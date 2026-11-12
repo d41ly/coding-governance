@@ -1,6 +1,6 @@
 export const meta = {
   name: 'tier2-review',
-  version: '1.60', // gov:kit tier2-review@1.60 // gov:kit review-harness@1.60 — BOTH ids: the
+  version: '1.61', // gov:kit tier2-review@1.61 // gov:kit review-harness@1.61 — BOTH ids: the
   // second is this entry's REGISTRY id, and without it a deployer grepping the id the
   // registry uses finds nothing. DEPL-dGaugedVintage-5. — engine identity (deployed verbatim; this field is the deployer's version marker)
   description:
@@ -1949,7 +1949,7 @@ function buildLensCall(L, run) {
         checklistBlock[L.key] +
         `\n` +
         (isSpec
-          ? `Emit CONCRETE findings only — each needs file, where, severity (blocker|high|medium|low), with "where" being the section address, e.g. "section 2 S5", a one-line claim, the impact, a proposed fix, and evidence: the command you ran and what it printed, or read: <path>:<line> for a finding that rests on reading alone. A spec finding is often the ABSENCE of a line, so address it by section. Every finding is ABOUT the spec set; its evidence may come from anywhere in ${repo} at HEAD.` +
+          ? `Emit CONCRETE findings only — each needs file, where, severity (blocker|high|medium|low), with "where" being the section address, e.g. "section 2 S5", a one-line claim, the impact, a proposed fix, and evidence: the command you ran and what it printed, or read: <path>#<symbol>, or the blob-pinned line <path>@<sha8>:<line> at HEAD, for a finding that rests on reading alone. A spec finding is often the ABSENCE of a line, so address it by section. Every finding is ABOUT the spec set; its evidence may come from anywhere in ${repo} at HEAD.` +
             (roles[finderKey] ? '' : ` No speculation, no style nits.`) + ` If nothing real, return findings: [].\n`
           : `Emit CONCRETE findings only — each needs file, line, severity (blocker|high|medium|low), a one-line claim, the impact, and a proposed fix. ` +
             (roles[finderKey] ? `Nothing outside the diff.` : `No speculation, no style nits, nothing outside the diff.`) + ` If nothing real, return findings: [].\n`) +
@@ -2239,7 +2239,7 @@ const verdictResults = await boundedParallel(
           `or \`duplicate of prior <ref>\` for a prior round's original; (6) a PREFERENCE that names no defect the rubric grades, not even a low.\n` +
           `Evidence that reads \`-\` was not recorded: probe the claim yourself and never confirm on the finder's word. ` +
           `A probe you could not run inside its bound is a finding you cannot establish; apply the default by the finder's grade, and never call it evidence that does not reproduce.\n\n`
-        : (roles.skeptic ? `For EACH finding below, ` : `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — `) + `read the actual code (Read/Grep the cited file:line and callers) and decide "confirmed" (real, reachable, impactful) or "refuted" (not reachable / not a bug / by-design / duplicate).\n` +
+        : (roles.skeptic ? `For EACH finding below, ` : `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — `) + `read the actual code (Read/Grep the cited line and its callers) and decide "confirmed" (real, reachable, impactful) or "refuted" (not reachable / not a bug / by-design / duplicate).\n` +
           // TOOL-dFairHearing-5 S3 - the spec skeptic's case (5) form, so a diff duplicate is read as one.
           `A DUPLICATE opens \`reason\` with \`duplicate of id=<n>\` for another finding in this batch that you CONFIRM in this same answer.\n\n`) +
         // TOOL-aSightedSkeptic-6 S4 - the default follows the FINDER's grade (spec section 8 F3). An
@@ -2748,7 +2748,7 @@ const synth = await agent(
     `holds to the grade that id takes, its binding grade unless you judge another grade right, and then write the reason ` +
     `in the report beside that finding. Set the item's severity to the highest of its grades, and rank the report's items ` +
     `by that severity, blockers first.` +
-    `\n\nWrite a markdown report (severity-ranked, blockers first, each with ${isSpec ? 'its file and section address' : 'file:line'} + fix + a left-shift gate suggestion) to a file under ${repo}/${reviewDir}. ` +
+    `\n\nWrite a markdown report (severity-ranked, blockers first, each with ${isSpec ? 'its file and section address' : 'the blob-pinned line <path>@<sha8>:<line> at the reviewed sha'} + fix + a left-shift gate suggestion) to a file under ${repo}/${reviewDir}. ` +
     // TOOL-aSightedSkeptic-2 S3 - a REJECTED fix never reaches the report as the fix.
     `Each CONFIRMED finding's fix line says whether a skeptic judged its fix. Where it is REJECTED, write the skeptic's ` +
     `corrected fix into the report, never the rejected one; where the note gives no correction, say the fix is still to be ` +

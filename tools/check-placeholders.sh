@@ -17,10 +17,11 @@
 # playbook file IS the un-instantiated template source and carries placeholders permanently and by
 # design. A leg asserting "no placeholder survives" over it would red on its own landing commit and
 # could never go green here. So that predicate takes explicit targets and is exercised only by
-# fixtures in the sibling test — never over the tracked source. The RENDER-side owner of it already
-# exists and stays where it is: govkit's `entries/playbook.kit.toml`'s `playbook-placeholders`
-# hole runs it over the DEPLOYED charter at `{playbook_path}`, which is the only place "survived" is
-# a meaningful question. The mode still takes TWO operands: an adopter whose charter renders beside a
+# fixtures in the sibling test — never over the tracked source. The RENDER-side owner of survival is
+# the renderer's own `--check`, which reports a placeholder that survives into the DEPLOYED charter,
+# the only place "survived" is a meaningful question; the `playbook` entry's placeholder hole, which
+# ran this mode over a seeded copy, left with that copy (PLAY-dOrderedCharter-31). The mode still
+# takes TWO operands: an adopter whose charter renders beside a
 # second filled file has two subjects, and one operand could not express that.
 set -u
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "check-placeholders: not a git repo"; exit 2; }

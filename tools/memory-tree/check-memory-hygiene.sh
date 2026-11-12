@@ -67,7 +67,7 @@ esac
 # no key at all, which the bar reads as a probe that could not answer rather than as a clean set.
 OFFENDERS=0; OFFENDER_KEYS=""
 if [ "${1:-}" = "--offenders" ]; then OFFENDERS=1; exec 3>&1 1>/dev/null; fi
-KIT_MEMORY_TREE_VERSION=2.157   # gov:kit memory-tree@2.157 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.158   # gov:kit memory-tree@2.158 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -109,7 +109,7 @@ _SPEC10_SHIPPED="$SPEC10_CUTOFF"   # captured BEFORE the source, so the fallback
 SPEC10_EVIDENCE_CUTOFF=""   # date; a Tier-2 spec dated >= this must RECORD its reuse audit (check 12); blank = never required
 # The SIXTH cutoff, same semantics as the three RULE cutoffs and preset here for the same adopter
 # argument the paragraph above states (TOOL-aJoinedCanon-1).
-REV_SCOPE_CUTOFF=""     # date; specs dated >= this must give every rev-2+ §9 entry a §n/Sn/ACn scope token (check 12); blank = never required
+REV_SCOPE_CUTOFF=""     # date; specs dated >= this: every rev-2+ revision-log entry must name a section, scope id or acceptance id (the template-conformance check); blank = never required
 # The SEVENTH cutoff, same semantics and preset for the same adopter argument (TOOL-aJoinedCanon-3).
 SCOPE_JOIN_CUTOFF=""    # date; specs dated >= this must have every §2 scope item name an AC label or NOT OBSERVED (check 12); blank = never required
 # The EIGHTH cutoff, same semantics and preset for the same adopter argument (TOOL-aJoinedCanon-4).
@@ -939,6 +939,10 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   # under <M>/project/, so an adopter of that kit owns the file whether or not it lists it in
   # PROJECT_REGISTRY_EXTRA. TOOL-aRepatriatedFork-10 S4.
   F:pass-order-waiver.txt) ;;
+  # The same class: the playbook kit's positional check reads its list at this DEFAULT path under
+  # <M>/project/ and reds it absent, so the kit's write mode writes it empty at every target
+  # (PLAY-dOrderedCharter-72).
+  F:positional-refs.txt) ;;
   # The same class again: the roles kit's catalogue checker reads the owner's stand-in waivers at
   # this DEFAULT path under <M>/project/ (TOOL-aOrientedCast-19 S5).
   F:role-stand-in-waiver.txt) ;;
@@ -2512,6 +2516,8 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
     # ---- The section-sign half is index()+substr() rather than a regex because the byte is multibyte
     # ---- and length() returns 2 on a byte-oriented awk and 1 on gawk in a UTF-8 locale; substr counts
     # ---- in whatever unit length just returned, so the pair is consistent in either interpreter.
+    # ---- The words half lowers the entry and needs the word section, whitespace, then a digit, so a
+    # ---- capitalised word and a wrap between the two count and the plural alone does not.
     # ---- (No apostrophe below this line: the whole awk program is one single-quoted shell string.)
     if (revscopecut != "" && fdate != "" && fdate >= revscopecut) {
       rs_in9 = 0; rs_ne = 0
@@ -2532,7 +2538,7 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
       for (i = 1; i <= rs_ne; i++) {
         if (rs_num[i] < 2) continue
         rs_E = rs_txt[i]; rs_p = index(rs_E, "§")
-        rs_has = (rs_p > 0 && substr(rs_E, rs_p + length("§"), 1) ~ /[0-9]/) || (rs_E ~ /(^|[^A-Za-z0-9])(S|AC)[0-9]/)
+        rs_has = (rs_p > 0 && substr(rs_E, rs_p + length("§"), 1) ~ /[0-9]/) || (rs_E ~ /(^|[^A-Za-z0-9])(S|AC)[0-9]/) || (tolower(rs_E) ~ /(^|[^a-z0-9])section[[:space:]]+[0-9]/)
         if (!rs_has) { rs_nb++; rs_bad = (rs_nb == 1) ? "rev-" rs_num[i] : rs_bad ", rev-" rs_num[i] }
       }
       if (rs_nb > 0)
@@ -3214,7 +3220,7 @@ if check_selected 27; then
 # 27 — a decision row or gotcha ADDED since the mainline merge-base that ranks as a near match of an
 # older record must name it, or carry a relation token. Delegated to row_grammar.py, the row
 # grammar's owner, for the reason 20 and 24 are (TOOL-cSpliceWarden-6), and ranked with the
-# memory-recall kit's own index builder (TOOL-aGraftedHelix-9). Full runs only: it reads a commit
+# index builder of this kit's id_grammar.py (TOOL-aGraftedHelix-9). Full runs only: it reads a commit
 # range, which a staged selection has no use for. The capture is printed on a GREEN run too, because
 # its summary line, or its NOT ARMED line, is the only evidence the check graded anything.
 if [ "$STAGED" = 0 ]; then
@@ -3499,8 +3505,8 @@ if [ -n "$alcut" ]; then
           lab = line
           sub(/^[ \t]*(-|\*)?[ \t]*(\*\*)?/, "", lab); sub(/[^A-Za-z0-9].*$/, "", lab)
           labs[++nlab] = lab
-          labt[nlab] = altoks(line)
-        } else if (nlab > 0 && line !~ /^[ \t]*$/) labt[nlab] = labt[nlab] altoks(line)
+          labx[nlab] = line
+        } else if (nlab > 0 && line !~ /^[ \t]*$/) { t = line; sub(/^[ \t]+/, "", t); labx[nlab] = labx[nlab] " " t }
       }
       close(f)
       if (hdr !~ / CLOSED /) next
@@ -3514,14 +3520,24 @@ if [ -n "$alcut" ]; then
       labera = (lcut != "" && substr(base, 1, 10) >= lcut) ? 1 : 0
       tokera = (tcut != "" && substr(base, 1, 10) >= tcut) ? 1 : 0
       print "U\t" seq "\t" uid "\t" labera "\t" tokera
-      for (i = 1; i <= nlab; i++) print "L\t" seq "\t" uid "\t" labs[i] "\t" labt[i]
+      for (i = 1; i <= nlab; i++) print "L\t" seq "\t" uid "\t" labs[i] "\t" altoks(labx[i])   # S16: a bullet joined, a wrapped span one token
     }
-    function altoks(s,   r, t) {
+    # PLAY-dOrderedCharter-77 S16: read over a JOINED bullet, so a span is closed as Markdown closes it, by
+    # a run of as many backticks as opened it; an unclosed run is literal text. Per line, a double-backtick
+    # span paired wrong and the line end reset the error; joined, it would shift every later pair. A
+    # backtick inside a span becomes a space, so the backtick stays a safe separator.
+    function altoks(s,   r, t, n, rest, k) {
       r = ""
-      while (match(s, /`[^`]+`/)) {
-        t = substr(s, RSTART + 1, RLENGTH - 2)
-        r = r t "`"
-        s = substr(s, RSTART + RLENGTH)
+      while (match(s, /`+/)) {
+        n = RLENGTH; rest = substr(s, RSTART + n); s = rest; t = ""; k = 0
+        while (match(rest, /`+/)) {
+          if (RLENGTH == n) { k = 1; t = t substr(rest, 1, RSTART - 1); break }
+          t = t substr(rest, 1, RSTART + RLENGTH - 1); rest = substr(rest, RSTART + RLENGTH)
+        }
+        if (!k) continue
+        s = substr(rest, RSTART + n)
+        gsub(/`/, " ", t)
+        if (t != "") r = r t "`"
       }
       return r
     }')

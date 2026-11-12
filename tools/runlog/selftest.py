@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""selftest.py — the runlog kit's arms. gov:kit runlog@1.14
+"""selftest.py — the runlog kit's arms. gov:kit runlog@1.15
 
     python <this kit>/selftest.py
 
@@ -7013,7 +7013,7 @@ def test_source_ac7_discovered_reach():
 def test_window_ac1_ac4_git_only_bounds():
     """AC1 and AC4: over one landed fixture the model's `record_window` IS the window the schema leg
     derives for that run, the Summary renders that window's start and closing time with `duration` their
-    difference, and a model carrying no `record_window` renders both facts `-`."""
+    difference, and a model carrying no `record_window` renders both facts' slots `-`."""
     fx = build_landed_fixture()
     j = write_journals(fx["repo"].parent, driver=fx["driver"], gates=fx["gates"], pushes=fx["pushes"])
     model = build_model(fx["repo"], journals=j)
@@ -7036,7 +7036,8 @@ def test_window_ac1_ac4_git_only_bounds():
     facts = parse_record_markdown(text)["Summary"]["facts"]
     check("window AC1: the Summary window is the start commit's time and the LANDED write's, and its "
           "duration is their difference", (facts["window"], facts["duration"]),
-          (f"{rl_model.derive_iso(start_t)} to {rl_model.derive_iso(close_t)}", f"{close_t - start_t}s"))
+          (f"{rl_model.derive_iso(start_t)} to {rl_model.derive_iso(close_t)}",
+           f"{close_t - start_t}s · DERIVED from the window"))
     check("window AC1: both rendered bounds are committer times of commits this fixture made",
           [b for b in facts["window"].split(" to ") if rl_model.parse_iso(b) not in times.values()], [])
     check("window AC1: a last-activity end closes at the closing commit's own time, the half-open "
@@ -7045,12 +7046,35 @@ def test_window_ac1_ac4_git_only_bounds():
           (model.record_window["start"], model.record_window["end"] - 1.0))
     bare = {k: v for k, v in dataclasses.asdict(model).items() if k != "record_window"}
     without = parse_record_markdown(rl_record.render_record(bare, "memory"))["Summary"]["facts"]
-    check("window AC4: a model carrying no record_window renders the window and duration facts `-`",
-          (without["window"], without["duration"]), ("- to -", "-"))
+    check("window AC4: a model carrying no record_window renders the window and duration slots `-`",
+          (without["window"], without["duration"]), ("- to -", "- · DERIVED from the window"))
     check_true("window AC4 liveness: the same model WITH the field rendered a time in each bound, so the "
                "`-` above is the field's absence and not the fixture's",
                all(rl_model.parse_iso(b) is not None for b in facts["window"].split(" to ")),
                facts["window"])
+
+
+def test_record_duration_derived_mark():
+    """PLAY-dOrderedCharter-78 S8: the rendered `duration` line carries its DERIVED mark after the count,
+    where the pinned-facts check reads it, and a record holding the bare form, as every record landed
+    before the mark does, still grades clean under the record's own check."""
+    fx = build_landed_fixture()
+    j = write_journals(fx["repo"].parent, driver=fx["driver"], gates=fx["gates"], pushes=fx["pushes"])
+    model = build_model(fx["repo"], journals=j)
+    text = rl_record.render_record(model, "memory", rl_record.measure_commitment(model, j))
+    line = next((ln for ln in text.split("\n") if ln.startswith("- duration: ")), "")
+    count = line[len("- duration: "):].split(" ")[0]
+    check_true("duration S8: the render writes the count then its DERIVED mark",
+               re.fullmatch(r"- duration: [0-9]+s · DERIVED from the window", line) is not None, line)
+    own = [u["id"] for u in dataclasses.asdict(model)["units"] if u.get("id")]
+    checks = rl_record.build_record_checks(FX_SLUG, "memory", own)
+    marked = rl_record.check_record_lines(text.split("\n"), checks, FX_SLUG, own)
+    bare = text.replace(line, f"- duration: {count}").replace(f'"{line[len("- duration: "):]}"', f'"{count}"')
+    check_true("duration S8 liveness: the bare record differs from the render in both copies of the fact",
+               bare.count(f"{count} · DERIVED") == 0 and text.count(f"{count} · DERIVED") == 2,
+               str((bare.count(f"{count} · DERIVED"), text.count(f"{count} · DERIVED"))))
+    check("duration S8: the record's check grades the marked render and the bare record alike, clean",
+          (marked, rl_record.check_record_lines(bare.split("\n"), checks, FX_SLUG, own)), ([], []))
 
 
 
@@ -7209,7 +7233,7 @@ def test_record_placement_windows():
         check(f"record AC1: the {name} placement's window is two committer times git printed, and its "
               "duration is their difference", (facts["window"], facts["duration"]),
               (f"{rl_model.derive_iso(start_t)} to {rl_model.derive_iso(close_t)}",
-               f"{close_t - start_t}s"))
+               f"{close_t - start_t}s · DERIVED from the window"))
         seen.update((facts["window opened by"], facts["window closed by"]))
         lag[name] = {k: facts[k] for k in PLACEMENT_LAG}
         # AC3: a commit of one other path, naming no unit, is no record commit at all.

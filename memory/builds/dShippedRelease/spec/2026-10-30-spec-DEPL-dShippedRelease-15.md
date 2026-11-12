@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-15 — promotion through environments: the `integrations` kit, the seven `release.*` items and a compare-and-swap on every promote
 
-**Status:** DEFERRED · rev-6 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 12 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-7 · 2026-11-04 · node d · Tier-2 · base f4597719 · streams deployer · order 12 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0425@3b7313d6 whole
 **Carries:** node:item.release.pick
@@ -43,7 +43,7 @@ where `deploy.runs` names the operator.
 
 ## 2. Scope (IN)
 
-- **S1** — The kit, by `python tools/playbook/core.py new kit integrations --layer layer.integrations`
+- **S1** — The kit, by `python tools/playbook/core.py new tool-kit integrations --layer layer.integrations`
   (DEPL-dShippedRelease-10 S4): `tools/integrations/kit.toml`, `requires = ["loop", "runtime"]`,
   holding `adapters.py`, `release.py`, `release_fixture.py` and `README.md`. No clause of the 31 names
   the kit and v2's `layer-expansions.md:327` does, so this unit creates it (scout C disagreement 8).
@@ -146,7 +146,7 @@ where `deploy.runs` names the operator.
   `help/README.md`, stating what a release does, each key and how to list an environment. NOT OBSERVED
   by a criterion: prose, read by the memory hygiene leg at the close.
 
-**Build-run preconditions**: `core.py new kit` (DEPL-dShippedRelease-10), `--lease`
+**Build-run preconditions**: `core.py new tool-kit` (DEPL-dShippedRelease-10), `--lease`
 (TOOL-dPlacedRequest-1, -16, -18), `write_gov_ref` (-11), `points.toml` and the grant check
 (TOOL-dWellOiledMachine-20, -17), `point.cadence-items` (-59), `raise_owner_item` (-48), `intake.py`
 (-4, -27), `read_items` (TOOL-dDeclaredLoop-12), `record-kinds.toml` (TOOL-dTotalRecall-1),
@@ -309,7 +309,7 @@ Dark: `release.environments` defaults empty, so `tick` prints `release — no en
 ### Files touched (estimate)
 
 - `tools/integrations/kit.toml` (new), `tools/integrations/adapters.py` (new), `tools/integrations/release.py` (new), `tools/integrations/release_fixture.py` (new), `tools/integrations/README.md` (new)
-- `tools/govkit/registry.toml`: the kit's entry, written by `core.py new kit`
+- `tools/govkit/registry.toml`: the kit's entry, written by `core.py new tool-kit`
 - `tools/runtime/points.toml`: S3, S13, S14
 - `tools/runtime/owner_items.py`: the four members
 - `tools/loop/loop.toml`: S14
@@ -356,7 +356,7 @@ Dark: `release.environments` defaults empty, so `tick` prints `release — no en
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python core.py new kit integrations --layer layer.integrations` has run at the pass, the
+- **AC1** — When `python core.py new tool-kit integrations --layer layer.integrations` has run at the pass, the
   kit's descriptor is tracked and the kit conformance gate of DEPL-dShippedRelease-10 grades it, exit 0.
   Red when: the kit fails the factory's own gate.
 - **AC2** — When `python adapters.py --check` runs over a fixture with a row missing each of `kind`,
@@ -468,12 +468,13 @@ New arm: tools/integrations/adapters.py · covers AC2 · `--check` over the plan
 - rev-4 · 2026-11-01 · §3 · the Edges gain the mirror of each edge the round-3 spec audit's promoted units declare toward this unit (units 124, 125); no scope, design or criterion moved.
 - rev-5 · 2026-11-01 · §3 · the Edges gain the mirror of each edge the round-4 spec audit's promoted units declare toward this unit (units 134); no scope, design or criterion moved.
 - rev-6 · 2026-11-01 · §3 · the Edges gain the mirror of each edge the round-5 spec audit's promoted units declare toward this unit (units 144); no scope, design or criterion moved.
+- rev-7 · 2026-11-04 · S1, AC1 · the factory `core.py new kit` becomes `core.py new tool-kit` in those items, the build-run preconditions, the files-touched list and the reuse audit. Every plain-prose kit stays. Cause: PLAY-dOrderedCharter-65 renamed the kind, and this is an outside write recorded by dOrderedCharter under `2026-11-04-prompt-PLAY-dOrderedCharter-65-kind-rename-fold-brief`; no other meaning moved.
 
 ## 10. Reuse audit
 
 The seams are `--lease` (TOOL-dPlacedRequest-1, called directly), `read_held_reds`' shape
 (`tools/unattended/unattended.sh:10113`), the `[[adapter]]` row of `tools/runtime/points.toml`
-(TOOL-dWellOiledMachine-20), and the factory `core.py new kit` (DEPL-dShippedRelease-10). `python
+(TOOL-dWellOiledMachine-20), and the factory `core.py new tool-kit` (DEPL-dShippedRelease-10). `python
 tools/codebase-map/reuse_lookup.py "promote a sha through environments with a compare-and-swap on the current
 deployment id"` returned `resolve_compare_base`, `add_deploy_kits` and id helpers, none a promotion, so no
 shipped seam fits beyond those. Scout C's row holds at `5d1c82ac`, with one correction to scout C's

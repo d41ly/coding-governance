@@ -41,6 +41,11 @@ in one place.
   `<cap> <value> <mode> <source>`, tab-separated. `python tools/policy/budgets.py check AGENTS.md
   25000` prints the verdict line and exits 1 when it refuses. Both read the policy file **as
   committed at the landed revision**, as `policy.py get` does, never your working tree.
+- **Ask where a cap's value lives:** `budgets.py home codex-instructions`, run in the repository,
+  prints one row, `<cap> <home> <value>`, tab-separated: the census row's home as `caps.toml` spells
+  it, and for a `constant:` home the integer its file assigns, read from your working tree; `-` for
+  any other home. A cap with no census row, or a constant its file does not assign as an integer,
+  refuses with exit 2, naming the file. The size gate reads Codex's limit for the charter this way.
 
 ## Which caps sit outside the switch
 
@@ -48,7 +53,7 @@ A cap whose consumer drops what is over it, or a check of correctness, is no siz
 switch never reaches it:
 
 - **consumer limits** keep their own behaviour: the orientation card's 8192 bytes, Codex's 32 KiB of
-  project instructions (announced by the agent-instructions adopter), a runlog record, a codebase-map
+  project instructions (the render's harness limit, which refuses a charter past it), a runlog record, a codebase-map
   feature card and a hook's 10000-character context.
 - **correctness checks** keep refusing under `warn`: the template-size gate's checks 3, 5 and 6 (a
   record or a declared limit that is not a number, and a document whose own `**Budget:` line disagrees
@@ -70,10 +75,14 @@ No value moved: every cap keeps the value its home holds.
 - **A declaration beside its gate** holds the line-length rows and the build README's slot ceilings.
 - **A constant in the gate** holds the rest: role bodies, the one-line rule, the roster line, the
   manifest's caps and the recall export.
+- **A policy key** holds one family: `code-slot`, the code block a role's handoff carries, takes its
+  value from `memory.code-budget`, `16k` or 16,000 bytes by default. Its census home reads
+  `policy:memory.code-budget`, a form only a family row may take, so `budgets.code-slot` can never be
+  a second home for the same value; set the key instead.
 
 A cap can take a value from the policy file too, `budgets."AGENTS.md" = 21000` say, but a cap held
 both there and in its legacy home refuses rather than picking one, and a family cap (line lengths,
-README slots, role bodies, one value per subject) takes no value from the policy file at all. A
+README slots, role bodies, the code slot, one value per subject) takes no value from the policy file at all. A
 value of `0` means unchecked, as it does in every legacy home; a negative value or one that is not a
 whole number makes the file invalid.
 

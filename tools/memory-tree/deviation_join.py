@@ -142,17 +142,13 @@ from design_lib import (  # noqa: E402  the one parser of the design, and its cl
     read_spec_revisions, read_tracked_builds, scan_chain_specs, write_design_fixture)
 from tree_lib import (  # noqa: E402
     GIT_ENV_LEAKS, HDR_RE, parse_conf, parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at)
+from build_records import (  # noqa: E402  the typed record factory: FIELD, the grammar of deviations.py:123
+    FIELD, derive_stem, read_record as read_typed_record, read_records as read_typed_records)
 
 SAY = "deviation"
 POLICIES = ("report", "refuse")
 APPROVALS = ("author-recorded", "by-risk")
 HOST_POLICY, HOST_APPROVAL = "report", "author-recorded"   # the chain's values, PLAY-dClosedLoop-4
-FIELD = re.compile(r"^- \*\*([A-Z][a-z-]+(?: [a-z]+)?):\*\* (.+)$")     # deviations.py:123
-REQUIRED = ("Departs from", "Hand-off", "Before", "After", "Cause", "Reason", "Evidence", "Risk", "Approver",
-            "Follow-through", "Caused-by")
-HANDS = ("design-to-spec", "design-revised", "spec-revised", "spec-to-code", "code-to-record")
-CAUSES = ("design defect", "owner ruling", "builder discovery", "review finding", "external")
-RISKS = ("editorial", "additive", "stricter", "loosening", "breaking")
 ROLES = ("spec writer", "author", "owner")      # the record grammar's approver roles, the longest first
 RANK = {"author": 0, "spec writer": 1, "owner": 2}
 LEAST = {"editorial": "author", "additive": "spec writer", "stricter": "spec writer", "loosening": "owner",
@@ -161,8 +157,7 @@ _ID =r"[A-Za-z]+-[A-Za-z0-9]+-\d+"
 DEPARTS = re.compile(r"^(`?)(?:" + _CL + r"@[0-9a-f]{8}|" + _ID + r"@rev-\d+|d[A-Z]\w+)\1(?: \[[^\]]+\])?$")
 FOLLOW = re.compile(r"^(?:amends " + _CL + r"@[0-9a-f]{8}|supersedes " + _CL + r"@[0-9a-f]{8} by " + _CL
                     + r"|new unit " + _ID + r"|(?:gap|ask|usage) \S+)$")
-_STEM = r"\d{4}-\d{2}-\d{2}-build-" + _ID + r"-deviation-"      # a record's stem, its <n> following
-RECORD_NAME = re.compile(r"(?:^|/)builds/(?P<build>[^/]+)/build/" + _STEM + r"(?P<n>\d+)\.md$")
+_STEM = derive_stem("deviation")                                 # a record's stem, its <n> following
 SUPERSEDES = re.compile(r"(`?)(" + _STEM + r"\d+)\1")           # one record id, quoted or bare
 RESCOPE = re.compile(r"^\S+ rescope · item (add|retire|supersede|defer) (\S+)(?: -> (\S+))? · reason (.*)$", re.M)
 LEDGER = re.compile(r"^- (\S+) — amended rev-(\d+)\b")
@@ -214,34 +209,20 @@ def read_join_state(root, conf):
 
 
 # ------------------------------------------------------------------------------------- the record
-def read_record(path, text):
-    """One record: its fields, keyed for the join, and `malformed`, `[(field, why)]` naming each field
-    the grammar refuses. The fields are returned whatever that list holds."""
-    lines = text.replace("\r\n", "\n").split("\n")
-    fields, bad, seen = {}, [], {}
-    for n, ln in enumerate(lines):
-        m = FIELD.match(ln)
-        if not m:
-            continue
-        key, value = m.group(1), m.group(2).strip()
-        if key in seen:
-            bad.append((key, f"is given twice, at lines {seen[key]} and {n + 1}"))
-            continue
-        seen[key] = n + 1
-        fields[key] = value
-        nxt = lines[n + 1] if n + 1 < len(lines) else ""
-        if key in ("Before", "After") and nxt.strip() and not nxt.startswith(("- **", "#")):
-            bad.append((key, "runs past its one line"))
-        if key == "After" and "|" in value:
-            bad.append((key, "holds a `|`: the as-built view renders **After:** as the Text cell of its "
-                             "clause's row, and the pipe would split that cell in two"))
-    name = RECORD_NAME.search(path)
-    if not name:
-        bad.append(("file name", "is not <date>-build-<unit id>-deviation-<n>.md in a build's build/ folder"))
-    bad += [(k, "is missing") for k in REQUIRED if k not in fields]
-    for key, allowed in (("Hand-off", HANDS), ("Cause", CAUSES), ("Risk", RISKS)):
-        if key in fields and fields[key] not in allowed:
-            bad.append((key, f"{fields[key]} is outside {' · '.join(allowed)}"))
+def check_deviation_line(key, value, nxt):
+    """The deviation kind's per-field rules, read as `build_records.read_record` reads each field."""
+    bad = []
+    if key in ("Before", "After") and nxt.strip() and not nxt.startswith(("- **", "#")):
+        bad.append((key, "runs past its one line"))
+    if key == "After" and "|" in value:
+        bad.append((key, "holds a `|`: the as-built view renders **After:** as the Text cell of its "
+                         "clause's row, and the pipe would split that cell in two"))
+    return bad
+
+
+def check_deviation_fields(fields):
+    """The deviation kind's whole-record rules: `DEPARTS` and `FOLLOW`."""
+    bad = []
     if "Departs from" in fields and not DEPARTS.match(fields["Departs from"]):
         bad.append(("Departs from", f"{fields['Departs from']} is no <clause id>@<hash8>, <unit>@rev-N or build slug"))
     follow = fields.get("Follow-through", "")
@@ -249,8 +230,15 @@ def read_record(path, text):
         why = ("names no clause at an eight-hex hash" if re.match(r"(amends|supersedes)\b", follow) else
                "is outside amends · supersedes · new unit · gap · ask · usage, written unquoted")
         bad.append(("Follow-through", f"{follow} {why}"))
-    if "Caused-by" in fields and not re.fullmatch(r"`?[^\s`]+`?", fields["Caused-by"]):
-        bad.append(("Caused-by", f"{fields['Caused-by']} is not one id"))
+    return bad
+
+
+def read_record(path, text):
+    """One record: its fields, keyed for the join, and `malformed`, `[(field, why)]` naming each field
+    the grammar refuses. The fields are returned whatever that list holds. The grammar, its name rule,
+    required fields and closed sets are `build_records`'; the pipe, `DEPARTS`, `FOLLOW` and
+    `**Supersedes:**` are this kind's own."""
+    fields, bad, name = read_typed_record(path, text, "deviation", check_deviation_line, check_deviation_fields)
     supersedes = fields.get("Supersedes")
     named = SUPERSEDES.fullmatch(supersedes or "")
     if supersedes is not None and not named:
@@ -278,23 +266,9 @@ def read_records(root, conf):
     The population is `design_lib.read_tracked_builds`', the one the records tables read through
     `gen_build_index.plan()`, so an untracked draft moves neither the view nor the join, and a record
     staged and not committed is read (TOOL-dTrueNorth-26 S7). A tracked path absent from the working
-    tree is read as absent. A failed `ls-files` is its `DesignRefusal`, which each caller maps."""
-    memory_root = (conf.get("MEMORY_ROOT") or "memory").strip().strip("/")
-    glob = re.compile(re.escape(memory_root) + r"/builds/[^/]+/build/[^/]*-deviation-[^/]*\.md")
-    records = []
-    for rel in sorted(p for p in read_tracked_builds(root, memory_root) if glob.fullmatch(p)):
-        p = pathlib.Path(root, rel)
-        if p.is_file():
-            records.append(read_record(rel, p.read_bytes().decode("utf-8", "replace")))
-    shared = {}
-    for r in records:
-        if r["n"] is not None:
-            shared.setdefault((r["build"], r["n"]), []).append(r)
-    for (_b, n), group in shared.items():
-        for r in group if len(group) > 1 else ():
-            others = ", ".join(o["path"] for o in group if o is not r)
-            r["malformed"].append(("file name", f"shares deviation-{n} with {others}"))
-    return records
+    tree is read as absent. A failed `ls-files` is its `DesignRefusal`, which each caller maps. The
+    population and the `<n>` collision are `build_records.read_records`'."""
+    return read_typed_records(root, conf, "deviation", read_record)
 
 
 # ------------------------------------------------------------------------------------ the history

@@ -19,6 +19,8 @@ owner = "dKeptSession"
 name = "charter.override"
 allowed = ["explicit-override", "live-owner-wins", "absolute"]
 default = "explicit-override"
+summary = "Which wins when a live instruction conflicts with the charter: the charter unless the owner overrides it in so many words, the live owner instruction, or the charter always; an override taken is recorded in the build's folder."
+usage = 'charter.override = "absolute"'
 owner = "dOrderedCharter"
 
 [[key]]
@@ -26,18 +28,24 @@ name = "charter.practices"
 allowed = { type = "set", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "catalogue or repo-declared practices" }
 empty = "never"
 default = { derived = "the governance foundation set" }
+summary = "Which practices the rendered charter carries: practice tags or pack names, and unset, the catalogue's foundation set."
+usage = 'charter.practices = ["practice.yagni", "practice.reuse"]'
 owner = "dOrderedCharter"
 
 [[key]]
 name = "core.bypass"
 allowed = ["with-hooks-report", "with-hooks-block", "never"]
 default = "with-hooks-report"
+summary = "Whether a permitted bypass skips the core checks with every other leg, its core red reported or blocking after, or never: under never the meta-check reds a core leg that carries a leg guard."
+usage = 'core.bypass = "never"'
 owner = "dOrderedCharter"
 
 [[key]]
 name = "core.exceptions"
 allowed = ["any-session-recorded", "owner-only-expiring", "none"]
 default = "any-session-recorded"
+summary = "Which exception records excuse a core red: any well-formed record a session wrote, only an owner-written one whose expiry is still ahead, or none, every record then red."
+usage = 'core.exceptions = "owner-only-expiring"'
 owner = "dOrderedCharter"
 
 [[key]]
@@ -645,17 +653,23 @@ name = "instructions.checks"
 allowed = ["refuse", "warn", "record"]
 default = "refuse"
 owner = "dOrderedCharter"
+summary = "What a render does when a reader's load set lacks a unit its required-by names: refuse the render, render with a missing-unit line the reader sees, or render and record the gap in the prompt record."
+usage = 'instructions.checks = "warn"'
 
 [[key]]
 name = "instructions.edit"
 allowed = ["owner-command-agents-propose", "flow-only", "command-for-all"]
 default = "owner-command-agents-propose"
+summary = "Who writes an instruction unit: the owner through the write command with agents only proposing, any caller of it, or only the flow's item."
+usage = 'instructions.edit = "command-for-all"'
 owner = "dOrderedCharter"
 
 [[key]]
 name = "instructions.proof"
 allowed = ["tty-cli", "signed", "both"]
 default = "tty-cli"
+summary = "What shows the write command's caller is the owner: standard error being a terminal, with the signed proof and both refused until that component lands."
+usage = 'instructions.proof = "tty-cli"'
 owner = "dOrderedCharter"
 
 [[key]]
@@ -663,12 +677,16 @@ name = "instructions.exclude"
 allowed = { type = "set", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "gov tags of any kind the overlay holds, a fixed one, one another active row needs, names as its actor or grants, and one a policy value names refused, each refusal naming the requirer or the key" }
 empty = "allowed"
 default = []
+summary = "Which of gov's instruction units and registered rows your repository leaves out: each listed gov tag is absent from the composition and its state reads excluded; a tag no unit or row of gov's holds is refused."
+usage = 'instructions.exclude = ["unit.push-after-review"]'
 owner = "dOrderedCharter"
 
 [[key]]
 name = "instructions.stale"
 allowed = ["order", "refuse", "warn"]
 default = "order"
+summary = "What update does when gov changed the meaning of a unit your overlay pins: render both texts and write an outbox order, hold the update until you re-pin, or render both and journal the edge with no order."
+usage = 'instructions.stale = "warn"'
 owner = "dOrderedCharter"
 
 [[key]]
@@ -1335,36 +1353,48 @@ owner = "dGroundRules"
 name = "tags.slice"
 allowed = ["leaf", "subtree"]
 default = "leaf"
+summary = "What `gov tag show` returns for a tag: its own row, or its subtree, every tag with it as a dot-prefix."
+usage = 'tags.slice = "subtree"'
 owner = "dOrderedCharter"
 
 [[key]]
 name = "tags.retired-cites"
 allowed = ["refuse-new", "warn", "allow"]
 default = "refuse-new"
+summary = "What `gov tag check` does with new text citing a retired tag: refuse it, warn, or allow it; a retired name minted again is refused under every value."
+usage = 'tags.retired-cites = "warn"'
 owner = "dOrderedCharter"
 
 [[key]]
 name = "tags.positional"
 allowed = ["shrink-only", "refuse", "report"]
 default = "shrink-only"
+summary = "What `gov tag check` does with a positional reference, a file:line citation or a section number: red it unless the positional list holds it, red it listed or not, or only print it."
+usage = 'tags.positional = "report"'
 owner = "dOrderedCharter"
 
 [[key]]
 name = "tags.bare-refs"
 allowed = ["charter-only", "unique", "never"]
 default = "charter-only"
+summary = "How `gov tag check` reads a bare name, a tag less its namespace: as a charter practice only, against every namespace and red where two match, or red anywhere outside the charter."
+usage = 'tags.bare-refs = "unique"'
 owner = "dOrderedCharter"
 
 [[key]]
 name = "tags.bundle"
 allowed = ["manifest", "inline", "both"]
 default = "both"
+summary = "What `gov tag bundle` does with a range's content: print the manifest alone and refuse --inline, inline every call under its --bytes budget, or print the manifest and inline on --inline."
+usage = 'tags.bundle = "manifest"'
 owner = "dOrderedCharter"
 
 [[key]]
 name = "tags.bundle-rows"
 allowed = [20, 40, 80]
 default = 40
+summary = "How many rows `gov tag bundle` prints before it folds rows by their kit directory, the largest group first; --under opens a folded group."
+usage = 'tags.bundle-rows = 80'
 owner = "dOrderedCharter"
 
 [[key]]
@@ -1395,6 +1425,8 @@ owner = "dFurnishedOrders"
 name = "instructions.legacy"
 allowed = ["shrink-only", "refuse"]
 default = "shrink-only"
+summary = "What the render gate does with the list of instruction files not yet rendered from units: hold it to shrinking, a listed file rendered from units reading as stale, or refuse every listed file."
+usage = 'instructions.legacy = "refuse"'
 owner = "dOrderedCharter"
 
 [[key]]

@@ -1,4 +1,5 @@
-<!-- gov:kit unattended@1.118 -->
+<!-- gov:kit unattended@1.119 -->
+[memory/guides/UNATTENDED-STOPS.md · Level 3 · Binding for an unattended run that stops without finishing; yields to levels 0 to 2]
 # The unattended stop contract — HELD, the hold codes and the lease
 
 *Installed beside `UNATTENDED-PROTOCOL.md` from the unattended kit and byte-compared against the
@@ -716,3 +717,4 @@ order and each unmet one named with its unit:
    unmet, naming the missing contract;
 5. no CLOSED unit's spec declares a `consumes-from` edge onto it, because a closed half that needs
    the open half is not landable, and that build is a HAND OFF instead.
+[/memory/guides/UNATTENDED-STOPS.md]

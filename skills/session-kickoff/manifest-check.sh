@@ -29,7 +29,9 @@
 #     its spec and the brief must RESOLVE, or nothing is appended (KICK-aRoutedQuill-1).
 #     The card verbs run NO manifest check: the session id comes from the SessionStart hook's JSON
 #     on stdin, else --session (--append: --session alone, stdin is the body); the card lives at
-#     <git-common-dir>/orientation/<sid>.md, shared by every worktree; the `node —` cell resolves
+#     <git-common-dir>/orientation/<sid>.md, shared by every worktree, and --write, --replay and
+#     --append re-render it, enveloped, into the session tree's ignored .claude/orientation-card.md
+#     (PLAY-dOrderedCharter-8: the payload `cwd`'s toplevel, else this tree); the `node —` cell resolves
 #     through the manifest audit block's `registry:` key. The append and the check do NOT judge
 #     relevance, scope, tier, or the truth of a claim at the line it cites — existence only.
 #
@@ -43,7 +45,7 @@
 #          READY line pins a BASE that is not HEAD, an id reader that could not answer, or a route
 #          the tree cannot check: no MEMORY_ROOT, or no defined-id set).
 set -u
-KIT_MANIFEST_VERSION="1.33"   # gov:kit kickoff-manifest@1.33 — the registry id
+KIT_MANIFEST_VERSION="1.34"   # gov:kit kickoff-manifest@1.34 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
 # VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
 # MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`
@@ -219,9 +221,15 @@ CARD_CAP_BYTES=${CARD_CAP_BYTES:-8192}
 # does; neither is an adopter knob.
 CARD_OVERLAP_BOUND=${CARD_OVERLAP_BOUND:-10}
 CARD_OVERLAP_ROWS=5
+# The replay's `map —` block's bound in seconds (PLAY-dOrderedCharter-4); the env override exists for
+# the self-test's slow-stub arm and is not an adopter knob.
+CARD_MAP_BOUND=${CARD_MAP_BOUND:-5}
 # The `cli —` cell's bound on `claude --version`, in seconds (KICK-aMendedFleet-4); the env override
 # exists for the self-test's slow-stub arm and is not an adopter knob.
 CARD_CLI_BOUND=${CARD_CLI_BOUND:-5}
+# The `memory —` cell's bound on the playbook kit's index measure, in seconds (PLAY-dOrderedCharter-14);
+# the env override exists for the self-test's slow-stub arm and is not an adopter knob.
+CARD_MEMORY_BOUND=${CARD_MEMORY_BOUND:-5}
 # The `claims —` cell's three constants (TOOL-aGraftedHelix-2): the read's bound in seconds, the
 # second clock's hide age, and the row cap. The bound's env override exists for the self-test's
 # slow-driver arm, as CARD_CAP_BYTES's does; none of the three is an adopter knob.
@@ -289,10 +297,21 @@ add_health_event() {
 # the `sed` below blocks forever, including for a caller that had already answered by flag.
 # Neither channel is a refusal naming both, never a card under a guessed id; a separator, `..` or
 # any byte outside [A-Za-z0-9._-] is refused before it can be joined into a path. `--append` never
-# reads stdin here — stdin is the body it stores — so it takes `--session` alone.
+# reads stdin here — stdin is the body it stores — so it takes `--session` alone. The payload is read
+# ONCE, and its `cwd` kept in CARD_CWD for the card file's tree (PLAY-dOrderedCharter-8 S2); JSON's
+# escaped backslash reads as `/`, the spelling git accepts on every host. The same read keeps the
+# payload's `transcript_path` in CARD_TRANSCRIPT, unescaped alike, and its `source` in CARD_SOURCE, the
+# card file's owner and its `clear` takeover (PLAY-dOrderedCharter-54 S1); no payload leaves both empty.
+CARD_CWD=""; CARD_TRANSCRIPT=""; CARD_SOURCE=""
 read_session_id() {
-  local sid=""
-  [ "$CARD_VERB" = append ] || [ -n "$CARD_SID" ] || [ -t 0 ] || sid=$(sed -n 's/.*"session_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+  local sid="" payload="" re_sid='"session_id"[[:space:]]*:[[:space:]]*"([^"]*)"' re_cwd='"cwd"[[:space:]]*:[[:space:]]*"([^"]*)"'
+  local re_tx='"transcript_path"[[:space:]]*:[[:space:]]*"([^"]*)"' re_src='"source"[[:space:]]*:[[:space:]]*"([^"]*)"'
+  [ "$CARD_VERB" = append ] || [ -n "$CARD_SID" ] || [ -t 0 ] || payload=$(cat)
+  [[ $payload =~ $re_sid ]] && sid=${BASH_REMATCH[1]}
+  # ponytail: a POSIX directory whose name holds a backslash reads wrong here, and the tree falls back to $ROOT
+  [[ $payload =~ $re_cwd ]] && CARD_CWD=${BASH_REMATCH[1]//\\\\//}
+  [[ $payload =~ $re_tx ]] && CARD_TRANSCRIPT=${BASH_REMATCH[1]//\\\\//}
+  [[ $payload =~ $re_src ]] && CARD_SOURCE=${BASH_REMATCH[1]}
   [ -n "$sid" ] || sid="$CARD_SID"
   if [ -z "$sid" ] && [ "$CARD_VERB" = append ]; then
     echo "MANIFEST env ERROR — --card --append has no session id: stdin is the body, so pass --session <sid>"; exit 2
@@ -315,6 +334,11 @@ if [ -n "$CARD" ]; then
   read_session_id
   CARD_FILE="$CARD_DIR/$CARD_SID.md"
   [ "$CARD_VERB" = path ] && { printf '%s\n' "$CARD_FILE"; exit 0; }
+  # The session's own tree, resolved once: the payload's `cwd` when git places it in a repository.
+  CARD_TREE=$ROOT
+  if [ -n "$CARD_CWD" ] && _ct=$(unset GIT_DIR GIT_WORK_TREE; git -C "$CARD_CWD" rev-parse --show-toplevel 2>/dev/null) && [ -n "$_ct" ]; then
+    CARD_TREE=${_ct%$'\r'}
+  fi
 fi
 
 STAGED=0; MF=""
@@ -495,7 +519,7 @@ derive_drift_line() {
 # `drift —` cell and before `live —`, is `derive_overlaps_line`: the unattended driver's
 # `--overlaps`, which reads local remote-tracking refs and never the network. The `claims —` cell,
 # after `live —`, is `derive_claims_line`, and the `health —` cell after it, above `recent —`, is
-# `render_health_cell`.
+# `render_health_cell`. The `memory —` cell, between `live —` and `claims —`, is `derive_memory_line`.
 derive_head_state() {   # → HEAD_BRANCH HEAD_SHA HEAD_DIRTY, read once by the card and once by the `now —` line
   local n
   HEAD_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null) || HEAD_BRANCH=HEAD
@@ -537,6 +561,7 @@ render_card() {
   derive_drift_line
   derive_overlaps_line
   printf '%s\n' "$live"
+  derive_memory_line
   derive_claims_line "$verb"
   render_health_cell
   printf 'recent —\n'
@@ -583,6 +608,38 @@ derive_overlaps_line() {
         END { if (f == "") f = "--overlaps exited " rc " and printed nothing"
               if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }
               print "overlaps — skipped: " f }' "$sf" ;;
+  esac
+  rm -f "$sf" 2>/dev/null
+  return 0
+}
+
+# The `memory —` cell (PLAY-dOrderedCharter-14): the harness's auto-memory index measured against
+# `memory.load-budget` and its standing directives counted, by the playbook kit's `memory_index.py
+# measure`, found as every sibling is by `resolve_kit_file` and bounded as the `overlaps —` cell bounds
+# its read: a kill into a scratch file under the card dir, never a `$( )` capture, stdin /dev/null. The
+# measure derives the index's place itself, so this script spells no second project key; `--home` hands
+# it this shell's `~`. Its first line prints on exit 0, and every failure is one `memory — skipped:` line.
+# WHAT THIS DOES NOT CHECK: the line's figures, which are the measure's to derive and bound.
+derive_memory_line() {
+  local mi py sf rc
+  mi=$(resolve_kit_file playbook memory_index.py)
+  [ -n "$mi" ] || { printf 'memory — skipped: no playbook memory_index.py resolves in this tree\n'; return 0; }
+  py=$(resolve_python 2>/dev/null) || { printf 'memory — skipped: no Python resolves on this node\n'; return 0; }
+  timeout -k 1 5 true </dev/null >/dev/null 2>&1 \
+    || { printf 'memory — skipped: this node has no working timeout -k, so the read would be unbounded and none ran\n'; return 0; }
+  sf=$(mkdir -p "$CARD_DIR" && mktemp "$CARD_DIR/.memory.XXXXXX") \
+    || { printf 'memory — skipped: no scratch file under %s to capture the measure in\n' "$CARD_DIR"; return 0; }
+  timeout -k 2 "$CARD_MEMORY_BOUND" "$py" "$mi" measure ${HOME:+--home "$HOME"} </dev/null >"$sf" 2>/dev/null; rc=$?
+  case "$rc" in
+    0) LC_ALL=C awk '{ sub(/\r$/, "") } NR == 1 { print; f = 1 }
+         END { if (!f) print "memory — skipped: the measure exited 0 and printed nothing" }' "$sf" ;;
+    124|137) printf 'memory — skipped: the measure did not answer within %ss\n' "$CARD_MEMORY_BOUND" ;;
+    *)
+      LC_ALL=C awk -v rc="$rc" '{ sub(/\r$/, "") }
+        NF && f == "" { f = $0 }
+        END { if (f == "") f = "the measure exited " rc " and printed nothing"
+              if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }
+              print "memory — skipped: " f }' "$sf" ;;
   esac
   rm -f "$sf" 2>/dev/null
   return 0
@@ -704,7 +761,7 @@ derive_claims_line() {   # $1 = the writer verb → the cell's head line and its
 # card leaves no file: every startup field is bounded, so an overflow means a derivation went wrong
 # and a truncated card would carry that error into every later reader.
 write_card() {
-  local card bytes
+  local card bytes breach
   card=$(render_card "$1")
   bytes=$(printf '%s\n' "$card" | wc -c | tr -d '[:space:]')
   if [ "$bytes" -gt "$CARD_CAP_BYTES" ]; then
@@ -713,15 +770,156 @@ write_card() {
   fi
   mkdir -p "$CARD_DIR" || { echo "MANIFEST env ERROR — cannot create $CARD_DIR"; exit 2; }
   printf '%s\n' "$card" > "$CARD_FILE" || { echo "MANIFEST env ERROR — cannot write $CARD_FILE"; exit 2; }
+  breach=$(derive_injected_breaches)
+  if [ -n "$breach" ]; then
+    printf '%s\n' "$breach" >> "$CARD_FILE"
+    card="$card"$'\n'"$breach"
+  fi
   printf '%s\n' "$card"
 }
 
-# The stored card, unchanged, then ONE `now —` line computed here and never stored — a second replay
-# must print one, not two. A missing card is written fresh under the replay's own name in its header.
+# The injected load points, measured once the card is on disk (PLAY-dOrderedCharter-11 S5): the playbook
+# kit's `load_sets.py injected` over the agent list, the Skill list and the card just written, its
+# `injected — breach` lines kept and every other line dropped, so a card over nothing gains no line.
+# The kit is found as every sibling is, by `resolve_kit_file`; no kit, no python or no working
+# `timeout` adds nothing. CARD_INJECTED_CAPS hands in `<name>=<bytes>` caps the cap census does not hold.
+# WHAT THIS DOES NOT CHECK: the harness's own composition of those lists, only the bytes they carry.
+derive_injected_breaches() {
+  local ls py caps=()
+  ls=$(resolve_kit_file playbook load_sets.py)
+  [ -n "$ls" ] || return 0
+  py=$(resolve_python 2>/dev/null) || return 0
+  timeout -k 1 5 true </dev/null >/dev/null 2>&1 || return 0
+  read -ra caps <<< "${CARD_INJECTED_CAPS:-}"
+  timeout -k 1 "${CARD_INJECTED_BOUND:-10}" "$py" "$ls" injected --root "$ROOT" --card "$CARD_FILE" \
+    ${caps[@]+"${caps[@]/#/--cap=}"} </dev/null 2>/dev/null | tr -d '\r' | grep '^injected — breach'
+  return 0
+}
+
+# The replay's `map —` block (PLAY-dOrderedCharter-4): the playbook kit's instruction map, its `map`
+# verb's lines verbatim, found as every sibling is by `resolve_kit_file` and bounded as the `overlaps —`
+# cell bounds its read: a kill into a scratch file under the card dir, never a `$( )` capture, stdin
+# /dev/null. Every failure is one `map — skipped:` line; the replay's exit and the card file are never
+# touched. WHAT THIS DOES NOT CHECK: the map's content, which is the verb's to derive and bound.
+derive_map_block() {
+  local iu py sf rc
+  iu=$(resolve_kit_file playbook instruction_units.py)
+  [ -n "$iu" ] || { printf 'map — skipped: no playbook instruction map resolves in this tree\n'; return 0; }
+  py=$(resolve_python 2>/dev/null) || { printf 'map — skipped: no Python resolves on this node\n'; return 0; }
+  timeout -k 1 5 true </dev/null >/dev/null 2>&1 \
+    || { printf 'map — skipped: this node has no working timeout -k, so the read would be unbounded and none ran\n'; return 0; }
+  sf=$(mkdir -p "$CARD_DIR" && mktemp "$CARD_DIR/.map.XXXXXX") \
+    || { printf 'map — skipped: no scratch file under %s to capture the map in\n' "$CARD_DIR"; return 0; }
+  # PLAY-dOrderedCharter-49 S73: the session's own tree, the payload's `cwd`, never the hook's working directory
+  timeout -k 2 "$CARD_MAP_BOUND" "$py" "$iu" map --root "$CARD_TREE" </dev/null >"$sf" 2>/dev/null; rc=$?
+  case "$rc" in
+    0) tr -d '\r' < "$sf" ;;
+    124|137) printf 'map — skipped: the map did not answer within %ss\n' "$CARD_MAP_BOUND" ;;
+    *)
+      LC_ALL=C awk -v rc="$rc" '{ sub(/\r$/, "") }
+        NF && f == "" { f = $0 }
+        END { if (f == "") f = "the map exited " rc " and printed nothing"
+              if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }
+              print "map — skipped: " f }' "$sf" ;;
+  esac
+  rm -f "$sf" 2>/dev/null
+  return 0
+}
+
+# The instruction map first, so the harness's cut of a hook's output takes a card's tail and never the
+# map; then the stored card, unchanged, then ONE `now —` line computed here and never stored — a second
+# replay must print one, not two. A missing card is written fresh under the replay's own name in its header.
 print_replay() {
+  derive_map_block
   if [ -f "$CARD_FILE" ]; then cat "$CARD_FILE"; else write_card replay; fi
   derive_head_state
   printf 'now — HEAD %s · %s · %s\n' "$HEAD_SHA" "$HEAD_BRANCH" "$HEAD_DIRTY"
+}
+
+# >>> envelope_sh — canonical copy: envelope.sh in the gov lib dir (byte-identical; gated)
+# `render_envelope_sh <path> <level> <direction> [<body-file>]` prints the opener, the body file's
+# bytes with a final newline added where it lacks one, and the closer: `render_envelope` of the Python
+# twin byte for byte. No body file, or an empty one, renders the two lines alone. A level that is no
+# unsigned integer returns 2 printing nothing; a body file that does not read returns 1.
+render_envelope_sh() {
+  case "${2:-}" in ''|*[!0-9]*) return 2 ;; esac
+  printf '[%s · Level %s · %s]\n' "$1" "$((10#$2))" "$3"
+  if [ -n "${4:-}" ] && [ -s "$4" ]; then
+    cat -- "$4" || return 1
+    [ -z "$(tail -c 1 -- "$4")" ] || printf '\n'
+  fi
+  printf '[/%s]\n' "$1"
+}
+# <<< envelope_sh
+
+# The card file (PLAY-dOrderedCharter-8 S2, S3): the stored card rendered into `<CARD_TREE>/.claude/
+# orientation-card.md` inside its level-1 envelope, the values of the playbook kit's `doc.orientation-card`
+# registry row, through a temp beside it renamed into place, so a reader never sees half a card. The
+# file is ignored before it is first written: a `check-ignore` miss appends the one exclude line to the
+# clone's `info/exclude`, which covers every worktree, and a second miss writes nothing. Silent when
+# written; any failure prints ONE `card-file — skipped:` line and returns 0, so it never changes a verb's
+# exit: the stored card is the record and this file its render. WHAT THIS DOES NOT DO: load the file;
+# nothing imports it until the charter's entry file does (PLAY-dOrderedCharter-43).
+# ONE OWNER PER TREE (PLAY-dOrderedCharter-49 S54, PLAY-dOrderedCharter-54): the file's second line is
+# `card-owner — <session id> · <transcript>`, the payload's transcript, else the one this session's own
+# owner line already records, else `absent`. Another session's owner is LIVE while its transcript is a
+# file `stat -c %Y` dates within CARD_OWNER_BOUND seconds of now, since the CLI appends to it every turn;
+# a live owner's file is left as it is, printing one skipped: line. Every other owner is dead: an id-only
+# or absent transcript, a missing file, an older one, or a time stat cannot read. A dead owner's file, or
+# any owner's under a `clear` payload, is taken over, printing one `took over:` line after the rename.
+# WHAT THIS DOES NOT CHECK: a sub-agent's transcript (an owner waiting on its agents past the bound reads
+# dead), a path spelled with a \uXXXX escape or an escaped quote (reads missing, so dead), a host whose
+# stat lacks -c (every owner dead), and a `resume` payload, which gets no `clear` treatment.
+CARD_FILE_REL=.claude/orientation-card.md
+CARD_FILE_DIRECTION="the build's card: where this session stands; level 0 outranks it"
+CARD_OWNER_BOUND=1800
+write_card_file() {
+  local dest="$CARD_TREE/$CARD_FILE_REL" common tmp body owner="" osid="" otx="" mtime="" took="" tx=${CARD_TRANSCRIPT:-absent}
+  local re_owner='^card-owner — ([A-Za-z0-9][A-Za-z0-9._-]*)( · (.+))?$'
+  if [ -f "$dest" ]; then
+    { IFS= read -r _; IFS= read -r owner; } < "$dest" 2>/dev/null
+    owner=${owner%$'\r'}
+    [[ $owner =~ $re_owner ]] && osid=${BASH_REMATCH[1]} && otx=${BASH_REMATCH[3]}
+    if [ "$osid" = "$CARD_SID" ]; then
+      [ -n "$CARD_TRANSCRIPT" ] || [ -z "$otx" ] || tx=$otx
+    elif [ "$CARD_SOURCE" = clear ]; then
+      took="session ${osid:-none} · source clear"
+    else
+      took="session ${osid:-none} · transcript absent"
+      if [ -n "$otx" ] && [ "$otx" != absent ] && [ -f "$otx" ] && mtime=$(stat -c %Y -- "$otx" 2>/dev/null) && [[ $mtime =~ ^[0-9]+$ ]]; then
+        if (( EPOCHSECONDS - mtime <= CARD_OWNER_BOUND )); then
+          printf 'card-file — skipped: another live session %s owns this tree\n' "$osid"; return 0
+        fi
+        took="session $osid · transcript $((EPOCHSECONDS - mtime))s old"
+      fi
+    fi
+  fi
+  if ! git -C "$CARD_TREE" check-ignore -q "$CARD_FILE_REL" 2>/dev/null; then
+    common=$(git -C "$CARD_TREE" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) && common=${common%$'\r'} && [ -n "$common" ] \
+      || { printf 'card-file — skipped: no git common dir resolves for %s\n' "$CARD_TREE"; return 0; }
+    # A line already there is not appended again: a tracked file at the path misses the probe either way.
+    grep -qxF "/$CARD_FILE_REL" "$common/info/exclude" 2>/dev/null \
+      || { mkdir -p "$common/info" \
+        && { [ ! -s "$common/info/exclude" ] || [ -z "$(tail -c 1 "$common/info/exclude")" ] || printf '\n'; } >> "$common/info/exclude" \
+        && printf '/%s\n' "$CARD_FILE_REL" >> "$common/info/exclude"; } 2>/dev/null \
+      || { printf 'card-file — skipped: the ignore line could not be appended to %s/info/exclude\n' "$common"; return 0; }
+    git -C "$CARD_TREE" check-ignore -q "$CARD_FILE_REL" 2>/dev/null \
+      || { printf 'card-file — skipped: %s is not ignored after the exclude line, so no file was written\n' "$CARD_FILE_REL"; return 0; }
+  fi
+  [ ! -d "$dest" ] || { printf 'card-file — skipped: %s is a directory\n' "$dest"; return 0; }
+  mkdir -p "$CARD_TREE/.claude" 2>/dev/null || { printf 'card-file — skipped: cannot create %s/.claude\n' "$CARD_TREE"; return 0; }
+  tmp=$(mktemp "$dest.XXXXXXXX" 2>/dev/null) || { printf 'card-file — skipped: no temp beside %s\n' "$dest"; return 0; }
+  body=$(mktemp "$dest.XXXXXXXX" 2>/dev/null) || { rm -f "$tmp"; printf 'card-file — skipped: no temp beside %s\n' "$dest"; return 0; }
+  if { printf 'card-owner — %s · %s\n' "$CARD_SID" "$tx" && { [ ! -f "$CARD_FILE" ] || cat -- "$CARD_FILE"; }; } > "$body" 2>/dev/null \
+      && render_envelope_sh "$CARD_FILE_REL" 1 "$CARD_FILE_DIRECTION" "$body" > "$tmp" 2>/dev/null \
+      && mv -f "$tmp" "$dest" 2>/dev/null; then
+    rm -f "$body" 2>/dev/null
+    [ -z "$took" ] || printf 'card-file — took over: %s\n' "$took"
+    return 0
+  fi
+  rm -f "$tmp" "$body" 2>/dev/null
+  printf 'card-file — skipped: cannot write %s\n' "$dest"
+  return 0
 }
 
 # ---- the append and the citation check (KICK-aReplayedCard-2) -------------------------------------
@@ -1043,7 +1241,7 @@ check_card_citations() {
   else
     py=$(resolve_python) || { echo "MANIFEST env ERROR — no usable python launcher for the id reader $reader, so the defined-id set is unknown rather than empty; resolve_python's refusal above names every candidate it ran, and GOV_PYTHON=<launcher> is the override"; exit 2; }
     "$py" "$reader" --print-defined-ids > "$CARD_TMP/idout" 2>&1; st=$?
-    # Exit 3 is the reader's NAMED degradation — memory-tree installed without memory-recall, so
+    # Exit 3 is the reader's NAMED degradation — memory-tree installed without its id_grammar.py, so
     # no grammar and no set — and it lands on the same branch as "no reader": paths are still
     # judged and the append proceeds. Every other non-zero status is a reader that could not answer.
     if [ "$st" = 3 ]; then
@@ -1337,12 +1535,12 @@ check_card() {
 
 if [ -n "$CARD" ]; then
   case "$CARD_VERB" in
-    write)  write_card write ;;
-    replay) print_replay ;;
+    write)  write_card write; write_card_file ;;
+    replay) print_replay; write_card_file ;;
     append|check)
       CARD_TMP=$(mktemp -d "${TMPDIR:-/tmp}/mfcard.XXXXXX") || { echo "MANIFEST env ERROR — cannot create a scratch dir under ${TMPDIR:-/tmp}"; exit 2; }
       trap 'rm -rf "$CARD_TMP"' EXIT
-      if [ "$CARD_VERB" = append ]; then add_card_body; else check_card; fi ;;
+      if [ "$CARD_VERB" = append ]; then add_card_body; write_card_file; else check_card; fi ;;
   esac
   exit 0
 fi

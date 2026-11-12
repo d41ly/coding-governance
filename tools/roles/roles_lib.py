@@ -1,7 +1,7 @@
 """roles_lib — the one reader of the role catalogue, and the one composition of a role (TOOL-aOrientedCast-1).
 
 Reads the role files under `agents/`, the workflow table `workflows.toml`, the memory-tree conf and
-the governing doc: its section 1 rule tags and its carried sections (TOOL-aOrientedCast-16). It is
+the governing doc: its practices' rule tags and its carried sections (TOOL-aOrientedCast-16). It is
 also the one reader of the owner's stand-in waiver registry and of the stand-in declarations under
 the builds' `prompts/` folders (TOOL-aOrientedCast-19), and of the governing doc's micro-format
 fence, `<!-- microformats -->` to `<!-- /microformats -->`, whose `agent` and `returned` shapes
@@ -24,7 +24,7 @@ import pathlib
 import re
 import tomllib
 
-KIT_ROLES_VERSION = "1.17"
+KIT_ROLES_VERSION = "1.18"
 
 #: Every front-matter key a role file may carry: Claude Code's own, then gov's.
 #: Split from one string, because a quoted `"tools"` beside a quoted segment reads to the
@@ -61,16 +61,21 @@ CONF_LINE_RE = re.compile(
 #: The playbook render's region markers. A charter rendered into a larger file sits between them,
 #: and only that span is read, so an adopter's own sections around it never reach an agent.
 PLAYBOOK_OPEN, PLAYBOOK_CLOSE = "<!-- gov:playbook -->", "<!-- /gov:playbook -->"
+#: The practices' marker pair inside the region (PLAY-dOrderedCharter-2 S6): the rule lines sit between them,
+#: each marker a whole line, so a role's tag resolves to its practice line whatever the headings say.
+PRACTICES_OPEN, PRACTICES_CLOSE = "<!-- gov:practices -->", "<!-- /gov:practices -->"
+#: A charter seeded before the markers holds its practices under a numbered first heading, read through
+#: this pattern alone until it is reseeded.
 SECTION_ONE_RE = re.compile(r"^## 1\. ")
-#: A section 1 rule line, `- [<tag>] <text>`; the whole line is the rule.
+#: A practice's rule line, `- [<tag>] <text>`; the whole line is the rule.
 RULE_LINE_RE = re.compile(r"^- \[([a-z0-9][a-z0-9-]*)\] ")
 #: One entry of a role's `rules` value: a tag, a trailing `?` marking it optional.
 RULE_KEY_RE = re.compile(r"^[a-z0-9][a-z0-9-]*\??$")
-#: The section 3 headings every agent type and handoff carries whole, in this order (§8 F3).
+#: The charter headings every agent type and handoff carries whole, in this order (§8 F3).
 CARRIED_SECTIONS = ("Protocols", "Facts")
 #: A v3.x charter's numbered heading, kept only to tell a pre-tag charter from an unknown doc.
 SECTION_RE = re.compile(r"^## (§\d+) — ")
-LEGACY_NOTE = ("%s is a pre-tag charter: it carries `## §<n> — ` headings and no section 1 rule tag, "
+LEGACY_NOTE = ("%s is a pre-tag charter: it carries `## §<n> — ` headings and no practice rule tag, "
                "so no role's rules resolve and no agent type or handoff carries the charter; reseed "
                "the charter template from gov, then re-render")
 HARNESS_RE = re.compile(r"^\{prefix\}/([^/{}\s]+)/([^/{}\s]+)$")
@@ -90,6 +95,9 @@ WAIVER_OWNER_RE = re.compile(r"^owner \S+$")
 #: The governing doc's micro-format fence and one definition line inside it (TOOL-aOrientedCast-20).
 MICROFORMATS_OPEN, MICROFORMATS_CLOSE = "<!-- microformats -->", "<!-- /microformats -->"
 MICROFORMAT_LINE_RE = re.compile(r"^- `(.*)`$")
+#: The one line an agent-type or handoff render prints with no playbook kit, so no registry ranks its
+#: blocks (PLAY-dOrderedCharter-5 F4); `%s` is the resolver's refusal, which names where it looked.
+UNRANKED_NOTE = "envelope — unarmed · no playbook kit, so the blocks render unranked: %s"
 
 
 class RolesError(Exception):
@@ -136,6 +144,33 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
+# >>> render_envelope — canonical copy: envelope.py in the gov lib dir (byte-identical; gated)
+def render_envelope(doc, level, direction, body):
+    """`body` between the opener and the closer naming `doc`; an empty body renders the two lines alone."""
+    if body and not body.endswith("\n"):
+        body += "\n"
+    return "[%s · Level %d · %s]\n%s[/%s]\n" % (doc, level, direction, body, doc)
+
+
+def read_envelopes(text):
+    """Each whole line of `text` that is an envelope line, in order: `(line number, "open", doc, level,
+    direction)` for an opener and `(line number, "close", doc, None, None)` for a closer."""
+    import re
+    opener = re.compile(r"^\[([^\[\]/][^\[\]]*?) · Level (\d+) · ([^\]]*)\]$")
+    closer = re.compile(r"^\[/([^\[\]]+)\]$")
+    found = []
+    for n, line in enumerate(text.replace("\r\n", "\n").split("\n"), 1):
+        m = opener.match(line)
+        if m:
+            found.append((n, "open", m.group(1), int(m.group(2)), m.group(3)))
+            continue
+        m = closer.match(line)
+        if m:
+            found.append((n, "close", m.group(1), None, None))
+    return found
+# <<< render_envelope
+
+
 def read_cap_answer(request, root, kit_dir):
     """`(value, mode, rule)` the policy kit answers for ONE census cap (TOOL-dGroundRules-9), `request`
     in its CLI grammar, `<cap>[=default:<n>]`, read in the repository at `root`. The kit is found by
@@ -159,6 +194,42 @@ def read_cap_answer(request, root, kit_dir):
     except (LookupError, ImportError) as exc:
         why = "no policy kit answered: %s" % exc
     return held, "refuse", "%s; a breach refuses as before" % why
+
+
+def check_load_set(root, kit_dir, blocks, points=(), reach=False):
+    """`(refused, lines)` of the playbook kit's load-set check for `blocks`, `[(slot, role block bytes)]`
+    (PLAY-dOrderedCharter-11 S4): ONE run of its `check` verb, each slot's reader set checked for a missing
+    required unit and its block measured against its body ceiling, and each of `points`, `[(load point,
+    bytes)]`, measured against its own cap: the `code` slot's block (PLAY-dOrderedCharter-27). With `reach`
+    the same run also prints each reader's reach units, one `load-set — reach ·` line each, for the caller
+    to take out of the notes (PLAY-dOrderedCharter-21). The kit
+    is found by `resolve_kit_dir` and run as a subprocess, since a kit imports no sibling kit; with none
+    found the check is one `unarmed` line and the render proceeds. The caller places each line: a `Missing required unit:` line
+    in the reader's text, a `**Load gaps:**` line in the prompt record, any other as a note."""
+    import os
+    import subprocess
+    import sys
+    try:
+        kit = resolve_kit_dir("playbook", "load_sets.py", kit_dir)
+    except LookupError as exc:
+        return False, ["load-set — unarmed · no playbook kit: %s" % exc]
+    argv = [sys.executable, str(kit / "load_sets.py"), "check", "--root", str(root)]
+    for slot, size in blocks:
+        argv += ["--reader", "role." + slot, "--load-point", "role.%s=%d" % (slot, size)]
+    for name, size in points:
+        argv += ["--load-point", "%s=%d" % (name, size)]
+    if reach:
+        argv.append("--reach")
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    try:
+        r = subprocess.run(argv, cwd=str(root), env=env, capture_output=True, encoding="utf-8",
+                           errors="replace", stdin=subprocess.DEVNULL, timeout=120)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return True, ["load-set — refused · the load-set check did not run: %s" % exc]
+    lines = [ln for ln in (r.stdout + r.stderr).splitlines() if ln.strip()]
+    if r.returncode not in (0, 1):
+        return True, lines or ["load-set — refused · the load-set check exited %d" % r.returncode]
+    return r.returncode == 1, lines
 
 
 def load_text(path):
@@ -201,47 +272,89 @@ def resolve_charter_path(root):
     return charter
 
 
+def load_document_registry(kit_dir):
+    """The rows of the playbook kit's document registry, `documents.toml`, found from `kit_dir` by
+    `resolve_kit_dir`. No playbook kit raises its LookupError, which the caller prints as one
+    `UNRANKED_NOTE` and renders unranked; a registry that is there and does not read raises RolesError
+    naming it (PLAY-dOrderedCharter-5 F4)."""
+    reg = resolve_kit_dir("playbook", "documents.toml", kit_dir) / "documents.toml"
+    try:
+        rows = tomllib.loads(reg.read_text(encoding="utf-8")).get("document") or []
+    except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError) as exc:
+        raise RolesError("%s: the document registry does not read, so no envelope can rank a block — %s"
+                         % (reg.as_posix(), exc))
+    return [r for r in rows if isinstance(r, dict)] if isinstance(rows, list) else []
+
+
+def read_envelope_row(rows, rel, memory_root):
+    """`(level, direction)` of the registry row among `rows` whose path matches the document `rel`, else
+    None (PLAY-dOrderedCharter-3 S4); `rows` None, no registry, reads as None too, so a tree without one
+    renders no envelope. A row's `*` holds within one segment, and a held row envelopes nothing."""
+    import fnmatch
+    want = rel.split("/")
+    for row in rows or []:
+        path = str(row.get("path", "")).replace("{memory_root}", memory_root).split("/")
+        if "hold" not in row and len(path) == len(want) and all(
+                fnmatch.fnmatchcase(w, p) for w, p in zip(want, path)):
+            level, direction = row.get("level"), row.get("direction")
+            ok = isinstance(level, int) and not isinstance(level, bool) and isinstance(direction, str)
+            return (level, direction) if ok else None
+    return None
+
+
 def parse_charter(text, where):
     """The governing doc as `{"shape", "rules", "carried"}`; RolesError (R0) on a doc this kit cannot read.
 
     Only the playbook region is read when the text holds its two markers once each, in order. A
-    section is a `## ` line and the lines up to the next one. Section 1's `- [<tag>] ` lines are the
-    rules, kept whole in charter order; each CARRIED_SECTIONS name is the first section headed by it,
-    as `(heading, body)` with the body's blank edges trimmed. With a rule the shape is `tagged` and
-    every carried section is required; with none and a `## §<n> — ` heading it is `legacy`, carrying
-    nothing; otherwise the doc is refused. `where` is the path every message names.
+    section is a `## ` line and the lines up to the next one. The `- [<tag>] ` lines between the
+    practices markers, each a whole line with the opener first, are the rules, kept whole in charter
+    order; a charter carrying no such pair, one seeded before them, has its rules read from the
+    section `SECTION_ONE_RE` heads. Each CARRIED_SECTIONS name is the first section headed by it, as
+    `(heading, body)` with the body's blank edges trimmed. With a rule the shape is `tagged` and every
+    carried section is required; with none and a `## §<n> — ` heading it is `legacy`, carrying nothing;
+    otherwise the doc is refused. `where` is the path every message names.
     """
     text = text.replace("\r\n", "\n")
     i = text.find(PLAYBOOK_OPEN)
     j = text.find(PLAYBOOK_CLOSE, i + len(PLAYBOOK_OPEN)) if i >= 0 else -1
     if j >= 0 and text.count(PLAYBOOK_OPEN) == 1 and text.count(PLAYBOOK_CLOSE) == 1:
         text = text[i + len(PLAYBOOK_OPEN):j]
+    # PLAY-dOrderedCharter-3 S4: an envelope's opener or closer is no section's line, so none rides into a
+    # Charter block, where the closer would read as another document's
+    enveloped = {n for n, *_ in read_envelopes(text)}
+    kept = [ln for n, ln in enumerate(text.split("\n"), 1) if n not in enveloped]
     sections = []
-    for line in text.split("\n"):
+    for line in kept:
         if line.startswith("## "):
             sections.append((line, []))
         elif sections:
             sections[-1][1].append(line)
+    a = kept.index(PRACTICES_OPEN) if PRACTICES_OPEN in kept else -1
+    b = kept.index(PRACTICES_CLOSE) if PRACTICES_CLOSE in kept else -1
+    if 0 <= a < b:
+        held = kept[a + 1:b]
+    else:   # a charter seeded before the markers
+        held = next((body for head, body in sections if SECTION_ONE_RE.match(head)), [])
     rules = {}
-    one = next((body for head, body in sections if SECTION_ONE_RE.match(head)), [])
-    for line in one:
+    for line in held:
         m = RULE_LINE_RE.match(line)
         if m and m.group(1) in rules:
-            raise RolesError("%s: R0 — the governing doc repeats the rule tag [%s] in section 1"
+            raise RolesError("%s: R0 — the governing doc repeats the practice rule tag [%s]"
                              % (where, m.group(1)))
         if m:
             rules[m.group(1)] = line
     if not rules:
         if any(SECTION_RE.match(ln) for ln in text.split("\n")):
             return {"shape": "legacy", "rules": {}, "carried": []}
-        raise RolesError("%s: R0 — the governing doc carries neither a section 1 rule tag nor a "
-                         "'## §<n> — ' heading, so it is no charter this kit reads" % where)
+        raise RolesError("%s: R0 — the governing doc carries no practice rule tag, between the practices "
+                         "markers or under a numbered first heading, and no '## §<n> — ' heading, so it is "
+                         "no charter this kit reads" % where)
     carried = []
     for name in CARRIED_SECTIONS:
         hit = next(((head, body) for head, body in sections
                     if head == "## " + name or head.startswith("## %s " % name)), None)
         if hit is None:
-            raise RolesError("%s: R0 — the governing doc carries section 1 rule tags and no '## %s' "
+            raise RolesError("%s: R0 — the governing doc carries practice rule tags and no '## %s' "
                              "section, which every role agent carries" % (where, name))
         body = list(hit[1])
         while body and not body[0].strip():
@@ -286,7 +399,7 @@ def check_rule_tags(charter, value):
     """`(defects, notes)` for one role's raw `rules` value against `parse_charter`'s structure.
 
     An entry that is not a lowercase tag (optionally ending in `?`) or repeats a tag is a defect on
-    either shape. On a tagged charter a bare tag section 1 lacks is a defect and an optional one a
+    either shape. On a tagged charter a bare tag its practices lack is a defect and an optional one a
     note; on a legacy charter every well-formed entry is admitted and resolves to nothing.
     """
     defects, notes, seen = [], [], set()
@@ -302,15 +415,15 @@ def check_rule_tags(charter, value):
         if charter["shape"] != "tagged" or tag in charter["rules"]:
             continue
         if e == tag:
-            defects.append("rules tag '%s' names no section 1 rule of the governing doc" % tag)
+            defects.append("rules tag '%s' names no practice of the governing doc" % tag)
         else:
-            notes.append("rules tag '%s' names no section 1 rule of the governing doc, so this role "
+            notes.append("rules tag '%s' names no practice of the governing doc, so this role "
                          "carries no such rule here" % e)
     return defects, notes
 
 
 def render_charter_blocks(charter, where, value, notes=None):
-    """The charter text a role agent carries: `### Charter rules` holding the section 1 lines the
+    """The charter text a role agent carries: `### Charter rules` holding the practice lines the
     `rules` value cites, in charter order, when it cites any, then each carried section under a
     `### ` heading, joined by one blank line and ending in one newline; `""` on a legacy charter.
 

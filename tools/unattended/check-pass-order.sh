@@ -38,7 +38,7 @@
 # below. `--preview` grades the live tree and prints violations without setting exit status, which is
 # how a candidate predicate gets run over the real tree before it is wired.
 set -u
-KIT_UNATTENDED_VERSION=1.118 # gov:kit unattended@1.118 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.119 # gov:kit unattended@1.119 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other two readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and wrong
@@ -59,7 +59,7 @@ _LIB_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 . "$_LIB_DIR/lib-unattended.sh"
 
 # S2f - `--preview` grades the live tree and prints everything it finds WITHOUT setting exit status.
-# AGENTS.md section 7 requires a candidate gate predicate to be run over the real tree before it is
+# The charter's `[class]` practice requires a candidate gate predicate to be run over the real tree before it is
 # wired, printing hits AND near-misses; without a mode that does not red, doing so means editing the
 # script or reading a failing bar. The blocker this leg's own build met at round 3 - two units
 # already on the default branch that the widened predicate reds - was found exactly this way.

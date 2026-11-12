@@ -5,7 +5,7 @@
 #
 # WHAT IT GRADES. `transition_audit.py` classifies MERGES by lineage, computes the delta of the
 # shards-side parent, accounts each entry against a tree, and refuses. Every arm below builds a
-# throwaway git repository, seeds this kit and its memory-recall sibling into it, writes a history
+# throwaway git repository, seeds this kit into it, writes a history
 # whose shape is the question, and runs the real checker inside it. Nothing here re-implements the
 # subject: a fixture that graded a re-implementation would grade the fixture.
 #
@@ -36,9 +36,8 @@ cd "$ROOT" || exit 2
 KIT_MT="$(unset GIT_DIR GIT_WORK_TREE; git -C "$(dirname "$0")" rev-parse --show-prefix)"; KIT_MT="${KIT_MT%/}"
 [ -n "$KIT_MT" ] || { echo "FAIL cannot derive this kit's own directory"; exit 2; }
 TOOL_ROOT="$(dirname "$KIT_MT")"
-KIT_MR="$TOOL_ROOT/memory-recall"
 KIT_LIB="$TOOL_ROOT/lib"
-[ -f "$KIT_MR/extract.py" ] || { echo "FAIL the memory-recall sibling is not beside this kit at $KIT_MR, and check 26 keys every row through its grammar — there is nothing to grade"; exit 2; }
+[ -f "$KIT_MT/id_grammar.py" ] || { echo "FAIL the id grammar is not in this kit at $KIT_MT/id_grammar.py, and check 26 keys every row through it — there is nothing to grade"; exit 2; }
 # shellcheck source=/dev/null
 . "$KIT_LIB/resolve-python.sh"
 PY=$(resolve_python) || { echo "FAIL no usable python launcher"; exit 2; }
@@ -72,9 +71,8 @@ SEED="$TMP/seed"
 # tree that installs the kits somewhere else.
 mkdir -p "$SEED/$TOOL_ROOT" "$SEED/memory/backlog" "$SEED/memory/builds/aSeed" "$SEED/memory/project"
 cp -r "$KIT_MT" "$SEED/$KIT_MT"
-cp -r "$KIT_MR" "$SEED/$KIT_MR"
 cp -r "$KIT_LIB" "$SEED/$KIT_LIB"
-rm -rf "$SEED/$KIT_MT/__pycache__" "$SEED/$KIT_MR/__pycache__"
+rm -rf "$SEED/$KIT_MT/__pycache__"
 # The kit paths INSIDE a fixture, which every arm below runs the real checker through.
 MOD="$KIT_MT/transition_audit.py"
 ENGINE="$KIT_MT/check-memory-hygiene.sh"
@@ -329,12 +327,12 @@ else
   bad "AC6: the shallow clone fixture could not be built, so the refusal went unexercised"; ok
 fi
 
-# --- AC15 — the memory-recall kit is a NAMED prerequisite, never a degraded mode -------------------
-NR="$TMP/f1norecall"; cp -r "$F1" "$NR"; rm -rf "$NR/$KIT_MR"
+# --- AC15 — the id grammar is a NAMED prerequisite, never a degraded mode -------------------------
+NR="$TMP/f1nogrammar"; cp -r "$F1" "$NR"; rm -f "$NR/$KIT_MT/id_grammar.py"
 audit "$NR" --expect-builds >/dev/null; nout=$_audit
-{ audit_rc "$NR" --expect-builds >/dev/null; [ "$_audit_rc" = 1 ] && has "$nout" "memory-recall" \
-  && has "$nout" "install the memory-recall kit" && has "$nout" "${KIT_MR##*/}"; } \
-  || bad "AC15: an absent memory-recall kit did not refuse by name with the path and the remedy"; ok
+{ audit_rc "$NR" --expect-builds >/dev/null; [ "$_audit_rc" = 1 ] && has "$nout" "id_grammar.py" \
+  && has "$nout" "reinstall the memory-tree kit" && has "$nout" "${KIT_MT##*/}"; } \
+  || bad "AC15: an absent id_grammar.py did not refuse by name with the path and the remedy"; ok
 
 # ================================================================== F5 — a shards-mode tree is DARK
 F5="$TMP/f5"; new_repo "$F5"
@@ -342,8 +340,8 @@ e5=$(engine "$F5")
 has "$e5" "memory-hygiene: check 26 is DORMANT" || bad "AC5: a shards-mode tree does not announce that check 26 is dormant"; ok
 printf '%s\n' "$e5" | grep -F 'memory-hygiene: check 26 ' | grep -qv 'is DORMANT' \
   && bad "AC5: a shards-mode tree printed a check 26 line other than the dormant announcement"; ok
-rm -rf "$F5/$KIT_MR"
-audit_rc "$F5" >/dev/null; [ "$_audit_rc" = 0 ] || bad "AC15: a shards-mode tree with no memory-recall kit did not stay dormant at exit 0"; ok
+rm -f "$F5/$KIT_MT/id_grammar.py"
+audit_rc "$F5" >/dev/null; [ "$_audit_rc" = 0 ] || bad "AC15: a shards-mode tree with no id_grammar.py did not stay dormant at exit 0"; ok
 
 # ============================================================ F2/F3/F4 — what IS and IS NOT a merge
 F2="$TMP/f2"; new_repo "$F2"
@@ -606,8 +604,9 @@ else
   [ -z "$extra" ] || bad "AC16: GOV_WIRING_HOOKS names a hook this tree does not track, so the list outlived its file:$extra"; ok
 fi
 
-# AC10 — the DECLARED edge. selfcheck grades an edge only when one is PRESENT, so deleting it is
-# invisible there; this arm is what makes the deletion red.
+# AC10 — the edge is GONE. Check 26's grammar is this kit's own `id_grammar.py` since
+# PLAY-dOrderedCharter-18, so a `requires_if` row naming memory-recall on BACKLOG_MODE would declare
+# an edge that no longer exists; this arm reds the row's return.
 DESC="$ROOT/$KIT_MT/kit.toml"
 if [ ! -f "$DESC" ]; then
   bad "AC10: this kit's own descriptor is not beside it, so the edge-presence arm went unexercised"; ok
@@ -617,11 +616,11 @@ import sys, tomllib
 d = tomllib.load(open(sys.argv[1], "rb"))
 rows = [r for r in d.get("requires_if", [])
         if r.get("kit") == "memory-recall" and "BACKLOG_MODE" in (r.get("when_any_key_set") or [])]
-print("present" if len(rows) == 1 else f"absent ({len(rows)})")
+print("absent" if not rows else f"present ({len(rows)})")
 PYEOF
 )
-  [ "$edgeout" = present ] \
-    || bad "AC10: this kit's descriptor declares no single requires_if edge to memory-recall on BACKLOG_MODE, so an adopter switching to builds mode has no declaration naming the prerequisite ($edgeout)"; ok
+  [ "$edgeout" = absent ] \
+    || bad "AC10: this kit's descriptor still declares a requires_if edge to memory-recall on BACKLOG_MODE, an edge the grammar's move into this kit removed ($edgeout)"; ok
 fi
 
 # ---------------------------------------------------------------------------------------- verdict

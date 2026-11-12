@@ -2,8 +2,9 @@
 name: lexicon
 description: Answer "what should I call this" from THIS repo's declared naming vocabulary, before writing the name. Use when about to name a new function, method, type, module or CLI subcommand; when a name will not fit and you are tempted to invent a verb; when renaming during a refactor; or when a gate has just refused a name and you need the replacement rather than the refusal. Also use before naming anything in an unfamiliar area, to see how the corpus already spells that concept. Routes through `python3 tools/lexicon/lexicon.py --suggest <identifier> --as <cell>`, which takes the SURFACE the name is for, reads the declaration at `.lexicon.conf` and the frozen canon beside it, and decides nothing. Do NOT use for ordinary code search — finding a symbol, a caller, a definition or a string is grep's job and this neither replaces nor intercepts it.
 ---
+[.claude/skills/lexicon/SKILL.md · Level 4 · A Skill, followed when its trigger holds; yields to levels 0 to 3]
 
-<!-- gov:kit lexicon@1.25 · RENDERED from this kit's SKILL.template.md — do not edit -->
+<!-- gov:kit lexicon@1.26 · RENDERED from this kit's SKILL.template.md — do not edit -->
 
 # The declared lexicon
 
@@ -96,3 +97,4 @@ That is the signal the table exists to produce. In order:
    the replacement — that is what `python3 tools/lexicon/lexicon.py --suggest` prints.
 3. **Only then consider the table wrong.** Adding a row is an owner decision and a change to a
    declared vocabulary, not a fix for one call site. Record what would not fit and why.
+[/.claude/skills/lexicon/SKILL.md]

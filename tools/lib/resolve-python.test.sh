@@ -367,6 +367,12 @@ remote_ladder_sh|$ROOT/$KIT_REL/resolve-remote.sh|$KIT_REL/resolve-remote
 compare_base_py|$ROOT/$KIT_REL/compare_base.py|$KIT_REL/compare_base
 git_env_leaks_py|$ROOT/$KIT_REL/git_env_leaks.py|$KIT_REL/git_env_leaks
 resolve_bash_py|$ROOT/$KIT_REL/resolve_bash.py|$KIT_REL/resolve_bash
+coverage_join|$ROOT/$KIT_REL/coverage_join.py|$KIT_REL/coverage_join
+common_git_dir|$ROOT/$KIT_REL/common_dir.py|$KIT_REL/common_dir
+render_envelope|$ROOT/$KIT_REL/envelope.py|$KIT_REL/envelope
+envelope_sh|$ROOT/$KIT_REL/envelope.sh|$KIT_REL/envelope
+auto_memory|$ROOT/$KIT_REL/auto_memory.py|$KIT_REL/auto_memory
+retired_kits|$ROOT/$KIT_REL/retired_kits.py|$KIT_REL/retired_kits
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -397,6 +403,20 @@ resolve_bash_py|$ROOT/$KIT_REL/resolve_bash.py|$KIT_REL/resolve_bash
 # memory-tree kit's GIT_ENV_LEAKS member for member; each had a copy with no canonical to drift from.
 # resolve_bash_py (TOOL-dGroundRules-25 S28) is the run-gates kit's bash rule the policy kit's checker
 # carries; the other copies return another shape and are TOOL-dSettledRoster-6's ask.
+# coverage_join (PLAY-dOrderedCharter-19 S9) is the join factory, compute_coverage and its siblings,
+# moved out of the codebase-map kit so no core build imports it; its one copy is memory-tree's
+# coverage_join.py, which every codebase-map consumer imports. common_git_dir (S10) is the main
+# repository's git directory, the recall kit's query log's home and the tag index's.
+# render_envelope (PLAY-dOrderedCharter-3 S3) is a load-bearing document's envelope, its writer and
+# its reader; the charter's renderer and the roles kit each carry it inline, both kits copy-installed.
+# envelope_sh (PLAY-dOrderedCharter-8 S8) is its shell twin, the card engine's copy, and part 2k below holds
+# the two canonicals to one byte form. Its stem is not `render_envelope_sh`: the copy grep matches a
+# stem by prefix, so the row above would read a block of that name as one of its own copies.
+# auto_memory (PLAY-dOrderedCharter-14 S1) is the harness's auto-memory location, its template and its
+# resolver: drift-audit's dangling-pointer signal and the playbook kit's index measure each carry it inline.
+# retired_kits (PLAY-dOrderedCharter-31 S10) is a target's kit selection read through the registry's
+# `[[retired]]` rows; govkit's selection resolver and the playbook renderer's kit readers each carry it
+# inline, both kits copy-installed, and part 2l below holds the canonical to its behaviour.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one
@@ -794,6 +814,46 @@ grep -qF 'With no policy kit found' "$ROOT/$HOOKS_DIR/README.md" \
   || bad "FH48 AC7 the hooks README states a sibling lookup, not the one resolveKitDir makes"; ok
 grep -qF 'last two segments' "$ROOT/$HOOKS_DIR/README.md" \
   || bad "FH48 AC8 the hooks README names a prefix the resolver never compares"; ok
+
+# ---- 2l. THE ENVELOPE, ONE BYTE FORM IN TWO LANGUAGES (PLAY-dOrderedCharter-8 S8) ------------------
+# Parity holds each inline copy to its canonical; this holds envelope.sh to envelope.py's
+# render_envelope, run as each is run, over the card's own triple around an empty body and around a
+# body lacking its final newline. Then the row boundary: no `render_envelope` block sits in the card
+# engine, so that row counts no copy there and the shell copy is graded by `envelope_sh` alone. WHAT
+# THIS DOES NOT CHECK: a level past one digit, a direction holding `%`, or any copy's call site.
+ENV_DIR="the build's card: where this session stands; level 0 outranks it"
+printf 'a\nb' > "$TMP/env.body"
+for env_body in "" "$TMP/env.body"; do
+  env_sh=$(bash "$HERE/envelope.sh" .claude/orientation-card.md 1 "$ENV_DIR" ${env_body:+"$env_body"} | od -An -tx1)
+  env_py=$("$REALPY" -B -c 'import sys; sys.path.insert(0, sys.argv[1]); from envelope import render_envelope
+body = open(sys.argv[3], encoding="utf-8").read() if sys.argv[3] else ""
+sys.stdout.buffer.write(render_envelope(".claude/orientation-card.md", 1, sys.argv[2], body).encode("utf-8"))' \
+    "$HERE" "$ENV_DIR" "$env_body" | od -An -tx1)
+  [ -n "$env_sh" ] && [ "$env_sh" = "$env_py" ] \
+    || bad "envelope.sh and envelope.py render different bytes around ${env_body:-an empty body}"; ok
+done
+env_rows=$(cd "$ROOT" && git grep -l "^# >>> render_envelope" -- skills/session-kickoff/manifest-check.sh || true)
+[ -z "$env_rows" ] || bad "the render_envelope row counts a copy in the card engine: $env_rows"; ok
+[ "$(cd "$ROOT" && git grep -c "^# >>> envelope_sh" -- skills/session-kickoff/manifest-check.sh | cut -d: -f2)" = 1 ] \
+  || bad "the card engine carries no envelope_sh block, so its envelope is graded by no row"; ok
+
+# ---- 2m. THE KIT SUCCESSION, BEHAVIOUR (PLAY-dOrderedCharter-31 S10) --------------------------------
+# Parity holds govkit's and the renderer's copies to the canonical; this holds the canonical to its
+# contract over one selection: a live id kept even where a row names it, a retired id read as its
+# successor, a `none` successor dropped, a repeat collapsed, an unknown id returned as it was; then a
+# row with no `successor` raising, the deny each caller turns into its refusal. WHAT THIS DOES NOT
+# CHECK: either caller's refusal text, which govkit's selftest and the renderer's --selftest assert.
+rk_got=$("$REALPY" -B -c 'import sys; sys.path.insert(0, sys.argv[1]); from retired_kits import resolve_retired_kits as r
+rows = [{"id": "live", "successor": "other"}, {"id": "old", "successor": "new"}, {"id": "gone", "successor": "none"}]
+print(" ".join(r(["live", "old", "new", "gone", "old", "stray"], {"live", "new"}, rows)))
+try:
+    r(["old"], set(), [{"id": "old"}])
+    print("no raise")
+except ValueError as e:
+    print("raised:", e)' "$HERE" | tr -d '\r')
+[ "$rk_got" = "live new stray
+raised: [[retired]] row 1 needs a non-empty string id and successor" ] \
+  || bad "the canonical resolve_retired_kits breaks its contract: ${rk_got//$'\n'/ | }"; ok
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver

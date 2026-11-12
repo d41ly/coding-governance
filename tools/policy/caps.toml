@@ -13,7 +13,9 @@
 #   enforcer  the file that measures the cap, `{prefix}`-relative as gate-legs.json spells one.
 #   home      where the value is declared today: `limits:<row key>` (a row of the template-size limits
 #             file, read by budgets.py alone), `file:<path>:<row key>`, `conf:<path>:<KEY>` or
-#             `constant:<path>:<NAME>`, the last three read by the enforcer and handed in.
+#             `constant:<path>:<NAME>`, the last three read by the enforcer and handed in, or
+#             `policy:<key>`, a policy key the enforcer reads, on a family row alone, so the key
+#             stays the one home of the value (PLAY-dOrderedCharter-27).
 #   family    true where the value is per subject: the enforcer asks only the mode, and the policy
 #             file may not set a value.
 #   research  the caps research's row number.
@@ -265,6 +267,17 @@ kit = "roles"
 installed = "{prefix}/roles/handoff.py"
 
 [[cap]]
+name = "code-slot"
+class = "switch"
+unit = "bytes"
+enforcer = "{prefix}/playbook/load_sets.py"
+home = "policy:memory.code-budget"
+family = true
+research = 0
+kit = "playbook-render"
+installed = "{prefix}/playbook/load_sets.py"
+
+[[cap]]
 name = "manifest-bytes"
 class = "switch"
 unit = "bytes"
@@ -345,12 +358,12 @@ installed = "{prefix}/memory-tree/corpus_ids.py"
 name = "codex-instructions"
 class = "consumer"
 unit = "bytes"
-enforcer = "{prefix}/agent-instructions/adopt-agent-instructions.sh"
-home = "constant:{prefix}/agent-instructions/adopt-agent-instructions.sh:CODEX_MAX"
+enforcer = "{prefix}/playbook/render_playbook.py"
+home = "constant:{prefix}/playbook/render_playbook.py:CODEX_MAX"
 family = false
 research = 23
-kit = "agent-instructions"
-installed = "{prefix}/agent-instructions/adopt-agent-instructions.sh"
+kit = "playbook-render"
+installed = "{prefix}/playbook/render_playbook.py"
 
 [[cap]]
 name = "runlog-record"

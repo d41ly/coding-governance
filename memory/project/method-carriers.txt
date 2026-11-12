@@ -36,3 +36,11 @@ tools/roles/SKILL.template.md · the SOURCE the build router Skill is rendered f
 tools/policy/caps.toml · the size-cap census row for the rendered method: its name and its limits-file home are the method's path, the subject the cap measures — a row keyed by the file, never a restatement of what the method says
 tools/policy/check_policy.py · the cap census's case table and its budgets-correctness-kept case name the method's path as a size-cap subject they plant into a scratch repository — a path the checker reads, never a restatement of what the method says
 help/spec-audit.md · the user-facing page for the three review.spec-audit keys and the two chain verbs; it points at M4 for the rule and anchors each member's usage row for the docs leg, so a changed default or flag reds there
+help/tags.md · the tags page's examples resolve the method's path and a positional label into it; it names the file as a lookup subject and restates none of the method
+tools/playbook/adopt-playbook.sh · a plant row of the edge-grammar selftest expects the method's path as the resolved target of a section edge, a fixture value
+tools/playbook/edge_grammar.py · the resolve fixture writes a stand-in file at the method's path so a section edge has a target, and copies none of the method's text
+tools/playbook/instructions-legacy.txt · the legacy instruction-file list names the method as one of gov's own instruction files, a path in an inventory
+tools/playbook/renderers.toml · the renderer table lists the method among the guides its scope renders, a path the renderer writes
+help/charter.md · the charter's help page names the method as the one held document, a path in an inventory
+tools/playbook/documents.toml · the document registry declares the method's path and template source so its envelope renders, a path the renderer writes
+tools/playbook/instruction_units.py · the held-envelope constant and its fixture row name the method's path, and copy none of its text

@@ -1,0 +1,51 @@
+# doors.toml — the door list (PLAY-dOrderedCharter-29 S5), the edge sites' doors until dTotalRecall's kind
+# registry joins its writer column. Read by writing_practice.py's `one-door` arm.
+#
+# One [[door]] row per node kind of the arm's DOOR_KINDS: `kind`; `population`, a tracked-path glob, `*` within
+# one segment, `{prefix}` the tool root and `{memory_root}` the conf's MEMORY_ROOT; `writer`, the tracked file of
+# the command that writes the kind; `witness`, a text its writer leaves in every node, "" where it leaves none, so
+# the kind is printed unobserved; and `pending`, in place of the other three, the build that lands a door not yet
+# built. No filename glob tells a rendered handoff from a brief in a prompts folder: the work-order glob is the
+# shape the handoff renderer names (`<id>-<n>-<role>`), and a brief of that shape is a frozen record, printed.
+
+[[door]]
+kind = "instruction-unit"
+population = "{prefix}/*/instructions.toml"
+writer = "{prefix}/playbook/instructions_edit.py"
+witness = ""
+
+[[door]]
+kind = "instruction-change"
+population = "{memory_root}/builds/*/build/*-change-*.md"
+writer = "{prefix}/playbook/instructions_edit.py"
+witness = ""
+
+[[door]]
+kind = "work-order"
+population = "{memory_root}/builds/*/prompts/*-prompt-*[0-9]-[0-9]*-[a-z]*.md"
+writer = "{prefix}/roles/handoff.py"
+witness = "<!-- gov:handoff "
+
+[[door]]
+kind = "override"
+population = "{memory_root}/builds/*/build/*-override-*.md"
+writer = "{prefix}/memory-tree/build_records.py"
+witness = ""
+
+[[door]]
+kind = "exception"
+population = "{memory_root}/builds/*/build/*-exception-*.md"
+writer = "{prefix}/memory-tree/build_records.py"
+witness = ""
+
+[[door]]
+kind = "record"
+pending = "dTotalRecall"
+
+[[door]]
+kind = "trailer"
+pending = "dWellOiledMachine"
+
+[[door]]
+kind = "act"
+pending = "dWellOiledMachine"

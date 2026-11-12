@@ -37,7 +37,8 @@ SEVEN SOURCES, NOTHING ELSE
   * under `LIVE_LANDED_UNCLOSED=1` ONLY, the drift-audit kit's `non_terminal_specs_cited_by_product_source`
     join, called in-process through that kit's own signal and restated nowhere here, which greps
     tracked product source; LIVE.md renders its rows as a per-build `Landed-unclosed` count
-    (TOOL-aMendedFleet-13). Blank or absent, the drift kit is never imported.
+    (TOOL-aMendedFleet-13). Blank or absent, the drift kit is never imported; set with no drift kit,
+    the column reads `not-installed: drift-audit`, a declared slot (PLAY-dOrderedCharter-17 S4).
   * under a set `SPEC_CARRIES_CUTOFF` ONLY, the carries join's coverage, `derive_carries_coverage` of
     the spec-tokens checker in this kit directory's parent, loaded by path and restated nowhere here,
     handed this module's parse of the conf (TOOL-dTrueNorth-16 S14); each chain build's README renders
@@ -559,7 +560,7 @@ def spec_ids(root: str, tracked: list, conf: dict) -> set:
     this corpus, two thirds of its ids had no spec at all. Resolving a record against it would let a
     binding name something no spec ever defined.
 
-    The predicate itself is `tree_lib.parse_spec_h1`, shared with the memory-recall kit's extractor
+    The predicate itself is `tree_lib.parse_spec_h1`, shared with `id_grammar.extract_records`
     so the two readers cannot disagree about which line defines an id (TOOL-aRepatriatedFork-40).
     """
     m = conf["MEMORY_ROOT"]
@@ -1939,15 +1940,21 @@ def derive_last_record(build: dict, asks) -> str:
     return max(dates)
 
 
+LANDED_NOT_INSTALLED = "not-installed: drift-audit"
+
+
 def read_landed_unclosed(root: str, conf: dict, resolve=None) -> dict | None:
     """TOOL-aMendedFleet-13 S1, S4, S5 — drift-audit's own spec-status signal record, or None.
 
     Blank or absent returns None and never resolves, let alone imports, the drift kit (S6). Set to
     `1`, it calls `signal_spec_status` through the kit's own `Ctx`, `load_conf` and
     `load_project_layer`, base ref `HEAD` because the signal never reads it, so the join is the drift
-    kit's and is restated nowhere here. Every failure is a named Problem before anything is written:
-    an illegal value, an unresolvable kit, a drift-kit refusal carried with its own text, and an
-    EMPTY evidence population, whose every zero would be a reassuring one.
+    kit's and is restated nowhere here. The kit is a declared slot (PLAY-dOrderedCharter-17 S4): one
+    that does not resolve returns `{"slot": LANDED_NOT_INSTALLED}`, which the column renders, and
+    stderr carries the `slot point.memory.live-column · <state>` line in every case. Every other
+    failure is a named Problem before anything is written: an illegal value, a drift-kit refusal
+    carried with its own text, and an EMPTY evidence population, whose every zero would be a
+    reassuring one.
     """
     raw = (conf.get("LIVE_LANDED_UNCLOSED") or "").strip()
     if raw not in ("", "1"):
@@ -1958,9 +1965,10 @@ def read_landed_unclosed(root: str, conf: dict, resolve=None) -> dict | None:
     try:
         kit = (resolve or backlog.resolve_kit_dir)("drift-audit", "drift_report.py",
                                                    os.path.dirname(os.path.abspath(__file__)))
-    except LookupError as exc:
-        raise Problem(f"LIVE_LANDED_UNCLOSED=1 needs the drift-audit kit, which does not "
-                      f"resolve: {exc}") from None
+    except LookupError:
+        # PLAY-dOrderedCharter-17 S4: a declared slot, never a refusal. The column names the state.
+        print(f"build-index: slot point.memory.live-column · {LANDED_NOT_INSTALLED}", file=sys.stderr)
+        return {"slot": LANDED_NOT_INSTALLED}
     sys.path.insert(0, str(kit))
     import drift_report  # noqa: PLC0415 — deferred: only a set key may import the sibling kit
     rootp = pathlib.Path(root)
@@ -1974,6 +1982,8 @@ def read_landed_unclosed(root: str, conf: dict, resolve=None) -> dict | None:
         raise Problem(f"LIVE_LANDED_UNCLOSED=1: drift-audit's {record.get('signal')} join read an EMPTY "
                       f"evidence population (EVIDENCE_GLOBS resolves to no tracked file), so every "
                       f"Landed-unclosed count would be a reassuring zero")
+    print("build-index: slot point.memory.live-column · %s"
+          % ("filled" if record.get("detail") else "searched-empty"), file=sys.stderr)
     return record
 
 
@@ -2044,8 +2054,11 @@ def derive_landed_counts(record: dict, builds: list, m: str) -> dict:
 
     A row counts for a non-terminal build only when its (file, id) pair is one of that build's units
     in this generator's TRACKED reading: the signal globs the filesystem, so an untracked spec reaches
-    it, and the pair keeps the render a function of the tracked tree. Terminal builds count zero.
+    it, and the pair keeps the render a function of the tracked tree. Terminal builds count zero. A
+    not-installed slot record keys every build to its state word (PLAY-dOrderedCharter-17 S4).
     """
+    if "slot" in record:
+        return {b["slug"]: record["slot"] for b in builds}
     counts = {}
     rows = {(r["file"], r["id"]) for r in record.get("detail") or ()}
     for b in builds:
@@ -6946,7 +6959,7 @@ def cmd_selftest() -> int:
             print(f"arm SKIP  the view's anchor arms did not run — {_why}")
             fails.append("the anchor arms were SKIPPED, so the anchor property is unobserved")
         else:
-            import extract as _anchor_kit  # noqa: PLC0415 — deferred exactly as backlog.py's is
+            import id_grammar as _anchor_kit  # noqa: PLC0415 — deferred exactly as backlog.py's is
             # THE GRAMMAR IS BOUND TO THE FIXTURE, not to this repo. Bound to this repo it would
             # recognise none of the fixture's families, return nothing for every line, and pass by
             # finding nothing — the empty-classification shape this kit has measured twice.
@@ -8348,10 +8361,12 @@ def cmd_selftest() -> int:
                 plan(_l_t, dict(_l_conf, LIVE_LANDED_UNCLOSED=" "),
                      resolve=lambda *_a: {}["a blank key resolved the drift kit"])[0]["memory/LIVE.md"]
                 == _l_live))
-        arm("TOOL-aMendedFleet-13 AC5 — a set key whose drift kit does not resolve refuses by name",
-            "LIVE_LANDED_UNCLOSED=1 needs the drift-audit kit, which does not resolve",
+        # PLAY-dOrderedCharter-17 AC3: where this arm asserted the refusal, the slot renders its state.
+        arm("PLAY-dOrderedCharter-17 AC3 — a set key whose drift kit does not resolve renders the column "
+            "not-installed and proceeds",
+            " | active | not-installed: drift-audit |\n",
             lambda: plan(_l_t, dict(_l_conf, LIVE_LANDED_UNCLOSED="1"),
-                         resolve=lambda *_a: {}["no drift-audit kit in this fixture"]))
+                         resolve=lambda *_a: {}["no drift-audit kit in this fixture"])[0]["memory/LIVE.md"])
         arm("TOOL-aMendedFleet-13 S5 — a value other than blank or 1 refuses by name",
             "LIVE_LANDED_UNCLOSED='yes' is not one of its two legal values",
             lambda: plan(_l_t, dict(_l_conf, LIVE_LANDED_UNCLOSED="yes")))

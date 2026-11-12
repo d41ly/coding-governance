@@ -257,7 +257,9 @@ except LookupError as e:
 r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
-CODEBASE_MAP_DIR=$(resolve_kit_dir "$_PY" codebase-map reuse_lookup.py "$HERE") || exit 2
+# PLAY-dOrderedCharter-17 S10: the codebase map is a declared slot. Where it does not resolve, the map
+# arms below skip with the slot line, their assertions counted, where this suite used to exit 2.
+CODEBASE_MAP_DIR=$(resolve_kit_dir "$_PY" codebase-map reuse_lookup.py "$HERE" 2>/dev/null) || CODEBASE_MAP_DIR=""
 CODEBASE_MAP="${CODEBASE_MAP_DIR##*/}"
 # Fixture identity and line endings for every git below, through the environment and not per repo
 # (TOOL-aSparedSpawn-9 S1): no spawn, and command scope outranks a node's global autocrlf=true.
@@ -490,6 +492,13 @@ write_rev_spec 93 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.'
 #      the specs that already do the right thing, because this house style wraps at ~100 columns.
 write_rev_spec 94 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · folded the review
   corrections, which moved §4 and the acceptance criteria beneath it.'
+# 95 — post-cutoff, a section named in WORDS (PLAY-dOrderedCharter-64) -> silent
+write_rev_spec 95 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · section 7 · folded the review corrections.'
+# 96 — the words form capitalised, its digit on the wrapped continuation line -> silent
+write_rev_spec 96 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · folded the review corrections, which moved Section
+  10 and nothing else.'
+# 97 — the plural with no digit names no section -> RED
+write_rev_spec 97 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · folded the review corrections across several sections.'
 
 # ---- TOOL-aJoinedCanon-3: the §2 scope-JOIN arms. SCOPE_JOIN_CUTOFF is declared at 2026-08-20 in
 # ---- the conf above, between the fixture eras. The shipped cutoff sits ahead of every dated spec on
@@ -889,6 +898,15 @@ ledspec 144 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observe
 #       `form` does not reach the spec side at all, so this one needs no head token.
 ledspec 146 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observed at length
   by `alpha.sh`, which is named only here.'
+# 147 — PLAY-dOrderedCharter-77 S16: the CRITERION's backticked command opens on its head line and closes
+#       on its wrap, and its answer names the path it closes on. Read per line, the closing backtick
+#       paired with the next span's opener and the criterion shared nothing with its answer: red.
+#       Joined, the command is one token holding the path: silent. 148 is its control, an answer
+#       sharing nothing, red either way.
+ledspec 147 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — when `bash alpha.sh
+  --list etc/beta.toml` runs, `gamma` prints nothing.'
+ledspec 148 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — when `bash alpha.sh
+  --list etc/beta.toml` runs, `gamma` prints nothing.'
 
 # ---- TOOL-aJoinedCanon-8: the four §3 EDGE arms. SPEC_EDGES_CUTOFF is 2026-08-20 in the shared
 # ---- conf. These are Tier-2 by construction: the arm sits BELOW the `hdr ~ /Tier-1/ next` cut,
@@ -1015,6 +1033,18 @@ write_rows_spec 182 10 '- security
 - AC1 — `alpha.sh` — observed.
 '
 } > "$D/build/2026-08-20-build-ARCH-tFixture-140-1-ledger.md"
+# PLAY-dOrderedCharter-77 S16: 147's answer names the path its criterion's wrapped command closes on; 148's
+# names nothing the criterion holds.
+printf '# ledger three
+
+**Serves:** journal ARCH-tFixture-147 ARCH-tFixture-148
+
+**Evidences:** ARCH-tFixture-147
+- AC1 — `etc/beta.toml` — observed.
+
+**Evidences:** ARCH-tFixture-148
+- AC1 — `zulu.py` — observed.
+' > "$D/build/2026-08-20-build-ARCH-tFixture-147-1-ledger.md"
 # CHECK 22's FIXTURES SIT ABOVE THE COMMIT, and that is load-bearing rather than tidy: the hygiene
 # engine selects its population with `git ls-files`, so a fixture written after this commit is
 # UNTRACKED and invisible to it. Written below, all six were ignored, check 22 graded nothing, and
@@ -1293,6 +1323,8 @@ hit  'ARCH-tFixture-142/AC1'                   # labels agree, content shares no
 miss 'ARCH-tFixture-143/AC1'                   # the shared token is on the answer continuation line
 hit  'ARCH-tFixture-144/AC1'                   # ...and deleting that continuation token reds it
 miss 'ARCH-tFixture-146/AC1'                   # the CRITERION names its token in its own wrap
+miss 'ARCH-tFixture-147/AC1'                   # a wrapped span is one token, joined (PLAY-dOrderedCharter-77 S16)
+hit  'ARCH-tFixture-148/AC1'                   # ...and its control, sharing nothing, still reds
 
 # ---- TOOL-aJoinedCanon-8: the four §3 edge arms and the three `fail 12` branches the joins add.
 hit  'tFixture-160.md (§3 carries no `### Edges` block'
@@ -1448,6 +1480,10 @@ miss 'tFixture-91.md (revision entries naming no'   # the entry gained a §4 tok
 miss 'tFixture-92.md (revision entries naming no'   # PRE-cutoff, grandfathered
 miss 'tFixture-93.md (revision entries naming no'   # rev-1 only, exempt
 miss 'tFixture-94.md (revision entries naming no'   # the token is on a wrapped continuation line
+# ---- PLAY-dOrderedCharter-64: a section named in words.
+miss 'tFixture-95.md (revision entries naming no'   # section 7, lower case
+miss 'tFixture-96.md (revision entries naming no'   # Section, its digit on the wrap
+hit  'tFixture-97.md (revision entries naming no section, scope id or acceptance id'   # sections, no digit
 
 # ---- TOOL-aJoinedCanon-3: §2 scope-join. AC1-AC5.
 hit  'tFixture-110.md (scope items naming neither an acceptance criterion nor NOT OBSERVED'
@@ -3094,6 +3130,19 @@ s10conf ''
 out=$(cd "$S10" && SPEC10_CUTOFF=1999-01-01 bash "$SCRIPT" 2>/dev/null)
 cnot 12 'memory/builds/tTen/spec/2026-08-01-spec-tTen-1.md'
 
+# --- PLAY-dOrderedCharter-42 S4 (AC4) — the typed-kinds round trip: the record factory writes one
+# --- record of every kind tree_lib.TYPED_RECORD_KINDS names into its own scratch repository, and
+# --- check 21's predicate, --print-bindings, prints no A row over it. Red on a kind the factory
+# --- mints and the bindings reader does not admit.
+out=$("$_PY" "$HERE/build_records.py" --fixture --plant typed-kinds 2>&1)
+hit 'build-records: PASS typed-kinds'
+
+# --- PLAY-dOrderedCharter-55 S8 (AC8) — a pending kind: a copy of the record factory with one kind's
+# --- entry declared pending imports, `read` exits 2 naming the unit, and `write_record` refuses it
+# --- naming the unit with no file written. Red on a write_record that writes a pending kind.
+out=$("$_PY" "$HERE/build_records.py" --fixture --plant pending-kind 2>&1)
+hit 'build-records: PASS pending-kind'
+
 # ---- the verdict, printed AFTER the last arm. Upstream printed PASS ~150 lines early and landed a
 # ---- red merge bar because the head of the output said success.
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23, and it closes TOOL-cTracedPromise-4 rather than
@@ -3583,6 +3632,10 @@ if grep -qF '`INDEX_CAP_LINES`, is: 500.' "$_fl/memory/HYGIENE.md" 2>/dev/null \
 else
   echo "FAIL --render did not state the fixture's own INDEX_CAP_LINES=500 / ENTRY_CAP_UNIT=bytes, or still spells gov's INDEX_CAP_LINES=0"; st=1
 fi
+if [ -z "$CODEBASE_MAP_DIR" ]; then
+  n=$((n+2))   # COUNTED EITHER WAY, so the floor grades this suite and not which kits sit beside it
+  echo "  SKIP slot point.memory.consult · not-installed: the map arms skip, no codebase-map kit resolving beside this one; their 2 assertions are counted, not run"
+else
 n=$((n+1))
 if grep -qF "\`scripts/${CODEBASE_MAP_DIR##*/}/gen_map.py\`" "$_fl/memory/TEMPLATE-SPEC.md" 2>/dev/null; then
   echo "ok   a flat install renders TOOL_ROOT from the receipt's prefix"
@@ -3594,6 +3647,7 @@ if grep -qF '`lib/cm/reuse_lookup.py`' "$_fl/memory/TEMPLATE-SPEC.md" 2>/dev/nul
   echo "ok   a sibling file the receipt re-homes renders at its row's path, not at the top-level prefix"
 else
   echo "FAIL the receipt row re-homing the codebase-map lookup to lib/cm/ was ignored — the render read the top-level prefix only"; st=1
+fi
 fi
 rm -rf "$_fl"
 
@@ -4075,78 +4129,72 @@ grep -qF 'Tier-1 micro-spec sections' <<<"$out_t1" && { echo "FAIL AC5: the micr
 # ---- those arms runs this script, so none sees whether the block sets status=1 on the module's
 # ---- exit or prints its summary on a green run, and the one grep that observed it is satisfied by
 # ---- a comment. A block that swallowed the exit would leave the leg green over every near match.
-# ---- A COPY-INSTALL fixture, the shape that module's check-27 arms use: this kit's scripts and the
-# ---- recall kit's modules sit where THIS install has them, so the index builder resolves and
-# ---- extract.py binds its id grammar to the fixture rather than to the host
+# ---- A COPY-INSTALL fixture, the shape that module's check-27 arms use: this kit's scripts and
+# ---- modules sit where THIS install has them, so the index builder in id_grammar.py resolves and
+# ---- binds its id grammar to the fixture rather than to the host
 # ---- (`grammar-bound-to-the-wrong-root`). Otherwise clean on the _b1 shape, so 27 is the branch's
 # ---- only offence. The branch row PARAPHRASES the base row: a verbatim restatement is also an exact
 # ---- duplicate, which is TOOL-aGraftedHelix-6's check 28 and not this arm's subject. Every run pins
 # ---- GOV_DEFAULT_BRANCH=main, because the relation base is derived from it.
-R27_KIT=$(resolve_kit_dir "$_PY" memory-recall bench.py "$HERE" 2>/dev/null) || R27_KIT=""
-if [ -z "$R27_KIT" ]; then
-  echo "skip check 27 through the engine: no memory-recall kit beside this one, so its five arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+5))
-else
-  R27=$TMP/rel27
-  _r27host=${HERE%/"$KIT_REL"}
-  mkdir -p "$R27/$KIT_REL" "$R27/$R27_KIT"
-  cp "$HERE"/*.sh "$HERE"/*.py "$R27/$KIT_REL"/
-  cp "$_r27host/$R27_KIT"/*.py "$R27/$R27_KIT"/
-  # The receipt rides along when there is one: it is how a re-homed recall kit resolves.
-  if [ -f "$_r27host/.governance/install.json" ]; then
-    mkdir -p "$R27/.governance" && cp "$_r27host/.governance/install.json" "$R27/.governance/"
-  fi
-  (
-    cd "$R27" || exit 1
-    git init -q --template= . && git symbolic-ref HEAD refs/heads/main
-    mkdir -p memory/builds/tOne/spec memory/project
-    printf '/%s/\n/%s/\n/.governance/\n__pycache__/\n' "${KIT_REL%%/*}" "${R27_KIT%%/*}" > .gitignore
-    printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\nNEAR_MATCH_GATE="red:0.125"\n' > .memory-tree.conf
-    printf '# charter\n\nRead `memory/README.md` first.\n' > AGENTS.md
-    printf '# r\n' > memory/README.md
-    printf '# d\n\n- ARCH-tOne-1 - rotation archives keep terminal rows only, and a live row never moves into one\n' > memory/DECISIONS.md
-    printf '# stale-header-waiver.txt -- EMPTY is expected; the file must exist.\n' > memory/project/stale-header-waiver.txt
-    printf -- '---\nslug: tOne\nnode: a\nopened: 2026-08-01\nstreams: arch\nroster: ARCH\nids: ARCH-tOne-1\nstatus: OPEN\n---\n\n# tOne\n\n<!-- gen:build-index -->\n\n<!-- /gen:build-index -->\n' > memory/builds/tOne/README.md
-    printf '# ARCH-tOne-1 - a unit\n\nbody\n' > memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md
-    git add -A && git -c commit.gpgsign=false commit -q -m base --no-verify
-    "$_PY" "$KIT_REL/gen_build_index.py" --write
-    git add -A && git -c commit.gpgsign=false commit -q -m gen --no-verify
-    git checkout -q -b arm
-    printf -- '- ARCH-tTwo-1 - a live row is never moved into a rotation archive, which holds only terminal rows\n' >> memory/DECISIONS.md
-    git add -A && git -c commit.gpgsign=false commit -q -m paraphrase --no-verify
-  ) >/dev/null 2>&1
-  run_rel27_gate() { local _b=$1; shift; ( cd "$R27" && git checkout -q "$_b" && GOV_DEFAULT_BRANCH=main bash "$R27/$KIT_REL/check-memory-hygiene.sh" "$@" 2>&1 ); }
-  o27=$(run_rel27_gate arm); r27rc=$?
-  n=$((n+1))
-  if [ "$r27rc" != 0 ] && grep -qE '^check 27: ARCH-tTwo-1 \(memory/DECISIONS\.md:[0-9]+\) near-matches ARCH-tOne-1 at ' <<<"$o27"; then
-    echo "ok   check 27 through the engine: a paraphrased decision row reds the leg, naming itself and the base row"
-  else
-    echo "FAIL check 27 through the engine: the branch adding a paraphrased row exited $r27rc without a check 27 line naming ARCH-tTwo-1 and ARCH-tOne-1 - the block swallowed the module's exit, or never ran it:"; printf '%s\n' "$o27" | sed 's/^/      /'; st=1
-  fi
-  # TOOL-aGraftedHelix-17: the paraphrase is all that keeps check 28 off this branch. A branch row
-  # whose body restates the base row's is a content duplicate, check 28 reds the same run, and the
-  # exit is no longer 27's to claim. The --offenders arm below reds then too, but its message is
-  # about the offending check; this one names the fixture's row as the cause.
-  n=$((n+1))
-  if grep -qE '^check 28:' <<<"$o27"; then
-    echo "FAIL check 27 through the engine: the branch run printed a check 28 line - the fixture's branch row ARCH-tTwo-1 is a content duplicate of its base row ARCH-tOne-1, so the exit belongs to check 28 and not to 27; paraphrase the row again:"; grep -E '^check 28:' <<<"$o27" | sed 's/^/      /'; st=1
-  else
-    echo "ok   check 27 through the engine: the branch run prints no check 28 line, so its row is no content duplicate of the base row"
-  fi
-  # --offenders, not a grep of the prose: it keys EVERY check's offence the same way, a delegated
-  # module's and corpus_ids' refusal included, and it is the only reader of the block's own key line.
-  _r27k=$(run_rel27_gate arm --offenders | cut -f1 | sort -u)
-  n=$((n+1))
-  [ "$_r27k" = "check 27" ] || { echo "FAIL check 27 through the engine: --offenders keyed the branch as [$(printf '%s' "$_r27k" | tr '\n' ',')] rather than check 27 alone - another check offends, so the exit is not 27's to claim, or the block keys nothing under 27"; st=1; }
-  o27=$(run_rel27_gate main); r27rc=$?
-  n=$((n+1))
-  case "$r27rc:$o27" in
-    0:*"row-grammar: check 27 graded 0 added record(s)"*) echo "ok   check 27 through the engine: the clean main exits 0 and prints the module's graded summary" ;;
-    *) echo "FAIL check 27 through the engine: the clean main exited $r27rc, or the green run did not print the 'row-grammar: check 27 graded 0' summary - the block drops its capture on exit 0:"; printf '%s\n' "$o27" | sed 's/^/      /'; st=1 ;;
-  esac
-  o27=$(GOV_DEFAULT_BRANCH=no-such-branch run_rel27_gate main); r27rc=$?
-  n=$((n+1))
-  [ "$r27rc" = 0 ] || { echo "FAIL check 27 through the engine: an exported GOV_DEFAULT_BRANCH naming no branch reached the pinned run (rc=$r27rc), so these arms grade the shell rather than the block:"; printf '%s\n' "$o27" | sed 's/^/      /'; st=1; }
+R27=$TMP/rel27
+_r27host=${HERE%/"$KIT_REL"}
+mkdir -p "$R27/$KIT_REL"
+cp "$HERE"/*.sh "$HERE"/*.py "$R27/$KIT_REL"/
+# The receipt rides along when there is one.
+if [ -f "$_r27host/.governance/install.json" ]; then
+  mkdir -p "$R27/.governance" && cp "$_r27host/.governance/install.json" "$R27/.governance/"
 fi
+(
+  cd "$R27" || exit 1
+  git init -q --template= . && git symbolic-ref HEAD refs/heads/main
+  mkdir -p memory/builds/tOne/spec memory/project
+  printf '/%s/\n/.governance/\n__pycache__/\n' "${KIT_REL%%/*}" > .gitignore
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\nNEAR_MATCH_GATE="red:0.125"\n' > .memory-tree.conf
+  printf '# charter\n\nRead `memory/README.md` first.\n' > AGENTS.md
+  printf '# r\n' > memory/README.md
+  printf '# d\n\n- ARCH-tOne-1 - rotation archives keep terminal rows only, and a live row never moves into one\n' > memory/DECISIONS.md
+  printf '# stale-header-waiver.txt -- EMPTY is expected; the file must exist.\n' > memory/project/stale-header-waiver.txt
+  printf -- '---\nslug: tOne\nnode: a\nopened: 2026-08-01\nstreams: arch\nroster: ARCH\nids: ARCH-tOne-1\nstatus: OPEN\n---\n\n# tOne\n\n<!-- gen:build-index -->\n\n<!-- /gen:build-index -->\n' > memory/builds/tOne/README.md
+  printf '# ARCH-tOne-1 - a unit\n\nbody\n' > memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md
+  git add -A && git -c commit.gpgsign=false commit -q -m base --no-verify
+  "$_PY" "$KIT_REL/gen_build_index.py" --write
+  git add -A && git -c commit.gpgsign=false commit -q -m gen --no-verify
+  git checkout -q -b arm
+  printf -- '- ARCH-tTwo-1 - a live row is never moved into a rotation archive, which holds only terminal rows\n' >> memory/DECISIONS.md
+  git add -A && git -c commit.gpgsign=false commit -q -m paraphrase --no-verify
+) >/dev/null 2>&1
+run_rel27_gate() { local _b=$1; shift; ( cd "$R27" && git checkout -q "$_b" && GOV_DEFAULT_BRANCH=main bash "$R27/$KIT_REL/check-memory-hygiene.sh" "$@" 2>&1 ); }
+o27=$(run_rel27_gate arm); r27rc=$?
+n=$((n+1))
+if [ "$r27rc" != 0 ] && grep -qE '^check 27: ARCH-tTwo-1 \(memory/DECISIONS\.md:[0-9]+\) near-matches ARCH-tOne-1 at ' <<<"$o27"; then
+  echo "ok   check 27 through the engine: a paraphrased decision row reds the leg, naming itself and the base row"
+else
+  echo "FAIL check 27 through the engine: the branch adding a paraphrased row exited $r27rc without a check 27 line naming ARCH-tTwo-1 and ARCH-tOne-1 - the block swallowed the module's exit, or never ran it:"; printf '%s\n' "$o27" | sed 's/^/      /'; st=1
+fi
+# TOOL-aGraftedHelix-17: the paraphrase is all that keeps check 28 off this branch. A branch row
+# whose body restates the base row's is a content duplicate, check 28 reds the same run, and the
+# exit is no longer 27's to claim. The --offenders arm below reds then too, but its message is
+# about the offending check; this one names the fixture's row as the cause.
+n=$((n+1))
+if grep -qE '^check 28:' <<<"$o27"; then
+  echo "FAIL check 27 through the engine: the branch run printed a check 28 line - the fixture's branch row ARCH-tTwo-1 is a content duplicate of its base row ARCH-tOne-1, so the exit belongs to check 28 and not to 27; paraphrase the row again:"; grep -E '^check 28:' <<<"$o27" | sed 's/^/      /'; st=1
+else
+  echo "ok   check 27 through the engine: the branch run prints no check 28 line, so its row is no content duplicate of the base row"
+fi
+# --offenders, not a grep of the prose: it keys EVERY check's offence the same way, a delegated
+# module's and corpus_ids' refusal included, and it is the only reader of the block's own key line.
+_r27k=$(run_rel27_gate arm --offenders | cut -f1 | sort -u)
+n=$((n+1))
+[ "$_r27k" = "check 27" ] || { echo "FAIL check 27 through the engine: --offenders keyed the branch as [$(printf '%s' "$_r27k" | tr '\n' ',')] rather than check 27 alone - another check offends, so the exit is not 27's to claim, or the block keys nothing under 27"; st=1; }
+o27=$(run_rel27_gate main); r27rc=$?
+n=$((n+1))
+case "$r27rc:$o27" in
+  0:*"row-grammar: check 27 graded 0 added record(s)"*) echo "ok   check 27 through the engine: the clean main exits 0 and prints the module's graded summary" ;;
+  *) echo "FAIL check 27 through the engine: the clean main exited $r27rc, or the green run did not print the 'row-grammar: check 27 graded 0' summary - the block drops its capture on exit 0:"; printf '%s\n' "$o27" | sed 's/^/      /'; st=1 ;;
+esac
+o27=$(GOV_DEFAULT_BRANCH=no-such-branch run_rel27_gate main); r27rc=$?
+n=$((n+1))
+[ "$r27rc" = 0 ] || { echo "FAIL check 27 through the engine: an exported GOV_DEFAULT_BRANCH naming no branch reached the pinned run (rc=$r27rc), so these arms grade the shell rather than the block:"; printf '%s\n' "$o27" | sed 's/^/      /'; st=1; }
 
 # ---- TOOL-aGraftedHelix-13 — CHECK 28's DISPATCH BLOCK, observed THROUGH THE ENGINE, for the reason
 # ---- the check-27 arms above exist: `row_grammar.py --selftest` arms the predicate and never runs
@@ -4585,9 +4633,17 @@ done
 # skipped aloud with that block's others. Counted by reading; OWED: observed at the close.
 # RAISED 668 -> 670 by TOOL-dGroundRules-25 S35: its two no-launcher assertions, exit 2 and the line,
 # each top-level and never skipped. Counted by reading; OWED: observed at the close.
+# RAISED 670 -> 673 by PLAY-dOrderedCharter-64: its three words-form rev-scope assertions, fixtures
+# 95, 96 and 97, each top-level and never skipped. Counted by reading; OWED: observed at the close.
+# RAISED 673 -> 674 by PLAY-dOrderedCharter-42: its typed-kinds round-trip assertion, top-level and
+# never skipped. Counted by reading; OWED: observed at the close.
+# RAISED 674 -> 675 by PLAY-dOrderedCharter-55: its pending-kind assertion, top-level and never
+# skipped. Counted by reading; OWED: observed at the close.
 # RAISED 670 -> 685 by TOOL-dPavedRoad-4: its fifteen staged-joins arms, nine top-level and six in a
 # two-pass loop, none skipped. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=685
+# MERGED at PLAY-dOrderedCharter-83's reconcile of 47ed57fab: the base 670, plus this branch's 5 from
+# PLAY-dOrderedCharter-64, -42 and -55, plus TOOL-dPavedRoad-4's 15 = 690. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=690
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

@@ -33,6 +33,7 @@ except (AttributeError, ValueError):
 
 import map_extractors as ext  # noqa: E402
 import map_lib as m  # noqa: E402
+import coverage_join as cj  # noqa: E402 - memory-tree's, on the path map_lib's import appends
 import reuse_lookup as rl  # noqa: E402
 
 IDS = ext.inventory_ids()
@@ -161,7 +162,7 @@ def _write(path: Path, content: str) -> None:
 def _seed_baseline() -> None:
     inventories = ext.all_inventories()
     tree = m.load_map_tree(IDS, decision_id_re=ID_RE)
-    cov = m.compute_coverage(inventories, m.owners_of(tree), {k: () for k in IDS})
+    cov = cj.compute_coverage(inventories, m.owners_of(tree), {k: () for k in IDS})
     _write(m.map_root() / "baseline.toml", m.render_baseline(cov.unclaimed, IDS))
     print(f"baseline: {sum(len(v) for v in cov.unclaimed.values())} unclaimed keys")
 

@@ -2,6 +2,7 @@
 
 id = "memory-recall"
 home = "memory-recall"
+layer = "layer.memory.recall"
 scope = "repo"
 version_from = { file = "recall_conf.py", pattern = "^KIT_MEMORY_RECALL_VERSION = " }
 requires = ["memory-tree"]
@@ -123,3 +124,14 @@ why = "a rendered artifact its own gate byte-compares"
 # `opt_in` rule the hook, to a target that asked for it. An adopter that keeps its hook outside this
 # directory declares that copy `[[own]]` in its deploy.toml; the fragment's hook path then resolves
 # to it through settings-merge.py, the one reader check-wiring calls.
+
+# THE DRIVE ROWS (PLAY-dOrderedCharter-6): how a session starts or advances a stage this kit serves. The
+# playbook render composes one charter line per row of each selected kit, and the role's handoff carries
+# its own role's lines. `stage` names a workflow of the roles kit's workflows.toml, or `start`; `role` a
+# role slot, or `main` for the main session.
+
+[[drive]]
+stage = "research"
+role = "gov-researcher"
+command = 'python <prefix>/memory-recall/query.py "<question>" --terms "<8-14 words>"'
+when = "a design choosing between candidates no seam decides"

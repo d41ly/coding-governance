@@ -1,0 +1,130 @@
+# namespaces.toml — the tag namespace registry (PLAY-dOrderedCharter-19 S2). Read by tag_index.read_namespaces.
+#
+# One [[namespace]] row per namespace: `ns`, the word a tag opens with; `owner`, the chain build that owns it;
+# `layer`, the layer register row it belongs to; `source`, what it is minted from; `extractor`, the
+# `<module>:<function>` that reads that source; `role`, `selects` or `describes`; `purpose-source`, where its
+# members' purposes are read; `join-armed-by`, the build that arms its joins. A namespace word is read from here
+# and never typed beside it. PLAY-dOrderedCharter-10 adds its eight rows; PLAY-dOrderedCharter-22 grades
+# `purpose-source` and `owner`: `owner` names a `[[build]]` row of <MEMORY_ROOT>/project/chain.toml, and `purpose-source`
+# is `<path>` (path-only), `<path>#<field>` (each member at a .toml path carries the field on its row, a .py path
+# assigns it) or `#<field>` (each member's own file carries it, `h1` a Markdown member's first `# ` line). A source
+# not in the view yet prints `pending` and grades once it lands. A path spells the tool root `{prefix}/`, which the
+# arm resolves against this registry's own tool root (PLAY-dOrderedCharter-72 S7).
+
+[[namespace]]
+ns = "doc"
+owner = "dOrderedCharter"
+layer = "layer.instruction"
+source = "the CHARTER path, memory/guides/*.md, memory/HYGIENE.md, memory/TEMPLATE-SPEC.md, and each [[document]] row of {prefix}/playbook/documents.toml whose tag none of those derives, and each [[reference]] row's registry of {prefix}/playbook/references.toml that opens doc.reference."
+extractor = "tag_index:extract_doc"
+role = "describes"
+purpose-source = "#h1"
+join-armed-by = "dOrderedCharter"
+
+[[namespace]]
+ns = "unit"
+owner = "dOrderedCharter"
+layer = "layer.instruction"
+source = "each [[unit]] row of every <kit>/instructions.toml, its scope values as selector rows, and each change record of an ended tag as a retired row; .governance/instructions.toml's rows are the repo namespace's"
+extractor = "instruction_units:extract_unit"
+role = "selects"
+purpose-source = "#help"
+join-armed-by = "dOrderedCharter"
+
+[[namespace]]
+ns = "reader"
+owner = "dOrderedCharter"
+layer = "layer.instruction"
+source = "each [[reader]] row's tag in {prefix}/playbook/readers.toml"
+extractor = "tag_index:extract_reader"
+role = "selects"
+purpose-source = "{prefix}/playbook/readers.toml#why"
+join-armed-by = "dOrderedCharter"
+
+[[namespace]]
+ns = "practice"
+owner = "dOrderedCharter"
+layer = "layer.instruction"
+source = "each [[practice]] row's tag in {prefix}/playbook/practices.toml"
+extractor = "tag_index:extract_practice"
+role = "selects"
+purpose-source = "{prefix}/playbook/practices.toml#line"
+join-armed-by = "dOrderedCharter"
+
+[[namespace]]
+ns = "level"
+owner = "dOrderedCharter"
+layer = "layer.instruction"
+source = "LEVELS in {prefix}/playbook/instruction_units.py, level.<name> each"
+extractor = "tag_index:extract_level"
+role = "describes"
+purpose-source = "{prefix}/playbook/instruction_units.py#LEVELS"
+join-armed-by = "dOrderedCharter"
+
+[[namespace]]
+ns = "layer"
+owner = "dOrderedCharter"
+layer = "layer.instruction"
+source = "each [[layer]] row's tag in {prefix}/playbook/layers.toml"
+extractor = "tag_index:extract_layer"
+role = "describes"
+purpose-source = "{prefix}/playbook/layers.toml#definition"
+join-armed-by = "dOrderedCharter"
+
+[[namespace]]
+ns = "principle"
+owner = "dOrderedCharter"
+layer = "layer.instruction"
+source = "each [[principle]] row's tag in {prefix}/playbook/principles.toml"
+extractor = "tag_index:extract_principle"
+role = "describes"
+purpose-source = "{prefix}/playbook/principles.toml#line"
+join-armed-by = "dOrderedCharter"
+
+[[namespace]]
+ns = "kind"
+owner = "dOrderedCharter"
+layer = "layer.instruction"
+source = "each [[kind]] row's tag in {prefix}/playbook/kinds.toml"
+extractor = "tag_index:extract_kind"
+role = "describes"
+purpose-source = "{prefix}/playbook/kinds.toml"
+join-armed-by = "dOrderedCharter"
+
+[[namespace]]
+ns = "kit"
+owner = "dOrderedCharter"
+layer = "layer.distribution"
+source = "the top-level id of each tracked kit.toml or *.kit.toml descriptor, kit.<id> at its own line"
+extractor = "tag_index:extract_kit"
+role = "describes"
+purpose-source = "{prefix}/govkit/registry.toml"
+join-armed-by = "dOrderedCharter"
+
+[[namespace]]
+ns = "repo"
+owner = "dOrderedCharter"
+layer = "layer.instruction"
+source = "each [[unit]] row's repo.<seg> tag in .governance/instructions.toml"
+extractor = "instruction_units:extract_repo"
+role = "selects"
+purpose-source = ".governance/instructions.toml"
+join-armed-by = "dOrderedCharter"
+
+# The native-id classes (PLAY-dOrderedCharter-28 S2), read by edge_grammar.read_native_classes: one [[native]]
+# row per class, `class`, the word an edge row's `from` or `to` names it by; `owner`, the build that registered
+# it; `pattern`, the `<module>:<name>` that compiles its ids, never a second regex; `resolver`, what prints its
+# members, a `<module>:--<flag>` script or a `<module>:<function>`. Each later class is registered, and its
+# resolution armed, by the build that brings it.
+
+[[native]]
+class = "family-id"
+owner = "dOrderedCharter"
+pattern = "id_grammar:grammar_for"
+resolver = "corpus_ids:--print-defined-ids"
+
+[[native]]
+class = "clause-id"
+owner = "dTrueNorth"
+pattern = "design_lib:_CL"
+resolver = "design_lib:read_design_view"

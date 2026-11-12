@@ -96,7 +96,11 @@ plant that must exit 0; `guard-merge-side` concludes a conflicted merge with the
 0, then with a third text, exit 1. The mirror shape's three (TOOL-dGroundRules-19): `guard-mirror-render`
 commits a catalogue row and stages the regenerated mirror alone, exit 0; `guard-mirror-beside-catalogue`
 stages it beside the row, exit 1; `guard-mirror-branch-green` commits the admitted mirror on a branch
-and reads `mirror --check` fresh at the new HEAD.
+and reads `mirror --check` fresh at the new HEAD. The live run's three (PLAY-dOrderedCharter-84) stage
+the deploy and instructions edits on a branch `run/t` whose committed run-state record and driver
+decide: `guard-run-live` exits 0 in either `run-branch` spelling, `guard-run-terminal` exits 1 on
+`LANDED`, `ABORTED` and a removed driver, and `guard-run-other-branch` exits 1 on a branch no record
+at HEAD names, a record only staged, and a detached HEAD.
 
 `legacy-homes` is an outcome case (TOOL-dGroundRules-7): per case, a repository holding a copy of
 policy.py, a `.unattended.conf`, a gate file and a house file where the copy resolves HOUSE_HOME,
@@ -233,10 +237,17 @@ def arm_schema(repo, kit):
     key no row matches (TOOL-dGroundRules-4 re-points this arm through the one judge), and the
     `[budgets]` table's rule over the cap census `repo` holds at this kit's path (TOOL-dGroundRules-9).
     A census that does not read, or a file that is not UTF-8, is the one finding. No policy file, or
-    one setting no key, is a population of 0, which this arm announces (TOOL-dGroundRules-21 S5)."""
+    one setting no key, is a population of 0, which this arm announces (TOOL-dGroundRules-21 S5). The
+    rows are the catalogue's joined with the working tree's overlay `[[policy]]` rows, so an `adopter.`
+    key is judged against its row (PLAY-dOrderedCharter-32 S7)."""
     rows, bad = load_rows(kit)
     if bad:
         return 0, "the catalogue did not parse", [bad]
+    overlay = Path(repo, policy.OVERLAY_REL)
+    try:
+        rows = rows + policy.parse_overlay_policies(overlay.read_text(encoding="utf-8") if overlay.is_file() else None)
+    except (policy.Refusal, UnicodeDecodeError) as exc:
+        return 0, f"{policy.OVERLAY_REL} did not read", [(policy.OVERLAY_REL, str(exc))]
     path = Path(repo, *POLICY_FILE)
     if not path.is_file():
         return 0, f"{POLICY_REL} is absent, so no key was graded", []
@@ -2284,6 +2295,7 @@ def run_mirror_landed_parity(name):
 GUARD_FILES = ("guard.py", "guarded-paths.txt", *READER_FILES)  # the reader: the mirror shape's `mirror --print`
 GUARD_MIRROR = ("guard-mirror-render", "guard-mirror-beside-catalogue", "guard-mirror-branch-green")
 GUARD_INPUTS = ("guard-mirror-beside-conf", "guard-mirror-inputs-join")  # TOOL-dGroundRules-25 S19, S21
+GUARD_RUN = ("guard-run-live", "guard-run-terminal", "guard-run-other-branch")  # PLAY-dOrderedCharter-84
 DEPLOY_REL = ".governance/deploy.toml"
 DECISIONS_REL = "memory/DECISIONS.md"
 # A measured-file cap whose key carries slashes and a leading dot, and the spec folder's class row, so
@@ -2364,7 +2376,9 @@ def run_guard_case(name):
     `mirror --write`: `guard-mirror-render` stages the mirror alone, exit 0;
     `guard-mirror-beside-catalogue` first moves the row back into the index, exit 1;
     `guard-mirror-branch-green` does it on a branch, commits the admitted mirror, and runs
-    `mirror --check` at the new HEAD, which must be fresh."""
+    `mirror --check` at the new HEAD, which must be fresh. The GUARD_RUN cases (PLAY-dOrderedCharter-84)
+    commit a driver declaring `PHASES_TERMINAL` on a branch `run/t`, then per scenario a run-state
+    record, its own commit or detach, and the staged deploy and instructions edits."""
     repo, kit = build_guard_repo()
     guard = [sys.executable, str(kit / "guard.py"), "--staged"]
     checks = []
@@ -2417,8 +2431,8 @@ def run_guard_case(name):
             extra = policy.LEGACY_FANOUT
             if name == "guard-mirror-inputs-join":
                 extra = ".zz-recorded.conf"
-                write_edit(kit / "policy.py", lambda t: t.replace("LEGACY_INPUTS = (LEGACY_FANOUT,)",
-                                                                  f"LEGACY_INPUTS = (LEGACY_FANOUT, {extra!r})"))
+                write_edit(kit / "policy.py", lambda t: t.replace("LEGACY_INPUTS = (LEGACY_FANOUT, OVERLAY_REL)",
+                                                                  f"LEGACY_INPUTS = (LEGACY_FANOUT, OVERLAY_REL, {extra!r})"))
                 run_fixture_git(repo, "add", "-A")
                 run_fixture_git(repo, "commit", "-q", "-m", "a render recording one more input")
             checks.append(check_get("HEAD", repo, ["--write"], lambda rc, o, e: rc == 0
@@ -2429,6 +2443,59 @@ def run_guard_case(name):
             run_fixture_git(repo, "add", "--", extra, policy.MIRROR_REL)
             checks.append(check_run(f"the mirror staged beside {extra}", "guard.py --staged", guard, lambda rc, o, e:
                                     rc == 1 and f"its input {extra} is staged changed" in o, cwd=repo))
+        if name in GUARD_RUN:
+            # Literals only, so the case reads no source file: the driver's terminal set, then per
+            # scenario (phase, run-branch, the step after the record's commit, exit, stdout needles).
+            run_rel, driver_rel = "memory/builds/tRun/RUN.md", "vendor/gov/run/unattended.sh"
+            admitted = (f"policy-guard: admitted · {DEPLOY_REL} .governance/instructions.toml · "
+                        f"the run-branch of {run_rel}, phase BUILDING")
+            unnamed = "no run-state file at HEAD names run/t as its run-branch"
+            live = ("BUILDING", "refs/heads/run/t")
+            scenarios = {
+                "guard-run-live": [("live", live, None, 0, [admitted]),
+                                   ("run-branch with no refs/heads/", ("BUILDING", "run/t"), None, 0, [admitted])],
+                "guard-run-terminal": [
+                    ("landed", ("LANDED", live[1]), None, 1,
+                     [f"refused · {DEPLOY_REL}", "its phase at HEAD, LANDED, is terminal"]),
+                    ("aborted", ("ABORTED", live[1]), None, 1, ["its phase at HEAD, ABORTED, is terminal"]),
+                    ("the driver removed", live, "driver", 1, ["no unattended driver at HEAD declares PHASES_TERMINAL"])],
+                "guard-run-other-branch": [
+                    ("another branch named", ("BUILDING", "refs/heads/run/other"), None, 1, [unnamed]),
+                    ("the record only staged", live, "staged", 1, [unnamed]),
+                    ("detached", live, "detach", 1, ["HEAD is detached"])],
+            }[name]
+            run_fixture_git(repo, "checkout", "-q", "-b", "run/t")
+            Path(repo, driver_rel).parent.mkdir(parents=True, exist_ok=True)
+            Path(repo, driver_rel).write_text('PHASES_TERMINAL="LANDED ABORTED"\n', encoding="utf-8", newline="\n")
+            run_fixture_git(repo, "add", "--", driver_rel)
+            run_fixture_git(repo, "commit", "-q", "-m", "the driver")
+            base = run_fixture_git(repo, "rev-parse", "HEAD")
+            for scenario, facts, step, want, present in scenarios:
+                for i, record in enumerate([facts] + ([live] if step == "staged" else [])):
+                    if i:  # the HEAD record removed in a commit, then a live one staged and never committed
+                        run_fixture_git(repo, "rm", "-q", "--", run_rel)
+                        run_fixture_git(repo, "commit", "-q", "-m", "the run-state record removed")
+                    Path(repo, run_rel).parent.mkdir(parents=True, exist_ok=True)
+                    Path(repo, run_rel).write_text("## Run facts\nphase: {}\nrun-branch: {}\n".format(*record),
+                                                   encoding="utf-8", newline="\n")
+                    run_fixture_git(repo, "add", "--", run_rel)
+                    if not i:
+                        run_fixture_git(repo, "commit", "-q", "-m", "the run-state record")
+                if step == "driver":
+                    run_fixture_git(repo, "rm", "-q", "--", driver_rel)
+                    run_fixture_git(repo, "commit", "-q", "-m", "the driver removed")
+                if step == "detach":
+                    run_fixture_git(repo, "checkout", "-q", "--detach")
+                for rel, edit in GUARD_PLANTS["guard-other-paths"][1][1] + GUARD_PLANTS["guard-other-paths"][2][1]:
+                    path = Path(repo, rel)
+                    path.write_text(edit(path.read_text(encoding="utf-8") if path.exists() else ""),
+                                    encoding="utf-8", newline="\n")
+                    run_fixture_git(repo, "add", "--", rel)
+                checks.append(check_run(scenario, "guard.py --staged", guard, lambda rc, o, e, want=want, present=present:
+                                        rc == want and all(n in o for n in present), cwd=repo))
+                run_fixture_git(repo, "reset", "-q", "--hard")
+                run_fixture_git(repo, "checkout", "-q", "run/t")
+                run_fixture_git(repo, "reset", "-q", "--hard", base)
         for scenario, edits, want, present, absent in GUARD_PLANTS.get(name, []):
             for rel, edit in edits:
                 path = Path(repo, rel)
@@ -3366,18 +3433,31 @@ def derive_role_body_plant(cap):
             "warn": "BUDGET WARN — role-body ·", "refuse": "-byte ceiling (budgets.enforce is refuse)"}
 
 
-def derive_one_line_rule_plant(cap):
-    """A copy of the render engine beside a copy of the policy kit, a template whose one-line region
-    holds a rule one character past the engine's cap, and the smallest descriptor and registry."""
+def derive_render_plant(cap, template):
+    """The render scaffold both render-engine plants build (PLAY-dOrderedCharter-31 S1): a copy of the engine
+    beside a copy of the policy kit, the smallest descriptor and registry, the modules its render imports
+    and the file holding `CODEX_MAX`, which its charter budget reads, and `template` beside the engine
+    copy, where the render reads it first (PLAY-dOrderedCharter-34 F7)."""
     rel = derive_enforcer_rel(cap)
-    v = read_source_number(rel, "ONE_LINE_MAX")
     eng = posixpath.dirname(rel)
-    return {"files": {rel: (derive_source_top() / rel).read_bytes(), f"{eng}/playbook.kit.toml": "",
+    codex = budgets.resolve_prefix_token(budgets.read_cap_census(derive_source_top())["codex-instructions"].home
+                                         .split(":")[1], budgets.derive_tool_root())
+    carried = {f"{eng}/{m}": (derive_source_top() / eng / m).read_bytes()
+               for m in ("instruction_units.py", "load_sets.py", "policy_value.py")}
+    carried[codex] = (derive_source_top() / codex).read_bytes()
+    return {"files": {**carried, rel: (derive_source_top() / rel).read_bytes(), f"{eng}/playbook.kit.toml": "",
                       f"{eng}/registry.toml": '[[entry]]\nid = "lexicon"\n',
-                      ".governance/deploy.toml": 'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "CHARTER.md"\n',
-                      "CHARTER.md": f"<!-- one-line -->\n- {'x' * v}\n<!-- /one-line -->\nend\n"},
-            "copies": (budgets.derive_kit_rel().rstrip("/"),), "argv": [sys.executable, rel, "--target", "{repo}"],
-            "warn": "BUDGET WARN — one-line-rule", "refuse": f"past the {v} a one-line rule may take"}
+                      ".governance/deploy.toml": 'kits = ["lexicon"]\n',
+                      f"{eng}/coding-governance-agents.template.md": template},
+            "copies": (budgets.derive_kit_rel().rstrip("/"),), "argv": [sys.executable, rel, "--target", "{repo}"]}
+
+
+def derive_one_line_rule_plant(cap):
+    """The render scaffold with a template whose one-line region holds a rule one character past the
+    engine's cap."""
+    v = read_source_number(derive_enforcer_rel(cap), "ONE_LINE_MAX")
+    return derive_render_plant(cap, f"<!-- one-line -->\n- {'x' * v}\n<!-- /one-line -->\nend\n") | {
+        "warn": "BUDGET WARN — one-line-rule", "refuse": f"past the {v} a one-line rule may take"}
 
 
 def derive_roster_line_plant(cap):
@@ -3393,6 +3473,22 @@ def derive_roster_line_plant(cap):
             "copies": (roles, budgets.derive_kit_rel().rstrip("/")), "argv": [sys.executable, rel, "roster"],
             "warn": f"BUDGET WARN — roster-line · {agent.name[:-len('.agent.md')]}",
             "refuse": "(budgets.enforce is refuse)"}
+
+
+def derive_code_slot_plant(cap):
+    """A handoff rendered from the source tree with a `code` block one byte past the budget its census home's
+    policy key defaults to, read off the catalogue (PLAY-dOrderedCharter-27). The renderer is the
+    `roster-line` row's enforcer, which measures the block through this row's, so neither path is spelled."""
+    key = cap.home.partition(":")[2]
+    default = str(policy.read_catalogue_row(policy.parse_key(key), policy.load_catalogue(policy.KIT))["default"])
+    v = int(default.rstrip("k")) * 1000  # ponytail: the load-set enforcer's unit, 1,000 bytes a `k`
+    handoff = derive_enforcer_path(budgets.read_cap_census(derive_source_top())["roster-line"])
+    return {"files": {".memory-tree.conf": ROLES_CONF, "AGENTS.md": (derive_source_top() / "AGENTS.md").read_bytes(),
+                      "memory/builds/tOne/README.md": "# tOne\n", "code.txt": "x" * v + "\n"},
+            "argv": [sys.executable, handoff, "render", "--role", "gov-skeptic", "--build", "tOne", "--unit",
+                     "TOOL-tOne-1", "--input", "code=code.txt", "--stdout"],
+            "warn": f"BUDGET WARN · code · {v + 1} bytes over {cap.name} {v} · budgets.enforce is warn",
+            "refuse": f"BUDGET REFUSE · code · {v + 1} bytes over {cap.name} {v} · budgets.enforce is refuse"}
 
 
 def derive_manifest_plant(cap, kit=True, body=None, env=None, argv_tail=()):
@@ -3451,7 +3547,7 @@ def derive_recall_export_plant(cap):
 
 def derive_outside_probe_plant(cap):
     """An outside row's enforcer run under each value, breaching its cap where it has a CLI to reach
-    it: the orientation card at a 1-byte cap, Codex's canonical one byte over CODEX_MAX, a charter
+    it: the orientation card at a 1-byte cap, a template rendered past CODEX_MAX, a charter
     citing a file under no cap, and a subagent route longer than the hook's context cap. A library
     with no CLI, the runlog record's and the feature card's, is imported and its constant printed:
     that run cannot breach, so the arm that holds it outside the switch is `arm_cap_census`'s join,
@@ -3467,8 +3563,8 @@ def derive_outside_probe_plant(cap):
                           "AGENTS.md": "# Charter\n\nRead `memory/HYGIENE.md` first.\n", "memory/HYGIENE.md": "# Hygiene\n"},
                 "argv": [sys.executable, src, "--check"], "warn": "under no byte cap"}
     v = read_source_number(rel, f"const {key}" if rel.endswith(".js") else key)
-    if cap.name == "codex-instructions":
-        return {"files": {"AGENTS.md": "x" * v + "\n"}, "argv": ["bash", src], "warn": f"over {v}"}
+    if cap.name == "codex-instructions":  # the render's harness-limit refusal, the same under warn and refuse
+        return derive_render_plant(cap, ("x" * 99 + "\n") * (v // 100 + 1)) | {"warn": f"over CODEX_MAX {v}"}
     if rel.endswith(".js"):  # the subagent context: a routed card of more route lines than the cap holds
 
         def write_card(t):
@@ -3514,7 +3610,7 @@ CAP_CASES = {
     "readme-bytes": derive_hygiene_plant, "readme-lines": derive_hygiene_plant, "dossier-bytes": derive_hygiene_plant,
     "dossier-lines": derive_hygiene_plant, "entry-chars": derive_hygiene_plant, "readme-entry-chars": derive_hygiene_plant,
     "readme-slot": derive_readme_slot_plant, "role-body": derive_role_body_plant, "one-line-rule": derive_one_line_rule_plant,
-    "roster-line": derive_roster_line_plant, "manifest-bytes": derive_manifest_plant, "manifest-line": derive_manifest_plant,
+    "roster-line": derive_roster_line_plant, "code-slot": derive_code_slot_plant, "manifest-bytes": derive_manifest_plant, "manifest-line": derive_manifest_plant,
     "manifest-trap": derive_manifest_plant, "universal-gotchas": derive_universal_plant, "recall-export": derive_recall_export_plant,
     "orientation-card": derive_outside_probe_plant, "cited-file-cap": derive_outside_probe_plant,
     "codex-instructions": derive_outside_probe_plant, "runlog-record": derive_outside_probe_plant,
@@ -3550,7 +3646,8 @@ def run_cap_case(name):
     family runs a third mode, `zero` (TOOL-dGroundRules-75): `derive_zero_plant` under `refuse`, which
     must exit 0 with no breach line and no awk error, a 0 read as unchecked; its modes run at once,
     each at its own path. An outside row must print the same exit and output under both, its marker in
-    it, so its two modes run in turn at ONE path; and the policy reader must refuse to answer it."""
+    it, so its two modes run in turn at ONE path; and the policy reader must refuse to answer it. A row
+    whose home is `policy:` adds `check_policy_home_family` (PLAY-dOrderedCharter-27)."""
     cap_name = name[len(CAP_CASE_PREFIX):]
     checks, seen = [], {}
     try:
@@ -3604,9 +3701,31 @@ def run_cap_case(name):
                 checks.append(("reader", "budgets.resolve_caps refuses an outside cap", False, "it answered"))
             except policy.Refusal as exc:
                 checks.append(("reader", "budgets.resolve_caps refuses an outside cap", "outside the switch" in exc.why, str(exc)))
+        if cap.home.startswith("policy:"):
+            checks.append(check_policy_home_family(t / "census", cap))
     finally:
         remove_repo(t)
     return print_checks(name, checks)
+
+
+def check_policy_home_family(t, cap):
+    """A copy of the census at `t`, at the census's own path, its `policy:` home row `cap` read `family =
+    false`: `read_cap_census` must refuse it naming the row, since `budgets.<cap>` in the policy file would
+    be a second home for the key's value (PLAY-dOrderedCharter-27). -> one check."""
+    what = "a census copy with the row's family false refuses naming the row"
+    src = (KIT / budgets.CENSUS).read_text(encoding="utf-8").replace("\r\n", "\n")
+    at = src.find(f'name = "{cap.name}"\n')
+    end = src.find("[[cap]]", at) if at >= 0 else -1
+    end = len(src) if end < 0 else end
+    row = src[at:end] if at >= 0 else ""
+    if "family = true" not in row:
+        return ("family false", what, False, f"no `family = true` line in {cap.name}'s row to plant against")
+    write_case_file(t, budgets.derive_census_rel(), src[:at] + row.replace("family = true", "family = false") + src[end:])
+    try:
+        budgets.read_cap_census(t)
+        return ("family false", what, False, "the census read")
+    except policy.Refusal as exc:
+        return ("family false", what, cap.name in exc.why and cap.home in exc.why, str(exc))
 
 
 def seed_budget_pin(cap_name, needle, row=None):
@@ -3803,6 +3922,36 @@ def run_budget_case(name):
         else:
             checks.append((name, "a known budgets case", False, "no such case"))
     except (subprocess.CalledProcessError, OSError, LookupError, KeyError, policy.Refusal) as exc:
+        checks.append((name, "the fixture", False, f"{type(exc).__name__}: {getattr(exc, 'stderr', '') or exc}"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
+# A planted census row whose `constant:` home names a fixture file, for `budgets-home`.
+HOME_ROW = ('\n[[cap]]\nname = "zz-home"\nclass = "consumer"\nunit = "bytes"\nenforcer = "{prefix}/zz/fixture.sh"\n'
+            'home = "constant:{prefix}/zz/fixture.sh:FIXTURE_MAX"\nfamily = false\nresearch = 0\nships = false\n')
+
+
+def run_budget_home(name):
+    """`budgets-home` (PLAY-dOrderedCharter-6 AC8): a census row whose `constant:` home names a fixture file
+    assigning FIXTURE_MAX=4096, then the same row over that file with no such line. `budgets.py home` prints
+    4096 in its value column the first time, and exits 2 naming the file the second."""
+    t, checks = Path(tempfile.mkdtemp(prefix="pol-")), []
+    try:
+        fixture = posixpath.join(budgets.derive_tool_root(), "zz", "fixture.sh")
+        census = (KIT / budgets.CENSUS).read_text(encoding="utf-8").replace("\r\n", "\n") + HOME_ROW
+        r = build_cap_repo(t / "r", {budgets.derive_kit_rel() + budgets.CENSUS: census,
+                                     fixture: "#!/bin/sh\nFIXTURE_MAX=4096\n"}, "warn")
+        home = [sys.executable, KIT / "budgets.py", "home", "zz-home"]
+        rc, out = run_case_argv(r, home)
+        checks.append(("a home assigning FIXTURE_MAX=4096", "exit 0 and 4096 in the value column",
+                       rc == 0 and out.strip().split("\t")[-1] == "4096", f"exit {rc} · {out.strip()}"))
+        write_case_file(r, fixture, "#!/bin/sh\n# no assignment of the key here\n")
+        rc, out = run_case_argv(r, home)
+        checks.append(("the same row, its file assigning nothing", f"exit 2 naming {fixture}",
+                       rc == 2 and fixture in out and "4096" not in out, f"exit {rc} · {out.strip()}"))
+    except (subprocess.CalledProcessError, OSError, policy.Refusal) as exc:
         checks.append((name, "the fixture", False, f"{type(exc).__name__}: {getattr(exc, 'stderr', '') or exc}"))
     finally:
         remove_repo(t)
@@ -4471,7 +4620,7 @@ CASES = [
     ("mirror-shim-exit-one", None, run_mirror_landed),
     ("mirror-absent-adopter", None, run_mirror_absent_adopter),
     ("mirror-landed-parity", None, run_mirror_landed_parity),
-    *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side", *GUARD_MIRROR, *GUARD_INPUTS]),  # outcome cases: guard.py --staged
+    *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side", *GUARD_MIRROR, *GUARD_INPUTS, *GUARD_RUN]),  # outcome cases: guard.py --staged
     ("legacy-homes", None, run_legacy_homes),  # an outcome case: one planted repository per case
     ("legacy-homes-main-dropped", None, run_legacy_main_dropped),  # the base is the merge-base, not the tip
     ("legacy-homes-present", None, run_legacy_present),  # gov's own list held and withheld from installs
@@ -4482,6 +4631,7 @@ CASES = [
     *((c, ARM["arm_schema"], s) for c, s in BUDGET_SCHEMA_SEEDS.items()),  # the size switch's schema plants
     *((c, None, run_budget_case) for c in BUDGET_CASES),  # outcome cases: the size switch
     ("budgets-ships-join", None, run_ships_join),  # the census's ships flags against the registry's exemptions
+    ("budgets-home", None, run_budget_home),  # the home verb over a planted constant: home, and over one assigning nothing
     ("fixtures-guard-census", None, run_fixtures_guard_census),  # the census's enforcers inside this leg's guard
     ("census-adopter-receipt", None, run_census_adopter_receipt),  # the census graded at each row's installed path
     ("census-receiptless-target", None, run_budget_case),  # no receipt and no registry: every row announced

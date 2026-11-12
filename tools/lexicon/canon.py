@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# gov:kit lexicon@1.25
+# gov:kit lexicon@1.26
 """canon.py — the SHIPPED concept clusters a proposed verb table may draw from.
 
 THE RULE, and it is the whole point of this file:

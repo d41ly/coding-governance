@@ -271,6 +271,29 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
+# The kit succession (PLAY-dOrderedCharter-31 S10), INLINED byte-identically from the canonical copy named on
+# its marker line and gated by the resolve-python self-test. `resolve_selection` reads a target's `kits`
+# through it, as the playbook renderer's kit readers do with their own copy.
+# >>> retired_kits — canonical copy: retired_kits.py in gov's lib dir (byte-identical; gated)
+def resolve_retired_kits(kits, entries, retired):
+    """<kits> with each id that is not in <entries> and that a row of <retired> names replaced by the
+    row's successor, or dropped where the successor is "none", in first-seen order with no id twice.
+    An id no entry and no row names comes back as it was, for its caller's own refusal."""
+    succ = {}
+    for n, row in enumerate(retired or [], 1):
+        rid, to = (row.get("id"), row.get("successor")) if isinstance(row, dict) else (None, None)
+        if not (isinstance(rid, str) and rid and isinstance(to, str) and to):
+            raise ValueError(f"[[retired]] row {n} needs a non-empty string id and successor")
+        succ[rid] = to
+    out = []
+    for k in kits:
+        k = k if k in entries else succ.get(k, k)
+        if k != "none" and k not in out:
+            out.append(k)
+    return out
+# <<< retired_kits
+
+
 def read_policy_value(key: str, root: pathlib.Path | str, rev: str | None = None) -> tuple:
     """-> (value, source, reason) for policy key `key` in the repository at `root`, as the policy
     kit's `policy.py get` answers it: the committed policy at the landed revision, or at `rev` when
@@ -1137,6 +1160,12 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
     mean "what this target declared" rather than "gov's registry default". Every caller that HAS a
     target descriptor passes it; `intake` does not, because it is the verb that writes that file and
     has none to read (TOOL-aScouredKit-13).
+
+    In the two branches that read a target-authored list, `--kits` and the target's `kits`, an id that
+    is no entry and that a `[[retired]]` row of `reg` names reads as its successor, or leaves the list
+    where the successor is `none`, through the shared `resolve_retired_kits`, so a target selecting a
+    kit that left still installs (PLAY-dOrderedCharter-31 S10). An id no entry and no row names is
+    refused as before, and a malformed row is a refusal.
     """
     # TOOL-aScouredKit-13, corrected twice by this build's own closing review. The shape guard sits
     # HERE, above the branch split, because BOTH branches consume a target-authored list: `cmd_adopt`
@@ -1169,6 +1198,10 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
         return derive_install_order(all_kits(descs), descs)
     if mode == "kits":
         kits = _check_kits_shape(kits, "the kit selection")
+        try:
+            kits = resolve_retired_kits(kits, descs, reg.get("retired"))
+        except ValueError as e:
+            raise Refusal(f"the registry's succession is malformed: {e}") from None
         unknown = [k for k in kits if k not in descs]
         if unknown:
             raise Refusal(
@@ -1183,6 +1216,10 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
     # the broken one, and `plan` previewed the same wrong set so nothing warned first.
     declared = _check_kits_shape((deploy or {}).get("kits"), "the target's deploy.toml `kits`")
     if declared:
+        try:
+            declared = resolve_retired_kits(declared, descs, reg.get("retired"))
+        except ValueError as e:
+            raise Refusal(f"the registry's succession is malformed: {e}") from None
         unknown = [k for k in declared if k not in descs]
         if unknown:
             raise Refusal(
@@ -1199,6 +1236,24 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
     if missing:
         raise Refusal(f"the default set names {', '.join(missing)}, absent from the registry")
     return derive_install_order(sorted(dk), descs)
+
+
+#: PLAY-dOrderedCharter-34 S6: the state words of the composition's delta report, S22's six and `widening`.
+COMPOSITION_STATES = ("unchanged", "amended", "replaced", "excluded", "stale", "orphaned", "widening")
+COMPOSITION_LINE_RE = re.compile(r"^  (" + "|".join(COMPOSITION_STATES) + r") +\[[^\]]*\] \S.*$")
+
+
+def derive_composition_lines(stdout: str | None) -> list[str]:
+    """The lines of a regenerate's stdout in the composition's delta-report shape, `{state:<18} [{origin:<13}]
+    <what>` indented two, whose state word is one of COMPOSITION_STATES; every other line is dropped, so an
+    adopter's regenerate cannot put arbitrary text into update's output (PLAY-dOrderedCharter-34 S6)."""
+    return [ln for ln in (stdout or "").splitlines() if COMPOSITION_LINE_RE.match(ln)]
+
+
+def derive_delta_tag(line: str) -> str:
+    """The tag a delta line names, the first word after its `[origin]` (PLAY-dOrderedCharter-49 S62): the
+    unit drift's lines and a regenerate's composition lines share the shape, so one tag joins the two."""
+    return line.partition("] ")[2].split(" ", 1)[0]
 
 
 def run_target_argv(argv: list[str] | tuple[str, ...],
@@ -1420,6 +1475,14 @@ def derive_root_confs(descs: dict) -> set[str]:
     return out
 
 
+def derive_root_shipped(descs: dict) -> set[str]:
+    """The `root-shipped` guard class's population. PLAY-dOrderedCharter-80 S3. Every source a
+    `root_relative` [[files]] rule ships from the repo root, derived as `derive_root_confs` derives
+    the root confs, so a root file no descriptor ships still falls into no class and reds 7c."""
+    return {s for d, _p in descs.values() for rule in d.get("files") or []
+            if rule.get("root_relative") for s in rule_sources(d, rule) if "/" not in s}
+
+
 def scan_argv_neighbours(root: pathlib.Path, rel: str, tracked: set[str]) -> list[str]:
     """Tracked files an argv file pulls in BY NAME — the near-miss population of check 7c2.
 
@@ -1580,6 +1643,32 @@ def scan_uncontained_writes(src: str) -> list[tuple[int, str, str]]:
         if writes and not inline and op_src not in graded:
             out.append((node.lineno, name, op_src))
     return sorted(out)
+
+
+def check_source_rows(root: pathlib.Path, descs: dict, r: "Report") -> None:
+    """PLAY-dOrderedCharter-70 S10: no SHIPPED ENGINE FILE holds a row citing gov's own records — a line whose
+    first tab cell starts `{memory_root}/builds/`, expanded through gov's ctx; a line with no tab is prose. Such a list is gov's alone and
+    reaches an adopter as rows naming files it does not have. DOES NOT CHECK: a record path outside the first
+    tab cell, a gov path outside the record tree, or a role other than `engine`."""
+    hits: dict[str, int] = {}
+    for eid, (d, _p) in descs.items():
+        ctx = canonical_ctx(eid)
+        builds = resolve_tokens("{memory_root}/builds/", ctx)[0]
+        for row in resolve_entry(root, d, ctx)["writes"].values():
+            src = row.get("src")
+            if not src or row["role"] != "engine" or src in hits:
+                continue
+            try:
+                text = (root / src).read_bytes().decode("utf-8", "replace")
+            except OSError:
+                continue
+            n = sum(1 for ln in text.splitlines() if "\t" in ln and ln.split("\t", 1)[0].startswith(builds))
+            if n:
+                hits[src] = n
+    for src, n in sorted(hits.items()):
+        r.fail(f"'{src}' ships as an engine file holding {n} row(s) whose first cell cites gov's own records "
+               f"under memory/builds/ — withhold it as `project-owned`, or drop the rows")
+    r.note(f"source rows: {len(hits)} shipped engine file(s) citing gov's records")
 
 
 def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int:
@@ -2263,6 +2352,10 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
     for k in default_kits(reg):
         if k not in descs:
             r.fail(f"the default set names '{k}', which is not a registry entry")
+    # PLAY-dOrderedCharter-31 S11: the default set is closed under `requires`, read through the one
+    # predicate `plan` and `apply` share with no receipt, so a default install never meets an UNMET line.
+    for eid, dep in derive_unsatisfied_requires([k for k in default_kits(reg) if k in descs], descs, None):
+        r.fail(f"the default set holds '{eid}', which requires '{dep}', and does not hold '{dep}'")
     unreachable = [e for e in descs if e not in derived_all
                    and descs[e][0].get("selectable") != "conditional"]
     for e in unreachable:
@@ -2305,7 +2398,12 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
     #          conf-only commit skipped that leg: struck twice for `.lexicon.conf`, and the leg
     #          TOOL-aWalkedCorpus-5 was filed on. Its population is DERIVED from the descriptors, so
     #          a root file no kit declares as its conf still falls into none and still reds here.
+    #          THE SEVENTH, `root-shipped` (PLAY-dOrderedCharter-80 S3): a root file a `root_relative`
+    #          rule ships, the charter template since PLAY-dOrderedCharter-34, which a leg guards
+    #          without its being any kit's conf. Derived too, and kept apart from `root-conf`, since
+    #          a conf a leg reads and a file a kit ships are two facts.
     root_confs = derive_root_confs(descs)
+    root_shipped = derive_root_shipped(descs)
     legs_path = resolve_tool_path(root, "gate-legs.json")
     _legs_rel = legs_path.relative_to(root).as_posix()  # named in the messages below, never typed
     if legs_path.is_file():
@@ -2330,6 +2428,8 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                     classes.append("kit-relative")
                 if g in root_confs:
                     classes.append("root-conf")
+                if g in root_shipped:
+                    classes.append("root-shipped")
                 if len(classes) != 1:
                     r.fail(f"guard pathspec '{g}' (leg '{leg.get('name')}') falls into "
                            f"{len(classes)} declared classes {classes or '[]'}, not exactly one — "
@@ -3478,12 +3578,15 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
     #          names are `adopters.toml`'s `[[adopter]]` rows, never a literal here, so a new adopter
     #          is banned the day it registers. Not `registry.toml`: the playbook renderer ships that
     #          file, so a name declared there would reach every adopter. The population is
-    #          `cmd_shipped`'s, every role included: an adopter receives a `project-owned` seed as
-    #          surely as an engine. A PURE BAN: TOOL-aRepatriatedFork-35 drained the last carried
-    #          sites and retired the carry table, so a row still declaring one is refused rather
-    #          than silently ignored.
+    #          `cmd_shipped --epoch`'s, the survivors whose role is in `EPOCH_ROLES`: gov supplies no
+    #          bytes for a `project-owned`, `forked` or `generated` source, so only a receiving role
+    #          puts a source here (PLAY-dOrderedCharter-71). A PURE BAN: TOOL-aRepatriatedFork-35
+    #          drained the last carried sites and retired the carry table, so a row still declaring
+    #          one is refused rather than silently ignored.
     #          DOES NOT CHECK: gov's own records, the deployer, or any file no descriptor ships; a
-    #          name spelled across a line break; a brand no row declares.
+    #          name spelled across a line break; a brand no row declares; a source only a role
+    #          outside `EPOCH_ROLES` names; a `project-owned` file a `cp -r` copy install still
+    #          carries, which the runbook's `rm -f` steps own.
     _adopters = load_toml(resolve_tool_path(root, GOVKIT_DIR.name, "adopters.toml")).get("adopter", [])
     _akey: dict[str, str] = {}
     for _a in _adopters:
@@ -3501,7 +3604,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                "over every shipped file while grading nothing")
     _shipped = sorted({row["src"] for eid, (d, _p) in descs.items()
                        for row in resolve_entry(root, d, canonical_ctx(eid))["survivors"]
-                       if row.get("src")})
+                       if row.get("src") and row["role"] in EPOCH_ROLES})
     _measured: dict[tuple, int] = {}
     for _src in _shipped:
         try:
@@ -3518,6 +3621,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                f"`{_akey[_nm]}` instead")
     r.note(f"adopter names: {len(_anames)} from {len(_adopters)} adopters.toml row(s) over "
            f"{len(_shipped)} shipped file(s) · {sum(_measured.values())} site(s)")
+    check_source_rows(root, descs, r)
 
     # ---- 11: TOOL-dSafePassage-6. EVERY FORWARDER IS ITS RENDER, AND NONE CLOSES BEFORE ITS WINDOW.
     #          `shims.py`'s parity over `shims.toml` (each open row's forwarder equals its render,
@@ -8957,8 +9061,11 @@ def derive_rename_map(root: pathlib.Path, base_commit: str | None, to_commit: st
 def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit: str,
                  index: dict[str, tuple[str, str]],
                  needles: dict[str, str] | None = None,
-                 rename=None) -> dict:
+                 rename=None, *, gov_absent: bool = False) -> dict:
     """One receipt row's verdict, from three identities. TWO of them are git blob OIDs.
+
+    `gov_absent` reads gov's side absent whatever gov holds at the row's `source`: a `seed` row whose kit
+    no longer lands its destination (PLAY-dOrderedCharter-31 S9), so the grid gives it the retired verdicts.
 
     OURS is the blob the TARGET's index holds, compared to the row's STORED `gov_oid` — the blob gov
     shipped at this row's `commit`. Not to `sha256`, and not to the target's WORKTREE: `sha256` is a
@@ -8993,7 +9100,7 @@ def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit:
     three are `None` on every other verdict.
     """
     src, base_commit = row.get("source"), row.get("commit")
-    theirs = blob_at(root, to_commit, src) if src else None
+    theirs = None if gov_absent else (blob_at(root, to_commit, src) if src else None)
     base = blob_at(root, base_commit, src) if (src and base_commit) else None
     entry = index.get(row["path"])
     ours_oid = entry[1] if entry else None
@@ -9286,6 +9393,39 @@ def read_retired_edits_mode(target: pathlib.Path) -> str:
         raise Refusal(f"install.retired-edits = {value!r} is neither `order` nor `keep` "
                       f"({source}: {reason})")
     return value
+
+
+def read_unit_drift(root: pathlib.Path, target: pathlib.Path, from_rev: str | None, to_rev: str,
+                    write: bool) -> tuple[dict, str]:
+    """PLAY-dOrderedCharter-33 S3, S7: the playbook kit's `drift` verb over the target's pinned edges,
+    run as a subprocess since govkit imports no kit, under the target's committed
+    `instructions.stale` at its HEAD. -> (the verb's report, the mode). A mode outside the three, a
+    reader refusal, no playbook kit or a report that does not parse is a Refusal naming the key."""
+    try:
+        value, source, reason = read_policy_value("instructions.stale", target, rev="HEAD")
+    except (LookupError, Refusal) as exc:
+        raise Refusal(f"instructions.stale could not be read: {exc}") from None
+    if value not in ("order", "refuse", "warn"):
+        raise Refusal(f"instructions.stale = {value!r} is none of order, refuse, warn ({source}: {reason})")
+    try:
+        kit = resolve_kit_dir("playbook", "pins.py", GOVKIT_DIR)
+    except LookupError as exc:
+        raise Refusal(f"instructions.stale = {value}, and the drift verb is not found: {exc}") from None
+    argv = [sys.executable, str(kit / "pins.py"), "drift", "--target", str(target), "--gov", str(root),
+            "--to", to_rev, "--stale", value, *(["--from", from_rev] if from_rev else []),
+            *(["--write"] if write else [])]
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    p = subprocess.run(argv, capture_output=True, text=True, encoding="utf-8", errors="replace",
+                       stdin=subprocess.DEVNULL, env=env)
+    try:
+        report = json.loads(p.stdout)
+    except ValueError:
+        report = None
+    if p.returncode not in (0, 1) or not isinstance(report, dict):
+        why = (p.stderr or p.stdout).strip().splitlines()
+        raise Refusal(f"instructions.stale = {value}: the drift verb exited {p.returncode}: "
+                      f"{why[-1] if why else 'it printed nothing'}")
+    return report, value
 
 
 def render_row_order_key(kind: str, path: str) -> str:
@@ -10314,7 +10454,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             print(f"  {'unattributed':<18} [{role:<13}] {row['path']}")
             continue
 
-        c = classify_row(root, target, row, to_commit, index0, needles, resolve_renamed)
+        # PLAY-dOrderedCharter-31 S9. A `seed` row whose kit is still an entry and whose destination the
+        # role re-resolution above finds no rule for is read with gov's side absent, so an edited copy
+        # reads `retired-edited` and an unedited one `withdrawn`, as TOOL-dSafePassage-9 rules for a
+        # retired seed row, while gov still ships the bytes at its `source` for another kit. What it does
+        # not see: a seed row whose recorded path an answer has since moved also finds no rule.
+        seed_gone = role == "seed" and row.get("kit") in descs and now is None
+        c = classify_row(root, target, row, to_commit, index0, needles, resolve_renamed, gov_absent=seed_gone)
 
         # DEPL-aRepatriatedFork-17 S4. LONE-CR LOSS IS A FINDING. Counted against gov's blob at the
         # row's own `commit`, on the target's worktree copy. Not a ROW line: this is a second line
@@ -10388,6 +10534,36 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 print(f"govkit update — mode-carry {row['path']} · {_ment[0]} -> {_mto} · "
                       f"gov at {to_commit[:8]}")
 
+    # PLAY-dOrderedCharter-33 S3, S7. THE UNIT DRIFT, after the per-file verdicts and before the write
+    # loop: the playbook kit's drift verb walks each pinned edge of the target's overlay under its
+    # committed `instructions.stale`. Its lines join the verdicts and the tally, its orders are written
+    # once the outbox exists, and `refuse` holds the whole update below, before any write.
+    _unit_orders: list[dict] = []
+    _unit_refuse = False
+    # PLAY-dOrderedCharter-49 S62: the gov tags the drift report printed a line for, so the composition relay
+    # below prints a gov unit's `stale` or `orphaned` line once, never again from a regenerate's stdout.
+    _drift_tags: set[str] = set()
+    if "playbook" in (kits or claimed):
+        try:
+            _drift, _stale_mode = read_unit_drift(root, target, base_commit, to_commit, write)
+        except Refusal as _ud_err:
+            r.fail(f"the unit drift is refused — {_ud_err}")
+            _add_held("playbook", ".governance/instructions.toml")
+            _drift, _stale_mode = {}, None
+        for _ln in _drift.get("lines") or []:
+            print(_ln)
+            _drift_tags.add(derive_delta_tag(_ln))
+            if not _ln.lstrip().startswith("held"):
+                _uv = f"unit:{_ln.split()[0]}"
+                tally[_uv] = tally.get(_uv, 0) + 1
+        for _red in _drift.get("reds") or []:
+            r.fail(f"the unit drift is red — {_red}")
+            _add_held("playbook", ".governance/instructions.toml")
+        if _drift:
+            print(f"govkit update — unit drift: {_drift.get('rows')} · instructions.stale = {_stale_mode}")
+        _unit_orders = _drift.get("orders") or []
+        _unit_refuse = bool(_drift.get("refuse"))
+
     for line in (f"  available (not installed): {e}" for e in available):
         print(line)
     if available:
@@ -10395,6 +10571,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               "`update` does not install them: widening a target's governance surface is an owner "
               "decision, and `--add-kits` is the flag that would")
     print("govkit update — " + " · ".join(f"{k} {v}" for k, v in sorted(tally.items())))
+    if _unit_refuse:
+        # hold-exempt: `refuse` holds the whole update, which returns here before any write
+        r.fail("instructions.stale = refuse holds this update: re-pin or re-point each edge held above "
+               "through instructions.edit, then re-run. NOTHING was written")
+        return r.emit()
     if tally.get("adopter-owned"):
         for _ln in derive_parity_lines(target, receipt, descs, r):
             print(f"govkit update — {_ln}")
@@ -10671,6 +10852,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
 
     outbox = target / ".governance" / "outbox"
     outbox.mkdir(parents=True, exist_ok=True)
+    # PLAY-dOrderedCharter-33 S7: each order the drift verb returned, keyed on its overlay row's path,
+    # its text the verb's whole order, title included.
+    for _uo in _unit_orders:
+        _uop = write_row_order(outbox, "unit", _uo["path"], _uo["body"])
+        print(f"  {'ordered':<18} [{'unit':<13}] {_uo['path']} · order {_uop.relative_to(target).as_posix()}")
     # The target-code switch, read once ABOVE the write loop (TOOL-dSafePassage-9 S1), so the
     # withdrawn arm's unwire and the re-render and wiring steps below read the one value.
     _rerender_on = os.environ.get("GOVKIT_RERENDER") != "0"
@@ -11807,6 +11993,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # runs it — and the mitigation is that the target never supplies the argv, not that the uid is
     # trusted.
     _rr_ran: list[str] = []
+    _rr_composition: list[str] = []   # PLAY-dOrderedCharter-34 S6: the delta lines the regenerates print
     _rr_declined: list[tuple[str, str]] = []
     # DEPL-cMendedVintage-1 S1. A STRICT SUBSET OF `_rr_declined`, and the subset is the point: it
     # holds ONLY the declines that are about a render going stale, because those are the ones whose
@@ -11942,6 +12129,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                     continue
                 _res = [resolve_tokens(a, _ctx_rr)[0] for a in _argv]
                 _out = run_target_argv(_res, target)
+                _rr_composition += derive_composition_lines(_out.stdout)
                 # THE EXIT CODE GOES THROUGH THE DECLARED PROBE, exactly as `_cmd_apply`'s
                 # CONFIGURE step does, and NOT through `rc != 0`. Writing the naive test here
                 # would have failed every update that touched `memory-tree`, whose adopter
@@ -12004,6 +12192,12 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"{len(_rr_declined)} declined")
         for _line in _rr_ran:
             print(f"govkit update —   ran {_line}")
+        _rr_relayed = [ln for ln in _rr_composition if derive_delta_tag(ln) not in _drift_tags]
+        print(f"govkit update — composition: {len(_rr_relayed)} line(s)"
+              + (f", {len(_rr_composition) - len(_rr_relayed)} the unit drift already printed"
+                 if len(_rr_relayed) != len(_rr_composition) else ""))
+        for _line in _rr_relayed:
+            print(_line)
     # DEPL-cMendedVintage-1 S4 — THE DECLINES ARE NOT GATED, and this SUPERSEDES half of
     # DEPL-dRetiredFork-3's AC6, which asked for output byte-identical to the pre-change run while
     # the flag is off. That criterion bought a safe dark landing for a step that printed nothing and
@@ -13770,9 +13964,14 @@ def derive_epoch_state(root: pathlib.Path, eid: str, desc: dict, base: str, head
     rng = f"{base}..{head}"
     paths = sorted({row["src"] for row in resolve_entry(root, desc, canonical_ctx(eid))["survivors"]
                     if row.get("src") and row["role"] in EPOCH_ROLES})
-    if not paths:
-        return "broken", f"FAILED · no {'/'.join(EPOCH_ROLES)} source to measure", "", 0
     vf = desc.get("version_from") or {}
+    if not paths:
+        # PLAY-dOrderedCharter-80 S5: a fileless entry declaring no version has nothing to measure
+        # and nothing owed, and `git log` never runs with an empty path list; one declaring a file
+        # still reads broken, since its version has no shipped source to date.
+        if "none" in vf:
+            return "skip", "skip · no declared version · moved: none", "", 0
+        return "broken", f"FAILED · no {'/'.join(EPOCH_ROLES)} source to measure", "", 0
     if "none" in vf or not vf.get("file"):
         moved = sorted({p for p in git(root, "-c", "core.quotePath=false", "log", "--format=",
                                        "--name-only", "--full-history", "--no-merges", rng,

@@ -4,6 +4,7 @@
 
 id = "roles"
 home = "roles"
+layer = "layer.roles"
 scope = "repo"
 
 # The card every `task:` and `card:` input is read from is written by the kickoff kit's card writer,
@@ -144,3 +145,32 @@ why = "a rendered index the roles render wiring leg byte-compares"
 [[lf_pin]]
 pattern = ".claude/skills/build/SKILL.md"
 why = "a rendered artifact its own gate byte-compares"
+
+# THE DRIVE ROWS (PLAY-dOrderedCharter-6): how a session starts or advances a stage this kit serves. The
+# playbook render composes one charter line per row of each selected kit, and the role's handoff carries
+# its own role's lines. `stage` names a workflow of the roles kit's workflows.toml, or `start`; `role` a
+# role slot, or `main` for the main session.
+
+[[drive]]
+stage = "start"
+role = "main"
+command = "/build"
+when = "only when the owner asks to attend a build"
+
+[[drive]]
+stage = "start"
+role = "gov-session"
+command = "python <prefix>/roles/handoff.py check <file>"
+when = "a subagent's task, handed over as a prompt file"
+
+[[drive]]
+stage = "handoff"
+role = "gov-session"
+command = "python <prefix>/roles/handoff.py render --role <role> --build <slug>"
+when = "work leaving this session for another"
+
+[[drive]]
+stage = "build"
+role = "gov-builder"
+command = "python <prefix>/roles/handoff.py render --role gov-builder --build <slug> --unit <id>"
+when = "a unit whose spec is READY"

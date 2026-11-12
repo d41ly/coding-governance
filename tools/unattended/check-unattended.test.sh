@@ -5760,9 +5760,9 @@ cd "$TMP" || exit 2; anchor_restore; read_topo s5   # every section after a re-c
 # arms need a second branch, a pushed tip, a remote whose HEAD can be repointed and a build folder
 # whose README carries an `asks:` line AT THE ANCHOR, and `reset_tree` would delete all of it.
 #
-# THE RECALL KIT'S REAL EXTRACTOR, copied in. S3's whole claim is that it judges an anchor by that
-# kit's `anchor_at` and holds no copy of its shapes, so a fixture carrying a stub extractor would be
-# grading a double this block wrote - a green arm over a shape the real callee never returns.
+# THE MEMORY-TREE KIT'S REAL GRAMMAR, copied in. S3's whole claim is that it judges an anchor by
+# that kit's `anchor_at` and holds no copy of its shapes, so a fixture carrying a stub grammar would
+# be grading a double this block wrote - a green arm over a shape the real callee never returns.
 #
 # THE STUB PRODUCER READS ITS TABLE AT THE REV IT IS ASKED ABOUT, so an arm can tell "re-derived at
 # the pinned tree" from "re-derived at HEAD": a table that moves after the pin changes the answer
@@ -5784,12 +5784,14 @@ cp "$TMP/$KIT_REL/PROTOCOL.template.md" "$ak/memory/guides/UNATTENDED-PROTOCOL.m
 cp "$TMP/$KIT_REL/VERBS.template.md" "$ak/memory/guides/UNATTENDED-VERBS.md"
 cp "$TMP/$KIT_REL/ASKS.template.md" "$ak/$KIT_REL/"
 cp "$TMP/$KIT_REL/ASKS.template.md" "$ak/memory/guides/UNATTENDED-ASKS.md"
-# the recall kit's extractor and its conf reader, into a directory the declared RECALL_CLI names
-# FOUND by the file only that kit holds, never by a typed kit directory (the carried-prefix ban).
-_rk_rel=$(git -C "$HERE" ls-files --full-name -- ':(top)*recall_conf.py' | head -n 1)
-_rk_src="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/${_rk_rel%/*}"
-cp "$_rk_src/extract.py" "$_rk_src/recall_conf.py" "$ak/rk/"
-n=$((n+1)); [ -f "$ak/rk/extract.py" ] || { echo "FAIL the ask block could not copy the recall kit's extractor, so every S3 arm below would grade a missing grammar"; st=1; }
+# the memory-tree kit's id grammar, beside this kit where the leg's sibling-kit resolver probes
+# (PLAY-dOrderedCharter-18, amended under dOrderedCharter's README rule 8). FOUND by the file only
+# that kit holds, never by a typed kit directory (the carried-prefix ban).
+_ig_rel=$(git -C "$HERE" ls-files --full-name -- ':(top)*id_grammar.py' | head -n 1)
+_ig_src="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/${_ig_rel%/*}"
+_ig_dst="$ak/$_b1tr${_ig_src##*/}"
+mkdir -p "$_ig_dst" && cp "$_ig_src/id_grammar.py" "$_ig_dst/"
+n=$((n+1)); [ -f "$_ig_dst/id_grammar.py" ] || { echo "FAIL the ask block could not copy the memory-tree kit's id grammar, so every S3 arm below would grade a missing grammar"; st=1; }
 printf 'MEMORY_ROOT=memory\nFAMILIES="example:EXMP tooling:TOOL"\n' > "$ak/.memory-tree.conf"
 cat > "$ak/.unattended.conf" <<AKCONF
 MEMORY_ROOT=memory
@@ -5939,13 +5941,21 @@ hit  "$out" "a mandated run's own build folder ANCHORS a record id belonging to 
 hit  "$out" "memory/builds/tRun/notes.md:3:TOOL-zOther-7"
 miss "$out" "TOOL-zOther-8"
 
-# AC6: a blank RECALL_CLI is a named skip, never zero anchors found
+# AC6: a blank RECALL_CLI no longer skips: the grammar is the memory-tree kit's, so the folder is
+# still judged (PLAY-dOrderedCharter-18, amended under dOrderedCharter's README rule 8)
 set_ak_pristine
 printf '# notes\n\n| `TOOL-zOther-7` | a foreign id, backticked |\n' > "$ak/memory/builds/tRun/notes.md"
 sed -i 's|^RECALL_CLI=.*|RECALL_CLI=""|' "$ak/.unattended.conf"; add_ak_commit "blank recall cli"; out=$(run_ak_leg)
+miss "$out" "check 37 SKIPPED for memory/builds/tRun"
+miss "$out" "RECALL_CLI is blank in this project"
+hit  "$out" "ANCHORS a record id belonging to another build"
+
+# PLAY-dOrderedCharter-70 S14: with the id grammar gone the check SKIPS, naming why, and claims no scan;
+# set_ak_pristine's reset restores the file for every arm below
+set_ak_pristine; rm -f "$_ig_dst/id_grammar.py"; out=$(run_ak_leg)
 hit  "$out" "check 37 SKIPPED for memory/builds/tRun"
-hit  "$out" "RECALL_CLI is blank in this project"
-miss "$out" "ANCHORS a record id belonging to another build"
+hit  "$out" "resolved through neither"
+miss "$out" "found no foreign anchor"
 
 # AC7: a LANDED record under a mandate with no freeze (its control is AC12b's record below)
 set_ak_pristine; sed -i 's/^phase: RUNNING$/phase: LANDED/' "$ak/$ak_R"; printf 'landed-anchor: local\n' >> "$ak/$ak_R"

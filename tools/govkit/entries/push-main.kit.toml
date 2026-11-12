@@ -4,9 +4,18 @@ id = "push-main"
 scope = "repo"
 kind = "flat"
 home = "."
+layer = "layer.flow"
 version_from = { none = "no version constant exists; measured 2026-08-11. Prescribed for copy by the runbook and detectable only by its sentinel path." }
 requires = []
 sentinel = "push-main.sh"
+# PLAY-dOrderedCharter-17: each edge to a non-core kit is a declared slot with its fallback.
+optional = [
+  { part = "{prefix}/push-main.sh", point = "point.flow.leg-pack", fallback = "the pre-push hook grades the landing again" },
+  { part = "{prefix}/push-main.sh", point = "point.flow.version", fallback = "the push bar's epoch legs grade the landing; the gov-first walk is skipped as not gov's tree" },
+  { part = ".githooks/pre-push", point = "point.flow.leg-pack", fallback = "no merge in this push is graded, said" },
+  { part = ".githooks/pre-push.test.sh", point = "point.flow.leg-pack", fallback = "the merge-loss arm skips, said" },
+  { part = "{prefix}/push-main.test.sh", point = "point.flow.version", fallback = "no installed govkit is read, said" },
+]
 
 [[files]]
 include = ["push-main.sh", "push-main.test.sh"]
@@ -81,7 +90,7 @@ ceiling = 1780
 
 # THE BAR HARNESS, which re-disables the hook's executed-word, option, working-copy and declared arms in a copy
 # on every run and observes the evasions land (TOOL-aRepatriatedFork-5, the owner's F2 ruling). It
-# ships so an adopter can retire its own copy: NicoCares carried the original.
+# ships so an adopter can retire its own copy: adopter nc carried the original, TOOL-aRepatriatedFork-5.
 [[gate_leg]]
 name = "pre-push bar self-test"
 subject = "kit"
@@ -97,3 +106,14 @@ why = "a CRLF hook does not execute"
 [[lf_pin]]
 pattern = ".githooks/pre-push"
 why = "a CRLF hook does not execute"
+
+# THE DRIVE ROWS (PLAY-dOrderedCharter-6): how a session starts or advances a stage this kit serves. The
+# playbook render composes one charter line per row of each selected kit, and the role's handoff carries
+# its own role's lines. `stage` names a workflow of the roles kit's workflows.toml, or `start`; `role` a
+# role slot, or `main` for the main session.
+
+[[drive]]
+stage = "gate-bar"
+role = "main"
+command = "bash <prefix>/push-main.sh"
+when = "the close or the push boundary: the pre-push hook runs the full bar"

@@ -2,7 +2,7 @@
 # this file and by nothing else (TOOL-dSafePassage-13).
 #
 # One `[[class]]` row per class of `surface-classes.toml`: `class`, its id there; `usage`, the
-# shape of its members' usage (`verb`, `key`, `hook`, `leg`, `page` or `none`); `rows`, where the
+# shape of its members' usage (`verb`, `key`, `hook`, `leg`, `synopsis`, `page` or `none`); `rows`, where the
 # members' rows come from, a reader `<path under the tool root>:<function>` over the registry that
 # already states them, or `usage.toml`, the `[[usage]]` rows below; and a `why`. A `page` or
 # `none` class carries no `rows`.
@@ -65,6 +65,34 @@ class = "entry"
 usage = "page"
 why = "a registry entry is graded for presence on a page"
 
+[[class]]
+class = "drive"
+usage = "synopsis"
+rows = "{prefix}/playbook/render_playbook.py:read_drive_reference_rows"
+why = "a stage and role is its when clauses and its commands, which the selected kits' drive rows state; help/reference/drive.md renders them (PLAY-dOrderedCharter-37)"
+
+[[class]]
+class = "kind"
+usage = "synopsis"
+rows = "{prefix}/playbook/render_playbook.py:read_kind_reference_rows"
+why = "a kind is its summary and its usage, which its kinds register row states; help/reference/kinds.md renders them (PLAY-dOrderedCharter-37)"
+
+[[class]]
+class = "unit"
+usage = "none"
+why = "a gov unit is loaded text, used by no verb, key, hook, leg or page; units carrying a usage field are the unit-usage class"
+
+[[class]]
+class = "unit-usage"
+usage = "synopsis"
+rows = "{prefix}/playbook/render_playbook.py:read_unit_reference_rows"
+why = "a unit carrying a usage is its text and its usage, which its instructions.toml row states; help/reference/units.md renders them"
+
+[[class]]
+class = "module-export"
+usage = "none"
+why = "an import name a module keeps for older callers has no verb, key, hook, leg or page"
+
 [[usage]]
 id = "command:build"
 shape = "verb"
@@ -96,6 +124,74 @@ id = "script:{prefix}/playbook/adopt-playbook.sh"
 shape = "verb"
 entry = "{prefix}/playbook/adopt-playbook.sh"
 flags = ["--target=", "--check", "--selftest"]
+
+[[usage]]
+id = "script:{prefix}/memory-tree/build_records.py#new"
+shape = "verb"
+entry = "{prefix}/memory-tree/build_records.py"
+verb = "new"
+flags = ["--build=", "--unit=", "--root=", "--principle=", "--excuses=", "--reason=", "--expires=", "--tag=", "--action=", "--mark=", "--before=", "--after=", "--successor=", "--promoted-from=", "--rule=", "--words=", "--session="]
+
+[[usage]]
+id = "script:{prefix}/playbook/instruction_units.py#envelopes"
+shape = "verb"
+entry = "{prefix}/playbook/instruction_units.py"
+verb = "envelopes"
+flags = ["--list", "--check", "--root="]
+
+[[usage]]
+id = "script:{prefix}/playbook/instruction_units.py#drive"
+shape = "verb"
+entry = "{prefix}/playbook/instruction_units.py"
+verb = "drive"
+flags = ["--list", "--check", "--root=", "--charter="]
+
+[[usage]]
+id = "script:{prefix}/playbook/load_sets.py#derive"
+shape = "verb"
+entry = "{prefix}/playbook/load_sets.py"
+verb = "derive"
+flags = ["--root=", "--reader=", "--item=", "--units=", "--feature=", "--code-budget="]
+
+[[usage]]
+id = "script:{prefix}/playbook/gov_tag.py#show"
+shape = "verb"
+entry = "{prefix}/playbook/gov_tag.py"
+verb = "show"
+flags = ["--json"]
+
+[[usage]]
+id = "script:{prefix}/playbook/gov_tag.py#where"
+shape = "verb"
+entry = "{prefix}/playbook/gov_tag.py"
+verb = "where"
+flags = ["--json"]
+
+[[usage]]
+id = "script:{prefix}/playbook/gov_tag.py#refs"
+shape = "verb"
+entry = "{prefix}/playbook/gov_tag.py"
+verb = "refs"
+flags = ["--json"]
+
+[[usage]]
+id = "script:{prefix}/playbook/gov_tag.py#check"
+shape = "verb"
+entry = "{prefix}/playbook/gov_tag.py"
+verb = "check"
+flags = ["--json", "--base="]
+
+[[usage]]
+id = "script:{prefix}/playbook/gov_tag.py"
+shape = "verb"
+entry = "{prefix}/playbook/gov_tag.py"
+flags = ["--rebuild", "--gc", "--list-positional", "--fixture", "--plant=", "--set="]
+
+[[usage]]
+id = "script:{prefix}/playbook/edge_grammar.py"
+shape = "verb"
+entry = "{prefix}/playbook/edge_grammar.py"
+flags = ["--list", "--parse=", "--check", "--base=", "--fixture", "--plant="]
 
 [[usage]]
 id = "script:{prefix}/run-gates/measure_legs.py"
@@ -256,4 +352,31 @@ flags = []
 id = "script:{prefix}/govkit/docs_leg.py"
 shape = "verb"
 entry = "{prefix}/govkit/docs_leg.py"
-flags = ["--list", "--undocumented", "--fixture", "--plant=", "--enforce="]
+flags = ["--list", "--undocumented", "--fixture", "--plant=", "--enforce=", "--fingerprints", "--run", "--page="]
+
+[[usage]]
+id = "script:{prefix}/playbook/render_playbook.py"
+shape = "verb"
+entry = "{prefix}/playbook/render_playbook.py"
+flags = ["--reference", "--check", "--render-scope="]
+
+[[usage]]
+id = "script:{prefix}/playbook/instructions_edit.py#list"
+shape = "verb"
+entry = "{prefix}/playbook/instructions_edit.py"
+verb = "list"
+flags = []
+
+[[usage]]
+id = "script:{prefix}/playbook/instructions_edit.py#edit"
+shape = "verb"
+entry = "{prefix}/playbook/instructions_edit.py"
+verb = "edit"
+flags = ["--manifest=", "--tag=", "--level=", "--type=", "--scope=", "--trigger=", "--budget=", "--text=", "--source=", "--owner=", "--usage=", "--help-text=", "--required-by=", "--enforced-by=", "--class=", "--fixed-by=", "--edges=", "--build=", "--unit=", "--mark="]
+
+[[usage]]
+id = "script:{prefix}/playbook/overlay.py#check"
+shape = "verb"
+entry = "{prefix}/playbook/overlay.py"
+verb = "check"
+flags = []

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the drift-audit kit's own falsifiability test.
 
-gov:kit drift-audit@1.31
+gov:kit drift-audit@1.32
 
     python <kit>/selftest.py
 
@@ -80,11 +80,11 @@ REPORT_REL = f"{ROOT_PFX}{KIT_NAME}/drift_report.py"
 FAILS: list[str] = []
 
 
-def resolve_recall_name() -> str:
-    """The memory-recall kit's directory NAME in this install, or "" where none is installed: a
+def resolve_grammar_name() -> str:
+    """The id grammar kit's directory NAME in this install, or "" where none is installed: a
     fixture built from this install cannot carry a kit this install does not have."""
     try:
-        return resolve_kit_dir("memory-recall", "extract.py", KIT).name
+        return resolve_kit_dir("memory-tree", "id_grammar.py", KIT).name
     except LookupError:
         return ""
 
@@ -1350,12 +1350,12 @@ def test_backlog_stragglers(tmp: pathlib.Path) -> None:
           "memory-tree" in str(s["detail"]), f"{s['detail']}")
 
     kit_root = KIT.parent
-    missing = [n for n in ("memory-tree", "memory-recall", "lib") if not (kit_root / n).is_dir()]
+    missing = [n for n in ("memory-tree", "lib") if not (kit_root / n).is_dir()]
     if missing:
         skip("backlog_stragglers: the live arms",
              f"the sibling kits are not installed beside this one: {', '.join(missing)}")
         return
-    for name in ("memory-tree", "memory-recall", "lib"):
+    for name in ("memory-tree", "lib"):
         shutil.copytree(kit_root / name, r / name,
                         ignore=shutil.ignore_patterns("__pycache__"))
     (r / ".memory-tree.conf").write_text(
@@ -2768,7 +2768,7 @@ def test_evidence_oracle(tmp: pathlib.Path) -> None:
 def test_local_grammar_matches_the_extractor(tmp: pathlib.Path) -> None:
     """The local fallback is not a second grammar, and this is what keeps it honest.
 
-    The report falls back to a local copy of the id alternation when the recall extractor is not
+    The report falls back to a local copy of the id alternation when the id grammar module is not
     importable, which is the only way a copy-installed kit can run in a tree without it. A copy
     nobody compares is a second grammar with extra steps, so compare it -- here, where this repo
     HAS the extractor, against what the extractor itself produces for this same tree.
@@ -2776,11 +2776,11 @@ def test_local_grammar_matches_the_extractor(tmp: pathlib.Path) -> None:
     import importlib.util
 
     try:
-        extractor = resolve_kit_dir("memory-recall", "extract.py", KIT) / "extract.py"
+        extractor = resolve_kit_dir("memory-tree", "id_grammar.py", KIT) / "id_grammar.py"
     except LookupError:
         extractor = None
     if extractor is None or not extractor.exists():
-        skip("local grammar equals the extractor's", "no memory-recall kit beside this one")
+        skip("local grammar equals the extractor's", "no memory-tree id grammar beside this one")
         return
     spec = importlib.util.spec_from_file_location("_drift_report_probe", KIT / "drift_report.py")
     mod = importlib.util.module_from_spec(spec)
@@ -2791,7 +2791,7 @@ def test_local_grammar_matches_the_extractor(tmp: pathlib.Path) -> None:
     # copy on ANY import failure, so comparing the two compared the copy to itself and passed for
     # free -- reproduced by forcing the import to raise. The arm now imports the extractor by path
     # and lets an import failure FAIL rather than quietly satisfy it.
-    espec = importlib.util.spec_from_file_location("_recall_extract_probe", extractor)
+    espec = importlib.util.spec_from_file_location("_id_grammar_probe", extractor)
     emod = importlib.util.module_from_spec(espec)
     sys.path.insert(0, str(extractor.parent))
     try:
@@ -2897,12 +2897,12 @@ def test_source_cited_ids(tmp: pathlib.Path) -> None:
           read_signal()["value"] == narrow + 1,
           f"value {narrow} -> {read_signal()['value']}, wanted +1 once the family was declared")
 
-    # ---- THE WHOLE REPORT SURVIVES A TREE WITH NO RECALL KIT. This fixture has never had one, so
+    # ---- THE WHOLE REPORT SURVIVES A TREE WITH NO ID GRAMMAR KIT. This fixture has never had one, so
     # the assertion is that the run RETURNS at all rather than raising and taking the other signals
     # with it -- the failure mode is a dead leg for that adopter, not a missing signal.
-    check("citations: the report returns in a tree with drift-audit and no recall kit",
-          not (resolve_recall_name() and (r / resolve_recall_name()).exists()) and read_signal()["signal"],
-          "the fixture unexpectedly has a recall kit beside it")
+    check("citations: the report returns in a tree with drift-audit and no id grammar kit",
+          not (resolve_grammar_name() and (r / resolve_grammar_name()).exists()) and read_signal()["signal"],
+          "the fixture unexpectedly has an id grammar kit beside it")
 
 
 # ---------------------------------------------------------------------------------------------

@@ -82,6 +82,10 @@ memory/backlog/*.md merge=rows
 # pre-switch branch's shard edits from line-merging into a view — without the attribute the driver
 # is never asked, and git's own text merge completes the merge with nothing refusing it.
 memory/builds/*/BACKLOG.md merge=rows
+# The instruction manifests, row stores across nodes (PLAY-dOrderedCharter-15): the driver keys each
+# `[[unit]]` table by its `tag`, so two nodes adding a unit merge with both tags once.
+**/instructions.toml merge=rows
+.governance/instructions.toml merge=rows
 
 # Wholly GENERATED views: a merge takes this side, and check 9 (gen_build_index.py --check) or
 # check 17 (gotchas.py --check) then reds the stale result until `--write` re-renders it.
@@ -98,6 +102,10 @@ memory/gotchas/INDEX.md merge=ours
 # view's two GENERATED_INDEXES pairs in `.unattended.conf`. Check 30 reds a view this line no longer
 # guards (`check_view_merge`, TOOL-dTrueNorth-26 S16), reading the attribute git resolves for the path.
 memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md merge=ours
+# The charter render's whole-file lock (PLAY-dOrderedCharter-49 S33): a merge takes this side, and the
+# lander's `regen.py --write` re-renders it through the playbook kit's `[[regenerate]]` row, which names it
+# in `writes`, so the merged lock is the render's and never a line merge of two.
+.governance/instructions.lock merge=ours
 
 # The governance template is under a STRICT byte gate — pin it (+ companions) to LF so a CRLF
 # checkout can't inflate the count past the limit. (The gate also normalizes, belt-and-suspenders.)

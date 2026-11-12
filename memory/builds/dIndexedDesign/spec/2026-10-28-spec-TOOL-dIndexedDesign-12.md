@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-12 — the structured spec's typed edges: `implements=` and `decides=` read through one spec-site adapter, and `design.seams` reading a tag's bundle
 
-**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 2 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-3 · 2026-11-03 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 2 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0394@97e00df6 whole
 
@@ -229,7 +229,7 @@ format document.
 
 ## 7. Gates
 
-`spec-tokens self-test` · `spec tokens (a spec's own names resolve)` · `memory hygiene` · `memory-hygiene self-test` · `build-index selftest` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `policy fixtures`
+`spec-tokens self-test` · `spec tokens (a spec's own names resolve)` · `memory hygiene` · `memory-hygiene self-test` · `build-index selftest` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `policy fixtures` · `playbook render selftest`
 
 New arm: tools/check-spec-tokens.test.sh · covers AC1 AC2 AC3 AC5 · a scratch spec with header, section, fenced and malformed edge lines and the parser stubbed, staged by the adapter admitting a pinned unit id or reading a fenced line · none
 
@@ -277,6 +277,7 @@ New arm: tools/check-spec-tokens.test.sh · covers AC1 AC2 AC3 AC5 · a scratch 
   source re-read at base `57bc3b91`.
 - rev-2 · 2026-10-28 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from edge of TOOL-dIndexedDesign-38,
   promoted by the round-1 spec audit of this build; nothing else moved.
+- rev-3 · 2026-11-03 · §7 · the leg line gains `playbook render selftest`, whose guard PLAY-dOrderedCharter-51 widened to `tools/memory-tree/design_lib.py` (`1f078024a`), by `2026-11-03-prompt-PLAY-dOrderedCharter-63-spec-brief`; nothing else moved.
 
 ## 10. Reuse audit
 

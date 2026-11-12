@@ -1,0 +1,16 @@
+# readers.toml — the `reader` namespace's members (PLAY-dOrderedCharter-10 §8 F1). Read by tag_index.extract_reader.
+#
+# One [[reader]] row per load route a unit's `scope` can select: `tag`, the member; `why`, the route. A reader
+# per harness joins when its adapter build registers it.
+
+[[reader]]
+tag = "reader.every"
+why = "every reader, whatever its load route"
+
+[[reader]]
+tag = "reader.driver"
+why = "the driving session, which loads the charter"
+
+[[reader]]
+tag = "reader.subagent"
+why = "a spawned subagent, which loads no charter (gap-found-03)"

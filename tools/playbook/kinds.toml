@@ -1,0 +1,182 @@
+# kinds.toml — the kinds register (PLAY-dOrderedCharter-7 S4), the `kind` namespace's declaring source: the closed
+# set of extension kinds of the foundations record's C3, so a `kind.*` tag this file lacks fails the tag resolver.
+# One [[kind]] row per kind: `tag` (kind.<name>); `owner`, the chain build that lands its factory, as the
+# foundations record's "Settled design for the core" assigns it; `binds`, the principle tags that bind it;
+# `population`, a tracked-path glob (`{prefix}` the tool root); `factory`, the command `core.py new <kind>` runs;
+# `gate`, the leg of <prefix>/gate-legs.json whose `enforces` holds every tag of `binds`; `summary`, one line on the
+# kind, and `usage`, its factory command or how a member joins its population, which help/reference/kinds.md
+# renders (PLAY-dOrderedCharter-37). A kind whose factory or
+# gate has not landed carries "" there and is a `kind` row of core-pending.txt naming its owner.
+# `python <prefix>/playbook/core.py kinds` grades the contract. A kind's name is never a namespace word: where a
+# kind's members form a namespace, its name puts a qualifier before that word, naming where the population lives,
+# and the `<kind>` that `core.py new` takes is that name.
+
+[[kind]]
+tag = "kind.tool-kit"
+owner = "dShippedRelease"
+binds = ["principle.p16"]
+population = "{prefix}/*/kit.toml"
+factory = ""
+gate = ""
+summary = "A deployable kit: a directory under the tool root with a kit.toml descriptor and its own adopter."
+usage = "a directory {prefix}/<kit>/ holding kit.toml, its adopter and its engine, with an [[entry]] row in the govkit registry"
+
+[[kind]]
+tag = "kind.command"
+owner = "dDeclaredLoop"
+binds = ["principle.p16"]
+population = ""
+factory = ""
+gate = ""
+summary = "A slash command an adopter's harness runs."
+usage = "no factory has landed; dDeclaredLoop lands it, and until then the kind has no member"
+
+[[kind]]
+tag = "kind.instruction-unit"
+owner = "dOrderedCharter"
+binds = ["principle.p13", "principle.p16"]
+population = "{prefix}/*/instructions.toml"
+factory = "python {prefix}/playbook/core.py new instruction-unit"
+gate = "instruction units (schema, one fact)"
+summary = "One instruction unit: a [[unit]] row of a kit's instructions.toml, rendered by its level, scope and trigger."
+usage = "python {prefix}/playbook/core.py new instruction-unit <name> [factory flags]"
+
+[[kind]]
+tag = "kind.policy-key"
+owner = "dDeclaredLoop"
+binds = ["principle.p16"]
+population = "{prefix}/policy/catalogue.toml"
+factory = ""
+gate = ""
+summary = "A policy key: a [[key]] row of the policy catalogue, read through policy.py get."
+usage = "a [[key]] row in {prefix}/policy/catalogue.toml, its name, allowed values, default, summary and usage"
+
+[[kind]]
+tag = "kind.preset"
+owner = "dDeclaredLoop"
+binds = ["principle.p16"]
+population = ""
+factory = ""
+gate = ""
+summary = "A named preset of policy values an adopter selects at once."
+usage = "no factory has landed; dDeclaredLoop lands it, and until then the kind has no member"
+
+[[kind]]
+tag = "kind.gate-leg"
+owner = "dWitnessedBar"
+binds = ["principle.p16"]
+population = "{prefix}/gate-legs.json"
+factory = ""
+gate = ""
+summary = "A gate leg: a row of the leg manifest the merge bar runs."
+usage = "a row in {prefix}/gate-legs.json, its name, argv, chunk, subject and ceiling"
+
+[[kind]]
+tag = "kind.role"
+owner = "dDeclaredLoop"
+binds = ["principle.p16"]
+population = ""
+factory = ""
+gate = ""
+summary = "A role an agent takes in the loop, rendered into its agent file."
+usage = "no factory has landed; dDeclaredLoop lands it, and until then the kind has no member"
+
+[[kind]]
+tag = "kind.workflow"
+owner = "dDeclaredLoop"
+binds = ["principle.p16"]
+population = "{prefix}/workflows/*.js"
+factory = ""
+gate = ""
+summary = "A Workflow script the harness runs as one program."
+usage = "a script {prefix}/workflows/<name>.js"
+
+[[kind]]
+tag = "kind.hook"
+owner = "dDeclaredLoop"
+binds = ["principle.p16"]
+population = "{prefix}/hooks/*.js"
+factory = ""
+gate = ""
+summary = "A harness hook script and the fragment that wires it."
+usage = "a script {prefix}/hooks/<name>.js with its fragment"
+
+[[kind]]
+tag = "kind.skill"
+owner = "dOrderedCharter"
+binds = ["principle.p16"]
+population = "*skills/*/SKILL.md"
+factory = "python {prefix}/playbook/core.py new skill"
+gate = "core skills conformance"
+summary = "A Skill under skills/<name>/, made by the core's factory."
+usage = "python {prefix}/playbook/core.py new skill <name> --description <text>"
+
+[[kind]]
+tag = "kind.charter-practice"
+owner = "dOrderedCharter"
+binds = ["principle.p14", "principle.p16"]
+population = "{prefix}/playbook/practices.toml"
+factory = "python {prefix}/playbook/core.py new charter-practice"
+gate = "core practices conformance"
+summary = "A charter practice: a [[practice]] row of practices.toml, one rule line of the charter."
+usage = "python {prefix}/playbook/core.py new charter-practice <name> --line <text>"
+
+[[kind]]
+tag = "kind.record-kind"
+owner = "dConvergedCharter"
+binds = ["principle.p16"]
+population = ""
+factory = ""
+gate = ""
+summary = "A kind of record the memory tree holds."
+usage = "no factory has landed; dConvergedCharter lands it, and until then the kind has no member"
+
+[[kind]]
+tag = "kind.stage"
+owner = "dDeclaredLoop"
+binds = ["principle.p16"]
+population = ""
+factory = ""
+gate = ""
+summary = "A stage of the loop a drive row names."
+usage = "no factory has landed; dDeclaredLoop lands it, and until then the kind has no member"
+
+[[kind]]
+tag = "kind.product-layer"
+owner = "dOrderedCharter"
+binds = ["principle.p16", "principle.p28"]
+population = "{prefix}/playbook/layers.toml"
+factory = "python {prefix}/playbook/check_layers.py --new"
+gate = "layer dependencies (the core never depends on an expansion)"
+summary = "A product layer: a row of layers.toml the layer check grades, the core never depending on an expansion."
+usage = "python {prefix}/playbook/check_layers.py --new <tag> --kind <kind> [--of <tag>] --definition <text>"
+
+[[kind]]
+tag = "kind.item"
+owner = "dDeclaredLoop"
+binds = ["principle.p16"]
+population = ""
+factory = ""
+gate = ""
+summary = "A work item the loop carries."
+usage = "no factory has landed; dDeclaredLoop lands it, and until then the kind has no member"
+
+[[kind]]
+tag = "kind.lens"
+owner = "dCalibratedLens"
+binds = ["principle.p16"]
+population = ""
+factory = ""
+gate = ""
+summary = "A review lens a Tier-2 review primes."
+usage = "no factory has landed; dCalibratedLens lands it, and until then the kind has no member"
+
+[[kind]]
+tag = "kind.scenario"
+owner = "dDeclaredLoop"
+binds = ["principle.p16"]
+population = ""
+factory = ""
+gate = ""
+summary = "A scenario the loop is exercised against."
+usage = "no factory has landed; dDeclaredLoop lands it, and until then the kind has no member"

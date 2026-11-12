@@ -8,9 +8,13 @@ the repository root: the role's Claude keys, then `effort: <level>` as `roles_li
 reads it from the kit's `house/policy.toml` (TOOL-aOrientedCast-10) with no model named, so a type
 carries the default tables' level and never a profile's (TOOL-aProfiledEffort-1), then
 `omitClaudeMd: true`, then gov's `workflow` and
-`writes`, then a body that is `roles_lib.render_role`'s output followed, under `## Charter`, by
-`roles_lib.render_charter_blocks` for the role: the section 1 rule lines its `rules` key cites, then
-the charter's carried sections whole (TOOL-aOrientedCast-16). A pre-tag charter renders no
+`writes`, then a body that is `roles_lib.render_role`'s output and, under `## Charter`,
+`roles_lib.render_charter_blocks` for the role: the practice lines its `rules` key cites, then
+the charter's carried sections whole (TOOL-aOrientedCast-16). Where the playbook kit's document registry
+reads, the body is ranked (PLAY-dOrderedCharter-5 S1): `## Charter` first, in the envelope of the charter's
+registry row, level 0, then the role, all in the agent file's own level-5 envelope; with no playbook kit the
+role comes first and the charter after it, unenveloped, and one `envelope — unarmed` note prints; a registry
+that does not read refuses, naming it. A pre-tag charter renders no
 `## Charter` and prints one note. Beside them it writes the generated
 index `.claude/roles.json`: every role with its `workflow`, `writes`, `agent` and `gates`, the gate legs
 the policy's `[gates]` table lets it run (empty where it names none), `harnesses`, the repo-relative
@@ -99,11 +103,16 @@ FIXTURE_MISSING = "{prefix}/workflows/missing.js"
 FIXTURE_ROOT = "toolroot"
 #: Every fixture kit carries a policy, so an absent file never reads as the fixture's normal state.
 FIXTURE_POLICY = '[effort]\ndefault = "medium"\n'
-#: The fixture's governing doc: a tagged charter inside a playbook region, an authored section after it.
-FIXTURE_DOC = ("<!-- gov:playbook -->\n# Doc\n\n## 1. Practices\n\n<!-- one-line -->\n- [one] Rule one.\n"
-               "- [two] Rule two.\n<!-- /one-line -->\n\n## Protocols — read the one whose trigger holds\n\n"
+#: The fixture's governing doc: a tagged charter inside a playbook region, its practices between their
+#: markers under an unnumbered heading, a tagged micro-format rule after them, an authored section after it.
+FIXTURE_DOC = ("<!-- gov:playbook -->\n# Doc\n\n## Practices\n\n<!-- gov:practices -->\n<!-- one-line -->\n"
+               "- [one] Rule one.\n- [two] Rule two.\n<!-- /one-line -->\n<!-- /gov:practices -->\n\n"
+               "### Micro-formats\n\n- [state] A micro-format rule.\n\n"
+               "## Protocols — read the one whose trigger holds\n\n"
                "- A pass: `mem/P.md`.\n\n## Facts\n\n- **Fact:** one.\n<!-- /gov:playbook -->\n\n"
                "## Authored\n\nafter the region\n")
+#: A charter seeded before the practices markers (PLAY-dOrderedCharter-2 S6), its rules under a numbered first heading.
+LEGACY_FIXTURE_DOC = "<!-- gov:playbook -->\n# Doc\n\n## 1. Practices\n\n- [one] Rule one.\n- [two] Rule two.\n\n" + FIXTURE_DOC[FIXTURE_DOC.index("## Protocols"):]
 
 
 def derive_tool_root(script_dir):
@@ -142,21 +151,39 @@ def load_catalogue(kit_dir, target_root):
     notes = [lib.LEGACY_NOTE % doc] if charter["shape"] == "legacy" else []
     return {"roles": roles, "workflows": workflows, "memory_root": memory_root,
             "policy": lib.load_policy(kit_dir, roles, workflows, notes),
-            "notes": notes, "charter": charter}
+            "notes": notes, "charter": charter, "charter_doc": doc}
 
 
-def render_agent_file(kit_dir, slot, role, memory_root, charter, notes, effort):
-    """One agent type's text: Claude keys, its effort, the trim, gov's two keys, the rendered role,
-    then `## Charter` and the role's charter blocks when the charter yields any."""
+def render_agent_file(kit_dir, slot, role, memory_root, charter, notes, effort, missing=(), rows=None,
+                      charter_doc=""):
+    """One agent type's text: Claude keys, its effort, the trim, gov's two keys, then the body. With
+    `rows`, the document registry, the body is ranked (PLAY-dOrderedCharter-5 S1): `## Charter` and the
+    role's charter blocks first, in the envelope of the charter's row at `charter_doc`, then the rendered
+    role and each `Missing required unit:` line the load-set check printed for it under `warn`, all in the
+    agent file's own envelope. With `rows` None, no playbook kit, the role comes first and the charter
+    after it, unenveloped. A charter that yields no block renders no `## Charter`."""
     keys = role["keys"]
     head = ["---"] + ["%s: %s" % (k, keys[k]) for k in CLAUDE_KEYS if k in keys]
     head += ["effort: %s" % effort, "omitClaudeMd: true", "workflow: %s" % keys.get("workflow", ""),
              "writes: %s" % keys.get("writes", ""), "---"]
-    text = "\n".join(head) + "\n" + lib.render_role(kit_dir, slot, memory_root)
+    body = lib.render_role(kit_dir, slot, memory_root)
+    if missing:
+        body += "\n" + "\n".join(missing) + "\n"
     blocks = lib.render_charter_blocks(charter, role["path"].as_posix(), keys.get("rules", ""), notes)
-    if blocks:
-        text += "\n## Charter\n\n" + blocks
-    return text
+    if blocks and rows is None:
+        body += "\n## Charter\n\n" + blocks
+    elif blocks:
+        blocks = "## Charter\n\n" + blocks
+        row = lib.read_envelope_row(rows, charter_doc, memory_root)
+        if row is not None:
+            blocks = lib.render_envelope(charter_doc, row[0], row[1], blocks)
+        body = blocks + "\n" + body
+    # PLAY-dOrderedCharter-3 S4: the body after the front matter in its envelope, where a registry row names it
+    rel = "%s/%s.md" % (AGENTS_REL, slot)
+    row = lib.read_envelope_row(rows, rel, memory_root)
+    if row is not None:
+        body = lib.render_envelope(rel, row[0], row[1], body)
+    return "\n".join(head) + "\n" + body
 
 
 def derive_harness_paths(workflows, tool_root, target_root):
@@ -303,12 +330,25 @@ def run_mode(mode, kit_dir, tool_root, target_root):
     """Render the catalogue at kit_dir into target_root and `--write` or `--check` it; the exit code."""
     try:
         cat = load_catalogue(kit_dir, target_root)
+        agents = [slot for slot, role in cat["roles"].items() if role["keys"].get("agent", "true") == "true"]
+        # PLAY-dOrderedCharter-11 S4: every agent type's load set and role block, ONE check before writing
+        refused, gate = lib.check_load_set(target_root, kit_dir, [
+            (slot, len(lib.render_role(kit_dir, slot, cat["memory_root"]).encode("utf-8"))) for slot in agents])
+        if refused:
+            raise lib.RolesError("\n".join(gate))
+        missing = {slot: [ln for ln in gate if ln.startswith("Missing required unit:")
+                          and ln.endswith(" · role." + slot)] for slot in agents}
+        cat["notes"].extend(ln for ln in gate if not ln.startswith("Missing required unit:"))
+        try:
+            rows = lib.load_document_registry(kit_dir)
+        except LookupError as exc:   # no playbook kit: the roles kit does not require it (F4)
+            rows = None
+            cat["notes"].append(lib.UNRANKED_NOTE % exc)
         rendered = {}
-        for slot, role in cat["roles"].items():
-            if role["keys"].get("agent", "true") == "true":
-                rendered["%s/%s.md" % (AGENTS_REL, slot)] = render_agent_file(
-                    kit_dir, slot, role, cat["memory_root"], cat["charter"], cat["notes"],
-                    lib.resolve_effort(cat["policy"], slot))
+        for slot in agents:
+            rendered["%s/%s.md" % (AGENTS_REL, slot)] = render_agent_file(
+                kit_dir, slot, cat["roles"][slot], cat["memory_root"], cat["charter"], cat["notes"],
+                lib.resolve_effort(cat["policy"], slot), missing[slot], rows, cat["charter_doc"])
         harnesses, absent = derive_harness_paths(cat["workflows"], tool_root, target_root)
         manifest = resolve_gate_manifest(tool_root, target_root)
         rendered[INDEX_REL] = render_roles_index(
@@ -381,6 +421,114 @@ def check_arm(state, arm, ok, what):
     state["n"] += 1
     if not ok:
         state["fail"].append("arm %d — %s" % (arm, what))
+
+
+def check_charter_shape_arms(state, roles):
+    """Arm 19 (PLAY-dOrderedCharter-2 S6): a charter seeded before the practices markers still renders a
+    role's cited rules; a tag outside the markers is no practice, so citing it refuses R4; and a charter
+    carrying neither the markers nor the numbered first heading refuses R0."""
+    pair = {s: roles[s] for s in ("r-one", "r-two")}
+    neither = FIXTURE_DOC.replace("<!-- gov:practices -->\n", "").replace("<!-- /gov:practices -->\n", "")
+    cut = dict(pair, **{"r-one": (roles["r-one"][0].replace("rules: two, one", "rules: one, state"), "")})
+    for case, doc, cast, want in (("19a", LEGACY_FIXTURE_DOC, pair, 0), ("19b", FIXTURE_DOC, cut, 2),
+                                  ("19c", neither, pair, 2)):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            kit, tool_root = build_fixture(root, cast)
+            (root / "DOC.md").write_text(doc, encoding="utf-8")
+            err = io.StringIO()
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+                rc = run_mode("write", kit, tool_root, root)
+            agent = root / ".claude" / "agents" / "r-one.md"
+            text = agent.read_text(encoding="utf-8") if agent.is_file() else ""
+            if case == "19a":
+                check_arm(state, 19, rc == 0 and "### Charter rules\n\n- [one] Rule one.\n- [two] Rule two.\n" in text,
+                          "a charter seeded before the markers exited %d without r-one's two rules" % rc)
+            else:
+                rule = "R4" if case == "19b" else "R0"
+                check_arm(state, 19, rc == want and rule in err.getvalue() and not text,
+                          "%s: exited %d without %s, or wrote r-one: %s" % (case, rc, rule, err.getvalue()))
+
+
+#: Arm 20's document registry (PLAY-dOrderedCharter-5): the fixture's charter at level 0, its agent types at 5.
+FIXTURE_REGISTRY = ('[[document]]\ntag = "doc.charter"\npath = "DOC.md"\nlevel = 0\ndirection = "The fixture charter"\n'
+                    'source = "DOC.md"\n\n[[document]]\ntag = "doc.agent"\npath = ".claude/agents/*.md"\nlevel = 5\n'
+                    'direction = "The fixture role"\nsource = "x"\n')
+
+
+def check_ranked_arms(state, roles):
+    """Arm 20 (PLAY-dOrderedCharter-5): with a playbook kit's registry beside the fixture kit, an agent file
+    opens its body with the charter's level-0 envelope inside its own level-5 one (AC1); a handoff carries
+    level 5 under `## Role` and levels 0 then 6 under `## Task`, and no charter rule line (AC2, AC3); `check`
+    passes it and exits 1 on the level-6 envelope moved above the level-0 one and on a deleted closer, naming
+    the envelope (AC4). A registry that does not read refuses naming it; no playbook kit renders unranked
+    with one unarmed note (F4). The practices block's reach is handed in for the load-set check's run."""
+    import handoff
+    with tempfile.TemporaryDirectory() as tmp:
+        root = pathlib.Path(tmp)
+        kit, tool_root = build_fixture(root, {"r-one": roles["r-one"]})
+        pb_home = "playbook"   # the fixture's playbook home under its tool root, joined through this one name
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+            run_mode("write", kit, tool_root, root)
+        check_arm(state, 20, sum(lib.UNRANKED_NOTE.split(":")[0] in ln for ln in out.getvalue().splitlines()) == 1,
+                  "no playbook kit printed no single unarmed line")
+        (tool_root / pb_home).mkdir()
+        (tool_root / pb_home / "documents.toml").write_text("[[document]\n", encoding="utf-8")
+        err = io.StringIO()
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+            rc = run_mode("write", kit, tool_root, root)
+        check_arm(state, 20, rc == 2 and "documents.toml: the document registry does not read" in err.getvalue(),
+                  "a registry that does not read exited %d without naming it: %s" % (rc, err.getvalue()))
+        (tool_root / pb_home / "documents.toml").write_text(FIXTURE_REGISTRY, encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            rc = run_mode("write", kit, tool_root, root)
+        agent = (root / AGENTS_REL / "r-one.md").read_text(encoding="utf-8")
+        found = lib.read_envelopes(agent)
+        check_arm(state, 20, rc == 0 and [(k, d, lv) for _n, k, d, lv, _x in found[:2]] == [
+            ("open", ".claude/agents/r-one.md", 5), ("open", "DOC.md", 0)] and found[-1][1:3] == (
+            "close", ".claude/agents/r-one.md") and agent.index("- [one] Rule one.") < agent.index("[/DOC.md]")
+            < agent.index("Body of r-one"), "the agent file is not ranked, charter first: %r" % agent)
+        (root / "mem" / "builds" / "fx" / "prompts").mkdir(parents=True)
+        (root / "spec.md").write_text("spec\n", encoding="utf-8")
+        saved = (handoff.KIT_DIR, handoff.WORK_ORDER, lib.check_load_set)
+        handoff.KIT_DIR, handoff.WORK_ORDER = kit, KIT_DIR / "templates" / "work-order.template.md"
+        lib.check_load_set = lambda *a, **k: (False, [handoff.REACH_LINE + "role.r-one · practice.one.build · "
+                                                      "Reach of one."])
+        try:
+            keys = lib.load_roles(kit)["r-one"]["keys"]
+            path, text, task = handoff.render_handoff(root, "mem", root / "DOC.md", "r-one", keys, "fx",
+                                                      "PLAY-fx-1", None, {"spec": "spec.md"}, None, [])
+        finally:
+            handoff.KIT_DIR, handoff.WORK_ORDER, lib.check_load_set = saved
+        path.write_text(text, encoding="utf-8", newline="\n")
+        at = text.index("\n## Task\n")
+        levels = [[lv for n, k, _d, lv, _x in lib.read_envelopes(part) if k == "open"]
+                  for part in (text[:at], text[at:])]
+        check_arm(state, 20, levels == [[5], [0, 6]] and task.split("\n\n", 1)[-1].startswith(
+                  "## Task\n\n[DOC.md#practices-at-build · Level 0 · "),
+                  "the handoff's levels per part are %r, not [5] then [0, 6] under its heading" % levels)
+        check_arm(state, 20, "### Charter rules" not in task and "- [one] Rule one." not in task,
+                  "the task part carries the charter")
+        rel = path.relative_to(root).as_posix()
+        ok, said = handoff.check_handoff(root, rel)
+        check_arm(state, 20, ok and said[-1].endswith("envelopes — Role 5 · Task 0 6"),
+                  "check over the rendered handoff: %r" % said)
+        lines = text.split("\n")
+        o0 = next(i for i, ln in enumerate(lines) if ln.startswith("[DOC.md#"))
+        c0 = lines.index("[/DOC.md#practices-at-build]")
+        for name, planted in (("reordered", lines[:o0] + lines[c0 + 1:-1] + lines[o0:c0 + 1] + [""]),
+                              ("unclosed", lines[:c0] + lines[c0 + 1:])):
+            plant = "\n".join(planted)
+            m = handoff.MARKER_RE.search(plant)
+            r, t = plant.index("\n## Role\n") + 1, plant.index("\n## Task\n") + 1
+            plant = plant.replace(m.group(0), m.group(0).replace(m.group(5), handoff.derive_section_sha(
+                plant[r:t])).replace(m.group(6), handoff.derive_section_sha(plant[t:])))
+            path.write_text(plant, encoding="utf-8", newline="\n")
+            ok, said = handoff.check_handoff(root, rel)
+            want = "opens at level 0 after" if name == "reordered" else "has no closer"
+            check_arm(state, 20, not ok and any("DOC.md#practices-at-build" in ln and want in ln for ln in said),
+                      "the %s envelope passed check: %r" % (name, said))
 
 
 def run_selftest():
@@ -708,6 +856,8 @@ def run_selftest():
                           and not any(ln.startswith("render_agents: misplaced") for ln in lines),
                           "%s: a namesake at %s beside no mark of its kit exited %d under --check, or "
                           "did not read as the note alone" % (case, namesake, rc))
+    check_charter_shape_arms(state, roles)
+    check_ranked_arms(state, roles)
     # Arm 19 (TOOL-aProfiledEffort-1): a profile table per model family. 19b, a type carries the
     # default tables' level; 19a, 19c, 19d and 19f, the levels a model resolves under each policy;
     # 19e, every profile defect refuses the render under its own dotted key and writes nothing.

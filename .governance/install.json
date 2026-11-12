@@ -29,24 +29,6 @@
   ],
   "files": [
     {
-      "path": "tools/agent-instructions/README.md",
-      "kit": "agent-instructions",
-      "role": "engine",
-      "source": "tools/agent-instructions/README.md"
-    },
-    {
-      "path": "tools/agent-instructions/adopt-agent-instructions.sh",
-      "kit": "agent-instructions",
-      "role": "engine",
-      "source": "tools/agent-instructions/adopt-agent-instructions.sh"
-    },
-    {
-      "path": "tools/agent-instructions/kit.toml",
-      "kit": "agent-instructions",
-      "role": "engine",
-      "source": "tools/agent-instructions/kit.toml"
-    },
-    {
       "path": "tools/check-install-prefix.sh",
       "kit": "check-install-prefix",
       "role": "engine",
@@ -287,6 +269,12 @@
       "source": "tools/memory-tree/build-readme-slot-limits.txt"
     },
     {
+      "path": "tools/memory-tree/build_records.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/build_records.py"
+    },
+    {
       "path": "tools/memory-tree/check-arms.py",
       "kit": "memory-tree",
       "role": "engine",
@@ -329,6 +317,12 @@
       "source": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "path": "tools/memory-tree/coverage_join.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/coverage_join.py"
+    },
+    {
       "path": "tools/memory-tree/design_lib.py",
       "kit": "memory-tree",
       "role": "engine",
@@ -351,6 +345,18 @@
       "kit": "memory-tree",
       "role": "engine",
       "source": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "path": "tools/memory-tree/id_grammar.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/id_grammar.py"
+    },
+    {
+      "path": "tools/memory-tree/import_walk.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/import_walk.py"
     },
     {
       "path": "tools/memory-tree/kit-dogfood-parity.test.sh",
@@ -411,12 +417,6 @@
       "kit": "memory-tree",
       "role": "engine",
       "source": "tools/memory-tree/tree_lib.py"
-    },
-    {
-      "path": "coding-governance-agents.template.md",
-      "kit": "playbook",
-      "role": "seed",
-      "source": "coding-governance-agents.template.md"
     },
     {
       "path": "tools/process-monitor/README.md",
@@ -881,10 +881,106 @@
       "source": "tools/playbook/adopt-playbook.sh"
     },
     {
+      "path": "tools/playbook/aliases.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/aliases.toml"
+    },
+    {
+      "path": "tools/playbook/check_layers.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/check_layers.py"
+    },
+    {
+      "path": "tools/playbook/core-pending.txt",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/core-pending.txt"
+    },
+    {
+      "path": "tools/playbook/core.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/core.py"
+    },
+    {
+      "path": "tools/playbook/documents.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/documents.toml"
+    },
+    {
+      "path": "tools/playbook/doors.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/doors.toml"
+    },
+    {
+      "path": "tools/playbook/edge_grammar.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/edge_grammar.py"
+    },
+    {
+      "path": "tools/playbook/edges.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/edges.toml"
+    },
+    {
+      "path": "tools/playbook/fixtures/composition.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/fixtures/composition.py"
+    },
+    {
+      "path": "tools/playbook/fixtures/row_kind.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/fixtures/row_kind.py"
+    },
+    {
       "path": "tools/playbook/fleet.toml",
       "kit": "playbook-render",
       "role": "engine",
       "source": "tools/playbook/fleet.toml"
+    },
+    {
+      "path": "tools/playbook/gov_tag.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/gov_tag.py"
+    },
+    {
+      "path": "tools/playbook/instruction_units.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/instruction_units.py"
+    },
+    {
+      "path": "tools/playbook/instructions-legacy.txt",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/instructions-legacy.txt"
+    },
+    {
+      "path": "tools/playbook/instructions.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/instructions.toml"
+    },
+    {
+      "path": "tools/playbook/instructions_edit.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "path": "tools/playbook/kinds.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/kinds.toml"
     },
     {
       "path": "tools/playbook/kit.toml",
@@ -893,16 +989,214 @@
       "source": "tools/playbook/kit.toml"
     },
     {
+      "path": "tools/playbook/layers.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/layers.toml"
+    },
+    {
+      "path": "tools/playbook/load_sets.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/load_sets.py"
+    },
+    {
+      "path": "tools/playbook/memory_index.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/memory_index.py"
+    },
+    {
+      "path": "tools/playbook/namespaces.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/namespaces.toml"
+    },
+    {
+      "path": "tools/playbook/overlay.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/overlay.py"
+    },
+    {
+      "path": "tools/playbook/overlay_rows.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/overlay_rows.py"
+    },
+    {
+      "path": "tools/playbook/packs.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/packs.toml"
+    },
+    {
+      "path": "tools/playbook/pins.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/pins.py"
+    },
+    {
+      "path": "tools/playbook/policy_value.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/policy_value.py"
+    },
+    {
+      "path": "tools/playbook/positional.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/positional.py"
+    },
+    {
+      "path": "tools/playbook/practice_census.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/practice_census.py"
+    },
+    {
+      "path": "tools/playbook/practices.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/practices.toml"
+    },
+    {
+      "path": "tools/playbook/principles.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/principles.toml"
+    },
+    {
+      "path": "tools/playbook/readers.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/readers.toml"
+    },
+    {
+      "path": "tools/playbook/references.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/references.toml"
+    },
+    {
       "path": "tools/playbook/render_playbook.py",
       "kit": "playbook-render",
       "role": "engine",
       "source": "tools/playbook/render_playbook.py"
     },
     {
+      "path": "tools/playbook/renderers.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/renderers.toml"
+    },
+    {
+      "path": "tools/playbook/row_checks.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/row_checks.py"
+    },
+    {
+      "path": "tools/playbook/spelling-map.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/spelling-map.toml"
+    },
+    {
+      "path": "tools/playbook/tag_bundle.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/tag_bundle.py"
+    },
+    {
+      "path": "tools/playbook/tag_index.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/tag_index.py"
+    },
+    {
+      "path": "tools/playbook/writing_practice.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/writing_practice.py"
+    },
+    {
       "path": "tools/playbook/playbook.kit.toml",
       "kit": "playbook-render",
       "role": "engine",
       "source": "tools/govkit/entries/playbook.kit.toml"
+    },
+    {
+      "path": "tools/playbook/coding-governance-agents.template.md",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "coding-governance-agents.template.md"
+    },
+    {
+      "path": "tools/playbook/check-line-length.kit.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/govkit/entries/check-line-length.kit.toml"
+    },
+    {
+      "path": "tools/playbook/check-microformats.kit.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/govkit/entries/check-microformats.kit.toml"
+    },
+    {
+      "path": "tools/playbook/check-placeholders.kit.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/govkit/entries/check-placeholders.kit.toml"
+    },
+    {
+      "path": "tools/playbook/kickoff-manifest.kit.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/govkit/entries/kickoff-manifest.kit.toml"
+    },
+    {
+      "path": "tools/playbook/settings-merge.kit.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/govkit/entries/settings-merge.kit.toml"
+    },
+    {
+      "path": "tools/playbook/check-testsuite-counts.kit.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/govkit/entries/check-testsuite-counts.kit.toml"
+    },
+    {
+      "path": "tools/playbook/check-wiring.kit.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/govkit/entries/check-wiring.kit.toml"
+    },
+    {
+      "path": "tools/playbook/push-main.kit.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/govkit/entries/push-main.kit.toml"
+    },
+    {
+      "path": "tools/playbook/check-kit-versions.kit.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/govkit/entries/check-kit-versions.kit.toml"
+    },
+    {
+      "path": "tools/playbook/check-agent-cap-restatement.kit.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/govkit/entries/check-agent-cap-restatement.kit.toml"
+    },
+    {
+      "path": "tools/playbook/check-install-prefix.kit.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/govkit/entries/check-install-prefix.kit.toml"
     },
     {
       "path": "tools/playbook/registry.toml",
@@ -1017,6 +1311,12 @@
       "kit": "roles",
       "role": "engine",
       "source": "tools/roles/roles_lib.py"
+    },
+    {
+      "path": "tools/roles/templates/work-order.template.md",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/templates/work-order.template.md"
     },
     {
       "path": "tools/roles/workflows.toml",
@@ -1481,6 +1781,11 @@
       "introduced": null,
       "state": "applied",
       "via": "witness"
+    },
+    {
+      "id": "playbook/adopter-rules-to-overlay",
+      "introduced": null,
+      "state": "applied"
     }
   ]
 }

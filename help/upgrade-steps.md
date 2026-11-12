@@ -13,6 +13,7 @@ the row, and a row the default branch has not landed reads `unlanded`. A kit tha
 
 - **See every step, in the order they run:**
 
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
   ```sh
   python tools/govkit/upgrade_steps.py list
   ```
@@ -150,6 +151,7 @@ gov runs it beside planted hooks and modules in a scratch copy and reads one ver
 
 To see the contract hold on this machine: <!-- usage: script:tools/govkit/upgrade_steps.py#fixture 8e855cf3 -->
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
 ```sh
 python tools/govkit/upgrade_steps.py fixture isolation                  # exit 0
 python tools/govkit/upgrade_steps.py fixture isolation --plant hook     # hook canary: absent
@@ -190,6 +192,7 @@ that step's re-read of the receipt shows schema 4, like any other row. A row is 
 receipt whose `schema` is a number of 4 or more and whose `steps` is a list; anything else is
 refused. `update --write` walks this step like any other; to run it by hand outside a walk: <!-- usage: script:tools/govkit/steps/receipt_schema_4.py#up 051ba178 --> <!-- usage: script:tools/govkit/steps/receipt_schema_4.py#witness f462d008 --> <!-- usage: script:tools/govkit/steps/receipt_schema_4.py#down a555ef91 -->
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and a <repo> or <rev> placeholder -->
 ```sh
 python tools/govkit/steps/receipt_schema_4.py up <repo>       # schema 3 -> 4
 python tools/govkit/steps/receipt_schema_4.py witness <repo>  # exit 0 at schema 4
@@ -269,6 +272,7 @@ put back before the first step, so a kill leaves that kit at the bytes it had be
 
 To see it on this machine:
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
 ```sh
 python tools/govkit/upgrade_steps.py fixture walk                       # s1 to s4 applied, in order
 python tools/govkit/upgrade_steps.py fixture walk --plant kill-step     # killed, re-run, converges
@@ -283,6 +287,7 @@ When you do mean to go back, ask for it by name. A step's down may name that `--
 `{to}`, which resolves in a rollback's down and nowhere else; a row spelling `{to}` in any other
 argv is refused when it is read: <!-- usage: verb:govkit.py:update c276c2e7 -->
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and a <repo> or <rev> placeholder -->
 ```sh
 python tools/govkit/govkit.py update --target <repo> --rollback --to <rev>          # preview
 python tools/govkit/govkit.py update --target <repo> --rollback --to <rev> --write  # perform
@@ -348,6 +353,7 @@ python tools/govkit/govkit.py update --target <repo> --rollback --to <rev> --wri
 
 To see it on this machine:
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
 ```sh
 python tools/govkit/upgrade_steps.py fixture rollback                         # s4 to s1 rolled back
 python tools/govkit/upgrade_steps.py fixture rollback --plant down-fails      # stops at s3, resumes
@@ -385,6 +391,7 @@ back byte-for-byte.
 `update --write` runs it as one of its steps; to run it by hand, from this checkout, against a
 repository whose `.agent-cap.conf` and policy file are committed: <!-- usage: script:tools/govkit/steps/fanout_cap.py#up 4f94983b --> <!-- usage: script:tools/govkit/steps/fanout_cap.py#witness 052d667f --> <!-- usage: script:tools/govkit/steps/fanout_cap.py#down 3f5f9500 -->
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and a <repo> or <rev> placeholder -->
 ```sh
 python tools/govkit/steps/fanout_cap.py up <repo>       # exit 1, writing nothing, on a bad value
 python tools/govkit/steps/fanout_cap.py witness <repo>  # exit 0 once no FANOUT_CAP is left
@@ -393,6 +400,41 @@ python tools/govkit/steps/fanout_cap.py down <repo>     # exit 1 if a file chang
 
 Then commit the result, `.governance/steps/agent-cap/` included: the before-image there is what the
 down restores from.
+
+## What this release's steps do to your repository
+
+Four moves reach an installed repository through `update`, each named here with what it leaves
+behind.
+
+- **Your adopter rules move into the overlay.** The step `playbook/adopter-rules-to-overlay` turns
+  each `- ` line of `[charter] adopter_rules` in `.governance/deploy.toml` into one level-0 unit of
+  `.governance/instructions.toml`, tagged `repo.rule-<NN>-<words>` in the rules' order and scoped to
+  every reader, then takes the key out of `deploy.toml`, every other byte kept. The rendered charter
+  holds the same rules in the same order before and after. The up refuses, writing nothing, on a key
+  line that is not a `- ` line, a rule the overlay reader refuses, a rule over the one-line budget,
+  or an overlay already holding a level-0 unit whose tag sorts below the converted rules. Its witness
+  holds once the key is gone and each rule is a unit's text; its down puts both files back
+  byte-for-byte. The key stays a key the render reads, so a repository that has not run the step
+  renders as before.
+- **The seeded charter template is retired.** The `playbook` entry no longer copies the template to
+  the path your `playbook_path` answer named: the `playbook-render` kit ships the template beside its
+  engine, and the `[[retired]]` row `playbook/seeded-template` names the old copy. `update` keeps
+  your copy either way: an edited one reads `retired-edited` and gets one order under
+  `.governance/outbox/` (none under `install.retired-edits = keep`), and one you never edited reads
+  `withdrawn`, deleted only under `--write-withdrawals`.
+- **The agent-instructions kit is retired into `playbook-render`.** Its wiring is the renderer's
+  `entry-files` scope. A receipt claiming `agent-instructions` is carried to `playbook-render`, as
+  above, and your `CLAUDE.md` import line is left as it is. Where your `deploy.toml` `kits` (or a
+  `--kits` list) still names `agent-instructions`, `plan`, `apply`, `adopt` and `intake` read it as
+  its successor `playbook-render`, and an id a `[[retired]]` row retires with `none` is dropped from
+  the list; an id that is neither an entry nor retired is still refused. The
+  `agent-instructions wiring` leg keeps its name on gov's own bar, running the renderer's
+  `--check-render --scope entry-files`; an adopter that held the agent-instructions kit stops
+  carrying it at its next `update`, and runs that command itself to check its entry files.
+- **`playbook-render` joins the default selection**, because the `check-microformats` gate now grades
+  the template it ships. `update` installs it as a default-gained kit, and the receipt claims it
+  from then on. An existing adopter's next `update` adds the `policy` kit too, because it joined the
+  default selection and `playbook-render` requires it.
 
 ## How gov proves a step before you meet it
 
@@ -405,6 +447,7 @@ declared step over that tree the way it would over yours. Every compare reads th
 and `.governance/outbox/`, with the index, and reads the receipt's re-measured fields the way the
 records that own them declare. Run it from this checkout: <!-- usage: script:tools/govkit/upgrade_walk.py 0cfca8d3 -->
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
 ```sh
 python tools/govkit/upgrade_walk.py                           # every case, then every arm
 python tools/govkit/upgrade_walk.py --list                    # the pin, the steps in walk order, the rows

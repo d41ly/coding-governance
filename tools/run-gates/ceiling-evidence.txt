@@ -29,8 +29,6 @@
 agent-cap restatement	27.0	1	a	2026-09-06	runner
 agent-cap restatement self-test	115.4	2	a	2026-09-24	runner
 agent-cap self-test	700.8	2	a	2026-09-24	runner
-agent-instructions self-test	27.9	2	a	2026-09-24	runner
-agent-instructions wiring	3.0	1	a	2026-09-06	runner
 branch-guard self-test	28.6	2	a	2026-09-24	runner
 brief-recorded	403.5	2	a	2026-09-24	runner
 build README slot contract	1.5	6	a	2026-09-21	runner
@@ -50,6 +48,7 @@ docs	2.7	1	d	2026-10-27	docs_leg.py on the worktree at 1b64e20a with the pass st
 drift-audit records	35.5	2	a	2026-09-24	runner
 drift-audit selftest	292.5	1	a	2026-09-24	runner
 drift-audit wiring	9.8	1	a	2026-09-06	runner
+edges (every declared edge parses, is registered and resolves)	35.0	1	d	2026-11-03	edge_grammar.py --check --base ce13efbe on the worktree with the pass applied and the tag index warm, 35s wall by date arithmetic, under a concurrent foreign gate run, build pass of PLAY-dOrderedCharter-28
 encoding posture (text IO names its encoding)	4.2	2	a	2026-09-24	runner
 every held leg is budgeted, every budget row resolves	35.6	2	a	2026-09-24	runner
 extract-arms self-test	23.1	2	a	2026-09-24	runner
@@ -72,6 +71,7 @@ kit placeholders (a declared token its adopter substitutes)	1.2	1	a	2026-09-24	r
 kit version markers	22.0	1	a	2026-09-06	runner
 kit-placeholders self-test	9.8	2	a	2026-09-24	runner
 kit/dogfood doc parity	5.2	2	a	2026-09-24	runner
+layer dependencies (the core never depends on an expansion)	3.6	1	a	2026-11-02	check_layers.py on the worktree at 64454cba with the pass staged, timed by bash time, 3.6s wall, build pass of PLAY-dOrderedCharter-16
 leg ceilings clear their evidenced maximum	1.7	2	a	2026-09-24	runner
 lexicon naming predicates	7.3	2	a	2026-09-24	runner
 lexicon selftest	287.5	2	a	2026-09-24	runner
@@ -134,6 +134,7 @@ shell-hygiene selftest	0.9	2	a	2026-09-24	runner
 spec tokens (a spec's own names resolve)	465.2	1	a	2026-10-28	taken by the main loop, the leg alone at ce91bfc2 on node a, rc 0, its packet join over 1 live chain run, real 465.2s; host free at its start but for an idle run-gates.sh orphan from Oct 23 and an idle python one-off from Oct 26, and a foreign spec-tokens of dSafePassage's dispatch overlapped its last ~20 s; killed at its 390 s ceiling under the close's bar at 10ab2148 in the pool, the pool's tail and its serial retry, and 512 s beside routed commits at ec8ad036
 spec-tokens self-test	156.8	1	a	2026-09-24	runner
 step-gate	4.4	1	d	2026-10-26	step_gate.py --base HEAD timed by bash time over a scratch clone of the branch carrying a source receipt, 4.4s wall, build pass of TOOL-dSafePassage-10
+tags (the resolver's checks)	210.0	1	a	2026-11-10	gov_tag.py check run alone over the tree at de36424bf by the main loop at the dOrderedCharter close, 210s wall, recorded by PLAY-dOrderedCharter-77 S15
 template size <=48KiB	5.1	1	a	2026-09-06	runner
 template size gate selftest	74.8	2	a	2026-09-24	runner
 testsuite counts (every bar self-test prints one)	26.4	1	a	2026-09-06	runner

@@ -524,6 +524,17 @@ sed -i 's/^output: .*/output: specs/' "$FX/$KREL/agents/gov-spec-writer.agent.md
 check_arm "arm 10 a spec writer whose output lacks its folder is one R14 line, naming the folder" \
    "$([ "$rc" = 1 ] && [ "$(grep -c ': R14 — ' "$A10R")" = 1 ] && grep ': R14 — ' "$A10R" | grep -qF '{{MEMORY_ROOT}}/builds/<slug>/spec/' && echo 1 || echo 0)"
 cp "$TMP_ROOT/a10.writer" "$FX/$KREL/agents/gov-spec-writer.agent.md"
+# PLAY-dOrderedCharter-21 S1: the build row's step, dropped and then misspelt, is one R6 line naming the row.
+cp "$FX/$KREL/workflows.toml" "$TMP_ROOT/a10.workflows"
+awk '/^name = "build"$/{b=1} b && /^step = /{b=0; next} {print}' "$TMP_ROOT/a10.workflows" > "$FX/$KREL/workflows.toml"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?
+check_arm "arm 10 a workflow row without step is one R6 line, naming the row and the field" \
+   "$([ "$rc" = 1 ] && grep ': R6 — ' "$A10R" | grep -qF "(build) is missing key 'step'" && echo 1 || echo 0)"
+sed 's/^step = "build"$/step = "buld"/' "$TMP_ROOT/a10.workflows" > "$FX/$KREL/workflows.toml"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?
+check_arm "arm 10 a step outside the declared words is one R6 line, naming the row and the value" \
+   "$([ "$rc" = 1 ] && grep ': R6 — ' "$A10R" | grep -F '(build)' | grep -qF "step 'buld'" && echo 1 || echo 0)"
+cp "$TMP_ROOT/a10.workflows" "$FX/$KREL/workflows.toml"
 printf 'CHARTER=%s\n' "$CH" > "$FX/.memory-tree.conf"
 (cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?
 check_arm "arm 10 a conf with its CHARTER line alone is unarmed, exit 2 naming MEMORY_ROOT" \

@@ -3,6 +3,7 @@
 
 id = "branch-reconcile"
 home = "branch-reconcile"
+layer = "layer.observability"
 scope = "repo"
 
 # Pinned at the CLI, which lands in the SAME unit as this descriptor, so the file the pattern reads

@@ -64,3 +64,35 @@ id = "entry"
 reader = "{prefix}/govkit/step_gate.py:read_entry_members"
 plant = "{prefix}/govkit/step_gate.py:write_entry_plant"
 summary = "each registry [[entry]] row's id"
+
+[[class]]
+id = "drive"
+reader = "{prefix}/playbook/render_playbook.py:read_drive_members"
+plant = "{prefix}/playbook/render_playbook.py:write_drive_plant"
+summary = "each stage and role of the drive rows gov's deploy selects, as drive.<stage>.<role> (PLAY-dOrderedCharter-37)"
+
+[[class]]
+id = "kind"
+reader = "{prefix}/playbook/render_playbook.py:read_kind_members"
+plant = "{prefix}/playbook/render_playbook.py:write_kind_plant"
+summary = "each [[kind]] tag of the kinds register (PLAY-dOrderedCharter-37)"
+
+[[class]]
+id = "unit"
+reader = "{prefix}/playbook/pins.py:read_unit_members"
+plant = "{prefix}/playbook/pins.py:write_unit_plant"
+summary = "each gov instruction unit, by its tag, from every kit's instructions.toml"
+witness = "{prefix}/playbook/pins.py:read_change_successors"
+
+[[class]]
+id = "unit-usage"
+reader = "{prefix}/playbook/render_playbook.py:read_unit_usage_members"
+plant = "{prefix}/playbook/render_playbook.py:write_unit_usage_plant"
+summary = "each gov instruction unit carrying a usage, by its tag, the units help/reference/units.md documents"
+witness = "{prefix}/playbook/pins.py:read_change_successors"
+
+[[class]]
+id = "module-export"
+reader = "{prefix}/codebase-map/map_lib.py:read_module_export_members"
+plant = "{prefix}/codebase-map/map_lib.py:write_module_export_plant"
+summary = "each name map_lib re-exports from the join factory, held for install.deprecation-window (PLAY-dOrderedCharter-31)"

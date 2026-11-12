@@ -174,8 +174,300 @@ PY_BIN=$(resolve_python "${PLAYBOOK_PY:-}") || exit 2
 # this case is a declaration, not a second parser.
 case " $* " in
   *" --selftest "*) : ;;   # the engine's arms, over its own temp fixtures — no target is read
-  *" --check "*)    : ;;   # assert the region still matches a fresh render, and that none survived
+  *" --check "*)    : ;;   # the charter scope's compare: the region matches a fresh render, none survived
+  *" --check-render "*) : ;;  # with --scope, one scope's compare; bare, the render gate over every scope
+  *" --render-scope "*) : ;;  # write one scope: charter, or entry-files
   *)                : ;;   # write the region
 esac
 
-exec "$PY_BIN" "$HERE/render_playbook.py" "$@"
+case " $* " in
+  *" --selftest "*) ;;
+  *) exec "$PY_BIN" "$HERE/render_playbook.py" "$@" ;;
+esac
+"$PY_BIN" "$HERE/render_playbook.py" "$@" || exit $?
+
+# THE SIBLING KITS EACH PLANT BLOCK REACHES (PLAY-dOrderedCharter-77 S11). A block's arms reach a kit this
+# one does not carry: the layer and tag blocks `memory-tree`, the edge block `roles`, the load-set block
+# `roles` and `policy`. Where one does not resolve, as at a `playbook-render` install without it, the
+# block prints `UNARMED — the <block> plants: no <home> kit in this install` and runs none of its arms;
+# at gov every kit resolves and every arm runs. What this does not check: a block whose arms reach a kit
+# only on some plants is unarmed whole where that kit is absent.
+# check_sibling_kit <home> <anchor>: 0 where this kit's own policy_value.resolve_kit_dir finds the kit.
+check_sibling_kit() {
+  "$PY_BIN" -I -c 'import sys; sys.path.insert(0, sys.argv[1]); from policy_value import resolve_kit_dir
+resolve_kit_dir(sys.argv[2], sys.argv[3], sys.argv[1])' "$HERE" "$1" "$2" >/dev/null 2>&1
+}
+
+# THE LAYER CHECK'S ARMS (PLAY-dOrderedCharter-16 S9). Each row plants one case into the check's own
+# scratch tree, `<plant>|<exit>|<a line it must print>`; the exit and the named line are asserted
+# together, so a check turned into a printer reds here. `none` is the control, green with no edge.
+_uk=; check_sibling_kit memory-tree import_walk.py || _uk=memory-tree
+if [ -n "$_uk" ]; then echo "UNARMED — the layer check's plants: no $_uk kit in this install"; else
+_lf=0
+while IFS='|' read -r _lp _lrc _lwant; do
+  [ -n "$_lp" ] || continue
+  # shellcheck disable=SC2086  # the plant field carries its own flags, word-split on purpose
+  _lout=$("$PY_BIN" "$HERE/check_layers.py" --fixture $( [ "$_lp" = none ] || echo "--plant $_lp" ) 2>&1); _lgot=$?
+  case "$_lgot:$_lout" in
+    "$_lrc:"*"$_lwant"*) printf 'arm ok    layers plant %s\n' "$_lp" ;;
+    *) _lf=$((_lf+1)); printf 'arm FAIL  layers plant %s — wanted rc=%s + %s, got rc=%s\n' "$_lp" "$_lrc" "$_lwant" "$_lgot"
+       printf '      %s\n' "${_lout//$'\n'/$'\n'      }" ;;
+  esac
+done <<'PLANTS'
+none|0|0 allowed, 0 red; 0 contract red(s)
+import|1|tools/corekit/core.py:9 · import · core kit corekit depends on non-core kit mapkit
+dynamic|1|tools/corekit/core.py:10 · dynamic · core kit corekit depends on non-core kit mapkit
+dynamic|1|tools/corekit/core.py:11 · dynamic · core kit corekit depends on non-core kit mapkit
+probe|1|tools/corekit/core.py:9 · probe · core kit corekit depends on non-core kit mapkit
+copy|1|tools/corekit/core.py:10 · copy · core kit corekit depends on non-core kit mapkit
+shell|1|tools/corekit/run.sh:4 · shell · core kit corekit depends on non-core kit expkit
+requires-if|1|tools/corekit/kit.toml:4 · requires-if · core kit corekit depends on non-core kit expkit
+unslotted|1|tools/corekit/core.py:7 · import · core kit corekit depends on non-core kit mapkit
+slotted --list|0|layers: edge tools/corekit/core.py:7 · import · corekit -> mapkit · allowed
+flat-slotted --list|0|layers: edge tools/flatgo:2 · shell · flatkit -> expkit · allowed
+flat-literal|1|optional row part 'tools/flatgo' spells the tool root literally: spell it {prefix}/flatgo
+ex1-pair|1|row 'layer.exp' uses point.exp.hook, which 'layer.exp2' declares
+no-layer|1|descriptor tools/mapkit/kit.toml declares no layer
+unknown-layer|1|descriptor tools/mapkit/kit.toml names layer 'layer.nowhere', which no row holds
+undeclared-point|1|row 'layer.exp' uses point.core.missing, which 0 core row(s) declare
+quoted|1|tools/corekit/run.sh:6 · probe · core kit corekit depends on non-core kit expkit
+quoted|1|0 allowed, 1 red;
+unshipped|1|tools/corekit/core.py:9 · probe · core kit corekit depends on non-core kit mapkit
+unshipped|1|0 allowed, 1 red;
+unparsable|2|layers: UNREADABLE tools/corekit/core.py (SyntaxError
+PLANTS
+if [ "$_lf" != 0 ]; then echo "FAIL — $_lf layer-check arm(s) failed"; exit 1; fi
+echo "PASS — the layer check's plants"
+fi
+
+# THE TAG RESOLVER'S ARMS (PLAY-dOrderedCharter-19 S13, S14). Each row runs `gov_tag.py --fixture` over one
+# plant in its own scratch repository, `<plant and --set flags>|<exit>|<a line it must print>|<a line it
+# must not print>`, the last field optional; exit and lines are asserted together. Every policy key a plant
+# reads is `--set`, so no row reads a policy file. The two `unclosed-` rows are PLAY-dOrderedCharter-68's: a
+# fence that never closes is red on a live page and printed on a frozen record. The rows from `bad-ns` on are
+# PLAY-dOrderedCharter-10's nine plants, the shape check and the joins; `dead-selector` and `file-name` print their second half's
+# exit on a `rc=` line, read here as a line. PLAY-dOrderedCharter-75's `unscoped-unit`, beside them, leaves
+# the `reader` join unarmed under a unit row with no `scope`; PLAY-dOrderedCharter-88's `every-selector` reads a
+# unit scoped `reader.every` as selected by every reader. Then four are PLAY-dOrderedCharter-44's: the index's
+# freshness keyed on blob, extractor and version, and its schema stamp. Then three rows are
+# PLAY-dOrderedCharter-51's two plants: worktrees whose extractor bytes differ, three of them since
+# PLAY-dOrderedCharter-55, keep their rows apart,
+# re-parse nothing on a second alternating round, and `--gc` collects the pruned one's version; a worktree
+# is never served another version's rows of a tree already built. Then PLAY-dOrderedCharter-55's four: a
+# helper's edit re-runs the extractor importing it, a schema rebuild completes in place under a held
+# reader, a removed extractor's stored rows are never served, and a worktree read under a second spelling
+# of its path keeps its dirty rows while a pruned one's leave. The rows after them are
+# PLAY-dOrderedCharter-22's `purpose` arm: the namespace rows' `owner` and `purpose-source`, and the chain
+# registry joined to the fixture design's view; `pending-source` and `new-no-purpose` print their second
+# half's exit on a `rc=` line. An owner the chain registry lacks prints unarmed and is never red, and a
+# native class of such an owner too, beside a held owner's class that still reds (PLAY-dOrderedCharter-78).
+# Then PLAY-dOrderedCharter-69's `git-env`: the `two-versions` and the edge
+# grammar's `resolve-tag` fixtures, run as children under an exported `GIT_DIR`, touch only their scratch. The
+# next six rows are PLAY-dOrderedCharter-70's: a TOML row placed on its own `tag =` line, a staged rename
+# serving the new name alone, and a charter moved by a committed and by an uncommitted conf edit; between
+# them, PLAY-dOrderedCharter-49's two: a dirty row leaves with its reverted edit, and a worktree re-created at
+# a gone one's path inherits none of its rows.
+# run_plant_rows <label> <script>: one `<plant and flags>|<exit>|<must print>|<must not print>` row per stdin
+# line, each run as `<script> --fixture --plant <plant and flags>`; every failed row adds one to `_tf`.
+run_plant_rows() {
+  while IFS='|' read -r _tp _trc _twant _tnot; do
+    [ -n "$_tp" ] || continue
+    # shellcheck disable=SC2086  # the plant field carries its own flags, word-split on purpose
+    _tout=$("$PY_BIN" "$2" --fixture --plant $_tp 2>&1); _tgot=$?
+    case "$_tgot:$_tout" in
+      "$_trc:"*"$_twant"*)
+        case "$_tout" in
+          *"${_tnot:-<none>}"*) _tf=$((_tf+1)); printf 'arm FAIL  %s plant %s — printed %s\n' "$1" "$_tp" "$_tnot" ;;
+          *) printf 'arm ok    %s plant %s\n' "$1" "$_tp" ;;
+        esac ;;
+      *) _tf=$((_tf+1)); printf 'arm FAIL  %s plant %s — wanted rc=%s + %s, got rc=%s\n' "$1" "$_tp" "$_trc" "$_twant" "$_tgot"
+         printf '      %s\n' "${_tout//$'\n'/$'\n'      }" ;;
+    esac
+  done
+}
+_uk=; check_sibling_kit memory-tree tree_lib.py || _uk=memory-tree
+if [ -n "$_uk" ]; then echo "UNARMED — the tag resolver's plants: no $_uk kit in this install"; else
+_tk="--set tags.bare-refs=charter-only --set tags.retired-cites=refuse-new"
+_tf=0
+run_plant_rows tags "$HERE/gov_tag.py" <<PLANTS
+none $_tk|0|tags: green · 0 red
+rebuild|0|dumps equal
+two-paths|0|incremental rows equal a cold build's
+dirty|0|both worktrees share one index|SERVES ANOTHER'S
+one-commit|0|built, 1 blob parsed
+slice --set tags.slice=leaf|0|tags: layer.memory · tools/corekit/core.tags:3|layer.memory.recall
+slice --set tags.slice=subtree|0|tags: layer.memory.recall · tools/corekit/core.tags:4
+retired $_tk|1|new text cites retired practice.old
+retired --set tags.retired-cites=warn --set tags.bare-refs=charter-only|0|tags: WARN memory/guides/ALPHA.md:11 · new text cites retired practice.old
+retired --set tags.retired-cites=allow --set tags.bare-refs=charter-only|0|tags: green · 0 red|cites retired
+retired-old $_tk|0|tags: green · 0 red
+retired-reminted $_tk|1|retired name minted again · practice.old
+retired-reminted --set tags.retired-cites=warn --set tags.bare-refs=charter-only|1|retired name minted again · practice.old
+retired-reminted --set tags.retired-cites=allow --set tags.bare-refs=charter-only|1|retired name minted again · practice.old
+bare $_tk|0|bare \`land\` -> practice.land
+bare --set tags.bare-refs=unique --set tags.retired-cites=refuse-new|1|bare \`memory\` is ambiguous: layer.memory and practice.memory
+bare --set tags.bare-refs=never --set tags.retired-cites=refuse-new|1|bare \`land\` outside the charter
+bare-charter --set tags.bare-refs=never --set tags.retired-cites=refuse-new|0|tags: green · 0 red
+owned $_tk|1|kit expkit (layer.exp) mints layer.fixture-x in core namespace layer
+owned-core $_tk|0|tags: green · 0 red
+scope $_tk|0|tags: unarmed unit (1 not graded)|· unresolved ·
+scope-guide $_tk|1|memory/guides/ALPHA.md:13 · unresolved · \`doc.nope\` names no row
+unclosed-fence $_tk|1|· unclosed fence ·|unresolved
+unclosed-record $_tk|0|unclosed fence, frozen record, printed
+bad-ns $_tk|1|· shape · step.build · namespace 'step' is not registered
+bad-seg $_tk|1|· shape · layer.Memory · segment 'Memory' is outside
+long-tag $_tk|1|· over 64 bytes (66)
+ns-word $_tk|1|· shape · practice.repo.x · first segment 'repo' is a namespace word
+none $_tk|0|tags: green · 0 red|namespace word
+escaped-word $_tk|1|namespace row 'a.b' is outside seg, so no tag is graded against it
+escaped-word $_tk|1|· shape · a.b.c · namespace 'a' is not registered
+unregistered-cite $_tk|1|\`layer.nowhere\` is cited and undeclared in layer
+dead-selector $_tk|1|\`reader.ghost\` is declared and selects no unit
+dead-selector $_tk|1|unused, a descriptor (not red): layer.memory layer.memory.lexicon
+dead-selector $_tk|1|without reader.ghost: rc=0
+unscoped-unit $_tk|0|tags: join reader · selects · unarmed|is declared and selects no unit
+every-selector $_tk|0|tags: green · 0 red|is declared and selects no unit
+empty-ns $_tk|0|tags: join kind · unarmed|\`kind.x\`
+file-name $_tk|0|1 file names not graded
+file-name $_tk|0|· unresolved · \`kit.toml\` names no row
+file-name $_tk|0|no tracked kit.toml: rc=1
+new-extractor|0|incremental rows equal a cold build's|old blobs: 0
+extractor-edit|0|the others ran 0 times, 4 skipped as fresh; 0 rows of the old version
+tagless|0|1 blob parsed after one file changed, 0 on a build with no change
+schema|0|tag-index — rebuilt: schema 0 to
+two-versions|0|round 2 parsed 0 and 0 and 0 blobs; 3 versions of fixture_tags:extract_declared held side by side|DIFFER
+two-versions|0|--gc left 0 rows of its version; the live dump unchanged
+served-across|0|served 0 rows of one's version, and one serves 1
+helper-edit|0|after the helper edit fixture_tags:extract_declared re-ran over 2 blobs, 0 skipped as fresh
+held-open|0|the rebuild completed under a held reader|DIFFER
+held-open|0|the file is index-s
+extractor-removed|0|the removed extractor's stored rows: 4, served: 0;|DIFFER
+worktree-spelling|0|served its own edit · 1 dirty rows kept under its key after the sweep, 0 of the pruned worktree's left
+none $_tk|0|tags: purpose · no chain to read
+no-owner $_tk|2|namespace row 1 lacks owner
+ghost-owner $_tk|0|tags: purpose · owner 'dGhost' · unarmed|names no build of
+foreign-native $_tk|0|family-id (owner dGhost) · unarmed|resolves nothing
+held-native $_tk|1|family-id (owner fixture) · resolves nothing
+no-purpose-source $_tk|2|namespace row 1 lacks purpose-source
+bad-purpose-source $_tk|1|namespace 'doc' · purpose-source 'AGENTS.md#practices' reads a field in a .md file
+member-no-field $_tk|1|namespace 'doc' · member doc.beta (memory/guides/BETA.md) lacks h1
+pending-source $_tk|0|tags: purpose · pending reader · {prefix}/playbook/readers.toml#why
+pending-source $_tk|0|members, 3 path-only, pending 1
+pending-source $_tk|0|/readers.toml) lacks why
+pending-source $_tk|0|readers.toml landed with a member lacking why: rc=1
+registry-ghost $_tk|1|registry row 'dGhost' names no build of the design view
+registry-missing $_tk|1|chain build 'dFixtureTwo' of the design view has no registry row
+registry-joined $_tk|0|2 registry rows joined to 2 view builds, 2 rows awaiting PM-5's review
+new-no-purpose $_tk|1|registry row 'dFixtureNew' carries no purpose, and no baseline [chain] row names it
+new-no-purpose $_tk|1|with a purpose: rc=0
+git-env|0|tags: plant git-env · both children green, core.bare false, the outer index unchanged
+toml-row|0|tags: plant toml-row · rows [('practice.a', 'tag', 4, 5), ('practice.b', 'tag', 8, 9)] on their own lines
+dirty-rename|0|doc.alpha resolves to [] and doc.beta to ['memory/guides/BETA.md']
+dirty-revert|0|the committed text served once reverted|STILL SERVED
+worktree-recreate|0|the re-created worktree serves the committed text|INHERITS
+charter-warm|0|incremental rows equal a cold build's
+charter-warm|0|doc.charter resolves to ['CHARTER2.md']
+charter-dirty|0|incremental rows equal a cold build's
+charter-dirty|0|doc.charter resolves to ['CHARTER2.md']
+reference-row $_tk|0|h1 = "The fixture's reference page"|lacks h1
+reference-row $_tk|0|show: rc=0, check: rc=0
+reference-no-h1 $_tk|1|member doc.reference.fixture (|resolves to no row
+reference-no-h1 $_tk|1|/references.toml) lacks h1
+PLANTS
+if [ "$_tf" != 0 ]; then echo "FAIL — $_tf tag-resolver arm(s) failed"; exit 1; fi
+echo "PASS — the tag resolver's plants"
+fi
+
+# THE EDGE GRAMMAR'S ARMS (PLAY-dOrderedCharter-24 §4). Each row runs `edge_grammar.py --fixture` over one
+# plant, the same row shape as the tag resolver's: the two-line block and a fenced line green, each
+# malformed plant naming both its bad lines in one refusal, the closed set's reds, and a selector a fixture
+# registry adds admitted with `edges.toml` unchanged. The rows from `promoted-elsewhere` on are
+# PLAY-dOrderedCharter-28's §4 plants: the one-writer type, the pin reds, and each address form resolved
+# over a scratch repository whose unit and clause texts moved under a second commit, beside the malformed
+# section, block and note refs segment.
+_uk=; check_sibling_kit roles roles_lib.py || _uk=roles
+if [ -n "$_uk" ]; then echo "UNARMED — the edge grammar's plants: no $_uk kit in this install"; else
+_tf=0
+run_plant_rows edges "$HERE/edge_grammar.py" <<'PLANTS'
+good-block|0|edges: site.md:6 · tests · kit.y, kit.z
+good-block|0|edges: inverse · feature.x implemented-by site.md:5
+good-block|0|edges: inverse · kit.z tested-by site.md:6
+good-block|0|edges: green · 2 edge(s)
+fenced-edge|0|edges: green · 0 edge(s)|site.md:4
+space-target|1|site.md:1: `**Edges:** tests=kit.y kit.z` holds the target 'kit.y kit.z', and a target holds no space; the grammar is
+space-target|1|site.md:3: `**Edges:** tests=kit.y, kit.z` holds the target ' kit.z'
+comma-in-pair|1|site.md:1: `**Edges:** tests,implements=kit.y` names the type 'tests,implements'
+comma-in-pair|1|site.md:3: `**Edges:** tests=kit.y,,kit.z` holds an empty target
+bracket-target|1|site.md:1: `**Edges:** tests=[kit.y]` holds the target '[kit.y]', and a target holds no bracket
+bracket-target|1|site.md:3: `**Edges:** tests=kit.y,kit.z]` holds the target 'kit.z]'
+two-types-one-line|1|site.md:1: `**Edges:** tests=kit.y tests=kit.z` carries a second `type=` pair
+two-types-one-line|1|site.md:3: `**Edges:** implements=kit.y · tests=kit.z` carries a second `type=` pair
+no-equals|1|site.md:1: `**Edges:** tests kit.y` holds no `type=` pair
+no-equals|1|site.md: 2 edge line(s) refused
+unregistered-type|1|edges: site.md:1 · frobs · is no type of edges.toml's closed set
+declared-inverse|1|edges: site.md:1 · implemented-by · is the inverse of implements
+declared-cites|1|edges: site.md:1 · cites · is derived
+outside-to|1|edges: site.md:1 · layer=kit.x · is outside layer's to [layer]
+pin-on-none|1|part-of=kit.x@1a2b3c4d · pins a target, and part-of's row says pin = "none"
+selector-registered|0|edges: green · 1 edge(s)
+selector-registered|0|edges: edges.toml unchanged
+selector-describes|1|edges: site.md:1 · instructs=feature.x · is outside instructs's to [selects]
+promoted-elsewhere|1|is written by instructions.edit alone, its one writer
+pin-no-at|1|holds the target 'practice.land:1a2b3c4d', and a pin is written `@<hash8>`
+pin-bad-hash|1|holds the target 'practice.land@1a2b3c', whose pin hash is not eight hex digits
+pin-no-text|1|pins 00000000, which matches no text in its unit's history
+pin-other-type|1|part-of=kit.x@1a2b3c4d · pins a target, and part-of's row says pin = "none": a pin on a type whose row admits none
+resolve-pinned-tag|0|edges: green · 1 edge(s)|matches no text
+clause-no-rev|1|pins cl-dAlpha-0001@00000000, which matches no revision of its clause
+resolve-pinned-clause|0|edges: resolved · spec.md:3 · carries-clause=cl-dAlpha-0001@|matches no revision
+resolve-tag|0|edges: resolved · site.md:1 · layer=layer.memory · layer.memory · tools/corekit/core.tags:3
+resolve-section|0|edges: resolved · site.md:1 · part-of=doc.build-method#m5-recall-and-reuse · doc.build-method#m5-recall-and-reuse · memory/guides/BUILD-METHOD.md
+resolve-family|0|edges: resolved · site.md:1 · serves=PLAY-dOrderedCharter-28 · family-id PLAY-dOrderedCharter-28 (owner dOrderedCharter)
+resolve-clause|0|edges: resolved · site.md:1 · carries-clause=cl-dAlpha-0001 · clause-id cl-dAlpha-0001
+bad-section|1|site.md:5: `**Edges:** implements=doc.build-method#` holds the target 'doc.build-method#', a malformed section target
+bad-block|1|site.md:5: `**Edges:** tests=kit.y implements=kit.z` carries a second `type=` pair
+bad-note-refs|1|site.py:1: `# gov:note layer.memory — x → y refs=a b` refs segment holds the target 'a b'
+PLANTS
+if [ "$_tf" != 0 ]; then echo "FAIL — $_tf edge-grammar arm(s) failed"; exit 1; fi
+echo "PASS — the edge grammar's plants"
+fi
+
+# THE LOAD SETS' ARMS (PLAY-dOrderedCharter-11, its New arm line). Each row runs `load_sets.py --fixture` over one plant in
+# its own scratch repository, the same row shape: a unit required by the builder and scoped only to the
+# skeptic refused under `refuse`, the builder's handoff writing no prompt file, `budgets.enforce`'s `warn`
+# leaving that refusal standing, and the gap printed under `warn` and `record`; a unit scoped
+# `role.gov-builder` selected only once a `role` row selects, and one scoped `feature.roles` only once a
+# `feature` row does, each unregistered part printed `unarmed`; a 40000-byte charter under a 50000 cap
+# refused on CODEX_MAX under `warn`; a role block ten bytes past its ceiling warned under `warn` and
+# refused under `refuse`. PLAY-dOrderedCharter-27's rows: every role's set lists its `code` slot, a stand-in
+# budget prices it, a malformed one and a committed value the catalogue row refuses each refuse naming
+# `memory.code-budget`, the derivation and the measure alike, and a code block one byte over the budget warns or refuses while one at it is quiet.
+_uk=; check_sibling_kit roles check_roles.py || _uk=roles
+check_sibling_kit policy budgets.py || _uk=${_uk:-policy}
+if [ -n "$_uk" ]; then echo "UNARMED — the load sets' plants: no $_uk kit in this install"; else
+_tf=0
+run_plant_rows load-sets "$HERE/load_sets.py" <<'PLANTS'
+required-away --checks refuse|1|handoff: no prompt file written
+required-away --checks refuse --budgets-enforce warn|1|missing unit.needed · instructions.checks=refuse
+required-away --checks warn|0|Missing required unit: unit.needed|refused
+required-away --checks record|0|**Load gaps:** role.gov-builder · unit.needed|Missing required unit
+role-unregistered|0|role — unarmed — role.*|unit.builder
+role-unregistered|0|item — unarmed|unit.skeptic
+role-registered|0|  unit.builder|unit.skeptic
+feature-unregistered|0|feature — unarmed — feature.*|selected: unit.roles
+feature-registered|0|selected: unit.roles|unarmed — feature.*
+charter-over --budgets-enforce warn|1|over CODEX_MAX 32768
+role-block-over --budgets-enforce warn|0|BUDGET WARN · role.gov-builder
+role-block-over --budgets-enforce refuse|1|BUDGET REFUSE · role.gov-builder
+code-every-role|0|code slot listed for every role|NO code slot
+role-unregistered --code-budget 4k|0|code — slot · budget 4000 · --code-budget 4k
+role-unregistered --code-budget 16|1|memory.code-budget is '16', not <n>k
+code-refused|1|refused · role.gov-builder · memory.code-budget did not read|budget 16000
+code-refused-check|1|refused · memory.code-budget did not read|bytes of
+code-over --budgets-enforce warn|0|BUDGET WARN · code ·
+code-over --budgets-enforce refuse|1|BUDGET REFUSE · code ·
+code-at --budgets-enforce refuse|0|bytes of|BUDGET
+PLANTS
+if [ "$_tf" != 0 ]; then echo "FAIL — $_tf load-set arm(s) failed"; exit 1; fi
+echo "PASS — the load sets' plants"
+fi

@@ -1,4 +1,5 @@
-<!-- gov:kit memory-tree@2.157 -->
+<!-- gov:kit memory-tree@2.158 -->
+[{{MEMORY_ROOT}}/HYGIENE.md · Level 3 · Read before writing any record, index or id under the memory root; yields to levels 0 to 2]
 # {{MEMORY_ROOT}}/ retention & hygiene
 
 `{{MEMORY_ROOT}}/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -155,6 +156,9 @@ set membership rather than a `grep -qxF` per call, because that fork ran once pe
 - **`pass-order-waiver.txt`** — the unattended kit's pass-order checker reads it at this default
   path, so check 3 admits it by name wherever that kit is adopted. A registry a PROJECT adds goes in
   `PROJECT_REGISTRY_EXTRA` instead.
+- **`positional-refs.txt`** — the playbook kit's positional check reads its list at this default
+  path and reds it absent, and that kit's write mode writes it empty, so the project-registry
+  whitelist admits it by name wherever that kit is adopted. Its rows are this tree's own.
 - `project/method-carriers.txt` — every file outside the memory tree that POINTS AT
   `guides/BUILD-METHOD.md`, one `<path> · <why>` row each, read by
   `check-method-carriers.sh`. Keyed on PATH alone, never `<path>:<line>`. It is per-repo and the kit
@@ -324,11 +328,11 @@ Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` pra
     Every §2 scope item must name the acceptance criterion that observes it, or carry `NOT OBSERVED`
     and a reason, once the filename date reaches `SCOPE_JOIN_CUTOFF`, on either tier — and only for a
     spec carrying BOTH headings, matched by heading TEXT rather than by ordinal. SHAPE only.
-    Every §9 revision entry numbered rev-2 or higher must name what it MOVED — a `§<n>`, `S<n>` or
-    `AC<n>` token — once the filename date reaches `REV_SCOPE_CUTOFF`, on either tier. Graded per
-    ENTRY with continuation lines folded in, because this corpus wraps §9 and puts the detail in the
-    wrap; rev-1 is exempt, and the engine announces a zero population rather than passing silently
-    while the cutoff sits ahead of the corpus.
+    Every revision-log entry numbered rev-2 or higher must name what it MOVED — a `§<n>`,
+    `section <n>`, `S<n>` or `AC<n>` token — once the filename date reaches `REV_SCOPE_CUTOFF`, on
+    either tier. Graded per ENTRY with continuation lines folded in, because this corpus wraps the
+    revision log and puts the detail in the wrap; rev-1 is exempt, and the engine announces a zero
+    population rather than passing silently while the cutoff sits ahead of the corpus.
     §8 is graded PER F-ITEM once the filename date reaches `FORK_ITEM_CUTOFF`, which supersedes the
     section-wide reading there: at a terminal status, on either tier, each F-item's span carries its
     own mark, quoted marks not counting; a Tier-2 §8 of any other shape reds at ANY status and under
@@ -393,9 +397,9 @@ upgraded bar; the grace announces itself on every run.
 
 Checks 13-15 live in `{{KIT_DIR}}/corpus_ids.py` and are DISABLED when their pins are blank.
 Every pin is MEASURED against the adopting corpus (`corpus_ids.py --measure`), never inherited: a pin
-copied from a larger tree is either vacuous or permanently red. The id grammar comes from the
-memory-recall kit, so arming these checks requires that kit — with the pins blank it is never
-imported, and with a pin set and the kit absent the failure is NAMED, not a traceback.
+copied from a larger tree is either vacuous or permanently red. The id grammar comes from this
+kit's own `id_grammar.py`, so arming these checks requires that file — with the pins blank it is never
+imported, and with a pin set and the file absent the failure is NAMED, not a traceback.
 
 17. **catalogue index freshness** — `gotchas/INDEX.md` byte-matches a fresh render.
 18. **a class declares its resolution** — every `kind: class` record names a gate or says in as many
@@ -523,7 +527,7 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     HEAD carries is classified BY LINEAGE and never by a parent's tip — a straggler that pulled the
     new conf early has a builds-mode tip and shards-mode content — and each row it changed owes
     exactly ONE `RELOCATED` provenance row naming the id and the change commit. Delegated to
-    `transition_audit.py`, which owns the walk, and keyed through the memory-recall kit's anchor
+    `transition_audit.py`, which owns the walk, and keyed through this kit's `id_grammar.py` anchor
     grammar, so no second row grammar is spelled here. LIVE ONLY WHEN `BACKLOG_MODE` IS `builds`: on a
     shards-mode tree it prints that it is DORMANT and why, because a silent zero there reads exactly
     like a clean audit. Three DEAD PROBE refusals guard it — a shallow repository, a history whose
@@ -545,17 +549,17 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
 
 27. **a new record that RESTATES an older one names it** — every decision row and every gotcha whose
     identity is absent at the mainline merge-base is ranked against the records present there, with
-    the memory-recall kit's own index builder over each record's summary (a row's text after its id,
+    the index builder of this kit's `id_grammar.py` over each record's summary (a row's text after its id,
     a gotcha's `description`). A top hit that reaches `NEAR_MATCH_GATE`'s floor in Jaccard similarity
     AND shares a term of four or more characters is a NEAR MATCH, and the new record must name the
-    hit, name a successor the recall kit's superseded-by map holds for it, or carry `supersedes`,
+    hit, name a successor `id_grammar.py`'s superseded-by map holds for it, or carry `supersedes`,
     `coexists-with` or `disputes`. It obliges a relation and never judges one. A hit that is a row of
     the new row's own session slug is counted and not graded. Delegated to `row_grammar.py`, which
     owns the row grammar; full runs only, because it reads a commit range. `red:<floor>` fails the
     leg, `warn:<floor>` prints `WARN` lines and passes, BLANK is NOT ARMED and says so on every run,
     and the kit ships it blank: a floor measured on another corpus is not a floor for yours, so
     measure your own with `row_grammar.py --measure-relations <floor>` before arming it. An armed
-    run with no mainline base, or with no memory-recall kit installed, is a named refusal. Every
+    run with no mainline base, or with no `id_grammar.py` beside `row_grammar.py`, is a named refusal. Every
     armed run prints one summary line with its counts, red or green.
     NOT GRADED, and said out loud: a near match below the TOP hit; a paraphrase under the floor; a
     bare relation token that names no record; a row edited in place, since the added set is decided
@@ -628,8 +632,13 @@ carry it too:
 
 - `<kind>` is closed: `spec-audit` (a pre-code pass over a spec) · `diff-review` (a pass over built
   code) · `journal` (evidence of what was built) · `research` (a report that precedes the specs) ·
-  `deviation` (a departure from the design or from a spec, in the grammar under "Deviation records").
-  An open kind field stops being groupable the first time two authors spell one relation differently.
+  `deviation` (a departure from the design or from a spec, in the grammar under "Deviation records") ·
+  `exception` (a principle excused for one part, minted by `PLAY-dOrderedCharter-7`'s record factory) ·
+  `override` (minted by `PLAY-dOrderedCharter-2`) · `change` (minted by `PLAY-dOrderedCharter-15`).
+  The four after `research` are the typed kinds: each record is named
+  `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, and the kind and that name are
+  joined both ways. An open kind field stops being groupable the first time two authors spell one
+  relation differently.
 - `<id>` is family-qualified, so a record can name a spec in ANOTHER build — which real corpora need,
   because one closing review legitimately covers two builds. On a `spec-audit` record dated on or
   after `SPEC_AUDIT_PIN_CUTOFF`, or carrying no date, each id is written `<id>@rev-<N>`, N the
@@ -826,3 +835,4 @@ its cap is SPLIT into two dossiers (never rotated; the map gate requires `FOUNDA
 that class is deliberately kept tighter than the index class because a split is the only remedy a
 dossier has and check 6 is the only size gate it has. The map's
 coverage/freshness enforcement is its own test file, not this script.
+[/{{MEMORY_ROOT}}/HYGIENE.md]

@@ -111,7 +111,7 @@ ids DEPL-dShippedRelease-142 DEPL-dShippedRelease-143 DEPL-dShippedRelease-144 D
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [DEPL-dShippedRelease-10 — the kit factory, its conformance gate, and one version and one wiring verdict](spec/2026-10-30-spec-DEPL-dShippedRelease-10.md) | 1 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-10 — the kit factory, its conformance gate, and one version and one wiring verdict](spec/2026-10-30-spec-DEPL-dShippedRelease-10.md) | 1 | 2 | DEFERRED | rev-5 | 2026-11-12 |
 | [DEPL-dShippedRelease-21 — a purpose on every kit, descriptors for govkit and lib, and inline copies generated](spec/2026-10-30-spec-DEPL-dShippedRelease-21.md) | 2 | 2 | DEFERRED | rev-3 | 2026-11-01 |
 | [DEPL-dShippedRelease-65 — every failure line of `check-kit-versions.sh` gets a home in `derive_version_findings` or a named retirement](spec/2026-10-30-spec-DEPL-dShippedRelease-65.md) | 2 | 2 | DEFERRED | rev-2 | 2026-11-01 |
 | [DEPL-dShippedRelease-66 — a retired leg stays resolvable for a live spec older than its retirement, by a row naming its successor](spec/2026-10-30-spec-DEPL-dShippedRelease-66.md) | 2 | 2 | DEFERRED | rev-2 | 2026-11-01 |
@@ -140,7 +140,7 @@ ids DEPL-dShippedRelease-142 DEPL-dShippedRelease-143 DEPL-dShippedRelease-144 D
 | [DEPL-dShippedRelease-59 — the records landing takes the turn and skips the queue's order, and a slug with no entry is enqueued at the call](spec/2026-10-30-spec-DEPL-dShippedRelease-59.md) | 11 | 2 | DEFERRED | rev-3 | 2026-11-01 |
 | [DEPL-dShippedRelease-68 — the late records landing passes the lander after the tombstone, from a tree of its own](spec/2026-10-30-spec-DEPL-dShippedRelease-68.md) | 11 | 2 | DEFERRED | rev-3 | 2026-11-01 |
 | [DEPL-dShippedRelease-69 — a landing that closes by carry-forward hands its lease back, so a second run of one slug can acquire it](spec/2026-10-30-spec-DEPL-dShippedRelease-69.md) | 11 | 2 | DEFERRED | rev-3 | 2026-11-01 |
-| [DEPL-dShippedRelease-15 — promotion through environments: the `integrations` kit, the seven `release.*` items and a compare-and-swap on every promote](spec/2026-10-30-spec-DEPL-dShippedRelease-15.md) | 12 | 2 | DEFERRED | rev-6 | 2026-11-01 |
+| [DEPL-dShippedRelease-15 — promotion through environments: the `integrations` kit, the seven `release.*` items and a compare-and-swap on every promote](spec/2026-10-30-spec-DEPL-dShippedRelease-15.md) | 12 | 2 | DEFERRED | rev-7 | 2026-11-04 |
 | [DEPL-dShippedRelease-51 — the landing review's base is the recorded tip before the push](spec/2026-10-30-spec-DEPL-dShippedRelease-51.md) | 12 | 2 | DEFERRED | rev-2 | 2026-11-01 |
 | [DEPL-dShippedRelease-52 — a landing with no outcome record derives its prior tip from the nearest first-parent merge](spec/2026-10-30-spec-DEPL-dShippedRelease-52.md) | 12 | 2 | DEFERRED | rev-2 | 2026-11-01 |
 | [DEPL-dShippedRelease-60 — `--deploy review` reads its own field first, so a re-walk neither re-fires nor overwrites a disposal](spec/2026-10-30-spec-DEPL-dShippedRelease-60.md) | 12 | 2 | DEFERRED | rev-2 | 2026-11-01 |
@@ -230,7 +230,7 @@ ids DEPL-dShippedRelease-142 DEPL-dShippedRelease-143 DEPL-dShippedRelease-144 D
 | [DEPL-dShippedRelease-9 — a derived runbook: the operator order for install and update, rendered from the kit descriptors, a hand edit red at render parity](spec/2026-10-30-spec-DEPL-dShippedRelease-9.md) | 31 | 2 | DEFERRED | rev-3 | 2026-11-01 |
 | [DEPL-dShippedRelease-140 — the `mint-` cases move to `tools/govkit/matrix.py`, so no gov-only fact sits in a shipped kit file](spec/2026-11-01-spec-DEPL-dShippedRelease-140.md) | 32 | 2 | DEFERRED | rev-1 | 2026-11-01 |
 | [DEPL-dShippedRelease-145 — `mint-regenerate-kits` runs every kit through `cmd_mint`, so the break its arm names reaches it](spec/2026-11-01-spec-DEPL-dShippedRelease-145.md) | 32 | 2 | DEFERRED | rev-1 | 2026-11-01 |
-| [DEPL-dShippedRelease-78 — the round-1 spec audit's 77 minors, batched: the Readers of what unit 10 retires, the legs and rows each unit owes, honest failure states, and the observations that read the wrong thing](spec/2026-10-30-spec-DEPL-dShippedRelease-78.md) | 32 | 2 | DEFERRED | rev-4 | 2026-11-03 |
+| [DEPL-dShippedRelease-78 — the round-1 spec audit's 77 minors, batched: the Readers of what unit 10 retires, the legs and rows each unit owes, honest failure states, and the observations that read the wrong thing](spec/2026-10-30-spec-DEPL-dShippedRelease-78.md) | 32 | 2 | DEFERRED | rev-5 | 2026-11-12 |
 | [DEPL-dShippedRelease-106 — The round-2 spec audit's 79 minors, batched: the rules units 49 to 78 left unstated, their failure states, and the records that named the wrong seam](spec/2026-10-30-spec-DEPL-dShippedRelease-106.md) | 33 | 2 | DEFERRED | rev-4 | 2026-11-01 |
 | [DEPL-dShippedRelease-125 — the round-3 spec audit's 45 MEDIUM and 7 LOW findings, one batch](spec/2026-11-01-spec-DEPL-dShippedRelease-125.md) | 34 | 2 | DEFERRED | rev-3 | 2026-11-01 |
 | [DEPL-dShippedRelease-131 — a refused pin has one way out, and `dispose-landing` admits it](spec/2026-11-01-spec-DEPL-dShippedRelease-131.md) | 35 | 2 | DEFERRED | rev-2 | 2026-11-01 |

@@ -1,6 +1,6 @@
 # memory-recall — ask your decision corpus a question, get the records that answer it
 
-<!-- gov:kit memory-recall@1.33 -->
+<!-- gov:kit memory-recall@1.34 -->
 
 A project-agnostic kit that turns a memory-tree corpus into two derived FTS5 indexes — one document
 per anchored record, one per heading-bounded chunk — fuses them with reciprocal rank fusion, and
@@ -30,6 +30,8 @@ Ported from adopter ic's `scripts/recall/` implementation at `5318064`.
 | `recall-opened.fragment.json` | the settings block that wires that hook: event, matcher, dedup marker, hook path. |
 | `recall-opened.test.sh` | the hook's own check, including a non-`memory` corpus root and a sibling worktree. Its closing `passed` line reports how many cases ran — no count is written here, for the reason the `selftest.py` row gives. |
 | `verbatim.json` | LF-normalised digests of the two verbatim files, so a silent edit to one reds the selftest. |
+
+The id grammar, the conf layer and the FTS5 index builder live in the memory-tree kit's `id_grammar.py` since PLAY-dOrderedCharter-18; `recall_conf.py`, `extract.py` and `bench.py` re-export every name from it.
 
 ## Configure
 

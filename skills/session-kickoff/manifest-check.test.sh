@@ -1058,12 +1058,14 @@ write_manifest "$CWT" "$wt_head" "AGENTS.md" "AGENTS.md"
 run_card "AC4 --card --write with no registry key" "$CWT" 0 - --card --write --session "$NONCE-t4d"
 check_eq "AC4 node — an absent registry key is UNKNOWN: no registry" "node — UNKNOWN: no registry" "$(read_cell node "$NONCE-t4d")"
 
-# AC5 — replay: the stored bytes, one `now —` line, the file untouched; a missing card is written
-# fresh under the replay's own name, node cell resolved.
+# AC5 — replay: the playbook kit's instruction map (PLAY-dOrderedCharter-4), the stored bytes, one
+# `now —` line, the file untouched; a missing card is written fresh under the replay's own name, node
+# cell resolved. The map is the clone's own `map` verb, found as the checker finds it.
 cp "$CARD_HOME/$NONCE-t1.md" "$TMP/t1.before"
+cwt_map=$(ROOT="$CWT" MC_DIR="${CHECK%/*}" resolve_kit_file playbook instruction_units.py)
 run_card "AC5 --card --replay prints the stored card" "$CWT" 0 "orientation — $NONCE-t1 · written " --card --replay --session "$NONCE-t1"
-check_eq "AC5 replay = the stored bytes then exactly one now — line" \
-  "$(cat "$TMP/t1.before"; printf 'now — HEAD %s · card-wt · dirty %s\n' "$wt_head" "$(git -C "$CWT" status --porcelain | wc -l | tr -d '[:space:]')")" "$(cat "$CARD_OUT")"
+check_eq "AC5 replay = the instruction map, the stored bytes, then exactly one now — line" \
+  "$("$MC_PY" "$cwt_map" map --root "$CWT" </dev/null | tr -d '\r'; cat "$TMP/t1.before"; printf 'now — HEAD %s · card-wt · dirty %s\n' "$wt_head" "$(git -C "$CWT" status --porcelain | wc -l | tr -d '[:space:]')")" "$(cat "$CARD_OUT")"
 cmp -s "$TMP/t1.before" "$CARD_HOME/$NONCE-t1.md" && { echo "ok   AC5 the file on disk is byte-identical after the replay"; pass=$((pass+1)); } \
   || { echo "FAIL AC5 the file on disk is byte-identical after the replay"; fail=$((fail+1)); }
 run_card "AC5 a second replay" "$CWT" 0 - --card --replay --session "$NONCE-t1"
@@ -1075,6 +1077,121 @@ grep -q "^orientation — $NONCE-t5 · written .* · by manifest-check.sh --card
   || { echo "FAIL AC5 the replay-written card names --card --replay as its writer"; head -1 "$CARD_HOME/$NONCE-t5.md" | sed 's/^/    /'; fail=$((fail+1)); }
 check_eq "AC5 the replay-written card resolves the node cell" "node — q · $CUSER" "$(read_cell node "$NONCE-t5")"
 check_eq "AC5 the replay-written card is followed by one now — line" "1" "$(grep -c '^now — ' "$CARD_OUT")"
+
+# ---- the card file (PLAY-dOrderedCharter-8 S2, S3) -------------------------------------------------
+# The stored card rendered, inside its level-1 envelope, into the tree of the SessionStart payload's
+# `cwd`: run from the clone's primary tree with the second worktree as `cwd`, so a file landing in the
+# tree the verb ran in is a red. The envelope lines are spelled here, not derived: this suite ships
+# beside the checker, and the lib dir their canonical lives in travels to nobody.
+CF_REL=.claude/orientation-card.md
+CF_SID="$NONCE-cf1"
+printf -v CF_PAYLOAD '{"session_id":"%s","cwd":"%s","hook_event_name":"SessionStart"}' "$CF_SID" "$CWT2"
+check_card_file() {   # $1=name: the opener, the owner line (no transcript_path in the payload), the stored card's bytes, the closer
+  { printf '[%s · Level 1 · %s]\n' "$CF_REL" "the build's card: where this session stands; level 0 outranks it"
+    printf 'card-owner — %s · absent\n' "$CF_SID"
+    cat "$CARD_HOME/$CF_SID.md"; printf '[/%s]\n' "$CF_REL"; } > "$TMP/cf.want"
+  cmp -s "$TMP/cf.want" "$CWT2/$CF_REL" && { echo "ok   $1"; pass=$((pass+1)); } \
+    || { echo "FAIL $1"; diff "$TMP/cf.want" "$CWT2/$CF_REL" 2>&1 | sed 's/^/    /'; fail=$((fail+1)); }
+}
+run_card_file() {   # $1=verb: the verb from the primary tree with the payload on stdin; exit to $got
+  (cd "$CCLONE" && printf '%s\n' "$CF_PAYLOAD" | bash "$CHECK" --card "--$1" > "$CARD_OUT" 2>&1); got=$?
+}
+run_card_file write
+check_eq "card file AC2: --card --write with a payload exits 0" "0" "$got"
+check_card_file "card file AC2: the payload's worktree holds the envelope around the stored card"
+[ ! -e "$CCLONE/$CF_REL" ] && { echo "ok   card file AC2: the primary tree, where the verb ran, holds no card file"; pass=$((pass+1)); } \
+  || { echo "FAIL card file AC2: the primary tree, where the verb ran, holds no card file"; fail=$((fail+1)); }
+check_eq "card file AC4: git status lists no card file" "" "$(git -C "$CWT2" status --porcelain --untracked-files=all | grep orientation-card)"
+run_card_file write
+check_eq "card file AC4: the clone's exclude carries the line once after two writes" "1" "$(grep -cxF "/$CF_REL" "$CCLONE/.git/info/exclude")"
+run_card_file replay
+check_card_file "card file AC3: the replay re-renders it"
+(cd "$CWT2" && printf -- '- TOOL-zCardFixture-10\n' | bash "$CHECK" --card --append --session "$CF_SID" > "$CARD_OUT" 2>&1); got=$?
+check_eq "card file AC3: the append, in the worktree, exits 0" "0" "$got"
+check_card_file "card file AC3: the append re-renders it"
+check_eq "card file AC3: the re-rendered file carries the appended line" "1" "$(grep -cx -- '- TOOL-zCardFixture-10' "$CWT2/$CF_REL")"
+# PLAY-dOrderedCharter-49 S54: a second session writing a card into the same tree leaves the first's card,
+# its owner line naming the first, and prints the one skipped: line naming the owner. The first session
+# writes again with a transcript touched now, since an owner with none is dead (PLAY-dOrderedCharter-54).
+: > "$TMP/cf1.jsonl"
+printf -v CF_PAYLOAD '{"session_id":"%s","cwd":"%s","transcript_path":"%s","hook_event_name":"SessionStart"}' "$CF_SID" "$CWT2" "$TMP/cf1.jsonl"
+run_card_file write
+printf -v CF_PAYLOAD2 '{"session_id":"%s","cwd":"%s","hook_event_name":"SessionStart"}' "$NONCE-cf2" "$CWT2"
+cp "$CWT2/$CF_REL" "$TMP/cf.first"
+(cd "$CCLONE" && printf '%s\n' "$CF_PAYLOAD2" | bash "$CHECK" --card --write > "$CARD_OUT" 2>&1); got=$?
+check_eq "card owner: a second session's --card --write exits 0" "0" "$got"
+check_eq "card owner: it prints the skip line naming the first session" "1" \
+  "$(grep -cxF "card-file — skipped: another live session $CF_SID owns this tree" "$CARD_OUT")"
+cmp -s "$TMP/cf.first" "$CWT2/$CF_REL" && { echo "ok   card owner: the first session's card survives"; pass=$((pass+1)); } \
+  || { echo "FAIL card owner: the first session's card survives"; diff "$TMP/cf.first" "$CWT2/$CF_REL" | sed 's/^/    /'; fail=$((fail+1)); }
+# Unwritable: the path a directory. Each verb keeps its exit and prints one skipped: line.
+rm -f "$CWT2/$CF_REL"; mkdir "$CWT2/$CF_REL"
+for cf_verb in write replay; do
+  run_card_file "$cf_verb"
+  check_eq "card file AC3: --$cf_verb over an unwritable card file exits 0 with one skipped: line" "0 1" "$got $(grep -c '^card-file — skipped: ' "$CARD_OUT")"
+done
+(cd "$CWT2" && printf -- '- TOOL-zCardFixture-10\n' | bash "$CHECK" --card --append --session "$CF_SID" > "$CARD_OUT" 2>&1); got=$?
+check_eq "card file AC3: --append over an unwritable card file exits 0 with one skipped: line" "0 1" "$got $(grep -c '^card-file — skipped: ' "$CARD_OUT")"
+rmdir "$CWT2/$CF_REL"
+
+# ---- the card file's owner (PLAY-dOrderedCharter-54) ----------------------------------------------
+# One scratch repository, a folder of transcripts and one payload per session. The owner line names
+# the session and its transcript; another session's owner is live while that transcript moved within
+# CARD_OWNER_BOUND, and a dead owner's card, or any owner under a `clear` payload, is taken over with
+# one printed line. Staged red by reading every other owner as live (AC4), by ignoring `source` (AC5),
+# or by recording `absent` on a session's own payload-less write (AC2).
+mkrepo owner; OW="$R"; OW_FILE="$OW/$CF_REL"; OWT="$TMP/owner-tx"; mkdir -p "$OWT"
+# write_owner_payload <stem> <sid> <transcript> [source] — $TMP/<stem>.json, the transcript in its native
+# spelling with JSON's doubled backslashes where cygpath gives one; OW_TX the `/` spelling the line holds.
+write_owner_payload() {
+  local p=$3
+  command -v cygpath >/dev/null 2>&1 && p=$(cygpath -w "$3")
+  printf '{"session_id":"%s","cwd":"%s","transcript_path":"%s","source":"%s","hook_event_name":"SessionStart"}\n' \
+    "$2" "$OW" "${p//\\/\\\\}" "${4:-startup}" > "$TMP/$1.json"
+  OW_TX=${p//\\//}
+}
+run_owner_card() { (cd "$OW" && bash "$CHECK" --card "$@" > "$CARD_OUT" 2>&1); got=$?; }   # stdin is the caller's
+read_owner_line() { sed -n 2p "$OW_FILE" | tr -d '\r'; }
+# write_owner_card <line> — the kept card with its second line replaced, or dropped when <line> is empty.
+write_owner_card() { { head -n 1 "$TMP/ow.keep"; [ -z "$1" ] || printf '%s\n' "$1"; tail -n +3 "$TMP/ow.keep"; } > "$OW_FILE"; }
+write_owner_payload s1 s1 "$OWT/t1.jsonl"; OW_T1=$OW_TX
+write_owner_payload s1b s1 "$OWT/t1b.jsonl"; OW_T1B=$OW_TX
+write_owner_payload s2 s2 "$OWT/t2.jsonl"; OW_T2=$OW_TX
+write_owner_payload s2-clear s2 "$OWT/t2.jsonl" clear
+: > "$OWT/t1.jsonl"; : > "$OWT/t1b.jsonl"; : > "$OWT/t2.jsonl"
+run_owner_card --write < "$TMP/s1.json"
+check_eq "owner AC1: a payload's write names the session and its transcript, spelled with /" "0|card-owner — s1 · $OW_T1" "$got|$(read_owner_line)"
+cp "$OW_FILE" "$TMP/ow.keep"
+run_owner_card --replay --session s1 </dev/null
+check_eq "owner AC2: the owner's payload-less replay keeps its transcript" "card-owner — s1 · $OW_T1" "$(read_owner_line)"
+mkrepo owner3
+(cd "$R" && bash "$CHECK" --card --write --session s3 </dev/null > "$CARD_OUT" 2>&1)
+check_eq "owner AC2: a first payload-less write records absent" "card-owner — s3 · absent" "$(sed -n 2p "$R/$CF_REL" | tr -d '\r')"
+touch "$OWT/t1.jsonl"; write_owner_card "card-owner — s1 · $OW_T1"
+run_owner_card --write < "$TMP/s2.json"
+check_eq "owner AC3: a live owner's card is skipped, naming it, and kept" \
+  "1|card-owner — s1 · $OW_T1" "$(grep -cxF 'card-file — skipped: another live session s1 owns this tree' "$CARD_OUT")|$(read_owner_line)"
+# The age is read at the write, so it may pass 3600 by the seconds the write itself took, and no more.
+ow_t0=$EPOCHSECONDS; touch -d "@$((ow_t0 - 3600))" "$OWT/t1.jsonl"; write_owner_card "card-owner — s1 · $OW_T1"
+run_owner_card --write < "$TMP/s2.json"
+ow_age=$(sed -n 's/^card-file — took over: session s1 · transcript \([0-9]*\)s old$/\1/p' "$CARD_OUT")
+check_eq "owner AC4: a transcript dated 3600 s back is a dead owner, taken over, its age 3600 s and the write's own" \
+  "card-owner — s2 · $OW_T2|1" "$(read_owner_line)|$([ -n "$ow_age" ] && (( ow_age >= 3600 && ow_age <= 3600 + EPOCHSECONDS - ow_t0 )) && echo 1)"
+rm -f "$OWT/t1.jsonl"
+for ow_case in "card-owner — s1 · $OW_T1|s1" "card-owner — s1 · absent|s1" "card-owner — s1|s1" "|none"; do
+  write_owner_card "${ow_case%|*}"
+  run_owner_card --write < "$TMP/s2.json"
+  check_eq "owner AC4: '${ow_case%|*}' is a dead owner, taken over" \
+    "card-owner — s2 · $OW_T2|1" "$(read_owner_line)|$(grep -cxF "card-file — took over: session ${ow_case##*|} · transcript absent" "$CARD_OUT")"
+done
+: > "$OWT/t1.jsonl"; write_owner_card "card-owner — s1 · $OW_T1"
+run_owner_card --write < "$TMP/s2-clear.json"
+check_eq "owner AC5: a clear payload takes over a live owner's card" \
+  "card-owner — s2 · $OW_T2|1" "$(read_owner_line)|$(grep -cxF 'card-file — took over: session s1 · source clear' "$CARD_OUT")"
+write_owner_card "card-owner — s1 · $OW_T1"
+run_owner_card --write < "$TMP/s1b.json"
+check_eq "owner AC6: the owner's own write with a new transcript records it, printing no verdict" \
+  "card-owner — s1 · $OW_T1B|0" "$(read_owner_line)|$(grep -cE '^card-file — (skipped|took over):' "$CARD_OUT")"
 
 # AC6 — --path prints one line and touches nothing.
 run_card "AC6 --card --path prints the card's path" "$CWT" 0 "/orientation/$NONCE-t6.md" --card --path --session "$NONCE-t6"
@@ -1163,6 +1280,85 @@ printf '#!/usr/bin/env bash\nsleep 5\n' > "$ov_drv"
 export CARD_OVERLAP_BOUND=1
 run_card "overlaps cell: a driver past the bound is unknown, not none" "$R" 0 "overlaps — skipped: --overlaps did not answer within 1s" --card --write --session "$NONCE-t77d"
 unset CARD_OVERLAP_BOUND
+
+# PLAY-dOrderedCharter-4 — the replay's `map —` block over a stub instruction map the resolver finds as
+# the repo's one tracked `instruction_units.py`: no module, a map of two known lines (an envelope pair),
+# a refusal, and a map that outlives a one-second bound. Each replay is the block, the stored card's
+# bytes, then one `now —` line; the startup writer prints no map. Staged red by moving the
+# `derive_map_block` call after the card in `print_replay`.
+# check_replay <name> <session> <want first lines> — $CARD_OUT against the stored card, one now — line.
+check_replay() {
+  local n; n=$(printf '%s\n' "$3" | wc -l | tr -d '[:space:]')
+  check_eq "$1: the map's lines come first" "$3" "$(head -n "$n" "$CARD_OUT")"
+  check_eq "$1: then the stored card's bytes, then one now — line" \
+    "$(<"$R/.git/orientation/$NONCE-$2.md")|1|now" \
+    "$(sed -n "$((n + 1)),\$p" "$CARD_OUT" | sed '$d')|$(grep -c '^now — ' "$CARD_OUT")|$(tail -1 "$CARD_OUT" | cut -c1-3)"
+}
+mkrepo mapnone
+run_card "map block: setup, a card with no playbook module" "$R" 0 - --card --write --session "$NONCE-t79a"
+run_card "map block: no module replays at exit 0" "$R" 0 - --card --replay --session "$NONCE-t79a"
+check_replay "map block: no module" t79a "map — skipped: no playbook instruction map resolves in this tree"
+mkrepo mapcell; mp_kit=playbook; mp_mod="$R/$mp_kit/instruction_units.py"; mkdir -p "$R/$mp_kit"
+mp_two=$'[AGENTS.md · Level 0 · a stub map]\n[/AGENTS.md]'
+printf 'print("[AGENTS.md · Level 0 · a stub map]")\nprint("[/AGENTS.md]")\n' > "$mp_mod"
+commit_all "$R" "the stub instruction map"
+run_card "map block: the startup writer over a stub map" "$R" 0 - --card --write --session "$NONCE-t79b"
+check_eq "map block: the startup writer prints no map — line and no envelope line" "0" "$(grep -cE '^(map — |\[)' "$CARD_OUT")"
+cp "$R/.git/orientation/$NONCE-t79b.md" "$TMP/t79b.before"
+run_card "map block: a replay over a stub map" "$R" 0 - --card --replay --session "$NONCE-t79b"
+check_replay "map block: a stub map" t79b "$mp_two"
+cmp -s "$TMP/t79b.before" "$R/.git/orientation/$NONCE-t79b.md" && { echo "ok   map block: the stored card is byte-identical after the replay"; pass=$((pass+1)); } \
+  || { echo "FAIL map block: the stored card is byte-identical after the replay"; fail=$((fail+1)); }
+printf 'import sys\nprint("boom")\nsys.exit(3)\n' > "$mp_mod"
+run_card "map block: a refusing map replays at exit 0" "$R" 0 - --card --replay --session "$NONCE-t79b"
+check_replay "map block: a refusing map" t79b "map — skipped: boom"
+printf 'import time\ntime.sleep(5)\n' > "$mp_mod"
+export CARD_MAP_BOUND=1
+run_card "map block: a map past the bound replays at exit 0" "$R" 0 - --card --replay --session "$NONCE-t79b"
+check_replay "map block: a map past the bound" t79b "map — skipped: the map did not answer within 1s"
+unset CARD_MAP_BOUND
+
+# PLAY-dOrderedCharter-11 S5 — the injected load points measured at a card write: the playbook kit's
+# load_sets.py, found in gov as the checker finds every sibling and copied beside the fixture's root, over
+# one agent file, with a scratch cap below the agent list's bytes and then one above it. Staged red by
+# deleting the `derive_injected_breaches` call in `write_card`.
+mkrepo injcell
+ij_src=$(ROOT="$GOVROOT" MC_DIR="${CHECK%/*}" resolve_kit_file playbook load_sets.py); ij_kit=playbook
+mkdir -p "$R/$ij_kit" "$R/.claude/agents"
+cp "$ij_src" "$R/$ij_kit/load_sets.py" \
+  || { echo "FAIL injected cell: no load_sets.py resolves from $GOVROOT"; fail=$((fail+1)); }
+printf -- '---\nname: a\ndescription: An agent that does one thing well.\n---\nbody\n' > "$R/.claude/agents/a.md"
+commit_all "$R" "the load-set module and one agent file"
+CARD_INJECTED_CAPS="agent-list=5" run_card "injected cell: a cap below the agent list prints its breach" "$R" 0 "injected — breach · agent list" --card --write --session "$NONCE-t78a"
+check_eq "injected cell: the breach line is appended to the stored card" "1" "$(grep -c '^injected — breach · agent list' "$R/.git/orientation/$NONCE-t78a.md")"
+CARD_INJECTED_CAPS="agent-list=5000" run_card "injected cell: a cap above it writes the card" "$R" 0 - --card --write --session "$NONCE-t78b"
+check_eq "injected cell: no breach line under the cap" "0" "$(grep -c '^injected — ' "$R/.git/orientation/$NONCE-t78b.md")"
+
+# PLAY-dOrderedCharter-14 AC4, AC5 — the `memory —` cell: gov's playbook `memory_index.py` and its policy
+# reader, found as the checker finds every sibling and copied beside the fixture's root, over a scratch
+# HOME holding an index where the module's own `derive_index_dir` puts it, so the card spells no project
+# key. No module, no memory directory, and a stub past a one-second bound are each one `memory — skipped:`
+# line at exit 0. Staged red by moving the `derive_memory_line` call after `derive_claims_line`.
+mkrepo memnone
+run_card "memory cell: no playbook module is a skipped: line at exit 0" "$R" 0 "memory — skipped: no playbook memory_index.py resolves in this tree" --card --write --session "$NONCE-t80a"
+mkrepo memcell; mm_home="$TMP/memhome"; mm_kit=playbook; mkdir -p "$R/$mm_kit" "$mm_home"
+mm_src=$(ROOT="$GOVROOT" MC_DIR="${CHECK%/*}" resolve_kit_file playbook memory_index.py)
+{ cp "$mm_src" "$R/$mm_kit/memory_index.py" && cp "${mm_src%/*}/policy_value.py" "$R/$mm_kit/policy_value.py"; } \
+  || { echo "FAIL memory cell: no memory_index.py resolves from $GOVROOT"; fail=$((fail+1)); }
+commit_all "$R" "the index measure and its policy reader"
+mm_dir=$("$MC_PY" -c 'import pathlib, sys; sys.path.insert(0, sys.argv[1]); import memory_index as m; print(m.derive_index_dir(sys.argv[2], sys.argv[3]).as_posix())' "$R/playbook" "$R" "$mm_home" | tr -d '\r')
+mkdir -p "$mm_dir" && printf -- '- [a rule](a-rule.md) — one rule\n' > "$mm_dir/MEMORY.md"
+printf -- '---\nname: a-rule\ndescription: one rule\ntype: feedback\n---\nbody\n' > "$mm_dir/a-rule.md"
+HOME="$mm_home" run_card "memory cell: --card --write over a HOME holding an index" "$R" 0 - --card --write --session "$NONCE-t80b"
+check_eq "memory cell: one line, which reached the index and read its budget" "1|memory.load-budget" \
+  "$(grep -c '^memory — ' "$R/.git/orientation/$NONCE-t80b.md")|$(grep -m1 '^memory — ' "$R/.git/orientation/$NONCE-t80b.md" | grep -o 'memory\.load-budget' | head -1)"
+check_eq "memory cell: sits after live — and before claims —" "live memory claims" \
+  "$(grep -oE '^(live|memory|claims) — ' "$R/.git/orientation/$NONCE-t80b.md" | cut -d' ' -f1 | tr '\n' ' ' | sed 's/ $//')"
+HOME="$TMP/memempty" run_card "memory cell: no memory directory is a skipped: line at exit 0" "$R" 0 "memory — skipped: no auto-memory index at" --card --write --session "$NONCE-t80c"
+printf 'import time\ntime.sleep(5)\n' > "$R/$mm_kit/memory_index.py"
+export CARD_MEMORY_BOUND=1
+run_card "memory cell: a measure past the bound is a skipped: line at exit 0" "$R" 0 "memory — skipped: the measure did not answer within 1s" --card --write --session "$NONCE-t80d"
+unset CARD_MEMORY_BOUND
 
 # TOOL-aSparedSpawn-11 S6, AC9 — a card write OUTSIDE the `cli —` block starts no `claude`. A stub that
 # appends to a log stands first on PATH for one write; the log must not exist after it. Staged red by
@@ -1437,19 +1633,26 @@ check_eq "K2 AC10 ...and the card holds one READY line, one task section, the se
   "$(grep -c '^READY — ' "$K2CCARD") $(grep -c '^## task' "$K2CCARD") $(grep -c 'Title:\*\* two' "$K2CCARD") $(grep -c 'Title:\*\* one' "$K2CCARD")"
 
 # ---- the aReplayedCard closing review, round 1: F1, F7, F8 and F9, each observed RED first -------
-# F1 — memory-tree installed WITHOUT memory-recall: the reader is present, its grammar is not. The
-# append must degrade to "id citations unchecked" and still judge the paths, never refuse — a
-# refusal here was a lockout whose printed remedy re-ran the refusing append. The grammar file is
-# hidden in the worktree for the one arm and restored after it.
+# F1 — memory-tree installed WITHOUT memory-recall: the reader is present and so is its grammar,
+# which is the memory-tree kit's own `id_grammar.py` since PLAY-dOrderedCharter-18. The recall kit's
+# extractor is hidden in the worktree for the one arm and restored after it, and the append still
+# CHECKS the card's id citations — no "id citations unchecked" NOTE — and judges the paths.
 K2E="$NONCE-k2e"; K2ECARD="$CARD_HOME/$K2E.md"
 run_card "F1 setup: a card for the no-grammar arm" "$CWT" 0 - --card --write --session "$K2E"
+# PLAY-dOrderedCharter-17 S10: the recall kit is a declared slot. With none to hide the hidden-reader
+# arm skips with the slot line, its 2 assertions counted.
+if [ -z "$RECALL_REL" ]; then
+  echo "skip slot point.memory.consult · not-installed: the hidden-reader arm F1 skips, no memory-recall kit resolving to hide; its 2 assertions are counted, not run"
+  pass=$((pass+2))
+else
 mv "$CWT/$RECALL_REL/extract.py" "$CWT/$RECALL_REL/extract.py.hid"
 { render_task_section; printf '## read\n- `AGENTS.md:1`\n%s\n' "$(render_ready_line "$wt_head")"; } | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2E" > "$CARD_OUT" 2>&1); got=$?
 mv "$CWT/$RECALL_REL/extract.py.hid" "$CWT/$RECALL_REL/extract.py"
-[ "$got" = 0 ] && grep -q '^NOTE: id citations unchecked — .*the id grammar lives in the memory-recall kit' "$CARD_OUT" && grep -q ' 1 tokens · 0 unverified ' "$CARD_OUT" \
-  && { echo "ok   F1 a reader with no memory-recall kit degrades to the NOTE, the path is judged, the append lands (exit 0)"; pass=$((pass+1)); } \
-  || { echo "FAIL F1 a reader with no memory-recall kit degrades to the NOTE, the path is judged, the append lands (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+[ "$got" = 0 ] && ! grep -q '^NOTE: id citations unchecked' "$CARD_OUT" && grep -q ' 1 tokens · 0 unverified ' "$CARD_OUT" \
+  && { echo "ok   F1 a reader with no memory-recall kit still checks ids, no NOTE, the path is judged, the append lands (exit 0)"; pass=$((pass+1)); } \
+  || { echo "FAIL F1 a reader with no memory-recall kit still checks ids, no NOTE, the path is judged, the append lands (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
 check_eq "F1 ...and the card ends with the body's READY line" "$(render_ready_line "$wt_head")" "$(tail -1 "$K2ECARD")"
+fi
 # F7 — a root-level tracked file cited by NAME is a path token (the spec-token lint's "exact tracked
 # path" half); a slashless dotted word that is not tracked (`e.g`) is nothing, never an UNVERIFIED.
 { render_task_section; printf '## read\n- read AGENTS.md first, e.g. before TOOL-zCardFixture-10\n%s\n' "$(render_ready_line "$wt_head")"; } | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2E" > "$CARD_OUT" 2>&1); got=$?
@@ -1577,11 +1780,12 @@ else
   echo "skip KQ AC8 R0 with no id reader — gov resolved no id reader, so there is none to hide and R0's MEMORY_ROOT words go unexercised"
 fi
 cp "$TMP/qconf" "$CWT2/.memory-tree.conf"
-mv "$CWT2/$RECALL_REL/extract.py" "$CWT2/$RECALL_REL/extract.py.hid"
+# The reader exits 3 only when ITS grammar is absent, which is the memory-tree kit's id_grammar.py.
+q_grammar="$CWT2/${READER_REL%/*}/id_grammar.py"; mv "$q_grammar" "$q_grammar.hid"
 check_route_refusal "KQ AC8 R0 a route whose id reader exits 3 exits 2" "$KQ" 2 "route R0: no defined-id set" < "$TMP/qb"
 grep -q '^NOTE: id citations unchecked' "$CARD_OUT" && { echo "ok   KQ AC8 liveness: the reader took its exit-3 branch"; pass=$((pass+1)); } \
   || { echo "FAIL KQ AC8 liveness: the reader took its exit-3 branch"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
-mv "$CWT2/$RECALL_REL/extract.py.hid" "$CWT2/$RECALL_REL/extract.py"
+mv "$q_grammar.hid" "$q_grammar"
 # AC6 — a route on a card no kickoff has appended to.
 KQ6="$NONCE-kq6"
 run_card "KQ AC6 setup: a fresh card with the sentinel" "$CWT2" 0 - --card --write --session "$KQ6"
@@ -2010,7 +2214,13 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # +2: TOOL-aOrientedCast-15 S5 — the KC L1 pair, an OUT label spaced before its colon, filled and
 # placeholder, counted off the diff; no suite ran in the pass.
 # 310 = the base 279 + aSparedSpawn's 1 + local main's 30, summed at TOOL-aSparedSpawn-34's reconcile.
-FLOOR_ASSERTIONS=310
+# +4: PLAY-dOrderedCharter-11 S5's injected cell, two run_card and two check_eq calls, counted off the
+# block; no suite ran in the pass, the card write was probed alone over a scratch fixture.
+# +16: PLAY-dOrderedCharter-4's `map —` block, six run_card, nine checks and one cmp, counted off the
+# block; no suite ran in the pass, the replay was probed alone over a scratch fixture.
+# +7: PLAY-dOrderedCharter-14's `memory —` cell, five run_card and two check_eq calls, counted off the
+# block; no suite ran in the pass, the card write was probed alone over a scratch fixture.
+FLOOR_ASSERTIONS=337
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

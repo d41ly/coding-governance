@@ -48,7 +48,7 @@
 # GIT_SSH, which the `ok` and `note` cases grade as they find it because the arm cannot tell who
 # wrote it; HTTPS remotes, which hold no ssh socket; and whether the remote's own idle timeout is
 # shorter than the silence the keepalive tolerates.
-KIT_CHECK_WIRING_VERSION=1.36   # gov:kit check-wiring@1.36 — the deployer's read
+KIT_CHECK_WIRING_VERSION=1.37   # gov:kit check-wiring@1.37 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
 # TOOL-dRetiredFork-8. Six `tools/<kit>/` literals were spelled here, and `govkit apply` ships these
@@ -1407,8 +1407,8 @@ check_merge_rows() {
   # RUN THE COMMAND, do not pattern-match its parts. "Wired" is "the command git will exec actually
   # merges", and the three tests above — driver exists, launcher exists, config string matches — are all
   # path-and-string. They cannot see the two runtime dependencies the driver reaches for at merge
-  # time: the resolve-python helper, which `pyrun.sh` sources, and the sibling memory-recall kit that
-  # owns the anchor grammar. Both were MEASURED printing `ok  merge  — merge.rows.driver wired`
+  # time: the resolve-python helper, which `pyrun.sh` sources, and the memory-tree kit's id_grammar.py,
+  # which owns the anchor grammar. Both were MEASURED printing `ok  merge  — merge.rows.driver wired`
   # here while the very next merge left `memory/DECISIONS.md` holding OURS-only content with zero
   # conflict markers and status `UU` — the silent take-ours the driver's own fail-closed wrapper
   # exists to prevent, arriving one level up where that wrapper never gets to run.
@@ -1481,7 +1481,7 @@ check_merge_rows() {
       }
     }' "$smoke/a" "$fams" 2>/dev/null)
   if [ "$rc_smoke" != 0 ] || [ -n "$miss" ]; then
-    echo "UNWIRED  merge     — the configured driver cannot merge: '$launcher' exited $rc_smoke on a per-family append collision, missing or duplicated:${miss:- none} ($(head -1 "$smoke/err" 2>/dev/null | tr -d '\r')). git prints CONFLICT and leaves the path holding OURS-only content with NO markers. Fix: restore the launcher beside $drv and the sibling memory-recall kit, check .memory-tree.conf FAMILIES, then re-run"
+    echo "UNWIRED  merge     — the configured driver cannot merge: '$launcher' exited $rc_smoke on a per-family append collision, missing or duplicated:${miss:- none} ($(head -1 "$smoke/err" 2>/dev/null | tr -d '\r')). git prints CONFLICT and leaves the path holding OURS-only content with NO markers. Fix: restore the launcher and id_grammar.py beside $drv, check .memory-tree.conf FAMILIES, then re-run"
     unwired=$((unwired+1))
     rm -rf "$smoke"
     return

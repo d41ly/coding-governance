@@ -3,6 +3,7 @@ answer per cap, and the verdict a breach takes.
 
     python <this kit>/budgets.py resolve <cap>[=legacy:<n>|=default:<n>] ...    # one row per cap
     python <this kit>/budgets.py check <cap>[=legacy:<n>|=default:<n>] <measured>  # the verdict
+    python <this kit>/budgets.py home <cap>                                      # where its value lives
 
 THE CENSUS, `caps.toml` beside this file, is one `[[cap]]` row per size cap: its name under
 `budgets.*`, its class, its unit, its enforcer, its legacy home and whether it is a family, and
@@ -54,7 +55,8 @@ LIMITS_NAME = "template-size-limits.txt"
 CLASSES = ("switch", "consumer", "correctness", "exempt")
 OUTSIDE = ("consumer", "correctness", "exempt")
 UNITS = ("bytes", "lines", "chars", "count")
-HOME_FORMS = ("limits", "file", "conf", "constant")
+# `policy:<key>` names a policy key its enforcer reads, on a family row alone (PLAY-dOrderedCharter-27).
+HOME_FORMS = ("limits", "file", "conf", "constant", "policy")
 FIELDS = ("name", "class", "unit", "enforcer", "home", "family", "research")
 # The optional fields, each with the value its absence means: `ships = false` marks a row whose
 # enforcer the deployer's registry exempts, so no install holds it (TOOL-dGroundRules-17).
@@ -112,7 +114,8 @@ def derive_census_rel():
 def read_cap_census(repo="."):
     """{name: Cap} for the census `repo` holds at this kit's own path, else this kit's own, in file
     order. A census that does not parse, a row lacking a field or carrying an unknown one, a class,
-    unit or home form outside its set, a `family` or OPTIONAL `ships` that is not a boolean, a shipped
+    unit or home form outside its set, a `family` or OPTIONAL `ships` that is not a boolean, a `policy:`
+    home on a row that is not a family (PLAY-dOrderedCharter-27), a shipped
     row lacking a SHIPPED field or a `ships = false` row carrying one, a reserved name, or a name twice
     is a Refusal naming the census and the row's line."""
     rel = derive_kit_rel()
@@ -139,6 +142,9 @@ def read_cap_census(repo="."):
                else f"home {row['home']!r} opens with none of {', '.join(HOME_FORMS)}"
                if str(row["home"]).partition(":")[0] not in HOME_FORMS
                else f"{bad} {flags[bad]!r} is not a boolean" if bad
+               else f"{row['name']}'s home {row['home']} is a policy key, which only a family row may name: "
+                    f"budgets.{row['name']} would be a second home for its value"
+               if str(row["home"]).startswith("policy:") and not flags["family"]
                else f"{row['name']} ships and lacks {', '.join(lacks)}" if lacks
                else f"{row['name']} has ships = false and carries {', '.join(where)}" if where and not flags["ships"]
                else f"{row['name']} shadows budgets.{row['name']}" if row["name"] in RESERVED
@@ -301,6 +307,27 @@ def resolve_caps(requests, repo=".", rev=None, refused=None):
     return out
 
 
+def read_cap_home(name, repo="."):
+    """(the census row's `home` as the census spells it, its value) for the cap `name`: for a `constant:`
+    home the integer assigned on the line `derive_home_line` finds in the working tree of `repo`, the shell
+    `KEY=n` and the Python `KEY = n` alike, else None. A cap with no census row, or a `constant:` home whose
+    file holds no such line or no integer after its `=`, is a Refusal naming the file and the line."""
+    cap = read_cap_census(repo).get(name)
+    if cap is None:
+        raise policy.Refusal(derive_census_rel(), 0, f"{name} names no row of the cap census")
+    if cap.home.partition(":")[0] != "constant":
+        return cap.home, None
+    path, line = derive_home_line(repo, cap.home)
+    key = cap.home.rpartition(":")[2]
+    if not line:
+        raise policy.Refusal(path, 0, f"{name}'s home names {key}, and no line of {path} assigns it")
+    text = Path(repo, path).read_text(encoding="utf-8", errors="replace").splitlines()[line - 1]
+    m = re.match(r"\s*([0-9]+)\b", text.partition("=")[2])
+    if not m:
+        raise policy.Refusal(path, line, f"{name}'s home assigns {key} no integer")
+    return cap.home, int(m[1])
+
+
 def check_cap(answer, measured, subject=None):
     """CapVerdict(over, refuse, line) for `measured` against `answer`. A value of 0, or none, is
     unchecked, as every enforcer reads it. A breach refuses under `refuse` and warns otherwise; the
@@ -354,19 +381,29 @@ def check_budgets(doc, text="", census=None):
 
 
 USAGE = ("usage: python budgets.py resolve [--explain] <cap>[=legacy:<n>|=default:<n>] ... "
-         "| check <cap>[=legacy:<n>|=default:<n>] <measured>")
+         "| check <cap>[=legacy:<n>|=default:<n>] <measured> | home <cap>")
 
 
 def main(argv):
     """`resolve`: one `<cap>\\t<value>\\t<mode>\\t<source>` row per request, `-` for an absent
     value; under `--explain`, one `budgets: <cap> · <rule> · <reason>` line per cap on stderr, the
     rule that set the mode, which a shell enforcer names on its breach line. `check`: the verdict
-    line, exit 1 when it refuses. Run in the repository to read."""
+    line, exit 1 when it refuses. `home`: one `<cap>\\t<home>\\t<value>` row, `read_cap_home`'s, `-`
+    for a home that is not `constant:`, exit 2 on its refusal (PLAY-dOrderedCharter-6). Run in the
+    repository to read."""
     for stream in (sys.stdout, sys.stderr):
         stream.reconfigure(encoding="utf-8", newline="\n")
     verb, args = (argv[0], argv[1:]) if argv else ("", [])
     explain = verb == "resolve" and args[:1] == ["--explain"]
     args = args[1:] if explain else args
+    if verb == "home" and len(args) == 1:
+        try:
+            home, value = read_cap_home(args[0])
+        except policy.Refusal as exc:
+            print(exc, file=sys.stderr)
+            return 2
+        print(f"{args[0]}\t{home}\t{'-' if value is None else value}")
+        return 0
     if verb == "check" and len(args) == 2 and args[1].isdigit():
         reqs, measured = args[:1], int(args[1])
     elif verb == "resolve" and args:

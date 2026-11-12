@@ -38,16 +38,20 @@ from the conf beside THIS kit, so run it inside the repo you are extracting.
 Writes ``spine.jsonl``, ``records.jsonl``, ``chunks.jsonl``, ``anchors.json`` and
 ``orphan-ids.txt``.
 Reading at a git rev (rather than the worktree) keeps a measurement reproducible against a sha.
+
+THE GRAMMAR IS THE MEMORY-TREE KIT'S since PLAY-dOrderedCharter-18: the eras, ``Grammar``,
+``grammar_for``, ``anchor_at``, the corpus walk and the four record readers check 27 imports live
+in that kit's ``id_grammar.py``, found through ``resolve_kit_dir`` (this kit ``requires``
+memory-tree), and this file re-exports each name and re-binds its module constants from the
+default grammar at import, so the CLI and ``query.py`` read exactly what they read before.
 """
 
 from __future__ import annotations
 
-import fnmatch
 import hashlib
 import json
 import pathlib
 import re
-import types
 import subprocess
 import sys
 from collections import defaultdict
@@ -102,90 +106,42 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
-# The spec-H1 predicate is the memory-tree kit's, found by `resolve_kit_dir` and imported on FIRST
-# USE (TOOL-aRepatriatedFork-40). This kit `requires` that one, so a miss is a refusal naming where
-# the resolver looked, never a silent "no spec defines anything". Deferred rather than at import:
-# the merge driver and check-wiring load this module for the GRAMMAR alone, and their fixtures carry
-# no memory-tree kit beside it.
-_PARSE_SPEC_H1 = None
+# The id grammar, from the memory-tree kit's ONE module (PLAY-dOrderedCharter-18), APPENDED to the
+# path rather than prepended so no module name that kit carries can shadow one of this kit's.
+_GRAMMAR_KIT = str(resolve_kit_dir("memory-tree", "id_grammar.py", pathlib.Path(__file__).resolve().parent))
+if _GRAMMAR_KIT not in sys.path:
+    sys.path.append(_GRAMMAR_KIT)
 
+import id_grammar  # noqa: E402
+from id_grammar import (  # noqa: E402,F401 — re-exported: every reader of this module keeps its spelling
+    _EXCLUDE_ANNOUNCED,
+    SUPERSEDE_PARTIAL,
+    Grammar,
+    anchor_at,
+    corpus_files,
+    corpus_inputs,
+    derive_supersession_map,
+    extract_records,
+    extract_supersessions,
+    git,
+    grammar_for,
+    heading_level,
+    resolve_declared_sources,
+)
 
-def load_parse_spec_h1():
-    global _PARSE_SPEC_H1
-    if _PARSE_SPEC_H1 is None:
-        kit = resolve_kit_dir("memory-tree", "tree_lib.py", pathlib.Path(__file__).resolve().parent)
-        if str(kit) not in sys.path:
-            sys.path.insert(0, str(kit))
-        from tree_lib import parse_spec_h1
-        _PARSE_SPEC_H1 = parse_spec_h1
-    return _PARSE_SPEC_H1
-
-# The three id eras of the memory-tree kit's id grammar, in one pattern:
-#   flat          ARCH-001              (family, "001",            None)
-#   node-scoped   ABL-d119              (family, "d119",           None)
-#   session       ABL-bSiftedArchive-3  (family, "bSiftedArchive", "3")   ...and its -3b correction
-# The family list is an allowlist on purpose: a bare \b[A-Z]{2,8}- pattern also matches WU, AC, SS,
-# JSON, PII and a dozen other non-id tokens that outnumber several real families. FORKED: the
-# allowlist is the conf's FAMILIES rather than eleven baked-in adopter ic tokens, plus any family the
-# conf declares CITED (`RECALL_CITED_FAMILIES`): an id this corpus mentions and never homes. Those
-# join this allowlist and never `_IDX` below, so a cited family gains ids and no durable home.
-FAMILIES = CONF.families + CONF.cited_families
+# The module constants, RE-BOUND from the default grammar: the memory-tree kit's binding to the repo
+# this kit is installed in, built once per process. The family allowlist is the conf's FAMILIES plus
+# its RECALL_CITED_FAMILIES, an id this corpus mentions and never homes, which never joins `_IDX`.
+_G = grammar_for()
+FAMILIES = _G.families
 _NODE = CONF.node_tag_class
+ERAS = _G.eras
+ID = _G.ID
+ID_RE = _G.ID_RE
+# An anchor is a line that DEFINES a record, as opposed to one that merely cites it; four shapes.
+A_HEADING, A_BOLD_LI, A_TABLE, A_DASH = _G.anchors
+SUPERSEDE_P1, SUPERSEDE_P2, SUPERSEDE_P3 = id_grammar.build_supersede_patterns(_G)
 
-
-def _eras(node: str) -> tuple[str, ...]:
-    """The three id eras, from ONE construction. A second copy is the catalogue-drift class.
-
-    The eras were spelled out TWICE in this file -- here and re-typed inside `grammar_for` -- and
-    every consumer outside this kit runs the `grammar_for` copy, so a widening applied to one and
-    not the other ships a grammar no gate exercises. That is `two-answers-to-one-question` verbatim,
-    and `corpus_ids.py:15-19` already names its shape: "upstream re-typed one alternation with its
-    branches reordered and would never have noticed". Collapsed before the era was touched.
-
-    The eras are spelled out rather than approximated. A loose `[A-Za-z0-9]+` tail also swallows
-    `ARCH-codebase`, `DES-admin`, `BLOCK-arm`, a charter's own `BBL-NNN` placeholder, and bare
-    session slugs like `ARCH-dLayeredKeystone` (which is a prefix of the record `-1`, not an id) --
-    measured upstream at +348 phantom ids and a 27% orphan rate against a true 9-10%.
-
-    THE SESSION ERA'S `[a-z]*` TAIL IS THIS FORK'S, and it is the narrowest widening that admits the
-    one extra form this corpus actually mints: the ratified correction id, `TOOL-aDrainedSluice-<n>b`.
-    The era is bounded by `\\b` on both sides, so before this the `-9` matched, the following `b`
-    killed the word boundary, and the WHOLE id failed to match rather than matching a prefix.
-    Measured on this repo at the widening: `memory/DECISIONS.md` went 35 of 73 rows keyed to 73 of
-    73, and the `records` document set went 53 documents to 91 -- the 38 correction rows were each
-    being swallowed into the body of the row above them, so a question about any of them answered
-    with its neighbour. `[a-z]*` adds those 38 and no phantom; `[A-Za-z0-9]*` or `\\w*` is the loose
-    tail measured above and stays rejected.
-    """
-    return (
-        r"\d{3}",  # flat            ARCH-001
-        rf"[{node}]\d{{2,3}}",  # node-scoped     ABL-d119
-        rf"[{node}][A-Za-z]{{2,}}-\d+[a-z]*",  # session  ABL-bSiftedArchive-3, and its -3b
-    )
-
-
-ERAS = _eras(_NODE)
-# Built by concatenation, not % or .format(): a regex is full of `{2,6}` quantifiers that .format()
-# reads as replacement fields.
-ID = r"(?:" + "|".join(FAMILIES) + r")-(?:" + "|".join(ERAS) + r")"
-ID_RE = re.compile(r"\b" + ID + r"\b")
-
-# An anchor is a line that DEFINES a record, as opposed to one that merely cites it. Four shapes
-# exist in this corpus and all four are load-bearing -- U4 of the unified build spec counts 759
-# pipe-table rows against 407 charter-form dash rows across 7 table schemas.
-# H1 is NOT one of the four LINE shapes. A build spec titles itself `# ARCH-aBoundGazetteer-1 — ...`,
-# and an H1 anchor that owned its section would own the whole file down to the next H1 -- one 40 KB
-# "record". Measured: records went 3 164 394 -> 8 507 443 indexed chars (mean 1 041 -> 2 572)
-# against the published mean of 1 086. The H2-H6 rule reproduces the published byte profile.
-# A SPEC's defining H1 does anchor, in `extract_records` (TOOL-aRepatriatedFork-40): it is decided by
-# PATH as well as line, through the memory-tree kit's `parse_spec_h1`, and its record is shaped as a
-# ROW -- the title line and its continuations -- so the byte profile holds.
-A_HEADING = re.compile(r"^#{2,6}\s+[`*]*(" + ID + r")\b")
-A_BOLD_LI = re.compile(r"^\s*[-*]\s+[`*]*(" + ID + r")\b[`*]*\s*[-—:·]")
-# The first cell may carry trailing text -- `| **ABL-a085** (AC2 sweep) | ... |` is one of the 7
-# table schemas U4 counts. Anchoring on cell 1 rather than on an exact cell match picks those up.
-A_TABLE = re.compile(r"^\|\s*[`*]*(" + ID + r")\b[^|]*\|")
-A_DASH = re.compile(r"^\s*[-*]\s+[`*]*(" + ID + r")\b[`*]*\s*[·|]")
 
 # A record's DURABLE home. `archive/<INDEX>.<date>.md` is included: rotation MOVES an index, it does
 # not retire its records, so a decision that lived in `DECISIONS.md` is still a decision after the
@@ -277,93 +233,6 @@ ALIASES_DEFAULT = pathlib.Path(__file__).resolve().parent / "aliases.json"
 
 class AliasError(RuntimeError):
     """An EXPLICITLY REQUESTED alias source that could not be read. An absent DEFAULT is not one."""
-
-
-def git(repo: pathlib.Path, *args: str) -> str:
-    return subprocess.run(
-        ["git", "-C", str(repo), *args], capture_output=True, text=True, check=True
-    ).stdout
-
-
-def corpus_files(repo: pathlib.Path, rev: str | None = None,
-                 include_untracked: bool = False) -> list[str]:
-    """The ONE corpus walk. Markdown under ``$MEMORY_ROOT``, for both callers.
-
-    There used to be two, and every widening had to teach both — the last one nearly shipped
-    teaching only this half. They differed on ONE axis seen from two ends, and it is preserved as a
-    parameter rather than as a duplicate: the MEASUREMENT path stays pinnable to a ``rev``, and the
-    QUERY path also takes untracked-not-ignored files, because a note written this session and not
-    yet committed is exactly what a session needs to find.
-
-    ``rev`` and ``include_untracked`` are mutually exclusive and a caller passing both is REFUSED:
-    a revision has no untracked files, so the combination has no meaning to resolve silently into.
-    """
-    if rev and include_untracked:
-        raise ValueError(
-            "corpus_files: rev and include_untracked are mutually exclusive — a revision has no "
-            "untracked files, and silently preferring one would make the corpus depend on which")
-    root = CONF.memory_root + "/"  # FORKED: conf, not a literal `memory/`
-    if rev:
-        names = git(repo, "ls-tree", "-r", "--name-only", rev, root).splitlines()
-    else:
-        names = git(repo, "ls-files", root).splitlines()
-        if include_untracked:
-            names += git(repo, "ls-files", "--others", "--exclude-standard", root).splitlines()
-    md = {p for p in names if p.endswith(".md")}
-    # `RECALL_EXCLUDE` (TOOL-aMendedFleet-27): shell-style patterns over the repo-relative path, so
-    # `*` spans a slash; case-SENSITIVE on every OS, because git's paths are. A pattern matching
-    # nothing is announced once per process, as an absent declared source is: a mistyped exclusion
-    # would otherwise look exactly like one with nothing left to exclude.
-    for pat in CONF.exclude:
-        hit = {p for p in md if fnmatch.fnmatchcase(p, pat)}
-        if not hit and pat not in _EXCLUDE_ANNOUNCED:
-            _EXCLUDE_ANNOUNCED.add(pat)
-            print(f"recall: RECALL_EXCLUDE pattern matches no corpus path: {pat}", file=sys.stderr)
-        md -= hit
-    return sorted(md)
-
-
-_EXCLUDE_ANNOUNCED: set[str] = set()
-
-
-def corpus_inputs(repo: pathlib.Path, rev: str | None = None,
-                  include_untracked: bool = False) -> tuple[list[str], list[str]]:
-    """Both halves of the corpus in ONE call: markdown, and the DECLARED extra sources.
-
-    They stay separate in the RETURN because they are extracted differently — markdown by heading,
-    a declaration by its key plus the comment block above it — but they are enumerated together so
-    a caller cannot take one and forget the other. That is exactly what happened: three call sites
-    outside the walks each had to be taught about declared sources, and the digest pair was taught
-    on only one side, which left the query cache unable to hit at all.
-    """
-    return (corpus_files(repo, rev, include_untracked), resolve_declared_sources(repo, rev))
-
-
-def resolve_declared_sources(repo: pathlib.Path, rev: str | None = None) -> list[str]:
-    """The DECLARED extra sources, from ``RECALL_EXTRA_SOURCES``.
-
-    Repo-relative, not repo-root-only: the first design admitted root confs alone, which would have
-    left ``<prefix>/template-size-limits.txt`` -- a declaration created in the same build -- outside
-    the corpus this widening exists to reach.
-
-    Declared, never globbed. A glob would sweep whatever a project happens to keep, and the
-    membership of a retrieval corpus is a decision about what counts as an answer. A declared file
-    that is absent is SKIPPED and reported; a glob matching nothing says nothing, which is the
-    vacuous-selector shape.
-    """
-    out = []
-    for rel in CONF.extra_sources:
-        if rev:
-            try:
-                git(repo, "cat-file", "-e", f"{rev}:{rel}")
-            except subprocess.CalledProcessError:
-                print(f"recall: declared source absent at {rev}, skipped: {rel}", file=sys.stderr)
-                continue
-        elif not (repo / rel).is_file():
-            print(f"recall: declared source absent, skipped: {rel}", file=sys.stderr)
-            continue
-        out.append(rel)
-    return sorted(out)
 
 
 _DECL_RE = re.compile(r"^\s*(?:export\s+)?([A-Z][A-Z0-9_]*)\s*=(.*)$")
@@ -546,185 +415,6 @@ def zero_record_diagnosis(
           "  ids. The chunk arm works without the grammar, so this is the only signal you get.\n"
         + f"  After fixing the conf, re-run with {rebuild_hint} if the cache predates the fix."
     )
-
-
-def anchor_at(line: str, g=None) -> str | None:
-    """Return the record id this line DEFINES, or None if it merely cites one.
-
-    `g` is a grammar bundle from `grammar_for(root)`; omitted, it is this module's own, bound at
-    import to the repo the KIT lives in.
-    """
-    pats = (A_HEADING, A_BOLD_LI, A_TABLE, A_DASH) if g is None else g.anchors
-    id_re = ID_RE if g is None else g.ID_RE
-    for pat in pats:
-        m = pat.match(line)
-        if m:
-            found = id_re.search(m.group(0))
-            if found:
-                return found.group(0)
-    return None
-
-
-class Grammar(types.SimpleNamespace):
-    """The id + anchor grammar bound to ONE resolved conf."""
-
-
-def grammar_for(root=None) -> Grammar:
-    """The same grammar, bound to an EXPLICIT repo root.
-
-    `repo_root()` deliberately anchors on THIS FILE, so the module-level constants above describe
-    the repo the kit is installed in and no `chdir` can move them. That is right for this module's
-    own CLI and wrong for a caller classifying a DIFFERENT tree — the id alternation would come from
-    the wrong repo and every id in the target would fail to match, silently, because a grammar that
-    recognises nothing yields an empty classification and an empty classification is what a clean
-    corpus yields. Measured: `corpus_ids.py`'s first selftest run reported a CLEAN scratch corpus
-    while using this repo's family list. One accessor, no second grammar.
-    """
-    if root is None:
-        return Grammar(ID=ID, ID_RE=ID_RE, anchors=(A_HEADING, A_BOLD_LI, A_TABLE, A_DASH),
-                       families=FAMILIES, memory_root=CONF.memory_root)
-    conf = recall_conf.resolve(pathlib.Path(root))
-    eras = _eras(conf.node_tag_class)
-    ident = (r"(?:" + "|".join(conf.families + conf.cited_families) + r")-(?:" + "|".join(eras)
-             + r")")
-    return Grammar(
-        ID=ident,
-        ID_RE=re.compile(r"\b" + ident + r"\b"),
-        anchors=(
-            re.compile(r"^#{2,6}\s+[`*]*(" + ident + r")\b"),
-            re.compile(r"^\s*[-*]\s+[`*]*(" + ident + r")\b[`*]*\s*[-—:·]"),
-            re.compile(r"^\|\s*[`*]*(" + ident + r")\b[^|]*\|"),
-            re.compile(r"^\s*[-*]\s+[`*]*(" + ident + r")\b[`*]*\s*[·|]"),
-        ),
-        families=conf.families + conf.cited_families,
-        memory_root=conf.memory_root,
-    )
-
-
-def heading_level(line: str) -> int | None:
-    m = re.match(r"^(#{1,6})\s", line)
-    return len(m.group(1)) if m else None
-
-
-def extract_records(path: str, text: str) -> list[dict]:
-    """One document per anchored record.
-
-    A heading anchor owns its section, down to the next heading of the same or higher level. A row
-    anchor (list entry or table row) owns its own line plus indented continuations -- those rows run
-    to 1-2 KB in this corpus, so the row IS the record.
-
-    A spec's DEFINING H1 -- `parse_spec_h1`, the predicate the index generator's `spec_ids` reads --
-    anchors too, and owns what a row anchor owns: its own line and the non-blank lines under it,
-    which is the spec's title (TOOL-aRepatriatedFork-40).
-    """
-    lines = text.splitlines()
-    h1 = load_parse_spec_h1()(path, text, CONF.memory_root, CONF.families)
-    h1_at = None
-    if h1:
-        # The predicate numbers `split("\n")` lines and this loop walks `splitlines()`, which also
-        # breaks on form feeds and U+2028; re-find the line by content when the two disagree.
-        want = text.split("\n")[h1[0] - 1].rstrip("\r")
-        h1_at = h1[0] - 1
-        if h1_at >= len(lines) or lines[h1_at] != want:
-            h1_at = next((k for k, ln in enumerate(lines) if ln == want), None)
-    docs, i = [], 0
-    while i < len(lines):
-        rid = anchor_at(lines[i])
-        lvl = heading_level(lines[i])
-        if not rid and i == h1_at:
-            # A ROW, not a section: the H1 line and the non-blank lines under it, i.e. the title.
-            # As a section to the next heading it carried the generated records table too, and
-            # measured on this corpus that took records 734 844 -> 2 000 616 indexed chars and the
-            # graded floor 0.8333 -> 0.7500 by moving every BM25 statistic. As a row: 805 928, 0.8333.
-            rid, lvl = h1[1], None
-        if not rid:
-            i += 1
-            continue
-        start, j = i, i + 1
-        if lvl is not None:
-            while j < len(lines):
-                nl = heading_level(lines[j])
-                if nl is not None and nl <= lvl:
-                    break
-                j += 1
-        else:
-            while j < len(lines) and lines[j].strip() and not anchor_at(lines[j]):
-                j += 1
-        body = "\n".join(lines[start:j]).strip()
-        if body:
-            docs.append({"id": rid, "path": path, "line": start + 1, "text": body})
-        i = max(j, i + 1)
-    return docs
-
-
-# --- supersession (TOOL-aGraftedHelix-4) ----------------------------------------------------------
-# Three spellings, pinned by the unit's spec §4 and measured over this corpus there. P1 and P2 read a
-# record's TEXT; P3 reads a spec's STATUS LINE, which no record's text holds because a spec's H1
-# record is its title row only (TOOL-aRepatriatedFork-40). An edge is PARTIAL when the id is followed
-# at once by a possessive or by `for` -- "SUPERSEDES <id>'s PREMISE" retires a clause, not a record.
-_SUP_W = r"[`*\[]*"  # optional wrapping before an id
-SUPERSEDE_P1 = re.compile(r"\bsupersed(?:e|es|ing)\s+" + _SUP_W + "(" + ID + r")\b", re.I)
-SUPERSEDE_P2 = re.compile(r"\bsuperseded\s+by\s+" + _SUP_W + "(" + ID + r")\b", re.I)
-SUPERSEDE_P3 = re.compile(
-    r"\bsuperseded[ -]by\s+((?:" + _SUP_W + ID + r"\b[`*\]]*[\s,]*)+)", re.I)
-SUPERSEDE_PARTIAL = re.compile(r"^[`*\]]*(?:['’]s\b|\s+for\b)", re.I)
-
-
-def extract_supersessions(path: str, text: str, records: list[dict]) -> list[tuple[str, str, str, str]]:
-    """Candidate edges ``(old, new, kind, pattern)`` from one file; ``kind`` is whole or partial.
-
-    ``records`` is what ``extract_records`` returned for this file. P1 (``supersedes <id>``) makes
-    the cited id old and the record new; P2 (``superseded by <id>``) the reverse; P3 is a
-    ``superseded by``/``superseded-by`` list on the ``**Status:** `` line in a spec's first five
-    lines, old being the id its H1 defines. A self-edge is skipped. Nothing here checks that an id
-    exists: ``derive_supersession_map`` does, over the whole walk.
-    """
-    edges: list[tuple[str, str, str, str]] = []
-
-    def add(old: str, new: str, after: str, pattern: str) -> None:
-        if old != new:
-            kind = "partial" if SUPERSEDE_PARTIAL.match(after) else "whole"
-            edges.append((old, new, kind, pattern))
-
-    for r in records:
-        t = r["text"]
-        for m in SUPERSEDE_P1.finditer(t):
-            add(m.group(1), r["id"], t[m.end(1):], "P1")
-        for m in SUPERSEDE_P2.finditer(t):
-            add(r["id"], m.group(1), t[m.end(1):], "P2")
-    h1 = load_parse_spec_h1()(path, text, CONF.memory_root, CONF.families)
-    if h1:
-        for line in text.split("\n")[:5]:
-            if not line.startswith("**Status:** "):
-                continue
-            for m in SUPERSEDE_P3.finditer(line):
-                for i in ID_RE.finditer(m.group(1)):
-                    add(h1[1], i.group(0), line[m.start(1) + i.end():], "P3")
-    return edges
-
-
-def derive_supersession_map(edges, defined) -> tuple[dict, dict]:
-    """``({old: [[new, kind], …]}, counts)`` over the edges whose two ends ``defined`` holds.
-
-    An edge naming an id no record anchors is dropped and its id counted UNRESOLVED -- never kept,
-    never minted. ``counts`` carries the map size, how many ids hold a whole edge and how many only
-    partial ones, the kept edges per pattern and kind, and the unresolved ids.
-    """
-    smap: dict[str, set] = {}
-    per = {p: {"whole": 0, "partial": 0} for p in ("P1", "P2", "P3")}
-    unresolved: set[str] = set()
-    for old, new, kind, pattern in edges:
-        missing = {i for i in (old, new) if i not in defined}
-        if missing:
-            unresolved |= missing
-            continue
-        if (new, kind) not in smap.setdefault(old, set()):
-            smap[old].add((new, kind))
-            per[pattern][kind] += 1
-    out = {old: [list(e) for e in sorted(smap[old])] for old in sorted(smap)}
-    whole = sum(1 for v in out.values() if any(k == "whole" for _, k in v))
-    return out, {"ids": len(out), "whole": whole, "partial": len(out) - whole,
-                 "patterns": per, "unresolved": sorted(unresolved)}
 
 
 def extract_chunks(

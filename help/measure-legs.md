@@ -75,6 +75,7 @@ If the run's `substitutions` is not empty, write `substituted` into the `--how` 
 
 ## Example
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and a <run id> placeholder -->
 ```bash
 python tools/run-gates/measure_legs.py --serial --legs my-legs.json --census-every 1
 sort -t$'\t' -k5,5nr "$(git rev-parse --absolute-git-dir)/gate-profile/<run id>/legs.tsv" | head

@@ -150,7 +150,8 @@ preflight line states the posture.
   commit and would red the bar for a reason no diff can fix.
 - **`manifest-check.sh` is wired at `SessionStart`** to write or replay the orientation card, two
   matchers on one event and so one `harness-hooks` claim; no path glob here covers it.
-- **The `governance-template:` marker fallback is engine-only.** The checker does not implement it, so
+- **The provenance-lock fallback is engine-only.** Step 2's last location is the `path` of the
+  `.governance/instructions.lock` row whose `template` is set. The checker does not implement it, so
   it is absent from `--locations` and is documented as engine behaviour instead. That is one fact in
   two documents, which is the shape this feature otherwise exists to remove; it survives because
   dropping it would silently change behaviour for adopters who have an instantiated playbook and no

@@ -1,0 +1,51 @@
+# instructions.toml: the playbook-render kit's instruction units, one [[unit]] row each, in the grammar
+# <prefix>/playbook/instruction_units.py reads (PLAY-dOrderedCharter-40). A row is written as
+# `instructions_edit.py propose add` prints it.
+
+[[unit]]
+tag = "unit.policy-schema"
+level = 4
+type = "directive"
+trigger = "When a build adds or changes a policy key"
+budget = "line"
+text = "MUST declare a policy key as a [[key]] row of <prefix>/policy/catalogue.toml, with its summary and usage, before any policy file sets it."
+owner = "dOrderedCharter"
+usage = "python <prefix>/policy/policy.py get <key> --explain"
+help = "One catalogue of keys checks every policy file and renders the policy reference page."
+enforced-by = ["policy check"]
+
+[[unit]]
+tag = "unit.drive-table"
+level = 4
+type = "directive"
+trigger = "When a build adds a way to start or advance the loop"
+budget = "line"
+text = "MUST declare a drive row as a [[drive]] row of its kit's descriptor, never in the charter's drive section by hand."
+owner = "dOrderedCharter"
+usage = "python <prefix>/playbook/instruction_units.py drive --check"
+help = "The kits' drive rows render the charter's drive section and the drive reference page, so a row typed into the charter drifts from both."
+enforced-by = ["playbook render wiring"]
+
+[[unit]]
+tag = "unit.kinds-register"
+level = 4
+type = "directive"
+trigger = "When a build adds a member of a registered kind"
+budget = "line"
+text = "MUST make a member of a registered kind through the factory its row in <prefix>/playbook/kinds.toml names, never by hand."
+owner = "dOrderedCharter"
+usage = "python <prefix>/playbook/core.py new <kind> <name>"
+help = "One register of kinds keeps each kind's factory and gate findable from one row."
+enforced-by = ["core kinds"]
+
+[[unit]]
+tag = "unit.unit-registry"
+level = 4
+type = "directive"
+trigger = "When a build adds or changes an instruction unit"
+budget = "line"
+text = "MUST write an instruction unit as a [[unit]] row of its kit's instructions.toml, in the grammar the schema leg reads, never as prose in a guide."
+owner = "dOrderedCharter"
+usage = "python <prefix>/playbook/instructions_edit.py propose add --manifest <kit> --tag <tag>"
+help = "Each unit is one row, so the units reference page and every load set read the same rows."
+enforced-by = ["instruction units (schema, one fact)"]

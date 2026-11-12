@@ -1,69 +1,41 @@
 # kit.toml — this entry, declared as data. Read by <prefix>/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
 
 id = "playbook"
+layer = "layer.instruction"
 scope = "repo"
 kind = "flat"
-version_from = { file = "coding-governance-agents.template.md", pattern = "governance-template: v", kind = "marker" }
+version_from = { none = "the entry lands no file since PLAY-dOrderedCharter-31 retired its seeded template, so no file of it carries a constant; the template versions with the playbook-render kit that ships it beside its engine" }
 requires = []
 
-# ONE file as of v3.0. The charter converged and the domain companion was deleted; the deploy-time
-# placeholder catalogue was never shipped either — it was prose the runbook said to read, and it is
-# now a program (`<prefix>/playbook/`). What ships is the charter template and nothing else, which is
-# why `[[files]] include` names exactly one path.
-#
-# COUNTING THIS ENTRY has been wrong twice, in the same direction both times: a catalogue the runbook
-# told an operator to READ was counted as a file this entry SHIPS, and the spec over-stated the entry
-# for four revisions on the strength of it. The include list is the count; prose beside it is not.
-#
-# ROLE: `seed`, not `project-owned`. Gov SUPPLIES these bytes once and the target owns them
-# afterwards, which is what `seed` means. Tagged `project-owned` the entry landed zero bytes while
-# sitting first in the default selection, and the placeholder hole below probed two paths nothing
-# had written.
-[[files]]
-include = ["coding-governance-agents.template.md"]
-role = "seed"
-to = "{playbook_path}"
-claims = ["coding-governance-agents.template.md"]
+# NO FILE since PLAY-dOrderedCharter-31. The entry seeded the charter template at an owner-chosen
+# `{playbook_path}`, a copy the render stopped reading at PLAY-dOrderedCharter-34; the renderer kit
+# now lands the template beside its engine. The seed rule, its placeholder hole and its line-ending
+# pin left together, and the registry's `[[retired]]` row `playbook/seeded-template` carries an
+# adopter's seeded copy. What the entry still holds is the placeholder declaration the renderer
+# reads, and the upgrade step that moves `[charter] adopter_rules` into the overlay.
 
 [adopt]
 argv = []
 mutates_index = false
-why_no_adopter = "installation is a copy to an owner-chosen path; the placeholders are the hole"
-
-[[hole]]
-id = "playbook-placeholders"
-kind = "authoring"
-blocks_adopt = false
-blocks_gate = false
-why = "nothing in a target observes the placeholders — no leg reads the deployed charter. The probe names the ONE file this entry ships, at {playbook_path}. History, kept because it is the reason this hole is armed at all rather than a reason to widen it back: when the charter deployed as two files, a probe naming only the main one was MEASURED going false-green while the companion sat unfilled. The second file is gone as of v3.0; a probe that names it again would be checking a path no target has."
-# PRESENCE FIRST (DEPL-aHalvedInstall-2). The bare `! grep` exited 0 with no charter on disk at all,
-# because grep exits 2 on a missing file and `!` turns that into a pass; selfcheck 6b now runs every
-# probe in an empty directory and refuses one that passes there.
-discharge = { command = ["bash", "-c", "test -f \"$1\" && ! grep -qE '\\{\\{[A-Z]' \"$1\"", "--", "{playbook_path}"] }
-# In RENDER mode `{playbook_path}` is the TEMPLATE, which always carries placeholders, so this probe
-# reds forever there (measured at both adopters, 2026-09-23). The render's own `--check` reports a
-# surviving placeholder, so the hole stands down when `playbook-render` is selected. In COPY mode it
-# is the only placeholder observer and runs exactly as before. DEPL-aRepatriatedFork-1 S4.
-stands_down = { when_selected = ["playbook-render"], why = "in render mode {playbook_path} is the template, and the render's own --check reports a surviving placeholder" }
+why_no_adopter = "the entry lands no file: the playbook-render kit ships the template and renders the charter"
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
 # reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.
 none = """
-installation is a copy to an owner-chosen path and there is no adopter. What needs observing is the placeholders, and that is the declared hole with its own probe
+the entry lands no file, so there is nothing here to observe: the render's own --check grades the charter and any surviving placeholder
 """
 
-# Line-ending pins this kit needs in a TARGET. Emitted into the target's own
-# .gitattributes as one govkit-owned block; the renormalize that follows reads git's
-# answer about which paths they govern, never these pattern strings.
-# The pin names the DESTINATION, `{playbook_path}`, not a directory plus gov's own filename. The
-# `{playbook_dir}/...` spelling was a leftover from a two-file deploy: `{playbook_dir}` is an answer
-# no `[[files]]` rule, leg or probe needs, so `intake` never asked for it and `apply` then REFUSED
-# every install of this entry — and supplying it by hand produced a pin naming a path the target does
-# not have. Both measured in a scratch install.
-[[lf_pin]]
-pattern = "{playbook_path}"
-why = "under a strict byte gate"
+# The step that carries `[charter] adopter_rules` into the overlay as level-0 `repo.` units
+# (PLAY-dOrderedCharter-31 S4). Its `surfaces` is the declared absence: the key stays a live input of
+# the render, so the step takes no member of gov's product away. Frozen once landed.
+[[upgrade]]
+id = "playbook/adopter-rules-to-overlay"
+up = ["python", "{gov}/govkit/steps/adopter_rules_to_overlay.py", "up", "{target}"]
+down = ["python", "{gov}/govkit/steps/adopter_rules_to_overlay.py", "down", "{target}"]
+witness = ["python", "{gov}/govkit/steps/adopter_rules_to_overlay.py", "witness", "{target}"]
+surfaces = []
+needs-target = false
 
 # ---------------------------------------------------------------- the DECLARATION the renderer reads
 # Every placeholder in the charter template, in one of three classes. This array replaces the prose
@@ -136,7 +108,7 @@ key = "ROLE_ROSTER"
 class = "derived"
 probe = "role_roster"
 kit = "roles"
-why = "section 3's Agent roles subsection: one `- ` line per role, printed by the roles kit's own `roster` verb so that kit stays the one reader of role files; only reachable when the roles block survives (TOOL-aOrientedCast-18)"
+why = "the Agent roles section: one `- ` line per role, printed by the roles kit's own `roster` verb so that kit stays the one reader of role files; only reachable when the roles block survives (TOOL-aOrientedCast-18)"
 
 # --- LEGACY: names a v3.x template uses and v4.0 does not. KEPT DECLARED (TOOL-aDistilledCharter-2
 # rev-2, closing review round 1, R1): an adopter's template is a SEED that `govkit update` never
@@ -274,7 +246,7 @@ why = "where a Tier-2 run is persisted as an in-repo artifact; must agree with m
 key = "ADOPTER_RULES"
 class = "defaulted"
 default = "- none — this repository adds no rules of its own"
-why = "section 2: this repository's own rules, one `- ` bullet per line, from `[charter] adopter_rules`. DEFAULTED, not asked: an asked key would refuse every adopter's next re-render until it answered, and the update would roll the kit back. The render grades each line (TOOL-aDistilledCharter-1)"
+why = "the project block, under `This repository's own rules`: this repository's own rules, one `- ` bullet per line, from `[charter] adopter_rules`. DEFAULTED, not asked: an asked key would refuse every adopter's next re-render until it answered, and the update would roll the kit back. The render grades each line (TOOL-aDistilledCharter-1)"
 
 # ---------------------------------------------------------------- the fenceable blocks
 # `when:` fences name a PROJECT PROPERTY that no kit governs, so they cannot be validated against the

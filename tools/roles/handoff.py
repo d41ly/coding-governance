@@ -11,11 +11,22 @@
     python handoff.py roster
     python handoff.py agents (--handoff <path> | --run <run-id>) [--session <file>] [--write]
 
-`render` composes the role as `roles_lib.render_role` renders it with a task block holding exactly
-the inputs the role's `reads` declares, in that order, then `roles_lib.render_charter_blocks` for
-the role as the last block: the section 1 rule lines its `rules` tags cite and the charter's carried
-sections (TOOL-aOrientedCast-16), each library note printed on stderr as `handoff: note — `. It writes
-the file under the build's `prompts/` folder, printing its repo-relative path. `--part task` prints
+`render` fills the work-order template, `templates/work-order.template.md` in this kit, whose slots are
+`role`, `roles_lib.render_role`'s output, then a `### Drive` block holding the charter's drive lines for the
+role where it has any (PLAY-dOrderedCharter-6); `opening`; `reads`, a block per input the role's `reads`
+declares, in that order, then the optional `input:code` every role carries (PLAY-dOrderedCharter-27): the
+text of the file `--input code=` names, measured against `memory.code-budget` by the load-set check; and
+`practices`, a `### Practices at <step>` block
+of one `- [<name>] <reach>` line per active practice reaching the step its workflow row names, the lines the
+load-set check's run prints under `--reach` (PLAY-dOrderedCharter-21). A slot with nothing to fill leaves no line.
+The charter's blocks ride once, in the role's agent file, never in the prompt; the render still grades the
+role's `rules` tags, each library note printed on stderr as `handoff: note — ` (PLAY-dOrderedCharter-5 S3).
+Where the playbook kit's document registry reads, each block sits in the envelope of its level
+(PLAY-dOrderedCharter-5 S2), opened under its section's heading: the `## Role` body in the agent file's row,
+level 5; first under `## Task` the practices block at level 0, doc `<charter>#practices-at-<step>` and the
+charter row's direction; then the rest of the task at level 6, doc the prompt file's path. With no playbook
+kit it renders unranked and prints one `envelope — unarmed` note; a registry that does not read refuses.
+It writes the file under the build's `prompts/` folder, printing its repo-relative path. `--part task` prints
 the marker line, a blank line and the `## Task` section instead; `--stdout` writes nothing and prints.
 Outside `--stand-in` it prints one stderr line after the notes, `handoff: description — <name>`, the
 spawn's name `<build> · <unit> · <workflow>`, the unit part left out with no `--unit`: the `Agent`
@@ -29,7 +40,10 @@ checker's R15 joins with that row. It does not check that the tool truly cannot 
 any hook or gate.
 The marker carries two hashes, each the first 12 hex digits of the SHA-256 of one section's bytes
 with CRLF folded to LF: `## Role` up to the byte before the `## Task` line, and `## Task` to the end
-of the file. `check` re-derives both and compares the marker's `path` with the file's own.
+of the file. `check` re-derives both and compares the marker's `path` with the file's own; then every
+envelope opened must close, and the levels must never decrease down each part, `## Role` and `## Task`,
+each failure naming the envelope; it prints each part's levels in order, or `unranked` for a file holding
+no envelope, which passes (PLAY-dOrderedCharter-5 S4).
 `harness-args` prints, as one line of sorted JSON, the union of the `stages` tables of every
 workflow whose harness names that script. `stage-efforts` prints, the same way, the reasoning effort
 `house/policy.toml` resolves for every stage key of ONE workflow's `stages` table: a harness call
@@ -64,7 +78,7 @@ Sources, by key family: `task:` the card's `## task` field, read by the kickoff 
 that checker's `--task-skeleton` prints, so a skeleton that does not yield eight refuses; `card:` the lines
 under the card's last `## <heading>`; `brief:` the `### <sub-head>` under the brief record's
 `## The brief`, and `brief:prompt` that record's `## The prompt` section; `input:` the `--input`
-argument; a rule tag the governing doc's section 1. The card is `--card`, else the file the
+argument; a rule tag the governing doc's practices. The card is `--card`, else the file the
 kickoff checker's `--card --path` prints for CLAUDE_CODE_SESSION_ID, so the card's location stays
 that checker's rule. A required key resolving to nothing, an empty value or a placeholder refuses
 and writes nothing; an optional one is named on the `Not supplied` line. A relative path
@@ -106,8 +120,11 @@ import roles_lib as lib  # noqa: E402  (the kit's own library, beside this file)
 #: each render reads them off the kickoff checker's `--task-skeleton` and zips them with these
 #: (TOOL-aOrientedCast-15 S3), so the checker that grades a card is the one source of its labels.
 TASK_FIELDS = ("title", "goal", "in", "out", "todo", "reuse", "acceptance", "gates")
-INPUT_NAMES = ("spec", "diff", "question", "prompt")
-PATH_INPUTS = ("spec", "prompt")
+INPUT_NAMES = ("spec", "diff", "question", "prompt", "code")
+PATH_INPUTS = ("spec", "prompt", "code")
+#: Every role's `code` slot (PLAY-dOrderedCharter-27): derived for each role, never written into its `reads`,
+#: so its key is read as optional and the CLI admits it for any role; its block holds the file's text.
+CODE_INPUT = "code"
 PLACEHOLDERS = ("…", "...", "tbd", "todo", "n/a", "none", "-", "?")
 KICKOFF_HOME, KICKOFF_CHECKER = "session-kickoff", "manifest-check.sh"
 CHECKER_BOUND_S = 30
@@ -115,6 +132,8 @@ SLUG_RE = lib.SLUG_RE
 UNIT_RE = re.compile(r"^[A-Z]+-([A-Za-z]+)-[0-9]+$")
 READY_RE = re.compile(r"^(- )?READY — ")
 BLANK_EDGES_RE = re.compile(r"\A\s*\n|\n\s*\Z")
+WORK_ORDER = KIT_DIR / "templates" / "work-order.template.md"
+SLOT_RE = re.compile(r"<!-- slot: ([a-z-]+) -->")
 MARKER_RE = lib.MARKER_RE
 ROLE_HEAD_RE, TASK_HEAD_RE = re.compile(r"^## Role$", re.M), re.compile(r"^## Task$", re.M)
 PROMPT_HEAD_RE = re.compile(r"^## The prompt[ \t]*$", re.M)
@@ -122,6 +141,20 @@ BRIEF_HEAD_RE = re.compile(r"^## The brief[ \t]*$", re.M)
 # ponytail: the playbook's one-line region refuses a rendered rule past 200 characters; spelled
 # again because a kit file may not import a sibling kit. A drift fails closed either way.
 ROSTER_LINE_MAX = 200
+#: `load_sets.py check --reach`'s line opening, one per reach unit, then `role.<name> · <tag> · <reach>`.
+REACH_LINE = "load-set — reach · "
+#: The ranked handoff (PLAY-dOrderedCharter-5 S2): the slot whose block leads the task part at level 0,
+#: its envelope's doc, and the task's own level and direction.
+LEAD_SLOTS = ("practices",)
+PRACTICES_DOC = "%s#practices-at-%s"
+TASK_LEVEL = 6
+TASK_DIRECTION = "The task: this unit's goal, scope and acceptance; yields to levels 0 to 5"
+#: PLAY-dOrderedCharter-8 S7: the card file the kickoff checker renders into each session tree, at level 1
+CARD_FILE_REL = ".claude/orientation-card.md"
+#: The charter's drive section and its line, `- <stage> · <role> — <when>: `<command>``, as the playbook kit
+#: renders them; a kit imports no sibling, so the heading's opening is spelled again here.
+DRIVE_HEAD = "## Drive — "
+DRIVE_LINE_RE = re.compile(r"^- \S+ · (\S+) — ")
 #: `agents` (TOOL-aOrientedCast-20): the ledger's file-name tail, the value of a field nothing
 #: answers, and the tool uses whose paths a `returned` line counts as written.
 LEDGER_TAIL = "-agent-ledger.md"
@@ -320,6 +353,61 @@ def derive_section_sha(section):
     return hashlib.sha256(section.replace("\r\n", "\n").encode("utf-8")).hexdigest()[:12]
 
 
+def render_work_order(fills, wraps=None):
+    """`(role_sec, task_sec)` of the work-order template: each paragraph kept, a slot line its fill, a slot
+    filled with nothing dropped, the two sections split at the template's own `## Task` line. A section
+    whose heading line `wraps` keys is ranked (PLAY-dOrderedCharter-5 S2): the fills of `LEAD_SLOTS`, each
+    already in its own lower-level envelope, open it, and the rest of its body follows inside the envelope
+    `(doc, level, direction)` the key names, every envelope under the heading."""
+    text = lib.load_text(WORK_ORDER).strip("\n")
+    task = TASK_HEAD_RE.search(text)
+    if not task:
+        raise lib.RolesError("%s carries no '## Task' line" % WORK_ORDER.as_posix())
+
+    def render_section(section):
+        paras, lead = [], []
+        wrap = (wraps or {}).get(section.strip("\n").split("\n", 1)[0])
+        for para in section.strip("\n").split("\n\n"):
+            slot = SLOT_RE.fullmatch(para)
+            if slot and slot.group(1) not in fills:
+                raise lib.RolesError("%s names the slot '%s', which no handoff fills"
+                                     % (WORK_ORDER.as_posix(), slot.group(1)))
+            (lead if slot and wrap and slot.group(1) in LEAD_SLOTS else paras).append(
+                fills[slot.group(1)] if slot else para)
+        paras = [p for p in paras if p]
+        if wrap:
+            rest = [lib.render_envelope(*wrap, "\n\n".join(paras[1:]))] if paras[1:] else []
+            paras = paras[:1] + ["\n".join(p.rstrip("\n") for p in lead + rest if p)]
+        return "\n\n".join(p for p in paras if p)
+
+    return render_section(text[:task.start()]) + "\n\n", render_section(text[task.start():]) + "\n"
+
+
+def extract_drive_lines(text, role):
+    """The charter's drive lines whose role is `role`: each `- <stage> · <role> — ` line of the section the
+    drive heading opens, as the playbook render composed it from the selected kits' `[[drive]]` rows
+    (PLAY-dOrderedCharter-6), so a subagent holds its role's lines as the main session does."""
+    out, inside = [], False
+    for line in text.replace("\r\n", "\n").split("\n"):
+        if line.startswith("## "):
+            inside = line.startswith(DRIVE_HEAD)
+        elif inside and DRIVE_LINE_RE.match(line) and DRIVE_LINE_RE.match(line).group(1) == role:
+            out.append(line.rstrip())
+    return out
+
+
+def render_card_block(root):
+    """PLAY-dOrderedCharter-8 S7: `## Card`, holding the card file's first line, the `## route` section of
+    what that line opens and its last line, the file's own envelope copied and never typed here; "" when
+    `<root>/.claude/orientation-card.md` is absent or carries no route."""
+    path = root / CARD_FILE_REL
+    if not path.is_file():
+        return ""
+    lines = lib.load_text(path).rstrip("\n").split("\n")
+    route = extract_card_section("\n".join(lines[1:-1]), "route") if len(lines) > 2 else None
+    return "## Card\n\n%s\n%s\n%s" % (lines[0], route, lines[-1]) if route else ""
+
+
 def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card_arg, inputs, out_path,
                    notes=None, tail=""):
     """`(path, text, task_part)` of the prompt file; raises RolesError naming every key that refused.
@@ -328,6 +416,31 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     build_dir = root / memory_root / "builds" / slug
     if not build_dir.is_dir():
         raise lib.RolesError("the build folder %s does not exist" % build_dir.as_posix())
+    values = {}
+    for name, v in inputs.items():
+        if name in PATH_INPUTS and v:
+            p = pathlib.Path(os.path.normpath(root / v))
+            if root not in p.parents or not p.is_file():
+                raise lib.RolesError("input:%s — %s names no file inside the repository" % (name, v))
+            # the code block holds the file's text, since its ranges are the payload; spec and prompt the path
+            v = lib.load_text(p) if name == CODE_INPUT else p.relative_to(root).as_posix()
+        values["input:" + name] = v.replace("\r\n", "\n")
+    # PLAY-dOrderedCharter-11 S4: the role's load set and its block's budget, before any card or brief is read;
+    # a supplied code block is measured beside it, CR stripped (PLAY-dOrderedCharter-27 S4)
+    role_text = lib.render_role(KIT_DIR, role, memory_root)
+    code = values.get("input:" + CODE_INPUT)
+    refused, gate = lib.check_load_set(root, KIT_DIR, [(role, len(role_text.encode("utf-8")))],
+                                       [(CODE_INPUT, len(code.replace("\r", "").encode("utf-8")))] if code else [],
+                                       reach=True)
+    if refused:
+        raise lib.RolesError("\n".join(gate))
+    # PLAY-dOrderedCharter-21 S3: the role's reach units, off the same run and out of the notes
+    reach = [ln[len(REACH_LINE):].split(" · ", 2) for ln in gate if ln.startswith(REACH_LINE)]
+    gate = [ln for ln in gate if not ln.startswith(REACH_LINE)]
+    missing = [ln for ln in gate if ln.startswith("Missing required unit:")]
+    gaps = [ln for ln in gate if ln.startswith("**Load gaps:**")]
+    if notes is not None:
+        notes.extend(ln for ln in gate if ln not in missing and ln not in gaps)
     unit_id = unit
     if unit_id is None:
         fm = lib.FRONT_MATTER_RE.match(lib.load_text(build_dir / "README.md")) \
@@ -337,15 +450,10 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
             raise lib.RolesError("no --unit, and %s/README.md names no ids: in its front matter"
                                  % build_dir.as_posix())
         unit_id = ids.group(1)
-    values, refusals = {}, []
-    for name, v in inputs.items():
-        if name in PATH_INPUTS and v:
-            p = pathlib.Path(os.path.normpath(root / v))
-            if root not in p.parents or not p.is_file():
-                raise lib.RolesError("input:%s — %s names no file inside the repository" % (name, v))
-            v = p.relative_to(root).as_posix()
-        values["input:" + name] = v.replace("\r\n", "\n")
+    refusals = []
     reads = [x.strip() for x in keys.get("reads", "").split(",") if x.strip()]
+    if not any(k.rstrip("?") == "input:" + CODE_INPUT for k in reads):
+        reads.append("input:%s?" % CODE_INPUT)  # the derived optional key every role carries
     card = brief = None
     why, labels = {}, {}
     if any(k.startswith("task:") for k in reads):
@@ -410,31 +518,61 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
             absent.append(key)
             reasons += [what] if why.get(src) and what not in reasons else []
     doc = charter_path.relative_to(root).as_posix() if root in charter_path.parents else charter_path.as_posix()
-    charter = lib.parse_charter(lib.load_text(charter_path), doc)
+    charter_text = lib.load_text(charter_path)
+    charter = lib.parse_charter(charter_text, doc)
     if charter["shape"] == "legacy" and notes is not None:
         notes.append(lib.LEGACY_NOTE % doc)
     try:
-        charter_blocks = lib.render_charter_blocks(
+        # PLAY-dOrderedCharter-5 S3: the charter rides once, in the agent file; the render still grades the tags
+        lib.render_charter_blocks(
             charter, (KIT_DIR / "agents" / (role + ".agent.md")).as_posix(), keys.get("rules", ""), notes)
     except lib.RolesError as e:
         refusals += str(e).split("\n")
-    else:
-        blocks += [charter_blocks.rstrip("\n")] if charter_blocks else []
     if refusals:
         raise lib.RolesError("\n".join(refusals))
+    try:
+        rows = lib.load_document_registry(KIT_DIR)
+    except LookupError as exc:   # no playbook kit: the roles kit does not require it (F4)
+        rows = None
+        if notes is not None:
+            notes.append(lib.UNRANKED_NOTE % exc)
     opening = ("This handoff is for build `%s`, unit `%s`." % (slug, unit_id) if unit
                else "This handoff is for build `%s`, and names no single unit." % slug)
+    if missing:
+        opening += "\n" + "\n".join(missing)
     if absent:
         opening += "\nNot supplied, optional: %s%s." % (
             ", ".join("`%s`" % k for k in absent), " — " + "; ".join(reasons) if reasons else "")
-    role_sec = "## Role\n\n%s\n\n" % lib.render_role(KIT_DIR, role, memory_root).strip("\n")
-    task_sec = "\n\n".join(["## Task", opening] + blocks) + "\n"
+    drive = extract_drive_lines(charter_text, role)
+    step = reach[0][1].rsplit(".", 1)[1] if reach else None
+    practices = ("### Practices at %s\n\n" % step + "\n".join(
+        "- [%s] %s" % (tag.split(".")[1], text) for _reader, tag, text in reach)) if reach else ""
     path = out_path or build_dir / "prompts" / derive_prompt_name(
         build_dir / "prompts", datetime.date.today().isoformat(), unit_id, role, tail)
     rel = path.relative_to(root).as_posix()
+    wraps = None
+    if rows is not None:   # PLAY-dOrderedCharter-5 S2: each block in the envelope of its level
+        from render_agents import AGENTS_REL
+        wraps = {"## Task": (rel, TASK_LEVEL, TASK_DIRECTION)}
+        agent = "%s/%s.md" % (AGENTS_REL, role)
+        row = lib.read_envelope_row(rows, agent, memory_root)
+        if row is not None:
+            wraps["## Role"] = (agent, row[0], row[1])
+        row = lib.read_envelope_row(rows, doc, memory_root)
+        if practices and row is not None:
+            practices = lib.render_envelope(PRACTICES_DOC % (doc, step), row[0], row[1], practices)
+    # PLAY-dOrderedCharter-8 S7: the card's level-1 block leads the task part after the level-0 practices
+    card_block = render_card_block(root)
+    if card_block:
+        practices = practices.rstrip("\n") + "\n\n" + card_block if practices else card_block
+    role_sec, task_sec = render_work_order({
+        "role": role_text.strip("\n")
+        + ("\n\n### Drive\n\n" + "\n".join(drive) if drive else ""), "opening": opening,
+        "reads": "\n\n".join(blocks), "practices": practices}, wraps)
     marker = "<!-- gov:handoff role=%s build=%s unit=%s path=%s role-sha=%s task-sha=%s -->" % (
         role, slug, unit or "-", rel, derive_section_sha(role_sec), derive_section_sha(task_sec))
-    head = "**Serves:** journal %s\n\n# %s handoff — %s\n\n%s\n\n" % (unit_id, role, unit_id, marker)
+    head = "**Serves:** journal %s\n%s\n# %s handoff — %s\n\n%s\n\n" % (
+        unit_id, "".join(g + "\n" for g in gaps), role, unit_id, marker)
     return path, head + role_sec + task_sec, marker + "\n\n" + task_sec
 
 
@@ -462,7 +600,40 @@ def check_handoff(root, path):
                                       ("task-sha", marker.group(6), task_sha),
                                       ("path", marker.group(4), rel))
            if said != actual]
-    return not bad, bad or ["%s role-sha=%s task-sha=%s" % (rel, role_sha, task_sha)]
+    ranked, levels = check_envelope_order(rel, text, role_m.start(), task_m.start())
+    bad += ranked
+    return not bad, bad or ["%s role-sha=%s task-sha=%s" % (rel, role_sha, task_sha), levels]
+
+
+def check_envelope_order(rel, text, role_at, task_at):
+    """`(bad, levels)` of PLAY-dOrderedCharter-5 S4 over a prompt file's text: every envelope opened closes,
+    in nesting order, and the openers' levels never decrease down each part, `## Role` from `role_at` and
+    `## Task` from `task_at`, which a native agent receives apart. `levels` is the one line naming each
+    part's levels in order; a file holding no envelope is `unranked` and passes, since a prompt record
+    rendered before the envelopes is frozen."""
+    found = lib.read_envelopes(text)
+    if not found:
+        return [], "%s envelopes — unranked: none carried, so no level is graded" % rel
+    bad, stack = [], []
+    for n, kind, doc, _level, _direction in found:
+        if kind == "open":
+            stack.append((n, doc))
+        elif stack and stack[-1][1] == doc:
+            stack.pop()
+        else:
+            bad.append("handoff: %s: line %d closes the envelope %s, and %s" % (
+                rel, n, doc, "the open one is %s" % stack[-1][1] if stack else "none is open"))
+    bad += ["handoff: %s: the envelope %s opened at line %d has no closer" % (rel, doc, n) for n, doc in stack]
+    said = []
+    for part, start, end in (("## Role", role_at, task_at), ("## Task", task_at, len(text))):
+        first, last = text.count("\n", 0, start) + 1, text.count("\n", 0, end) + 1
+        opened = [(n, doc, level) for n, kind, doc, level, _d in found if kind == "open" and first <= n <= last]
+        for (_n, was, low), (n, doc, level) in zip(opened, opened[1:]):
+            if level < low:
+                bad.append("handoff: %s: the envelope %s at line %d opens at level %d after %s at level %d, "
+                           "and levels never decrease down the %s part" % (rel, doc, n, level, was, low, part))
+        said.append("%s %s" % (part[3:], " ".join(str(lv) for _n, _d, lv in opened) or "none"))
+    return bad, "%s envelopes — %s" % (rel, " · ".join(said))
 
 
 def write_json_line(obj):
@@ -1066,7 +1237,7 @@ def main(argv):
         keys = roles[a.role]["keys"]
         read = {x.strip().rstrip("?") for x in keys.get("reads", "").split(",")}
         for name in inputs:
-            if name != "prompt" and "input:" + name not in read:
+            if name not in ("prompt", CODE_INPUT) and "input:" + name not in read:
                 ap.error("input:%s is a key %s does not read" % (name, a.role))
         prompts = root / memory_root / "builds" / a.build / "prompts"
         out = a.out and pathlib.Path(os.path.normpath(root / a.out))

@@ -9,6 +9,7 @@ description: >-
   at the start of a work session. The project's CLAUDE.md and its manifest always outrank
   this skill on any conflict.
 ---
+[skills/session-kickoff/SKILL.md · Level 4 · The kickoff engine, followed at a session's start; yields to levels 0 to 3]
 
 # Session kickoff (project-agnostic engine)
 
@@ -84,9 +85,8 @@ Then, in order, after those:
    refuses it by design. Step 2b therefore SKIPS the audit for it, and the READY card says
    `manifest: machine-global (<path>) — unaudited`. A stale one is then visible every kickoff instead
    of silently authoritative.
-2. Else an instantiated governance doc: grep the repo for the `governance-template:` marker (e.g.
-   `docs/PARALLEL.md`) — skipping files whose name contains `.template` or whose body still holds
-   `{{`-shaped placeholders: a template is not an instantiated governance doc. **This fallback is
+2. Else an instantiated governance doc: the `path` of the `.governance/instructions.lock` row whose
+   `template` is set (e.g. `docs/PARALLEL.md`); a template is never one. **This fallback is
    ENGINE-ONLY** — `manifest-check.sh` does not implement it, which is why it is not in `--locations`.
 
 The manifest is **authoritative for everything project-specific**: branch/layout conventions,
@@ -266,3 +266,4 @@ the parked decisions). It does not merge and it does not push.
 3. **Offer separately — don't bundle:** instantiating the full governance playbook
    (`coding-governance-agents.template.md`, via `<prefix>/playbook/adopt-playbook.sh --target <repo>`) for
    projects that want the whole multi-node ruleset. The manifest is just the kickoff layer.
+[/skills/session-kickoff/SKILL.md]

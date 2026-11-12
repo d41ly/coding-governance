@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-78 — the round-1 spec audit's 77 minors, batched: the Readers of what unit 10 retires, the legs and rows each unit owes, honest failure states, and the observations that read the wrong thing
 
-**Status:** DEFERRED · rev-4 · 2026-11-03 · node d · Tier-2 · base f4597719 · streams deployer · order 32 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-5 · 2026-11-12 · node d · Tier-2 · base f4597719 · streams deployer · order 32 · advances DEPL-dShippedRelease-32
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -84,7 +84,7 @@ M46 89; M47 90; M48 93; M49 95; M50 97; M51 99; M52 100; M53 102; M54 103; M55 1
   witness sets `applied`. Observed by AC12.
 - **S19** — id 98, M12. A step whose `up` is a recipe prints it and stops the walk as `attended`,
   never `step-failed`, and rollback's `down` reads the same way. Observed by AC12.
-- **S20** — id 20, M13, landing on units 10, 15 and 21. `core.py new kit` states `--purpose` as
+- **S20** — id 20, M13, landing on units 10, 15 and 21. `core.py new tool-kit` states `--purpose` as
   required, and each spelled command carries it. Observed by AC13.
 - **S21** — id 21, M14, landing on unit 12. The `landing-turn` wait is one row, `on` the turn's ref,
   and its dead-holder case is planted. Observed by AC14.
@@ -362,7 +362,7 @@ Live at this unit's pass, the last of the build. Spec text that a finding correc
   case, `attend` prints the recipe and ends `attended`; after a hand migration a re-run sets
   `applied`.
   Red when: `attend` reports a failure every run on a shards tree.
-- **AC13** — When `python core.py new kit fixture-kit --layer layer.memory --purpose "x"` runs in a
+- **AC13** — When `python core.py new tool-kit fixture-kit --layer layer.memory --purpose "x"` runs in a
   scratch copy it exits 0; with no `--purpose` it exits 2 naming it.
   Red when: a spelled command cannot exit 0.
 - **AC14** — When `python waits.py sweep` runs on a planted dead holder past `leases.expiry-hours`,
@@ -551,6 +551,8 @@ New arm: tools/integrations/release_fixture.py · covers AC16 AC49 AC60 · the p
 - rev-2 · 2026-11-01 · §3 · the Edges gain the mirror of each edge the round-2 spec audit's promoted units declare toward this unit (units 106); no scope, design or criterion moved.
 - rev-3 · 2026-11-01 · §3 · the Edges gain the mirror of each edge the round-5 spec audit's promoted units declare toward this unit (units 144); no scope, design or criterion moved.
 - rev-4 · 2026-11-03 · §2 S59 · the exit-3 re-read names its surface, TOOL-dPlacedRequest-34 S22's `--lease status run release <E>` and its sixth TAB field, the field DEPL-dShippedRelease-138 S48 reads for the build lease; S48 is not widened and the exit-3 behaviour does not change.
+- rev-4 · 2026-11-04 · S20, AC13 · the factory `core.py new kit` becomes `core.py new tool-kit` in those items. Every plain-prose kit stays. Cause: PLAY-dOrderedCharter-65 renamed the kind, and this is an outside write recorded by dOrderedCharter under `2026-11-04-prompt-PLAY-dOrderedCharter-65-kind-rename-fold-brief`; no other meaning moved.
+- rev-5 · 2026-11-12 · S20 S59 AC13 · two rev-4 entries were written in parallel, main's on S59 and dOrderedCharter's on S20 and AC13, and neither moved the other's items; this rev holds both. An outside write recorded by dOrderedCharter under `2026-11-11-prompt-PLAY-dOrderedCharter-83-spec-brief`.
 
 ## 10. Reuse audit
 

@@ -3,6 +3,7 @@
 
 id = "lexicon"
 home = "lexicon"
+layer = "layer.memory.lexicon"
 scope = "repo"
 version_from = { file = "lexicon.py", pattern = "^KIT_LEXICON_VERSION = " }
 

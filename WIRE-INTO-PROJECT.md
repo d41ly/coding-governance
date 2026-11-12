@@ -98,13 +98,17 @@ placeholder from the target's own `deploy.toml` and drops the conditional blocks
 kit for. Run it rather than copying by hand.
 
 ```bash
-python <gov>/<prefix>/govkit/govkit.py intake --target <project> --kits playbook,playbook-render,check-microformats,…
+python <gov>/<prefix>/govkit/govkit.py intake --target <project> --kits playbook,playbook-render,memory-tree,policy,check-microformats,…
 bash  <gov>/<prefix>/playbook/adopt-playbook.sh --target <project>
 bash  <gov>/<prefix>/playbook/adopt-playbook.sh --target <project> --check   # wire as a gate leg
 ```
 
-**Keep the `<!-- governance-template: vN.N -->` marker verbatim** — the kickoff engine's Step-2
-fallback and the upstream re-pull both read it.
+`playbook-render` requires `memory-tree` and `policy`, since its render reads both, so `govkit`
+refuses a selection that names the renderer without them.
+
+**Commit `.governance/instructions.lock` with the charter** — the render writes its provenance there,
+never into the charter: the lock's charter row carries the template's `vN.N` in `template`, and the
+kickoff engine's Step-2 fallback reads that row.
 
 ### What the renderer cannot decide for you
 
@@ -119,7 +123,7 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
   dead key, so its claimed keys cannot rot into fiction; path globs and dossier prose are not gated.
   `map_diff` renders any git range as a feature-level
   changelog. Zero CI changes — the gate rides the existing suite. Keeping it selected keeps its
-  tools line in the charter's section 3.
+  tools line in the charter's "Tools to rely on" section.
 - **A records-vs-reality audit** (`drift-audit/` kit): asks whether this repo's RECORD of its own
   state still matches the tree — stale claims, closed specs with no product commit, hand-kept
   inventories disagreeing with what they describe. Stdlib and git, seconds, no agents. Drop it if the
@@ -127,9 +131,13 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
 - **Retrieval over that tree** (`memory-recall/` kit, requires the memory tree): ask the decision
   corpus a question and get the records that answer it, ranked. Offline, stdlib, writes nothing in
   the worktree.
-- **One canonical instruction file** (`agent-instructions/` kit): agents do not all read the same
-  filename, and Claude Code does not read `AGENTS.md` natively. Drop it only if exactly one agent
-  tool reads this repo; with two, this kit is what stops the second reading a stale copy.
+- **One canonical instruction file** (the `playbook-render` kit's `entry-files` scope): agents do not
+  all read the same filename, and Claude Code does not read `AGENTS.md` natively. The renderer wires
+  each harness's file to `AGENTS.md`, which is what stops a second agent reading a stale copy; the
+  agent-instructions kit that did this retired into it, and a `kits` list still naming that kit reads
+  as `playbook-render`. Its `--card` switch, off by default, is `render_playbook.py --render-scope
+  entry-files --card`: `CLAUDE.md` imports the session's orientation card beside `AGENTS.md`, and
+  `--check-render --card` reds a pointer without it.
 - **Parallel-test guardrails** (`pytest-parallel-guardrails/` kit): drop it if the project is not
   Python or does not run `pytest -n auto`. The charter's one line on the bug classes it fixes is
   that kit's tools line, so a selection without the kit carries no line on them.
@@ -158,14 +166,17 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
 
 `drop_blocks` in the target's `deploy.toml` names blocks to remove that no kit governs. One exists:
 
-- `when:cross-os` — the `[cross-os]` practice and the toolchain fact. Drop it for a single-OS team.
+- `when:cross-os` — the toolchain fact. Drop it for a single-OS team; the `[portable]` practice,
+  which replaced the cross-OS one, stays active, and the note the member prints asks for no removal,
+  since it still cuts the toolchain fact.
 
 v4.0 retired `node-table` and `security-outbound`: the node registry is generated from the fleet,
 and the outbound rules moved to the spec template's security checklist. A `drop_blocks` member
 naming either is printed as `retired` and ignored; delete it.
 
-Section 1, `[voice]` included, binds every adopter and is not droppable. A project that wants a
-different persona says so in a section-2 line; the facts-over-wit half binds regardless.
+The active practices, `[voice]` among them, bind the adopter: `charter.practices` names the set, the
+foundation set by default (`help/charter.md`). A project that wants a different persona says so in a
+section-2 line; while `[voice]` is active, its facts-over-wit half binds.
 
 ### Section 2 — this repository's own rules
 
@@ -190,9 +201,10 @@ records keep the letter they were written with.
 - **Precedence.** `[charter]`, then `[answers]`, then the probe or the declared default. An answer
   outranks a probe, and the render prints both, so correct a wrong derivation by answering it rather
   than by forking the descriptor.
-- **`playbook_path` names the TEMPLATE** when `playbook-render` is selected; the charter is
-  `--charter`, default `AGENTS.md`, and the render refuses when the two are one file. Without the
-  renderer it is the copied charter, and the placeholder hole probes it.
+- **`playbook_path` is no longer an answer any kit needs.** The `playbook` entry stopped seeding a
+  copy of the template there; the `playbook-render` kit ships the template beside its engine and
+  writes the charter named by `--charter`, default `AGENTS.md`. A copy seeded earlier is kept by
+  `update`, read `retired-edited` if you edited it and `withdrawn` if you did not.
 - **`[charter]`** holds render-only prose that `[answers]` refuses, such as the commit trailer with
   its angle brackets. govkit never reads it into an argv. A key there must name a declared
   placeholder and no argv token, and a value may not carry a control character other than a
@@ -217,8 +229,9 @@ it, so a target that renders the charter gets the gate that keeps that block hon
 default selection; decline it by naming a selection that omits it.
 
 Wire the leg into your gate runner and CI as `micro-format definitions`, running
-`bash {prefix}/check-microformats.sh <playbook>` — the argv the descriptor declares, with
-`{prefix}` resolved to your install prefix. The token form is deliberate: a literal `tools/` path
+`bash {prefix}/check-microformats.sh` — the argv the descriptor declares, with `{prefix}` resolved
+to your install prefix. With no argument the gate reads the charter template beside the
+`playbook-render` kit's engine, found through your install receipt; an argument names another file. The token form is deliberate: a literal `tools/` path
 here would be a kit path the `install-prefix` ban reds on, with no waiver to take.
 
 <!-- govkit:entry memory-tree -->
@@ -582,7 +595,7 @@ memory-tree owns that file, which is why §0 makes this decision depend on §3.
 1. Copy the kit dir in **as `<prefix>/memory-recall/`**. The kit dir's NAME is load-bearing; the prefix
    is not — `adopt-memory-recall.sh` derives its own with `git rev-parse --show-prefix` and
    `check-wiring.sh` probes both spellings — but every kit here goes under the one `<prefix>/`, and
-   `corpus_ids.py` needs memory-tree and memory-recall to be SIBLINGS, so they move together:
+   the id grammar this kit reads ships in memory-tree's `id_grammar.py`, so install memory-tree first:
    `cp -r <gov>/<prefix>/memory-recall <project>/<prefix>/memory-recall`.
 
    **Then delete the three GOV-ONLY files that copy brings with it.** `kit.toml` withholds them from
@@ -754,11 +767,12 @@ CLI runs by path and reads the repository it is pointed at.
 ## 3i — Adopt the policy kit (with the review harness)
 
 One file per repository, `.governance/policy.toml`, holds the policy values its gates and hooks
-read, each checked against the kit's catalogue. The kit is not in the default selection. The
-`review-harness` kit requires it, and `govkit` refuses a selection that names a kit without what it
-requires, naming the missing id.
+read, each checked against the kit's catalogue. The kit is in the default selection because the
+`playbook-render` kit requires it, as the `review-harness` kit does, and `govkit` refuses a selection
+that names a kit without what it requires, naming the missing id.
 
-1. Add `policy` to `kits` in `.governance/deploy.toml`, with `memory-tree`, which it requires.
+1. A selection other than the default adds `policy` to `kits` in `.governance/deploy.toml`, with
+   `memory-tree`, which it requires.
 2. **What the install renders.** The kit's adopter, `bash <prefix>/policy/adopt-policy.sh
    --scaffold`, runs at install and at every update unless `GOVKIT_RERENDER=0` declines it. It
    writes the starter policy file only where none exists, and says `kept` otherwise: the file is
@@ -776,8 +790,8 @@ requires, naming the missing id.
 
 The engine (§1) discovers the manifest by searching `<project>`, **first hit wins**:
 the locations `bash <prefix>/manifest-check.sh --locations` prints, in order →
-`SESSION-KICKOFF.md` → else it greps `docs/` + root for the `governance-template:` marker (the playbook
-from §2). Write the manifest to one of those paths so it resolves.
+`SESSION-KICKOFF.md` → else the charter row of `.governance/instructions.lock`, the row whose
+`template` is set (the playbook from §2). Write the manifest to one of those paths so it resolves.
 
 1. Instantiate it:
    ```bash
@@ -835,9 +849,9 @@ the INVOKING directory, not from its own location — run it with the cwd inside
 4. `bash <prefix>/manifest-check.sh` → 0.
 5. Re-render the charter the way §2 does, rather than re-pulling lines into it: since v4.0 it carries no
    manifest lines, and the DoD write-back and the merge exception are the `kickoff-manifest ratchet`
-   leg's refusals. The render writes the `governance-template:` marker of the template it read, so
-   the marker cannot lie about the version; both the kickoff engine's Step-2 fallback and the
-   re-pull mechanism read it.
+   leg's refusals. The render writes the version marker of the template it read into the charter
+   row of `.governance/instructions.lock`, never into the charter, so the row cannot lie about the
+   version; the kickoff engine's Step-2 fallback reads it.
 5b. Add `registry: <path>` to the audit block (v1.4) — the file whose first table under
    `## Node registry` names the project's nodes, read by the checker's `--card` verbs for the
    session card's `node —` cell. Without it every card the project writes reads `node — UNKNOWN:
@@ -1339,8 +1353,8 @@ it.
 
 ```
 <project>/
-├── AGENTS.md / CLAUDE.md        # (optional) project charter / agent-instruction file (agent-instructions kit)
-├── docs/PARALLEL.md             # governance playbook, filled (governance-template marker kept) — ONE file; §2 ships no companion
+├── AGENTS.md / CLAUDE.md        # (optional) project charter / agent-instruction file (playbook-render kit)
+├── docs/PARALLEL.md             # governance playbook, filled (its provenance in .governance/instructions.lock) — ONE file; §2 ships no companion
 ├── memory/guides/SESSION-KICKOFF.md  # kickoff manifest (v1.5: audit block + sealed eight-field §A region + registry key) — the engine reads this
 ├── <prefix>/manifest-check.sh # ratchet gate — engine-identical copy (overwrite wholesale on kit updates)
 ├── .gitattributes               # EOL rules — the checker (+ the memory tree if §3 adopted)
@@ -2162,12 +2176,10 @@ a `{kit}` token and both the writer and the checker expand it against the fragme
   re-run `--scaffold`; the cache invalidates itself on the resolved conf, so no manual purge is needed.
 
 - **Precedence on any conflict:** `CLAUDE.md` > manifest > skill — follow the winner, fix the loser.
-- **Pull upstream improvements:** the charter carries `governance-template: vN.N`. `govkit update`
-  refreshes the engine and its declarations and re-renders the region from the template you HAVE
-  (unless GOVKIT_RERENDER=0): the template is a seed it never rewrites, and it reports
-  `reseed-available` when gov's has moved. To take a new template version, copy
-  `<gov>/coding-governance-agents.template.md` over the file `playbook_path` names, then re-render;
-  until you do, an older template still renders and the render notes its marker. The manifest
+- **Pull upstream improvements:** the charter's row in `.governance/instructions.lock` carries the template's `vN.N`. `govkit update`
+  refreshes the engine, its declarations and the template the `playbook-render` kit lands beside the
+  engine, and re-renders the region from it (unless GOVKIT_RERENDER=0), so a new template version
+  arrives with the update. A copy seeded earlier at `playbook_path` is no input of the render. The manifest
   carries its own `kickoff-manifest: vN.N`. The `memory-tree/` scripts are identical across repos —
   copy the newer versions in wholesale.
   **v4.1 (2026-10-09), the first v4 release, REPLACES the charter's shape:** sections §0 to §16 are gone. Section 1 is

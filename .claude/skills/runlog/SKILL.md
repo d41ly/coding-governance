@@ -12,6 +12,7 @@ description: >-
   a definition or a string in code is grep's job — nor for why the repository is the way it is,
   which its decision logs answer.
 ---
+[.claude/skills/runlog/SKILL.md · Level 4 · A Skill, followed when its trigger holds; yields to levels 0 to 3]
 
 # Ask a run what it did
 
@@ -107,3 +108,4 @@ a hand-edited copy reds the adopter's `--check` arm.
 - Trends across many runs. One run at a time, except the gate-leg row above, which counts bars.
 - Whether a decision was right. The record and the model judge no decision's quality, and neither
   does this Skill.
+[/.claude/skills/runlog/SKILL.md]

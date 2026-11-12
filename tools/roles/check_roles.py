@@ -11,8 +11,9 @@ touching nothing else, then grades as usual.
 
   R0  no `.memory-tree.conf`, no CHARTER key in it, or no file at that path; a blank or absent
       MEMORY_ROOT in it (TOOL-aOrientedCast-19); a governing doc that
-      carries neither a section 1 rule tag nor a `## §<n> — ` heading, a tagged doc lacking a
-      carried section (`## Protocols`, `## Facts`), or a tag repeated in section 1 (exit 2)
+      carries no practice rule tag, between its practices markers or under a numbered first heading,
+      and no `## §<n> — ` heading, a tagged doc lacking a carried section (`## Protocols`,
+      `## Facts`), or a practice tag repeated (exit 2)
   R1  zero role files or zero workflow entries, or a tagged charter no role's `rules` cites a tag
       of: a check that graded nothing is DEAD PROBE
   R2  a front-matter defect: unknown, indented, repeated or missing key (`rules` may be empty;
@@ -21,7 +22,7 @@ touching nothing else, then grades as usual.
       `model` absent on an agent role
   R3  a `reads` key outside the vocabulary, named twice, or `card:reuse` without `?`
   R4  a `rules` entry that is not a lowercase tag optionally ending in `?`, a tag named twice, or a
-      bare tag naming no section 1 rule of a tagged charter; an optional (`?`) tag section 1 lacks
+      bare tag naming no practice of a tagged charter; an optional (`?`) tag its practices lack
       prints one `roles: note:`. A pre-tag (v3.x) charter resolves no tag and prints one note
   R5  a body empty, over its slot's ceiling, carrying a `# `/`## ` line or a token other than
       {{MEMORY_ROOT}}, or spelling the file name of a protocol the charter's Protocols section
@@ -29,7 +30,8 @@ touching nothing else, then grades as usual.
       family cap `role-body` (TOOL-dGroundRules-9): under `warn` it prints a `BUDGET WARN` line and
       is no defect; with no policy kit, or a refusing reader, it is a defect as before
   R6  a workflow entry with an unknown, missing or repeated key or name, a missing name of the ten,
-      a non-integer or negative `stage`, an unknown `driver`, or a `trigger` carrying a newline
+      a non-integer or negative `stage`, a `step` outside STEP_NAMES, an unknown `driver`, or a
+      `trigger` carrying a newline
   R7  a role whose `workflow` names no entry, or whose entry does not list it
   R8  a `roles` entry naming no role file; an agent or workflow driver with no role; a role file no
       entry lists
@@ -95,7 +97,10 @@ BODY_CEILINGS = {
 }
 WORKFLOW_NAMES = ("orient", "research", "reuse", "handoff", "spec-write", "spec-review", "build",
                   "closing-review", "gate-bar", "bookkeeping")
-WORKFLOW_KEYS = ("name", "stage", "driver", "harness", "roles", "stages", "enforced-by", "trigger")
+WORKFLOW_KEYS = ("name", "stage", "step", "driver", "harness", "roles", "stages", "enforced-by", "trigger")
+#: A workflow's `step`, the flow step its work order serves (PLAY-dOrderedCharter-21): the flow's words, the
+#: entry step, the review breakpoint, and `none` for a workflow that serves no step.
+STEP_NAMES = ("entry", "plan", "design", "build", "test", "deploy", "review", "none")
 DRIVERS = ("agent", "workflow", "program", "main-loop")
 WRITES = ("none", "spec", "product", "review", "records")
 REQUIRED_ROLE_KEYS = ("name", "description", "workflow", "reads", "writes", "rules", "returns",
@@ -256,7 +261,7 @@ def check_roles(root, kit_dir, write=False):
     if not files:
         add_defect(kit_dir / "agents", "R1", "DEAD PROBE: no role file, so this check graded nothing")
     elif charter["shape"] == "tagged" and not cited & set(charter["rules"]):
-        add_defect(charter_path, "R1", "DEAD PROBE: no role's rules cites a section 1 rule tag of "
+        add_defect(charter_path, "R1", "DEAD PROBE: no role's rules cites a practice tag of "
                    "this charter, so no rule reaches any agent")
 
     table = kit_dir / "workflows.toml"
@@ -286,6 +291,8 @@ def check_roles(root, kit_dir, write=False):
         stage = w.get("stage")
         if "stage" in w and (not isinstance(stage, int) or isinstance(stage, bool) or stage < 0):
             add_defect(table, "R6", "%s stage %r is not an integer at or above 0" % (where, stage))
+        if "step" in w and w["step"] not in STEP_NAMES:
+            add_defect(table, "R6", "%s step %r is not one of %s" % (where, w["step"], " ".join(STEP_NAMES)))
         if "driver" in w and w["driver"] not in DRIVERS:
             add_defect(table, "R6", "%s driver %r is not one of %s" % (where, w["driver"], " ".join(DRIVERS)))
         trig = w.get("trigger")

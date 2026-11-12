@@ -1,4 +1,5 @@
-<!-- gov:kit unattended@1.118 -->
+<!-- gov:kit unattended@1.119 -->
+[memory/guides/UNATTENDED-VERBS.md · Level 3 · Binding with the unattended protocol, the verbs a run calls; yields to levels 0 to 2]
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -1091,3 +1092,4 @@ verb stages the run record beside the ABORTED record, so commit them together.
 
 Delete the idle-wake with `KEEPALIVE_DELETE` before you finish, and attest `keepalive-reaped`.
 Nothing else can: an unreaped job is orphaned in a store no later run can see.
+[/memory/guides/UNATTENDED-VERBS.md]

@@ -110,6 +110,17 @@ text = "<!-- upgrade-walk plant edited-retired: an adopter's own line in a file 
 expect = "ordered"
 order = "retired-edited"
 
+# PLAY-dOrderedCharter-31 S4: one adopter rule, so `playbook/adopter-rules-to-overlay` has a key to move
+# and its skip case reads the step load-bearing. `contains` reads the table header the step's line
+# edit leaves; it does not check that the rule reached the overlay, which the step's own witness does.
+[[plant]]
+id = "adopter-rules"
+path = ".governance/deploy.toml"
+edit = "append"
+text = "\n[charter]\nadopter_rules = \"\"\"\n- Name the upgrade-walk plant adopter-rules in every walk.\n\"\"\"\n"
+expect = "carried"
+contains = "[charter]"
+
 [[gov_plant]]
 id = "withdraw-one"
 what = "the hooks README dropped from its descriptor's [[files]], so gov no longer ships an installed file"

@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-21 — each practice's reach per step rendered as step-scoped units handed in work orders
 
-**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base ce13efbe · streams playbook · order 23 · advances PLAY-dOrderedCharter-38
+**Status:** CLOSED · rev-4 · 2026-11-09 · node d · Tier-2 · base ce13efbe · streams playbook · order 23 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0051@44bf9720 whole
 
@@ -12,10 +12,18 @@
 | [2026-10-23-build-PLAY-dOrderedCharter-1-edge-fix-return.md](../build/2026-10-23-build-PLAY-dOrderedCharter-1-edge-fix-return.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-33 |
 | [2026-10-23-build-PLAY-dOrderedCharter-1-reuse-scout-a.md](../build/2026-10-23-build-PLAY-dOrderedCharter-1-reuse-scout-a.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-27 |
 | [2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md](../build/2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
-| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY-dOrderedCharter-76 PLAY-dOrderedCharter-77 PLAY-dOrderedCharter-78 PLAY-dOrderedCharter-80 PLAY-dOrderedCharter-81 PLAY-dOrderedCharter-82 PLAY-dOrderedCharter-83 PLAY-dOrderedCharter-84 PLAY-dOrderedCharter-85 PLAY-dOrderedCharter-86 PLAY-dOrderedCharter-87 PLAY-dOrderedCharter-88 |
+| [2026-11-02-build-PLAY-dOrderedCharter-21-ledger.md](../build/2026-11-02-build-PLAY-dOrderedCharter-21-ledger.md) | journal | — |
+| [2026-11-09-build-PLAY-dOrderedCharter-21-1-builder-return.md](../build/2026-11-09-build-PLAY-dOrderedCharter-21-1-builder-return.md) | journal | — |
+| [2026-11-09-build-PLAY-dOrderedCharter-21-deviation-211.md](../build/2026-11-09-build-PLAY-dOrderedCharter-21-deviation-211.md) | deviation | — |
+| [2026-11-10-build-PLAY-dOrderedCharter-1-runlog-8d3cc031.md](../build/2026-11-10-build-PLAY-dOrderedCharter-1-runlog-8d3cc031.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY-dOrderedCharter-76 PLAY-dOrderedCharter-77 PLAY-dOrderedCharter-78 PLAY-dOrderedCharter-80 PLAY-dOrderedCharter-81 PLAY-dOrderedCharter-82 PLAY-dOrderedCharter-83 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-33 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
+| [2026-11-02-prompt-PLAY-dOrderedCharter-21-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-21-build-brief.md) | journal | — |
+| [2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md) | research | PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-11-04-prompt-PLAY-dOrderedCharter-27-drift-sweep-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-27-drift-sweep-brief.md) | research | PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-55 |
+| [2026-11-08-prompt-PLAY-dOrderedCharter-27-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-27-drift-fold-brief.md) | research | PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -26,30 +34,61 @@ A practice redefines a step only if the agent working that step reads what it ch
 (foundations R1, v2:959-961 P14); the owner chose to hand that reach in work orders as step-scoped
 units and to keep the charter at one line per practice (systems IW-2, "Step units in work orders",
 v2:1101). Today a handoff carries whole rule lines chosen by the role's `rules:` value and nothing
-per step (`tools/roles/handoff.py:397-407`). This unit derives, for the step a work order serves, one
+per step (`tools/roles/handoff.py:397-407`, now the `charter-blocks` slot
+`tools/roles/handoff.py#render_handoff` fills). This unit derives, for the step a work order serves, one
 unit per active practice that declares reach at that step, hands those units in the work order, and
 holds the charter to one line per practice.
 
 ## 2. Scope (IN)
 
 - **S1** — The step a work order serves. Each workflow row of `tools/roles/workflows.toml` gains a
-  `step` field naming the flow step its work belongs to, a reach key of the practice catalogue, or
-  `none` for a workflow that serves no step. `check_roles.py` admits the key in `WORKFLOW_KEYS`
-  (`tools/roles/check_roles.py:92`) and refuses a row without it. A role's step is its `workflow:`
-  value's row's `step`. The seeded values are §4's table. Observed by AC1.
+  `step` field naming the flow step its work belongs to, one of `STEP_NAMES`, a tuple `check_roles.py`
+  declares beside `WORKFLOW_NAMES` (`tools/roles/check_roles.py#WORKFLOW_NAMES`): the flow's words `plan`,
+  `design`, `build`, `test` and `deploy`, `entry`, `review`, and `none` for a workflow that serves no step
+  (the fork record's F3). `check_roles.py` admits the key in `WORKFLOW_KEYS`
+  (`tools/roles/check_roles.py:92`, today `tools/roles/check_roles.py#WORKFLOW_KEYS`), and that is the
+  whole refusal of a row without it: the missing-key loop in `tools/roles/check_roles.py#check_roles`
+  already refuses a row lacking any `WORKFLOW_KEYS` member. The same loop refuses, at R6, a `step` outside
+  `STEP_NAMES`, naming the row and the value, as it refuses a name outside `WORKFLOW_NAMES`. The file's
+  header comment, which lists each key, gains the `step` line. A role's step is its `workflow:` value's
+  row's `step`. The seeded values are the table in section 4. `WORKFLOW_KEYS` also lays out the
+  workflows table `tools/roles/check_roles.py#render_catalogue_region` writes into
+  `tools/roles/README.md`'s `gen:roles-catalogue` region, one column per key, and the stale-region check
+  reds a region that differs from a fresh render, so the builder re-renders it with
+  `check_roles.py --write` in the same commit. Observed by AC1.
 - **S2** — The reach units. `derive_load_set` (`PLAY-dOrderedCharter-11`) adds, for a reader whose
   step is not `none`, one unit per active practice (`charter.practices`, resolved by
   `resolve_active_practices` of `PLAY-dOrderedCharter-1`) whose catalogue row has a
   `reach.<step>` value: tag `practice.<name>.<step>`, scope `step.<step>` and the practice's own tag,
   level 0, the practice's, type `directive`, text the reach value. They are derived at render from the
-  catalogue and never written as rows. Observed by AC2.
-- **S3** — Handed in the work order. `render_handoff` (`tools/roles/handoff.py:312`) renders the reach
+  catalogue and never written as rows. The reader's role part, its `role.<name>` selector, is reported
+  `unarmed` while no `role` namespace is registered, as unit 11 reports an unregistered `feature.*`
+  part; the reach units do not ride that part, since they are keyed on the role's step, read from its
+  workflow row the way unit 11's derivation reads the role's `rules:` value, so they load all the same. Their `step.<step>` scope names a namespace
+  `tools/playbook/namespaces.toml` does not register: `derive_load_set` validates no scope of a derived
+  unit, and the tag resolver, whose shape check reds `step.build` as an unregistered namespace (the
+  `bad-ns` plant row, `tools/playbook/adopt-playbook.sh@c7269a97:281`), reads only written rows, so the
+  scope is printed and never graded. Observed by AC2.
+- **S3** — Handed in the work order. `render_handoff` (`tools/roles/handoff.py:312`, now
+  `tools/roles/handoff.py#render_handoff`) renders the reach
   units as one `### Practices at <step>` block after the charter blocks, one `- [<name>] <reach>` line
-  each in catalogue order, and none for a step of `none`. Observed by AC3.
+  each in catalogue order, and none for a step of `none`. At `eb1c90a1c` the charter blocks fill the
+  `charter-blocks` slot of unit 20's work-order template, `tools/roles/templates/work-order.template.md`, the
+  last slot of its `## Task` section, so the block fills a new `practices` slot after it. A slot filled with
+  nothing leaves no line (`tools/roles/handoff.py#render_work_order`), and the block sits inside the
+  `## Task` section, the only part the spawn guard admits as a native agent's prompt
+  (`tools/hooks/agent-cap.js#extractTaskSection`). The roles kit gets the units from the same `load_sets.py`
+  subprocess unit 11's S4 runs, found through `resolve_kit_dir`. With the playbook kit absent, or a role
+  whose `workflow:` names no row, the slot is empty and the render proceeds, so the pinned bytes of
+  `tools/playbook/instruction_units.py#arm_work_order`, which renders a fixture role of workflow `fixture`
+  with no playbook kit in its tree, still hold. Observed by AC3.
 - **S4** — The charter keeps one line per practice. A check in the `practices` verb of
   `tools/playbook/instruction_units.py` refuses a rendered charter whose practices region holds any
   line other than one `- [<name>] <line>` per active practice, so no reach text is rendered into the
-  charter. Observed by AC4.
+  charter. The region is the one between the `PRACTICES_OPEN` and `PRACTICES_CLOSE` markers unit 2's S6
+  adds. The lines it admits are the ones `tools/playbook/render_playbook.py#render_practice_lines` renders
+  since unit 1, which also leaves out a row whose `kit` the target does not select and each `drop_blocks`
+  member, so the check refuses a line no catalogue row spells, never a row's absence. Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -88,7 +127,9 @@ holds the charter to one line per practice.
 | `bookkeeping` | `none` |
 
 The step words are the flow's (v2:917 P20: plan, design, build, test, deploy), plus `entry` for the
-entry step and `review` for the review breakpoint, the reach keys foundations R1's example uses.
+entry step and `review` for the review breakpoint, the reach keys foundations R1's example uses. At
+`eb1c90a1c` the catalogue's rows carry reach at `plan`, `design`, `build`, `test`, `deploy` and `review`,
+and none at `entry`, so an `orient` work order renders no block until a row gains one.
 
 ### The rendered block
 
@@ -101,8 +142,9 @@ entry step and `review` for the review breakpoint, the reach keys foundations R1
 
 ### Inventory
 
-Minted: the workflow field `step` and its value `none`; the derived tag form `practice.<name>.<step>`;
-the handoff block `### Practices at <step>`; the charter check's one-line-per-practice arm.
+Minted: the workflow field `step` and its value `none`; the tuple `STEP_NAMES`; the work-order template
+slot `practices`; the derived tag form `practice.<name>.<step>`; the handoff block
+`### Practices at <step>`; the charter check's one-line-per-practice arm.
 
 ### Migration
 
@@ -111,13 +153,16 @@ roles kit ships its own `workflows.toml`, so no adopter holds one to migrate.
 
 ### Rollout
 
-Live at landing; every builder handoff gains the block.
+Live at landing; every builder handoff gains the block. The `practices` verb's plant lays its scratch
+charter out through `tools/playbook/instruction_units.py#derive_tool_rel` and spells no kit path, as the
+shipped-surface ban requires since unit 72.
 
 ### Files touched (estimate)
 
 - `tools/roles/workflows.toml`
 - `tools/roles/check_roles.py`
 - `tools/roles/handoff.py`
+- `tools/roles/templates/work-order.template.md`
 - `tools/roles/README.md`
 - `tools/playbook/load_sets.py`
 - `tools/playbook/instruction_units.py`
@@ -145,14 +190,20 @@ Live at landing; every builder handoff gains the block.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python tools/roles/check_roles.py` runs over a scratch kit whose `build` row lacks
-  `step`, it exits non-zero naming the row and the field; over the shipped kit it exits 0.
-  Red when: a workflow without `step` passes.
-- **AC2** — When `python load_sets.py derive --reader role.gov-builder` runs, it lists a
-  unit `practice.yagni.build` and one per other active practice with a `build` reach, and none with a
-  `design` reach only; for `role.gov-session` (workflow `handoff`, step `none`) it lists none.
-  Red when: a reach unit of another step loads, or a step of `none` loads one.
-- **AC3** — When `python tools/roles/handoff.py render --role builder --build <fixture> --stdout`
+- **AC1** — When `python <scratch>/tools/roles/check_roles.py --root <scratch>` runs, the checker reading
+  the kit beside it, over a scratch copy of gov's tree whose roles kit's `build` row lacks `step`, it
+  exits non-zero naming the row and the field; with that row's `step` set to `buld` instead, it exits
+  non-zero naming the row and the value; over an unedited scratch copy of the shipped kit, its
+  README re-rendered by `--write`, it exits 0.
+  Red when: a workflow without `step` passes, a step outside the declared words passes, or the catalogue
+  region lacks the `step` column.
+- **AC2** — When `python load_sets.py derive --reader role.gov-builder` runs, it prints the role part
+  `unarmed` and lists a unit `practice.yagni.build` and one per other active practice with a `build`
+  reach, and none with a `design` reach only; for `role.gov-session` (workflow `handoff`, step `none`)
+  it lists none.
+  Red when: a reach unit of another step loads, a step of `none` loads one, or the unarmed role part
+  drops the reach units.
+- **AC3** — When `python tools/roles/handoff.py render --role gov-builder --build <fixture> --unit <id> --stdout`
   runs, the output holds `### Practices at build` with `- [yagni] delete rather than disable`; with
   `charter.practices` passed as a stand-in set without `practice.yagni`, the line is absent.
   Red when: the block is missing, or an inactive practice's reach is handed.
@@ -163,7 +214,7 @@ Live at landing; every builder handoff gains the block.
 
 ## 7. Gates
 
-`roles render wiring` · `roles render selftest` · `playbook render selftest` · `govkit acceptance matrix`
+`roles render wiring` · `roles render selftest` · `playbook render selftest` · `govkit acceptance matrix` · `policy fixtures`
 
 New arm: tools/roles/check_roles.py · covers AC1 · its selftest's fixture kit omits `step` on one workflow row · none
 New arm: tools/playbook/instruction_units.py · covers AC4 · the `practices` verb's selftest plants a reach line in a scratch charter's practices region · none
@@ -180,17 +231,46 @@ New arm: tools/playbook/instruction_units.py · covers AC4 · the `practices` ve
   at the step (R-C); (b) only those the role's `rules:` cites. RESOLVED (agent, 2026-10-23, delegated):
   (a), rung 1, layer-instruction R-C lists "the active practices' reach for the step" in every load
   set. widens: none · relaxes: none
+- **F3 — What `check_roles.py` admits as a `step` value.** S1 read "a reach key of the practice
+  catalogue"; at `eb1c90a1c` the catalogue (`tools/playbook/practices.toml`) carries no `entry` reach, and
+  the roles kit reads no file of a sibling kit, so the seeded `orient` row would fail that reading and the
+  roles checker cannot test it. Options: (a) `STEP_NAMES`, a declared tuple in
+  `tools/roles/check_roles.py` beside `WORKFLOW_NAMES`, the flow's words with `entry`, `review` and
+  `none`, a step no active practice reaches rendering no block; (b) presence alone, any value admitted;
+  (c) the roles checker runs the playbook kit's `practices` verb and refuses a step no row reaches.
+  RESOLVED (agent, 2026-11-08, delegated): (a), by the build method's fork rule. (c) lost: it makes the
+  roles checker depend on the playbook kit, the kit-dependency kind unit 73's F1 parks with the owner,
+  and it refuses the seeded `entry`. (b) meets every criterion (a) meets and passes a misspelt step,
+  which renders no block with no word said, against section 5's refusal of an unknown step, so (a) is
+  the more feature-rich. widens: the roles kit gains one declared set of step words, which
+  dDeclaredLoop's step namespace replaces with the field · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
+- rev-3 · 2026-11-04 · section 2 S1, S2 · AC1 to AC3 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-27-1-spec-writer.md`, the drift sweep's findings 21-1 to 21-4 read at `c7269a97`: the moved citations carry their stable forms; the missing-key loop is the whole refusal and the README's catalogue region is re-rendered with the key; AC3 renders as `gov-builder` with `--unit`; the role part reads `unarmed` and the `step.<step>` scope is never graded; AC1 runs over a scratch copy, not the `roles catalogue` leg's argv.
+- rev-4 · 2026-11-08 · section 1 · S1 to S4 · section 4 seeded values, Inventory, Rollout, Files touched ·
+  AC1 · section 8 new F3 · section 10 · from `2026-11-08-prompt-PLAY-dOrderedCharter-27-drift-fold-brief.md`:
+  re-read at `eb1c90a1c`. The catalogue unit 1 landed carries no `entry` reach and the roles kit reads
+  none of it, so the step words become a declared tuple the checker grades (F3), and AC1 plants a
+  misspelt step; the block fills a new slot after unit 20's `charter-blocks` slot, inside the `## Task`
+  section the spawn guard admits, and an absent playbook kit or workflow row leaves it empty, keeping
+  `arm_work_order`'s pinned bytes; S4 names unit 2's practices markers and unit 1's
+  `render_practice_lines`; the plant derives its paths since unit 72; moved anchors gain their symbols.
+  Re-checked unchanged: ten workflow rows, `gov-session` on `handoff`, no `step` namespace row, and
+  `yagni`'s `build` reach `delete rather than disable`.
 
 ## 10. Reuse audit
 
 The seams extended: `render_charter_blocks` as called from `render_handoff`
-(`tools/roles/handoff.py:397-407`, `tools/roles/roles_lib.py:284`), where practice lines reach a
-handoff today and where the block joins; `tools/roles/workflows.toml` and `WORKFLOW_KEYS`
-(`tools/roles/check_roles.py:92`, checked at `:258-260`), the declared workflow rows the step joins;
+(`tools/roles/handoff.py:397-407`, now inside `tools/roles/handoff.py#render_handoff`,
+`tools/roles/roles_lib.py:284`, today
+`tools/roles/roles_lib.py#render_charter_blocks`), where practice lines reach a handoff today, and unit 20's
+work-order template, whose slot list the block joins; `tools/roles/workflows.toml` and `WORKFLOW_KEYS` (`tools/roles/check_roles.py:92`,
+today `tools/roles/check_roles.py#WORKFLOW_KEYS`, checked in `tools/roles/check_roles.py#check_roles`
+and rendered by `tools/roles/check_roles.py#render_catalogue_region`), the declared workflow rows the
+step joins;
 and `PLAY-dOrderedCharter-11`'s `derive_load_set`. `python tools/codebase-map/reuse_lookup.py
 "assemble a role handoff from the charter rules and the task"` ranked `RolesError`, `parse_charter`,
 `resolve_charter_path`, `render_charter_blocks`, `render_role` and `check_rule_tags` from

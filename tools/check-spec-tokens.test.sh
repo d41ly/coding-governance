@@ -57,6 +57,9 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # and opening a sentence, in double quotes, a code span and a fence, the hit past the fence, the day
 # before, the blank key, and the waiver's hit, report line and --list row, each top-level. Counted by
 # reading; OWED: observed at the close.
+# RAISED 215 -> 218 by PLAY-dOrderedCharter-63: its three status-header arms, the fenced OPEN example
+# below and above a DEFERRED header and the fenced CLOSED example in an OPEN spec, each top-level.
+# Counted by reading; OWED: observed at the close.
 # RAISED 215 -> 224 by TOOL-dFairHearing-48: its nine arm-labels arms, each top-level. Counted by reading;
 # OWED: observed at the close.
 # RAISED 224 -> 236 by TOOL-aSmoothedDispatch-5: its twelve --spec arms, one for AC1, two each for AC2,
@@ -68,7 +71,9 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # the two refusals, each top-level. Counted by reading; OWED: observed at the close.
 # MERGED at TOOL-aSmoothedDispatch-22's reconcile: the base 224, plus TOOL-dPavedRoad-1's 7, plus this
 # branch's 14, less the ten unit 5 arms dropped there = 235. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=235
+# MERGED at PLAY-dOrderedCharter-83's reconcile of 47ed57fab: main's 235 plus this branch's 3 from
+# PLAY-dOrderedCharter-63 = 238. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=238
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -559,6 +564,57 @@ sed -i 's|\*\*Status:\*\* OPEN|**Status:** CLOSED|' "$d/memory/builds/tOne/spec/
 sed -i 's|`'"${PFX}gate-legs.json"'` exists|`'"${PFX}nope.sh"'` exists|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
 git -C "$d" add -A >/dev/null
 arm "a CLOSED spec is frozen, so it refuses rather than grading" 1 "$d" "REFUSING"
+
+# 10b — PLAY-dOrderedCharter-63: a spec's liveness is its status header, the first `**Status:**` line
+# outside a fenced block, so a fenced example's status line is never read. One arm per plant; the
+# bad witness is arm 2's `nope.sh`, which a graded spec reds on. A fenced example is a backtick fence
+# of three lines: the opening marker, the status line, the closing marker.
+d=$base/deferred-fenced; scratch "$d"
+cat > "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-2.md" <<'SPEC'
+# TOOL-tOne-2 — a parked unit
+
+**Status:** DEFERRED · rev-1 · 2026-09-02 · node t · Tier-1 · base 0123abcd · streams tooling
+
+## 4. Design
+
+```
+**Status:** OPEN · rev-1 · 2026-09-02 · node t · Tier-1 · base 0123abcd · streams tooling
+```
+
+## 6. Acceptance criteria
+
+- **AC1** — `{PFX}nope.sh` exists.
+SPEC
+sed -i "s#{PFX}#${PFX}#g" "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-2.md"
+git -C "$d" add -A >/dev/null
+arm "a fenced OPEN example below a DEFERRED header is not read, so the spec stays ungraded" 0 "$d" \
+  "1 live spec(s) · 1 terminal spec(s) not graded" "nope.sh"
+d=$base/fence-above-header; scratch "$d"
+cat > "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-2.md" <<'SPEC'
+# TOOL-tOne-2 — a parked unit
+
+```
+**Status:** OPEN · rev-1 · 2026-09-02 · node t · Tier-1 · base 0123abcd · streams tooling
+```
+
+**Status:** DEFERRED · rev-1 · 2026-09-02 · node t · Tier-1 · base 0123abcd · streams tooling
+
+## 4. Design
+
+## 6. Acceptance criteria
+
+- **AC1** — `{PFX}nope.sh` exists.
+SPEC
+sed -i "s#{PFX}#${PFX}#g" "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-2.md"
+git -C "$d" add -A >/dev/null
+arm "a fenced OPEN example above a DEFERRED header is not the header either" 0 "$d" \
+  "1 live spec(s) · 1 terminal spec(s) not graded" "nope.sh"
+d=$base/live-fenced-closed; scratch "$d"
+sed -i 's|`'"${PFX}gate-legs.json"'` exists|`'"${PFX}nope.sh"'` exists|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+sed -i 's|^## 6\. Acceptance criteria|```\n**Status:** CLOSED · rev-1\n```\n\n&|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+git -C "$d" add -A >/dev/null
+arm "a fenced CLOSED example does not freeze an OPEN spec, so its hit still REDS" 1 "$d" \
+  "not tracked by git ls-files" "REFUSING"
 
 # 11 — the waiver registry itself must exist
 d=$base/noreg; scratch "$d"

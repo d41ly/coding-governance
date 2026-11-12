@@ -15,23 +15,76 @@ reference; this page is the short version.
 1. **Kickoff writes the card.** Its `## task` block carries the goal, scope, cut-line, To-do, Reuse,
    acceptance check and gates.
 2. **A role supplies the constant part.** Each role is one file under `<prefix>/roles/agents/`: its
-   instructions, the inputs it reads, the file class it may write and the charter's section 1 rule
-   tags it needs, under `rules`. It also says when the role is mandatory, under `mandatory`, and
+   instructions, the inputs it reads, the file class it may write and the tags of the charter's
+   practices it needs, under `rules`. It also says when the role is mandatory, under `mandatory`, and
    where its output goes, under `output`. Its agent carries those rule lines and the charter's
    Protocols and Facts sections whole.
 3. **The handoff renderer joins them.** `handoff.py render` writes one prompt file under the build's
    `prompts/` folder, with `## Role` and then `## Task`, filled from the card, the build's brief and
    any `--input` values. A spec writer's task also carries the brief's `## The prompt`, the owner's
    own words, as its `brief:prompt` block. A required input that is missing or still a placeholder
-   refuses by name.
+   refuses by name. The prompt carries no charter text: the charter rides once, in the agent file.
 4. **The agent runs as a native type.** Each role is rendered into `.claude/agents/gov-<role>.md`,
    which starts without the full charter and at the reasoning effort the policy file sets. It
-   carries the section 1 rules its role cites and the charter's Protocols and Facts sections.
+   carries the practices its role cites and the charter's Protocols and Facts sections, first.
    The dispatcher passes the level for the model in use: a harness call carries `efforts`, the JSON
    `handoff.py stage-efforts <workflow> --model <id>` prints, where `<id>` is the session's own
    model id as its environment states it. A harness call at another level is refused by the spawn
    guard, which names the stage, both levels and that command; pass what it prints. A stage that
    neither `roles` nor `efforts` names is refused too.
+5. **Each block carries its level.** With the playbook kit installed, every block a subagent gets
+   sits in an envelope, `[<doc> · Level <n> · <direction>]` up to `[/<doc>]`, so it ranks them as
+   the main session does. The agent file holds the charter at level 0 inside its own level 5. The
+   task part holds the practices at its step at level 0, then the task at level 6.
+   `handoff.py check <file>` refuses an envelope left open or a level that falls within a part.
+   Without the playbook kit the render prints one `envelope — unarmed` note and ranks nothing.
+
+## When a render checks a role's load set
+
+Before it writes, the handoff renderer, and the agent-type render for every agent at once, asks the
+playbook kit which instruction units the role loads. A unit can name the readers that must load it,
+under `required-by`. When the role's set lacks such a unit, the policy key `instructions.checks`
+decides:
+
+- `refuse`, the default: nothing is written. The refusal reads
+  `load-set — refused · role.<name> · missing <unit> · instructions.checks=refuse`, and the remedy is
+  to scope the unit to that role, or to drop the role from its `required-by`.
+- `warn`: the render is written with a `Missing required unit: <unit> · role.<name>` line where the
+  agent reads it, in the handoff's task opening or the agent type's body.
+- `record`: the render is written, and the handoff's prompt file gains a `**Load gaps:**` line under
+  its `**Serves:**` line. The agent's text is unchanged.
+
+No value skips the check, and `budgets.enforce` never softens it. The same render measures the role
+block against its body ceiling: under `budgets.enforce = "warn"` an oversized block prints a
+`BUDGET WARN` note, and under `refuse` the render is refused. With no playbook kit installed, the
+render prints one `load-set — unarmed` note and proceeds.
+
+## The practices at the work order's step
+
+Each workflow names the step its work serves, under `step` in `<prefix>/roles/workflows.toml`: `entry`,
+`plan`, `design`, `build`, `test`, `deploy`, `review`, or `none`. A work order carries what each active
+practice changes at its role's step: the handoff's task section ends with a `### Practices at <step>`
+block, one `- [<name>] <reach>` line per practice that reaches that step. A builder's reads, for example,
+`- [yagni] delete rather than disable`. The charter keeps one line per practice and carries no reach.
+
+The active practices are the policy key `charter.practices`, the foundation set when unset. A step of
+`none`, a step no active practice reaches, or an install with no playbook kit renders no block.
+`python <prefix>/playbook/load_sets.py derive --reader role.<name>` lists the units as <!-- usage: script:tools/playbook/load_sets.py#derive c95f3b73 -->
+`practice.<name>.<step>`.
+
+## The code input every role carries
+
+Every role's load set has a `code` slot, so a handoff can carry code ranges, the definitions with
+their callers, callees and tests, without any role file naming it. Pass a file with
+`--input code=<path>`: the handoff gains an `### input:code` block holding that file's text. Leave it
+out and the task opening names `input:code` among the optional inputs not supplied.
+
+The slot's budget is the policy key `memory.code-budget`, `16k` by default, which is 16,000 bytes;
+`python <prefix>/playbook/load_sets.py derive --reader role.<name>` prints it as
+`code — slot · budget 16000 · memory.code-budget default 16k`. A block over it obeys the size switch
+as the role block does: `BUDGET WARN · code · <bytes> bytes over code-slot <budget>` under `warn`, a
+refused render under `refuse` or with `code-slot` in `budgets.pinned`. A value that is not `<n>k`
+refuses the render, naming the key.
 
 ## How to use it
 
@@ -39,6 +92,7 @@ reference; this page is the short version.
   the workflows in stage order and calls the same harnesses `/unattended` uses.
 - **Hand one task to one agent:**
 
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and placeholders -->
   ```bash
   python tools/roles/handoff.py render --role gov-builder --build <slug> --unit <unit-id> --part task
   ```
@@ -167,7 +221,7 @@ needs the kickoff and memory-tree kits.
   A harness its kit ships with no template, `unattended-unit.js`, is marked by `kit.toml` alone. A
   file of its name beside neither mark is not counted as its kit's, and reads as the note.
   check-wiring's note names `adopt-roles.sh --check` as the command that says which.
-- The `[roles]` rule and the Agent roles section ship with template v4.4. A template seeded earlier
-  keeps rendering without them: merge the `[roles]` rule, the shortened Tools bullet and the Agent
-  roles section from gov's template into yours, then re-render. Without the playbook renderer,
+- The `[roles]` rule and the Agent roles section ship with template v4.4. The render reads the
+  template the renderer kit ships beside its engine, so an update brings them; a copy seeded earlier
+  at `playbook_path` is no longer read. Without the playbook renderer,
   fill `{{ROLE_ROSTER}}` from `python <prefix>/roles/handoff.py roster`. <!-- usage: script:tools/roles/handoff.py#roster 739c5825 -->

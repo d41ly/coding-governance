@@ -131,8 +131,42 @@ arm "a head defined twice reds" red \
   "a definition head is defined more than once, so a reader keeping its first definition and one keeping its last read two different shapes" \
   '/^- `gates/a\
 - `gates — RED · <leg>`'
+# PLAY-dOrderedCharter-2 S5: a field asking for a credential reds, today's `up` field among them, and a
+# field naming where the credential lives does not.
+arm "a field asking for a credential reds" red \
+  "a definition field asks for a credential, and a shape names where one lives, never its value" \
+  's/^- `gates — .*/- `up — <service> :<port> · admin <user> · pw <pw-or-where-it-lives>`/'
+arm "a field naming where a credential lives does NOT red" ok "" \
+  's/^- `gates — .*/- `up — <service> :<port> · admin <user> · creds in <where-they-live>`/'
 arm "an opener that is not a whole line is cannot-run" cannot \
   "not delimited by exactly one fence pair" 's/^<!-- microformats -->$/x <!-- microformats -->/'
+
+# PLAY-dOrderedCharter-80 S4: with NO argument a copy of the gate reads the template beside the
+# playbook-render kit's engine, found by its anchor `render_playbook.py`, over a fence-less template at
+# the repository root; once the kit's template is gone it reads the root one and cannot run. Red before
+# S4, when the gate's no-argument subject was the root template alone. The layout is a foreign prefix
+# with the kit's home in a variable, so no kit path is spelled (PLAY-dOrderedCharter-81 S1).
+KW="$TMP/kit-subject"
+KR=vendor/gov    # a foreign prefix: the resolver probes beside the gate, wherever it is installed
+KH=playbook      # the home the gate's resolver names, held once so no kit path is spelled
+KP="$KW/$KR"
+mkdir -p "$KP/$KH"
+git -C "$KW" init -q 2>/dev/null
+cp "$GATE" "$KP/${GATE##*/}"
+: > "$KP/$KH/render_playbook.py"
+fixture "$KP/$KH"
+mv "$KP/$KH/charter.md" "$KP/$KH/coding-governance-agents.template.md"
+printf 'A root template with no fence.\n' > "$KW/coding-governance-agents.template.md"
+out=$(cd "$KW" && bash "$KR/${GATE##*/}" 2>&1); rc=$?
+label="no argument reads the template beside the playbook-render kit's engine"
+[ "$rc" -eq 0 ] && say_ok "$label" || say_fail "$label" "expected 0, got $rc: $out"
+rm -f "$KP/$KH/coding-governance-agents.template.md"
+out=$(cd "$KW" && bash "$KR/${GATE##*/}" 2>&1); rc=$?
+label="no argument and no kit template reads the root template"
+case "$rc:$out" in
+  2:*"not delimited by exactly one fence pair"*) say_ok "$label" ;;
+  *) say_fail "$label" "expected rc 2 naming the fence pair, got $rc: $out" ;;
+esac
 
 printf '\n'
 if [ "$FAILED" -ne 0 ]; then

@@ -60,7 +60,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.118 # gov:kit unattended@1.118 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.119 # gov:kit unattended@1.119 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -88,7 +88,7 @@ _LIB_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 # The python launcher, INLINED byte-identically from the canonical copy named on its marker line
 # (this kit is copy-installed and has no shared lib to source). Two callers spawn one: check 21's
 # repair hint runs the sibling resolver with it, which reads the receipt in Python, and the folder-wide
-# anchor ban (TOOL-dDerivedDocket-18) reaches the recall kit's own extractor through it. ONE copy
+# anchor ban (TOOL-dDerivedDocket-18) reaches the memory-tree kit's id grammar through it. ONE copy
 # serves both, since a second would be a second block for the parity gate to miss. A resolver that
 # finds no usable launcher is a NAMED SKIP at the arm that asked, never a silent pass: being on PATH
 # is not evidence, so the candidate is RUN.
@@ -2303,28 +2303,28 @@ read_ask_row() { # ask id · status|ready -> the value, or nothing
   printf '%s\n' "$AQ_ROWS" | awk -F'\t' -v i="$1" -v n="$_n" '$1 == i { print $n; exit }'
 }
 
-# ---- S3's ANCHOR JUDGEMENT, THROUGH THE RECALL KIT'S OWN EXTRACTOR. Whether a line ANCHORS an id
-# ---- (defines the record) or merely cites one is that kit's `anchor_at`, and a local list of the
-# ---- shapes it admits is two copies of one grammar: they disagree silently, and the copy is always
-# ---- the one that rots. The extractor is reached through the DECLARED `RECALL_CLI`, whose
-# ---- directory holds it — a kit file may name nothing outside itself by literal, and a
+# ---- S3's ANCHOR JUDGEMENT, THROUGH THE MEMORY-TREE KIT'S OWN GRAMMAR. Whether a line ANCHORS an
+# ---- id (defines the record) or merely cites one is that kit's `id_grammar.anchor_at`, and a local
+# ---- list of the shapes it admits is two copies of one grammar: they disagree silently, and the copy
+# ---- is always the one that rots. The grammar is found through the sibling-kit resolver, receipt row
+# ---- first (PLAY-dOrderedCharter-18) — a kit file may name nothing outside itself by literal, and a
 # ---- `tools/<kit>/` spelling resolves to nothing in an adopter installed at another prefix.
 # ----
-# ---- A BLANK KEY, A MISSING EXTRACTOR AND AN UNRESOLVABLE INTERPRETER ARE THREE NAMED SKIPS. None
-# ---- of them is zero anchors found, and the caller prints which one it took.
+# ---- AN UNRESOLVABLE INTERPRETER AND A MISSING GRAMMAR ARE TWO NAMED SKIPS. Neither is zero
+# ---- anchors found, and the caller prints which one it took.
 ASK_ANCHOR_PY='
 import sys
 sys.dont_write_bytecode = True
 sys.path.insert(0, sys.argv[1])
 try:
-    import extract
+    import id_grammar
 except Exception as exc:
-    sys.stderr.write("the anchor extractor did not import: %s\n" % exc)
+    sys.stderr.write("the anchor grammar did not import: %s\n" % exc)
     raise SystemExit(3)
 try:
-    g = extract.grammar_for(sys.argv[2])
+    g = id_grammar.grammar_for(sys.argv[2])
 except Exception as exc:
-    sys.stderr.write("the anchor extractor could not bind a grammar: %s\n" % exc)
+    sys.stderr.write("the anchor grammar could not bind to this tree: %s\n" % exc)
     raise SystemExit(3)
 slug = sys.argv[3]
 for raw in sys.stdin.read().split("\n"):
@@ -2337,7 +2337,7 @@ for raw in sys.stdin.read().split("\n"):
     except OSError:
         continue
     for i, line in enumerate(body.replace("\r\n", "\n").split("\n"), 1):
-        got = extract.anchor_at(line, g)
+        got = id_grammar.anchor_at(line, g)
         if not got:
             continue
         home = got.split("-", 1)[1].rsplit("-", 1)[0]
@@ -2346,24 +2346,19 @@ for raw in sys.stdin.read().split("\n"):
 '
 ASK_ANCHORS=""; ASK_ANCHOR_WHY=""
 scan_foreign_anchors() { # build folder · slug -> 0 and ASK_ANCHORS, or 1 and ASK_ANCHOR_WHY
-  local _dir="$1" _slug="$2" _rdir _ext _py _rc _askd
+  local _dir="$1" _slug="$2" _rdir _py _rc _askd
   ASK_ANCHORS=""; ASK_ANCHOR_WHY=""
-  if [ -z "$RECALL_CLI" ]; then
-    ASK_ANCHOR_WHY="RECALL_CLI is blank in this project, so the recall kit is not adopted here and the anchor grammar this arm judges by is absent — which is NOT the same answer as no foreign anchor found"
-    return 1
-  fi
-  case "$RECALL_CLI" in */*) _rdir="${RECALL_CLI%/*}" ;; *) _rdir="." ;; esac
-  _ext="$_rdir/extract.py"
-  if [ ! -f "$_ext" ]; then
-    ASK_ANCHOR_WHY="the declared RECALL_CLI names a directory that holds no anchor extractor, so there is no grammar to read and a local copy of its shapes would be a second one: $_ext"
-    return 1
-  fi
   _py=$(resolve_python 2>/dev/null) || _py=""
   if [ -z "$_py" ]; then
-    ASK_ANCHOR_WHY="no python launcher on this node RAN, so the anchor extractor could not be reached; every candidate is executed rather than looked up, because being on PATH is not evidence"
+    ASK_ANCHOR_WHY="no python launcher on this node RAN, so the anchor grammar could not be reached; every candidate is executed rather than looked up, because being on PATH is not evidence"
     return 1
   fi
-  _askd=$(mktemp -d) || { ASK_ANCHOR_WHY="cannot create a capture directory, so the anchor extractor was never run and this folder went unjudged"; return 1; }
+  if ! _rdir=$(resolve_kit_dir "$_py" memory-tree id_grammar.py "$HERE" 2>/dev/null); then
+    ASK_ANCHOR_WHY="the memory-tree kit's id_grammar.py resolved through neither the install receipt nor a probe beside this kit, so there is no grammar to read and a local copy of its shapes would be a second one"
+    return 1
+  fi
+  _rdir=${_rdir%$'\r'}
+  _askd=$(mktemp -d) || { ASK_ANCHOR_WHY="cannot create a capture directory, so the anchor grammar was never run and this folder went unjudged"; return 1; }
   GIT ls-files -- "$_dir" >"$_askd/files" 2>/dev/null
   if [ "$REMOTE_BOUND_LIVE" = 1 ]; then
     timeout -k 5s "$REMOTE_BOUND" "$_py" -c "$ASK_ANCHOR_PY" "$_rdir" "$ROOT" "$_slug" \
@@ -2379,7 +2374,7 @@ scan_foreign_anchors() { # build folder · slug -> 0 and ASK_ANCHORS, or 1 and A
   rm -rf "$_askd" 2>/dev/null
   if [ "$_rc" != 0 ]; then
     ASK_ANCHORS=""
-    [ -n "$ASK_ANCHOR_WHY" ] || ASK_ANCHOR_WHY="the anchor extractor exited $_rc without saying why"
+    [ -n "$ASK_ANCHOR_WHY" ] || ASK_ANCHOR_WHY="the anchor grammar exited $_rc without saying why"
     return 1
   fi
   ASK_ANCHOR_WHY=""

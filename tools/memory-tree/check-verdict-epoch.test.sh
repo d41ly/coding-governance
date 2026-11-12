@@ -60,6 +60,9 @@ engine() { # $1=dir $2=version $3=extra-body-line
     printf 'echo hygiene\n'
     [ -n "$3" ] && printf '%s\n' "$3"
   } > "$1/${PFX}${KIT_NAME}/check-memory-hygiene.sh"
+  # PLAY-dOrderedCharter-16 S5: the gate runs its import walk from the graded tree's kit directory,
+  # so every fixture lays the walk beside its engine, as an install does.
+  cp "$HERE/import_walk.py" "$1/${PFX}${KIT_NAME}/import_walk.py"
 }
 
 commit_engine() { # $1=dir $2=version $3=extra-body-line $4=message
@@ -278,6 +281,50 @@ BASE_Q=$(cd "$Q" && git rev-parse HEAD)
 arm 'a sibling a delegate imports and DELEGATES omits exits 2 naming both' 2 "$KIT_REL/newmod.py is imported by $KIT_REL/design_lib.py and is not in DELEGATES" "$Q" "$BASE_Q"
 printf 'def load(:\n    import newmod\n' > "$Q/$KIT_REL/design_lib.py"
 arm '...and a delegate that does not parse exits 2 naming it' 2 "$KIT_REL/design_lib.py does not parse, so its imports were not read" "$Q" "$BASE_Q"
+
+# ---- 5f. THE GRAMMAR IS A DELEGATE (PLAY-dOrderedCharter-18). The id grammar moved out of the recall
+# kit into this kit's `id_grammar.py`, so its change dates a verdict the way any delegate's does: a
+# behaviour-bearing edit with the constant unmoved FAILS naming it. Then the same tree is graded by a
+# copy of this gate whose DELEGATES drops `${_kit}id_grammar.py`, and the import-closure walk exits 2
+# naming it and the delegate that imports it. The copy sits beside the gate, where its own-directory
+# derivation reads the same kit prefix, and is removed by the EXIT trap. The gate before the move,
+# which scanned the grammar only through a resolved recall kit, exits 0 clean on the first fixture.
+GR=$(newrepo grammar)
+engine "$GR" 1.5 ""
+printf 'def grammar(root):\n    import id_grammar\n    return id_grammar.grammar_for(root)\n' > "$GR/$KIT_REL/corpus_ids.py"
+printf 'ERAS = ("flat",)\n' > "$GR/$KIT_REL/id_grammar.py"
+( cd "$GR" && git add -A && git commit -qm base --no-verify ) >/dev/null
+BASE_GR=$(cd "$GR" && git rev-parse HEAD)
+printf 'ERAS = ("flat", "session")\n' > "$GR/$KIT_REL/id_grammar.py"
+( cd "$GR" && git add -A && git commit -qm "the grammar widens an era, no bump" --no-verify ) >/dev/null
+arm 'an id_grammar.py edit with no bump FAILS naming it' 1 "moved: $KIT_REL/id_grammar.py" "$GR" "$BASE_GR"
+MUT="$HERE/check-verdict-epoch.mut$$.sh"
+trap 'rm -rf "$TMP" "$MUT"' EXIT
+sed 's/ \${_kit}id_grammar\.py / /' "$GATE" > "$MUT"
+if grep -q '{_kit}id_grammar\.py' "$MUT"; then
+  fails=$((fails+1)); printf 'arm FAIL  %s\n' 'the DELEGATES-drop plant did not remove id_grammar.py from the gate copy'
+else
+  GATE_SAVED=$GATE; GATE=$MUT
+  arm '...and a gate whose DELEGATES drops id_grammar.py exits 2 naming it and its importer' 2 "$KIT_REL/id_grammar.py is imported by $KIT_REL/corpus_ids.py and is not in DELEGATES" "$GR" "$BASE_GR"
+  GATE=$GATE_SAVED
+fi
+rm -f "$MUT"
+
+# ---- 5g. THE WALK IS LIFTED, ITS READING KEPT (PLAY-dOrderedCharter-16 S5). The closure moved into
+# `import_walk.py`, which the layer check shares and which also yields `dynamic` loads; this gate
+# keeps its static reading. A delegate reaching one sibling through a nested `from` import and
+# another module only through `importlib.import_module` prints the closure line the inline walk
+# printed, the dynamic load counted nowhere. Red against a walk that counts dynamic rows, which
+# exits 2 naming `newmod.py`.
+L=$(newrepo lifted)
+engine "$L" 1.5 ""
+printf 'import importlib\ndef render(root):\n    from deviation_join import read_record\n    return read_record(root), importlib.import_module("newmod")\n' > "$L/$KIT_REL/design_lib.py"
+printf 'def read_record(path):\n    return path\n' > "$L/$KIT_REL/deviation_join.py"
+printf 'X = 1\n' > "$L/$KIT_REL/newmod.py"
+printf 'X = 1\n' > "$L/${PFX}check-spec-tokens.py"
+( cd "$L" && git add -A && git commit -qm base --no-verify ) >/dev/null
+BASE_L=$(cd "$L" && git rev-parse HEAD)
+arm 'the lifted walk prints the inline walk'"'"'s closure line, a dynamic load no sibling' 0 "the delegates' import closure is 2 sibling module(s) and 1 other scanned file(s), every sibling in DELEGATES" "$L" "$BASE_L"
 
 # ---- 6. this repo, right now --------------------------------------------------------------------
 # The live tree must be clean, and it must be clean because the constant MOVED — not because nothing

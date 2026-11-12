@@ -161,7 +161,7 @@ def append_only_re(root: str) -> re.Pattern:
 
 def load_defined_ids(root: str, grammar_dir=None):
     """`(ids, None)`: every id this corpus DEFINES, from `corpus_ids`' one walk — or `(None, why)` when
-    the id grammar's kit is absent, which check 18 ANNOUNCES rather than reds (TOOL-aGraftedHelix-3).
+    the id grammar's module is absent, which check 18 ANNOUNCES rather than reds (TOOL-aGraftedHelix-3).
 
     The set `corpus_ids.py --print-defined-ids` prints, reached in-process the way `append_only_re`
     reaches its sibling, so there is still ONE id grammar: a decision recorded as a spec H1 or a backlog
@@ -180,8 +180,8 @@ def load_defined_ids(root: str, grammar_dir=None):
         spec.loader.exec_module(mod)
         if grammar_dir is not None:
             mod.GRAMMAR_DIR = pathlib.Path(grammar_dir)
-        if not (mod.GRAMMAR_DIR / "extract.py").is_file():
-            return None, "the id grammar lives in the memory-recall kit, which is not installed beside this one"
+        if not (mod.GRAMMAR_DIR / "id_grammar.py").is_file():
+            return None, "the id grammar lives in id_grammar.py, which is not installed beside this module"
         return set(mod.walk(root, mod.load_conf(root))["defs"]), None
     except Exception as exc:  # noqa: BLE001 — the sibling's own Problem is a different class
         raise Problem(f"gotchas: could not ask corpus_ids for the defined-id set: "
@@ -1240,10 +1240,31 @@ def cmd_selftest() -> int:
         globals()["load_defined_ids"] = lambda root: real_load(root, grammar_dir=os.path.join(base, "no-grammar"))
         try:
             arm("an absent id-grammar kit is announced NOT resolved and exits 0",
-                "decision ARCH-tOne-1 NOT resolved — the id grammar lives in the memory-recall kit, which is "
-                "not installed beside this one\n[rc=0]", lambda: cmd_check(ti, ci))
+                "decision ARCH-tOne-1 NOT resolved — the id grammar lives in id_grammar.py, which is "
+                "not installed beside this module\n[rc=0]", lambda: cmd_check(ti, ci))
         finally:
             globals()["load_defined_ids"] = real_load
+        # PLAY-dOrderedCharter-17 AC2: check 18's grammar is this kit's own, so a tree with no recall
+        # kit still resolves ids — an undefined decision reds by name, and nothing is announced absent.
+        tn, cn = build_tree("inv-norecall", {"n.md": build_invariant("n", decision="ARCH-tNone-9")})
+        # PLAY-dOrderedCharter-70 S18: run from a COPY of this kit with no memory-recall sibling, so an import that
+        # regains the recall kit fails here rather than resolving against the real install beside this file.
+        import shutil
+        here = os.path.dirname(os.path.abspath(__file__))  # the copy sits at this kit's last two segments
+        kit_copy = os.path.join(tn, os.path.basename(os.path.dirname(here)), os.path.basename(here))
+        # the whole kit, not its *.py alone: corpus_ids asks check-memory-hygiene.sh for its sets
+        shutil.copytree(here, kit_copy,
+                        ignore=shutil.ignore_patterns("__pycache__"))
+
+        def run_kit_copy():
+            p = subprocess.run([sys.executable, os.path.join(kit_copy, "gotchas.py"), "--check"], cwd=tn,
+                               capture_output=True, text=True, encoding="utf-8")
+            print(p.stdout + p.stderr, end="")
+            return p.returncode
+        arm("with no recall kit, check 18 reds an undefined decision by name", "names decision ARCH-tNone-9, "
+            "which no record in this corpus defines", run_kit_copy)
+        arm("...and announces no grammar kit absent", "[rc=0]",
+            lambda: 0 if load_defined_ids(tn)[1] is None else 1)
 
         # A leg name resolves through a fixture manifest, and the reds a SET manifest makes possible.
         tl, cl = build_tree("inv-leg", {"l.md": build_invariant("l", over={"Guarded by": "`fixture leg`"})}, legs)

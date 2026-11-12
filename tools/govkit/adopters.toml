@@ -3,7 +3,7 @@
 # for it, because the playbook renderer ships that file to every adopter.
 #
 # TOOL-aRepatriatedFork-31. `govkit.py selfcheck` arm 10 bans every `names` spelling,
-# case-insensitively, from every file `govkit.py shipped` lists, so an adopter is covered the day its
+# case-insensitively, from every file `govkit.py shipped --epoch` lists, so an adopter is covered the day its
 # row lands here. The class it closes: an adopter's brand gate reds on ANOTHER adopter's name, and a
 # shipped provenance comment is how one reached it.
 #

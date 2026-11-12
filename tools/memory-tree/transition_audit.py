@@ -105,82 +105,25 @@ def resolve_root() -> pathlib.Path:
                   f"no declaration to read the watched paths from")
 
 
-# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
-def resolve_kit_dir(home, anchor, here):
-    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
-
-    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
-       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
-       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
-       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
-    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
-    3. refuse — LookupError naming the three places looked; never a guessed prefix.
-    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
-    """
-    import json
-    import pathlib
-    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
-    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
-    receipt = root / ".governance" / "install.json"
-    try:
-        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
-    except (OSError, ValueError, AttributeError):
-        rows = []
-    for row in rows:
-        if not isinstance(row, dict) or not row.get("path"):
-            continue
-        src = str(row.get("source") or "").split("/")
-        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
-        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
-            continue
-        hit = (root / str(row["path"])).absolute()
-        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
-            return hit.parent
-    probes = (here / home, here.parent / home)
-    for cand in probes:
-        if (cand / anchor).is_file():
-            return cand
-    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
-        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
-# <<< resolve_kit_dir
-
-
-def resolve_recall_kit() -> pathlib.Path:
-    """The memory-recall kit directory of THIS install, through the one resolver.
-
-    The same call `merge-rows.py` makes (TOOL-aRepatriatedFork-2 S3): the install receipt first,
-    which is the only record of a kit dir an adopter RENAMED, then the two probes beside this kit.
-    The CODE comes from this install and the grammar from the audited tree's conf, which is the
-    split `merge-rows.py` already keeps. THERE IS NO DEGRADED MODE: keying rows by anything but the
-    declared anchor grammar grades a different population under a rule nobody configured, which is
-    worse than refusing and harder to notice.
-    """
-    try:
-        return resolve_kit_dir("memory-recall", "extract.py", pathlib.Path(__file__).resolve().parent)
-    except LookupError as exc:
-        looked = str(exc)
-    raise Problem(
-        f"the `memory-recall` kit is not installed beside this one ({looked}). Check 26 "
-        f"keys every delta row through that kit's anchor grammar and there is no degraded mode: a "
-        f"second row grammar spelled here would be two answers to one question. "
-        f"Remedy: install the memory-recall kit")
-
-
 def resolve_anchor(root: pathlib.Path):
-    """`(anchor_at, grammar)` bound to THIS tree, imported lazily from the memory-recall kit.
+    """`(anchor_at, grammar)` bound to THIS tree, from this kit's own `id_grammar.py`.
 
-    Lazy on purpose, and the same import `merge-rows.py` makes: at module scope an import failure
-    would kill the commit-msg hook before it could name what is missing, and a hook that dies with a
-    traceback reads as a broken repository rather than as a missing kit.
+    Lazy on purpose: at module scope an import failure would kill the commit-msg hook before it
+    could name what is missing, and a hook that dies with a traceback reads as a broken repository.
+    The CODE comes from this install and the grammar from the audited tree's conf, which is the
+    split `merge-rows.py` keeps. THERE IS NO DEGRADED MODE: keying rows by anything but the declared
+    anchor grammar grades a different population under a rule nobody configured.
     """
-    kit = resolve_recall_kit()
-    # APPEND, never `insert(0, ...)`: prepending puts the kit dir ahead of the stdlib, so any module
-    # name it ever gains shadows the real one.
-    if str(kit) not in sys.path:
-        sys.path.append(str(kit))
-    import extract as EX   # noqa: PLC0415 — deliberately deferred; see above
-
-    return EX.anchor_at, EX.grammar_for(str(root))
+    add_kit_to_path()
+    try:
+        import id_grammar  # noqa: PLC0415 — deliberately deferred; see above
+    except ImportError as exc:
+        raise Problem(
+            f"this kit's id_grammar.py does not import beside it ({KIT.as_posix()}: {exc}). Check 26 "
+            f"keys every delta row through that anchor grammar and there is no degraded mode: a "
+            f"second row grammar spelled here would be two answers to one question. "
+            f"Remedy: reinstall the memory-tree kit") from None
+    return id_grammar.anchor_at, id_grammar.grammar_for(str(root))
 
 
 def add_kit_to_path() -> None:
@@ -515,7 +458,7 @@ class Walk:
         self._anchor = None
 
     def resolve_grammar(self):
-        """The anchor grammar, resolved on FIRST USE so a dormant tree never needs the recall kit."""
+        """The anchor grammar, resolved on FIRST USE so a dormant tree never reads it."""
         if self._anchor is None:
             self._anchor = resolve_anchor(self.root)
         return self._anchor
@@ -525,7 +468,7 @@ class Walk:
 
         Full mode resolves it eagerly, before any merge is classified, and hands it here. Doing it
         lazily was a measured defect: a warm delta cache answers every merge without ever keying a
-        row, so a tree whose memory-recall kit had been deleted reported a clean audit — the
+        row, so a tree whose grammar module had been deleted reported a clean audit — the
         refusal S15 owes never fired because nothing asked for the grammar.
         """
         self._anchor = pair
@@ -702,16 +645,16 @@ def derive_cache_key(walk: Walk) -> str:
 
     RESOLVED VALUES, never the conf's bytes, so a comment edit keeps the cache warm. The grammar
     enters as its compiled PATTERNS, which carry the families, the cited families and the node-tag
-    eras exactly. The memory-recall conf's own `digest()` rides beside them because it folds that
-    kit's version, and `anchor_at`'s code lives there, where this module's `CACHE_EPOCH` cannot
+    eras exactly. The conf's own `digest()` rides beside them because it folds the grammar
+    module's own bytes, and `anchor_at`'s code lives there, where this module's `CACHE_EPOCH` cannot
     see it move. Two worktrees that declare differently now recompute in turn over one shared
     entry instead of reading each other's delta: that costs wall clock and never a verdict.
     """
     _anchor, grammar = walk.resolve_grammar()
-    import recall_conf    # noqa: PLC0415 — the sibling kit's dir is on the path once the grammar is
+    import id_grammar    # noqa: PLC0415 — this kit's dir is on the path once the grammar is
 
     parts = [walk.memory_root, walk.prefix, walk.archive_re.pattern, walk.conf_rel, grammar.ID,
-             *(pat.pattern for pat in grammar.anchors), recall_conf.resolve(walk.root).digest()]
+             *(pat.pattern for pat in grammar.anchors), id_grammar.resolve(walk.root).digest()]
     return hashlib.sha1("\0".join(parts).encode("utf-8")).hexdigest()[:16]
 
 
@@ -798,8 +741,8 @@ def scan_history(root: pathlib.Path, tips: list, expect_builds: bool, account_ti
                         "about the clone and not about the tree")
 
     # THE PREREQUISITE, ASSERTED BEFORE ANYTHING IS GRADED. Every delta row is keyed through the
-    # memory-recall kit's anchor grammar and there is no degraded mode, so a builds-mode tree
-    # without that kit is refused by name here rather than wherever the first row happens to be
+    # kit's anchor grammar and there is no degraded mode, so a builds-mode tree whose grammar
+    # module does not import is refused by name here rather than wherever the first row happens to be
     # keyed — which, with a warm cache, is nowhere at all.
     grammar = resolve_anchor(root)
 

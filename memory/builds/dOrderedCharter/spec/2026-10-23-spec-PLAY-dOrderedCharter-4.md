@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-4 — the instruction map re-injected on compact and resume through the existing replay fragment
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 25 · advances PLAY-dOrderedCharter-38
+**Status:** CLOSED · rev-5 · 2026-11-09 · node d · Tier-2 · base ce13efbe · streams playbook · order 25 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0034@06f1afc5 whole
 
@@ -14,13 +14,20 @@
 | [2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md](../build/2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-build-PLAY-dOrderedCharter-4-deviation-41.md](../build/2026-10-24-build-PLAY-dOrderedCharter-4-deviation-41.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-4-deviation-42.md](../build/2026-10-24-build-PLAY-dOrderedCharter-4-deviation-42.md) | deviation | — |
-| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY-dOrderedCharter-76 PLAY-dOrderedCharter-77 PLAY-dOrderedCharter-78 PLAY-dOrderedCharter-80 PLAY-dOrderedCharter-81 PLAY-dOrderedCharter-82 PLAY-dOrderedCharter-83 PLAY-dOrderedCharter-84 PLAY-dOrderedCharter-85 PLAY-dOrderedCharter-86 PLAY-dOrderedCharter-87 PLAY-dOrderedCharter-88 |
 | [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-25-build-PLAY-dOrderedCharter-4-deviation-43.md](../build/2026-10-25-build-PLAY-dOrderedCharter-4-deviation-43.md) | deviation | — |
+| [2026-11-02-build-PLAY-dOrderedCharter-4-ledger.md](../build/2026-11-02-build-PLAY-dOrderedCharter-4-ledger.md) | journal | — |
+| [2026-11-09-build-PLAY-dOrderedCharter-4-1-builder-return.md](../build/2026-11-09-build-PLAY-dOrderedCharter-4-1-builder-return.md) | journal | — |
+| [2026-11-09-build-PLAY-dOrderedCharter-4-deviation-703.md](../build/2026-11-09-build-PLAY-dOrderedCharter-4-deviation-703.md) | deviation | — |
+| [2026-11-10-build-PLAY-dOrderedCharter-1-runlog-8d3cc031.md](../build/2026-11-10-build-PLAY-dOrderedCharter-1-runlog-8d3cc031.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY-dOrderedCharter-76 PLAY-dOrderedCharter-77 PLAY-dOrderedCharter-78 PLAY-dOrderedCharter-80 PLAY-dOrderedCharter-81 PLAY-dOrderedCharter-82 PLAY-dOrderedCharter-83 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-33 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-11-02-prompt-PLAY-dOrderedCharter-4-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-4-build-brief.md) | journal | — |
+| [2026-11-04-prompt-PLAY-dOrderedCharter-27-drift-sweep-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-27-drift-sweep-brief.md) | research | PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-55 |
+| [2026-11-08-prompt-PLAY-dOrderedCharter-27-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-27-drift-fold-brief.md) | research | PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -42,15 +49,21 @@ that already fires on `resume|compact`, and adds no third SessionStart entry.
   `python tools/playbook/instruction_units.py map` prints `render_instruction_map`'s lines, the
   function PLAY-dOrderedCharter-2 lands in that module, wrapped by S16's `render_envelope` with the
   charter's registry row (`doc.charter`, level 0) and the direction `the instruction map: rebuild the
-  hierarchy from it before acting`. Observed by AC1, AC3.
+  hierarchy from it before acting`. The helper is the playbook kit's inline copy, which unit 3's S3
+  places in `tools/playbook/render_playbook.py`; the verb imports it from that module inside the
+  function, as `tools/playbook/instruction_units.py#derive_instruction_tokens` imports that module's
+  readers. Those lines are the eight level lines, then, while a registry row carries `hold`, the one
+  `held —` line unit 2's S3 renders from it, then S2's preset line. Observed by AC1, AC3.
 - **S2** — The preset line. `render_instruction_map` gains one last line naming the active policy
   preset, foundations R2's third part of the map, so the charter's map section and the replay carry
   it alike. Until presets exist it is a constant naming the hand-over and pointing at `policy.py get <key>
   --explain`, which prints each key's source, rather than restating the resolution order. Observed by
   AC1.
 - **S3** — The bound. The verb refuses past `MAP_CAP_BYTES = 1792` (exit 2, one `instruction-map:`
-  line, no map), and each level line is cut at `MAP_LINE_BYTES = 160` with `… (+<k>)`. Observed by
-  AC2.
+  line, no map), and each level line is cut at `MAP_LINE_BYTES = 160` with `… (+<k>)`. The cap counts
+  every printed line, the `held —` line included: eight level lines at the cut, 161 bytes each with
+  their newline, and that line's 139 bytes PINNED at unit 2's `d0c16d29` leave 364 bytes for the preset
+  line and the envelope's two. Observed by AC2.
 - **S4** — `print_replay` in `skills/session-kickoff/manifest-check.sh` prints a `map —` block before
   the stored card, through a new `derive_map_block` that resolves the module as an optional sibling
   (`resolve_kit_file playbook instruction_units.py`) and bounds the call as the `overlaps —` cell
@@ -93,6 +106,7 @@ that already fires on `resume|compact`, and adds no third SessionStart entry.
 ```
 [AGENTS.md · Level 0 · the instruction map: rebuild the hierarchy from it before acting]
 <render_instruction_map's lines, one per level 0 to 7>
+<the held — line, while a registry row carries hold>
 preset — none: presets join the policy reader at dKeptSession; a key's source: policy.py get <key> --explain
 [/AGENTS.md]
 ```
@@ -105,7 +119,9 @@ preset — none: presets join the policy reader at dKeptSession; a key's source:
 - `MAP_CAP_BYTES = 1792`: a map past it exits 2 printing one `instruction-map: <bytes> over
   MAP_CAP_BYTES` line and no map, because every field is bounded and an overflow means a derivation
   went wrong, the rule `write_card` keeps (`skills/session-kickoff/manifest-check.sh:703-718`).
-- `--root <dir>` (default: the git toplevel of the working directory) names the tree whose
+- `--root <dir>` (default: the git toplevel of the working directory, read through
+  `tools/playbook/instruction_units.py#run_git`, which decodes its output as UTF-8, so the verb adds no
+  call the encoding-posture leg reds) names the tree whose
   registry is read. The verb exits 0 with the map, 2 on a refusal, never 1: it is a renderer.
 
 ### The preset line
@@ -128,7 +144,8 @@ card's tail, never the level-0 map.
 
 `derive_map_block` follows `derive_overlaps_line` (`:555-589`) rung for rung:
 
-1. `resolve_kit_file playbook instruction_units.py` (`:854-866`) empty → `map — skipped: no playbook
+1. `resolve_kit_file playbook instruction_units.py`
+   (`skills/session-kickoff/manifest-check.sh#resolve_kit_file`) empty → `map — skipped: no playbook
    instruction map resolves in this tree`.
 2. `resolve_python` empty → `map — skipped: no Python resolves on this node`.
 3. No working `timeout -k` → the same `skipped:` form the overlaps cell prints.
@@ -156,7 +173,9 @@ unchanged.
 ### Rollout
 
 The replay's first line changes in every tree that takes this release. No switch: the map is
-read-only output and the fallback is today's replay plus one line.
+read-only output and the fallback is today's replay plus one line. The verb's selftest arms lay their
+scratch registry out through `tools/playbook/instruction_units.py#derive_tool_rel` and spell no kit
+path, as the shipped-surface ban requires since unit 72.
 
 ### Files touched (estimate)
 
@@ -167,8 +186,8 @@ read-only output and the fallback is today's replay plus one line.
 ### Alternatives rejected
 
 - **A third SessionStart fragment printing the map.** Refused by the clause and by `check_card`
-  (`tools/check-wiring.sh:1044-1046`), which iterates exactly the two card fragments, so a third
-  entry would be wiring no arm grades.
+  (`tools/check-wiring.sh:1044-1046`, today `tools/check-wiring.sh#check_card`), which iterates exactly
+  the two card fragments, so a third entry would be wiring no arm grades.
 - **Storing the map in the card at write time.** The card is per session and written at startup; a
   map stored there goes stale when a registry row changes mid-session, and the replay's job is to
   print what holds now.
@@ -193,7 +212,8 @@ read-only output and the fallback is today's replay plus one line.
 ## 6. Acceptance criteria
 
 - **AC1** — When `python instruction_units.py map --root <fixture>` runs over a
-  scratch tree holding a document registry with one row at level 0 and one at level 5, it prints the
+  scratch tree holding a document registry with one row at level 0 and one at level 5, neither carrying
+  `hold`, it prints the
   `[AGENTS.md · Level 0 · ` opener, `render_instruction_map`'s eight level lines in order 0 to 7, the
   `preset —` line last before the envelope's closer line (§4's form, naming `AGENTS.md`), and exits 0; the charter's map section
   rendered from the same fixture carries the same `preset —` line, which names `policy.py get <key>
@@ -230,7 +250,7 @@ read-only output and the fallback is today's replay plus one line.
 
 ## 7. Gates
 
-`govkit acceptance matrix` · `lexicon naming predicates` · `manifest-check self-test` · `playbook render selftest` · `scratch-guard self-test` · `check-wiring self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit acceptance matrix` · `lexicon naming predicates` · `manifest-check self-test` · `playbook render selftest` · `scratch-guard self-test` · `check-wiring self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
 
 New arm: skills/session-kickoff/manifest-check.test.sh · covers AC4 AC5 AC6 · the replay's map-first order, its three skipped forms and the writer's absence of a map, its failing case staged by printing the map after the card · none
 New arm: tools/playbook/render_playbook.py · covers AC1 AC2 · `--selftest` arms rendering the `map` verb over a two-row registry and an over-cap one, staged by dropping the preset line from the verb's output · none
@@ -259,17 +279,30 @@ New arm: tools/playbook/render_playbook.py · covers AC1 AC2 · `--selftest` arm
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §2 S2 · §3 Non-goals · §4 The verb, The preset line · AC1 · §8 F3's evidence · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 31: the preset line stops restating the resolution order, which dGroundRules' reader extends with a last-valid source and a derived-default refusal, and points at `policy.py get <key> --explain`; F3 keeps its resolution.
+- rev-4 · 2026-11-04 · section 4 The replay, Alternatives rejected · section 7 · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-27-1-spec-writer.md`, the drift sweep's findings 4-1 and 4-2 read at `c7269a97`: the leg line names `policy fixtures`, whose guard `skills/session-kickoff/manifest-check.sh` trips; `resolve_kit_file` and `check_card` carry their stable forms beside their moved lines, and the reuse audit stops saying the scout's `check_card` line holds.
+- rev-5 · 2026-11-08 · S1 S3 · section 4 The verb, Rollout · AC1 · from
+  `2026-11-08-prompt-PLAY-dOrderedCharter-27-drift-fold-brief.md`: re-read at `eb1c90a1c`. Unit 2's map
+  now renders a `held —` line while a registry row carries `hold`, so S1 and the verb's form print it
+  before the preset line, S3's cap counts it, and AC1's fixture states it holds none, as unit 2's F5
+  relies on; S1 names the `render_envelope` copy the verb imports, unit 3's in
+  `tools/playbook/render_playbook.py`; the `--root` read goes through the module's UTF-8 `run_git`, after
+  unit 73's encoding finding, and the arms derive their paths since unit 72. Re-checked unchanged:
+  `print_replay` at `skills/session-kickoff/manifest-check.sh:721-725`, `derive_overlaps_line` at
+  `:555-589`, `skills/session-kickoff/manifest-check.sh#write_card` refusing an over-cap card, two card
+  fragments under `check_card`, and `LEVELS`' eight levels.
 
 ## 10. Reuse audit
 
 The seams extended: the replay `print_replay` (`skills/session-kickoff/manifest-check.sh:721-725`)
 and its existing fragment `orientation-replay.fragment.json` (matcher `resume|compact`); the bounded
-optional-sibling probe `derive_overlaps_line` (`:555-589`) with `resolve_kit_file` (`:854-866`),
+optional-sibling probe `derive_overlaps_line` (`:555-589`) with `resolve_kit_file`
+(`skills/session-kickoff/manifest-check.sh#resolve_kit_file`),
 whose rungs `derive_map_block` follows and whose resolver it calls rather than spelling a sibling
 path; PLAY-dOrderedCharter-2's `render_instruction_map` and PLAY-dOrderedCharter-3's
 `render_envelope` and `read_document_registry`, consumed, never retyped. The scout row
 (`2026-10-23-build-PLAY-dOrderedCharter-1-reuse-scout-a.md`, unit -4) was verified against source:
-`print_replay` sits at `:721` and `check_card` at `tools/check-wiring.sh:1044`, as it states.
+`print_replay` sits at `:721`, as it states; its `check_card` at `tools/check-wiring.sh:1044` has since
+moved, and this spec cites it as `tools/check-wiring.sh#check_card`.
 `reuse_lookup.py "re-inject the instruction map on compact and resume through the session start replay hook"`
 ranked `map_root`, `load_map_tree` and `render_map_md` (`tools/codebase-map/map_lib.py`), the
 codebase map's dossier renderers, which render no instruction ladder, and `extract_session` and

@@ -1,4 +1,4 @@
-<!-- gov:kit policy@1.4 -->
+<!-- gov:kit policy@1.5 -->
 # policy — one file for a repository's policy, and the catalogue that is its schema
 
 A repository's policy lives in ONE file, `.governance/policy.toml`, TOML 1.0, read through `tomllib`
@@ -281,14 +281,17 @@ pinned LF in `.gitattributes`. `render_mirror(repo, rev)` renders it for one rev
 {
   "catalogue_blob": "<blob id of this kit's catalogue at the revision>",
   "keys": {"budgets.enforce": {"reason": "...", "source": "file", "value": "warn"}},
-  "legacy_blobs": {".agent-cap.conf": "<its blob id at the revision, or null when absent>"},
+  "legacy_blobs": {".agent-cap.conf": "<its blob id at the revision, or null when absent>",
+                   ".governance/instructions.toml": "<the same>"},
   "policy_blob": "<blob id of .governance/policy.toml at the revision, or null when absent>"
 }
 ```
 
 **Every input the resolution reads is pinned** (TOOL-dGroundRules-21 S17). `legacy_blobs` maps each
 legacy input `resolve_read` reads, `LEGACY_INPUTS` in `policy.py`, today `.agent-cap.conf`, whose
-`FANOUT_CAP` lowers the agent limit, to its blob id at the rendered revision or null, and the helper
+`FANOUT_CAP` lowers the agent limit, and the instruction overlay `.governance/instructions.toml`, whose
+`[[policy]]` rows are the rows of the repository's own `adopter.` keys (PLAY-dOrderedCharter-32), to its
+blob id at the rendered revision or null, and the helper
 reads a mirror whose recorded id differs at L, or that carries no `legacy_blobs`, as STALE, so a
 landing that changes the conf alone is never read through a mirror holding the old limit. THE RULE: a
 unit adding a resolution input adds its path to `LEGACY_INPUTS`, so its blob joins this map.
@@ -331,7 +334,8 @@ Python and shell consumers call the reader, never the mirror.
 ## The guard
 
 The stand-in, until dDeclaredLoop's guard lands, for the defaults of `policy-file.guard` and
-`policy-file.proof`, owner-only and the TTY proof, enforced without reading either key: `guard.py`
+`policy-file.proof`, owner-only outside a live unattended run's branch, and the TTY proof, enforced
+without reading either key: `guard.py`
 imports no reader. gov's `.githooks/pre-commit` carries its block, above the legs. When a path
 `guarded-paths.txt` lists at HEAD is staged, the block admits on the owner's terminal proof,
 `[ -t 2 ]`, since git leaves a hook's stderr as the committer's; otherwise it runs
@@ -364,13 +368,31 @@ policy change is one commit and its regenerated mirror the next. What remains mu
   carrying `RAISED <old> -> <new>`;
 - `memory/DECISIONS.md` is staged with at least one `- ` row added and no line removed.
 
+A change those conditions refuse is still admitted on a live run's branch (PLAY-dOrderedCharter-84),
+reading no policy key and asking for no decision row. `check_run_mandate` reads `HEAD` alone, each
+step stopping at its first miss: the branch, `git symbolic-ref -q HEAD` (none: `HEAD is detached`);
+the candidates, the run-state files `git grep -l` finds naming it over `:(glob)**/builds/*/RUN.md` at
+`HEAD`, kept where `read_run_fact`'s `run-branch`, `refs/heads/` off, is the branch (none:
+`no run-state file at HEAD names <branch> as its run-branch`), so a run-state file staged in the same
+commit grants nothing; the terminal set, the `PHASES_TERMINAL="..."` line of each
+`unattended.sh` at `HEAD` at any depth, parsed and never imported (none:
+`no unattended driver at HEAD declares PHASES_TERMINAL, so no phase reads live`; more than one set, or
+a token not `[A-Z]+`: `the PHASES_TERMINAL declarations at HEAD read <values>, not one set of phase
+tokens`); and the phase, the first candidate in path order whose `phase` is a phase token outside
+that set admitting (else, per candidate, `<path> names <branch> and its phase at HEAD, <PHASE>, is
+terminal`, or `'<value>', is no phase token`). `read_run_fact` follows the driver's `fact` grammar:
+one trailing CR off each line, the `## Run facts` section to the next `## ` line, the first
+`<key>:` line winning, leading spaces off the value. An admission prints
+`policy-guard: admitted · <paths> · the run-branch of <run-state path>, phase <PHASE>`.
+
 Exit 0 prints `policy-guard: admitted · budgets.<cap> <old> -> <new> · its change record attached`.
-Exit 1 prints every failed condition as `policy-guard: refused · <path> · <why>`, then one remedy
-line, which names `git restore --staged --worktree` for the mirror, since the landing renders it with
-no hook firing. Exit 2 is a git read that failed. It stops forgetting, not evasion: `--no-verify`, a
-pty wrapper, a list line removed one commit before the change, another clone, a cherry-pick or rebase,
-and a guard file deleted from the working tree all pass it, and the push-time bar does not re-judge
-authorship. The block is gov's own; the runbook's copy instructions do not carry it.
+Exit 1 prints every failed condition as `policy-guard: refused · <path> · <why>`, then each reason no
+live run admits it as `policy-guard: not a live run's branch · <why>`, then one remedy line, which
+names `git restore --staged --worktree` for the mirror, since the landing renders it with no hook
+firing. Exit 2 is a git read that failed. It stops forgetting, not evasion: `--no-verify`, a pty
+wrapper, a list line removed one commit before the change, another clone, a cherry-pick or rebase, a
+guard file deleted from the working tree, and a run-state file committed naming the agent's own
+branch with a live phase all pass it, and the push-time bar does not re-judge authorship. The block is gov's own; the runbook's copy instructions do not carry it.
 
 ## The arms
 

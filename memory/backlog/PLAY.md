@@ -52,8 +52,4 @@ Cite ids, never line numbers.
 | [PLAY-dConvergedCharter-35](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | LOW | PLAY-dConvergedCharter-8 | 2026-11-04 | TWO PARENTS NAME THE WIRING LEGS DIFFERENTLY. PLAY-dOrderedCharter-20… |
 | [PLAY-dConvergedCharter-36](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | LOW | PLAY-dConvergedCharter-22 | 2026-11-04 | THE RULING KIND STAYS UNARMED IN GOV. TOOL-dLinkedLibrary-8 gives the… |
 | [PLAY-dConvergedCharter-37](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | LOW | PLAY-dConvergedCharter-12 | 2026-11-04 | THE UNATTENDED SUITE ASKS OUTLIVE THE SUITES. PLAY-dClosedLoop-11 to… |
-| [PLAY-dOrderedCharter-38](../builds/dOrderedCharter/BACKLOG.md) | DEFERRED | MED | PLAY-dOrderedCharter-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
-| [PLAY-dOrderedCharter-56](../builds/dOrderedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE SLOTS NAME dBoundRoles AS THEIR RENDERER. PLAY-dOrderedCharter-17's… |
-| [PLAY-dOrderedCharter-57](../builds/dOrderedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE LOAD SET TAKES NO FEATURE SELECTION. TOOL-dFurnishedOrders-18… |
-| [PLAY-dOrderedCharter-58](../builds/dOrderedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE FEATURE SELECTOR NAMES THE WRONG ARMING BUILD.… |
-| [PLAY-dOrderedCharter-59](../builds/dOrderedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE TYPED-KIND FILE-NAME JOIN READS A LOOSE STEM. The typed-kind join… |
+| [PLAY-dOrderedCharter-66](../builds/dOrderedCharter/BACKLOG.md) | OPEN | MED | — | 2026-11-04 | BUILD-METHOD HOLDS NO ENVELOPE. PLAY-dOrderedCharter-3's interim keeps… |

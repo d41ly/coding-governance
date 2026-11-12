@@ -26,7 +26,6 @@ tools/govkit/selftest.py	file-io	1	govkit self-test, shipped by no descriptor
 tools/govkit/selftest.py	subprocess	24	govkit self-test, shipped by no descriptor
 tools/lexicon/selftest.py	subprocess	31	project-owned kit self-test, withheld from adopters
 tools/memory-recall/check-recall.py	subprocess	1	project-owned recall check, withheld from adopters
-tools/memory-recall/extract.py	subprocess	1	forked recall source, never sent to an adopter
 tools/memory-recall/query.py	subprocess	1	forked recall source, never sent to an adopter
 tools/memory-recall/selftest.py	subprocess	13	project-owned kit self-test, withheld from adopters
 tools/memory-recall/test_recall_floor.py	subprocess	4	project-owned recall floor, withheld from adopters

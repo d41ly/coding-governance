@@ -13,7 +13,6 @@
 agent-cap restatement	repo	product
 agent-cap restatement self-test	kit	selftests
 agent-cap self-test	kit	selftests
-agent-instructions self-test	kit	selftests
 agent-instructions wiring	repo	wiring
 backlog migration selftest	kit	selftests
 branch-guard self-test	repo	selftests
@@ -30,6 +29,11 @@ codebase-map adopter e2e	kit	e2e
 codebase-map coverage + freshness	repo	declarations
 codebase-map gate coverage	repo	declarations
 codebase-map kit selftest	kit	selftests
+core kinds	repo	declarations
+core meta-check	repo	declarations
+core practices conformance	repo	declarations
+core selftest	kit	selftests
+core skills conformance	repo	declarations
 corpus-ids selftest	kit	selftests
 dead-path carriers (deleted files still named)	repo	declarations
 dead-path carriers self-test	kit	selftests
@@ -37,6 +41,7 @@ docs	repo	declarations
 drift-audit records	repo	declarations
 drift-audit selftest	kit	selftests
 drift-audit wiring	repo	wiring
+edges (every declared edge parses, is registered and resolves)	repo	declarations
 encoding posture (text IO names its encoding)	repo	product
 every held leg is budgeted, every budget row resolves	repo	declarations
 extract-arms self-test	kit	selftests
@@ -50,10 +55,20 @@ govkit selfcheck	repo	declarations
 govkit selftest	kit	selftests
 harness arms (fail branches armed or pinned)	repo	declarations
 held-halves selftest	kit	selftests
+help page commands	repo	declarations
+help reference pages	repo	declarations
 hook destinations (every declared hook path ships)	repo	product
 hook destinations self-test	kit	selftests
 install-prefix (shipped surface)	repo	product
 install-prefix self-test	kit	selftests
+instruction edits (manifest checks)	repo	declarations
+instruction edits selftest	kit	selftests
+instruction envelopes	repo	product
+instruction grammar (statement types, provenance lock)	repo	product
+instruction ladder (level is the one term)	repo	product
+instruction render (one renderer of record)	repo	wiring
+instruction units (schema, one fact)	repo	declarations
+instruction units selftest	kit	selftests
 kickoff engine size <=18KiB	repo	product
 kickoff-manifest ratchet	repo	records
 kit epoch (shipped bytes move, the version moves)	repo	declarations
@@ -61,6 +76,7 @@ kit placeholders (a declared token its adopter substitutes)	repo	declarations
 kit version markers	repo	declarations
 kit-placeholders self-test	kit	selftests
 kit/dogfood doc parity	repo	declarations
+layer dependencies (the core never depends on an expansion)	repo	declarations
 leg ceilings clear their evidenced maximum	repo	declarations
 lexicon naming predicates	repo	declarations
 lexicon selftest	kit	selftests
@@ -78,6 +94,7 @@ method carriers (every pointer declared)	repo	declarations
 method-carriers self-test	kit	selftests
 micro-format definitions	repo	product
 micro-format gate selftest	kit	selftests
+one-owner	repo	declarations
 pass-order history	repo	declarations
 placeholder-catalogue self-test	kit	selftests
 playbook parity	repo	product
@@ -97,6 +114,7 @@ process-monitor wiring	repo	records
 profile-bar selftest	kit	selftests
 push-main self-test	kit	selftests
 pytest-guardrails self-test	kit	selftests
+python reads (a name never bound, an import outside its guard)	repo	declarations
 python resolver (behaviour + inline parity + idiom ban)	kit	wiring
 recall floor	repo	declarations
 recall floor arms	repo	selftests
@@ -142,6 +160,9 @@ spec-tokens self-test	kit	selftests
 step-gate	repo	declarations
 step-rows-frozen	repo	declarations
 straggler-guard arms	repo	declarations
+tags (the resolver's checks)	repo	declarations
+tags bundle selftest	kit	selftests
+tags positional selftest	kit	selftests
 template size <=48KiB	repo	product
 template size gate selftest	kit	selftests
 testsuite counts (every bar self-test prints one)	repo	declarations
@@ -159,3 +180,4 @@ verdict-epoch self-test	kit	selftests
 verifier fan-out	repo	declarations
 verifier fan-out self-test	kit	selftests
 workflow script syntax	repo	wiring
+writing practice (records and units)	repo	declarations

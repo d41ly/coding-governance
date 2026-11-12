@@ -3,6 +3,7 @@
 
 id = "policy"
 home = "policy"
+layer = "layer.instruction"
 scope = "repo"
 # The kit's version constant; README.md's first line carries the marker that equals it
 # (TOOL-dGroundRules-21 S3), which govkit selfcheck 5 and 5c and `check-kit-versions.sh` read.
@@ -10,6 +11,11 @@ version_from = { file = "policy.py", pattern = "^KIT_POLICY_VERSION = " }
 # A sibling kit is reached through the inlined `resolve_kit_dir` and a declared `requires`, and a miss
 # refuses: reader coverage reads the memory-tree kit's `tree_lib` (TOOL-dGroundRules-21 S26).
 requires = ["memory-tree"]
+# PLAY-dOrderedCharter-17: the reads of the deployer's registry are declared slots with their fallbacks.
+optional = [
+  { part = "policy.py", point = "point.runtime.install-target", fallback = "the tree reads unadopted, its answer where no registry is" },
+  { part = "check_policy.py", point = "point.runtime.install-target", fallback = "the fixture case's existing WRONG naming the deployer, its exit kept" },
+]
 
 # Everything the kit ships is engine, overwritten on every update: the catalogue, the shrink-only list
 # beside it, the module, the checker and the adopter; the legacy-home list alone is withheld, below. A repository's own policy is the file the

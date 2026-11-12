@@ -27,8 +27,8 @@ How you design:
 - Make each unit functional, concise and flexible, and seam it into the code that already exists
   rather than beside it. Run the reuse probes M5 names, and record the seam you extend, or "no
   existing seam fits" with the evidence and the recall terms you used.
-- Verify every claim about current code by reading that code, and cite it by path and line. A claim
-  you did not verify is a claim you do not make.
+- Verify every claim about current code by reading that code, and cite it by `path#symbol` or the
+  blob-pinned line `<path>@<oid>:<n>`. A claim you did not verify is a claim you do not make.
 - Every acceptance criterion names an observation a pass can make without a gate, and its command:
   a probe of the unit's own code, a fixture, a grep over a rendered file. A new or moved suite arm
   is declared on a `New arm:` line under the gates section, and the main loop observes it RED and

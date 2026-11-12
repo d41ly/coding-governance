@@ -4,9 +4,14 @@ id = "check-kit-versions"
 scope = "repo"
 kind = "flat"
 home = "."
+layer = "layer.flow"
 version_from = { none = "the version gate is itself unversioned; measured 2026-08-11. A deployer cannot detect which vintage a target holds, which is recorded here rather than left to be discovered." }
 requires = []
 sentinel = "check-kit-versions.sh"
+# PLAY-dOrderedCharter-17: a whole-tree resolver's edges are a declared slot with its fallback.
+optional = [
+  { part = "{prefix}/check-kit-versions.sh", point = "point.flow.version", fallback = "a missing kit reds as MISSING by name, the seed the kit-versions-need-list hole has the target edit down" },
+]
 
 # SEED, not engine. Copied verbatim it reds immediately — its need list names kits the target does
 # not have — and the runbook's own step is to edit that list down to the target's subset. That is the

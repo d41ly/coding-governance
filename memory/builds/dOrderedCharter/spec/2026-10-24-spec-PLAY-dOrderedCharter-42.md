@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-42 — the bindings reader admits every kind the record factory mints, joined to its file name both ways
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 12 · advances PLAY-dOrderedCharter-38
+**Status:** CLOSED · rev-5 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 12 · closes PLAY-dOrderedCharter-59 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,9 +10,17 @@
 |---|---|---|
 | [2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md](../build/2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
 | [2026-10-24-build-PLAY-dOrderedCharter-42-deviation-421.md](../build/2026-10-24-build-PLAY-dOrderedCharter-42-deviation-421.md) | deviation | — |
-| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY-dOrderedCharter-76 PLAY-dOrderedCharter-77 PLAY-dOrderedCharter-78 PLAY-dOrderedCharter-80 PLAY-dOrderedCharter-81 PLAY-dOrderedCharter-82 PLAY-dOrderedCharter-83 PLAY-dOrderedCharter-84 PLAY-dOrderedCharter-85 PLAY-dOrderedCharter-86 PLAY-dOrderedCharter-87 PLAY-dOrderedCharter-88 |
+| [2026-11-02-build-PLAY-dOrderedCharter-42-ledger.md](../build/2026-11-02-build-PLAY-dOrderedCharter-42-ledger.md) | journal | — |
+| [2026-11-04-build-PLAY-dOrderedCharter-42-1-builder-return.md](../build/2026-11-04-build-PLAY-dOrderedCharter-42-1-builder-return.md) | journal | — |
+| [2026-11-10-build-PLAY-dOrderedCharter-1-runlog-8d3cc031.md](../build/2026-11-10-build-PLAY-dOrderedCharter-1-runlog-8d3cc031.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY-dOrderedCharter-76 PLAY-dOrderedCharter-77 PLAY-dOrderedCharter-78 PLAY-dOrderedCharter-80 PLAY-dOrderedCharter-81 PLAY-dOrderedCharter-82 PLAY-dOrderedCharter-83 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
+| [2026-11-02-prompt-PLAY-dOrderedCharter-17-ask-fold-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-17-ask-fold-brief.md) | research | PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-25 |
+| [2026-11-02-prompt-PLAY-dOrderedCharter-42-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-42-build-brief.md) | journal | — |
+| [2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md) | research | PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-11-03-prompt-PLAY-dOrderedCharter-53-drift-sweep-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-53-drift-sweep-brief.md) | research | PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 |
 | [2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md](../reviews/2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-49 |
+| [2026-11-05-review-PLAY-dOrderedCharter-1-closing-diff-review-round1.md](../reviews/2026-11-05-review-PLAY-dOrderedCharter-1-closing-diff-review-round1.md) | diff-review | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 |
 
 <!-- /gen:spec-records -->
 
@@ -44,10 +52,23 @@ before unit 15 (order 16) and unit 2 (order 20) mint their kinds.
   Observed by AC2.
 - **S3** — The file-name join, every typed kind. The deviation rule `read_bindings` applies today
   (`tools/memory-tree/tree_lib.py:566-576`, TOOL-dTrueNorth-4 S2) is generalised to each member of
-  `TYPED_RECORD_KINDS`: a file named `-<kind>-<n>.md` in a `build/` folder whose Serves kind is not
-  `<kind>` is malformed, and a record whose Serves kind is a typed kind and whose file is not so named
-  is malformed, each naming the kind. The deviation wording is kept for the deviation kind.
-  Observed by AC3.
+  `TYPED_RECORD_KINDS`: a file named `<date>-build-<unit id>-<kind>-<n>.md` in a `build/` folder whose
+  Serves kind is not `<kind>` is malformed, and a record whose Serves kind is a typed kind and whose file
+  is not so named is malformed, each naming the kind. Both directions read `-<kind>-<n>.md` only on the
+  stem `deviation_name` spells (`tools/memory-tree/tree_lib.py:492-493`), `<kind>` in place of
+  `deviation`, never on any name ending so, as `deviation_named` (`:491`) reads today: the six research
+  records `2026-10-20-build-PLAY-dClosedLoop-1-execution-return-plan-2.md` to `-7.md` stay bound once
+  `plan` joins the tuple (TOOL-dRankedPlan-16 §8 F5), where generalising `:491` would red them. For the
+  deviation kind this narrows the first direction: a file off the stem ending `-deviation-<n>.md` no
+  longer reads malformed in `read_bindings`, and is still refused by the deviation join's own
+  file-name check, `RECORD_NAME` in `read_record` of `tools/memory-tree/deviation_join.py`, over every
+  path its `read_records` glob names. The deviation wording is kept for the deviation kind. Observed by
+  AC3 and AC6.
+  **Readers:** by name: `deviation_named`, the any-name-ending pattern the stem read retires, at
+  `tools/memory-tree/tree_lib.py:491` and its one read at line 569; no other file spells it · by value:
+  `tools/memory-tree/gen_build_index.py:756` prints a `malformed` record's `why` as an `A` row, the
+  TOOL-dTrueNorth-4 AC8 arms at `gen_build_index.py:6031-6036` compare the deviation wording this item
+  keeps, and `tools/memory-tree/deviation_join.py:564` reads the same bindings.
 - **S4** — The round trip, armed. The factory gains `python tools/memory-tree/build_records.py
   --fixture --plant typed-kinds`, in the shape of `deviation_join.py --fixture`: it writes one record
   of every kind `TYPED_RECORD_KINDS` names into a build folder of a scratch git repository, through the
@@ -80,9 +101,12 @@ before unit 15 (order 16) and unit 2 (order 20) mint their kinds.
 Read at `ce13efbe`. `RECORD_KIND_TOKENS` is the five-member tuple at `tools/memory-tree/tree_lib.py:406`;
 `read_bindings` takes the first token of a Serves line as the kind when it is a member (`:544`) and
 otherwise sets `state = "malformed"` naming the five (`:561-565`). `gen_build_index.py` imports the
-tuple (`:187`), and `cmd_print_bindings` (`:682`) is the predicate check 21 reads. The deviation
-kind's both-ways file-name join is `deviation_named` (`tools/memory-tree/tree_lib.py:491`) and its use
-at `:566-576`. Unit 7 S7 extracts the factory from `tools/memory-tree/deviation_join.py` into
+tuple in its `from tree_lib import` block (`:188`, the name at `:189`), and `cmd_print_bindings`
+(`:691`) is the predicate check 21 reads. The deviation kind's both-ways file-name join is
+`deviation_named` (`tools/memory-tree/tree_lib.py:491`, any name ending `-deviation-<n>.md`) and
+`deviation_name` (`:492-493`, the `<date>-build-<unit id>-deviation-<n>.md` stem), used at `:566-577`.
+At HEAD the tracked build records ending `-deviation-<n>.md` all sit on that stem (`git ls-files`,
+PINNED 2026-11-03), so the narrowing moves no record's verdict. Unit 7 S7 extracts the factory from `tools/memory-tree/deviation_join.py` into
 `build_records.py`, in the same kit as `tree_lib.py`; S8 writes `**Serves:** exception <unit id>`.
 Unit 2 S4 writes `**Serves:** override <unit id>` and unit 15 S7 `**Serves:** change <unit id>`;
 neither spec names `tree_lib.py`.
@@ -168,10 +192,18 @@ header.
   the closed `<kind>` list, it names every member of `TYPED_RECORD_KINDS` as a backticked kind.
   Red when: the doc's closed list still stops at `deviation`, or a word elsewhere in the file passes
   for the kind.
+- **AC6** — When a probe imports `tree_lib` from a scratch copy of `tools/memory-tree/` whose
+  `TYPED_RECORD_KINDS` adds `plan`, and calls `read_bindings` over a scratch git repository holding a
+  record `2026-10-20-build-PLAY-dClosedLoop-1-execution-return-plan-2.md` in a `build/` folder whose
+  Serves line says `research`, its state is `bound` and its kind `research`; a record
+  `notes-deviation-1.md` there whose Serves line says `journal` reads `bound` too, and
+  `deviation_join.read_record` over it names its file name.
+  Red when: the join reads `-plan-<n>.md` on a name off the `-build-<unit id>-<kind>-<n>.md` stem, or an
+  off-stem deviation name escapes both readers.
 
 ## 7. Gates
 
-`memory hygiene` · `build-index selftest` · `memory-hygiene self-test` · `verdict epoch (kit version dates the engine)` · `lexicon naming predicates` · `tier2-review self-test` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
+`memory hygiene` · `build-index selftest` · `memory-hygiene self-test` · `verdict epoch (kit version dates the engine)` · `lexicon naming predicates` · `tier2-review self-test` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `playbook render selftest`
 
 New arm: tools/memory-tree/build_records.py · covers AC4 · its `--fixture --plant typed-kinds` round trip over every typed kind, run by the memory-hygiene self-test, its failing case staged by the base tuple without the three tokens · none
 
@@ -189,6 +221,13 @@ New arm: tools/memory-tree/build_records.py · covers AC4 · its `--fixture --pl
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-1 spec audit's finding 31 (HIGH, item H4).
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
+- rev-3 · 2026-11-02 · S3 · AC6 · closes PLAY-dOrderedCharter-59 by
+  `2026-11-02-prompt-PLAY-dOrderedCharter-17-ask-fold-brief`: the typed-kind file-name join reads
+  `-<kind>-<n>.md` only on the stem `-build-<unit id>-<kind>-<n>.md`, seen by AC6 on a research record
+  named `…-return-plan-2.md` staying bound once `plan` joins `TYPED_RECORD_KINDS`.
+- rev-5 · 2026-11-03 · S3 · §4 · AC6 · from `2026-11-03-prompt-PLAY-dOrderedCharter-53-drift-fold-brief.md` (42-1 to 42-3): the stem is `deviation_name` at `tree_lib.py:492-493` and the deviation kind's narrowing is stated and observed; `gen_build_index.py`'s import block and `cmd_print_bindings` re-anchored; the deviation join's file-name check cited as `RECORD_NAME`, by name.
+- rev-5 · 2026-11-03 · S3 · from `2026-11-03-prompt-PLAY-dOrderedCharter-9-readers-brief.md`: S3's `**Readers:**` clause names the readers of the any-name-ending deviation pattern, by name and by value.
+- rev-4 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Items 2 and 3: the leg line names `policy fixtures` and `playbook render selftest`, whose guards §4 Files touched trips, `tools/memory-tree/tree_lib.py` the latter's, the guards hits the spec-token check reads with DEFERRED as live.
 
 ## 10. Reuse audit
 

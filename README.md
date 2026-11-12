@@ -14,9 +14,10 @@ machines/sessions on the same repo.
   converged into the charter and the deploy-time placeholder catalog became a program. Install it
   with `bash tools/playbook/adopt-playbook.sh --target <repo>`, which fills every placeholder from
   the target's `deploy.toml` and drops the conditional blocks that target has no kit for.
-- **`tools/agent-instructions/`** — install a canonical `AGENTS.md` in a target repo and wire every AI
-  tool's file to it (`CLAUDE.md` `@AGENTS.md` import, Gemini config, symlink/copy), with a `--check`
-  drift gate. Use it to deploy the filled playbook as a project's agent-instruction file.
+- **`tools/playbook/render_playbook.py --render-scope entry-files`** — the renderer wires every AI
+  tool's file to the canonical `AGENTS.md` (`CLAUDE.md` `@AGENTS.md` import, Gemini config,
+  symlink/copy), and `--check` is its drift gate. It absorbed the retired agent-instructions kit,
+  whose `[[retired]]` row carries an adopter to `playbook-render`.
 - **`skills/session-kickoff/`** — the generic `/session-kickoff` skill: the project-agnostic
   *engine* (git-state guards, closed-scope collection, READY card). Project specifics come
   from a per-repo **kickoff manifest** the skill discovers (see its Step 2 search list);

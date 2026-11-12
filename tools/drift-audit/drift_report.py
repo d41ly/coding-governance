@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """drift_report.py — does this repo's own RECORD of its state still describe reality?
 
-gov:kit drift-audit@1.31
+gov:kit drift-audit@1.32
 
     python <prefix>/drift-audit/drift_report.py            # human table, always exits 0
     python <prefix>/drift-audit/drift_report.py --json     # machine-readable, always exits 0
@@ -92,7 +92,7 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
-KIT_DRIFT_AUDIT_VERSION = "1.31"
+KIT_DRIFT_AUDIT_VERSION = "1.32"
 
 CONF_NAME = ".memory-tree.conf"
 
@@ -576,7 +576,8 @@ _STATUS = re.compile(r"^\*\*Status:\*\*\s*([A-Za-z]+)", re.M)
 # memory-tree conf, which is precisely where the wrong binding reports a confident zero.
 #
 # IMPORTABLE OR NOT. drift-audit is copy-installed and must keep running in a tree that has no
-# memory-recall, so the accessor answers when it imports and a LOCAL COPY answers when it does not.
+# memory-tree kit, so the accessor answers when its `id_grammar.py` imports and a LOCAL COPY answers
+# when it does not.
 # That copy is not a second grammar by stealth: the self-test asserts it still equals what the
 # extractor produces whenever the extractor is present, so a divergence fails loudly here instead of
 # silently in an adopter. This is unit 2's F1 resolution, and unit 3 adopts it by reference rather
@@ -586,7 +587,7 @@ _FAMILY_SHAPE = re.compile(r"^[A-Z][A-Z0-9]*$")
 
 
 def _build_local_ident(families) -> str:
-    """The LOCAL COPY of the shipped id alternation, for a tree with no recall kit.
+    """The LOCAL COPY of the shipped id alternation, for a tree with no id grammar module.
 
     Byte-compared against the extractor's own output by this kit's self-test whenever that kit is
     present, which is what keeps "fallback" from meaning "second grammar".
@@ -602,16 +603,16 @@ def _build_local_ident(families) -> str:
 
 
 def _resolve_ident(root, families) -> str:
-    """The shipped alternation for THIS tree, from the recall extractor where it is importable."""
+    """The shipped alternation for THIS tree, from the memory-tree kit's id grammar where it imports."""
     try:
-        kit = resolve_kit_dir("memory-recall", "extract.py", pathlib.Path(__file__).resolve().parent)
+        kit = resolve_kit_dir("memory-tree", "id_grammar.py", pathlib.Path(__file__).resolve().parent)
     except LookupError:
         return _build_local_ident(families)
     added = str(kit)
     sys.path.insert(0, added)
     try:
-        import extract  # type: ignore
-        return extract.grammar_for(root).ID
+        import id_grammar  # type: ignore
+        return id_grammar.grammar_for(root).ID
     except Exception:
         # A present-but-unusable sibling is the fallback case, never a crash. Every signal is
         # evaluated in one unguarded comprehension, so a raise here takes the whole report down.
@@ -625,7 +626,7 @@ def _resolve_ident(root, families) -> str:
 
 
 def _build_local_anchors(ident: str):
-    """The LOCAL COPY of the four anchor shapes, for a tree with no recall kit.
+    """The LOCAL COPY of the four anchor shapes, for a tree with no id grammar module.
 
     UNGUARDED, and said so rather than claimed otherwise. The sibling `_build_local_ident` IS
     byte-compared against the extractor by this kit's self-test; these anchor patterns are NOT.
@@ -650,16 +651,16 @@ def _build_local_anchors(ident: str):
 
 
 def _resolve_anchors(root, families):
-    """The anchor patterns for THIS tree, from the recall extractor where it is importable."""
+    """The anchor patterns for THIS tree, from the memory-tree kit's id grammar where it imports."""
     try:
-        kit = resolve_kit_dir("memory-recall", "extract.py", pathlib.Path(__file__).resolve().parent)
+        kit = resolve_kit_dir("memory-tree", "id_grammar.py", pathlib.Path(__file__).resolve().parent)
     except LookupError:
         return _build_local_anchors(_build_local_ident(families))
     added = str(kit)
     sys.path.insert(0, added)
     try:
-        import extract  # type: ignore
-        return tuple(re.compile(a.pattern, a.flags | re.M) for a in extract.grammar_for(root).anchors)
+        import id_grammar  # type: ignore
+        return tuple(re.compile(a.pattern, a.flags | re.M) for a in id_grammar.grammar_for(root).anchors)
     except Exception:
         return _build_local_anchors(_build_local_ident(families))
     finally:
@@ -943,6 +944,34 @@ _NOT_A_PATH = set("<>{}*?$|\"'\\")
 _LINE_SUFFIX = re.compile(r":\d+$")
 
 
+def read_git_stdout(repo: pathlib.Path, *args: str) -> str:
+    return subprocess.run(
+        ["git", "-C", str(repo), *args], capture_output=True, text=True, encoding="utf-8", check=True
+    ).stdout
+
+
+git = read_git_stdout  # the name the inlined common_git_dir block calls
+
+
+# >>> common_git_dir -- canonical copy: common_dir.py in the gov lib dir (byte-identical; gated)
+def common_git_dir(repo: pathlib.Path) -> pathlib.Path:
+    """The MAIN repository's git directory, shared by every worktree.
+
+    ``--git-dir`` in a linked worktree is ``.git/worktrees/<name>``, which ``git worktree remove``
+    deletes outright -- taking the query log with it. It is also RELATIVE (bare ``.git``) when run
+    at the repo root and absolute elsewhere, so the raw value is not a usable path either way.
+    """
+    raw = git(repo, "rev-parse", "--git-common-dir").strip()
+    p = pathlib.Path(raw)
+    return p.resolve() if p.is_absolute() else (repo / raw).resolve()
+# <<< common_git_dir
+
+
+# >>> auto_memory -- canonical copy: auto_memory.py in the gov lib dir (byte-identical; gated)
+#: the harness's location of a project's auto-memory; one constant, so a layout change is one edit
+AUTO_MEMORY_TEMPLATE = "~/.claude/projects/{checkout}/memory"
+
+
 def resolve_auto_memory_dir(root: pathlib.Path, declared: str) -> pathlib.Path | None:
     """Expand an AUTO_MEMORY_DIR declaration; None when it is blank (NOT ASKED).
 
@@ -955,14 +984,15 @@ def resolve_auto_memory_dir(root: pathlib.Path, declared: str) -> pathlib.Path |
     if not declared:
         return None
     if "{checkout}" in declared:
-        out = subprocess.run(["git", "-C", str(root), "rev-parse", "--path-format=absolute",
-                              "--git-common-dir"], capture_output=True, text=True,
-                             encoding="utf-8", errors="replace")
-        common = out.stdout.strip()
-        if out.returncode == 0 and common:
-            key = re.sub(r"[^A-Za-z0-9-]", "-", str(pathlib.Path(common).parent))
+        try:   # the one common-dir derivation, the block beside this one (PLAY-dOrderedCharter-49 S68)
+            common = common_git_dir(root)
+        except (OSError, subprocess.CalledProcessError):
+            common = None
+        if common is not None:
+            key = re.sub(r"[^A-Za-z0-9-]", "-", str(common.parent))
             declared = declared.replace("{checkout}", key)
     return root / pathlib.Path(declared).expanduser()
+# <<< auto_memory
 
 
 def signal_dangling_pointers(ctx) -> dict:

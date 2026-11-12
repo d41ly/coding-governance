@@ -37,6 +37,8 @@
 # the `merge=ours` indexes stale, and the push bar refuses a stale declared output before its first
 # leg. `--prepare` folds what it moved into the prepared merge beside the mint; the attended landing
 # commits it as `regen: generated outputs onto <remote>/<branch> at <sha8> for <unit>`, `Pass: none`.
+# In `--prepare`, gov first's walk is folded before the regeneration, so a generator reading HEAD sees
+# it committed (PLAY-dOrderedCharter-85), the order the attended landing's own commits keep.
 # A failed write refuses the landing as a refused mint does. No regen.py beside this lander says so
 # in one line and lands as before. What it does NOT do: prove the result fresh -- the push bar's
 # preflight is that check, and a regeneration cannot fix a check red for another reason.
@@ -863,7 +865,10 @@ resolve_lander_kit() {  # kit home · file -> "<python>\t<kit dir>" · 0; else t
 # the branch moves, rather than after the bar at the push. Exit 1 of the mode returns 1 with its
 # lines; a DEAD PROBE, no python and no kit each print one line and return 0, because the pre-push
 # hook grades the same range again at the push and binds there. The kit is found from THIS script's
-# own directory, the tool root it was installed into, never from a typed prefix.
+# own directory, the tool root it was installed into, never from a typed prefix. The kit is a declared
+# slot (PLAY-dOrderedCharter-17): no kit prints `slot point.flow.leg-pack · not-installed: <fallback>`,
+# and a run prints `searched-empty` (no loss) or `filled` (a loss) on stderr. `run_minter` and
+# `run_gov_first` print the same grammar at `point.flow.version`.
 check_merge_losses() {  # R · T -> 1 when a merge in R..T loses a definition; 0 otherwise, any skip printed
   local py dir out rc got
   got=$(resolve_lander_kit lexicon lexicon.py); rc=$?
@@ -872,14 +877,14 @@ check_merge_losses() {  # R · T -> 1 when a merge in R..T loses a definition; 0
     return 0
   fi
   if [ "$rc" != 0 ]; then
-    echo "push-main: the merge-loss check did NOT run — no lexicon kit beside this lander; the pre-push hook grades the landing again." >&2
+    echo "push-main: slot point.flow.leg-pack · not-installed: the pre-push hook grades the landing again — no lexicon kit beside this lander." >&2
     return 0
   fi
   py=${got%%$'\t'*} dir=${got#*$'\t'}
   out=$("$py" "$top/$dir/lexicon.py" --merge-losses "$1..$2" 2>&1); rc=$?
   case "$rc" in
-    0) return 0 ;;
-    1) printf '%s\n' "$out" | sed 's/^/  /' >&2; return 1 ;;
+    0) echo "push-main: slot point.flow.leg-pack · searched-empty" >&2; return 0 ;;
+    1) echo "push-main: slot point.flow.leg-pack · filled" >&2; printf '%s\n' "$out" | sed 's/^/  /' >&2; return 1 ;;
   esac
   echo "push-main: DEAD PROBE — the merge-loss check could not answer, so this prepare continues; the pre-push hook binds the landing:" >&2
   printf '%s\n' "$out" | sed 's/^/  /' >&2
@@ -968,13 +973,14 @@ run_minter() {  # base · [head] -> 0 minted, clean or announced-skipped · 1 th
   fi
   # A missing deployer is a skip, never a refusal.
   if [ "$rc" != 0 ]; then
-    echo "push-main: kit versions were NOT minted — no govkit deployer beside this lander; the push bar's epoch legs grade the landing."
+    echo "push-main: slot point.flow.version · not-installed: the push bar's epoch legs grade the landing — no govkit deployer beside this lander, so kit versions were NOT minted."
     return 0
   fi
   py=${got%%$'\t'*} dir=${got#*$'\t'}
   out=$("$py" "$top/$dir/govkit.py" mint --base "$1" ${2:+--head "$2"} 2>&1); rc=$?
   if [ "$rc" -eq 0 ]; then
     printf '%s\n' "$out" | grep -v -e ' · clean$' -e ' · skip · ' || true
+    echo "push-main: slot point.flow.version · filled" >&2
     return 0
   fi
   echo "push-main: the version minter REFUSED (exit $rc):" >&2
@@ -998,17 +1004,18 @@ run_gov_first() {  # -> 0 walked or announced-skipped · 1 a step, the landing c
       echo "push-main: the upgrade steps could NOT be run on gov first — a govkit deployer is beside this lander and no usable python launcher runs it, and no later gate runs a step on gov." >&2
       return 1
     fi
-    echo "push-main: steps were NOT run on gov first — no govkit deployer beside this lander, so this is not gov's tree."
+    echo "push-main: slot point.flow.version · not-installed: the gov-first walk is skipped as not gov's tree — no govkit deployer beside this lander."
     return 0
   fi
   if [ "$rc" != 0 ]; then
-    echo "push-main: steps were NOT run on gov first — no govkit deployer beside this lander, so this is not gov's tree."
+    echo "push-main: slot point.flow.version · not-installed: the gov-first walk is skipped as not gov's tree — no govkit deployer beside this lander."
     return 0
   fi
   py=${got%%$'\t'*} dir=${got#*$'\t'}
   out=$("$py" "$top/$dir/govkit.py" update --target "$top" --write 2>&1); rc=$?
   if [ "$rc" -eq 0 ]; then
     printf '%s\n' "$out"
+    echo "push-main: slot point.flow.version · filled" >&2
     return 0
   fi
   echo "push-main: the upgrade steps REFUSED on gov first (exit $rc):" >&2
@@ -1031,6 +1038,17 @@ read_mint_unit() {  # range -> the unit id on stdout, or nothing
   # piped straight into `head` its first line became the unit id.
   out=$("$py" "$top/$dir/routed_commits.py" --newest-unit "$1" 2>/dev/null) || return 0
   printf '%s\n' "$out" | head -n 1
+}
+
+# `write_merge_fold <first> <second> <message>` rewrites the detached prepared merge over the working
+# tree, same parents and message, when the tree differs from HEAD, and leaves the new merge in the
+# caller's `t`. `commit-tree`, so no pre-commit hook fires (the MINT note in `cmd_prepare`). Its two
+# callers: after gov first's walk, so the regeneration meets the walk committed at HEAD, and after the
+# regeneration (PLAY-dOrderedCharter-85). Each caller refuses on its own 1 with its own stage's text.
+write_merge_fold() {  # first parent · second parent · message -> 0 HEAD is the merge over the tree, or the tree was HEAD's · 1 the commit or the ref move failed
+  [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ] || return 0
+  git add -A
+  t=$(git commit-tree "$(git write-tree)" -p "$1" -p "$2" -m "$3") && git update-ref --no-deref HEAD "$t" || return 1
 }
 
 # `--prepare`: merge THIS branch onto the advertised tip, in place, and move the branch to it.
@@ -1122,6 +1140,16 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
     echo "push-main: the upgrade steps this landing declares did not hold on gov first (named above). Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
     return 1
   fi
+  # FOLD THE WALK BEFORE THE REGENERATION (PLAY-dOrderedCharter-85): the policy mirror renders only a
+  # committed input, so the mint's and the walk's output enter the merge first. The refusals below
+  # then reset to this folded `t`, and the checkout of the branch takes away what the walk created.
+  if ! write_merge_fold "$R" "$oldb" "$msg"; then
+    git reset -q --hard HEAD >/dev/null 2>&1 || true
+    remove_new_untracked "$gfsnap"; rm -f "$gfsnap"
+    git checkout "$branch" >/dev/null 2>&1 || true
+    echo "push-main: could not fold the upgrade steps' output into the merge before the regeneration. Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
+    return 1
+  fi
   # REGENERATE INTO THE MERGE (TOOL-aPrimedIndex-4): after the mint, because a minted version can
   # itself stale an output that stamps it; folded by the same rewrite, same parents and subject.
   if ! run_regen; then
@@ -1132,14 +1160,11 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
     return 1
   fi
   rm -f "$gfsnap"
-  if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
-    git add -A
-    if ! t=$(git commit-tree "$(git write-tree)" -p "$R" -p "$oldb" -m "$msg") || ! git update-ref --no-deref HEAD "$t"; then
-      git reset -q --hard HEAD >/dev/null 2>&1 || true
-      git checkout "$branch" >/dev/null 2>&1 || true
-      echo "push-main: could not commit the minted versions into the merge. Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
-      return 1
-    fi
+  if ! write_merge_fold "$R" "$oldb" "$msg"; then
+    git reset -q --hard HEAD >/dev/null 2>&1 || true
+    git checkout "$branch" >/dev/null 2>&1 || true
+    echo "push-main: could not commit the minted versions into the merge. Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
+    return 1
   fi
   # MERGE LOSS (TOOL-aMendedFleet-3): the CONFLICT path's exit shape, so a refused landing leaves the
   # branch exactly where it was. `R..t` holds this merge and every merge the branch carries past R.

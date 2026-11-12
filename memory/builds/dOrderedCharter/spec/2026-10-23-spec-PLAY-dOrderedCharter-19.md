@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-19 — the tag grammar, its namespace registry, the derived SQLite tag index and its one resolver, and the join factory moved to the core
 
-**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base ce13efbe · streams playbook · order 4 · advances PLAY-dOrderedCharter-38
+**Status:** CLOSED · rev-8 · 2026-11-03 · node d · Tier-2 · base ce13efbe · streams playbook · order 4 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0049@a87d159d whole
 **Carries:** node:system.tags
@@ -18,15 +18,25 @@
 | [2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md](../build/2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-build-PLAY-dOrderedCharter-19-deviation-191.md](../build/2026-10-24-build-PLAY-dOrderedCharter-19-deviation-191.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-19-deviation-192.md](../build/2026-10-24-build-PLAY-dOrderedCharter-19-deviation-192.md) | deviation | — |
-| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY-dOrderedCharter-76 PLAY-dOrderedCharter-77 PLAY-dOrderedCharter-78 PLAY-dOrderedCharter-80 PLAY-dOrderedCharter-81 PLAY-dOrderedCharter-82 PLAY-dOrderedCharter-83 PLAY-dOrderedCharter-84 PLAY-dOrderedCharter-85 PLAY-dOrderedCharter-86 PLAY-dOrderedCharter-87 PLAY-dOrderedCharter-88 |
 | [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-25-build-PLAY-dOrderedCharter-19-deviation-193.md](../build/2026-10-25-build-PLAY-dOrderedCharter-19-deviation-193.md) | deviation | — |
 | [2026-10-25-build-PLAY-dOrderedCharter-19-deviation-194.md](../build/2026-10-25-build-PLAY-dOrderedCharter-19-deviation-194.md) | deviation | — |
+| [2026-11-02-build-PLAY-dOrderedCharter-19-ledger.md](../build/2026-11-02-build-PLAY-dOrderedCharter-19-ledger.md) | journal | — |
+| [2026-11-03-build-PLAY-dOrderedCharter-19-4-builder-return.md](../build/2026-11-03-build-PLAY-dOrderedCharter-19-4-builder-return.md) | journal | — |
+| [2026-11-03-build-PLAY-dOrderedCharter-19-deviation-195.md](../build/2026-11-03-build-PLAY-dOrderedCharter-19-deviation-195.md) | deviation | — |
+| [2026-11-10-build-PLAY-dOrderedCharter-1-runlog-8d3cc031.md](../build/2026-11-10-build-PLAY-dOrderedCharter-1-runlog-8d3cc031.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY-dOrderedCharter-76 PLAY-dOrderedCharter-77 PLAY-dOrderedCharter-78 PLAY-dOrderedCharter-80 PLAY-dOrderedCharter-81 PLAY-dOrderedCharter-82 PLAY-dOrderedCharter-83 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md](../prompts/2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-46 |
+| [2026-11-02-prompt-PLAY-dOrderedCharter-19-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-19-build-brief.md) | journal | — |
+| [2026-11-03-prompt-PLAY-dOrderedCharter-19-1-spec-writer.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-19-1-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-PLAY-dOrderedCharter-19-2-spec-writer.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-19-2-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-PLAY-dOrderedCharter-19-divergence-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-19-divergence-brief.md) | research | PLAY-dOrderedCharter-49 |
+| [2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
+| [2026-11-05-review-PLAY-dOrderedCharter-1-closing-diff-review-round1.md](../reviews/2026-11-05-review-PLAY-dOrderedCharter-1-closing-diff-review-round1.md) | diff-review | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 |
 
 <!-- /gen:spec-records -->
 
@@ -38,7 +48,7 @@ No section tag has a resolver and no citation is checked: 1,438 citations, 788 o
 namespace registry, one derived SQLite index per node at `<git-common-dir>/gov/index.db` shared by
 every worktree and re-parsing only the blobs a commit changed, and one resolver, `gov tag`, with
 `gov tag show`, `where`, `refs` and `check`, under three policy keys, and the `tags` leg pack. With it the join factory leaves the
-optional codebase-map kit for the core and `tools/lib`, beside `map_lib.resolve_compare_base`'s siblings, so no core build imports codebase-map (H5), and positional
+optional codebase-map kit for the core and `tools/lib`, so no core build imports codebase-map or reads its conf (H5), and positional
 references gain alias rows and a keyed list (systems `[cross]`, `[design-tags]`; the night pass two,
 point 3, the owner's NT-15; C1-F3, DA-M9, FM10).
 
@@ -60,7 +70,8 @@ point 3, the owner's NT-15; C1-F3, DA-M9, FM10).
   `## M5 — Recall and reuse` is `m5-recall-and-reuse`. The `unit` namespace: a
   tag per `[[unit]]` row of every `<kit>/instructions.toml` and of `.governance/instructions.toml`
   (shared interfaces S10 and S14); empty until PLAY-dOrderedCharter-9 lands rows, and printed as
-  `unarmed`, never green, while empty. Observed by AC9.
+  `unarmed`, never green, while empty; a citation into an unarmed namespace is counted, never
+  graded (S7, §8 F5). Observed by AC9 and AC16.
 - **S4** — The index, `<git-common-dir>/gov/index.db`, written by the extractors alone through
   `build_index`, never committed and never loaded whole. Tables: `tree_path(tree, path, blob)`;
   `blob_row(blob, extractor, tag, kind, line, end_line, text)` for what a blob holds;
@@ -78,13 +89,18 @@ point 3, the owner's NT-15; C1-F3, DA-M9, FM10).
   says (`leaf` or `subtree`, default `leaf`); `where` prints `path:line`; `refs` prints every citation
   of it; `check` runs S7. Output is text, or JSON with `--json`, the index's only JSON. Observed by
   AC6.
-- **S7** — Two checks under `check`. `retired`: new text citing a retired tag, or a retired name
+- **S7** — Two checks under `check`, over one graded population: the citations of §4 "### Which
+  text is a citation" whose path is outside `<MEMORY_ROOT>/builds/`, `MEMORY_ROOT` read from
+  `.memory-tree.conf` (§8 F4). `retired`: new text citing a retired tag, or a retired name
   minted again, as `tags.retired-cites` says (`refuse-new` red, `warn` printed and exit 0, `allow`
   silent; default `refuse-new`); new text is a citation absent from the base tree, the base read by
-  `resolve_compare_base`. `resolves`: a citation that resolves to no row is red, and bare
+  `resolve_compare_base`. `resolves`: a graded citation that resolves to no row is red, and bare
   references read as `tags.bare-refs` says (§4 "### Bare references"; default `charter-only`).
+  Neither check grades a citation into a namespace S3 prints `unarmed` (§8 F5). Nothing left
+  ungraded is silent: the summary prints `<n> in build records not graded` and, per unarmed
+  namespace, `unarmed <ns> (<n> not graded)`, both DERIVED at the run.
   The retired set is the index's `retired` rows, which an extractor writes; the change-record
-  extractor that fills them is PLAY-dOrderedCharter-15's. Observed by AC7 and AC8.
+  extractor that fills them is PLAY-dOrderedCharter-15's. Observed by AC7, AC8 and AC16.
   **Readers:** by name: READER NOT IN TREE — this item retires no name; it grades retirements that
   change records will carry, and its only reader, `gov_tag.py`, is new in this unit · by value: NO VALUE READERS —
   the retired set is empty until PLAY-dOrderedCharter-15's extractor writes it.
@@ -110,18 +126,40 @@ point 3, the owner's NT-15; C1-F3, DA-M9, FM10).
   **Readers:** by name: READER NOT IN TREE — the three rows land with dGroundRules and retire
   nothing; their one reader is `read_policy_value` in `policy_value.py`, new in this unit · by value:
   `show` for `tags.slice` and `check` for the other two, each through `read_policy_value`.
-- **S9** — The join factory (shared interface S2): `compute_coverage` with its `Coverage` class,
-  `resolve_compare_base`, `derive_baseline_additions` and the pure `drop_touched_exemptions`, moved
-  from `tools/codebase-map/map_lib.py` (`:1373`, `:1390-1404`, `:1502`, `:1530`) to the canonical `tools/lib/coverage_join.py`, and
-  shipped inline in `tools/memory-tree/coverage_join.py` under a `coverage_join` row of
-  `tools/lib/resolve-python.test.sh`'s `PARITY_ROWS`. The consumers, `gen_map.py`, `map_diff.py`,
-  `selftest.py`, `test_codebase_map.template.py` and its copy `test_codebase_map.py`, are rewritten to
-  import the four names from memory-tree's module, which codebase-map already `requires`
-  (`tools/codebase-map/kit.toml:7`); `map_lib` re-exports them for `install.deprecation-window`
-  releases, declared by PLAY-dOrderedCharter-31's `module-export` class row, the mechanism that counts
-  that hold being that unit's §8 F6, which the owner settled: dConvergedCharter counts the window
-  from that row's landing commit; the template is
-  re-copied into adopters through govkit's update. Observed by AC10.
+- **S9** — The join factory (shared interface S2), moved from `tools/codebase-map/map_lib.py`.
+  `compute_coverage` (`:1404`) with its `Coverage` class (`:1390-1401`), the pure
+  `drop_touched_exemptions` (`:1373`) and `derive_baseline_additions` (`:1544`) with its git read
+  `_read_git_text` (`:1435`) form a `coverage_join` block whose canonical is the new
+  `tools/lib/coverage_join.py`. The moved `derive_baseline_additions(root, base, rel)` takes the
+  baseline's root-relative path and lets a working file's `tomllib.TOMLDecodeError` propagate, so
+  the core calls neither `map_root` nor `load_conf` (`:214-216`, `:181`) and raises no `MapError`
+  (`:75`); this was PLAY-dOrderedCharter-49's S38 (finding 44), folded here. `resolve_compare_base`
+  is canonical in neither file: `map_lib.resolve_compare_base` (`:1507`) is a `compare_base_py`
+  copy this unit deletes, the name re-exported, and its canonical stays `tools/lib/compare_base.py` (`:15`).
+  The shipped module, `tools/memory-tree/coverage_join.py`, carries the `coverage_join` copy under a
+  new `coverage_join` row of `PARITY_ROWS` (`tools/lib/resolve-python.test.sh:351-370`), and a
+  `compare_base_py` copy beside the `remote_ladder_py` copy it calls, each held by its existing row.
+  The consumers, `gen_map.py`, `map_diff.py`, `selftest.py`, `test_codebase_map.template.py` and its
+  copy `test_codebase_map.py`, are rewritten to import the four names from memory-tree's module,
+  which codebase-map already `requires` (`tools/codebase-map/kit.toml:8`), the two test files passing
+  `map_root(root) / "baseline.toml"` relative to the root. `map_lib` re-exports `compute_coverage`,
+  `Coverage`, `drop_touched_exemptions` and `resolve_compare_base`, and keeps
+  `derive_baseline_additions(root, base)` as a wrapper that supplies that path and raises the core's
+  parse error as `MapError`, so an older copy's two-argument call still runs; the hold is
+  `install.deprecation-window` releases, declared by PLAY-dOrderedCharter-31's `module-export` class
+  row, the mechanism that counts that hold being that unit's §8 F6, which the owner settled:
+  dConvergedCharter counts the window from that row's landing commit; the template is re-copied into
+  adopters through govkit's update. Observed by AC10 and AC17.
+  **Readers:** by name: `tools/codebase-map/gen_map.py:164`, `tools/codebase-map/map_diff.py:112`,
+  `tools/codebase-map/selftest.py:524` (and lines 965 and 1588 to 1617),
+  `tools/codebase-map/test_codebase_map.py:144` and `tools/codebase-map/test_codebase_map.template.py:144`
+  (and lines 164 and 168 in each), every one rewritten to memory-tree's module;
+  `memory/map/features/codebase-map.md:48`, whose `map_lib.resolve_compare_base` stays true through
+  the re-export; and `memory/map/generated/symbols.json`, regenerated in the pass. `tools/policy/policy.py`
+  spells `resolve_compare_base` too, as its own `compare_base_py` copy, which this item leaves alone ·
+  by value: `test_baseline_never_gains_a_key` in both test files reads the compare base's
+  `(sha, why)` and the additions' `(added, note)`, and `gen_map.py` and the coverage test read
+  `Coverage`'s four fields; every shape is unchanged, and only the additions' call gains `rel`.
 - **S10** — The common-dir resolver (shared interface S3): `common_git_dir` canonicalised from
   `tools/memory-recall/query.py:248-257` into `tools/lib/common_dir.py`, under a `common_git_dir`
   `PARITY_ROWS` row whose copies are `query.py`'s and `tag_index.py`'s. Observed by AC11.
@@ -134,10 +172,10 @@ point 3, the owner's NT-15; C1-F3, DA-M9, FM10).
 - **S12** — The `tags` leg pack (shared interface S21): the leg `tags (the resolver's checks)` in
   `tools/gate-legs.json`, argv `python {prefix}/playbook/gov_tag.py check`, carrying `"pack":
   "tags"`, a new key never an overloaded `chunk`; `pack` joins the run-gates canary's known-key set
-  (`tools/run-gates/run-gates.test.sh:244,580`), and the leg gains its meta-gate rows. Observed by
+  (`tools/run-gates/run-gates.test.sh:364,700`), and the leg gains its meta-gate rows. Observed by
   AC13.
 - **S13** — The fixture, `gov_tag.py --fixture --plant <case>`, a scratch git repository with two
-  worktrees, a three-row registry and planted documents. Observed by AC2 to AC8.
+  worktrees, a three-row registry and planted documents. Observed by AC2 to AC8 and AC16.
 - **S14** — The `owned` arm of `check`, the systems record's check table row: a tag minted in a
   namespace whose row's `layer` is a core layer, by a declaring source that sits in a kit whose
   descriptor's `layer` is an `optional` or `expansion` row of `tools/playbook/layers.toml`, is red,
@@ -183,9 +221,12 @@ point 3, the owner's NT-15; C1-F3, DA-M9, FM10).
 - **consumes-from** external — dGroundRules, landed before this build run: the catalogue `tools/policy/catalogue.toml` holding the three rows and the shrink-only `tools/policy/unsummarised-keys.txt` (TOOL-dGroundRules-1 S3, S6, `cl-dClosedLoop-0007`), the reader `policy.py get` (TOOL-dGroundRules-2 S7, `cl-dClosedLoop-0008`) and the mirror's `mirror --write`; and dSafePassage's update for the re-copied template. The re-export rides no dSafePassage shim row: its hold is unit 31's settled re-export fork, counted by dConvergedCharter
 - **hands-off** `PLAY-dOrderedCharter-40` — the doc extractor reading the reference registry's rows, so each page's registry tag is declared (finding 2)
 - **hands-off** `PLAY-dOrderedCharter-44` — S4's freshness keyed on the extractor and its version as well as the blob, with a parse ledger and a schema stamp (finding 76)
-- **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 11, 44, 55, 77 and 78, which that batch unit corrects after this unit lands, each by the item its report id names
+- **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 11, 55, 77 and 78, which that batch unit corrects after this unit lands, each by the item its report id names; finding 44 is folded into S9 and AC17
 - **hands-off** `PLAY-dOrderedCharter-51` — `tree_built` keyed on the tree and its extractor-versions digest, and every read filtered to the reading worktree's own versions (round-2 id 30)
 - **hands-off** `PLAY-dOrderedCharter-55` — the index's order-5 independence, its in-place schema rebuild and the dirty rows' canonical worktree key (round-2 ids 4, 31, 41)
+- **hands-off** `PLAY-dOrderedCharter-2` — `read_policy_value` and `PolicyRefused` in `tools/playbook/policy_value.py`, through which that unit's S2 reads `charter.override`
+- **hands-off** `PLAY-dOrderedCharter-11` — `read_policy_value` and `PolicyRefused` in `tools/playbook/policy_value.py`, through which that unit's S2 reads `instructions.checks`, and `read_namespaces` in `tools/playbook/tag_index.py`, through which its S1 reads the `role` and `feature` rows
+- **hands-off** `PLAY-dOrderedCharter-27` — `read_policy_value` in `tools/playbook/policy_value.py` and its refusal `PolicyRefused`, which that unit's S2 reads `memory.code-budget` through
 
 ## 4. Design
 
@@ -217,8 +258,15 @@ planted case, one blob at two paths with one deleted, rebuilds to the rows a col
 transaction per build; WAL off, since every worktree opens the one file. The index's writes follow
 recall's SQLite pattern (`tools/memory-recall/query.py:381` `_write_set`).
 
-The citation extractor scans tracked `.md`, `.py`, `.sh`, `.js`, `.toml` and `.json` text outside
-fences for tokens `TAG_RE` matches whose namespace is registered, and for `<doc>#<seg>` sections.
+### Which text is a citation
+
+A citation is the whole text of a backticked span or of a bracketed span in tracked Markdown,
+outside fences, that `TAG_RE` matches in a registered namespace or that names a `<doc>#<seg>`
+section. Nothing in a `.py`, `.sh`, `.js`, `.toml` or `.json` file is one, so a code identifier such
+as `doc.get(` never is. `extract_citations` writes every citation into `path_row`, so `refs` lists a
+build record's citations too; `check` grades only those outside `<MEMORY_ROOT>/builds/` (S7), where
+frozen records quote plants and unbuilt specs cite the tags their units will mint. At landing no
+citation sits outside it (AC16), so the leg's failing case is §7's plant until a unit writes one.
 
 ### Bare references
 
@@ -237,16 +285,20 @@ python tools/playbook/gov_tag.py --rebuild | --list-positional
 python tools/playbook/gov_tag.py --fixture --plant <case> [--set <key>=<value>]
 ```
 
-Every line opens `tags:`. `check`'s summary carries namespaces, tags, citations, unresolved,
-retired-cited, bare refs and each empty namespace named `unarmed`, DERIVED at the run.
+Every line opens `tags:`. `check`'s summary carries namespaces, tags, citations graded, unresolved,
+retired-cited, bare refs, the build records' citations not graded, and each empty namespace named
+`unarmed` with its citations not graded, DERIVED at the run.
 
 ### The join factory
 
-The canonical block in `tools/lib/coverage_join.py` carries its own inline copy of the remote ladder
-(`remote_ladder_py`, `tools/lib/resolve_remote.py:17`), as `map_lib` does today. `map_lib` keeps the
-four names as `from coverage_join import ...` after resolving memory-tree's directory, so an adopter
-whose older `test_codebase_map.py` calls `m.compute_coverage` still runs. Without that line the
-codebase-map leg reds, which is the clause's planted case.
+`tools/lib/coverage_join.py` holds the `coverage_join` block alone. `tools/memory-tree/coverage_join.py`
+holds that block's copy and copies of `remote_ladder_py` (`tools/lib/resolve_remote.py:16`) and
+`compare_base_py` (`tools/lib/compare_base.py:15`), as `map_lib` carries the two today (`:1447`,
+`:1506`); memory-tree's `row_grammar.py:1080` already carries a `remote_ladder_py` copy. `map_lib`
+deletes both copies, its one `resolve_remote` call (`:1527`) leaving with them, and keeps four names as `from coverage_join import ...` after resolving memory-tree's directory, and
+the two-argument `derive_baseline_additions` wrapper of S9, so an adopter whose older
+`test_codebase_map.py` calls `m.compute_coverage` or `m.derive_baseline_additions(root, base)` still
+runs. Without the import line the codebase-map leg reds, which is the clause's planted case.
 
 ### Inventory
 
@@ -271,7 +323,8 @@ Additive. `index.db` is derived and built on first use; deleting it costs one re
 
 ### Rollout
 
-Live at landing under the catalogue defaults; the leg runs over gov's tree.
+Live at landing under the catalogue defaults; the leg runs over gov's tree and lands green by
+AC16's measurement, printing its zero graded citations rather than reading them as coverage.
 
 ### Files touched (estimate)
 
@@ -296,6 +349,9 @@ Live at landing under the catalogue defaults; the leg runs over gov's tree.
 - `tools/run-gates/run-gates.test.sh`
 - `tools/govkit/registry.toml`
 - `tools/govkit/subject-pins.tsv`
+- `tools/govkit/usage.toml`
+- `.lexicon.conf`, the verb pin moved, because the canonical and its copy each count
+- `memory/project/docs-undocumented.txt`, the docs leg's rows for `help/tags.md`
 - `tools/run-gates/ceiling-evidence.txt`
 - `memory/map/features/playbook.md`
 - `tools/playbook/policy_value.py` (new: `read_policy_value`, `PolicyRefused`, its inline `resolve_kit_dir`)
@@ -309,6 +365,7 @@ Live at landing under the catalogue defaults; the leg runs over gov's tree.
 - **Path-keyed rows only**: one blob sat at 24 paths at `e1a54ac67`, so a rename re-parses what did
   not change (the night pass two's review).
 - **The join factory left in `map_lib`**: the core would import an optional kit (H5).
+- **Every tracked text file graded, or only text new since the base**: §8 F4, each by its measured red.
 
 ## 5. Production-readiness checklist
 
@@ -316,8 +373,8 @@ Live at landing under the catalogue defaults; the leg runs over gov's tree.
 - perf / scale: a cold build parses every blob once; a one-file commit re-parses one blob; both DERIVED at the pass by the fixture's `--rebuild` timing, and the leg's `ceiling` set from the measured run.
 - error / empty / loading states: an unreadable registry exits 2; an empty namespace prints `unarmed`; a locked database waits on SQLite's busy timeout and then exits 2 naming it; an exit 2 from `policy.py get`, or no policy kit found, exits 2 naming the key, as TOOL-dSafePassage-9's mode read refuses.
 - observability: one summary line and one line per red.
-- risks: a tag-shaped token in prose that is not a citation; only registered namespaces are read, and `resolves` reds such a token, which the author answers by writing the full tag or quoting it otherwise.
-- testing: AC1 to AC14 and §7's arms.
+- risks: a tag-shaped token in prose that is not a citation; only a whole backticked or bracketed span of Markdown in a registered namespace is read, and `resolves` reds such a span, which the author answers by writing the full tag or quoting it otherwise. Not checked: code, build records and unarmed namespaces, each counted in the summary.
+- testing: AC1 to AC17 and §7's arms.
 - migration: §4 "### Migration".
 - user docs: a page `help/tags.md` for `gov tag` and the three keys, and its line in `help/README.md`.
 
@@ -358,11 +415,12 @@ Live at landing under the catalogue defaults; the leg runs over gov's tree.
 - **AC10** — When the parity row's block extraction is reproduced by
   `diff <(cd tools/lib && sed -n '/>>> coverage_join/,/<<< coverage_join/p' coverage_join.py) <(cd tools/memory-tree && sed -n '/>>> coverage_join/,/<<< coverage_join/p' coverage_join.py)`,
   it prints nothing; `git grep -n "m\.compute_coverage\|m\.resolve_compare_base\|m\.derive_baseline_additions\|m\.drop_touched_exemptions" -- tools/codebase-map`
-  prints nothing; and in a scratch copy with `map_lib.py`'s re-export line deleted and the base's
-  `test_codebase_map.py` restored, `python tools/codebase-map/test_codebase_map.py` exits non-zero
-  naming `compute_coverage`, and with the line kept exits as the tree does.
+  prints nothing; and `python -c "import sys, inspect; sys.path.insert(0,'tools/codebase-map'); import map_lib as m; print([callable(getattr(m, n)) for n in ('compute_coverage', 'Coverage', 'drop_touched_exemptions', 'resolve_compare_base')], len(inspect.signature(m.derive_baseline_additions).parameters))"`
+  prints four `True` and `2`, the names and the two-argument call an older
+  `test_codebase_map.py` makes, while in a scratch copy with `map_lib.py`'s re-export line deleted
+  the same probe exits non-zero naming `compute_coverage`.
   Red when: a consumer still reaches a moved name through `map_lib`, or the re-export is not what
-  keeps an older copy working.
+  keeps an older copy's names resolving.
   fixture: a copy under `%TEMP%`.
 - **AC11** — When the two `common_git_dir` blocks in `tools/memory-recall/query.py` and
   `tag_index.py` are compared with the canonical `common_dir.py` by the
@@ -389,19 +447,40 @@ Live at landing under the catalogue defaults; the leg runs over gov's tree.
   prints three lines.
   Red when: a key keeps no summary or usage, stays on the list, gains a second row, or is read in a
   shape the reader-coverage arm does not count.
+- **AC16** — When `python tools/playbook/gov_tag.py check` runs over gov's tree at the pass, it
+  exits 0 and its summary prints the citations graded, `<n> in build records not graded` and
+  `unarmed unit (<n> not graded)`; with `` `doc.no-such-doc` `` added to
+  `memory/guides/MERGE-BAR.md` it exits 1 naming that path and line; and `--plant scope` exits 0
+  over an unresolved bracketed tag in a `memory/builds/` file, `doc.get(` in a `.py` file and a
+  `unit.x` citation with no unit rows, each counted, and exits 1 with that unresolved tag in a guide.
+  Measured before the pass, at HEAD `804879199`, S7's population leaves **0 red** over the tree:
+  0 citations graded, and 204 under `memory/builds/` not graded (34 resolve, 14 do not, 156 cite
+  `unit`).
+  Red when: a build record's citation or a code identifier is graded, a skip prints no count, or
+  the plant passes.
+- **AC17** — When `git grep -n "map_root\|load_conf\|MapError" -- tools/lib/coverage_join.py tools/memory-tree/coverage_join.py`
+  runs, it prints nothing; and a probe calling memory-tree's moved
+  `derive_baseline_additions(tmp, base, rel)`, `rel` being `memory/map/baseline.toml`, in a scratch
+  git repository whose base commit seeds that file with `a = ["k1"]`, answers `({}, note)` for an unchanged working file,
+  `({"a": ["k2"]}, note)` for a working `a = ["k1", "k2"]`, `None` with `no memory/map/baseline.toml at <sha>`
+  for a base without the file, and raises `tomllib.TOMLDecodeError`, never `MapError`, for a
+  working file that does not parse.
+  Red when: the core reads codebase-map's conf or raises its error, or one of the four answers
+  moves.
+  fixture: a scratch git repository under `%TEMP%`.
 
 ## 7. Gates
 
-`memory hygiene` · `python resolver (behaviour + inline parity + idiom ban)` · `codebase-map coverage + freshness` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `recall floor` · `memory-recall kit selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor arms` · `playbook render selftest` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `kit epoch (shipped bytes move, the version moves)`
+`memory hygiene` · `python resolver (behaviour + inline parity + idiom ban)` · `codebase-map coverage + freshness` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `recall floor` · `memory-recall kit selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor arms` · `playbook render selftest` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `kit epoch (shipped bytes move, the version moves)` · `straggler-guard arms`
 
 dGroundRules' policy legs, `policy check` and `policy fixtures`, run `arm_summaries`, the mirror's
 parity and the reader-coverage arm over this unit's rows and calls; they are named here rather than
 on the leg line, because neither exists at this spec's base.
 
-New arm: tools/playbook/gov_tag.py · covers AC9 AC12 · the new `tags` leg over the tree, its failing case staged by citing `doc.no-such-doc` in a guide · none
-New arm: tools/playbook/adopt-playbook.sh · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC14 · the playbook-render selftest runs `gov_tag.py --fixture` under every plant of S13 and S14 · none
+New arm: tools/playbook/gov_tag.py · covers AC9 AC12 AC16 · the new `tags` leg over the tree, its failing case staged by citing `doc.no-such-doc` as a backticked span in a guide · none
+New arm: tools/playbook/adopt-playbook.sh · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC14 AC16 · the playbook-render selftest runs `gov_tag.py --fixture` under every plant of S13 and S14 · none
 New arm: tools/lib/resolve-python.test.sh · covers AC10 AC11 · the `coverage_join` and `common_git_dir` parity rows, each failing case staged by editing one copy · none
-New arm: tools/codebase-map/selftest.py · covers AC10 · the selftest's coverage and base arms import the four names from memory-tree's module · none
+New arm: tools/codebase-map/selftest.py · covers AC10 AC17 · the selftest's coverage and base arms import the four names from memory-tree's module, staged by restoring the core's two-argument `derive_baseline_additions` · none
 
 ## 8. Open questions
 
@@ -421,6 +500,33 @@ New arm: tools/codebase-map/selftest.py · covers AC10 · the selftest's coverag
   table names `unique`'s and `never`'s reds and no third. RESOLVED (agent, 2026-10-23, delegated):
   §4 "### Bare references", rung 3, the reading under which each value has its own planted red.
   widens: none · relaxes: none
+- **F4 — Which text `check` grades (unit 19's divergence).** Each option was run over HEAD
+  `804879199` against `resolve_compare_base`'s base `8bec4cef`, registered namespaces `doc` and
+  `unit`; each must leave 0 red and still red §7's plant. Rev-5, every tracked text file: 34
+  unresolved `doc` citations in 12 files with a word-bounded `TAG_RE` (the builder's unbounded grep
+  found 103 in 30, `doc.get(` among them) and 223 into `unit`. (a) a whole backticked or bracketed
+  Markdown span: 14 red, all under `memory/builds/` (spec 3:157 `doc.skills`, spec 8:74
+  `doc.orientation-card`). (b) only citations absent from the base, keyed by path and tag: 2 red, the
+  two prompt records `804879199` committed that quote the plant. (b') the same keyed by tag alone: 0
+  red, but `doc.no-such-doc` is at the base (this spec's line 401 there), so the plant passes.
+  (c) (a) and (b): the same 2 red. (d) (a) over paths outside `<MEMORY_ROOT>/builds/`: 0 red, the
+  plant reds. (e) (d) and (b): 0 red, the plant reds. Veto 1 discards (a), (b) and (c), whose reds
+  sit in frozen records or unbuilt specs no pass may edit, failing §7's `tags` leg, and (b'), whose
+  plant passes. (e) loses to (d): a citation whose
+  target is later renamed sits in unchanged text, which (d) reds and (e) passes, and with no fetched
+  remote `resolve_compare_base` answers None (`tools/codebase-map/selftest.py:1600`), leaving (e)
+  nothing to grade. The zero is not the evidence alone: (d)'s graded population is empty at
+  landing, printed as such, and the plant is its liveness. RESOLVED (agent, 2026-11-03, delegated):
+  (d), §4 "### Which text is a citation" and S7. widens: none · relaxes: rev-5's `resolves` red, for
+  a citation in code or under `memory/builds/`, each counted, never graded
+- **F5 — Whether a citation into an unarmed namespace is graded.** Options: (a) graded, red as
+  unresolved; (b) counted and not graded until the namespace holds a row. No `unit` citation sits in
+  F4's population at HEAD, so the tree does not decide. (a) reds a citation for its namespace's
+  emptiness rather than its text, and a unit built before PLAY-dOrderedCharter-9 that writes one
+  in a guide or a help page would red with no remedy but unit 9's rows, a follow-up (b) does not
+  leave; (b) prints the count charter `[gate]` asks, and the first row grades them all.
+  RESOLVED (agent, 2026-11-03, delegated): (b), S7. widens: none · relaxes: rev-5's `resolves`
+  red, for a citation into an unarmed namespace, counted
 
 ## 9. Revision log
 
@@ -439,23 +545,36 @@ New arm: tools/codebase-map/selftest.py · covers AC10 · the selftest's coverag
 - rev-5 · 2026-10-25 · S9 · §3 · S9's hold is PLAY-dOrderedCharter-31's §8 F6, which the owner settled
   on (a), counted by dConvergedCharter from the `module-export` row's landing commit, from
   `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md` Item 3.
+- rev-6 · 2026-11-03 · §1 · S3 · S7 · S9 · S12 · S13 · §3 · §4 · §5 · AC16 · AC17 · §7 · §8 F4 F5 ·
+  §10 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-divergence-brief.md`: `check` grades whole
+  backticked or bracketed Markdown spans outside the build records (F4, 0 red at HEAD) and counts
+  an unarmed namespace's citations (F5); PLAY-dOrderedCharter-49's S38 and AC29 fold into S9 and
+  AC17, the core reading no codebase-map conf; `resolve_compare_base` rides as a `compare_base_py`
+  copy; stale lines re-cited at HEAD.
+- rev-7 · 2026-11-03 · §4 Files touched · AC10 · AC17 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 1: AC17 observes the moved `derive_baseline_additions` by a probe of its four answers in a scratch repository, and AC10 the re-export by a `map_lib` probe, neither by a suite run, the codebase-map selftest staying on §7's `New arm:` line; Files touched adds `tools/govkit/usage.toml`, `.lexicon.conf` and `memory/project/docs-undocumented.txt`.
+- rev-8 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md`, the main loop's confirming sweep: rev-7's Files touched names `.lexicon.conf`, which trips the `straggler-guard arms` guard, so the §7 leg line names that leg.
+- 2026-11-04 · section 3 Edges · from `2026-11-04-prompt-PLAY-dOrderedCharter-15-edge-mirror-brief.md`: the hands-off mirrors of the consumes-from edges units 2, 11 and 27 declare against this unit; a mirror-only edit, so the status line keeps its rev.
 
 ## 10. Reuse audit
 
-The seams extended: `compute_coverage` and its three siblings (`tools/codebase-map/map_lib.py:1373,
-1404, 1502, 1530`), moved and not rewritten; the `PARITY_ROWS` canonical-copy table
-(`tools/lib/resolve-python.test.sh:168-184`); `common_git_dir` (`tools/memory-recall/query.py:248`);
-blob reads through `read_blobs_at` (`tools/memory-tree/tree_lib.py:328`); recall's SQLite build
-pattern (`tools/memory-recall/bench.py:88`, `query.py:381`). `reuse_lookup.py "build a blob-keyed
+The seams extended: `compute_coverage` and its siblings (`tools/codebase-map/map_lib.py:1373,
+1404, 1544`), moved and not rewritten, `derive_baseline_additions` narrowed to a path argument;
+`resolve_compare_base` through its existing canonical `tools/lib/compare_base.py` and
+`compare_base_py` row, the base `retired` already reads, never a second canonical; the `PARITY_ROWS`
+canonical-copy table (`tools/lib/resolve-python.test.sh:351-370`); `common_git_dir`
+(`tools/memory-recall/query.py:248`); blob reads through `read_blobs_at`
+(`tools/memory-tree/tree_lib.py:328`); recall's SQLite build pattern
+(`tools/memory-tree/id_grammar.py:604`, which `tools/memory-recall/bench.py:103` imports, and
+`query.py:381`). `reuse_lookup.py "build a blob-keyed
 SQLite cache of what each file defines and cites"` ranked `key`, `keys`, `build`, `build_commit`,
-`build_fixture` and `read_conf_key`, none an index of definitions; `bench.py`'s `build_index` is an FTS
+`build_fixture` and `read_conf_key`, none an index of definitions; `id_grammar.py`'s `build_index` is an FTS
 ranking index, not a definition index, so no tag index exists. The policy read reuses the playbook
 kit's `resolve_kit_dir` block, whose kit copy opens `tools/playbook/render_playbook.py:78-79`, as a
 new inline copy in `tools/playbook/policy_value.py` that the existing `resolve_kit_dir` row of
-`PARITY_ROWS` (`tools/lib/resolve-python.test.sh:172`) holds to its canonical, found by that row's
-marker grep (`:218`) with no new row; and it runs `policy.py get` as TOOL-dSafePassage-9 runs it for
+`PARITY_ROWS` (`tools/lib/resolve-python.test.sh:355`) holds to its canonical, found by that row's
+marker grep (`:409`) with no new row; and it runs `policy.py get` as TOOL-dSafePassage-9 runs it for
 govkit, in the contract unit 7's §4 states, never importing the sibling kit. Where the scout and source disagree:
-the run-gates canary's known-key set (`run-gates.test.sh:244,580`) refuses a new leg key, which the
+the run-gates canary's known-key set (`run-gates.test.sh:364,700`) refuses a new leg key, which the
 scout's `pack` proposal did not name.
 
 Recall terms used: `python tools/memory-recall/query.py "how is the tag index keyed and shared across worktrees" --terms "tag index sqlite index.db git-common-dir blob path dirty worktree resolver gov tag NT-15"`

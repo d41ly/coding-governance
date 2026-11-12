@@ -37,8 +37,13 @@ globs = [
 # carried-prefix ban as a path assembled from quoted segments.
 default = [
   "playbook",
+  # PLAY-dOrderedCharter-31 S11: the renderer ships the template `check-microformats` grades, so it
+  # ships with every default install.
+  "playbook-render",
   "kickoff-manifest",
   "memory-tree",
+  # PLAY-dOrderedCharter-78 S1: `playbook-render` requires the policy kit, so the default carries it.
+  "policy",
   "codebase-map",
   "memory-recall",
   "run-gates",
@@ -101,10 +106,6 @@ descriptor = "{prefix}/roles/kit.toml"
 [[entry]]
 id = "branch-reconcile"
 descriptor = "{prefix}/branch-reconcile/kit.toml"
-
-[[entry]]
-id = "agent-instructions"
-descriptor = "{prefix}/agent-instructions/kit.toml"
 
 [[entry]]
 id = "unattended"
@@ -192,7 +193,30 @@ kind = "flat"
 # retiring commit is DERIVED from the default branch's first-parent history and never typed. `update`
 # and `check` read these rows through `<prefix>/govkit/upgrade_steps.py`, never here: a claimed kit
 # with a successor is carried to it, one retired to "none" is released and its rows read
-# `withdrawn`. A landed row is frozen. None has retired yet.
+# `withdrawn`. A landed row is frozen. A target's `kits` naming a retired id reads as its successor
+# (PLAY-dOrderedCharter-31 S10).
+
+# PLAY-dOrderedCharter-31 S1: the renderer's `entry-files` scope absorbed the kit's wiring.
+[[retired]]
+id = "agent-instructions"
+successor = "playbook-render"
+surfaces = [
+  "entry:agent-instructions",
+  "file:{prefix}/agent-instructions/README.md",
+  "file:{prefix}/agent-instructions/adopt-agent-instructions.sh",
+  "file:{prefix}/agent-instructions/kit.toml",
+  "installable:{prefix}/agent-instructions/README.md",
+  "installable:{prefix}/agent-instructions/adopt-agent-instructions.sh",
+  "installable:{prefix}/agent-instructions/kit.toml",
+]
+
+# PLAY-dOrderedCharter-31 S5: the `playbook` entry's seed rule, which copied the charter template to
+# `{playbook_path}`. The renderer kit ships the template beside its engine; an adopter's copy reads
+# `retired-edited` or `withdrawn` at `update`.
+[[retired]]
+id = "playbook/seeded-template"
+successor = "none"
+surfaces = ["file:coding-governance-agents.template.md", "installable:{playbook_path}"]
 
 # ------------------------------------------------------------------------------------- exemptions
 # Each carries a non-empty reason. `selfcheck` reds on an exemption whose path no longer exists, so
@@ -331,6 +355,10 @@ why = "gov's own rebase-time carrier for the straggler rule, deliberately not sh
 [[exempt]]
 path = ".githooks/straggler-guard.test.sh"
 why = "gov's own red/green arms for the two files above, which are themselves registry exemptions. Its fixtures build a memory tree, install this repo's kits into it and drive the real hooks; an adopter receives neither the library nor `pre-rebase`, so the suite would red there on absence rather than on behaviour. Exemptions are exact-path, so the subjects' rows do not cover their sibling — the precedent is `.githooks/pre-commit.test.sh` above. TOOL-dDerivedDocket-13."
+
+[[exempt]]
+path = "skills/session-kickoff/card-compaction.fixture.sh"
+why = "gov's own live fixture for the orientation card file, deliberately not shipped. It drives two headless `claude` sessions and a compaction, minutes of model time and API tokens, so the main loop runs it live and no target receives it: a target has no build whose card it would prove. PLAY-dOrderedCharter-8 S1; exempted by PLAY-dOrderedCharter-77 S7."
 
 [[exempt]]
 path = "AGENTS.md"
@@ -544,8 +572,8 @@ name = "foreign-prefix parity (every self-test at three prefixes)"
 why = "it runs `foreign-prefix.gov.test.sh`, which `<prefix>/run-gates/kit.toml` withholds with `role = \"project-owned\"` beside `run-gates.gov.test.sh`: it moves GOV's whole tool root in a scratch clone and grades gov's own declared self-test population there, so in any other tree it has no population to move. A held leg with a budget row, run once per build (TOOL-aRepatriatedFork-18 section 8 F3, TOOL-aRepatriatedFork-30 S1). NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`."
 
 [[exempt_leg]]
-name = "agent-instructions self-test"
-why = "it runs `adopt-agent-instructions.test.sh`, which `<prefix>/agent-instructions/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+name = "agent-instructions wiring"
+why = "it runs `<prefix>/playbook/render_playbook.py --check-render --scope entry-files --aliases claude`, the renderer's `entry-files` check over gov's own entry files, which the retired agent-instructions kit's `--check` reached. NOT a [[gate_leg]] on the `playbook-render` descriptor: that row would hand it to every target selecting that entry, where it reds while the target's aliases are unwired, and no path of `apply` wires them (section 8, F3). PLAY-dOrderedCharter-39."
 
 [[exempt_leg]]
 name = "codebase-map kit selftest"
@@ -712,6 +740,86 @@ name = "policy fixtures"
 why = "it runs `check_policy.py --fixture`, which plants each red case of the policy kit's arms into a scratch repository and asserts it red as planted and green without, so its subject is the arms and the catalogue in `<prefix>/policy/` and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. The file ships, because the same script is the `policy check` leg every adopter runs; the LEG is gov's, held on GOV's bar like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dGroundRules-1."
 
 [[exempt_leg]]
+name = "layer dependencies (the core never depends on an expansion)"
+why = "it runs `<prefix>/playbook/check_layers.py`, which grades gov's own kit sources against gov's own layer register, `<prefix>/playbook/layers.toml`: every descriptor's `layer` row and every edge from a file a core kit ships to a non-core kit. The script and the register ship with the playbook-render kit's `**` include, so an adopter receives them, but the LEG is gov's: the kits it grades are authored here, and an adopter that copy-installs them has no edge of its own to grade. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-16."
+
+[[exempt_leg]]
+name = "tags (the resolver's checks)"
+why = "it runs `<prefix>/playbook/gov_tag.py check`, the tag resolver's checks over gov's own tree: the citations of gov's guides, help pages and kit READMEs against the namespaces `<prefix>/playbook/namespaces.toml` registers, read from gov's own index. The resolver and its registry ship with the playbook-render kit's `**` include, so an adopter receives them, but the LEG is gov's: the documents it grades and the namespaces it grades them against are authored here. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-19."
+
+[[exempt_leg]]
+name = "instruction ladder (level is the one term)"
+why = "it runs `<prefix>/playbook/instruction_units.py ladder-terms`, which reds a ladder place spelled as a priority or a rank in gov's own instruction sources, the closed pathspec list `LADDER_SOURCES`: gov's charter template, kit templates, role agents, Skills and workflow templates. The module ships with the playbook-render kit's `**` include, so an adopter receives it, but the LEG is gov's: the sources it grades are authored here, and an adopter's tree holds none of those paths. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-13."
+
+[[exempt_leg]]
+name = "instruction grammar (statement types, provenance lock)"
+why = "it runs `<prefix>/playbook/instruction_units.py grammar`, which grades gov's own unit rows against the closed statement types through the unit reader, every document gov renders from units against the four unloaded shapes, and gov's own `.governance/instructions.lock` against the tree. The module ships with the playbook-render kit's `**` include, and the renderer writes an adopter its own lock, but the LEG is gov's: the unit rows and their reader are authored here, so an adopter carrying the leg holds an empty population for its unit half. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-12."
+
+[[exempt_leg]]
+name = "instruction envelopes"
+why = "it runs `<prefix>/playbook/instruction_units.py envelopes --check`, which holds every document of `<prefix>/playbook/documents.toml` to its envelope and every load-bearing document gov tracks to a row of it. The module and the registry ship with the playbook-render kit's `**` include, but the LEG is gov's: the registry's seeded rows name gov's own documents, the merge-bar guide, the kickoff manifest and the role agent files among them, and each row must match a file, so an adopter carrying the leg reds on a document it never received. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-3."
+
+[[exempt_leg]]
+name = "edges (every declared edge parses, is registered and resolves)"
+why = "it runs `<prefix>/playbook/edge_grammar.py --check`, the edge check over gov's own tree: every record header, record section, spec `**Carries:**` line, `gov:handoff` marker and commit trailer read as a typed edge, graded against `<prefix>/playbook/edges.toml` and resolved against gov's own index, defined ids and design view. The checker and its registries ship with the playbook-render kit's `**` include, so an adopter receives them, but the LEG is gov's: the records, specs and trailers it grades are authored here, beside the `tags` leg it joins in the `tags` pack. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-28."
+
+[[exempt_leg]]
+name = "writing practice (records and units)"
+why = "it runs `<prefix>/playbook/writing_practice.py check`, the writing practice's one-subject, pinned-facts, one-door and rationale-apart arms over gov's own records, unit rows and registered documents, against `<prefix>/playbook/doors.toml` and gov's keyed list `unpinned-facts.txt` under the memory root's `project/` folder, which no descriptor ships and no target is written. The module and the door list ship with the playbook-render kit's `**` include, but the LEG is gov's: an adopter carrying it refuses on the absent list until it seeds its own. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-29."
+
+[[exempt_leg]]
+name = "one-owner"
+why = "it runs `<prefix>/playbook/writing_practice.py check one-owner`, which holds every namespace, kind and kit unit row gov authors to exactly one owner, a build gov's `memory/builds/` holds or a layer of `<prefix>/playbook/layers.toml`. The module ships with the playbook-render kit's `**` include, but the LEG is gov's: the owners it grades name gov's own chain builds, which an adopter's tree does not hold. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-29."
+
+[[exempt_leg]]
+name = "instruction edits (manifest checks)"
+why = "it runs `<prefix>/playbook/instructions_edit.py check`, the write command's checks over gov's own manifests and change records, among them the tag checks, against the citations of gov's guides, help pages and kit READMEs and the namespaces `<prefix>/playbook/namespaces.toml` registers, read from gov's own index, the reason the `tags` row gives. The command ships with the playbook-render kit's `**` include, but the LEG is gov's: the rows and records it grades are authored here. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-15."
+
+[[exempt_leg]]
+name = "instruction edits selftest"
+why = "it runs `<prefix>/playbook/instructions_edit.py fixture`, every plant of the module's table. Its cases reach the `policy` and `memory-tree` kits, which a `playbook-render` target may not hold, the reason `instruction units selftest` gives, so the LEG is gov's: on gov's bar each kit is present, and a kit not found reds the case, never a skip. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-15."
+
+[[exempt_leg]]
+name = "instruction units (schema, one fact)"
+why = "it runs `<prefix>/playbook/instruction_units.py schema one-fact`, which grades each row of the kit manifests gov authors: an adopter copy-installs those manifests and never edits them, the reason `layer dependencies` gives, so an adopter carrying the leg grades nothing of its own. The module ships with the playbook-render kit's `**` include, but the LEG is gov's. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-20."
+
+[[exempt_leg]]
+name = "instruction render (one renderer of record)"
+why = "it runs `<prefix>/playbook/render_playbook.py --check-render`, the render gate over gov's own files against gov's own `<prefix>/playbook/renderers.toml` and `<prefix>/playbook/instructions-legacy.txt`, whose rows name gov's instruction files. The engine ships with the playbook-render kit's `**` include and an adopter keeps its renders through the absorbed wiring legs, but the LEG is gov's. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-20."
+
+[[exempt_leg]]
+name = "instruction units selftest"
+why = "it runs `<prefix>/playbook/instruction_units.py fixture`, every plant of the module's table. `work-order` and `legacy` reach the `roles` and `policy` kits, which a `playbook-render` target may not hold, so the LEG is gov's: on gov's bar each kit is present, and a kit not found reds the case, never a skip. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-20."
+
+[[exempt_leg]]
+name = "core selftest"
+why = "it runs `<prefix>/playbook/core.py fixture`, every plant of the core's table, each writing its registries, legs, records and committed policy into a scratch repository. Its plants read their policy through the `policy` kit, which a `playbook-render` target may not hold, the reason `instruction units selftest` gives, so the LEG is gov's, as the core's four gates over gov's own registries are: on gov's bar each kit is present, and a kit not found reds the case, never a skip. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-7, moved here by PLAY-dOrderedCharter-77 S8."
+
+[[exempt_leg]]
+name = "tags positional selftest"
+why = "it runs `<prefix>/playbook/positional.py --selftest`, every positional plant, each through `gov_tag.py --fixture` in a scratch repository. Its plants read the `tags.*` keys through the `policy` kit and their blobs through the `memory-tree` kit, which a `playbook-render` target may not hold, the reason `instruction units selftest` gives, so the LEG is gov's, beside the `tags` row above. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-26, moved here by PLAY-dOrderedCharter-77 S8."
+
+[[exempt_leg]]
+name = "tags bundle selftest"
+why = "it runs `<prefix>/playbook/tag_bundle.py --selftest`, every `bundle-*` plant, each through `gov_tag.py --fixture` in a scratch repository, so it reaches the `policy` and `memory-tree` kits for the reason `tags positional selftest` gives, and the LEG is gov's. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-25, moved here by PLAY-dOrderedCharter-77 S8."
+
+[[exempt_leg]]
+name = "core meta-check"
+why = "it runs `<prefix>/playbook/core.py meta-check`, which joins gov's own principle registry, `<prefix>/playbook/principles.toml`, both ways to the `enforces` of gov's own legs and the `binds` of gov's own kinds register, against gov's own pending list and design record. The script and its registries ship with the playbook-render kit's `**` include, but the LEG is gov's: the principles, legs and pending rows it grades are authored here. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-7."
+
+[[exempt_leg]]
+name = "core kinds"
+why = "it runs `<prefix>/playbook/core.py kinds`, the conformance-gate contract over gov's own kinds register, `<prefix>/playbook/kinds.toml`: each landed kind's factory and the gate leg of gov's own `gate-legs.json` that enforces its binds. The LEG is gov's, as `core meta-check`'s is, for that row's reason. PLAY-dOrderedCharter-7."
+
+[[exempt_leg]]
+name = "core skills conformance"
+why = "it runs `<prefix>/playbook/core.py kinds skill`, the Skill kind's gate over gov's own `skills/*/SKILL.md`: every Skill directory holds a SKILL.md whose name is its directory and whose description is non-empty and at most 1024 characters. The Skills it grades are gov's own, so the LEG is gov's, as `core meta-check`'s is, for that row's reason. PLAY-dOrderedCharter-7."
+
+[[exempt_leg]]
+name = "core practices conformance"
+why = "it runs `<prefix>/playbook/core.py kinds practice`, the practice kind's gate over gov's own practice catalogue, `<prefix>/playbook/practices.toml`, `unarmed` until PLAY-dOrderedCharter-1 writes it. The catalogue it grades is gov's own, so the LEG is gov's, as `core meta-check`'s is, for that row's reason. PLAY-dOrderedCharter-7."
+
+[[exempt_leg]]
 name = "step-rows-frozen"
 why = "it runs `<prefix>/govkit/upgrade_steps.py frozen`, the deployer's own step reader grading gov's landed `[[upgrade]]` and `[[retired]]` rows against the push base. The deployer is a registry exemption that never travels into a target, and a step row is authored in gov's descriptors, so the rows are frozen where they land; an adopter has no deployer and no row to freeze. TOOL-dSafePassage-1."
 
@@ -724,5 +832,17 @@ name = "docs"
 why = "it runs `<prefix>/govkit/docs_leg.py`, which grades gov's own pages under `help/` against gov's own user-facing population through the step gate's class readers and the rows of `usage.toml`, and reads `help.enforce` through the deployer's policy reader. The deployer is a registry exemption that never travels into a target, and the pages, the rows and the shrink-only list are gov's, so the leg grades gov's landings; an adopter has no deployer and no help tree it grades. TOOL-dSafePassage-13."
 
 [[exempt_leg]]
+name = "help reference pages"
+why = "it runs `<prefix>/playbook/render_playbook.py --reference --check`, which compares gov's own pages under `help/reference/` with a render of the registries `<prefix>/playbook/references.toml` declares, taking each anchor's fingerprint from the docs leg's `--fingerprints`. The renderer ships with the playbook-render kit, but the docs leg it reads is the deployer's, a registry exemption that never travels into a target, and the pages are gov's, so the LEG is gov's. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-37."
+
+[[exempt_leg]]
+name = "help page commands"
+why = "it runs `<prefix>/govkit/docs_leg.py --run`, which runs every command gov's own pages under `help/` show, each page in a scratch adopter it installs gov's checkout into. The leg is the deployer's, a registry exemption that never travels into a target, and the pages are gov's, so the leg grades gov's landings; an adopter has no deployer and no help tree it runs. PLAY-dOrderedCharter-37."
+
+[[exempt_leg]]
 name = "upgrade-walk"
 why = "it runs `<prefix>/govkit/upgrade_walk.py`, which builds release-0 with the `apply` of a scratch clone of gov at the commit `<prefix>/govkit/fixtures/release-0/pin.txt` pins, then walks every declared `[[upgrade]]` step over it up, down, up again, skipped, killed and failed through the deployer's own `update`. The deployer is a registry exemption that never travels into a target, and the steps, the pin and the fixture are gov's, so the leg grades gov's kit source; an adopter has no deployer and no step to prove. TOOL-dSafePassage-5."
+
+[[exempt_leg]]
+name = "python reads (a name never bound, an import outside its guard)"
+why = "it runs `<prefix>/run-gates/py_reads.py`, which reads gov's own manifest and gov's own tracked Python through the memory-tree kit's import walk. The file is withheld by its `project-owned` row in the run-gates descriptor, so no target's manifest can carry the leg. PLAY-dOrderedCharter-67."

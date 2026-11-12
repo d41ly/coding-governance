@@ -245,6 +245,7 @@ def git(repo: pathlib.Path, *args: str) -> str:
 # resolver this kit has.
 
 
+# >>> common_git_dir -- canonical copy: common_dir.py in the gov lib dir (byte-identical; gated)
 def common_git_dir(repo: pathlib.Path) -> pathlib.Path:
     """The MAIN repository's git directory, shared by every worktree.
 
@@ -255,6 +256,7 @@ def common_git_dir(repo: pathlib.Path) -> pathlib.Path:
     raw = git(repo, "rev-parse", "--git-common-dir").strip()
     p = pathlib.Path(raw)
     return p.resolve() if p.is_absolute() else (repo / raw).resolve()
+# <<< common_git_dir
 
 
 def read_worktree_head(repo: pathlib.Path) -> str | None:
@@ -426,6 +428,8 @@ def _build_cache(repo: pathlib.Path, dirp: pathlib.Path, files: list[str],
     _write_set(dirp, "chunks", chunks)
     man = {
         "version": CACHE_VERSION,
+        # PLAY-dOrderedCharter-49 S28: the kit's version, so a recall-only bump rebuilds a warm cache
+        "kit_version": recall_conf.KIT_MEMORY_RECALL_VERSION,
         "chunk_max": CHUNK_MAX,
         "n_files": len(files),
         "counts": {"records": len(records), "chunks": len(chunks)},
@@ -729,6 +733,7 @@ def ensure_cache(repo: pathlib.Path, force: bool = False) -> tuple[pathlib.Path,
         yield (man is not None, "no manifest")
         if man is not None:
             yield (man.get("version") == CACHE_VERSION, "CACHE_VERSION")
+            yield (man.get("kit_version") == recall_conf.KIT_MEMORY_RECALL_VERSION, "KIT_MEMORY_RECALL_VERSION")
             yield (man.get("chunk_max") == CHUNK_MAX, "chunk_max")
             yield (man.get("conf_digest") == CONF.digest(), "conf_digest")
             yield (man.get("alias_digest") == alias_digest(), "alias_digest")

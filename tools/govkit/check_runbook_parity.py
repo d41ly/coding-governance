@@ -57,7 +57,9 @@ ANCHOR = re.compile(r"<!--\s*govkit:entry\s+([a-z0-9-]+)\s*-->")
 # MEASURED 2026-09-20 on node `c` at 316978ec, five runs, before the pin existed: `18 problem(s)`
 # over `8 anchored section(s)`, `26 registry entr(y|ies)`, `0 exempt`. Every one of the eighteen is
 # a registry entry with no anchored runbook section. Writing those sections is a separate build.
-PROBLEM_PIN = 18
+# RE-MEASURED 2026-11-11 for PLAY-dOrderedCharter-80 S6: `17 problem(s)` once PLAY-dOrderedCharter-31
+# retired the `agent-instructions` entry, which had carried no anchored section; the pin falls with it.
+PROBLEM_PIN = 17
 
 
 def main() -> int:

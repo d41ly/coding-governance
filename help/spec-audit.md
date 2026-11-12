@@ -58,6 +58,7 @@ every confirmed finding promoted.
 
 `--help` prints every verb the unattended driver takes and the guide that states each verb's contract, then the driver's usage header, and exits 0. `-h` is the same. <!-- usage: verb:unattended.sh:--help 965e3eb2 -->
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
 ```bash
 bash tools/unattended/unattended.sh --help
 ```
@@ -66,6 +67,7 @@ bash tools/unattended/unattended.sh --help
 
 `--record-round` appends one spec-audit round to the build's chain record. <!-- usage: verb:unattended.sh:--record-round 60847ce3 -->
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and placeholders -->
 ```bash
 bash tools/unattended/unattended.sh --record-round <slug> --subject <s> --audited "<ids>" --blockers <b> --highs <h> --finding <id>/<severity>/<nature>/<spec>[,<spec>]/<unit>/<rev> --sibling <unit>@rev-<n>
 ```
@@ -93,6 +95,7 @@ bash tools/unattended/unattended.sh --record-round <slug> --subject <s> --audite
 `--chain-verdict` derives whether a chain goes on, and writes nothing. <!-- usage: verb:unattended.sh:--chain-verdict 5fdc7c80 -->
 It reads the chain record and the roster alone.
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and placeholders -->
 ```bash
 bash tools/unattended/unattended.sh --chain-verdict <slug>
 ```

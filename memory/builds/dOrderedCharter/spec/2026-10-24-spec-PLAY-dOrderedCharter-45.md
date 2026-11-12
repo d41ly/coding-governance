@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-45 — the merge driver's TOML-table class states its whole conflict envelope and proves its output parses
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 17 · advances PLAY-dOrderedCharter-38
+**Status:** CLOSED · rev-3 · 2026-11-05 · node d · Tier-2 · base ce13efbe · streams playbook · order 17 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,9 +11,16 @@
 | [2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md](../build/2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
 | [2026-10-24-build-PLAY-dOrderedCharter-45-deviation-451.md](../build/2026-10-24-build-PLAY-dOrderedCharter-45-deviation-451.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-45-deviation-452.md](../build/2026-10-24-build-PLAY-dOrderedCharter-45-deviation-452.md) | deviation | — |
-| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY-dOrderedCharter-76 PLAY-dOrderedCharter-77 PLAY-dOrderedCharter-78 PLAY-dOrderedCharter-80 PLAY-dOrderedCharter-81 PLAY-dOrderedCharter-82 PLAY-dOrderedCharter-83 PLAY-dOrderedCharter-84 PLAY-dOrderedCharter-85 PLAY-dOrderedCharter-86 PLAY-dOrderedCharter-87 PLAY-dOrderedCharter-88 |
+| [2026-11-02-build-PLAY-dOrderedCharter-45-ledger.md](../build/2026-11-02-build-PLAY-dOrderedCharter-45-ledger.md) | journal | — |
+| [2026-11-05-build-PLAY-dOrderedCharter-45-1-builder-return.md](../build/2026-11-05-build-PLAY-dOrderedCharter-45-1-builder-return.md) | journal | — |
+| [2026-11-05-build-PLAY-dOrderedCharter-45-deviation-453.md](../build/2026-11-05-build-PLAY-dOrderedCharter-45-deviation-453.md) | deviation | — |
+| [2026-11-10-build-PLAY-dOrderedCharter-1-runlog-8d3cc031.md](../build/2026-11-10-build-PLAY-dOrderedCharter-1-runlog-8d3cc031.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY-dOrderedCharter-76 PLAY-dOrderedCharter-77 PLAY-dOrderedCharter-78 PLAY-dOrderedCharter-80 PLAY-dOrderedCharter-81 PLAY-dOrderedCharter-82 PLAY-dOrderedCharter-83 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
+| [2026-11-02-prompt-PLAY-dOrderedCharter-45-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-45-build-brief.md) | journal | — |
+| [2026-11-04-prompt-PLAY-dOrderedCharter-1-drift-sweep-brief.md](../prompts/2026-11-04-prompt-PLAY-dOrderedCharter-1-drift-sweep-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-41 |
 | [2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md](../reviews/2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-49 |
+| [2026-11-05-review-PLAY-dOrderedCharter-1-closing-diff-review-round1.md](../reviews/2026-11-05-review-PLAY-dOrderedCharter-1-closing-diff-review-round1.md) | diff-review | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 |
 
 <!-- /gen:spec-records -->
 
@@ -22,7 +29,7 @@
 The round-1 spec audit (`memory/builds/dOrderedCharter/reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md`)
 confirmed **finding 79 at HIGH**, its item **H6**. `PLAY-dOrderedCharter-15` S1 adds a multi-line
 `[[unit]]` table class to `tools/memory-tree/merge-rows.py`, whose row plane is one line per row
-(`_ROW_RE` at `:402`), and states only "no tag lost, none duplicated". It says nothing about both
+(`_ROW_RE`, `tools/memory-tree/merge-rows.py#_ROW_RE`), and states only "no tag lost, none duplicated". It says nothing about both
 sides editing one tag's table, one side deleting a tag the other edits, a multi-line `text = """..."""`
 string, or whether the merged file must still parse as TOML. A line merge would interleave two edits
 of one unit's text, and a whole-table merge would silently drop one side's edit; both pass unit 15's
@@ -69,8 +76,9 @@ side's. It repairs unit 15 and is built right after it.
   text parses with `tomllib`; its key set equals the set S3 derived, each key once; and each entry's
   chunk is byte-identical to that key's chunk on one of the three sides. A failed postcondition, or
   any conflict, writes the whole-file conflict body through `write_conflict_body`
-  (`tools/memory-tree/merge-rows.py:1333`) with a label naming every conflicting key, and exits 1, as
-  the driver fails closed today (`:1550-1553`). Observed by AC4.
+  (`tools/memory-tree/merge-rows.py:1333` at base; `tools/memory-tree/merge-rows.py#write_conflict_body`)
+  with a label naming every conflicting key, and exits 1, as the driver fails closed today (the
+  `except Exception` arm of `main()`, `tools/memory-tree/merge-rows.py@c7269a97:1511-1514`). Observed by AC4.
 - **S5** — The plants, through unit 15's fixture, `python tools/playbook/instructions_edit.py fixture
   --plant <case>`: `merge-both-edit`, `merge-delete-edit`, `merge-edit-delete`, `merge-multiline` (a
   `text = """..."""` value on each side, one holding a line that reads `[[unit]]`), `merge-same-add`,
@@ -102,6 +110,10 @@ lines are `key = value` pairs, merged positionally as structure by `git merge-fi
 `write_conflict_body` (`:1333`), a whole-file conflict carrying both sides. Unit 15 S1 routes
 `**/instructions.toml` and `.governance/instructions.toml` to `merge=rows`, and its AC1 plants two adds
 and one duplicate add only.
+
+Re-read at `c7269a97`: unit 18 (`2d03321ab`) moved each line above 39 lines up, and each is held by its
+symbol: `tools/memory-tree/merge-rows.py#_ROW_RE`, `tools/memory-tree/merge-rows.py#merge` (`path` still
+keyword-only), `tools/memory-tree/merge-rows.py#main` and `tools/memory-tree/merge-rows.py#write_conflict_body`.
 
 ### Flow
 
@@ -195,12 +207,14 @@ New arm: tools/memory-tree/merge-rows.test.sh · covers AC2 AC3 AC4 AC5 · the t
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-1 spec audit's finding 79 (HIGH, item H6).
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-52, PLAY-dOrderedCharter-55.
+- rev-3 · 2026-11-04 · section 1 · section 2 S4 · section 4 Evidence · section 10 · from `2026-11-04-prompt-PLAY-dOrderedCharter-1-drift-fold-brief.md` (finding 45-1): the driver's lines, which unit 18 moved 39 lines up, are cited by symbol or by a line pinned at `c7269a97`, each base citation kept beside its stable form.
 
 ## 10. Reuse audit
 
-The seam extended is `merge()` and `main()` in `tools/memory-tree/merge-rows.py` (`:1227`, `:1508`), the
-row-keyed driver every governed index already routes through, with its fail-closed conflict writer
-`write_conflict_body` (`:1333`) reused as is. `python tools/codebase-map/reuse_lookup.py "three-way
+The seam extended is `merge()` and `main()` in `tools/memory-tree/merge-rows.py`
+(`tools/memory-tree/merge-rows.py#merge`, `tools/memory-tree/merge-rows.py#main`), the row-keyed driver
+every governed index already routes through, with its fail-closed conflict writer `write_conflict_body`
+(`tools/memory-tree/merge-rows.py#write_conflict_body`) reused as is. `python tools/codebase-map/reuse_lookup.py "three-way
 merge of keyed TOML tables with a parse postcondition"` ranked `key` (`tools/memory-tree/merge-rows.py`,
 fan-in 104), `parse` and `merge` (`tools/memory-tree/merge-rows.py`, `tools/settings-merge.py`) by name
 stem. `merge` is the seam; `key` keys one-line rows by id and belongs to the plane this class

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# gov:kit lexicon@1.25
+# gov:kit lexicon@1.26
 """lexicon.py — two naming predicates over a DECLARED vocabulary, plus one self-containment refusal.
 
 THE INVOCATIONS ARE NOT LISTED HERE. Run the file with no recognised mode and it prints them, with
@@ -87,9 +87,12 @@ from lexicon_conf import (ConfError, CONVENTIONS, PATTERN_PARTS, SURFACES, langs
 from subtokens import (check_convention, classify, leading_verb, read_stem,  # noqa: E402
                        render_convention, subtokens)
 
-KIT_LEXICON_VERSION = "1.25"
+KIT_LEXICON_VERSION = "1.26"
 
 CONF_NAME = ".lexicon.conf"
+#: the playbook kit's home under the tool root, where `read_tag_words` resolves the namespace registry
+#: (PLAY-dOrderedCharter-72): the one spelling its selftest's fixture lays out at too
+PLAYBOOK_HOME = "playbook"
 WAIVER_FILES = {
     "verb": "lexicon-verb-waivers.txt",
     "suffix": "lexicon-suffix-waivers.txt",
@@ -3912,6 +3915,130 @@ def run_suggest(root: Path, name: str, cell_spec: str) -> int:
     return 0
 
 
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
+#: the tag grammar's segment shape; a registry word outside it is never a namespace word here
+TAG_SEG_RE = re.compile(r"[a-z0-9][a-z0-9-]*")
+
+
+def read_tag_words(here=None) -> tuple:
+    """`(words, registry path)`: the `ns` of each `[[namespace]]` row of the playbook kit's
+    `namespaces.toml`, found through `resolve_kit_dir` and never read from `.lexicon.conf`
+    (PLAY-dOrderedCharter-10 S7, §8 F2). A row outside the segment shape is dropped, never spliced.
+    LookupError or ValueError when the registry does not resolve or read."""
+    import tomllib
+    reg = resolve_kit_dir(PLAYBOOK_HOME, "namespaces.toml", here or Path(__file__).resolve().parent) / "namespaces.toml"
+    try:
+        rows = tomllib.loads(reg.read_text(encoding="utf-8")).get("namespace") or []
+    except (OSError, tomllib.TOMLDecodeError) as exc:
+        raise ValueError(f"the namespace registry {reg.as_posix()} does not read: {exc}") from None
+    words = {r["ns"] for r in rows if isinstance(r, dict) and isinstance(r.get("ns"), str)
+             and TAG_SEG_RE.fullmatch(r["ns"])}
+    return words, reg
+
+
+def check_tag_name(tag: str, words: set) -> str:
+    """The rule `tag` breaks, or "": each segment after the namespace held to the segment shape and graded
+    by `check_convention` against kebab, a VIOLATION refused and an AMBIGUOUS one (`0`) passed, and a
+    first segment that is a namespace word refused, as the core's shape check does."""
+    head = tag.split("#")[0]
+    _ns, _, rest = head.partition(".")
+    segs = rest.split(".") if rest else []
+    if not segs:
+        return "no name after the namespace"
+    if segs[0] in words:
+        return f"first segment '{segs[0]}' is a namespace word"
+    for seg in segs:
+        if not TAG_SEG_RE.fullmatch(seg):
+            return f"segment '{seg}' is outside {TAG_SEG_RE.pattern}"
+        verdict, msg = check_convention(seg, "kebab")
+        if verdict == "VIOLATION":
+            return f"segment {msg}"
+    return ""
+
+
+def run_tags(text: str) -> int:
+    """`--tags` — one tag per stdin line, each graded by `check_tag_name` against the registry's
+    words. Exit 0 none refused, 1 one or more, 2 the registry does not resolve or read."""
+    try:
+        words, reg = read_tag_words()
+    except (LookupError, ValueError) as exc:
+        print(f"lexicon: --tags reads the namespace words from the registry, and it cannot: {exc}")
+        return 2
+    names = [ln.strip() for ln in text.splitlines() if ln.strip()]
+    refused = 0
+    for name in names:
+        why = check_tag_name(name, words)
+        if why:
+            refused += 1
+            print(f"lexicon: tag {name} · {why}")
+    print(f"lexicon: tags · {len(names)} graded, {refused} refused · namespace words from {reg.as_posix()}")
+    return 1 if refused else 0
+
+
+def run_suggest_tag(name: str, ns: str) -> int:
+    """`--suggest <name> --as tag.<ns>` — one line for one tag name, `<ns>.` optional on `name`. Like
+    `run_suggest`, it returns only 0 and 2: 2 when `<ns>` is no registered word."""
+    try:
+        words, reg = read_tag_words()
+    except (LookupError, ValueError) as exc:
+        print(f"lexicon: `--as tag.{ns}` reads the namespace words from the registry, and it cannot: {exc}")
+        return 2
+    if ns not in words:
+        print(f"lexicon: `--as tag.{ns}` names no namespace {reg.as_posix()} registers: {' '.join(sorted(words))}")
+        return 2
+    rest = name[len(ns) + 1:] if name.startswith(ns + ".") else name
+    tag = f"{ns}.{rest}"
+    why = check_tag_name(tag, words)
+    if not why:
+        print(f"OK — {tag} satisfies kebab in every segment and opens with no namespace word")
+        return 0
+    fixed = ".".join(render_convention(s, "kebab") or s for s in rest.split("."))
+    if fixed != rest and not check_tag_name(f"{ns}.{fixed}", words):
+        print(f"use `{ns}.{fixed}` — {tag}: {why}")
+    else:
+        print(f"`{tag}` breaks a tag rule this verb will not re-spell: {why}")
+    return 0
+
+
 def run_expand(root: Path) -> int:
     """`--expand` — the one-time widening of the declared table, bounded by the frozen clusters.
 
@@ -4357,7 +4484,7 @@ def main(argv: list[str]) -> int:
     me = resolve_self_path()
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode not in ("--check", "--list", "--measure", "--suggest", "--expand", "--offenders",
-                    "--merge-losses"):
+                    "--merge-losses", "--tags"):
         # THE USAGE BLOCK LIVES HERE AND NOWHERE ELSE. It moved out of the module docstring, whose
         # copy spelled the install prefix six times and reached every adopter unchanged.
         sys.stderr.write(
@@ -4369,7 +4496,10 @@ def main(argv: list[str]) -> int:
             "                     locator, count or cut; exits as --check does\n"
             "  --measure          print the pins THIS conf produces; decide nothing\n"
             "  --suggest <name> --as <ext>.<surface>\n"
-            "                     one line for ONE identifier, no corpus pass\n"
+            "                     one line for ONE identifier, no corpus pass; `--as tag.<ns>`\n"
+            "                     answers a tag's name\n"
+            "  --tags             grade the tag names on stdin against the namespace registry's\n"
+            "                     words; non-zero on a refused name\n"
             "  --expand           propose the live clusters this table does not declare; writes\n"
             "                     nothing. The stamp lives in adopt-lexicon.sh --expand --stamp\n"
             "  --merge-losses <a>..<b>\n"
@@ -4403,6 +4533,11 @@ def main(argv: list[str]) -> int:
                              "  --as is REQUIRED: the surface decides which predicates are armed "
                              "and which convention the answer is spelled in.\n")
             return 2
+        if cell_spec.startswith("tag."):
+            return run_suggest_tag(argv[2], cell_spec[len("tag."):])
+    if mode == "--tags":
+        # A SUPPLY verb like `--suggest`: it reads stdin and the registry, never the corpus or a pin.
+        return run_tags(sys.stdin.read())
     out = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True, encoding="utf-8")
     if out.returncode != 0:
         sys.stderr.write("lexicon: not a git repo\n")

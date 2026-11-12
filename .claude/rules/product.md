@@ -5,6 +5,7 @@ paths:
   - "coding-governance-agents.template.md"
   - "WIRE-INTO-PROJECT.md"
 ---
+[.claude/rules/product.md · Level 4 · A path rule, loaded when a file it names is opened; yields to levels 0 to 3]
 
 # What ships here — the product, loaded when you open a product file
 
@@ -31,7 +32,8 @@ paths:
   reads the project's `.unattended.conf` declarations rather than restating them — a run that will
   merge and push with no owner turn replaces the explicit-ask checkpoint with a committed standing
   mandate, the charter's `[land]` substitute),
-  `agent-instructions/`, `pytest-parallel-guardrails/` (bounded,
+  `playbook/` (the charter's renderer, which also wires every harness's file to `AGENTS.md`),
+  `pytest-parallel-guardrails/` (bounded,
   attributable pytest-xdist runs: the four-knob ini recipe, the crashprobe worker-death
   attribution plugin, the aiosqlite closed-loop seam patch + forced-race gate), the
   `check-template-size.sh` gate, and `check-wiring.sh` (detects/auto-wires
@@ -41,3 +43,4 @@ paths:
 - Kits live in `tools/`; the session-kickoff skill stays at `skills/` (machine-junction discovery).
 - The template holds practices, never procedures: a rule that needs more than one line belongs in the
   tool, gate or protocol that enforces it, and the template points there.
+[/.claude/rules/product.md]

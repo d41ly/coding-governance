@@ -82,8 +82,11 @@
   {
     "name": "playbook parity",
     "argv": [
-      "bash",
-      "{prefix}/check-playbook-parity.sh"
+      "python",
+      "{prefix}/playbook/render_playbook.py",
+      "--check-render",
+      "--scope",
+      "claims"
     ],
     "chunk": "product",
     "subject": "repo",
@@ -182,7 +185,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "enforces": ["practice.portable.paths"]
   },
   {
     "name": "shell hygiene (a fork spent on builtin work)",
@@ -212,7 +216,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "enforces": ["practice.portable.temp-files"]
   },
   {
     "name": "spawn budget (forks per hot entrypoint)",
@@ -252,7 +257,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "enforces": ["practice.portable.encoding"]
   },
   {
     "name": "kit version markers",
@@ -293,9 +299,11 @@
   {
     "name": "agent-instructions wiring",
     "argv": [
-      "bash",
-      "{prefix}/agent-instructions/adopt-agent-instructions.sh",
-      "--check",
+      "python",
+      "{prefix}/playbook/render_playbook.py",
+      "--check-render",
+      "--scope",
+      "entry-files",
       "--aliases",
       "claude"
     ],
@@ -330,7 +338,8 @@
     ],
     "chunk": "wiring",
     "subject": "kit",
-    "ceiling": 350
+    "ceiling": 350,
+    "enforces": ["practice.portable.launch", "practice.portable.interpreter-floor"]
   },
   {
     "name": "agent-cap self-test",
@@ -381,20 +390,6 @@
     "chunk": "selftests",
     "subject": "kit",
     "ceiling": 300
-  },
-  {
-    "name": "agent-instructions self-test",
-    "argv": [
-      "bash",
-      "{prefix}/agent-instructions/adopt-agent-instructions.test.sh"
-    ],
-    "guard": [
-      "{prefix}/agent-instructions/",
-      "{prefix}/lib/"
-    ],
-    "chunk": "selftests",
-    "subject": "kit",
-    "ceiling": 330
   },
   {
     "name": "memory-hygiene self-test",
@@ -486,7 +481,9 @@
     "guard": [
       "{prefix}/lib/",
       "{prefix}/memory-tree/",
-      "{prefix}/check-spec-tokens.py"
+      "{prefix}/check-spec-tokens.py",
+      "{prefix}/policy/budgets.py",
+      "{prefix}/policy/policy.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -527,7 +524,9 @@
     ],
     "guard": [
       "{prefix}/lib/",
-      "{prefix}/memory-tree/"
+      "{prefix}/memory-tree/",
+      "{prefix}/policy/budgets.py",
+      "{prefix}/policy/policy.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -824,7 +823,8 @@
     "guard": [
       "{prefix}/codebase-map/",
       "{prefix}/lib/",
-      "{prefix}/lexicon/"
+      "{prefix}/lexicon/",
+      "{prefix}/memory-tree/coverage_join.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -840,7 +840,8 @@
     "subject": "repo",
     "guard": [
       "{prefix}/codebase-map/",
-      ".codebase-map.conf"
+      ".codebase-map.conf",
+      "{prefix}/memory-tree/coverage_join.py"
     ],
     "ceiling": 180
   },
@@ -892,7 +893,11 @@
     ],
     "guard": [
       "{prefix}/lib/",
-      "{prefix}/memory-recall/"
+      "{prefix}/memory-recall/",
+      "{prefix}/memory-tree/id_grammar.py",
+      "{prefix}/memory-tree/tree_lib.py",
+      "{prefix}/policy/budgets.py",
+      "{prefix}/policy/policy.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -907,7 +912,11 @@
     "guard": [
       "{prefix}/memory-recall/",
       "memory/",
-      ".memory-tree.conf"
+      ".memory-tree.conf",
+      "{prefix}/memory-tree/id_grammar.py",
+      "{prefix}/memory-tree/tree_lib.py",
+      "{prefix}/policy/budgets.py",
+      "{prefix}/policy/policy.py"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -922,7 +931,11 @@
     "guard": [
       "{prefix}/memory-recall/",
       "memory/",
-      "{prefix}/govkit/"
+      "{prefix}/govkit/",
+      "{prefix}/memory-tree/id_grammar.py",
+      "{prefix}/memory-tree/tree_lib.py",
+      "{prefix}/policy/budgets.py",
+      "{prefix}/policy/policy.py"
     ],
     "chunk": "selftests",
     "subject": "repo",
@@ -947,7 +960,14 @@
     ],
     "guard": [
       "{prefix}/drift-audit/",
-      "{prefix}/lib/"
+      "{prefix}/lib/",
+      "{prefix}/memory-tree/id_grammar.py",
+      "{prefix}/memory-tree/tree_lib.py",
+      "{prefix}/lexicon/canon.py",
+      "{prefix}/lexicon/lexicon.py",
+      "{prefix}/lexicon/lexicon_conf.py",
+      "{prefix}/lexicon/scaffold_lexicon.py",
+      "{prefix}/lexicon/subtokens.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -984,7 +1004,10 @@
     ],
     "guard": [
       "{prefix}/process-monitor/census.py",
-      "{prefix}/process-monitor/selftest.py"
+      "{prefix}/process-monitor/selftest.py",
+      "{prefix}/process-monitor/classify.py",
+      "{prefix}/process-monitor/reap.py",
+      "{prefix}/process-monitor/scope.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1298,7 +1321,8 @@
       ".githooks/pre-push",
       "{prefix}/process-monitor/census.py",
       "{prefix}/process-monitor/reap.py",
-      "{prefix}/process-monitor/scope.py"
+      "{prefix}/process-monitor/scope.py",
+      "{prefix}/process-monitor/classify.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1488,6 +1512,32 @@
     "subject": "repo",
     "ceiling": 130,
     "doc_reads": ["help/", "memory/project/docs-undocumented.txt"]
+  },
+  {
+    "name": "help reference pages",
+    "argv": [
+      "python",
+      "{prefix}/playbook/render_playbook.py",
+      "--reference",
+      "--check"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 130,
+    "enforces": ["principle.p42"]
+  },
+  {
+    "name": "help page commands",
+    "argv": [
+      "python",
+      "{prefix}/govkit/docs_leg.py",
+      "--run"
+    ],
+    "reads": {"history": "it reads help.enforce at the landed revision through govkit's read_policy_value, and installs gov at this checkout's HEAD into one scratch adopter per page holding a runnable block (PLAY-dOrderedCharter-37)."},
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 600,
+    "enforces": ["principle.p42"]
   },
   {
     "name": "upgrade-walk",
@@ -1744,7 +1794,17 @@
   {
     "name": "playbook render selftest",
     "guard": [
-      "{prefix}/playbook/"
+      "{prefix}/playbook/",
+      "{prefix}/memory-tree/import_walk.py",
+      "{prefix}/memory-tree/check-arms.py",
+      "{prefix}/memory-tree/tree_lib.py",
+      "{prefix}/memory-tree/id_grammar.py",
+      "{prefix}/memory-tree/coverage_join.py",
+      "{prefix}/memory-tree/design_lib.py",
+      "{prefix}/memory-tree/corpus_ids.py",
+      "{prefix}/lexicon/",
+      "{prefix}/govkit/entries/playbook.kit.toml",
+      "coding-governance-agents.template.md"
     ],
     "argv": [
       "bash",
@@ -1830,6 +1890,255 @@
     "ceiling": 120
   },
   {
+    "name": "layer dependencies (the core never depends on an expansion)",
+    "argv": [
+      "python",
+      "{prefix}/playbook/check_layers.py"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 124,
+    "enforces": ["principle.p28", "principle.p16"]
+  },
+  {
+    "name": "core meta-check",
+    "argv": [
+      "python",
+      "{prefix}/playbook/core.py",
+      "meta-check"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p16"]
+  },
+  {
+    "name": "core kinds",
+    "argv": [
+      "python",
+      "{prefix}/playbook/core.py",
+      "kinds"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p16"]
+  },
+  {
+    "name": "core skills conformance",
+    "argv": [
+      "python",
+      "{prefix}/playbook/core.py",
+      "kinds",
+      "skill"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p16"]
+  },
+  {
+    "name": "core practices conformance",
+    "argv": [
+      "python",
+      "{prefix}/playbook/core.py",
+      "kinds",
+      "practice"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p14", "principle.p16"]
+  },
+  {
+    "name": "core selftest",
+    "argv": [
+      "python",
+      "{prefix}/playbook/core.py",
+      "fixture"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "enforces": ["principle.p16"]
+  },
+  {
+    "name": "instruction ladder (level is the one term)",
+    "argv": [
+      "python",
+      "{prefix}/playbook/instruction_units.py",
+      "ladder-terms"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p13", "principle.p11"]
+  },
+  {
+    "name": "instruction grammar (statement types, provenance lock)",
+    "argv": [
+      "python",
+      "{prefix}/playbook/instruction_units.py",
+      "grammar"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p11"]
+  },
+  {
+    "name": "instruction units (schema, one fact)",
+    "argv": [
+      "python",
+      "{prefix}/playbook/instruction_units.py",
+      "schema",
+      "one-fact"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p11", "principle.p13", "principle.p16"]
+  },
+  {
+    "name": "instruction render (one renderer of record)",
+    "argv": [
+      "python",
+      "{prefix}/playbook/render_playbook.py",
+      "--check-render"
+    ],
+    "chunk": "wiring",
+    "subject": "repo",
+    "ceiling": 560,
+    "enforces": ["principle.p11", "principle.p13"]
+  },
+  {
+    "name": "instruction envelopes",
+    "argv": [
+      "python",
+      "{prefix}/playbook/instruction_units.py",
+      "envelopes",
+      "--check"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p13"]
+  },
+  {
+    "name": "instruction units selftest",
+    "argv": [
+      "python",
+      "{prefix}/playbook/instruction_units.py",
+      "fixture"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "enforces": ["principle.p16"]
+  },
+  {
+    "name": "instruction edits (manifest checks)",
+    "argv": [
+      "python",
+      "{prefix}/playbook/instructions_edit.py",
+      "check"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 180,
+    "enforces": ["principle.p11", "principle.p13"]
+  },
+  {
+    "name": "instruction edits selftest",
+    "argv": [
+      "python",
+      "{prefix}/playbook/instructions_edit.py",
+      "fixture"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "enforces": ["principle.p16"]
+  },
+  {
+    "name": "tags (the resolver's checks)",
+    "argv": [
+      "python",
+      "{prefix}/playbook/gov_tag.py",
+      "check"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 420,
+    "pack": "tags",
+    "enforces": ["practice.writing.address", "practice.writing.retirement"]
+  },
+  {
+    "name": "tags positional selftest",
+    "argv": [
+      "python",
+      "{prefix}/playbook/positional.py",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "pack": "tags"
+  },
+  {
+    "name": "tags bundle selftest",
+    "argv": [
+      "python",
+      "{prefix}/playbook/tag_bundle.py",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "pack": "tags"
+  },
+  {
+    "name": "edges (every declared edge parses, is registered and resolves)",
+    "argv": [
+      "python",
+      "{prefix}/playbook/edge_grammar.py",
+      "--check"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 180,
+    "pack": "tags",
+    "enforces": ["practice.writing.typed-relations"]
+  },
+  {
+    "name": "writing practice (records and units)",
+    "argv": [
+      "python",
+      "{prefix}/playbook/writing_practice.py",
+      "check"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 180,
+    "pack": "tags",
+    "enforces": ["practice.writing.one-subject", "practice.writing.pinned-facts", "practice.writing.one-door",
+                 "practice.writing.rationale-apart"]
+  },
+  {
+    "name": "one-owner",
+    "argv": [
+      "python",
+      "{prefix}/playbook/writing_practice.py",
+      "check",
+      "one-owner"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 180,
+    "pack": "tags",
+    "enforces": ["practice.writing.one-owner"]
+  },
+  {
     "name": "policy fixtures",
     "argv": [
       "python",
@@ -1856,12 +2165,14 @@
       "{prefix}/memory-tree/gen_build_index.py",
       "{prefix}/roles/check_roles.py",
       "{prefix}/playbook/render_playbook.py",
+      "{prefix}/playbook/instruction_units.py",
+      "{prefix}/playbook/load_sets.py",
+      "{prefix}/playbook/policy_value.py",
       "{prefix}/roles/handoff.py",
       "skills/session-kickoff/manifest-check.sh",
       "{prefix}/memory-tree/gotchas.py",
       "{prefix}/memory-recall/query.py",
       "{prefix}/memory-tree/corpus_ids.py",
-      "{prefix}/agent-instructions/adopt-agent-instructions.sh",
       "{prefix}/runlog/record.py",
       "{prefix}/codebase-map/map_lib.py",
       "{prefix}/hooks/scratch-guard.js",
@@ -1873,7 +2184,6 @@
       "{prefix}/roles/kit.toml",
       "{prefix}/playbook/kit.toml",
       "{prefix}/memory-recall/kit.toml",
-      "{prefix}/agent-instructions/kit.toml",
       "{prefix}/runlog/kit.toml",
       "{prefix}/codebase-map/kit.toml",
       "{prefix}/hooks/kit.toml",
@@ -1935,6 +2245,17 @@
     "subject": "repo",
     "ceiling": 300,
     "doc_reads": ["AGENTS.md", "CLAUDE.md"]
+  },
+  {
+    "name": "python reads (a name never bound, an import outside its guard)",
+    "argv": [
+      "python",
+      "{prefix}/run-gates/py_reads.py"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p16"]
   },
   {
     "name": "receipt sync (installed files match the receipt)",

@@ -31,7 +31,8 @@ from fixture_target import build_scratch_gov, build_target  # noqa: E402 — the
 
 PFX = govkit.derive_tool_root(govkit.repo_root())
 PLANTS = ("fragment-withdrawn", "fragment-rollback", "edited-gone", "edited-row", "keep",
-          "seed-retired-edited", "seed-retired-clean", "render-edited", "render-clean",
+          "seed-retired-edited", "seed-retired-clean", "seed-rule-gone-edited", "seed-rule-gone-clean",
+          "render-edited", "render-clean",
           "render-edited-no-oid", "render-eol-no-oid", "dispatch-gap", "edited-reshipped",
           "edited-rolled-back", "render-edited-kill", "render-filter-broken")
 # Each stub is one statement over the scratch module `m`, run after it loads and before its `main`.
@@ -40,6 +41,9 @@ STUBS = {
     "report-omits": 'm.render_retired_edited_line = lambda *a, **k: ""',
     "today": "m.check_render_edited = lambda *a, **k: False",
     "seed-override": 'm.SEED_KEPT_VERDICTS = ("missing", "renamed")',
+    # PLAY-dOrderedCharter-31 S9: the seed predicate never holds, as `update` read a seed row before it.
+    "seed-rule-kept": ("m.classify_row = (lambda f: lambda *a, **k: f(*a, **{**k, 'gov_absent': False}))"
+                       "(m.classify_row)"),
     # TOOL-dSafePassage-63: a row with no `oid` graded False, as the check did before its fallback.
     "oid-only": ("m.check_render_edited = lambda t, r, f=m.check_render_edited: "
                  "bool(r.get('oid')) and f(t, r)"),
@@ -280,13 +284,19 @@ def run_plant(tmp: pathlib.Path, plant: str, stub: str, write_withdrawals: bool,
                 ("a forked line", str(any("forked" in ln and gone in ln for ln in out.splitlines())),
                  "False")]
         return obs
-    if plant in ("seed-retired-edited", "seed-retired-clean"):
-        clean = plant == "seed-retired-clean"
+    if plant in ("seed-retired-edited", "seed-retired-clean", "seed-rule-gone-edited", "seed-rule-gone-clean"):
+        clean = plant.endswith("-clean")
         copy = read_bytes(t, seed) if clean else b"seed\nthe target's own line\n"
         if not clean:
             (t / seed).write_bytes(copy)
             write_commit(t, "the target edits its seeded copy")
-        write_gov_files(g, {}, drop=("seed.md",))
+        if plant.startswith("seed-rule-gone"):
+            # PLAY-dOrderedCharter-31 S9: the seed rule leaves the descriptor and gov keeps its source.
+            rule = '[[files]]\ninclude = ["seed.md"]\nrole = "seed"\nto = "docs/seed.md"\n\n'
+            (g / resolve_kit_path(DEMO, "kit.toml")).write_text(KIT.replace(rule, ""), encoding="utf-8",
+                                                                newline="\n")
+        else:
+            write_gov_files(g, {}, drop=("seed.md",))
         write_commit(g, "B")
         out = run_update(g, t, *(("--write-withdrawals",) if clean else ()), stub=stub)
         obs.append(("verdict " + seed, read_verdict(out, seed), "withdrawn" if clean else "retired-edited"))

@@ -40,12 +40,15 @@ cd "$ROOT" || exit 2
 GATE_REL="${PFX}${GATE##*/}"
 # The deployer the kit-source test resolves, found by its ENGINE file rather than by a typed name.
 GK_SRC=$(git ls-files -- "${PFX}*/govkit.py" | head -1)
-[ -n "$GK_SRC" ] || { echo "check-install-prefix.test: no govkit engine under ${PFX:-the repo root}"; exit 2; }
+# PLAY-dOrderedCharter-17 S10: the deployer is a declared slot. Every arm below builds its fixture from
+# its engine, so with none the registry arms skip, SAID, and the suite exits 0 having graded nothing.
+[ -n "$GK_SRC" ] || { echo "check-install-prefix.test: slot point.flow.version · not-installed: the registry arms skip — no govkit engine under ${PFX:-the repo root}, so this suite graded nothing"; exit 0; }
 GK=${GK_SRC%/*}; GK=${GK##*/}
 TL=tool   # gov's own prefix is "${TL}s", assembled so that this file does not spell it
 T=$(printf '\t')
 # RAISED 39 -> 40 by TOOL-aMendedFleet-111: the NONKIT liveness arm (1).
-FLOOR_ASSERTIONS=40
+# RAISED 40 -> 41 by PLAY-dOrderedCharter-70: the consumer skip's slot line (1), counted off the arm.
+FLOOR_ASSERTIONS=41
 fails=0; passed=0; GRADED=0
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 
@@ -189,6 +192,22 @@ for _n in 2 3; do
     *) bad "DGR84 ...the HEAD: operand on line $_n passed unnamed" ;; esac
 done
 
+# ==================== PLAY-dOrderedCharter-77 S3 — rule 3's operand splits on `[` too ============
+# A tracked template's Skill envelope opens `[` ahead of the Skill dir, which is no path segment, so it
+# counts nothing; a `[` ahead of a literal directory and a kit still counts. Staged red by taking `[`
+# back out of the split.
+E="$TMP/envelope"; build_source_fixture "$E" 'A qdemo kit.'
+{
+  printf '%s\n' '[.claude/skills/qdemo/SKILL.md · Level 4 · x]'
+  printf '%s\n' '[x/qdemo/a.py'
+} > "$E/${PFX}qdemo/SKILL.template.md"
+git -C "$E" add -A >/dev/null 2>&1
+read_gate "$E"; _ec=$?
+if [ "$_ec" = 1 ] && [[ $LAST_OUT != *"  ${PFX}qdemo/SKILL.template.md:1  "* ]]; then good "DOC77 a Skill envelope opened by [ counts nothing"
+else bad "DOC77 a Skill envelope opened by [ counted, or the gate exited $_ec, wanted 1"; fi
+case "$LAST_OUT" in *"  ${PFX}qdemo/SKILL.template.md:2  qdemo"*) good "DOC77 ...and a [ ahead of a literal directory and a kit still counts" ;;
+  *) bad "DOC77 ...the [-led literal directory on line 2 passed unnamed" ;; esac
+
 # ==================== the POPULATION is every tracked file, shipped or not =====================
 P1="$TMP/population"; build_source_fixture "$P1" 'A qdemo kit.'
 mkdir -p "$P1/${PFX}notes"
@@ -258,6 +277,9 @@ nout=$(cd "$N/scripts" && bash "${GATE##*/}" 2>&1); nrc=$?
 [ "$nrc" = 0 ] && good "a consumer exits 0 — it ships nothing" || bad "a consumer redded (rc $nrc) on bytes it received: $nout"
 case "$nout" in *"SKIPPED — this repo is not a kit SOURCE"*) good "...and SAYS its files went ungraded" ;;
   *) bad "the consumer skip was silent — a skip that looks like a pass is indistinguishable from coverage" ;; esac
+# PLAY-dOrderedCharter-70 S13: the skip names the deployer slot's state, the line the slot declaration owes
+case "$nout" in *"install-prefix: slot point.flow.version · not-installed: "*) good "...and names the deployer slot not-installed" ;;
+  *) bad "the consumer skip printed no \`slot point.flow.version · not-installed\` line: $nout" ;; esac
 
 # NO KIT DIRECTORIES: the receipt points the resolver at a deployer outside the gate's own root, so the
 # kit-source test passes and the kit walk under the gate's directory finds nothing to enumerate.

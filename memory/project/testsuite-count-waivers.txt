@@ -4,7 +4,6 @@
 # green over the tree it was written against rather than over an assumption about it.
 .githooks/pre-commit.test.sh
 .githooks/pre-push.test.sh
-tools/agent-instructions/adopt-agent-instructions.test.sh
 tools/check-wiring.test.sh
 tools/codebase-map/adopt-codebase-map.test.sh
 tools/hooks/agent-cap.test.sh

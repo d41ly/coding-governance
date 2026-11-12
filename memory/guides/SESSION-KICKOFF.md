@@ -1,11 +1,12 @@
+[memory/guides/SESSION-KICKOFF.md · Level 3 · This repository's kickoff manifest, read at a session's kickoff; yields to levels 0 to 2]
 # Session kickoff manifest — coding-governance
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-11-11T07:07:52+02:00 @ 97598d468c42809c1361e458067c53ea03f34af6
+last-audit: 2026-11-12T02:15:52+02:00 @ b63a70b3a998adea9b4e02e6e415d133c1e3f24a
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 1dc7a7932d57dda674832fcd143d97b7a06edd3d
+last-body-change: b0d43c0a16c69bee47713482065b65e19ac80eb3
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -141,6 +142,14 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 - 2026-08-23 · the owner's standing instruction on the kit self-test suites · `--checks` yes,
   `--selftests --serial` only when they ask. The cost is process creation, not logic:
   `memory/gotchas/process-creation-is-the-suite-cost.md` · prune when a bar runs them automatically.
+- 2026-11-08 · a build that edits `tools/run-gates/run-gates.sh` · the red attribution reads every red OWN
+  (its KF3: the run edited its own grader), so such a build cannot land itself and hands its landing to the
+  owner; run its red legs on an `origin/main` worktree early to tell its own reds apart · prune when the
+  attribution can grade a run that edits the runner.
+- 2026-11-10 · `unattended.sh --rescope --act defer` · a deferral releases neither the dispatch order gate nor a dispatched unit's
+  path reservation: move an independent later unit into the deferred unit's order group, and close a dispatched one's pass with a
+  commit under its own `Pass:` trailer (dOrderedCharter) · prune when the session "Make --dispatch refuse fast and honour deferrals"
+  lands its fix on main.
 
 
 ### Environment traps worth front-loading
@@ -217,3 +226,4 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
   RETIRED (`TOOL-dSpentCeiling-1`). Lesson: measure with the checker before and after, never
   estimate, and record every movement beside the number.
 - Every gate, hook and the lander resolve python through `tools/lib/resolve-python.sh`, which refuses a launcher below the floor `tools/lib/python-floor.txt` declares; `bash tools/lib/python-floor.sh preflight` names each candidate and the install command (`help/python-floor.md`, `TOOL-dSafePassage-11`).
+[/memory/guides/SESSION-KICKOFF.md]

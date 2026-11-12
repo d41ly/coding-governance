@@ -66,7 +66,7 @@ set -u
 if [ -n "${EPOCHREALTIME:-}" ]; then DRIVER_T0_US=${EPOCHREALTIME//[!0-9]/}
 else printf -v DRIVER_T0_US '%(%s)T' -1; DRIVER_T0_US="${DRIVER_T0_US}000000"; fi
 readonly DRIVER_T0_US
-KIT_UNATTENDED_VERSION=1.118 # gov:kit unattended@1.118 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.119 # gov:kit unattended@1.119 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -792,12 +792,13 @@ case "$RESUME_SCHEDULE" in
   *) echo "unattended: REFUSING - RESUME_SCHEDULE is declared as '$RESUME_SCHEDULE', which is outside the closed set 'on off'. A switch that cannot be resolved is a restart policy nobody declared." >&2
      RUNLOG_CLEAN=1; exit 2 ;;
 esac
-# TOOL-aGraftedHelix-1 S16 - THE RUN-CLAIM SWITCH, and it lands DARK. Charter section 1 puts Tier-2
-# behaviour behind a default-off flag, and no owner ruling of TOOL-dDerivedDocket-5's shape turns
-# this one on in the kit, so BLANK OR ABSENT IS `off`: an adopter whose conf predates the key is not
-# exposed by a kit update. A value outside the set is a REFUSAL, for LANDER_MODE's reason. The NOTE
-# naming an undeclared switch is printed by --preflight alone, the verb that starts a run, so a verb
-# that never touches a claim prints nothing new; RUN_CLAIMS_SET remembers whether it was declared.
+# TOOL-aGraftedHelix-1 S16 - THE RUN-CLAIM SWITCH, and it lands DARK. The charter's [small] practice
+# puts risky behaviour behind a default-off switch, and no owner ruling of TOOL-dDerivedDocket-5's
+# shape turns this one on in the kit, so BLANK OR ABSENT IS `off`: an adopter whose conf predates
+# the key is not exposed by a kit update. A value outside the set is a REFUSAL, for LANDER_MODE's
+# reason. The NOTE naming an undeclared switch is printed by --preflight alone, the verb that starts
+# a run, so a verb that never touches a claim prints nothing new; RUN_CLAIMS_SET remembers whether
+# it was declared.
 RUN_CLAIMS_SET=1
 case "$RUN_CLAIMS" in
   "") RUN_CLAIMS=off; RUN_CLAIMS_SET="" ;;
@@ -1416,11 +1417,24 @@ print_drift_delta() { # run-state file
     echo "drift-delta: skipped — no python launcher resolves, so the drift kit's reader cannot run"
     return 0
   fi
+  # PLAY-dOrderedCharter-17 S6: the drift kit is a declared slot, its state named on one line
   if ! d=$(resolve_kit_dir "$py" drift-audit drift_report.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
-    echo "drift-delta: skipped — no drift-audit kit holding drift_report.py resolves beside this kit"
+    echo "drift-delta: slot point.runtime.reading · not-installed: the close prints no drift delta — no drift-audit kit holding drift_report.py resolves beside this kit"
     return 0
   fi
-  "$py" "$d/drift_report.py" --delta "$base" HEAD || true
+  # PLAY-dOrderedCharter-70 S2: the slot's outcome is the reader's, never assumed: a failed read and a
+  # skipped one each say so. The reader always prints a line, so an empty capture cannot mean `skipped`.
+  local out rc=0
+  out=$("$py" "$d/drift_report.py" --delta "$base" HEAD) || rc=$?
+  [ -z "$out" ] || printf '%s\n' "$out"
+  if [ "$rc" != 0 ]; then
+    echo "drift-delta: the reader exited $rc, no delta read"
+    return 0
+  fi
+  case "$out" in
+    *"drift-delta: skipped"*) echo "drift-delta: slot point.runtime.reading · searched-empty" >&2 ;;
+    *) echo "drift-delta: slot point.runtime.reading · filled" >&2 ;;
+  esac
   return 0
 }
 # TOOL-dFoldedAudit-7 S2 - THE SPEC-AUDIT SWITCHES, the driver's ONE reader of the three policy keys.
@@ -4056,7 +4070,9 @@ check_branch_carried() { # slug
   if ! out=$(GIT -c core.quotepath=off log --no-renames --format=%x01%h --name-only HEAD --not "$ASHA" ${ex:+"$ex"} 2>/dev/null); then
     hit="none, the listing itself failed - HEAD --not $ASHA${ex:+ $ex}"
   else
-    while IFS= read -r line; do
+    local -a rows
+    mapfile -t rows <<<"$out"
+    for line in "${rows[@]}"; do
       line=${line%$'\r'}
       case "$line" in
         $'\001'*) sha=${line#?}; continue ;;
@@ -4065,7 +4081,7 @@ check_branch_carried() { # slug
       ok=""
       for q in ${GENERATED_INDEXES:-}; do covers "${q%%:*}" "$line" && { ok=1; break; }; done
       [ -n "$ok" ] || { hit="$sha $line"; break; }
-    done <<<"$out"
+    done
   fi
   [ -n "$hit" ] || return 0
   fail 114 "a first preflight found this branch carrying a commit the default branch does not hold that touches a path outside this build's folder and the declared generated indexes, and it would land with the run without passing through the spec loop; start the run in a fresh worktree off the default branch, carrying only the build folder - the commit and the first such path: $hit"
@@ -8608,7 +8624,7 @@ read_tree_clocks() {
 # has no newest write and reads as older than any bound. A listed path deleted from disk has no
 # mtime and is SKIPPED, not a dead probe. A clock or mtime probe that answers nothing IS a dead probe
 # and is a refusal: a zero from it would read as "written just now", which is PROGRESSING forever,
-# the reassuring-zero class the charter's section 7 refuses. Every verdict exits 0; only the three
+# the reassuring-zero class the charter's [gate] practice refuses. Every verdict exits 0; only the three
 # refusals exit 1. `refuse_if_terminal` is not reused for the terminal case: its sentence says the
 # verb "would rewrite" the record, and this verb rewrites nothing.
 print_audit() { # slug
@@ -15091,7 +15107,8 @@ write_run_record() { # slug -> 0 always; one line per miss
      || ! d=$(resolve_kit_dir "$py" runlog runlog.py "$KIT_DIR" 2>/dev/null) || [ ! -f "$d/runlog.py" ]; then
     # The resolver answers REPO-RELATIVE to the kit's own repository, so the file test is what holds
     # a driver run from another tree to the kit in the tree being closed, as the generator's is.
-    echo "unattended: run record not asked — no runlog kit holding runlog.py resolves beside this kit, so there is nothing to render from and no record is owed"
+    # PLAY-dOrderedCharter-17 S6: the runlog kit is a declared slot, its state named on one line
+    echo "unattended: slot point.runtime.reading · not-installed: no run record is owed — no runlog kit holding runlog.py resolves beside this kit, so there is nothing to render from"
     return 0
   fi
   run_bounded "$py" -B "$d/runlog.py" record "$slug" --write; rc=$?
@@ -15101,7 +15118,9 @@ write_run_record() { # slug -> 0 always; one line per miss
     return 0
   fi
   rec=$(printf '%s\n' "$RB_STDOUT" | sed -n 's/^runlog: record written \(.*\) ([0-9]* bytes.*/\1/p' | head -1)
-  [ -n "$rec" ] || return 0   # the renderer's own no-record line, printed above, is the answer
+  # the renderer's own no-record line, printed above, is the answer
+  [ -n "$rec" ] || { echo "unattended: slot point.runtime.reading · searched-empty" >&2; return 0; }
+  echo "unattended: slot point.runtime.reading · filled" >&2
   GIT add -- "$rec" >/dev/null 2>&1 \
     || { echo "unattended: run record written but git could not stage it, so no index was rendered: $rec"; return 0; }
   if ! gen=$(resolve_index_generator) || [ ! -f "$gen" ]; then

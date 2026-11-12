@@ -1,6 +1,6 @@
 export const meta = {
   name: 'drift-audit-state',
-  version: '1.31',
+  version: '1.32',
   description:
     "Drift audit Tier 1/2: are this repo's own records still true? Stale maps, stale memory, charter drift, work-state uncertainty, record-gate integrity. Project-agnostic; all repo facts arrive via args.",
   whenToUse:
@@ -12,7 +12,7 @@ export const meta = {
   ],
 }
 
-// gov:kit drift-audit@1.31
+// gov:kit drift-audit@1.32
 // --- bounded fan-out (inlined; workflow scripts cannot import) ------------
 // BOTH THE CONCURRENCY CAP AND THE VERIFIER TOTAL ARE BARE LITERALS IN THE RENDER, and neither is
 // caller-settable. The retired form bound each of them from an `<expr> || 5` fallback, which read as a
@@ -32,7 +32,7 @@ const CAP = {{FANOUT_CAP}}
 // DERIVED, so a consumer gate can re-derive the expected sentence and byte-compare it. That is the
 // whole mechanical difference: a gate that re-derives CANNOT be satisfied by a hand-written string,
 // and relaxing it to a substring match would make it satisfiable by prose — the first class
-// AGENTS.md section 7 names.
+// the charter's `[gate]` practice names.
 //
 // THE SENTENCE IS NOW A CONTRACT (ratified F1). Changing it is a version bump like any other, and
 // the drift-audit kit's own README states the three states so a later editor knows the cost.
@@ -47,7 +47,7 @@ function deriveLiveness(c) {
 
 function renderLivenessNote(state, c) {
   if (state === 'dead') {
-    // DEAD PROBE, never a zero. AGENTS.md section 7: a probe that cannot move says so, because a
+    // DEAD PROBE, never a zero. The charter's `[gate]` practice: a probe that cannot move says so, because a
     // reassuring zero from a broken signal is indistinguishable from a clean run.
     return `DEAD PROBE: this run measured NOTHING - ${c.lensesRun} lens(es) ran, ` +
       `${c.lensesDead} died, synthesis ${c.synth ? 'returned' : 'DIED'}; the note is not a zero ` +
@@ -120,9 +120,9 @@ ALREADY KNOWN — do not re-report as new:
 ${a.byDesign || '(none supplied)'}
 
 EVIDENCE RULES (these decide whether your finding survives the skeptic):
-- Every finding needs a real path:line you actually opened. Forward slashes only, no backslashes.
+- Every finding needs a real line you actually opened, cited as the blob-pinned line <path>@<sha8>:<line> at the audited sha. Forward slashes only, no backslashes.
 - A "stale record" claim must show BOTH sides: what the record says, and what is actually true, each
-  with its own path:line or command output. A one-sided claim will be refuted.
+  with its own pinned line or command output. A one-sided claim will be refuted.
 - Distinguish three very different things and never conflate them:
   (a) a record that is WRONG — says X, reality is not-X. The serious class.
   (b) a record that is merely OLD but still true.
@@ -193,7 +193,7 @@ note. Audit it:
    inventory key is claimed somewhere, and no claim names a deleted key) and what it does NOT (that
    the surrounding PROSE is true; that a claim is non-redundant — multi-claim is typically legal).
  - Then sample dossiers for BUSY areas and check their prose against source. Name specific false
-   sentences with both path:lines.
+   sentences with both pinned lines.
  - Every grace/backfill/exemption list: how big, what is still parked there, has it shrunk? A large
    permanent baseline means the coverage gate is mostly excused.
  - If a shrink mechanism is documented, find its CALLERS. A grace list whose un-gracing command is
@@ -365,10 +365,10 @@ const verdictBatches = await boundedParallel(
     agent(
       `You are a DEFAULT-REFUTE skeptic auditing findings from a records/state drift audit of ${REPO}
 (ships at ${BASE}). Your job is to REFUTE. Assume each finding is wrong until its evidence forces you
-to agree. Open the cited file:line yourself and re-run the checks.
+to agree. Open the cited pinned line yourself and re-run the checks.
 
 Refute when ANY of these hold:
-- the cited file:line does not say what the finding claims;
+- the cited pinned line does not say what the finding claims;
 - the record is APPEND-ONLY and was deliberately superseded by a later id — designed behaviour, not
   staleness;
 - the document is under an archive/ path, or is explicitly marked SUPERSEDED/rotated;
@@ -479,7 +479,7 @@ Write it so a tired reader has the answer in the first ten lines. Structure:
 2. THE STATE ANSWER — a plain-language statement of what state the work is actually in: how many
    build records contradict git, what is built-but-unlanded, and what is structurally UNKNOWABLE from
    this clone. The owner asked this directly; answer it directly and do not bury it.
-3. Severity-ordered table of CONFIRMED findings (id, severity, file:line, one-line claim).
+3. Severity-ordered table of CONFIRMED findings (id, severity, <path>@<sha8>:<line>, one-line claim).
 4. PARTIAL findings with the corrected severity beside the original.
 5. UNVERIFIED findings, listed explicitly — NOT refuted, NOT cleared. If the count is zero, say so and
    explain why that is positive evidence rather than an absence of checking.
@@ -489,7 +489,7 @@ Write it so a tired reader has the answer in the first ten lines. Structure:
 8. Cross-cutting themes: the MECHANISM by which records go stale here, not the instances.
 9. A prioritized do-this-next list, cheapest-high-value first, each naming the file to touch.
 
-Rules: every claim keeps its file:line. Do not soften or round. Do not invent findings not in the
+Rules: every claim keeps its blob-pinned line, <path>@<sha8>:<line>. Do not soften or round. Do not invent findings not in the
 data. Report precision and all five counts honestly. Where a number came from an orchestrator
 heuristic and was NOT re-derived, label it as such. Where findings contradict each other, surface the
 contradiction rather than silently picking one — include a short contradictions appendix if there are

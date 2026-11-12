@@ -38,6 +38,12 @@ whitespace, which is what the earlier `grep -n '^```'` had excluded.
 Never write a triple-backtick span inline. Use single backticks for a quoted fragment, or a real
 fenced block on its own lines. Where the quoted text itself contains backticks, paraphrase it.
 
+A Markdown reader walks `tree_lib.unfenced_lines` (`tools/memory-tree/tree_lib.py#unfenced_lines`)
+and never a fence walker of its own: that one reader ends on an `(opened_at, None)` sentinel when a
+document ends inside a fence, so its caller can report the truncation instead of reading on past it.
+The tag index reads every tracked Markdown file through it, and its `tags` leg reds an unclosed fence
+outside `memory/builds/` (PLAY-dOrderedCharter-68).
+
 ## How to catch it
 
 Parity, not eyeballing. Count fence-shaped lines the way the reader counts them — with leading
@@ -47,8 +53,8 @@ whitespace allowed — and an ODD count means an unclosed fence:
 grep -cE '^[[:space:]]*(```|~~~)' <file>
 ```
 
-There is **no machine gate** for this class today, and the parity count above is the documented
-check. Nothing in the tree counts fence-shaped lines: the readers that tokenize fences each keep
+Outside the `tags` leg there is **no machine gate** for this class, and the parity count above is the
+documented check. Nothing else in the tree counts fence-shaped lines: the other readers that tokenize fences each keep
 their own machine and none of them reports an odd count, which is precisely why the truncation
 surfaces as somebody else's finding.
 

@@ -2,6 +2,7 @@
 
 id = "unattended"
 home = "unattended"
+layer = "layer.runtime"
 scope = "repo"
 version_from = { file = "unattended.sh", pattern = "^KIT_UNATTENDED_VERSION=" }
 # `settings-merge` since TOOL-aRepatriatedFork-11 (section 8 F2): this kit ships hook fragments and its
@@ -10,6 +11,14 @@ version_from = { file = "unattended.sh", pattern = "^KIT_UNATTENDED_VERSION=" }
 # `kickoff-manifest` since TOOL-aRoutedQuill-7: past PROMPT_BRIEF_SKELETON_CUTOFF a prompt-mode preflight
 # reads the brief's sub-heads from that kit's checker, so an install without it refuses every such run.
 requires = ["memory-tree", "review-harness", "settings-merge", "kickoff-manifest"]
+# PLAY-dOrderedCharter-17: each edge to a non-core kit is a declared slot with its fallback.
+optional = [
+  { part = "unattended.sh", point = "point.runtime.reading", fallback = "the close prints no drift delta, said" },
+  { part = "unattended.sh", point = "point.runtime.reading", fallback = "no run record is owed, said" },
+  { part = "unattended.test.sh", point = "point.runtime.install-target", fallback = "the dispatch arms announce their skip" },
+  { part = "unattended.test.sh", point = "point.runtime.reading", fallback = "the run-record and drift-delta arms skip with the slot line, their assertions counted" },
+  { part = "unattended.test.sh", point = "point.memory.consult", fallback = "the conf-spelling arm's MAP_ROOT half skips, said, its assertions counted" },
+]
 
 [[files]]
 include = "**"
@@ -414,3 +423,14 @@ why = "an installed artifact both its adopter and check 10 byte-compare"
 [[lf_pin]]
 pattern = ".claude/skills/unattended/SKILL.md"
 why = "a rendered artifact its own gate byte-compares"
+
+# THE DRIVE ROWS (PLAY-dOrderedCharter-6): how a session starts or advances a stage this kit serves. The
+# playbook render composes one charter line per row of each selected kit, and the role's handoff carries
+# its own role's lines. `stage` names a workflow of the roles kit's workflows.toml, or `start`; `role` a
+# role slot, or `main` for the main session.
+
+[[drive]]
+stage = "start"
+role = "main"
+command = "/unattended <slug>"
+when = "a build is requested: it runs unattended by default, its committed README at BASE being the mandate"

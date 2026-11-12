@@ -11,6 +11,7 @@ description: >-
   merge or push the default branch — the repository's own lander does that — nor for a single
   `git branch -d` the owner named.
 ---
+[.claude/skills/cleanup/SKILL.md · Level 4 · A Skill, followed when its trigger holds; yields to levels 0 to 3]
 
 # Reconcile branches and worktrees
 
@@ -57,3 +58,4 @@ parked decisions for the owner, each with its evidence.
 
 Exit 2 names the reason on stderr. A ladder that cannot choose a remote names `GOV_REMOTE`: set it,
 or `GOV_DEFAULT_BRANCH`, and re-run. A manifest that cannot be written deletes nothing.
+[/.claude/skills/cleanup/SKILL.md]

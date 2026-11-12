@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-34 — composition and its report: the project block and marked parts from the overlay, budgets and harness limits at render, one composition for every harness, the delta report, and the practice census
 
-**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base ce13efbe · streams playbook · order 35 · advances PLAY-dOrderedCharter-38
+**Status:** CLOSED · rev-10 · 2026-11-09 · node d · Tier-2 · base ce13efbe · streams playbook · order 35 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0064@42692e4c whole
 
@@ -14,14 +14,27 @@
 | [2026-10-24-build-PLAY-dOrderedCharter-34-deviation-342.md](../build/2026-10-24-build-PLAY-dOrderedCharter-34-deviation-342.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-34-deviation-343.md](../build/2026-10-24-build-PLAY-dOrderedCharter-34-deviation-343.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-34-deviation-344.md](../build/2026-10-24-build-PLAY-dOrderedCharter-34-deviation-344.md) | deviation | — |
-| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY-dOrderedCharter-76 PLAY-dOrderedCharter-77 PLAY-dOrderedCharter-78 PLAY-dOrderedCharter-80 PLAY-dOrderedCharter-81 PLAY-dOrderedCharter-82 PLAY-dOrderedCharter-83 PLAY-dOrderedCharter-84 PLAY-dOrderedCharter-85 PLAY-dOrderedCharter-86 PLAY-dOrderedCharter-87 PLAY-dOrderedCharter-88 |
 | [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-25-build-PLAY-dOrderedCharter-34-deviation-345.md](../build/2026-10-25-build-PLAY-dOrderedCharter-34-deviation-345.md) | deviation | — |
 | [2026-10-25-build-PLAY-dOrderedCharter-34-deviation-346.md](../build/2026-10-25-build-PLAY-dOrderedCharter-34-deviation-346.md) | deviation | — |
+| [2026-11-02-build-PLAY-dOrderedCharter-34-ledger.md](../build/2026-11-02-build-PLAY-dOrderedCharter-34-ledger.md) | journal | — |
+| [2026-11-09-build-PLAY-dOrderedCharter-34-1-builder-return.md](../build/2026-11-09-build-PLAY-dOrderedCharter-34-1-builder-return.md) | journal | — |
+| [2026-11-09-build-PLAY-dOrderedCharter-34-census.md](../build/2026-11-09-build-PLAY-dOrderedCharter-34-census.md) | research | — |
+| [2026-11-09-build-PLAY-dOrderedCharter-34-deviation-347.md](../build/2026-11-09-build-PLAY-dOrderedCharter-34-deviation-347.md) | deviation | — |
+| [2026-11-09-build-PLAY-dOrderedCharter-34-deviation-348.md](../build/2026-11-09-build-PLAY-dOrderedCharter-34-deviation-348.md) | deviation | — |
+| [2026-11-10-build-PLAY-dOrderedCharter-1-runlog-8d3cc031.md](../build/2026-11-10-build-PLAY-dOrderedCharter-1-runlog-8d3cc031.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY-dOrderedCharter-76 PLAY-dOrderedCharter-77 PLAY-dOrderedCharter-78 PLAY-dOrderedCharter-80 PLAY-dOrderedCharter-81 PLAY-dOrderedCharter-82 PLAY-dOrderedCharter-83 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md](../prompts/2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-46 |
+| [2026-11-02-prompt-PLAY-dOrderedCharter-34-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-34-build-brief.md) | journal | — |
+| [2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md) | research | PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-11-08-prompt-PLAY-dOrderedCharter-46-drift-fold-brief.md](../prompts/2026-11-08-prompt-PLAY-dOrderedCharter-46-drift-fold-brief.md) | research | PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
+| [2026-11-09-prompt-PLAY-dOrderedCharter-34-1-spec-writer.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-34-1-spec-writer.md) | journal | — |
+| [2026-11-09-prompt-PLAY-dOrderedCharter-34-2-spec-writer.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-34-2-spec-writer.md) | journal | — |
+| [2026-11-09-prompt-PLAY-dOrderedCharter-34-repair-2-brief.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-34-repair-2-brief.md) | research | — |
+| [2026-11-09-prompt-PLAY-dOrderedCharter-34-repair-brief.md](../prompts/2026-11-09-prompt-PLAY-dOrderedCharter-34-repair-brief.md) | research | — |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -43,14 +56,31 @@ units 31 and 32.
 ## 2. Scope (IN)
 
 - **S1** — The project block from level-0 units. The charter's project block (unit 2's part of the
-  level-0 envelope, rendered from `[charter] adopter_rules` until now) is composed from the overlay's
-  level-0 `repo.` units (unit 32's), in their declared order, each unit's `select` and `when` applied.
-  Gov's own rendered `AGENTS.md` carries the same rule lines after the switch as before it. Observed by
-  AC1.
-- **S2** — The marked part. A repository unit at level 3, 4 or 5 renders inside its document between
-  `<!-- gov:repo -->` and `<!-- /gov:repo -->`, one part per document, after gov's text; a repository
-  unit at level 1, 6 or 7 is refused naming it, since a repository cannot write the card, the task or
-  memory (adopter-instructions item 3). Observed by AC2 and AC3.
+  level-0 envelope, rendered from `[charter] adopter_rules` until now) is composed of the lines
+  `[charter] adopter_rules` holds, as today, followed by the overlay's level-0 `repo.` units
+  (PLAY-dOrderedCharter-32's), one `- ` line each in their declared order, each unit's `select` and
+  `when` applied; the key's declared default bullet renders only where neither the key nor a level-0
+  unit supplies a line. The key keeps rendering until PLAY-dOrderedCharter-31's step converts its lines
+  into overlay units, so every rule stays in the charter between the two units (section 8, F10). Gov's own rendered `AGENTS.md` carries the same rule lines
+  after the switch as before it. Observed by AC1.
+- **S2** — The marked part. A repository unit at level 3, 4 or 5 renders where a unit slot selects it:
+  `tools/playbook/render_playbook.py#render_unit_slots` expands each `<!-- units: <selector> -->` line
+  of a template the renderer renders through `tools/playbook/overlay.py#derive_slot_units`, which places
+  an edge-free `repo.` unit whose `scope` the selector selects after gov's units of its level, and an
+  amending or superseding one beside the gov unit it names. Each run of consecutive repository units in
+  a slot's output renders between `<!-- gov:repo -->` and `<!-- /gov:repo -->`, and a slot placing none
+  writes no pair. No other step places a repository unit, so none prints twice, and the pair is written
+  by the slot render from the template each run, so a re-render meets no earlier pair. Re-read at HEAD
+  5c7f520b8, no template carries a unit slot (DERIVED: `git grep -l -F -e "<!-- units:"` finds only
+  `tools/playbook/README.md`, `tools/playbook/render_playbook.py`,
+  `tools/playbook/instruction_units.py` and `tools/playbook/overlay.py`, in code, prose and fixtures,
+  beside records under `memory/`), and the renderer of record renders the charter and its entry files
+  alone, every level-3 to level-5 document being a `kit-adopter` or
+  `hand` row of `tools/playbook/renderers.toml`. So a level-3 to level-5 repository unit that no slot of
+  the render selects is named in one `unplaced` note and renders nowhere (section 8, F11). A repository
+  unit at level 1, 6 or 7 is refused naming it, as `tools/playbook/overlay.py#read_overlay` already
+  refuses it, since a repository cannot write the card, the task or memory (adopter-instructions
+  item 3). Observed by AC2 and AC3.
 - **S3** — Budgets at render. Each composed document is measured per load point against its cap under
   `budgets.*` (S18, read through unit 11's budget reader, which calls `budgets.py resolve` with the cap
   named as the census `tools/policy/caps.toml` names it, `AGENTS.md` for the charter; TOOL-dGroundRules-9
@@ -61,18 +91,49 @@ units 31 and 32.
   and the render writes no file it would have to truncate. Observed by AC4 and AC5.
 - **S4** — One composition for every harness. Each harness file the wiring names is an import line, a
   symlink, or the composition's own bytes; a harness file holding anything else is refused at
-  `--check`, naming it, so no alias is a copy that drifts. Observed by AC6.
-- **S5** — The seeded template retired as the render's input. `resolve_template_path`
-  (`tools/playbook/render_playbook.py:768-782`) reads gov's engine template and never the target's
-  `playbook_path` copy; a target answer naming `playbook_path` prints one `retired` note and the
-  composition reads nothing from it. **Readers:** by name: `tools/playbook/render_playbook.py`, whose
-  `resolve_template_path` is the one render-time reader, and `tools/playbook/README.md`, which says the
-  render reads the seeded copy; the seed rule and its hole probe in
-  `tools/govkit/entries/playbook.kit.toml`, and `tools/govkit/govkit.py`, `tools/govkit/matrix.py`,
-  `tools/govkit/selftest.py`, `tools/check-placeholders.sh`,
-  `tools/govkit/entries/check-microformats.kit.toml` and `WIRE-INTO-PROJECT.md` are unit 31's
-  inventory · by value: `resolve_template_path` returning the target's seeded copy when `playbook_path`
-  is answered, the one value reader this item changes. Observed by AC7.
+  `--check`, naming it, so no alias is a copy that drifts. Re-read at 05fd1b7f7, unit 20 landed
+  the compare: `tools/playbook/render_playbook.py#check_entry_files`, the `entry-files` scope of
+  `--check-render`, already refuses an alias that is neither an import line, a symlink to
+  `AGENTS.md` nor its bytes, naming it, over the aliases `ALIAS_PATHS` names. This item reuses that
+  predicate and adds the write half: a copy-mode alias is re-written from the composition in the run
+  that writes `AGENTS.md`. Observed by AC6.
+- **S5** — The seeded template retired as the render's input, and the template an install reads
+  shipped with the renderer. `resolve_template_path` (`tools/playbook/render_playbook.py:768-782`)
+  drops its `answers` parameter and reads the renderer kit's own template in the tree it renders,
+  `tools/playbook/instruction_units.py#derive_kit_file` over the target and the template's name, then
+  gov's at `gov_root`, and where neither is a file it refuses naming both paths; it never reads the
+  target's `playbook_path` copy, and a target answer naming `playbook_path` prints one `retired` note
+  and the composition reads nothing from it. The renderer kit's descriptor `tools/playbook/kit.toml`
+  gains one `root_relative` `[[files]]` rule, role `engine`, landing the root's
+  `coding-governance-agents.template.md` at `{prefix}/playbook/coding-governance-agents.template.md`,
+  beside the engine where its declarations already land, so every install and update writes the
+  template the render reads; gov holds no copy beside its engine and reads its own root's (section 8,
+  F12). **Readers:** by name: at HEAD f91d3b28a, `tools/playbook/render_playbook.py`, whose
+  `resolve_template_path` is the one render-time reader and whose module docstring and
+  template-is-charter refusal name `playbook_path`, `tools/playbook/README.md`, whose two-modes
+  section says the render reads the seeded copy, and `help/charter.md` and `help/roles.md`, which say
+  a template seeded earlier keeps rendering as it was, each re-worded here; the seed rule and its hole
+  probe in `tools/govkit/entries/playbook.kit.toml`, and `tools/govkit/govkit.py`,
+  `tools/govkit/matrix.py`, `tools/govkit/selftest.py`, `tools/check-placeholders.sh`,
+  `tools/govkit/entries/check-microformats.kit.toml`, `WIRE-INTO-PROJECT.md` and
+  `tools/govkit/fixtures/release-0/deploy.toml`, which spell the key for the seed, its copy mode or a
+  pinned release's answers, are unit 31's inventory, and the matrix's scratch install, which selects
+  the renderer, then receives the template from the new rule, the bytes its seed lands · by value: the
+  three callers of `resolve_template_path`, `tools/playbook/render_playbook.py#render`,
+  `tools/playbook/render_playbook.py#write_charter_lock`, whose lock row's `template` then names the kit's path in an install and the
+  root's in gov, as gov's row does today, and the selftest's read of gov's template; the fixtures that
+  hand the render a template through `playbook_path`: the renderer's selftest in
+  `tools/playbook/render_playbook.py`, `tools/playbook/instruction_units.py` (its slot and status arms
+  through `SLOT_DEPLOY`, and its lock arm, which also asserts the row's `template`),
+  `tools/playbook/instructions_edit.py` (its re-render arm, through `SLOT_DEPLOY`),
+  `tools/playbook/overlay.py` (its unborn-head, check-refuses-candidate and write-then-render arms,
+  through `SLOT_DEPLOY` and four render calls) and `tools/policy/check_policy.py` (the one-line rule
+  plant), each planting its template where the new reader looks first (section 8, F7); the render's
+  reseed note and legacy branches, read against `TEMPLATE_MAJOR`, which an install's template, the
+  kit's own copy, never trips, kept for the fixtures that plant an older one (section 5); and
+  `LADDER_SOURCES` in `tools/playbook/instruction_units.py`, whose `{prefix}/*/*.template.md`
+  pathspec matches the installed copy in an adopter's tree, the bytes its root entry reads in gov.
+  Observed by AC7.
 - **S6** — The delta report. At every render and every update the renderer prints one line per gov
   unit and per gov row, its state one of S22's six (§4 "### The delta report"), then one per
   repository unit, then each widening unit 36's `derive_widenings` returns, each line in
@@ -81,17 +142,43 @@ units 31 and 32.
 - **S7** — The census. `tools/playbook/practice_census.py` reads every row of the practice catalogue
   (unit 1's `tools/playbook/practices.toml`) and prints, per row, its evidence and its ruling, `ship`
   or `gov-only`, by the predicate §4 states; a row with no evidence rules `ship`. Observed by AC9.
-- **S8** — The rulings applied, gov first. Each row the census rules `gov-only` moves out of the
-  shipped set: its `[[practice]]` row and its `foundation` entry are taken out of
-  `tools/playbook/practices.toml`, and its line becomes a level-0 `repo.` unit of gov's own overlay,
-  written by the route unit 32 lands for gov's own rules. Gov's re-rendered `AGENTS.md` still carries
-  every such line, now in its project block; unit 31 writes each moved unit's change record. The
-  census table is recorded in the build's census record. The per-row owner ruling the clause names is
-  relaxed to the predicate (deviation 341, §8 F4). **Readers:** by name: READER NOT IN TREE — the
-  catalogue and its `practice.<name>` tags land with unit 1 at order 17, after this spec's base, and
-  the predicate rules `ship` any row a role's `rules:` cites, so no role render loses a cited practice
-  · by value: `resolve_active_practices`, unit 1's reader of `charter.practices`, whose default set
-  shrinks by the moved rows. Observed by AC10.
+- **S8** — The rulings applied, gov first. A row the census rules `gov-only` moves out of the shipped
+  foundation set by the disposition the census prints beside it (section 4, Applying a ruling): under
+  `moves`, its `foundation` entry, its `[[practice]]` row and every `practice` row of
+  `tools/playbook/core-pending.txt` naming its tag or one of its rule tags leave
+  `tools/playbook/practices.toml` and the pending list in one commit; under `moves, row kept`, its
+  `foundation` entry leaves and its `[[practice]]` row and pending rows stay, the declaring source the
+  core meta-check joins the legs' `enforces` to; under either, its line becomes a level-0 `repo.` unit
+  of gov's own overlay, written by the route unit 32 lands for gov's own rules. Under `stays` nothing
+  moves. `tools/gate-legs.json` is read and never edited (section 8, F9). Gov's re-rendered `AGENTS.md`
+  still carries every moved line, now in its project block; unit 31 writes each moved unit's change
+  record. The census table, each row's ruling and each `gov-only` row's disposition, is recorded in
+  the build's census record. The per-row owner ruling the clause names is relaxed to the predicate
+  (deviation 341, §8 F4). Re-read at HEAD 5c7f520b8, the census rules `practice.writing` alone
+  `gov-only`, with `stays`, and every `foundation` row `ship` (DERIVED: the predicate over
+  `tools/playbook/practices.toml`, `tools/gate-legs.json`, `tools/govkit/registry.toml` and the
+  `rules:` lines of `tools/roles/agents/`), so the moved set is the build run's census output and is
+  empty at HEAD. The pass greps each moved tag before its commit, and each hit is re-pointed,
+  re-worded or kept, the commit's `Decided:` trailer naming every kept one.
+  **Readers:** by name: re-grepped at HEAD 5c7f520b8 with an extended git grep for practice tags outside
+  the memory tree, the files spelling a catalogue row's
+  tag or rule tag, among which a moved row's tags fall: `tools/playbook/practices.toml`,
+  `tools/playbook/core-pending.txt`, `tools/gate-legs.json` (each leg's `enforces`, which holds no tag
+  of a row that moves whole, since a row a leg names keeps its row), `tools/policy/catalogue.toml`
+  (the `charter.practices` usage line), `help/charter.md`, and in their fixtures, examples, docstrings
+  or comments `tools/playbook/adopt-playbook.sh`, `tools/playbook/core.py`,
+  `tools/playbook/edge_grammar.py`, `tools/playbook/gov_tag.py`, `tools/playbook/instructions_edit.py`,
+  `tools/playbook/render_playbook.py`, `tools/playbook/tag_bundle.py`,
+  `tools/playbook/writing_practice.py` and `tools/memory-tree/build_records.py`; the grep's other hits,
+  `help/tags.md`, `tools/lexicon/selftest.py`, `tools/playbook/overlay.py`,
+  `tools/roles/render_agents.py`, `tools/govkit/registry.toml` and `tools/playbook/doors.toml`, spell no
+  catalogue row's tag, only `practice.repo.x`, `practice.local-rule`, `practice.one.build` or the file
+  name `writing_practice.py`; the roles' `rules:` lines under `tools/roles/agents/` cite short names,
+  and the predicate rules `ship` any row a role's `rules:` cites, so no role render loses a cited
+  practice · by value: `resolve_active_practices`, unit 1's reader of `charter.practices`, whose
+  default set shrinks by the moved rows, and `tools/playbook/core.py#run_meta_check`, which joins each
+  leg's `enforces` to the catalogue's tags and rule tags and counts the pending `practice` rows, so a
+  `moves` row's pending rows leave with it and a kept row keeps its own. Observed by AC10.
 - **S9** — The page `help/composition.md`, linked from `help/README.md`: where a repository's units
   render, how budgets and harness limits act, how to read the delta report, and what the census moved.
   Observed by AC11.
@@ -109,6 +196,9 @@ units 31 and 32.
   records of the census's moved units and the agent-instructions wiring's move: unit 31's.
 - A legacy block for an adopter's existing instruction files and `adopt.instructions`: dLinkedLibrary.
 - Moving the roles' house files into the overlay as level-5 units: dBoundRoles.
+- A unit slot in a level-3 to level-5 template, and that document's kit adopter expanding it: the
+  owning kit's. This unit marks the repository's units in the slots of the documents the renderer of
+  record renders, and names every other one `unplaced` (section 8, F11).
 
 ### Edges
 
@@ -117,11 +207,11 @@ units 31 and 32.
 - **consumes-from** `PLAY-dOrderedCharter-6` — the harness limit `CODEX_MAX` and the check that reads it
 - **consumes-from** `PLAY-dOrderedCharter-11` — the budget reader and each load point's cap
 - **consumes-from** `PLAY-dOrderedCharter-20` — the renderer of record and the absorbed agent-instructions wiring
-- **consumes-from** `PLAY-dOrderedCharter-32` — the overlay's level-0 and level-3 to level-5 `repo.` units, read through `read_overlay`, and the route for gov's own rules
+- **consumes-from** `PLAY-dOrderedCharter-32` — the overlay's level-0 and level-3 to level-5 `repo.` units, read through `read_overlay` and placed in a unit slot by `derive_slot_units`, and the route for gov's own rules
 - **consumes-from** `PLAY-dOrderedCharter-33` — each gov unit's state behind a pin
 - **consumes-from** `PLAY-dOrderedCharter-35` — each gov row's state from the composer
 - **consumes-from** `PLAY-dOrderedCharter-36` — the widening list
-- **hands-off** `PLAY-dOrderedCharter-31` — the seeded template's `[[retired]]` row and the readers of `playbook_path`, the change records of the census's moved units, and `CODEX_MAX`'s new home when the agent-instructions kit leaves
+- **hands-off** `PLAY-dOrderedCharter-31` — the seeded template's `[[retired]]` row and the readers of `playbook_path`, the change records of the census's moved units, and `CODEX_MAX`'s new home when the agent-instructions kit leaves; and the template the renderer kit ships beside its engine (S5), which the render reads once that unit's step takes the seed rule out
 - **consumes-from** external — dGroundRules, landed before the build run: `budgets.*` and `budgets.enforce` (v2:1346-1347), read with `budgets.py resolve`, and the cap census whose `codex-instructions` row names `CODEX_MAX`'s home (TOOL-dGroundRules-9 S1, S2)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 6, 10, 21 and 29, which that batch unit corrects after this unit lands, each by the item its report id names
 - **hands-off** `PLAY-dOrderedCharter-55` — AC11's pathspec, which unit 49 S24 corrects, is observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2)
@@ -134,17 +224,57 @@ units 31 and 32.
 gov's text is resolved:
 
 1. Read the overlay's units through unit 32's reader, keep those whose `select` and `when` hold.
-2. Level 0: their `text` lines, in overlay order, become the project block's body, the part unit 2
-   places; until the overlay holds a level-0 unit, the block renders `[charter] adopter_rules` as
-   unit 2 does.
-3. Levels 3 to 5: each document's units render between the marked pair, appended after gov's text.
-   An existing pair is rewritten in place; a document with no repository unit carries no pair.
+2. Level 0: the `ADOPTER_RULES` placeholder's value is the `[charter] adopter_rules` lines, as
+   `tools/playbook/render_playbook.py#read_charter_table` reads them today, followed by one
+   `- <text>` line per level-0 unit, in overlay order; the descriptor's default bullet stands only
+   where neither supplies a line. The substitution then runs as it does today, so every line lands in
+   the one-line region under `This repository's own rules`, the part unit 2 places, and
+   `check_one_line_regions` grades it. Once PLAY-dOrderedCharter-31's step takes the key out, the
+   units alone are the body.
+3. Levels 3 to 5: no step of their own. `tools/playbook/render_playbook.py#render_unit_slots` already
+   places each repository unit a slot selects, through `tools/playbook/overlay.py#derive_slot_units`;
+   its `render_slot` wraps each run of consecutive placed units whose `origin` is `repository` in the
+   marked pair. After the slots, each level-3 to level-5 overlay unit no slot placed, read against the
+   `(tag, line)` pairs `render_unit_slots` appends to `slots` (a list of the step's own where the
+   caller passes none), is noted `unplaced   <tag> · level <n> · no unit slot of this render selects
+   it`.
 4. Measure: per load point, the document's composed bytes; per origin (`gov:<kit>`, `repository`),
    the bytes each contributes, largest first.
 
 The marked pair reuses the region-marker shape `REGION_OPEN` and `REGION_CLOSE` already give
 `<!-- gov:playbook -->` (`:121-123`), so the one-line and region checks read it, and
-`check_one_line_regions` (`:667`) runs over the composed text.
+`check_one_line_regions` (`:667`) runs over the composed text. It passes over a line that is the
+pair's open or close, as it passes over a blank one, so a slot inside a one-line region keeps its pair.
+
+Re-read at `05fd1b7f7`, every seam this section names is landed and moved since the base:
+`tools/playbook/render_playbook.py#render`,
+`tools/playbook/render_playbook.py#check_one_line_regions`,
+`tools/playbook/render_playbook.py#resolve_template_path` and
+`tools/playbook/render_playbook.py#read_charter_table`, `REGION_OPEN` and `REGION_CLOSE` beside
+`OPEN_RE` in that file, and in govkit `tools/govkit/govkit.py#_cmd_update`, the body `cmd_update`
+wraps, which prints the verdict line in the widths below, and
+`tools/govkit/govkit.py#run_target_argv`. The renderer now also expands unit slots
+(`tools/playbook/render_playbook.py#render_unit_slots`) and renders the practice lines
+(`tools/playbook/render_playbook.py#render_practice_lines`), so the composition step sits after
+both. The Codex announce is still the adopter's own `print_size_note`, in
+`tools/agent-instructions/adopt-agent-instructions.sh#print_size_note`; the renderer prints none.
+
+### The template input
+
+`tools/playbook/render_playbook.py#resolve_template_path`, called with `gov_root` and the target,
+returns the first file of two: `tools/playbook/instruction_units.py#derive_kit_file` over the target
+and `coding-governance-agents.template.md`, and that name under `gov_root`. `derive_kit_file` joins
+the target to the prefix of the kit's own directory, so in an install the first file sits in the
+engine's own directory, where the kit's new `root_relative` rule lands it; in gov it is absent and the
+second is gov's root template, the file gov's lock row already names; in a fixture tree it is the
+path the fixture plants, beside the renderer table it already plants there. The kit's copy comes
+first because in an install `gov_root` is the target's own root, which can hold a seed. Where neither
+is a file the render refuses naming both. `tools/playbook/render_playbook.py#render`'s
+template-is-charter refusal keeps its check, its message naming the template's path and no answer
+key. The first lookup imports `instruction_units` through
+`tools/playbook/render_playbook.py#load_units_module`, as
+`tools/playbook/render_playbook.py#render_charter_envelope` already does on every render, so a lone
+engine copy carries that module beside it (section 8, F7).
 
 ### Budgets and harness limits
 
@@ -202,17 +332,44 @@ A row of the catalogue rules `gov-only` when all four hold, and `ship` otherwise
 4. no role definition the roles kit ships cites its short name in `rules:` (the join `roles_lib.py`
    reads), so moving it breaks no role render.
 
+In clauses 1 and 3, a leg names a row's tag in `enforces` when its `enforces` holds the tag itself or
+one of the row's rule tags, `<tag>.<rule>` for each name in the row's `rules`: the join
+`tools/playbook/core.py#run_meta_check` makes over the catalogue and `tools/gate-legs.json`, so the
+census and the core meta-check read one fact (section 8, F8).
+
 A `{{HELP_DIR}}`-style placeholder in a line is an adopter's path and counts as shipped. Each row
 prints its tag, each named path with `shipped by <entry>` or `gov-only`, each enforcing leg with its
-class, and the ruling.
+class and the tag it enforces, and the ruling.
+
+### Applying a ruling
+
+Beside each `gov-only` ruling the census prints its disposition, the one S8 applies:
+
+- `moves` — the row is a `foundation` member and no leg names its tag: its `foundation` entry, its
+  `[[practice]]` row and its pending rows leave, and its line becomes a level-0 `repo.` unit.
+- `moves, row kept` — the row is a `foundation` member and a leg names its tag: its `foundation` entry
+  leaves and its line becomes a level-0 `repo.` unit, while its `[[practice]]` row and pending rows
+  stay as the declaring source `run_meta_check` joins those legs' `enforces` to, which reds an
+  `enforces` tag no catalogue row holds and one outside the `principle` and `practice` namespaces, so
+  the tags cannot follow the line into a `repo.` unit (section 8, F9).
+- `stays` — the row is no `foundation` member, so no shipped default carries it and gov's charter,
+  which takes the `foundation` default, does not render it; a level-0 unit holding its line would add a
+  line gov's charter lacks, which AC1 reds, so nothing moves.
+
+At HEAD 5c7f520b8 the one `gov-only` row is `practice.writing`, with `stays` (S8): its line names no
+path, the eight rule tags of its `rules` are enforced by four legs of `tools/gate-legs.json`, each an
+`[[exempt_leg]]` of `tools/govkit/registry.toml`, no role's `rules:` cites it, and `foundation` does not
+list it (DERIVED: those three files and `tools/roles/agents/` at HEAD). `practice.portable`, the one
+`foundation` row a leg names, rules `ship`, since two of the legs enforcing its rule tags are no
+`[[exempt_leg]]` (DERIVED: the same files).
 
 ### Inventory
 
 | Minted | Where | Cell |
 |---|---|---|
 | `tools/playbook/practice_census.py` (CLI) | playbook kit | the lexicon's naming predicates |
-| `compose_document`, `measure_contributors`, `render_delta_report` | `tools/playbook/render_playbook.py` | the lexicon's naming predicates |
-| the marked pair `<!-- gov:repo -->` and `<!-- /gov:repo -->` | every level-3 to level-5 document holding a repository unit | none |
+| `build_document`, `measure_contributors`, `render_delta_report` | `tools/playbook/render_playbook.py` | the lexicon's naming predicates |
+| the marked pair `<!-- gov:repo -->` and `<!-- /gov:repo -->` | each run of repository units in a unit slot's output | none |
 | `tools/playbook/fixtures/composition.py` (fixture) | playbook kit | the lexicon's naming predicates |
 | `help/composition.md` | `help/` | none |
 | the census record | `memory/builds/dOrderedCharter/build/`, written at the build run | hygiene check 5's filename grammar |
@@ -221,7 +378,9 @@ class, and the ruling.
 
 Gov is the first tree composed: the build run renders gov's `AGENTS.md` before and after S1, and the two
 carry the same rule lines (AC1). An adopter's `[charter] adopter_rules` keeps rendering until unit 31's
-step converts it into overlay units.
+step converts it into overlay units. Gov's does too, ahead of any level-0 unit: re-read at HEAD
+5c7f520b8, `git ls-files .governance` lists no `instructions.toml`, so gov's project block holds the
+key's lines alone until a unit lands.
 
 ### Files touched (estimate)
 
@@ -231,7 +390,17 @@ step converts it into overlay units.
 - `tools/playbook/practices.toml` (unit 1's; its `foundation` array)
 - `tools/playbook/fixtures/composition.py` (new)
 - `tools/govkit/govkit.py` (the relay of the composition lines at update)
-- `.governance/instructions.toml` (gov's overlay; the census's moved units, through unit 32's route)
+- `.governance/instructions.toml` (gov's overlay; the census's moved units, through unit 32's route,
+  where the build run's census prints a `moves` or `moves, row kept` row)
+- `tools/playbook/core-pending.txt` (each `moves` row's pending rows, S8)
+- `tools/playbook/kit.toml` (the template's `root_relative` rule, S5; its `requires` comment's
+  template reason re-worded, the declarations reason kept)
+- `tools/playbook/instruction_units.py`, `tools/playbook/instructions_edit.py`,
+  `tools/playbook/overlay.py` (fixtures planting their template at their tree's renderer-kit
+  directory, F7)
+- `tools/policy/check_policy.py` (the one-line rule plant: its template beside its engine copy, with
+  `instruction_units.py`, F7)
+- `tools/playbook/README.md`, `help/charter.md`, `help/roles.md` (the template input, S5)
 - `help/composition.md` (new)
 - `help/README.md`
 
@@ -255,11 +424,20 @@ step converts it into overlay units.
 - perf / scale: one overlay read per render, one byte count per document and origin.
 - error / empty / loading states: an overlay with no repository unit composes gov's text alone and
   prints every gov unit `unchanged`; a repository unit at a level it may not write refuses naming it;
+  a level-3 to level-5 repository unit no slot of the render selects is named in one `unplaced` note;
   a missing cap reads as no budget and says so on one line.
 - observability: every overflow names its contributors; every update prints the composition heading
   and its lines, a zero count included.
 - risks: the census predicate rules a row `gov-only` that an adopter relied on by default
-  (deviation 341); the owner's walk of the departures report is the turn that reverses it. Edits to
+  (deviation 341); the owner's walk of the departures report is the turn that reverses it. A
+  `moves, row kept` row's line sits twice, as the row's `line` and its unit's `text`, and no check
+  compares the two; none takes that disposition at HEAD 5c7f520b8 (section 4, Applying a ruling). An
+  install whose kit copy of the template was deleted by hand falls through to its own root, where a
+  seed answered under the template's own name would be read; the kit lands the engine and the
+  template in one install, so no install or update leaves that state. The render's reseed note and
+  legacy branches then fire only on a fixture's older template, an install's being the kit's own;
+  their removal is a follow-up this unit's close files, the descriptor's LEGACY rows being the seed
+  entry's. Edits to
   `render()` share one long function with the template path (`a-new-local-collides-in-a-long-function`,
   `memory/gotchas/a-new-local-collides-in-a-long-function.md`).
 - testing: the fixture plants of §6, and the self-test arm of §7.
@@ -269,14 +447,20 @@ step converts it into overlay units.
 ## 6. Acceptance criteria
 
 - **AC1** — When `python tools/playbook/render_playbook.py --target .` writes gov's
-  `AGENTS.md` at the build run with gov's level-0 overlay units in place, `git diff --stat` shows only
-  envelope and ordering changes and every line of `[charter] adopter_rules` at `ce13efbe` is present in
-  the project block, and `python composition.py --plant project-block` exits 0.
-  Red when: a level-0 unit is missing from the block, or one renders outside it.
-- **AC2** — When `python composition.py --plant marked-part` runs, the level-4
-  document carries gov's text, then `<!-- gov:repo -->`, the repository's unit, `<!-- /gov:repo -->`;
-  a second render leaves the document byte-identical.
-  Red when: the part renders before gov's text, or a re-render nests a second pair.
+  `AGENTS.md` at the build run, `git diff --stat` shows only envelope and ordering changes and every
+  line of `[charter] adopter_rules` at `ce13efbe` is present in the project block, followed by each
+  level-0 unit gov's overlay holds; and `python composition.py --plant project-block` (an answered
+  `adopter_rules` and two level-0 units) exits 0 with the key's lines and then the units' in overlay
+  order, and with the key unanswered, the units alone and no default bullet.
+  Red when: an `adopter_rules` line or a level-0 unit is missing from the block, one renders outside
+  it, or the default bullet renders beside a unit.
+- **AC2** — When `python composition.py --plant marked-part` runs (a planted template whose unit slot
+  selects gov's level-4 units and one edge-free level-4 repository unit), the slot's output carries
+  gov's units, then `<!-- gov:repo -->`, the repository's unit once, `<!-- /gov:repo -->`; a second
+  render leaves the document byte-identical; and `--plant unplaced` (the same unit, a template with no
+  slot) exits 0 with one `unplaced` note naming the unit.
+  Red when: a repository unit renders outside a pair or twice, a re-render nests a second pair, or an
+  unplaced unit goes unnamed.
 - **AC3** — When `python composition.py --plant level-6` runs (a repository unit
   at level 6), it exits 1 naming the unit and its level.
   Red when: a repository unit writes the task, the card or memory.
@@ -295,8 +479,13 @@ step converts it into overlay units.
   Red when: a copy-mode alias drifts from the composition and `--check` passes.
 - **AC7** — When `python composition.py --plant seeded-template` runs (a target
   answering `playbook_path` with an edited seeded copy), the composition is byte-identical to the same
-  target without the answer, and one `retired` note names `playbook_path`.
-  Red when: any byte of the seeded copy reaches the render.
+  target without the answer, and one `retired` note names `playbook_path`; its `--plant
+  installed-template` case (the template only at the fixture tree's renderer-kit directory, the
+  render's `gov_root` an empty directory) renders from that copy, and with the copy removed exits 1
+  naming both paths; and `git grep -n -F -e "coding-governance-agents.template.md" --
+  tools/playbook/kit.toml` finds the `[[files]]` rule landing it beside the engine.
+  Red when: any byte of the seeded copy reaches the render, an install's render finds no template, or
+  a missing template refuses naming one path.
 - **AC8** — When `python composition.py --plant delta` runs, it prints six state
   lines, one per S22 state, and one `widening` line, each in the `{v:<18} [{role:<13}]` widths; and when
   `python tools/govkit/govkit.py update --target <scratch adopter>` runs on the fixture's scratch adopter, its output carries the
@@ -304,14 +493,22 @@ step converts it into overlay units.
   Red when: `update` prints no composition lines, or relays a line whose state word is outside the set.
 - **AC9** — When `python practice_census.py` runs over gov's tree, it prints one ruling per
   row of `practices.toml` with its evidence, and its `--plant gov-only` and `--plant
-  no-evidence` cases print `gov-only` and `ship`.
-  Red when: a row with no evidence rules `gov-only`, or a row is printed with no ruling.
-- **AC10** — When the census's `gov-only` rows are applied at the build run, `git grep -n -F -e
-  "practice.<name>" -- tools/playbook/practices.toml` finds no moved row's tag, gov's overlay holds one
-  level-0 `repo.` unit per moved row, `python tools/roles/render_agents.py --check` passes, and gov's
-  re-rendered `AGENTS.md` still carries each moved line.
-  Red when: a moved line is lost from gov's charter, a role cites a moved practice, or a `ship` row
-  moves.
+  no-evidence` cases print `gov-only` and `ship`; its `--plant row-kept` case (a `foundation` row whose
+  one rule tag only an exempt leg enforces) prints `gov-only` with `moves, row kept`, and its
+  `--plant outside-foundation` case prints `gov-only` with `stays`.
+  Red when: a row with no evidence rules `gov-only`, a row is printed with no ruling, a row whose rule
+  tag a leg enforces reads as having no evidence, or a row a leg names prints `moves`.
+- **AC10** — When the census's `gov-only` rows are applied at the build run, the census record lists
+  every row's ruling and each `gov-only` row's disposition; for each `moves` row, `git grep -n -F -e
+  "practice.<name>" -- tools/playbook/practices.toml tools/playbook/core-pending.txt` finds none of its
+  tags; for each `moves, row kept` row, `git grep -n -F -e "\"practice.<name>\"," --
+  tools/playbook/practices.toml` finds no `foundation` entry; gov's overlay holds one level-0 `repo.`
+  unit per moved line; `python tools/playbook/core.py meta-check` exits 0,
+  `python tools/roles/render_agents.py --check` passes, and gov's re-rendered `AGENTS.md` still
+  carries each moved line.
+  Red when: a moved line is lost from gov's charter, a role cites a moved practice, a `ship` or
+  `stays` row moves, or the meta-check reds a tag a move orphaned. An empty moved set, the census's
+  output at HEAD 5c7f520b8 (S8), is read as no move, never as coverage of a move's edits.
   fixture: gov's own tree at the build run, after unit 32's overlay lands.
 - **AC11** — When `git grep -n -e "budgets.enforce" -- composition.md help/README.md` runs, it finds
   the page's budget section and the index line.
@@ -319,10 +516,23 @@ step converts it into overlay units.
 
 ## 7. Gates
 
-`playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms` · `template size <=48KiB` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`playbook render selftest` · `playbook render wiring` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms` · `template size <=48KiB` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `core meta-check` · `instruction units selftest`
 
 New arm: tools/playbook/render_playbook.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 · `run_selftest` runs the composition fixture over every plant and asserts each exit, line and written byte · none
 New arm: tools/govkit/selftest.py · covers AC8 · a scratch adopter whose playbook regenerate prints the six state lines and one foreign line, asserting `update` relays the six and not the seventh · none
+
+`core meta-check` grades the pending list S8 edits, and `instruction units selftest` runs the fixtures
+F7 moves to their tree's renderer-kit directory; neither carries a guard, so both run on every bar.
+Run at HEAD f91d3b28a, the one-line rule plant of `policy fixtures` exits 1 under `warn` with a
+`ModuleNotFoundError` for `instruction_units`, raised from
+`tools/playbook/render_playbook.py#render_charter_envelope`, its engine copy carrying no such module,
+and exits 1 under `refuse` with the length refusal (PINNED: the plant's two runs through
+`tools/policy/check_policy.py#run_cap_mode`, 2026-11-09); F7 gives that copy the module, and the
+plant's two exits are observed at this pass's close. The
+`govkit acceptance matrix` leg is red at `05fd1b7f7` for the renderer's dependency unit 73 parked for
+the owner (its fork record's F1): the matrix's scratch install holds no memory-tree kit, and
+`tools/playbook/check_layers.py` resolves that kit at import. This pass does not repair it, and
+`practice_census.py` adds no import-time edge to it.
 
 ## 8. Open questions
 
@@ -362,6 +572,116 @@ New arm: tools/govkit/selftest.py · covers AC8 · a scratch adopter whose playb
   with each cap named as the census `tools/policy/caps.toml` names it (TOOL-dGroundRules-9 S1, S2), and
   reads `CODEX_MAX` with `budgets.py home codex-instructions`, unit 6's verb over that census's
   `codex-instructions` row. widens: none · relaxes: none
+- **F7 — How a fixture names its charter template once the render stops reading `playbook_path`.**
+  Re-read at HEAD f91d3b28a, the renderer's own selftest and the fixtures of
+  `tools/playbook/instruction_units.py`, `tools/playbook/instructions_edit.py`,
+  `tools/playbook/overlay.py` and `tools/policy/check_policy.py` answer `playbook_path` to hand the
+  render a template of their own; under S5 each would render gov's template and its assertions would
+  fail. `tools/govkit/matrix.py` and `tools/govkit/selftest.py` answer it for the seed rule and its
+  hole, never as a template a render of theirs reads, and the matrix's scratch install, which selects
+  the renderer, receives the template from F12's rule, the bytes its seed lands. Options: (a) a
+  renderer flag naming the template; (b) each fixture names its template through the `gov_root` that
+  `render` and `run_charter_scope` take; (c) the render keeps reading `playbook_path` where the
+  answered file differs from gov's seed; (d) each fixture plants its template where F12's reader
+  looks first, its tree's renderer-kit directory, spelled through
+  `tools/playbook/instruction_units.py#derive_kit_rel` as its renderer table is, and stops answering
+  `playbook_path`, the lock arm's expected `template` naming that path and the renderer selftest's
+  template-is-charter arm passing `--charter` at that path; a lone engine copy, the
+  one-line rule plant, plants it beside the copy and carries `instruction_units.py` there, which the
+  reader imports. (c) lets a seeded copy's bytes reach the render, which AC7 reds, so the build
+  method's first veto discards it; (a) adds a flag to a shipped command, a new public surface, its
+  second veto. (b) fails every fixture that reaches the render through `main`, which takes no
+  `gov_root` and derives it from the engine's own place: `tools/playbook/instruction_units.py#run_render`,
+  the edit verb's own re-render `tools/playbook/instructions_edit.py#run_render`, and
+  `tools/playbook/overlay.py#run_render_cli`, so their arms red, the first veto. (d) builds no
+  surface and reuses the tree-relative seam the render already reads its document registry through.
+  Recommendation (d). RESOLVED (agent, 2026-11-09, delegated): (d), the one option no veto discards,
+  replacing the 2026-11-08 pick of (b) that the second repair brief's item 2 showed fails those arms.
+  widens: none · relaxes: none
+- **F8 — How the census reads "a leg names its tag in `enforces`".** A catalogue row's `rules` name the
+  rule tags `<tag>.<rule>` a leg's `enforces` pairs with (the header of
+  `tools/playbook/practices.toml`), and `tools/playbook/core.py#run_meta_check` counts a row enforced
+  once each rule tag is enforced or pending. Options: (a) the exact tag only; (b) the tag or any of its
+  rule tags. Re-read at HEAD 5c7f520b8, no leg's `enforces` names a bare catalogue tag, every practice
+  tag a leg enforces being a rule tag of `practice.portable` or `practice.writing` (DERIVED: the
+  `enforces` lists of `tools/gate-legs.json`). Under (a) the predicate's leg half therefore matches
+  nothing, and a row whose rules four legs enforce reads as having no evidence for one reason only: the
+  census would read a narrower join than the meta-check reads over the same file. That is a selector
+  matching nothing read as a ruling, the class the build method's counter-rule refuses, and one fact
+  read two ways. Under (b) the leg half is live, ruling `practice.portable` `ship` and
+  `practice.writing` `gov-only` (section 4, Applying a ruling). Recommendation (b).
+  RESOLVED (agent, 2026-11-09, delegated): (b), by the build method's fork rule, (a) discarded under
+  its counter-rule; what a moved row's tags then do is F9. widens: none · relaxes: none
+- **F9 — What a `gov-only` row a leg names does when S8 applies it.** Its tag or rule tags sit in the
+  `enforces` of legs in `tools/gate-legs.json`, and `run_meta_check` reds an `enforces` tag no
+  catalogue row holds and refuses one outside the `principle` and `practice` namespaces, so the tags
+  cannot follow its line into a `repo.` unit. Options: (a) its `foundation` entry leaves and its line
+  becomes a level-0 unit, its `[[practice]]` row and pending rows staying as the tags' declaring source,
+  `tools/gate-legs.json` untouched; (b) the row leaves and its tags leave each leg's `enforces`, a leg
+  left with none gaining a `leg` row in `tools/playbook/core-pending.txt`; (c) the row leaves and its
+  tags stay; (d) the row is held whole and listed for the owner. (c) reds the core meta-check, a leg of
+  section 7, so the first veto discards it. (d) leaves a `gov-only` row in the shipped foundation set,
+  against the carried clause's "the gov-only ones moving to gov's own overlay", a bound only a further
+  deviation record could relax, and leaves the row's whole move as a follow-up. (b) grows a list whose header declares it shrink-only and
+  strips the record of what gov's legs enforce, leaving each such leg to be re-tagged later; (a)
+  leaves one line held twice, the row's `line` and the unit's `text`, stated in section 5. A row
+  outside `foundation` takes neither: no shipped default carries it and gov's charter does not render
+  it, so it `stays` (section 4, Applying a ruling). Recommendation (a). RESOLVED (agent, 2026-11-09,
+  delegated): (a), the survivor with the fewest follow-ups under the fork rule. widens: none ·
+  relaxes: none
+- **F10 — How the project block meets `[charter] adopter_rules` before PLAY-dOrderedCharter-31
+  converts it.** Composition step 2 stopped rendering the key once the overlay held a level-0 unit, and
+  gov's adopter rules reach the overlay only through PLAY-dOrderedCharter-31's step, which builds after
+  this unit. Options: (a) the block renders the key's lines, then the level-0 units, until that step
+  takes the key out; (b) this unit converts gov's own adopter rules into overlay units itself; (c) step
+  2 as it stood. (c) drops gov's adopter rules from its charter the moment a census row moves, which
+  AC1 reds, so the first veto discards it. (b) is a second writer of the conversion
+  PLAY-dOrderedCharter-31's S4 owns, and it writes `.governance/deploy.toml` and
+  `.governance/instructions.toml`, which the minimal guard refuses to an agent's pass
+  (PLAY-dOrderedCharter-32's F4), a write surface beyond this unit's, so the third veto discards it.
+  (a) hands that unit no work: its step already takes the key out in the write that adds the units.
+  Recommendation (a). RESOLVED (agent, 2026-11-09, delegated): (a), the one option no veto discards.
+  widens: none · relaxes: none
+- **F11 — Where a level-3 to level-5 repository unit renders.** No template holds a unit slot or a
+  marked pair, and the renderer of record renders the charter alone (S2). Options: (a) reuse
+  `tools/playbook/overlay.py#derive_slot_units` through `render_unit_slots`, marking each run of
+  repository units in a slot's output and naming every unit no slot selects `unplaced`; (b) the
+  composition appends a marked part to the end of each level-3 to level-5 document, as step 3 said;
+  (c) a slot added to each level-3 to level-5 template, and each owning kit's adopter taught to expand
+  it. (b) makes the renderer a second writer of documents `tools/playbook/renderers.toml` gives a
+  `kit-adopter` renderer, among them `{memory_root}/guides/BUILD-METHOD.md` and
+  `{memory_root}/guides/REVIEW-PROTOCOL.md`, a write surface beyond the charter and entry files this
+  unit's tier priced, so the third veto discards it; (c) adds the slot to the templates and adopters of
+  every kit owning such a document, a new public surface in each, so the second veto discards it. (a)
+  builds no surface and places a unit once, where its scope selects it. Recommendation (a).
+  RESOLVED (agent, 2026-11-09, delegated): (a), the one option no veto discards; a slot in a level-3
+  to level-5 template is the owning kit's (section 3). widens: none · relaxes: none
+- **F12 — Which template an install's render reads once the seeded copy is retired.** Re-read at HEAD
+  f91d3b28a, `tools/playbook/render_playbook.py#main` derives `gov_root` as the engine's parent's
+  parent, the target's own root in an install; the playbook entry seeds the template only to
+  `{playbook_path}` (`tools/govkit/entries/playbook.kit.toml`), the renderer kit's descriptor
+  `tools/playbook/kit.toml` ships none, and PLAY-dOrderedCharter-31's S5 takes the seed rule out. A
+  reader of `gov_root` alone would refuse every install, update and check of the renderer, and a
+  template planted at a fixture's root by hand would hide that. Options: (a) the renderer kit ships
+  the template through a `root_relative` `[[files]]` rule to `{prefix}/playbook/`, and the reader
+  looks in the rendered tree's renderer-kit directory first, through
+  `tools/playbook/instruction_units.py#derive_kit_file`, and at `gov_root` second, as
+  `tools/playbook/render_playbook.py#resolve_declaration_paths` reads a descriptor beside the engine
+  first and gov's tree second; (b) S5, AC7 and F7 leave this unit for PLAY-dOrderedCharter-31, so
+  the input's retirement and the seed rule's exit land together, the edge mirrored on that spec;
+  (c) as (a), its first lookup the engine's own directory rather than the tree's; (d) S5 waits for
+  PLAY-dOrderedCharter-31 and the render keeps reading `playbook_path`. (d) lets a seeded copy's
+  bytes reach the render, which AC7 reds, so the first veto discards it. (b) moves the retirement
+  into a unit whose section 3 names dropping the seeded template as the render's input this unit's,
+  a non-goal of that spec, and leaves it the same replacement to build, so the first veto discards
+  it. (a) and (c) add one file inside the kit's existing install home, where its `root_relative`
+  rules already land the descriptors the render reads, through govkit's existing engine-file write:
+  no new install location, public surface or governance carrier, and no write surface beyond the
+  files the kit already writes. (c) leaves each fixture reaching the render through `main` to run a
+  scratch copy of the whole kit as its own process, since `main` derives the engine's directory from
+  its own file (F7); (a) serves those fixtures through a seam the render already reads. Recommendation
+  (a), on the tie-break's reuse of a found seam. RESOLVED (agent, 2026-11-09, delegated): (a), the
+  survivor reusing `derive_kit_file`. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -375,6 +695,41 @@ New arm: tools/govkit/selftest.py · covers AC8 · a scratch adopter whose playb
 - rev-5 · 2026-10-25 · S3 · §4 Budgets and harness limits · §8 F6 · §10 · item 6 of
   `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md`, the parent audit's P1: `CODEX_MAX` is read
   with `budgets.py home codex-instructions`, unit 6's verb, and this unit parses no census row.
+- rev-6 · 2026-11-03 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-19-latent-hits-brief.md` Item 2: the leg line names `policy fixtures`, whose guard a §4 Files touched path trips, the guards hit the spec-token check reads with DEFERRED as live.
+- rev-7 · 2026-11-08 · S4 S5 S8 · section 4 The composition, in the renderer, Files touched ·
+  section 7 · section 8 F7 new · section 10 · from
+  `2026-11-08-prompt-PLAY-dOrderedCharter-46-drift-fold-brief.md`: re-read at `05fd1b7f7`. S4 reuses
+  unit 20's landed `check_entry_files` and adds only the write half. S5's by-value readers were one
+  and are seven: every fixture that answers `playbook_path` to hand the render its template, which
+  F7 moves to the renderer's `gov_root` parameter. S8's by-name half said no reader was in the tree;
+  unit 1 has landed, so it lists the files that spell a practice tag, and each moved row's
+  `core-pending.txt` row leaves with it, since the core meta-check reds a pending row naming no
+  practice. The design section anchors its moved seams by symbol; the leg line gains the core
+  meta-check and the instruction-unit fixtures, and the gates section names the acceptance-matrix
+  leg's parked red.
+- rev-8 · 2026-11-09 · section 4 Inventory · main loop: the minted `compose_document` is renamed `build_document`, since the naming lexicon declares no `compose` verb, as spec 35's composer was.
+- rev-9 · 2026-11-09 · S1 S2 S5 S8 · section 3 · section 4 · section 5 · AC1 AC2 AC9 AC10 · section 8
+  F8 to F11 new · section 10 · from `2026-11-09-prompt-PLAY-dOrderedCharter-34-repair-brief.md`,
+  the builder's hand-back, re-read at HEAD 5c7f520b8. The census reads a leg's `enforces` through the
+  catalogue's rule tags, the core meta-check's join (F8); a `gov-only` ruling applies by a printed
+  disposition, `moves`, `moves, row kept` or `stays`, so a row a leg names keeps its catalogue row and
+  `tools/gate-legs.json` is never edited, and `practice.writing`, the one `gov-only` row at HEAD,
+  stays (F9; AC9 and AC10 gain the plants and greps). The project block renders `[charter]
+  adopter_rules` ahead of the level-0 units until PLAY-dOrderedCharter-31's step takes the key out
+  (F10; AC1). Level-3 to level-5 units reuse the unit slots through `derive_slot_units`, each run of
+  them marked, every unit no slot selects named `unplaced`, and a slot in such a template is the
+  owning kit's (F11; S2, step 3, AC2, a non-goal). S8's and S5's readers are re-grepped at HEAD.
+- rev-10 · 2026-11-09 · S5 · section 3 · section 4 The template input, Files touched · section 5 ·
+  AC7 · section 7 · section 8 F7 F12 new · section 10 · from
+  `2026-11-09-prompt-PLAY-dOrderedCharter-34-repair-2-brief.md`, the builder's second hand-back,
+  re-read at HEAD f91d3b28a. The renderer kit ships the template beside its engine and the reader
+  takes the rendered tree's kit copy first and gov's root second, so no install reads a template
+  nothing ships (F12; S5, AC7, the edge to PLAY-dOrderedCharter-31). Fixtures reaching the render
+  through `main` take no `gov_root`, so F7 moves every fixture's template to its tree's renderer-kit
+  directory; `tools/playbook/overlay.py` joins S5's by-value readers and Files touched, and the
+  matrix and govkit selftest leave Files touched, since they answer the key for the seed and the
+  matrix's install receives the template from the rule. S5's Readers gain the help pages and the reseed branches, section 5 the fall-through and the
+  reseed follow-up, and section 7 the one-line plant's run at HEAD.
 
 ## 10. Reuse audit
 
@@ -395,6 +750,28 @@ says. Where a record and the source disagree: the scout places `print_size_note`
 `:64-68`, the announce-only body ending at its `return 0`. The recall probe found the clause, the
 adopter-instructions items 12 to 17 and PLAY-aOrientedCast-3 (`memory/DECISIONS.md:12`), the owner's
 20480 ceiling for `AGENTS.md` "still 62% of the 32768 bytes Codex reads", the measured pair S3 holds
-apart.
+apart. Re-read at `05fd1b7f7`: the seams are landed and moved, each anchored by symbol in the design
+section; unit 20's `tools/playbook/render_playbook.py#check_entry_files` is the alias compare S4
+reuses; and the template seam F7 takes is the `gov_root` parameter of
+`tools/playbook/render_playbook.py#render`, kept in the signature for the template, as
+`tools/playbook/render_playbook.py#resolve_declaration_paths` says. Re-read at HEAD 5c7f520b8 for
+the repair brief: the level-3 to level-5 placement reuses `tools/playbook/overlay.py#derive_slot_units`
+through `tools/playbook/render_playbook.py#render_unit_slots`, and the level-1, 6 and 7 refusal is
+`tools/playbook/overlay.py#read_overlay`'s; the census's leg reading is
+`tools/playbook/core.py#run_meta_check`'s join of `enforces` to the catalogue's tags and rule tags.
+`reuse_lookup.py "place a repository instruction unit into the document slot its scope selects"` and
+`"which legs enforce a practice row through its rule tags"` ranked name-token hits only
+(`parse_unit_rows`, `read_units`, test-script functions); read at source, the two seams above are the
+ones that place and join. Re-read at HEAD f91d3b28a for the second repair brief: the template read
+reuses `tools/playbook/instruction_units.py#derive_kit_file`, "the tree's own table rather than this
+module's", which `tools/playbook/render_playbook.py#render_charter_envelope` already reads the
+document registry through, and the shipping reuses the renderer kit's `root_relative` rules, the
+seam `tools/playbook/render_playbook.py#resolve_declaration_paths` reads its descriptor from.
+`reuse_lookup.py "read a file the kit ships beside the installed engine, falling back to the source
+checkout"` ranked `resolve_kit_dir`, which finds another kit's directory from the install receipt,
+and name-token hits (`read_text`, `read`, `kit_rel`); read at source, none names this kit's own file
+in the rendered tree. S5's readers are the hits outside the memory tree of fixed-string greps for
+`playbook_path`, `resolve_template_path`, `SLOT_DEPLOY`, `TPL.md`, `reseed` and the template's name
+at that HEAD, each read at source.
 
-Recall terms used: `python tools/memory-recall/query.py "how is the composed charter measured against the Codex limit and which units overflow" --terms "composition project block level-0 units budget overflow largest contributors Codex limit delta report"`
+Recall terms used: `python tools/memory-recall/query.py "how is the composed charter measured against the Codex limit and which units overflow" --terms "composition project block level-0 units budget overflow largest contributors Codex limit delta report"` · `python tools/memory-recall/query.py "where does a repository instruction unit at level 3 render and how does a moved practice keep its rule tags" --terms "unit slot derive_slot_units marked part rule tags enforces meta-check adopter_rules project block"` · `python tools/memory-recall/query.py "where does an installed charter renderer read its template once the seeded copy is retired" --terms "template seeded playbook_path resolve_template_path root_relative engine beside install renderer kit"`

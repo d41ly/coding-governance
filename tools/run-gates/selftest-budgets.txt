@@ -49,7 +49,6 @@
 # <name>	<budget seconds>	<argv, empty = take it from <prefix>/gate-legs.json>	<the reading>
 agent-cap restatement self-test	520		worst of 11 readings 342s, x1.5
 agent-cap self-test	590		worst of 7 readings 389s, x1.5
-agent-instructions self-test	150		worst of 8 readings 96s, x1.5
 backlog migration selftest	300		worst of 4 readings alone 105s on node a 2026-10-01 by direct invocation (79s and 105s at moved prefixes), and over 130s in the foreign-prefix leg's 8-wide pool, where it runs whole; set to its manifest ceiling, the pooled bound; it was 80 from 49s on node d
 branch-guard self-test	60		worst of 8 readings 20s, x1.5
 build-index selftest	140		worst of 10 readings 88s, x1.5
@@ -57,6 +56,7 @@ check-arms selftest	60		worst of 10 readings 17s, x1.5
 check-wiring self-test	3290		worst of 11 readings 2192s, x1.5
 codebase-map adopter e2e	70		worst of 7 readings 46s, x1.5
 codebase-map kit selftest	60		worst of 9 readings 27s, x1.5
+core selftest	60		one reading alone over the tree by the main loop at 51cd8b402, 38s, x1.5 floored at 60 (PLAY-dOrderedCharter-77 S14)
 corpus-ids selftest	1080		worst of 10 readings 715s, x1.5
 dead-path carriers self-test	900		worst of 11 readings 599s, x1.5
 extract-arms self-test	60		measured 11s on node a 2026-09-07 at inner width 4, x1.5 floored at this file 60s minimum
@@ -67,6 +67,8 @@ govkit selftest	1600		worst of 7 readings 1065s, x1.5
 held-halves selftest	60		measured 1.3s on node a 2026-10-11 by direct invocation, x1.5 floored at this file 60s minimum
 hook destinations self-test	510		worst of 4 readings 335s, x1.5
 install-prefix self-test	1180		worst of 11 readings 783s, x1.5
+instruction edits selftest	160		one reading alone over the tree by the main loop at 51cd8b402, 103s, x1.5 floored at 60 (PLAY-dOrderedCharter-77 S14)
+instruction units selftest	250		one reading alone over the tree by the main loop at 51cd8b402, 161s, x1.5 floored at 60 (PLAY-dOrderedCharter-77 S14), its one red expectation a database is locked on the shared index another session held
 kit-placeholders self-test	60		worst of 7 readings 24s, x1.5
 lexicon selftest	590		worst of 9 readings 389s, x1.5
 line-length gate selftest	60		measured 8s on node a 2026-09-07 under run-selftests.sh at its exported width 8 (was 208s worst-of-8 before the port), x1.5 floored at this file 60s minimum
@@ -114,6 +116,8 @@ settings-merge selftest	60		worst of 11 readings 4s, x1.5
 shell-hygiene selftest	60		measured 0.3s on node a 2026-09-10 by direct invocation, x1.5 floored at this file 60s minimum
 spec-audit opt-in pack self-test	60		PINNED by declaration at this file's 60s floor, not measured; re-priced from the first measured run. TOOL-dFairHearing-23 S26
 spec-tokens self-test	130		worst of 6 readings 80s, x1.5
+tags bundle selftest	60		one reading alone over the tree by the main loop at 51cd8b402, 22s, x1.5 floored at 60 (PLAY-dOrderedCharter-77 S14)
+tags positional selftest	170		one reading alone over the tree by the main loop at 51cd8b402, 108s, x1.5 floored at 60 (PLAY-dOrderedCharter-77 S14)
 template size gate selftest	290		worst of 11 readings 190s, x1.5
 testsuite counts self-test	170		worst of 11 readings 109s, x1.5
 tier2-review self-test	60		worst of 8 readings 8s, x1.5

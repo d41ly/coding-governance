@@ -1,0 +1,292 @@
+# edges.toml — the edge-type registry (PLAY-dOrderedCharter-24 S1, PLAY-dOrderedCharter-28 S1). Read by
+# edge_grammar.read_edge_types and edge_grammar.read_trailer_keys.
+#
+# One [[edge]] row per type of ONE closed set: `type`; `inverse`, derived from this row and never declared
+# at a site; `from` and `to`, the namespace words of namespaces.toml a source and a target sit in, its
+# native-id classes (`family-id`, `clause-id`), or the class words `any` (every registered namespace and
+# every native id) and `selects` (every namespace whose row has role = "selects"); `pin`, `none`, `tag` or
+# `clause`; `status`, `declared` or `derived`; `declared-at`, the site that owns the fact; and an optional
+# `writer`, the one site that writes the type, an edge of it read at any other site being red. A word not
+# registered yet (`feature`, `item`, `record`, `commit`, `session`, `act`, and the classes `spec`,
+# `decision` and `build`) admits nothing until its build registers it; an id matching no class under such
+# a word is `unarmed`. These are P33's twelve declared types and the derived `cites`, then
+# PLAY-dOrderedCharter-28's twelve from the memory plan's [edges], `decides` and `after` widened,
+# then PLAY-dOrderedCharter-49's two of a spec's `### Edges` block.
+#
+# One [[trailer]] row per commit trailer key: `key` and the `type` it declares, so a key is registered
+# once and the commit adapter reads this table.
+
+[[edge]]
+type = "part-of"
+inverse = "has-part"
+from = ["any"]
+to = ["any"]
+pin = "none"
+status = "declared"
+declared-at = "annotations, dossier claims"
+
+[[edge]]
+type = "implements"
+inverse = "implemented-by"
+from = ["any"]
+to = ["feature", "spec"]
+pin = "none"
+status = "declared"
+declared-at = "gov:feature, the code record"
+
+[[edge]]
+type = "tests"
+inverse = "tested-by"
+from = ["any"]
+to = ["any"]
+pin = "none"
+status = "declared"
+declared-at = "the test's own declaration"
+
+[[edge]]
+type = "decides"
+inverse = "decided-by"
+from = ["decision"]
+to = ["any", "commit", "item"]
+pin = "none"
+status = "declared"
+declared-at = "the decision row; Decided: trailers"
+
+[[edge]]
+type = "instructs"
+inverse = "instructed-by"
+from = ["unit"]
+to = ["selects"]
+pin = "none"
+status = "declared"
+declared-at = "the unit's scope"
+
+[[edge]]
+type = "enforces"
+inverse = "enforced-by"
+from = ["any"]
+to = ["unit", "practice", "principle"]
+pin = "none"
+status = "declared"
+declared-at = "the leg's or hook's fields"
+
+[[edge]]
+type = "after"
+inverse = "before"
+from = ["build", "session"]
+to = ["build", "session"]
+pin = "none"
+status = "declared"
+declared-at = "the chain row; the session binding, through resume and fork"
+
+[[edge]]
+type = "supersedes"
+inverse = "superseded-by"
+from = ["any"]
+to = ["any"]
+pin = "tag"
+status = "declared"
+declared-at = "the new node"
+
+[[edge]]
+type = "amends"
+inverse = "amended-by"
+from = ["any"]
+to = ["any"]
+pin = "tag"
+status = "declared"
+declared-at = "the amending node"
+
+[[edge]]
+type = "patches"
+inverse = "patched-by"
+from = ["build"]
+to = ["build", "item"]
+pin = "none"
+status = "declared"
+declared-at = "the patch build's intake"
+
+[[edge]]
+type = "owner"
+inverse = "owns"
+from = ["any"]
+to = ["build", "layer"]
+pin = "none"
+status = "declared"
+declared-at = "the node's declaration"
+
+[[edge]]
+type = "layer"
+inverse = "in-layer"
+from = ["kit"]
+to = ["layer"]
+pin = "none"
+status = "declared"
+declared-at = "the descriptor"
+
+[[edge]]
+type = "cites"
+inverse = "cited-by"
+from = ["any"]
+to = ["any"]
+pin = "none"
+status = "derived"
+declared-at = "derived from the text"
+
+# PLAY-dOrderedCharter-28's twelve, from the memory plan's [edges].
+
+[[edge]]
+type = "serves"
+inverse = "served-by"
+from = ["record", "work-order", "commit"]
+to = ["family-id", "item", "build"]
+pin = "none"
+status = "declared"
+declared-at = "the **Serves:** line; the Gov-Unit:, Gov-Item: and Pass: trailers; the gov:handoff marker's unit= and build="
+
+[[edge]]
+type = "made-by"
+inverse = "made"
+from = ["commit", "record"]
+to = ["act", "owner"]
+pin = "none"
+status = "declared"
+declared-at = "the Gov-Act: trailer; the record header's **Made-by:**"
+
+[[edge]]
+type = "caused-by"
+inverse = "causes"
+from = ["record"]
+to = ["any"]
+pin = "none"
+status = "declared"
+declared-at = "the record header's **Caused-by:**"
+
+[[edge]]
+type = "follows"
+inverse = "followed-by"
+from = ["act"]
+to = ["work-order"]
+pin = "none"
+status = "declared"
+declared-at = "the act record"
+
+[[edge]]
+type = "answers"
+inverse = "answered-by"
+from = ["return", "answer"]
+to = ["work-order", "fork"]
+pin = "none"
+status = "declared"
+declared-at = "the return's header; the answer's section"
+
+[[edge]]
+type = "runs-in"
+inverse = "hosts"
+from = ["act", "claim", "commit"]
+to = ["session"]
+pin = "none"
+status = "declared"
+declared-at = "the session binding; a claim's session:; the Gov-Session: trailer"
+
+[[edge]]
+type = "carries"
+inverse = "carried-by"
+from = ["landing"]
+to = ["family-id", "commit"]
+pin = "none"
+status = "declared"
+declared-at = "the landing record"
+
+[[edge]]
+type = "carries-clause"
+inverse = "carried-in"
+from = ["family-id"]
+to = ["clause-id"]
+pin = "clause"
+status = "declared"
+declared-at = "the spec's **Carries:** line"
+
+[[edge]]
+type = "pinned-at"
+inverse = "pinned-by"
+from = ["record", "probe", "claim"]
+to = ["commit", "tree"]
+pin = "none"
+status = "declared"
+declared-at = "a record's Derived at, a probe's pin"
+
+[[edge]]
+type = "reads"
+inverse = "read-by"
+from = ["item", "role"]
+to = ["kind"]
+pin = "none"
+status = "declared"
+declared-at = "the role definition's reads: field and the item's declaration"
+
+[[edge]]
+type = "writes"
+inverse = "written-by"
+from = ["item", "role"]
+to = ["kind"]
+pin = "none"
+status = "declared"
+declared-at = "the role definition's writes: field and the item's declaration"
+
+[[edge]]
+type = "promoted-from"
+inverse = "promoted-to"
+from = ["unit", "scenario"]
+to = ["any"]
+pin = "none"
+status = "declared"
+declared-at = "instructions.edit's change record"
+writer = "instructions.edit"
+
+# PLAY-dOrderedCharter-49 S40: a spec's `### Edges` block, each its own type and inverse (F11). The hygiene
+# gate and check-spec-tokens.py's scan_handoffs keep parsing the block; these rows put its two verbs in the set.
+
+[[edge]]
+type = "consumes-from"
+inverse = "consumed-by"
+from = ["family-id"]
+to = ["family-id"]
+pin = "none"
+status = "declared"
+declared-at = "a spec's ### Edges block"
+
+[[edge]]
+type = "hands-off"
+inverse = "receives-from"
+from = ["family-id"]
+to = ["family-id"]
+pin = "none"
+status = "declared"
+declared-at = "a spec's ### Edges block"
+
+# The commit trailer keys, each with the type it declares (the memory plan's [sites], a commit).
+
+[[trailer]]
+key = "Gov-Unit"
+type = "serves"
+
+[[trailer]]
+key = "Gov-Item"
+type = "serves"
+
+[[trailer]]
+key = "Gov-Act"
+type = "made-by"
+
+[[trailer]]
+key = "Gov-Session"
+type = "runs-in"
+
+[[trailer]]
+key = "Pass"
+type = "serves"
+
+[[trailer]]
+key = "Decided"
+type = "decides"

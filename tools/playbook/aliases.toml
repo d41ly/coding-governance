@@ -1,0 +1,187 @@
+# aliases.toml — positional labels mapped to tags (PLAY-dOrderedCharter-19 S11). Read by gov_tag.py.
+#
+# One [[alias]] row per positional label that never moved: `ref = "<doc> <label>"`, `target` the
+# `doc.<name>#<seg>` it names. `where` and `show` resolve a ref through it. The BUILD-METHOD M-steps
+# each name their own `##` section; the hygiene checks are numbered items of one section, the check
+# catalog, so each check names that section. The live positional references are kept by key in
+# positional-refs.txt under <MEMORY_ROOT>/project/, never as a count.
+#
+# A row whose `ref` is a `doc.<name>#<seg>` retires that section (PLAY-dOrderedCharter-29 S8): the
+# resolver's `retired` check reds a section the compare base holds and the tip lacks with no row here,
+# and a retired section's slug minted again, so `target` names where the section went.
+
+[[alias]]
+ref = "BUILD-METHOD M1"
+target = "doc.build-method#m1-what-this-is"
+
+[[alias]]
+ref = "BUILD-METHOD M2"
+target = "doc.build-method#m2-the-spec-set-decompose-detect-classify-act"
+
+[[alias]]
+ref = "BUILD-METHOD M3"
+target = "doc.build-method#m3-forks-the-decision-rule-and-the-limit-of-your-authority"
+
+[[alias]]
+ref = "BUILD-METHOD M4"
+target = "doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it"
+
+[[alias]]
+ref = "BUILD-METHOD M5"
+target = "doc.build-method#m5-recall-and-reuse"
+
+[[alias]]
+ref = "BUILD-METHOD M6"
+target = "doc.build-method#m6-passes-commits-parallelism"
+
+[[alias]]
+ref = "BUILD-METHOD M7"
+target = "doc.build-method#m7-regrounding"
+
+[[alias]]
+ref = "BUILD-METHOD M8"
+target = "doc.build-method#m8-closing-the-build"
+
+[[alias]]
+ref = "BUILD-METHOD M9"
+target = "doc.build-method#m9-the-wrap-up-a-derivation-not-a-recollection"
+
+[[alias]]
+ref = "BUILD-METHOD M10"
+target = "doc.build-method#m10-if-the-run-is-unattended"
+
+[[alias]]
+ref = "BUILD-METHOD M11"
+target = "doc.build-method#m11-where-everything-else-lives-read-these-do-not-restate-them"
+
+[[alias]]
+ref = "BUILD-METHOD M12"
+target = "doc.build-method#m12-research-test-choose-when-the-solution-is-not-given"
+
+[[alias]]
+ref = "HYGIENE check 1"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 2"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 3"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 4"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 5"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 6"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 7"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 8"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 9"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 10"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 11"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 12"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 13"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 14"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 15"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 16"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 17"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 18"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 19"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 20"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 24"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 21"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 22"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 25"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 26"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 27"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 28"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 29"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "HYGIENE check 30"
+target = "doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home"
+
+[[alias]]
+ref = "doc.charter#1-governing-practices"
+target = "doc.charter#practices-follow-each-one"
+
+[[alias]]
+ref = "doc.charter#2-this-repository"
+target = "doc.charter#this-repository-s-own-rules"
+
+[[alias]]
+ref = "doc.charter#3-generated"
+target = "doc.charter#node-registry"

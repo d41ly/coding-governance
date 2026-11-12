@@ -1,3 +1,4 @@
+[memory/guides/REVIEW-PROTOCOL.md · Level 3 · Read before any review or Workflow fan-out; yields to levels 0 to 2]
 # Review + multi-agent Workflow protocol (BINDING — part of the charter)
 
 Read this before ANY multi-agent review or `Workflow` run. Ported from adopter ic's charter
@@ -159,7 +160,7 @@ memory tree and a design pass is where a new surface is first decided (PLAY-aDis
 ## The Tier-2 pattern
 
 Dimension finders, the lenses of the review kit's catalogue `{{TOOL_ROOT}}workflows/lenses.toml` in the
-preset the subject kind names, its opt-in rows included, emit `file:line` findings **scoped to an immutable base SHA**, then skeptics try to REFUTE each before it
+preset the subject kind names, its opt-in rows included, emit findings cited as the blob-pinned line `<path>@<sha8>:<line>` at the reviewed sha, **scoped to an immutable base SHA**, then skeptics try to REFUTE each before it
 is recorded. Feed the finders the security model, the open asks on the files under review — the
 rows `gen_build_index.py --asks --json --path <every path the diff touches>` prints, ranked by
 severity and capped, with `--limit 0` lifting the cap, or the backlog shards when its `mode` field
@@ -233,3 +234,4 @@ on one unescaped backslash and regenerating whole.
   `Bash|PowerShell` denied a Bash command issued from inside a sidechain.
   The cap is graded over the committed harness rather than inside the running script, because the
   orchestrator's script is where the fan-out decision is MADE — not because nothing reaches a sidechain.
+[/memory/guides/REVIEW-PROTOCOL.md]

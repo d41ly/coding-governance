@@ -43,6 +43,7 @@ KIT_NAME = Path(os.path.abspath(__file__)).parent.name
 sys.path.insert(0, str(Path(os.path.abspath(__file__)).parent))
 
 import map_lib as m  # noqa: E402
+import coverage_join as cj  # noqa: E402 - memory-tree's, on the path map_lib's import appends
 import reuse_lookup as rl  # noqa: E402
 import map_diff as md  # noqa: E402
 import check_gate_coverage as cg  # noqa: E402
@@ -521,22 +522,22 @@ def test_remedy_paths_are_real(tmp: Path):
 
 
 def test_coverage_directions():
-    cov = m.compute_coverage(INV, {"x": claims(flags=("a_flag",))}, EMPTY_BASE)
+    cov = cj.compute_coverage(INV, {"x": claims(flags=("a_flag",))}, EMPTY_BASE)
     assert cov.unclaimed == {"flags": ["b_flag"], "routes": ["api/x/route.ts"]}
-    cov = m.compute_coverage(
+    cov = cj.compute_coverage(
         INV,
         {"x": claims(flags=("a_flag", "dead"))},
         EMPTY_BASE | {"flags": ("b_flag",), "routes": ("api/x/route.ts",)},
     )
     assert cov.stale_claims == {"flags": ["x: dead"]}
-    cov = m.compute_coverage(
+    cov = cj.compute_coverage(
         INV,
         {"x": claims(flags=("a_flag", "b_flag"), routes=("api/x/route.ts",))},
         EMPTY_BASE | {"flags": ("gone", "b_flag")},
     )
     assert cov.stale_baseline == {"flags": ["gone"]}
     assert cov.lazy_baseline == {"flags": ["b_flag"]}
-    cov = m.compute_coverage(
+    cov = cj.compute_coverage(
         INV,
         {"x": claims(flags=("a_flag", "b_flag"), routes=("api/x/route.ts",)), "y": claims(flags=("a_flag",))},
         EMPTY_BASE,
@@ -962,10 +963,10 @@ def test_affordance_exemption_drop():
     attributed = m.attribute_paths(["src/touched/a.py"], tree)
     assert set(attributed) == {"touched"}, attributed  # only 'touched' was in the range
     exempt = frozenset({"touched", "untouched"})
-    kept = m.drop_touched_exemptions(exempt, attributed)
+    kept = cj.drop_touched_exemptions(exempt, attributed)
     assert kept == frozenset({"untouched"}), kept  # touched loses grace, untouched keeps it
     # a range that hits nothing graced (foundation/UNMAPPED are never in the exempt list) is a no-op
-    assert m.drop_touched_exemptions(exempt, {"UNMAPPED": ["z"], "foundation": ["vendor/b.py"]}) == exempt
+    assert cj.drop_touched_exemptions(exempt, {"UNMAPPED": ["z"], "foundation": ["vendor/b.py"]}) == exempt
 
     # gate consequence: the un-graced 'touched' dossier (no affordance block yet) is now an offender
     texts = {
@@ -1585,36 +1586,36 @@ def test_baseline_additions_from_git(tmp: Path):
     run_git("commit", "-qm", "seed the baseline")
     seeded = run_git("rev-parse", "HEAD")
 
-    same, note = m.derive_baseline_additions(tmp, seeded)
+    same, note = cj.derive_baseline_additions(tmp, seeded, "memory/map/baseline.toml")
     assert same == {} and "base carried 1 key(s), working carries 1" in note, (same, note)
     baseline.write_text(m.render_baseline({"flags": ["a", "b"], "routes": ["r"]}, IDS), encoding="utf-8")
-    added, _ = m.derive_baseline_additions(tmp, seeded)
+    added, _ = cj.derive_baseline_additions(tmp, seeded, "memory/map/baseline.toml")
     assert added == {"flags": ["b"], "routes": ["r"]}, f"an added key must be named: {added}"
-    none, why = m.derive_baseline_additions(tmp, bare)
+    none, why = cj.derive_baseline_additions(tmp, bare, "memory/map/baseline.toml")
     assert none is None and "no memory/map/baseline.toml" in why, (none, why)
     # TOOL-dLadderedRemote-2: the remote is the LADDER'S, not one called `origin`. The ambient
     # GOV_REMOTE and GOV_DEFAULT_BRANCH are cleared for these arms, so a node exporting either
     # cannot make one pass, and restored after.
     saved = {k: os.environ.pop(k) for k in ("GOV_REMOTE", "GOV_DEFAULT_BRANCH") if k in os.environ}
     try:
-        gone, reason = m.resolve_compare_base(tmp)
+        gone, reason = cj.resolve_compare_base(tmp)
         assert gone is None and reason == "no remote to compare against", (gone, reason)
         run_git("remote", "add", "upstream", "../upstream.git")
         run_git("update-ref", "refs/remotes/upstream/main", bare)
         run_git("symbolic-ref", "refs/remotes/upstream/HEAD", "refs/remotes/upstream/main")
-        got, why = m.resolve_compare_base(tmp)
+        got, why = cj.resolve_compare_base(tmp)
         assert got == bare and why == "merge-base of HEAD and upstream/main", (got, why)
         # TOOL-dLadderedRemote-5: the OBSERVED branch, never GOV_DEFAULT_BRANCH, picks the base.
         os.environ["GOV_DEFAULT_BRANCH"] = "elsewhere"
-        same, why = m.resolve_compare_base(tmp)
+        same, why = cj.resolve_compare_base(tmp)
         assert same == bare and why == "merge-base of HEAD and upstream/main", (same, why)
         del os.environ["GOV_DEFAULT_BRANCH"]
         run_git("remote", "add", "origin", "../origin.git")
         run_git("update-ref", "refs/remotes/origin/main", seeded)
-        refused, why = m.resolve_compare_base(tmp)
+        refused, why = cj.resolve_compare_base(tmp)
         assert refused is None and "export GOV_REMOTE=<remote>" in why, (refused, why)
         os.environ["GOV_REMOTE"] = "upstream"
-        chosen, why = m.resolve_compare_base(tmp)
+        chosen, why = cj.resolve_compare_base(tmp)
         assert chosen == bare and "upstream/main" in why, (chosen, why)
     finally:
         os.environ.pop("GOV_REMOTE", None)

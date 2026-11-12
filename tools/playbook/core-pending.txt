@@ -1,0 +1,242 @@
+# core-pending.txt — the core's shrink-only pending list (PLAY-dOrderedCharter-7 S3). One row per item the
+# meta-check or the kinds contract would red today: <principle|practice|leg|kind> TAB <name> TAB <the build that
+# arms it>. A principle's arming build is the chain build carrying the first clause of its design [enforcement]
+# row; a leg's is dWitnessedBar, which owns the gate-leg kind; a kind's is its register owner. Seeded once at
+# the build pass from the tree, its `practice` rows when the catalogue landed (PLAY-dOrderedCharter-1), it only
+# shrinks after: `python <prefix>/playbook/core.py meta-check` reds a row
+# whose item is enforced now, and an item with no row.
+principle	principle.p1	dDeclaredLoop
+principle	principle.p2	dDeclaredLoop
+principle	principle.p3	dWitnessedBar
+principle	principle.p4	dOrderedCharter
+principle	principle.p5	dPlacedRequest
+principle	principle.p6	dTendedCadence
+principle	principle.p7	dDeclaredLoop
+principle	principle.p8	dOrderedCharter
+principle	principle.p9	dGroundRules
+principle	principle.p10	dGroundRules
+principle	principle.p12	dIndexedDesign
+principle	principle.p15	dOrderedCharter
+principle	principle.p17	dIndexedDesign
+principle	principle.p18	dBoundRoles
+principle	principle.p19	dScopedBuild
+principle	principle.p20	dDeclaredLoop
+principle	principle.p21	dKeptSession
+principle	principle.p22	dDeclaredLoop
+principle	principle.p23	dDeclaredLoop
+principle	principle.p24	dDeclaredLoop
+principle	principle.p25	dBoundRoles
+principle	principle.p26	dBoundRoles
+principle	principle.p27	dOrderedCharter
+principle	principle.p29	dBoundRoles
+principle	principle.p30	dTotalRecall
+principle	principle.p31	dPlacedRequest
+principle	principle.p32	dPlacedRequest
+principle	principle.p33	dOrderedCharter
+principle	principle.p34	dOrderedCharter
+principle	principle.p35	dTrueNorth
+principle	principle.p36	dWellOiledMachine
+principle	principle.p37	dSafePassage
+principle	principle.p38	dGroundRules
+principle	principle.p39	dGroundRules
+principle	principle.p40	dPlacedRequest
+principle	principle.p41	dTrueNorth
+practice	practice.yagni	dWitnessedBar
+practice	practice.reuse	dWitnessedBar
+practice	practice.consistency	dWitnessedBar
+practice	practice.core	dWitnessedBar
+practice	practice.contract	dWitnessedBar
+practice	practice.derive	dWitnessedBar
+practice	practice.one-fact	dWitnessedBar
+practice	practice.spec	dWitnessedBar
+practice	practice.verify	dWitnessedBar
+practice	practice.gate	dWitnessedBar
+practice	practice.class	dWitnessedBar
+practice	practice.left-shift	dWitnessedBar
+practice	practice.bar	dWitnessedBar
+practice	practice.cost	dWitnessedBar
+practice	practice.small	dWitnessedBar
+practice	practice.isolate	dWitnessedBar
+practice	practice.land	dWitnessedBar
+practice	practice.post-merge	dWitnessedBar
+practice	practice.reconcile	dWitnessedBar
+practice	practice.migrations	dWitnessedBar
+practice	practice.ids	dWitnessedBar
+practice	practice.memory	dWitnessedBar
+practice	practice.records	dWitnessedBar
+practice	practice.docs	dWitnessedBar
+practice	practice.security	dWitnessedBar
+practice	practice.risk	dWitnessedBar
+practice	practice.bound	dWitnessedBar
+practice	practice.portable.line-endings	dWitnessedBar
+practice	practice.portable.quoting	dWitnessedBar
+practice	practice.portable.language-roles	dWitnessedBar
+practice	practice.tokens	dWitnessedBar
+practice	practice.tools	dWitnessedBar
+practice	practice.roles	dWitnessedBar
+practice	practice.voice	dWitnessedBar
+practice	practice.signal	dWitnessedBar
+practice	practice.formats	dWitnessedBar
+practice	practice.default	dWitnessedBar
+practice	practice.solid	dWitnessedBar
+practice	practice.dry	dWitnessedBar
+practice	practice.tdd	dWitnessedBar
+leg	kickoff-manifest ratchet	dWitnessedBar
+leg	template size <=48KiB	dWitnessedBar
+leg	charter size	dWitnessedBar
+leg	micro-format definitions	dWitnessedBar
+leg	micro-format gate selftest	dWitnessedBar
+leg	line length	dWitnessedBar
+leg	line-length gate selftest	dWitnessedBar
+leg	playbook parity	dWitnessedBar
+leg	playbook parity selftest	dWitnessedBar
+leg	template size gate selftest	dWitnessedBar
+leg	build-method size	dWitnessedBar
+leg	unattended protocol size	dWitnessedBar
+leg	unattended skill size	dWitnessedBar
+leg	kickoff engine size <=18KiB	dWitnessedBar
+leg	shell hygiene (a loop fed by a command substitution)	dWitnessedBar
+leg	shell hygiene (a fork spent on builtin work)	dWitnessedBar
+leg	spawn budget (forks per hot entrypoint)	dWitnessedBar
+leg	shell-hygiene selftest	dWitnessedBar
+leg	kit version markers	dWitnessedBar
+leg	verdict epoch (kit version dates the engine)	dWitnessedBar
+leg	verdict-epoch self-test	dWitnessedBar
+leg	agent-instructions wiring	dWitnessedBar
+leg	manifest-check self-test	dWitnessedBar
+leg	agent-cap self-test	dWitnessedBar
+leg	scratch-guard self-test	dWitnessedBar
+leg	format-guard self-test	dWitnessedBar
+leg	memory-hygiene self-test	dWitnessedBar
+leg	row-driver view refusal	dWitnessedBar
+leg	row-keyed merge driver replay	dWitnessedBar
+leg	kit/dogfood doc parity	dWitnessedBar
+leg	method carriers (every pointer declared)	dWitnessedBar
+leg	method-carriers self-test	dWitnessedBar
+leg	build-index selftest	dWitnessedBar
+leg	build README slot contract	dWitnessedBar
+leg	corpus-ids selftest	dWitnessedBar
+leg	gotchas selftest	dWitnessedBar
+leg	routed-commits selftest	dWitnessedBar
+leg	row-grammar selftest	dWitnessedBar
+leg	backlog migration selftest	dWitnessedBar
+leg	harness arms (fail branches armed or pinned)	dWitnessedBar
+leg	check-arms selftest	dWitnessedBar
+leg	branch-guard self-test	dWitnessedBar
+leg	pre-push self-test	dWitnessedBar
+leg	pre-push run-log line	dWitnessedBar
+leg	pre-push bar self-test	dWitnessedBar
+leg	push-main self-test	dWitnessedBar
+leg	check-wiring self-test	dWitnessedBar
+leg	verifier fan-out self-test	dWitnessedBar
+leg	review-protocol parity (kit vs dogfood)	dWitnessedBar
+leg	review-join ban (no ref-keyed join)	dWitnessedBar
+leg	workflow script syntax	dWitnessedBar
+leg	tier2-review self-test	dWitnessedBar
+leg	unattended-build self-test	dWitnessedBar
+leg	review-join self-test	dWitnessedBar
+leg	spec-audit opt-in pack self-test	dWitnessedBar
+leg	review-replay selftest	dWitnessedBar
+leg	pytest-guardrails self-test	dWitnessedBar
+leg	codebase-map kit selftest	dWitnessedBar
+leg	codebase-map gate coverage	dWitnessedBar
+leg	codebase-map coverage + freshness	dWitnessedBar
+leg	codebase-map adopter e2e	dWitnessedBar
+leg	settings-merge selftest	dWitnessedBar
+leg	memory-recall kit selftest	dWitnessedBar
+leg	recall floor	dWitnessedBar
+leg	recall floor arms	dWitnessedBar
+leg	memory-recall skill wiring	dWitnessedBar
+leg	drift-audit selftest	dWitnessedBar
+leg	drift-audit wiring	dWitnessedBar
+leg	process-monitor wiring	dWitnessedBar
+leg	process-monitor census selftest	dWitnessedBar
+leg	process-monitor adopter selftest	dWitnessedBar
+leg	runlog selftest	dWitnessedBar
+leg	runlog record schema	dWitnessedBar
+leg	runlog skill wiring	dWitnessedBar
+leg	cleanup skill wiring	dWitnessedBar
+leg	branch-reconcile selftest	dWitnessedBar
+leg	drift-audit records	dWitnessedBar
+leg	unattended kit gate	dWitnessedBar
+leg	pass-order history	dWitnessedBar
+leg	routed commits name a specced unit	dWitnessedBar
+leg	brief-recorded	dWitnessedBar
+leg	playbook validity gate	dWitnessedBar
+leg	unattended skill wiring	dWitnessedBar
+leg	run-gates canary	dWitnessedBar
+leg	run-gates evidence	dWitnessedBar
+leg	run-gates turnstile	dWitnessedBar
+leg	run-gates gov canary	dWitnessedBar
+leg	foreign-prefix parity (every self-test at three prefixes)	dWitnessedBar
+leg	run-gates run-log line	dWitnessedBar
+leg	run-gates adopter e2e	dWitnessedBar
+leg	run-gates wiring	dWitnessedBar
+leg	profile-bar selftest	dWitnessedBar
+leg	held-halves selftest	dWitnessedBar
+leg	measure-legs selftest	dWitnessedBar
+leg	install-prefix (shipped surface)	dWitnessedBar
+leg	hook destinations (every declared hook path ships)	dWitnessedBar
+leg	hook destinations self-test	dWitnessedBar
+leg	agent-cap restatement	dWitnessedBar
+leg	agent-cap restatement self-test	dWitnessedBar
+leg	install-prefix self-test	dWitnessedBar
+leg	dead-path carriers (deleted files still named)	dWitnessedBar
+leg	dead-path carriers self-test	dWitnessedBar
+leg	remote literals (kit code names no remote)	dWitnessedBar
+leg	remote literals self-test	dWitnessedBar
+leg	govkit selfcheck	dWitnessedBar
+leg	kit epoch (shipped bytes move, the version moves)	dWitnessedBar
+leg	step-rows-frozen	dWitnessedBar
+leg	step-gate	dWitnessedBar
+leg	docs	dWitnessedBar
+leg	upgrade-walk	dWitnessedBar
+leg	govkit selftest	dWitnessedBar
+leg	lexicon naming predicates	dWitnessedBar
+leg	lexicon selftest	dWitnessedBar
+leg	lexicon wiring	dWitnessedBar
+leg	playbook placeholder catalogue	dWitnessedBar
+leg	placeholder-catalogue self-test	dWitnessedBar
+leg	memory hygiene	dWitnessedBar
+leg	transition-audit arms	dWitnessedBar
+leg	straggler-guard arms	dWitnessedBar
+leg	marker contracts	dWitnessedBar
+leg	verifier fan-out	dWitnessedBar
+leg	govkit refusal join	dWitnessedBar
+leg	govkit runbook parity	dWitnessedBar
+leg	govkit acceptance matrix	dWitnessedBar
+leg	testsuite counts (every bar self-test prints one)	dWitnessedBar
+leg	testsuite counts self-test	dWitnessedBar
+leg	playbook render wiring	dWitnessedBar
+leg	playbook render selftest	dWitnessedBar
+leg	spec tokens (a spec's own names resolve)	dWitnessedBar
+leg	kit placeholders (a declared token its adopter substitutes)	dWitnessedBar
+leg	roles catalogue	dWitnessedBar
+leg	roles render wiring	dWitnessedBar
+leg	roles render selftest	dWitnessedBar
+leg	roles adopter self-test	dWitnessedBar
+leg	policy check	dWitnessedBar
+leg	tags positional selftest	dWitnessedBar
+leg	tags bundle selftest	dWitnessedBar
+leg	policy fixtures	dWitnessedBar
+leg	leg ceilings clear their evidenced maximum	dWitnessedBar
+leg	every held leg is budgeted, every budget row resolves	dWitnessedBar
+leg	receipt sync (installed files match the receipt)	dWitnessedBar
+leg	spec-tokens self-test	dWitnessedBar
+leg	kit-placeholders self-test	dWitnessedBar
+leg	selftest harness self-test	dWitnessedBar
+leg	extract-arms self-test	dWitnessedBar
+leg	run-selftests self-test	dWitnessedBar
+kind	kind.tool-kit	dShippedRelease
+kind	kind.command	dDeclaredLoop
+kind	kind.policy-key	dDeclaredLoop
+kind	kind.preset	dDeclaredLoop
+kind	kind.gate-leg	dWitnessedBar
+kind	kind.role	dDeclaredLoop
+kind	kind.workflow	dDeclaredLoop
+kind	kind.hook	dDeclaredLoop
+kind	kind.record-kind	dConvergedCharter
+kind	kind.stage	dDeclaredLoop
+kind	kind.item	dDeclaredLoop
+kind	kind.lens	dCalibratedLens
+kind	kind.scenario	dDeclaredLoop

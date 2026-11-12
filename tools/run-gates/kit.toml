@@ -10,9 +10,14 @@
 
 id = "run-gates"
 home = "run-gates"
+layer = "layer.flow"
 scope = "repo"
 version_from = { file = "run-gates.sh", pattern = "^KIT_RUN_GATES_VERSION=" }
 requires = []
+# PLAY-dOrderedCharter-17: the selection's govkit read is a declared slot with its fallback.
+optional = [
+  { part = "run-gates.sh", point = "point.flow.version", fallback = "the owner and epoch columns read unreachable" },
+]
 
 [[files]]
 include = "**"
@@ -94,6 +99,20 @@ role = "project-owned"
 # absent — the announced-unarmed state. TOOL-aSparedSpawn-5 S3.
 [[files]]
 include = ["windows-only-legs.txt"]
+role = "project-owned"
+
+# AND SO IS THE OWED-ROWS PROBE. PLAY-dOrderedCharter-50. `owed_rows.py` names the rows GOV's own
+# registries owe a pass that adds or retires a leg, reading govkit and the codebase map from this
+# repo's tree: a probe a pass runs before its commit, not a leg, and no adopter receives it.
+[[files]]
+include = ["owed_rows.py"]
+role = "project-owned"
+
+# AND SO IS THE PYTHON-READS SCANNER. PLAY-dOrderedCharter-67. `py_reads.py` walks GOV's manifest and
+# gov's tracked Python through the memory-tree kit's import walk, and its leg is GOV's, an
+# [[exempt_leg]] in <prefix>/govkit/registry.toml, so no adopter receives the file.
+[[files]]
+include = ["py_reads.py"]
 role = "project-owned"
 
 # AND SO ARE THE GATE PROFILER'S FIXTURES. TOOL-dRedressedBar-19 S29. `measure_legs.py` ships, but

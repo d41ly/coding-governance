@@ -2,6 +2,7 @@
 
 id = "review-harness"
 home = "workflows"
+layer = "layer.roles"
 scope = "repo"
 # The TEMPLATE, since TOOL-aRepatriatedFork-7: `tier2-review.js` is a render now, and a version constant
 # the [[files]] rules do not land is one an adopter cannot pin against. Both carry the same line.
@@ -180,3 +181,38 @@ why = "measured: 350 CR bytes made the shipped harness unlaunchable while its ow
 [[lf_pin]]
 pattern = "{kit}/spec-audit-optin.fragment.json"
 why = "check-wiring.sh reads the fragment with sed; a trailing CR lands inside the captured matcher and the arm reports UNWIRED against a correctly wired repo"
+
+# THE DRIVE ROWS (PLAY-dOrderedCharter-6): how a session starts or advances a stage this kit serves. The
+# playbook render composes one charter line per row of each selected kit, and the role's handoff carries
+# its own role's lines. `stage` names a workflow of the roles kit's workflows.toml, or `start`; `role` a
+# role slot, or `main` for the main session.
+
+[[drive]]
+stage = "spec-write"
+role = "gov-spec-writer"
+command = "Workflow <prefix>/workflows/unattended-build.js"
+when = "a build whose units lack a spec or hold a thin one"
+
+[[drive]]
+stage = "spec-review"
+role = "gov-spec-reviewer"
+command = "Workflow <prefix>/workflows/tier2-review.js"
+when = "a spec audit the build or its project declares"
+
+[[drive]]
+stage = "spec-review"
+role = "gov-skeptic"
+command = "Workflow <prefix>/workflows/tier2-review.js"
+when = "a finding handed on to refute"
+
+[[drive]]
+stage = "closing-review"
+role = "gov-diff-reviewer"
+command = "Workflow <prefix>/workflows/tier2-review.js"
+when = "the last unit terminal, over the cumulative diff"
+
+[[drive]]
+stage = "closing-review"
+role = "gov-synthesizer"
+command = "Workflow <prefix>/workflows/tier2-review.js"
+when = "the verified findings, merged into one report"

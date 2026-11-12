@@ -1749,11 +1749,8 @@ def read_excerpt_chars(conf: dict) -> int:
 
 
 # ---------------------------------------------------------------------------------------- selftest
-# TEST-ONLY. The real anchor grammar lives in the memory-recall kit and is never vendored here; AC2
-# asserts the ANCHOR PROPERTY against that file rather than against a local copy, because an arm
-# that grades a copy passes happily when the real grammar moves underneath it. Resolution is the
-# same two-layout walk `merge-rows.py` already performs, and it is deliberately NOT at module scope:
-# a module that cannot be imported without a sibling kit is a module an adopter cannot install.
+# The sibling-kit resolver, which `gen_build_index.py` and `gotchas.py` reach as
+# `backlog.resolve_kit_dir` for the policy kit's budgets.
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -1794,20 +1791,21 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
+# TEST-ONLY. The real anchor grammar is the sibling `id_grammar.py` and is never re-typed here; AC2
+# asserts the ANCHOR PROPERTY against it rather than against a local copy, because an arm that
+# grades a copy passes happily when the real grammar moves underneath it. Deferred, never at module
+# scope, so an import failure is the arm's SKIP and not this module's.
 def _resolve_anchor_at():
     here = pathlib.Path(__file__).resolve()
     root = next((p for p in here.parents if (p / ".memory-tree.conf").is_file()), None)
     if root is None:
         return None, None, "no .memory-tree.conf above this file"
+    if str(here.parent) not in sys.path:
+        sys.path.append(str(here.parent))
     try:
-        kit = resolve_kit_dir("memory-recall", "extract.py", here.parent)
-    except LookupError as exc:
-        return None, None, f"the memory-recall kit is not installed in this tree ({exc})"
-    sys.path.append(str(kit))
-    try:
-        import extract as anchor_kit  # noqa: PLC0415 — deliberately deferred; see above
+        import id_grammar as anchor_kit  # noqa: PLC0415 — deliberately deferred; see above
     except Exception as exc:  # noqa: BLE001 — an import failure here is a SKIP, never a red arm
-        return None, None, f"the memory-recall kit is present but not importable here ({exc})"
+        return None, None, f"this kit's id_grammar.py is not importable here ({exc})"
     return anchor_kit.anchor_at, anchor_kit.grammar_for(str(root)), ""
 
 
@@ -1953,9 +1951,9 @@ def run_arms(report: bool = True) -> list:
     # ---- AC2: the REAL anchor grammar, and the renderer/parser round trip.
     anchor_at, grammar, why = _resolve_anchor_at()
     if anchor_at is None:
-        print(f"arm SKIP  backlog: the real `extract.anchor_at` anchor arm did not run — {why}. "
-              f"The memory-recall kit owns the one anchor grammar and it is never vendored here, "
-              f"so with the kit absent this property is UNEXERCISED rather than passing.")
+        print(f"arm SKIP  backlog: the real `id_grammar.anchor_at` anchor arm did not run — {why}. "
+              f"id_grammar.py owns the one anchor grammar and it is never copied here, "
+              f"so with it absent this property is UNEXERCISED rather than passing.")
     else:
         arm("the REAL anchor grammar anchors an ask row on its id", "TOOL-dAnchorProbe-1",
             lambda: str(anchor_at(render_ask_row("TOOL-dAnchorProbe-1", "2026-02-01", "x"),

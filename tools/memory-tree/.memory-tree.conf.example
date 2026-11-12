@@ -55,12 +55,13 @@ SPEC10_CUTOFF="2026-08-04"
 SPEC10_EVIDENCE_CUTOFF=""
 
 # Rev-scope ratchet (check 12): from this date, a §9 revision entry numbered rev-2 or higher must
-# name what it MOVED — at least one `§<n>`, `S<n>` or `AC<n>` token anywhere in the entry, with
-# continuation lines folded in. rev-1 is exempt, because a first draft moved everything. Blank =
-# never required. Set it STRICTLY AHEAD of every dated spec on every live branch AND ahead of a date
-# your fleet can still write into, as with the cutoffs above; your corpus then exercises neither arm,
-# which is why the kit self-test carries red and green fixtures for both. The engine prints a
-# zero-population notice while that is true, so the silence is announced rather than assumed.
+# name what it MOVED — at least one `§<n>`, `section <n>`, `S<n>` or `AC<n>` token anywhere in the
+# entry, with continuation lines folded in. rev-1 is exempt, because a first draft moved everything.
+# Blank = never required. Set it STRICTLY AHEAD of every dated spec on every live branch AND ahead of
+# a date your fleet can still write into, as with the cutoffs above; your corpus then exercises
+# neither arm, which is why the kit self-test carries red and green fixtures for both. The engine
+# prints a zero-population notice while that is true, so the silence is announced rather than
+# assumed.
 REV_SCOPE_CUTOFF=""
 
 # Scope-join ratchet (check 12): from this date, every column-0 item in a spec's `## N. Scope (IN)`
@@ -302,11 +303,11 @@ SEVERITY_UNLABELLED_PIN=""
 LIVE_ROW_PIN=""
 
 # Check 27 — every decision row and gotcha ADDED since the mainline merge-base is ranked against the
-# records that existed there, with the memory-recall kit's index builder, and a top hit at or above
+# records that existed there, with the index builder of this kit's id_grammar.py, and a top hit at or above
 # the floor that shares a term of four or more characters must be named by the new record or
 # answered with `supersedes <id>`, `coexists-with` or `disputes`. Grammar `red:<floor>` or
 # `warn:<floor>`, the floor a decimal in (0, 1]. A malformed value is a named refusal, and so is an
-# armed key with no memory-recall kit installed beside this one.
+# armed key with no id_grammar.py beside this kit's row_grammar.py.
 # BLANK = NOT ARMED, announced on every run, and blank is what this kit ships: a floor measured on
 # another corpus is not a floor for yours. Measure your own before arming —
 # `row_grammar.py --measure-relations <floor>` replays your history and prints, per band, how many
@@ -464,10 +465,10 @@ LIVE_DORMANT_DAYS=""
 # trailing column, `Landed-unclosed`: per live build, how many of its non-terminal units carry an id
 # that tracked product source cites, read by calling the drift-audit kit's own
 # non_terminal_specs_cited_by_product_source signal in-process, so the count and the drift report
-# cannot disagree. A candidate to close, not a verdict. Setting it DECLARES that this tree carries
-# the drift-audit kit and its filled project layer: an unresolvable kit, a refusing project layer
-# and an EVIDENCE_GLOBS that resolves to no tracked file each refuse by name before anything is
-# written. BLANK OR ABSENT RENDERS LIVE.md AS BEFORE, byte for byte, and never imports that kit.
+# cannot disagree. A candidate to close, not a verdict. The kit is a declared slot: where it does
+# not resolve, the column reads `not-installed: drift-audit` and the render proceeds. A refusing
+# project layer and an EVIDENCE_GLOBS that resolves to no tracked file each refuse by name before
+# anything is written. BLANK OR ABSENT RENDERS LIVE.md AS BEFORE, byte for byte, and never imports that kit.
 LIVE_LANDED_UNCLOSED=""
 
 # DESIGN_RECORD, DESIGN_BASELINE, DESIGN_VIEW, DESIGN_NODES — the design chain's four keys, gov's own:

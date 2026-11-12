@@ -93,7 +93,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.46' // gov:kit agent-cap@1.46 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.47' // gov:kit agent-cap@1.47 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 
 // The review harness a deny message points at, DERIVED (TOOL-aRepatriatedFork-2 S6): found by
 // `resolveKitDir` in the workflows kit (TOOL-dFairHearing-32 S25), and the bare name when it refuses,

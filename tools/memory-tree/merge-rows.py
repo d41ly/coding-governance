@@ -20,6 +20,22 @@ line, because in that grammar every row about one ask — the ask, its SEV row, 
 it — leads with that ask's id, and first-id keying therefore conflicts on a pair a filer and a
 triager produce on ordinary work. The audit line names which census ran.
 
+A FOURTH CLASS, THE INSTRUCTION MANIFESTS, IS NOT ROWS OF LINES (PLAY-dOrderedCharter-15, -45). A `%P` named
+`instructions.toml` goes to `resolve_tables` before anything below runs, since a `[[unit]]` table spans lines and
+no line of it is a row: each side is cut into a preamble and one chunk per array-of-tables entry, keyed by the
+array's name with the entry's `tag`, or its `key` where it has no `tag`, and merged per key against the base by
+`TABLE_ENVELOPE` (PLAY-dOrderedCharter-52), one row per reachable state of the key in the base, ours and theirs:
+
+    present: unchanged/unchanged base · changed/unchanged ours · unchanged/changed theirs · changed/changed same
+             ours · changed/changed different CONFLICT · deleted/unchanged deleted · deleted/changed CONFLICT ·
+             changed/deleted CONFLICT · unchanged/deleted deleted · deleted/deleted deleted
+    absent:  added/absent ours · absent/added theirs · added/added same ours, once · added/added different CONFLICT
+
+A state the mapping does not hold conflicts too, so a missed row fails closed. A key in conflict is a
+`TableConflict`, a whole-file conflict naming each key. A side whose cut does not
+reproduce `tomllib`'s read of it fails closed, and the written bytes are re-cut before they are returned, so they
+parse, hold each key once and hold each chunk as one side wrote it.
+
 A GENERATED VIEW IS NEVER MERGED WITH AN AUTHORED SHARD. After the switch-over
 `memory/backlog/<FAMILY>.md` is RENDERED from the per-build files, and a branch forked before it
 still edits that path as an authored shard. Line-merging those two is silent damage in both
@@ -53,6 +69,10 @@ non-row content this corpus produced (a heading, a placeholder, a repeated lead-
 sub-heading in two sections) and its ONE observed corruption is a row line duplicated at rc 0 —
 which is exactly the population keying owns. Partitioning by the grammar would hand git the row
 lines it duplicates and rebuild the defect on the other side of the split.
+
+A THIRD PLANE, THE TABLE CLASS, SITS BESIDE THE TWO AND NEVER MEETS THEM. No line of a manifest reaches the
+predicate, the skeleton or `git merge-file`: its unit of merge is a whole entry, because a line merge interleaves
+two edits of one `text` value and still reads as no tag lost.
 
 THE SKELETON is how the two planes recombine in ORDER rather than by guess. Each of `%O %A %B` is
 projected to a line list of the same length in which every ROW line becomes a single token line and
@@ -153,14 +173,14 @@ Its own header states what it cannot see.
 Exit 0 = merged clean, or `--check` passed. Exit 1 = conflict markers written to %A (git leaves the
 path unmerged), or `--check` failed. Exit 2 = called with fewer than the three input paths (usage).
 """
-# Annotations as strings, the same house rule `extract.py` and `map_lib.py` follow. `resolve_python`
+# Annotations as strings, the same house rule `id_grammar.py` and `map_lib.py` follow. `resolve_python`
 # imposes NO version floor — every candidate is accepted on `-c "import sys"` alone — so the
 # interpreter a node hands this driver is whatever it has, and a `str | None` in a signature is
 # evaluated at def time without this line.
 from __future__ import annotations
 
-# Module scope, unlike `extract` and `tempfile` below: this import runs BEFORE `anchors()` appends
-# the memory-recall kit to `sys.path`, so the shadowing the deferred imports guard against cannot
+# Module scope, unlike `id_grammar` and `tempfile` below: this import runs BEFORE `anchors()` appends
+# this kit's directory to `sys.path`, so the shadowing the deferred imports guard against cannot
 # reach it.
 import hashlib
 import pathlib
@@ -168,50 +188,10 @@ import re
 import subprocess
 import sys
 
-# Same rationale as `<prefix>/memory-recall/extract.py`: CPython writes a module's bytecode next to its
+# Same rationale as this kit's `id_grammar.py`: CPython writes a module's bytecode next to its
 # SOURCE, which is inside the worktree being merged. A merge driver that reads three blobs and writes
 # one should write nothing else, and this is the whole of that property on the deferred import below.
 sys.dont_write_bytecode = True
-
-# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
-def resolve_kit_dir(home, anchor, here):
-    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
-
-    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
-       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
-       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
-       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
-    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
-    3. refuse — LookupError naming the three places looked; never a guessed prefix.
-    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
-    """
-    import json
-    import pathlib
-    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
-    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
-    receipt = root / ".governance" / "install.json"
-    try:
-        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
-    except (OSError, ValueError, AttributeError):
-        rows = []
-    for row in rows:
-        if not isinstance(row, dict) or not row.get("path"):
-            continue
-        src = str(row.get("source") or "").split("/")
-        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
-        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
-            continue
-        hit = (root / str(row["path"])).absolute()
-        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
-            return hit.parent
-    probes = (here / home, here.parent / home)
-    for cand in probes:
-        if (cand / anchor).is_file():
-            return cand
-    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
-        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
-# <<< resolve_kit_dir
-
 
 _ANCHOR_AT = None
 _GRAMMAR = None
@@ -255,14 +235,15 @@ def anchors() -> tuple:
     global _ANCHOR_AT, _GRAMMAR
     if _ANCHOR_AT is None:
         root = _anchor_root()
+        # The grammar is this kit's own `id_grammar.py` (PLAY-dOrderedCharter-18), a sibling: an
+        # absent or broken one raises here and the driver turns it into a real conflict.
         # APPEND, never `insert(0, …)`: prepending puts the kit dir ahead of the stdlib, so any
         # module name it ever gains shadows the real one — a `tempfile.py` there would silently
         # replace the stdlib module `text_merge` imports below.
-        # The sibling kit through the ONE resolver (TOOL-aRepatriatedFork-2 S3): receipt, probes, then
-        # a LookupError naming all three places, which the driver turns into a real conflict.
-        sys.path.append(str(resolve_kit_dir("memory-recall", "extract.py",
-                                            pathlib.Path(__file__).resolve().parent)))
-        import extract as EX  # noqa: PLC0415 — deliberately deferred; see above
+        here = str(pathlib.Path(__file__).resolve().parent)
+        if here not in sys.path:
+            sys.path.append(here)
+        import id_grammar as EX  # noqa: PLC0415 — deliberately deferred; see above
         _GRAMMAR = EX.grammar_for(str(root))
         _ANCHOR_AT = EX.anchor_at
     return _ANCHOR_AT, _GRAMMAR
@@ -286,7 +267,7 @@ def resolve_view_layer():
     content with no markers. Raised from in here it lands in the fail-closed handler and the author
     gets conflict markers instead of a quietly truncated file.
 
-    APPEND, never `insert(0, …)`, for the reason spelled at the memory-recall append above: this
+    APPEND, never `insert(0, …)`, for the reason spelled at the grammar append above: this
     directory carries module names of its own and prepending it would let one shadow a stdlib
     module. Running as `__main__` already puts this directory first, so the append is what makes the
     import work when the driver is IMPORTED rather than run — which `--check` does.
@@ -366,6 +347,10 @@ class ViewShardRefused(RuntimeError):
         self.recipe = recipe
 
 
+class TableConflict(RuntimeError):
+    """Both sides moved one manifest key apart; the message names each key."""
+
+
 class DuplicatedContent(RuntimeError):
     """A duplicate postcondition refused the result. Raised, never printed-and-continued."""
 
@@ -400,6 +385,8 @@ class StructureDrift(RuntimeError):
 # here instead of guessed there. It is also the ONLY partition predicate — stateless, one line at a
 # time, no parser state, because state is where all three rounds of defects lived.
 _ROW_RE = re.compile(r"^\s*[-*]\s")
+_MANIFEST_NAME = "instructions.toml"
+_TABLE_HEADER = "[["
 # Deliberately INDEPENDENT of the driver's own anchor grammar, and not imported from it. The keyed
 # path already guarantees uniqueness for what `key()` keys; this exists for the population it does
 # NOT key. Keying the postcondition on the same regex as the merge would make it self-consistent and
@@ -1224,12 +1211,131 @@ def structure_identity(merged: list[str], skel: list[str]) -> None:
 
 # --------------------------------------------------------------------------------------------
 
+def check_manifest(path: str | None) -> bool:
+    """Whether `%P` names an instruction manifest, a store of array-of-tables entries."""
+    return path is not None and path.replace("\\", "/").rsplit("/", 1)[-1] == _MANIFEST_NAME
+
+
+def read_tables(lines: list[str]) -> tuple[str, dict]:
+    """`(preamble, {entry key: chunk})` of one side, an entry key being the array's name with the entry's `tag`, or
+    its `key` where it has none. A chunk runs from its header to the next. A column-0 `[[` whose prefix does not
+    parse sits inside a value, a multi-line string's line say, since a cut there leaves that value open, so it cuts
+    nothing. A chunk that is not one entry, an entry with neither field, a key twice, or a cut that does not rebuild
+    `tomllib`'s read of the whole side raises, and the driver fails closed."""
+    import tomllib  # noqa: PLC0415 — deferred, as the driver's other imports are; see `anchors()`
+    whole = tomllib.loads("".join(lines))
+    pieces, start = [], 0
+    for cut in [*(i for i, ln in enumerate(lines) if ln.startswith(_TABLE_HEADER)), len(lines)]:
+        text = "".join(lines[start:cut])
+        try:
+            pieces.append((text, tomllib.loads(text)))
+        except tomllib.TOMLDecodeError:
+            continue
+        start = cut
+    (preamble, head), *chunks = pieces
+    tables, rows = {}, {}
+    for text, parsed in chunks:
+        name, entries = next(iter(parsed.items()))
+        if len(parsed) != 1 or not isinstance(entries, list) or len(entries) != 1:
+            raise StructureDrift(f"the chunk {text[:40]!r} is not one array-of-tables entry")
+        ident = entries[0].get("tag", entries[0].get("key"))
+        if ident is None:
+            raise StructureDrift(f"a [[{name}]] entry carries neither a tag nor a key")
+        entry = f"{name}.{ident}"
+        if entry in tables:
+            raise DuplicatedContent(f"{entry} heads two entries of one side")
+        tables[entry] = text
+        rows.setdefault(name, []).append(entries[0])
+    if {**head, **rows} != whole:
+        raise StructureDrift("the cut does not reproduce tomllib's read of the whole side")
+    return preamble, tables
+
+
+# PLAY-dOrderedCharter-52: the table class's envelope, one row per reachable `(base, ours, theirs[, agreement])`
+# state; a state with no row is a conflict, never a side. The driver's suite enumerates it for totality.
+TABLE_ENVELOPE = {
+    ("present", "unchanged", "unchanged"): "base",
+    ("present", "changed", "unchanged"): "ours",
+    ("present", "unchanged", "changed"): "theirs",
+    ("present", "changed", "changed", "same"): "ours",
+    ("present", "changed", "changed", "different"): "conflict",
+    ("present", "deleted", "unchanged"): "deleted",
+    ("present", "deleted", "changed"): "conflict",
+    ("present", "changed", "deleted"): "conflict",
+    ("present", "unchanged", "deleted"): "deleted",
+    ("absent", "added", "absent"): "ours",
+    ("absent", "absent", "added"): "theirs",
+    ("present", "deleted", "deleted"): "deleted",
+    ("absent", "added", "added", "same"): "ours",
+    ("absent", "added", "added", "different"): "conflict",
+}
+
+
+def derive_side_state(base: str | None, ours: str | None, theirs: str | None) -> tuple:
+    """One key's `TABLE_ENVELOPE` state, None an absent side, line endings folded before any comparison."""
+    o, a, b = (t if t is None else t.replace("\r\n", "\n") for t in (base, ours, theirs))
+    if o is None:
+        sides = tuple("absent" if t is None else "added" for t in (a, b))
+    else:
+        sides = tuple("deleted" if t is None else "unchanged" if t == o else "changed" for t in (a, b))
+    agreement = ("same" if a == b else "different",) if sides in (("changed", "changed"), ("added", "added")) else ()
+    return ("absent" if o is None else "present", *sides, *agreement)
+
+
+def resolve_table(base: str | None, ours: str | None, theirs: str | None) -> tuple[str | None, bool]:
+    """One key's three-way from `TABLE_ENVELOPE`, None an absent side: `(its text, whether it conflicts)`. A state
+    the mapping does not hold conflicts, so a missed row fails closed."""
+    result = TABLE_ENVELOPE.get(derive_side_state(base, ours, theirs), "conflict")
+    if result == "conflict":
+        return None, True
+    return {"base": base, "ours": ours, "theirs": theirs, "deleted": None}[result], False
+
+
+def resolve_tables(o_lines, a_lines, b_lines) -> list[str]:
+    """The manifests' merge: ours' surviving entries in ours' order, then theirs' entries whose result is `theirs` and
+    that ours does not hold, in theirs'; a `deleted` result is emitted nowhere. Returned only once the
+    written text parses, holds the merged keys each once, and holds each chunk byte for byte as one side wrote it,
+    modulo the terminator: every kept chunk is written with its terminators folded to the file's dominant one,
+    so a CRLF side and an LF side merge to one terminator throughout (PLAY-dOrderedCharter-55 S22)."""
+    (o_pre, O), (a_pre, A), (b_pre, B) = read_tables(o_lines), read_tables(a_lines), read_tables(b_lines)
+    preamble, clash = resolve_table(o_pre, a_pre, b_pre)
+    conflicts, kept = ["the preamble"] * clash, {}
+    for entry in [*A, *(k for k in B if k not in A)]:
+        text, clash = resolve_table(O.get(entry), A.get(entry), B.get(entry))
+        if clash:
+            conflicts.append(entry)
+        elif text is not None:
+            kept[entry] = text
+    if conflicts:
+        raise TableConflict(", ".join(conflicts))
+    term = _dominant(a_lines, b_lines, o_lines)
+
+    def derive_terminated(t):
+        # PLAY-dOrderedCharter-70 S6: a side's unterminated last chunk is written terminated; PLAY-dOrderedCharter-55
+        # S22: each of its terminators folded to `term`, so the written file holds one terminator throughout
+        if not t:
+            return t
+        body = t.replace("\r\n", "\n").replace("\r", "\n")
+        return (body if body.endswith("\n") else body + "\n").replace("\n", term)
+    merged = _lines("".join(derive_terminated(p) for p in [preamble or "", *kept.values()]))
+    written = read_tables(merged)[1]    # text that does not parse, or a key twice, raises here
+    if list(written) != list(kept):
+        raise RowLoss(f"the written tables {list(written)} are not the merged {list(kept)}")
+    for entry, text in written.items():
+        if text not in (derive_terminated(O.get(entry)), derive_terminated(A.get(entry)), derive_terminated(B.get(entry))):
+            raise StructureDrift(f"the written chunk of {entry} is byte-identical to no side's")
+    print(f"merge-rows: tables O/A/B {len(O)}/{len(A)}/{len(B)} -> {len(written)} written, clean", file=sys.stderr)
+    return merged
+
+
 def merge(o_lines, a_lines, b_lines, *, path=None) -> tuple[list[str], bool]:
     # `path` IS KEYWORD-ONLY, and that is the gotcha class
     # `row-driver-emits-a-plausible-file-with-rows-missing.md` closed structurally rather than by
     # care: a fourth POSITIONAL beside three interchangeable line lists is a transposition waiting
     # to happen, and a transposed argument here yields a well-formed file with rows missing.
     #
+    if check_manifest(path):
+        return resolve_tables(o_lines, a_lines, b_lines), False
     # THE VIEW/SHARD REFUSAL COMES FIRST — before the skeleton, the key merge and every
     # postcondition. There is nothing to reconcile on this pair: one side is a generated table and
     # the other is authored rows that belong in a build's own file, and any merge of them is damage
@@ -1546,6 +1652,10 @@ def main(argv: list[str]) -> int:
         print(f"merge-rows: REFUSED — {exc}", file=sys.stderr)
         for line in exc.recipe:
             print(line, file=sys.stderr)
+        return rc
+    except TableConflict as exc:
+        rc = write_conflict_body(a, b, f"theirs (table conflict: {exc})")
+        print(f"merge-rows: CONFLICT — each side changed {exc} apart", file=sys.stderr)
         return rc
     except Exception as exc:  # noqa: BLE001 — deliberately total; see above
         print(f"merge-rows: FAILED ({exc.__class__.__name__}: {exc}) — writing a conflict rather "

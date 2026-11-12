@@ -10,6 +10,8 @@
 - PLAY-aCandidStub-1 · the §10-into-`gotchas/` retirement is REFUTED, not deferred: the kit is Optional so no universal rule may route to its dir, `aFoldedQuarry` U4 §2 S8/§3 charter the corpora disjoint, and DERIVED anchors make a generic record inert. The drift is one level up
 - **PLAY-dDerivedDocket-1** — **attended landings keep local-main-first; an unattended run lands by its protocol's rule** (owner, D12-i3). §6's backlog bullet points at the memory tree's status rule, true in both modes. Detail `builds/dDerivedDocket/`. — _2026-09-28, `d`_
 - PLAY-aOrientedCast-3 · `AGENTS.md` ceiling 16384->20480 (owner, 2026-10-13): the agent and returned micro-formats put the charter at 16729; 20 KiB leaves room for more roles and rules without another owner turn soon, still 62% of the 32768 bytes Codex reads.
+- **PLAY-dOrderedCharter-3** - **its envelopes raise two no-headroom size rows to their renders' measured bytes, `memory/guides/UNATTENDED-PROTOCOL.md` and `.claude/skills/unattended/SKILL.md`**: agent, 2026-11-08, under TOOL-aOrientedCast-23's four raise terms. Detail `builds/dOrderedCharter/`.
+- **PLAY-dOrderedCharter-2** - **the re-founded charter raises the `AGENTS.md` size row 20480 -> 23161, its render's measured bytes, under the 32768 Codex reads**: agent, 2026-11-08, under TOOL-aOrientedCast-23's raise terms. Detail `builds/dOrderedCharter/`.
 
 ## KICK — kickoff
 

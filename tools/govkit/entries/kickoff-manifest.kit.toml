@@ -4,12 +4,18 @@ id = "kickoff-manifest"
 scope = "repo"
 kind = "flat"
 home = "skills/session-kickoff"
+layer = "layer.flow"
 # THE ONE HOME OUTSIDE THE TOOL ROOT, so it is spelled from the repo root and says so. Every other
 # `home` is kit-relative and joined to the derived tool root at load (TOOL-aRepatriatedFork-29 §8 F2);
 # the kickoff engine sits at machine-junction discovery's fixed path, which no install prefix moves.
 home_root_relative = true
 version_from = { file = "manifest-check.sh", pattern = "^KIT_MANIFEST_VERSION=" }
 requires = []
+# PLAY-dOrderedCharter-17: the suite's edge to the recall kit is a declared slot with its fallback; the
+# part is the repo path itself, this entry's home being spelled from the repo root.
+optional = [
+  { part = "skills/session-kickoff/manifest-check.test.sh", point = "point.memory.consult", fallback = "the hidden-reader arm skips, said" },
+]
 
 [[files]]
 include = ["manifest-check.sh"]
@@ -92,3 +98,32 @@ installation is a copy. The ratchet is this entry's gate LEG and grading it from
 [[lf_pin]]
 pattern = "{user_skills}/session-kickoff/SKILL.md"
 why = "measured: 224 CR bytes under a gate that greps its text"
+
+# THE DRIVE ROWS (PLAY-dOrderedCharter-6): how a session starts or advances a stage this kit serves. The
+# playbook render composes one charter line per row of each selected kit, and the role's handoff carries
+# its own role's lines. `stage` names a workflow of the roles kit's workflows.toml, or `start`; `role` a
+# role slot, or `main` for the main session.
+
+[[drive]]
+stage = "start"
+role = "main"
+command = "/session-kickoff"
+when = "a new task from the owner"
+
+[[drive]]
+stage = "start"
+role = "main"
+command = "/session-kickoff"
+when = "a resumed or compacted session, which re-reads its card before it acts"
+
+[[drive]]
+stage = "start"
+role = "main"
+command = "/session-kickoff"
+when = "another harness without gov's hooks, which writes no card, so the kickoff runs by hand"
+
+[[drive]]
+stage = "orient"
+role = "gov-orienter"
+command = "/session-kickoff"
+when = "once per session, before the first unit opens"

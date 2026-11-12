@@ -128,6 +128,7 @@ sys.path.insert(0, str(_kit_dir()))
 
 import map_extractors as ext  # noqa: E402
 import map_lib as m  # noqa: E402
+import coverage_join as cj  # noqa: E402 - memory-tree's, on the path map_lib's import appends
 
 INVENTORY_IDS = ext.inventory_ids()
 ID_RE = getattr(ext, "DECISION_ID_RE", m.DEFAULT_DECISION_ID_RE)
@@ -141,7 +142,7 @@ ID_RE = getattr(ext, "DECISION_ID_RE", m.DEFAULT_DECISION_ID_RE)
 def test_every_inventory_key_is_claimed_or_baselined() -> None:
     inventories = ext.all_inventories()
     tree = m.load_map_tree(INVENTORY_IDS, decision_id_re=ID_RE)
-    cov = m.compute_coverage(inventories, m.owners_of(tree), tree.baseline)
+    cov = cj.compute_coverage(inventories, m.owners_of(tree), tree.baseline)
     assert cov.clean, (
         "codebase-map coverage violations.\n"
         f"UNCLAIMED (new key? claim it in a feature dossier, or FOUNDATION.md for shared "
@@ -161,11 +162,11 @@ def test_baseline_never_gains_a_key() -> None:
     no baseline at the base. The compared sha and both sides' key counts print on every graded run,
     so a comparison of the committed file against itself (CI on the landed tip) is visible."""
     root = m.repo_root()
-    base, why = m.resolve_compare_base(root)
+    base, why = cj.resolve_compare_base(root)
     if base is None:
         print(f"     UNGRADED: {why}")
         return
-    added, note = m.derive_baseline_additions(root, base)
+    added, note = cj.derive_baseline_additions(root, base, (m.map_root(root) / "baseline.toml").relative_to(root).as_posix())
     if added is None:
         print(f"     UNGRADED: {note} ({why})")
         return

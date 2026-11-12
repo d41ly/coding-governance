@@ -2,6 +2,7 @@
 name: deploy-governance
 description: Install this repo's governance kits into a target repository — the playbook, the kickoff manifest and its ratchet, the memory tree, the codebase map, memory-recall, and the rest — using the govkit deployer rather than by following a prose runbook. Use when the owner wants a repo wired for governance, when an existing install needs verifying, or when a partly-adopted target needs finishing. Do NOT use to change what the kits themselves do; that is ordinary work in this repo.
 ---
+[skills/deploy-governance/SKILL.md · Level 4 · Followed when installing the kits into a target repository; yields to levels 0 to 3]
 
 # Deploying the governance chain
 
@@ -171,3 +172,4 @@ no gate leg reds, and the kit is quietly doing less than it appears to. That is 
 `.gitattributes` block write and the gate-runner and CI wiring: neither has an implementation, so wire
 those two by hand and treat the runbook as reference for them specifically. `check` cannot prove a
 rendered document is CORRECT, only that it matches a fresh render.
+[/skills/deploy-governance/SKILL.md]

@@ -78,10 +78,9 @@ ENGINE_REL=$(git ls-files -- '*/migrate_backlog.py' 'migrate_backlog.py' | head 
 [ -n "$ENGINE_REL" ] || { echo "FAIL the relocation engine is not tracked here, so the recipe has no canonical text to grade against"; exit 2; }
 KIT_MT=$(dirname "$ENGINE_REL")
 TOOL_ROOT=$(dirname "$KIT_MT")
-KIT_MR="$TOOL_ROOT/memory-recall"
 KIT_LIB="$TOOL_ROOT/lib"
 WIRING="$TOOL_ROOT/check-wiring.sh"
-[ -f "$KIT_MR/extract.py" ] || { echo "FAIL the memory-recall sibling is not beside the memory-tree kit at $KIT_MR, and the transition audit keys every row through its grammar"; exit 2; }
+[ -f "$KIT_MT/id_grammar.py" ] || { echo "FAIL the id grammar is not in the memory-tree kit at $KIT_MT/id_grammar.py, and the transition audit keys every row through it"; exit 2; }
 [ -f "$WIRING" ] || { echo "FAIL the wiring checker is not at $WIRING, so the session step cannot be exercised"; exit 2; }
 # shellcheck source=/dev/null
 . "$KIT_LIB/resolve-python.sh"
@@ -138,10 +137,9 @@ write_kits() { # $1 = repo dir — the real engines, at the fixture's own prefix
   mkdir -p "$1/$FX_ROOT/run-gates"
   printf 'the kit-root probe reads this directory, never a spelled prefix\n' > "$1/$FX_ROOT/run-gates/.keep"
   cp -r "$ROOT/$KIT_MT" "$1/$FX_MT"
-  cp -r "$ROOT/$KIT_MR" "$1/$FX_ROOT/memory-recall"
   cp -r "$ROOT/$KIT_LIB" "$1/$FX_ROOT/lib"
   cp "$ROOT/$WIRING" "$1/$FX_ROOT/check-wiring.sh"
-  rm -rf "$1/$FX_MT/__pycache__" "$1/$FX_ROOT/memory-recall/__pycache__"
+  rm -rf "$1/$FX_MT/__pycache__"
   rm -f "$1/$FX_MT/check-memory-hygiene.sh"   # the header says why: the hygiene leg must not resolve here
 }
 init_repo() { # $1 = repo dir — a shards-mode base commit, a bare origin, and the hooks wired

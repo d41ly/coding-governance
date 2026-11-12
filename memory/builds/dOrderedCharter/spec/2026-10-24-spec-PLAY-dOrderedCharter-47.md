@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-47 — a record written on a branch that never held the positional check is graded print-only, by its adding commit's ancestry
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
+**Status:** CLOSED · rev-3 · 2026-11-04 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,9 +13,18 @@
 | [2026-10-24-build-PLAY-dOrderedCharter-47-deviation-471.md](../build/2026-10-24-build-PLAY-dOrderedCharter-47-deviation-471.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-47-deviation-472.md](../build/2026-10-24-build-PLAY-dOrderedCharter-47-deviation-472.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-47-deviation-473.md](../build/2026-10-24-build-PLAY-dOrderedCharter-47-deviation-473.md) | deviation | — |
-| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY-dOrderedCharter-76 PLAY-dOrderedCharter-77 PLAY-dOrderedCharter-78 PLAY-dOrderedCharter-80 PLAY-dOrderedCharter-81 PLAY-dOrderedCharter-82 PLAY-dOrderedCharter-83 PLAY-dOrderedCharter-84 PLAY-dOrderedCharter-85 PLAY-dOrderedCharter-86 PLAY-dOrderedCharter-87 PLAY-dOrderedCharter-88 |
+| [2026-11-02-build-PLAY-dOrderedCharter-47-ledger.md](../build/2026-11-02-build-PLAY-dOrderedCharter-47-ledger.md) | journal | — |
+| [2026-11-04-build-PLAY-dOrderedCharter-47-1-builder-return.md](../build/2026-11-04-build-PLAY-dOrderedCharter-47-1-builder-return.md) | journal | — |
+| [2026-11-10-build-PLAY-dOrderedCharter-1-runlog-8d3cc031.md](../build/2026-11-10-build-PLAY-dOrderedCharter-1-runlog-8d3cc031.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 PLAY-dOrderedCharter-67 PLAY-dOrderedCharter-68 PLAY-dOrderedCharter-69 PLAY-dOrderedCharter-70 PLAY-dOrderedCharter-71 PLAY-dOrderedCharter-72 PLAY-dOrderedCharter-73 PLAY-dOrderedCharter-74 PLAY-dOrderedCharter-75 PLAY-dOrderedCharter-76 PLAY-dOrderedCharter-77 PLAY-dOrderedCharter-78 PLAY-dOrderedCharter-80 PLAY-dOrderedCharter-81 PLAY-dOrderedCharter-82 PLAY-dOrderedCharter-83 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
+| [2026-11-02-prompt-PLAY-dOrderedCharter-47-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-47-build-brief.md) | journal | — |
+| [2026-11-03-prompt-PLAY-dOrderedCharter-47-1-spec-reviewer.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-47-1-spec-reviewer.md) | journal | — |
+| [2026-11-03-prompt-PLAY-dOrderedCharter-47-1-spec-writer.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-47-1-spec-writer.md) | journal | — |
+| [2026-11-03-prompt-PLAY-dOrderedCharter-47-drift-fold-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-47-drift-fold-brief.md) | research | — |
+| [2026-11-03-prompt-PLAY-dOrderedCharter-47-drift-sweep-brief.md](../prompts/2026-11-03-prompt-PLAY-dOrderedCharter-47-drift-sweep-brief.md) | research | PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 |
 | [2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md](../reviews/2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-49 |
+| [2026-11-05-review-PLAY-dOrderedCharter-1-closing-diff-review-round1.md](../reviews/2026-11-05-review-PLAY-dOrderedCharter-1-closing-diff-review-round1.md) | diff-review | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-61 PLAY-dOrderedCharter-62 PLAY-dOrderedCharter-63 PLAY-dOrderedCharter-64 PLAY-dOrderedCharter-65 |
 
 <!-- /gen:spec-records -->
 
@@ -51,8 +60,10 @@ never red. It repairs unit 26 and is built right after it.
 - **S4** — The probe, as a plant through unit 19's fixture, `python tools/playbook/gov_tag.py --fixture
   --plant positional-forked-before`: a scratch repository whose branch forks before the commit that
   adds `positional.py`, writes a record under `memory/builds/<slug>/build/` citing `x.py:1`, and is
-  merged after that commit; the leg's arm then exits 0 printing the grandfathered line. A second
-  record written after the merge and citing `x.py:2` is red. Observed by AC2.
+  merged after that commit; the arm then exits 0 printing the grandfathered line. A second
+  record written after the merge and citing `x.py:2` is red. The case joins the `PLANTS` tuple of
+  `tools/playbook/gov_tag.py` (`:317`), and unit 26's `tags positional selftest` leg runs it with
+  every `positional-*` case (unit 26 §3 Edges, round-2 id 28). Observed by AC2.
 
 ## 3. Non-goals (OUT)
 
@@ -64,7 +75,7 @@ never red. It repairs unit 26 and is built right after it.
 
 ### Edges
 
-- **consumes-from** `PLAY-dOrderedCharter-26` — `positional.py`, its list check and its plants, whose verdict S3 narrows for records written before the check; without them there is nothing to grandfather
+- **consumes-from** `PLAY-dOrderedCharter-26` — `positional.py`, its list check, its plants and the `tags positional selftest` leg that runs them, whose verdict S3 narrows for records written before the check; without them there is nothing to grandfather
 - **hands-off** `PLAY-dOrderedCharter-53` — grandfathering per line by the commit blame names, never by the file's adding commit (round-2 id 36)
 - **hands-off** `PLAY-dOrderedCharter-55` — round-2 ids 15, 28 and 37: the spec-record and bulk-move faces of the per-line rule, and the plants run in `tags positional selftest`
 
@@ -77,7 +88,8 @@ Read at `ce13efbe`; the seam is unit 26's design. Unit 26 S2 seeds once and refu
 "Resolution of the two stable forms" and names "Unresolved", which a bare file:line citation is not.
 `tree_lib.read_adding_commits` (`tools/memory-tree/tree_lib.py:302`) returns `{path: sha}`, the oldest
 commit that added each path, from one `git log --diff-filter=A` over one pathspec, and is the kit's
-one adding-commit reader (TOOL-dTrueNorth-20 S32). The audit counted 16 branches with
+one adding-commit reader (TOOL-dTrueNorth-20 S32); re-read at `8aafb0314`, its docstring (`:303`)
+and its `setdefault` (`:324`) keep the oldest add of a path added twice. The audit counted 16 branches with
 `git branch -a | grep -c unattended` (finding 81's evidence, PINNED 2026-10-23).
 
 ### Why ancestry and not a date or a snapshot
@@ -98,6 +110,7 @@ predicates` grades the Python names.
 
 - `tools/playbook/positional.py`
 - `tools/playbook/gov_tag.py` (the plant)
+- `tools/playbook/README.md` (the sentence §5 names)
 
 ### Rollout
 
@@ -122,9 +135,10 @@ so the dispatch sequences the three rather than running them together (M6).
 - error / empty / loading states: no `L` (module not yet committed) grades every record; a failed git
   call is an `OSError` naming it, as `read_adding_commits` raises, and exits 2.
 - observability: each grandfathered reference is printed with its adding commit.
-- risks: a record deleted and re-added after `L` is graded from its new add, the oldest add kept by
-  the reader being the original; stated in the module's docstring.
-- testing: AC1 to AC3; S4 is a plant under unit 19's selftest arm.
+- risks: a record deleted and re-added after `L` is graded from its original add, since the reader
+  keeps the oldest (`tools/memory-tree/tree_lib.py:324`): a record first added before `L` stays
+  grandfathered after a re-add; stated in the module's docstring.
+- testing: AC1 to AC3; S4 is a plant of unit 19's fixture, run by unit 26's `tags positional selftest` leg.
 - migration: none.
 - user docs: unit 26's paragraph in `tools/playbook/README.md` gains one sentence on the rule.
 
@@ -146,7 +160,7 @@ so the dispatch sequences the three rather than running them together (M6).
 
 `playbook render selftest` · `govkit acceptance matrix` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/playbook/adopt-playbook.sh · covers AC2 AC3 · the playbook-render selftest runs `positional-forked-before`, its failing case staged by grading the pre-fork record under unit 26's base rule · none
+New arm: tools/playbook/positional.py · covers AC2 AC3 · unit 26's `tags positional selftest` leg runs `positional-forked-before` with every `positional-*` case, its failing case staged by grading the pre-fork record under unit 26's base rule · none
 
 ## 8. Open questions
 
@@ -163,6 +177,10 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC2 AC3 · the playbook-rend
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-1 spec audit's finding 81 (HIGH, item H8).
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-53, PLAY-dOrderedCharter-55.
+- rev-3 · 2026-11-03 · S4 · §3 · §4 · §5 · §7 · from `2026-11-03-prompt-PLAY-dOrderedCharter-47-drift-fold-brief.md`
+  findings 47-1 to 47-3: the plant's arm runs in unit 26's `tags positional selftest` leg, not the
+  playbook-render selftest; `tools/playbook/README.md` joins Files touched; a re-added record is graded
+  from its original add, the oldest the reader keeps.
 
 ## 10. Reuse audit
 

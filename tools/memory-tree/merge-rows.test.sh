@@ -279,8 +279,6 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 LIB_DIR=$(resolve_kit_dir "$PY" lib pyrun.sh "$HERE") || exit 2
 LIB="${LIB_DIR##*/}"
-MEMORY_RECALL_DIR=$(resolve_kit_dir "$PY" memory-recall extract.py "$HERE") || exit 2
-MEMORY_RECALL="${MEMORY_RECALL_DIR##*/}"
 
 DRV="bash $LIB_DIR/pyrun.sh $KIT_REL/${KIT}/merge-rows.py"
 bad() { echo "FAIL $1"; st=1; }
@@ -530,18 +528,18 @@ failclosed() {  # $1 label · $2 scratch tree holding $KIT_REL/${KIT}/merge-rows
     || bad "$1: the driver failed closed for a reason other than the staged one ($3): $(head -1 "$TMP/fcerr" | cut -c1-160)"
 }
 mkscratch() { local d; d=$(mktemp -d); SCRATCH="$SCRATCH $d"
-  mkdir -p "$d/${PFX}${KIT}" "$d/${PFX}${MEMORY_RECALL}"
+  mkdir -p "$d/${PFX}${KIT}"
   seed_driver_kit "$d/${PFX}${KIT}"
   printf '%s' "$d"; }
 S=$(mkscratch); cp .memory-tree.conf "$S/"
-printf 'this is not valid syntax(\n' > "$S/${PFX}${MEMORY_RECALL}/extract.py"
+printf 'this is not valid syntax(\n' > "$S/${PFX}${KIT}/id_grammar.py"
 failclosed "broken grammar" "$S" "SyntaxError: "
 # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
 if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${probe_n:-1} assertions)" || echo "FAIL (${probe_n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
-S=$(mkscratch); cp .memory-tree.conf "$S/"          # kit dir present, extract.py absent
-failclosed "missing grammar module" "$S" "LookupError: no memory-recall kit"
+S=$(mkscratch); cp .memory-tree.conf "$S/"          # kit dir present, id_grammar.py absent
+rm -f "$S/${PFX}${KIT}/id_grammar.py"
+failclosed "missing grammar module" "$S" "ModuleNotFoundError: No module named 'id_grammar'"
 S=$(mkscratch)                                       # no .memory-tree.conf above the driver
-cp $MEMORY_RECALL_DIR/extract.py $MEMORY_RECALL_DIR/recall_conf.py "$S/${PFX}${MEMORY_RECALL}/"
 failclosed "missing .memory-tree.conf" "$S" "RuntimeError: no .memory-tree.conf"
 
 # --- 0d. the oracle sees a row the driver's grammar does NOT, and `dups` fires ---------------------
@@ -832,10 +830,9 @@ audit "a structure conflict at rc 1" 1 0 0 1
 # configured command is `bash <prefix>/lib/pyrun.sh <prefix>/memory-tree/merge-rows.py …` and its paths are
 # RELATIVE, so a fixture carrying only the two kits cannot launch anything.
 E=$(mktemp -d); SCRATCH="$SCRATCH $E"
-mkdir -p "$E/${PFX}${KIT}" "$E/${PFX}${MEMORY_RECALL}" "$E/${PFX}${LIB}" "$E/memory/backlog"
+mkdir -p "$E/${PFX}${KIT}" "$E/${PFX}${LIB}" "$E/memory/backlog"
 cp .memory-tree.conf "$E/"
 seed_driver_kit "$E/${PFX}${KIT}"
-cp $MEMORY_RECALL_DIR/extract.py $MEMORY_RECALL_DIR/recall_conf.py "$E/${PFX}${MEMORY_RECALL}/"
 cp $LIB_DIR/pyrun.sh $LIB_DIR/resolve-python.sh "$E/${PFX}lib/"
 (
   cd "$E" || exit 2
@@ -1325,7 +1322,7 @@ cr=$(endings "$TMP/a")
 # ...and the fail-closed path, which is a THIRD synthesis site and the one an author hits when the
 # grammar cannot be read at all.
 S=$(mkscratch); cp .memory-tree.conf "$S/"
-printf 'this is not valid syntax(\n' > "$S/${PFX}${MEMORY_RECALL}/extract.py"
+printf 'this is not valid syntax(\n' > "$S/${PFX}${KIT}/id_grammar.py"
 { cprose alpha beta; crow TOOL-zFixture-1 base; } > "$TMP/o"
 { cprose alpha beta; crow TOOL-zFixture-1 OURS; } > "$TMP/a"
 { cprose alpha beta; crow TOOL-zFixture-1 THEIRS; } > "$TMP/b"
@@ -1825,9 +1822,9 @@ done < "$TMP/recipe"
 # BEFORE %A is written, and git then reports a conflict over ours-only content with no markers in
 # it — the incoming rows simply absent, nothing saying so.
 S=$(mkscratch); cp .memory-tree.conf "$S/"
-cp $MEMORY_RECALL_DIR/extract.py $MEMORY_RECALL_DIR/recall_conf.py "$S/${PFX}${MEMORY_RECALL}/"
-# `backlog.py` and its siblings are already here, because `mkscratch` lays the whole kit.
-# `git init` AND NOT A TIDY-UP: `recall_conf.resolve` refuses a root that is not inside a git
+# `backlog.py`, `id_grammar.py` and their siblings are already here, because `mkscratch` lays the
+# whole kit.
+# `git init` AND NOT A TIDY-UP: `id_grammar.resolve` refuses a root that is not inside a git
 # repository, so without this the liveness control below fails for that reason and the broken-import
 # arm after it would be graded against a tree that never worked.
 git -C "$S" init -q -b main >/dev/null 2>&1 \
@@ -1869,13 +1866,13 @@ fi
 # unset, `git -C <dir> rev-parse --show-toplevel` returns the root; linked worktree, GIT_DIR set, the
 # same command returns <dir> itself. So the driver aborted on every backlog merge in a worktree while
 # case 9 stayed green, and this leg was blind to the class it exists to hold. Observed RED against the
-# pre-fix recall_conf.py.
+# pre-fix conf layer.
 #
 # It wires the SHIPPED wrapper, not pyrun.sh: `merge-rows.sh` is what a node actually carries, and it
 # is the path an adopter gets.
 #
 # EACH KIT DIR IS NAMED ONCE, and the sources are anchored rather than left to the caller's cwd.
-# `MT`/`MR`/`LIB` each appear in three places — the scratch layout this case BUILDS, the copies into
+# `MT`/`LIB` each appear in three places — the scratch layout this case BUILDS, the copies into
 # it, and (for `MT`) the driver command — so those cannot drift apart. Sources hang off `$ROOT`,
 # which is the repository git reports for this script's own location; that makes them independent of
 # the ambient cwd, which a bare relative path is not once any subshell cds elsewhere. It was two
@@ -1885,12 +1882,10 @@ fi
 # writes gov's bytes verbatim and such a literal resolves to nothing at another prefix.
 W=$(mktemp -d); SCRATCH="$SCRATCH $W"
 MT=${PFX}${KIT}
-MR=${PFX}${MEMORY_RECALL}
 LIB=${PFX}lib
-mkdir -p "$W/$MT" "$W/$MR" "$W/$LIB" "$W/memory/backlog"
+mkdir -p "$W/$MT" "$W/$LIB" "$W/memory/backlog"
 cp "$ROOT/.memory-tree.conf" "$W/"
 seed_driver_kit "$W/$MT"
-cp "$ROOT/$MR/extract.py" "$ROOT/$MR/recall_conf.py" "$W/$MR/"
 cp "$ROOT/$LIB/pyrun.sh" "$ROOT/$LIB/resolve-python.sh" "$W/$LIB/"
 WT="$W-wt"; SCRATCH="$SCRATCH $WT"
 (
@@ -1945,11 +1940,10 @@ WT="$W-wt"; SCRATCH="$SCRATCH $WT"
 # the generator all import the kit's one conf parser from it, and without it `--check` died on
 # ModuleNotFoundError in every fixture this builder made.
 mkfixrepo() {  # $1 = a directory -> a git repo on `main` with this kit wired as the row driver
-  local d=$1 mt=${PFX}${KIT} mr=${PFX}${MEMORY_RECALL} lb=${PFX}lib
-  mkdir -p "$d/$mt" "$d/$mr" "$d/$lb" "$d/memory/backlog"
+  local d=$1 mt=${PFX}${KIT} lb=${PFX}lib
+  mkdir -p "$d/$mt" "$d/$lb" "$d/memory/backlog"
   cp "$ROOT/.memory-tree.conf" "$d/"
   seed_driver_kit "$d/$mt"
-  cp "$ROOT/$MEMORY_RECALL_DIR/extract.py" "$ROOT/$MEMORY_RECALL_DIR/recall_conf.py" "$d/$mr/"
   cp "$ROOT/$LIB_DIR/pyrun.sh" "$ROOT/$LIB_DIR/resolve-python.sh" "$d/$lb/"
   git -C "$d" init -q -b main
   git -C "$d" config user.email t@e
@@ -2199,6 +2193,116 @@ mkcheckrepo "$Q" shards ""
   git add -A; git commit -q -m 'a memory root nothing is filed under' )
 check_says "an empty governed population refuses" "$Q" 1 "no tracked path under nowhere/"
 
+# --- 54. THE MANIFESTS MERGE PER ENTRY, AND A LINE MERGE FAILS THE SAME ASSERTIONS (PLAY-dOrderedCharter-45)
+# The table class over the inputs of the seven merge plants of `instructions_edit.py fixture`, spelled
+# here so this suite needs no other kit. EVERY case replays the same three files through
+# `git merge-file`, the line merge this class replaces, under the same assertions: a case the control
+# also passes proves nothing about the class, so `red` demands the control FAIL, and only the identical
+# add, the one case a line merge gets right, says `held`. What this does not check: the `.gitattributes`
+# route to the driver, which those plants cover through a real `git merge`.
+MANIFEST=tools/alpha/instructions.toml
+OVERLAY=.governance/instructions.toml
+derive_fx_unit() { printf '[[unit]]\ntag = "unit.%s"\nlevel = 3\ntext = "%s"\n' "$1" "${2:-MUST hold.}"; }
+derive_fx_unterminated() { printf '[[unit]]\ntag = "unit.%s"\nlevel = 3\ntext = "%s"' "$1" "${2:-MUST hold.}"; }  # derive_fx_unit, no closing newline
+derive_fx_long() { printf '[[unit]]\ntag = "unit.%s"\nlevel = 3\ntext = """\n%b\n"""\n' "$1" "$2"; }
+derive_fx_policy() { printf '[[policy]]\nkey = "adopter.%s"\ndefault = "%s"\n' "$1" "${2:-a}"; }
+derive_table_fault() {  # $1 got rc · $2 want rc · $3 what the close names, empty on a clean want -> the first broken expectation
+  [ "$1" = "$2" ] || { echo "rc=$1, expected $2"; return; }
+  if [ "$2" = 0 ]; then
+    cmp -s "$TMP/a" "$TMP/twant" || { echo "the written bytes are not the wanted merge"; return; }
+    "$PY" -c 'import sys, tomllib; tomllib.load(open(sys.argv[1], "rb"))' "$TMP/a" 2>/dev/null || echo "the output does not parse"
+    return
+  fi
+  { printf '<<<<<<< ours\n'; cat "$TMP/ta"; printf '=======\n'; cat "$TMP/tb"; } > "$TMP/twhole"
+  sed '$d' "$TMP/a" | cmp -s - "$TMP/twhole" || { echo "%A is not the whole-file body of both sides"; return; }
+  tail -1 "$TMP/a" | grep -F '>>>>>>> theirs' | grep -qF "$3" || echo "the closing label names no $3"
+}
+check_table_case() {  # $1 label · $2 %P · $3 want rc · $4 what the close names · $5 the line merge's verdict: red | held · $6 what the driver's stderr names, optional
+  local rc broken
+  cp "$TMP/ta" "$TMP/a"
+  $DRV "$TMP/to" "$TMP/a" "$TMP/tb" "$2" >/dev/null 2>"$TMP/terr" && rc=0 || rc=$?
+  broken=$(derive_table_fault "$rc" "$3" "$4")
+  [ -z "$broken" ] || bad "table class, $1: $broken — stderr [$(head -1 "$TMP/terr" | cut -c1-160)]"
+  # PLAY-dOrderedCharter-70 S16: a fail-closed case names ITS postcondition, never only the string all of them share
+  [ -z "${6:-}" ] || grep -qF -- "$6" "$TMP/terr" || bad "table class, $1: the driver's stderr names no $6 — [$(head -1 "$TMP/terr" | cut -c1-160)]"
+  grep -q '^merge-rows: rows ' "$TMP/terr" && bad "table class, $1: a manifest's lines reached the row plane"
+  cp "$TMP/ta" "$TMP/a"
+  git merge-file -q -L ours -L base -L theirs "$TMP/a" "$TMP/to" "$TMP/tb" 2>/dev/null && rc=0 || rc=$?
+  broken=$(derive_table_fault "$rc" "$3" "$4")
+  if [ "$5" = red ]; then
+    [ -n "$broken" ] || bad "table class, $1: a line merge passes this case too, so it proves nothing about the class"
+  else
+    [ -z "$broken" ] || bad "table class, $1: the line merge this case holds for broke: $broken"
+  fi
+}
+derive_fx_unit a > "$TMP/to"; derive_fx_unit a 'MUST one.' > "$TMP/ta"; derive_fx_unit a 'MUST two.' > "$TMP/tb"
+check_table_case "both sides edit one tag" "$MANIFEST" 1 unit.unit.a red
+{ derive_fx_unit a; derive_fx_unit b; } > "$TMP/to"; derive_fx_unit b > "$TMP/ta"; { derive_fx_unit a 'MUST two.'; derive_fx_unit b; } > "$TMP/tb"
+check_table_case "ours deletes a tag theirs edits" "$MANIFEST" 1 unit.unit.a red
+{ derive_fx_unit a; derive_fx_unit b; } > "$TMP/to"; { derive_fx_unit a 'MUST one.'; derive_fx_unit b; } > "$TMP/ta"; derive_fx_unit b > "$TMP/tb"
+check_table_case "ours edits a tag theirs deletes" "$MANIFEST" 1 unit.unit.a red
+INNER='before\n[[unit]]\ntag = "unit.fake"\nafter'
+{ derive_fx_unit a; derive_fx_long m "$INNER"; derive_fx_unit b; } > "$TMP/to"
+{ derive_fx_unit a 'MUST one.'; derive_fx_long m "$INNER"; derive_fx_unit b; derive_fx_long c 'plain\nlines'; } > "$TMP/ta"
+{ derive_fx_unit a; derive_fx_long m "$INNER"; derive_fx_unit b 'MUST two.'; } > "$TMP/tb"
+{ derive_fx_unit a 'MUST one.'; derive_fx_long m "$INNER"; derive_fx_unit b 'MUST two.'; derive_fx_long c 'plain\nlines'; } > "$TMP/twant"
+check_table_case "a string holding a header line" "$MANIFEST" 0 "" red
+derive_fx_unit a > "$TMP/to"; { derive_fx_unit a; derive_fx_unit x; } > "$TMP/ta"; cp "$TMP/ta" "$TMP/tb"; cp "$TMP/ta" "$TMP/twant"
+check_table_case "one tag added with the same bytes" "$MANIFEST" 0 "" held
+derive_fx_policy one > "$TMP/to"; { derive_fx_policy one; derive_fx_policy two; derive_fx_policy three; } > "$TMP/ta"; { derive_fx_policy one; derive_fx_policy four; derive_fx_policy five; } > "$TMP/tb"
+{ derive_fx_policy one; derive_fx_policy two; derive_fx_policy three; derive_fx_policy four; derive_fx_policy five; } > "$TMP/twant"
+check_table_case "policy rows added on each side" "$OVERLAY" 0 "" red
+derive_fx_policy one > "$TMP/to"; derive_fx_policy one b > "$TMP/ta"; derive_fx_policy one c > "$TMP/tb"
+check_table_case "both sides edit one policy row" "$OVERLAY" 1 policy.adopter.one red
+derive_fx_unit a > "$TMP/to"; { derive_fx_unit a; printf '  [[unit]]\ntag = "unit.hidden"\n'; } > "$TMP/ta"; { derive_fx_unit a; derive_fx_unit x; } > "$TMP/tb"
+check_table_case "an indented header after an entry" "$MANIFEST" 1 "merge-rows failed" red "is not one array-of-tables entry"
+derive_fx_unit a > "$TMP/to"; { printf '  [[unit]]\ntag = "unit.hidden"\n'; derive_fx_unit a; } > "$TMP/ta"; { derive_fx_unit a; derive_fx_unit x; } > "$TMP/tb"
+check_table_case "an indented header in the preamble" "$MANIFEST" 1 "merge-rows failed" red "the cut does not reproduce tomllib's read"
+# PLAY-dOrderedCharter-70 S6: sides ending in an unterminated entry merge clean, each written chunk a side's bytes
+# once terminated; the merge writes the last entry terminated.
+{ derive_fx_unit a; derive_fx_unterminated b; } > "$TMP/to"
+{ derive_fx_unit a 'MUST one.'; derive_fx_unterminated b; } > "$TMP/ta"
+{ derive_fx_unit a; derive_fx_unterminated b 'MUST two.'; } > "$TMP/tb"
+{ derive_fx_unit a 'MUST one.'; derive_fx_unit b 'MUST two.'; } > "$TMP/twant"
+check_table_case "disjoint edits over an unterminated last entry" "$MANIFEST" 0 "" red
+{ derive_fx_unit a; derive_fx_unterminated b; } > "$TMP/to"
+{ derive_fx_unit a 'MUST one.'; derive_fx_unterminated b; } > "$TMP/ta"
+{ derive_fx_unit a; derive_fx_unit b; derive_fx_unterminated c; } > "$TMP/tb"
+{ derive_fx_unit a 'MUST one.'; derive_fx_unit b; derive_fx_unit c; } > "$TMP/twant"
+check_table_case "an unterminated final chunk in ours, an add in theirs" "$MANIFEST" 0 "" red
+
+# --- 55. THE TABLE ENVELOPE IS TOTAL, AND ITS ONE-SIDED ROWS HOLD (PLAY-dOrderedCharter-52) ---------
+# Every (base, ours, theirs) over an alphabet of an absent side and three texts, one also in CRLF, is
+# classified by the driver's own `derive_side_state`; the states reached must be exactly the rows of
+# `TABLE_ENVELOPE`, fourteen of them. Red on a state with no row, on a row no state reaches, and on a
+# deleted row. What this does not check: that a row's RESULT is right; the plants' inputs below do that
+# for rows 9, 12 and 11, the three unit 45's cases left out.
+"$PY" - <<'PYEOF'
+import importlib.util, itertools, os, sys
+sys.dont_write_bytecode = True
+spec = importlib.util.spec_from_file_location("mr", os.environ["KIT_REL"] + "/" + os.environ["KIT"] + "/merge-rows.py")
+mr = importlib.util.module_from_spec(spec); spec.loader.exec_module(mr)
+sides = [None, "x\n", "x\r\n", "y\n", "z\n"]
+reached = {mr.derive_side_state(*t) for t in itertools.product(sides, repeat=3) if t != (None, None, None)}
+rows = set(mr.TABLE_ENVELOPE)
+for state in sorted(reached - rows):
+    print(f"FAIL table envelope: the state {state} has no row")
+for state in sorted(rows - reached):
+    print(f"FAIL table envelope: the row {state} is reached by no state")
+if len(reached) != 14:
+    print(f"FAIL table envelope: {len(reached)} reachable state(s), expected the fourteen")
+sys.exit(0 if reached == rows and len(reached) == 14 else 1)
+PYEOF
+[ $? = 0 ] || bad "table envelope: the mapping is not total over the reachable states"
+# The plants `merge-theirs-delete`, `merge-both-delete` and `merge-theirs-add`, each beside an ours edit
+# of another tag; a line merge gets the two deletes right, so only the add demands it fail.
+{ derive_fx_unit a; derive_fx_unit b; } > "$TMP/to"; { derive_fx_unit a; derive_fx_unit b 'MUST one.'; } > "$TMP/ta"; derive_fx_unit b > "$TMP/tb"; derive_fx_unit b 'MUST one.' > "$TMP/twant"
+check_table_case "theirs deletes a tag ours left unchanged" "$MANIFEST" 0 "" held
+{ derive_fx_unit a; derive_fx_unit b; } > "$TMP/to"; derive_fx_unit b 'MUST one.' > "$TMP/ta"; derive_fx_unit b > "$TMP/tb"; derive_fx_unit b 'MUST one.' > "$TMP/twant"
+check_table_case "both sides delete one tag" "$MANIFEST" 0 "" held
+derive_fx_unit b > "$TMP/to"; derive_fx_unit b 'MUST one.' > "$TMP/ta"; { derive_fx_unit b; derive_fx_unit a; } > "$TMP/tb"; { derive_fx_unit b 'MUST one.'; derive_fx_unit a; } > "$TMP/twant"
+check_table_case "only theirs adds a tag" "$MANIFEST" 0 "" red
+
 # The count is DERIVED from the file, not typed: a hand-maintained tally reads as a claim about
 # coverage and goes stale the first time a group is added without touching it. The floor is a
 # RATCHET — raised with the groups, never left behind, or a deleted group passes as a green run.
@@ -2209,7 +2313,7 @@ check_says "an empty governed population refuses" "$Q" 1 "no tracked path under 
 # driver, and the count of cases the arithmetic bar binds on.
 ngroups=$(grep -c '^# --- ' "$SELF")
 nruns=$(grep -c '^run "' "$SELF")
-[ "$ngroups" -ge 55 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 55 — a group was deleted"
+[ "$ngroups" -ge 57 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 57 — a group was deleted"
 [ "$nruns" -ge 42 ] || bad "only $nruns 'run' case(s) remain, expected at least 42 — a group was emptied while its banner stayed, which the banner count cannot see"
 [ "$NEVER_WORSE_BOUND" -ge "$NEVER_WORSE_FLOOR" ]   || bad "the arithmetic never-worse comparison bound on $NEVER_WORSE_BOUND case(s) against a grow-only floor of $NEVER_WORSE_FLOOR — a control flipped from rc 0 to rc 1 and silently left the bar"
 [ "$st" = 0 ] && echo "PASS — merge-rows: $ngroups groups / $nruns run cases held, $NEVER_WORSE_BOUND under the arithmetic never-worse bar, $ncons conservative (cap $CONSERVATIVE_CAP)"
