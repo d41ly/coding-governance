@@ -8,7 +8,7 @@ One reading the close will meet: `python tools/run-gates/pass_legs.py --budget` 
 
 **Evidences:** TOOL-aNimbleMend-3
 - AC1 — `python <kit>/pass_legs.py --figures` — in this repository it printed one line of three tab-separated integers, 600, 690 and 120, ended by a bare line feed with no carriage return.
-- AC2 — `python <kit>/pass_legs.py --budget` — over `green` it exited 0 and its last line was the summary naming 6 legs and a sum of 600.0; over `none` it exited 0 and its last line was `pass-budget: 0 leg(s) declared`; neither printed `WARN`.
+- AC2 — `python <kit>/pass_legs.py --budget` — over `green` it exited 0 and its last line was the summary naming 6 legs and a sum of 600.0; over `none` it exited 0 and its last line was `pass-budget: 0 leg(s) declared`; neither printed `WARN`. (PINNED, 2026-11-12)
 - AC3 — `pass-budget: WARN` — over `band` it exited 0 and printed one line opening with the token and naming 665.0, ahead of the summary line.
 - AC4 — `PASS-BUDGET FAILED` — over `over` it exited 1 and printed one line opening with the token, naming 700.0 and the 690 limit.
 - AC5 — `check_pass_eligible` — over `cap` and over `bare` it exited 1 and named the leg, as over the cap and as holding no cost row, with no pass-leg evidence file in the fixture, so the predicate alone answers `no-red` for both.

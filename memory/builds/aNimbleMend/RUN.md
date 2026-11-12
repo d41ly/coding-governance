@@ -69,3 +69,5 @@ base: 1265772cc365418ac6431a7f0f9e069f3bb79dc0
 2026-11-12T16:14:04Z brief · item TOOL-aNimbleMend-7 · reason f3d516ac08bd memory/builds/aNimbleMend/prompts/2026-11-12-prompt-TOOL-aNimbleMend-7-build-brief.md
 
 2026-11-12T16:21:16Z dispatch · item 43f38988 TOOL-aNimbleMend-7 · reason tools/workflows/unattended-unit.js tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/workflows/unattended-build.test.sh tools/unattended/VERBS.template.md tools/roles/SKILL.template.md memory/guides/UNATTENDED-VERBS.md .claude/skills/build/SKILL.md memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-7-1-acceptance-ledger.md memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-7.md
+
+2026-11-12T16:28:15Z rescope · item add TOOL-aNimbleMend-13 · reason the pass legs' first run over this build, after unit 7, redded eight legs: three false reds from legs that read the filtered leg list as their subject, a kit-subject leg the rule selects and the runner holds, a kit.toml sentence govkit selfcheck refuses, one unruled function name in pass_legs.py, and a stale docstring; each sits in a CLOSED unit
