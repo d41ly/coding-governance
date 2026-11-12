@@ -1,12 +1,13 @@
 # TOOL-aNimbleMend-14 — the red-fix lane opens only on a red of this branch's present state: an open red is bounded by its row's own head
 
-**Status:** SPECCED · rev-1 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 14
+**Status:** INPROGRESS · rev-1 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-12-prompt-TOOL-aNimbleMend-14-brief.md](../prompts/2026-11-12-prompt-TOOL-aNimbleMend-14-brief.md) | research | — |
+| [2026-11-12-prompt-TOOL-aNimbleMend-14-build-brief.md](../prompts/2026-11-12-prompt-TOOL-aNimbleMend-14-build-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 

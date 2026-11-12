@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-12-prompt-TOOL-aNimbleMend-15-brief.md](../prompts/2026-11-12-prompt-TOOL-aNimbleMend-15-brief.md) | research | — |
+| [2026-11-12-prompt-TOOL-aNimbleMend-15-build-brief.md](../prompts/2026-11-12-prompt-TOOL-aNimbleMend-15-build-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
