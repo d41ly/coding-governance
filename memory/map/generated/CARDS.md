@@ -203,7 +203,7 @@ The policy file .governance/policy.toml, the policy kit's catalogue that is its 
 - decisions 1: `TOOL-dGroundRules-1`
 - gate-legs 2: `policy check`, `policy fixtures`
 - kits 1: `policy`
-- gotcha-classes 1: `check-grades-one-layer-of-a-layered-config.md`
+- gotcha-classes 3: `check-grades-one-layer-of-a-layered-config.md`, `off-switch-leaves-new-output-standing.md`, `budget-row-not-remeasured-after-added-arms.md`
 - globs 4: `tools/policy/**`, `.governance/policy.toml`, `.governance/policy.json`, `help/policy.md`
 
 ## process-monitor
@@ -271,10 +271,10 @@ The gate runner, its harnesses, and the adopter that keeps a target's verdict re
 - decisions 9: `TOOL-aPacedTurnstile-1`, `TOOL-aPacedTurnstile-2`, `TOOL-aPacedTurnstile-4`, `TOOL-aPacedTurnstile-5`, `TOOL-aPacedTurnstile-6`, `TOOL-aPacedTurnstile-3`, `TOOL-aPacedTurnstile-7`, `TOOL-aPacedTurnstile-16`, `TOOL-dLoggedFlight-3`
 - gate-legs 15: `run-gates gov canary`, `run-gates adopter e2e`, `run-gates wiring`, `profile-bar selftest`, `every held leg is budgeted, every budget row resolves`, `run-selftests self-test`, `selftest harness self-test`, `extract-arms self-test`, `leg ceilings clear their evidenced maximum`, `run-gates run-log line`, `receipt sync (installed files match the receipt)`, `pre-push bar self-test`, `held-halves selftest`, `measure-legs selftest`
 - kits 1
-- gotcha-classes 18
+- gotcha-classes 19
 - guides 1
 - globs 28
-- cut 49 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 50 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## run-gates-turnstile
 
@@ -343,10 +343,10 @@ Unattended runs — a mandate on disk, not a block of chat
 - workflow-scripts 2: `unattended-build.js`, `unattended-unit.js`
 - skill-engines 1: `session-kickoff`
 - rendered-skills 1: `unattended`
-- gotcha-classes 25: `reflowed-prompt-string-reads-as-a-deleted-stop.md`, `text-mode-read-eats-a-bare-cr.md`, `assertion-between-two-derived-values.md`, `second-implementation-is-not-a-second-opinion.md`
+- gotcha-classes 27: `reflowed-prompt-string-reads-as-a-deleted-stop.md`, `text-mode-read-eats-a-bare-cr.md`, `assertion-between-two-derived-values.md`, `second-implementation-is-not-a-second-opinion.md`
 - guides 4
 - globs 3
-- cut 28 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 30 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## unattended-mandate
 

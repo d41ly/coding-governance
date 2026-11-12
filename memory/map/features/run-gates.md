@@ -37,7 +37,7 @@ gotcha-classes = ["bounded-through-a-pipe-is-unbounded.md", "a-runner-knob-owes-
   "canary-waits-on-a-rendezvous-not-a-clock.md", "sweep-issues-no-cost-verdict.md",
   "changed-mode-selection-ignores-doc-reads.md",
   "fail-count-reads-a-pattern-the-row-never-prints.md",
-  "hand-typed-count-of-an-enumerated-population.md"]
+  "hand-typed-count-of-an-enumerated-population.md", "inherited-env-retargets-a-check.md"]
 guides = ["MERGE-BAR.md"]
 backlog-shards = []
 lexicon-verbs = []
