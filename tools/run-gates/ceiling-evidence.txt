@@ -64,7 +64,7 @@ hook destinations (every declared hook path ships)	46.1	1	a	2026-09-24	runner
 hook destinations self-test	801.4	1	a	2026-09-24	runner
 install-prefix (shipped surface)	58.2	2	a	2026-09-24	runner
 install-prefix self-test	577.2	2	a	2026-09-24	runner
-instruction edits (manifest checks)	110.0	1	a	2026-11-12	gov_tag.py check raced against instructions_edit.py check on a fresh index in a scratch clone of 33a1a8676, instructions_edit waiting on the tag-index write lock, 110s wall, TOOL-aLiftedCeiling-1 AC2
+instruction edits (manifest checks)	110.0	1	a	2026-11-12	gov_tag.py check raced against instructions_edit.py check on a fresh index in a scratch clone of 33a1a8676 (the pass commit; unit 1's spec named 123123146, and tools/playbook is identical at both), instructions_edit waiting on the tag-index write lock, 110s wall, no other gate run on the host during the race (the main loop's account; no census reached it), TOOL-aLiftedCeiling-1 AC2, source restated by TOOL-aLiftedCeiling-2
 kickoff engine size <=18KiB	7.6	1	a	2026-09-06	runner
 kickoff-manifest ratchet	15.6	1	a	2026-09-24	runner
 kit epoch (shipped bytes move, the version moves)	30.1	2	a	2026-09-24	runner

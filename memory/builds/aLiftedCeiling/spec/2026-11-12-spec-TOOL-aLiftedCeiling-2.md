@@ -1,11 +1,12 @@
 # TOOL-aLiftedCeiling-2 — the instruction-edits evidence row names its host load and its clone's commit
 
-**Status:** DEFERRED · rev-1 · 2026-11-12 · node a · Tier-1 · base b28597c1f · streams tooling · order 2
+**Status:** CLOSED · rev-1 · 2026-11-12 · node a · Tier-1 · base b28597c1f · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-12-build-TOOL-aLiftedCeiling-2-ledger.md](../build/2026-11-12-build-TOOL-aLiftedCeiling-2-ledger.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aLiftedCeiling-2-1-spec-writer.md](../prompts/2026-11-12-prompt-TOOL-aLiftedCeiling-2-1-spec-writer.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aLiftedCeiling-2-build-brief.md](../prompts/2026-11-12-prompt-TOOL-aLiftedCeiling-2-build-brief.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aLiftedCeiling-2-spec-brief.md](../prompts/2026-11-12-prompt-TOOL-aLiftedCeiling-2-spec-brief.md) | research | — |
