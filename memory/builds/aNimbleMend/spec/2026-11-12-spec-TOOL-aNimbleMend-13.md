@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-13 — the first pass-leg run's findings repaired: a pass leg grades the whole manifest, the rule selects no leg the runner holds, and three texts say what the code does
 
-**Status:** SPECCED · rev-1 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 13
+**Status:** INPROGRESS · rev-1 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
