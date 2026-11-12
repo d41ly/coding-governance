@@ -28,6 +28,12 @@ no history, so a red count read from it would be 0 or 1.
   python pass_legs.py --apply                  write the field onto the manifest from tracked files
   python pass_legs.py --check                  exit 1 unless the manifest is what --apply writes
   python pass_legs.py --report                 one line per leg: verdict, reds, cost, score, name
+  python pass_legs.py --budget                 exit 1 when the declared legs break the owner's limits
+  python pass_legs.py --figures                the budget, the limit and the cap, tab-separated
+
+THE BUDGET GATE (TOOL-aNimbleMend-3) is a second reading of the same tracked files, independent of
+the rule: `check_pass_budget` grades every row carrying `pass_leg`, however the field got there,
+and `derive-ceilings.py --check` calls it, so the ceiling leg carries it on every bar.
 
 Exit 0 clean, 1 a finding or a DEAD PROBE, 2 a refusal with nothing written.
 """
@@ -50,6 +56,9 @@ LEGS_BESIDE = HERE.parent / "gate-legs.json"
 PASS_BUDGET_SECONDS = 600
 # No single leg takes more than a fifth of a pass (the spec's F1, resolved at 120).
 PASS_LEG_CAP_SECONDS = 120
+# Where the budget gate reds. A declared list summing above the budget and at or under this is a
+# warning: the band a cost row that rose after the last apply lands in.
+PASS_LIMIT_SECONDS = 690
 
 # The unattended kit gate is found by its SCRIPT, so a renamed row stays excluded.
 UNATTENDED_GATE = "check-unattended.sh"
@@ -222,6 +231,64 @@ def check_pass_eligible(leg: dict, reds: dict, ceilings: dict) -> str:
     return ""
 
 
+def check_pass_budget(legs, ceilings: dict) -> tuple:
+    """(failures, lines) for the rows of `legs` carrying `pass_leg`, graded against the figures.
+
+    `legs` is the manifest's rows and `ceilings` the cost rows, {leg: seconds}. `failures` are the
+    findings, for stderr, and `lines` the warning and the summary, for stdout; a run with a failure
+    prints no summary. One finding per leg, the first that fits: an excluded class, a leg the runner
+    would hold, no cost row, over the cap. The cost is asked DIRECTLY, because the predicate answers
+    `no-red` ahead of both cost reasons; its `over-cap` is kept for the last-seconds reading. The
+    sum is every declared leg that has a cost row. Figures that contradict each other are a Refusal.
+
+    WHAT IT DOES NOT CHECK: whether the list is the rule's own output, which is `--check`; and a
+    cost row is the worst reading on record, on one node, with the legs run one after another.
+    """
+    budget, limit, cap = PASS_BUDGET_SECONDS, PASS_LIMIT_SECONDS, PASS_LEG_CAP_SECONDS
+    if limit < budget or cap > budget:
+        raise Refusal(f"the figures contradict each other: budget {budget}s, limit {limit}s, cap "
+                      f"{cap}s — the limit may not be under the budget, nor the cap over it")
+    declared = [l for l in legs if "pass_leg" in l]
+    if not declared:
+        return [], ["pass-budget: 0 leg(s) declared"]
+    evidence = read_pass_evidence()
+    reds = evidence[1] if evidence else {}
+    failures, total = [], 0.0
+    for leg in declared:
+        name = leg["name"]
+        cost = ceilings.get(name)
+        total += cost or 0.0
+        reason = check_pass_eligible(leg, reds, ceilings)
+        if reason in ("selftest", "e2e", "unattended-gate"):
+            why = f"it is of an excluded class, `{reason}`, which no pass runs"
+        # ponytail: the gate's own clause; it goes once the predicate answers a reason for a
+        # kit-subject row, and this reads that reason instead.
+        elif leg.get("subject") == "kit":
+            why = "the pass-leg runner would hold it, its subject being `kit`, and run nothing"
+        elif cost is None:
+            why = "it has no cost row in the ceiling evidence, so its seconds are unknown"
+        elif cost > cap:
+            why = f"its cost row, {cost:.1f}s, is over the {cap}s cap"
+        elif reason == "over-cap":
+            why = f"its last seconds are over the {cap}s cap, above its {cost:.1f}s cost row"
+        else:
+            continue
+        failures.append(f"{name}: {why}")
+    n = len(declared)
+    if total > limit:
+        failures.append(f"{n} declared leg(s) sum to {total:.1f}s, over the {limit}s limit "
+                        f"(budget {budget}s)")
+    if failures:
+        return failures, []
+    lines = []
+    if total > budget:
+        lines.append(f"pass-budget: WARN — {n} declared leg(s) sum to {total:.1f}s, over the "
+                     f"{budget}s budget, inside the {limit}s limit")
+    lines.append(f"pass-budget: {n} leg(s) declared, {total:.1f}s against a {budget}s budget and a "
+                 f"{limit}s limit, cap {cap}s")
+    return failures, lines
+
+
 def derive_pass_legs(legs, reds: dict, ceilings: dict) -> list:
     """Every leg's verdict, ranked legs first in fill order, then the excluded in manifest order.
 
@@ -343,6 +410,22 @@ def cmd_report() -> int:
     return 0
 
 
+def cmd_budget() -> int:
+    _text, legs = read_manifest()
+    failures, lines = check_pass_budget(legs, read_ceilings())
+    for f in failures:
+        print(f"PASS-BUDGET FAILED — {f}", file=sys.stderr)
+    for line in lines:
+        print(line)
+    return 1 if failures else 0
+
+
+def cmd_figures() -> int:
+    sys.stdout.reconfigure(newline="\n")  # a shell `read` would keep a CR on the last field
+    print(f"{PASS_BUDGET_SECONDS:d}\t{PASS_LIMIT_SECONDS:d}\t{PASS_LEG_CAP_SECONDS:d}")
+    return 0
+
+
 def cmd_write() -> int:
     node = os.environ.get("GOV_NODE")
     if not node:
@@ -393,6 +476,10 @@ def main() -> int:
                    help="exit 1 unless the manifest is what --apply would write")
     g.add_argument("--report", action="store_const", dest="verb", const=cmd_report,
                    help="one line per leg: verdict, reds, cost, score, name")
+    g.add_argument("--budget", action="store_const", dest="verb", const=cmd_budget,
+                   help="exit 1 when the declared legs break the budget gate's limits")
+    g.add_argument("--figures", action="store_const", dest="verb", const=cmd_figures,
+                   help="the budget, the limit and the cap as one tab-separated line")
     try:
         return ap.parse_args().verb()
     except Refusal as e:

@@ -1015,6 +1015,8 @@ gov's own and is withheld from the payload, as the ceiling evidence is.
 | `python pass_legs.py --apply` | writes the field onto each selected row and removes it from every other, from tracked files alone. It edits the manifest as text, one line after a row's `"name"` line, and refuses with exit 2 and nothing written unless the result parses to the old rows with only `pass_leg` differing |
 | `python pass_legs.py --check` | exit 0 printing `pass-legs: <n> declared, <sum>s of <budget>s` when the manifest's bytes are what `--apply` would write; exit 1 naming each leg that carries a field the rule does not give it and each selected leg that lacks one |
 | `python pass_legs.py --report` | one line per leg: verdict, reds, cost, score and name, under the window line |
+| `python pass_legs.py --budget` | the budget gate below: exit 0 when the declared legs are clean, a warning included; exit 1 on any finding; exit 2 when it cannot grade, on a manifest that does not parse, a limit under the budget or a cap over the budget |
+| `python pass_legs.py --figures` | prints `<budget> TAB <limit> TAB <cap>` and nothing else, three integers, so a shell reader holds no copy of them |
 
 **With no evidence file the rule selects nothing.** `--apply` writes nothing over a manifest with no
 field, `--check` is green and prints `pass-legs: not derived, no evidence file`, and a field typed
@@ -1027,6 +1029,38 @@ and every bar's preflight proves it fresh, as "Generated outputs" above states f
 row. A ceiling-evidence refresh that moves the selection is cured by the landing or by one
 `--regen`, and is never a leg's red. A deployer update rebuilds the rows it owns from their
 descriptors and drops the field from them, and the same staged row puts it back.
+
+**The budget gate re-reads the list the rule leaves.** `--check` asks whether the field is the
+rule's own output. `--budget` asks a different question of the same tracked files: whether the
+declared rows, however the field got there, fit the owner's limits. A field typed by hand, a cost
+row that rose after the last apply and a fault in the rule all land here. It reads the field and
+never `pass.fast-legs`. `check_pass_budget` gives each declared leg the first finding that fits,
+then sums the list:
+
+| finding | the declared leg, or the list |
+|---|---|
+| excluded class | `check_pass_eligible` answers `selftest`, `e2e` or `unattended-gate` for it |
+| held | has `subject` `kit`, so the pass-leg runner would hold it and run nothing |
+| no cost row | has no row in `ceiling-evidence.txt` |
+| over the cap | has a cost row above `PASS_LEG_CAP_SECONDS`, or `check_pass_eligible` answers `over-cap` on its last seconds |
+| over the limit | the declared legs' cost rows sum above `PASS_LIMIT_SECONDS` |
+
+The two cost findings ask the cost row directly, because the predicate answers `no-red` ahead of
+both. `PASS_LIMIT_SECONDS` is a constant of `pass_legs.py` beside the budget and the cap. A sum
+above `PASS_BUDGET_SECONDS` and at or under the limit is a `pass-budget: WARN` line and no finding.
+Each finding is a `PASS-BUDGET FAILED` line on stderr naming its leg. A clean run ends on
+`pass-budget: <n> leg(s) declared, <sum>s against a <budget>s budget and a <limit>s limit, cap
+<cap>s`, or on `pass-budget: 0 leg(s) declared` when no row carries the field.
+
+**The leg `leg ceilings clear their evidenced maximum` carries it.** `derive-ceilings.py --check`
+calls `check_pass_budget` after its own arm, whether or not a ceiling failed, and exits with the
+higher of the two. Where `pass_legs.py` is not beside it, it prints `pass-budget: not graded` and
+its own verdict stands. That leg is gov's own, so an adopter runs `--budget` by hand once it holds
+cost rows.
+
+What the gate does not check: a cost row is the worst reading on record on one node, and a leg
+never re-measured can sit under its true cost. The sum is the legs run one after another, and a leg
+its guard skips counts in full.
 
 ## The gov-only harness
 

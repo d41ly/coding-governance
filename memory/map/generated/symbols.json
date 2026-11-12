@@ -6628,6 +6628,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "check_pass_budget",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
       "id": "check_pass_eligible",
       "kind": "function",
       "file": "tools/run-gates/pass_legs.py"
@@ -8193,6 +8198,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "cmd_budget",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
       "id": "cmd_bump",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -8331,6 +8341,11 @@
       "id": "cmd_extract",
       "kind": "function",
       "file": "tools/runlog/runlog.py"
+    },
+    {
+      "id": "cmd_figures",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "cmd_for_diff",
@@ -16351,6 +16366,11 @@
       "id": "print_pass",
       "kind": "function",
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
+    },
+    {
+      "id": "print_pb_out",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "print_pin_rows",
@@ -27203,6 +27223,11 @@
       "file": "tools/workflows/check_by_design_parity.py"
     },
     {
+      "id": "run_pb",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "run_pfx_push",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -33261,6 +33286,16 @@
       "id": "write_pause_row",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
+      "id": "write_pb_cost",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "write_pb_legs",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "write_pfx_stamp",

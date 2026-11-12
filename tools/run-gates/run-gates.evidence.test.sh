@@ -284,7 +284,9 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=240
+FLOOR_ASSERTIONS=250
+# RAISED 240 -> 250 by TOOL-aNimbleMend-3: the pass-budget arms, AC2's two, AC3's one, AC4's one, AC5's
+# two, AC6's one, AC7's two and AC8's one. Counted one per `ok … || nope` pair.
 # RAISED 234 -> 240 by TOOL-aSparedSpawn-32: the composed reuse designs, AC9's one, AC10's one, AC12's
 # three and the lineage stamp's reused_cache one. Counted one per `ok … || nope` pair.
 # MERGED 208 / 141 -> 234 at the reconcile with origin/main fcba0600 (TOOL-aSparedSpawn-32): base 115,
@@ -2241,6 +2243,113 @@ printf '%s\n' "$pz_rep" | grep '^# set aside:' | grep -q '[^0-9]1 paused' \
   && ok "AC10 the set-aside line names 1 paused" \
   || { nope "AC10 the set-aside line does not name 1 paused"; printf '%s\n' "$pz_rep" | sed 's/^/      /'; }
 rm -rf "$PZ_T"
+
+# --- THE PASS-BUDGET GATE (TOOL-aNimbleMend-3 AC2 to AC8) -------------------------------------------
+# `pass_legs.py --budget` grades the rows carrying `pass_leg` against the budget, the limit and the
+# cap, and `derive-ceilings.py --check` carries it. A fixture of its own: the kit's two scripts and
+# the margin, one hand-written cost file, and one planted manifest per finding, each named by
+# GATE_LEGS. Every leg is `chunk` product with a ceiling of 1000 unless its manifest says otherwise.
+# The sums are PINNED to the owner's 600 and 690; the cap is read from `--figures`, never typed.
+# NO pass-leg evidence file exists here, so the predicate answers `no-red` for every product leg and
+# the two cost findings are reachable only by asking the cost row directly.
+# WHAT THIS DOES NOT CHECK: the last-seconds half of the cap finding, which needs an evidence file,
+# and the exit-2 refusals, which need the constants edited.
+PB_T=$(mktemp -d); PB_K="$PB_T/${PFX}${KIT}"
+mkdir -p "$PB_K"
+cp "$ROOT/${PFX}${KIT}/pass_legs.py" "$ROOT/${PFX}${KIT}/derive-ceilings.py" "$ROOT/${PFX}${KIT}/ceiling-margin.txt" "$PB_K/" \
+  || { echo "evidence-test: cannot copy the ceiling kit for the pass-budget arms"; exit 2; }
+( cd "$PB_T" && git init -q --template= -b main . ) >/dev/null 2>&1
+PB_CAP=$("$DC_PY" "$PB_K/pass_legs.py" --figures 2>/dev/null | tr -d '\r' | cut -f3)
+case "$PB_CAP" in ''|*[!0-9]*) echo "evidence-test: pass_legs.py --figures printed no cap"; exit 2 ;; esac
+write_pb_legs() { # manifest name · count · leg prefix -> <count> declared product legs
+  local i rows=""
+  for ((i = 1; i <= $2; i++)); do
+    rows="$rows${rows:+,}"$'\n'"  {\"name\": \"$3$i\", \"pass_leg\": true, \"argv\": [\"true\"], \"chunk\": \"product\", \"ceiling\": 1000}"
+  done
+  printf '[%s\n]\n' "$rows" > "$PB_T/$1.json"
+}
+write_pb_cost() { printf '%s\t%s\t1\ta\t2026-11-12\trunner\n' "$1" "$2" >> "$PB_K/ceiling-evidence.txt"; }   # leg · seconds
+run_pb() { # manifest name · script · verb -> PB_RC, and both streams in PB_OUT
+  PB_OUT=$( cd "$PB_T" && GATE_LEGS="$PB_T/$1.json" "$DC_PY" "$PB_K/${2:-pass_legs.py}" "${3:---budget}" 2>&1 | tr -d '\r'; exit "${PIPESTATUS[0]}" ); PB_RC=$?
+}
+print_pb_out() { printf '%s\n' "$PB_OUT" | sed 's/^/      /'; }
+write_pb_legs green 6 g; write_pb_legs band 7 b; write_pb_legs over 7 o
+write_pb_legs cap 1 capleg; write_pb_legs bare 1 bareleg
+printf '%s\n' '[' '  {"name": "plain", "argv": ["true"], "chunk": "product", "ceiling": 1000}' ']' > "$PB_T/none.json"
+printf '%s\n' '[' \
+  '  {"name": "c-self", "pass_leg": true, "argv": ["true"], "chunk": "selftests", "ceiling": 1000},' \
+  '  {"name": "c-e2e", "pass_leg": true, "argv": ["true"], "chunk": "e2e", "ceiling": 1000},' \
+  '  {"name": "c-unat", "pass_leg": true, "argv": ["bash", "x/check-unattended.sh"], "chunk": "product", "ceiling": 1000},' \
+  '  {"name": "c-kit", "pass_leg": true, "argv": ["true"], "chunk": "product", "subject": "kit", "ceiling": 1000}' \
+  ']' > "$PB_T/class.json"
+printf '# hdr\n' > "$PB_K/ceiling-evidence.txt"
+for pb_i in 1 2 3 4 5 6 7; do
+  [ "$pb_i" = 7 ] || write_pb_cost "g$pb_i" 100.0
+  write_pb_cost "b$pb_i" 95.0; write_pb_cost "o$pb_i" 100.0
+done
+write_pb_cost capleg1 "$((PB_CAP + 1)).0"; write_pb_cost plain 1.0
+for pb_i in c-self c-e2e c-unat c-kit; do write_pb_cost "$pb_i" 1.0; done
+pb_sum="pass-budget: 6 leg(s) declared, 600.0s against a 600s budget and a 690s limit, cap ${PB_CAP}s"
+
+# AC2. A list at exactly the budget is clean, and an empty list says it graded nothing.
+run_pb green
+[ "$PB_RC" = 0 ] && [ "$(printf '%s\n' "$PB_OUT" | tail -n 1)" = "$pb_sum" ] && ! printf '%s\n' "$PB_OUT" | grep -q 'WARN' \
+  && ok "AC2 six legs summing to exactly the budget exit 0 on the summary line, with no warning" \
+  || { nope "AC2 a list at exactly the budget did not read clean (rc=$PB_RC)"; print_pb_out; }
+run_pb none
+[ "$PB_RC" = 0 ] && [ "$(printf '%s\n' "$PB_OUT" | tail -n 1)" = "pass-budget: 0 leg(s) declared" ] && ! printf '%s\n' "$PB_OUT" | grep -q 'WARN' \
+  && ok "AC2 a manifest with no declared row exits 0 on the zero line" \
+  || { nope "AC2 an empty declared list did not print the zero line (rc=$PB_RC)"; print_pb_out; }
+# AC3. The band between the budget and the limit warns and is no finding.
+run_pb band
+[ "$PB_RC" = 0 ] && [ "$(printf '%s\n' "$PB_OUT" | grep -c '^pass-budget: WARN')" = 1 ] \
+  && printf '%s\n' "$PB_OUT" | grep '^pass-budget: WARN' | grep -q '665' \
+  && printf '%s\n' "$PB_OUT" | tail -n 1 | grep -q '^pass-budget: 7 leg(s) declared' \
+  && ok "AC3 seven legs summing to 665 exit 0 with one WARN line ahead of the summary" \
+  || { nope "AC3 the tolerance band is a finding, or passes with no line (rc=$PB_RC)"; print_pb_out; }
+# AC4. Past the limit is the finding, and it names the sum and the limit.
+run_pb over
+[ "$PB_RC" = 1 ] && [ "$(printf '%s\n' "$PB_OUT" | grep -c '^PASS-BUDGET FAILED')" = 1 ] \
+  && printf '%s\n' "$PB_OUT" | grep '^PASS-BUDGET FAILED' | grep '700' | grep -q '690s limit' \
+  && ok "AC4 seven legs summing to 700 exit 1 on one failure line naming 700 and the 690s limit" \
+  || { nope "AC4 a list over the limit did not red (rc=$PB_RC)"; print_pb_out; }
+# AC5. The cost is asked directly: no evidence file is here, so the predicate alone answers `no-red`.
+run_pb cap
+[ ! -e "$PB_K/pass-leg-evidence.txt" ] && [ "$PB_RC" = 1 ] \
+  && printf '%s\n' "$PB_OUT" | grep '^PASS-BUDGET FAILED' | grep 'capleg1' | grep -q "over the ${PB_CAP}s cap" \
+  && ok "AC5 a leg costing one second over the cap exits 1 and is named, with no pass-leg evidence file" \
+  || { nope "AC5 a leg over the cap was not named (rc=$PB_RC)"; print_pb_out; }
+run_pb bare
+[ ! -e "$PB_K/pass-leg-evidence.txt" ] && [ "$PB_RC" = 1 ] \
+  && printf '%s\n' "$PB_OUT" | grep '^PASS-BUDGET FAILED' | grep 'bareleg1' | grep -q 'no cost row' \
+  && ok "AC5 a declared leg with no cost row exits 1 and is named" \
+  || { nope "AC5 a leg with no cost row was not named (rc=$PB_RC)"; print_pb_out; }
+# AC6. One failure line per leg: three excluded classes, and the kit-subject leg the runner would hold.
+run_pb class
+pb_ok=1
+[ "$PB_RC" = 1 ] && [ "$(printf '%s\n' "$PB_OUT" | grep -c '^PASS-BUDGET FAILED')" = 4 ] || pb_ok=0
+for pb_i in 'c-self: .*`selftest`' 'c-e2e: .*`e2e`' 'c-unat: .*`unattended-gate`' 'c-kit: .*runner would hold'; do
+  [ "$(printf '%s\n' "$PB_OUT" | grep -c "^PASS-BUDGET FAILED — $pb_i")" = 1 ] || pb_ok=0
+done
+[ "$pb_ok" = 1 ] \
+  && ok "AC6 four failure lines, one per leg: selftest, e2e, unattended-gate, and the kit-subject leg as held by the runner" \
+  || { nope "AC6 the class manifest did not red once per leg (rc=$PB_RC)"; print_pb_out; }
+# AC7. The ceiling check carries the arm, red and green.
+run_pb over derive-ceilings.py --check
+[ "$PB_RC" = 1 ] && printf '%s\n' "$PB_OUT" | grep '^PASS-BUDGET FAILED' | grep '700' | grep -q '690s limit' \
+  && ok "AC7 derive-ceilings.py --check exits 1 over the over-limit manifest and prints the limit finding" \
+  || { nope "AC7 the ceiling check did not carry the budget finding (rc=$PB_RC)"; print_pb_out; }
+run_pb green derive-ceilings.py --check
+[ "$PB_RC" = 0 ] && printf '%s\n' "$PB_OUT" | grep -q '^ceiling-evidence: ' && printf '%s\n' "$PB_OUT" | grep -qxF "$pb_sum" \
+  && ok "AC7 over the green manifest it exits 0 with the ceiling-evidence summary and the pass-budget summary" \
+  || { nope "AC7 the ceiling check over a green list did not print both summaries (rc=$PB_RC)"; print_pb_out; }
+# AC8. Without its sibling the check says the budget was not graded, and its own verdict stands.
+rm -rf "$PB_K/pass_legs.py" "$PB_K/__pycache__"
+run_pb over derive-ceilings.py --check
+[ "$PB_RC" = 0 ] && printf '%s\n' "$PB_OUT" | grep -q '^pass-budget: not graded' && ! printf '%s\n' "$PB_OUT" | grep -q 'Traceback' \
+  && ok "AC8 with pass_legs.py removed the ceiling check exits 0 on a not-graded line" \
+  || { nope "AC8 a missing pass_legs.py broke the ceiling check (rc=$PB_RC)"; print_pb_out; }
+rm -rf "$PB_T"
 
 # --- THE WORKER'S BUILTINS KEEP TODAY'S BYTES (TOOL-aSparedSpawn-4 AC1 to AC4, AC6, AC7) -----------
 # The worker reads its clock, its output, its log name and its key with builtins where it spawned. Each
