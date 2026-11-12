@@ -73,6 +73,14 @@ role = "project-owned"
 include = ["ceiling-evidence.txt", "ceiling-margin.txt"]
 role = "project-owned"
 
+# AND SO IS THE PASS-LEG EVIDENCE. `pass-leg-evidence.txt` carries THIS repo's recorded reds per
+# leg, distilled from this node's bar run log, so an adopter receiving it would rank its legs by
+# reds it never had. `pass_legs.py` DOES ship: with no evidence file it derives nothing and says
+# so, and an adopter's own `--write` gives it one. TOOL-aNimbleMend-2.
+[[files]]
+include = ["pass-leg-evidence.txt"]
+role = "project-owned"
+
 # THE SELF-TEST DECLARATION IS GOV'S TOO. Its rows name this repo's suites and carry
 # readings taken on this node, so an adopter receiving it gets a population they do not have
 # and a gate that reds on arrival. `run-selftests.sh` itself DOES ship — it is the mechanism
@@ -140,6 +148,19 @@ mutates_index = false
 # DEPL-aHalvedInstall-3: why `update` never re-runs this adopter. A kit with an adopter declares
 # [[regenerate]] or this reason, and selfcheck refuses one declaring neither.
 why_no_regenerate = "the adopter writes nothing; the [gate_runner] declaration its check joins against is emitted by govkit itself from [gate_runner_seed], on apply and on update"
+
+# THE PASS-LEG FIELD IS RE-APPLIED AT EVERY LANDING. TOOL-aNimbleMend-2. `regen.py` makes this staged
+# row an item, so the lander re-derives `pass_leg` over each merged tree and every bar's preflight
+# proves it fresh: a ceiling-evidence refresh that moves the selection is cured by the landing or by
+# one `--regen`, and is never a leg's red. NOT a `[[generated]]` row, because the unattended kit
+# enrols every `[[generated]]` path as a generated index and the manifest is an authored file.
+# Stage 2: the field reads no other generated output, and the codebase map at stage 3 reads the
+# tree after it. The adopter above still writes nothing, which is what its reason states.
+[[regenerate]]
+argv = ["python", "{kit}/pass_legs.py", "--apply"]
+check = ["python", "{kit}/pass_legs.py", "--check"]
+stage = 2
+writes = ["the pass_leg field of the leg manifest"]
 
 [check]
 argv = ["bash", "{kit}/adopt-run-gates.sh", "--check"]

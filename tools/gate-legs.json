@@ -1,6 +1,7 @@
 [
   {
     "name": "kickoff-manifest ratchet",
+    "pass_leg": true,
     "argv": [
       "bash",
       "skills/session-kickoff/manifest-check.sh"
@@ -81,6 +82,7 @@
   },
   {
     "name": "playbook parity",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/playbook/render_playbook.py",
@@ -131,6 +133,7 @@
   },
   {
     "name": "unattended protocol size",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/check-template-size.sh",
@@ -164,6 +167,7 @@
   },
   {
     "name": "shell hygiene (a loop fed by a command substitution)",
+    "pass_leg": true,
     "argv": [
       "python3",
       "{prefix}/gate-lint/sh_hygiene.py",
@@ -247,6 +251,7 @@
   },
   {
     "name": "encoding posture (text IO names its encoding)",
+    "pass_leg": true,
     "argv": [
       "python3",
       "{prefix}/gate-lint/encoding_posture.py",
@@ -273,6 +278,7 @@
   },
   {
     "name": "verdict epoch (kit version dates the engine)",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/memory-tree/check-verdict-epoch.sh"
@@ -327,6 +333,7 @@
   },
   {
     "name": "python resolver (behaviour + inline parity + idiom ban)",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/lib/resolve-python.test.sh"
@@ -453,6 +460,7 @@
   },
   {
     "name": "method carriers (every pointer declared)",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/memory-tree/check-method-carriers.sh"
@@ -491,6 +499,7 @@
   },
   {
     "name": "build README slot contract",
+    "pass_leg": true,
     "argv": [
       "python3",
       "{prefix}/memory-tree/gen_build_index.py",
@@ -580,6 +589,7 @@
   },
   {
     "name": "harness arms (fail branches armed or pinned)",
+    "pass_leg": true,
     "argv": [
       "python3",
       "{prefix}/memory-tree/check-arms.py",
@@ -847,6 +857,7 @@
   },
   {
     "name": "codebase-map coverage + freshness",
+    "pass_leg": true,
     "argv": [
       "python3",
       "{prefix}/codebase-map/test_codebase_map.py"
@@ -1089,6 +1100,7 @@
   },
   {
     "name": "drift-audit records",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/drift-audit/drift_report.py",
@@ -1330,6 +1342,7 @@
   },
   {
     "name": "install-prefix (shipped surface)",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/check-install-prefix.sh"
@@ -1345,6 +1358,7 @@
   },
   {
     "name": "hook destinations (every declared hook path ships)",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/check-hook-destinations.sh"
@@ -1408,6 +1422,7 @@
   },
   {
     "name": "dead-path carriers (deleted files still named)",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/check-dead-paths.sh"
@@ -1456,6 +1471,7 @@
   },
   {
     "name": "govkit selfcheck",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/govkit/govkit.py",
@@ -1468,6 +1484,7 @@
   },
   {
     "name": "kit epoch (shipped bytes move, the version moves)",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/govkit/govkit.py",
@@ -1503,6 +1520,7 @@
   },
   {
     "name": "docs",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/govkit/docs_leg.py"
@@ -1570,6 +1588,7 @@
   },
   {
     "name": "lexicon naming predicates",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/lexicon/lexicon.py"
@@ -1607,6 +1626,7 @@
   },
   {
     "name": "lexicon wiring",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/lexicon/adopt-lexicon.sh",
@@ -1733,6 +1753,7 @@
   },
   {
     "name": "govkit runbook parity",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/govkit/check_runbook_parity.py"
@@ -1760,6 +1781,7 @@
   },
   {
     "name": "testsuite counts (every bar self-test prints one)",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/check-testsuite-counts.sh"
@@ -1780,6 +1802,7 @@
   },
   {
     "name": "playbook render wiring",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/playbook/adopt-playbook.sh",
@@ -1828,6 +1851,7 @@
   },
   {
     "name": "kit placeholders (a declared token its adopter substitutes)",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/check-kit-placeholders.py"
@@ -2224,6 +2248,7 @@
   },
   {
     "name": "leg ceilings clear their evidenced maximum",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/run-gates/derive-ceilings.py",
@@ -2236,6 +2261,7 @@
   },
   {
     "name": "every held leg is budgeted, every budget row resolves",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/run-gates/run-selftests.sh",

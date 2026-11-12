@@ -363,7 +363,7 @@ if bad:
 n=$((n+1))
 "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads", "pack", "enforces"}
+KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads", "pack", "enforces", "pass_leg"}
 try:
     legs = json.load(open(sys.argv[1]))
 except Exception as e:
@@ -699,7 +699,7 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"]},{"name":"b","argv":["bash","y.
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"impur":"typo"}]' > "$ctl/typo.json"
 keyset_probe() { "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads", "pack", "enforces"}
+KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads", "pack", "enforces", "pass_leg"}
 legs = json.load(open(sys.argv[1]))
 sys.exit(1 if any(k not in KNOWN for l in legs for k in l) else 0)
 ' "$1"; }
@@ -745,6 +745,16 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"],"enforce":["r"]}]' > "$ctl/enft
 if keyset_probe "$ctl/enf.json" && ! keyset_probe "$ctl/enftypo.json"; then :
 else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`enforces\` and FAIL a near-miss of it; one of the two did not hold"
+  fail=1
+fi
+# ...and `pass_leg` (TOOL-aNimbleMend-2 S6), by the same two halves, in both KNOWN copies: the field
+# `pass_legs.py --apply` derives onto a row, and the near-miss is the plural a hand would type.
+n=$((n+1))
+printf '%s' '[{"name":"a","pass_leg":true,"argv":["bash","x.sh"]}]' > "$ctl/pl.json"
+printf '%s' '[{"name":"a","pass_legs":true,"argv":["bash","x.sh"]}]' > "$ctl/pltypo.json"
+if keyset_probe "$ctl/pl.json" && ! keyset_probe "$ctl/pltypo.json"; then :
+else
+  echo "canary: the manifest key-set predicate must PASS a row carrying \`pass_leg\` and FAIL a near-miss of it; one of the two did not hold"
   fail=1
 fi
 rm -rf "$ctl"

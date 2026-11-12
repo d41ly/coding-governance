@@ -39,3 +39,9 @@ base: 1265772cc365418ac6431a7f0f9e069f3bb79dc0
 2026-11-12T14:42:23Z dispatch · item 75115e9a TOOL-aNimbleMend-1 · reason tools/policy/catalogue.toml tools/policy/README.md .governance/policy.json memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-1.md
 
 2026-11-12T14:46:22Z dispatch · item 2121531d TOOL-aNimbleMend-1 · reason tools/policy/catalogue.toml tools/policy/README.md .governance/policy.json memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-1.md memory/LIVE.md memory/builds/aNimbleMend/README.md
+
+2026-11-12T14:50:52Z dispatch · item a4a3b4ed TOOL-aNimbleMend-2 · reason tools/run-gates/pass_legs.py tools/run-gates/pass-leg-evidence.txt tools/gate-legs.json tools/run-gates/kit.toml tools/run-gates/run-gates.test.sh tools/run-gates/README.md memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-2.md
+
+2026-11-12T14:50:54Z brief · item TOOL-aNimbleMend-2 · reason 3495a99c3b81 memory/builds/aNimbleMend/prompts/2026-11-12-prompt-TOOL-aNimbleMend-2-build-brief.md
+
+2026-11-12T14:58:51Z dispatch · item a4a3b4ed TOOL-aNimbleMend-2 · reason tools/run-gates/pass_legs.py tools/run-gates/pass-leg-evidence.txt tools/gate-legs.json tools/run-gates/kit.toml tools/run-gates/run-gates.test.sh tools/run-gates/README.md memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-2.md memory/LIVE.md memory/builds/aNimbleMend/README.md memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md

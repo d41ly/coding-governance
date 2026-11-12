@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-2 — the pass-leg declaration: a `pass_leg` field on a leg's row, written by a derivation over the bar run log and the ceiling evidence
 
-**Status:** INPROGRESS · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 2
 
 <!-- gen:spec-records -->
 

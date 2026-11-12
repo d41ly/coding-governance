@@ -365,6 +365,11 @@
     {
       "id": "Refusal",
       "kind": "class",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
+      "id": "Refusal",
+      "kind": "class",
       "file": "tools/run-gates/regen.py"
     },
     {
@@ -6623,6 +6628,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "check_pass_eligible",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
       "id": "check_pass_open",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -8173,6 +8183,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "cmd_apply",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
       "id": "cmd_asks",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -8226,6 +8241,11 @@
       "id": "cmd_check",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
+      "id": "cmd_check",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "cmd_check_asbuilt",
@@ -8483,6 +8503,11 @@
       "file": "tools/run-gates/derive-ceilings.py"
     },
     {
+      "id": "cmd_report",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
       "id": "cmd_selftest",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -8606,6 +8631,11 @@
       "id": "cmd_write",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
+      "id": "cmd_write",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "cnot",
@@ -10578,6 +10608,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_pass_legs",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
       "id": "derive_past_pin_ids",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -11371,6 +11406,11 @@
       "id": "derive_stall_window",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "derive_state",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "derive_status",
@@ -14331,6 +14371,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/run-gates/owed_rows.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "main",
@@ -17383,6 +17428,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "read_ceilings",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
       "id": "read_cell",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
@@ -18743,6 +18793,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "read_last_seconds",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
       "id": "read_last_valid",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -18971,6 +19026,11 @@
       "id": "read_manifest",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "read_manifest",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "read_manifest_tags",
@@ -19311,6 +19371,11 @@
       "id": "read_pass_declarations",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "read_pass_evidence",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "read_patch_lines",
@@ -19731,6 +19796,11 @@
       "id": "read_records",
       "kind": "function",
       "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "read_red_counts",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "read_refs",
@@ -22613,6 +22683,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "render_pass_field",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
       "id": "render_patch",
       "kind": "function",
       "file": "tools/playbook/fixtures/row_kind.py"
@@ -22996,6 +23071,11 @@
       "id": "render_status_row",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "render_summary",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "render_summary_cell",
@@ -23743,6 +23823,11 @@
       "file": "tools/run-gates/derive-ceilings.py"
     },
     {
+      "id": "resolve_git_dirs",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
       "id": "resolve_gov_pin",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -24351,6 +24436,11 @@
       "id": "resolve_ln_staged",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "resolve_manifest_path",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "resolve_measurer_currency",
