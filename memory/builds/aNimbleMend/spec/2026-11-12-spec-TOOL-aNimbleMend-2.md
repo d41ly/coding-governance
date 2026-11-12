@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-12-build-TOOL-aNimbleMend-2-1-acceptance-ledger.md](../build/2026-11-12-build-TOOL-aNimbleMend-2-1-acceptance-ledger.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aNimbleMend-1-brief.md](../prompts/2026-11-12-prompt-TOOL-aNimbleMend-1-brief.md) | research | TOOL-aNimbleMend-1 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 |
 | [2026-11-12-prompt-TOOL-aNimbleMend-2-build-brief.md](../prompts/2026-11-12-prompt-TOOL-aNimbleMend-2-build-brief.md) | research | — |
 
@@ -15,7 +16,7 @@
 
 The legs a unit pass runs are declared once, as a field on each leg's own row of the leg manifest,
 and no hand writes that field: one derivation ranks every leg by recorded reds per evidenced second
-and fills a 600 s budget. The rule is recorded where the derivation lives, its inputs are tracked,
+and fills a 600 s budget. The rule is recorded where the derivation lives, its inputs are tracked, <!-- PINNED 2026-11-12 -->
 and the declaration is re-applied at every landing, so the list cannot drift from its evidence.
 
 ## 2. Scope (IN)
@@ -42,7 +43,7 @@ and the declaration is re-applied at every landing, so the list cannot drift fro
 
 ## 3. Non-goals (OUT)
 
-- The budget gate. That a declared list sums to 600 s at most, reds past 690 s, holds no leg over
+- The budget gate. That a declared list sums to 600 s at most, reds past 690 s, holds no leg over <!-- PINNED 2026-11-12 -->
   the cap and no excluded class is `TOOL-aNimbleMend-3`'s gate. This unit's rule produces such a
   list, and that unit refuses one that is not.
 - Any new leg. The scoped forms of memory hygiene and the spec-token check, and pinned facts and
@@ -60,7 +61,7 @@ and the declaration is re-applied at every landing, so the list cannot drift fro
 
 ### Edges
 
-- **hands-off** `TOOL-aNimbleMend-3` — its gate reads the pass-leg field, the budget and cap constants and the exclusion predicate from this unit's module, and owns the 690 s tolerance
+- **hands-off** `TOOL-aNimbleMend-3` — its gate reads the pass-leg field, the budget and cap constants and the exclusion predicate from this unit's module, and owns the 690 s tolerance <!-- PINNED 2026-11-12 -->
 - **hands-off** `TOOL-aNimbleMend-4` — its new legs carry no bar history, so it states how each enters the pass-leg evidence before this rule can select it
 - **hands-off** `TOOL-aNimbleMend-5` — the adapter takes its list from the rows carrying the pass-leg field, and never from a list of its own
 - **hands-off** `TOOL-aNimbleMend-11` — the pass-leg help page names the field, the rule and the write verb
@@ -142,9 +143,9 @@ The rule counts every recorded red, an inherited one included. The run log does 
 red was, and the owner's starting table counts the inherited policy-check reds too.
 
 **What the rule yields at this base.** PINNED, measured 2026-11-12 on node `a` by a read-only
-probe of the three stores, with the cap at 120: 202 bars, 117 of them red, 78 legs with a red, 124
-of 171 legs with a ceiling-evidence row. Excluded: 29 `selftest`, 1 `unattended-gate`, 15
-`unevidenced`, 7 `over-cap`. Selected: 26 legs summing 412.8 s. The seven over the cap are
+probe of the three stores, with the cap at 120: 202 bars, 117 of them red, 78 legs with a red, 124 <!-- PINNED 2026-11-12 -->
+of 171 legs with a ceiling-evidence row. Excluded: 29 `selftest`, 1 `unattended-gate`, 15 <!-- PINNED 2026-11-12 -->
+`unevidenced`, 7 `over-cap`. Selected: 26 legs summing 412.8 s. The seven over the cap are <!-- PINNED 2026-11-12 -->
 `memory hygiene`, `brief-recorded`, `pass-order history`, `spec tokens (a spec's own names resolve)`,
 `govkit acceptance matrix`, `routed commits name a specced unit` and `tags (the resolver's checks)`.
 The fifteen `unevidenced` legs, `policy check` and `instruction edits (manifest checks)` among them,
@@ -224,7 +225,7 @@ tool tree for `KNOWN` and `unknown key` finds no other reader that refuses a man
 
 ### Alternatives rejected
 
-- **Verbs added to `derive-ceilings.py`.** Its name and its 48 KB are about ceilings, its file name
+- **Verbs added to `derive-ceilings.py`.** Its name and its 48 KB are about ceilings, its file name <!-- PINNED 2026-11-12 -->
   cannot be imported, and `TOOL-aNimbleMend-3` and `TOOL-aNimbleMend-5` import the predicate.
 - **Reds read from the ledger, as the prompt words it.** The ledger keeps one row per leg and no
   history, so a red count from it is 0 or 1.
@@ -233,7 +234,7 @@ tool tree for `KNOWN` and `unknown key` finds no other reader that refuses a man
 - **Seconds taken from the ledger alone.** The budget gate sums the ceiling evidence, and two cost
   figures for one leg is two facts.
 - **Fresh ceiling-evidence rows written here for the unevidenced legs.** `policy check` declares a
-  120 s ceiling, and any new row for it reds `derive-ceilings.py --check`, which asks 120 s of
+  120 s ceiling, and any new row for it reds `derive-ceilings.py --check`, which asks 120 s of <!-- PINNED 2026-11-12 -->
   headroom above the reading.
 - **The field written by hand and only checked.** The owner's rule is derive, never type.
 - **A separate tracked list of pass legs.** The owner rules one declaration, in the manifest.
@@ -300,7 +301,7 @@ Fixture B is the same shape with seven `product` legs, `p1` to `p7`, each with c
   deleted from `a-cheap`'s row it exits 1 naming `a-cheap`.
   Red when: the check compares only one direction.
 - **AC5** — When `python <kit>/pass_legs.py --apply` runs in F over a manifest with no
-  field, committed, `git diff --numstat -- tools/gate-legs.json` reports 2 lines added and 0
+  field, committed, `git diff --numstat -- tools/gate-legs.json` reports 2 lines added and 0 <!-- PINNED 2026-11-12 -->
   deleted, and a second `--apply` leaves `git diff` unchanged.
   Red when: the manifest is re-dumped as JSON, which deletes lines, or a second run inserts a second
   line.
@@ -348,9 +349,9 @@ no ceiling and no ceiling-evidence row changes here.
 
 - **F1 — What is the per-leg cap, `PASS_LEG_CAP_SECONDS`?** The owner asks for a stated cap and
   states no value. At this base the choice barely moves the list: PINNED, measured 2026-11-12, a
-  cap of 60 selects 25 legs at 377.3 s, and 120 or 200 both select 26 at 412.8 s.
+  cap of 60 selects 25 legs at 377.3 s, and 120 or 200 both select 26 at 412.8 s. <!-- PINNED 2026-11-12 -->
   - **60** — a tenth of the budget. It drops `install-prefix (shipped surface)`, 27 reds at 58.2 s
-    evidenced and above 60 s in the ledger.
+    evidenced and above 60 s in the ledger. <!-- PINNED 2026-11-12 -->
   - **120** — a fifth of the budget, and the floor `tools/run-gates/ceiling-margin.txt` already
     uses for headroom. No single leg can take more than a fifth of a pass.
   - **200** — a third of the budget. It admits nothing more today, and lets three legs fill a pass.

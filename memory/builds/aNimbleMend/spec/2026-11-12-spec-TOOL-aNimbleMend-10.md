@@ -53,7 +53,7 @@ verb that grades one commit in seconds.
   TOOL-aNimbleMend-8's.
 - The fix's record and its join, which are TOOL-aNimbleMend-9's.
 - "No new feature" and "no design choice" as such. No reader can tell a feature from a fix inside
-  60 lines of an existing file. L1 and L4 bound what a feature could be, and §4 says what is left
+  60 lines of an existing file. L1 and L4 bound what a feature could be, and §4 says what is left <!-- PINNED 2026-11-12 -->
   unchecked.
 - Calling the verb from a hook or from the run point. This unit ships the verb; no hook is changed
   here.
@@ -167,9 +167,9 @@ hand under a short path in the host temp directory. Its conf is `set_fixture_con
 | Commit | Trailer | Holds | Expected |
 |---|---|---|---|
 | c1 | none | `src/a.txt`, `src/b.txt`, `src/c.txt`, `src/d.txt`, the spec of `TOOL-tFix-1`, `.governance/policy.toml` | not graded by the limits |
-| c2 | `Red-fix: leg one` | 3 lines changed in `src/a.txt` | inside every limit |
+| c2 | `Red-fix: leg one` | 3 lines changed in `src/a.txt` | inside every limit | <!-- PINNED 2026-11-12 -->
 | c3 | `Red-fix: leg one` | one line changed in each of four `src/` files | L1, by paths |
-| c4 | `Red-fix: leg one` | 61 lines changed in `src/a.txt` | L1, by lines |
+| c4 | `Red-fix: leg one` | 61 lines changed in `src/a.txt` | L1, by lines | <!-- PINNED 2026-11-12 -->
 | c5 | `Red-fix: leg one` | one line in `src/a.txt` and one in `.governance/policy.toml` | L2 |
 | c6 | `Red-fix: leg one` | one line in `src/a.txt` and one in the spec | L3 |
 | c7 | `Red-fix: leg one` | adds a fifth file under `src/` | L4 |
@@ -261,13 +261,13 @@ New arm: tools/memory-tree/routed_commits.py · covers AC1 AC2 AC3 AC4 AC5 AC6 A
 
 - **F1 — What is the size bound?** The prompt asks for a stated bound and names none. The measured
   precedents are in §4, "Evidence".
-  - Option A: 3 paths and 60 lines. It admits units 81 and 82 with about a fifth to spare and
+  - Option A: 3 paths and 60 lines. It admits units 81 and 82 with about a fifth to spare and <!-- PINNED 2026-11-12 -->
     sends unit 80 to a spec.
-  - Option B: 5 paths and 120 lines. It doubles the room and still refuses unit 80.
-  - Option C: 12 paths and 450 lines, so that unit 80 would have passed. It bounds almost nothing.
+  - Option B: 5 paths and 120 lines. It doubles the room and still refuses unit 80. <!-- PINNED 2026-11-12 -->
+  - Option C: 12 paths and 450 lines, so that unit 80 would have passed. It bounds almost nothing. <!-- PINNED 2026-11-12 -->
   - Recommendation: A. A fix larger than every single-bar precedent is the case the prompt sends
     through a spec, and a commit that is over can be split per leg.
-  RESOLVED (agent, 2026-11-12, delegated): A, 3 paths and 60 lines. A larger fix is the case the prompt sends through a spec.
+  RESOLVED (agent, 2026-11-12, delegated): A, 3 paths and 60 lines. A larger fix is the case the prompt sends through a spec. <!-- PINNED 2026-11-12 -->
 - **F2 — What stands in for "no new surface"?** A surface cannot be read from a diff, so the gate
   needs a proxy.
   - Option A: no added path under `ROUTED_PATHS`. Deletions pass.

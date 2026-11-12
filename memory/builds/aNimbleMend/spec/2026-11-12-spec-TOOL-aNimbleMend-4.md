@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-12-build-TOOL-aNimbleMend-4-1-acceptance-ledger.md](../build/2026-11-12-build-TOOL-aNimbleMend-4-1-acceptance-ledger.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aNimbleMend-1-brief.md](../prompts/2026-11-12-prompt-TOOL-aNimbleMend-1-brief.md) | research | TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 |
 | [2026-11-12-prompt-TOOL-aNimbleMend-4-build-brief.md](../prompts/2026-11-12-prompt-TOOL-aNimbleMend-4-build-brief.md) | research | — |
 
@@ -300,7 +301,7 @@ New arm: tools/run-gates/run-gates.test.sh · covers AC1 · a control manifest w
   selection and the probe repeats on `--only 21,23`. Liveness: the probe can answer no, as
   `--only 12,25` did at `351 s` (PINNED, §4 "Evidence"). This writer's reading is `78 s` (PINNED,
   the same table), so the recommendation is the row as written at a cap of 120 or more.
-  RESOLVED (agent, 2026-11-12, delegated): the row stands as written. The main loop timed `--only 9,21,23` alone on node a at 66 s on 2026-11-12, under the cap of 120.
+  RESOLVED (agent, 2026-11-12, delegated): the row stands as written. The main loop timed `--only 9,21,23` alone on node a at 66 s on 2026-11-12, under the cap of 120. <!-- PINNED 2026-11-12 -->
 - **FACT-QUESTION · F2 — Does the positional check alone fit the per-leg cap?** No reading of it
   alone exists, and a role agent's hook refuses the command. Probe: the main loop times
   `python tools/playbook/positional.py check` alone on node `a`. Observation: at or under the cap,
@@ -308,7 +309,7 @@ New arm: tools/run-gates/run-gates.test.sh · covers AC1 · a control manifest w
   revision, and "The slow legs" states the exclusion. Liveness: the whole tags leg reads `210.0 s`
   (PINNED, the ceiling evidence), so a reading above the cap is possible. Recommendation: keep the
   row if the reading fits.
-  RESOLVED (agent, 2026-11-12, delegated): the positional row stands. The main loop timed the positional check alone on node a at 29 s on 2026-11-12, under the cap of 120.
+  RESOLVED (agent, 2026-11-12, delegated): the positional row stands. The main loop timed the positional check alone on node a at 29 s on 2026-11-12, under the cap of 120. <!-- PINNED 2026-11-12 -->
 
 ## 9. Revision log
 

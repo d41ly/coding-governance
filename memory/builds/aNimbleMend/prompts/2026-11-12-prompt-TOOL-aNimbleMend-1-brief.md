@@ -63,7 +63,7 @@ Source: `C:/Users/DAILY-~1/AppData/Local/Temp/claude/9d098fb74f3324d9/0394fa33-0
 > 3. **Fast pass legs (feature 2).**
 >    - **Declaration.** Declared once, in `tools/gate-legs.json`, as a per-leg field or tag, never as a second hand-typed list.
 >    - **Budget gate.** The sum of the declared legs' evidenced ceilings (`tools/run-gates/ceiling-evidence.txt`) must stay within
->      600 s, and the gate reds a list that would exceed about 690 s. A pass run that overruns its budget prints the overrun as a
+>      600 s, and the gate reds a list that would exceed about 690 s. A pass run that overruns its budget prints the overrun as a <!-- PINNED 2026-11-12 -->
 >      finding, never silently.
 >    - **Run point.** The main loop, or the builder after its commit (decide which and say why), runs the list scoped to the pass's
 >      diff, with the guards the legs already declare.
@@ -99,7 +99,7 @@ Source: `C:/Users/DAILY-~1/AppData/Local/Temp/claude/9d098fb74f3324d9/0394fa33-0
 >    - **Pinned facts and positional** (`writing_practice.py check pinned-facts`, `positional.py check`) are cheap and redded
 >      several times mid-build. Make them pass legs too, if they are legs, or add them as legs.
 >    - **Too slow for a pass:** spec tokens (905.7 s), the govkit acceptance matrix (1084.3 s), routed commits (636.8 s),
->      pass-order history (282.9 s), straggler-guard arms (184 s), brief-recorded (183.8 s), and the unattended kit gate (2240 s).
+>      pass-order history (282.9 s), straggler-guard arms (184 s), brief-recorded (183.8 s), and the unattended kit gate (2240 s). <!-- PINNED 2026-11-12 -->
 >      State each exclusion. Where a cheap, scoped form of one exists, for example the spec-token check graded only for the
 >      pass's own spec, propose it.
 >    - **Derive, never type.** The red counts and seconds above are evidence, not the list. Derive the list from the gate ledger
@@ -140,7 +140,7 @@ Source: `C:/Users/DAILY-~1/AppData/Local/Temp/claude/9d098fb74f3324d9/0394fa33-0
 >   - the after-the-fact record is written and joined;
 >   - a product write that answers no red is still refused by the write gate.
 > - With `pass.fast_legs` on:
->   - one unit pass runs the declared list in at most 690 s on node a;
+>   - one unit pass runs the declared list in at most 690 s on node a; <!-- PINNED 2026-11-12 -->
 >   - the list excludes the unattended kit gate, every self-test and every leg over the per-leg cap;
 >   - a budget gate reds a list planted over the budget.
 > - With either switch off, the lane or the pass legs are absent, and the old behaviour holds byte for byte.
@@ -153,12 +153,12 @@ Source: `C:/Users/DAILY-~1/AppData/Local/Temp/claude/9d098fb74f3324d9/0394fa33-0
 ## The brief
 
 ### Goal
-Two mechanisms, each behind a policy key that defaults on in every repository: a red bar leg or pass leg is fixed inline with no spec and its typed record written afterwards, and every unit pass is followed by a declared list of fast gate legs held to 600 s, 690 s at most. Every other product change stays spec-first, and the full bar still runs once, at the close.
+Two mechanisms, each behind a policy key that defaults on in every repository: a red bar leg or pass leg is fixed inline with no spec and its typed record written afterwards, and every unit pass is followed by a declared list of fast gate legs held to 600 s, 690 s at most. Every other product change stays spec-first, and the full bar still runs once, at the close. <!-- PINNED 2026-11-12 -->
 
 ### Items
 1. Two policy keys in the policy kit's catalogue, both default on, one per mechanism, named through the lexicon and the catalogue's key grammar [planned TOOL-aNimbleMend-1]
 2. The pass-leg list declared once, as a field on a leg's row in `tools/gate-legs.json`, derived from the gate ledger and the ceiling evidence by a recorded rule of red frequency per second inside the budget [planned TOOL-aNimbleMend-2]
-3. A budget gate: the declared legs' evidenced ceilings sum to 600 s at most and red past 690 s, with a stated per-leg cap, and the unattended kit gate, every self-test leg and chunk and the e2e chunk excluded for good [planned TOOL-aNimbleMend-3]
+3. A budget gate: the declared legs' evidenced ceilings sum to 600 s at most and red past 690 s, with a stated per-leg cap, and the unattended kit gate, every self-test leg and chunk and the e2e chunk excluded for good [planned TOOL-aNimbleMend-3] <!-- PINNED 2026-11-12 -->
 4. Memory hygiene in a scoped form, pinned facts and positional as pass legs, each measured, and a scoped spec-token check proposed for the pass's own spec; every leg too slow for a pass has its exclusion stated [planned TOOL-aNimbleMend-4]
 5. A runner for the declared list over the pass's diff, with the guards the legs already declare, that records its run and prints a budget overrun as a finding [planned TOOL-aNimbleMend-5]
 6. The gate guard and the scratch guard admit exactly the pass legs during a pass, and nothing else [planned TOOL-aNimbleMend-6]
@@ -172,7 +172,7 @@ Two mechanisms, each behind a policy key that defaults on in every repository: a
 
 ### Acceptance
 - With both keys at their defaults, in a scratch adopter and in gov: a planted red on a fast leg is fixed through the lane with no spec, its record is written and joined, and a product write that answers no red is still refused by the write gate.
-- With the pass-leg key on: one unit pass runs the declared list in at most 690 s on node a, the list holds no unattended kit gate, no self-test and no leg over the per-leg cap, and the budget gate reds a list planted over the budget.
+- With the pass-leg key on: one unit pass runs the declared list in at most 690 s on node a, the list holds no unattended kit gate, no self-test and no leg over the per-leg cap, and the budget gate reds a list planted over the budget. <!-- PINNED 2026-11-12 -->
 - With either key off, the lane or the pass legs are absent and the earlier behaviour holds byte for byte.
 - Every new gate has been seen red.
 

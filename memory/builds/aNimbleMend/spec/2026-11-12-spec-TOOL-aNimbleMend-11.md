@@ -206,7 +206,7 @@ legs run after the pass's commit, at the main loop. M6's closed set of pass kind
 inline fix is a commit the main loop or a product-writing role makes between passes, and the
 method points at the protocol for it, as M1 requires of anything a carrier states.
 
-**The bytes.** With both replacements the render measures 30709 bytes CR-stripped and 367 lines
+**The bytes.** With both replacements the render measures 30709 bytes CR-stripped and 367 lines <!-- PINNED 2026-11-12 -->
 (PINNED, 2026-11-12, both replacements applied in memory to the render at 91ca33f2). The first
 alone measures 30730, which is over the row, so the two land together.
 
@@ -305,7 +305,7 @@ No switch. The documents describe mechanisms that are on by default.
 
 - **Raising the method's budget.** Its row's block reserves the next movement to the owner and M3
   puts M1's budget outside a run's delegation, so no run may make it. The two replacements fit
-  with 11 bytes to spare.
+  with 11 bytes to spare. <!-- PINNED 2026-11-12 -->
 - **Stating both mechanisms in full in the method.** M1 forbids a rule stated both there and in a
   carrier it points at, and the bytes are not there. The method points, the protocol states.
 - **A new protocol section 14.** Section 12 is the section about what happens between passes, and
@@ -321,7 +321,7 @@ No switch. The documents describe mechanisms that are on by default.
 
 - security — No write path, hook or input boundary. The lane page states what the lane does not
   check, so a reader does not take the lane for a proof that a fix was needed.
-- perf / scale — The method grows 50 bytes and the protocol about 700, each read whole by a run at
+- perf / scale — The method grows 50 bytes and the protocol about 700, each read whole by a run at <!-- PINNED 2026-11-12 -->
   its own boundary.
 - error / empty / loading states — A page section whose subject the tree does not hold at the pass
   is left out and returned as a gap, never written from this spec's reading of a sibling.

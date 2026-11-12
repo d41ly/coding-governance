@@ -209,7 +209,7 @@ for a commit with no id.
 Each is executed by a case through an installed copy or the clone, which `check_guard_trace`
 cannot see, and none is in the guard at 97e0841d. `check_guard_lines` requires each to be tracked,
 which units 2 and 5 make true before this unit builds. The bar runner is not added: it is the
-adapter's engine, every bar already runs it, and guarding this 644 s leg on it would run the leg
+adapter's engine, every bar already runs it, and guarding this 644 s leg on it would run the leg <!-- PINNED 2026-11-12 -->
 on every runner edit.
 
 ### What it does not check
@@ -272,7 +272,7 @@ No switch. The cases run where the `policy fixtures` leg runs, which is gov's ba
   the tree lacks is a WRONG line naming it. A case that asserts nothing is a WRONG, as the suite's
   count line requires.
 - observability — One `policy-fixture:` line per step, each with what it observed.
-- risks — The leg's budget row is 970 s. If the two cases take the leg past it, the row is
+- risks — The leg's budget row is 970 s. If the two cases take the leg past it, the row is <!-- PINNED 2026-11-12 -->
   re-measured by its file's own rule at the close. The conf keys an installed adopter needs for
   the write gate and the grader are written by the case, and a key this spec did not foresee is
   the builder's to add and to name in the ledger.
@@ -375,8 +375,8 @@ New arm: tools/policy/check_policy.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · the l
     the grader and the record run under gov's own conf, role index, policy file and prefix, in
     about a minute. Gov's real list is read at the close by AC9 and timed by AC10.
   - **B, gov's declared list plus the planted row.** Every pass of the fixtures leg then runs the
-    whole list, about 400 s by TOOL-aNimbleMend-2's reading, twice, inside a leg budgeted at
-    970 s, and any real leg red in the clone for its own reason turns the case WRONG.
+    whole list, about 400 s by TOOL-aNimbleMend-2's reading, twice, inside a leg budgeted at <!-- PINNED 2026-11-12 -->
+    970 s, and any real leg red in the clone for its own reason turns the case WRONG. <!-- PINNED 2026-11-12 -->
   - Recommendation: A.
   RESOLVED (agent, 2026-11-12, delegated): A, one planted row. Gov's real list is read and timed at the close.
 

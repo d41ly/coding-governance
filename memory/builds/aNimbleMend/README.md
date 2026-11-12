@@ -23,7 +23,7 @@ list of fast legs run after every pass. The prompt is recorded under `prompts/`.
 
 - A red bar leg or pass leg is fixed with no spec, and a typed record follows it.
 - Every other product write still needs its specced unit.
-- Each pass runs the declared fast legs inside 600 s, 690 s at most.
+- Each pass runs the declared fast legs inside 600 s, 690 s at most. <!-- PINNED 2026-11-12 -->
 - The list is derived from the gate ledger by a recorded rule, and a gate reds one over budget.
 - Either switch off restores today's behaviour.
 
@@ -58,7 +58,7 @@ None.
 |---|---|---|
 | 1 | `TOOL-aNimbleMend-1` | the two policy keys, default on, with the reader each mechanism asks before it acts |
 | 2 | `TOOL-aNimbleMend-2` | the pass-leg declaration, a field on a leg's row in the leg manifest, written by a derivation over the gate ledger and the ceiling evidence under a recorded rule |
-| 3 | `TOOL-aNimbleMend-3` | the budget gate: the declared legs' evidenced ceilings sum to 600 s at most, red past 690 s, with a per-leg cap and the excluded classes refused |
+| 3 | `TOOL-aNimbleMend-3` | the budget gate: the declared legs' evidenced ceilings sum to 600 s at most, red past 690 s, with a per-leg cap and the excluded classes refused | <!-- PINNED 2026-11-12 -->
 | 4 | `TOOL-aNimbleMend-4` | the scoped legs a pass can afford: memory hygiene in its staged or `--only` form, pinned facts and positional, and the spec-token check for the pass's own spec |
 | 5 | `TOOL-aNimbleMend-5` | the pass-leg runner: the declared list run over the pass's diff with each leg's own guard, its run record, and an overrun printed as a finding |
 | 6 | `TOOL-aNimbleMend-6` | the hooks: the gate guard and the scratch guard admit the pass-leg runner during a pass, and nothing else |
@@ -91,7 +91,7 @@ ids TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 
 | [TOOL-aNimbleMend-12 — the acceptance suite: one pass-leg run and one inline fix, end to end, in a scratch adopter and in a clone of gov, with each switch on and off](spec/2026-11-12-spec-TOOL-aNimbleMend-12.md) | 12 | 2 | SPECCED | rev-2 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 13 bound to this build, across 2 record folder(s).
+Records: 16 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

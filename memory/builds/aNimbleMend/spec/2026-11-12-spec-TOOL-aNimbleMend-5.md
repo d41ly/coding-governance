@@ -258,7 +258,7 @@ bar on the host.
   Red when: a key is missing, a failed leg reads `ok`, or the adapter exits 0 over a red runner.
   figure: 2 is DERIVED from the fixture manifest.
 - **AC6** — When the fixture's copy of `pass_legs.py` and of the limit's declaration state a budget
-  of 1 second and a limit of 2, and `alpha` sleeps 4 seconds, the command prints one line opening
+  of 1 second and a limit of 2, and `alpha` sleeps 4 seconds, the command prints one line opening <!-- PINNED 2026-11-12 -->
   `pass-legs: FINDING overrun`, the record's `over` reads `limit`, and the exit code is still 0. With a limit of 600 the same run prints no
   `FINDING overrun` line and one `pass-legs: NOTE` line.
   Red when: the wall time is not compared, or a finding changes the exit code.
@@ -291,20 +291,20 @@ The arm for AC4 is TOOL-aNimbleMend-12's, whose scratch adopter holds the policy
 ## 8. Open questions
 
 - **F1 — Does a pass-leg run take the host turnstile?** The turnstile admits one bar per host at a
-  time, and this run's record states a gate backstop that allows 7200 s of queue. A pass-leg run
-  that queues behind another worktree's bar cannot meet 690 s by any design of its legs.
+  time, and this run's record states a gate backstop that allows 7200 s of queue. A pass-leg run <!-- PINNED 2026-11-12 -->
+  that queues behind another worktree's bar cannot meet 690 s by any design of its legs. <!-- PINNED 2026-11-12 -->
   - **Queue as a bar does.** No runner knob is set. Two gate runs never overlap on the host. The
     wall time of S6 then includes the wait, so nearly every run on a busy node prints the overrun
-    finding, and the build's 690 s acceptance is not observable there.
+    finding, and the build's 690 s acceptance is not observable there. <!-- PINNED 2026-11-12 -->
   - **Run beside the bar.** The adapter sets `GATE_TURNSTILE=0`. The run starts at once and its
     wall time is its legs' time. It overlaps a queued bar's legs, the contention the turnstile's
     own comment measured for whole bars, here for at most the budget's ten minutes.
   - **Queue, and time the legs only.** No knob is set, and `wall_s` is read from the runner's
     record rather than the adapter's clock. The finding is true to the legs, and the pass still
     waits for however long the queue is.
-  Recommendation: run beside the bar. It is the only option under which the 690 s criterion can be
+  Recommendation: run beside the bar. It is the only option under which the 690 s criterion can be <!-- PINNED 2026-11-12 -->
   observed on a shared node, and it needs one existing knob.
-  RESOLVED (agent, 2026-11-12, delegated): run beside the bar. It is the one option under which the build's 690 s criterion can be observed on a shared node, and it uses a knob the runner already has.
+  RESOLVED (agent, 2026-11-12, delegated): run beside the bar. It is the one option under which the build's 690 s criterion can be observed on a shared node, and it uses a knob the runner already has. <!-- PINNED 2026-11-12 -->
 
 ## 9. Revision log
 
