@@ -29,3 +29,9 @@ anchor-ref: refs/heads/main
 base: 1265772cc365418ac6431a7f0f9e069f3bb79dc0
 
 ## Parked
+
+2026-11-12T14:35:41Z dispatch · item 5484178a TOOL-aNimbleMend-1 · reason tools/policy/catalogue.toml tools/policy/README.md .governance/policy.json memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-1.md
+
+2026-11-12T14:35:43Z brief · item TOOL-aNimbleMend-1 · reason 1cbf0ffc957c memory/builds/aNimbleMend/prompts/2026-11-12-prompt-TOOL-aNimbleMend-1-build-brief.md
+
+2026-11-12T14:38:27Z dispatch · item 5484178a TOOL-aNimbleMend-1 · reason tools/policy/catalogue.toml tools/policy/README.md .governance/policy.json memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-1.md

@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-1 — two policy keys, default on, and the ask each mechanism makes before it acts
 
-**Status:** SPECCED · rev-1 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 1
+**Status:** INPROGRESS · rev-1 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
