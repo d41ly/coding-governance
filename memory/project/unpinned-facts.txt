@@ -12107,7 +12107,7 @@ memory/builds/dOrderedCharter/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packe
 memory/builds/dOrderedCharter/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	44 rows
 memory/builds/dOrderedCharter/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	551 KB
 memory/builds/dOrderedCharter/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	64 B
-memory/builds/dOrderedCharter/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	77 specs
+memory/builds/dOrderedCharter/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	78 specs
 memory/builds/dOrderedCharter/prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-4-spec-writer.md	30 s
 memory/builds/dOrderedCharter/prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-4-spec-writer.md	32 KiB
 memory/builds/dOrderedCharter/prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-4-spec-writer.md	64 B
@@ -15147,3 +15147,6 @@ memory/map/features/row-grammar.md	137 rows
 memory/map/features/runlog.md	100,000 lines
 memory/map/features/unattended-mandate.md	2 bytes
 memory/map/generated/CARDS.md	1024 bytes
+memory/builds/dOrderedCharter/spec/2026-11-12-spec-PLAY-dOrderedCharter-86.md	0 lines
+memory/builds/dOrderedCharter/spec/2026-11-12-spec-PLAY-dOrderedCharter-86.md	25 legs
+memory/builds/dOrderedCharter/spec/2026-11-12-spec-PLAY-dOrderedCharter-86.md	508 files
