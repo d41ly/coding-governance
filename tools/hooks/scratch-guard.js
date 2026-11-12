@@ -103,18 +103,23 @@
  * that role's type. It grades two write classes; `none`, `review` and `records` are declared in the
  * index and read by nothing here.
  *
- * THE RED-FIX LANE (TOOL-aNimbleMend-8). A product write the route arm or the role arm is about to
- * refuse is admitted, with one witness line, while the gate ledger under the worktree's own git dir
- * (`gate-ledger.tsv`, written by the bar runner and by a pass-leg run) records a leg `fail` or
- * `timeout` and the policy key `bar.inline-red-fixes` reads `on`, or no policy kit resolves. The
- * writer is the main loop or a role declaring `writes = product`; any other writer, a broken role
- * index, the key `off`, a refused key read and any other value each leave the refusal standing.
- * `readOpenReds` reads the ledger, `checkRedLane` is the decision, and the commit owes a
- * `Red-fix: <leg>` trailer beside `Pass: none`, which the commit grader reads. A spec write never
- * reaches it. WHAT THE LANE DOES NOT CHECK: whether the write fixes the red, since any product path
- * is admitted while any leg is open; whether a red no run has re-measured is still red, since a row
- * stands until the runner next records that leg; and a ledger edited by hand, which is read like
- * the runner's.
+ * THE RED-FIX LANE (TOOL-aNimbleMend-8, bounded by TOOL-aNimbleMend-14). A product write the route
+ * arm or the role arm is about to refuse is admitted, with one witness line, while the gate ledger
+ * under the worktree's own git dir (`gate-ledger.tsv`, written by the bar runner and by a pass-leg
+ * run) holds an OPEN red and the policy key `bar.inline-red-fixes` reads `on`, or no policy kit
+ * resolves. A row is an open red when it has the nine-field form with status `fail` or `timeout`,
+ * names a leg of the manifest the conf key `LEG_MANIFEST` names, and its head field is `HEAD` or an
+ * ancestor of `HEAD` the landed revision does not reach: the runner carries old rows forward, so a
+ * row is bounded by its own head. A blank `LEG_MANIFEST` closes the lane. The writer is the main
+ * loop or a role declaring `writes = product`; any other writer, a broken role index, the key
+ * `off`, a refused key read and any other value each leave the refusal standing. `readOpenReds`
+ * reads the ledger, `checkRedLane` is the decision, and the commit owes a `Red-fix: <leg>` trailer
+ * beside `Pass: none`, which the commit grader reads. A spec write never reaches it. WHAT THE LANE
+ * DOES NOT CHECK: whether the write fixes the red, since any product path is admitted while any row
+ * is open; whether the tree the run graded was clean, since a run over a dirty tree stamps `HEAD`;
+ * whether a later commit of the branch already fixed the red, since a row at an unlanded ancestor
+ * stays open until a run measures its leg again or the branch lands; and a ledger edited by hand
+ * or a manifest edited in the working tree, each read like the runner's.
  *
  * THE FOURTH CHECK: THE ROLE-GATE ARM (TOOL-aOrientedCast-11). Gates are the main session's, at the
  * merge or push threshold. On a Bash or PowerShell payload carrying an `agent_type`, AFTER the
@@ -1165,21 +1170,66 @@ function checkRoleWrite(cls, index, w) {
 const GATE_LEDGER_FILE = 'gate-ledger.tsv'
 
 /**
- * S1: the names of the legs the gate ledger under `gitDir` records red, in ledger order. A row is
- * tab-separated, its first field the leg name and its third the status; `fail` and `timeout` are
- * red, `ok`, `retried` and any other status are not, and a row with fewer than three fields is
- * skipped. An absent, empty or unreadable ledger, and an empty `gitDir`, is the empty list.
+ * The names of the legs the gate ledger under `gitDir` records red ON THIS BRANCH'S PRESENT STATE,
+ * in ledger order (TOOL-aNimbleMend-14). The runner carries forward every row a run did not
+ * measure, so a row is bounded by its own head field, never by its status alone. A row is open
+ * when all four hold, tested in this order:
+ *  - form: nine or more tab-separated fields, the third `fail` or `timeout`. A legacy five-field
+ *    row, a short row and an `ok` or `retried` row are not open.
+ *  - head shape: the ninth field is a full hex sha.
+ *  - manifest: the first field is the `name` of a row of the JSON list the conf key `LEG_MANIFEST`
+ *    of `<top>/.memory-tree.conf` names, read from the working tree. No `chunk`, `subject` or
+ *    `pass_leg` is tested, so a held leg stays eligible.
+ *  - head place: the ninth field is `HEAD` of `top`, or a commit `git rev-list HEAD --not <landed>`
+ *    prints there, `<landed>` being the policy helper's `readLandedRevision(top)`. The landed read
+ *    and the `rev-list` run only where a candidate's head differs from `HEAD`.
+ * Every failure closes the lane and none throws: an empty `gitDir` or `top`, an absent or unreadable
+ * ledger, a blank or absent key, a manifest that is unreadable, unparsable or no list, and an
+ * unreadable `HEAD` each answer the empty list; no policy helper, a refused landed read and a failed
+ * `rev-list` leave only the rows at `HEAD` open.
  */
-function readOpenReds(gitDir) {
-  if (!gitDir) return []
+function readOpenReds(gitDir, top) {
+  if (!gitDir || !top) return []
+  const fs = require('fs')
+  const path = require('path')
   let text
-  try { text = require('fs').readFileSync(require('path').join(gitDir, GATE_LEDGER_FILE), 'utf8') } catch { return [] }
-  const reds = []
+  try { text = fs.readFileSync(path.join(gitDir, GATE_LEDGER_FILE), 'utf8') } catch { return [] }
+  let rows = []
   for (const l of text.split('\n')) {
+    // Split on the tab and count: the row's empty fields are kept, so the head stays the ninth.
     const f = l.replace(/\r$/, '').split('\t')
-    if (f.length >= 3 && (f[2] === 'fail' || f[2] === 'timeout')) reds.push(f[0])
+    if (f.length >= 9 && (f[2] === 'fail' || f[2] === 'timeout') && /^[0-9a-f]{40,64}$/.test(f[8])) rows.push({ name: f[0], head: f[8] })
   }
-  return reds
+  if (rows.length === 0) return []
+  let legs
+  try {
+    const rel = (readConfKey(fs.readFileSync(path.join(top, ROUTE_CONF), 'utf8'), 'LEG_MANIFEST') || '').trim()
+    if (!rel) return []
+    const doc = JSON.parse(fs.readFileSync(path.join(top, buildNativePath(rel)), 'utf8'))
+    if (!Array.isArray(doc)) return []
+    legs = new Set(doc.map((r) => (r && typeof r === 'object' ? r.name : null)).filter((n) => typeof n === 'string'))
+  } catch { return [] }
+  rows = rows.filter((r) => legs.has(r.name))
+  if (rows.length === 0) return []
+  const { spawnSync } = require('child_process')
+  const runGit = (args) => {
+    try { return spawnSync('git', args, { cwd: top, encoding: 'utf8', timeout: 20000, windowsHide: true }) } catch { return { status: 1, stdout: '' } }
+  }
+  const h = runGit(['rev-parse', '--verify', '-q', 'HEAD'])
+  const head = h.status === 0 ? String(h.stdout || '').trim() : ''
+  if (!head) return []
+  const unlanded = new Set()
+  if (rows.some((r) => r.head !== head)) {
+    try {
+      const helper = require('./agent-cap.js').resolvePolicyHelper()
+      const landed = helper && fs.existsSync(helper) ? require(helper).readLandedRevision(top) : ''
+      if (/^[0-9a-f]{40,64}$/.test(landed)) {
+        const r = runGit(['rev-list', 'HEAD', '--not', landed])
+        if (r.status === 0) for (const sha of String(r.stdout || '').split(/\r?\n/)) if (sha) unlanded.add(sha)
+      }
+    } catch { unlanded.clear() }
+  }
+  return rows.filter((r) => r.head === head || unlanded.has(r.head)).map((r) => r.name)
 }
 
 /**
@@ -1236,8 +1286,10 @@ function checkRedLane(w) {
  *     deny. The route arm runs first and never instead: a builder with no buildable route meets
  *     step 7, 8 or 9b's refusal word for word.
  * 10. the red-fix lane (TOOL-aNimbleMend-8), on a product-class refusal from step 7, 8, 9b or 9a
- *     and on nothing else: read the lane key `bar.inline-red-fixes`, then the gate ledger
- *     (readOpenReds), then return checkRedLane's witness, or the refusal as composed. A key read that
+ *     and on nothing else: read the lane key `bar.inline-red-fixes`, then the gate ledger's open
+ *     reds (readOpenReds over the worktree's git dir and toplevel: a row counts only at `HEAD` or at
+ *     an unlanded ancestor of it, for a leg of `LEG_MANIFEST`, TOOL-aNimbleMend-14), then return
+ *     checkRedLane's witness, or the refusal as composed. A key read that
  *     refused or answered another value appends its one line to the refusal; under `off` the refusal
  *     is byte for byte the one composed. An admitted write and every non-product write read neither.
  * No `agent_id` exemption: a subagent's write is judged by the same order (S7).
@@ -1333,7 +1385,7 @@ function checkRouted(data, env) {
       try { m = /gitdir:\s*(.+)/.exec(fs.readFileSync(mine.hit.gitPath, 'utf8')) } catch { m = null }
       gitDir = m ? path.resolve(top, m[1].trim()) : ''
     }
-    const admit = checkRedLane({ agentType, index: loadRoleIndex(top), lane, reds: readOpenReds(gitDir) })
+    const admit = checkRedLane({ agentType, index: loadRoleIndex(top), lane, reds: readOpenReds(gitDir, top) })
     if (admit) return admit
     return !lane.on && lane.why ? { deny: `${verdict.deny}${lane.why}\n` } : verdict
   }

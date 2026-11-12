@@ -29,9 +29,19 @@ It then prints one witness line naming the open legs and what the commit owes:
 red-fix lane admits this write — open red leg(s): <leg>; its commit owes a `Red-fix: <leg>` trailer beside `Pass: none`
 ```
 
-The lane closes when the leg next runs green: a ledger row stands until the runner next records
-that leg, and the gate itself writes nothing to the ledger. A spec write never reaches the lane,
-and a broken role index closes it.
+A red row is open only on this branch's present state. The runner carries forward every row a run
+did not measure, so the gate bounds a row by the row's own head field, and counts it when all of
+these hold:
+
+- the row has the runner's nine-field form, which an older five-field row does not;
+- its name is a leg of the manifest the conf key `LEG_MANIFEST` names, and a blank key closes the
+  lane;
+- its head is `HEAD`, or an ancestor of `HEAD` that the landed revision does not reach.
+
+So the lane stays open across the fix commit, and closes when a run records the leg green or the
+branch lands. A leg a pass-leg run holds stays eligible: a full bar's red at `HEAD` opens the
+lane. The gate itself writes nothing to the ledger. A spec write never reaches the lane, and a
+broken role index closes it.
 
 ## What the commit owes
 
@@ -141,8 +151,10 @@ one line saying why. [The policy file](policy.md) says how a key is set and read
   and it bounds nothing: the limits are the commit grader's.
 - Whether the named leg was ever red. The gate ledger is per clone and untracked, so the commit
   grader reads none, and a trailer naming a real leg passes.
-- Whether a red that no run has re-measured is still red, or a ledger edited by hand, which is
-  read like the runner's.
+- Whether a later commit of the branch already fixed the red: a row at an unlanded ancestor of
+  `HEAD` stays open until a run measures its leg again or the branch lands. Nor whether the tree
+  the run graded was clean, nor a ledger edited by hand or a manifest edited in the working tree,
+  each read as it stands.
 - The limits do not see whether the change is a fix, a new surface made inside an existing file, a
   deleted path, a record outside `spec/`, or a guarded list the fix commit itself shortened.
 - The join does not check that the record is the fix's direct child, that `Rerun` or `Red line` is

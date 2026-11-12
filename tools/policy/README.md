@@ -23,7 +23,7 @@ its three neighbours but one shape (TOOL-dGroundRules-6), and later units re-poi
 | `unsummarised-keys.txt` | GENERATED, shrink-only: the rows with no `summary` or no `usage` |
 | `legacy-homes.txt` | GENERATED, shrink-only: one row per key a legacy policy home holds, with its mark (TOOL-dGroundRules-7); gov's own, withheld from installs by a `project-owned` rule in `kit.toml` (TOOL-dGroundRules-17) |
 | `policy.py` | the module: `load_catalogue`, `read_catalogue_row`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, the inlined `resolve_compare_base`, `resolve_kit_dir` and `GIT_ENV_LEAKS`, the one blob reader `read_blob_at`, the reader `resolve` over `read_revision` and `resolve_read`, the file's one judge `validate`, the mirror's `render_mirror`, the legacy homes' `derive_legacy_homes` and `check_legacy_homes`, the census tree's `derive_census_tree` over the registry search `derive_registry_tree`, and the legacy list's one grading rule `check_legacy_graded`, and the `lists` (`cmd_lists`), `scaffold`, `get`, `check`, `mirror` and `settings` verbs |
-| `policy-mirror.js` | the mirror's one reader, for hooks: `readPolicy` and its `get` CLI |
+| `policy-mirror.js` | the mirror's one reader, for hooks: `readPolicy` and its `get` CLI, and `readLandedRevision(top)`, the landed revision's full sha as the shim's `landed` prints it |
 | `policy-shim.sh` | the helper's shell half: the landed revision, and the reader under a resolved launcher |
 | `guard.py` | the minimal guard: `guard.py --staged`, the verdict over an agent's staged change to a guarded path |
 | `guarded-paths.txt` | the one spelling of the guarded set, read at HEAD by `guard.py` and the pre-commit hook |

@@ -1217,13 +1217,35 @@ fi
 # `off`; a branch that does not exist is a refused read. Every arm ABOVE ran with that variable as
 # the caller left it. Against the hook at 1d010f40 the L-AC1 and L-AC3 rows fail (no readOpenReds, no
 # checkRedLane) and each exit-0 row below exits 2; the exit-2 rows are their near-misses.
+# A row is an open red only when its own head places it on the branch's present state
+# (TOOL-aNimbleMend-14): nine fields, a leg of the conf's LEG_MANIFEST, and a head that is HEAD or
+# an ancestor of HEAD the landed revision does not reach. So the worktree's conf gains LEG_MANIFEST
+# for this block, a manifest names the legs, and the worktree gains two commits above the landed
+# tip: SG_C0 is the landed tip, SG_C1 the unlanded ancestor, SG_C2 the HEAD and SG_C3 a commit on
+# another line of history. The block's last lines put the conf and the worktree's HEAD back.
 SG_WT_GITDIR=$(unset GIT_DIR GIT_WORK_TREE; git -C "$SGWT" rev-parse --absolute-git-dir)
 SG_LEDGER="$SG_WT_GITDIR/gate-ledger.tsv"
-# write_ledger <leg name>=<status> ... — a gate ledger of nine-field rows, one per argument.
+sg_lane_base=$(git -C "$SGWT" rev-parse HEAD)
+SG_C0=$(git -C "$SGFIX" rev-parse HEAD)
+SG_C3=$($SGGIT -C "$SGFIX" commit-tree "$SG_C0^{tree}" -p "$SG_C0" -m 'the lane fixture: another line of history')
+$SGGIT -C "$SGWT" commit -q --allow-empty -m 'the lane fixture: an unlanded ancestor'
+SG_C1=$(git -C "$SGWT" rev-parse HEAD)
+$SGGIT -C "$SGWT" commit -q --allow-empty -m 'the lane fixture: the head'
+SG_C2=$(git -C "$SGWT" rev-parse HEAD)
+cp "$SG_CONF" "$TMP/lane-conf.bak"
+printf 'LEG_MANIFEST="sg-legs.json"\n' >> "$SG_CONF"
+printf '[{"name":"leg one"},{"name":"leg two"},{"name":"leg three"},{"name":"leg four"},{"name":"held leg","chunk":"selftests"}]\n' > "$SGWT/sg-legs.json"
+# write_ledger <leg name>=<status>[@<head>] ... — a gate ledger of nine-field rows, one per argument.
+# The head is the ninth field: SG_C2, the worktree's HEAD, where the argument names none, and EMPTY
+# for a bare trailing `@`.
 write_ledger() {
-  local r
+  local r st
   : > "$SG_LEDGER"
-  for r in "$@"; do printf '%s\t1\t%s\tk\tt\tr\t0\tb\th\n' "${r%%=*}" "${r#*=}" >> "$SG_LEDGER"; done
+  for r in "$@"; do
+    st=${r#*=}
+    case "$st" in *@*) ;; *) st="$st@$SG_C2" ;; esac
+    printf '%s\t1\t%s\tk\tt\tr\t0\tb\t%s\n' "${r%%=*}" "${st%%@*}" "${st#*@}" >> "$SG_LEDGER"
+  done
 }
 sg_blob=$(printf '[bar]\ninline-red-fixes = "off"\n' | git -C "$SGFIX" hash-object -w --stdin)
 sg_tree=$(printf '100644 blob %s\tpolicy.toml\n' "$sg_blob" | git -C "$SGFIX" mktree)
@@ -1233,10 +1255,10 @@ SG_LANE_ON=$(git -C "$SGFIX" symbolic-ref --short HEAD)
 write_ledger "leg one=fail" "leg two=ok" "leg three=timeout" "leg four=retried"
 printf 'a name alone\n' >> "$SG_LEDGER"
 mkdir -p "$TMP/lane-empty"
-sg_reds=$(node -p "JSON.stringify(require(process.argv[1]).readOpenReds(process.argv[2]))" "$HOOK" "$SG_WT_GITDIR" 2>&1)
+sg_reds=$(node -p "JSON.stringify(require(process.argv[1]).readOpenReds(process.argv[2], process.argv[3]))" "$HOOK" "$SG_WT_GITDIR" "$SG_CWD_WT" 2>&1)
 if [ "$sg_reds" = '["leg one","leg three"]' ]; then echo "ok   L-AC1 readOpenReds reads fail and timeout rows in ledger order, and skips ok, retried and a short row"; pass=$((pass+1))
 else echo "FAIL L-AC1 readOpenReds over the fixture ledger printed: $sg_reds"; fail=$((fail+1)); fi
-sg_reds=$(node -p "JSON.stringify(require(process.argv[1]).readOpenReds(process.argv[2]))" "$HOOK" "$TMP/lane-empty" 2>&1)
+sg_reds=$(node -p "JSON.stringify(require(process.argv[1]).readOpenReds(process.argv[2], process.argv[3]))" "$HOOK" "$TMP/lane-empty" "$SG_CWD_WT" 2>&1)
 if [ "$sg_reds" = '[]' ]; then echo "ok   L-AC1 readOpenReds over a directory holding no ledger is the empty list"; pass=$((pass+1))
 else echo "FAIL L-AC1 readOpenReds over a directory holding no ledger printed: $sg_reds"; fail=$((fail+1)); fi
 export GOV_DEFAULT_BRANCH="$SG_LANE_ON"
@@ -1244,6 +1266,24 @@ run_write "L-AC2 the key on, a red open, the main loop, an unrouted card -> allo
 write_ledger "leg two=ok" "leg four=retried"
 run_write "L-AC2 the key on, no red open -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
 cp "$TMP/err" "$TMP/lane-composed.err"
+# The arm class "a carried-forward ledger row never opens the lane" (TOOL-aNimbleMend-14): the runner
+# carries forward every row a run did not measure, so each row below is one a bound closes, sent
+# through the real hook, and the last two are their near-misses. With the bound-free row test
+# restored in the hook each of the five refusal arms exits 0.
+write_ledger "leg one=fail@"
+run_write "L14 a fail row with an empty head -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+write_ledger "leg one=fail@$SG_C0"
+run_write "L14 a fail row whose head is a landed commit -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+write_ledger "leg gone=fail"
+run_write "L14 a fail row at HEAD for a leg absent from the manifest -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+printf 'leg one\t1\tfail\tk\tt\n' > "$SG_LEDGER"
+run_write "L14 a legacy five-field fail row -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+write_ledger "leg one=fail@$SG_C3"
+run_write "L14 a fail row whose head is on another line of history -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+write_ledger "held leg=fail"
+run_write "L14 a held leg redded at HEAD -> allow, the witness naming the leg" 0 "one;;red-fix lane;;held leg" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+write_ledger "leg one=fail@$SG_C1"
+run_write "L14 a fail row at an unlanded ancestor of HEAD -> allow, the witness naming the leg" 0 "one;;red-fix lane;;leg one" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
 write_ledger "leg one=fail"
 export GOV_DEFAULT_BRANCH=sg-lane-off
 run_write "L-AC2 the key off, a red open -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
@@ -1262,7 +1302,9 @@ write_roles broken
 run_edit "L-AC2 a broken role index, the main loop, a red open -> deny with the ## route refusal" 2 "any;;## route" Write "$SG_T" - session_id=sgtest-r6 "cwd=$SG_CWD_WT"
 write_roles absent
 unset GOV_DEFAULT_BRANCH
-rm -f "$SG_LEDGER"
+rm -f "$SG_LEDGER" "$SGWT/sg-legs.json"
+cp "$TMP/lane-conf.bak" "$SG_CONF"
+git -C "$SGWT" reset -q --soft "$sg_lane_base"
 sg_lane_at=$(node -p "const t = String(require(process.argv[1]).checkRouted); const s = t.indexOf(\"checkRoleWrite('spec'\"); s >= 0 && t.indexOf('checkRedLane') > s" "$HOOK" 2>&1)
 if [ "$sg_lane_at" = true ]; then echo "ok   L-AC3 checkRouted asks checkRedLane, and only after the spec class has returned"; pass=$((pass+1))
 else echo "FAIL L-AC3 checkRouted does not ask checkRedLane after the spec class returns ($sg_lane_at)"; fail=$((fail+1)); fi
@@ -1604,8 +1646,10 @@ n=$((pass+fail))
 # 1 for AC2), counted by hand under the same rule.
 # 347 = 333 + the 14 red-fix lane rows TOOL-aNimbleMend-8 added (2 for AC1, 10 for AC2 and 2 for AC3),
 # counted by hand under the same rule.
+# 354 = 347 + the 7 run_write rows of TOOL-aNimbleMend-14's arm class "a carried-forward ledger row
+# never opens the lane" (5 refusals and 2 near-miss admits), counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=347
+FLOOR_ASSERTIONS=354
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

@@ -497,24 +497,32 @@ read like a generated one; a session launched AS a role carries that role's type
 script is read afresh on every call, so the arm binds a session from its next write once the tree
 its hooks run from holds it.
 
-**The red-fix lane: an open red admits a product write** (`TOOL-aNimbleMend-8`). A product write does
+**The red-fix lane: an open red admits a product write** (`TOOL-aNimbleMend-8`, bounded by
+`TOOL-aNimbleMend-14`). A product write does
 not always need a routed unit. Where the gate is about to refuse one — no card, no route, no
 buildable unit, or a writer the role arm refuses — it asks the lane, step 10 of `checkRouted`'s
 order. The lane admits with one witness line when all three hold: the policy key
 `bar.inline-red-fixes` reads `on`, or no policy kit resolves beside the hook; the gate ledger
 `gate-ledger.tsv` under the worktree's own git dir, which the bar runner and a pass-leg run write,
-holds a row whose status is `fail` or `timeout` (`readOpenReds`); and the writer is the main loop or
-a role declaring `writes = product` (`checkRedLane`, whose comment is the decision's rows). The
+holds an open red (`readOpenReds`); and the writer is the main loop or
+a role declaring `writes = product` (`checkRedLane`, whose comment is the decision's rows). A row is
+an open red only on the branch's present state, because the runner carries forward every row a run
+did not measure: it has the nine-field form with status `fail` or `timeout`, its name is a leg of
+the manifest the conf key `LEG_MANIFEST` names, and its head field is `HEAD` or an ancestor of
+`HEAD` the landed revision does not reach, which the policy kit's `readLandedRevision` answers. A
+legacy five-field row, a row with no head, a blank `LEG_MANIFEST` and a head that is landed or on
+another line of history each close the lane; a held leg redded at `HEAD` opens it. The
 witness names the open legs and what the commit owes: a `Red-fix: <leg>` trailer, one leg name per
 trailer line, beside `Pass: none`, which the commit grader `routed_commits.py` reads in place of a
 unit id. With the key `off` the refusal is byte for byte the one the gate composed; a key read that
 refused, or answered any other value, leaves the refusal standing and appends its one line. A
 broken role index closes the lane. The key and the ledger are read on a would-be refusal only, and
 a spec write never reaches the lane. What it does not check: whether the write fixes the red, since
-any product path is admitted while any leg is open and the commit grader bounds nothing here;
-whether a red that no run has re-measured is still red, since a row stands until the runner next
-records that leg, and this gate writes nothing to the ledger; and a ledger edited by hand, which
-is read like the runner's.
+any product path is admitted while any row is open and the commit grader bounds nothing here;
+whether a later commit of the branch already fixed the red, since a row at an unlanded ancestor
+stays open until a run measures its leg again or the branch lands, and this gate writes nothing to
+the ledger; whether the tree the run graded was clean; and a ledger edited by hand or a manifest
+edited in the working tree, each read as it stands.
 
 **The third event: `SubagentStart`** (`TOOL-aRoutedQuill-4`). A subagent inherits the hooks but not
 the parent's card, so `scratch-guard-subagent.fragment.json` wires the same script on `SubagentStart`

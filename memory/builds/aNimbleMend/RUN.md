@@ -123,3 +123,7 @@ base: 1265772cc365418ac6431a7f0f9e069f3bb79dc0
 2026-11-12T20:20:16Z rescope · item add TOOL-aNimbleMend-14 · reason promoted at the closing diff review's round 1 exit (0 blockers, 3 highs, 20 minors): unit 14 the one HIGH item, unit 15 the mediums and lows batched
 
 2026-11-12T20:20:18Z rescope · item add TOOL-aNimbleMend-15 · reason promoted at the closing diff review's round 1 exit (0 blockers, 3 highs, 20 minors): unit 14 the one HIGH item, unit 15 the mediums and lows batched
+
+2026-11-12T20:56:56Z dispatch · item f967551e TOOL-aNimbleMend-14 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/hooks/README.md tools/policy/policy-mirror.js tools/policy/README.md help/red-fix-lane.md memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-14-1-acceptance-ledger.md memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-14.md memory/LIVE.md memory/builds/aNimbleMend/README.md memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json
+
+2026-11-12T20:56:58Z brief · item TOOL-aNimbleMend-14 · reason 0f8aaa39d014 memory/builds/aNimbleMend/prompts/2026-11-12-prompt-TOOL-aNimbleMend-14-build-brief.md
