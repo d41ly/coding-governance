@@ -492,7 +492,16 @@ def main() -> int:
     g.add_argument("--figures", action="store_const", dest="verb", const=cmd_figures,
                    help="the budget, the limit and the cap as one tab-separated line")
     try:
-        return ap.parse_args().verb()
+        verb = ap.parse_args().verb
+        # NO MANIFEST BESIDE THE KIT IS THE NOT-DERIVED STATE, green and said (TOOL-aNimbleMend-15). A
+        # fresh install holds none until its first leg is wired, and the staged row of this kit's
+        # descriptor runs --check in every bar's preflight, so a refusal here stopped an adopter's bar
+        # from starting. A path GATE_LEGS names is the caller's claim, and its absence still refuses.
+        # WHAT THIS DOES NOT CHECK: that a manifest SHOULD exist; the bar runner refuses one it cannot read.
+        if verb in (cmd_apply, cmd_check) and not os.environ.get("GATE_LEGS") and not LEGS_BESIDE.exists():
+            print(f"pass-legs: not derived, no leg manifest at {LEGS_BESIDE.as_posix()}")
+            return 0
+        return verb()
     except Refusal as e:
         print(f"pass-legs: REFUSED — {e}", file=sys.stderr)
         return 2

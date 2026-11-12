@@ -284,9 +284,10 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=270
+FLOOR_ASSERTIONS=272
 # RAISED 253 -> 270 by TOOL-aNimbleMend-15: the pass-leg rule arms over fixtures F and B, S8's thirteen,
 # S2's one and S3's three. Counted one per `ok … || nope` pair; this pass runs no suite.
+# RAISED 270 -> 272 by a further pass of the same unit: the two absent-manifest arms of --check.
 # RAISED 250 -> 253 by TOOL-aNimbleMend-13: the kit-subject arms, AC3's two and AC4's one. Counted one
 # per `ok … || nope` pair; this pass runs no suite.
 # RAISED 240 -> 250 by TOOL-aNimbleMend-3: the pass-budget arms, AC2's two, AC3's one, AC4's one, AC5's
@@ -2547,6 +2548,18 @@ run_pw f --check
 [ "$PW_RC" = 0 ] && [ "$PW_OUT" = "pass-legs: 6 declared, 600.0s of 600s" ] \
   && ok "S8 --check over fixture B prints six declared legs at 600.0s of 600s" \
   || { nope "S8 --check over fixture B is not green on six legs at the budget (rc=$PW_RC)"; print_pw_out; }
+# A FRESH INSTALL HOLDS NO MANIFEST BESIDE THE KIT, and this kit's staged row runs --check there in
+# every bar's preflight: green and said. GATE_LEGS is unset here, as the leg shim leaves it, and the
+# fixture kit's sibling manifest was never written. A path GATE_LEGS names and that is absent refuses.
+PW_OUT=$( cd "$PW_T" && unset GATE_LEGS; "$DC_PY" "$PW_K/pass_legs.py" --check 2>&1 | tr -d '\r'; exit "${PIPESTATUS[0]}" ); PW_RC=$?
+[ "$PW_RC" = 0 ] && [ ! -e "$PW_K/../gate-legs.json" ] && printf '%s\n' "$PW_OUT" | grep -q '^pass-legs: not derived, no leg manifest at ' \
+  && ok "--check with no manifest beside the kit and GATE_LEGS unset exits 0 on a not-derived line" \
+  || { nope "--check refused a fresh install that holds no manifest beside the kit (rc=$PW_RC)"; print_pw_out; }
+rm -f "$PW_M"
+run_pw f --check
+[ "$PW_RC" = 2 ] && printf '%s\n' "$PW_OUT" | grep -q '^pass-legs: REFUSED — the leg manifest .* does not read as JSON' \
+  && ok "--check still refuses with exit 2 when the manifest GATE_LEGS names is absent" \
+  || { nope "--check read an absent manifest GATE_LEGS names as not derived (rc=$PW_RC)"; print_pw_out; }
 rm -rf "$PW_T"
 
 # --- THE WORKER'S BUILTINS KEEP TODAY'S BYTES (TOOL-aSparedSpawn-4 AC1 to AC4, AC6, AC7) -----------

@@ -141,3 +141,5 @@ base: 1265772cc365418ac6431a7f0f9e069f3bb79dc0
 2026-11-12T22:19:49Z dispatch · item 685c0bf2 TOOL-aNimbleMend-15 · reason tools/hooks/scratch-guard.test.sh
 
 2026-11-12T23:12:53Z dispatch · item 7e785ac2 TOOL-aNimbleMend-15 · reason tools/workflows/unattended-unit.js tools/workflows/unattended-build.test.sh
+
+2026-11-12T23:42:07Z dispatch · item 8ed4b1d5 TOOL-aNimbleMend-15 · reason tools/run-gates/pass_legs.py tools/run-gates/run-gates.evidence.test.sh tools/run-gates/README.md

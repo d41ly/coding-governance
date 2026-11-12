@@ -1032,7 +1032,10 @@ no manifest row is a Refusal: exit 2, before the run log is read or a byte is wr
 **With no evidence file the rule selects nothing.** `--apply` writes nothing over a manifest with no
 field, `--check` is green and prints `pass-legs: not derived, no evidence file`, and a field typed
 by hand is still a finding. That is an adopter's state on arrival, until it runs `--write` on a
-node that has run a bar.
+node that has run a bar. A fresh install may hold no manifest beside the kit at all: `--apply` and
+`--check` then exit 0 printing `pass-legs: not derived, no leg manifest at <path>`, so the staged
+row below reads fresh and the bar's preflight passes. A manifest `GATE_LEGS` names and that is
+absent still refuses with exit 2.
 
 **The field is re-applied at every landing.** This kit's descriptor declares `--apply` and
 `--check` as a staged `[[regenerate]]` row at stage 2, so `--regen` and the lander write the field
