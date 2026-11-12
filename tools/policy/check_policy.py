@@ -4598,10 +4598,11 @@ PASS_LANE_LEG = "planted pass leg"
 PASS_LANE_PROGRAM = "import sys; sys.exit('BROKEN' in open(sys.argv[1], encoding='utf-8').read())"
 # The gov case's build, unit and product file under the tool root: this build's folder, which the clone holds.
 PASS_LANE_GOV = ("aNimbleMend", "TOOL-aNimbleMend-12", "planted-pass-leg.txt")
-# What the flow runs, each found by its path's ending: a receipt row in the adopter, the tool root in the clone.
-PASS_LANE_FILES = {"adapter": "/run-gates/pass-legs.sh", "hook": "/hooks/scratch-guard.js",
-                   "records": "/memory-tree/build_records.py", "grader": "/memory-tree/routed_commits.py",
-                   "policy": "/policy/policy.py"}
+# What the flow runs, each a (kit home, file) pair `resolve_kit_dir` locates in the target: by a receipt
+# row in the adopter, by the probe beside the clone's own policy kit in gov. No path is spelled here.
+PASS_LANE_FILES = {"adapter": ("run-gates", "pass-legs.sh"), "hook": ("hooks", "scratch-guard.js"),
+                   "records": ("memory-tree", "build_records.py"), "grader": ("memory-tree", "routed_commits.py"),
+                   "policy": (KIT.name, "policy.py")}
 LANE_KEY, LEGS_KEY = "bar.inline-red-fixes", "pass.fast-legs"
 PASS_JOIN = re.compile(r"(\d+) fix commit\(s\) · (\d+) record\(s\) · (\d+) owed")
 PASS_LEGS_CONST = re.compile(r"^const PASS_LEGS = '([^']*)'", re.M)  # the harness template's spelling of the adapter call
@@ -4631,7 +4632,6 @@ def build_pass_lane_target(name, gov):
             for remote in run_fixture_git(t, "remote").split():
                 run_fixture_git(t, "remote", "remove", remote)
             run_fixture_git(t, "checkout", "-q", "-B", "main")
-            found = {k: troot + end if (t / (troot + end)).is_file() else None for k, end in PASS_LANE_FILES.items()}
         else:
             ids, missed = derive_requires_closure(list(PASS_LANE_KITS))
             if missed:
@@ -4642,12 +4642,14 @@ def build_pass_lane_target(name, gov):
             if rc:
                 raise RuntimeError(f"the deployer's apply --kits {','.join(ids)} exited {rc}, so nothing was "
                                    f"installed to grade: {out.strip()[-600:]}")
-            paths = [str(r.get("path")) for r in read_receipt_rows(t)]
-            found = {k: next((p for p in paths if p.endswith(end)), None) for k, end in PASS_LANE_FILES.items()}
-        lacks = [PASS_LANE_FILES[k] for k, p in found.items() if not p]
-        if lacks:
-            raise RuntimeError(f"the target holds no {', '.join(lacks)} " + ("under its tool root" if gov else
-                               "as a receipt row's path") + ", so the flow has no such step to run")
+        # the clone probes from its own policy kit; the adopter's root holds no kit, so only a receipt row answers
+        here, found = (t / troot / KIT.name if gov else t).absolute(), {}
+        for k, (home, anchor) in PASS_LANE_FILES.items():
+            try:
+                found[k] = (resolve_kit_dir(home, anchor, here) / anchor).relative_to(t.absolute()).as_posix()
+            except (LookupError, ValueError) as exc:
+                raise RuntimeError(f"the target holds no {anchor} of the {home} kit, so the flow has no such step "
+                                   f"to run: {exc}") from None
         conf_path = t / ".memory-tree.conf"
         conf = load_tree_lib().parse_conf(conf_path.read_bytes().decode("utf-8").replace("\r\n", "\n"), {})
         memroot = (conf.get("MEMORY_ROOT") or "memory").strip().strip("/")

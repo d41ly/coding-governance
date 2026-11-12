@@ -111,3 +111,5 @@ base: 1265772cc365418ac6431a7f0f9e069f3bb79dc0
 2026-11-12T19:04:12Z brief · item TOOL-aNimbleMend-12 · reason 38fe9d723c08 memory/builds/aNimbleMend/prompts/2026-11-12-prompt-TOOL-aNimbleMend-12-build-brief.md
 
 2026-11-12T19:22:19Z dispatch · item 883e7e25 TOOL-aNimbleMend-12 · reason tools/policy/check_policy.py tools/policy/README.md tools/gate-legs.json memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-12-1-acceptance-ledger.md memory/guides/SESSION-KICKOFF.md
+
+2026-11-12T19:35:04Z dispatch · item 679697d7 TOOL-aNimbleMend-12 · reason tools/policy/check_policy.py memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-12-1-acceptance-ledger.md memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-12.md memory/LIVE.md memory/builds/aNimbleMend/README.md memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json
