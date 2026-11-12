@@ -48,6 +48,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [borrowed-seed-inherits-its-head-state](borrowed-seed-inherits-its-head-state.md) | class | 3 |  | a fixture built from another suite's seed inherits that seed's HEAD state, and a probe that reads HEAD is dead on an unborn one |
 | [bounded-through-a-pipe-is-unbounded](bounded-through-a-pipe-is-unbounded.md) | class | 7 |  | a wall-clock timeout captured through a command substitution bounds the verdict and not the clock, and reports success on schedule while the caller blocks |
 | [canary-waits-on-a-rendezvous-not-a-clock](canary-waits-on-a-rendezvous-not-a-clock.md) | invariant | 1 |  | the run-gates canary never compares elapsed times, and that is the ruling, not a gap |
+| [carried-forward-row-read-as-current](carried-forward-row-read-as-current.md) | class | 4 |  | a reader of a store whose writer carries old rows forward takes every row as present state, so a months-old row decides today's answer |
 | [changed-mode-selection-ignores-doc-reads](changed-mode-selection-ignores-doc-reads.md) | class | 7 |  | a kit-subject leg that declares doc_reads is selected under changed mode by its kit's shipped sources alone, so a change that moves only the records it reads leaves it held |
 | [check-format-grades-two-populations](check-format-grades-two-populations.md) | class | 3 |  | the build README slot gate binds every tracked README on one axis and only the declared ones on the other, so a new folder can red on a rule its author never opted into |
 | [check-grades-one-layer-of-a-layered-config](check-grades-one-layer-of-a-layered-config.md) | class | 6 |  | an enforcement check reads one layer of a configuration its consumer layers, often through a resolver built to pick a write target, so a value in a layer it never reads runs past the check while the layer it grades is clean |
@@ -178,6 +179,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 | [zero-witness-over-an-unnamed-population](zero-witness-over-an-unnamed-population.md) | class | 5 |  | a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean |
 
-162 record(s): 159 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+163 record(s): 160 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->
