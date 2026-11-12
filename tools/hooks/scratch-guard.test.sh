@@ -1275,6 +1275,23 @@ mkdir -p "$TMP/nopol/hk"; cp "$HERE"/*.js "$TMP/nopol/hk/"
 sg_hook=$HOOK; HOOK="$TMP/nopol/hk/scratch-guard.js"
 run_write "L15 no policy kit beside the hook, a red open, the main loop -> allow, the witness carrying the NOTE" 0 "one;;red-fix lane;;leg one, leg three;;NOTE — no policy kit resolves beside this hook, so bar.inline-red-fixes reads on" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
 HOOK=$sg_hook
+# TOOL-aNimbleMend-15 S7: a BLANK LEG_MANIFEST reads as gate-legs.json beside the run-gates kit the
+# hook's own resolver finds, as the commit grader reads it. The real hook's run-gates kit sits
+# outside this fixture, so the two rows run a copy of the hook INSIDE the worktree, at sgk/hooks/,
+# beside a run-gates kit of one anchor file, with the conf put back to the form that names no
+# manifest. The first row has the kit's manifest at sgk/gate-legs.json and the lane opens on the
+# reds at HEAD; the second has that file removed and the lane stays shut. The copy has no policy
+# kit beside it, so the first witness carries the NOTE as the S11 row's does. With the blank-key
+# fallback taken out of the hook (`if (!rel) return []` restored) the first row exits 2.
+# WHAT THIS DOES NOT CHECK: a manifest beside a kit OUTSIDE the worktree, which no row plants.
+cp "$SG_CONF" "$TMP/lane-conf.named"; cp "$TMP/lane-conf.bak" "$SG_CONF"
+mkdir -p "$SGWT/sgk/hooks" "$SGWT/sgk/run-gates"; cp "$HERE"/*.js "$SGWT/sgk/hooks/"
+: > "$SGWT/sgk/run-gates/run-gates.sh"; cp "$SGWT/sg-legs.json" "$SGWT/sgk/gate-legs.json"
+HOOK="$SGWT/sgk/hooks/scratch-guard.js"
+run_write "L15 a blank LEG_MANIFEST, the run-gates kit's manifest present, a red at HEAD -> allow, the witness naming the legs" 0 "one;;red-fix lane;;leg one, leg three" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+rm -f "$SGWT/sgk/gate-legs.json"
+run_write "L15 a blank LEG_MANIFEST, no manifest beside the run-gates kit, a red at HEAD -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+HOOK=$sg_hook; rm -rf "$SGWT/sgk"; cp "$TMP/lane-conf.named" "$SG_CONF"
 write_ledger "leg two=ok" "leg four=retried"
 run_write "L-AC2 the key on, no red open -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
 cp "$TMP/err" "$TMP/lane-composed.err"
@@ -1678,8 +1695,10 @@ n=$((pass+fail))
 # 359 = 354 + the 5 lane rows of TOOL-aNimbleMend-15: the hook with no policy kit beside it (1), and
 # the key left unread with no red open (2) and for a writer the lane never admits (2), counted by
 # hand under the same rule.
+# 361 = 359 + the 2 blank-LEG_MANIFEST rows of TOOL-aNimbleMend-15 S7 (the kit's manifest present,
+# and none found), counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=359
+FLOOR_ASSERTIONS=361
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

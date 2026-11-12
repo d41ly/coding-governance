@@ -274,8 +274,8 @@ UNIVERSAL_BUDGET="3"
 # The red-fix lane reads the same key twice. The commit grader, routed_commits.py, checks a
 # `Red-fix: <leg>` trailer against this manifest as the commit holds it; BLANK, it falls back to
 # `gate-legs.json` beside the run-gates kit installed beside this one, and with no such kit inside
-# the repository a lane commit reds as `LEG_MANIFEST is blank`. The write gate has no fallback: blank,
-# its lane stays closed. Name the manifest here to open the lane's write half.
+# the repository a lane commit reds as `LEG_MANIFEST is blank`. The write gate takes the same
+# fallback from the hooks kit: blank, its lane opens on that manifest and stays closed with none.
 LEG_MANIFEST=""
 
 # memory-recall only (safe to delete if that kit is not adopted): the cache budget over the whole

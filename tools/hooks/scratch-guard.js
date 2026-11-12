@@ -110,7 +110,8 @@
  * resolves. A row is an open red when it has the nine-field form with status `fail` or `timeout`,
  * names a leg of the manifest the conf key `LEG_MANIFEST` names, and its head field is `HEAD` or an
  * ancestor of `HEAD` the landed revision does not reach: the runner carries old rows forward, so a
- * row is bounded by its own head. A blank `LEG_MANIFEST` closes the lane. The writer is the main
+ * row is bounded by its own head. A blank `LEG_MANIFEST` reads as `gate-legs.json` beside the
+ * run-gates kit this install holds, and closes the lane where none resolves. The writer is the main
  * loop or a role declaring `writes = product`; any other writer, a broken role index, the key
  * `off`, a refused key read and any other value each leave the refusal standing. `readOpenReds`
  * reads the ledger, `checkRedLane` is the decision, and the commit owes a `Red-fix: <leg>` trailer
@@ -1178,13 +1179,16 @@ const GATE_LEDGER_FILE = 'gate-ledger.tsv'
  *    row, a short row and an `ok` or `retried` row are not open.
  *  - head shape: the ninth field is a full hex sha.
  *  - manifest: the first field is the `name` of a row of the JSON list the conf key `LEG_MANIFEST`
- *    of `<top>/.memory-tree.conf` names, read from the working tree. No `chunk`, `subject` or
- *    `pass_leg` is tested, so a held leg stays eligible.
+ *    of `<top>/.memory-tree.conf` names, read from the working tree. A blank or absent key reads
+ *    as the commit grader reads it (TOOL-aNimbleMend-15 S7): `gate-legs.json` beside the run-gates
+ *    kit `resolveKitDir` finds from this hook's own directory, and only where that file sits
+ *    inside `top`. No `chunk`, `subject` or `pass_leg` is tested, so a held leg stays eligible.
  *  - head place: the ninth field is `HEAD` of `top`, or a commit `git rev-list HEAD --not <landed>`
  *    prints there, `<landed>` being the policy helper's `readLandedRevision(top)`. The landed read
  *    and the `rev-list` run only where a candidate's head differs from `HEAD`.
  * Every failure closes the lane and none throws: an empty `gitDir` or `top`, an absent or unreadable
- * ledger, a blank or absent key, a manifest that is unreadable, unparsable or no list, and an
+ * ledger, a blank or absent key with no run-gates kit resolved or its manifest outside `top`, a
+ * manifest that is unreadable, unparsable or no list, and an
  * unreadable `HEAD` each answer the empty list; no policy helper, a refused landed read and a failed
  * `rev-list` leave only the rows at `HEAD` open.
  */
@@ -1204,8 +1208,17 @@ function readOpenReds(gitDir, top) {
   let legs
   try {
     const rel = (readConfKey(fs.readFileSync(path.join(top, ROUTE_CONF), 'utf8'), 'LEG_MANIFEST') || '').trim()
-    if (!rel) return []
-    const doc = JSON.parse(fs.readFileSync(path.join(top, buildNativePath(rel)), 'utf8'))
+    let file = rel ? path.join(top, buildNativePath(rel)) : ''
+    if (!rel) {
+      // A BLANK KEY (TOOL-aNimbleMend-15 S7), read as the commit grader's `resolve_leg_manifest` reads
+      // it: `gate-legs.json` beside the run-gates kit this install holds, and only inside `top`. The
+      // resolver throws where no such kit resolves, which the catch below answers.
+      file = path.join(path.dirname(require('./agent-cap.js').resolveKitDir('run-gates', 'run-gates.sh', __dirname)), 'gate-legs.json')
+      const real = buildComparablePath(resolveRealPath(file))
+      const root = buildComparablePath(resolveRealPath(top))
+      if (!real || !root || real === root || !checkUnderRoot(real, root)) return []
+    }
+    const doc = JSON.parse(fs.readFileSync(file, 'utf8'))
     if (!Array.isArray(doc)) return []
     legs = new Set(doc.map((r) => (r && typeof r === 'object' ? r.name : null)).filter((n) => typeof n === 'string'))
   } catch { return [] }

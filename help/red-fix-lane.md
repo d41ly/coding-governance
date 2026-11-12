@@ -34,7 +34,8 @@ did not measure, so the gate bounds a row by the row's own head field, and count
 these hold:
 
 - the row has the runner's nine-field form, which an older five-field row does not;
-- its name is a leg of the manifest the conf key `LEG_MANIFEST` names, and a blank key closes the
+- its name is a leg of the manifest the conf key `LEG_MANIFEST` names, or, with the key blank, of
+  `gate-legs.json` beside the installed run-gates kit; a blank key with no such file closes the
   lane;
 - its head is `HEAD`, or an ancestor of `HEAD` that the landed revision does not reach.
 
@@ -64,7 +65,8 @@ still graded against the limits.
 The grader finds the manifest by the conf key `LEG_MANIFEST` of `.memory-tree.conf`. With the key
 blank it falls back to `gate-legs.json` beside the run-gates kit installed beside the memory-tree
 kit. Where no such kit resolves inside the repository, a lane commit is a violation that reads
-`LEG_MANIFEST is blank`. The write gate has no fallback, as the bounds above state.
+`LEG_MANIFEST is blank`. The write gate takes the same fallback from the hooks kit, as the bounds
+above state, so a default install opens both halves of the lane with the key left blank.
 
 ## The limits
 

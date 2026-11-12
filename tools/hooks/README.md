@@ -510,12 +510,18 @@ an open red only on the branch's present state, because the runner carries forwa
 did not measure: it has the nine-field form with status `fail` or `timeout`, its name is a leg of
 the manifest the conf key `LEG_MANIFEST` names, and its head field is `HEAD` or an ancestor of
 `HEAD` the landed revision does not reach, which the policy kit's `readLandedRevision` answers. A
-legacy five-field row, a row with no head, a blank `LEG_MANIFEST` and a head that is landed or on
-another line of history each close the lane; a held leg redded at `HEAD` opens it. The
+blank `LEG_MANIFEST` reads as the commit grader reads it (`TOOL-aNimbleMend-15`): `gate-legs.json`
+beside the run-gates kit `resolveKitDir` finds from the hook's own directory, inside the worktree. A
+legacy five-field row, a row with no head, a blank `LEG_MANIFEST` with no such manifest found and a
+head that is landed or on another line of history each close the lane; a held leg redded at `HEAD`
+opens it. The
 witness names the open legs and what the commit owes: a `Red-fix: <leg>` trailer, one leg name per
 trailer line, beside `Pass: none`, which the commit grader `routed_commits.py` reads in place of a
 unit id. With the key `off` the refusal is byte for byte the one the gate composed; a key read that
-refused, or answered any other value, leaves the refusal standing and appends its one line. A
+refused, or answered any other value, leaves the refusal standing and appends its one line, and
+only where a red is open and the writer is one the lane admits: the ledger and the role index are
+read first, and with no red open, a broken index or any other writer the key is not read and no
+line is appended. A
 broken role index closes the lane. The key and the ledger are read on a would-be refusal only, and
 a spec write never reaches the lane. What it does not check: whether the write fixes the red, since
 any product path is admitted while any row is open and the commit grader bounds nothing here;

@@ -4619,7 +4619,8 @@ def build_pass_lane_target(name, gov):
 
     Else the adopter: `build_install_target` with PASS_LANE_KITS' closure and one `apply` through
     `run_govkit`, each file found through its receipt row, then what an adopter writes by hand, committed:
-    `ROUTED_PATHS`, `LEG_MANIFEST` and a `ROUTED_COMMIT_CUTOFF` before every fixture commit in the conf;
+    `ROUTED_PATHS` and a `ROUTED_COMMIT_CUTOFF` before every fixture commit in the conf, the leg-manifest
+    key left blank as installed so the grader and the write gate take their fallback (TOOL-aNimbleMend-15);
     one build folder holding one spec whose id opens with the conf's first family; a leg manifest of one
     row carrying no pass-leg field, since `build_install_target` strips the `[gate_runner]` seed and the
     deployer then orders the legs and emits no manifest; and `src/app.txt` holding `ok`, committed under
@@ -4664,7 +4665,9 @@ def build_pass_lane_target(name, gov):
             if not family:
                 raise RuntimeError("the installed .memory-tree.conf declares no FAMILIES, so no unit id can be spelled")
             build, unit, product = "tPassLane", f"{family}-tPassLane-1", "src/app.txt"
-            conf_path.write_bytes(conf_path.read_bytes() + f'\nROUTED_PATHS="src/"\nLEG_MANIFEST="{manifest}"\n'
+            # no leg-manifest key (TOOL-aNimbleMend-15 S7): the installed conf ships it blank, and the
+            # grader and the write gate each fall back to the manifest beside the run-gates kit
+            conf_path.write_bytes(conf_path.read_bytes() + '\nROUTED_PATHS="src/"\n'
                                   'ROUTED_COMMIT_CUTOFF="2001-01-01"\n'.encode("utf-8"))
             write_case_file(t, f"{memroot}/builds/{build}/spec/2026-01-01-spec-{unit}.md", f"# {unit} — a unit\n\n"
                             "**Status:** INPROGRESS · rev-1 · 2026-01-01 · node a · Tier-2 · base 0123abcd\n")
