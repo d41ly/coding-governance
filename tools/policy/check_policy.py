@@ -4790,8 +4790,10 @@ def run_pass_lane_case(name):
             template = (resolve_kit_dir("workflows", anchor, here) / anchor).relative_to(t.absolute()).as_posix()
             said = PASS_LEGS_CONST.search(policy.read_text_or_none(t / template) or "")
             argv = said[1].replace("{{TOOL_ROOT}}", budgets.derive_tool_root() + "/").split() if said else []
-            checks.append(("setup", f"g1 · PASS_LEGS in {template} names bash, the adapter under the tool root and --base",
-                           argv[:3] == ["bash", case["adapter"], "--base"] and len(argv) == 4,
+            # TOOL-aNimbleMend-15 S13: the parent hands the command out with NO base; the unit harness
+            # appends the commit its builder started from, since a pass can make more than one commit.
+            checks.append(("setup", f"g1 · PASS_LEGS in {template} names bash and the adapter under the tool root, and no base",
+                           argv == ["bash", case["adapter"]],
                            said[0] if said else "no PASS_LEGS constant reads there"))
         else:
             rc, out, err = run_pass_adapter("HEAD")

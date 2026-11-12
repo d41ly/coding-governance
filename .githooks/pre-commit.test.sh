@@ -245,6 +245,43 @@ git reset -q; echo 7 > "$pl"
 out=$(git commit -qm g7 -- "$pl" 2>&1); rc=$?
 case "$out" in *"no guard.py resolves"*) r=$rc ;; *) r=0 ;; esac
 ck "S1 guard.py removed and a listed path committed by git commit -- <path>, never added: refused" "$r" 1
+# ---- the red-fix join's staged form, TOOL-aNimbleMend-15 S12 --------------------------------------
+# A stand-in join at the root install says how it was called and exits 1 while HEAD's message carries
+# a `Red-fix:` trailer, the real join's staged verdict on a fix with no record; the real join's own
+# refusal is armed in the memory-tree kit. The hook ran that join only inside the hygiene leg, so
+# only beside a staged memory path. These arms hold the other branch: a commit staging NO memory
+# path runs the join's staged form by itself, a product-only commit on top of an unrecorded fix is
+# refused, a staged memory path still takes the hygiene leg alone, and a launcher or a kit that
+# does not resolve is an announced skip that commits. Red with the `else` branch taken out of the hook.
+rj=build_records.py; d="$tmp/red-fix-join"; rm -rf "$d"; mkdir -p "$d"
+cd "$d" || exit 2
+git init -q --template= -b main
+mkdir hk; cp "$HOOK" hk/pre-commit; chmod +x hk/pre-commit; git config core.hooksPath hk
+mkdir -p "$mt" vendor src memory; cp "$repo_src/$resolver" vendor/
+printf 'import subprocess, sys\nprint("JOIN RAN", *sys.argv[1:])\nsaid = subprocess.run(["git", "log", "-1", "--format=%%B"], capture_output=True, text=True).stdout\nsys.exit(1 if "Red-fix:" in said else 0)\n' > "$mt/$rj"
+printf '#!/usr/bin/env bash\necho "HYGIENE RAN $*"\n' > "$mt/$hy"
+echo 0 > src/app.txt; git add -A; git commit -q --no-verify -m fixture
+echo 1 > src/app.txt; git add src/app.txt
+out=$(git commit -q -m plain 2>&1); rc=$?
+case "$out" in *"HYGIENE RAN"*) r=1 ;; *"JOIN RAN join red-fix --staged"*) r=$rc ;; *) r=1 ;; esac
+ck "S12 a commit staging no memory path runs the join's staged form, and over a clean HEAD it commits" "$r" 0
+echo 2 > src/app.txt; git add src/app.txt; git commit -q --no-verify -m "fix: the leg reads green again" -m "Red-fix: a leg"
+echo 3 > src/app.txt; git add src/app.txt
+out=$(git commit -q -m product 2>&1); rc=$?
+case "$out" in *"JOIN RAN join red-fix --staged"*) r=$rc ;; *) r=0 ;; esac
+ck "S12 a product-only commit on top of an unrecorded fix is refused by the join" "$r" 1
+git reset -q; echo x > memory/rec.md; git add memory/rec.md
+out=$(git commit -q -m record 2>&1); rc=$?
+case "$out" in *"JOIN RAN"*) r=1 ;; *"HYGIENE RAN --staged"*) r=$rc ;; *) r=1 ;; esac
+ck "S12 a commit staging a memory path runs the hygiene leg, and the join's own branch does not run" "$r" 0
+git rm -q --cached "vendor/${resolver##*/}"; git add src/app.txt
+out=$(git commit -q -m no-launcher 2>&1); rc=$?
+case "$out" in *"JOIN RAN"*) r=1 ;; *"pre-commit: red-fix join leg SKIPPED — no tracked python resolver, or no usable launcher, to run $mt/$rj."*) r=$rc ;; *) r=1 ;; esac
+ck "S12 no tracked resolver is an announced skip of the join, and the commit proceeds" "$r" 0
+rm -f "$mt/$rj"; echo 4 > src/app.txt; git add src/app.txt
+out=$(git commit -q -m no-kit 2>&1); rc=$?
+case "$out" in *"JOIN RAN"*) r=1 ;; *"pre-commit: red-fix join leg SKIPPED — no kit root: no install-receipt row for $mt/$rj, no $mt/$rj at the root, and no GOV_KITROOT declared in .githooks/gate-env.sh."*) r=$rc ;; *) r=1 ;; esac
+ck "S12 a join no rung resolves is an announced skip naming every rung, and the commit proceeds" "$r" 0
 cd "$tmp" || exit 2
 
 echo "---- $pass passed, $fail failed ----"

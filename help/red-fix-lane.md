@@ -61,6 +61,11 @@ manifest, are violations that say so, and the grader's summary line counts the a
 `<n> red-fix`. A commit that names a unit as well is routed by its unit as ever, and its trailer is
 still graded against the limits.
 
+The grader finds the manifest by the conf key `LEG_MANIFEST` of `.memory-tree.conf`. With the key
+blank it falls back to `gate-legs.json` beside the run-gates kit installed beside the memory-tree
+kit. Where no such kit resolves inside the repository, a lane commit is a violation that reads
+`LEG_MANIFEST is blank`. The write gate has no fallback, as the bounds above state.
+
 ## The limits
 
 Every commit carrying the trailer is graded against four limits, and a finding reds the grader.
@@ -125,6 +130,12 @@ next commit. With `--staged` the join grades `HEAD` alone and refuses that same 
 after a fix is its record's. The memory hygiene leg runs the join as its check 31, "a red fix has
 its record".
 
+That refusal is the pre-commit hook's. The hook runs the staged hygiene leg where the commit stages
+a path under the memory root, and `build_records.py join red-fix --staged` by itself where it
+stages none, so a product-only commit on top of an unrecorded fix is refused too. A hook copied
+before it gained that second branch runs no join on such a commit, and the unrecorded fix is then
+found by the next full hygiene run.
+
 ## The switch
 
 `bar.inline-red-fixes` in `.governance/policy.toml` turns the lane on or off. <!-- usage: policy:bar.inline-red-fixes 3272585d -->
@@ -143,7 +154,15 @@ Turning the key `off` reds nothing that landed: the commit grader applies the ke
 range and never to the history, so a lane commit already in history is still admitted. The key is
 read at the landed revision, so a branch cannot flip its own switch. A read the policy reader
 refuses, or a value that is neither `on` nor `off`, leaves the write gate's refusal standing with
-one line saying why. [The policy file](policy.md) says how a key is set and read.
+one line saying why. The write gate reads the key last: with no red open, or for a writer the lane
+never admits, it does not read the key and the refusal carries no such line.
+[The policy file](policy.md) says how a key is set and read.
+
+Two parts of the lane run whatever the key reads, because they grade history and not the write.
+The commit grader's limits pass grades every commit carrying the trailer and prints one
+`red-fix limits · graded <n>` line per graded population on every run, `graded 0` included. The
+join grades every `Red-fix:` commit against its record and prints its summary line on every run.
+With the key `off` both still print, and both can still red.
 
 ## What it does not check
 

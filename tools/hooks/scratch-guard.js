@@ -1244,6 +1244,9 @@ function readOpenReds(gitDir, top) {
  *  6. `agentType` names an `agent`-true role declaring `writes = product` → witness
  *  7. anything else, the untyped harness agent included → null
  * It does not ask whether the write fixes the red: any product path is admitted while a leg is open.
+ * The caller asks it TWICE (TOOL-aNimbleMend-15): first with `lane.on` taken as true, over the reds
+ * and the index alone, so steps 2 to 7 decide before the key is read; then, only where that
+ * admitted, with the lane as the key answered it, where step 1 decides.
  */
 function checkRedLane(w) {
   if (!w.lane || w.lane.on !== true) return null
@@ -1286,12 +1289,15 @@ function checkRedLane(w) {
  *     deny. The route arm runs first and never instead: a builder with no buildable route meets
  *     step 7, 8 or 9b's refusal word for word.
  * 10. the red-fix lane (TOOL-aNimbleMend-8), on a product-class refusal from step 7, 8, 9b or 9a
- *     and on nothing else: read the lane key `bar.inline-red-fixes`, then the gate ledger's open
- *     reds (readOpenReds over the worktree's git dir and toplevel: a row counts only at `HEAD` or at
- *     an unlanded ancestor of it, for a leg of `LEG_MANIFEST`, TOOL-aNimbleMend-14), then return
- *     checkRedLane's witness, or the refusal as composed. A key read that
- *     refused or answered another value appends its one line to the refusal; under `off` the refusal
- *     is byte for byte the one composed. An admitted write and every non-product write read neither.
+ *     and on nothing else: read the gate ledger's open reds (readOpenReds over the worktree's git
+ *     dir and toplevel: a row counts only at `HEAD` or at an unlanded ancestor of it, for a leg of
+ *     `LEG_MANIFEST`, TOOL-aNimbleMend-14) and the role index FIRST. With no red open, a broken
+ *     index, or a writer checkRedLane's steps 4 to 6 would not admit, the refusal stands as
+ *     composed and the lane key is not read (TOOL-aNimbleMend-15). Only then read the lane key
+ *     `bar.inline-red-fixes`, and return checkRedLane's witness, or the refusal as composed. A key
+ *     read that refused or answered another value appends its one line to the refusal, and only
+ *     where a red is open and the writer is admissible; under `off` the refusal is byte for byte
+ *     the one composed. An admitted write and every non-product write read neither.
  * No `agent_id` exemption: a subagent's write is judged by the same order (S7).
  */
 function checkRouted(data, env) {
@@ -1365,6 +1371,21 @@ function checkRouted(data, env) {
   // through untouched, so the key and the ledger are read on a refusal only.
   const checkLane = (verdict) => {
     if (!verdict || !verdict.deny) return verdict
+    // THE CHEAP TESTS FIRST (TOOL-aNimbleMend-15 S14). The ledger and the role index are files; the
+    // key is a policy read that spawns git. So checkRedLane is asked once with the lane taken as
+    // on: with no red open, a broken index or a writer its steps 4 to 6 would not admit, the
+    // refusal stands as composed and the key is never read, which is every refusal of a tree with
+    // no open red. A refused key read there appends no line.
+    // The worktree's OWN git dir, where the runner wrote, never the common dir.
+    let gitDir = mine.hit.gitPath
+    if (mine.hit.isFile) {
+      let m = null
+      try { m = /gitdir:\s*(.+)/.exec(fs.readFileSync(mine.hit.gitPath, 'utf8')) } catch { m = null }
+      gitDir = m ? path.resolve(top, m[1].trim()) : ''
+    }
+    const reds = readOpenReds(gitDir, top)
+    const index = loadRoleIndex(top)
+    if (!checkRedLane({ agentType, index, lane: { on: true, why: '' }, reds })) return verdict
     let lane
     try {
       const helper = require('./agent-cap.js').resolvePolicyHelper()
@@ -1378,14 +1399,7 @@ function checkRouted(data, env) {
     } catch (e) {
       lane = { on: false, why: String((e && e.message) || e).split(/\r?\n/)[0] }
     }
-    // The worktree's OWN git dir, where the runner wrote, never the common dir.
-    let gitDir = mine.hit.gitPath
-    if (mine.hit.isFile) {
-      let m = null
-      try { m = /gitdir:\s*(.+)/.exec(fs.readFileSync(mine.hit.gitPath, 'utf8')) } catch { m = null }
-      gitDir = m ? path.resolve(top, m[1].trim()) : ''
-    }
-    const admit = checkRedLane({ agentType, index: loadRoleIndex(top), lane, reds: readOpenReds(gitDir, top) })
+    const admit = checkRedLane({ agentType, index, lane, reds })
     if (admit) return admit
     return !lane.on && lane.why ? { deny: `${verdict.deny}${lane.why}\n` } : verdict
   }

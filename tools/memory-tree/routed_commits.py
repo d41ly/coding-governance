@@ -29,8 +29,9 @@ Which spec defines an id is `tree_lib.parse_spec_h1` over every spec at HEAD.
 THE RED-FIX LANE (TOOL-aNimbleMend-8). A graded commit that names no unit is admitted when it carries
 at least one `Red-fix: <leg name>` trailer, one leg per trailer line, and every value is a leg name
 of the `LEG_MANIFEST` file in that commit's own tree; the summary line counts them as `<n> red-fix`.
-A value that names no leg, a blank `LEG_MANIFEST` and a commit holding no manifest are violations
-that say so. A commit that names a unit is graded as ever and its trailer is not read. The policy
+A blank `LEG_MANIFEST` reads as `gate-legs.json` beside the run-gates kit found beside this one
+(`resolve_leg_manifest`, TOOL-aNimbleMend-15). A value that names no leg, a blank `LEG_MANIFEST`
+with no such kit inside the repository, and a commit holding no manifest are violations that say so. A commit that names a unit is graded as ever and its trailer is not read. The policy
 key `bar.inline-red-fixes` gates the pushed RANGE and never the history: off, a `Red-fix:` commit in
 RANGE is `names no unit`, and WHOLE still admits it, so turning the key off reds nothing that
 landed. The key is read once, by `read_lane_state`, and only when a RANGE commit is a candidate; a
@@ -295,6 +296,22 @@ def read_lane_state(repo) -> tuple:
     return False, f"bar.inline-red-fixes reads {value}, neither on nor off, so the red-fix lane is closed"
 
 
+def resolve_leg_manifest(repo, conf: dict) -> str:
+    """The leg manifest a `Red-fix:` value is checked against, as a path relative to `repo`: the conf's
+    `LEG_MANIFEST` where it is not blank, else `gate-legs.json` beside the run-gates kit found beside
+    this one (TOOL-aNimbleMend-15 S7), so a default install grades the lane with the key left blank.
+    The empty string where no run-gates kit resolves or that file sits outside `repo`."""
+    named = (conf.get("LEG_MANIFEST") or "").strip()
+    if named:
+        return named
+    from backlog import resolve_kit_dir   # noqa: E402  the kit's inline copy of the sibling resolver
+    try:
+        beside = resolve_kit_dir("run-gates", "run-gates.sh", KIT).parent / "gate-legs.json"
+        return beside.resolve().relative_to(pathlib.Path(repo).resolve()).as_posix()
+    except (LookupError, OSError, ValueError):
+        return ""
+
+
 def read_guarded_paths():
     """The lines of the policy kit's `guarded-paths.txt` as the working tree holds it, the kit found
     beside this one; None where no policy kit resolves or the list does not read, which limit L2
@@ -390,7 +407,7 @@ def check_routed_commits(repo, env) -> tuple:
     # TOOL-aNimbleMend-8 S7: the lane key, read ONCE and only when a RANGE commit carries the trailer and
     # names no unit. It gates the pushed range, never the history: WHOLE admits whatever the key says.
     lane = []
-    manifest = (conf.get("LEG_MANIFEST") or "").strip()
+    manifest = resolve_leg_manifest(repo, conf)
     # TOOL-aNimbleMend-10: the limits pass's lines, its listed shas, and its one-slot guarded-list cache.
     limit_lines, limit_shas, guarded = [], set(), []
     for mode, rev_args, label, tag in populations:
@@ -913,6 +930,66 @@ def run_selftest() -> int:
             "TOOL-aNimbleMend-8 AC5 a trailer-free history reads no lane key, prints no red-fix count and costs "
             "two git spawns fewer than its lane twin, the batched manifest read and the limits read; "
             f"TOOL-aNimbleMend-10 AC6 it prints `red-fix limits · graded 0` once per population ({spawns})", out + "\n" + out2)
+
+        # ---- TOOL-aNimbleMend-15 S9: the REAL `read_lane_state`, reached through a stub of the one
+        # policy read it makes. Every arm above replaces the function itself, so its three other
+        # outcomes ran nowhere: a refused read and an unknown value close the lane under the reader's
+        # line, and no policy kit opens it under the NOTE. Staged by stubbing `read_lane_state` in
+        # place of the reader, which leaves each `why` line unprinted.
+        def check_reader_refused(_key, _root):
+            raise ValueError("policy: refused · the fixture's reader said no")
+
+        def check_reader_absent(_key, _root):
+            raise LookupError("no policy kit in this fixture")
+
+        set_fixture_conf(repo, LEG_MANIFEST="legs.json")
+        orig_reader = globals()["read_policy_value"]
+        try:
+            for stub, why in ((check_reader_refused, "policy: refused · the fixture's reader said no"),
+                              (lambda _key, _root: "maybe",
+                               "bar.inline-red-fixes reads maybe, neither on nor off, so the red-fix lane is closed")):
+                globals()["read_policy_value"] = stub
+                rc, both = run_check(repo, {"GATE_PUSH_BASE": s[0]})
+                listed = both.split(f"{SAY}: {beside}")[0].split("\n")
+                print_arm(rc == 1 and "red-fix" not in listed[0] and f"{SAY}: {why}" in listed
+                    and any(c2 in ln and ln.endswith("no unit id — names no unit") for ln in listed),
+                    f"TOOL-aNimbleMend-15 S9 through the real read_lane_state, a reader answering `{why}` closes the "
+                    "lane: RANGE lists the fix commit `names no unit` under that line", both)
+            globals()["read_policy_value"] = check_reader_absent
+            rc, both = run_check(repo, {"GATE_PUSH_BASE": s[0]})
+            listed = both.split(f"{SAY}: {beside}")[0].split("\n")
+            print_arm("1 red-fix" in listed[0] and not any(c2 in ln for ln in listed)
+                and f"{SAY}: NOTE — no policy kit resolves beside this kit, so bar.inline-red-fixes reads on" in listed,
+                "TOOL-aNimbleMend-15 S9 through the real read_lane_state, no policy kit opens the lane: RANGE "
+                "counts `1 red-fix` under the NOTE line", both)
+        finally:
+            globals()["read_policy_value"] = orig_reader
+
+        # ---- TOOL-aNimbleMend-15 S7: a blank LEG_MANIFEST falls back to the manifest beside the
+        # run-gates kit found beside this one. The fixture holds such a kit on disk and the manifest
+        # in its commits, and this module's own location is stubbed to sit beside it. Staged by
+        # taking the fallback out of `resolve_leg_manifest`: the commit reds `LEG_MANIFEST is blank`,
+        # as the arm above shows it does where the kit beside this module is outside the repository.
+        home, anchor = "run-gates", "run-gates.sh"      # the resolver's own two arguments, as the function passes them
+        repo, s = build_fixture(root, "lanebeside", [
+            {"msg": "init", "date": OLD_EPOCH,
+             "files": {"README.md": "x\n", "kits/gate-legs.json": '[{"name": "leg one"}]\n', "src/a.txt": "0\n"}},
+            {"msg": "fix: clear leg one\n\nRed-fix: leg one\nPass: none", "files": {"src/a.txt": "a\n"}}])
+        set_fixture_conf(repo)
+        kits = repo / "kits"
+        (kits / home).mkdir(parents=True)
+        (kits / home / anchor).write_bytes(b"#!/usr/bin/env bash\n")
+        orig_kit = globals()["KIT"]
+        try:
+            globals()["KIT"] = kits / orig_kit.name
+            found = resolve_leg_manifest(repo, {})
+            rc, out = run_check(repo)
+        finally:
+            globals()["KIT"] = orig_kit
+        print_arm(found == "kits/gate-legs.json" and rc == 0 and "1 red-fix" in out.split("\n")[0]
+            and "LEG_MANIFEST is blank" not in out,
+            f"TOOL-aNimbleMend-15 S7 a blank LEG_MANIFEST beside a run-gates kit reads that kit's manifest "
+            f"(got '{found}') and admits the lane commit", out)
         policy_get = "policy" + ".py"       # spelled apart: AC6 counts that name in this file as zero
         import build_records  # noqa: E402  a sibling, for the one policy read's second caller
         import inspect

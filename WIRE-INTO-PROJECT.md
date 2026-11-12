@@ -280,6 +280,9 @@ here would be a kit path the `install-prefix` ban reds on, with no waiver to tak
      if [ -f "$top/<prefix>/memory-tree/check-memory-hygiene.sh" ] &&
         git diff --cached --name-only --diff-filter=ACMR -- 'memory/**' | grep -q .; then
        bash "$top/<prefix>/memory-tree/check-memory-hygiene.sh" --staged || exit 1
+     elif [ -f "$top/<prefix>/memory-tree/build_records.py" ]; then
+       # no memory path staged: the red-fix join alone, so a commit on top of an unrecorded fix is refused
+       python "$top/<prefix>/memory-tree/build_records.py" join red-fix --staged || exit 1
      fi
      ```
    - **`.gitattributes`** (Windows-determinism for check 9) — add:

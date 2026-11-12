@@ -1263,6 +1263,18 @@ if [ "$sg_reds" = '[]' ]; then echo "ok   L-AC1 readOpenReds over a directory ho
 else echo "FAIL L-AC1 readOpenReds over a directory holding no ledger printed: $sg_reds"; fail=$((fail+1)); fi
 export GOV_DEFAULT_BRANCH="$SG_LANE_ON"
 run_write "L-AC2 the key on, a red open, the main loop, an unrouted card -> allow, one witness line naming the legs and the trailer" 0 "one;;red-fix lane;;leg one, leg three;;Red-fix: <leg>" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+# TOOL-aNimbleMend-15 S11: the SAME row through a copy of the hook with NO policy kit beside it. Every
+# other row runs the hook where the policy kit resolves, so the arm that opens the lane without
+# reading its key ran nowhere. The copy sits under the suite's scratch dir with every script of this
+# kit and no sibling, and the witness must carry the NOTE: a row that ran with the kit resolved
+# prints none, so the NOTE is what says this branch was reached.
+# WHAT THIS DOES NOT CHECK: the unknown-value arm, `bar.inline-red-fixes reads <value>, neither on
+# nor off`, which is unreachable defence: the policy reader refuses a value outside the key's two
+# before the hook sees one, so no fixture reaches it through a policy file.
+mkdir -p "$TMP/nopol/hk"; cp "$HERE"/*.js "$TMP/nopol/hk/"
+sg_hook=$HOOK; HOOK="$TMP/nopol/hk/scratch-guard.js"
+run_write "L15 no policy kit beside the hook, a red open, the main loop -> allow, the witness carrying the NOTE" 0 "one;;red-fix lane;;leg one, leg three;;NOTE — no policy kit resolves beside this hook, so bar.inline-red-fixes reads on" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+HOOK=$sg_hook
 write_ledger "leg two=ok" "leg four=retried"
 run_write "L-AC2 the key on, no red open -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
 cp "$TMP/err" "$TMP/lane-composed.err"
@@ -1291,6 +1303,21 @@ if cmp -s "$TMP/err" "$TMP/lane-composed.err"; then echo "ok   L-AC2 under the k
 else echo "FAIL L-AC2 under the key off the refusal differs from the one composed with no red open"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
 export GOV_DEFAULT_BRANCH=sg-no-such-branch
 run_write "L-AC2 a refused key read, a red open -> deny, the reader's line appended to the refusal" 2 "any;;## route;;policy: refused" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+# TOOL-aNimbleMend-15 S14: the ledger and the role tests run BEFORE the key read. With no red open,
+# and with a writer the lane would never admit, the key is not read, so a read that would be refused
+# appends no line and the refusal is the one composed. The row above is the liveness half: the same
+# refused read, with a red open and an admissible writer, does append its line. With the key read
+# first again, as before this unit, both comparisons below fail.
+write_ledger "leg two=ok"
+run_write "L15 a refused key read, no red open -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+if cmp -s "$TMP/err" "$TMP/lane-composed.err" && ! grep -q 'policy: refused' "$TMP/err"; then echo "ok   L15 with no red open the key is not read: the refusal is byte for byte the one composed and holds no policy: refused line"; pass=$((pass+1))
+else echo "FAIL L15 with no red open a refused key read still appended its line to the refusal"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+write_ledger "leg one=fail"
+write_roles ok
+run_edit "L15 a refused key read, a red open, gov-spec-writer on a product path -> deny with the ## route refusal" 2 "any;;## route" Write "$SG_T" - session_id=sgtest-r6 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-spec-writer
+if ! grep -q 'policy: refused' "$TMP/err"; then echo "ok   L15 for a writer the lane never admits the key is not read: the refusal holds no policy: refused line"; pass=$((pass+1))
+else echo "FAIL L15 a writer the lane never admits still had the key read, and its refused read appended a line"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+write_roles absent
 export GOV_DEFAULT_BRANCH="$SG_LANE_ON"
 write_roles ok
 run_edit "L-AC2 a role index, the main loop on a buildable route (the role arm's refusal), a red open -> allow, the witness line" 0 "one;;red-fix lane;;leg one" Write "$SG_T" - session_id=sgtest-r1 "cwd=$SG_CWD_WT"
@@ -1648,8 +1675,11 @@ n=$((pass+fail))
 # counted by hand under the same rule.
 # 354 = 347 + the 7 run_write rows of TOOL-aNimbleMend-14's arm class "a carried-forward ledger row
 # never opens the lane" (5 refusals and 2 near-miss admits), counted by hand under the same rule.
+# 359 = 354 + the 5 lane rows of TOOL-aNimbleMend-15: the hook with no policy kit beside it (1), and
+# the key left unread with no red open (2) and for a writer the lane never admits (2), counted by
+# hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=354
+FLOOR_ASSERTIONS=359
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
