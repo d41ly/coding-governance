@@ -13,3 +13,12 @@ ran in the pass. Where a line says "owed", the main loop observes it after every
 - AC4 — `^queued-writers|0|both writers green|DIFFER$` — the spec's `grep -c` printed 1 (PINNED, the pass's diff).
 
 **Owed to the close.** Every leg of the spec's Gates section, and the `New arm:` line's RED-first observation over the three staged breaks for AC1, AC2 and AC3.
+
+**Main-loop observations at the close.** The `queued-writers` row over pass commit a03bb6339 in a scratch clone, one staged
+break at a time, each restored before the next (DERIVED at a03bb6339, the scratchpad log aq-arm2.log).
+
+- AC1 — `skipped` — with the waiter's re-read under the lock deleted, the plant exited 1 printing writer two skipped at 7: the
+  rebuild the parsed count could not see is now red.
+- AC2 — `does not open with BEGIN IMMEDIATE` — with each of the tree-build, overlay and collection blocks' lock deleted in turn,
+  the plant exited 1 naming that block's line.
+- AC3 — `both writers green` — no break printed it; restored, the plant exited 0 with it as the last line.
