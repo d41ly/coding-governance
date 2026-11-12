@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-10 — the inline lane's limits, graded on every `Red-fix:` commit
 
-**Status:** SPECCED · rev-2 · 2026-11-12 · node a · Tier-2 · base 1265772c · streams tooling · order 10
+**Status:** INPROGRESS · rev-2 · 2026-11-12 · node a · Tier-2 · base 1265772c · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
