@@ -65,14 +65,14 @@ the shell derives and the templates from `govkit.py shipped`. The meta-check fig
 the base copy, and a pass copy carrying S1 to S4.
 
 - The ban red (PINNED, the counter over the base copy and the worktree): exit 1 with three hits.
-  They are `tools/policy/README.md:378` and `tools/policy/guard.py:237`, each spelling
-  `unattended/unattended.sh`, and `tools/policy/check_policy.py:2449`, spelling
+  They are `tools/policy/README.md:378` and `tools/policy/guard.py@ec8de420:237`, each spelling
+  `unattended/unattended.sh`, and `tools/policy/check_policy.py@4820db46:2449`, spelling
   `tools/unattended/unattended.sh`. The summary reads 508 files graded and 7 renders left out. Rule
   3 of the predicate counts a kit segment followed by a file under any lead,
-  `tools/check-install-prefix.sh:52`.
+  `tools/check-install-prefix.sh@401a476d:52`.
 - The meta-check red (PINNED, `run_meta_check` over the worktree): exit 1 with one red,
   `leg 'spec-audit opt-in pack self-test' carries no enforces and no pending row`, from
-  `tools/playbook/core.py:327`. The leg row is `tools/gate-legs.json:783`, with no `guard` and no
+  `tools/playbook/core.py@854477bd:327`. The leg row is `tools/gate-legs.json@83fb3a5f:783`, with no `guard` and no
   `enforces`. It arrived with TOOL-dFairHearing-16 at `886c11fea`.
 - The pass measured (PINNED, the same probes over the pass copy): the counter exits 0 with 0
   spellings on 0 lines, still 508 files graded and 7 renders. `run_meta_check` returns 0 with
@@ -81,11 +81,11 @@ the base copy, and a pass copy carrying S1 to S4.
 ### The ban (S1, S2, S3)
 
 The counter drains a kit segment only after `{prefix}/`, `{kit}/`, `{{TOOL_ROOT}}`, `<prefix>/` or
-`<tool-root>/`, `tools/check-install-prefix.sh:405`. None of these fits the guard. The guard greps
+`<tool-root>/`, `tools/check-install-prefix.sh@401a476d:405`. None of these fits the guard. The guard greps
 HEAD at every depth, so it has no prefix to spell. The remedy that keeps its rules is to drop the
 kit segment and match the driver by its file name. The probe over each new line counts nothing.
 `**/unattended.sh` and `**/unattended/unattended.sh` select the same one declaration at HEAD:
-`tools/unattended/unattended.sh:993`, `PHASES_TERMINAL="LANDED ABORTED"` (PINNED, `git grep` over
+`tools/unattended/unattended.sh@2a59172f:993`, `PHASES_TERMINAL="LANDED ABORTED"` (PINNED, `git grep` over
 both pathspecs). `**/` also matches at the root: a toy repository holding `unattended.sh` and
 `vendor/gov/run/unattended.sh` returned both. No other tracked file is named `unattended.sh`
 (PINNED, `git ls-tree -r` at HEAD).
@@ -189,9 +189,9 @@ none
 
 This unit extends existing seams and adds no mechanism. The guard keeps its own HEAD-only
 `git grep`. The fixture keeps its literal layout. The pending list takes one more row of the shape
-its siblings use, which the meta-check's message names as the remedy, `tools/playbook/core.py:327`.
+its siblings use, which the meta-check's message names as the remedy, `tools/playbook/core.py@854477bd:327`.
 No existing seam fits a sibling-kit lookup at HEAD. `resolve_kit_dir` answers from the working
-tree's receipt and probes, `tools/lib/resolve_kit_dir.py:18`, so it would break the guard's rule
+tree's receipt and probes, `tools/lib/resolve_kit_dir.py@00b26e94:18`, so it would break the guard's rule
 that it reads HEAD alone.
 
 Recall terms used:

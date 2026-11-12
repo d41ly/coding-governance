@@ -112,7 +112,7 @@ Write spec PLAY-dOrderedCharter-86, a micro-spec for one mechanical fix unit at 
    written; carry its `**Derived:**` binding line; status line `DEFERRED · rev-1 · 2026-11-12 · node a · Tier-1 · base <HEAD short
    sha> · streams tooling · order 47 · advances PLAY-dOrderedCharter-38`.
 2. **install-prefix (shipped surface).** The leg reds on three kit-path spellings PLAY-dOrderedCharter-84 added:
-   `tools/policy/README.md:378`, `tools/policy/check_policy.py:2449` and `tools/policy/guard.py:237`, each spelling the unattended
+   `tools/policy/README.md:378`, `tools/policy/check_policy.py@4820db46:2449` and `tools/policy/guard.py@ec8de420:237`, each spelling the unattended
    kit's `unattended/unattended.sh`. Read the leg's rule in `tools/check-install-prefix.sh` and how other kits find a sibling kit's
    file (its message names `resolve_kit_dir` and a drained token); derive each spelling so none is a literal kit path, keeping the
    guard's own rule that it imports no other kit and reads the driver at HEAD.
