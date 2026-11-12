@@ -833,9 +833,11 @@ def run_plant(root, top, plant, sets) -> int:
         a, b = one.result(), state["parsed"]
         runs, skipped = sum(state["runs"].values()), sum(state["skipped"].values())
         say(f"writer one parsed {a} blob(s); writer two parsed {b}, ran {runs} and skipped {skipped}")
+        say(f"busy timeout {ti.BUSY_TIMEOUT} s")
         # S3: the green line prints last, and only once every check holds
+        # TOOL-aQueuedIndex-3 S1: a full tree build measured 95 s, so a timeout below 600 brings the flake back
         green = (print_equal(read_dump(root), read_cold_dump()) and blocks and not bare
-                 and a > 0 and b == runs == skipped == 0)
+                 and a > 0 and b == runs == skipped == 0 and ti.BUSY_TIMEOUT >= 600)
         if green:
             say("both writers green")
         return 0 if green else 1

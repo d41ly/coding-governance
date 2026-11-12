@@ -1,11 +1,12 @@
 # TOOL-aQueuedIndex-3 — the queued-writers plant pins the busy timeout
 
-**Status:** DEFERRED · rev-1 · 2026-11-12 · node a · Tier-1 · base 8c8e4412a · streams tooling · order 3
+**Status:** CLOSED · rev-1 · 2026-11-12 · node a · Tier-1 · base 8c8e4412a · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-12-build-TOOL-aQueuedIndex-3-ledger.md](../build/2026-11-12-build-TOOL-aQueuedIndex-3-ledger.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aQueuedIndex-3-1-spec-writer.md](../prompts/2026-11-12-prompt-TOOL-aQueuedIndex-3-1-spec-writer.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aQueuedIndex-3-build-brief.md](../prompts/2026-11-12-prompt-TOOL-aQueuedIndex-3-build-brief.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aQueuedIndex-3-spec-brief.md](../prompts/2026-11-12-prompt-TOOL-aQueuedIndex-3-spec-brief.md) | research | — |
