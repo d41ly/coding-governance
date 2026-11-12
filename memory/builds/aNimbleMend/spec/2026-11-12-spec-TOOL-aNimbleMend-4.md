@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-4 — the scoped legs: three manifest rows a pass can afford, for memory hygiene's pass checks, the positional check alone and the spec tokens of the pass's own spec
 
-**Status:** OPEN · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 3
+**Status:** INPROGRESS · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
