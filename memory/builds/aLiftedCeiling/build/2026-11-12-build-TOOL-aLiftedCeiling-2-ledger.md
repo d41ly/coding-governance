@@ -18,3 +18,9 @@ the clone's diff was the one row replaced (DERIVED at 9ee033127). The generated 
   their evidenced maximum" (PINNED, the hook's refusal in this pass).
 
 **Owed to the close.** AC4, and every leg of the spec's Gates section. The spec declares no `New arm:` line.
+
+**Main-loop observation at the close.** Over pass commit aeb5e0a6b in this worktree (DERIVED at aeb5e0a6b, the scratchpad log
+al2-ac4.log).
+
+- AC4 — `--check` — the ceiling check exited 0 with no failure line, and its outside-reading list carries the leg's row with the new
+  source text naming the host load and the commit its race ran at.

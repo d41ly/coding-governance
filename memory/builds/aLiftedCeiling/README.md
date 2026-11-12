@@ -55,7 +55,7 @@ ids TOOL-aLiftedCeiling-1 TOOL-aLiftedCeiling-2
 | [TOOL-aLiftedCeiling-2 — the instruction-edits evidence row names its host load and its clone's commit](spec/2026-11-12-spec-TOOL-aLiftedCeiling-2.md) | 2 | 1 | CLOSED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 12 bound to this build, across 4 record folder(s).
+Records: 13 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
