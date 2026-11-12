@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-12 — the acceptance suite: one pass-leg run and one inline fix, end to end, in a scratch adopter and in a clone of gov, with each switch on and off
 
-**Status:** INPROGRESS · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 12
+**Status:** CLOSED · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 12
 
 <!-- gen:spec-records -->
 

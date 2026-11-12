@@ -4786,7 +4786,8 @@ def run_pass_lane_case(name):
                                    want, cwd=t)
 
         if gov:  # g1: the command a main loop is told to run is the command the steps below run
-            template = f"{budgets.derive_tool_root()}/workflows/unattended-build.template.js"
+            anchor, here = "unattended-build.template.js", (t / budgets.derive_tool_root() / KIT.name).absolute()
+            template = (resolve_kit_dir("workflows", anchor, here) / anchor).relative_to(t.absolute()).as_posix()
             said = PASS_LEGS_CONST.search(policy.read_text_or_none(t / template) or "")
             argv = said[1].replace("{{TOOL_ROOT}}", budgets.derive_tool_root() + "/").split() if said else []
             checks.append(("setup", f"g1 · PASS_LEGS in {template} names bash, the adapter under the tool root and --base",
