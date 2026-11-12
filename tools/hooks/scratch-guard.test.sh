@@ -1277,7 +1277,7 @@ run_write "L15 no policy kit beside the hook, a red open, the main loop -> allow
 HOOK=$sg_hook
 # TOOL-aNimbleMend-15 S7: a BLANK LEG_MANIFEST reads as gate-legs.json beside the run-gates kit the
 # hook's own resolver finds, as the commit grader reads it. The real hook's run-gates kit sits
-# outside this fixture, so the two rows run a copy of the hook INSIDE the worktree, at sgk/hooks/,
+# outside this fixture, so the two rows run a copy of the hook INSIDE the worktree, under sgk,
 # beside a run-gates kit of one anchor file, with the conf put back to the form that names no
 # manifest. The first row has the kit's manifest at sgk/gate-legs.json and the lane opens on the
 # reds at HEAD; the second has that file removed and the lane stays shut. The copy has no policy
@@ -1285,9 +1285,12 @@ HOOK=$sg_hook
 # fallback taken out of the hook (`if (!rel) return []` restored) the first row exits 2.
 # WHAT THIS DOES NOT CHECK: a manifest beside a kit OUTSIDE the worktree, which no row plants.
 cp "$SG_CONF" "$TMP/lane-conf.named"; cp "$TMP/lane-conf.bak" "$SG_CONF"
-mkdir -p "$SGWT/sgk/hooks" "$SGWT/sgk/run-gates"; cp "$HERE"/*.js "$SGWT/sgk/hooks/"
-: > "$SGWT/sgk/run-gates/run-gates.sh"; cp "$SGWT/sg-legs.json" "$SGWT/sgk/gate-legs.json"
-HOOK="$SGWT/sgk/hooks/scratch-guard.js"
+# The two kit directories are named from variables, never typed: this kit's own directory name and
+# the run-gates kit's, as the resolver printed it above (the install-prefix ban's rule 3).
+sg_kh="$SGWT/sgk/${HERE##*/}"; sg_kr="$SGWT/sgk/$RUN_GATES"
+mkdir -p "$sg_kh" "$sg_kr"; cp "$HERE"/*.js "$sg_kh/"
+: > "$sg_kr/run-gates.sh"; cp "$SGWT/sg-legs.json" "$SGWT/sgk/gate-legs.json"
+HOOK="$sg_kh/scratch-guard.js"
 run_write "L15 a blank LEG_MANIFEST, the run-gates kit's manifest present, a red at HEAD -> allow, the witness naming the legs" 0 "one;;red-fix lane;;leg one, leg three" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
 rm -f "$SGWT/sgk/gate-legs.json"
 run_write "L15 a blank LEG_MANIFEST, no manifest beside the run-gates kit, a red at HEAD -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
