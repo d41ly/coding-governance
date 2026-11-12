@@ -1,6 +1,6 @@
 # TOOL-aQueuedIndex-1 — writers of the shared tag index queue instead of failing
 
-**Status:** DEFERRED · rev-1 · 2026-11-12 · node a · Tier-2 · base f1d7712e6 · streams tooling · order 1
+**Status:** DEFERRED · rev-2 · 2026-11-12 · node a · Tier-2 · base 6f5d27a20 · streams tooling · order 1 · ratified 2026-11-12
 
 <!-- gen:spec-records -->
 
@@ -180,8 +180,13 @@ node's. Its files ride the per-plant branch of `build_tags_fixture`
    `run_verb(root, "rebuild", None, sets=sets)`, which opens its own connection in its own thread and
    builds H. The fan-out bound is two writers: this thread and the main thread.
 5. **Wait for the lock.** The main thread polls the index file every 0.05 s, for at most 30 s, with
-   a raw `sqlite3.connect(path, timeout=0)` that runs `BEGIN IMMEDIATE` and rolls back at once. The
-   first `database is locked` means writer one is inside its write block. The `held-open` plant
+   a raw `sqlite3.connect(path, timeout=0)` that runs `BEGIN IMMEDIATE` and rolls back at once.
+   The first `database is locked` is not enough. Writer one's `load_index` writes
+   `PRAGMA user_version` on every open, holding the lock for milliseconds before its build starts,
+   so the poll reads writer one as inside its write block only once every poll has seen the lock
+   held for 0.5 s in a row. The tree build holds it for the staged 3 s parse, which leaves writer two
+   most of that parse to reach its unlocked read. At BASE, writer one's open waits on writer two's
+   held view, so the refusal in step 6 still comes first. The `held-open` plant
    already holds the index through a raw `sqlite3` connection
    (`tools/playbook/gov_tag.py@f1d7712e6:754-777`). At the bound, the plant prints
    `writer one never took the write lock` and returns 1.
@@ -324,10 +329,17 @@ than the busy timeout.
     times the longest build measured, and nothing has measured it green.
   - Recommendation: (a). It is the only value measured green, and a slower machine's cold build
     stays inside it.
+  - RESOLVED (agent, 2026-11-12, delegated): (a) 600 s. The main loop took the recommendation
+    under the owner's prompt and accepted brief, which delegate forks to recommendations.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-12 · initial draft.
+- rev-2 · 2026-11-12 · §4 · §8 · base moved to 6f5d27a20. §4 Design step 5 folds the builder's
+  deviation 11 (`2026-11-12-build-TOOL-aQueuedIndex-1-deviation-11`): the poll reads writer one as
+  inside its write block only once the lock has been held for 0.5 s in a row, because
+  `load_index` writes `PRAGMA user_version` on every open. §8 F1 is marked resolved, delegated,
+  on (a) 600 s.
 
 ## 10. Reuse audit
 

@@ -29,3 +29,7 @@ anchor-ref: refs/heads/main
 base: d084590b612e1dfe97fb7a55b1ff9c1cedb3482c
 
 ## Parked
+
+2026-11-12T14:50:25Z dispatch · item 6f5d27a2 TOOL-aQueuedIndex-1 · reason tools/playbook/tag_index.py tools/playbook/gov_tag.py tools/playbook/adopt-playbook.sh help/tags.md memory/builds/aQueuedIndex/spec/2026-11-12-spec-TOOL-aQueuedIndex-1.md memory/builds/aQueuedIndex/build/2026-11-12-build-TOOL-aQueuedIndex-1-ledger.md memory/builds/aQueuedIndex/build/2026-11-12-build-TOOL-aQueuedIndex-1-deviation-11.md memory/builds/aQueuedIndex/README.md memory/LIVE.md memory/map/generated memory/map/baseline.toml memory/project/positional-refs.txt memory/project/unpinned-facts.txt
+
+2026-11-12T14:50:54Z brief · item TOOL-aQueuedIndex-1 · reason b901a3ad86b9 memory/builds/aQueuedIndex/prompts/2026-11-12-prompt-TOOL-aQueuedIndex-1-build-brief.md

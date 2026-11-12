@@ -51,7 +51,7 @@ ids TOOL-aQueuedIndex-1
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aQueuedIndex-1 — writers of the shared tag index queue instead of failing](spec/2026-11-12-spec-TOOL-aQueuedIndex-1.md) | 1 | 2 | DEFERRED | rev-1 | 2026-11-12 |
+| [TOOL-aQueuedIndex-1 — writers of the shared tag index queue instead of failing](spec/2026-11-12-spec-TOOL-aQueuedIndex-1.md) | 1 | 2 | DEFERRED | rev-2 | 2026-11-12 |
 <!-- /gen:build-units -->
 
 Records: 4 bound to this build, across 2 record folder(s).
