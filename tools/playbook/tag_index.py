@@ -1092,12 +1092,14 @@ def check_tag_shape(con, ctx) -> tuple[list, list]:
     return reds, graded
 
 
-def check_namespace_joins(con, ctx, file_names=None) -> tuple[list, list]:
+def check_namespace_joins(con, ctx, file_names=None, *, every) -> tuple[list, list]:
     """S4, each namespace joined both ways through `compute_coverage`: every graded citation into it is a
     member (a retired one included, the `retired` arm's question), file names aside; and, for a `selects`
     namespace whose members are not units, every member selects a unit, graded once some unit's `scope`
     names a tag of the namespace (PLAY-dOrderedCharter-75). An empty population prints `unarmed` and
-    grades nothing; a descriptor's unused members are printed, never red. -> (reds, lines)."""
+    grades nothing; a descriptor's unused members are printed, never red. A unit scoped `every`, the
+    caller's wildcard tag, is in the set every reader loads, so each declared member selects it
+    (PLAY-dOrderedCharter-88). -> (reds, lines)."""
     load_memory_tree()
     from coverage_join import compute_coverage
     if file_names is None:
@@ -1138,6 +1140,8 @@ def check_namespace_joins(con, ctx, file_names=None) -> tuple[list, list]:
                              "so no member is graded as selecting")
                 continue
             dec = declared.get(ns, {})
+            if every in sel:  # a unit scoped `every` is in each member's load set
+                sel = {**{t: sel[every] for t in dec}, **sel}
             cov = compute_coverage({ns: sorted(dec)}, {"units": {ns: tuple(sel)}}, {ns: ()})
             for tag in cov.unclaimed.get(ns, []):
                 reds.append(f"tags: {dec[tag][0]}:{dec[tag][1]} · join · `{tag}` is declared and selects no unit")

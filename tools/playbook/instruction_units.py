@@ -1906,7 +1906,7 @@ def arm_arms(c):
         con = ti.load_index(root)
         try:
             ti.load_view(con, root, ctx)
-            joins = "\n".join(ti.check_namespace_joins(con, ctx)[1])
+            joins = "\n".join(ti.check_namespace_joins(con, ctx, every=EVERY)[1])
             members = sorted(r[0] for r in ti.read_rows(con, ("tag",)) if r[5] in ti.UNIT_EXTRACTORS)
         finally:
             con.close()

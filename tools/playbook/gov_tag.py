@@ -226,7 +226,7 @@ def run_check(con, root, ctx, kit_rel, *, sets, base, as_json, state) -> int:
                             lambda: read_policy_value("tags.retired-cites", root)[0][0])
     file_names = ti.read_view_file_names(con)
     reds, shaped = ti.check_tag_shape(con, ctx)
-    j_reds, j_lines = ti.check_namespace_joins(con, ctx, file_names)
+    j_reds, j_lines = ti.check_namespace_joins(con, ctx, file_names, every=instruction_units.EVERY)
     s_reds, c = ti.check_resolves(con, ctx, bare_mode, armed, file_names)
     reds += j_reds + s_reds
     base_spans, base_sections, base_why = None, None, ""
@@ -380,6 +380,7 @@ UNCLOSED = "\n```\nand [doc.nope]\n"
 PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retired", "retired-old",
           "retired-reminted", "bare", "bare-charter", "owned", "owned-core", "scope", "scope-guide",
           "bad-ns", "bad-seg", "long-tag", "ns-word", "unregistered-cite", "dead-selector", "unscoped-unit",
+          "every-selector",
           "empty-ns", "escaped-word", "file-name", "new-extractor", "extractor-edit", "tagless", "schema",
           "no-owner", "ghost-owner", "no-purpose-source", "bad-purpose-source", "member-no-field", "pending-source",
           "registry-ghost", "registry-missing", "registry-joined", "new-no-purpose", "two-versions",
@@ -432,9 +433,13 @@ SHAPE_PLANTS = {
                      {"tools/corekit/core.tags": "+a.b.c\n"}),
     "unregistered-cite": ("", {"memory/guides/ALPHA.md": "+\nsee `layer.nowhere`\n"}),
     "dead-selector": (FIXTURE_UNIT_ROW + derive_fixture_row("reader", "tag_index:extract_reader", "selects"), {
-        f"{FIXTURE_KIT}/readers.toml": '[[reader]]\ntag = "reader.every"\n\n[[reader]]\ntag = "reader.ghost"\n',
-        "tools/corekit/instructions.toml": '[[unit]]\ntag = "unit.alpha"\nscope = ["reader.every"]\n',
+        f"{FIXTURE_KIT}/readers.toml": '[[reader]]\ntag = "reader.one"\n\n[[reader]]\ntag = "reader.ghost"\n',
+        "tools/corekit/instructions.toml": '[[unit]]\ntag = "unit.alpha"\nscope = ["reader.one"]\n',
         "tools/corekit/core.tags": "+layer.memory.lexicon\n"}),
+    # PLAY-dOrderedCharter-88: a unit scoped `reader.every` is in every reader's load set, so each selects it
+    "every-selector": (FIXTURE_UNIT_ROW + derive_fixture_row("reader", "tag_index:extract_reader", "selects"), {
+        f"{FIXTURE_KIT}/readers.toml": '[[reader]]\ntag = "reader.every"\n\n[[reader]]\ntag = "reader.ghost"\n',
+        "tools/corekit/instructions.toml": '[[unit]]\ntag = "unit.alpha"\nscope = ["reader.every"]\n'}),
     # PLAY-dOrderedCharter-75: a unit row with no `scope` leaves the `reader` join unarmed
     "unscoped-unit": (FIXTURE_UNIT_ROW + derive_fixture_row("reader", "tag_index:extract_reader", "selects"), {
         f"{FIXTURE_KIT}/readers.toml": '[[reader]]\ntag = "reader.every"\n',
@@ -1033,7 +1038,7 @@ def run_plant(root, top, plant, sets) -> int:
     if plant in ("dead-selector", "file-name"):  # the plant's exit, then its second half's on one line
         rc = run_verb(root, "check", None, sets=sets)
         if plant == "dead-selector":
-            write_commit(root, {f"{FIXTURE_KIT}/readers.toml": '[[reader]]\ntag = "reader.every"\n'}, "no ghost")
+            write_commit(root, {f"{FIXTURE_KIT}/readers.toml": '[[reader]]\ntag = "reader.one"\n'}, "no ghost")
             half = "without reader.ghost"
         else:
             run_git(root, "mv", "tools/corekit/kit.toml", "tools/corekit/corekit.kit.toml")

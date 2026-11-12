@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-88 — the `repo` namespace reads its purpose path-only, and the reader join counts a unit scoped `reader.every` as selected by every reader
 
-**Status:** DEFERRED · rev-1 · 2026-11-12 · node a · Tier-2 · base 9b9e829df · streams tooling · order 49 · advances PLAY-dOrderedCharter-38
+**Status:** CLOSED · rev-1 · 2026-11-12 · node a · Tier-2 · base 9b9e829df · streams tooling · order 49 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-12-build-PLAY-dOrderedCharter-88-deviation-881.md](../build/2026-11-12-build-PLAY-dOrderedCharter-88-deviation-881.md) | deviation | — |
+| [2026-11-12-build-PLAY-dOrderedCharter-88-ledger.md](../build/2026-11-12-build-PLAY-dOrderedCharter-88-ledger.md) | journal | — |
 | [2026-11-12-prompt-PLAY-dOrderedCharter-88-1-spec-writer.md](../prompts/2026-11-12-prompt-PLAY-dOrderedCharter-88-1-spec-writer.md) | journal | — |
 | [2026-11-12-prompt-PLAY-dOrderedCharter-88-build-brief.md](../prompts/2026-11-12-prompt-PLAY-dOrderedCharter-88-build-brief.md) | journal | — |
 | [2026-11-12-prompt-PLAY-dOrderedCharter-88-spec-brief.md](../prompts/2026-11-12-prompt-PLAY-dOrderedCharter-88-spec-brief.md) | research | — |

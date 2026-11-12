@@ -83,7 +83,8 @@ tag-shaped word that is not a citation, quote it another way, with doubled backt
   itself a namespace word, such as `` `practice.repo.x` ``.
 - **join** — a citation that is no member of its namespace, such as `` `layer.nowhere` ``; and a
   `reader` or `practice` member no unit selects, once some unit's `scope` names a tag of its namespace.
-  Until then the namespace prints `selects · unarmed`. A describing namespace's unused members are
+  Until then the namespace prints `selects · unarmed`. A unit scoped `reader.every` is selected by
+  every reader, since it is in the set every reader loads. A describing namespace's unused members are
   listed, never red.
 - **purpose** — a namespace row whose `purpose-source` a member lacks; a chain registry row naming no
   build of the design view, a design build with no row, and a row with no `purpose` for a build v2's

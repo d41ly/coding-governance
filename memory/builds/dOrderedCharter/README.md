@@ -102,7 +102,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 80 unit(s) · node d · opened 2026-10-21 · streams playbook
+**Build status:** CLOSED · 80 unit(s) · node d · opened 2026-10-21 · streams playbook
 ids PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12
 ids PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24
 ids PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36
@@ -194,10 +194,10 @@ ids PLAY-dOrderedCharter-86 PLAY-dOrderedCharter-87 PLAY-dOrderedCharter-88 TOOL
 | [PLAY-dOrderedCharter-85 — the prepare folds gov first's walk into the merge before it regenerates](spec/2026-11-12-spec-PLAY-dOrderedCharter-85.md) | 46 | 2 | CLOSED | rev-1 | 2026-11-12 |
 | [PLAY-dOrderedCharter-86 — the run guard finds the driver by its file name, and the opt-in pack's self-test leg gets its pending row](spec/2026-11-12-spec-PLAY-dOrderedCharter-86.md) | 47 | 1 | CLOSED | rev-1 | 2026-11-12 |
 | [PLAY-dOrderedCharter-87 — the adopter-rules step types each rule `adopter-rule`, a level-0 repository statement type the grammar admits as written](spec/2026-11-12-spec-PLAY-dOrderedCharter-87.md) | 48 | 2 | CLOSED | rev-1 | 2026-11-12 |
-| [PLAY-dOrderedCharter-88 — the `repo` namespace reads its purpose path-only, and the reader join counts a unit scoped `reader.every` as selected by every reader](spec/2026-11-12-spec-PLAY-dOrderedCharter-88.md) | 49 | 2 | DEFERRED | rev-1 | 2026-11-12 |
+| [PLAY-dOrderedCharter-88 — the `repo` namespace reads its purpose path-only, and the reader join counts a unit scoped `reader.every` as selected by every reader](spec/2026-11-12-spec-PLAY-dOrderedCharter-88.md) | 49 | 2 | CLOSED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 668 bound to this build, across 4 record folder(s).
+Records: 670 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

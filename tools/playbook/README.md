@@ -283,7 +283,8 @@ function in `tag_index.py` and printed `unarmed` while that source declares noth
 (every defined tag and selector value in a registered namespace, every segment in shape, at most 64
 bytes before any `#`, no first segment that is a namespace word, a registry word outside the segment
 shape a red and never a word), the joins (every citation a member; every `reader` and `practice` member
-selecting a unit once some unit's `scope` names a tag of its namespace) and the name-check slot, `point.instruction.name-check`, where the
+selecting a unit once some unit's `scope` names a tag of its namespace, a unit scoped `reader.every`
+selected by every reader since it is in the set every reader loads) and the name-check slot, `point.instruction.name-check`, where the
 lexicon's `--tags` grades the same names. A cited span that is the base name of a tracked file is counted
 as a file name, never red. The later namespaces are not registered, so their tags red until the build
 that arms each adds its row:
