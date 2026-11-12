@@ -9,11 +9,13 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+units-at-landing: TOOL-aQueuedIndex-1 TOOL-aQueuedIndex-2 TOOL-aQueuedIndex-3
+gates-run: unattended-179450345232738512245-5856 c739aab7
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 8439558dd73588bc753e954376a5288a8d0d5aa1
-phase: VERIFYING
+phase: LANDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/unattended-aqueuedindex
