@@ -47,3 +47,5 @@ base: 768014ca37d52bef329959838d97957c97f541e9
 2026-11-12T20:59:11Z rescope · item add TOOL-aLiftedCeiling-3 · reason the close bar's install-prefix red: unit 2's evidence row source spells the playbook kit's path, which a shipped file may not; the row is rewritten by the kit without it
 
 2026-11-12T21:15:10Z brief · item TOOL-aLiftedCeiling-3 · reason 1314a873eb50 memory/builds/aLiftedCeiling/prompts/2026-11-12-prompt-TOOL-aLiftedCeiling-3-build-brief.md
+
+2026-11-12T21:17:59Z dispatch · item 5d336cf1 TOOL-aLiftedCeiling-3 · reason tools/run-gates/ceiling-evidence.txt memory/builds/aLiftedCeiling/spec/2026-11-12-spec-TOOL-aLiftedCeiling-3.md memory/builds/aLiftedCeiling/build/2026-11-12-build-TOOL-aLiftedCeiling-3-ledger.md memory/builds/aLiftedCeiling/README.md memory/LIVE.md

@@ -46,7 +46,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 3 unit(s) · node a · opened 2026-11-12 · streams tooling
+**Build status:** CLOSED · 3 unit(s) · node a · opened 2026-11-12 · streams tooling
 ids TOOL-aLiftedCeiling-1 TOOL-aLiftedCeiling-2 TOOL-aLiftedCeiling-3
 
 <!-- gen:build-units -->
@@ -54,10 +54,10 @@ ids TOOL-aLiftedCeiling-1 TOOL-aLiftedCeiling-2 TOOL-aLiftedCeiling-3
 |---|---|---|---|---|---|
 | [TOOL-aLiftedCeiling-1 — the instruction-edits leg's ceiling covers its wait on the tag index](spec/2026-11-12-spec-TOOL-aLiftedCeiling-1.md) | 1 | 1 | CLOSED | rev-1 | 2026-11-12 |
 | [TOOL-aLiftedCeiling-2 — the instruction-edits evidence row names its host load and its clone's commit](spec/2026-11-12-spec-TOOL-aLiftedCeiling-2.md) | 2 | 1 | CLOSED | rev-1 | 2026-11-12 |
-| [TOOL-aLiftedCeiling-3 — the instruction-edits evidence row's source spells no kit path](spec/2026-11-12-spec-TOOL-aLiftedCeiling-3.md) | 3 | 1 | DEFERRED | rev-1 | 2026-11-12 |
+| [TOOL-aLiftedCeiling-3 — the instruction-edits evidence row's source spells no kit path](spec/2026-11-12-spec-TOOL-aLiftedCeiling-3.md) | 3 | 1 | CLOSED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 16 bound to this build, across 4 record folder(s).
+Records: 17 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
