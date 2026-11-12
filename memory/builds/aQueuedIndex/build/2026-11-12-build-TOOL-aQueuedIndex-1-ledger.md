@@ -16,3 +16,14 @@ suite or bar ran in the pass. Where a line says "owed", the main loop observes i
 **Sibling plants over autocommit.** `held-open`, `schema`, `tagless`, `dirty` and `two-versions` each exited 0 over the pass's code, the schema reset's explicit transaction and the plants' own `with con:` blocks included (PINNED, those plant runs).
 
 **Owed to the close.** Every leg of the spec's Gates section, the `New arm:` line's RED-first observation for AC1 and AC2, and AC3's five races.
+
+**Main-loop observations at the close.** Run over pass commit dd195a2e1 in a scratch clone under a short temp directory, its
+own index fresh before each race (DERIVED at dd195a2e1, the scratchpad logs aq-ac3.log and tq-arm-*.log).
+
+- AC3 — `database is locked` — five races of the tags check against the instruction-edits check each exited 0 on both
+  writers, the slowest writer at 130 s and the rest between 105 s and 110 s, and no log line carried the lock refusal.
+- AC1 — `both writers green` — the `queued-writers` row over BASE's index module exited 1 with writer two refused on the lock
+  refusal, and exited 0 once the pass's module was restored: the arm's RED-first half holds.
+- AC2 — `writer two parsed 0` — with the re-read under the lock deleted, the plant still exited 0 and still printed writer two at
+  0: the blob-parse cache counts a rebuild's blobs as skipped, so this arm cannot go red. The closing review's round 1 confirmed
+  the same defect as B1; TOOL-aQueuedIndex-2 owns the fix.

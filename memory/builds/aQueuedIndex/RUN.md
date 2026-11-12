@@ -35,3 +35,7 @@ base: d084590b612e1dfe97fb7a55b1ff9c1cedb3482c
 2026-11-12T14:50:54Z brief · item TOOL-aQueuedIndex-1 · reason b901a3ad86b9 memory/builds/aQueuedIndex/prompts/2026-11-12-prompt-TOOL-aQueuedIndex-1-build-brief.md
 
 2026-11-12T15:23:30Z dispatch · item eb478868 TOOL-aQueuedIndex-1 · reason tools/playbook/tag_index.py tools/playbook/gov_tag.py tools/playbook/adopt-playbook.sh help/tags.md memory/builds/aQueuedIndex/spec/2026-11-12-spec-TOOL-aQueuedIndex-1.md memory/builds/aQueuedIndex/build/2026-11-12-build-TOOL-aQueuedIndex-1-ledger.md memory/builds/aQueuedIndex/build/2026-11-12-build-TOOL-aQueuedIndex-1-deviation-11.md memory/builds/aQueuedIndex/README.md memory/LIVE.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-12T15:38:35Z review · item aQueuedIndex · reason verdict BLOCKED · blockers 2
+
+2026-11-12T15:38:37Z rescope · item add TOOL-aQueuedIndex-2 · reason the closing review's round-1 findings, batched: the queued-writers plant cannot see the under-lock re-read (B1), no arm fails when the overlay or gc block loses its BEGIN IMMEDIATE (M1), and the plant prints green before its checks (L1)

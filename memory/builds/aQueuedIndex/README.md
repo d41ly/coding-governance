@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-12
 streams: tooling
 roster: TOOL
-ids: TOOL-aQueuedIndex-1
+ids: TOOL-aQueuedIndex-1 TOOL-aQueuedIndex-2
 authorized-by: prompt
 ---
 
@@ -46,7 +46,7 @@ None.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node a · opened 2026-11-12 · streams tooling
-ids TOOL-aQueuedIndex-1
+ids TOOL-aQueuedIndex-1 TOOL-aQueuedIndex-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -54,7 +54,7 @@ ids TOOL-aQueuedIndex-1
 | [TOOL-aQueuedIndex-1 — writers of the shared tag index queue instead of failing](spec/2026-11-12-spec-TOOL-aQueuedIndex-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 3 record folder(s).
+Records: 11 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
