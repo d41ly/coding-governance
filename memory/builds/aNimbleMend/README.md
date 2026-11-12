@@ -72,7 +72,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 12 unit(s) · node a · opened 2026-11-12 · streams tooling
+**Build status:** SPECCED · 13 unit(s) · node a · opened 2026-11-12 · streams tooling
 ids TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 TOOL-aNimbleMend-13
 
 <!-- gen:build-units -->
@@ -90,15 +90,16 @@ ids TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 
 | [TOOL-aNimbleMend-10 — the inline lane's limits, graded on every `Red-fix:` commit](spec/2026-11-12-spec-TOOL-aNimbleMend-10.md) | 10 | 2 | SPECCED | rev-2 | 2026-11-12 |
 | [TOOL-aNimbleMend-11 — the documents: a help page per mechanism, and the build method and the unattended protocol saying where the pass legs run and what the lane admits](spec/2026-11-12-spec-TOOL-aNimbleMend-11.md) | 11 | 2 | SPECCED | rev-3 | 2026-11-12 |
 | [TOOL-aNimbleMend-12 — the acceptance suite: one pass-leg run and one inline fix, end to end, in a scratch adopter and in a clone of gov, with each switch on and off](spec/2026-11-12-spec-TOOL-aNimbleMend-12.md) | 12 | 2 | SPECCED | rev-2 | 2026-11-12 |
+| [TOOL-aNimbleMend-13 — the first pass-leg run's findings repaired: a pass leg grades the whole manifest, the rule selects no leg the runner holds, and three texts say what the code does](spec/2026-11-12-spec-TOOL-aNimbleMend-13.md) | 13 | 2 | SPECCED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 22 bound to this build, across 3 record folder(s).
+Records: 23 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aNimbleMend-1 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9.
+Ids no `spec-audit` record has ever named: TOOL-aNimbleMend-1 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 TOOL-aNimbleMend-13 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9.
 
-Ids whose spec moved past its audited revision: none — 0 of 12 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 13 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -117,6 +118,7 @@ Ids whose spec moved past its audited revision: none — 0 of 12 unit id(s) carr
 | 10 | `TOOL-aNimbleMend-10` | no |
 | 11 | `TOOL-aNimbleMend-11` | no |
 | 12 | `TOOL-aNimbleMend-12` | no |
+| 13 | `TOOL-aNimbleMend-13` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
