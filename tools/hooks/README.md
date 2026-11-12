@@ -616,7 +616,7 @@ scanned once. The role index is read at the checkout root of the payload `cwd`, 
 | Row | Matches | Admitted when |
 |---|---|---|
 | G1 leg | its argv equals a leg's of the gate manifest the role index names, from the leg's script on | the role's allowlist names that leg |
-| G2 runner | the bar runner, the self-test runner or the unattended gates runner, by basename, any form | never |
+| G2 runner | the bar runner, the self-test runner, the unattended gates runner or the pass-leg runner `pass-legs.sh`, by basename, any form | never |
 | G3 suite | a `*.test.sh` or `*selftest.py` script, or a script carrying `--selftest` | it carries `--render`, `--list` or `--help`, or it is an allowlisted G1 leg |
 
 The allowlist is the role index's `gates` list for that type, which the roles kit renders from the

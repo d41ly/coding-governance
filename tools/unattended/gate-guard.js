@@ -65,7 +65,9 @@
  *
  * WHAT IT NEVER DENIES. The plain bar — `run-gates.sh` with neither flag — is the scoped form the
  * owner allows at the main loop, and this hook cannot tell a child from the main loop; the child
- * prompt forbids it there by instruction. A quoted MENTION of any of the shapes — a commit
+ * prompt forbids it there by instruction. Nor the pass-leg runner `pass-legs.sh` with neither
+ * flag: it matches none of rows D1 to D5, and scratch-guard's row G2 refuses it to a role agent.
+ * A quoted MENTION of any of the shapes — a commit
  * message, a `grep` argument, a heredoc body — is invisible by construction of the view, with one
  * exception read on purpose: a `$( … )` or backtick span inside DOUBLE quotes, or inside an
  * UNQUOTED heredoc body (`<<EOF`, which bash expands before the consumer reads a line; a

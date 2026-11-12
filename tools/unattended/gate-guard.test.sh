@@ -454,6 +454,14 @@ run "AC3 BUILDING: a suite --check -> allow"                  0 "$B" 'bash '"${P
 run "AC3 BUILDING: bash -n <suite>, the syntax check -> allow" 0 "$B" 'bash -n '"${PFX}${KIT_NAME}/gate-guard.test.sh"''
 run "  control: bash -x <suite> is still a run -> deny"       2 "$B" 'bash -x '"${PFX}${KIT_NAME}/gate-guard.test.sh"''
 run "  control: BUILDING still denies the bare suite"         2 "$B" "$D4"
+# TOOL-aNimbleMend-6: the pass-leg runner matches none of rows D1 to D5, so the main loop runs it in
+# every phase; a non-empty flag in front of it is still row D1, which also proves the fixture is
+# keyed. Against a resolveFileRow shape for the runner's basename the first row exits 2.
+PASS_LEGS='bash '"${PFX}${RUN_GATES}/pass-legs.sh"' --base HEAD~1'
+run "N-AC3 BUILDING: the pass-leg runner -> allow"            0 "$B" "$PASS_LEGS"
+if [ -s "$TMP/err" ]; then echo "FAIL N-AC3 the allow printed to stderr"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+else echo "ok   N-AC3 the allow prints nothing"; pass=$((pass+1)); fi
+run "N-AC4 BUILDING: GATE_FULL=1 before the pass-leg runner -> deny" 2 "$B" "GATE_FULL=1 $PASS_LEGS"; check_names "N-AC4" 'GATE_FULL=1'
 
 # ---- AC4: the key --------------------------------------------------------------------------------
 F=$(build_fixture BUILDING 'anchor-kind: run-branch' 'branch-ref: refs/heads/other')
@@ -767,7 +775,9 @@ n=$((pass+fail))
 # static count of the arms above at ~10% headroom, because the pass that wrote this file may not
 # run it (the hook it tests denies the invocation at BUILDING); the main loop's first green at
 # VERIFYING confirms the executed count against this floor. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=179
+FLOOR_ASSERTIONS=183
+# RAISED 179 -> 183 at TOOL-aNimbleMend-6, by the static count of the assertions it added: the
+# pass-leg runner's allow with its empty-stderr check, and its flagged deny with one token check.
 # RAISED 163 -> 179 at TOOL-aOrientedCast-24, by the static count of the assertions it added: Q1's
 # `liveness LIVE` token, Q7's allow, Q8's deny with its two token checks, Q9's two, Q10's three denies
 # with a token check each and its LANDED allow, Q11's allow and Q12's — sixteen.

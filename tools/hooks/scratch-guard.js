@@ -108,7 +108,8 @@
  * scratch verdict and the orientation check, `checkRoleGate` refuses a simple command that runs a
  * gate the role's allowlist does not name: G1, the argv of a leg of the gate manifest the role
  * index names (`gates.manifest`), compared word for word from its script on; G2, the bar runner,
- * the self-test runner or the unattended gates runner, by basename, in any form; G3, a `*.test.sh`
+ * the self-test runner, the unattended gates runner or the pass-leg runner `pass-legs.sh`
+ * (TOOL-aNimbleMend-6), by basename, in any form; G3, a `*.test.sh`
  * or `*selftest.py` script, or a script carrying `--selftest`, unless it carries `--render`,
  * `--list` or `--help`. The allowlist is the index's `gates` list for that type, rendered from the
  * roles kit's policy; a type the index does not name, `workflow-subagent` among them, may run
@@ -1298,8 +1299,11 @@ const GATE_OPTION_RULES = {
   exec: { takes: ['-a'] },
   command: { takes: [], ends: /^-[vV]$/ },
 }
-/** G2, by basename and in any form: the bar runner, the self-test runner, the unattended gates runner. */
-const GATE_RUNNERS = ['run-gates.sh', 'run-selftests.sh', 'run-unattended-gates.sh']
+/**
+ * G2, by basename and in any form: the bar runner, the self-test runner, the unattended gates
+ * runner, and the pass-leg runner `pass-legs.sh` (TOOL-aNimbleMend-6), which is the main loop's.
+ */
+const GATE_RUNNERS = ['run-gates.sh', 'run-selftests.sh', 'run-unattended-gates.sh', 'pass-legs.sh']
 /** G3's admitting words: a render, a listing or a usage text runs no arm. */
 const GATE_SUITE_ADMITS = ['--render', '--list', '--help']
 

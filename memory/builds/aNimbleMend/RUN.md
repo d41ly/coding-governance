@@ -59,3 +59,7 @@ base: 1265772cc365418ac6431a7f0f9e069f3bb79dc0
 2026-11-12T15:48:32Z dispatch · item 19ed9d30 TOOL-aNimbleMend-5 · reason tools/run-gates/pass-legs.sh tools/run-gates/run-gates.test.sh tools/run-gates/README.md memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-5-1-acceptance-ledger.md memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-5.md
 
 2026-11-12T15:48:34Z brief · item TOOL-aNimbleMend-5 · reason 6bd4fe894f72 memory/builds/aNimbleMend/prompts/2026-11-12-prompt-TOOL-aNimbleMend-5-build-brief.md
+
+2026-11-12T16:04:55Z dispatch · item 8079fde2 TOOL-aNimbleMend-6 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/hooks/README.md tools/unattended/gate-guard.js tools/unattended/gate-guard.test.sh memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-6.md memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-6-1-acceptance-ledger.md
+
+2026-11-12T16:04:57Z brief · item TOOL-aNimbleMend-6 · reason e7ee96fbeffa memory/builds/aNimbleMend/prompts/2026-11-12-prompt-TOOL-aNimbleMend-6-build-brief.md

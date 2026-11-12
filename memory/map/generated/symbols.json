@@ -6713,6 +6713,11 @@
       "file": "tools/playbook/positional.py"
     },
     {
+      "id": "check_pl_value",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
       "id": "check_placeholder",
       "kind": "function",
       "file": "tools/roles/handoff.py"
@@ -19483,9 +19488,24 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_pl_key",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
       "id": "read_pl_kids",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_pl_leg",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "read_pl_marks",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
     },
     {
       "id": "read_pl_sum",
@@ -24895,6 +24915,11 @@
     {
       "id": "resolve_python",
       "kind": "function",
+      "file": "tools/run-gates/pass-legs.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
@@ -27256,6 +27281,11 @@
       "id": "run_pl_kill",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_pl_legs",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
     },
     {
       "id": "run_plan",
@@ -33306,6 +33336,21 @@
       "id": "write_pk_conf",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "write_pl_commit",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "write_pl_figures",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "write_pl_legs",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
     },
     {
       "id": "write_pl_orphan",

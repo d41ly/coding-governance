@@ -1264,6 +1264,14 @@ run_role_bash "G-AC1 PowerShell: the bar after an env assignment -> deny naming 
 run_role_bash "G-AC1 the main loop runs the bar -> allow, stderr EMPTY" 0 empty - Bash "bash kit/$RUN_GATES/run-gates.sh"
 run_role_bash "G-AC1 the main loop runs a suite -> allow, stderr EMPTY" 0 empty - Bash "bash kit/$SG_K_HOOKS/agent-cap.test.sh"
 run_role_bash "G-AC1 the main loop runs a leg -> allow, stderr EMPTY" 0 empty - Bash "python kit/$SG_K_ROLES/check_roles.py"
+# ---- TOOL-aNimbleMend-6: the pass-leg runner is row G2 for a role agent and the main loop's -------
+# ---- Against a GATE_RUNNERS without the name, each exit-2 row below exits 0. ----------------------
+SG_PASS_LEGS=pass-legs.sh
+run_role_bash "N-AC1 the pass-leg runner -> deny naming G2" 2 "any;;G2 runner;;gov-builder" gov-builder Bash "bash kit/$RUN_GATES/$SG_PASS_LEGS --base HEAD~1"
+run_role_bash "N-AC1 the pass-leg runner behind env -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "env bash kit/$RUN_GATES/$SG_PASS_LEGS --base HEAD~1"
+run_role_bash "N-AC1 the pass-leg runner behind timeout 600 -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "timeout 600 bash kit/$RUN_GATES/$SG_PASS_LEGS --base HEAD~1"
+run_role_bash "N-AC1 PowerShell: the pass-leg runner -> deny naming G2" 2 "any;;G2 runner" gov-builder PowerShell "bash kit/$RUN_GATES/$SG_PASS_LEGS --base HEAD~1"
+run_role_bash "N-AC2 the main loop runs the pass-leg runner -> allow, stderr EMPTY" 0 empty - Bash "bash kit/$RUN_GATES/$SG_PASS_LEGS --base HEAD~1"
 # ---- AC1: BY ROLE — the allowlist decides ---------------------------------------------------------
 run_role_bash "G-AC1 gov-spec-writer runs memory hygiene -> allow, stderr EMPTY" 0 empty gov-spec-writer Bash "bash kit/$SG_K_MEMORY_TREE/check-memory-hygiene.sh"
 run_role_bash "G-AC1 gov-builder runs memory hygiene -> deny naming the leg" 2 "any;;G1 leg;;memory hygiene" gov-builder Bash "bash kit/$SG_K_MEMORY_TREE/check-memory-hygiene.sh"
@@ -1534,8 +1542,10 @@ n=$((pass+fail))
 # AC4, 4 for AC5 and 1 for AC6), counted by hand under the same rule.
 # 328 = 325 + the 3 context rows TOOL-aSmoothedDispatch-8 added for its AC6 (the run_sub, the check_ctx
 # and the no-dispatch-row check), counted by hand under the same rule.
+# 333 = 328 + the 5 run_role_bash rows TOOL-aNimbleMend-6 added for the pass-leg runner (4 for AC1 and
+# 1 for AC2), counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=328
+FLOOR_ASSERTIONS=333
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
