@@ -33068,6 +33068,11 @@
       "file": "tools/playbook/instructions_edit.py"
     },
     {
+      "id": "write_merge_fold",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
       "id": "write_message",
       "kind": "function",
       "file": "tools/hooks/format-guard.test.sh"

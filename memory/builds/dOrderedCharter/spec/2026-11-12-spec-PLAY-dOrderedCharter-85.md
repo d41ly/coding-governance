@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-85 — the prepare folds gov first's walk into the merge before it regenerates
 
-**Status:** DEFERRED · rev-1 · 2026-11-12 · node a · Tier-2 · base 5177028b6 · streams tooling · order 46 · advances PLAY-dOrderedCharter-38 · ratified 2026-11-12
+**Status:** CLOSED · rev-1 · 2026-11-12 · node a · Tier-2 · base 5177028b6 · streams tooling · order 46 · advances PLAY-dOrderedCharter-38 · ratified 2026-11-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-12-build-PLAY-dOrderedCharter-85-ledger.md](../build/2026-11-12-build-PLAY-dOrderedCharter-85-ledger.md) | journal | — |
 | [2026-11-12-prompt-PLAY-dOrderedCharter-85-build-brief.md](../prompts/2026-11-12-prompt-PLAY-dOrderedCharter-85-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

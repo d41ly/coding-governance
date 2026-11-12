@@ -37,6 +37,8 @@
 # the `merge=ours` indexes stale, and the push bar refuses a stale declared output before its first
 # leg. `--prepare` folds what it moved into the prepared merge beside the mint; the attended landing
 # commits it as `regen: generated outputs onto <remote>/<branch> at <sha8> for <unit>`, `Pass: none`.
+# In `--prepare`, gov first's walk is folded before the regeneration, so a generator reading HEAD sees
+# it committed (PLAY-dOrderedCharter-85), the order the attended landing's own commits keep.
 # A failed write refuses the landing as a refused mint does. No regen.py beside this lander says so
 # in one line and lands as before. What it does NOT do: prove the result fresh -- the push bar's
 # preflight is that check, and a regeneration cannot fix a check red for another reason.
@@ -1038,6 +1040,17 @@ read_mint_unit() {  # range -> the unit id on stdout, or nothing
   printf '%s\n' "$out" | head -n 1
 }
 
+# `write_merge_fold <first> <second> <message>` rewrites the detached prepared merge over the working
+# tree, same parents and message, when the tree differs from HEAD, and leaves the new merge in the
+# caller's `t`. `commit-tree`, so no pre-commit hook fires (the MINT note in `cmd_prepare`). Its two
+# callers: after gov first's walk, so the regeneration meets the walk committed at HEAD, and after the
+# regeneration (PLAY-dOrderedCharter-85). Each caller refuses on its own 1 with its own stage's text.
+write_merge_fold() {  # first parent · second parent · message -> 0 HEAD is the merge over the tree, or the tree was HEAD's · 1 the commit or the ref move failed
+  [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ] || return 0
+  git add -A
+  t=$(git commit-tree "$(git write-tree)" -p "$1" -p "$2" -m "$3") && git update-ref --no-deref HEAD "$t" || return 1
+}
+
 # `--prepare`: merge THIS branch onto the advertised tip, in place, and move the branch to it.
 #
 # THE SUBJECT NAMES THE SLUG AND NO UNIT ID. `build_commit` in the unattended kit joins a commit to
@@ -1127,6 +1140,16 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
     echo "push-main: the upgrade steps this landing declares did not hold on gov first (named above). Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
     return 1
   fi
+  # FOLD THE WALK BEFORE THE REGENERATION (PLAY-dOrderedCharter-85): the policy mirror renders only a
+  # committed input, so the mint's and the walk's output enter the merge first. The refusals below
+  # then reset to this folded `t`, and the checkout of the branch takes away what the walk created.
+  if ! write_merge_fold "$R" "$oldb" "$msg"; then
+    git reset -q --hard HEAD >/dev/null 2>&1 || true
+    remove_new_untracked "$gfsnap"; rm -f "$gfsnap"
+    git checkout "$branch" >/dev/null 2>&1 || true
+    echo "push-main: could not fold the upgrade steps' output into the merge before the regeneration. Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
+    return 1
+  fi
   # REGENERATE INTO THE MERGE (TOOL-aPrimedIndex-4): after the mint, because a minted version can
   # itself stale an output that stamps it; folded by the same rewrite, same parents and subject.
   if ! run_regen; then
@@ -1137,14 +1160,11 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
     return 1
   fi
   rm -f "$gfsnap"
-  if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
-    git add -A
-    if ! t=$(git commit-tree "$(git write-tree)" -p "$R" -p "$oldb" -m "$msg") || ! git update-ref --no-deref HEAD "$t"; then
-      git reset -q --hard HEAD >/dev/null 2>&1 || true
-      git checkout "$branch" >/dev/null 2>&1 || true
-      echo "push-main: could not commit the minted versions into the merge. Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
-      return 1
-    fi
+  if ! write_merge_fold "$R" "$oldb" "$msg"; then
+    git reset -q --hard HEAD >/dev/null 2>&1 || true
+    git checkout "$branch" >/dev/null 2>&1 || true
+    echo "push-main: could not commit the minted versions into the merge. Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
+    return 1
   fi
   # MERGE LOSS (TOOL-aMendedFleet-3): the CONFLICT path's exit shape, so a refused landing leaves the
   # branch exactly where it was. `R..t` holds this merge and every merge the branch carries past R.

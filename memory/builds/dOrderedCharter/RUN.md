@@ -589,3 +589,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-12T00:57:05Z rescope · item add PLAY-dOrderedCharter-84 · reason the owner's 2026-11-12 ruling that no file is owner-only to a run under its mandate: the policy guard admits a live run's guarded change, and the prepare commits its upgrade steps' output before regenerating
 
 2026-11-12T01:22:06Z rescope · item add PLAY-dOrderedCharter-85 · reason spec 84's F1 taken on the owner's take-forks-recommendations ruling: the lander's merge fold before the regeneration splits from the guard's run admission, one mechanism per spec
+
+2026-11-12T01:56:33Z brief · item PLAY-dOrderedCharter-85 · reason 64a3f34a5866 memory/builds/dOrderedCharter/prompts/2026-11-12-prompt-PLAY-dOrderedCharter-85-build-brief.md
+
+2026-11-12T02:07:30Z dispatch · item 3279b49c PLAY-dOrderedCharter-85 · reason tools/push-main.sh tools/push-main.test.sh memory/builds/dOrderedCharter/spec/2026-11-12-spec-PLAY-dOrderedCharter-85.md memory/builds/dOrderedCharter/build/2026-11-12-build-PLAY-dOrderedCharter-85-ledger.md memory/builds/dOrderedCharter/build/2026-11-12-build-PLAY-dOrderedCharter-85-deviation-851.md memory/builds/dOrderedCharter/README.md memory/LIVE.md memory/map/generated memory/map/baseline.toml memory/project/positional-refs.txt memory/project/unpinned-facts.txt

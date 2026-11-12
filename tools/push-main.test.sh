@@ -1609,4 +1609,32 @@ else
   echo "  skip — 40 no govkit deployer beside this lander or no python launcher, so the attended gov-first arm did not run"
 fi
 
+# 41 — PLAY-dOrderedCharter-85 AC1: --prepare folds gov first's walk into the merge BEFORE it
+#      regenerates. The branch commits a planted step that passes and a regen.py that, as the policy
+#      mirror does, refuses any uncommitted change; the prepare exits 0 with one merge onto the
+#      advertised tip, a clean tree, and a receipt at HEAD recording the planted step. Red at the base
+#      lander, which regenerates over the walk's uncommitted receipt and refuses `could NOT be regenerated`.
+if [ -n "$_mt_gk" ] && [ -n "$_rg_k" ] && [ -n "$_py_arms" ]; then
+  out41=$(
+    build_regen_fixture "$tmp/remote41.git" "$tmp/work41" || exit 1
+    R41=$(git rev-parse HEAD)
+    git checkout -q -b feat
+    printf '\n[[upgrade]]\nid = "govkit/planted-fold"\nup = ["python", "-c", "pass"]\ndown = ["python", "-c", "pass"]\nwitness = ["python", "-c", "pass"]\nsurfaces = []\nneeds-target = false\n' >> "${KIT_REL}$_mt_gk/steps.toml"
+    printf 'import subprocess, sys\ns = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True).stdout\nsys.stderr.write(s)\nsys.exit(1 if s.strip() else 0)\n' > "${KIT_REL}$_rg_k/regen.py"
+    git commit -q --no-verify -am "TOOL-tFix-41: a planted passing step and a regen.py refusing an uncommitted change"
+    B41=$(git rev-parse HEAD)
+    unset GATE_PUSH_BASE; bash "$lander" --prepare --slug tFoldBeforeRegen 2>&1; echo "prepare-rc=$?"
+    [ "$(git rev-parse HEAD^1)" = "$R41" ] && [ "$(git rev-parse HEAD^2)" = "$B41" ] && echo one-merge=1
+    st41=$(git status --porcelain); [ -z "$st41" ] && echo clean=1 || echo "left=[$st41]"
+    git show HEAD:.governance/install.json 2>/dev/null | grep -q 'govkit/planted-fold' && echo receipt=1
+  )
+  case "$out41" in
+    *"prepare-rc=0"*"one-merge=1"*"clean=1"*"receipt=1"*)
+      ok "41 --prepare folds gov first's walk into the merge before the regeneration, so a regen.py refusing an uncommitted change passes and the receipt records the planted step" ;;
+    *) bad "41 --prepare regenerated over gov first's uncommitted walk, or left no single clean merge holding the planted step's receipt: $out41" ;;
+  esac
+else
+  echo "  skip — 41 no govkit deployer or no run-gates kit holding regen.py beside this lander, or no python launcher, so the fold-before-regeneration arm did not run"
+fi
+
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }

@@ -191,10 +191,10 @@ ids TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-82 — the acceptance matrix reads the renderer's bullet keys in a child process, so its closure stays its own](spec/2026-11-11-spec-PLAY-dOrderedCharter-82.md) | 44 | 1 | CLOSED | rev-2 | 2026-11-11 |
 | [PLAY-dOrderedCharter-83 — the reconcile merge with origin/main at 47ed57fab: fifty conflicted files, each resolved by its kind](spec/2026-11-11-spec-PLAY-dOrderedCharter-83.md) | 45 | 2 | CLOSED | rev-1 | 2026-11-12 |
 | [PLAY-dOrderedCharter-84 — a live unattended run's branch may commit a guarded path](spec/2026-11-12-spec-PLAY-dOrderedCharter-84.md) | 46 | 2 | DEFERRED | rev-2 | 2026-11-12 |
-| [PLAY-dOrderedCharter-85 — the prepare folds gov first's walk into the merge before it regenerates](spec/2026-11-12-spec-PLAY-dOrderedCharter-85.md) | 46 | 2 | DEFERRED | rev-1 | 2026-11-12 |
+| [PLAY-dOrderedCharter-85 — the prepare folds gov first's walk into the merge before it regenerates](spec/2026-11-12-spec-PLAY-dOrderedCharter-85.md) | 46 | 2 | CLOSED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 650 bound to this build, across 4 record folder(s).
+Records: 651 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
