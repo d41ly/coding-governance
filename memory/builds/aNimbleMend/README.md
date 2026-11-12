@@ -71,7 +71,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 12 unit(s) · node a · opened 2026-11-12 · streams tooling
+**Build status:** INPROGRESS · 12 unit(s) · node a · opened 2026-11-12 · streams tooling
 ids TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12
 
 <!-- gen:build-units -->
@@ -81,7 +81,7 @@ ids TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 
 | [TOOL-aNimbleMend-2 — the pass-leg declaration: a `pass_leg` field on a leg's row, written by a derivation over the bar run log and the ceiling evidence](spec/2026-11-12-spec-TOOL-aNimbleMend-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-11-12 |
 | [TOOL-aNimbleMend-4 — the scoped legs: three manifest rows a pass can afford, for memory hygiene's pass checks, the positional check alone and the spec tokens of the pass's own spec](spec/2026-11-12-spec-TOOL-aNimbleMend-4.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-12 |
 | [TOOL-aNimbleMend-3 — the budget gate: the declared pass legs' cost rows sum inside the budget, red past the limit, with no leg over the cap, unmeasured, held or of an excluded class](spec/2026-11-12-spec-TOOL-aNimbleMend-3.md) | 4 | 2 | CLOSED | rev-1 | 2026-11-12 |
-| [TOOL-aNimbleMend-5 — the pass-leg runner: the declared legs run over one pass's diff through the bar runner, with a run record and an overrun printed as a finding](spec/2026-11-12-spec-TOOL-aNimbleMend-5.md) | 5 | 2 | OPEN | rev-2 | 2026-11-12 |
+| [TOOL-aNimbleMend-5 — the pass-leg runner: the declared legs run over one pass's diff through the bar runner, with a run record and an overrun printed as a finding](spec/2026-11-12-spec-TOOL-aNimbleMend-5.md) | 5 | 2 | INPROGRESS | rev-2 | 2026-11-12 |
 | [TOOL-aNimbleMend-6 — the hooks: the pass-leg runner is refused to a role agent by the role-gate arm and stays admitted at the main loop by the gate guard, pinned on both](spec/2026-11-12-spec-TOOL-aNimbleMend-6.md) | 6 | 2 | OPEN | rev-2 | 2026-11-12 |
 | [TOOL-aNimbleMend-7 — the run point: each unit harness return tells the main loop to run the pass legs](spec/2026-11-12-spec-TOOL-aNimbleMend-7.md) | 7 | 2 | SPECCED | rev-2 | 2026-11-12 |
 | [TOOL-aNimbleMend-8 — the inline red-fix lane: an open red admits a product write, and a `Red-fix:` trailer admits its commit](spec/2026-11-12-spec-TOOL-aNimbleMend-8.md) | 8 | 2 | SPECCED | rev-2 | 2026-11-12 |

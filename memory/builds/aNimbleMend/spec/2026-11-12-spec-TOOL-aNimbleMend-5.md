@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-5 — the pass-leg runner: the declared legs run over one pass's diff through the bar runner, with a run record and an overrun printed as a finding
 
-**Status:** OPEN · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 5
+**Status:** INPROGRESS · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
