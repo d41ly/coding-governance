@@ -7,7 +7,7 @@ tools/workflows/README.md	first backticked `file:line`). Recall from the two rec
 tools/workflows/check-review-join.sh	#   * COLLISION — two findings at one file:line (normal when two lenses read one function) collapse
 tools/workflows/check-review-join.sh	# that join on a `file:line` STRING the skeptic has to reproduce byte-for-byte has two failure modes,
 tools/workflows/check-review-join.test.sh	// The retired join was `verdicts[v.ref] = v`, which collided on a shared file:line.
-tools/workflows/review_replay.py	Each item is `{id, path, line}`, path and line None when the item is UNSCORABLE; in `spec-audit`
+tools/workflows/replay_scorer.py	Each item is `{id, path, line}`, path and line None when the item is UNSCORABLE; in `spec-audit`
 tools/workflows/tier2-review.template.js	// (b) COLLISION — two findings at one file:line are entirely normal when two lenses read the same
 tools/workflows/tier2-review.template.js	// integer id, never by `ref` (two findings at one file:line would collapse into one row).
 # a read directive: the writer re-reads the line a finding already cites, and writes no citation
@@ -15,3 +15,7 @@ tools/roles/agents/gov-skeptic.agent.md	- Re-run the finding's evidence yourself
 tools/workflows/tier2-review.template.js	`Then re-run the finding's evidence under the PROBE POLICY above: run the command it names, or re-read the path and line it names, and say in \`reason\` what you observed.\n` +
 # a citation of a document line: a record's line, whose suffix CODE_EXTENSIONS does not hold
 tools/runlog/SKILL.template.md	`<path>:<line>`, a run-state line by its time and verb, a commit by its sha, or a journal line by
+# main's merged narration of the file:line form, carried by the reconcile with origin/main at 47ed57fab (PLAY-dOrderedCharter-83)
+tools/workflows/check-review-join.js	`its skeptic verdict on a \`file:line\` STRING loses findings to echo drift and COLLAPSES two ` +
+tools/workflows/check-verifier-fanout.sh	# MSYS converts an absolute path only as a whole argument, so `<path>:<line>` reached node unconverted
+tools/workflows/replay_scorer.py	"""`<path>:<line>` of each pairing comprehension in the tracked `*.py` at and below `root`, this file excepted.

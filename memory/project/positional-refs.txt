@@ -29,7 +29,7 @@
 .memory-tree.conf	tools/unattended/check-playbook.sh:23
 .memory-tree.conf	tools/unattended/check-unattended.sh:264
 .memory-tree.conf	tools/unattended/unattended.sh:318
-.memory-tree.conf	tools/unattended/unattended.sh:323
+.memory-tree.conf	tools/unattended/unattended.sh:324
 .memory-tree.conf	tools/workflows/check-review-join.sh:2
 .memory-tree.conf	tools/workflows/check-verifier-fanout.sh:1
 help/agent-limit.md	.governance/policy.toml:0
@@ -2214,6 +2214,7 @@ memory/builds/aGroundedOrientation/reviews/2026-08-27-review-TOOL-aGroundedOrien
 memory/builds/aGroundedOrientation/spec/2026-08-27-spec-TOOL-aGroundedOrientation-2.md	tools/unattended/check-unattended.sh:99
 memory/builds/aGroundedOrientation/spec/2026-08-27-spec-TOOL-aGroundedOrientation-3.md	HYGIENE check 23
 memory/builds/aGroundedOrientation/spec/2026-08-27-spec-TOOL-aGroundedOrientation-3.md	tools/memory-tree/check-memory-hygiene.sh:1114
+memory/builds/aGuardedEffort/reviews/2026-11-10-review-TOOL-aGuardedEffort-1-diff-review-round1.md	BUILD-METHOD M6
 memory/builds/aGuardedTally/prompts/2026-08-03-prompt-TOOL-aGuardedTally-1-1.md	tier2-review.js:121-128
 memory/builds/aGuardedTally/reviews/2026-08-04-review-TOOL-aGuardedTally-1-1.md	adopt-memory-tree.sh:31
 memory/builds/aGuardedTally/reviews/2026-08-04-review-TOOL-aGuardedTally-1-1.md	adopt-memory-tree.sh:40
@@ -9949,6 +9950,9 @@ memory/builds/aSightedSkeptic/spec/2026-10-01-spec-TOOL-aSightedSkeptic-8.md	a.j
 memory/builds/aSightedSkeptic/spec/2026-10-01-spec-TOOL-aSightedSkeptic-8.md	b.js:3
 memory/builds/aSightedSkeptic/spec/2026-10-01-spec-TOOL-aSightedSkeptic-8.md	tools/workflows/unattended-build.js:940
 memory/builds/aSightedSkeptic/spec/2026-10-01-spec-TOOL-aSightedSkeptic-9.md	tools/workflows/kit.toml:61
+memory/builds/aSmoothedDispatch/spec/2026-11-10-spec-TOOL-aSmoothedDispatch-18.md	BUILD-METHOD M2
+memory/builds/aSmoothedDispatch/spec/2026-11-10-spec-TOOL-aSmoothedDispatch-18.md	BUILD-METHOD M8
+memory/builds/aSmoothedDispatch/spec/2026-11-10-spec-TOOL-aSmoothedDispatch-9.md	BUILD-METHOD M8
 memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-8-acceptance-ledger.md	tools/check-wiring.sh:1772
 memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-8-acceptance-ledger.md	unattended.sh:58
 memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-8-acceptance-ledger.md	unattended.sh:7728
@@ -13080,6 +13084,106 @@ memory/builds/dBriefedPass/spec/2026-09-01-spec-TOOL-dBriefedPass-4.md	tools/wor
 memory/builds/dBriefedPass/spec/2026-09-01-spec-TOOL-dBriefedPass-4.md	unattended.sh:3768
 memory/builds/dBriefedPass/spec/2026-09-01-spec-TOOL-dBriefedPass-4.md	unattended.sh:3821
 memory/builds/dBriefedPass/spec/2026-09-01-spec-TOOL-dBriefedPass-5.md	tools/unattended/kit.toml:6
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-11-deviation-112.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-12-deviation-122.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-13-deviation-132.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-14-deviation-142.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-15-deviation-152.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-16-deviation-162.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-17-deviation-172.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-19-deviation-191.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-20-deviation-201.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-21-deviation-211.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-22-deviation-221.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-23-deviation-231.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-24-deviation-241.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-25-deviation-251.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-26-deviation-261.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-27-deviation-271.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-28-deviation-281.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-29-deviation-291.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-30-deviation-301.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-31-deviation-311.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-32-deviation-321.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-33-deviation-331.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-34-deviation-341.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-35-deviation-351.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-36-deviation-361.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-37-deviation-371.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-38-deviation-381.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-39-deviation-391.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-40-deviation-401.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-41-deviation-411.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-7-deviation-72.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-02-build-TOOL-dCalibratedLens-9-deviation-92.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-1-ancestors-reground-returns.md	HYGIENE check 9
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-1-departures-spec.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-1-deviation-12.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-1-deviation-13.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md	HYGIENE check 9
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-10-deviation-102.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-10-deviation-103.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-10-deviation-104.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-2-deviation-22.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-2-deviation-23.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-2-deviation-24.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-21-deviation-212.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-23-deviation-232.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-25-deviation-252.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-29-deviation-292.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-3-deviation-32.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-3-deviation-33.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-3-deviation-34.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-4-deviation-42.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-4-deviation-43.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-4-deviation-44.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-42-deviation-421.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-43-deviation-431.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-44-deviation-441.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-45-deviation-451.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-46-deviation-461.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-47-deviation-471.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-48-deviation-481.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-5-deviation-52.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-5-deviation-53.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-5-deviation-54.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-6-deviation-62.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-6-deviation-63.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-6-deviation-64.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-8-deviation-82.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-03-build-TOOL-dCalibratedLens-8-deviation-83.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md	HYGIENE check 12
+memory/builds/dCalibratedLens/build/2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md	HYGIENE check 9
+memory/builds/dCalibratedLens/build/2026-11-04-build-TOOL-dCalibratedLens-1-deviation-17.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-04-build-TOOL-dCalibratedLens-10-deviation-106.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-04-build-TOOL-dCalibratedLens-12-deviation-123.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-04-build-TOOL-dCalibratedLens-14-deviation-145.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-04-build-TOOL-dCalibratedLens-15-deviation-154.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-04-build-TOOL-dCalibratedLens-16-deviation-165.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-04-build-TOOL-dCalibratedLens-17-deviation-173.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-04-build-TOOL-dCalibratedLens-19-deviation-193.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-04-build-TOOL-dCalibratedLens-2-deviation-27.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-04-build-TOOL-dCalibratedLens-20-deviation-203.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-04-build-TOOL-dCalibratedLens-24-deviation-243.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-04-build-TOOL-dCalibratedLens-3-deviation-37.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-04-build-TOOL-dCalibratedLens-5-deviation-56.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-04-build-TOOL-dCalibratedLens-7-deviation-74.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-04-build-TOOL-dCalibratedLens-8-deviation-87.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/build/2026-11-04-build-TOOL-dCalibratedLens-9-deviation-95.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md	BUILD-METHOD M2
+memory/builds/dCalibratedLens/prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md	BUILD-METHOD M2
+memory/builds/dCalibratedLens/prompts/2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/prompts/2026-11-02-prompt-TOOL-dCalibratedLens-31-promoted-fix-brief.md	HYGIENE check 25
+memory/builds/dCalibratedLens/prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-1-spec-writer.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/prompts/2026-11-04-prompt-TOOL-dCalibratedLens-1-crosscheck-audit-disposal.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/prompts/2026-11-04-prompt-TOOL-dCalibratedLens-14-1-spec-writer.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/prompts/2026-11-04-prompt-TOOL-dCalibratedLens-16-1-spec-writer.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/prompts/2026-11-04-prompt-TOOL-dCalibratedLens-3-1-spec-writer.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/prompts/2026-11-04-prompt-TOOL-dCalibratedLens-9-1-spec-writer.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/reviews/2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md	BUILD-METHOD M7
+memory/builds/dCalibratedLens/reviews/2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/spec/2026-11-02-spec-TOOL-dCalibratedLens-41.md	BUILD-METHOD M4
+memory/builds/dCalibratedLens/spec/2026-11-03-spec-TOOL-dCalibratedLens-48.md	BUILD-METHOD M4
 memory/builds/dCarriedReceipt/BACKLOG.md	lib-unattended.sh:98-109
 memory/builds/dCarriedReceipt/BACKLOG.md	unattended.sh:3072
 memory/builds/dCarriedReceipt/BACKLOG.md	unattended.sh:3135
@@ -16236,7 +16340,26 @@ memory/builds/dClosedLoop/reviews/2026-10-20-review-PLAY-dClosedLoop-1-whole-wal
 memory/builds/dClosedLoop/reviews/2026-10-20-review-PLAY-dClosedLoop-1-whole-walk-c.md	unattended.sh:29-30
 memory/builds/dClosedLoop/reviews/2026-10-20-review-PLAY-dClosedLoop-1-whole-walk-c.md	unattended.sh:774
 memory/builds/dClosedLoop/spec/2026-10-20-spec-PLAY-dClosedLoop-1.md	tools/roles/handoff.py:763
+memory/builds/dConvergedCharter/build/2026-11-03-build-PLAY-dConvergedCharter-1-spec-stage-returns.md	BUILD-METHOD M6
+memory/builds/dConvergedCharter/build/2026-11-04-build-PLAY-dConvergedCharter-1-departures-spec.md	BUILD-METHOD M4
+memory/builds/dConvergedCharter/build/2026-11-04-build-PLAY-dConvergedCharter-38-deviation-381.md	BUILD-METHOD M4
+memory/builds/dConvergedCharter/build/2026-11-04-build-PLAY-dConvergedCharter-39-deviation-391.md	BUILD-METHOD M4
+memory/builds/dConvergedCharter/build/2026-11-04-build-PLAY-dConvergedCharter-40-deviation-401.md	BUILD-METHOD M4
 memory/builds/dConvergedCharter/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	tools/unattended/unattended.sh:111
+memory/builds/dConvergedCharter/prompts/2026-11-03-prompt-PLAY-dConvergedCharter-1-spec-brief.md	BUILD-METHOD M2
+memory/builds/dConvergedCharter/prompts/2026-11-04-prompt-PLAY-dConvergedCharter-11-fold-brief.md	BUILD-METHOD M4
+memory/builds/dConvergedCharter/prompts/2026-11-04-prompt-PLAY-dConvergedCharter-11-r4-fold-brief.md	BUILD-METHOD M4
+memory/builds/dConvergedCharter/prompts/2026-11-04-prompt-PLAY-dConvergedCharter-17-fold-brief.md	BUILD-METHOD M4
+memory/builds/dConvergedCharter/prompts/2026-11-04-prompt-PLAY-dConvergedCharter-7-r4-fold-brief.md	BUILD-METHOD M4
+memory/builds/dConvergedCharter/spec/2026-11-03-spec-PLAY-dConvergedCharter-12.md	BUILD-METHOD M6
+memory/builds/dConvergedCharter/spec/2026-11-03-spec-PLAY-dConvergedCharter-19.md	BUILD-METHOD M5
+memory/builds/dConvergedCharter/spec/2026-11-03-spec-PLAY-dConvergedCharter-2.md	BUILD-METHOD M5
+memory/builds/dConvergedCharter/spec/2026-11-04-spec-PLAY-dConvergedCharter-38.md	BUILD-METHOD M6
+memory/builds/dConvergedCharter/spec/2026-11-04-spec-PLAY-dConvergedCharter-39.md	BUILD-METHOD M6
+memory/builds/dConvergedCharter/spec/2026-11-04-spec-PLAY-dConvergedCharter-40.md	BUILD-METHOD M6
+memory/builds/dCountedConsumers/README.md	BUILD-METHOD M6
+memory/builds/dCountedConsumers/prompts/2026-11-02-prompt-TOOL-dCountedConsumers-1-brief.md	BUILD-METHOD M6
+memory/builds/dCountedConsumers/spec/2026-11-02-spec-TOOL-dCountedConsumers-1.md	BUILD-METHOD M6
 memory/builds/dDeclaredLoop/build/2026-10-24-build-TOOL-dDeclaredLoop-1-readers-fix-return.md	unattended.sh:12769
 memory/builds/dDeclaredLoop/build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-a.md	adopt-roles.sh:131-140
 memory/builds/dDeclaredLoop/build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-a.md	check-unattended.sh:624-628
@@ -16432,6 +16555,10 @@ memory/builds/dDeclaredLoop/build/2026-10-25-build-TOOL-dDeclaredLoop-1-dordered
 memory/builds/dDeclaredLoop/build/2026-10-25-build-TOOL-dDeclaredLoop-1-reground-returns.md	deviation_join.py:371
 memory/builds/dDeclaredLoop/build/2026-10-25-build-TOOL-dDeclaredLoop-1-reground-returns.md	tools/memory-tree/deviation_join.py:218-220
 memory/builds/dDeclaredLoop/build/2026-10-25-build-TOOL-dDeclaredLoop-1-reground-returns.md	tools/memory-tree/kit.toml:8
+memory/builds/dDeclaredLoop/build/2026-11-05-build-TOOL-dDeclaredLoop-1-crosscheck-returns.md	BUILD-METHOD M4
+memory/builds/dDeclaredLoop/build/2026-11-05-build-TOOL-dDeclaredLoop-1-parents-crosscheck.md	BUILD-METHOD M4
+memory/builds/dDeclaredLoop/build/2026-11-05-build-TOOL-dDeclaredLoop-1-reground-returns.md	BUILD-METHOD M4
+memory/builds/dDeclaredLoop/build/2026-11-05-build-TOOL-dDeclaredLoop-30-deviation-303.md	BUILD-METHOD M4
 memory/builds/dDeclaredLoop/prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-owner-review-cap.md	BUILD-METHOD M4
 memory/builds/dDeclaredLoop/prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md	BUILD-METHOD M2
 memory/builds/dDeclaredLoop/prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md	BUILD-METHOD M4
@@ -16453,6 +16580,12 @@ memory/builds/dDeclaredLoop/prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-2-spe
 memory/builds/dDeclaredLoop/prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md	tools/memory-tree/kit.toml:8
 memory/builds/dDeclaredLoop/prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-12-2-spec-writer.md	tools/memory-tree/kit.toml:8
 memory/builds/dDeclaredLoop/prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-26-1-spec-writer.md	tools/memory-tree/kit.toml:8
+memory/builds/dDeclaredLoop/prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md	BUILD-METHOD M4
+memory/builds/dDeclaredLoop/prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-reground.md	BUILD-METHOD M4
+memory/builds/dDeclaredLoop/prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-21-1-spec-reviewer.md	BUILD-METHOD M4
+memory/builds/dDeclaredLoop/prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-30-1-spec-reviewer.md	BUILD-METHOD M4
+memory/builds/dDeclaredLoop/prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-30-2-spec-writer.md	BUILD-METHOD M4
+memory/builds/dDeclaredLoop/prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-32-1-spec-writer.md	BUILD-METHOD M4
 memory/builds/dDeclaredLoop/reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md	adopt-roles.sh:142-148
 memory/builds/dDeclaredLoop/reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md	adopt-roles.test.sh:96-100
 memory/builds/dDeclaredLoop/reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md	check-brief-recorded.sh:304-306
@@ -16756,6 +16889,7 @@ memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-20.md	tools/
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-20.md	tools/workflows/unattended-build.template.js:1990-1997
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-20.md	tools/workflows/unattended-build.template.js:2205-2208
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-20.md	tools/workflows/unattended-build.template.js:2208-2209
+memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-21.md	BUILD-METHOD M4
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-21.md	tools/memory-tree/tree_lib.py:28
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-21.md	tools/unattended/check-unattended.sh:624
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-21.md	tools/unattended/unattended.sh:12610-12618
@@ -16805,11 +16939,13 @@ memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-3.md	tools/m
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-3.md	tools/memory-tree/tree_lib.py:27
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-3.md	tools/unattended/lib-unattended.sh:1149
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-3.md	tools/unattended/unattended.sh:6192-6193
+memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-30.md	BUILD-METHOD M4
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-30.md	tools/memory-tree/gen_build_index.py:1204
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-30.md	tools/memory-tree/gen_build_index.py:450
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-30.md	tools/memory-tree/tree_lib.py:28
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-30.md	tools/unattended/unattended.sh:12640
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-30.md	tools/unattended/unattended.sh:392-422
+memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-31.md	BUILD-METHOD M4
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-31.md	tools/unattended/lib-unattended.sh:191
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-31.md	tools/unattended/unattended.sh:10567
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-31.md	tools/unattended/unattended.sh:7862-7875
@@ -16819,7 +16955,6 @@ memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-31.md	tools/
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-32.md	BUILD-METHOD M4
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-32.md	tools/drift-audit/drift_report.py:2427
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-32.md	tools/runlog/model.py:98
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-32.md	tools/unattended/check-unattended.sh:822-870
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-32.md	tools/unattended/check-unattended.sh:845-848
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-32.md	tools/unattended/lib-unattended.sh:2207
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-32.md	tools/unattended/unattended.sh:12610
@@ -17968,6 +18103,7 @@ memory/builds/dFairHearing/build/2026-10-23-build-TOOL-dFairHearing-38-deviation
 memory/builds/dFairHearing/build/2026-10-23-build-TOOL-dFairHearing-39-deviation-391.md	BUILD-METHOD M4
 memory/builds/dFairHearing/build/2026-10-23-build-TOOL-dFairHearing-39-deviation-391.md	tools/memory-tree/gotchas.py:1335-1339
 memory/builds/dFairHearing/build/2026-10-23-build-TOOL-dFairHearing-40-deviation-401.md	BUILD-METHOD M4
+memory/builds/dFairHearing/build/2026-11-03-build-TOOL-dFairHearing-1-deviation-12.md	BUILD-METHOD M3
 memory/builds/dFairHearing/prompts/2026-10-23-prompt-TOOL-dFairHearing-1-amend-fix-brief.md	tools/memory-tree/design_lib.py:169
 memory/builds/dFairHearing/prompts/2026-10-23-prompt-TOOL-dFairHearing-1-owner-stop-reviews.md	BUILD-METHOD M4
 memory/builds/dFairHearing/prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md	BUILD-METHOD M2
@@ -18067,11 +18203,6 @@ memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-4-14-25-2
 memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md	tools/drift-audit/kit.toml:13
 memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md	tools/workflows/tier2-review.template.js:1021
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-10.md	tools/check-agent-cap-restatement.sh:90-95
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-10.md	tools/hooks/agent-cap.js:493-497
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-10.md	tools/hooks/agent-cap.js:495
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-10.md	tools/workflows/tier2-review.template.js:1403-1405
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-10.md	tools/workflows/tier2-review.template.js:1736-1744
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-10.md	tools/workflows/tier2-review.template.js:774-800
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-11.md	BUILD-METHOD M2
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-11.md	BUILD-METHOD M8
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-11.md	tools/workflows/tier2-review.template.js:1026-1028
@@ -18086,141 +18217,63 @@ memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-12.md	review_r
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-12.md	review_replay.py:4
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-12.md	review_replay.py:84
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-12.md	tools/drift-audit/drift_report.py:2040
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-12.md	tools/govkit/govkit.py:937
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-12.md	tools/govkit/selftest.py:8196
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-12.md	tools/run-gates/measure_legs.py:3582
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-12.md	tools/workflows/review_replay.py:263-305
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-12.md	tools/workflows/review_replay.py:308-655
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-12.md	tools/workflows/review_replay.py:64-81
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-12.md	tools/workflows/review_replay.py:87-305
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-13.md	tier2-review.js:705-773
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-13.md	tools/govkit/govkit.py:108
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-13.md	tools/govkit/govkit.py:1151
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-13.md	tools/hooks/agent-cap.js:934-968
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-13.md	tools/roles/roles_lib.py:339-350
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-13.md	tools/workflows/check-protocol-parity.test.sh:476-487
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-13.md	tools/workflows/kit.toml:115-120
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-13.md	tools/workflows/kit.toml:72-79
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-13.md	tools/workflows/tier2-review.template.js:774-800
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-14.md	memory/builds/aScoutedSeam/build/2026-10-18-build-TOOL-aScoutedSeam-1-13-system.py:315-331
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-15.md	BUILD-METHOD M8
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-15.md	tools/memory-tree/gotchas.py:76-80
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-15.md	tools/workflows/check-protocol-parity.test.sh:44-49
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-15.md	tools/workflows/kit.toml:9
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-15.md	tools/workflows/tier2-review.template.js:519-523
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-15.md	tools/workflows/tier2-review.template.js:985
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-15.md	tools/workflows/unattended-build.template.js:1372-1460
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-15.md	tools/workflows/unattended-build.template.js:1379-1380
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-15.md	tools/workflows/unattended-build.template.js:767-771
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-16.md	BUILD-METHOD M2
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-16.md	tools/check-wiring.sh:861-875
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-16.md	tools/govkit/govkit.py:6109-6125
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-16.md	tools/hooks/agent-cap.js:789
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-16.md	tools/hooks/agent-cap.js:789-1264
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-16.md	tools/hooks/scratch-guard.js:1614-1615
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	BUILD-METHOD M4
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	BUILD-METHOD M8
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	tools/memory-tree/tree_lib.py:28
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	tools/memory-tree/tree_lib.py:377
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	tools/runlog/model.py:577
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	tools/unattended/unattended.sh:12594-12618
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	tools/unattended/unattended.sh:12610-12618
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	tools/unattended/unattended.sh:12762-12765
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	tools/workflows/tier2-review.js:1639-1644
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	tools/workflows/tier2-review.js:1879-1888
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	tools/workflows/tier2-review.js:1902-1903
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	tools/workflows/tier2-review.js:2068
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	tools/workflows/tier2-review.js:293-296
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	tools/workflows/tier2-review.js:78-83
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	tools/workflows/tier2-review.js:949-992
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	tools/workflows/tier2-review.test.sh:244-260
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	tools/workflows/tier2-review.test.sh:312
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	tools/workflows/tier2-review.test.sh:321-340
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	tools/workflows/tier2-review.test.sh:70-81
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	tools/workflows/tier2-review.test.sh:70-92
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	tools/workflows/unattended-build.template.js:1675-1678
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md	unattended.sh:3135
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-18.md	BUILD-METHOD M2
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-18.md	tools/memory-tree/tree_lib.py:28
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-18.md	tools/memory-tree/tree_lib.py:377
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-18.md	tools/workflows/review_replay.py:100-115
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-18.md	tools/workflows/review_replay.py:36-44
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-18.md	tools/workflows/tier2-review.js:317
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-18.md	tools/workflows/tier2-review.js:715-727
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-18.md	tools/workflows/tier2-review.js:907-912
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-18.md	tools/workflows/tier2-review.test.sh:321-340
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-18.md	tools/workflows/tier2-review.test.sh:70-92
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-2.md	tools/workflows/tier2-review.template.js:210-217
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-2.md	tools/workflows/tier2-review.test.sh:67-81
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-20.md	tools/unattended/unattended.sh:12612-12619
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-20.md	tools/workflows/tier2-review.template.js:1972-1979
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-20.md	tools/workflows/tier2-review.template.js:2046-2051
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-20.md	tools/workflows/unattended-build.template.js:1764-1775
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-20.md	tools/workflows/unattended-build.template.js:1786-1787
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-22.md	tools/govkit/govkit.py:6109-6125
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-22.md	tools/govkit/govkit.py:9286-9316
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-22.md	tools/hooks/agent-cap.js:111-116
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-22.md	tools/hooks/agent-cap.js:1914-1915
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-22.md	tools/hooks/agent-cap.js:2269-2272
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-22.md	tools/hooks/kit.toml:9
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-22.md	tools/workflows/kit.toml:9
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-23.md	BUILD-METHOD M4
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-23.md	BUILD-METHOD M6
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-23.md	tools/govkit/registry.toml:642-644
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-23.md	tools/hooks/agent-cap.js:1362-1380
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-23.md	tools/hooks/agent-cap.js:39-48
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-23.md	tools/hooks/agent-cap.js:497
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-23.md	tools/memory-tree/gotchas.py:432-440
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-23.md	tools/push-main.sh:26-33
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-23.md	tools/workflows/drift-audit-state.template.js:78
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-23.md	tools/workflows/review_replay.py:100-115
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-23.md	tools/workflows/tier2-review.template.js:506
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-23.md	tools/workflows/unattended-build.test.sh:1995-1996
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-25.md	tools/workflows/review_replay.py:87-97
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-27.md	BUILD-METHOD M4
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-27.md	review_replay.py:84
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-27.md	tools/check-kit-versions.sh:69-105
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-27.md	tools/drift-audit/kit.toml:13
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-27.md	tools/govkit/govkit.py:1034-1059
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-27.md	tools/govkit/govkit.py:13719-13724
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-27.md	tools/govkit/govkit.py:3019-3020
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-27.md	tools/govkit/govkit.py:9287-9293
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-27.md	tools/memory-tree/gotchas.py:432-440
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-27.md	tools/memory-tree/gotchas.py:435-437
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-27.md	tools/workflows/review_replay.py:100-115
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-27.md	tools/workflows/review_replay.py:68-70
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-27.md	tools/workflows/tier2-review.test.sh:481
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-3.md	tools/hooks/agent-cap.js:934-968
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-3.md	tools/workflows/tier2-review.template.js:846-850
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-3.md	tools/workflows/tier2-review.test.sh:67-81
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-30.md	tools/workflows/tier2-review.template.js:297
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-31.md	tools/run-gates/run-gates.sh:395-405
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-32.md	BUILD-METHOD M4
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-32.md	tools/check-playbook-parity.sh:141-148
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-32.md	tools/drift-audit/kit.toml:13
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-32.md	tools/govkit/govkit.py:1050-1059
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-32.md	tools/hooks/agent-cap.js:1303
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-32.md	tools/lib/resolve_kit_dir.py:15-51
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-32.md	tools/workflows/review_replay.py:84
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-32.md	tools/workflows/tier2-review.template.js:1021
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-33.md	tools/check-wiring.sh:51
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-33.md	tools/govkit/govkit.py:13238
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-33.md	tools/govkit/govkit.py:13314
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-34.md	tools/check-wiring.sh:51
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-34.md	tools/govkit/govkit.py:767
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-34.md	tools/govkit/govkit.py:820
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-36.md	BUILD-METHOD M4
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-36.md	BUILD-METHOD M6
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-36.md	tools/codebase-map/map_lib.py:1502
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-36.md	tools/run-gates/run-gates.sh:396-399
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-37.md	BUILD-METHOD M4
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-37.md	BUILD-METHOD M6
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-37.md	tools/hooks/agent-cap.js:1303
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-37.md	tools/hooks/agent-cap.js:1325-1328
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-37.md	tools/lib/resolve_kit_dir.py:29
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-37.md	tools/workflows/tier2-review.template.js:180
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-37.md	tools/workflows/tier2-review.template.js:491
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-38.md	tools/memory-tree/gotchas.py:1335-1339
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-39.md	BUILD-METHOD M8
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-39.md	tools/memory-tree/gotchas.py:340
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-4.md	tools/hooks/agent-cap.js:1780-1784
@@ -18237,11 +18290,6 @@ memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-4.md	tools/wor
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-4.md	tools/workflows/tier2-review.test.sh:67-81
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-4.md	tools/workflows/tier2-review.test.sh:89-99
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-40.md	BUILD-METHOD M4
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-40.md	tools/codebase-map/map_lib.py:1502
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-40.md	tools/govkit/govkit.py:115
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-40.md	tools/govkit/govkit.py:2222
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-40.md	tools/govkit/govkit.py:703-705
-memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-40.md	tools/hooks/agent-cap.js:720
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-40.md	tools/lib/resolve_kit_dir.py:29
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-40.md	tools/workflows/kit.toml:8
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-5.md	a.js:3
@@ -18271,6 +18319,7 @@ memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-7.md	tools/wor
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-7.md	tools/workflows/tier2-review.test.sh:89-99
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-8.md	tools/workflows/drift-audit-state.template.js:78
 memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-9.md	tools/memory-tree/gotchas.py:16-21
+memory/builds/dFinishedRecord/spec/2026-11-05-spec-TOOL-dFinishedRecord-2.md	BUILD-METHOD M4
 memory/builds/dFoldedAudit/RUN.md	BUILD-METHOD M6
 memory/builds/dFoldedAudit/build/2026-11-01-build-TOOL-dFoldedAudit-1-1-orient-enforcement.md	BUILD-METHOD M4
 memory/builds/dFoldedAudit/build/2026-11-01-build-TOOL-dFoldedAudit-1-1-orient-enforcement.md	check-unattended.sh:2717
@@ -21848,6 +21897,8 @@ memory/builds/dIndexedDesign/build/2026-10-28-build-TOOL-dIndexedDesign-50-devia
 memory/builds/dIndexedDesign/build/2026-10-28-build-TOOL-dIndexedDesign-51-deviation-511.md	BUILD-METHOD M4
 memory/builds/dIndexedDesign/build/2026-10-28-build-TOOL-dIndexedDesign-52-deviation-521.md	BUILD-METHOD M4
 memory/builds/dIndexedDesign/build/2026-10-28-build-TOOL-dIndexedDesign-53-deviation-531.md	BUILD-METHOD M4
+memory/builds/dIndexedDesign/build/2026-11-05-build-TOOL-dIndexedDesign-1-crosscheck-returns.md	BUILD-METHOD M4
+memory/builds/dIndexedDesign/build/2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md	BUILD-METHOD M4
 memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-1-reuse-scout.md	BUILD-METHOD M2
 memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-2-reuse-scout.md	BUILD-METHOD M5
 memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-3-reuse-scout.md	BUILD-METHOD M2
@@ -21862,6 +21913,10 @@ memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-spe
 memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md	tree_lib.py:429-432
 memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md	unattended.sh:3975
 memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md	unattended.sh:4458
+memory/builds/dIndexedDesign/prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-1-spec-reviewer.md	BUILD-METHOD M4
+memory/builds/dIndexedDesign/prompts/2026-11-05-prompt-TOOL-dIndexedDesign-1-parents-crosscheck.md	BUILD-METHOD M4
+memory/builds/dIndexedDesign/prompts/2026-11-05-prompt-TOOL-dIndexedDesign-16-1-spec-reviewer.md	BUILD-METHOD M4
+memory/builds/dIndexedDesign/prompts/2026-11-05-prompt-TOOL-dIndexedDesign-9-1-spec-reviewer.md	BUILD-METHOD M4
 memory/builds/dIndexedDesign/reviews/2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md	BUILD-METHOD M6
 memory/builds/dIndexedDesign/reviews/2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md	agent-cap.js:1409
 memory/builds/dIndexedDesign/reviews/2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md	agent-cap.js:1566
@@ -22246,6 +22301,7 @@ memory/builds/dIndexedDesign/spec/2026-10-28-spec-TOOL-dIndexedDesign-7.md	tools
 memory/builds/dIndexedDesign/spec/2026-10-28-spec-TOOL-dIndexedDesign-7.md	tools/memory-tree/gen_build_index.py:8617
 memory/builds/dIndexedDesign/spec/2026-10-28-spec-TOOL-dIndexedDesign-7.md	tools/workflows/review_replay.py:100
 memory/builds/dIndexedDesign/spec/2026-10-28-spec-TOOL-dIndexedDesign-7.md	tools/workflows/review_replay.py:185
+memory/builds/dIndexedDesign/spec/2026-10-28-spec-TOOL-dIndexedDesign-8.md	BUILD-METHOD M2
 memory/builds/dIndexedDesign/spec/2026-10-28-spec-TOOL-dIndexedDesign-8.md	catalogue.toml:41
 memory/builds/dIndexedDesign/spec/2026-10-28-spec-TOOL-dIndexedDesign-8.md	design_lib.py:543
 memory/builds/dIndexedDesign/spec/2026-10-28-spec-TOOL-dIndexedDesign-8.md	tools/memory-tree/check-memory-hygiene.sh:2426-2441
@@ -23010,6 +23066,7 @@ memory/builds/dLinkedLibrary/build/2026-10-28-build-TOOL-dLinkedLibrary-1-parent
 memory/builds/dLinkedLibrary/build/2026-10-28-build-TOOL-dLinkedLibrary-1-reground-returns.md	tools/lib/resolve-python.test.sh:172
 memory/builds/dLinkedLibrary/build/2026-10-28-build-TOOL-dLinkedLibrary-1-reground-returns.md	tools/memory-tree/deviation_join.py:239
 memory/builds/dLinkedLibrary/build/2026-10-28-build-TOOL-dLinkedLibrary-1-reground-returns.md	tools/policy/policy.py:1332-1360
+memory/builds/dLinkedLibrary/build/2026-11-05-build-TOOL-dLinkedLibrary-1-parents-crosscheck.md	BUILD-METHOD M4
 memory/builds/dLinkedLibrary/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	HYGIENE check 19
 memory/builds/dLinkedLibrary/prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-1-reuse-scout.md	BUILD-METHOD M5
 memory/builds/dLinkedLibrary/prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md	BUILD-METHOD M2
@@ -23033,6 +23090,8 @@ memory/builds/dLinkedLibrary/prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-2-s
 memory/builds/dLinkedLibrary/prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md	tools/memory-tree/kit.toml:8
 memory/builds/dLinkedLibrary/prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-2-1-spec-writer.md	tools/memory-tree/kit.toml:8
 memory/builds/dLinkedLibrary/prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-7-1-spec-writer.md	tools/memory-tree/kit.toml:8
+memory/builds/dLinkedLibrary/prompts/2026-11-05-prompt-TOOL-dLinkedLibrary-1-1-spec-reviewer.md	BUILD-METHOD M4
+memory/builds/dLinkedLibrary/prompts/2026-11-05-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md	BUILD-METHOD M4
 memory/builds/dLinkedLibrary/reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md	adopt-agent-instructions.sh:136
 memory/builds/dLinkedLibrary/reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md	adopter-ic-2cff5855.receipt.json:64-69
 memory/builds/dLinkedLibrary/reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md	agent-cap.js:1490
@@ -25659,6 +25718,11 @@ memory/builds/dOrderedCharter/spec/2026-11-03-spec-PLAY-dOrderedCharter-63.md	to
 memory/builds/dOrderedCharter/spec/2026-11-03-spec-PLAY-dOrderedCharter-63.md	tools/memory-tree/gen_build_index.py:495-551
 memory/builds/dOrderedCharter/spec/2026-11-03-spec-PLAY-dOrderedCharter-63.md	tools/memory-tree/tree_lib.py:149
 memory/builds/dOrderedCharter/spec/2026-11-03-spec-PLAY-dOrderedCharter-63.md	tools/memory-tree/tree_lib.py:376-380
+memory/builds/dOrderedCharter/spec/2026-11-12-spec-PLAY-dOrderedCharter-84.md	BUILD-METHOD M2
+memory/builds/dPavedRoad/build/2026-11-10-build-TOOL-dPavedRoad-4-ledger.md	HYGIENE check 12
+memory/builds/dPavedRoad/build/2026-11-10-build-TOOL-dPavedRoad-4-ledger.md	HYGIENE check 23
+memory/builds/dPavedRoad/spec/2026-11-10-spec-TOOL-dPavedRoad-4.md	HYGIENE check 12
+memory/builds/dPavedRoad/spec/2026-11-10-spec-TOOL-dPavedRoad-4.md	HYGIENE check 23
 memory/builds/dPinnedHandoff/spec/2026-09-22-spec-TOOL-dPinnedHandoff-1.md	tools/memory-tree/check-memory-hygiene.sh:1352-1377
 memory/builds/dPinnedHandoff/spec/2026-09-22-spec-TOOL-dPinnedHandoff-1.md	tools/memory-tree/check-memory-hygiene.sh:1709-1753
 memory/builds/dPinnedHandoff/spec/2026-09-22-spec-TOOL-dPinnedHandoff-2.md	tools/check-spec-tokens.py:322-384
@@ -25775,6 +25839,8 @@ memory/builds/dPlacedRequest/build/2026-10-25-build-TOOL-dPlacedRequest-61-devia
 memory/builds/dPlacedRequest/build/2026-10-25-build-TOOL-dPlacedRequest-62-deviation-621.md	BUILD-METHOD M4
 memory/builds/dPlacedRequest/build/2026-10-25-build-TOOL-dPlacedRequest-63-deviation-631.md	BUILD-METHOD M4
 memory/builds/dPlacedRequest/build/2026-10-25-build-TOOL-dPlacedRequest-64-deviation-641.md	BUILD-METHOD M4
+memory/builds/dPlacedRequest/build/2026-11-05-build-TOOL-dPlacedRequest-1-crosscheck-returns.md	BUILD-METHOD M4
+memory/builds/dPlacedRequest/build/2026-11-05-build-TOOL-dPlacedRequest-1-parents-crosscheck.md	BUILD-METHOD M4
 memory/builds/dPlacedRequest/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	tools/unattended/unattended.sh:852
 memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-3-reuse-scout.md	BUILD-METHOD M3
 memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md	HYGIENE check 12
@@ -25800,6 +25866,8 @@ memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-44-pr
 memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-50-promoted-fix-brief.md	HYGIENE check 12
 memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-57-promoted-fix-brief.md	HYGIENE check 25
 memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-64-promoted-fix-brief.md	HYGIENE check 25
+memory/builds/dPlacedRequest/prompts/2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md	BUILD-METHOD M4
+memory/builds/dPlacedRequest/prompts/2026-11-05-prompt-TOOL-dPlacedRequest-3-1-spec-reviewer.md	BUILD-METHOD M4
 memory/builds/dPlacedRequest/reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md	check-kit-versions.sh:296-325
 memory/builds/dPlacedRequest/reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md	derive-ceilings.py:695-698
 memory/builds/dPlacedRequest/reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md	fleet.toml:13
@@ -26470,6 +26538,7 @@ memory/builds/dRankedPlan/build/2026-10-28-build-TOOL-dRankedPlan-1-parents-cros
 memory/builds/dRankedPlan/build/2026-10-28-build-TOOL-dRankedPlan-1-parents-crosscheck.md	tree_lib.py:471
 memory/builds/dRankedPlan/build/2026-10-28-build-TOOL-dRankedPlan-1-reground-returns.md	check_policy.py:423-427
 memory/builds/dRankedPlan/build/2026-10-28-build-TOOL-dRankedPlan-1-reground-returns.md	gen_build_index.py:690
+memory/builds/dRankedPlan/build/2026-11-05-build-TOOL-dRankedPlan-1-parents-crosscheck.md	BUILD-METHOD M4
 memory/builds/dRankedPlan/prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md	BUILD-METHOD M2
 memory/builds/dRankedPlan/prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md	tools/policy/catalogue.toml:204
 memory/builds/dRankedPlan/prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md	tools/policy/policy.py:752
@@ -26477,6 +26546,8 @@ memory/builds/dRankedPlan/prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-2-spec-wr
 memory/builds/dRankedPlan/prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md	tools/memory-tree/gen_build_index.py:2293-2296
 memory/builds/dRankedPlan/prompts/2026-10-28-prompt-TOOL-dRankedPlan-13-1-spec-writer.md	tools/memory-tree/gen_build_index.py:2293-2296
 memory/builds/dRankedPlan/prompts/2026-10-28-prompt-TOOL-dRankedPlan-83-spec-brief.md	tools/gate-legs.json:1096-1099
+memory/builds/dRankedPlan/prompts/2026-11-05-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md	BUILD-METHOD M4
+memory/builds/dRankedPlan/prompts/2026-11-05-prompt-TOOL-dRankedPlan-3-1-spec-reviewer.md	BUILD-METHOD M4
 memory/builds/dRankedPlan/reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md	adopt-memory-tree.sh:519
 memory/builds/dRankedPlan/reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md	catalogue.toml:84-86
 memory/builds/dRankedPlan/reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md	check_roles.py:114
@@ -33752,6 +33823,7 @@ memory/builds/dTotalRecall/build/2026-10-26-build-TOOL-dTotalRecall-96-deviation
 memory/builds/dTotalRecall/build/2026-10-26-build-TOOL-dTotalRecall-97-deviation-971.md	BUILD-METHOD M4
 memory/builds/dTotalRecall/build/2026-10-26-build-TOOL-dTotalRecall-98-deviation-981.md	BUILD-METHOD M4
 memory/builds/dTotalRecall/build/2026-10-26-build-TOOL-dTotalRecall-99-deviation-991.md	BUILD-METHOD M4
+memory/builds/dTotalRecall/build/2026-11-05-build-TOOL-dTotalRecall-1-parents-crosscheck.md	BUILD-METHOD M4
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-6-spec-writer.md	tools/govkit/registry.toml:380
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-6-spec-writer.md	tools/memory-tree/kit.toml:8
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-owner-review-stop.md	BUILD-METHOD M4
@@ -33767,6 +33839,8 @@ memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-18-1-spec
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-18-1-spec-writer.md	tools/memory-tree/kit.toml:8
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-8-1-spec-writer.md	tools/govkit/registry.toml:380
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-8-1-spec-writer.md	tools/memory-tree/kit.toml:8
+memory/builds/dTotalRecall/prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md	BUILD-METHOD M4
+memory/builds/dTotalRecall/prompts/2026-11-05-prompt-TOOL-dTotalRecall-11-1-spec-reviewer.md	BUILD-METHOD M4
 memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md	backlog.py:1042
 memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md	check-memory-hygiene.sh:1806
 memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md	check-recall.py:511
@@ -37709,6 +37783,7 @@ memory/builds/dWitnessedBar/build/2026-10-25-build-TOOL-dWitnessedBar-95-deviati
 memory/builds/dWitnessedBar/build/2026-10-25-build-TOOL-dWitnessedBar-96-deviation-961.md	BUILD-METHOD M4
 memory/builds/dWitnessedBar/build/2026-10-25-build-TOOL-dWitnessedBar-97-deviation-971.md	BUILD-METHOD M4
 memory/builds/dWitnessedBar/build/2026-10-26-build-TOOL-dWitnessedBar-1-reground-returns.md	tools/run-gates/measure_legs.py:116-153
+memory/builds/dWitnessedBar/build/2026-11-05-build-TOOL-dWitnessedBar-1-parents-crosscheck.md	BUILD-METHOD M4
 memory/builds/dWitnessedBar/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	tools/unattended/stop-guard.js:111
 memory/builds/dWitnessedBar/prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-owner-review-stop.md	BUILD-METHOD M4
 memory/builds/dWitnessedBar/prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md	BUILD-METHOD M2
@@ -37718,6 +37793,8 @@ memory/builds/dWitnessedBar/prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-1-spe
 memory/builds/dWitnessedBar/prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md	tools/memory-tree/kit.toml:8
 memory/builds/dWitnessedBar/prompts/2026-10-26-prompt-TOOL-dWitnessedBar-28-1-spec-writer.md	tools/memory-tree/kit.toml:8
 memory/builds/dWitnessedBar/prompts/2026-10-26-prompt-TOOL-dWitnessedBar-3-2-spec-writer.md	tools/memory-tree/kit.toml:8
+memory/builds/dWitnessedBar/prompts/2026-11-05-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md	BUILD-METHOD M4
+memory/builds/dWitnessedBar/prompts/2026-11-05-prompt-TOOL-dWitnessedBar-21-1-spec-reviewer.md	BUILD-METHOD M4
 memory/builds/dWitnessedBar/reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md	.governance/deploy.toml:66
 memory/builds/dWitnessedBar/reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md	BUILD-METHOD M8
 memory/builds/dWitnessedBar/reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md	adopt-codebase-map.sh:190-200
@@ -38550,13 +38627,14 @@ memory/map/features/build-method.md	tools/memory-tree/adopt-memory-tree.sh:59
 memory/map/features/build-method.md	tools/memory-tree/kit-dogfood-parity.test.sh:53
 memory/map/features/review-harnesses.md	drift-audit-code.js:48
 memory/map/features/review-harnesses.md	drift-audit-state.js:47
+memory/project/spec-token-waivers.txt	tools/hooks/agent-cap.js:1972
 memory/project/spec-token-waivers.txt	tools/hooks/agent-cap.js:2092
 memory/project/unarmed-branches.txt	skills/session-kickoff/manifest-check.test.sh:1186
 memory/project/unarmed-branches.txt	tools/check-dead-paths.test.sh:124
 memory/project/unarmed-branches.txt	tools/check-dead-paths.test.sh:231
 memory/project/unarmed-branches.txt	tools/check-dead-paths.test.sh:281
 memory/project/unarmed-branches.txt	tools/check-dead-paths.test.sh:297
-memory/project/unarmed-branches.txt	tools/check-install-prefix.test.sh:236
+memory/project/unarmed-branches.txt	tools/check-install-prefix.test.sh:271
 memory/project/unarmed-branches.txt	tools/codebase-map/adopt-codebase-map.test.sh:139
 memory/project/unarmed-branches.txt	tools/lib/resolve-python.test.sh:193
 memory/project/unarmed-branches.txt	tools/lib/resolve-python.test.sh:196
@@ -38635,7 +38713,6 @@ tools/govkit/selftest.py	govkit.py:5743
 tools/govkit/selftest.py	govkit.py:6112
 tools/govkit/selftest.py	python_floor.py:36
 tools/govkit/steps.toml	check-recall.py:394
-tools/hooks/agent-cap.test.sh	/workflows/tier2-review.js:290
 tools/lexicon/selftest.py	web/widget.ts:3
 tools/lexicon/ts-conformance-fixtures.json	remoteBinding.ts:95-97
 tools/lib/resolve-python.test.sh	hash.py:1
@@ -38702,13 +38779,19 @@ tools/unattended/check-unattended.test.sh	check-unattended.sh:483
 tools/unattended/check-unattended.test.sh	probe-date.sh:2
 tools/unattended/unattended.sh	check-memory-hygiene.sh:880
 tools/workflows/README.md	/repo/a.sh:12
+tools/workflows/check-verifier-fanout.test.sh	/workflows/tier2-review.js:290
 tools/workflows/drift-audit-code.js	file.py:1234
 tools/workflows/drift-audit-code.template.js	file.py:1234
+tools/workflows/replay_scorer.py	a.py:1
+tools/workflows/replay_scorer.py	a.py:2
+tools/workflows/replay_scorer.py	a/b.py:12
+tools/workflows/replay_scorer.py	b.py:12
+tools/workflows/replay_scorer.py	b.py:12-20
+tools/workflows/replay_scorer.py	bench.py:384
+tools/workflows/replay_scorer.py	bench.py:647
+tools/workflows/replay_scorer.py	sub/planted.py:2
 tools/workflows/review_replay.py	/projects/x/mod/b.py:41
 tools/workflows/review_replay.py	/projects/x/src/a.sh:12
-tools/workflows/review_replay.py	a/b.py:12
-tools/workflows/review_replay.py	b.py:12
-tools/workflows/review_replay.py	b.py:12-20
 tools/workflows/review_replay.py	c.py:7
 tools/workflows/review_replay.py	mod/b.py:40
 tools/workflows/review_replay.py	mod/c.py:7
@@ -38716,6 +38799,12 @@ tools/workflows/review_replay.py	src/a.sh:1
 tools/workflows/review_replay.py	src/a.sh:10
 tools/workflows/review_replay.py	src/a.sh:12
 tools/workflows/review_replay.py	src/a.sh:14
+tools/workflows/tier2-review.test.sh	a.js:10
+tools/workflows/tier2-review.test.sh	a.js:12
+tools/workflows/tier2-review.test.sh	a.js:14
+tools/workflows/tier2-review.test.sh	a.js:3
+tools/workflows/tier2-review.test.sh	b.js:10
+tools/workflows/tier2-review.test.sh	correctness.js:1
 tools/workflows/tier2-review.test.sh	p.js:9
 tools/workflows/tier2-review.test.sh	security.js:1
 tools/workflows/unattended-build.test.sh	gh32-pathless.js:3

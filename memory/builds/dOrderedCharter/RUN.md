@@ -23,7 +23,7 @@ parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 47ed57fab692a005daa7c9850c59e033dfbddce3 · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 0e5ae91841dec1e58e1f478642345f18e75c81bc
+witness: 4fac9ff75dfad51c001b257d1722d5c86aa24f9f
 phase: BUILDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
