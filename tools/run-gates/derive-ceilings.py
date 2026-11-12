@@ -641,7 +641,12 @@ def cmd_write(root, gd, args) -> int:
 
 
 def cmd_check(root, gd, args) -> int:
-    """The gate. TWO TRACKED FILES and nothing else, so the verdict is a property of the tree."""
+    """The gate. TRACKED FILES and nothing else, so the verdict is a property of the tree.
+
+    The ceiling arm reads the leg manifest, `ceiling-evidence.txt` and `ceiling-margin.txt`. The
+    budget arm reads `pass-leg-evidence.txt` beside them, through `pass_legs.py`, where that module
+    is beside this script.
+    """
     legs = read_legs(root)
     ev = read_evidence()
     floor, frac, _ = read_margin()

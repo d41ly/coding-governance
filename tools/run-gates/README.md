@@ -984,6 +984,7 @@ data. This section says which rows carry it, and nothing here runs a leg.
    | reason | the leg |
    |---|---|
    | `selftest` | has `chunk` `selftests` |
+   | `kit-subject` | has `subject` `kit`, the other half of what the runner holds |
    | `e2e` | has `chunk` `e2e` |
    | `unattended-gate` | has an `argv` word ending `check-unattended.sh`, so a renamed row stays excluded |
    | `no-red` | has no row in the pass-leg evidence |
@@ -1041,7 +1042,7 @@ then sums the list:
 | finding | the declared leg, or the list |
 |---|---|
 | excluded class | `check_pass_eligible` answers `selftest`, `e2e` or `unattended-gate` for it |
-| held | has `subject` `kit`, so the pass-leg runner would hold it and run nothing |
+| held | `check_pass_eligible` answers `kit-subject` for it, so the pass-leg runner would hold it and run nothing |
 | no cost row | has no row in `ceiling-evidence.txt` |
 | over the cap | has a cost row above `PASS_LEG_CAP_SECONDS`, or `check_pass_eligible` answers `over-cap` on its last seconds |
 | over the limit | the declared legs' cost rows sum above `PASS_LIMIT_SECONDS` |
@@ -1068,7 +1069,9 @@ its guard skips counts in full.
 `bash <prefix>/run-gates/pass-legs.sh --base <rev>` runs the declared pass legs over one pass's
 diff (TOOL-aNimbleMend-5). It holds no leg command and no verdict logic: it filters the manifest to
 the rows whose `pass_leg` is true, in manifest order, writes them to `<git-dir>/gate-pass-legs.json`
-and starts `run-gates.sh` once with that file as `GATE_LEGS`. `--base` is required and must name a
+and starts `run-gates.sh` once with that file as `GATE_LEGS`. Each row is copied with its `argv`
+behind the held tier's leg shim, `bash <prefix>/run-gates/run-held-wsl.sh --leg`, and nothing else
+of the row moves (TOOL-aNimbleMend-13). `--base` is required and must name a
 commit; without one it exits 2 and starts nothing, because the runner reads an unresolvable base as
 empty and runs every leg.
 
@@ -1124,8 +1127,10 @@ the runner call, so it includes the runner's own start, which no cost row holds.
   naming the filtered manifest. The push hook trusts a stamp only when its manifest is the kit's
   own, so the next push runs its bar in full, and the next full bar re-earns the stamp.
 - The run adds its legs' rows to the gate ledger and leaves every other row standing.
-- `GATE_LEGS` is inherited by every leg, so a declared leg that reads it as its subject grades the
-  filtered list and not the manifest. `GATE_BASE` is inherited the same way.
+- Every leg starts through the shim with `GATE_LEGS` unset, so a declared leg that reads it as its
+  subject grades the manifest beside its kit, as under the full bar, whatever the caller exported.
+  Each leg costs one more shell start, and a ledger row the run writes is keyed on the wrapped
+  command. `GATE_BASE` is inherited as the adapter set it.
 
 What it does not check: whether the declared list is the rule's own output or inside its budget,
 which are `pass_legs.py --check` and `--budget`, and whether a skipped leg's guard is too narrow. It

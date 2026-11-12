@@ -333,7 +333,6 @@
   },
   {
     "name": "python resolver (behaviour + inline parity + idiom ban)",
-    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/lib/resolve-python.test.sh"

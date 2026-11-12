@@ -49,8 +49,9 @@ from profile_bar import parse_verdicts  # noqa: E402  the runner's verdict gramm
 # spelled, because this kit installs at <prefix>/run-gates/ and a literal resolves at one prefix only.
 MANIFEST_BESIDE = os.path.join(os.path.dirname(KITDIR), "gate-legs.json")
 DECLARATION_BESIDE = os.path.join(KITDIR, "windows-only-legs.txt")
-# The shim every partition row runs its leg through. `{prefix}` is the runner's own token, resolved
-# per tree, and the kit dir's name is read from this file's location.
+# The shim every partition row runs its leg through, and every row the pass-leg adapter,
+# `pass-legs.sh`, filters. `{prefix}` is the runner's own token, resolved per tree, and the kit
+# dir's name is read from this file's location.
 SHIM = "{prefix}/" + os.path.basename(KITDIR) + "/run-held-wsl.sh"
 
 SHARED_FILE = ".githooks/gate-env.sh"

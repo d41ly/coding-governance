@@ -73,3 +73,7 @@ base: 1265772cc365418ac6431a7f0f9e069f3bb79dc0
 2026-11-12T16:28:15Z rescope · item add TOOL-aNimbleMend-13 · reason the pass legs' first run over this build, after unit 7, redded eight legs: three false reds from legs that read the filtered leg list as their subject, a kit-subject leg the rule selects and the runner holds, a kit.toml sentence govkit selfcheck refuses, one unruled function name in pass_legs.py, and a stale docstring; each sits in a CLOSED unit
 
 2026-11-12T16:53:41Z brief · item TOOL-aNimbleMend-13 · reason de1155b411c2 memory/builds/aNimbleMend/prompts/2026-11-12-prompt-TOOL-aNimbleMend-13-build-brief.md
+
+2026-11-12T16:59:12Z dispatch · item b7bfe5fa TOOL-aNimbleMend-13 · reason tools/run-gates/pass-legs.sh tools/run-gates/pass_legs.py tools/gate-legs.json tools/run-gates/kit.toml tools/run-gates/derive-ceilings.py tools/run-gates/run-held-wsl.sh tools/run-gates/held_halves.py tools/run-gates/README.md tools/run-gates/run-gates.test.sh tools/run-gates/run-gates.evidence.test.sh memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-13.md memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-13-1-acceptance-ledger.md
+
+2026-11-12T17:05:34Z dispatch · item b7bfe5fa TOOL-aNimbleMend-13 · reason memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/builds/aNimbleMend/README.md

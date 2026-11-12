@@ -62,7 +62,7 @@ PASS_LIMIT_SECONDS = 690
 
 # The unattended kit gate is found by its SCRIPT, so a renamed row stays excluded.
 UNATTENDED_GATE = "check-unattended.sh"
-EXCLUSIONS = ("selftest", "e2e", "unattended-gate", "no-red", "unevidenced", "over-cap")
+EXCLUSIONS = ("selftest", "kit-subject", "e2e", "unattended-gate", "no-red", "unevidenced", "over-cap")
 
 _NAME_LINE = re.compile(r'^    "name": (".*"),\s*$')
 _FIELD_LINE = re.compile(r'^\s*"pass_leg"\s*:')
@@ -217,6 +217,8 @@ def check_pass_eligible(leg: dict, reds: dict, ceilings: dict) -> str:
     name = leg.get("name")
     if leg.get("chunk") == "selftests":
         return "selftest"
+    if leg.get("subject") == "kit":
+        return "kit-subject"
     if leg.get("chunk") == "e2e":
         return "e2e"
     if any(str(a).endswith(UNATTENDED_GATE) for a in leg.get("argv") or []):
@@ -261,9 +263,7 @@ def check_pass_budget(legs, ceilings: dict) -> tuple:
         reason = check_pass_eligible(leg, reds, ceilings)
         if reason in ("selftest", "e2e", "unattended-gate"):
             why = f"it is of an excluded class, `{reason}`, which no pass runs"
-        # ponytail: the gate's own clause; it goes once the predicate answers a reason for a
-        # kit-subject row, and this reads that reason instead.
-        elif leg.get("subject") == "kit":
+        elif reason == "kit-subject":
             why = "the pass-leg runner would hold it, its subject being `kit`, and run nothing"
         elif cost is None:
             why = "it has no cost row in the ceiling evidence, so its seconds are unknown"
@@ -339,12 +339,12 @@ def render_pass_field(text: str, selected) -> str:
         raise Refusal(f"the edited manifest would not parse ({e}); a `pass_leg` line typed as a "
                       f"row's last key leaves a trailing comma, so remove it by hand")
 
-    def strip(rows):
+    def remove_pass_field(rows):
         return [{k: v for k, v in r.items() if k != "pass_leg"} for r in rows]
 
     before = json.loads(text)
     declared = {r["name"] for r in after if r.get("pass_leg") is True}
-    if strip(after) != strip(before) or declared != {r["name"] for r in before} & set(selected) \
+    if remove_pass_field(after) != remove_pass_field(before) or declared != {r["name"] for r in before} & set(selected) \
             or any("pass_leg" in r and r["pass_leg"] is not True for r in after):
         raise Refusal("the edit would change more than the `pass_leg` field of the selected rows")
     return new

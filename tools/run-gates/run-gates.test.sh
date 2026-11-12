@@ -269,7 +269,9 @@ fail=0
 # TOOL-aNimbleMend-2 added and left uncounted. Neither is gated. Counted by reading; this pass runs no suite.
 # 412 -> 438, TOOL-aNimbleMend-5: section 14's twenty-six pass-leg assertions, none of them gated.
 # Counted off the section's own `check_pl_value` calls; this pass runs no suite.
-FLOOR_ASSERTIONS=438
+# 438 -> 440, TOOL-aNimbleMend-13: arm 14a2's two, a pass leg's `GATE_LEGS` unset behind the shim and
+# set once the wrap is taken out of the fixture's adapter. Neither is gated. Counted by reading.
+FLOOR_ASSERTIONS=440
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -4102,9 +4104,13 @@ rm -rf "$SC" 2>/dev/null || true
 #    figures edited into the fixture's OWN copy of the declaration module; the adapter types none.
 PL=$(mktemp -d) || { echo "canary: cannot create a scratch dir for the pass-leg arms"; exit 2; }
 PLR="$PL/r"; mkdir -p "$PLR/$KIT_REL" "$PLR/fx" "$PLR/watched" "$PL/marks" "$PL/ts"
+#    The adapter writes each row behind the held tier's leg shim (TOOL-aNimbleMend-13), so the shim,
+#    the module naming it and the module that one imports sit in the fixture kit too. Each marker
+#    HOLDS what `GATE_LEGS` read when its script started, `unset` where it was not set.
 cp "$KITDIR/run-gates.sh" "$KITDIR/gate-profiles.txt" "$KITDIR/gate-fingerprint.sh" "$KITDIR/pass_legs.py" \
-   "$KITDIR/pass-legs.sh" "$PLR/$KIT_REL/" 2>/dev/null
-printf '#!/usr/bin/env bash\n: > "%s/$1"\n[ "$1" = alpha ] && { sleep "${FX_SLEEP:-0}"; exit "${FX_RC:-0}"; }\nexit 0\n' "$PL/marks" > "$PLR/fx/mark.sh"
+   "$KITDIR/pass-legs.sh" "$KITDIR/run-held-wsl.sh" "$KITDIR/held_halves.py" "$KITDIR/profile_bar.py" \
+   "$PLR/$KIT_REL/" 2>/dev/null
+printf '#!/usr/bin/env bash\necho "${GATE_LEGS:-unset}" > "%s/$1"\n[ "$1" = alpha ] && { sleep "${FX_SLEEP:-0}"; exit "${FX_RC:-0}"; }\nexit 0\n' "$PL/marks" > "$PLR/fx/mark.sh"
 write_pl_legs() { # alpha's own extra fields · rows appended after gamma
   printf '[{"name": "alpha", %s"argv": ["bash", "fx/mark.sh", "alpha"]},\n {"name": "beta", "pass_leg": true, "argv": ["bash", "fx/mark.sh", "beta"], "guard": ["watched/"]},\n {"name": "gamma", "argv": ["bash", "fx/mark.sh", "gamma"]}%s]\n' "$1" "$2" > "$PLR/${PFX}gate-legs.json"
 }
@@ -4138,6 +4144,18 @@ printf 'w2\n' > "$PLR/watched/w.txt"; write_pl_commit "watched moves"
 run_pl_legs -- --base HEAD~1
 check_pl_value "AC1 the adapter exits with the runner's green" "$PL_RC" 0
 check_pl_value "AC1 the two declared rows ran and the undeclared row did not" "$(read_pl_marks)" "alpha beta "
+# 14a2. TOOL-aNimbleMend-13 AC1 — a pass leg starts with `GATE_LEGS` unset, so it reads the manifest
+#      beside its kit and never the filtered list. The liveness half takes the wrap out of the
+#      fixture's OWN copy of the adapter, and the same marker must then name the filtered file: a
+#      marker that could only ever read `unset` would prove nothing. The adapter is uncommitted for
+#      that one run, which moves no guard here, and the copy is restored before the next arm.
+check_pl_value "13-AC1 a pass leg starts with GATE_LEGS unset" "$(tr -d '\r' < "$PL/marks/alpha" 2>/dev/null)" unset
+sed 's/\["bash", held_halves\.SHIM, "--leg"\] + //' "$KITDIR/pass-legs.sh" > "$PLR/$KIT_REL/pass-legs.sh"
+run_pl_legs -- --base HEAD~1
+check_pl_value "13-AC1 ...and with the wrap taken out of the adapter it inherits the filtered list" \
+  "$(tr -d '\r' < "$PL/marks/alpha" 2>/dev/null | grep -c 'gate-pass-legs\.json$')" 1
+cp "$KITDIR/pass-legs.sh" "$PLR/$KIT_REL/pass-legs.sh"
+run_pl_legs -- --base HEAD~1
 # 14b. AC5 — the record of that run: every key, the declared count, and both legs ok.
 _plk=""
 for _k in run_id base head started exit verdict declared wall_s budget_s limit_s over held; do

@@ -9,7 +9,9 @@
 #
 # WHAT IT DOES. It holds no leg command and no verdict logic. It filters the leg manifest to the
 # rows whose `pass_leg` is true (`pass_legs.py` derives that field), writes them to
-# `<git-dir>/gate-pass-legs.json`, and starts `run-gates.sh` beside it ONCE with that file as
+# `<git-dir>/gate-pass-legs.json`, each with its `argv` behind `bash <kit>/run-held-wsl.sh --leg`,
+# the shim that unsets `GATE_LEGS`, so every pass leg reads the manifest beside its kit and only the
+# list the runner starts is narrow. It starts `run-gates.sh` beside it ONCE with that file as
 # `GATE_LEGS`, the resolved base as `GATE_BASE`, a pinned `GATE_RUN_ID` of the form
 # `pass-<UTC stamp>-<pid>`, and `GATE_FULL` and `GATE_SELFTESTS` EMPTY, so each leg's own guard
 # decides against the pass's diff and a flag the calling session exported cannot widen the run.
@@ -33,7 +35,8 @@
 # WHAT IT DOES NOT CHECK. Whether the declared list is the rule's own output or inside its budget:
 # those are `pass_legs.py --check` and `--budget`. Which legs a guard skipped for a good reason. And
 # it scrubs no runner knob beyond the two named above: an inherited `GATE_DOCS_BASE` or `GATE_REUSE`
-# reaches the runner as the caller set it.
+# reaches the runner as the caller set it. A caller's own `GATE_LEGS` is the manifest filtered, and
+# its legs still grade the one beside the kit.
 #
 # WHAT A RUN COSTS THE BAR'S RECORDS is in this kit's README, under the pass-leg runner.
 set -u
@@ -290,16 +293,22 @@ fi
 
 # ---- 4. the list and the two figures, one python call --------------------------------------------
 # `read_manifest` is the declaration module's own reader, so `GATE_LEGS` outranks the kit dir's
-# sibling here exactly as it does there. Each selected row is copied whole, in manifest order.
+# sibling here exactly as it does there. Each selected row is copied in manifest order with its
+# `argv` behind the leg shim (TOOL-aNimbleMend-13): the runner exports `GATE_LEGS` to every leg, and
+# a leg that reads it as its subject must grade the manifest beside its kit, never this filtered
+# list. The shim is the held tier's own, named by `held_halves.SHIM`; an import that fails ends
+# this call, and the `|| exit 2` below, with nothing run.
 PL_FIGURES=$("$PYBIN" -B -c '
 import json, os, sys
 sys.path.insert(0, sys.argv[1])
+import held_halves
 import pass_legs
 try:
     _text, legs = pass_legs.read_manifest()
 except pass_legs.Refusal as e:
     sys.exit("pass-legs: REFUSED — %s" % e)
-rows = [l for l in legs if l.get("pass_leg") is True]
+rows = [dict(l, argv=["bash", held_halves.SHIM, "--leg"] + list(l.get("argv") or []))
+        for l in legs if l.get("pass_leg") is True]
 tmp = "%s.%d.tmp" % (sys.argv[2], os.getpid())
 with open(tmp, "w", encoding="utf-8", newline="\n") as f:
     json.dump(rows, f, indent=2, ensure_ascii=False)

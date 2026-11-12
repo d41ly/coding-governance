@@ -147,7 +147,7 @@ argv = ["bash", "{kit}/adopt-run-gates.sh"]
 mutates_index = false
 # DEPL-aHalvedInstall-3: why `update` never re-runs this adopter. A kit with an adopter declares
 # [[regenerate]] or this reason, and selfcheck refuses one declaring neither.
-why_no_regenerate = "the adopter writes nothing; the [gate_runner] declaration its check joins against is emitted by govkit itself from [gate_runner_seed], on apply and on update"
+why_no_regenerate = "the adopter writes nothing, so `update` re-runs no adopter here whatever GOVKIT_RERENDER reads; the [gate_runner] declaration its check joins against is emitted by govkit itself from [gate_runner_seed], on apply and on update"
 
 # THE PASS-LEG FIELD IS RE-APPLIED AT EVERY LANDING. TOOL-aNimbleMend-2. `regen.py` makes this staged
 # row an item, so the lander re-derives `pass_leg` over each merged tree and every bar's preflight

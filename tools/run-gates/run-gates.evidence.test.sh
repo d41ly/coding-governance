@@ -284,7 +284,9 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=250
+FLOOR_ASSERTIONS=253
+# RAISED 250 -> 253 by TOOL-aNimbleMend-13: the kit-subject arms, AC3's two and AC4's one. Counted one
+# per `ok … || nope` pair; this pass runs no suite.
 # RAISED 240 -> 250 by TOOL-aNimbleMend-3: the pass-budget arms, AC2's two, AC3's one, AC4's one, AC5's
 # two, AC6's one, AC7's two and AC8's one. Counted one per `ok … || nope` pair.
 # RAISED 234 -> 240 by TOOL-aSparedSpawn-32: the composed reuse designs, AC9's one, AC10's one, AC12's
@@ -2343,6 +2345,31 @@ run_pb green derive-ceilings.py --check
 [ "$PB_RC" = 0 ] && printf '%s\n' "$PB_OUT" | grep -q '^ceiling-evidence: ' && printf '%s\n' "$PB_OUT" | grep -qxF "$pb_sum" \
   && ok "AC7 over the green manifest it exits 0 with the ceiling-evidence summary and the pass-budget summary" \
   || { nope "AC7 the ceiling check over a green list did not print both summaries (rc=$PB_RC)"; print_pb_out; }
+# TOOL-aNimbleMend-13 AC3 AC4. The rule answers `kit-subject` for a row the runner would hold, ahead
+# of `no-red`. The evidence file is planted HERE, after the arms above that need it absent. `k-kit`
+# and `k-plain` hold the same red row and the same cost row and differ in `subject` alone, so
+# `k-plain` reading `selected` is the liveness half: a fixture whose evidence nobody read would
+# leave both rows undeclared and prove nothing about the clause.
+printf '# window\t1\t-\t-\ta\t2026-11-12\nk-kit\t3\t1.0\nk-plain\t3\t1.0\n' > "$PB_K/pass-leg-evidence.txt"
+write_pb_cost k-kit 1.0; write_pb_cost k-plain 1.0
+printf '%s\n' '[' '  {' '    "name": "k-kit",' '    "argv": ["true"], "chunk": "product", "subject": "kit", "ceiling": 1000' '  },' \
+  '  {' '    "name": "k-plain",' '    "argv": ["true"], "chunk": "product", "ceiling": 1000' '  }' ']' > "$PB_T/kit13.json"
+run_pb kit13 pass_legs.py --report
+[ "$PB_RC" = 0 ] && [ "$(printf '%s\n' "$PB_OUT" | grep -c "^kit-subject"$'\t'".*"$'\t'"k-kit$")" = 1 ] \
+  && [ "$(printf '%s\n' "$PB_OUT" | grep -c "^selected"$'\t'".*"$'\t'"k-plain$")" = 1 ] \
+  && ok "13-AC3 --report reads the kit-subject row kit-subject and its twin without the subject selected" \
+  || { nope "13-AC3 a kit-subject row holding a red row and a cost row is not excluded as kit-subject (rc=$PB_RC)"; print_pb_out; }
+run_pb kit13 pass_legs.py --apply
+[ "$PB_RC" = 0 ] && [ "$(grep -c '"pass_leg": true' "$PB_T/kit13.json")" = 1 ] \
+  && [ "$(grep -A1 '"name": "k-plain"' "$PB_T/kit13.json" | grep -c '"pass_leg": true')" = 1 ] \
+  && ok "13-AC3 --apply declares the twin and leaves the kit-subject row undeclared" \
+  || { nope "13-AC3 --apply declared the kit-subject row, or declared nothing (rc=$PB_RC)"; print_pb_out; }
+printf '%s\n' '[' '  {"name": "k-kit", "pass_leg": true, "argv": ["true"], "chunk": "product", "subject": "kit", "ceiling": 1000}' ']' > "$PB_T/kit13d.json"
+run_pb kit13d
+[ "$PB_RC" = 1 ] && [ "$(printf '%s\n' "$PB_OUT" | grep -c '^PASS-BUDGET FAILED — k-kit: .*runner would hold')" = 1 ] \
+  && ok "13-AC4 a hand-declared kit-subject row holding a red row is still the budget gate's held finding" \
+  || { nope "13-AC4 a declared kit-subject row with a red row drew no held finding (rc=$PB_RC)"; print_pb_out; }
+rm -f "$PB_K/pass-leg-evidence.txt"
 # AC8. Without its sibling the check says the budget was not graded, and its own verdict stands.
 rm -rf "$PB_K/pass_legs.py" "$PB_K/__pycache__"
 run_pb over derive-ceilings.py --check
