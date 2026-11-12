@@ -102,7 +102,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 77 unit(s) · node d · opened 2026-10-21 · streams playbook
+**Build status:** CLOSED · 77 unit(s) · node d · opened 2026-10-21 · streams playbook
 ids PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12
 ids PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24
 ids PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36
@@ -190,11 +190,11 @@ ids TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-81 — the second close bar's two product reds, each by its narrowest fix](spec/2026-11-11-spec-PLAY-dOrderedCharter-81.md) | 43 | 1 | CLOSED | rev-1 | 2026-11-11 |
 | [PLAY-dOrderedCharter-82 — the acceptance matrix reads the renderer's bullet keys in a child process, so its closure stays its own](spec/2026-11-11-spec-PLAY-dOrderedCharter-82.md) | 44 | 1 | CLOSED | rev-2 | 2026-11-11 |
 | [PLAY-dOrderedCharter-83 — the reconcile merge with origin/main at 47ed57fab: fifty conflicted files, each resolved by its kind](spec/2026-11-11-spec-PLAY-dOrderedCharter-83.md) | 45 | 2 | CLOSED | rev-1 | 2026-11-12 |
-| [PLAY-dOrderedCharter-84 — a live unattended run's branch may commit a guarded path](spec/2026-11-12-spec-PLAY-dOrderedCharter-84.md) | 46 | 2 | DEFERRED | rev-2 | 2026-11-12 |
+| [PLAY-dOrderedCharter-84 — a live unattended run's branch may commit a guarded path](spec/2026-11-12-spec-PLAY-dOrderedCharter-84.md) | 46 | 2 | CLOSED | rev-2 | 2026-11-12 |
 | [PLAY-dOrderedCharter-85 — the prepare folds gov first's walk into the merge before it regenerates](spec/2026-11-12-spec-PLAY-dOrderedCharter-85.md) | 46 | 2 | CLOSED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 652 bound to this build, across 4 record folder(s).
+Records: 654 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

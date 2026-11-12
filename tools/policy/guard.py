@@ -9,17 +9,22 @@ The verdict over the staged change of an agent's commit. It refuses a change to 
 same commit. A merge concluded with a parent's blob writes nothing new and is admitted. The mirror
 `.governance/policy.json` leaves the judged set when its staged bytes are its render at HEAD and the
 render's inputs are staged as HEAD holds them (TOOL-dGroundRules-19), so a catalogue or policy change
-is one commit and its regenerated mirror the next. Exit 0 admitted, 1 refused naming every failed
-condition, 2 when git cannot say what is staged.
+is one commit and its regenerated mirror the next. A change the verdict refuses is still admitted on
+a live run's branch (PLAY-dOrderedCharter-84): HEAD's branch is the `run-branch` of a run-state file
+at HEAD whose `phase` there is outside the `PHASES_TERMINAL` set an unattended driver at HEAD
+declares, with no decision row asked. Exit 0 admitted, 1 refused naming every failed condition and
+why no live run admits it, 2 when git cannot say what is staged.
 
-It enforces the defaults of `policy-file.guard` and `policy-file.proof`, owner-only and the TTY proof,
-WITHOUT READING EITHER KEY: it imports no policy reader. The owner's proof is the pre-commit hook's,
+It enforces the defaults of `policy-file.guard` and `policy-file.proof`, owner-only outside a live
+unattended run's branch, and the TTY proof, WITHOUT READING EITHER KEY: it imports no policy reader. The owner's proof is the pre-commit hook's,
 a committer at a terminal, checked before this runs; this file judges the commit that lacks it.
 
 IT STOPS FORGETTING, NOT EVASION. These pass it: `git commit --no-verify`; a pty wrapper giving an
 agent's commit a terminal, the threat the owner accepted; a list line removed in one commit and the
 file changed in the next; a commit made on another clone; a cherry-pick or a rebase, which fire no
-pre-commit; and this file deleted from the working tree, since the hook resolves the kit there. The
+pre-commit; this file deleted from the working tree, since the hook resolves the kit there; and a
+run-state file committed naming the agent's own branch with a live phase, which admits the commit
+after it, though never its own, since the guard reads HEAD. The
 push-time bar does not re-judge authorship.
 """
 import difflib
@@ -37,8 +42,9 @@ POLICY = ".governance/policy.toml"
 MIRROR = ".governance/policy.json"
 DECISIONS = "memory/DECISIONS.md"
 NOT_CAPS = (("budgets", "enforce"), ("budgets", "pinned"))
-REMEDY = ("policy-guard: an agent may raise one measured-file cap in this shape; any other change to "
-          "these files is the owner's, committed from a terminal.")
+REMEDY = ("policy-guard: an agent may raise one measured-file cap in this shape, or commit on the run "
+          "branch of a live unattended run; any other change to these files is the owner's, committed "
+          "from a terminal.")
 MIRROR_REMEDY = (f" The landing renders {MIRROR} and commits it with no hook firing; drop it from this "
                  f"commit: git restore --staged --worktree {MIRROR}")
 
@@ -191,6 +197,61 @@ def check_decisions_row():
     return rows > 0 and not removed
 
 
+def read_run_fact(text, key):
+    """The value of `<key>:` in a run-state file's text, or None where its `## Run facts` section holds
+    no such line. The driver's `fact` grammar, re-read rather than imported: one trailing CR off each
+    line, the section from a line opening `## Run facts` to the next line opening `## `, the first line
+    opening `<key>:` winning, leading spaces off the value."""
+    inside = False
+    for ln in text.split("\n"):
+        ln = ln.removesuffix("\r")
+        if ln.startswith("## "):
+            inside = ln.startswith("## Run facts")
+        elif inside and ln.startswith(f"{key}:"):
+            return ln[len(key) + 1:].lstrip(" ")
+    return None
+
+
+def check_run_mandate():
+    """Whether the commit's branch is the run-branch of a live unattended run, read from HEAD alone
+    (PLAY-dOrderedCharter-84) -> (`"<run-state path>, phase <PHASE>"`, []) where it is, else (None,
+    each reason it is not). The branch is HEAD's symbolic ref; a candidate is a run-state file at HEAD,
+    `builds/<slug>/RUN.md` under any root, whose `run-branch` fact, `refs/heads/` off, is that branch;
+    the terminal set is the `PHASES_TERMINAL` line of every unattended driver at HEAD, parsed and never
+    imported, and must read as one set of phase tokens; the first candidate in path order whose
+    `phase` fact is a phase token outside that set admits. HEAD, never the index: a run-state file
+    staged in the same commit grants nothing. A grammar that moves refuses."""
+    head = run_git("symbolic-ref", "-q", "HEAD", missing=True)
+    if head is None:
+        return None, ["HEAD is detached"]
+    branch = head.decode("utf-8").strip().removeprefix("refs/heads/")
+    names = run_git("grep", "-l", "-z", "-F", "-e", branch, "HEAD", "--", ":(glob)**/builds/*/RUN.md", missing=True)
+    kept = []
+    for name in sorted(n for n in (names or b"").decode("utf-8").split("\0") if n):
+        text = run_git("cat-file", "blob", name).decode("utf-8", errors="replace")
+        if (read_run_fact(text, "run-branch") or "").removeprefix("refs/heads/") == branch:
+            kept.append((name.removeprefix("HEAD:"), text))
+    if not kept:
+        return None, [f"no run-state file at HEAD names {branch} as its run-branch"]
+    lines = run_git("grep", "-h", "-E", '^PHASES_TERMINAL="[^"]*"[[:space:]]*$', "HEAD", "--",
+                    ":(glob)**/unattended/unattended.sh", missing=True)
+    sets = {tuple(ln.split('"')[1].split())
+            for ln in (lines or b"").decode("utf-8", errors="replace").split("\n") if ln.strip()}
+    if not sets:
+        return None, ["no unattended driver at HEAD declares PHASES_TERMINAL, so no phase reads live"]
+    if len(sets) != 1 or not all(re.fullmatch(r"[A-Z]+", t) for s in sets for t in s):
+        return None, ["the PHASES_TERMINAL declarations at HEAD read "
+                      f"{' | '.join(sorted(' '.join(s) for s in sets))}, not one set of phase tokens"]
+    terminal, whys = set(*sets), []
+    for path, text in kept:
+        phase = read_run_fact(text, "phase") or ""
+        if re.fullmatch(r"[A-Z]+", phase) and phase not in terminal:
+            return f"{path}, phase {phase}", []
+        whys.append(f"{path} names {branch} and its phase at HEAD, {phase}, is terminal" if phase in terminal
+                    else f"{path} names {branch} and its phase at HEAD, '{phase}', is no phase token")
+    return None, whys
+
+
 def main(argv):
     if argv != ["--staged"]:
         print("usage: python guard.py --staged", file=sys.stderr)
@@ -217,8 +278,14 @@ def main(argv):
     if not refused:
         print(f"policy-guard: admitted · {cap[0]} {cap[1]} -> {cap[2]} · its change record attached")
         return 0
+    admission, whys = check_run_mandate()
+    if admission is not None:
+        print(f"policy-guard: admitted · {' '.join(sorted(touched))} · the run-branch of {admission}")
+        return 0
     for path, why in refused:
         print(f"policy-guard: refused · {path} · {why}")
+    for why in whys:
+        print(f"policy-guard: not a live run's branch · {why}")
     print(REMEDY + (MIRROR_REMEDY if MIRROR in touched else ""))
     return 1
 

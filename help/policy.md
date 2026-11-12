@@ -197,6 +197,16 @@ pre-commit hook guards four paths, listed in `tools/policy/guarded-paths.txt`:
   commit of `.governance/policy.json` with neither of those two files staged beside it. The hook
   renders the mirror at `HEAD` itself and admits the staged one only when its bytes are that render,
   printing `policy-guard: admitted · .governance/policy.json · equals its render at HEAD`.
+- **An agent's commit on a live run's branch is admitted.** Any change to the four files that the
+  shapes above would refuse is admitted when the branch being committed on is the `run-branch:` of
+  an unattended run's run-state file, `builds/<slug>/RUN.md`, committed at `HEAD`, and that file's
+  `phase:` at `HEAD` is not one of the `PHASES_TERMINAL` phases the unattended driver at `HEAD`
+  declares. The guard reads `HEAD`, never the staged run-state file, so a commit cannot admit itself.
+  It prints `policy-guard: admitted · <paths> · the run-branch of <run-state file>, phase <PHASE>`,
+  and asks for no decision row: every commit on a run branch is already joined to a specced unit.
+  When no live run names the branch, the refusal lines below are followed by one
+  `policy-guard: not a live run's branch · <why>` line per reason: a detached `HEAD`, no run-state
+  file at `HEAD` naming the branch, no driver declaring the terminal set, or a terminal phase.
 - **Everything else is refused**, each reason on its own `policy-guard: refused · <path> · <why>`
   line: a lowered cap, two caps changed, a cap added or removed, a class row such as
   `memory/builds/*/spec/` (it names no one file), `budgets.enforce` or `budgets.pinned`, any other
@@ -213,7 +223,10 @@ pre-commit hook guards four paths, listed in `tools/policy/guarded-paths.txt`:
 - **What the guard does not catch.** It stops forgetting, not evasion: `git commit --no-verify`, a
   wrapper that gives an agent's commit a terminal, a line removed from the list in one commit and the
   file changed in the next, a commit made in another clone, a cherry-pick or a rebase (no pre-commit
-  runs), and the guard file deleted from the working tree all pass it. The hook binds once it is on
+  runs), the guard file deleted from the working tree, and a run-state file committed naming the
+  agent's own branch with a live phase, which admits every commit after it, all pass it. It reads
+  the phase a run-state file records, not the one the unattended kit derives, so a run that has
+  landed reads live until a terminal phase is committed. The hook binds once it is on
   `main` in the primary checkout, whose hooks every worktree runs. The push gate does not re-check
   who made a change.
 

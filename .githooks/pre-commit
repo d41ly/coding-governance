@@ -184,7 +184,8 @@ print_kit_miss() { # <leg> <kit dir, or ""> <file> [home] -> the announced skip,
 }
 
 # policy guard (TOOL-dGroundRules-6) — the minimal guard over the paths the policy kit's
-# guarded-paths.txt lists at HEAD: owner-only and the TTY proof, enforced without reading
+# guarded-paths.txt lists at HEAD: owner-only outside a live unattended run's branch, and the TTY
+# proof, enforced without reading
 # policy-file.guard or policy-file.proof, until dDeclaredLoop's guard lands and retires this block.
 # Git sends a hook's stdout to stderr and leaves stderr as the committer's, so `[ -t 2 ]` reads
 # whether a person sits at a terminal, which an agent's shell does not. It stops forgetting, not

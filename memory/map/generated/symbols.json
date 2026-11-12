@@ -7198,6 +7198,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "check_run_mandate",
+      "kind": "function",
+      "file": "tools/policy/guard.py"
+    },
+    {
       "id": "check_run_state",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -20031,6 +20036,11 @@
       "id": "read_run_fact",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "read_run_fact",
+      "kind": "function",
+      "file": "tools/policy/guard.py"
     },
     {
       "id": "read_run_fact",

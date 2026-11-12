@@ -96,7 +96,11 @@ plant that must exit 0; `guard-merge-side` concludes a conflicted merge with the
 0, then with a third text, exit 1. The mirror shape's three (TOOL-dGroundRules-19): `guard-mirror-render`
 commits a catalogue row and stages the regenerated mirror alone, exit 0; `guard-mirror-beside-catalogue`
 stages it beside the row, exit 1; `guard-mirror-branch-green` commits the admitted mirror on a branch
-and reads `mirror --check` fresh at the new HEAD.
+and reads `mirror --check` fresh at the new HEAD. The live run's three (PLAY-dOrderedCharter-84) stage
+the deploy and instructions edits on a branch `run/t` whose committed run-state record and driver
+decide: `guard-run-live` exits 0 in either `run-branch` spelling, `guard-run-terminal` exits 1 on
+`LANDED`, `ABORTED` and a removed driver, and `guard-run-other-branch` exits 1 on a branch no record
+at HEAD names, a record only staged, and a detached HEAD.
 
 `legacy-homes` is an outcome case (TOOL-dGroundRules-7): per case, a repository holding a copy of
 policy.py, a `.unattended.conf`, a gate file and a house file where the copy resolves HOUSE_HOME,
@@ -2291,6 +2295,7 @@ def run_mirror_landed_parity(name):
 GUARD_FILES = ("guard.py", "guarded-paths.txt", *READER_FILES)  # the reader: the mirror shape's `mirror --print`
 GUARD_MIRROR = ("guard-mirror-render", "guard-mirror-beside-catalogue", "guard-mirror-branch-green")
 GUARD_INPUTS = ("guard-mirror-beside-conf", "guard-mirror-inputs-join")  # TOOL-dGroundRules-25 S19, S21
+GUARD_RUN = ("guard-run-live", "guard-run-terminal", "guard-run-other-branch")  # PLAY-dOrderedCharter-84
 DEPLOY_REL = ".governance/deploy.toml"
 DECISIONS_REL = "memory/DECISIONS.md"
 # A measured-file cap whose key carries slashes and a leading dot, and the spec folder's class row, so
@@ -2371,7 +2376,9 @@ def run_guard_case(name):
     `mirror --write`: `guard-mirror-render` stages the mirror alone, exit 0;
     `guard-mirror-beside-catalogue` first moves the row back into the index, exit 1;
     `guard-mirror-branch-green` does it on a branch, commits the admitted mirror, and runs
-    `mirror --check` at the new HEAD, which must be fresh."""
+    `mirror --check` at the new HEAD, which must be fresh. The GUARD_RUN cases (PLAY-dOrderedCharter-84)
+    commit a driver declaring `PHASES_TERMINAL` on a branch `run/t`, then per scenario a run-state
+    record, its own commit or detach, and the staged deploy and instructions edits."""
     repo, kit = build_guard_repo()
     guard = [sys.executable, str(kit / "guard.py"), "--staged"]
     checks = []
@@ -2436,6 +2443,59 @@ def run_guard_case(name):
             run_fixture_git(repo, "add", "--", extra, policy.MIRROR_REL)
             checks.append(check_run(f"the mirror staged beside {extra}", "guard.py --staged", guard, lambda rc, o, e:
                                     rc == 1 and f"its input {extra} is staged changed" in o, cwd=repo))
+        if name in GUARD_RUN:
+            # Literals only, so the case reads no source file: the driver's terminal set, then per
+            # scenario (phase, run-branch, the step after the record's commit, exit, stdout needles).
+            run_rel, driver_rel = "memory/builds/tRun/RUN.md", "tools/unattended/unattended.sh"
+            admitted = (f"policy-guard: admitted · {DEPLOY_REL} .governance/instructions.toml · "
+                        f"the run-branch of {run_rel}, phase BUILDING")
+            unnamed = "no run-state file at HEAD names run/t as its run-branch"
+            live = ("BUILDING", "refs/heads/run/t")
+            scenarios = {
+                "guard-run-live": [("live", live, None, 0, [admitted]),
+                                   ("run-branch with no refs/heads/", ("BUILDING", "run/t"), None, 0, [admitted])],
+                "guard-run-terminal": [
+                    ("landed", ("LANDED", live[1]), None, 1,
+                     [f"refused · {DEPLOY_REL}", "its phase at HEAD, LANDED, is terminal"]),
+                    ("aborted", ("ABORTED", live[1]), None, 1, ["its phase at HEAD, ABORTED, is terminal"]),
+                    ("the driver removed", live, "driver", 1, ["no unattended driver at HEAD declares PHASES_TERMINAL"])],
+                "guard-run-other-branch": [
+                    ("another branch named", ("BUILDING", "refs/heads/run/other"), None, 1, [unnamed]),
+                    ("the record only staged", live, "staged", 1, [unnamed]),
+                    ("detached", live, "detach", 1, ["HEAD is detached"])],
+            }[name]
+            run_fixture_git(repo, "checkout", "-q", "-b", "run/t")
+            Path(repo, driver_rel).parent.mkdir(parents=True, exist_ok=True)
+            Path(repo, driver_rel).write_text('PHASES_TERMINAL="LANDED ABORTED"\n', encoding="utf-8", newline="\n")
+            run_fixture_git(repo, "add", "--", driver_rel)
+            run_fixture_git(repo, "commit", "-q", "-m", "the driver")
+            base = run_fixture_git(repo, "rev-parse", "HEAD")
+            for scenario, facts, step, want, present in scenarios:
+                for i, record in enumerate([facts] + ([live] if step == "staged" else [])):
+                    if i:  # the HEAD record removed in a commit, then a live one staged and never committed
+                        run_fixture_git(repo, "rm", "-q", "--", run_rel)
+                        run_fixture_git(repo, "commit", "-q", "-m", "the run-state record removed")
+                    Path(repo, run_rel).parent.mkdir(parents=True, exist_ok=True)
+                    Path(repo, run_rel).write_text("## Run facts\nphase: {}\nrun-branch: {}\n".format(*record),
+                                                   encoding="utf-8", newline="\n")
+                    run_fixture_git(repo, "add", "--", run_rel)
+                    if not i:
+                        run_fixture_git(repo, "commit", "-q", "-m", "the run-state record")
+                if step == "driver":
+                    run_fixture_git(repo, "rm", "-q", "--", driver_rel)
+                    run_fixture_git(repo, "commit", "-q", "-m", "the driver removed")
+                if step == "detach":
+                    run_fixture_git(repo, "checkout", "-q", "--detach")
+                for rel, edit in GUARD_PLANTS["guard-other-paths"][1][1] + GUARD_PLANTS["guard-other-paths"][2][1]:
+                    path = Path(repo, rel)
+                    path.write_text(edit(path.read_text(encoding="utf-8") if path.exists() else ""),
+                                    encoding="utf-8", newline="\n")
+                    run_fixture_git(repo, "add", "--", rel)
+                checks.append(check_run(scenario, "guard.py --staged", guard, lambda rc, o, e, want=want, present=present:
+                                        rc == want and all(n in o for n in present), cwd=repo))
+                run_fixture_git(repo, "reset", "-q", "--hard")
+                run_fixture_git(repo, "checkout", "-q", "run/t")
+                run_fixture_git(repo, "reset", "-q", "--hard", base)
         for scenario, edits, want, present, absent in GUARD_PLANTS.get(name, []):
             for rel, edit in edits:
                 path = Path(repo, rel)
@@ -4560,7 +4620,7 @@ CASES = [
     ("mirror-shim-exit-one", None, run_mirror_landed),
     ("mirror-absent-adopter", None, run_mirror_absent_adopter),
     ("mirror-landed-parity", None, run_mirror_landed_parity),
-    *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side", *GUARD_MIRROR, *GUARD_INPUTS]),  # outcome cases: guard.py --staged
+    *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side", *GUARD_MIRROR, *GUARD_INPUTS, *GUARD_RUN]),  # outcome cases: guard.py --staged
     ("legacy-homes", None, run_legacy_homes),  # an outcome case: one planted repository per case
     ("legacy-homes-main-dropped", None, run_legacy_main_dropped),  # the base is the merge-base, not the tip
     ("legacy-homes-present", None, run_legacy_present),  # gov's own list held and withheld from installs
