@@ -6,6 +6,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-12-build-TOOL-aQueuedIndex-1-agent-ledger.md](../build/2026-11-12-build-TOOL-aQueuedIndex-1-agent-ledger.md) | journal | TOOL-aQueuedIndex-1 TOOL-aQueuedIndex-2 |
+| [2026-11-12-build-TOOL-aQueuedIndex-3-1-builder-return.md](../build/2026-11-12-build-TOOL-aQueuedIndex-3-1-builder-return.md) | journal | — |
 | [2026-11-12-build-TOOL-aQueuedIndex-3-ledger.md](../build/2026-11-12-build-TOOL-aQueuedIndex-3-ledger.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aQueuedIndex-3-1-spec-writer.md](../prompts/2026-11-12-prompt-TOOL-aQueuedIndex-3-1-spec-writer.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aQueuedIndex-3-build-brief.md](../prompts/2026-11-12-prompt-TOOL-aQueuedIndex-3-build-brief.md) | journal | — |

@@ -56,7 +56,7 @@ ids TOOL-aQueuedIndex-1 TOOL-aQueuedIndex-2 TOOL-aQueuedIndex-3
 | [TOOL-aQueuedIndex-3 — the queued-writers plant pins the busy timeout](spec/2026-11-12-spec-TOOL-aQueuedIndex-3.md) | 3 | 1 | CLOSED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 19 bound to this build, across 4 record folder(s).
+Records: 20 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

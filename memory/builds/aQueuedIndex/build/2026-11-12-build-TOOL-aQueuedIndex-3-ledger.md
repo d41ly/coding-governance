@@ -11,3 +11,9 @@ ran in the pass. Where a line says "owed", the main loop observes it after every
 - AC2 — `busy timeout 60 s` — over a scratch copy of the playbook, lib and memory-tree kits in a fresh repository under a short temp directory, with the index module's timeout set to 60, the same plant printed that line, exited 1 and printed no green line. With the line set back to 600 it exited 0 and printed `both writers green` last (PINNED, those two plant runs). The `New arm:` line's RED-first observation at the close is still owed.
 
 **Owed to the close.** Every leg of the spec's Gates section, and the `New arm:` line's RED-first observation for AC2.
+
+**Main-loop observation at the close.** The `queued-writers` row over pass commit 73813cae8 in a scratch clone (DERIVED at
+73813cae8, the scratchpad logs tq3-red.log and tq3-green.log).
+
+- AC2 — `busy timeout 60 s` — with the index module's timeout set to 60 the plant exited 1 and printed no green line; restored
+  to 600 it exited 0 with `both writers green` last.
