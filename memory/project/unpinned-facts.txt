@@ -15200,3 +15200,7 @@ memory/builds/aQueuedIndex/spec/2026-11-12-spec-TOOL-aQueuedIndex-3.md	3 s
 memory/builds/aQueuedIndex/spec/2026-11-12-spec-TOOL-aQueuedIndex-3.md	300 s
 memory/builds/aQueuedIndex/spec/2026-11-12-spec-TOOL-aQueuedIndex-3.md	600 s
 memory/builds/aQueuedIndex/spec/2026-11-12-spec-TOOL-aQueuedIndex-3.md	95 s
+memory/builds/aLiftedCeiling/README.md	420 s
+memory/builds/aLiftedCeiling/prompts/2026-11-12-prompt-TOOL-aLiftedCeiling-1-brief.md	180 s
+memory/builds/aLiftedCeiling/prompts/2026-11-12-prompt-TOOL-aLiftedCeiling-1-brief.md	420 s
+memory/builds/aLiftedCeiling/prompts/2026-11-12-prompt-TOOL-aLiftedCeiling-1-brief.md	95 s
