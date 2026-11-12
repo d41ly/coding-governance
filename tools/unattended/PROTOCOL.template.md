@@ -719,6 +719,14 @@ answer on disk, **and is DECLARED through `--dispatch`**, which makes the refusa
 sequential pass and not only a concurrent one — a rule enforced only where two passes race misses
 every ordinary build.
 
+**Two switches act BETWEEN passes, each a policy key that defaults on.** Under `pass.fast-legs` the
+unit harness's return carries a `nextAction`, and the MAIN LOOP runs it before the next dispatch:
+the declared pass legs over that pass's diff. A role agent's pass stays gate-free. Under
+`bar.inline-red-fixes` a leg the gate ledger records red, the bar's or a pass leg's, may be fixed
+with NO spec: the commit names the leg in a `Red-fix:` trailer beside `Pass: none`, the fix's typed
+record is the next commit, and the commit grader holds the fix to its limits. Every other product
+write keeps the route above; either key `off` restores it for that mechanism.
+
 ## 13. The kickoff engine's interactive exits
 
 Moved from the engine's Step 5b (`TOOL-aHonedRuleset-3`); the engine keeps a pointer.

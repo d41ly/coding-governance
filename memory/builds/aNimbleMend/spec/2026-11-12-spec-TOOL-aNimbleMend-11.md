@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-11 — the documents: a help page per mechanism, and the build method and the unattended protocol saying where the pass legs run and what the lane admits
 
-**Status:** INPROGRESS · rev-3 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 11
+**Status:** CLOSED · rev-3 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
