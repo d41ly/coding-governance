@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-9 — the red-fix record: a typed kind written after the fix and joined to its commit
 
-**Status:** CLOSED · rev-2 · 2026-11-12 · node a · Tier-2 · base 1265772c · streams tooling · order 9
+**Status:** INPROGRESS · rev-2 · 2026-11-12 · node a · Tier-2 · base 1265772c · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
