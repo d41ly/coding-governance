@@ -112,8 +112,9 @@ CREATE TABLE IF NOT EXISTS blob_parsed(blob TEXT NOT NULL, extractor TEXT NOT NU
 """
 #: the index file's `PRAGMA user_version` and the number in its name; a file stamped otherwise is rebuilt in place
 INDEX_SCHEMA = 3
-#: SQLite's busy timeout, seconds: a second writer waits this long on the first, then the verb exits 2.
-BUSY_TIMEOUT = 60
+#: SQLite's busy timeout, seconds: a second writer waits this long for the first, which outlasts a full tree
+#: build, then the verb exits 2 (TOOL-aQueuedIndex-1 S4).
+BUSY_TIMEOUT = 600
 
 
 class TagError(RuntimeError):
@@ -510,11 +511,12 @@ def load_index(root, reset=False) -> sqlite3.Connection:
     file, and SQLite's lock serialises the writers. A file holding tables under a `user_version` other than
     INDEX_SCHEMA, or any file under `reset`, has every table dropped and created again in place inside one
     `BEGIN IMMEDIATE` transaction, never unlinked, so a reader holding the file keeps it (S16); a stale
-    stamp prints one line saying so."""
+    stamp prints one line saying so. The connection runs in autocommit, and every write block takes the write
+    lock first with `BEGIN IMMEDIATE` (TOOL-aQueuedIndex-1)."""
     db = derive_index_path(root)
     db.parent.mkdir(parents=True, exist_ok=True)
     try:
-        con = sqlite3.connect(str(db), timeout=BUSY_TIMEOUT)
+        con = sqlite3.connect(str(db), timeout=BUSY_TIMEOUT, isolation_level=None)
         con.execute("PRAGMA journal_mode=DELETE")
         old = con.execute("PRAGMA user_version").fetchone()[0]
         if (reset or old != INDEX_SCHEMA) and con.execute("SELECT 1 FROM sqlite_master LIMIT 1").fetchone():
@@ -639,7 +641,8 @@ def build_index(root, tree, ctx, con, stats) -> None:
     `git ls-tree -r`, then each extractor over each blob it has not read at its current version
     (`_write_parsed`), read through memory-tree's `read_blobs_at`, in one transaction. Then rows no tree
     or worktree holds are removed. Counts into `stats`, nothing for a tree already built."""
-    if con.execute("SELECT 1 FROM tree_built WHERE tree=? AND versions=?", (tree, ctx["digest"])).fetchone():
+    built = ("SELECT 1 FROM tree_built WHERE tree=? AND versions=?", (tree, ctx["digest"]))
+    if con.execute(*built).fetchone():
         return
     tree_lib, _ = load_memory_tree()
     entries = []
@@ -662,6 +665,9 @@ def build_index(root, tree, ctx, con, stats) -> None:
 
     try:
         with con:
+            con.execute("BEGIN IMMEDIATE")
+            if con.execute(*built).fetchone():  # another writer built it while this one queued (TOOL-aQueuedIndex-1 S3)
+                return
             con.execute("DELETE FROM tree_path WHERE tree=?", (tree,))
             con.executemany("INSERT INTO tree_path VALUES (?,?,?)", [(tree, p, b) for p, b in entries])
             _write_parsed(con, ctx, blobs, read_text, stats)
@@ -736,6 +742,7 @@ def build_overlay(root, ctx, con, stats) -> None:
 
     try:
         with con:
+            con.execute("BEGIN IMMEDIATE")
             con.execute("DELETE FROM dirty_path WHERE worktree=?", (wt,))
             con.executemany("INSERT INTO dirty_path VALUES (?,?,?)", [(wt, p, b) for p, b in entries])
             _write_parsed(con, ctx, blobs, read_text, stats)
@@ -774,6 +781,7 @@ def remove_dead_versions(con, root, kit_rel) -> tuple[int, int]:
     rows = 0
     try:
         with con:
+            con.execute("BEGIN IMMEDIATE")
             dead = set(con.execute("SELECT extractor, version FROM blob_parsed UNION SELECT extractor, version "
                                    "FROM blob_row UNION SELECT extractor, version FROM path_row")) - live
             for ex, ver in dead:

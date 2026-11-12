@@ -1,11 +1,13 @@
 # TOOL-aQueuedIndex-1 — writers of the shared tag index queue instead of failing
 
-**Status:** DEFERRED · rev-2 · 2026-11-12 · node a · Tier-2 · base 6f5d27a20 · streams tooling · order 1 · ratified 2026-11-12
+**Status:** CLOSED · rev-2 · 2026-11-12 · node a · Tier-2 · base 6f5d27a20 · streams tooling · order 1 · ratified 2026-11-12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-12-build-TOOL-aQueuedIndex-1-deviation-11.md](../build/2026-11-12-build-TOOL-aQueuedIndex-1-deviation-11.md) | deviation | — |
+| [2026-11-12-build-TOOL-aQueuedIndex-1-ledger.md](../build/2026-11-12-build-TOOL-aQueuedIndex-1-ledger.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aQueuedIndex-1-1-spec-writer.md](../prompts/2026-11-12-prompt-TOOL-aQueuedIndex-1-1-spec-writer.md) | journal | — |
 | [2026-11-12-prompt-TOOL-aQueuedIndex-1-brief.md](../prompts/2026-11-12-prompt-TOOL-aQueuedIndex-1-brief.md) | research | — |
 | [2026-11-12-prompt-TOOL-aQueuedIndex-1-build-brief.md](../prompts/2026-11-12-prompt-TOOL-aQueuedIndex-1-build-brief.md) | journal | — |

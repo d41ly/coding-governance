@@ -393,7 +393,7 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "retired-section-aliased", "retired-section-reminted", "reference-row", "reference-no-h1",
           "foreign-native", "held-native", "positional-no-tree", "positional-absent", "dirty-revert",
           "worktree-recreate", "helper-edit", "held-open", "extractor-removed", "worktree-spelling",
-          "positional-spec-revbump", "positional-bulk-move")
+          "positional-spec-revbump", "positional-bulk-move", "queued-writers")
 #: PLAY-dOrderedCharter-78 S4's two plants: a `family-id` native class over the fixture's own id grammar,
 #: owned by a build the chain registry lacks, and by the one it holds
 NATIVE_OWNERS = {"foreign-native": "dGhost", "held-native": "fixture"}
@@ -599,6 +599,9 @@ def build_tags_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
                                             'resolver = "corpus_ids:--print-defined-ids"\n')
     if plant == "tagless":  # a blob the extractor reads and takes no row from
         files["tools/corekit/none.tags"] = "# declares nothing\n"
+    if plant == "queued-writers":  # TOOL-aQueuedIndex-1 S5: a blob holding `pause` parses for 3 s
+        files[f"{kit}/fixture_tags.py"] = FIXTURE_EXTRACTOR.replace(
+            "    rows = []\n", '    rows = []\n    if "pause" in text: __import__("time").sleep(3)  # noqa: E701\n', 1)
     if plant in SHAPE_PLANTS:
         rows, extra = SHAPE_PLANTS[plant]
         files[f"{kit}/namespaces.toml"] += rows
@@ -775,6 +778,52 @@ def run_plant(root, top, plant, sets) -> int:
         say(f"the rebuild {'completed' if done else 'FAILED'} under a held reader, which reads {rows} blob rows",
             f"stamped {stamp}; the file is {path.name}")
         return 0 if done and rows and stamp == ti.INDEX_SCHEMA and named and same else 1
+    # TOOL-aQueuedIndex-1 S5: two writers over one unbuilt tree, the second holding a view it served first
+    if plant == "queued-writers":
+        import concurrent.futures
+        import sqlite3
+        import time
+        run_verb(root, "rebuild", None, sets=sets)
+        base = ti.read_git(root, "rev-parse", "HEAD^{tree}").strip()
+        write_commit(root, {"tools/corekit/pause.tags": "pause\n"}, "a blob that parses for 3 s")
+        ctx = ti.derive_context(root, root / FIXTURE_KIT / "namespaces.toml")
+        path = ti.derive_index_path(root)
+        con = ti.load_index(root)
+        pool = concurrent.futures.ThreadPoolExecutor(max_workers=1)  # writer one; writer two is this thread
+        state = None
+        try:
+            ti.load_view(con, root, ctx, tree=base, overlay=False)  # as run_check serves its base tree
+            one = pool.submit(run_verb, root, "rebuild", None, sets=sets)
+            # writer one is inside its write block once the lock reads held for 0.5 s: its per-open
+            # `PRAGMA user_version` write holds it for milliseconds only
+            deadline, since = time.monotonic() + 30, None
+            while True:
+                probe = sqlite3.connect(str(path), timeout=0)
+                try:
+                    probe.execute("BEGIN IMMEDIATE")
+                    probe.rollback()
+                    since = None
+                except sqlite3.OperationalError:
+                    since = since or time.monotonic()
+                finally:
+                    probe.close()
+                if since and time.monotonic() - since >= 0.5:
+                    break
+                if time.monotonic() > deadline:
+                    say("writer one never took the write lock")
+                    return 1
+                time.sleep(0.05)
+            try:
+                state = ti.load_view(con, root, ctx)
+            except ti.TagError as exc:
+                say(f"writer two refused: {exc}")
+                return 1
+        finally:
+            con.close()
+            pool.shutdown(wait=True)
+        a, b = one.result(), state["parsed"]
+        say(f"writer one parsed {a} blob(s), writer two parsed {b}; both writers green")
+        return 0 if print_equal(read_dump(root), read_cold_dump()) and a > 0 and b == 0 else 1
     if plant == "extractor-removed":
         reg, gone = f"{FIXTURE_KIT}/namespaces.toml", "fixture_again:extract_again"
         base_reg = (root / reg).read_text(encoding="utf-8")
