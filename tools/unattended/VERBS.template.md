@@ -836,6 +836,7 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
     verb still exits 0. A child returning `diverged: true` stopped before its code on the spec
     section its `why` names: have that spec revised by the spec-writer role through a rendered
     handoff, as the `/build` Skill's stage 5 does, then dispatch the unit again.
+    A child return carrying `nextAction` is acted on first, before that re-read and the next dispatch.
     Any other `committed:false` stops the loop. Nothing refuses the next dispatch for you: the one refusal of an early stop is `build-complete` at `--close`, and its
     escapes are a unit carried forward against an open ask or a recorded `--override build-complete`.
 - **Run the bug-class checklist after every commit**, before the next pass: the memory-tree kit's

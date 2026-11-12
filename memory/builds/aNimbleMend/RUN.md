@@ -63,3 +63,9 @@ base: 1265772cc365418ac6431a7f0f9e069f3bb79dc0
 2026-11-12T16:04:55Z dispatch · item 8079fde2 TOOL-aNimbleMend-6 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/hooks/README.md tools/unattended/gate-guard.js tools/unattended/gate-guard.test.sh memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-6.md memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-6-1-acceptance-ledger.md
 
 2026-11-12T16:04:57Z brief · item TOOL-aNimbleMend-6 · reason e7ee96fbeffa memory/builds/aNimbleMend/prompts/2026-11-12-prompt-TOOL-aNimbleMend-6-build-brief.md
+
+2026-11-12T16:14:02Z dispatch · item 43f38988 TOOL-aNimbleMend-7 · reason tools/workflows/unattended-unit.js tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/workflows/unattended-build.test.sh tools/unattended/VERBS.template.md tools/roles/SKILL.template.md memory/guides/UNATTENDED-VERBS.md .claude/skills/build/SKILL.md memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-7-1-acceptance-ledger.md
+
+2026-11-12T16:14:04Z brief · item TOOL-aNimbleMend-7 · reason f3d516ac08bd memory/builds/aNimbleMend/prompts/2026-11-12-prompt-TOOL-aNimbleMend-7-build-brief.md
+
+2026-11-12T16:21:16Z dispatch · item 43f38988 TOOL-aNimbleMend-7 · reason tools/workflows/unattended-unit.js tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/workflows/unattended-build.test.sh tools/unattended/VERBS.template.md tools/roles/SKILL.template.md memory/guides/UNATTENDED-VERBS.md .claude/skills/build/SKILL.md memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-7-1-acceptance-ledger.md memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-7.md

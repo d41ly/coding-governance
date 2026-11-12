@@ -72,7 +72,8 @@ Until `--plan --paths` prints `next: none - every tracked spec is terminal`, for
 3. call the hand-out's `dispatch.scriptPath` with `dispatch.args` plus `unitId`, `specPath`,
    `briefPath`, `roles` from `handoff.py harness-args unattended-unit` and `efforts` from
    `handoff.py stage-efforts build --model <id>`, on every dispatch;
-4. on `diverged: true`, write a revision record under the build's `prompts/` holding `## The brief`
+4. act on the return's `nextAction`, where it carries one, before the next dispatch;
+5. on `diverged: true`, write a revision record under the build's `prompts/` holding `## The brief`
    and no `## The prompt`, its Goal the builder's `why` verbatim and its other four sub-heads copied
    from the build's brief; spawn `gov-spec-writer` on it with `--input spec=<path> --input
    prompt=<that record>`; then dispatch the unit again. On any other `committed: false`, stop and bring

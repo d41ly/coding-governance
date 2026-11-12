@@ -1215,9 +1215,14 @@ has "S4 skippedTerminal still travels on the hand-out" "$o" '"skippedTerminal":'
 o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2)")
 d=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"dispatch"://')
 has "F2 dispatch.args carries the mode — unattended" "$d" '"mode":"unattended"'
+# TOOL-aNimbleMend-7 — the pass-leg runner's invocation travels in BOTH modes, unconditionally.
+has "passLegs: dispatch.args carries the runner's invocation — unattended" "$d" '/pass-legs.sh --base HEAD~1"'
+has "passLegs: ...under the key the child reads — unattended" "$d" '"passLegs":"bash '
 o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"dispose":{"disposed":true,"standing":[],"summary":"d"}}')
 d=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"dispatch"://')
 has "F2 dispatch.args carries the mode — attended" "$d" '"mode":"attended"'
+has "passLegs: dispatch.args carries the runner's invocation — attended" "$d" '/pass-legs.sh --base HEAD~1"'
+has "passLegs: ...under the key the child reads — attended" "$d" '"passLegs":"bash '
 
 # THE GENERAL FORM, not a substring arm. The refusal set is DERIVED from the driver itself, by two
 # readings of it joined: pass one records every top-level function whose body, up to the next
@@ -1313,6 +1318,32 @@ for v in 7 '""' '"a\nb"' '"a`b"'; do
   o=$(run_wf "$(printf "$CHILD_PB" "$v" unattended)" '{}' "$C")
   has "prebuild: the child REFUSES $v" "$o" "THROW unattended-unit: args \`prebuild\`"
   hasnt_ "prebuild: ...before any spawn for $v" "$o" "agent:build"
+done
+
+# TOOL-aNimbleMend-7 — `passLegs` is OPTIONAL and reaches the RETURN, never the prompt. With it and a
+# commit, the return's `nextAction` names the command and the sha and a log line names the command;
+# with no commit, a divergence included, there is no `nextAction`; absent, nothing appears. The
+# builder's prompt and spawn options are the same with and without it, so the pass stays gate-free.
+CHILD_PL='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","unitId":"A-tB-1","specPath":"s1","briefPath":"b1","driver":"bash drv.sh","ground":"G. goes under /tmp/s. ","checklist":"CK","passLegs":%s,"mode":"unattended"}'
+PL_OK='{"build":{"committed":true,"sha":"abc1234","why":"","summary":"s"}}'
+o=$(run_wf "$(printf "$CHILD_PL" '"PL --base HEAD~1"')" "$PL_OK" "$C")
+has "passLegs: the return's nextAction names the command in backticks" "$o" '"nextAction":"Run `PL --base HEAD~1` at the main loop before the next dispatch'
+has "passLegs: ...and the pass commit's sha" "$o" 'The pass commit is abc1234, which is HEAD'
+has "passLegs: the log names the unit and the command" "$o" 'log:unit A-tB-1: pass legs `PL --base HEAD~1`'
+printf -v _wfj "$CHILD_ARGS" unattended; pl_none=$(run_wf "$_wfj" "$PL_OK" "$C")
+hasnt_ "passLegs absent: a committed pass returns no nextAction" "$pl_none" '"nextAction"'
+hasnt_ "passLegs absent: no log line" "$pl_none" "pass legs"
+same "passLegs: the builder's prompt and options are the same with and without it" \
+  "$(printf '%s\n' "$o" | grep -E '^(prompt|promptjson|type|effort):')" "$(printf '%s\n' "$pl_none" | grep -E '^(prompt|promptjson|type|effort):')"
+o=$(run_wf "$(printf "$CHILD_PL" '"PL --base HEAD~1"')" '{"build":{"committed":false,"sha":"","why":"w","summary":"s"}}' "$C")
+hasnt_ "passLegs: a pass that committed nothing returns no nextAction" "$o" '"nextAction"'
+o=$(run_wf "$(printf "$CHILD_PL" '"PL --base HEAD~1"')" '{"build":{"committed":false,"sha":"","why":"DIVERGENCE: x","summary":"s"}}' "$C")
+has "passLegs: a divergence is still a divergence" "$o" '"diverged":true'
+hasnt_ "passLegs: ...and returns no nextAction" "$o" '"nextAction"'
+for v in 7 '""' '"a\nb"' '"a`b"'; do
+  o=$(run_wf "$(printf "$CHILD_PL" "$v")" "$PL_OK" "$C")
+  has "passLegs: the child REFUSES $v" "$o" "THROW unattended-unit: args \`passLegs\`"
+  hasnt_ "passLegs: ...before any spawn for $v" "$o" "agent:build"
 done
 
 # ========================= F4 (closing review, HIGH) — DISPOSED-BUT-STANDING IS NOT DISPOSED
@@ -3815,7 +3846,10 @@ has    "FA15 AC25 the undeclared throw" "$o" "a disposal passes the hand-out's \
 # Not measured by a run: the pass that wrote it runs no suite.
 # RAISED 920 -> 925 by TOOL-dFairHearing-48: the five `FH48 AC4` sites, the result, its exit and gaps, and the
 # two absences. Counted by reading, not measured by a run: the pass that wrote it runs no suite.
-FLOOR_ASSERTIONS=925
+# RAISED 925 -> 940 by TOOL-aNimbleMend-7: the `passLegs` sites, nine on the child's return, log and prompt,
+# the refusal loop's two counted once, and four on `dispatch.args` across the two modes. Counted by
+# reading, not measured by a run: the pass that wrote it runs no suite.
+FLOOR_ASSERTIONS=940
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

@@ -62,6 +62,10 @@
 //
 // `efforts` IS OPTIONAL (TOOL-aOrientedCast-10), with the same one key: `builder`, the reasoning
 // effort the builder spawns at, which the parent forwards in `dispatch.args` beside `roles`.
+//
+// `passLegs` IS OPTIONAL (TOOL-aNimbleMend-7): a one-line command the parent hands out in
+// `dispatch.args`. Given, and the builder committed, the return carries a `nextAction` ordering the
+// main loop to run it over the pass commit. Absent, the return, log, prompt and options are unchanged.
 export const meta = {
   name: 'unattended-unit',
   version: '1.1', // gov:kit unattended-unit@1.1 — engine identity (deployed verbatim)
@@ -141,6 +145,19 @@ if (
   throw new Error(
     'unattended-unit: args `prebuild` must be a non-empty single-line string with no backtick, got ' +
       JSON.stringify(cfg.prebuild) + '. Omit the key to leave the pre-build checklist off.',
+  )
+}
+
+// `passLegs` IS OPTIONAL TOO (TOOL-aNimbleMend-7), graded by the same three-part test because it is
+// spelled inside backticks as well: in the RETURN's `nextAction`, never in the prompt. The builder is
+// not told the command, since a role agent's pass runs no gate; the main loop runs it after the commit.
+if (
+  cfg.passLegs !== undefined &&
+  (typeof cfg.passLegs !== 'string' || cfg.passLegs === '' || /[\r\n`]/.test(cfg.passLegs))
+) {
+  throw new Error(
+    'unattended-unit: args `passLegs` must be a non-empty single-line string with no backtick, got ' +
+      JSON.stringify(cfg.passLegs) + '. Omit the key and the return names no pass-leg run.',
   )
 }
 
@@ -323,6 +340,7 @@ const PROMPT =
   'before you return. Return committed:false with a `why` rather than a commit you cannot stand behind.'
 
 if (cfg.prebuild !== undefined) log('unit ' + cfg.unitId + ': prebuild checklist `' + cfg.prebuild + '`')
+if (cfg.passLegs !== undefined) log('unit ' + cfg.unitId + ': pass legs `' + cfg.passLegs + '`')
 
 log('unit ' + cfg.unitId + ': builder ' + (builder
   ? 'spawns as the ' + builder + ' agent type'
@@ -346,4 +364,15 @@ return {
   why: (r && r.why) || '',
   summary: (r && r.summary) || '',
   diverged: !!(r && r.committed === false && typeof r.why === 'string' && r.why.indexOf('DIVERGENCE:') === 0),
+  // TOOL-aNimbleMend-7 - THE RUN POINT. Present only when the caller handed `passLegs` AND a commit
+  // exists to run it over; it orders the main loop, and says nothing about how a red is fixed.
+  ...(cfg.passLegs !== undefined && r && r.committed
+    ? {
+        nextAction:
+          'Run `' + cfg.passLegs + '` at the main loop before the next dispatch and before any later ' +
+          'commit, where that file exists. The pass commit is ' + ((r && r.sha) || '') + ', which is HEAD ' +
+          'when the command runs. Act on its exit status and on every finding line it prints. The ' +
+          'command runs nothing where `pass.fast-legs` is `off`.',
+      }
+    : {}),
 }
