@@ -31,12 +31,12 @@ mode: slug
 run-branch: refs/heads/branch/unattended-dorderedcharter-725f52
 anchor-kind: default-branch
 cli-version: 2.1.309
-lease-utc: 2026-11-12T06:55:29Z
+lease-utc: 2026-11-12T08:57:46Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 5716
 session: 0394fa33-012c-408f-a840-e6e4cfaac23f
-keepalive: 43486bcf
+keepalive: 8409d178
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 8bec4cefd957d194660a8d7c2916f420b7299074
 anchor-ref: refs/heads/main
@@ -611,3 +611,5 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-12T07:50:54Z brief · item PLAY-dOrderedCharter-87 · reason d8e33c1e7ea3 memory/builds/dOrderedCharter/prompts/2026-11-12-prompt-PLAY-dOrderedCharter-87-build-brief.md
 
 2026-11-12T08:02:39Z dispatch · item 585277ae PLAY-dOrderedCharter-87 · reason tools/playbook/instruction_units.py tools/govkit/steps/adopter_rules_to_overlay.py help/overlay.md memory/builds/dOrderedCharter/spec/2026-11-12-spec-PLAY-dOrderedCharter-87.md memory/builds/dOrderedCharter/build/2026-11-12-build-PLAY-dOrderedCharter-87-ledger.md memory/builds/dOrderedCharter/build/2026-11-12-build-PLAY-dOrderedCharter-87-deviation-871.md memory/builds/dOrderedCharter/README.md memory/LIVE.md memory/map/generated memory/map/baseline.toml memory/project/positional-refs.txt memory/project/unpinned-facts.txt
+
+2026-11-12T08:58:10Z rescope · item add PLAY-dOrderedCharter-88 · reason the seventh close bar's tags reds over the prepared merge: the nine repo.rule units the adopter-rules step writes lack namespace help, and two declared readers select no unit; seen only once the overlay exists in gov's tree
