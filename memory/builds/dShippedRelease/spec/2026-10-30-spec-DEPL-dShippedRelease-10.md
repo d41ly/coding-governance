@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-10 — the kit factory, its conformance gate, and one version and one wiring verdict
 
-**Status:** DEFERRED · rev-4 · 2026-11-04 · node d · Tier-2 · base f4597719 · streams deployer · order 1 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-5 · 2026-11-12 · node d · Tier-2 · base f4597719 · streams deployer · order 1 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0420@7a9716bf whole
 **Carries:** node:item.kits.version
@@ -117,7 +117,7 @@ wiring verdict, and `item.kits.version`, the row and slot for what `cmd_mint` al
   `drift-audit wiring`, `process-monitor wiring`, `runlog skill wiring`, `cleanup skill wiring`,
   `unattended skill wiring`, `run-gates wiring`, `lexicon wiring`, `playbook render wiring` and
   `roles render wiring` retire from `tools/gate-legs.json`, `tools/govkit/subject-pins.tsv`,
-  `tools/run-gates/ceiling-evidence.txt`, `tools/agent-instructions/kit.toml`,
+  `tools/run-gates/ceiling-evidence.txt`,
   `tools/memory-recall/kit.toml`, `tools/drift-audit/kit.toml`, `tools/process-monitor/kit.toml`,
   `tools/runlog/kit.toml`, `tools/branch-reconcile/kit.toml`, `tools/unattended/kit.toml`,
   `tools/run-gates/kit.toml`, `tools/lexicon/kit.toml`, `tools/playbook/kit.toml`,
@@ -475,6 +475,7 @@ New arm: tools/loop/loop_lib.py · covers AC13 · `check_program` over a fixture
 - rev-2 · 2026-10-30 · §3 · the Edges gain the mirror of each edge the round-1 spec audit's promoted units declare toward this unit (units 65, 66, 67, 78); no scope, design or criterion moved. The pair with unit 17 is restated on what it still carries.
 - rev-3 · 2026-11-01 · §3 · the Edges gain the mirror of each edge the round-2 spec audit's promoted units declare toward this unit (units 100, 106); no scope, design or criterion moved.
 - rev-4 · 2026-11-04 · S1, S4, S5, S12, AC4, AC6 · the kind tag `kind.kit` becomes `kind.tool-kit` and the factory `core.py new kit` becomes `core.py new tool-kit`, in those items, the Goal, the Design section's kind-row block and the readiness checklist. AC6's grep now counts `kind.tool-kit`, since the old spelling would print 0 for no reason. The reuse audit's recall-terms line keeps `kind.kit`, the query as it was run, and the schema's `name = "kit"` and every plain-prose kit stay. Cause: PLAY-dOrderedCharter-65 renamed the kind, and this is an outside write recorded by dOrderedCharter under `2026-11-04-prompt-PLAY-dOrderedCharter-65-kind-rename-fold-brief`; no other meaning moved.
+- rev-5 · 2026-11-12 · S10 · the agent-instructions kit's descriptor leaves the S10 Readers list, since PLAY-dOrderedCharter-31 retired that kit and no reader spells it; no scope, design or criterion moved.
 
 ## 10. Reuse audit
 

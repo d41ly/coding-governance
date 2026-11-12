@@ -111,7 +111,7 @@ ids DEPL-dShippedRelease-142 DEPL-dShippedRelease-143 DEPL-dShippedRelease-144 D
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [DEPL-dShippedRelease-10 — the kit factory, its conformance gate, and one version and one wiring verdict](spec/2026-10-30-spec-DEPL-dShippedRelease-10.md) | 1 | 2 | DEFERRED | rev-4 | 2026-11-04 |
+| [DEPL-dShippedRelease-10 — the kit factory, its conformance gate, and one version and one wiring verdict](spec/2026-10-30-spec-DEPL-dShippedRelease-10.md) | 1 | 2 | DEFERRED | rev-5 | 2026-11-12 |
 | [DEPL-dShippedRelease-21 — a purpose on every kit, descriptors for govkit and lib, and inline copies generated](spec/2026-10-30-spec-DEPL-dShippedRelease-21.md) | 2 | 2 | DEFERRED | rev-3 | 2026-11-01 |
 | [DEPL-dShippedRelease-65 — every failure line of `check-kit-versions.sh` gets a home in `derive_version_findings` or a named retirement](spec/2026-10-30-spec-DEPL-dShippedRelease-65.md) | 2 | 2 | DEFERRED | rev-2 | 2026-11-01 |
 | [DEPL-dShippedRelease-66 — a retired leg stays resolvable for a live spec older than its retirement, by a row naming its successor](spec/2026-10-30-spec-DEPL-dShippedRelease-66.md) | 2 | 2 | DEFERRED | rev-2 | 2026-11-01 |

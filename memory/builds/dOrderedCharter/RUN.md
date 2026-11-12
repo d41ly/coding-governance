@@ -605,3 +605,5 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-12T04:54:50Z brief · item PLAY-dOrderedCharter-86 · reason 95a5593ad6f1 memory/builds/dOrderedCharter/prompts/2026-11-12-prompt-PLAY-dOrderedCharter-86-build-brief.md
 
 2026-11-12T05:07:01Z dispatch · item 9f25dca0 PLAY-dOrderedCharter-86 · reason tools/policy/guard.py tools/policy/check_policy.py tools/policy/README.md tools/playbook/core-pending.txt memory/builds/dOrderedCharter/spec/2026-11-12-spec-PLAY-dOrderedCharter-86.md memory/builds/dOrderedCharter/build/2026-11-12-build-PLAY-dOrderedCharter-86-ledger.md memory/builds/dOrderedCharter/build/2026-11-12-build-PLAY-dOrderedCharter-86-deviation-861.md memory/builds/dOrderedCharter/README.md memory/LIVE.md memory/map/generated memory/map/baseline.toml memory/project/positional-refs.txt memory/project/unpinned-facts.txt
+
+2026-11-12T06:43:45Z rescope · item add PLAY-dOrderedCharter-87 · reason the sixth close bar's instruction-units red: the adopter-rules upgrade step writes each rule as a directive with no modal and no trigger, which the instruction-unit grammar refuses; seen only once the lander ran the step
