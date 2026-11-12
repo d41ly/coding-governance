@@ -46,8 +46,10 @@ by selector, and `render_unit` gives the line each loads as, a derived unit's fr
 
 THE STATEMENT GRAMMAR. Every loaded unit is one of `STATEMENT_TYPES`; `check_statement` grades a unit row
 against its type and `check_document` a rendered document for the four shapes that load without giving
-direction. GRAMMAR grades every unit row `read_units` returns, `unarmed` while the tree holds none, every
-lock row whose `units` is non-empty through `check_document`, and the lock; `--doc` grades one document.
+direction. An `adopter-rule` is an adopter's own rule carried as written, legal on a level-0 `repo` unit
+only, which `check_unit_row` holds it to. GRAMMAR grades every unit row `read_units` returns, `unarmed`
+while the tree holds none, every lock row whose `units` is non-empty through `check_document`, and the
+lock; `--doc` grades one document.
 
 THE LOCK, `.governance/instructions.lock`, carries render provenance instead of the loaded text: one
 `[[target]]` row per rendered target, `path`, `blob` (the git blob id of the rendered bytes), `units`
@@ -155,9 +157,9 @@ LADDER_SOURCES = (
 )
 LADDER_TERM = re.compile(r"\b(priority|rank)[ -]?[0-7]\b", re.IGNORECASE)
 
-STATEMENT_TYPES = ("directive", "constraint", "definition", "pointer", "policy-value", "fact")
+STATEMENT_TYPES = ("directive", "constraint", "definition", "pointer", "policy-value", "fact", "adopter-rule")
 """S9's closed set (PLAY-dOrderedCharter-12): every loaded unit is one of these, and no other file types it."""
-DIRECTIVE, CONSTRAINT, DEFINITION, POINTER, POLICY_VALUE, FACT = STATEMENT_TYPES
+DIRECTIVE, CONSTRAINT, DEFINITION, POINTER, POLICY_VALUE, FACT, ADOPTER_RULE = STATEMENT_TYPES
 
 MODALS = ("MUST", "NEVER", "ALWAYS")
 """The modal a directive's text opens with."""
@@ -197,7 +199,7 @@ DERIVED_UNIT_KEYS = ("origin", "status")
 UNIT_REQUIRED = ("tag", "level", "type")
 UNIT_CLASSES = ("fixed", "open")
 BUDGET_BYTES = {"line": 200, "block": 600}
-TYPED_TYPES = (DIRECTIVE, CONSTRAINT, DEFINITION, POINTER)
+TYPED_TYPES = (DIRECTIVE, CONSTRAINT, DEFINITION, POINTER, ADOPTER_RULE)
 #: A change record's `Action` values that end a tag; every other leaves it active.
 ENDING_ACTIONS = ("remove", "rename", "split")
 ACTIVE = "active"
@@ -931,6 +933,9 @@ def check_unit_row(unit, row, ns="unit") -> list[str]:
             add_red("tag", f"{unit.tag!r} is no tag of the `{ns}` namespace", f"spell it {ns}.<name>")
     if unit.type is not None and unit.type not in STATEMENT_TYPES:
         add_red("type", f"{unit.type!r} is no statement type", f"type it one of {', '.join(STATEMENT_TYPES)}")
+    if unit.type == ADOPTER_RULE and (ns != "repo" or unit.level != 0):
+        add_red("type", f"{unit.type!r} types a level-0 `repo` unit only",
+                f"type it one of {', '.join(t for t in STATEMENT_TYPES if t != ADOPTER_RULE)}")
     if unit.budget is not None and unit.budget not in BUDGET_BYTES:
         add_red("budget", f"{unit.budget!r} is no budget class", f"use one of {', '.join(BUDGET_BYTES)}")
     limit = BUDGET_BYTES.get(unit.budget or "line")
@@ -1623,6 +1628,8 @@ STATEMENT_ROWS = (
     ({"tag": "fx.command", "type": POINTER, "text": "Before a push, run `bash {prefix}/push-main.sh`."}, None),
     ({"tag": "fx.policy", "type": POLICY_VALUE, "source": "policy:tags.slice"}, None),
     ({"tag": "fx.fact", "type": FACT, "source": "cmd:git rev-parse --abbrev-ref HEAD"}, None),
+    ({"tag": "repo.rule-01-fx", "type": ADOPTER_RULE,
+      "text": "Name the upgrade-walk plant adopter-rules in every walk."}, None),
     ({"tag": "fx.unregistered", "type": FACT, "source": "cmd:git worktree list"}, "names no registered command"),
     ({"tag": "fx.no-modal", "type": DIRECTIVE, "text": "Land through the lander.", "trigger": "always"},
      "opens with no modal"),
@@ -1984,6 +1991,7 @@ SCHEMA_ROWS = (
     ('tag = "unit.classed"\nlevel = 3\ntype = "directive"\ntext = "MUST hold."\nclass = "loose"\n', "class"),
     ('tag = "unit.scoped"\nlevel = 3\ntype = "directive"\ntext = "MUST hold."\nscope = ["nosuch.reader"]\n', "scope"),
     ('tag = "unit.budgeted"\nlevel = 3\ntype = "directive"\ntext = "MUST hold."\nbudget = "page"\n', "budget"),
+    ('tag = "unit.carried"\nlevel = 0\ntype = "adopter-rule"\ntext = "Carry the rule as written."\n', "type"),
 )
 ONE_FACT_ROWS = ('[[unit]]\ntag = "unit.a"\nlevel = 3\ntype = "directive"\ntext = "MUST land  through it."\n\n'
                  '[[unit]]\ntag = "unit.b"\nlevel = 3\ntype = "directive"\ntext = "MUST land through it."\n')

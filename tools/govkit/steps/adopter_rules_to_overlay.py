@@ -8,7 +8,7 @@ in `.governance/deploy.toml` into one level-0 `repo.` unit of `.governance/instr
 key out of the descriptor; the DOWN restores both files byte-identical from the before-image; the WITNESS
 exits 0 when the key is absent and every line the before-image's key held is a unit's text.
 
-THE ROWS. Line `n` of the key becomes `tag = "repo.rule-<NN>-<seg>"`, `level = 0`, `type = "directive"`,
+THE ROWS. Line `n` of the key becomes `tag = "repo.rule-<NN>-<seg>"`, `level = 0`, `type = "adopter-rule"`,
 `scope = ["reader.every"]` and `text`, the line with its leading `- ` cut. `<NN>` is `n` zero-padded to two
 digits, or to the key's line count's digit count past 99 lines; `<seg>` is the text folded by the tag index's
 `derive_heading_seg`, cut at 40 bytes, its trailing `-` trimmed, and an empty fold takes `repo.rule-<NN>`.
@@ -19,8 +19,9 @@ order, renders the same lines in the same order on either side of the step.
 THE UP, in order. No `[charter]` table or no `adopter_rules` key: exit 0, nothing written. It refuses, exit 1
 and nothing written: a key line that is not a `- ` line; an overlay level-0 unit whose tag sorts below the
 last converted tag, which the block rendered after the key's lines and the writer would place among them;
-and a row the overlay reader refuses, a line over the one-line budget among them. A tag the overlay already
-holds is the writer's own refusal, exit 2. The rows are placed by `derive_overlay_text`, the function
+a row the instruction-unit grammar reds through `check_statement`; and a row the overlay reader refuses,
+a line over the one-line budget among them. A tag the overlay already holds is the writer's own refusal,
+exit 2. The rows are placed by `derive_overlay_text`, the function
 `write_overlay_units` writes through, so a re-run over a killed up recomputes the before-image's after-state
 and converges. The key leaves `deploy.toml` by a line edit that keeps every other byte, written LAST, so the
 witness changes last.
@@ -103,10 +104,10 @@ def derive_rule_tag(n: int, width: int, text: str, fold) -> str:
     return f"repo.rule-{n:0{width}d}" + (f"-{seg}" if seg else "")
 
 
-def derive_rule_rows(lines: list[str], fold) -> list[dict]:
-    """One overlay row per rule line, in the rules' order."""
+def derive_rule_rows(lines: list[str], fold, kind: str) -> list[dict]:
+    """One overlay row per rule line, in the rules' order, each typed `kind`."""
     width = max(2, len(str(len(lines))))
-    return [{"tag": derive_rule_tag(n, width, ln[2:], fold), "level": 0, "type": "directive",
+    return [{"tag": derive_rule_tag(n, width, ln[2:], fold), "level": 0, "type": kind,
              "scope": ["reader.every"], "text": ln[2:]} for n, ln in enumerate(lines, 1)]
 
 
@@ -172,7 +173,10 @@ def cmd_up(target: pathlib.Path) -> int:
         after = {DEPLOY: render_deploy_rest(data, spelled)}
         if not lines:
             return after
-        rows = derive_rule_rows(lines, tag_index.derive_heading_seg)
+        rows = derive_rule_rows(lines, tag_index.derive_heading_seg, ov.iu.ADOPTER_RULE)
+        reds = [red for row in rows for red in ov.iu.check_statement(row)]
+        if reds:
+            raise Refusal("the converted rows break the instruction-unit grammar:\n" + "\n".join(reds))
         units, faults = ov.iu.parse_unit_rows(text, OVERLAY)
         if faults:
             raise Refusal(f"{OVERLAY}: " + "; ".join(faults))

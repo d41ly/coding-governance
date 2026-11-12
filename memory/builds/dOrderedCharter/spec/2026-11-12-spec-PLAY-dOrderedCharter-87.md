@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-87 — the adopter-rules step types each rule `adopter-rule`, a level-0 repository statement type the grammar admits as written
 
-**Status:** DEFERRED · rev-1 · 2026-11-12 · node a · Tier-2 · base 3aa7da3d6 · streams tooling · order 48 · advances PLAY-dOrderedCharter-38
+**Status:** CLOSED · rev-1 · 2026-11-12 · node a · Tier-2 · base 3aa7da3d6 · streams tooling · order 48 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-12-build-PLAY-dOrderedCharter-87-ledger.md](../build/2026-11-12-build-PLAY-dOrderedCharter-87-ledger.md) | journal | — |
 | [2026-11-12-prompt-PLAY-dOrderedCharter-87-1-spec-writer.md](../prompts/2026-11-12-prompt-PLAY-dOrderedCharter-87-1-spec-writer.md) | journal | — |
 | [2026-11-12-prompt-PLAY-dOrderedCharter-87-build-brief.md](../prompts/2026-11-12-prompt-PLAY-dOrderedCharter-87-build-brief.md) | journal | — |
 | [2026-11-12-prompt-PLAY-dOrderedCharter-87-spec-brief.md](../prompts/2026-11-12-prompt-PLAY-dOrderedCharter-87-spec-brief.md) | research | — |

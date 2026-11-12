@@ -20,6 +20,10 @@ trigger = "before every pass commit"
 text = "MUST verify against the staged bytes."
 ```
 
+An `adopter-rule` unit is one of your own rules carried as written. `update` writes one for each line it
+moves out of `[charter] adopter_rules`, and its text renders exactly as you wrote it. It needs no modal and
+no trigger, and only a level-0 `repo.` unit may carry the type: on any other unit it is refused.
+
 ## Amend or replace one of gov's units
 
 Give your unit an `edges` entry naming gov's unit, pinned to its text as `<tag>@<hash8>`; `python
