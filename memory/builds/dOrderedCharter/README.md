@@ -195,7 +195,7 @@ ids PLAY-dOrderedCharter-86 PLAY-dOrderedCharter-87 TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-86 — the run guard finds the driver by its file name, and the opt-in pack's self-test leg gets its pending row](spec/2026-11-12-spec-PLAY-dOrderedCharter-86.md) | 47 | 1 | CLOSED | rev-1 | 2026-11-12 |
 <!-- /gen:build-units -->
 
-Records: 660 bound to this build, across 4 record folder(s).
+Records: 662 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
