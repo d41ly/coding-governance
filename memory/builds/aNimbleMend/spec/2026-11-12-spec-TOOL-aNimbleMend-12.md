@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-12 — the acceptance suite: one pass-leg run and one inline fix, end to end, in a scratch adopter and in a clone of gov, with each switch on and off
 
-**Status:** SPECCED · rev-1 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 12
+**Status:** SPECCED · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
@@ -368,6 +368,7 @@ New arm: tools/policy/check_policy.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · the l
   - **C, pinned literals.** The case holds the base's refusal text as a string. It is B's
     staleness with a hand-typed copy.
   - Recommendation: A.
+  RESOLVED (agent, 2026-11-12, delegated): A, two paths of the built tree. B and C bind a suite arm to one historical sha or a hand-typed copy of it.
 - **F2 — What does the gov case run as its pass-leg list?**
   - **A, one planted row, every other row's field removed in the clone.** The lane, the adapter,
     the grader and the record run under gov's own conf, role index, policy file and prefix, in
@@ -376,10 +377,12 @@ New arm: tools/policy/check_policy.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · the l
     whole list, about 400 s by TOOL-aNimbleMend-2's reading, twice, inside a leg budgeted at
     970 s, and any real leg red in the clone for its own reason turns the case WRONG.
   - Recommendation: A.
+  RESOLVED (agent, 2026-11-12, delegated): A, one planted row. Gov's real list is read and timed at the close.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-12 · initial draft.
+- rev-2 · 2026-11-12 · every §8 fork resolved in place under the run's mandate (M3).
 
 ## 10. Reuse audit
 

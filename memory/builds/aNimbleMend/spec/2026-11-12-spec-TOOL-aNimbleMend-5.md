@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-5 — the pass-leg runner: the declared legs run over one pass's diff through the bar runner, with a run record and an overrun printed as a finding
 
-**Status:** OPEN · rev-1 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 5
+**Status:** OPEN · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -100,7 +100,7 @@ Read at 97e0841d. Line numbers are of `tools/run-gates/run-gates.sh` unless anot
 | The ledger merge keeps every row this run did not measure. | `:5396-5404` |
 | The turnstile queues one bar per host and `GATE_TURNSTILE=0` turns it off. | `:1586-1640` |
 | `GATE_BASE` is not among the variables the runner removes before a leg starts, so a leg inherits it. | the `unset` lines `:377`, `:387`, `:556`, `:2743`, `:2753`, `:3876` |
-| A shell caller in this kit resolves the policy reader with `resolve_kit_dir` and asks it with `policy.py get <key>`. | `tools/run-gates/run-gates.gov.test.sh:165-170` |
+| A shell caller in this kit resolves the policy reader with `resolve_kit_dir` and asks it with `policy.py get <key>`. | `tools/run-gates/run-gates.gov.test.sh@17d30d22:165-170` |
 | The push hook trusts a full-green stamp only when its `manifest` is the kit's own. | `.githooks/pre-push#check_green_manifest` |
 
 ### The flow
@@ -303,10 +303,12 @@ The arm for AC4 is TOOL-aNimbleMend-12's, whose scratch adopter holds the policy
     waits for however long the queue is.
   Recommendation: run beside the bar. It is the only option under which the 690 s criterion can be
   observed on a shared node, and it needs one existing knob.
+  RESOLVED (agent, 2026-11-12, delegated): run beside the bar. It is the one option under which the build's 690 s criterion can be observed on a shared node, and it uses a knob the runner already has.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-12 · initial draft.
+- rev-2 · 2026-11-12 · every §8 fork resolved in place under the run's mandate (M3).
 
 ## 10. Reuse audit
 

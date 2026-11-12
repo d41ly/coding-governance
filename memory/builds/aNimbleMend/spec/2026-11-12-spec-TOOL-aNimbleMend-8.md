@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-8 — the inline red-fix lane: an open red admits a product write, and a `Red-fix:` trailer admits its commit
 
-**Status:** SPECCED · rev-1 · 2026-11-12 · node a · Tier-2 · base 1265772c · streams tooling · order 8
+**Status:** SPECCED · rev-2 · 2026-11-12 · node a · Tier-2 · base 1265772c · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -385,10 +385,12 @@ New arm: tools/memory-tree/routed_commits.py · covers AC4 AC5 AC6 · the probe'
     byte-for-byte sentence holds for a history that holds no lane commit, which is every repository
     that never turned it on. S7, the table of §4 and AC5 are written to A; under B the WHOLE column
     takes the key and AC5's last clause inverts.
+  RESOLVED (agent, 2026-11-12, delegated): A, the key gates the pushed range only. Under B the key could not be turned off after first use without a waiver per landed commit.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-12 · initial draft.
+- rev-2 · 2026-11-12 · every §8 fork resolved in place under the run's mandate (M3).
 
 ## 10. Reuse audit
 

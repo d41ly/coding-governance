@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-9 — the red-fix record: a typed kind written after the fix and joined to its commit
 
-**Status:** SPECCED · rev-1 · 2026-11-12 · node a · Tier-2 · base 1265772c · streams tooling · order 9
+**Status:** SPECCED · rev-2 · 2026-11-12 · node a · Tier-2 · base 1265772c · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -272,10 +272,12 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC7 · a fixtu
     TOOL-aNimbleMend-8's admission rule, not this unit's.
   - Recommendation: A. It is what the door does with no change, and the join grades the commit and
     the record, never which unit the record sits under.
+  RESOLVED (agent, 2026-11-12, delegated): A. The record sits under a unit of the build whose unit last changed the fixed file, which the door does with no change.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-12 · initial draft.
+- rev-2 · 2026-11-12 · every §8 fork resolved in place under the run's mandate (M3).
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-4 — the scoped legs: three manifest rows a pass can afford, for memory hygiene's pass checks, the positional check alone and the spec tokens of the pass's own spec
 
-**Status:** OPEN · rev-1 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 3
+**Status:** OPEN · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -299,6 +299,7 @@ New arm: tools/run-gates/run-gates.test.sh · covers AC1 · a control manifest w
   selection and the probe repeats on `--only 21,23`. Liveness: the probe can answer no, as
   `--only 12,25` did at `351 s` (PINNED, §4 "Evidence"). This writer's reading is `78 s` (PINNED,
   the same table), so the recommendation is the row as written at a cap of 120 or more.
+  RESOLVED (agent, 2026-11-12, delegated): the row stands as written. The main loop timed `--only 9,21,23` alone on node a at 66 s on 2026-11-12, under the cap of 120.
 - **FACT-QUESTION · F2 — Does the positional check alone fit the per-leg cap?** No reading of it
   alone exists, and a role agent's hook refuses the command. Probe: the main loop times
   `python tools/playbook/positional.py check` alone on node `a`. Observation: at or under the cap,
@@ -306,10 +307,12 @@ New arm: tools/run-gates/run-gates.test.sh · covers AC1 · a control manifest w
   revision, and "The slow legs" states the exclusion. Liveness: the whole tags leg reads `210.0 s`
   (PINNED, the ceiling evidence), so a reading above the cap is possible. Recommendation: keep the
   row if the reading fits.
+  RESOLVED (agent, 2026-11-12, delegated): the positional row stands. The main loop timed the positional check alone on node a at 29 s on 2026-11-12, under the cap of 120.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-12 · initial draft.
+- rev-2 · 2026-11-12 · every §8 fork resolved in place under the run's mandate (M3).
 
 ## 10. Reuse audit
 

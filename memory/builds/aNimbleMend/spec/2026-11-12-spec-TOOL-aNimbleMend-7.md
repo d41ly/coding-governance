@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-7 — the run point: each unit harness return tells the main loop to run the pass legs
 
-**Status:** SPECCED · rev-1 · 2026-11-12 · node a · Tier-2 · base 1265772c · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-11-12 · node a · Tier-2 · base 1265772c · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -294,10 +294,12 @@ New arm: tools/workflows/unattended-build.test.sh · covers AC6 · the hand-out'
     literally and costs a silent off state, which is the failure this build exists to remove. Under
     B, S5 changes to an optional forwarded arg and S6's sentences gain the policy read; the child,
     S1 to S4, is the same under both.
+  RESOLVED (agent, 2026-11-12, delegated): A, always. The adapter is the one asker of the key, so a caller that forgets an argument cannot turn a default-on mechanism off.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-12 · initial draft.
+- rev-2 · 2026-11-12 · every §8 fork resolved in place under the run's mandate (M3).
 
 ## 10. Reuse audit
 

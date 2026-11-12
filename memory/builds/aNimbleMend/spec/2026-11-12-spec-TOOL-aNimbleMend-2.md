@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-2 — the pass-leg declaration: a `pass_leg` field on a leg's row, written by a derivation over the bar run log and the ceiling evidence
 
-**Status:** SPECCED · rev-1 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -354,10 +354,12 @@ no ceiling and no ceiling-evidence row changes here.
     uses for headroom. No single leg can take more than a fifth of a pass.
   - **200** — a third of the budget. It admits nothing more today, and lets three legs fill a pass.
   Recommendation: 120.
+  RESOLVED (agent, 2026-11-12, delegated): 120. A fifth of the budget, the floor the ceiling margin already uses, and it selects the same legs as 200 at this base.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-12 · initial draft.
+- rev-2 · 2026-11-12 · every §8 fork resolved in place under the run's mandate (M3).
 
 ## 10. Reuse audit
 

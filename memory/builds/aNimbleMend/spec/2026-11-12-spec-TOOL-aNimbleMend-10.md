@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-10 — the inline lane's limits, graded on every `Red-fix:` commit
 
-**Status:** SPECCED · rev-1 · 2026-11-12 · node a · Tier-2 · base 1265772c · streams tooling · order 10
+**Status:** SPECCED · rev-2 · 2026-11-12 · node a · Tier-2 · base 1265772c · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -266,6 +266,7 @@ New arm: tools/memory-tree/routed_commits.py · covers AC1 AC2 AC3 AC4 AC5 AC6 A
   - Option C: 12 paths and 450 lines, so that unit 80 would have passed. It bounds almost nothing.
   - Recommendation: A. A fix larger than every single-bar precedent is the case the prompt sends
     through a spec, and a commit that is over can be split per leg.
+  RESOLVED (agent, 2026-11-12, delegated): A, 3 paths and 60 lines. A larger fix is the case the prompt sends through a spec.
 - **F2 — What stands in for "no new surface"?** A surface cannot be read from a diff, so the gate
   needs a proxy.
   - Option A: no added path under `ROUTED_PATHS`. Deletions pass.
@@ -275,10 +276,12 @@ New arm: tools/memory-tree/routed_commits.py · covers AC1 AC2 AC3 AC4 AC5 AC6 A
     fix to a leg's own row, such as a wrong guard.
   - Recommendation: A. It is the one reading that never refuses a narrowest fix among the measured
     precedents, and what it leaves open is stated in §4.
+  RESOLVED (agent, 2026-11-12, delegated): A, no added path under `ROUTED_PATHS`. It never refuses a narrowest fix among the measured precedents.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-12 · initial draft.
+- rev-2 · 2026-11-12 · every §8 fork resolved in place under the run's mandate (M3).
 
 ## 10. Reuse audit
 

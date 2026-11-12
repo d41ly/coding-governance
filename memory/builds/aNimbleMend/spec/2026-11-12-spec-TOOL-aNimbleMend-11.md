@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-11 — the documents: a help page per mechanism, and the build method and the unattended protocol saying where the pass legs run and what the lane admits
 
-**Status:** SPECCED · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 11
+**Status:** SPECCED · rev-3 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
@@ -434,11 +434,13 @@ command and an unmarked block.
     It changes a governance carrier the prompt did not name, which the build method's veto 2 makes
     an owner turn, and the charter's size row was set to its measured bytes with no headroom.
   - Recommendation: A. B is the owner's to order, and the wrap-up is where it is offered.
+  RESOLVED (agent, 2026-11-12, delegated): A, leave the charter. B changes a governance carrier the prompt did not name, which is an owner turn; it is offered at the wrap-up.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-12 · initial draft.
 - rev-2 · 2026-11-12 · AC6 names the two help pages by their scope items, since a path the unit has not built yet is an untracked citation to the spec-token check.
+- rev-3 · 2026-11-12 · every §8 fork resolved in place under the run's mandate (M3).
 
 ## 10. Reuse audit
 

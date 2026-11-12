@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-6 — the hooks: the pass-leg runner is refused to a role agent by the role-gate arm and stays admitted at the main loop by the gate guard, pinned on both
 
-**Status:** OPEN · rev-1 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 6
+**Status:** OPEN · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -63,7 +63,7 @@ Read at 97e0841d.
 |---|---|
 | Row G2 is `GATE_RUNNERS.includes(buildBaseName(c.head))`, over three basenames. | `tools/hooks/scratch-guard.js#checkGateRunner`, `:1302` |
 | The role-gate arm returns null when the payload carries no `agent_type`. | `tools/hooks/scratch-guard.js#checkRoleGate`, step 1 of its comment |
-| A launched script is a candidate, so `bash <path>/pass-legs.sh` reaches row G2. | `tools/hooks/scratch-guard.js:1501` |
+| A launched script is a candidate, so `bash <path>/pass-legs.sh` reaches row G2. | `tools/hooks/scratch-guard.js@209dc48a:1501` |
 | Row G2 has no allowlist: only a manifest leg on the role's list is admitted ahead of it. | `tools/hooks/scratch-guard.js#checkRoleGate`, step 7 of its comment |
 | The gate guard denies a flag token matching `FLAG_RE` with a non-empty value, and a head word `resolveFileRow` classifies. | `tools/unattended/gate-guard.js#scanDenyHits` |
 | `resolveFileRow` classifies three shapes: the self-test runner, the unattended gates runner, and a suite file. `pass-legs.sh` is none. | `tools/unattended/gate-guard.js#resolveFileRow` |
@@ -181,7 +181,7 @@ New arm: tools/unattended/gate-guard.test.sh · covers AC3 AC4 · a `resolveFile
 ## 8. Open questions
 
 - **F1 — Does "and nothing else" also refuse the plain bar during a pass?** The gate guard admits
-  the bar runner with neither flag in every phase, and BUILD-METHOD M6 names that form as the main
+  the bar runner with neither flag in every phase, and `doc.build-method#m6-passes-commits-parallelism` names that form as the main
   loop's scoped bar. The roster row reads that the hooks admit the pass-leg runner during a pass
   "and nothing else".
   - **Leave the plain bar admitted.** The guard gains no row. With the key off or on, every call
@@ -193,10 +193,12 @@ New arm: tools/unattended/gate-guard.test.sh · covers AC3 AC4 · a `resolveFile
     sentence, and the guard gains its first policy read.
   Recommendation: leave the plain bar admitted. The second option changes a rule of the build
   method that the owner's prompt did not ask to change.
+  RESOLVED (agent, 2026-11-12, delegated): leave the plain bar admitted. The other option changes a rule of the build method the prompt did not ask to change, and it gives the guard a policy read.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-12 · initial draft.
+- rev-2 · 2026-11-12 · every §8 fork resolved in place under the run's mandate (M3).
 
 ## 10. Reuse audit
 
