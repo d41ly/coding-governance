@@ -403,7 +403,7 @@ down restores from.
 
 ## What this release's steps do to your repository
 
-Four moves reach an installed repository through `update`, each named here with what it leaves
+Five moves reach an installed repository through `update`, each named here with what it leaves
 behind.
 
 - **Your adopter rules move into the overlay.** The step `playbook/adopter-rules-to-overlay` turns
@@ -435,6 +435,10 @@ behind.
   the template it ships. `update` installs it as a default-gained kit, and the receipt claims it
   from then on. An existing adopter's next `update` adds the `policy` kit too, because it joined the
   default selection and `playbook-render` requires it.
+- **The `loop` kit joins the default selection**, because the `roles` kit now requires it: the roles
+  kit reads each workflow's order from the loop definition the `loop` kit ships. `update` installs
+  it as a default-gained kit, and the receipt claims it from then on. A `--kits`-scoped `update`
+  gains nothing, and a `--kits` selection naming `roles` names `loop` too or is refused.
 
 ## How gov proves a step before you meet it
 

@@ -55,6 +55,9 @@ default = [
   "check-wiring",
   # TOOL-aOrientedCast-8 S1: the role catalogue, its agent types and the `/build` Skill bind only
   # where they are installed and rendered, so the roles kit ships with every default install.
+  # TOOL-dDeclaredLoop-36 S1: `roles` requires `loop`, whose definition the catalogue checker and
+  # the adopter of `roles` read each workflow's order from, so the default carries `loop` too.
+  "loop",
   "roles",
 ]
 

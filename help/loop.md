@@ -62,4 +62,6 @@ in `workflows.toml` with no row here, or a row here naming no workflow there, is
 ## Who owns it
 
 The file is gov's and an update overwrites it: the steps and each workflow's place are not an
-adopter's to seed. An install takes the loop kit with the roles kit, which requires it.
+adopter's to seed. The loop kit is in the default selection, so a default install takes it, and
+`update` installs it into a tree whose receipt predates it, as a default-gained kit. The roles kit
+requires the loop kit: a `--kits` selection naming `roles` names `loop` too or is refused.
