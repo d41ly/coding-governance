@@ -87,8 +87,9 @@ catalogue nor the key.
 
 THE DRIVE LINES (PLAY-dOrderedCharter-6). A template's `{{DRIVE}}` line expands, before the placeholder set
 is collected, to `render_drive_line` per `[[drive]]` row of the selected kits' descriptors, in
-`read_drive_rows` order: `start` rows first, then the stage integer of the roles kit's workflow the row
-names, then kit and row order. A selection with no row drops the section, heading and region. A selected
+`read_drive_rows` order: `start` rows first, then the order the loop definition, the loop kit's `loop.toml`,
+gives the workflow the row names (TOOL-dDeclaredLoop-1), then kit and row order; with no loop kit, kit and row
+order alone. A selection with no row drops the section, heading and region. A selected
 kit whose descriptor is found neither beside this engine nor at the registry's path refuses the render.
 
 THE RE-FOUNDED CHARTER (PLAY-dOrderedCharter-2). Four more lines expand before the placeholder set is
@@ -1631,10 +1632,23 @@ def read_workflows(engine_dir: Path) -> list[dict]:
     return tomllib.loads(read_input(kit / 'workflows.toml', "the roles kit's workflow list")).get('workflow', [])
 
 
+def load_loop_kit(engine_dir: Path):
+    """`(the loop kit's reader module, that kit's directory)`, the kit found with `resolve_kit_dir` from
+    `engine_dir` and put on `sys.path` (TOOL-dDeclaredLoop-1); LookupError where no install holds it. The
+    reader's refusal of a definition is `LoopError`, a ValueError, the caller's to catch."""
+    kit = resolve_kit_dir('loop', 'loop_lib.py', engine_dir)
+    if str(kit) not in sys.path:
+        sys.path.insert(0, str(kit))
+    import loop_lib  # the loop kit's reader, found above
+    return loop_lib, kit
+
+
 def read_drive_rows(engine_dir: Path, kits: list[str]) -> list[dict]:
     """Every `[[drive]]` row of the selected `kits`, each with its `kit` and its 1-based `row` there, in render order: `start` rows
-    first, then by the stage integer of the workflow the row names, then kit order and row order. A stage
-    no workflow names sorts last. A selected kit whose descriptor no place holds refuses, naming the kit. A kit id
+    first, then by the order the loop definition gives the workflow the row names, read through the loop kit's
+    reader (TOOL-dDeclaredLoop-1), then kit order and row order. A stage no workflow names sorts last. With no
+    loop kit every row keeps kit and row order; a loop definition that does not read refuses, naming it. A selected
+    kit whose descriptor no place holds refuses, naming the kit. A kit id
     that left the registry with a `[[retired]]` row reads as its successor (PLAY-dOrderedCharter-31 S10)."""
     reg = tomllib.loads(read_input(resolve_declaration_paths(engine_dir, engine_dir)[1], 'the govkit registry'))
     spelled = {e.get('id'): e.get('descriptor', '') for e in reg.get('entry', [])}
@@ -1650,8 +1664,14 @@ def read_drive_rows(engine_dir: Path, kits: list[str]) -> list[dict]:
                           f'none beside this engine or at the registry\'s path {spelled.get(kit) or "(no row)"}')
         desc = tomllib.loads(read_input(path, f'the descriptor of {kit}'))
         rows += [{**r, 'kit': kit, 'row': n} for n, r in enumerate(desc.get('drive', []), 1) if isinstance(r, dict)]
-    stages = {w.get('name'): w.get('stage', 0) for w in read_workflows(engine_dir)}
-    last = max([s for s in stages.values() if isinstance(s, int)], default=0) + 1
+    try:
+        loop_lib, loop_kit = load_loop_kit(engine_dir)
+        stages = loop_lib.read_workflow_order(loop_kit)
+    except LookupError:
+        stages = {}
+    except ValueError as e:     # the reader's LoopError
+        raise Refusal(f'the drive section sorts by the loop definition, which does not read: {e}') from None
+    last = max(stages.values(), default=0) + 1
     return sorted(rows, key=lambda r: (r.get('stage') != DRIVE_START, stages.get(r.get('stage'), last)))
 
 

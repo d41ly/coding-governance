@@ -1,0 +1,99 @@
+# loop.toml — the loop's definition: the gov steps, and where each roles workflow sits in them.
+# Read through loop_lib.py beside this file, and by nothing else; `python loop_lib.py --check` grades it.
+#
+# One [[step]] row per gov step, in the loop's order:
+#   tag    the step's tag, a member of the `step` namespace
+#   order  its place in the loop, counted from 1
+#   state  the build state a build holds while it is in the step
+#   exit   the step's exit item, a tag of the `item` namespace
+#
+# One [[workflow]] row per workflow of the roles kit's workflows.toml, joined by name both ways by that
+# kit's catalogue checker (rule R6):
+#   name   the roles workflow
+#   order  its build order, 0 for an any-time workflow; the `## Stage <n>` number of the /build Skill
+#   step   the step its work sits in, a [[step]] tag above, or "none"
+#   reach  optional, `entry` or `review`: the word its work orders load practices under, where that is
+#          not the step's own last segment
+
+[[step]]
+tag = "step.plan"
+order = 1
+state = "planning"
+exit = "item.plan.exit"
+
+[[step]]
+tag = "step.design"
+order = 2
+state = "designing"
+exit = "item.design.exit"
+
+[[step]]
+tag = "step.build"
+order = 3
+state = "building"
+exit = "item.build.exit"
+
+[[step]]
+tag = "step.test"
+order = 4
+state = "testing"
+exit = "item.test.exit"
+
+[[step]]
+tag = "step.deploy"
+order = 5
+state = "deploying"
+exit = "item.deploy.close"
+
+[[workflow]]
+name = "orient"
+order = 1
+step = "none"
+reach = "entry"
+
+[[workflow]]
+name = "reuse"
+order = 2
+step = "step.design"
+
+[[workflow]]
+name = "spec-write"
+order = 3
+step = "step.design"
+
+[[workflow]]
+name = "spec-review"
+order = 4
+step = "step.design"
+reach = "review"
+
+[[workflow]]
+name = "build"
+order = 5
+step = "step.build"
+
+[[workflow]]
+name = "closing-review"
+order = 6
+step = "step.build"
+reach = "review"
+
+[[workflow]]
+name = "gate-bar"
+order = 7
+step = "step.test"
+
+[[workflow]]
+name = "research"
+order = 0
+step = "step.plan"
+
+[[workflow]]
+name = "handoff"
+order = 0
+step = "none"
+
+[[workflow]]
+name = "bookkeeping"
+order = 0
+step = "none"

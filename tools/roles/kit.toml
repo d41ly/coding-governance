@@ -9,8 +9,10 @@ scope = "repo"
 
 # The card every `task:` and `card:` input is read from is written by the kickoff kit's card writer,
 # and the checker, the library and the adopter read the memory root and the governing doc's path from
-# `.memory-tree.conf`.
-requires = ["kickoff-manifest", "memory-tree"]
+# `.memory-tree.conf`. Each workflow's build order and step are the loop kit's (TOOL-dDeclaredLoop-1):
+# the catalogue checker joins the workflow table with the loop definition, and the adopter binds the
+# Skill's stage headings to its orders, so with no loop kit both refuse.
+requires = ["kickoff-manifest", "memory-tree", "loop"]
 
 # `/build` and `handoff.py harness-args` drive the three harnesses `workflows.toml` names, and all
 # three ship in `review-harness`, which is not a default. TOOL-aOrientedCast-8 section 8 F1: a plain

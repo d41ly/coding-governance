@@ -493,6 +493,25 @@ def load_workflows(kit_dir):
     return entries
 
 
+def read_workflow_order(kit_dir):
+    """`{workflow name: order}` from the loop definition (TOOL-dDeclaredLoop-1): each workflow's build
+    order, 0 for an any-time one, which this kit's table no longer carries. The loop kit is found by
+    `resolve_kit_dir` from `kit_dir` and its reader imported, as `read_cap_answer` reaches the policy
+    kit. No loop kit, or a definition its reader refuses, raises RolesError naming it."""
+    import sys
+    try:
+        kit = str(resolve_kit_dir("loop", "loop_lib.py", kit_dir))
+        if kit not in sys.path:
+            sys.path.insert(0, kit)
+        import loop_lib  # the loop kit's reader, found above
+    except (LookupError, ImportError) as exc:
+        raise RolesError("no loop kit places the workflows: %s" % exc)
+    try:
+        return loop_lib.read_workflow_order(kit)
+    except loop_lib.LoopError as exc:
+        raise RolesError("the loop definition does not read: %s" % exc)
+
+
 def extract_workflow_harnesses(workflows):
     """The `harness` value of each `[[workflow]]` entry whose `driver` is `workflow`, in table order."""
     return [w.get("harness") for w in workflows if w.get("driver") == "workflow"]

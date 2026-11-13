@@ -41,14 +41,17 @@
 # The answer reads the disk at render time: an `apply` that runs this before the harnesses are
 # rendered writes the plain path, and `--check` then reads the Skill out of sync until `--scaffold`.
 #
-# THE STAGE BINDING. Each `## Stage <n> — <workflow>` heading of the template must name a
-# `[[workflow]]` of the catalogue whose `stage` is <n>, the headings run in strictly ascending stage
-# order, and every workflow of stage 1 or more is named by exactly one heading. It runs inside
-# `render_skill`, so `--check` grades exactly what `--scaffold` would write.
+# THE STAGE BINDING. Each `## Stage <n> — <workflow>` heading of the template must name a workflow
+# the loop definition places at order <n>, the headings run in strictly ascending order, and every
+# workflow of order 1 or more is named by exactly one heading. The orders are the loop definition's
+# (TOOL-dDeclaredLoop-1), read through `roles_lib.read_workflow_order`, the library's one reader of
+# them, as one `name<TAB>order` line per workflow; no awk parses TOML. It runs inside `render_skill`,
+# so `--check` grades exactly what `--scaffold` would write.
 #
 # WHAT THIS DOES NOT CHECK: what a stage's body says, whether the commands it names exist, or any
-# catalogue key but `name` and `stage`. The catalogue is read with awk over `[[workflow]]` blocks, so
-# an inline-table reformat reads zero workflows and refuses as a dead probe rather than passing.
+# fact about a workflow but its name and its order. A loop definition that does not read, or no loop
+# kit, is a failed derivation, exit 2, and one that places zero workflows refuses as a dead probe
+# rather than passing.
 set -u
 MODE="${1-}"
 case "$MODE" in
@@ -250,41 +253,39 @@ OUT=".claude/skills/build/SKILL.md"
 
 render_skill() { # -> the render on stdout; 1 a stage disagreement or a surviving token, 2 a dead probe
   [ -f "$TEMPLATE" ] && [ -f "$CATALOGUE" ] || { echo "roles: $KIT_REL lacks SKILL.template.md or workflows.toml" >&2; return 2; }
-  local bind rc out left
-  bind=$(awk -v cat="$KIT_REL/workflows.toml" -v tpl="$KIT_REL/SKILL.template.md" '
-    function close_blk() {
-      if (blk) {
-        if (name == "" || stage == "") { print "roles: catalogue block at " cat ":" blk " carries no " (name == "" ? "name" : "stage") " line"; bad = 1 }
-        else { n++; st[name] = stage }
-      }
-      blk = 0; name = ""; stage = ""
+  local bind rc out left orders
+  # THE ORDERS (TOOL-dDeclaredLoop-1): one `name<TAB>order` line per workflow the loop definition
+  # places, through the library's one reader of it. A refused read prints its own line and is exit 2.
+  orders=$("$PY" -B -c 'import sys
+sys.path.insert(0, sys.argv[1])
+import roles_lib
+try:
+    placed = roles_lib.read_workflow_order(sys.argv[1])
+except roles_lib.RolesError as e:
+    sys.exit("roles: %s" % e)
+sys.stdout.buffer.write("".join("%s\t%d\n" % kv for kv in placed.items()).encode("utf-8"))' "$KIT_DIR") || return 2
+  bind=$(WORKFLOW_ORDERS="$orders" awk -v tpl="$KIT_REL/SKILL.template.md" '
+    BEGIN {
+      k = split(ENVIRON["WORKFLOW_ORDERS"], row, "\n")
+      for (i = 1; i <= k; i++) { sub(/\r$/, "", row[i]); if (split(row[i], f, "\t") == 2) { n++; st[f[1]] = f[2] + 0 } }
+      if (n == 0) { print "roles: dead probe — the loop definition placed zero workflows"; dead = 1; exit 2 }
     }
-    function switch_file() { switched = 1; close_blk(); if (n == 0) { print "roles: dead probe — " cat " parsed zero [[workflow]] blocks"; dead = 1; exit 2 } }
     { sub(/\r$/, "") }
-    FILENAME == ARGV[1] {
-      if ($0 ~ /^\[\[workflow\]\][ \t]*$/) { close_blk(); blk = FNR; next }
-      if (blk && $0 ~ /^name = "/) { v = $0; sub(/^name = "/, "", v); sub(/".*/, "", v); name = v }
-      if (blk && $0 ~ /^stage = [0-9]+/) { v = $0; sub(/^stage = /, "", v); sub(/[^0-9].*/, "", v); stage = v + 0 }
-      next
-    }
-    !switched { switch_file() }
     /^## Stage / {
       h = "heading \"" $0 "\" at " tpl ":" FNR
       if (NF != 5 || $4 != "—" || $3 !~ /^[0-9]+$/) { print "roles: " h " is not of the form ## Stage <n> — <workflow>"; bad = 1; next }
       num = $3 + 0; wf = $5
-      if (!(wf in st)) { print "roles: " h " names no [[workflow]] entry of " cat; bad = 1; next }
-      if (st[wf] != num) { print "roles: " h " says stage " num " but the entry " wf " is stage " st[wf]; bad = 1 }
+      if (!(wf in st)) { print "roles: " h " names no [[workflow]] row of the loop definition"; bad = 1; next }
+      if (st[wf] != num) { print "roles: " h " says stage " num " but the order of the entry " wf " is " st[wf] " in the loop definition"; bad = 1 }
       if (seen[wf]++) { print "roles: " h " names the entry " wf " a second time"; bad = 1 }
       if (num <= last) { print "roles: " h " does not ascend past stage " last; bad = 1 }
       last = num
     }
     END {
       if (dead) exit 2
-      if (!switched) switch_file()
-      if (dead) exit 2
-      for (w in st) if (st[w] >= 1 && !(w in seen)) { print "roles: the entry " w " (stage " st[w] ") of " cat " is named by no ## Stage heading"; bad = 1 }
+      for (w in st) if (st[w] >= 1 && !(w in seen)) { print "roles: the entry " w " (order " st[w] ") of the loop definition is named by no ## Stage heading"; bad = 1 }
       exit bad
-    }' "$CATALOGUE" "$TEMPLATE"); rc=$?
+    }' "$TEMPLATE"); rc=$?
   [ "$rc" -eq 0 ] || { printf '%s\n' "$bind" >&2; return "$rc"; }
   # The `X` sentinel keeps trailing newlines `$( )` would strip. The replacements are QUOTED, because
   # bash 5.1+ reads an unquoted `&` in one as the matched text.

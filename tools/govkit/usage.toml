@@ -278,6 +278,18 @@ entry = "{prefix}/policy/adopt-policy.sh"
 flags = ["--scaffold", "--check", "--target="]
 
 [[usage]]
+id = "script:{prefix}/loop/loop_lib.py"
+shape = "verb"
+entry = "{prefix}/loop/loop_lib.py"
+flags = ["--check", "--fixture", "--plant="]
+
+[[usage]]
+id = "script:{prefix}/loop/adopt-loop.sh"
+shape = "verb"
+entry = "{prefix}/loop/adopt-loop.sh"
+flags = ["--check"]
+
+[[usage]]
 id = "script:{prefix}/policy/budgets.py#resolve"
 shape = "verb"
 entry = "{prefix}/policy/budgets.py"

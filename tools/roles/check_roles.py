@@ -30,8 +30,10 @@ touching nothing else, then grades as usual.
       family cap `role-body` (TOOL-dGroundRules-9): under `warn` it prints a `BUDGET WARN` line and
       is no defect; with no policy kit, or a refusing reader, it is a defect as before
   R6  a workflow entry with an unknown, missing or repeated key or name, a missing name of the ten,
-      a non-integer or negative `stage`, a `step` outside STEP_NAMES, an unknown `driver`, or a
-      `trigger` carrying a newline
+      an unknown `driver`, or a `trigger` carrying a newline; a workflow no `[[workflow]]` row of
+      the loop definition places, a loop row naming no workflow here, or a loop definition that
+      does not read, one line (TOOL-dDeclaredLoop-1): a workflow's order and step are the loop
+      definition's, so a `stage` or `step` key here is an unknown key
   R7  a role whose `workflow` names no entry, or whose entry does not list it
   R8  a `roles` entry naming no role file; an agent or workflow driver with no role; a role file no
       entry lists
@@ -97,10 +99,7 @@ BODY_CEILINGS = {
 }
 WORKFLOW_NAMES = ("orient", "research", "reuse", "handoff", "spec-write", "spec-review", "build",
                   "closing-review", "gate-bar", "bookkeeping")
-WORKFLOW_KEYS = ("name", "stage", "step", "driver", "harness", "roles", "stages", "enforced-by", "trigger")
-#: A workflow's `step`, the flow step its work order serves (PLAY-dOrderedCharter-21): the flow's words, the
-#: entry step, the review breakpoint, and `none` for a workflow that serves no step.
-STEP_NAMES = ("entry", "plan", "design", "build", "test", "deploy", "review", "none")
+WORKFLOW_KEYS = ("name", "driver", "harness", "roles", "stages", "enforced-by", "trigger")
 DRIVERS = ("agent", "workflow", "program", "main-loop")
 WRITES = ("none", "spec", "product", "review", "records")
 REQUIRED_ROLE_KEYS = ("name", "description", "workflow", "reads", "writes", "rules", "returns",
@@ -288,11 +287,6 @@ def check_roles(root, kit_dir, write=False):
             add_defect(table, "R6", "%s repeats the name '%s'" % (where, name))
         else:
             by_name[name] = w
-        stage = w.get("stage")
-        if "stage" in w and (not isinstance(stage, int) or isinstance(stage, bool) or stage < 0):
-            add_defect(table, "R6", "%s stage %r is not an integer at or above 0" % (where, stage))
-        if "step" in w and w["step"] not in STEP_NAMES:
-            add_defect(table, "R6", "%s step %r is not one of %s" % (where, w["step"], " ".join(STEP_NAMES)))
         if "driver" in w and w["driver"] not in DRIVERS:
             add_defect(table, "R6", "%s driver %r is not one of %s" % (where, w["driver"], " ".join(DRIVERS)))
         trig = w.get("trigger")
@@ -334,6 +328,22 @@ def check_roles(root, kit_dir, write=False):
     for name in WORKFLOW_NAMES:
         if workflows and name not in by_name:
             add_defect(table, "R6", "the workflow '%s' has no entry" % name)
+    # THE JOIN WITH THE LOOP DEFINITION, both ways (TOOL-dDeclaredLoop-1): a workflow's order and step
+    # are written there alone, so each workflow here has one row there and each row there names one here.
+    if workflows:
+        try:
+            placed = lib.read_workflow_order(kit_dir)
+        except lib.RolesError as e:
+            add_defect(table, "R6", str(e))
+        else:
+            for name in by_name:
+                if name not in placed:
+                    add_defect(table, "R6", "the workflow '%s' has no [[workflow]] row in the loop "
+                               "definition, so no loop row places it" % name)
+            for name in placed:
+                if name not in by_name:
+                    add_defect(table, "R6", "the loop definition's [[workflow]] row '%s' names no "
+                               "workflow of this table" % name)
 
     listed_anywhere = {s for w in workflows if isinstance(w.get("roles"), list) for s in w["roles"]}
     for slot, r in roles.items():

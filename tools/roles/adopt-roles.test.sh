@@ -5,13 +5,14 @@
 #   ROLES_ADOPTER=<a copy> bash <prefix>/roles/adopt-roles.test.sh   # grade a copy, for a red observation
 #
 # Each arm builds its own fixture: a fresh git repository holding a copy of this kit, with the adopter
-# under test as its `adopt-roles.sh`, the governing doc and memory root this repository's conf names,
+# under test as its `adopt-roles.sh`, a copy of the loop kit's definition and reader beside it, the
+# governing doc and memory root this repository's conf names,
 # scaffolded once. Then it stages ONE break into the fixture and asserts the adopter's refusal by exit
 # code AND by the text naming it, because an exit code alone is shared by every refusal the adopter
 # has: a copy with the stage binding staged out still exits 1 on the agent compare.
 #
-# The arms: a stage heading naming a workflow at the wrong stage; a catalogue workflow no heading
-# names; a token surviving the substitution; a byte appended to a rendered agent type; an unknown
+# The arms: a loop row whose order disagrees with its stage heading; a workflow of the loop
+# definition no heading names; a token surviving the substitution; a byte appended to a rendered agent type; an unknown
 # argument; the renderer's task part sent to the hooks kit's spawn guard (arm 6, which SKIPs out loud
 # without that kit or node); an `export` conf line with a trailing comment (arm 7); the roster verb's
 # one line per role and its refusal of a line past 200 characters (arm 8); the agents verb's two
@@ -19,7 +20,8 @@
 # ledger exactly once across two runs, a run without `--write` writing nothing, a harness run's two
 # agent lines and one returned line, a prompt opening with a blank line still matching, and a
 # transcript stripped of its effort printing `unknown` under the plain policy (arm 9);
-# the stand-in render's refusal, R15 both ways and over eight bad rows, R13, R14 and R0 (arm 10);
+# the stand-in render's refusal, R15 both ways and over eight bad rows, R13, R14, R6 over a loop row
+# with no step, a misspelt one and a `stage` key in the catalogue, and R0 (arm 10);
 # the roles kit's reading of a prompt's marker line and of the charter's micro-format fence
 # against the hooks kit's own (arm 11, which SKIPs out loud as arm 6 does); a `--scaffold` whose
 # agent render refuses, which exits 1 naming the refusal and writes no Skill (arm 13); the cited
@@ -93,17 +95,26 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +2 for arm 21 (TOOL-aGuardedEffort-1); arm 20 and arm 6's added payload are out of the floor.
 # +0 for arm 6's harness calls and rendered tables (TOOL-aGuardedEffort-2): on its SKIP path, out of the floor.
 # +2 for arm 22 (TOOL-dPavedRoad-3).
-FLOOR_ASSERTIONS=61
+# +1 for arm 10's planted `stage` key (TOOL-dDeclaredLoop-1).
+FLOOR_ASSERTIONS=62
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
-FX=""; FXK="$KREL"
+# THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
+# from the loop definition, so every fixture holds a copy of the loop kit beside its roles kit, at the
+# home `loop`, where the library's resolver probes. The source is the loop kit beside this one.
+LOOP_SRC="$HERE/../loop"
+[ -f "$LOOP_SRC/loop_lib.py" ] && [ -f "$LOOP_SRC/loop.toml" ] || { echo "adopt-roles.test: no loop kit beside this one at $LOOP_SRC, so no fixture can place its workflows"; exit 2; }
+FX=""; FXK="$KREL"; FXL=""
 build_fixture() { # [kit path] [fixture dir] -> $FX: a repo holding this kit at the kit path, $KREL
-  # unless given, with $ADOPTER as its adopter, scaffolded; rc of the scaffold. The fixture directory
-  # is $TMP_ROOT/fx<n> unless given, and run_adopter reads the kit path the last call used.
+  # unless given, with $ADOPTER as its adopter, and the loop kit beside it at $FXL, scaffolded; rc of
+  # the scaffold. The fixture directory is $TMP_ROOT/fx<n> unless given, and run_adopter reads the kit
+  # path the last call used.
   FXK=${1:-$KREL}; FX=${2:-$TMP_ROOT/fx$n}
-  _chd=.; [[ $CH == */* ]] && _chd=${CH%/*}; mkdir -p "$FX/$FXK" "$FX/$_chd" || return 2
+  FXL=loop; [[ $FXK == */* ]] && FXL=${FXK%/*}/loop
+  _chd=.; [[ $CH == */* ]] && _chd=${CH%/*}; mkdir -p "$FX/$FXK" "$FX/$FXL" "$FX/$_chd" || return 2
   git init -q "$FX" || return 2
   cp -R "$HERE"/. "$FX/$FXK"/ && cp "$ADOPTER" "$FX/$FXK/adopt-roles.sh" || return 2
+  cp "$LOOP_SRC/loop_lib.py" "$LOOP_SRC/loop.toml" "$FX/$FXL"/ || return 2
   printf 'MEMORY_ROOT=%s\nCHARTER=%s\n' "$MR" "$CH" > "$FX/.memory-tree.conf"
   cp "$REPO/$CH" "$FX/$CH" || return 2
   (cd "$FX" && bash "$FXK/adopt-roles.sh" --scaffold >/dev/null 2>&1)
@@ -131,21 +142,23 @@ for w in table:
         pairs.append(pair)
 sys.stdout.buffer.write("".join(p + "\n" for p in pairs).encode("utf-8"))'
 
-# ---- arm 1: a stage heading naming a workflow at the wrong stage --------------------------------
+# ---- arm 1: a loop row whose order disagrees with its stage heading --------------------------------
 build_fixture; check_arm "arm 1 the fixture scaffolds and checks clean" "$([ $? = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
-sed -i 's/^## Stage 2 — reuse$/## Stage 3 — reuse/' "$FX/$KREL/SKILL.template.md"
+# TOOL-dDeclaredLoop-1: the order is the loop definition's, so the break is planted THERE, on the
+# fixture's `reuse` row. An adopter still reading the roles catalogue never compares it.
+awk '/^name = "reuse"$/{b=1} b && /^order = /{print "order = 9"; b=0; next} {print}' "$LOOP_SRC/loop.toml" > "$FX/$FXL/loop.toml"
 out=$(run_adopter --check); rc=$?
-check_arm "arm 1 a heading at the wrong stage refuses, naming the entry's own stage" \
-   "$([ "$rc" = 1 ] && [[ $out == *'says stage 3 but the entry reuse is stage 2'* ]] && echo 1 || echo 0)"
+check_arm "arm 1 a loop row whose order disagrees with its heading refuses, naming the entry's own order" \
+   "$([ "$rc" = 1 ] && [[ $out == *'says stage 2 but the order of the entry reuse is 9 in the loop definition'* ]] && echo 1 || echo 0)"
 # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
 if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 
-# ---- arm 2: a catalogue workflow no heading names ----------------------------------------------
+# ---- arm 2: a workflow of the loop definition no heading names ----------------------------------------------
 build_fixture; check_arm "arm 2 the fixture scaffolds and checks clean" "$([ $? = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
 sed -i '/^## Stage 2 — reuse$/d' "$FX/$KREL/SKILL.template.md"
 out=$(run_adopter --check); rc=$?
-check_arm "arm 2 a stage-2 workflow no heading names refuses, naming it" \
-   "$([ "$rc" = 1 ] && _re2=$'the entry reuse \\(stage 2\\) of [^\n]* is named by no ## Stage heading' && [[ $out =~ $_re2 ]] && echo 1 || echo 0)"
+check_arm "arm 2 an order-2 workflow no heading names refuses, naming it and the loop definition" \
+   "$([ "$rc" = 1 ] && [[ $out == *'the entry reuse (order 2) of the loop definition is named by no ## Stage heading'* ]] && echo 1 || echo 0)"
 
 # ---- arm 3: a token surviving the substitution --------------------------------------------------
 build_fixture; check_arm "arm 3 the fixture scaffolds and checks clean" "$([ $? = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
@@ -524,16 +537,23 @@ sed -i 's/^output: .*/output: specs/' "$FX/$KREL/agents/gov-spec-writer.agent.md
 check_arm "arm 10 a spec writer whose output lacks its folder is one R14 line, naming the folder" \
    "$([ "$rc" = 1 ] && [ "$(grep -c ': R14 — ' "$A10R")" = 1 ] && grep ': R14 — ' "$A10R" | grep -qF '{{MEMORY_ROOT}}/builds/<slug>/spec/' && echo 1 || echo 0)"
 cp "$TMP_ROOT/a10.writer" "$FX/$KREL/agents/gov-spec-writer.agent.md"
-# PLAY-dOrderedCharter-21 S1: the build row's step, dropped and then misspelt, is one R6 line naming the row.
+# PLAY-dOrderedCharter-21 S1, moved by TOOL-dDeclaredLoop-1: a workflow's step is the loop definition's,
+# so the build row's step is dropped and then misspelt in the fixture's LOOP definition, each one R6
+# line naming that definition and the row; and a `stage` key planted in the catalogue is an unknown key.
+awk '/^name = "build"$/{b=1} b && /^step = /{b=0; next} {print}' "$LOOP_SRC/loop.toml" > "$FX/$FXL/loop.toml"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?
+check_arm "arm 10 a loop row without step is one R6 line, naming the loop definition and the row" \
+   "$([ "$rc" = 1 ] && [ "$(grep -c ': R6 — ' "$A10R")" = 1 ] && grep ': R6 — ' "$A10R" | grep -F 'the loop definition does not read' | grep -qF '(build) carries no step' && echo 1 || echo 0)"
+awk '/^name = "build"$/{b=1} b && /^step = /{print "step = \"step.buld\""; b=0; next} {print}' "$LOOP_SRC/loop.toml" > "$FX/$FXL/loop.toml"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?
+check_arm "arm 10 a step that is no declared step tag is one R6 line, naming the loop definition, the row and the value" \
+   "$([ "$rc" = 1 ] && [ "$(grep -c ': R6 — ' "$A10R")" = 1 ] && grep ': R6 — ' "$A10R" | grep -F 'the loop definition does not read' | grep -F '(build)' | grep -qF "step 'step.buld'" && echo 1 || echo 0)"
+cp "$LOOP_SRC/loop.toml" "$FX/$FXL/loop.toml"
 cp "$FX/$KREL/workflows.toml" "$TMP_ROOT/a10.workflows"
-awk '/^name = "build"$/{b=1} b && /^step = /{b=0; next} {print}' "$TMP_ROOT/a10.workflows" > "$FX/$KREL/workflows.toml"
+awk '{print} /^name = "spec-write"$/{print "stage = 3"}' "$TMP_ROOT/a10.workflows" > "$FX/$KREL/workflows.toml"
 (cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?
-check_arm "arm 10 a workflow row without step is one R6 line, naming the row and the field" \
-   "$([ "$rc" = 1 ] && grep ': R6 — ' "$A10R" | grep -qF "(build) is missing key 'step'" && echo 1 || echo 0)"
-sed 's/^step = "build"$/step = "buld"/' "$TMP_ROOT/a10.workflows" > "$FX/$KREL/workflows.toml"
-(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?
-check_arm "arm 10 a step outside the declared words is one R6 line, naming the row and the value" \
-   "$([ "$rc" = 1 ] && grep ': R6 — ' "$A10R" | grep -F '(build)' | grep -qF "step 'buld'" && echo 1 || echo 0)"
+check_arm "arm 10 a stage key in the catalogue is one R6 line, naming the row and the unknown key" \
+   "$([ "$rc" = 1 ] && [ "$(grep -c ': R6 — ' "$A10R")" = 1 ] && grep ': R6 — ' "$A10R" | grep -qF "(spec-write) has an unknown key 'stage'" && echo 1 || echo 0)"
 cp "$TMP_ROOT/a10.workflows" "$FX/$KREL/workflows.toml"
 printf 'CHARTER=%s\n' "$CH" > "$FX/.memory-tree.conf"
 (cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?

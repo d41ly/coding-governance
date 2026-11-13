@@ -61,14 +61,16 @@ render prints one `load-set — unarmed` note and proceeds.
 
 ## The practices at the work order's step
 
-Each workflow names the step its work serves, under `step` in `<prefix>/roles/workflows.toml`: `entry`,
-`plan`, `design`, `build`, `test`, `deploy`, `review`, or `none`. A work order carries what each active
+Each workflow has a reach word, the step its work orders load practices at: `entry`, `plan`, `design`,
+`build`, `test`, `deploy`, `review`, or `none`. It is the loop definition's, `<prefix>/loop/loop.toml`,
+and no key of the roles kit: the workflow's row there gives it as `reach` where it carries one, else as
+the last word of its `step` ([the loop definition](loop.md)). A work order carries what each active
 practice changes at its role's step: the handoff's task section ends with a `### Practices at <step>`
 block, one `- [<name>] <reach>` line per practice that reaches that step. A builder's reads, for example,
 `- [yagni] delete rather than disable`. The charter keeps one line per practice and carries no reach.
 
 The active practices are the policy key `charter.practices`, the foundation set when unset. A step of
-`none`, a step no active practice reaches, or an install with no playbook kit renders no block.
+`none`, a step no active practice reaches, or an install with no playbook kit or no loop kit renders no block.
 `python <prefix>/playbook/load_sets.py derive --reader role.<name>` lists the units as <!-- usage: script:tools/playbook/load_sets.py#derive c95f3b73 -->
 `practice.<name>.<step>`.
 
@@ -89,7 +91,8 @@ refuses the render, naming the key.
 ## How to use it
 
 - **Run an attended build:** after kickoff's READY card and the owner's go, invoke `/build`. It walks
-  the workflows in stage order and calls the same harnesses `/unattended` uses.
+  the workflows in the order the loop definition gives them, each workflow's `order` in
+  `<prefix>/loop/loop.toml`, and calls the same harnesses `/unattended` uses.
 - **Hand one task to one agent:**
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and placeholders -->

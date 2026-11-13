@@ -3,6 +3,7 @@
 One task-oriented page per user-facing feature: what it is, how to use it, a short example.
 
 - [Role agents and `/build`](roles.md) — how a task reaches a role agent, and how to adjust a role.
+- [The loop definition](loop.md) — the five steps and each workflow's order, step and reach word in `loop.toml`, how to read it with `loop_lib.py --check`, and what stops a read.
 - [Profiling the gate legs](measure-legs.md) — run every leg clean and see what each one costs.
 - [The policy file](policy.md) — where a repository's policy lives, how to set a key, how to read one with `policy.py get`, and how it is checked.
 - [The agent limit](agent-limit.md) — how many agents run at once, how to raise or lower it, what `policy.py settings --write` renders, and what the agent-cap hook refuses.

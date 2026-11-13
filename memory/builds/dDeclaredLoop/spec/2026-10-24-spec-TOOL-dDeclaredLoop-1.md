@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-1 — the loop kit and its definition keyed by the stage tags, the roles kit's stage table moved into it
 
-**Status:** INPROGRESS · rev-5 · 2026-11-13 · node d · Tier-2 · base ed497191 · streams tooling · order 2 · advances TOOL-dDeclaredLoop-35
+**Status:** CLOSED · rev-5 · 2026-11-13 · node d · Tier-2 · base ed497191 · streams tooling · order 2 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0086@76547911 whole
 
@@ -23,8 +23,10 @@
 | [2026-11-05-build-TOOL-dDeclaredLoop-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-1-crosscheck-returns.md) | research | TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 |
 | [2026-11-05-build-TOOL-dDeclaredLoop-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-1-parents-crosscheck.md) | research | TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 |
 | [2026-11-05-build-TOOL-dDeclaredLoop-1-reground-returns.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-1-reground-returns.md) | research | TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 |
+| [2026-11-13-build-TOOL-dDeclaredLoop-1-1-acceptance-ledger.md](../build/2026-11-13-build-TOOL-dDeclaredLoop-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-13-build-TOOL-dDeclaredLoop-1-1-builder-return.md](../build/2026-11-13-build-TOOL-dDeclaredLoop-1-1-builder-return.md) | journal | — |
 | [2026-11-13-build-TOOL-dDeclaredLoop-1-deviation-13.md](../build/2026-11-13-build-TOOL-dDeclaredLoop-1-deviation-13.md) | deviation | — |
+| [2026-11-13-build-TOOL-dDeclaredLoop-1-deviation-14.md](../build/2026-11-13-build-TOOL-dDeclaredLoop-1-deviation-14.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-1-reuse-scout.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-1-reuse-scout.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-2-reuse-scout.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-2-reuse-scout.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-3-reuse-scout.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-3-reuse-scout.md) | journal | — |

@@ -430,8 +430,8 @@ def extract_kit(ctx, path, text=None):
 
 
 def extract_step(ctx, path, text=None):
-    """The `step` namespace: the `tag` of each `[[step]]` row of the loop definition, `loop/loop.toml` under
-    the tool root (TOOL-dDeclaredLoop-18 S2)."""
+    """The `step` namespace: the `tag` of each `[[step]]` row of the loop definition, the loop kit's
+    `loop.toml` under the tool root (TOOL-dDeclaredLoop-18 S2)."""
     if text is None:
         return "" if _read_tool_file(ctx, path, "loop", "loop.toml") else None
     return derive_tag_rows(text, "step")

@@ -128,6 +128,10 @@ id = "policy"
 descriptor = "{prefix}/policy/kit.toml"
 
 [[entry]]
+id = "loop"
+descriptor = "{prefix}/loop/kit.toml"
+
+[[entry]]
 id = "check-placeholders"
 descriptor = "{prefix}/govkit/entries/check-placeholders.kit.toml"
 why_split = "a FLAT entry for two depth-1 FILES under <prefix>/, not a kit directory; `<prefix>/*` is a depth-1 surface glob that includes files, so each one is its own unclaimed path"

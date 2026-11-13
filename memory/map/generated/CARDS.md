@@ -129,6 +129,16 @@ Naming predicates over a per-repo DECLARATION — a closed verb table, a banned-
 - globs 4: `tools/lexicon/*`, `tools/check-placeholders.sh`, `tools/check-placeholders.test.sh`
 - cut 1 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
+## loop
+
+The loop definition: the five gov steps as data, each roles workflow's build order, step and reach word, and the one reader every other kit takes them from
+
+- status `building` · streams `tooling` · dossier `memory/map/features/loop.md`
+- decisions 1: `TOOL-dDeclaredLoop-1`
+- gate-legs 1: `loop definition`
+- kits 1: `loop`
+- globs 2: `tools/loop/**`, `help/loop.md`
+
 ## memory-recall
 
 Conf-driven retrieval over the memory tree, and a merge-bar floor over a committed question set

@@ -1,0 +1,41 @@
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/.
+# Contract: memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-1.md
+
+id = "loop"
+home = "loop"
+layer = "layer.flow"
+scope = "repo"
+# The kit's version constant; README.md's first line carries the marker that equals it.
+version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
+# The definition names no other kit's file and its reader is stdlib only. The roles kit requires this
+# one, since its catalogue checker and its adopter read each workflow's order here.
+requires = []
+
+# Everything the kit ships is engine, overwritten on every update: the definition, its reader, the
+# adopter and the README. The gov steps and each workflow's place are gov's, never an adopter's seed.
+[[files]]
+include = "**"
+role = "engine"
+
+# The adopter grades the installed definition and writes nothing, so adopting is checking.
+[adopt]
+argv = ["bash", "{kit}/adopt-loop.sh", "--check"]
+mutates_index = false
+why_no_regenerate = "the adopter reads the definition the kit ships and writes nothing: there is no rendered artifact to go a vintage stale"
+
+[check]
+argv = ["bash", "{kit}/adopt-loop.sh", "--check"]
+
+[[outcome]]
+code = 0
+probe = { must_exist = "{kit}/loop.toml" }
+means = "adopted"
+
+# THE DEFINITION LEG SHIPS. Its subject is the definition every reader in the target reads, so a
+# failure means the target's loop does not read, whoever changed it.
+[[gate_leg]]
+name = "loop definition"
+subject = "repo"
+argv = ["python", "{kit}/loop_lib.py", "--check"]
+guard = []
+ceiling = 120

@@ -40,7 +40,8 @@ carrying the rule lines the role cites and the charter's Protocols and Facts sec
 the hooks read; its `--check` is the `roles render wiring` leg (TOOL-aOrientedCast-3). The kit's
 adopter, `adopt-roles.sh`, renders the `/build` Skill from `SKILL.template.md`: the router an
 attended session follows after kickoff's go, whose `## Stage` headings the render binds to the
-workflow table's stages, and whose `--check` byte-compares the committed render (KICK-aOrientedCast-2). The
+orders of the loop definition, the loop kit's `loop.toml`, where each workflow's build order and
+step moved from this kit's table (TOOL-dDeclaredLoop-1), and whose `--check` byte-compares the committed render (KICK-aOrientedCast-2). The
 kit is a default adopter kit: govkit installs it, seeds the house overlays once, and its adopter
 renders all three artifacts at install and update behind the one `roles render wiring` leg; with no
 governing doc at `CHARTER` it renders the Skill alone and exits 3, an accepted outcome, and
@@ -171,5 +172,7 @@ seam: `roles_lib.render_role` — reuse for any route that hands a role to an ag
 extend via the house overlay, never a second composition.
 seam: `roles_lib.load_workflows` + `workflows.toml` — reuse for any consumer that needs which roles
 drive a workflow or which stage key spawns as which role; extend via a new key graded by the checker.
+seam: `roles_lib.read_workflow_order` — reuse for a consumer inside this kit that needs a workflow's
+build order; it reads the loop kit's `loop.toml` through that kit's reader, never a key of this table.
 seam: `handoff.py render` / `harness-args` — reuse for any route that hands an agent its prompt or a
 harness its roles; extend via a new `reads` source in the renderer, never a hand-written prompt.

@@ -9,7 +9,7 @@ description: Drive an ATTENDED code build through the harness pipeline an unatte
 
 This Skill is a ROUTER. The procedure is `{{MEMORY_ROOT}}/guides/BUILD-METHOD.md`: read it WHOLE
 before stage 3, and it wins any difference. The stages below are the workflows of
-`{{KIT_DIR}}/workflows.toml`, in its stage order. Every `handoff.py` here is
+`{{KIT_DIR}}/workflows.toml`, in the order the loop kit's definition, `loop.toml`, gives them. Every `handoff.py` here is
 `python {{KIT_DIR}}/handoff.py`, and every `unattended.sh` is `bash {{TOOL_ROOT}}unattended/unattended.sh`.
 
 ## Before stage 3

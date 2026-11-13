@@ -3352,7 +3352,9 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
                       "modules-link-dangling"):
             mods = target / ".git" / "modules"
             if kind == "modules-link-loop":
-                loop, to = mods / "a" / "loop", mods
+                # the link is named `loop`, the kind's last word: spelt here it reads as a kit path,
+                # since a kit of that name landed (TOOL-dDeclaredLoop-1)
+                loop, to = mods / "a" / kind.rsplit("-", 1)[-1], mods
                 loop.parent.mkdir()
             elif kind == "modules-root-link":
                 loop, to = mods, tmp / "modules-root"

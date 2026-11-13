@@ -56,9 +56,11 @@ level-0 block sits inside `## Task` because the spawn guard hands a native agent
 that section. With no playbook kit the prompt renders unranked and one `envelope — unarmed` note
 prints; a registry that does not read refuses, naming it. The
 `practices` slot is a `### Practices at <step>` block, one `- [<name>] <reach>` line per active practice
-whose catalogue row reaches the `step` of the role's workflow row, which the playbook kit's load-set check
-prints in the run it already makes; a step of `none`, no playbook kit or a workflow with no row leaves it
-empty (PLAY-dOrderedCharter-21). Each workflow row's `step` is one of `check_roles.py`'s `STEP_NAMES`. A `task:` key is read from the session card's `## task`
+whose catalogue row reaches the reach word of the role's workflow, which the playbook kit's load-set check
+prints in the run it already makes; a word of `none`, no playbook kit, no loop kit or a workflow with no
+row there leaves it empty (PLAY-dOrderedCharter-21). The reach word is the loop definition's, the loop
+kit's `loop.toml`: the workflow row's `reach` there, else the last segment of its `step`, else `none`
+(TOOL-dDeclaredLoop-1). A `task:` key is read from the session card's `## task`
 field by the kickoff checker's field grammar, a `card:` key from that card's section, a `brief:` key
 from the build's brief record, `brief:prompt` from its `## The prompt` section and every other one
 from its `### <sub-head>` under `## The brief`, and an `input:` key from `--input`. A required key
@@ -324,9 +326,10 @@ record in the build that shipped this renderer is the instrument to re-run.
 
 `roles` is in govkit's default selection (TOOL-aOrientedCast-8), so `govkit apply` installs it and
 `govkit update --write` installs it where a receipt predates it, printing `default-gained`. It
-requires the kickoff kit, whose card writer every `task:` and `card:` input is read from, and the
+requires the kickoff kit, whose card writer every `task:` and `card:` input is read from, the
 memory-tree kit, whose `.memory-tree.conf` names the memory root and, by `CHARTER`, the governing
-doc the roles' rule tags resolve against.
+doc the roles' rule tags resolve against, and the loop kit, whose `loop.toml` holds each workflow's
+build order and step (TOOL-dDeclaredLoop-1).
 
 **A role's `rules` tags.** A tag every v4.x charter template carries outside any `when:` or `kit:`
 block is cited bare. A tag a target's charter may lack is cited with a trailing `?` — `spec`, which v4.0
@@ -365,7 +368,7 @@ type or role index on its eol line.
 
 `bash adopt-roles.sh --scaffold | --check` renders `SKILL.template.md` into
 `.claude/skills/build/SKILL.md`, the router an ATTENDED session follows after kickoff's READY card
-and the owner's go (KICK-aOrientedCast-2). It walks this catalogue's workflows in stage order and
+and the owner's go (KICK-aOrientedCast-2). It walks this catalogue's workflows in the loop definition's order and
 points at the carriers `/unattended` already follows (the build method, the verbs guide, the two
 build harnesses' attended mode, the review harness) instead of restating them; every agent it orders
 is spawned from a `handoff.py render` and every harness call carries `handoff.py harness-args` and
@@ -391,10 +394,12 @@ answer reads the disk at render time: `apply` runs the adopter before the harnes
 a first install names the plain path, `--check` reads the Skill out of sync, and the next
 `--scaffold`, which `govkit update` runs, corrects it. A failed citation pass exits 2.
 
-The render also BINDS the Skill's stages to `workflows.toml`: each `## Stage <n> — <workflow>`
-heading must name a workflow whose `stage` is `<n>`, the headings ascend strictly, and every
-workflow of stage 1 or more is named by exactly one heading. A disagreement exits 1 naming the
-heading and the entry; a catalogue read yielding zero workflows exits 2 as a dead probe. `--check`
+The render also BINDS the Skill's stages to the loop definition, the loop kit's `loop.toml`, read
+through `roles_lib.read_workflow_order` (TOOL-dDeclaredLoop-1): each `## Stage <n> — <workflow>`
+heading must name a workflow whose `order` there is `<n>`, the headings ascend strictly, and every
+workflow of order 1 or more is named by exactly one heading. A disagreement exits 1 naming the
+heading and the entry; no loop kit, a definition that does not read, or one placing zero workflows
+exits 2. `--check`
 renders in memory and byte-compares with the file on disk, carriage returns stripped from both, so
 it grades exactly what `--scaffold` would write.
 
@@ -410,7 +415,9 @@ the role files, the overlays and the workflow table against each other in both d
 memory-tree conf's `CHARTER` key; a body or an overlay spelling a protocol's file name reds as R5 or
 R10. A role called mandatory under a workflow whose `enforced-by` names no hook script, without an
 `unenforced — <why>` clause, reds as R13, and a writer role whose `output` lacks its class's folder
-as R14. A stand-in declaration and the owner's waiver rows are joined as R15, under "Standing in for
+as R14. The workflow table is joined with the loop definition by workflow name, both ways, as R6: a
+workflow's build order and step are that definition's, so a `stage` or `step` key in the table reds
+as unknown (TOOL-dDeclaredLoop-1). A stand-in declaration and the owner's waiver rows are joined as R15, under "Standing in for
 a role". It prints one line per defect naming the file and the rule (the rules are listed in its
 header, with what it does not check), then a summary of every count it graded, the charter's shape among
 them. Exit 0 clean, 1 on a defect or an empty catalogue (DEAD PROBE), 2 when the conf, its
@@ -420,18 +427,18 @@ else; the check compares the two on every run.
 <!-- gen:roles-catalogue -->
 **Workflows**, from `workflows.toml`:
 
-| name | stage | step | driver | harness | roles | stages | enforced-by | trigger |
-|---|---|---|---|---|---|---|---|---|
-| orient | 1 | entry | main-loop | /session-kickoff | gov-orienter | — | manifest-check.sh --card --append | once per session, at kickoff, before the first work-unit is opened |
-| reuse | 2 | design | agent | none | gov-reuse-scout | — | none — the scout's trigger is the kickoff opt-in that aScoutedSeam owns | before a new behaviour is designed, when kickoff asks for a scout |
-| spec-write | 3 | design | workflow | {prefix}/workflows/unattended-build.js | gov-spec-writer, gov-builder, gov-spec-reviewer, gov-skeptic, gov-synthesizer | specWriter → gov-spec-writer, disposal → gov-spec-writer, builder → gov-builder, specFinder → gov-spec-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | scratch-guard.js role arm | once per build, after orientation, for every unit whose spec is missing or thin |
-| spec-review | 4 | review | workflow | {prefix}/workflows/tier2-review.js | gov-spec-reviewer, gov-skeptic, gov-synthesizer | specFinder → gov-spec-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | agent-cap.js spawn guard, on the build harness's Workflow call whose roles carry the audit's review keys | after the spec set is written, where the build or its project declares a spec audit |
-| build | 5 | build | workflow | {prefix}/workflows/unattended-unit.js | gov-builder | builder → gov-builder | scratch-guard.js role arm, routed commits name a specced unit | once per unit, in stage order, after its spec is READY |
-| closing-review | 6 | review | workflow | {prefix}/workflows/tier2-review.js | gov-diff-reviewer, gov-skeptic, gov-synthesizer | diffFinder → gov-diff-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | agent-cap.js spawn guard | once per build, after the last unit is terminal, over the cumulative diff |
-| gate-bar | 7 | test | program | bash {prefix}/run-gates/run-gates.sh | — | — | the pre-push hook | once, after the closing review, at the close or the push boundary |
-| research | 0 | plan | agent | none | gov-researcher | — | agent-cap.js spawn guard | any time a design must choose between candidates that no existing seam decides |
-| handoff | 0 | none | program | python {prefix}/roles/handoff.py render | gov-session | — | none — a session-to-session message is no tool call the spawn guard sees | any time work passes to another session of this repository |
-| bookkeeping | 0 | none | main-loop | none | — | — | memory hygiene | any time a record, an index or the run state is updated |
+| name | driver | harness | roles | stages | enforced-by | trigger |
+|---|---|---|---|---|---|---|
+| orient | main-loop | /session-kickoff | gov-orienter | — | manifest-check.sh --card --append | once per session, at kickoff, before the first work-unit is opened |
+| reuse | agent | none | gov-reuse-scout | — | none — the scout's trigger is the kickoff opt-in that aScoutedSeam owns | before a new behaviour is designed, when kickoff asks for a scout |
+| spec-write | workflow | {prefix}/workflows/unattended-build.js | gov-spec-writer, gov-builder, gov-spec-reviewer, gov-skeptic, gov-synthesizer | specWriter → gov-spec-writer, disposal → gov-spec-writer, builder → gov-builder, specFinder → gov-spec-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | scratch-guard.js role arm | once per build, after orientation, for every unit whose spec is missing or thin |
+| spec-review | workflow | {prefix}/workflows/tier2-review.js | gov-spec-reviewer, gov-skeptic, gov-synthesizer | specFinder → gov-spec-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | agent-cap.js spawn guard, on the build harness's Workflow call whose roles carry the audit's review keys | after the spec set is written, where the build or its project declares a spec audit |
+| build | workflow | {prefix}/workflows/unattended-unit.js | gov-builder | builder → gov-builder | scratch-guard.js role arm, routed commits name a specced unit | once per unit, in stage order, after its spec is READY |
+| closing-review | workflow | {prefix}/workflows/tier2-review.js | gov-diff-reviewer, gov-skeptic, gov-synthesizer | diffFinder → gov-diff-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | agent-cap.js spawn guard | once per build, after the last unit is terminal, over the cumulative diff |
+| gate-bar | program | bash {prefix}/run-gates/run-gates.sh | — | — | the pre-push hook | once, after the closing review, at the close or the push boundary |
+| research | agent | none | gov-researcher | — | agent-cap.js spawn guard | any time a design must choose between candidates that no existing seam decides |
+| handoff | program | python {prefix}/roles/handoff.py render | gov-session | — | none — a session-to-session message is no tool call the spawn guard sees | any time work passes to another session of this repository |
+| bookkeeping | main-loop | none | — | — | memory hygiene | any time a record, an index or the run state is updated |
 
 **Roles**, from `agents/*.agent.md`:
 

@@ -12,3 +12,4 @@
 # the install-prefix gate's old waiver registry, which was shrink-only and could only lose rows.
 
 lib     gov-internal. Ships nothing to an adopter; every copy-installed kit carries its contents inline instead.
+loop    holds the loop's definition and its reader, installed through the roles kit's `requires`. A charter loop section rendered from it is a non-goal of TOOL-dDeclaredLoop-1, the unit that made the kit.

@@ -228,6 +228,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "LoopError",
+      "kind": "class",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "MapError",
       "kind": "class",
       "file": "tools/codebase-map/map_lib.py"
@@ -1129,6 +1134,11 @@
     },
     {
       "id": "arm_drive_no_row",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_drive_order",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
     },
@@ -6303,6 +6313,11 @@
       "file": "tools/unattended/resume-tick.sh"
     },
     {
+      "id": "check_loop",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "check_m26_probe",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
@@ -10793,6 +10808,11 @@
       "file": "tools/push-main.sh"
     },
     {
+      "id": "derive_reach",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "derive_reach_units",
       "kind": "function",
       "file": "tools/playbook/load_sets.py"
@@ -13693,6 +13713,16 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "load_loop",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
+      "id": "load_loop_kit",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "load_manifest",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
@@ -14146,6 +14176,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/lib/python_floor.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "main",
@@ -17863,6 +17898,11 @@
       "file": "tools/playbook/tag_index.py"
     },
     {
+      "id": "read_definition",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "read_defs_at_sha",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -20658,6 +20698,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "read_steps",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "read_stop_listing",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -21256,6 +21301,21 @@
       "id": "read_witnessed_members",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "read_workflow_order",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
+      "id": "read_workflow_order",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "read_workflow_reach",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "read_workflows",
@@ -22506,6 +22566,11 @@
       "id": "render_drive_line",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "render_drive_loop",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "render_driver_lines",
@@ -24921,6 +24986,11 @@
       "id": "resolve_python",
       "kind": "function",
       "file": "tools/lib/resolve-python.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
+      "file": "tools/loop/adopt-loop.sh"
     },
     {
       "id": "resolve_python",
@@ -33331,6 +33401,11 @@
       "id": "write_lookup",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
+    },
+    {
+      "id": "write_loop_plant",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "write_manifest",

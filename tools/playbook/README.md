@@ -289,8 +289,9 @@ lexicon's `--tags` grades the same names. A cited span that is the base name of 
 as a file name, never red.
 
 TOOL-dDeclaredLoop-18 registers four more, their extractors beside the eight: `step` and `item` (each
-`[[step]]` and `[[item]]` row's `tag` in the loop definition, `loop/loop.toml` under the tool root, both
-`selects` and `unarmed` until that file lands), `policy` (`policy.<name>` for each `[[key]]` row of the
+`[[step]]` and `[[item]]` row's `tag` in the loop definition, the loop kit's `loop.toml`, both
+`selects`; `step` is armed since TOOL-dDeclaredLoop-1 landed that file, and `item` stays `unarmed` until it
+holds an `[[item]]` row), `policy` (`policy.<name>` for each `[[key]]` row of the
 policy kit's `catalogue.toml` whose name is all literal segments) and `command` (`command.<id>.<verb>` for
 each `[[command]]` row, `verb` and `run`, of a kit descriptor, `unarmed` until a descriptor holds one). A
 catalogue name carrying a `<word>` or `*` segment is no member: its literal prefix is one `family` row,

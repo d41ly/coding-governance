@@ -1944,6 +1944,18 @@
     "ceiling": 120
   },
   {
+    "name": "loop definition",
+    "argv": [
+      "python",
+      "{prefix}/loop/loop_lib.py",
+      "--check"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p1"]
+  },
+  {
     "name": "layer dependencies (the core never depends on an expansion)",
     "argv": [
       "python",

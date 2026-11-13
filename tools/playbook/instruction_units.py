@@ -2591,9 +2591,19 @@ DRIVE_DIR_ROWS = ('[[drive]]\nstage = "start"\nrole = "main"\ncommand = "/fixtur
                   '[[drive]]\nstage = "build"\nrole = "gov-builder"\ncommand = "python fixture.py build"\n'
                   'when = "a fixture unit"\n')
 DRIVE_FLAT_ROWS = '[[drive]]\nstage = "gate-bar"\nrole = "main"\ncommand = "bash fixture-land.sh"\nwhen = "the close"\n'
-DRIVE_WORKFLOWS = ('[[workflow]]\nname = "build"\nstage = 5\nroles = ["gov-builder"]\n\n'
-                   '[[workflow]]\nname = "gate-bar"\nstage = 7\nroles = []\n')
+DRIVE_WORKFLOWS = ('[[workflow]]\nname = "build"\nroles = ["gov-builder"]\n\n'
+                   '[[workflow]]\nname = "gate-bar"\nroles = []\n')
 DRIVE_KITS = ("memory-tree", "push-main")   # a dir kit and a flat entry of the real registry
+
+
+def render_drive_loop(build=5, gate_bar=7) -> str:
+    """The fixture's loop definition (TOOL-dDeclaredLoop-1): the gov steps and the two workflows the drive
+    rows name, at the orders given; the shipped orders by default."""
+    steps = ("plan", "design", "build", "test", "deploy")
+    return "".join(f'[[step]]\ntag = "step.{s}"\norder = {n}\nstate = "{s}"\nexit = "item.{s}.exit"\n\n'
+                   for n, s in enumerate(steps, 1)) + (
+        f'[[workflow]]\nname = "build"\norder = {build}\nstep = "step.build"\n\n'
+        f'[[workflow]]\nname = "gate-bar"\norder = {gate_bar}\nstep = "step.test"\n')
 
 
 def write_drive_charter(c, drop=None, add=None):
@@ -2605,11 +2615,15 @@ def write_drive_charter(c, drop=None, add=None):
                  + f"\n{rp.ONE_LINE_CLOSE}\n")
 
 
-def write_drive_tree(c, dir_rows=DRIVE_DIR_ROWS, kit_toml=None):
+def write_drive_tree(c, dir_rows=DRIVE_DIR_ROWS, kit_toml=None, loop=None):
     """The tree the drive check grades green, laid out as an install: this kit's descriptor and the registry
     beside the engine, the flat entry's descriptor beside them, the dir kit's and the roles kit's at the tool
-    root, the deploy answers selecting the two, and a charter rendered from their rows."""
+    root, the loop kit's definition, `loop` or the fixture's own, with a copy of the real reader at the home
+    `loop` there, the deploy answers selecting the two, and a charter rendered from their rows."""
     import render_playbook as rp
+    c.write_file(derive_tool_rel("loop", "loop.toml"), loop or render_drive_loop())
+    c.write_file(derive_tool_rel("loop", "loop_lib.py"),
+                 (rp.load_loop_kit(KIT_DIR)[1] / "loop_lib.py").read_text(encoding="utf-8"))
     c.write_file(derive_kit_rel("kit.toml"), kit_toml or (KIT_DIR / "kit.toml").read_text(encoding="utf-8"))
     c.write_file(derive_kit_rel("registry.toml"),
                  rp.resolve_declaration_paths(KIT_DIR, KIT_DIR)[1].read_text(encoding="utf-8"))
@@ -2676,6 +2690,19 @@ def arm_drive_lost_line(c):
     check_drive_red(c, "a rendered line deleted from the drive region", [f"{DRIVE_KITS[1]} · row 1", "fixture-land.sh"])
 
 
+def arm_drive_order(c):
+    """TOOL-dDeclaredLoop-1 S9: the drive rows sort by the loop definition's orders. At the shipped orders
+    the build row lists before the gate-bar row; with the two orders swapped in the fixture's definition the
+    gate-bar row lists first. A sort reading the roles catalogue, which carries no order, keeps kit and row
+    order and lists the build row first both times."""
+    for orders, first, second in (({}, "build", "gate-bar"), ({"build": 7, "gate_bar": 5}, "gate-bar", "build")):
+        write_drive_tree(c, loop=render_drive_loop(**orders))
+        lines, rc = run_drive(c.top, "--list", c.top / derive_kit_rel(""))
+        at = {s: next((n for n, ln in enumerate(lines) if f"- {s} · " in ln), -1) for s in (first, second)}
+        c.check(f"with {orders or 'the shipped orders'} drive --list lists the {first} row before the {second} row",
+                rc == 0 and -1 < at[first] < at[second], " | ".join(lines))
+
+
 def arm_drive_default_route(c):
     """PLAY-dOrderedCharter-23, moved by PLAY-dOrderedCharter-80 S10: the shipped unattended and roles
     descriptors render the unattended start line once, the attended /build line directly under it.
@@ -2709,6 +2736,7 @@ PLANTS = {"parse": arm_parse, "tags": arm_tags, "priority": arm_priority, "state
           "drive-bad-role": arm_drive_bad_role, "drive-no-row": arm_drive_no_row,
           "drive-empty-command": arm_drive_empty_command, "drive-unshipped-descriptor": arm_drive_unshipped_descriptor,
           "drive-hand-line": arm_drive_hand_line, "drive-lost-line": arm_drive_lost_line,
+          "drive-order": arm_drive_order,
           "drive-default-route": arm_drive_default_route, "map-held": arm_map_held,
           "practices-reach": arm_practices_reach, "card-absent": arm_card_absent, "card-level": arm_card_level,
           "card-tracked": arm_card_tracked}
