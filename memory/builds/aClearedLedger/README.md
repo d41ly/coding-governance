@@ -70,13 +70,13 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 9 unit(s) · node a · opened 2026-11-13 · streams tooling
+**Build status:** INPROGRESS · 9 unit(s) · node a · opened 2026-11-13 · streams tooling
 ids TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-7 TOOL-aClearedLedger-8 TOOL-aClearedLedger-9 TOOL-aClearedLedger-10
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aClearedLedger-1 — the `[spec]` practice states its one exception: an inline red fix commits no spec and owes its typed record](spec/2026-11-13-spec-TOOL-aClearedLedger-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-11-13 |
+| [TOOL-aClearedLedger-1 — the `[spec]` practice states its one exception: an inline red fix commits no spec and owes its typed record](spec/2026-11-13-spec-TOOL-aClearedLedger-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-11-13 |
 | [TOOL-aClearedLedger-2 — the protocol's section 12 says why a red fix's record is the next commit and cannot ride its own fix](spec/2026-11-13-spec-TOOL-aClearedLedger-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-13 |
 | [TOOL-aClearedLedger-3 — the gate guard denies a flag-form suite the leg manifest declares above the direct-check bound, and its parity arm reads every direct-check form](spec/2026-11-13-spec-TOOL-aClearedLedger-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-11-13 |
 | [TOOL-aClearedLedger-4 — the scratch guard suite's context arms start from a session tree with no card file](spec/2026-11-13-spec-TOOL-aClearedLedger-4.md) | 4 | 1 | SPECCED | rev-1 | 2026-11-13 |
@@ -87,7 +87,7 @@ ids TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClea
 | [TOOL-aClearedLedger-10 — four suite budget rows re-declared from readings taken alone on a quiet node, with the ceiling evidence and the pass legs re-derived](spec/2026-11-13-spec-TOOL-aClearedLedger-10.md) | 10 | 1 | SPECCED | rev-1 | 2026-11-13 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 2 record folder(s).
+Records: 4 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
