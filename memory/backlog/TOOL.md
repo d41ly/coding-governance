@@ -185,7 +185,7 @@ Cite ids, never line numbers.
 | [TOOL-aMeteredTurnstile-5](../builds/aMeteredTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | longest-first dispatch pessimises time-to-first-signal by construction:… |
 | [TOOL-aMeteredTurnstile-6](../builds/aMeteredTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | the bar did not get slower, PROCESS CREATION did: measured 2026-08-20… |
 | [TOOL-aNamedGesture-2](../builds/aNamedGesture/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | the kickoff manifest's last-audit stamp read 2026-08-26T10:10:00+03:00… |
-| [TOOL-aNimbleMend-17](../builds/aNimbleMend/BACKLOG.md) | SPECCED | LOW | TOOL-aClearedLedger-4 | 2026-11-13 | INHERITED RED: SEVEN CONTEXT ARMS OF THE SCRATCH-GUARD SUITE.… |
+| [TOOL-aNimbleMend-17](../builds/aNimbleMend/BACKLOG.md) | INPROGRESS | LOW | TOOL-aClearedLedger-4 | 2026-11-13 | INHERITED RED: SEVEN CONTEXT ARMS OF THE SCRATCH-GUARD SUITE.… |
 | [TOOL-aNimbleMend-18](../builds/aNimbleMend/BACKLOG.md) | SPECCED | LOW | TOOL-aClearedLedger-5 | 2026-11-13 | INHERITED RED: THE SPEC-TOKENS SUITE'S MANIFEST PARITY ARM.… |
 | [TOOL-aNimbleMend-19](../builds/aNimbleMend/BACKLOG.md) | SPECCED | MED | TOOL-aClearedLedger-6 | 2026-11-13 | INHERITED RED: EIGHT LINES OF THE HYGIENE SELF-TEST.… |
 | [TOOL-aNimbleMend-20](../builds/aNimbleMend/BACKLOG.md) | SPECCED | MED | TOOL-aClearedLedger-7 | 2026-11-13 | INHERITED RED: THIRTY-THREE WRONG ASSERTIONS OF THE POLICY FIXTURES… |
