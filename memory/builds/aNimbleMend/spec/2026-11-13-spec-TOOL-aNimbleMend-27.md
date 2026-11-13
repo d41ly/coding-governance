@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-27 — the close's three red legs repaired: three no-fork forms in the pass-leg adapter, five guards that cover what they import, one manifest bullet inside its cap, and four re-declared rows
 
-**Status:** SPECCED · rev-1 · 2026-11-13 · node a · Tier-1 · base 2ba17e9d · streams tooling · order 16
+**Status:** INPROGRESS · rev-1 · 2026-11-13 · node a · Tier-1 · base 2ba17e9d · streams tooling · order 16
 
 <!-- gen:spec-records -->
 
