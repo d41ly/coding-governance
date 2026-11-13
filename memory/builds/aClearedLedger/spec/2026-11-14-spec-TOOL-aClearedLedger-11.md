@@ -141,7 +141,7 @@ and every word after it, holds all three rules. Every script word is tried in or
 
 Rule 3 is the stricter of the two forms the review records for item M2, and it is the one both of
 the skeptic's judgements hold under. The looser form reads any option after `at` as a hit, which
-denies `--fixture --list`; the judgement on finding 9 calls that unsound against the hook's own
+denies `--fixture --list`; the judgement on finding 9 calls that unsound against the hook's own <!-- PINNED 2026-11-14 -->
 header. Under rule 3 a changed directory is a hit, a case word is a miss by the option name, and a
 case word after the full argv is a miss by length.
 
@@ -177,7 +177,7 @@ const g = require('./tools/unattended/gate-guard.js'), c = 'bash x/y.test.sh>x.l
 g.scanDenyHits(c, g.buildCommandView(c), 0, 'Bash').map((h) => h.row).join()
 ```
 
-The fail-open probe. The pass builds the scratch fixture TOOL-aClearedLedger-3's section 4 calls
+The fail-open probe. The pass builds the scratch fixture TOOL-aClearedLedger-3's section 4 calls <!-- PINNED 2026-11-14 -->
 `<F>`, copies the hook to `<F>/kit/gate-guard.js`, and feeds that copy with `node` a `Bash`
 payload whose `cwd` is `<F>` and whose command is the line below. The copy reads its manifest at
 `<F>/gate-legs.json`.
