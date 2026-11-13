@@ -49,6 +49,16 @@ commit; `--staged` grades HEAD alone and refuses that same fix, so the commit af
 NOT CHECKED: that the record is the fix's direct child, that `Rerun` or `Red line` is true, or that the leg
 was red. `--fixture --plant red-fix-join` stages the door's refusals and each finding.
 
+THE DISPOSITION KIND and its stand-in door (TOOL-dDeclaredLoop-16 S4): `build_records.py new disposition
+--build <slug> --unit <id> --item <tag> --disposition <word> --channel <channel> [--reason <text>]` writes the
+next `<date>-build-<unit id>-disposition-<n>.md`, the owner's disposition of one loop item: `Item` (a tag
+opening `item.`), `Disposition` (one word), `Channel` (`mailbox`, `terminal` or `prompt`, where the owner
+answered), an optional `Reason` and `Caused-by`. It refuses, exit 1 and writing nothing, an `--item` that is no
+such tag, a `--disposition` that is not one word, a `--channel` outside the closed set and an empty
+`--reason`. It is the door every channel calls until a mailbox or a prompt writer adopts it. NOT CHECKED
+here: that the word is a member of the item's closed outcome set, which is the loop kit's
+`check_disposition_record`, since a kit imports no sibling; and that the item is declared.
+
 ONE LINE PER VALUE, at the one writer (PLAY-dOrderedCharter-49 S53): `write_record` refuses a field value
 holding a CR or an LF, or opening `**<Word>:**`, before it writes anything, so no door's value forges a
 field; every door's refusal exits 1, writing nothing.
@@ -86,7 +96,8 @@ ID = r"[A-Za-z]+-[A-Za-z0-9]+-\d+"
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 SLUG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9-]*$")
 PRINCIPLE = re.compile(r"^principle\.p[1-9]\d*$")
-TAG = r"[a-z0-9][a-z0-9-]*(?:\.[a-z0-9][a-z0-9-]*)+"
+SEG = r"[a-z0-9][a-z0-9-]*"                                    # one segment of a tag, and one disposition word
+TAG = SEG + r"(?:\." + SEG + r")+"
 PIN = re.compile(TAG + r"@[0-9a-f]{8}")
 FORGED_FIELD = re.compile(r"^\s*\*\*[A-Za-z][A-Za-z-]*(?: [a-z]+)?:\*\*")   # a value that would read as a field
 CHANGE_ACTIONS = ("add", "edit", "remove", "rename", "split")   # the one list `instructions_edit.WRITE_VERBS` reads
@@ -95,6 +106,7 @@ CHANGE_MARKS = ("editorial", "semantic")
 OVERRIDE_TAKEN = ("explicit-override", "live-owner-wins")   # the `charter.override` values an override is taken under
 PROOF = re.compile(r"tty-cli|none — \S.*")
 DOOR_PROOF = "none — stand-in door"
+DISPOSITION_CHANNELS = ("mailbox", "terminal", "prompt")   # where the owner answered a held item
 
 # kind -> its required fields and its closed sets, `(field, allowed values)` in refusal order
 KINDS = {
@@ -122,11 +134,15 @@ KINDS = {
         "required": ("Leg", "Red line", "Files", "Commit", "Rerun", "Caused-by"),
         "closed": (),
     },
+    "disposition": {
+        "required": ("Item", "Disposition", "Channel", "Caused-by"),
+        "closed": (("Channel", DISPOSITION_CHANNELS),),
+    },
 }
 if set(KINDS) != set(TYPED_RECORD_KINDS):
     raise ImportError("build_records: the kind table and tree_lib.TYPED_RECORD_KINDS differ on "
                       + ", ".join(sorted(set(KINDS) ^ set(TYPED_RECORD_KINDS))))
-DOORS = ("exception", "change", "override", "red-fix")  # the kinds `new <kind>` writes; every other kind is `write_record`'s alone
+DOORS = ("exception", "change", "override", "red-fix", "disposition")  # the kinds `new <kind>` writes; every other kind is `write_record`'s alone
 PLANTS = ("typed-kinds", "pending-kind", "red-fix-join")
 SHA40 = re.compile(r"[0-9a-f]{40}")
 SAY_JOIN = "build-records: red-fix join"
@@ -471,6 +487,43 @@ def check_red_fix_join(root, staged=False):
     return (1 if found else 0), lines
 
 
+# -------------------------------------------------------------------------------- the disposition kind
+def check_disposition_fields(fields):
+    """The disposition kind's own field rules: `Item` a tag opening `item.`, `Disposition` one word."""
+    bad = []
+    item, word = fields.get("Item"), fields.get("Disposition")
+    if item is not None and not (item.startswith("item.") and re.fullmatch(TAG, item)):
+        bad.append(("Item", f"{item} is no tag opening item."))
+    if word is not None and not re.fullmatch(SEG, word):
+        bad.append(("Disposition", f"{word} is not one word"))
+    return bad
+
+
+def read_disposition(path, text):
+    """One disposition record: its fields under their own names, and `id`, `path`, `build`, `n` and
+    `malformed`."""
+    fields, bad, name = read_record(path, text, "disposition", check_fields=check_disposition_fields)
+    return {**fields, "id": pathlib.PurePosixPath(path).stem, "path": path,
+            "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None,
+            "malformed": bad}
+
+
+def write_disposition(root, build, unit, item, disposition, channel, reason=None, today=None):
+    """The stand-in door: the next disposition record of `build`, written under `root`'s own memory tree.
+    -> its repo-relative path. Every value is validated here, the write boundary; a refusal is ValueError.
+    The word's membership of the item's outcome set is not read here: that join is the loop kit's."""
+    fields = [("Item", item), ("Disposition", disposition), ("Channel", channel)]
+    fields += [("Reason", reason)] * (reason is not None)
+    fields.append(("Caused-by", unit))
+    bad = [f"{k} is one non-empty line" for k, v in fields if not v or not v.strip()]
+    if channel not in DISPOSITION_CHANNELS:
+        bad.append(f"Channel {channel} is outside {' · '.join(DISPOSITION_CHANNELS)}")
+    bad += [f"{k} {why}" for k, why in check_disposition_fields(dict(fields))]
+    if bad:
+        raise ValueError("; ".join(bad))
+    return write_record(root, build, unit, "disposition", f"{item} disposed {disposition}", fields, today)
+
+
 def write_record(root, build, unit, kind, title, fields, today=None):
     """The record writer every door shares: the next `kind` record of `build` under `root`'s own memory tree,
     headed `# <unit> <kind> <n> — <title>`, then `**Serves:** <kind> <unit>` and each `(key, value)` of
@@ -519,6 +572,8 @@ DOOR_ARGV = {
     # the fixture's first commit carries the trailer, so HEAD is a fix of this leg when the door runs
     "red-fix": (["--leg", "the fixture leg", "--red-line", "FAIL the fixture leg", "--commit", "HEAD",
                  "--rerun", "the fixture leg · green"], ["--leg", "the fixture leg"]),
+    "disposition": (["--item", "item.plan.exit", "--disposition", "continue", "--channel", "terminal"],
+                    ["--item", "item.plan.exit"]),
 }
 
 
@@ -792,6 +847,9 @@ def main(argv):
         doors.choices["override"].add_argument(flag, required=True)
     for flag in ("--leg", "--red-line", "--commit", "--rerun"):
         doors.choices["red-fix"].add_argument(flag, required=True)
+    for flag in ("--item", "--disposition", "--channel"):
+        doors.choices["disposition"].add_argument(flag, required=True)
+    doors.choices["disposition"].add_argument("--reason")
     read = sub.add_parser("read", help="read one record and name every refusal")
     read.add_argument("path")
     join = sub.add_parser("join", help="join every Red-fix: commit to its red-fix record, both ways")
@@ -823,6 +881,9 @@ def main(argv):
                 rel = write_override(root, args.build, args.unit, args.rule, args.words, args.session)
             elif args.kind == "red-fix":
                 rel = write_red_fix(root, args.build, args.unit, args.leg, args.red_line, args.commit, args.rerun)
+            elif args.kind == "disposition":
+                rel = write_disposition(root, args.build, args.unit, args.item, args.disposition, args.channel,
+                                        args.reason)
             else:
                 rel = write_exception(root, args.build, args.unit, args.principle, args.excuses, args.reason,
                                       args.expires)
@@ -853,6 +914,8 @@ def main(argv):
         bad = read_override(rel, text)["malformed"]
     elif kind == "red-fix":
         bad = read_red_fix(rel, text)["malformed"]
+    elif kind == "disposition":
+        bad = read_disposition(rel, text)["malformed"]
     else:
         bad = read_exception(rel, text)["malformed"]
     for ln in text.replace("\r\n", "\n").split("\n"):

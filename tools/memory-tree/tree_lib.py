@@ -443,7 +443,7 @@ BIND_HEAD_LINES = 12
 # way. The factory's kind table is refused at import when its keys differ from this tuple: the
 # reader owns the one list, and the factory reads it, because the reader importing the factory
 # would cycle through `deviation_join.py`.
-TYPED_RECORD_KINDS = ("deviation", "exception", "override", "change", "red-fix")
+TYPED_RECORD_KINDS = ("deviation", "exception", "override", "change", "red-fix", "disposition")
 RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "journal", "research") + TYPED_RECORD_KINDS
 # Optional leading whitespace and an optional comment marker: the corpus holds a non-markdown record
 # (a shell script), where the line can only be a comment. An extension-scoped rule would structurally

@@ -4,7 +4,7 @@
 Derived, never authored: a build leaves this file when every one of its units reaches a
 terminal status. Nothing here is edited by hand.
 
-Dormant: no record dated within 21 days of 2026-11-13, the newest record date in this tree (aNimbleMend).
+Dormant: no record dated within 21 days of 2026-11-14, the newest record date in this tree (dDeclaredLoop).
 
 Landed-unclosed: the build's non-terminal units whose id tracked product source cites, by drift-audit's non_terminal_specs_cited_by_product_source join. A candidate to close, not a verdict.
 
@@ -17,7 +17,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dCalibratedLens](builds/dCalibratedLens/README.md) | DEFERRED | d | 2026-10-21 | tooling | 56 | 2026-11-04 | active | 0 |
 | [dClosedLoop](builds/dClosedLoop/README.md) | INPROGRESS | d | 2026-10-14 | playbook+kickoff+tooling+deployer | 39 | 2026-10-26 | active | 0 |
 | [dConvergedCharter](builds/dConvergedCharter/README.md) | DEFERRED | d | 2026-10-21 | playbook | 41 | 2026-11-05 | active | 0 |
-| [dDeclaredLoop](builds/dDeclaredLoop/README.md) | INPROGRESS | d | 2026-10-21 | tooling | 111 | 2026-11-13 | active | 0 |
+| [dDeclaredLoop](builds/dDeclaredLoop/README.md) | DEFERRED | d | 2026-10-21 | tooling | 111 | 2026-11-14 | active | 0 |
 | [dFurnishedOrders](builds/dFurnishedOrders/README.md) | DEFERRED | d | 2026-10-21 | tooling | 61 | 2026-11-05 | active | 0 |
 | [dIndexedDesign](builds/dIndexedDesign/README.md) | DEFERRED | d | 2026-10-21 | tooling | 53 | 2026-11-05 | active | 0 |
 | [dKeptSession](builds/dKeptSession/README.md) | DEFERRED | d | 2026-10-21 | kickoff | 66 | 2026-11-05 | active | 0 |

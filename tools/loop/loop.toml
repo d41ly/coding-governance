@@ -14,6 +14,16 @@
 #   step   the step its work sits in, a [[step]] tag above, or "none"
 #   reach  optional, `entry` or `review`: the word its work orders load practices under, where that is
 #          not the step's own last segment
+#
+# [dispositions], the one closed disposition set (cl-dClosedLoop-0101), the words a placing item returns:
+#   set    its members, each one word, none given twice
+# It is not the review round's exit (fold or promote, REVIEW_DISPOSITIONS of the unattended kit), not the
+# per-finding report grammar (class:, new:, gate:, none), and not triage's verdicts (select, defer,
+# retire, refuse), which move a build in planning to one of its terminal states.
+#
+# One [[disposition-alias]] row per legacy word that means a member:
+#   word   the legacy word, no member of the set
+#   means  the member it means
 
 [[step]]
 tag = "step.plan"
@@ -97,3 +107,18 @@ step = "none"
 name = "bookkeeping"
 order = 0
 step = "none"
+
+[dispositions]
+set = ["continue", "amend", "new", "patch", "repeat", "unit", "breakpoint", "ask", "none"]
+
+[[disposition-alias]]
+word = "attach"
+means = "amend"
+
+[[disposition-alias]]
+word = "defer"
+means = "ask"
+
+[[disposition-alias]]
+word = "refuse-as-duplicate"
+means = "continue"

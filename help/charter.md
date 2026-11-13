@@ -120,7 +120,7 @@ An install with no policy kit renders the `explicit-override` sentence and print
 committed value goes unread until you install that kit. A value the policy reader refuses stops the
 render, naming the key.
 
-An override taken is a record in the build's `build/` folder, written by the memory-tree kit: <!-- usage: script:tools/memory-tree/build_records.py#new d9f4ae09 -->
+An override taken is a record in the build's `build/` folder, written by the memory-tree kit: <!-- usage: script:tools/memory-tree/build_records.py#new 3cae4d5e -->
 
 <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries a placeholder the shell reads as a redirect -->
 ```bash

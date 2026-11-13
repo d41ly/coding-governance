@@ -5533,6 +5533,16 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "check_disposition_fields",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
+      "id": "check_disposition_record",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "check_dl_archive",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -18078,6 +18088,16 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_disposition",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
+      "id": "read_dispositions",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "read_dl_sum",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -19536,6 +19556,11 @@
       "id": "read_origin_scope",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
+    },
+    {
+      "id": "read_outcome_set",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "read_over_cap_findings",
@@ -24056,6 +24081,11 @@
       "id": "resolve_display_path",
       "kind": "function",
       "file": "tools/roles/check_roles.py"
+    },
+    {
+      "id": "resolve_disposition",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "resolve_drift_at",
@@ -33066,6 +33096,11 @@
       "id": "write_disposal_fixture",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_disposition",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "write_dl_landing",

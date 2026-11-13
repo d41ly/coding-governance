@@ -130,7 +130,7 @@ id = "script:{prefix}/memory-tree/build_records.py#new"
 shape = "verb"
 entry = "{prefix}/memory-tree/build_records.py"
 verb = "new"
-flags = ["--build=", "--unit=", "--root=", "--principle=", "--excuses=", "--reason=", "--expires=", "--tag=", "--action=", "--mark=", "--before=", "--after=", "--successor=", "--promoted-from=", "--rule=", "--words=", "--session=", "--leg=", "--red-line=", "--commit=", "--rerun="]
+flags = ["--build=", "--unit=", "--root=", "--principle=", "--excuses=", "--reason=", "--expires=", "--tag=", "--action=", "--mark=", "--before=", "--after=", "--successor=", "--promoted-from=", "--rule=", "--words=", "--session=", "--leg=", "--red-line=", "--commit=", "--rerun=", "--item=", "--disposition=", "--channel="]
 
 [[usage]]
 id = "script:{prefix}/memory-tree/build_records.py#join"

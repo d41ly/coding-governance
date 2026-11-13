@@ -649,8 +649,9 @@ carry it too:
   `deviation` (a departure from the design or from a spec, in the grammar under "Deviation records") ·
   `exception` (a principle excused for one part, minted by `PLAY-dOrderedCharter-7`'s record factory) ·
   `override` (minted by `PLAY-dOrderedCharter-2`) · `change` (minted by `PLAY-dOrderedCharter-15`) ·
-  `red-fix` (the record of an inline red fix, in the grammar under "Red-fix records").
-  The five after `research` are the typed kinds: each record is named
+  `red-fix` (the record of an inline red fix, in the grammar under "Red-fix records") ·
+  `disposition` (the owner's disposition of one loop item, in the grammar under "Disposition records").
+  The six after `research` are the typed kinds: each record is named
   `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, and the kind and that name are
   joined both ways. An open kind field stops being groupable the first time two authors spell one
   relation differently.
@@ -718,6 +719,16 @@ command that showed the leg green, and its result) and Caused-by (one id). Write
 `build_records.py new red-fix --build <slug> --unit <id> --leg <leg name> --red-line <line> --commit
 <rev> --rerun <command and result>`, which derives Files and Commit from the commit and refuses a
 commit carrying no trailer naming that leg. Check 31 joins every such commit to its record.
+
+**Disposition records.** The owner's answer to a held loop item is a `disposition` record named
+`<date>-build-<unit id>-disposition-<n>.md` in a build's `build/` folder, under the unit the item
+belongs to, or the build's first unit for an item no unit owns. Its fields are `- **<Key>:** <value>`
+bullets, one line each: Item (the disposed item's tag, opening `item.`), Disposition (one word, a
+member of that item's closed outcome set), Channel (`mailbox` · `terminal` · `prompt`, where the owner
+answered) and Caused-by (one id), with Reason optional. Write it through the door, `build_records.py
+new disposition --build <slug> --unit <id> --item <tag> --disposition <word> --channel <channel>
+[--reason <text>]`, which refuses a value outside those shapes. The door does not read the item's
+outcome set: that join is the loop kit's `check_disposition_record`, run by whoever reads the record.
 
 ## Acceptance ledger — how a built unit evidences its criteria
 
