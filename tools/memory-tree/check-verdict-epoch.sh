@@ -250,7 +250,7 @@ _ve_py=$(resolve_python 2>/dev/null) || _ve_py=""
 # `merge-rows.py` import lazily. The import-closure check below is what keeps this list whole.
 # PLAY-dOrderedCharter-7 S7: and `build_records.py`, the typed record factory `deviation_join.py` imports at
 # module level, which now holds the deviation record's field grammar and its population.
-DELEGATES="${_kit}tree_lib.py ${_kit}row_grammar.py ${_kit}gen_build_index.py ${_kit}corpus_ids.py ${_kit}gotchas.py ${_kit}id_grammar.py ${_kit}merge-rows.py ${_kit}design_lib.py ${_kit}asbuilt_view.py ${_kit}deviation_join.py ${_kit}build_records.py ${_kit}routed_commits.py ${_kit}backlog.py ${_kit}../check-spec-tokens.py"
+DELEGATES="${_kit}tree_lib.py ${_kit}commit_trailers.py ${_kit}row_grammar.py ${_kit}gen_build_index.py ${_kit}corpus_ids.py ${_kit}gotchas.py ${_kit}id_grammar.py ${_kit}merge-rows.py ${_kit}design_lib.py ${_kit}asbuilt_view.py ${_kit}deviation_join.py ${_kit}build_records.py ${_kit}routed_commits.py ${_kit}backlog.py ${_kit}../check-spec-tokens.py"
 [ -f "$ENGINE" ] || { echo "verdict-epoch: $ENGINE is missing — this gate reads the engine's own source"; exit 2; }
 SCAN="$ENGINE"
 for _d in $DELEGATES; do
