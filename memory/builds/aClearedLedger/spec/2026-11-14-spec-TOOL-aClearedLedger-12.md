@@ -1,11 +1,12 @@
 # TOOL-aClearedLedger-12 — the gate guard's word reader keeps a two-character redirection operator whole, so row D6 denies an over-bound suite whose output is appended
 
-**Status:** INPROGRESS · rev-1 · 2026-11-14 · node a · Tier-2 · base 8db6f4be · streams tooling · order 12
+**Status:** CLOSED · rev-1 · 2026-11-14 · node a · Tier-2 · base 8db6f4be · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-14-build-TOOL-aClearedLedger-12-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aClearedLedger-12-1-acceptance-ledger.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aClearedLedger-12-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aClearedLedger-12-1-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aClearedLedger-12-brief.md](../prompts/2026-11-14-prompt-TOOL-aClearedLedger-12-brief.md) | research | — |
 

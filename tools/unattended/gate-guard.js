@@ -360,8 +360,9 @@ function readQuotedSubstitutions(text, tool) {
  * (closing round 3, T4): pairing the outer `"` with the first `"` inside the span split
  * `msg="$(printf "%s" "run bash <suite> next")"` into an assignment word and a launcher at head.
  * Bash's rule under both tools; the span itself is read back by readQuotedSubstitutions.
- * A word also ends before an unquoted `>` or `<` once it holds anything but digits, outside `${…}`
- * (TOOL-aClearedLedger-11). The reader is shared, so rows D2 to D4 see a glued redirection too.
+ * A word also ends before an unquoted `>` or `<` once it holds anything but a redirection operator,
+ * outside `${…}` (TOOL-aClearedLedger-11, narrowed by TOOL-aClearedLedger-12 so a two-character
+ * operator is one word). The reader is shared, so rows D2 to D4 see a glued redirection too.
  */
 function readTokenAt(cmd, from, stop) {
   let i = from
@@ -393,10 +394,11 @@ function readTokenAt(cmd, from, stop) {
       out += ch
     } else if (/[\s;|&(){}`]/.test(ch)) {
       break
-    } else if ((ch === '>' || ch === '<') && !brace && out !== '' && !/^\d+$/.test(out)) {
+    } else if ((ch === '>' || ch === '<') && !brace && out !== '' && !/^(?:\d*|&)[<>]*$/.test(out)) {
       // A glued redirection ends the word (TOOL-aClearedLedger-11): `x.py --selftest>x.log` is the
-      // flag and then a redirection word. An operator that opens a word, bare or behind a
-      // file-descriptor digit, is read on as before, so REDIRECT_RE drops it with its glued target.
+      // flag and then a redirection word. While the word so far is itself a redirection operator,
+      // the prefix REDIRECT_RE reads, it is read on (TOOL-aClearedLedger-12): `>>`, `2>>` and `<<<`
+      // stay one word, so REDIRECT_RE drops the operator with its target, glued or spaced.
       break
     } else {
       out += ch
