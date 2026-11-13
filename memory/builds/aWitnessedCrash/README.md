@@ -50,10 +50,10 @@ ids TOOL-aWitnessedCrash-1
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aWitnessedCrash-1 — check 23's maps are declared set, and the hygiene engine reds on a bash runtime error it ran past](spec/2026-11-13-spec-TOOL-aWitnessedCrash-1.md) | 1 | 1 | INPROGRESS | rev-1 | 2026-11-13 |
+| [TOOL-aWitnessedCrash-1 — check 23's maps are declared set, and the hygiene engine reds on a bash runtime error it ran past](spec/2026-11-13-spec-TOOL-aWitnessedCrash-1.md) | 1 | 1 | INPROGRESS | rev-2 | 2026-11-13 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 3 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -1,11 +1,13 @@
 # TOOL-aWitnessedCrash-1 — check 23's maps are declared set, and the hygiene engine reds on a bash runtime error it ran past
 
-**Status:** INPROGRESS · rev-1 · 2026-11-13 · node a · Tier-1 · base f9a87e782 · streams tooling · order 1
+**Status:** INPROGRESS · rev-2 · 2026-11-13 · node a · Tier-1 · base f9a87e782 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-13-prompt-TOOL-aWitnessedCrash-1-1-revision.md](../prompts/2026-11-13-prompt-TOOL-aWitnessedCrash-1-1-revision.md) | research | — |
+| [2026-11-13-prompt-TOOL-aWitnessedCrash-1-2-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-aWitnessedCrash-1-2-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aWitnessedCrash-1-brief.md](../prompts/2026-11-13-prompt-TOOL-aWitnessedCrash-1-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -173,8 +175,9 @@ At base, assertions 3, 4 and 6 fail. Measured on 2026-11-13: the injected copy e
 
 `KIT_MEMORY_TREE_VERSION` moves from 2.158 to the next minor above the value at the build's tip.
 That is 2.159 unless the tip has moved. It is one commit after the last code move. Every file
-`git grep -l "memory-tree@2.158"` lists at base moves with it: the engine, the four
-`tools/memory-tree/*.template.md` files, and their four dogfood copies under `memory/`.
+`git grep -l "memory-tree@2.158" -- ':!memory/builds'` lists at base moves with it: the engine, the
+four `tools/memory-tree/*.template.md` files, and their four dogfood copies under `memory/`. The
+pathspec leaves out build records, which quote a stamp as prose and carry none. This spec is one.
 
 ### The probe a pass runs for AC2 to AC4
 
@@ -233,9 +236,10 @@ Each one was tested on node a's `bash 5.3.9` on 2026-11-13.
   `if check_selected 12 25; then`), `--only 12` over the young tree exits 2, not 1.
   Red when: the witness exits on its own, or it runs after the `--only` refusal and overwrites its
   status.
-- **AC5** — When `git grep -l "memory-tree@2.158"` runs at the built tip, it lists nothing, and
-  `git grep -l "memory-tree@2.159"`, or the version S4 chose, lists the same nine files that the first grep listed at
-  base.
+- **AC5** — When `git grep -l "memory-tree@2.158" -- ':!memory/builds'` runs at the built tip, it
+  lists nothing, and `git grep -l "memory-tree@2.159" -- ':!memory/builds'`, or the version S4
+  chose, lists the same nine files that the first grep listed at base. The pathspec leaves out build
+  records, because this spec quotes both strings in its own prose.
   Red when: a stamp is left behind, or the engine moves without its templates.
 
 ## 6. Gates
@@ -257,6 +261,12 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-11-13 · initial draft.
+- rev-2 · 2026-11-13 · S4 · AC5 · the builder's divergence, carried by
+  `2026-11-13-prompt-TOOL-aWitnessedCrash-1-1-revision`: AC5's unscoped greps listed this spec,
+  which quotes both stamp strings, so the criterion could not be observed. Both greps now take the
+  pathspec `':!memory/builds'`. At the tip the 2.158 grep lists nothing and the 2.159 grep lists the
+  nine carriers, the same nine the 2.158 grep lists at base f9a87e782. No code move is owed, so the
+  built pass commits 8e4f578c3 and ef4855a15 stand.
 
 ## 9. Reuse audit
 
