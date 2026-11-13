@@ -10,17 +10,17 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 hold-run: 
-hold-streak: 1 · at 6c2337e6
+hold-streak: 2 · at 815abf73
 resume-owed: none · owner
-held-at: 2026-11-13T06:07:14Z
-hold-reason: check 118 refuses every dispatch until a spec-audit chain covers the 98 live specs, and the owner ended this build's audit chain at round 12; the parked decision names the three options
+held-at: 2026-11-13T10:37:19Z
+hold-reason: the owner withdrew the ruling to re-run the spec audit before any audit started; check 118 still refuses every dispatch, and the parked decision stands
 hold-until: owner
 hold-code: host-owner-action
 held-from: BUILDING
 refreshed-at: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 02f75e81a2ac8314cc989e9174ac14b6c3b9e823
-phase: BUILDING
+witness: 815abf738fef0b0ba867aea8ff516a864d7bf6d8
+phase: HELD
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -47,3 +47,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-13T06:07:18Z hold · item host-owner-action · reason until owner · reaped b9b65262 · resume none(owner)
 
 2026-11-13T10:36:20Z resume · item dDeclaredLoop · reason held · keepalive 22094182 · manual
+
+2026-11-13T10:37:23Z hold · item host-owner-action · reason until owner · reaped 22094182 · resume none(owner)
