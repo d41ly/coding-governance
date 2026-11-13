@@ -33,7 +33,9 @@
 # check-16 notices, any line opening `HYGIENE advisory `, under `--only` the one liveness line
 # `HYGIENE --only <sel> ran checks <ids>`, and a `BUDGET WARN ` line, a check-6 or check-7 breach the
 # policy kit's size switch warns on (TOOL-dGroundRules-9). Anything else printed is a regression. Under `--only`, a
-# requested id whose `check_selected` call never ran exits 2: its verdict would be silence.
+# requested id whose `check_selected` call never ran exits 2: its verdict would be silence. A line in
+# bash's runtime-error shape on this engine's stderr reds an otherwise clean run, and the stderr is
+# replayed at exit (TOOL-aWitnessedCrash-1).
 set -u
 # --only N[,M]: parsed BEFORE the `cd` below, because the selectable set is read from "$0" and a
 # relative "$0" names this file only from the caller's directory. Refused whole, before any check runs,
@@ -611,6 +613,13 @@ except LookupError as e:
 }
 # <<< resolve_python
 _PY=$(resolve_python) || { echo "HYGIENE — no usable python; checks 9 and 13-19 delegate to sibling modules"; exit 2; }
+# TOOL-aWitnessedCrash-1: the crash witness. Bash 5.3 runs on past some runtime errors under
+# `set -u` (an unset map's `${#X[@]}` fails its command and the script continues), so the exit
+# status cannot see a check that stopped part-way. This engine's stderr is kept and replayed at
+# exit, and the tail reds on any line in bash's runtime-error shape.
+_CRASH_LOG=$(mktemp) || { echo "HYGIENE — cannot run: mktemp failed, and the crash witness keeps this engine's stderr in a file"; exit 2; }
+exec 4>&2 2>"$_CRASH_LOG"
+trap 'exec 2>&4; cat "$_CRASH_LOG" >&2; rm -f "$_CRASH_LOG"' EXIT
 
 # ---- THE SWITCH OVER CHECKS 6 AND 7 (TOOL-dGroundRules-9) ------------------------------------------
 # Each of the ten caps below is a row of the policy kit's cap census. ONE python start asks all ten,
@@ -3544,7 +3553,7 @@ if [ -n "$alcut" ]; then
   # The ledger as a MAP, built once. FIRST-WINS, because the retired lookup was `grep -m1` and a
   # bash associative array is last-wins; getting that backwards would silently reclassify a unit
   # whose ledger carries two lines for one criterion.
-  declare -A ALFORM ALTOK
+  declare -A ALFORM=() ALTOK=()
   while IFS= read -r _al; do
     [ -n "$_al" ] || continue
     # TOOL-aJoinedCanon-6: the row is now `<unit> <label> <form>` TAB `<tokens>`. Split on the
@@ -3558,7 +3567,7 @@ if [ -n "$alcut" ]; then
   # TOOL-aJoinedCanon-6: the two era flags, read BEFORE the label walk because arm B consults them
   # inside it. A U row now carries `<seq> <uid> <labera> <tokera>`; an older stream carrying neither
   # reads as 0 and both arms stay silent, which is what blank-means-off has to mean here too.
-  declare -A ALLABERA ALTOKERA
+  declare -A ALLABERA=() ALTOKERA=()
   while IFS="	" read -r _et _eseq _euid _elab _etok; do
     [ -n "$_euid" ] || continue
     ALLABERA["$_euid"]="${_elab:-0}"; ALTOKERA["$_euid"]="${_etok:-0}"
@@ -3568,7 +3577,7 @@ if [ -n "$alcut" ]; then
   # stream order the retired outer loop walked and `-k4,4` is the `sort -u` it applied inside it,
   # so the three failure strings below are built in exactly the order they were before. No LC_ALL,
   # matching the retired `sort -u`, which took the ambient collation.
-  declare -A ALHASLAB ALSPECLAB
+  declare -A ALHASLAB=() ALSPECLAB=()
   altokbad=""
   while IFS="	" read -r _lt _lseq _luid _llab _ltok; do
     [ -n "$_llab" ] || continue
@@ -3658,6 +3667,15 @@ if [ -n "$POP_MISSING" ]; then
   printf '%s' "$POP_MISSING"
   status=1
   [ "$OFFENDERS" = 0 ] || add_offender_keys population $'\n'"$POP_MISSING"
+fi
+
+# --- the crash witness's verdict (TOOL-aWitnessedCrash-1), over the stderr kept since the resolver.
+_crash=$(grep -E '^.+: line [0-9]+: ' "$_CRASH_LOG" || true)
+if [ -n "$_crash" ]; then
+  echo "HYGIENE FAILED — bash reported a runtime error on this engine's stderr, so a check may have stopped part-way and its silence is not a pass:"
+  printf '%s\n' "$_crash"
+  status=1
+  [ "$OFFENDERS" = 0 ] || add_offender_keys crash $'\n'"$(printf '%s\n' "$_crash" | sed -E 's#^(.*/)?([^/]*): line [0-9]+: #\2: #')"
 fi
 
 # THE KEYS, numbered where one repeats, on the fd `--offenders` kept for them. Nothing else reaches it.
