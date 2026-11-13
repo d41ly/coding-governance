@@ -11,5 +11,5 @@
 - **Evidence:** `tools/lib/commit_trailers.py#read_key_table`, `tools/lib/commit_trailers.py#build_fixture` and `tools/memory-tree/routed_commits.py#read_routed_commits` at the pass commit of `TOOL-dDeclaredLoop-23`.
 - **Risk:** additive
 - **Approver:** author, the builder pass, under the chain's `author-recorded` value (`PLAY-dClosedLoop-4`)
-- **Follow-through:** none
+- **Follow-through:** ask TOOL-dDeclaredLoop-35
 - **Caused-by:** TOOL-dDeclaredLoop-23

@@ -11,5 +11,5 @@
 - **Evidence:** the opening sentence of the section "What this release's steps do to your repository" in `help/upgrade-steps.md`, before and after the pass commit of `TOOL-dDeclaredLoop-36`.
 - **Risk:** editorial
 - **Approver:** author, the builder pass, under the chain's `author-recorded` value (`PLAY-dClosedLoop-4`)
-- **Follow-through:** none
+- **Follow-through:** ask TOOL-dDeclaredLoop-35
 - **Caused-by:** TOOL-dDeclaredLoop-36

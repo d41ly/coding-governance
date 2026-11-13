@@ -11,6 +11,6 @@
 - **Evidence:** `named_in_playbook` in `tools/check-playbook-parity.sh`, the header of `tools/govkit/subject-pins.tsv`, the header of `tools/govkit/usage.toml`, the `watch:` line of `memory/guides/SESSION-KICKOFF.md`, the output of `bash tools/check-install-prefix.sh --list` before and after the respelling, and the pass commit of `TOOL-dDeclaredLoop-1`.
 - **Risk:** additive
 - **Approver:** author, the builder pass, under the chain's `author-recorded` value (`PLAY-dClosedLoop-4`)
-- **Follow-through:** none
+- **Follow-through:** ask TOOL-dDeclaredLoop-35
 - **Caused-by:** TOOL-dDeclaredLoop-1
 - **Surface:** tools/playbook-kit-waivers.txt, tools/govkit/subject-pins.tsv, tools/govkit/usage.toml, the loop descriptor, and one line each of tools/playbook/README.md, tools/playbook/tag_index.py and tools/govkit/upgrade_steps.py
