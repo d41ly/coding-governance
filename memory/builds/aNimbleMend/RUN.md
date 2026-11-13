@@ -143,3 +143,5 @@ base: 1265772cc365418ac6431a7f0f9e069f3bb79dc0
 2026-11-12T23:12:53Z dispatch · item 7e785ac2 TOOL-aNimbleMend-15 · reason tools/workflows/unattended-unit.js tools/workflows/unattended-build.test.sh
 
 2026-11-12T23:42:07Z dispatch · item 8ed4b1d5 TOOL-aNimbleMend-15 · reason tools/run-gates/pass_legs.py tools/run-gates/run-gates.evidence.test.sh tools/run-gates/README.md
+
+2026-11-13T01:22:44Z dispatch · item 369e6922 TOOL-aNimbleMend-15 · reason tools/memory-tree/routed_commits.py tools/memory-tree/README.md

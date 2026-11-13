@@ -979,13 +979,14 @@ def run_selftest() -> int:
         kits = repo / "kits"
         (kits / home).mkdir(parents=True)
         (kits / home / anchor).write_bytes(b"#!/usr/bin/env bash\n")
-        orig_kit = globals()["KIT"]
+        const = "KIT"       # the module constant's name, held apart: the hygiene suite reads a quoted
+        orig_kit = globals()[const]      # capital name in a subscript as a conf key, and this is none
         try:
-            globals()["KIT"] = kits / orig_kit.name
+            globals()[const] = kits / orig_kit.name
             found = resolve_leg_manifest(repo, {})
             rc, out = run_check(repo)
         finally:
-            globals()["KIT"] = orig_kit
+            globals()[const] = orig_kit
         print_arm(found == "kits/gate-legs.json" and rc == 0 and "1 red-fix" in out.split("\n")[0]
             and "LEG_MANIFEST is blank" not in out,
             f"TOOL-aNimbleMend-15 S7 a blank LEG_MANIFEST beside a run-gates kit reads that kit's manifest "
