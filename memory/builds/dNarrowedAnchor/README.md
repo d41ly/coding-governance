@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-24
 streams: tooling
 roster: TOOL
-ids: TOOL-dNarrowedAnchor-1 TOOL-dNarrowedAnchor-2 TOOL-dNarrowedAnchor-3
+ids: TOOL-dNarrowedAnchor-1 TOOL-dNarrowedAnchor-2 TOOL-dNarrowedAnchor-3 TOOL-dNarrowedAnchor-4
 ---
 
 # dNarrowedAnchor — the second anchor becomes PER-MODE, so a `slug` run cannot reach it
@@ -57,26 +57,28 @@ the folder predates the run, so such a run has contradicted its own declaration 
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
 | 1 | `TOOL-dNarrowedAnchor-1` | 2 | the second anchor is admissible per MODE, and `slug` is not one of them |
+| 2 | `TOOL-dNarrowedAnchor-4` | 1 | the drift baseline drops unit 1 once it closed, and its comment stops counting ids |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node d · opened 2026-08-24 · streams tooling
-ids TOOL-dNarrowedAnchor-1 TOOL-dNarrowedAnchor-2 TOOL-dNarrowedAnchor-3
+**Build status:** INPROGRESS · 2 unit(s) · node d · opened 2026-08-24 · streams tooling
+ids TOOL-dNarrowedAnchor-1 TOOL-dNarrowedAnchor-2 TOOL-dNarrowedAnchor-3 TOOL-dNarrowedAnchor-4
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dNarrowedAnchor-1 — the second anchor is admissible per MODE, and `slug` is not one of them](spec/2026-08-24-spec-TOOL-dNarrowedAnchor-1.md) | — | 2 | CLOSED | rev-2 | 2026-11-13 |
+| [TOOL-dNarrowedAnchor-4 — drop the closed TOOL-dNarrowedAnchor-1 from the signal-2 baseline set](spec/2026-11-13-spec-TOOL-dNarrowedAnchor-4.md) | — | 1 | INPROGRESS | rev-2 | 2026-11-13 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 5 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dNarrowedAnchor-1.
+Ids no `spec-audit` record has ever named: TOOL-dNarrowedAnchor-1 TOOL-dNarrowedAnchor-4.
 
-Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
