@@ -1,12 +1,14 @@
 # TOOL-aClearedLedger-7 — the policy fixtures leg prints no wrong assertion: fourteen guard paths, the recall plant's grammar file, and check 8 saying the reader's refusal
 
-**Status:** INPROGRESS · rev-1 · 2026-11-13 · node a · Tier-1 · base 8db6f4be · streams tooling · order 7 · closes TOOL-aNimbleMend-20
+**Status:** INPROGRESS · rev-2 · 2026-11-13 · node a · Tier-1 · base 8db6f4be · streams tooling · order 7 · closes TOOL-aNimbleMend-20
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-13-prompt-TOOL-aClearedLedger-1-brief.md](../prompts/2026-11-13-prompt-TOOL-aClearedLedger-1-brief.md) | research | TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-9 TOOL-aClearedLedger-10 |
+| [2026-11-13-prompt-TOOL-aClearedLedger-7-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-aClearedLedger-7-1-spec-writer.md) | journal | — |
+| [2026-11-13-prompt-TOOL-aClearedLedger-7-brief.md](../prompts/2026-11-13-prompt-TOOL-aClearedLedger-7-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -27,6 +29,9 @@ them. This unit fixes each of the three causes where it sits, so the leg reads `
   the cap it grades is the handed-in default of a reader that refused. Its exit and its remedy
   sentence are unchanged. Observed by AC5 and AC6.
 - **S4** — The whole leg prints `0 wrong`. Observed by AC7, which is the main loop's.
+- **S5** — The `last-audit` value of `memory/guides/SESSION-KICKOFF.md` is re-stamped in the unit's
+  closing commit, under that file's stamp rule, with a delta line in the commit message. S1 and S3
+  each move a file its `watch:` line names. Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -36,8 +41,6 @@ them. This unit fixes each of the three causes where it sits, so the leg reads `
 - No skip of check 8 for an undeclared cap (section 4, "Alternatives rejected").
 - No arm is added to `tools/check-template-size.test.sh`. The case `budgets-reader-refused` is the
   arm that observes S3, and it is red today.
-- The `last-audit` re-stamp of `memory/guides/SESSION-KICKOFF.md` that a moved manifest owes. The
-  main loop makes it after the pass, as it did after TOOL-aNimbleMend-27.
 - Any kit version, which the lander's `mint` moves.
 - Any edit to a CLOSED spec. Each correction is stated here.
 
@@ -102,6 +105,10 @@ file satisfies the sibling probe. `derive_zero_plant` copies `files`, so the thi
 UNVERIFIED: that the export, past the lookup, reaches its cap check in all three modes. No probe of
 this spec ran the case. AC4 observes it, and a further missing file is this scope item's to plant.
 
+rev-2: the brief of this revision reports that the rev-1 builder's return settles this note. That
+pass was restored whole and its return is in no tracked record, so this spec states no outcome of
+its own. AC4 stays the observation and the planting clause above stands.
+
 ### S3 — check 8 and a reader that refused
 
 `budgets.py resolve` answers a refused reader with a row and prints the refusal on its stderr
@@ -123,18 +130,44 @@ holds the charter's cap inside `CODEX_MAX` under either value of the switch. TOO
 S31 has a refusing reader's refusal printed once. Before the edit the builder runs
 `git grep -n "not held inside the smallest harness"` and keeps every substring a reader pins.
 
+### S5 — the manifest stamp
+
+The staged leg of `skills/session-kickoff/manifest-check.sh` runs at every commit. Its check 5
+refuses a commit that stages a file of the manifest's `watch:` line unless the staged manifest's
+`last-audit` line differs from the one at `HEAD`. `tools/gate-legs.json` and
+`tools/check-template-size.sh` are both on that line, so the stamp rides this unit's commit. The
+rev-1 pass could not commit without it, and `29c9024c7` landed TOOL-aNimbleMend-27 the same way.
+
+Before staging, the builder re-reads each section B line of the manifest that names either file:
+the gate fence under "Gate commands (the merge bar)", and the size-limit bullet under "Environment
+traps worth front-loading". A line this unit made stale is corrected. A guard path and a longer
+check 8 message are expected to change neither. The builder then rewrites the `last-audit` line
+alone: the datetime is now, with its offset, and later than the stored one, and the sha is
+`git rev-parse HEAD` at stamping. The commit message carries the line
+`skills/session-kickoff/SKILL.md` gives:
+
+```
+manifest-audit: delta <none|summary> · watch-commits-since-stamp: <n>
+```
+
+`<n>` is `git rev-list --count <stored-sha>..HEAD` over the paths of the `watch:` line, counted
+before the stamp is rewritten.
+
 ### What it does not check
 
 - A file a child process reads. The trace sees this process alone, by its own docstring.
 - A playbook module added after this unit. The census reds on it, which is its job.
 - Check 8's wording under a refusal. AC5 counts the ladder's sentence and nothing else.
 - A refusing reader over a charter inside the default. Check 8 reds there too, now with the reason.
+- That the stamp's datetime advanced, or that the section B lines were re-read. AC8 reads the
+  staged sha alone.
 
 ### Files touched (estimate)
 
 - `tools/gate-legs.json`
 - `tools/policy/check_policy.py`
 - `tools/check-template-size.sh`
+- `memory/guides/SESSION-KICKOFF.md`
 
 ### Alternatives rejected
 
@@ -151,7 +184,7 @@ S31 has a refusing reader's refusal printed once. Before the edit the builder ru
 
 ## 5. Acceptance criteria
 
-Each of AC1 to AC6 is a probe a builder runs. A one-case fixture run is the direct check the
+Each of AC1 to AC6, and AC8, is a probe a builder runs. A one-case fixture run is the direct check the
 spec-token checker admits. Where a hook refuses one, that criterion is the main loop's.
 
 - **AC1** — When the fourteen paths of section 4's table, one per line, are piped to
@@ -181,13 +214,19 @@ spec-token checker admits. Where a hook refuses one, that criterion is the main 
   Red when: any assertion is wrong, one outside the three causes included.
   permission: the main loop's; the command is a leg's own.
   cost: the leg's ceiling is 2420 s (PINNED, 2026-11-13).
+- **AC8** — When the unit's files are staged and
+  `git diff --cached -U0 -- memory/guides/SESSION-KICKOFF.md | grep -c "^+last-audit: .* @ $(git rev-parse HEAD)\$"`
+  runs, it prints 1, and `git diff --cached --numstat -- memory/guides/SESSION-KICKOFF.md` prints
+  1 added and 1 deleted where no section B line was stale.
+  Red when: the stamp is not staged with the watched files, or its sha is not the commit's parent.
 
 ## 6. Gates
 
-`policy fixtures` · `template size gate selftest` · `charter size` · `scratch-guard self-test` · `routed-commits selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest`
+`policy fixtures` · `template size gate selftest` · `charter size` · `scratch-guard self-test` · `routed-commits selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `recall floor` · `recall floor arms`
 
-The first is the leg this unit repairs. The next two run the enforcer S3 edits. The last five are
-owed by a guard the estimate trips: two by the policy checker, three by the manifest.
+The first is the leg this unit repairs. The next two run the enforcer S3 edits. The next five are
+owed by a guard the estimate trips: two by the policy checker, three by the manifest. The last two
+guard the kickoff manifest S5 stamps.
 
 The close is the brief's: the plain bar once after the last unit. No arm is added or moved.
 
@@ -198,6 +237,10 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-11-13 · initial draft.
+- rev-2 · 2026-11-13 · after the rev-1 builder's divergence: the pre-commit manifest check refused
+  the pass commit, which staged two watched files and no stamp. The non-goal that left the
+  `last-audit` re-stamp to the main loop is dropped. S5, AC8 and one "Files touched" line put it in
+  the unit's closing commit. A rev-2 paragraph stands under S2's UNVERIFIED note.
 
 ## 9. Reuse audit
 
