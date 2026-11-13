@@ -154,3 +154,7 @@ base: 1265772cc365418ac6431a7f0f9e069f3bb79dc0
 2026-11-13T06:15:34Z rescope · item add TOOL-aNimbleMend-27 · reason the close's full bar on b61832752 red on three legs this build caused — shell hygiene, python reads and spawn budget — repaired as one unit
 
 2026-11-13T06:30:45Z brief · item TOOL-aNimbleMend-27 · reason e0de61e21288 memory/builds/aNimbleMend/prompts/2026-11-13-prompt-TOOL-aNimbleMend-27-build-brief.md
+
+2026-11-13T06:37:06Z dispatch · item a8aa6f8c TOOL-aNimbleMend-27 · reason tools/run-gates/pass-legs.sh tools/gate-legs.json memory/project/spawn-idiom-sites.txt memory/project/fork-ceilings.txt memory/guides/SESSION-KICKOFF.md
+
+2026-11-13T06:50:27Z dispatch · item a8aa6f8c TOOL-aNimbleMend-27 · reason memory/builds/aNimbleMend/README.md memory/builds/aNimbleMend/build/2026-11-13-build-TOOL-aNimbleMend-27-1-acceptance-ledger.md memory/builds/aNimbleMend/spec/2026-11-13-spec-TOOL-aNimbleMend-27.md memory/guides/SESSION-KICKOFF.md memory/project/fork-ceilings.txt memory/project/spawn-idiom-sites.txt tools/gate-legs.json tools/run-gates/pass-legs.sh

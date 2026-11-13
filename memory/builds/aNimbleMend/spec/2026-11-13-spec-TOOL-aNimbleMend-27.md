@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-13-build-TOOL-aNimbleMend-27-1-acceptance-ledger.md](../build/2026-11-13-build-TOOL-aNimbleMend-27-1-acceptance-ledger.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aNimbleMend-27-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-aNimbleMend-27-1-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aNimbleMend-27-brief.md](../prompts/2026-11-13-prompt-TOOL-aNimbleMend-27-brief.md) | research | — |
 | [2026-11-13-prompt-TOOL-aNimbleMend-27-build-brief.md](../prompts/2026-11-13-prompt-TOOL-aNimbleMend-27-build-brief.md) | research | — |

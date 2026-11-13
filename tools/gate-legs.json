@@ -909,7 +909,8 @@
       "{prefix}/memory-tree/id_grammar.py",
       "{prefix}/memory-tree/tree_lib.py",
       "{prefix}/policy/budgets.py",
-      "{prefix}/policy/policy.py"
+      "{prefix}/policy/policy.py",
+      "{prefix}/memory-tree/backlog.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -928,7 +929,8 @@
       "{prefix}/memory-tree/id_grammar.py",
       "{prefix}/memory-tree/tree_lib.py",
       "{prefix}/policy/budgets.py",
-      "{prefix}/policy/policy.py"
+      "{prefix}/policy/policy.py",
+      "{prefix}/memory-tree/backlog.py"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -947,7 +949,8 @@
       "{prefix}/memory-tree/id_grammar.py",
       "{prefix}/memory-tree/tree_lib.py",
       "{prefix}/policy/budgets.py",
-      "{prefix}/policy/policy.py"
+      "{prefix}/policy/policy.py",
+      "{prefix}/memory-tree/backlog.py"
     ],
     "chunk": "selftests",
     "subject": "repo",
@@ -979,7 +982,8 @@
       "{prefix}/lexicon/lexicon.py",
       "{prefix}/lexicon/lexicon_conf.py",
       "{prefix}/lexicon/scaffold_lexicon.py",
-      "{prefix}/lexicon/subtokens.py"
+      "{prefix}/lexicon/subtokens.py",
+      "{prefix}/memory-tree/backlog.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -2284,7 +2288,8 @@
       "memory/builds/dClosedLoop/build/",
       "help/policy.md",
       ".governance/install.json",
-      "{prefix}/memory-tree/build_records.py"
+      "{prefix}/memory-tree/build_records.py",
+      "{prefix}/memory-tree/id_grammar.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
