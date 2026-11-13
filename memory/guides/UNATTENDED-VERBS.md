@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.120 -->
+<!-- gov:kit unattended@1.121 -->
 [memory/guides/UNATTENDED-VERBS.md · Level 3 · Binding with the unattended protocol, the verbs a run calls; yields to levels 0 to 2]
 # Unattended runs — the verbs
 
@@ -301,19 +301,29 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   worktree, rows disposing fewer BLOCKER or HIGH ids than `--blockers` or `--highs` count, so a round
   whose HIGHs reached neither a promotion nor a fold is a refusal, and a `local` or `--sibling` row that
   never reached the tree: a unit no tracked spec carries, a rev below 2 or above the spec's header, or a
-  rev with no Revision log entry.
+  rev with no Revision log entry. `--record-round <slug> --owner-stop <path>` records the owner's
+  ruling that the chain has ended instead: it appends `round <N> · owner-stop · record <path>` on a
+  round of its own, counted over every row of the record, and names a new record from the roster's
+  first id. `<path>` is a tracked file directly under the build's `prompts/` folder, and the whole
+  path, the memory root included, stays inside `[A-Za-z0-9._/-]`. No round flag sits beside it, and it refuses one given, a path outside that
+  folder or that charset, a path git does not track, and a roster that yields no id for a new record.
+  It does not check that the owner wrote the cited record: the row is evidence a reader opens.
 - `--chain-verdict` — `--chain-verdict <slug>`: derives whether a spec audit's chain goes on from that
   record and the roster alone, and writes nothing. It prints one line, and every word exits 0:
-  `unattended: chain <slug> · round <N> · <word> · reason <reason>[ · audit <ids>][ · override specs-audited <ids>]`.
+  `unattended: chain <slug> · round <N> · <word> · reason <reason>[ · audit <ids>][ · override specs-audited <ids>][ · record <path>]`.
   The word is `CONTINUE`, `STOP` or `HOLD`, in the five ordered steps the build method's
   spec-audit section states, and the reason names the step: `unreviewed`, `clean`, `own-work`,
-  `ceiling` or `open`. On CONTINUE, re-invoke the build harness at the next `round` with `auditIds`
+  `ceiling` or `open`. Ahead of the five, a last round holding an `owner-stop` row reads `STOP` with
+  reason `owner-stop` and the cited record after `record`, naming no override, and `--dispatch`
+  prints that record on its own line; an audit round recorded after the row takes the verdict back.
+  On CONTINUE, re-invoke the build harness at the next `round` with `auditIds`
   the ids after `audit`, no `subjectRound` and no `subjects`, and dispatch nothing, because a folded
   spec is audited again. On STOP, dispatch the roster; a unit after `override specs-audited` is built
   from its spec as written and closes under a recorded `--override specs-audited`. On HOLD a second
   line prints the recipe: `--park <slug> --item spec-audit-chain-ceiling`, reap the keepalive, then
   `--handoff <slug> --code owner-decision --reaped <id>`, because `--hold` refuses that code; an
-  attended run asks the owner. A HOLD stays the answer until the owner moves the ceiling or rules.
+  attended run asks the owner. A HOLD stays the answer until the owner moves the ceiling or rules,
+  and a ruling to stop is recorded by `--record-round <slug> --owner-stop <path>`.
   THE VERDICT IS COMPUTED ONCE, here: the harness renders the two commands and reads no set. Three
   policy keys answer, each reported by `policy.py get`, and with no policy kit each takes its kit
   default with a note. `review.spec-audit.disposal` is the rule above, its old value `promote-all`.
