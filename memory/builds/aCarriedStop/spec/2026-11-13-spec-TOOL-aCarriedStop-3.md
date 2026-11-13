@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md) | journal | TOOL-aCarriedStop-1 TOOL-aCarriedStop-2 |
 | [2026-11-13-build-TOOL-aCarriedStop-2-promotions.md](../build/2026-11-13-build-TOOL-aCarriedStop-2-promotions.md) | research | TOOL-aCarriedStop-2 |
+| [2026-11-13-prompt-TOOL-aCarriedStop-3-build-brief.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-3-build-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 

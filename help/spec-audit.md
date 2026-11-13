@@ -103,8 +103,9 @@ bash tools/unattended/unattended.sh --record-round <slug> --owner-stop <path>
   record's last round plus one, counted over every row. A new record is named from the roster's
   first id.
 - **The path** is the repository-relative path of a tracked file directly under the build's
-  `prompts/` folder, the record that holds the owner's ruling. Its file name stays inside
-  `[A-Za-z0-9._-]`.
+  `prompts/` folder, the record that holds the owner's ruling. The whole path, the memory
+  root included, stays inside `[A-Za-z0-9._/-]`, so a memory root outside that class makes every
+  owner-stop call a refusal that names the path.
 - **What it refuses,** before writing a byte: any of `--subject`, `--audited`, `--blockers`,
   `--highs`, `--finding` and `--sibling` beside it, because a ruling is no audit; a path outside
   that folder or that charset; a path git does not track; and a roster that yields no id to name a

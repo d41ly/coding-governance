@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: cfda7001d79dcab29ffd50594e200c32f61f3f67
-phase: VERIFYING
+witness: a484dc6c96eea283689776a894be36fda4ccdbd4
+phase: BUILDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/sad-allen-74f7bd
@@ -41,3 +41,9 @@ base: d646814e4a6a6747d3cdb471128be57a0e24e094
 2026-11-13T12:35:00Z rescope · item add TOOL-aCarriedStop-2 · reason promoted from the closing review's HIGH: the owner-stop path is held to one rule by the writer and the reader
 
 2026-11-13T12:35:05Z rescope · item add TOOL-aCarriedStop-3 · reason promoted from the closing review: its six mediums and four lows, batched
+
+2026-11-13T13:04:06Z brief · item TOOL-aCarriedStop-2 · reason d5d557e5e0f9 memory/builds/aCarriedStop/prompts/2026-11-13-prompt-TOOL-aCarriedStop-2-build-brief.md
+
+2026-11-13T13:05:21Z dispatch · item a484dc6c TOOL-aCarriedStop-2 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/spec-audit.md memory/builds/aCarriedStop/spec/2026-11-13-spec-TOOL-aCarriedStop-2.md memory/builds/aCarriedStop/build/2026-11-13-build-TOOL-aCarriedStop-2-1-acceptance-ledger.md memory/builds/aCarriedStop/README.md memory/LIVE.md memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json
+
+2026-11-13T13:13:34Z dispatch · item a484dc6c TOOL-aCarriedStop-2 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/spec-audit.md memory/builds/aCarriedStop/spec/2026-11-13-spec-TOOL-aCarriedStop-2.md memory/builds/aCarriedStop/build/2026-11-13-build-TOOL-aCarriedStop-2-1-acceptance-ledger.md memory/builds/aCarriedStop/README.md memory/LIVE.md memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json memory/builds/aCarriedStop/prompts/2026-11-13-prompt-TOOL-aCarriedStop-2-1-builder.md memory/builds/aCarriedStop/prompts/2026-11-13-prompt-TOOL-aCarriedStop-3-build-brief.md memory/builds/aCarriedStop/spec/2026-11-13-spec-TOOL-aCarriedStop-3.md

@@ -3347,7 +3347,7 @@ same "FA9 AC13 its row is written" "$(grep -c 'review · item dFix · reason ver
 _cs_stop="memory/builds/dFix/prompts/2026-10-24-prompt-FIX-dFix-1-owner-review-stop.md"
 _cs_open="1/HIGH/new-mechanism/FIX-dFix-1/FIX-dFix-2/1"
 _cs_alone="--owner-stop records the owner's ruling alone, and a round's flag beside it would mix a ruling with an audit"
-_cs_folder="--owner-stop names no file directly under this build's prompts folder, or its file name leaves [A-Za-z0-9._-], so the row would cite nothing a reader can open"
+_cs_folder="--owner-stop names no file directly under this build's prompts folder, or its path leaves [A-Za-z0-9._/-], so the row would cite nothing a reader can open"
 _cs_index="--owner-stop names a file git does not track, and a ruling no commit holds is one no later run can read"
 write_stop_fixture() { # -> the gate's fixture, its audit declared and the owner's record tracked
   write_gate_fixture "$_fa_dated" 2026-11-01
@@ -3417,6 +3417,18 @@ write_stop_fixture
 write_gate_exit s2
 write_stop_row
 check_gate_refused "CS1 AC7 an exit beside the owner's stop" "$_cg_lost, so the verdict would be read without it: s2;"
+# TOOL-aCarriedStop-2 AC1: THE WRITER HOLDS THE WHOLE PATH TO THE READER'S CLASS. The stop fixture with its
+# root moved to `mem+ory` and the conf following. The failing case, observed at the close and not by the
+# pass that wrote this: the driver from before this unit tests the file name alone, exits 0 and lists a
+# record its own verdict then refuses. WHAT IT DOES NOT CHECK: the reader's side, a root holding a
+# space, `@` or `~`, which take the same test as `+`, and the census arm's figure.
+write_stop_fixture
+( cd "$_fc_r" && git mv memory mem+ory && sed -i 's/^MEMORY_ROOT=.*/MEMORY_ROOT=mem+ory/' .unattended.conf )
+write_fold_commit "$_fa_dated" root "$_fc_r"
+out=$(run_chain --record-round dFix --owner-stop "mem+ory${_cs_stop#memory}"); rc=$?
+same "CS2 AC1 a root outside the class exits 1" "$rc" "1"
+hit "$out" "UNATTENDED check 118 FAILED — the spec-audit chain record refuses this: $_cs_folder: mem+ory${_cs_stop#memory}"
+same "CS2 AC1 the refusal left no record" "$(read_chain_file)$(ls "$_fc_r/mem+ory/builds/dFix/build" 2>/dev/null)" ""
 
 # ---- TOOL-dFoldedAudit-15: THE BATCH'S DRIVER ARMS. The failing cases, observed at the close and not by the
 # ---- pass that wrote this: `owe=$(( promoted - minors ))` restored and `dword` fixed at `promoted` red AC2 to

@@ -1,13 +1,16 @@
 # TOOL-aCarriedStop-2 — the owner-stop path answers to one class: the writer refuses, before any byte, a whole path its reader's grammar would not admit
 
-**Status:** INPROGRESS · rev-1 · 2026-11-13 · node a · Tier-2 · base cfda7001 · streams tooling · order 2
+**Status:** CLOSED · rev-1 · 2026-11-13 · node a · Tier-2 · base cfda7001 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md) | journal | TOOL-aCarriedStop-1 TOOL-aCarriedStop-3 |
+| [2026-11-13-build-TOOL-aCarriedStop-2-1-acceptance-ledger.md](../build/2026-11-13-build-TOOL-aCarriedStop-2-1-acceptance-ledger.md) | journal | — |
 | [2026-11-13-build-TOOL-aCarriedStop-2-promotions.md](../build/2026-11-13-build-TOOL-aCarriedStop-2-promotions.md) | research | TOOL-aCarriedStop-3 |
+| [2026-11-13-prompt-TOOL-aCarriedStop-2-1-builder.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-2-1-builder.md) | journal | — |
+| [2026-11-13-prompt-TOOL-aCarriedStop-2-build-brief.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-2-build-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 

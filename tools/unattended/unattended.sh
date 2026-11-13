@@ -1177,6 +1177,9 @@ SPEC_AUDIT_CHAIN_CEILING_DEFAULT="4"
 UNIT_ID_ERE='[A-Z]+-[A-Za-z0-9]+-[0-9]+'
 CHAIN_SEVERITIES='BLOCKER|HIGH|MEDIUM|LOW'
 CHAIN_NATURES='local|new-mechanism'
+# The class of a cited path, whole (TOOL-aCarriedStop-2): the bracket expression and no quantifier, so
+# the writer's refusal prints it and the reader's awk anchors it.
+CHAIN_PATH_CLASS='[A-Za-z0-9._/-]'
 HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed external-prerequisite acceptance-underivable repo-state-out-of-mandate gate-red-out-of-scope claim-lost"
 # THE HOLD VOCABULARY, a SECOND closed set beside the halt one and never an extension of it. Each
 # names a stop the run cannot fix and did not cause; none of them ends the run. A project extends
@@ -13687,9 +13690,12 @@ check_chain_fold() { # unit · the row's rev, with `load_spec_facts` already rea
 #
 # THE OWNER'S STOP IS A ROW OF ITS OWN ROUND (TOOL-aCarriedStop-1). `--owner-stop <path>` records the
 # owner's ruling that the chain has ended, citing a tracked record under the build's `prompts/` folder,
-# and no round flag sits beside it: a ruling is no audit. The path is held to a prefix, a charset and
-# the index, and the index test is an EQUALITY, because a name of `..` passes the charset and lists the
-# build's other files. THE COUNT READS EVERY ROW, so the round after a stop takes the next number, and
+# and no round flag sits beside it: a ruling is no audit. The path is held, in this order, to the
+# folder's prefix, to a name that is not empty and holds no slash, to `CHAIN_PATH_CLASS` from its first
+# character to its last, the memory root included, and to the index (TOOL-aCarriedStop-2). The class is
+# the READER'S, expanded from the one constant on both sides, so no row the writer admits is one
+# `derive_chain_verdict` refuses. The index test is an EQUALITY, because a name of `..` passes the class
+# and lists the build's other files. THE COUNT READS EVERY ROW, so the round after a stop takes the next number, and
 # on a record with no such row the count is what it was: a finding or sibling row carries its subject
 # row's number. WHAT IT DOES NOT CHECK: that the owner wrote the cited record or that it rules a stop.
 # Any tracked file directly under that folder passes, so the row is evidence a reader can open, printed
@@ -13715,7 +13721,7 @@ write_chain_round() { # slug · subject · audited ids · blockers · highs, row
     done
     [ -z "$mixed" ] || { check_chain_fault "--owner-stop records the owner's ruling alone, and a round's flag beside it would mix a ruling with an audit: $mixed"; return 1; }
     named=${path#"$M/builds/$slug/prompts/"}
-    { [ "$named" != "$path" ] && [[ $named =~ ^[A-Za-z0-9._-]+$ ]]; } || { check_chain_fault "--owner-stop names no file directly under this build's prompts folder, or its file name leaves [A-Za-z0-9._-], so the row would cite nothing a reader can open: $path"; return 1; }
+    { [ "$named" != "$path" ] && [ -n "$named" ] && [[ $named != */* ]] && [[ $path =~ ^$CHAIN_PATH_CLASS+$ ]]; } || { check_chain_fault "--owner-stop names no file directly under this build's prompts folder, or its path leaves $CHAIN_PATH_CLASS, so the row would cite nothing a reader can open: $path"; return 1; }
     [ "$(git ls-files -- "$path" 2>/dev/null)" = "$path" ] || { check_chain_fault "--owner-stop names a file git does not track, and a ruling no commit holds is one no later run can read: $path"; return 1; }
   else
     [[ $subj =~ ^[A-Za-z0-9-]+$ ]] || { check_chain_fault "--subject is outside [A-Za-z0-9-]+, and a row nothing can parse is prose in a record the verdict reads: $subj"; return 1; }
@@ -13817,7 +13823,7 @@ write_chain_round() { # slug · subject · audited ids · blockers · highs, row
 # header's prefix reaches that fault instead of leaving the sets (TOOL-dFoldedAudit-15 S4).
 derive_chain_verdict() { # record or empty · live ids · stop mode · ceiling -> 0 with _cv_* set, else check 118 and 1
   local out
-  out=$(awk -v live="$2" -v stop="$3" -v ceiling="$4" -v idre="^$UNIT_ID_ERE\$" -v sevre="^($CHAIN_SEVERITIES)\$" -v natre="^($CHAIN_NATURES)\$" '
+  out=$(awk -v live="$2" -v stop="$3" -v ceiling="$4" -v idre="^$UNIT_ID_ERE\$" -v sevre="^($CHAIN_SEVERITIES)\$" -v natre="^($CHAIN_NATURES)\$" -v pathre="^record $CHAIN_PATH_CLASS+\$" '
     function isid(s) { return s ~ idre }
     function isids(s,   a, k, i) {
       k = split(s, a, " ")
@@ -13855,7 +13861,7 @@ derive_chain_verdict() { # record or empty · live ids · stop mode · ceiling -
         audn[r] = substr(f[3], 9)
       } else if (k == 4 && f[2] == "sibling" && f[3] ~ /^unit / && isid(substr(f[3], 6)) && f[4] ~ /^rev [0-9]+$/) {
         fold[r] = fold[r] " " substr(f[3], 6)
-      } else if (k == 3 && f[2] == "owner-stop" && f[3] ~ "^record [A-Za-z0-9._/-]+$") {
+      } else if (k == 3 && f[2] == "owner-stop" && f[3] ~ pathre) {
         ruled[r] = substr(f[3], 8)
       } else if (k == 7 && f[2] ~ /^finding [0-9]+$/ && f[3] ~ sevre &&
                  f[4] ~ natre && f[5] ~ /^specs / && isids(substr(f[5], 7)) &&

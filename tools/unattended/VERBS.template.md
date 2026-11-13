@@ -304,8 +304,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   rev with no Revision log entry. `--record-round <slug> --owner-stop <path>` records the owner's
   ruling that the chain has ended instead: it appends `round <N> · owner-stop · record <path>` on a
   round of its own, counted over every row of the record, and names a new record from the roster's
-  first id. `<path>` is a tracked file directly under the build's `prompts/` folder whose name stays
-  inside `[A-Za-z0-9._-]`. No round flag sits beside it, and it refuses one given, a path outside that
+  first id. `<path>` is a tracked file directly under the build's `prompts/` folder, and the whole
+  path, the memory root included, stays inside `[A-Za-z0-9._/-]`. No round flag sits beside it, and it refuses one given, a path outside that
   folder or that charset, a path git does not track, and a roster that yields no id for a new record.
   It does not check that the owner wrote the cited record: the row is evidence a reader opens.
 - `--chain-verdict` — `--chain-verdict <slug>`: derives whether a spec audit's chain goes on from that
