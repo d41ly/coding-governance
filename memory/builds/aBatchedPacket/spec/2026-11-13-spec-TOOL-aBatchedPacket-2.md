@@ -1,11 +1,12 @@
 # TOOL-aBatchedPacket-2 — the closing review's round 1 repaired: each arm of the front door's suite able to fail on the read it names, the leg's owed rows, and a parent read that declines under a foreign git location
 
-**Status:** INPROGRESS · rev-1 · 2026-11-14 · node a · Tier-2 · base d3ee4c149 · streams tooling · order 2
+**Status:** CLOSED · rev-1 · 2026-11-14 · node a · Tier-2 · base d3ee4c149 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-14-build-TOOL-aBatchedPacket-2-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aBatchedPacket-2-1-acceptance-ledger.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aBatchedPacket-2-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-aBatchedPacket-2-1-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aBatchedPacket-2-brief.md](../prompts/2026-11-13-prompt-TOOL-aBatchedPacket-2-brief.md) | research | — |
 | [2026-11-14-prompt-TOOL-aBatchedPacket-2-1-builder.md](../prompts/2026-11-14-prompt-TOOL-aBatchedPacket-2-1-builder.md) | journal | — |
@@ -445,7 +446,7 @@ New arm: tools/chain-packet.test.sh · covers AC8 · CP9, staged with the leak-v
     and it needs a synthetic design, registers and packets the instruments accept.
   - Recommendation: (a). It is the report's stated rule for a suite that clones the whole tree,
     the brief admits it, and (b) taxes every records commit and every later spec.
-  - Decided 2026-11-14 by the main loop, no owner turn being available under the brief: (a).
+  RESOLVED (agent, 2026-11-14, delegated): (a).
 
 ## 9. Revision log
 

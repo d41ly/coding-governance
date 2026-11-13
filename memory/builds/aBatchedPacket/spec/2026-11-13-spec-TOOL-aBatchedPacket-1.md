@@ -1,12 +1,13 @@
 # TOOL-aBatchedPacket-1 — a front door for the chain packet: the instrument's own `main`, its two per-spec reads answered in-process, bound to the instrument blobs it was read against
 
-**Status:** INPROGRESS · rev-1 · 2026-11-13 · node a · Tier-2 · base 8db6f4bef · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-11-13 · node a · Tier-2 · base 8db6f4bef · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-13-build-TOOL-aBatchedPacket-1-analysis.md](../build/2026-11-13-build-TOOL-aBatchedPacket-1-analysis.md) | research | — |
+| [2026-11-14-build-TOOL-aBatchedPacket-1-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aBatchedPacket-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aBatchedPacket-1-1-builder.md](../prompts/2026-11-13-prompt-TOOL-aBatchedPacket-1-1-builder.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aBatchedPacket-1-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-aBatchedPacket-1-1-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aBatchedPacket-1-brief.md](../prompts/2026-11-13-prompt-TOOL-aBatchedPacket-1-brief.md) | research | — |
@@ -504,7 +505,7 @@ New arm: tools/check-spec-tokens.test.sh · covers AC8 · a checker copy in a to
     standing arm guards a later edit of the door.
   - Recommendation: (a). The door is bound to three constants, so the one change that can break it
     silently is an edit to the door itself, and only real-bytes arms see that.
-  - Decided 2026-11-13 by the main loop, no owner turn being available under the brief: (a).
+  RESOLVED (agent, 2026-11-13, delegated): (a).
 - **F2 — What do the fast-path arms do once an instrument's blob has moved at HEAD?**
   - (a) Fail, naming the role and the cure: read the reliance points again and set the constant.
     The landing that moves the instrument then owes that step, the landing of ask
@@ -513,7 +514,7 @@ New arm: tools/check-spec-tokens.test.sh · covers AC8 · a checker copy in a to
     per call, and nothing reds.
   - Recommendation: (a). A skip there would read as coverage, and the fourteen-minute walk would
     return unannounced.
-  - Decided 2026-11-13 by the main loop, no owner turn being available under the brief: (a).
+  RESOLVED (agent, 2026-11-13, delegated): (a).
 - **F3 — How are AC11's base readings taken?**
   - (a) All nineteen instrument runs, in the background on copies of the frozen clone, three at a
     time, while the build proceeds.
@@ -522,14 +523,14 @@ New arm: tools/check-spec-tokens.test.sh · covers AC8 · a checker copy in a to
     is cut to AC7.
   - Recommendation: (a). The brief names each plant and control, the runs need no attention, and
     the node's load only stretches their wall time.
-  - Decided 2026-11-13 by the main loop, no owner turn being available under the brief: (b), run one at a time. Option (a) keeps three walks of about 15,000 processes each (PINNED 2026-11-13) on the node for hours beside the live dDeclaredLoop run, which the brief's constraints rule out. AC11 is observed on those five argument lists against the instrument, and on all nineteen through the door against the exits the instrument's docstring states.
+  RESOLVED (agent, 2026-11-13, delegated): (b), run one at a time. Option (a) keeps three walks of about 15,000 processes each (PINNED 2026-11-13) on the node for hours beside the live dDeclaredLoop run, which the brief's constraints rule out. AC11 is observed on those five argument lists against the instrument, and on all nineteen through the door against the exits the instrument's docstring states.
 - **F4 — Where does a chain session learn to call the door?**
   - (a) One line in the kickoff manifest, `memory/guides/SESSION-KICKOFF.md`, written by the main
     loop at the close, beside the line on the carries join.
   - (b) The dossier and the door's docstring only.
   - Recommendation: (a). Chain READMEs and packets word the direct call and cannot change, so
     without a line every session reads, only the checker's join gets faster.
-  - Decided 2026-11-13 by the main loop, no owner turn being available under the brief: (a).
+  RESOLVED (agent, 2026-11-13, delegated): (a).
 
 ## 9. Revision log
 

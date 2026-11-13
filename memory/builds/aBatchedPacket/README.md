@@ -53,17 +53,17 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-11-13 · streams tooling
+**Build status:** CLOSED · 2 unit(s) · node a · opened 2026-11-13 · streams tooling
 ids TOOL-aBatchedPacket-1 TOOL-aBatchedPacket-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aBatchedPacket-1 — a front door for the chain packet: the instrument's own `main`, its two per-spec reads answered in-process, bound to the instrument blobs it was read against](spec/2026-11-13-spec-TOOL-aBatchedPacket-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-11-13 |
-| [TOOL-aBatchedPacket-2 — the closing review's round 1 repaired: each arm of the front door's suite able to fail on the read it names, the leg's owed rows, and a parent read that declines under a foreign git location](spec/2026-11-13-spec-TOOL-aBatchedPacket-2.md) | 2 | 2 | INPROGRESS | rev-1 | 2026-11-14 |
+| [TOOL-aBatchedPacket-1 — a front door for the chain packet: the instrument's own `main`, its two per-spec reads answered in-process, bound to the instrument blobs it was read against](spec/2026-11-13-spec-TOOL-aBatchedPacket-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-13 |
+| [TOOL-aBatchedPacket-2 — the closing review's round 1 repaired: each arm of the front door's suite able to fail on the read it names, the leg's owed rows, and a parent read that declines under a foreign git location](spec/2026-11-13-spec-TOOL-aBatchedPacket-2.md) | 2 | 2 | CLOSED | rev-1 | 2026-11-14 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 4 record folder(s).
+Records: 10 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

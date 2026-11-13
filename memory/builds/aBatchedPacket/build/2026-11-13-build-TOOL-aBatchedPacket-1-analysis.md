@@ -154,6 +154,21 @@ walk, and the plants damage the render and the arms, which the front door does n
 The three instrument blobs are the same in both clones: `packet.py` `cab3bff1`, `carries.py`
 `0b5fab9c`, `schedule.py` `5aa5421e`.
 
+**The built door**, `tools/chain-packet.py` at `d46719074`, on the same clones, 2026-11-14, the node more
+loaded than at the prototype's readings:
+
+| Step | Clone | Before | After | Same output |
+|---|---|---|---|---|
+| `--check dDeclaredLoop`, packet stale | fc | 845.5 s, 15,465 processes | 26.4 s and 50.2 s in two runs, 23 processes | the eight lines, by `diff` |
+| `--write dDeclaredLoop` | fc | 859.3 s, 15,459 processes | 22.1 s and 18.2 s, 17 processes | the packet, by `cmp` |
+| `check-spec-tokens.py`, one live chain run | fd | 1,062.1 s, 15,509 processes | 97.7 s and 95.7 s, 49 processes | every line, by `diff` |
+| `--parity dDeclaredLoop` | fc | | identical, 73,446 bytes, 2,142 s for the instrument's walk under load | |
+
+Five fixture runs the instrument's own way, one at a time on `fc`, gave the door's stdout and exit byte
+for byte: the unplanted fixture, the pin plant, its two controls and the run-live plant.
+
+The closing review's round 1 and its repair are the build's review record and unit 2.
+
 ## 5. What the design does not check
 
 - A chain spec revision in history that is not UTF-8. The instrument's `real_specs` fails on one, and
