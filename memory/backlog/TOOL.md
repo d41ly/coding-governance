@@ -196,6 +196,7 @@ Cite ids, never line numbers.
 | [TOOL-aNimbleMend-24](../builds/aNimbleMend/BACKLOG.md) | OPEN | MED | — | 2026-11-13 | OWNER CALL: TWO SENTENCES ABOUT THE LANE THAT ONLY THE OWNER MAY… |
 | [TOOL-aNimbleMend-25](../builds/aNimbleMend/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | inherited red: leg shell hygiene (a fork spent on builtin work) red at… |
 | [TOOL-aNimbleMend-26](../builds/aNimbleMend/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | inherited red: leg spawn budget (forks per hot entrypoint) red at… |
+| [TOOL-aNimbleMend-28](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | THREE SUITES' FORK-IDIOM ROWS WERE RE-DECLARED UPWARD, NOT DRAINED.… |
 | [TOOL-aNumeralWarden-2](../builds/aNumeralWarden/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | agent-cap's enclosing-opener walk is defeated by two nested wrappers or… |
 | [TOOL-aNumeralWarden-3](../builds/aNumeralWarden/BACKLOG.md) | OPEN | — | — | 2026-08-10 | a drift-audit pin RAISE is indistinguishable from a population drain to… |
 | [TOOL-aPacedTurnstile-9](../builds/aPacedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | prove each leg guard COMPLETE, the sound fix TOOL-aPacedTurnstile-7… |

@@ -13,6 +13,7 @@
 - TOOL-aNimbleMend-24 · filed 2026-11-13 · OWNER CALL: TWO SENTENCES ABOUT THE LANE THAT ONLY THE OWNER MAY SETTLE. The charter's `[spec]` practice still reads that every product-code unit commits its spec first, and an inline red fix is product code with no spec; amending it changes a governance carrier the prompt did not name. And the protocol's section 12 says the fix's typed record is the next commit, where the prompt allowed the same commit or the next. · seen `tools/unattended/PROTOCOL.template.md` matching `Two switches act BETWEEN passes` run `grep -n "Two switches act BETWEEN passes" tools/unattended/PROTOCOL.template.md` · accept the owner rules on each sentence, and the carrier that states it says what was ruled
 - TOOL-aNimbleMend-25 · filed 2026-11-13 · inherited red: leg shell hygiene (a fork spent on builtin work) red at 2ba17e9d, introduced by 6f50dab9 · seen `{prefix}/gate-lint/sh_hygiene.py`@2ba17e9d run `python3 {prefix}/gate-lint/sh_hygiene.py --spawn-idioms memory/project/spawn-idiom-sites.txt . :!*.test.sh :!memory/` · accept the leg is green at the default branch's tip → 6f50dab9
 - TOOL-aNimbleMend-26 · filed 2026-11-13 · inherited red: leg spawn budget (forks per hot entrypoint) red at 2ba17e9d, introduced by an unknown landing · seen `{prefix}/gate-lint/fork-count.sh`@2ba17e9d run `bash {prefix}/gate-lint/fork-count.sh memory/project/fork-ceilings.txt .` · accept the leg is green at the default branch's tip
+- TOOL-aNimbleMend-28 · filed 2026-11-13 · THREE SUITES' FORK-IDIOM ROWS WERE RE-DECLARED UPWARD, NOT DRAINED. This build's arms added `var-pipe` sites to `tools/run-gates/run-gates.evidence.test.sh` and `tools/run-gates/run-gates.test.sh` and `printf-subst` sites to `tools/workflows/unattended-build.test.sh`; TOOL-aNimbleMend-27 raised the three rows of the registry to the measured counts rather than convert the sites, because a conversion owes a whole run of each suite. · seen `memory/project/spawn-idiom-sites.txt` matching `the arms TOOL-aNimbleMend added` run `grep -c "the arms TOOL-aNimbleMend added" memory/project/spawn-idiom-sites.txt` · accept each of the three rows is back at or below the count it declared before this build
 
 ## Dispositions
 
@@ -38,3 +39,5 @@
 - KEEP · TOOL-aNimbleMend-25 · filed by an unattended run for the owning build; outside this build's goal
 - SEV · TOOL-aNimbleMend-26 · HIGH · a merge-bar leg is red on the default branch
 - KEEP · TOOL-aNimbleMend-26 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-aNimbleMend-28 · LOW · a declared debt of forks in three suites; no verdict moves
+- KEEP · TOOL-aNimbleMend-28 · decided by the main loop at the close; the drain owes three suite runs
