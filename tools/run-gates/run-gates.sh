@@ -33,7 +33,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.46   # gov:kit run-gates@1.46
+KIT_RUN_GATES_VERSION=1.47   # gov:kit run-gates@1.47
 # 1.40 -> 1.41: the kit ships `measure_legs.py`, a gate profiler that runs every manifest leg clean and
 # unbounded, each in its own Windows Job Object, with its fixtures and its `measure-legs selftest` leg
 # (TOOL-dRedressedBar-18). This runner's behaviour does not move; the profiler reads its text.

@@ -81,7 +81,7 @@ micro-format gate selftest	460		worst of 8 readings 303s, x1.5
 placeholder-catalogue self-test	80		worst of 8 readings 50s, x1.5
 playbook parity selftest	150		worst of 7 readings 93s, x1.5
 playbook render selftest	60		worst of 8 readings 10s, x1.5
-policy fixtures	970		measured 644s on node a 2026-10-25 at 4f52f18c, one whole serial run of the leg's own argv over the fixture's 150 cases, 929 assertion(s) executed and 0 wrong, x1.5. TOOL-dGroundRules-78
+policy fixtures	1820		measured 1210s on node a 2026-11-13 at 2ba17e9d6, one whole serial run of the leg's own argv alone on a clone, 1021 assertion(s) executed and 33 wrong, the 33 filed as TOOL-aNimbleMend-20, x1.5. TOOL-aNimbleMend-15
 pre-push bar self-test	60		one proxy reading 32.5s on node a 2026-09-23, a scratch fixture making the harness's 18 pushes, x1.5 floored at this file 60s minimum. TOOL-aRepatriatedFork-5
 pre-push run-log line	60		worst of 3 readings 39s on node d 2026-09-14 by direct invocation, x1.5 floored at this file 60s minimum. TOOL-dLoggedFlight-4, withheld from adopters
 pre-push self-test	1020		worst of 8 readings 676s, x1.5
@@ -97,7 +97,7 @@ review-join self-test	460		worst of 8 readings 301s, x1.5
 review-replay selftest	60		measured 0.2s on node a 2026-10-01 by direct invocation, x1.5 floored at this file 60s minimum
 roles adopter self-test	60		PINNED by declaration at this file's 60s floor, not measured; re-priced from the first measured run. TOOL-aOrientedCast-8
 roles render selftest	60		measured 1.3s on node a 2026-10-11, one direct run of the argv in the pass that wrote it, x1.5 floored at this file 60s minimum. TOOL-aOrientedCast-3
-routed-commits selftest	80		measured 50s on node a 2026-10-09, one direct run of the scratch copy while other sessions held the box, x1.5. TOOL-aRoutedQuill-3
+routed-commits selftest	500		measured 330s on node a 2026-11-13 at 2ba17e9d6, one direct run of the leg's own argv alone on a clone, all arms held, x1.5. TOOL-aNimbleMend-15
 row-grammar selftest	60		worst of 10 readings 36s, x1.5
 row-keyed merge driver replay	1620		worst of 10 readings 1077s, x1.5
 run-gates adopter e2e	300		worst of 8 readings 198s, x1.5
@@ -109,7 +109,7 @@ run-gates turnstile	3630		worst of 9 readings 2419s, x1.5
 run-selftests self-test	1217		measured 811s on node a 2026-09-14, direct timed run of the suite alone on a frozen git clone --local at f23b71e0 (108 arms, inner width 1, 15 bash processes on the box before it started, PASS), x1.5 rounded up; the 300s ceiling it replaces was killed at 300.333s exit 124 and had observed no wall
 branch-reconcile selftest	78		measured 52s on node d 2026-10-13, the whole suite run once at VERIFYING over 92 assertions, x1.5
 runlog selftest	93		measured 62s on node d 2026-09-16, the worst of the direct runs (58 to 62 s) after the closing review's round-1 fold and the second origin/main reconcile raised the suite to 1291 assertions, x1.5
-scratch-guard self-test	220		worst of 8 readings 145s, x1.5
+scratch-guard self-test	290		measured 187s on node a 2026-11-13 at 2ba17e9d6, one direct run of the suite alone on a clone, 378 passed and 7 failed, the 7 filed as TOOL-aNimbleMend-17, x1.5. TOOL-aNimbleMend-15
 format-guard self-test	30		worst of 2 readings 16s on node a 2026-10-13 (73 assertions, post-reboot), x1.5 rounded up; re-declared at aHeardState's VERIFYING from the ESTIMATE of 120
 selftest harness self-test	60		measured 37s on node a 2026-09-07, x1.5
 settings-merge selftest	60		worst of 11 readings 4s, x1.5
