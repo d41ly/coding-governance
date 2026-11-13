@@ -17,7 +17,7 @@ second leg reds. Take it out and the first one does.
 
 Node d, 2026-11-14, landing `branch/d-builds-clarification-dfddc4`. The close-out flipped
 `TOOL-dPolishedVitrine-1` to CLOSED. The bar join grades live specs only, so the waiver for that
-spec's `tools/install-prefix-carried.txt` citation produced no hit and read stale. The fix commit
+spec's citation of a since-deleted ledger file produced no hit and read stale. The fix commit
 deleted the row and named the unit in its subject. `--pass-spec` takes the newest unit the range
 names and grades its spec "whatever their status", so it graded the closed spec and found the
 citation unwaived.
