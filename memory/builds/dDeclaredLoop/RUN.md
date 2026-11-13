@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 phase: BUILDING
@@ -32,3 +33,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 ## Parked
 
 2026-11-13T04:55:18Z brief · item TOOL-dDeclaredLoop-18 · reason a382adfd781a memory/builds/dDeclaredLoop/prompts/2026-11-13-prompt-TOOL-dDeclaredLoop-18-build-brief.md
+
+2026-11-13T06:04:47Z decision · item the dispatch gate (check 118) refuses every unit of this build run until a spec-audit chain covers all 98 live specs, and the owner ended this build's audit chain at round 12: which stands? · reason options: (a) the owner rules the audit run again, and the run re-invokes the build harness with auditIds over the 98 specs, a chain that ran twelve rounds here without a clean round; (b) the owner sets review.spec-audit.disposal off by-nature or removes spec-audit from the README, so the gate does not read the chain for this build run; (c) the owner rules how the twelve recorded rounds enter a chain-rounds record. Refused to choose: (a) reverses the owner's 2026-10-24 stop, (b) edits an owner-landed README key or a policy value to pass a gate, (c) hand-builds an append-only record; none is delegated
