@@ -194,8 +194,6 @@ Cite ids, never line numbers.
 | [TOOL-aNimbleMend-22](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | FOUR SUITES RAN PAST THEIR DECLARED COST BUDGETS AT THIS BUILD'S CLOSE.… |
 | [TOOL-aNimbleMend-23](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | A Red-fix: COMMIT THAT TOUCHES NO PATH CAN NEVER BE RECORDED. The door… |
 | [TOOL-aNimbleMend-24](../builds/aNimbleMend/BACKLOG.md) | OPEN | MED | — | 2026-11-13 | OWNER CALL: TWO SENTENCES ABOUT THE LANE THAT ONLY THE OWNER MAY… |
-| [TOOL-aNimbleMend-25](../builds/aNimbleMend/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | inherited red: leg shell hygiene (a fork spent on builtin work) red at… |
-| [TOOL-aNimbleMend-26](../builds/aNimbleMend/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | inherited red: leg spawn budget (forks per hot entrypoint) red at… |
 | [TOOL-aNimbleMend-28](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | THREE SUITES' FORK-IDIOM ROWS WERE RE-DECLARED UPWARD, NOT DRAINED.… |
 | [TOOL-aNumeralWarden-2](../builds/aNumeralWarden/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | agent-cap's enclosing-opener walk is defeated by two nested wrappers or… |
 | [TOOL-aNumeralWarden-3](../builds/aNumeralWarden/BACKLOG.md) | OPEN | — | — | 2026-08-10 | a drift-audit pin RAISE is indistinguishable from a population drain to… |
