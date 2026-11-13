@@ -115,12 +115,12 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-1 — the loop kit and its definition keyed by the stage tags, the roles kit's stage table moved into it](spec/2026-10-24-spec-TOOL-dDeclaredLoop-1.md) | 2 | 2 | CLOSED | rev-5 | 2026-11-13 |
 | [TOOL-dDeclaredLoop-23 — the commit node and its kind, and one trailer reader with both views](spec/2026-10-24-spec-TOOL-dDeclaredLoop-23.md) | 3 | 2 | CLOSED | rev-3 | 2026-11-13 |
 | [TOOL-dDeclaredLoop-36 — the loop kit in govkit's default selection, so a default apply installs what roles requires](spec/2026-10-24-spec-TOOL-dDeclaredLoop-36.md) | 3 | 2 | CLOSED | rev-3 | 2026-11-13 |
-| [TOOL-dDeclaredLoop-16 — one closed disposition set, and the owner's disposition record](spec/2026-10-24-spec-TOOL-dDeclaredLoop-16.md) | 4 | 2 | DEFERRED | rev-3 | 2026-10-25 |
-| [TOOL-dDeclaredLoop-37 — the trailer re-points observed at their call sites, red at base](spec/2026-10-24-spec-TOOL-dDeclaredLoop-37.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-38 — the trailer CLI writes LF only, so a shell loop never keeps a CR on its last token](spec/2026-10-24-spec-TOOL-dDeclaredLoop-38.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-39 — the one trailer reader carries the git pins of the readers it replaces](spec/2026-10-24-spec-TOOL-dDeclaredLoop-39.md) | 4 | 2 | DEFERRED | rev-1 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-40 — the trailer reader finds the key table through the kit resolver, and reads a floor of keys where none is installed](spec/2026-10-24-spec-TOOL-dDeclaredLoop-40.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-57 — `update` refuses a claimed kit whose `requires` it leaves unmet, on every admission path](spec/2026-10-24-spec-TOOL-dDeclaredLoop-57.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-16 — one closed disposition set, and the owner's disposition record](spec/2026-10-24-spec-TOOL-dDeclaredLoop-16.md) | 4 | 2 | DEFERRED | rev-4 | 2026-11-13 |
+| [TOOL-dDeclaredLoop-37 — the trailer re-points observed at their call sites, red at base](spec/2026-10-24-spec-TOOL-dDeclaredLoop-37.md) | 4 | 2 | DEFERRED | rev-3 | 2026-11-13 |
+| [TOOL-dDeclaredLoop-38 — the trailer CLI writes LF only, so a shell loop never keeps a CR on its last token](spec/2026-10-24-spec-TOOL-dDeclaredLoop-38.md) | 4 | 2 | DEFERRED | rev-3 | 2026-11-13 |
+| [TOOL-dDeclaredLoop-39 — the one trailer reader carries the git pins of the readers it replaces](spec/2026-10-24-spec-TOOL-dDeclaredLoop-39.md) | 4 | 2 | DEFERRED | rev-2 | 2026-11-13 |
+| [TOOL-dDeclaredLoop-40 — the trailer reader finds the key table through the kit resolver, and reads a floor of keys where none is installed](spec/2026-10-24-spec-TOOL-dDeclaredLoop-40.md) | 4 | 2 | DEFERRED | rev-3 | 2026-11-13 |
+| [TOOL-dDeclaredLoop-57 — `update` refuses a claimed kit whose `requires` it leaves unmet, on every admission path](spec/2026-10-24-spec-TOOL-dDeclaredLoop-57.md) | 4 | 2 | DEFERRED | rev-3 | 2026-11-13 |
 | [TOOL-dDeclaredLoop-5 — the witness-class rule: every witness classed, the actor class refused](spec/2026-10-24-spec-TOOL-dDeclaredLoop-5.md) | 5 | 2 | DEFERRED | rev-3 | 2026-10-25 |
 | [TOOL-dDeclaredLoop-58 — the LF-only criterion reads a counted, non-empty CLI output before it looks for a CR](spec/2026-10-24-spec-TOOL-dDeclaredLoop-58.md) | 5 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-73 — the claimed-requires refusal grades each kit's `requires` at the vintage `update --to` installs](spec/2026-10-24-spec-TOOL-dDeclaredLoop-73.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-24 |
@@ -212,7 +212,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 249 bound to this build, across 4 record folder(s).
+Records: 261 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -221,13 +221,13 @@ Ids no `spec-audit` record has ever named: TOOL-dDeclaredLoop-100 TOOL-dDeclared
 Ids whose spec moved past its audited revision: TOOL-dDeclaredLoop-1@rev-1 TOOL-dDeclaredLoop-11@rev-1 TOOL-dDeclaredLoop-12@rev-1 TOOL-dDeclaredLoop-13@rev-1 TOOL-dDeclaredLoop-14@rev-1 TOOL-dDeclaredLoop-15@rev-1 TOOL-dDeclaredLoop-16@rev-1 TOOL-dDeclaredLoop-17@rev-1 TOOL-dDeclaredLoop-18@rev-1
 TOOL-dDeclaredLoop-2@rev-1 TOOL-dDeclaredLoop-20@rev-1 TOOL-dDeclaredLoop-21@rev-1 TOOL-dDeclaredLoop-22@rev-1 TOOL-dDeclaredLoop-23@rev-1 TOOL-dDeclaredLoop-24@rev-1 TOOL-dDeclaredLoop-25@rev-1 TOOL-dDeclaredLoop-26@rev-1 TOOL-dDeclaredLoop-27@rev-1 TOOL-dDeclaredLoop-28@rev-1
 TOOL-dDeclaredLoop-29@rev-1 TOOL-dDeclaredLoop-3@rev-1 TOOL-dDeclaredLoop-30@rev-1 TOOL-dDeclaredLoop-31@rev-1 TOOL-dDeclaredLoop-32@rev-1 TOOL-dDeclaredLoop-33@rev-1 TOOL-dDeclaredLoop-34@rev-1 TOOL-dDeclaredLoop-36@rev-1 TOOL-dDeclaredLoop-37@rev-1 TOOL-dDeclaredLoop-38@rev-1
-TOOL-dDeclaredLoop-4@rev-1 TOOL-dDeclaredLoop-40@rev-1 TOOL-dDeclaredLoop-41@rev-1 TOOL-dDeclaredLoop-42@rev-1 TOOL-dDeclaredLoop-43@rev-1 TOOL-dDeclaredLoop-44@rev-1 TOOL-dDeclaredLoop-45@rev-1 TOOL-dDeclaredLoop-46@rev-1 TOOL-dDeclaredLoop-47@rev-1 TOOL-dDeclaredLoop-48@rev-1
-TOOL-dDeclaredLoop-49@rev-1 TOOL-dDeclaredLoop-5@rev-1 TOOL-dDeclaredLoop-50@rev-1 TOOL-dDeclaredLoop-51@rev-1 TOOL-dDeclaredLoop-52@rev-1 TOOL-dDeclaredLoop-53@rev-1 TOOL-dDeclaredLoop-54@rev-1 TOOL-dDeclaredLoop-55@rev-1 TOOL-dDeclaredLoop-56@rev-1 TOOL-dDeclaredLoop-57@rev-1
-TOOL-dDeclaredLoop-59@rev-1 TOOL-dDeclaredLoop-6@rev-1 TOOL-dDeclaredLoop-60@rev-1 TOOL-dDeclaredLoop-61@rev-1 TOOL-dDeclaredLoop-62@rev-1 TOOL-dDeclaredLoop-63@rev-1 TOOL-dDeclaredLoop-64@rev-1 TOOL-dDeclaredLoop-65@rev-1 TOOL-dDeclaredLoop-66@rev-1 TOOL-dDeclaredLoop-67@rev-1
-TOOL-dDeclaredLoop-68@rev-1 TOOL-dDeclaredLoop-69@rev-1 TOOL-dDeclaredLoop-7@rev-1 TOOL-dDeclaredLoop-70@rev-1 TOOL-dDeclaredLoop-71@rev-1 TOOL-dDeclaredLoop-72@rev-1 TOOL-dDeclaredLoop-73@rev-1 TOOL-dDeclaredLoop-74@rev-1 TOOL-dDeclaredLoop-75@rev-1 TOOL-dDeclaredLoop-76@rev-1
-TOOL-dDeclaredLoop-77@rev-1 TOOL-dDeclaredLoop-78@rev-1 TOOL-dDeclaredLoop-79@rev-1 TOOL-dDeclaredLoop-8@rev-1 TOOL-dDeclaredLoop-80@rev-1 TOOL-dDeclaredLoop-81@rev-1 TOOL-dDeclaredLoop-82@rev-1 TOOL-dDeclaredLoop-83@rev-1 TOOL-dDeclaredLoop-84@rev-1 TOOL-dDeclaredLoop-85@rev-1
-TOOL-dDeclaredLoop-86@rev-1 TOOL-dDeclaredLoop-87@rev-1 TOOL-dDeclaredLoop-88@rev-1 TOOL-dDeclaredLoop-89@rev-1 TOOL-dDeclaredLoop-90@rev-1 TOOL-dDeclaredLoop-91@rev-1 TOOL-dDeclaredLoop-92@rev-1 TOOL-dDeclaredLoop-93@rev-1 TOOL-dDeclaredLoop-94@rev-1 TOOL-dDeclaredLoop-95@rev-1
-TOOL-dDeclaredLoop-96@rev-1.
+TOOL-dDeclaredLoop-39@rev-1 TOOL-dDeclaredLoop-4@rev-1 TOOL-dDeclaredLoop-40@rev-1 TOOL-dDeclaredLoop-41@rev-1 TOOL-dDeclaredLoop-42@rev-1 TOOL-dDeclaredLoop-43@rev-1 TOOL-dDeclaredLoop-44@rev-1 TOOL-dDeclaredLoop-45@rev-1 TOOL-dDeclaredLoop-46@rev-1 TOOL-dDeclaredLoop-47@rev-1
+TOOL-dDeclaredLoop-48@rev-1 TOOL-dDeclaredLoop-49@rev-1 TOOL-dDeclaredLoop-5@rev-1 TOOL-dDeclaredLoop-50@rev-1 TOOL-dDeclaredLoop-51@rev-1 TOOL-dDeclaredLoop-52@rev-1 TOOL-dDeclaredLoop-53@rev-1 TOOL-dDeclaredLoop-54@rev-1 TOOL-dDeclaredLoop-55@rev-1 TOOL-dDeclaredLoop-56@rev-1
+TOOL-dDeclaredLoop-57@rev-1 TOOL-dDeclaredLoop-59@rev-1 TOOL-dDeclaredLoop-6@rev-1 TOOL-dDeclaredLoop-60@rev-1 TOOL-dDeclaredLoop-61@rev-1 TOOL-dDeclaredLoop-62@rev-1 TOOL-dDeclaredLoop-63@rev-1 TOOL-dDeclaredLoop-64@rev-1 TOOL-dDeclaredLoop-65@rev-1 TOOL-dDeclaredLoop-66@rev-1
+TOOL-dDeclaredLoop-67@rev-1 TOOL-dDeclaredLoop-68@rev-1 TOOL-dDeclaredLoop-69@rev-1 TOOL-dDeclaredLoop-7@rev-1 TOOL-dDeclaredLoop-70@rev-1 TOOL-dDeclaredLoop-71@rev-1 TOOL-dDeclaredLoop-72@rev-1 TOOL-dDeclaredLoop-73@rev-1 TOOL-dDeclaredLoop-74@rev-1 TOOL-dDeclaredLoop-75@rev-1
+TOOL-dDeclaredLoop-76@rev-1 TOOL-dDeclaredLoop-77@rev-1 TOOL-dDeclaredLoop-78@rev-1 TOOL-dDeclaredLoop-79@rev-1 TOOL-dDeclaredLoop-8@rev-1 TOOL-dDeclaredLoop-80@rev-1 TOOL-dDeclaredLoop-81@rev-1 TOOL-dDeclaredLoop-82@rev-1 TOOL-dDeclaredLoop-83@rev-1 TOOL-dDeclaredLoop-84@rev-1
+TOOL-dDeclaredLoop-85@rev-1 TOOL-dDeclaredLoop-86@rev-1 TOOL-dDeclaredLoop-87@rev-1 TOOL-dDeclaredLoop-88@rev-1 TOOL-dDeclaredLoop-89@rev-1 TOOL-dDeclaredLoop-90@rev-1 TOOL-dDeclaredLoop-91@rev-1 TOOL-dDeclaredLoop-92@rev-1 TOOL-dDeclaredLoop-93@rev-1 TOOL-dDeclaredLoop-94@rev-1
+TOOL-dDeclaredLoop-95@rev-1 TOOL-dDeclaredLoop-96@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
