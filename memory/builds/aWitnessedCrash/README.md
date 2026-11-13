@@ -44,13 +44,13 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-11-13 · streams tooling
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-11-13 · streams tooling
 ids TOOL-aWitnessedCrash-1
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aWitnessedCrash-1 — check 23's maps are declared set, and the hygiene engine reds on a bash runtime error it ran past](spec/2026-11-13-spec-TOOL-aWitnessedCrash-1.md) | 1 | 1 | INPROGRESS | rev-2 | 2026-11-13 |
+| [TOOL-aWitnessedCrash-1 — check 23's maps are declared set, and the hygiene engine reds on a bash runtime error it ran past](spec/2026-11-13-spec-TOOL-aWitnessedCrash-1.md) | 1 | 1 | CLOSED | rev-2 | 2026-11-13 |
 <!-- /gen:build-units -->
 
 Records: 5 bound to this build, across 3 record folder(s).

@@ -11,10 +11,13 @@ injected copy exited 0 with no crash row. AC5 ran the two greps at the tip, and 
 base f9a87e782. The suite's new arm and its RED-first run are owed to the close, per the spec's
 `New arm:` line.
 
+The fix pass on the close bar's reds replaced the witness's `grep` with a builtin read loop. The
+main loop's probe then re-ran over the worktree's kit, and AC2 to AC4 read as below again.
+
 **Evidences:** TOOL-aWitnessedCrash-1
 - AC1 — `bash tools/memory-tree/check-memory-hygiene.sh --staged` — in a clone of the tip with one
-  blank line appended to `memory/HYGIENE.md` and staged, the run exited 0 in 5 s. `grep -c` counted
-  0 lines carrying `unbound variable` across its stdout and stderr together.
+  blank line appended to `memory/HYGIENE.md` and staged, the run exited 0. `grep -c` found no line
+  carrying `unbound variable` across its stdout and stderr together.
 - AC2 — `HYGIENE FAILED — bash reported a runtime error` — the uninjected copy exited 0 under
   `--only 1` over `Y`. The injected copy held `__wc_probe` twice and exited 1. Its stdout opened with
   that line and named the error. Its stderr file carried `__wc_probe: unbound variable`, so the replay
