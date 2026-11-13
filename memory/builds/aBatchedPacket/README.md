@@ -53,22 +53,23 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-11-13 · streams tooling
+**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-11-13 · streams tooling
 ids TOOL-aBatchedPacket-1 TOOL-aBatchedPacket-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aBatchedPacket-1 — a front door for the chain packet: the instrument's own `main`, its two per-spec reads answered in-process, bound to the instrument blobs it was read against](spec/2026-11-13-spec-TOOL-aBatchedPacket-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-11-13 |
+| [TOOL-aBatchedPacket-2 — the closing review's round 1 repaired: each arm of the front door's suite able to fail on the read it names, the leg's owed rows, and a parent read that declines under a foreign git location](spec/2026-11-13-spec-TOOL-aBatchedPacket-2.md) | 2 | 2 | INPROGRESS | rev-1 | 2026-11-14 |
 <!-- /gen:build-units -->
 
 Records: 7 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aBatchedPacket-1.
+Ids no `spec-audit` record has ever named: TOOL-aBatchedPacket-1 TOOL-aBatchedPacket-2.
 
-Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -76,6 +77,7 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-aBatchedPacket-1` | no |
+| 2 | `TOOL-aBatchedPacket-2` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
