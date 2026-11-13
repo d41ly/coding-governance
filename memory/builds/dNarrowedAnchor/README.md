@@ -61,18 +61,18 @@ the folder predates the run, so such a run has contradicted its own declaration 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node d · opened 2026-08-24 · streams tooling
+**Build status:** CLOSED · 1 unit(s) · node d · opened 2026-08-24 · streams tooling
 ids TOOL-dNarrowedAnchor-1 TOOL-dNarrowedAnchor-2 TOOL-dNarrowedAnchor-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dNarrowedAnchor-1 — the second anchor is admissible per MODE, and `slug` is not one of them](spec/2026-08-24-spec-TOOL-dNarrowedAnchor-1.md) | — | 2 | INPROGRESS | rev-1 | 2026-08-25 |
+| [TOOL-dNarrowedAnchor-1 — the second anchor is admissible per MODE, and `slug` is not one of them](spec/2026-08-24-spec-TOOL-dNarrowedAnchor-1.md) | — | 2 | CLOSED | rev-2 | 2026-11-13 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: TOOL-dNarrowedAnchor-1.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dNarrowedAnchor-1.
 

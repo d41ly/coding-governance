@@ -1,10 +1,12 @@
 # TOOL-dNarrowedAnchor-1 — the second anchor is admissible per MODE, and `slug` is not one of them
 
-**Status:** INPROGRESS · rev-1 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
+**Status:** CLOSED · rev-2 · 2026-11-13 · node d · Tier-2 · base 9ddcc5c9 · streams tooling · ratified 2026-11-13
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-11-13-build-TOOL-dNarrowedAnchor-1-1-journal.md](../build/2026-11-13-build-TOOL-dNarrowedAnchor-1-1-journal.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -179,16 +181,17 @@ Off the bar by owner ruling 2026-08-23 and therefore run BY HAND, with the resul
   "needs `published`"; (b) `prompt` alone, narrowest, but it breaks the documented playbook-run path
   for any adopter whose owner does not pre-land the folder. Recommendation (a), because (b) would make
   the kit's own routing table describe a path preflight refuses.
-  **RESOLVED (author, 2026-08-24): (a).** The carrier states the requirement, so excluding `recipe`
+  **RESOLVED (owner, 2026-11-13): (a).** The carrier states the requirement, so excluding `recipe`
   would contradict a shipped instruction rather than narrow an abuse.
 - **F2 — refuse, or downgrade to the strict anchor?** A downgrade would let a `slug` run continue
   against the merge-base instead of erroring. Rejected: the merge-base is exactly where its README was
   already shown to be absent, so the run would take `fail 6` one step later with a message about the
-  wrong thing. **RESOLVED (author, 2026-08-24): refuse, and name both exits.**
+  wrong thing. **RESOLVED (owner, 2026-11-13): refuse, and name both exits.**
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-24 · initial draft.
+- rev-2 · 2026-11-13 · §8 F1 and F2 re-signed RESOLVED (owner, 2026-11-13). The author had marked them `(author, …)`, which no §8 reader accepts, and the owner ratified both as built at `baa2857e4` when the unit closed.
 
 ## 10. Reuse audit
 
