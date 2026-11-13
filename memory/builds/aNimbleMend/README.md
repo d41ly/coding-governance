@@ -100,7 +100,7 @@ ids TOOL-aNimbleMend-16 TOOL-aNimbleMend-17 TOOL-aNimbleMend-18 TOOL-aNimbleMend
 | [TOOL-aNimbleMend-27 — the close's three red legs repaired: three no-fork forms in the pass-leg adapter, five guards that cover what they import, one manifest bullet inside its cap, and four re-declared rows](spec/2026-11-13-spec-TOOL-aNimbleMend-27.md) | 16 | 1 | CLOSED | rev-1 | 2026-11-13 |
 <!-- /gen:build-units -->
 
-Records: 41 bound to this build, across 4 record folder(s).
+Records: 42 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
