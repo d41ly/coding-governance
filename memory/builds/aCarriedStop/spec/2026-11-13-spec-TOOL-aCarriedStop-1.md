@@ -1,6 +1,6 @@
 # TOOL-aCarriedStop-1 — the owner-stop row: `--record-round --owner-stop` appends it citing the owner's tracked record, and the one chain verdict reads it as STOP
 
-**Status:** SPECCED · rev-1 · 2026-11-13 · node a · Tier-2 · base d646814e · streams tooling
+**Status:** INPROGRESS · rev-2 · 2026-11-13 · node a · Tier-2 · base d646814e · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-11-13-build-TOOL-aCarriedStop-1-candidates.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-candidates.md) | research | — |
 | [2026-11-13-prompt-TOOL-aCarriedStop-1-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-1-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aCarriedStop-1-brief.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-brief.md) | research | — |
+| [2026-11-13-prompt-TOOL-aCarriedStop-1-build-brief.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-build-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -421,12 +422,14 @@ The names `run`, `<b>`, `<stop>`, `<pass>`, `<118>`, "commit" and the fixture ar
 
 The first six are the legs that grade this unit's change. The last seven are owed by a guard a
 path of the estimate trips. The main loop runs the merge bar once, at the close, with the
-self-test tier that holds the driver's suite. No leg is added. Every arm below lives beside the suite's check 118 arms and uses
-its `write_gate_fixture`, `run_chain`, `check_gate_refused` and `check_gate_admits` helpers. The
-RED observation of each is the suite run against the driver at `d646814e`, where `--owner-stop` is
-an unknown argument.
+self-test tier that holds the driver's suite. No leg is added.
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 · the existing arm `AC6 a declared audit with no round`, kept as written: the declaration with no record refuses · none
+Every arm below lives beside the suite's check 118 arms and uses its `write_gate_fixture`,
+`run_chain`, `check_gate_refused` and `check_gate_admits` helpers. The RED observation of each is
+the suite run against the driver at `d646814e`, where `--owner-stop` is an unknown argument. AC1
+has an arm already, `AC6 a declared audit with no round`, which stays as written and is the red
+case beside the new green ones.
+
 New arm: tools/unattended/unattended.test.sh · covers AC2 AC3 · the same fixture after the owner-stop row is recorded and committed: the verdict line and the dispatch line each end with the record, and the pass gains its row · none
 New arm: tools/unattended/unattended.test.sh · covers AC4 · each of the four refusal values quoted whole, the record's bytes compared after each · none
 New arm: tools/unattended/unattended.test.sh · covers AC5 · an audit round after the row takes the next number and the verdict · none
@@ -444,11 +447,11 @@ arm's own figure, which §4 names as red at the base.
     looks behind the row for the round the ceiling counted.
   - Recommendation: (a). A HOLD "stays the answer until the owner moves the ceiling or rules"
     (`tools/unattended/VERBS.template.md@d646814e:316`). Moving the ceiling yields CONTINUE and one
-    more round, so before this unit a ruling to stop had no form the verdict could read. The
-    observed chain ended at its round 12 against a ceiling of 4, so (b) would leave it held.
+    more round, so before this unit a ruling to stop had no form the verdict could read. And (b)
+    makes the reader look behind the last round, a second reading the derivation does not have.
   - RESOLVED (agent, 2026-11-13, delegated): (a), the main loop's pick under the build's prompt
-    mandate, by M3: the goal names the owner's ended chain and (b) does not carry one that ended
-    past the ceiling.
+    mandate, by M3: the goal names the owner's ended chain, and one that ended at the ceiling is
+    such a chain.
 - **F2 — Is the writer a flag on `--record-round` or a verb of its own?**
   - (a) A flag. The row joins the one record that verb owns, through its one append tail.
   - (b) A verb. It keeps `VERB_REQUIRES`' row unconditional, and grows the verb list, the Skill's
@@ -461,6 +464,10 @@ arm's own figure, which §4 names as red at the base.
 ## 9. Revision log
 
 - rev-1 · 2026-11-13 · initial draft.
+- rev-2 · 2026-11-13 · §7 · §8 · the writer's own correction after commit `17926918` took rev-1
+  mid-check: the `New arm:` line for AC1 became prose, because that arm exists and is not new, and
+  F1's recommendation and mark lost a claim about the observed chain that the code does not bear
+  out. No scope item, design rule or criterion moved.
 
 ## 10. Reuse audit
 
