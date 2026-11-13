@@ -319,6 +319,7 @@ The joins that resolve a live spec's leg names, witness paths and line citations
 - status `shipped` · streams `tooling` · dossier `memory/map/features/spec-tokens.md`
 - decisions 0
 - gate-legs 3: `spec tokens (a spec's own names resolve)`, `spec tokens (the pass's own spec)`, `spec-tokens self-test`
+- gotcha-classes 1: `a-terminal-spec-named-by-a-pass-splits-the-waiver-joins.md`
 - globs 3: `tools/check-spec-tokens.py`, `tools/check-spec-tokens.test.sh`, `memory/project/spec-token-waivers.txt`
 
 ## testsuite-counts

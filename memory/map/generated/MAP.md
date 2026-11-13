@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 174 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 168 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 174 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 169 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -290,6 +290,7 @@ Inventories: gate-legs: 174 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · 
 | `a-runner-knob-owes-a-push-class.md` | run-gates |
 | `a-spec-run-close-owes-the-closing-review-override.md` | unattended-stops |
 | `a-spelling-change-strands-its-readers.md` | install-prefix |
+| `a-terminal-spec-named-by-a-pass-splits-the-waiver-joins.md` | spec-tokens |
 | `a-view-fix-trades-one-blindness-for-another.md` | agent-cap |
 | `ab-arm-never-did-the-work.md` | run-gates |
 | `absence-assertion-over-whole-file-text.md` | baseline |
