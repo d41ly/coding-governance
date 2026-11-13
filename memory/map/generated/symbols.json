@@ -5003,6 +5003,11 @@
       "file": "tools/check-wiring.sh"
     },
     {
+      "id": "check_bar",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "check_bar_tied",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -9906,6 +9911,11 @@
       "id": "derive_fixture_row",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
+    },
+    {
+      "id": "derive_flag_suites",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "derive_floor_breaches",
