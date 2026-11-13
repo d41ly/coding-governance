@@ -81,13 +81,13 @@ ids TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClea
 | [TOOL-aClearedLedger-3 — the gate guard denies a flag-form suite the leg manifest declares above the direct-check bound, and its parity arm reads every direct-check form](spec/2026-11-13-spec-TOOL-aClearedLedger-3.md) | 3 | 2 | CLOSED | rev-1 | 2026-11-13 |
 | [TOOL-aClearedLedger-4 — the scratch guard suite's context arms start from a session tree with no card file](spec/2026-11-13-spec-TOOL-aClearedLedger-4.md) | 4 | 1 | CLOSED | rev-1 | 2026-11-13 |
 | [TOOL-aClearedLedger-5 — the bar join denies a direct-check form the manifest declares above the bound, and its parity arm reads all three direct-check words](spec/2026-11-13-spec-TOOL-aClearedLedger-5.md) | 5 | 1 | CLOSED | rev-2 | 2026-11-13 |
-| [TOOL-aClearedLedger-6 — the hygiene self-test's eight lines: the partition arm folds check 26's cache figure, the override derivation leaves the carried resolver block out, and the conf example declares six recall keys](spec/2026-11-13-spec-TOOL-aClearedLedger-6.md) | 6 | 1 | INPROGRESS | rev-1 | 2026-11-13 |
+| [TOOL-aClearedLedger-6 — the hygiene self-test's eight lines: the partition arm folds check 26's cache figure, the override derivation leaves the carried resolver block out, and the conf example declares six recall keys](spec/2026-11-13-spec-TOOL-aClearedLedger-6.md) | 6 | 1 | INPROGRESS | rev-2 | 2026-11-13 |
 | [TOOL-aClearedLedger-7 — the policy fixtures leg prints no wrong assertion: fourteen guard paths, the recall plant's grammar file, and check 8 saying the reader's refusal](spec/2026-11-13-spec-TOOL-aClearedLedger-7.md) | 7 | 1 | SPECCED | rev-1 | 2026-11-13 |
 | [TOOL-aClearedLedger-9 — a path-less `Red-fix:` commit owes no record: the join holds it out by name and the door says why it refuses](spec/2026-11-13-spec-TOOL-aClearedLedger-9.md) | 9 | 2 | SPECCED | rev-1 | 2026-11-13 |
 | [TOOL-aClearedLedger-10 — four suite budget rows re-declared from readings taken alone on a quiet node, with the ceiling evidence and the pass legs re-derived](spec/2026-11-13-spec-TOOL-aClearedLedger-10.md) | 10 | 1 | SPECCED | rev-1 | 2026-11-13 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 3 record folder(s).
+Records: 10 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -1,12 +1,14 @@
 # TOOL-aClearedLedger-6 — the hygiene self-test's eight lines: the partition arm folds check 26's cache figure, the override derivation leaves the carried resolver block out, and the conf example declares six recall keys
 
-**Status:** INPROGRESS · rev-1 · 2026-11-13 · node a · Tier-1 · base 8db6f4be · streams tooling · order 6 · closes TOOL-aNimbleMend-19
+**Status:** INPROGRESS · rev-2 · 2026-11-13 · node a · Tier-1 · base 8db6f4be · streams tooling · order 6 · closes TOOL-aNimbleMend-19
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-13-prompt-TOOL-aClearedLedger-1-brief.md](../prompts/2026-11-13-prompt-TOOL-aClearedLedger-1-brief.md) | research | TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-7 TOOL-aClearedLedger-9 TOOL-aClearedLedger-10 |
+| [2026-11-13-prompt-TOOL-aClearedLedger-6-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-aClearedLedger-6-1-spec-writer.md) | journal | — |
+| [2026-11-13-prompt-TOOL-aClearedLedger-6-brief.md](../prompts/2026-11-13-prompt-TOOL-aClearedLedger-6-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -20,9 +22,9 @@ fell behind a module that moved into the kit.
 ## 2. Scope (IN)
 
 - **S1** — The partition arm of `tools/memory-tree/check-memory-hygiene.test.sh` compares both
-  sides through one helper, `_hs_lines`, which folds the digits after `cache hits ` to a constant.
+  sides through one helper, `extract_hs_lines`, which folds the digits after `cache hits ` to a constant.
   Every other byte of a line still decides the comparison. Observed by AC1 and AC6.
-- **S2** — The suite derives the engine's override reads through one helper, `_engreads_of`, which
+- **S2** — The suite derives the engine's override reads through one helper, `derive_engreads`, which
   leaves out the block between the `# >>> resolve_python` and `# <<< resolve_python` marker lines.
   `_engexempt` loses `GOV_PYTHON` and keeps `MAP_ROOT`. Observed by AC2 and AC6.
 - **S3** — Three assertions are added: the engine carries each marker line exactly once, a read
@@ -69,10 +71,10 @@ compares verdict lines. So the arm is the wrong side.
 The helper is one line, spelled exactly so, because AC1 reads it by pattern:
 
 ```bash
-_hs_lines() { grep . | sed -E 's/(cache hits )[0-9]+/\1N/' | sort -u; }
+extract_hs_lines() { grep . | sed -E 's/(cache hits )[0-9]+/\1N/' | sort -u; }
 ```
 
-The comparison and the `diff` beside it each pipe `$out` and `$_hs_union` through `_hs_lines` in
+The comparison and the `diff` beside it each pipe `$out` and `$_hs_union` through `extract_hs_lines` in
 place of the `grep . | sort -u` they carry today. No assertion is added or removed.
 
 ### S2 and S3 — the resolver block reads no conf
@@ -87,7 +89,7 @@ it. Leaving the block out of the derivation cures both and every later read the 
 The helper is one line, spelled exactly so, because AC2 reads it by pattern:
 
 ```bash
-_engreads_of() { sed '/^# >>> resolve_python /,/^# <<< resolve_python$/d; s/[[:space:]]#.*$//; s/^[[:space:]]*#.*$//' "$1" | grep -oE '\$\{[A-Z][A-Z0-9_]+:[-=]' | sed 's/^\${//; s/:[-=]$//'; }
+derive_engreads() { sed '/^# >>> resolve_python /,/^# <<< resolve_python$/d; s/[[:space:]]#.*$//; s/^[[:space:]]*#.*$//' "$1" | grep -oE '\$\{[A-Z][A-Z0-9_]+:[-=]' | sed 's/^\${//; s/:[-=]$//'; }
 ```
 
 `_engreads` becomes the helper's output over the engine, joined with `_engpresets` as today. A
@@ -128,7 +130,9 @@ file. Both helpers are reached through a pipe, and the staged file is written by
 Each is written `KEY=""` on its own line. The block opens with the sentence the cache-budget block
 carries, that the keys are memory-recall's and safe to delete where that kit is not adopted, and
 adds that `id_grammar.py` in this kit is their reader. Each comment is two or three lines and
-points at the README for the rest; the README owns the full text.
+points at the README for the rest; the README owns the full text. A comment names that file in
+words, as the memory-recall kit's README, and never by its path: a file under `tools/` may not
+spell another kit's path.
 
 Probed on 2026-11-13 at `8db6f4be`: a copy of the example with the six blank lines appended and a
 copy without them resolve to one `digest()`.
@@ -138,20 +142,20 @@ copy without them resolve to one `digest()`.
 Probe P1, the fold, run from the repository root:
 
 ```bash
-eval "$(grep -E '^_hs_lines\(\) ' tools/memory-tree/check-memory-hygiene.test.sh)"
+eval "$(grep -E '^extract_hs_lines\(\) ' tools/memory-tree/check-memory-hygiene.test.sh)"
 a='memory-hygiene: check 26 transitions examined 4 · cache hits 0 · x'
 b='memory-hygiene: check 26 transitions examined 4 · cache hits 4 · x'
 c='memory-hygiene: check 26 transitions examined 5 · cache hits 4 · x'
-[ "$(printf '%s\n' "$a" | _hs_lines)" = "$(printf '%s\n' "$b" | _hs_lines)" ] && echo fold-equal
-[ "$(printf '%s\n' "$b" | _hs_lines)" = "$(printf '%s\n' "$c" | _hs_lines)" ] || echo verdict-differs
+[ "$(printf '%s\n' "$a" | extract_hs_lines)" = "$(printf '%s\n' "$b" | extract_hs_lines)" ] && echo fold-equal
+[ "$(printf '%s\n' "$b" | extract_hs_lines)" = "$(printf '%s\n' "$c" | extract_hs_lines)" ] || echo verdict-differs
 ```
 
 Probe P2, the derivation, with `S` naming a scratch file holding the five staged lines above:
 
 ```bash
-eval "$(grep -E '^_engreads_of\(\) ' tools/memory-tree/check-memory-hygiene.test.sh)"
-_engreads_of tools/memory-tree/check-memory-hygiene.sh | sort -u | tr '\n' ' '; echo
-_engreads_of "$S" | sort -u | tr '\n' ' '; echo
+eval "$(grep -E '^derive_engreads\(\) ' tools/memory-tree/check-memory-hygiene.test.sh)"
+derive_engreads tools/memory-tree/check-memory-hygiene.sh | sort -u | tr '\n' ' '; echo
+derive_engreads "$S" | sort -u | tr '\n' ' '; echo
 ```
 
 Probe P3, the python parity rule over the real kit, the suite's own pattern and exemption list:
@@ -210,7 +214,7 @@ A role agent's hook refuses a suite, so AC6 is the main loop's. The others are p
 runs from the repository root.
 
 - **AC1** — When probe P1 of section 4 runs against the suite file, it prints `fold-equal` and
-  then `verdict-differs`, and `grep -o '| _hs_lines' tools/memory-tree/check-memory-hygiene.test.sh | wc -l`
+  then `verdict-differs`, and `grep -o '| extract_hs_lines' tools/memory-tree/check-memory-hygiene.test.sh | wc -l`
   prints 4.
   Red when: the helper folds nothing, which prints `verdict-differs` alone, or folds a figure other
   than the cache's, which prints `fold-equal` alone, or one side of the comparison bypasses it.
@@ -246,8 +250,8 @@ runs from the repository root.
 The main loop runs the leg's suite at the close, on a frozen clone, with the plain bar after the
 last unit. Each arm below is observed RED and then GREEN there.
 
-New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · covers AC2 · the range expression removed from `_engreads_of`, so the staged inside key is derived · `FLOOR_ASSERTIONS` 707 to 708
-New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · covers AC1 AC6 · the fold removed from `_hs_lines` on a clone with a cold cache, so the partition differs on check 26's line · none, the arm is moved and not added
+New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · covers AC2 · the range expression removed from `derive_engreads`, so the staged inside key is derived · `FLOOR_ASSERTIONS` 707 to 708
+New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · covers AC1 AC6 · the fold removed from `extract_hs_lines` on a clone with a cold cache, so the partition differs on check 26's line · none, the arm is moved and not added
 
 ## 7. Open questions
 
@@ -256,6 +260,14 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-11-13 · initial draft.
+- rev-2 · 2026-11-13 · section 2 · section 4 · section 5 · section 6 · S1 S2 S4 · AC1 AC2 · the
+  builder's divergence: the two helper names rev-1 mandated led with no declared verb, and the
+  naming lexicon's verb-offender pin is an equality the tree sits on. They become
+  `extract_hs_lines` and `derive_engreads`, which
+  `python tools/lexicon/lexicon.py --suggest <name> --as sh.function` answers OK for, through the
+  scope lines, the two helper definitions, probes P1 and P2, AC1's count and the two `New arm:`
+  lines. No pin moves. S4 also states that the example's comments name the memory-recall kit's
+  README in words.
 
 ## 9. Reuse audit
 
