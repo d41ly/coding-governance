@@ -19,20 +19,19 @@ hold-code: host-owner-action
 held-from: BUILDING
 refreshed-at: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 815abf738fef0b0ba867aea8ff516a864d7bf6d8
-phase: HELD
-spec-audit: 2026-10-21
+witness: 5f0d0633dc69263e1fb4fecf82021ca62e5692f6
+phase: BUILDING
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-declared-loop-d56bf0
 anchor-kind: default-branch
 cli-version: 2.1.321
-lease-utc: 2026-11-13T10:36:12Z
+lease-utc: 2026-11-13T10:41:50Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 25292
 session: 7c85732c-fa0c-43e9-83f2-238d293195e0
-keepalive: 22094182
+keepalive: 45e677fb
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 anchor-ref: refs/heads/main
@@ -49,3 +48,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-13T10:36:20Z resume · item dDeclaredLoop · reason held · keepalive 22094182 · manual
 
 2026-11-13T10:37:23Z hold · item host-owner-action · reason until owner · reaped 22094182 · resume none(owner)
+
+2026-11-13T10:42:03Z resume · item dDeclaredLoop · reason held · keepalive 45e677fb · manual
