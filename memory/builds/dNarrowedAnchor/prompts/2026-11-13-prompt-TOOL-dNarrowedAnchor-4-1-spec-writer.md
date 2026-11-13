@@ -98,7 +98,7 @@ entry goes.
 
 ### brief:items
 
-1. S1: the list at `tools/drift-audit/drift_signals.py:409` keeps `TOOL-aBatchedLintel-1` and loses
+1. S1: the list at `tools/drift-audit/drift_signals.py@be2a1df7:409` keeps `TOOL-aBatchedLintel-1` and loses
    `TOOL-dNarrowedAnchor-1`. The comment block above it stays true; amend it only if it names the
    deleted id.
 2. Tier-1 micro-spec, authored into
