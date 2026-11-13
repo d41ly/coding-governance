@@ -11,8 +11,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 ## Run facts
 gates-run: unattended-17945472974883861634-1039 b6183275
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: cf2c673f3d365895c562b658425a2cfe5892c365
-phase: VERIFYING
+witness: 602f89528e4cb5a0075b607b91ca872aa75218a7
+phase: BUILDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/inline-bar-fixes-pass-legs-1a64f7
@@ -150,3 +150,7 @@ base: 1265772cc365418ac6431a7f0f9e069f3bb79dc0
 2026-11-13T05:05:09Z dispatch · item 2ba17e9d TOOL-aNimbleMend-15 · reason tools/run-gates/selftest-budgets.txt tools/run-gates/ceiling-evidence.txt tools/run-gates/pass-leg-evidence.txt tools/gate-legs.json memory/guides/SESSION-KICKOFF.md
 
 2026-11-13T05:10:24Z dispatch · item 2ba17e9d TOOL-aNimbleMend-15 · reason memory/LIVE.md memory/builds/aNimbleMend/README.md memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-15-1-acceptance-ledger.md memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-15.md memory/guides/SESSION-KICKOFF.md tools/gate-legs.json tools/run-gates/ceiling-evidence.txt tools/run-gates/pass-leg-evidence.txt tools/run-gates/selftest-budgets.txt
+
+2026-11-13T06:15:34Z rescope · item add TOOL-aNimbleMend-27 · reason the close's full bar on b61832752 red on three legs this build caused — shell hygiene, python reads and spawn budget — repaired as one unit
+
+2026-11-13T06:30:45Z brief · item TOOL-aNimbleMend-27 · reason e0de61e21288 memory/builds/aNimbleMend/prompts/2026-11-13-prompt-TOOL-aNimbleMend-27-build-brief.md
