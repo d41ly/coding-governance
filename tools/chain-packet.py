@@ -22,7 +22,13 @@ The two reads:
                        If that render raises, the instrument's own child runs instead.
   the parent specs     each `git show <ref>:<path>` of `schedule.py#tree_state` is answered from
                        one `tree_lib.py#read_blobs_at` call per parent build. A path the batch
-                       cannot answer is read by the instrument's own `git`.
+                       cannot answer is read by the instrument's own `git`. That reader runs its
+                       git less the variables `tree_lib.GIT_ENV_LEAKS` names, and the instrument's
+                       git runs under them. So with any of them set this read is not installed, the
+                       instrument's own git reads the parent specs, and one stderr line says so:
+                       `chain-packet: <NAME>[, <NAME>] set, so the parent specs are read by the
+                       instrument's own git`. The coverage report read stays installed, and
+                       `--parity` takes the same branch.
 
 THE FALLBACK. The shortcuts are bound to content: `INSTRUMENT_BLOBS` holds the git blob id of each
 instrument whose internals they rely on, compared with the file's bytes BEFORE anything is loaded.
@@ -45,11 +51,23 @@ blob comparison folds CRLF; an object format other than SHA-1, where every role 
 the other modules the instrument loads, which run as they stand on both paths; speed; and whether
 the instrument's own reading is right. A caller who runs the instrument directly gets the same
 bytes, slowly.
+
+Nor, on the git environment (TOOL-aBatchedPacket-2): a git variable outside `GIT_ENV_LEAKS`, a
+graft file among them, under which the batch reader and the instrument's git still run under
+different environments, since the door declines only on the twelve names the kit's reader strips;
+whether a leak variable that is set is harmless, since the door declines on presence, so such a
+run reads the parents the slow way; and the report read under a foreign git directory, which reads
+working-tree files on both paths. The suite's arm CP8 compares the parent read's cached answers
+with git's own, and its arm CP9 runs the door and the instrument under a foreign `GIT_DIR`. What
+those arms and the suite's fixture leave unchecked, a parent spec that is not UTF-8 in CP8 and the
+records the leg skips under changed mode among them, is stated in the suite's header.
 """
 import hashlib
 import importlib.util
+import os
 import subprocess
 import sys
+import types
 from pathlib import Path
 
 sys.dont_write_bytecode = True
@@ -134,23 +152,16 @@ def set_reads(packet, tree_lib):
     git = schedule.git
     cache = {}
 
-    class Subprocess:
-        """The real module, attribute for attribute, with `run` answering the report call."""
-
-        def __getattr__(self, name):
-            return getattr(subprocess, name)
-
-        @staticmethod
-        def run(args, *a, **k):
-            if isinstance(args, list) and len(args) == 4 \
-                    and args[:3] == [sys.executable, packet.INSTRUMENTS[0], "--report"]:
-                try:
-                    return subprocess.CompletedProcess(args, 0, stdout=run_report(carries, args[3]),
-                                                       stderr="")
-                except Exception as e:      # whatever it is, the refusal must be the instrument's
-                    print(f"chain-packet: the in-process report raised {type(e).__name__}, running "
-                          "carries.py --report as the instrument does", file=sys.stderr)
-            return subprocess.run(args, *a, **k)
+    def run(args, *a, **k):
+        if isinstance(args, list) and len(args) == 4 \
+                and args[:3] == [sys.executable, packet.INSTRUMENTS[0], "--report"]:
+            try:
+                return subprocess.CompletedProcess(args, 0, stdout=run_report(carries, args[3]),
+                                                   stderr="")
+            except Exception as e:      # whatever it is, the refusal must be the instrument's
+                print(f"chain-packet: the in-process report raised {type(e).__name__}, running "
+                      "carries.py --report as the instrument does", file=sys.stderr)
+        return subprocess.run(args, *a, **k)
 
     def read_git(*args, check=True):
         if len(args) == 5 and args[:3] == ("ls-tree", "-r", "--name-only"):
@@ -167,7 +178,15 @@ def set_reads(packet, tree_lib):
             return cache[args[1]]
         return git(*args, check=check)
 
-    packet.subprocess = Subprocess()
+    # The real module, attribute for attribute, with `run` answering the report call.
+    packet.subprocess = types.SimpleNamespace(**{**vars(subprocess), "run": run})
+    # read_blobs_at runs its git less GIT_ENV_LEAKS and the instrument's git runs under them, so
+    # with one set the two could read different repositories: the instrument's own git stays.
+    leaks = [name for name in tree_lib.GIT_ENV_LEAKS if name in os.environ]
+    if leaks:
+        print(f"chain-packet: {', '.join(leaks)} set, so the parent specs are read by the "
+              "instrument's own git", file=sys.stderr)
+        return
     schedule.git = read_git
 
 
@@ -189,17 +208,17 @@ def check_parity(packet, tree_lib, slug):
     set_reads(packet, tree_lib)
     fast = render_outcome(packet, slug)
 
-    def show(o):    # a refusal's message can carry a child's stderr, folded here onto the one line
+    def render_outcome_line(o):    # a refusal's message can carry a child's stderr, folded onto the one line
         return f"{o[0]} {len(o[2].encode('utf-8'))} bytes" if o[0] == "packet" \
             else f"{o[0]}: {' '.join(o[1].split())}"
     if slow != fast:
-        print(f"chain-packet: parity {slug} · DIFFERENT · the instrument {show(slow)} · "
-              f"the door {show(fast)}")
+        print(f"chain-packet: parity {slug} · DIFFERENT · the instrument {render_outcome_line(slow)} · "
+              f"the door {render_outcome_line(fast)}")
         return 1
     if slow[0] == "packet":
-        print(f"chain-packet: parity {slug} · identical · {show(slow)[7:]} · {slow[1]}")
+        print(f"chain-packet: parity {slug} · identical · {render_outcome_line(slow)[7:]} · {slow[1]}")
     else:
-        print(f"chain-packet: parity {slug} · identical · both {show(slow)}")
+        print(f"chain-packet: parity {slug} · identical · both {render_outcome_line(slow)}")
     return 0
 
 

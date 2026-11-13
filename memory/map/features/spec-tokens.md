@@ -210,6 +210,21 @@ shape, never a waiver row, because a shape generalises to specs nobody has writt
   missing beside it, prints one stderr line opening `chain-packet: shortcuts off` and runs the
   instrument as a child, so the result is the instrument's, slowly. A landing that moves one of the
   three owes the door's constant after re-reading the reliance points listed beside it.
+- THE GIT ENVIRONMENT of that door: with any variable `tree_lib.GIT_ENV_LEAKS` names set, the parent
+  read is not installed and one stderr line says so, `chain-packet: <NAME>[, <NAME>] set, so the
+  parent specs are read by the instrument's own git`; the report read stays, and `--parity` takes the
+  same branch. It declines on presence, on those twelve names alone: a git variable outside the
+  list, a graft file among them, is not checked, and the report read reads working-tree files under
+  a foreign git directory on both paths (TOOL-aBatchedPacket-2).
+- `bash tools/chain-packet.test.sh` — the door's suite. CP8 compares the parent read's cached answer
+  for each kept parent path with git's own, one path holding a lone CR, with the instrument's git made
+  to raise, and holds no parent spec that is not UTF-8; CP9 runs the door and the instrument under a
+  foreign `GIT_DIR` and compares the two outputs; CP3 to CP5 refuse any `chain-packet:` line on the
+  door's stderr. Its leg is guarded on the tool root and the instrument folder, so under changed mode
+  a records-only change does not select it: the suite header names the records fixture T reads, and
+  `GATE_FULL=1` is the route after one moves. No arm stages the fixture's README refusal, the marker
+  arm of the checker's suite grades a copy of the checker, and no gate finds another leg whose suite
+  reads past its guard.
 - `memory/project/spec-token-waivers.txt` — the shrink-only exception registry.
 
 ## The section-7 contract (TOOL-aJoinedCanon-7)

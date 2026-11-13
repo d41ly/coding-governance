@@ -2000,11 +2000,6 @@
     {
       "id": "bad",
       "kind": "function",
-      "file": "tools/chain-packet.test.sh"
-    },
-    {
-      "id": "bad",
-      "kind": "function",
       "file": "tools/check-dead-paths.test.sh"
     },
     {
@@ -15520,11 +15515,6 @@
     {
       "id": "ok",
       "kind": "function",
-      "file": "tools/chain-packet.test.sh"
-    },
-    {
-      "id": "ok",
-      "kind": "function",
       "file": "tools/check-dead-paths.test.sh"
     },
     {
@@ -16300,6 +16290,11 @@
     {
       "id": "print_fail",
       "kind": "function",
+      "file": "tools/chain-packet.test.sh"
+    },
+    {
+      "id": "print_fail",
+      "kind": "function",
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
     },
     {
@@ -16426,6 +16421,11 @@
       "id": "print_own_spec",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "print_pass",
+      "kind": "function",
+      "file": "tools/chain-packet.test.sh"
     },
     {
       "id": "print_pass",

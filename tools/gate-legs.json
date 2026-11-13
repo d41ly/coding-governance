@@ -2363,9 +2363,7 @@
       "{prefix}/chain-packet.test.sh"
     ],
     "guard": [
-      "{prefix}/chain-packet.py",
-      "{prefix}/chain-packet.test.sh",
-      "{prefix}/memory-tree/tree_lib.py",
+      "{prefix}/",
       "memory/builds/dClosedLoop/build/"
     ],
     "chunk": "selftests",
