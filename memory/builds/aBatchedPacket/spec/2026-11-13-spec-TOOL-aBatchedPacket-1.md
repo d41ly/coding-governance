@@ -10,6 +10,7 @@
 | [2026-11-13-prompt-TOOL-aBatchedPacket-1-1-builder.md](../prompts/2026-11-13-prompt-TOOL-aBatchedPacket-1-1-builder.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aBatchedPacket-1-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-aBatchedPacket-1-1-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aBatchedPacket-1-brief.md](../prompts/2026-11-13-prompt-TOOL-aBatchedPacket-1-brief.md) | research | — |
+| [2026-11-13-review-TOOL-aBatchedPacket-1-diff-review-round1.md](../reviews/2026-11-13-review-TOOL-aBatchedPacket-1-diff-review-round1.md) | diff-review | — |
 
 <!-- /gen:spec-records -->
 

@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-13
 streams: tooling
 roster: TOOL
-ids: TOOL-aBatchedPacket-1
+ids: TOOL-aBatchedPacket-1 TOOL-aBatchedPacket-2
 authorized-by: prompt
 ---
 
@@ -32,7 +32,7 @@ are in `build/`, and the prompt is in `prompts/`.
 ## Build-level rules
 
 - **Classification (M2)**: one unit, MISSING at open, Tier-2: a new shipped script and a changed
-  call in the spec-token checker.
+  call in the spec-token checker. A second unit, Tier-2, repairs the closing review's round 1.
 - The three pinned instruments under `memory/builds/dClosedLoop/build/` keep their bytes. Editing
   one is the owner's landing and re-pin, which this build files as an ask and does not take.
 - `memory/builds/dDeclaredLoop/` and its run's branch are a live run's, and are not touched.
@@ -49,11 +49,12 @@ None.
 | # | Unit | Mechanism |
 |---|---|---|
 | 1 | `TOOL-aBatchedPacket-1` | a front door that runs the packet instrument with its per-spec git reads answered in one process, bound to the instruments' blobs, and the spec-token checker's packet join calling it |
+| 2 | `TOOL-aBatchedPacket-2` | the closing review's round 1 repaired: the suite's arms made able to fail on each read, the leg's registrations and guard, the names the lexicon grades, and the batched read under an ambient git location |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-11-13 · streams tooling
-ids TOOL-aBatchedPacket-1
+ids TOOL-aBatchedPacket-1 TOOL-aBatchedPacket-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -61,7 +62,7 @@ ids TOOL-aBatchedPacket-1
 | [TOOL-aBatchedPacket-1 — a front door for the chain packet: the instrument's own `main`, its two per-spec reads answered in-process, bound to the instrument blobs it was read against](spec/2026-11-13-spec-TOOL-aBatchedPacket-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-11-13 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 3 record folder(s).
+Records: 7 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
