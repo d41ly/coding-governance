@@ -50,6 +50,11 @@ Cite ids, never line numbers.
 | [TOOL-aBriskPreflight-18](../builds/aBriskPreflight/BACKLOG.md) | OPEN | BLOCKER | — | 2026-10-12 | inherited red: leg playbook render wiring red at 37200355, older than… |
 | [TOOL-aCandidStub-1](../builds/aCandidStub/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | tools/hooks/agent-cap.js blesses an identifier bound from an EMPTY… |
 | [TOOL-aCandidStub-2](../builds/aCandidStub/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | tools/memory-tree/adopt-memory-tree.sh scaffolds no gotchas/, and… |
+| [TOOL-aCarriedStop-4](../builds/aCarriedStop/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | held red: suite codebase-map adopter e2e red at 8db6f4be on the daily… |
+| [TOOL-aCarriedStop-5](../builds/aCarriedStop/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | held red: suite check-wiring self-test red at 8db6f4be on the daily… |
+| [TOOL-aCarriedStop-6](../builds/aCarriedStop/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | held red: suite playbook render selftest red at 8db6f4be on the daily… |
+| [TOOL-aCarriedStop-7](../builds/aCarriedStop/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | held red: suite scratch-guard self-test red at 8db6f4be on the daily… |
+| [TOOL-aCarriedStop-8](../builds/aCarriedStop/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | held red: suite template size gate selftest red at 8db6f4be on the… |
 | [TOOL-aCollapsedScan-5](../builds/aCollapsedScan/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | THE ORIGINAL FACT IS NOW FALSE and the ASK SURVIVES. Re-measured… |
 | [TOOL-aCollapsedScan-8](../builds/aCollapsedScan/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | tools/drift-audit/drift_report.py at line 65 carries the SAME… |
 | [TOOL-aCollapsedScan-9](../builds/aCollapsedScan/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | a BUDGET_* ceiling is a single integer over a cost that is both… |

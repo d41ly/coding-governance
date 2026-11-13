@@ -5,7 +5,7 @@ opened: 2026-11-13
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aCarriedStop-1 TOOL-aCarriedStop-2 TOOL-aCarriedStop-3
+ids: TOOL-aCarriedStop-1 TOOL-aCarriedStop-2 TOOL-aCarriedStop-3 TOOL-aCarriedStop-4 TOOL-aCarriedStop-5 TOOL-aCarriedStop-6 TOOL-aCarriedStop-7 TOOL-aCarriedStop-8
 ---
 
 # aCarriedStop — a build run carries the owner's ended spec-audit chain past the dispatch gate through a recorded row
@@ -57,7 +57,7 @@ None.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 3 unit(s) · node a · opened 2026-11-13 · streams tooling
-ids TOOL-aCarriedStop-1 TOOL-aCarriedStop-2 TOOL-aCarriedStop-3
+ids TOOL-aCarriedStop-1 TOOL-aCarriedStop-2 TOOL-aCarriedStop-3 TOOL-aCarriedStop-4 TOOL-aCarriedStop-5 TOOL-aCarriedStop-6 TOOL-aCarriedStop-7 TOOL-aCarriedStop-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
