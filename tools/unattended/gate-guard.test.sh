@@ -789,14 +789,38 @@ run_planted "D6 the same leg with a case word -> allow"                   0 "$B"
 run_planted "D6 the over-bound leg behind a redirection -> deny"          2 "$B" "$M_FLAG > x.log 2>&1"
 run_planted "D6 the over-bound leg in a bash -c body -> deny"             2 "$B" "bash -c '$M_FLAG'"
 run_planted "D6 the over-bound leg in a double-quoted \$( ) -> deny"       2 "$B" 'printf '"'%s'"' "$('"$M_FLAG"')"'
+# TOOL-aClearedLedger-11: the spellings the closing review walked past row D6, each over the 900
+# manifest. The script is matched at ANY word, so a launcher the grammar does not skip hides
+# nothing (M1); an option's value may differ and a case word after it may not (M2); the bare file
+# name, a `./` path and a glued redirection all read (M3); a backslashed upper-case path folds (L1).
+M_REST="${M_FLAG#python3 }"
+run_planted "D6 the leg behind an unexpanded \"\$PY\" -> deny"              2 "$B" '"$PY" '"$M_REST"
+run_planted "D6 the leg behind python.exe -> deny"                        2 "$B" "python.exe $M_REST"
+run_planted "D6 the leg behind python3 -u -B -> deny"                     2 "$B" "python3 -u -B $M_REST"
+run_planted "D6 the leg as an if condition -> deny"                       2 "$B" "if $M_FLAG; then :; fi"
+run_planted "D6 the leg behind /usr/bin/python3 -> deny"                  2 "$B" "/usr/bin/python3 $M_REST"
+run_planted "D6 the --fixture leg with another option value -> deny"      2 "$B" "$M_FIX --strict-from other/"
+run_planted "D6 the same with a case word after the full argv -> allow"   0 "$B" "$M_FIX --strict-from other/ one-case"
+run_planted "D6 the leg by its file name after a cd -> deny"              2 "$B" "cd ${PFX}zz-kit && python3 planted_suite.py --selftest"
+run_planted "D6 the leg by a ./ path -> deny"                             2 "$B" "python3 ./planted_suite.py --selftest"
+run_planted "D6 the --fixture leg with a glued redirection -> deny"       2 "$B" "$M_FIX>x.log"
+run "D4 a suite word with a glued redirection -> deny"                    2 "$B" "$D4>x.log"
+run_planted "D6 the leg by a backslashed upper-case path -> deny"         2 "$B" 'python3 C:\repo\ZZ-KIT\PLANTED_SUITE.py --selftest'
 F=$(build_fixture VERIFYING)
 run_planted "D6 the over-bound leg at VERIFYING -> allow"                 0 "$F" "$M_FLAG"
 build_manifest 300
 run_planted "D6 the same --selftest leg at the bound -> allow"            0 "$B" "$M_FLAG"
+# The two fail-open arms beside each manifest state send a row D2 hit WITH the row D6 candidate
+# (TOOL-aClearedLedger-11, M5): a manifest read that throws reaches the catch in `main`, which
+# exits 0 exactly as the unarmed row does, so the allow arm alone cannot tell the two apart. The
+# deny can: it is printed only when the read answered the empty list and row D2 stood.
+M_BOTH="bash ${PFX}${RUN_GATES}/run-selftests.sh; $M_FLAG"
 rm -f "$TMP/gate-legs.json"
 run_planted "D6 the over-bound leg, manifest absent -> allow"             0 "$B" "$M_FLAG"
+run_planted "D6 a runner beside the leg, manifest absent -> deny"         2 "$B" "$M_BOTH"
 printf '{' > "$TMP/gate-legs.json"
 run_planted "D6 the over-bound leg, manifest unparsable -> allow"         0 "$B" "$M_FLAG"
+run_planted "D6 a runner beside the leg, manifest unparsable -> deny"     2 "$B" "$M_BOTH"
 # The parity rule's own failing case: a leg above the bound in NO direct-check form is a suite
 # convention neither the word shapes nor row D6 reads, and the rule must name it — and must not
 # name the flag-form leg beside it, which row D6 denies.
@@ -827,7 +851,12 @@ n=$((pass+fail))
 # static count of the arms above at ~10% headroom, because the pass that wrote this file may not
 # run it (the hook it tests denies the invocation at BUILDING); the main loop's first green at
 # VERIFYING confirms the executed count against this floor. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=196
+FLOOR_ASSERTIONS=210
+# RAISED 196 -> 210 at TOOL-aClearedLedger-11, by the static count of the assertions it added to the
+# arm class "a manifest suite in flag form", fourteen: five launcher spellings, the option value
+# and its case-word control, the file name after a `cd`, the `./` path, the two glued redirections
+# (one of them row D4's, through the hook in place), the backslashed upper-case path, and the two
+# runner-beside-the-leg denies with the manifest absent and unparsable.
 # RAISED 183 -> 196 at TOOL-aClearedLedger-3, by the static count of the assertions it added: the
 # pin of the direct-check bound and words against the hook's exports, one; and the arm class "a
 # manifest suite in flag form", twelve — ten `run_planted` arms, the token check naming the planted

@@ -108,9 +108,21 @@ is in any phase before `VERIFYING`, it exits 2 on a command that would run the f
 `bash -c` bodies included). It also refuses a script the gate manifest declares a suite by cost:
 a `chunk = selftests` leg of the `gate-legs.json` in the directory above the kit, run in a
 direct-check form (`--selftest`, `--fixture` or a bare `fixture` word) and with a `ceiling`
-above the direct-check bound the hook exports. A shorter spelling that still reaches that word is
-refused; a longer one, a single fixture case say, is the direct check and passes, as does every
-direct-check form at or under the bound and every such script the manifest does not declare. The
+above the direct-check bound the hook exports. Any word of a simple command may name the leg's
+script, whatever launcher stands in front of it, with `\` folded to `/`, case ignored and leading
+`./` taken off, by a trailing path in either direction: the script under a longer path and its
+bare file name after a `cd` both do. A shorter spelling that still reaches that word is refused,
+and so is one whose option value differs from the leg's; a longer one, or one with another option
+name, a single fixture case say, is the direct check and passes, as does every direct-check form
+at or under the bound and every such script the manifest does not declare. A word ends at a glued
+`>` or `<`, so a redirection hides neither this form nor a suite word. The gaps this row keeps:
+two files that share a file name, or a trailing path, read alike; an unquoted mention of a script
+and its direct-check word at an argument position reads as a run; a path assembled at run time, a
+module name after `-m` with no path, and a python heredoc walk past it; a spelling whose option
+name differs from the leg's is read as scoped, whatever the script does with it; a suite the
+manifest does not declare, or declares in another chunk, is not seen, and the manifest is read
+uncommitted. The spec lint's bar join holds the same rule, and reads two spellings the hook does
+not: a quoted mention, and a `bash -c` body inside another. The
 read-only verbs — `--list`, `--check`, `--rank`, `--help`, `--render` — pass, the
 plain bar passes, and a quoted mention of any shape is invisible. It keys the record to the branch
 through the `run-branch:` fact `--preflight` writes on both anchors (protocol fact 13), falling

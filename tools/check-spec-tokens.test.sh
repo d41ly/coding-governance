@@ -78,7 +78,10 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # RAISED 245 -> 248 by TOOL-aClearedLedger-5: its three direct-check assertions beside the parity arm,
 # the constants' equality, the staged derivation and the staged spellings, each top-level. Counted by
 # reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=248
+# RAISED 248 -> 252 by TOOL-aClearedLedger-11: its two staged assertions, the wrapper spellings and the
+# option pair, and its two command-line arms over a manifest carrying a ceiling, each top-level; the
+# staged spellings assertion it widens was counted already. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=252
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -1124,6 +1127,24 @@ else echo "arm FAIL  parity: graded $popn + exempt $skipn != the manifest's $leg
 #      manifest the grade of a flag-form leg above the bound is a derivation from the manifest the
 #      arm also reads, so it cannot fail there; these stage their OWN rows instead. One line per
 #      assertion, `ok` or what was found, so a probe that raised prints nothing and reds all three.
+#      TOOL-aClearedLedger-11 widens the third and adds two, on the same terms. The third gains
+#      the redirected, the piped and the backslashed upper-case spelling, and the call with NO set,
+#      which shows the set is the cause of every hit beside it. Its backslash is written DOUBLED:
+#      stderr is merged into the output, and a bare `\o` in the literal prints a SyntaxWarning onto
+#      line 1. The fourth feeds the wrapper spellings below, handed in as arguments because they
+#      carry quote characters this single-quoted body cannot spell; the fifth is the option pair.
+WRAPPER_SPELLINGS=(
+  '"$PY" t/over.py --selftest'
+  'cd t && python over.py --selftest'
+  'python ./over.py --selftest'
+  'python t/over.py --selftest>x.log'
+  'x=$(python t/over.py --selftest)'
+  '(cd t && python over.py --selftest)'
+  '`python t/over.py --selftest`'
+  'python t/over.py --selftest & wait'
+  'python "t/over.py" --selftest'
+  'bash -c "python t/over.py --selftest"'
+)
 direct=$("$PY" -c 'import importlib.util, sys
 spec = importlib.util.spec_from_file_location("cst", sys.argv[1])
 m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
@@ -1139,15 +1160,42 @@ staged = m.derive_flag_suites([
     {"name": "plain", "chunk": "selftests", "ceiling": 301, "argv": ["python", "t/plain.py"]}])
 got = [name for name, _ceiling, _words in staged]
 print("ok" if got == ["over", "plant"] else "derived %r" % got)
-got = [bool(m.check_bar(t, staged)) for t in ("python t/plant.py fixture", "python t/plant.py fixture one", "python t/plant.py")]
-print("ok" if got == [True, False, False] else "read %r" % got)' "$LINT" "$DIRECT_CHECK_BOUND" "$DIRECT_CHECK_WORDS" 2>&1 | tr -d '\r')
+got = [bool(m.check_bar(t, staged)) for t in ("python t/plant.py fixture", "python t/plant.py fixture one", "python t/plant.py",
+    "python t/over.py --selftest > x.log 2>&1", "python t/over.py --selftest | tail -1", "python T\\over.py --selftest")]
+got.append(bool(m.check_bar("python t/over.py --selftest")))
+print("ok" if got == [True, False, False, True, True, True, False] else "read %r" % got)
+got = [t for t in sys.argv[4:] if not m.check_bar(t, staged)]
+print("ok" if len(sys.argv) > 4 and not got else "%d fed, not read as a hit: %r" % (len(sys.argv) - 4, got))
+got = [bool(m.check_bar(t, staged)) for t in ("python t/plant.py fixture --strict y", "python t/plant.py fixture --other y", "python t/plant.py fixture --strict x one")]
+print("ok" if got == [True, False, False] else "read %r" % got)' "$LINT" "$DIRECT_CHECK_BOUND" "$DIRECT_CHECK_WORDS" "${WRAPPER_SPELLINGS[@]}" 2>&1 | tr -d '\r')
 d1=$(printf '%s\n' "$direct" | sed -n 1p); d2=$(printf '%s\n' "$direct" | sed -n 2p); d3=$(printf '%s\n' "$direct" | sed -n 3p)
+d4=$(printf '%s\n' "$direct" | sed -n 4p); d5=$(printf '%s\n' "$direct" | sed -n 5p)
 if [ "$d1" = ok ]; then echo "arm ok    direct-check: this suite's bound and word list equal the module's"; pass=$((pass+1))
 else echo "arm FAIL  direct-check: this suite's bound and word list differ from the module's: ${d1:-no output}"; fail=$((fail+1)); fi
 if [ "$d2" = ok ]; then echo "arm ok    direct-check: six staged rows derive the two direct-check forms above the bound, in manifest order"; pass=$((pass+1))
 else echo "arm FAIL  direct-check: six staged rows did not derive the 301 --selftest row and the fixture row: ${d2:-no output}"; fail=$((fail+1)); fi
-if [ "$d3" = ok ]; then echo "arm ok    direct-check: the staged leg spelled to its fixture word is a hit, with a case word and as the script alone it is not"; pass=$((pass+1))
-else echo "arm FAIL  direct-check: the staged leg's three spellings did not read hit, miss, miss: ${d3:-no output}"; fail=$((fail+1)); fi
+if [ "$d3" = ok ]; then echo "arm ok    direct-check: the staged leg spelled to its fixture word is a hit, with a case word and as the script alone it is not; redirected, piped and backslashed it is a hit, and with no set it is none"; pass=$((pass+1))
+else echo "arm FAIL  direct-check: the staged legs' seven spellings did not read hit, miss, miss, hit, hit, hit, miss: ${d3:-no output}"; fail=$((fail+1)); fi
+if [ "$d4" = ok ]; then echo "arm ok    direct-check: every wrapper spelling of the staged leg is a hit"; pass=$((pass+1))
+else echo "arm FAIL  direct-check: a wrapper spelling of the staged leg is no hit: ${d4:-no output}"; fail=$((fail+1)); fi
+if [ "$d5" = ok ]; then echo "arm ok    direct-check: the option pair reads a changed value as a hit, another option name and a case word after the full argv as none"; pass=$((pass+1))
+else echo "arm FAIL  direct-check: the option pair did not read hit, miss, miss: ${d5:-no output}"; fail=$((fail+1)); fi
+
+# ---- TOOL-aClearedLedger-11: TWO command-line arms. `main` derives the set from the manifest and
+#      hands it to `check_bar`, and no arm above reads that through the command line: every scratch
+#      manifest so far carries no `ceiling`. This one keeps the `real leg` row and gains a
+#      `--selftest` leg whose script is tracked, so no other join reds, and a spec dated after the
+#      cutoff backticks its argv. Above the bound it reds naming the leg; at the bound it is clean.
+d=$base/slow; scratch "$d"
+mkdir -p "$d/${PFX}x"; : > "$d/${PFX}x/slow.py"
+printf 'SPEC_DIRECT_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+sed -i 's|`'"${PFX}gate-legs.json"'` exists|`python '"${PFX}x/slow.py"' --selftest` answers|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+printf '[{"name":"real leg"},\n {"name":"slow suite","chunk":"selftests","ceiling":%s,"argv":["python","{prefix}/x/slow.py","--selftest"]}]\n' 301 > "$d/${PFX}gate-legs.json"
+git -C "$d" add -A >/dev/null
+arm "a §6 bullet spelling a manifest leg above the bound REDS as [bar], naming the leg and its ceiling" 1 "$d" 'this spells the manifest leg `slow suite`, a suite by its declared ceiling of 301 s'
+printf '[{"name":"real leg"},\n {"name":"slow suite","chunk":"selftests","ceiling":%s,"argv":["python","{prefix}/x/slow.py","--selftest"]}]\n' 300 > "$d/${PFX}gate-legs.json"
+git -C "$d" add -A >/dev/null
+arm "the same bullet with the leg AT the bound is clean" 0 "$d" "0 pre-cutoff live spec(s) carry one and are not graded" '[bar]'
 
 # ---- TOOL-dDerivedDocket-37: the hands-off join. THIRTEEN arms over SIX scratch repos, one per
 #      criterion, and a criterion's later states edit that repo's files IN PLACE: the checker takes

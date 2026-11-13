@@ -38,17 +38,29 @@
  *       review F2 — six of the manifest's `chunk = selftests` legs are that file, govkit's at
  *       3445 s among them).
  *   D5  the quoted body of `bash -c` / `sh -c`, scanned once as a command of its own
- *   D6  a script the gate manifest declares a suite by cost (TOOL-aClearedLedger-3): the head word
- *       and the words after it name a `chunk = selftests` leg of MANIFEST_BASENAME, read in the
- *       directory above this file, whose `ceiling` is above DIRECT_CHECK_BOUND and whose argv
- *       carries one of DIRECT_CHECK_WORDS. The head matches the leg's script by its trailing
- *       path, `\` folded to `/` and case ignored; a SHORTER spelling that still reaches the leg's
- *       direct-check word is a hit (`check_policy.py --fixture` runs every case), and a LONGER or
- *       different one is a scoped variant and is not (`check_policy.py --fixture <case>`).
- *       Redirection words are taken out before the compare. A direct-check form at or under the
- *       bound stays the direct check a spec names. It does NOT see a flag-form suite the manifest
- *       does not declare or declares in another chunk, nor tell two files with one trailing path
- *       apart, and it reads the manifest uncommitted.
+ *   D6  a script the gate manifest declares a suite by cost (TOOL-aClearedLedger-3, and
+ *       TOOL-aClearedLedger-11 for the match): ANY word of a simple command, and the words after
+ *       it, spell a `chunk = selftests` leg of MANIFEST_BASENAME, read in the directory above this
+ *       file, whose `ceiling` is above DIRECT_CHECK_BOUND and whose argv carries one of
+ *       DIRECT_CHECK_WORDS. The word need not be the head the grammar above resolves, so a
+ *       launcher it does not skip (`"$PY"`, `python.exe`, `python3 -u -B`, `python -m pdb`, an
+ *       `if`) hides nothing. The word names the leg's script with `\` folded to `/`, case ignored
+ *       and leading `./` taken off, by a trailing path in EITHER direction: `<dir>/<script>` and
+ *       the bare file name after a `cd` both do. A SHORTER spelling that still reaches the leg's
+ *       direct-check word is a hit (`check_policy.py --fixture` runs every case), and so is one
+ *       whose option VALUE differs from the leg's (`--strict-from <other dir>` scopes nothing);
+ *       a LONGER one, or one whose option name differs, is a scoped variant and is not
+ *       (`check_policy.py --fixture <case>`, `--fixture --list`). Redirection words are taken out
+ *       before the compare, and a word ends at a glued `>` or `<`, which rows D2 to D4 gain too.
+ *       A direct-check form at or under the bound stays the direct check a spec names.
+ *       WHAT ROW D6 DOES NOT TELL APART OR SEE: two files that share a file name, or a trailing
+ *       path, read alike; an unquoted mention of a script and its direct-check word at an argument
+ *       position (`echo <script> --selftest`) reads as a run; a path assembled at run time, a
+ *       module name after `-m` with no path, and a python heredoc walk past it; a spelling whose
+ *       option name differs from the leg's is read as scoped, whatever the script does with it;
+ *       and it does not see a suite the manifest does not declare or declares in another chunk,
+ *       and reads the manifest uncommitted. The spec lint's bar join holds the same rule and reads
+ *       two spellings this row does not: a quoted mention, and a `bash -c` body inside another.
  * A D2, D3 or D4 token is NOT a hit when the same simple command carries one of READ_ONLY_VERBS:
  * those forms answer in seconds and one of them is how the memory-tree kit re-renders its guides.
  * Row D6 does not consult them: a command carrying one is a longer spelling and misses.
@@ -93,7 +105,7 @@
  * reads TERMINAL.
  *
  * THE KEY. The predicate runs first, and the filesystem is read only on a hit or a row D6
- * candidate — a launched script followed by one of DIRECT_CHECK_WORDS: the overwhelming
+ * candidate — a simple command carrying one of DIRECT_CHECK_WORDS: the overwhelming
  * majority of tool calls carry neither and cost one scan of one string. The manifest is read
  * once, and only after a live run is found. On a hit or a candidate the hook
  * walks up from the payload's `cwd` to `.git`, reads the PER-WORKTREE `HEAD` (never the common
@@ -348,6 +360,8 @@ function readQuotedSubstitutions(text, tool) {
  * (closing round 3, T4): pairing the outer `"` with the first `"` inside the span split
  * `msg="$(printf "%s" "run bash <suite> next")"` into an assignment word and a launcher at head.
  * Bash's rule under both tools; the span itself is read back by readQuotedSubstitutions.
+ * A word also ends before an unquoted `>` or `<` once it holds anything but digits, outside `${…}`
+ * (TOOL-aClearedLedger-11). The reader is shared, so rows D2 to D4 see a glued redirection too.
  */
 function readTokenAt(cmd, from, stop) {
   let i = from
@@ -378,6 +392,11 @@ function readTokenAt(cmd, from, stop) {
       brace = false
       out += ch
     } else if (/[\s;|&(){}`]/.test(ch)) {
+      break
+    } else if ((ch === '>' || ch === '<') && !brace && out !== '' && !/^\d+$/.test(out)) {
+      // A glued redirection ends the word (TOOL-aClearedLedger-11): `x.py --selftest>x.log` is the
+      // flag and then a redirection word. An operator that opens a word, bare or behind a
+      // file-descriptor digit, is read on as before, so REDIRECT_RE drops it with its glued target.
       break
     } else {
       out += ch
@@ -460,10 +479,12 @@ function resolveFileRow(tok) {
  * measurement (spec rev-4): 38 runs sat among the near-misses of the grammar without them.
  *
  * `candidates`, when passed, collects row D6's candidates and leaves the return value alone: each
- * simple command whose head carries no D2 to D4 row and whose later words include one of
- * DIRECT_CHECK_WORDS pushes `{ head, words }`, `words` being the head and every word after it with
- * redirections taken out. A redirection is a word to scanSegments, so `> x.log` and `2>` would
- * otherwise be compared as arguments. Both recursions hand the array on.
+ * simple command whose resolved head carries no D2 to D4 row and whose words include one of
+ * DIRECT_CHECK_WORDS pushes `{ words }`, `words` being EVERY word of the simple command, the
+ * launcher words included, with redirections taken out (TOOL-aClearedLedger-11: the head the
+ * grammar resolved is not what names the script, and a segment it left with no head, behind
+ * `python -m` say, is a candidate too). A redirection is a word to scanSegments, so `> x.log` and
+ * `2>` would otherwise be compared as arguments. Both recursions hand the array on.
  */
 function scanDenyHits(cmd, view, depth, tool, candidates) {
   depth = depth || 0
@@ -568,17 +589,16 @@ function scanDenyHits(cmd, view, depth, tool, candidates) {
         break
       }
     }
-    if (head === null) continue
-    const cls = resolveFileRow(head)
+    const cls = head === null ? null : resolveFileRow(head)
     if (cls && !readOnly) hits.push(Object.assign({ token: head }, cls))
     if (candidates && !cls) {
-      const words = [head]
-      for (let j = k + 1; j < toks.length; j++) {
+      const words = []
+      for (let j = 0; j < toks.length; j++) {
         const redir = REDIRECT_RE.exec(toks[j])
         if (!redir) words.push(toks[j])
         else if (redir[0] === toks[j]) j++   // a bare operator: its target is the next word
       }
-      if (words.slice(1).some((w) => DIRECT_CHECK_WORDS.includes(w))) candidates.push({ head, words })
+      if (words.some((w) => DIRECT_CHECK_WORDS.includes(w))) candidates.push({ words })
     }
   }
   // A `$( … )` or backtick span inside a double-quoted string, or inside an unquoted heredoc body,
@@ -623,23 +643,39 @@ function readSuiteLegs(file) {
 }
 
 /**
- * Row D6's match: the first leg the candidate names, or null. Three rules, all of which hold:
- * the head ends with the leg's script path (`\` folded, case ignored); the candidate has no more
- * words than the leg and each later word equals the leg's at that place; and the candidate reaches
- * the leg's first DIRECT_CHECK_WORDS member. So a shorter spelling that still runs the checks is a
- * hit and a longer or different one — a case name, a read-only verb — is a miss. A leg whose argv
- * carries no such member never matches: rows D2 to D4 own the word shapes.
+ * Row D6's match: the first leg the candidate spells, or null (TOOL-aClearedLedger-11). Every word
+ * of the candidate is tried as the script word, in order, and the spelling is that word and every
+ * word after it. Three rules, all of which hold, `at` being the place of the leg's first
+ * DIRECT_CHECK_WORDS member:
+ *   1  the word, folded (`\` to `/`, lower case, leading `./` segments off) and not empty, equals
+ *      the leg's script, ends with `/` and that script, or is a trailing path of it after a `/`;
+ *   2  the spelling has no more words than the leg, reaches `at`, and each word up to `at` equals
+ *      the leg's at that place;
+ *   3  each word after `at` equals the leg's, except at an option's VALUE — a leg word that does
+ *      not open with `-` behind one that does — where any word holds.
+ * So a shorter spelling that still runs the checks, and one with a changed option value, is a hit;
+ * a longer one or one with another option name — a case name, a read-only verb — is a miss. A leg
+ * whose argv carries no such member never matches: rows D2 to D4 own the word shapes.
  */
 function checkSuiteLeg(candidate, legs) {
-  const head = candidate.head.replace(/\\/g, '/').toLowerCase()
-  const n = candidate.words.length
-  for (const leg of legs) {
-    const script = leg.words[0].toLowerCase()
-    if (head !== script && !head.endsWith('/' + script)) continue
-    if (n > leg.words.length) continue
-    if (!candidate.words.every((w, i) => i === 0 || w === leg.words[i])) continue
-    const at = leg.words.findIndex((w, i) => i > 0 && DIRECT_CHECK_WORDS.includes(w))
-    if (at > 0 && n >= at + 1) return leg
+  const words = candidate.words
+  for (let s = 0; s < words.length; s++) {
+    const word = words[s].replace(/\\/g, '/').toLowerCase().replace(/^(?:\.\/+)+/, '')
+    if (word === '') continue
+    const n = words.length - s
+    for (const leg of legs) {
+      const script = leg.words[0].toLowerCase()
+      if (word !== script && !word.endsWith('/' + script) && !script.endsWith('/' + word)) continue
+      const at = leg.words.findIndex((w, i) => i > 0 && DIRECT_CHECK_WORDS.includes(w))
+      if (at < 1 || n > leg.words.length || n < at + 1) continue
+      let holds = true
+      for (let i = 1; i < n && holds; i++) {
+        const want = leg.words[i]
+        const value = i > at && !want.startsWith('-') && leg.words[i - 1].startsWith('-')
+        holds = value || words[s + i] === want
+      }
+      if (holds) return leg
+    }
   }
   return null
 }
@@ -763,7 +799,7 @@ function checkCommand(cmd, cwd, tool) {
       if (leg) {
         hits.push({
           row: 'D6', what: 'suite', shape: 'a self-test suite',
-          token: `${c.head} (the gate manifest's leg "${leg.name}", ceiling ${leg.ceiling} s)`,
+          token: `${leg.words[0]} (the gate manifest's leg "${leg.name}", ceiling ${leg.ceiling} s)`,
         })
       }
     }

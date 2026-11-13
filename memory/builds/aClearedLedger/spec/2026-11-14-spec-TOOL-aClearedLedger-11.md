@@ -1,11 +1,12 @@
 # TOOL-aClearedLedger-11 — the gate guard's row D6 and the spec checker's bar join read one command alike, and each new branch has an arm that can fail
 
-**Status:** INPROGRESS · rev-1 · 2026-11-14 · node a · Tier-2 · base 8db6f4be · streams tooling · order 11
+**Status:** CLOSED · rev-1 · 2026-11-14 · node a · Tier-2 · base 8db6f4be · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-14-build-TOOL-aClearedLedger-11-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aClearedLedger-11-1-acceptance-ledger.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aClearedLedger-11-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-aClearedLedger-11-1-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aClearedLedger-11-brief.md](../prompts/2026-11-13-prompt-TOOL-aClearedLedger-11-brief.md) | research | — |
 
