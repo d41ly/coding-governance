@@ -5,7 +5,7 @@ opened: 2026-11-12
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 TOOL-aNimbleMend-13 TOOL-aNimbleMend-14 TOOL-aNimbleMend-15
+ids: TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 TOOL-aNimbleMend-13 TOOL-aNimbleMend-14 TOOL-aNimbleMend-15 TOOL-aNimbleMend-16 TOOL-aNimbleMend-17 TOOL-aNimbleMend-18 TOOL-aNimbleMend-19 TOOL-aNimbleMend-20 TOOL-aNimbleMend-21 TOOL-aNimbleMend-22 TOOL-aNimbleMend-23 TOOL-aNimbleMend-24
 ---
 
 # aNimbleMend — a red leg is fixed inline with its record written after, and every pass runs a budgeted list of fast legs
@@ -76,6 +76,7 @@ None.
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 15 unit(s) · node a · opened 2026-11-12 · streams tooling
 ids TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 TOOL-aNimbleMend-13 TOOL-aNimbleMend-14 TOOL-aNimbleMend-15
+ids TOOL-aNimbleMend-16 TOOL-aNimbleMend-17 TOOL-aNimbleMend-18 TOOL-aNimbleMend-19 TOOL-aNimbleMend-20 TOOL-aNimbleMend-21 TOOL-aNimbleMend-22 TOOL-aNimbleMend-23 TOOL-aNimbleMend-24
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
