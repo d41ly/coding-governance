@@ -11,3 +11,10 @@ Built against spec rev-2 in one pass commit, from the tip `8079fde2d`, which is 
 - AC4 — `flag:` — with a non-empty full-bar flag in front the hook exited 2, named the record at BUILDING and printed the flag token on its `flag:` line, so the fixture was keyed and AC3 did not pass by failing open.
 - AC5 — `PRE` — with `PRE` = `8079fde2d` the criterion's pipeline printed nothing: every moved line of the gate guard is a header comment line.
 - AC6 — `grep -c 'pass-legs' tools/hooks/README.md` — printed 1, and the grep of the hook printed three lines: the header comment, the comment on the array, and the array. (PINNED, 2026-11-12)
+
+## Arms observed at the close
+
+The main loop observed each new arm on node a on 2026-11-13, in scratch clones of the branch under the host's temp directory: GREEN in a whole run of the suite, RED in a whole run with the staged break named below applied to the clone's copy of the shipped file and nothing else changed. The suites' inherited failures, present at base `1265772cc`, are named where they stand beside a red. (PINNED, 2026-11-13)
+
+- `tools/hooks/scratch-guard.test.sh` — GREEN at `7e785ac21`: 378 passed. RED with `pass-legs.sh` taken out of `GATE_RUNNERS`: the four `N-AC1` rows failed, exit 0 where 2 was wanted. The suite's seven inherited failures (S-AC2, S-AC3, S-AC5, S-AC8) stand in both runs. (PINNED, 2026-11-13)
+- `tools/unattended/gate-guard.test.sh` — GREEN at `7e785ac21`: 201 passed; the two parity failures also fail at base. RED with a file row added that denies the adapter: `N-AC3 BUILDING: the pass-leg runner -> allow` failed with exit 2, and its stderr check with it. (PINNED, 2026-11-13)

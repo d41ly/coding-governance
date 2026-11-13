@@ -17,3 +17,9 @@ Built against spec rev-2 in the pass commit `d4eb74047`. Each line is a probe th
 - AC10 — `python tools/run-gates/regen.py --list` — named `pass_legs.py --apply` at stage 2 with its `--check`, and the `kit.toml` grep printed 2. (PINNED, 2026-11-12)
 - AC11 — `GOV_NODE=a python tools/run-gates/pass_legs.py --write` — in this repository it read 202 bars, 117 of them red, and wrote 78 evidence rows; `--check` exited 0 with 26 legs declared at 412.8s of the 600s budget, none a self-test, an e2e leg or the unattended gate. (PINNED, 2026-11-12)
 - AC12 — `tools/run-gates/README.md` — the criterion's two greps printed 8 and 2. (PINNED, 2026-11-12)
+
+## Arms observed at the close
+
+The main loop observed each new arm on node a on 2026-11-13, in scratch clones of the branch under the host's temp directory: GREEN in a whole run of the suite, RED in a whole run with the staged break named below applied to the clone's copy of the shipped file and nothing else changed. The suites' inherited failures, present at base `1265772cc`, are named where they stand beside a red. (PINNED, 2026-11-13)
+
+- `tools/run-gates/run-gates.test.sh` — GREEN at `7e785ac21`: PASS, 478 assertions against a floor of 450. RED with `pass_leg` and `scope_of` taken out of the suite's first known-keys literal: the canary printed `leg row(s) carry a key outside the pinned set`, naming `pass_leg` on the declared rows. Staged in one run with three other breaks of that suite. (PINNED, 2026-11-13)

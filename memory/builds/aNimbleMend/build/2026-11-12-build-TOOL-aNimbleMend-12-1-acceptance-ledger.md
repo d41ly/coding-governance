@@ -17,3 +17,10 @@ Where the built tree and the spec's text disagreed, the case asserts the tree as
 - AC8 — `grep -c -e "pass-and-lane-adopter" -e "pass-and-lane-gov" tools/policy/README.md` — printed 2.
 - AC9 — `PASS-BUDGET FAILED` — the main loop ran `python tools/run-gates/pass_legs.py --budget` on node a: it exited 0 with no such line, printing `pass-budget: 29 leg(s) declared, 486.5s against a 600s budget and a 690s limit, cap 120s` (PINNED, 2026-11-12)
 - AC10 — `gate-pass-legs.txt` — the main loop ran `bash tools/run-gates/pass-legs.sh --base HEAD~1` on node a over the first pass commit: the run record read `declared 29`, `wall_s 212`, `budget_s 600`, `limit_s 690`, `over none`, `held 0` (PINNED, 2026-11-12)
+
+## Arms observed at the close
+
+The main loop observed each new arm on node a on 2026-11-13, in scratch clones of the branch under the host's temp directory: GREEN in a whole run of the suite, RED in a whole run with the staged break named below applied to the clone's copy of the shipped file and nothing else changed. The suites' inherited failures, present at base `1265772cc`, are named where they stand beside a red. (PINNED, 2026-11-13)
+
+- `tools/policy/check_policy.py --fixture pass-and-lane-adopter` — GREEN at `7e785ac21`: 97 assertions, 0 wrong. RED with the lane's decision returning null for every writer: step 4 went WRONG, 1 of 94. RED with the adapter no longer exiting on the key read `off`: step 13 went WRONG, 1 of 94. (PINNED, 2026-11-13)
+- `tools/policy/check_policy.py --fixture pass-and-lane-gov` — GREEN at `7e785ac21`: 88 assertions, 0 wrong. RED with the lane's decision returning null: step 4 went WRONG, 1 of 85. (PINNED, 2026-11-13)

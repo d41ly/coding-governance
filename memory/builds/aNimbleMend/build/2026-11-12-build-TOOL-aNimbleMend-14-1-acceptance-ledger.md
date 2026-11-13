@@ -12,3 +12,9 @@ Built against spec rev-1 in one pass commit. Each line is a probe of the changed
 - AC5 — `at-head, held-at-head, unlanded` — the hook exited 0 over the fixture with one stderr line holding those names and no landed leg; with the three open rows taken out of the ledger it exited 2 and printed no witness.
 - AC6 — `function` — the criterion's `node -p` over `tools/policy/policy-mirror.js` printed it.
 - AC7 — `LEG_MANIFEST` — the four greps printed 0, 1, 0 and 1 in the criterion's order.
+
+## Arms observed at the close
+
+The main loop observed each new arm on node a on 2026-11-13, in scratch clones of the branch under the host's temp directory: GREEN in a whole run of the suite, RED in a whole run with the staged break named below applied to the clone's copy of the shipped file and nothing else changed. The suites' inherited failures, present at base `1265772cc`, are named where they stand beside a red. (PINNED, 2026-11-13)
+
+- `tools/hooks/scratch-guard.test.sh` — GREEN at `7e785ac21`: 378 passed, the seven arms of the class among them. RED with the bound-free row test restored: the five `L14` refusal rows failed, exit 0 where 2 was wanted, and the blank-key deny row with them. The suite's seven inherited failures (S-AC2, S-AC3, S-AC5, S-AC8) stand in both runs. (PINNED, 2026-11-13)

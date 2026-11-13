@@ -12,3 +12,9 @@ Built against spec rev-2 in one pass commit, from the tip `43f389883`, which is 
 - AC5 — `prompt:` — the `prompt:` and `opts:` lines of the AC1 run and of the AC2 run were identical under `diff`, and the AC1 prompt held no occurrence of the command.
 - AC6 — `grep -c "passLegs: PASS_LEGS"` — printed 1 over the template and over the render, as did the grep for the constant's line; the rendered line reads `bash tools/run-gates/pass-legs.sh --base HEAD~1`, holds no `{{`, and `git ls-files --error-unmatch` accepted `tools/run-gates/pass-legs.sh`. (PINNED, 2026-11-12)
 - AC7 — `grep -c nextAction` — printed 1 over `tools/unattended/VERBS.template.md` and over `memory/guides/UNATTENDED-VERBS.md` against 0 at `PRE`, and 3 over `tools/roles/SKILL.template.md` and over `.claude/skills/build/SKILL.md` against 2 at `PRE`. (PINNED, 2026-11-12)
+
+## Arms observed at the close
+
+The main loop observed each new arm on node a on 2026-11-13, in scratch clones of the branch under the host's temp directory: GREEN in a whole run of the suite, RED in a whole run with the staged break named below applied to the clone's copy of the shipped file and nothing else changed. The suites' inherited failures, present at base `1265772cc`, are named where they stand beside a red. (PINNED, 2026-11-13)
+
+- `tools/workflows/unattended-build.test.sh` — GREEN at `8ed4b1d56`: 1452 arms, exit 0. RED with the child ignoring `passLegs`: six `passLegs:` arms failed. RED with the hand-out dropping `passLegs` from `dispatch.args`: four arms failed, the invocation and the key in each mode. At `7e785ac21` the suite was red on six arms of this build's making, five layout arms and one prompt join, which TOOL-aNimbleMend-15's pass `8ed4b1d56` repaired. (PINNED, 2026-11-13)

@@ -16,3 +16,10 @@ Built against spec rev-2 in one pass commit. Each line is a probe of the changed
 - AC9 — `over pin` — observed by the main loop at `cb1ee1c51`: the lexicon exited 0 and printed no line holding it.
 - AC10 — `pass-leg-evidence.txt` — the grep for the old two-file sentence printed 0 and the grep for the evidence file's name printed 1.
 - AC11 — `filtered list and not the manifest` — the three greps printed 0, 1 and 1, in the criterion's order.
+
+## Arms observed at the close
+
+The main loop observed each new arm on node a on 2026-11-13, in scratch clones of the branch under the host's temp directory: GREEN in a whole run of the suite, RED in a whole run with the staged break named below applied to the clone's copy of the shipped file and nothing else changed. The suites' inherited failures, present at base `1265772cc`, are named where they stand beside a red. (PINNED, 2026-11-13)
+
+- `tools/run-gates/run-gates.test.sh` — GREEN at `7e785ac21`: PASS, 478 assertions. RED with the shim wrap taken out of the adapter: `pass legs — 13-AC1 a pass leg starts with GATE_LEGS unset` failed, the leg reading the filtered list's path. (PINNED, 2026-11-13)
+- `tools/run-gates/run-gates.evidence.test.sh` — GREEN at `369e6922c`: PASS, 295 assertions. RED with the kit-subject clause taken out of `check_pass_eligible`: `13-AC3` twice and `13-AC4`. (PINNED, 2026-11-13)

@@ -16,3 +16,9 @@ Three readings the close will meet. The fourth cost of the spec's section 4: thr
 - AC7 — `pass-legs: FINDING held` — with a fourth row carrying the field and `"subject": "kit"` the command printed one line opening with the token, the row wrote no marker, its `leg` line read `not-run`, the record's `held` read 1, and the exit code was 0.
 - AC8 — `pass-legs: 0 legs declared, nothing ran` — with no row carrying the field the command printed the token, started no runner, exited 0, and the record's `verdict` read `EMPTY`.
 - AC9 — `grep -c 'pass-legs.sh' tools/run-gates/README.md` — printed 3 against 0 at the pass's starting tip `19ed9d30a`, and the grep for `gate-full-green` printed 12 against 11 there.
+
+## Arms observed at the close
+
+The main loop observed each new arm on node a on 2026-11-13, in scratch clones of the branch under the host's temp directory: GREEN in a whole run of the suite, RED in a whole run with the staged break named below applied to the clone's copy of the shipped file and nothing else changed. The suites' inherited failures, present at base `1265772cc`, are named where they stand beside a red. (PINNED, 2026-11-13)
+
+- `tools/run-gates/run-gates.test.sh` — GREEN at `7e785ac21`: PASS, 478 assertions. RED with the adapter's field filter removed and its wall-time comparison replaced by a constant: ten `pass legs` lines, AC1, AC3, AC5, AC7, three of AC8 and three of AC6. (PINNED, 2026-11-13)

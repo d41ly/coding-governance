@@ -16,3 +16,9 @@ One reading the close will meet: `python tools/run-gates/pass_legs.py --budget` 
 - AC7 — `python <kit>/derive-ceilings.py --check` — in the fixture, over `over` it exited 1 and its output held the limit finding; over `green` it exited 0 and held both the `ceiling-evidence:` summary and the `pass-budget:` summary. In this repository the same command is a leg's and was not run; the close owes it.
 - AC8 — `pass-budget: not graded` — with `pass_legs.py` removed from the fixture's kit copy the check over `over` exited 0, printed a line opening with the token and no traceback.
 - AC9 — `grep -c 'PASS_LIMIT_SECONDS' tools/run-gates/README.md` — printed 2, and the grep for `--budget` printed 3.
+
+## Arms observed at the close
+
+The main loop observed each new arm on node a on 2026-11-13, in scratch clones of the branch under the host's temp directory: GREEN in a whole run of the suite, RED in a whole run with the staged break named below applied to the clone's copy of the shipped file and nothing else changed. The suites' inherited failures, present at base `1265772cc`, are named where they stand beside a red. (PINNED, 2026-11-13)
+
+- `tools/run-gates/run-gates.evidence.test.sh` — GREEN at `369e6922c`: PASS, 295 assertions against a floor of 272. RED with the limit comparison removed: `AC4 a list over the limit did not red` and `AC7 the ceiling check did not carry the budget finding`. RED with the kit-subject clause removed, so the held finding cannot fire: `AC6 the class manifest did not red once per leg`. Staged in one run with three other breaks of that suite, 24 failing lines in all. (PINNED, 2026-11-13)
