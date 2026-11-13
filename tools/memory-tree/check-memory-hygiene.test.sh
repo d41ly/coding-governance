@@ -2313,7 +2313,7 @@ sed -i 's/^# --- empty-population report/declare -A __wc_probe\n: "${#__wc_probe
 n=$((n+1)); [ "$(grep -c '__wc_probe' "$_wc_k/check-memory-hygiene.sh")" = 2 ] || { echo "FAIL the crash-witness injection did not land as exactly two lines"; st=1; }
 _wc_o=$(cd "$Y" && bash "$_wc_k/check-memory-hygiene.sh" --only 1 2>"$TMP/wcrash.err"); _wc_rc=$?
 n=$((n+1)); [ "$_wc_rc" = 1 ] || { echo "FAIL a bash runtime error the engine ran past exited $_wc_rc, not 1"; st=1; }
-n=$((n+1)); grep -qF 'HYGIENE FAILED — bash reported a runtime error' <<<"$_wc_o" || { echo "FAIL a bash runtime error the engine ran past printed no HYGIENE FAILED line"; st=1; }
+n=$((n+1)); grep -qF "HYGIENE FAILED — bash reported a runtime error on this engine's stderr, so a check may have stopped part-way and its silence is not a pass" <<<"$_wc_o" || { echo "FAIL a bash runtime error the engine ran past printed no HYGIENE FAILED line"; st=1; }
 n=$((n+1)); grep -qF '__wc_probe: unbound variable' "$TMP/wcrash.err" || { echo "FAIL the crash witness did not replay the engine's stderr at exit"; st=1; }
 _wc_o=$(cd "$Y" && bash "$_wc_k/check-memory-hygiene.sh" --offenders 2>/dev/null 3>&1)
 n=$((n+1)); grep -qxF "check crash	check-memory-hygiene.sh: __wc_probe: unbound variable" <<<"$_wc_o" || { echo "FAIL --offenders did not key the bash runtime error as one check crash row without its path or line"; st=1; }

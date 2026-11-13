@@ -3670,7 +3670,12 @@ if [ -n "$POP_MISSING" ]; then
 fi
 
 # --- the crash witness's verdict (TOOL-aWitnessedCrash-1), over the stderr kept since the resolver.
-_crash=$(grep -E '^.+: line [0-9]+: ' "$_CRASH_LOG" || true)
+# A builtin read loop, not a grep: the verdict block forks nothing on a clean run (the fork ceiling).
+_crash=; _crash_re='^.+: line [0-9]+: '
+while IFS= read -r _cl || [ -n "$_cl" ]; do
+  _cl=${_cl%$'\r'}  # MSYS grep printed a CRLF line without its CR; so does this loop
+  if [[ $_cl =~ $_crash_re ]]; then _crash+=${_crash:+$'\n'}$_cl; fi
+done <"$_CRASH_LOG"
 if [ -n "$_crash" ]; then
   echo "HYGIENE FAILED — bash reported a runtime error on this engine's stderr, so a check may have stopped part-way and its silence is not a pass:"
   printf '%s\n' "$_crash"
