@@ -1,6 +1,6 @@
 # TOOL-aClearedLedger-7 — the policy fixtures leg prints no wrong assertion: fourteen guard paths, the recall plant's grammar file, and check 8 saying the reader's refusal
 
-**Status:** INPROGRESS · rev-2 · 2026-11-13 · node a · Tier-1 · base 8db6f4be · streams tooling · order 7 · closes TOOL-aNimbleMend-20
+**Status:** CLOSED · rev-2 · 2026-11-13 · node a · Tier-1 · base 8db6f4be · streams tooling · order 7 · closes TOOL-aNimbleMend-20
 
 <!-- gen:spec-records -->
 
