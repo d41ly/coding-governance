@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-13-build-TOOL-dNarrowedAnchor-1-1-journal.md](../build/2026-11-13-build-TOOL-dNarrowedAnchor-1-1-journal.md) | journal | — |
+| [2026-11-13-build-TOOL-dNarrowedAnchor-1-agent-ledger.md](../build/2026-11-13-build-TOOL-dNarrowedAnchor-1-agent-ledger.md) | journal | TOOL-dNarrowedAnchor-4 |
 
 <!-- /gen:spec-records -->
 

@@ -62,17 +62,17 @@ the folder predates the run, so such a run has contradicted its own declaration 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 2 unit(s) · node d · opened 2026-08-24 · streams tooling
+**Build status:** CLOSED · 2 unit(s) · node d · opened 2026-08-24 · streams tooling
 ids TOOL-dNarrowedAnchor-1 TOOL-dNarrowedAnchor-2 TOOL-dNarrowedAnchor-3 TOOL-dNarrowedAnchor-4
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dNarrowedAnchor-1 — the second anchor is admissible per MODE, and `slug` is not one of them](spec/2026-08-24-spec-TOOL-dNarrowedAnchor-1.md) | — | 2 | CLOSED | rev-2 | 2026-11-13 |
-| [TOOL-dNarrowedAnchor-4 — drop the closed TOOL-dNarrowedAnchor-1 from the signal-2 baseline set](spec/2026-11-13-spec-TOOL-dNarrowedAnchor-4.md) | — | 1 | INPROGRESS | rev-2 | 2026-11-13 |
+| [TOOL-dNarrowedAnchor-4 — drop the closed TOOL-dNarrowedAnchor-1 from the signal-2 baseline set](spec/2026-11-13-spec-TOOL-dNarrowedAnchor-4.md) | — | 1 | CLOSED | rev-2 | 2026-11-13 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 3 record folder(s).
+Records: 6 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

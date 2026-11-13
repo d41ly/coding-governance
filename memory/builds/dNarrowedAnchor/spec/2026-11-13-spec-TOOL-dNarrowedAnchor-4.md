@@ -1,11 +1,12 @@
 # TOOL-dNarrowedAnchor-4 — drop the closed TOOL-dNarrowedAnchor-1 from the signal-2 baseline set
 
-**Status:** INPROGRESS · rev-2 · 2026-11-13 · node d · Tier-1 · base 2ba17e9d · streams tooling · ratified 2026-11-13
+**Status:** CLOSED · rev-2 · 2026-11-13 · node d · Tier-1 · base 2ba17e9d · streams tooling · ratified 2026-11-13
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-13-build-TOOL-dNarrowedAnchor-1-agent-ledger.md](../build/2026-11-13-build-TOOL-dNarrowedAnchor-1-agent-ledger.md) | journal | TOOL-dNarrowedAnchor-1 |
 | [2026-11-13-prompt-TOOL-dNarrowedAnchor-4-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-dNarrowedAnchor-4-1-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-dNarrowedAnchor-4-2-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-dNarrowedAnchor-4-2-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-dNarrowedAnchor-4-3-builder.md](../prompts/2026-11-13-prompt-TOOL-dNarrowedAnchor-4-3-builder.md) | journal | — |
