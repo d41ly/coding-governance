@@ -9,12 +9,14 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-aNimbleMend-16=OPEN TOOL-aNimbleMend-17=OPEN TOOL-aNimbleMend-18=OPEN TOOL-aNimbleMend-19=OPEN TOOL-aNimbleMend-20=OPEN TOOL-aNimbleMend-21=OPEN TOOL-aNimbleMend-22=OPEN TOOL-aNimbleMend-23=OPEN TOOL-aNimbleMend-24=OPEN TOOL-aNimbleMend-25=OPEN TOOL-aNimbleMend-26=OPEN TOOL-aNimbleMend-28=OPEN
+units-at-landing: TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-4 TOOL-aNimbleMend-3 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-13 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 TOOL-aNimbleMend-14 TOOL-aNimbleMend-15 TOOL-aNimbleMend-27
 parked-surfaced: yes
 keepalive-reaped: yes
-gates-run: unattended-17945472974883861634-1039 b6183275
+gates-run: unattended-179455354511218625433-1793 42074190
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 148920512962eb7eddfb7941e7d7a0009b9eb8ca
-phase: VERIFYING
+phase: LANDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/inline-bar-fixes-pass-legs-1a64f7
