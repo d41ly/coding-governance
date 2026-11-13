@@ -446,7 +446,7 @@ def extract_item(ctx, path, text=None):
 
 def extract_policy(ctx, path, text=None):
     """The `policy` namespace: `policy.<name>` for each `[[key]]` row of the policy catalogue,
-    `policy/catalogue.toml` under the tool root, whose `name` is all literal segments. A name carrying a
+    the policy kit's `catalogue.toml`, whose `name` is all literal segments. A name carrying a
     `<word>` or `*` segment is no member: its literal prefix, the segments before the first placeholder,
     yields one `family` row at the first row carrying it, which `derive_family_tags` reads; a name that
     opens with a placeholder yields nothing (TOOL-dDeclaredLoop-18 S3)."""
