@@ -73,7 +73,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 11 unit(s) · node a · opened 2026-11-13 · streams tooling
+**Build status:** SPECCED · 12 unit(s) · node a · opened 2026-11-13 · streams tooling
 ids TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-7 TOOL-aClearedLedger-8 TOOL-aClearedLedger-9 TOOL-aClearedLedger-10 TOOL-aClearedLedger-11 TOOL-aClearedLedger-12 TOOL-aClearedLedger-13
 
 <!-- gen:build-units -->
@@ -90,15 +90,17 @@ ids TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClea
 | [TOOL-aClearedLedger-10 — four suite budget rows re-declared from readings taken alone on a quiet node, with the ceiling evidence and the pass legs re-derived](spec/2026-11-13-spec-TOOL-aClearedLedger-10.md) | 10 | 1 | DEFERRED | rev-1 | 2026-11-13 |
 | [TOOL-aClearedLedger-11 — the gate guard's row D6 and the spec checker's bar join read one command alike, and each new branch has an arm that can fail](spec/2026-11-14-spec-TOOL-aClearedLedger-11.md) | 11 | 2 | CLOSED | rev-1 | 2026-11-14 |
 | [TOOL-aClearedLedger-12 — the gate guard's word reader keeps a two-character redirection operator whole, so row D6 denies an over-bound suite whose output is appended](spec/2026-11-14-spec-TOOL-aClearedLedger-12.md) | 12 | 2 | CLOSED | rev-1 | 2026-11-14 |
+| [TOOL-aClearedLedger-13 — the spec lint reads a half-glued redirection and a quoted value as the hook does, and each new branch and reworded clause has an arm that can fail](spec/2026-11-14-spec-TOOL-aClearedLedger-13.md) | 13 | 2 | SPECCED | rev-1 | 2026-11-14 |
 <!-- /gen:build-units -->
 
 Records: 23 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aClearedLedger-1 TOOL-aClearedLedger-10 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-7 TOOL-aClearedLedger-9 TOOL-aClearedLedger-11 TOOL-aClearedLedger-12.
+Ids no `spec-audit` record has ever named: TOOL-aClearedLedger-1 TOOL-aClearedLedger-10 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-7 TOOL-aClearedLedger-9 TOOL-aClearedLedger-11 TOOL-aClearedLedger-12
+TOOL-aClearedLedger-13.
 
-Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 12 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -116,6 +118,7 @@ Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carr
 | 10 | `TOOL-aClearedLedger-10` | no |
 | 11 | `TOOL-aClearedLedger-11` | no |
 | 12 | `TOOL-aClearedLedger-12` | no |
+| 13 | `TOOL-aClearedLedger-13` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
