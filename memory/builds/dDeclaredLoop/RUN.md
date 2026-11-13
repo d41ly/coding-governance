@@ -66,3 +66,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-13T18:19:43Z dispatch · item 094af7f7 TOOL-dDeclaredLoop-36 · reason tools/govkit/registry.toml help/loop.md help/upgrade-steps.md tools/playbook-kit-waivers.txt memory/builds/dDeclaredLoop/build/2026-11-13-build-TOOL-dDeclaredLoop-36-1-acceptance-ledger.md memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-36.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/backlog/TOOL.md
 
 2026-11-13T18:47:44Z dispatch · item 094af7f7 TOOL-dDeclaredLoop-36 · reason memory/builds/dDeclaredLoop/build/2026-11-13-build-TOOL-dDeclaredLoop-36-deviation-363.md
+
+2026-11-13T19:19:00Z brief · item TOOL-dDeclaredLoop-23 · reason 387f3459bf58 memory/builds/dDeclaredLoop/prompts/2026-11-13-prompt-TOOL-dDeclaredLoop-23-build-brief.md
