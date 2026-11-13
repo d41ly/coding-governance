@@ -87,7 +87,7 @@ ids TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClea
 | [TOOL-aClearedLedger-10 — four suite budget rows re-declared from readings taken alone on a quiet node, with the ceiling evidence and the pass legs re-derived](spec/2026-11-13-spec-TOOL-aClearedLedger-10.md) | 10 | 1 | SPECCED | rev-1 | 2026-11-13 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 3 record folder(s).
+Records: 8 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
