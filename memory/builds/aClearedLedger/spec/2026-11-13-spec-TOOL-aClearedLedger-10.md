@@ -1,6 +1,6 @@
 # TOOL-aClearedLedger-10 — four suite budget rows re-declared from readings taken alone on a quiet node, with the ceiling evidence and the pass legs re-derived
 
-**Status:** SPECCED · rev-1 · 2026-11-13 · node a · Tier-1 · base 8db6f4be · streams tooling · order 10 · closes TOOL-aNimbleMend-22
+**Status:** DEFERRED · rev-1 · 2026-11-13 · node a · Tier-1 · base 8db6f4be · streams tooling · order 10 · closes TOOL-aNimbleMend-22
 
 <!-- gen:spec-records -->
 

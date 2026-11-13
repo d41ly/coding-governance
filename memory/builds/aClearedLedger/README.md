@@ -70,7 +70,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 9 unit(s) · node a · opened 2026-11-13 · streams tooling
+**Build status:** DEFERRED · 9 unit(s) · node a · opened 2026-11-13 · streams tooling
 ids TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-7 TOOL-aClearedLedger-8 TOOL-aClearedLedger-9 TOOL-aClearedLedger-10
 
 <!-- gen:build-units -->
@@ -84,7 +84,7 @@ ids TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClea
 | [TOOL-aClearedLedger-6 — the hygiene self-test's eight lines: the partition arm folds check 26's cache figure, the override derivation leaves the carried resolver block out, and the conf example declares six recall keys](spec/2026-11-13-spec-TOOL-aClearedLedger-6.md) | 6 | 1 | CLOSED | rev-2 | 2026-11-13 |
 | [TOOL-aClearedLedger-7 — the policy fixtures leg prints no wrong assertion: fourteen guard paths, the recall plant's grammar file, and check 8 saying the reader's refusal](spec/2026-11-13-spec-TOOL-aClearedLedger-7.md) | 7 | 1 | CLOSED | rev-2 | 2026-11-13 |
 | [TOOL-aClearedLedger-9 — a path-less `Red-fix:` commit owes no record: the join holds it out by name and the door says why it refuses](spec/2026-11-13-spec-TOOL-aClearedLedger-9.md) | 9 | 2 | CLOSED | rev-1 | 2026-11-13 |
-| [TOOL-aClearedLedger-10 — four suite budget rows re-declared from readings taken alone on a quiet node, with the ceiling evidence and the pass legs re-derived](spec/2026-11-13-spec-TOOL-aClearedLedger-10.md) | 10 | 1 | SPECCED | rev-1 | 2026-11-13 |
+| [TOOL-aClearedLedger-10 — four suite budget rows re-declared from readings taken alone on a quiet node, with the ceiling evidence and the pass legs re-derived](spec/2026-11-13-spec-TOOL-aClearedLedger-10.md) | 10 | 1 | DEFERRED | rev-1 | 2026-11-13 |
 <!-- /gen:build-units -->
 
 Records: 13 bound to this build, across 3 record folder(s).
