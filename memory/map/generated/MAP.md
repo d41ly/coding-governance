@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 171 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 162 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 174 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 168 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -87,6 +87,7 @@ Inventories: gate-legs: 171 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · 
 | `marker contracts` | row-grammar |
 | `measure-legs selftest` | run-gates |
 | `memory hygiene` | memory-tree-hygiene |
+| `memory hygiene (the pass checks)` | memory-tree-hygiene |
 | `memory-hygiene self-test` | memory-tree-hygiene |
 | `memory-recall kit selftest` | memory-recall |
 | `memory-recall skill wiring` | memory-recall |
@@ -105,6 +106,7 @@ Inventories: gate-legs: 171 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · 
 | `playbook validity gate` | playbook-mode |
 | `policy check` | policy |
 | `policy fixtures` | policy |
+| `positional (the citation check alone)` | playbook |
 | `pre-push bar self-test` | run-gates |
 | `pre-push run-log line` | runlog |
 | `pre-push self-test` | push-main |
@@ -155,6 +157,7 @@ Inventories: gate-legs: 171 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · 
 | `shell-hygiene selftest` | gate-lint |
 | `spawn budget (forks per hot entrypoint)` | gate-lint |
 | `spec tokens (a spec's own names resolve)` | spec-tokens |
+| `spec tokens (the pass's own spec)` | spec-tokens |
 | `spec-audit opt-in pack self-test` | review-harnesses |
 | `spec-tokens self-test` | spec-tokens |
 | `step-gate` | govkit |
@@ -292,6 +295,7 @@ Inventories: gate-legs: 171 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · 
 | `absence-assertion-over-whole-file-text.md` | baseline |
 | `absence-read-from-one-of-several-homes.md` | build-method |
 | `adopter-migration-sweep.md` | review-harnesses |
+| `agent-output-interpolated-into-an-instruction.md` | unattended |
 | `allocation-knob-without-a-ceiling.md` | run-gates-turnstile |
 | `allowlist-narrower-than-the-root-it-guards.md` | agent-cap |
 | `amendment-leaves-its-other-half-standing.md` | build-method |
@@ -307,7 +311,9 @@ Inventories: gate-legs: 171 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · 
 | `beacon-published-before-it-is-complete.md` | run-gates-turnstile |
 | `borrowed-seed-inherits-its-head-state.md` | unattended |
 | `bounded-through-a-pipe-is-unbounded.md` | run-gates, unattended |
+| `budget-row-not-remeasured-after-added-arms.md` | policy |
 | `canary-waits-on-a-rendezvous-not-a-clock.md` | run-gates |
+| `carried-forward-row-read-as-current.md` | agent-cap |
 | `changed-mode-selection-ignores-doc-reads.md` | run-gates |
 | `check-format-grades-two-populations.md` | build-readme-surface |
 | `check-grades-one-layer-of-a-layered-config.md` | policy |
@@ -326,6 +332,7 @@ Inventories: gate-legs: 171 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · 
 | `fail-count-reads-a-pattern-the-row-never-prints.md` | run-gates |
 | `fallback-drain-strands-its-witnesses.md` | build-method |
 | `fallback-fabricates-the-passing-value.md` | unattended |
+| `fixed-base-assumes-one-commit-per-pass.md` | unattended |
 | `fixed-sleep-does-not-place-a-signal.md` | runlog |
 | `fixture-inherits-ambient-machine-state.md` | unattended |
 | `fixture-lacks-a-gate-the-consumer-has.md` | govkit |
@@ -350,6 +357,7 @@ Inventories: gate-legs: 171 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · 
 | `hookspath-resolves-into-another-checkout.md` | run-gates |
 | `id-matched-as-a-substring.md` | unattended |
 | `index-derivation-reads-a-half-staged-move-as-a-deletion.md` | memory-tree-hygiene |
+| `inherited-env-retargets-a-check.md` | run-gates |
 | `inherited-git-dir-pins-the-work-tree-to-the-cwd.md` | unattended-mandate |
 | `inline-fence-swallows-the-rest-of-the-file.md` | memory-tree-hygiene |
 | `inline-marker-breaks-a-line-continuation.md` | install-prefix |
@@ -372,6 +380,7 @@ Inventories: gate-legs: 171 · kits: 19 · git-hooks: 4 · harness-hooks: 13 · 
 | `nt-against-a-missing-file-is-true.md` | runlog |
 | `observation-before-the-last-fold-of-the-same-commit.md` | build-method |
 | `observed-by-claim-no-arm-discharges.md` | review-harnesses |
+| `off-switch-leaves-new-output-standing.md` | policy |
 | `one-run-claim-recorded-as-agreed.md` | build-method |
 | `one-value-field-records-a-mixed-outcome.md` | build-method |
 | `orchestrator-hand-off-owed-a-disposition.md` | unattended-stops |

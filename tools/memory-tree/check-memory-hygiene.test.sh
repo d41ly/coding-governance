@@ -1296,7 +1296,7 @@ done
 # ---- equals the union of the scoped runs' lines, liveness lines set aside, over one selection per
 # ---- `check_selected` call, named by its first id. The list is this suite's pin of the population.
 _hs_union=""
-for _hs_s in 1 2 3 4 5 6 9 10 11 12 13 17 20 21 22 23 24 26 27 28 29 30; do
+for _hs_s in 1 2 3 4 5 6 9 10 11 12 13 17 20 21 22 23 24 26 27 28 29 30 31; do
   run_scoped "$_hs_s"
   _hs_union+=$(grep -v '^HYGIENE --only ' <<<"$sout" || true)$'\n'
 done
@@ -3160,6 +3160,49 @@ hit 'build-records: PASS typed-kinds'
 out=$("$_PY" "$HERE/build_records.py" --fixture --plant pending-kind 2>&1)
 hit 'build-records: PASS pending-kind'
 
+# --- TOOL-aNimbleMend-9 S7 (AC2 to AC6) — the red-fix door and its join: the plant stages, in a scratch
+# --- repository of its own, the door deriving Commit and Files from an abbreviated rev, its three
+# --- refusals, an owed fix at HEAD, the --staged form red and then green, the clean join and each of J1
+# --- to J6, and FAILs naming any case that did not hold. Red on a door that stores the rev as typed or
+# --- writes for a commit that is no fix of the leg, and on a join that misses a finding.
+out=$("$_PY" "$HERE/build_records.py" --fixture --plant red-fix-join 2>&1)
+hit 'build-records: PASS red-fix-join'
+miss 'build-records: FAIL'
+
+# --- TOOL-aNimbleMend-9 S5 (AC7) — CHECK 31 THROUGH THE ENGINE, in a tree of its own. A fix at HEAD with
+# --- no record is owed and passes the full run, and fails --staged, the commit that must be its
+# --- record's; one commit later the unrecorded fix is below HEAD and check 31 fails naming it; and with
+# --- its record written through the door and staged, check 31 passes on the join's summary line. Red
+# --- on a check that is not wired, that --only does not select, or that reads no trailer or no record.
+RF31=$TMP/rf31
+mkdir -p "$RF31/memory/builds/tFix/spec" && git -C "$RF31" init -q --template= .
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\n' > "$RF31/.memory-tree.conf"
+printf '# ARCH-tFix-1 — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-11-12 · node a · Tier-2 · base 0123abcd\n' > "$RF31/memory/builds/tFix/spec/2026-11-12-spec-ARCH-tFix-1.md"
+write_rf31_commit() { ( cd "$RF31" && git add -A && git -c user.email=f@x -c user.name=f -c commit.gpgsign=false commit -q --no-verify "$@" ) >/dev/null 2>&1; }
+run_rf31_gate() { ( cd "$RF31" && bash "$SCRIPT" "$@" 2>&1 ); }
+write_rf31_commit -m 'a fix' -m 'Red-fix: the fixture leg'
+out=$(run_rf31_gate --only 31); rf31rc=$?
+n=$((n+1)); [ "$rf31rc" = 0 ] || { echo "FAIL check 31 through the engine: a fix at HEAD whose record is not yet due exited $rf31rc, not 0"; st=1; }
+hit '1 owed'
+out=$(run_rf31_gate --staged)
+chit 31 'the fixture leg · the fix commit has no red-fix record'
+printf 'later\n' > "$RF31/later.txt"; write_rf31_commit -m 'one more commit'
+out=$(run_rf31_gate --only 31); rf31rc=$?
+n=$((n+1)); [ "$rf31rc" = 1 ] || { echo "FAIL check 31 through the engine: an unrecorded fix below HEAD exited $rf31rc, not 1"; st=1; }
+chit 31 'the fixture leg · the fix commit has no red-fix record'
+chit 31 'a Red-fix: commit and its red-fix record disagree; write the record with build_records.py new red-fix'
+"$_PY" "$HERE/build_records.py" new red-fix --root "$RF31" --build tFix --unit ARCH-tFix-1 --leg 'the fixture leg' \
+  --red-line 'FAIL the fixture leg' --commit 'HEAD~1' --rerun 'the fixture leg, green' >/dev/null 2>&1
+git -C "$RF31" add -A >/dev/null 2>&1
+out=$(run_rf31_gate --only 31); rf31rc=$?
+n=$((n+1)); [ "$rf31rc" = 0 ] || { echo "FAIL check 31 through the engine: a fix with its record staged exited $rf31rc, not 0"; st=1; }
+hit 'memory-hygiene: check 31: red-fix join · 1 fix commit(s) · 1 record(s) · 0 owed'
+# --- The join's exit 2: the fix commit's loose object is removed, so the join's `git log` cannot walk
+# --- HEAD's parent and check 31 fails on a join nobody could read. Last, since it breaks the fixture.
+rf31sha=$(git -C "$RF31" rev-parse 'HEAD~1'); rm -f "$RF31/.git/objects/${rf31sha:0:2}/${rf31sha:2}"
+out=$(run_rf31_gate --only 31)
+chit 31 'the red-fix join could not be read, so no Red-fix: commit was joined to its record'
+
 # ---- the verdict, printed AFTER the last arm. Upstream printed PASS ~150 lines early and landed a
 # ---- red merge bar because the head of the output said success.
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23, and it closes TOOL-cTracedPromise-4 rather than
@@ -4662,7 +4705,13 @@ done
 # PLAY-dOrderedCharter-64, -42 and -55, plus TOOL-dPavedRoad-4's 15 = 690. Counted by reading; OWED: observed at the close.
 # RAISED 690 -> 696 by TOOL-aWitnessedCrash-1: its six crash-witness assertions, each top-level and
 # never skipped. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=696
+# RAISED 690 -> 699 by TOOL-aNimbleMend-9: its two red-fix-join plant assertions and its seven check-31
+# engine assertions, each top-level and never skipped. Counted by reading; OWED: observed at the close.
+# RAISED 699 -> 701 by TOOL-aNimbleMend-9's second pass: check 31's two failure texts, one assertion
+# each, top-level and never skipped. Counted by reading; OWED: observed at the close.
+# MERGED at this build's reconcile of origin/main cac14c195: the base 690, plus TOOL-aWitnessedCrash-1's 6,
+# plus TOOL-aNimbleMend-9's 11 = 707. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=707
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

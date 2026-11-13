@@ -231,6 +231,23 @@ if git diff --cached --name-only --diff-filter=ACMR -- 'memory/**' | grep -q .; 
   else
     print_kit_miss "memory-tree hygiene" memory-tree check-memory-hygiene.sh
   fi
+else
+  # THE RED-FIX JOIN'S STAGED FORM, on a commit that stages NO memory path (TOOL-aNimbleMend-15 S12).
+  # The hygiene leg above runs the join as its check 31, and only beside a staged memory path, so a
+  # product-only commit on top of an unrecorded `Red-fix:` commit was not refused and the fix sat
+  # below HEAD until the next full hygiene run. The join grades HEAD alone here: one `git log -1`.
+  # The launcher is the tracked resolver the policy guard above sources. A kit or a launcher that
+  # does not resolve is an announced skip, as for every leg of this hook.
+  if g=$(resolve_kit_gate memory-tree build_records.py); then
+    rf_r=$(git ls-files -- '*resolve-python.sh' | head -n 1)
+    if [ -z "$rf_r" ] || ! . "./$rf_r" || ! py=$(resolve_python); then
+      echo "pre-commit: red-fix join leg SKIPPED — no tracked python resolver, or no usable launcher, to run $g."
+    elif ! "$py" "$g" join red-fix --staged; then
+      rc=1
+    fi
+  else
+    print_kit_miss "red-fix join" memory-tree build_records.py
+  fi
 fi
 
 # kickoff-manifest ratchet, staged leg — its gate decides whether a watched file is staged, so its

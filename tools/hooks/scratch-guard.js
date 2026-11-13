@@ -103,12 +103,32 @@
  * that role's type. It grades two write classes; `none`, `review` and `records` are declared in the
  * index and read by nothing here.
  *
+ * THE RED-FIX LANE (TOOL-aNimbleMend-8, bounded by TOOL-aNimbleMend-14). A product write the route
+ * arm or the role arm is about to refuse is admitted, with one witness line, while the gate ledger
+ * under the worktree's own git dir (`gate-ledger.tsv`, written by the bar runner and by a pass-leg
+ * run) holds an OPEN red and the policy key `bar.inline-red-fixes` reads `on`, or no policy kit
+ * resolves. A row is an open red when it has the nine-field form with status `fail` or `timeout`,
+ * names a leg of the manifest the conf key `LEG_MANIFEST` names, and its head field is `HEAD` or an
+ * ancestor of `HEAD` the landed revision does not reach: the runner carries old rows forward, so a
+ * row is bounded by its own head. A blank `LEG_MANIFEST` reads as `gate-legs.json` beside the
+ * run-gates kit this install holds, and closes the lane where none resolves. The writer is the main
+ * loop or a role declaring `writes = product`; any other writer, a broken role index, the key
+ * `off`, a refused key read and any other value each leave the refusal standing. `readOpenReds`
+ * reads the ledger, `checkRedLane` is the decision, and the commit owes a `Red-fix: <leg>` trailer
+ * beside `Pass: none`, which the commit grader reads. A spec write never reaches it. WHAT THE LANE
+ * DOES NOT CHECK: whether the write fixes the red, since any product path is admitted while any row
+ * is open; whether the tree the run graded was clean, since a run over a dirty tree stamps `HEAD`;
+ * whether a later commit of the branch already fixed the red, since a row at an unlanded ancestor
+ * stays open until a run measures its leg again or the branch lands; and a ledger edited by hand
+ * or a manifest edited in the working tree, each read like the runner's.
+ *
  * THE FOURTH CHECK: THE ROLE-GATE ARM (TOOL-aOrientedCast-11). Gates are the main session's, at the
  * merge or push threshold. On a Bash or PowerShell payload carrying an `agent_type`, AFTER the
  * scratch verdict and the orientation check, `checkRoleGate` refuses a simple command that runs a
  * gate the role's allowlist does not name: G1, the argv of a leg of the gate manifest the role
  * index names (`gates.manifest`), compared word for word from its script on; G2, the bar runner,
- * the self-test runner or the unattended gates runner, by basename, in any form; G3, a `*.test.sh`
+ * the self-test runner, the unattended gates runner or the pass-leg runner `pass-legs.sh`
+ * (TOOL-aNimbleMend-6), by basename, in any form; G3, a `*.test.sh`
  * or `*selftest.py` script, or a script carrying `--selftest`, unless it carries `--render`,
  * `--list` or `--help`. The allowlist is the index's `gates` list for that type, rendered from the
  * roles kit's policy; a type the index does not name, `workflow-subagent` among them, may run
@@ -142,7 +162,7 @@
  */
 'use strict'
 
-const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.47 — ships inside the hooks kit entry
+const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.48 — ships inside the hooks kit entry
 
 const TOOLS = ['Bash', 'PowerShell']
 const MAX_FINDINGS = 6
@@ -1145,6 +1165,111 @@ function checkRoleWrite(cls, index, w) {
   return { deny: renderRoleDeny(cls, index, writers, w) }
 }
 
+// ---- the red-fix lane (TOOL-aNimbleMend-8) ------------------------------------------------------
+
+/** The bar runner's ledger under a worktree's own git dir; the runner's `RG_GIT_DIR` holds it. */
+const GATE_LEDGER_FILE = 'gate-ledger.tsv'
+
+/**
+ * The names of the legs the gate ledger under `gitDir` records red ON THIS BRANCH'S PRESENT STATE,
+ * in ledger order (TOOL-aNimbleMend-14). The runner carries forward every row a run did not
+ * measure, so a row is bounded by its own head field, never by its status alone. A row is open
+ * when all four hold, tested in this order:
+ *  - form: nine or more tab-separated fields, the third `fail` or `timeout`. A legacy five-field
+ *    row, a short row and an `ok` or `retried` row are not open.
+ *  - head shape: the ninth field is a full hex sha.
+ *  - manifest: the first field is the `name` of a row of the JSON list the conf key `LEG_MANIFEST`
+ *    of `<top>/.memory-tree.conf` names, read from the working tree. A blank or absent key reads
+ *    as the commit grader reads it (TOOL-aNimbleMend-15 S7): `gate-legs.json` beside the run-gates
+ *    kit `resolveKitDir` finds from this hook's own directory, and only where that file sits
+ *    inside `top`. No `chunk`, `subject` or `pass_leg` is tested, so a held leg stays eligible.
+ *  - head place: the ninth field is `HEAD` of `top`, or a commit `git rev-list HEAD --not <landed>`
+ *    prints there, `<landed>` being the policy helper's `readLandedRevision(top)`. The landed read
+ *    and the `rev-list` run only where a candidate's head differs from `HEAD`.
+ * Every failure closes the lane and none throws: an empty `gitDir` or `top`, an absent or unreadable
+ * ledger, a blank or absent key with no run-gates kit resolved or its manifest outside `top`, a
+ * manifest that is unreadable, unparsable or no list, and an
+ * unreadable `HEAD` each answer the empty list; no policy helper, a refused landed read and a failed
+ * `rev-list` leave only the rows at `HEAD` open.
+ */
+function readOpenReds(gitDir, top) {
+  if (!gitDir || !top) return []
+  const fs = require('fs')
+  const path = require('path')
+  let text
+  try { text = fs.readFileSync(path.join(gitDir, GATE_LEDGER_FILE), 'utf8') } catch { return [] }
+  let rows = []
+  for (const l of text.split('\n')) {
+    // Split on the tab and count: the row's empty fields are kept, so the head stays the ninth.
+    const f = l.replace(/\r$/, '').split('\t')
+    if (f.length >= 9 && (f[2] === 'fail' || f[2] === 'timeout') && /^[0-9a-f]{40,64}$/.test(f[8])) rows.push({ name: f[0], head: f[8] })
+  }
+  if (rows.length === 0) return []
+  let legs
+  try {
+    const rel = (readConfKey(fs.readFileSync(path.join(top, ROUTE_CONF), 'utf8'), 'LEG_MANIFEST') || '').trim()
+    let file = rel ? path.join(top, buildNativePath(rel)) : ''
+    if (!rel) {
+      // A BLANK KEY (TOOL-aNimbleMend-15 S7), read as the commit grader's `resolve_leg_manifest` reads
+      // it: `gate-legs.json` beside the run-gates kit this install holds, and only inside `top`. The
+      // resolver throws where no such kit resolves, which the catch below answers.
+      file = path.join(path.dirname(require('./agent-cap.js').resolveKitDir('run-gates', 'run-gates.sh', __dirname)), 'gate-legs.json')
+      const real = buildComparablePath(resolveRealPath(file))
+      const root = buildComparablePath(resolveRealPath(top))
+      if (!real || !root || real === root || !checkUnderRoot(real, root)) return []
+    }
+    const doc = JSON.parse(fs.readFileSync(file, 'utf8'))
+    if (!Array.isArray(doc)) return []
+    legs = new Set(doc.map((r) => (r && typeof r === 'object' ? r.name : null)).filter((n) => typeof n === 'string'))
+  } catch { return [] }
+  rows = rows.filter((r) => legs.has(r.name))
+  if (rows.length === 0) return []
+  const { spawnSync } = require('child_process')
+  const runGit = (args) => {
+    try { return spawnSync('git', args, { cwd: top, encoding: 'utf8', timeout: 20000, windowsHide: true }) } catch { return { status: 1, stdout: '' } }
+  }
+  const h = runGit(['rev-parse', '--verify', '-q', 'HEAD'])
+  const head = h.status === 0 ? String(h.stdout || '').trim() : ''
+  if (!head) return []
+  const unlanded = new Set()
+  if (rows.some((r) => r.head !== head)) {
+    try {
+      const helper = require('./agent-cap.js').resolvePolicyHelper()
+      const landed = helper && fs.existsSync(helper) ? require(helper).readLandedRevision(top) : ''
+      if (/^[0-9a-f]{40,64}$/.test(landed)) {
+        const r = runGit(['rev-list', 'HEAD', '--not', landed])
+        if (r.status === 0) for (const sha of String(r.stdout || '').split(/\r?\n/)) if (sha) unlanded.add(sha)
+      }
+    } catch { unlanded.clear() }
+  }
+  return rows.filter((r) => r.head === head || unlanded.has(r.head)).map((r) => r.name)
+}
+
+/**
+ * S2: the lane's one decision, first match wins. `w` carries `agentType`, `index` as loadRoleIndex
+ * returns it, `lane` as `{ on, why }` and `reds` as readOpenReds returns them. `{ witness }` admits,
+ * null leaves the refusal standing.
+ *  1. `lane.on` is not true → null
+ *  2. `reds` is empty → null
+ *  3. the index is broken → null
+ *  4. `agentType` is empty, the main loop → witness
+ *  5. the index is absent → witness
+ *  6. `agentType` names an `agent`-true role declaring `writes = product` → witness
+ *  7. anything else, the untyped harness agent included → null
+ * It does not ask whether the write fixes the red: any product path is admitted while a leg is open.
+ * The caller asks it TWICE (TOOL-aNimbleMend-15): first with `lane.on` taken as true, over the reds
+ * and the index alone, so steps 2 to 7 decide before the key is read; then, only where that
+ * admitted, with the lane as the key answered it, where step 1 decides.
+ */
+function checkRedLane(w) {
+  if (!w.lane || w.lane.on !== true) return null
+  if (!Array.isArray(w.reds) || w.reds.length === 0) return null
+  if (!w.index || w.index.state === 'broken') return null
+  const r = w.index.state === 'ok' && w.agentType && Object.prototype.hasOwnProperty.call(w.index.roles, w.agentType) ? w.index.roles[w.agentType] : null
+  if (w.agentType && w.index.state !== 'absent' && !(r && r.agent === true && r.writes === 'product')) return null
+  return { witness: `red-fix lane admits this write — open red leg(s): ${w.reds.join(', ')}; its commit owes a \`Red-fix: <leg>\` trailer beside \`Pass: none\`${w.lane.why ? ` · ${w.lane.why}` : ''}` }
+}
+
 /**
  * THE ONE EVALUATION ORDER of the write gate. Returns null to print nothing, `{ witness }` to allow
  * with one stderr line, `{ deny }` to refuse.
@@ -1176,6 +1301,16 @@ function checkRoleWrite(cls, index, w) {
  *     `writes = product` → deny, UNARMED; the payload's `agent_type` names such a role → null; else
  *     deny. The route arm runs first and never instead: a builder with no buildable route meets
  *     step 7, 8 or 9b's refusal word for word.
+ * 10. the red-fix lane (TOOL-aNimbleMend-8), on a product-class refusal from step 7, 8, 9b or 9a
+ *     and on nothing else: read the gate ledger's open reds (readOpenReds over the worktree's git
+ *     dir and toplevel: a row counts only at `HEAD` or at an unlanded ancestor of it, for a leg of
+ *     `LEG_MANIFEST`, TOOL-aNimbleMend-14) and the role index FIRST. With no red open, a broken
+ *     index, or a writer checkRedLane's steps 4 to 6 would not admit, the refusal stands as
+ *     composed and the lane key is not read (TOOL-aNimbleMend-15). Only then read the lane key
+ *     `bar.inline-red-fixes`, and return checkRedLane's witness, or the refusal as composed. A key
+ *     read that refused or answered another value appends its one line to the refusal, and only
+ *     where a red is open and the writer is admissible; under `off` the refusal is byte for byte
+ *     the one composed. An admitted write and every non-product write read neither.
  * No `agent_id` exemption: a subagent's write is judged by the same order (S7).
  */
 function checkRouted(data, env) {
@@ -1245,15 +1380,51 @@ function checkRouted(data, env) {
     const routed = extractRouteUnits(cardText).units.filter((u) => u.spec).map((u) => buildComparablePath(path.join(top, buildNativePath(u.spec))))
     return checkRoleWrite('spec', loadRoleIndex(top), { tool, ti, native: target, target: targetC, agentType, slug, routed })
   }
+  // Step 10: the red-fix lane, asked with a product-class verdict already composed. An admit passes
+  // through untouched, so the key and the ledger are read on a refusal only.
+  const checkLane = (verdict) => {
+    if (!verdict || !verdict.deny) return verdict
+    // THE CHEAP TESTS FIRST (TOOL-aNimbleMend-15 S14). The ledger and the role index are files; the
+    // key is a policy read that spawns git. So checkRedLane is asked once with the lane taken as
+    // on: with no red open, a broken index or a writer its steps 4 to 6 would not admit, the
+    // refusal stands as composed and the key is never read, which is every refusal of a tree with
+    // no open red. A refused key read there appends no line.
+    // The worktree's OWN git dir, where the runner wrote, never the common dir.
+    let gitDir = mine.hit.gitPath
+    if (mine.hit.isFile) {
+      let m = null
+      try { m = /gitdir:\s*(.+)/.exec(fs.readFileSync(mine.hit.gitPath, 'utf8')) } catch { m = null }
+      gitDir = m ? path.resolve(top, m[1].trim()) : ''
+    }
+    const reds = readOpenReds(gitDir, top)
+    const index = loadRoleIndex(top)
+    if (!checkRedLane({ agentType, index, lane: { on: true, why: '' }, reds })) return verdict
+    let lane
+    try {
+      const helper = require('./agent-cap.js').resolvePolicyHelper()
+      if (!helper || !fs.existsSync(helper)) {
+        lane = { on: true, why: 'NOTE — no policy kit resolves beside this hook, so bar.inline-red-fixes reads on' }
+      } else {
+        const v = require(helper).readPolicy('bar.inline-red-fixes', { repo: top }).value
+        lane = v === 'on' ? { on: true, why: '' } : v === 'off' ? { on: false, why: '' }
+          : { on: false, why: `bar.inline-red-fixes reads ${JSON.stringify(v)}, neither on nor off, so the red-fix lane is closed` }
+      }
+    } catch (e) {
+      lane = { on: false, why: String((e && e.message) || e).split(/\r?\n/)[0] }
+    }
+    const admit = checkRedLane({ agentType, index, lane, reds })
+    if (admit) return admit
+    return !lane.on && lane.why ? { deny: `${verdict.deny}${lane.why}\n` } : verdict
+  }
   const card = sid ? readCard(mine.common, sid) : null
   if (!card || card.text === null) {
     const where = card ? `this session has no orientation card at ${card.shown} (session ${sid})` : 'the payload carries no session_id, so no orientation card can be read'
-    return { deny: renderRouteDeny(tool, targetC, entry, confShown, where, `Create the card with manifest-check.sh --card --write --session ${sid || '<session id>'} from the kickoff kit, then run /session-kickoff, which specs the unit, writes its brief and appends a ## route naming it.`) }
+    return checkLane({ deny: renderRouteDeny(tool, targetC, entry, confShown, where, `Create the card with manifest-check.sh --card --write --session ${sid || '<session id>'} from the kickoff kit, then run /session-kickoff, which specs the unit, writes its brief and appends a ## route naming it.`) })
   }
   const route = extractRouteUnits(card.text)
   if (!route.seen || route.units.length === 0) {
     const what = route.seen ? `its ## route at ${card.shown} carries no - unit: line` : `its orientation card ${card.shown} carries no ## route`
-    return { deny: renderRouteDeny(tool, targetC, entry, confShown, what, `Run /session-kickoff: give the unit its spec, then append a ## route naming it through manifest-check.sh --card --append --session ${sid}.`) }
+    return checkLane({ deny: renderRouteDeny(tool, targetC, entry, confShown, what, `Run /session-kickoff: give the unit its spec, then append a ## route naming it through manifest-check.sh --card --append --session ${sid}.`) })
   }
   // Step 9a: the route admits; the writer's role decides. The slug is the unit id's middle.
   const checkUnitWrite = (u) => {
@@ -1263,17 +1434,17 @@ function checkRouted(data, env) {
   const reasons = []
   for (const u of route.units) {
     const why = checkBuildable(u, route.build, top, memRoot.trim(), confBytes)
-    if (!why) return checkUnitWrite(u)
+    if (!why) return checkLane(checkUnitWrite(u))
     reasons.push(`  ${u.unit}: ${why}`)
   }
   // Step 9b: the units the build's run-state file records as dispatched, minus the card's own.
   const dispatched = readDispatchedUnits(top, memRoot.trim(), route.build)
   const onCard = new Set(route.units.map((u) => u.unit))
   for (const u of dispatched.units) {
-    if (!onCard.has(u.unit) && !checkBuildable(u, route.build, top, memRoot.trim(), confBytes)) return checkUnitWrite(u)
+    if (!onCard.has(u.unit) && !checkBuildable(u, route.build, top, memRoot.trim(), confBytes)) return checkLane(checkUnitWrite(u))
   }
   if (dispatched.units.length > 0) reasons.push(`  the run-state file ${dispatched.file} records a dispatch for ${dispatched.units.length} unit(s) of ${route.build}, and none is buildable`)
-  return { deny: renderRouteDeny(tool, targetC, entry, confShown, `no unit its card ${card.shown} routes is buildable:\n${reasons.join('\n')}`, 'Make one routed unit buildable — its spec at the status that admits writes — or route the unit that owns this write through /session-kickoff and manifest-check.sh --card --append.') }
+  return checkLane({ deny: renderRouteDeny(tool, targetC, entry, confShown, `no unit its card ${card.shown} routes is buildable:\n${reasons.join('\n')}`, 'Make one routed unit buildable — its spec at the status that admits writes — or route the unit that owns this write through /session-kickoff and manifest-check.sh --card --append.') })
 }
 
 // ---- the role-gate arm (TOOL-aOrientedCast-11) --------------------------------------------------
@@ -1298,8 +1469,11 @@ const GATE_OPTION_RULES = {
   exec: { takes: ['-a'] },
   command: { takes: [], ends: /^-[vV]$/ },
 }
-/** G2, by basename and in any form: the bar runner, the self-test runner, the unattended gates runner. */
-const GATE_RUNNERS = ['run-gates.sh', 'run-selftests.sh', 'run-unattended-gates.sh']
+/**
+ * G2, by basename and in any form: the bar runner, the self-test runner, the unattended gates
+ * runner, and the pass-leg runner `pass-legs.sh` (TOOL-aNimbleMend-6), which is the main loop's.
+ */
+const GATE_RUNNERS = ['run-gates.sh', 'run-selftests.sh', 'run-unattended-gates.sh', 'pass-legs.sh']
 /** G3's admitting words: a render, a listing or a usage text runs no arm. */
 const GATE_SUITE_ADMITS = ['--render', '--list', '--help']
 
@@ -1739,4 +1913,4 @@ function main() {
 }
 
 if (require.main === module) main()
-module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits }
+module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane }

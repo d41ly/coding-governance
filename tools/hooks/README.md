@@ -417,7 +417,7 @@ out.
 **What it refuses.** An `Edit`, `Write`, `MultiEdit` or `NotebookEdit` whose target —
 `tool_input.file_path`, else `tool_input.notebook_path`, resolved against the payload `cwd` — lies
 under a product path, unless the session's orientation card carries a `## route` naming a unit whose
-spec is BUILDABLE. The product paths are `ROUTED_PATHS` in the `.memory-tree.conf` at the target's
+spec is BUILDABLE, or the red-fix lane below admits it. The product paths are `ROUTED_PATHS` in the `.memory-tree.conf` at the target's
 toplevel: whitespace-separated, repo-root-relative, a trailing `/` naming a directory, matched by
 whole segment on the comparable form, so `toolsx/` is not under `tools/`. BUILDABLE means the route
 line's spec sits under `<MEMORY_ROOT>/builds/<build>/spec/`, exists, has an H1 naming the unit, and
@@ -496,6 +496,39 @@ read like a generated one; a session launched AS a role carries that role's type
 `review` and `records` write classes are declared in the index and graded by nothing here. A hook
 script is read afresh on every call, so the arm binds a session from its next write once the tree
 its hooks run from holds it.
+
+**The red-fix lane: an open red admits a product write** (`TOOL-aNimbleMend-8`, bounded by
+`TOOL-aNimbleMend-14`). A product write does
+not always need a routed unit. Where the gate is about to refuse one — no card, no route, no
+buildable unit, or a writer the role arm refuses — it asks the lane, step 10 of `checkRouted`'s
+order. The lane admits with one witness line when all three hold: the policy key
+`bar.inline-red-fixes` reads `on`, or no policy kit resolves beside the hook; the gate ledger
+`gate-ledger.tsv` under the worktree's own git dir, which the bar runner and a pass-leg run write,
+holds an open red (`readOpenReds`); and the writer is the main loop or
+a role declaring `writes = product` (`checkRedLane`, whose comment is the decision's rows). A row is
+an open red only on the branch's present state, because the runner carries forward every row a run
+did not measure: it has the nine-field form with status `fail` or `timeout`, its name is a leg of
+the manifest the conf key `LEG_MANIFEST` names, and its head field is `HEAD` or an ancestor of
+`HEAD` the landed revision does not reach, which the policy kit's `readLandedRevision` answers. A
+blank `LEG_MANIFEST` reads as the commit grader reads it (`TOOL-aNimbleMend-15`): `gate-legs.json`
+beside the run-gates kit `resolveKitDir` finds from the hook's own directory, inside the worktree. A
+legacy five-field row, a row with no head, a blank `LEG_MANIFEST` with no such manifest found and a
+head that is landed or on another line of history each close the lane; a held leg redded at `HEAD`
+opens it. The
+witness names the open legs and what the commit owes: a `Red-fix: <leg>` trailer, one leg name per
+trailer line, beside `Pass: none`, which the commit grader `routed_commits.py` reads in place of a
+unit id. With the key `off` the refusal is byte for byte the one the gate composed; a key read that
+refused, or answered any other value, leaves the refusal standing and appends its one line, and
+only where a red is open and the writer is one the lane admits: the ledger and the role index are
+read first, and with no red open, a broken index or any other writer the key is not read and no
+line is appended. A
+broken role index closes the lane. The key and the ledger are read on a would-be refusal only, and
+a spec write never reaches the lane. What it does not check: whether the write fixes the red, since
+any product path is admitted while any row is open and the commit grader bounds nothing here;
+whether a later commit of the branch already fixed the red, since a row at an unlanded ancestor
+stays open until a run measures its leg again or the branch lands, and this gate writes nothing to
+the ledger; whether the tree the run graded was clean; and a ledger edited by hand or a manifest
+edited in the working tree, each read as it stands.
 
 **The third event: `SubagentStart`** (`TOOL-aRoutedQuill-4`). A subagent inherits the hooks but not
 the parent's card, so `scratch-guard-subagent.fragment.json` wires the same script on `SubagentStart`
@@ -616,7 +649,7 @@ scanned once. The role index is read at the checkout root of the payload `cwd`, 
 | Row | Matches | Admitted when |
 |---|---|---|
 | G1 leg | its argv equals a leg's of the gate manifest the role index names, from the leg's script on | the role's allowlist names that leg |
-| G2 runner | the bar runner, the self-test runner or the unattended gates runner, by basename, any form | never |
+| G2 runner | the bar runner, the self-test runner, the unattended gates runner or the pass-leg runner `pass-legs.sh`, by basename, any form | never |
 | G3 suite | a `*.test.sh` or `*selftest.py` script, or a script carrying `--selftest` | it carries `--render`, `--list` or `--help`, or it is an allowlisted G1 leg |
 
 The allowlist is the role index's `gates` list for that type, which the roles kit renders from the

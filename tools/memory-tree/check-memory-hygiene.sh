@@ -69,7 +69,7 @@ esac
 # no key at all, which the bar reads as a probe that could not answer rather than as a clean set.
 OFFENDERS=0; OFFENDER_KEYS=""
 if [ "${1:-}" = "--offenders" ]; then OFFENDERS=1; exec 3>&1 1>/dev/null; fi
-KIT_MEMORY_TREE_VERSION=2.160   # gov:kit memory-tree@2.160 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.161   # gov:kit memory-tree@2.161 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -1994,6 +1994,36 @@ case "$_c30" in
 $ab30" ;;
   *) fail 30 "the as-built view could not be rendered, so none of its verdicts was read:
 $ab30" ;;
+esac
+
+fi
+
+if check_selected 31; then
+# 31 — THE RED-FIX JOIN (TOOL-aNimbleMend-9 S5). An inline red fix has no spec, so its one account is the
+# red-fix record written after it. Delegated to the record factory's `join red-fix`, as 30 delegates
+# `--check-asbuilt`, so the `Red-fix:` trailer is spelled in the kit's Python alone: every commit
+# reachable from HEAD carrying the trailer is joined to its tracked record both ways, findings J1 to J6
+# of `build_records.py#check_red_fix_join`. The verb exits 1 naming each finding and 2 when git or the
+# tracked population cannot be read; both fail here, because a join nobody could read is no clearance.
+# Its last line on exit 0 is a summary of what it read, printed here, which is this check's liveness. A
+# fix at HEAD with no record is printed as owed and passes, since its record is the next commit.
+# Under --staged `--staged` is passed through and the verb grades HEAD alone: a HEAD carrying the trailer
+# with no record in the index fails, so the commit after a fix is its record's, and a HEAD carrying no
+# trailer prints the verb's held line. NOT CHECKED: that the record is the fix's direct child on a full
+# run, that its Rerun or Red line is true, or that the leg was red.
+_c31a=(join red-fix); [ "$STAGED" = 1 ] && _c31a+=(--staged)
+rf31=$("$_PY" "$HERE/build_records.py" "${_c31a[@]}" 2>&1); _c31=$?
+rf31=${rf31//$'\r'/}
+case "$_c31" in
+  0) _r31=$rf31$'\n'
+     while [ -n "$_r31" ]; do
+       _c31l=${_r31%%$'\n'*}; _r31=${_r31#*$'\n'}
+       [ -z "$_c31l" ] || printf 'memory-hygiene: check 31: %s\n' "${_c31l#build-records: }"
+     done ;;
+  1) fail 31 "a Red-fix: commit and its red-fix record disagree; write the record with build_records.py new red-fix:
+$rf31" ;;
+  *) fail 31 "the red-fix join could not be read, so no Red-fix: commit was joined to its record:
+$rf31" ;;
 esac
 
 fi

@@ -775,6 +775,24 @@ usage = 'review.spec-audit.chain-ceiling = 6'
 owner = "dFoldedAudit"
 direction = "raise-loosens"
 
+# TOOL-aNimbleMend-1: the two switches of the aNimbleMend mechanisms, each default on. They are no
+# row of the design's [policies] table, so the header's order does not place them.
+[[key]]
+name = "bar.inline-red-fixes"
+allowed = ["on", "off"]
+default = "on"
+summary = "Whether a red bar leg or pass leg may be fixed with no spec, its record written after: on, or off, every product write then needing its specced unit."
+usage = 'bar.inline-red-fixes = "off"'
+owner = "aNimbleMend"
+
+[[key]]
+name = "pass.fast-legs"
+allowed = ["on", "off"]
+default = "on"
+summary = "Whether the declared fast gate legs run after every unit pass: on, or off, a pass then running no gate leg."
+usage = 'pass.fast-legs = "off"'
+owner = "aNimbleMend"
+
 [[key]]
 name = "review.design-audit.runs"
 allowed = [1, 2, 3]

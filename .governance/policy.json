@@ -1,5 +1,5 @@
 {
-  "catalogue_blob": "7400f98e3501e3f48c6818d1bb1653eff6d9e351",
+  "catalogue_blob": "9ce5a224c3e6ec3c462f228f1c2ed443eaf56515",
   "keys": {
     "actions.free": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
@@ -45,6 +45,11 @@
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
       "source": "default",
       "value": "plan-only"
+    },
+    "bar.inline-red-fixes": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "on"
     },
     "budgets.enforce": {
       "reason": "set in .governance/policy.toml at {rev}",
@@ -707,6 +712,11 @@
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
       "source": "default",
       "value": "record-only"
+    },
+    "pass.fast-legs": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "on"
     },
     "patch.ratify": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",

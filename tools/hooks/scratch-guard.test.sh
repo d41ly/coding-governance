@@ -1209,6 +1209,153 @@ else
   echo "FAIL D-AC6 the hook's RUN_STATE_FILE is '$sg_runmd_hook' and the driver's runmd_of basename is '$sg_runmd_driver'"; fail=$((fail+1))
 fi
 
+# ---- the RED-FIX LANE (TOOL-aNimbleMend-8): an open red in the gate ledger admits a product write --
+# ---- the gate was about to refuse, with the lane key on; off, the refusal is the one composed ------
+# The ledger sits under the linked worktree's OWN git dir. The lane key is read at the landed
+# revision, which in a clone with no remote is the local branch GOV_DEFAULT_BRANCH names: the primary
+# branch holds no policy file, so the key reads its default `on`; `sg-lane-off` holds one setting it
+# `off`; a branch that does not exist is a refused read. Every arm ABOVE ran with that variable as
+# the caller left it. Against the hook at 1d010f40 the L-AC1 and L-AC3 rows fail (no readOpenReds, no
+# checkRedLane) and each exit-0 row below exits 2; the exit-2 rows are their near-misses.
+# A row is an open red only when its own head places it on the branch's present state
+# (TOOL-aNimbleMend-14): nine fields, a leg of the conf's LEG_MANIFEST, and a head that is HEAD or
+# an ancestor of HEAD the landed revision does not reach. So the worktree's conf gains LEG_MANIFEST
+# for this block, a manifest names the legs, and the worktree gains two commits above the landed
+# tip: SG_C0 is the landed tip, SG_C1 the unlanded ancestor, SG_C2 the HEAD and SG_C3 a commit on
+# another line of history. The block's last lines put the conf and the worktree's HEAD back.
+SG_WT_GITDIR=$(unset GIT_DIR GIT_WORK_TREE; git -C "$SGWT" rev-parse --absolute-git-dir)
+SG_LEDGER="$SG_WT_GITDIR/gate-ledger.tsv"
+sg_lane_base=$(git -C "$SGWT" rev-parse HEAD)
+SG_C0=$(git -C "$SGFIX" rev-parse HEAD)
+SG_C3=$($SGGIT -C "$SGFIX" commit-tree "$SG_C0^{tree}" -p "$SG_C0" -m 'the lane fixture: another line of history')
+$SGGIT -C "$SGWT" commit -q --allow-empty -m 'the lane fixture: an unlanded ancestor'
+SG_C1=$(git -C "$SGWT" rev-parse HEAD)
+$SGGIT -C "$SGWT" commit -q --allow-empty -m 'the lane fixture: the head'
+SG_C2=$(git -C "$SGWT" rev-parse HEAD)
+cp "$SG_CONF" "$TMP/lane-conf.bak"
+printf 'LEG_MANIFEST="sg-legs.json"\n' >> "$SG_CONF"
+printf '[{"name":"leg one"},{"name":"leg two"},{"name":"leg three"},{"name":"leg four"},{"name":"held leg","chunk":"selftests"}]\n' > "$SGWT/sg-legs.json"
+# write_ledger <leg name>=<status>[@<head>] ... — a gate ledger of nine-field rows, one per argument.
+# The head is the ninth field: SG_C2, the worktree's HEAD, where the argument names none, and EMPTY
+# for a bare trailing `@`.
+write_ledger() {
+  local r st
+  : > "$SG_LEDGER"
+  for r in "$@"; do
+    st=${r#*=}
+    case "$st" in *@*) ;; *) st="$st@$SG_C2" ;; esac
+    printf '%s\t1\t%s\tk\tt\tr\t0\tb\t%s\n' "${r%%=*}" "${st%%@*}" "${st#*@}" >> "$SG_LEDGER"
+  done
+}
+sg_blob=$(printf '[bar]\ninline-red-fixes = "off"\n' | git -C "$SGFIX" hash-object -w --stdin)
+sg_tree=$(printf '100644 blob %s\tpolicy.toml\n' "$sg_blob" | git -C "$SGFIX" mktree)
+sg_top=$(printf '040000 tree %s\t.governance\n' "$sg_tree" | git -C "$SGFIX" mktree)
+git -C "$SGFIX" update-ref refs/heads/sg-lane-off "$($SGGIT -C "$SGFIX" commit-tree "$sg_top" -m 'the lane key off')"
+SG_LANE_ON=$(git -C "$SGFIX" symbolic-ref --short HEAD)
+write_ledger "leg one=fail" "leg two=ok" "leg three=timeout" "leg four=retried"
+printf 'a name alone\n' >> "$SG_LEDGER"
+mkdir -p "$TMP/lane-empty"
+sg_reds=$(node -p "JSON.stringify(require(process.argv[1]).readOpenReds(process.argv[2], process.argv[3]))" "$HOOK" "$SG_WT_GITDIR" "$SG_CWD_WT" 2>&1)
+if [ "$sg_reds" = '["leg one","leg three"]' ]; then echo "ok   L-AC1 readOpenReds reads fail and timeout rows in ledger order, and skips ok, retried and a short row"; pass=$((pass+1))
+else echo "FAIL L-AC1 readOpenReds over the fixture ledger printed: $sg_reds"; fail=$((fail+1)); fi
+sg_reds=$(node -p "JSON.stringify(require(process.argv[1]).readOpenReds(process.argv[2], process.argv[3]))" "$HOOK" "$TMP/lane-empty" "$SG_CWD_WT" 2>&1)
+if [ "$sg_reds" = '[]' ]; then echo "ok   L-AC1 readOpenReds over a directory holding no ledger is the empty list"; pass=$((pass+1))
+else echo "FAIL L-AC1 readOpenReds over a directory holding no ledger printed: $sg_reds"; fail=$((fail+1)); fi
+export GOV_DEFAULT_BRANCH="$SG_LANE_ON"
+run_write "L-AC2 the key on, a red open, the main loop, an unrouted card -> allow, one witness line naming the legs and the trailer" 0 "one;;red-fix lane;;leg one, leg three;;Red-fix: <leg>" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+# TOOL-aNimbleMend-15 S11: the SAME row through a copy of the hook with NO policy kit beside it. Every
+# other row runs the hook where the policy kit resolves, so the arm that opens the lane without
+# reading its key ran nowhere. The copy sits under the suite's scratch dir with every script of this
+# kit and no sibling, and the witness must carry the NOTE: a row that ran with the kit resolved
+# prints none, so the NOTE is what says this branch was reached.
+# WHAT THIS DOES NOT CHECK: the unknown-value arm, `bar.inline-red-fixes reads <value>, neither on
+# nor off`, which is unreachable defence: the policy reader refuses a value outside the key's two
+# before the hook sees one, so no fixture reaches it through a policy file.
+mkdir -p "$TMP/nopol/hk"; cp "$HERE"/*.js "$TMP/nopol/hk/"
+sg_hook=$HOOK; HOOK="$TMP/nopol/hk/scratch-guard.js"
+run_write "L15 no policy kit beside the hook, a red open, the main loop -> allow, the witness carrying the NOTE" 0 "one;;red-fix lane;;leg one, leg three;;NOTE — no policy kit resolves beside this hook, so bar.inline-red-fixes reads on" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+HOOK=$sg_hook
+# TOOL-aNimbleMend-15 S7: a BLANK LEG_MANIFEST reads as gate-legs.json beside the run-gates kit the
+# hook's own resolver finds, as the commit grader reads it. The real hook's run-gates kit sits
+# outside this fixture, so the two rows run a copy of the hook INSIDE the worktree, under sgk,
+# beside a run-gates kit of one anchor file, with the conf put back to the form that names no
+# manifest. The first row has the kit's manifest at sgk/gate-legs.json and the lane opens on the
+# reds at HEAD; the second has that file removed and the lane stays shut. The copy has no policy
+# kit beside it, so the first witness carries the NOTE as the S11 row's does. With the blank-key
+# fallback taken out of the hook (`if (!rel) return []` restored) the first row exits 2.
+# WHAT THIS DOES NOT CHECK: a manifest beside a kit OUTSIDE the worktree, which no row plants.
+cp "$SG_CONF" "$TMP/lane-conf.named"; cp "$TMP/lane-conf.bak" "$SG_CONF"
+# The two kit directories are named from variables, never typed: this kit's own directory name and
+# the run-gates kit's, as the resolver printed it above (the install-prefix ban's rule 3).
+sg_kh="$SGWT/sgk/${HERE##*/}"; sg_kr="$SGWT/sgk/$RUN_GATES"
+mkdir -p "$sg_kh" "$sg_kr"; cp "$HERE"/*.js "$sg_kh/"
+: > "$sg_kr/run-gates.sh"; cp "$SGWT/sg-legs.json" "$SGWT/sgk/gate-legs.json"
+HOOK="$sg_kh/scratch-guard.js"
+run_write "L15 a blank LEG_MANIFEST, the run-gates kit's manifest present, a red at HEAD -> allow, the witness naming the legs" 0 "one;;red-fix lane;;leg one, leg three" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+rm -f "$SGWT/sgk/gate-legs.json"
+run_write "L15 a blank LEG_MANIFEST, no manifest beside the run-gates kit, a red at HEAD -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+HOOK=$sg_hook; rm -rf "$SGWT/sgk"; cp "$TMP/lane-conf.named" "$SG_CONF"
+write_ledger "leg two=ok" "leg four=retried"
+run_write "L-AC2 the key on, no red open -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+cp "$TMP/err" "$TMP/lane-composed.err"
+# The arm class "a carried-forward ledger row never opens the lane" (TOOL-aNimbleMend-14): the runner
+# carries forward every row a run did not measure, so each row below is one a bound closes, sent
+# through the real hook, and the last two are their near-misses. With the bound-free row test
+# restored in the hook each of the five refusal arms exits 0.
+write_ledger "leg one=fail@"
+run_write "L14 a fail row with an empty head -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+write_ledger "leg one=fail@$SG_C0"
+run_write "L14 a fail row whose head is a landed commit -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+write_ledger "leg gone=fail"
+run_write "L14 a fail row at HEAD for a leg absent from the manifest -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+printf 'leg one\t1\tfail\tk\tt\n' > "$SG_LEDGER"
+run_write "L14 a legacy five-field fail row -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+write_ledger "leg one=fail@$SG_C3"
+run_write "L14 a fail row whose head is on another line of history -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+write_ledger "held leg=fail"
+run_write "L14 a held leg redded at HEAD -> allow, the witness naming the leg" 0 "one;;red-fix lane;;held leg" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+write_ledger "leg one=fail@$SG_C1"
+run_write "L14 a fail row at an unlanded ancestor of HEAD -> allow, the witness naming the leg" 0 "one;;red-fix lane;;leg one" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+write_ledger "leg one=fail"
+export GOV_DEFAULT_BRANCH=sg-lane-off
+run_write "L-AC2 the key off, a red open -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+if cmp -s "$TMP/err" "$TMP/lane-composed.err"; then echo "ok   L-AC2 under the key off the refusal is byte for byte the one composed with no red open"; pass=$((pass+1))
+else echo "FAIL L-AC2 under the key off the refusal differs from the one composed with no red open"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+export GOV_DEFAULT_BRANCH=sg-no-such-branch
+run_write "L-AC2 a refused key read, a red open -> deny, the reader's line appended to the refusal" 2 "any;;## route;;policy: refused" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+# TOOL-aNimbleMend-15 S14: the ledger and the role tests run BEFORE the key read. With no red open,
+# and with a writer the lane would never admit, the key is not read, so a read that would be refused
+# appends no line and the refusal is the one composed. The row above is the liveness half: the same
+# refused read, with a red open and an admissible writer, does append its line. With the key read
+# first again, as before this unit, both comparisons below fail.
+write_ledger "leg two=ok"
+run_write "L15 a refused key read, no red open -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+if cmp -s "$TMP/err" "$TMP/lane-composed.err" && ! grep -q 'policy: refused' "$TMP/err"; then echo "ok   L15 with no red open the key is not read: the refusal is byte for byte the one composed and holds no policy: refused line"; pass=$((pass+1))
+else echo "FAIL L15 with no red open a refused key read still appended its line to the refusal"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+write_ledger "leg one=fail"
+write_roles ok
+run_edit "L15 a refused key read, a red open, gov-spec-writer on a product path -> deny with the ## route refusal" 2 "any;;## route" Write "$SG_T" - session_id=sgtest-r6 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-spec-writer
+if ! grep -q 'policy: refused' "$TMP/err"; then echo "ok   L15 for a writer the lane never admits the key is not read: the refusal holds no policy: refused line"; pass=$((pass+1))
+else echo "FAIL L15 a writer the lane never admits still had the key read, and its refused read appended a line"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+write_roles absent
+export GOV_DEFAULT_BRANCH="$SG_LANE_ON"
+write_roles ok
+run_edit "L-AC2 a role index, the main loop on a buildable route (the role arm's refusal), a red open -> allow, the witness line" 0 "one;;red-fix lane;;leg one" Write "$SG_T" - session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+run_edit "L-AC2 gov-builder, an unrouted card, a red open -> allow, the witness line" 0 "one;;red-fix lane;;leg one" Write "$SG_T" - session_id=sgtest-r6 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-builder
+run_edit "L-AC2 gov-spec-writer on a product path, a red open -> deny with the ## route refusal" 2 "any;;## route" Write "$SG_T" - session_id=sgtest-r6 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-spec-writer
+run_edit "L-AC2 the untyped harness agent, a red open -> deny with the ## route refusal" 2 "any;;## route" Write "$SG_T" - session_id=sgtest-r6 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=workflow-subagent
+run_edit "L-AC3 gov-builder writing a spec, a red open -> deny by the role arm: a spec write never reaches the lane" 2 "any;;a spec path;;gov-spec-writer" Write "$SG_CWD_WT/$SG_SPECS/2026-10-09-spec-TOOL-x-2.md" - session_id=sgtest-r6 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-builder
+write_roles broken
+run_edit "L-AC2 a broken role index, the main loop, a red open -> deny with the ## route refusal" 2 "any;;## route" Write "$SG_T" - session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+write_roles absent
+unset GOV_DEFAULT_BRANCH
+rm -f "$SG_LEDGER" "$SGWT/sg-legs.json"
+cp "$TMP/lane-conf.bak" "$SG_CONF"
+git -C "$SGWT" reset -q --soft "$sg_lane_base"
+sg_lane_at=$(node -p "const t = String(require(process.argv[1]).checkRouted); const s = t.indexOf(\"checkRoleWrite('spec'\"); s >= 0 && t.indexOf('checkRedLane') > s" "$HOOK" 2>&1)
+if [ "$sg_lane_at" = true ]; then echo "ok   L-AC3 checkRouted asks checkRedLane, and only after the spec class has returned"; pass=$((pass+1))
+else echo "FAIL L-AC3 checkRouted does not ask checkRedLane after the spec class returns ($sg_lane_at)"; fail=$((fail+1)); fi
+
 # ==================================================================================================
 # ---- the ROLE-GATE ARM (TOOL-aOrientedCast-11): a role agent runs no gate its allowlist does not --
 # ---- name; the main loop is never refused -------------------------------------------------------
@@ -1264,6 +1411,14 @@ run_role_bash "G-AC1 PowerShell: the bar after an env assignment -> deny naming 
 run_role_bash "G-AC1 the main loop runs the bar -> allow, stderr EMPTY" 0 empty - Bash "bash kit/$RUN_GATES/run-gates.sh"
 run_role_bash "G-AC1 the main loop runs a suite -> allow, stderr EMPTY" 0 empty - Bash "bash kit/$SG_K_HOOKS/agent-cap.test.sh"
 run_role_bash "G-AC1 the main loop runs a leg -> allow, stderr EMPTY" 0 empty - Bash "python kit/$SG_K_ROLES/check_roles.py"
+# ---- TOOL-aNimbleMend-6: the pass-leg runner is row G2 for a role agent and the main loop's -------
+# ---- Against a GATE_RUNNERS without the name, each exit-2 row below exits 0. ----------------------
+SG_PASS_LEGS=pass-legs.sh
+run_role_bash "N-AC1 the pass-leg runner -> deny naming G2" 2 "any;;G2 runner;;gov-builder" gov-builder Bash "bash kit/$RUN_GATES/$SG_PASS_LEGS --base HEAD~1"
+run_role_bash "N-AC1 the pass-leg runner behind env -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "env bash kit/$RUN_GATES/$SG_PASS_LEGS --base HEAD~1"
+run_role_bash "N-AC1 the pass-leg runner behind timeout 600 -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "timeout 600 bash kit/$RUN_GATES/$SG_PASS_LEGS --base HEAD~1"
+run_role_bash "N-AC1 PowerShell: the pass-leg runner -> deny naming G2" 2 "any;;G2 runner" gov-builder PowerShell "bash kit/$RUN_GATES/$SG_PASS_LEGS --base HEAD~1"
+run_role_bash "N-AC2 the main loop runs the pass-leg runner -> allow, stderr EMPTY" 0 empty - Bash "bash kit/$RUN_GATES/$SG_PASS_LEGS --base HEAD~1"
 # ---- AC1: BY ROLE — the allowlist decides ---------------------------------------------------------
 run_role_bash "G-AC1 gov-spec-writer runs memory hygiene -> allow, stderr EMPTY" 0 empty gov-spec-writer Bash "bash kit/$SG_K_MEMORY_TREE/check-memory-hygiene.sh"
 run_role_bash "G-AC1 gov-builder runs memory hygiene -> deny naming the leg" 2 "any;;G1 leg;;memory hygiene" gov-builder Bash "bash kit/$SG_K_MEMORY_TREE/check-memory-hygiene.sh"
@@ -1534,8 +1689,19 @@ n=$((pass+fail))
 # AC4, 4 for AC5 and 1 for AC6), counted by hand under the same rule.
 # 328 = 325 + the 3 context rows TOOL-aSmoothedDispatch-8 added for its AC6 (the run_sub, the check_ctx
 # and the no-dispatch-row check), counted by hand under the same rule.
+# 333 = 328 + the 5 run_role_bash rows TOOL-aNimbleMend-6 added for the pass-leg runner (4 for AC1 and
+# 1 for AC2), counted by hand under the same rule.
+# 347 = 333 + the 14 red-fix lane rows TOOL-aNimbleMend-8 added (2 for AC1, 10 for AC2 and 2 for AC3),
+# counted by hand under the same rule.
+# 354 = 347 + the 7 run_write rows of TOOL-aNimbleMend-14's arm class "a carried-forward ledger row
+# never opens the lane" (5 refusals and 2 near-miss admits), counted by hand under the same rule.
+# 359 = 354 + the 5 lane rows of TOOL-aNimbleMend-15: the hook with no policy kit beside it (1), and
+# the key left unread with no red open (2) and for a writer the lane never admits (2), counted by
+# hand under the same rule.
+# 361 = 359 + the 2 blank-LEG_MANIFEST rows of TOOL-aNimbleMend-15 S7 (the kit's manifest present,
+# and none found), counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=328
+FLOOR_ASSERTIONS=361
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

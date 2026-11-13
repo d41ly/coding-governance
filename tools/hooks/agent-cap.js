@@ -93,7 +93,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.47' // gov:kit agent-cap@1.47 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.48' // gov:kit agent-cap@1.48 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 
 // The review harness a deny message points at, DERIVED (TOOL-aRepatriatedFork-2 S6): found by
 // `resolveKitDir` in the workflows kit (TOOL-dFairHearing-32 S25), and the bare name when it refuses,
@@ -1107,6 +1107,8 @@ module.exports = {
   resolveModelProfile, checkEffortLevel, // rule 8's, for the roles kit's parity arm and a probe of the rule alone
   // TOOL-dPavedRoad-2 S5: format-guard.js finds the roles kit and reads the handoff marker through these.
   resolveKitDir, extractHandoffMarker,
+  // TOOL-aNimbleMend-8 S4: scratch-guard.js finds the policy kit's mirror reader for the red-fix lane's key.
+  resolvePolicyHelper,
 }
 if (require.main === module) main()
 

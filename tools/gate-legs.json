@@ -1,6 +1,7 @@
 [
   {
     "name": "kickoff-manifest ratchet",
+    "pass_leg": true,
     "argv": [
       "bash",
       "skills/session-kickoff/manifest-check.sh"
@@ -81,6 +82,7 @@
   },
   {
     "name": "playbook parity",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/playbook/render_playbook.py",
@@ -131,6 +133,7 @@
   },
   {
     "name": "unattended protocol size",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/check-template-size.sh",
@@ -164,6 +167,7 @@
   },
   {
     "name": "shell hygiene (a loop fed by a command substitution)",
+    "pass_leg": true,
     "argv": [
       "python3",
       "{prefix}/gate-lint/sh_hygiene.py",
@@ -247,6 +251,7 @@
   },
   {
     "name": "encoding posture (text IO names its encoding)",
+    "pass_leg": true,
     "argv": [
       "python3",
       "{prefix}/gate-lint/encoding_posture.py",
@@ -273,6 +278,7 @@
   },
   {
     "name": "verdict epoch (kit version dates the engine)",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/memory-tree/check-verdict-epoch.sh"
@@ -366,7 +372,8 @@
       "{prefix}/hooks/",
       "{prefix}/lib/",
       "{prefix}/unattended/unattended.sh",
-      "skills/session-kickoff/"
+      "skills/session-kickoff/",
+      "{prefix}/policy/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -453,6 +460,7 @@
   },
   {
     "name": "method carriers (every pointer declared)",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/memory-tree/check-method-carriers.sh"
@@ -491,6 +499,7 @@
   },
   {
     "name": "build README slot contract",
+    "pass_leg": true,
     "argv": [
       "python3",
       "{prefix}/memory-tree/gen_build_index.py",
@@ -542,7 +551,8 @@
     "guard": [
       "{prefix}/lib/",
       "{prefix}/memory-tree/",
-      "{prefix}/unattended/lib-unattended.sh"
+      "{prefix}/unattended/lib-unattended.sh",
+      "{prefix}/policy/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -580,6 +590,7 @@
   },
   {
     "name": "harness arms (fail branches armed or pinned)",
+    "pass_leg": true,
     "argv": [
       "python3",
       "{prefix}/memory-tree/check-arms.py",
@@ -847,6 +858,7 @@
   },
   {
     "name": "codebase-map coverage + freshness",
+    "pass_leg": true,
     "argv": [
       "python3",
       "{prefix}/codebase-map/test_codebase_map.py"
@@ -1089,6 +1101,7 @@
   },
   {
     "name": "drift-audit records",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/drift-audit/drift_report.py",
@@ -1330,6 +1343,7 @@
   },
   {
     "name": "install-prefix (shipped surface)",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/check-install-prefix.sh"
@@ -1345,6 +1359,7 @@
   },
   {
     "name": "hook destinations (every declared hook path ships)",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/check-hook-destinations.sh"
@@ -1408,6 +1423,7 @@
   },
   {
     "name": "dead-path carriers (deleted files still named)",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/check-dead-paths.sh"
@@ -1456,6 +1472,7 @@
   },
   {
     "name": "govkit selfcheck",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/govkit/govkit.py",
@@ -1468,6 +1485,7 @@
   },
   {
     "name": "kit epoch (shipped bytes move, the version moves)",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/govkit/govkit.py",
@@ -1503,6 +1521,7 @@
   },
   {
     "name": "docs",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/govkit/docs_leg.py"
@@ -1570,6 +1589,7 @@
   },
   {
     "name": "lexicon naming predicates",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/lexicon/lexicon.py"
@@ -1607,6 +1627,7 @@
   },
   {
     "name": "lexicon wiring",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/lexicon/adopt-lexicon.sh",
@@ -1657,6 +1678,21 @@
     "chunk": "records",
     "subject": "repo",
     "ceiling": 12720
+  },
+  {
+    "name": "memory hygiene (the pass checks)",
+    "pass_leg": true,
+    "argv": [
+      "bash",
+      "{prefix}/memory-tree/check-memory-hygiene.sh",
+      "--only",
+      "9,21,23"
+    ],
+    "scope_of": "memory hygiene",
+    "reads": {"base": "its later checks diff what was added since the mainline merge-base (TOOL-aSparedSpawn-13 S3).", "clock": "it compares the date against RECORD_SERVES_CUTOFF (TOOL-aSparedSpawn-13 S3).", "history": "it reads commits since that merge-base (TOOL-aSparedSpawn-13 S3)."},
+    "chunk": "records",
+    "subject": "repo",
+    "ceiling": 300
   },
   {
     "name": "transition-audit arms",
@@ -1733,6 +1769,7 @@
   },
   {
     "name": "govkit runbook parity",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/govkit/check_runbook_parity.py"
@@ -1760,6 +1797,7 @@
   },
   {
     "name": "testsuite counts (every bar self-test prints one)",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/check-testsuite-counts.sh"
@@ -1780,6 +1818,7 @@
   },
   {
     "name": "playbook render wiring",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/playbook/adopt-playbook.sh",
@@ -1827,7 +1866,22 @@
     "ceiling": 940
   },
   {
+    "name": "spec tokens (the pass's own spec)",
+    "pass_leg": true,
+    "argv": [
+      "python",
+      "{prefix}/check-spec-tokens.py",
+      "--pass-spec"
+    ],
+    "scope_of": "spec tokens (a spec's own names resolve)",
+    "reads": {"history": "it names the pass's unit from the `git log` of `$GATE_BASE..HEAD`, else of the last commit (TOOL-aNimbleMend-4 S2)."},
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "kit placeholders (a declared token its adopter substitutes)",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/check-kit-placeholders.py"
@@ -2038,6 +2092,7 @@
   },
   {
     "name": "instruction edits (manifest checks)",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/playbook/instructions_edit.py",
@@ -2072,6 +2127,20 @@
     "ceiling": 420,
     "pack": "tags",
     "enforces": ["practice.writing.address", "practice.writing.retirement"]
+  },
+  {
+    "name": "positional (the citation check alone)",
+    "pass_leg": true,
+    "argv": [
+      "python",
+      "{prefix}/playbook/positional.py",
+      "check"
+    ],
+    "scope_of": "tags (the resolver's checks)",
+    "reads": {"history": "it reads when each line holding a citation was written, by `git blame -M` (TOOL-aNimbleMend-4 S1)."},
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300
   },
   {
     "name": "tags positional selftest",
@@ -2112,6 +2181,7 @@
   },
   {
     "name": "writing practice (records and units)",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/playbook/writing_practice.py",
@@ -2179,8 +2249,7 @@
       "{prefix}/govkit/entries/",
       "{prefix}/memory-tree/kit.toml",
       "{prefix}/memory-tree/adopt-memory-tree.sh",
-      "{prefix}/run-gates/kit.toml",
-      "{prefix}/run-gates/regen.py",
+      "{prefix}/run-gates/",
       "{prefix}/roles/kit.toml",
       "{prefix}/playbook/kit.toml",
       "{prefix}/memory-recall/kit.toml",
@@ -2216,7 +2285,8 @@
       "AGENTS.md",
       "memory/builds/dClosedLoop/build/",
       "help/policy.md",
-      ".governance/install.json"
+      ".governance/install.json",
+      "{prefix}/memory-tree/build_records.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -2224,6 +2294,7 @@
   },
   {
     "name": "leg ceilings clear their evidenced maximum",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/run-gates/derive-ceilings.py",
@@ -2236,6 +2307,7 @@
   },
   {
     "name": "every held leg is budgeted, every budget row resolves",
+    "pass_leg": true,
     "argv": [
       "bash",
       "{prefix}/run-gates/run-selftests.sh",

@@ -185,6 +185,6 @@ function main(argv) {
   return 0;
 }
 
-module.exports = { readPolicy, PolicyRefusal };
+module.exports = { readPolicy, PolicyRefusal, readLandedRevision };
 
 if (require.main === module) process.exitCode = main(process.argv.slice(2));

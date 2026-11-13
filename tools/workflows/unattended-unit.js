@@ -62,6 +62,11 @@
 //
 // `efforts` IS OPTIONAL (TOOL-aOrientedCast-10), with the same one key: `builder`, the reasoning
 // effort the builder spawns at, which the parent forwards in `dispatch.args` beside `roles`.
+//
+// `passLegs` IS OPTIONAL (TOOL-aNimbleMend-7): a one-line command the parent hands out in
+// `dispatch.args`. Given, and the builder committed, the return carries a `nextAction` ordering the
+// main loop to run it over the pass's commits, from the `base` the builder returns
+// (TOOL-aNimbleMend-15). Absent, the return, log, prompt and options are unchanged.
 export const meta = {
   name: 'unattended-unit',
   version: '1.1', // gov:kit unattended-unit@1.1 — engine identity (deployed verbatim)
@@ -144,6 +149,19 @@ if (
   )
 }
 
+// `passLegs` IS OPTIONAL TOO (TOOL-aNimbleMend-7), graded by the same three-part test because it is
+// spelled inside backticks as well: in the RETURN's `nextAction`, never in the prompt. The builder is
+// not told the command, since a role agent's pass runs no gate; the main loop runs it after the commit.
+if (
+  cfg.passLegs !== undefined &&
+  (typeof cfg.passLegs !== 'string' || cfg.passLegs === '' || /[\r\n`]/.test(cfg.passLegs))
+) {
+  throw new Error(
+    'unattended-unit: args `passLegs` must be a non-empty single-line string with no backtick, got ' +
+      JSON.stringify(cfg.passLegs) + '. Omit the key and the return names no pass-leg run.',
+  )
+}
+
 // `roles` IS NOT A `check()` CALL: it is optional, and its key set is closed. The joined key list is
 // compared with the two legal spellings, so the test needs no loop and no arrow.
 const AGENT_TYPE_SHAPE = /^[A-Za-z][A-Za-z0-9_-]{0,63}$/ // owner: tier2-review.template.js `workerType`
@@ -210,6 +228,7 @@ const UNIT_SCHEMA = {
   properties: {
     committed: { type: 'boolean' },
     sha: { type: 'string' },
+    base: { type: 'string' },
     why: { type: 'string' },
     summary: { type: 'string' },
   },
@@ -269,6 +288,12 @@ const PROMPT =
       'to say. The caller has the spec revised by the spec-writer role and dispatches this unit again.\n'
     : 'The spec is the design; where you must diverge, CHANGE THE SPEC FIRST as a rev-N bump with its ' +
       'section 9 line, then write the code.\n') +
+  // TOOL-aNimbleMend-15 - asked in BOTH modes and with or without `passLegs`, so the prompt stays the
+  // same either way: a pass can make more than one commit, and only the builder saw where it started.
+  // AHEAD of the driver steps, never after them: the pre-build paragraph follows the `--brief` order
+  // and precedes the no-gate paragraph, and the suite pins both joins.
+  'Before your first write, read `git rev-parse HEAD` and return what it prints as `base`: the commit ' +
+  'this pass started from.\n' +
   DRIVER_STEPS +
   // TOOL-aMendedFleet-74 — empty unless the caller passed `prebuild`, so a default prompt is unchanged.
   // FILE paths, never a directory: a directory selects the whole catalogue, not a checklist.
@@ -323,12 +348,18 @@ const PROMPT =
   'before you return. Return committed:false with a `why` rather than a commit you cannot stand behind.'
 
 if (cfg.prebuild !== undefined) log('unit ' + cfg.unitId + ': prebuild checklist `' + cfg.prebuild + '`')
+if (cfg.passLegs !== undefined) log('unit ' + cfg.unitId + ': pass legs `' + cfg.passLegs + '`')
 
 log('unit ' + cfg.unitId + ': builder ' + (builder
   ? 'spawns as the ' + builder + ' agent type'
   : 'is untyped: no roles.builder was passed, so it spawns untyped with its role prose inline'))
 log(effort ? 'effort builder: ' + effort + ' — efforts.builder'
   : 'effort builder: the agent type\'s own, else the session\'s — no efforts.builder')
+
+// TOOL-aNimbleMend-15 - A COMMIT NAME AN AGENT RETURNED reaches `nextAction` only through this shape.
+// `nextAction` is an instruction to the main loop, which holds grants the builder lacks, and `sha` and
+// `base` are a role agent's free text. The return's own `sha` field and the log line keep the raw value.
+const COMMIT_SHAPE = /^[0-9a-f]{7,64}$/
 
 const r = await agent(
   PROMPT,
@@ -346,4 +377,26 @@ return {
   why: (r && r.why) || '',
   summary: (r && r.summary) || '',
   diverged: !!(r && r.committed === false && typeof r.why === 'string' && r.why.indexOf('DIVERGENCE:') === 0),
+  // TOOL-aNimbleMend-7 - THE RUN POINT. Present only when the caller handed `passLegs` AND a commit
+  // exists to run it over; it orders the main loop, and says nothing about how a red is fixed.
+  // TOOL-aNimbleMend-15 - the command's base is the commit the builder STARTED from, never a relative
+  // rev: a pass can make two commits. A `base` that fails the shape, or that names the pass commit
+  // itself (one a prefix of the other), is not used, and the sentence hands the main loop the rev it
+  // read before the dispatch. A `sha` that fails the shape names no commit here.
+  ...(cfg.passLegs !== undefined && r && r.committed
+    ? {
+        nextAction:
+          'Run `' + cfg.passLegs + ' --base ' +
+          (typeof r.base === 'string' && COMMIT_SHAPE.test(r.base) &&
+          String(r.sha || '').indexOf(r.base) !== 0 && r.base.indexOf(String(r.sha || '')) !== 0
+            ? r.base + '`'
+            : '<rev>`, where the builder returned no usable base, so `<rev>` is the commit HEAD named ' +
+              'before the dispatch,') +
+          ' at the main loop before the next dispatch and before any later ' +
+          'commit, where that file exists. The pass commit is ' +
+          (typeof r.sha === 'string' && COMMIT_SHAPE.test(r.sha) ? r.sha + ', which is HEAD ' : 'HEAD ') +
+          'when the command runs. Act on its exit status and on every finding line it prints. The ' +
+          'command runs nothing where `pass.fast-legs` is `off`.',
+      }
+    : {}),
 }

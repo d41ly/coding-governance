@@ -2,7 +2,7 @@
 name: build
 description: Drive an ATTENDED code build through the harness pipeline an unattended run uses - spec writers, the spec audit where the owner declared one, one builder per unit, the closing review and one bar - with every agent spawned as its rendered role. Use after /session-kickoff's READY card and the owner's go, for a build that writes product code. Do NOT use for a run that merges and pushes with no owner turn, which is /unattended, or for a change that writes no product code.
 ---
-<!-- gov:kit roles@1.18 -->
+<!-- gov:kit roles@1.19 -->
 [.claude/skills/build/SKILL.md · Level 4 · A Skill, followed when its trigger holds; yields to levels 0 to 3]
 
 # Attended builds
@@ -72,7 +72,8 @@ Until `--plan --paths` prints `next: none - every tracked spec is terminal`, for
 3. call the hand-out's `dispatch.scriptPath` with `dispatch.args` plus `unitId`, `specPath`,
    `briefPath`, `roles` from `handoff.py harness-args unattended-unit` and `efforts` from
    `handoff.py stage-efforts build --model <id>`, on every dispatch;
-4. on `diverged: true`, write a revision record under the build's `prompts/` holding `## The brief`
+4. act on the return's `nextAction`, where it carries one, before the next dispatch;
+5. on `diverged: true`, write a revision record under the build's `prompts/` holding `## The brief`
    and no `## The prompt`, its Goal the builder's `why` verbatim and its other four sub-heads copied
    from the build's brief; spawn `gov-spec-writer` on it with `--input spec=<path> --input
    prompt=<that record>`; then dispatch the unit again. On any other `committed: false`, stop and bring

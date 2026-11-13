@@ -602,6 +602,10 @@ const DRIVER = 'bash tools/unattended/unattended.sh'
 // this unit deletes, and the child cannot carry it: a shipped kit file names nothing outside itself
 // by literal, so it lives in the parent, whose install paths are filled in when it is rendered.
 const CHECKLIST = 'python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD'
+// TOOL-aNimbleMend-7 - THE PASS LEGS TRAVEL THE SAME WAY, always: the runner asks `pass.fast-legs`
+// itself, so no caller can switch it off by forgetting an arg. It carries NO base (TOOL-aNimbleMend-15):
+// a pass can make more than one commit, so the child appends the commit its builder started from.
+const PASS_LEGS = 'bash tools/run-gates/pass-legs.sh'
 // TOOL-aGraftedHelix-15 S5 - ONE REMEDY CLOSES EVERY REFUSAL THAT ASKS FOR A COMMIT, computed once so
 // the sites cannot drift into two answers. The remedy used to name the same arguments again, and
 // under `resumeFromRunId` that is the replay: the Workflow runtime returns cached results for the
@@ -3026,6 +3030,7 @@ const handOut = {
     // with no builder role the object carries no `roles` key, as before.
     args: {
       repo: repo, slug: slug, scratch: scratch, mode: mode, driver: DRIVER, ground: GROUND, checklist: CHECKLIST,
+      passLegs: PASS_LEGS,
       ...(roles.builder ? { roles: { builder: roles.builder } } : {}),
       // TOOL-aOrientedCast-10 S7 - `efforts.builder` travels the same way, and alone.
       ...(efforts.builder ? { efforts: { builder: efforts.builder } } : {}),

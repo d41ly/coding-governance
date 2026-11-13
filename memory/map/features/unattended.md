@@ -26,7 +26,8 @@ gotcha-classes = ["reflowed-prompt-string-reads-as-a-deleted-stop.md", "text-mod
   "fallback-fabricates-the-passing-value.md", "two-readers-of-one-config-one-re-derived.md",
   "destructive-step-before-its-precondition.md", "line-count-reads-empty-capture-as-one.md",
   "guard-fed-the-value-it-supersedes.md", "witness-graded-against-a-fact-written-after-it.md",
-  "porcelain-diff-names-a-rename-by-its-destination.md", "a-helper-extraction-blinds-a-per-function-rule.md"]
+  "porcelain-diff-names-a-rename-by-its-destination.md", "a-helper-extraction-blinds-a-per-function-rule.md",
+  "agent-output-interpolated-into-an-instruction.md", "fixed-base-assumes-one-commit-per-pass.md"]
 guides = ["UNATTENDED-PROTOCOL.md", "UNATTENDED-VERBS.md", "UNATTENDED-STOPS.md", "UNATTENDED-ASKS.md"]
 backlog-shards = []
 lexicon-verbs = []

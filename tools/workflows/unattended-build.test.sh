@@ -248,6 +248,10 @@ POLICY_KIT_DIR=$(resolve_kit_dir "$_rkd_py" policy policy.py "$HERE") || exit 2
 POLICY_KIT="${POLICY_KIT_DIR##*/}"
 MT_KIT_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree gotchas.py "$HERE") || exit 2
 MT_KIT="${MT_KIT_DIR##*/}"
+# The run-gates kit, by the pass-leg runner the harness names in `dispatch.args.passLegs`
+# (TOOL-aNimbleMend-7): a layout below holds that file under this directory's resolved name.
+RUN_GATES_DIR=$(resolve_kit_dir "$_rkd_py" run-gates pass-legs.sh "$HERE") || exit 2
+RUN_GATES="${RUN_GATES_DIR##*/}"
 # In this suite KIT_REL names the TOOL ROOT, not the kit dir: the prefix without its slash.
 KIT_REL="${PFX%/}"; KIT_REL="${KIT_REL:-.}"
 # ROOTPFX is a ROOT install's prefix, empty by definition: a fixture that models a root install,
@@ -1215,9 +1219,16 @@ has "S4 skippedTerminal still travels on the hand-out" "$o" '"skippedTerminal":'
 o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2)")
 d=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"dispatch"://')
 has "F2 dispatch.args carries the mode — unattended" "$d" '"mode":"unattended"'
+# TOOL-aNimbleMend-7 — the pass-leg runner's invocation travels in BOTH modes, unconditionally.
+# TOOL-aNimbleMend-15 — with NO base: the closing quote sits right after the script, so a relative rev
+# restored in the template reds both rows. The child appends the commit its builder started from.
+has "passLegs: dispatch.args carries the runner's invocation — unattended" "$d" '/pass-legs.sh"'
+has "passLegs: ...under the key the child reads — unattended" "$d" '"passLegs":"bash '
 o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"dispose":{"disposed":true,"standing":[],"summary":"d"}}')
 d=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"dispatch"://')
 has "F2 dispatch.args carries the mode — attended" "$d" '"mode":"attended"'
+has "passLegs: dispatch.args carries the runner's invocation — attended" "$d" '/pass-legs.sh"'
+has "passLegs: ...under the key the child reads — attended" "$d" '"passLegs":"bash '
 
 # THE GENERAL FORM, not a substring arm. The refusal set is DERIVED from the driver itself, by two
 # readings of it joined: pass one records every top-level function whose body, up to the next
@@ -1313,6 +1324,54 @@ for v in 7 '""' '"a\nb"' '"a`b"'; do
   o=$(run_wf "$(printf "$CHILD_PB" "$v" unattended)" '{}' "$C")
   has "prebuild: the child REFUSES $v" "$o" "THROW unattended-unit: args \`prebuild\`"
   hasnt_ "prebuild: ...before any spawn for $v" "$o" "agent:build"
+done
+
+# TOOL-aNimbleMend-7 — `passLegs` is OPTIONAL and reaches the RETURN, never the prompt. With it and a
+# commit, the return's `nextAction` names the command and the sha and a log line names the command;
+# with no commit, a divergence included, there is no `nextAction`; absent, nothing appears. The
+# builder's prompt and spawn options are the same with and without it, so the pass stays gate-free.
+CHILD_PL='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","unitId":"A-tB-1","specPath":"s1","briefPath":"b1","driver":"bash drv.sh","ground":"G. goes under /tmp/s. ","checklist":"CK","passLegs":%s,"mode":"unattended"}'
+# TOOL-aNimbleMend-15 — the command arrives with NO base and the child appends the commit the builder
+# says it started from, as a THIRD sha here so neither the pass commit nor a relative rev can pass for it.
+PL_OK='{"build":{"committed":true,"sha":"abc1234","base":"def5678","why":"","summary":"s"}}'
+read_next_action() { printf '%s\n' "$1" | sed -n 's/^RESULT .*"nextAction":"\([^"]*\)".*/\1/p'; }
+o=$(run_wf "$(printf "$CHILD_PL" '"PL"')" "$PL_OK" "$C")
+has "passLegs: the return's nextAction names the command in backticks, with the builder's base" "$o" '"nextAction":"Run `PL --base def5678` at the main loop before the next dispatch'
+hasnt_ "passLegs: ...and no relative rev" "$(read_next_action "$o")" 'HEAD~'
+has "passLegs: ...and the pass commit's sha" "$o" 'The pass commit is abc1234, which is HEAD'
+has "passLegs: the log names the unit and the command" "$o" 'log:unit A-tB-1: pass legs `PL`'
+has "passLegs: the builder is asked for the commit it started from — unattended" "$o" 'return what it prints as `base`'
+printf -v _wfj "$CHILD_ARGS" unattended; pl_none=$(run_wf "$_wfj" "$PL_OK" "$C")
+hasnt_ "passLegs absent: a committed pass returns no nextAction" "$pl_none" '"nextAction"'
+hasnt_ "passLegs absent: no log line" "$pl_none" "pass legs"
+same "passLegs: the builder's prompt and options are the same with and without it" \
+  "$(printf '%s\n' "$o" | grep -E '^(prompt|promptjson|type|effort):')" "$(printf '%s\n' "$pl_none" | grep -E '^(prompt|promptjson|type|effort):')"
+printf -v _wfj "$CHILD_ARGS" attended
+has "passLegs: the builder is asked for the commit it started from — attended" "$(run_wf "$_wfj" "$PL_OK" "$C")" 'return what it prints as `base`'
+# No base, a base that IS the pass commit (one a prefix of the other) and an ill-shaped base all fall
+# back to one sentence, which hands the main loop the rev it read before the dispatch.
+PL_FALLBACK='Run `PL --base <rev>`, where the builder returned no usable base, so `<rev>` is the commit HEAD named before the dispatch, at the main loop'
+o=$(run_wf "$(printf "$CHILD_PL" '"PL"')" '{"build":{"committed":true,"sha":"abc1234","why":"","summary":"s"}}' "$C")
+has "passLegs: a return with no base spells the fallback sentence" "$o" "$PL_FALLBACK"
+o=$(run_wf "$(printf "$CHILD_PL" '"PL"')" '{"build":{"committed":true,"sha":"abc1234ff","base":"abc1234","why":"","summary":"s"}}' "$C")
+has "passLegs: a base that is the pass commit itself is not used" "$o" "$PL_FALLBACK"
+o=$(run_wf "$(printf "$CHILD_PL" '"PL"')" '{"build":{"committed":true,"sha":"abc1234","base":"HEAD~1 x","why":"","summary":"s"}}' "$C")
+has "passLegs: an ill-shaped base is not used" "$o" "$PL_FALLBACK"
+hasnt_ "passLegs: ...and never reaches nextAction" "$(read_next_action "$o")" 'HEAD~1 x'
+# AC1 — a sha holding a space and a backtick names no commit in nextAction; the return's own field keeps it.
+o=$(run_wf "$(printf "$CHILD_PL" '"PL"')" '{"build":{"committed":true,"sha":"a b`c","base":"def5678","why":"","summary":"s"}}' "$C")
+hasnt_ "passLegs: an ill-shaped sha is absent from nextAction" "$(read_next_action "$o")" 'a b`c'
+has "passLegs: ...which says the pass commit is HEAD" "$(read_next_action "$o")" 'commit, where that file exists. The pass commit is HEAD when the command runs.'
+has "passLegs: ...and the return's own sha field keeps the raw value" "$o" '"sha":"a b`c"'
+o=$(run_wf "$(printf "$CHILD_PL" '"PL"')" '{"build":{"committed":false,"sha":"","why":"w","summary":"s"}}' "$C")
+hasnt_ "passLegs: a pass that committed nothing returns no nextAction" "$o" '"nextAction"'
+o=$(run_wf "$(printf "$CHILD_PL" '"PL"')" '{"build":{"committed":false,"sha":"","why":"DIVERGENCE: x","summary":"s"}}' "$C")
+has "passLegs: a divergence is still a divergence" "$o" '"diverged":true'
+hasnt_ "passLegs: ...and returns no nextAction" "$o" '"nextAction"'
+for v in 7 '""' '"a\nb"' '"a`b"'; do
+  o=$(run_wf "$(printf "$CHILD_PL" "$v")" "$PL_OK" "$C")
+  has "passLegs: the child REFUSES $v" "$o" "THROW unattended-unit: args \`passLegs\`"
+  hasnt_ "passLegs: ...before any spawn for $v" "$o" "agent:build"
 done
 
 # ========================= F4 (closing review, HIGH) — DISPOSED-BUT-STANDING IS NOT DISPOSED
@@ -2195,6 +2254,11 @@ build_layout() { # dir · kit dir · unattended dir, or '-' for none · checklis
   # `-` IS A REVIEW-HARNESS-ONLY INSTALL, which `requires` permits: this kit requires agent-cap and
   # policy and nothing else, so neither the unattended kit nor the memory-tree kit has to be there.
   if [ "$ud" != - ]; then mkdir -p "$d/$ud"; printf '#!/usr/bin/env bash\n' > "$d/$ud/unattended.sh"; fi
+  # THE PASS-LEG RUNNER, a stub as the driver is (TOOL-aNimbleMend-15): the harness names it in
+  # `dispatch.args.passLegs` since TOOL-aNimbleMend-7, so arm (v) asks the layout for it. It sits a
+  # directory up from this kit, where the render's probe for the citation looks, under the name the
+  # resolver printed for the run-gates kit. No layout types that name.
+  if [ "$ud" != - ]; then mkdir -p "$d/$kd/../${RUN_GATES}"; printf '#!/usr/bin/env bash\n' > "$d/$kd/../${RUN_GATES}/pass-legs.sh"; fi
   if [ -n "$gp" ]; then mkdir -p "$(dirname "$d/$gp")"; printf '# a stub checklist\n' > "$d/$gp"; fi
   ( cd "$d" && git add -A && git commit -q --no-verify -m layout )
 }
@@ -3815,7 +3879,13 @@ has    "FA15 AC25 the undeclared throw" "$o" "a disposal passes the hand-out's \
 # Not measured by a run: the pass that wrote it runs no suite.
 # RAISED 920 -> 925 by TOOL-dFairHearing-48: the five `FH48 AC4` sites, the result, its exit and gaps, and the
 # two absences. Counted by reading, not measured by a run: the pass that wrote it runs no suite.
-FLOOR_ASSERTIONS=925
+# RAISED 925 -> 940 by TOOL-aNimbleMend-7: the `passLegs` sites, nine on the child's return, log and prompt,
+# the refusal loop's two counted once, and four on `dispatch.args` across the two modes. Counted by
+# reading, not measured by a run: the pass that wrote it runs no suite.
+# RAISED 940 -> 950 by TOOL-aNimbleMend-15: ten `passLegs` sites on the child, the absent relative rev,
+# the prompt's request for a base in two modes, the fallback sentence three times with one absence, and the
+# ill-shaped sha's three. Counted by reading, not measured by a run: the pass that wrote it runs no suite.
+FLOOR_ASSERTIONS=950
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

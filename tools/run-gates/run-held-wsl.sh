@@ -8,7 +8,8 @@
 #
 # Two internal modes, each reached only through the modes above:
 #   --half <S> <tree> <out>   the WSL half, run INSIDE WSL from the worktree at S
-#   --leg <argv…>             every partition row's leg: GATE_LEGS unset, then exec
+#   --leg <argv…>             every partition row's leg: GATE_LEGS unset, then exec. Its second
+#                             caller is the pass-leg adapter, pass-legs.sh, for each declared row
 #
 # Exit: the combiner's. 0 GREEN, 1 RED, 2 REFUSED, 3 TREE MOVED, 4 HOST.
 #

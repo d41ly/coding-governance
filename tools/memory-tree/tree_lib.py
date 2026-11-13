@@ -44,6 +44,41 @@ CENSUS_TERMINAL = ("CLOSED", "WONTDO", "DEFERRED")
 # record's front matter ends.
 FM_RE = re.compile(r"\A---\n(.*?)\n---\n", re.S)
 
+# The red-fix lane's commit trailer, its one spelling (TOOL-aNimbleMend-8 S5): a fix commit carries
+# `Red-fix: <leg name>`, one leg per trailer line, and `routed_commits.py` reads it through this name.
+RED_FIX_TRAILER = "Red-fix"
+
+
+def parse_leg_names(text: str) -> set:
+    """The leg names a leg manifest's text declares: the `name` of each `{name: ...}` row of its
+    top-level list. ValueError when the text is not JSON or its top level is not a list. The kit's
+    one manifest parser (TOOL-aNimbleMend-8): `gotchas.py#load_leg_names` reads a working-tree
+    manifest through it and the commit grader a blob at a commit."""
+    import json
+
+    rows = json.loads(text)
+    if not isinstance(rows, list):
+        raise ValueError("the top level is not a list of leg rows")
+    return {r["name"] for r in rows if isinstance(r, dict) and isinstance(r.get("name"), str)}
+
+
+def read_policy_value(key, root):
+    """`key` at `root`'s landed revision, through the policy kit's `policy.py get`, found beside this
+    kit since a kit imports no sibling. LookupError where no policy kit resolves; ValueError, the
+    reader's last line in it, where the reader refuses. The kit's one policy read
+    (TOOL-aNimbleMend-8 S7): each caller passes the key as a literal first argument."""
+    import sys
+    from backlog import resolve_kit_dir   # noqa: E402  the kit's inline copy of the sibling resolver
+    kit = resolve_kit_dir("policy", "policy.py", pathlib.Path(__file__).resolve().parent)
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    p = subprocess.run([sys.executable, str(kit / "policy.py"), "get", key], cwd=str(root), env=env,
+                       capture_output=True, text=True, encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL)
+    said = p.stdout.split()
+    if p.returncode != 0 or len(said) != 1:
+        why = (p.stderr or p.stdout).strip().splitlines()
+        raise ValueError(f"{key} did not read: {why[-1] if why else f'exit {p.returncode}'}")
+    return said[0]
+
 
 def kit_rel() -> str:
     """This kit's directory relative to the enclosing checkout, DERIVED and never spelled.
@@ -408,7 +443,7 @@ BIND_HEAD_LINES = 12
 # way. The factory's kind table is refused at import when its keys differ from this tuple: the
 # reader owns the one list, and the factory reads it, because the reader importing the factory
 # would cycle through `deviation_join.py`.
-TYPED_RECORD_KINDS = ("deviation", "exception", "override", "change")
+TYPED_RECORD_KINDS = ("deviation", "exception", "override", "change", "red-fix")
 RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "journal", "research") + TYPED_RECORD_KINDS
 # Optional leading whitespace and an optional comment marker: the corpus holds a non-markdown record
 # (a shell script), where the line can only be a comment. An extension-scoped rule would structurally

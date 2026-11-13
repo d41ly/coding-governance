@@ -365,6 +365,11 @@
     {
       "id": "Refusal",
       "kind": "class",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
+      "id": "Refusal",
+      "kind": "class",
       "file": "tools/run-gates/regen.py"
     },
     {
@@ -3328,6 +3333,11 @@
       "file": "tools/run-gates/held_halves.py"
     },
     {
+      "id": "build_pass_lane_target",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "build_path_probe",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -4468,6 +4478,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "checkLane",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkLiteralOpen",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -4514,6 +4529,11 @@
     },
     {
       "id": "checkPosixRootLitter",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkRedLane",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
@@ -6623,6 +6643,16 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "check_pass_budget",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
+      "id": "check_pass_eligible",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
       "id": "check_pass_open",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -6696,6 +6726,11 @@
       "id": "check_pins",
       "kind": "function",
       "file": "tools/playbook/positional.py"
+    },
+    {
+      "id": "check_pl_value",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
     },
     {
       "id": "check_placeholder",
@@ -6951,6 +6986,16 @@
       "id": "check_red_at",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "check_red_fix_join",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
+      "id": "check_red_fix_limits",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
     },
     {
       "id": "check_reds",
@@ -8173,9 +8218,19 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "cmd_apply",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
       "id": "cmd_asks",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "cmd_budget",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "cmd_bump",
@@ -8226,6 +8281,11 @@
       "id": "cmd_check",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
+      "id": "cmd_check",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "cmd_check_asbuilt",
@@ -8311,6 +8371,11 @@
       "id": "cmd_extract",
       "kind": "function",
       "file": "tools/runlog/runlog.py"
+    },
+    {
+      "id": "cmd_figures",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "cmd_for_diff",
@@ -8483,6 +8548,11 @@
       "file": "tools/run-gates/derive-ceilings.py"
     },
     {
+      "id": "cmd_report",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
       "id": "cmd_selftest",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -8606,6 +8676,11 @@
       "id": "cmd_write",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
+      "id": "cmd_write",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "cnot",
@@ -10578,6 +10653,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_pass_legs",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
       "id": "derive_past_pin_ids",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -11371,6 +11451,11 @@
       "id": "derive_stall_window",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "derive_state",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "derive_status",
@@ -14335,6 +14420,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
     },
     {
@@ -15738,6 +15828,11 @@
       "file": "tools/workflows/replay_scorer.py"
     },
     {
+      "id": "parse_leg_names",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
       "id": "parse_legacy_rows",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -16308,6 +16403,11 @@
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
     },
     {
+      "id": "print_pb_out",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "print_pin_rows",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -16346,6 +16446,11 @@
       "id": "print_probe_populations",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "print_pw_out",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "print_ready",
@@ -16779,6 +16884,11 @@
     },
     {
       "id": "readMode",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "readOpenReds",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
@@ -17381,6 +17491,11 @@
       "id": "read_catalogue_row",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "read_ceilings",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "read_cell",
@@ -18340,6 +18455,11 @@
     {
       "id": "read_guarded_paths",
       "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
+      "id": "read_guarded_paths",
+      "kind": "function",
       "file": "tools/policy/guard.py"
     },
     {
@@ -18738,9 +18858,19 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "read_lane_state",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
       "id": "read_lang_modes",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "read_last_seconds",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "read_last_valid",
@@ -18973,6 +19103,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "read_manifest",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
       "id": "read_manifest_tags",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -19158,6 +19293,11 @@
       "file": "tools/memory-tree/routed_commits.py"
     },
     {
+      "id": "read_next_action",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
       "id": "read_next_line",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
@@ -19313,6 +19453,16 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "read_pass_evidence",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
+      "id": "read_pass_spec",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "read_patch_lines",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -19393,9 +19543,24 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_pl_key",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
       "id": "read_pl_kids",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_pl_leg",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "read_pl_marks",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
     },
     {
       "id": "read_pl_sum",
@@ -19506,6 +19671,11 @@
       "id": "read_policy_value",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "read_policy_value",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "read_policy_value",
@@ -19731,6 +19901,16 @@
       "id": "read_records",
       "kind": "function",
       "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "read_red_counts",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
+      "id": "read_red_fix",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "read_refs",
@@ -20081,6 +20261,11 @@
       "id": "read_scan_overlaps",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "read_scope_reds",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "read_scouted_population",
@@ -22613,6 +22798,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "render_pass_field",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
       "id": "render_patch",
       "kind": "function",
       "file": "tools/playbook/fixtures/row_kind.py"
@@ -22996,6 +23186,11 @@
       "id": "render_status_row",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "render_summary",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "render_summary_cell",
@@ -23743,6 +23938,11 @@
       "file": "tools/run-gates/derive-ceilings.py"
     },
     {
+      "id": "resolve_git_dirs",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
       "id": "resolve_gov_pin",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -24333,6 +24533,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "resolve_leg_manifest",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
       "id": "resolve_leg_python",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -24351,6 +24556,11 @@
       "id": "resolve_ln_staged",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "resolve_manifest_path",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
     },
     {
       "id": "resolve_measurer_currency",
@@ -24771,6 +24981,11 @@
       "id": "resolve_python",
       "kind": "function",
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
+      "file": "tools/run-gates/pass-legs.sh"
     },
     {
       "id": "resolve_python",
@@ -27093,6 +27308,11 @@
       "file": "tools/playbook/edge_grammar.py"
     },
     {
+      "id": "run_pass_lane_case",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "run_pathless",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
@@ -27101,6 +27321,11 @@
       "id": "run_pattern",
       "kind": "function",
       "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
+      "id": "run_pb",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "run_pfx_push",
@@ -27131,6 +27356,11 @@
       "id": "run_pl_kill",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_pl_legs",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
     },
     {
       "id": "run_plan",
@@ -27318,6 +27548,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "run_pw",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "run_raw",
       "kind": "function",
       "file": "tools/unattended/gate-guard.test.sh"
@@ -27411,6 +27646,11 @@
       "id": "run_reverse_walk",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "run_rf31_gate",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
       "id": "run_rm",
@@ -32958,6 +33198,11 @@
       "file": "tools/push-main.sh"
     },
     {
+      "id": "write_lane_key",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "write_layer_row",
       "kind": "function",
       "file": "tools/playbook/check_layers.py"
@@ -32966,6 +33211,11 @@
       "id": "write_lease",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_ledger",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "write_leg_capture",
@@ -33163,6 +33413,16 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "write_pb_cost",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "write_pb_legs",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "write_pfx_stamp",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -33171,6 +33431,21 @@
       "id": "write_pk_conf",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "write_pl_commit",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "write_pl_figures",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "write_pl_legs",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
     },
     {
       "id": "write_pl_orphan",
@@ -33196,6 +33471,11 @@
       "id": "write_planted",
       "kind": "function",
       "file": "tools/unattended/check-arms-groups.test.sh"
+    },
+    {
+      "id": "write_planted_leg",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "write_pm_red",
@@ -33293,6 +33573,26 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "write_pw_cost",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "write_pw_last",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "write_pw_log",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "write_pw_row",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "write_python_stubs",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
@@ -33351,6 +33651,11 @@
       "id": "write_recovered_logs",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "write_red_fix",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "write_red_ref",
@@ -33414,6 +33719,11 @@
     },
     {
       "id": "write_rev_spec",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "write_rf31_commit",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },

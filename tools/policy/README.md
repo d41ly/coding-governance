@@ -1,4 +1,4 @@
-<!-- gov:kit policy@1.5 -->
+<!-- gov:kit policy@1.6 -->
 # policy — one file for a repository's policy, and the catalogue that is its schema
 
 A repository's policy lives in ONE file, `.governance/policy.toml`, TOML 1.0, read through `tomllib`
@@ -23,7 +23,7 @@ its three neighbours but one shape (TOOL-dGroundRules-6), and later units re-poi
 | `unsummarised-keys.txt` | GENERATED, shrink-only: the rows with no `summary` or no `usage` |
 | `legacy-homes.txt` | GENERATED, shrink-only: one row per key a legacy policy home holds, with its mark (TOOL-dGroundRules-7); gov's own, withheld from installs by a `project-owned` rule in `kit.toml` (TOOL-dGroundRules-17) |
 | `policy.py` | the module: `load_catalogue`, `read_catalogue_row`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, the inlined `resolve_compare_base`, `resolve_kit_dir` and `GIT_ENV_LEAKS`, the one blob reader `read_blob_at`, the reader `resolve` over `read_revision` and `resolve_read`, the file's one judge `validate`, the mirror's `render_mirror`, the legacy homes' `derive_legacy_homes` and `check_legacy_homes`, the census tree's `derive_census_tree` over the registry search `derive_registry_tree`, and the legacy list's one grading rule `check_legacy_graded`, and the `lists` (`cmd_lists`), `scaffold`, `get`, `check`, `mirror` and `settings` verbs |
-| `policy-mirror.js` | the mirror's one reader, for hooks: `readPolicy` and its `get` CLI |
+| `policy-mirror.js` | the mirror's one reader, for hooks: `readPolicy` and its `get` CLI, and `readLandedRevision(top)`, the landed revision's full sha as the shim's `landed` prints it |
 | `policy-shim.sh` | the helper's shell half: the landed revision, and the reader under a resolved launcher |
 | `guard.py` | the minimal guard: `guard.py --staged`, the verdict over an agent's staged change to a guarded path |
 | `guarded-paths.txt` | the one spelling of the guarded set, read at HEAD by `guard.py` and the pre-commit hook |
@@ -331,6 +331,39 @@ but exit 0 and its own exit-2 refusal, exit 1 or 127, a null status, a signal or
 `PolicyRefusal` naming the status, the signal and the shim's stderr (TOOL-dGroundRules-21 S16).
 Python and shell consumers call the reader, never the mirror.
 
+## A default-on switch
+
+The contract for a mechanism an adopter turns off with one line of the policy file
+(TOOL-aNimbleMend-1). Two rows carry it today, each `allowed = ["on", "off"]` and `default = "on"`:
+`bar.inline-red-fixes`, whose `off` means no inline red-fix lane, every product write then needing
+its specced unit, and `pass.fast-legs`, whose `off` means a unit pass runs no gate leg. A mechanism
+asks its key once, immediately before the act the key switches, and never at load.
+
+| The reader's answer | What the mechanism does |
+|---|---|
+| `on` | acts |
+| `off` | is absent: it does what the tree did before the mechanism, and prints nothing new |
+| no policy kit resolves beside the asker | acts, and prints one NOTE line on stderr naming the key and `on` |
+| the reader refuses, exit 2 or a `PolicyRefusal` | is absent, and prints the reader's own refusal line |
+| any other value | is absent, and prints one line naming the key and the value |
+
+The third row holds because the catalogue is this kit's: a repository without the kit has no switch
+and keeps the mechanism. The fourth and fifth fail to the earlier behaviour, because a switch that
+cannot be read must not loosen anything. `read_spec_audit_switch` in the unattended kit's driver is
+the precedent for all three.
+
+The call shapes, one per language, each passing the key as a literal so reader coverage,
+`scan_reader_keys` in `check_policy.py`, counts it; a key passed through a variable reads as unread:
+
+| Asker | Call | Policy kit found by |
+|---|---|---|
+| shell | `"$py" "$d/policy.py" get pass.fast-legs` | the asker kit's inline `resolve_kit_dir` |
+| Python | a call whose first argument is the key literal, running `policy.py get` as a subprocess | the asker kit's inline `resolve_kit_dir` |
+| JavaScript hook | `readPolicy('pass.fast-legs', { repo })` from `policy-mirror.js` | `resolveKitDir`, as the agent-cap hook's `resolvePolicyHelper` does |
+
+With no `--rev` both readers take the landed revision, so a run cannot flip its own switch on its
+branch, and a key set to `off` on a branch has no effect until it lands.
+
 ## The guard
 
 The stand-in, until dDeclaredLoop's guard lands, for the defaults of `policy-file.guard` and
@@ -635,6 +668,28 @@ nothing (S12); `arms-empty-declared` reds an `ARMS` row declaring no `empty` or 
 `arms-empty-target` runs `--repo` over a target with one committed README, where `arm_schema`,
 `arm_reader_coverage` and `arm_mirror_readers` must print `not graded`, then over its scaffold, where
 `arm_schema` must grade the scaffold's keys with no finding (S27).
+
+The two end-to-end cases of the pass legs and the red-fix lane (TOOL-aNimbleMend-12), each an outcome
+case run by `run_pass_lane_case` and each printing one line per step. `pass-and-lane-adopter` installs
+this kit, `run-gates`, `agent-cap` and `memory-tree` into a fresh target, writes what its adopter
+writes by hand (the routed path, the leg manifest and its conf key, one build folder with one spec)
+and observes, in order: the adapter's empty-list line before any row carries the pass-leg field; the
+write gate refusing a product write while no red is open; a pass commit that breaks the planted leg
+recorded `fail` in the run record and the gate ledger; the gate admitting the same write with the
+lane's one witness line; the refusal byte for byte the first one with `bar.inline-red-fixes` off; a fix
+commit carrying `Red-fix:` beside `Pass: none` inside the lane's limits; the leg `ok` and the lane
+closed again; the fix's record written by the record door and joined, none owed; the commit grader
+counting `1 red-fix` over the pushed range, and listing the fix commit as `names no unit` with the key
+off; and, with `pass.fast-legs` off, the adapter exiting 0 and printing nothing with the run record
+and the ledger hashing as before. `pass-and-lane-gov` runs the same order in a clone of the tree under
+test, under gov's own conf, role index, policy file and mirror, with one planted row as the whole
+pass-leg list; it drops the adapter's empty list and the grader's two steps, and adds the harness
+template's `PASS_LEGS` naming the invocation the steps run and the gate refusing a role that declares
+no product write while the red is open. Neither observes an arm a building unit owns, one of gov's
+real legs red, the harness or a role agent's refusal at the hooks, the derivation's own list, or that
+the unchanged path kept the base commit's bytes: each comparison is between two outputs of the built
+tree. Both run the adapter under `GATE_REGEN_CHECK=0`, since the runner's freshness preflight refuses
+a pass-leg field the derivation rule did not write, so neither observes that preflight.
 
 ## Each arm in an adopter
 

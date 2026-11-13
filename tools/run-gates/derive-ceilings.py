@@ -641,7 +641,12 @@ def cmd_write(root, gd, args) -> int:
 
 
 def cmd_check(root, gd, args) -> int:
-    """The gate. TWO TRACKED FILES and nothing else, so the verdict is a property of the tree."""
+    """The gate. TRACKED FILES and nothing else, so the verdict is a property of the tree.
+
+    The ceiling arm reads the leg manifest, `ceiling-evidence.txt` and `ceiling-margin.txt`. The
+    budget arm reads `pass-leg-evidence.txt` beside them, through `pass_legs.py`, where that module
+    is beside this script.
+    """
     legs = read_legs(root)
     ev = read_evidence()
     floor, frac, _ = read_margin()
@@ -709,14 +714,34 @@ def cmd_check(root, gd, args) -> int:
               f"runner — a number an operator measured and typed, not one this tool watched: "
               + "; ".join(f"{n} {ev[n][0]:.1f}s on node {ev[n][2]}, {ev[n][4]}" for n in oob),
               file=sys.stderr)
-    if bad:
-        for b in bad:
-            print(f"CEILING-EVIDENCE FAILED — {b}", file=sys.stderr)
-        return 1
-    print(f"ceiling-evidence: {len(legs) - len(unbacked)} of {len(legs)} leg(s) backed "
-          f"({len(oob)} of them out-of-band), every one clearing its evidenced maximum by "
-          f"max({floor}s, {frac} x max)")
-    return 0
+    for b in bad:
+        print(f"CEILING-EVIDENCE FAILED — {b}", file=sys.stderr)
+    if not bad:
+        print(f"ceiling-evidence: {len(legs) - len(unbacked)} of {len(legs)} leg(s) backed "
+              f"({len(oob)} of them out-of-band), every one clearing its evidenced maximum by "
+              f"max({floor}s, {frac} x max)")
+    rc = 1 if bad else 0
+    # THE PASS-BUDGET ARM (TOOL-aNimbleMend-3), run whether or not a ceiling failed, over the
+    # manifest and the cost rows read above. THE IMPORT IS GUARDED AND INSIDE THE FUNCTION: an
+    # install, or a fixture, may hold this script without its sibling, and there the budget is not
+    # graded, said aloud, and the ceiling verdict stands alone.
+    try:
+        import pass_legs
+    except ImportError:
+        print("pass-budget: not graded — pass_legs.py is not beside derive-ceilings.py",
+              file=sys.stderr)
+        return rc
+    try:
+        failures, lines = pass_legs.check_pass_budget(list(legs.values()),
+                                                      {n: r[0] for n, r in ev.items()})
+    except pass_legs.Refusal as e:
+        print(f"pass-budget: REFUSED — {e}", file=sys.stderr)
+        return 2
+    for f in failures:
+        print(f"PASS-BUDGET FAILED — {f}", file=sys.stderr)
+    for line in lines:
+        print(line)
+    return max(rc, 1 if failures else 0)
 
 
 def main() -> int:

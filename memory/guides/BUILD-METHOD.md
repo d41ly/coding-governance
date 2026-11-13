@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.160 -->
+<!-- gov:kit memory-tree@2.161 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -197,12 +197,13 @@ python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD
 **It takes a COMMITTED range, exits 0 whenever it prints a checklist, and 1 with a `HYGIENE gotchas:` line when it refuses the range**: the trap and the reading are beside its row in `tools/memory-tree/README.md`.
 
 **A pass runs no merge bar, no self-test suite and no gate beyond its role's allowlist**, which a
-hook enforces on every role agent. An agent pass verifies with a fixture or a probe of its own code,
-and a pass that needs a gate or suite verdict returns that need to the main loop rather than running
-one; a new arm's RED-first observation is the main loop's, at the close (M8). The
+hook enforces on every role agent. An agent pass verifies with a fixture or a probe of its own code
+and returns any need for a gate or suite verdict to the main loop; a new arm's RED-first observation
+is the main loop's, at the close (M8). After a unit pass's commit the main loop runs the pass legs,
+and a red leg may be fixed inline: protocol §12. The
 bar runs ONCE, after the last unit is terminal: at the close under a mandate, at the push boundary
 otherwise. Where a pass touched files a leg guards and the MAIN LOOP judges a bar necessary, the
-plain bar with no flag is the scoped form — at the main loop, never in a child. A pass whose check
+plain bar with no flag is the scoped form, never in a child. A pass whose check
 is red is not followed by another: fix it, or park it with the reason. A pass that produced no
 change commits nothing and says so.
 

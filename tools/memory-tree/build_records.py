@@ -36,6 +36,19 @@ is taken, with any field empty, where no policy kit answers the key, and where `
 playbook kit's practice catalogue, a practice or its `<practice>.<rule>`. It is a door the memory plan lists
 until dTotalRecall's record door adopts it.
 
+THE RED-FIX KIND, its door and its join (TOOL-aNimbleMend-9): `build_records.py new red-fix --build <slug>
+--unit <id> --leg <leg name> --red-line <line> --commit <rev> --rerun <command · result>` writes the next
+`<date>-build-<unit id>-red-fix-<n>.md`, the record of an inline red fix, after the fix: `Leg`, `Red line`,
+`Files` and `Commit` (both derived from the commit, the sha in full), `Rerun` and `Caused-by`. It refuses,
+exit 1 and writing nothing, a rev naming no commit reachable from HEAD, a commit carrying no `Red-fix:`
+trailer or none naming `--leg`, and an empty text flag. `build_records.py join red-fix [--staged] [--root
+<path>]` joins every `Red-fix:` commit reachable from HEAD to its record both ways, findings J1 to J6 of
+`check_red_fix_join`: exit 0 clean, 1 on a finding, 2 where git or the tracked population cannot be read,
+its last line a summary. A fix at HEAD with no record is printed as owed, since its record is the next
+commit; `--staged` grades HEAD alone and refuses that same fix, so the commit after a fix is its record's.
+NOT CHECKED: that the record is the fix's direct child, that `Rerun` or `Red line` is true, or that the leg
+was red. `--fixture --plant red-fix-join` stages the door's refusals and each finding.
+
 ONE LINE PER VALUE, at the one writer (PLAY-dOrderedCharter-49 S53): `write_record` refuses a field value
 holding a CR or an LF, or opening `**<Word>:**`, before it writes anything, so no door's value forges a
 field; every door's refusal exits 1, writing nothing.
@@ -66,7 +79,7 @@ KIT = pathlib.Path(__file__).resolve().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from design_lib import read_design_conf, read_tracked_builds  # noqa: E402  the tracked population
-from tree_lib import TYPED_RECORD_KINDS  # noqa: E402  the reader's kind list, this table's keys
+from tree_lib import RED_FIX_TRAILER, TYPED_RECORD_KINDS  # noqa: E402  the reader's kind list, this table's keys
 
 FIELD = re.compile(r"^- \*\*([A-Z][a-z-]+(?: [a-z]+)?):\*\* (.+)$")     # the instrument deviations.py's
 ID = r"[A-Za-z]+-[A-Za-z0-9]+-\d+"
@@ -105,12 +118,18 @@ KINDS = {
         "required": ("Unit", "Action", "Before", "After", "Mark", "Proof", "Caused-by"),
         "closed": (("Mark", CHANGE_MARKS), ("Action", CHANGE_ACTIONS)),
     },
+    "red-fix": {
+        "required": ("Leg", "Red line", "Files", "Commit", "Rerun", "Caused-by"),
+        "closed": (),
+    },
 }
 if set(KINDS) != set(TYPED_RECORD_KINDS):
     raise ImportError("build_records: the kind table and tree_lib.TYPED_RECORD_KINDS differ on "
                       + ", ".join(sorted(set(KINDS) ^ set(TYPED_RECORD_KINDS))))
-DOORS = ("exception", "change", "override")  # the kinds `new <kind>` writes; every other kind is `write_record`'s alone
-PLANTS = ("typed-kinds", "pending-kind")
+DOORS = ("exception", "change", "override", "red-fix")  # the kinds `new <kind>` writes; every other kind is `write_record`'s alone
+PLANTS = ("typed-kinds", "pending-kind", "red-fix-join")
+SHA40 = re.compile(r"[0-9a-f]{40}")
+SAY_JOIN = "build-records: red-fix join"
 #: PLAY-dOrderedCharter-55 S8's `pending-kind`: the exception kind's entry staged pending, in a copy of this module
 PENDING_ENTRY = ('    "exception": {\n        "required": ("Principle", "Excuses", "Reason", "Caused-by"),\n'
                  '        "closed": (),\n    },\n', '    "exception": {"pending": "ARCH-tKinds-9"},\n')
@@ -310,21 +329,11 @@ def read_override(path, text):
 def read_override_value(root):
     """`charter.override` at `root`'s landed revision, through the policy kit's `policy.py get`, found beside
     this kit since a kit imports no sibling. ValueError where no policy kit answers or the reader refuses."""
-    import os
-    import subprocess
-    from backlog import resolve_kit_dir   # noqa: E402  the kit's inline copy of the sibling resolver
+    from tree_lib import read_policy_value   # noqa: E402  the kit's one policy read (TOOL-aNimbleMend-8 S7)
     try:
-        kit = resolve_kit_dir("policy", "policy.py", KIT)
+        return read_policy_value("charter.override", root)
     except LookupError as exc:
         raise ValueError(f"charter.override cannot be read, so no override is recorded: {exc}") from None
-    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
-    p = subprocess.run([sys.executable, str(kit / "policy.py"), "get", "charter.override"], cwd=str(root), env=env,
-                       capture_output=True, text=True, encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL)
-    said = p.stdout.split()
-    if p.returncode != 0 or len(said) != 1:
-        why = (p.stderr or p.stdout).strip().splitlines()
-        raise ValueError(f"charter.override did not read: {why[-1] if why else f'exit {p.returncode}'}")
-    return said[0]
 
 
 def read_rule_tags():
@@ -358,6 +367,108 @@ def write_override(root, build, unit, rule, words, session, today=None):
                          f"override is taken")
     fields = [("Rule", rule), ("Words", words), ("Session", session), ("Value", value), ("Caused-by", unit)]
     return write_record(root, build, unit, "override", f"{rule} set aside by the owner", fields, today)
+
+
+# -------------------------------------------------------------------------------- the red-fix kind
+def read_red_fix(path, text):
+    """One red-fix record: its fields under their own names, and `id`, `path`, `build`, `n` and `malformed`.
+    Its own field rule: `Commit` is a full 40-hex sha."""
+    fields, bad, name = read_record(
+        path, text, "red-fix",
+        check_fields=lambda f: [("Commit", f"{f['Commit']} is not a full 40-hex sha")]
+        if "Commit" in f and not SHA40.fullmatch(f["Commit"]) else [])
+    return {**fields, "id": pathlib.PurePosixPath(path).stem, "path": path,
+            "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None,
+            "malformed": bad}
+
+
+def write_red_fix(root, build, unit, leg, red_line, commit, rerun, today=None):
+    """The door: the next red-fix record of `build`, written under `root`'s own memory tree after the fix,
+    its `Commit` the full sha `commit` resolves to and its `Files` that commit's paths, both read from the
+    commit and never from a flag. -> its repo-relative path. Every value is validated here, the write
+    boundary; a refusal, a commit that is no `Red-fix:` commit of `leg` among them, is ValueError."""
+    import routed_commits   # noqa: E402  the trailer's one read; imported here so no cycle forms at load
+    for name, value in (("--leg", leg), ("--red-line", red_line), ("--commit", commit), ("--rerun", rerun)):
+        if not value or not value.strip():
+            raise ValueError(f"{name} is one non-empty line")
+    leg = leg.strip()
+    try:
+        got = routed_commits.run_git(root, "rev-parse", "--verify", "--quiet", "--end-of-options",
+                                     commit.strip() + "^{commit}", may_fail=True)
+        sha = (got or b"").decode("utf-8", "replace").strip()
+        if not SHA40.fullmatch(sha) or routed_commits.run_git(root, "merge-base", "--is-ancestor", sha, "HEAD",
+                                                               may_fail=True) is None:
+            raise ValueError(f"--commit {commit!r} names no commit reachable from HEAD")
+        fix = routed_commits.read_routed_commits(root, ["-1", sha])[0]
+    except routed_commits.Refusal as exc:
+        raise ValueError(str(exc)) from None
+    if not fix["red_fix"]:
+        raise ValueError(f"commit {sha[:8]} carries no `{RED_FIX_TRAILER}:` trailer, so it is no red fix")
+    if leg not in fix["red_fix"]:
+        raise ValueError(f"--leg {leg!r} is no `{RED_FIX_TRAILER}:` trailer value of {sha[:8]}, whose legs are: "
+                         + " · ".join(fix["red_fix"]))
+    if not fix["paths"]:
+        raise ValueError(f"commit {sha[:8]} touches no path, so it has no `Files` to record")
+    fields = [("Leg", leg), ("Red line", red_line), ("Files", ", ".join(sorted(fix["paths"]))), ("Commit", sha),
+              ("Rerun", rerun), ("Caused-by", unit)]
+    return write_record(root, build, unit, "red-fix", f"{leg} fixed in {sha[:8]}", fields, today)
+
+
+def check_red_fix_join(root, staged=False):
+    """`join red-fix`: every `Red-fix:` commit reachable from HEAD against every tracked red-fix record, each
+    trailer value owing one record whose `Commit` is that sha and whose `Leg` is that value.
+    -> (exit, lines), the last line of exit 0 and 1 a summary.
+
+    J1 a fix commit below HEAD with a value no record answers · J2 a record whose `Commit` is no fix commit
+    of the population · J3 a record whose `Leg` is no trailer value of its commit · J4 a record whose `Files`
+    differs from the commit's paths · J5 two records answering one commit and leg · J6 a record malformed by
+    `read_record`. A value at HEAD with no record is printed as owed and is no finding. `staged` reads HEAD
+    alone: an unanswered value there is J1, J2 is not graded since the population is one commit, and a HEAD
+    with no trailer is held. Exit 2 where git fails or the tracked population cannot be read; a repository
+    with no commit holds an empty population."""
+    import routed_commits                  # noqa: E402  imported here so no cycle forms at load
+    from design_lib import DesignRefusal   # noqa: E402
+    try:
+        born = routed_commits.run_git(root, "rev-parse", "--verify", "--quiet", "HEAD^{commit}", may_fail=True)
+        commits = routed_commits.read_routed_commits(root, ["-1", "HEAD"] if staged else ["HEAD"]) if born else []
+        records = read_records(root, read_design_conf(root), "red-fix", read_red_fix)
+    except (routed_commits.Refusal, DesignRefusal, OSError, ValueError) as exc:
+        return 2, [f"{SAY_JOIN} · refused · {exc}"]
+    head = commits[0]["sha"] if commits else None
+    fixes = {c["sha"]: list(dict.fromkeys(c["red_fix"])) for c in commits if c["red_fix"]}
+    paths = {c["sha"]: ", ".join(sorted(c["paths"])) for c in commits if c["red_fix"]}
+    if staged and not fixes:
+        return 0, [f"{SAY_JOIN} · held under --staged · HEAD carries no `{RED_FIX_TRAILER}:` trailer"]
+    found, said, answers, owed = [], [], {}, 0
+    for r in records:
+        if r["malformed"]:
+            found += [f"J6 · {r['path']} · {key} {why}" for key, why in r["malformed"]]
+            continue
+        sha, leg = r["Commit"], r["Leg"]
+        if sha not in fixes:
+            if not staged:
+                found.append(f"J2 · {r['path']} · Commit {sha} is no `{RED_FIX_TRAILER}:` commit reachable from HEAD")
+            continue
+        if leg not in fixes[sha]:
+            found.append(f"J3 · {r['path']} · Leg {leg} is no trailer value of {sha[:8]}, whose legs are: "
+                         + " · ".join(fixes[sha]))
+            continue
+        if r["Files"] != paths[sha]:
+            found.append(f"J4 · {r['path']} · Files {r['Files']} differs from {sha[:8]}'s paths: {paths[sha]}")
+        answers.setdefault((sha, leg), []).append(r["path"])
+    found += [f"J5 · {' · '.join(held)} · two records answer {sha[:8]} · {leg}"
+              for (sha, leg), held in answers.items() if len(held) > 1]
+    for sha, leg in ((s, v) for s, legs in fixes.items() for v in legs):
+        if (sha, leg) in answers:
+            continue
+        if sha == head and not staged:   # owed and not late: the record is the next commit
+            owed += 1
+            said.append(f"{SAY_JOIN} · owed · {sha[:8]} · {leg}")
+        else:
+            found.append(f"J1 · {sha[:8]} · {leg} · the fix commit has no red-fix record")
+    lines = [f"{SAY_JOIN} · {f}" for f in found] + said
+    lines.append(f"{SAY_JOIN} · {len(fixes)} fix commit(s) · {len(records)} record(s) · {owed} owed")
+    return (1 if found else 0), lines
 
 
 def write_record(root, build, unit, kind, title, fields, today=None):
@@ -405,6 +516,9 @@ DOOR_ARGV = {
                 "--after", "unit.fixture@0123abcd"], ["--tag", "unit.fixture"]),
     "override": (["--rule", "practice.verify", "--words", "skip the bar on this one", "--session", "fixture"],
                  ["--rule", "practice.verify"]),
+    # the fixture's first commit carries the trailer, so HEAD is a fix of this leg when the door runs
+    "red-fix": (["--leg", "the fixture leg", "--red-line", "FAIL the fixture leg", "--commit", "HEAD",
+                 "--rerun", "the fixture leg · green"], ["--leg", "the fixture leg"]),
 }
 
 
@@ -494,7 +608,88 @@ def run_fixture(plant):
             run_git("symbolic-ref", "HEAD", "refs/heads/main")
             run_git("add", "-A")
             run_git("-c", "user.name=fx", "-c", "user.email=fx@example.invalid", "-c", "commit.gpgsign=false",
-                    "commit", "-qm", "the fixture build")
+                    "commit", "-qm", "the fixture build", "-m", f"{RED_FIX_TRAILER}: {DOOR_ARGV['red-fix'][1][1]}")
+            if plant == "red-fix-join":   # TOOL-aNimbleMend-9 S7: the door's refusals and each finding of the join
+                leg, folder = DOOR_ARGV["red-fix"][1][1], root / "memory/builds/tKinds/build"
+                door = ["--leg", leg, "--red-line", "FAIL the fixture leg", "--rerun", "the fixture leg · green"]
+                cases = [0]
+
+                def run_join(*flags):
+                    p = subprocess.run([sys.executable, str(pathlib.Path(__file__).resolve()), "join", "red-fix",
+                                        "--root", str(root), *flags], capture_output=True, text=True, encoding="utf-8")
+                    return p.returncode, (p.stdout + p.stderr).strip()
+
+                def write_commit(subject, *trailers):
+                    run_git("add", "-A")
+                    run_git("-c", "user.name=fx", "-c", "user.email=fx@example.invalid", "-c", "commit.gpgsign=false",
+                            "commit", "-qm", subject, *(x for t in trailers for x in ("-m", t)))
+                    return run_git("rev-parse", "HEAD").strip()
+
+                def check_case(case, got, rc, *needles):
+                    """One case: the exit, and one printed line holding every needle."""
+                    line = next((ln for ln in got[1].splitlines() if all(n in ln for n in needles)), None)
+                    cases[0] += 1
+                    if got[0] != rc or line is None:
+                        bad.append(f"{case}: exited {got[0]}, not {rc} with one line holding {' and '.join(needles)}: "
+                                   f"{got[1][:400]}")
+                    print(f"build-records: {plant} · {case} · exit {got[0]} · {line}")
+
+                fix = run_git("rev-parse", "HEAD").strip()
+                check_case("owed at HEAD", run_join(), 0, "owed", fix[:8], leg)
+                check_case("staged, unrecorded at HEAD", run_join("--staged"), 1, "J1", fix[:8])
+                rc, said = run_door(root, "red-fix", unit, door + ["--commit", fix[:8]])
+                rel = (re.search(r"wrote (\S+)", said) or [None, ""])[1]
+                rec = read_red_fix(rel, (root / rel).read_bytes().decode("utf-8")) if rc == 0 and rel else {}
+                files = ".memory-tree.conf, memory/builds/tKinds/spec/2026-01-01-spec-ARCH-tKinds-1.md"
+                cases[0] += 1
+                if rec.get("Commit") != fix or rec.get("Files") != files or rec.get("malformed"):
+                    bad.append(f"door: exited {rc} from the rev {fix[:8]} and wrote Commit {rec.get('Commit')}, Files "
+                               f"{rec.get('Files')}, malformed {rec.get('malformed')}: {said.strip()[:200]}")
+                print(f"build-records: {plant} · door · exit {rc} · from {fix[:8]} · Commit {rec.get('Commit')} · "
+                      f"Files {rec.get('Files')}")
+                if not bad:
+                    run_git("add", "--", rel)
+                    check_case("staged, recorded at HEAD", run_join("--staged"), 0, "1 fix commit(s)")
+                    plain = write_commit("the record")
+                    check_case("clean", run_join(), 0, "1 fix commit(s) · 1 record(s) · 0 owed")
+                    for case, flags in (("a commit with no trailer", door + ["--commit", plain[:8]]),
+                                        ("a --leg no trailer names", ["--leg", "another leg", *door[2:], "--commit", fix[:8]]),
+                                        ("a rev that names no commit", door + ["--commit", "no-such-rev"])):
+                        rc, said = run_door(root, "red-fix", unit, flags)
+                        held = len(list(folder.glob("*-red-fix-*.md")))
+                        cases[0] += 1
+                        if rc != 1 or held != 1:
+                            bad.append(f"refusal, {case}: exited {rc}, not 1, with {held} record(s), not 1: {said.strip()[:200]}")
+                        print(f"build-records: {plant} · refusal · {case} · exit {rc} · {held} record(s)")
+                    text = (root / rel).read_bytes().decode("utf-8")
+                    twin = rel.replace("-red-fix-1.md", "-red-fix-2.md")
+                    for case, old, new, needles in (
+                            ("J4", "- **Files:** .memory-tree.conf, ", "- **Files:** ", (rel,)),
+                            ("J3", f"- **Leg:** {leg}", "- **Leg:** another leg", (rel, leg)),
+                            ("J2", fix, "0" * 40, (rel, "0" * 40)),
+                            ("J6", "- **Rerun:** the fixture leg · green\n", "", (rel, "Rerun is missing")),
+                            ("J5", None, None, (rel, twin))):
+                        if old is not None and old not in text:
+                            bad.append(f"{case}: the record does not hold {old!r}, so the plant stages nothing")
+                        with open(root / (rel if old is not None else twin), "w", encoding="utf-8", newline="\n") as fh:
+                            fh.write(text.replace(old, new) if old is not None else text)
+                        run_git("add", "-A")
+                        check_case(case, run_join(), 1, f"· {case} ·", *needles)
+                        if old is None:
+                            run_git("rm", "-qf", "--", twin)
+                        with open(root / rel, "w", encoding="utf-8", newline="\n") as fh:
+                            fh.write(text)
+                    (root / "fixed.txt").write_text("a second fix\n", encoding="utf-8")
+                    late = write_commit("a second fix", f"{RED_FIX_TRAILER}: {leg}")
+                    (root / "later.txt").write_text("one more commit\n", encoding="utf-8")
+                    write_commit("one more commit on an unrecorded fix")
+                    check_case("J1", run_join(), 1, "· J1 ·", late[:8], leg)
+                for why in bad:
+                    print(f"build-records: FAIL {plant} · {why}")
+                if not bad:
+                    print(f"build-records: PASS {plant} — {cases[0]} cases: the door, its refusals, owed, --staged "
+                          f"and J1 to J6")
+                return 1 if bad else 0
             try:
                 read_override_value(root)
                 unarmed = set()
@@ -595,8 +790,14 @@ def main(argv):
     change.add_argument("--promoted-from")
     for flag in ("--rule", "--words", "--session"):
         doors.choices["override"].add_argument(flag, required=True)
+    for flag in ("--leg", "--red-line", "--commit", "--rerun"):
+        doors.choices["red-fix"].add_argument(flag, required=True)
     read = sub.add_parser("read", help="read one record and name every refusal")
     read.add_argument("path")
+    join = sub.add_parser("join", help="join every Red-fix: commit to its red-fix record, both ways")
+    join.add_argument("joined", choices=("red-fix",))
+    join.add_argument("--staged", action="store_true", help="grade HEAD alone against the records in the index")
+    join.add_argument("--root", default=".")
     args = ap.parse_args(argv)
     if args.fixture:
         if args.verb or not args.plant:
@@ -605,7 +806,13 @@ def main(argv):
     if args.plant:
         ap.error("--plant takes --fixture")
     if args.verb is None:
-        ap.error("a verb, new or read, or --fixture --plant <case>")
+        ap.error("a verb, new, read or join, or --fixture --plant <case>")
+    if args.verb == "join":
+        rc, lines = check_red_fix_join(pathlib.Path(args.root).absolute(), args.staged)
+        if hasattr(sys.stdout, "reconfigure"):   # check 31 reads these lines: UTF-8 and LF whatever the host
+            sys.stdout.reconfigure(encoding="utf-8", newline="\n")
+        print("\n".join(lines))
+        return rc
     if args.verb == "new":
         root = pathlib.Path(args.root).absolute()
         try:
@@ -614,6 +821,8 @@ def main(argv):
                                    args.after, DOOR_PROOF, args.successor, args.promoted_from)
             elif args.kind == "override":
                 rel = write_override(root, args.build, args.unit, args.rule, args.words, args.session)
+            elif args.kind == "red-fix":
+                rel = write_red_fix(root, args.build, args.unit, args.leg, args.red_line, args.commit, args.rerun)
             else:
                 rel = write_exception(root, args.build, args.unit, args.principle, args.excuses, args.reason,
                                       args.expires)
@@ -642,6 +851,8 @@ def main(argv):
         bad = read_change(rel, text)["malformed"]
     elif kind == "override":
         bad = read_override(rel, text)["malformed"]
+    elif kind == "red-fix":
+        bad = read_red_fix(rel, text)["malformed"]
     else:
         bad = read_exception(rel, text)["malformed"]
     for ln in text.replace("\r\n", "\n").split("\n"):

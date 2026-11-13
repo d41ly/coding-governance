@@ -84,6 +84,12 @@ Documented on [help/spec-audit.md](../spec-audit.md).
 ## `review.spec-audit.chain-ceiling`
 Documented on [help/spec-audit.md](../spec-audit.md).
 
+## `bar.inline-red-fixes`
+Documented on [help/red-fix-lane.md](../red-fix-lane.md).
+
+## `pass.fast-legs`
+Documented on [help/pass-legs.md](../pass-legs.md).
+
 ## `help.enforce`
 Documented on [help/docs-leg.md](../docs-leg.md).
 

@@ -14,10 +14,10 @@ PreToolUse guards — fan-out bounded across Workflow+Agent, scratch bounded acr
 - kits 1: `hooks`
 - harness-hooks 4: `PreToolUse tools/hooks/agent-cap.js`, `PreToolUse tools/hooks/scratch-guard.js`, `SubagentStart tools/hooks/scratch-guard.js`, `Stop tools/hooks/format-guard.js`
 - workflow-scripts 1: `check-verifier-fanout.js`
-- gotcha-classes 9: `bash-c-multiline-flattens-under-msys.md`, `held-suite-guard-misses-a-sibling-kit.md`
+- gotcha-classes 10: `bash-c-multiline-flattens-under-msys.md`, `held-suite-guard-misses-a-sibling-kit.md`
 - guides 1
 - globs 12
-- cut 20 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 21 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## annotation-style
 
@@ -157,12 +157,12 @@ check-memory-hygiene.sh: the memory tree's structural gate, its per-class size c
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/memory-tree-hygiene.md`
 - decisions 3: `TOOL-aRelaxedShard-1`, `TOOL-aWidenedGuide-1`, `TOOL-dDerivedDocket-31`
-- gate-legs 11: `memory hygiene`, `memory-hygiene self-test`, `verdict epoch (kit version dates the engine)`, `verdict-epoch self-test`, `kit version markers`, `kit/dogfood doc parity`, `transition-audit arms`, `backlog migration selftest`, `straggler-guard arms`, `routed commits name a specced unit`, `routed-commits selftest`
+- gate-legs 12: `memory hygiene`, `memory hygiene (the pass checks)`, `memory-hygiene self-test`, `verdict epoch (kit version dates the engine)`, `verdict-epoch self-test`, `kit version markers`, `kit/dogfood doc parity`, `transition-audit arms`, `backlog migration selftest`, `straggler-guard arms`, `routed commits name a specced unit`, `routed-commits selftest`
 - kits 1: `memory-tree`
 - git-hooks 2: `commit-msg`, `pre-rebase`
 - gotcha-classes 22: `a-grep-for-a-word-is-a-presence-probe.md`, `suite-edited-while-bash-executes-it.md`, `ledger-token-wrapped-across-a-line-joins-nothing.md`
-- globs 11: `tools/memory-tree/check-memory-hygiene.sh`
-- cut 29 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- globs 11
+- cut 30 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## memory-tree-merge-driver
 
@@ -180,10 +180,10 @@ The governance playbook — the shipped template + companions, and the gates ove
 
 - status `shipped` · streams `playbook`, `tooling` · dossier `memory/map/features/playbook.md`
 - decisions 1: `TOOL-aSiftedPlaybook-1`
-- gate-legs 32: `template size gate selftest`, `playbook parity`, `playbook parity selftest`, `playbook render wiring`, `agent-instructions wiring`, `playbook render selftest`, `charter size`, `micro-format definitions`, `micro-format gate selftest`, `line length`, `line-length gate selftest`, `layer dependencies (the core never depends on an expansion)`, `instruction units (schema, one fact)`, `instruction render (one renderer of record)`, `help reference pages`, `instruction units selftest`, `instruction edits (manifest checks)`, `instruction edits selftest`, `tags (the resolver's checks)`, `tags positional selftest`, `tags bundle selftest`
+- gate-legs 33: `template size gate selftest`, `playbook parity`, `playbook parity selftest`, `playbook render wiring`, `agent-instructions wiring`, `playbook render selftest`, `charter size`, `micro-format definitions`, `micro-format gate selftest`, `line length`, `line-length gate selftest`, `layer dependencies (the core never depends on an expansion)`, `instruction units (schema, one fact)`, `instruction render (one renderer of record)`, `help reference pages`, `instruction units selftest`, `instruction edits (manifest checks)`, `instruction edits selftest`, `tags (the resolver's checks)`, `positional (the citation check alone)`, `tags positional selftest`
 - kits 1: `playbook`
 - globs 8
-- cut 19 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 20 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## playbook-mode
 
@@ -203,7 +203,7 @@ The policy file .governance/policy.toml, the policy kit's catalogue that is its 
 - decisions 1: `TOOL-dGroundRules-1`
 - gate-legs 2: `policy check`, `policy fixtures`
 - kits 1: `policy`
-- gotcha-classes 1: `check-grades-one-layer-of-a-layered-config.md`
+- gotcha-classes 3: `check-grades-one-layer-of-a-layered-config.md`, `off-switch-leaves-new-output-standing.md`, `budget-row-not-remeasured-after-added-arms.md`
 - globs 4: `tools/policy/**`, `.governance/policy.toml`, `.governance/policy.json`, `help/policy.md`
 
 ## process-monitor
@@ -271,10 +271,10 @@ The gate runner, its harnesses, and the adopter that keeps a target's verdict re
 - decisions 9: `TOOL-aPacedTurnstile-1`, `TOOL-aPacedTurnstile-2`, `TOOL-aPacedTurnstile-4`, `TOOL-aPacedTurnstile-5`, `TOOL-aPacedTurnstile-6`, `TOOL-aPacedTurnstile-3`, `TOOL-aPacedTurnstile-7`, `TOOL-aPacedTurnstile-16`, `TOOL-dLoggedFlight-3`
 - gate-legs 15: `run-gates gov canary`, `run-gates adopter e2e`, `run-gates wiring`, `profile-bar selftest`, `every held leg is budgeted, every budget row resolves`, `run-selftests self-test`, `selftest harness self-test`, `extract-arms self-test`, `leg ceilings clear their evidenced maximum`, `run-gates run-log line`, `receipt sync (installed files match the receipt)`, `pre-push bar self-test`, `held-halves selftest`, `measure-legs selftest`
 - kits 1
-- gotcha-classes 18
+- gotcha-classes 19
 - guides 1
 - globs 28
-- cut 49 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 50 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## run-gates-turnstile
 
@@ -318,7 +318,7 @@ The joins that resolve a live spec's leg names, witness paths and line citations
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/spec-tokens.md`
 - decisions 0
-- gate-legs 2: `spec tokens (a spec's own names resolve)`, `spec-tokens self-test`
+- gate-legs 3: `spec tokens (a spec's own names resolve)`, `spec tokens (the pass's own spec)`, `spec-tokens self-test`
 - globs 3: `tools/check-spec-tokens.py`, `tools/check-spec-tokens.test.sh`, `memory/project/spec-token-waivers.txt`
 
 ## testsuite-counts
@@ -343,10 +343,10 @@ Unattended runs — a mandate on disk, not a block of chat
 - workflow-scripts 2: `unattended-build.js`, `unattended-unit.js`
 - skill-engines 1: `session-kickoff`
 - rendered-skills 1: `unattended`
-- gotcha-classes 25: `reflowed-prompt-string-reads-as-a-deleted-stop.md`, `text-mode-read-eats-a-bare-cr.md`, `assertion-between-two-derived-values.md`, `second-implementation-is-not-a-second-opinion.md`
+- gotcha-classes 27: `reflowed-prompt-string-reads-as-a-deleted-stop.md`, `text-mode-read-eats-a-bare-cr.md`, `assertion-between-two-derived-values.md`, `second-implementation-is-not-a-second-opinion.md`
 - guides 4
 - globs 3
-- cut 28 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 30 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## unattended-mandate
 

@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.119 -->
+<!-- gov:kit unattended@1.120 -->
 [memory/guides/UNATTENDED-PROTOCOL.md · Level 3 · Binding for a run that merges and pushes with no owner turn; yields to levels 0 to 2]
 # Unattended runs — the protocol
 
@@ -718,6 +718,14 @@ and the run-state file joins the two halves.
 answer on disk, **and is DECLARED through `--dispatch`**, which makes the refusal reachable on a
 sequential pass and not only a concurrent one — a rule enforced only where two passes race misses
 every ordinary build.
+
+**Two switches act BETWEEN passes, each a policy key that defaults on.** Under `pass.fast-legs` the
+unit harness's return carries a `nextAction`, and the MAIN LOOP runs it before the next dispatch:
+the declared pass legs over that pass's diff. A role agent's pass stays gate-free. Under
+`bar.inline-red-fixes` a leg the gate ledger records red, the bar's or a pass leg's, may be fixed
+with NO spec: the commit names the leg in a `Red-fix:` trailer beside `Pass: none`, the fix's typed
+record is the next commit, and the commit grader holds the fix to its limits. Every other product
+write keeps the route above; either key `off` restores it for that mechanism.
 
 ## 13. The kickoff engine's interactive exits
 
