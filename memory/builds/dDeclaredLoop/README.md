@@ -112,7 +112,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dDeclaredLoop-18 — the `step`, `item`, `policy` and `command` tag namespaces, with their extractors](spec/2026-10-24-spec-TOOL-dDeclaredLoop-18.md) | 1 | 2 | CLOSED | rev-5 | 2026-11-13 |
-| [TOOL-dDeclaredLoop-1 — the loop kit and its definition keyed by the stage tags, the roles kit's stage table moved into it](spec/2026-10-24-spec-TOOL-dDeclaredLoop-1.md) | 2 | 2 | INPROGRESS | rev-4 | 2026-11-13 |
+| [TOOL-dDeclaredLoop-1 — the loop kit and its definition keyed by the stage tags, the roles kit's stage table moved into it](spec/2026-10-24-spec-TOOL-dDeclaredLoop-1.md) | 2 | 2 | INPROGRESS | rev-5 | 2026-11-13 |
 | [TOOL-dDeclaredLoop-23 — the commit node and its kind, and one trailer reader with both views](spec/2026-10-24-spec-TOOL-dDeclaredLoop-23.md) | 3 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-36 — the loop kit in govkit's default selection, so a default apply installs what roles requires](spec/2026-10-24-spec-TOOL-dDeclaredLoop-36.md) | 3 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-16 — one closed disposition set, and the owner's disposition record](spec/2026-10-24-spec-TOOL-dDeclaredLoop-16.md) | 4 | 2 | DEFERRED | rev-3 | 2026-10-25 |
@@ -212,7 +212,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 226 bound to this build, across 4 record folder(s).
+Records: 227 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
