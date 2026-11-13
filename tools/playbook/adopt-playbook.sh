@@ -188,7 +188,7 @@ esac
 
 # THE SIBLING KITS EACH PLANT BLOCK REACHES (PLAY-dOrderedCharter-77 S11). A block's arms reach a kit this
 # one does not carry: the layer and tag blocks `memory-tree`, the edge block `roles`, the load-set block
-# `roles` and `policy`. Where one does not resolve, as at a `playbook-render` install without it, the
+# `roles` and `policy`, the policy-namespace block `memory-tree` and `policy`. Where one does not resolve, as at a `playbook-render` install without it, the
 # block prints `UNARMED — the <block> plants: no <home> kit in this install` and runs none of its arms;
 # at gov every kit resolves and every arm runs. What this does not check: a block whose arms reach a kit
 # only on some plants is unarmed whole where that kit is absent.
@@ -319,6 +319,11 @@ bad-seg $_tk|1|· shape · layer.Memory · segment 'Memory' is outside
 long-tag $_tk|1|· over 64 bytes (66)
 ns-word $_tk|1|· shape · practice.repo.x · first segment 'repo' is a namespace word
 none $_tk|0|tags: green · 0 red|namespace word
+policy-ns-word $_tk|1|· shape · policy.step.timeout · first segment 'step' is a namespace word
+loop-rows $_tk|0|tags: plant loop-rows · where: rc=0 0, check: rc=0
+loop-bad-seg $_tk|1|· shape · step.Plan · segment 'Plan' is outside
+command-rows $_tk|1|\`command.corekit.old\` is cited and undeclared in command|\`command.corekit.new\`
+ns-word-leaf $_tk|0|tags: green · 0 red|namespace word
 escaped-word $_tk|1|namespace row 'a.b' is outside seg, so no tag is graded against it
 escaped-word $_tk|1|· shape · a.b.c · namespace 'a' is not registered
 unregistered-cite $_tk|1|\`layer.nowhere\` is cited and undeclared in layer
@@ -377,6 +382,22 @@ reference-no-h1 $_tk|1|/references.toml) lacks h1
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf tag-resolver arm(s) failed"; exit 1; fi
 echo "PASS — the tag resolver's plants"
+fi
+
+# THE POLICY NAMESPACE'S ARMS (TOOL-dDeclaredLoop-18 S6). Two tag-resolver plants that reach the policy kit:
+# the installed catalogue's literal names all members and its placeholder prefixes all families, counted
+# against the plant's own parse; and a citation under a family declared only where the policy kit's matcher
+# finds its row. What this does not check: what a placeholder segment stands for.
+_uk=; check_sibling_kit memory-tree tree_lib.py || _uk=memory-tree
+check_sibling_kit policy policy.py || _uk=${_uk:-policy}
+if [ -n "$_uk" ]; then echo "UNARMED — the policy namespace's plants: no $_uk kit in this install"; else
+_tf=0
+run_plant_rows tags "$HERE/gov_tag.py" <<PLANTS
+policy-catalogue $_tk|0|tags: plant policy-catalogue ·
+policy-family $_tk|1|\`policy.review.build.nope\` is cited and undeclared in policy|\`policy.review.build\`
+PLANTS
+if [ "$_tf" != 0 ]; then echo "FAIL — $_tf policy-namespace arm(s) failed"; exit 1; fi
+echo "PASS — the policy namespace's plants"
 fi
 
 # THE EDGE GRAMMAR'S ARMS (PLAY-dOrderedCharter-24 §4). Each row runs `edge_grammar.py --fixture` over one

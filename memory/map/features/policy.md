@@ -80,11 +80,11 @@ extend via a new `type` in the `allowed` grammar, never a second value checker.
 seam: `policy.scan_keys` — reuse for any walk of a parsed policy document to its graded keys and the
 catalogue rows naming them; extend via the row matcher `read_catalogue_row`, never a joined-string compare.
 
-seam: `policy.resolve` — reuse for any read of a policy key's value, at the landed revision or a
+seam: `tools/policy/policy.py#resolve` — reuse for any read of a policy key's value, at the landed revision or a
 named one, parsed and never sourced; extend via a step named in `RESOLUTION_ORDER`, never a second
 order, a second reader or a working-tree read.
 
-seam: `policy.validate` — reuse for any verdict on a whole policy file's text, problems with their
+seam: `tools/policy/policy.py#validate` — reuse for any verdict on a whole policy file's text, problems with their
 lines; extend via `check_value` for a value rule, never a second judge, and never read a default
 for text it refuses (`read_last_valid_value` is the one fallback).
 

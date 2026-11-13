@@ -3978,13 +3978,14 @@ def read_tag_words(here=None) -> tuple:
 def check_tag_name(tag: str, words: set) -> str:
     """The rule `tag` breaks, or "": each segment after the namespace held to the segment shape and graded
     by `check_convention` against kebab, a VIOLATION refused and an AMBIGUOUS one (`0`) passed, and a
-    first segment that is a namespace word refused, as the core's shape check does."""
+    first segment that is a namespace word refused in a name of two or more segments, as the core's shape
+    check does."""
     head = tag.split("#")[0]
     _ns, _, rest = head.partition(".")
     segs = rest.split(".") if rest else []
     if not segs:
         return "no name after the namespace"
-    if segs[0] in words:
+    if len(segs) > 1 and segs[0] in words:
         return f"first segment '{segs[0]}' is a namespace word"
     for seg in segs:
         if not TAG_SEG_RE.fullmatch(seg):
@@ -4029,7 +4030,7 @@ def run_suggest_tag(name: str, ns: str) -> int:
     tag = f"{ns}.{rest}"
     why = check_tag_name(tag, words)
     if not why:
-        print(f"OK — {tag} satisfies kebab in every segment and opens with no namespace word")
+        print(f"OK — {tag} satisfies kebab in every segment and breaks no first-segment rule")
         return 0
     fixed = ".".join(render_convention(s, "kebab") or s for s in rest.split("."))
     if fixed != rest and not check_tag_name(f"{ns}.{fixed}", words):

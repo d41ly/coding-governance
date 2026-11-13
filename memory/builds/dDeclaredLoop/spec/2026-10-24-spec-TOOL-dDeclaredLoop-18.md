@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-18 — the `step`, `item`, `policy` and `command` tag namespaces, with their extractors
 
-**Status:** INPROGRESS · rev-5 · 2026-11-13 · node d · Tier-2 · base ed497191 · streams tooling · order 1 · advances TOOL-dDeclaredLoop-35
+**Status:** CLOSED · rev-5 · 2026-11-13 · node d · Tier-2 · base ed497191 · streams tooling · order 1 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0103@2d82c817 whole
 **Carries:** node:tag-namespace.step
@@ -17,6 +17,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-25-build-TOOL-dDeclaredLoop-18-deviation-181.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-18-deviation-181.md) | deviation | — |
 | [2026-11-05-build-TOOL-dDeclaredLoop-18-deviation-182.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-18-deviation-182.md) | deviation | — |
+| [2026-11-13-build-TOOL-dDeclaredLoop-18-1-acceptance-ledger.md](../build/2026-11-13-build-TOOL-dDeclaredLoop-18-1-acceptance-ledger.md) | journal | — |
 | [2026-11-13-build-TOOL-dDeclaredLoop-18-1-builder-return.md](../build/2026-11-13-build-TOOL-dDeclaredLoop-18-1-builder-return.md) | journal | — |
 | [2026-11-13-build-TOOL-dDeclaredLoop-18-2-builder-return.md](../build/2026-11-13-build-TOOL-dDeclaredLoop-18-2-builder-return.md) | journal | — |
 | [2026-11-13-build-TOOL-dDeclaredLoop-18-3-builder-return.md](../build/2026-11-13-build-TOOL-dDeclaredLoop-18-3-builder-return.md) | journal | — |

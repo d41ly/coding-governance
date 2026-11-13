@@ -16,6 +16,9 @@ value answers raises `PolicyRefused`.
 
 `read_tag_policy(root, rev)` reads every tag-valued key's members in process through the policy kit's
 mirror render, the row checks' policy walk (PLAY-dOrderedCharter-36 S4).
+
+`read_declared_keys(keys, root, rev)` answers which of `keys` a catalogue row matches, in process and
+reading no value: the tag index's family join (TOOL-dDeclaredLoop-18 S5).
 """
 from __future__ import annotations
 
@@ -152,4 +155,29 @@ def read_tag_policy(root, rev: str = "HEAD") -> dict:
                 out[key] = [str(v) for v in value] if isinstance(value, list) else [str(value)]
     except policy.Refusal as exc:
         raise PolicyRefused(key, str(exc)) from None
+    return out
+
+
+def read_declared_keys(keys, root, rev: str = "HEAD") -> set:
+    """-> the keys of `keys` a catalogue row matches at `rev`: `read_tag_policy`'s row walk without the
+    value, so a key whose row carries a derived default is declared (TOOL-dDeclaredLoop-18 S5). The
+    policy kit's `read_catalogue_row` is the one matcher; a key it refuses, or that is no key, is left
+    out and the walk goes on. No kit, or a Refusal of the revision read, raises `PolicyRefused`."""
+    what = f"the catalogue rows at {rev}"
+    try:
+        load_policy_kit()
+    except LookupError as exc:
+        raise PolicyRefused(what, f"no policy kit found: {exc}") from None
+    import policy
+    try:
+        rows = policy.read_revision(str(root), rev)["rows"]
+    except policy.Refusal as exc:
+        raise PolicyRefused(what, str(exc)) from None
+    out = set()
+    for key in keys:
+        try:
+            policy.read_catalogue_row(policy.parse_key(key), rows)
+        except policy.Refusal:
+            continue
+        out.add(key)
     return out

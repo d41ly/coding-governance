@@ -305,7 +305,7 @@ UNIT_EXTRACTORS = ("instruction_units:extract_unit", "instruction_units:extract_
 
 #: the one table-to-key map both TOML row readers read: a table absent here keys its rows on `tag`
 #: (PLAY-dOrderedCharter-40 S4, its section 8 F4)
-ROW_TAG_KEYS = {"reference": "registry"}
+ROW_TAG_KEYS = {"reference": "registry", "key": "name", "command": "verb"}
 
 
 def read_toml_tags(text, table):
@@ -348,6 +348,13 @@ def derive_tag_rows(text, table):
 
 def _read_kit_file(ctx, path, name):
     return path == f"{ctx['kit']}/{name}"
+
+
+def _read_tool_file(ctx, path, kit, name):
+    """Whether `path` is `<kit>/<name>` under the tool root, the parent of the registry's kit directory, as
+    `check_namespace_purpose` derives it; a root install's `.` adds no segment."""
+    troot = pathlib.PurePosixPath(ctx["kit"]).parent.as_posix()
+    return path == resolve_prefix_token(f"{{prefix}}/{kit}/{name}", troot)
 
 
 def extract_reader(ctx, path, text=None):
@@ -420,6 +427,57 @@ def extract_kit(ctx, path, text=None):
     lines = text.splitlines()
     n = next((i for i, ln in enumerate(lines, 1) if re.match(r"\s*id\s*=", ln)), 1)
     return [(f"kit.{kid}", "tag", n, n, lines[n - 1] if lines else "")]
+
+
+def extract_step(ctx, path, text=None):
+    """The `step` namespace: the `tag` of each `[[step]]` row of the loop definition, `loop/loop.toml` under
+    the tool root (TOOL-dDeclaredLoop-18 S2)."""
+    if text is None:
+        return "" if _read_tool_file(ctx, path, "loop", "loop.toml") else None
+    return derive_tag_rows(text, "step")
+
+
+def extract_item(ctx, path, text=None):
+    """The `item` namespace: the `tag` of each `[[item]]` row of the loop definition (TOOL-dDeclaredLoop-18 S2)."""
+    if text is None:
+        return "" if _read_tool_file(ctx, path, "loop", "loop.toml") else None
+    return derive_tag_rows(text, "item")
+
+
+def extract_policy(ctx, path, text=None):
+    """The `policy` namespace: `policy.<name>` for each `[[key]]` row of the policy catalogue,
+    `policy/catalogue.toml` under the tool root, whose `name` is all literal segments. A name carrying a
+    `<word>` or `*` segment is no member: its literal prefix, the segments before the first placeholder,
+    yields one `family` row at the first row carrying it, which `derive_family_tags` reads; a name that
+    opens with a placeholder yields nothing (TOOL-dDeclaredLoop-18 S3)."""
+    if text is None:
+        return "" if _read_tool_file(ctx, path, "policy", "catalogue.toml") else None
+    lines = text.splitlines()
+    rows, seen = [], set()
+    for name, kind, n, end, span in derive_tag_rows(text, "key"):
+        segs = name.split(".")
+        cut = next((i for i, s in enumerate(segs) if s == "*" or (s.startswith("<") and s.endswith(">"))), None)
+        if cut is None:
+            rows.append((f"policy.{name}", kind, n, end, span))
+        elif cut and (prefix := ".".join(segs[:cut])) not in seen:
+            seen.add(prefix)
+            rows.append((f"policy.{prefix}", "family", n, n, lines[n - 1]))
+    return rows
+
+
+def extract_command(ctx, path, text=None):
+    """The `command` namespace: `command.<id>.<verb>` for each `[[command]]` row of a kit descriptor
+    `extract_kit` reads, `<id>` the descriptor's top-level `id`; a descriptor with no string `id` yields
+    nothing (TOOL-dDeclaredLoop-18 S4)."""
+    if text is None:
+        return extract_kit(ctx, path)
+    try:
+        kid = tomllib.loads(text).get("id")
+    except tomllib.TOMLDecodeError:
+        return []
+    if not isinstance(kid, str) or not kid:
+        return []
+    return [(f"command.{kid}.{verb}", *rest) for verb, *rest in derive_tag_rows(text, "command")]
 
 
 CODE_SPAN_RE = re.compile(r"(`+)(.+?)(?<!`)\1(?!`)")
@@ -936,13 +994,41 @@ def check_unclosed(con, ctx) -> tuple[list, list]:
     return reds, lines
 
 
-def check_resolves(con, ctx, bare_mode, armed, file_names=None) -> tuple[list, dict]:
+def derive_family_tags(con, ctx) -> tuple[set, list]:
+    """The family join (TOOL-dDeclaredLoop-18 S5): the graded citations under a `family` row that a
+    catalogue row declares, and the join's one line. A candidate is a graded span with no `#`, no defining
+    row, and a family tag as its dot-prefix; `policy_value.read_declared_keys` answers which of them the
+    policy kit's own matcher finds a row for. No family row, or no candidate, reads no policy. A refused
+    read declares nothing and its line carries the reader's words. What this does not check: what a
+    placeholder stands for, so any key the matcher accepts is declared. -> (tags, lines)."""
+    families = {t for t, *_ in read_rows(con, ("family",))}
+    if not families:
+        return set(), []
+    defined = read_defined(con)
+    graded, _records = read_population(con, ctx, namespaces=sorted({f.split(".")[0] for f in families}))
+    cited = sorted({t for t, *_ in graded if "#" not in t and t not in defined
+                    and any(t.startswith(f + ".") for f in families)})
+    tags, refused = set(), ""
+    if cited:
+        from policy_value import PolicyRefused, read_declared_keys
+        try:
+            keys = read_declared_keys([t.split(".", 1)[1] for t in cited], ctx["root"], "HEAD")
+            tags = {t for t in cited if t.split(".", 1)[1] in keys}
+        except PolicyRefused as exc:
+            refused = f" · refused: {exc.line}"
+    return tags, [f"tags: join policy · families · {len(families)} families, {len(cited)} cited under one, "
+                  f"{len(tags)} declared by the catalogue{refused}"]
+
+
+def check_resolves(con, ctx, bare_mode, armed, file_names=None, *, family=()) -> tuple[list, dict]:
     """S7 `resolves`: a graded citation into an armed namespace that resolves to no row is red; one into
     an unarmed namespace, or under `<MEMORY_ROOT>/builds/`, is counted and never graded. A retired tag
     resolves here: whether citing it is red is the `retired` arm's question. A span naming no row that is
     the base name of a served path is a file name, counted and never red (PLAY-dOrderedCharter-10 §8 F3).
-    Bare references read as `bare_mode` says (`charter-only`, `unique`, `never`)."""
+    Bare references read as `bare_mode` says (`charter-only`, `unique`, `never`). `family`, the tags
+    `derive_family_tags` returns, name a row for the `names no row` test alone."""
     defined = read_defined(con)
+    declared = defined | set(family)
     if file_names is None:
         file_names = read_view_file_names(con)
     tails = {t.split(".", 1)[1] for t in defined if "#" not in t and "." in t}
@@ -956,11 +1042,11 @@ def check_resolves(con, ctx, bare_mode, armed, file_names=None) -> tuple[list, d
             if not armed[ns]:
                 counts["unarmed"][ns] = counts["unarmed"].get(ns, 0) + 1
                 continue
-            if text not in defined and text in file_names:
+            if text not in declared and text in file_names:
                 counts["file_names"] += 1
                 continue
             counts["graded"] += 1
-            if text not in defined:
+            if text not in declared:
                 counts["unresolved"] += 1
                 reds.append(f"tags: {path}:{line} · unresolved · `{text}` names no row")
             continue
@@ -1078,20 +1164,20 @@ def derive_tag_fault(head: str, words) -> str | None:
         return f"segment '{bad or ''}' is outside {SEG}"
     if len(head.encode("utf-8")) > TAG_MAX_BYTES:
         return f"over {TAG_MAX_BYTES} bytes ({len(head.encode('utf-8'))})"
-    if segs[0] in words:
+    if len(segs) > 1 and segs[0] in words:  # a one-segment name's bare form is no citation (TOOL-dDeclaredLoop-18 S10)
         return f"first segment '{segs[0]}' is a namespace word"
     return None
 
 
 def check_tag_shape(con, ctx) -> tuple[list, list]:
-    """S3, the shape check, over every defining row and every unit row's selector value: each graded
-    before any `#<seg>`, against the registry's words, a word outside `seg` a red naming its row and
-    never a word. -> (reds, the tags graded)."""
+    """S3, the shape check, over every defining row, every unit row's selector value and every `family`
+    prefix: each graded before any `#<seg>`, against the registry's words, a word outside `seg` a red
+    naming its row and never a word. -> (reds, the tags graded)."""
     words = {r["ns"] for r in ctx["namespaces"]}
     reds = [f"tags: {ctx['registry']} · shape · namespace row '{ns}' is outside seg, so no tag is graded "
             f"against it" for ns in ctx["malformed"]]
     graded = []
-    for tag, path, line, *_ in read_rows(con, DEFINE_KINDS + ("selector",)):
+    for tag, path, line, *_ in read_rows(con, DEFINE_KINDS + ("selector", "family")):
         head = tag.split("#")[0]
         reason = derive_tag_fault(head, words)
         if reason:
@@ -1100,14 +1186,15 @@ def check_tag_shape(con, ctx) -> tuple[list, list]:
     return reds, graded
 
 
-def check_namespace_joins(con, ctx, file_names=None, *, every) -> tuple[list, list]:
+def check_namespace_joins(con, ctx, file_names=None, *, every, family=()) -> tuple[list, list]:
     """S4, each namespace joined both ways through `compute_coverage`: every graded citation into it is a
     member (a retired one included, the `retired` arm's question), file names aside; and, for a `selects`
     namespace whose members are not units, every member selects a unit, graded once some unit's `scope`
     names a tag of the namespace (PLAY-dOrderedCharter-75). An empty population prints `unarmed` and
     grades nothing; a descriptor's unused members are printed, never red. A unit scoped `every`, the
     caller's wildcard tag, is in the set every reader loads, so each declared member selects it
-    (PLAY-dOrderedCharter-88). -> (reds, lines)."""
+    (PLAY-dOrderedCharter-88). `family`, the tags `derive_family_tags` returns, are members of their
+    namespace for the citation direction, in a namespace a defining row already arms. -> (reds, lines)."""
     load_memory_tree()
     from coverage_join import compute_coverage
     if file_names is None:
@@ -1118,6 +1205,9 @@ def check_namespace_joins(con, ctx, file_names=None, *, every) -> tuple[list, li
         members.setdefault(ns, set()).add(tag)
         if kind != "retired" and "#" not in tag:
             declared.setdefault(ns, {}).setdefault(tag, (path, line))
+    for tag in family:
+        if tag.split(".")[0] in members:
+            members[tag.split(".")[0]].add(tag)
     units = [r for r in read_rows(con, ("tag",)) if r[5] in UNIT_EXTRACTORS]
     selected: dict = {}
     for tag, path, line, *_ in read_rows(con, ("selector",)):

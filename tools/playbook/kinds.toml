@@ -7,9 +7,9 @@
 # kind, and `usage`, its factory command or how a member joins its population, which help/reference/kinds.md
 # renders (PLAY-dOrderedCharter-37). A kind whose factory or
 # gate has not landed carries "" there and is a `kind` row of core-pending.txt naming its owner.
-# `python <prefix>/playbook/core.py kinds` grades the contract. A kind's name is never a namespace word: where a
-# kind's members form a namespace, its name puts a qualifier before that word, naming where the population lives,
-# and the `<kind>` that `core.py new` takes is that name.
+# `python <prefix>/playbook/core.py kinds` grades the contract. A kind's one-segment name may be a namespace word, as
+# the `item` and `command` kinds are: the grammar refuses a word only as the first of two or more segments
+# (TOOL-dDeclaredLoop-18 S10). The `<kind>` that `core.py new` takes is still the name.
 
 [[kind]]
 tag = "kind.tool-kit"

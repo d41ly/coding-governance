@@ -9848,6 +9848,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "derive_family_tags",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "derive_first_bound",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -12308,6 +12313,11 @@
       "file": "tools/workflows/replay_scorer.py"
     },
     {
+      "id": "extract_command",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "extract_conf_keys",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
@@ -12388,6 +12398,11 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "extract_item",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "extract_jsx_defs",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -12456,6 +12471,11 @@
       "id": "extract_plan_writes",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "extract_policy",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "extract_practice",
@@ -12546,6 +12566,11 @@
       "id": "extract_stated_count",
       "kind": "function",
       "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "extract_step",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "extract_subject_pins",
@@ -17811,6 +17836,11 @@
       "id": "read_declared_keys",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "read_declared_keys",
+      "kind": "function",
+      "file": "tools/playbook/policy_value.py"
     },
     {
       "id": "read_declared_points",

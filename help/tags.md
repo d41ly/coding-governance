@@ -2,7 +2,7 @@
 
 **What it is.** A tag names one thing in the repository: `doc.build-method` is the build method
 guide, `doc.build-method#m5-recall-and-reuse` its `## M5` section. A tag is `<ns>.<seg>(.<seg>)*`,
-lower-case, at most 64 bytes, and its namespace is a row of `tools/playbook/namespaces.toml`. Ten
+lower-case, at most 64 bytes, and its namespace is a row of `tools/playbook/namespaces.toml`. Fourteen
 namespaces are registered today, each read from the file that declares its members:
 
 | Namespace | Its members come from |
@@ -17,10 +17,21 @@ namespaces are registered today, each read from the file that declares its membe
 | `kind` | `tools/playbook/kinds.toml` |
 | `kit` | the `id` of each `kit.toml` and `*.kit.toml` descriptor |
 | `repo` | the units of `.governance/instructions.toml` |
+| `step` | each `[[step]]` row's `tag` in the loop definition, the loop kit's `loop.toml`, once that kit lands |
+| `item` | each `[[item]]` row's `tag` in the same file |
+| `policy` | each `[[key]]` row of `tools/policy/catalogue.toml` whose name is all literal segments, as `policy.<name>` |
+| `command` | each `[[command]]` row, `verb` and `run`, of a kit descriptor, as `command.<kit id>.<verb>` |
 
-A namespace whose file declares nothing yet prints as `unarmed`, and nothing in it is graded. A tag in
-a namespace no row registers, such as `step.build`, is red: `step`, `item` and `policy` join when
-dDeclaredLoop registers them, `role` with dBoundRoles and `record` with dTotalRecall.
+A namespace whose file declares nothing yet prints as `unarmed`, and nothing in it is graded: `step`
+and `item` until the loop definition lands, `command` until a descriptor holds a `[[command]]` row.
+`policy` is graded today. A tag in a namespace no row registers is red: `role` joins when dBoundRoles
+registers it and `record` with dTotalRecall.
+
+A catalogue key whose name carries a placeholder segment, such as `review.<stage>` or `budgets.*`, is
+not a tag. Its literal prefix is a family: a citation under it, such as `policy.review.<a stage>`, is
+declared when the policy kit's catalogue has a row matching the key, and `check` prints the count on
+its `join policy · families` line. The prefix alone is no tag, and what the placeholder stands for is
+not checked.
 
 The resolver is `tools/playbook/gov_tag.py`, which stands in for `gov tag`. It reads a derived index,
 `<git-common-dir>/gov/index-s<n>.db`, `<n>` the index's format number: one SQLite file per machine
@@ -82,8 +93,9 @@ tag-shaped word that is not a citation, quote it another way, with doubled backt
 - **owned** — a tag minted in a core layer's namespace by a kit whose layer is optional or an
   expansion.
 - **shape** — a defined tag, or a value a unit's `scope` selects, in an unregistered namespace, with a
-  segment outside `[a-z0-9][a-z0-9-]*`, longer than 64 bytes before any `#`, or whose first segment is
-  itself a namespace word, such as `` `practice.repo.x` ``.
+  segment outside `[a-z0-9][a-z0-9-]*`, longer than 64 bytes before any `#`, or with a name of two or more segments
+  whose first is itself a namespace word, such as `` `practice.repo.x` ``. A one-segment name may be a
+  namespace word, as the `item` kind's is.
 - **join** — a citation that is no member of its namespace, such as `` `layer.nowhere` ``; and a
   `reader` or `practice` member no unit selects, once some unit's `scope` names a tag of its namespace.
   Until then the namespace prints `selects · unarmed`. A unit scoped `reader.every` is selected by
@@ -204,7 +216,7 @@ id pinned to a hash (`kit.y@1a2b3c4d`). The set, as `--list` prints it:
 `any` is every registered namespace and every native id. `selects` is every namespace whose row in
 `namespaces.toml` has `role = "selects"`, so a selector namespace a later build registers is an
 `instructs` target without a change to `edges.toml`. A word no row registers yet, such as `feature`,
-`item`, `commit` or `session`, admits nothing until its build registers it, and an id under such a
+`commit` or `session`, admits nothing until its build registers it, and an id under such a
 word is counted `unarmed`.
 
 **Native ids.** An id that is no tag belongs to a native class, one `[[native]]` row of

@@ -281,17 +281,28 @@ function in `tag_index.py` and printed `unarmed` while that source declares noth
 `kind` (`kinds.toml`), `kit` (the top-level `id` of every `kit.toml` and `*.kit.toml`, in
 `layer.distribution`) and `repo` (`.governance/instructions.toml`'s units). `check` adds the shape check
 (every defined tag and selector value in a registered namespace, every segment in shape, at most 64
-bytes before any `#`, no first segment that is a namespace word, a registry word outside the segment
-shape a red and never a word), the joins (every citation a member; every `reader` and `practice` member
+bytes before any `#`, no name of two or more segments whose first is a namespace word, a registry word
+outside the segment shape a red and never a word), the joins (every citation a member; every `reader` and `practice` member
 selecting a unit once some unit's `scope` names a tag of its namespace, a unit scoped `reader.every`
 selected by every reader since it is in the set every reader loads) and the name-check slot, `point.instruction.name-check`, where the
 lexicon's `--tags` grades the same names. A cited span that is the base name of a tracked file is counted
-as a file name, never red. The later namespaces are not registered, so their tags red until the build
-that arms each adds its row:
+as a file name, never red.
+
+TOOL-dDeclaredLoop-18 registers four more, their extractors beside the eight: `step` and `item` (each
+`[[step]]` and `[[item]]` row's `tag` in the loop definition, `loop/loop.toml` under the tool root, both
+`selects` and `unarmed` until that file lands), `policy` (`policy.<name>` for each `[[key]]` row of the
+policy kit's `catalogue.toml` whose name is all literal segments) and `command` (`command.<id>.<verb>` for
+each `[[command]]` row, `verb` and `run`, of a kit descriptor, `unarmed` until a descriptor holds one). A
+catalogue name carrying a `<word>` or `*` segment is no member: its literal prefix is one `family` row,
+shape-graded, and a citation under it is declared where the policy kit's own row matcher finds a row for
+the key, read in process through `policy_value.read_declared_keys`; `check` prints the count on its
+`join policy · families` line, and a refused policy read declares nothing. What the family join does not
+check: what a placeholder stands for, so `policy.review.<anything>` is declared by `review.<stage>`.
+
+The later namespaces are not registered, so their tags red until the build that arms each adds its row:
 
 | Namespace | Armed by |
 |---|---|
-| `step`, `item`, `policy` | dDeclaredLoop |
 | `role` | dBoundRoles |
 | `record` | dTotalRecall |
 

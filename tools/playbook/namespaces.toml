@@ -111,6 +111,46 @@ role = "selects"
 purpose-source = ".governance/instructions.toml"
 join-armed-by = "dOrderedCharter"
 
+[[namespace]]
+ns = "step"
+owner = "dDeclaredLoop"
+layer = "layer.flow"
+source = "each [[step]] row's tag in {prefix}/loop/loop.toml"
+extractor = "tag_index:extract_step"
+role = "selects"
+purpose-source = "{prefix}/loop/loop.toml"
+join-armed-by = "dDeclaredLoop"
+
+[[namespace]]
+ns = "item"
+owner = "dDeclaredLoop"
+layer = "layer.flow"
+source = "each [[item]] row's tag in {prefix}/loop/loop.toml"
+extractor = "tag_index:extract_item"
+role = "selects"
+purpose-source = "{prefix}/loop/loop.toml"
+join-armed-by = "dDeclaredLoop"
+
+[[namespace]]
+ns = "policy"
+owner = "dDeclaredLoop"
+layer = "layer.instruction"
+source = "each [[key]] row's name in {prefix}/policy/catalogue.toml, policy.<name> each, and one family row per literal prefix of the names carrying a placeholder segment"
+extractor = "tag_index:extract_policy"
+role = "describes"
+purpose-source = "{prefix}/policy/catalogue.toml"
+join-armed-by = "dDeclaredLoop"
+
+[[namespace]]
+ns = "command"
+owner = "dDeclaredLoop"
+layer = "layer.distribution"
+source = "each [[command]] row's verb in a tracked kit.toml or *.kit.toml descriptor, command.<id>.<verb> each"
+extractor = "tag_index:extract_command"
+role = "describes"
+purpose-source = "{prefix}/govkit/registry.toml"
+join-armed-by = "dDeclaredLoop"
+
 # The native-id classes (PLAY-dOrderedCharter-28 S2), read by edge_grammar.read_native_classes: one [[native]]
 # row per class, `class`, the word an edge row's `from` or `to` names it by; `owner`, the build that registered
 # it; `pattern`, the `<module>:<name>` that compiles its ids, never a second regex; `resolver`, what prints its

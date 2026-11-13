@@ -226,8 +226,10 @@ def run_check(con, root, ctx, kit_rel, *, sets, base, as_json, state) -> int:
                             lambda: read_policy_value("tags.retired-cites", root)[0][0])
     file_names = ti.read_view_file_names(con)
     reds, shaped = ti.check_tag_shape(con, ctx)
-    j_reds, j_lines = ti.check_namespace_joins(con, ctx, file_names, every=instruction_units.EVERY)
-    s_reds, c = ti.check_resolves(con, ctx, bare_mode, armed, file_names)
+    family, f_lines = ti.derive_family_tags(con, ctx)  # TOOL-dDeclaredLoop-18 S5: one derivation, two readers
+    j_reds, j_lines = ti.check_namespace_joins(con, ctx, file_names, every=instruction_units.EVERY, family=family)
+    j_lines += f_lines
+    s_reds, c = ti.check_resolves(con, ctx, bare_mode, armed, file_names, family=family)
     reds += j_reds + s_reds
     base_spans, base_sections, base_why = None, None, ""
     has_retired = con.execute(ti.VIEW_ROWS + " WHERE p.kind='retired' LIMIT 1").fetchone()
@@ -393,7 +395,9 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "retired-section-aliased", "retired-section-reminted", "reference-row", "reference-no-h1",
           "foreign-native", "held-native", "positional-no-tree", "positional-absent", "dirty-revert",
           "worktree-recreate", "helper-edit", "held-open", "extractor-removed", "worktree-spelling",
-          "positional-spec-revbump", "positional-bulk-move", "queued-writers")
+          "positional-spec-revbump", "positional-bulk-move", "queued-writers",
+          "policy-ns-word", "policy-catalogue", "policy-family", "loop-rows", "loop-bad-seg", "command-rows",
+          "ns-word-leaf")
 #: PLAY-dOrderedCharter-78 S4's two plants: a `family-id` native class over the fixture's own id grammar,
 #: owned by a build the chain registry lacks, and by the one it holds
 NATIVE_OWNERS = {"foreign-native": "dGhost", "held-native": "fixture"}
@@ -422,6 +426,9 @@ def derive_fixture_row(ns, extractor, role="describes", layer="layer.instruction
             f'extractor = "{extractor}"\nrole = "{role}"\npurpose-source = "{purpose}"\njoin-armed-by = "fixture"\n')
 
 
+#: TOOL-dDeclaredLoop-18 S6: the policy catalogue and the loop definition as a fixture tree holds them
+FIXTURE_CATALOGUE = instruction_units.derive_tool_rel("policy", "catalogue.toml")
+FIXTURE_LOOP = instruction_units.derive_tool_rel("loop", "loop.toml")
 #: PLAY-dOrderedCharter-10 S8: each plant's registry rows and the files it adds to the base fixture
 SHAPE_PLANTS = {
     "bad-ns": (FIXTURE_UNIT_ROW, {"tools/corekit/instructions.toml": '[[unit]]\ntag = "step.build"\n'}),
@@ -457,6 +464,25 @@ SHAPE_PLANTS = {
     "reference-row": ("", {f"{FIXTURE_KIT}/references.toml": REFERENCE_ROW}),
     "reference-no-h1": ("", {f"{FIXTURE_KIT}/references.toml": REFERENCE_ROW.replace(
         'h1 = "The fixture\'s reference page"\n', "")}),
+    # TOOL-dDeclaredLoop-18 S6: the four namespaces' plants, each sibling kit's file at this install's layout
+    "policy-ns-word": (derive_fixture_row("policy", "tag_index:extract_policy")
+                       + derive_fixture_row("step", "tag_index:extract_step", "selects"),
+                       {FIXTURE_CATALOGUE: '[[key]]\nname = "step.timeout"\n'}),
+    "policy-catalogue": (derive_fixture_row("policy", "tag_index:extract_policy"), {}),  # the file: build_tags_fixture
+    "policy-family": (derive_fixture_row("policy", "tag_index:extract_policy"), {
+        FIXTURE_CATALOGUE: '[[key]]\nname = "tags.slice"\n\n[[key]]\nname = "review.<stage>"\n',
+        "memory/guides/ALPHA.md": "+\nsee `policy.review.build` and `policy.review.build.nope`\n"}),
+    "loop-rows": (derive_fixture_row("step", "tag_index:extract_step", "selects")
+                  + derive_fixture_row("item", "tag_index:extract_item", "selects"),
+                  {FIXTURE_LOOP: '[[step]]\ntag = "step.plan"\n\n[[item]]\ntag = "item.plan.exit"\n'}),
+    "loop-bad-seg": (derive_fixture_row("step", "tag_index:extract_step", "selects"),
+                     {FIXTURE_LOOP: '[[step]]\ntag = "step.Plan"\n'}),
+    "command-rows": (derive_fixture_row("command", "tag_index:extract_command"), {
+        "tools/corekit/kit.toml": '+\n[[command]]\nverb = "new"\nrun = "core.py new"\n',
+        "memory/guides/ALPHA.md": "+\nsee `command.corekit.new` and `command.corekit.old`\n"}),
+    # S10: the `ns-word` plant's name cut to one segment, legal in both twins
+    "ns-word-leaf": (derive_fixture_row("repo", "fixture_tags:extract_declared"),
+                     {"tools/corekit/core.tags": "+practice.repo\n"}),
 }
 #: PLAY-dOrderedCharter-22's registry plants: each edits the base registry's first row, `doc`'s
 PURPOSE_PLANTS = {
@@ -607,6 +633,10 @@ def build_tags_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
         files[f"{kit}/namespaces.toml"] += rows
         for rel, text in extra.items():  # a leading `+` appends to the base file
             files[rel] = files[rel] + text[1:] if text.startswith("+") else text
+    if plant == "policy-catalogue":  # TOOL-dDeclaredLoop-18: the installed policy kit's catalogue, byte for byte
+        from policy_value import resolve_kit_dir
+        files[FIXTURE_CATALOGUE] = (resolve_kit_dir("policy", "catalogue.toml", KIT_DIR)
+                                    / "catalogue.toml").read_bytes().decode("utf-8")
     write_commit(root, files, "base")
     if plant in CHAIN_PLANTS:
         write_chain_fixture(root, plant)
@@ -1118,6 +1148,26 @@ def run_plant(root, top, plant, sets) -> int:
         checked = run_verb(root, "check", None, sets=sets)
         say(f"show: rc={rc}, check: rc={checked}")
         return 1 if rc or checked else 0
+    if plant == "loop-rows":  # TOOL-dDeclaredLoop-18: each loop tag resolves to its own table's row, the check green
+        rcs = [run_verb(root, "where", t, sets=sets) for t in ("step.plan", "item.plan.exit")]
+        checked = run_verb(root, "check", None, sets=sets)
+        say(f"where: rc={rcs[0]} {rcs[1]}, check: rc={checked}")
+        return 1 if any(rcs) or checked else 0
+    if plant == "policy-catalogue":  # the index's members and families against this plant's own parse of the bytes
+        import tomllib
+        checked = run_verb(root, "check", None, sets=sets)
+        names = [r["name"] for r in tomllib.loads((root / FIXTURE_CATALOGUE).read_text(encoding="utf-8"))["key"]]
+        held = [n for n in names if "<" in n or "*" in n]
+        literal, prefixes = len(names) - len(held), len({re.split(r"\.(?:<|\*)", n)[0] for n in held})
+        con = ti.load_index(root)
+        try:
+            ti.load_view(con, root, ti.derive_context(root, root / FIXTURE_KIT / "namespaces.toml"))
+            members = len(ti.read_rows(con, ("tag",), like="policy.%"))
+            families = len(ti.read_rows(con, ("family",), like="policy.%"))
+        finally:
+            con.close()
+        say(f"{members} members of {literal} literal names, {families} families of {prefixes} prefixes")
+        return 0 if members == literal > 0 and families == prefixes > 0 and not checked else 1
     if plant in ("pending-source", "new-no-purpose"):  # PLAY-dOrderedCharter-22: the source lands, the row gains a purpose
         rc = run_verb(root, "check", None, sets=sets)
         if plant == "pending-source":
