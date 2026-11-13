@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-13
 streams: tooling
 roster: TOOL
-ids: TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-7 TOOL-aClearedLedger-8 TOOL-aClearedLedger-9 TOOL-aClearedLedger-10
+ids: TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-7 TOOL-aClearedLedger-8 TOOL-aClearedLedger-9 TOOL-aClearedLedger-10 TOOL-aClearedLedger-11
 authorized-by: slug
 asks: TOOL-aNimbleMend-16..24
 ---
@@ -67,11 +67,12 @@ None.
 | 7 | `TOOL-aClearedLedger-7` | the policy fixtures leg prints no wrong assertion: the guard census, the reader refusal and the recall export cap |
 | 8 | `TOOL-aClearedLedger-9` | what a path-less `Red-fix:` commit owes, stated by the door or the join, with a plant case |
 | 9 | `TOOL-aClearedLedger-10` | four suite budget rows re-measured alone on a quiet node, with the ceilings and the pass legs re-derived |
+| 10 | `TOOL-aClearedLedger-11` | the closing review's nine medium and low findings as one batch: the gate guard's row D6 and the spec checker's bar join read one command alike, and each new branch has an arm that can fail |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 9 unit(s) · node a · opened 2026-11-13 · streams tooling
-ids TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-7 TOOL-aClearedLedger-8 TOOL-aClearedLedger-9 TOOL-aClearedLedger-10
+**Build status:** SPECCED · 10 unit(s) · node a · opened 2026-11-13 · streams tooling
+ids TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-7 TOOL-aClearedLedger-8 TOOL-aClearedLedger-9 TOOL-aClearedLedger-10 TOOL-aClearedLedger-11
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -85,15 +86,16 @@ ids TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClea
 | [TOOL-aClearedLedger-7 — the policy fixtures leg prints no wrong assertion: fourteen guard paths, the recall plant's grammar file, and check 8 saying the reader's refusal](spec/2026-11-13-spec-TOOL-aClearedLedger-7.md) | 7 | 1 | CLOSED | rev-2 | 2026-11-13 |
 | [TOOL-aClearedLedger-9 — a path-less `Red-fix:` commit owes no record: the join holds it out by name and the door says why it refuses](spec/2026-11-13-spec-TOOL-aClearedLedger-9.md) | 9 | 2 | CLOSED | rev-1 | 2026-11-13 |
 | [TOOL-aClearedLedger-10 — four suite budget rows re-declared from readings taken alone on a quiet node, with the ceiling evidence and the pass legs re-derived](spec/2026-11-13-spec-TOOL-aClearedLedger-10.md) | 10 | 1 | DEFERRED | rev-1 | 2026-11-13 |
+| [TOOL-aClearedLedger-11 — the gate guard's row D6 and the spec checker's bar join read one command alike, and each new branch has an arm that can fail](spec/2026-11-14-spec-TOOL-aClearedLedger-11.md) | 11 | 2 | SPECCED | rev-1 | 2026-11-14 |
 <!-- /gen:build-units -->
 
-Records: 13 bound to this build, across 3 record folder(s).
+Records: 16 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aClearedLedger-1 TOOL-aClearedLedger-10 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-7 TOOL-aClearedLedger-9.
+Ids no `spec-audit` record has ever named: TOOL-aClearedLedger-1 TOOL-aClearedLedger-10 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-7 TOOL-aClearedLedger-9 TOOL-aClearedLedger-11.
 
-Ids whose spec moved past its audited revision: none — 0 of 9 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 10 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -109,6 +111,7 @@ Ids whose spec moved past its audited revision: none — 0 of 9 unit id(s) carry
 | 7 | `TOOL-aClearedLedger-7` | no |
 | 9 | `TOOL-aClearedLedger-9` | no |
 | 10 | `TOOL-aClearedLedger-10` | no |
+| 11 | `TOOL-aClearedLedger-11` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
