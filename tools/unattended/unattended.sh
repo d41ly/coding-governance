@@ -14193,7 +14193,7 @@ check_pass_open() { # grp · unit · run-state file · declared set (space-separ
 # WHAT IT DOES NOT CHECK: a `--no-verify` commit never reaches it, and `Pass: none` is taken at its
 # word. Check 23 still grades both at the close.
 check_commit_message() { # commit message file
-  local msg="$1" f rel="" ref slug trl subj rows r d o u decl graded st p q ok uncov uncovl briefs cmd kd head
+  local msg="$1" f rel="" ref slug trl subj rows r d o u decl graded st p q ok uncov uncovl briefs cmd kd head py
   [ -f "$msg" ] || { fail 49 "--check-commit was given no readable commit message file: ${msg:-(none)}"; return 1; }
   # It runs on EVERY commit, so the candidates are narrowed by one grep for this branch's ref before
   # the holder predicate, which reads the record's facts, confirms each.
@@ -14205,15 +14205,25 @@ check_commit_message() { # commit message file
   done
   [ -n "$rel" ] || return 0
   slug=${rel%/RUN.md}; slug=${slug##*/}
-  # READ AS THE CLOSE READS THEM (closing review r1, M2/L2): `%(trailers:key=Pass)` matches the key in
-  # any case, ids split on any character an id cannot hold, a `none` anywhere attributes the commit to
-  # nothing, and `%s` is the first PARAGRAPH joined, not its first line.
-  trl=$(git interpret-trailers --parse <"$msg" 2>/dev/null | sed -n 's/^[Pp][Aa][Ss][Ss]: *//p' | tr '\n' ' ')
-  trl=${trl//[^A-Za-z0-9-]/ }
-  # CR STRIPPED FIRST: the hook reads the editor's file before git's cleanup, and a CRLF blank line is
-  # `\r`, which is not blank to awk, so the paragraph never ended (closing review r2, M5). One awk and no
-  # `grep` stage: MSYS grep strips CR on its own, which hid this on one node and not on another.
-  subj=$(awk '{ sub(/\r$/, "") } /^#/ { next } NF { p = 1 } p && !NF { exit } p { printf "%s ", $0 }' "$msg")
+  # READ AS THE CLOSE READS THEM (closing review r1, M2/L2), by the kit's one trailer reader
+  # (TOOL-dDeclaredLoop-23 S5): the `message` verb of `commit_trailers.py` beside this script reads the
+  # `Pass:` key in any case with git's own trailer parse, splits ids on any character an id cannot
+  # hold, and takes the subject as the first PARAGRAPH joined, comment lines and CRs dropped, since the
+  # hook reads the editor's file before git's cleanup (closing review r2, M5). It prints ONE line:
+  # `PASSTRAILER <ids>` where the trailer holds a token, no id where a `none` is among them, else the
+  # subject's tokens. NO LAUNCHER, OR A READER THAT FAILS, GRADES NOTHING AND SAYS SO, status 2, never a
+  # pass: an unread message would read as carrying no trailer and naming no unit.
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! trl=$("$py" "$KIT_DIR/commit_trailers.py" message "$msg"); then
+    echo "unattended: --check-commit could not read this message's Pass: trailer, no python launcher resolved or the kit's commit_trailers.py failed, so it graded nothing"
+    return 2
+  fi
+  trl=${trl%$'\r'}; subj=""
+  case "$trl" in
+    PASSTRAILER) trl=none ;;
+    "PASSTRAILER "*) trl=${trl#PASSTRAILER } ;;
+    *) subj=$trl; trl="" ;;
+  esac
   # ONE LINE PER UNIT, `<o|O> <unit> <anchor> <declared paths>`, from the key holding the unit's LAST
   # row (the library's `current`), which is the window check 23 grades a commit made now in: a row at
   # a later anchor is a new pass, graded alone, and an earlier pass's paths do not carry into it

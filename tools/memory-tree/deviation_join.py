@@ -303,14 +303,12 @@ def read_ancestors(parents, sha, cache):
 
 def read_first_passes(commits, units, entries, when):
     """`{unit: sha}`, each unit's first pass (S5): the oldest commit, by committer date, carrying a
-    `Pass:` trailer naming it, or carrying none, naming it in its subject and writing a routed path."""
+    `Pass:` trailer naming it, or carrying none, naming it in its subject and writing a routed path.
+    The ids are the `replace` view of the kit's one trailer reader (TOOL-dDeclaredLoop-23 S5)."""
     first = {}
     for c in commits:
-        if c["trailer"]:
-            names = re.sub(r"[^A-Za-z0-9-]", " ", c["trailer"]).split()
-            named = set() if "none" in names else units.intersection(names)
-        elif any(routed_commits.test_routed_path(p, entries) for p in c["paths"]):
-            named = units.intersection(re.sub(r"[^A-Za-z0-9-]", " ", c["subject"]).split())
+        if c["trailer"] or any(routed_commits.test_routed_path(p, entries) for p in c["paths"]):
+            named = units.intersection(routed_commits.derive_attribution(c, "replace"))
         else:
             named = set()
         for u in named:

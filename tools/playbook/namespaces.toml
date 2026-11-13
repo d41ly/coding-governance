@@ -168,3 +168,9 @@ class = "clause-id"
 owner = "dTrueNorth"
 pattern = "design_lib:_CL"
 resolver = "design_lib:read_design_view"
+
+[[native]]
+class = "commit"
+owner = "dDeclaredLoop"
+pattern = "commit_trailers:SHA_RE"
+resolver = "commit_trailers:--print-commits"

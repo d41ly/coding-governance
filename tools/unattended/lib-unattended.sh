@@ -1062,21 +1062,17 @@ pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEA
   # nothing and its subject is never read; a commit with no trailer keeps the subject match a landed
   # record was graded by. Before this a records commit whose subject named a unit, or a range such as
   # `-1..4`, was taken as that unit's pass.
-  GIT log --reverse --format="%H%x09%s%x1f%(trailers:key=Pass,valueonly,separator=%x20)" "$_pa..$_pto" >"$_pf" 2>/dev/null || :
-  # It reads LINES rather than word-splitting because a subject holds spaces, and the possibly-empty
-  # field is LAST for the reason memory/gotchas/empty-field-collapses-unless-it-is-last.md states.
-  while IFS=$'\t' read -r _pc _psub; do
+  # THE WALK IS THE ONE TRAILER READER'S (TOOL-dDeclaredLoop-23 S5): `read_attribution_tokens` below
+  # prints one tokenised line per commit, `<sha> PASSTRAILER <ids>` for a trailered commit and
+  # `<sha> <subject tokens>` otherwise, with the one token rule applied and a `none` already cleared,
+  # so the unit is matched here as a whole token of the line. A reader that cannot answer says why on
+  # stderr, and that is rc 2 for the reason the scratch-file refusal above gives.
+  read_attribution_tokens --reverse "$_pa..$_pto" >"$_pf" || { rm -f "$_pf"; return 2; }
+  # It reads LINES rather than word-splitting because a subject holds spaces: the sha is the first
+  # word and everything after it is the line's tokens.
+  while read -r _pc _psub; do
     [ -n "$_pc" ] || continue
-    _ptr=${_psub#*$'\x1f'}; [ "$_ptr" = "$_psub" ] && _ptr=""; _psub=${_psub%%$'\x1f'*}
-    if [ -n "$_ptr" ]; then
-      # ONE TOKEN RULE for every trailer reader (closing review r1, M2/L2): ids split on any character
-      # an id cannot hold, so `A, B` names both, and a `none` anywhere attributes the commit to nothing.
-      _ptr=" ${_ptr//[^A-Za-z0-9-]/ } "
-      case "$_ptr" in *" none "*) continue ;; esac
-      case "$_ptr" in *" $_pu "*) ;; *) continue ;; esac
-    else
-      id_in "$_psub" "$_pu" || continue
-    fi
+    case " $_psub " in *" $_pu "*) ;; *) continue ;; esac
     _ptouch=$(GIT diff-tree --no-commit-id --name-only -r "$_pc" 2>/dev/null | grep -vxF -- "$_prel" || true)
     [ -n "$_ptouch" ] || continue
     # EXACT membership against the newline-wrapped set, deliberately not `covers`: a row naming a
@@ -1163,12 +1159,22 @@ check_gen_region_only() { # before object · after object -> 0 when both exist a
 # everywhere: a commit carrying a `Pass:` trailer yields `PASSTRAILER <its ids>` and NOT its subject,
 # so `Pass: none` names no unit; one with no trailer yields its subject's tokens, as before. Tokens
 # are runs of `[A-Za-z0-9-]`, the shape a whole-token `case " $id "` match reads.
+#
+# THE LINES ARE THE KIT'S ONE TRAILER READER'S (TOOL-dDeclaredLoop-23 S5): the `tokens` verb of
+# `commit_trailers.py` beside this library, its `replace` view, run with the launcher the caller's own
+# inline `resolve_python` answers, as `resolve_index_generator` asks it. NO LAUNCHER IS A NAMED
+# REFUSAL, status 2 with nothing printed, never an empty answer: an empty answer reads every unit as
+# unbuilt and looks like a correct one. The reader's own refusal, an install holding no trailer key
+# table say, reaches stderr and is this function's status. The CRs a Windows interpreter ends its
+# lines with are dropped here, and the replace-ref pin `GIT` carries rides the call's environment,
+# since the reader spawns git itself.
 read_attribution_tokens() { # git-log revision arguments -> one tokenised line per commit
-  GIT log --format='%H %s%x1f%(trailers:key=Pass,valueonly,separator=%x20)' "$@" 2>/dev/null \
-    | awk -F '\037' '{ if ($2 != "") { split($1, h, " "); t = $2; gsub(/[^A-Za-z0-9-]/, " ", t)
-                                        if ((" " t " ") ~ / none /) t = ""; print h[1] " PASSTRAILER " t }
-                       else print $1 }' \
-    | tr -c 'A-Za-z0-9\n-' ' '
+  local _rt_py="" _rt_d
+  declare -F resolve_python >/dev/null && _rt_py=$(resolve_python 2>/dev/null) || _rt_py=""
+  [ -n "$_rt_py" ] || { printf '%s\n' 'lib-unattended: read_attribution_tokens found no python launcher, so no commit is attributed' >&2; return 2; }
+  case "${BASH_SOURCE[0]}" in */*) _rt_d=${BASH_SOURCE[0]%/*} ;; *) _rt_d=. ;; esac
+  GIT_NO_REPLACE_OBJECTS=1 "$_rt_py" "$_rt_d/commit_trailers.py" tokens "$@" | tr -d '\r'
+  return "${PIPESTATUS[0]}"
 }
 
 # ------------------------------------------------------------- which commit BUILT this unit, once

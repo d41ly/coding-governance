@@ -216,14 +216,16 @@ id pinned to a hash (`kit.y@1a2b3c4d`). The set, as `--list` prints it:
 `any` is every registered namespace and every native id. `selects` is every namespace whose row in
 `namespaces.toml` has `role = "selects"`, so a selector namespace a later build registers is an
 `instructs` target without a change to `edges.toml`. A word no row registers yet, such as `feature`,
-`commit` or `session`, admits nothing until its build registers it, and an id under such a
+`item` or `session`, admits nothing until its build registers it, and an id under such a
 word is counted `unarmed`.
 
 **Native ids.** An id that is no tag belongs to a native class, one `[[native]]` row of
 `namespaces.toml` naming its `owner`, the `pattern` that compiles it and the `resolver` that lists its
-members. Two are registered: `family-id`, the `PLAY-dOrderedCharter-24` ids, owner dOrderedCharter,
-resolved against the ids a spec defines; and `clause-id`, the `cl-dTrueNorth-0001` clause ids, owner
-dTrueNorth, resolved against the design view. `python tools/playbook/gov_tag.py check` prints each
+members. Three are registered: `family-id`, the `PLAY-dOrderedCharter-24` ids, owner dOrderedCharter,
+resolved against the ids a spec defines; `clause-id`, the `cl-dTrueNorth-0001` clause ids, owner
+dTrueNorth, resolved against the design view; and `commit`, a commit's full forty-digit sha, owner
+dDeclaredLoop, resolved against the commits HEAD reaches, so an abbreviated sha is no member.
+`python tools/playbook/gov_tag.py check` prints each
 class with its owner and its member count. A class whose owner the chain registry does not hold prints
 `tags: native · <class> (owner <owner>) · unarmed: no build of the chain registry` and runs no
 resolver, the same way the `purpose` arm prints such an owner unarmed, so its members are not counted.
@@ -241,6 +243,8 @@ work order's `gov:handoff` marker's `unit=` and `build=` as `serves`; an instruc
 `scope`, `required-by` and `enforced-by`; a code note's `refs=` segment; and a commit's trailers,
 `Pass:`, `Gov-Unit:` and `Gov-Item:` as `serves`, `Gov-Act:` as `made-by`, `Gov-Session:` as
 `runs-in` and `Decided:` as `decides`. The trailer keys are the `[[trailer]]` rows of `edges.toml`. A
+row may carry no `type`: it registers a key that carries a value and no edge, which `Gov-Transition:`,
+`Gov-Policy:` and `Red-fix:` are, so gov's one trailer reader reads it and no edge is read from it. A
 `serves` trailer is read as edges only when every comma-separated target is a well-formed address; a
 value of prose, or `none`, is counted unread and is neither an edge nor a red, and `--check` prints the
 count. A spec's `### Edges` block declares `consumes-from` and `hands-off` between unit ids, whose

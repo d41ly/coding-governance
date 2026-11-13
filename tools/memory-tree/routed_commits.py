@@ -21,8 +21,9 @@ nothing excuses a pushed commit; `ROUTED_COMMIT_WAIVED` is read wherever WHOLE i
 boundary's WHOLE half included, and a listed sha that is not a violation there reds as stale.
 
 ATTRIBUTION is the UNION of the ids among the subject's whole tokens and the ids a `Pass:` trailer
-names; `Pass: none` adds none and keeps the subject's. That deliberately differs from
-`read_attribution_tokens` in the unattended kit, where a trailer REPLACES the subject: that reader
+names; `Pass: none` adds none and keeps the subject's. It is the `union` view of the kit's one trailer
+reader, `commit_trailers.py` (TOOL-dDeclaredLoop-23), and deliberately not its `replace` view, which
+`read_attribution_tokens` in the unattended kit names, where a trailer REPLACES the subject: that reader
 decides which commit is a unit's pass, this leg only whether a commit is attributed to any unit.
 Which spec defines an id is `tree_lib.parse_spec_h1` over every spec at HEAD.
 
@@ -102,6 +103,7 @@ if str(KIT) not in sys.path:
     sys.path.append(str(KIT))
 from tree_lib import (GIT_ENV_LEAKS, RED_FIX_TRAILER, build_git_env, build_spec_path_re, parse_conf,  # noqa: E402
                       parse_leg_names, parse_spec_h1, read_policy_value)
+from commit_trailers import derive_attribution, read_commits  # noqa: E402  the kit's one trailer reader
 
 SAY = "routed-commits"
 #: TOOL-aNimbleMend-10 F1: the most paths under ROUTED_PATHS one `Red-fix:` commit may change.
@@ -264,17 +266,18 @@ def read_routed_commits(repo, rev_args: list) -> list:
     """Every commit in the range, newest first, from ONE log pass (S6): sha, parents, committer date,
     subject, `Pass:` trailer and the paths it touches, renames read as a deletion plus an addition.
     `red_fix` is the list of its `Red-fix:` trailer values (TOOL-aNimbleMend-8 S5), one leg name per
-    trailer line: a leg name holds spaces, commas and parentheses, so a value is its whole line."""
-    fmt = ("%x1e%H%x1f%P%x1f%cI%x1f%s%x1f%(trailers:key=Pass,valueonly,separator=%x20)%x1f"
-           "%(trailers:key=" + RED_FIX_TRAILER + ",valueonly,unfold,separator=%x1d)%x1f")
-    raw = run_git(repo, "log", "-z", "--root", "--no-renames", "--name-only", "--no-color",
-                  f"--format={fmt}", *rev_args, "--").decode("utf-8", "replace")
-    commits = []
-    for rec in raw.split("\x1e")[1:]:
-        sha, parents, date, subject, trailer, red_fix, rest = rec.split("\x1f", 6)
-        commits.append({"sha": sha, "parents": parents.split(), "date": date, "subject": subject,
-                        "trailer": trailer.strip(), "red_fix": [v.strip() for v in red_fix.split("\x1d") if v.strip()],
-                        "paths": [p for p in re.split(r"[\0\n]", rest) if p]})
+    trailer line: a leg name holds spaces, commas and parentheses, so a value is its whole line.
+    The pass is the one trailer reader's, run through this module's pinned, counted runner
+    (TOOL-dDeclaredLoop-23 S5); a key the trailer table does not register, a kit that does not resolve
+    and a stream that ends mid-record are each a Refusal."""
+    try:
+        commits = read_commits(repo, rev_args, ("Pass", RED_FIX_TRAILER), files=True,
+                               run=lambda at, argv: run_git(at, *argv))
+    except (LookupError, ValueError) as exc:
+        raise Refusal(f"the commit log cannot be read: {exc}") from None
+    for c in commits:
+        c["trailer"] = " ".join(c["trailers"]["Pass"]).strip()
+        c["red_fix"] = [v for v in c["trailers"][RED_FIX_TRAILER] if v]
     return commits
 
 
@@ -428,7 +431,7 @@ def check_routed_commits(repo, env) -> tuple:
                 not_routed += 1
             else:
                 graded += 1
-                ids = extract_unit_ids(c["subject"] + " " + c["trailer"], id_re)
+                ids = derive_attribution(c, "union", id_re)
                 pairs = [(i, p) for i in ids for p in id_map.get(i, [])]
                 if not ids and c["red_fix"] and mode == "RANGE" and not lane:
                     lane.append(read_lane_state(repo))
@@ -567,11 +570,12 @@ def read_newest_unit(repo, rev_range: str) -> str:
     tracked = [p for p in run_git(repo, "ls-tree", "-r", "-z", "--name-only", "HEAD").decode("utf-8", "replace").split("\0") if p]
     id_map, _ = load_spec_paths(repo, tracked, memory_root, families)
     id_re = build_id_re(families)
-    raw = run_git(repo, "log", "--no-merges", "--no-color",
-                  "--format=%s%x1f%(trailers:key=Pass,valueonly,separator=%x20)%x1e",
-                  rev_range, "--").decode("utf-8", "replace")
-    for rec in raw.split("\x1e"):
-        for uid in extract_unit_ids(rec.replace("\x1f", " "), id_re):
+    try:
+        commits = read_commits(repo, ["--no-merges", rev_range], ("Pass",), run=lambda at, argv: run_git(at, *argv))
+    except (LookupError, ValueError) as exc:
+        raise Refusal(f"the commit log cannot be read: {exc}") from None
+    for c in commits:
+        for uid in derive_attribution(c, "union", id_re):
             if uid in id_map:
                 return uid
     return ""

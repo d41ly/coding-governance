@@ -4581,11 +4581,11 @@ for f in $RUNS; do
     # TOOL-aQuenchedHarness-7.
     # A TRAILERED commit is attributed by its trailer alone, so its ambiguity is read from the trailer
     # too (closing review r1, M3): a subject that merely MENTIONS a sibling skipped the subset test.
-    dshitsub=$(GIT log -1 --format='%s%x1f%(trailers:key=Pass,valueonly,separator=%x20)' "$dshit" 2>/dev/null)
-    case "$dshitsub" in
-      *$'\x1f') dshitsub=${dshitsub%$'\x1f'} ;;
-      *) dshitsub=${dshitsub#*$'\x1f'}; dshitsub=${dshitsub//[^A-Za-z0-9-]/ } ;;
-    esac
+    # THE LINE IS THE ONE TRAILER READER'S (TOOL-dDeclaredLoop-23 S5), the library's
+    # `read_attribution_tokens`: `<sha> PASSTRAILER <ids>` for a trailered commit, `<sha> <subject
+    # tokens>` otherwise, so the sha and the marker are cut off and what is left is what attributes it.
+    dshitsub=$(read_attribution_tokens -1 "$dshit")
+    dshitsub=${dshitsub#* }; dshitsub=${dshitsub#PASSTRAILER }
     while IFS= read -r dssib; do
       [ -n "$dssib" ] || continue
       dssitem=${dssib#* dispatch · item }; dssitem=${dssitem%% · reason *}

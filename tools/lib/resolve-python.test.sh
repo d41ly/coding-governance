@@ -373,6 +373,7 @@ render_envelope|$ROOT/$KIT_REL/envelope.py|$KIT_REL/envelope
 envelope_sh|$ROOT/$KIT_REL/envelope.sh|$KIT_REL/envelope
 auto_memory|$ROOT/$KIT_REL/auto_memory.py|$KIT_REL/auto_memory
 retired_kits|$ROOT/$KIT_REL/retired_kits.py|$KIT_REL/retired_kits
+commit_trailers_py|$ROOT/$KIT_REL/commit_trailers.py|$KIT_REL/commit_trailers
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -417,6 +418,9 @@ retired_kits|$ROOT/$KIT_REL/retired_kits.py|$KIT_REL/retired_kits
 # retired_kits (PLAY-dOrderedCharter-31 S10) is a target's kit selection read through the registry's
 # `[[retired]]` rows; govkit's selection resolver and the playbook renderer's kit readers each carry it
 # inline, both kits copy-installed, and part 2l below holds the canonical to its behaviour.
+# commit_trailers_py (TOOL-dDeclaredLoop-23 S4) is the one reader of a commit's trailers, its two
+# attribution views and its CLI; the memory-tree kit's and the unattended kit's commit_trailers.py are
+# each that block whole, beside a copy of resolve_kit_dir, through which the reader finds the key table.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one

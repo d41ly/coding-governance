@@ -391,9 +391,14 @@ PLAY-dOrderedCharter-28 adds the memory plan's twelve types (`serves`, `made-by`
 `answers`, `runs-in`, `carries`, `carries-clause`, `pinned-at`, `reads`, `writes`, `promoted-from`),
 widens `decides` and `after`, and gives a row an optional `writer`: `promoted-from`'s is
 `instructions.edit`, so the type read at any other site is red. `edges.toml`'s `[[trailer]]` rows map each
-commit trailer key to its type, read by `read_trailer_keys`. `namespaces.toml`'s `[[native]]` rows
+commit trailer key to its type, read by `read_trailer_keys`; a row with no `type` (`Gov-Transition`,
+`Gov-Policy`, `Red-fix`, TOOL-dDeclaredLoop-23) registers a key that carries a value and no edge, which
+`read_trailer_keys` passes over while still refusing a key two rows name, and which memory-tree's
+`commit_trailers.read_commits`, the one trailer reader, reads beside the typed keys, refusing a key no
+row registers. `namespaces.toml`'s `[[native]]` rows
 register the native-id classes, `family-id` (pattern `id_grammar:grammar_for`, resolver `corpus_ids.py
---print-defined-ids`) and `clause-id` (pattern `design_lib:_CL`, resolver `read_design_view`), read by
+--print-defined-ids`), `clause-id` (pattern `design_lib:_CL`, resolver `read_design_view`) and `commit`
+(pattern `commit_trailers:SHA_RE`, the full sha, resolver `commit_trailers.py --print-commits`), read by
 `read_native_classes`; `gov_tag.py check` prints each with its owner and population
 (`check_native_classes`). A pinned tag is legal only where a row's `pin` is `tag` and resolves when some
 committed revision of its unit's text hashes to it (`read_text_history` over `tree_lib.read_blobs_at`);

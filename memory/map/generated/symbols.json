@@ -2765,7 +2765,17 @@
     {
       "id": "build_fixture",
       "kind": "function",
+      "file": "tools/lib/commit_trailers.py"
+    },
+    {
+      "id": "build_fixture",
+      "kind": "function",
       "file": "tools/lib/lib-selftest.sh"
+    },
+    {
+      "id": "build_fixture",
+      "kind": "function",
+      "file": "tools/memory-tree/commit_trailers.py"
     },
     {
       "id": "build_fixture",
@@ -2791,6 +2801,11 @@
       "id": "build_fixture",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
+    },
+    {
+      "id": "build_fixture",
+      "kind": "function",
+      "file": "tools/unattended/commit_trailers.py"
     },
     {
       "id": "build_fixture",
@@ -9330,12 +9345,27 @@
     {
       "id": "derive_attribution",
       "kind": "function",
+      "file": "tools/lib/commit_trailers.py"
+    },
+    {
+      "id": "derive_attribution",
+      "kind": "function",
+      "file": "tools/memory-tree/commit_trailers.py"
+    },
+    {
+      "id": "derive_attribution",
+      "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "derive_attribution",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "derive_attribution",
+      "kind": "function",
+      "file": "tools/unattended/commit_trailers.py"
     },
     {
       "id": "derive_auc",
@@ -11626,6 +11656,21 @@
       "id": "derive_timeline_values",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "derive_tokens",
+      "kind": "function",
+      "file": "tools/lib/commit_trailers.py"
+    },
+    {
+      "id": "derive_tokens",
+      "kind": "function",
+      "file": "tools/memory-tree/commit_trailers.py"
+    },
+    {
+      "id": "derive_tokens",
+      "kind": "function",
+      "file": "tools/unattended/commit_trailers.py"
     },
     {
       "id": "derive_tool_class",
@@ -14175,6 +14220,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/lib/commit_trailers.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/lib/python_floor.py"
     },
     {
@@ -14246,6 +14296,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/memory-tree/commit_trailers.py"
     },
     {
       "id": "main",
@@ -14511,6 +14566,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/settings-merge.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/unattended/commit_trailers.py"
     },
     {
       "id": "main",
@@ -17733,6 +17793,21 @@
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
+      "id": "read_commits",
+      "kind": "function",
+      "file": "tools/lib/commit_trailers.py"
+    },
+    {
+      "id": "read_commits",
+      "kind": "function",
+      "file": "tools/memory-tree/commit_trailers.py"
+    },
+    {
+      "id": "read_commits",
+      "kind": "function",
+      "file": "tools/unattended/commit_trailers.py"
+    },
+    {
       "id": "read_condition_rows",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
@@ -18818,6 +18893,21 @@
       "file": "tools/playbook/gov_tag.py"
     },
     {
+      "id": "read_key_table",
+      "kind": "function",
+      "file": "tools/lib/commit_trailers.py"
+    },
+    {
+      "id": "read_key_table",
+      "kind": "function",
+      "file": "tools/memory-tree/commit_trailers.py"
+    },
+    {
+      "id": "read_key_table",
+      "kind": "function",
+      "file": "tools/unattended/commit_trailers.py"
+    },
+    {
       "id": "read_kind_members",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -19251,6 +19341,21 @@
       "id": "read_merge_heads",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "read_message_ids",
+      "kind": "function",
+      "file": "tools/lib/commit_trailers.py"
+    },
+    {
+      "id": "read_message_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/commit_trailers.py"
+    },
+    {
+      "id": "read_message_ids",
+      "kind": "function",
+      "file": "tools/unattended/commit_trailers.py"
     },
     {
       "id": "read_mint_unit",
@@ -24340,6 +24445,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/lib/commit_trailers.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/lib/resolve-python.test.sh"
     },
     {
@@ -24371,6 +24481,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/memory-tree/commit_trailers.py"
     },
     {
       "id": "resolve_kit_dir",
@@ -24486,6 +24601,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/unattended/check-pass-order.test.sh"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/unattended/commit_trailers.py"
     },
     {
       "id": "resolve_kit_dir",
@@ -25150,7 +25270,17 @@
     {
       "id": "resolve_python",
       "kind": "function",
+      "file": "tools/unattended/check-brief-recorded.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
       "file": "tools/unattended/check-brief-recorded.test.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
+      "file": "tools/unattended/check-pass-order.sh"
     },
     {
       "id": "resolve_python",
@@ -26825,7 +26955,17 @@
     {
       "id": "run_git",
       "kind": "function",
+      "file": "tools/lib/commit_trailers.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
       "file": "tools/lib/python_floor.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/memory-tree/commit_trailers.py"
     },
     {
       "id": "run_git",
@@ -26886,6 +27026,11 @@
       "id": "run_git",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/unattended/commit_trailers.py"
     },
     {
       "id": "run_git_bytes",
