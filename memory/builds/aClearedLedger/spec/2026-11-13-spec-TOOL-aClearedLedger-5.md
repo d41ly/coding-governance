@@ -1,6 +1,6 @@
 # TOOL-aClearedLedger-5 — the bar join denies a direct-check form the manifest declares above the bound, and its parity arm reads all three direct-check words
 
-**Status:** SPECCED · rev-2 · 2026-11-13 · node a · Tier-1 · base 8db6f4be · streams tooling · order 5 · closes TOOL-aNimbleMend-18
+**Status:** INPROGRESS · rev-2 · 2026-11-13 · node a · Tier-1 · base 8db6f4be · streams tooling · order 5 · closes TOOL-aNimbleMend-18
 
 <!-- gen:spec-records -->
 
