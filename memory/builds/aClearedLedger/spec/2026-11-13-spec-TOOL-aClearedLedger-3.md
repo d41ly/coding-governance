@@ -1,6 +1,6 @@
 # TOOL-aClearedLedger-3 — the gate guard denies a flag-form suite the leg manifest declares above the direct-check bound, and its parity arm reads every direct-check form
 
-**Status:** SPECCED · rev-1 · 2026-11-13 · node a · Tier-2 · base 8db6f4be · streams tooling · order 3 · closes TOOL-aNimbleMend-16
+**Status:** INPROGRESS · rev-1 · 2026-11-13 · node a · Tier-2 · base 8db6f4be · streams tooling · order 3 · closes TOOL-aNimbleMend-16
 
 <!-- gen:spec-records -->
 
