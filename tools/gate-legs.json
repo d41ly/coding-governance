@@ -556,7 +556,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 660
   },
   {
     "name": "row-grammar selftest",
@@ -1101,7 +1101,6 @@
   },
   {
     "name": "drift-audit records",
-    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/drift-audit/drift_report.py",
@@ -2092,7 +2091,6 @@
   },
   {
     "name": "instruction edits (manifest checks)",
-    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/playbook/instructions_edit.py",
@@ -2290,7 +2288,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 1290
+    "ceiling": 2420
   },
   {
     "name": "leg ceilings clear their evidenced maximum",

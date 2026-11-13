@@ -1,6 +1,6 @@
 # TOOL-aNimbleMend-15 — the closing review's thirteen mediums and four lows, batched: the pass-leg tooling, the commit grader, the hooks, three guards and two help pages say and check what they do
 
-**Status:** INPROGRESS · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 15
+**Status:** CLOSED · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 15
 
 <!-- gen:spec-records -->
 

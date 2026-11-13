@@ -145,3 +145,7 @@ base: 1265772cc365418ac6431a7f0f9e069f3bb79dc0
 2026-11-12T23:42:07Z dispatch · item 8ed4b1d5 TOOL-aNimbleMend-15 · reason tools/run-gates/pass_legs.py tools/run-gates/run-gates.evidence.test.sh tools/run-gates/README.md
 
 2026-11-13T01:22:44Z dispatch · item 369e6922 TOOL-aNimbleMend-15 · reason tools/memory-tree/routed_commits.py tools/memory-tree/README.md
+
+2026-11-13T05:05:09Z dispatch · item 2ba17e9d TOOL-aNimbleMend-15 · reason tools/run-gates/selftest-budgets.txt tools/run-gates/ceiling-evidence.txt tools/run-gates/pass-leg-evidence.txt tools/gate-legs.json memory/guides/SESSION-KICKOFF.md
+
+2026-11-13T05:10:24Z dispatch · item 2ba17e9d TOOL-aNimbleMend-15 · reason memory/LIVE.md memory/builds/aNimbleMend/README.md memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-15-1-acceptance-ledger.md memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-15.md memory/guides/SESSION-KICKOFF.md tools/gate-legs.json tools/run-gates/ceiling-evidence.txt tools/run-gates/pass-leg-evidence.txt tools/run-gates/selftest-budgets.txt
