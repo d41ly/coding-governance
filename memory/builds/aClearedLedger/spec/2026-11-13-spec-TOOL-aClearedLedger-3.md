@@ -50,7 +50,7 @@ the manifest, and gives the arm the one form it lacks, so the two agree with no 
   to pass the arm.
 - Any edit to `tools/gate-legs.json`. No leg's argv, ceiling or guard moves here.
 - A file whose name ends `selftest.py` for any flag-form suite, the cure ask TOOL-aDeferredBar-12
-  names. §4 records why it lost.
+  names. §4 says why it lost.
 - `tools/check-spec-tokens.py`, its matcher `BAR` and its suite's parity arm. That reader is this
   build's unit 5, and its exemption list and bound are its own.
 - A deny of a direct-check form at or under the bound. A `--selftest` flag or a fixture is the

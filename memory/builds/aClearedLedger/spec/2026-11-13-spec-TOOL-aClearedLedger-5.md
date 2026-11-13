@@ -82,7 +82,7 @@ The third line is the first line's leg, uncounted. It is an arm defect, and S3 d
 
 ### Which side is wrong
 
-The reader, for a flag-form leg above the bound. `routed-commits selftest` read 330 s alone
+The reader, for a flag-form leg above the bound. `routed-commits selftest` read 330 s alone <!-- PINNED 2026-11-13 -->
 (PINNED, 2026-11-13, at `2ba17e9d6`, in `tools/run-gates/ceiling-evidence.txt`), so it is a suite by
 cost, and a spec may name it as an acceptance observation today. The reader cannot see a ceiling,
 which is also why three more flag-form suites sit in `PARITY_EXEMPT` by name.
@@ -227,7 +227,7 @@ run over the tree on 2026-11-13, at `8db6f4be` with this build's specs beside it
 ### Alternatives rejected
 
 - **Declaring `routed_commits.py` in `PARITY_EXEMPT`.** It is the arm's own interim remedy, and the
-  brief refuses it: no exemption is added to make the arm pass. It also leaves the 330 s suite
+  brief refuses it: no exemption is added to make the arm pass. It also leaves the 330 s suite <!-- PINNED 2026-11-13 -->
   (PINNED, 2026-11-13) free to stand as an acceptance observation.
 - **Moving the entrypoint to a `selftest.py` file.** It cures both readers, and it is ask
   TOOL-aDeferredBar-12's unit: a new kit file, a manifest argv, a guard and the pass-leg list.
