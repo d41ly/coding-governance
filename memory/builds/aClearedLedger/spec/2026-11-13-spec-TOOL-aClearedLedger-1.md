@@ -1,11 +1,12 @@
 # TOOL-aClearedLedger-1 — the `[spec]` practice states its one exception: an inline red fix commits no spec and owes its typed record
 
-**Status:** INPROGRESS · rev-1 · 2026-11-13 · node a · Tier-2 · base 8db6f4be · streams tooling · order 1 · closes TOOL-aNimbleMend-24
+**Status:** CLOSED · rev-1 · 2026-11-13 · node a · Tier-2 · base 8db6f4be · streams tooling · order 1 · closes TOOL-aNimbleMend-24
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-13-build-TOOL-aClearedLedger-1-1-acceptance-ledger.md](../build/2026-11-13-build-TOOL-aClearedLedger-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aClearedLedger-1-1-builder.md](../prompts/2026-11-13-prompt-TOOL-aClearedLedger-1-1-builder.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aClearedLedger-1-brief.md](../prompts/2026-11-13-prompt-TOOL-aClearedLedger-1-brief.md) | research | TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-7 TOOL-aClearedLedger-9 TOOL-aClearedLedger-10 |
 
