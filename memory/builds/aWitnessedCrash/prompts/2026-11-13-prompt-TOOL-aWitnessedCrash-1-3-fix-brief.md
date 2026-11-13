@@ -20,7 +20,7 @@ Clear them, changing nothing else. The spec stays at rev-2; none of these moves 
 
 ## 2. `harness arms (fail branches armed or pinned)`
 
-`check-arms: tools/memory-tree/check-memory-hygiene.sh:3677 status site (reasoned) has no POSITIVE assertion naming its own
+`check-arms: tools/memory-tree/check-memory-hygiene.sh@c5285391:3677 status site (reasoned) has no POSITIVE assertion naming its own
 failure text ("HYGIENE FAILED — bash reported a runtime error on this engine's stderr, so a check may have stopped
 part-way and its silence is not a pass")`. The arm in `tools/memory-tree/check-memory-hygiene.test.sh` greps only the
 prefix. Make that assertion grep the whole failure text. The assertion count does not change, so `FLOOR_ASSERTIONS` stays 696.
