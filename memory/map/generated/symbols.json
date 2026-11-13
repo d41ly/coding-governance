@@ -9778,6 +9778,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "derive_engreads",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
       "id": "derive_entries",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -12411,6 +12416,11 @@
       "id": "extract_heredoc_body",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "extract_hs_lines",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
       "id": "extract_jsx_defs",

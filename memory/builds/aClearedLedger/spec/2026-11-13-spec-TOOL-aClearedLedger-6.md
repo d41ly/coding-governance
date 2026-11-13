@@ -1,6 +1,6 @@
 # TOOL-aClearedLedger-6 — the hygiene self-test's eight lines: the partition arm folds check 26's cache figure, the override derivation leaves the carried resolver block out, and the conf example declares six recall keys
 
-**Status:** INPROGRESS · rev-2 · 2026-11-13 · node a · Tier-1 · base 8db6f4be · streams tooling · order 6 · closes TOOL-aNimbleMend-19
+**Status:** CLOSED · rev-2 · 2026-11-13 · node a · Tier-1 · base 8db6f4be · streams tooling · order 6 · closes TOOL-aNimbleMend-19
 
 <!-- gen:spec-records -->
 
