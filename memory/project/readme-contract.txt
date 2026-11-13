@@ -232,4 +232,7 @@ memory/builds/aProfiledEffort/README.md
 memory/builds/aShelvedLeg/README.md
 memory/builds/aGuardedEffort/README.md
 memory/builds/dPavedRoad/README.md
+memory/builds/aQueuedIndex/README.md
+memory/builds/aLiftedCeiling/README.md
+memory/builds/aWitnessedCrash/README.md
 memory/builds/aNimbleMend/README.md

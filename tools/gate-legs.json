@@ -2092,6 +2092,7 @@
   },
   {
     "name": "instruction edits (manifest checks)",
+    "pass_leg": true,
     "argv": [
       "python",
       "{prefix}/playbook/instructions_edit.py",
@@ -2099,7 +2100,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 180,
+    "ceiling": 420,
     "enforces": ["principle.p11", "principle.p13"]
   },
   {

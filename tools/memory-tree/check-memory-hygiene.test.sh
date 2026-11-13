@@ -2300,6 +2300,23 @@ n=$((n+1))
 n=$((n+1))
 grep -qF 'row-grammar: NOT MEASURED — memory/backlog/ARCH.md has no LIVE_ROW_PIN entry' <<<"$outy" \
   || { echo "FAIL a green check 20 run swallowed its NOT MEASURED line, so an unarmed live-row pin is silent again"; st=1; }
+# TOOL-aWitnessedCrash-1: the crash witness. A copy of this kit runs `--only 1` over the young tree
+# above, with the shipped defect's own shape injected at the tail, outside every check block: an
+# unset map's count, which bash 5.3 reports under `set -u` and runs on past with exit 0. The
+# uninjected copy exiting 0 pins the red to the injection. `--only 1` because a full run of a copied
+# kit reds check 9 on this tree (its render differs from another directory); the --offenders row is
+# read by exact match, so check 9's rows there are not graded.
+_wc_k=$TMP/wcrash; mkdir -p "$_wc_k"; cp -r "$HERE"/. "$_wc_k"/
+_wc_o=$(cd "$Y" && bash "$_wc_k/check-memory-hygiene.sh" --only 1 2>/dev/null); _wc_rc=$?
+n=$((n+1)); [ "$_wc_rc" = 0 ] || { echo "FAIL the uninjected kit copy, --only 1 over the young tree, exited $_wc_rc, not 0"; st=1; }
+sed -i 's/^# --- empty-population report/declare -A __wc_probe\n: "${#__wc_probe[@]}"\n&/' "$_wc_k/check-memory-hygiene.sh"
+n=$((n+1)); [ "$(grep -c '__wc_probe' "$_wc_k/check-memory-hygiene.sh")" = 2 ] || { echo "FAIL the crash-witness injection did not land as exactly two lines"; st=1; }
+_wc_o=$(cd "$Y" && bash "$_wc_k/check-memory-hygiene.sh" --only 1 2>"$TMP/wcrash.err"); _wc_rc=$?
+n=$((n+1)); [ "$_wc_rc" = 1 ] || { echo "FAIL a bash runtime error the engine ran past exited $_wc_rc, not 1"; st=1; }
+n=$((n+1)); grep -qF "HYGIENE FAILED — bash reported a runtime error on this engine's stderr, so a check may have stopped part-way and its silence is not a pass" <<<"$_wc_o" || { echo "FAIL a bash runtime error the engine ran past printed no HYGIENE FAILED line"; st=1; }
+n=$((n+1)); grep -qF '__wc_probe: unbound variable' "$TMP/wcrash.err" || { echo "FAIL the crash witness did not replay the engine's stderr at exit"; st=1; }
+_wc_o=$(cd "$Y" && bash "$_wc_k/check-memory-hygiene.sh" --offenders 2>/dev/null 3>&1)
+n=$((n+1)); grep -qxF "check crash	check-memory-hygiene.sh: __wc_probe: unbound variable" <<<"$_wc_o" || { echo "FAIL --offenders did not key the bash runtime error as one check crash row without its path or line"; st=1; }
 # TOOL-aGraftedHelix-3 S7: checks 17-19's capture reaches the operator on a GREEN run too. A young tree
 # holding one invariant whose decision resolves and whose guard is a leg name, with LEG_MANIFEST
 # undeclared: gotchas.py announces the guard NOT resolved at exit 0, and an engine that printed the
@@ -4686,11 +4703,15 @@ done
 # two-pass loop, none skipped. Counted by reading; OWED: observed at the close.
 # MERGED at PLAY-dOrderedCharter-83's reconcile of 47ed57fab: the base 670, plus this branch's 5 from
 # PLAY-dOrderedCharter-64, -42 and -55, plus TOOL-dPavedRoad-4's 15 = 690. Counted by reading; OWED: observed at the close.
+# RAISED 690 -> 696 by TOOL-aWitnessedCrash-1: its six crash-witness assertions, each top-level and
+# never skipped. Counted by reading; OWED: observed at the close.
 # RAISED 690 -> 699 by TOOL-aNimbleMend-9: its two red-fix-join plant assertions and its seven check-31
 # engine assertions, each top-level and never skipped. Counted by reading; OWED: observed at the close.
 # RAISED 699 -> 701 by TOOL-aNimbleMend-9's second pass: check 31's two failure texts, one assertion
 # each, top-level and never skipped. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=701
+# MERGED at this build's reconcile of origin/main cac14c195: the base 690, plus TOOL-aWitnessedCrash-1's 6,
+# plus TOOL-aNimbleMend-9's 11 = 707. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=707
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
