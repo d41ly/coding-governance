@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-13-prompt-TOOL-aBatchedPacket-2-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-aBatchedPacket-2-1-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aBatchedPacket-2-brief.md](../prompts/2026-11-13-prompt-TOOL-aBatchedPacket-2-brief.md) | research | — |
+| [2026-11-14-prompt-TOOL-aBatchedPacket-2-1-builder.md](../prompts/2026-11-14-prompt-TOOL-aBatchedPacket-2-1-builder.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
