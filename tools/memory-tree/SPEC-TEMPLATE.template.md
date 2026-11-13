@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.158 -->
+<!-- gov:kit memory-tree@2.159 -->
 [{{MEMORY_ROOT}}/TEMPLATE-SPEC.md · Level 3 · The spec format, read before writing a spec or adding a write path; yields to levels 0 to 2]
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
