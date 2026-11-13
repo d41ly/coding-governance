@@ -185,15 +185,14 @@ Cite ids, never line numbers.
 | [TOOL-aMeteredTurnstile-5](../builds/aMeteredTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | longest-first dispatch pessimises time-to-first-signal by construction:… |
 | [TOOL-aMeteredTurnstile-6](../builds/aMeteredTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | the bar did not get slower, PROCESS CREATION did: measured 2026-08-20… |
 | [TOOL-aNamedGesture-2](../builds/aNamedGesture/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | the kickoff manifest's last-audit stamp read 2026-08-26T10:10:00+03:00… |
-| [TOOL-aNimbleMend-16](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | INHERITED RED: THE GATE-GUARD SUITE'S TWO MANIFEST PARITY ARMS.… |
-| [TOOL-aNimbleMend-17](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | INHERITED RED: SEVEN CONTEXT ARMS OF THE SCRATCH-GUARD SUITE.… |
-| [TOOL-aNimbleMend-18](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | INHERITED RED: THE SPEC-TOKENS SUITE'S MANIFEST PARITY ARM.… |
-| [TOOL-aNimbleMend-19](../builds/aNimbleMend/BACKLOG.md) | OPEN | MED | — | 2026-11-13 | INHERITED RED: EIGHT LINES OF THE HYGIENE SELF-TEST.… |
-| [TOOL-aNimbleMend-20](../builds/aNimbleMend/BACKLOG.md) | OPEN | MED | — | 2026-11-13 | INHERITED RED: THIRTY-THREE WRONG ASSERTIONS OF THE POLICY FIXTURES… |
-| [TOOL-aNimbleMend-21](../builds/aNimbleMend/BACKLOG.md) | OPEN | MED | — | 2026-11-13 | THE HYGIENE GATE PRINTS AN UNBOUND-VARIABLE ERROR UNDER --staged. Every… |
-| [TOOL-aNimbleMend-22](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | FOUR SUITES RAN PAST THEIR DECLARED COST BUDGETS AT THIS BUILD'S CLOSE.… |
-| [TOOL-aNimbleMend-23](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | A Red-fix: COMMIT THAT TOUCHES NO PATH CAN NEVER BE RECORDED. The door… |
-| [TOOL-aNimbleMend-24](../builds/aNimbleMend/BACKLOG.md) | OPEN | MED | — | 2026-11-13 | OWNER CALL: TWO SENTENCES ABOUT THE LANE THAT ONLY THE OWNER MAY… |
+| [TOOL-aNimbleMend-16](../builds/aNimbleMend/BACKLOG.md) | SPECCED | LOW | TOOL-aClearedLedger-3 | 2026-11-13 | INHERITED RED: THE GATE-GUARD SUITE'S TWO MANIFEST PARITY ARMS.… |
+| [TOOL-aNimbleMend-17](../builds/aNimbleMend/BACKLOG.md) | SPECCED | LOW | TOOL-aClearedLedger-4 | 2026-11-13 | INHERITED RED: SEVEN CONTEXT ARMS OF THE SCRATCH-GUARD SUITE.… |
+| [TOOL-aNimbleMend-18](../builds/aNimbleMend/BACKLOG.md) | SPECCED | LOW | TOOL-aClearedLedger-5 | 2026-11-13 | INHERITED RED: THE SPEC-TOKENS SUITE'S MANIFEST PARITY ARM.… |
+| [TOOL-aNimbleMend-19](../builds/aNimbleMend/BACKLOG.md) | SPECCED | MED | TOOL-aClearedLedger-6 | 2026-11-13 | INHERITED RED: EIGHT LINES OF THE HYGIENE SELF-TEST.… |
+| [TOOL-aNimbleMend-20](../builds/aNimbleMend/BACKLOG.md) | SPECCED | MED | TOOL-aClearedLedger-7 | 2026-11-13 | INHERITED RED: THIRTY-THREE WRONG ASSERTIONS OF THE POLICY FIXTURES… |
+| [TOOL-aNimbleMend-22](../builds/aNimbleMend/BACKLOG.md) | SPECCED | LOW | TOOL-aClearedLedger-10 | 2026-11-13 | FOUR SUITES RAN PAST THEIR DECLARED COST BUDGETS AT THIS BUILD'S CLOSE.… |
+| [TOOL-aNimbleMend-23](../builds/aNimbleMend/BACKLOG.md) | SPECCED | LOW | TOOL-aClearedLedger-9 | 2026-11-13 | A Red-fix: COMMIT THAT TOUCHES NO PATH CAN NEVER BE RECORDED. The door… |
+| [TOOL-aNimbleMend-24](../builds/aNimbleMend/BACKLOG.md) | SPECCED | MED | TOOL-aClearedLedger-1 | 2026-11-13 | OWNER CALL: TWO SENTENCES ABOUT THE LANE THAT ONLY THE OWNER MAY… |
 | [TOOL-aNimbleMend-28](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | THREE SUITES' FORK-IDIOM ROWS WERE RE-DECLARED UPWARD, NOT DRAINED.… |
 | [TOOL-aNumeralWarden-2](../builds/aNumeralWarden/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | agent-cap's enclosing-opener walk is defeated by two nested wrappers or… |
 | [TOOL-aNumeralWarden-3](../builds/aNumeralWarden/BACKLOG.md) | OPEN | — | — | 2026-08-10 | a drift-audit pin RAISE is indistinguishable from a population drain to… |
