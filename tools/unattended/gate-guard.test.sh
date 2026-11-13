@@ -383,11 +383,11 @@ LEGS="$HERE/../gate-legs.json"
 DIRECT_CHECK_BOUND=300
 DIRECT_CHECK_WORDS='--selftest --fixture fixture'
 PARITY_EXEMPT='test_recall_floor.py'
-# grade_parity <manifest> <hook> — grades every `chunk = selftests` leg of <manifest> against <hook>
+# check_parity <manifest> <hook> — grades every `chunk = selftests` leg of <manifest> against <hook>
 # at BUILDING and leaves legn, popn, skipn, exempt_seen and unmatched for the caller. A function
 # because the arm class "a manifest suite in flag form" below runs it once more over a planted
 # population, which is how the rule is seen to red.
-grade_parity() {
+check_parity() {
   local legs=$1 hook=$2 pop ceil script cmd payload w direct
   # One TAB-separated row per leg: ceiling, the script's basename, the argv. `tr -d '\r'`: a
   # Windows python writes CRLF to a pipe, and a CR on the basename made the exemption never match —
@@ -421,7 +421,7 @@ $pop
 PARITY
 }
 if [ -f "$LEGS" ]; then
-  grade_parity "$LEGS" "$HOOK"
+  check_parity "$LEGS" "$HOOK"
   if [ "$popn" -gt 0 ]; then echo "ok   parity: the manifest holds $popn whole-suite selftests leg(s) to grade, $skipn exempt and printed above"; pass=$((pass+1))
   else echo "FAIL parity: the manifest holds no whole-suite selftests leg, so parity would be certified over nothing"; fail=$((fail+1)); fi
   for x in $PARITY_EXEMPT; do
@@ -772,15 +772,15 @@ else echo "FAIL Q12 a cwd of 42 (exit $got, want 0 with an empty stderr)"; sed '
 # The hook reads the manifest in the directory above its own, so these arms run the kit copy above
 # beside a PLANTED manifest at $TMP: two legs in a direct-check form, at the ceiling each arm names.
 # The real manifest's legs cross the bound whenever a ceiling is re-derived; a planted one does not.
-# plant_manifest <ceiling> [extra-row] — <extra-row> is a JSON object appended to the list.
-plant_manifest() {
+# build_manifest <ceiling> [extra-row] — <extra-row> is a JSON object appended to the list.
+build_manifest() {
   printf '[{"name":"planted flag suite","chunk":"selftests","ceiling":%s,"argv":["python3","{prefix}/zz-kit/planted_suite.py","--selftest"]},\n {"name":"planted fixture suite","chunk":"selftests","ceiling":%s,"argv":["python","{prefix}/zz-kit/planted_cases.py","--fixture","--strict-from","zz/cases/"]}%s]\n' \
     "$1" "$1" "${2:+,$2}" > "$TMP/gate-legs.json"
 }
 run_planted() { local HOOK=$ASK_HOOK; run "$@"; }
 M_FLAG='python3 '"${PFX}"'zz-kit/planted_suite.py --selftest'
 M_FIX='python '"${PFX}"'zz-kit/planted_cases.py --fixture'
-plant_manifest 900
+build_manifest 900
 run_planted "D6 a --selftest leg above the bound -> deny"                 2 "$B" "$M_FLAG"
 if grep -q 'planted flag suite' "$TMP/err"; then echo "ok   D6 the deny names the manifest leg"; pass=$((pass+1))
 else echo "FAIL D6 the deny does not name the leg planted flag suite"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
@@ -791,7 +791,7 @@ run_planted "D6 the over-bound leg in a bash -c body -> deny"             2 "$B"
 run_planted "D6 the over-bound leg in a double-quoted \$( ) -> deny"       2 "$B" 'printf '"'%s'"' "$('"$M_FLAG"')"'
 F=$(build_fixture VERIFYING)
 run_planted "D6 the over-bound leg at VERIFYING -> allow"                 0 "$F" "$M_FLAG"
-plant_manifest 300
+build_manifest 300
 run_planted "D6 the same --selftest leg at the bound -> allow"            0 "$B" "$M_FLAG"
 rm -f "$TMP/gate-legs.json"
 run_planted "D6 the over-bound leg, manifest absent -> allow"             0 "$B" "$M_FLAG"
@@ -800,8 +800,8 @@ run_planted "D6 the over-bound leg, manifest unparsable -> allow"         0 "$B"
 # The parity rule's own failing case: a leg above the bound in NO direct-check form is a suite
 # convention neither the word shapes nor row D6 reads, and the rule must name it — and must not
 # name the flag-form leg beside it, which row D6 denies.
-plant_manifest 900 '{"name":"planted bare suite","chunk":"selftests","ceiling":900,"argv":["python3","{prefix}/zz-kit/planted_bare.py"]}'
-grade_parity "$TMP/gate-legs.json" "$ASK_HOOK"
+build_manifest 900 '{"name":"planted bare suite","chunk":"selftests","ceiling":900,"argv":["python3","{prefix}/zz-kit/planted_bare.py"]}'
+check_parity "$TMP/gate-legs.json" "$ASK_HOOK"
 case "$unmatched" in
   *planted_suite.py*|*planted_cases.py*) echo "FAIL D6 parity over the planted population names a leg row D6 denies:$unmatched"; fail=$((fail+1)) ;;
   *planted_bare.py*) echo "ok   D6 parity over the planted population reds on the bare over-bound script and on it alone ($popn graded)"; pass=$((pass+1)) ;;
