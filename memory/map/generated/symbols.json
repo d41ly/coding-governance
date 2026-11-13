@@ -4618,6 +4618,11 @@
       "file": "tools/unattended/stop-guard.js"
     },
     {
+      "id": "checkSuiteLeg",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
       "id": "checkThrottled",
       "kind": "function",
       "file": "tools/process-monitor/procmon-hook.js"
@@ -12863,6 +12868,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "grade_parity",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.test.sh"
+    },
+    {
       "id": "grammar",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -16098,6 +16108,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "plant_manifest",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.test.sh"
+    },
+    {
       "id": "pop_guard",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.sh"
@@ -16991,6 +17006,11 @@
       "id": "readStdin",
       "kind": "function",
       "file": "tools/unattended/run-lease.js"
+    },
+    {
+      "id": "readSuiteLegs",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
     },
     {
       "id": "readThrottleSeconds",
@@ -27416,6 +27436,11 @@
       "id": "run_plant_rows",
       "kind": "function",
       "file": "tools/playbook/adopt-playbook.sh"
+    },
+    {
+      "id": "run_planted",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.test.sh"
     },
     {
       "id": "run_pm",

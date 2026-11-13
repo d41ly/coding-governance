@@ -104,8 +104,14 @@ file before anything runs `--check`.
 it UNWIRED with the merge command as the remedy. While the run-state record on the CURRENT branch
 is in any phase before `VERIFYING`, it exits 2 on a command that would run the flagged bar
 (`GATE_FULL=` or `GATE_SELFTESTS=` with a non-empty value) or a self-test suite (a word ending
-`run-selftests.sh`, `run-unattended-gates.sh` or `.test.sh` at command position, `bash -c` bodies
-included). The read-only verbs — `--list`, `--check`, `--rank`, `--help`, `--render` — pass, the
+`run-selftests.sh`, `run-unattended-gates.sh`, `.test.sh` or `selftest.py` at command position,
+`bash -c` bodies included). It also refuses a script the gate manifest declares a suite by cost:
+a `chunk = selftests` leg of the `gate-legs.json` in the directory above the kit, run in a
+direct-check form (`--selftest`, `--fixture` or a bare `fixture` word) and with a `ceiling`
+above the direct-check bound the hook exports. A shorter spelling that still reaches that word is
+refused; a longer one, a single fixture case say, is the direct check and passes, as does every
+direct-check form at or under the bound and every such script the manifest does not declare. The
+read-only verbs — `--list`, `--check`, `--rank`, `--help`, `--render` — pass, the
 plain bar passes, and a quoted mention of any shape is invisible. It keys the record to the branch
 through the `run-branch:` fact `--preflight` writes on both anchors (protocol fact 13), falling
 back to `branch-ref:` for a record written before that fact existed, and it fails open on every
