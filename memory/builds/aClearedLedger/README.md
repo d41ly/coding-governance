@@ -71,7 +71,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 10 unit(s) · node a · opened 2026-11-13 · streams tooling
+**Build status:** INPROGRESS · 10 unit(s) · node a · opened 2026-11-13 · streams tooling
 ids TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-7 TOOL-aClearedLedger-8 TOOL-aClearedLedger-9 TOOL-aClearedLedger-10 TOOL-aClearedLedger-11
 
 <!-- gen:build-units -->
@@ -86,7 +86,7 @@ ids TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClea
 | [TOOL-aClearedLedger-7 — the policy fixtures leg prints no wrong assertion: fourteen guard paths, the recall plant's grammar file, and check 8 saying the reader's refusal](spec/2026-11-13-spec-TOOL-aClearedLedger-7.md) | 7 | 1 | CLOSED | rev-2 | 2026-11-13 |
 | [TOOL-aClearedLedger-9 — a path-less `Red-fix:` commit owes no record: the join holds it out by name and the door says why it refuses](spec/2026-11-13-spec-TOOL-aClearedLedger-9.md) | 9 | 2 | CLOSED | rev-1 | 2026-11-13 |
 | [TOOL-aClearedLedger-10 — four suite budget rows re-declared from readings taken alone on a quiet node, with the ceiling evidence and the pass legs re-derived](spec/2026-11-13-spec-TOOL-aClearedLedger-10.md) | 10 | 1 | DEFERRED | rev-1 | 2026-11-13 |
-| [TOOL-aClearedLedger-11 — the gate guard's row D6 and the spec checker's bar join read one command alike, and each new branch has an arm that can fail](spec/2026-11-14-spec-TOOL-aClearedLedger-11.md) | 11 | 2 | SPECCED | rev-1 | 2026-11-14 |
+| [TOOL-aClearedLedger-11 — the gate guard's row D6 and the spec checker's bar join read one command alike, and each new branch has an arm that can fail](spec/2026-11-14-spec-TOOL-aClearedLedger-11.md) | 11 | 2 | INPROGRESS | rev-1 | 2026-11-14 |
 <!-- /gen:build-units -->
 
 Records: 16 bound to this build, across 4 record folder(s).
