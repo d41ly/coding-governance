@@ -1,6 +1,6 @@
 # TOOL-aClearedLedger-4 — the scratch guard suite's context arms start from a session tree with no card file
 
-**Status:** INPROGRESS · rev-1 · 2026-11-13 · node a · Tier-1 · base 8db6f4be · streams tooling · order 4 · closes TOOL-aNimbleMend-17
+**Status:** CLOSED · rev-1 · 2026-11-13 · node a · Tier-1 · base 8db6f4be · streams tooling · order 4 · closes TOOL-aNimbleMend-17
 
 <!-- gen:spec-records -->
 
