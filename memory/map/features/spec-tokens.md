@@ -8,7 +8,7 @@ streams = ["tooling"]
 decisions = []
 
 [claims]
-gate-legs = ["spec tokens (a spec's own names resolve)", "spec tokens (the pass's own spec)", "spec-tokens self-test"]
+gate-legs = ["spec tokens (a spec's own names resolve)", "spec tokens (the pass's own spec)", "spec-tokens self-test", "chain-packet self-test"]
 kits = []
 git-hooks = []
 harness-hooks = []
@@ -23,6 +23,8 @@ lexicon-verbs = []
 globs = [
   "tools/check-spec-tokens.py",
   "tools/check-spec-tokens.test.sh",
+  "tools/chain-packet.py",
+  "tools/chain-packet.test.sh",
   "memory/project/spec-token-waivers.txt",
 ]
 ```
@@ -193,6 +195,21 @@ shape, never a waiver row, because a shape generalises to specs nobody has writt
   the legs whose guard each path trips by the guards join's own rule, broad ones marked, glob guards
   printed UNEVALUATED, and the unguarded count as a footer. Grades no spec; exit 2 when every path
   is untracked (TOOL-aMendedFleet-87).
+- `python tools/chain-packet.py --check <slug>`, `--write <slug>` or `--fixture` — the chain packet's
+  front door, and what the packet join runs when it sits beside the checker. It hands the arguments to
+  the packet instrument's own `main` with two reads answered in-process, the coverage report and the
+  parent specs, so no git process is spawned per spec revision; every stdout line and the exit are the
+  instrument's (TOOL-aBatchedPacket-1).
+- `python tools/chain-packet.py --parity <slug>` — renders the packet the instrument's way, then with
+  the two reads installed, and compares path, bytes and any refusal; exit 0 identical, 1 different.
+  The on-demand proof, at the cost of the instrument's walk once.
+- `python tools/chain-packet.py <any other arguments>` — the instrument as a child, unchanged;
+  `--repin` goes this way.
+- THE FALLBACK of that door: it holds the blob id of the packet, carries and schedule instruments and
+  compares each with the file before loading anything. A moved or stubbed instrument, or `tree_lib.py`
+  missing beside it, prints one stderr line opening `chain-packet: shortcuts off` and runs the
+  instrument as a child, so the result is the instrument's, slowly. A landing that moves one of the
+  three owes the door's constant after re-reading the reliance points listed beside it.
 - `memory/project/spec-token-waivers.txt` — the shrink-only exception registry.
 
 ## The section-7 contract (TOOL-aJoinedCanon-7)

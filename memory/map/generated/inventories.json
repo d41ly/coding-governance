@@ -14,6 +14,7 @@
       "build README slot contract",
       "build-index selftest",
       "build-method size",
+      "chain-packet self-test",
       "charter size",
       "check-arms selftest",
       "check-wiring self-test",
