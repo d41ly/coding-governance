@@ -466,8 +466,8 @@ BAR_WHY = ("a bar or suite is not an acceptance observation: observe the checker
            "a --selftest flag or a fixture; name the suite under New arm:; the bar and the suites "
            "run once, after the build is complete")
 # TOOL-aClearedLedger-5: the manifest half of the bar join. The bound is the manifest's default
-# ceiling in seconds, and the words are the three direct-check spellings; `tools/unattended/
-# gate-guard.js` carries both under the same names and values, and neither file reads the other.
+# ceiling in seconds, and the words are the three direct-check spellings; the unattended kit's
+# gate guard carries both under the same names and values, and neither file reads the other.
 DIRECT_CHECK_BOUND = 300
 DIRECT_CHECK_WORDS = ("--selftest", "--fixture", "fixture")
 SIMPLE_COMMAND_SPLIT = re.compile(r"&&|[;|(]")
