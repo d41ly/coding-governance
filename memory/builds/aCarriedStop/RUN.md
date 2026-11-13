@@ -9,12 +9,20 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+hold-run: 
+hold-streak: 1 · at 4bf57cb7
+resume-owed: unattended-resume-acarriedstop · fire 2026-11-13T19:08:25Z
+held-at: 2026-11-13T18:38:25Z
+hold-reason: the close's bar is 94/95 green and its one red, routed commits name a specced unit, timed out CONTENDED at 760 s twice; alone at this tip it exits 0 in 957 s
+hold-until: probe gate
+hold-code: host-degraded
+held-from: VERIFYING
 gates-run: unattended-17945890617045659641-176387 41c93c8b
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 41015d329ec2ee8ee76f2251d4da9d7afbe7e8c2
-phase: VERIFYING
+witness: 4bf57cb7626b94a7a19730c86f2c94164cccb88a
+phase: HELD
 may: none
 mode: prompt
 run-branch: refs/heads/branch/sad-allen-74f7bd
@@ -54,3 +62,5 @@ base: d646814e4a6a6747d3cdb471128be57a0e24e094
 2026-11-13T13:17:27Z brief · item TOOL-aCarriedStop-3 · reason 6157aebb1bcc memory/builds/aCarriedStop/prompts/2026-11-13-prompt-TOOL-aCarriedStop-3-build-brief.md
 
 2026-11-13T13:18:41Z dispatch · item 8a248e2b TOOL-aCarriedStop-3 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/aCarriedStop/spec/2026-11-13-spec-TOOL-aCarriedStop-3.md memory/builds/aCarriedStop/build/2026-11-13-build-TOOL-aCarriedStop-3-1-acceptance-ledger.md memory/builds/aCarriedStop/README.md memory/LIVE.md memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json memory/builds/aCarriedStop/prompts/2026-11-13-prompt-TOOL-aCarriedStop-3-1-builder.md
+
+2026-11-13T18:38:32Z hold · item host-degraded · reason until probe gate · reaped 86f6a40a · resume unattended-resume-acarriedstop
