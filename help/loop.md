@@ -52,7 +52,7 @@ look alike and are not this set: a review round's exit (`fold` or `promote`), th
 ## The owner's disposition record
 
 When the owner answers a held item, the answer is one record in the build's `build/` folder, written
-by the memory-tree kit: <!-- usage: script:tools/memory-tree/build_records.py#new 3cae4d5e -->
+by the memory-tree kit's record door, which [the charter page](charter.md) documents:
 
 <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries a placeholder the shell reads as a redirect -->
 ```bash
