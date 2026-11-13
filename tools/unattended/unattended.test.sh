@@ -3377,6 +3377,10 @@ write_stop_fixture
 write_fixture_round s1 "$_fc_all" 0 0
 _fc_f=$(read_chain_file); _fc_bytes=$(<"$_fc_r/$_fc_f")
 check_chain_refused "$_cs_alone: --subject" --owner-stop "$_cs_stop" --subject s2
+check_chain_refused "$_cs_alone: --audited" --owner-stop "$_cs_stop" --audited FIX-dFix-1
+check_chain_refused "$_cs_alone: --blockers" --owner-stop "$_cs_stop" --blockers 0
+check_chain_refused "$_cs_alone: --highs" --owner-stop "$_cs_stop" --highs 0
+check_chain_refused "$_cs_alone: --sibling" --owner-stop "$_cs_stop" --sibling FIX-dFix-1@rev-2
 check_chain_refused "$_cs_folder: memory/builds/dFix/spec/2026-11-01-spec-FIX-dFix-1.md" --owner-stop memory/builds/dFix/spec/2026-11-01-spec-FIX-dFix-1.md
 check_chain_refused "$_cs_folder: ${_cs_stop%/*}/a b.md" --owner-stop "${_cs_stop%/*}/a b.md"
 check_chain_refused "$_cs_index: ${_cs_stop%/*}/.." --owner-stop "${_cs_stop%/*}/.."
@@ -3429,6 +3433,62 @@ out=$(run_chain --record-round dFix --owner-stop "mem+ory${_cs_stop#memory}"); r
 same "CS2 AC1 a root outside the class exits 1" "$rc" "1"
 hit "$out" "UNATTENDED check 118 FAILED — the spec-audit chain record refuses this: $_cs_folder: mem+ory${_cs_stop#memory}"
 same "CS2 AC1 the refusal left no record" "$(read_chain_file)$(ls "$_fc_r/mem+ory/builds/dFix/build" 2>/dev/null)" ""
+# TOOL-aCarriedStop-3: THE CLOSING REVIEW'S ARMS, each on a stop fixture of its own; the four mixed-flag
+# tokens of AC2 sit beside `--subject`, above. The failing cases are the close's to observe: the count
+# test off its route guard prints two `integer expected` lines and reds AC1; `pathre` unanchored and the
+# field count read as at least three red AC3's rows in turn; the last round taken over subject rows reds
+# the ceiling, and the previous-round sets taken from the last round that is no stop red the carry; the
+# roster fallback deleted and the empty value read as a path red AC5. WHAT THESE DO NOT CHECK: stderr on
+# a refusal or an audit round, a malformed stop row of any other shape, a ceiling other than the shipped
+# 4, the carry for a promotion, and the census arm's figure.
+# AC1: a successful owner-stop call prints no stderr line beside the conf notes, called as `run_chain` calls.
+write_stop_fixture
+( cd "$_fc_r" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH bash "$_fc_r/u/unattended.sh" --record-round dFix --owner-stop "$_cs_stop" ) >/dev/null 2>"$_sw_tmp/err"; rc=$?
+same "CS3 AC1 the owner-stop call exits 0" "$rc" "0"
+same "CS3 AC1 its stderr holds the notes alone" "$(grep -vc '^unattended: NOTE - ' "$_sw_tmp/err")" "0"
+# AC3: the reader refuses a stop row outside the class, then one of four fields. The awk exits at the first
+# bad row, so the record is restored from the index between the two.
+write_stop_fixture
+write_stop_row
+_fc_f=$(read_chain_file)
+for _cs_row in "round 2 · owner-stop · record ${_cs_stop%/*}/a b.md" "round 2 · owner-stop · record $_cs_stop · extra"; do
+  printf '%s\n' "$_cs_row" >> "$_fc_r/$_fc_f"
+  out=$(run_chain --chain-verdict dFix); rc=$?
+  same "CS3 AC3 [$_cs_row] exits 1" "$rc" "1"
+  hit "$out" "UNATTENDED check 118 FAILED — the spec-audit chain record refuses this: a body row is outside the grammar, and the record is append-only, so it was edited by hand: $_cs_row"
+  git -C "$_fc_r" checkout -- "$_fc_f"
+done
+# AC4: the stop's round counts toward the ceiling, and the round after it carries no fold of the round
+# before it. Each record is read with the stop and, as its control, without.
+for _cs_with in stop ""; do
+  write_stop_fixture
+  write_fixture_round s1 "FIX-dFix-1 FIX-dFix-2 FIX-dFix-3" 0 1 --finding 1/HIGH/new-mechanism/FIX-dFix-1/FIX-dFix-4/1
+  write_fixture_round s2 FIX-dFix-4 0 1 --finding 2/HIGH/new-mechanism/FIX-dFix-1/FIX-dFix-5/1
+  [ -z "$_cs_with" ] || write_stop_row
+  write_fixture_round s3 "FIX-dFix-5 FIX-dFix-6 FIX-dFix-7" 0 1 --finding 3/HIGH/new-mechanism/FIX-dFix-1/FIX-dFix-6/1
+  out=$(run_chain --chain-verdict dFix)
+  if [ -n "$_cs_with" ]; then hit "$out" "unattended: chain dFix · round 4 · HOLD · reason ceiling"
+  else same "CS3 AC4 the ceiling's control" "$out" "unattended: chain dFix · round 3 · CONTINUE · reason open · audit FIX-dFix-6"; fi
+  write_stop_fixture
+  write_fixture_round s1 "$_fc_all" 0 0
+  write_fixture_round s2 FIX-dFix-1 0 0 --sibling FIX-dFix-2@rev-2
+  [ -z "$_cs_with" ] || write_stop_row
+  write_fixture_round s3 FIX-dFix-1 0 0
+  out=$(run_chain --chain-verdict dFix)
+  if [ -n "$_cs_with" ]; then same "CS3 AC4 the carry ends at the stop" "$out" "unattended: chain dFix · round 4 · STOP · reason clean"
+  else same "CS3 AC4 the carry's control" "$out" "unattended: chain dFix · round 3 · CONTINUE · reason unreviewed · audit FIX-dFix-2"; fi
+done
+# AC5: a roster with no tracked spec still names the new record, and an empty value is no stop at all.
+write_stop_fixture
+( cd "$_fc_r" && git rm -q -r memory/builds/dFix/spec )
+out=$(run_chain --record-round dFix --owner-stop "$_cs_stop"); rc=$?
+same "CS3 AC5 a roster with no spec exits 0" "$rc" "0"
+same "CS3 AC5 the record is named from the roster" "$(grep -c -- '-build-FIX-dFix-1-chain-rounds[.]md$' <<<"$(read_chain_file)")" "1"
+write_stop_fixture
+out=$(run_chain --record-round dFix --owner-stop ""); rc=$?
+same "CS3 AC5 an empty value exits 1" "$rc" "1"
+hit "$out" "UNATTENDED check 112 FAILED — --record-round requires --subject"
+same "CS3 AC5 the empty value left no record" "$(read_chain_file)" ""
 
 # ---- TOOL-dFoldedAudit-15: THE BATCH'S DRIVER ARMS. The failing cases, observed at the close and not by the
 # ---- pass that wrote this: `owe=$(( promoted - minors ))` restored and `dword` fixed at `promoted` red AC2 to

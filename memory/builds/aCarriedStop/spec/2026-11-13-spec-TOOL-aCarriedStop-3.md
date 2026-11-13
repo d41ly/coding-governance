@@ -1,6 +1,6 @@
 # TOOL-aCarriedStop-3 — the closing review's mediums and lows, batched: the count test on the audit route only, the owner-stop arms the suite lacks, the base driver's reading and the usage header's padding
 
-**Status:** INPROGRESS · rev-1 · 2026-11-13 · node a · Tier-2 · base cfda7001 · streams tooling · order 3
+**Status:** CLOSED · rev-1 · 2026-11-13 · node a · Tier-2 · base cfda7001 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md) | journal | TOOL-aCarriedStop-1 TOOL-aCarriedStop-2 |
 | [2026-11-13-build-TOOL-aCarriedStop-2-promotions.md](../build/2026-11-13-build-TOOL-aCarriedStop-2-promotions.md) | research | TOOL-aCarriedStop-2 |
+| [2026-11-13-build-TOOL-aCarriedStop-3-1-acceptance-ledger.md](../build/2026-11-13-build-TOOL-aCarriedStop-3-1-acceptance-ledger.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aCarriedStop-3-build-brief.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-3-build-brief.md) | research | — |
 
 <!-- /gen:spec-records -->

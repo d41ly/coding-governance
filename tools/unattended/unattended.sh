@@ -30,7 +30,7 @@
 #   unattended.sh --record-set <slug> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--run <id>] [--set <hashes>]]
 #   unattended.sh --record-round <slug> --subject <s> --audited "<ids>" --blockers <b> --highs <h> [--finding <row>]... [--sibling <unit>@rev-<n>]...   # append one spec-audit round, no run-state file needed
 #   unattended.sh --record-round <slug> --owner-stop <path>        # append the owner's stop, citing a tracked record under the build's prompts/ folder
-#   unattended.sh --chain-verdict <slug>                         # CONTINUE, STOP or HOLD, derived from that record and the roster; writes nothing
+#   unattended.sh --chain-verdict <slug>                           # CONTINUE, STOP or HOLD, derived from that record and the roster; writes nothing
 #   unattended.sh --check-commit <message file>                    # from commit-msg: refuse an open pass's undeclared staged path
 #   unattended.sh --claims                                         # every run claim on the remote: slug, node, status, beat-age-s, verdict
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
@@ -13771,7 +13771,7 @@ write_chain_round() { # slug · subject · audited ids · blockers · highs, row
     read_spec_disposal "$_runmd" "$slug"
     [ "$_sd_value" = by-nature ] || { check_chain_fault "a local or --sibling row folds, and this run's spec disposal reads $_sd_value${_se_why:+, $_se_why}, which folds nothing"; return 1; }
   fi
-  if [ "${#b_ids[@]}" -lt "$blockers" ] || [ "${#h_ids[@]}" -lt "$highs" ]; then
+  if [ -z "$path" ] && { [ "${#b_ids[@]}" -lt "$blockers" ] || [ "${#h_ids[@]}" -lt "$highs" ]; }; then
     check_chain_fault "the rows dispose ${#b_ids[@]} BLOCKER and ${#h_ids[@]} HIGH id(s) where the review counted $blockers and $highs, and every confirmed one is disposed somewhere"
     return 1
   fi
