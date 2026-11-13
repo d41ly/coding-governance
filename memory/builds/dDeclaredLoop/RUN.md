@@ -50,3 +50,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-13T10:37:23Z hold · item host-owner-action · reason until owner · reaped 22094182 · resume none(owner)
 
 2026-11-13T10:42:03Z resume · item dDeclaredLoop · reason held · keepalive 45e677fb · manual
+
+2026-11-13T11:31:45Z dispatch · item 0ca2f812 TOOL-dDeclaredLoop-18 · reason tools/playbook/namespaces.toml tools/playbook/tag_index.py tools/playbook/gov_tag.py tools/playbook/policy_value.py tools/playbook/adopt-playbook.sh tools/playbook/README.md help/tags.md memory/map/features/policy.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json memory/builds/dDeclaredLoop/build/2026-11-13-build-TOOL-dDeclaredLoop-18-1-acceptance-ledger.md memory/builds/dDeclaredLoop/build/2026-11-13-build-TOOL-dDeclaredLoop-18-deviation-184.md memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-18.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/ledger/2026-11.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
