@@ -1,6 +1,6 @@
 # TOOL-aWitnessedCrash-1 — check 23's maps are declared set, and the hygiene engine reds on a bash runtime error it ran past
 
-**Status:** SPECCED · rev-1 · 2026-11-13 · node a · Tier-1 · base f9a87e782 · streams tooling · order 1
+**Status:** INPROGRESS · rev-1 · 2026-11-13 · node a · Tier-1 · base f9a87e782 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
