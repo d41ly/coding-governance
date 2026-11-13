@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: d646814e4a6a6747d3cdb471128be57a0e24e094
-phase: SPECCING
+witness: 0dd449637fb37b22ed40ef0b4627c49b906c2c24
+phase: BUILDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/sad-allen-74f7bd
@@ -29,3 +29,9 @@ anchor-ref: refs/heads/main
 base: d646814e4a6a6747d3cdb471128be57a0e24e094
 
 ## Parked
+
+2026-11-13T11:45:32Z brief · item TOOL-aCarriedStop-1 · reason 8cf3c8a5e30d memory/builds/aCarriedStop/prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-build-brief.md
+
+2026-11-13T11:46:03Z brief · item TOOL-aCarriedStop-1 · reason b1335796cfc0 memory/builds/aCarriedStop/prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-build-brief.md
+
+2026-11-13T11:47:24Z dispatch · item 0dd44963 TOOL-aCarriedStop-1 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md tools/unattended/SKILL.template.md memory/guides/UNATTENDED-VERBS.md .claude/skills/unattended/SKILL.md help/spec-audit.md tools/template-size-limits.txt memory/builds/aCarriedStop/spec/2026-11-13-spec-TOOL-aCarriedStop-1.md memory/builds/aCarriedStop/build/2026-11-13-build-TOOL-aCarriedStop-1-1-acceptance-ledger.md memory/builds/aCarriedStop/README.md memory/LIVE.md memory/guides/SESSION-KICKOFF.md

@@ -28,6 +28,7 @@ Everything the spec's §3 lists, and any file the spec's §4 does not name. Any 
 - Every edit lands before the header goes CLOSED, and the CLOSED flip is in the same pass commit.
 - A new shell function owes `python tools/codebase-map/gen_map.py --write` in the pass commit.
 - `tools/unattended/unattended.sh` holds CRLF-sensitive and backslash-heavy text: edit it with the Edit tool, never through a heredoc or a Python text-mode rewrite.
+- `memory/DECISIONS.md` is a shared record the dispatch refuses, so the pass never writes it: the main loop adds the decision row of the spec's S9 after the pass, and the return carries that row's text.
 - If the pre-commit hook asks for a `last-audit` re-stamp of `memory/guides/SESSION-KICKOFF.md`, make it as the hook's message states and name it in the return.
 
 ### Reuse

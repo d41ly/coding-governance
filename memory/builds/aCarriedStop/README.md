@@ -54,16 +54,16 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-11-13 · streams tooling
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-11-13 · streams tooling
 ids TOOL-aCarriedStop-1
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aCarriedStop-1 — the owner-stop row: `--record-round --owner-stop` appends it citing the owner's tracked record, and the one chain verdict reads it as STOP](spec/2026-11-13-spec-TOOL-aCarriedStop-1.md) | — | 2 | INPROGRESS | rev-2 | 2026-11-13 |
+| [TOOL-aCarriedStop-1 — the owner-stop row: `--record-round --owner-stop` appends it citing the owner's tracked record, and the one chain verdict reads it as STOP](spec/2026-11-13-spec-TOOL-aCarriedStop-1.md) | — | 2 | CLOSED | rev-2 | 2026-11-13 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 3 record folder(s).
+Records: 6 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

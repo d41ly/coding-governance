@@ -1,13 +1,15 @@
 # TOOL-aCarriedStop-1 — the owner-stop row: `--record-round --owner-stop` appends it citing the owner's tracked record, and the one chain verdict reads it as STOP
 
-**Status:** INPROGRESS · rev-2 · 2026-11-13 · node a · Tier-2 · base d646814e · streams tooling
+**Status:** CLOSED · rev-2 · 2026-11-13 · node a · Tier-2 · base d646814e · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-13-build-TOOL-aCarriedStop-1-1-acceptance-ledger.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-13-build-TOOL-aCarriedStop-1-candidates.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-candidates.md) | research | — |
 | [2026-11-13-prompt-TOOL-aCarriedStop-1-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-1-spec-writer.md) | journal | — |
+| [2026-11-13-prompt-TOOL-aCarriedStop-1-2-builder.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-2-builder.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aCarriedStop-1-brief.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-brief.md) | research | — |
 | [2026-11-13-prompt-TOOL-aCarriedStop-1-build-brief.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-build-brief.md) | research | — |
 

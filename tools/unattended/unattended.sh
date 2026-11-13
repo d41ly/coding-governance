@@ -29,7 +29,8 @@
 #   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--playbook-sha <sha>] [--run <id>]]
 #   unattended.sh --record-set <slug> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--run <id>] [--set <hashes>]]
 #   unattended.sh --record-round <slug> --subject <s> --audited "<ids>" --blockers <b> --highs <h> [--finding <row>]... [--sibling <unit>@rev-<n>]...   # append one spec-audit round, no run-state file needed
-#   unattended.sh --chain-verdict <slug>                           # CONTINUE, STOP or HOLD, derived from that record and the roster; writes nothing
+#   unattended.sh --record-round <slug> --owner-stop <path>        # append the owner's stop, citing a tracked record under the build's prompts/ folder
+#   unattended.sh --chain-verdict <slug>                         # CONTINUE, STOP or HOLD, derived from that record and the roster; writes nothing
 #   unattended.sh --check-commit <message file>                    # from commit-msg: refuse an open pass's undeclared staged path
 #   unattended.sh --claims                                         # every run claim on the remote: slug, node, status, beat-age-s, verdict
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
@@ -947,7 +948,9 @@ check_run_state() { # run-state file · what there is no run for -> 0 when the f
 # each per-site refusal stood on, so the order a verb's refusals are reached in did not move. Not
 # here: a flag only a partner flag requires (`--override` and `--waive` each require `--reason`, and
 # `--hold` one of its reap pair) and a value refused for its shape rather than its absence. Leg check
-# 52 joins every pair below to a call and every call to a pair.
+# 52 joins every pair below to a call and every call to a pair. The record-round row's four are owed by
+# the audit route only: an `--owner-stop` call records a ruling and no round, so it never reaches the
+# four calls, and the row and the join stay as they are (TOOL-aCarriedStop-1).
 VERB_REQUIRES="--abort --reason --code
 --hold --code --until --reason
 --register-task --task --heartbeat
@@ -13681,35 +13684,67 @@ check_chain_fold() { # unit · the row's rev, with `load_spec_facts` already rea
 # so the test is "fewer", never "differs". THE VERB MOVES NO RUN STATE, so a terminal record does not
 # refuse it (TOOL-dFoldedAudit-15 S9): it writes a separate record, the caller commits that beside the
 # disposal's folds, and an attended chain on a finished build still records its round.
-write_chain_round() { # slug · subject · audited ids · blockers · highs, rows in RR_FINDINGS and RR_SIBLINGS
-  local slug="$1" subj="$2" audited="$3" blockers="$4" highs="$5"
-  local id="$UNIT_ID_ERE" rec now tok rows="" last=0 seen=0 round folds=()
+#
+# THE OWNER'S STOP IS A ROW OF ITS OWN ROUND (TOOL-aCarriedStop-1). `--owner-stop <path>` records the
+# owner's ruling that the chain has ended, citing a tracked record under the build's `prompts/` folder,
+# and no round flag sits beside it: a ruling is no audit. The path is held to a prefix, a charset and
+# the index, and the index test is an EQUALITY, because a name of `..` passes the charset and lists the
+# build's other files. THE COUNT READS EVERY ROW, so the round after a stop takes the next number, and
+# on a record with no such row the count is what it was: a finding or sibling row carries its subject
+# row's number. WHAT IT DOES NOT CHECK: that the owner wrote the cited record or that it rules a stop.
+# Any tracked file directly under that folder passes, so the row is evidence a reader can open, printed
+# on every verdict and dispatch line, and no guard against a run that lies.
+write_chain_round() { # slug · subject · audited ids · blockers · highs, rows in RR_FINDINGS and RR_SIBLINGS, or the cited record in RR_OWNER_STOP
+  local slug="$1" subj="$2" audited="$3" blockers="$4" highs="$5" path="$RR_OWNER_STOP"
+  local id="$UNIT_ID_ERE" rec now tok rows="" last=0 seen=0 round folds=() mixed="" named
   local f_id f_sev f_nat f_specs f_unit f_rev
   local re_ids="^$id( $id)*\$" re_sibling="^$id@rev-[0-9]+\$"
   local re_finding="^[0-9]+/($CHAIN_SEVERITIES)/($CHAIN_NATURES)/$id(,$id)*/$id/[0-9]+\$"
   local -A b_ids=() h_ids=()
   check_slug "$slug" || return 1
-  check_verb_flag --record-round --subject "$subj" || return 1
-  check_verb_flag --record-round --audited "$audited" || return 1
-  check_verb_flag --record-round --blockers "$blockers" || return 1
-  check_verb_flag --record-round --highs "$highs" || return 1
+  if [ -z "$path" ]; then
+    check_verb_flag --record-round --subject "$subj" || return 1
+    check_verb_flag --record-round --audited "$audited" || return 1
+    check_verb_flag --record-round --blockers "$blockers" || return 1
+    check_verb_flag --record-round --highs "$highs" || return 1
+  fi
   [ -d "$M/builds/$slug" ] || { check_chain_fault "no build folder holds this slug, so a round has nothing to bind to: $slug"; return 1; }
-  [[ $subj =~ ^[A-Za-z0-9-]+$ ]] || { check_chain_fault "--subject is outside [A-Za-z0-9-]+, and a row nothing can parse is prose in a record the verdict reads: $subj"; return 1; }
-  [[ $audited =~ $re_ids ]] || { check_chain_fault "--audited holds a token that is no unit id, or two spaces, and a row nothing can parse is prose in a record the verdict reads: $audited"; return 1; }
-  [[ "$blockers:$highs" =~ ^[0-9]{1,6}:[0-9]{1,6}$ ]] || { check_chain_fault "--blockers and --highs are the review's two integers: $blockers and $highs"; return 1; }
+  if [ -n "$path" ]; then
+    for tok in "--subject:$subj" "--audited:$audited" "--blockers:$blockers" "--highs:$highs" "--finding:${RR_FINDINGS[*]+given}" "--sibling:${RR_SIBLINGS[*]+given}"; do
+      [ -z "${tok#*:}" ] || mixed="${mixed:+$mixed }${tok%%:*}"
+    done
+    [ -z "$mixed" ] || { check_chain_fault "--owner-stop records the owner's ruling alone, and a round's flag beside it would mix a ruling with an audit: $mixed"; return 1; }
+    named=${path#"$M/builds/$slug/prompts/"}
+    { [ "$named" != "$path" ] && [[ $named =~ ^[A-Za-z0-9._-]+$ ]]; } || { check_chain_fault "--owner-stop names no file directly under this build's prompts folder, or its file name leaves [A-Za-z0-9._-], so the row would cite nothing a reader can open: $path"; return 1; }
+    [ "$(git ls-files -- "$path" 2>/dev/null)" = "$path" ] || { check_chain_fault "--owner-stop names a file git does not track, and a ruling no commit holds is one no later run can read: $path"; return 1; }
+  else
+    [[ $subj =~ ^[A-Za-z0-9-]+$ ]] || { check_chain_fault "--subject is outside [A-Za-z0-9-]+, and a row nothing can parse is prose in a record the verdict reads: $subj"; return 1; }
+    [[ $audited =~ $re_ids ]] || { check_chain_fault "--audited holds a token that is no unit id, or two spaces, and a row nothing can parse is prose in a record the verdict reads: $audited"; return 1; }
+    [[ "$blockers:$highs" =~ ^[0-9]{1,6}:[0-9]{1,6}$ ]] || { check_chain_fault "--blockers and --highs are the review's two integers: $blockers and $highs"; return 1; }
+  fi
   read_chain_record "$slug" || return 1
   if [ -n "$_chain_rec" ]; then
     read -r last seen < <(awk -v subj="$subj" '
       { sub(/\r$/, "") }
-      /^round [0-9]+ · subject / {
+      /^round [0-9]+ · / {
         split($0, f, " · "); split(f[1], w, " ")
         if (w[2] + 0 > last) last = w[2] + 0
-        if (f[2] == "subject " subj) seen = 1
+        if (subj != "" && f[2] == "subject " subj) seen = 1
       }
       END { print last + 0, seen + 0 }' "$_chain_rec")
   fi
   [ "$seen" = 0 ] || { check_chain_fault "an earlier round of the record already carries this --subject, and a replay would count one generation twice: $subj"; return 1; }
   round=$((last + 1))
+  # THE ID A NEW RECORD IS NAMED FROM: the audit route's first audited id, and for the owner's stop the
+  # first id of the specs and then of the authored plan, the order `read_chain_verdict` walks.
+  named=${audited%% *}
+  if [ -n "$path" ] && [ -z "$_chain_rec" ]; then
+    named=$(spec_ids "$M/builds/$slug"); [ -n "$named" ] || named=$(roster_ids "$slug") || named=""
+    named=${named%%[[:space:]]*}
+    [ -n "$named" ] || { check_chain_fault "the roster yields no id, so a new chain record has no unit to be named from: $slug"; return 1; }
+  fi
+  [ -z "$path" ] || rows="round $round · owner-stop · record $path"$'\n'
+  [ -n "$path" ] || rows="round $round · subject $subj · audited $audited"$'\n'
   for tok in ${RR_FINDINGS[@]+"${RR_FINDINGS[@]}"}; do
     [[ $tok =~ $re_finding ]] || { check_chain_fault "a --finding is outside <id>/<severity>/<nature>/<spec>[,<spec>]/<unit>/<rev>: $tok"; return 1; }
     IFS=/ read -r f_id f_sev f_nat f_specs f_unit f_rev <<<"$tok"
@@ -13745,12 +13780,12 @@ write_chain_round() { # slug · subject · audited ids · blockers · highs, row
   if [ -z "$rec" ]; then
     now=$(read_utc_now)
     [ -n "$now" ] || print_env_failure 118 "the clock answered nothing, so the record cannot be named and no round was written"
-    rec="$M/builds/$slug/build/${now%%T*}-build-${audited%% *}-chain-rounds.md"
+    rec="$M/builds/$slug/build/${now%%T*}-build-$named-chain-rounds.md"
     mkdir -p "${rec%/*}" 2>/dev/null || print_env_failure 118 "cannot create the build's record folder, so no round was written: ${rec%/*}"
   fi
   {
-    [ -n "$_chain_rec" ] || printf '# %s — the spec-audit chain'\''s rounds\n\n**Serves:** journal %s\n\nAppended by `--record-round` and read by `--chain-verdict`. Never edited by hand.\n\n' "$slug" "${audited%% *}"
-    printf 'round %s · subject %s · audited %s\n%s' "$round" "$subj" "$audited" "$rows"
+    [ -n "$_chain_rec" ] || printf '# %s — the spec-audit chain'\''s rounds\n\n**Serves:** journal %s\n\nAppended by `--record-round` and read by `--chain-verdict`. Never edited by hand.\n\n' "$slug" "$named"
+    printf '%s' "$rows"
   } >> "$rec" || print_env_failure 118 "cannot append to the record, so this round is not recorded: $rec"
   stage_runmd "$rec" || print_env_failure 118 "the round is written and git could not stage it, so the next call cannot find the record: $rec"
   echo "unattended: chain round recorded — $slug · round $round · $rec"
@@ -13764,6 +13799,12 @@ write_chain_round() { # slug · subject · audited ids · blockers · highs, row
 # id of P(N-1) and F(N-1) that round N's OWN `audited` row lacks (TOOL-dFoldedAudit-10), because `aud` is
 # cumulative, which keeps a spec round 1 audited reviewed, and alone it let a round stop clean over a fold
 # the next round never read. Live is what ends that test: a CLOSED or WONTDO id is in no walk here.
+#   0. Round N holds an `owner-stop` row: STOP, owner-stop, citing the row's record (TOOL-aCarriedStop-1).
+#      Read ahead of every step below and from the last round only, so it passes a record that reads
+#      CONTINUE or HOLD, and an audit round recorded after it takes the verdict back. That round's
+#      previous round is the stop, which holds no fold and no promotion, so nothing of the round before
+#      the stop is carried into it as unreviewed. The row counts toward the ceiling like any round, and
+#      the override set is empty, because the record cannot tell which units the audits named.
 #   1. U non-empty: CONTINUE, unreviewed, auditing U, P(N) and F(N).
 #   2. H(N) and P(N) empty: STOP, clean.
 #   3. own-work, N >= 2, H(N) NON-EMPTY, every high's specs inside P(N-1) and F(N-1): STOP, own-work.
@@ -13814,6 +13855,8 @@ derive_chain_verdict() { # record or empty · live ids · stop mode · ceiling -
         audn[r] = substr(f[3], 9)
       } else if (k == 4 && f[2] == "sibling" && f[3] ~ /^unit / && isid(substr(f[3], 6)) && f[4] ~ /^rev [0-9]+$/) {
         fold[r] = fold[r] " " substr(f[3], 6)
+      } else if (k == 3 && f[2] == "owner-stop" && f[3] ~ "^record [A-Za-z0-9._/-]+$") {
+        ruled[r] = substr(f[3], 8)
       } else if (k == 7 && f[2] ~ /^finding [0-9]+$/ && f[3] ~ sevre &&
                  f[4] ~ natre && f[5] ~ /^specs / && isids(substr(f[5], 7)) &&
                  f[6] ~ /^unit / && isid(substr(f[6], 6)) && f[7] ~ /^rev [0-9]+$/) {
@@ -13827,6 +13870,7 @@ derive_chain_verdict() { # record or empty · live ids · stop mode · ceiling -
     END {
       if (bad != "") { print "BAD|" bad; exit }
       N = last + 0
+      if (ruled[N] != "") { print N "|STOP|owner-stop|||" ruled[N]; exit }
       toset(prom[N], P); toset(fold[N], F); toset(prom[N - 1] " " fold[N - 1], prior); toset(audn[N], own)
       c = split(live, L, " ")
       for (i = 1; i <= c; i++) if ((!(L[i] in aud) && !(L[i] in P)) || ((L[i] in prior) && !(L[i] in own))) { U[L[i]] = 1; unreviewed = 1 }
@@ -13842,13 +13886,13 @@ derive_chain_verdict() { # record or empty · live ids · stop mode · ceiling -
         for (i in F) U[i] = 1
         audit = joined(U)
       }
-      print N "|" word "|" reason "|" audit "|" override
+      print N "|" word "|" reason "|" audit "|" override "|"
     }' "${1:-/dev/null}") || print_env_failure 118 "awk could not read the record, so no verdict exists: ${1:-(none)}"
   case "$out" in
     BAD\|*) check_chain_fault "a body row is outside the grammar, and the record is append-only, so it was edited by hand: ${out#BAD|}"
             return 1 ;;
   esac
-  IFS='|' read -r _cv_round _cv_word _cv_reason _cv_audit _cv_override <<<"$out"
+  IFS='|' read -r _cv_round _cv_word _cv_reason _cv_audit _cv_override _cv_record <<<"$out"
 }
 # A verdict of each of the three exits 0: the verb answered, and the caller acts on the word. The roster
 # is the specs and the authored plan together, so a promoted unit counts once its spec is tracked. CLOSED
@@ -13885,6 +13929,7 @@ print_chain_verdict() { # slug -> the verdict line, then the recipe line on a HO
   line="unattended: chain $slug · round $_cv_round · $_cv_word · reason $_cv_reason"
   [ -z "$_cv_audit" ] || line="$line · audit $_cv_audit"
   [ -z "$_cv_override" ] || line="$line · override specs-audited $_cv_override"
+  [ -z "$_cv_record" ] || line="$line · record $_cv_record"
   printf '%s\n' "$line"
   [ "$_cv_word" != HOLD ] || printf 'unattended: chain %s holds for the owner at the ceiling of %s round(s): bash %s --park %s --item spec-audit-chain-ceiling --reason <what stands>, then reap the keepalive and bash %s --handoff %s --code owner-decision --reason <what the owner decides> --reaped <the keepalive id you deleted>; an attended run asks the owner.\n' \
     "$slug" "$_cv_ceiling" "$DRIVER_ARGV0" "$slug" "$DRIVER_ARGV0" "$slug"
@@ -13920,13 +13965,18 @@ read_unrecorded_exits() { # run-state file · slug · the chain record, or nothi
 # leaves neither: N is then 0, and the verdict reads unreviewed. Each refusal is a value of `why`, because
 # the driver's census sits at its ceiling and the way up is the owner's retirement review.
 #
-# NOTHING A RUN WRITES PASSES A HOLD: `--park` writes the question and `--handoff` the stop, and both are the
-# run's own rows. The owner moves `review.spec-audit.chain-ceiling` in the guarded policy file, the verdict
-# leaves HOLD for CONTINUE, and the chain takes the round the raised ceiling asks for.
+# NO PARK ROW AND NO HAND-OFF ROW PASSES A HOLD: `--park` writes the question and `--handoff` the stop, and
+# both are the run's own rows. Two acts leave a HOLD, and both are the owner's. The owner moves
+# `review.spec-audit.chain-ceiling` in the guarded policy file, the verdict leaves HOLD for CONTINUE, and
+# the chain takes the round the raised ceiling asks for. Or the owner rules the chain ended, and
+# `--record-round --owner-stop` records that ruling as a row citing its tracked record, which the verdict
+# reads as STOP and this gate prints on the dispatch line (TOOL-aCarriedStop-1). The row is run-writable,
+# as every round is, so it is evidence a reviewer opens and no guard against a run that lies.
 #
 # WHAT IT DOES NOT CHECK: that a run calls `--dispatch` at all, the limit M2's floor already has; a round's
-# truth, so a forged STOP passes; and an uncommitted edit of the policy file, which the verdict reads from
-# the working copy and the path guard refuses at the commit.
+# truth, so a forged STOP passes, an owner-stop row citing a record the owner never wrote among them; and
+# an uncommitted edit of the policy file, which the verdict reads from the working copy and the path guard
+# refuses at the commit.
 check_chain_dispatch() { # run-state file · slug -> 0 when the chain admits this dispatch, else check 118 and 1
   local rel="$1" slug="$2" unrec
   read_spec_exit_rule "$rel" "$slug" "$slug-spec-set"
@@ -13942,7 +13992,7 @@ check_chain_dispatch() { # run-state file · slug -> 0 when the chain admits thi
   [ -z "$unrec" ] || { check_chain_fault "--dispatch reads a terminal spec exit no chain round records, so the verdict would be read without it: $unrec; run that round's --record-round and commit the record"; return 1; }
   read_chain_verdict "$slug" || return 1
   case "$_cv_word" in
-    STOP) echo "unattended: dispatch — chain $slug · round $_cv_round · STOP · reason $_cv_reason"
+    STOP) echo "unattended: dispatch — chain $slug · round $_cv_round · STOP · reason $_cv_reason${_cv_record:+ · record $_cv_record}"
           return 0 ;;
     HOLD) check_chain_fault "--dispatch builds nothing while the chain reads HOLD: round $_cv_round stands at the ceiling of $_cv_ceiling round(s), and only the owner moves review.spec-audit.chain-ceiling; a parked decision or a hand-off row is the question, never the answer" ;;
     *)    check_chain_fault "--dispatch builds nothing while the chain reads $_cv_word: round $_cv_round, reason $_cv_reason; re-invoke the build harness with auditIds: $_cv_audit" ;;
@@ -15202,7 +15252,7 @@ HOLD_UNTIL=""; HOLD_REAPED=""; HOLD_UNREACH=""; HOLD_RUN=""; RS_REPLACES=""; RS_
 RP_PATH=""; RP_LEG=""; VERDICT=""; RP_ROOT=""; RP_PBSHA=""; RP_RUN=""; RP_SET=""; BR_UNIT=""
 RS_ACT=""; RS_SUCC=""
 DP_WRITES=()
-RR_AUDITED=""; RR_FINDINGS=(); RR_SIBLINGS=()
+RR_AUDITED=""; RR_FINDINGS=(); RR_SIBLINGS=(); RR_OWNER_STOP=""
 OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
 # TOOL-cBriefedPilot-3 - the owner's waiver pairs, through unit 1's accumulator rather than a second
 # one. Same reason for parallel arrays: the reason is free text an owner types, and a record
@@ -15294,6 +15344,7 @@ while [ $# -gt 0 ]; do
     --audited)      RR_AUDITED="${2:-}"; shift 2 || shift ;;
     --finding)      RR_FINDINGS+=("${2:-}"); shift 2 || shift ;;
     --sibling)      RR_SIBLINGS+=("${2:-}"); shift 2 || shift ;;
+    --owner-stop)   RR_OWNER_STOP="${2:-}"; shift 2 || shift ;;
     --plan)         shift; refuse_waive_unless_preflight --plan || { RUNLOG_CLEAN=1; exit 1; }
                     # SEVERAL SLUGS IN ONE PROCESS, and the single-slug form is byte-identical to
                     # what it always was — the framing below only appears when more than one slug is

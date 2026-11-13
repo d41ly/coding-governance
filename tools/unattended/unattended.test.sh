@@ -3337,6 +3337,87 @@ out=$(run_chain --review dFix --subject dFix --verdict CLEAN --blockers 0 --high
 same "FA9 AC13 a closing review needs no base" "$rc" "0"
 same "FA9 AC13 its row is written" "$(grep -c 'review · item dFix · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 0$' "$_cg_run")" "1"
 
+# ---- TOOL-aCarriedStop-1: THE OWNER'S STOP IS A ROW, AND THE ONE VERDICT READS IT AS STOP. The gate's
+# ---- fixture with its audit declared and one tracked record under the build's `prompts/` folder. The red
+# ---- beside these greens is `AC6 a declared audit with no round`, above: the same declaration with no row
+# ---- still refuses. The failing case, observed at the close and not by the pass that wrote this: the
+# ---- driver from before this unit, where `--owner-stop` is an unknown argument, reds every arm below.
+# ---- WHAT THESE DO NOT CHECK: the truth of the cited record, a row written by hand, and the census arm's
+# ---- own figure.
+_cs_stop="memory/builds/dFix/prompts/2026-10-24-prompt-FIX-dFix-1-owner-review-stop.md"
+_cs_open="1/HIGH/new-mechanism/FIX-dFix-1/FIX-dFix-2/1"
+_cs_alone="--owner-stop records the owner's ruling alone, and a round's flag beside it would mix a ruling with an audit"
+_cs_folder="--owner-stop names no file directly under this build's prompts folder, or its file name leaves [A-Za-z0-9._-], so the row would cite nothing a reader can open"
+_cs_index="--owner-stop names a file git does not track, and a ruling no commit holds is one no later run can read"
+write_stop_fixture() { # -> the gate's fixture, its audit declared and the owner's record tracked
+  write_gate_fixture "$_fa_dated" 2026-11-01
+  mkdir -p "$_fc_r/${_cs_stop%/*}"
+  printf '# the owner ends the audit chain\n' > "$_fc_r/$_cs_stop"
+  write_gate_fact 's/^witness: abc$/&\nspec-audit: 2026-11-01/'
+}
+write_stop_row() { # -> the owner-stop row through the verb, committed
+  out=$(run_chain --record-round dFix --owner-stop "$_cs_stop"); rc=$?
+  same "CS1 the owner-stop row records" "$rc" "0"
+  write_fold_commit "$_fa_dated" stop "$_fc_r"
+}
+# AC2 and AC3: the row is written and staged, the verdict cites it, and the gate admits the pass on that line.
+write_stop_fixture
+write_stop_row
+hit "$out" "unattended: chain round recorded — dFix · round 1 · "
+_fc_f=$(read_chain_file)
+same "CS1 AC2 one record, named from the roster's first id" "$(grep -c -- '-build-FIX-dFix-1-chain-rounds[.]md$' <<<"$_fc_f")" "1"
+same "CS1 AC2 the row is the record's last line" "$(tail -n 1 "$_fc_r/$_fc_f")" "round 1 · owner-stop · record $_cs_stop"
+out=$(run_chain --chain-verdict dFix); rc=$?
+same "CS1 AC2 the verdict exits 0" "$rc" "0"
+same "CS1 AC2 the verdict cites the record" "$out" "unattended: chain dFix · round 1 · STOP · reason owner-stop · record $_cs_stop"
+check_gate_admits "CS1 AC3 the owner's stop"
+hit "$out" "unattended: dispatch — chain dFix · round 1 · STOP · reason owner-stop · record $_cs_stop"
+# AC4: each refusal value whole, with the record's bytes as they stood, then the two a new record meets.
+write_stop_fixture
+write_fixture_round s1 "$_fc_all" 0 0
+_fc_f=$(read_chain_file); _fc_bytes=$(<"$_fc_r/$_fc_f")
+check_chain_refused "$_cs_alone: --subject" --owner-stop "$_cs_stop" --subject s2
+check_chain_refused "$_cs_folder: memory/builds/dFix/spec/2026-11-01-spec-FIX-dFix-1.md" --owner-stop memory/builds/dFix/spec/2026-11-01-spec-FIX-dFix-1.md
+check_chain_refused "$_cs_folder: ${_cs_stop%/*}/a b.md" --owner-stop "${_cs_stop%/*}/a b.md"
+check_chain_refused "$_cs_index: ${_cs_stop%/*}/.." --owner-stop "${_cs_stop%/*}/.."
+: > "$_fc_r/${_cs_stop%/*}/untracked.md"
+check_chain_refused "$_cs_index: ${_cs_stop%/*}/untracked.md" --owner-stop "${_cs_stop%/*}/untracked.md"
+write_stop_fixture
+out=$(run_chain --record-round dFix --owner-stop "$_cs_stop" --finding "$_cs_open"); rc=$?
+same "CS1 AC4 a finding beside the flag exits 1" "$rc" "1"
+hit "$out" "UNATTENDED check 118 FAILED — the spec-audit chain record refuses this: $_cs_alone: --finding"
+( cd "$_fc_r" && git rm -q -r memory/builds/dFix/spec && printf '# dFix\n' > memory/builds/dFix/README.md && git add -A >/dev/null )
+out=$(run_chain --record-round dFix --owner-stop "$_cs_stop"); rc=$?
+same "CS1 AC4 a roster with no id exits 1" "$rc" "1"
+hit "$out" "UNATTENDED check 118 FAILED — the spec-audit chain record refuses this: the roster yields no id, so a new chain record has no unit to be named from: dFix"
+same "CS1 AC4 no refusal left a record" "$(read_chain_file)$(ls "$_fc_r/memory/builds/dFix/build" 2>/dev/null)" ""
+# AC5: an audit round after the row takes the next number, and the verdict with it.
+write_stop_fixture
+write_stop_row
+write_fixture_round s1 "$_fc_all" 0 1 --finding "$_cs_open"
+hit "$out" "dFix · round 2 · "
+same "CS1 AC5 the audit round is round 2" "$(grep -c "^round 2 · subject s1 · audited $_fc_all\$" "$_fc_r/$(read_chain_file)")" "1"
+same "CS1 AC5 the audit takes the verdict back" "$(run_chain --chain-verdict dFix)" "unattended: chain dFix · round 2 · CONTINUE · reason open · audit FIX-dFix-2"
+# AC6: the row stops a CONTINUE and a HOLD, read ahead of the unreviewed test and of the ceiling.
+write_stop_fixture
+write_fixture_round s1 "$_fc_all" 0 1 --finding "$_cs_open"
+hit "$(run_chain --chain-verdict dFix)" "round 1 · CONTINUE · reason open"
+write_stop_row
+hit "$(run_chain --chain-verdict dFix)" "round 2 · STOP · reason owner-stop"
+write_stop_fixture
+write_hold_rounds
+hit "$(run_chain --chain-verdict dFix)" "round 4 · HOLD · reason ceiling"
+write_stop_row
+out=$(run_chain --chain-verdict dFix)
+same "CS1 AC6 a stopped HOLD prints one line" "$out" "unattended: chain dFix · round 5 · STOP · reason owner-stop · record $_cs_stop"
+check_gate_admits "CS1 AC6 a HOLD the owner stopped"
+hit "$out" "round 5 · STOP · reason owner-stop · record $_cs_stop"
+# AC7: the row records no subject, so a terminal spec exit no round records still refuses.
+write_stop_fixture
+write_gate_exit s2
+write_stop_row
+check_gate_refused "CS1 AC7 an exit beside the owner's stop" "$_cg_lost, so the verdict would be read without it: s2;"
+
 # ---- TOOL-dFoldedAudit-15: THE BATCH'S DRIVER ARMS. The failing cases, observed at the close and not by the
 # ---- pass that wrote this: `owe=$(( promoted - minors ))` restored and `dword` fixed at `promoted` red AC2 to
 # ---- AC4; the unanchored skip list reads AC6's prefixed rows as `reason clean`; the terminal guard restored

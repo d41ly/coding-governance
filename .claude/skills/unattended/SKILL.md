@@ -120,6 +120,7 @@ unattended.sh --overlaps  # local
 unattended.sh --beat <slug>
 unattended.sh --review <slug> --subject <id-or-slug> --verdict <verdict> --blockers <N>
 unattended.sh --record-round <slug> --subject <s> --audited "<ids>" --blockers <N> --highs <N>
+unattended.sh --record-round <slug> --owner-stop <path>
 unattended.sh --chain-verdict <slug>
 python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD
 ```

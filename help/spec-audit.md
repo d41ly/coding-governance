@@ -65,7 +65,7 @@ bash tools/unattended/unattended.sh --help
 
 ## Recording a round
 
-`--record-round` appends one spec-audit round to the build's chain record. <!-- usage: verb:unattended.sh:--record-round 60847ce3 -->
+`--record-round` appends one spec-audit round to the build's chain record. <!-- usage: verb:unattended.sh:--record-round 0d0412b9 -->
 
 <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and placeholders -->
 ```bash
@@ -90,6 +90,28 @@ bash tools/unattended/unattended.sh --record-round <slug> --subject <s> --audite
   the tree, meaning a unit no tracked spec carries, a rev below 2 or above the spec's header, or a
   rev with no revision-log entry.
 
+### Recording the owner's stop
+
+When the owner rules that a chain has ended, `--owner-stop` records that ruling in place of a round:
+
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and placeholders -->
+```bash
+bash tools/unattended/unattended.sh --record-round <slug> --owner-stop <path>
+```
+
+- **The row:** `round <N> · owner-stop · record <path>`, on a round of its own. The number is the
+  record's last round plus one, counted over every row. A new record is named from the roster's
+  first id.
+- **The path** is the repository-relative path of a tracked file directly under the build's
+  `prompts/` folder, the record that holds the owner's ruling. Its file name stays inside
+  `[A-Za-z0-9._-]`.
+- **What it refuses,** before writing a byte: any of `--subject`, `--audited`, `--blockers`,
+  `--highs`, `--finding` and `--sibling` beside it, because a ruling is no audit; a path outside
+  that folder or that charset; a path git does not track; and a roster that yields no id to name a
+  new record from.
+- **What it does not check:** that the owner wrote the cited record, or that it rules a stop. The
+  row is evidence a reader can open, printed on every verdict and dispatch line.
+
 ## Asking the verdict
 
 `--chain-verdict` derives whether a chain goes on, and writes nothing. <!-- usage: verb:unattended.sh:--chain-verdict 5fdc7c80 -->
@@ -103,14 +125,15 @@ bash tools/unattended/unattended.sh --chain-verdict <slug>
 It prints one line, and every word exits 0:
 
 ```text
-unattended: chain <slug> · round <N> · <word> · reason <reason>[ · audit <ids>][ · override specs-audited <ids>]
+unattended: chain <slug> · round <N> · <word> · reason <reason>[ · audit <ids>][ · override specs-audited <ids>][ · record <path>]
 ```
 
-The word comes from the first of five steps that holds, in M4's order, and the reason names the
-step:
+An owner's stop is read first. After it, the word comes from the first of five steps that holds, in
+M4's order, and the reason names the step:
 
 | Step | Word | Reason | When it holds |
 |---|---|---|---|
+| — | `STOP` | `owner-stop` | the record's last round holds an `--owner-stop` row; the line ends with `record` and the path the row cites, and names no override |
 | 1 | `CONTINUE` | `unreviewed` | a live roster spec no round audited and this round did not promote, or one of the previous round's promotions and BLOCKER-or-HIGH folds that this round did not audit; it is audited with step 5's set |
 | 2 | `STOP` | `clean` | no BLOCKER or HIGH, and nothing promoted |
 | 3 | `STOP` | `own-work` | from round 2, every BLOCKER's and HIGH's specs sit inside the previous round's promotions and BLOCKER-or-HIGH folds |
@@ -124,11 +147,13 @@ What to do on each word:
   audited again.
 - **`STOP`:** dispatch the roster. On an `own-work` stop this round's disposal still runs, and a
   unit after `override specs-audited` is built from its spec as written and closes under a
-  recorded `--override specs-audited`.
+  recorded `--override specs-audited`. On an `owner-stop` the dispatch line names the cited record
+  as well, and an audit round recorded after the row takes the verdict back.
 - **`HOLD`:** a second line prints the recipe: `--park <slug> --item spec-audit-chain-ceiling`,
   reap the keepalive, then `--handoff <slug> --code owner-decision --reaped <id>`, because `--hold`
   refuses that code. An attended run asks the owner. A HOLD stays the answer until the owner moves
-  the ceiling or rules.
+  the ceiling or rules. A ruling to stop is recorded with `--record-round <slug> --owner-stop <path>`,
+  and the verdict then reads `STOP`.
 
 ## When a chain stops
 
