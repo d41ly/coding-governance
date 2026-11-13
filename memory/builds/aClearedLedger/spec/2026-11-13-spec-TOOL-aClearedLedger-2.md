@@ -1,6 +1,6 @@
 # TOOL-aClearedLedger-2 — the protocol's section 12 says why a red fix's record is the next commit and cannot ride its own fix
 
-**Status:** SPECCED · rev-1 · 2026-11-13 · node a · Tier-2 · base 8db6f4be · streams tooling · order 2
+**Status:** INPROGRESS · rev-1 · 2026-11-13 · node a · Tier-2 · base 8db6f4be · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
