@@ -1,6 +1,6 @@
 # TOOL-aCarriedStop-3 — the closing review's mediums and lows, batched: the count test on the audit route only, the owner-stop arms the suite lacks, the base driver's reading and the usage header's padding
 
-**Status:** SPECCED · rev-1 · 2026-11-13 · node a · Tier-2 · base cfda7001 · streams tooling · order 3
+**Status:** INPROGRESS · rev-1 · 2026-11-13 · node a · Tier-2 · base cfda7001 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
