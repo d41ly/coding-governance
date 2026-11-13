@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-13-build-TOOL-aCarriedStop-1-1-acceptance-ledger.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-1-acceptance-ledger.md) | journal | — |
+| [2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md) | journal | — |
 | [2026-11-13-build-TOOL-aCarriedStop-1-candidates.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-candidates.md) | research | — |
 | [2026-11-13-prompt-TOOL-aCarriedStop-1-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-1-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aCarriedStop-1-2-builder.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-2-builder.md) | journal | — |
