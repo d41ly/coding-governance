@@ -67,7 +67,7 @@ ids TOOL-aCarriedStop-1 TOOL-aCarriedStop-2 TOOL-aCarriedStop-3
 | [TOOL-aCarriedStop-1 — the owner-stop row: `--record-round --owner-stop` appends it citing the owner's tracked record, and the one chain verdict reads it as STOP](spec/2026-11-13-spec-TOOL-aCarriedStop-1.md) | — | 2 | CLOSED | rev-2 | 2026-11-13 |
 <!-- /gen:build-units -->
 
-Records: 15 bound to this build, across 4 record folder(s).
+Records: 16 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
