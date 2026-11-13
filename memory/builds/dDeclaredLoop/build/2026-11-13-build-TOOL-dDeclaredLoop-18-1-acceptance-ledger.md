@@ -11,7 +11,7 @@ observation of the new arm in `tools/playbook/adopt-playbook.sh`, seven rows, fi
 resolver's block and two in the block guarded on the policy kit.
 
 **Evidences:** TOOL-dDeclaredLoop-18
-- AC1 — `policy-ns-word` — the plant exited 1 and printed `tags: tools/policy/catalogue.toml:2 · shape ·
+- AC1 — `policy-ns-word` — the plant exited 1 and printed `tags: tools/policy/catalogue.toml@9ce5a224:2 · shape ·
   policy.step.timeout · first segment 'step' is a namespace word`; the name-check printed the same
   reason for the same tag.
 - AC2 — `policy-catalogue` — the plant exited 0 and printed `tags: plant policy-catalogue · 264 members

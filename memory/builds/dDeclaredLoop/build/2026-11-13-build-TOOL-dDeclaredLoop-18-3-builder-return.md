@@ -8,9 +8,9 @@ Run wf_ee1ee571-451. The dispatch gate admitted the pass. The builder built the 
 
 DIVERGENCE: spec rev-4 §4 "The four rows" / "Migration" / "Rollout" and AC8 say the four registry rows land additively with the `tags` leg green. They do not. Registering `command`, `item` and `policy` as namespace words makes three existing tags break `derive_tag_fault`'s rule "first segment is a namespace word":
 
-- `kind.command` at tools/playbook/kinds.toml:25
-- `kind.item` at tools/playbook/kinds.toml:155
-- `kit.policy` at tools/policy/kit.toml:4 (the policy kit's descriptor `id`)
+- `kind.command` at tools/playbook/kinds.toml@f616569e:25
+- `kind.item` at tools/playbook/kinds.toml@f616569e:155
+- `kit.policy` at tools/policy/kit.toml@73fefee1:4 (the policy kit's descriptor `id`)
 
 Observed with the unit fully built in the worktree: `check_tag_shape` over the live tree returned exactly those three reds, and `lexicon.py --tags` refuses the same three, so the `tags` leg would carry six reds at landing (three shape, three name-check). §4 "The catalogue in the `policy` namespace" pins `derive_tag_fault` only over the 264 new member tags and six family tags against the fourteen words; it never grades the tags already defined in other namespaces against the four new words. `step` collides with nothing today.
 
@@ -42,7 +42,7 @@ TOOL-dDeclaredLoop-18 was not built to a commit: returned as a DIVERGENCE, spec 
 - memory/map/generated/symbols.json is the only generated map file the unit moves.
 - With `step` registered in gov's registry, the existing `bad-ns` plant prints 1 red instead of 2 (the lexicon reads gov's registry, not the fixture's); its adopter row still matches.
 
-**Cost note.** The `--dispatch` verb took about 25 minutes, most of it in `check-spec-tokens.py` → packet `--check` → `carries.py --report dDeclaredLoop`. I waited on it past the 600 s bound three times because writing was gated on it.
+**Cost note.** The `--dispatch` verb took about 25 minutes, most of it in `check-spec-tokens.py` → packet `--check` → `carries.py --report dDeclaredLoop`. I waited on it past the 600 s (PINNED) bound three times because writing was gated on it.
 
 **Still owed at the close once the spec is revised and the unit rebuilt:** the §7 new arm, RED on `policy-ns-word`, `loop-bad-seg`, `command-rows` and `policy-family` then GREEN, and the `tags` leg over the real tree.
 

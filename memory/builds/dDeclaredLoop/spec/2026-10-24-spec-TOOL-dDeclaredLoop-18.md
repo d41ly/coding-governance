@@ -232,7 +232,7 @@ Each `purpose-source` is the path-only form, the one form of
   Markdown path with a `#design-tags` field could not land.
 - A `<path>#<field>` source over the catalogue would read each member through `read_toml_field`, which
   finds a row by the value of its tag key. A catalogue row's key holds `review.rounds` and the member
-  is `policy.review.rounds`, so no member is ever found. Only 30 of the catalogue's 272 rows carry a
+  is `policy.review.rounds`, so no member is ever found. Only 30 of the catalogue's 272 rows (PINNED) carry a
   `summary` (PINNED, read 2026-11-13), so the field would not grade the rest either.
 - `{prefix}/loop/loop.toml` is not in the view until TOOL-dDeclaredLoop-1 lands, so the `step` and
   `item` rows print `pending` and are never red; the arm prints them path-only from then on.
@@ -414,7 +414,7 @@ row has. The
 rows of `policy-catalogue` and `policy-family` reach the policy kit, so they run in a block of their
 own guarded by `check_sibling_kit policy policy.py`, which prints `UNARMED` where no policy kit is
 installed. Each plant builds one scratch repository; the `bad-seg` plant measured 2.2 s and the
-`bad-ns` plant 7.2 s on 2026-11-13, and the seven rows' wall-clock ceiling is 90 s together.
+`bad-ns` plant 7.2 s on 2026-11-13, and the seven rows' wall-clock ceiling is 90 s (PINNED) together.
 
 ### The command namespace
 
@@ -468,7 +468,7 @@ python -c "import sys; sys.path.insert(0, 'tools/playbook'); import gov_tag as g
 ```
 
 At `0ca2f812` it printed `probe: 305 graded, 0 shape, 0 name-check · slot
-point.instruction.name-check · searched-empty` in 34 s over a warm index (observed 2026-11-13). It
+point.instruction.name-check · searched-empty` in 34 s (PINNED) over a warm index (observed 2026-11-13). It
 writes nothing but the derived index under the git common directory, as `where` does. What it does not
 check: the joins, the `resolves` arm, the `purpose` arm and every other arm of `check`, which AC8
 observes at the close.
@@ -628,7 +628,7 @@ Each fixture command below ends with the two flags every tag plant takes,
   `purpose-source` is spelled in a form the arm reds; or the rule is left whole in a twin, so
   `kind.command`, `kind.item` and `kit.policy` each print on a `· shape ·` or a `name-check ·` line; or
   the three were renamed instead, so the diff names a file.
-  cost: one index build over the tree, measured at 95 s cold by the `queued-writers` plant's comment in
+  cost: one index build over the tree, measured at 95 s (PINNED) cold by the `queued-writers` plant's comment in
   `tools/playbook/gov_tag.py`.
   This is the `tags` leg's own command, so the main loop observes it at the close; AC10 is the pass's
   observation of its shape and name-check arms.
@@ -649,7 +649,7 @@ Each fixture command below ends with the two flags every tag plant takes,
   left whole the probe prints six such lines, three per twin, for `kind.command`, `kind.item` and
   `kit.policy`.
   figure: `<n>` is DERIVED at observation; 305 at `0ca2f812`, before this unit's members join.
-  cost: 34 s over a warm index, measured 2026-11-13; one index build of 95 s where the index is cold.
+  cost: 34 s (PINNED) over a warm index, measured 2026-11-13; one index build of 95 s where the index is cold.
 
 ## 7. Gates
 
@@ -751,7 +751,7 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 AC4 AC6 AC9 · t
     the path the records point at. The owner answered a breach of this rule twice on 2026-10-19, each
     time with a rename ("rename that segment to conform to tag grammar"; "yes, rename them and add the
     check"). PLAY-dOrderedCharter-65 §3 says the registering build renames `kind.item` under its rule,
-    and PLAY-dOrderedCharter-10 §5 calls `kit.policy` "a red that build owes". Its cost: the two kind
+    and PLAY-dOrderedCharter-10 §5 terms `kit.policy` "a red that build owes". Its cost: the two kind
     rows and their readers in `tools/playbook/core-pending.txt` and `help/reference/kinds.md`; the
     text of six unbuilt specs that spell `kind.item` or `kind.command` (TOOL-dDeclaredLoop-6, -24,
     -25, -27 and -29, and TOOL-dBoundRoles-22); and a wording gap against cl-dClosedLoop-0109, which

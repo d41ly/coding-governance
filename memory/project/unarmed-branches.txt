@@ -190,6 +190,7 @@ tools/playbook/adopt-playbook.sh	exit	1	layer-check arm(s) failed	no sibling sui
 tools/playbook/adopt-playbook.sh	exit	1	tag-resolver arm(s) failed	the same reason, for the tag resolver's plant rows
 tools/playbook/adopt-playbook.sh	exit	1	edge-grammar arm(s) failed	the same reason, for the edge grammar's plant rows
 tools/playbook/adopt-playbook.sh	exit	1	load-set arm(s) failed	the same reason, for the load set's plant rows
+tools/playbook/adopt-playbook.sh	exit	1	policy-namespace arm(s) failed	the same reason, for the policy namespace's plant rows
 skills/session-kickoff/card-compaction.fixture.sh	exit	1	card-compaction: FAILED limb A1 — session A printed no session_id	no sibling suite: the fixture drives two live headless sessions and a compaction, so no arm can stage its failure offline; the main loop runs it live
 skills/session-kickoff/card-compaction.fixture.sh	exit	1	card-compaction: FAILED limb A — session A names the primary's nonce	no sibling suite: the fixture drives two live headless sessions and a compaction, so no arm can stage its failure offline; the main loop runs it live
 skills/session-kickoff/card-compaction.fixture.sh	exit	1	card-compaction: FAILED limb A — session A names neither	no sibling suite: the fixture drives two live headless sessions and a compaction, so no arm can stage its failure offline; the main loop runs it live
