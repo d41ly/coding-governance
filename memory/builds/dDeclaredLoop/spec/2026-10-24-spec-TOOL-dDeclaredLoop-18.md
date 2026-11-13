@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-18 — the `step`, `item`, `policy` and `command` tag namespaces, with their extractors
 
-**Status:** INPROGRESS · rev-4 · 2026-11-13 · node d · Tier-2 · base ed497191 · streams tooling · order 1 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-5 · 2026-11-13 · node d · Tier-2 · base ed497191 · streams tooling · order 1 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0103@2d82c817 whole
 **Carries:** node:tag-namespace.step
@@ -19,15 +19,19 @@
 | [2026-11-05-build-TOOL-dDeclaredLoop-18-deviation-182.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-18-deviation-182.md) | deviation | — |
 | [2026-11-13-build-TOOL-dDeclaredLoop-18-1-builder-return.md](../build/2026-11-13-build-TOOL-dDeclaredLoop-18-1-builder-return.md) | journal | — |
 | [2026-11-13-build-TOOL-dDeclaredLoop-18-2-builder-return.md](../build/2026-11-13-build-TOOL-dDeclaredLoop-18-2-builder-return.md) | journal | — |
+| [2026-11-13-build-TOOL-dDeclaredLoop-18-3-builder-return.md](../build/2026-11-13-build-TOOL-dDeclaredLoop-18-3-builder-return.md) | journal | — |
 | [2026-11-13-build-TOOL-dDeclaredLoop-18-deviation-183.md](../build/2026-11-13-build-TOOL-dDeclaredLoop-18-deviation-183.md) | deviation | — |
+| [2026-11-13-build-TOOL-dDeclaredLoop-18-deviation-184.md](../build/2026-11-13-build-TOOL-dDeclaredLoop-18-deviation-184.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-56 |
 | [2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-56 |
 | [2026-11-05-prompt-TOOL-dDeclaredLoop-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-3-owner-forks.md) | research | TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-56 |
 | [2026-11-13-prompt-TOOL-dDeclaredLoop-18-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-dDeclaredLoop-18-1-spec-writer.md) | journal | — |
+| [2026-11-13-prompt-TOOL-dDeclaredLoop-18-2-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-dDeclaredLoop-18-2-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-dDeclaredLoop-18-build-brief.md](../prompts/2026-11-13-prompt-TOOL-dDeclaredLoop-18-build-brief.md) | journal | — |
 | [2026-11-13-prompt-TOOL-dDeclaredLoop-18-owner-audit-key-dropped.md](../prompts/2026-11-13-prompt-TOOL-dDeclaredLoop-18-owner-audit-key-dropped.md) | research | — |
+| [2026-11-13-prompt-TOOL-dDeclaredLoop-18-spec-brief-2.md](../prompts/2026-11-13-prompt-TOOL-dDeclaredLoop-18-spec-brief-2.md) | research | — |
 | [2026-11-13-prompt-TOOL-dDeclaredLoop-18-spec-brief.md](../prompts/2026-11-13-prompt-TOOL-dDeclaredLoop-18-spec-brief.md) | research | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-33 |
 
@@ -41,6 +45,11 @@ the core's tag-shape check, and every catalogue key's name is among the `policy`
 this unit lands, a tag in any of the four reads `namespace '<ns>' is not registered`, the first rule of
 `tools/playbook/tag_index.py#derive_tag_fault` (the owner's tag-grammar answers; systems.md
 `[design-tags]`, "Owners").
+
+Three tags other namespaces already define open with one of the four words: `kind.command`, `kind.item`
+and `kit.policy`. The registration carries the rule that keeps them legal, the namespace-word rule read
+as a rule over names of two or more segments (§4 "### The namespace-word rule", §8 F8), so the rows
+land with no tag renamed.
 
 ## 2. Scope (IN)
 
@@ -63,16 +72,27 @@ this unit lands, a tag in any of the four reads `namespace '<ns>' is not registe
   catalogue row matches, and hands the matched tags to `check_namespace_joins` and to `check_resolves`
   as declared (§8 F6, F7). A refused read declares nothing. Observed by AC6.
 - **S6** — The fixture plants on `gov_tag.py --fixture --plant <case>`: `policy-ns-word`,
-  `policy-catalogue`, `policy-family`, `loop-rows`, `loop-bad-seg` and `command-rows`, per §4
-  "### The plants". Observed by AC1, AC2, AC3, AC4 and AC6.
+  `policy-catalogue`, `policy-family`, `loop-rows`, `loop-bad-seg`, `command-rows` and `ns-word-leaf`,
+  per §4 "### The plants". Observed by AC1, AC2, AC3, AC4, AC6 and AC9.
 - **S7** — The name-check point: the four namespace words reach `lexicon.py --tags` through the
   registry they now sit in, with no list typed elsewhere. Observed by AC7.
 - **S8** — The two pages that list the registered namespaces: `tools/playbook/README.md`'s table of
-  later namespaces and the build that arms each, and `help/tags.md`'s table of namespaces and the
-  sentence under it, each naming this unit's four rows as registered. Observed by AC5.
+  later namespaces and the build that arms each, and `help/tags.md`'s opening count of registered
+  namespaces, its table of namespaces and the sentence under it, each naming this unit's four rows as
+  registered. `help/tags.md`'s edge paragraph also lists `item` among the words no row registers yet;
+  that list then reads `feature`, `commit` and `session`. Observed by AC5.
 - **S9** — The two seam lines of `memory/map/features/policy.md` that spell a Python seam as a
   backticked `policy.<symbol>` span are written in the charter's `path#symbol` form, so the armed
   `policy` namespace grades neither as a citation. Observed by AC8.
+- **S10** — The namespace-word rule, in both places that hold it, fires only on a name of two or more
+  segments: `tools/playbook/tag_index.py#derive_tag_fault` and its twin
+  `tools/lexicon/lexicon.py#check_tag_name`, per §4 "### The namespace-word rule". `kind.command`,
+  `kind.item` and `kit.policy` are one-segment names and stay legal; `practice.repo.x` and
+  `policy.step.timeout` stay red. Observed by AC7, AC9 and AC10.
+- **S11** — The three texts that state the rule follow S10: the `shape` bullet of `help/tags.md`, the
+  grammar sentence of `tools/playbook/README.md`, and the header comment of
+  `tools/playbook/kinds.toml`, whose sentence "A kind's name is never a namespace word" two of its own
+  rows break once `item` and `command` are words. Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -96,7 +116,13 @@ this unit lands, a tag in any of the four reads `namespace '<ns>' is not registe
   `policy` namespace is the one instance.
 - A family prefix as a tag: `policy.review` cited on its own stays undeclared, and `show` and `where`
   resolve no `family` row.
-- The lexicon's grading of a tag's name past the namespace word: dMindYourWords'.
+- The lexicon's grading of a tag's name past the namespace-word rule: dMindYourWords'.
+- A rename of `kind.command`, `kind.item` or the policy kit's `id`, and of any row, reader or sibling
+  spec that spells one (§8 F8). The three kinds PLAY-dOrderedCharter-65 renamed keep their names.
+- An exception keyed on a namespace: no word is typed into either rule and the registry gains no
+  field.
+- The reason text of the rule, `first segment '<seg>' is a namespace word`, which the `ns-word`
+  plant's row and the lexicon's own self-test quote: unchanged.
 
 ### Edges
 
@@ -106,7 +132,84 @@ this unit lands, a tag in any of the four reads `namespace '<ns>' is not registe
 
 ## 4. Design
 
-Every claim below about current code was read at `cb34ba60`.
+Every claim below about current code was read at `cb34ba60`, and re-read for rev-5 at `0ca2f812`:
+`git diff --stat cb34ba60 0ca2f812 -- tools help skills memory/map` prints nothing, so no cited line
+moved between the two.
+
+### The namespace-word rule
+
+The rule sits in two functions, each the last test of its grader, and each refuses with one text,
+`first segment '<seg>' is a namespace word`:
+
+| Twin | Reads its words from | Its test today |
+|---|---|---|
+| `tools/playbook/tag_index.py#derive_tag_fault` | the caller's set: `check_tag_shape` passes the `ns` of each row of `ctx["namespaces"]` | `segs[0] in words` |
+| `tools/lexicon/lexicon.py#check_tag_name` | `read_tag_words`, the `ns` of each `[[namespace]]` row of the playbook kit's registry | `segs[0] in words` |
+
+`segs` is the tag's segments after its namespace. `tools/playbook/gov_tag.py#run_check` runs both over
+one population: `check_tag_shape` grades every defining row and every selector value, and
+`run_name_check` pipes the graded tags to `lexicon.py --tags`. A collision is therefore two reds.
+
+With the four words in the registry, three defined tags break the rule in both twins, six reds
+(observed by the third builder dispatch with the unit built, and reproduced at `0ca2f812` by a
+`check_tag_shape` call over the live index with the four words added to its context in memory):
+
+| Tag | Declared at | Cited outside `<MEMORY_ROOT>/builds/` | Word |
+|---|---|---|---|
+| `kind.command` | `tools/playbook/kinds.toml`, a `[[kind]]` row's `tag` | `help/reference/kinds.md`, a heading and its usage stamp; `tools/playbook/core-pending.txt`, a `kind` row | `command` |
+| `kind.item` | `tools/playbook/kinds.toml`, a `[[kind]]` row's `tag` | the same two files, the same two forms | `item` |
+| `kit.policy` | `tools/policy/kit.toml`, the descriptor's `id`, minted as `kit.<id>` by `extract_kit` | none: `git grep` finds the span in no tracked file outside the build records | `policy` |
+
+No other defined tag opens with any of the fourteen words. Of the 17 `[[kind]]` rows these two are the
+only ones whose name is a word, and of the 29 tracked descriptors `policy` is the only `id` that is
+one (PINNED, a `tomllib` read on 2026-11-13). `step` collides with nothing.
+
+**The change.** Both twins test `len(segs) > 1 and segs[0] in words`. Nothing else in either function
+moves: the reason text, the order of the tests, and where the words are read from stay as they are.
+`lexicon.py`'s `--suggest <name> --as tag.<ns>` line for a passing name ends `and opens with no
+namespace word`, false for `kit.policy`; it ends `and breaks no first-segment rule` instead.
+
+**How each of the three stays legal.** Each has one segment after its namespace, so `len(segs)` is 1
+and the rule does not fire: `kind.command` and `kind.item` under the `kind` namespace, `kit.policy`
+under `kit`. No row, descriptor or citation of the three is edited.
+
+**Why one segment is the line.** The rule guards one reading, found in
+`tools/playbook/tag_index.py#check_resolves`. A bare reference is a tag less its namespace. A tag
+`practice.repo.x` has the bare form `repo.x`, which `_derive_span_ns` reads as a span of the `repo`
+namespace, so `check_resolves` grades it as a citation into `repo` and never as a bare reference to
+the `practice` tag: one span, two readings. A one-segment name has a bare form with no dot, `item` or
+`policy`, for which `_derive_span_ns` returns `None`. It is never a citation into any namespace,
+whatever words are registered. The narrowed rule refuses exactly the names whose bare form is
+tag-shaped. This reading is this spec's, drawn from that function; no record states the rule's reason.
+
+**What stays red.** Every name the records name as a breach has two or more segments: the `ns-word`
+plant's `practice.repo.x`, the owner segment in `role.repo.<name>` that the owner's 2026-10-19 answer
+renamed `adopter`, the four catalogue keys `policy.guard` and its siblings, which as tags are
+`policy.policy.guard`, this unit's planted `policy.step.timeout`, and AC7's `policy.item.x`. A probe of
+the 305 tags the live tree's shape check grades at `0ca2f812` found none of two or more segments
+opening with any of the fourteen words (PINNED, 2026-11-13), so the narrowed rule reds nothing at
+landing and passes nothing the tree holds beyond the three.
+
+**What the narrowed rule does not check.** A one-segment name that is a namespace word is legal in
+every namespace. The three kinds PLAY-dOrderedCharter-65 renamed would pass under their old names. A
+catalogue key of one segment that is a word, such as a row `name = "step"`, mints `policy.step` and
+is not red; the catalogue's seven one-segment names, `preset`, `autonomy`, `attendance`, `floor`,
+`leases`, `placement` and `verdict`, are none of the fourteen words (PINNED, the same read).
+
+**The third caller.** `tools/playbook/memory_index.py` refuses a promotion's `--tag` through
+`derive_tag_fault` and follows with no edit.
+
+**The three texts of S11.**
+
+- `help/tags.md`, the `shape` bullet: a name of two or more segments whose first is itself a namespace
+  word, with the page's `practice.repo.x` example kept, and one clause that a one-segment name may be
+  a word.
+- `tools/playbook/README.md`, the sentence listing what the shape check holds: "no first segment that
+  is a namespace word" becomes the same two-or-more-segments form.
+- `tools/playbook/kinds.toml`, the header comment's last sentence: a kind's one-segment name may be a
+  namespace word, as the `item` and `command` kinds are, the grammar refusing a word only as the
+  first of two or more segments; the `<kind>` that `core.py new` takes is still the name. The comment
+  is no row, so `help/reference/kinds.md`, rendered from the rows, does not move.
 
 ### The four rows
 
@@ -202,7 +305,8 @@ literal name.
 
 `derive_tag_fault` over the 264 member tags and the six family tags, against the ten registered words
 and this unit's four, returns no fault, and the longest member tag is 39 bytes (PINNED, the same
-read). The red the clause names is a first segment that is a namespace word: a catalogue row
+read). That read graded the tags this unit mints and never the tags other namespaces already define
+against the four new words; §4 "### The namespace-word rule" does. The red the clause names is a first segment that is a namespace word: a catalogue row
 `name = "step.timeout"` yields `policy.step.timeout`, which `derive_tag_fault` refuses as
 `first segment 'step' is a namespace word`.
 
@@ -263,7 +367,7 @@ tracked one; in a worktree they are one file.
 
 ### The plants
 
-Six names join `PLANTS` in `tools/playbook/gov_tag.py`, each built by `build_tags_fixture` on the
+Seven names join `PLANTS` in `tools/playbook/gov_tag.py`, each built by `build_tags_fixture` on the
 `SHAPE_PLANTS` shape, its registry rows through `derive_fixture_row`. A sibling kit's path is
 `instruction_units.derive_tool_rel("policy", "catalogue.toml")` or `("loop", "loop.toml")`.
 
@@ -275,7 +379,19 @@ Six names join `PLANTS` in `tools/playbook/gov_tag.py`, each built by `build_tag
 | `loop-rows` | `step`, `item`, both `selects` | a loop definition of `[[step]] tag = "step.plan"` and `[[item]] tag = "item.plan.exit"` | 0 | `tags: plant loop-rows · where: rc=0 0, check: rc=0` |
 | `loop-bad-seg` | `step` | a loop definition of `[[step]] tag = "step.Plan"` | 1 | `· shape · step.Plan · segment 'Plan' is outside [a-z0-9][a-z0-9-]*` |
 | `command-rows` | `command` | a `[[command]]` row, `verb = "new"` and `run`, appended to `tools/corekit/kit.toml`; the guide cites `command.corekit.new` and `command.corekit.old` | 1 | `` `command.corekit.old` is cited and undeclared in command ``, and never a line holding `` `command.corekit.new` `` |
+| `ns-word-leaf` | `repo`, the row the `ns-word` plant registers | `tools/corekit/core.tags` holding `+practice.repo` | 0 | `tags: green · 0 red`, and never a line holding `namespace word` |
 
+- `ns-word-leaf` is the `ns-word` plant with its name cut to one segment, and it grades both twins in
+  one run, since `run_check` calls the shape check and the name-check. Its second twin reads gov's
+  registry, which holds `repo`, and never the fixture's. With the core's rule narrowed in memory and
+  the lexicon's left as it is, the plant's bytes exited 1 on one red, `tags: name-check · lexicon: tag
+  practice.repo · first segment 'repo' is a namespace word` (observed 2026-11-13 at `0ca2f812`): the
+  failing case of a rule narrowed in one twin alone.
+- The `bad-ns` plant, PLAY-dOrderedCharter-10's, plants `step.build` in a fixture whose registry holds
+  no `step` row. It keeps its row: the fixture's registry is its own, so the shape check still reds
+  `namespace 'step' is not registered`, and the adopter row matches that line and exit 1, never a red
+  count. At `0ca2f812` the plant prints one red and `searched-empty` (observed 2026-11-13); the third
+  dispatch saw one red with the unit built. This spec pins no count for it.
 - `policy-catalogue` reads `<m>` and `<f>` from the index, the view's `tag` and `family` rows under
   `policy.`, and `<l>` and `<p>` from its own `tomllib` parse of the same bytes, which shares no code
   with `extract_policy`. It exits 0 only when `m == l`, `f == p`, both are above zero and `check` is
@@ -287,14 +403,17 @@ Six names join `PLANTS` in `tools/playbook/gov_tag.py`, each built by `build_tag
   `load_policy_kit` resolves the policy kit from the playbook kit's own directory,.
 - `loop-rows` runs `where step.plan`, `where item.plan.exit` and `check`, and prints the three exits
   on one line, the form the `reference-row` plant prints.
-- `loop-bad-seg` and `command-rows` need no branch of `run_plant`: they fall to its closing `check`.
+- `loop-bad-seg`, `command-rows` and `ns-word-leaf` need no branch of `run_plant`: they fall to its
+  closing `check`.
 
-In `tools/playbook/adopt-playbook.sh` the rows of `policy-ns-word`, `loop-rows`, `loop-bad-seg` and
-`command-rows` join the tag resolver's `run_plant_rows` block, each with the block's `$_tk` flags. The
+In `tools/playbook/adopt-playbook.sh` the rows of `policy-ns-word`, `loop-rows`, `loop-bad-seg`,
+`command-rows` and `ns-word-leaf` join the tag resolver's `run_plant_rows` block, each with the block's
+`$_tk` flags, the last with `namespace word` as the text its output must not hold, the form the `none`
+row has. The
 rows of `policy-catalogue` and `policy-family` reach the policy kit, so they run in a block of their
 own guarded by `check_sibling_kit policy policy.py`, which prints `UNARMED` where no policy kit is
-installed. Each plant builds one scratch repository; the `bad-seg` plant measured 2.2 s on 2026-11-13,
-and the six rows' wall-clock ceiling is 60 s together.
+installed. Each plant builds one scratch repository; the `bad-seg` plant measured 2.2 s and the
+`bad-ns` plant 7.2 s on 2026-11-13, and the seven rows' wall-clock ceiling is 90 s together.
 
 ### The command namespace
 
@@ -327,25 +446,56 @@ The policy keys also become bare-reference tails in `check_resolves`. Under `tag
 charter-only`, the value the landed revision reads (read 2026-11-13), only a `practice.` match counts,
 so no line moves. Under `unique` or `never` every backticked policy key is a bare reference.
 
+The four words also meet the tags other namespaces define. `kind.command`, `kind.item` and
+`kit.policy` are legal under S10, as §4 "### The namespace-word rule" states, and no other defined tag
+opens with one of the words.
+
+In the edge grammar, `tools/playbook/edge_grammar.py#check_edges` passes a tag target whose namespace
+is registered and named by its type's `to`. `item` is in the `to` of `decides`, `patches` and `serves`,
+so an `item.<...>` target passes that test from landing, where today it is red as `namespace 'item' is
+not registered`. An id target of `patches` or `serves` that matches no class stays `unarmed`, since
+each `to` still names `build`, a word no row registers. S8's edit to the edge paragraph of
+`help/tags.md` follows from this; this unit reads no further into how an edge target resolves.
+
+### The probe
+
+AC10's command, run from the repository root. It calls the two changed checks as `run_check` calls
+them, over the live tree's index, and runs no other arm:
+
+```text
+python -c "import sys; sys.path.insert(0, 'tools/playbook'); import gov_tag as g, tag_index as ti; r = g.resolve_repo_root(); k = g.derive_kit_rel(r); c = ti.derive_context(r, r / k / 'namespaces.toml'); con = ti.load_index(r); ti.load_view(con, r, c); reds, shaped = ti.check_tag_shape(con, c); n, slot = g.run_name_check(r, shaped); print('\n'.join(reds + n)); print('probe:', len(shaped), 'graded,', len(reds), 'shape,', len(n), 'name-check ·', slot)"
+```
+
+At `0ca2f812` it printed `probe: 305 graded, 0 shape, 0 name-check · slot
+point.instruction.name-check · searched-empty` in 34 s over a warm index (observed 2026-11-13). It
+writes nothing but the derived index under the git common directory, as `where` does. What it does not
+check: the joins, the `resolves` arm, the `purpose` arm and every other arm of `check`, which AC8
+observes at the close.
+
 ### Inventory
 
 Minted: the four rows of S1; `extract_step`, `extract_item`, `extract_policy`, `extract_command`,
 `derive_family_tags` and `read_declared_keys`; the `family` row kind; the `ROW_TAG_KEYS` entries `key`
-and `command`; the `[[command]]` descriptor table with keys `verb` and `run`; the six plants of S6.
+and `command`; the `[[command]]` descriptor table with keys `verb` and `run`; the seven plants of S6.
 Naming cells: each function is asked of `python tools/lexicon/lexicon.py --suggest <name> --as
 py.function` at the pass.
 
 ### Migration
 
-Additive, with one respelling. The registry gains four rows and no row moves; the two dossier spans of
-S9 are respelled in the commit that registers `policy`, since either alone leaves the `tags` leg red or
-the respelling unexplained. Reverting the commit restores both.
+Additive, with one respelling and one rule narrowed. The registry gains four rows and no row moves;
+the two dossier spans of S9 are respelled in the commit that registers `policy`, since either alone
+leaves the `tags` leg red or the respelling unexplained. S10's narrowing lands in that commit too, in
+both twins: the rows without it are six reds, and one twin without the other is three. The narrowing
+only admits names, so no tag that is legal today turns red and no data is rewritten. Reverting the
+commit restores all of it.
 
 ### Rollout
 
 Live at landing on the `tags` leg, whose `check` runs every registered namespace's extractor, the
 shape check, both joins and the name-check. `step`, `item` and `command` land `unarmed`; `policy`
-lands armed.
+lands armed. The lexicon kit and the playbook kit each carry one twin of S10 and land in the one
+commit. Neither kit's version constant moves: `tools/check-kit-versions.sh` grades that each constant
+is present and well-formed, never that it moved.
 
 ### Files touched (estimate)
 
@@ -355,8 +505,15 @@ lands armed.
 - `tools/playbook/policy_value.py`
 - `tools/playbook/adopt-playbook.sh`
 - `tools/playbook/README.md`
+- `tools/playbook/kinds.toml`
+- `tools/lexicon/lexicon.py`
 - `help/tags.md`
 - `memory/map/features/policy.md`
+- `memory/map/generated/symbols.json`
+
+The last is generated: the codebase-map kit's `gen_map.py --write` rewrites it for the new functions,
+never a hand edit. The third dispatch found it the only file under `memory/map/generated/` the unit
+moves.
 
 ### Alternatives rejected
 
@@ -366,6 +523,8 @@ lands armed.
   are not tag-shaped, and `<role>` and `<workflow>` range over namespaces no build has registered yet.
 - **`memory/map/` left out of the graded population.** That is a second population rule in
   `read_population` for two spans the charter's own cite form already spells.
+- **The three colliding tags renamed, an exception keyed on a namespace, or other words registered.**
+  §8 F8's options (a), (c) and (d), with what each costs.
 
 ## 5. Production-readiness checklist
 
@@ -384,12 +543,15 @@ lands armed.
 - risks — a catalogue key a later build adds with a namespace word first reds at that build's pass,
   which is the intent. A family row hides a placeholder segment from the shape check. A Markdown page
   that backticks a `policy.<symbol>` code reference reds from landing on; S9 clears the two that
-  exist.
+  exist. S10 changes a rule the owner settled on 2026-10-19 and PLAY-dOrderedCharter-65 kept whole;
+  §8 F8 states whose pick that is. A rule narrowed in one twin alone is three reds, which the
+  `ns-word-leaf` plant and AC10 each show.
 - testing — the plants of S6, observed by a pass through the fixture; the suite arm in §7 is observed
   RED then GREEN by the main loop at the close.
-- migration — additive with one respelling, as §4 Migration says.
-- user docs — `help/tags.md` lists the registered namespaces and names these three as unregistered;
-  S8 brings it current, with `tools/playbook/README.md`.
+- migration — additive with one respelling and one rule narrowed, as §4 Migration says.
+- user docs — `help/tags.md` lists the registered namespaces and names these three as unregistered,
+  lists `item` as a word no row registers, and states the namespace-word rule; S8 and S11 bring it
+  current, with `tools/playbook/README.md`.
 
 ## 6. Acceptance criteria
 
@@ -422,9 +584,20 @@ Each fixture command below ends with the two flags every tag plant takes,
   too.
 - **AC5** — When `grep -cE '^ns = "(step|item|policy|command)"' tools/playbook/namespaces.toml` runs,
   it prints 4; `grep -c '| dDeclaredLoop |' tools/playbook/README.md` prints 0; and
-  `grep -cE '^\| .(step|item|policy|command). \|' help/tags.md` prints 4.
+  `grep -cE '^\| .(step|item|policy|command). \|' help/tags.md` prints 4. And
+  `grep -c 'Ten$' help/tags.md`, `grep -c '^.item., .commit. or .session.' help/tags.md`,
+  `grep -c 'no first segment that is a namespace word' tools/playbook/README.md` and
+  `grep -c 'is never a namespace word' tools/playbook/kinds.toml` each print 0, while
+  `grep -c -i 'fourteen' help/tags.md` prints 1 or more and `grep -c 'two or more segments' <file>`
+  prints 1 or more for each of `help/tags.md`, `tools/playbook/README.md` and
+  `tools/playbook/kinds.toml`.
   Red when: a row is missing, so a tag in that namespace still reads `is not registered`; or a page
-  still lists the namespace as one a later build arms.
+  still lists the namespace as one a later build arms, counts ten, or names `item` as unregistered; or
+  one of S11's three texts still states the rule over every name.
+  figure: every count is DERIVED at observation; at `0ca2f812` the four zero-greps each print 1, and
+  the `fourteen` grep and the three `two or more segments` greps each print 0 (observed 2026-11-13).
+  The two `help/tags.md` zero-greps read a line as the page wraps it today, so a re-wrapped line
+  passes them unseen; the `fourteen` grep is the count's positive check.
 - **AC6** — When `python tools/playbook/gov_tag.py --fixture --plant policy-family <flags>` runs, it
   exits 1, prints a line holding `` `policy.review.build.nope` is cited and undeclared in policy ``,
   prints `tags: join policy · families · 1 families, 2 cited under one, 1 declared by the catalogue`,
@@ -437,24 +610,56 @@ Each fixture command below ends with the two flags every tag plant takes,
   and prints `lexicon: tag policy.item.x · first segment 'item' is a namespace word`.
   Red when: the `item` row is not in the registry the lexicon reads, so the tag is graded clean and
   the command exits 0, as it does at `cb34ba60`.
-- **AC8** — When `python tools/playbook/gov_tag.py check` runs over the tree, it prints no `· join ·`
-  and no `· unresolved ·` line holding a `policy.` span, no `· shape ·` line holding `policy.`, and one
-  `tags: purpose · pending` line each for `step` and `item`; and
-  `git grep -c -e 'policy\.resolve' -e 'policy\.validate' -- memory/map/features/policy.md` prints nothing.
+  And when `printf 'kind.item\nkit.policy\nkind.command\npolicy.item.x\n' | python tools/lexicon/lexicon.py --tags`
+  runs, it exits 1, prints that one `lexicon: tag` line and no other, and prints `lexicon: tags · 4
+  graded, 1 refused`; and `python tools/lexicon/lexicon.py --suggest policy --as tag.kit` prints
+  `OK — kit.policy satisfies kebab in every segment and breaks no first-segment rule`.
+  Red when: the lexicon's twin keeps the rule over every name, so the run prints `4 graded, 4 refused`;
+  or the narrowing drops the rule, so it prints `4 graded, 0 refused`, as it does at `0ca2f812`, where
+  no row registers the three words.
+- **AC8** — When `python tools/playbook/gov_tag.py check` runs over the tree, it prints no `· shape ·`
+  line and no `name-check ·` line, no `· join ·` and no `· unresolved ·` line holding a `policy.` span,
+  and one `tags: purpose · pending` line each for `step` and `item`; and
+  `git grep -c -e 'policy\.resolve' -e 'policy\.validate' -- memory/map/features/policy.md` prints
+  nothing; and `git diff --stat <base> HEAD -- tools/policy help/reference/kinds.md tools/playbook/core-pending.txt`,
+  `<base>` the commit the pass started from, prints nothing.
   Red when: the two seam lines keep their spans, so `policy.resolve` prints on a `· join ·` line; or a
-  `purpose-source` is spelled in a form the arm reds.
+  `purpose-source` is spelled in a form the arm reds; or the rule is left whole in a twin, so
+  `kind.command`, `kind.item` and `kit.policy` each print on a `· shape ·` or a `name-check ·` line; or
+  the three were renamed instead, so the diff names a file.
   cost: one index build over the tree, measured at 95 s cold by the `queued-writers` plant's comment in
   `tools/playbook/gov_tag.py`.
+  This is the `tags` leg's own command, so the main loop observes it at the close; AC10 is the pass's
+  observation of its shape and name-check arms.
+- **AC9** — When `python tools/playbook/gov_tag.py --fixture --plant ns-word-leaf <flags>` runs, it
+  exits 0, prints `tags: green · 0 red`, and prints no line holding `namespace word`; and
+  `--plant ns-word` still exits 1 with `· shape · practice.repo.x · first segment 'repo' is a namespace
+  word`.
+  Red when: either twin keeps the rule over a one-segment name, so `practice.repo` prints on a
+  `· shape ·` or a `name-check ·` line and the plant exits 1; or the narrowing drops the rule, so the
+  `ns-word` plant exits 0.
+  fixture: the plant's second twin is the installed lexicon reading gov's registry, whose `repo` row
+  the tree holds today.
+- **AC10** — When §4 "### The probe"'s command runs from the repository root with the unit built, it
+  prints no line holding `· shape ·` and no line holding `name-check ·`, and its last line reads
+  `probe: <n> graded, 0 shape, 0 name-check · slot point.instruction.name-check · searched-empty`.
+  Red when: a defined tag opens with one of the four words and the rule still reaches it, so the tag
+  prints on a `· shape ·` line, a `name-check ·` line or both. With the four rows landed and the rule
+  left whole the probe prints six such lines, three per twin, for `kind.command`, `kind.item` and
+  `kit.policy`.
+  figure: `<n>` is DERIVED at observation; 305 at `0ca2f812`, before this unit's members join.
+  cost: 34 s over a warm index, measured 2026-11-13; one index build of 95 s where the index is cold.
 
 ## 7. Gates
 
 The pass adds no leg: the `tags` leg runs the extractors and the check, and this unit's rows join it as
-data. What the leg does not check for this unit: no member's purpose, the path-only form; and no
-`step`, `item` or `command` tag, while those three are `unarmed`.
+data. What the leg does not check for this unit: no member's purpose, the path-only form; no
+`step`, `item` or `command` tag, while those three are `unarmed`; and, from S10, no one-segment name
+that is a namespace word.
 
-`playbook render selftest` · `govkit acceptance matrix` · `lexicon naming predicates` · `lexicon selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `tags (the resolver's checks)` · `policy fixtures` · `recall floor` · `recall floor arms`
+`playbook render selftest` · `govkit acceptance matrix` · `lexicon naming predicates` · `lexicon selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `tags (the resolver's checks)` · `policy fixtures` · `recall floor` · `recall floor arms` · `codebase-map kit selftest` · `drift-audit selftest`
 
-New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 AC4 AC6 · the playbook-render selftest runs `gov_tag.py --fixture` under each plant of S6, four rows in the tag resolver's block and two in a block guarded on the policy kit, its failing case staged by the `policy-ns-word`, `loop-bad-seg`, `command-rows` and `policy-family` plants · none
+New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 AC4 AC6 AC9 · the playbook-render selftest runs `gov_tag.py --fixture` under each plant of S6, five rows in the tag resolver's block and two in a block guarded on the policy kit, its failing case staged by the `policy-ns-word`, `loop-bad-seg`, `command-rows` and `policy-family` plants, and for the `ns-word-leaf` row by the rule left whole in either twin · none
 
 ## 8. Open questions
 
@@ -537,6 +742,56 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 AC4 AC6 · the p
   RESOLVED (agent, 2026-11-13, delegated): (b), rung 3: the one matcher called in process meets AC6 with no copied
   text and no follow-up ask; the owner's F5 pick permitted the computed-key call and is left unused, not reversed.
   widens: none · relaxes: none
+- **F8 — Registering `command`, `item` and `policy` makes `kind.command`, `kind.item` and `kit.policy`
+  break the namespace-word rule in both twins. How do the three stay legal?** The third dispatch built
+  rev-4 whole and found six reds on the live tree, three per twin. Options:
+  - **(a) Rename the three.** The two kinds take a qualifier under the rule PLAY-dOrderedCharter-65
+    wrote into the header of `tools/playbook/kinds.toml`, and the policy kit takes a new `id`. This is
+    the path the records point at. The owner answered a breach of this rule twice on 2026-10-19, each
+    time with a rename ("rename that segment to conform to tag grammar"; "yes, rename them and add the
+    check"). PLAY-dOrderedCharter-65 §3 says the registering build renames `kind.item` under its rule,
+    and PLAY-dOrderedCharter-10 §5 calls `kit.policy` "a red that build owes". Its cost: the two kind
+    rows and their readers in `tools/playbook/core-pending.txt` and `help/reference/kinds.md`; the
+    text of six unbuilt specs that spell `kind.item` or `kind.command` (TOOL-dDeclaredLoop-6, -24,
+    -25, -27 and -29, and TOOL-dBoundRoles-22); and a wording gap against cl-dClosedLoop-0109, which
+    names "the `item` kind". The kit's `id` is the larger cost: it is an `[[entry]]` row of
+    `tools/govkit/registry.toml` and a member of that file's default kit list, a deploy file names it,
+    as the tracked `tools/govkit/fixtures/release-0/deploy.toml` does, and it sits under
+    `tools/policy/`, which this unit's §3 keeps unedited. That rename is an adopter-facing migration with its own upgrade
+    step, a second mechanism, so (a) lands only behind a unit this build does not hold.
+  - **(b) Narrow the rule to names of two or more segments**, in both twins, as §4 "### The
+    namespace-word rule" states. One condition in each of two functions, three texts that state the
+    rule, one plant. No tag, row, kit or sibling spec is renamed, and the clause's four words and the
+    `item` kind keep their spelling. Every breach the records name stays red, since each has two or
+    more segments. Its cost is authority, not code: it amends the systems record's sentence "A first
+    segment may not be a namespace word", which the owner's answers rest on, and it withdraws the
+    header sentence PLAY-dOrderedCharter-65 added. That spec's F1 held that a change to this rule
+    needs an owner turn, and the 2026-10-19 review record held the same of an exception. It also
+    passes a one-segment name that is a word in every namespace, the three kinds that unit renamed
+    included.
+  - **(c) An exception keyed on a namespace**, the `kind` and `kit` namespaces admitted by a typed
+    word or by a new registry field both twins read. PLAY-dOrderedCharter-65 F1 weighed this as its
+    option (B): a typed word is a second spelling of the registry, and a field is one more required
+    key on all fourteen rows of `REGISTRY_FIELDS`. It carries (b)'s authority cost and more code.
+  - **(d) Register other words.** cl-dClosedLoop-0103 names the four words, and shared interface I2
+    fixes the tag forms `item.<step>.<name>` and `policy.<name>` that sibling specs already spell, so
+    this option rewrites the clause and more specs than (a).
+
+  Recommendation: (b). It is the only option that lands this unit as one mechanism with the `tags`
+  leg green: (a) cannot land without the kit's rename, (c) costs more for the same pick, and (d)
+  rewrites the clause. A hybrid, the two kinds renamed and the rule narrowed for the kit alone, pays
+  both costs. The spec body, S10, S11, AC7, AC8, AC9 and AC10 are written on (b). Under (a) S10, S11
+  and the `ns-word-leaf` plant leave this spec, `tools/playbook/kinds.toml`'s two rows and their
+  readers join it, and the unit waits on a rename of the policy kit's `id`.
+
+  Whose pick: (b) changes a rule of dClosedLoop's settled design that the owner answered in person,
+  and two records hold that such a change waits for the owner. Whether the run's mandate reaches it
+  is for the run to state where it marks this fork; this spec does not mark it.
+  RESOLVED (agent, 2026-11-13, delegated): (b), rung 5, ER:388: the only option that lands this unit as one
+  mechanism with the tags leg green; it narrows a rule of the settled design the owner answered in person, so it is
+  recorded as a departure in `2026-11-13-build-TOOL-dDeclaredLoop-18-deviation-184` and listed first at the landing.
+  widens: S10, S11, the `ns-word-leaf` plant, AC9, and two files, `tools/lexicon/lexicon.py` and
+  `tools/playbook/kinds.toml` · relaxes: the namespace-word rule, for one-segment names
 
 ## 9. Revision log
 
@@ -561,6 +816,14 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 AC4 AC6 · the p
   smaller points: the `policy-family` plant copies no kit, and §4's write set gains
   `tools/playbook/adopt-playbook.sh`, `tools/playbook/policy_value.py`, `help/tags.md` and the
   dossier.
+- rev-5 · 2026-11-13 · §1 · S6 S8 S10 S11 · §3 · §4 · §5 · AC5 AC7 AC8 AC9 AC10 · §7 · §8 F8 · §10 ·
+  after the builder return `2026-11-13-build-TOOL-dDeclaredLoop-18-3-builder-return`, which built
+  rev-4 whole and failed AC8 on three tags other namespaces define. §4 "### The namespace-word rule"
+  names `kind.command`, `kind.item` and `kit.policy` with the narrowed rule that keeps each legal; §8
+  F8 is the fork, open, with the body written on its option (b). S8 gains the opening count and the
+  edge paragraph of `help/tags.md`. §4 names the one generated map file the unit moves and pins no red
+  count for the `bad-ns` plant. AC9 is the `ns-word-leaf` plant and AC10 the pass's probe of the two
+  changed checks over the live tree.
 
 ## 10. Reuse audit
 
@@ -577,5 +840,17 @@ namespace with an extractor over a TOML table"`, run 2026-11-13, ranked `read_na
 `family` kind: a read of `tools/playbook/tag_index.py` for the kinds its readers name finds `doc`,
 `section`, `tag`, `retired`, `selector`, `span`, `unclosed` and `parsed`, and none stands for a prefix
 that declares the tags under it.
+
+For S10 the seam is the rule's own two functions, `derive_tag_fault` and `check_tag_name`, each
+changed in place; no third statement of the rule exists in code, and `tools/playbook/memory_index.py`
+calls the first. The `ns-word-leaf` plant reuses the `ns-word` plant's registry row and file.
+`python tools/codebase-map/reuse_lookup.py "refuse a tag whose first segment is a namespace word"`,
+run 2026-11-13, ranked `read_namespaces` and `TagError` of `tools/playbook/tag_index.py` and four
+refusal classes of other modules, none a second holder of the rule. The recall query below returned
+the owner's 2026-10-19 answers, the systems record's Grammar bullet and the review record that put
+the rule to the owner, the records §8 F8 weighs; PLAY-dOrderedCharter-65, the prior instance of this
+collision, was found by `git grep` for the three tags.
+
+Recall terms used (rev-5): `python tools/memory-recall/query.py "may a tag's first segment be a namespace word, and who settled it" --terms "namespace word first segment rename tag grammar kind.item kit.policy narrowing owner answer bare reference"`
 
 Recall terms used: `python tools/memory-recall/query.py "how are tag namespaces registered with extractors and shape checked" --terms "namespace registry extractor tag grammar seg shape check namespace word policy catalogue key"`
