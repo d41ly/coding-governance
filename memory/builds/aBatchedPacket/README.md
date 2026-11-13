@@ -61,7 +61,7 @@ ids TOOL-aBatchedPacket-1
 | [TOOL-aBatchedPacket-1 — a front door for the chain packet: the instrument's own `main`, its two per-spec reads answered in-process, bound to the instrument blobs it was read against](spec/2026-11-13-spec-TOOL-aBatchedPacket-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-11-13 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 4 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
