@@ -1,11 +1,12 @@
 # TOOL-aClearedLedger-9 — a path-less `Red-fix:` commit owes no record: the join holds it out by name and the door says why it refuses
 
-**Status:** INPROGRESS · rev-1 · 2026-11-13 · node a · Tier-2 · base 8db6f4be · streams tooling · order 9 · closes TOOL-aNimbleMend-23
+**Status:** CLOSED · rev-1 · 2026-11-13 · node a · Tier-2 · base 8db6f4be · streams tooling · order 9 · closes TOOL-aNimbleMend-23
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-13-build-TOOL-aClearedLedger-9-1-acceptance-ledger.md](../build/2026-11-13-build-TOOL-aClearedLedger-9-1-acceptance-ledger.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aClearedLedger-1-brief.md](../prompts/2026-11-13-prompt-TOOL-aClearedLedger-1-brief.md) | research | TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-7 TOOL-aClearedLedger-10 |
 
 <!-- /gen:spec-records -->
