@@ -3,10 +3,10 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-11-13T05:56:57+02:00 @ 0071491ade5c8b07912711a33a471432f00ff48c
+last-audit: 2026-11-13T06:03:04+02:00 @ 6f50dab916b3ce2fe5a80e328c6d44792e39d852
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: b0d43c0a16c69bee47713482065b65e19ac80eb3
+last-body-change: 6f50dab916b3ce2fe5a80e328c6d44792e39d852
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -50,7 +50,7 @@ lives where each bullet points.
 - A build of more than one pass runs on `memory/guides/BUILD-METHOD.md`; it is in `watch:`, so editing it re-audits this manifest.
 - A build may amend its own roster (BUILD-METHOD M2, M3) and must run delegated disjoint passes in parallel (M6); both invert a session's default.
 - Every session start writes an orientation card; a commit is refused until its READY line is appended, and only from a tree the card names (`tools/hooks/scratch-guard.js`).
-- A card's `## route` lands only when its build, unit specs and brief all resolve; a write under `ROUTED_PATHS` needs a route naming a buildable unit, and a pushed commit there names a specced one (`TOOL-aRoutedQuill-2`, `-3`).
+- A card's `## route` lands only when its build, unit specs and brief all resolve; a write under `ROUTED_PATHS` needs a route naming a buildable unit, and a pushed commit there names a specced one (`TOOL-aRoutedQuill-2`, `-3`). The one exception is the red-fix lane: with `bar.inline-red-fixes` on and a leg recorded red at this branch's own head, the gate admits a product write with no route, and its commit carries a `Red-fix: <leg>` trailer and owes a `red-fix` record (`TOOL-aNimbleMend-8`, `-9`, `-10`, `-14`).
 - The card's READY anchor accepts both the bare and the `- ` list-item spelling (`TOOL-cMendedVintage-16`).
 - An attended code build runs through `/build` after kickoff's go: the role catalogue's workflows in stage order (`KICK-aOrientedCast-2`).
 - Layout: `main` lives in `C:/projects/coding-governance`; every unit's branch rides its own worktree under `.claude/worktrees/<branch-slug>/`, and `git worktree list` is the inventory.
@@ -96,6 +96,7 @@ GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD and the
 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. On demand only; the §B correction dated 2026-08-23 says what that costs
 # Per profile row: a whole-RUN wall (GATE_WALL; a breach kills the legs, TOOL-aQuenchedHarness-1), and mempause holding dispatch while used memory is above it (TOOL-aGraftedHelix-7)
 GATE_ATTRIBUTE=<rev> bash tools/run-gates/run-gates.sh   # re-run each RED leg at <rev> and print whose red it is: OWN, INHERITED, MIXED, CONTENDED or DEAD PROBE. Report-only, the exit never moves; .githooks/pre-push exports the remote sha. TOOL-dDerivedDocket-23
+bash tools/run-gates/pass-legs.sh --base <rev>   # the declared FAST legs over one pass's diff, at the main loop after a unit pass's commit; `pass.fast-legs` off runs nothing; a role agent's hook refuses it. Its record is `gate-pass-legs.txt` in the git dir. TOOL-aNimbleMend-5, -7
 bash tools/run-gates/run-selftests.sh --serial  # the HELD population on demand, budget-timed; --pooled withholds cost verdicts and REFUSES an uncalibrated row until --pooled --calibrate; bare REFUSES; GOV_NODE must be a registry tag; a pooled red keeps each row's output under <git-dir>/gate-logs/selftests/. TOOL-aBatchedArm-4, -5
 bash tools/unattended/run-unattended-gates.sh --pooled   # DoD for tools/unattended/ work: pooled PARITY against tools/run-gates/selftest-pooled-evidence.txt, or `--selftests --serial --attribute <BASE>` reading `verdict clean`. TOOL-dDerivedDocket-1
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # bug-class checklist + by-design block for THIS diff; the review harness acquires it on the diff kind
