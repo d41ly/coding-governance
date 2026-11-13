@@ -5,7 +5,7 @@ opened: 2026-11-13
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aCarriedStop-1
+ids: TOOL-aCarriedStop-1 TOOL-aCarriedStop-2 TOOL-aCarriedStop-3
 ---
 
 # aCarriedStop — a build run carries the owner's ended spec-audit chain past the dispatch gate through a recorded row
@@ -51,30 +51,39 @@ None.
 | # | Unit | Mechanism |
 |---|---|---|
 | 1 | `TOOL-aCarriedStop-1` | the owner-stop row: `--record-round` appends it citing the owner's tracked record, and the one chain verdict `--dispatch` and `--chain-verdict` share reads it as STOP |
+| 2 | `TOOL-aCarriedStop-2` | promoted from the closing review's HIGH: the owner-stop path is held to one rule, so the writer admits no path its reader refuses |
+| 3 | `TOOL-aCarriedStop-3` | promoted from the closing review: its remaining mediums and its lows, batched |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-11-13 · streams tooling
-ids TOOL-aCarriedStop-1
+**Build status:** INPROGRESS · 3 unit(s) · node a · opened 2026-11-13 · streams tooling
+ids TOOL-aCarriedStop-1 TOOL-aCarriedStop-2 TOOL-aCarriedStop-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
+| [TOOL-aCarriedStop-2 — the owner-stop path answers to one class: the writer refuses, before any byte, a whole path its reader's grammar would not admit](spec/2026-11-13-spec-TOOL-aCarriedStop-2.md) | 2 | 2 | INPROGRESS | rev-1 | 2026-11-13 |
+| [TOOL-aCarriedStop-3 — the closing review's mediums and lows, batched: the count test on the audit route only, the owner-stop arms the suite lacks, the base driver's reading and the usage header's padding](spec/2026-11-13-spec-TOOL-aCarriedStop-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-11-13 |
 | [TOOL-aCarriedStop-1 — the owner-stop row: `--record-round --owner-stop` appends it citing the owner's tracked record, and the one chain verdict reads it as STOP](spec/2026-11-13-spec-TOOL-aCarriedStop-1.md) | — | 2 | CLOSED | rev-2 | 2026-11-13 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 3 record folder(s).
+Records: 10 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aCarriedStop-1.
+Ids no `spec-audit` record has ever named: TOOL-aCarriedStop-1 TOOL-aCarriedStop-2 TOOL-aCarriedStop-3.
 
-Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 2 | `TOOL-aCarriedStop-2` | no |
+| 3 | `TOOL-aCarriedStop-3` | no |
+
+Unordered: `TOOL-aCarriedStop-1`.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

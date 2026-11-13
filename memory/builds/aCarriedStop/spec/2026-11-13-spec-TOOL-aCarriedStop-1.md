@@ -7,12 +7,14 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-13-build-TOOL-aCarriedStop-1-1-acceptance-ledger.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-1-acceptance-ledger.md) | journal | — |
-| [2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md) | journal | — |
+| [2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md) | journal | TOOL-aCarriedStop-2 TOOL-aCarriedStop-3 |
 | [2026-11-13-build-TOOL-aCarriedStop-1-candidates.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-candidates.md) | research | — |
 | [2026-11-13-prompt-TOOL-aCarriedStop-1-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-1-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aCarriedStop-1-2-builder.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-2-builder.md) | journal | — |
+| [2026-11-13-prompt-TOOL-aCarriedStop-1-3-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-3-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aCarriedStop-1-brief.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-brief.md) | research | — |
 | [2026-11-13-prompt-TOOL-aCarriedStop-1-build-brief.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-build-brief.md) | research | — |
+| [2026-11-13-review-TOOL-aCarriedStop-1-diff-review-round1.md](../reviews/2026-11-13-review-TOOL-aCarriedStop-1-diff-review-round1.md) | diff-review | — |
 
 <!-- /gen:spec-records -->
 
