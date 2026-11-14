@@ -26,3 +26,16 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Run no gate leg, no suite, no bar. Verify with a fixture or a probe of the code you changed.
 - A change the spec did not state is a deviation record in `build/`, as the build README's rules say; its values are `report`
   and `author-recorded`.
+
+## Two passes, because of check 49
+
+- `--dispatch` refuses a write set that names a generated index together with its generator, and this unit edits
+  `tools/memory-tree/backlog.py`, the generator of `memory/backlog/`. Build it in TWO passes, each with its own
+  `--dispatch` and its own commit carrying `Pass: TOOL-dDeclaredLoop-12`.
+- Pass one declares and writes `tools/memory-tree/backlog.py` alone (its inline helper copy and the re-pointed call in
+  `derive_verdicts`), with the spec left INPROGRESS and `memory/backlog/` neither declared nor staged. Probe that the
+  backlog render is unchanged before committing.
+- Pass two, at the new anchor, declares everything else, `memory/backlog/` and every other file
+  `gen_build_index.py --write` rewrites among it, but not `backlog.py`; it moves the spec to CLOSED.
+- Your earlier attempt's drafts are in the scratchpad: `needs_graph.py` and `items.toml`. Record its two transcription
+  choices (plan.record's "a select", and the conditional needs written as plain needs) in the acceptance ledger.
