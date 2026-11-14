@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-73 — the claimed-requires refusal grades each kit's `requires` at the vintage `update --to` installs
 
-**Status:** DEFERRED · rev-3 · 2026-11-14 · node d · Tier-2 · base ed497191 · streams tooling · order 5 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-3 · 2026-11-14 · node d · Tier-2 · base ed497191 · streams tooling · order 5 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-11-14-build-TOOL-dDeclaredLoop-73-deviation-732.md](../build/2026-11-14-build-TOOL-dDeclaredLoop-73-deviation-732.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-68-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-68-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 |
 | [2026-11-14-prompt-TOOL-dDeclaredLoop-73-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-73-1-spec-writer.md) | journal | — |
+| [2026-11-14-prompt-TOOL-dDeclaredLoop-73-build-brief.md](../prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-73-build-brief.md) | journal | — |
 | [2026-11-14-prompt-TOOL-dDeclaredLoop-73-reground-brief.md](../prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-73-reground-brief.md) | research | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 |
 
