@@ -32233,6 +32233,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "test_write_moved",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "test_writes_nothing_in_worktree",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"

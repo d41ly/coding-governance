@@ -3301,14 +3301,15 @@ def cmd_write(root: str, conf: dict, staged: bool = False) -> int:
         view = render_asbuilt_view(root, conf)
     except Problem as exc:
         refused = exc
+    # TOOL-aTrimmedWait-4 — both paths write only what moved: a file left in place already holds the
+    # bytes `write_text` would give it, so the tree is the one a full rewrite leaves.
     to_stage, view_prev = [], None
-    if view["state"] == "armed":
-        if staged and derive_moved_artifacts(root, {view["rel"]: view["text"]}):
+    if view["state"] == "armed" and derive_moved_artifacts(root, {view["rel"]: view["text"]}):
+        if staged:
             to_stage.append(view["rel"])
             view_path = os.path.join(root, view["rel"])
             view_prev = pathlib.Path(view_path).read_bytes() if os.path.isfile(view_path) else False
-        if not staged or to_stage:
-            write_text(os.path.join(root, view["rel"]), view["text"])
+        write_text(os.path.join(root, view["rel"]), view["text"])
     artifacts, orphans, unmanaged, verdicts, guarded = plan(root, conf, create_missing=True)
     if staged and guarded:
         # The view was written first because `plan()` reads it; a decline writes nothing, so put it back.
@@ -3319,9 +3320,10 @@ def cmd_write(root: str, conf: dict, staged: bool = False) -> int:
         print(f"build-index: render NOT staged — the data-loss guard holds {' '.join(sorted(guarded))}")
         print_verdicts(verdicts, guarded, conf)
         return 1
+    rendered = len(artifacts)
+    moved = derive_moved_artifacts(root, artifacts)
+    artifacts = {rel: artifacts[rel] for rel in moved}
     if staged:
-        moved = derive_moved_artifacts(root, artifacts)
-        artifacts = {rel: artifacts[rel] for rel in moved}
         to_stage += moved + list(orphans)
         if not to_stage:
             print("build-index: render NOT staged — no artifact's bytes moved, so check 9's refusal is not "
@@ -3334,7 +3336,7 @@ def cmd_write(root: str, conf: dict, staged: bool = False) -> int:
         print(f"build-index: removed orphaned shard {p}")
     for p in unmanaged:
         print(f"build-index: WARNING unmanaged file under ledger/ left in place: {p}")
-    print(f"build-index: wrote {len(artifacts)} artifact(s)")
+    print(f"build-index: wrote {len(artifacts)} artifact(s), {rendered - len(artifacts)} unchanged")
     if staged:
         # `run()` drops GIT_INDEX_FILE; under `git commit -a` only an add through the hook's index lands.
         env = _build_git_env()
@@ -4789,6 +4791,70 @@ def test_staged_write(arm) -> None:
                 f"{' under LIVE_LANDED_UNCLOSED=1' if 'LIVE_LANDED' in conf_text else ''}", "ARM-PASS",
                 lambda: build_arm_result(ok, rc, out))
         run("git", "reset", "-q", "--hard", cwd=t)
+
+
+def test_write_moved(arm) -> None:
+    """TOOL-aTrimmedWait-4's arms: plain `--write` writes only the artifacts whose bytes moved. The fixture
+    is the spec's §6, a rendered and committed `_fixture`; a second render, a CRLF build README and a
+    status flip are staged in turn. Every file's mtime is first set to a fixed past value, so any write
+    moves it on a filesystem of any mtime resolution. Each arm reads `ARM-PASS` or `ARM-MISS`."""
+    gbi = os.path.abspath(__file__)
+    old = 1_000_000_000 * 10**9
+
+    def run_write(t):
+        p = subprocess.run([sys.executable, gbi, "--write"], cwd=t, capture_output=True, text=True,
+                           encoding="utf-8", env=_build_git_env())
+        return p.returncode, p.stdout + p.stderr
+
+    def read_porcelain(t):
+        return sorted(ln[3:] for ln in run("git", "status", "--porcelain", "-uall", cwd=t).split("\n") if ln)
+
+    def derive_touched(t, paths):
+        # Every path's mtime pinned to `old`, then the write; the paths whose mtime is no longer `old`.
+        for p in paths:
+            os.utime(os.path.join(t, p), ns=(old, old))
+        rc, out = run_write(t)
+        touched = set()
+        for p in set(paths) | set(read_porcelain(t)):
+            fp = os.path.join(t, p)
+            if not os.path.isfile(fp) or os.stat(fp).st_mtime_ns != old:
+                touched.add(p)
+        return rc, out, touched
+
+    with tempfile.TemporaryDirectory() as base:
+        t = os.path.join(base, "wm"); os.makedirs(t)
+        _fixture(t)
+        run(sys.executable, gbi, "--write", cwd=t)
+        run("git", "add", "-A", cwd=t)
+        run("git", "commit", "-q", "-m", "rendered", "--no-verify", cwd=t)
+        tracked = [p for p in run("git", "ls-files", cwd=t).split("\n") if p]
+        rc, out, touched = derive_touched(t, tracked)
+        ok = rc == 0 and bool(re.search(r"wrote 0 artifact\(s\), [1-9]\d* unchanged", out)) and not touched
+        got1 = f"{'ARM-PASS' if ok else 'ARM-MISS'} rc={rc} touched={sorted(touched)} {out}"
+        arm("TOOL-aTrimmedWait-4 AC1 — a second --write writes nothing, counts the rest unchanged, and "
+            "moves no mtime", "ARM-PASS", lambda: got1)
+        readme = "memory/builds/tOne/README.md"
+        rp = os.path.join(t, readme)
+        lf = pathlib.Path(rp).read_bytes()
+        pathlib.Path(rp).write_bytes(lf.replace(b"\n", b"\r\n"))
+        rc, out = run_write(t)
+        after = pathlib.Path(rp).read_bytes()
+        ok = rc == 0 and after == lf and b"\r\n" not in after and "wrote 1 artifact(s)" in out
+        got3 = f"{'ARM-PASS' if ok else 'ARM-MISS'} rc={rc} {out}"
+        arm("TOOL-aTrimmedWait-4 AC3 — a CRLF build README is rewritten to the render's LF bytes", "ARM-PASS",
+            lambda: got3)
+        spec = "memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md"
+        sp = os.path.join(t, spec)
+        write_text(sp, read_text(sp).replace("INPROGRESS", "DEFERRED"))
+        rc, out, touched = derive_touched(t, [p for p in tracked if p != spec])
+        porcelain = set(read_porcelain(t))
+        check_rc = subprocess.run([sys.executable, gbi, "--check"], cwd=t, capture_output=True,
+                                  env=_build_git_env()).returncode
+        ok = rc == 0 and touched == porcelain and spec in porcelain and len(porcelain) > 1 and check_rc == 0
+        got2 = (f"{'ARM-PASS' if ok else 'ARM-MISS'} rc={rc} check={check_rc} touched={sorted(touched)} "
+                f"porcelain={sorted(porcelain)} {out}")
+        arm("TOOL-aTrimmedWait-4 AC2 — after a status flip the moved mtimes are the spec plus the rendered "
+            "paths git reports, and --check exits 0", "ARM-PASS", lambda: got2)
 
 
 def test_coverage_region(arm) -> None:
@@ -8696,6 +8762,7 @@ def cmd_selftest() -> int:
 
     test_staged_render(arm)
     test_staged_write(arm)
+    test_write_moved(arm)
     test_coverage_region(arm)
     test_coverage_stub(arm)
     arm("TOOL-dTrueNorth-16 AC15 — read_header_verbs refuses an expand returning three values with backlog.Problem "
