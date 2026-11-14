@@ -1,12 +1,14 @@
 # TOOL-aTrimmedWait-2 — hygiene check 12 grades one named spec or one build on request, and the spec writer is told to run it that way
 
-**Status:** SPECCED · rev-1 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 2 · closes TOOL-aSmoothedDispatch-16 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md) | research | TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-2-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-2-1-spec-writer.md) | journal | — |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-2-ruling.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-2-ruling.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -349,12 +351,15 @@ the spec-token checker over this file and check 12 over it in a scratch clone.
   - (b) Leave the ask open and let the close dispose it by hand.
   Recommendation: (a). It leaves no follow-up open, and the accept line is met in full for the one
   role the ask measured.
+  RESOLVED (owner, 2026-11-14): (a), add `closes TOOL-aSmoothedDispatch-16` to this header.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-14 · initial draft from brief `2026-11-14-prompt-TOOL-aTrimmedWait-1-brief`,
   item 2, grounded at `846d51d3` and measured at `a25c84fc0`, whose code is identical. The scope is
   its own mode rather than `--staged`'s, for the `base` resolve arm `--staged` skips.
+- rev-2 · 2026-11-14 · §8 · F1 RESOLVED by the owner's pick (a), and the header gains
+  `closes TOOL-aSmoothedDispatch-16`, per ruling `2026-11-14-prompt-TOOL-aTrimmedWait-2-ruling`.
 
 ## 10. Reuse audit
 

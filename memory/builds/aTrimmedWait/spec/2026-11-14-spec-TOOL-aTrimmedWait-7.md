@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-7 — `handoff.py agents` keeps its parsed session calls per transcript and parses only the bytes appended since
 
-**Status:** SPECCED · rev-1 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 7 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,9 @@
 |---|---|---|
 | [2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md) | research | TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-7-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-1-spec-writer.md) | journal | — |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-7-2-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-2-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-7-revision.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-revision.md) | research | — |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-7-ruling.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-ruling.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -290,12 +292,15 @@ What the arms do not check: timing, which AC9 owns on node a, and a forged recor
   - Recommendation: (a). It is the only option with no code and no number to defend, and the
     growth is a fraction of what the harness already keeps. A prune is cheap to add once a folder
     is measured large.
+  - RESOLVED (owner, 2026-11-14): (a), never prune.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-14 · initial draft from the build brief
   `2026-11-14-prompt-TOOL-aTrimmedWait-1-brief`, item R6, grounded at `846d51d3` with timings
   taken on node a.
+- rev-2 · 2026-11-14 · §8 F1 · the owner resolved F1 to (a), never prune, per
+  `2026-11-14-prompt-TOOL-aTrimmedWait-7-ruling`.
 
 ## 10. Reuse audit
 

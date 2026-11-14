@@ -1,12 +1,14 @@
 # TOOL-aTrimmedWait-5 — the holder's idle-wake `--resume` stops paying one git process per briefed unit
 
-**Status:** SPECCED · rev-1 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 5
+**Status:** SPECCED · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 5 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md) | research | TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-5-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-5-1-spec-writer.md) | journal | — |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-5-ruling.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-5-ruling.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -289,6 +291,7 @@ The close runs the bar once, after the last unit is terminal. This spec's author
   smallest diff, and B on top would save about 2 s per tick for a cache with the ceilings above.
   Ruling for B or C rewrites §2 to §7 in a rev-2, and amends the README's roster row 5 and its
   expected-improvement line, which are the owner's.
+  RESOLVED (owner, 2026-11-14): A, batch the brief hashing ("Batch hashing (Recommended)").
 
 ## 9. Revision log
 
@@ -297,6 +300,8 @@ The close runs the bar once, after the last unit is terminal. This spec's author
   per-brief hash loop dominating a holder's tick, and the stop-guard's per-turn line made the
   roster's replay unable to keep the output as worded. The spec is written for the batch, and F1
   asks the owner to choose.
+- rev-2 · 2026-11-14 · §8 F1 · F1 RESOLVED (owner) to A, batch hashing, by the ruling
+  `2026-11-14-prompt-TOOL-aTrimmedWait-5-ruling`. Sections 2 to 7 stand as written.
 
 ## 10. Reuse audit
 

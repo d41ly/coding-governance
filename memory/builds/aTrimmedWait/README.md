@@ -24,7 +24,7 @@ measurements and their scripts are recorded in the brief under `prompts/`.
 - A spec defect `--dispatch` would refuse is refused before the spec commit.
 - One spec or one build is graded by check 12 in seconds, not 376 s.
 - A commit renders its own index instead of being refused on check 9.
-- An unmoved run's `--resume` tick returns its last verdict.
+- An idle-wake `--resume` tick hashes every brief in one git call, not one per brief.
 - A role agent cannot poll; it waits on the notification.
 - `handoff.py agents` reads only a transcript's appended bytes.
 
@@ -57,8 +57,8 @@ None.
 | 1 | `TOOL-aTrimmedWait-1` | R1: one pre-commit spec validation that runs `--dispatch`'s cheap refusals through the driver's own predicates, wired into the spec stage and the writer's instructions |
 | 2 | `TOOL-aTrimmedWait-2` | R2: hygiene check 12 graded over one named spec or build, with the writer told to use it |
 | 3 | `TOOL-aTrimmedWait-3` | R3: the pre-commit hook renders the staged builds' index before check 9 grades it, and stages what it wrote |
-| 4 | `TOOL-aTrimmedWait-4` | R3: `gen_build_index.py --write` re-renders only the regions its changed inputs reach |
-| 5 | `TOOL-aTrimmedWait-5` | R4: `--resume` prints its last verdict when HEAD, the run-state file and the task registry are unchanged |
+| 4 | `TOOL-aTrimmedWait-4` | R3: `gen_build_index.py --write` writes only the artifacts whose rendered bytes moved (owner, 2026-11-14) |
+| 5 | `TOOL-aTrimmedWait-5` | R4: `--resume` and `--status` hash every brief in one `git hash-object --stdin-paths` call, every line byte-identical (owner, 2026-11-14) |
 | 6 | `TOOL-aTrimmedWait-6` | R5: the scratch guard refuses a role agent's polling wait, and G3 reads past `-o pipefail` |
 | 7 | `TOOL-aTrimmedWait-7` | R6: `handoff.py agents` caches parsed calls per transcript and parses only appended bytes |
 <!-- /roster:units -->
@@ -71,15 +71,15 @@ ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWai
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aTrimmedWait-1 — `unattended.sh --check-specs` refuses, before the spec commit and through `--dispatch`'s own predicates, every spec defect `--dispatch` refuses from the spec files alone](spec/2026-11-14-spec-TOOL-aTrimmedWait-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-11-14 |
-| [TOOL-aTrimmedWait-2 — hygiene check 12 grades one named spec or one build on request, and the spec writer is told to run it that way](spec/2026-11-14-spec-TOOL-aTrimmedWait-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-14 |
+| [TOOL-aTrimmedWait-2 — hygiene check 12 grades one named spec or one build on request, and the spec writer is told to run it that way](spec/2026-11-14-spec-TOOL-aTrimmedWait-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-11-14 |
 | [TOOL-aTrimmedWait-3 — a commit refused on build-index drift renders its own index, stages it and is graded again](spec/2026-11-14-spec-TOOL-aTrimmedWait-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-11-14 |
-| [TOOL-aTrimmedWait-4 — `gen_build_index.py --write` writes only the artifacts whose bytes moved](spec/2026-11-14-spec-TOOL-aTrimmedWait-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-11-14 |
-| [TOOL-aTrimmedWait-5 — the holder's idle-wake `--resume` stops paying one git process per briefed unit](spec/2026-11-14-spec-TOOL-aTrimmedWait-5.md) | 5 | 2 | SPECCED | rev-1 | 2026-11-14 |
+| [TOOL-aTrimmedWait-4 — `gen_build_index.py --write` writes only the artifacts whose bytes moved](spec/2026-11-14-spec-TOOL-aTrimmedWait-4.md) | 4 | 2 | SPECCED | rev-2 | 2026-11-14 |
+| [TOOL-aTrimmedWait-5 — the holder's idle-wake `--resume` stops paying one git process per briefed unit](spec/2026-11-14-spec-TOOL-aTrimmedWait-5.md) | 5 | 2 | SPECCED | rev-2 | 2026-11-14 |
 | [TOOL-aTrimmedWait-6 — the role gate refuses a role agent's polling wait, and steps past an option cluster such as `-eo pipefail`](spec/2026-11-14-spec-TOOL-aTrimmedWait-6.md) | 6 | 2 | SPECCED | rev-1 | 2026-11-14 |
-| [TOOL-aTrimmedWait-7 — `handoff.py agents` keeps its parsed session calls per transcript and parses only the bytes appended since](spec/2026-11-14-spec-TOOL-aTrimmedWait-7.md) | 7 | 2 | SPECCED | rev-1 | 2026-11-14 |
+| [TOOL-aTrimmedWait-7 — `handoff.py agents` keeps its parsed session calls per transcript and parses only the bytes appended since](spec/2026-11-14-spec-TOOL-aTrimmedWait-7.md) | 7 | 2 | SPECCED | rev-2 | 2026-11-14 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 2 record folder(s).
+Records: 11 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

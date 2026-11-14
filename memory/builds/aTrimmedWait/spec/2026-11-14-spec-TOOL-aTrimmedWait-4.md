@@ -1,12 +1,14 @@
 # TOOL-aTrimmedWait-4 — `gen_build_index.py --write` writes only the artifacts whose bytes moved
 
-**Status:** SPECCED · rev-1 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 4 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md) | research | TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-4-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-4-1-spec-writer.md) | journal | — |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-4-ruling.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-4-ruling.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -209,10 +211,13 @@ What this arm does not check: the base parity of AC4 over the real tree, and the
     for the coverage and Landed-unclosed readers are each one mechanism, so each would be its own
     unit, and they are worth filing as an ask with the §4 figures. (b) fails the build's rule that
     a scoped answer must prove its inputs, because its reach map is an authored second answer.
+  - RESOLVED (owner, 2026-11-14): (a), the moved-only write.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-14 · initial draft.
+- rev-2 · 2026-11-14 · §8 F1 · ratified · F1 resolved by the owner at (a), the moved-only write,
+  recorded in 2026-11-14-prompt-TOOL-aTrimmedWait-4-ruling.
 
 ## 10. Reuse audit
 
