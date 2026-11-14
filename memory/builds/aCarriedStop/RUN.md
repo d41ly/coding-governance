@@ -17,12 +17,12 @@ hold-reason: the close's bar is 94/95 green and its one red, routed commits name
 hold-until: probe gate
 hold-code: host-degraded
 held-from: VERIFYING
-gates-run: unattended-17945890617045659641-176387 41c93c8b
+gates-run: unattended-17946237702863409310-732830 1f732d9b
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 60a6d0d79abdc5e70747f93bf34d7c1305f4dc65
-phase: VERIFYING
+witness: 1f732d9ba8a3777ce842a47ad10642203a62bd04
+phase: BUILDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/sad-allen-74f7bd
@@ -72,3 +72,7 @@ base: d646814e4a6a6747d3cdb471128be57a0e24e094
 2026-11-14T02:02:40Z brief · item TOOL-aCarriedStop-9 · reason 319fad7ee0b8 memory/builds/aCarriedStop/prompts/2026-11-14-prompt-TOOL-aCarriedStop-9-build-brief.md
 
 2026-11-14T02:04:10Z dispatch · item 4cb4b39f TOOL-aCarriedStop-9 · reason tools/run-gates/ceiling-evidence.txt tools/gate-legs.json memory/guides/SESSION-KICKOFF.md memory/builds/aCarriedStop/spec/2026-11-14-spec-TOOL-aCarriedStop-9.md memory/builds/aCarriedStop/build/2026-11-14-build-TOOL-aCarriedStop-9-1-acceptance-ledger.md memory/builds/aCarriedStop/README.md memory/LIVE.md memory/builds/aCarriedStop/prompts/2026-11-14-prompt-TOOL-aCarriedStop-9-2-builder.md memory/builds/aCarriedStop/build/2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md memory/builds/aCarriedStop/spec/2026-11-13-spec-TOOL-aCarriedStop-1.md memory/builds/aCarriedStop/spec/2026-11-13-spec-TOOL-aCarriedStop-2.md memory/builds/aCarriedStop/spec/2026-11-13-spec-TOOL-aCarriedStop-3.md
+
+2026-11-14T05:04:34Z rescope · item add TOOL-aCarriedStop-10 · reason adopted under M10 at the third close: install-prefix reads OWN on the inherited kit-path spellings in tools/chain-packet.py, and the push bar would refuse the same, so the owner's order to land needs them routed through resolve_kit_dir
+
+2026-11-14T05:06:32Z brief · item TOOL-aCarriedStop-9 · reason d24e2a2dd8c9 memory/builds/aCarriedStop/prompts/2026-11-14-prompt-TOOL-aCarriedStop-9-build-brief.md

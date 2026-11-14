@@ -6,10 +6,12 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md) | journal | TOOL-aCarriedStop-1 TOOL-aCarriedStop-2 TOOL-aCarriedStop-3 |
+| [2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md) | journal | TOOL-aCarriedStop-1 TOOL-aCarriedStop-2 TOOL-aCarriedStop-3 TOOL-aCarriedStop-10 |
 | [2026-11-14-build-TOOL-aCarriedStop-9-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aCarriedStop-9-1-acceptance-ledger.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aCarriedStop-9-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aCarriedStop-9-1-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aCarriedStop-9-2-builder.md](../prompts/2026-11-14-prompt-TOOL-aCarriedStop-9-2-builder.md) | journal | — |
+| [2026-11-14-prompt-TOOL-aCarriedStop-9-brief.md](../prompts/2026-11-14-prompt-TOOL-aCarriedStop-9-brief.md) | research | — |
+| [2026-11-14-prompt-TOOL-aCarriedStop-9-build-brief.md](../prompts/2026-11-14-prompt-TOOL-aCarriedStop-9-build-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 

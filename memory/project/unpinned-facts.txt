@@ -15240,3 +15240,14 @@ memory/builds/aCarriedStop/prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-1-spec-
 memory/builds/aCarriedStop/prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-3-spec-writer.md	98 specs
 memory/builds/aCarriedStop/prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-brief.md	98 specs
 memory/builds/aCarriedStop/spec/2026-11-13-spec-TOOL-aCarriedStop-2.md	96869 bytes
+memory/builds/aCarriedStop/RUN.md	760 s
+memory/builds/aCarriedStop/RUN.md	957 s
+memory/builds/aCarriedStop/build/2026-11-13-build-TOOL-aCarriedStop-1-arms-observed.md	2763s
+memory/builds/aCarriedStop/build/2026-11-13-build-TOOL-aCarriedStop-1-arms-observed.md	3540 s
+memory/builds/aCarriedStop/build/2026-11-13-build-TOOL-aCarriedStop-1-arms-observed.md	760 s
+memory/builds/aCarriedStop/prompts/2026-11-14-prompt-TOOL-aCarriedStop-9-1-spec-writer.md	120 s
+memory/builds/aCarriedStop/prompts/2026-11-14-prompt-TOOL-aCarriedStop-9-brief.md	120 s
+memory/builds/aCarriedStop/spec/2026-11-14-spec-TOOL-aCarriedStop-9.md	120 s
+memory/builds/aCarriedStop/spec/2026-11-14-spec-TOOL-aCarriedStop-9.md	3540 s
+memory/builds/aCarriedStop/spec/2026-11-14-spec-TOOL-aCarriedStop-9.md	760 s
+memory/builds/aCarriedStop/spec/2026-11-14-spec-TOOL-aCarriedStop-9.md	957 s
