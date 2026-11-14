@@ -17,8 +17,8 @@ were written and not run: their RED-first observations, the executed counts agai
 The owner's parity captures. Check 29's staged read, `gen_build_index.py --check-coverage --staged`
 over the real tree with `memory/builds/dWellOiledMachine/spec/2026-10-26-spec-TOOL-dWellOiledMachine-1.md`
 flipped to INPROGRESS and staged: the clone at `4e2f7d26` and the built clone each exited 0 and
-printed the one line `build-index: coverage — check 29 graded 1 INPROGRESS chain spec(s) in 1 of 22 <!-- PINNED 2026-11-14 -->
-chain build(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21`, and `cmp` printed nothing. Timings, base
+printed the same one coverage line, check 29 grading 1 INPROGRESS chain spec in 1 of 22 chain builds, <!-- PINNED 2026-11-14 -->
+and `cmp` printed nothing. Timings, base
 then built, on node `a`: 35 s and 41 s, one run each, inside the noise of one run. The render key, <!-- PINNED 2026-11-14 -->
 AC17, is byte-identical over one tree. The spec-token cache's three not-recorded lines keep their
 bytes, read off the probe output against the text at `4e2f7d26`.
@@ -65,8 +65,8 @@ bytes, read off the probe output against the text at `4e2f7d26`.
   `read_carries_texts` around `derive_carries_coverage` with `building=True`, printed `reads 2` at
   `4e2f7d26` and `reads 1` built.
 - AC12 — `{"kind":"popen","argv":["x"]}` — `ac3.sh` with the popen stub, whose `--input-key`
-  answers through the real checker's `main`, printed `spec-token cache not recorded: the input
-  record cannot be replayed` and left no key file, on the built driver and at `4e2f7d26`. The red
+  answers through the real checker's `main`, printed the not-recorded line ending
+  `the input record cannot be replayed` and left no key file, on the built driver and at `4e2f7d26`. The red
   with the replay branch collapsed is the close's.
 - AC13 — `python tools/memory-tree/gotchas.py --check` — exited 0 with one advisory line after
   `--write`, and the `grep -c` over `memory/gotchas/INDEX.md` printed 3.
