@@ -21,8 +21,8 @@ gates-run: unattended-17945890617045659641-176387 41c93c8b
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 5e2451f221005155b60d323cdbce8e478f9fa450
-phase: VERIFYING
+witness: 4cb4b39fa5e80598e89f257bd4f4d01ae914f701
+phase: BUILDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/sad-allen-74f7bd
@@ -68,3 +68,7 @@ base: d646814e4a6a6747d3cdb471128be57a0e24e094
 2026-11-14T01:02:27Z resume · item aCarriedStop · reason held · keepalive 1af57cf5 · manual
 
 2026-11-14T01:06:12Z rescope · item add TOOL-aCarriedStop-9 · reason owner ordered 2026-11-14: raise the routed-commits leg's ceiling and land; the close's bar timed it out at 760 s twice while it reads 957 s alone
+
+2026-11-14T02:02:40Z brief · item TOOL-aCarriedStop-9 · reason 319fad7ee0b8 memory/builds/aCarriedStop/prompts/2026-11-14-prompt-TOOL-aCarriedStop-9-build-brief.md
+
+2026-11-14T02:04:10Z dispatch · item 4cb4b39f TOOL-aCarriedStop-9 · reason tools/run-gates/ceiling-evidence.txt tools/gate-legs.json memory/guides/SESSION-KICKOFF.md memory/builds/aCarriedStop/spec/2026-11-14-spec-TOOL-aCarriedStop-9.md memory/builds/aCarriedStop/build/2026-11-14-build-TOOL-aCarriedStop-9-1-acceptance-ledger.md memory/builds/aCarriedStop/README.md memory/LIVE.md memory/builds/aCarriedStop/prompts/2026-11-14-prompt-TOOL-aCarriedStop-9-2-builder.md memory/builds/aCarriedStop/build/2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md memory/builds/aCarriedStop/spec/2026-11-13-spec-TOOL-aCarriedStop-1.md memory/builds/aCarriedStop/spec/2026-11-13-spec-TOOL-aCarriedStop-2.md memory/builds/aCarriedStop/spec/2026-11-13-spec-TOOL-aCarriedStop-3.md
