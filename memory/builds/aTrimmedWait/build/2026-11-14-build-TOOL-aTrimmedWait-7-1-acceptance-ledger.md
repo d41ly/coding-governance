@@ -59,6 +59,19 @@ at the close.
   scratch session ending in a torn line, the refusal of a `--handoff` file holding no marker, and
   the usage exit for a missing session file. Exit codes, stdout and stderr were byte-identical
   across base, built and warm on all five: 0, 1, 1, 1 and 2.
+- Fix pass, per `2026-11-14-prompt-TOOL-aTrimmedWait-7-fix` — `python tools/lexicon/lexicon.py --check`
+  exited 1 at ae2077c3b with `verb offenders 1211 over pin 1208`, and 0 after the fix: the suite <!-- PINNED 2026-11-14 -->
+  helpers `a23` and `a23_cold` became `run_agents23` and `check_cold23`, each answered `OK` by
+  `lexicon.py --suggest --as sh.function`, and `.lexicon.conf` pins `VERB_OFFENDER_PIN` at the
+  measured 1209 under a `RE-MEASURED` row for the inline `common_git_dir`, which `--offenders` <!-- DERIVED from lexicon.py --check P1 verb offenders -->
+  names in `tools/roles/handoff.py` and nothing else of this unit. The same command timed before:
+  8.20 s, 8.21 s and 8.14 s of wall; after: 8.07 s, 7.53 s and 8.39 s. <!-- PINNED 2026-11-14 -->
+  Arm 23 now checks the record edit's exit code in both poison steps and in each foreign-key step,
+  and requires a `*.json` record before the find-newer test; probed over a scratch folder, the
+  record edit exited 1 and the `*.json` guard returned 1 on an empty folder, and both returned 0 <!-- PINNED 2026-11-14 -->
+  once a record sat in it. `bash -n` parsed the suite. `python -I <scratch>/r6probe.py` printed
+  `PASS` for all seven cases before and after, byte-identical, and `tools/roles/handoff.py` is
+  unchanged by this fix, so no verdict moved.
 - Owed to the close: arm 23 of `tools/roles/adopt-roles.test.sh`, which covers both `New arm:` lines <!-- DERIVED from the spec's section 7 -->
   of the spec, its eight assertions and `FLOOR_ASSERTIONS` at 69, observed RED with `handoff.py` <!-- DERIVED from 61 plus arm 23's eight check_arm calls -->
   at the base and GREEN once restored; and the gate legs §7 lists.

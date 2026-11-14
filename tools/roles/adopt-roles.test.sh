@@ -1038,38 +1038,39 @@ elif mode == "offset":
     rec["offset"] = pathlib.Path(rec["session"]).stat().st_size + 1
 text = json.dumps(rec)
 rp.write_text(text[:len(text) // 2] if mode == "truncated" else text, encoding="utf-8")'
-a23() { out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" agents --handoff "$A9H" --session "$A23S" 2>"$TMP_ROOT/a23.err"); rc=$?; out=${out//$'\r'/}; }
-a23_cold() { [ "$rc" = 0 ] && [ "$out" = "$A9L1"$'\n'"$A9L2" ]; }
-[ ! -e "$A23D" ]; _a=$?; a23
+run_agents23() { out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" agents --handoff "$A9H" --session "$A23S" 2>"$TMP_ROOT/a23.err"); rc=$?; out=${out//$'\r'/}; }
+check_cold23() { [ "$rc" = 0 ] && [ "$out" = "$A9L1"$'\n'"$A9L2" ]; }
+[ ! -e "$A23D" ]; _a=$?; run_agents23
 check_arm "arm 23 a cold call prints arm 9's lines and writes one record under the fixture's git common dir" \
-   "$([ "$_rc23" = 0 ] && [ "$_a" = 0 ] && a23_cold && [ "$(ls "$A23D" | grep -cE '^[0-9a-f]{16}\.json$')" = 1 ] \
+   "$([ "$_rc23" = 0 ] && [ "$_a" = 0 ] && check_cold23 && [ "$(ls "$A23D" | grep -cE '^[0-9a-f]{16}\.json$')" = 1 ] \
       && [ "$(ls -A "$A23D" | wc -l)" = 1 ] && echo 1 || echo 0)"
-touch -d '2000-01-01 00:00:00' "$A23D"/*.json; a23
+touch -d '2000-01-01 00:00:00' "$A23D"/*.json; run_agents23
 check_arm "arm 23 ...a warm call prints the same lines and leaves the record unwritten" \
-   "$(a23_cold && [ -z "$(find "$A23D" -name '*.json' -newermt '2001-01-01')" ] && echo 1 || echo 0)"
-"$PY" -B -c "$A23_EDIT" "$A23D" poison; a23
+   "$(check_cold23 && [ -n "$(find "$A23D" -name '*.json')" ] \
+      && [ -z "$(find "$A23D" -name '*.json' -newermt '2001-01-01')" ] && echo 1 || echo 0)"
+"$PY" -B -c "$A23_EDIT" "$A23D" poison; _e23=$?; run_agents23
 check_arm "arm 23 ...a record whose notifications are emptied drops the returned line, so the record is read" \
-   "$([ "$rc" = 0 ] && [ "$out" = "$A9L1" ] && echo 1 || echo 0)"
-head -n 1 "$TMP_ROOT/a23.full" > "$A23S"; a23; tail -n +2 "$TMP_ROOT/a23.full" >> "$A23S"; a23
+   "$([ "$_e23" = 0 ] && [ "$rc" = 0 ] && [ "$out" = "$A9L1" ] && echo 1 || echo 0)"
+head -n 1 "$TMP_ROOT/a23.full" > "$A23S"; run_agents23; tail -n +2 "$TMP_ROOT/a23.full" >> "$A23S"; run_agents23
 check_arm "arm 23 ...a record taken on the first line, then the rest appended, prints the cold lines" \
-   "$(a23_cold && echo 1 || echo 0)"
+   "$(check_cold23 && echo 1 || echo 0)"
 _l1=$(head -n 1 "$TMP_ROOT/a23.full" | wc -c)
-head -c $((_l1 + 40)) "$TMP_ROOT/a23.full" > "$A23S"; a23; tail -c +$((_l1 + 41)) "$TMP_ROOT/a23.full" >> "$A23S"; a23
+head -c $((_l1 + 40)) "$TMP_ROOT/a23.full" > "$A23S"; run_agents23; tail -c +$((_l1 + 41)) "$TMP_ROOT/a23.full" >> "$A23S"; run_agents23
 check_arm "arm 23 ...a torn last line, then completed, prints the cold lines" \
-   "$(a23_cold && cmp -s "$A23S" "$TMP_ROOT/a23.full" && echo 1 || echo 0)"
-"$PY" -B -c "$A23_EDIT" "$A23D" poison; sed -i 's/async_launched/async_launchex/' "$A23S"; a23
+   "$(check_cold23 && cmp -s "$A23S" "$TMP_ROOT/a23.full" && echo 1 || echo 0)"
+"$PY" -B -c "$A23_EDIT" "$A23D" poison; _e23=$?; sed -i 's/async_launched/async_launchex/' "$A23S"; run_agents23
 check_arm "arm 23 a transcript edited at equal length keys the record off and prints the cold lines" \
-   "$(a23_cold && echo 1 || echo 0)"
+   "$([ "$_e23" = 0 ] && check_cold23 && echo 1 || echo 0)"
 _f=""
 for _k in parser session offset truncated; do
-  "$PY" -B -c "$A23_EDIT" "$A23D" "$_k"; a23; a23_cold || _f="$_f $_k"
+  "$PY" -B -c "$A23_EDIT" "$A23D" "$_k" || _f="$_f $_k(no-edit)"; run_agents23; check_cold23 || _f="$_f $_k"
 done
 check_arm "arm 23 a record with a foreign parser, session or offset, or truncated, prints the cold lines" \
    "$([ -z "$_f" ] && echo 1 || echo 0)"
 [ -z "$_f" ] || echo "    arm 23: the record was used under:$_f"
-rm -rf "$A23D"; printf x > "$A23D"; a23
+rm -rf "$A23D"; printf x > "$A23D"; run_agents23
 check_arm "arm 23 an unwritable record folder prints the cold lines and leaves no temporary file" \
-   "$(a23_cold && [ -z "$(find "$FX/.git" -name '*.tmp')" ] && echo 1 || echo 0)"
+   "$(check_cold23 && [ -z "$(find "$FX/.git" -name '*.tmp')" ] && echo 1 || echo 0)"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

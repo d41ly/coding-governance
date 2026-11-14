@@ -543,16 +543,6 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
-      "id": "a23",
-      "kind": "function",
-      "file": "tools/roles/adopt-roles.test.sh"
-    },
-    {
-      "id": "a23_cold",
-      "kind": "function",
-      "file": "tools/roles/adopt-roles.test.sh"
-    },
-    {
       "id": "a2tree",
       "kind": "function",
       "file": "tools/workflows/check-review-join.test.sh"
@@ -5326,6 +5316,11 @@
       "id": "check_clean",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_cold23",
+      "kind": "function",
+      "file": "tools/roles/adopt-roles.test.sh"
     },
     {
       "id": "check_collisions",
@@ -26041,6 +26036,11 @@
       "id": "run_against",
       "kind": "function",
       "file": "tools/process-monitor/adopt-process-monitor.test.sh"
+    },
+    {
+      "id": "run_agents23",
+      "kind": "function",
+      "file": "tools/roles/adopt-roles.test.sh"
     },
     {
       "id": "run_ak_leg",
