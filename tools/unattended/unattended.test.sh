@@ -7959,6 +7959,65 @@ miss "$o" "--dispatch refuses: the declared spec-token checker reds over the liv
 # ---- condition 1 (its own path) and must reach the stub. The unit-2 arm restores RUN.md below.
 o=$(run --dispatch tRun --pass ARCH-tRun-5 --writes ${PFX}swift5.sh)
 hit "$o" "--dispatch refuses: the declared spec-token checker reds over the live tree"
+# ---- TOOL-aBriskDeclaration-1 - THE ORDER VERB IS READ WITH NO PROCESS, AND THE SPEC-TOKEN CHECKER
+# ---- STARTS BESIDE THE OPEN-PASS READER AND IS READ AFTER CONDITION 1. Two traced dispatches over the
+# ---- pair above, both refused, so neither writes a row: ARCH-tRun-5 on its own path reaches the stub,
+# ---- and on ARCH-tRun-4's path is condition 1's. Each is a process under `bash -x`, counted as
+# ---- `run_proc` counts one, its trace under `.git` so the fixture tree does not move. A1 grades the
+# ---- reader in process with PATH emptied over ten planted headers, whose answers are the base
+# ---- reader's, PINNED on node a on 2026-11-14 (the spec's §4 table). RED-first: the driver at
+# ---- 846d51d39 forked grep under a substitution, so A1 read UNSET and the trace carried
+# ---- `++ order_verb_of`, ran the checker after the reader, and started no checker at condition 1.
+mkdir -p "$TMP/.git/bd"
+bd_h='**Status:** SPECCED · rev-1 · 2026-11-14 · node a · Tier-2 · base 0123abcd'
+printf '# t\n\n%s · order 7\n' "$bd_h" > "$TMP/.git/bd/p01"
+printf '# t\n\n%s ·  order 7\n' "$bd_h" > "$TMP/.git/bd/p02"
+printf '# t\n\n%s ·order 7\n' "$bd_h" > "$TMP/.git/bd/p03"
+printf '# t\n\n%s · order 7 · streams tooling\n' "$bd_h" > "$TMP/.git/bd/p04"
+printf '# t\r\n\r\n%s · order 7\r\n' "$bd_h" > "$TMP/.git/bd/p05"
+printf '# t\r\n\r\n%s · order 7x\r\n' "$bd_h" > "$TMP/.git/bd/p06"
+printf '# t\n\n%s · order 2x\n' "$bd_h" > "$TMP/.git/bd/p07"
+printf '# t\n\n%s\n' "$bd_h" > "$TMP/.git/bd/p08"
+printf '# t\n\n%s · order 3\n%s · order 9\n' "$bd_h" "$bd_h" > "$TMP/.git/bd/p09"
+printf '# t\n\n  %s · order 7\n' "$bd_h" > "$TMP/.git/bd/p10"
+# A1: each plant's answer is left in `_order_verb` with no command on PATH to fork.
+o=$( ( PATH=/nonexistent
+  for _f in p01 p02 p03 p04 p05 p06 p07 p08 p09 p10; do
+    order_verb_of "$TMP/.git/bd/$_f" >/dev/null; printf '%s=[%s] ' "$_f" "${_order_verb-UNSET}"
+  done ) )
+same "brisk A1: the order verb is read with no process" "$o" "p01=[7] p02=[7] p03=[7] p04=[7] p05=[7] p06=[MALFORMED · order 7x] p07=[MALFORMED · order 2x] p08=[] p09=[3] p10=[] "
+bd_sl=$(sed -n '/^order_verb_of() {/,/^}$/p' "$SCRIPT" | grep -v '^[[:space:]]*#')
+hit "$bd_sl" '_order_verb=$n'
+same "brisk A1: order_verb_of's body opens no substitution" "$(printf '%s\n' "$bd_sl" | grep -c -e '\$(' -e '`')" 0
+# A1 and A2: the dispatch that reaches the stub. The start's `init_bounded` precedes the reader, and
+# its `read_bounded` follows it; the order gate's reads are calls, never substitutions.
+printf . >>"$DRV_PROC_TALLY"
+o=$(run_main_at_head bash -x "$SCRIPT" --dispatch tRun --pass ARCH-tRun-5 --writes ${PFX}swift5.sh 2>"$TMP/.git/bd/trace5")
+hit "$o" "--dispatch refuses: the declared spec-token checker reds over the live tree"
+hit "$(grep -E '^\+ order_verb_of ' "$TMP/.git/bd/trace5" | head -1)" "order_verb_of "
+same "brisk A1: no order verb is read through a substitution" "$(grep -cE '^\+\+ order_verb_of ' "$TMP/.git/bd/trace5")" 0
+same "brisk A2: the checker starts before the open-pass reader and is read after it" "$(awk '/^\++ init_bounded .*swift-stub\.py/ && !i { i = NR } /^\++ read_open_passes / && !r { r = NR } r && NR > r && /^\++ read_bounded / && !b { b = NR } END { print ((i && r && i < r) ? "start-first" : "start-late"), (b ? "read-after" : "unread") }' "$TMP/.git/bd/trace5")" "start-first read-after"
+# A3: condition 1 refuses in the window, so the started checker is waited for, never killed.
+printf . >>"$DRV_PROC_TALLY"
+o=$(run_main_at_head bash -x "$SCRIPT" --dispatch tRun --pass ARCH-tRun-5 --writes ${PFX}swift.sh 2>"$TMP/.git/bd/trace1")
+hit "$o" "two passes claiming one file are not disjoint"
+miss "$o" "--dispatch refuses: the declared spec-token checker reds over the live tree"
+same "brisk A3: a condition-1 refusal waits for the started checker" "$(awk '/^\++ init_bounded .*swift-stub\.py/ && !i { i = NR } /^\++ fail 49 .--dispatch declares a path a sibling/ && !f { f = NR } f && NR > f && /^\++ read_bounded / && !b { b = NR } f && NR > f && /^\++ kill / { k++ } END { print (i ? "started" : "unstarted"), ((f && i && i < f) ? "refused" : "no-refusal"), (b ? "read" : "unread"), "kills=" k + 0 }' "$TMP/.git/bd/trace1")" "started refused read kills=0"
+# A4: every `return 1` between the start and the read waits for the checker. A write added in the
+# window is not seen here: the spec's §4 states that invariant and what would break it.
+bd_win=$(awk '/^verb_dispatch\(\)/ { v = 1 } v && /init_spec_token_check "\$slug"/ { w = 1; next } v && /run_spec_token_check "\$slug"/ { w = 0 } w && !/^[[:space:]]*#/ && /return 1/ { n++; if ($0 !~ /remove_spec_token_check/) print "MISSING " NR } END { print n + 0 }' "$SCRIPT")
+miss "$bd_win" "MISSING"
+same "brisk A4: the window holds the two waiting refusals" "$([ "${bd_win##*$'\n'}" -ge 2 ] 2>/dev/null && echo yes || echo "no: $bd_win")" yes
+# A5: the start prints nothing, even when the resolver diagnoses on stderr; the read prints the
+# diagnosis and then refuses, on the start's verdict.
+o=$( ( load_driver_conf && {
+  resolve_python() { echo RESOLVER-DIAG >&2; return 1; }
+  init_spec_token_check tRun >"$TMP/.git/bd/start" 2>&1; printf 'state=%s\n' "${ST_STATE-UNSET}"
+  run_spec_token_check tRun; } ) 2>&1 )
+same "brisk A5: the start half prints nothing" "$(cat "$TMP/.git/bd/start")" ""
+hit "$o" "state=nopython"
+same "brisk A5: the read prints the resolver's diagnosis, then refuses" "$(printf '%s\n' "$o" | grep -oE 'RESOLVER-DIAG|the inline resolver found no usable python' | tr '\n' '|')" "RESOLVER-DIAG|the inline resolver found no usable python|"
+rm -rf "$TMP/.git/bd"
 
 # ---- TOOL-aSwiftRefusal-2 - A DEFERRED EARLIER-ORDER SIBLING DOES NOT HOLD BACK THE ORDER GATE, on
 # ---- the same pair. ARCH-tRun-4 passes only when its spec reads DEFERRED AND its last row is a

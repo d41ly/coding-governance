@@ -4830,23 +4830,35 @@ roster_ids() { # slug -> ids the AUTHORED plan names, which may include unspecce
 # disagreed with the generator on a doubled separator space, on no space, and on a trailing-garbage
 # value. The first two read EMPTY, which skips the order gate entirely — the failure a reader cannot
 # see, under a comment asserting the two readers could not disagree.
-order_verb_of() { # spec file -> prints the order integer, or nothing; refuses a malformed verb
-  local hdr n loose
-  hdr=$(grep -m1 '^\*\*Status:\*\*' "$1" 2>/dev/null) || return 0
-  n=$(printf '%s' "$hdr" | grep -oE "$ORDER_OK_RE" | head -1 | grep -oE '[0-9]+' | head -1)
+# READ WITH BUILTINS ALONE (TOOL-aBriskDeclaration-1 S1). The order gate calls this once per unit of
+# the build, and the grep pipeline it replaced started about seven processes a call. The first line
+# opening `**Status:**` is read with `read`, one trailing CR dropped, and both patterns are matched with
+# `[[ =~ ]]`, which takes the same POSIX ERE grep took. The `[ -f ]` guard and the loop's `2>/dev/null`,
+# placed before the input redirect, keep a missing path, a directory or an unreadable file silent with
+# an empty answer, as `grep -m1` with its stderr silenced was.
+order_verb_of() { # spec file -> prints the order integer, or nothing, and leaves it in _order_verb; refuses a malformed verb
+  local hdr="" n="" loose="" line
+  _order_verb=""
+  [ -f "$1" ] || return 0
+  while IFS= read -r line || [ -n "$line" ]; do
+    case "$line" in '**Status:**'*) hdr=${line%$'\r'}; break ;; esac
+  done 2>/dev/null <"$1"
+  [ -n "$hdr" ] || return 0
+  [[ $hdr =~ $ORDER_OK_RE ]] && [[ ${BASH_REMATCH[0]} =~ [0-9]+ ]] && n=${BASH_REMATCH[0]}
   if [ -z "$n" ]; then
-    loose=$(printf '%s' "$hdr" | grep -oE "$ORDER_LOOSE_RE" | head -1)
+    [[ $hdr =~ $ORDER_LOOSE_RE ]] && loose=${BASH_REMATCH[0]}
     if [ -n "$loose" ]; then
-      # THE REFUSAL IS THE CALLER'S TO MAKE, not this function's. Both call sites read this through
-      # `$( )`, so a `fail` here writes its message into the captured stream and its status dies in
-      # the subshell — the verb then exited 0 with zero bytes of output on a malformed order verb,
-      # which is a silent pass on exactly the input this reader was added to refuse. So the sentinel
-      # comes back on stdout and the caller fails in ITS shell, where the status is real.
-      printf 'MALFORMED %s' "$loose"
+      # THE REFUSAL IS THE CALLER'S TO MAKE, not this function's. Both call sites read `_order_verb`
+      # with this function's stdout sent to /dev/null, so neither forks. The sentinel still comes
+      # back rather than a `fail` here, because the caller holds both refusal texts in one place, and
+      # a caller that read this through a command substitution would meet the old trap: a `fail`
+      # inside it writes its message into the captured stream and its status dies in the subshell,
+      # so the verb exited 0 with zero bytes of output on a malformed order verb.
+      _order_verb="MALFORMED $loose"; printf '%s' "$_order_verb"
       return 0
     fi
   fi
-  printf '%s' "$n"
+  _order_verb=$n; printf '%s' "$n"
   return 0
 }
 unit_ids_of() { # slug
@@ -14455,26 +14467,66 @@ derive_spec_token_key() { # slug · launcher -> a 40-hex key, or nothing and sta
 # verdict admits, so a refusal re-runs every time and a tree edited mid-run is recorded under the key
 # of the tree it read. The record is one file per slug under the sidecar root, read with `read -r`
 # and written with one `printf`; a failed read or write costs a later miss and never refuses.
+#
+# TWO HALVES, AS `init_bounded` AND `read_bounded` ARE (TOOL-aBriskDeclaration-1 S3, S4). The start
+# half, `init_spec_token_check`, derives the key and starts the checker before the open-pass reader,
+# so the two run side by side; it prints nothing and refuses nothing, and records what it decided in
+# the five ST_ globals. This read half prints every line and makes every refusal where the call
+# always sat, from that record, and empties it so a later call in the same shell never reads it. A
+# direct call with no start before it runs the two back to back, as `run_bounded` does.
+ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_HANDLE=""
+init_spec_token_check() { # slug -> the decision in ST_STATE, and under `run` the checker started; prints nothing
+  local _stdir="" _stwas=""
+  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_HANDLE=""
+  if [ -z "${SPEC_TOKENS_CLI:-}" ]; then ST_STATE=blank; return 0; fi
+  [ -f "$ROOT/$SPEC_TOKENS_CLI" ] || { ST_STATE=missing; return 0; }
+  # SILENCED HERE, re-run for its print at the read. Printing the resolver's diagnosis now would put
+  # it ahead of the reader's notes and onto a condition-1 refusal that never printed it; with its
+  # stderr not a terminal, the silenced call never reaches the uv prompt either.
+  ST_PY=$(resolve_python 2>/dev/null) || { ST_PY=""; ST_STATE=nopython; return 0; }
+  ST_KEY=$(derive_spec_token_key "$1" "$ST_PY") || ST_KEY=""
+  if [ -n "$ST_KEY" ]; then
+    _stdir=$(resolve_sidecar_dir) && [ -n "$_stdir" ] && ST_REC="$_stdir/spec-tokens.$1.key"
+    if [ -n "$ST_REC" ] && [ -f "$ST_REC" ]; then read -r _stwas <"$ST_REC" || :; fi
+    if [ "$_stwas" = "$ST_KEY" ]; then ST_STATE=skip; return 0; fi
+  fi
+  ST_STATE=run
+  # A start that cannot make its capture leaves ST_HANDLE empty, and the read half then runs the
+  # synchronous form, which prints that sentence where it always did.
+  init_bounded "$ST_PY" "$SPEC_TOKENS_CLI" && ST_HANDLE=$RB_HANDLE
+  return 0
+}
+# NO CHECKER OUTLIVES THE VERB UNREAD. A refusal between the start and the read waits for the started
+# checker and discards its answer -- never a kill, for the reason `read_preflight_probes` gives.
+remove_spec_token_check() { # -> a started checker waited for and its answer discarded; prints nothing
+  [ -z "${ST_HANDLE:-}" ] || read_bounded "$ST_HANDLE" || :
+  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_HANDLE=""
+  return 0
+}
 run_spec_token_check() { # slug -> 0 admitted or skipped, 1 refused under check 49
-  local slug="$1" _stpy _strc _stq _stkey="" _stdir="" _strec="" _stwas=""
-  if [ -z "${SPEC_TOKENS_CLI:-}" ]; then
+  local slug="$1" _stst _stpy _stkey _strec _sth _strc _stq
+  [ -n "${ST_STATE:-}" ] || init_spec_token_check "$slug"
+  _stst=$ST_STATE; _stpy=$ST_PY; _stkey=$ST_KEY; _strec=$ST_REC; _sth=$ST_HANDLE
+  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_HANDLE=""
+  if [ "$_stst" = blank ]; then
     echo "unattended: dispatch — SPEC_TOKENS_CLI is blank or undeclared, so no spec-token check ran over the live tree before this dispatch: an announced skip, not a pass"
     return 0
   fi
-  [ -f "$ROOT/$SPEC_TOKENS_CLI" ] || { fail 49 "--dispatch: SPEC_TOKENS_CLI names a file that is not there, so the spec-token check would pass by running nothing: $SPEC_TOKENS_CLI"; return 1; }
-  _stpy=$(resolve_python) || { fail 49 "--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run: $SPEC_TOKENS_CLI"; return 1; }
-  _stkey=$(derive_spec_token_key "$slug" "$_stpy") || _stkey=""
-  if [ -n "$_stkey" ]; then
-    _stdir=$(resolve_sidecar_dir) && [ -n "$_stdir" ] && _strec="$_stdir/spec-tokens.$slug.key"
-    if [ -n "$_strec" ] && [ -f "$_strec" ]; then read -r _stwas <"$_strec" || :; fi
-    if [ "$_stwas" = "$_stkey" ]; then
-      echo "unattended: dispatch — spec-token check skipped: its inputs match the check last admitted for $slug (key ${_stkey:0:12})"
-      return 0
-    fi
-  else
+  [ "$_stst" != missing ] || { fail 49 "--dispatch: SPEC_TOKENS_CLI names a file that is not there, so the spec-token check would pass by running nothing: $SPEC_TOKENS_CLI"; return 1; }
+  # Refused on the START's verdict; the second call is only for its diagnosis on stderr.
+  [ "$_stst" != nopython ] || { resolve_python >/dev/null || :; fail 49 "--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run: $SPEC_TOKENS_CLI"; return 1; }
+  if [ "$_stst" = skip ]; then
+    echo "unattended: dispatch — spec-token check skipped: its inputs match the check last admitted for $slug (key ${_stkey:0:12})"
+    return 0
+  fi
+  if [ -z "$_stkey" ]; then
     echo "unattended: dispatch — spec-token cache off: no run-gates gate-fingerprint.sh resolves in this install, or it printed no digest, so the checker runs"
   fi
-  run_bounded "$_stpy" "$SPEC_TOKENS_CLI"; _strc=$?
+  if [ -n "$_sth" ]; then
+    read_bounded "$_sth"; _strc=$?
+  else
+    run_bounded "$_stpy" "$SPEC_TOKENS_CLI"; _strc=$?
+  fi
   if ! _stq=$(check_spec_token_hits "$slug" "$_strc" "$RB_OUT"); then
     fail 49 "--dispatch refuses: the declared spec-token checker reds over the live tree, so a live spec names a bar, a suite or a token that does not resolve and the unit would build against it ($SPEC_TOKENS_CLI exited $_strc in ${RB_TOOK}s): ${_stq//$'\n'/ }"
     return 1
@@ -14484,7 +14536,7 @@ run_spec_token_check() { # slug -> 0 admitted or skipped, 1 refused under check 
     echo "unattended: dispatch — the spec-token checker reds only in other builds' specs, which the bar's whole-tree leg still grades, so this dispatch is admitted: ${BASH_REMATCH[1]:-?} hit(s), first: ${_stq%%$'\n'*}"
   fi
   if [ -n "$_strec" ]; then
-    { mkdir -p "$_stdir" && printf '%s\n' "$_stkey" >"$_strec"; } 2>/dev/null || :
+    { mkdir -p "${_strec%/*}" && printf '%s\n' "$_stkey" >"$_strec"; } 2>/dev/null || :
   fi
   return 0
 }
@@ -14539,7 +14591,7 @@ verb_dispatch() { # slug · unit · writes...
   # disagree on: two spaces after the separator, or none, read EMPTY here and 3 there, and a
   # trailing-garbage value read as its numeric prefix here while the generator RAISES. An empty
   # read SILENTLY SKIPS the whole order gate, which is the worst of the three.
-  _d_ord=$(order_verb_of "$_d_spec")
+  order_verb_of "$_d_spec" >/dev/null; _d_ord=$_order_verb
   case "$_d_ord" in MALFORMED\ *)
     fail 49 "a spec status header carries something shaped like the build-order verb that does not conform, and a reader taking its numeric prefix would sequence the build on a value nobody wrote: $_d_spec spells [${_d_ord#MALFORMED }]"
     return 1 ;;
@@ -14548,7 +14600,7 @@ verb_dispatch() { # slug · unit · writes...
     for _o_id in $(unit_ids_of "$slug"); do
       [ "$_o_id" = "$unit" ] && continue
       _o_spec="${SPEC_PATH[$_o_id]:-}"; [ -n "$_o_spec" ] || continue
-      _o_ord=$(order_verb_of "$_o_spec")
+      order_verb_of "$_o_spec" >/dev/null; _o_ord=$_order_verb
       case "$_o_ord" in MALFORMED\ *)
         fail 49 "a sibling spec status header carries something shaped like the build-order verb that does not conform, so this build's order cannot be sequenced against it: $_o_spec spells [${_o_ord#MALFORMED }]"
         return 1 ;;
@@ -14762,6 +14814,18 @@ verb_dispatch() { # slug · unit · writes...
   # re-declaration naming only its added paths free the earlier ones while the pass was still open.
   # A unit whose spec is CLOSED or WONTDO reserves nothing, each released key named on stderr
   # (TOOL-dGroundRules-66): the reader's own comment says why.
+  #
+  # THE SPEC-TOKEN CHECKER STARTS HERE, BESIDE THE OPEN-PASS READER (TOOL-aBriskDeclaration-1 S5), and
+  # is read where it always ran, after condition 1. Neither reads the other, so the declaration costs
+  # the longer of the two. Every refusal above returns with no checker started. THE WINDOW holds two
+  # refusals, the generator pairing and condition 1, and each calls `remove_spec_token_check` before
+  # its `return 1`, which waits for the checker and discards its answer, so none outlives the verb.
+  # NOTHING IN THE WINDOW WRITES THE TREE -- the reader runs `git rev-parse`, `git log` into a temp
+  # file and `git diff-tree`, the rest reads strings -- so the key derived at the start describes the
+  # tree the checker reads; a write moved above the read (the claim, `park`, `stage_or_fail`), a `git
+  # status` added between, or a writer added to the reader would break that, and the arm over the
+  # window's returns does not see it.
+  init_spec_token_check "$slug"
   sibrows=$(read_open_passes "$rel")
   sibpaths=$(printf '%s\n' "$sibrows" | sed 's/.* · reason //' | tr '\n' ' ')
   # A PROOF OVER NOBODY SAYS SO. The condition-1 loop below iterates the sibling rows and returns
@@ -14810,7 +14874,7 @@ verb_dispatch() { # slug · unit · writes...
         for g in $gens; do
           if overlaps "$g" "$q"; then
             _as=""; [ "$g" = "${gens%%$'\n'*}" ] || _as=" (declared as $gen)"
-            fail 49 "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted: $idx with $g$_as"; return 1
+            fail 49 "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted: $idx with $g$_as"; remove_spec_token_check; return 1
           fi
         done
       done
@@ -14827,7 +14891,7 @@ verb_dispatch() { # slug · unit · writes...
         # `memory/builds/x/spec/s.md` collide on every write, and string equality calls them disjoint.
         overlaps "$p" "$q" || continue
         local _who=${sib#* dispatch · item }; _who=${_who%% · reason *}
-        fail 49 "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint: $p also in $_who"; return 1
+        fail 49 "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint: $p also in $_who"; remove_spec_token_check; return 1
       done
     done
   done <<SIBS
@@ -14835,9 +14899,11 @@ $sibrows
 SIBS
   # ------------------------------------------------- aDeferredBar closing review F3 (unit 2)
   # THE SPEC-TOKEN CHECK, `run_spec_token_check`: its header says what it runs, scopes and caches.
-  # IT RUNS LAST AMONG THE LOCAL REFUSALS (TOOL-aSwiftRefusal-1): it is the one that costs a tree-wide
-  # scan, and every refusal above it is decided from the run-state file, the spec headers or `git` in
-  # seconds, so an out-of-order or overlapping dispatch is refused before the checker runs at all.
+  # IT IS READ LAST AMONG THE LOCAL REFUSALS (TOOL-aSwiftRefusal-1, TOOL-aBriskDeclaration-1): it is
+  # the one that costs a tree-wide scan, so it is started just before the open-pass reader and read
+  # here, after condition 1. Every refusal above the start is decided from the run-state file, the
+  # spec headers or `git` in seconds, so an out-of-order dispatch is refused before the checker starts;
+  # the two refusals between the start and here wait for it, and its own refusal prints after them all.
   run_spec_token_check "$slug" || return 1
   # PARKED NORMALISED. Every refusal above asks its question through `normpath`; recording the raw
   # spelling meant the guards judged one path and the leg graded another, and `work/sub/` sailed

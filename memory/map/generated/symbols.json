@@ -13123,6 +13123,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "init_spec_token_check",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "init_straggler_guard",
       "kind": "function",
       "file": ".githooks/straggler-guard.sh"
@@ -21611,6 +21616,11 @@
       "id": "remove_shared_file",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "remove_spec_token_check",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "remove_stubs",

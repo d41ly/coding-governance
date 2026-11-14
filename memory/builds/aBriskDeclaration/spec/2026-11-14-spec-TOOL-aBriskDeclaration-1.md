@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-14-build-TOOL-aBriskDeclaration-1-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aBriskDeclaration-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-14-build-TOOL-aBriskDeclaration-1-analysis.md](../build/2026-11-14-build-TOOL-aBriskDeclaration-1-analysis.md) | research | — |
 | [2026-11-14-prompt-TOOL-aBriskDeclaration-1-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aBriskDeclaration-1-1-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aBriskDeclaration-1-2-builder.md](../prompts/2026-11-14-prompt-TOOL-aBriskDeclaration-1-2-builder.md) | journal | — |
