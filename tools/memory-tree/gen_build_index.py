@@ -3301,52 +3301,71 @@ def cmd_write(root: str, conf: dict, staged: bool = False) -> int:
         view = render_asbuilt_view(root, conf)
     except Problem as exc:
         refused = exc
-    # TOOL-aTrimmedWait-4 — both paths write only what moved: a file left in place already holds the
-    # bytes `write_text` would give it, so the tree is the one a full rewrite leaves.
-    to_stage, view_prev = [], None
-    if view["state"] == "armed" and derive_moved_artifacts(root, {view["rel"]: view["text"]}):
-        if staged:
-            to_stage.append(view["rel"])
-            view_path = os.path.join(root, view["rel"])
-            view_prev = pathlib.Path(view_path).read_bytes() if os.path.isfile(view_path) else False
-        write_text(os.path.join(root, view["rel"]), view["text"])
-    artifacts, orphans, unmanaged, verdicts, guarded = plan(root, conf, create_missing=True)
-    if staged and guarded:
-        # The view was written first because `plan()` reads it; a decline writes nothing, so put it back.
-        if view_prev is False:
-            os.remove(os.path.join(root, view["rel"]))
-        elif view_prev is not None:
-            pathlib.Path(root, view["rel"]).write_bytes(view_prev)
-        print(f"build-index: render NOT staged — the data-loss guard holds {' '.join(sorted(guarded))}")
-        print_verdicts(verdicts, guarded, conf)
+    if staged and refused:
+        # TOOL-aTrimmedWait-8 S1 — a decline writes nothing, so the view refusal is declined here,
+        # before the first write, and not raised after the render is staged.
+        print(f"build-index: render NOT staged — {refused}")
         return 1
-    rendered = len(artifacts)
-    moved = derive_moved_artifacts(root, artifacts)
-    artifacts = {rel: artifacts[rel] for rel in moved}
-    if staged:
-        to_stage += moved + list(orphans)
-        if not to_stage:
-            print("build-index: render NOT staged — no artifact's bytes moved, so check 9's refusal is not "
-                  "drift a render cures")
+    # TOOL-aTrimmedWait-8 S2 — every path the staged mode writes or removes has its prior bytes
+    # recorded first (None: it was absent), and the one `finally` below puts them all back when the
+    # mode leaves before `git add` succeeds, on a decline return or on any exception.
+    undo: dict = {}
+    landed = False
+    try:
+        # TOOL-aTrimmedWait-4 — both paths write only what moved: a file left in place already holds
+        # the bytes `write_text` would give it, so the tree is the one a full rewrite leaves.
+        to_stage = []
+        if view["state"] == "armed" and derive_moved_artifacts(root, {view["rel"]: view["text"]}):
+            if staged:
+                to_stage.append(view["rel"])
+                view_path = os.path.join(root, view["rel"])
+                undo[view["rel"]] = pathlib.Path(view_path).read_bytes() if os.path.isfile(view_path) else None
+            write_text(os.path.join(root, view["rel"]), view["text"])
+        artifacts, orphans, unmanaged, verdicts, guarded = plan(root, conf, create_missing=True)
+        if staged and guarded:
+            print(f"build-index: render NOT staged — the data-loss guard holds {' '.join(sorted(guarded))}")
+            print_verdicts(verdicts, guarded, conf)
             return 1
-    for rel, text in sorted(artifacts.items()):
-        write_text(os.path.join(root, rel), text)
-    for p in orphans:
-        os.remove(os.path.join(root, p))
-        print(f"build-index: removed orphaned shard {p}")
-    for p in unmanaged:
-        print(f"build-index: WARNING unmanaged file under ledger/ left in place: {p}")
-    print(f"build-index: wrote {len(artifacts)} artifact(s), {rendered - len(artifacts)} unchanged")
+        rendered = len(artifacts)
+        moved = derive_moved_artifacts(root, artifacts)
+        artifacts = {rel: artifacts[rel] for rel in moved}
+        if staged:
+            to_stage += moved + list(orphans)
+            if not to_stage:
+                print("build-index: render NOT staged — no artifact's bytes moved, so check 9's refusal is "
+                      "not drift a render cures")
+                return 1
+            for rel in [*artifacts, *orphans]:
+                path = os.path.join(root, rel)
+                undo.setdefault(rel, pathlib.Path(path).read_bytes() if os.path.isfile(path) else None)
+        for rel, text in sorted(artifacts.items()):
+            write_text(os.path.join(root, rel), text)
+        for p in orphans:
+            os.remove(os.path.join(root, p))
+            print(f"build-index: removed orphaned shard {p}")
+        for p in unmanaged:
+            print(f"build-index: WARNING unmanaged file under ledger/ left in place: {p}")
+        print(f"build-index: wrote {len(artifacts)} artifact(s), {rendered - len(artifacts)} unchanged")
+        if staged:
+            # `run()` drops GIT_INDEX_FILE; under `git commit -a` only an add through the hook's index lands.
+            env = _build_git_env()
+            if os.environ.get("GIT_INDEX_FILE"):
+                env["GIT_INDEX_FILE"] = os.environ["GIT_INDEX_FILE"]
+            try:
+                subprocess.run(["git", "add", "-A", "--", *to_stage], cwd=root, capture_output=True,
+                               check=True, env=env)
+            except (OSError, subprocess.CalledProcessError) as exc:
+                raise Problem(f"render NOT staged — git add refused the rendered artifacts ({exc})") from None
+        landed = True
+    finally:
+        if staged and not landed:
+            for rel, prior in undo.items():
+                path = pathlib.Path(root, rel)
+                if prior is None:
+                    path.unlink(missing_ok=True)
+                else:
+                    path.write_bytes(prior)
     if staged:
-        # `run()` drops GIT_INDEX_FILE; under `git commit -a` only an add through the hook's index lands.
-        env = _build_git_env()
-        if os.environ.get("GIT_INDEX_FILE"):
-            env["GIT_INDEX_FILE"] = os.environ["GIT_INDEX_FILE"]
-        try:
-            subprocess.run(["git", "add", "-A", "--", *to_stage], cwd=root, capture_output=True,
-                           check=True, env=env)
-        except (OSError, subprocess.CalledProcessError) as exc:
-            raise Problem(f"render NOT staged — git add refused the rendered artifacts ({exc})") from None
         for p in to_stage:
             print(f"build-index: staged {p}")
     # A RENDER IS NOT A VERDICT (fork F1). One unparseable ask row must not leave a whole tree
@@ -4736,15 +4755,15 @@ def test_staged_write(arm) -> None:
         spec = "memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md"
         readme = "memory/builds/tOne/README.md"
 
-        def write_staged_change(conf_text=on):
-            run("git", "reset", "-q", "--hard", cwd=t)
-            sp = os.path.join(t, spec)
+        def write_staged_change(conf_text=on, tree=t):
+            run("git", "reset", "-q", "--hard", cwd=tree)
+            sp = os.path.join(tree, spec)
             write_text(sp, read_text(sp).replace("INPROGRESS", "DEFERRED"))
-            run("git", "add", spec, cwd=t)
-            write_text(cpath, conf_text)
+            run("git", "add", spec, cwd=tree)
+            write_text(os.path.join(tree, ".memory-tree.conf"), conf_text)
 
-        def read_porcelain():
-            return run("git", "status", "--porcelain", cwd=t)
+        def read_porcelain(tree=t):
+            return run("git", "status", "--porcelain", cwd=tree)
 
         write_staged_change()
         rc, out = run_write_staged(t)
@@ -4773,9 +4792,11 @@ def test_staged_write(arm) -> None:
         write_staged_change()
         foreign = os.path.join(base, "other-index")
         shutil.copyfile(os.path.join(t, ".git", "index"), foreign)
+        before = read_porcelain()
         rc, out = run_write_staged(t, GIT_INDEX_FILE=foreign)
         arm("TOOL-aTrimmedWait-3 AC3 — a foreign GIT_INDEX_FILE is declined by name", "ARM-PASS",
-            lambda: build_arm_result(rc == 1 and "render NOT staged" in out and "other-index" in out, rc, out))
+            lambda: build_arm_result(rc == 1 and "render NOT staged" in out and "other-index" in out
+                                     and read_porcelain() == before, rc, out))
         rc, out = run_write_staged(t, GIT_INDEX_FILE=os.path.join(t, ".git", "index"))
         arm("TOOL-aTrimmedWait-3 AC3 — the repository's own index under an absolute path proceeds", "ARM-PASS",
             lambda: build_arm_result(rc == 0 and f"build-index: staged {readme}" in out, rc, out))
@@ -4790,6 +4811,102 @@ def test_staged_write(arm) -> None:
             arm(f"TOOL-aTrimmedWait-3 AC4 — an unstaged {rel} {'declines' if declines else 'proceeds'}"
                 f"{' under LIVE_LANDED_UNCLOSED=1' if 'LIVE_LANDED' in conf_text else ''}", "ARM-PASS",
                 lambda: build_arm_result(ok, rc, out))
+        # TOOL-aTrimmedWait-8 AC2 — an empty index.lock with GIT_INDEX_FILE unset: `check_staged_write`
+        # reads the index and passes, and `git add` refuses. The lock goes before any later git command.
+        write_staged_change()
+        lock = os.path.join(t, ".git", "index.lock")
+        before = read_porcelain()
+        open(lock, "w", encoding="utf-8").close()
+        rc, out = run_write_staged(t)
+        os.remove(lock)
+        ok = (rc == 1 and "git add refused the rendered artifacts" in out and read_porcelain() == before
+              and read_text(os.path.join(t, readme)) == run("git", "show", f"HEAD:{readme}", cwd=t))
+        arm("TOOL-aTrimmedWait-8 AC2 — a refused git add puts back every file the mode wrote", "ARM-PASS",
+            lambda: build_arm_result(ok, rc, out))
+        # AC7 — the index's own `.lock`, which `git commit -a` hands the hook, and a relative path.
+        write_staged_change()
+        shutil.copyfile(os.path.join(t, ".git", "index"), lock)
+        rc, out = run_write_staged(t, GIT_INDEX_FILE=lock)
+        os.remove(lock)
+        arm("TOOL-aTrimmedWait-8 AC7 — GIT_INDEX_FILE naming the index's .lock proceeds", "ARM-PASS",
+            lambda: build_arm_result(rc == 0 and f"build-index: staged {readme}" in out, rc, out))
+        write_staged_change()
+        rc, out = run_write_staged(t, GIT_INDEX_FILE=".git/index")
+        arm("TOOL-aTrimmedWait-8 AC7 — a relative GIT_INDEX_FILE naming the own index proceeds", "ARM-PASS",
+            lambda: build_arm_result(rc == 0 and f"build-index: staged {readme}" in out, rc, out))
+        # AC5 — a committed month shard no record renders into is an orphan, and its removal is staged.
+        run("git", "reset", "-q", "--hard", cwd=t)
+        shard = "memory/ledger/2020-01.md"
+        write_text(os.path.join(t, shard), "stale\n")
+        run("git", "add", "--", shard, cwd=t)
+        run("git", "commit", "-q", "-m", "orphan", "--no-verify", cwd=t)
+        write_staged_change()
+        rc, out = run_write_staged(t)
+        removed = run("git", "diff", "--cached", "--name-only", "--diff-filter=D", cwd=t).split("\n")
+        ok = (rc == 0 and f"build-index: staged {shard}" in out and shard in removed
+              and not os.path.exists(os.path.join(t, shard)))
+        arm("TOOL-aTrimmedWait-8 AC5 — an orphaned ledger shard's removal is staged", "ARM-PASS",
+            lambda: build_arm_result(ok, rc, f"removed={removed} {out}"))
+        run("git", "reset", "-q", "--hard", "HEAD~1", cwd=t)
+        # `<d>`: the same tree built through the design factory, its view armed, rendered and committed.
+        d = os.path.join(base, "sd"); os.makedirs(d)
+        _texts, record_rel, view_rel, sha = _build_design_fixture(d)
+        on_d = (_render_fixture_conf() + f'DESIGN_RECORD="{record_rel}"\nDESIGN_BASELINE="{sha}"\n'
+                f'DESIGN_VIEW="{view_rel}"\nDESIGN_NODES="memory/design/nodes.py"\nSTAGED_RENDER="1"\n')
+        write_text(os.path.join(d, ".memory-tree.conf"), on_d)
+        run(sys.executable, gbi, "--write", cwd=d)
+        run("git", "add", "-A", cwd=d)
+        run("git", "commit", "-q", "-m", "rendered", "--no-verify", cwd=d)
+        view_path, readme_d = os.path.join(d, view_rel), os.path.join(d, readme)
+        # AC1 — a view that cannot be rendered is declined before the first write.
+        write_staged_change(on_d.replace(sha, "0" * 40), d)
+        run("git", "add", ".memory-tree.conf", cwd=d)
+        before = read_porcelain(d)
+        rc, out = run_write_staged(d)
+        ok = (rc == 1 and "build-index: render NOT staged — as-built view — DESIGN_BASELINE" in out
+              and read_porcelain(d) == before)
+        arm("TOOL-aTrimmedWait-8 AC1 — the view refusal declines and writes nothing", "ARM-PASS",
+            lambda: build_arm_result(ok, rc, out))
+        # AC3 — `plan()` raises over a staged `parents: nope`, after the moved view was written.
+        write_staged_change(on_d, d)
+        write_text(view_path, read_text(view_path).replace("first. | baseline", "first, quietly. | baseline"))
+        write_text(readme_d, read_text(readme_d).replace("streams: arch", "streams: arch\nparents: nope"))
+        run("git", "add", "--", view_rel, readme, cwd=d)
+        before, view_before = read_porcelain(d), pathlib.Path(view_path).read_bytes()
+        rc, out = run_write_staged(d)
+        ok = (rc == 1 and "parents: names 'nope'" in out and read_porcelain(d) == before
+              and pathlib.Path(view_path).read_bytes() == view_before)
+        arm("TOOL-aTrimmedWait-8 AC3 — a plan() refusal puts the hand-edited view back", "ARM-PASS",
+            lambda: build_arm_result(ok, rc, out))
+        write_staged_change(on_d, d)
+        write_text(readme_d, read_text(readme_d).replace("streams: arch", "streams: arch\nparents: nope"))
+        run("git", "add", "--", readme, cwd=d)
+        run("git", "rm", "-q", "--", view_rel, cwd=d)
+        before = read_porcelain(d)
+        rc, out = run_write_staged(d)
+        ok = (rc == 1 and "parents: names 'nope'" in out and read_porcelain(d) == before
+              and not os.path.exists(view_path))
+        arm("TOOL-aTrimmedWait-8 AC3 — a plan() refusal removes the view the run created", "ARM-PASS",
+            lambda: build_arm_result(ok, rc, out))
+        # AC4 — the guarded decline over a moved view: an authored row in the ARCH family's view.
+        run("git", "reset", "-q", "--hard", cwd=d)
+        on_d4 = on_d + 'BACKLOG_MODE="builds"\nASK_CUTOFF="2099-01-01"\n'
+        write_text(os.path.join(d, ".memory-tree.conf"), on_d4)
+        run(sys.executable, gbi, "--write", cwd=d)
+        run("git", "add", "-A", cwd=d)
+        run("git", "commit", "-q", "-m", "views", "--no-verify", cwd=d)
+        arch = "memory/backlog/ARCH.md"
+        write_staged_change(on_d4, d)
+        write_text(os.path.join(d, arch), read_text(os.path.join(d, arch)) + "- ARCH-tOne-9 an authored row\n")
+        write_text(view_path, read_text(view_path).replace("first. | baseline", "first, quietly. | baseline"))
+        run("git", "add", "--", arch, view_rel, cwd=d)
+        before, view_before = read_porcelain(d), pathlib.Path(view_path).read_bytes()
+        rc, out = run_write_staged(d)
+        ok = (rc == 1 and f"render NOT staged — the data-loss guard holds {arch}" in out
+              and read_porcelain(d) == before and pathlib.Path(view_path).read_bytes() == view_before)
+        arm("TOOL-aTrimmedWait-8 AC4 — the guarded decline puts the moved view back", "ARM-PASS",
+            lambda: build_arm_result(ok, rc, out))
+        run("git", "reset", "-q", "--hard", cwd=d)
         run("git", "reset", "-q", "--hard", cwd=t)
 
 
@@ -5191,6 +5308,29 @@ def check_expand_contract() -> str:
     return "no refusal"
 
 
+def _build_design_fixture(tmp: str) -> tuple:
+    """A `_fixture` tree with an armed design committed as its baseline (TOOL-aTrimmedWait-8 S1): a record
+    giving dAlpha two clauses in its `[chain]`, the view's merge=ours line, and the `Baseline:` line naming
+    the `design` commit, left uncommitted. Returns `(texts, record_rel, view_rel, sha)`; the conf is the
+    caller's."""
+    texts = {"cl-dAlpha-0001": "The reader takes `alpha-one` first.", "cl-dAlpha-0002": "The run writes `alpha-two`."}
+    record_rel = "memory/design/record.md"
+    view_rel = "memory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-as-built.md"
+    record = ("# a design record\n\n**Serves:** research ARCH-tOne-1\n\n## [chain]\n\n"
+              "| Build | Node | Owner | Clauses | Note |\n|---|---|---|---|---|\n| dAlpha | a | b | "
+              + "; ".join(f"{text} `{cid}`" for cid, text in texts.items()) + " | c |\n\n## [clause-ids]\n\n")
+    _fixture(tmp)
+    write_text(os.path.join(tmp, record_rel), record)
+    # TOOL-dTrueNorth-26 S16 — the view's merge=ours line, so an arm asserting check 30 clean reads
+    # a guarded view, as the tree's own `.gitattributes` guards DESIGN_VIEW.
+    write_text(os.path.join(tmp, ".gitattributes"), f"{view_rel} merge=ours\n")
+    run("git", "add", "-A", cwd=tmp)
+    run("git", "commit", "-q", "-m", "design", "--no-verify", cwd=tmp)
+    sha = run("git", "rev-parse", "HEAD", cwd=tmp).strip()
+    write_text(os.path.join(tmp, record_rel), record + f"Baseline: `{sha}`\n")
+    return texts, record_rel, view_rel, sha
+
+
 def test_asbuilt_view(arm) -> None:
     """TOOL-dTrueNorth-6's arms: every `asbuilt_view.py` fixture plant, and the host over a tree of its own.
 
@@ -5220,23 +5360,9 @@ def test_asbuilt_view(arm) -> None:
         arm(what, "plant held", lambda ok=ok, detail=detail: "plant held" if ok else detail)
     arm("TOOL-dTrueNorth-16 AC31 — check_view matches rows with design_lib.VIEW_ROW, never a copy", "True",
         lambda: str(asbuilt_view.VIEW_ROW is design_lib.VIEW_ROW))
-    texts = {"cl-dAlpha-0001": "The reader takes `alpha-one` first.", "cl-dAlpha-0002": "The run writes `alpha-two`."}
-    record_rel = "memory/design/record.md"
-    view_rel = "memory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-as-built.md"
     dev_rel = "memory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-deviation-1.md"
-    record = ("# a design record\n\n**Serves:** research ARCH-tOne-1\n\n## [chain]\n\n"
-              "| Build | Node | Owner | Clauses | Note |\n|---|---|---|---|---|\n| dAlpha | a | b | "
-              + "; ".join(f"{text} `{cid}`" for cid, text in texts.items()) + " | c |\n\n## [clause-ids]\n\n")
     with tempfile.TemporaryDirectory() as tmp:
-        _fixture(tmp)
-        write_text(os.path.join(tmp, record_rel), record)
-        # TOOL-dTrueNorth-26 S16 — the view's merge=ours line, so an arm asserting check 30 clean reads
-        # a guarded view, as the tree's own `.gitattributes` guards DESIGN_VIEW.
-        write_text(os.path.join(tmp, ".gitattributes"), f"{view_rel} merge=ours\n")
-        run("git", "add", "-A", cwd=tmp)
-        run("git", "commit", "-q", "-m", "design", "--no-verify", cwd=tmp)
-        sha = run("git", "rev-parse", "HEAD", cwd=tmp).strip()
-        write_text(os.path.join(tmp, record_rel), record + f"Baseline: `{sha}`\n")
+        texts, record_rel, view_rel, sha = _build_design_fixture(tmp)
 
         def write_conf(baseline=sha, view=view_rel, record=record_rel, nodes="memory/design/nodes.py"):
             write_text(os.path.join(tmp, ".memory-tree.conf"), _render_fixture_conf()

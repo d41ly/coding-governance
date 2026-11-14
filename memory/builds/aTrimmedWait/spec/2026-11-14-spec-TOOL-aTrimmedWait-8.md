@@ -1,11 +1,12 @@
 # TOOL-aTrimmedWait-8 — a declined staged render leaves the tree as it found it, and the paths the closing review found untested are armed
 
-**Status:** INPROGRESS · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 8 · ratified 2026-11-14
+**Status:** CLOSED · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 8 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-14-build-TOOL-aTrimmedWait-8-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aTrimmedWait-8-1-acceptance-ledger.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-8-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-8-1-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-8-promotion.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-8-promotion.md) | research | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-8-ruling.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-8-ruling.md) | research | TOOL-aTrimmedWait-9 |

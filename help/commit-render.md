@@ -44,7 +44,11 @@ refuses the commit as it does today, when:
 - a render input, a path under the memory root, the conf or the kit, carries an unstaged change,
   since the render would then not be what the commit carries;
 - the data-loss guard holds a backlog view;
+- the as-built view cannot be rendered, so the render has nothing to stage;
 - no artifact's bytes moved, so check 9's refusal is not drift a render cures.
+
+A refusal while the mode renders or stages puts back every file it wrote, and the hook refuses the
+commit as before.
 
 ## What it does not check
 

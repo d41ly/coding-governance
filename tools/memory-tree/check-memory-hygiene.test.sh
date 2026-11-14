@@ -1300,12 +1300,20 @@ done
 # ---- left tracked-only drops tOne-4, so its arms red.
 SC=$TMP/scoped12; _sc_s=memory/builds/tOne/spec; mkdir -p "$SC"
 ( cd "$SC" && git init -q --template= .
-  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nBASE_RESOLVE_CUTOFF="2026-08-26"\n' > .memory-tree.conf
-  mkdir -p "$_sc_s" memory/builds/tTwo/spec
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nBASE_RESOLVE_CUTOFF="2026-08-26"\nSPEC_EDGES_CUTOFF="2026-09-08"\n' > .memory-tree.conf
+  mkdir -p "$_sc_s" memory/builds/tTwo/spec memory/builds/tThree/spec
   good | sed 's/tFixture-1/tOne-1/' > "$_sc_s/2026-08-01-spec-tOne-1.md"
   good | sed 's/tFixture-1/tOne-2/; /^## 7\. Gates$/d' > "$_sc_s/2026-08-01-spec-tOne-2.md"
   good | sed 's/tFixture-1/tOne-3/; s/2026-08-01/2026-08-26/g' > "$_sc_s/2026-08-26-spec-tOne-3.md"
   good | sed 's/tFixture-1/tTwo-1/; /^## 7\. Gates$/d' > memory/builds/tTwo/spec/2026-08-01-spec-tTwo-1.md
+  # TOOL-aTrimmedWait-8 S5: tThree, dated at the edge cutoff. tThree-1 declares an edge tThree-2 does
+  # not declare back, and tThree-3 carries a bullet with no payload.
+  good10 | sed 's/tFixture-1/tThree-1/; s/2026-08-10/2026-09-08/g; s/^- Nothing else\.$/&\n\n### Edges\n\n- **hands-off** `ARCH-tThree-2` — the second half./' \
+    > memory/builds/tThree/spec/2026-09-08-spec-tThree-1.md
+  good10 | sed 's/tFixture-1/tThree-2/; s/2026-08-10/2026-09-08/g; s/^- Nothing else\.$/&\n\n### Edges\n\nnone/' \
+    > memory/builds/tThree/spec/2026-09-08-spec-tThree-2.md
+  good10 | sed 's/tFixture-1/tThree-3/; s/2026-08-10/2026-09-08/g; s/^- Nothing else\.$/&\n\n### Edges\n\n- **hands-off** — something, somewhere./' \
+    > memory/builds/tThree/spec/2026-09-08-spec-tThree-3.md
   git add -A && git commit -q -m scoped12 --no-verify
   good | sed 's/tFixture-1/tOne-4/; /^## 7\. Gates$/d' > "$_sc_s/2026-08-01-spec-tOne-4.md"
   good | sed 's/tFixture-1/tOne-5/; s/2026-08-01/2026-07-01/g' > "$_sc_s/2026-07-01-spec-tOne-5.md"
@@ -1336,6 +1344,31 @@ n=$((n+1)); [ "$_sc_rc" = 1 ] && grep -qF 'tOne-2.md (' <<<"$_sc_o" && grep -qF 
 n=$((n+1)); grep -qF 'tTwo-1.md (' <<<"$_sc_o" && { echo "FAIL scoped: --build tOne graded the other build's tTwo-1"; st=1; }
 n=$((n+1)); grep -qxF 'HYGIENE --only 12 ran checks 12 25 over 4 spec(s) of tOne' <<<"$_sc_o" \
   || { echo "FAIL scoped: --build tOne printed no liveness line naming its four graded specs"; st=1; }
+# ---- TOOL-aTrimmedWait-8 AC8: the scoped EDGE reading. --spec tThree-1 grades it as `P` and reads its
+# ---- build's other specs as `J` siblings: the reciprocity finding is tThree-1's own and prints as the
+# ---- unscoped run prints it; tThree-3's payload finding is a sibling's, which the unscoped run prints
+# ---- and the scoped one keeps out. Staged breaks: `|| SCOPED` dropped from the sibling tagging, and
+# ---- `| SCOPED` dropped from the edge awk's `stg`.
+_sc_recip='declares no matching **consumes-from**'
+_sc_line=$(grep -F "$_sc_recip" <<<"$_sc_full" | grep -F 'tThree-1.md (')
+n=$((n+1)); [ -n "$_sc_line" ] && grep -qF '2026-09-08-spec-tThree-3.md (§3 `### Edges` bullet with no payload' <<<"$_sc_full" \
+  || { echo "FAIL scoped: the unscoped --only 12 printed no tThree-1 reciprocity line or no tThree-3 payload line"; st=1; }
+_sc_o=$(cd "$SC" && bash "$SCRIPT" --only 12 --spec memory/builds/tThree/spec/2026-09-08-spec-tThree-1.md 2>/dev/null); _sc_rc=$?
+n=$((n+1)); [ "$_sc_rc" = 1 ] && [ "$(grep -F "$_sc_recip" <<<"$_sc_o" | grep -F 'tThree-1.md (')" = "$_sc_line" ] \
+  || { echo "FAIL scoped: --spec tThree-1 exited $_sc_rc or its reciprocity line differs from the unscoped run's"; st=1; }
+n=$((n+1)); grep -qF '2026-09-08-spec-tThree-3.md' <<<"$_sc_o" && { echo "FAIL scoped: --spec tThree-1 printed its J sibling tThree-3"; st=1; }
+# ---- AC9: every cutoff key a SCOPED branch of the producer tests is armed by this tree's conf, at a
+# ---- date on or before a committed spec's. The key set is DERIVED from $SCRIPT each run, and an empty
+# ---- set reds, so the arm cannot pass over a producer whose SCOPED lines it no longer reads.
+_sc_last=$(cd "$SC" && git ls-files -- memory/builds | grep -oE '/spec/[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-' | cut -c7-16 | sort | tail -n1)
+_sc_nk=0
+while read -r _sc_k; do
+  _sc_nk=$((_sc_nk+1))
+  _sc_v=$(sed -n "s/^$_sc_k=\"\([0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\)\"\$/\1/p" "$SC/.memory-tree.conf")
+  n=$((n+1)); [ -n "$_sc_v" ] && ! [ "$_sc_last" \< "$_sc_v" ] \
+    || { echo "FAIL scoped: the scope tree's conf leaves $_sc_k unarmed: '$_sc_v' is not a date on or before its last committed spec's, '$_sc_last'"; st=1; }
+done < <(grep -E '"\$SCOPED" = 1|\| SCOPED' "$SCRIPT" | grep -oE '[A-Z0-9_]+_CUTOFF' | sort -u)
+n=$((n+1)); [ "$_sc_nk" -gt 0 ] || { echo "FAIL scoped: no *_CUTOFF key derived from the producer's SCOPED lines"; st=1; }
 # S1's refusals: each exits 2 on one `cannot run` line and grades nothing.
 for _sc_a in "--spec $_sc_s/2026-08-01-spec-tOne-2.md" "--only 9 --spec $_sc_s/2026-08-01-spec-tOne-2.md" \
   "--only 12 --spec $_sc_s/2026-08-01-spec-tOne-2.md --staged" "--only 12 --spec $_sc_s/notes.md" \
