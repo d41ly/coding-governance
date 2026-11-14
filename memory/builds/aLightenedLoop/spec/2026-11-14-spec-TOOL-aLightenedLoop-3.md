@@ -1,6 +1,6 @@
 # TOOL-aLightenedLoop-3 — `--dispatch` runs before the builder spawns, and its spec-token cache keys on what the checker read
 
-**Status:** SPECCED · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 3 · ratified 2026-11-14
+**Status:** INPROGRESS · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 3 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
