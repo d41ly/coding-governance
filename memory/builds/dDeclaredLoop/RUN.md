@@ -142,3 +142,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-14T15:23:36Z brief · item TOOL-dDeclaredLoop-42 · reason e85affb13d60 memory/builds/dDeclaredLoop/prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-42-build-brief.md
 
 2026-11-14T16:15:35Z dispatch · item 9cad19ae TOOL-dDeclaredLoop-42 · reason tools/loop/loop_witness.py tools/lib/run_tree_kill.py tools/lib/resolve-python.test.sh tools/run-gates/regen.py tools/loop/README.md help/loop.md memory/map/generated/symbols.json memory/builds/dDeclaredLoop/build/2026-11-14-build-TOOL-dDeclaredLoop-42-1-acceptance-ledger.md memory/builds/dDeclaredLoop/build/2026-11-14-build-TOOL-dDeclaredLoop-42-deviation-423.md memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-42.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/backlog/TOOL.md
+
+2026-11-14T17:18:15Z brief · item TOOL-dDeclaredLoop-13 · reason de9942a8bc94 memory/builds/dDeclaredLoop/prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-13-build-brief.md
