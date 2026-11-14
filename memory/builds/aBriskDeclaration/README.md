@@ -58,10 +58,10 @@ ids TOOL-aBriskDeclaration-1
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aBriskDeclaration-1 — `--dispatch` reads the order verb with no process, and starts the spec-token checker before the open-pass reader](spec/2026-11-14-spec-TOOL-aBriskDeclaration-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-11-14 |
+| [TOOL-aBriskDeclaration-1 — `--dispatch` reads the order verb with no process, and starts the spec-token checker before the open-pass reader](spec/2026-11-14-spec-TOOL-aBriskDeclaration-1.md) | 1 | 2 | INPROGRESS | rev-2 | 2026-11-14 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 3 record folder(s).
+Records: 7 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

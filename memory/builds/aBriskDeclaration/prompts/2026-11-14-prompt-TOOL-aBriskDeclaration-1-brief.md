@@ -61,7 +61,7 @@ The driver suite's `--dispatch` arms, run directly. `check-arms` over the driver
 
 ## Drawn from the session
 
-> rc=0 wall=625.6 · git processes 192 · other traced processes 728 · order gate about 230 s · open-pass reader about 172 s · checker 152.2 s
+> rc=0 wall=625.6 · git processes 192 · other traced processes 728 · order gate about 230 s · open-pass reader about 172 s · checker 152.2 s <!-- PINNED 2026-11-14 -->
 — agent, the traced `--dispatch` on the frozen clone `dm` (the live tip `bc42f13ca` merged with `846d51d39`), node a, 2026-11-14 (PINNED)
 
 > rc=0 wall=203.2 · git processes 193 · other traced processes 233 · stdout, stderr and the parked row identical by `diff`

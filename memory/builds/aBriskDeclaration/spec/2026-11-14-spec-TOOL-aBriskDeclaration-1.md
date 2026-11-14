@@ -1,6 +1,6 @@
 # TOOL-aBriskDeclaration-1 — `--dispatch` reads the order verb with no process, and starts the spec-token checker before the open-pass reader
 
-**Status:** INPROGRESS · rev-1 · 2026-11-14 · node a · Tier-2 · base 846d51d39 · streams tooling · order 1
+**Status:** INPROGRESS · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d39 · streams tooling · order 1 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
@@ -10,7 +10,9 @@
 | [2026-11-14-build-TOOL-aBriskDeclaration-1-analysis.md](../build/2026-11-14-build-TOOL-aBriskDeclaration-1-analysis.md) | research | — |
 | [2026-11-14-prompt-TOOL-aBriskDeclaration-1-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aBriskDeclaration-1-1-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aBriskDeclaration-1-2-builder.md](../prompts/2026-11-14-prompt-TOOL-aBriskDeclaration-1-2-builder.md) | journal | — |
+| [2026-11-14-prompt-TOOL-aBriskDeclaration-1-3-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aBriskDeclaration-1-3-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aBriskDeclaration-1-brief.md](../prompts/2026-11-14-prompt-TOOL-aBriskDeclaration-1-brief.md) | research | — |
+| [2026-11-14-prompt-TOOL-aBriskDeclaration-1-forks-brief.md](../prompts/2026-11-14-prompt-TOOL-aBriskDeclaration-1-forks-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -42,14 +44,14 @@ reads as it did.
   it is. Observed by AC3.
 - **S6** — `remove_spec_token_check` waits for a started checker and discards its answer, never
   killing it, and the generator-pairing and condition-1 refusals call it between their `fail 49`
-  and their `return 1`. Observed by AC4, AC5.
+  and their `return 1`. Observed by AC4, AC5, AC12.
 - **S7** — The comments that state the old order are made true (§4, "Comments made true").
   Observed by AC9.
 - **S8** — The verbs guide's `--dispatch` paragraph says the checker is started before the
   open-pass reader and read after condition 1, in `tools/unattended/VERBS.template.md` and its copy
   `memory/guides/UNATTENDED-VERBS.md`, byte-equal past line 1. Observed by AC8.
 - **S9** — The suite arms of §4, "The arms", in `tools/unattended/unattended.test.sh`. Observed by
-  AC1, AC3, AC4, AC5, AC6.
+  AC1, AC3, AC4, AC5, AC6, AC12.
 - **S10** — No `fail 49` site moves, so `tools/unattended/unarmed-branches.txt` is not re-keyed.
   Observed by AC7.
 - **S11** — `memory/map/generated/symbols.json` regenerated, carrying the two new functions.
@@ -284,9 +286,20 @@ is declared. Each traced run is a process, `bash -x "$SCRIPT"` through `run_main
   double that prints `RESOLVER-DIAG` on stderr and returns 1, `init_spec_token_check tRun` prints
   nothing on either stream and leaves `ST_STATE` at `nopython`. A following
   `run_spec_token_check tRun` prints `RESOLVER-DIAG` and then the resolver refusal.
+- **A6, a generator-pairing refusal waits** (the owner's F2 pick). Placed after A3 and before A4:
+  the group appends `GENERATED_INDEXES="${PFX}bd-idx.md:${PFX}bd-gen"` to `.unattended.conf`, and
+  the trace of the ARCH-tRun-5 dispatch with `--writes ${PFX}bd-idx.md --writes ${PFX}bd-gen`
+  carries the stub's `init_bounded` line, a line matching
+  `^\++ fail 49 .--dispatch declares a generated index together with its generator` after it, a
+  `read_bounded` line after that, and no line matching `^\++ kill ` after the refusal. The output
+  carries the pairing refusal's text and not the spec-token refusal. One declaration names both
+  halves, so the refusal needs no sibling row, and the order gate and condition 1 pass as they do
+  for A2: ARCH-tRun-4 is dispatched, and neither path is one it declared. Neither file exists, so
+  `resolve_generator` keys the declared spelling alone. The group then deletes the
+  `GENERATED_INDEXES` line, which no arm in region 3 sets before it. The refused dispatch writes no row.
 
-Ceiling, a declared bound rather than a measurement: the group adds two driver processes and
-twelve in-process calls to shard 3, at most 90 s on node a. The close's shard-3 run measures it.
+Ceiling, a declared bound rather than a measurement: the group adds three driver processes and
+twelve in-process calls to shard 3, at most 120 s on node a (PINNED 2026-11-14). The close's shard-3 run measures it.
 
 ### Inventory
 
@@ -309,7 +322,7 @@ None of these names occurs in the driver, its library or the suite at base.
 
 ### Rollout
 
-Live, with no switch; F1 asks whether that holds. The build README requires the owner's explicit
+Live, with no switch, the owner's F1 pick. The build README requires the owner's explicit
 ask before landing. The live dDeclaredLoop run merges these lines with main when it next does; the
 analysis record's `dm` clone took the same hunks onto that merge with no conflict in the driver.
 
@@ -319,7 +332,7 @@ analysis record's `dm` clone took the same hunks onto that merge with no conflic
   prompt on a terminal, out ahead of the reader's notes and onto refusals that never printed it. It
   also kept `ST_STATE` across calls and carried a redundant directory global.
 - **A start that records nothing on a resolver failure, leaving the read half to decide as before.**
-  The skip path would then derive the key twice, about 8 s of `git status`, on every re-dispatch.
+  The skip path would then derive the key twice, about 8 s of `git status` (PINNED 2026-11-14), on every re-dispatch.
 - **A shared discard helper extracted from `read_preflight_probes`.** What the two share is one
   `read_bounded` call on a handle, which both already reuse. The rest, putting `RB_` values back,
   has no reader after `--dispatch` returns, and extracting it moves `--preflight`'s code and owes
@@ -362,7 +375,7 @@ analysis record's `dm` clone took the same hunks onto that merge with no conflic
 - observability — no line changes. The trace shows the start before the reader.
 - risks — the window's no-write invariant (§4); concurrent load from the two children on a loaded
   node; the merge with the live run's branch.
-- testing — AC1 to AC11 and the arms on the `New arm:` lines in §7.
+- testing — AC1 to AC12 and the arms on the `New arm:` lines in §7.
 - migration — N/A: no data or record shape moves; the sidecar key file is read and written as now.
 - user docs — the verbs guide (S8); no page under `help/` describes `--dispatch`.
 
@@ -456,6 +469,16 @@ analysis record's `dm` clone took the same hunks onto that merge with no conflic
   with an unreachable push URL; rebuilt as that record's section 1 says if it is gone.
   permission: the main loop's, at the close; it fetches the real remote's claim and pushes nothing.
   figure: the before figures are PINNED in the analysis record; the after figures are DERIVED here.
+- **AC12** — When the same traced dispatch runs with the conf declaring
+  `GENERATED_INDEXES="${PFX}bd-idx.md:${PFX}bd-gen"` and `--writes ${PFX}bd-idx.md --writes ${PFX}bd-gen`
+  in place of its own path, stdout carries
+  `--dispatch declares a generated index together with its generator` and not the spec-token
+  refusal, and the trace holds the stub's `init_bounded` line, the generator-pairing `fail 49` line,
+  a `read_bounded` line after that, and no `kill` line after it.
+  Red when: the `remove_spec_token_check` call is missing at the generator-pairing refusal, or the
+  checker is killed, or the start sits below that refusal.
+  fixture: as AC3, plus the `GENERATED_INDEXES` pair, where `PFX` is the suite's install prefix.
+  permission: as AC3.
 
 ## 7. Gates
 
@@ -465,6 +488,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 · the driver at 
 New arm: tools/unattended/unattended.test.sh · covers AC3 · base, where run_bounded starts the checker after the open-pass reader returns · none
 New arm: tools/unattended/unattended.test.sh · covers AC4 AC5 · base, which starts no checker on a condition-1 refusal and has no start call to bound the window · none
 New arm: tools/unattended/unattended.test.sh · covers AC6 · base, which has no start half, and the prototype's start, which prints the resolver's diagnosis · none
+New arm: tools/unattended/unattended.test.sh · covers AC12 · the driver at base 846d51d39, which starts no checker before the generator-pairing refusal, so the trace holds no stub init_bounded line and no read_bounded after the refusal; and 4fed38fe1 with that refusal's remove_spec_token_check call deleted, which leaves no read_bounded after it · none
 
 The close's driver-suite run re-observes, unchanged, every existing arm over `--dispatch`: in region
 3 the dBriefedPass-2 and -3 refusal arms with the malformed `order 2x` case, the aDeferredBar F3
@@ -481,15 +505,17 @@ The suite's floor is a minimum, and these arms only add to it.
   (a) Live, no switch: every line is unchanged, AC11 diffs a whole dispatch, and a switch would
   keep two paths where the dark one is exercised by no run. (b) A conf key, default off: the run
   stays on today's path until an owner turns it on, at the cost of a key-table row and a second
-  path the arms must cover. Recommendation: (a).
+  path the arms must cover. Recommendation: (a). RESOLVED (owner, 2026-11-14): (a) Live, no switch.
 - **F2 — Does the generator-pairing refusal owe a behavioural arm of its own?** (a) No: AC5's class
   predicate grades every `return 1` in the window, that refusal's included, and the brief names
   condition 1's arm alone. (b) Yes: a traced arm with a `GENERATED_INDEXES` pair in the fixture,
-  one more driver process in shard 3. Recommendation: (a).
+  one more driver process in shard 3. Recommendation: (a). RESOLVED (owner, 2026-11-14): (b) Add its
+  own arm, which is A6 and AC12.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-14 · initial draft.
+- rev-2 · 2026-11-14 · F1 and F2 RESOLVED by the owner (2026-11-14-prompt-TOOL-aBriskDeclaration-1-forks-brief): F1 (a) live, which the code at 4fed38fe1 and fc4c62bfa already follows; F2 (b), so arm A6, AC12 and its `New arm:` line are added. No other code moves.
 
 ## 10. Reuse audit
 

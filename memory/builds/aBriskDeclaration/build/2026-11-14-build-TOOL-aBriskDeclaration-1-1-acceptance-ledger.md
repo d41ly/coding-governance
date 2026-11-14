@@ -34,10 +34,10 @@ written there without backticks.
 - AC3 — `bash -x tools/unattended/unattended.sh --dispatch tRun --pass ARCH-tRun-5` — not run over the
   suite's tRun fixture in the pass. The new arm A2 grades it, and its run is owed to the main loop at
   the close. As a direct probe instead, the driver was sourced into a scratch git repository holding a
-  stub that sleeps 3 s, prints an own-build hit and exits 1. `init_spec_token_check tRun` left
-  `ST_STATE=run` and a handle and returned in 2 s. `run_spec_token_check tRun` printed the cache-off
+  stub that sleeps 3 s, prints an own-build hit and exits 1. `init_spec_token_check tRun` left <!-- PINNED 2026-11-14 -->
+  `ST_STATE=run` and a handle and returned in 2 s. `run_spec_token_check tRun` printed the cache-off <!-- PINNED 2026-11-14 -->
   line and then `the declared spec-token checker reds over the live tree (stub.py exited 1 in 3s)`.
-  It returned 1 at 5 s in all and left `ST_STATE` empty.
+  It returned 1 at 5 s in all and left `ST_STATE` empty. <!-- PINNED 2026-11-14 -->
 - AC4 — `two passes claiming one file are not disjoint` — not run over the suite's fixture in the
   pass. The new arm A3 grades it, owed to the main loop. As a direct probe in the same scratch
   repository, a started checker was still running when `remove_spec_token_check` was called. The call
@@ -63,5 +63,13 @@ written there without backticks.
   leads with init` and `OK — remove_spec_token_check leads with remove`. After `gen_map.py --write`,
   the index gained one function entry for each of the two names, in `tools/unattended/unattended.sh`,
   and nothing else.
-- AC11 — `GIT_TRACE` — not run in the pass. The frozen-clone before-and-after measurement is owed to
-  the main loop at the close.
+- AC11 — `GIT_TRACE` — not run in the pass; the main loop ran it on node a, 2026-11-14, after the pass.
+  Clone `dm` is the live tip `bc42f13ca` merged with `846d51d39`, reset and its spec-token key record
+  removed; clone `db` is the same merge with the driver of `fc4c62bfa` applied, which `git apply` took
+  cleanly. One `--dispatch dDeclaredLoop --pass TOOL-dDeclaredLoop-9 --writes tools/loop/loop_lib.py`
+  under `bash -x` with `GIT_TRACE` on each, after first, then before, back to back. Before: rc 0, 200.1
+  s, 192 git processes, 727 other traced processes (PINNED 2026-11-14). After: rc 0, 125.4 s, 193 git
+  processes, 233 other traced processes (PINNED 2026-11-14). `diff` printed nothing for the stdout, for
+  the stderr lines that are not trace lines, and for the staged run-state row with its UTC stamp
+  masked. In the after trace, `init_spec_token_check` precedes `read_open_passes`, and the wait in
+  `read_bounded` fell from 108.9 s to 58.9 s (PINNED 2026-11-14).

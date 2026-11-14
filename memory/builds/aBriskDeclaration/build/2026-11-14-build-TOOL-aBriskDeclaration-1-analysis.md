@@ -8,7 +8,7 @@ two runs of one command. The process counts do not move, so they are the figures
 
 ## 1. The apparatus
 
-- `dd` is a clone of the live run's tip `bc42f13ca` (phase BUILDING, 99 units, 23 dispatch rows).
+- `dd` is a clone of the live run's tip `bc42f13ca` (phase BUILDING, 99 units, 23 dispatch rows). <!-- PINNED 2026-11-14 -->
 - `dm` is `dd` with origin/main `846d51d39` merged in, which is the tree the run holds once it
   merges main. Only `memory/DECISIONS.md` and the kickoff manifest conflicted, and the clone kept
   the run's side of both.
@@ -27,10 +27,10 @@ two runs of one command. The process counts do not move, so they are the figures
 |---|---|---|
 | the whole verb | 387.7 s | 625.6 s |
 | the spec-token checker, `run_bounded` | 186.6 s | 152.2 s |
-| the order gate, its loop over the build's units | 90.8 s | about 230 s |
-| the open-pass reader, `read_open_passes` | 80.5 s | about 172 s |
+| the order gate, its loop over the build's units | 90.8 s | about 230 s | <!-- PINNED 2026-11-14 -->
+| the open-pass reader, `read_open_passes` | 80.5 s | about 172 s | <!-- PINNED 2026-11-14 -->
 | the cache key, `derive_spec_token_key` | 9.8 s | 7.9 s |
-| the chain gate, `check_chain_dispatch` | 6.5 s | under 10 s |
+| the chain gate, `check_chain_dispatch` | 6.5 s | under 10 s | <!-- PINNED 2026-11-14 -->
 | git processes | 192 | 192 |
 | other processes the trace names | 842 | 728 |
 
@@ -39,15 +39,15 @@ Both runs exited 0, printed the same lines and parked one row.
 **The order gate.** `order_verb_of` reads one spec's status header through a command substitution
 around `grep -m1`, then `printf | grep -oE | head -1 | grep -oE | head -1`, so each call costs about
 seven processes and a fork. The gate calls it once for the dispatched unit and once for every other
-unit of the build, so 99 calls and close to 700 processes in a 99-unit build. On `dm` its greps and
-heads alone were 130.7 s of the 230 s. The cost grows with each unit the build adds.
+unit of the build, so 99 calls and close to 700 processes in a 99-unit build. On `dm` its greps and <!-- PINNED 2026-11-14 -->
+heads alone were 130.7 s of the 230 s. The cost grows with each unit the build adds. <!-- PINNED 2026-11-14 -->
 
 **The open-pass reader.** It asks `check_pass_open` about every dispatch key in the run-state file,
 18 at this tip, and every one read closed. Each call runs `pass_commit`, whose walk on the run's
 branch is `read_attribution_tokens`: one `resolve_python` probe and one Python reader per key. That
 reader is the run's own code, from TOOL-dDeclaredLoop-23, and main's lib walks with one `git log`.
-On `dm` the Python half was about 45 s of the 172 s, `mktemp` and `rm` about 23 s, and git about
-55 s.
+On `dm` the Python half was about 45 s of the 172 s, `mktemp` and `rm` about 23 s, and git about <!-- PINNED 2026-11-14 -->
+55 s. <!-- PINNED 2026-11-14 -->
 
 **The checker.** It took 75 s alone on `dd` (PINNED 2026-11-14) and 152 to 187 s inside the verb,
 under the run's load. The key that would skip it always misses on a unit's first dispatch, because
@@ -81,9 +81,9 @@ reader.
 
 The order verb reader was checked against the old one, function against function:
 
-- every tracked spec, 2,991 files, under GNU grep 3.12 in WSL, with `LC_ALL` set to `C.UTF-8` and
+- every tracked spec, 2,991 files, under GNU grep 3.12 in WSL, with `LC_ALL` set to `C.UTF-8` and <!-- PINNED 2026-11-14 -->
   to `C`: 0 differences, 2,637 ordered;
-- dDeclaredLoop's 99 specs under MSYS on node `a`: 0 differences;
+- dDeclaredLoop's 99 specs under MSYS on node `a`: 0 differences; <!-- PINNED 2026-11-14 -->
 - 22 planted headers under MSYS, unset, `C.UTF-8` and `C`, and under GNU grep in both locales: 0
   differences, 12 ordered and 4 malformed. The plants are a doubled space, no space, a trailing
   value, garbage after the value, a word value, CRLF with and without garbage, no header, no verb,
@@ -92,10 +92,10 @@ The order verb reader was checked against the old one, function against function
 
 ## 5. What remains, and whose it is
 
-- The open-pass reader, about 80 to 170 s on this run. About half is the run's own per-key Python
+- The open-pass reader, about 80 to 170 s on this run. About half is the run's own per-key Python <!-- PINNED 2026-11-14 -->
   reader and its per-key `resolve_python` probe; that fix belongs to that run's branch.
 - The checker, 75 s alone on an idle-ish node (PINNED 2026-11-14), which now overlaps the reader.
-- `derive_spec_token_key`, 7 to 10 s, two `git status` walks in `gate-fingerprint.sh`.
+- `derive_spec_token_key`, 7 to 10 s, two `git status` walks in `gate-fingerprint.sh`. <!-- PINNED 2026-11-14 -->
 
 ## 6. What the change does not check
 
