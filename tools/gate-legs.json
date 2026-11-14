@@ -1985,6 +1985,19 @@
     "enforces": ["principle.p11"]
   },
   {
+    "name": "loop transition tables",
+    "argv": [
+      "python",
+      "{prefix}/loop/loop_table.py",
+      "check",
+      "--selftest"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p20"]
+  },
+  {
     "name": "layer dependencies (the core never depends on an expansion)",
     "argv": [
       "python",

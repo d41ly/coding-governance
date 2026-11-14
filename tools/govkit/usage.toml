@@ -324,6 +324,26 @@ verb = "show"
 flags = []
 
 [[usage]]
+id = "script:{prefix}/loop/loop_table.py"
+shape = "verb"
+entry = "{prefix}/loop/loop_table.py"
+flags = ["--fixture", "--plant="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_table.py#move"
+shape = "verb"
+entry = "{prefix}/loop/loop_table.py"
+verb = "move"
+flags = ["--level=", "--from=", "--item=", "--outcome=", "--fact="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_table.py#check"
+shape = "verb"
+entry = "{prefix}/loop/loop_table.py"
+verb = "check"
+flags = ["--selftest"]
+
+[[usage]]
 id = "script:{prefix}/loop/adopt-loop.sh"
 shape = "verb"
 entry = "{prefix}/loop/adopt-loop.sh"

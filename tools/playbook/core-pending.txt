@@ -18,7 +18,6 @@ principle	principle.p15	dOrderedCharter
 principle	principle.p17	dIndexedDesign
 principle	principle.p18	dBoundRoles
 principle	principle.p19	dScopedBuild
-principle	principle.p20	dDeclaredLoop
 principle	principle.p21	dKeptSession
 principle	principle.p22	dDeclaredLoop
 principle	principle.p23	dDeclaredLoop

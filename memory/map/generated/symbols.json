@@ -538,6 +538,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "TransitionRefused",
+      "kind": "class",
+      "file": "tools/loop/loop_table.py"
+    },
+    {
       "id": "Unit",
       "kind": "class",
       "file": "tools/playbook/instruction_units.py"
@@ -7908,6 +7913,11 @@
       "file": "tools/memory-tree/routed_commits.py"
     },
     {
+      "id": "check_transition_tables",
+      "kind": "function",
+      "file": "tools/loop/loop_table.py"
+    },
+    {
       "id": "check_tree",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -10731,6 +10741,11 @@
       "id": "derive_module_export_rel",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "derive_move",
+      "kind": "function",
+      "file": "tools/loop/loop_table.py"
     },
     {
       "id": "derive_moved_invariants",
@@ -14411,6 +14426,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/loop/loop_table.py"
     },
     {
       "id": "main",
@@ -21063,6 +21083,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_stand_ins",
+      "kind": "function",
+      "file": "tools/loop/loop_table.py"
+    },
+    {
       "id": "read_stash",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -21391,6 +21416,11 @@
       "id": "read_trailer_keys",
       "kind": "function",
       "file": "tools/playbook/edge_grammar.py"
+    },
+    {
+      "id": "read_transition_rows",
+      "kind": "function",
+      "file": "tools/loop/loop_table.py"
     },
     {
       "id": "read_tree_bytes",
@@ -28493,6 +28523,11 @@
       "file": "tools/workflows/review_replay.py"
     },
     {
+      "id": "run_selftest_cases",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "run_settle",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -34721,6 +34756,11 @@
       "id": "write_t1_spec",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "write_table_plant",
+      "kind": "function",
+      "file": "tools/loop/loop_table.py"
     },
     {
       "id": "write_target_plants",

@@ -251,6 +251,91 @@ The check does not judge whether a pairing is the right item, which is a review'
 handle's checker word agrees with its item's witness class. `DOD_EXTRA` and `DIRECTIVES_EXTRA`, your
 own handles, are not mapped here.
 
+## Transition tables
+
+A build moves between states only along a declared row. The file holds one table per level, build,
+feature and unit, as `[[transition]]` rows, and the states of each level in `[states]`:
+
+```toml
+[states]
+build = ["planning", "designing", "building", "testing", "deploying", "paused", "parked"]
+feature = ["decomposed", "designed", "built", "tested", "deployed"]
+unit = ["designed", "built", "tested", "deployed"]
+
+[[transition]]
+level = "build"           # build, feature or unit
+from = ["planning"]       # the level's states, "none" for its entry, or "@open" for every open state
+item = "item.plan.exit"   # the item whose outcome fires the row, by tag
+outcome = "recorded"      # one word of that item's closed outcome set
+to = "designing"          # a state, "@prior" or "@reentry"
+witness = "the transition record"
+# disposition = "new"     # optional: the move's disposition fact must be this member
+# when = "before-push"    # optional: the row holds only while the landing is unpushed
+```
+
+A row names its item by tag, never by a position; `check` prints each table's row and state counts.
+No row enters a terminal state such as landed or refused yet: those rows belong to a later unit.
+
+- **Ask for a move:** `python tools/loop/loop_table.py move --level build --from planning --item item.plan.exit --outcome recorded` <!-- usage: script:tools/loop/loop_table.py#move a9f6141c -->
+  answers from the rows alone, with one of three answers:
+  - `move` with the state it enters, exit 0, and `stand-in <owner>` after it when the item's own
+    build has not landed yet, so a fixture witness stands in for it;
+  - `refused`, exit 1, when no row holds the move, for instance a build in planning asking to leave
+    on Design's exit: stage order alone never admits a move;
+  - `unanswered`, exit 2, when the level or state is unknown or a fact the row needs is missing.
+
+  Some rows read facts, each passed as `--fact k=v`. A row entering `@prior`, the resume after a
+  pause, takes `prior`, the state the pause left. The re-entry row, written with item `@any`, takes
+  `reenters`, the item being re-entered, and enters that item's step's state; it holds only before the
+  landing push, so it takes `pushed`, `yes` or `no`. A row with a `disposition` takes `disposition`.
+  None of them defaults.
+
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
+  ```bash
+  python tools/loop/loop_table.py move --level build --from planning --item item.plan.exit --outcome recorded
+  python tools/loop/loop_table.py move --level build --from paused --item item.life.request --outcome resume --fact prior=testing
+  python tools/loop/loop_table.py move --level build --from building --item @any --outcome admitted --fact reenters=item.plan.input --fact pushed=no
+  ```
+
+  ```text
+  move — build · planning → designing · item.plan.exit · stand-in dRankedPlan
+  move — build · paused → testing · item.life.request · stand-in dWellOiledMachine
+  move — build · building → planning · @any
+  ```
+
+- **Check the tables:** `check` prints one `loop: table` line per level with its row and state <!-- usage: script:tools/loop/loop_table.py#check 0011b11d -->
+  counts, one `loop: owed` line per owed row and one `loop: stand-in` line per stand-in, and exits
+  0. It exits 1, naming the row, on a state the level does not declare, two rows for one move, an
+  item that is no tag or resolves to nothing, an outcome outside its item's set, or a disposition
+  outside the set. It also joins every item's cross-step routes, an outcome sent to `transition` or
+  to an item of another step, with the build table both ways: a route with no row, a row on no
+  route, and a row entering another state than the routed item's step are each refused. It exits 2
+  when the file holds no transition row, so it never admits a move over nothing. `check --selftest`
+  runs `check`, every case below and each kind of answer, and the `loop transition tables` gate
+  runs it on every push and landing.
+
+- **The owed rows:** some cross-step routes enter states other units' rows write, such as the Deploy
+  exit, which enters landed. Each stands on an `[[owed-row]]` naming its item, outcome and the unit or
+  build that writes the row, and `check` prints it. The list only shrinks: once a row covers a route,
+  its owed row is refused as stale until it is deleted.
+
+- **The stand-ins:** every row item is a stand-in until its own build lands, each a `[[stand-in]]` row
+  naming the item and its owner. The owning build deletes its row in the landing that arms the item's
+  witness. A stand-in row for an item no row names, or naming another owner than the item declares,
+  is refused.
+
+- **See a refusal:** `--fixture --plant <case>` runs `check` with one break made in memory and exits <!-- usage: script:tools/loop/loop_table.py 6513b6ba -->
+  1 on the refusal it must draw. The cases are `bad-state` (a row entering reviewing), `two-rows` (a
+  second row for building's exit), `bad-exit` (rows naming the bare plan.exit, an undeclared item and
+  an outcome outside the item's set), `dropped-row` (the building exit's row deleted while its route
+  stays), `unrouted-row` (a row on an outcome routed inside its own step), `owed-stale` (an owed row a
+  build row covers) and `stand-in` (a stale and a mis-owned stand-in row). The files on disk are never
+  changed.
+
+The tables do not judge whether a move's witness holds, which is the writer's precondition, or
+whether a state is reachable or a cycle terminates. The feature and unit rows are not joined to the
+routes, and a feature's state, its least-advanced unit's, is the mover's call.
+
 ## The owner's disposition record
 
 When the owner answers a held item, the answer is one record in the build's `build/` folder, written

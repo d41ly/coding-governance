@@ -49,6 +49,28 @@
 #   handle    the handle, as the registry spells it before its first ":"
 #   item      the [[item]] tag whose witness the handle's check reads
 #
+# [states], each level's states (TOOL-dDeclaredLoop-13): `build`, `feature` and `unit`, each the list of
+# that level's open states. A level's entry is "none", never a state. loop_table.py beside this file
+# reads it and the three tables below, and its `check` grades them:
+#
+# One [[transition]] row per move of a level's table:
+#   level        build, feature or unit, a key of [states]
+#   from         a list of the level's states, "none" for its entry, or "@open" for every open state
+#   item         the item whose outcome fires the row, by tag; "@any" on the one row re-entering a step,
+#                the re-entered item named by the move's `reenters` fact
+#   outcome      one word of that item's closed outcome set
+#   to           a state of the level, "@prior" for the state the move's `prior` fact names, or
+#                "@reentry" for the state of the re-entered item's step
+#   witness      what witnesses the move
+#   disposition  optional, the member of [dispositions] the move's `disposition` fact must be
+#   when         optional, "before-push": the row holds only while the move's `pushed` fact is no
+#
+# One [[stand-in]] row per row item whose owning build has not landed, shrink-only: `item`, its tag,
+# and `owner`, that build, which deletes the row in the landing that arms the item's witness.
+#
+# One [[owed-row]] row per cross-step route whose build row another unit or build writes, shrink-only:
+# `item` and `outcome`, the route, and `by`, the writer, which deletes the row in the same landing.
+#
 # One [[item]] row per item of a gov step's program (TOOL-dDeclaredLoop-12), after every table above:
 #   tag        the item's tag, `item.<step>.<name>`, a member of the `item` namespace
 #   step       the [[step]] tag its tag opens
@@ -350,6 +372,512 @@ item = "item.design.decompose"
 registry = "DIRECTIVES_CORE"
 handle = "passes-harnessed"
 item = "item.build.unit-pass"
+
+# ---- The transition tables (TOOL-dDeclaredLoop-13) -----------------------------------------------------
+
+[states]
+build = ["planning", "designing", "building", "testing", "deploying", "paused", "parked"]
+feature = ["decomposed", "designed", "built", "tested", "deployed"]
+unit = ["designed", "built", "tested", "deployed"]
+
+# The build table, B1 to B25: no row enters a terminal or touches parked; those are other units' rows.
+
+# B1
+[[transition]]
+level = "build"
+from = ["none"]
+item = "item.entry.claim"
+outcome = "claimed"
+disposition = "new"
+to = "planning"
+witness = "the claim record"
+
+# B2
+[[transition]]
+level = "build"
+from = ["none"]
+item = "item.plan.dedupe"
+outcome = "patch"
+to = "designing"
+witness = "the dupes record"
+
+# B3
+[[transition]]
+level = "build"
+from = ["none"]
+item = "item.entry.claim"
+outcome = "claimed"
+disposition = "repeat"
+to = "designing"
+witness = "the claim record"
+
+# B4
+[[transition]]
+level = "build"
+from = ["planning"]
+item = "item.plan.exit"
+outcome = "recorded"
+to = "designing"
+witness = "the transition record"
+
+# B5
+[[transition]]
+level = "build"
+from = ["designing"]
+item = "item.design.exit"
+outcome = "recorded"
+to = "building"
+witness = "the transition record"
+
+# B6
+[[transition]]
+level = "build"
+from = ["designing"]
+item = "item.design.decompose"
+outcome = "goal-fork"
+to = "planning"
+witness = "the decomposition record naming the goal fork"
+
+# B7
+[[transition]]
+level = "build"
+from = ["building"]
+item = "item.build.exit"
+outcome = "recorded"
+to = "testing"
+witness = "the transition record"
+
+# B8
+[[transition]]
+level = "build"
+from = ["building"]
+item = "item.build.unit-pass"
+outcome = "spec-wrong"
+to = "designing"
+witness = "the pass record naming the spec defect"
+
+# B9
+[[transition]]
+level = "build"
+from = ["building"]
+item = "item.build.core"
+outcome = "own-red"
+to = "designing"
+witness = "the core verdict naming the build's own red"
+
+# B10
+[[transition]]
+level = "build"
+from = ["building"]
+item = "item.review.dispose"
+outcome = "unit"
+to = "designing"
+witness = "the review disposition promoting a unit"
+
+# B11
+[[transition]]
+level = "build"
+from = ["planning", "designing", "building", "testing", "deploying"]
+item = "@any"
+outcome = "admitted"
+when = "before-push"
+to = "@reentry"
+witness = "the admission record naming the re-entered item"
+
+# B12
+[[transition]]
+level = "build"
+from = ["testing"]
+item = "item.test.exit"
+outcome = "recorded"
+to = "deploying"
+witness = "the transition record"
+
+# B13
+[[transition]]
+level = "build"
+from = ["testing"]
+item = "item.test.attribute"
+outcome = "code-miss"
+to = "building"
+witness = "the attribution record"
+
+# B14
+[[transition]]
+level = "build"
+from = ["testing"]
+item = "item.test.merge"
+outcome = "conflict"
+to = "building"
+witness = "the merge record naming the conflict"
+
+# B15
+[[transition]]
+level = "build"
+from = ["building"]
+item = "item.build.resolve"
+outcome = "resolved"
+to = "testing"
+witness = "the resolution commit"
+
+# B16
+[[transition]]
+level = "build"
+from = ["testing"]
+item = "item.test.attribute"
+outcome = "spec-wrong"
+to = "designing"
+witness = "the attribution record"
+
+# B17
+[[transition]]
+level = "build"
+from = ["deploying"]
+item = "item.deploy.current"
+outcome = "stale"
+to = "testing"
+witness = "the currency record naming the moved default branch"
+
+# B18
+[[transition]]
+level = "build"
+from = ["deploying"]
+item = "item.deploy.land"
+outcome = "refused"
+to = "testing"
+witness = "the lander's refusal"
+
+# B19
+[[transition]]
+level = "build"
+from = ["@open"]
+item = "item.life.request"
+outcome = "pause"
+to = "paused"
+witness = "the owner's request record"
+
+# B20
+[[transition]]
+level = "build"
+from = ["paused"]
+item = "item.life.request"
+outcome = "resume"
+to = "@prior"
+witness = "the owner's request record"
+
+# B21
+[[transition]]
+level = "build"
+from = ["building"]
+item = "item.build.unit-pass"
+outcome = "interface-change"
+to = "designing"
+witness = "the pass record naming the interface change"
+
+# B22
+[[transition]]
+level = "build"
+from = ["building"]
+item = "item.build.distill"
+outcome = "unclassed"
+to = "designing"
+witness = "the distill record naming the unclassed finding"
+
+# B23
+[[transition]]
+level = "build"
+from = ["building"]
+item = "item.build.resolve"
+outcome = "interface-clash"
+to = "designing"
+witness = "the resolution record naming the clash"
+
+# B24
+[[transition]]
+level = "build"
+from = ["testing"]
+item = "item.test.seen-red"
+outcome = "missing"
+to = "building"
+witness = "the seen-red record naming the missing arm"
+
+# B25
+[[transition]]
+level = "build"
+from = ["testing"]
+item = "item.test.route"
+outcome = "inherited"
+to = "designing"
+witness = "the route record naming the inherited red"
+
+# The unit table, U1 to U8: a unit is designed when its spec is committed and derived READY, built when
+# its pass commits and acceptance record hold, tested while the verdict for the build's prepared merge
+# holds, and deployed when the landing contains it.
+
+# U1
+[[transition]]
+level = "unit"
+from = ["none"]
+item = "item.design.ready"
+outcome = "ready"
+to = "designed"
+witness = "the spec committed and derived READY"
+
+# U2
+[[transition]]
+level = "unit"
+from = ["designed"]
+item = "item.build.acceptance"
+outcome = "pass"
+to = "built"
+witness = "the pass commit and its acceptance record"
+
+# U3
+[[transition]]
+level = "unit"
+from = ["built"]
+item = "item.test.exit"
+outcome = "recorded"
+to = "tested"
+witness = "the verdict for the build's prepared merge"
+
+# U4
+[[transition]]
+level = "unit"
+from = ["tested"]
+item = "item.deploy.land"
+outcome = "landed-gated"
+to = "deployed"
+witness = "the landing containing the unit"
+
+# U5
+[[transition]]
+level = "unit"
+from = ["built"]
+item = "item.test.attribute"
+outcome = "spec-wrong"
+to = "designed"
+witness = "the attribution record"
+
+# U6
+[[transition]]
+level = "unit"
+from = ["tested"]
+item = "item.deploy.current"
+outcome = "stale"
+to = "built"
+witness = "the currency record naming the moved default branch"
+
+# U7
+[[transition]]
+level = "unit"
+from = ["tested"]
+item = "item.deploy.land"
+outcome = "landed-ungated"
+to = "deployed"
+witness = "the landing containing the unit"
+
+# U8
+[[transition]]
+level = "unit"
+from = ["tested"]
+item = "item.deploy.land"
+outcome = "already-held"
+to = "deployed"
+witness = "the landing containing the unit"
+
+# The feature table, F1 to F8: a feature holds its least-advanced unit's state, so a row fires on its
+# last unit's outcome, which the mover judges and the engine does not.
+
+# F1
+[[transition]]
+level = "feature"
+from = ["none"]
+item = "item.design.decompose"
+outcome = "decomposed"
+to = "decomposed"
+witness = "the decomposition record"
+
+# F2
+[[transition]]
+level = "feature"
+from = ["decomposed"]
+item = "item.design.ready"
+outcome = "ready"
+to = "designed"
+witness = "its last unit's spec committed and derived READY"
+
+# F3
+[[transition]]
+level = "feature"
+from = ["designed"]
+item = "item.build.acceptance"
+outcome = "pass"
+to = "built"
+witness = "its last unit's pass commit and acceptance record"
+
+# F4
+[[transition]]
+level = "feature"
+from = ["built"]
+item = "item.test.exit"
+outcome = "recorded"
+to = "tested"
+witness = "the verdict for the build's prepared merge"
+
+# F5
+[[transition]]
+level = "feature"
+from = ["tested"]
+item = "item.deploy.land"
+outcome = "landed-gated"
+to = "deployed"
+witness = "the landing containing its last unit"
+
+# F6
+[[transition]]
+level = "feature"
+from = ["designed", "built"]
+item = "item.design.reentry"
+outcome = "breaking"
+to = "decomposed"
+witness = "the architect's re-entry record naming the breaking change"
+
+# F7
+[[transition]]
+level = "feature"
+from = ["tested"]
+item = "item.deploy.land"
+outcome = "landed-ungated"
+to = "deployed"
+witness = "the landing containing its last unit"
+
+# F8
+[[transition]]
+level = "feature"
+from = ["tested"]
+item = "item.deploy.land"
+outcome = "already-held"
+to = "deployed"
+witness = "the landing containing its last unit"
+
+# The stand-ins: every row item, no owning build having landed. The fixture witness is the mover naming
+# the witnessing commit.
+
+[[stand-in]]
+item = "item.entry.claim"
+owner = "dPlacedRequest"
+
+[[stand-in]]
+item = "item.plan.dedupe"
+owner = "dRankedPlan"
+
+[[stand-in]]
+item = "item.plan.exit"
+owner = "dRankedPlan"
+
+[[stand-in]]
+item = "item.design.decompose"
+owner = "dIndexedDesign"
+
+[[stand-in]]
+item = "item.design.exit"
+owner = "dIndexedDesign"
+
+[[stand-in]]
+item = "item.design.ready"
+owner = "dIndexedDesign"
+
+[[stand-in]]
+item = "item.design.reentry"
+owner = "dIndexedDesign"
+
+[[stand-in]]
+item = "item.build.unit-pass"
+owner = "dScopedBuild"
+
+[[stand-in]]
+item = "item.build.acceptance"
+owner = "dScopedBuild"
+
+[[stand-in]]
+item = "item.build.distill"
+owner = "dScopedBuild"
+
+[[stand-in]]
+item = "item.build.core"
+owner = "dScopedBuild"
+
+[[stand-in]]
+item = "item.build.exit"
+owner = "dScopedBuild"
+
+[[stand-in]]
+item = "item.build.resolve"
+owner = "dScopedBuild"
+
+[[stand-in]]
+item = "item.review.dispose"
+owner = "dDeclaredLoop"
+
+[[stand-in]]
+item = "item.test.merge"
+owner = "dWitnessedBar"
+
+[[stand-in]]
+item = "item.test.seen-red"
+owner = "dWitnessedBar"
+
+[[stand-in]]
+item = "item.test.attribute"
+owner = "dWitnessedBar"
+
+[[stand-in]]
+item = "item.test.route"
+owner = "dWitnessedBar"
+
+[[stand-in]]
+item = "item.test.exit"
+owner = "dWitnessedBar"
+
+[[stand-in]]
+item = "item.deploy.current"
+owner = "dShippedRelease"
+
+[[stand-in]]
+item = "item.deploy.land"
+owner = "dShippedRelease"
+
+[[stand-in]]
+item = "item.life.request"
+owner = "dWellOiledMachine"
+
+# The owed rows: the cross-step routes whose build row another unit or build writes.
+
+[[owed-row]]
+item = "item.plan.triage-rule"
+outcome = "refuse"
+by = "TOOL-dDeclaredLoop-15"
+
+[[owed-row]]
+item = "item.plan.triage-judge"
+outcome = "refuse"
+by = "TOOL-dDeclaredLoop-15"
+
+[[owed-row]]
+item = "item.plan.place"
+outcome = "unplaced"
+by = "dRankedPlan"
+
+[[owed-row]]
+item = "item.deploy.parents"
+outcome = "withdrawn"
+by = "TOOL-dDeclaredLoop-15"
+
+[[owed-row]]
+item = "item.deploy.close"
+outcome = "closed"
+by = "TOOL-dDeclaredLoop-15"
 
 # ---- Plan's program ----------------------------------------------------------------------------------
 

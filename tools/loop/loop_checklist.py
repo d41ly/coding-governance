@@ -20,7 +20,7 @@ absent or empty, never green over nothing; a definition `read_items` refuses exi
 `--fixture --plant <case>` runs `check` with one break of `PLANTS` made in memory on the rows or the
 registries as read, never on disk, and exits 1 on the refusal the break draws. `check --selftest` runs
 `check` over the tree, every plant, each owed exit 1 naming its break, and `show` on a mapped handle
-and an absent one, printing PASS or FAIL per case; exit 0 only when every case holds. `show <handle>`
+and an absent one, through `loop_lib.run_selftest_cases`, printing PASS or FAIL per case; exit 0 only when every case holds. `show <handle>`
 prints `<registry> <item>` from the rows alone, exit 2 for a handle no row maps.
 
 WHAT THIS DOES NOT CHECK: that a pairing is the right item, a judgement per handle a review reads; that
@@ -29,8 +29,6 @@ handles, an adopter's own; and the members' fields after the handle. The unatten
 kit, so the driver read takes no descriptor edge; the leg running `check --selftest` is gov's own.
 """
 import argparse
-import contextlib
-import io
 import pathlib
 import re
 import sys
@@ -40,7 +38,7 @@ KIT = pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from loop_lib import (CHECKLIST_REGISTRIES, LoopError, check_checklist_rows,  # noqa: E402
-                      read_checklist_rows, read_items, resolve_kit_dir)
+                      read_checklist_rows, read_items, resolve_kit_dir, run_selftest_cases)
 
 SAY = "loop"
 #: `--plant`'s cases, each a break made in memory on the rows or the registries as read, and the text
@@ -135,22 +133,7 @@ def main(argv):
         cases += [(p, ["--fixture", "--plant", p], 1, "%s: refused · " % SAY, PLANTS[p][1]) for p in PLANTS]
         cases += [("show gates-green", ["show", "gates-green"], 0, "DOD_CORE item.test.verdict", ""),
                   ("show nosuch", ["show", "nosuch"], 2, "%s: no [[checklist]] row" % SAY, "nosuch")]
-        failed = []
-        for name, case_argv, owed, opening, needle in cases:
-            out = io.StringIO()
-            with contextlib.redirect_stdout(out):
-                rc = main(case_argv)
-            said = out.getvalue()
-            line = next((ln for ln in said.splitlines() if ln.startswith(opening) and needle in ln), None)
-            if rc == owed and line:
-                print("%s: checklist selftest · PASS %s · exit %d · %s" % (SAY, name, rc, line[:200]))
-            else:
-                failed.append(name)
-                print("%s: checklist selftest · FAIL %s · exit %d, owed %d and a line %r naming %r: %s" % (
-                    SAY, name, rc, owed, opening, needle, said[-400:]))
-        print("%s: checklist selftest · %s · %d case(s) · %d failed%s" % (
-            SAY, "FAIL" if failed else "PASS", len(cases), len(failed), (": " + " ".join(failed)) if failed else ""))
-        return 1 if failed else 0
+        return run_selftest_cases(main, cases, "%s: checklist selftest" % SAY)
     try:
         registries = read_core_registries(KIT)
     except LookupError as e:

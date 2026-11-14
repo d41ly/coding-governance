@@ -87,6 +87,7 @@ line-length gate selftest	kit	selftests
 loop checklist tags	repo	declarations
 loop computed witness	kit	selftests
 loop definition	repo	declarations
+loop transition tables	repo	declarations
 manifest-check self-test	kit	selftests
 marker contracts	repo	declarations
 measure-legs selftest	kit	selftests

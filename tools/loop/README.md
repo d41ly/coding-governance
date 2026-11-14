@@ -197,6 +197,41 @@ python <prefix>/loop/loop_checklist.py --fixture --plant missing-handle
 python <prefix>/loop/loop_checklist.py show reuse-probed
 ```
 
+## The transition tables
+
+One table per level, build, feature and unit (TOOL-dDeclaredLoop-13): `[states]` holds each level's
+open states, and each `[[transition]]` row a move, its `level`, `from` (states, `none` for the level's
+entry, or `@open`), the `item` tag and `outcome` that fire it, its `to` (a state, `@prior` or
+`@reentry`), its `witness`, and optionally a `disposition` and `when = "before-push"`. `[[stand-in]]`
+names the owner of each row item whose build has not landed, and `[[owed-row]]` each cross-step route
+whose build row another unit or build writes; both lists only shrink. `loop_lib.py` does not read
+them: `loop_table.py` does, through `read_transition_rows` and `read_stand_ins` over the parsed
+definition, and `derive_move` answers a move from the rows alone, raising `TransitionRefused` where no
+row holds it and ValueError on an unknown level or state or a missing fact a row reads (`prior`,
+`reenters`, `pushed`, `disposition`), never a default.
+
+`move` prints `move — <level> · <from> → <to> · <item>`, with `· stand-in <owner>` for a stand-in item,
+exit 0; `refused — ...: no row`, exit 1; `unanswered — ...: <why>`, exit 2. `check`, by
+`check_transition_tables`, prints a `loop: table` line per level, a `loop: owed` line per owed row and
+a `loop: stand-in` line per stand-in, and refuses an undeclared level or state, two rows for one move,
+a row item that is no tag or resolves to neither an `[[item]]` row nor a stand-in, an outcome outside
+its item's set, a disposition outside the set, and a stale or mis-owned stand-in. It joins every
+cross-step route, an outcome routed to `transition` or to an item of another step, with the build
+table both ways, an owed row standing for a row another unit writes and refused once a row covers it,
+and each step's exit to a build row out of its state. Both verbs exit 2 where the definition does not
+read or holds no transition row. `--fixture --plant <case>` runs `check` with one break of `PLANTS`
+made in memory by `write_table_plant`: `bad-state`, `two-rows`, `bad-exit`, `dropped-row`,
+`unrouted-row`, `owed-stale` and `stand-in`. `check --selftest` runs `check`, every plant and each
+kind of move through `run_selftest_cases`, the case loop `loop_checklist.py` shares, and is the kit's
+`loop transition tables` gate leg.
+
+```bash
+python <prefix>/loop/loop_table.py move --level build --from designing --item item.design.exit --outcome recorded
+python <prefix>/loop/loop_table.py check
+python <prefix>/loop/loop_table.py check --selftest
+python <prefix>/loop/loop_table.py --fixture --plant dropped-row
+```
+
 ## The reader, `loop_lib.py`
 
 | function | returns |
@@ -329,7 +364,8 @@ both ways. That a step tag or an item tag is registered: the tag index reads the
 the `step` namespace. That a `command:` name names a real command, that a `hook:` event exists, or
 that a pending role's slot is the stem a later build ships. A non-role item's allowance beyond being
 non-empty: the allowance vocabulary of a role's `writes` is the roles kit's. A need on an item outside the five programs; that a stand-in path
-exists, or that a `transition` route reaches a transition table. That a disposition
+exists. The transition tables check no witness, no stand-in owner's landing, no reachability or
+termination, and no feature or unit row against the routes. That a disposition
 record's `Item` names a declared item, which reads `None`, or that a writer resolved an alias before
 it wrote. An unknown key on a row is neither read nor refused. That a witness's `by` is true. That
 the build an actor-list row names will compute its witness.

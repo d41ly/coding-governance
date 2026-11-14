@@ -75,6 +75,12 @@ a position. `read_checklist_rows` returns the rows and `check_checklist_rows` gr
 against the registries and the declared items. Neither runs inside `load_loop` or `--check`: the command
 is `loop_checklist.py` beside this file, which reads the driver's registry lines.
 
+The definition also holds one transition table per level (TOOL-dDeclaredLoop-13): `[states]`, and the
+`[[transition]]`, `[[stand-in]]` and `[[owed-row]]` rows. `loop_table.py` beside this file reads and
+checks them, and answers each move; nothing here reads them. `run_selftest_cases` is the in-process case
+loop that command and `loop_checklist.py` share for `check --selftest`: each case run through the
+command's `main`, its output captured, graded by its exit and a line by its opening and a needle.
+
 A definition that does not hold is refused with `LoopError`, a `ValueError` naming the file and the row: a
 file that does not read or is no TOML; a `step` or `workflow` table that is no array of tables; the gov
 steps missing, repeated or out of order, a tag that is no gov step, or an `order` that is not the step's
@@ -107,13 +113,16 @@ catalogue check, both ways; that a step tag or an item tag is registered in its 
 tag index's; what a `state` word means; that a `command:` name names a real command, a `hook:` event
 exists, or a pending role's slot is the stem a later build ships; a non-role item's allowance beyond
 being non-empty; a need on an item outside the five programs; that
-a `stand-in:` path exists or a `transition` route reaches a transition table; that a disposition record's
+a `stand-in:` path exists; that a `transition` route reaches a row of the build's transition table,
+which `loop_table.py` beside this file checks, both ways (TOOL-dDeclaredLoop-13); that a disposition record's
 `Item` names a declared item, which reads None; or that a writer resolved an alias before it wrote. An
 unknown key on a row is not read and not refused. That a witness's `by` is true. Stdlib only, but for
 `read_actor_base` and `read_builds_dir`, which import the memory-tree kit's compare base and its conf
 reader inside the function, and `read_role_defaults`, which imports the roles kit's library there, so a
 reader calling `load_loop` never reaches them.
 """
+import contextlib
+import io
 import pathlib
 import re
 import sys
@@ -1093,6 +1102,29 @@ def write_loop_plant(data, case, rows, base_rows):
             pass  # its break is the roles kit's directory, which `main` resolves from a scratch directory
         else:
             plan["exit"] = "item.design.exit"
+
+
+def run_selftest_cases(main, cases, label):
+    """Each case `(name, argv, owed exit, opening, needle)` run through `main(argv)` in process with its
+    output captured, and held when it exits as owed and prints a line opening with `opening` that holds
+    `needle`. One `<label> · PASS` or `· FAIL` line per case, then the summary line; 0 when every case
+    holds, else 1. The shared case loop of `loop_checklist.py` and `loop_table.py` beside this file."""
+    failed = []
+    for name, case_argv, owed, opening, needle in cases:
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            rc = main(case_argv)
+        said = out.getvalue()
+        line = next((ln for ln in said.splitlines() if ln.startswith(opening) and needle in ln), None)
+        if rc == owed and line:
+            print("%s · PASS %s · exit %d · %s" % (label, name, rc, line[:200]))
+        else:
+            failed.append(name)
+            print("%s · FAIL %s · exit %d, owed %d and a line %r naming %r: %s" % (
+                label, name, rc, owed, opening, needle, said[-400:]))
+    print("%s · %s · %d case(s) · %d failed%s" % (
+        label, "FAIL" if failed else "PASS", len(cases), len(failed), (": " + " ".join(failed)) if failed else ""))
+    return 1 if failed else 0
 
 
 def main(argv):
