@@ -127,7 +127,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-12 — each step a program of items with declared needs, outcomes and routes](spec/2026-10-24-spec-TOOL-dDeclaredLoop-12.md) | 6 | 2 | CLOSED | rev-5 | 2026-11-14 |
 | [TOOL-dDeclaredLoop-41 — the actor-witness list graded where its builds live, and an adopter's own agent items its own](spec/2026-10-24-spec-TOOL-dDeclaredLoop-41.md) | 6 | 2 | CLOSED | rev-5 | 2026-11-14 |
 | [TOOL-dDeclaredLoop-9 — each step's items declared with one actor, inputs, allowance, return schema and witness](spec/2026-10-24-spec-TOOL-dDeclaredLoop-9.md) | 7 | 2 | CLOSED | rev-2 | 2026-11-14 |
-| [TOOL-dDeclaredLoop-17 — witnesses computed rather than typed by the acting agent](spec/2026-10-24-spec-TOOL-dDeclaredLoop-17.md) | 8 | 2 | DEFERRED | rev-3 | 2026-10-25 |
+| [TOOL-dDeclaredLoop-17 — witnesses computed rather than typed by the acting agent](spec/2026-10-24-spec-TOOL-dDeclaredLoop-17.md) | 8 | 2 | DEFERRED | rev-4 | 2026-11-14 |
 | [TOOL-dDeclaredLoop-11 — every checklist item named by a semantic tag, its number only display order](spec/2026-10-24-spec-TOOL-dDeclaredLoop-11.md) | 9 | 2 | DEFERRED | rev-3 | 2026-11-05 |
 | [TOOL-dDeclaredLoop-42 — the acceptance re-run bounded on the clock, its commands run by bash, never cmd.exe](spec/2026-10-24-spec-TOOL-dDeclaredLoop-42.md) | 9 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-13 — one transition table per level, the engine refusing a move it lacks](spec/2026-10-24-spec-TOOL-dDeclaredLoop-13.md) | 10 | 2 | DEFERRED | rev-3 | 2026-11-05 |
@@ -212,7 +212,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 322 bound to this build, across 4 record folder(s).
+Records: 324 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
