@@ -9,6 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-aCarriedStop-4=OPEN TOOL-aCarriedStop-5=OPEN TOOL-aCarriedStop-6=OPEN TOOL-aCarriedStop-7=OPEN TOOL-aCarriedStop-8=OPEN
+units-at-landing: TOOL-aCarriedStop-2 TOOL-aCarriedStop-3 TOOL-aCarriedStop-9 TOOL-aCarriedStop-10 TOOL-aCarriedStop-1
 hold-run: 
 hold-streak: 1 · at 4bf57cb7
 resume-owed: unattended-resume-acarriedstop · fire 2026-11-13T19:08:25Z
@@ -17,12 +19,12 @@ hold-reason: the close's bar is 94/95 green and its one red, routed commits name
 hold-until: probe gate
 hold-code: host-degraded
 held-from: VERIFYING
-gates-run: unattended-179464206554192622328-1124200 01787a62
+gates-run: unattended-179464626594916132477-1195153 37f62def
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 3d8689eaa
-phase: VERIFYING
+phase: LANDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/sad-allen-74f7bd
