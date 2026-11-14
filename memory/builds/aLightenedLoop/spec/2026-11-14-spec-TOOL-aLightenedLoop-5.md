@@ -12,6 +12,7 @@
 | [2026-11-14-prompt-TOOL-aLightenedLoop-1-fork-answers.md](../prompts/2026-11-14-prompt-TOOL-aLightenedLoop-1-fork-answers.md) | research | TOOL-aLightenedLoop-1 TOOL-aLightenedLoop-3 |
 | [2026-11-14-prompt-TOOL-aLightenedLoop-5-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aLightenedLoop-5-1-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aLightenedLoop-5-fork-fold.md](../prompts/2026-11-14-prompt-TOOL-aLightenedLoop-5-fork-fold.md) | research | — |
+| [2026-11-14-review-TOOL-aLightenedLoop-1-5-implementation-diff-round1.md](../reviews/2026-11-14-review-TOOL-aLightenedLoop-1-5-implementation-diff-round1.md) | diff-review | TOOL-aLightenedLoop-1 TOOL-aLightenedLoop-2 TOOL-aLightenedLoop-3 TOOL-aLightenedLoop-4 |
 
 <!-- /gen:spec-records -->
 
