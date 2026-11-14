@@ -812,6 +812,13 @@ run_planted "D6 the leg appended to a log -> deny"                        2 "$B"
 run_planted "D6 the leg appended with 2>&1 behind it -> deny"             2 "$B" "$M_FLAG >> x.log 2>&1"
 run_planted "D6 the leg appended by 2>> -> deny"                          2 "$B" "$M_FLAG 2>> err.log"
 run_planted "D6 the leg appended to an unexpanded \"\$LOG\" -> deny"        2 "$B" "$M_FLAG"' >> "$LOG"'
+# TOOL-aClearedLedger-13: the head-less segment (`-m` leaves the grammar no head) still yields a
+# candidate, and two ALLOW arms that pin a miss on purpose. Each is the hook's half of a difference
+# the header comment and the README state against the spec lint, which reads both spellings: it
+# fails on the day the hook reads the spelling, which is the day those texts must move.
+run_planted "D6 the leg behind python3 -m pdb -> deny"                    2 "$B" "python3 -m pdb $M_REST"
+run_planted "D6 a kept gap: a 2>&1 ahead of the flag -> allow"            0 "$B" "${M_FLAG% --selftest} 2>&1 --selftest"
+run_planted "D6 a kept gap: a glued variable prefix -> allow"             0 "$B" 'python3 ${DIR}zz-kit/planted_suite.py --selftest'
 F=$(build_fixture VERIFYING)
 run_planted "D6 the over-bound leg at VERIFYING -> allow"                 0 "$F" "$M_FLAG"
 build_manifest 300
@@ -857,7 +864,10 @@ n=$((pass+fail))
 # static count of the arms above at ~10% headroom, because the pass that wrote this file may not
 # run it (the hook it tests denies the invocation at BUILDING); the main loop's first green at
 # VERIFYING confirms the executed count against this floor. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=214
+FLOOR_ASSERTIONS=217
+# RAISED 214 -> 217 at TOOL-aClearedLedger-13, by the static count of the assertions it added to the
+# arm class "a manifest suite in flag form", three: the leg behind `python3 -m pdb`, and the two
+# kept gaps pinned as allows, a `2>&1` ahead of the flag and a glued variable prefix.
 # RAISED 210 -> 214 at TOOL-aClearedLedger-12, by the static count of the assertions it added to the
 # arm class "a manifest suite in flag form", four: the leg's output appended by `>>`, by `>>` with
 # `2>&1` behind it, by `2>>`, and by `>>` to a quoted unexpanded variable.

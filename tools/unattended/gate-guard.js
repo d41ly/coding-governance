@@ -58,9 +58,14 @@
  *       position (`echo <script> --selftest`) reads as a run; a path assembled at run time, a
  *       module name after `-m` with no path, and a python heredoc walk past it; a spelling whose
  *       option name differs from the leg's is read as scoped, whatever the script does with it;
+ *       a redirection carrying `&` ahead of the direct-check word cuts the command there
+ *       (`<script> 2>&1 --selftest`, `<script> &>x.log --selftest`), so the script and its word
+ *       fall into two commands though bash runs the suite (TOOL-aClearedLedger-13);
  *       and it does not see a suite the manifest does not declare or declares in another chunk,
  *       and reads the manifest uncommitted. The spec lint's bar join holds the same rule and reads
- *       two spellings this row does not: a quoted mention, and a `bash -c` body inside another.
+ *       these spellings this row does not: a redirection carrying `&`
+ *       ahead of the direct-check word, a glued variable prefix (`${DIR}<script>`), a quoted
+ *       mention, and a `bash -c` body inside another.
  * A D2, D3 or D4 token is NOT a hit when the same simple command carries one of READ_ONLY_VERBS:
  * those forms answer in seconds and one of them is how the memory-tree kit re-renders its guides.
  * Row D6 does not consult them: a command carrying one is a longer spelling and misses.

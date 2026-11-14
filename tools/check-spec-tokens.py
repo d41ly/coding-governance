@@ -470,12 +470,16 @@ BAR_WHY = ("a bar or suite is not an acceptance observation: observe the checker
 # gate guard carries both under the same names and values, and neither file reads the other.
 DIRECT_CHECK_BOUND = 300
 DIRECT_CHECK_WORDS = ("--selftest", "--fixture", "fixture")
-# TOOL-aClearedLedger-11: the gate guard's own separator set, so both readers cut one command into
-# the same simple commands. An `&` beside a `>` is part of a redirection (`2>&1`, `&>`) and does
-# not split; every other `&` does, so `&&` splits twice and a bare `&` never survives as a word.
+# TOOL-aClearedLedger-11: the separator characters are the gate guard's own. The split differs from
+# the hook's where TOOL-aClearedLedger-13 names it: an `&` beside a `>` is part of a redirection
+# (`2>&1`, `&>`) and does not split here, and does there; and the braces of `${ }` split here and
+# not there, since this pattern holds no brace state. In both the lint reads more. Every other `&`
+# splits, so `&&` splits twice and a bare `&` never survives as a word.
 # A quote character is NOT a separator: a quoted script path and its flag stay one command.
 SIMPLE_COMMAND_SPLIT = re.compile(r"[;|(){}`\n]|(?<!>)&(?!>)")
-REDIRECTION = re.compile(r"(?:\d*|&)(?:>>?|<{1,3})")
+# TOOL-aClearedLedger-13: read with `fullmatch` over a word. Group 1 stands before the operator and
+# group 2 is the target glued behind it.
+REDIRECTION = re.compile(r"(.*?)&?[<>]+&?(.*)", re.S)   # used with fullmatch
 
 
 def derive_flag_suites(rows, bound=DIRECT_CHECK_BOUND):
@@ -507,50 +511,66 @@ def check_bar(tok, flag_suites=()):
     member of `flag_suites`.
 
     The spelling rule is the gate guard's row D6 rule, held here in this file's own words
-    (TOOL-aClearedLedger-11). A word is read with every quote character taken out and cut at its
-    first `>` or `<`; a redirection word is skipped. Any word may be the script word: folded (`\\`
+    (TOOL-aClearedLedger-11). Each simple command is read twice (TOOL-aClearedLedger-13): flat, its
+    words split on whitespace, so a quoted body reads as words; and quoted, a quoted run kept one
+    word, so a value holding a space stays one. A leg spelled by either read is a hit. A word is
+    read with every quote character taken out. Everything from its first `>` or `<` on, with an
+    `&` glued ahead of that operator, is a redirection: what stands before it is kept as the word
+    unless it is empty or all digits, a file descriptor, and when nothing stands behind the
+    operator its target is the next word, which is dropped. Any word may be the script word: folded (`\\`
     to `/`, lower case, leading `./` off) it equals the leg's script, ends with `/` and that
     script, or is a trailing path of it. The words from it on are no more than the leg's, reach the
     leg's direct-check word and equal the leg's up to it; after it each equals the leg's, except
     that an option's VALUE (a leg word not opening with `-` behind one that does) may be any word.
     Two files that share a file name read alike, and an unquoted mention at an argument position
-    reads as a run, as in the hook. This reader has no quote state and no depth, so it OVER-reads
-    the hook in two places: a quoted mention, and a `bash -c` body inside another, are hits here
-    and not there."""
+    reads as a run, as in the hook. This reader has no quote state over a command, no depth and no
+    brace state, and it keeps an `&` beside a `>` inside the command, so it OVER-reads the hook.
+    These are hits here and not there: a redirection carrying `&` ahead of the direct-check word
+    (`<script> 2>&1 --selftest`, where the hook cuts the command at the `&`);
+    a glued variable prefix (`${DIR}<script>`, which splits here at the braces); a quoted mention;
+    and a `bash -c` body inside another."""
     if BAR.search(tok):
         return BAR_WHY
     for command in SIMPLE_COMMAND_SPLIT.split(tok):
-        words, drop_next = [], False
-        for w in command.split():
-            w = w.replace("'", "").replace('"', "")
-            if not w:
-                continue
-            if drop_next:
-                drop_next = False
-                continue
-            m = REDIRECTION.match(w)
-            if m:
-                drop_next = m.end() == len(w)   # a bare operator: its target is the next word
-                continue
-            words.append(re.split(r"[<>]", w, maxsplit=1)[0])
-        for name, ceiling, leg in flag_suites:
-            first = leg[0].lower()
-            reach = next(i for i, w in enumerate(leg) if i and w in DIRECT_CHECK_WORDS)
-            for i, w in enumerate(words):
-                w = re.sub(r"^(?:\./+)+", "", w.replace("\\", "/").lower())
-                if not w or (w != first and not w.endswith("/" + first)
-                             and not first.endswith("/" + w)):
+        # The flat read, then the quoted one; neither processes an escape, so a backslash
+        # survives for the fold below.
+        for raw in (command.split(),
+                    re.findall(r"(?:[^\s\"']|\"[^\"]*\"|'[^']*'|[\"'])+", command)):
+            words, drop_next = [], False
+            for w in raw:
+                w = w.replace("'", "").replace('"', "")
+                if not w:
                     continue
-                candidate = words[i:]
-                if not reach < len(candidate) <= len(leg):
+                if drop_next:
+                    drop_next = False
                     continue
-                # Up to the direct-check word each word is the leg's; after it an option's value
-                # may be any word, and any other difference names a case or another option.
-                if all(candidate[j] == leg[j]
-                       or (j > reach and not leg[j].startswith("-") and leg[j - 1].startswith("-"))
-                       for j in range(1, len(candidate))):
-                    return (f"{BAR_WHY}; this spells the manifest leg `{name}`, a suite by its "
-                            f"declared ceiling of {ceiling} s")
+                m = REDIRECTION.fullmatch(w)
+                if m:
+                    drop_next = not m.group(2)   # the operator ended the word: its target is next
+                    w = m.group(1)
+                    if not w or w.isdigit():     # nothing, or a file descriptor
+                        continue
+                words.append(w)
+            for name, ceiling, leg in flag_suites:
+                first = leg[0].lower()
+                reach = next(i for i, w in enumerate(leg) if i and w in DIRECT_CHECK_WORDS)
+                for i, w in enumerate(words):
+                    w = re.sub(r"^(?:\./+)+", "", w.replace("\\", "/").lower())
+                    if not w or (w != first and not w.endswith("/" + first)
+                                 and not first.endswith("/" + w)):
+                        continue
+                    candidate = words[i:]
+                    if not reach < len(candidate) <= len(leg):
+                        continue
+                    # Up to the direct-check word each word is the leg's; after it an option's
+                    # value may be any word, and any other difference names a case or another
+                    # option.
+                    if all(candidate[j] == leg[j]
+                           or (j > reach and not leg[j].startswith("-")
+                               and leg[j - 1].startswith("-"))
+                           for j in range(1, len(candidate))):
+                        return (f"{BAR_WHY}; this spells the manifest leg `{name}`, a suite by its "
+                                f"declared ceiling of {ceiling} s")
     return None
 
 

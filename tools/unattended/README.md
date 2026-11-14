@@ -119,10 +119,13 @@ at or under the bound and every such script the manifest does not declare. A wor
 two files that share a file name, or a trailing path, read alike; an unquoted mention of a script
 and its direct-check word at an argument position reads as a run; a path assembled at run time, a
 module name after `-m` with no path, and a python heredoc walk past it; a spelling whose option
-name differs from the leg's is read as scoped, whatever the script does with it; a suite the
+name differs from the leg's is read as scoped, whatever the script does with it; a redirection
+carrying `&` ahead of the direct-check word cuts the command there (`<script> 2>&1 --selftest`),
+so the script and its word fall into two commands though bash runs the suite; a suite the
 manifest does not declare, or declares in another chunk, is not seen, and the manifest is read
-uncommitted. The spec lint's bar join holds the same rule, and reads two spellings the hook does
-not: a quoted mention, and a `bash -c` body inside another. The
+uncommitted. The spec lint's bar join holds the same rule, and reads these spellings the hook does
+not: a redirection carrying `&` ahead of the direct-check word, a glued variable prefix
+(`${DIR}<script>`), a quoted mention, and a `bash -c` body inside another. The
 read-only verbs — `--list`, `--check`, `--rank`, `--help`, `--render` — pass, the
 plain bar passes, and a quoted mention of any shape is invisible. It keys the record to the branch
 through the `run-branch:` fact `--preflight` writes on both anchors (protocol fact 13), falling

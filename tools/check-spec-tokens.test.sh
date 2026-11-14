@@ -1133,6 +1133,10 @@ else echo "arm FAIL  parity: graded $popn + exempt $skipn != the manifest's $leg
 #      stderr is merged into the output, and a bare `\o` in the literal prints a SyntaxWarning onto
 #      line 1. The fourth feeds the wrapper spellings below, handed in as arguments because they
 #      carry quote characters this single-quoted body cannot spell; the fifth is the option pair.
+#      TOOL-aClearedLedger-13 widens the fourth, on the same one line: a half-glued redirection
+#      whose target is the next word, a quoted value holding a space (one entry spells the staged
+#      `plant` leg), and the spellings only this reader's split admits, an `&` beside a `>` ahead
+#      of the flag and a glued variable prefix. The `bash -c` entry is the arm of the flat read.
 WRAPPER_SPELLINGS=(
   '"$PY" t/over.py --selftest'
   'cd t && python over.py --selftest'
@@ -1144,6 +1148,15 @@ WRAPPER_SPELLINGS=(
   'python t/over.py --selftest & wait'
   'python "t/over.py" --selftest'
   'bash -c "python t/over.py --selftest"'
+  'python t/over.py --selftest> x.log'
+  'python t/over.py --selftest<<< x'
+  'python t/over.py --selftest&> x.log'
+  'python t/over.py --selftest >& x.log'
+  'python t/over.py --selftest > "my log.txt"'
+  'python t/plant.py fixture --strict "my dir/"'
+  'python t/over.py 2>&1 --selftest'
+  'python t/over.py &>x.log --selftest'
+  'python ${DIR}t/over.py --selftest'
 )
 direct=$("$PY" -c 'import importlib.util, sys
 spec = importlib.util.spec_from_file_location("cst", sys.argv[1])
@@ -1176,8 +1189,8 @@ if [ "$d2" = ok ]; then echo "arm ok    direct-check: six staged rows derive the
 else echo "arm FAIL  direct-check: six staged rows did not derive the 301 --selftest row and the fixture row: ${d2:-no output}"; fail=$((fail+1)); fi
 if [ "$d3" = ok ]; then echo "arm ok    direct-check: the staged leg spelled to its fixture word is a hit, with a case word and as the script alone it is not; redirected, piped and backslashed it is a hit, and with no set it is none"; pass=$((pass+1))
 else echo "arm FAIL  direct-check: the staged legs' seven spellings did not read hit, miss, miss, hit, hit, hit, miss: ${d3:-no output}"; fail=$((fail+1)); fi
-if [ "$d4" = ok ]; then echo "arm ok    direct-check: every wrapper spelling of the staged leg is a hit"; pass=$((pass+1))
-else echo "arm FAIL  direct-check: a wrapper spelling of the staged leg is no hit: ${d4:-no output}"; fail=$((fail+1)); fi
+if [ "$d4" = ok ]; then echo "arm ok    direct-check: every wrapper spelling of a staged leg is a hit"; pass=$((pass+1))
+else echo "arm FAIL  direct-check: a wrapper spelling of a staged leg is no hit: ${d4:-no output}"; fail=$((fail+1)); fi
 if [ "$d5" = ok ]; then echo "arm ok    direct-check: the option pair reads a changed value as a hit, another option name and a case word after the full argv as none"; pass=$((pass+1))
 else echo "arm FAIL  direct-check: the option pair did not read hit, miss, miss: ${d5:-no output}"; fail=$((fail+1)); fi
 

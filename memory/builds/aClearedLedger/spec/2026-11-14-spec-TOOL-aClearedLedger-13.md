@@ -1,11 +1,12 @@
 # TOOL-aClearedLedger-13 — the spec lint reads a half-glued redirection and a quoted value as the hook does, and each new branch and reworded clause has an arm that can fail
 
-**Status:** INPROGRESS · rev-1 · 2026-11-14 · node a · Tier-2 · base 8db6f4be · streams tooling · order 13
+**Status:** CLOSED · rev-1 · 2026-11-14 · node a · Tier-2 · base 8db6f4be · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-14-build-TOOL-aClearedLedger-13-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aClearedLedger-13-1-acceptance-ledger.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aClearedLedger-13-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aClearedLedger-13-1-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aClearedLedger-13-brief.md](../prompts/2026-11-14-prompt-TOOL-aClearedLedger-13-brief.md) | research | — |
 
