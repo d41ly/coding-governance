@@ -10,11 +10,11 @@ The unit's own builder reported, on its pass commit 78cc7c112, quoted:
 
 The main loop's pass-legs run over b9ad1f6ba..78cc7c112 then reported these reds the pass owns, quoted:
 
-> install-prefix: a tracked file spells a kit path ... tools/workflows/unattended-build.test.sh:3760, :3761 and :3764 (the three new `TW1 AC5` assertions)
+> install-prefix: a tracked file spells a kit path ... tools/workflows/unattended-build.test.sh@5118b298:3760, :3761 and :3764 (the three new `TW1 AC5` assertions)
 
-> HYGIENE check-arms: tools/unattended/unattended.sh:15453 exit site (delegated) has no POSITIVE assertion naming its own failure text ('refuse_waive_unless_preflight --check-specs || { RUNLOG_CLEAN=1; exit 1; }') and is not pinned ... mark its block with `# arm-signature: <text its callee prints>` and assert that text, or pin it
+> HYGIENE check-arms: tools/unattended/unattended.sh@cdfd8502:15453 exit site (delegated) has no POSITIVE assertion naming its own failure text ('refuse_waive_unless_preflight --check-specs || { RUNLOG_CLEAN=1; exit 1; }') and is not pinned ... mark its block with `# arm-signature: <text its callee prints>` and assert that text, or pin it
 
-> HYGIENE check-arms: tools/unattended/unattended.sh:14618 check 49 branch 23 has no POSITIVE assertion naming its own failure text ("a sibling spec status header carries something shaped like the build-order verb that does not conform, so this build's order cannot be sequenced against it") and is not pinned
+> HYGIENE check-arms: tools/unattended/unattended.sh@cdfd8502:14618 check 49 branch 23 has no POSITIVE assertion naming its own failure text ("a sibling spec status header carries something shaped like the build-order verb that does not conform, so this build's order cannot be sequenced against it") and is not pinned
 
 > HYGIENE check-arms: tools/unattended/unarmed-branches.txt:50 pins tools/unattended/unattended.sh check 49 branch 21, which IS armed now — delete the row (the pin is shrink-only)
 
