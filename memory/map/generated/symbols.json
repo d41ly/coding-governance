@@ -34053,6 +34053,16 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "write_stop_fixture",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_stop_row",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "write_su_aborted",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"

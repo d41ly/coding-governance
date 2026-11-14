@@ -116,7 +116,7 @@ receipt sync (installed files match the receipt)	1.0	2	a	2026-09-24	runner
 review-join ban (no ref-keyed join)	10.8	2	a	2026-09-24	runner
 review-join self-test	110.3	2	a	2026-09-24	runner
 review-protocol parity (kit vs dogfood)	7.0	2	a	2026-09-24	runner
-routed commits name a specced unit	1525.0	1	a	2026-11-14	routed_commits.py run alone by the main loop over GATE_PUSH_BASE 0578adb73 at cd6b059f4 in a worktree, rc 0, 1525s wall, the dClosedLoop dDeclaredLoop unattended run live on the node throughout and no other gate run started by this session
+routed commits name a specced unit	1761.4	1	a	2026-11-14	taken by the main loop on node a, the leg alone on a detached tree at 5e2451f2, read twice one after the other: GATE_PUSH_BASE unset so it graded WHOLE as the close's bar does, rc 0, 1491.2s, 3 foreign gate processes live at its start and 26 at its end, a full bar of another session having started in the primary tree; then GATE_PUSH_BASE=49358761, origin main from ls-remote, so it graded RANGE and WHOLE beside it as the landing push's bar does, rc 0, 1761.4s, 27 foreign gate processes live at its start and 9 at its end; both contended, the cost under the load the close and the push meet on this node; the larger governs; alone at 41c93c8b with GATE_PUSH_BASE=8db6f4be it read 957s, rc 0; killed at its 760 s ceiling twice under aCarriedStop's second close bar at 41c93c8b, a spawn at 3.6x this clone's floor; TOOL-aCarriedStop-9
 routed-commits selftest	330.0	1	a	2026-11-13	the leg's own argv alone on a scratch clone of 2ba17e9d6 on node a, one whole run, timed by date arithmetic, close of TOOL-aNimbleMend-15
 row-grammar selftest	42.7	2	a	2026-09-24	runner
 row-keyed merge driver replay	269.1	2	a	2026-09-24	runner
