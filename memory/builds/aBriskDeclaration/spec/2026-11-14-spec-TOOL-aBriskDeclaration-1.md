@@ -1,6 +1,6 @@
 # TOOL-aBriskDeclaration-1 — `--dispatch` reads the order verb with no process, and starts the spec-token checker before the open-pass reader
 
-**Status:** INPROGRESS · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d39 · streams tooling · order 1 · ratified 2026-11-14
+**Status:** CLOSED · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d39 · streams tooling · order 1 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 

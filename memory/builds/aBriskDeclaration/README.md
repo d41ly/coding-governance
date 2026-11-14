@@ -52,13 +52,13 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-11-14 · streams tooling
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-11-14 · streams tooling
 ids TOOL-aBriskDeclaration-1
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aBriskDeclaration-1 — `--dispatch` reads the order verb with no process, and starts the spec-token checker before the open-pass reader](spec/2026-11-14-spec-TOOL-aBriskDeclaration-1.md) | 1 | 2 | INPROGRESS | rev-2 | 2026-11-14 |
+| [TOOL-aBriskDeclaration-1 — `--dispatch` reads the order verb with no process, and starts the spec-token checker before the open-pass reader](spec/2026-11-14-spec-TOOL-aBriskDeclaration-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-11-14 |
 <!-- /gen:build-units -->
 
 Records: 8 bound to this build, across 3 record folder(s).
