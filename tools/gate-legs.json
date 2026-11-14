@@ -1972,6 +1972,19 @@
     "enforces": ["principle.p2"]
   },
   {
+    "name": "loop checklist tags",
+    "argv": [
+      "python",
+      "{prefix}/loop/loop_checklist.py",
+      "check",
+      "--selftest"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p11"]
+  },
+  {
     "name": "layer dependencies (the core never depends on an expansion)",
     "argv": [
       "python",

@@ -166,6 +166,31 @@ through its `write_acceptance`, `Writer: stand-in`; `rerun --sha --cmd --expect.
 this one; a kit that does not resolve exits 2, never a pass. `--selftest` runs them and this reader's
 `computed-actor` and `computed-unserved` plants, and is gov's `loop computed witness` gate.
 
+## The checklist map
+
+One `[[checklist]]` row per handle of the unattended driver's `DOD_CORE` and `DIRECTIVES_CORE`
+(TOOL-dDeclaredLoop-11): its `registry`, its `handle` as the registry spells it before its first `:`,
+and the `item` tag whose witness the handle's check reads, and no other key, so no row stores a
+position. `read_checklist_rows` returns the rows and `check_checklist_rows` grades them both ways.
+
+`loop_checklist.py` is the command. `check` reads the two registry lines from the driver, found by
+`resolve_kit_dir` with no edge to that kit, since it requires this one, as that kit's checker reads
+them: the first `<NAME>="<members>"` line once trailing whitespace is stripped, each handle the text
+before a member's first `:`. It prints a `loop: checklist` line per row and a `loop: checklist-count`
+line per registry, and exits 1 on a refusal, 2 where the driver does not resolve or a registry line
+is absent or empty. `show <handle>` prints `<registry> <item>` from the rows alone, exit 2 for an
+unmapped handle. `--fixture --plant <case>` runs `check` with one break of `PLANTS` made in memory:
+`missing-handle`, `stale-row`, `two-rows`, `undeclared-item`, `bare-item`, `numbered-row` and
+`bad-registry`. `check --selftest` runs `check`, every plant and `show`, and is gov's
+`loop checklist tags` gate, on every automatic bar.
+
+```bash
+python <prefix>/loop/loop_checklist.py check
+python <prefix>/loop/loop_checklist.py check --selftest
+python <prefix>/loop/loop_checklist.py --fixture --plant missing-handle
+python <prefix>/loop/loop_checklist.py show reuse-probed
+```
+
 ## The reader, `loop_lib.py`
 
 | function | returns |
@@ -180,6 +205,8 @@ this one; a kit that does not resolve exits 2, never a pass. `--selftest` runs t
 | `check_disposition_record(kit_dir, record)` | `True` where the record's `Disposition` is in its `Item`'s outcome set, `None` for an undeclared item |
 | `check_computed_witnesses(data, where)` | each `[[computed-witness]]` row graded, `{name, serves, class, writer, armed-by}`, its class derived from the served item |
 | `read_computed_witnesses(kit_dir)` | the definition's computed witnesses, graded |
+| `read_checklist_rows(kit_dir)` | the `[[checklist]]` rows in file order, ungraded |
+| `check_checklist_rows(rows, registries, items)` | `(lines, refusals)`: the rows checked both ways against the two core registries' handles and the declared items |
 | `read_witness_classes(kit_dir)` | `{"classes": [...], "refused": [...]}`, the definition's witnesses graded |
 | `check_witness_classes(data, where)` | `(site, class, by)` per witness, after grading `[witnesses]`, the witness aliases, every step's `witness` and every item's |
 | `check_alias_rows(rows, members, table, where)` | nothing; refuses an alias row of either table whose `word` is a member or repeats, or whose `means` is no member |

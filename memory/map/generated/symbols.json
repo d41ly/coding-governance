@@ -5333,6 +5333,11 @@
       "file": "tools/roles/render_agents.py"
     },
     {
+      "id": "check_checklist_rows",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "check_child_forwarding",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
@@ -14390,6 +14395,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/loop/loop_checklist.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/loop/loop_lib.py"
     },
     {
@@ -17898,6 +17908,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "read_checklist_rows",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "read_checks_mode",
       "kind": "function",
       "file": "tools/playbook/load_sets.py"
@@ -18116,6 +18131,11 @@
       "id": "read_core",
       "kind": "function",
       "file": "tools/lexicon/subtokens.py"
+    },
+    {
+      "id": "read_core_registries",
+      "kind": "function",
+      "file": "tools/loop/loop_checklist.py"
     },
     {
       "id": "read_cutoff_key",
@@ -24221,6 +24241,11 @@
       "id": "resolve_charter_path",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "resolve_checklist_handle",
+      "kind": "function",
+      "file": "tools/loop/loop_checklist.py"
     },
     {
       "id": "resolve_cited_paths",
@@ -33351,6 +33376,11 @@
       "id": "write_charter_lock",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "write_checklist_plant",
+      "kind": "function",
+      "file": "tools/loop/loop_checklist.py"
     },
     {
       "id": "write_claim",

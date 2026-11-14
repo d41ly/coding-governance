@@ -42,6 +42,13 @@
 #   word   the legacy word, no member of the set
 #   means  the member it means
 #
+# One [[checklist]] row per handle of the unattended driver's DOD_CORE and DIRECTIVES_CORE
+# (TOOL-dDeclaredLoop-11), naming the item by its tag and never by a number; loop_checklist.py beside
+# this file checks the rows both ways against the two registries:
+#   registry  DOD_CORE or DIRECTIVES_CORE, the driver constant holding the handle
+#   handle    the handle, as the registry spells it before its first ":"
+#   item      the [[item]] tag whose witness the handle's check reads
+#
 # One [[item]] row per item of a gov step's program (TOOL-dDeclaredLoop-12), after every table above:
 #   tag        the item's tag, `item.<step>.<name>`, a member of the `item` namespace
 #   step       the [[step]] tag its tag opens
@@ -193,6 +200,156 @@ means = "ask"
 [[disposition-alias]]
 word = "refuse-as-duplicate"
 means = "continue"
+
+[[checklist]]
+registry = "DOD_CORE"
+handle = "gates-green"
+item = "item.test.verdict"
+
+[[checklist]]
+registry = "DOD_CORE"
+handle = "records-current"
+item = "item.deploy.record"
+
+[[checklist]]
+registry = "DOD_CORE"
+handle = "authorization-reachable"
+item = "item.deploy.mandate"
+
+[[checklist]]
+registry = "DOD_CORE"
+handle = "landed-via-lander"
+item = "item.deploy.land"
+
+[[checklist]]
+registry = "DOD_CORE"
+handle = "build-complete"
+item = "item.build.exit"
+
+[[checklist]]
+registry = "DOD_CORE"
+handle = "closing-review-recorded"
+item = "item.build.ratify"
+
+[[checklist]]
+registry = "DOD_CORE"
+handle = "specs-audited"
+item = "item.design.ready"
+
+[[checklist]]
+registry = "DOD_CORE"
+handle = "pieces-complete"
+item = "item.build.exit"
+
+[[checklist]]
+registry = "DOD_CORE"
+handle = "set-checks-recorded"
+item = "item.test.verdict"
+
+[[checklist]]
+registry = "DOD_CORE"
+handle = "keepalive-reaped"
+item = "item.deploy.unlease"
+
+[[checklist]]
+registry = "DOD_CORE"
+handle = "parked-decisions-surfaced"
+item = "item.deploy.record"
+
+[[checklist]]
+registry = "DOD_CORE"
+handle = "reuse-probed"
+item = "item.design.seams"
+
+[[checklist]]
+registry = "DOD_CORE"
+handle = "asks-disposed"
+item = "item.deploy.record"
+
+[[checklist]]
+registry = "DIRECTIVES_CORE"
+handle = "minimal-prose"
+item = "item.deploy.record"
+
+[[checklist]]
+registry = "DIRECTIVES_CORE"
+handle = "sub-specced"
+item = "item.design.unit-spec"
+
+[[checklist]]
+registry = "DIRECTIVES_CORE"
+handle = "forks-resolved"
+item = "item.design.unit-spec"
+
+[[checklist]]
+registry = "DIRECTIVES_CORE"
+handle = "specs-reviewed"
+item = "item.design.ready"
+
+[[checklist]]
+registry = "DIRECTIVES_CORE"
+handle = "reuse-first"
+item = "item.design.seams"
+
+[[checklist]]
+registry = "DIRECTIVES_CORE"
+handle = "parallel-when-disjoint"
+item = "item.build.unit-pass"
+
+[[checklist]]
+registry = "DIRECTIVES_CORE"
+handle = "passes-committed"
+item = "item.build.unit-pass"
+
+[[checklist]]
+registry = "DIRECTIVES_CORE"
+handle = "diff-reviewed"
+item = "item.build.ratify"
+
+[[checklist]]
+registry = "DIRECTIVES_CORE"
+handle = "land-once-done"
+item = "item.deploy.land"
+
+[[checklist]]
+registry = "DIRECTIVES_CORE"
+handle = "conflicts-reconciled"
+item = "item.build.resolve"
+
+[[checklist]]
+registry = "DIRECTIVES_CORE"
+handle = "wrap-up-derived"
+item = "item.deploy.record"
+
+[[checklist]]
+registry = "DIRECTIVES_CORE"
+handle = "researched"
+item = "item.design.research"
+
+[[checklist]]
+registry = "DIRECTIVES_CORE"
+handle = "solution-tested"
+item = "item.design.research"
+
+[[checklist]]
+registry = "DIRECTIVES_CORE"
+handle = "pieces-recorded"
+item = "item.build.exit"
+
+[[checklist]]
+registry = "DIRECTIVES_CORE"
+handle = "playbook-followed"
+item = "item.build.unit-pass"
+
+[[checklist]]
+registry = "DIRECTIVES_CORE"
+handle = "discoveries-adopted"
+item = "item.design.decompose"
+
+[[checklist]]
+registry = "DIRECTIVES_CORE"
+handle = "passes-harnessed"
+item = "item.build.unit-pass"
 
 # ---- Plan's program ----------------------------------------------------------------------------------
 

@@ -68,6 +68,13 @@ The definition also declares the computed witness kinds (TOOL-dDeclaredLoop-17):
 class from its served item's witness, never typed on the row; `read_computed_witnesses` returns them.
 Neither runs inside `load_loop`. The re-run stand-in, `loop_witness.py` beside this file, writes two.
 
+The definition also maps each handle of the unattended driver's two core registries onto the declared
+item whose witness its check reads (TOOL-dDeclaredLoop-11): one `[[checklist]]` row per handle, its
+`registry` of `CHECKLIST_REGISTRIES`, its `handle` and its `item` tag, and no other key, so no row stores
+a position. `read_checklist_rows` returns the rows and `check_checklist_rows` grades them both ways
+against the registries and the declared items. Neither runs inside `load_loop` or `--check`: the command
+is `loop_checklist.py` beside this file, which reads the driver's registry lines.
+
 A definition that does not hold is refused with `LoopError`, a `ValueError` naming the file and the row: a
 file that does not read or is no TOML; a `step` or `workflow` table that is no array of tables; the gov
 steps missing, repeated or out of order, a tag that is no gov step, or an `order` that is not the step's
@@ -179,6 +186,10 @@ DECLARATION_SITES = ("DOD_CORE", "DOD_EXTRA")
 ACTOR_KINDS = ("role", "command", "executor", "hook", "owner")
 #: An item's actor, `<kind>:<name>`, fullmatched; the bare `executor` and `owner` are the other form.
 ACTOR_FORM = re.compile(r"([a-z]+):([^\s,:]+)")
+#: The unattended driver's two core handle registries a `[[checklist]]` row maps from (TOOL-dDeclaredLoop-11).
+CHECKLIST_REGISTRIES = ("DOD_CORE", "DIRECTIVES_CORE")
+#: A `[[checklist]]` row's keys, and its only keys: a row never stores a position.
+CHECKLIST_KEYS = ("registry", "handle", "item")
 
 
 class LoopError(ValueError):
@@ -361,6 +372,62 @@ def read_computed_witnesses(kit_dir):
     """The `[[computed-witness]]` rows of the definition in `kit_dir`, graded by `check_computed_witnesses`,
     each with its derived `class`; LoopError where the definition or a row does not hold."""
     return check_computed_witnesses(*read_definition(kit_dir))
+
+
+def read_checklist_rows(kit_dir):
+    """The `[[checklist]]` rows of the definition in `kit_dir`, in file order, ungraded; LoopError where
+    the definition does not read or `checklist` is no array of tables."""
+    data, where = read_definition(kit_dir)
+    rows = data.get("checklist", [])
+    if not isinstance(rows, list) or not all(isinstance(r, dict) for r in rows):
+        raise LoopError(where, "'checklist' is not an array of tables")
+    return rows
+
+
+def check_checklist_rows(rows, registries, items):
+    """`(lines, refusals)` of the `[[checklist]]` `rows` against `registries`, each of
+    `CHECKLIST_REGISTRIES` mapped to its handles in order, and `items`, the declared `[[item]]` rows. A
+    refusal per row carrying a key outside `CHECKLIST_KEYS` or missing one, naming a registry outside
+    `CHECKLIST_REGISTRIES`, a handle its registry lacks or one an earlier row maps, or an item that opens
+    no `item.<step>.` of a gov step or that no declared row holds; and per core handle no row maps. A
+    `loop: checklist <registry> · <handle> · <item>` line per row, then a count line per registry."""
+    declared = {r.get("tag") for r in items}
+    shape = re.compile(r"item\.(%s)\.%s" % ("|".join(t.split(".", 1)[1] for t in STEP_TAGS), SEG.pattern))
+    lines, refusals, mapped = [], [], {}
+    for n, row in enumerate(rows, 1):
+        reg, handle, item = (row.get(k) for k in CHECKLIST_KEYS)
+        at = "checklist row %d (%s)" % (n, handle if isinstance(handle, str) and handle else "no handle")
+        extra = [k for k in row if k not in CHECKLIST_KEYS]
+        if extra:
+            refusals.append("%s carries the key %s, outside %s: a row stores no position" % (
+                at, " ".join(extra), " ".join(CHECKLIST_KEYS)))
+        missing = [k for k in CHECKLIST_KEYS if not (isinstance(row.get(k), str) and row.get(k))]
+        if missing:
+            refusals.append("%s carries no %s" % (at, " and no ".join(missing)))
+            continue
+        if reg not in CHECKLIST_REGISTRIES:
+            refusals.append("%s names the registry %s, neither of %s" % (at, reg, " ".join(CHECKLIST_REGISTRIES)))
+            continue
+        if handle not in registries.get(reg, []):
+            refusals.append("%s maps %s %s, a handle %s does not hold" % (at, reg, handle, reg))
+        elif (reg, handle) in mapped:
+            refusals.append("%s maps %s %s, which row %d maps already: one row per handle" % (
+                at, reg, handle, mapped[(reg, handle)]))
+        else:
+            mapped[(reg, handle)] = n
+        if not shape.fullmatch(item):
+            refusals.append("%s maps onto %s, which opens no item.<step>. of a gov step" % (at, item))
+        elif item not in declared:
+            refusals.append("%s maps onto %s, which no [[item]] row declares" % (at, item))
+        lines.append("loop: checklist %s · %s · %s" % (reg, handle, item))
+    for reg in CHECKLIST_REGISTRIES:
+        handles = registries.get(reg, [])
+        for handle in handles:
+            if (reg, handle) not in mapped:
+                refusals.append("%s %s has no [[checklist]] row mapping it onto an item" % (reg, handle))
+        lines.append("loop: checklist-count %s · %d handle(s) · %d mapped" % (
+            reg, len(handles), sum(1 for r, _h in mapped if r == reg)))
+    return lines, refusals
 
 
 def read_witness_classes(kit_dir):

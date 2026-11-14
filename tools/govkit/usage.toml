@@ -304,6 +304,26 @@ verb = "rerun"
 flags = ["--sha=", "--cmd=", "--expect="]
 
 [[usage]]
+id = "script:{prefix}/loop/loop_checklist.py"
+shape = "verb"
+entry = "{prefix}/loop/loop_checklist.py"
+flags = ["--fixture", "--plant="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_checklist.py#check"
+shape = "verb"
+entry = "{prefix}/loop/loop_checklist.py"
+verb = "check"
+flags = ["--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_checklist.py#show"
+shape = "verb"
+entry = "{prefix}/loop/loop_checklist.py"
+verb = "show"
+flags = []
+
+[[usage]]
 id = "script:{prefix}/loop/adopt-loop.sh"
 shape = "verb"
 entry = "{prefix}/loop/adopt-loop.sh"

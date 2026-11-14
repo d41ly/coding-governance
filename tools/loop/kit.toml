@@ -22,6 +22,9 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # deviation_join inside its functions, under the edge above, and its `hold-inherited` plant runs the
 # unattended driver, which requires this kit, so that reach takes no edge and exits 2 where the driver
 # does not resolve; the plant's leg is gov's own, an [[exempt_leg]] of the registry, no row here.
+# The checklist command, loop_checklist.py (TOOL-dDeclaredLoop-11), reads that driver's two core
+# registry lines as text, found the same way, so it takes no edge either and exits 2 where the driver
+# does not resolve; its leg is gov's own [[exempt_leg]] too.
 requires = ["memory-tree"]
 
 # Everything the kit ships is engine, overwritten on every update: the definition, its reader, the

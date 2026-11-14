@@ -189,6 +189,63 @@ only when the attribution record of the bar its `gates-run` fact names reads eve
 `INHERITED`, as `--handoff --code owner-landing` already is. A close that prints the inherited-red hold
 also records which paths it staged, so committing them before holding keeps the bar tied.
 
+## Checklist handles and their items
+
+The unattended driver names each Definition of Done item and each method directive by a handle,
+such as `gates-green` or `reuse-first`, in its two core registries, `DOD_CORE` and `DIRECTIVES_CORE`.
+The file maps every one of those handles onto the declared item whose witness the handle's check
+reads, one `[[checklist]]` row each:
+
+```toml
+[[checklist]]
+registry = "DOD_CORE"          # DOD_CORE or DIRECTIVES_CORE
+handle = "gates-green"         # as the registry spells it before its first ":"
+item = "item.test.verdict"     # the declared item whose witness the check reads
+```
+
+A row holds those three keys and no other, so it never stores a position: an item is reached by its
+tag, and the registry's word order is only the order the driver shows. Several handles may map onto
+one item, such as `item.deploy.record`.
+
+- **Find a handle's item:** `python tools/loop/loop_checklist.py show reuse-probed` reads the rows <!-- usage: script:tools/loop/loop_checklist.py#show 8af12fd7 -->
+  alone and prints the handle's registry and item. A handle no row maps exits 2.
+
+  ```text
+  DOD_CORE item.design.seams
+  ```
+
+- **Check the map:** `check` reads the two registry lines from the unattended driver and checks the <!-- usage: script:tools/loop/loop_checklist.py#check a625a5c2 -->
+  rows both ways. It prints one `loop: checklist` line per row and a `loop: checklist-count` line per
+  registry, and exits 0. It exits 1, naming the row, the handle or the key, when a core handle has
+  no row, a row names a handle its registry does not hold, a handle has two rows, a row's item is no
+  `item.<step>.<name>` tag the file declares, a row carries a key beyond the three, or a row's
+  registry is neither core registry. It exits 2 when the driver is not installed, or a registry line
+  is missing or empty, so it is never green over nothing. `check --selftest` runs `check`, every
+  case below and `show`, and the `loop checklist tags` gate runs it on every push and landing.
+
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and reads the unattended driver beside it -->
+  ```bash
+  python tools/loop/loop_checklist.py check
+  python tools/loop/loop_checklist.py --fixture --plant missing-handle
+  ```
+
+  ```text
+  loop: checklist DOD_CORE · gates-green · item.test.verdict
+  loop: checklist-count DIRECTIVES_CORE · 17 handle(s) · 17 mapped
+  ```
+
+- **See a refusal:** `--fixture --plant <case>` runs `check` with one break made in memory and exits <!-- usage: script:tools/loop/loop_checklist.py d6167c09 -->
+  1 on the refusal it must draw. The cases are `missing-handle` (a handle added to `DOD_CORE` that no
+  row maps), `stale-row` (a row whose handle no registry holds), `two-rows` (a second row for
+  `gates-green`), `undeclared-item` (a row mapping onto an item the file does not declare),
+  `bare-item` (a row mapping onto an item tag without its `item.` opening), `numbered-row` (a row
+  carrying a `number` key) and `bad-registry` (a row whose registry is `DOD_EXTRA`). The files on
+  disk are never changed.
+
+The check does not judge whether a pairing is the right item, which is a review's call, or whether a
+handle's checker word agrees with its item's witness class. `DOD_EXTRA` and `DIRECTIVES_EXTRA`, your
+own handles, are not mapped here.
+
 ## The owner's disposition record
 
 When the owner answers a held item, the answer is one record in the build's `build/` folder, written
@@ -326,3 +383,5 @@ kit's role files for the role items' defaults, without requiring that kit: where
 installed, each role item prints `unarmed`. `loop_witness.py` writes its records through the
 memory-tree kit, and its `hold-inherited` case runs the unattended driver without requiring that kit,
 since the unattended kit requires this one; its gate is gov's own and an install does not carry it.
+`loop_checklist.py` reads the unattended driver's two registry lines the same way, and its
+`loop checklist tags` gate is gov's own too.
