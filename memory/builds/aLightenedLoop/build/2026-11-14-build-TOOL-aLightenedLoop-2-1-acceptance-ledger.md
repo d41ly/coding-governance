@@ -79,6 +79,6 @@ timings are AC5's.
 
 - The `New arm:` lines of §7, all in `tools/unattended/unattended.test.sh`, RED against the driver at
   `846d51d39` and GREEN at the tip: the `wake` AC1 arms after the task-registry block, the AC2
-  `wk_full` arms beside them plus the `orphans` hit in the process-ledger AC4 block, the AC3 cadence
+  `check_wake_full` arms beside them plus the `orphans` hit in the process-ledger AC4 block, the AC3 cadence
   arms, and the parity table's `wake` row.
 - §7's legs, `bash tools/unattended/run-unattended-gates.sh --pooled`, and the merge bar.
