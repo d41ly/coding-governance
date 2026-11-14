@@ -10,18 +10,18 @@ under the session's temp `nm16out` folder and are not tracked.
 
 ## The asks' accept lines
 
-| Ask | Run, on a clone at | What it printed |
+| Record | Run, on a clone at | What it printed |
 |---|---|---|
-| TOOL-aNimbleMend-16 | the gate guard's suite, `48ee864e3` | `216 passed, 0 failed`, no line opening `FAIL parity:` (PINNED 2026-11-13) |
-| TOOL-aNimbleMend-17 | the scratch guard's suite, `1b75a3b0e` | `385 passed, 0 failed`, no `S-AC2`, `S-AC3`, `S-AC5` or `S-AC8` FAIL line (PINNED 2026-11-13) |
-| TOOL-aNimbleMend-18 | the spec-token suite, `7cbe4a220` | `PASS (253 assertions)`, no `arm FAIL` line naming parity (PINNED 2026-11-13) |
-| TOOL-aNimbleMend-19 | the hygiene self-test, `ab84f0372` | exit 0, `PASS (731 assertions)` (PINNED 2026-11-13) |
-| TOOL-aNimbleMend-20 | the policy fixtures leg, `7d58d947e` | `922 assertion(s) executed · 0 wrong` (PINNED 2026-11-13) |
-| TOOL-aNimbleMend-23 | the `red-fix-join` plant, `1e516f5af` | `PASS red-fix-join — 19 cases` (PINNED 2026-11-13) |
-| TOOL-aNimbleMend-25, -26 | the two lint commands, `8db6f4bef` | exit 0 and `0 red`, disposed in this build's backlog |
-| TOOL-aNimbleMend-21 | five `--staged` hygiene runs, `8db6f4bef` | no `unbound variable` line; cured by TOOL-aWitnessedCrash-1, disposed in the backlog |
-| TOOL-aNimbleMend-24 | the practice catalogue and the protocol's section 12 | the owner's two rulings, written by units 1 and 2 |
-| TOOL-aNimbleMend-22 | two timing rounds, `1e516f5af` | parked in the backlog: the node was never quiet |
+| ask TOOL-aNimbleMend-16 | the gate guard's suite, `48ee864e3` | `216 passed, 0 failed`, no line opening `FAIL parity:` (PINNED 2026-11-13) |
+| ask TOOL-aNimbleMend-17 | the scratch guard's suite, `1b75a3b0e` | `385 passed, 0 failed`, no `S-AC2`, `S-AC3`, `S-AC5` or `S-AC8` FAIL line (PINNED 2026-11-13) |
+| ask TOOL-aNimbleMend-18 | the spec-token suite, `7cbe4a220` | `PASS (253 assertions)`, no `arm FAIL` line naming parity (PINNED 2026-11-13) |
+| ask TOOL-aNimbleMend-19 | the hygiene self-test, `ab84f0372` | exit 0, `PASS (731 assertions)` (PINNED 2026-11-13) |
+| ask TOOL-aNimbleMend-20 | the policy fixtures leg, `7d58d947e` | `922 assertion(s) executed · 0 wrong` (PINNED 2026-11-13) |
+| ask TOOL-aNimbleMend-23 | the `red-fix-join` plant, `1e516f5af` | `PASS red-fix-join — 19 cases` (PINNED 2026-11-13) |
+| ask TOOL-aNimbleMend-25, -26 | the two lint commands, `8db6f4bef` | exit 0 and `0 red`, disposed in this build's backlog |
+| ask TOOL-aNimbleMend-21 | five `--staged` hygiene runs, `8db6f4bef` | no `unbound variable` line; cured by TOOL-aWitnessedCrash-1, disposed in the backlog |
+| ask TOOL-aNimbleMend-24 | the practice catalogue and the protocol's section 12 | the owner's two rulings, written by units 1 and 2 |
+| ask TOOL-aNimbleMend-22 | two timing rounds, `1e516f5af` | parked in the backlog: the node was never quiet |
 
 ## The suites at the tip of each later unit
 
