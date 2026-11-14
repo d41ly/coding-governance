@@ -3187,6 +3187,7 @@ for m in unattended attended; do
   same "OC4 AC1 child $m untyped: its prompt equals the empty-roles run's, byte for byte" \
     "$(printf '%s\n' "$o" | grep '^promptjson:')" "$(run_wf "$(printf "$CHILD_ARGS" $m | sed "$OC_EMPTY")" '{}' "$C" | grep '^promptjson:')"
   has    "OC4 AC1 child $m untyped: it is told to change its spec first" "$o" "CHANGE THE SPEC FIRST"
+  has    "aLightenedLoop-4 AC3 child $m untyped: it checks its spec can be built first" "$o" "check that the spec can be built as written"
   hasnt_ "OC4 AC1 child $m untyped: ...and not to hand a divergence back" "$o" "a why that opens DIVERGENCE:"
   hasnt_ "OC4 AC1 child $m untyped: ...nor the status-only flip" "$o" "changes nothing else in the spec"
   hasnt_ "OC4 AC1 child $m untyped: ...nor a role stamp" "$(printf '%s\n' "$o" | grep '^prompt:')" "This stage runs as the"
@@ -3199,6 +3200,7 @@ has    "OC4 AC4 ...handing a divergence back" "$o" "a why that opens DIVERGENCE:
 has    "OC4 AC4 ...with the status-only flip" "$o" "changes nothing else in the spec"
 hasnt_ "OC4 AC4 ...and never told to edit its spec" "$o" "CHANGE THE SPEC FIRST"
 hasnt_ "OC4 AC4 ...nor to close as WONTDO" "$o" "or to WONTDO with a reason"
+hasnt_ "aLightenedLoop-4 AC3 ...and its prompt leaves the feasibility check to the role" "$o" "check that the spec can be built as written"
 o=$(run_wf "$OC_CT" '{"build":{"committed":false,"sha":"","why":"DIVERGENCE: §4 names a verb the code lacks","summary":"s"}}' "$C")
 has    "OC4 AC4 a DIVERGENCE: why returns diverged true" "$o" '"diverged":true'
 o=$(run_wf "$OC_CT" '{"build":{"committed":false,"sha":"","why":"tests red","summary":"s"}}' "$C")
