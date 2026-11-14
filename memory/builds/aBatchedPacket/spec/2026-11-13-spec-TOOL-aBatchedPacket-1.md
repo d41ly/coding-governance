@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-13-build-TOOL-aBatchedPacket-1-analysis.md](../build/2026-11-13-build-TOOL-aBatchedPacket-1-analysis.md) | research | — |
 | [2026-11-14-build-TOOL-aBatchedPacket-1-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aBatchedPacket-1-1-acceptance-ledger.md) | journal | — |
+| [2026-11-14-build-TOOL-aBatchedPacket-1-red-fix-1.md](../build/2026-11-14-build-TOOL-aBatchedPacket-1-red-fix-1.md) | red-fix | — |
 | [2026-11-13-prompt-TOOL-aBatchedPacket-1-1-builder.md](../prompts/2026-11-13-prompt-TOOL-aBatchedPacket-1-1-builder.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aBatchedPacket-1-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-aBatchedPacket-1-1-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aBatchedPacket-1-brief.md](../prompts/2026-11-13-prompt-TOOL-aBatchedPacket-1-brief.md) | research | — |

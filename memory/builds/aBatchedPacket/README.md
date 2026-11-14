@@ -63,7 +63,7 @@ ids TOOL-aBatchedPacket-1 TOOL-aBatchedPacket-2
 | [TOOL-aBatchedPacket-2 — the closing review's round 1 repaired: each arm of the front door's suite able to fail on the read it names, the leg's owed rows, and a parent read that declines under a foreign git location](spec/2026-11-13-spec-TOOL-aBatchedPacket-2.md) | 2 | 2 | CLOSED | rev-1 | 2026-11-14 |
 <!-- /gen:build-units -->
 
-Records: 11 bound to this build, across 4 record folder(s).
+Records: 12 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
