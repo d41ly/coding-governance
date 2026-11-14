@@ -827,6 +827,10 @@ run_planted "D6 a quoted > glued before a redirection is an argument -> allow"  
 # operator is the target's, so bash runs the leg with its output redirected: the leg, denied.
 run_planted "D6 a quoted > opening a glued target after > -> deny"  2 "$B" "$M_FLAG >'>x.log'"
 run_planted "D6 a quoted > opening a glued target after 2> -> deny"  2 "$B" "$M_FLAG 2>'>x.log'"
+# TOOL-aClearedLedger-16, review round 4's item M1: a quote opening after a complete operator leaves
+# a glued redirection, so the target is dropped and the words are the leg's: the leg, denied.
+run_planted "D6 the leg with a quoted target glued to > -> deny"  2 "$B" "$M_FLAG >\"x.log\""
+run_planted "D6 the leg with a quoted target glued to 2> -> deny"  2 "$B" "$M_FLAG 2>\"x.log\""
 F=$(build_fixture VERIFYING)
 run_planted "D6 the over-bound leg at VERIFYING -> allow"                 0 "$F" "$M_FLAG"
 build_manifest 300
@@ -872,7 +876,10 @@ n=$((pass+fail))
 # static count of the arms above at ~10% headroom, because the pass that wrote this file may not
 # run it (the hook it tests denies the invocation at BUILDING); the main loop's first green at
 # VERIFYING confirms the executed count against this floor. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=221
+FLOOR_ASSERTIONS=223
+# RAISED 221 -> 223 at TOOL-aClearedLedger-16, by the static count of the assertions it added to the
+# arm class "a manifest suite in flag form", two: the leg with a double-quoted target glued to `>`
+# and to `2>`, each the leg with its output redirected.
 # RAISED 219 -> 221 at TOOL-aClearedLedger-15, by the static count of the assertions it added to the
 # arm class "a manifest suite in flag form", two: a quoted `>` opening a glued target after `>` and
 # after `2>`, each the leg with its output redirected.

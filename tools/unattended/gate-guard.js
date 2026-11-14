@@ -65,7 +65,7 @@
  *       and reads the manifest uncommitted. The spec lint's bar join holds the same rule and reads
  *       these spellings this row does not: a redirection carrying `&`
  *       ahead of the direct-check word, a glued variable prefix (`${DIR}<script>`), a quoted
- *       mention, a quoted operator character before a redirection (`'&'>x.log`, `'>' x.log`),
+ *       mention, a quoted operator character before a redirection (`'&'>x.log`, `'>'>x.log`),
  *       which this row keeps as an argument, and a `bash -c` body inside another.
  * A D2, D3 or D4 token is NOT a hit when the same simple command carries one of READ_ONLY_VERBS:
  * those forms answer in seconds and one of them is how the memory-tree kit re-renders its guides.
@@ -366,12 +366,12 @@ function readQuotedSubstitutions(text, tool) {
  * (closing round 3, T4): pairing the outer `"` with the first `"` inside the span split
  * `msg="$(printf "%s" "run bash <suite> next")"` into an assignment word and a launcher at head.
  * Bash's rule under both tools; the span itself is read back by readQuotedSubstitutions.
- * A word also ends before an unquoted `>` or `<` once it holds quoting or anything but descriptor
- * digits and operator characters, outside `${…}` (TOOL-aClearedLedger-11, narrowed by
- * TOOL-aClearedLedger-12 so a two-character operator is one word, and by TOOL-aClearedLedger-14 so
- * a quoted character is never part of an operator). The reader is shared, so rows D2 to D4 see a
- * glued redirection too. It returns `quotedAt`, the offset in the word where its quoting opened,
- * -1 for a word with none.
+ * A word also ends before an unquoted `>` or `<` once it holds quoting, an empty pair included, or
+ * anything but descriptor digits and operator characters, outside `${…}` (TOOL-aClearedLedger-11,
+ * narrowed by TOOL-aClearedLedger-12 so a two-character operator is one word, and by
+ * TOOL-aClearedLedger-14 so a quoted character is never part of an operator). The reader is shared,
+ * so rows D2 to D4 see a glued redirection too. It returns `quotedAt`, the offset in the word where
+ * its quoting opened, -1 for a word with none.
  */
 function readTokenAt(cmd, from, stop) {
   let i = from
@@ -405,13 +405,14 @@ function readTokenAt(cmd, from, stop) {
       out += ch
     } else if (/[\s;|&(){}`]/.test(ch)) {
       break
-    } else if ((ch === '>' || ch === '<') && !brace && out !== '' && (quotedAt >= 0 || !/^\d*[<>]*$/.test(out))) {
+    } else if ((ch === '>' || ch === '<') && !brace && (quotedAt >= 0 || !/^\d*[<>]*$/.test(out))) {
       // A glued redirection ends the word (TOOL-aClearedLedger-11): `x.py --selftest>x.log` is the
       // flag and then a redirection word. While the word so far is unquoted descriptor digits and
       // operator characters, it is read on (TOOL-aClearedLedger-12): `>>`, `2>>` and `<<<` stay one
       // word, so REDIRECT_RE drops the operator with its target, glued or spaced. A word holding
       // quoting ends here, as bash ends it: `'&'>x.log` and `'>'>x.log` are an argument and then
-      // a redirection (TOOL-aClearedLedger-14).
+      // a redirection (TOOL-aClearedLedger-14). An empty pair is quoting too: `"">x.log` is an empty
+      // argument and then a redirection (TOOL-aClearedLedger-16).
       break
     } else {
       out += ch

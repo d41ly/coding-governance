@@ -528,8 +528,10 @@ def check_bar(tok, flag_suites=()):
     These are hits here and not there: a redirection carrying `&` ahead of the direct-check word
     (`<script> 2>&1 --selftest`, where the hook cuts the command at the `&`);
     a glued variable prefix (`${DIR}<script>`, which splits here at the braces); a quoted mention;
-    a quoted operator character before a redirection, which this reader reads with its quotes out
-    and the hook keeps as an argument; and a `bash -c` body inside another."""
+    a quoted operator character before a redirection, which the hook keeps as an argument: a
+    quoted `&` splits the command here because the split pattern has no quote state, and a quoted
+    `>` is read with its quotes out and dropped as a redirection; and a `bash -c` body inside
+    another."""
     if BAR.search(tok):
         return BAR_WHY
     for command in SIMPLE_COMMAND_SPLIT.split(tok):
