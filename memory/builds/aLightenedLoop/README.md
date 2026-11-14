@@ -69,7 +69,7 @@ ids TOOL-aLightenedLoop-1 TOOL-aLightenedLoop-2 TOOL-aLightenedLoop-3 TOOL-aLigh
 | [TOOL-aLightenedLoop-5 — the stop-guard caches the `--liveness` verdict, keyed on every input the verdict reads and expired by the liveness clock](spec/2026-11-14-spec-TOOL-aLightenedLoop-5.md) | 5 | 2 | SPECCED | rev-2 | 2026-11-14 |
 <!-- /gen:build-units -->
 
-Records: 12 bound to this build, across 3 record folder(s).
+Records: 13 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

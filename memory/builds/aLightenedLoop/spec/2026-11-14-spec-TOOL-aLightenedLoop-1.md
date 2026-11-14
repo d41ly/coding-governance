@@ -10,6 +10,7 @@
 | [2026-11-14-build-TOOL-aLightenedLoop-1-analysis.md](../build/2026-11-14-build-TOOL-aLightenedLoop-1-analysis.md) | research | TOOL-aLightenedLoop-2 TOOL-aLightenedLoop-3 TOOL-aLightenedLoop-4 TOOL-aLightenedLoop-5 |
 | [2026-11-14-build-TOOL-aLightenedLoop-1-override-1.md](../build/2026-11-14-build-TOOL-aLightenedLoop-1-override-1.md) | override | — |
 | [2026-11-14-build-TOOL-aLightenedLoop-1-red-fix-1.md](../build/2026-11-14-build-TOOL-aLightenedLoop-1-red-fix-1.md) | red-fix | — |
+| [2026-11-14-build-TOOL-aLightenedLoop-1-red-fix-2.md](../build/2026-11-14-build-TOOL-aLightenedLoop-1-red-fix-2.md) | red-fix | — |
 | [2026-11-14-prompt-TOOL-aLightenedLoop-1-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aLightenedLoop-1-1-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aLightenedLoop-1-brief.md](../prompts/2026-11-14-prompt-TOOL-aLightenedLoop-1-brief.md) | research | TOOL-aLightenedLoop-2 TOOL-aLightenedLoop-3 TOOL-aLightenedLoop-4 TOOL-aLightenedLoop-5 |
 | [2026-11-14-prompt-TOOL-aLightenedLoop-1-fork-answers.md](../prompts/2026-11-14-prompt-TOOL-aLightenedLoop-1-fork-answers.md) | research | TOOL-aLightenedLoop-3 TOOL-aLightenedLoop-5 |
