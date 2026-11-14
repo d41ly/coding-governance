@@ -32,7 +32,7 @@ The two reads:
 
 THE FALLBACK. The shortcuts are bound to content: `INSTRUMENT_BLOBS` holds the git blob id of each
 instrument whose internals they rely on, compared with the file's bytes BEFORE anything is loaded.
-With any role moved, with `tree_lib.py` not found by `resolve_kit_dir`, or with no shortcut mode among the
+With any role moved, with `tree_lib.py` not beside this script, or with no shortcut mode among the
 arguments, the door prints one stderr line, `chain-packet: shortcuts off, ...`, naming every
 reason, and runs the instrument as a child. A re-pinned or stubbed instrument is therefore graded
 the slow way, never by a shortcut read against other bytes. The ids are constants with no
@@ -73,6 +73,28 @@ from pathlib import Path
 sys.dont_write_bytecode = True
 
 HERE = Path(__file__).resolve().parent
+INSTRUMENT_DIR = "memory/builds/dClosedLoop/build"
+# One git blob id per instrument, each with the reliance points read against that blob. A landing
+# that moves an instrument reads its points again against the new bytes, then sets the constant.
+INSTRUMENT_BLOBS = {
+    # The module names `subprocess`, `carries` and `schedule`; `INSTRUMENTS[0]`, the carries
+    # instrument's path; the report call's argument shape in `derive_sources`,
+    # `[sys.executable, INSTRUMENTS[0], "--report", slug]`, of whose result it reads `returncode`,
+    # `stderr` and `stdout.strip()`; `main`, `render_packet`, `Refusal`, `Unmeasured`; and the two
+    # `lru_cache` readers `read_tree` and `read_asks`.
+    "packet": "cab3bff165a1bb61a5854f58d350912e79a7b34b",
+    # `design()` returning `(builds, nodes, retired)`; `join(builds, nodes, retired, specs, only)`,
+    # whose second result is the carriers and whose one read of a revision list sits under
+    # `if revs:` and feeds findings alone; `report(b, builds, nodes, specs, carriers)`;
+    # `real_specs`'s sorted `*.md` glob of each build's `spec/` folder, read as UTF-8; and `main`'s
+    # `--report` branch, which prints `report` and returns 0.
+    "carries": "0b5fab9cc06d7b03c50ab94522092e2b9e266ce3",
+    # `git(*args, check=True)` returning stdout decoded `text=True, encoding="utf-8"`; and the two
+    # calls `tree_state` makes, `git("ls-tree", "-r", "--name-only", ref, <folder>)` once per
+    # build and `git("show", f"{ref}:{p}")` once per listed path.
+    "schedule": "5aa5421e265b02ba4478f8860ad9a4f5fea94500",
+}
+FAST_MODES = ("--write", "--check", "--fixture")
 
 
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
@@ -113,35 +135,6 @@ def resolve_kit_dir(home, anchor, here):
     raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
-
-
-# The memory-tree kit is RESOLVED, never spelled (TOOL-aCarriedStop-10); None when it does not resolve.
-try:
-    KIT_DIR = resolve_kit_dir("memory-tree", "tree_lib.py", HERE)
-except LookupError:
-    KIT_DIR = None
-INSTRUMENT_DIR = "memory/builds/dClosedLoop/build"
-# One git blob id per instrument, each with the reliance points read against that blob. A landing
-# that moves an instrument reads its points again against the new bytes, then sets the constant.
-INSTRUMENT_BLOBS = {
-    # The module names `subprocess`, `carries` and `schedule`; `INSTRUMENTS[0]`, the carries
-    # instrument's path; the report call's argument shape in `derive_sources`,
-    # `[sys.executable, INSTRUMENTS[0], "--report", slug]`, of whose result it reads `returncode`,
-    # `stderr` and `stdout.strip()`; `main`, `render_packet`, `Refusal`, `Unmeasured`; and the two
-    # `lru_cache` readers `read_tree` and `read_asks`.
-    "packet": "cab3bff165a1bb61a5854f58d350912e79a7b34b",
-    # `design()` returning `(builds, nodes, retired)`; `join(builds, nodes, retired, specs, only)`,
-    # whose second result is the carriers and whose one read of a revision list sits under
-    # `if revs:` and feeds findings alone; `report(b, builds, nodes, specs, carriers)`;
-    # `real_specs`'s sorted `*.md` glob of each build's `spec/` folder, read as UTF-8; and `main`'s
-    # `--report` branch, which prints `report` and returns 0.
-    "carries": "0b5fab9cc06d7b03c50ab94522092e2b9e266ce3",
-    # `git(*args, check=True)` returning stdout decoded `text=True, encoding="utf-8"`; and the two
-    # calls `tree_state` makes, `git("ls-tree", "-r", "--name-only", ref, <folder>)` once per
-    # build and `git("show", f"{ref}:{p}")` once per listed path.
-    "schedule": "5aa5421e265b02ba4478f8860ad9a4f5fea94500",
-}
-FAST_MODES = ("--write", "--check", "--fixture")
 
 
 def derive_blob(path):
@@ -282,14 +275,16 @@ def main(argv):
         print("chain-packet: --parity takes one slug and nothing else", file=sys.stderr)
         return 2
     reasons = scan_moved(found)
-    tree_lib = None
-    if KIT_DIR is None:
+    tree_lib = kit = None
+    try:
+        kit = resolve_kit_dir("memory-tree", "tree_lib.py", HERE)
+    except LookupError:
         reasons.append("tree_lib.py is not beside this script")
     if not parity and not any(a in FAST_MODES for a in argv):
         reasons.append("no shortcut mode in the arguments")
     if not reasons:     # nothing is loaded before the blobs have been compared
         try:
-            tree_lib = load_module("tree_lib", KIT_DIR / "tree_lib.py")
+            tree_lib = load_module("tree_lib", kit / "tree_lib.py")
         except Exception:
             reasons.append("tree_lib.py is not beside this script")
     if reasons:

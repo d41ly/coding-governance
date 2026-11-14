@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-13-build-TOOL-aBatchedPacket-1-analysis.md](../build/2026-11-13-build-TOOL-aBatchedPacket-1-analysis.md) | research | — |
 | [2026-11-14-build-TOOL-aBatchedPacket-1-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aBatchedPacket-1-1-acceptance-ledger.md) | journal | — |
+| [2026-11-14-build-TOOL-aBatchedPacket-1-red-fix-1.md](../build/2026-11-14-build-TOOL-aBatchedPacket-1-red-fix-1.md) | red-fix | — |
 | [2026-11-13-prompt-TOOL-aBatchedPacket-1-1-builder.md](../prompts/2026-11-13-prompt-TOOL-aBatchedPacket-1-1-builder.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aBatchedPacket-1-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-aBatchedPacket-1-1-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aBatchedPacket-1-brief.md](../prompts/2026-11-13-prompt-TOOL-aBatchedPacket-1-brief.md) | research | — |
@@ -286,8 +287,8 @@ CP3, CP4 and CP5 also assert that stderr holds no `shortcuts off` line, so a run
 cannot pass as a fast one. When an instrument's blob has moved at HEAD those three arms fail naming
 the role, which is F2.
 
-The suite's wall-clock ceiling is 900 s, declared on its manifest row. Its cost is roughly eleven
-packet renders on T at about 15 s each plus the clone (UNVERIFIED estimate, from the prototype's
+The suite's wall-clock ceiling is 900 s, declared on its manifest row. Its cost is roughly eleven <!-- PINNED 2026-11-14 -->
+packet renders on T at about 15 s each plus the clone (UNVERIFIED estimate, from the prototype's <!-- PINNED 2026-11-14 -->
 16.8 s on the full tree); the builder records the first measured reading.
 
 What the suite does not check: the full tree, speed, the `--fixture` route, and a moved `carries`
@@ -399,7 +400,7 @@ blob binding is the dark state: with any instrument moved, every call is the ins
 - **An unconditional fast path.** A re-pinned or stubbed instrument would be graded by shortcuts
   read against other bytes.
 - **The suite's arms inside the checker's suite.** The fast-path arms need the real instruments on
-  a real tree, minutes of work against that suite's 130 s budget row. F1 holds the choice.
+  a real tree, minutes of work against that suite's 130 s budget row. F1 holds the choice. <!-- PINNED 2026-11-14 -->
 
 ## 5. Production-readiness checklist
 
@@ -408,7 +409,7 @@ blob binding is the dark state: with any instrument moved, every call is the ins
   with no environment or flag form. The door imports only tracked files it has hashed, plus
   `tree_lib.py`.
 - perf / scale — about 20 processes where the instrument makes 15,465 (PINNED, the analysis record).
-  What remains is the `--asks` child, about 13 s, out of scope.
+  What remains is the `--asks` child, about 13 s, out of scope. <!-- PINNED 2026-11-14 -->
 - error / empty / loading states — no instrument or several: exit 2 and one line. A moved role:
   the instrument as a child. An in-process report that raises: the instrument's own child. A batch
   read that fails: the instrument's own reads.
@@ -431,12 +432,12 @@ command runs from the root of the tree it names.
 
 - **AC1** — When `python <door> --check dDeclaredLoop` runs in `<clone>`, its stdout is the eight
   lines the instrument printed there, it exits 1, its stderr holds no `chain-packet:` line, and it
-  finishes in under 60 s.
+  finishes in under 60 s. <!-- PINNED 2026-11-14 -->
   Red when: a read is answered from other bytes, or the run fell back to the instrument.
   figure: 60 s is PINNED, the brief's bound; the instrument's 845.5 s is PINNED, 2026-11-13.
   cost: none beyond the run if the instrument's output was kept; otherwise one instrument run.
 - **AC2** — When `python <door> --write dDeclaredLoop` runs in `<clone>`, it prints one line opening
-  `packet: wrote`, exits 0 and finishes in under 60 s; `python <door> --check dDeclaredLoop` then
+  `packet: wrote`, exits 0 and finishes in under 60 s; `python <door> --check dDeclaredLoop` then <!-- PINNED 2026-11-14 -->
   prints a summary line carrying `byte compare green`.
   Red when: the write path is not routed through the instrument's `main`.
   figure: 60 s is PINNED, the brief's bound.
@@ -470,7 +471,7 @@ command runs from the root of the tree it names.
 - **AC10** — When `python tools/check-spec-tokens.py` runs in a copy of `<clone>` whose
   `memory/builds/dDeclaredLoop/RUN.md` ends with an added `phase: BUILDING` line, it prints
   `packet join · 1 live chain run(s) · 1 packet(s) checked` and a `[packet]` hit quoting the
-  instrument's summary line, and finishes in under 180 s.
+  instrument's summary line, and finishes in under 180 s. <!-- PINNED 2026-11-14 -->
   Red when: the join still runs the instrument's walk.
   figure: 180 s is PINNED, the brief's "a few minutes"; the checker alone took 45.9 s there
   (PINNED, 2026-11-13).

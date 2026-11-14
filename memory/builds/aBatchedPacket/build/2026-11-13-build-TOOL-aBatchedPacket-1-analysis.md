@@ -19,7 +19,7 @@ completeness arms and the pin arm. Both start with `derive_sources(slug)`, which
 | the design: v2's `[chain]` rows, the owned nodes | `carries.design()`, in-process, which loads `map.py` | 6 git |
 | the baseline clauses | one `git show <baseline>:<v2>` | 1 |
 | the as-built view, the gap register, v2's sections | file reads | 0 |
-| each parent's state | `schedule.tree_state("HEAD", …)`: one `git ls-tree` per parent, one `git show HEAD:<spec>` per parent spec | 2 + 125 for dDeclaredLoop, whose two parents hold 80 and 45 specs |
+| each parent's state | `schedule.tree_state("HEAD", …)`: one `git ls-tree` per parent, one `git show HEAD:<spec>` per parent spec | 2 + 125 for dDeclaredLoop, whose two parents hold 80 and 45 specs | <!-- PINNED 2026-11-14 -->
 | the README roster, the decision row | file reads | 0 |
 | the coverage field | a child: `carries.py --report <slug>` | 1 python, and see below |
 | the open asks | a child: `gen_build_index.py --asks --build dClosedLoop --json` | 1 python |
@@ -134,7 +134,7 @@ clone of `8db6f4bef`; `fd` is a frozen clone of the live run's tip `f75d11d47`, 
 | Step | Clone | Before | After | Same output |
 |---|---|---|---|---|
 | `packet.py --check dDeclaredLoop`, packet stale | fc | 845.5 s, 15,465 processes, exit 1 | 16.8 s, 20 processes, exit 1 | the eight lines, by `diff` |
-| `packet.py --write dDeclaredLoop` | fc | 859.3 s, 15,459 processes, exit 0 | 16.2 s, 14 processes, exit 0 | the packet, 73,446 bytes, by `cmp`; sha1 `3f79a259` both |
+| `packet.py --write dDeclaredLoop` | fc | 859.3 s, 15,459 processes, exit 0 | 16.2 s, 14 processes, exit 0 | the packet, 73,446 bytes, by `cmp`; sha1 `3f79a259` both | <!-- PINNED 2026-11-14 -->
 | `--check dDeclaredLoop` after that write | fc | not run | 17.5 s, exit 0, byte compare green | |
 | `check-spec-tokens.py`, no live chain run | fc | 45.9 s, 26 processes, exit 0 | unchanged path | |
 | `check-spec-tokens.py`, one live chain run | fd | 1,062.1 s, 15,509 processes, exit 1 | 57.9 s, 46 processes, exit 1 | every line, the `[packet]` hit included, by `diff` |
@@ -143,7 +143,7 @@ The last row is the dispatch declaration's cost: `run_spec_token_check` runs tha
 rest of `verb_dispatch` reads the run-state file and spec headers. Its "after" was taken with the
 checker's packet join pointed at the prototype in the clone, the one-line change the unit makes.
 
-The instrument's fixture, through the prototype on `fc`, each about 20 s: the unplanted fixture exits
+The instrument's fixture, through the prototype on `fc`, each about 20 s: the unplanted fixture exits <!-- PINNED 2026-11-14 -->
 0; the plants `clause`, `gap`, `parent`, `owed`, `roster`, `ask`, `hand-edit` and `pin` exit 1, each
 with its one finding; `run-live`, `run-unpushed`, `run-dirty`, `run-live-agent` and
 `run-live-detached` exit 1 refused; `run-landed`, `run-pushed` and `run-live-owner` exit 0; the pin
@@ -162,7 +162,7 @@ loaded than at the prototype's readings:
 | `--check dDeclaredLoop`, packet stale | fc | 845.5 s, 15,465 processes | 26.4 s and 50.2 s in two runs, 23 processes | the eight lines, by `diff` |
 | `--write dDeclaredLoop` | fc | 859.3 s, 15,459 processes | 22.1 s and 18.2 s, 17 processes | the packet, by `cmp` |
 | `check-spec-tokens.py`, one live chain run | fd | 1,062.1 s, 15,509 processes | 97.7 s and 95.7 s, 49 processes | every line, by `diff` |
-| `--parity dDeclaredLoop` | fc | | identical, 73,446 bytes, 2,142 s for the instrument's walk under load | |
+| `--parity dDeclaredLoop` | fc | | identical, 73,446 bytes, 2,142 s for the instrument's walk under load | | <!-- PINNED 2026-11-14 -->
 
 Five fixture runs the instrument's own way, one at a time on `fc`, gave the door's stdout and exit byte
 for byte: the unplanted fixture, the pin plant, its two controls and the run-live plant.

@@ -2,7 +2,7 @@
 
 # gov-spec-writer handoff — TOOL-aBatchedPacket-1
 
-<!-- gov:handoff role=gov-spec-writer build=aBatchedPacket unit=TOOL-aBatchedPacket-1 path=memory/builds/aBatchedPacket/prompts/2026-11-13-prompt-TOOL-aBatchedPacket-1-1-spec-writer.md role-sha=a3bc1199e30f task-sha=62069e651a4f -->
+<!-- gov:handoff role=gov-spec-writer build=aBatchedPacket unit=TOOL-aBatchedPacket-1 path=memory/builds/aBatchedPacket/prompts/2026-11-13-prompt-TOOL-aBatchedPacket-1-1-spec-writer.md role-sha=a3bc1199e30f task-sha=43ab24ad86d8 -->
 
 ## Role
 
@@ -79,9 +79,18 @@ refusing, not a hit: name it in your return.
 - [security] deny by default and give automation the narrowest grant
 - [bound] a fan-out declares its bound
 [/AGENTS.md#practices-at-design]
+
+## Card
+
+[.claude/orientation-card.md · Level 1 · the build's card: where this session stands; level 0 outranks it]
+- build: aBatchedPacket
+- unit: TOOL-aBatchedPacket-1 · spec memory/builds/aBatchedPacket/spec/2026-11-13-spec-TOOL-aBatchedPacket-1.md
+- unit: TOOL-aBatchedPacket-2 · spec memory/builds/aBatchedPacket/spec/2026-11-13-spec-TOOL-aBatchedPacket-2.md
+- brief: memory/builds/aBatchedPacket/prompts/2026-11-13-prompt-TOOL-aBatchedPacket-2-brief.md
+[/.claude/orientation-card.md]
 [memory/builds/aBatchedPacket/prompts/2026-11-13-prompt-TOOL-aBatchedPacket-1-1-spec-writer.md · Level 6 · The task: this unit's goal, scope and acceptance; yields to levels 0 to 5]
 This handoff is for build `aBatchedPacket`, unit `TOOL-aBatchedPacket-1`.
-Not supplied, optional: `input:spec`, `task:reuse`, `card:route`, `input:code`.
+Not supplied, optional: `input:spec`, `input:code`.
 
 ### brief:prompt
 
@@ -132,5 +141,16 @@ The spec-token checker's suite and the new suite, run directly. `check-arms` ove
 - `carries.py --build <slug> --exit`, the Design-exit join, which reads every revision and stays as slow as it is.
 - A recorded-verdict cache. The measured cost after the change leaves nothing for one to save.
 - `memory/builds/dDeclaredLoop/` and the driver's `verb_dispatch`.
-- `gen_build_index.py --asks`, 13 seconds of what remains.
+- `gen_build_index.py --asks`, 13 seconds of what remains. <!-- PINNED 2026-11-14 -->
+
+### task:reuse
+
+tools/memory-tree/tree_lib.py#read_blobs_at; tools/check-spec-tokens.py#scan_live_packets.
+
+### card:route
+
+- build: aBatchedPacket
+- unit: TOOL-aBatchedPacket-1 · spec memory/builds/aBatchedPacket/spec/2026-11-13-spec-TOOL-aBatchedPacket-1.md
+- unit: TOOL-aBatchedPacket-2 · spec memory/builds/aBatchedPacket/spec/2026-11-13-spec-TOOL-aBatchedPacket-2.md
+- brief: memory/builds/aBatchedPacket/prompts/2026-11-13-prompt-TOOL-aBatchedPacket-2-brief.md
 [/memory/builds/aBatchedPacket/prompts/2026-11-13-prompt-TOOL-aBatchedPacket-1-1-spec-writer.md]
