@@ -15,7 +15,9 @@ its steps in that verbs file's section `The paths, in order`, which wins any dif
 ## Before any path — schedule the idle-wake NOW
 
 First act, before orienting: `{{KEEPALIVE_CREATE}}` at {{KEEPALIVE_INTERVAL}}; keep the id. Each tick
-runs `unattended.sh --resume <slug> --keepalive-id <id>`, then `unattended.sh --audit <slug>`. A
+runs `unattended.sh --wake <slug> --keepalive-id <id>`. `HEALTHY` ends the turn. `FULL` runs
+`unattended.sh --resume <slug> --keepalive-id <id>`, then `unattended.sh --audit <slug>`. A `cadence`
+other than your job's replaces the job, as the verbs file says. A
 background task's starter runs `unattended.sh --register-task <slug> --task <name> --heartbeat <path>`,
 later `unattended.sh --release-task <slug> --task <name>`. Readers share
 `unattended.sh --liveness <slug>`. A run that never starts still reaps it.

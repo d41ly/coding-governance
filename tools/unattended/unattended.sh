@@ -7,6 +7,7 @@
 #   unattended.sh --phase <slug> <phase> --witness <sha>   # move the run, with its witness
 #   unattended.sh --status <slug>                          # one line: phase · witness · next unit
 #   unattended.sh --audit <slug>                           # one line per open dispatched unit: idle time, PROGRESSING|STALLED
+#   unattended.sh --wake <slug> --keepalive-id <id>        # the idle-wake's first act: HEALTHY, or FULL and why, then the cadence due
 #   unattended.sh --register-task <slug> --task <name> --heartbeat <absolute path>   # BEFORE starting a background task
 #   unattended.sh --release-task <slug> --task <name>      # the task ended; --audit stops grading its heartbeat
 #   unattended.sh --liveness <slug>                        # key: value lines and ONE verdict, for an out-of-session reader
@@ -112,7 +113,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
 # place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
 # the gate leg, because no runtime derivation crosses a file boundary.
-VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --brief --beat"
+VERBS_SLUG="--preflight --status --audit --wake --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --brief --beat"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
 VERBS_INLINE="--plan --phase --check-commit --claims --overlaps --version"
@@ -682,7 +683,7 @@ CONF="$ROOT/.unattended.conf"
 # misspelling grant what nobody declared. It sits ON the second line because the source-level arm
 # greps the line below with -A1, and anything inserted between them hides it.
 MEMORY_ROOT=memory; LANDER=""; LANDER_MODE=""; SELFTESTS_OWED_PATHS=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
-KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="$SHARED_RECORDS_UNDECLARED"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
+KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; KEEPALIVE_TRACKED_INTERVAL=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="$SHARED_RECORDS_UNDECLARED"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
 ASKS_CMD=""; HELD_CI_WORKFLOW=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""; HANDOFF_CUTOFF=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""; RUN_CLAIMS=""
@@ -955,6 +956,7 @@ VERB_REQUIRES="--abort --reason --code
 --hold --code --until --reason
 --register-task --task --heartbeat
 --release-task --task
+--wake --keepalive-id
 --attest --item
 --review --subject
 --park --item --reason
@@ -8610,6 +8612,13 @@ read_tree_clocks() {
     if [ -z "$TC_LASTW" ] || [ "$m" -gt "$TC_LASTW" ]; then TC_LASTW=$m; fi
   done <<<"$dirty"
 }
+# THE TREE IS PROGRESSING unless its newest commit AND its newest write are both older than
+# UNIT_STALL_BOUND; a clean tree has no newest write and reads as older than any bound. One
+# predicate, so `--audit`'s STALLED and `--wake`'s `tree idle` cannot disagree (TOOL-aLightenedLoop-2 S2).
+check_tree_progressing() { # now · commit clock · write clock (empty on a clean tree) -> 1 when idle past the bound
+  if [ $(($1 - $2)) -gt "$UNIT_STALL_BOUND" ] && { [ -z "$3" ] || [ $(($1 - $3)) -gt "$UNIT_STALL_BOUND" ]; }; then return 1; fi
+  return 0
+}
 
 # --audit: THE DISPATCHED-UNIT STALL PROBE. TOOL-aProbedUnit-3. One line per unit whose LATEST
 # pass — every dispatch row at its newest anchor, unioned the way check 23 unions them — is still
@@ -8688,7 +8697,7 @@ print_audit() { # slug
     open=$((open+1))
     el=$((now - disp))
     if [ -n "$lastw" ]; then wtxt="$((now - lastw))s ago"; else wtxt="none"; fi
-    if [ $((now - lastc)) -gt "$UNIT_STALL_BOUND" ] && { [ -z "$lastw" ] || [ $((now - lastw)) -gt "$UNIT_STALL_BOUND" ]; }; then
+    if ! check_tree_progressing "$now" "$lastc" "$lastw"; then
       verdict=STALLED
     else
       verdict=PROGRESSING
@@ -8727,10 +8736,10 @@ TASK_OPEN_AWK='{ sub(/\r$/, "") }
   $2 == "register" { if (!($3 in seen)) { seen[$3] = 1; ord[++n] = $3 } o[$3] = 1; at[$3] = $1; hb[$3] = $4 }
   $2 == "release"  { o[$3] = 0 }
   END { for (i = 1; i <= n; i++) { k = ord[i]; if (o[k]) print k "\t" at[k] "\t" hb[k] } }'
-TA_DEAD=""
-print_task_audit() { # slug · now (epoch seconds) — sets TA_DEAD to the probe that answered nothing
+TA_DEAD=""; TA_OPEN=0; TA_STALLED=0
+print_task_audit() { # slug · now (epoch seconds) — sets TA_DEAD to the probe that answered nothing, TA_OPEN and TA_STALLED to its counts
   local slug="$1" now="$2" dir reg rows name iso beat m since wtxt verdict n=0
-  TA_DEAD=""
+  TA_DEAD=""; TA_OPEN=0; TA_STALLED=0
   dir=$(resolve_sidecar_dir) || dir=""
   reg="$dir/tasks.$slug.tsv"
   rows=""
@@ -8750,12 +8759,80 @@ print_task_audit() { # slug · now (epoch seconds) — sets TA_DEAD to the probe
       case "$since" in ""|*[!0-9]*) TA_DEAD="date -u -d on the registration time $iso of task $name"; break ;; esac
       wtxt="none"
     fi
-    n=$((n+1))
-    if [ $((now - since)) -gt "$TASK_STALL_BOUND" ]; then verdict=STALLED; else verdict=PROGRESSING; fi
+    n=$((n+1)); TA_OPEN=$((TA_OPEN+1))
+    if [ $((now - since)) -gt "$TASK_STALL_BOUND" ]; then verdict=STALLED; TA_STALLED=$((TA_STALLED+1)); else verdict=PROGRESSING; fi
     printf 'unattended-audit: task %s · registered %s · heartbeat %s · last-beat %s · %s\n' "$name" "$iso" "$beat" "$wtxt" "$verdict"
     [ "$verdict" = STALLED ] && printf 'unattended-audit: remedy — read the heartbeat of task %s, stop the task, record why with --park or a Decided: line, release it with --release-task, then re-run it bounded or leave it parked\n' "$name"
   done < <(printf '%s\n' "$rows")
   [ -n "$TA_DEAD" ] || [ "$n" -gt 0 ] || echo "unattended-audit: no heartbeat-bearing tasks registered"
+  return 0
+}
+
+# --wake: THE IDLE-WAKE'S FIRST ACT, TOOL-aLightenedLoop-2. Each tick ran `--resume` then `--audit`,
+# and on a healthy run both found nothing to do. This asks the predicates those two act on and
+# prints ONE line: HEALTHY, and the tick ends; or FULL with the first reason that held, and the tick
+# runs the pair exactly as before. The rows are SUFFICIENT conditions in `verb_resume`'s own order,
+# so a FULL may meet a pair with nothing to do, which costs time and never a verdict; HEALTHY holds
+# only when no row does. The phase is the RECORDED one, offline: `read_derived_phase` may ask the
+# remote, and it differs from the record only on LANDING and a hand-off HELD, which read FULL here.
+# The same line names the cadence due: KEEPALIVE_TRACKED_INTERVAL while a registered task is open
+# and that key is declared, else KEEPALIVE_INTERVAL. It writes nothing; the claim read refreshes the
+# private claim cache only, as `--resume`'s does.
+#
+#   unattended-wake: <slug> · HEALTHY · tasks <n> open · cadence <cadence>
+#   unattended-wake: <slug> · FULL · <reason> · tasks <n> open · cadence <cadence>
+#
+# WHAT IT DOES NOT CHECK: which units are open (an idle tree reads FULL with none), or whether the
+# agent replaces its job when the cadence moves; that is an act no script observes.
+print_wake() { # slug
+  local slug="$1" rel ph why="" hw=0 ka ls_utc ls_sid ls_pid l now n cad
+  read_bound_key TASK_STALL_BOUND "$TASK_STALL_BOUND_DEFAULT" seconds "a registered task reads STALLED after the kit default of ${TASK_STALL_BOUND_DEFAULT}s with no heartbeat"
+  check_slug "$slug" || return 1
+  check_verb_flag --wake --keepalive-id "$KID" || return 1
+  runmd_of "$slug" >/dev/null; rel=$_runmd
+  check_run_state "$rel" "run for the idle-wake to read" || return 1
+  read_recorded_phase "$rel" >/dev/null; ph=$_fact
+  case "$ph" in ""|HELD|LANDING) why="phase ${ph:-absent}" ;; *) ! is_terminal "$ph" || why="phase $ph" ;; esac
+  if [ -z "$why" ]; then fact "$rel" abandoned >/dev/null; [ -z "$_fact" ] || why=abandoned; fi
+  [ -n "$why" ] || ! check_asks_moved "$slug" "$rel" || why="asks moved"
+  if [ -z "$why" ]; then resolve_holder_worktree "$rel" || hw=$?; [ "$hw" != 1 ] || why=worktree; fi
+  fact "$rel" keepalive >/dev/null; ka=$_fact; fact "$rel" lease-utc >/dev/null; ls_utc=$_fact
+  fact "$rel" session >/dev/null; ls_sid=$_fact; fact "$rel" pid >/dev/null; ls_pid=$_fact
+  [ -n "$why" ] || [ "$KID" = "$ka" ] || why=holder
+  [ -n "$why" ] || check_lease_current "$ls_utc" "$ls_sid" "$ls_pid" || why=lease
+  if [ -z "$why" ] && [ "$RUN_CLAIMS" = on ]; then
+    if ! read_claims quiet; then
+      why="claims unread"
+    else
+      # A SUBSHELL, its output discarded: check 108 is `--resume`'s to print, and its `fail` must not
+      # set this verb's status or journal a check it never refused on.
+      ( check_claim_writable "$slug" holder "$ka" "${ls_sid:-absent}" "$ka" "$rel" ) >/dev/null 2>&1
+      [ "$?" = 2 ] || why=claim
+    fi
+  fi
+  if [ -z "$why" ] && read_proc_ledger "$slug"; then
+    for l in "${PL_LINES[@]}"; do derive_proc_state "$l"; [ "$PS_STATE" != orphan ] || { why=orphans; break; }; done
+  fi
+  if [ -z "$why" ]; then
+    read_tree_clocks
+    if [ -n "$TC_DEAD" ]; then why="clock probe"
+    elif ! check_tree_progressing "$TC_NOW" "$TC_LASTC" "$TC_LASTW"; then why="tree idle"; fi
+  fi
+  # THE TASKS ARE COUNTED ON EVERY CALL, because the cadence reads the count. A redirection and not a
+  # substitution, so TA_* survive in this shell.
+  now=$TC_NOW; case "$now" in ""|*[!0-9]*) printf -v now '%(%s)T' -1 ;; esac
+  print_task_audit "$slug" "$now" >/dev/null
+  if [ -z "$why" ]; then
+    if [ -n "$TA_DEAD" ]; then why="task probe"; elif [ "$TA_STALLED" -gt 0 ]; then why="task stalled"; fi
+  fi
+  n=$TA_OPEN; [ -z "$TA_DEAD" ] || n=unknown
+  cad=${KEEPALIVE_INTERVAL:-undeclared}
+  if [ "$n" != unknown ] && [ "$n" -gt 0 ] && [ -n "$KEEPALIVE_TRACKED_INTERVAL" ]; then cad=$KEEPALIVE_TRACKED_INTERVAL; fi
+  if [ -z "$why" ]; then
+    printf 'unattended-wake: %s · HEALTHY · tasks %s open · cadence %s\n' "$slug" "$n" "$cad"
+  else
+    printf 'unattended-wake: %s · FULL · %s · tasks %s open · cadence %s\n' "$slug" "$why" "$n" "$cad"
+  fi
   return 0
 }
 
@@ -9332,6 +9409,12 @@ check_holder_worktree() { # slug · run-state file -> 0 passes, 1 with its own r
 # a pid the `pid` fact does not name (TOOL-dDerivedDocket-63); freshness is
 # `check_lease_fresh`, `--liveness`'s own clock and bound; a record with no `lease-utc` predates the
 # run-state lease and keeps its build folder's clock against the same bound (§8 F13).
+# THE HOLDER'S LEASE IS THIS HARNESS'S: `lease-utc` set, and the session and pid the record names are
+# the ones the harness exposes, `absent` standing for an unexposed one. `verb_resume`'s holder row
+# re-records the lease when this fails, and `--wake` answers FULL then (TOOL-aLightenedLoop-2 S2).
+check_lease_current() { # lease-utc · session · pid -> 0 when the lease is this harness's
+  [ -n "$1" ] && [ "$2" = "${CLAUDE_CODE_SESSION_ID:-absent}" ] && [ "$3" = "${CLAUDE_PID:-absent}" ]
+}
 verb_resume() { # slug
   local slug="$1" rel p cond age bound rhc rc ka _rs_at _rs_bt _rs_rc ok os op
   local ls_utc ls_sid ls_pid ls_hat live me rb cur restart lu cw cas ps pv
@@ -9531,7 +9614,7 @@ verb_resume() { # slug
       check_claim_writable "$slug" holder "$ka" "${ls_sid:-absent}" "$ka" "$rel"; cw=$?
       [ "$cw" != 1 ] || return 1
     fi
-    if [ -z "$ls_utc" ] || [ "$ls_sid" != "${me:-absent}" ] || [ "$ls_pid" != "${CLAUDE_PID:-absent}" ]; then
+    if ! check_lease_current "$ls_utc" "$ls_sid" "$ls_pid"; then
       os=$ls_sid; op=$ls_pid
       lu=$(read_utc_now) || lu=""
       if [ -n "$cw" ]; then write_claim "$slug" live "$ka" holder "" "$lu"; cas=$?; [ "$cas" != 1 ] || return 1; fi
@@ -15435,6 +15518,7 @@ case "$VERB" in
   --preflight) verb_preflight "$SLUG" "$KID"; print_preflight_breach ;;
   --status)    verb_status "$SLUG" ;;
   --audit)     print_audit "$SLUG" ;;
+  --wake)      print_wake "$SLUG" ;;
   --register-task) write_task_register "$SLUG" "$TK_NAME" "$TK_BEAT" ;;
   --release-task)  write_task_release "$SLUG" "$TK_NAME" ;;
   --liveness)  print_liveness "$SLUG" ;;

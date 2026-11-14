@@ -2452,6 +2452,7 @@ plan framed over two slugs | : | --plan tRun tNone --framed
 preflight | : | --preflight tRun --keepalive-id k1
 phase | : | --phase tRun BUILDING --witness abc
 audit | : | --audit tRun
+wake | : | --wake tRun --keepalive-id k1
 register-task | : | --register-task tRun --task t --heartbeat /no/such/beat
 release-task | : | --release-task tRun --task t
 liveness | : | --liveness tRun
@@ -9745,6 +9746,73 @@ hit "$(run --register-task tRun --task leg-c --heartbeat "$TK_BEAT")" "the run i
 rm -rf "$TK_REG" "$TK_DIR"
 reset_tree
 
+# ---- TOOL-aLightenedLoop-2: `--wake`, the idle-wake's first act. One line, HEALTHY or FULL with the
+# ---- first reason that holds, then the open-task count and the cadence due. Each arm starts from
+# ---- `build_audit_fixture`, whose preflight leased k1 to the prologue's session and pid, and
+# ---- registers one task beating outside the scratch repo, so its file is no untracked path the tree
+# ---- clock stats. Against the 846d51d39 driver `--wake` is check 14's unknown argument.
+build_wake_fixture() { # reset, preflight, one fresh registered task
+  build_audit_fixture
+  WK_REG="$(git rev-parse --git-dir)/unattended/tasks.tRun.tsv"; rm -rf "$WK_REG"
+  printf 'KEEPALIVE_INTERVAL="every 10 minutes"\n' >> .unattended.conf
+  echo beat > "$WK_DIR/wkbeat.txt"
+  run --register-task tRun --task wf --heartbeat "$WK_DIR/wkbeat.txt" >/dev/null
+}
+WK_DIR=$(mktemp -d)
+# AC1 — a leased holder record with a fresh task reads HEALTHY, and nothing is written.
+build_wake_fixture
+wk_h=$(git hash-object memory/builds/tRun/RUN.md); wk_s=$(git status --porcelain)
+out=$(run --wake tRun --keepalive-id k1); rc=$?
+same "wake AC1 a healthy record exits 0" "$rc" "0"
+same "wake AC1 the one line" "$out" "unattended-wake: tRun · HEALTHY · tasks 1 open · cadence every 10 minutes"
+same "wake AC1 the record's hash is unchanged" "$(git hash-object memory/builds/tRun/RUN.md)" "$wk_h"
+same "wake AC1 the tree is unchanged" "$(git status --porcelain)" "$wk_s"
+hit "$(run --wake tRun)" "--wake requires --keepalive-id, because the verb's row in VERB_REQUIRES lists it"
+# AC2 — each staged break reads FULL with its reason. `wk_full` resets, applies the break, then reads.
+wk_full() { # reason · keepalive id · break command...
+  local why="$1" kid="$2"; shift 2
+  build_wake_fixture
+  "$@"
+  out=$(run --wake tRun --keepalive-id "$kid"); rc=$?
+  same "wake AC2 $why exits 0" "$rc" "0"
+  hit "$out" "unattended-wake: tRun · FULL · $why · tasks 1 open · "
+}
+wk_full "phase HELD" k1 mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: HELD/'
+wk_full abandoned k1 mutate memory/builds/tRun/RUN.md 's/^\(phase: .*\)/\1\nabandoned: x/'
+wk_full "asks moved" k1 mutate memory/builds/tRun/RUN.md 's/^\(phase: .*\)/\1\nasks: X-1/'
+wk_full worktree k1 mutate memory/builds/tRun/RUN.md 's|^run-branch: .*|run-branch: refs/heads/other|'
+wk_full holder k2 true
+wk_full lease k1 mutate memory/builds/tRun/RUN.md 's/^pid: .*/pid: 999/'
+# A second remote is check 24 inside the claim read, so the read fails without reaching the network.
+# The fixture's own bare origin answers the read, and with no claim of this lease on it a write is
+# due, so `claim` holds whatever an earlier arm left there.
+wk_claims_on() { printf 'RUN_CLAIMS="on"\n' >> .unattended.conf; }
+wk_claims_off() { wk_claims_on; git remote add wk-second /no/such/remote; }
+wk_full "claims unread" k1 wk_claims_off
+git remote remove wk-second 2>/dev/null
+wk_full claim k1 wk_claims_on
+wk_age() { mkconf "true" "true" "" "3600" "" "60"; printf 'KEEPALIVE_INTERVAL="every 10 minutes"\n' >> .unattended.conf
+  git add -A && GIT_COMMITTER_DATE="$(( $(date -u +%s) - 3600 )) +0000" git commit -q -m "fixture: age the clocks" --no-verify; }
+wk_full "tree idle" k1 wk_age
+wk_stale() { mkconf "true" "true" "" "3600" "" "1800" "7" "5400" "" "1800" "6" "60"
+  printf 'KEEPALIVE_INTERVAL="every 10 minutes"\n' >> .unattended.conf; touch -d "@$(( $(date -u +%s) - 3600 ))" "$WK_DIR/wkbeat.txt"; }
+wk_full "task stalled" k1 wk_stale
+# AC3 — the cadence follows the registry: the tracked key while a task is open, the base key after
+# its release, the base key throughout when the tracked one is blank, and `undeclared` with neither.
+build_wake_fixture
+printf 'KEEPALIVE_TRACKED_INTERVAL="every 30 minutes"\n' >> .unattended.conf
+hit "$(run --wake tRun --keepalive-id k1)" "· tasks 1 open · cadence every 30 minutes"
+run --release-task tRun --task wf >/dev/null
+hit "$(run --wake tRun --keepalive-id k1)" "· tasks 0 open · cadence every 10 minutes"
+build_wake_fixture
+printf 'KEEPALIVE_TRACKED_INTERVAL=""\n' >> .unattended.conf
+hit "$(run --wake tRun --keepalive-id k1)" "· tasks 1 open · cadence every 10 minutes"
+run --release-task tRun --task wf >/dev/null
+printf 'KEEPALIVE_INTERVAL=""\n' >> .unattended.conf
+hit "$(run --wake tRun --keepalive-id k1)" "· tasks 0 open · cadence undeclared"
+rm -rf "$WK_REG" "$WK_DIR"
+reset_tree
+
 # ---- TOOL-aWokenSentinel-1: the LEASE. `--preflight` records `session:` and `pid:` beside the
 # ---- keepalive, `absent` with ONE NOTE where the harness exposes none, and `--resume --keepalive-id`
 # ---- replaces all three on a live record and is refused through check 26 on a terminal one. The
@@ -16486,6 +16554,8 @@ init_pl_fixture
 printf 'PROCMON_CMD=""\n' >> "$pl_dir/.unattended.conf"
 run_pl_git add -A >/dev/null; run_pl_git commit -q -m blank-reaper --no-verify
 write_pl_orphan 47
+# TOOL-aLightenedLoop-2 AC2 — the holder's `--wake` reads the orphan the reap below acts on as FULL.
+hit  "$(run_pl --wake tRun --keepalive-id k1)" "unattended-wake: tRun · FULL · orphans · "
 out=$(run_pl --resume tRun --keepalive-id k1)
 hit  "$out" "unattended: reaping is OFF because PROCMON_CMD is blank, so 1 orphan(s) of tRun are counted and left running: $PL_ORPH"
 hit  "$out" "· orphans 1"

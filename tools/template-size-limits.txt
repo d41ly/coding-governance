@@ -163,7 +163,11 @@ memory/guides/BUILD-METHOD.md	30720
 # switches that act between passes, which the owner's prompt asks the protocol to state. The render
 # measures 68022 CR-stripped, and the row is that figure because this block's rule is no
 # headroom. A run's raise, on the four terms above (memory/DECISIONS.md, TOOL-aNimbleMend-11).
-memory/guides/UNATTENDED-PROTOCOL.md	68022
+# RAISED 68022 -> 68216, 2026-11-14, by TOOL-aLightenedLoop-2: section 5's idle-wake prompt naming
+# `--wake` first, and section 8's `KEEPALIVE_TRACKED_INTERVAL` row, the conf key that verb prints.
+# The render measures 68216 CR-stripped, and the row is that figure because this block's rule is no
+# headroom. A run's raise, on the four terms above (memory/DECISIONS.md, TOOL-aLightenedLoop-2).
+memory/guides/UNATTENDED-PROTOCOL.md	68216
 
 # --- the unattended Skill, as rendered ----------------------------------------------------------
 # 10240 bytes = 10 KiB, CR-stripped (TOOL-aMendedFleet-68 S5). The Skill is the first file every
@@ -185,7 +189,11 @@ memory/guides/UNATTENDED-PROTOCOL.md	68022
 # block the gate reads and no prose coming back. The render measures 10580 CR-stripped, and the row
 # is that figure, with no headroom. A run's raise, on the four terms above (memory/DECISIONS.md,
 # TOOL-aCarriedStop-1).
-.claude/skills/unattended/SKILL.md	10580
+# RAISED 10580 -> 10744, 2026-11-14, by TOOL-aLightenedLoop-2: the idle-wake's tick names
+# `unattended.sh --wake` first, which the kit gate requires of every declared verb, and the pair on
+# `FULL` after it. The render measures 10744 CR-stripped, and the row is that figure, with no
+# headroom. A run's raise, on the four terms above (memory/DECISIONS.md, TOOL-aLightenedLoop-2).
+.claude/skills/unattended/SKILL.md	10744
 
 # --- every LIVE spec, a CLASS row (TOOL-aMendedFleet-25) --------------------------------------
 # 49152 bytes = 48 KiB, CR-stripped, the charter template's own ceiling, so no spec costs more to

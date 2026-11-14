@@ -81,7 +81,7 @@ the stated boundary and the ask mandate are `unattended-mandate`.
 
 **Nothing in a script can reach the scheduler.** The job the agent schedules there is the IDLE-WAKE:
 it fires only while the session is idle, so it cannot wake a stalled one; its prompt runs
-`--resume --keepalive-id`, then `--audit`, the unit stall probe. What wakes a run is the keepalive —
+`--wake`, and on `FULL` `--resume --keepalive-id` and `--audit`, the unit stall probe. What wakes a run is the keepalive —
 the stop-guard at turn end, the stall-recorder at error end, the resume tick from the OS scheduler —
 three actors outside the session, reading one predicate, `--liveness`, whose clock counts a bar
 queued at the turnstile by the runner's heartbeat (`TOOL-dDerivedDocket-64`) and a session waiting
