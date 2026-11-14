@@ -9,7 +9,8 @@ scope = "repo"
 version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # The definition names no other kit's file. Its reader is stdlib only but for `read_actor_base`, which
 # imports the memory-tree kit's compare base to read the actor-witness list at it (TOOL-dDeclaredLoop-5),
-# so this kit requires memory-tree. The roles kit requires this one, since its catalogue checker and its
+# and `read_builds_dir`, which imports that kit's conf reader to find the builds folder of a tree whose
+# conf sets DESIGN_RECORD (TOOL-dDeclaredLoop-41), so this kit requires memory-tree. The roles kit requires this one, since its catalogue checker and its
 # adopter read each workflow's order here. Two reads of the playbook kit take no edge
 # (TOOL-dDeclaredLoop-12): `read_layer_tags` reads its layers.toml for the item inputs' layer tags, and
 # `--scopes` runs its load_sets.py as a subprocess for each item's scope. Each prints `unarmed` where

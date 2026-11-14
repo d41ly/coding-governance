@@ -117,12 +117,15 @@ Each row is `<site>`, `<witness>` and `<build>`, separated by tabs, where the bu
 computed witness replaces it. The list only shrinks: a row it did not hold at the compare base is
 refused. The list holds two rows today, `keepalive-reaped` until dWellOiledMachine and
 `parked-decisions-surfaced` until dShippedRelease, both from the driver's `DOD_CORE`. A row is also
-refused when its build has no `memory/builds/<build>/README.md`, or when the witness it names is no
-`actor` witness.
+refused when the witness it names is no `actor` witness, or when its site is neither a step nor
+`DOD_CORE`. A row whose build has no `<MEMORY_ROOT>/builds/<build>/README.md` is refused only in a
+tree whose `.memory-tree.conf` sets `DESIGN_RECORD`, the tree that owns the chain's builds. Anywhere
+else, `--check` prints each row ending `foreign build, not graded`, and says why on its builds line.
 
 **Upgrading.** If your `.unattended.conf` declares a `DOD_EXTRA` entry with no class, check 53 of the
 unattended leg refuses it, naming the entry. Append `:machine` or `:agent` to it. An `:agent` entry
-also needs an actor-list row naming the build that computes its witness.
+is admitted and printed `adopter-declared`, because `DOD_EXTRA` holds your own items and the actor
+list only governs the ones gov ships. Check 53's report line names each one.
 
 ## The owner's disposition record
 
@@ -156,7 +159,8 @@ unarmed and never as a pass.
   and the inputs go unchecked. Then it
   prints the witness classes, one line per witness alias and per step's witness, one line per
   actor-list row with its build, and the base it compared the list against, or `no comparison` and
-  why. It exits 0, or 1 when the list is refused.
+  why. A `loop: actor-list builds` line follows, naming the builds folder, or `foreign` and why. It
+  exits 0, or 1 when the list is refused.
 
   ```text
   loop: step step.build · order 3 · state building · exit item.build.exit
@@ -172,9 +176,10 @@ unarmed and never as a pass.
 - **Grade a Definition of Done:** `python tools/loop/loop_lib.py --grade-site DOD_CORE gates-green:machine keepalive-reaped:agent parked-decisions-surfaced:agent`
   prints one `loop: site` line per entry with its word and class, and `until <build>` on an actor
   entry. The site is `DOD_CORE` or `DOD_EXTRA`. It exits 1, with a `loop: refused` line, for an entry
-  with no class word, for a word no alias holds, and for an actor entry the list does not hold. It
-  also exits 1 for a list row of that site that no actor entry matches. Check 53 of the unattended leg
-  runs it over the driver's `DOD_CORE` and your conf's `DOD_EXTRA`.
+  with no class word and for a word no alias holds. The list joins `DOD_CORE` alone: there it also
+  exits 1 for an actor entry the list does not hold, and for a list row that no actor entry matches.
+  A `DOD_EXTRA` actor entry is admitted, its line ending `adopter-declared, not on the shipped list`.
+  Check 53 of the unattended leg runs it over the driver's `DOD_CORE` and your conf's `DOD_EXTRA`.
 
 - **See each item's scope:** `python tools/loop/loop_lib.py --scopes` checks the file as `--check` does,
   then prints one line per item with the instruction units scoped to it. It runs the playbook kit's
@@ -194,7 +199,8 @@ unarmed and never as a pass.
   `reordered`, `bad-step`, `bad-reach`, `disposition-unknown` (a word given twice in the set) and
   `disposition-alias` (an alias meaning no member). The witness cases are `witness-no-class`,
   `witness-bad-class`, `witness-actor-unlisted`, `witness-actor-listed` (which reads clean),
-  `actor-list-grown`, `actor-list-stale` and `actor-list-no-build`. The program cases are
+  `actor-list-grown`, `actor-list-stale`, `actor-list-no-build` and `actor-list-foreign` (which reads
+  the builds folder as foreign, prints each row `foreign build` and exits 0). The program cases are
   `needs-cycle`, `needs-unresolved`, `outcome-unrouted`, `route-unresolved`, `input-no-layer` and
   `exit-missing`. Two cases run `--scopes` after the read and exit 0 when it behaves:
   `scope-selected` scopes one unit to one item in a scratch file and shows it on that item's line
@@ -225,4 +231,5 @@ adopter's to seed. The loop kit is in the default selection, so a default instal
 `update` installs it into a tree whose receipt predates it, as a default-gained kit. The roles kit
 requires the loop kit: a `--kits` selection naming `roles` names `loop` too or is refused. The
 unattended kit requires the loop kit too, for check 53. The loop kit requires the memory-tree kit,
-because `--check` reads the actor list at the compare base that kit resolves.
+because `--check` reads the actor list at the compare base that kit resolves, and reads
+`DESIGN_RECORD` and `MEMORY_ROOT` through that kit's conf reader.

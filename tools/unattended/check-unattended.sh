@@ -6747,7 +6747,9 @@ if check_selected 53; then
 # ---- What this does NOT check: that a `machine` entry is in fact derived from history, or that the
 # ---- build an actor row names will compute its witness; the list's shrink-only compare and its build
 # ---- folders are the loop kit's own `loop definition` leg, which never sees DOD_CORE.
-_c53_why=""; _c53_out=""; _c53_rc=0; _c53_n=0
+# ---- TOOL-dDeclaredLoop-41 S5: a DOD_EXTRA actor entry is the adopter's own and `--grade-site` admits it,
+# ---- printed `adopter-declared`; the passing branch names each such entry in its report line.
+_c53_why=""; _c53_out=""; _c53_rc=0; _c53_n=0; _c53_adopted=""
 _c53_py=$(resolve_python 2>/dev/null) || _c53_py=""
 if [ -z "$_c53_py" ]; then
   _c53_why="no python launcher on this node RAN"
@@ -6762,7 +6764,7 @@ else
     _c53_o=$(set -f; "$_c53_py" "$_c53_dir/loop_lib.py" --grade-site "$_c53_site" $_c53_set 2>&1); _c53_r=$?
     _c53_o=${_c53_o//$'\r'/}
     case "$_c53_r" in
-      0) ;;
+      0) _c53_adopted="$_c53_adopted$(printf '%s\n' "$_c53_o" | sed -n 's/^loop: site [^ ]* · \([^ ]*\) · \([^ ]*\) · .* · adopter-declared, .*$/\1:\2 /p' | tr -d '\n')" ;;
       1) _c53_rc=1; _c53_out="$_c53_out$(printf '%s\n' "$_c53_o" | grep '^loop: refused · ' | tr '\n' ' ')" ;;
       *) _c53_why="the loop kit's --grade-site $_c53_site exited $_c53_r: $(printf '%s\n' "$_c53_o" | sed -n 1p)" ;;
     esac
@@ -6773,7 +6775,8 @@ if [ -n "$_c53_why" ]; then
 elif [ "$_c53_rc" = 1 ]; then
   fail 53 "a Definition-of-Done entry declares no witness class, a word no witness alias holds, or an actor witness the loop kit's actor-witness list does not name, or the list names an actor entry the site no longer declares, so a run would read a fact the acting agent typed as its witness; append :machine or :agent to an unclassed entry, and list an actor one with the build that computes it: $_c53_out"
 else
-  report "check 53 graded the witness class of $_c53_n Definition-of-Done entr(ies) through the loop kit's --grade-site: every entry classed, every actor entry listed"
+  _c53_adopted=${_c53_adopted% }
+  report "check 53 graded the witness class of $_c53_n Definition-of-Done entr(ies) through the loop kit's --grade-site: every entry classed, every DOD_CORE actor entry listed, adopter-declared: ${_c53_adopted:-none}"
 fi
 fi
 fi   # ---- end of the checks `--only 28` skips

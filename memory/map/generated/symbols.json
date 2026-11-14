@@ -17673,6 +17673,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "read_builds_dir",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "read_bundle_rows",
       "kind": "function",
       "file": "tools/playbook/tag_bundle.py"

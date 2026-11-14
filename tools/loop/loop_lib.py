@@ -30,8 +30,11 @@ copies this module and a definition with no witness keeps reading. `actor-witnes
 file is the shrink-only list of actor witnesses, `<site>\\t<witness>\\t<build>` per row, the build being
 the one whose computed witness takes its place: `check_actor_list` grades it both ways against the
 definition, against itself at the compare base `read_actor_base` reads, and against each build's
-folder. `--grade-site` joins a declaration site outside the definition, `DOD_CORE` or `DOD_EXTRA` of
-the unattended driver, to the aliases and the list, both ways.
+folder under the builds folder `read_builds_dir` reads, only in a tree whose memory-tree conf sets
+`DESIGN_RECORD`; elsewhere each row prints `foreign build`. The list's one declaration site is
+`DOD_CORE`. `--grade-site` joins a declaration site outside the definition, `DOD_CORE` or `DOD_EXTRA`
+of the unattended driver, to the aliases, and `DOD_CORE` to the list both ways; `DOD_EXTRA` is the
+adopter's own, its actor entries admitted and printed `adopter-declared`.
 
 The definition also holds each gov step's program (TOOL-dDeclaredLoop-12): one `[[item]]` row per item,
 its `tag` `item.<step>.<name>`, its `step`, `actor`, `needs`, `inputs`, `allowance`, `returns`, closed
@@ -59,13 +62,14 @@ it; `read_dispositions` and `--check` refuse a definition that declares no set.
 `--check` prints one line per step and per workflow, the set and one line per alias, then a count, and exits 0; a refused definition is one
 line and exit 1. It prints each step's program, `loop: program <step> · <n> item(s) · <tags>` in needs
 order, or `loop: inputs unarmed` and why before them where no layer tags resolve. It then prints the witness classes, one line per witness alias and per witness, one
-line per list row with its build and the list's base line, the base or `no comparison` and why, and
-each refusal of the list as `loop: refused · ...`, exit 1. `--fixture --plant <case>` reads the shipped
+line per list row with its build and the list's base line, the base or `no comparison` and why, the
+builds line, the folder or `foreign` and why, and each refusal of the list as `loop: refused · ...`,
+exit 1. `--fixture --plant <case>` reads the shipped
 definition and list with the named break made in memory, never on disk, the list's base being the
 shipped list as read, and exits 1 on the refusal the break must draw, 0 if the reader accepted it. The
 plants are `PLANTS`. `--grade-site <site> <entry>...` prints `loop: site <site> · <item> · <word> ·
-<class>` per entry, `· until <build>` on an actor entry, then each refusal, and exits 0, or 1 on a
-refusal. `--scopes` prints `loop: scope <tag> · <derive's item line> · <the tags it lists, or none>` per
+<class>` per entry, `· until <build>` on a `DOD_CORE` actor entry, `· adopter-declared, not on the
+shipped list` on a `DOD_EXTRA` one, then each refusal, and exits 0, or 1 on a refusal. `--scopes` prints `loop: scope <tag> · <derive's item line> · <the tags it lists, or none>` per
 item and exits 0, or 1 on a refused definition or a derive that exits non-zero. Exit 2 is a usage
 error, a site outside `DECLARATION_SITES` included.
 
@@ -76,8 +80,8 @@ being read, each field's content being its own unit's; a need on an item outside
 a `stand-in:` path exists or a `transition` route reaches a transition table; that a disposition record's
 `Item` names a declared item, which reads None; or that a writer resolved an alias before it wrote. An
 unknown key on a row is not read and not refused. That a witness's `by` is true. Stdlib only, but for
-`read_actor_base`, which imports the memory-tree kit's compare base inside the function, so a reader
-calling `load_loop` never reaches it.
+`read_actor_base` and `read_builds_dir`, which import the memory-tree kit's compare base and its conf
+reader inside the function, so a reader calling `load_loop` never reaches them.
 """
 import pathlib
 import re
@@ -120,6 +124,7 @@ PLANTS = {"missing-step": "the step.deploy row taken out",
           "actor-list-grown": "a list row the base lacks",
           "actor-list-stale": "a row for step.design, whose witness is history, in the list and its base",
           "actor-list-no-build": "a row naming dNoSuchBuild in the list and its base",
+          "actor-list-foreign": "the builds folder read as a tree whose conf sets no DESIGN_RECORD reads it",
           "needs-cycle": "item.plan.dedupe given a need on item.plan.triage-rule, which needs it",
           "needs-unresolved": "item.plan.triage-oracle added to item.plan.record's any-of need",
           "outcome-unrouted": "item.plan.place's route for unplaced taken out",
@@ -276,13 +281,13 @@ def read_witness_classes(kit_dir):
     return {"classes": list(data["witnesses"]["classes"]), "refused": list(data["witnesses"]["refused"])}
 
 
-def check_actor_list(rows, base_rows, sites, root):
+def check_actor_list(rows, base_rows, sites, builds_dir):
     """One refusal per row of the actor-witness list `rows`, its lines as read, that is not three
     tab-separated fields; that `base_rows`, the list at the compare base, lacks (None is no comparison);
     whose site is a definition site holding no actor witness of that name, or neither such a site nor
-    one of `DECLARATION_SITES`; or whose build has no `memory/builds/<build>/README.md` under `root`.
-    And one per actor witness of a definition site no row lists. `sites` maps each definition site to
-    `{witness: class}`."""
+    `DOD_CORE`; or, where `builds_dir` is a path, whose build has no `<builds_dir>/<build>/README.md`.
+    With `builds_dir` None, the tree declares no chain and no row's build is tested. And one per actor
+    witness of a definition site no row lists. `sites` maps each definition site to `{witness: class}`."""
     refusals, listed = [], set()
     for line in rows:
         fields = line.split("\t")
@@ -298,12 +303,13 @@ def check_actor_list(rows, base_rows, sites, root):
             if sites[site].get(witness) != "actor":
                 refusals.append("the list row %s %s names no actor witness: %s's witness %s is %s" % (
                     site, witness, site, witness, sites[site].get(witness, "absent")))
-        elif site not in DECLARATION_SITES:
-            refusals.append("the list row %s %s names a site that is neither a definition site nor one of %s" % (
-                site, witness, " ".join(DECLARATION_SITES)))
-        if not (pathlib.Path(root) / "memory" / "builds" / build / "README.md").is_file():
-            refusals.append("the list row %s %s names the build %s, which has no memory/builds/%s/README.md" % (
-                site, witness, build, build))
+        elif site != "DOD_CORE":
+            refusals.append("the list row %s %s names a site that is neither a definition site nor DOD_CORE, "
+                            "the one declaration site the list grades" % (site, witness))
+        readme = pathlib.Path(builds_dir) / build / "README.md" if builds_dir is not None else None
+        if readme is not None and not readme.is_file():
+            refusals.append("the list row %s %s names the build %s, which has no %s" % (
+                site, witness, build, readme.as_posix()))
     for site, named in sites.items():
         for witness, cls in named.items():
             if cls == "actor" and (site, witness) not in listed:
@@ -435,6 +441,26 @@ def read_actor_base(kit_dir):
     return [ln for ln in text.splitlines() if ln.strip()], base
 
 
+def read_builds_dir(kit_dir, root):
+    """`(builds_dir, why)`: `<root>/<MEMORY_ROOT>/builds` where the memory tree's conf at `root` sets
+    `DESIGN_RECORD`, the mark of the tree that owns the chain's build names, or None and why: no
+    memory-tree kit, or no `DESIGN_RECORD` in the conf, a missing conf included. The memory-tree kit's
+    `read_design_conf` is imported inside the function, as `read_actor_base` imports its compare base."""
+    try:
+        mt_dir = resolve_kit_dir("memory-tree", "design_lib.py", kit_dir)
+    except LookupError as e:
+        return None, str(e)
+    if str(mt_dir) not in sys.path:
+        sys.path.insert(0, str(mt_dir))
+    from design_lib import read_design_conf
+    conf = read_design_conf(root)
+    if not str(conf.get("DESIGN_RECORD") or "").strip():
+        return None, "%s sets no DESIGN_RECORD, or is absent, so the chain's builds are not this tree's" % (
+            (pathlib.Path(root) / ".memory-tree.conf").as_posix())
+    memory_root = (conf.get("MEMORY_ROOT") or "memory").strip().strip("/")
+    return pathlib.Path(root) / memory_root / "builds", ""
+
+
 def read_actor_rows(kit_dir):
     """The actor-witness list's lines in `kit_dir`, blank lines dropped; LoopError where it does not read."""
     path = pathlib.Path(kit_dir) / ACTOR_LIST
@@ -448,13 +474,16 @@ def check_site_witnesses(kit_dir, site, entries):
     """`(lines, refusals)` of the declaration site `site`'s `entries`, each `<item>` or `<item>:<word>`:
     a line per entry whose word resolves through `[[witness-alias]]`; a refusal per entry with no word,
     a word no alias row holds, or an actor word with no `<site> <item>` list row, and per list row of
-    `site` whose item is no actor entry. The list is the one in `kit_dir`, read without a base."""
+    `site` whose item is no actor entry. The list is the one in `kit_dir`, read without a base.
+    `DOD_EXTRA` is the adopter's own: no list row is read for it, and an actor entry there is admitted,
+    its line ending `· adopter-declared, not on the shipped list`."""
     data, where = read_definition(kit_dir)
     check_witness_classes(data, where)
     refused, aliases = data["witnesses"]["refused"], data.get("witness-alias", [])
     words = " or ".join(":" + r["word"] for r in aliases)
+    own = site == "DOD_EXTRA"
     listed = {}
-    for line in read_actor_rows(kit_dir):
+    for line in [] if own else read_actor_rows(kit_dir):
         fields = line.split("\t")
         if len(fields) == 3 and fields[0] == site:
             listed[fields[1]] = fields[2]
@@ -469,7 +498,9 @@ def check_site_witnesses(kit_dir, site, entries):
             refusals.append("%s %s: %r is no witness word; the words are %s" % (site, entry, word, words))
             continue
         line = "loop: site %s · %s · %s · %s" % (site, item, word, cls)
-        if cls in refused:
+        if cls in refused and own:
+            line += " · adopter-declared, not on the shipped list"
+        elif cls in refused:
             actors.add(item)
             if item in listed:
                 line += " · until %s" % listed[item]
@@ -752,6 +783,8 @@ def write_loop_plant(data, case, rows, base_rows):
     elif case == "actor-list-no-build":
         rows.append("DOD_CORE\tkeepalive-reaped\tdNoSuchBuild")
         base_rows.append("DOD_CORE\tkeepalive-reaped\tdNoSuchBuild")
+    elif case == "actor-list-foreign":
+        pass  # its break is the builds folder, which `main` sets after the read
     elif case == "missing-step":
         data["step"] = [r for r in steps if r.get("tag") != "step.deploy"]
     elif case == "reordered":
@@ -834,6 +867,9 @@ def main(argv):
         return 1
     if not plant:
         base_rows, base_why = read_actor_base(kit_dir)
+    builds_dir, builds_why = read_builds_dir(kit_dir, root)
+    if plant == "actor-list-foreign":
+        builds_dir, builds_why = None, PLANTS[plant]
     for s in loop["step"]:
         print("loop: step %s · order %d · state %s · exit %s" % (s["tag"], s["order"], s["state"], s["exit"]))
     for w in loop["workflow"]:
@@ -857,12 +893,17 @@ def main(argv):
     for line in rows:
         fields = line.split("\t")
         if len(fields) == 3:
-            print("loop: actor witness %s · %s · until %s" % tuple(fields))
+            print("loop: actor witness %s · %s · until %s" % tuple(fields) + (
+                "" if builds_dir is not None else " · foreign build, not graded"))
     if base_rows is None:
         print("loop: actor-list base · no comparison · %s" % base_why)
     else:
         print("loop: actor-list base · %s" % base_why)
-    refusals = check_actor_list(rows, base_rows, sites, root)
+    if builds_dir is None:
+        print("loop: actor-list builds · foreign · %s" % builds_why)
+    else:
+        print("loop: actor-list builds · %s" % builds_dir.as_posix())
+    refusals = check_actor_list(rows, base_rows, sites, builds_dir)
     if scratch is not None and not refusals:
         refusals = check_scope_plant(plant, layers, pathlib.Path(scratch.name), kit_dir, root,
                                      [r["tag"] for r in data.get("item", [])])

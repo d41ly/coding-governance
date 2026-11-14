@@ -119,9 +119,12 @@ disposition aliases are: `machine` means `history`, `agent` means `actor`.
 
 `actor-witnesses.txt` beside the definition is the shrink-only list of actor witnesses, rows only,
 `<site>`, `<witness>` and `<build>` separated by tabs, the build being the one whose computed witness
-takes its place. A site is a step tag or one of `DECLARATION_SITES`, `DOD_CORE` and `DOD_EXTRA`. It
+takes its place. A site is a step tag or `DOD_CORE`, the one declaration site the list grades. It
 is seeded with the two `agent` entries of `DOD_CORE`: `keepalive-reaped` until `dWellOiledMachine`
-and `parked-decisions-surfaced` until `dShippedRelease`.
+and `parked-decisions-surfaced` until `dShippedRelease`. A row's build folder is tested only in a
+tree whose `.memory-tree.conf` sets `DESIGN_RECORD`, under `<MEMORY_ROOT>/builds/`; in any other
+tree each row prints `foreign build, not graded`. `DOD_EXTRA` is the adopter's own: its actor entries
+need no row and are admitted, printed `adopter-declared`.
 
 ## The reader, `loop_lib.py`
 
@@ -141,8 +144,9 @@ and `parked-decisions-surfaced` until `dShippedRelease`.
 | `resolve_alias(rows, word)` | the `means` of the row holding `word`, or `None` |
 | `read_actor_rows(kit_dir)` | the actor list's non-blank lines, the list's one reader |
 | `read_actor_base(kit_dir)` | `(rows, base)` of the list at the compare base, or `(None, why)` for no comparison |
-| `check_actor_list(rows, base_rows, sites, root)` | one refusal per list row not three fields, absent at the base, naming no actor witness of its site, or naming a build with no folder; and per actor witness no row lists |
-| `check_site_witnesses(kit_dir, site, entries)` | `(lines, refusals)` for one declaration site's `<item>:<word>` entries, joined to the aliases and the list both ways |
+| `read_builds_dir(kit_dir, root)` | `(builds_dir, "")` where the conf at `root` sets `DESIGN_RECORD`, or `(None, why)`: no memory-tree kit, or no `DESIGN_RECORD` |
+| `check_actor_list(rows, base_rows, sites, builds_dir)` | one refusal per list row not three fields, absent at the base, naming no actor witness of its site or a site that is neither a step nor `DOD_CORE`, or, with a `builds_dir`, naming a build with no folder there; and per actor witness no row lists |
+| `check_site_witnesses(kit_dir, site, entries)` | `(lines, refusals)` for one declaration site's `<item>:<word>` entries, joined to the aliases, and for `DOD_CORE` to the list both ways; a `DOD_EXTRA` actor entry is admitted, `adopter-declared` |
 | `derive_outcome_set(row, members, where)` | one item row's closed outcome set, `members` for `"dispositions"`; the rule `read_outcome_set` and `check_program` share |
 | `check_program(data, where, layers)` | `{step tag: [item tags in needs order]}` once the item rows hold as each step's program |
 | `read_layer_tags(kit_dir)` | the playbook kit's layer tags; `LookupError` where that kit does not resolve |
@@ -164,8 +168,9 @@ The witnesses are graded by `check_witness_classes` alone, called from `read_wit
 `check_site_witnesses` and `--check`, never from `load_loop`: a reader that copies this module with a
 definition holding no witness keeps reading. `read_actor_base` takes the repository root and the
 list's path from `git rev-parse`, finds the memory-tree kit with its inline `resolve_kit_dir`, and
-imports that kit's `resolve_compare_base` inside the function, so nothing else here needs more than
-the standard library.
+imports that kit's `resolve_compare_base` inside the function. `read_builds_dir` finds the same kit
+the same way and imports its `read_design_conf` inside the function. Those two are the only reaches
+outside the standard library.
 
 A kit reads it by finding this kit's directory with its own `resolve_kit_dir` and importing the
 module from there. Three readers do today: the roles kit's `roles_lib.read_workflow_order`, which its
@@ -178,7 +183,9 @@ drive rows by `order` and pick each role's practices by its reach word.
 - `python loop_lib.py --check` reads the definition and prints one line per step and per workflow,
   the disposition set on one line and one line per alias, then the witness classes, one line per
   witness alias and per witness, one line per actor-list row with its build, and the list's base line:
-  the base it compared against, or `no comparison` and why, never read as an empty list. Exit 0 read,
+  the base it compared against, or `no comparison` and why, never read as an empty list. Then
+  `loop: actor-list builds · <folder>`, or `loop: actor-list builds · foreign · <why>`, each row's line
+  ending `foreign build, not graded` in that case. Exit 0 read,
   1 refused with the reason on one line or each list refusal as `loop: refused · ...`. It prints
   `loop: program <step> · <n> item(s) · <tags>` per step, after `loop: inputs unarmed` and why where
   the playbook kit's layer tags do not resolve. It is the `loop definition` gate leg, and it runs no
@@ -194,7 +201,8 @@ drive rows by `order` and pick each role's practices by its reach word.
   `defer` row meaning no member), `witness-no-class`, `witness-bad-class` (class `agent-said`),
   `witness-actor-unlisted` (step.plan's class `actor`), `witness-actor-listed` (that, and listed, which
   reads clean), `actor-list-grown` (a row the base lacks), `actor-list-stale` (a row for step.design,
-  whose witness is `history`) and `actor-list-no-build` (a row naming `dNoSuchBuild`). The program
+  whose witness is `history`), `actor-list-no-build` (a row naming `dNoSuchBuild`) and
+  `actor-list-foreign` (the builds folder set to foreign after the read, which reads clean). The program
   cases are `needs-cycle`, `needs-unresolved` (a missing tag inside an any-of entry),
   `outcome-unrouted`, `route-unresolved`, `input-no-layer` and `exit-missing`. `scope-selected` and
   `scope-no-kit` run the read and then the scope verb, exiting 0 when it behaves: the first over a
@@ -206,7 +214,9 @@ drive rows by `order` and pick each role's practices by its reach word.
   `DOD_EXTRA`, whose entries are `<item>` or `<item>:<word>`. The word resolves through
   `[[witness-alias]]` alone. It prints `loop: site <site> · <item> · <word> · <class>` per entry,
   `· until <build>` on a listed actor entry, then each refusal: an entry with no word, a word no alias
-  row holds, an actor entry the list does not hold, and a list row of that site no actor entry holds.
+  row holds, and for `DOD_CORE` an actor entry the list does not hold and a list row no actor entry
+  holds. A `DOD_EXTRA` actor entry reads no list row; its line ends `· adopter-declared, not on the
+  shipped list`, and check 53's report names it.
   Exit 0, 1 on a refusal, 2 on usage or a site outside `DECLARATION_SITES`. It reads the list in this
   directory and runs no git. The unattended kit's check 53 calls it, which is why that kit requires
   this one.
