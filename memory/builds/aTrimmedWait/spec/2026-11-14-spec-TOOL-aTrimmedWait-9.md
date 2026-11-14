@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-9 — closing-review repair, hooks and roles: the role gate reads no shell comment as words, the P3 rows are tested at the floor, and arm 23 tells a resumed read from a cold re-parse
 
-**Status:** SPECCED · rev-3 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 8 · ratified 2026-11-14
+**Status:** INPROGRESS · rev-3 · 2026-11-15 · node a · Tier-2 · base 846d51d3 · streams tooling · order 8 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
