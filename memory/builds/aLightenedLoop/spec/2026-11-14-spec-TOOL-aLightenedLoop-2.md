@@ -1,6 +1,6 @@
 # TOOL-aLightenedLoop-2 — the idle-wake tick: one cheap `--wake` verb that ends a healthy turn, and a longer cadence while a registered task is open
 
-**Status:** SPECCED · rev-1 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 2
+**Status:** INPROGRESS · rev-1 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
