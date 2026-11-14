@@ -135,7 +135,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-15 — the build table's terminal states, and `deps.on-parent-withdrawn` routing a withdrawn parent](spec/2026-10-24-spec-TOOL-dDeclaredLoop-15.md) | 12 | 2 | CLOSED | rev-4 | 2026-11-14 |
 | [TOOL-dDeclaredLoop-3 — the transition record three ways, its channels the set `transitions.record` selects](spec/2026-10-24-spec-TOOL-dDeclaredLoop-3.md) | 13 | 2 | CLOSED | rev-5 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-10 — backward transitions recorded like forward ones](spec/2026-10-24-spec-TOOL-dDeclaredLoop-10.md) | 14 | 2 | CLOSED | rev-2 | 2026-11-15 |
-| [TOOL-dDeclaredLoop-2 — the guard, the TTY policy command and the default floor](spec/2026-10-24-spec-TOOL-dDeclaredLoop-2.md) | 15 | 2 | DEFERRED | rev-4 | 2026-11-05 |
+| [TOOL-dDeclaredLoop-2 — the guard, the TTY policy command and the default floor](spec/2026-10-24-spec-TOOL-dDeclaredLoop-2.md) | 15 | 2 | DEFERRED | rev-5 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-43 — the guarded write restores each path's prior bytes, and writes each through a sibling temp file](spec/2026-10-24-spec-TOOL-dDeclaredLoop-43.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-44 — the policy push arm grades a merge on its combined diff, and a new branch against the remote default tip](spec/2026-10-24-spec-TOOL-dDeclaredLoop-44.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-8 — claims keyed and trusted by key and source](spec/2026-10-24-spec-TOOL-dDeclaredLoop-8.md) | 16 | 2 | DEFERRED | rev-3 | 2026-11-05 |
@@ -212,7 +212,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 382 bound to this build, across 4 record folder(s).
+Records: 384 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
