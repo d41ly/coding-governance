@@ -253,6 +253,11 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "NeedsCycle",
+      "kind": "class",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
       "id": "Offender",
       "kind": "class",
       "file": "tools/lexicon/lexicon.py"
@@ -10686,6 +10691,11 @@
       "id": "derive_needle",
       "kind": "function",
       "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
+      "id": "derive_needs_order",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
     },
     {
       "id": "derive_new_beside",
@@ -28971,6 +28981,11 @@
       "id": "scan_corpus",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"
+    },
+    {
+      "id": "scan_cycles",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
     },
     {
       "id": "scan_dead_anchors",

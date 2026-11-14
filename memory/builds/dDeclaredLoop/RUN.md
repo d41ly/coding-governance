@@ -112,3 +112,7 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-14T08:40:24Z brief · item TOOL-dDeclaredLoop-12 · reason ae62f5f5a99e memory/builds/dDeclaredLoop/prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-12-build-brief.md
 
 2026-11-14T09:01:47Z brief · item TOOL-dDeclaredLoop-12 · reason d9c0b6c99e80 memory/builds/dDeclaredLoop/prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-12-build-brief.md
+
+2026-11-14T09:13:13Z dispatch · item 04bcd80d TOOL-dDeclaredLoop-12 · reason tools/memory-tree/backlog.py
+
+2026-11-14T09:18:42Z dispatch · item 04bcd80d TOOL-dDeclaredLoop-12 · reason memory/map/generated/symbols.json
