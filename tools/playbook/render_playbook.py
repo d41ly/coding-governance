@@ -1443,24 +1443,20 @@ def render_delta_line(state: str, origin: str, what: str) -> str:
 
 
 def read_kind_rows(target: Path, exclude: set, records: list) -> list[tuple[str, dict, list]]:
-    """`(kind, {gov tag: state}, widenings)` per row kind the target's kinds register lists with a schema, its
-    gov rows read at HEAD from the namespace row's `source`, composed through `overlay_rows`."""
+    """`(kind, {gov tag: state}, widenings)` per row kind the target's kinds register lists with a schema,
+    composed at HEAD through `overlay_rows.derive_kind_composition`; a kind it answers None for, its schema
+    file absent or HEAD holding no blob at its namespace `source`, is passed over (TOOL-dDeclaredLoop-24 S3)."""
     import overlay_rows
     import pins
     import row_checks
-    from policy_value import read_tag_policy
-    from tag_index import resolve_prefix_token
-    iu, out = load_units_module(), []
+    load_units_module()
+    out = []
     for k in pins.read_row_kinds(target):
         kind = str(k.get('tag', '')).partition('.')[2]
-        schema = overlay_rows.read_kind_schema(target, kind)
-        names = tomllib.loads(read_input(iu.derive_kit_file(target, 'namespaces.toml'), 'the namespace registry'))
-        source = next((r.get('source') for r in names.get('namespace') or [] if r.get('ns') == kind), None)
-        text = iu.run_git(target, 'show', f'HEAD:{resolve_prefix_token(source, iu.derive_kit_prefix())}') if source else ''
-        gov = [{**r, 'origin': kind, 'source': source} for r in tomllib.loads(text).get(kind, [])]
-        policy = read_tag_policy(target, 'HEAD') if exclude else {}
-        _rows, states, *_rest, checks = overlay_rows.derive_row_composition(
-            kind, schema, gov, overlay_rows.read_overlay_rows(target).get(kind, []), exclude, 'order', records, policy)
+        got = overlay_rows.derive_kind_composition(target, kind, exclude, records)
+        if got is None:
+            continue
+        _rows, states, *_rest, checks = got
         out.append((kind, states, row_checks.derive_widenings(checks)))
     return out
 

@@ -24,6 +24,22 @@ is `stale` and `instructions.stale` acts, `order` and `warn` applying the patch 
 (`orphaned`), the amendment held out and the replacement composing on its own. Rows with no edge join as
 the repository's own. After the edge loop `row_checks.check_rows` reads every edge and the composed rows,
 and its reds refuse before a `refuse` hold. It returns data and writes nothing.
+
+ONE KIND AT HEAD (TOOL-dDeclaredLoop-24). `derive_kind_composition(root, kind, exclude, records)` is the one
+per-kind body: the schema, gov's rows read at HEAD from the kind's namespace `source` through memory-tree's
+`tree_lib.read_blobs_at`, the overlay's rows, the tag-valued policy where an exclusion is set, and
+`derive_row_composition` under the stale mode `order`. It answers None, before any read grades, where the
+schema file is absent from `root`, so a target without the kit that ships it composes no row of the kind,
+and where HEAD is unborn or holds no blob at the `source`, so a first install's render, its rows staged and
+not committed, composes none either. `render_playbook.read_kind_rows` calls it per kind.
+
+    python overlay_rows.py compose --kind <kind>
+
+composes the repository at the working directory and prints one JSON object: `rows`, `states`, `held`,
+`stale`, `operations` (the row checks' classified patch operations) and `pins`, each gov row's eight-hex
+pin over its canonical form. Exit 0; 1 with each red line of a refusal; 2 naming `unarmed` and the path
+where the kind is not registered with a schema, its schema file is absent, or HEAD holds no blob at its
+`source`, and on a usage error.
 """
 from __future__ import annotations
 
@@ -325,3 +341,85 @@ def derive_row_composition(kind, schema, gov_rows, overlay_rows, exclude, stale_
         check_reds([f"{SAY}: red · instructions.stale = refuse · the update is held until instructions.edit re-pins:",
                 *stale])
     return composed, states, held, stale, orders, checks
+
+
+def read_kind_source(root, kind) -> tuple:
+    """`(schema path, source path, gov rows)` of the registered `kind` under `root`, both paths tree-relative:
+    gov's rows read at HEAD from the namespace row's `source`, each carrying `origin` and `source`; None for
+    the rows where the schema file is absent from `root`, or HEAD is unborn or holds no blob at the `source`.
+    A namespace row naming no `source` reads no gov row. OverlayRefused where the kind is not registered."""
+    from tag_index import resolve_prefix_token
+    row = next((r for r in pins.read_row_kinds(root) if r.get("tag") == f"kind.{kind}"), None)
+    if row is None:
+        check_reds([f"{SAY}: red · kind {kind} · the kinds register lists no such kind with a `schema`"])
+    prefix = iu.derive_kit_prefix()
+    schema_rel = resolve_prefix_token(row["schema"], prefix)
+    names = tomllib.loads(iu.derive_kit_file(root, "namespaces.toml").read_text(encoding="utf-8"))
+    source = next((r.get("source") for r in names.get("namespace") or [] if r.get("ns") == kind), None)
+    source_rel = resolve_prefix_token(source, prefix) if source else ""
+    if not (pathlib.Path(root) / schema_rel).is_file():
+        return schema_rel, source_rel, None
+    if not source:
+        return schema_rel, source_rel, []
+    if not ov.check_born(root):
+        return schema_rel, source_rel, None
+    iu.load_memory_tree_path()
+    from tree_lib import read_blobs_at
+    text = read_blobs_at(root, [("HEAD", source_rel)])[("HEAD", source_rel)]
+    if text is None:
+        return schema_rel, source_rel, None
+    return schema_rel, source_rel, [{**r, "origin": kind, "source": source} for r in tomllib.loads(text).get(kind, [])]
+
+
+def derive_kind_composition(root, kind, exclude, records):
+    """What `derive_row_composition` returns for `kind` composed at HEAD under `root`, or None where the
+    kind's schema file is absent from `root`, or HEAD is unborn or holds no blob at its namespace `source`
+    (TOOL-dDeclaredLoop-24 S3, section 8 F9). The overlay and the exclusions are read at HEAD as well."""
+    from policy_value import read_tag_policy
+    _schema_rel, _source_rel, gov = read_kind_source(root, kind)
+    if gov is None:
+        return None
+    schema = read_kind_schema(root, kind)
+    policy = read_tag_policy(root, "HEAD") if exclude else {}
+    return derive_row_composition(kind, schema, gov, read_overlay_rows(root).get(kind, []), exclude, "order",
+                                  records, policy)
+
+
+def run_compose(argv) -> int:
+    """The `compose --kind <kind>` verb over the repository at the working directory: -> its exit."""
+    from policy_value import PolicyRefused
+    if len(argv) != 3 or argv[:2] != ["compose", "--kind"] or not argv[2]:
+        print(f"{SAY}: usage: python overlay_rows.py compose --kind <kind>", file=sys.stderr)
+        return 2
+    root, kind = pathlib.Path.cwd(), argv[2]
+    try:
+        if not any(r.get("tag") == f"kind.{kind}" for r in pins.read_row_kinds(root)):
+            print(f"{SAY}: unarmed · kind {kind} · {iu.derive_kit_file(root, 'kinds.toml').relative_to(root).as_posix()} "
+                  f"lists no such kind with a `schema`")
+            return 2
+        schema_rel, source_rel, gov = read_kind_source(root, kind)
+        if gov is None:
+            absent = not (root / schema_rel).is_file()
+            print(f"{SAY}: unarmed · kind {kind} · " + (f"{schema_rel}, its schema, is absent" if absent else
+                                                       f"HEAD holds no {source_rel}, its namespace source"))
+            return 2
+        got = derive_kind_composition(root, kind, ov.read_excluded_tags(root), iu.read_change_records(root))
+        schema = read_kind_schema(root, kind)
+    except PolicyRefused as exc:
+        print(f"{SAY}: red · the composition is refused: policy {exc.key}: {exc.line}")
+        return 1
+    except (ValueError, OSError) as exc:   # OverlayRefused, UnitRowError, LevelError, a TOML fault
+        for line in str(exc).splitlines():
+            print(line)
+        return 1
+    rows, states, held, stale, _orders, checks = got
+    print(json.dumps({"rows": rows, "states": states, "held": held, "stale": stale,
+                      "operations": checks["operations"],
+                      "pins": {r["tag"]: iu.derive_unit_pin(derive_row_canon(schema, r)) for r in gov}},
+                     ensure_ascii=False, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.exit(run_compose(sys.argv[1:]))

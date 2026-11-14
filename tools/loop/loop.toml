@@ -71,6 +71,15 @@
 # One [[owed-row]] row per cross-step route whose build row another unit or build writes, shrink-only:
 # `item` and `outcome`, the route, and `by`, the writer, which deletes the row in the same landing.
 #
+# One [[record-version]] row per typed record kind an item returns or reads (TOOL-dDeclaredLoop-24),
+# read by loop_items.py beside this file:
+#   kind     record-kind.<name>, a key of the memory-tree kit's record table
+#   version  the kind's current version, an integer from 1; an input or a `returns` written
+#            record-kind.<name>@<n> names a version, and one written without `@<n>` reads this one
+#   fields   the first eight hex of the SHA-256 of the kind's row, its `required` and `closed`, as
+#            canonical JSON. A row whose fields hash moved while its version did not is refused: a bump
+#            re-pins it. An untyped kind reads version 1 and has no row.
+#
 # One [[item]] row per item of a gov step's program (TOOL-dDeclaredLoop-12), after every table above:
 #   tag        the item's tag, `item.<step>.<name>`, a member of the `item` namespace
 #   step       the [[step]] tag its tag opens
@@ -878,6 +887,16 @@ by = "TOOL-dDeclaredLoop-15"
 item = "item.deploy.close"
 outcome = "closed"
 by = "TOOL-dDeclaredLoop-15"
+
+[[record-version]]
+kind = "record-kind.acceptance"
+version = 1
+fields = "c24a6acc"
+
+[[record-version]]
+kind = "record-kind.disposition"
+version = 1
+fields = "f5e4fde2"
 
 # ---- Plan's program ----------------------------------------------------------------------------------
 

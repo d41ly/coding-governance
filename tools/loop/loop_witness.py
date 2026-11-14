@@ -56,7 +56,7 @@ sys.dont_write_bytecode = True
 KIT = pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
-from loop_lib import resolve_kit_dir  # noqa: E402  this kit's inline copy of the sibling resolver
+from loop_lib import read_memory_tree, resolve_kit_dir  # noqa: E402  this kit's inline copy of the sibling resolver
 
 SAY = "loop-witness"
 #: The default bound of one re-run command, in seconds.
@@ -119,15 +119,6 @@ def run_tree_kill(proc):
     except subprocess.TimeoutExpired:
         pass
 # <<< run_tree_kill_py
-
-
-def read_memory_tree(anchor):
-    """The memory-tree kit's directory holding `anchor`, found from this kit and put on `sys.path`;
-    LookupError naming where it looked."""
-    mt_dir = resolve_kit_dir("memory-tree", anchor, KIT)
-    if str(mt_dir) not in sys.path:
-        sys.path.insert(0, str(mt_dir))
-    return mt_dir
 
 
 def read_clean_env(**put):

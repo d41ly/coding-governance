@@ -1985,6 +1985,19 @@
     "enforces": ["principle.p11"]
   },
   {
+    "name": "loop item kind",
+    "argv": [
+      "python",
+      "{prefix}/loop/loop_items.py",
+      "check",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "repo",
+    "ceiling": 300,
+    "enforces": ["principle.p16"]
+  },
+  {
     "name": "loop transition tables",
     "argv": [
       "python",

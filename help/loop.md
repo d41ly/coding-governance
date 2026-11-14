@@ -336,6 +336,99 @@ The tables do not judge whether a move's witness holds, which is the writer's pr
 whether a state is reachable or a cycle terminates. The feature and unit rows are not joined to the
 routes, and a feature's state, its least-advanced unit's, is the mover's call.
 
+## The item kind, `kind.item`
+
+Items are a registered kind: the kinds register's `kind.item` row names a factory, a row schema,
+`tools/loop/item-schema.toml`, and a gate, so your repository can add an item to a gov step, or patch
+or exclude one of gov's, from its own overlay, `.governance/instructions.toml`, the way it changes any
+registered kind's row (see [overlay rows](overlay-rows.md)). Every check reads the composition of gov's
+items with yours at your last commit, never the overlay's text, so a patch that closes a needs cycle is
+caught even though no row you wrote holds one.
+
+**Your own item** is an `[[item]]` table with every field a gov item carries, its tag holding `adopter`
+at the third segment, item.test.adopter.smoke for instance:
+
+```toml
+[[item]]
+tag = "item.test.adopter.smoke"
+step = "step.test"
+actor = "command:smoke"
+needs = ["item.test.verdict"]
+inputs = ["layer.flow:the verified tree"]
+allowance = "the smoke record"
+returns = "record-kind.smoke"
+outcomes = ["done"]
+witness = { class = "history", by = "the smoke record" }
+owner = "your-build"
+routes = { done = "item.test.exit" }
+```
+
+**What you may change on gov's items.** The schema says, field by field:
+
+- `needs` is open, and removing a need widens it; adding one narrows it.
+- `inputs` and `routes` are open, and adding widens them. An `amends` writes `routes` whole, so every
+  changed route reads as a widening, with gov's old table as a narrowing beside it.
+- `step`, `witness` and `outcomes` are fixed by a principle, and `actor`, `allowance`, `returns` and
+  `owner` are fixed because they declare no direction. Patching one is refused, naming the field and
+  what fixes it.
+- Each step's exit item and the floor item `item.test.verdict`, whose verdict the runner writes, are
+  fixed rows: an `amends`, a `supersedes` or an exclusion of one is refused.
+- An exclusion is refused while another item still needs the excluded one, naming that item, or while
+  a policy key such as review.breakpoints names it, naming the key.
+
+**Records at a version.** An input that reads a record is written `<layer tag>:record-kind.<name>`, or
+with `@<n>` for a version, and a `returns` names the record kind it writes the same way. The definition
+pins each typed record kind an item returns at its current version with a `[[record-version]]` row,
+whose `fields` is a hash of the kind's required and closed fields. If the kind's fields change while its
+version does not, `check` refuses it: the meaning moved with no bump. An input without `@<n>` reads the
+current version. One with it must be met by an item in its needs closure returning that kind at that
+version, so after a bump an input still pinned at the old version is refused until it moves.
+
+- **Check the composed items:** `python tools/loop/loop_items.py check` composes your repository <!-- usage: script:tools/loop/loop_items.py#check 3c7c7c39 -->
+  through the playbook kit and prints `loop: items composed · <n> row(s) · <m> repository`, one
+  `loop: patch` line per classified patch operation of your overlay, one `loop: record-version` line
+  per version row and `loop: record inputs · <n> joined`, and exits 0. It exits 1 on a refusal: the
+  composition's, a needs cycle (each named), a need no item declares, a step exit or the floor item
+  with no fixed row, a version row whose hash moved, or a record input no needed item produces. It
+  exits 2, `unarmed`, where the playbook kit is not installed, the schema is absent, or your last
+  commit holds no definition yet, as right after a first install, before its commit.
+  `check --selftest` runs `check` and every case below. Gov's own `loop item kind` gate runs it; an
+  install does not carry that gate, since the check reaches the playbook kit, which the loop kit does
+  not require.
+
+- **Add a gov item:** `new` appends one gov item to the definition, routing its `done` to the step's <!-- usage: script:tools/loop/loop_items.py#new 967f4049 -->
+  exit item, `python tools/loop/loop_items.py new <name> --step <step> --actor <actor> --witness-by <text> --owner <build>`, with `--input`, `--allowance` and `--returns` owed by every actor but a
+  `role:` one, which takes them from its role. It grades the file as written with the definition's own
+  checks and restores its bytes and exits 1 when they refuse it. A name that is not one tag segment,
+  the name `adopter`, a tag the definition already declares, a step that is no gov step and a missing
+  flag each exit 2 before any write. The kinds register runs it as the item kind's factory:
+
+  ```text
+  python <prefix>/playbook/core.py new item <name> --step <step> --actor <kind:name> --witness-by <text> --owner <build> [--input <layer:what> --allowance <text> --returns <record>]
+  ```
+
+- **See a refusal:** `--fixture --plant <case>` builds a scratch repository holding a copy of the kits <!-- usage: script:tools/loop/loop_items.py 461a5b05 -->
+  `check` reaches, commits one plant there, runs `check` and relays its output and exit. The cases:
+  `factory` (the register's factory adds an item, `check` reads it, and the same add again exits 2),
+  `repo-cycle`, `repo-unresolved-need`, `repo-input-unproduced`, `repo-input-produced`,
+  `version-unbumped`, `version-bumped`, `version-stale-input`, `patch-witness`, `patch-outcomes`,
+  `supersede-floor`, `supersede-exit`, `exclude-needed`, `exclude-breakpoint`, `patch-remove-need`,
+  `patch-add-need`, `patch-routes`, `amended-cycle` (an `amends` whose added need closes a cycle the
+  overlay text does not hold), `exit-unfixed`, `schema-absent` and `definition-uncommitted` (a
+  first install's state, where the render composes no item and refuses nothing).
+
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
+  ```bash
+  python tools/loop/loop_items.py check
+  python tools/loop/loop_items.py --fixture --plant amended-cycle
+  python tools/loop/loop_items.py new smoke --step step.test --actor command:smoke --input "layer.flow:the verified tree" --allowance "the smoke record" --returns record-kind.smoke --witness-by "the smoke record" --owner your-build
+  ```
+
+`check` does not tell whether a `fields` hash re-pinned with no version bump was meant: the rule
+compares each row with the record table and reads no earlier revision, so that edit is the review's to
+see. A role item's record kind comes from its role and is not joined. The step gate's `item` class
+grades a gov item that disappears between a landing's base and its tip, as it does any member.
+
 ## The owner's disposition record
 
 When the owner answers a held item, the answer is one record in the build's `build/` folder, written

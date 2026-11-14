@@ -77,7 +77,13 @@ is `loop_checklist.py` beside this file, which reads the driver's registry lines
 
 The definition also holds one transition table per level (TOOL-dDeclaredLoop-13): `[states]`, and the
 `[[transition]]`, `[[stand-in]]` and `[[owed-row]]` rows. `loop_table.py` beside this file reads and
-checks them, and answers each move; nothing here reads them. `run_selftest_cases` is the in-process case
+checks them, and answers each move; nothing here reads them.
+
+The definition also pins each typed record kind an item returns or reads at a version
+(TOOL-dDeclaredLoop-24): one `[[record-version]]` row per kind, its `kind`, its `version` and its `fields`,
+the hash of the kind's row in the memory-tree kit's record table. `loop_items.py` beside this file reads
+and checks them with the composed items; nothing here reads them. `read_memory_tree` finds that kit for
+this module's two callers, `loop_witness.py` and `loop_items.py`. `run_selftest_cases` is the in-process case
 loop that command and `loop_checklist.py` share for `check --selftest`: each case run through the
 command's `main`, its output captured, graded by its exit and a line by its opening and a needle.
 
@@ -573,6 +579,15 @@ def scan_cycles(edges, live=None):
                     stack.append((nxt, path + (nxt,)))
     return [found[k] for k in sorted(found)]
 # <<< needs_graph_py
+
+
+def read_memory_tree(anchor):
+    """The memory-tree kit's directory holding `anchor`, found from this kit and put on `sys.path`;
+    LookupError naming where it looked."""
+    mt_dir = resolve_kit_dir("memory-tree", anchor, pathlib.Path(__file__).absolute().parent)
+    if str(mt_dir) not in sys.path:
+        sys.path.insert(0, str(mt_dir))
+    return mt_dir
 
 
 def read_actor_base(kit_dir):

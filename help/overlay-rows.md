@@ -5,9 +5,26 @@ Gov ships structured rows as well as instruction units: a kind the kinds registe
 way you change a unit (see [the instruction overlay](overlay.md)): from your own row in
 `.governance/instructions.toml`, never by editing gov's row, which the next update overwrites.
 
-No real kind registers a schema yet; the mechanism ships dark, proven on a fixture kind, and each kind's
-own build arms it. The examples use a kind `fixture` whose schema declares the open set fields `grants`
+The first kind to register a schema is the loop's items, `kind.item`, whose schema is
+`tools/loop/item-schema.toml` and whose rows, fields and fixed rows the [loop definition](loop.md) page
+describes. The examples below use a kind `fixture` whose schema declares the open set fields `grants`
 and `needs`, the open scalar `ceiling`, and its owner seat at segment 1.
+
+## See one kind's composition
+
+`python tools/playbook/overlay_rows.py compose --kind item` composes the repository you run it in at <!-- usage: script:tools/playbook/overlay_rows.py#compose 28f85325 -->
+its last commit and prints one JSON object: `rows`, the composed rows; `states`, each gov row's state;
+`held` and `stale`, the held patches and the stale edges; `operations`, each patch operation classified
+`widens` or `narrows`; and `pins`, each gov row's eight-hex pin, the one an `amends` or `supersedes`
+names. It exits 1 with each line of a refusal, and 2 naming `unarmed` and the path where the kind is
+not registered with a schema, its schema file is absent, or your last commit holds no copy of the
+kind's gov rows yet, as right after a first install, before its commit. A render passes over such a kind
+and composes none of its rows.
+
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
+```bash
+python tools/playbook/overlay_rows.py compose --kind item
+```
 
 ## Your own tag
 

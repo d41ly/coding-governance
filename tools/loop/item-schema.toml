@@ -1,0 +1,94 @@
+# item-schema.toml — the row schema of the `item` kind (TOOL-dDeclaredLoop-24): what a repository's own
+# `[[item]]` row in its overlay may hold, and which fields and rows of gov's items it may not touch.
+# Read by the playbook kit's overlay_rows.py through the kinds register's `kind.item` row, and by
+# loop_items.py beside this file, which joins the `[[fixed-row]]` set with the definition's step exits.
+#
+# [kind]: `name`, the kind, and `owner-seat`, the tag segment a repository row holds `adopter` at, so a
+# repository item is tagged item.<step>.adopter.<name>.
+#
+# One [[field]] row per key of a gov item but `tag`, which is no field: a `supersedes` composes at gov's
+# tag and an `amends` carries no tag of its own, so a gov item's tag never changes. A field is open when
+# it declares `widens`, the direction that widens it, and fixed otherwise: by its `fixed-by` sources, or
+# by its undeclared class where it declares neither, so the fixed set is deny-by-default.
+#   needs     a constraint set: removing a need widens
+#   inputs    a read set: reading more widens
+#   routes    patched whole by an `amends`, every changed route one widening
+#
+# One [[fixed-row]] per step's exit item and for the floor item, whose witness the runner writes: no
+# repository row amends, supersedes or excludes one. Every source is a `principle=` tag, never a parser
+# path, which would resolve to nothing at another install prefix.
+
+[kind]
+name = "item"
+owner-seat = 2
+
+[[field]]
+name = "step"
+shape = "scalar"
+fixed-by = ["principle=principle.p20"]
+
+[[field]]
+name = "witness"
+shape = "scalar"
+fixed-by = ["principle=principle.p2"]
+
+[[field]]
+name = "outcomes"
+shape = "set"
+fixed-by = ["principle=principle.p24"]
+
+[[field]]
+name = "actor"
+shape = "scalar"
+
+[[field]]
+name = "allowance"
+shape = "scalar"
+
+[[field]]
+name = "returns"
+shape = "scalar"
+
+[[field]]
+name = "owner"
+shape = "scalar"
+
+[[field]]
+name = "needs"
+shape = "set"
+ref = "needs"
+widens = "remove"
+
+[[field]]
+name = "inputs"
+shape = "set"
+widens = "add"
+
+[[field]]
+name = "routes"
+shape = "set"
+widens = "add"
+
+[[fixed-row]]
+tag = "item.plan.exit"
+fixed-by = ["principle=principle.p20"]
+
+[[fixed-row]]
+tag = "item.design.exit"
+fixed-by = ["principle=principle.p20"]
+
+[[fixed-row]]
+tag = "item.build.exit"
+fixed-by = ["principle=principle.p20"]
+
+[[fixed-row]]
+tag = "item.test.exit"
+fixed-by = ["principle=principle.p20"]
+
+[[fixed-row]]
+tag = "item.deploy.close"
+fixed-by = ["principle=principle.p20"]
+
+[[fixed-row]]
+tag = "item.test.verdict"
+fixed-by = ["principle=principle.p2"]

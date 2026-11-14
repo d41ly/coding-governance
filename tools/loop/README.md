@@ -232,6 +232,40 @@ python <prefix>/loop/loop_table.py check --selftest
 python <prefix>/loop/loop_table.py --fixture --plant dropped-row
 ```
 
+## The item kind
+
+The items are a registered kind (TOOL-dDeclaredLoop-24): the kinds register's `kind.item` row names
+`loop_items.py new` as its factory, `item-schema.toml` beside this file as its row schema, and the leg
+`loop item kind` as its gate. A repository adds an item, or patches or excludes one of gov's, from its
+overlay, `.governance/instructions.toml`, as it does any registered kind's row; its own item's tag holds
+`adopter` at the schema's owner seat, segment 2. The schema declares each key of a gov item but `tag` as
+a field: `needs` an open set widened by removing a need, `inputs` and `routes` open sets widened by
+adding, `routes` patched whole; `step`, `witness` and `outcomes` fixed by a principle, and `actor`,
+`allowance`, `returns` and `owner` fixed by their undeclared class. Its `[[fixed-row]]` set is each
+step's exit item and the floor item `item.test.verdict`, which no repository row amends, supersedes or
+excludes.
+
+`check` composes the repository through the playbook kit's `overlay_rows.py compose --kind item`, run as
+a subprocess, so this kit imports no playbook module; it exits 2, `unarmed`, where that kit does not
+resolve, the schema is absent, or HEAD holds no definition. It then grades the definition holding the
+composed rows: `check_program`, `check_witness_classes` and `check_item_declarations` above; the
+`[[fixed-row]]` set joined with the step exits and the floor item, both ways; each `[[record-version]]`
+row of the definition, its `fields` the hash of its kind's row in the memory-tree kit's record table,
+refused when the hash moved while the `version` did not; and each record input of a composed item,
+`<layer tag>:record-kind.<name>` or `...@<n>`, joined to an item of its needs closure returning that
+kind at that version, an unversioned value reading the kind's current version. `new` appends one gov
+item to the definition, grades the file as written and restores its bytes on a refusal.
+`read_item_members` and `write_item_plant` are the step gate's `item` class. `--fixture --plant <case>`
+runs `check` in a scratch repository holding a copy of the kits it reaches, with one plant committed,
+and `check --selftest` runs `check` and every plant through `run_selftest_cases`.
+
+```bash
+python <prefix>/loop/loop_items.py check
+python <prefix>/loop/loop_items.py check --selftest
+python <prefix>/loop/loop_items.py --fixture --plant amended-cycle
+python <prefix>/playbook/core.py new item <name> --step <step> --actor <kind:name> --witness-by <text> --owner <build>
+```
+
 ## The reader, `loop_lib.py`
 
 | function | returns |

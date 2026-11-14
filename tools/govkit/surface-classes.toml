@@ -96,3 +96,10 @@ id = "module-export"
 reader = "{prefix}/codebase-map/map_lib.py:read_module_export_members"
 plant = "{prefix}/codebase-map/map_lib.py:write_module_export_plant"
 summary = "each name map_lib re-exports from the join factory, held for install.deprecation-window (PLAY-dOrderedCharter-31)"
+
+[[class]]
+id = "item"
+reader = "{prefix}/loop/loop_items.py:read_item_members"
+plant = "{prefix}/loop/loop_items.py:write_item_plant"
+summary = "each gov [[item]] tag of the loop definition, by its tag (TOOL-dDeclaredLoop-24)"
+witness = "{prefix}/playbook/pins.py:read_change_successors"

@@ -238,6 +238,5 @@ kind	kind.workflow	dDeclaredLoop
 kind	kind.hook	dDeclaredLoop
 kind	kind.record-kind	dConvergedCharter
 kind	kind.stage	dDeclaredLoop
-kind	kind.item	dDeclaredLoop
 kind	kind.lens	dCalibratedLens
 kind	kind.scenario	dDeclaredLoop

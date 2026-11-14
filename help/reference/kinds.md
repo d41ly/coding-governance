@@ -115,11 +115,11 @@ python <prefix>/playbook/check_layers.py --new <tag> --kind <kind> [--of <tag>] 
 ```
 
 ## `kind.item`
-<!-- usage: kind:kind.item 3e272ca3 -->
-A work item the loop carries.
+<!-- usage: kind:kind.item af468ce7 -->
+A work item of a gov step's program: an [[item]] row of the loop definition, or a repository's own in its overlay.
 
 ```text
-no factory has landed; dDeclaredLoop lands it, and until then the kind has no member
+python <prefix>/playbook/core.py new item <name> --step <step> --actor <kind:name> --witness-by <text> --owner <build> [--input <layer:what> --allowance <text> --returns <record>]
 ```
 
 ## `kind.lens`

@@ -93,6 +93,11 @@ class = "module-export"
 usage = "none"
 why = "an import name a module keeps for older callers has no verb, key, hook, leg or page"
 
+[[class]]
+class = "item"
+usage = "none"
+why = "an item is a definition row, used by no verb, key, hook, leg or page of its own (TOOL-dDeclaredLoop-24)"
+
 [[usage]]
 id = "command:build"
 shape = "verb"
@@ -348,6 +353,33 @@ id = "script:{prefix}/loop/adopt-loop.sh"
 shape = "verb"
 entry = "{prefix}/loop/adopt-loop.sh"
 flags = ["--check"]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_items.py"
+shape = "verb"
+entry = "{prefix}/loop/loop_items.py"
+flags = ["--fixture", "--plant="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_items.py#check"
+shape = "verb"
+entry = "{prefix}/loop/loop_items.py"
+verb = "check"
+flags = ["--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_items.py#new"
+shape = "verb"
+entry = "{prefix}/loop/loop_items.py"
+verb = "new"
+flags = ["--step=", "--actor=", "--witness-by=", "--owner=", "--input=", "--allowance=", "--returns="]
+
+[[usage]]
+id = "script:{prefix}/playbook/overlay_rows.py#compose"
+shape = "verb"
+entry = "{prefix}/playbook/overlay_rows.py"
+verb = "compose"
+flags = ["--kind="]
 
 [[usage]]
 id = "script:{prefix}/policy/budgets.py#resolve"
