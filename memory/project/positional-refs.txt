@@ -16831,14 +16831,6 @@ memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-11.md	tools/
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-11.md	tools/unattended/check-unattended.sh:427-438
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-11.md	tools/unattended/unattended.sh:12579
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-11.md	tools/unattended/unattended.sh:868
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-12.md	tools/govkit/govkit.py:911
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-12.md	tools/govkit/govkit.py:932-941
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-12.md	tools/lib/resolve-python.test.sh:172
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-12.md	tools/memory-tree/backlog.py:1271
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-12.md	tools/memory-tree/backlog.py:1271-1292
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-12.md	tools/memory-tree/kit.toml:8
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-12.md	tools/memory-tree/tree_lib.py:27
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-12.md	tools/playbook/render_playbook.py:470-499
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-13.md	tools/memory-tree/tree_lib.py:27
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-13.md	tools/unattended/unattended.sh:6140-6143
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-13.md	tools/unattended/unattended.sh:6191
@@ -16959,7 +16951,6 @@ memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-4.md	tools/c
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-4.md	tools/codebase-map/map_lib.py:1042-1048
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-4.md	tools/codebase-map/map_lib.py:1404
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-4.md	tools/codebase-map/map_lib.py:1404-1432
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-41.md	tools/memory-tree/design_lib.py:126
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-42.md	tools/govkit/govkit.py:1144
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-42.md	tools/govkit/govkit.py:1144-1197
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-42.md	tools/process-monitor/reap.py:12-13
