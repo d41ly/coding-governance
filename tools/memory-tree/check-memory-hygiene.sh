@@ -839,7 +839,7 @@ if [ "$SCOPED" = 1 ]; then
   if [ "$SCOPE_KIND" = spec ]; then
     STAGED_SET["$SCOPE_ARG"]=1
   else
-    while IFS= read -r _l; do [ -z "$_l" ] || STAGED_SET["$_l"]=1; done <<<"$FILES"
+    while IFS= read -r _l; do [ -z "$_l" ] || STAGED_SET["$_l"]=1; done < <(printf '%s\n' "$FILES")
   fi
 fi
 in_scope() { [ "$STAGED" = 0 ] && [ "$SCOPED" = 0 ] && return 0; [ -n "${STAGED_SET[$1]+x}" ]; }   # zero-fork (see LEGACY_SET)

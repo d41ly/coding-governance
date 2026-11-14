@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-2 — hygiene check 12 grades one named spec or one build on request, and the spec writer is told to run it that way
 
-**Status:** INPROGRESS · rev-4 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 2 · closes TOOL-aSmoothedDispatch-16 · ratified 2026-11-14
+**Status:** CLOSED · rev-4 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 2 · closes TOOL-aSmoothedDispatch-16 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 

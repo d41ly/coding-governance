@@ -38,3 +38,11 @@ and the new arm's RED-first observation are owed to the close.
   `grep -cE '[a-z-]+/check-memory-hygiene[.]sh' tools/roles/agents/gov-spec-writer.agent.md`
   printed 0; `grep -c -- '--only 12 --spec <path> | --build <slug>' tools/memory-tree/check-memory-hygiene.sh`
   printed 1.
+- Fix (brief `2026-11-14-prompt-TOOL-aTrimmedWait-2-fix`) — the `--build` arm's loop reads `FILES`
+  through `done < <(printf '%s\n' "$FILES")`, not `<<<`. `grep -c '<<<' tools/memory-tree/check-memory-hygiene.sh`
+  printed 28 at the parent `6d4b20d9a` and 27 after, the loop site alone leaving. <!-- PINNED 2026-11-14 -->
+  `bash "$SCRATCH/u2.sh"` printed its AC1 to AC3 lines byte-identical under `cmp` to its run over
+  the script at `91e91ed35`, which the parent holds unchanged. The same command,
+  `time bash tools/memory-tree/check-memory-hygiene.sh --only 12 --build aTrimmedWait`, timed one
+  at a time on node a, ran `real` 0m6.878s before and 0m6.236s after, exit 0 at both, its output <!-- PINNED 2026-11-14 -->
+  byte-identical under `cmp` and ending on `HYGIENE --only 12 ran checks 12 25 over 7 spec(s) of aTrimmedWait`. <!-- PINNED 2026-11-14 -->
