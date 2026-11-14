@@ -16883,10 +16883,6 @@ memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-29.md	tools/
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-29.md	tools/roles/check_roles.py:198-206
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-29.md	tools/roles/handoff.py:337-399
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-29.md	tools/roles/roles_lib.py:36-40
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-3.md	tools/memory-tree/routed_commits.py:231
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-3.md	tools/memory-tree/tree_lib.py:27
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-3.md	tools/unattended/lib-unattended.sh:1149
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-3.md	tools/unattended/unattended.sh:6192-6193
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-30.md	BUILD-METHOD M4
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-30.md	tools/memory-tree/gen_build_index.py:1204
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-30.md	tools/memory-tree/gen_build_index.py:450
