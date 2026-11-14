@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-7 — `handoff.py agents` keeps its parsed session calls per transcript and parses only the bytes appended since
 
-**Status:** CLOSED · rev-3 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 7 · ratified 2026-11-14
+**Status:** INPROGRESS · rev-3 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 7 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-11-14-prompt-TOOL-aTrimmedWait-7-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-1-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-7-2-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-2-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-7-4-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-4-spec-writer.md) | journal | — |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-7-fix.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-fix.md) | research | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-7-revision.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-revision.md) | research | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-7-ruling.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-ruling.md) | research | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-7-writing-practice.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-writing-practice.md) | research | — |
