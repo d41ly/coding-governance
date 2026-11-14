@@ -1,11 +1,12 @@
 # TOOL-aTrimmedWait-2 — hygiene check 12 grades one named spec or one build on request, and the spec writer is told to run it that way
 
-**Status:** INPROGRESS · rev-4 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 2 · closes TOOL-aSmoothedDispatch-16 · ratified 2026-11-14
+**Status:** CLOSED · rev-4 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 2 · closes TOOL-aSmoothedDispatch-16 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-14-build-TOOL-aTrimmedWait-2-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aTrimmedWait-2-1-acceptance-ledger.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md) | research | TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-2-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-2-1-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-2-2-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-2-2-spec-writer.md) | journal | — |

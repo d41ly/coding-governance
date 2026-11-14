@@ -1292,6 +1292,61 @@ for _hs_a in "--only 12 --staged" "--staged --only 12" "--offenders --only 12" "
   n=$((n+1)); [ "$_hs_rc" = 2 ] || { echo "FAIL [$_hs_a] exited $_hs_rc, not 2"; st=1; }
   n=$((n+1)); grep -qF 'HYGIENE check' <<<"$_hs_o" && { echo "FAIL [$_hs_a] graded a check"; st=1; }
 done
+# ---- TOOL-aTrimmedWait-2: `--only 12 --spec <path>` and `--only 12 --build <slug>` grade check 12's
+# ---- block over one spec or one build, untracked specs included, with the `base` resolve arm the
+# ---- unscoped run runs. Its own tree: tOne holds a clean spec, a red one, a LIVE one whose `base`
+# ---- resolves to nothing, an untracked red one and an untracked pre-cutoff one; tTwo holds a red one.
+# ---- Staged breaks: the scope run as STAGED=1 skips the `base` arm, so the tOne-3 arms red; FILES
+# ---- left tracked-only drops tOne-4, so its arms red.
+SC=$TMP/scoped12; _sc_s=memory/builds/tOne/spec; mkdir -p "$SC"
+( cd "$SC" && git init -q --template= .
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nBASE_RESOLVE_CUTOFF="2026-08-26"\n' > .memory-tree.conf
+  mkdir -p "$_sc_s" memory/builds/tTwo/spec
+  good | sed 's/tFixture-1/tOne-1/' > "$_sc_s/2026-08-01-spec-tOne-1.md"
+  good | sed 's/tFixture-1/tOne-2/; /^## 7\. Gates$/d' > "$_sc_s/2026-08-01-spec-tOne-2.md"
+  good | sed 's/tFixture-1/tOne-3/; s/2026-08-01/2026-08-26/g' > "$_sc_s/2026-08-26-spec-tOne-3.md"
+  good | sed 's/tFixture-1/tTwo-1/; /^## 7\. Gates$/d' > memory/builds/tTwo/spec/2026-08-01-spec-tTwo-1.md
+  git add -A && git commit -q -m scoped12 --no-verify
+  good | sed 's/tFixture-1/tOne-4/; /^## 7\. Gates$/d' > "$_sc_s/2026-08-01-spec-tOne-4.md"
+  good | sed 's/tFixture-1/tOne-5/; s/2026-08-01/2026-07-01/g' > "$_sc_s/2026-07-01-spec-tOne-5.md"
+  printf 'notes\n' > "$_sc_s/notes.md" )
+_sc_base='tOne-3.md (status header `base 0123abcd` resolves to no commit'
+_sc_full=$(cd "$SC" && bash "$SCRIPT" --only 12 2>/dev/null); _sc_rc=$?
+n=$((n+1)); [ "$_sc_rc" = 1 ] && grep -qF 'tOne-2.md (' <<<"$_sc_full" && grep -qF 'tTwo-1.md (' <<<"$_sc_full" && grep -qF "$_sc_base" <<<"$_sc_full" \
+  || { echo "FAIL scoped: the unscoped --only 12 over the scope tree exited $_sc_rc or missed a tracked plant"; st=1; }
+n=$((n+1)); grep -qF 'tOne-4.md (' <<<"$_sc_full" && { echo "FAIL scoped: the unscoped --only 12 graded the untracked tOne-4"; st=1; }
+_sc_o=$(cd "$SC" && bash "$SCRIPT" --only 12 --spec "$_sc_s/2026-08-01-spec-tOne-2.md" 2>/dev/null); _sc_rc=$?
+n=$((n+1)); [ "$_sc_rc" = 1 ] && [ "$(grep -F 'tOne-2.md (' <<<"$_sc_o")" = "$(grep -F 'tOne-2.md (' <<<"$_sc_full")" ] \
+  || { echo "FAIL scoped: --spec tOne-2 exited $_sc_rc or its findings differ from the unscoped run's"; st=1; }
+n=$((n+1)); grep -qF 'tTwo-1.md (' <<<"$_sc_o" && { echo "FAIL scoped: --spec tOne-2 graded the other build's tTwo-1"; st=1; }
+n=$((n+1)); grep -qxF "HYGIENE --only 12 ran checks 12 25 over 1 spec(s) of $_sc_s/2026-08-01-spec-tOne-2.md" <<<"$_sc_o" \
+  || { echo "FAIL scoped: --spec tOne-2 printed no liveness line naming one spec and its path"; st=1; }
+_sc_o=$(cd "$SC" && bash "$SCRIPT" --only 12 --spec "$_sc_s/2026-08-26-spec-tOne-3.md" 2>/dev/null); _sc_rc=$?
+n=$((n+1)); [ "$_sc_rc" = 1 ] && [ "$(grep -F "$_sc_base" <<<"$_sc_o")" = "$(grep -F "$_sc_base" <<<"$_sc_full")" ] \
+  || { echo "FAIL scoped: --spec tOne-3 exited $_sc_rc or skipped the base resolve arm the unscoped run reds"; st=1; }
+_sc_o=$(cd "$SC" && bash "$SCRIPT" --only 12 --spec "$_sc_s/2026-08-01-spec-tOne-1.md" 2>/dev/null); _sc_rc=$?
+n=$((n+1)); [ "$_sc_rc" = 0 ] && grep -qxF "HYGIENE --only 12 ran checks 12 25 over 1 spec(s) of $_sc_s/2026-08-01-spec-tOne-1.md" <<<"$_sc_o" \
+  || { echo "FAIL scoped: --spec on the clean tOne-1 exited $_sc_rc or printed no liveness line"; st=1; }
+_sc_o=$(cd "$SC" && bash "$SCRIPT" --only 12 --spec "$_sc_s/2026-08-01-spec-tOne-4.md" 2>/dev/null); _sc_rc=$?
+n=$((n+1)); [ "$_sc_rc" = 1 ] && grep -qF 'tOne-4.md (## sections differ' <<<"$_sc_o" \
+  || { echo "FAIL scoped: --spec on the untracked red tOne-4 exited $_sc_rc or did not name it"; st=1; }
+_sc_o=$(cd "$SC" && bash "$SCRIPT" --only 12 --build tOne 2>/dev/null); _sc_rc=$?
+n=$((n+1)); [ "$_sc_rc" = 1 ] && grep -qF 'tOne-2.md (' <<<"$_sc_o" && grep -qF "$_sc_base" <<<"$_sc_o" && grep -qF 'tOne-4.md (' <<<"$_sc_o" \
+  || { echo "FAIL scoped: --build tOne exited $_sc_rc or missed tOne-2, tOne-3's base or the untracked tOne-4"; st=1; }
+n=$((n+1)); grep -qF 'tTwo-1.md (' <<<"$_sc_o" && { echo "FAIL scoped: --build tOne graded the other build's tTwo-1"; st=1; }
+n=$((n+1)); grep -qxF 'HYGIENE --only 12 ran checks 12 25 over 4 spec(s) of tOne' <<<"$_sc_o" \
+  || { echo "FAIL scoped: --build tOne printed no liveness line naming its four graded specs"; st=1; }
+# S1's refusals: each exits 2 on one `cannot run` line and grades nothing.
+for _sc_a in "--spec $_sc_s/2026-08-01-spec-tOne-2.md" "--only 9 --spec $_sc_s/2026-08-01-spec-tOne-2.md" \
+  "--only 12 --spec $_sc_s/2026-08-01-spec-tOne-2.md --staged" "--only 12 --spec $_sc_s/notes.md" \
+  "--only 12 --spec $_sc_s/2026-08-01-spec-tOne-404.md" "--only 12 --spec $_sc_s/2026-07-01-spec-tOne-5.md" \
+  "--only 12 --spec memory/builds/tTwo/../tOne/spec/2026-08-01-spec-tOne-2.md" "--only 12 --build nope" "--only 12 --build ../tOne"; do
+  _sc_o=$(cd "$SC" && bash "$SCRIPT" $_sc_a 2>/dev/null); _sc_rc=$?
+  n=$((n+1)); [ "$_sc_rc" = 2 ] || { echo "FAIL scoped [$_sc_a] exited $_sc_rc, not 2"; st=1; }
+  n=$((n+1)); [ "$(grep -c '^HYGIENE — cannot run' <<<"$_sc_o")" = 1 ] || { echo "FAIL scoped [$_sc_a] printed no single cannot-run line"; st=1; }
+  n=$((n+1)); grep -qF 'HYGIENE check' <<<"$_sc_o" && { echo "FAIL scoped [$_sc_a] graded a check"; st=1; }
+done
+rm -rf "$SC"
 # ---- AC8: the PARTITION. Over this red tree the SET of lines the unscoped run printed (`out`, above)
 # ---- equals the union of the scoped runs' lines, liveness lines set aside, over one selection per
 # ---- `check_selected` call, named by its first id. The list is this suite's pin of the population.
@@ -4711,7 +4766,9 @@ done
 # each, top-level and never skipped. Counted by reading; OWED: observed at the close.
 # MERGED at this build's reconcile of origin/main cac14c195: the base 690, plus TOOL-aWitnessedCrash-1's 6,
 # plus TOOL-aNimbleMend-9's 11 = 707. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=707
+# RAISED 707 -> 745 by TOOL-aTrimmedWait-2: its scope arms, eleven top-level and twenty-seven in a
+# nine-pass refusal loop, none skipped. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=745
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

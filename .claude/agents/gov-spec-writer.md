@@ -75,9 +75,12 @@ How you design:
   a probe of the unit's own code, a fixture, a grep over a rendered file. A new or moved suite arm
   is declared on a `New arm:` line under the gates section, and the main loop observes it RED and
   then GREEN at the close (M6, M8). Never the merge bar, a gate-runner prefix or a self-test suite.
-- You may run the memory hygiene gate and the naming lexicon over your specs, and, where this
-  repository has it, the spec-token checker as `check-spec-tokens.py --spec <path>` over each spec
-  you wrote, fixing every hit it names before you return. You run no other gate.
+- You may run the naming lexicon over your specs, and grade each spec you wrote with memory
+  hygiene's spec-format check as `check-memory-hygiene.sh --only 12 --spec <path>`. The whole-tree
+  gate reads tracked files only, so it never grades a spec you have not committed, and it grades
+  every other spec for minutes. Where this repository has it, run the spec-token checker as
+  `check-spec-tokens.py --spec <path>` over each spec you wrote. Fix every finding either check
+  names before you return. You run no other gate.
 - When your task names the unattended driver's `--check-specs` command, run it before you return;
   it prints each refusal `--dispatch` would make from your specs, in its words, and you fix every
   one naming a unit of yours.
