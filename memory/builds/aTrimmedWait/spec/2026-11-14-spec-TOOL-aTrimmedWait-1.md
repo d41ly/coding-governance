@@ -1,11 +1,12 @@
 # TOOL-aTrimmedWait-1 — `unattended.sh --check-specs` refuses, before the spec commit and through `--dispatch`'s own predicates, every spec defect `--dispatch` refuses from the spec files alone
 
-**Status:** INPROGRESS · rev-1 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-14-build-TOOL-aTrimmedWait-1-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aTrimmedWait-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md) | research | TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 |
 
 <!-- /gen:spec-records -->

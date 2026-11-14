@@ -7989,6 +7989,49 @@ git rm -q --cached memory/builds/tRun/spec/swift4.md memory/builds/tRun/spec/swi
 rm -f memory/builds/tRun/spec/swift4.md memory/builds/tRun/spec/swift5.md ${PFX}swift-stub.py
 cp "$TMP/swift-readme" memory/builds/tRun/README.md; cp "$TMP/swift-runmd" memory/builds/tRun/RUN.md
 git add memory/builds/tRun/README.md memory/builds/tRun/RUN.md >/dev/null 2>&1
+# ---- TOOL-aTrimmedWait-1 - `--check-specs` makes --dispatch's five spec-file refusals over UNTRACKED
+# ---- specs, with no run-state file, in --dispatch's own words: one build per refusal class, since the
+# ---- edge scan grades a whole build, a clean build, and a two-unit build carrying two refusals, which
+# ---- are both reported rather than the first alone. Nothing is staged, by the arm or by the verb.
+# ---- RED-first is the close's: staged by making `check_dispatch_specs` read tracked specs only and
+# ---- return after its first refusal, which reds the clean and two-refusal arms.
+cs_mk() { # slug · seq · header tail · scope body · edges body
+  mkdir -p "memory/builds/$1/spec"
+  printf '%s\n' "# ARCH-$1-$2 — fixture" "" \
+    "**Status:** SPECCED · rev-1 · 2026-11-14 · node a · Tier-2 · base 0123abcd$3" "" \
+    "## 2. Scope (IN)" "" "$4" "" "## 3. Non-goals (OUT)" "" "### Edges" "" "$5" "" \
+    "## 6. Acceptance criteria" "" '- **AC1** — When `x` runs, it prints y.' "" \
+    "## 7. Gates" "" '- g' "" "## 8. Open questions" "" "none" \
+    > "memory/builds/$1/spec/2026-11-14-spec-ARCH-$1-$2.md"
+}
+cs_s='- **S1** — a thing. Observed by AC1.'
+cs_mk tCsA 1 ' · order 1' "$cs_s" 'none'
+cs_mk tCsB 1 '' '' 'none'
+cs_mk tCsC 1 ' · order 2x' "$cs_s" 'none'
+cs_mk tCsD 1 '' "$cs_s" '- **consumes-from** ARCH-tCsD-2 — no backticks'
+cs_mk tCsE 1 '' "$cs_s" '- **consumes-from** `ARCH-tCsE-2` — one end'
+cs_mk tCsE 2 '' "$cs_s" '- **consumes-from** `ARCH-tCsE-1` — the other end'
+cs_mk tCsG 1 '' '' 'none'
+cs_mk tCsG 2 ' · order 2x' "$cs_s" 'none'
+o=$(run --check-specs tCsA ARCH-tCsA-1); same "check-specs: a clean untracked build exits 0" "$?" 0
+hit "$o" "unattended: --check-specs tCsA — ARCH-tCsA-1: none carries a refusal --dispatch makes from its spec files"
+miss "$o" "UNATTENDED check"
+o=$(run --check-specs tCsB ARCH-tCsB-1); same "check-specs: a THIN spec exits 1" "$?" 1
+hit "$o" "--dispatch declares a build pass for a unit whose spec grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing states what done MEANS for it: ARCH-tCsB-1"
+o=$(run --check-specs tCsC ARCH-tCsC-1); same "check-specs: a malformed order verb exits 1" "$?" 1
+hit "$o" "and a reader taking its numeric prefix would sequence the build on a value nobody wrote: memory/builds/tCsC/spec/2026-11-14-spec-ARCH-tCsC-1.md spells [· order 2x]"
+o=$(run --check-specs tCsD ARCH-tCsD-1); same "check-specs: an unreadable Edges line exits 1" "$?" 1
+hit "$o" "or the word none with no backticked token after it in the bullet: memory/builds/tCsD/spec/2026-11-14-spec-ARCH-tCsD-1.md"
+o=$(run --check-specs tCsE ARCH-tCsE-1 ARCH-tCsE-2); same "check-specs: a consumes-from cycle exits 1" "$?" 1
+hit "$o" "edges form a cycle, so no unit on it can be dispatched after its producer closes and the run would wedge here with no named stop: ARCH-tCsE-1 -> ARCH-tCsE-2 -> ARCH-tCsE-1"
+o=$(run --check-specs tCsF ARCH-tCsF-1); same "check-specs: a unit no spec carries exits 1" "$?" 1
+hit "$o" "--dispatch declares a build pass for a unit no tracked spec under this build defines, which is M2's MISSING: the method's hard floor is that a MISSING unit is never built, and writing the spec afterwards is the same act with the record written last: ARCH-tCsF-1"
+o=$(run --check-specs tCsG ARCH-tCsG-1 ARCH-tCsG-2); same "check-specs: a two-unit build with two refusals exits 1" "$?" 1
+same "check-specs: both units' refusals are reported, not the first alone" "$(grep -c '^UNATTENDED check 49 FAILED' <<<"$o")" 2
+o=$(run --check-specs tCsA); same "check-specs: no unit id exits 1" "$?" 1
+hit "$o" "--check-specs was given no unit id, so it would grade nothing and print what a clean build prints: tCsA"
+same "check-specs: the verb stages nothing, so every fixture spec stays untracked" "$(git ls-files --others --exclude-standard -- 'memory/builds/tCs*/spec/*.md' | grep -c .)" 8
+rm -rf memory/builds/tCsA memory/builds/tCsB memory/builds/tCsC memory/builds/tCsD memory/builds/tCsE memory/builds/tCsG
 # ---- region 3 ends HERE rather than at the old seam above the spec-token arm group: that group runs
 # ---- over the dispatch fixture the arms before it left, so it cannot open a region (TOOL-aGraftedHelix-41).
 fi   # ---- end REGION 3 ------------------------------------------------------------------------
@@ -19544,7 +19587,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # five `hit`/`miss` lines and the M3 block's two `mutate`s and three `same`/`miss`/`hit` lines, every one
 # unconditional, counted off the blocks' own lines; no suite ran, and their RED-first observation is the close's.
 # MERGED at TOOL-aSmoothedDispatch-21's reconcile: the base 3256, plus 42, plus 31 = 3329.
-FLOOR_ASSERTIONS=3329
+# RAISED 3329 -> 3347 by TOOL-aTrimmedWait-1: the --check-specs arm's 18 region-three `same`/`hit`/`miss`
+# lines, every one unconditional, counted off the block's own lines; no suite ran, and its RED-first
+# observation is the close's.
+FLOOR_ASSERTIONS=3347
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -19755,7 +19801,8 @@ FLOOR_SHARD_2=229
 # RAISED 411 -> 434 by TOOL-aSmoothedDispatch-8 on 2026-11-10: the same 23 region-three spec-token assertions, see FLOOR_ASSERTIONS.
 # RAISED 405 -> 416 by TOOL-aSwiftRefusal-4: the same 11 region-three spec-token arm and L1 assertions, see FLOOR_ASSERTIONS.
 # MERGED at TOOL-aSmoothedDispatch-21's reconcile: the base 405, plus 29, plus 11 = 445.
-FLOOR_SHARD_3=445
+# RAISED 445 -> 463 by TOOL-aTrimmedWait-1: the same 18 region-three --check-specs assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_3=463
 # RAISED 373 -> 382 by TOOL-dGroundRules-66: the same 9 region-four terminal-unit assertions, see FLOOR_ASSERTIONS.
 # RAISED 382 -> 383 by TOOL-dGroundRules-70: the same 1 region-four reader assertion, see FLOOR_ASSERTIONS.
 # RAISED 383 -> 386 by TOOL-aSmoothedDispatch-1 on 2026-11-10: the same net 3 region-four --writes split assertions, see FLOOR_ASSERTIONS.

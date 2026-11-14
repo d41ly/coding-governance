@@ -36,6 +36,9 @@ How you design:
 - You may run the memory hygiene gate and the naming lexicon over your specs, and, where this
   repository has it, the spec-token checker as `check-spec-tokens.py --spec <path>` over each spec
   you wrote, fixing every hit it names before you return. You run no other gate.
+- When your task names the unattended driver's `--check-specs` command, run it before you return;
+  it prints each refusal `--dispatch` would make from your specs, in its words, and you fix every
+  one naming a unit of yours.
 - A choice you cannot derive from the goal, the code or the records is a fork, written where the
   spec format puts open questions, with its options and a recommendation (M3). Never decide one
   silently.

@@ -90,6 +90,10 @@ refuses the render, naming the key.
 
 - **Run an attended build:** after kickoff's READY card and the owner's go, invoke `/build`. It walks
   the workflows in stage order and calls the same harnesses `/unattended` uses.
+- **Check a spec before it is committed:** a spec writer runs
+  `unattended.sh --check-specs <slug> <unit>` before returning, and the spec commit refuses on it. <!-- usage: verb:unattended.sh:--check-specs 131e24bd -->
+  It prints each refusal `--dispatch` would make from the spec files, in its words, so a defect is
+  fixed before the spec commit rather than after a builder was dispatched.
 - **Hand one task to one agent:**
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and placeholders -->

@@ -3749,6 +3749,24 @@ has    "FA15 AC25 the declared throw" "$o" 'a disposal passes the ids `--chain-v
 o=$(run_strict_fa3 "$UNITS" '{"terminalSubject":true,"stderr":"x"}')
 has    "FA15 AC25 the undeclared throw" "$o" "a disposal passes the hand-out's \`promotedIds\` as \`auditIds\`"
 
+# ================================ TOOL-aTrimmedWait-1 — `--check-specs` BEFORE THE SPEC COMMIT
+# Each writer, typed or not, is told to run the verb over its own group's ids, and the committer to run
+# it over every authored id before its block and return `committed: false` on a non-zero exit; that
+# return is refused by its `why`. Staged by deleting the writer sentence and the commit step.
+TW1_SPEC='{"spec-write":{"authored":["A-tB-1","A-tB-2","A-tB-3"],"alreadyPresent":[],"refused":[],"summary":"s"},"commit":%s}'
+TW1_OK='{"committed":true,"sha":"'$CSHA'","why":"","specs":[{"id":"A-tB-1","path":"'$GH33_SF'/2026-10-13-spec-A-tB-1.md"},{"id":"A-tB-2","path":"'$GH33_SF'/2026-10-13-spec-A-tB-2.md"},{"id":"A-tB-3","path":"'$GH33_SF'/2026-10-13-spec-A-tB-3.md"}],"summary":"ok"}'
+for tw1_args in "$OFF_UNITS" "${OFF_UNITS/'"slug":"tB",'/'"slug":"tB","roles":{"specWriter":"gov-spec-writer"},'}"; do
+  o=$(run_wf "$tw1_args" "$(printf "$TW1_SPEC" "$TW1_OK")"); tw1_w=$(grep '^prompt:spec-write:' <<<"$o")
+  same "TW1 AC5 the order-1 writer is told to run --check-specs over its two ids" "$(grep -cF -- 'Before you return, run `bash tools/unattended/unattended.sh --check-specs tB A-tB-1 A-tB-2` in /tmp/r.' <<<"$tw1_w")" 1
+  same "TW1 AC5 the order-2 writer is told to run it over its one id" "$(grep -cF -- 'run `bash tools/unattended/unattended.sh --check-specs tB A-tB-3` in /tmp/r.' <<<"$tw1_w")" 1
+done
+tw1_c=$(grep '^prompt:commit:' <<<"$o")
+has    "TW1 AC5 the committer runs --check-specs over every authored id" "$tw1_c" 'Then run `bash tools/unattended/unattended.sh --check-specs tB A-tB-1 A-tB-2 A-tB-3` in /tmp/r'
+has    "TW1 AC5 ...and returns committed: false on a non-zero exit" "$tw1_c" 'when it exits non-zero, run nothing further and return `committed: false` with its stdout in `why`'
+o=$(run_wf "$OFF_UNITS" "$(printf "$TW1_SPEC" '{"committed":false,"sha":"","why":"UNATTENDED check 49 FAILED — spec THIN: A-tB-2","specs":[],"summary":"x"}')")
+has    "TW1 AC5 a commit double refused by --check-specs THROWS naming its output" "$(grep '^THROW' <<<"$o")" 'the spec commit stage did not commit: "UNATTENDED check 49 FAILED — spec THIN: A-tB-2"'
+hasnt_ "TW1 AC5 ...and hands out no roster" "$o" '"roster":[{'
+
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Authored from a
 # static count of the `same`/`has`/`hasnt_` sites in this file — `grep -cE '^\s*(same|has|hasnt_) '`
 # over it, 326 at 1d8530e7 (TOOL-aWokenSentinel-21) — at ~10 % headroom, rounded down, because the
@@ -3885,7 +3903,10 @@ has    "FA15 AC25 the undeclared throw" "$o" "a disposal passes the hand-out's \
 # RAISED 940 -> 950 by TOOL-aNimbleMend-15: ten `passLegs` sites on the child, the absent relative rev,
 # the prompt's request for a base in two modes, the fallback sentence three times with one absence, and the
 # ill-shaped sha's three. Counted by reading, not measured by a run: the pass that wrote it runs no suite.
-FLOOR_ASSERTIONS=950
+# RAISED 950 -> 958 by TOOL-aTrimmedWait-1: the `TW1 AC5` sites, two per writer mode across the loop's two
+# modes, two on the commit prompt, and the refused commit's throw and absent roster. Counted by reading,
+# not measured by a run: the pass that wrote it runs no suite.
+FLOOR_ASSERTIONS=958
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

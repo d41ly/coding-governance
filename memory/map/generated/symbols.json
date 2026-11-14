@@ -5508,6 +5508,11 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "check_dispatch_specs",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_dl_archive",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -5546,6 +5551,11 @@
       "id": "check_drive_red",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "check_edge_shape",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_edges",
@@ -7878,6 +7888,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "check_unit_spec",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_unmerged_live",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -8854,6 +8869,11 @@
     },
     {
       "id": "crround",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "cs_mk",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
     },
