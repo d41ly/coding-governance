@@ -1,6 +1,6 @@
 # TOOL-aLightenedLoop-4 — a builder checks its spec can be built before its first edit, a spec cites where it read the code, and a watched path brings its manifest re-stamp
 
-**Status:** SPECCED · rev-1 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 4
+**Status:** INPROGRESS · rev-1 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
