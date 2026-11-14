@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-3 — a commit refused on build-index drift renders its own index, stages it and is graded again
 
-**Status:** CLOSED · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 3
+**Status:** INPROGRESS · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-11-14-build-TOOL-aTrimmedWait-3-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aTrimmedWait-3-1-acceptance-ledger.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md) | research | TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-3-2-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-3-2-spec-writer.md) | journal | — |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-3-fix.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-3-fix.md) | research | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-3-writing-practice.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-3-writing-practice.md) | research | — |
 
 <!-- /gen:spec-records -->
