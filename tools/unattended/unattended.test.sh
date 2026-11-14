@@ -8104,6 +8104,33 @@ git add memory/builds/tRun/prompts/brief-2.md >/dev/null 2>&1
 o=$(run --status tRun)
 n=$((n+1)); case "$o" in *"STALE briefs 1"*) ;; *) echo "FAIL brief: with two briefs and one edited, the reader did not report exactly one stale -- $o"; st=1 ;; esac
 
+# ---- TOOL-aTrimmedWait-5 - ONE GIT CALL GRADES EVERY BRIEF, AND A FAILED BATCH MOVES NO COUNT. A git
+# ---- shim on PATH logs each `hash-object` call while `--status` grades three briefs: one fresh, one
+# ---- edited, one gone. The batch answers in one call; with `--stdin-paths` failed, the per-path
+# ---- fallback grades the two present rows to the same line. `run_proc`, because the shim must be the
+# ---- `git` a fresh driver process resolves. Shim and log live under `.git/`, so the tree stays clean.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+mkdir -p memory/builds/tRun/prompts "$TMP/.git/tw5-shim"
+for _tw in 1 2 3; do
+  printf 'tw5 brief %s\n' "$_tw" > "memory/builds/tRun/prompts/tw5-$_tw.md"
+  _twh=$(git hash-object "memory/builds/tRun/prompts/tw5-$_tw.md")
+  printf '2026-11-14T10:00:00Z brief · item ARCH-tRun-7%s · reason %s memory/builds/tRun/prompts/tw5-%s.md\n' \
+    "$_tw" "${_twh:0:12}" "$_tw" >> memory/builds/tRun/RUN.md
+done
+printf 'edited\n' >> memory/builds/tRun/prompts/tw5-2.md; rm -f memory/builds/tRun/prompts/tw5-3.md
+printf '#!/usr/bin/env bash\ncase " $* " in *" hash-object "*) printf "%%s\\n" "$*" >> "$TW5_LOG";; esac\n[ -n "${TW5_FAIL:-}" ] && case " $* " in *" --stdin-paths "*) exit 1;; esac\nexec "%s" "$@"\n' \
+  "$(command -v git)" > "$TMP/.git/tw5-shim/git"
+chmod +x "$TMP/.git/tw5-shim/git"
+export TW5_LOG="$TMP/.git/tw5.calls"
+: > "$TW5_LOG"; o=$(PATH="$TMP/.git/tw5-shim:$PATH" run_proc --status tRun)
+hit "$o" "STALE briefs 1 · briefs gone 1"
+same "TW5 the present briefs are graded by one hash-object call" "$(grep -c '' "$TW5_LOG")" 1
+same "TW5 that one call is the --stdin-paths batch" "$(grep -c -- '--stdin-paths' "$TW5_LOG")" 1
+: > "$TW5_LOG"; o2=$(TW5_FAIL=1 PATH="$TMP/.git/tw5-shim:$PATH" run_proc --status tRun)
+same "TW5 a failed batch falls back per path and prints the same status line" "$o2" "$o"
+same "TW5 the fallback pays the failed batch and then one call per present brief" "$(grep -c '' "$TW5_LOG")" 3
+unset TW5_LOG; rm -rf "$TMP/.git/tw5-shim" "$TMP/.git/tw5.calls"
+
 echo "MARK park-taxonomy" >&2
 # ---------------------------------------------------------------------------------------------
 # ---- THE PARKED-KIND TAXONOMY AND THE COUNTABLE ATTESTATION.
@@ -19590,7 +19617,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3329 -> 3347 by TOOL-aTrimmedWait-1: the --check-specs arm's 18 region-three `same`/`hit`/`miss`
 # lines, every one unconditional, counted off the block's own lines; no suite ran, and its RED-first
 # observation is the close's.
-FLOOR_ASSERTIONS=3347
+# RAISED 3347 -> 3352 by TOOL-aTrimmedWait-5: the batched brief-hash arm's one `hit` and four `same`
+# lines in region four, every one unconditional, counted off the block's own lines; no suite ran, and
+# its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3352
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -19810,7 +19840,8 @@ FLOOR_SHARD_3=463
 # RAISED 383 -> 393 by TOOL-aSwiftRefusal-3: the same 10 region-four deferred-unit assertions, see FLOOR_ASSERTIONS.
 # RAISED 393 -> 403 by TOOL-aSwiftRefusal-4: the same 10 region-four M1 and M3 assertions, see FLOOR_ASSERTIONS.
 # MERGED at TOOL-aSmoothedDispatch-21's reconcile: the base 383, plus 7, plus 20 = 410.
-FLOOR_SHARD_4=410
+# RAISED 410 -> 415 by TOOL-aTrimmedWait-5: the same 5 region-four batched brief-hash assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_4=415
 FLOOR_SHARD_5=297
 FLOOR_SHARD_6=127
 FLOOR_SHARD_7=311

@@ -8433,13 +8433,20 @@ verb_status() { # slug
   # STILL `STALE briefs 1`. A count that cannot return to zero is indistinguishable from one that is
   # stuck, so it tells a reader nothing. `awk` keeps the LAST row seen per unit, which is the live
   # claim; the superseded rows stay in the record as the history they are.
-  local _bstale=0 _bgone=0 _bl _bh _bp _bnow
+  #
+  # ONE GIT CALL FOR EVERY BRIEF (TOOL-aTrimmedWait-5). The loop only sorts rows into gone and
+  # present; the present paths are hashed after it by ONE `hash-object --stdin-paths`, which applies
+  # each path's filters as the writer's path-argument form does. A per-row call cost the holder's
+  # idle-wake tick about 15 s at 72 rows. A batch that exits non-zero or answers a different number of
+  # lines than it was given is not trusted: every row is graded by the per-path call instead, so a
+  # failed batch never moves a count. An empty answer is stale, as it always was.
+  local _bstale=0 _bgone=0 _bl _bh _bp _bi _bout _brc
+  local -a _bhs=() _bps=() _bnows=()
   while IFS= read -r _bl; do
     [ -n "$_bl" ] || continue
     _bh=${_bl%% *}; _bp=${_bl#* }
     if [ ! -f "$_bp" ]; then _bgone=$((_bgone+1)); continue; fi
-    _bnow=$(GIT hash-object "$_bp" 2>/dev/null | cut -c1-12)
-    [ "$_bnow" = "$_bh" ] || _bstale=$((_bstale+1))
+    _bhs+=("$_bh"); _bps+=("$_bp")
   #
   # ONE awk PASS AND NO BACK-REFERENCE. The first cut used a `sed` capture group and the `` did
   # not survive being written through a shell heredoc: the landed bytes read `/ /p`, so the unit id
@@ -8452,6 +8459,17 @@ $(awk -F' · ' '$1 ~ /^[0-9][0-9-]*T[0-9:]*Z brief$/ && $2 ~ /^item / && $3 ~ /^
      u = substr($2, 6); r = substr($3, 8); last[u] = r
    } END { for (u in last) print last[u] }' "$rel" 2>/dev/null)
 BRIEFROWS
+  if [ "${#_bps[@]}" -gt 0 ]; then
+    _bout=$(printf '%s\n' "${_bps[@]}" | GIT hash-object --stdin-paths 2>/dev/null); _brc=$?
+    mapfile -t _bnows <<<"$_bout"
+    if [ "$_brc" -ne 0 ] || [ "${#_bnows[@]}" -ne "${#_bps[@]}" ]; then
+      _bnows=()
+      for _bi in "${!_bps[@]}"; do _bnows[_bi]=$(GIT hash-object "${_bps[_bi]}" 2>/dev/null); done
+    fi
+    for _bi in "${!_bps[@]}"; do
+      [ "${_bnows[_bi]:0:12}" = "${_bhs[_bi]}" ] || _bstale=$((_bstale+1))
+    done
+  fi
   [ "$_bstale" -gt 0 ] && parked="$parked · STALE briefs $_bstale"
   [ "$_bgone" -gt 0 ] && parked="$parked · briefs gone $_bgone"
   # THE RESUME TICK'S ATTEMPTS, on the parked/noted rule: a FIELD on this one line, printed only
