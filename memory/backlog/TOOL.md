@@ -41,6 +41,9 @@ Cite ids, never line numbers.
 | [TOOL-aBranchedMandate-8](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | --preflight OVERWRITES a live non-terminal run-state file, losing the… |
 | [TOOL-aBranchedMandate-10](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | map_extractors.template.py unions the two JS scans with a bare +,… |
 | [TOOL-aBranchedMandate-11](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | govkit.py's blocked skip reason is unreachable behind cmd_apply's early… |
+| [TOOL-aBriskDeclaration-2](../builds/aBriskDeclaration/BACKLOG.md) | OPEN | MED | — | 2026-11-14 | THE RESOLVER REFUSAL'S PIN OUTLIVED ITS REASON. Arm A5 of… |
+| [TOOL-aBriskDeclaration-3](../builds/aBriskDeclaration/BACKLOG.md) | OPEN | LOW | — | 2026-11-14 | THE OLD ORDER STILL STATED ONE SENTENCE UP. The verbs guide's… |
+| [TOOL-aBriskDeclaration-4](../builds/aBriskDeclaration/BACKLOG.md) | OPEN | LOW | — | 2026-11-14 | NO PLANT FOR AN UNTERMINATED LAST LINE. order_verb_of's read loop sees… |
 | [TOOL-aBriskPreflight-8](../builds/aBriskPreflight/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | owner call: a read-only selector on tools/check-wiring.sh that skips… |
 | [TOOL-aBriskPreflight-9](../builds/aBriskPreflight/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | owner call: preflight reads the unattended kit's own hook wiring before… |
 | [TOOL-aBriskPreflight-13](../builds/aBriskPreflight/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite push-main self-test red at 9b743831 on the daily held… |

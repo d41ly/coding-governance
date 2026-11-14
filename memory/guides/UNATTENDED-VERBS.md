@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.122 -->
+<!-- gov:kit unattended@1.123 -->
 [memory/guides/UNATTENDED-VERBS.md · Level 3 · Binding with the unattended protocol, the verbs a run calls; yields to levels 0 to 2]
 # Unattended runs — the verbs
 
@@ -237,10 +237,12 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   A pass's COMMIT is the one whose `Pass: <unit-id>` trailer names it; a commit with no trailer falls back to
   its subject, and `Pass: none` names no unit. After every cheap refusal and before the claim read it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
   live tree: the checker's bar join grades LIVE specs, an unattended build closes each unit spec in its
-  own build commit, and this verb is the one point that sees a spec before its unit builds. It runs
-  last because it costs a tree-wide scan, and every refusal above it — the order gate, the edge and
-  hold gates, the path and shared-record refusals, condition 1 — is decided from the run-state file,
-  the spec headers or `git` in seconds. It refuses on any red but a hit in another build's spec,
+  own build commit, and this verb is the one point that sees a spec before its unit builds.
+  It is started just before the open-pass reader and read after condition 1, because it costs a tree-wide
+  scan: it runs beside the reader, a refusal between the two waits for it and discards its answer,
+  and its own refusal still prints after every refusal above it — the order gate, the edge and hold
+  gates, the path and shared-record refusals, condition 1 — each decided from the run-state file, the
+  spec headers or `git`. It refuses on any red but a hit in another build's spec,
   which it notes and admits, because the bar's whole-tree leg still grades that build.
   It skips the run when its inputs match the last check it admitted for this build, keyed on the
   slug, the checker, the launcher, HEAD and the run-gates working-tree fingerprint, recorded under
