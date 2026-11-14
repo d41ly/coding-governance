@@ -398,6 +398,11 @@ def check_hold_plant(root, bad):
     run_fixture_git(repo, "commit", "-qm", "base")
     run_fixture_git(root, "init", "-q", "--bare", str(origin))
     run_fixture_git(root, "--git-dir", str(origin), "symbolic-ref", "HEAD", "refs/heads/main")
+    # an identity in each repository the driver commits in, the bare origin included: a node with no
+    # global identity otherwise fails a driver commit and reads as a kit defect
+    for where in (("-C", str(repo)), ("--git-dir", str(origin))):
+        run_fixture_git(root, *where, "config", "user.email", "fx@example.invalid")
+        run_fixture_git(root, *where, "config", "user.name", "fx")
     run_fixture_git(repo, "remote", "add", "origin", str(origin))
     run_fixture_git(repo, "push", "-q", "origin", "main")
     base = run_fixture_git(repo, "rev-parse", "HEAD")

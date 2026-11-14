@@ -51,6 +51,6 @@ new `[[exempt_leg]]` row (deviation 173).
   criterion's `grep -c 'principle.p2' tools/playbook/core-pending.txt` printed 9, not 0, because the
   pattern also matches the rows of `principle.p20` to `principle.p29`, which stay; the `principle.p2` row
   itself is gone, `grep -cP 'principle\.p2\t'` printing 0. The criterion's grep is the spec's to revise.
-- AC8 — `build-records: typed-kinds · acceptance · <path> · bound` — `build_records.py --fixture --plant
-  typed-kinds` printed that line for `2026-11-14-build-ARCH-tKinds-1-acceptance-1.md` and ended `PASS`,
+- AC8 — `build-records: typed-kinds · acceptance · <path> · bound` — the factory's `typed-kinds` plant
+  printed that line for `2026-11-14-build-ARCH-tKinds-1-acceptance-1.md` and ended `PASS`,
   having asserted each record's `S` row with its kind and no `A` row.
