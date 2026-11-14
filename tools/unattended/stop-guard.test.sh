@@ -717,7 +717,7 @@ for K in out rc err line; do
   cmp -s "$TMP/torn.$K" "$TMP/nocache.$K" && print_ok "L5-AC7 a torn cache file: the $K equals a run with no cache" || print_bad "L5-AC7 a torn cache file: the $K differs"
   cmp -s "$TMP/unholdable.$K" "$TMP/nocache.$K" && print_ok "L5-AC7 an unholdable cache path: the $K equals a run with no cache" || print_bad "L5-AC7 an unholdable cache path: the $K differs"
 done
-check_hit "$(cat "$TMP/nocache.line")" '"reason": "run-open"' "L5-AC7 the no-cache capture holds its sidecar line"
+check_hit "$(<"$TMP/nocache.line")" '"reason": "run-open"' "L5-AC7 the no-cache capture holds its sidecar line"
 
 # ---- L5-AC8: the stub fixture, whose `.git` holds only HEAD, nested inside a repository: the key is
 # ---- null and nothing is stored. RED when show-ref runs without --git-dir and resolves the outer repo.
