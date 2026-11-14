@@ -8873,11 +8873,6 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
-      "id": "cs_mk",
-      "kind": "function",
-      "file": "tools/unattended/unattended.test.sh"
-    },
-    {
       "id": "ctl_wrong",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.test.sh"
@@ -32886,6 +32881,11 @@
       "id": "write_cov29_view",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "write_cs_spec",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_decl",
