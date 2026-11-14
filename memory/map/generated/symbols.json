@@ -7963,6 +7963,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_wake_full",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "check_walk_exit",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
@@ -29778,6 +29783,26 @@
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
     },
     {
+      "id": "set_wake_age",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "set_wake_claims_off",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "set_wake_claims_on",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "set_wake_stale",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "settings_json",
       "kind": "function",
       "file": "tools/check-wiring.sh"
@@ -32556,31 +32581,6 @@
       "id": "wit",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
-    },
-    {
-      "id": "wk_age",
-      "kind": "function",
-      "file": "tools/unattended/unattended.test.sh"
-    },
-    {
-      "id": "wk_claims_off",
-      "kind": "function",
-      "file": "tools/unattended/unattended.test.sh"
-    },
-    {
-      "id": "wk_claims_on",
-      "kind": "function",
-      "file": "tools/unattended/unattended.test.sh"
-    },
-    {
-      "id": "wk_full",
-      "kind": "function",
-      "file": "tools/unattended/unattended.test.sh"
-    },
-    {
-      "id": "wk_stale",
-      "kind": "function",
-      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "wline",

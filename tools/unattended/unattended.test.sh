@@ -9768,8 +9768,8 @@ same "wake AC1 the one line" "$out" "unattended-wake: tRun · HEALTHY · tasks 1
 same "wake AC1 the record's hash is unchanged" "$(git hash-object memory/builds/tRun/RUN.md)" "$wk_h"
 same "wake AC1 the tree is unchanged" "$(git status --porcelain)" "$wk_s"
 hit "$(run --wake tRun)" "--wake requires --keepalive-id, because the verb's row in VERB_REQUIRES lists it"
-# AC2 — each staged break reads FULL with its reason. `wk_full` resets, applies the break, then reads.
-wk_full() { # reason · keepalive id · break command...
+# AC2 — each staged break reads FULL with its reason. `check_wake_full` resets, applies the break, then reads.
+check_wake_full() { # reason · keepalive id · break command...
   local why="$1" kid="$2"; shift 2
   build_wake_fixture
   "$@"
@@ -9777,26 +9777,26 @@ wk_full() { # reason · keepalive id · break command...
   same "wake AC2 $why exits 0" "$rc" "0"
   hit "$out" "unattended-wake: tRun · FULL · $why · tasks 1 open · "
 }
-wk_full "phase HELD" k1 mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: HELD/'
-wk_full abandoned k1 mutate memory/builds/tRun/RUN.md 's/^\(phase: .*\)/\1\nabandoned: x/'
-wk_full "asks moved" k1 mutate memory/builds/tRun/RUN.md 's/^\(phase: .*\)/\1\nasks: X-1/'
-wk_full worktree k1 mutate memory/builds/tRun/RUN.md 's|^run-branch: .*|run-branch: refs/heads/other|'
-wk_full holder k2 true
-wk_full lease k1 mutate memory/builds/tRun/RUN.md 's/^pid: .*/pid: 999/'
+check_wake_full "phase HELD" k1 mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: HELD/'
+check_wake_full abandoned k1 mutate memory/builds/tRun/RUN.md 's/^\(phase: .*\)/\1\nabandoned: x/'
+check_wake_full "asks moved" k1 mutate memory/builds/tRun/RUN.md 's/^\(phase: .*\)/\1\nasks: X-1/'
+check_wake_full worktree k1 mutate memory/builds/tRun/RUN.md 's|^run-branch: .*|run-branch: refs/heads/other|'
+check_wake_full holder k2 true
+check_wake_full lease k1 mutate memory/builds/tRun/RUN.md 's/^pid: .*/pid: 999/'
 # A second remote is check 24 inside the claim read, so the read fails without reaching the network.
 # The fixture's own bare origin answers the read, and with no claim of this lease on it a write is
 # due, so `claim` holds whatever an earlier arm left there.
-wk_claims_on() { printf 'RUN_CLAIMS="on"\n' >> .unattended.conf; }
-wk_claims_off() { wk_claims_on; git remote add wk-second /no/such/remote; }
-wk_full "claims unread" k1 wk_claims_off
+set_wake_claims_on() { printf 'RUN_CLAIMS="on"\n' >> .unattended.conf; }
+set_wake_claims_off() { set_wake_claims_on; git remote add wk-second /no/such/remote; }
+check_wake_full "claims unread" k1 set_wake_claims_off
 git remote remove wk-second 2>/dev/null
-wk_full claim k1 wk_claims_on
-wk_age() { mkconf "true" "true" "" "3600" "" "60"; printf 'KEEPALIVE_INTERVAL="every 10 minutes"\n' >> .unattended.conf
+check_wake_full claim k1 set_wake_claims_on
+set_wake_age() { mkconf "true" "true" "" "3600" "" "60"; printf 'KEEPALIVE_INTERVAL="every 10 minutes"\n' >> .unattended.conf
   git add -A && GIT_COMMITTER_DATE="$(( $(date -u +%s) - 3600 )) +0000" git commit -q -m "fixture: age the clocks" --no-verify; }
-wk_full "tree idle" k1 wk_age
-wk_stale() { mkconf "true" "true" "" "3600" "" "1800" "7" "5400" "" "1800" "6" "60"
+check_wake_full "tree idle" k1 set_wake_age
+set_wake_stale() { mkconf "true" "true" "" "3600" "" "1800" "7" "5400" "" "1800" "6" "60"
   printf 'KEEPALIVE_INTERVAL="every 10 minutes"\n' >> .unattended.conf; touch -d "@$(( $(date -u +%s) - 3600 ))" "$WK_DIR/wkbeat.txt"; }
-wk_full "task stalled" k1 wk_stale
+check_wake_full "task stalled" k1 set_wake_stale
 # AC3 — the cadence follows the registry: the tracked key while a task is open, the base key after
 # its release, the base key throughout when the tracked one is blank, and `undeclared` with neither.
 build_wake_fixture
