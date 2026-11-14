@@ -26,10 +26,10 @@ mode: slug
 run-branch: refs/heads/branch/unattended-declared-loop-d56bf0
 anchor-kind: default-branch
 cli-version: 2.1.321
-lease-utc: 2026-11-13T10:41:50Z
+lease-utc: 2026-11-14T16:08:14Z
 pid-image: claude.exe
 host: compeeto-agent
-pid: 25292
+pid: 3872
 session: 7c85732c-fa0c-43e9-83f2-238d293195e0
 keepalive: 45e677fb
 anchor-url: https://github.com/d41ly/coding-governance.git
@@ -140,3 +140,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-14T14:53:17Z dispatch · item 9ac7250b TOOL-dDeclaredLoop-11 · reason tools/loop/loop.toml tools/loop/loop_lib.py tools/loop/loop_checklist.py tools/loop/kit.toml tools/loop/README.md tools/gate-legs.json tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/govkit/usage.toml help/loop.md memory/map/features/loop.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dDeclaredLoop/build/2026-11-14-build-TOOL-dDeclaredLoop-11-1-acceptance-ledger.md memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-11.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
 
 2026-11-14T15:23:36Z brief · item TOOL-dDeclaredLoop-42 · reason e85affb13d60 memory/builds/dDeclaredLoop/prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-42-build-brief.md
+
+2026-11-14T16:15:35Z dispatch · item 9cad19ae TOOL-dDeclaredLoop-42 · reason tools/loop/loop_witness.py tools/lib/run_tree_kill.py tools/lib/resolve-python.test.sh tools/run-gates/regen.py tools/loop/README.md help/loop.md memory/map/generated/symbols.json memory/builds/dDeclaredLoop/build/2026-11-14-build-TOOL-dDeclaredLoop-42-1-acceptance-ledger.md memory/builds/dDeclaredLoop/build/2026-11-14-build-TOOL-dDeclaredLoop-42-deviation-423.md memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-42.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/backlog/TOOL.md

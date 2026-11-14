@@ -246,6 +246,7 @@ def resolve_bash(probe):
     return found
 
 
+# >>> run_tree_kill_py -- canonical copy: run_tree_kill.py in the gov lib dir (byte-identical; gated)
 def run_tree_kill(proc):
     """Kill a timed-out child and what it started, then reap it: `taskkill /T` on Windows, the child's
     own process group on POSIX. Each step is best-effort, because the child may already be gone."""
@@ -265,6 +266,7 @@ def run_tree_kill(proc):
         proc.wait(timeout=10)
     except subprocess.TimeoutExpired:
         pass
+# <<< run_tree_kill_py
 
 
 def run_command(argv, root, bound):

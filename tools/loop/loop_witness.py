@@ -7,10 +7,15 @@
     python loop_witness.py --selftest
 
 `run_witness_commands(repo, sha, commands, timeout)` is the re-run: a detached worktree of `sha` in a
-temporary directory, each command run there through the platform shell with a timeout and every name of
-the memory-tree kit's `GIT_ENV_LEAKS` unset, its exit status (or `timeout`) and the first twelve hex digits
-of the SHA-256 of its combined output kept, and the worktree removed on every exit path. Output is hashed
-raw, so a command whose output carries a timestamp never re-runs equal; that is reported, never normalised.
+temporary directory, each command run there as `bash -c <command>` with every name of the memory-tree
+kit's `GIT_ENV_LEAKS` unset, its exit status (or `timeout`) and the first twelve hex digits of the SHA-256
+of its combined output kept, and the worktree removed on every exit path. The bash is the inline
+`resolve_bash`'s, one that can see this file, and a call with none raises LookupError. Output goes to a
+file beside the worktree, never a pipe, read once the wait returns, so a grandchild holding it cannot hold
+the call; on the timeout the command's process tree is killed through the inline `run_tree_kill`. A
+worktree still on disk after the teardown is named on stderr, `loop-witness: leaked <path>`, never
+raised. Output is hashed raw, so a command whose output carries a timestamp never re-runs equal; that is
+reported, never normalised.
 
 `acceptance` is the acceptance stand-in until dWellOiledMachine's executor writes the record: `--sha`
 resolved to its full commit in the tree at `--root`, the commands re-run there, and the record written
@@ -34,14 +39,18 @@ for a reader to compare), or that an exit was the expected answer. The hold-inhe
 unattended driver, found by `resolve_kit_dir`, which requires this kit; this kit declares no edge back.
 """
 import argparse
+import contextlib
 import hashlib
+import io
 import os
 import pathlib
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
+import time
 
 sys.dont_write_bytecode = True
 KIT = pathlib.Path(__file__).absolute().parent
@@ -57,7 +66,9 @@ PLANTS = {"acceptance": "a unit's two commands re-run at its commit, an uncommit
           "acceptance-malformed": "two records typed by hand: no run line, and Writer agent",
           "probe-rerun": "a command re-run at its pinned SHA, at a later commit, and at a SHA that does not resolve",
           "hold-inherited": "a preflighted run held under inherited-red over an OWN attribution, an untied bar, and "
-                            "an INHERITED one with its staged set"}
+                            "an INHERITED one with its staged set",
+          "bash-syntax": "a command only bash can run, re-run at its commit",
+          "timeout-grandchild": "a command whose grandchild outlives its bound, re-run and torn down"}
 #: The loop reader's plants this leg runs too, each owed exit 1 with a refusal naming the acceptance row.
 READER_PLANTS = ("computed-actor", "computed-unserved")
 FX_UNIT = "TOOL-tFix-1"
@@ -85,6 +96,29 @@ def resolve_bash(script):
             return c
     return None
 # <<< resolve_bash_py
+
+
+# >>> run_tree_kill_py -- canonical copy: run_tree_kill.py in the gov lib dir (byte-identical; gated)
+def run_tree_kill(proc):
+    """Kill a timed-out child and what it started, then reap it: `taskkill /T` on Windows, the child's
+    own process group on POSIX. Each step is best-effort, because the child may already be gone."""
+    try:
+        if os.name == "nt":
+            subprocess.run(["taskkill", "/F", "/T", "/PID", str(proc.pid)], stdout=subprocess.DEVNULL,
+                           stderr=subprocess.DEVNULL, timeout=30)
+        else:
+            os.killpg(proc.pid, signal.SIGKILL)
+    except (OSError, subprocess.SubprocessError):
+        pass
+    try:
+        proc.kill()
+    except OSError:
+        pass
+    try:
+        proc.wait(timeout=10)
+    except subprocess.TimeoutExpired:
+        pass
+# <<< run_tree_kill_py
 
 
 def read_memory_tree(anchor):
@@ -128,7 +162,12 @@ def remove_tree(path):
 
 def run_witness_commands(repo, sha, commands, timeout=TIMEOUT):
     """[(command, exit, hash12)] for each command run in a detached worktree of `sha`, `exit` an int or
-    `timeout`. LookupError where the worktree cannot be added, `sha` naming no commit among the causes."""
+    `timeout`. LookupError where no bash can see this file, or where the worktree cannot be added, `sha`
+    naming no commit among the causes."""
+    script = pathlib.Path(__file__).absolute()
+    bash = resolve_bash(script)
+    if bash is None:
+        raise LookupError("no bash that can see %s: GOV_BASH, PATH and Git for Windows looked in" % script.as_posix())
     env = read_clean_env()
     tmp = tempfile.mkdtemp(prefix="lw-")
     tree = os.path.join(tmp, "tree")
@@ -139,22 +178,29 @@ def run_witness_commands(repo, sha, commands, timeout=TIMEOUT):
             raise LookupError("git worktree add --detach of %s failed in %s" % (sha, repo))
         added = True
         runs = []
-        for command in commands:
-            # ponytail: a timeout kills the shell; a grandchild it spawned may outlive it until the
-            # executor's spawn bound (TOOL-dDeclaredLoop-42) replaces this.
-            try:
-                p = subprocess.run(command, shell=True, cwd=tree, env=env, stdout=subprocess.PIPE,
-                                   stderr=subprocess.STDOUT, timeout=timeout)
-                code, output = p.returncode, p.stdout
-            except subprocess.TimeoutExpired as exc:
-                code, output = "timeout", exc.output or b""
-            runs.append((command, code, hashlib.sha256(output).hexdigest()[:12]))
+        for n, command in enumerate(commands, 1):
+            # output to a file beside the worktree, never a pipe: a grandchild holding a pipe holds the
+            # read past the bound (gotcha bounded-through-a-pipe-is-unbounded)
+            out = os.path.join(tmp, "cmd-%d.out" % n)
+            with open(out, "wb") as sink:
+                p = subprocess.Popen([bash, "-c", command], cwd=tree, env=env, stdin=subprocess.DEVNULL,
+                                     stdout=sink, stderr=subprocess.STDOUT,
+                                     **({} if os.name == "nt" else {"start_new_session": True}))
+                try:
+                    code = p.wait(timeout=timeout)
+                except subprocess.TimeoutExpired:
+                    run_tree_kill(p)
+                    code = "timeout"
+            with open(out, "rb") as fh:
+                runs.append((command, code, hashlib.sha256(fh.read()).hexdigest()[:12]))
         return runs
     finally:
         if added:
             read_git(repo, "worktree", "remove", "--force", tree, env=env)
         remove_tree(tmp)
         read_git(repo, "worktree", "prune", env=env)
+        if added and os.path.isdir(tree):
+            print("%s: leaked %s" % (SAY, pathlib.Path(tree).as_posix()), file=sys.stderr)
 
 
 def run_acceptance(args):
@@ -329,6 +375,45 @@ def check_rerun_plant(root, bad):
             bad.append("rerun at %s exited %d, not %d answering %s: %s" % (sha[:8], rc, rc_owed, verdict, said[:300]))
 
 
+def check_bash_syntax_plant(root, bad):
+    """TOOL-dDeclaredLoop-42 AC1: a command only bash runs re-runs at its commit, exit 0 and the hash of
+    `0` and a newline. cmd.exe records a non-zero exit; a POSIX sh with no `[[` prints nothing."""
+    write_scratch_unit(root)
+    run_fixture_git(root, "add", "-A")
+    run_fixture_git(root, "commit", "-qm", "the scratch unit")
+    sha = run_fixture_git(root, "rev-parse", "HEAD")
+    [(_c, code, digest)] = run_witness_commands(root, sha, ["[[ x == x ]] && true | grep -c x; exit 0"])
+    owed = hashlib.sha256(b"0\n").hexdigest()[:12]
+    print("%s: bash-syntax · exit %s · %s" % (SAY, code, digest))
+    if code != 0 or digest != owed:
+        bad.append("the command re-ran exit %s hash %s, not exit 0 hash %s" % (code, digest, owed))
+
+
+def check_grandchild_plant(root, bad):
+    """TOOL-dDeclaredLoop-42 AC2 and AC3: `sleep 30 & wait` under a 2 s timeout returns within 10 s
+    recording `timeout`, and its worktree is pruned, or still on disk and named by a `leaked` line."""
+    write_scratch_unit(root)
+    run_fixture_git(root, "add", "-A")
+    run_fixture_git(root, "commit", "-qm", "the scratch unit")
+    sha = run_fixture_git(root, "rev-parse", "HEAD")
+    said = io.StringIO()
+    start = time.monotonic()
+    with contextlib.redirect_stderr(said):
+        [(_c, code, _d)] = run_witness_commands(root, sha, ["sleep 30 & wait"], timeout=2)
+    took = time.monotonic() - start
+    print("%s: timeout-grandchild · exit %s · %.1f s" % (SAY, code, took))
+    if code != "timeout" or took > 10:
+        bad.append("the call took %.1f s recording exit %s, not timeout within 10 s" % (took, code))
+    trees = [ln[len("worktree "):] for ln in run_fixture_git(root, "worktree", "list", "--porcelain").splitlines()
+             if ln.startswith("worktree ")]
+    named = {os.path.normcase(os.path.realpath(p))
+             for p in re.findall(r"^%s: leaked (.+)$" % SAY, said.getvalue(), re.M)}
+    unnamed = [t for t in trees[1:] if not (os.path.isdir(t) and os.path.normcase(os.path.realpath(t)) in named)]
+    print("%s: timeout-grandchild · %d worktree(s) · %d named leaked" % (SAY, len(trees), len(named)))
+    if unnamed:
+        bad.append("worktree(s) left with no leaked line naming them: %s" % unnamed)
+
+
 #: The conf the hold-inherited plant's driver reads: every key the driver NOTEs about when blank, declared.
 HOLD_CONF = """MEMORY_ROOT=memory
 UNITS_REGION_CUTOFF="2026-08-19"
@@ -457,7 +542,8 @@ def run_fixture(plant):
     print("%s: fixture · plant %s · %s" % (SAY, plant, PLANTS[plant]))
     try:
         rc = {"acceptance": check_acceptance_plant, "acceptance-malformed": check_malformed_plant,
-              "probe-rerun": check_rerun_plant, "hold-inherited": check_hold_plant}[plant](root, bad)
+              "probe-rerun": check_rerun_plant, "hold-inherited": check_hold_plant,
+              "bash-syntax": check_bash_syntax_plant, "timeout-grandchild": check_grandchild_plant}[plant](root, bad)
     except (subprocess.CalledProcessError, OSError, LookupError, ImportError) as exc:
         detail = getattr(exc, "stderr", "") or ""
         bad.append("the fixture could not be built: %s %s" % (exc, detail.strip()[:300]))

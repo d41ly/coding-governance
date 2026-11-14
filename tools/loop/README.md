@@ -155,13 +155,19 @@ today by `loop_witness.py` beside this file, and `red-attribution` serving `item
 by the bar runner.
 
 `loop_witness.py` is the re-run stand-in. `run_witness_commands(repo, sha, commands, timeout)` adds a
-detached worktree of `sha` under the host temp directory, runs each command there through the shell
+detached worktree of `sha` under the host temp directory, runs each command there as `bash -c <command>`
 with the memory-tree kit's `GIT_ENV_LEAKS` unset, keeps each exit, or `timeout`, and the first twelve
-hex digits of the SHA-256 of its combined output, and removes the worktree on every exit path.
+hex digits of the SHA-256 of its combined output, and removes the worktree on every exit path. The bash
+is the inline `resolve_bash`'s, one that can see this file, and a call with none raises `LookupError`.
+Each command's output goes to `cmd-<n>.out` beside the worktree, never a pipe, read once the wait
+returns; on the timeout the inline `run_tree_kill`, the `run_tree_kill_py` block the run-gates kit's
+`regen.py` carries too, kills the command's tree. A worktree still on disk after the teardown is named
+on stderr, `loop-witness: leaked <path>`, never raised.
 `acceptance --build --unit --sha --cmd... [--root]` writes the memory-tree kit's acceptance record
 through its `write_acceptance`, `Writer: stand-in`; `rerun --sha --cmd --expect...` answers each command
 `confirmed`, `refuted` or `inconclusive`. Its plants are `acceptance`, `acceptance-malformed`,
-`probe-rerun` and `hold-inherited`, the last running the unattended driver, found by
+`probe-rerun`, `bash-syntax`, a command only bash runs, `timeout-grandchild`, a grandchild outliving
+the bound, and `hold-inherited`, the last running the unattended driver, found by
 `resolve_kit_dir` and run through the inline `resolve_bash`, with no edge to that kit, since it requires
 this one; a kit that does not resolve exits 2, never a pass. `--selftest` runs them and this reader's
 `computed-actor` and `computed-unserved` plants, and is gov's `loop computed witness` gate.

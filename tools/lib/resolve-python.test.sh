@@ -375,6 +375,7 @@ auto_memory|$ROOT/$KIT_REL/auto_memory.py|$KIT_REL/auto_memory
 retired_kits|$ROOT/$KIT_REL/retired_kits.py|$KIT_REL/retired_kits
 commit_trailers_py|$ROOT/$KIT_REL/commit_trailers.py|$KIT_REL/commit_trailers
 needs_graph_py|$ROOT/$KIT_REL/needs_graph.py|$KIT_REL/needs_graph
+run_tree_kill_py|$ROOT/$KIT_REL/run_tree_kill.py|$KIT_REL/run_tree_kill
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -426,6 +427,8 @@ needs_graph_py|$ROOT/$KIT_REL/needs_graph.py|$KIT_REL/needs_graph
 # needs_graph_py (TOOL-dDeclaredLoop-12 S5) is the order a needs graph allows and its cycles, extracted
 # at its third instance: govkit's install order, the backlog grader's hold cycles and the loop kit's
 # item programs each carry it inline.
+# run_tree_kill_py (TOOL-dDeclaredLoop-42 S4) is the run-gates kit's kill of a timed-out child's tree
+# and its reap; the run-gates regenerator and the loop kit's witness re-run each carry it inline.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one

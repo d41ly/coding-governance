@@ -162,10 +162,15 @@ declared item, a served item whose witness class is `actor`, a `writer` that is 
 `stand-in:` path nor an actor, and an empty `armed-by`.
 
 The `acceptance` and `probe-rerun` witnesses are written today by `tools/loop/loop_witness.py`.
-Each re-run checks the commit out into a temporary worktree, runs every command there through the
-shell with the git location variables unset, and keeps its exit code and the first twelve hex digits
-of the SHA-256 of its output. The worktree is removed afterwards, even after a failure. Output is
-hashed exactly as printed, so a command that prints the time never re-runs equal.
+Each re-run checks the commit out into a temporary worktree, runs every command there as
+`bash -c "<command>"` with the git location variables unset, and keeps its exit code and the first
+twelve hex digits of the SHA-256 of its output. Bash runs every command, on Windows too, so a
+criterion's `[[ ]]` and pipes work as written; where no bash can be found the re-run is refused.
+Output goes to a file, never a pipe, so a command that leaves a background process behind cannot
+keep the re-run waiting. A command that runs past its time limit is stopped with every process it
+started and recorded as `timeout`. The worktree is removed afterwards, even after a failure, and one
+still on disk is named on stderr as `loop-witness: leaked <path>`. Output is hashed exactly as
+printed, so a command that prints the time never re-runs equal.
 
 <!-- run: no — needs a build folder and a committed unit in the adopter, which a scratch adopter does not hold -->
 ```bash
@@ -345,9 +350,11 @@ unarmed and never as a pass.
   commands re-run at its commit while an uncommitted edit sits beside them), `acceptance-malformed`
   (records typed by hand, with no run line or a writer outside `executor` and `stand-in`, each read
   as malformed), `probe-rerun` (`confirmed` at the pinned commit, `refuted` at a later one,
-  `inconclusive` at one that does not resolve) and `hold-inherited`, which preflights a run through
+  `inconclusive` at one that does not resolve), `hold-inherited`, which preflights a run through
   the unattended driver and holds it under `inherited-red` over an `OWN` leg, an untied bar and an
-  `INHERITED` one. `--selftest` runs every case and the two computed-witness cases above, and the
+  `INHERITED` one, `bash-syntax` (a command only bash can run, re-run with exit 0 and the hash of its
+  `0`) and `timeout-grandchild` (`sleep 30 & wait` under a two-second limit, which must come back
+  within ten seconds as `timeout`, its worktree removed or named as leaked). `--selftest` runs every case and the two computed-witness cases above, and the
   `loop computed witness` gate runs it. A case whose kit is not installed exits 2, never a pass.
 
 ## What stops a read
