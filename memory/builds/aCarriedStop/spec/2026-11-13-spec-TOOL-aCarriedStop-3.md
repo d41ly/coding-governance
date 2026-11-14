@@ -6,7 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md) | journal | TOOL-aCarriedStop-1 TOOL-aCarriedStop-2 |
+| [2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md) | journal | TOOL-aCarriedStop-1 TOOL-aCarriedStop-2 TOOL-aCarriedStop-9 |
 | [2026-11-13-build-TOOL-aCarriedStop-1-arms-observed.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-arms-observed.md) | journal | TOOL-aCarriedStop-1 TOOL-aCarriedStop-2 |
 | [2026-11-13-build-TOOL-aCarriedStop-1-runlog-17926918.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-runlog-17926918.md) | journal | TOOL-aCarriedStop-1 TOOL-aCarriedStop-2 |
 | [2026-11-13-build-TOOL-aCarriedStop-2-promotions.md](../build/2026-11-13-build-TOOL-aCarriedStop-2-promotions.md) | research | TOOL-aCarriedStop-2 |

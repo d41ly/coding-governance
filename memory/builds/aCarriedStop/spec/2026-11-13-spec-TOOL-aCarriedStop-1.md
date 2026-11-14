@@ -7,7 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-13-build-TOOL-aCarriedStop-1-1-acceptance-ledger.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-1-acceptance-ledger.md) | journal | — |
-| [2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md) | journal | TOOL-aCarriedStop-2 TOOL-aCarriedStop-3 |
+| [2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md) | journal | TOOL-aCarriedStop-2 TOOL-aCarriedStop-3 TOOL-aCarriedStop-9 |
 | [2026-11-13-build-TOOL-aCarriedStop-1-arms-observed.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-arms-observed.md) | journal | TOOL-aCarriedStop-2 TOOL-aCarriedStop-3 |
 | [2026-11-13-build-TOOL-aCarriedStop-1-candidates.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-candidates.md) | research | — |
 | [2026-11-13-build-TOOL-aCarriedStop-1-runlog-17926918.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-runlog-17926918.md) | journal | TOOL-aCarriedStop-2 TOOL-aCarriedStop-3 |
@@ -16,6 +16,8 @@
 | [2026-11-13-prompt-TOOL-aCarriedStop-1-3-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-3-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aCarriedStop-1-brief.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-brief.md) | research | — |
 | [2026-11-13-prompt-TOOL-aCarriedStop-1-build-brief.md](../prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-build-brief.md) | research | — |
+| [2026-11-14-prompt-TOOL-aCarriedStop-9-brief.md](../prompts/2026-11-14-prompt-TOOL-aCarriedStop-9-brief.md) | research | — |
+| [2026-11-14-prompt-TOOL-aCarriedStop-9-build-brief.md](../prompts/2026-11-14-prompt-TOOL-aCarriedStop-9-build-brief.md) | research | — |
 | [2026-11-13-review-TOOL-aCarriedStop-1-diff-review-round1.md](../reviews/2026-11-13-review-TOOL-aCarriedStop-1-diff-review-round1.md) | diff-review | — |
 
 <!-- /gen:spec-records -->

@@ -21,19 +21,19 @@ gates-run: unattended-17945890617045659641-176387 41c93c8b
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 4bf57cb7626b94a7a19730c86f2c94164cccb88a
-phase: HELD
+witness: 5e2451f221005155b60d323cdbce8e478f9fa450
+phase: VERIFYING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/sad-allen-74f7bd
 anchor-kind: local
 cli-version: 2.1.321
-lease-utc: 2026-11-13T10:49:29Z
+lease-utc: 2026-11-14T01:01:55Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 29592
 session: 729cb159-5621-445f-9b95-f98824ace689
-keepalive: 86f6a40a
+keepalive: 1af57cf5
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 8db6f4bef58d5d88898d35ecf67e2297f6160cfa
 anchor-ref: refs/heads/main
@@ -64,3 +64,7 @@ base: d646814e4a6a6747d3cdb471128be57a0e24e094
 2026-11-13T13:18:41Z dispatch · item 8a248e2b TOOL-aCarriedStop-3 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/aCarriedStop/spec/2026-11-13-spec-TOOL-aCarriedStop-3.md memory/builds/aCarriedStop/build/2026-11-13-build-TOOL-aCarriedStop-3-1-acceptance-ledger.md memory/builds/aCarriedStop/README.md memory/LIVE.md memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json memory/builds/aCarriedStop/prompts/2026-11-13-prompt-TOOL-aCarriedStop-3-1-builder.md
 
 2026-11-13T18:38:32Z hold · item host-degraded · reason until probe gate · reaped 86f6a40a · resume unattended-resume-acarriedstop
+
+2026-11-14T01:02:27Z resume · item aCarriedStop · reason held · keepalive 1af57cf5 · manual
+
+2026-11-14T01:06:12Z rescope · item add TOOL-aCarriedStop-9 · reason owner ordered 2026-11-14: raise the routed-commits leg's ceiling and land; the close's bar timed it out at 760 s twice while it reads 957 s alone
