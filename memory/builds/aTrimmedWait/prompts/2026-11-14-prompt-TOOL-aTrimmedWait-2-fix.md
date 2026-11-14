@@ -27,7 +27,7 @@ probe and unchanged-verdict fixture observed, and set the header CLOSED again as
 3. The acceptance ledger gains one row for this fix.
 
 ### Acceptance
-- `grep -c '<<<' tools/memory-tree/check-memory-hygiene.sh` prints 8.
+- `grep -c '<<<' tools/memory-tree/check-memory-hygiene.sh` falls from 28 to 27: only the loop site leaves. DERIVED from the file at 911f4371b
 - The scratchpad probe `u2.sh` prints its AC lines unchanged.
 
 ### Gates
