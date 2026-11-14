@@ -17,8 +17,8 @@
 ## 1. Goal
 
 `tools/unattended/stop-guard.js` spawns `bash unattended.sh --liveness <slug>` on every `Stop` of a
-bound session, which cost about 2.7 h over dSafePassage's 1,028 stops (13 s a spawn on a live run,
-5 s on an attended slug). This unit serves that verdict from a per-worktree cache whenever no input
+bound session, which cost about 2.7 h over dSafePassage's 1,028 stops (13 s a spawn on a live run, <!-- PINNED 2026-11-14 -->
+5 s on an attended slug). This unit serves that verdict from a per-worktree cache whenever no input <!-- PINNED 2026-11-14 -->
 of the verdict has moved and the liveness clock cannot yet have flipped LIVE to STALE, so a stop costs
 one `git show-ref` and a few file reads, and every decision, reason text and sidecar line stays
 byte-identical to a fresh read. The cache is on by default, and `STOP_GUARD_LIVENESS_CACHE=off`
@@ -265,7 +265,7 @@ shipped bytes move, and the lander's mint makes it. An adopter receives it with 
   exit 0, and their `stop.<slug>.log` lines equal the base's with `utc` removed. The sidecar is
   deleted before each run, so each reads block 1 of 6.
   Red when: the hit returns stdout other than the stored driver stdout, or a key part leaks into it.
-  cost: about ten real `--liveness` spawns, 5 to 13 s each.
+  cost: about ten real `--liveness` spawns, 5 to 13 s each. <!-- PINNED 2026-11-14 -->
   fixture: a clone made by the probe; the tree holds no bound run of its own.
 - **AC2** — When the AC1 probe times each `node tools/unattended/stop-guard.js` run, the built
   hook's hit is faster than the base hook's run at the same phase on node a, and both figures are
@@ -342,7 +342,7 @@ clone, and an input absent from §4's table, which no arm can stage.
 ## 8. Open questions
 
 - **F1 — Is the fault path acceptable?** While an entry is valid, a stop is served the last good
-  verdict even when a fresh read would have hit a dead probe or run past the 60 s bound and allowed
+  verdict even when a fresh read would have hit a dead probe or run past the 60 s bound and allowed <!-- PINNED 2026-11-14 -->
   with `liveness-unreadable`. On a contended node a slow driver is the likely case: there the cached
   hook blocks with `run-open`, where today it allows. No cache can reproduce a fault it skipped.
   - (a) Accept it, and state in `stop-guard.js`'s header that a cache hit does not reproduce a

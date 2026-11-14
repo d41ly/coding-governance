@@ -86,8 +86,8 @@ Read at `846d51d39`. Every blob cited here is the one at that commit, and the wo
   already lives in the harness.
 - A role body may not spell a protocol file's name, and `TEMPLATE-SPEC.md` is one: the catalogue
   checker's R5 (`tools/roles/check_roles.py@db628e9ae396:227-229`). The role names "the spec format"
-  instead. The builder's body ceiling is 4096 bytes (`:93-97`). The handoff render reported its body
-  at 2257 bytes at `846d51d39`.
+  instead. The builder's body ceiling is 4096 bytes (`:93-97`). The handoff render reported its body <!-- PINNED 2026-11-14 -->
+  at 2257 bytes at `846d51d39`. <!-- PINNED 2026-11-14 -->
 - The spec writer's citation rule already names both forms, at
   `tools/roles/agents/gov-spec-writer.agent.md@043e61df0427:30-31`, since PLAY-dOrderedCharter-48.
   The spec format's writing rule names neither: `tools/memory-tree/SPEC-TEMPLATE.template.md@1e45ee10d546:107`.
@@ -221,7 +221,7 @@ In `tools/workflows/unattended-build.test.sh`, beside the OC4 child arms:
 ## 5. Production-readiness checklist
 
 - security — N/A: prose in two prompts and one format document, and no new write path or surface.
-- perf / scale — the builder body grows by about 560 bytes, under its 4096-byte ceiling. Timing is
+- perf / scale — the builder body grows by about 560 bytes, under its 4096-byte ceiling. Timing is <!-- PINNED 2026-11-14 -->
   exempt, as §3 says.
 - error / empty / loading states — N/A: no code path branches on the new text.
 - observability — the handoff render prints the role body's size on stderr on every render.
@@ -246,7 +246,7 @@ the scratch root the task names.
   again after it, its outputs saved to `$S`, `diff` of the two prints the
   marker line, whose `role-sha` moves, then the S1 paragraph's six lines and the blank line after
   them as added lines, and nothing else.
-  Its stderr load-set note reports the body under 4096 bytes.
+  Its stderr load-set note reports the body under 4096 bytes. <!-- PINNED 2026-11-14 -->
   Red when: the role render drifts elsewhere, or the paragraph pushes the body over its ceiling and
   the note reports it.
   figure: DERIVED, the byte count read from the note at observation time.

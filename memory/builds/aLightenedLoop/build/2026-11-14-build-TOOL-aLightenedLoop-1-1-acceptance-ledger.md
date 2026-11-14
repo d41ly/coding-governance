@@ -130,7 +130,7 @@ The wall-clock seconds, base then tip, every scenario:
 
 **Evidences:** TOOL-aLightenedLoop-1
 - AC1 — `find memory -type f -newer <marker>` — after the tip's second `gen_build_index.py --write`
-  on P0 it listed 0 files; on the base side it listed 3212, every artifact.
+  on P0 it listed 0 files; on the base side it listed 3212, every artifact. <!-- PINNED 2026-11-14 -->
 - AC2 — `diff -r` — over the `gen_build_index.py --write` and `gen_build_index.py --check`
   captures of both sides it printed nothing, each `--check` ending `build-index: clean (3212
   artifact(s))` and exit 0, and both `git status --porcelain` readings were empty.

@@ -59,10 +59,10 @@ out of scope, by the owner's answer to F1, because the cross-build joins are sho
   there, and the attended child text stays as it is.
 - No new `nextAction` sentence in the build harness. Those sentences are pinned by its suite; the
   new instruction travels as a field, as `resolvePathsWith` already does.
-- No edit to the unattended Skill. It sits at its ceiling of 10580 bytes
+- No edit to the unattended Skill. It sits at its ceiling of 10580 bytes <!-- PINNED 2026-11-14 -->
   (`tools/template-size-limits.txt:188`), and the field is self-describing.
 - No scoping of the check to one build. The scoping half of the brief's item 3, rev-1's S7, is out
-  of scope by F1's resolution, and the section "Why the check is not scoped" in §4 records why.
+  of scope by F1's resolution, and the section "Why the check is not scoped" in §4 records why. <!-- PINNED 2026-11-14 -->
 - No incremental, per-spec checker. It is filed as a follow-up ask at the build's wrap-up.
 - No kit version bump by hand. The lander's mint moves it.
 - None of units 1, 2, 4 or 5's mechanisms.
@@ -76,34 +76,34 @@ none
 ### What the code does today, read at `846d51d3`
 
 - The builder runs the first `--dispatch`. The unattended branch of `DRIVER_STEPS`
-  (`tools/workflows/unattended-unit.js:258`) opens with "Declare the write set with" the driver's
-  `--dispatch` at `tools/workflows/unattended-unit.js:264`. A Workflow script has no shell, so the
+  (`tools/workflows/unattended-unit.js@71852dc0:258`) opens with "Declare the write set with" the driver's
+  `--dispatch` at `tools/workflows/unattended-unit.js@71852dc0:264`. A Workflow script has no shell, so the
   child cannot run it for the builder.
-- The build harness's hand-out object `dispatch` (`tools/workflows/unattended-build.js:3018`) holds
-  `scriptPath`, `args`, `perUnit` and `resolvePathsWith` (`tools/workflows/unattended-build.js:3039`).
+- The build harness's hand-out object `dispatch` (`tools/workflows/unattended-build.js@996b9ed7:3018`) holds
+  `scriptPath`, `args`, `perUnit` and `resolvePathsWith` (`tools/workflows/unattended-build.js@996b9ed7:3039`).
   The last is already a command the main loop runs before a unit's call, so a field that instructs
   the main loop is an existing shape.
-- The key is `derive_spec_token_key` (`tools/unattended/unattended.sh:14430`): the slug, the
+- The key is `derive_spec_token_key` (`tools/unattended/unattended.sh@95b8f840:14430`): the slug, the
   checker, the launcher, `GIT rev-parse HEAD` and the run-gates working-tree fingerprint. The
   fingerprint digests the HEAD tree, the porcelain status and every dirty or untracked blob
-  (`tools/run-gates/gate-fingerprint.sh:1`). So any commit, any tracked edit and any untracked file
+  (`tools/run-gates/gate-fingerprint.sh@862c00cc:1`). So any commit, any tracked edit and any untracked file
   moves the key, whether or not the checker reads it.
-- `run_spec_token_check` (`tools/unattended/unattended.sh:14458`) derives the key before the
+- `run_spec_token_check` (`tools/unattended/unattended.sh@95b8f840:14458`) derives the key before the
   checker runs and records it after an admit. Its skip line and its cache-off line are the two
-  announcements the suite pins (`tools/unattended/unattended.test.sh:7839`,
-  `tools/unattended/unattended.test.sh:7876`).
+  announcements the suite pins (`tools/unattended/unattended.test.sh@0d9cd163:7839`,
+  `tools/unattended/unattended.test.sh@0d9cd163:7876`).
 - The suite's arm asserts the old over-sensitivity. Step b edits the build's README and expects a
-  re-run (`tools/unattended/unattended.test.sh:7842`), and step c makes an empty commit and expects
-  a re-run (`tools/unattended/unattended.test.sh:7850`). This unit inverts both on purpose.
-- The checker's git calls go through `subprocess.run`: `run` (`tools/check-spec-tokens.py:577`) for
-  `git ls-files`, the cutoff pickaxe (`tools/check-spec-tokens.py:762`), the packet instrument per
-  live chain run (`tools/check-spec-tokens.py:1559`), the spec revision log
-  (`tools/memory-tree/design_lib.py:687`), the one `git cat-file --batch` that takes stdin
-  (`tools/memory-tree/tree_lib.py:377`, through `tools/memory-tree/tree_lib.py:327`), and the policy
-  read (`tools/memory-tree/tree_lib.py:74`).
-- `add_source_read` (`tools/policy/check_policy.py:4182`) is an audit hook that keeps an `open`
+  re-run (`tools/unattended/unattended.test.sh@0d9cd163:7842`), and step c makes an empty commit and expects
+  a re-run (`tools/unattended/unattended.test.sh@0d9cd163:7850`). This unit inverts both on purpose.
+- The checker's git calls go through `subprocess.run`: `run` (`tools/check-spec-tokens.py@42905ba5:577`) for
+  `git ls-files`, the cutoff pickaxe (`tools/check-spec-tokens.py@42905ba5:762`), the packet instrument per
+  live chain run (`tools/check-spec-tokens.py@42905ba5:1559`), the spec revision log
+  (`tools/memory-tree/design_lib.py@82906599:687`), the one `git cat-file --batch` that takes stdin
+  (`tools/memory-tree/tree_lib.py@54a65cd4:377`, through `tools/memory-tree/tree_lib.py@54a65cd4:327`), and the policy
+  read (`tools/memory-tree/tree_lib.py@54a65cd4:74`).
+- `add_source_read` (`tools/policy/check_policy.py@4b35ad98:4182`) is an audit hook that keeps an `open`
   event only when it reads, maps a bytecode-cache read to its source, and flags a cache name it
-  cannot map. It is installed by `sys.addaudithook` at `tools/policy/check_policy.py:5020`. The
+  cannot map. It is installed by `sys.addaudithook` at `tools/policy/check_policy.py@4b35ad98:5020`. The
   recorder below needs that same filter, so this unit is its second instance.
 
 ### S1 — `dispatch.declare`
@@ -154,7 +154,7 @@ The canonical copy is a new file in the gov lib dir, `read_open.py`, holding the
 `# >>> read_open_py -- canonical copy: read_open.py in the gov lib dir (byte-identical; gated)` and
 `# <<< read_open_py`. `tools/policy/check_policy.py` and `tools/check-spec-tokens.py` each carry the
 block inline, and `add_source_read` keeps only its root, temp and git-dir filtering around the call.
-The parity table (`tools/lib/resolve-python.test.sh:351`) gains the row
+The parity table (`tools/lib/resolve-python.test.sh@4b2fb1fb:351`) gains the row
 `read_open_py|$ROOT/$KIT_REL/read_open.py|$KIT_REL/read_open`.
 
 Before writing the block, the builder greps the tree for `addaudithook` outside the policy kit. If
@@ -165,7 +165,7 @@ caller.
 ### S4 — the input record
 
 When `SPEC_TOKENS_INPUTS` is set and not empty, the checker calls `arm_input_trace` at module level,
-right after its standard-library imports (`tools/check-spec-tokens.py:272`) and before the kit
+right after its standard-library imports (`tools/check-spec-tokens.py@42905ba5:272`) and before the kit
 resolves. Arming inside `main` would be too late: the kit's modules load at import, and a change to
 one of them would then move no key. An environment variable, not a flag, carries the request,
 because a declared `SPEC_TOKENS_CLI` that does not know it simply ignores it and writes no record. A
@@ -243,7 +243,7 @@ longer invalidates a record between runs.
 - A records-only commit, or an edit to a file no live spec cites and the checker never opens. Today
   both miss.
 - A second unit of the same build in a parallel group. The run-state file is read only by the packet
-  join, for a chain run that has a packet (`tools/check-spec-tokens.py:1551`). So a non-chain run's
+  join, for a chain run that has a packet (`tools/check-spec-tokens.py@42905ba5:1551`). So a non-chain run's
   own dispatch row no longer moves the key. That reverses TOOL-aSmoothedDispatch-4's non-goal, which
   had to include the run-state file because the fingerprint could not tell who read it.
 - Not the next unit of a sequential run. Each pass commit sets its unit's spec CLOSED, and the
@@ -254,7 +254,7 @@ longer invalidates a record between runs.
 ### What the key does not check
 
 - A path probed only by `is_file` or `exists` and never opened, such as `run_md.is_file()` at
-  `tools/check-spec-tokens.py:1551`. A tracked file appearing there moves the replayed
+  `tools/check-spec-tokens.py@42905ba5:1551`. A tracked file appearing there moves the replayed
   `git ls-files` answer. An untracked one does not.
 - The environment beyond the recorded delta, and a Python package upgraded in place under one
   launcher path. Both were outside TOOL-aSmoothedDispatch-4's key as well.
@@ -266,9 +266,9 @@ longer invalidates a record between runs.
 The cheap scoped form is the checker's `--spec` mode over the dispatching build's live specs. That
 mode differs from the whole-tree run in three places, read at `846d51d3`:
 
-- It skips the carries join and the packet join (`tools/check-spec-tokens.py:1954`,
-  `tools/check-spec-tokens.py:1976`).
-- It reports no stale waiver row (`tools/check-spec-tokens.py:2000`).
+- It skips the carries join and the packet join (`tools/check-spec-tokens.py@42905ba5:1954`,
+  `tools/check-spec-tokens.py@42905ba5:1976`).
+- It reports no stale waiver row (`tools/check-spec-tokens.py@42905ba5:2000`).
 - It grades every named spec whatever its status, where the whole tree grades live specs only.
 
 The dispatch verdict refuses on any stale row and on any hit whose file is not under a build folder,
@@ -498,7 +498,7 @@ checker.
   Red when: the verdict lines differ between the two drivers, or this unit's driver re-runs on the
   unread edit.
   permission: it runs the whole-tree checker, which only the main loop may run.
-  cost: about eight cold checker runs, near 62 s each on node `a`.
+  cost: about eight cold checker runs, near 62 s each on node `a`. <!-- PINNED 2026-11-14 -->
   fixture: the base driver is a worktree at `846d51d3` under `%TEMP%/l3b`, sourced from this
   worktree's root as the pass probe sources the driver.
   figure: every time is DERIVED at observation.
@@ -556,17 +556,17 @@ The close runs the bar once, after the last unit is terminal. This spec's author
 ## 10. Reuse audit
 
 The seams this unit extends: the hand-out's `dispatch` object and its command field
-`resolvePathsWith` (`tools/workflows/unattended-build.js:3039`); the unattended `DRIVER_STEPS`
-branch (`tools/workflows/unattended-unit.js:258`); `derive_spec_token_key` and
-`run_spec_token_check` (`tools/unattended/unattended.sh:14430`,
-`tools/unattended/unattended.sh:14458`), re-keyed in place; the run-gates fingerprint, kept as the
+`resolvePathsWith` (`tools/workflows/unattended-build.js@996b9ed7:3039`); the unattended `DRIVER_STEPS`
+branch (`tools/workflows/unattended-unit.js@71852dc0:258`); `derive_spec_token_key` and
+`run_spec_token_check` (`tools/unattended/unattended.sh@95b8f840:14430`,
+`tools/unattended/unattended.sh@95b8f840:14458`), re-keyed in place; the run-gates fingerprint, kept as the
 run-window guard; and the policy kit's audit-hook read filter `add_source_read`
-(`tools/policy/check_policy.py:4182`), extracted to the lib dir under the parity table at its second
+(`tools/policy/check_policy.py@4b35ad98:4182`), extracted to the lib dir under the parity table at its second
 instance. `reuse_lookup.py` for "record which files a check read and skip the rerun when none of
 them changed" ranked generic name stems only (`read_text`, `read`, `check`, `records`, `skip`), so
 no caching seam fits beyond the fingerprint; `addaudithook` was then found by grep at
-`tools/policy/check_policy.py:5020`. Recall's top hit was TOOL-aSmoothedDispatch-4, whose key this
-unit replaces. A scout note it surfaced named `derive_cache_key` (`tools/memory-tree/transition_audit.py:636`
+`tools/policy/check_policy.py@4b35ad98:5020`. Recall's top hit was TOOL-aSmoothedDispatch-4, whose key this
+unit replaces. A scout note it surfaced named `derive_cache_key` (`tools/memory-tree/transition_audit.py@419c2700:636`
 at `846d51d3`, cited there as line 693) as a key over declared inputs; that is the rejected
 declared-list shape. TOOL-aHoistedPass-21, an ask about hoisting a dispatch to the main loop,
 concerns Workflow calls rather than this verb.

@@ -2,7 +2,7 @@
 
 # Where a build unit's fixed overhead goes: the slowdown audit behind this build
 
-These figures come from the dSafePassage session `c5f50d22` (about 102 units, plus 4 of dPavedRoad),
+These figures come from the dSafePassage session `c5f50d22` (about 102 units, plus 4 of dPavedRoad), <!-- PINNED 2026-11-14 -->
 which covered 157 workflows and 469 agents. They were re-timed on `main` 846d51d39 on node `a` beside a
 live run, so read every wall time as about ±2×. The instruments are the scripts `slow.py`, `slow2.py`
 and `slow3.py`, each run as `python -B <script> <session-dir> <out>`. Their outputs are `slow.txt` and
@@ -14,15 +14,15 @@ its last. Summed over 101 builders, the overhead is about 31 h.
 
 ## 1. The commit tail (about 17 h)
 
-- `gen_build_index.py --write` takes 68–106 s. On an idle re-render it rewrote all 3,206 artifacts
+- `gen_build_index.py --write` takes 68–106 s. On an idle re-render it rewrote all 3,206 artifacts <!-- PINNED 2026-11-14 -->
   while none changed content, because `write_text` (line 296) opens every file `"wb"`. Those writes
-  cost about 12 s by cProfile, and the `git status` after them about 3 s more.
-- A cProfile of `--write` at 92 s: `plan` (line 2700) 83 s; `read_carries_coverage` (line 1990, through
-  `check-spec-tokens.py`'s `derive_carries_coverage` at 1122 and `read_carries_specs` at 952) 35 s;
-  `collect` (line 1107) 33 s; and 52 git spawns, about 24 s.
-- The pre-commit hook took about 230 s on a one-line append to a ledger under
-  `memory/builds/dPavedRoad/build/`. Check 9 ran `--check --staged` for 67 s and printed a full render.
-  Check 29 ran `--check-coverage --staged` for 34 s to report that it graded nothing.
+  cost about 12 s by cProfile, and the `git status` after them about 3 s more. <!-- PINNED 2026-11-14 -->
+- A cProfile of `--write` at 92 s: `plan` (line 2700) 83 s; `read_carries_coverage` (line 1990, through <!-- PINNED 2026-11-14 -->
+  `check-spec-tokens.py`'s `derive_carries_coverage` at 1122 and `read_carries_specs` at 952) 35 s; <!-- PINNED 2026-11-14 -->
+  `collect` (line 1107) 33 s; and 52 git spawns, about 24 s. <!-- PINNED 2026-11-14 -->
+- The pre-commit hook took about 230 s on a one-line append to a ledger under <!-- PINNED 2026-11-14 -->
+  `memory/builds/dPavedRoad/build/`. Check 9 ran `--check --staged` for 67 s and printed a full render. <!-- PINNED 2026-11-14 -->
+  Check 29 ran `--check-coverage --staged` for 34 s to report that it graded nothing. <!-- PINNED 2026-11-14 -->
 - Why check 9's staged skip did not fire: `check_index_input` (line 895) classes any path under a
   build's `spec`, `build`, `prompts` or `reviews` folder as structural (line 927), because the
   renderer reads those records' headers, bindings and filenames. So every edit there renders,
@@ -32,8 +32,8 @@ its last. Summed over 101 builders, the overhead is about 31 h.
 
 ## 2. Idle-wake ticks (about 24.5 h of main-loop time)
 
-- 666 tick turns averaged 132 s each and produced 795k output tokens in total.
-- `unattended.sh --resume` ran 483 times for 370 min: a median of 12 s on its own, and about 72 s
+- 666 tick turns averaged 132 s each and produced 795k output tokens in total. <!-- PINNED 2026-11-14 -->
+- `unattended.sh --resume` ran 483 times for 370 min: a median of 12 s on its own, and about 72 s <!-- PINNED 2026-11-14 -->
   when paired with `--audit`.
 - Most ticks fired while a harness-tracked Workflow was running, and that Workflow notifies the
   session itself when it finishes. Because the main loop takes one turn at a time, a tick also delays
@@ -44,8 +44,8 @@ its last. Summed over 101 builders, the overhead is about 31 h.
 
 ## 3. `--dispatch` inside the builder (about 19 h; partly fixed since)
 
-- The session made 229 calls, with a median of 5.3 min. Its 50 refusals took the same 5.4 min each,
-  and 45 calls ran past the 120 s tool default and were moved to the background.
+- The session made 229 calls, with a median of 5.3 min. Its 50 refusals took the same 5.4 min each, <!-- PINNED 2026-11-14 -->
+  and 45 calls ran past the 120 s tool default and were moved to the background. <!-- PINNED 2026-11-14 -->
 - aSwiftRefusal, aSmoothedDispatch and aBatchedPacket have since landed cheap refusals first, a check
   scoped to the dispatching build's specs, and no packet history walk.
 - Still open on 846d51d39: `run_spec_token_check` (line 14458) takes 62 s today. Its cache key
@@ -57,7 +57,7 @@ its last. Summed over 101 builders, the overhead is about 31 h.
 
 ## 4. Rework from diverged units (about 8 h of builders, plus spec rounds)
 
-- 23 unit runs diverged and 4 more ended uncommitted, about 481 min in total. 17 of 41 units needed
+- 23 unit runs diverged and 4 more ended uncommitted, about 481 min in total. 17 of 41 units needed <!-- PINNED 2026-11-14 -->
   more than one spec-writer round, for 66 spawns. dSafePassage unit 5 took 6 dispatches and 6 spec
   rounds, about 4 h of builders, and builders ran 50–100 min before diverging.
 - The causes, by run: the spec contradicts itself, about 9; the spec claims behaviour the current code
@@ -69,8 +69,8 @@ its last. Summed over 101 builders, the overhead is about 31 h.
 ## 5. Stop-guard liveness (about 2.7 h)
 
 - `tools/unattended/stop-guard.js` spawns `bash unattended.sh --liveness <slug>` (`runLiveness`) on
-  every Stop. The session had 1,028 Stops at an average of 9.3 s. Today the spawn takes 13 s on a live
-  run and 5 s on an attended slug.
+  every Stop. The session had 1,028 Stops at an average of 9.3 s. Today the spawn takes 13 s on a live <!-- PINNED 2026-11-14 -->
+  run and 5 s on an attended slug. <!-- PINNED 2026-11-14 -->
 
 ## 6. Overlap with the chain builds, checked at kickoff
 

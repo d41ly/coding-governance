@@ -13,8 +13,8 @@
 
 ## 1. Goal
 
-Each idle-wake tick today runs `--resume` and then `--audit`: about 12 s and 72 s, over 666 ticks in
-dSafePassage that averaged 132 s of main-loop time each. This unit adds one driver verb, `--wake`,
+Each idle-wake tick today runs `--resume` and then `--audit`: about 12 s and 72 s, over 666 ticks in <!-- PINNED 2026-11-14 -->
+dSafePassage that averaged 132 s of main-loop time each. This unit adds one driver verb, `--wake`, <!-- PINNED 2026-11-14 -->
 that answers in one line whether those two acts would find anything to do. On `HEALTHY` the model
 ends its turn, and on `FULL` it runs the pair exactly as today. The same line names the cadence the
 idle-wake should run at, which is longer while a registered task is open. No existing verb's
@@ -220,7 +220,7 @@ and `memory/guides/UNATTENDED-PROTOCOL.md`, all written by `bash tools/unattende
 |---|---|---|---|
 | `.claude/skills/unattended/SKILL.md` | 10580 | 10580, row at `tools/template-size-limits.txt@1e83100dad69:188` | raised to the measured render, no headroom |
 | `memory/guides/UNATTENDED-PROTOCOL.md` | 68022 | 68022, row at `:166` | raised to the measured render, no headroom |
-| `memory/guides/UNATTENDED-VERBS.md` | 96906 bytes, 1106 lines | 98304 bytes, 1200 lines, `GUIDE_CAP_BYTES` at `tools/memory-tree/check-memory-hygiene.sh@f064ddabb88e:152` | fits, and must, because the row is not this run's to raise |
+| `memory/guides/UNATTENDED-VERBS.md` | 96906 bytes, 1106 lines | 98304 bytes, 1200 lines, `GUIDE_CAP_BYTES` at `tools/memory-tree/check-memory-hygiene.sh@f064ddabb88e:152` | fits, and must, because the row is not this run's to raise | <!-- PINNED 2026-11-14 -->
 
 The figures are PINNED, measured 2026-11-14. The 1398 bytes of verbs-carrier headroom are shared
 with any sibling unit that edits that carrier, so this unit spends at most 900 of them.

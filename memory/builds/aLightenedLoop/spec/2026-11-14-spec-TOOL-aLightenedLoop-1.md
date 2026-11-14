@@ -22,7 +22,7 @@
 
 A builder's commit renders the build index twice: once by its own `--write`, and once inside the
 pre-commit hook's check 9. Check 29 then reads the whole carries join to report that it graded
-nothing. This unit removes that fixed cost, measured at 68 to 230 s per commit in dSafePassage, and
+nothing. This unit removes that fixed cost, measured at 68 to 230 s per commit in dSafePassage, and <!-- PINNED 2026-11-14 -->
 moves no verdict, refusal text or rendered byte of checks 9 and 29.
 
 ## 2. Scope (IN)
@@ -239,7 +239,7 @@ nothing, and `read_design` and the status pass still run with their refusals.
 
 `tools/memory-tree/README.md` gains three sentences: the stamp beside the `--check --staged`
 paragraph near line 602, the narrowed `build/` skip in the same paragraph, and the early exit in
-the `--check-coverage` paragraph near line 372. `memory/HYGIENE.md` check 29 says the staged verb
+the `--check-coverage` paragraph near line 372. the hygiene check catalogue (`doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home`) says for check 29 that the staged verb
 runs on the render's trigger and otherwise holds, which stays true. No page under `help/` describes
 check 9's or check 29's staged form: `grep -rln "render SKIPPED" help` finds none.
 
@@ -380,7 +380,7 @@ New arm: `tools/check-spec-tokens.test.sh` · covers AC7 AC8 · a design fixture
   such cache is written by `--write` and read by `--check`, a guard sharing state with what it
   guards. The charter's `[class]` rule forbids that, and only the owner overrides a charter rule.
   - **A — the stamp of §4 S2, under `--staged` only.** The hook's render on a spec commit, about
-    70 s, becomes four git calls. A render that is not a fixed point is caught at the push
+    70 s, becomes four git calls. A render that is not a fixed point is caught at the push <!-- PINNED 2026-11-14 -->
     boundary instead of at the commit, the trade the staged skip already makes for unrendered
     paths. Needs the owner's override of `[class]`, recorded in `memory/DECISIONS.md`.
   - **B — a stamp only a full `--check` leaves.** No shared state with `--write`, but the hook's
@@ -397,7 +397,7 @@ New arm: `tools/check-spec-tokens.test.sh` · covers AC7 AC8 · a design fixture
 ## 9. Revision log
 
 - rev-1 · 2026-11-14 · initial draft.
-- rev-2 · 2026-11-14 · §2 S2 · §4 S2 · §4 files touched · §5 · §6 AC3 AC4 · §8 F1 · folded the owner's
+- rev-2 · 2026-11-14 · §2 S2 · §4 S2 · §4 files touched · §5 · §6 AC3 AC4 · §8 F1 · folded the owner's <!-- PINNED 2026-11-14 -->
   answer to F1 (option A) per `2026-11-14-prompt-TOOL-aLightenedLoop-1-fork-fold` and the override
   record `2026-11-14-build-TOOL-aLightenedLoop-1-override-1`; the gating notes on S2, AC3 and AC4 are
   dropped, and the header carries `ratified 2026-11-14`.

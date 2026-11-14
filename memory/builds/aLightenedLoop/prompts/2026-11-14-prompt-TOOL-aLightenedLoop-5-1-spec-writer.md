@@ -118,5 +118,5 @@ memory/builds/aLightenedLoop/spec/2026-11-14-spec-TOOL-aLightenedLoop-5.md
 
 ### task:reuse
 
-check_staged_render / check_index_input (gen_build_index.py:977, :895) · derive_spec_token_key + gate-fingerprint.sh (unattended.sh:14458) · runLiveness (stop-guard.js:111) · DRIVER_STEPS (unattended-unit.js:259) · reuse_lookup found no generic caching seam
+`tools/memory-tree/gen_build_index.py#check_staged_render` · `tools/memory-tree/gen_build_index.py#check_index_input` · `tools/unattended/unattended.sh#derive_spec_token_key` + gate-fingerprint.sh · `tools/unattended/stop-guard.js#runLiveness` · `tools/workflows/unattended-unit.js#DRIVER_STEPS` · reuse_lookup found no generic caching seam
 [/memory/builds/aLightenedLoop/prompts/2026-11-14-prompt-TOOL-aLightenedLoop-5-1-spec-writer.md]
