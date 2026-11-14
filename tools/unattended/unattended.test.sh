@@ -3262,7 +3262,8 @@ hit "$out" "round 4 · HOLD · reason ceiling"
 same "FA9 AC14 the recipe is a second line" "$(grep '^unattended: chain' <<<"$out" | sed -n 2p | grep -c -- '--handoff dFix --code owner-decision')" "1"
 same "FA9 AC14 one derivation" "$(grep -c 'derive_chain_verdict "' "$SCRIPT")" "1"
 same "FA9 AC15 the driver's census holds" "$(( $(grep -cE "$_cg_census" "$SCRIPT") <= 318 ))" "1"
-same "FA9 AC15 the leg's census holds" "$(( $(grep -cE "$_cg_census" "$HERE/check-unattended.sh") <= 264 ))" "1"
+# The leg's bound is its REFUSAL_CEILINGS token, 266 since TOOL-dDeclaredLoop-5's check 53 (decision TOOL-dDeclaredLoop-5).
+same "FA9 AC15 the leg's census holds" "$(( $(grep -cE "$_cg_census" "$HERE/check-unattended.sh") <= 266 ))" "1"
 # AC3, and AC7's third population, over a policy kit, so COUNTED EITHER WAY. The owner's move reads as
 # CONTINUE, never as a pass, and the round the raised ceiling asks for lets the dispatch through.
 if [ -z "$_sw_rel" ]; then

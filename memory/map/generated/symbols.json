@@ -4863,6 +4863,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "check_actor_list",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "check_admit",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -4886,6 +4891,11 @@
       "id": "check_alias_copies",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "check_alias_rows",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "check_all",
@@ -7498,6 +7508,11 @@
       "file": "tools/playbook/edge_grammar.py"
     },
     {
+      "id": "check_site_witnesses",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "check_skill",
       "kind": "function",
       "file": "tools/lexicon/adopt-lexicon.sh"
@@ -8026,6 +8041,11 @@
       "id": "check_wiring_runnable",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_witness_classes",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "check_work_landed",
@@ -17198,6 +17218,16 @@
       "file": "tools/playbook/load_sets.py"
     },
     {
+      "id": "read_actor_base",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
+      "id": "read_actor_rows",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "read_adding_commits",
       "kind": "function",
       "file": "tools/memory-tree/tree_lib.py"
@@ -21468,6 +21498,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_witness_classes",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "read_witnessed_members",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
@@ -23838,6 +23873,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "resolve_alias",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "resolve_alias_interpreter",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -24536,6 +24576,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/lib/resolve_kit_dir.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "resolve_kit_dir",
@@ -29711,6 +29756,11 @@
       "id": "seed_log",
       "kind": "function",
       "file": "tools/unattended/resume-tick.test.sh"
+    },
+    {
+      "id": "seed_loop_kit",
+      "kind": "function",
+      "file": "tools/unattended/check-unattended.test.sh"
     },
     {
       "id": "seed_mirror_absent",

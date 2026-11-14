@@ -281,7 +281,7 @@ flags = ["--scaffold", "--check", "--target="]
 id = "script:{prefix}/loop/loop_lib.py"
 shape = "verb"
 entry = "{prefix}/loop/loop_lib.py"
-flags = ["--check", "--fixture", "--plant="]
+flags = ["--check", "--fixture", "--plant=", "--grade-site="]
 
 [[usage]]
 id = "script:{prefix}/loop/adopt-loop.sh"

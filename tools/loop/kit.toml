@@ -7,9 +7,11 @@ layer = "layer.flow"
 scope = "repo"
 # The kit's version constant; README.md's first line carries the marker that equals it.
 version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
-# The definition names no other kit's file and its reader is stdlib only. The roles kit requires this
-# one, since its catalogue checker and its adopter read each workflow's order here.
-requires = []
+# The definition names no other kit's file. Its reader is stdlib only but for `read_actor_base`, which
+# imports the memory-tree kit's compare base to read the actor-witness list at it (TOOL-dDeclaredLoop-5),
+# so this kit requires memory-tree. The roles kit requires this one, since its catalogue checker and its
+# adopter read each workflow's order here.
+requires = ["memory-tree"]
 
 # Everything the kit ships is engine, overwritten on every update: the definition, its reader, the
 # adopter and the README. The gov steps and each workflow's place are gov's, never an adopter's seed.
@@ -37,5 +39,6 @@ means = "adopted"
 name = "loop definition"
 subject = "repo"
 argv = ["python", "{kit}/loop_lib.py", "--check"]
+reads = { base = "it compares the actor-witness list with itself at the compare base, the merge-base with the default branch, so a verdict cached against one base says nothing about another (TOOL-dDeclaredLoop-5)." }
 guard = []
 ceiling = 120

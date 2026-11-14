@@ -28,6 +28,7 @@
 .memory-tree.conf	tools/unattended/check-pass-order.sh:2
 .memory-tree.conf	tools/unattended/check-playbook.sh:23
 .memory-tree.conf	tools/unattended/check-unattended.sh:264
+.memory-tree.conf	tools/unattended/check-unattended.sh:266
 .memory-tree.conf	tools/unattended/unattended.sh:318
 .memory-tree.conf	tools/unattended/unattended.sh:324
 .memory-tree.conf	tools/workflows/check-review-join.sh:2

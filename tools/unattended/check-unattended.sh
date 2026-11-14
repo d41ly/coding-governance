@@ -6735,6 +6735,47 @@ report "check 52 joined the driver's VERB_REQUIRES, claim declarations and their
 # batch adds to retire refusals should not cost more refusal sites than it can help (TOOL-aSparedSpawn-14).
 [ -z "$_c52_hits" ] || fail 52 "the driver's shared refusals have a second spelling or a gap - a run-state test refusing outside check_run_state, a VERB_REQUIRES pair and its check_verb_flag call out of step, a claim mode or class its declarations lack, or a population with nothing to join - so the one arm each helper keeps no longer covers its condition: $_c52_hits"
 fi
+if check_selected 53; then
+# ---- check 53 - EVERY DEFINITION-OF-DONE ENTRY NAMES ITS WITNESS CLASS, AND AN ACTOR ONE IS LISTED.
+# ---- TOOL-dDeclaredLoop-5 S5: the driver's `checker_of` no longer reads an entry with no `:<word>` as
+# ---- `machine`, so an unclassed entry is refused here, before a run reads it. The loop kit's
+# ---- `loop_lib.py --grade-site` is the one reader of the alias rows and the actor-witness list: this
+# ---- check passes it DOD_CORE, read from the driver above the core guard, and DOD_EXTRA, read from
+# ---- the conf, never `$DOD`, which the core region sets and `--only 53` skips. It decides on the exit
+# ---- code alone: 0 graded, 1 a refusal quoted, anything else - and no python or no loop kit - the
+# ---- second branch, naming which. The kit is found as `scan_foreign_anchors` finds memory-tree's.
+# ---- What this does NOT check: that a `machine` entry is in fact derived from history, or that the
+# ---- build an actor row names will compute its witness; the list's shrink-only compare and its build
+# ---- folders are the loop kit's own `loop definition` leg, which never sees DOD_CORE.
+_c53_why=""; _c53_out=""; _c53_rc=0; _c53_n=0
+_c53_py=$(resolve_python 2>/dev/null) || _c53_py=""
+if [ -z "$_c53_py" ]; then
+  _c53_why="no python launcher on this node RAN"
+elif ! _c53_dir=$(resolve_kit_dir "$_c53_py" loop loop_lib.py "$HERE" 2>/dev/null); then
+  _c53_why="the loop kit's loop_lib.py resolved through neither the install receipt nor a probe beside this kit"
+else
+  _c53_dir=${_c53_dir%$'\r'}
+  for _c53_site in DOD_CORE DOD_EXTRA; do
+    _c53_set=${!_c53_site}
+    [ -n "${_c53_set//[[:space:]]/}" ] || continue
+    _c53_n=$(( _c53_n + $(set -f; set -- $_c53_set; echo $#) ))
+    _c53_o=$(set -f; "$_c53_py" "$_c53_dir/loop_lib.py" --grade-site "$_c53_site" $_c53_set 2>&1); _c53_r=$?
+    _c53_o=${_c53_o//$'\r'/}
+    case "$_c53_r" in
+      0) ;;
+      1) _c53_rc=1; _c53_out="$_c53_out$(printf '%s\n' "$_c53_o" | grep '^loop: refused · ' | tr '\n' ' ')" ;;
+      *) _c53_why="the loop kit's --grade-site $_c53_site exited $_c53_r: $(printf '%s\n' "$_c53_o" | sed -n 1p)" ;;
+    esac
+  done
+fi
+if [ -n "$_c53_why" ]; then
+  fail 53 "the loop kit could not grade the Definition-of-Done entries' witness classes, so an unclassed entry or an unlisted actor-typed fact would pass as a witness unread: $_c53_why"
+elif [ "$_c53_rc" = 1 ]; then
+  fail 53 "a Definition-of-Done entry declares no witness class, a word no witness alias holds, or an actor witness the loop kit's actor-witness list does not name, or the list names an actor entry the site no longer declares, so a run would read a fact the acting agent typed as its witness; append :machine or :agent to an unclassed entry, and list an actor one with the build that computes it: $_c53_out"
+else
+  report "check 53 graded the witness class of $_c53_n Definition-of-Done entr(ies) through the loop kit's --grade-site: every entry classed, every actor entry listed"
+fi
+fi
 fi   # ---- end of the checks `--only 28` skips
 
 

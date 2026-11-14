@@ -188,6 +188,17 @@ cp "$HERE/ASKS.template.md" memory/guides/UNATTENDED-ASKS.md
 # probe tests only that the FILE exists, so a stub at the sibling home is the whole dependency.
 MT_REL=$(dirname "$KIT_REL")/memory-tree; MT_REL=${MT_REL#./}
 mkdir -p "$MT_REL" && printf '# fixture stub: the probe target of derive_index_repair\n' > "$MT_REL/gen_build_index.py"
+# THE LOOP KIT, BESIDE THIS KIT WHERE CHECK 53'S SIBLING-KIT RESOLVER PROBES (TOOL-dDeclaredLoop-5): its
+# reader, its definition and its actor-witness list, the three files `--grade-site` reads. FOUND by the
+# file only that kit holds, never by a typed kit directory, as the ask block finds the id grammar. Every
+# tree below that runs the leg is seeded the same way, or check 53 reds there on a missing kit.
+_lk_rel=$(git -C "$HERE" ls-files --full-name -- ':(top)*loop_lib.py' | head -n 1)
+_lk_src="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/${_lk_rel%/*}"
+LOOP_REL=$(dirname "$KIT_REL")/${_lk_src##*/}; LOOP_REL=${LOOP_REL#./}
+seed_loop_kit() { # tree -> the loop kit's three files copied into <tree>/$LOOP_REL
+  mkdir -p "$1/$LOOP_REL" && cp "$_lk_src/loop_lib.py" "$_lk_src/loop.toml" "$_lk_src/actor-witnesses.txt" "$1/$LOOP_REL/"
+}
+seed_loop_kit .
 SCRIPT="$TMP/$KIT_REL/check-unattended.sh"
 
 mkconf() { cat > .unattended.conf <<EOF
@@ -804,6 +815,7 @@ ma_init() { # name · [bare] -> $ma_root/<name>, built to the shape above; `bare
      "$TMP/$KIT_REL/check-playbook.sh" "$TMP/$KIT_REL/PROTOCOL.template.md" "$TMP/$KIT_REL/SKILL.template.md" \
      "$TMP/$KIT_REL/VERBS.template.md" "$TMP/$KIT_REL/PLAYBOOK-TEMPLATE.template.md" \
      "$TMP/$KIT_REL/.unattended.conf.example" "$d/$KIT_REL/"
+  seed_loop_kit "$d"
   cp "$TMP/$KIT_REL/PROTOCOL.template.md" "$d/memory/guides/UNATTENDED-PROTOCOL.md"
   cp "$TMP/$KIT_REL/VERBS.template.md" "$d/memory/guides/UNATTENDED-VERBS.md"
   cp "$TMP/$KIT_REL/ASKS.template.md" "$d/$KIT_REL/"
@@ -5389,6 +5401,7 @@ lm_dir=$(mktemp -d)
      "$HERE/PROTOCOL.template.md" "$HERE/SKILL.template.md" "$HERE/VERBS.template.md" \
      "$HERE/STOPS.template.md" "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" \
      "$HERE/.unattended.conf.example" "$KIT_REL/"
+  seed_loop_kit .
   cp "$HERE/PROTOCOL.template.md" memory/guides/UNATTENDED-PROTOCOL.md
   cp "$HERE/VERBS.template.md" memory/guides/UNATTENDED-VERBS.md
   cp "$HERE/ASKS.template.md" "$KIT_REL/"
@@ -5780,6 +5793,7 @@ cp "$TMP/$KIT_REL/check-unattended.sh" "$TMP/$KIT_REL/unattended.sh" "$TMP/$KIT_
    "$TMP/$KIT_REL/check-playbook.sh" "$TMP/$KIT_REL/PROTOCOL.template.md" "$TMP/$KIT_REL/SKILL.template.md" \
    "$TMP/$KIT_REL/VERBS.template.md" "$TMP/$KIT_REL/PLAYBOOK-TEMPLATE.template.md" \
    "$TMP/$KIT_REL/.unattended.conf.example" "$ak/$KIT_REL/"
+seed_loop_kit "$ak"
 cp "$TMP/$KIT_REL/PROTOCOL.template.md" "$ak/memory/guides/UNATTENDED-PROTOCOL.md"
 cp "$TMP/$KIT_REL/VERBS.template.md" "$ak/memory/guides/UNATTENDED-VERBS.md"
 cp "$TMP/$KIT_REL/ASKS.template.md" "$ak/$KIT_REL/"
@@ -6226,6 +6240,7 @@ cp "$TMP/$KIT_REL/check-unattended.sh" "$TMP/$KIT_REL/unattended.sh" "$TMP/$KIT_
    "$TMP/$KIT_REL/check-playbook.sh" "$TMP/$KIT_REL/PROTOCOL.template.md" "$TMP/$KIT_REL/SKILL.template.md" \
    "$TMP/$KIT_REL/VERBS.template.md" "$TMP/$KIT_REL/PLAYBOOK-TEMPLATE.template.md" \
    "$TMP/$KIT_REL/.unattended.conf.example" "$ma0/$KIT_REL/"
+seed_loop_kit "$ma0"
 cp "$TMP/$KIT_REL/PROTOCOL.template.md" "$ma0/memory/guides/UNATTENDED-PROTOCOL.md"
 cp "$TMP/$KIT_REL/VERBS.template.md" "$ma0/memory/guides/UNATTENDED-VERBS.md"
 cp "$TMP/$KIT_REL/ASKS.template.md" "$ma0/$KIT_REL/"
@@ -7060,6 +7075,27 @@ hit  "$(bash "$SCRIPT" --only 52 2>&1)" "claim class foreign-scratch (an arm at 
 reset_tree
 mutate $KIT_REL/unattended.sh '/^VERB_REQUIRES="/,/"$/d'
 hit  "$(bash "$SCRIPT" --only 52 2>&1)" "nothing to join: no VERB_REQUIRES row"
+reset_tree
+
+# ==== TOOL-dDeclaredLoop-5: CHECK 53, each Definition-of-Done entry's witness class graded through the
+# ---- loop kit's `--grade-site`, read off a run scoped to 53. AC7: an unclassed DOD_EXTRA entry reds,
+# ---- quoting the loop kit's refusal that names it, which also proves `--only 53` reads DOD_EXTRA from
+# ---- the conf rather than `$DOD`, which the core region sets; restored, the run prints its liveness
+# ---- line alone. The first arm carries the refusal branch's whole literal.
+reset_tree; mkconf "" "b"
+out=$(bash "$SCRIPT" --only 53 2>&1); rc=$?
+hit  "$out" "UNATTENDED check 53 FAILED — a Definition-of-Done entry declares no witness class, a word no witness alias holds, or an actor witness the loop kit's actor-witness list does not name, or the list names an actor entry the site no longer declares, so a run would read a fact the acting agent typed as its witness; append :machine or :agent to an unclassed entry, and list an actor one with the build that computes it: "
+hit  "$out" "loop: refused · DOD_EXTRA b declares no witness class"
+same "check 53 refuses an unclassed DOD_EXTRA entry, exit code" "$rc" "1"
+reset_tree
+out=$(bash "$SCRIPT" --only 53 2>&1); rc=$?
+miss "$out" "UNATTENDED check 53 FAILED"
+same "check 53 over the classed fixture prints its liveness line alone" "$(grep -v '^check-unattended: --only 53 ran checks 53; skipped' <<<"$out")" ""
+same "check 53 over the classed fixture, exit code" "$rc" "0"
+# ---- THE SECOND BRANCH: a tree with no loop kit beside the copy reds naming the unreachable kit, never
+# ---- a pass over entries nobody graded.
+reset_tree; rm -rf "$LOOP_REL"
+hit  "$(bash "$SCRIPT" --only 53 2>&1)" "UNATTENDED check 53 FAILED — the loop kit could not grade the Definition-of-Done entries' witness classes, so an unclassed entry or an unlisted actor-typed fact would pass as a witness unread: the loop kit's loop_lib.py resolved through neither"
 reset_tree
 
 # ==== TOOL-dAlignedCarrier-6: CHECK 48, a run-state fact written after the function's last stage

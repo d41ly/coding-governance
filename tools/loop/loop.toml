@@ -6,6 +6,16 @@
 #   order  its place in the loop, counted from 1
 #   state  the build state a build holds while it is in the step
 #   exit   the step's exit item, a tag of the `item` namespace
+#   witness  what witnesses the step's exit: { class = "<class>", by = "<what>" }, the class one of
+#          [witnesses] classes or refused below (TOOL-dDeclaredLoop-5)
+#
+# [witnesses], the witness classes: `classes` a fact the acting agent cannot type is witnessed by,
+# `refused` the class it can (`actor`), which no witness may carry unless actor-witnesses.txt beside
+# this file lists it with the build whose computed witness takes its place.
+#
+# One [[witness-alias]] row per checker word of the unattended driver's DOD_CORE:
+#   word   the checker word, `machine` or `agent`
+#   means  the class it means
 #
 # One [[workflow]] row per workflow of the roles kit's workflows.toml, joined by name both ways by that
 # kit's catalogue checker (rule R6):
@@ -30,30 +40,47 @@ tag = "step.plan"
 order = 1
 state = "planning"
 exit = "item.plan.exit"
+witness = { class = "history", by = "the transition record into the next step" }
 
 [[step]]
 tag = "step.design"
 order = 2
 state = "designing"
 exit = "item.design.exit"
+witness = { class = "history", by = "the transition record into the next step" }
 
 [[step]]
 tag = "step.build"
 order = 3
 state = "building"
 exit = "item.build.exit"
+witness = { class = "history", by = "the transition record into the next step" }
 
 [[step]]
 tag = "step.test"
 order = 4
 state = "testing"
 exit = "item.test.exit"
+witness = { class = "history", by = "the transition record into the next step" }
 
 [[step]]
 tag = "step.deploy"
 order = 5
 state = "deploying"
 exit = "item.deploy.close"
+witness = { class = "history", by = "the transition record that closes the build" }
+
+[witnesses]
+classes = ["history", "hook-record", "remote-verdict"]
+refused = ["actor"]
+
+[[witness-alias]]
+word = "machine"
+means = "history"
+
+[[witness-alias]]
+word = "agent"
+means = "actor"
 
 [[workflow]]
 name = "orient"

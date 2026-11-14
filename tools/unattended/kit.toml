@@ -10,7 +10,9 @@ version_from = { file = "unattended.sh", pattern = "^KIT_UNATTENDED_VERSION=" }
 # settings-merge.py, and the target's receipt then names the program that wrote its settings file.
 # `kickoff-manifest` since TOOL-aRoutedQuill-7: past PROMPT_BRIEF_SKELETON_CUTOFF a prompt-mode preflight
 # reads the brief's sub-heads from that kit's checker, so an install without it refuses every such run.
-requires = ["memory-tree", "review-harness", "settings-merge", "kickoff-manifest"]
+# `loop` since TOOL-dDeclaredLoop-5: check 53 of the leg grades each Definition-of-Done entry's witness
+# class through that kit's `loop_lib.py --grade-site`, the one reader of the alias rows and the actor list.
+requires = ["memory-tree", "review-harness", "settings-merge", "kickoff-manifest", "loop"]
 # PLAY-dOrderedCharter-17: each edge to a non-core kit is a declared slot with its fallback.
 optional = [
   { part = "unattended.sh", point = "point.runtime.reading", fallback = "the close prints no drift delta, said" },

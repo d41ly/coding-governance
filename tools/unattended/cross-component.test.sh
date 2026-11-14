@@ -94,6 +94,12 @@ cp "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/mem
 cp "$HERE/VERBS.template.md" memory/guides/UNATTENDED-VERBS.md
 cp "$HERE/ASKS.template.md" "${PFX}unattended/"
 cp "$HERE/ASKS.template.md" memory/guides/UNATTENDED-ASKS.md
+# THE LOOP KIT'S THREE FILES, beside the unattended kit where check 53 resolves it (TOOL-dDeclaredLoop-5):
+# without them the leg reds on a missing kit in every arm below. Found by the file only that kit holds.
+_lk_rel=$(git -C "$HERE" ls-files --full-name -- ':(top)*loop_lib.py' | head -n 1)
+_lk_src="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/${_lk_rel%/*}"
+mkdir -p "${PFX}${_lk_src##*/}" \
+  && cp "$_lk_src/loop_lib.py" "$_lk_src/loop.toml" "$_lk_src/actor-witnesses.txt" "${PFX}${_lk_src##*/}/"
 sed -e 's|{{MEMORY_ROOT}}|memory|g' -e 's|{{KIT_DIR}}|'"${PFX}unattended"'|g' \
     -e 's|{{KEEPALIVE_CREATE}}|CronCreate|g' -e 's|{{KEEPALIVE_DELETE}}|CronDelete|g' \
     -e 's|{{RESUME_SCHEDULE_CREATE}}|TheScheduleCreate|g' -e 's|{{RESUME_SCHEDULE_DELETE}}|TheScheduleDelete|g' \

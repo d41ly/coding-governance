@@ -1480,7 +1480,9 @@ read_spec_audit_switch() { # disposal|chain-stop|chain-ceiling -> the value on s
   esac
   printf '%s\n' "$out"
 }
-checker_of()  { local p; for p in $(dod); do case "$p" in "$1:"*) printf '%s' "${p#*:}"; return;; esac; done; printf 'machine'; }
+# NO SILENT DEFAULT (TOOL-dDeclaredLoop-5 S5): an entry that declares no `:<class>` has no checker, so
+# this returns 1 and prints nothing, and check 53 of the leg refuses that entry before a run reads it.
+checker_of()  { local p; for p in $(dod); do case "$p" in "$1:"*) printf '%s' "${p#*:}"; return 0;; esac; done; return 1; }
 
 # ------------------------------------------------------------------------------ the region grammar
 # Kit-owned, NOT a project declaration: an adopter chooses paths and commands, not the file's shape.
