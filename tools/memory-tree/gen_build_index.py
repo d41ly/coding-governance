@@ -1137,7 +1137,7 @@ def resolve_render_stamp(root: str) -> str:
     git cannot name it (TOOL-aLightenedLoop-1 S2)."""
     try:
         rel = subprocess.run(["git", "rev-parse", "--git-path", "gen-build-index-render-stamp"], cwd=root,
-                             capture_output=True, text=True, check=True, env=_build_git_env()).stdout.strip()
+                             capture_output=True, text=True, encoding="utf-8", check=True, env=_build_git_env()).stdout.strip()
     except (OSError, subprocess.CalledProcessError):
         return ""
     return os.path.join(root, rel) if rel else ""
