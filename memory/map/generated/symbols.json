@@ -4533,6 +4533,11 @@
       "file": "tools/workflows/unattended-build.template.js"
     },
     {
+      "id": "checkPollWait",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkPosixRootLitter",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -9186,6 +9191,11 @@
       "id": "deriveSidecarPath",
       "kind": "function",
       "file": "tools/unattended/run-lease.js"
+    },
+    {
+      "id": "deriveSleepSeconds",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "deriveSlotLens",
@@ -22066,6 +22076,11 @@
       "id": "renderPerLineBlanked",
       "kind": "function",
       "file": "tools/workflows/check-review-join.js"
+    },
+    {
+      "id": "renderPollDeny",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "renderPosix",

@@ -187,6 +187,8 @@ until an owner writes its first row.
 - A spec write from anything but the spec writer, and a product write from anything but the builder
   on a specced unit. The main loop may still flip a spec's `**Status:**` line.
 - A role agent running the bar, the self-test runner or any suite, beyond what `[gates]` allows.
+- A role agent's polling wait: a `tail` that follows a file, a `sleep` inside a `while`
+  or `until` loop, or a `sleep` of 5 s or more.
 - In a session routed to a live build, a final message that leaves out the `agent` or `returned`
   line of an agent its turn dispatched or received. It is refused once per turn end, and the
   refusal prints the lines to paste, derived for it by `handoff.py agents`; where it cannot derive
