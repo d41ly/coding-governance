@@ -126,3 +126,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-14T10:03:03Z brief · item TOOL-dDeclaredLoop-41 · reason 8b85da835be6 memory/builds/dDeclaredLoop/prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-41-build-brief.md
 
 2026-11-14T10:14:53Z dispatch · item def461c8 TOOL-dDeclaredLoop-41 · reason tools/loop/loop_lib.py tools/loop/README.md tools/loop/kit.toml help/loop.md tools/unattended/check-unattended.sh memory/map/generated/symbols.json memory/builds/dDeclaredLoop/build/2026-11-14-build-TOOL-dDeclaredLoop-41-1-acceptance-ledger.md memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-41.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/backlog/TOOL.md
+
+2026-11-14T10:51:02Z brief · item TOOL-dDeclaredLoop-9 · reason c7206af26957 memory/builds/dDeclaredLoop/prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-9-build-brief.md
