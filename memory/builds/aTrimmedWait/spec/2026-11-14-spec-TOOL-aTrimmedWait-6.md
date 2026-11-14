@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-6 — the role gate refuses a role agent's polling wait, and steps past an option cluster such as `-eo pipefail`
 
-**Status:** SPECCED · rev-1 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 6
+**Status:** SPECCED · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -31,12 +31,12 @@ unrefused, because only a bare `-o` takes an argument in the option table.
   that holds any of these:
   - **P1 tail follow**: a `tail` whose words carry a follow option;
   - **P2 sleep in a loop**: a `sleep` in a command that also holds a `while` or `until` loop;
-  - **P3 sleep at or over 5 s**: a `sleep` of 5 s or more, or one whose duration it cannot read.
+  - **P3 sleep at or over 5 s**: a `sleep` of 5 s or more, or one whose duration it cannot read. <!-- DERIVED from POLL_SLEEP_FLOOR_S -->
 
   It refuses with a reason naming the row and the notification that replaces the wait. It binds where
   the role arm binds, and only when no gate row has already refused the command. Observed by AC2,
   AC3 and AC4.
-- **S3** — The near misses stay admitted: a `sleep` under 5 s outside a `while` or `until` loop, a
+- **S3** — The near misses stay admitted: a `sleep` under 5 s outside a `while` or `until` loop, a <!-- DERIVED from POLL_SLEEP_FLOOR_S -->
   `tail` without a follow option, and every command the main loop runs. Observed by AC2 and AC3.
 - **S4** — The hook's header, the hooks README's role-gate section and the roles help page state the
   P rows. The option-gap example drops out of both ceiling sentences, which otherwise stand as
@@ -103,9 +103,9 @@ was classed by regular expressions approximating S2's rows. PINNED on 2026-11-14
 | Bash calls | 9301 |
 | P1, a `tail` with `-f`, `-F`, `--follow` or a cluster carrying `f` | 104 |
 | P2, a `sleep` in a command holding `while` or `until` | 12 |
-| P3, a flat `sleep` of 5 s or more, or unreadable | 69 |
+| P3, a flat `sleep` of 5 s or more, or unreadable | 69 <!-- DERIVED from POLL_SLEEP_FLOOR_S --> |
 | refused by any row, distinct commands | 184 |
-| a `sleep` admitted: under 5 s, no loop | 1, `kill <pid>; sleep 1; ps -ef ...` |
+| a `sleep` admitted: under 5 s, no loop | 1, `kill <pid>; sleep 1; ps -ef ...` <!-- DERIVED from POLL_SLEEP_FLOOR_S --> |
 | a `timeout <d> sleep <n>` shape | 0 |
 
 Every refused command this writer sampled waited on a background command's output file or a
@@ -195,7 +195,7 @@ A command started with run_in_background notifies this agent when it exits, so t
 This is the ceiling S4 writes:
 
 - Polling through a script, an interpreter, a function or an alias.
-- A `sleep` under 5 s in a `for` loop.
+- A `sleep` under 5 s in a `for` loop. <!-- DERIVED from POLL_SLEEP_FLOOR_S -->
 - A `sleep` under a shorter `timeout`, which is graded on its own duration. The measured corpus
   held none.
 - A file named like a follow option without `--`.
@@ -247,7 +247,7 @@ corpus, through the base module and the built one, and classes each difference. 
 `poll` when the base admits and the built hook refuses with a P row. It is `cluster` when the
 command carries a shell option cluster holding `o` or `O`. Anything else is `other`. This writer ran
 it base against base at `a25c84fc0`, and it printed
-`commands 9301 · same 9301 · poll 0 · cluster 0 · other 0` in 48 s.
+`commands 9301 · same 9301 · poll 0 · cluster 0 · other 0` in 48 s. <!-- PINNED 2026-11-14 -->
 
 ```js
 // node p6c.js <base module> <new module> <session transcript dir> <checkout root>
@@ -324,12 +324,12 @@ of new assertions, and the close confirms the count from a real run.
 - security — no new write, path or input. The arm stays fail-closed for a role agent, and the new
   rows read only the command text.
 - perf / scale — one more scan of the command per role-agent call, in microseconds. The saving is the
-  agent's wait: 240 s on the AC6 payload, and about 12 h over the measured session by the brief's
+  agent's wait: 240 s on the AC6 payload, and about 12 h over the measured session by the brief's <!-- DERIVED from the AC6 payload's own duration -->
   figure.
 - error / empty / loading states — a duration that does not read is refused, with a message naming
   the row. An absent role index adds no arm, as the help page states.
 - observability — each refusal names the agent type, the simple command and its P row.
-- risks — a legitimate probe that sleeps 5 s or more on the command line is refused, and its remedy
+- risks — a legitimate probe that sleeps 5 s or more on the command line is refused, and its remedy <!-- DERIVED from POLL_SLEEP_FLOOR_S -->
   is a script or a shorter pause. Adopters receive the rows with their next hooks install. The suite
   `TOOL-aCarriedStop-7` names is red on the daily held job, so the close reads this unit's new arms
   by their own rows rather than by the suite's exit.
@@ -370,7 +370,7 @@ of new assertions, and the close confirms the count from a real run.
 - **AC6** — When the main loop times the hook over the R5 payload of `"$SCRATCH/p6.sh"`, through
   `node "$SCRATCH/base6/scratch-guard.js"` and then `node tools/hooks/scratch-guard.js`, one at a time
   on node a, the acceptance ledger records both readings with their exits: 0, then 2.
-  Red when: the built hook exits 0, so the agent goes on to wait 240 s.
+  Red when: the built hook exits 0, so the agent goes on to wait 240 s. <!-- DERIVED from the AC6 payload's own duration -->
   figure: DERIVED at observation. The 240 s is the payload's own duration.
 
 ## 7. Gates
@@ -396,8 +396,12 @@ none
 
 - rev-1 · 2026-11-14 · initial draft from the brief `2026-11-14-prompt-TOOL-aTrimmedWait-1-brief`,
   item 6, grounded at `846d51d3`. The kickoff probe named `tail -f` and the option gap; the measured
-  corpus added the `sleep` shapes and the 5 s floor. The roster pairs two mechanisms in one unit,
+  corpus added the `sleep` shapes and the 5 s floor. The roster pairs two mechanisms in one unit, <!-- DERIVED from POLL_SLEEP_FLOOR_S -->
   and this spec keeps the pairing as the roster wrote it.
+- rev-2 · 2026-11-14 · §2, §4, §5, §6, §9 · each figure the pinned-facts arm named carries a pin on
+  its line: PINNED where measured, DERIVED naming `POLL_SLEEP_FLOOR_S` or the AC6 payload where
+  computed, no meaning changed, per `2026-11-14-prompt-TOOL-aTrimmedWait-7-writing-practice`. The
+  two fenced literals that quote the shipped refusal and help text carry none.
 
 ## 10. Reuse audit
 

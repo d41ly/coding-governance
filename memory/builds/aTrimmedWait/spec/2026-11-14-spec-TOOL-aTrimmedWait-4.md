@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-4 — `gen_build_index.py --write` writes only the artifacts whose bytes moved
 
-**Status:** SPECCED · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 4 · ratified 2026-11-14
+**Status:** SPECCED · rev-3 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 4 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
@@ -14,7 +14,7 @@
 
 ## 1. Goal
 
-`gen_build_index.py --write` rewrites every artifact it renders, 3206 files on this tree, though
+`gen_build_index.py --write` rewrites every artifact it renders, 3206 files on this tree, though <!-- PINNED 2026-11-14 -->
 a commit's change moves a handful and a clean tree moves none. Rewriting them all costs 16.8 s,
 where comparing them first costs 0.8 s (PINNED, §4). This unit makes `--write` write only what
 moved, so every caller pays for its own change and the tree it leaves is byte-identical to today's.
@@ -198,7 +198,7 @@ What this arm does not check: the base parity of AC4 over the real tree, and the
     every spec under `builds/*/spec/` (`tools/drift-audit/drift_report.py#signal_spec_status`).
     A spec status change, the commonest commit, still pays both. The coverage join reads only the
     chain builds' specs (`tools/check-spec-tokens.py#read_carries_specs`), so a change outside
-    them could skip its 15.6 s, and the render loop's share, under 10 s, could shrink. Both need a
+    them could skip its 15.6 s, and the render loop's share, under 10 s, could shrink. Both need a <!-- PINNED 2026-11-14 -->
     second statement, beside the renderer, of what every region reads. A wrong entry there
     becomes a silent stale artifact. And a roster kept from the last render is the
     output-read-as-input `rosters()` forbids.
@@ -218,6 +218,8 @@ What this arm does not check: the base parity of AC4 over the real tree, and the
 - rev-1 · 2026-11-14 · initial draft.
 - rev-2 · 2026-11-14 · §8 F1 · ratified · F1 resolved by the owner at (a), the moved-only write,
   recorded in 2026-11-14-prompt-TOOL-aTrimmedWait-4-ruling.
+- rev-3 · 2026-11-14 · §1 §8 · each fact the writing-practice leg's pinned-facts arm named is pinned
+  on its line, with no change of meaning, by `2026-11-14-prompt-TOOL-aTrimmedWait-5-writing-practice`.
 
 ## 10. Reuse audit
 

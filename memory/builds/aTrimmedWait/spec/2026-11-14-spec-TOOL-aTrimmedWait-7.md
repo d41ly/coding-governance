@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-7 — `handoff.py agents` keeps its parsed session calls per transcript and parses only the bytes appended since
 
-**Status:** SPECCED · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 7 · ratified 2026-11-14
+**Status:** SPECCED · rev-3 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 7 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
@@ -9,8 +9,10 @@
 | [2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md) | research | TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-7-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-1-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-7-2-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-2-spec-writer.md) | journal | — |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-7-4-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-4-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-7-revision.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-revision.md) | research | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-7-ruling.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-ruling.md) | research | — |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-7-writing-practice.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-writing-practice.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -80,12 +82,12 @@ added records only.
   each binding `git = read_git_stdout` beside its copy
   (`tools/playbook/tag_index.py@46bfe37d2a8b:461`). The drift kit keeps its history file there
   (`tools/drift-audit/drift_report.py@1234f714127:3814-3822`).
-- The measured session `db957487` has a transcript of 52,312,549 bytes. It holds 168 calls and 378
+- The measured session `db957487` has a transcript of 52,312,549 bytes. It holds 168 calls and 378 <!-- PINNED 2026-11-14 -->
   notified ids, and no line fails to parse (PINNED, 2026-11-14, node a).
 - `handoff.py agents --run wf_01f28407-289` on that session took 1.10 s, 1.26 s and 0.99 s of wall
   in three runs. Under `cProfile`, `load_session_calls` was 0.470 s of 0.873 s, of which
-  `json.loads` was 0.187 s over 4,080 lines and the token scan 0.124 s over 104,191. A sha256 of
-  the whole file took 0.041 s to 0.045 s. A JSON dump of the triple is 1,241,721 bytes and loads
+  `json.loads` was 0.187 s over 4,080 lines and the token scan 0.124 s over 104,191. A sha256 of <!-- PINNED 2026-11-14 -->
+  the whole file took 0.041 s to 0.045 s. A JSON dump of the triple is 1,241,721 bytes and loads <!-- PINNED 2026-11-14 -->
   in 0.004 s. All PINNED, 2026-11-14, node a, with other sessions running on it.
 
 ### Data model
@@ -189,7 +191,7 @@ Each candidate was tested against the measured session, per M12.
   `read_session_record` before use, and its name is a hex digest, so no transcript path reaches a
   file name. Writes stay under the git common dir. §4 "What it does not check" states the forged
   record.
-- perf / scale — A warm call reads the transcript once to hash it, about 0.045 s at 52 MB, and parses
+- perf / scale — A warm call reads the transcript once to hash it, about 0.045 s at 52 MB, and parses <!-- PINNED 2026-11-14 -->
   the appended lines only. The record is about 2.4% of its transcript: 1.24 MB for 52.3 MB.
 - error / empty / loading states — A missing, malformed, stale or foreign record is a miss and a
   parse from byte 0. An unwritable folder is a miss on every call and prints nothing. A transcript
@@ -301,6 +303,9 @@ What the arms do not check: timing, which AC9 owns on node a, and a forged recor
   taken on node a.
 - rev-2 · 2026-11-14 · §8 F1 · the owner resolved F1 to (a), never prune, per
   `2026-11-14-prompt-TOOL-aTrimmedWait-7-ruling`.
+- rev-3 · 2026-11-14 · §4, §5 · each measured figure the pinned-facts arm named carries
+  `<!-- PINNED 2026-11-14 -->` on its line, no meaning changed, per
+  `2026-11-14-prompt-TOOL-aTrimmedWait-7-writing-practice`.
 
 ## 10. Reuse audit
 

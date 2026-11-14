@@ -19,7 +19,7 @@ The prompt arrived as prose from the session that started this one, on the owner
 >    - **R1:** validate a spec against what `--dispatch` checks, before the spec commit. About 30h of re-dispatch rework, from 44 extra agents.
 >    - **R2:** scope memory-hygiene check 12 to one spec or one build. About 8h; each run takes 4–6 min.
 >    - **R3:** render the build index before the pre-commit grade, and render only what changed. About 3–5h, plus 71 check-9 refusals.
->    - **R4:** short-circuit the idle-wake `--resume` and `--release-task` when nothing moved. About 6h at 51 s per tick.
+>    - **R4:** short-circuit the idle-wake `--resume` and `--release-task` when nothing moved. About 6h at 51 s per tick. <!-- PINNED 2026-11-14 -->
 >    - **R5:** no suites inside a pass (scratch-guard G3, every launch form), and no `tail -f` polling. About 12h of builder waiting.
 >    - **R6:** make `handoff.py agents` incremental. About 1.5h.
 >

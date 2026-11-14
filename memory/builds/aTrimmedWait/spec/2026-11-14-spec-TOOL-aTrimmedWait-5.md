@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-5 — the holder's idle-wake `--resume` stops paying one git process per briefed unit
 
-**Status:** SPECCED · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 5 · ratified 2026-11-14
+**Status:** SPECCED · rev-3 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 5 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
@@ -8,16 +8,18 @@
 |---|---|---|
 | [2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md) | research | TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-5-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-5-1-spec-writer.md) | journal | — |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-5-3-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-5-3-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-5-ruling.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-5-ruling.md) | research | — |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-5-writing-practice.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-5-writing-practice.md) | research | — |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
-The idle-wake runs `--resume` every tick, and the brief puts that tick at 51 s in session
+The idle-wake runs `--resume` every tick, and the brief puts that tick at 51 s in session <!-- PINNED 2026-11-14 -->
 `db957487`. Measured for this spec, most of a holder's tick is one loop in `verb_status`: it spawns
 one `git hash-object` per parked brief row to grade `STALE briefs`, and dFairHearing's record
-briefed 45 units. This unit hashes every brief in one git call, so the tick, `--status` and every
+briefed 45 units. This unit hashes every brief in one git call, so the tick, `--status` and every <!-- PINNED 2026-11-14 -->
 take-over row stop paying per brief, and every line the verb prints stays byte-identical.
 
 The roster names a different mechanism for this item, a replay of the last verdict. Section 8 F1
@@ -67,12 +69,12 @@ All readings were taken on node a on 2026-11-14, against code byte-identical to 
 | Reading | Result |
 |---|---|
 | Holder `--resume`, a clone of this repo, a record with no brief rows, untraced | 33.5 s |
-| The same under `bash -x` with timestamps | startup 13.0 s, `verb_status` 7.9 s, the rest under 1 s |
+| The same under `bash -x` with timestamps | startup 13.0 s, `verb_status` 7.9 s, the rest under 1 s | <!-- PINNED 2026-11-14 -->
 | The same record with 72 brief rows, traced | 24.3 s in all: startup 2.1 s, `verb_status` 21.4 s, of which the brief loop is 16.2 s |
 | `hash-object` calls in that trace | 72, every one at `verb_status`'s brief loop, none elsewhere |
 | 72 spec files hashed one `git hash-object` each, then in one `--stdin-paths` call | 15.9 s, then 1.07 s |
-| Holder `--resume` on the §4 fixture, 72 rows, base driver | 34.5 s, exit 0 |
-| Brief rows in landed run records | dFairHearing 52 rows over 45 units, dTrueNorth 30 over 30 |
+| Holder `--resume` on the §4 fixture, 72 rows, base driver | 34.5 s, exit 0 | <!-- PINNED 2026-11-14 -->
+| Brief rows in landed run records | dFairHearing 52 rows over 45 units, dTrueNorth 30 over 30 | <!-- PINNED 2026-11-14 -->
 
 The batched call printed the same hashes as the per-path calls, in input order. That held for a
 file with CRLF line endings under `core.autocrlf=true`, the value a clone on node a reads.
@@ -273,8 +275,8 @@ The close runs the bar once, after the last unit is terminal. This spec's author
   the roster was written.
   - **A, batch (this spec as written).** One `git hash-object --stdin-paths` call grades every
     brief. Every line stays byte-identical by construction. It also speeds `--status` and the
-    take-over rows. On the 72-row fixture it removes about 15 s of a 24-34 s tick. It leaves startup
-    and the rest of `verb_status`, about 5 s traced.
+    take-over rows. On the 72-row fixture it removes about 15 s of a 24-34 s tick. It leaves startup <!-- DERIVED from §4's two hash rows -->
+    and the rest of `verb_status`, about 5 s traced. <!-- PINNED 2026-11-14 -->
   - **B, replay.** As worded, B moves a verdict. The stop-guard appends a timed line at every turn
     end, and the status line prints its time. To keep every line, B must re-read that field live
     every tick and splice it into the replay. Its key must also cover far more than three inputs:
@@ -283,12 +285,12 @@ The close runs the bar once, after the last unit is terminal. This spec's author
     - the resume-tick sidecar;
     - the lease clock's verdict, recomputed every tick;
     - a process ledger whose every line classifies `gone`, or orphans are possible.
-    The key costs about 3 s to derive. After A, B would save at most the 5 s left in `verb_status`.
+    The key costs about 3 s to derive. After A, B would save at most the 5 s left in `verb_status`. <!-- PINNED 2026-11-14 -->
     B adds a sidecar record, a key and a splice.
   - **C, both.** C is B's cost on top of A's.
 
   Recommendation: A. It meets the README's speed outcome and its "No verdict moves" rule with the
-  smallest diff, and B on top would save about 2 s per tick for a cache with the ceilings above.
+  smallest diff, and B on top would save about 2 s per tick for a cache with the ceilings above. <!-- DERIVED from B's 5 s less its 3 s key, above -->
   Ruling for B or C rewrites §2 to §7 in a rev-2, and amends the README's roster row 5 and its
   expected-improvement line, which are the owner's.
   RESOLVED (owner, 2026-11-14): A, batch the brief hashing ("Batch hashing (Recommended)").
@@ -302,6 +304,8 @@ The close runs the bar once, after the last unit is terminal. This spec's author
   asks the owner to choose.
 - rev-2 · 2026-11-14 · §8 F1 · F1 RESOLVED (owner) to A, batch hashing, by the ruling
   `2026-11-14-prompt-TOOL-aTrimmedWait-5-ruling`. Sections 2 to 7 stand as written.
+- rev-3 · 2026-11-14 · §1 §4 §8 · each fact the writing-practice leg's pinned-facts arm named is pinned
+  on its line, with no change of meaning, by `2026-11-14-prompt-TOOL-aTrimmedWait-5-writing-practice`.
 
 ## 10. Reuse audit
 

@@ -1,12 +1,14 @@
 # TOOL-aTrimmedWait-3 — a commit refused on build-index drift renders its own index, stages it and is graded again
 
-**Status:** SPECCED · rev-1 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md) | research | TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-3-2-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-3-2-spec-writer.md) | journal | — |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-3-writing-practice.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-3-writing-practice.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -41,7 +43,7 @@ default-off switch, and grade the commit again, so the verdict is the one the ma
 - **S4** — `derive_moved_artifacts`, the repo-relative paths whose file is missing or whose BYTES
   differ from the rendered text's UTF-8 encoding. Observed by AC1.
 - **S5** — `.githooks/pre-commit` runs the mode only after the hygiene leg fails with a
-  `HYGIENE check 9 FAILED` line. When the mode exits 0, the hook prints one line and runs the
+  `HYGIENE check <N> FAILED` line, N = 9. When the mode exits 0, the hook prints one line and runs the
   hygiene leg again, and that second run's exit decides. In every other case the hook refuses
   as it does today. Observed by AC5, AC6.
 - **S6** — `STAGED_RENDER` is declared blank in `tools/memory-tree/.memory-tree.conf.example`
@@ -77,7 +79,7 @@ default-off switch, and grade the commit again, so the verdict is the one the ma
 ### The flow
 
 The hook runs the hygiene leg as it does today, with its output captured and then printed. If
-the leg failed and its output holds a line opening `HYGIENE check 9 FAILED`, the hook runs
+the leg failed and its output holds a line opening `HYGIENE check <N> FAILED` with N = 9, the hook runs
 `gen_build_index.py --write-staged` under the index git handed it. A 0 from the mode means it
 staged a rendered artifact, so the hook prints
 `pre-commit: the build index was rendered and staged; grading the memory hygiene leg again.` and
@@ -162,7 +164,7 @@ The edit sits in the hygiene leg's branch (`.githooks/pre-commit@468b13e4:227`).
 resolved with `resolve_kit_gate memory-tree gen_build_index.py`, and the launcher the way the
 red-fix branch resolves one (`.githooks/pre-commit@468b13e4:242`). The mode runs under
 `with_hook_index` (`.githooks/pre-commit@468b13e4:11`). The match is a whole-line prefix on
-`HYGIENE check 9 FAILED`, the text `fail()` prints
+`HYGIENE check <N> FAILED` with N = 9, the text `fail()` prints
 (`tools/memory-tree/check-memory-hygiene.sh@f064ddab:406`). Under `OFFENDERS=1` `fail()` prints
 keys instead; the hook never sets that variable.
 
@@ -245,7 +247,7 @@ as `help/reference/drive.md` shows `--write`.
 - security — A new write path: the hook adds generated files to a commit. It is off by default.
   It writes only paths `plan()` renders and orphans it removes, and only when no render input is
   unstaged, so no operator edit is ever staged by it.
-- perf / scale — A clean commit pays nothing. A refused one pays one render (about 47 s on this
+- perf / scale — A clean commit pays nothing. A refused one pays one render (about 47 s on this <!-- DERIVED from §4 Measurements -->
   tree, PINNED above) and one hygiene run, against the manual remedy's render, add and second
   commit.
 - error / empty / loading states — Every decline names its reason and exits 1, and the hook then
@@ -292,12 +294,12 @@ rendered with `--write` and committed. Then the spec's status token `INPROGRESS`
   Red when: the unstaged check reads a pathspec other than `check_staged_render`'s, so one of the
   two source-file cases flips.
 - **AC5** — When the hook commits in a repository whose stand-in hygiene gate prints
-  `HYGIENE check 9 FAILED — drift` and exits 1 on its first run and exits 0 on its second, and
+  `HYGIENE check <N> FAILED — drift`, N = 9, and exits 1 on its first run and exits 0 on its second, and
   whose stand-in generator stages a file and exits 0, the commit exits 0 and carries that file.
   Red when: the hook does not run the generator, or does not grade again, so the commit is
   refused.
   fixture: stand-in gates planted the way the hook suite's `run_prefix_commit` helper plants one.
-- **AC6** — When the stand-in hygiene gate fails with `HYGIENE check 12 FAILED — x`, the
+- **AC6** — When the stand-in hygiene gate fails with `HYGIENE check <N> FAILED — x`, N = 12, the
   stand-in generator never runs and the commit is refused. When it fails with the check 9 line and
   the stand-in generator exits 1, the hygiene gate runs once and the commit is refused. And
   `grep -c 'echo "HYGIENE check $1 FAILED' tools/memory-tree/check-memory-hygiene.sh` prints 1.
@@ -308,7 +310,7 @@ rendered with `--write` and committed. Then the spec's status token `INPROGRESS`
   `grep -c 'write-staged' tools/memory-tree/README.md` prints 1 or more.
   Red when: the key ships on, or the kit README is silent. At base each prints 0.
 - **AC8** — When `grep -c 'commit-render.md' help/README.md` runs it prints 1, and
-  `grep -rl 'STAGED_RENDER' help` names that page, which also names `HYGIENE check 9 FAILED` and
+  `grep -rl 'STAGED_RENDER' help` names that page, which also names `HYGIENE check <N> FAILED` with N = 9 and
   the partial-commit exclusion.
   Red when: the page or its index line is absent. At base each prints 0.
 - **AC9** — When a clone of this repository at the unit's commit has a spec's status token
@@ -346,6 +348,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-14 · initial draft.
+- rev-2 · 2026-11-14 · §2 §4 §5 §6 · the 47 s figure is pinned DERIVED, and each quoted `fail()` line is
+  spelled `HYGIENE check <N> FAILED` with its N stated beside it, so it reads as output and not as a
+  positional reference, per `2026-11-14-prompt-TOOL-aTrimmedWait-3-writing-practice`. No meaning changes.
 
 ## 10. Reuse audit
 

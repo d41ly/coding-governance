@@ -1,13 +1,16 @@
 # TOOL-aTrimmedWait-1 — `unattended.sh --check-specs` refuses, before the spec commit and through `--dispatch`'s own predicates, every spec defect `--dispatch` refuses from the spec files alone
 
-**Status:** CLOSED · rev-1 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 1
+**Status:** INPROGRESS · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-14-build-TOOL-aTrimmedWait-1-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aTrimmedWait-1-1-acceptance-ledger.md) | journal | — |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-1-2-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-1-2-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md) | research | TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-1-fix.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-1-fix.md) | research | — |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-1-writing-practice.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-1-writing-practice.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -42,6 +45,9 @@ commit, so the same defect is refused while its author can still fix it.
   regenerated. Observed by AC6.
 - **S5** — The verb is documented: its usage line in the driver header, its entry in the verbs
   guide and its installed twin, and a usage anchor on `help/roles.md`. Observed by AC7.
+- **S6** — The unattended Skill invokes the verb beside `--plan`, because check 26 of
+  `tools/unattended/check-unattended.sh` requires every declared verb to be invoked in the Skill an
+  agent reads, and the pass put `--check-specs` in `VERBS_INLINE`. Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -211,6 +217,26 @@ so the gate admits it with no allowlist change.
   member no page anchors, because `memory/project/docs-undocumented.txt` only shrinks
   (`help/docs-leg.md`).
 
+### S6 — the Skill
+
+Check 26's loop over `VERBS_ALL` fails when the Skill template holds no `unattended.sh <verb> `
+invocation (`tools/unattended/check-unattended.sh@c43efbd9155f:4948`), and the pass added
+`--check-specs` to `VERBS_INLINE` (`tools/unattended/unattended.sh@cdfd850256f8:119`). The seam is
+the Skill template's fenced verb block, which already invokes `--plan`, `--claims` and `--overlaps`
+one per line. One line joins it directly after `--plan`'s
+(`tools/unattended/SKILL.template.md@7d1f6cf0121d:116`):
+
+```text
+unattended.sh --check-specs <slug> <unit-id>...
+```
+
+`bash tools/unattended/adopt-unattended.sh` re-renders `.claude/skills/unattended/SKILL.md` from it.
+The render's size row in `tools/template-size-limits.txt` holds its measured size with no headroom
+(`tools/template-size-limits.txt@1e83100dad69:188`), so the line takes the render past it. The pass
+raises the row to the render's CR-stripped measured size on the file's four raise terms, argued above
+the row as `RAISED <old> -> <new>` in the shape `TOOL-aCarriedStop-1`'s movement takes, with this
+unit's row in `memory/DECISIONS.md` in the same commit.
+
 ### The pass probe, `$SCRATCH/u1.sh`
 
 `$SCRATCH` is the run's scratch directory. Run the probe from the worktree root. It builds a
@@ -291,6 +317,10 @@ the base and move with this unit's own edits, so the builder finds each site by 
 - `tools/roles/agents/gov-spec-writer.agent.md`
 - `.claude/agents/gov-spec-writer.md`
 - `help/roles.md`
+- `tools/unattended/SKILL.template.md`
+- `.claude/skills/unattended/SKILL.md`
+- `tools/template-size-limits.txt`
+- `memory/DECISIONS.md`
 
 ### Alternatives rejected
 
@@ -359,7 +389,7 @@ from the worktree root at the pass commit.
   TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4
   TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7` runs on node a at the pass's parent
   commit, it prints `UNATTENDED check 14 FAILED — unknown argument`; at the pass commit it prints
-  either the clean line or check-49 lines only, and its `real` wall is at most 60 s. The ledger
+  either the clean line or check-49 lines only, and its `real` wall is at most 60 s. The ledger <!-- PINNED 2026-11-14 -->
   records both walls.
   Red when: the verb reads more than the build's specs, a whole-tree scan, and its wall reaches
   minutes as the spec-token check's did.
@@ -368,7 +398,7 @@ from the worktree root at the pass commit.
 - **AC5** — When `grep -c "' --check-specs ' + slug" tools/workflows/unattended-build.js` runs it
   prints 2, and the same grep over `tools/workflows/unattended-build.template.js` prints 2. When
   `sed -n '/const commitBlock = \[/,/\]\.join/p' tools/workflows/unattended-build.js | git hash-object --stdin`
-  runs it prints `c6ca14b74b2441e87eac15e4094dbbccb49cfa6b`, the hash of the same 21 lines at the
+  runs it prints `c6ca14b74b2441e87eac15e4094dbbccb49cfa6b`, the hash of the same 21 lines at the <!-- PINNED 2026-11-14 -->
   base. At the close the harness suite reads the writer prompt and the commit prompt carrying the
   command, and a commit double returning `committed: false` with the verb's output refusing by its
   `why`.
@@ -388,10 +418,18 @@ from the worktree root at the pass commit.
   prints one line naming `help/roles.md`.
   Red when: one guide copy is edited without its twin; or the header line is missing, so `--help`
   lists the verb once; or no help page anchors it, the docs leg's UNDOCUMENTED case.
+- **AC8** — When `grep -c 'unattended.sh --check-specs ' tools/unattended/SKILL.template.md` runs it
+  prints 1, the same grep over `.claude/skills/unattended/SKILL.md` prints 1,
+  `bash tools/unattended/adopt-unattended.sh --check` exits 0, and
+  `tr -d '\r' < .claude/skills/unattended/SKILL.md | wc -c` prints the figure on the
+  `.claude/skills/unattended/SKILL.md` row of `tools/template-size-limits.txt`.
+  Red when: the template gains the line and the Skill is not re-rendered, so the render check exits
+  non-zero; or the line is absent, so check 26 fails with "a declared verb is never invoked in the
+  Skill"; or the row is not raised, so the Skill's size passes its ceiling.
 
 ## 7. Gates
 
-`unattended kit gate` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `scratch-guard self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `review-join self-test` · `policy fixtures` · `check-wiring self-test` · `lexicon naming predicates` · `roles catalogue` · `roles render wiring` · `install-prefix (shipped surface)` · `docs` · `shell hygiene (a loop fed by a command substitution)` · `shell hygiene (a fork spent on builtin work)` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers`
+`unattended kit gate` · `unattended skill wiring` · `unattended skill size` · `harness arms (fail branches armed or pinned)` · `scratch-guard self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `review-join self-test` · `policy fixtures` · `check-wiring self-test` · `lexicon naming predicates` · `roles catalogue` · `roles render wiring` · `install-prefix (shipped surface)` · `docs` · `shell hygiene (a loop fed by a command substitution)` · `shell hygiene (a fork spent on builtin work)` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers`
 
 New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 · fixture builds each carrying one refusal class, a clean build and a two-unit build with two refusals, all untracked; staged by making `check_dispatch_specs` return after its first refusal and read tracked specs only, which reds the clean and two-refusal arms · `FLOOR_ASSERTIONS`, raised by the count of new assertions, which the close confirms
 
@@ -413,6 +451,13 @@ none
   item 1, grounded at `846d51d3` and read at `a25c84fc0`, whose code is identical. The README's
   "wired into the spec stage and the writer's instructions" is read as both the stage's two prompts
   and the role text, for the reason under Alternatives rejected.
+- rev-2 · 2026-11-14 · §2 S6 · §4 · AC4 · AC5 · AC8 · §7 · §10 · from records
+  `2026-11-14-prompt-TOOL-aTrimmedWait-1-writing-practice` and
+  `2026-11-14-prompt-TOOL-aTrimmedWait-1-fix`, the pass legs over `78cc7c112`: the facts on AC4's
+  and AC5's lines and §10's line count carry their pins; S6, its design, AC8 and the gate
+  `unattended skill size` add the Skill's `--check-specs` invocation check 26 requires, with the
+  Skill's size row raise it forces; the two Skill files, the size-limits file and
+  `memory/DECISIONS.md` join Files touched.
 
 ## 10. Reuse audit
 
@@ -428,6 +473,6 @@ seam fits beyond the driver's own functions. Recall's top hits were the dIndexed
 which names `plan_state` and `--dispatch`'s MISSING and THIN refusals at older line numbers
 (`:13648-13650`), `TOOL-dTrueNorth-20`'s deviation 6, which added the unreadable-edge and cycle
 refusals, and `TOOL-aHoistedPass-6`'s table of what `--dispatch` refuses. The recall records cite
-lines that the base places about 870 lines later.
+lines that the base places about 870 lines later. <!-- DERIVED from tools/unattended/unattended.sh@95b8f8404cc3:14519 -->
 
 Recall terms used: `python tools/memory-recall/query.py "how can a spec writer check its spec against the dispatch refusals before the spec commit" --terms "dispatch plan_state THIN MISSING order verb malformed consumes-from edges cycle spec commit writer"`

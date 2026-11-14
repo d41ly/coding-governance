@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-2 — hygiene check 12 grades one named spec or one build on request, and the spec writer is told to run it that way
 
-**Status:** SPECCED · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 2 · closes TOOL-aSmoothedDispatch-16 · ratified 2026-11-14
+**Status:** SPECCED · rev-3 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 2 · closes TOOL-aSmoothedDispatch-16 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
@@ -51,9 +51,9 @@ The full run, `--staged` and the bar grade exactly what they grade today.
   legs run the same argv and grade the same population.
 - No scope for any check but 12 and 25. Their block is the one the writer needs, and the
   measurement says it is the whole cost: `--only 11` ran in 19.5 s wall and 2.1 s CPU on the same
-  clone, so the producers every `--only` run pays are not the 376 s.
+  clone, so the producers every `--only` run pays are not the 376 s. <!-- PINNED 2026-11-14 -->
 - No change to the producers that run ahead of every check block. They cost the scoped run about
-  19 s, and the README asks for seconds.
+  19 s, and the README asks for seconds. <!-- PINNED 2026-11-14 -->
 - No cache of a spec's verdict. Check 12's edge joins read across a build, so a per-spec verdict
   is not a function of the spec's bytes alone.
 - No change to the `gov-spec-writer` gate allowlist in `tools/roles/house/policy.toml`. The scoped
@@ -98,7 +98,7 @@ All citations are to `tools/memory-tree/check-memory-hygiene.sh@f064ddabb88e`, w
 On a clone of `a25c84fc0` at `%TEMP%/tw2`, node a, with sibling writers running beside it: `--only
 12` ran 401.9 s wall, 325.7 s user over 2991 tracked specs; `--only 11` ran 19.5 s wall, 2.1 s
 user. The brief's reading at `846d51d39` was 376.705 s. Both PINNED. Check 12's cost is CPU in its
-selection, about 0.13 s a spec; a build's 10 to 30 specs cost a few seconds above the producers.
+selection, about 0.13 s a spec; a build's 10 to 30 specs cost a few seconds above the producers. <!-- PINNED 2026-11-14 -->
 
 ### S1 — the parse and its refusals
 
@@ -188,7 +188,7 @@ of `help/pass-legs.md`, and `python tools/govkit/docs_leg.py --list` lists no ro
 
 `$SCRATCH` is the run's scratch directory. Run it from the worktree root. It builds a fixture
 repository at `$TEMP/u2` from this repository's conf and two CLOSED builds, which the unchanged
-script grades clean in 15 s. It plants a section-canon red in one spec of each build, makes a third
+script grades clean in 15 s. It plants a section-canon red in one spec of each build, makes a third <!-- PINNED 2026-11-14 -->
 spec live so its `base`, absent from the fixture, reds the resolve arm, and writes an untracked red
 spec and an untracked pre-cutoff spec. The unchanged script's full run names the three tracked
 plants and neither untracked file, observed at `a25c84fc0`.
@@ -274,7 +274,7 @@ Each candidate was tested on the clone at `a25c84fc0` or read against the code b
 
 - security — read-only, as every hygiene run is. The named path is never executed and is read only
   after it passes check 12's own selector, which admits nothing outside `$M/builds/<slug>/spec/`.
-- perf / scale — the producers, about 19 s on node a, plus check 12 over one build's specs.
+- perf / scale — the producers, about 19 s on node a, plus check 12 over one build's specs. <!-- PINNED 2026-11-14 -->
 - error / empty / loading states — every bad argument and every empty selection refuses with exit 2
   and grades nothing (S1's table).
 - observability — the liveness line names the scope and the count graded.
@@ -309,7 +309,7 @@ from the worktree root at the pass commit.
 - **AC4** — When `time bash tools/memory-tree/check-memory-hygiene.sh --only 12 --spec
   memory/builds/aTrimmedWait/spec/2026-11-14-spec-TOOL-aTrimmedWait-2.md` runs on node a at the
   pass's parent commit, it refuses with `--only takes one comma list and no other argument`; at the
-  pass commit it grades the spec and its `real` wall is at most 60 s. The ledger also records
+  pass commit it grades the spec and its `real` wall is at most 60 s. The ledger also records <!-- PINNED 2026-11-14 -->
   `time bash tools/memory-tree/check-memory-hygiene.sh --only 12` at both commits, whose last line
   reads `HYGIENE --only 12 ran checks 12 25` at both.
   Red when: the scope narrows nothing and the scoped wall approaches the unscoped one, 401.9 s at
@@ -360,6 +360,8 @@ the spec-token checker over this file and check 12 over it in a scratch clone.
   its own mode rather than `--staged`'s, for the `base` resolve arm `--staged` skips.
 - rev-2 · 2026-11-14 · §8 · F1 RESOLVED by the owner's pick (a), and the header gains
   `closes TOOL-aSmoothedDispatch-16`, per ruling `2026-11-14-prompt-TOOL-aTrimmedWait-2-ruling`.
+- rev-3 · 2026-11-14 · §3 §4 §5 §6 · each measured figure the pinned-facts arm named is pinned on its
+  line, per `2026-11-14-prompt-TOOL-aTrimmedWait-3-writing-practice`. No meaning changes.
 
 ## 10. Reuse audit
 
