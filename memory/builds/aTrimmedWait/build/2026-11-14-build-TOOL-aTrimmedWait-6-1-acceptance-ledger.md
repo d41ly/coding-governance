@@ -37,10 +37,10 @@ main loop at the close.
   into `node "$SCRATCH/base6/scratch-guard.js"` three times, then into
   `node tools/hooks/scratch-guard.js` three times, one at a time on node a:
   base 136, 107 and 111 ms, each exit 0; built 121, 132 and 155 ms, each exit 2. <!-- PINNED 2026-11-14 -->
-  The hook's own cost stays near a tenth of a second, and the 240 s wait it refuses is the
+  The hook's own cost stays near a tenth of a second, and the 240 s wait it refuses is the <!-- DERIVED from the AC6 payload's own duration -->
   payload's own duration. <!-- DERIVED from the AC6 payload's own duration -->
 - Verdict parity — on the pass probe's fixture the base and built hook gave identical exits for N1
   to N7, so every admit and the one gate refusal stand; the R rows are the intended new refusals.
   The corpus probe's `same` and `other 0` carry the same reading over the measured session.
 - Owed to the close: the new arm's 14 `run_role_bash` rows (7 for AC2, 7 for AC3) and `FLOOR_ASSERTIONS` at 375, <!-- DERIVED from 361 plus the 14 new rows -->
-  observed RED on the spec's staged break and GREEN once restored, and the §7 legs.
+  observed RED on the spec's staged break and GREEN once restored, and the gate legs listed in §7.
