@@ -959,6 +959,11 @@ kind = "record-kind.disposition"
 version = 1
 fields = "f5e4fde2"
 
+[[record-version]]
+kind = "record-kind.transition"
+version = 1
+fields = "55701546"
+
 # ---- Plan's program ----------------------------------------------------------------------------------
 
 [[item]]

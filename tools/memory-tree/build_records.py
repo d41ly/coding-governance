@@ -66,6 +66,12 @@ acceptance commands re-run at one commit: `Sha` (the full commit the re-run read
 hex, no run line, and a line opening `run ·` outside the grammar. It has no `new` door, so no flag types a
 run line: the loop kit's re-run stand-in, `loop_witness.py acceptance`, computes them and calls the writer.
 
+THE TRANSITION KIND (TOOL-dDeclaredLoop-3 S2): `<date>-build-<anchor id>-transition-<n>.md`, one build stage
+move, the anchor the lowest unit id a spec H1 under the build defines: `Build`, `From`, `To`, `Item` and `Sha`,
+then any extension field the move carries. `read_transition` is its reader, which refuses a `Sha` that is not
+eight to forty hex digits and a `From` or `To` that is not one word. It has no `new` door: every field is
+computed from the move, and the loop kit's transition writer, `loop_transition.py record`, calls `write_record`.
+
 ONE LINE PER VALUE, at the one writer (PLAY-dOrderedCharter-49 S53): `write_record` refuses a field value
 holding a CR or an LF, or opening `**<Word>:**`, before it writes anything, so no door's value forges a
 field; every door's refusal exits 1, writing nothing. Its `lines`, written after the fields, are refused
@@ -153,6 +159,10 @@ KINDS = {
     "acceptance": {
         "required": ("Sha", "Writer", "Caused-by"),
         "closed": (("Writer", ACCEPTANCE_WRITERS),),
+    },
+    "transition": {
+        "required": ("Build", "From", "To", "Item", "Sha"),
+        "closed": (),
     },
 }
 if set(KINDS) != set(TYPED_RECORD_KINDS):
@@ -584,6 +594,23 @@ def write_acceptance(root, build, unit, sha, writer, runs, today=None):
     return write_record(root, build, unit, "acceptance", f"re-run at {sha[:8]}", fields, today, lines)
 
 
+# -------------------------------------------------------------------------------- the transition kind
+def read_transition(path, text):
+    """One transition record: its fields under their own names, and `id`, `path`, `build`, `n` and
+    `malformed`. Its own rules: `Sha` is eight to forty hex digits, and `From` and `To` are single words."""
+    def check_fields(fields):
+        bad = [(k, f"{fields[k]} is not one word") for k in ("From", "To")
+               if k in fields and not re.fullmatch(SEG, fields[k])]
+        if "Sha" in fields and not re.fullmatch(r"[0-9a-f]{8,40}", fields["Sha"]):
+            bad.append(("Sha", f"{fields['Sha']} is not eight to forty hex digits"))
+        return bad
+
+    fields, bad, name = read_record(path, text, "transition", check_fields=check_fields)
+    return {**fields, "id": pathlib.PurePosixPath(path).stem, "path": path,
+            "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None,
+            "malformed": bad}
+
+
 def write_record(root, build, unit, kind, title, fields, today=None, lines=()):
     """The record writer every door shares: the next `kind` record of `build` under `root`'s own memory tree,
     headed `# <unit> <kind> <n> — <title>`, then `**Serves:** <kind> <unit>`, each `(key, value)` of
@@ -984,6 +1011,8 @@ def main(argv):
         bad = read_disposition(rel, text)["malformed"]
     elif kind == "acceptance":
         bad = read_acceptance(rel, text)["malformed"]
+    elif kind == "transition":
+        bad = read_transition(rel, text)["malformed"]
     else:
         bad = read_exception(rel, text)["malformed"]
     for ln in text.replace("\r\n", "\n").split("\n"):

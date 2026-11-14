@@ -285,6 +285,45 @@ python <prefix>/loop/loop_parents.py --fixture --plant withdrawn-parent --value 
 python <prefix>/loop/loop_parents.py --selftest
 ```
 
+## The transition record
+
+`loop_transition.py` (TOOL-dDeclaredLoop-3) records a build's stage move three ways, the channels the
+policy key `transitions.record` selects, any non-empty subset and all three by default, read through the
+policy kit's `resolve` at one revision per move: HEAD for the writer, each trailer's commit for the check.
+
+```text
+Gov-Transition: <from> -> <to> · build=<slug> · item=<tag> · sha=<sha8>[ · <name>=<value>]...
+<date>-build-<anchor id>-transition-<n>.md   Build · From · To · Item · Sha · then each extension field
+transition — <slug> · <from> → <to> · <item tag> · <sha>
+```
+
+The trailer is the source. The log record is the memory-tree kit's typed `transition` kind, written
+through its `write_record` under the lowest unit id a spec H1 under the build defines; a move made
+before the build's first spec writes none, and the next move after it back-fills one per earlier
+trailer. The micro-format line is printed, never stored, by `render_transition_line` from
+`TRANSITION_LINE`, and the charter's micro-format block defines it. An extension field's name is one of
+`TRANSITION_FIELDS`, which holds `stand-in`, written where the item has a `[[stand-in]]` row.
+
+`record` (`write_transition`) answers the move by `derive_move` first, so a move no row holds prints
+`refused` and writes nothing; it resolves the witness to HEAD or its ancestor, refuses a staged index,
+and commits the records, or an empty commit, as `loop transition(<slug>): <from> -> <to>` with the
+trailer where selected. `check` (`check_transition_channels`) holds each record to its trailer field by
+field, names a record no trailer backs, prints `pending` while moves wait on the first spec and
+`unstored` where the set stores nothing, and holds the definition in `AGENTS.md` to `TRANSITION_LINE`.
+`read_transitions(build, repo)` returns the build's moves newest first. Both verbs exit 2 on a policy
+refusal naming `transitions.record`, and 2 `unarmed` where the policy kit does not resolve, since this
+kit takes no edge to it. `--fixture --plant <case>` runs both over a scratch repository: `default`,
+`subset-trailer-line`, `subset-log`, `empty-set`, `log-drift`, `orphan-log`, `no-row`, `line-drift`,
+`pre-spec` and `field`. `check --selftest` holds the tree's own definition, then runs every plant, and
+is gov's `loop transition record` leg.
+
+```bash
+python <prefix>/loop/loop_transition.py record --build <slug> --from <state> --item <tag> --outcome <o> --witness <sha>
+python <prefix>/loop/loop_transition.py check --build <slug> [--root <path>]
+python <prefix>/loop/loop_transition.py --fixture --plant default
+python <prefix>/loop/loop_transition.py check --selftest
+```
+
 ## The item kind
 
 The items are a registered kind (TOOL-dDeclaredLoop-24): the kinds register's `kind.item` row names
@@ -454,7 +493,8 @@ non-empty: the allowance vocabulary of a role's `writes` is the roles kit's. A n
 exists. The transition tables check no witness, no stand-in owner's landing, no reachability or
 termination, and no feature or unit row against the routes, nor that every terminal is entered by
 a row. The parent route reads no parent planning ending, no hold past the wait ceiling, and no
-`withdrawn` post. That a disposition
+`withdrawn` post. The transition record judges no witness beyond resolving it and records no feature or
+unit move, and it pairs records with trailers by order. That a disposition
 record's `Item` names a declared item, which reads `None`, or that a writer resolved an alias before
 it wrote. An unknown key on a row is neither read nor refused. That a witness's `by` is true. That
 the build an actor-list row names will compute its witness.

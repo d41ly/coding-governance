@@ -411,6 +411,80 @@ The route does not read a parent's planning ending, such as refused or deferred,
 past its wait ceiling, and a parent aborted for a reason it later resumes from reads withdrawn until
 its next run.
 
+## Recording a build's move
+
+When a build moves from one stage to the next, the move is recorded in up to three places, and the
+policy key `transitions.record` in `.governance/policy.toml` says which:
+
+- **`trailer`**: the move's commit carries
+  `Gov-Transition: <from> -> <to> · build=<slug> · item=<tag> · sha=<sha8>`, with any extra field, such
+  as `stand-in=<owner>`, after it.
+- **`log`**: a record in the build's `build/` folder, `<date>-build-<id>-transition-<n>.md`, holding
+  the same fields as `- **Build:**`, `- **From:**`, `- **To:**`, `- **Item:**` and `- **Sha:**` lines,
+  where `<id>` is the lowest unit id a spec under the build defines.
+- **`micro-format`**: the line `transition — <slug> · <from> → <to> · <item tag> · <sha>`, printed
+  after the commit for your final message, and never stored.
+
+All three are on by default. To opt out of a channel, set the ones you keep; the set is never empty,
+and a file setting `[]` is invalid:
+
+```toml
+[transitions]
+record = ["trailer", "micro-format"]
+```
+
+The trailer is the source: the log record is held to it field by field. With `trailer` opted out, the
+log record is the source; with only `micro-format` selected, nothing is stored and the check says
+`unstored`.
+
+- **Record a move:** `python tools/loop/loop_transition.py record --build <slug> --from <state> --item <tag> --outcome <o> --witness <sha>` <!-- usage: script:tools/loop/loop_transition.py#record 51794820 -->
+  answers the move from the build's transition table first, so a move no row holds prints `refused`
+  and exits 1 writing nothing. The witness is the commit the exit item's witness was read at, HEAD or
+  an ancestor of it. It refuses, exit 2, when your index holds staged changes, since the move's commit
+  carries its own records alone. `--fact k=v` passes a fact a row reads, `--field k=v` a registered
+  extra field, and `--root` the repository, the current directory by default.
+
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries placeholders the shell reads as redirects -->
+  ```bash
+  python tools/loop/loop_transition.py record --build <slug> --from planning --item item.plan.exit --outcome recorded --witness HEAD
+  ```
+
+  ```text
+  loop: wrote memory/builds/<slug>/build/<date>-build-<id>-transition-1.md
+  loop: recorded · planning -> designing · commit <sha8>
+  transition — <slug> · planning → designing · item.plan.exit · <sha8>
+  ```
+
+  A move made before the build has its first spec writes the trailer and no record; the next move
+  after the first spec writes the missing records first, in move order.
+
+- **Check a build's moves:** `check --build <slug>` holds each log record to its move's trailer, names <!-- usage: script:tools/loop/loop_transition.py#check 53beaa6b -->
+  a record no trailer backs, and holds the `transition` definition in your `AGENTS.md` to the line the
+  writer prints. It exits 0 clean and 1 on a finding, printing `pending — <n> move(s) before the
+  build's first spec` while moves wait on a spec, or `unstored` where the set stores nothing. Both
+  verbs exit 2 when `transitions.record` does not resolve, and 2 `unarmed` where the policy kit is not
+  installed beside the loop kit, never falling back to a default.
+
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries a placeholder the shell reads as a redirect -->
+  ```bash
+  python tools/loop/loop_transition.py check --build <slug>
+  ```
+
+- **See it on a scratch repository:** `--fixture --plant <case>` builds a scratch repository holding <!-- usage: script:tools/loop/loop_transition.py 930359dc -->
+  the build `tFix`, records a move there, runs the check and removes it. The cases are `default`,
+  `subset-trailer-line`, `subset-log`, `empty-set`, `log-drift`, `orphan-log`, `no-row`, `line-drift`,
+  `pre-spec` and `field`. `check --selftest` runs every case, and gov's own `loop transition record`
+  gate runs it.
+
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
+  ```bash
+  python tools/loop/loop_transition.py --fixture --plant default
+  python tools/loop/loop_transition.py check --selftest
+  ```
+
+Only build-level moves are recorded; nothing calls the writer yet, until the executor that moves a
+build at each item boundary lands.
+
 ## The item kind, `kind.item`
 
 Items are a registered kind: the kinds register's `kind.item` row names a factory, a row schema,

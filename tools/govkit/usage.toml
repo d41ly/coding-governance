@@ -362,6 +362,26 @@ verb = "route"
 flags = ["--build=", "--state=", "--root="]
 
 [[usage]]
+id = "script:{prefix}/loop/loop_transition.py"
+shape = "verb"
+entry = "{prefix}/loop/loop_transition.py"
+flags = ["--fixture", "--plant="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_transition.py#record"
+shape = "verb"
+entry = "{prefix}/loop/loop_transition.py"
+verb = "record"
+flags = ["--build=", "--from=", "--item=", "--outcome=", "--witness=", "--fact=", "--field=", "--root="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_transition.py#check"
+shape = "verb"
+entry = "{prefix}/loop/loop_transition.py"
+verb = "check"
+flags = ["--build=", "--root=", "--selftest"]
+
+[[usage]]
 id = "script:{prefix}/loop/adopt-loop.sh"
 shape = "verb"
 entry = "{prefix}/loop/adopt-loop.sh"

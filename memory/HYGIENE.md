@@ -652,7 +652,8 @@ carry it too:
   `red-fix` (the record of an inline red fix, in the grammar under "Red-fix records") ·
   `disposition` (the owner's disposition of one loop item, in the grammar under "Disposition records") ·
   `acceptance` (a unit's acceptance commands re-run at a commit, in the grammar under "Acceptance
-  records"). The seven after `research` are the typed kinds: each record is named
+  records") · `transition` (one build stage move, in the grammar under "Transition records"). The
+  eight after `research` are the typed kinds: each record is named
   `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, and the kind and that name are
   joined both ways. An open kind field stops being groupable the first time two authors spell one
   relation differently.
@@ -740,6 +741,16 @@ hash the first twelve hex digits of the SHA-256 of the command's combined output
 run line, or with a line opening `run ·` outside that grammar, is malformed. It has no door: the
 lines are computed, never typed, by the loop kit's `loop_witness.py acceptance` until an executor
 writes it, and a hand-typed record reads malformed wherever it lacks them.
+
+**Transition records.** A build's stage move is a `transition` record named
+`<date>-build-<anchor id>-transition-<n>.md` in the build's `build/` folder, the anchor the lowest unit
+id a spec H1 under the build defines, `<n>` following the move order. Its fields are
+`- **<Key>:** <value>` bullets, one line each: Build, From and To (one state word each), Item (the exit
+item's tag) and Sha (eight to forty hex digits, the witness commit), all required, then any extension
+field the move carries, its name capitalised (`Stand-in`). It has no door: the loop kit's
+`loop_transition.py record` writes it from the move, beside the move's `Gov-Transition` trailer, and
+its `check` holds the record to that trailer field by field. A move made before the build's first spec
+writes no record; the next move after it back-fills one per earlier trailer.
 
 ## Acceptance ledger — how a built unit evidences its criteria
 

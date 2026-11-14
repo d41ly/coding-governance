@@ -137,6 +137,7 @@
 - `READY — <slug> · node <tag> · <branch> · base <sha> · Tier-<n> · gates <list>`
 - `BUILD — <slug> · Tier-<n> · <done>/<total> <step> · left <ids|none|unspecced>`
 - `SPEC — [<unit-id>](<path>) · review <ids|none>[ · open <ids|none>]`
+- `transition — <slug> · <from> → <to> · <item tag> · <sha>`
 - `agent — <role> · effort <level> · model <model> · <unit-id|label> · prompt [<name>](<path>) · writes <class> · gates <legs|none> · run <run-id|direct>/<agent-id>`
 - `returned — <role> · <outcome> · <wall> · <tokens> out · run <run-id|direct>/<agent-id>`
 - `unchanged — since <link> · delta <text|none>`

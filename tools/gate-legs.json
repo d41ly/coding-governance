@@ -2010,6 +2010,19 @@
     "enforces": ["principle.p21"]
   },
   {
+    "name": "loop transition record",
+    "argv": [
+      "python",
+      "{prefix}/loop/loop_transition.py",
+      "check",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p20"]
+  },
+  {
     "name": "loop transition tables",
     "argv": [
       "python",

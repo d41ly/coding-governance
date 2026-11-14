@@ -7928,6 +7928,16 @@
       "file": "tools/memory-tree/routed_commits.py"
     },
     {
+      "id": "check_transition_channels",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
+      "id": "check_transition_definition",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
       "id": "check_transition_tables",
       "kind": "function",
       "file": "tools/loop/loop_table.py"
@@ -14490,6 +14500,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/loop/loop_witness.py"
     },
     {
@@ -16378,6 +16393,11 @@
       "file": "tools/process-monitor/scope.py"
     },
     {
+      "id": "parse_transition_trailer",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
       "id": "parse_ts_defs",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -17836,6 +17856,11 @@
       "id": "read_cached",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "read_cached_channels",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
     },
     {
       "id": "read_canon_refusal",
@@ -19680,6 +19705,11 @@
     {
       "id": "read_memory_root",
       "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
+      "id": "read_memory_root",
+      "kind": "function",
       "file": "tools/playbook/positional.py"
     },
     {
@@ -20401,6 +20431,11 @@
       "id": "read_record_cells",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_record_channels",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
     },
     {
       "id": "read_record_commit",
@@ -21493,9 +21528,34 @@
       "file": "tools/playbook/edge_grammar.py"
     },
     {
+      "id": "read_transition",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
+      "id": "read_transition_commits",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
+      "id": "read_transition_moves",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
+      "id": "read_transition_records",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
       "id": "read_transition_rows",
       "kind": "function",
       "file": "tools/loop/loop_table.py"
+    },
+    {
+      "id": "read_transitions",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
     },
     {
       "id": "read_tree_bytes",
@@ -23548,6 +23608,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "render_record_key",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
       "id": "render_redacted",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
@@ -23881,6 +23946,16 @@
       "id": "render_transition_conf",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "render_transition_line",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
+      "id": "render_transition_trailer",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
     },
     {
       "id": "render_tree_cell",
@@ -24331,6 +24406,11 @@
       "id": "resolve_brief_record",
       "kind": "function",
       "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "resolve_build_anchor",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
     },
     {
       "id": "resolve_cache_dir",
@@ -28600,6 +28680,11 @@
     {
       "id": "run_selftest",
       "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
       "file": "tools/loop/loop_witness.py"
     },
     {
@@ -28936,6 +29021,11 @@
       "id": "run_trailer_plant",
       "kind": "function",
       "file": "tools/playbook/edge_grammar.py"
+    },
+    {
+      "id": "run_transition_fixture",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
     },
     {
       "id": "run_tree_kill",
@@ -34966,6 +35056,21 @@
       "id": "write_transcript_lines",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "write_transition",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
+      "id": "write_transition_plant",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
+      "id": "write_transition_record",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
     },
     {
       "id": "write_unit_plant",
