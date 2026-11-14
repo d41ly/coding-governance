@@ -38,12 +38,13 @@
 # One [[item]] row per item of a gov step's program (TOOL-dDeclaredLoop-12), after every table above:
 #   tag        the item's tag, `item.<step>.<name>`, a member of the `item` namespace
 #   step       the [[step]] tag its tag opens
-#   actor      `<kind>:<name>`, one actor of one kind
-#   needs      the items it waits for: each entry a tag, or a list of tags any one of which meets it; []
+#   actor      `<kind>:<name>`, one actor of one kind: role, command, executor, hook or owner, or the
+#              bare `executor` or `owner`; a role's name is its role file's stem, such as gov-builder
+#   needs     the items it waits for: each entry a tag, or a list of tags any one of which meets it; []
 #              for none. A need on an item outside the five programs is added by the unit declaring it.
 #   inputs     `<layer tag>:<what it reads>`, the layer a tag of the playbook kit's layers.toml; a role
 #              actor's absent inputs, allowance and returns are its role's
-#   allowance  what it may write
+#   allowance  what it may write; a role actor's may only narrow its role's to `none`
 #   returns    its return template, the record kind it writes
 #   outcomes   its closed outcome set, a list of words, or "dispositions" for the set above
 #   witness    what witnesses it: { class = "<class>", by = "<what>" }
@@ -212,7 +213,7 @@ routes = { select = "item.plan.record", defer = "stand-in:{prefix}/memory-tree/b
 [[item]]
 tag = "item.plan.triage-judge"
 step = "step.plan"
-actor = "role:planner"
+actor = "role:gov-planner"
 needs = ["item.plan.triage-rule"]
 outcomes = ["select", "defer", "retire", "refuse"]
 witness = { class = "history", by = "the schema check over its return, its choice joined to the triage record" }
@@ -222,7 +223,7 @@ routes = { select = "item.plan.record", defer = "stand-in:{prefix}/memory-tree/b
 [[item]]
 tag = "item.plan.record"
 step = "step.plan"
-actor = "role:planner"
+actor = "role:gov-planner"
 needs = [["item.plan.triage-judge", "item.plan.triage-rule"]]
 outcomes = ["drafted", "research", "owner-question"]
 witness = { class = "history", by = "the plan-record schema check" }
@@ -232,7 +233,7 @@ routes = { drafted = "item.plan.place", research = "item.plan.research", owner-q
 [[item]]
 tag = "item.plan.research"
 step = "step.plan"
-actor = "role:researcher"
+actor = "role:gov-researcher"
 needs = ["item.plan.record"]
 outcomes = ["answered"]
 witness = { class = "history", by = "the research record's schema check" }
@@ -281,7 +282,7 @@ routes = { scored = "item.plan.reason", review = "stand-in:{prefix}/workflows/ti
 [[item]]
 tag = "item.plan.reason"
 step = "step.plan"
-actor = "role:planner"
+actor = "role:gov-planner"
 needs = ["item.plan.recommend"]
 outcomes = ["review", "no-review"]
 witness = { class = "history", by = "the schema check, its answer joined to the recommendation record" }
@@ -332,7 +333,7 @@ routes = { additive = "item.design.unit-spec", breaking = "item.design.decompose
 [[item]]
 tag = "item.design.inventory"
 step = "step.design"
-actor = "role:architect"
+actor = "role:gov-architect"
 needs = ["item.design.input"]
 outcomes = ["inventoried"]
 witness = { class = "history", by = "the inventory joined to every built unit" }
@@ -342,7 +343,7 @@ routes = { inventoried = "item.design.decompose" }
 [[item]]
 tag = "item.design.seams"
 step = "step.design"
-actor = "role:reuse-scout"
+actor = "role:gov-reuse-scout"
 needs = ["item.design.input"]
 outcomes = ["found"]
 witness = { class = "history", by = "the seams' probe digests, re-derived by the executor" }
@@ -352,7 +353,7 @@ routes = { found = "item.design.decompose" }
 [[item]]
 tag = "item.design.decompose"
 step = "step.design"
-actor = "role:architect"
+actor = "role:gov-architect"
 needs = [["item.design.inventory", "item.design.reentry", "item.design.seams"]]
 outcomes = ["decomposed", "fact-fork", "goal-fork"]
 witness = { class = "history", by = "the roster and interface schema check, every raised feature fork joined to its fork record" }
@@ -362,7 +363,7 @@ routes = { decomposed = "item.design.overlaps", fact-fork = "item.design.researc
 [[item]]
 tag = "item.design.research"
 step = "step.design"
-actor = "role:researcher"
+actor = "role:gov-researcher"
 needs = ["item.design.decompose"]
 outcomes = ["answered"]
 witness = { class = "history", by = "the research record's schema check" }
@@ -385,7 +386,7 @@ routes = { streams = "item.design.streams", specs = "item.design.unit-spec", ref
 [[item]]
 tag = "item.design.streams"
 step = "step.design"
-actor = "role:planner"
+actor = "role:gov-planner"
 needs = ["item.design.overlaps"]
 outcomes = ["grouped"]
 witness = { class = "history", by = "the stream plan, each stream's units re-derived against the order and the overlap record" }
@@ -395,7 +396,7 @@ routes = { grouped = "item.design.unit-spec" }
 [[item]]
 tag = "item.design.unit-spec"
 step = "step.design"
-actor = "role:spec-writer"
+actor = "role:gov-spec-writer"
 needs = [["item.design.input", "item.design.overlaps", "item.design.streams"]]
 outcomes = ["authored", "feature-fork"]
 witness = { class = "history", by = "the format check on the spec at its SHA, every raised fork joined to its fork record" }
@@ -418,7 +419,7 @@ routes = { scored = "item.design.reason", review = "stand-in:{prefix}/workflows/
 [[item]]
 tag = "item.design.reason"
 step = "step.design"
-actor = "role:architect"
+actor = "role:gov-architect"
 needs = ["item.design.recommend"]
 outcomes = ["review", "no-review"]
 witness = { class = "history", by = "the schema check, its answer joined to the recommendation record" }
@@ -482,7 +483,7 @@ routes = { held = "item.build.unit-pass", waiting = "item.build.unit-lease", ref
 [[item]]
 tag = "item.build.unit-pass"
 step = "step.build"
-actor = "role:builder"
+actor = "role:gov-builder"
 needs = ["item.build.unit-lease"]
 outcomes = ["committed", "spec-wrong", "interface-change", "fork"]
 witness = { class = "history", by = "the commit, resolved by the executor" }
@@ -505,7 +506,7 @@ routes = { pass = "item.build.scope", fail = "item.build.fix-pass" }
 [[item]]
 tag = "item.build.fix-pass"
 step = "step.build"
-actor = "role:builder"
+actor = "role:gov-builder"
 needs = [["item.build.acceptance", "item.build.reuse-check", "item.test.attribute", "item.test.seen-red"]]
 outcomes = ["committed"]
 witness = { class = "history", by = "the commit, resolved by the executor" }
@@ -528,7 +529,7 @@ routes = { next-pass = "item.build.unit-pass", in-scope = "item.build.reuse-chec
 [[item]]
 tag = "item.build.revert-pass"
 step = "step.build"
-actor = "role:builder"
+actor = "role:gov-builder"
 needs = ["item.build.scope"]
 outcomes = ["reverted", "descoped"]
 witness = { class = "history", by = "the commit, resolved by the executor" }
@@ -538,7 +539,7 @@ routes = { reverted = "item.build.scope", descoped = "item.build.core" }
 [[item]]
 tag = "item.build.reuse-check"
 step = "step.build"
-actor = "role:reuse-scout"
+actor = "role:gov-reuse-scout"
 needs = ["item.build.scope"]
 outcomes = ["clean", "duplicate", "disputed", "overflow", "non-converging"]
 witness = { class = "history", by = "a computed join: every listed unit and every MUST has one row" }
@@ -613,7 +614,7 @@ routes = { recorded = "transition" }
 [[item]]
 tag = "item.build.resolve"
 step = "step.build"
-actor = "role:builder"
+actor = "role:gov-builder"
 needs = ["item.test.merge"]
 outcomes = ["resolved", "interface-clash"]
 witness = { class = "history", by = "the resolution commit, resolved by the executor, and the routing record" }
@@ -677,7 +678,7 @@ routes = { nondeterministic = "item.test.flakes", own = "item.test.attribute", c
 [[item]]
 tag = "item.test.attribute"
 step = "step.test"
-actor = "role:tester"
+actor = "role:gov-tester"
 needs = ["item.test.route"]
 outcomes = ["code-miss", "spec-wrong"]
 witness = { class = "history", by = "a computed join: every such red has one judgment, and the artifact its route names exists" }
@@ -726,7 +727,7 @@ routes = { scored = "item.test.reason", review = "stand-in:{prefix}/workflows/ti
 [[item]]
 tag = "item.test.reason"
 step = "step.test"
-actor = "role:tester"
+actor = "role:gov-tester"
 needs = ["item.test.recommend"]
 outcomes = ["review", "no-review"]
 witness = { class = "history", by = "the schema check, its answer joined to the recommendation record" }

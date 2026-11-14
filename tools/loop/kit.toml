@@ -14,7 +14,10 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # adopter read each workflow's order here. Two reads of the playbook kit take no edge
 # (TOOL-dDeclaredLoop-12): `read_layer_tags` reads its layers.toml for the item inputs' layer tags, and
 # `--scopes` runs its load_sets.py as a subprocess for each item's scope. Each prints `unarmed` where
-# that kit does not resolve, so the check and the verb degrade rather than fail.
+# that kit does not resolve, so the check and the verb degrade rather than fail. The read of the roles
+# kit takes no edge either, since the roles kit requires this one (TOOL-dDeclaredLoop-9):
+# `read_role_defaults` imports its roles_lib.py inside the function for each role item's defaults, and
+# where that kit does not resolve every role item prints `unarmed`.
 requires = ["memory-tree"]
 
 # Everything the kit ships is engine, overwritten on every update: the definition, its reader, the

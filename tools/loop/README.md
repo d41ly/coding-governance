@@ -73,7 +73,7 @@ table above, transcribed from the flow-steps record's five step tables.
 |---|---|
 | `tag` | `item.<step>.<name>`, a member of the `item` namespace |
 | `step` | the `[[step]]` tag its tag opens |
-| `actor` | `<kind>:<name>`, one actor of one kind |
+| `actor` | `<kind>:<name>`, one actor of one kind in `ACTOR_KINDS`, or the bare `executor` or `owner`; a role's name is its role file's stem |
 | `needs` | the items it waits for: each entry a tag, or a list of tags any one of which meets it; `[]` for none |
 | `inputs` | `<layer tag>:<what it reads>`, the layer a tag of the playbook kit's `layers.toml` |
 | `allowance` | what it may write |
@@ -82,6 +82,23 @@ table above, transcribed from the flow-steps record's five step tables.
 | `witness` | `{ class, by }`, as a step's |
 | `owner` | the build that owns it |
 | `routes` | an inline table, one target per outcome: a declared item, `transition`, or `stand-in:{prefix}/<home>/<file>` |
+
+**The actor and the role defaults** (TOOL-dDeclaredLoop-9). `check_item_declarations(items, roles,
+why)` grades each row's actor: one string fullmatching `ACTOR_FORM`, `<kind>:<name>`, its kind in
+`ACTOR_KINDS` (`role`, `command`, `executor`, `hook`, `owner`), or the bare `executor` or `owner`; a
+list, a comma, whitespace or a second colon is refused, naming the item and the value. A non-role
+item carries a non-empty `inputs`, `allowance` and `returns`. A `role:<slot>` item's slot is a role
+file's stem under the roles kit's `agents/`, such as `gov-builder`, and `resolve_item_declaration`
+gives its absent `inputs` the role's `reads` split on commas, its absent `allowance` the role's
+`writes` and its absent `returns` the role's `returns`, naming each field's source. The catalogue is
+`read_role_defaults(kit_dir)`: the roles kit found by `resolve_kit_dir` from this directory, its
+`roles_lib` imported inside the function and `load_roles` of that directory returned, or None and
+why. A role item's explicit field equal to its role's is refused as a copy, and its explicit
+`allowance` may only be `none`, a narrowing: the role item's write set is its role's or nothing. A
+slot the catalogue lacks prints `pending`; where the roles kit does not resolve, every role item
+prints `unarmed`. Neither is a refusal, neither is green, and both are counted. The descriptor
+declares no edge to the roles kit, which requires this one. Every item's `witness` is graded by
+`check_witness_classes` after the steps', and joins the actor list as a step's does.
 
 A role actor's absent `inputs`, `allowance` and `returns` are its role's. A `needs` phrase in the
 step tables naming no item, such as "a select", is the any-of list of the items routing into the row;
@@ -139,7 +156,7 @@ need no row and are admitted, printed `adopter-declared`.
 | `read_outcome_set(kit_dir, item)` | the closed outcome set of the `[[item]]` row tagged `item`, or `None` |
 | `check_disposition_record(kit_dir, record)` | `True` where the record's `Disposition` is in its `Item`'s outcome set, `None` for an undeclared item |
 | `read_witness_classes(kit_dir)` | `{"classes": [...], "refused": [...]}`, the definition's witnesses graded |
-| `check_witness_classes(data, where)` | `(site, class, by)` per witness, after grading `[witnesses]`, the witness aliases and every step's `witness` |
+| `check_witness_classes(data, where)` | `(site, class, by)` per witness, after grading `[witnesses]`, the witness aliases, every step's `witness` and every item's |
 | `check_alias_rows(rows, members, table, where)` | nothing; refuses an alias row of either table whose `word` is a member or repeats, or whose `means` is no member |
 | `resolve_alias(rows, word)` | the `means` of the row holding `word`, or `None` |
 | `read_actor_rows(kit_dir)` | the actor list's non-blank lines, the list's one reader |
@@ -151,6 +168,9 @@ need no row and are admitted, printed `adopter-declared`.
 | `check_program(data, where, layers)` | `{step tag: [item tags in needs order]}` once the item rows hold as each step's program |
 | `read_layer_tags(kit_dir)` | the playbook kit's layer tags; `LookupError` where that kit does not resolve |
 | `read_items(kit_dir)` | the `[[item]]` rows in file order, once `check_loop` and `check_program` hold |
+| `read_role_defaults(kit_dir)` | `(roles, "")`, the roles kit's catalogue as its `load_roles` reads it, or `(None, why)` where that kit does not resolve or read |
+| `resolve_item_declaration(item, roles)` | `{inputs, allowance, returns, source}` of one item row, a role item's absent fields its role's, `source` per field `item`, `role:<slot>`, `pending` or `unarmed` |
+| `check_item_declarations(items, roles, why)` | `(lines, refusals)`: one `loop: item` line per item and the count line, and a refusal per actor, missing field, copy or widened allowance |
 | `derive_item_scope(kit_dir, root, tags, units=None)` | one `loop: scope` line per item, its load set as `load_sets.py derive` lists it, or `unarmed` |
 
 Each refuses a definition that does not hold with `LoopError`, a `ValueError` naming the file and
@@ -169,7 +189,8 @@ The witnesses are graded by `check_witness_classes` alone, called from `read_wit
 definition holding no witness keeps reading. `read_actor_base` takes the repository root and the
 list's path from `git rev-parse`, finds the memory-tree kit with its inline `resolve_kit_dir`, and
 imports that kit's `resolve_compare_base` inside the function. `read_builds_dir` finds the same kit
-the same way and imports its `read_design_conf` inside the function. Those two are the only reaches
+the same way and imports its `read_design_conf` inside the function, and `read_role_defaults` finds
+the roles kit the same way and imports its `roles_lib` there. Those three are the only reaches
 outside the standard library.
 
 A kit reads it by finding this kit's directory with its own `resolve_kit_dir` and importing the
@@ -188,8 +209,18 @@ drive rows by `order` and pick each role's practices by its reach word.
   ending `foreign build, not graded` in that case. Exit 0 read,
   1 refused with the reason on one line or each list refusal as `loop: refused · ...`. It prints
   `loop: program <step> · <n> item(s) · <tags>` per step, after `loop: inputs unarmed` and why where
-  the playbook kit's layer tags do not resolve. It is the `loop definition` gate leg, and it runs no
-  scope derivation.
+  the playbook kit's layer tags do not resolve. Then one line per item in file order and the count,
+  before the witness lines:
+
+  ```text
+  loop: item <tag> · <actor> · inputs from <source> · allowance <value> from <source> · returns from <source>
+  loop: item <tag> · <actor> · pending · the roles kit holds no <slot> role
+  loop: item <tag> · <actor> · unarmed · <why>
+  loop: items · <n> read · <p> pending · <u> unarmed
+  ```
+
+  Each item refusal prints `loop: refused · ...` beside the list's, exit 1. It is the
+  `loop definition` gate leg, and it runs no scope derivation.
 - `python loop_lib.py --scopes` reads and checks the definition as `--check` does, then prints
   `loop: scope <tag> · <derive's item line> · <the tags it lists, or none>` per item. Exit 0, every
   line `unarmed` included; 1 on a refused definition, or on a derive that exits non-zero, naming the
@@ -204,7 +235,14 @@ drive rows by `order` and pick each role's practices by its reach word.
   whose witness is `history`), `actor-list-no-build` (a row naming `dNoSuchBuild`) and
   `actor-list-foreign` (the builds folder set to foreign after the read, which reads clean). The program
   cases are `needs-cycle`, `needs-unresolved` (a missing tag inside an any-of entry),
-  `outcome-unrouted`, `route-unresolved`, `input-no-layer` and `exit-missing`. `scope-selected` and
+  `outcome-unrouted`, `route-unresolved`, `input-no-layer` and `exit-missing`. The actor cases are
+  `actor-two` (item.build.unit-pass given a list of two actors), `actor-bad-kind` (its actor
+  `agent:x`), `witness-missing` (its witness taken off), `allowance-missing` (item.plan.place's
+  allowance taken off), `role-copy` (item.build.unit-pass given its role's `writes`, `product`),
+  `role-widen` (item.design.seams, a `role:gov-reuse-scout` item, given `product`), each exiting 1;
+  `role-pending` (item.build.unit-pass's actor `role:gov-no-such-role`, printed `pending`) and
+  `roles-no-kit` (the roles kit resolved from an empty scratch directory under the host temp
+  directory, every role item printed `unarmed`), each exiting 0. `scope-selected` and
   `scope-no-kit` run the read and then the scope verb, exiting 0 when it behaves: the first over a
   scratch manifest under the host temp directory scoping one unit to one item, which must be listed
   on that item's line alone; the second with a scratch directory as the kit directory, where the
@@ -227,8 +265,9 @@ drive rows by `order` and pick each role's practices by its reach word.
 
 That a workflow row names a workflow the roles kit holds: the roles catalogue checker joins the two
 both ways. That a step tag or an item tag is registered: the tag index reads the `[[step]]` rows as
-the `step` namespace. An item's actor, allowance, return template and witness beyond being read: each
-field's content is a later unit's. A need on an item outside the five programs; that a stand-in path
+the `step` namespace. That a `command:` name names a real command, that a `hook:` event exists, or
+that a pending role's slot is the stem a later build ships. A non-role item's allowance beyond being
+non-empty: the allowance vocabulary of a role's `writes` is the roles kit's. A need on an item outside the five programs; that a stand-in path
 exists, or that a `transition` route reaches a transition table. That a disposition
 record's `Item` names a declared item, which reads `None`, or that a writer resolved an alias before
 it wrote. An unknown key on a row is neither read nor refused. That a witness's `by` is true. That

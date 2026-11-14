@@ -80,8 +80,21 @@ Each outcome has exactly one route. A route goes to another item, to `transition
 moves to another step, or to `stand-in:{prefix}/<kit>/<file>`, the tool that does that work today
 when the item that will do it belongs to a later build. `{prefix}` stands for the folder your kits
 are installed under. Each input starts with a layer tag from the playbook kit's `layers.toml`, such
-as `layer.memory` or `layer.flow`. A role actor, such as `role:planner`, takes its inputs, allowance
-and return template from its role, so its row leaves them out.
+as `layer.memory` or `layer.flow`.
+
+Each item has exactly one actor, one string. Its kind is `role`, `command`, `executor`, `hook` or
+`owner`, written `<kind>:<name>`, or the bare word `executor` or `owner`. A list of actors, a comma
+or a second colon is refused: an item done by different actors is one item per actor. A command,
+executor, hook or owner item writes its own `inputs`, `allowance` and `returns`, and each must be
+there and not empty.
+
+A role actor names its role by the role file's stem, such as `role:gov-builder` for
+`gov-builder.agent.md`. Its row leaves out `inputs`, `allowance` and `returns`, and takes them from
+the role file in the roles kit: `inputs` from its `reads`, `allowance` from its `writes`, and `returns`
+from its `returns`. If a role row writes one of them anyway with the role's own value, it is refused
+as a copy. A role row may write `allowance = "none"` to narrow its role, and no other allowance.
+A role the roles kit does not hold yet prints `pending`, and if the roles kit is not installed every
+role item prints `unarmed`. Neither is refused, and neither counts as checked.
 
 An item's instruction scope, the instruction units it loads, is never typed on its row. It is
 derived from the units whose `scope` names the item; `--scopes` below prints it.
@@ -156,11 +169,12 @@ unarmed and never as a pass.
   workflow with its order, step and reach word, then the dispositions and one line per alias. It
   prints one `loop: program` line per step, with its items in an order where each comes after the
   items it needs. Where the playbook kit is not installed, a `loop: inputs unarmed` line comes first
-  and the inputs go unchecked. Then it
-  prints the witness classes, one line per witness alias and per step's witness, one line per
+  and the inputs go unchecked. Then it prints one `loop: item` line per item, saying where each of
+  its fields comes from, or `pending` or `unarmed`, and a `loop: items` count line. Then it
+  prints the witness classes, one line per witness alias and per step's and item's witness, one line per
   actor-list row with its build, and the base it compared the list against, or `no comparison` and
   why. A `loop: actor-list builds` line follows, naming the builds folder, or `foreign` and why. It
-  exits 0, or 1 when the list is refused.
+  exits 0, or 1 when an item or the list is refused.
 
   ```text
   loop: step step.build · order 3 · state building · exit item.build.exit
@@ -168,6 +182,10 @@ unarmed and never as a pass.
   loop: dispositions continue amend new patch repeat unit breakpoint ask none
   loop: disposition-alias defer · means ask
   loop: program step.test · 10 item(s) · item.test.merge item.test.select item.test.verdict ...
+  loop: item item.plan.place · command:plan.place · inputs from item · allowance the plan view from item · returns from item
+  loop: item item.build.unit-pass · role:gov-builder · inputs from role:gov-builder · allowance product from role:gov-builder · returns from role:gov-builder
+  loop: item item.design.inventory · role:gov-architect · pending · the roles kit holds no gov-architect role
+  loop: items · 61 read · 9 pending · 0 unarmed
   loop: witness classes history hook-record remote-verdict · refused actor
   loop: witness step.build · class history · by the transition record into the next step
   loop: actor witness DOD_CORE · keepalive-reaped · until dWellOiledMachine
@@ -202,7 +220,12 @@ unarmed and never as a pass.
   `actor-list-grown`, `actor-list-stale`, `actor-list-no-build` and `actor-list-foreign` (which reads
   the builds folder as foreign, prints each row `foreign build` and exits 0). The program cases are
   `needs-cycle`, `needs-unresolved`, `outcome-unrouted`, `route-unresolved`, `input-no-layer` and
-  `exit-missing`. Two cases run `--scopes` after the read and exit 0 when it behaves:
+  `exit-missing`. The actor cases are `actor-two` (two actors on one item), `actor-bad-kind`,
+  `witness-missing` (an item with no witness), `allowance-missing` (a command item with no
+  allowance), `role-copy` (a role item repeating its role's allowance), `role-widen` (a role item
+  given a wider allowance), `role-pending` (a role the roles kit does not hold, which prints `pending`
+  and exits 0) and `roles-no-kit` (the roles kit looked for in an empty scratch folder, so every role
+  item prints `unarmed` and it exits 0). Two cases run `--scopes` after the read and exit 0 when it behaves:
   `scope-selected` scopes one unit to one item in a scratch file and shows it on that item's line
   alone, and `scope-no-kit` looks for the playbook kit in an empty scratch folder and shows every line
   `unarmed`. The files on disk are never changed.
@@ -219,6 +242,9 @@ that does not start `item.` and a step word, an item declared twice, a need nami
 of needs (each cycle named once), an empty outcome list or one with a word twice, an outcome with no
 route or a route for no outcome, a route to anything but an item, `transition` or a stand-in, an
 input whose layer tag is not in `layers.toml`, and a step whose `exit` is not one of its own items.
+It refuses an item with no `witness`, as it does a step. `--check` also refuses an actor that is not
+one string of a known kind, a non-role item missing its `inputs`, `allowance` or `returns`, and a
+role item that copies its role or writes an allowance other than `none`.
 The `loop definition` gate runs the read on every push and landing.
 
 The roles kit's `roles catalogue` gate joins the two files by workflow name, both ways: a workflow
@@ -232,4 +258,6 @@ adopter's to seed. The loop kit is in the default selection, so a default instal
 requires the loop kit: a `--kits` selection naming `roles` names `loop` too or is refused. The
 unattended kit requires the loop kit too, for check 53. The loop kit requires the memory-tree kit,
 because `--check` reads the actor list at the compare base that kit resolves, and reads
-`DESIGN_RECORD` and `MEMORY_ROOT` through that kit's conf reader.
+`DESIGN_RECORD` and `MEMORY_ROOT` through that kit's conf reader. `--check` also reads the roles
+kit's role files for the role items' defaults, without requiring that kit: where it is not
+installed, each role item prints `unarmed`.

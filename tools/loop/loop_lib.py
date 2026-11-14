@@ -49,6 +49,18 @@ prints each item's instruction scope, `derive_item_scope` running that kit's `lo
 per item as a subprocess, so this module imports no sibling kit. Where the playbook kit does not
 resolve, the inputs print `unarmed` and every scope line too; the loop kit declares no edge to it.
 
+Each item declares one actor of one kind (TOOL-dDeclaredLoop-9): `<kind>:<name>`, the kind in
+`ACTOR_KINDS`, or the bare `executor` or `owner`. A non-role item carries its own `inputs`, `allowance`
+and `returns`. A `role:<slot>` item, the slot a role file's stem, takes each absent one from its role:
+`read_role_defaults` reads the roles kit's catalogue through its `roles_lib.load_roles`, the kit found
+by `resolve_kit_dir` and imported inside the function, and `resolve_item_declaration` gives the item
+its role's `reads`, `writes` and `returns`, naming each field's source. `check_item_declarations`
+refuses an actor that is not one string of a declared kind, a non-role item missing a field, a role
+item's explicit field equal to its role's (a copy), and a role item's explicit `allowance` other than
+`none`. A slot the catalogue lacks prints `pending`, and every role item `unarmed` where the roles
+kit does not resolve; neither is a refusal, and the loop kit declares no edge to that kit. Every
+item's `witness` is graded by `check_witness_classes` beside the steps', and joins the actor list.
+
 A definition that does not hold is refused with `LoopError`, a `ValueError` naming the file and the row: a
 file that does not read or is no TOML; a `step` or `workflow` table that is no array of tables; the gov
 steps missing, repeated or out of order, a tag that is no gov step, or an `order` that is not the step's
@@ -61,10 +73,12 @@ it; `read_dispositions` and `--check` refuse a definition that declares no set.
 
 `--check` prints one line per step and per workflow, the set and one line per alias, then a count, and exits 0; a refused definition is one
 line and exit 1. It prints each step's program, `loop: program <step> · <n> item(s) · <tags>` in needs
-order, or `loop: inputs unarmed` and why before them where no layer tags resolve. It then prints the witness classes, one line per witness alias and per witness, one
+order, or `loop: inputs unarmed` and why before them where no layer tags resolve, then one `loop: item`
+line per item in file order, each field's source or `pending` or `unarmed`, and `loop: items · <n>
+read · <p> pending · <u> unarmed`. It then prints the witness classes, one line per witness alias and per witness, one
 line per list row with its build and the list's base line, the base or `no comparison` and why, the
-builds line, the folder or `foreign` and why, and each refusal of the list as `loop: refused · ...`,
-exit 1. `--fixture --plant <case>` reads the shipped
+builds line, the folder or `foreign` and why, and each refusal of the items and the list as
+`loop: refused · ...`, exit 1. `--fixture --plant <case>` reads the shipped
 definition and list with the named break made in memory, never on disk, the list's base being the
 shipped list as read, and exits 1 on the refusal the break must draw, 0 if the reader accepted it. The
 plants are `PLANTS`. `--grade-site <site> <entry>...` prints `loop: site <site> · <item> · <word> ·
@@ -75,13 +89,15 @@ error, a site outside `DECLARATION_SITES` included.
 
 WHAT THIS DOES NOT CHECK: that a workflow row names a workflow the roles kit holds, which is that kit's
 catalogue check, both ways; that a step tag or an item tag is registered in its namespace, which is the
-tag index's; what a `state` word means; an item's actor, allowance, return template or witness beyond
-being read, each field's content being its own unit's; a need on an item outside the five programs; that
+tag index's; what a `state` word means; that a `command:` name names a real command, a `hook:` event
+exists, or a pending role's slot is the stem a later build ships; a non-role item's allowance beyond
+being non-empty; a need on an item outside the five programs; that
 a `stand-in:` path exists or a `transition` route reaches a transition table; that a disposition record's
 `Item` names a declared item, which reads None; or that a writer resolved an alias before it wrote. An
 unknown key on a row is not read and not refused. That a witness's `by` is true. Stdlib only, but for
 `read_actor_base` and `read_builds_dir`, which import the memory-tree kit's compare base and its conf
-reader inside the function, so a reader calling `load_loop` never reaches them.
+reader inside the function, and `read_role_defaults`, which imports the roles kit's library there, so a
+reader calling `load_loop` never reaches them.
 """
 import pathlib
 import re
@@ -132,7 +148,15 @@ PLANTS = {"missing-step": "the step.deploy row taken out",
           "input-no-layer": "item.plan.input's input read from layer.memry",
           "exit-missing": "step.plan's exit set to item.design.exit, an item of another step",
           "scope-selected": "each item's scope derived over a scratch manifest scoping one unit to item.plan.record",
-          "scope-no-kit": "the layer tags and each item's scope resolved from a scratch directory with no playbook kit"}
+          "scope-no-kit": "the layer tags and each item's scope resolved from a scratch directory with no playbook kit",
+          "actor-two": "item.build.unit-pass's actor set to the list role:gov-builder and command:build.unit-pass",
+          "actor-bad-kind": "item.build.unit-pass's actor set to agent:x",
+          "witness-missing": "item.build.unit-pass's witness taken off",
+          "allowance-missing": "item.plan.place's allowance taken off",
+          "role-copy": "item.build.unit-pass given allowance product, its role's writes",
+          "role-widen": "item.design.seams, a role:gov-reuse-scout item, given allowance product",
+          "role-pending": "item.build.unit-pass's actor set to role:gov-no-such-role",
+          "roles-no-kit": "the roles kit resolved from an empty scratch directory"}
 #: The plants whose break is in what the scope verb reads rather than in the definition, so `--check`
 #: runs whole and the scope verb runs after it.
 SCOPE_PLANTS = ("scope-selected", "scope-no-kit")
@@ -141,6 +165,10 @@ PLANT_SCOPE_UNIT = ("unit.loop-fixture", "item.plan.record")
 #: The declaration sites outside the definition whose entries `--grade-site` grades: the unattended
 #: driver's core Definition of Done and the conf's extra one, each a set of `<item>:<word>` entries.
 DECLARATION_SITES = ("DOD_CORE", "DOD_EXTRA")
+#: An item's actor kinds, closed (TOOL-dDeclaredLoop-9): one actor per item, of one kind.
+ACTOR_KINDS = ("role", "command", "executor", "hook", "owner")
+#: An item's actor, `<kind>:<name>`, fullmatched; the bare `executor` and `owner` are the other form.
+ACTOR_FORM = re.compile(r"([a-z]+):([^\s,:]+)")
 
 
 class LoopError(ValueError):
@@ -235,8 +263,9 @@ def resolve_alias(rows, word):
 
 def check_witness_classes(data, where):
     """`data`'s witnesses graded: `[witnesses]`, then every `[[witness-alias]]` row, then every `[[step]]`
-    row's `witness`; `[(site, class, by)]` per witness, a step's site its tag. LoopError naming `where`
-    and the table and row that does not hold, a definition declaring no `[witnesses]` included."""
+    row's `witness` and every `[[item]]` row's after them (TOOL-dDeclaredLoop-9); `[(site, class, by)]`
+    per witness, a step's or an item's site its tag. LoopError naming `where` and the table and row that
+    does not hold, a definition declaring no `[witnesses]` included."""
     table = data.get("witnesses")
     if not isinstance(table, dict):
         raise LoopError(where, "declares no witness classes, a [witnesses] table with classes and refused")
@@ -258,17 +287,18 @@ def check_witness_classes(data, where):
         raise LoopError(where, "'witness-alias' is not an array of tables")
     check_alias_rows(aliases, members, "witness-alias", where)
     witnesses = []
-    for row in data.get("step", []):
+    sites = [("step", r) for r in data.get("step", [])] + [("item", r) for r in read_item_rows(data, where)]
+    for kind, row in sites:
         tag, witness = row.get("tag"), row.get("witness")
         if witness is None:
-            raise LoopError(where, "the step %s carries no witness, an inline table { class, by }" % tag)
+            raise LoopError(where, "the %s %s carries no witness, an inline table { class, by }" % (kind, tag))
         if not isinstance(witness, dict) or not isinstance(witness.get("class"), str):
-            raise LoopError(where, "the step %s carries a witness with no class" % tag)
+            raise LoopError(where, "the %s %s carries a witness with no class" % (kind, tag))
         if not isinstance(witness.get("by"), str) or not witness["by"].strip():
-            raise LoopError(where, "the step %s carries a witness with no by, what witnesses it" % tag)
+            raise LoopError(where, "the %s %s carries a witness with no by, what witnesses it" % (kind, tag))
         if witness["class"] not in members:
-            raise LoopError(where, "the step %s witness class %r is no class and not refused: %s" % (
-                tag, witness["class"], " ".join(members)))
+            raise LoopError(where, "the %s %s witness class %r is no class and not refused: %s" % (
+                kind, tag, witness["class"], " ".join(members)))
         witnesses.append((tag, witness["class"], witness["by"]))
     return witnesses
 
@@ -688,6 +718,107 @@ def check_program(data, where, layers):
     return {s: [t for t in order if declared[t]["step"] == s] for s in STEP_TAGS}
 
 
+def read_role_defaults(kit_dir):
+    """`(roles, "")`, the roles kit's catalogue as its `roles_lib.load_roles` reads it, the kit found
+    from `kit_dir` through `resolve_kit_dir` and its library imported inside the function, as
+    `read_builds_dir` reaches the memory-tree kit; or `(None, why)` where the kit does not resolve, its
+    library does not import or its catalogue does not read."""
+    try:
+        roles_dir = resolve_kit_dir("roles", "roles_lib.py", kit_dir)
+        if str(roles_dir) not in sys.path:
+            sys.path.insert(0, str(roles_dir))
+        import roles_lib  # the roles kit's reader, found above
+    except (LookupError, ImportError) as e:
+        return None, str(e)
+    try:
+        return roles_lib.load_roles(roles_dir), ""
+    except roles_lib.RolesError as e:
+        return None, str(e)
+
+
+def resolve_item_declaration(item, roles):
+    """`{"inputs", "allowance", "returns", "source"}` of one `[[item]]` row, `source` naming each
+    field's: `item` where the row declares it, which a non-role item always does; for a `role:<slot>`
+    item's absent field, its role's `reads` split on commas, `writes` or `returns`, sourced
+    `role:<slot>`, or None sourced `pending` where `roles` holds no such slot and `unarmed` where
+    `roles` is None."""
+    actor = item.get("actor")
+    slot = actor[len("role:"):] if isinstance(actor, str) and actor.startswith("role:") else None
+    out, source = {}, {}
+    for field, key in (("inputs", "reads"), ("allowance", "writes"), ("returns", "returns")):
+        if field in item or slot is None:
+            out[field], source[field] = item.get(field), "item"
+        elif roles is None or slot not in roles:
+            out[field], source[field] = None, "unarmed" if roles is None else "pending"
+        else:
+            value = roles[slot]["keys"].get(key)
+            if field == "inputs" and isinstance(value, str):
+                value = [v.strip() for v in value.split(",") if v.strip()]
+            out[field], source[field] = value, actor
+    out["source"] = source
+    return out
+
+
+def check_item_declarations(items, roles, why):
+    """`(lines, refusals)` of the `[[item]]` rows `items`: one `loop: item` line per item in file order
+    and the count line, and one refusal per field that does not hold. The actor is one string,
+    `ACTOR_FORM` with its kind in `ACTOR_KINDS`, or the bare `executor` or `owner`. A non-role item
+    carries a non-empty `inputs` list, `allowance` and `returns`; a role item's absent ones are its
+    role's through `resolve_item_declaration`, an explicit one equal to its role's is refused as a copy,
+    and its explicit `allowance` may only be `none`. A role the catalogue `roles` lacks prints `pending`,
+    and every role item `unarmed` with `why` where `roles` is None; neither is a refusal."""
+    lines, refusals, pending, unarmed = [], [], 0, 0
+    for row in items:
+        tag, actor = row.get("tag"), row.get("actor")
+        form = ACTOR_FORM.fullmatch(actor) if isinstance(actor, str) else None
+        kind = actor if actor in ("executor", "owner") else form.group(1) if form else None
+        if kind is None:
+            refusals.append("the item %s actor %r is not one string <kind>:<name>, executor or owner: one "
+                            "actor per item" % (tag, actor))
+        elif kind not in ACTOR_KINDS:
+            refusals.append("the item %s actor kind %s is not one of %s" % (tag, kind, " ".join(ACTOR_KINDS)))
+            kind = None
+        got = resolve_item_declaration(row, roles)
+        if kind is not None and kind != "role":
+            for field in ("inputs", "allowance", "returns"):
+                value = got[field]
+                if field == "inputs":
+                    ok = isinstance(value, list) and value and all(isinstance(v, str) and v.strip() for v in value)
+                else:
+                    ok = isinstance(value, str) and value.strip()
+                if not ok:
+                    refusals.append("the item %s carries no %s, which a %s actor declares" % (tag, field, kind))
+        elif kind == "role":
+            slot = form.group(2)
+            role = roles.get(slot) if roles is not None else None
+            for field, key in (("inputs", "reads"), ("allowance", "writes"), ("returns", "returns")):
+                if field not in row or role is None:
+                    continue
+                theirs = role["keys"].get(key)
+                if field == "inputs" and isinstance(theirs, str):
+                    theirs = [v.strip() for v in theirs.split(",") if v.strip()]
+                if row[field] == theirs:
+                    refusals.append("the item %s %s copies its role %s's %s; leave it out and the role's "
+                                    "applies" % (tag, field, slot, key))
+            allowance = row.get("allowance", "none")
+            if allowance != "none" and (role is None or allowance != role["keys"].get("writes")):
+                refusals.append("the item %s allowance %r widens its role %s: a role item's allowance may only "
+                                "be none" % (tag, allowance, slot))
+            if roles is None:
+                unarmed += 1
+                lines.append("loop: item %s · %s · unarmed · %s" % (tag, actor, why))
+                continue
+            if role is None:
+                pending += 1
+                lines.append("loop: item %s · %s · pending · the roles kit holds no %s role" % (tag, actor, slot))
+                continue
+        src = got["source"]
+        lines.append("loop: item %s · %s · inputs from %s · allowance %s from %s · returns from %s" % (
+            tag, actor, src["inputs"], got["allowance"], src["allowance"], src["returns"]))
+    lines.append("loop: items · %d read · %d pending · %d unarmed" % (len(items), pending, unarmed))
+    return lines, refusals
+
+
 def read_layer_tags(kit_dir):
     """The layer tags of the playbook kit's `layers.toml`, each `[[layer]]` row's `tag`, the kit found
     from `kit_dir` through `resolve_kit_dir`; LookupError where it does not resolve. LoopError where the
@@ -810,6 +941,22 @@ def write_loop_plant(data, case, rows, base_rows):
         elif case == "input-no-layer":
             inputs = items["item.plan.input"]["inputs"]
             inputs[0] = "layer.memry:" + inputs[0].split(":", 1)[1]
+        elif case == "actor-two":
+            items["item.build.unit-pass"]["actor"] = ["role:gov-builder", "command:build.unit-pass"]
+        elif case == "actor-bad-kind":
+            items["item.build.unit-pass"]["actor"] = "agent:x"
+        elif case == "witness-missing":
+            items["item.build.unit-pass"].pop("witness")
+        elif case == "allowance-missing":
+            items["item.plan.place"].pop("allowance")
+        elif case == "role-copy":
+            items["item.build.unit-pass"]["allowance"] = "product"
+        elif case == "role-widen":
+            items["item.design.seams"]["allowance"] = "product"
+        elif case == "role-pending":
+            items["item.build.unit-pass"]["actor"] = "role:gov-no-such-role"
+        elif case == "roles-no-kit":
+            pass  # its break is the roles kit's directory, which `main` resolves from a scratch directory
         else:
             plan["exit"] = "item.design.exit"
 
@@ -843,8 +990,9 @@ def main(argv):
         for line in lines:
             print(line)
         return 0
-    # A scope plant's scratch directory sits under the host temp directory and is removed after.
-    scratch = tempfile.TemporaryDirectory() if plant in SCOPE_PLANTS else None
+    # A scope plant's or roles-no-kit's scratch directory sits under the host temp directory and is
+    # removed after.
+    scratch = tempfile.TemporaryDirectory() if plant in SCOPE_PLANTS + ("roles-no-kit",) else None
     layer_dir = scratch.name if plant == "scope-no-kit" else kit_dir
     try:
         data, where = read_definition(kit_dir)
@@ -882,6 +1030,10 @@ def main(argv):
         print("loop: inputs unarmed · %s" % layers_why)
     for step, tags in program.items():
         print("loop: program %s · %d item(s) · %s" % (step, len(tags), " ".join(tags)))
+    roles, roles_why = read_role_defaults(scratch.name if plant == "roles-no-kit" else kit_dir)
+    item_lines, item_refusals = check_item_declarations(read_item_rows(data, where), roles, roles_why)
+    for line in item_lines:
+        print(line)
     print("loop: witness classes %s · refused %s" % (" ".join(data["witnesses"]["classes"]),
                                                       " ".join(data["witnesses"]["refused"])))
     for a in data.get("witness-alias", []):
@@ -903,10 +1055,11 @@ def main(argv):
         print("loop: actor-list builds · foreign · %s" % builds_why)
     else:
         print("loop: actor-list builds · %s" % builds_dir.as_posix())
-    refusals = check_actor_list(rows, base_rows, sites, builds_dir)
-    if scratch is not None and not refusals:
+    refusals = item_refusals + check_actor_list(rows, base_rows, sites, builds_dir)
+    if plant in SCOPE_PLANTS and not refusals:
         refusals = check_scope_plant(plant, layers, pathlib.Path(scratch.name), kit_dir, root,
                                      [r["tag"] for r in data.get("item", [])])
+    if scratch is not None:
         scratch.cleanup()
     for r in refusals:
         print("loop: refused · %s" % r)

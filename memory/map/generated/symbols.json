@@ -6198,6 +6198,11 @@
       "file": "tools/process-monitor/scope.py"
     },
     {
+      "id": "check_item_declarations",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "check_journal",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
@@ -20463,6 +20468,11 @@
       "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
+      "id": "read_role_defaults",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "read_role_field",
       "kind": "function",
       "file": "tools/playbook/load_sets.py"
@@ -24476,6 +24486,11 @@
       "id": "resolve_introducing_commit",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
+    },
+    {
+      "id": "resolve_item_declaration",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "resolve_job_backend",
