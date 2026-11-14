@@ -238,4 +238,5 @@ memory/builds/aWitnessedCrash/README.md
 memory/builds/aNimbleMend/README.md
 memory/builds/aBatchedPacket/README.md
 memory/builds/aCarriedStop/README.md
+memory/builds/aClearedLedger/README.md
 memory/builds/aBriskDeclaration/README.md

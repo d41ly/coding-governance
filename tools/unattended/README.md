@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.121 -->
+<!-- gov:kit unattended@1.122 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -104,8 +104,31 @@ file before anything runs `--check`.
 it UNWIRED with the merge command as the remedy. While the run-state record on the CURRENT branch
 is in any phase before `VERIFYING`, it exits 2 on a command that would run the flagged bar
 (`GATE_FULL=` or `GATE_SELFTESTS=` with a non-empty value) or a self-test suite (a word ending
-`run-selftests.sh`, `run-unattended-gates.sh` or `.test.sh` at command position, `bash -c` bodies
-included). The read-only verbs — `--list`, `--check`, `--rank`, `--help`, `--render` — pass, the
+`run-selftests.sh`, `run-unattended-gates.sh`, `.test.sh` or `selftest.py` at command position,
+`bash -c` bodies included). It also refuses a script the gate manifest declares a suite by cost:
+a `chunk = selftests` leg of the `gate-legs.json` in the directory above the kit, run in a
+direct-check form (`--selftest`, `--fixture` or a bare `fixture` word) and with a `ceiling`
+above the direct-check bound the hook exports. Any word of a simple command may name the leg's
+script, whatever launcher stands in front of it, with `\` folded to `/`, case ignored and leading
+`./` taken off, by a trailing path in either direction: the script under a longer path and its
+bare file name after a `cd` both do. A shorter spelling that still reaches that word is refused,
+and so is one whose option value differs from the leg's; a longer one, or one with another option
+name, a single fixture case say, is the direct check and passes, as does every direct-check form
+at or under the bound and every such script the manifest does not declare. A word ends at a glued
+`>` or `<`, so a redirection hides neither this form nor a suite word. The gaps this row keeps:
+two files that share a file name, or a trailing path, read alike; an unquoted mention of a script
+and its direct-check word at an argument position reads as a run; a path assembled at run time, a
+module name after `-m` with no path, and a python heredoc walk past it; a spelling whose option
+name differs from the leg's is read as scoped, whatever the script does with it; a redirection
+carrying `&` ahead of the direct-check word cuts the command there (`<script> 2>&1 --selftest`),
+so the script and its word fall into two commands though bash runs the suite; a suite the
+manifest does not declare, or declares in another chunk, is not seen, and the manifest is read
+uncommitted. The spec lint's bar join holds the same rule, and reads these spellings the hook does
+not: a redirection carrying `&` ahead of the direct-check word, a glued variable prefix
+(`${DIR}<script>`), a quoted mention, a quoted operator character before a redirection
+(`'&'>x.log`, `'>'>x.log`), which this row keeps as an argument, and a `bash -c` body inside
+another. The
+read-only verbs — `--list`, `--check`, `--rank`, `--help`, `--render` — pass, the
 plain bar passes, and a quoted mention of any shape is invisible. It keys the record to the branch
 through the `run-branch:` fact `--preflight` writes on both anchors (protocol fact 13), falling
 back to `branch-ref:` for a record written before that fact existed, and it fails open on every

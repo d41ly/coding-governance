@@ -4,7 +4,7 @@
  * while the unattended run on the current branch is in a phase before VERIFYING, and refuses an
  * `AskUserQuestion` call from the session holding a non-terminal run's lease.
  *
- * gov:kit unattended@1.121 — a courtesy marker; the kit version gate pairs the four named `.sh`
+ * gov:kit unattended@1.122 — a courtesy marker; the kit version gate pairs the four named `.sh`
  * carriers and every `*.template.md`, and does not read this one.
  *
  * Contract: the spec for TOOL-aDeferredBar-3 under the build folder of that slug.
@@ -38,12 +38,42 @@
  *       review F2 — six of the manifest's `chunk = selftests` legs are that file, govkit's at
  *       3445 s among them).
  *   D5  the quoted body of `bash -c` / `sh -c`, scanned once as a command of its own
+ *   D6  a script the gate manifest declares a suite by cost (TOOL-aClearedLedger-3, and
+ *       TOOL-aClearedLedger-11 for the match): ANY word of a simple command, and the words after
+ *       it, spell a `chunk = selftests` leg of MANIFEST_BASENAME, read in the directory above this
+ *       file, whose `ceiling` is above DIRECT_CHECK_BOUND and whose argv carries one of
+ *       DIRECT_CHECK_WORDS. The word need not be the head the grammar above resolves, so a
+ *       launcher it does not skip (`"$PY"`, `python.exe`, `python3 -u -B`, `python -m pdb`, an
+ *       `if`) hides nothing. The word names the leg's script with `\` folded to `/`, case ignored
+ *       and leading `./` taken off, by a trailing path in EITHER direction: `<dir>/<script>` and
+ *       the bare file name after a `cd` both do. A SHORTER spelling that still reaches the leg's
+ *       direct-check word is a hit (`check_policy.py --fixture` runs every case), and so is one
+ *       whose option VALUE differs from the leg's (`--strict-from <other dir>` scopes nothing);
+ *       a LONGER one, or one whose option name differs, is a scoped variant and is not
+ *       (`check_policy.py --fixture <case>`, `--fixture --list`). Redirection words are taken out
+ *       before the compare, and a word ends at a glued `>` or `<`, which rows D2 to D4 gain too.
+ *       A direct-check form at or under the bound stays the direct check a spec names.
+ *       WHAT ROW D6 DOES NOT TELL APART OR SEE: two files that share a file name, or a trailing
+ *       path, read alike; an unquoted mention of a script and its direct-check word at an argument
+ *       position (`echo <script> --selftest`) reads as a run; a path assembled at run time, a
+ *       module name after `-m` with no path, and a python heredoc walk past it; a spelling whose
+ *       option name differs from the leg's is read as scoped, whatever the script does with it;
+ *       a redirection carrying `&` ahead of the direct-check word cuts the command there
+ *       (`<script> 2>&1 --selftest`, `<script> &>x.log --selftest`), so the script and its word
+ *       fall into two commands though bash runs the suite (TOOL-aClearedLedger-13);
+ *       and it does not see a suite the manifest does not declare or declares in another chunk,
+ *       and reads the manifest uncommitted. The spec lint's bar join holds the same rule and reads
+ *       these spellings this row does not: a redirection carrying `&`
+ *       ahead of the direct-check word, a glued variable prefix (`${DIR}<script>`), a quoted
+ *       mention, a quoted operator character before a redirection (`'&'>x.log`, `'>'>x.log`),
+ *       which this row keeps as an argument, and a `bash -c` body inside another.
  * A D2, D3 or D4 token is NOT a hit when the same simple command carries one of READ_ONLY_VERBS:
  * those forms answer in seconds and one of them is how the memory-tree kit re-renders its guides.
+ * Row D6 does not consult them: a command carrying one is a longer spelling and misses.
  * The rows are measured against the manifest rather than restated beside it: the suite's parity arm
- * feeds every `chunk = selftests` argv to this predicate, exempting a `--selftest` flag form only
- * by its declared ceiling and printing each exemption (round 2 R3) — the flag form is textual and
- * this hook does not read a ceiling, so a flag-form suite above the bound is declared there by name.
+ * feeds every `chunk = selftests` argv to this predicate, exempting a direct-check form only at or
+ * under the bound and printing each exemption (round 2 R3). Rows D2 to D4 are textual; row D6 is
+ * the one that reads a ceiling, so a flag-form suite above the bound is denied and not declared.
  *
  * THE QUESTION ARM (TOOL-aOrientedCast-22). An unattended run never asks (BUILD-METHOD M10): nobody
  * is there to answer, and a run that called `AskUserQuestion` stalled until the owner came back. A
@@ -66,7 +96,7 @@
  * WHAT IT NEVER DENIES. The plain bar — `run-gates.sh` with neither flag — is the scoped form the
  * owner allows at the main loop, and this hook cannot tell a child from the main loop; the child
  * prompt forbids it there by instruction. Nor the pass-leg runner `pass-legs.sh` with neither
- * flag: it matches none of rows D1 to D5, and scratch-guard's row G2 refuses it to a role agent.
+ * flag: it matches none of rows D1 to D6, and scratch-guard's row G2 refuses it to a role agent.
  * A quoted MENTION of any of the shapes — a commit
  * message, a `grep` argument, a heredoc body — is invisible by construction of the view, with one
  * exception read on purpose: a `$( … )` or backtick span inside DOUBLE quotes, or inside an
@@ -80,8 +110,10 @@
  * branch may still ask — or from one whose run is at `LANDED` or `ABORTED`, or whose `--liveness`
  * reads TERMINAL.
  *
- * THE KEY. The predicate runs first, and the filesystem is read only on a hit: the overwhelming
- * majority of tool calls carry no deny shape and cost one scan of one string. On a hit the hook
+ * THE KEY. The predicate runs first, and the filesystem is read only on a hit or a row D6
+ * candidate — a simple command carrying one of DIRECT_CHECK_WORDS: the overwhelming
+ * majority of tool calls carry neither and cost one scan of one string. The manifest is read
+ * once, and only after a live run is found. On a hit or a candidate the hook
  * walks up from the payload's `cwd` to `.git`, reads the PER-WORKTREE `HEAD` (never the common
  * dir's, whose HEAD is the primary tree's branch), reads `MEMORY_ROOT` from `.unattended.conf`,
  * and reads every `<MEMORY_ROOT>/builds/<slug>/RUN.md` whose `run-branch:` — else `branch-ref:`,
@@ -90,8 +122,9 @@
  * the branch and never the existence of a record. A matched record in a phase outside
  * PHASES_ALLOW denies, naming that record.
  *
- * NO PATH OUTSIDE THIS FILE IS SPELLED. The conf key, the conf basename and the record basename
- * are the only names; the kit dir, the memory root and the record path are derived from the walk.
+ * NO PATH OUTSIDE THIS FILE IS SPELLED. The conf key, the conf basename, the record basename and
+ * the manifest basename are the only names; the kit dir, the memory root and the record path are
+ * derived from the walk, and the manifest is read in the directory above this file's own.
  * The four allowed phase names are restated here deliberately (spec §8 F5): reading them from the
  * driver at run time would switch this hook off silently the day the driver could not be read,
  * because the hook fails open; four literals pinned by a direct read and a suite arm fail loudly.
@@ -107,7 +140,8 @@
  *
  * FAILS OPEN. Unparseable stdin, an unknown tool, a missing command, no `.git`, a detached HEAD,
  * no conf, no record on this branch, no lease for the session, an unloadable `run-lease.js`:
- * every one exits 0. This is a hygiene rule, not a containment
+ * every one exits 0. An absent manifest, one that does not parse and one that is no list leave
+ * row D6 unarmed and rows D1 to D5 standing. This is a hygiene rule, not a containment
  * boundary; a security control would have to fail the other way. ONE input does not allow: an
  * unreadable liveness (no `verdict:` line, a non-zero exit, the bound, or stop-guard.js failing to
  * load) leaves a leased run's recorded phase standing, because an allow there would switch the
@@ -139,6 +173,12 @@ const READ_ONLY_VERBS = ['--list', '--check', '--rank', '--help', '--render']
 const CONF_BASENAME = '.unattended.conf'
 const CONF_KEY = 'MEMORY_ROOT'
 const RECORD_BASENAME = 'RUN.md'
+// Row D6 (TOOL-aClearedLedger-3). A leg whose `ceiling` is at or under the bound is a direct check;
+// 300 is the manifest's default ceiling. The words are the arguments that make a script run its own
+// checks. Both are restated in gate-guard.test.sh and pinned there against these exports.
+const DIRECT_CHECK_BOUND = 300
+const DIRECT_CHECK_WORDS = ['--selftest', '--fixture', 'fixture']
+const MANIFEST_BASENAME = 'gate-legs.json'
 const MAX_NEST = 1
 
 function readStdin() {
@@ -326,12 +366,19 @@ function readQuotedSubstitutions(text, tool) {
  * (closing round 3, T4): pairing the outer `"` with the first `"` inside the span split
  * `msg="$(printf "%s" "run bash <suite> next")"` into an assignment word and a launcher at head.
  * Bash's rule under both tools; the span itself is read back by readQuotedSubstitutions.
+ * A word also ends before an unquoted `>` or `<` once it holds quoting, an empty pair included, or
+ * anything but descriptor digits and operator characters, outside `${…}` (TOOL-aClearedLedger-11,
+ * narrowed by TOOL-aClearedLedger-12 so a two-character operator is one word, and by
+ * TOOL-aClearedLedger-14 so a quoted character is never part of an operator). The reader is shared,
+ * so rows D2 to D4 see a glued redirection too. It returns `quotedAt`, the offset in the word where
+ * its quoting opened, -1 for a word with none.
  */
 function readTokenAt(cmd, from, stop) {
   let i = from
   while (i < stop && /\s/.test(cmd[i])) i++
   let out = ''
   let quote = ''
+  let quotedAt = -1   // where in `out` the word's first quote opened; -1 for a word with none
   let brace = false   // inside a `${…}` — its braces are the token's, not grouping (round 2, R4)
   while (i < stop) {
     const ch = cmd[i]
@@ -349,6 +396,7 @@ function readTokenAt(cmd, from, stop) {
       } else out += ch
     } else if (ch === "'" || ch === '"') {
       quote = ch
+      if (quotedAt < 0) quotedAt = out.length
     } else if (ch === '{' && cmd[i - 1] === '$') {
       brace = true
       out += ch
@@ -357,12 +405,21 @@ function readTokenAt(cmd, from, stop) {
       out += ch
     } else if (/[\s;|&(){}`]/.test(ch)) {
       break
+    } else if ((ch === '>' || ch === '<') && !brace && (quotedAt >= 0 || !/^\d*[<>]*$/.test(out))) {
+      // A glued redirection ends the word (TOOL-aClearedLedger-11): `x.py --selftest>x.log` is the
+      // flag and then a redirection word. While the word so far is unquoted descriptor digits and
+      // operator characters, it is read on (TOOL-aClearedLedger-12): `>>`, `2>>` and `<<<` stay one
+      // word, so REDIRECT_RE drops the operator with its target, glued or spaced. A word holding
+      // quoting ends here, as bash ends it: `'&'>x.log` and `'>'>x.log` are an argument and then
+      // a redirection (TOOL-aClearedLedger-14). An empty pair is quoting too: `"">x.log` is an empty
+      // argument and then a redirection (TOOL-aClearedLedger-16).
+      break
     } else {
       out += ch
     }
     i++
   }
-  return { text: out, end: i }
+  return { text: out, end: i, quotedAt }
 }
 
 /**
@@ -373,6 +430,9 @@ function readTokenAt(cmd, from, stop) {
  * whose view is all blank while its text is not can only be a heredoc body — a quoted string keeps
  * its quote marks — and is skipped whole; without that the body of `python - <<EOF` would be read
  * as commands, which is exactly what the view exists to prevent.
+ *
+ * Each token array carries a parallel array `quotedAt` as a property, each word's quoting offset
+ * from readTokenAt; a word that unquotes to empty is kept by that fact (TOOL-aClearedLedger-14).
  */
 function scanSegments(cmd, view) {
   const out = []
@@ -381,15 +441,17 @@ function scanSegments(cmd, view) {
     if (e <= s) return
     if (/\S/.test(cmd.slice(s, e)) && !/\S/.test(view.slice(s, e))) return
     const toks = []
+    const quotedAt = []
     let at = s
     while (at < e) {
       const t = readTokenAt(cmd, at, e)
       if (t.end <= at) break
-      if (t.text !== '' || /["']/.test(cmd.slice(at, t.end))) toks.push(t.text)
+      if (t.text !== '' || t.quotedAt >= 0) { toks.push(t.text); quotedAt.push(t.quotedAt) }
       at = t.end
     }
     // `then`, `do` and `else` open a command position; drop them so the word after is the head.
-    while (toks.length && /^(then|do|else)$/.test(toks[0])) toks.shift()
+    while (toks.length && /^(then|do|else)$/.test(toks[0])) { toks.shift(); quotedAt.shift() }
+    toks.quotedAt = quotedAt
     if (toks.length) out.push(toks)
   }
   let brace = false   // `${…}` is one word, not a group (round 2, R4); readTokenAt agrees
@@ -421,6 +483,8 @@ const ASSIGN_RE = /^[A-Za-z_][A-Za-z0-9_]*=/
 const DURATION_RE = /^(?:\d+(?:\.\d+)?[smhd]?|\$.+)$/
 const SHORT_OPT_RE = /^-[A-Za-z]+$/
 const VERSION_OPT_RE = /^-\d+(?:\.\d+)?$/   // `py -3`, `py -3.12`: the launcher's version selector (closing round 3, T6)
+// A redirection word: `>`, `>>`, `2>`, `&>`, `<`, `<<<`, bare or with its target glued (row D6).
+const REDIRECT_RE = /^(?:\d*|&)(?:>>?|<{1,3})/
 
 function resolveFileRow(tok) {
   if (/run-selftests\.sh$/.test(tok)) return { row: 'D2', what: 'runner', shape: 'the self-test runner' }
@@ -434,8 +498,19 @@ function resolveFileRow(tok) {
  * `export`, `time`, `nohup`, `NAME=value` words, `timeout N`, and `bash`/`sh` with one short option;
  * row D5 re-enters once on the argument of `-c`. `{`, `time` and `nohup` were added by the corpus
  * measurement (spec rev-4): 38 runs sat among the near-misses of the grammar without them.
+ *
+ * `candidates`, when passed, collects row D6's candidates and leaves the return value alone: each
+ * simple command whose resolved head carries no D2 to D4 row and whose words include one of
+ * DIRECT_CHECK_WORDS pushes `{ words }`, `words` being EVERY word of the simple command, the
+ * launcher words included, with redirections taken out (TOOL-aClearedLedger-11: the head the
+ * grammar resolved is not what names the script, and a segment it left with no head, behind
+ * `python -m` say, is a candidate too). A redirection is a word to scanSegments, so `> x.log` and
+ * `2>` would otherwise be compared as arguments. A word holding quoting is a redirection only when
+ * the text before its quoting starts with an operator REDIRECT_RE matches, so `'&'` and `2'>'x` are
+ * words, and `2>"x.log"` and `>'>x.log'` are redirections (TOOL-aClearedLedger-15). Only a word with
+ * no quoting can be a bare operator whose target is the next word. Both recursions hand the array on.
  */
-function scanDenyHits(cmd, view, depth, tool) {
+function scanDenyHits(cmd, view, depth, tool, candidates) {
   depth = depth || 0
   const hits = []
   for (const toks of scanSegments(cmd, view)) {
@@ -525,7 +600,7 @@ function scanDenyHits(cmd, view, depth, tool) {
           if (opt === '-n') { head = null; break }
           if (opt === '-c' && depth < MAX_NEST && k < toks.length) {
             const body = toks[k]
-            for (const h of scanDenyHits(body, buildCommandView(body), depth + 1, tool)) {
+            for (const h of scanDenyHits(body, buildCommandView(body), depth + 1, tool, candidates)) {
               hits.push(Object.assign({}, h, { row: 'D5' }))
             }
             head = null
@@ -538,9 +613,18 @@ function scanDenyHits(cmd, view, depth, tool) {
         break
       }
     }
-    if (head === null) continue
-    const cls = resolveFileRow(head)
+    const cls = head === null ? null : resolveFileRow(head)
     if (cls && !readOnly) hits.push(Object.assign({ token: head }, cls))
+    if (candidates && !cls) {
+      const words = []
+      for (let j = 0; j < toks.length; j++) {
+        const q = toks.quotedAt[j]
+        const redir = REDIRECT_RE.exec(q < 0 ? toks[j] : toks[j].slice(0, q))   // the operator is unquoted text: a quoted character never joins it
+        if (!redir) words.push(toks[j])
+        else if (q < 0 && redir[0] === toks[j]) j++   // a bare unquoted operator: its target is the next word
+      }
+      if (words.some((w) => DIRECT_CHECK_WORDS.includes(w))) candidates.push({ words })
+    }
   }
   // A `$( … )` or backtick span inside a double-quoted string, or inside an unquoted heredoc body,
   // is a command of its own (round 2, R5 R6 R13; round 3, T1), scanned the way row D5 scans a
@@ -549,9 +633,76 @@ function scanDenyHits(cmd, view, depth, tool) {
   // through unchanged, so a `bash -c` inside a span is opened exactly as one outside it would be
   // (round 3, T8: `depth + 1` here spent row D5's cap and the nested `-c` was never read).
   for (const body of readQuotedSubstitutions(cmd, tool)) {
-    for (const h of scanDenyHits(body, buildCommandView(body), depth, tool)) hits.push(h)
+    for (const h of scanDenyHits(body, buildCommandView(body), depth, tool, candidates)) hits.push(h)
   }
   return hits
+}
+
+/**
+ * The manifest's suites by cost, as `[{ name, ceiling, words }]`: every row of the JSON list whose
+ * `chunk` is `selftests`, whose `argv` is a list of strings and whose `ceiling` is a number above
+ * DIRECT_CHECK_BOUND. `words` is the argv from its first word carrying `/` on, with a leading
+ * `{prefix}/` taken off that word. The shape is scratch-guard.js's `readGateLegs`, copied and not
+ * required for the reason buildHeredocView records. A read or parse failure, and a value that is
+ * no list, answer the empty list: the row is unarmed, never a throw.
+ */
+function readSuiteLegs(file) {
+  let rows
+  try {
+    rows = JSON.parse(fs.readFileSync(file, 'utf8'))
+  } catch {
+    return []
+  }
+  if (!Array.isArray(rows)) return []
+  const legs = []
+  for (const g of rows) {
+    if (!g || g.chunk !== 'selftests' || !Array.isArray(g.argv) || !g.argv.every((w) => typeof w === 'string')) continue
+    if (typeof g.ceiling !== 'number' || !(g.ceiling > DIRECT_CHECK_BOUND)) continue
+    const at = g.argv.findIndex((w) => w.includes('/'))
+    if (at < 0) continue
+    const words = g.argv.slice(at)
+    words[0] = words[0].replace(/^\{prefix\}\//, '')
+    legs.push({ name: String(g.name), ceiling: g.ceiling, words })
+  }
+  return legs
+}
+
+/**
+ * Row D6's match: the first leg the candidate spells, or null (TOOL-aClearedLedger-11). Every word
+ * of the candidate is tried as the script word, in order, and the spelling is that word and every
+ * word after it. Three rules, all of which hold, `at` being the place of the leg's first
+ * DIRECT_CHECK_WORDS member:
+ *   1  the word, folded (`\` to `/`, lower case, leading `./` segments off) and not empty, equals
+ *      the leg's script, ends with `/` and that script, or is a trailing path of it after a `/`;
+ *   2  the spelling has no more words than the leg, reaches `at`, and each word up to `at` equals
+ *      the leg's at that place;
+ *   3  each word after `at` equals the leg's, except at an option's VALUE — a leg word that does
+ *      not open with `-` behind one that does — where any word holds.
+ * So a shorter spelling that still runs the checks, and one with a changed option value, is a hit;
+ * a longer one or one with another option name — a case name, a read-only verb — is a miss. A leg
+ * whose argv carries no such member never matches: rows D2 to D4 own the word shapes.
+ */
+function checkSuiteLeg(candidate, legs) {
+  const words = candidate.words
+  for (let s = 0; s < words.length; s++) {
+    const word = words[s].replace(/\\/g, '/').toLowerCase().replace(/^(?:\.\/+)+/, '')
+    if (word === '') continue
+    const n = words.length - s
+    for (const leg of legs) {
+      const script = leg.words[0].toLowerCase()
+      if (word !== script && !word.endsWith('/' + script) && !script.endsWith('/' + word)) continue
+      const at = leg.words.findIndex((w, i) => i > 0 && DIRECT_CHECK_WORDS.includes(w))
+      if (at < 1 || n > leg.words.length || n < at + 1) continue
+      let holds = true
+      for (let i = 1; i < n && holds; i++) {
+        const want = leg.words[i]
+        const value = i > at && !want.startsWith('-') && leg.words[i - 1].startsWith('-')
+        holds = value || words[s + i] === want
+      }
+      if (holds) return leg
+    }
+  }
+  return null
 }
 
 /** `ref: refs/heads/x` → the ref; a bare sha → null, because a detached HEAD keys nothing. */
@@ -653,18 +804,32 @@ function resolveRunPhase(root, memoryRoot, ref) {
   return matched
 }
 
-/** The whole decision: hits first, the filesystem only on a hit. Null means allow. `tool` is the
- * payload's `tool_name`, read by the walker for the one rule that differs between the two wired
- * tools (closing round 3, T3). */
+/** The whole decision: hits and row D6's candidates first, the filesystem only on either, and the
+ * manifest only once a live run is found. Null means allow. `tool` is the payload's `tool_name`,
+ * read by the walker for the one rule that differs between the two wired tools (closing round 3, T3). */
 function checkCommand(cmd, cwd, tool) {
-  const hits = scanDenyHits(cmd, buildCommandView(cmd), 0, tool)
-  if (hits.length === 0) return null
+  const candidates = []
+  const hits = scanDenyHits(cmd, buildCommandView(cmd), 0, tool, candidates)
+  if (hits.length === 0 && candidates.length === 0) return null
   const repo = resolveRepoRoot(cwd)
   if (!repo) return null
   const memoryRoot = readMemoryRoot(repo.root)
   if (!memoryRoot) return null
   const live = resolveRunPhase(repo.root, memoryRoot, repo.headRef).filter((r) => !PHASES_ALLOW.includes(r.phase))
   if (live.length === 0) return null
+  if (candidates.length) {
+    const legs = readSuiteLegs(path.join(__dirname, '..', MANIFEST_BASENAME))
+    for (const c of candidates) {
+      const leg = checkSuiteLeg(c, legs)
+      if (leg) {
+        hits.push({
+          row: 'D6', what: 'suite', shape: 'a self-test suite',
+          token: `${leg.words[0]} (the gate manifest's leg "${leg.name}", ceiling ${leg.ceiling} s)`,
+        })
+      }
+    }
+  }
+  if (hits.length === 0) return null
   return { hits, live }
 }
 
@@ -797,8 +962,9 @@ function main() {
 if (require.main === module) main()
 module.exports = {
   readStdin, readHeredocs, buildHeredocView, readSpanEnd, buildCommandView, readQuotedSubstitutions,
-  scanSegments, scanDenyHits,
+  scanSegments, scanDenyHits, readSuiteLegs, checkSuiteLeg,
   resolveRepoRoot, readHeadRef, readMemoryRoot,
   resolveRunPhase, checkCommand, renderDeny, extractAskQuestions, checkAsk, renderAskDeny, main,
+  DIRECT_CHECK_BOUND, DIRECT_CHECK_WORDS, MANIFEST_BASENAME,
   PHASES_ALLOW, PHASES_TERMINAL, ASK_TOOL, ASK_QUOTE_MAX, READ_ONLY_VERBS, TOOLS, KIT_GATE_GUARD_VERSION,
 }

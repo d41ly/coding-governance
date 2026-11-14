@@ -66,7 +66,10 @@ key, read across their line wraps.
          self-test-suite INVOCATION, in a LIVE spec dated at or after SPEC_DIRECT_CUTOFF
          (`.memory-tree.conf`, blank = off) -> a hit (TOOL-aDeferredBar-2). A bar or a suite is
          not an acceptance observation: the pass observes the checker on a staged break, a
-         --selftest flag or a fixture, and the bar runs once after the build is complete. The
+         --selftest flag or a fixture, and the bar runs once after the build is complete. A
+         `--selftest`, `--fixture` or `fixture` form of a `chunk = selftests` leg whose manifest
+         ceiling is above DIRECT_CHECK_BOUND is a suite too, and its hit names the leg and the
+         ceiling (TOOL-aClearedLedger-5); a manifest with no `ceiling` denies no such form. The
          test runs FIRST in each loop, on the raw token, because NOT_A_TOKEN and NOT_A_LEG would
          drop the motivating `GATE_SELFTESTS=1 bash ...` token unread. Pre-cutoff carriers are
          COUNTED on the report line and listed by --list as NEAR, so the OFF state and the
@@ -450,6 +453,11 @@ AC_ORDER_KEY = "SPEC_AC_ORDER_CUTOFF"
 # `\S` read it as one while the hook of TOOL-aDeferredBar-3 unquoted it to OFF). The policy kit's
 # `check_policy.py --fixture` with no case is a suite, because it runs every case, while naming one
 # case makes it the direct check a criterion may name.
+# The pattern is the TEXTUAL half and reads no ceiling (TOOL-aClearedLedger-5): a `--selftest`,
+# `--fixture` or `fixture` form the manifest declares ABOVE DIRECT_CHECK_BOUND is a suite by cost,
+# and `check_bar` denies it by joining the token to the set `derive_flag_suites` reads from the
+# manifest. A form at or under the bound, and a longer or case-scoped spelling of a leg above it,
+# stay the direct check.
 BAR = re.compile(
     r"(?:^|&&|[;|(])\s*(?:\w+=\S*\s+)*(?:timeout\s+(?:(?:-[ks]|--kill-after|--signal)\s+\S+\s+|-\S+\s+)*\S+\s+)?"
     r"(?:(?:bash|sh|python3?(?:\.\d+)?|py)\s+(?:(?!-[ncm]\s)(?:-X\S*(?:\s+\S+)?|-[A-Za-z]+|-\d+(?:\.\d+)?)\s+)?)?(?:\S*/)?"
@@ -459,6 +467,118 @@ BAR = re.compile(
 BAR_WHY = ("a bar or suite is not an acceptance observation: observe the checker on a staged break, "
            "a --selftest flag or a fixture; name the suite under New arm:; the bar and the suites "
            "run once, after the build is complete")
+# TOOL-aClearedLedger-5: the manifest half of the bar join. The bound is the manifest's default
+# ceiling in seconds, and the words are the three direct-check spellings; the unattended kit's
+# gate guard carries both under the same names and values, and neither file reads the other.
+DIRECT_CHECK_BOUND = 300
+DIRECT_CHECK_WORDS = ("--selftest", "--fixture", "fixture")
+# TOOL-aClearedLedger-11: the separator characters are the gate guard's own. The split differs from
+# the hook's where TOOL-aClearedLedger-13 names it: an `&` beside a `>` is part of a redirection
+# (`2>&1`, `&>`) and does not split here, and does there; and the braces of `${ }` split here and
+# not there, since this pattern holds no brace state. In both the lint reads more. Every other `&`
+# splits, so `&&` splits twice and a bare `&` never survives as a word.
+# A quote character is NOT a separator: a quoted script path and its flag stay one command.
+SIMPLE_COMMAND_SPLIT = re.compile(r"[;|(){}`\n]|(?<!>)&(?!>)")
+# TOOL-aClearedLedger-13: read with `fullmatch` over a word. Group 1 stands before the operator and
+# group 2 is the target glued behind it.
+REDIRECTION = re.compile(r"(.*?)&?[<>]+&?(.*)", re.S)   # used with fullmatch
+
+
+def derive_flag_suites(rows, bound=DIRECT_CHECK_BOUND):
+    """The manifest's suites in a direct-check form, as `(name, ceiling, words)` in manifest order:
+    each `chunk = selftests` row whose `ceiling` is a number above `bound` and whose `words` hold a
+    member of DIRECT_CHECK_WORDS after the first. `words` is the argv from its first word carrying
+    a slash on, with a leading `{prefix}/` taken off that word."""
+    suites = []
+    for r in rows:
+        ceiling = r.get("ceiling")
+        if (r.get("chunk") != "selftests" or isinstance(ceiling, bool)
+                or not isinstance(ceiling, (int, float)) or ceiling <= bound):
+            continue
+        argv = r.get("argv") or []
+        at = next((i for i, a in enumerate(argv) if "/" in a), None)
+        if at is None:
+            continue
+        words = list(argv[at:])
+        if words[0].startswith("{prefix}/"):
+            words[0] = words[0][len("{prefix}/"):]
+        if any(w in DIRECT_CHECK_WORDS for w in words[1:]):
+            suites.append((r["name"], ceiling, tuple(words)))
+    return suites
+
+
+def check_bar(tok, flag_suites=()):
+    """The reason `tok` is a bar or suite invocation, or None: BAR_WHY when `BAR` matches it, and
+    BAR_WHY with a clause naming the leg and its ceiling when a simple command of it spells a
+    member of `flag_suites`.
+
+    The spelling rule is the gate guard's row D6 rule, held here in this file's own words
+    (TOOL-aClearedLedger-11). Each simple command is read twice (TOOL-aClearedLedger-13): flat, its
+    words split on whitespace, so a quoted body reads as words; and quoted, a quoted run kept one
+    word, so a value holding a space stays one. A leg spelled by either read is a hit. A word is
+    read with every quote character taken out. Everything from its first `>` or `<` on, with an
+    `&` glued ahead of that operator, is a redirection: what stands before it is kept as the word
+    unless it is empty or all digits, a file descriptor, and when nothing stands behind the
+    operator its target is the next word, which is dropped. Any word may be the script word: folded (`\\`
+    to `/`, lower case, leading `./` off) it equals the leg's script, ends with `/` and that
+    script, or is a trailing path of it. The words from it on are no more than the leg's, reach the
+    leg's direct-check word and equal the leg's up to it; after it each equals the leg's, except
+    that an option's VALUE (a leg word not opening with `-` behind one that does) may be any word.
+    Two files that share a file name read alike, and an unquoted mention at an argument position
+    reads as a run, as in the hook. This reader has no quote state over a command, no depth and no
+    brace state, and it keeps an `&` beside a `>` inside the command, so it OVER-reads the hook.
+    These are hits here and not there: a redirection carrying `&` ahead of the direct-check word
+    (`<script> 2>&1 --selftest`, where the hook cuts the command at the `&`);
+    a glued variable prefix (`${DIR}<script>`, which splits here at the braces); a quoted mention;
+    a quoted operator character before a redirection, which the hook keeps as an argument: a
+    quoted `&` splits the command here because the split pattern has no quote state, and a quoted
+    `>` is read with its quotes out and dropped as a redirection; and a `bash -c` body inside
+    another."""
+    if BAR.search(tok):
+        return BAR_WHY
+    for command in SIMPLE_COMMAND_SPLIT.split(tok):
+        # The flat read, then the quoted one; neither processes an escape, so a backslash
+        # survives for the fold below.
+        for raw in (command.split(),
+                    re.findall(r"(?:[^\s\"']|\"[^\"]*\"|'[^']*'|[\"'])+", command)):
+            words, drop_next = [], False
+            for w in raw:
+                w = w.replace("'", "").replace('"', "")
+                if not w:
+                    continue
+                if drop_next:
+                    drop_next = False
+                    continue
+                m = REDIRECTION.fullmatch(w)
+                if m:
+                    drop_next = not m.group(2)   # the operator ended the word: its target is next
+                    w = m.group(1)
+                    if not w or w.isdigit():     # nothing, or a file descriptor
+                        continue
+                words.append(w)
+            for name, ceiling, leg in flag_suites:
+                first = leg[0].lower()
+                reach = next(i for i, w in enumerate(leg) if i and w in DIRECT_CHECK_WORDS)
+                for i, w in enumerate(words):
+                    w = re.sub(r"^(?:\./+)+", "", w.replace("\\", "/").lower())
+                    if not w or (w != first and not w.endswith("/" + first)
+                                 and not first.endswith("/" + w)):
+                        continue
+                    candidate = words[i:]
+                    if not reach < len(candidate) <= len(leg):
+                        continue
+                    # Up to the direct-check word each word is the leg's; after it an option's
+                    # value may be any word, and any other difference names a case or another
+                    # option.
+                    if all(candidate[j] == leg[j]
+                           or (j > reach and not leg[j].startswith("-")
+                               and leg[j - 1].startswith("-"))
+                           for j in range(1, len(candidate))):
+                        return (f"{BAR_WHY}; this spells the manifest leg `{name}`, a suite by its "
+                                f"declared ceiling of {ceiling} s")
+    return None
+
+
 # TOOL-dDerivedDocket-37: the hands-off join's key and refusal. Its GRAMMAR IS CHECK 12'S, read through
 # the memory-tree kit's `design_lib.read_spec_edges` (TOOL-dGroundRules-32 S17), which also reads a
 # bullet's two-space continuation lines: a payload wrapped past the house width is still the
@@ -1690,6 +1810,7 @@ def main(argv):
                 r["guard"] = [resolve_prefix_token(g, troot) for g in r["guard"]]
         legs = {r["name"] for r in rows}
         guarded, broad = derive_guarded_legs(rows)
+        flag_suites = derive_flag_suites(rows)
     except Exception as exc:  # noqa: BLE001 - a malformed manifest is a refusal, not a pass
         print(f"spec-tokens: REFUSING — {LEGS} did not parse: {exc}")
         return 1
@@ -1750,7 +1871,7 @@ def main(argv):
         armed = bool(direct_cut) and bool(m) and m.group(1) >= direct_cut
         g_armed = bool(guards_cut) and bool(m) and m.group(1) >= guards_cut
         named = set()                 # the manifest names the leg line contributes
-        pop_toks, bar_toks = [], []   # every graded-population token · the BAR matches among them
+        pop_toks, bar_toks = [], []   # every graded-population token · the (token, reason) bar hits
         gates = extract_gates(text)
         if gates is None:
             # No Gates heading at all. Silent by design, and counted apart from the section that
@@ -1767,8 +1888,9 @@ def main(argv):
                 # The bar test runs FIRST, on the raw token. NOT_A_TOKEN drops a `GATE_` prefix and
                 # NOT_A_LEG a `bash ` opener or a slash, and the motivating instruction carries all
                 # three; a bar token was never a leg, so it contributes nothing and continues.
-                if BAR.search(tok):
-                    bar_toks.append(tok)
+                why = check_bar(tok, flag_suites)
+                if why:
+                    bar_toks.append((tok, why))
                     continue
                 if NOT_A_TOKEN.match(tok):
                     continue
@@ -1798,8 +1920,9 @@ def main(argv):
                 pop_toks.append(tok)
                 # First here too, and the paths join still runs over the token's words: a tracked
                 # runner path resolves either way, and the two joins answer different questions.
-                if BAR.search(tok):
-                    bar_toks.append(tok)
+                why = check_bar(tok, flag_suites)
+                if why:
+                    bar_toks.append((tok, why))
                 for word in tok.split():
                     if check_path_shaped(word, files):
                         graded += 1
@@ -1812,16 +1935,16 @@ def main(argv):
         if armed:
             bar_specs += 1
             bar_examined += len(pop_toks)
-            hits += [(f, "bar", tok, BAR_WHY) for tok in bar_toks]
+            hits += [(f, "bar", tok, why) for tok, why in bar_toks]
         elif bar_toks:
             # Not graded, but COUNTED and listed: a skip that does not announce its size is
             # indistinguishable from coverage, and the OFF state hides the most.
             bar_carriers += 1
             where = f"predates {DIRECT_KEY} {direct_cut}" if direct_cut else f"{DIRECT_KEY} blank (arm off)"
-            near += [(f, "bar", tok, where) for tok in bar_toks]
+            near += [(f, "bar", tok, where) for tok, _why in bar_toks]
         graded_set = set(pop_toks)
         near += [(f, "bar", tok, "outside the graded population")
-                 for tok in TICK.findall(text) if BAR.search(tok) and tok not in graded_set]
+                 for tok in TICK.findall(text) if check_bar(tok, flag_suites) and tok not in graded_set]
         # THE GUARDS JOIN (TOOL-aBlindedTrial-8): the declared write set against every guarded leg.
         # One hit per MISSING leg, its token naming the first declared path that trips it — the
         # composite keeps a `[leg]` waiver row keyed on the bare leg name from swallowing it.

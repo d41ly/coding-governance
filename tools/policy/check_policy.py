@@ -3534,9 +3534,12 @@ def derive_universal_plant(cap):
 
 def derive_recall_export_plant(cap):
     """The recall kit and the policy kit copied in, so the kit's repository is the case's, and a query
-    log of one query a day, long enough that its export passes the cap."""
+    log of one query a day, long enough that its export passes the cap. The memory-tree kit's
+    `id_grammar.py` is planted beside them, the one file the recall kit's sibling lookup needs
+    (TOOL-aClearedLedger-7 S2): the whole kit copied would owe the leg's guard every file of it."""
     rel = derive_enforcer_rel(cap)
     v = read_source_number(rel, "EXPORT_CAP")
+    grammar = posixpath.join(budgets.derive_tool_root(), "memory-tree", "id_grammar.py")
 
     def write_query_log(t):
         log = Path(run_fixture_git(t, "rev-parse", "--path-format=absolute", "--git-common-dir"), "recall", "queries.jsonl")
@@ -3544,7 +3547,9 @@ def derive_recall_export_plant(cap):
         log.write_text("".join(json.dumps({"qid": i + 1, "type": "query", "at": f"{2000 + i // 336:04d}-{i % 336 // 28 + 1:02d}-"
                                            f"{i % 28 + 1:02d}T00:00:00Z", "n_hits": 1, "results": []}) + "\n"
                                for i in range(v // 25)), encoding="utf-8", newline="\n")
-    return {"files": {".memory-tree.conf": HYGIENE_CONF, "memory/README.md": "# r\n"}, "post": write_query_log,
+    return {"files": {".memory-tree.conf": HYGIENE_CONF, "memory/README.md": "# r\n",
+                      grammar: (derive_source_top() / grammar).read_bytes().replace(b"\r\n", b"\n")},
+            "post": write_query_log,
             "copies": (posixpath.dirname(rel), budgets.derive_kit_rel().rstrip("/")),
             "argv": [sys.executable, rel, "--export", "--tag", "z"],
             "warn": "BUDGET WARN — recall-export", "refuse": "over the"}

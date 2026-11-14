@@ -14,7 +14,7 @@ writes: none
 
 ### Charter rules
 
-- [spec] Spec before code: every product-code unit commits its spec first, a micro-spec for a mechanical change and a full design pass for a substantive one.
+- [spec] Spec before code: every product-code unit commits its spec first, a micro-spec if mechanical, a full design pass if substantive; an inline red fix commits none and owes its typed record.
 - [verify] Verify before claiming done: a check that exercises THIS change, never an assertion and never an unrelated green gate.
 - [gate] A gate never seen red is not a gate: observe its failing case, state what it does not check, and never read a skip, an unmovable probe, an exemption or an empty population as coverage.
 - [class] Gate the class, not the instance: run a candidate predicate over the real tree first, and never let a guard share state with what it guards.

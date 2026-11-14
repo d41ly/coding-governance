@@ -3198,6 +3198,11 @@
       "file": "tools/push-main.test.sh"
     },
     {
+      "id": "build_manifest",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.test.sh"
+    },
+    {
       "id": "build_map_rows",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -4618,6 +4623,11 @@
       "file": "tools/unattended/stop-guard.js"
     },
     {
+      "id": "checkSuiteLeg",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
       "id": "checkThrottled",
       "kind": "function",
       "file": "tools/process-monitor/procmon-hook.js"
@@ -4991,6 +5001,11 @@
       "id": "check_backlog_stragglers",
       "kind": "function",
       "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "check_bar",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "check_bar_tied",
@@ -6636,6 +6651,11 @@
       "id": "check_parity",
       "kind": "function",
       "file": "tools/chain-packet.py"
+    },
+    {
+      "id": "check_parity",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.test.sh"
     },
     {
       "id": "check_parity",
@@ -9768,6 +9788,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "derive_engreads",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
       "id": "derive_entries",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -9901,6 +9926,11 @@
       "id": "derive_fixture_row",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
+    },
+    {
+      "id": "derive_flag_suites",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "derive_floor_breaches",
@@ -12396,6 +12426,11 @@
       "id": "extract_heredoc_body",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "extract_hs_lines",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
       "id": "extract_jsx_defs",
@@ -17026,6 +17061,11 @@
       "id": "readStdin",
       "kind": "function",
       "file": "tools/unattended/run-lease.js"
+    },
+    {
+      "id": "readSuiteLegs",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
     },
     {
       "id": "readThrottleSeconds",
@@ -27486,6 +27526,11 @@
       "id": "run_plant_rows",
       "kind": "function",
       "file": "tools/playbook/adopt-playbook.sh"
+    },
+    {
+      "id": "run_planted",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.test.sh"
     },
     {
       "id": "run_pm",
