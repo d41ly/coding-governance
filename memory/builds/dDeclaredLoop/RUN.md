@@ -108,3 +108,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-14T07:32:10Z brief · item TOOL-dDeclaredLoop-73 · reason 9fd959ce761d memory/builds/dDeclaredLoop/prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-73-build-brief.md
 
 2026-11-14T07:42:53Z dispatch · item 62ee39d1 TOOL-dDeclaredLoop-73 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/map/generated/symbols.json memory/builds/dDeclaredLoop/build/2026-11-14-build-TOOL-dDeclaredLoop-73-1-acceptance-ledger.md memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-73.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/backlog/TOOL.md
+
+2026-11-14T08:40:24Z brief · item TOOL-dDeclaredLoop-12 · reason ae62f5f5a99e memory/builds/dDeclaredLoop/prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-12-build-brief.md
