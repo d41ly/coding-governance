@@ -21,6 +21,13 @@ block spells `_order_verb` in backticks, and AC1 requires the function's slice, 
 removed, to hold no backtick. The header line is not a comment line, so AC1 decides it: the name is
 written there without backticks.
 
+A second pass built against spec rev-2, on node a, 2026-11-14. Rev-2 records the owner's picks: F1 (a),
+live with no switch, which the code at `4fed38fe1` already follows; F2 (b), arm A6 and AC12. That pass
+added arm A6 to region 3 of `tools/unattended/unattended.test.sh`, after A3 and before A4. No driver
+code moved. Owed to the main loop at the close: AC12 as the criterion states it, and A6 observed red at
+base `846d51d39` and at `4fed38fe1` with the pairing refusal's `remove_spec_token_check` call deleted,
+then green. With F1 and F2 marked RESOLVED, that pass also set the spec CLOSED, as its last change.
+
 **Evidences:** TOOL-aBriskDeclaration-1
 - AC1 — `order_verb_of` — the criterion's probe ran with `PATH=/nonexistent` over the ten §4 plants and
   over three extra files: a directory, a header with no final newline, and a missing path. It ran under
@@ -73,3 +80,10 @@ written there without backticks.
   the stderr lines that are not trace lines, and for the staged run-state row with its UTC stamp
   masked. In the after trace, `init_spec_token_check` precedes `read_open_passes`, and the wait in
   `read_bounded` fell from 108.9 s to 58.9 s (PINNED 2026-11-14).
+- AC12 — `--dispatch declares a generated index together with its generator` — not run over the suite's
+  tRun fixture in the pass. The new arm A6 grades it, and its run is owed to the main loop at the
+  close. `bash -n` over the suite printed nothing. As a direct probe, A6's trace awk ran over three
+  `bash -x` traces of stub functions that print the driver's own `fail 49` line, single-quoted as in
+  the real trace. With a start, the refusal and a remove, it printed `started refused read kills=0`.
+  With the remove deleted, it printed `started refused unread kills=0`. With no start, it printed
+  `unstarted no-refusal read kills=0`.

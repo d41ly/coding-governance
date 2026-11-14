@@ -7964,9 +7964,10 @@ miss "$o" "--dispatch refuses: the declared spec-token checker reds over the liv
 o=$(run --dispatch tRun --pass ARCH-tRun-5 --writes ${PFX}swift5.sh)
 hit "$o" "--dispatch refuses: the declared spec-token checker reds over the live tree"
 # ---- TOOL-aBriskDeclaration-1 - THE ORDER VERB IS READ WITH NO PROCESS, AND THE SPEC-TOKEN CHECKER
-# ---- STARTS BESIDE THE OPEN-PASS READER AND IS READ AFTER CONDITION 1. Two traced dispatches over the
-# ---- pair above, both refused, so neither writes a row: ARCH-tRun-5 on its own path reaches the stub,
-# ---- and on ARCH-tRun-4's path is condition 1's. Each is a process under `bash -x`, counted as
+# ---- STARTS BESIDE THE OPEN-PASS READER AND IS READ AFTER CONDITION 1. Three traced dispatches over the
+# ---- pair above, all refused, so none writes a row: ARCH-tRun-5 on its own path reaches the stub, on
+# ---- ARCH-tRun-4's path is condition 1's, and on an index with its generator is the pairing's (A6).
+# ---- Each is a process under `bash -x`, counted as
 # ---- `run_proc` counts one, its trace under `.git` so the fixture tree does not move. A1 grades the
 # ---- reader in process with PATH emptied over ten planted headers, whose answers are the base
 # ---- reader's, PINNED on node a on 2026-11-14 (the spec's §4 table). RED-first: the driver at
@@ -8007,6 +8008,18 @@ o=$(run_main_at_head bash -x "$SCRIPT" --dispatch tRun --pass ARCH-tRun-5 --writ
 hit "$o" "two passes claiming one file are not disjoint"
 miss "$o" "--dispatch refuses: the declared spec-token checker reds over the live tree"
 same "brisk A3: a condition-1 refusal waits for the started checker" "$(awk '/^\++ init_bounded .*swift-stub\.py/ && !i { i = NR } /^\++ fail 49 .--dispatch declares a path a sibling/ && !f { f = NR } f && NR > f && /^\++ read_bounded / && !b { b = NR } f && NR > f && /^\++ kill / { k++ } END { print (i ? "started" : "unstarted"), ((f && i && i < f) ? "refused" : "no-refusal"), (b ? "read" : "unread"), "kills=" k + 0 }' "$TMP/.git/bd/trace1")" "started refused read kills=0"
+# A6 (the owner's F2 pick): the generator-pairing refusal, the window's other one, waits too. One
+# declaration names both halves, so no sibling row is needed, and the order gate and condition 1 pass
+# as for A2. Neither file exists, so the declared spelling alone keys. RED-first: the driver at
+# 846d51d39 started no checker before this refusal, and 4fed38fe1 with its remove call deleted left
+# no `read_bounded` after it. The refused dispatch writes no row; the conf line is deleted after.
+printf 'GENERATED_INDEXES="%s"\n' "${PFX}bd-idx.md:${PFX}bd-gen" >> .unattended.conf
+printf . >>"$DRV_PROC_TALLY"
+o=$(run_main_at_head bash -x "$SCRIPT" --dispatch tRun --pass ARCH-tRun-5 --writes ${PFX}bd-idx.md --writes ${PFX}bd-gen 2>"$TMP/.git/bd/traceg")
+sed -i '/^GENERATED_INDEXES=/d' .unattended.conf
+hit "$o" "--dispatch declares a generated index together with its generator"
+miss "$o" "--dispatch refuses: the declared spec-token checker reds over the live tree"
+same "brisk A6: a generator-pairing refusal waits for the started checker" "$(awk '/^\++ init_bounded .*swift-stub\.py/ && !i { i = NR } /^\++ fail 49 .--dispatch declares a generated index together with its generator/ && !f { f = NR } f && NR > f && /^\++ read_bounded / && !b { b = NR } f && NR > f && /^\++ kill / { k++ } END { print (i ? "started" : "unstarted"), ((f && i && i < f) ? "refused" : "no-refusal"), (b ? "read" : "unread"), "kills=" k + 0 }' "$TMP/.git/bd/traceg")" "started refused read kills=0"
 # A4: every `return 1` between the start and the read waits for the checker. A write added in the
 # window is not seen here: the spec's §4 states that invariant and what would break it.
 bd_win=$(awk '/^verb_dispatch\(\)/ { v = 1 } v && /init_spec_token_check "\$slug"/ { w = 1; next } v && /run_spec_token_check "\$slug"/ { w = 0 } w && !/^[[:space:]]*#/ && /return 1/ { n++; if ($0 !~ /remove_spec_token_check/) print "MISSING " NR } END { print n + 0 }' "$SCRIPT")
