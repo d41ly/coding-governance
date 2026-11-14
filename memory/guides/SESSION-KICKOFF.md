@@ -3,10 +3,10 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-11-14T22:35:21+02:00 @ ea10b214f1d8df3f1fbcbac37c11b6cd733e1da2
+last-audit: 2026-11-14T22:54:37+02:00 @ ffc628ab4c30c646fe4c371da26b103eeecdd604
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: a8aa6f8c5ffbfdba1af3958c5fd59ae011fc24e5
+last-body-change: ffc628ab4c30c646fe4c371da26b103eeecdd604
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -77,6 +77,8 @@ lives where each bullet points.
 - The read-path byte budget is retired (`TOOL-dSpentCeiling-1`): check 6's per-class caps are the bound, and a sum is not re-added.
 - A live `RUN.md` is outside check 6 by class (`TOOL-cMendedVintage-13`); a retired one is capped.
 - This repository's policy values live in `.governance/policy.toml`, checked against `tools/policy/catalogue.toml`; the pre-commit guard refuses an agent's change to it but one raised measured-file cap with its record (`help/policy.md`).
+- `--dispatch` refuses one write set naming a generated index with its generator (check 49): a unit that edits a generator builds in two passes, the generator edit first and the re-rendered index second (`TOOL-dDeclaredLoop-12`).
+- The loop kit's definition `tools/loop/loop.toml` is checked one concern per module, each its own leg: `loop_lib.py --check`, and `check` on `loop_table.py`, `loop_checklist.py` and `loop_items.py` (`help/loop.md`).
 
 ### Pointer map (load the row(s) the task touches)
 
