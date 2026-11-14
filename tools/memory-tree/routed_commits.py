@@ -271,8 +271,9 @@ def read_routed_commits(repo, rev_args: list) -> list:
     `red_fix` is the list of its `Red-fix:` trailer values (TOOL-aNimbleMend-8 S5), one leg name per
     trailer line: a leg name holds spaces, commas and parentheses, so a value is its whole line.
     The pass is the one trailer reader's, run through this module's pinned, counted runner
-    (TOOL-dDeclaredLoop-23 S5); a key the trailer table does not register, a kit that does not resolve
-    and a stream that ends mid-record are each a Refusal."""
+    (TOOL-dDeclaredLoop-23 S5); a key the trailer table does not register and a stream that ends
+    mid-record are each a Refusal. Where no playbook kit resolves, or its table holds no row, the
+    reader reads its floor keys, which hold both keys read here (TOOL-dDeclaredLoop-40)."""
     try:
         commits = read_commits(repo, rev_args, ("Pass", RED_FIX_TRAILER), files=True,
                                run=lambda at, argv: run_git(at, *argv))
@@ -1274,6 +1275,42 @@ def run_selftest() -> int:
                   and commit_trailers.GIT_ENV_LEAKS == tree_lib.GIT_ENV_LEAKS,
             "TOOL-dDeclaredLoop-39 AC4 this kit's commit_trailers.GIT_ENV_LEAKS equals tree_lib.GIT_ENV_LEAKS",
             f"reader {commit_trailers.__file__}: {commit_trailers.GIT_ENV_LEAKS!r}\ntree_lib: {tree_lib.GIT_ENV_LEAKS!r}")
+
+        # ---- TOOL-dDeclaredLoop-40 AC2 AC3 AC5 AC6: this kit's copy of the reader in a scratch tree with
+        # no trailer key table, then with a table of no rows, reads the floor keys, refuses any other by
+        # name, and notes the skipped check once per process on stderr, never on stdout.
+        top40 = root / "floor40"
+        (top40 / "kit").mkdir(parents=True)
+        shutil.copy(KIT / "commit_trailers.py", top40 / "kit")
+        fix40 = commit_trailers.build_fixture(top40)
+        env40 = {k: v for k, v in build_git_env().items() if k not in GIT_ENV_LEAKS}
+        read40 = ("import sys; sys.path.insert(0, sys.argv[1]); import commit_trailers as ct\n"
+                  "for keys, files in ((('Pass',), 0), (('Pass',), 0), (('Pass', 'Red-fix'), 1), (('Gov-Nope',), 0)):\n"
+                  "    try: print([c['trailers'] for c in ct.read_commits('.', ['-1', 'HEAD'], keys, files)])\n"
+                  "    except ValueError as exc: print('ValueError', exc)\n")
+
+        def run40(*argv):
+            return subprocess.run([sys.executable, *argv], cwd=fix40, capture_output=True, text=True, env=env40)
+
+        note40 = "unregistered-key check skipped: no edges.toml"
+        want40 = ["[{'Pass': ['TOOL-tFix-2']}]"] * 2 + ["[{'Pass': ['TOOL-tFix-2'], 'Red-fix': []}]"]
+        got = run40("-c", read40, str(top40 / "kit"))
+        lines = got.stdout.splitlines()
+        print_arm(lines[:3] == want40 and len(lines) > 3 and "'Gov-Nope'" in lines[3] and lines[3].startswith("ValueError")
+                  and got.stderr.count(note40) == 1,
+            "TOOL-dDeclaredLoop-40 AC2 AC3 AC6 with no trailer key table the reader reads Pass and Red-fix, "
+            "refuses Gov-Nope by name, and notes the skipped check once", f"{got.stdout}\n{got.stderr}")
+        tok = run40(str(top40 / "kit" / "commit_trailers.py"), "tokens", "-1", "HEAD")
+        print_arm(tok.returncode == 0 and "PASSTRAILER TOOL-tFix-2" in tok.stdout and note40 not in tok.stdout
+                  and note40 in tok.stderr,
+            "TOOL-dDeclaredLoop-40 AC3 `tokens` with no trailer key table exits 0, its note on stderr only",
+            f"exit {tok.returncode}\n{tok.stdout}\n{tok.stderr}")
+        (top40 / "playbook").mkdir()
+        (top40 / "playbook" / "edges.toml").write_text("# no [[trailer]] row\n", encoding="utf-8")
+        got = run40("-c", read40, str(top40 / "kit"))
+        print_arm(got.stdout.splitlines()[:1] == want40[:1] and note40 in got.stderr,
+            "TOOL-dDeclaredLoop-40 AC5 a trailer key table of no rows reads the floor keys, with the note",
+            f"{got.stdout}\n{got.stderr}")
     finally:
         shutil.rmtree(root, ignore_errors=True)
     print(f"{SAY} selftest: {'all arms held' if not failed else f'{len(failed)} arm(s) FAILED'}")

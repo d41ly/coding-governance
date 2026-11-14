@@ -16,8 +16,10 @@ the unattended kit's shell `GIT`.
 
 A commit is a node of the `commit` native class, and every trailer key gov reads is one `[[trailer]]`
 row of the playbook kit's `edges.toml`. `read_commits` reads a registered key and refuses any other, so
-no consumer reads a trailer the table does not name. Two views answer who a commit is attributed to,
-and each consumer names its own:
+no consumer reads a trailer the table does not name. Where this install holds no playbook kit, or its
+table holds no `[[trailer]]` row, the reader reads a closed floor of keys instead, `FLOOR_KEYS`, refuses
+any other by name and says once on stderr that the check was skipped (TOOL-dDeclaredLoop-40). Two views
+answer who a commit is attributed to, and each consumer names its own:
 
     union     the subject's ids plus the `Pass:` trailer's; `Pass: none` adds none and keeps the subject's
     replace   the `Pass:` trailer's ids alone, a `none` anywhere attributing nothing; the subject's
@@ -27,9 +29,6 @@ and each consumer names its own:
     python commit_trailers.py message <file>                        # a message not yet committed
     python commit_trailers.py --print-commits                       # the commit class's members
     python commit_trailers.py --fixture                             # three planted commits, both views
-
-NOT here: a floor for an install holding no playbook kit (TOOL-dDeclaredLoop-40), where every read
-refuses with the resolver's own line.
 """
 from __future__ import annotations
 
@@ -136,14 +135,31 @@ def run_git(repo, argv, stdin=None):
     return proc.stdout
 
 
+#: The keys read where no trailer key table is installed, or the one installed holds no `[[trailer]]`
+#: row (TOOL-dDeclaredLoop-40): a closed list, each a row of the playbook kit's table, never joined to it.
+FLOOR_KEYS = ("Pass", "Decided", "Gov-Transition", "Gov-Policy", "Red-fix")
+_floor_noted = False
+
+
 def read_key_table() -> tuple:
     """`(keys, path)`: every key a `[[trailer]]` row of the playbook kit's `edges.toml` registers, typed
     or not, and the table's path. The kit is the one the sibling-kit resolver finds from this file's
-    directory; LookupError, the resolver's own line, where this install holds none."""
-    path = resolve_kit_dir("playbook", "edges.toml", pathlib.Path(__file__).parent) / "edges.toml"
-    with open(path, "rb") as fh:
-        rows = tomllib.load(fh).get("trailer") or []
-    return {row.get("key") for row in rows if isinstance(row, dict)}, path
+    directory. Where this install holds none, or its table holds no row, `(FLOOR_KEYS, None)`, and one
+    stderr line per process says the check was skipped."""
+    global _floor_noted
+    try:
+        path = resolve_kit_dir("playbook", "edges.toml", pathlib.Path(__file__).parent) / "edges.toml"
+        with open(path, "rb") as fh:
+            rows = tomllib.load(fh).get("trailer") or []
+        keys = {row.get("key") for row in rows if isinstance(row, dict)}
+    except LookupError:
+        keys = set()
+    if keys:
+        return keys, path
+    if not _floor_noted:
+        _floor_noted = True
+        print(f"{SAY}: unregistered-key check skipped: no edges.toml", file=sys.stderr)
+    return set(FLOOR_KEYS), None
 
 
 def read_commits(repo, revs, keys, files=False, run=None) -> list:
@@ -152,12 +168,13 @@ def read_commits(repo, revs, keys, files=False, run=None) -> list:
     to the list of its values, by git's own trailer parse. `files` adds `paths`, renames read as a
     deletion plus an addition. `run(repo, argv)` is the consumer's git runner, returning stdout bytes.
 
-    ValueError names a requested key the table does not register, and a stream that ends mid-record."""
+    ValueError names a requested key the table does not register, or outside the floor where no table
+    registers one, and a stream that ends mid-record."""
     registered, table = read_key_table()
     for key in keys:
         if key not in registered:
-            raise ValueError(f"the trailer key '{key}' is not registered in {table.as_posix()}, "
-                             "so no commit is read for it")
+            where = table.as_posix() if table else "the floor keys, no trailer key table registering any"
+            raise ValueError(f"the trailer key '{key}' is not registered in {where}, so no commit is read for it")
     fmt = "%x1e%H%x1f%P%x1f%cI%x1f%s" + "".join(
         f"%x1f%(trailers:key={k},valueonly,unfold,separator=%x1d)" for k in keys) + "%x1f"
     argv = ["log", *(("-z", "--root", "--no-renames", "--name-only") if files else ()), "--no-color",

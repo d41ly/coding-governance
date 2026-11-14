@@ -1164,8 +1164,9 @@ check_gen_region_only() { # before object · after object -> 0 when both exist a
 # `commit_trailers.py` beside this library, its `replace` view, run with the launcher the caller's own
 # inline `resolve_python` answers, as `resolve_index_generator` asks it. NO LAUNCHER IS A NAMED
 # REFUSAL, status 2 with nothing printed, never an empty answer: an empty answer reads every unit as
-# unbuilt and looks like a correct one. The reader's own refusal, an install holding no trailer key
-# table say, reaches stderr and is this function's status. The CRs a Windows interpreter ends its
+# unbuilt and looks like a correct one. An install holding no trailer key table reads the reader's
+# floor keys, `Pass` among them, and its one note goes to stderr (TOOL-dDeclaredLoop-40); the
+# reader's own refusal reaches stderr and is this function's status. The CRs a Windows interpreter ends its
 # lines with are dropped here. The pins `GIT` carries are the reader's own runner's, for every caller
 # (TOOL-dDeclaredLoop-39), so this call sets none.
 read_attribution_tokens() { # git-log revision arguments -> one tokenised line per commit

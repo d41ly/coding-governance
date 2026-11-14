@@ -244,8 +244,10 @@ work order's `gov:handoff` marker's `unit=` and `build=` as `serves`; an instruc
 `Pass:`, `Gov-Unit:` and `Gov-Item:` as `serves`, `Gov-Act:` as `made-by`, `Gov-Session:` as
 `runs-in` and `Decided:` as `decides`. The trailer keys are the `[[trailer]]` rows of `edges.toml`. A
 row may carry no `type`: it registers a key that carries a value and no edge, which `Gov-Transition:`,
-`Gov-Policy:` and `Red-fix:` are, so gov's one trailer reader reads it and no edge is read from it. A
-`serves` trailer is read as edges only when every comma-separated target is a well-formed address; a
+`Gov-Policy:` and `Red-fix:` are, so gov's one trailer reader reads it and no edge is read from it.
+Where no `edges.toml` is installed, or it holds no `[[trailer]]` row, the reader reads a closed floor of
+keys, `Pass`, `Decided`, `Gov-Transition`, `Gov-Policy` and `Red-fix`, refuses any other by name, and
+says once on stderr that the check was skipped; a table with rows decides alone. A `serves` trailer is read as edges only when every comma-separated target is a well-formed address; a
 value of prose, or `none`, is counted unread and is neither an edge nor a red, and `--check` prints the
 count. A spec's `### Edges` block declares `consumes-from` and `hands-off` between unit ids, whose
 inverses are `consumed-by` and `receives-from`; the memory hygiene check parses that block.
