@@ -1,11 +1,12 @@
 # TOOL-aClearedLedger-15 — the gate guard reads a redirection operator from unquoted text only, so a quoted character opening a glued target stays the target's
 
-**Status:** INPROGRESS · rev-1 · 2026-11-14 · node a · Tier-2 · base 8db6f4be · streams tooling · order 15
+**Status:** CLOSED · rev-1 · 2026-11-14 · node a · Tier-2 · base 8db6f4be · streams tooling · order 15
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-14-build-TOOL-aClearedLedger-15-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aClearedLedger-15-1-acceptance-ledger.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aClearedLedger-15-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aClearedLedger-15-1-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aClearedLedger-15-brief.md](../prompts/2026-11-14-prompt-TOOL-aClearedLedger-15-brief.md) | research | — |
 

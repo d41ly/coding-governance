@@ -504,10 +504,10 @@ function resolveFileRow(tok) {
  * launcher words included, with redirections taken out (TOOL-aClearedLedger-11: the head the
  * grammar resolved is not what names the script, and a segment it left with no head, behind
  * `python -m` say, is a candidate too). A redirection is a word to scanSegments, so `> x.log` and
- * `2>` would otherwise be compared as arguments. A word whose quoting opens inside the operator
- * REDIRECT_RE matches, `'&'` or `'>'` say, is a word and not a redirection, as bash reads it; a
- * quote opening after the operator, `2>"x.log"`, leaves it one (TOOL-aClearedLedger-14). Both
- * recursions hand the array on.
+ * `2>` would otherwise be compared as arguments. A word holding quoting is a redirection only when
+ * the text before its quoting starts with an operator REDIRECT_RE matches, so `'&'` and `2'>'x` are
+ * words, and `2>"x.log"` and `>'>x.log'` are redirections (TOOL-aClearedLedger-15). Only a word with
+ * no quoting can be a bare operator whose target is the next word. Both recursions hand the array on.
  */
 function scanDenyHits(cmd, view, depth, tool, candidates) {
   depth = depth || 0
@@ -618,9 +618,9 @@ function scanDenyHits(cmd, view, depth, tool, candidates) {
       const words = []
       for (let j = 0; j < toks.length; j++) {
         const q = toks.quotedAt[j]
-        const redir = REDIRECT_RE.exec(toks[j])
-        if (!redir || (q >= 0 && q < redir[0].length)) words.push(toks[j])   // quoting inside the operator: a word
-        else if (redir[0] === toks[j]) j++   // a bare operator: its target is the next word
+        const redir = REDIRECT_RE.exec(q < 0 ? toks[j] : toks[j].slice(0, q))   // the operator is unquoted text: a quoted character never joins it
+        if (!redir) words.push(toks[j])
+        else if (q < 0 && redir[0] === toks[j]) j++   // a bare unquoted operator: its target is the next word
       }
       if (words.some((w) => DIRECT_CHECK_WORDS.includes(w))) candidates.push({ words })
     }
