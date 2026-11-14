@@ -134,7 +134,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-24 — the `item` kind in the kinds register, its factory, and the checks over the composed items](spec/2026-10-24-spec-TOOL-dDeclaredLoop-24.md) | 11 | 2 | CLOSED | rev-5 | 2026-11-14 |
 | [TOOL-dDeclaredLoop-15 — the build table's terminal states, and `deps.on-parent-withdrawn` routing a withdrawn parent](spec/2026-10-24-spec-TOOL-dDeclaredLoop-15.md) | 12 | 2 | CLOSED | rev-4 | 2026-11-14 |
 | [TOOL-dDeclaredLoop-3 — the transition record three ways, its channels the set `transitions.record` selects](spec/2026-10-24-spec-TOOL-dDeclaredLoop-3.md) | 13 | 2 | CLOSED | rev-5 | 2026-11-15 |
-| [TOOL-dDeclaredLoop-10 — backward transitions recorded like forward ones](spec/2026-10-24-spec-TOOL-dDeclaredLoop-10.md) | 14 | 2 | DEFERRED | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-10 — backward transitions recorded like forward ones](spec/2026-10-24-spec-TOOL-dDeclaredLoop-10.md) | 14 | 2 | DEFERRED | rev-2 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-2 — the guard, the TTY policy command and the default floor](spec/2026-10-24-spec-TOOL-dDeclaredLoop-2.md) | 15 | 2 | DEFERRED | rev-4 | 2026-11-05 |
 | [TOOL-dDeclaredLoop-43 — the guarded write restores each path's prior bytes, and writes each through a sibling temp file](spec/2026-10-24-spec-TOOL-dDeclaredLoop-43.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-44 — the policy push arm grades a merge on its combined diff, and a new branch against the remote default tip](spec/2026-10-24-spec-TOOL-dDeclaredLoop-44.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-24 |
@@ -212,22 +212,22 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 376 bound to this build, across 4 record folder(s).
+Records: 378 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dDeclaredLoop-100 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99.
 
-Ids whose spec moved past its audited revision: TOOL-dDeclaredLoop-1@rev-1 TOOL-dDeclaredLoop-11@rev-1 TOOL-dDeclaredLoop-12@rev-1 TOOL-dDeclaredLoop-13@rev-1 TOOL-dDeclaredLoop-14@rev-1 TOOL-dDeclaredLoop-15@rev-1 TOOL-dDeclaredLoop-16@rev-1 TOOL-dDeclaredLoop-17@rev-1 TOOL-dDeclaredLoop-18@rev-1
-TOOL-dDeclaredLoop-2@rev-1 TOOL-dDeclaredLoop-20@rev-1 TOOL-dDeclaredLoop-21@rev-1 TOOL-dDeclaredLoop-22@rev-1 TOOL-dDeclaredLoop-23@rev-1 TOOL-dDeclaredLoop-24@rev-1 TOOL-dDeclaredLoop-25@rev-1 TOOL-dDeclaredLoop-26@rev-1 TOOL-dDeclaredLoop-27@rev-1 TOOL-dDeclaredLoop-28@rev-1
-TOOL-dDeclaredLoop-29@rev-1 TOOL-dDeclaredLoop-3@rev-1 TOOL-dDeclaredLoop-30@rev-1 TOOL-dDeclaredLoop-31@rev-1 TOOL-dDeclaredLoop-32@rev-1 TOOL-dDeclaredLoop-33@rev-1 TOOL-dDeclaredLoop-34@rev-1 TOOL-dDeclaredLoop-36@rev-1 TOOL-dDeclaredLoop-37@rev-1 TOOL-dDeclaredLoop-38@rev-1
-TOOL-dDeclaredLoop-39@rev-1 TOOL-dDeclaredLoop-4@rev-1 TOOL-dDeclaredLoop-40@rev-1 TOOL-dDeclaredLoop-41@rev-1 TOOL-dDeclaredLoop-42@rev-1 TOOL-dDeclaredLoop-43@rev-1 TOOL-dDeclaredLoop-44@rev-1 TOOL-dDeclaredLoop-45@rev-1 TOOL-dDeclaredLoop-46@rev-1 TOOL-dDeclaredLoop-47@rev-1
-TOOL-dDeclaredLoop-48@rev-1 TOOL-dDeclaredLoop-49@rev-1 TOOL-dDeclaredLoop-5@rev-1 TOOL-dDeclaredLoop-50@rev-1 TOOL-dDeclaredLoop-51@rev-1 TOOL-dDeclaredLoop-52@rev-1 TOOL-dDeclaredLoop-53@rev-1 TOOL-dDeclaredLoop-54@rev-1 TOOL-dDeclaredLoop-55@rev-1 TOOL-dDeclaredLoop-56@rev-1
-TOOL-dDeclaredLoop-57@rev-1 TOOL-dDeclaredLoop-58@rev-1 TOOL-dDeclaredLoop-59@rev-1 TOOL-dDeclaredLoop-6@rev-1 TOOL-dDeclaredLoop-60@rev-1 TOOL-dDeclaredLoop-61@rev-1 TOOL-dDeclaredLoop-62@rev-1 TOOL-dDeclaredLoop-63@rev-1 TOOL-dDeclaredLoop-64@rev-1 TOOL-dDeclaredLoop-65@rev-1
-TOOL-dDeclaredLoop-66@rev-1 TOOL-dDeclaredLoop-67@rev-1 TOOL-dDeclaredLoop-68@rev-1 TOOL-dDeclaredLoop-69@rev-1 TOOL-dDeclaredLoop-7@rev-1 TOOL-dDeclaredLoop-70@rev-1 TOOL-dDeclaredLoop-71@rev-1 TOOL-dDeclaredLoop-72@rev-1 TOOL-dDeclaredLoop-73@rev-1 TOOL-dDeclaredLoop-74@rev-1
-TOOL-dDeclaredLoop-75@rev-1 TOOL-dDeclaredLoop-76@rev-1 TOOL-dDeclaredLoop-77@rev-1 TOOL-dDeclaredLoop-78@rev-1 TOOL-dDeclaredLoop-79@rev-1 TOOL-dDeclaredLoop-8@rev-1 TOOL-dDeclaredLoop-80@rev-1 TOOL-dDeclaredLoop-81@rev-1 TOOL-dDeclaredLoop-82@rev-1 TOOL-dDeclaredLoop-83@rev-1
-TOOL-dDeclaredLoop-84@rev-1 TOOL-dDeclaredLoop-85@rev-1 TOOL-dDeclaredLoop-86@rev-1 TOOL-dDeclaredLoop-87@rev-1 TOOL-dDeclaredLoop-88@rev-1 TOOL-dDeclaredLoop-89@rev-1 TOOL-dDeclaredLoop-9@rev-1 TOOL-dDeclaredLoop-90@rev-1 TOOL-dDeclaredLoop-91@rev-1 TOOL-dDeclaredLoop-92@rev-1
-TOOL-dDeclaredLoop-93@rev-1 TOOL-dDeclaredLoop-94@rev-1 TOOL-dDeclaredLoop-95@rev-1 TOOL-dDeclaredLoop-96@rev-1.
+Ids whose spec moved past its audited revision: TOOL-dDeclaredLoop-1@rev-1 TOOL-dDeclaredLoop-10@rev-1 TOOL-dDeclaredLoop-11@rev-1 TOOL-dDeclaredLoop-12@rev-1 TOOL-dDeclaredLoop-13@rev-1 TOOL-dDeclaredLoop-14@rev-1 TOOL-dDeclaredLoop-15@rev-1 TOOL-dDeclaredLoop-16@rev-1 TOOL-dDeclaredLoop-17@rev-1
+TOOL-dDeclaredLoop-18@rev-1 TOOL-dDeclaredLoop-2@rev-1 TOOL-dDeclaredLoop-20@rev-1 TOOL-dDeclaredLoop-21@rev-1 TOOL-dDeclaredLoop-22@rev-1 TOOL-dDeclaredLoop-23@rev-1 TOOL-dDeclaredLoop-24@rev-1 TOOL-dDeclaredLoop-25@rev-1 TOOL-dDeclaredLoop-26@rev-1 TOOL-dDeclaredLoop-27@rev-1
+TOOL-dDeclaredLoop-28@rev-1 TOOL-dDeclaredLoop-29@rev-1 TOOL-dDeclaredLoop-3@rev-1 TOOL-dDeclaredLoop-30@rev-1 TOOL-dDeclaredLoop-31@rev-1 TOOL-dDeclaredLoop-32@rev-1 TOOL-dDeclaredLoop-33@rev-1 TOOL-dDeclaredLoop-34@rev-1 TOOL-dDeclaredLoop-36@rev-1 TOOL-dDeclaredLoop-37@rev-1
+TOOL-dDeclaredLoop-38@rev-1 TOOL-dDeclaredLoop-39@rev-1 TOOL-dDeclaredLoop-4@rev-1 TOOL-dDeclaredLoop-40@rev-1 TOOL-dDeclaredLoop-41@rev-1 TOOL-dDeclaredLoop-42@rev-1 TOOL-dDeclaredLoop-43@rev-1 TOOL-dDeclaredLoop-44@rev-1 TOOL-dDeclaredLoop-45@rev-1 TOOL-dDeclaredLoop-46@rev-1
+TOOL-dDeclaredLoop-47@rev-1 TOOL-dDeclaredLoop-48@rev-1 TOOL-dDeclaredLoop-49@rev-1 TOOL-dDeclaredLoop-5@rev-1 TOOL-dDeclaredLoop-50@rev-1 TOOL-dDeclaredLoop-51@rev-1 TOOL-dDeclaredLoop-52@rev-1 TOOL-dDeclaredLoop-53@rev-1 TOOL-dDeclaredLoop-54@rev-1 TOOL-dDeclaredLoop-55@rev-1
+TOOL-dDeclaredLoop-56@rev-1 TOOL-dDeclaredLoop-57@rev-1 TOOL-dDeclaredLoop-58@rev-1 TOOL-dDeclaredLoop-59@rev-1 TOOL-dDeclaredLoop-6@rev-1 TOOL-dDeclaredLoop-60@rev-1 TOOL-dDeclaredLoop-61@rev-1 TOOL-dDeclaredLoop-62@rev-1 TOOL-dDeclaredLoop-63@rev-1 TOOL-dDeclaredLoop-64@rev-1
+TOOL-dDeclaredLoop-65@rev-1 TOOL-dDeclaredLoop-66@rev-1 TOOL-dDeclaredLoop-67@rev-1 TOOL-dDeclaredLoop-68@rev-1 TOOL-dDeclaredLoop-69@rev-1 TOOL-dDeclaredLoop-7@rev-1 TOOL-dDeclaredLoop-70@rev-1 TOOL-dDeclaredLoop-71@rev-1 TOOL-dDeclaredLoop-72@rev-1 TOOL-dDeclaredLoop-73@rev-1
+TOOL-dDeclaredLoop-74@rev-1 TOOL-dDeclaredLoop-75@rev-1 TOOL-dDeclaredLoop-76@rev-1 TOOL-dDeclaredLoop-77@rev-1 TOOL-dDeclaredLoop-78@rev-1 TOOL-dDeclaredLoop-79@rev-1 TOOL-dDeclaredLoop-8@rev-1 TOOL-dDeclaredLoop-80@rev-1 TOOL-dDeclaredLoop-81@rev-1 TOOL-dDeclaredLoop-82@rev-1
+TOOL-dDeclaredLoop-83@rev-1 TOOL-dDeclaredLoop-84@rev-1 TOOL-dDeclaredLoop-85@rev-1 TOOL-dDeclaredLoop-86@rev-1 TOOL-dDeclaredLoop-87@rev-1 TOOL-dDeclaredLoop-88@rev-1 TOOL-dDeclaredLoop-89@rev-1 TOOL-dDeclaredLoop-9@rev-1 TOOL-dDeclaredLoop-90@rev-1 TOOL-dDeclaredLoop-91@rev-1
+TOOL-dDeclaredLoop-92@rev-1 TOOL-dDeclaredLoop-93@rev-1 TOOL-dDeclaredLoop-94@rev-1 TOOL-dDeclaredLoop-95@rev-1 TOOL-dDeclaredLoop-96@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
