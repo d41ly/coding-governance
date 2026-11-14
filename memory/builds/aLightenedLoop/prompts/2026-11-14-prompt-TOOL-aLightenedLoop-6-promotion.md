@@ -9,7 +9,7 @@
 ## The brief
 
 ### Goal
-Close every confirmed item of the closing review's round 1, `memory/builds/aLightenedLoop/reviews/2026-11-14-review-TOOL-aLightenedLoop-1-5-implementation-diff-round1.md`: seven MEDIUM and one LOW. The verdict is CLEAN WITH FIXES, CONVERGED, with no blocker or HIGH. BUILD-METHOD M4 promotes every MEDIUM and LOW at a DIFF exit into ONE batched unit naming them all. These items share the generated indexes and one generator, so they are not disjoint and stay one unit. The build's parity rule binds this unit as it bound units 1 to 5.
+Close every confirmed item of the closing review's round 1, `memory/builds/aLightenedLoop/reviews/2026-11-14-review-TOOL-aLightenedLoop-1-5-implementation-diff-round1.md`: seven MEDIUM and one LOW. The verdict is CLEAN WITH FIXES, CONVERGED, with no blocker or HIGH. the build method's spec-audit rule (`doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it`) promotes every MEDIUM and LOW at a DIFF exit into ONE batched unit naming them all. These items share the generated indexes and one generator, so they are not disjoint and stay one unit. The build's parity rule binds this unit as it bound units 1 to 5.
 
 ### Items
 1. M1 (id 1): `print_wake` in `tools/unattended/unattended.sh` reads the recorded phase, but it is not on check 39's allow-list (`PHASE_RECORDED_FNS` in `tools/unattended/check-unattended.sh`), so the unattended kit leg reds. Make the kit leg green without widening what check 39 admits beyond this one reader.

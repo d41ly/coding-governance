@@ -17,7 +17,7 @@
 
 Close the eight items of the closing review's round 1,
 `memory/builds/aLightenedLoop/reviews/2026-11-14-review-TOOL-aLightenedLoop-1-5-implementation-diff-round1.md`
-(below, "the report"), as one batched repair unit under BUILD-METHOD M4: one allow-list entry, one
+(below, "the report"), as one batched repair unit under the build method's spec-audit rule (`doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it`): one allow-list entry, one
 reordered cache bracket, one avoided re-read, the arms that could not fail made able to, and three
 new bug classes recorded. A ninth item is the owner's fold,
 `memory/builds/aLightenedLoop/prompts/2026-11-14-prompt-TOOL-aLightenedLoop-6-stamp-fold.md`: unit
@@ -93,8 +93,8 @@ Each item names the report heading it repairs.
 Every claim below was read at `4e2f7d26`, the run branch's tip after the report.
 
 - `bash tools/unattended/check-unattended.sh --only 39` at `4e2f7d26` prints
-  `UNATTENDED check 39 FAILED` naming `unattended.sh:8794 calls read_recorded_phase() inside
-  print_wake()`. The allow-list is `tools/unattended/check-unattended.sh@c43efbd91555:6227`, and
+  `UNATTENDED check 39 FAILED` naming `tools/unattended/unattended.sh@72489115:8794 calls read_recorded_phase() inside
+  print_wake()`. The allow-list is `tools/unattended/check-unattended.sh@c43efbd9155f:6227`, and
   the call is `tools/unattended/unattended.sh@724891152173:8794`. The suite's check-39 CONTROL arm
   (`tools/unattended/check-unattended.test.sh@42c65ff80d35:5261-5266`) asserts the shipped driver and
   allow-list are silent, so that arm is red today too. The two arms that rewrite the list
@@ -397,7 +397,7 @@ No path above is on the kickoff manifest's `watch:` line in `memory/guides/SESSI
   later move, and the skeptic found its first spelling still moved `refs`.
 - **M3, a third `read_tree_state` after the derive.** It is correct, and it costs one more
   fingerprint on every admitted dispatch. The reorder costs nothing on the common path.
-- **M4, the report's real-clock form** with `set_live_clock 0 3` and a 3 s bound. It is green on
+- **M4, the report's real-clock form** with `set_live_clock 0 3` and a 3 s bound. It is green on <!-- PINNED 2026-11-14 -->
   correct code, but it goes red on a dropped `+ 1` only when both stops land in one second, so the
   arm's red depends on the node's load. The pinned clock makes both directions exact.
 - **M5, three arms** as the report's class fix asks. The third cannot be seen red, by the gate
@@ -426,10 +426,10 @@ stop-guard suite is withheld by `tools/unattended/kit.toml`, so the main loop ru
   a moved tree only. M9 adds one read of the key's four parts per `--write` and one read-back of
   each written path. The arms add four `node` calls, five `--wake` runs, two fixture renders and one
   probe line. Under `budget-row-not-remeasured-after-added-arms`, the two raised floors owe a word on
-  their budget rows: the stop-guard row is 60 s against a 23 s reading, and the spec-tokens row is
-  130 s against 80 s, each a margin far above one call. The `build-index selftest` row, 140 s
-  against 88 s, gains six renders, two for M5 and four for M9, and the main loop re-measures it if the close reads it above
-  100 s.
+  their budget rows: the stop-guard row is 60 s against a 23 s reading, and the spec-tokens row is <!-- PINNED 2026-11-14 -->
+  130 s against 80 s, each a margin far above one call. The `build-index selftest` row, 140 s <!-- PINNED 2026-11-14 -->
+  against 88 s, gains six renders, two for M5 and four for M9, and the main loop re-measures it if the close reads it above <!-- PINNED 2026-11-14 -->
+  100 s. <!-- PINNED 2026-11-14 -->
 - error / empty / loading states — M3 keeps every not-recorded line, and an empty key still records
   nothing.
 - observability — unchanged: the three not-recorded lines are today's bytes.
