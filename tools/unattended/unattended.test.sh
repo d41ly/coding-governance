@@ -4475,6 +4475,10 @@ n=$((n+1)); [ "$(grep -c '^# >>> resolve_python' "$SCRIPT")" = 1 ] || { echo "FA
 np=$(awk '/^# >>> resolve_python/{b=1} b{if(/^# <<< resolve_python/)b=0; next} /^[[:space:]]*#/{next} /^[[:space:]]*local[[:space:]]/{next} {l=$0; gsub(/"[^"]*"/, """", l); print NR": "l}' "$SCRIPT" | grep -E '(^|[^-_.[:alnum:]])(python3?|py) ' || true)
 n=$((n+1)); [ -z "$np" ] || { echo "FAIL the driver invokes a python launcher without the resolver: $np"; st=1; }
 n=$((n+1)); grep -q 'run_bounded "\$_stpy" "\$SPEC_TOKENS_CLI"' "$SCRIPT" || { echo "FAIL the declared spec-token checker is not run through the resolved launcher"; st=1; }
+# ---- TOOL-aBriskDeclaration-1: the line above is now the read half's fallback for a start that could
+# ---- not make its capture. The checker's live launch is the start half's, so it is held to the same
+# ---- launcher: ST_PY assigned from the resolver alone, and the started command naming it.
+n=$((n+1)); { grep -q '^  ST_PY=\$(resolve_python 2>/dev/null)' "$SCRIPT" && grep -q 'init_bounded "\$ST_PY" "\$SPEC_TOKENS_CLI"' "$SCRIPT"; } || { echo "FAIL the started spec-token checker is not run through the resolved launcher"; st=1; }
 
 # ============================================================ TOOL-aBoundedVerdict-15
 # ---- S1: the two phase writers that did NOT stage now do. The leg's whole per-run population is the
