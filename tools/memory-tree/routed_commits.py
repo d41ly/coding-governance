@@ -1290,7 +1290,7 @@ def run_selftest() -> int:
                   "    except ValueError as exc: print('ValueError', exc)\n")
 
         def run40(*argv):
-            return subprocess.run([sys.executable, *argv], cwd=fix40, capture_output=True, text=True, env=env40)
+            return subprocess.run([sys.executable, *argv], cwd=fix40, capture_output=True, text=True, encoding="utf-8", env=env40)
 
         note40 = "unregistered-key check skipped: no edges.toml"
         want40 = ["[{'Pass': ['TOOL-tFix-2']}]"] * 2 + ["[{'Pass': ['TOOL-tFix-2'], 'Red-fix': []}]"]
