@@ -967,6 +967,19 @@ def read_carries_specs(root, design, cutoff, files=None, conf=None):
     parse, or carries a verb the grammar refuses, under `unparsed`, beside the selector's own reasons.
     Read per path without following a rename, so a rename starts a new history.
     """
+    texts, statuses, skipped = read_carries_texts(root, design, cutoff, files, conf)
+    history = load_design_lib().read_spec_revisions(pathlib.Path(root), list(texts))
+    specs = {}
+    for p, (build, text) in texts.items():
+        specs.setdefault(build, []).append((p, text, [after for _sha, _before, after in history.get(p, [])
+                                                      if after is not None]))
+    return specs, statuses, skipped
+
+
+def read_carries_texts(root, design, cutoff, files=None, conf=None):
+    """`read_carries_specs` up to its history read (TOOL-aLightenedLoop-1 S4): `(texts, statuses,
+    skipped)`, `texts` mapping each kept path to `(build, text)`, so a caller that needs only the
+    statuses reads no spec history."""
     dl = load_design_lib()
     gbi = load_kit_module("gen_build_index")
     root = pathlib.Path(root)
@@ -993,12 +1006,7 @@ def read_carries_specs(root, design, cutoff, files=None, conf=None):
             continue
         statuses[path] = unit["status"]
         texts[path] = (build, text)
-    history = dl.read_spec_revisions(root, list(texts))
-    specs = {}
-    for p, (build, text) in texts.items():
-        specs.setdefault(build, []).append((p, text, [after for _sha, _before, after in history.get(p, [])
-                                                      if after is not None]))
-    return specs, statuses, skipped
+    return texts, statuses, skipped
 
 
 def scan_carries(design, specs, exit_mode=False):
@@ -1119,7 +1127,7 @@ def scan_carries(design, specs, exit_mode=False):
     return {"findings": findings, "carriers": carriers, "measured": measured, "bindings": bindings}
 
 
-def derive_carries_coverage(root, files=None, conf=None):
+def derive_carries_coverage(root, files=None, conf=None, building=False):
     """The carries join's coverage, read once (TOOL-dTrueNorth-2): the one value the leg and the
     coverage region read. The keys come from `conf`, the caller's parse of `.memory-tree.conf`, or
     from `design_lib.read_design_conf`'s when it passes none, so the leg and the generator read one
@@ -1134,6 +1142,11 @@ def derive_carries_coverage(root, files=None, conf=None):
     `carries.py:293-312` computes, computed the same way, and its findings with their arm labels. A
     cutoff `check_cutoff_value` refused, a blank or unreadable design key and an unreadable history
     each raise `DesignRefusal`; a measured count of zero is returned, and refusing it is the leg's.
+
+    `building=True` (TOOL-aLightenedLoop-1 S4, check 29's staged read) returns early, after the
+    statuses, when no chain spec is INPROGRESS: `{"state": "armed", "cutoff", "building": False,
+    "builds"}`, each build carrying its `specs` and a `findings` of None. WHAT IT DOES NOT CHECK: on
+    that path a history read that would have failed is never reached.
     """
     root = pathlib.Path(root)
     dl = load_design_lib()
@@ -1148,6 +1161,15 @@ def derive_carries_coverage(root, files=None, conf=None):
         raise dl.DesignRefusal(f"{CARRIES_KEY} {cutoff} is set and every DESIGN_* key ({', '.join(dl.DESIGN_KEYS)}) "
                                "is blank, so the carries join has no design to read", blank=dl.DESIGN_KEYS)
     design = dl.read_design(root, conf)
+    if building:
+        texts, statuses, skipped = read_carries_texts(root, design, cutoff, files, conf)
+        if "INPROGRESS" not in statuses.values():
+            # TOOL-aLightenedLoop-1 S4 — no chain spec is building, so check 29 grades nothing: no
+            # history read and no join. `findings` is None, never [], so no reader takes this value
+            # for a clean coverage.
+            return {"state": "armed", "cutoff": cutoff, "building": False,
+                    "builds": {b: {"specs": [(p, statuses[p]) for p, (at, _t) in texts.items() if at == b],
+                                   "findings": None} for b in design["builds"]}}
     specs, statuses, skipped = read_carries_specs(root, design, cutoff, files, conf)
     scan = scan_carries(design, specs, exit_mode=True)
     carriers, bindings, measured = scan["carriers"], scan["bindings"], scan["measured"]

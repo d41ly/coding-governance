@@ -1,11 +1,12 @@
 # TOOL-aLightenedLoop-1 — the commit tail: `--write` writes only changed bytes, a render stamp answers the hook, check 9's staged skip admits a records edit, and check 29 exits early
 
-**Status:** INPROGRESS · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 1 · ratified 2026-11-14
+**Status:** CLOSED · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 1 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-14-build-TOOL-aLightenedLoop-1-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aLightenedLoop-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-14-build-TOOL-aLightenedLoop-1-analysis.md](../build/2026-11-14-build-TOOL-aLightenedLoop-1-analysis.md) | research | TOOL-aLightenedLoop-2 TOOL-aLightenedLoop-3 TOOL-aLightenedLoop-4 TOOL-aLightenedLoop-5 |
 | [2026-11-14-build-TOOL-aLightenedLoop-1-override-1.md](../build/2026-11-14-build-TOOL-aLightenedLoop-1-override-1.md) | override | — |
 | [2026-11-14-prompt-TOOL-aLightenedLoop-1-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aLightenedLoop-1-1-spec-writer.md) | journal | — |

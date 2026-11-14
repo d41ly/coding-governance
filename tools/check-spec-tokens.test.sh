@@ -1763,6 +1763,33 @@ check_rev_probe "read_spec_revisions reads bytes: the last revision after a mult
 check_rev_probe "read_carries_specs and the deviation population read one revision reader" "AC12 one reader True"
 check_rev_probe "scan_carries parses no status: a WONTDO carrier handed past the filter collides" "AC9 scan_carries parses no status True"
 check_rev_probe "the checker's SPEC_DATE is design_lib's one compiled pattern" "AC32 one date pattern True"
+# TOOL-aLightenedLoop-1 AC7 AC8 — check 29's staged read, in-process over the same fixture: with no
+# chain spec INPROGRESS, `building=True` stops after the statuses and every build carries `findings`
+# None; with dAlpha-1 flipped to INPROGRESS it returns the full value, a findings list per build. Red
+# against a derive with no `building` keyword, and against an early exit that ignores the statuses.
+cov_out=$(cd "$d" && "$PY" -c 'import importlib.util, sys
+path, kit, lint = sys.argv[1:4]
+sys.path.insert(0, kit)
+import design_lib as dl
+spec = importlib.util.spec_from_file_location("cst", lint)
+cst = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(cst)
+conf = dl.read_design_conf(".")
+def read_findings():
+    v = cst.derive_carries_coverage(".", conf=conf, building=True)
+    return sorted({type(e["findings"]).__name__ for e in v["builds"].values()})
+print("AC7 early", read_findings())
+text = open(path, encoding="utf-8").read()
+open(path, "w", encoding="utf-8", newline="\n").write(text.replace("**Status:** OPEN", "**Status:** INPROGRESS", 1))
+try:
+    print("AC8 full", read_findings())
+finally:
+    open(path, "w", encoding="utf-8", newline="\n").write(text)' "$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md" "$MEMORY_TREE" "$LINT" 2>&1)
+check_cov_probe() {   # $1 label · $2 the probe line it must print
+  case "$cov_out" in *"$2"*) echo "arm ok    $1"; pass=$((pass+1)) ;; *) echo "arm FAIL  $1 — expected the probe to print: $2"; printf '%s\n' "$cov_out" | tail -3; fail=$((fail+1)) ;; esac
+}
+check_cov_probe "building=True with no INPROGRESS chain spec returns findings None for every build" "AC7 early ['NoneType']"
+check_cov_probe "building=True with one INPROGRESS chain spec returns the full value's findings lists" "AC8 full ['list']"
 # TOOL-dTrueNorth-20 AC18 AC21 AC22 — ONE conf grammar, ONE row grammar and ONE date pattern, in-process.
 # AC18: a cutoff key outside the carries keys, declared twice and then behind `export `, reads its LAST
 # value through `read_conf_key`, red against the base reader, which took the first declaration and read
