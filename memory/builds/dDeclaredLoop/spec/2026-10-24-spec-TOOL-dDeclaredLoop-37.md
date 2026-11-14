@@ -14,6 +14,7 @@
 | [2026-11-13-build-TOOL-dDeclaredLoop-37-deviation-372.md](../build/2026-11-13-build-TOOL-dDeclaredLoop-37-deviation-372.md) | deviation | — |
 | [2026-11-14-build-TOOL-dDeclaredLoop-37-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-dDeclaredLoop-37-1-acceptance-ledger.md) | journal | — |
 | [2026-11-14-build-TOOL-dDeclaredLoop-37-deviation-373.md](../build/2026-11-14-build-TOOL-dDeclaredLoop-37-deviation-373.md) | deviation | — |
+| [2026-11-14-build-TOOL-dDeclaredLoop-37-red-fix-4.md](../build/2026-11-14-build-TOOL-dDeclaredLoop-37-red-fix-4.md) | red-fix | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
 | [2026-11-13-prompt-TOOL-dDeclaredLoop-37-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-dDeclaredLoop-37-1-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-dDeclaredLoop-37-reground-brief.md](../prompts/2026-11-13-prompt-TOOL-dDeclaredLoop-37-reground-brief.md) | research | — |
