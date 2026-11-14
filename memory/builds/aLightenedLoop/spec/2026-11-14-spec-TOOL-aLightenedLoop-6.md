@@ -1,13 +1,15 @@
 # TOOL-aLightenedLoop-6 — the closing review round 1 repaired: check 39 admits the wake reader, the spec-token key derived inside its stability bracket, check 29 reads chain specs once, and the arms that could not fail made able to
 
-**Status:** SPECCED · rev-1 · 2026-11-14 · node a · Tier-2 · base 4e2f7d26 · streams tooling · order 6
+**Status:** SPECCED · rev-2 · 2026-11-14 · node a · Tier-2 · base 4e2f7d26 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-14-prompt-TOOL-aLightenedLoop-6-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aLightenedLoop-6-1-spec-writer.md) | journal | — |
+| [2026-11-14-prompt-TOOL-aLightenedLoop-6-2-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aLightenedLoop-6-2-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aLightenedLoop-6-promotion.md](../prompts/2026-11-14-prompt-TOOL-aLightenedLoop-6-promotion.md) | research | — |
+| [2026-11-14-prompt-TOOL-aLightenedLoop-6-stamp-fold.md](../prompts/2026-11-14-prompt-TOOL-aLightenedLoop-6-stamp-fold.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -17,7 +19,10 @@ Close the eight items of the closing review's round 1,
 `memory/builds/aLightenedLoop/reviews/2026-11-14-review-TOOL-aLightenedLoop-1-5-implementation-diff-round1.md`
 (below, "the report"), as one batched repair unit under BUILD-METHOD M4: one allow-list entry, one
 reordered cache bracket, one avoided re-read, the arms that could not fail made able to, and three
-new bug classes recorded. The build's parity rule binds it: every touched check keeps its exit code,
+new bug classes recorded. A ninth item is the owner's fold,
+`memory/builds/aLightenedLoop/prompts/2026-11-14-prompt-TOOL-aLightenedLoop-6-stamp-fold.md`: unit
+1's `cmd_write` stamps a render with a key derived after the render, M3's defect in another cache,
+and it takes M3's bracket. The build's parity rule binds it: every touched check keeps its exit code,
 refusal text and rendered bytes, except check 39, whose red on this tree is the defect.
 
 ## 2. Scope (IN)
@@ -54,11 +59,17 @@ Each item names the report heading it repairs.
   164, and in `tools/check-spec-tokens.test.sh`, 251 to 252, each with a comment naming this unit.
   NOT OBSERVED by a criterion: a floor is read by its own suite at the close, and §7's `New arm:`
   lines name both moves.
+- **S12** — the owner's fold, not a report heading: `cmd_write` in
+  `tools/memory-tree/gen_build_index.py` reads the render key's four parts once before the render
+  and once after it, and stamps only when the two reads agree on every path the render did not write
+  and every path it wrote still holds the bytes it wrote. The reads move out of `derive_render_key`
+  into `read_render_state`, and the key's bytes over one tree do not change. Two selftest arms each
+  move the tree inside the window. Observed by AC15, AC16 and AC17.
 
 ## 3. Non-goals (OUT)
 
-- No behaviour beyond the eight items. The owner's rulings in the report's by-design block stand:
-  unit 1's staged stamp under the `[class]` override, unit 3 unscoped, and unit 5's fault path and
+- No behaviour beyond the nine items, the report's eight and the owner's fold. The owner's rulings
+  in the report's by-design block stand: unit 1's staged stamp under the `[class]` override, unit 3 unscoped, and unit 5's fault path and
   its default-on cache with its kill switch.
 - No edit of specs 1 to 5. They are CLOSED and frozen. This spec states where their claims now hold.
 - No `print_wake` change. M1 is an allow-list entry, and M6 adds arms only.
@@ -73,11 +84,7 @@ Each item names the report heading it repairs.
 ### Edges
 
 - **consumes-from** external — the landed code of units 1, 2, 3 and 5 at `4e2f7d26`: the stamp
-  guard, `print_wake`, `run_spec_token_check` and the liveness cache arms this unit repairs.
-- **hands-off** external — `cmd_write` in `tools/memory-tree/gen_build_index.py` derives the render
-  stamp's key after the render, the order S3 corrects in the driver, so an edit landing between the
-  render and the derive is stamped as rendered. It is the report's M3 left-shift sweep and outside
-  the eight items. The owner may file it.
+  guard and its key, `print_wake`, `run_spec_token_check` and the liveness cache arms this unit repairs.
 
 ## 4. Design
 
@@ -128,6 +135,16 @@ Every claim below was read at `4e2f7d26`, the run branch's tip after the report.
   `check-spec-tokens.py@d073ec443d3d:1344`, then falls through to `read_carries_specs` at `:1352`,
   which calls it again at `:1149`. Outside the checker, `read_carries_specs` is called only by
   `tools/check-spec-tokens.test.sh@6ce564b1e224:1754`.
+- `cmd_write` (`tools/memory-tree/gen_build_index.py@634b80267131:3297`) removes the stamp first
+  (`:3300-3303`), then runs `check_archives_tracked` (`:3304`), writes the view (`:3315`), writes every
+  artifact `plan` returns and removes the orphans (`:3316-3320`), and calls `print_verdicts` through
+  the module global (`:3330`). Only after all of that does it call `derive_render_key` (`:3343`) and
+  write the stamp (`:3345`). `derive_render_key` (`:1102-1131`) hashes HEAD, `git ls-files -z`, each
+  path `git diff HEAD --name-only` lists with its working-tree digest or `absent`, and the untracked
+  set, in that order. `write_text` writes `text.encode("utf-8")` (`:303`). Under `--write`, `plan`
+  makes every build README (`:2879`) and every unit spec (`:2911`) an artifact. The staged reader
+  compares the stamp with `derive_render_key(root)` (`:9100`). The selftest already swaps a module
+  global for a shim in-process and restores it in a `finally` (`:5533-5543`).
 - Dossiers: `memory/map/features/unattended-stops.md` and `memory/map/features/unattended.md`
   describe the stop-guard and the driver, and `memory/map/features/spec-tokens.md` the checker. Each
   carries a `gotcha-classes` key.
@@ -280,6 +297,52 @@ anchors are derived from the paths named. The dossier claims are by key:
 `unattended-stops` gains `boundary-arm-sits-past-its-margin.md`, `unattended` gains
 `refusal-branch-with-no-arm.md`, and `spec-tokens` gains `hot-path-reads-its-input-twice.md`.
 
+### M9 — the render stamp inside its bracket
+
+The key cannot simply be derived before the render, because the render writes, and the stamp must
+name the tree after the write, which is the tree `--check --staged` derives over. So the bracket
+spans the render, and the render's own writes are the only change it explains:
+
+1. `read_render_state(root)` holds today's reads of `derive_render_key`, up to the hash. It returns
+   `(head, tracked, differs, untracked)`: the HEAD bytes, the tracked paths in `ls-files` order, a
+   dict from each differing path to its digest or `absent` in `git diff` order, and the untracked
+   paths in order. It returns None when a git call fails.
+2. `derive_render_key(root, state=None)` hashes `state`, or a fresh `read_render_state(root)` when
+   it is None, in today's byte order with today's separators. A None state gives "". The staged
+   reader's call is unchanged, and the key over one tree is byte-identical to today's (AC17).
+3. `cmd_write` reads `before = read_render_state(root) if stamp else None` right after the stamp is
+   removed and before `check_archives_tracked`, so before any read the render makes.
+4. `cmd_write` keeps `written`, a dict from each repo-relative path it wrote to the text it wrote:
+   the view's when armed, and every artifact's. `orphans` is kept as `plan` returns it.
+5. At the stamp, under today's guard, `after = read_render_state(root)`, and the stamp is
+   `derive_render_key(root, after)` only when `check_render_settled(root, before, after, written,
+   orphans)` answers True.
+
+`check_render_settled` answers True when neither state is None, the two states are equal once every
+entry for a path in `written` or `orphans` is dropped from each part, every path in `written` reads
+back as exactly `text.encode("utf-8")`, and every orphan is absent. Paths compare as repo-relative
+`/` strings. The read-back runs after `after`, so an edit to a written path before `after` is seen by
+the bytes compare, and an edit after it is outside the stamped key, which then misses. An edit to any
+other path between `before` and `after` moves a part, so no stamp is written, and the next
+`--check --staged` renders in full, the case unit 1's AC4 arm shows. On a tree that holds still,
+`after` is what today's derive reads, so the stamped key is today's key.
+
+The arms sit in `test_render_stamp`, each in a fresh `_fixture` in its own folder under the
+function's base. Each appends a spec body line, runs `git add -A`, and runs
+`_read_mode(cmd_write, t, conf)` once with no shim, reading whether a file exists at
+`resolve_render_stamp(t)`. It then swaps the module global `print_verdicts` for a shim that makes
+one move and calls through, runs `_read_mode(cmd_write, t, conf)` again, restores the global in a
+`finally`, and reads again. Each arm wants `True False`, so the first read shows the stamp is
+reachable on that fixture.
+
+| arm | the shim's move | staged break |
+|---|---|---|
+| a path the render did not write | writes a new untracked `notes.md` in the fixture's memory folder | the `check_render_settled` call deleted from the stamp's condition |
+| a path the render wrote | appends a line to the fixture's tOne `README.md`, below its region | the bytes compare deleted from `check_render_settled` |
+
+`print_verdicts` runs after every write and before the stamp, so the shim's move lands inside the
+window. Under the second break the first arm stays green, because its move is outside `written`.
+
 ### Inventory
 
 | minted | kind | where |
@@ -288,6 +351,9 @@ anchors are derived from the paths named. The dossier claims are by key:
 | `boundary-arm-sits-past-its-margin` | gotcha class | `memory/gotchas/` |
 | `refusal-branch-with-no-arm` | gotcha class | `memory/gotchas/` |
 | `hot-path-reads-its-input-twice` | gotcha class | `memory/gotchas/` |
+| `read_render_state` | function, the key's reads split out | `tools/memory-tree/gen_build_index.py` |
+| `state` | keyword parameter of `derive_render_key` | `tools/memory-tree/gen_build_index.py` |
+| `check_render_settled` | function, the stamp's bracket test | `tools/memory-tree/gen_build_index.py` |
 | `stub-raced.py`, `stub-popen.py` | suite stub files, deleted by the block | the driver suite's fixture |
 
 ### What it does not check
@@ -298,6 +364,10 @@ anchors are derived from the paths named. The dossier claims are by key:
 - M5: the `not guarded` conjunct alone, for the reason above.
 - M6: the order of the rows. Each arm stages one reason on an otherwise healthy fixture.
 - M7: the time saved. The count is pinned because a wall-clock figure is too noisy for an arm.
+- M9: an edit made and reverted inside the window, which leaves the rendered tree. An edit to a
+  written path between the render's read of it and its `write_text`, which the write overwrites, as
+  it does today. Inputs outside the key, which are unit 1's stated limit: the interpreter, the
+  environment and ignored files.
 
 ### Files touched (estimate)
 
@@ -332,6 +402,13 @@ No path above is on the kickoff manifest's `watch:` line in `memory/guides/SESSI
   arm's red depends on the node's load. The pinned clock makes both directions exact.
 - **M5, three arms** as the report's class fix asks. The third cannot be seen red, by the gate
   rule of this charter.
+- **M9, the key derived before the render and compared after it**, the brief's first form. Every
+  `--write` that changes a byte moves the key, so it would refuse the stamp in exactly the flow unit
+  1 built it for: edit, `--write`, `git add -u`, commit.
+- **M9, a second `plan` after the derive to prove a fixed point.** It is correct, and it costs one
+  more full render per `--write`, the cost unit 1 exists to remove.
+- **M9, dropping the written paths without the bytes compare.** Under `--write` every unit spec and
+  build README is a written path, so an edit to a spec in the window would be stamped as rendered.
 - **M7, splitting out a history-only function.** It is a second public reader for one caller. The
   optional parameter keeps one.
 
@@ -346,16 +423,18 @@ stop-guard suite is withheld by `tools/unattended/kit.toml`, so the main loop ru
 - security — N/A: no new input, write path or grant. M3 narrows when a cache key is written.
 - perf / scale — M7 removes one status pass over every chain spec on each staged INPROGRESS commit,
   which spec 1 measured at 1.3 s over 1,543 specs (PINNED 2026-11-14, spec 1). M3 adds one replay on
-  a moved tree only. The arms add four `node` calls, five `--wake` runs, two fixture renders and one
+  a moved tree only. M9 adds one read of the key's four parts per `--write` and one read-back of
+  each written path. The arms add four `node` calls, five `--wake` runs, two fixture renders and one
   probe line. Under `budget-row-not-remeasured-after-added-arms`, the two raised floors owe a word on
   their budget rows: the stop-guard row is 60 s against a 23 s reading, and the spec-tokens row is
   130 s against 80 s, each a margin far above one call. The `build-index selftest` row, 140 s
-  against 88 s, gains two renders, and the main loop re-measures it if the close reads it above
+  against 88 s, gains six renders, two for M5 and four for M9, and the main loop re-measures it if the close reads it above
   100 s.
 - error / empty / loading states — M3 keeps every not-recorded line, and an empty key still records
   nothing.
 - observability — unchanged: the three not-recorded lines are today's bytes.
-- risks — M3 reorders a cache write, and AC3 with the existing tree-moved and no-record arms covers
+- risks — M9 can only withhold a stamp today's code writes, and a withheld stamp renders in full.
+  AC17 pins the key's bytes. M3 reorders a cache write, and AC3 with the existing tree-moved and no-record arms covers
   each branch. The `date` stubs are scoped to one call each, so no later arm inherits them.
 - testing — the `New arm:` lines of §7, each observed red on its staged break and green restored by
   the main loop at the close.
@@ -431,6 +510,19 @@ stop-guard suite is withheld by `tools/unattended/kit.toml`, so the main loop ru
 - **AC14** — When `python tools/codebase-map/gen_map.py --check` runs, it exits 0, and a grep of
   each named dossier's `gotcha-classes` line finds its class.
   Red when: a class is unclaimed, or `memory/map/generated/` was not re-rendered.
+- **AC15** — When the selftest's first moved-tree arm runs `cmd_write` over a `_fixture` with a
+  staged spec edit, a file exists at `resolve_render_stamp` after the unshimmed run, and none exists
+  after the run whose `print_verdicts` shim writes a new `notes.md` in the fixture's memory folder.
+  Red when: the stamp's condition does not call `check_render_settled`, so the moved tree is stamped.
+- **AC16** — When the second moved-tree arm runs the same sequence with a shim that appends a line
+  to the fixture's tOne `README.md`, a stamp exists after the unshimmed run and none after the
+  shimmed one.
+  Red when: `check_render_settled` skips the bytes compare, so an edit to a written path is stamped.
+- **AC17** — When `python -c` loads the built `gen_build_index.py` and its copy at `4e2f7d26`, read
+  with `git show`, over one scratch repository holding a committed, a modified, a deleted and an
+  untracked file, the old `derive_render_key(root)`, the built `derive_render_key(root)` and the
+  built `derive_render_key(root, read_render_state(root))` print three equal digests.
+  Red when: the built hash reads its parts in another order or with other separators.
 
 ## 7. Gates
 
@@ -451,6 +543,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC8 · the dead-`date` wa
 New arm: tools/unattended/unattended.test.sh · covers AC9 · the dead `date -d` wake arm, staged with the `TA_DEAD` branch deleted · none
 New arm: tools/memory-tree/gen_build_index.py --selftest · covers AC5 · the unmanaged-ledger stamp arm, staged with `not unmanaged` deleted from the guard · none
 New arm: tools/memory-tree/gen_build_index.py --selftest · covers AC6 · the V7 stamp arm, staged with `rc == 0` deleted from the guard · none
+New arm: tools/memory-tree/gen_build_index.py --selftest · covers AC15 AC16 · the two moved-tree stamp arms; AC15's staged with the `check_render_settled` call deleted from the stamp's condition, AC16's with the bytes compare deleted from `check_render_settled` · none
 New arm: tools/check-spec-tokens.test.sh · covers AC10 · the read-count probe, staged with `pre` ignored in `read_carries_specs` · `FLOOR_ASSERTIONS`, 251 to 252
 
 AC1's observation is the existing check-39 CONTROL arm of `tools/unattended/check-unattended.test.sh`,
@@ -464,6 +557,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-14 · initial draft.
+- rev-2 · 2026-11-14 · §1 · S12 · §3 · M9 · §5 · AC15 to AC17 · §7 · §10 · the owner's fold
+  `2026-11-14-prompt-TOOL-aLightenedLoop-6-stamp-fold`, handed off by
+  `2026-11-14-prompt-TOOL-aLightenedLoop-6-2-spec-writer`: the render stamp's key race moves from the
+  hands-off edge into scope.
 
 ## 10. Reuse audit
 
@@ -477,7 +574,9 @@ the AC9 stub pattern of the driver suite's spec-token block, the session move's 
 `run_spec_token_check` around `derive_spec_token_key` and `read_tree_state`. M7 widens
 `read_carries_specs`. M8 follows the `memory/gotchas/` record shape and the dossiers' existing key.
 Of the brief's named seams, `check_staged_render` and `check_index_input` are not touched, since M5
-grades `cmd_write`'s guard and not the staged classifier. `runLiveness` is untouched, as M4 calls
+grades `cmd_write`'s guard and not the staged classifier. M9 extends `derive_render_key` by
+splitting its reads into `read_render_state`, and its arms extend `test_render_stamp` with the
+selftest's module-global shim swap. `runLiveness` is untouched, as M4 calls
 `readLiveness`. `DRIVER_STEPS` is not used, since no item touches the unit driver. Recall's first
 hit, TOOL-aBatchedPacket-2, is the precedent for this unit's shape: one repair unit, one `New arm:`
 line per arm, each with its staged break.

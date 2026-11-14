@@ -68,10 +68,10 @@ ids TOOL-aLightenedLoop-1 TOOL-aLightenedLoop-2 TOOL-aLightenedLoop-3 TOOL-aLigh
 | [TOOL-aLightenedLoop-3 — `--dispatch` runs before the builder spawns, and its spec-token cache keys on what the checker read](spec/2026-11-14-spec-TOOL-aLightenedLoop-3.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-14 |
 | [TOOL-aLightenedLoop-4 — a builder checks its spec can be built before its first edit, a spec cites where it read the code, and a watched path brings its manifest re-stamp](spec/2026-11-14-spec-TOOL-aLightenedLoop-4.md) | 4 | 2 | CLOSED | rev-1 | 2026-11-14 |
 | [TOOL-aLightenedLoop-5 — the stop-guard caches the `--liveness` verdict, keyed on every input the verdict reads and expired by the liveness clock](spec/2026-11-14-spec-TOOL-aLightenedLoop-5.md) | 5 | 2 | CLOSED | rev-2 | 2026-11-14 |
-| [TOOL-aLightenedLoop-6 — the closing review round 1 repaired: check 39 admits the wake reader, the spec-token key derived inside its stability bracket, check 29 reads chain specs once, and the arms that could not fail made able to](spec/2026-11-14-spec-TOOL-aLightenedLoop-6.md) | 6 | 2 | SPECCED | rev-1 | 2026-11-14 |
+| [TOOL-aLightenedLoop-6 — the closing review round 1 repaired: check 39 admits the wake reader, the spec-token key derived inside its stability bracket, check 29 reads chain specs once, and the arms that could not fail made able to](spec/2026-11-14-spec-TOOL-aLightenedLoop-6.md) | 6 | 2 | SPECCED | rev-2 | 2026-11-14 |
 <!-- /gen:build-units -->
 
-Records: 21 bound to this build, across 4 record folder(s).
+Records: 23 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -125,7 +125,7 @@ No behaviour beyond the eight items. The owner's rulings recorded in the review'
 
 ### task:reuse
 
-check_staged_render / check_index_input (gen_build_index.py:977, :895) · derive_spec_token_key + gate-fingerprint.sh (unattended.sh:14458) · runLiveness (stop-guard.js:111) · DRIVER_STEPS (unattended-unit.js:259) · reuse_lookup found no generic caching seam
+`tools/memory-tree/gen_build_index.py#check_staged_render` · `tools/memory-tree/gen_build_index.py#check_index_input` · `tools/unattended/unattended.sh#derive_spec_token_key` + gate-fingerprint.sh · `tools/unattended/stop-guard.js#runLiveness` · `tools/workflows/unattended-unit.js#DRIVER_STEPS` · reuse_lookup found no generic caching seam
 
 ### card:route
 
