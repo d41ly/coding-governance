@@ -56,7 +56,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 5 unit(s) · node a · opened 2026-11-14 · streams tooling
+**Build status:** CLOSED · 5 unit(s) · node a · opened 2026-11-14 · streams tooling
 ids TOOL-aLightenedLoop-1 TOOL-aLightenedLoop-2 TOOL-aLightenedLoop-3 TOOL-aLightenedLoop-4 TOOL-aLightenedLoop-5
 
 <!-- gen:build-units -->
@@ -66,10 +66,10 @@ ids TOOL-aLightenedLoop-1 TOOL-aLightenedLoop-2 TOOL-aLightenedLoop-3 TOOL-aLigh
 | [TOOL-aLightenedLoop-2 — the idle-wake tick: one cheap `--wake` verb that ends a healthy turn, and a longer cadence while a registered task is open](spec/2026-11-14-spec-TOOL-aLightenedLoop-2.md) | 2 | 2 | CLOSED | rev-1 | 2026-11-14 |
 | [TOOL-aLightenedLoop-3 — `--dispatch` runs before the builder spawns, and its spec-token cache keys on what the checker read](spec/2026-11-14-spec-TOOL-aLightenedLoop-3.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-14 |
 | [TOOL-aLightenedLoop-4 — a builder checks its spec can be built before its first edit, a spec cites where it read the code, and a watched path brings its manifest re-stamp](spec/2026-11-14-spec-TOOL-aLightenedLoop-4.md) | 4 | 2 | CLOSED | rev-1 | 2026-11-14 |
-| [TOOL-aLightenedLoop-5 — the stop-guard caches the `--liveness` verdict, keyed on every input the verdict reads and expired by the liveness clock](spec/2026-11-14-spec-TOOL-aLightenedLoop-5.md) | 5 | 2 | INPROGRESS | rev-2 | 2026-11-14 |
+| [TOOL-aLightenedLoop-5 — the stop-guard caches the `--liveness` verdict, keyed on every input the verdict reads and expired by the liveness clock](spec/2026-11-14-spec-TOOL-aLightenedLoop-5.md) | 5 | 2 | CLOSED | rev-2 | 2026-11-14 |
 <!-- /gen:build-units -->
 
-Records: 17 bound to this build, across 3 record folder(s).
+Records: 18 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -254,11 +254,15 @@ header of the `health_log_sh` block in `lib-unattended.sh`.
 ## The sidecar
 
 `<git-dir>/unattended/` is where the keepalive actors write, and it is the WORKTREE's git dir,
-never the common dir, because a run lives in one worktree. Three kinds, one file per run each:
+never the common dir, because a run lives in one worktree. Four kinds, one file per run each:
 `stop.<slug>.log`, one JSON line per stop the stop-guard decided (unit 3); `stall.<slug>.log`, one
 line per API-error end the stall-recorder saw (unit 4); `resume.<slug>.log`, one attempt line per
-tick, with the launcher `resume.<slug>.<utc>.sh` and its `.out` beside it (unit 5). Append-only and
-never tracked; read by `--liveness`, `--status`, `--landed` and the tick.
+tick, with the launcher `resume.<slug>.<utc>.sh` and its `.out` beside it (unit 5). The first three
+are append-only and never tracked; read by `--liveness`, `--status`, `--landed` and the tick.
+The fourth, `liveness.<slug>.json`, is the stop-guard's cache of the driver's `--liveness` stdout
+(`TOOL-aLightenedLoop-5`): one entry, rewritten whole, keyed on a hash of every input that verdict
+reads, a LIVE entry expiring before a fresh read could say STALE. Only the stop-guard reads it, and
+`STOP_GUARD_LIVENESS_CACHE=off` in the hook's environment stops it being read or written.
 
 ## The bar `--close` runs
 

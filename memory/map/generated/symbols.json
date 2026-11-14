@@ -2928,6 +2928,11 @@
       "file": "tools/memory-tree/tree_lib.py"
     },
     {
+      "id": "build_gitfixture",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.test.sh"
+    },
+    {
       "id": "build_gov_index",
       "kind": "function",
       "file": "tools/govkit/census.py"
@@ -9136,6 +9141,11 @@
       "id": "deriveLiveness",
       "kind": "function",
       "file": "tools/workflows/drift-audit-state.template.js"
+    },
+    {
+      "id": "deriveLivenessKey",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
     },
     {
       "id": "deriveOrder",
@@ -16873,6 +16883,11 @@
       "file": "tools/unattended/run-lease.js"
     },
     {
+      "id": "readBytes",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
+    },
+    {
       "id": "readCard",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -16896,6 +16911,11 @@
       "id": "readConfValue",
       "kind": "function",
       "file": "tools/unattended/run-lease.js"
+    },
+    {
+      "id": "readDigits",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
     },
     {
       "id": "readDispatchedUnits",
@@ -16971,6 +16991,11 @@
       "id": "readLiveSlugs",
       "kind": "function",
       "file": "tools/hooks/format-guard.js"
+    },
+    {
+      "id": "readLiveness",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
     },
     {
       "id": "readMemoryRoot",
@@ -17886,6 +17911,11 @@
       "id": "read_core",
       "kind": "function",
       "file": "tools/lexicon/subtokens.py"
+    },
+    {
+      "id": "read_count",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.test.sh"
     },
     {
       "id": "read_cutoff_key",
@@ -26798,6 +26828,11 @@
       "file": "tools/playbook/pins.py"
     },
     {
+      "id": "run_fxgit",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.test.sh"
+    },
+    {
       "id": "run_gate",
       "kind": "function",
       "file": "tools/check-remote-literals.test.sh"
@@ -29783,6 +29818,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "set_live_clock",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.test.sh"
+    },
+    {
       "id": "set_liveness",
       "kind": "function",
       "file": "tools/unattended/stop-guard.test.sh"
@@ -31408,6 +31448,11 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_nostore",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.test.sh"
+    },
+    {
       "id": "test_one_retirement_is_free",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -32801,6 +32846,11 @@
       "id": "write_candidate",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "write_capture",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.test.sh"
     },
     {
       "id": "write_card",
