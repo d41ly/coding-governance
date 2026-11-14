@@ -126,8 +126,8 @@ commit. AC3 to AC5 are the builder's, before the commit.
   refuses it to `gov-builder`.
   figure: PINNED. That the door's three lines were the only hits is the main loop's run at `0578adb73`.
 - **AC2** — When the main loop runs the same checker in a scratch clone detached at the pass
-  commit's parent, it lists `tools/chain-packet.py:239`, `tools/chain-packet.py:245` and
-  `tools/chain-packet.test.sh:405`, and exits 1.
+  commit's parent, it lists `tools/chain-packet.py@dc026a49:239`, `tools/chain-packet.py@dc026a49:245` and
+  `tools/chain-packet.test.sh@d3447869:405`, and exits 1.
   Red when: the clone is detached at the pass commit itself, or the checker no longer reads a quoted
   kit segment joined by `/`, and it exits 0.
   permission: as AC1.
