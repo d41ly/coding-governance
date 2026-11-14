@@ -7798,6 +7798,11 @@
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
+      "id": "check_trailer_parses",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
       "id": "check_tree",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"

@@ -439,7 +439,7 @@ Cite ids, never line numbers.
 | [TOOL-dCarriedReceipt-3](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | a FOLD pass legitimately spans many units, and the dispatch machinery… |
 | [TOOL-dCarriedReceipt-4](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | a spec that is DELIBERATELY never closed cannot be cited from tracked… |
 | [TOOL-dClosedLexicon-14](../builds/dClosedLexicon/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | govkit check printed playbook: landed-but-inert and exited 0 over a… |
-| [TOOL-dDeclaredLoop-35](../builds/dDeclaredLoop/BACKLOG.md) | INPROGRESS | MED | TOOL-dDeclaredLoop-37 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dDeclaredLoop-35](../builds/dDeclaredLoop/BACKLOG.md) | DEFERRED | MED | TOOL-dDeclaredLoop-10 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dDeclaredLoop-101](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE ABSENT-EXPANSION REFUSAL ADMITS A VALUE ON A CORE POINT.… |
 | [TOOL-dDeclaredLoop-102](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | A NEW POLICY KEY LANDS WITHOUT ITS PRESET VALUES. v2:1421 lets no key… |
 | [TOOL-dDeclaredLoop-103](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE MAILBOX INTERRUPT NAMES THE WRONG ARMING BUILD.… |

@@ -135,7 +135,10 @@ def run_git(repo, *args, stdin: bytes | None = None, may_fail: bool = False):
         if may_fail:
             return None
         detail = proc.stderr.decode("utf-8", "replace").strip()
-        raise Refusal(f"`git {' '.join(args)}` failed: {detail}")
+        refusal = Refusal(f"`git {' '.join(args)}` failed: {detail}")
+        # TOOL-dDeclaredLoop-37 S5: a caller whose verb answers through its status reads it here.
+        refusal.status, refusal.out = proc.returncode, proc.stdout
+        raise refusal
     return proc.stdout
 
 
@@ -579,6 +582,37 @@ def read_newest_unit(repo, rev_range: str) -> str:
             if uid in id_map:
                 return uid
     return ""
+
+
+#: TOOL-dDeclaredLoop-37 S5: the two spellings of a consumer's own trailer parse. Each literal is split
+#: inside its needle, so the probe never reads this line as a hit.
+TRAILER_PARSE_NEEDLES = ("trailers:key=" "Pass,", "interpret-trailers " "--parse")
+
+
+def check_trailer_parses(root, rev=None) -> list:
+    """Every line under `root` that spells its own trailer parse, as `<path>:<line>` relative to
+    `root`: ONE `git grep -n -F` for the two needles, run in `root`, over its tracked files, or
+    over the tree of `rev` when given, less `*.test.sh` and any `commit_trailers.py`.
+    [] where git greps and finds none; Refusal where git cannot grep `root`.
+
+    It does not read a parse spelled another way, a key other than `Pass`, or an untracked file."""
+    argv = ["grep", "-n", "-z", "-F"]
+    for needle in TRAILER_PARSE_NEEDLES:
+        argv += ["-e", needle]
+    argv += ([rev] if rev else []) + ["--", ".", ":!*.test.sh", ":!*commit_trailers.py"]
+    try:
+        out = run_git(root, *argv)
+    except Refusal as exc:
+        # git grep exits 1 for no match; any other failure is git unable to grep, never an empty answer.
+        if exc.status == 1 and not exc.out.strip():
+            return []
+        raise
+    hits = []
+    for line in out.decode("utf-8", "replace").split("\n"):
+        if line:
+            path, num = line.split("\0")[:2]
+            hits.append(f"{path[len(rev) + 1:] if rev else path}:{num}")
+    return hits
 
 
 # ------------------------------------------------------------------------------------- self-test
@@ -1195,6 +1229,31 @@ def run_selftest() -> int:
             subprocess.run = real_run
         print_arm("the spec revision log failed" in seen and "fatal: the stub refuses git log" in seen,
             "TOOL-dTrueNorth-20 AC17 a revision log exiting 128 raises the named refusal, its stderr line in it", seen)
+
+        # ---- TOOL-dDeclaredLoop-37 AC3 (S5): no consumer spells its own trailer parse. The live arm
+        # reads the tracked files of the tool root this kit sits in; the planted arm a scratch
+        # repository, by revision, since the fixture checks nothing out. Both sit outside every
+        # counted GIT_SPAWNS window.
+        try:
+            hits = check_trailer_parses(KIT.parent)
+            print_arm(not hits, "TOOL-dDeclaredLoop-37 AC3 no tracked file under the tool root spells its own "
+                "trailer parse", "\n".join(hits))
+        except Refusal:
+            print("  ok   — TOOL-dDeclaredLoop-37 AC3 NOT GRADED: the tool root is not in a git work tree, so no "
+                  "file was read for a trailer parse")
+        planted = "fmt = '" "%(trailers:key=" "Pass,valueonly)'\n"
+        repo, s = build_fixture(root, "parses", [{"msg": "plant", "files": {
+            "kit/consumer.sh": "# a consumer\n" + planted, "kit/consumer.test.sh": planted,
+            "kit/commit_trailers.py": planted}}])
+        hits = check_trailer_parses(repo, s[0])
+        try:
+            seen = f"returned {check_trailer_parses(repo, '0' * 40)!r}"
+        except Refusal as exc:
+            seen = f"Refusal {exc}"
+        print_arm(hits == ["kit/consumer.sh:2"] and seen.startswith("Refusal "),
+            "TOOL-dDeclaredLoop-37 AC3 a planted consumer's trailer parse is named by path and line, the suite "
+            "and the reader beside it are not, and a revision git cannot grep is a Refusal",
+            f"hits {hits!r}\nan unreadable revision: {seen}")
     finally:
         shutil.rmtree(root, ignore_errors=True)
     print(f"{SAY} selftest: {'all arms held' if not failed else f'{len(failed)} arm(s) FAILED'}")
