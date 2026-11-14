@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-13
 streams: tooling
 roster: TOOL
-ids: TOOL-aBatchedPacket-1 TOOL-aBatchedPacket-2
+ids: TOOL-aBatchedPacket-1 TOOL-aBatchedPacket-2 TOOL-aBatchedPacket-3
 authorized-by: prompt
 ---
 
@@ -54,7 +54,7 @@ None.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 2 unit(s) · node a · opened 2026-11-13 · streams tooling
-ids TOOL-aBatchedPacket-1 TOOL-aBatchedPacket-2
+ids TOOL-aBatchedPacket-1 TOOL-aBatchedPacket-2 TOOL-aBatchedPacket-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
