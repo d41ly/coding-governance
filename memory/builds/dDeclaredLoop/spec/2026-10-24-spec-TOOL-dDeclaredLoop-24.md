@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-24 — the `item` kind in the kinds register, its factory, and the checks over the composed items
 
-**Status:** INPROGRESS · rev-4 · 2026-11-14 · node d · Tier-2 · base ed497191 · streams tooling · order 11 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-5 · 2026-11-14 · node d · Tier-2 · base ed497191 · streams tooling · order 11 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0109@48e119fc whole
 
@@ -14,11 +14,13 @@
 | [2026-10-25-build-TOOL-dDeclaredLoop-24-deviation-241.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-24-deviation-241.md) | deviation | — |
 | [2026-11-14-build-TOOL-dDeclaredLoop-24-1-builder-return.md](../build/2026-11-14-build-TOOL-dDeclaredLoop-24-1-builder-return.md) | journal | — |
 | [2026-11-14-build-TOOL-dDeclaredLoop-24-deviation-242.md](../build/2026-11-14-build-TOOL-dDeclaredLoop-24-deviation-242.md) | deviation | — |
+| [2026-11-14-build-TOOL-dDeclaredLoop-24-deviation-243.md](../build/2026-11-14-build-TOOL-dDeclaredLoop-24-deviation-243.md) | deviation | — |
 | [2026-11-14-build-TOOL-dDeclaredLoop-24-red-fix-14.md](../build/2026-11-14-build-TOOL-dDeclaredLoop-24-red-fix-14.md) | red-fix | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-56 |
 | [2026-11-14-prompt-TOOL-dDeclaredLoop-24-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-24-1-spec-writer.md) | journal | — |
+| [2026-11-14-prompt-TOOL-dDeclaredLoop-24-2-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-24-2-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-dDeclaredLoop-24-build-brief.md](../prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-24-build-brief.md) | journal | — |
 | [2026-11-14-prompt-TOOL-dDeclaredLoop-24-reground-brief.md](../prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-24-reground-brief.md) | research | — |
 | [2026-11-14-prompt-TOOL-dDeclaredLoop-24-spec-brief.md](../prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-24-spec-brief.md) | research | — |
@@ -61,13 +63,15 @@ record-version join over it.
   `tools/playbook/render_playbook.py#read_kind_rows` runs today: the schema, gov's rows read at
   `HEAD` from the kind's namespace `source`, the overlay's rows, the tag-valued policy where an
   exclusion is set, and `derive_row_composition`. It answers None where the kind's schema file is
-  absent from `root`, so a target without the loop kit composes no item row; `read_kind_rows` calls
+  absent from `root`, so a target without the loop kit composes no item row, and where `HEAD` is
+  unborn or holds no blob at the namespace `source`, so a first install's render, its definition
+  staged and not committed, composes no item row and refuses nothing (§8 F9); `read_kind_rows` calls
   it per kind and passes over a None. A `compose --kind <kind>` verb on the same module prints one
   kind's composition as JSON, the verb TOOL-dDeclaredLoop-26 §8 F5 asked for (§8 F5). The `item`
   row of `tools/playbook/namespaces.toml` takes `source = "{prefix}/loop/loop.toml"`, the path form
-  that read takes. Observed by AC9, AC12 and AC13.
-  **Readers:** by name: `tools/playbook/render_playbook.py`, its kind-rows reader, which hands a
-  namespace's `source` to `git show` · by value: `tools/playbook/render_playbook.py`, the same
+  that read takes. Observed by AC9, AC12, AC13 and AC14.
+  **Readers:** by name: `tools/playbook/render_playbook.py`, its kind-rows reader, which reads a
+  namespace's `source` at `HEAD` · by value: `tools/playbook/render_playbook.py`, the same
   reader, and `tools/playbook/tag_index.py`, its namespace reader, which requires a non-empty
   `source` and joins nothing on it.
 - **S4** — The item checks, `check_item_composition` in `tools/loop/loop_items.py`, over the
@@ -194,10 +198,24 @@ registers `floor`.
 ### The composition read
 
 `derive_kind_composition(root, kind, exclude, records)` returns what `derive_row_composition`
-returns, or None where the file the kind row's `schema` names is absent from `root`. Its body is
-`read_kind_rows`' loop body today: `read_kind_schema`, the namespace row's `source` resolved through
-the tool root and read by `git show HEAD:<path>`, `read_overlay_rows`, `read_tag_policy` at `HEAD`
-when `exclude` is non-empty, and `derive_row_composition` under the stale mode `order`.
+returns, or None in two cases, each checked before any read grades: the file the kind row's `schema`
+names is absent from `root`; or the namespace row's `source`, resolved through the tool root, is no
+blob at `HEAD`, an unborn `HEAD` included (`tools/playbook/overlay.py#check_born`). Its body is
+`read_kind_rows`' loop body today: `read_kind_schema`, the `source` read at `HEAD`,
+`read_overlay_rows`, `read_tag_policy` at `HEAD` when `exclude` is non-empty, and
+`derive_row_composition` under the stale mode `order`.
+
+The `source` is read through `tools/memory-tree/tree_lib.py#read_blobs_at`, the one `<rev>:<path>`
+reader, which answers None for a path the revision does not hold, as
+`tools/playbook/overlay.py#read_landed_text` reads the overlay; it replaces the
+`tools/playbook/instruction_units.py#run_git` call at
+`tools/playbook/render_playbook.py@3b75311dc:1459`, whose failure on a path absent at `HEAD` raises
+`LevelError`, which `tools/playbook/render_playbook.py#render_delta_report` turns into a `Refusal`.
+`govkit apply` stages what it lands and never commits (`tools/govkit/govkit.py@cfde91758:8015`), and
+its playbook adopter renders inside the same run, so a first install's definition is on disk and in
+the index but not at `HEAD`. Every read of the composition stays at one revision, the overlay and the
+exclusions already at `HEAD` (§8 F9): that render composes no item row, and the next render after the
+install's commit composes gov's.
 
 ```text
 python <prefix>/playbook/overlay_rows.py compose --kind <kind>
@@ -208,8 +226,9 @@ It composes the repository at the working directory, `exclude` from
 `tools/playbook/instruction_units.py#read_change_records`, and prints one JSON object: `rows`, the
 composed rows; `states`; `held`; `stale`; `operations`, the classified patch operations of the
 row checks; and `pins`, each gov row's eight-hex pin over its canonical form, the pin an `amends` or
-`supersedes` names. Exit 0; 1 with each red line of an `OverlayRefused`; 2 naming `unarmed` where the
-kind is not registered with a schema or its schema file is absent, and on a usage error.
+`supersedes` names. Exit 0; 1 with each red line of an `OverlayRefused`; 2 naming `unarmed` and the
+path where the kind is not registered with a schema, its schema file is absent, or `HEAD` holds no
+blob at its `source`, and on a usage error.
 
 `tools/loop/loop_items.py` finds the playbook kit through `tools/loop/loop_lib.py#resolve_kit_dir`
 and runs the verb as a subprocess, so the loop kit imports no playbook module and takes no edge to
@@ -232,7 +251,8 @@ fields = "<hash8>"   # the kind's KINDS row, its `required` and `closed`, as can
 - Every typed kind, a key of `tools/memory-tree/build_records.py#KINDS`, that an item returns or
   reads holds one row; a row whose kind is no typed kind is refused.
 - `check` recomputes each `fields` from that kind row. A hash that differs while `version` did not
-  move is red, naming the kind: its meaning changed with no bump. A bump re-pins the hash.
+  move is red, naming the kind: its meaning changed with no bump. A bump re-pins the hash. The rule
+  reads no base, so a `fields` re-pinned with no bump is green (§5, §8 F10).
 - An untyped kind reads version 1 and has no row.
 - Each record input of a composed item is met by an item in its needs closure, every tag its
   `needs` name, any-of members included, followed transitively, whose `returns` names that kind at
@@ -326,7 +346,9 @@ kind.
 
 Live on landing. In gov, the leg grades gov's own items on every bar. In a target, the next update's
 render composes the item kind as it composes units, its delta report printing one line per gov item,
-61 PINNED 2026-11-14, and a target holding no loop kit composes none (S3).
+61 PINNED 2026-11-14, and a target holding no loop kit composes none (S3). A first install's render
+composes none either, its definition staged and not yet committed, and the render after that commit
+composes gov's items (F9).
 
 ### Files touched (estimate)
 
@@ -334,7 +356,8 @@ render composes the item kind as it composes units, its delta report printing on
 - `tools/playbook/core-pending.txt`: the `kind` row of `kind.item`
 - `tools/playbook/namespaces.toml`: the `item` row's `source`
 - `tools/playbook/overlay_rows.py`: `derive_kind_composition`, the `compose` verb and its docstring
-- `tools/playbook/render_playbook.py`: `read_kind_rows` through `derive_kind_composition`
+- `tools/playbook/render_playbook.py`: `read_kind_rows` through `derive_kind_composition`, its
+  `run_git` read of the `source` gone
 - `tools/loop/item-schema.toml`
 - `tools/loop/loop_items.py`
 - `tools/loop/loop.toml`: the `[[record-version]]` rows
@@ -347,6 +370,14 @@ render composes the item kind as it composes units, its delta report printing on
 - `tools/govkit/registry.toml`: the `[[exempt_leg]]` row
 - `tools/gate-legs.json`: the leg `loop item kind`, argv `python {prefix}/loop/loop_items.py check
   --selftest`, `selftests`, `repo`, ceiling 300, `enforces` `principle.p16`
+- `tools/run-gates/selftest-budgets.txt`: the `loop item kind` row, since the leg runs in the
+  `selftests` chunk: its budget one reading of the leg alone over the built tree, x1.5 floored at 60,
+  its reading column naming that reading and its argv column empty, so the argv is taken from
+  `tools/gate-legs.json`, as the `loop computed witness` row
+  (`tools/run-gates/selftest-budgets.txt@4f03cfa80:76`). `run-selftests.sh --check`
+  (`tools/run-gates/run-selftests.sh@25d3174e1:288`), the leg `every held leg is budgeted, every
+  budget row resolves`, reads it both ways, a held leg with no row red; `--serial` grades the suite's
+  cost against the budget.
 - `tools/govkit/subject-pins.tsv`, regenerated by `python tools/govkit/govkit.py selfcheck --write`
 - `memory/map/features/loop.md`: the leg in its `gate-legs` list
 - `memory/map/generated/`, re-rendered by the codebase-map kit's `gen_map.py --write`
@@ -374,19 +405,33 @@ render composes the item kind as it composes units, its delta report printing on
 - perf / scale — 61 gov rows, PINNED 2026-11-14, composed once per `check` by one subprocess. The
   leg's ceiling is 300 seconds, PINNED 2026-11-14 as `loop computed witness`'s, whose plants also
   build scratch repositories; `tools/run-gates/ceiling-evidence.txt` is the runner's, so no row.
-- error / empty / loading states — an unresolved playbook kit, an unregistered kind and an absent
-  schema each exit 2 as `unarmed`, never green; an unreadable overlay is the verb's exit 1; an empty
-  `[[item]]` table is `check_program`'s refusal, since each step's exit must be a declared item.
+- error / empty / loading states — an unresolved playbook kit, an unregistered kind, an absent
+  schema and a definition `HEAD` does not hold each exit 2 as `unarmed`, never green; the render
+  passes over the last two and composes no item row (F9); an unreadable overlay is the verb's exit 1;
+  an empty `[[item]]` table is `check_program`'s refusal, since each step's exit must be a declared
+  item.
 - observability — each refusal names the item, the field, the requirer or the key, and the
   `fixed-by` source; each patch prints its class, each version row its hash.
 - risks — §8 F6 fixes `actor`, so an adopter cannot re-assign a gov item's actor. Every target's
-  render prints the item delta lines. Both kits' versions move where the lander mints them
-  (`tools/govkit/govkit.py#cmd_epoch`).
+  render prints the item delta lines once its definition is committed. Both kits' versions move where
+  the lander mints them (`tools/govkit/govkit.py#cmd_epoch`).
+- what the checks do not check — the render does not tell a first install, its definition staged
+  and not committed, from a target whose definition was deleted and committed: each composes no item
+  row and prints no line saying so (F9). The record-version rule compares each pinned `fields` with
+  the hash recomputed from `KINDS` and nothing else (F10): it reds a `KINDS` change made without
+  touching the definition, and a `fields` value re-pinned with no `version` bump stays green, an edit
+  of the definition's own row that only the review of its diff sees.
 - testing — what the change could newly red, and what keeps each green:
   - `core kinds` and `core meta-check`: the pending row is deleted in the same change, the leg
     exists, enforces `principle.p16` and carries no `guard`.
   - `govkit selftest`: `tools/govkit/selftest.py#check_step_gate_fixture` gains the `item` case,
-    held by the class's plant and the witness row the fixture writes.
+    held by the class's plant and the witness row the fixture writes. Its default-apply arm, `OC8 AC4
+    a default apply into a scratch target exits 0` in `tools/govkit/selftest.py#check_roles_install`
+    (`tools/govkit/selftest.py@2d8b5b278:2975`), applies the playbook and loop kits into a scratch
+    target whose `HEAD` holds only the governing doc, so its render meets the definition staged and
+    not committed: F9's None keeps that render unrefused, and AC14 stages the same state.
+  - `every held leg is budgeted, every budget row resolves`: the `loop item kind` row of
+    `tools/run-gates/selftest-budgets.txt` lands in the same change as the leg.
   - `docs`: the class has its `tools/govkit/usage.toml` row, each command the pages show has a
     usage row and anchor, a block a scratch adopter cannot run carries a `run: no` line, and
     `help/reference/kinds.md` is re-rendered for the row's new `usage`.
@@ -474,19 +519,29 @@ render composes the item kind as it composes units, its delta report printing on
   Red when: the schema's fixed rows drift from the step exits the definition names.
 - **AC12** — When `python loop_items.py --fixture --plant schema-absent` runs there, the scratch
   holding no `item-schema.toml`, the scratch's `overlay_rows.py compose --kind item` exits 2 naming
-  `unarmed`, `check` exits 2, and a `python -c` subprocess there calling `read_kind_rows` prints no
-  item row.
+  `unarmed` and the schema's path, `check` exits 2, and a `python -c` subprocess there calling
+  `read_kind_rows` prints no item row.
   Red when: a target holding the playbook kit without the loop kit's schema refuses its render.
 - **AC13** — When `python loop_items.py check` runs there on the built tree, it exits 0 printing
   `loop: items composed · 61 row(s) · 0 repository` and two `loop: record-version` lines, PINNED.
   figure: 61 and two PINNED 2026-11-14, the `[[item]]` tables and the typed kinds returned at HEAD.
   Red when: a gov item fails the kind's own checks, or a typed kind returned holds no version row.
+- **AC14** — When `python loop_items.py --fixture --plant definition-uncommitted` runs there, its
+  scratch committing the definition's removal and then staging the definition again, so `HEAD` holds
+  no `tools/loop/loop.toml` while the index and the disk do, as `govkit apply` leaves a first install:
+  the scratch's `overlay_rows.py compose --kind item` exits 2 naming `unarmed` and
+  `tools/loop/loop.toml`; `check` exits 2; a `python -c` subprocess there calling
+  `render_delta_report` returns with no `Refusal` and no line whose origin is `gov:item`; and after a
+  `git commit` of the staged definition there, the same call prints 61 `gov:item` lines.
+  figure: 61 PINNED 2026-11-14, the `[[item]]` tables at HEAD.
+  Red when: the first render of an install whose definition is staged and not committed refuses, or
+  composes gov's items from a revision that does not hold them.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `loop definition` · `loop transition tables` · `loop checklist tags` · `loop computed witness` · `core kinds` · `core meta-check` · `core selftest` · `tags (the resolver's checks)` · `step-gate` · `docs` · `install-prefix (shipped surface)` · `govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest` · `policy fixtures` · `codebase-map coverage + freshness` · `kickoff-manifest ratchet` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `loop definition` · `loop transition tables` · `loop checklist tags` · `loop computed witness` · `core kinds` · `core meta-check` · `core selftest` · `tags (the resolver's checks)` · `step-gate` · `docs` · `install-prefix (shipped surface)` · `govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest` · `policy fixtures` · `codebase-map coverage + freshness` · `kickoff-manifest ratchet` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `every held leg is budgeted, every budget row resolves` · `pre-push run-log line` · `run-gates turnstile` · `run-gates run-log line` · `run-gates adopter e2e` · `profile-bar selftest`
 
-New arm: tools/loop/loop_items.py · covers AC1 AC3 AC4 AC5 AC6 AC7 AC9 AC11 AC12 AC13 · the `loop item kind` leg's `check --selftest`, its failing case staged by the `repo-cycle` plant · none
+New arm: tools/loop/loop_items.py · covers AC1 AC3 AC4 AC5 AC6 AC7 AC9 AC11 AC12 AC13 AC14 · the `loop item kind` leg's `check --selftest`, its failing case staged by the `repo-cycle` plant · none
 
 New arm: tools/govkit/selftest.py · covers AC8 · `check_step_gate_fixture` reads every class row, so the `item` row arms its own case, its failing case the row's plant with no witness row · none
 
@@ -552,6 +607,39 @@ New arm: tools/govkit/selftest.py · covers AC8 · `check_step_gate_fixture` rea
   Recommendation (a).
   RESOLVED (agent, 2026-11-14, delegated): (a), rung 1, the `[enforcement]` table as written.
   widens: none · relaxes: none
+- **F9 — What does `derive_kind_composition` answer where the kind's schema is present but `HEAD`
+  holds no blob at its namespace `source`, as a first install leaves the definition staged and not
+  committed?** The builder return 2026-11-14-build-TOOL-dDeclaredLoop-24-1-builder-return observed
+  rev-4's `git show HEAD:` read refuse that render. Options: (a) None, as for an absent schema: the
+  `source` read at `HEAD` through `tools/memory-tree/tree_lib.py#read_blobs_at`, a missing blob or an
+  unborn `HEAD` answering None, so the first render composes no item row, `compose` and `check` exit 2
+  `unarmed`, and the render after the install's commit composes gov's rows; every read of the
+  composition stays at `HEAD`, where `tools/playbook/overlay.py#read_landed_text` already reads an
+  absent overlay as absent and `tools/playbook/overlay.py#read_excluded_tags` an unborn `HEAD` as the
+  empty set. (b) Zero gov rows: the render prints the same nothing as (a), but `compose` exits 0 with
+  no row, an absent source answered as an empty composition, and gov's own `check` on such a tree
+  reads as `check_program`'s refusal of an empty table rather than `unarmed`. (c) Gov's rows from the
+  working tree: the first render prints gov's 61 items, but the composition then mixes gov's rows from
+  the disk with the overlay and the exclusions at `HEAD`, and in gov `check` would grade an
+  uncommitted edit of the definition as landed, against §1's landed revision and the reason S7's
+  factory grades its own write over the file as written. Recommendation (a): one revision for every
+  read, the overlay reader's own absent rule, and no answer that reads as a result. The body follows
+  (a).
+  RESOLVED (agent, 2026-11-14, delegated): (a), rung 3: it answers an unread definition as unarmed, never as an empty green, and reads the definition at HEAD like the overlay it composes with
+  widens: none · relaxes: none
+- **F10 — Does the record-version rule compare against the row at a base, so a `fields` re-pinned
+  with no `version` bump reds?** Options: (a) no: the rule compares the pinned `fields` with the hash
+  recomputed from `tools/memory-tree/build_records.py#KINDS`, which reds a `KINDS` change made without
+  touching the definition, the change made in another kit's file; a re-pin with no bump is an edit of
+  the definition's own row, in the diff its review reads, and §5 states it unchecked. (b) yes: read
+  the definition's `[[record-version]]` rows at the landing base that
+  `tools/govkit/upgrade_steps.py#resolve_landing_base` answers, through `read_blobs_at`, and red a row
+  whose `fields` differs from the base row's while its `version` equals it; the loop kit then reaches
+  the govkit kit for its base, a second cross-kit reach beside S3's verb, and a row joining in the
+  range has no base row to compare. Recommendation (a): one mechanism and one reach, the unreviewed
+  drift caught and the gap named. The body follows (a).
+  RESOLVED (agent, 2026-11-14, delegated): (a), rung 3: section 5 names the re-pin gap and a base comparison would add a second reach from the loop kit into govkit, which the [yagni] practice does not owe
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -570,6 +658,13 @@ New arm: tools/govkit/selftest.py · covers AC8 · `check_step_gate_fixture` rea
   its pending row; seat 2, principle sources, `actor` fixed, `routes` patched whole (F6); version rows
   in the definition (F7); S3 lands the `compose` verb (F5); the leg is gov's `[[exempt_leg]]`; the
   usage, registry, map and kickoff rows joined the write set; code cited by symbol.
+- rev-5 · 2026-11-14 · S3 · §4 · §5 · AC12 AC14 · §7 · §8 F9 F10 · from the builder return
+  2026-11-14-build-TOOL-dDeclaredLoop-24-1-builder-return: the composition reads the namespace
+  `source` at `HEAD` through `read_blobs_at` and answers None where `HEAD` holds none, so a first
+  install's render, its definition staged and not committed, composes no item row and refuses nothing
+  (F9); AC14 observes it; §5 names govkit selftest's default-apply arm and what keeps it green; the
+  `selftest-budgets.txt` row joins the write set and its legs the gates line; §5 states the
+  record-version rule's unchecked re-pin (F10). Mechanism, carries, order and status kept.
 
 ## 10. Reuse audit
 
