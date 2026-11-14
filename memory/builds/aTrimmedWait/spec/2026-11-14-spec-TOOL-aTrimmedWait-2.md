@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-2 — hygiene check 12 grades one named spec or one build on request, and the spec writer is told to run it that way
 
-**Status:** INPROGRESS · rev-3 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 2 · closes TOOL-aSmoothedDispatch-16 · ratified 2026-11-14
+**Status:** INPROGRESS · rev-4 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 2 · closes TOOL-aSmoothedDispatch-16 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,8 @@
 |---|---|---|
 | [2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md) | research | TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-2-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-2-1-spec-writer.md) | journal | — |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-2-2-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-2-2-spec-writer.md) | journal | — |
+| [2026-11-14-prompt-TOOL-aTrimmedWait-2-divergence.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-2-divergence.md) | research | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-2-ruling.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-2-ruling.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -190,8 +192,12 @@ of `help/pass-legs.md`, and `python tools/govkit/docs_leg.py --list` lists no ro
 repository at `$TEMP/u2` from this repository's conf and two CLOSED builds, which the unchanged
 script grades clean in 15 s. It plants a section-canon red in one spec of each build, makes a third <!-- PINNED 2026-11-14 -->
 spec live so its `base`, absent from the fixture, reds the resolve arm, and writes an untracked red
-spec and an untracked pre-cutoff spec. The unchanged script's full run names the three tracked
-plants and neither untracked file, observed at `a25c84fc0`.
+spec and an untracked pre-cutoff spec. The untracked red spec is the clean spec renumbered, with its
+section canon broken and its `consumes-from` bullet to unit 2 dropped, so it carries no unmatched
+edge and its one red is its own; a kept bullet would be a true edge finding against unit 2, which
+hands off to unit 3 only, reported whenever N or C is graded. The unchanged script's full run names
+the three tracked plants and neither untracked file, observed at `a25c84fc0`; committed, the planted
+N reads `N 1` there, its section-canon line alone.
 
 ```bash
 set -u
@@ -205,7 +211,7 @@ K=$S/2026-11-13-spec-TOOL-aCarriedStop-3.md; N=$S/2026-11-14-spec-$P-98.md
 B=memory/builds/aSmoothedDispatch/spec/2026-11-10-spec-TOOL-aSmoothedDispatch-4.md
 sed -i '/^## 7\. Gates$/d' "$A" "$B"
 sed -i '0,/^\*\*Status:\*\* CLOSED/s//**Status:** INPROGRESS/' "$C"
-sed "s/$P-3 /$P-98 /; /^## 7\. Gates\$/d" "$K" > "$N"
+sed "s/$P-3 /$P-98 /; /^## 7\. Gates\$/d; /^- \*\*consumes-from\*\* \`$P-2\`/,/^- /{/^- \*\*consumes-from\*\* external/!d}" "$K" > "$N"
 cp "$K" "$S/2026-07-01-spec-$P-97.md"
 cnt() { grep -cF -- "$2 (" <<<"$1"; }
 F=$(bash "$H" --only 12 2>/dev/null)
@@ -362,6 +368,10 @@ the spec-token checker over this file and check 12 over it in a scratch clone.
   `closes TOOL-aSmoothedDispatch-16`, per ruling `2026-11-14-prompt-TOOL-aTrimmedWait-2-ruling`.
 - rev-3 · 2026-11-14 · §3 §4 §5 §6 · each measured figure the pinned-facts arm named is pinned on its
   line, per `2026-11-14-prompt-TOOL-aTrimmedWait-3-writing-practice`. No meaning changes.
+- rev-4 · 2026-11-14 · §4 · the pass probe's untracked N drops the clean spec's `consumes-from`
+  bullet to unit 2, so N adds no unmatched edge and AC1 and AC2 stand as written under S2, per
+  divergence record `2026-11-14-prompt-TOOL-aTrimmedWait-2-divergence`, option (a), dispatched by
+  `2026-11-14-prompt-TOOL-aTrimmedWait-2-2-spec-writer`. S2 and §6 are unchanged.
 
 ## 10. Reuse audit
 
