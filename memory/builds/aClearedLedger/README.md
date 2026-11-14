@@ -74,7 +74,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 13 unit(s) · node a · opened 2026-11-13 · streams tooling
+**Build status:** INPROGRESS · 13 unit(s) · node a · opened 2026-11-13 · streams tooling
 ids TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-7 TOOL-aClearedLedger-8 TOOL-aClearedLedger-9 TOOL-aClearedLedger-10 TOOL-aClearedLedger-11 TOOL-aClearedLedger-12 TOOL-aClearedLedger-13
 ids TOOL-aClearedLedger-14
 
@@ -93,7 +93,7 @@ ids TOOL-aClearedLedger-14
 | [TOOL-aClearedLedger-11 — the gate guard's row D6 and the spec checker's bar join read one command alike, and each new branch has an arm that can fail](spec/2026-11-14-spec-TOOL-aClearedLedger-11.md) | 11 | 2 | CLOSED | rev-1 | 2026-11-14 |
 | [TOOL-aClearedLedger-12 — the gate guard's word reader keeps a two-character redirection operator whole, so row D6 denies an over-bound suite whose output is appended](spec/2026-11-14-spec-TOOL-aClearedLedger-12.md) | 12 | 2 | CLOSED | rev-1 | 2026-11-14 |
 | [TOOL-aClearedLedger-13 — the spec lint reads a half-glued redirection and a quoted value as the hook does, and each new branch and reworded clause has an arm that can fail](spec/2026-11-14-spec-TOOL-aClearedLedger-13.md) | 13 | 2 | CLOSED | rev-1 | 2026-11-14 |
-| [TOOL-aClearedLedger-14 — the gate guard never reads a quoted character as a redirection operator, and the frozen quoted-read regex is restated whole](spec/2026-11-14-spec-TOOL-aClearedLedger-14.md) | 14 | 2 | SPECCED | rev-2 | 2026-11-14 |
+| [TOOL-aClearedLedger-14 — the gate guard never reads a quoted character as a redirection operator, and the frozen quoted-read regex is restated whole](spec/2026-11-14-spec-TOOL-aClearedLedger-14.md) | 14 | 2 | INPROGRESS | rev-2 | 2026-11-14 |
 <!-- /gen:build-units -->
 
 Records: 27 bound to this build, across 4 record folder(s).

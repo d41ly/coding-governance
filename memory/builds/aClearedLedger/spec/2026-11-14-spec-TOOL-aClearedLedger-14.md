@@ -1,6 +1,6 @@
 # TOOL-aClearedLedger-14 — the gate guard never reads a quoted character as a redirection operator, and the frozen quoted-read regex is restated whole
 
-**Status:** SPECCED · rev-2 · 2026-11-14 · node a · Tier-2 · base 8db6f4be · streams tooling · order 14 · ratified 2026-11-14
+**Status:** INPROGRESS · rev-2 · 2026-11-14 · node a · Tier-2 · base 8db6f4be · streams tooling · order 14 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
