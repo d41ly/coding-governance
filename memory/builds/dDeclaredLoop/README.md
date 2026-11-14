@@ -131,7 +131,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-11 — every checklist item named by a semantic tag, its number only display order](spec/2026-10-24-spec-TOOL-dDeclaredLoop-11.md) | 9 | 2 | CLOSED | rev-4 | 2026-11-14 |
 | [TOOL-dDeclaredLoop-42 — the acceptance re-run bounded on the clock, its commands run by bash, never cmd.exe](spec/2026-10-24-spec-TOOL-dDeclaredLoop-42.md) | 9 | 2 | CLOSED | rev-3 | 2026-11-14 |
 | [TOOL-dDeclaredLoop-13 — one transition table per level, the engine refusing a move it lacks](spec/2026-10-24-spec-TOOL-dDeclaredLoop-13.md) | 10 | 2 | CLOSED | rev-4 | 2026-11-14 |
-| [TOOL-dDeclaredLoop-24 — the `item` kind in the kinds register, its factory, and the checks over the composed items](spec/2026-10-24-spec-TOOL-dDeclaredLoop-24.md) | 11 | 2 | DEFERRED | rev-3 | 2026-10-25 |
+| [TOOL-dDeclaredLoop-24 — the `item` kind in the kinds register, its factory, and the checks over the composed items](spec/2026-10-24-spec-TOOL-dDeclaredLoop-24.md) | 11 | 2 | DEFERRED | rev-4 | 2026-11-14 |
 | [TOOL-dDeclaredLoop-15 — the build table's terminal states, and `deps.on-parent-withdrawn` routing a withdrawn parent](spec/2026-10-24-spec-TOOL-dDeclaredLoop-15.md) | 12 | 2 | DEFERRED | rev-3 | 2026-11-05 |
 | [TOOL-dDeclaredLoop-3 — the transition record three ways, its channels the set `transitions.record` selects](spec/2026-10-24-spec-TOOL-dDeclaredLoop-3.md) | 13 | 2 | DEFERRED | rev-4 | 2026-11-05 |
 | [TOOL-dDeclaredLoop-10 — backward transitions recorded like forward ones](spec/2026-10-24-spec-TOOL-dDeclaredLoop-10.md) | 14 | 2 | DEFERRED | rev-1 | 2026-10-24 |
@@ -212,7 +212,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 348 bound to this build, across 4 record folder(s).
+Records: 350 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
