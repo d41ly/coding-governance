@@ -1109,13 +1109,13 @@ def derive_render_key(root: str) -> str:
     WHAT IT DOES NOT COVER: the interpreter and the process environment beyond git's."""
     env = _build_git_env()
 
-    def git(*argv: str) -> bytes:
+    def run_git(*argv: str) -> bytes:
         return subprocess.run(["git", *argv], cwd=root, capture_output=True, check=True, env=env).stdout
 
     try:
-        h = hashlib.sha256(b"HEAD " + git("rev-parse", "--verify", "-q", "HEAD").strip() + b"\n")
-        h.update(b"tracked\0" + git("ls-files", "-z") + b"\n")
-        for rel in git("diff", "HEAD", "--name-only", "--no-renames", "-z").split(b"\0"):
+        h = hashlib.sha256(b"HEAD " + run_git("rev-parse", "--verify", "-q", "HEAD").strip() + b"\n")
+        h.update(b"tracked\0" + run_git("ls-files", "-z") + b"\n")
+        for rel in run_git("diff", "HEAD", "--name-only", "--no-renames", "-z").split(b"\0"):
             if not rel:
                 continue
             path = os.path.join(root, os.fsdecode(rel))
@@ -1125,7 +1125,7 @@ def derive_render_key(root: str) -> str:
             else:
                 digest = b"absent"
             h.update(b"differs\0" + rel + b"\0" + digest + b"\n")
-        h.update(b"untracked\0" + git("ls-files", "--others", "--exclude-standard", "-z"))
+        h.update(b"untracked\0" + run_git("ls-files", "--others", "--exclude-standard", "-z"))
     except (OSError, subprocess.CalledProcessError):
         return ""
     return h.hexdigest()
@@ -4699,7 +4699,7 @@ def test_staged_render(arm) -> None:
         run("git", "add", "-A", cwd=t2)
         run("git", "commit", "-q", "-m", "records", "--no-verify", cwd=t2)
 
-        def stage_record(*edits):
+        def write_staged_record(*edits):
             run("git", "reset", "-q", "--hard", cwd=t2)
             for rel, old, new in edits:
                 path = os.path.join(t2, rel)
@@ -4709,19 +4709,19 @@ def test_staged_render(arm) -> None:
 
         arm("TOOL-aLightenedLoop-1 AC5 — a no-id append to a build record skips, naming the record",
             "False 1 modified file(s), none a build-index input, 1 of them build records whose binding head is "
-            "unchanged", lambda: stage_record((rec, "body\n", "body\na plain line\n")))
+            "unchanged", lambda: write_staged_record((rec, "body\n", "body\na plain line\n")))
         arm("TOOL-aLightenedLoop-1 AC6 — a binding head edit renders with today's reason",
             f"True {rec} is a build-index input or output",
-            lambda: stage_record((rec, "research", "journal")))
+            lambda: write_staged_record((rec, "research", "journal")))
         arm("TOOL-aLightenedLoop-1 AC6 — a build record citing a new id renders", "True",
-            lambda: stage_record((rec, "body\n", "body\nnow ARCH-tOne-7\n")))
+            lambda: write_staged_record((rec, "body\n", "body\nnow ARCH-tOne-7\n")))
         arm("TOOL-aLightenedLoop-1 AC6 — a deviation record's body edit renders",
-            f"True {dev} is a build-index input or output", lambda: stage_record((dev, "body\n", "body\nplain\n")))
+            f"True {dev} is a build-index input or output", lambda: write_staged_record((dev, "body\n", "body\nplain\n")))
         arm("TOOL-aLightenedLoop-1 AC6 — a file in a DESIGN_VIEW folder renders",
-            f"True {near} is a build-index input or output", lambda: stage_record((near, "body\n", "body\nplain\n")))
+            f"True {near} is a build-index input or output", lambda: write_staged_record((near, "body\n", "body\nplain\n")))
         arm("TOOL-aLightenedLoop-1 AC6 — a quiet record beside a later-listed spec edit names the record",
             f"True {rec} is a build-index input or output",
-            lambda: stage_record((rec, "body\n", "body\nplain\n"),
+            lambda: write_staged_record((rec, "body\n", "body\nplain\n"),
                                  ("memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md", "base 0123abcd\n",
                                   "base 0123abcd\n\nplain\n")))
 
