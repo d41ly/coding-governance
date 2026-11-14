@@ -14,6 +14,7 @@
 | [2026-11-14-prompt-TOOL-aBriskDeclaration-1-4-builder.md](../prompts/2026-11-14-prompt-TOOL-aBriskDeclaration-1-4-builder.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aBriskDeclaration-1-brief.md](../prompts/2026-11-14-prompt-TOOL-aBriskDeclaration-1-brief.md) | research | — |
 | [2026-11-14-prompt-TOOL-aBriskDeclaration-1-forks-brief.md](../prompts/2026-11-14-prompt-TOOL-aBriskDeclaration-1-forks-brief.md) | research | — |
+| [2026-11-14-review-TOOL-aBriskDeclaration-1-closing-diff-round1.md](../reviews/2026-11-14-review-TOOL-aBriskDeclaration-1-closing-diff-round1.md) | diff-review | — |
 
 <!-- /gen:spec-records -->
 
