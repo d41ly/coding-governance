@@ -15277,12 +15277,13 @@ write_run_record() { # slug -> 0 always; one line per miss
 # Refusal 1 of five, and it does NOT belong in verb_preflight's precondition block where this spec
 # first put it: that function never runs for another verb, so a guard there could never fire. It is a
 # DISPATCH guard, and it has to be evaluated inside the --plan and --phase arms too, because both of
-# those exit INSIDE the loop and a post-loop check alone never sees them.
-refuse_waive_unless_preflight() { # verb
+# those exit INSIDE the loop and a post-loop check alone never sees them. It EXITS rather than returns
+# (TOOL-aTrimmedWait-1): every caller exited 1 on its refusal, so the five `|| { ...; exit 1; }` sites
+# were one refusal spelled five times, each an unarmable delegated site; now it is this one fail branch.
+refuse_waive_unless_preflight() { # verb -> 0, or exit 1 after check 37
   [ "$WAIVE_SEEN" = 1 ] || return 0
   local v="$1"
-  fail 37 "--waive is accepted by --preflight alone; the owner turn that grants a waiver is the last one there is, and a verb reachable mid-run is a place the run could answer its own question: $v"
-  return 1
+  fail 37 "--waive is accepted by --preflight alone; the owner turn that grants a waiver is the last one there is, and a verb reachable mid-run is a place the run could answer its own question: $v"; RUNLOG_CLEAN=1; exit 1
 }
 # --------------------------------------------------------------------------------------- dispatch
 # TOOL-cBriefedPilot-1 - the PAIRED accumulator. `--override) OV="${2:-}"` stored a scalar, so a
@@ -15403,7 +15404,7 @@ while [ $# -gt 0 ]; do
     --finding)      RR_FINDINGS+=("${2:-}"); shift 2 || shift ;;
     --sibling)      RR_SIBLINGS+=("${2:-}"); shift 2 || shift ;;
     --owner-stop)   RR_OWNER_STOP="${2:-}"; shift 2 || shift ;;
-    --plan)         shift; refuse_waive_unless_preflight --plan || { RUNLOG_CLEAN=1; exit 1; }
+    --plan)         shift; refuse_waive_unless_preflight --plan
                     # SEVERAL SLUGS IN ONE PROCESS, and the single-slug form is byte-identical to
                     # what it always was — the framing below only appears when more than one slug is
                     # given, so no existing caller sees a new byte. TOOL-aQuenchedHarness-10.
@@ -15450,18 +15451,18 @@ while [ $# -gt 0 ]; do
     # TOOL-aTrimmedWait-1 - the slug, then every bare word up to the next flag as a unit.
     --check-specs)  shift; CS_SLUG=${1:-}; shift 2>/dev/null || true; CS_UNITS=()
                     while [ $# -gt 0 ]; do case "$1" in --*) break ;; esac; CS_UNITS+=("$1"); shift; done
-                    refuse_waive_unless_preflight --check-specs || { RUNLOG_CLEAN=1; exit 1; }
+                    refuse_waive_unless_preflight --check-specs
                     check_dispatch_specs "$CS_SLUG" "${CS_UNITS[@]}"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     --phase)        shift; PH_SLUG=${1:-}; shift 2>/dev/null || true; PH_WANT=${1:-}; shift 2>/dev/null || true
                     PH_WIT=""
                     [ "${1:-}" = "--witness" ] && { shift; PH_WIT=${1:-}; }
-                    refuse_waive_unless_preflight --phase || { RUNLOG_CLEAN=1; exit 1; }
+                    refuse_waive_unless_preflight --phase
                     verb_phase "$PH_SLUG" "$PH_WANT" "$PH_WIT"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     --check-commit) shift
                     CC_TMP=$(mktemp) || { echo "unattended: --check-commit cannot create a scratch file, so it graded nothing"; RUNLOG_CLEAN=1; exit 2; }
                     check_commit_message "${1:-}"; _rl_rc=$?; rm -f "$CC_TMP"; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     # TOOL-aGraftedHelix-1 - the remote's claims, read and printed; no slug, because it lists them all.
-    --claims)       refuse_waive_unless_preflight --claims || { RUNLOG_CLEAN=1; exit 1; }
+    --claims)       refuse_waive_unless_preflight --claims
                     print_claims; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; RUNLOG_CLEAN=1; exit 0 ;;
     --help|-h)      echo "unattended: the verbs are $(verb_list); each verb's contract is $MEMORY_ROOT/guides/UNATTENDED-VERBS.md"
@@ -15485,7 +15486,7 @@ done
 # re-synchronised by hand and drifted again at the next verb. Both survivors now DERIVE - the refusal
 # above from VERBS_SLUG, this usage text from the header's own invocation lines - so there is nothing
 # left here to re-synchronise.
-case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}" || { RUNLOG_CLEAN=1; exit 1; } ;; esac
+case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}" ;; esac
 [ -n "$VERB" ] || { usage; RUNLOG_CLEAN=1; exit 2; }
 
 case "$VERB" in

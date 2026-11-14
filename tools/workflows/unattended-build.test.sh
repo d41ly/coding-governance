@@ -3757,11 +3757,11 @@ TW1_SPEC='{"spec-write":{"authored":["A-tB-1","A-tB-2","A-tB-3"],"alreadyPresent
 TW1_OK='{"committed":true,"sha":"'$CSHA'","why":"","specs":[{"id":"A-tB-1","path":"'$GH33_SF'/2026-10-13-spec-A-tB-1.md"},{"id":"A-tB-2","path":"'$GH33_SF'/2026-10-13-spec-A-tB-2.md"},{"id":"A-tB-3","path":"'$GH33_SF'/2026-10-13-spec-A-tB-3.md"}],"summary":"ok"}'
 for tw1_args in "$OFF_UNITS" "${OFF_UNITS/'"slug":"tB",'/'"slug":"tB","roles":{"specWriter":"gov-spec-writer"},'}"; do
   o=$(run_wf "$tw1_args" "$(printf "$TW1_SPEC" "$TW1_OK")"); tw1_w=$(grep '^prompt:spec-write:' <<<"$o")
-  same "TW1 AC5 the order-1 writer is told to run --check-specs over its two ids" "$(grep -cF -- 'Before you return, run `bash tools/unattended/unattended.sh --check-specs tB A-tB-1 A-tB-2` in /tmp/r.' <<<"$tw1_w")" 1
-  same "TW1 AC5 the order-2 writer is told to run it over its one id" "$(grep -cF -- 'run `bash tools/unattended/unattended.sh --check-specs tB A-tB-3` in /tmp/r.' <<<"$tw1_w")" 1
+  same "TW1 AC5 the order-1 writer is told to run --check-specs over its two ids" "$(grep -cF -- 'Before you return, run `bash '"${PFX}${UNATTENDED}"'/unattended.sh --check-specs tB A-tB-1 A-tB-2` in /tmp/r.' <<<"$tw1_w")" 1
+  same "TW1 AC5 the order-2 writer is told to run it over its one id" "$(grep -cF -- 'run `bash '"${PFX}${UNATTENDED}"'/unattended.sh --check-specs tB A-tB-3` in /tmp/r.' <<<"$tw1_w")" 1
 done
 tw1_c=$(grep '^prompt:commit:' <<<"$o")
-has    "TW1 AC5 the committer runs --check-specs over every authored id" "$tw1_c" 'Then run `bash tools/unattended/unattended.sh --check-specs tB A-tB-1 A-tB-2 A-tB-3` in /tmp/r'
+has    "TW1 AC5 the committer runs --check-specs over every authored id" "$tw1_c" 'Then run `bash '"${PFX}${UNATTENDED}"'/unattended.sh --check-specs tB A-tB-1 A-tB-2 A-tB-3` in /tmp/r'
 has    "TW1 AC5 ...and returns committed: false on a non-zero exit" "$tw1_c" 'when it exits non-zero, run nothing further and return `committed: false` with its stdout in `why`'
 o=$(run_wf "$OFF_UNITS" "$(printf "$TW1_SPEC" '{"committed":false,"sha":"","why":"UNATTENDED check 49 FAILED — spec THIN: A-tB-2","specs":[],"summary":"x"}')")
 has    "TW1 AC5 a commit double refused by --check-specs THROWS naming its output" "$(grep '^THROW' <<<"$o")" 'the spec commit stage did not commit: "UNATTENDED check 49 FAILED — spec THIN: A-tB-2"'

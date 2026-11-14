@@ -32,7 +32,7 @@ themselves, their floors and each new arm's RED-first observation are owed to th
 - AC4 — `time bash tools/unattended/unattended.sh --check-specs aTrimmedWait TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7`
   — at the parent `b9ad1f6ba` it printed `UNATTENDED check 14 FAILED — unknown argument` naming
   `--check-specs`, exit 1, `real` 0m6.049s; at this pass it printed the clean line naming the seven
-  units, exit 0, `real` 0m9.885s, under the 60 s budget.
+  units, exit 0, `real` 0m9.885s, under the 60 s budget. <!-- PINNED 2026-11-14 -->
 - AC5 — `grep -c "' --check-specs ' + slug" tools/workflows/unattended-build.js` — printed 2, and 2
   over `tools/workflows/unattended-build.template.js`;
   `sed -n '/const commitBlock = \[/,/\]\.join/p' tools/workflows/unattended-build.js | git hash-object --stdin`
@@ -49,3 +49,42 @@ themselves, their floors and each new arm's RED-first observation are owed to th
   `bash tools/unattended/unattended.sh --help | grep -c -- '--check-specs'` printed 2;
   `python tools/govkit/docs_leg.py --fingerprints | grep -F 'verb:unattended.sh:--check-specs'`
   printed `verb:unattended.sh:--check-specs 131e24bd help/roles.md`.
+
+## The fix pass, from `2026-11-14-prompt-TOOL-aTrimmedWait-1-fix`, at spec rev-2
+
+Observed on node a, one command at a time with nothing else running, from the worktree root over the
+fix pass's tree. No merge bar, no self-test suite and no gate leg ran; what only a gate observes is
+named below as the close's.
+
+**Evidences:** TOOL-aTrimmedWait-1
+- AC8 — `grep -c 'unattended.sh --check-specs ' tools/unattended/SKILL.template.md` — printed 1, and
+  1 over `.claude/skills/unattended/SKILL.md` after `bash tools/unattended/adopt-unattended.sh`
+  re-rendered it, the render's diff being that one line; a second render left its blob unchanged,
+  `004dc13f8208b72151ce96b1898845934903e10c` both times, which is the comparison
+  `bash tools/unattended/adopt-unattended.sh --check` makes, and that leg itself is the close's;
+  `tr -d '\r' < .claude/skills/unattended/SKILL.md | wc -c` printed 10628, the figure now on the <!-- PINNED 2026-11-14 -->
+  `.claude/skills/unattended/SKILL.md` row of `tools/template-size-limits.txt`, raised from 10580 <!-- PINNED 2026-11-14 -->
+  with its `memory/DECISIONS.md` row.
+- AC4, re-timed — the same `--check-specs aTrimmedWait` command over the seven units, each driver run
+  once from one scratch copy of the kit: the parent's driver `real` 0m5.982s, this pass's 0m6.507s, <!-- PINNED 2026-11-14 -->
+  both exit 0 with the clean line; from the worktree path this pass's printed the clean line, exit 0,
+  `real` 0m4.448s, under the 60 s budget. <!-- PINNED 2026-11-14 -->
+- AC1, AC2 — `bash "$SCRATCH/u1.sh"` — printed the ten lines both criteria name, unchanged:
+  `clean rc 0 hit 1 fails 0` through `untracked 8`.
+- No verdict moves — `refuse_waive_unless_preflight` now exits itself, so the five
+  `|| { RUNLOG_CLEAN=1; exit 1; }` sites at its callers are gone and the four pre-existing pins of
+  them are deleted from `memory/project/unarmed-branches.txt`. A fixture ran nine cases through the
+  parent's driver and this pass's: `--waive` beside `--plan` (both orders), `--check-specs`,
+  `--phase`, `--claims` and `--status`, `--check-specs` with no unit, the seven-unit clean run and an
+  unknown flag. Both printed the same check-37, check-14 and clean lines with the same exit codes,
+  byte-identical under `cmp` once the scratch copy's own no-`.git` notice on stderr is set aside.
+- The pass legs' reds — the three `TW1 AC5` lines spell the driver through `${PFX}${UNATTENDED}`,
+  and the TW1 block under a stub of the suite's `same`, `has` and `hasnt_` passed its 8 assertions
+  with the suite's own prefix and failed with a wrong one; `cs_mk` is `write_cs_spec`, which
+  `python tools/lexicon/lexicon.py --suggest write_cs_spec --as sh.function` grades OK, and the
+  driver block under its stub passed its 18 assertions; the sibling malformed-order pin in
+  `tools/unattended/unarmed-branches.txt` is re-keyed 21 -> 23, the refusal having moved below the
+  two edge refusals `check_edge_shape` now holds; `python tools/memory-tree/check-arms.py --report`
+  read `ceiling tools/unattended/unattended.sh 321/324` and check 49 branch 23 PINNED. The leg <!-- PINNED 2026-11-14 -->
+  `check-arms.py --check`, the install-prefix leg, the lexicon leg, the kit gate's check 26 and the
+  Skill size leg are the close's.

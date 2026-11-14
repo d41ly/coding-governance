@@ -7995,7 +7995,7 @@ git add memory/builds/tRun/README.md memory/builds/tRun/RUN.md >/dev/null 2>&1
 # ---- are both reported rather than the first alone. Nothing is staged, by the arm or by the verb.
 # ---- RED-first is the close's: staged by making `check_dispatch_specs` read tracked specs only and
 # ---- return after its first refusal, which reds the clean and two-refusal arms.
-cs_mk() { # slug · seq · header tail · scope body · edges body
+write_cs_spec() { # slug · seq · header tail · scope body · edges body
   mkdir -p "memory/builds/$1/spec"
   printf '%s\n' "# ARCH-$1-$2 — fixture" "" \
     "**Status:** SPECCED · rev-1 · 2026-11-14 · node a · Tier-2 · base 0123abcd$3" "" \
@@ -8005,14 +8005,14 @@ cs_mk() { # slug · seq · header tail · scope body · edges body
     > "memory/builds/$1/spec/2026-11-14-spec-ARCH-$1-$2.md"
 }
 cs_s='- **S1** — a thing. Observed by AC1.'
-cs_mk tCsA 1 ' · order 1' "$cs_s" 'none'
-cs_mk tCsB 1 '' '' 'none'
-cs_mk tCsC 1 ' · order 2x' "$cs_s" 'none'
-cs_mk tCsD 1 '' "$cs_s" '- **consumes-from** ARCH-tCsD-2 — no backticks'
-cs_mk tCsE 1 '' "$cs_s" '- **consumes-from** `ARCH-tCsE-2` — one end'
-cs_mk tCsE 2 '' "$cs_s" '- **consumes-from** `ARCH-tCsE-1` — the other end'
-cs_mk tCsG 1 '' '' 'none'
-cs_mk tCsG 2 ' · order 2x' "$cs_s" 'none'
+write_cs_spec tCsA 1 ' · order 1' "$cs_s" 'none'
+write_cs_spec tCsB 1 '' '' 'none'
+write_cs_spec tCsC 1 ' · order 2x' "$cs_s" 'none'
+write_cs_spec tCsD 1 '' "$cs_s" '- **consumes-from** ARCH-tCsD-2 — no backticks'
+write_cs_spec tCsE 1 '' "$cs_s" '- **consumes-from** `ARCH-tCsE-2` — one end'
+write_cs_spec tCsE 2 '' "$cs_s" '- **consumes-from** `ARCH-tCsE-1` — the other end'
+write_cs_spec tCsG 1 '' '' 'none'
+write_cs_spec tCsG 2 ' · order 2x' "$cs_s" 'none'
 o=$(run --check-specs tCsA ARCH-tCsA-1); same "check-specs: a clean untracked build exits 0" "$?" 0
 hit "$o" "unattended: --check-specs tCsA — ARCH-tCsA-1: none carries a refusal --dispatch makes from its spec files"
 miss "$o" "UNATTENDED check"
