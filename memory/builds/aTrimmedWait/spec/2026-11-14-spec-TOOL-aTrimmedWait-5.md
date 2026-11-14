@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-5 — the holder's idle-wake `--resume` stops paying one git process per briefed unit
 
-**Status:** SPECCED · rev-3 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 5 · ratified 2026-11-14
+**Status:** INPROGRESS · rev-3 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 5 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
