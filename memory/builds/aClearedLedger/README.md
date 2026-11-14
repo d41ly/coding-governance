@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-13
 streams: tooling
 roster: TOOL
-ids: TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-7 TOOL-aClearedLedger-8 TOOL-aClearedLedger-9 TOOL-aClearedLedger-10 TOOL-aClearedLedger-11 TOOL-aClearedLedger-12 TOOL-aClearedLedger-13
+ids: TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-7 TOOL-aClearedLedger-8 TOOL-aClearedLedger-9 TOOL-aClearedLedger-10 TOOL-aClearedLedger-11 TOOL-aClearedLedger-12 TOOL-aClearedLedger-13 TOOL-aClearedLedger-14
 authorized-by: slug
 asks: TOOL-aNimbleMend-16..24
 ---
@@ -70,11 +70,13 @@ None.
 | 10 | `TOOL-aClearedLedger-11` | the closing review's nine medium and low findings as one batch: the gate guard's row D6 and the spec checker's bar join read one command alike, and each new branch has an arm that can fail |
 | 11 | `TOOL-aClearedLedger-12` | the gate guard's word reader keeps a two-character redirection operator whole, so row D6 denies an over-bound suite whose output is appended |
 | 12 | `TOOL-aClearedLedger-13` | review round 2's six medium and low findings as one batch: the spec lint reads a half-glued redirection and a quoted value as the hook does, and each new branch and reworded clause has an arm that can fail |
+| 13 | `TOOL-aClearedLedger-14` | review round 3's two low findings as one batch: the gate guard's word reader ends a word at a redirection once a quoted character entered it, and unit 13's quoted-read regex is restated where a table cannot split it |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 12 unit(s) · node a · opened 2026-11-13 · streams tooling
+**Build status:** SPECCED · 13 unit(s) · node a · opened 2026-11-13 · streams tooling
 ids TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-7 TOOL-aClearedLedger-8 TOOL-aClearedLedger-9 TOOL-aClearedLedger-10 TOOL-aClearedLedger-11 TOOL-aClearedLedger-12 TOOL-aClearedLedger-13
+ids TOOL-aClearedLedger-14
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -91,16 +93,17 @@ ids TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClea
 | [TOOL-aClearedLedger-11 — the gate guard's row D6 and the spec checker's bar join read one command alike, and each new branch has an arm that can fail](spec/2026-11-14-spec-TOOL-aClearedLedger-11.md) | 11 | 2 | CLOSED | rev-1 | 2026-11-14 |
 | [TOOL-aClearedLedger-12 — the gate guard's word reader keeps a two-character redirection operator whole, so row D6 denies an over-bound suite whose output is appended](spec/2026-11-14-spec-TOOL-aClearedLedger-12.md) | 12 | 2 | CLOSED | rev-1 | 2026-11-14 |
 | [TOOL-aClearedLedger-13 — the spec lint reads a half-glued redirection and a quoted value as the hook does, and each new branch and reworded clause has an arm that can fail](spec/2026-11-14-spec-TOOL-aClearedLedger-13.md) | 13 | 2 | CLOSED | rev-1 | 2026-11-14 |
+| [TOOL-aClearedLedger-14 — the gate guard never reads a quoted character as a redirection operator, and the frozen quoted-read regex is restated whole](spec/2026-11-14-spec-TOOL-aClearedLedger-14.md) | 14 | 2 | SPECCED | rev-2 | 2026-11-14 |
 <!-- /gen:build-units -->
 
-Records: 24 bound to this build, across 4 record folder(s).
+Records: 27 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aClearedLedger-1 TOOL-aClearedLedger-10 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-7 TOOL-aClearedLedger-9 TOOL-aClearedLedger-11 TOOL-aClearedLedger-12
-TOOL-aClearedLedger-13.
+TOOL-aClearedLedger-13 TOOL-aClearedLedger-14.
 
-Ids whose spec moved past its audited revision: none — 0 of 12 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 13 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -119,6 +122,7 @@ Ids whose spec moved past its audited revision: none — 0 of 12 unit id(s) carr
 | 11 | `TOOL-aClearedLedger-11` | no |
 | 12 | `TOOL-aClearedLedger-12` | no |
 | 13 | `TOOL-aClearedLedger-13` | no |
+| 14 | `TOOL-aClearedLedger-14` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

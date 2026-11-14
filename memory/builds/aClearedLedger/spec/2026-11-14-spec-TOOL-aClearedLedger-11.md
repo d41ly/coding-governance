@@ -9,6 +9,7 @@
 | [2026-11-14-build-TOOL-aClearedLedger-11-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aClearedLedger-11-1-acceptance-ledger.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aClearedLedger-11-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-aClearedLedger-11-1-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aClearedLedger-11-brief.md](../prompts/2026-11-13-prompt-TOOL-aClearedLedger-11-brief.md) | research | — |
+| [2026-11-14-review-TOOL-aClearedLedger-11-12-13-diff-review-round3.md](../reviews/2026-11-14-review-TOOL-aClearedLedger-11-12-13-diff-review-round3.md) | diff-review | TOOL-aClearedLedger-12 TOOL-aClearedLedger-13 |
 | [2026-11-14-review-TOOL-aClearedLedger-11-diff-review-round2.md](../reviews/2026-11-14-review-TOOL-aClearedLedger-11-diff-review-round2.md) | diff-review | — |
 
 <!-- /gen:spec-records -->
