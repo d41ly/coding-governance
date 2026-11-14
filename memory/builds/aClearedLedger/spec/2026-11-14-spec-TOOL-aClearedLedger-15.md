@@ -1,6 +1,6 @@
 # TOOL-aClearedLedger-15 — the gate guard reads a redirection operator from unquoted text only, so a quoted character opening a glued target stays the target's
 
-**Status:** SPECCED · rev-1 · 2026-11-14 · node a · Tier-2 · base 8db6f4be · streams tooling · order 15
+**Status:** INPROGRESS · rev-1 · 2026-11-14 · node a · Tier-2 · base 8db6f4be · streams tooling · order 15
 
 <!-- gen:spec-records -->
 

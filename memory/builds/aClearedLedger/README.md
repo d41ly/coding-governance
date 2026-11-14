@@ -76,7 +76,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 15 unit(s) · node a · opened 2026-11-13 · streams tooling
+**Build status:** INPROGRESS · 15 unit(s) · node a · opened 2026-11-13 · streams tooling
 ids TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-7 TOOL-aClearedLedger-8 TOOL-aClearedLedger-9 TOOL-aClearedLedger-10 TOOL-aClearedLedger-11 TOOL-aClearedLedger-12 TOOL-aClearedLedger-13
 ids TOOL-aClearedLedger-14 TOOL-aClearedLedger-15 TOOL-aClearedLedger-16
 
@@ -96,7 +96,7 @@ ids TOOL-aClearedLedger-14 TOOL-aClearedLedger-15 TOOL-aClearedLedger-16
 | [TOOL-aClearedLedger-12 — the gate guard's word reader keeps a two-character redirection operator whole, so row D6 denies an over-bound suite whose output is appended](spec/2026-11-14-spec-TOOL-aClearedLedger-12.md) | 12 | 2 | CLOSED | rev-1 | 2026-11-14 |
 | [TOOL-aClearedLedger-13 — the spec lint reads a half-glued redirection and a quoted value as the hook does, and each new branch and reworded clause has an arm that can fail](spec/2026-11-14-spec-TOOL-aClearedLedger-13.md) | 13 | 2 | CLOSED | rev-1 | 2026-11-14 |
 | [TOOL-aClearedLedger-14 — the gate guard never reads a quoted character as a redirection operator, and the frozen quoted-read regex is restated whole](spec/2026-11-14-spec-TOOL-aClearedLedger-14.md) | 14 | 2 | CLOSED | rev-2 | 2026-11-14 |
-| [TOOL-aClearedLedger-15 — the gate guard reads a redirection operator from unquoted text only, so a quoted character opening a glued target stays the target's](spec/2026-11-14-spec-TOOL-aClearedLedger-15.md) | 15 | 2 | SPECCED | rev-1 | 2026-11-14 |
+| [TOOL-aClearedLedger-15 — the gate guard reads a redirection operator from unquoted text only, so a quoted character opening a glued target stays the target's](spec/2026-11-14-spec-TOOL-aClearedLedger-15.md) | 15 | 2 | INPROGRESS | rev-1 | 2026-11-14 |
 | [TOOL-aClearedLedger-16 — the drop test's deny side is armed, an empty quoted pair ends its word at a redirection, and three texts state what the code holds](spec/2026-11-14-spec-TOOL-aClearedLedger-16.md) | 16 | 2 | SPECCED | rev-1 | 2026-11-14 |
 <!-- /gen:build-units -->
 
