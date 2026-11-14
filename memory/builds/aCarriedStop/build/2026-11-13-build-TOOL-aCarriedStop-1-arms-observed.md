@@ -32,3 +32,8 @@ Observed by the main loop at VERIFYING on node a, 2026-11-13, on frozen worktree
 
 - Green at `60a6d0d79`: `python tools/run-gates/derive-ceilings.py --check` printed every backed leg clearing its evidenced maximum, the routed commits leg at 3540 s over 1761.4 s.
 - Red with `GATE_LEGS` naming the parent's `tools/gate-legs.json`: `CEILING-EVIDENCE FAILED`, the leg's 760 s ceiling short by 2763s of what its evidence asks (TOOL-aCarriedStop-9).
+
+## TOOL-aCarriedStop-10's AC1 and AC2, observed by the main loop
+
+- Green at `3d8689eaa`: `bash tools/check-install-prefix.sh` exited 0 and printed `clean`, with no line of `tools/chain-packet.py` or `tools/chain-packet.test.sh` listed (TOOL-aCarriedStop-10).
+- Red at its parent, on a detached tree: the same checker exited 1 and listed `tools/chain-packet.py@dc026a49:239`, `:245` and `tools/chain-packet.test.sh@d3447869:405` (TOOL-aCarriedStop-10).

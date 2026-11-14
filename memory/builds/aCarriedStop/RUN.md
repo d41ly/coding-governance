@@ -21,8 +21,8 @@ gates-run: unattended-17946237702863409310-732830 1f732d9b
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 1f732d9ba8a3777ce842a47ad10642203a62bd04
-phase: BUILDING
+witness: 3d8689eaa
+phase: VERIFYING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/sad-allen-74f7bd
