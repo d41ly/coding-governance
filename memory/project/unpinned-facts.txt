@@ -15236,3 +15236,7 @@ memory/builds/aLiftedCeiling/spec/2026-11-12-spec-TOOL-aLiftedCeiling-2.md	180 s
 memory/builds/aLiftedCeiling/prompts/2026-11-12-prompt-TOOL-aLiftedCeiling-3-build-brief.md	110 s
 memory/builds/aLiftedCeiling/prompts/2026-11-12-prompt-TOOL-aLiftedCeiling-3-build-brief.md	420 s
 memory/builds/aLiftedCeiling/spec/2026-11-12-spec-TOOL-aLiftedCeiling-3.md	110 s
+memory/builds/aCarriedStop/prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-1-spec-writer.md	98 specs
+memory/builds/aCarriedStop/prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-3-spec-writer.md	98 specs
+memory/builds/aCarriedStop/prompts/2026-11-13-prompt-TOOL-aCarriedStop-1-brief.md	98 specs
+memory/builds/aCarriedStop/spec/2026-11-13-spec-TOOL-aCarriedStop-2.md	96869 bytes
