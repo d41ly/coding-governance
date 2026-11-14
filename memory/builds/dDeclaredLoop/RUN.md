@@ -116,3 +116,9 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-14T09:13:13Z dispatch · item 04bcd80d TOOL-dDeclaredLoop-12 · reason tools/memory-tree/backlog.py
 
 2026-11-14T09:18:42Z dispatch · item 04bcd80d TOOL-dDeclaredLoop-12 · reason memory/map/generated/symbols.json
+
+2026-11-14T09:25:21Z dispatch · item 2b6336e6 TOOL-dDeclaredLoop-12 · reason tools/lib/needs_graph.py tools/lib/resolve-python.test.sh tools/govkit/govkit.py tools/govkit/usage.toml tools/loop/loop.toml tools/loop/loop_lib.py tools/loop/README.md tools/loop/kit.toml help/loop.md memory/map/generated/symbols.json memory/builds/dDeclaredLoop/build/2026-11-14-build-TOOL-dDeclaredLoop-12-1-acceptance-ledger.md memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-12.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/backlog/TOOL.md
+
+2026-11-14T09:37:00Z dispatch · item 2b6336e6 TOOL-dDeclaredLoop-12 · reason memory/builds/dDeclaredLoop/build/2026-11-14-build-TOOL-dDeclaredLoop-12-deviation-124.md
+
+2026-11-14T09:40:59Z dispatch · item 2b6336e6 TOOL-dDeclaredLoop-12 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md

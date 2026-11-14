@@ -34,6 +34,24 @@
 # One [[disposition-alias]] row per legacy word that means a member:
 #   word   the legacy word, no member of the set
 #   means  the member it means
+#
+# One [[item]] row per item of a gov step's program (TOOL-dDeclaredLoop-12), after every table above:
+#   tag        the item's tag, `item.<step>.<name>`, a member of the `item` namespace
+#   step       the [[step]] tag its tag opens
+#   actor      `<kind>:<name>`, one actor of one kind
+#   needs      the items it waits for: each entry a tag, or a list of tags any one of which meets it; []
+#              for none. A need on an item outside the five programs is added by the unit declaring it.
+#   inputs     `<layer tag>:<what it reads>`, the layer a tag of the playbook kit's layers.toml; a role
+#              actor's absent inputs, allowance and returns are its role's
+#   allowance  what it may write
+#   returns    its return template, the record kind it writes
+#   outcomes   its closed outcome set, a list of words, or "dispositions" for the set above
+#   witness    what witnesses it: { class = "<class>", by = "<what>" }
+#   owner      the build that owns it
+#   routes     an inline table, one `<outcome> = "<target>"` per outcome: a declared item tag,
+#              "transition" for a cross-step move, or "stand-in:{prefix}/<home>/<file>", today's tool
+#              where the route reaches a later build. Inline, never an [item.routes] table, so the
+#              tag index reads each row as one span.
 
 [[step]]
 tag = "step.plan"
@@ -149,3 +167,752 @@ means = "ask"
 [[disposition-alias]]
 word = "refuse-as-duplicate"
 means = "continue"
+
+# ---- Plan's program ----------------------------------------------------------------------------------
+
+[[item]]
+tag = "item.plan.input"
+step = "step.plan"
+actor = "command:plan.input"
+needs = []
+inputs = ["layer.memory:the intake record, or the selected ask, filing or proposal"]
+allowance = "the pinned input"
+returns = "record-kind.input-pin"
+outcomes = ["pinned"]
+witness = { class = "history", by = "its SHA" }
+owner = "dRankedPlan"
+routes = { pinned = "item.plan.dedupe" }
+
+[[item]]
+tag = "item.plan.dedupe"
+step = "step.plan"
+actor = "command:plan.dedupe"
+needs = ["item.plan.input"]
+inputs = ["layer.memory:the live builds, the design index and the open ask records"]
+allowance = "the dupes record"
+returns = "record-kind.dupes"
+outcomes = ["none", "patch", "duplicate"]
+witness = { class = "history", by = "the dupes record, keyed by the derived index" }
+owner = "dRankedPlan"
+routes = { none = "item.plan.triage-rule", patch = "transition", duplicate = "stand-in:{prefix}/roles/agents/gov-orienter.agent.md" }
+
+[[item]]
+tag = "item.plan.triage-rule"
+step = "step.plan"
+actor = "command:plan.triage-rule"
+needs = ["item.plan.dedupe"]
+inputs = ["layer.memory:the dupes record and the asks", "layer.instruction:the declared triage rules"]
+allowance = "the triage record"
+returns = "record-kind.triage"
+outcomes = ["select", "defer", "retire", "refuse", "undecided"]
+witness = { class = "history", by = "the triage record naming its rule" }
+owner = "dRankedPlan"
+routes = { select = "item.plan.record", defer = "stand-in:{prefix}/memory-tree/backlog.py", retire = "stand-in:{prefix}/memory-tree/backlog.py", refuse = "transition", undecided = "item.plan.triage-judge" }
+
+[[item]]
+tag = "item.plan.triage-judge"
+step = "step.plan"
+actor = "role:planner"
+needs = ["item.plan.triage-rule"]
+outcomes = ["select", "defer", "retire", "refuse"]
+witness = { class = "history", by = "the schema check over its return, its choice joined to the triage record" }
+owner = "dRankedPlan"
+routes = { select = "item.plan.record", defer = "stand-in:{prefix}/memory-tree/backlog.py", retire = "stand-in:{prefix}/memory-tree/backlog.py", refuse = "transition" }
+
+[[item]]
+tag = "item.plan.record"
+step = "step.plan"
+actor = "role:planner"
+needs = [["item.plan.triage-judge", "item.plan.triage-rule"]]
+outcomes = ["drafted", "research", "owner-question"]
+witness = { class = "history", by = "the plan-record schema check" }
+owner = "dRankedPlan"
+routes = { drafted = "item.plan.place", research = "item.plan.research", owner-question = "stand-in:{prefix}/memory-tree/build_records.py" }
+
+[[item]]
+tag = "item.plan.research"
+step = "step.plan"
+actor = "role:researcher"
+needs = ["item.plan.record"]
+outcomes = ["answered"]
+witness = { class = "history", by = "the research record's schema check" }
+owner = "dRankedPlan"
+routes = { answered = "item.plan.record" }
+
+[[item]]
+tag = "item.plan.place"
+step = "step.plan"
+actor = "command:plan.place"
+needs = ["item.plan.record"]
+inputs = ["layer.memory:the plan record and the plan view"]
+allowance = "the plan view"
+returns = "record-kind.plan-view"
+outcomes = ["placed", "unplaced"]
+witness = { class = "history", by = "the placement predicate" }
+owner = "dRankedPlan"
+routes = { placed = "item.plan.lease", unplaced = "transition" }
+
+[[item]]
+tag = "item.plan.lease"
+step = "step.plan"
+actor = "command:plan.lease"
+needs = ["item.plan.place"]
+inputs = ["layer.runtime:the build's lease ref"]
+allowance = "the lease record"
+returns = "record-kind.lease"
+outcomes = ["held", "refused"]
+witness = { class = "history", by = "the lease record the lease engine writes at each take" }
+owner = "dRankedPlan"
+routes = { held = "item.plan.recommend", refused = "stand-in:{prefix}/memory-tree/build_records.py" }
+
+[[item]]
+tag = "item.plan.recommend"
+step = "step.plan"
+actor = "command:plan.recommend"
+needs = ["item.plan.lease"]
+inputs = ["layer.memory:the plan record"]
+allowance = "the recommendation record"
+returns = "record-kind.recommendation"
+outcomes = ["scored", "review", "no-review"]
+witness = { class = "history", by = "the recommendation record" }
+owner = "dDeclaredLoop"
+routes = { scored = "item.plan.reason", review = "stand-in:{prefix}/workflows/tier2-review.js", no-review = "item.plan.exit" }
+
+[[item]]
+tag = "item.plan.reason"
+step = "step.plan"
+actor = "role:planner"
+needs = ["item.plan.recommend"]
+outcomes = ["review", "no-review"]
+witness = { class = "history", by = "the schema check, its answer joined to the recommendation record" }
+owner = "dDeclaredLoop"
+routes = { review = "stand-in:{prefix}/workflows/tier2-review.js", no-review = "item.plan.exit" }
+
+[[item]]
+tag = "item.plan.exit"
+step = "step.plan"
+actor = "command:plan.exit"
+needs = [["item.plan.reason", "item.plan.recommend"]]
+inputs = ["layer.memory:the reached items' witnesses"]
+allowance = "the transition record"
+returns = "record-kind.transition"
+outcomes = ["recorded"]
+witness = { class = "history", by = "the transition record over the reached items' witnesses" }
+owner = "dRankedPlan"
+routes = { recorded = "transition" }
+
+# ---- Design's program --------------------------------------------------------------------------------
+
+[[item]]
+tag = "item.design.input"
+step = "step.design"
+actor = "command:design.input"
+needs = []
+inputs = ["layer.memory:the design input and its kind"]
+allowance = "the pinned input"
+returns = "record-kind.input-pin"
+outcomes = ["plan-record", "amendment", "plan-revision", "patch", "finding", "playbook-run"]
+witness = { class = "history", by = "its SHA and kind" }
+owner = "dIndexedDesign"
+routes = { plan-record = "item.design.seams", amendment = "item.design.reentry", plan-revision = "item.design.inventory", patch = "item.design.overlaps", finding = "item.design.overlaps", playbook-run = "item.design.unit-spec" }
+
+[[item]]
+tag = "item.design.reentry"
+step = "step.design"
+actor = "command:design.reentry"
+needs = ["item.design.input"]
+inputs = ["layer.memory:the declared interfaces"]
+allowance = "the diff record"
+returns = "record-kind.interface-diff"
+outcomes = ["additive", "breaking"]
+witness = { class = "history", by = "the diff record" }
+owner = "dIndexedDesign"
+routes = { additive = "item.design.unit-spec", breaking = "item.design.decompose" }
+
+[[item]]
+tag = "item.design.inventory"
+step = "step.design"
+actor = "role:architect"
+needs = ["item.design.input"]
+outcomes = ["inventoried"]
+witness = { class = "history", by = "the inventory joined to every built unit" }
+owner = "dIndexedDesign"
+routes = { inventoried = "item.design.decompose" }
+
+[[item]]
+tag = "item.design.seams"
+step = "step.design"
+actor = "role:reuse-scout"
+needs = ["item.design.input"]
+outcomes = ["found"]
+witness = { class = "history", by = "the seams' probe digests, re-derived by the executor" }
+owner = "dIndexedDesign"
+routes = { found = "item.design.decompose" }
+
+[[item]]
+tag = "item.design.decompose"
+step = "step.design"
+actor = "role:architect"
+needs = [["item.design.inventory", "item.design.reentry", "item.design.seams"]]
+outcomes = ["decomposed", "fact-fork", "goal-fork"]
+witness = { class = "history", by = "the roster and interface schema check, every raised feature fork joined to its fork record" }
+owner = "dIndexedDesign"
+routes = { decomposed = "item.design.overlaps", fact-fork = "item.design.research", goal-fork = "transition" }
+
+[[item]]
+tag = "item.design.research"
+step = "step.design"
+actor = "role:researcher"
+needs = ["item.design.decompose"]
+outcomes = ["answered"]
+witness = { class = "history", by = "the research record's schema check" }
+owner = "dIndexedDesign"
+routes = { answered = "item.design.decompose" }
+
+[[item]]
+tag = "item.design.overlaps"
+step = "step.design"
+actor = "command:design.overlaps"
+needs = [["item.design.decompose", "item.design.input"]]
+inputs = ["layer.memory:the design index and the roster's write sets"]
+allowance = "the overlap record"
+returns = "record-kind.overlap"
+outcomes = ["streams", "specs", "refused"]
+witness = { class = "history", by = "the overlap record" }
+owner = "dIndexedDesign"
+routes = { streams = "item.design.streams", specs = "item.design.unit-spec", refused = "item.design.decompose" }
+
+[[item]]
+tag = "item.design.streams"
+step = "step.design"
+actor = "role:planner"
+needs = ["item.design.overlaps"]
+outcomes = ["grouped"]
+witness = { class = "history", by = "the stream plan, each stream's units re-derived against the order and the overlap record" }
+owner = "dIndexedDesign"
+routes = { grouped = "item.design.unit-spec" }
+
+[[item]]
+tag = "item.design.unit-spec"
+step = "step.design"
+actor = "role:spec-writer"
+needs = [["item.design.input", "item.design.overlaps", "item.design.streams"]]
+outcomes = ["authored", "feature-fork"]
+witness = { class = "history", by = "the format check on the spec at its SHA, every raised fork joined to its fork record" }
+owner = "dIndexedDesign"
+routes = { authored = "item.design.recommend", feature-fork = "item.design.decompose" }
+
+[[item]]
+tag = "item.design.recommend"
+step = "step.design"
+actor = "command:design.recommend"
+needs = ["item.design.unit-spec"]
+inputs = ["layer.memory:the specs at their SHAs"]
+allowance = "the recommendation record"
+returns = "record-kind.recommendation"
+outcomes = ["scored", "review", "no-review"]
+witness = { class = "history", by = "the recommendation record" }
+owner = "dDeclaredLoop"
+routes = { scored = "item.design.reason", review = "stand-in:{prefix}/workflows/tier2-review.js", no-review = "item.design.ready" }
+
+[[item]]
+tag = "item.design.reason"
+step = "step.design"
+actor = "role:architect"
+needs = ["item.design.recommend"]
+outcomes = ["review", "no-review"]
+witness = { class = "history", by = "the schema check, its answer joined to the recommendation record" }
+owner = "dDeclaredLoop"
+routes = { review = "stand-in:{prefix}/workflows/tier2-review.js", no-review = "item.design.ready" }
+
+[[item]]
+tag = "item.design.ready"
+step = "step.design"
+actor = "command:design.ready"
+needs = [["item.design.reason", "item.design.recommend"]]
+inputs = ["layer.memory:each spec's status and tier, and the spec audit's disposition"]
+allowance = "none"
+returns = "record-kind.readiness"
+outcomes = ["ready", "not-ready"]
+witness = { class = "history", by = "derived READY: none MISSING, THIN, FORKED or UNCARRIED" }
+owner = "dIndexedDesign"
+routes = { ready = "item.design.exit", not-ready = "item.design.unit-spec" }
+
+[[item]]
+tag = "item.design.exit"
+step = "step.design"
+actor = "command:design.exit"
+needs = ["item.design.ready"]
+inputs = ["layer.memory:the reached items' witnesses and the confirmed interfaces"]
+allowance = "the transition record and the confirmed messages"
+returns = "record-kind.transition"
+outcomes = ["recorded"]
+witness = { class = "history", by = "the transition record" }
+owner = "dIndexedDesign"
+routes = { recorded = "transition" }
+
+# ---- Build's program ---------------------------------------------------------------------------------
+
+[[item]]
+tag = "item.build.base"
+step = "step.build"
+actor = "command:build.base"
+needs = []
+inputs = ["layer.memory:the history and the mandate"]
+allowance = "none"
+returns = "record-kind.base-pin"
+outcomes = ["pinned"]
+witness = { class = "history", by = "the base SHA and the intake record" }
+owner = "dScopedBuild"
+routes = { pinned = "item.build.unit-lease" }
+
+[[item]]
+tag = "item.build.unit-lease"
+step = "step.build"
+actor = "command:build.unit-lease"
+needs = ["item.build.base"]
+inputs = ["layer.runtime:the unit's lease ref", "layer.memory:the spec's dependency record"]
+allowance = "the lease record"
+returns = "record-kind.lease"
+outcomes = ["held", "waiting", "refused"]
+witness = { class = "history", by = "the lease record, and the spec's dependency record joined to each named unit's clean reuse check" }
+owner = "dScopedBuild"
+routes = { held = "item.build.unit-pass", waiting = "item.build.unit-lease", refused = "stand-in:{prefix}/memory-tree/build_records.py" }
+
+[[item]]
+tag = "item.build.unit-pass"
+step = "step.build"
+actor = "role:builder"
+needs = ["item.build.unit-lease"]
+outcomes = ["committed", "spec-wrong", "interface-change", "fork"]
+witness = { class = "history", by = "the commit, resolved by the executor" }
+owner = "dScopedBuild"
+routes = { committed = "item.build.acceptance", spec-wrong = "transition", interface-change = "transition", fork = "stand-in:{prefix}/memory-tree/build_records.py" }
+
+[[item]]
+tag = "item.build.acceptance"
+step = "step.build"
+actor = "executor:build.acceptance"
+needs = ["item.build.unit-pass"]
+inputs = ["layer.memory:the spec's acceptance commands", "layer.flow:the gates the unit adds or changes"]
+allowance = "the acceptance record and a seen-red record per gate"
+returns = "record-kind.acceptance"
+outcomes = ["pass", "fail"]
+witness = { class = "history", by = "the executor-written acceptance record, and a seen-red record per gate the unit adds or changes" }
+owner = "dScopedBuild"
+routes = { pass = "item.build.scope", fail = "item.build.fix-pass" }
+
+[[item]]
+tag = "item.build.fix-pass"
+step = "step.build"
+actor = "role:builder"
+needs = [["item.build.acceptance", "item.build.reuse-check", "item.test.attribute", "item.test.seen-red"]]
+outcomes = ["committed"]
+witness = { class = "history", by = "the commit, resolved by the executor" }
+owner = "dScopedBuild"
+routes = { committed = "item.build.acceptance" }
+
+[[item]]
+tag = "item.build.scope"
+step = "step.build"
+actor = "command:build.scope"
+needs = ["item.build.acceptance"]
+inputs = ["layer.memory:the unit's write set and its commits"]
+allowance = "the scope report"
+returns = "record-kind.scope-report"
+outcomes = ["next-pass", "in-scope", "stray", "refused"]
+witness = { class = "history", by = "the scope report" }
+owner = "dScopedBuild"
+routes = { next-pass = "item.build.unit-pass", in-scope = "item.build.reuse-check", stray = "item.build.reuse-check", refused = "item.build.revert-pass" }
+
+[[item]]
+tag = "item.build.revert-pass"
+step = "step.build"
+actor = "role:builder"
+needs = ["item.build.scope"]
+outcomes = ["reverted", "descoped"]
+witness = { class = "history", by = "the commit, resolved by the executor" }
+owner = "dScopedBuild"
+routes = { reverted = "item.build.scope", descoped = "item.build.core" }
+
+[[item]]
+tag = "item.build.reuse-check"
+step = "step.build"
+actor = "role:reuse-scout"
+needs = ["item.build.scope"]
+outcomes = ["clean", "duplicate", "disputed", "overflow", "non-converging"]
+witness = { class = "history", by = "a computed join: every listed unit and every MUST has one row" }
+owner = "dScopedBuild"
+routes = { clean = "item.build.recommend", duplicate = "item.build.fix-pass", disputed = "stand-in:{prefix}/workflows/tier2-review.js", overflow = "item.build.reuse-check", non-converging = "stand-in:{prefix}/memory-tree/backlog.py" }
+
+[[item]]
+tag = "item.build.recommend"
+step = "step.build"
+actor = "command:build.recommend"
+needs = ["item.build.reuse-check"]
+inputs = ["layer.memory:each roster unit's clean reuse check"]
+allowance = "the recommendation record"
+returns = "record-kind.recommendation"
+outcomes = ["review", "ratify", "no-review"]
+witness = { class = "history", by = "the recommendation record" }
+owner = "dDeclaredLoop"
+routes = { review = "stand-in:{prefix}/workflows/tier2-review.js", ratify = "item.build.ratify", no-review = "item.build.distill" }
+
+[[item]]
+tag = "item.build.ratify"
+step = "step.build"
+actor = "owner:build.ratify"
+needs = ["item.build.recommend"]
+inputs = ["layer.memory:each fork its author classed major"]
+allowance = "the owner's disposition record for each major fork"
+returns = "record-kind.disposition"
+outcomes = ["ratified", "rejected"]
+witness = { class = "history", by = "the owner's disposition record for each major fork" }
+owner = "dScopedBuild"
+routes = { ratified = "item.build.distill", rejected = "item.build.distill" }
+
+[[item]]
+tag = "item.build.distill"
+step = "step.build"
+actor = "command:build.distill"
+needs = ["item.build.ratify", "item.build.recommend"]
+inputs = ["layer.memory:the build's resolved fork records"]
+allowance = "the decision log, in the build's own branch"
+returns = "record-kind.decision-row"
+outcomes = ["appended", "unclassed", "unratified-major"]
+witness = { class = "history", by = "a one-to-one join on (build, fork id) between the build's resolved forks and a row for each major one" }
+owner = "dScopedBuild"
+routes = { appended = "item.build.core", unclassed = "transition", unratified-major = "stand-in:{prefix}/memory-tree/build_records.py" }
+
+[[item]]
+tag = "item.build.core"
+step = "step.build"
+actor = "executor:build.core"
+needs = ["item.build.distill"]
+inputs = ["layer.flow:the core checks over the build's range"]
+allowance = "the core result"
+returns = "record-kind.core-result"
+outcomes = ["clean", "own-red"]
+witness = { class = "history", by = "the executor-written result" }
+owner = "dScopedBuild"
+routes = { clean = "item.build.exit", own-red = "transition" }
+
+[[item]]
+tag = "item.build.exit"
+step = "step.build"
+actor = "command:build.exit"
+needs = ["item.build.core"]
+inputs = ["layer.memory:the reached items' witnesses"]
+allowance = "the transition record"
+returns = "record-kind.transition"
+outcomes = ["recorded"]
+witness = { class = "history", by = "the transition record" }
+owner = "dScopedBuild"
+routes = { recorded = "transition" }
+
+[[item]]
+tag = "item.build.resolve"
+step = "step.build"
+actor = "role:builder"
+needs = ["item.test.merge"]
+outcomes = ["resolved", "interface-clash"]
+witness = { class = "history", by = "the resolution commit, resolved by the executor, and the routing record" }
+owner = "dScopedBuild"
+routes = { resolved = "item.test.merge", interface-clash = "transition" }
+
+# ---- Test's program ----------------------------------------------------------------------------------
+
+[[item]]
+tag = "item.test.merge"
+step = "step.test"
+actor = "command:test.merge"
+needs = []
+inputs = ["layer.flow:the build merged onto the default branch's tip"]
+allowance = "Test's worktree"
+returns = "record-kind.prepared-merge"
+outcomes = ["prepared", "conflict", "refused"]
+witness = { class = "history", by = "the prepared merge's SHA and tree hash, or the tip's" }
+owner = "dWitnessedBar"
+routes = { prepared = "item.test.select", conflict = "item.build.resolve", refused = "stand-in:{prefix}/memory-tree/backlog.py" }
+
+[[item]]
+tag = "item.test.select"
+step = "step.test"
+actor = "command:test.select"
+needs = ["item.test.merge"]
+inputs = ["layer.flow:the legs the paths claim, the landing levels and the held legs"]
+allowance = "the selection record"
+returns = "record-kind.selection"
+outcomes = ["selected"]
+witness = { class = "history", by = "the selection record" }
+owner = "dWitnessedBar"
+routes = { selected = "item.test.verdict" }
+
+[[item]]
+tag = "item.test.verdict"
+step = "step.test"
+actor = "command:test.verdict"
+needs = ["item.test.select"]
+inputs = ["layer.flow:the selected legs"]
+allowance = "the verdict record for the tree"
+returns = "record-kind.verdict"
+outcomes = ["green", "red", "stale"]
+witness = { class = "history", by = "the runner-written verdict per tree hash, each red classed" }
+owner = "dWitnessedBar"
+routes = { green = "item.test.seen-red", red = "item.test.route", stale = "item.test.merge" }
+
+[[item]]
+tag = "item.test.route"
+step = "step.test"
+actor = "command:test.route"
+needs = ["item.test.verdict"]
+inputs = ["layer.flow:each red leg and its re-run on the same tree"]
+allowance = "the routing record"
+returns = "record-kind.routing"
+outcomes = ["nondeterministic", "own", "contended", "dead-probe", "inherited", "non-blocking"]
+witness = { class = "history", by = "every red joined to one route, with its re-run's verdict" }
+owner = "dWitnessedBar"
+routes = { nondeterministic = "item.test.flakes", own = "item.test.attribute", contended = "item.test.verdict", dead-probe = "stand-in:{prefix}/memory-tree/build_records.py", inherited = "transition", non-blocking = "stand-in:{prefix}/memory-tree/backlog.py" }
+
+[[item]]
+tag = "item.test.attribute"
+step = "step.test"
+actor = "role:tester"
+needs = ["item.test.route"]
+outcomes = ["code-miss", "spec-wrong"]
+witness = { class = "history", by = "a computed join: every such red has one judgment, and the artifact its route names exists" }
+owner = "dWitnessedBar"
+routes = { code-miss = "item.build.fix-pass", spec-wrong = "transition" }
+
+[[item]]
+tag = "item.test.flakes"
+step = "step.test"
+actor = "command:test.flakes"
+needs = ["item.test.route"]
+inputs = ["layer.flow:the nondeterministic legs and their window of verdicts"]
+allowance = "the flake record"
+returns = "record-kind.flake"
+outcomes = ["held", "recorded", "retried"]
+witness = { class = "history", by = "the flake record, or under retry-only the re-entry's routing record" }
+owner = "dWitnessedBar"
+routes = { held = "item.test.select", recorded = "item.test.verdict", retried = "item.test.verdict" }
+
+[[item]]
+tag = "item.test.seen-red"
+step = "step.test"
+actor = "command:test.seen-red"
+needs = ["item.test.verdict"]
+inputs = ["layer.memory:the seen-red records of the gates the build added or changed"]
+allowance = "none"
+returns = "record-kind.seen-red-join"
+outcomes = ["present", "missing"]
+witness = { class = "history", by = "the seen-red records, joined one to one to the gates the build added or changed" }
+owner = "dWitnessedBar"
+routes = { present = "item.test.recommend", missing = "item.build.fix-pass" }
+
+[[item]]
+tag = "item.test.recommend"
+step = "step.test"
+actor = "command:test.recommend"
+needs = ["item.test.seen-red"]
+inputs = ["layer.flow:the verdict and its signals"]
+allowance = "the recommendation record"
+returns = "record-kind.recommendation"
+outcomes = ["scored", "review", "no-review"]
+witness = { class = "history", by = "the recommendation record" }
+owner = "dDeclaredLoop"
+routes = { scored = "item.test.reason", review = "stand-in:{prefix}/workflows/tier2-review.js", no-review = "item.test.exit" }
+
+[[item]]
+tag = "item.test.reason"
+step = "step.test"
+actor = "role:tester"
+needs = ["item.test.recommend"]
+outcomes = ["review", "no-review"]
+witness = { class = "history", by = "the schema check, its answer joined to the recommendation record" }
+owner = "dDeclaredLoop"
+routes = { review = "stand-in:{prefix}/workflows/tier2-review.js", no-review = "item.test.exit" }
+
+[[item]]
+tag = "item.test.exit"
+step = "step.test"
+actor = "command:test.exit"
+needs = [["item.test.reason", "item.test.recommend"]]
+inputs = ["layer.memory:the reached items' witnesses and the verified tree"]
+allowance = "the transition record and the build's lease record"
+returns = "record-kind.transition"
+outcomes = ["recorded"]
+witness = { class = "history", by = "the transition record and the lease record" }
+owner = "dWitnessedBar"
+routes = { recorded = "transition" }
+
+# ---- Deploy's program --------------------------------------------------------------------------------
+
+[[item]]
+tag = "item.deploy.current"
+step = "step.deploy"
+actor = "command:deploy.current"
+needs = []
+inputs = ["layer.flow:the verdict's tree and the prepared merge on the current tip"]
+allowance = "the comparison record"
+returns = "record-kind.comparison"
+outcomes = ["current", "stale"]
+witness = { class = "history", by = "the comparison record" }
+owner = "dShippedRelease"
+routes = { current = "item.deploy.mandate", stale = "transition" }
+
+[[item]]
+tag = "item.deploy.mandate"
+step = "step.deploy"
+actor = "command:deploy.mandate"
+needs = ["item.deploy.current"]
+inputs = ["layer.memory:the plan's ratification, the derived plan record's, or the landing gate's disposition"]
+allowance = "none"
+returns = "record-kind.mandate-check"
+outcomes = ["authorized"]
+witness = { class = "history", by = "the ratifying transition record, the derived plan record or the gate's witness" }
+owner = "dShippedRelease"
+routes = { authorized = "item.deploy.parents" }
+
+[[item]]
+tag = "item.deploy.parents"
+step = "step.deploy"
+actor = "command:deploy.parents"
+needs = ["item.deploy.mandate"]
+inputs = ["layer.memory:each parent's state"]
+allowance = "none"
+returns = "record-kind.parents"
+outcomes = ["landed", "held", "withdrawn", "moved"]
+witness = { class = "history", by = "the parents' records" }
+owner = "dShippedRelease"
+routes = { landed = "item.deploy.land", held = "item.deploy.parents", withdrawn = "transition", moved = "item.deploy.parents" }
+
+[[item]]
+tag = "item.deploy.land"
+step = "step.deploy"
+actor = "command:deploy.land"
+needs = ["item.deploy.parents"]
+inputs = ["layer.flow:the prepared merge, the landing queue and the pre-push bar"]
+allowance = "the default branch, by one push"
+returns = "record-kind.landing-outcome"
+outcomes = ["landed-gated", "landed-ungated", "already-held", "refused", "unreachable", "argument"]
+witness = { class = "history", by = "the outcome class, from the lander's exit, the pre-push hook's records and probes of the remote" }
+owner = "dShippedRelease"
+routes = { landed-gated = "item.deploy.core", landed-ungated = "item.deploy.core", already-held = "item.deploy.core", refused = "transition", unreachable = "item.deploy.land", argument = "stand-in:{prefix}/memory-tree/backlog.py" }
+
+[[item]]
+tag = "item.deploy.core"
+step = "step.deploy"
+actor = "command:deploy.core"
+needs = ["item.deploy.land"]
+inputs = ["layer.flow:the post-merge bar's verdict for the landed SHA"]
+allowance = "the landing record's copy of the verdict"
+returns = "record-kind.core-verdict"
+outcomes = ["green", "red", "refused", "running", "no-verdict"]
+witness = { class = "history", by = "the bar's verdict for the landed SHA" }
+owner = "dShippedRelease"
+routes = { green = "item.deploy.record", red = "item.deploy.record", refused = "stand-in:{prefix}/memory-tree/build_records.py", running = "item.deploy.core", no-verdict = "stand-in:{prefix}/memory-tree/build_records.py" }
+
+[[item]]
+tag = "item.deploy.record"
+step = "step.deploy"
+actor = "command:deploy.record"
+needs = ["item.deploy.core"]
+inputs = ["layer.flow:the lander's marker, or the pushed SHA and the remote tip"]
+allowance = "the landing record"
+returns = "record-kind.landing"
+outcomes = ["recorded"]
+witness = { class = "history", by = "the landing record" }
+owner = "dShippedRelease"
+routes = { recorded = "item.deploy.distill" }
+
+[[item]]
+tag = "item.deploy.distill"
+step = "step.deploy"
+actor = "command:deploy.distill"
+needs = ["item.deploy.record"]
+inputs = ["layer.memory:the decision log at the landed SHA"]
+allowance = "none"
+returns = "record-kind.decision-join"
+outcomes = ["confirmed", "unarmed", "missing"]
+witness = { class = "history", by = "the rows at the landed SHA, joined one to one on (build, fork id) to the build's major forks" }
+owner = "dShippedRelease"
+routes = { confirmed = "item.deploy.recommend", unarmed = "item.deploy.recommend", missing = "stand-in:{prefix}/memory-tree/backlog.py" }
+
+[[item]]
+tag = "item.deploy.recommend"
+step = "step.deploy"
+actor = "command:deploy.recommend"
+needs = ["item.deploy.distill"]
+inputs = ["layer.memory:the landing record"]
+allowance = "the recommendation record"
+returns = "record-kind.recommendation"
+outcomes = ["review", "no-review"]
+witness = { class = "history", by = "the recommendation record" }
+owner = "dDeclaredLoop"
+routes = { review = "stand-in:{prefix}/workflows/tier2-review.js", no-review = "item.deploy.notify" }
+
+[[item]]
+tag = "item.deploy.notify"
+step = "step.deploy"
+actor = "command:deploy.notify"
+needs = ["item.deploy.recommend"]
+inputs = ["layer.memory:the build's dependents"]
+allowance = "the dependents' mailboxes"
+returns = "record-kind.landed-post"
+outcomes = ["posted"]
+witness = { class = "history", by = "the mailbox posts" }
+owner = "dShippedRelease"
+routes = { posted = "item.deploy.released" }
+
+[[item]]
+tag = "item.deploy.released"
+step = "step.deploy"
+actor = "command:deploy.released"
+needs = ["item.deploy.notify"]
+inputs = ["layer.flow:the release slot's exit record for the landed SHA"]
+allowance = "the wake's witness"
+returns = "record-kind.release-wake"
+outcomes = ["verified", "unverified", "timed-out"]
+witness = { class = "history", by = "the wake's witness, or the landing record's build.closes value" }
+owner = "dShippedRelease"
+routes = { verified = "item.deploy.close", unverified = "stand-in:{prefix}/memory-tree/build_records.py", timed-out = "stand-in:{prefix}/memory-tree/build_records.py" }
+
+[[item]]
+tag = "item.deploy.snapshot"
+step = "step.deploy"
+actor = "command:deploy.snapshot"
+needs = ["item.deploy.notify", "item.deploy.released"]
+inputs = ["layer.memory:the card"]
+allowance = "the snapshot commit"
+returns = "record-kind.snapshot"
+outcomes = ["committed"]
+witness = { class = "history", by = "the snapshot commit" }
+owner = "dShippedRelease"
+routes = { committed = "item.deploy.unlease" }
+
+[[item]]
+tag = "item.deploy.unlease"
+step = "step.deploy"
+actor = "command:deploy.unlease"
+needs = ["item.deploy.snapshot"]
+inputs = ["layer.runtime:the build's leases and its mailbox"]
+allowance = "the terminal tombstones and the mailbox's copy in the build folder"
+returns = "record-kind.tombstone"
+outcomes = ["closed"]
+witness = { class = "history", by = "the terminal tombstones, and the mailbox's messages in the folder" }
+owner = "dShippedRelease"
+routes = { closed = "item.deploy.close" }
+
+[[item]]
+tag = "item.deploy.close"
+step = "step.deploy"
+actor = "command:deploy.close"
+needs = ["item.deploy.released", "item.deploy.unlease"]
+inputs = ["layer.memory:the reached items' witnesses and the release outcome"]
+allowance = "the transition record"
+returns = "record-kind.transition"
+outcomes = ["closed", "red-wait"]
+witness = { class = "history", by = "the transition record" }
+owner = "dShippedRelease"
+routes = { closed = "transition", red-wait = "stand-in:{prefix}/memory-tree/build_records.py" }

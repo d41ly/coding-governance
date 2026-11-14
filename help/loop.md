@@ -49,6 +49,43 @@ Three alias rows map older words onto members: `attach` means `amend`, `defer` m
 look alike and are not this set: a review round's exit (`fold` or `promote`), the `class:`, `new:`,
 `gate:` and `none` lines of a review finding, and triage's verdicts on a build in planning.
 
+## Each step's program
+
+Each step is a program of items, one `[[item]]` row per item, and `--check` prints how many each
+step holds. A row names who does the work, what it waits for, what it reads, what it may
+write, the words it can answer with, and where each answer goes:
+
+```toml
+[[item]]
+tag = "item.plan.place"
+step = "step.plan"
+actor = "command:plan.place"             # <kind>:<name>, one actor
+needs = ["item.plan.record"]             # the items it waits for
+inputs = ["layer.memory:the plan record and the plan view"]
+allowance = "the plan view"              # what it may write
+returns = "record-kind.plan-view"        # the record kind it writes
+outcomes = ["placed", "unplaced"]        # its closed set of answers
+witness = { class = "history", by = "the placement predicate" }
+owner = "dRankedPlan"
+routes = { placed = "item.plan.lease", unplaced = "transition" }
+```
+
+A `needs` entry is one item, or a list of items where any one of them is enough:
+
+```toml
+needs = [["item.design.inventory", "item.design.reentry", "item.design.seams"]]
+```
+
+Each outcome has exactly one route. A route goes to another item, to `transition` when the build
+moves to another step, or to `stand-in:{prefix}/<kit>/<file>`, the tool that does that work today
+when the item that will do it belongs to a later build. `{prefix}` stands for the folder your kits
+are installed under. Each input starts with a layer tag from the playbook kit's `layers.toml`, such
+as `layer.memory` or `layer.flow`. A role actor, such as `role:planner`, takes its inputs, allowance
+and return template from its role, so its row leaves them out.
+
+An item's instruction scope, the instruction units it loads, is never typed on its row. It is
+derived from the units whose `scope` names the item; `--scopes` below prints it.
+
 ## Witness classes
 
 Every fact the loop reads as done has a witness, and every witness names its class. Three classes
@@ -106,13 +143,17 @@ recorded under the build's first unit.
 Which words an item accepts is the item's own: a placing item takes the set above, and an owner gate
 lists its own outcomes, such as `ratified` and `rejected`. The loop reader's
 `check_disposition_record` joins a record to its item's outcomes and reads the word as written, so
-write a member and never an alias. Until the item rows land in the file it answers `None` for every
-item, which reads as unarmed and never as a pass.
+write a member and never an alias. For an item the file declares it answers true, or refuses a word
+outside that item's outcomes. For an item the file does not declare it answers `None`, which reads as
+unarmed and never as a pass.
 
 ## How to use it
 
-- **Read the loop:** `python tools/loop/loop_lib.py --check` prints one line per step and per <!-- usage: script:tools/loop/loop_lib.py 036bc6db -->
-  workflow with its order, step and reach word, then the dispositions and one line per alias. Then it
+- **Read the loop:** `python tools/loop/loop_lib.py --check` prints one line per step and per <!-- usage: script:tools/loop/loop_lib.py 8a025e56 -->
+  workflow with its order, step and reach word, then the dispositions and one line per alias. It
+  prints one `loop: program` line per step, with its items in an order where each comes after the
+  items it needs. Where the playbook kit is not installed, a `loop: inputs unarmed` line comes first
+  and the inputs go unchecked. Then it
   prints the witness classes, one line per witness alias and per step's witness, one line per
   actor-list row with its build, and the base it compared the list against, or `no comparison` and
   why. It exits 0, or 1 when the list is refused.
@@ -122,6 +163,7 @@ item, which reads as unarmed and never as a pass.
   loop: workflow spec-review · order 4 · step step.design · reach review
   loop: dispositions continue amend new patch repeat unit breakpoint ask none
   loop: disposition-alias defer · means ask
+  loop: program step.test · 10 item(s) · item.test.merge item.test.select item.test.verdict ...
   loop: witness classes history hook-record remote-verdict · refused actor
   loop: witness step.build · class history · by the transition record into the next step
   loop: actor witness DOD_CORE · keepalive-reaped · until dWellOiledMachine
@@ -134,6 +176,17 @@ item, which reads as unarmed and never as a pass.
   also exits 1 for a list row of that site that no actor entry matches. Check 53 of the unattended leg
   runs it over the driver's `DOD_CORE` and your conf's `DOD_EXTRA`.
 
+- **See each item's scope:** `python tools/loop/loop_lib.py --scopes` checks the file as `--check` does,
+  then prints one line per item with the instruction units scoped to it. It runs the playbook kit's
+  `load_sets.py derive` once per item, so it takes some seconds, and `--check` does not run it.
+
+  ```text
+  loop: scope item.plan.record · item — 0 unit(s) · none
+  ```
+
+  Where the playbook kit is not installed, every line says `unarmed` and names where it looked, and
+  the command still exits 0. A `derive` that fails stops it with exit 1, naming the item.
+
 - **Check an install:** `bash tools/loop/adopt-loop.sh --check` runs the same read through the <!-- usage: script:tools/loop/adopt-loop.sh a5990311 -->
   resolved python. The kit renders nothing, so there is nothing to scaffold.
 - **See a refusal:** `python tools/loop/loop_lib.py --fixture --plant reordered` reads the file with
@@ -141,8 +194,12 @@ item, which reads as unarmed and never as a pass.
   `reordered`, `bad-step`, `bad-reach`, `disposition-unknown` (a word given twice in the set) and
   `disposition-alias` (an alias meaning no member). The witness cases are `witness-no-class`,
   `witness-bad-class`, `witness-actor-unlisted`, `witness-actor-listed` (which reads clean),
-  `actor-list-grown`, `actor-list-stale` and `actor-list-no-build`. The files on disk are never
-  changed.
+  `actor-list-grown`, `actor-list-stale` and `actor-list-no-build`. The program cases are
+  `needs-cycle`, `needs-unresolved`, `outcome-unrouted`, `route-unresolved`, `input-no-layer` and
+  `exit-missing`. Two cases run `--scopes` after the read and exit 0 when it behaves:
+  `scope-selected` scopes one unit to one item in a scratch file and shows it on that item's line
+  alone, and `scope-no-kit` looks for the playbook kit in an empty scratch folder and shows every line
+  `unarmed`. The files on disk are never changed.
 
 ## What stops a read
 
@@ -151,7 +208,12 @@ and in order, when a workflow is named twice, when an `order` is not an integer 
 a `step` is absent or is neither a step tag nor `none`, when a `reach` is neither `entry` nor
 `review`, when the disposition set is missing, empty or holds a word twice, or when an alias row's
 `word` is a member or its `means` is not one. It also refuses a step with no `witness`, a witness with
-no class or no `by`, and a class that is in neither witness list. The `loop definition` gate runs the read on every push and landing.
+no class or no `by`, and a class that is in neither witness list. For the item rows it refuses a tag
+that does not start `item.` and a step word, an item declared twice, a need naming no item, a cycle
+of needs (each cycle named once), an empty outcome list or one with a word twice, an outcome with no
+route or a route for no outcome, a route to anything but an item, `transition` or a stand-in, an
+input whose layer tag is not in `layers.toml`, and a step whose `exit` is not one of its own items.
+The `loop definition` gate runs the read on every push and landing.
 
 The roles kit's `roles catalogue` gate joins the two files by workflow name, both ways: a workflow
 in `workflows.toml` with no row here, or a row here naming no workflow there, is one `R6` line.

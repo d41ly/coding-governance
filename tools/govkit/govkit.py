@@ -1001,6 +1001,57 @@ def all_kits(descs: dict[str, tuple[dict, str]]) -> list[str]:
     return sorted(e for e, (d, _) in descs.items() if d.get("selectable") != "conditional")
 
 
+# The order a needs graph allows, and its cycles: `derive_install_order` orders a selection through it.
+# >>> needs_graph_py -- canonical copy: needs_graph.py in the gov lib dir (byte-identical; gated)
+class NeedsCycle(ValueError):
+    """No order exists. `stuck` holds the nodes left unplaced, sorted: every node on a cycle and every
+    node that needs one, so `scan_cycles` is what names the cycles themselves."""
+
+    def __init__(self, stuck):
+        super().__init__("a needs cycle among %s" % ", ".join(stuck))
+        self.stuck = stuck
+
+
+def derive_needs_order(nodes, needs):
+    """`nodes` in an order where each follows every node `needs[node]` names: Kahn, each ready tier
+    sorted, so the order is sorted order wherever no edge applies. A need outside `nodes` constrains
+    nothing, and a node needing itself is a cycle. NeedsCycle where no order exists."""
+    want = set(nodes)
+    deps = {n: {d for d in needs.get(n, ()) if d in want} for n in nodes}
+    out, placed = [], set()
+    while len(out) < len(nodes):
+        ready = sorted(n for n in nodes if n not in placed and deps[n] <= placed)
+        if not ready:
+            raise NeedsCycle(sorted(n for n in nodes if n not in placed))
+        out.extend(ready)
+        placed.update(ready)
+    return out
+
+
+def scan_cycles(edges, live=None):
+    """Every cycle of `edges`, `{node: the nodes it points at}`, each reported ONCE and rotated to its
+    smallest member, in sorted order; a node pointing at itself is a cycle of one. `live`, a predicate
+    over a node, leaves out each node it answers False for, as a start and as a step; None keeps all.
+    Once and rotated, because a cycle found from each of its members is one finding."""
+    keep = live if live is not None else (lambda node: True)
+    found = {}
+    for start in [a for a in sorted(edges) if keep(a)]:
+        stack = [(start, (start,))]
+        while stack:
+            node, path = stack.pop()
+            for nxt in sorted(edges.get(node, ())):
+                if not keep(nxt):
+                    continue
+                if nxt == start:
+                    low = path.index(min(path))
+                    key = path[low:] + path[:low]
+                    found.setdefault(key, key)
+                elif nxt not in path:
+                    stack.append((nxt, path + (nxt,)))
+    return [found[k] for k in sorted(found)]
+# <<< needs_graph_py
+
+
 def derive_install_order(ids: list[str], descs: dict[str, tuple[dict, str]]) -> list[str]:
     """Order a selection so a kit follows everything it `requires`. Alphabetical within a tier.
 
@@ -1020,24 +1071,18 @@ def derive_install_order(ids: list[str], descs: dict[str, tuple[dict, str]]) -> 
     Kahn with an alphabetical ready-queue, so the result is deterministic and reduces to today's
     alphabetical order whenever no edge applies. A cycle REFUSES rather than falling back to
     alphabetical: an install order nobody can satisfy is not an order, and silently picking one is
-    how this class returns.
+    how this class returns. The order is the gov lib's needs-graph helper, carried inline above.
     """
     want = set(ids)
     deps = {i: sorted({d for d in (descs[i][0].get("requires") or []) if d in want and d != i})
             for i in ids}
-    out, placed = [], set()
-    while len(out) < len(ids):
-        ready = sorted(i for i in ids
-                       if i not in placed and all(d in placed for d in deps[i]))
-        if not ready:
-            stuck = sorted(i for i in ids if i not in placed)
-            raise Refusal(
-                f"`requires` has a cycle among {', '.join(stuck)} — refusing to invent an install "
-                f"order. Break the cycle in the descriptors; an order nobody can satisfy is not one"
-            )
-        out.extend(ready)
-        placed.update(ready)
-    return out
+    try:
+        return derive_needs_order(ids, deps)
+    except NeedsCycle as e:
+        raise Refusal(
+            f"`requires` has a cycle among {', '.join(e.stuck)} — refusing to invent an install "
+            f"order. Break the cycle in the descriptors; an order nobody can satisfy is not one"
+        ) from None
 
 
 def derive_unsatisfied_requires(selection: list[str], descs: dict[str, tuple[dict, str]],

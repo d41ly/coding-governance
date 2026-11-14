@@ -374,6 +374,7 @@ envelope_sh|$ROOT/$KIT_REL/envelope.sh|$KIT_REL/envelope
 auto_memory|$ROOT/$KIT_REL/auto_memory.py|$KIT_REL/auto_memory
 retired_kits|$ROOT/$KIT_REL/retired_kits.py|$KIT_REL/retired_kits
 commit_trailers_py|$ROOT/$KIT_REL/commit_trailers.py|$KIT_REL/commit_trailers
+needs_graph_py|$ROOT/$KIT_REL/needs_graph.py|$KIT_REL/needs_graph
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -422,6 +423,9 @@ commit_trailers_py|$ROOT/$KIT_REL/commit_trailers.py|$KIT_REL/commit_trailers
 # attribution views and its CLI; the memory-tree kit's and the unattended kit's commit_trailers.py are
 # each that block whole, beside a copy of resolve_kit_dir, through which the reader finds the key table,
 # and a copy of git_env_leaks_py, the names the reader's pinned runner drops (TOOL-dDeclaredLoop-39 S4).
+# needs_graph_py (TOOL-dDeclaredLoop-12 S5) is the order a needs graph allows and its cycles, extracted
+# at its third instance: govkit's install order, the backlog grader's hold cycles and the loop kit's
+# item programs each carry it inline.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one

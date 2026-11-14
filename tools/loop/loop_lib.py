@@ -2,6 +2,7 @@
 """loop_lib — the one reader of the loop's definition, `loop.toml` beside this file (TOOL-dDeclaredLoop-1).
 
     python loop_lib.py --check                    # read the definition, print what was read
+    python loop_lib.py --scopes                   # each item's instruction scope, derived
     python loop_lib.py --fixture --plant <case>   # read it with one break planted in memory
     python loop_lib.py --grade-site <site> <entry>...   # grade one declaration site's witness entries
 
@@ -32,6 +33,19 @@ definition, against itself at the compare base `read_actor_base` reads, and agai
 folder. `--grade-site` joins a declaration site outside the definition, `DOD_CORE` or `DOD_EXTRA` of
 the unattended driver, to the aliases and the list, both ways.
 
+The definition also holds each gov step's program (TOOL-dDeclaredLoop-12): one `[[item]]` row per item,
+its `tag` `item.<step>.<name>`, its `step`, `actor`, `needs`, `inputs`, `allowance`, `returns`, closed
+`outcomes`, `witness`, `owner` and `routes`, an inline table naming one target per outcome: a declared
+item, `transition`, or `stand-in:{prefix}/<home>/<file>`. A `needs` entry is a tag, or a list of tags any
+one of which meets it. `check_program` grades the rows as one needs graph, ordered by the needs-graph
+helper below: every need declared, no cycle, each outcome set closed through `derive_outcome_set`, the
+rule `read_outcome_set` applies, each outcome routed once to a target that resolves, each input's text
+before its first `:` a layer tag `read_layer_tags` reads from the playbook kit's `layers.toml`, and each
+step's `exit` an item of that step. `read_items` returns the rows once both checks hold. `--scopes`
+prints each item's instruction scope, `derive_item_scope` running that kit's `load_sets.py derive` once
+per item as a subprocess, so this module imports no sibling kit. Where the playbook kit does not
+resolve, the inputs print `unarmed` and every scope line too; the loop kit declares no edge to it.
+
 A definition that does not hold is refused with `LoopError`, a `ValueError` naming the file and the row: a
 file that does not read or is no TOML; a `step` or `workflow` table that is no array of tables; the gov
 steps missing, repeated or out of order, a tag that is no gov step, or an `order` that is not the step's
@@ -43,27 +57,32 @@ repeats an earlier row's, or whose `means` is no member. The table is graded whe
 it; `read_dispositions` and `--check` refuse a definition that declares no set.
 
 `--check` prints one line per step and per workflow, the set and one line per alias, then a count, and exits 0; a refused definition is one
-line and exit 1. It then prints the witness classes, one line per witness alias and per witness, one
+line and exit 1. It prints each step's program, `loop: program <step> · <n> item(s) · <tags>` in needs
+order, or `loop: inputs unarmed` and why before them where no layer tags resolve. It then prints the witness classes, one line per witness alias and per witness, one
 line per list row with its build and the list's base line, the base or `no comparison` and why, and
 each refusal of the list as `loop: refused · ...`, exit 1. `--fixture --plant <case>` reads the shipped
 definition and list with the named break made in memory, never on disk, the list's base being the
 shipped list as read, and exits 1 on the refusal the break must draw, 0 if the reader accepted it. The
 plants are `PLANTS`. `--grade-site <site> <entry>...` prints `loop: site <site> · <item> · <word> ·
 <class>` per entry, `· until <build>` on an actor entry, then each refusal, and exits 0, or 1 on a
-refusal. Exit 2 is a usage error, a site outside `DECLARATION_SITES` included.
+refusal. `--scopes` prints `loop: scope <tag> · <derive's item line> · <the tags it lists, or none>` per
+item and exits 0, or 1 on a refused definition or a derive that exits non-zero. Exit 2 is a usage
+error, a site outside `DECLARATION_SITES` included.
 
 WHAT THIS DOES NOT CHECK: that a workflow row names a workflow the roles kit holds, which is that kit's
-catalogue check, both ways; that a step tag or an exit item is registered in its namespace, which is the
-tag index's; that the item an `exit` names exists, since the item rows are not in this file yet; what a
-`state` word means; an `[[item]]` row beyond the `tag` and `outcomes` the outcome read asks of it, since
-the item schema is its own unit's; that a disposition record's `Item` names a declared item, which reads
-None; or that a writer resolved an alias before it wrote. An unknown key on a row is not read and not
-refused. That a witness's `by` is true. Stdlib only, but for `read_actor_base`, which imports the
-memory-tree kit's compare base inside the function, so a reader calling `load_loop` never reaches it.
+catalogue check, both ways; that a step tag or an item tag is registered in its namespace, which is the
+tag index's; what a `state` word means; an item's actor, allowance, return template or witness beyond
+being read, each field's content being its own unit's; a need on an item outside the five programs; that
+a `stand-in:` path exists or a `transition` route reaches a transition table; that a disposition record's
+`Item` names a declared item, which reads None; or that a writer resolved an alias before it wrote. An
+unknown key on a row is not read and not refused. That a witness's `by` is true. Stdlib only, but for
+`read_actor_base`, which imports the memory-tree kit's compare base inside the function, so a reader
+calling `load_loop` never reaches it.
 """
 import pathlib
 import re
 import sys
+import tempfile
 import tomllib
 
 KIT_LOOP_VERSION = "1.0"
@@ -81,6 +100,12 @@ REACH_WORDS = ("entry", "review")
 SEG = re.compile(r"[a-z0-9][a-z0-9-]*")
 #: An `[[item]]` row's `outcomes` when its closed outcome set is the `[dispositions]` set.
 OUTCOMES_REF = "dispositions"
+#: An item's route target for a cross-step move, whose transition table is its own unit's.
+ROUTE_TRANSITION = "transition"
+#: An item's route target into a later build: today's stand-in tool, spelled under the install prefix.
+ROUTE_STAND_IN = re.compile(r"stand-in:\{prefix\}/[^/\s]+/\S+")
+#: The reader whose load set `--scopes` asks `load_sets.py derive` for, beside each item.
+SCOPE_READER = "reader.every"
 #: `--plant`'s cases, each a break made in the definition as read, and what it does.
 PLANTS = {"missing-step": "the step.deploy row taken out",
           "reordered": "the step.test row moved before step.build",
@@ -94,7 +119,20 @@ PLANTS = {"missing-step": "the step.deploy row taken out",
           "witness-actor-listed": "step.plan's witness class set to actor, and listed in the list and its base",
           "actor-list-grown": "a list row the base lacks",
           "actor-list-stale": "a row for step.design, whose witness is history, in the list and its base",
-          "actor-list-no-build": "a row naming dNoSuchBuild in the list and its base"}
+          "actor-list-no-build": "a row naming dNoSuchBuild in the list and its base",
+          "needs-cycle": "item.plan.dedupe given a need on item.plan.triage-rule, which needs it",
+          "needs-unresolved": "item.plan.triage-oracle added to item.plan.record's any-of need",
+          "outcome-unrouted": "item.plan.place's route for unplaced taken out",
+          "route-unresolved": "item.plan.place's placed outcome routed to item.plan.leas",
+          "input-no-layer": "item.plan.input's input read from layer.memry",
+          "exit-missing": "step.plan's exit set to item.design.exit, an item of another step",
+          "scope-selected": "each item's scope derived over a scratch manifest scoping one unit to item.plan.record",
+          "scope-no-kit": "the layer tags and each item's scope resolved from a scratch directory with no playbook kit"}
+#: The plants whose break is in what the scope verb reads rather than in the definition, so `--check`
+#: runs whole and the scope verb runs after it.
+SCOPE_PLANTS = ("scope-selected", "scope-no-kit")
+#: The `scope-selected` plant's unit: one scratch manifest row scoped to one item.
+PLANT_SCOPE_UNIT = ("unit.loop-fixture", "item.plan.record")
 #: The declaration sites outside the definition whose entries `--grade-site` grades: the unattended
 #: driver's core Definition of Done and the conf's extra one, each a set of `<item>:<word>` entries.
 DECLARATION_SITES = ("DOD_CORE", "DOD_EXTRA")
@@ -314,6 +352,57 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
+# The order a needs graph allows, and its cycles: `check_program` orders the items through it.
+# >>> needs_graph_py -- canonical copy: needs_graph.py in the gov lib dir (byte-identical; gated)
+class NeedsCycle(ValueError):
+    """No order exists. `stuck` holds the nodes left unplaced, sorted: every node on a cycle and every
+    node that needs one, so `scan_cycles` is what names the cycles themselves."""
+
+    def __init__(self, stuck):
+        super().__init__("a needs cycle among %s" % ", ".join(stuck))
+        self.stuck = stuck
+
+
+def derive_needs_order(nodes, needs):
+    """`nodes` in an order where each follows every node `needs[node]` names: Kahn, each ready tier
+    sorted, so the order is sorted order wherever no edge applies. A need outside `nodes` constrains
+    nothing, and a node needing itself is a cycle. NeedsCycle where no order exists."""
+    want = set(nodes)
+    deps = {n: {d for d in needs.get(n, ()) if d in want} for n in nodes}
+    out, placed = [], set()
+    while len(out) < len(nodes):
+        ready = sorted(n for n in nodes if n not in placed and deps[n] <= placed)
+        if not ready:
+            raise NeedsCycle(sorted(n for n in nodes if n not in placed))
+        out.extend(ready)
+        placed.update(ready)
+    return out
+
+
+def scan_cycles(edges, live=None):
+    """Every cycle of `edges`, `{node: the nodes it points at}`, each reported ONCE and rotated to its
+    smallest member, in sorted order; a node pointing at itself is a cycle of one. `live`, a predicate
+    over a node, leaves out each node it answers False for, as a start and as a step; None keeps all.
+    Once and rotated, because a cycle found from each of its members is one finding."""
+    keep = live if live is not None else (lambda node: True)
+    found = {}
+    for start in [a for a in sorted(edges) if keep(a)]:
+        stack = [(start, (start,))]
+        while stack:
+            node, path = stack.pop()
+            for nxt in sorted(edges.get(node, ())):
+                if not keep(nxt):
+                    continue
+                if nxt == start:
+                    low = path.index(min(path))
+                    key = path[low:] + path[:low]
+                    found.setdefault(key, key)
+                elif nxt not in path:
+                    stack.append((nxt, path + (nxt,)))
+    return [found[k] for k in sorted(found)]
+# <<< needs_graph_py
+
+
 def read_actor_base(kit_dir):
     """`(rows or None, why)`: the actor-witness list's lines at the compare base and the base, or None
     and why there is no comparison: no work tree, no memory-tree kit, no base, or no list at the base."""
@@ -456,26 +545,174 @@ def resolve_disposition(kit_dir, word):
     raise LoopError(where, "%r is no disposition and no alias of one; the set is %s" % (word, " ".join(members)))
 
 
-def read_outcome_set(kit_dir, item):
-    """The closed outcome set of the `[[item]]` row whose `tag` is `item`: the disposition set for a row
-    declaring `outcomes = "dispositions"`, the row's own list otherwise, None for an item the definition
-    does not declare. LoopError for an `item` table that is no array of tables, or a row found whose
-    `outcomes` is neither."""
-    data, where = read_definition(kit_dir)
-    check_loop(data, where)
+def derive_outcome_set(row, members, where):
+    """The closed outcome set of one `[[item]]` row: `members`, the disposition set, for a row declaring
+    `outcomes = "dispositions"`, the row's own list otherwise. LoopError naming `where` and the item for
+    a row whose `outcomes` is neither, is empty or gives a word twice, or that names the disposition set
+    where the definition declares none."""
+    item, outcomes = row.get("tag"), row.get("outcomes")
+    if outcomes == OUTCOMES_REF:
+        if not members:
+            raise LoopError(where, "declares no disposition set, a [dispositions] table with its set")
+        return list(members)
+    if not isinstance(outcomes, list) or not outcomes or not all(isinstance(w, str) for w in outcomes):
+        raise LoopError(where, "the item %s carries no outcomes, a list of words or %r" % (item, OUTCOMES_REF))
+    for word in outcomes:
+        if outcomes.count(word) > 1:
+            raise LoopError(where, "the item %s gives the outcome %s twice" % (item, word))
+    return list(outcomes)
+
+
+def read_item_rows(data, where):
+    """`data`'s `[[item]]` rows; LoopError for an `item` table that is no array of tables."""
     rows = data.get("item", [])
     if not isinstance(rows, list) or not all(isinstance(r, dict) for r in rows):
         raise LoopError(where, "'item' is not an array of tables")
-    for row in rows:
-        if row.get("tag") != item:
-            continue
-        outcomes = row.get("outcomes")
-        if outcomes == OUTCOMES_REF:
-            return read_dispositions(kit_dir)
-        if not isinstance(outcomes, list) or not outcomes or not all(isinstance(w, str) for w in outcomes):
-            raise LoopError(where, "the item %s carries no outcomes, a list of words or %r" % (item, OUTCOMES_REF))
-        return list(outcomes)
+    return rows
+
+
+def read_outcome_set(kit_dir, item):
+    """The closed outcome set of the `[[item]]` row whose `tag` is `item`, by `derive_outcome_set`'s
+    rule; None for an item the definition does not declare. LoopError for an `item` table that is no
+    array of tables, or a row found whose outcomes do not hold."""
+    data, where = read_definition(kit_dir)
+    members = check_loop(data, where)["dispositions"]
+    for row in read_item_rows(data, where):
+        if row.get("tag") == item:
+            return derive_outcome_set(row, members, where)
     return None
+
+
+def check_program(data, where, layers):
+    """`data`'s `[[item]]` rows graded as each gov step's program, returned as `{step tag: [item tags in
+    needs order]}`. `layers` is the set of layer tags an input may name, or None where none resolved,
+    which leaves the inputs unchecked. LoopError naming `where`, the item and the field that does not
+    hold: a tag opening no `item.<step>.` of a gov step, a `step` other than that one, or a tag given
+    twice; a need naming no declared item, or a needs cycle, each cycle named once; an outcome set that
+    does not hold; routes that are not exactly the outcomes, or a target that is no declared item,
+    `transition` or `stand-in:{prefix}/<home>/<file>`; an input naming no layer tag; and a step whose
+    `exit` is no declared item of that step."""
+    members = check_loop(data, where)["dispositions"]
+    rows, steps = read_item_rows(data, where), {t.split(".", 1)[1]: t for t in STEP_TAGS}
+    declared = {}
+    for n, row in enumerate(rows, 1):
+        tag = row.get("tag")
+        parts = tag.split(".", 2) if isinstance(tag, str) else []
+        if len(parts) != 3 or parts[0] != "item" or parts[1] not in steps or not parts[2]:
+            raise LoopError(where, "item row %d tag %r opens no item.<step>. of a gov step: %s" % (
+                n, tag, " ".join(steps)))
+        if row.get("step") != steps[parts[1]]:
+            raise LoopError(where, "the item %s step %r is not %s, the step its tag opens" % (
+                tag, row.get("step"), steps[parts[1]]))
+        if tag in declared:
+            raise LoopError(where, "the item %s is declared twice" % tag)
+        declared[tag] = row
+    needs = {}
+    for tag, row in declared.items():
+        entries = row.get("needs")
+        if not isinstance(entries, list):
+            raise LoopError(where, "the item %s carries no needs, a list of tags and any-of lists, [] for none" % tag)
+        needs[tag] = []
+        for entry in entries:
+            group = entry if isinstance(entry, list) else [entry]
+            if not group or not all(isinstance(t, str) for t in group):
+                raise LoopError(where, "the item %s needs %r, which is neither a tag nor a list of tags" % (tag, entry))
+            for t in group:
+                if t not in declared:
+                    raise LoopError(where, "the item %s needs %s, which no [[item]] row declares" % (tag, t))
+                needs[tag].append(t)
+    try:
+        order = derive_needs_order(list(declared), needs)
+    except NeedsCycle:
+        cycles = scan_cycles({t: set(n) for t, n in needs.items()})
+        raise LoopError(where, "the item needs form a cycle: %s" % "; ".join(
+            " -> ".join(c + (c[0],)) for c in cycles)) from None
+    for tag, row in declared.items():
+        outcomes = derive_outcome_set(row, members, where)
+        routes = row.get("routes")
+        if not isinstance(routes, dict):
+            raise LoopError(where, "the item %s carries no routes, an inline table of outcome = target" % tag)
+        for word in outcomes:
+            if word not in routes:
+                raise LoopError(where, "the item %s outcome %s has no route" % (tag, word))
+        for word, target in routes.items():
+            if word not in outcomes:
+                raise LoopError(where, "the item %s routes %s, which is no outcome of its set: %s" % (
+                    tag, word, " ".join(outcomes)))
+            if target not in declared and target != ROUTE_TRANSITION and not (
+                    isinstance(target, str) and ROUTE_STAND_IN.fullmatch(target)):
+                raise LoopError(where, "the item %s routes %s to %r, which is no declared item, %s or "
+                                       "stand-in:{prefix}/<home>/<file>" % (tag, word, target, ROUTE_TRANSITION))
+        inputs = row.get("inputs", [])
+        if not isinstance(inputs, list) or not all(isinstance(i, str) for i in inputs):
+            raise LoopError(where, "the item %s inputs are not a list of <layer tag>:<what it reads>" % tag)
+        for text in inputs if layers is not None else ():
+            if text.split(":", 1)[0] not in layers:
+                raise LoopError(where, "the item %s input %r names no layer tag of the playbook kit's layers.toml" % (
+                    tag, text))
+    for row in data.get("step", []):
+        exit_tag = row.get("exit")
+        if exit_tag not in declared or declared[exit_tag]["step"] != row.get("tag"):
+            raise LoopError(where, "the step %s exit %r is no declared item of that step" % (row.get("tag"), exit_tag))
+    return {s: [t for t in order if declared[t]["step"] == s] for s in STEP_TAGS}
+
+
+def read_layer_tags(kit_dir):
+    """The layer tags of the playbook kit's `layers.toml`, each `[[layer]]` row's `tag`, the kit found
+    from `kit_dir` through `resolve_kit_dir`; LookupError where it does not resolve. LoopError where the
+    file does not read or is no TOML."""
+    path = resolve_kit_dir("playbook", "layers.toml", kit_dir) / "layers.toml"
+    try:
+        with open(path, "rb") as fh:
+            data = tomllib.load(fh)
+    except OSError as e:
+        raise LoopError(path.as_posix(), "cannot be read: %s" % e.strerror)
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
+        raise LoopError(path.as_posix(), "not valid TOML: %s" % e)
+    return {row.get("tag") for row in data.get("layer", []) if isinstance(row, dict)}
+
+
+def read_items(kit_dir):
+    """The `[[item]]` rows of the definition in `kit_dir`, in file order, once `check_loop` and
+    `check_program` hold; the inputs are graded where the playbook kit's layer tags resolve."""
+    data, where = read_definition(kit_dir)
+    check_loop(data, where)
+    try:
+        layers = read_layer_tags(kit_dir)
+    except LookupError:
+        layers = None
+    check_program(data, where, layers)
+    return read_item_rows(data, where)
+
+
+def derive_item_scope(kit_dir, root, tags, units=None):
+    """One `loop: scope <tag> · <derive's item line> · <the tags it lists, or none>` line per item of
+    `tags`: the playbook kit's `load_sets.py derive --reader reader.every --item <tag>` over the
+    repository at `root`, `--units <units>` added where given, run once per item as a subprocess, so
+    this module imports no sibling kit. Where that kit does not resolve from `kit_dir`, every line is
+    `unarmed`, naming the LookupError. LoopError naming the item, the exit and derive's first output
+    line where a derive exits non-zero."""
+    import os
+    import subprocess
+    try:
+        script = resolve_kit_dir("playbook", "load_sets.py", kit_dir) / "load_sets.py"
+    except LookupError as e:
+        return ["loop: scope %s · unarmed · %s" % (tag, e) for tag in tags]
+    env = dict(os.environ, PYTHONIOENCODING="utf-8")
+    lines = []
+    for tag in tags:
+        argv = [sys.executable, str(script), "derive", "--reader", SCOPE_READER, "--item", tag, "--root", str(root)]
+        if units is not None:
+            argv += ["--units", str(units)]
+        p = subprocess.run(argv, capture_output=True, text=True, encoding="utf-8", errors="replace", env=env)
+        out = p.stdout.splitlines()
+        if p.returncode != 0:
+            first = next(iter(out + p.stderr.splitlines()), "no output")
+            raise LoopError(script.as_posix(), "derive for the item %s exited %d: %s" % (tag, p.returncode, first))
+        said = next((ln for ln in out if ln.startswith("item —")), "item — no line")
+        listed = [ln.strip() for ln in out if ln.startswith("  ") and ln.strip()]
+        lines.append("loop: scope %s · %s · %s" % (tag, said, " ".join(listed) or "none"))
+    return lines
 
 
 def check_disposition_record(kit_dir, record):
@@ -525,8 +762,23 @@ def write_loop_plant(data, case, rows, base_rows):
         workflows["spec-review"]["reach"] = "revew"
     elif case == "disposition-unknown":
         data["dispositions"]["set"].append("ask")
-    else:
+    elif case == "disposition-alias":
         next(r for r in data["disposition-alias"] if r.get("word") == "defer")["means"] = "postpone"
+    elif case in PLANTS and case not in SCOPE_PLANTS:
+        items = {r.get("tag"): r for r in data.get("item", [])}
+        if case == "needs-cycle":
+            items["item.plan.dedupe"]["needs"].append("item.plan.triage-rule")
+        elif case == "needs-unresolved":
+            items["item.plan.record"]["needs"][0].append("item.plan.triage-oracle")
+        elif case == "outcome-unrouted":
+            items["item.plan.place"]["routes"].pop("unplaced")
+        elif case == "route-unresolved":
+            items["item.plan.place"]["routes"]["placed"] = "item.plan.leas"
+        elif case == "input-no-layer":
+            inputs = items["item.plan.input"]["inputs"]
+            inputs[0] = "layer.memry:" + inputs[0].split(":", 1)[1]
+        else:
+            plan["exit"] = "item.design.exit"
 
 
 def main(argv):
@@ -544,11 +796,23 @@ def main(argv):
         for r in refusals:
             print("loop: refused · %s" % r)
         return 1 if refusals else 0
-    if argv != ["--check"] and plant not in PLANTS:
-        print("usage: python loop_lib.py --check | --fixture --plant <%s> | --grade-site <%s> <entry>..." % (
+    if argv not in (["--check"], ["--scopes"]) and plant not in PLANTS:
+        print("usage: python loop_lib.py --check | --scopes | --fixture --plant <%s> | --grade-site <%s> <entry>..." % (
             "|".join(PLANTS), "|".join(DECLARATION_SITES)), file=sys.stderr)
         return 2
     root = next((d for d in (kit_dir, *kit_dir.parents) if (d / ".git").exists()), kit_dir)
+    if argv == ["--scopes"]:
+        try:
+            lines = derive_item_scope(kit_dir, root, [r["tag"] for r in read_items(kit_dir)])
+        except LoopError as e:
+            print("loop: %s" % e)
+            return 1
+        for line in lines:
+            print(line)
+        return 0
+    # A scope plant's scratch directory sits under the host temp directory and is removed after.
+    scratch = tempfile.TemporaryDirectory() if plant in SCOPE_PLANTS else None
+    layer_dir = scratch.name if plant == "scope-no-kit" else kit_dir
     try:
         data, where = read_definition(kit_dir)
         rows = read_actor_rows(kit_dir)
@@ -560,6 +824,11 @@ def main(argv):
         if not loop["dispositions"]:
             raise LoopError(where, "declares no disposition set, a [dispositions] table with its set")
         witnesses = check_witness_classes(data, where)
+        try:
+            layers, layers_why = read_layer_tags(layer_dir), ""
+        except LookupError as e:
+            layers, layers_why = None, str(e)
+        program = check_program(data, where, layers)
     except LoopError as e:
         print("loop: %s" % e)
         return 1
@@ -573,6 +842,10 @@ def main(argv):
     for a in data.get("disposition-alias", []):
         print("loop: disposition-alias %s · means %s" % (a["word"], a["means"]))
     print("loop: %d step(s) and %d workflow(s) read from %s" % (len(loop["step"]), len(loop["workflow"]), where))
+    if layers is None:
+        print("loop: inputs unarmed · %s" % layers_why)
+    for step, tags in program.items():
+        print("loop: program %s · %d item(s) · %s" % (step, len(tags), " ".join(tags)))
     print("loop: witness classes %s · refused %s" % (" ".join(data["witnesses"]["classes"]),
                                                       " ".join(data["witnesses"]["refused"])))
     for a in data.get("witness-alias", []):
@@ -590,9 +863,40 @@ def main(argv):
     else:
         print("loop: actor-list base · %s" % base_why)
     refusals = check_actor_list(rows, base_rows, sites, root)
+    if scratch is not None and not refusals:
+        refusals = check_scope_plant(plant, layers, pathlib.Path(scratch.name), kit_dir, root,
+                                     [r["tag"] for r in data.get("item", [])])
+        scratch.cleanup()
     for r in refusals:
         print("loop: refused · %s" % r)
     return 1 if refusals else 0
+
+
+def check_scope_plant(plant, layers, scratch, kit_dir, root, tags):
+    """Run the scope verb under a scope plant, printing its lines, and return the refusals: under
+    `scope-selected`, a scratch manifest in `scratch` scoping one unit to one item, which must appear
+    on that item's line alone; under `scope-no-kit`, `scratch` as the kit directory, so the inputs and
+    every scope line must read `unarmed`."""
+    unit, item = PLANT_SCOPE_UNIT
+    try:
+        if plant == "scope-selected":
+            manifest = scratch / "units.toml"
+            manifest.write_text('[[unit]]\ntag = "%s"\nscope = ["%s"]\n' % (unit, item), encoding="utf-8")
+            lines = derive_item_scope(kit_dir, root, tags, manifest)
+        else:
+            lines = derive_item_scope(scratch, root, tags)
+    except LoopError as e:
+        return [str(e)]
+    for line in lines:
+        print(line)
+    if plant == "scope-selected":
+        hits = [ln.split(" · ", 1)[0][len("loop: scope "):] for ln in lines if (" %s" % unit) in ln]
+        print("loop: fixture · %s listed on %s" % (unit, " ".join(hits) or "no item's line"))
+        return [] if hits == [item] else ["the planted unit %s scoped to %s is listed on %s" % (
+            unit, item, " ".join(hits) or "no item's line")]
+    armed = [ln for ln in lines if " · unarmed · " not in ln]
+    return ([] if layers is None else ["the inputs read layer tags with no playbook kit"]) + [
+        "a scope line with no playbook kit is armed: %s" % ln for ln in armed]
 
 
 if __name__ == "__main__":

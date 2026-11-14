@@ -255,6 +255,21 @@
     {
       "id": "NeedsCycle",
       "kind": "class",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "NeedsCycle",
+      "kind": "class",
+      "file": "tools/lib/needs_graph.py"
+    },
+    {
+      "id": "NeedsCycle",
+      "kind": "class",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
+      "id": "NeedsCycle",
+      "kind": "class",
       "file": "tools/memory-tree/backlog.py"
     },
     {
@@ -6898,6 +6913,11 @@
       "file": "tools/playbook/positional.py"
     },
     {
+      "id": "check_program",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "check_projection",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -7401,6 +7421,11 @@
       "id": "check_scope_arms",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "check_scope_plant",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "check_scratch_guard",
@@ -10363,6 +10388,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "derive_item_scope",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "derive_joins",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
@@ -10695,6 +10725,21 @@
     {
       "id": "derive_needs_order",
       "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_needs_order",
+      "kind": "function",
+      "file": "tools/lib/needs_graph.py"
+    },
+    {
+      "id": "derive_needs_order",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
+      "id": "derive_needs_order",
+      "kind": "function",
       "file": "tools/memory-tree/backlog.py"
     },
     {
@@ -10726,6 +10771,11 @@
       "id": "derive_opted_out",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_outcome_set",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "derive_outside_probe_plant",
@@ -18958,6 +19008,16 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "read_item_rows",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
+      "id": "read_items",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "read_job_accounting",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -19156,6 +19216,11 @@
       "id": "read_layer_kinds",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
+    },
+    {
+      "id": "read_layer_tags",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "read_layers",
@@ -28981,6 +29046,21 @@
       "id": "scan_corpus",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"
+    },
+    {
+      "id": "scan_cycles",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "scan_cycles",
+      "kind": "function",
+      "file": "tools/lib/needs_graph.py"
+    },
+    {
+      "id": "scan_cycles",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "scan_cycles",
