@@ -4179,6 +4179,37 @@ def read_source_git_dirs(top):
     return tuple(os.path.realpath(d) for d in dirs)
 
 
+# The read filter (TOOL-aLightenedLoop-3 S3), INLINED byte-identically from the canonical copy named
+# on its marker line and gated by the resolve-python self-test; the spec-token checker carries it too.
+# >>> read_open_py -- canonical copy: read_open.py in the gov lib dir (byte-identical; gated)
+def derive_read_path(path, mode, flags):
+    """-> (path, refused) for an `open` audit event that reads, or None for one that does not.
+
+    A descriptor is None. With mode None the intent is in the flags, and any of `O_WRONLY`, `O_RDWR`
+    or `O_CREAT` is None (TOOL-dGroundRules-43 S9); a mode that is not a string, or holds any of `w`,
+    `a`, `x` or `+`, is None. A `.pyc` under a `__pycache__` directory is the source file it was
+    compiled from (TOOL-dGroundRules-35 S1); a cache name `source_from_cache` refuses is kept as
+    spelled, with `refused` true (TOOL-dGroundRules-52 S25). The path is returned through realpath.
+    """
+    if isinstance(path, int):
+        return None
+    if mode is None:
+        if flags & (os.O_WRONLY | os.O_RDWR | os.O_CREAT):
+            return None
+    elif not isinstance(mode, str) or any(c in mode for c in "wax+"):
+        return None
+    p = os.fsdecode(path)
+    refused = False
+    # TOOL-dGroundRules-52 S20: no `.pyc.<digits>` cut, since the flag filter above drops importlib's temporary write
+    if os.path.basename(os.path.dirname(p)) == "__pycache__" and p.endswith(".pyc"):
+        try:
+            p = importlib.util.source_from_cache(p)
+        except ValueError:
+            refused = True
+    return os.path.realpath(p), refused
+# <<< read_open_py
+
+
 def add_source_read(event, args):
     """The audit hook `--fixture` installs before its first case (TOOL-dGroundRules-33 S2): an `open`
     event whose mode reads and writes nothing, a None mode read by its flags, which carry none of
@@ -4192,27 +4223,15 @@ def add_source_read(event, args):
     A hook that raised would fail the very open it audits, so a path that does not resolve keeps nothing.
     A bytecode-cache read is kept as the source file it was compiled from (TOOL-dGroundRules-35 S1), so
     a warm load still records its `.py`; a cache name `source_from_cache` refuses is kept as spelled,
-    and in UNMAPPED_READS too, so the trace names it (TOOL-dGroundRules-52 S25)."""
+    and in UNMAPPED_READS too, so the trace names it (TOOL-dGroundRules-52 S25). The read filter itself
+    is `derive_read_path`, the `read_open_py` block (TOOL-aLightenedLoop-3 S3)."""
     if event != "open" or not TRACE_ROOTS:
         return
     try:
-        path, mode, flags = args[0], args[1], args[2]
-        if isinstance(path, int):
+        kept = derive_read_path(args[0], args[1], args[2])
+        if kept is None:
             return
-        if mode is None:  # TOOL-dGroundRules-43 S9: `os.open` carries its intent in the flags alone
-            if flags & (os.O_WRONLY | os.O_RDWR | os.O_CREAT):
-                return
-        elif not isinstance(mode, str) or any(c in mode for c in "wax+"):
-            return
-        p = os.fsdecode(path)
-        refused = False
-        # TOOL-dGroundRules-52 S20: no `.pyc.<digits>` cut, since S9's flag filter above drops importlib's temporary write
-        if os.path.basename(os.path.dirname(p)) == "__pycache__" and p.endswith(".pyc"):
-            try:
-                p = importlib.util.source_from_cache(p)
-            except ValueError:
-                refused = True
-        p = os.path.realpath(p)
+        p, refused = kept
         top, tmp, git_dirs = TRACE_ROOTS
         n = os.path.normcase(p)
         if any(n.startswith(os.path.normcase(d) + os.sep) for d in git_dirs):

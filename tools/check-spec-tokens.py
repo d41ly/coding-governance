@@ -268,15 +268,194 @@ keeps the broad guards that join drops and marks them, and prints the chunk and 
 hold rule reads without applying that rule. A guard carrying `*`, `?` or `[` is printed UNEVALUATED
 under every path, because the runner's `git diff` would expand it and this rule compares literals.
 A query in which EVERY path is untracked exits 2.
+
+  SPEC_TOKENS_INPUTS=<file> python <prefix>/check-spec-tokens.py   # also record what the run read
+  python <prefix>/check-spec-tokens.py --input-key <file>         # one digest over that record, now
+
+SPEC_TOKENS_INPUTS (TOOL-aLightenedLoop-3 S4) set and not empty makes the run RECORD its inputs to
+that file at exit: every file it opens to read outside the interpreter's own prefixes, every
+directory it lists, and every subprocess it runs through `subprocess.run`, with its cwd, input and
+environment delta. It only records: stdout and the exit status are the same with it and without it.
+A variable and not a flag, so a declared checker that does not know it ignores it. --input-key
+(S5) hashes the record's bytes and the replay of each line against the tree as it is NOW, prints
+the 40-hex digest and exits 0; a record that does not parse, or holds a subprocess the wrapper did
+not see, prints nothing and exits 1. The unattended driver keys its spec-token cache on it.
 """
+import atexit
+import base64
 import datetime
+import hashlib
 import importlib.util
 import json
+import locale
 import os
 import pathlib
 import re
 import subprocess
 import sys
+
+# The read filter (TOOL-aLightenedLoop-3 S3), INLINED byte-identically from the canonical copy named
+# on its marker line and gated by the resolve-python self-test; the policy kit carries it too.
+# >>> read_open_py -- canonical copy: read_open.py in the gov lib dir (byte-identical; gated)
+def derive_read_path(path, mode, flags):
+    """-> (path, refused) for an `open` audit event that reads, or None for one that does not.
+
+    A descriptor is None. With mode None the intent is in the flags, and any of `O_WRONLY`, `O_RDWR`
+    or `O_CREAT` is None (TOOL-dGroundRules-43 S9); a mode that is not a string, or holds any of `w`,
+    `a`, `x` or `+`, is None. A `.pyc` under a `__pycache__` directory is the source file it was
+    compiled from (TOOL-dGroundRules-35 S1); a cache name `source_from_cache` refuses is kept as
+    spelled, with `refused` true (TOOL-dGroundRules-52 S25). The path is returned through realpath.
+    """
+    if isinstance(path, int):
+        return None
+    if mode is None:
+        if flags & (os.O_WRONLY | os.O_RDWR | os.O_CREAT):
+            return None
+    elif not isinstance(mode, str) or any(c in mode for c in "wax+"):
+        return None
+    p = os.fsdecode(path)
+    refused = False
+    # TOOL-dGroundRules-52 S20: no `.pyc.<digits>` cut, since the flag filter above drops importlib's temporary write
+    if os.path.basename(os.path.dirname(p)) == "__pycache__" and p.endswith(".pyc"):
+        try:
+            p = importlib.util.source_from_cache(p)
+        except ValueError:
+            refused = True
+    return os.path.realpath(p), refused
+# <<< read_open_py
+
+
+# TOOL-aLightenedLoop-3 S4 - THE INPUT RECORD, armed below at module level and so ahead of the kit's
+# loads: a kit module the checker loads is then one of its reads, and an edit to it moves the key.
+# INPUT_LINES holds each input as one compact JSON line, so the record is sorted and de-duplicated.
+# `depth` is how many `run_traced` calls are open: a `subprocess.Popen` event fired inside one is
+# that call's own, and one fired outside every one is a call no replay can repeat.
+INPUT_LINES = set()
+INPUT_TRACE = {"path": "", "skip": (), "depth": 0, "run": subprocess.run}
+
+
+def add_input_line(kind, **keys):
+    INPUT_LINES.add(json.dumps({"kind": kind, **keys}, sort_keys=True, separators=(",", ":")))
+
+
+def arm_input_trace(path):
+    """Record this run's inputs to <path> at exit: the checker's own file first, because the
+    interpreter opened it before any hook could exist, then the audit hook, the `subprocess.run`
+    wrapper and the exit handler. The prefixes skipped are the interpreter's, which the launcher in
+    the driver's key stands for."""
+    INPUT_TRACE["path"] = path
+    INPUT_TRACE["skip"] = tuple(sorted({os.path.normcase(os.path.realpath(p)) + os.sep
+                                        for p in (sys.prefix, sys.base_prefix, sys.exec_prefix)}))
+    add_input_line("read", path=os.path.realpath(__file__))
+    subprocess.run = run_traced
+    atexit.register(write_input_record)
+    sys.addaudithook(add_input_event)
+
+
+def add_input_event(event, args):
+    """The audit hook: a kept `open` is a read, `os.listdir` and `os.scandir` a listing, and a
+    `subprocess.Popen` outside `run_traced` a `popen` line that makes the record unreplayable. A hook
+    that raised would fail the very call it audits, so any error records nothing."""
+    try:
+        if event == "open":
+            kept = derive_read_path(args[0], args[1], args[2])
+            if kept is not None and not os.path.normcase(kept[0]).startswith(INPUT_TRACE["skip"]):
+                add_input_line("read", path=kept[0])
+        elif event in ("os.listdir", "os.scandir"):
+            if not isinstance(args[0], int):
+                add_input_line("list", path=os.path.realpath(os.fsdecode(args[0] if args[0] is not None else ".")))
+        elif event == "subprocess.Popen" and not INPUT_TRACE["depth"]:
+            argv = args[1]
+            add_input_line("popen", argv=[os.fsdecode(argv)] if isinstance(argv, (str, bytes))
+                           else [os.fsdecode(os.fspath(a)) for a in argv])
+    except Exception:  # noqa: BLE001 - the hook must never fail what it audits
+        return
+
+
+def run_traced(*popenargs, **kwargs):
+    """`subprocess.run` while the trace is armed: it records the call, then makes it and returns its
+    result untouched. A call a replay could not repeat -- a shell string, a stdin that is neither the
+    call's input nor nothing -- is recorded as `popen`, so its record is a miss and never a wrong hit."""
+    try:
+        argv = popenargs[0] if popenargs else kwargs.get("args")
+        if (isinstance(argv, (str, bytes)) or kwargs.get("shell")
+                or kwargs.get("stdin") not in (None, subprocess.DEVNULL)):
+            add_input_line("popen", argv=[os.fsdecode(argv)] if isinstance(argv, (str, bytes))
+                           else [os.fsdecode(os.fspath(a)) for a in argv])
+        else:
+            data = kwargs.get("input") or b""
+            if isinstance(data, str):
+                data = data.encode(kwargs.get("encoding") or locale.getpreferredencoding(False),
+                                   kwargs.get("errors") or "strict")
+            env = kwargs.get("env")
+            add_input_line(
+                "run", argv=[os.fsdecode(os.fspath(a)) for a in argv],
+                cwd=os.path.realpath(os.fsdecode(os.fspath(kwargs["cwd"]))) if kwargs.get("cwd") is not None
+                else os.getcwd(),
+                drop=sorted(k for k in os.environ if env is not None and k not in env),
+                set={os.fsdecode(k): os.fsdecode(v) for k, v in (env or {}).items() if os.environ.get(k) != v},
+                input=base64.b64encode(data).decode("ascii"))
+    except Exception:  # noqa: BLE001 - a call the record cannot spell is still made, as `popen`
+        add_input_line("popen", argv=[repr(popenargs[:1])])
+    INPUT_TRACE["depth"] += 1
+    try:
+        return INPUT_TRACE["run"](*popenargs, **kwargs)
+    finally:
+        INPUT_TRACE["depth"] -= 1
+
+
+def write_input_record():
+    """The exit handler: the record, one line per input, sorted. A failed write leaves no record,
+    which the driver reads as a run that cannot be keyed, never as a refusal."""
+    try:
+        with open(INPUT_TRACE["path"], "w", encoding="utf-8", newline="\n") as fh:
+            fh.write("".join(line + "\n" for line in sorted(INPUT_LINES)))
+    except OSError:
+        return
+
+
+def derive_input_digest(record):
+    """--input-key (TOOL-aLightenedLoop-3 S5): the SHA-1 over the record's own bytes and, line by line
+    in record order, its replay against the tree now -- a read's file hash or `absent`, a listing's
+    sorted names or `absent`, a run's exit status and stdout hash, re-run with its recorded cwd, input
+    and environment delta. None when the record does not parse or holds a line no replay can repeat."""
+    try:
+        raw = pathlib.Path(record).read_bytes()
+        lines = [json.loads(x) for x in raw.decode("utf-8").splitlines() if x.strip()]
+    except (OSError, ValueError):
+        return None
+    if not all(isinstance(x, dict) and x.get("kind") in ("read", "list", "run") for x in lines):
+        return None
+    h = hashlib.sha1(raw)
+    for x in lines:
+        try:
+            if x["kind"] == "read":
+                try:
+                    ans = hashlib.sha1(pathlib.Path(x["path"]).read_bytes()).hexdigest()
+                except OSError:
+                    ans = "absent"
+            elif x["kind"] == "list":
+                try:
+                    ans = json.dumps(sorted(os.listdir(x["path"])))
+                except OSError:
+                    ans = "absent"
+            else:
+                env = {k: v for k, v in os.environ.items() if k not in x["drop"]}
+                env.update(x["set"])
+                try:
+                    p = subprocess.run(x["argv"], cwd=x["cwd"], env=env, input=base64.b64decode(x["input"]),
+                                       stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+                    ans = f"{p.returncode} {hashlib.sha1(p.stdout).hexdigest()}"
+                except OSError as exc:
+                    ans = f"oserror {type(exc).__name__}"
+        except (KeyError, TypeError, ValueError):
+            return None
+        h.update(f"{x['kind']}\0{ans}\n".encode("utf-8"))
+    return h.hexdigest()
+
+
+if os.environ.get("SPEC_TOKENS_INPUTS"):
+    arm_input_trace(os.environ["SPEC_TOKENS_INPUTS"])
 
 # The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test.
@@ -1647,6 +1826,13 @@ def read_pass_spec(root, files, args):
 
 
 def main(argv):
+    if "--input-key" in argv:   # TOOL-aLightenedLoop-3 S5: a query over a record, ahead of the spec walk
+        ops = argv[argv.index("--input-key") + 1:]
+        key = derive_input_digest(ops[0]) if ops else None
+        if key is None:
+            return 1
+        print(key)
+        return 0
     listing = "--list" in argv
     root = pathlib.Path(run("git", "rev-parse", "--show-toplevel").strip())
     if not root.name:

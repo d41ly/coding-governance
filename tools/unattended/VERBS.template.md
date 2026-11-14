@@ -249,8 +249,10 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   the spec headers or `git` in seconds. It refuses on any red but a hit in another build's spec,
   which it notes and admits, because the bar's whole-tree leg still grades that build.
   It skips the run when its inputs match the last check it admitted for this build, keyed on the
-  slug, the checker, the launcher, HEAD and the run-gates working-tree fingerprint, recorded under
-  the sidecar root; with no fingerprint it announces that the cache is off and runs the checker. A blank or absent key is an ANNOUNCED skip on stdout,
+  slug, the checker, the launcher and
+  a digest of every file and git answer its last admitted run read,
+  recorded under the sidecar root only when the tree and HEAD held still while it ran; with no
+  fingerprint it announces that the cache is off and runs the checker. A blank or absent key is an ANNOUNCED skip on stdout,
   never a silent pass. Where `RUN_CLAIMS` is `on` it reads the run's claim as the holder after every
   local refusal and before the row: another session's claim is check 108 and no row is written.
 - `--review` — records ONE review round for a subject and reports what the loop is doing:

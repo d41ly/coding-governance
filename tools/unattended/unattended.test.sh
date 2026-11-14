@@ -7808,9 +7808,9 @@ if [ -f "$STC" ]; then
   # ---- tRun's spec is clean and a second build tOther's live spec names the flagged bar. The cache
   # ---- steps call `run_spec_token_check` in process, because every refusal that writes no row now
   # ---- precedes the check (TOOL-aSwiftRefusal-1), so no row is written and the tree does not move
-  # ---- between them; step a's glob dispatch is kept for its glob assertions. The first call re-runs
-  # ---- the checker (the declared dispatch moved the run-state file) and records the key, the second
-  # ---- reads it. The run-gates fingerprint is copied where the driver resolves it, or the cache is announced off. RED-first:
+  # ---- between them; step a's glob dispatch is kept for its glob assertions. Under the key over
+  # ---- what the checker read (TOOL-aLightenedLoop-3), both calls read the key the declared dispatch
+  # ---- recorded. The run-gates fingerprint is copied where the driver resolves it, or the cache is announced off. RED-first:
   # ---- the inline block refused the first dispatch with check 49 and ran the checker on both calls.
   sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI="'"${PFX}check-spec-tokens.py"'"|' .unattended.conf
   printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md
@@ -7831,32 +7831,36 @@ if [ -f "$STC" ]; then
   sd_spec=memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md
   sd_clean=$(cat "$sd_spec"); sd_bar='AC1 `GATE_SELFTESTS=1 bash run-gates.sh` is green.'
   sd_red=${sd_clean/'AC1 observable.'/$sd_bar}
-  # TOOL-aSmoothedDispatch-8 AC4 step a: call 1's declared row moved the run-state file, so only $fp moved.
+  # TOOL-aSmoothedDispatch-8 AC4 step a, INVERTED by TOOL-aLightenedLoop-3 AC8: call 1's declared row
+  # moved the run-state file, which only the packet join reads and only for a chain run with a packet,
+  # so it moves the fingerprint and not the key, and this call SKIPS the check call 1 admitted.
   o=$( ( load_driver_conf && run_spec_token_check tRun ) 2>&1 )
-  hit "$o" "$sd_admit"
-  miss "$o" "spec-token check skipped"
+  hit "$o" "spec-token check skipped: its inputs match the check last admitted for tRun"
+  miss "$o" "spec-tokens: "
   hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")" "--dispatch was given a --writes path carrying a glob metacharacter"
   o=$( ( load_driver_conf && run_spec_token_check tRun ) 2>&1 )
   hit "$o" "spec-token check skipped: its inputs match the check last admitted for tRun"
   miss "$o" "spec-tokens: "
   hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")" "--dispatch was given a --writes path carrying a glob metacharacter"
-  # TOOL-aSmoothedDispatch-8 AC4 step b: an edited tracked file moves the fingerprint.
+  # TOOL-aSmoothedDispatch-8 AC4 step b, INVERTED by TOOL-aLightenedLoop-3 AC8: an edited tracked file
+  # the checker never reads moves the fingerprint and not the key, which is a digest over what the
+  # checker's last admitted run read, so the call SKIPS and the checker prints nothing.
   printf '\n' >> memory/builds/tRun/README.md
   o=$( ( load_driver_conf && run_spec_token_check tRun ) 2>&1 )
-  hit "$o" "$sd_admit"
-  miss "$o" "spec-token check skipped"
-  # TOOL-aSmoothedDispatch-8 AC4 step c: an empty commit moves HEAD and nothing the fingerprint reads.
-  # `--only` with no path commits HEAD's own tree: a bare --allow-empty would commit the staged specs,
-  # which moves HEAD^{tree} and the porcelain, so the step would re-run with $hd dropped too.
+  hit "$o" "spec-token check skipped: its inputs match the check last admitted for tRun"
+  miss "$o" "spec-tokens: "
+  # TOOL-aSmoothedDispatch-8 AC4 step c, INVERTED by TOOL-aLightenedLoop-3 AC8: an empty commit moves
+  # HEAD, and HEAD is out of the key, so the call SKIPS. `--only` with no path commits HEAD's own tree:
+  # a bare --allow-empty would commit the staged specs, which the checker does read.
   git commit -q --allow-empty --only -m "sd8 empty" --no-verify
   o=$( ( load_driver_conf && run_spec_token_check tRun ) 2>&1 )
-  hit "$o" "$sd_admit"
-  miss "$o" "spec-token check skipped"
+  hit "$o" "spec-token check skipped: its inputs match the check last admitted for tRun"
+  miss "$o" "spec-tokens: "
   git reset -q --soft HEAD~1
   git checkout -q -- memory/builds/tRun/README.md
   # TOOL-aSmoothedDispatch-8 AC4 step d: a second slug over the tree tRun's record was just written for.
-  # The tRun call re-records at this HEAD, or step c's record would miss on HEAD alone. In process,
-  # because a --dispatch tOther needs a run-state file, a chain and a spec of its own.
+  # The tRun call is kept from the HEAD-keyed cut, where it re-recorded at this HEAD; it now skips. In
+  # process, because a --dispatch tOther needs a run-state file, a chain and a spec of its own.
   ( load_driver_conf && run_spec_token_check tRun ) >/dev/null 2>&1
   o=$( ( load_driver_conf && run_spec_token_check tOther ) 2>&1 )
   hit "$o" "$sd_refuse"
@@ -7871,6 +7875,22 @@ if [ -f "$STC" ]; then
   hit "$o" "$sd_refuse"
   miss "$o" "spec-token check skipped"
   printf '%s\n' "$sd_clean" > "$sd_spec"
+  # TOOL-aLightenedLoop-3 AC9: a checker that edits a tracked file while it runs is admitted and its key
+  # is NOT recorded, and one that writes no input record is admitted twice with the line naming that.
+  # Both are stubs declared for their calls alone. The moving one loads the real checker module, so
+  # the module-level tracer arms and writes a real record, and only the tree's movement withholds it.
+  printf 'import importlib.util\ns = importlib.util.spec_from_file_location("cst", "%scheck-spec-tokens.py")\nm = importlib.util.module_from_spec(s); s.loader.exec_module(m)\nopen("memory/builds/tRun/README.md", "a").write("moved\\n")\n' "$PFX" > ${PFX}stub-moved.py
+  printf 'import sys\nsys.exit(0)\n' > ${PFX}stub-quiet.py
+  o=$( ( load_driver_conf && SPEC_TOKENS_CLI="${PFX}stub-moved.py" run_spec_token_check tRun ) 2>&1 )
+  hit "$o" "spec-token cache not recorded: the tree or HEAD moved while the checker ran, so the next dispatch runs the checker"
+  miss "$o" "spec-token check skipped"
+  git checkout -q -- memory/builds/tRun/README.md
+  o=$( ( load_driver_conf && SPEC_TOKENS_CLI="${PFX}stub-quiet.py" run_spec_token_check tRun ) 2>&1 )
+  hit "$o" "spec-token cache not recorded: the checker wrote no input record, so the next dispatch runs the checker"
+  o=$( ( load_driver_conf && SPEC_TOKENS_CLI="${PFX}stub-quiet.py" run_spec_token_check tRun ) 2>&1 )
+  hit "$o" "spec-token cache not recorded: the checker wrote no input record"
+  miss "$o" "spec-token check skipped"
+  rm -f ${PFX}stub-moved.py ${PFX}stub-quiet.py
   # TOOL-aSmoothedDispatch-8 AC4 step f: no fingerprint, no key: the cache is off on both calls.
   rm -f .git/unattended/spec-tokens.tRun.key "./${PFX}$_sd_home/gate-fingerprint.sh"
   o=$( ( load_driver_conf && run_spec_token_check tRun ) 2>&1 )
@@ -19614,7 +19634,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # five `hit`/`miss` lines and the M3 block's two `mutate`s and three `same`/`miss`/`hit` lines, every one
 # unconditional, counted off the blocks' own lines; no suite ran, and their RED-first observation is the close's.
 # MERGED at TOOL-aSmoothedDispatch-21's reconcile: the base 3256, plus 42, plus 31 = 3329.
-FLOOR_ASSERTIONS=3329
+# RAISED 3329 -> 3334 by TOOL-aLightenedLoop-3: 5 region-three spec-token cache assertions (3 `hit`,
+# 2 `miss`) for the moved-tree and untraced-checker calls; steps b and c are inverted at 2 each, net 0,
+# so FLOOR_SHARD_3 carries the same 5. COUNTED off the block's own lines; no suite ran, and their
+# RED-first observation is the close's.
+FLOOR_ASSERTIONS=3334
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -19825,7 +19849,8 @@ FLOOR_SHARD_2=229
 # RAISED 411 -> 434 by TOOL-aSmoothedDispatch-8 on 2026-11-10: the same 23 region-three spec-token assertions, see FLOOR_ASSERTIONS.
 # RAISED 405 -> 416 by TOOL-aSwiftRefusal-4: the same 11 region-three spec-token arm and L1 assertions, see FLOOR_ASSERTIONS.
 # MERGED at TOOL-aSmoothedDispatch-21's reconcile: the base 405, plus 29, plus 11 = 445.
-FLOOR_SHARD_3=445
+# RAISED 445 -> 450 by TOOL-aLightenedLoop-3: the same 5 region-three spec-token cache assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_3=450
 # RAISED 373 -> 382 by TOOL-dGroundRules-66: the same 9 region-four terminal-unit assertions, see FLOOR_ASSERTIONS.
 # RAISED 382 -> 383 by TOOL-dGroundRules-70: the same 1 region-four reader assertion, see FLOOR_ASSERTIONS.
 # RAISED 383 -> 386 by TOOL-aSmoothedDispatch-1 on 2026-11-10: the same net 3 region-four --writes split assertions, see FLOOR_ASSERTIONS.

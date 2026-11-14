@@ -79,7 +79,10 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # door beside it, top-level. Counted by reading; OWED: observed at the close.
 # RAISED 246 -> 247 by TOOL-aBatchedPacket-2: its one packet-join arm, the checker copy with a marker
 # door beside it, top-level. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=247
+# RAISED 247 -> 251 by TOOL-aLightenedLoop-3: its four input-record arms, the traced run's parity, the
+# record's reads and run, and --input-key's digest and its popen refusal, each top-level. Counted by
+# reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=251
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -2181,6 +2184,35 @@ ARM_ARGS=(--pass-spec)
 GATE_BASE=$ps_base arm "NM4 AC5 --pass-spec with no operand reads the inherited GATE_BASE" 0 "$d" "--pass-spec · $ps_base..HEAD · TOOL-tOne-1"
 GATE_BASE= arm "NM4 AC5 --pass-spec with no operand and a blank GATE_BASE reads the last commit" 0 "$d" "--pass-spec · HEAD~1..HEAD · TOOL-tOne-1"
 ARM_ARGS=()
+
+# TOOL-aLightenedLoop-3 AC5 AC6 AC7: THE INPUT RECORD. A run with SPEC_TOKENS_INPUTS naming a file
+# prints the same bytes and exits as the run without it, and its record names the fixture's spec and
+# leg manifest as reads and its `git ls-files` as a run; `--input-key` over that record prints one
+# 40-hex digest, and over a record holding a `popen` line prints nothing and exits 1. The staged break
+# is a tracer that prints one line, which reds the first arm alone.
+check_input_arm() {   # $1 label · $2 the status of the test that decides it
+  if [ "$2" = 0 ]; then echo "arm ok    $1"; pass=$((pass+1)); else echo "arm FAIL  $1"; fail=$((fail+1)); fi
+}
+d=$base/inputs; scratch "$d"
+li_rec="$base/inputs.rec"
+li_plain=$(cd "$d" && "$PY" "$LINT" 2>&1); li_prc=$?
+li_traced=$(cd "$d" && SPEC_TOKENS_INPUTS="$li_rec" "$PY" "$LINT" 2>&1); li_trc=$?
+[ "$li_plain" = "$li_traced" ] && [ "$li_prc" = "$li_trc" ] && [ -n "$li_plain" ]
+check_input_arm "LL3 AC6 a traced run prints the bytes and exits as the untraced one ($li_prc, $li_trc)" $?
+"$PY" -c '
+import json, os, sys
+L = [json.loads(x) for x in open(sys.argv[1], encoding="utf-8")]
+r = [os.path.basename(x["path"]) for x in L if x["kind"] == "read"]
+ok = "2026-09-02-spec-TOOL-tOne-1.md" in r and "gate-legs.json" in r and any(x["kind"] == "run" and x["argv"][-1:] == ["ls-files"] for x in L)
+sys.exit(0 if ok else 1)' "$li_rec" 2>/dev/null
+check_input_arm "LL3 AC5 the record names the fixture's spec and leg manifest as reads and git ls-files as a run" $?
+li_key=$(cd "$d" && "$PY" "$LINT" --input-key "$li_rec" 2>&1); li_krc=$?; li_key=${li_key//$'\r'/}
+[ "$li_krc" = 0 ] && [[ $li_key =~ ^[0-9a-f]{40}$ ]]
+check_input_arm "LL3 AC7 --input-key over a replayable record prints one 40-hex digest" $?
+printf '{"kind":"popen","argv":["x"]}\n' > "$base/inputs.bad"
+li_key=$(cd "$d" && "$PY" "$LINT" --input-key "$base/inputs.bad" 2>&1); li_krc=$?
+[ "$li_krc" = 1 ] && [ -z "$li_key" ]
+check_input_arm "LL3 AC7 --input-key over a record holding a popen line prints nothing and exits 1" $?
 
 # TOOL-dGroundRules-32 S9, TOOL-dGroundRules-40: the build-order render's overlap rule is the
 # dispatcher's, and both are graded against the truth. Each OVERLAP_PAIRS row is two paths relative to

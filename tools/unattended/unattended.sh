@@ -14504,18 +14504,34 @@ check_spec_token_hits() { # slug · checker status · checker output -> 0 admits
   return 1
 }
 
-# TOOL-aSmoothedDispatch-4 S2 - THE KEY over every input the spec-token checker reads: the slug the
-# verdict scopes to, the declared checker, the launcher that runs it, HEAD (the checker reads history
-# through `git log`), and the run-gates kit's WORKING-TREE fingerprint, resolved as `print_drift_delta`
-# resolves a sibling kit. The fingerprint prints nothing on any failure, and so does this: an empty
-# key is the cache OFF for that call, never a key over a missing input. What it does not see: a git
-# setting carried in the environment, and a Python package upgraded in place under one launcher path.
-derive_spec_token_key() { # slug · launcher -> a 40-hex key, or nothing and status 1
+# TOOL-aLightenedLoop-3 S6 - THE KEY over what the checker's last run READ: the slug the verdict
+# scopes to, the declared checker, the launcher that runs it, and the checker's own `--input-key`
+# digest over <record>, the input record that run wrote. The digest folds the record's bytes and the
+# replay of each file, listing and git call in it against the tree now, so a commit or an edit that
+# moves none of them keeps the key: HEAD and the fingerprint are out of it, and guard only the window
+# the checker runs in (`read_tree_state`). A record that cannot be read or replayed prints nothing,
+# and so does this: an empty key is a miss, never a key over a missing input. The variable is emptied
+# for the query, so it never arms a record of its own. What it does not see: a path only probed for
+# existence, a git setting carried in the environment, and a Python package upgraded in place under
+# one launcher path.
+derive_spec_token_key() { # slug · launcher · record -> a 40-hex key, or nothing and status 1
+  local dg
+  dg=$(SPEC_TOKENS_INPUTS= "$2" "$SPEC_TOKENS_CLI" --input-key "$3" 2>/dev/null) || return 1
+  dg=${dg%$'\r'}
+  [[ $dg =~ ^[0-9a-f]{40}$ ]] || return 1
+  printf '%s\n' "$1" "$SPEC_TOKENS_CLI" "$2" "$dg" | GIT hash-object --stdin 2>/dev/null
+}
+
+# TOOL-aLightenedLoop-3 S6 - THE RUN WINDOW'S GUARD: the run-gates kit's WORKING-TREE fingerprint,
+# resolved as `print_drift_delta` resolves a sibling kit, and HEAD, one line each, or nothing when
+# either is missing. Read before and after the checker runs, and a key is recorded only when the two
+# reads agree, so a tree edited mid-run is never recorded as the tree the checker read.
+read_tree_state() { # launcher -> the fingerprint line and HEAD, or nothing and status 1
   local d fp hd
-  d=$(resolve_kit_dir "$2" run-gates gate-fingerprint.sh "$KIT_DIR" 2>/dev/null) && [ -n "$d" ] || return 1
+  d=$(resolve_kit_dir "$1" run-gates gate-fingerprint.sh "$KIT_DIR" 2>/dev/null) && [ -n "$d" ] || return 1
   fp=$(bash "$ROOT/$d/gate-fingerprint.sh" 2>/dev/null) && [ -n "$fp" ] || return 1
   hd=$(GIT rev-parse HEAD 2>/dev/null) && [ -n "$hd" ] || return 1
-  printf '%s\n' "$1" "$SPEC_TOKENS_CLI" "$2" "$hd" "$fp" | GIT hash-object --stdin 2>/dev/null
+  printf '%s\n%s\n' "$fp" "$hd"
 }
 
 # ------------------------------------------------- aDeferredBar closing review F3 (unit 2)
@@ -14534,30 +14550,40 @@ derive_spec_token_key() { # slug · launcher -> a 40-hex key, or nothing and sta
 #
 # TOOL-aSmoothedDispatch-4 S2-S4 - MOVED HERE from `verb_dispatch` with its refusal texts and its
 # announced skip unchanged, then SCOPED and CACHED. It refuses only on a red `check_spec_token_hits`
-# cannot prove foreign. The key is derived BEFORE the checker runs and recorded only after the
-# verdict admits, so a refusal re-runs every time and a tree edited mid-run is recorded under the key
-# of the tree it read. The record is one file per slug under the sidecar root, read with `read -r`
-# and written with one `printf`; a failed read or write costs a later miss and never refuses.
+# cannot prove foreign. A key is recorded only after the verdict admits, so a refusal re-runs every
+# time. The key is one file per slug under the sidecar root, read with `read -r` and written with one
+# `printf`; a failed read or write costs a later miss and never refuses.
+#
+# TOOL-aLightenedLoop-3 S6 - RE-KEYED on what the checker READ. Beside the key sits the input record
+# its last run wrote, `spec-tokens.<slug>.inputs`, and a lookup derives the key over that record, so
+# a commit or an edit that moves nothing the checker read keeps the key. The record is removed and
+# re-written by every run, the variable set for that one call. A key is recorded only when the
+# verdict admits, the tree state read before the run equals the one read after it, and the record
+# is there and replays; otherwise one line says why it is not, and no fingerprint still prints the
+# cache-off line and nothing more.
 run_spec_token_check() { # slug -> 0 admitted or skipped, 1 refused under check 49
-  local slug="$1" _stpy _strc _stq _stkey="" _stdir="" _strec="" _stwas=""
+  local slug="$1" _stpy _strc _stq _stkey="" _stdir="" _strec="" _stin="" _stwas="" _stat="" _stnow="" _stwhy=""
   if [ -z "${SPEC_TOKENS_CLI:-}" ]; then
     echo "unattended: dispatch — SPEC_TOKENS_CLI is blank or undeclared, so no spec-token check ran over the live tree before this dispatch: an announced skip, not a pass"
     return 0
   fi
   [ -f "$ROOT/$SPEC_TOKENS_CLI" ] || { fail 49 "--dispatch: SPEC_TOKENS_CLI names a file that is not there, so the spec-token check would pass by running nothing: $SPEC_TOKENS_CLI"; return 1; }
   _stpy=$(resolve_python) || { fail 49 "--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run: $SPEC_TOKENS_CLI"; return 1; }
-  _stkey=$(derive_spec_token_key "$slug" "$_stpy") || _stkey=""
-  if [ -n "$_stkey" ]; then
-    _stdir=$(resolve_sidecar_dir) && [ -n "$_stdir" ] && _strec="$_stdir/spec-tokens.$slug.key"
-    if [ -n "$_strec" ] && [ -f "$_strec" ]; then read -r _stwas <"$_strec" || :; fi
-    if [ "$_stwas" = "$_stkey" ]; then
+  _stdir=$(resolve_sidecar_dir) && [ -n "$_stdir" ] && _strec="$_stdir/spec-tokens.$slug.key" && _stin="$_stdir/spec-tokens.$slug.inputs"
+  if [ -n "$_strec" ] && [ -f "$_strec" ] && [ -f "$_stin" ]; then
+    read -r _stwas <"$_strec" || :
+    _stkey=$(derive_spec_token_key "$slug" "$_stpy" "$_stin") || _stkey=""
+    if [ -n "$_stkey" ] && [ "$_stwas" = "$_stkey" ]; then
       echo "unattended: dispatch — spec-token check skipped: its inputs match the check last admitted for $slug (key ${_stkey:0:12})"
       return 0
     fi
-  else
+  fi
+  _stat=$(read_tree_state "$_stpy") || _stat=""
+  if [ -z "$_stat" ]; then
     echo "unattended: dispatch — spec-token cache off: no run-gates gate-fingerprint.sh resolves in this install, or it printed no digest, so the checker runs"
   fi
-  run_bounded "$_stpy" "$SPEC_TOKENS_CLI"; _strc=$?
+  if [ -n "$_stin" ]; then rm -f "$_stin" 2>/dev/null; mkdir -p "$_stdir" 2>/dev/null; fi
+  SPEC_TOKENS_INPUTS=$_stin run_bounded "$_stpy" "$SPEC_TOKENS_CLI"; _strc=$?
   if ! _stq=$(check_spec_token_hits "$slug" "$_strc" "$RB_OUT"); then
     fail 49 "--dispatch refuses: the declared spec-token checker reds over the live tree, so a live spec names a bar, a suite or a token that does not resolve and the unit would build against it ($SPEC_TOKENS_CLI exited $_strc in ${RB_TOOK}s): ${_stq//$'\n'/ }"
     return 1
@@ -14566,9 +14592,19 @@ run_spec_token_check() { # slug -> 0 admitted or skipped, 1 refused under check 
     [[ $RB_OUT =~ spec-tokens:\ ([0-9]+)\ unwaived ]]
     echo "unattended: dispatch — the spec-token checker reds only in other builds' specs, which the bar's whole-tree leg still grades, so this dispatch is admitted: ${BASH_REMATCH[1]:-?} hit(s), first: ${_stq%%$'\n'*}"
   fi
-  if [ -n "$_strec" ]; then
-    { mkdir -p "$_stdir" && printf '%s\n' "$_stkey" >"$_strec"; } 2>/dev/null || :
+  [ -n "$_stat" ] || return 0
+  _stnow=$(read_tree_state "$_stpy") || _stnow=""
+  if [ "$_stnow" != "$_stat" ]; then
+    _stwhy="the tree or HEAD moved while the checker ran"
+  elif [ -z "$_stin" ] || [ ! -f "$_stin" ]; then
+    _stwhy="the checker wrote no input record"
+  elif ! _stkey=$(derive_spec_token_key "$slug" "$_stpy" "$_stin") || [ -z "$_stkey" ]; then
+    _stwhy="the input record cannot be replayed"
+  else
+    { printf '%s\n' "$_stkey" >"$_strec"; } 2>/dev/null || :
+    return 0
   fi
+  echo "unattended: dispatch — spec-token cache not recorded: $_stwhy, so the next dispatch runs the checker"
   return 0
 }
 

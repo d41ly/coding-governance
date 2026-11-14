@@ -261,8 +261,10 @@ const DRIVER_STEPS =
       'not call them: --dispatch, --brief and --rescope all refuse without one. Write down the paths ' +
       'each pass will touch before you touch them anyway — the declaration is what makes disjointness ' +
       'checkable, and here only you can check it.\n'
-    : 'Declare the write set with `' + cfg.driver + ' --dispatch ' + cfg.slug + ' --pass ' + cfg.unitId +
-      ' --writes <path>` before you write anything. A REFUSAL FROM IT IS BINDING — read it and stop. ' +
+    : "The main loop declared this unit's write set with `" + cfg.driver + ' --dispatch ' + cfg.slug +
+      ' --pass ' + cfg.unitId + ' --writes <path>` before it spawned you, from the spec\'s Files touched ' +
+      'estimate. Before you write a path outside that set, declare it with the same command, naming ' +
+      'only the paths you add. A REFUSAL FROM IT IS BINDING — read it and stop. ' +
       'ITS SILENCE IS NOT A CLEARANCE: it refuses this unit only for having no tracked spec or a THIN ' +
       'one, plus the shape of the paths you declared; its ORDER gate runs only where this unit AND the ' +
       'blocking sibling both carry an `order` verb, and a sibling that merely declared a dispatch stops ' +

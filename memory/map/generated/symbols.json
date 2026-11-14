@@ -708,6 +708,16 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "add_input_event",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "add_input_line",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "add_item",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
@@ -1271,6 +1281,11 @@
       "id": "arm_hold_second",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_input_trace",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "arm_installed_template",
@@ -6128,6 +6143,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_input_arm",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
       "id": "check_instances",
       "kind": "function",
       "file": "tools/workflows/replay_scorer.py"
@@ -10178,6 +10198,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "derive_input_digest",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "derive_install_order",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -10826,6 +10851,21 @@
       "id": "derive_reach_units",
       "kind": "function",
       "file": "tools/playbook/load_sets.py"
+    },
+    {
+      "id": "derive_read_path",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "derive_read_path",
+      "kind": "function",
+      "file": "tools/lib/read_open.py"
+    },
+    {
+      "id": "derive_read_path",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "derive_readme_slot_plant",
@@ -21033,6 +21073,11 @@
       "file": "tools/playbook/instructions_edit.py"
     },
     {
+      "id": "read_tree_state",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_tree_text",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -28215,6 +28260,11 @@
     {
       "id": "run_traced",
       "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "run_traced",
+      "kind": "function",
       "file": "tools/gate-lint/fork-count.sh"
     },
     {
@@ -33276,6 +33326,11 @@
       "id": "write_inherited_asks",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_input_record",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "write_install_receipt",
