@@ -4,7 +4,13 @@
 This kit's copy. Each block below is INLINED byte-identically from the canonical copy its marker line
 names, gov's lib dir, which ships nothing; `<prefix>/lib/resolve-python.test.sh`'s parity table reds a
 copy that drifts. `routed_commits.py` and `deviation_join.py` import it, and the `commit` native class's pattern and resolver are read from it. The sibling-kit resolver rides beside the reader because the reader finds the
-trailer key table through it.
+trailer key table through it, and the `git_env_leaks_py` block because the reader's runner drops those names.
+
+Every git read through the default runner `run_git` is pinned (TOOL-dDeclaredLoop-39): the argv
+carries `--no-replace-objects` and `-c log.showSignature=false`, the environment `GIT_GRAFT_FILE=/dev/null`
+and no `GIT_ENV_LEAKS` name, so a replace ref, a graft or an inherited `GIT_DIR` cannot change what a
+commit is attributed to. These are the pins of the readers it replaced: `routed_commits.run_git` and
+the unattended kit's shell `GIT`.
 
 A commit is a node of the `commit` native class, and every trailer key gov reads is one `[[trailer]]`
 row of the playbook kit's `edges.toml`. `read_commits` reads a registered key and refuses any other, so
@@ -20,8 +26,8 @@ and each consumer names its own:
     python commit_trailers.py --print-commits                       # the commit class's members
     python commit_trailers.py --fixture                             # three planted commits, both views
 
-NOT here: the git pins of the default runner (TOOL-dDeclaredLoop-39) and a floor for an install holding no playbook kit (TOOL-dDeclaredLoop-40),
-where every read refuses with the resolver's own line.
+NOT here: a floor for an install holding no playbook kit (TOOL-dDeclaredLoop-40), where every read
+refuses with the resolver's own line.
 """
 from __future__ import annotations
 
@@ -79,6 +85,27 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
+# >>> git_env_leaks_py -- canonical copy: git_env_leaks.py in the gov lib dir (byte-identical; gated)
+# The eight location variables git EXPORTS to a hook, which reach any subprocess the hook starts and
+# name another tree than the one a reader was pointed at; and the four pathspec-mode variables a
+# caller can carry, which turn a `:(glob)` pathspec into a literal name that matches nothing.
+GIT_ENV_LEAKS = (
+    "GIT_DIR",
+    "GIT_WORK_TREE",
+    "GIT_INDEX_FILE",
+    "GIT_OBJECT_DIRECTORY",
+    "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+    "GIT_COMMON_DIR",
+    "GIT_NAMESPACE",
+    "GIT_PREFIX",
+    "GIT_LITERAL_PATHSPECS",
+    "GIT_GLOB_PATHSPECS",
+    "GIT_NOGLOB_PATHSPECS",
+    "GIT_ICASE_PATHSPECS",
+)
+# <<< git_env_leaks_py
+
+
 # >>> commit_trailers_py -- canonical copy: commit_trailers.py in the gov lib dir (byte-identical; gated)
 #: A member of the `commit` native class: the full sha, which is what a `Decided:` edge's target spells.
 SHA_RE = re.compile(r"[0-9a-f]{40}")
@@ -93,9 +120,14 @@ _FIXTURE_ID = re.compile(r"TOOL-tFix-[0-9]+")
 
 
 def run_git(repo, argv, stdin=None):
-    """The reader's own runner, the CLI's case: `git -C <repo> <argv>`, its stdout as bytes, or OSError
-    carrying git's stderr. A Python consumer passes its own runner instead, so its pins hold."""
-    proc = subprocess.run(["git", "-C", str(repo), *argv], input=stdin, capture_output=True)
+    """The reader's own runner, pinned: `git --no-replace-objects -c log.showSignature=false -C <repo>
+    <argv>` under the caller's environment with `GIT_GRAFT_FILE=/dev/null` and no `GIT_ENV_LEAKS` name,
+    so neither a replace ref, a graft nor an inherited `GIT_DIR` changes what it reads. Its stdout as
+    bytes, or OSError carrying git's stderr."""
+    env = {k: v for k, v in os.environ.items() if k not in GIT_ENV_LEAKS}
+    env["GIT_GRAFT_FILE"] = "/dev/null"
+    proc = subprocess.run(["git", "--no-replace-objects", "-c", "log.showSignature=false", "-C", str(repo), *argv],
+                          input=stdin, capture_output=True, env=env)
     if proc.returncode:
         raise OSError(f"`git {' '.join(argv)}` exited {proc.returncode}: "
                       + proc.stderr.decode("utf-8", "replace").strip())

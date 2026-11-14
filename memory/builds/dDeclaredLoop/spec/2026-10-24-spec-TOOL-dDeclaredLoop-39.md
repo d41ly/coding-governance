@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-39 — the one trailer reader carries the git pins of the readers it replaces
 
-**Status:** INPROGRESS · rev-2 · 2026-11-14 · node d · Tier-2 · base ed497191 · streams tooling · order 4 · advances TOOL-dDeclaredLoop-35
+**Status:** CLOSED · rev-2 · 2026-11-14 · node d · Tier-2 · base ed497191 · streams tooling · order 4 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-36-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-36-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-39-deviation-391.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-39-deviation-391.md) | deviation | — |
 | [2026-11-13-build-TOOL-dDeclaredLoop-39-deviation-392.md](../build/2026-11-13-build-TOOL-dDeclaredLoop-39-deviation-392.md) | deviation | — |
+| [2026-11-14-build-TOOL-dDeclaredLoop-39-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-dDeclaredLoop-39-1-acceptance-ledger.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
 | [2026-11-13-prompt-TOOL-dDeclaredLoop-39-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-dDeclaredLoop-39-1-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-dDeclaredLoop-39-reground-brief.md](../prompts/2026-11-13-prompt-TOOL-dDeclaredLoop-39-reground-brief.md) | research | — |

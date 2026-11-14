@@ -420,7 +420,8 @@ commit_trailers_py|$ROOT/$KIT_REL/commit_trailers.py|$KIT_REL/commit_trailers
 # inline, both kits copy-installed, and part 2l below holds the canonical to its behaviour.
 # commit_trailers_py (TOOL-dDeclaredLoop-23 S4) is the one reader of a commit's trailers, its two
 # attribution views and its CLI; the memory-tree kit's and the unattended kit's commit_trailers.py are
-# each that block whole, beside a copy of resolve_kit_dir, through which the reader finds the key table.
+# each that block whole, beside a copy of resolve_kit_dir, through which the reader finds the key table,
+# and a copy of git_env_leaks_py, the names the reader's pinned runner drops (TOOL-dDeclaredLoop-39 S4).
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one

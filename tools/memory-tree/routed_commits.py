@@ -1266,6 +1266,14 @@ def run_selftest() -> int:
         print_arm(b"\r" not in out38,
             f"TOOL-dDeclaredLoop-38 AC1 `tokens HEAD` over the planted fixture writes LF only, on {sys.platform}"
             + ("" if sys.platform == "win32" else " (not live here: the default newline is LF)"), repr(out38))
+
+        # ---- TOOL-dDeclaredLoop-39 AC4: this kit's copy of the reader drops tree_lib's leak list, the
+        # canonical's copy compared with the kit's own tuple, member for member and in order.
+        import tree_lib  # noqa: E402
+        print_arm(pathlib.Path(commit_trailers.__file__).resolve().parent == KIT
+                  and commit_trailers.GIT_ENV_LEAKS == tree_lib.GIT_ENV_LEAKS,
+            "TOOL-dDeclaredLoop-39 AC4 this kit's commit_trailers.GIT_ENV_LEAKS equals tree_lib.GIT_ENV_LEAKS",
+            f"reader {commit_trailers.__file__}: {commit_trailers.GIT_ENV_LEAKS!r}\ntree_lib: {tree_lib.GIT_ENV_LEAKS!r}")
     finally:
         shutil.rmtree(root, ignore_errors=True)
     print(f"{SAY} selftest: {'all arms held' if not failed else f'{len(failed)} arm(s) FAILED'}")

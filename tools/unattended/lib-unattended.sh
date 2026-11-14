@@ -1166,14 +1166,14 @@ check_gen_region_only() { # before object · after object -> 0 when both exist a
 # REFUSAL, status 2 with nothing printed, never an empty answer: an empty answer reads every unit as
 # unbuilt and looks like a correct one. The reader's own refusal, an install holding no trailer key
 # table say, reaches stderr and is this function's status. The CRs a Windows interpreter ends its
-# lines with are dropped here, and the replace-ref pin `GIT` carries rides the call's environment,
-# since the reader spawns git itself.
+# lines with are dropped here. The pins `GIT` carries are the reader's own runner's, for every caller
+# (TOOL-dDeclaredLoop-39), so this call sets none.
 read_attribution_tokens() { # git-log revision arguments -> one tokenised line per commit
   local _rt_py="" _rt_d
   declare -F resolve_python >/dev/null && _rt_py=$(resolve_python 2>/dev/null) || _rt_py=""
   [ -n "$_rt_py" ] || { printf '%s\n' 'lib-unattended: read_attribution_tokens found no python launcher, so no commit is attributed' >&2; return 2; }
   case "${BASH_SOURCE[0]}" in */*) _rt_d=${BASH_SOURCE[0]%/*} ;; *) _rt_d=. ;; esac
-  GIT_NO_REPLACE_OBJECTS=1 "$_rt_py" "$_rt_d/commit_trailers.py" tokens "$@" | tr -d '\r'
+  "$_rt_py" "$_rt_d/commit_trailers.py" tokens "$@" | tr -d '\r'
   return "${PIPESTATUS[0]}"
 }
 
