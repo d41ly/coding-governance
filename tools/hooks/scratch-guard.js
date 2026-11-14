@@ -141,7 +141,7 @@
  * agent's polling wait, read by `checkPollWait` with the shell's reserved words stepped: P1 tail
  * follow, a `tail` carrying a follow option; P2 sleep in a loop, a `sleep` in a command holding a
  * `while` or `until` loop; P3 sleep at or over 5 s, a `sleep` of `POLL_SLEEP_FLOOR_S` or more, or
- * of a duration that does not read. A gate row refusing the same command wins, and the background
+ * of a duration that does not read. A shell comment is read by no row. A gate row refusing the same command wins, and the background
  * command's exit notification is the wait. The index is read at the checkout root of the payload `cwd`, else of
  * `CLAUDE_PROJECT_DIR`; neither resolving adds no arm, with one witness line when
  * `CLAUDE_PROJECT_DIR` is set. An absent
@@ -1544,10 +1544,11 @@ function scanLauncherOptions(a, k, rule, depth, out, opts) {
  * `-c` or `-m` names no script — each ends the segment. With `opts.reserved` (TOOL-aTrimmedWait-6,
  * the polling rows alone) the prefix loop also steps a word of SHELL_RESERVED_WORDS.
  * Returns `[{ text, head, argv, launched, reserved }]`, argv being the head and every word after it,
- * reserved the reserved words stepped.
+ * reserved the reserved words stepped. A `#` beginning a word, outside quotes and heredoc bodies,
+ * blanks the rest of its line first, as the shell drops a comment (TOOL-aTrimmedWait-9).
  */
 function scanCommandHeads(cmd, depth = 0, opts = {}) {
-  const view = buildCommandView(cmd)
+  const view = buildCommandView(cmd).replace(/(^|[\s;&|()<>])#[^\n]*/g, (w, p) => p + ' '.repeat(w.length - p.length))
   const out = []
   const seg = /[^;|&()\n]+/g
   let m

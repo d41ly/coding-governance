@@ -1476,6 +1476,23 @@ run_role_bash "W-AC3 N4 the main loop's tail -f -> allow, stderr EMPTY" 0 empty 
 run_role_bash "W-AC3 N5 for ...; do sleep 1; done -> allow, stderr EMPTY" 0 empty gov-builder Bash 'for i in 1 2 3; do sleep 1; done'
 run_role_bash "W-AC3 N6 bash -no pipefail <suite> -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash -no pipefail kit/$SG_K_HOOKS/agent-cap.test.sh"
 run_role_bash "W-AC3 N7 bash -o pipefail <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash -o pipefail kit/$RUN_GATES/run-gates.sh"
+# ---- TOOL-aTrimmedWait-9, review items M2 and L2: a shell comment is read by no row, and P3 is ----
+# ---- tested at its floor. With the comment cut removed from scanCommandHeads, C1 and C3 exit 2 ----
+# ---- and C6 exits 0; with the cut opening at any #, C5 exits 0. With >= become > in -------------
+# ---- checkPollWait F1 exits 0, and with the m multiplier become 1 F2 exits 0 ----------------------
+run_role_bash "W9-AC1 C1 sleep 3 # brief pause -> allow, stderr EMPTY" 0 empty gov-builder Bash 'sleep 3 # brief pause'
+run_role_bash "W9-AC1 C2 sleep 9 # x -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep 9 # x'
+run_role_bash "W9-AC1 C3 a comment's ; starts no command -> allow, stderr EMPTY" 0 empty gov-builder Bash 'sleep 3 # a; sleep 9'
+run_role_bash "W9-AC1 C4 a quoted ' #' opens no comment -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash "echo ' #'; sleep 9"
+run_role_bash "W9-AC1 C5 a # inside a word opens no comment -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep 3#x'
+run_role_bash "W9-AC2 C6 <suite> # --render -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "bash kit/$SG_K_HOOKS/agent-cap.test.sh # --render"
+run_role_bash "W9-AC4 F1 sleep 5, at the floor -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep 5'
+run_role_bash "W9-AC4 F2 sleep 1m -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep 1m'
+run_role_bash "W9-AC4 F3 sleep 1h -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep 1h'
+run_role_bash "W9-AC4 F4 sleep 1d -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep 1d'
+run_role_bash "W9-AC4 F5 sleep infinity -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep infinity'
+run_role_bash "W9-AC4 F6 sleep 4.9, under the floor -> allow, stderr EMPTY" 0 empty gov-builder Bash 'sleep 4.9'
+run_role_bash "W9-AC4 F7 sleep 4s, under the floor -> allow, stderr EMPTY" 0 empty gov-builder Bash 'sleep 4s'
 # ---- AC3: the anchor — a cwd under no checkout falls back to CLAUDE_PROJECT_DIR; against a ---------
 # ---- checkRoleGate reading the payload cwd alone, the first row exits 0 and the third says nothing -
 run_role_bash "O-AC3 cwd under no checkout, CLAUDE_PROJECT_DIR the fixture -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash kit/$RUN_GATES/run-gates.sh" "$SG_NOREPO" "$SG_CWD_WT"
@@ -1720,8 +1737,10 @@ n=$((pass+fail))
 # and none found), counted by hand under the same rule.
 # 375 = 361 + the 14 run_role_bash rows TOOL-aTrimmedWait-6 added (7 for AC2 and 7 for AC3), counted
 # by hand under the same rule.
+# 388 = 375 + the 13 run_role_bash rows TOOL-aTrimmedWait-9 added (6 for its S1 and 7 for its S2),
+# counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=375
+FLOOR_ASSERTIONS=388
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

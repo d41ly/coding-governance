@@ -1018,9 +1018,11 @@ check_arm "arm 22 an empty prompt refuses by name" \
 # ---- written afresh, run through the CLI: cold, which writes one record under the fixture's git
 # ---- common dir; warm, which writes nothing; with the record's `notified` emptied, which drops the
 # ---- `returned` line and so proves the record is read; after an append and after a torn line, each
-# ---- resumed from the record's offset; and with the record keyed off by a transcript edit, a
-# ---- foreign key or an unwritable folder, each printing the cold lines. It reads arm 9's writer and
-# ---- lines. The failing case, observed at the close and not by the pass that wrote this: handoff.py
+# ---- resumed from the record's offset, which only a resumed read shows: the record's bad count,
+# ---- seeded to 7, prints as a note, and the returned line needs the appended result to reach the
+# ---- call through the rebuilt by_id (TOOL-aTrimmedWait-9); and with the record keyed off by a
+# ---- transcript edit, a foreign key or an unwritable folder, each printing the cold lines. It reads
+# ---- arm 9's writer and lines. The failing case, observed at the close and not by the pass that wrote this: handoff.py
 # ---- at the base, where no record is written. Not checked: timing, and a forged record.
 build_fixture; _rc23=$?
 A23S="$TMP_ROOT/s23/projects/p/22222222-2222-4222-8222-222222222222.jsonl"
@@ -1036,6 +1038,8 @@ elif mode == "session":
     rec["session"] += ".other"
 elif mode == "offset":
     rec["offset"] = pathlib.Path(rec["session"]).stat().st_size + 1
+elif mode == "bad":
+    rec["bad"] = 7
 text = json.dumps(rec)
 rp.write_text(text[:len(text) // 2] if mode == "truncated" else text, encoding="utf-8")'
 run_agents23() { out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" agents --handoff "$A9H" --session "$A23S" 2>"$TMP_ROOT/a23.err"); rc=$?; out=${out//$'\r'/}; }
@@ -1051,13 +1055,15 @@ check_arm "arm 23 ...a warm call prints the same lines and leaves the record unw
 "$PY" -B -c "$A23_EDIT" "$A23D" poison; _e23=$?; run_agents23
 check_arm "arm 23 ...a record whose notifications are emptied drops the returned line, so the record is read" \
    "$([ "$_e23" = 0 ] && [ "$rc" = 0 ] && [ "$out" = "$A9L1" ] && echo 1 || echo 0)"
-head -n 1 "$TMP_ROOT/a23.full" > "$A23S"; run_agents23; tail -n +2 "$TMP_ROOT/a23.full" >> "$A23S"; run_agents23
-check_arm "arm 23 ...a record taken on the first line, then the rest appended, prints the cold lines" \
-   "$(check_cold23 && echo 1 || echo 0)"
+head -n 1 "$TMP_ROOT/a23.full" > "$A23S"; run_agents23
+"$PY" -B -c "$A23_EDIT" "$A23D" bad; _e23=$?; tail -n +2 "$TMP_ROOT/a23.full" >> "$A23S"; run_agents23
+check_arm "arm 23 ...a record taken on the first line, its bad count seeded, then the rest appended, prints the cold lines and the seeded count" \
+   "$([ "$_e23" = 0 ] && check_cold23 && grep -q ': 7 line(s) did not parse' "$TMP_ROOT/a23.err" && echo 1 || echo 0)"
 _l1=$(head -n 1 "$TMP_ROOT/a23.full" | wc -c)
-head -c $((_l1 + 40)) "$TMP_ROOT/a23.full" > "$A23S"; run_agents23; tail -c +$((_l1 + 41)) "$TMP_ROOT/a23.full" >> "$A23S"; run_agents23
-check_arm "arm 23 ...a torn last line, then completed, prints the cold lines" \
-   "$(check_cold23 && cmp -s "$A23S" "$TMP_ROOT/a23.full" && echo 1 || echo 0)"
+head -c $((_l1 + 40)) "$TMP_ROOT/a23.full" > "$A23S"; run_agents23
+"$PY" -B -c "$A23_EDIT" "$A23D" bad; _e23=$?; tail -c +$((_l1 + 41)) "$TMP_ROOT/a23.full" >> "$A23S"; run_agents23
+check_arm "arm 23 ...a torn last line, its bad count seeded, then completed, prints the cold lines and the seeded count" \
+   "$([ "$_e23" = 0 ] && check_cold23 && grep -q ': 7 line(s) did not parse' "$TMP_ROOT/a23.err" && cmp -s "$A23S" "$TMP_ROOT/a23.full" && echo 1 || echo 0)"
 "$PY" -B -c "$A23_EDIT" "$A23D" poison; _e23=$?; sed -i 's/async_launched/async_launchex/' "$A23S"; run_agents23
 check_arm "arm 23 a transcript edited at equal length keys the record off and prints the cold lines" \
    "$([ "$_e23" = 0 ] && check_cold23 && echo 1 || echo 0)"
