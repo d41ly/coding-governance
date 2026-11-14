@@ -4,7 +4,6 @@ node: a
 opened: 2026-11-14
 streams: tooling
 roster: TOOL
-status: OPEN
 ids: TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7
 ---
 
@@ -65,25 +64,41 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-11-14 · streams tooling
+**Build status:** SPECCED · 7 unit(s) · node a · opened 2026-11-14 · streams tooling
 ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aTrimmedWait-1 — `unattended.sh --check-specs` refuses, before the spec commit and through `--dispatch`'s own predicates, every spec defect `--dispatch` refuses from the spec files alone](spec/2026-11-14-spec-TOOL-aTrimmedWait-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-11-14 |
+| [TOOL-aTrimmedWait-2 — hygiene check 12 grades one named spec or one build on request, and the spec writer is told to run it that way](spec/2026-11-14-spec-TOOL-aTrimmedWait-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-14 |
+| [TOOL-aTrimmedWait-3 — a commit refused on build-index drift renders its own index, stages it and is graded again](spec/2026-11-14-spec-TOOL-aTrimmedWait-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-11-14 |
+| [TOOL-aTrimmedWait-4 — `gen_build_index.py --write` writes only the artifacts whose bytes moved](spec/2026-11-14-spec-TOOL-aTrimmedWait-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-11-14 |
+| [TOOL-aTrimmedWait-5 — the holder's idle-wake `--resume` stops paying one git process per briefed unit](spec/2026-11-14-spec-TOOL-aTrimmedWait-5.md) | 5 | 2 | SPECCED | rev-1 | 2026-11-14 |
+| [TOOL-aTrimmedWait-6 — the role gate refuses a role agent's polling wait, and steps past an option cluster such as `-eo pipefail`](spec/2026-11-14-spec-TOOL-aTrimmedWait-6.md) | 6 | 2 | SPECCED | rev-1 | 2026-11-14 |
+| [TOOL-aTrimmedWait-7 — `handoff.py agents` keeps its parsed session calls per transcript and parses only the bytes appended since](spec/2026-11-14-spec-TOOL-aTrimmedWait-7.md) | 7 | 2 | SPECCED | rev-1 | 2026-11-14 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 3 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aTrimmedWait-1` | no |
+| 2 | `TOOL-aTrimmedWait-2` | no |
+| 3 | `TOOL-aTrimmedWait-3` | no |
+| 4 | `TOOL-aTrimmedWait-4` | no |
+| 5 | `TOOL-aTrimmedWait-5` | no |
+| 6 | `TOOL-aTrimmedWait-6` | no |
+| 7 | `TOOL-aTrimmedWait-7` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
