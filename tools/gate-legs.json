@@ -2357,6 +2357,20 @@
     "ceiling": 330
   },
   {
+    "name": "chain-packet self-test",
+    "argv": [
+      "bash",
+      "{prefix}/chain-packet.test.sh"
+    ],
+    "guard": [
+      "{prefix}/",
+      "memory/builds/dClosedLoop/build/"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 900
+  },
+  {
     "name": "kit-placeholders self-test",
     "argv": [
       "bash",
