@@ -1250,7 +1250,7 @@ def run_selftest() -> int:
             seen = f"returned {check_trailer_parses(repo, '0' * 40)!r}"
         except Refusal as exc:
             seen = f"Refusal {exc}"
-        print_arm(hits == ["kit/consumer.sh:2"] and seen.startswith("Refusal "),
+        print_arm(hits == ["kit/consumer.sh" + ":" + "2"] and seen.startswith("Refusal "),
             "TOOL-dDeclaredLoop-37 AC3 a planted consumer's trailer parse is named by path and line, the suite "
             "and the reader beside it are not, and a revision git cannot grep is a Refusal",
             f"hits {hits!r}\nan unreadable revision: {seen}")
