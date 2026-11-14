@@ -1,6 +1,6 @@
 # TOOL-aClearedLedger-16 — the drop test's deny side is armed, an empty quoted pair ends its word at a redirection, and three texts state what the code holds
 
-**Status:** SPECCED · rev-1 · 2026-11-14 · node a · Tier-2 · base 8db6f4be · streams tooling · order 16
+**Status:** INPROGRESS · rev-1 · 2026-11-14 · node a · Tier-2 · base 8db6f4be · streams tooling · order 16
 
 <!-- gen:spec-records -->
 
