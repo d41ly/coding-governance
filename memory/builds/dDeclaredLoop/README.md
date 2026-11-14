@@ -126,7 +126,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-73 — the claimed-requires refusal grades each kit's `requires` at the vintage `update --to` installs](spec/2026-10-24-spec-TOOL-dDeclaredLoop-73.md) | 5 | 2 | CLOSED | rev-3 | 2026-11-14 |
 | [TOOL-dDeclaredLoop-12 — each step a program of items with declared needs, outcomes and routes](spec/2026-10-24-spec-TOOL-dDeclaredLoop-12.md) | 6 | 2 | CLOSED | rev-5 | 2026-11-14 |
 | [TOOL-dDeclaredLoop-41 — the actor-witness list graded where its builds live, and an adopter's own agent items its own](spec/2026-10-24-spec-TOOL-dDeclaredLoop-41.md) | 6 | 2 | CLOSED | rev-5 | 2026-11-14 |
-| [TOOL-dDeclaredLoop-9 — each step's items declared with one actor, inputs, allowance, return schema and witness](spec/2026-10-24-spec-TOOL-dDeclaredLoop-9.md) | 7 | 2 | DEFERRED | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-9 — each step's items declared with one actor, inputs, allowance, return schema and witness](spec/2026-10-24-spec-TOOL-dDeclaredLoop-9.md) | 7 | 2 | DEFERRED | rev-2 | 2026-11-14 |
 | [TOOL-dDeclaredLoop-17 — witnesses computed rather than typed by the acting agent](spec/2026-10-24-spec-TOOL-dDeclaredLoop-17.md) | 8 | 2 | DEFERRED | rev-3 | 2026-10-25 |
 | [TOOL-dDeclaredLoop-11 — every checklist item named by a semantic tag, its number only display order](spec/2026-10-24-spec-TOOL-dDeclaredLoop-11.md) | 9 | 2 | DEFERRED | rev-3 | 2026-11-05 |
 | [TOOL-dDeclaredLoop-42 — the acceptance re-run bounded on the clock, its commands run by bash, never cmd.exe](spec/2026-10-24-spec-TOOL-dDeclaredLoop-42.md) | 9 | 2 | DEFERRED | rev-2 | 2026-10-24 |
@@ -212,7 +212,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 316 bound to this build, across 4 record folder(s).
+Records: 318 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -226,8 +226,8 @@ TOOL-dDeclaredLoop-48@rev-1 TOOL-dDeclaredLoop-49@rev-1 TOOL-dDeclaredLoop-5@rev
 TOOL-dDeclaredLoop-57@rev-1 TOOL-dDeclaredLoop-58@rev-1 TOOL-dDeclaredLoop-59@rev-1 TOOL-dDeclaredLoop-6@rev-1 TOOL-dDeclaredLoop-60@rev-1 TOOL-dDeclaredLoop-61@rev-1 TOOL-dDeclaredLoop-62@rev-1 TOOL-dDeclaredLoop-63@rev-1 TOOL-dDeclaredLoop-64@rev-1 TOOL-dDeclaredLoop-65@rev-1
 TOOL-dDeclaredLoop-66@rev-1 TOOL-dDeclaredLoop-67@rev-1 TOOL-dDeclaredLoop-68@rev-1 TOOL-dDeclaredLoop-69@rev-1 TOOL-dDeclaredLoop-7@rev-1 TOOL-dDeclaredLoop-70@rev-1 TOOL-dDeclaredLoop-71@rev-1 TOOL-dDeclaredLoop-72@rev-1 TOOL-dDeclaredLoop-73@rev-1 TOOL-dDeclaredLoop-74@rev-1
 TOOL-dDeclaredLoop-75@rev-1 TOOL-dDeclaredLoop-76@rev-1 TOOL-dDeclaredLoop-77@rev-1 TOOL-dDeclaredLoop-78@rev-1 TOOL-dDeclaredLoop-79@rev-1 TOOL-dDeclaredLoop-8@rev-1 TOOL-dDeclaredLoop-80@rev-1 TOOL-dDeclaredLoop-81@rev-1 TOOL-dDeclaredLoop-82@rev-1 TOOL-dDeclaredLoop-83@rev-1
-TOOL-dDeclaredLoop-84@rev-1 TOOL-dDeclaredLoop-85@rev-1 TOOL-dDeclaredLoop-86@rev-1 TOOL-dDeclaredLoop-87@rev-1 TOOL-dDeclaredLoop-88@rev-1 TOOL-dDeclaredLoop-89@rev-1 TOOL-dDeclaredLoop-90@rev-1 TOOL-dDeclaredLoop-91@rev-1 TOOL-dDeclaredLoop-92@rev-1 TOOL-dDeclaredLoop-93@rev-1
-TOOL-dDeclaredLoop-94@rev-1 TOOL-dDeclaredLoop-95@rev-1 TOOL-dDeclaredLoop-96@rev-1.
+TOOL-dDeclaredLoop-84@rev-1 TOOL-dDeclaredLoop-85@rev-1 TOOL-dDeclaredLoop-86@rev-1 TOOL-dDeclaredLoop-87@rev-1 TOOL-dDeclaredLoop-88@rev-1 TOOL-dDeclaredLoop-89@rev-1 TOOL-dDeclaredLoop-9@rev-1 TOOL-dDeclaredLoop-90@rev-1 TOOL-dDeclaredLoop-91@rev-1 TOOL-dDeclaredLoop-92@rev-1
+TOOL-dDeclaredLoop-93@rev-1 TOOL-dDeclaredLoop-94@rev-1 TOOL-dDeclaredLoop-95@rev-1 TOOL-dDeclaredLoop-96@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
