@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-9 — closing-review repair, hooks and roles: the role gate reads no shell comment as words, the P3 rows are tested at the floor, and arm 23 tells a resumed read from a cold re-parse
 
-**Status:** SPECCED · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 8 · ratified 2026-11-14
+**Status:** SPECCED · rev-3 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 8 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
@@ -16,8 +16,9 @@
 
 The closing diff review of TOOL-aTrimmedWait-1..7, round 1
 (`memory/builds/aTrimmedWait/reviews/2026-11-14-review-TOOL-aTrimmedWait-1-diff-review-round1.md`),
-exited CONVERGED with verdict CLEAN WITH FIXES. BUILD-METHOD M4 batches its MEDIUM and LOW items by
-disjoint write set. This unit takes the hooks and roles set: M2, L2 and M7. M2 is a false refusal
+exited CONVERGED with verdict CLEAN WITH FIXES. The build method's spec-audit section
+(`doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it`) batches
+its MEDIUM and LOW items by disjoint write set. This unit takes the hooks and roles set: M2, L2 and M7. M2 is a false refusal
 inside unit 6's polling class. L2 and M7 are verification gaps, where a regression of unit 6 or
 unit 7 passes every arm. Each item takes the fix the record's skeptic judged sound, and for L2 and
 M7 the skeptic's class-level or corrected fix. Every line cited below was read at `2a13de8b6`, whose
@@ -40,10 +41,10 @@ blobs of the three files equal the record's pins (`scratch-guard.js@3220edce`,
   outside quotes and heredoc bodies, and runs to the end of its line. The hook's header and the
   scanner's doc comment each gain one sentence stating it. The suite gains rows C1 to C6 of §4.
   Observed by AC1, AC2, AC3 and AC5.
-- **S2** — Review item "L2 — The P3 rows test only far from the 5 s floor and no unit suffix", with
+- **S2** — Review item "L2 — The P3 rows test only far from the 5 s floor and no unit suffix", with <!-- DERIVED from scratch-guard.js#POLL_SLEEP_FLOOR_S -->
   the skeptic's class-level fix. The suite gains rows F1 to F7 of §4: `sleep 5`, `sleep 1m`,
   `sleep 1h`, `sleep 1d` and `sleep infinity` each refused naming P3, and `sleep 4.9` and `sleep 4s`
-  each admitted with empty stderr. `FLOOR_ASSERTIONS` rises by the 13 rows S1 and S2 add, with a
+  each admitted with empty stderr. `FLOOR_ASSERTIONS` rises by the 13 rows S1 and S2 add, with a <!-- DERIVED from the run_role_bash rows of §4 -->
   history line. No code moves for S2: every row already reads as the record says at `2a13de8b6`.
   Observed by AC4 and AC5.
 - **S3** — Review item "M7 — Arm 23's append and torn arms cannot tell a resumed read from a cold
@@ -170,7 +171,7 @@ check_arm "arm 23 ...a record taken on the first line, its bad count seeded, the
 The torn arm takes the same three steps over its `head -c` and `tail -c` split, and keeps its `cmp`.
 Each arm asserts two things, and each needs the resume:
 
-- The note naming 7 lines prints only when the record seeded the read. A cold re-parse of the
+- The note naming 7 lines prints only when the record seeded the read. A cold re-parse of the <!-- DERIVED from the bad count §4's new A23_EDIT mode seeds -->
   fixture counts 0, so it prints no note.
 - The `returned` line prints only when the appended `res` line attached its `agentId` to the call
   through `by_id`, which the resume rebuilt from the record's `calls`. The appended notification
@@ -284,7 +285,7 @@ The base module is `git show 2a13de8b6:tools/hooks/scratch-guard.js`, written be
 `agent-cap.js` from the same commit, which it requires. The transcript directory is spec 6's:
 `C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dfairhearing-fe4e9c/db957487-b5c0-4a88-ab27-88dd90bc468f`.
 This writer ran it over the scratch copy carrying §4's line, and it printed
-`commands 9301 · same 9301 · moved 0 · comment 155` in 11 s. The built module's verdicts there were
+`commands 9301 · same 9301 · moved 0 · comment 155` in 11 s. The built module's verdicts there were <!-- PINNED 2026-11-14 -->
 admit 9069, G1 63, G3 8, P1 104, P2 38 and P3 19, so the probe reads live verdicts. (PINNED 2026-11-14)
 
 ### The resume probe, `$SCRATCH/p9m7.py`
@@ -445,6 +446,10 @@ The close runs the bar once, after the last unit is terminal. This spec's author
   recorded as F1: the comment cut stays shared in `scanCommandHeads`, and the one G3 verdict it moves
   is stated as the build rule's exception in §3 and §5. The header gains `ratified 2026-11-14`. The
   `bad`-count poison for M7 stands as written. No design change.
+- rev-3 · 2026-11-14 · §1 · §2 · §4 · each figure the pinned-facts arm named carries a pin on its line:
+  `5 s` and `13 rows` in §2 and `7 lines` in §4 as DERIVED, naming the floor constant, the suite rows
+  and the seeded count, and `11 s` in §4 as PINNED. §1 cites the build method's spec-audit section by
+  its tag rather than by its literal section number, as the positional leg asks. No meaning changed.
 
 ## 10. Reuse audit
 

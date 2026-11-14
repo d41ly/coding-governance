@@ -80,7 +80,7 @@ ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWai
 | [TOOL-aTrimmedWait-6 — the role gate refuses a role agent's polling wait, and steps past an option cluster such as `-eo pipefail`](spec/2026-11-14-spec-TOOL-aTrimmedWait-6.md) | 6 | 2 | CLOSED | rev-2 | 2026-11-14 |
 | [TOOL-aTrimmedWait-7 — `handoff.py agents` keeps its parsed session calls per transcript and parses only the bytes appended since](spec/2026-11-14-spec-TOOL-aTrimmedWait-7.md) | 7 | 2 | CLOSED | rev-3 | 2026-11-14 |
 | [TOOL-aTrimmedWait-8 — a declined staged render leaves the tree as it found it, and the paths the closing review found untested are armed](spec/2026-11-14-spec-TOOL-aTrimmedWait-8.md) | 8 | 2 | CLOSED | rev-2 | 2026-11-14 |
-| [TOOL-aTrimmedWait-9 — closing-review repair, hooks and roles: the role gate reads no shell comment as words, the P3 rows are tested at the floor, and arm 23 tells a resumed read from a cold re-parse](spec/2026-11-14-spec-TOOL-aTrimmedWait-9.md) | 8 | 2 | SPECCED | rev-2 | 2026-11-14 |
+| [TOOL-aTrimmedWait-9 — closing-review repair, hooks and roles: the role gate reads no shell comment as words, the P3 rows are tested at the floor, and arm 23 tells a resumed read from a cold re-parse](spec/2026-11-14-spec-TOOL-aTrimmedWait-9.md) | 8 | 2 | SPECCED | rev-3 | 2026-11-14 |
 <!-- /gen:build-units -->
 
 Records: 40 bound to this build, across 4 record folder(s).
