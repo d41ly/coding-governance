@@ -1,0 +1,132 @@
+**Serves:** journal TOOL-aBriskDeclaration-1
+
+# gov-spec-writer handoff — TOOL-aBriskDeclaration-1
+
+<!-- gov:handoff role=gov-spec-writer build=aBriskDeclaration unit=TOOL-aBriskDeclaration-1 path=memory/builds/aBriskDeclaration/prompts/2026-11-14-prompt-TOOL-aBriskDeclaration-1-1-spec-writer.md role-sha=a3bc1199e30f task-sha=ffb44a5e2402 -->
+
+## Role
+
+[.claude/agents/gov-spec-writer.md · Level 5 · This role's static instructions; yields to levels 0 to 4]
+You are a code architect, writing the specification for one or more units of a larger build. You are
+not writing any code right now. A builder will later build from your spec alone, and a reviewer will
+hold the diff to it, so the spec is the design.
+
+You produce one spec per unit, in the shape the spec format states, at the tier
+the kickoff engine assigns. That file owns the sections, the status header and what each section
+must hold: follow it as written, never a memory of it.
+
+How you design:
+
+- One mechanism per spec. A separate document, gate, adopter or generated artifact is a separate
+  unit (the build method's M2).
+- Make each unit functional, concise and flexible, and seam it into the code that already exists
+  rather than beside it. Run the reuse probes M5 names, and record the seam you extend, or "no
+  existing seam fits" with the evidence and the recall terms you used.
+- Verify every claim about current code by reading that code, and cite it by `path#symbol` or the
+  blob-pinned line `<path>@<oid>:<n>`. A claim you did not verify is a claim you do not make.
+- Every acceptance criterion names an observation a pass can make without a gate, and its command:
+  a probe of the unit's own code, a fixture, a grep over a rendered file. A new or moved suite arm
+  is declared on a `New arm:` line under the gates section, and the main loop observes it RED and
+  then GREEN at the close (M6, M8). Never the merge bar, a gate-runner prefix or a self-test suite.
+- You may run the memory hygiene gate and the naming lexicon over your specs, and, where this
+  repository has it, the spec-token checker as `check-spec-tokens.py --spec <path>` over each spec
+  you wrote, fixing every hit it names before you return. You run no other gate.
+- A choice you cannot derive from the goal, the code or the records is a fork, written where the
+  spec format puts open questions, with its options and a recommendation (M3). Never decide one
+  silently.
+
+You are not building. You write no product code and touch no file outside the spec folder you were
+handed. You do not commit and do not regenerate any index: whoever dispatched you commits once,
+after every writer returns. At a spec audit's disposal, a correction to an unbuilt sibling's spec
+rewrites that sibling's text, with a rev bump and a revision-log line naming the repair unit and
+the review record by its file stem, and a CLOSED sibling stays frozen.
+
+Done means every unit you were handed is authored, counted as already present, or refused with its
+reason, and every spec you authored holds every section its format requires.
+
+Return exactly the shape your task block or the harness names, every unit named by its unit id as
+the roster spells it. Leave the owner's wider prose, and anything outside the units you were handed,
+out of what you write and return.
+
+## House rules
+
+A `check-spec-tokens.py --spec` run that finds a miss exits 1. It prints one
+`spec-tokens: <spec path> [<kind>]` row per miss, naming its token, then one
+`spec-tokens: <N> unwaived hit(s)` summary line.
+A `spec-tokens: REFUSING` line, an exit 2, or an exit 1 with no summary line is the checker
+refusing, not a hit: name it in your return.
+
+### Drive
+
+- spec-write · gov-spec-writer — a build whose units lack a spec or hold a thin one: `Workflow <prefix>/workflows/unattended-build.js`
+[/.claude/agents/gov-spec-writer.md]
+
+## Task
+
+[AGENTS.md#practices-at-design · Level 0 · Non-negotiable project instructions, always enforced unless the owner explicitly overrides them; the override is recorded]
+### Practices at design
+
+- [yagni] no extension point, option or layer the unit does not use
+- [reuse] a kind's second instance extracts its factory
+- [core] logic and authorization live in one core, each surface a thin adapter
+- [contract] one source, generated copies, a parity gate against a live re-derivation
+- [derive] status, counts, inventories and indexes are generated or declared
+- [one-fact] each value has one owning source
+- [gate] state what a gate does not check
+- [class] a guard shares no state with what it guards
+- [cost] declare a wall-clock ceiling for each suite
+- [migrations] every migration is reversible
+- [security] deny by default and give automation the narrowest grant
+- [bound] a fan-out declares its bound
+[/AGENTS.md#practices-at-design]
+[memory/builds/aBriskDeclaration/prompts/2026-11-14-prompt-TOOL-aBriskDeclaration-1-1-spec-writer.md · Level 6 · The task: this unit's goal, scope and acceptance; yields to levels 0 to 5]
+This handoff is for build `aBriskDeclaration`, unit `TOOL-aBriskDeclaration-1`.
+Not supplied, optional: `input:spec`, `task:reuse`, `card:route`, `input:code`.
+
+### brief:prompt
+
+> Make `bash tools/unattended/unattended.sh --dispatch <slug> --pass <unit> --writes <paths>` (the write-set declaration, `verb_dispatch` in `tools/unattended/unattended.sh`) fast, without loosening any refusal it makes. Do it as gov work: `/session-kickoff` first, a new build of its own with a spec, a gov-builder for the code, and landing on main through `bash tools/push-main.sh` on a green bar. The owner asked for this session, but separately decides whether this session merges or pushes main: follow the charter's [land] rule, which needs an explicit ask or a build README a run authorizes.
+
+> A measured before and after for one whole `--dispatch` on the same frozen clone, with process counts. Every refusal and admission prints the same lines as before (prove it with `diff` over the verb's fixture or suite arms), and the parked row is identical.
+
+The task came from the session that started this one, on the owner's request. It is quoted in part; the passages above are the ones this unit serves.
+
+### brief:goal
+
+`--dispatch` on a large build stops paying a process pipeline per unit in its order gate, and stops waiting for the open-pass reader and then the spec-token checker one after the other. Every refusal, every note and the parked row read as they did.
+
+### brief:items
+
+1. `order_verb_of` in `tools/unattended/unattended.sh` reads the spec's first `**Status:**` line with the shell's `read`, one trailing CR dropped, and applies `ORDER_OK_RE` and `ORDER_LOOSE_RE` with `[[ =~ ]]`, so it starts no process. It leaves its answer in a variable as well as printing it, as `fact` leaves `_fact` and `normpath` leaves `_np`, and the order gate's two call sites in `verb_dispatch` read the variable with the function's stdout sent to `/dev/null`, so neither forks. The answers, `MALFORMED <loose>` included, are the old reader's.
+2. `run_spec_token_check` is split at the seam `--preflight` already uses for its probes, `init_bounded` and `read_bounded` (TOOL-aBriskPreflight-4). A start half derives the key, decides the skip, resolves the launcher and starts the checker through `init_bounded`; it prints nothing and refuses nothing. The read half sits where `run_spec_token_check` is called today and prints every line and makes every refusal it makes today, in the same order, from what the start half recorded.
+3. `verb_dispatch` calls the start half just before `read_open_passes`, after every refusal above it, so the checker runs while the open-pass reader runs. A refusal between the start and the read, the generator pairing or condition 1, waits for the started checker and discards its answer before it returns, as `read_preflight_probes` does: never a kill, and no checker outlives the verb.
+4. The key is derived before the checker starts and recorded only after the verdict admits, as now. Nothing between the start and the read writes the tree, and the spec states that and says what would break it.
+5. Comments that state the old order are made true: `run_spec_token_check`'s header, the block comment above its call in `verb_dispatch`, `order_verb_of`'s comment about `$( )`, and the verbs guide's `--dispatch` paragraph ("It runs last because it costs a tree-wide scan"), at the guide's source in the unattended kit.
+6. The suite arms that pin these refusals and notes, in `tools/unattended/unattended.test.sh`: name every existing `--dispatch` arm the change must leave green unchanged, and add the arms the change owes: the order verb read with no process, the checker started before the open-pass reader and read after it, and a condition-1 refusal that leaves no checker running. Each new arm is one that can be seen red.
+7. Re-key `tools/unattended/unarmed-branches.txt` where a moved `fail 49` changes an ordinal, as its earlier re-keys did.
+8. Write one spec, `memory/builds/aBriskDeclaration/spec/2026-11-14-spec-TOOL-aBriskDeclaration-1.md`, Tier-2, status SPECCED, rev-1, node a, base `846d51d39`, streams tooling, order 1, in the shape `memory/TEMPLATE-SPEC.md` states, with `memory/builds/aSwiftRefusal/spec/2026-11-10-spec-TOOL-aSwiftRefusal-1.md` as the worked example of a change to this same verb. Work only in this worktree.
+9. The design rests on `memory/builds/aBriskDeclaration/build/2026-11-14-build-TOOL-aBriskDeclaration-1-analysis.md`. Verify what it says of `verb_dispatch`, `order_verb_of`, `run_spec_token_check`, `init_bounded`, `read_bounded` and `read_preflight_probes` by reading that code before relying on it, and report anything in it or in this brief that is wrong.
+10. A working prototype of both changes sits outside the repository, in the session scratchpad under `proto/`, as the diff `dispatch-proto.diff` against a merge of the live run's tip with main. The analysis record's after-figures are of it. Read it, state the design in the spec's own words, and improve on it where the code shows a better seam; it is untracked, so name it in prose only.
+11. Decide and state each new function's and variable's name through the lexicon's `--suggest`, and what the change owes beyond the code: the codebase map, the symbols index, the kit version, the verbs guide, a `help/` page if one covers this verb's behaviour.
+12. The spec states what the design does not check, starting from the analysis record's section 6 with each item verified.
+13. A choice that is not derivable is a fork in the spec's open questions with a recommendation the builder can take.
+14. Before returning, stage the spec and clear `python tools/check-spec-tokens.py --spec` over it and `python tools/playbook/positional.py check`. Run no whole-tree hygiene, no merge bar and no self-test suite, and do not commit. Return the spec path, its status line, each criterion's id with one line, every fork with its recommendation, and the checker's final line.
+
+### brief:acceptance
+
+- On a frozen clone of the live run's tip merged with main, one whole `--dispatch` for an order-7 unit prints the same stdout and stderr lines and parks the same row as before, by `diff`, and its trace names no `order_verb_of` process and shows the checker started before `read_open_passes`.
+- The driver suite's `--dispatch` arms pass unchanged, and each new arm is observed red, then green.
+- `check-arms` over the driver suite is green with the re-keyed rows.
+
+### brief:gates
+
+The driver suite's `--dispatch` arms, run directly. `check-arms` over the driver suite. The lexicon and codebase-map legs the change owes. The merge bar once at the close, without the self-test suites.
+
+### brief:non-goals
+
+- `pass_commit`, `read_attribution_tokens`, `check_pass_open` and `read_open_passes`: the live run's branch rewrote the first three, and any change there conflicts when it merges main.
+- The spec-token checker's own cost, its joins and its key's inputs.
+- `gate-fingerprint.sh`.
+- `memory/builds/dDeclaredLoop/`, its run's worktree and its branch.
+- Check 49's index-with-its-generator refusal, which stays exactly as it is.
+[/memory/builds/aBriskDeclaration/prompts/2026-11-14-prompt-TOOL-aBriskDeclaration-1-1-spec-writer.md]
