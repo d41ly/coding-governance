@@ -122,3 +122,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-14T09:37:00Z dispatch · item 2b6336e6 TOOL-dDeclaredLoop-12 · reason memory/builds/dDeclaredLoop/build/2026-11-14-build-TOOL-dDeclaredLoop-12-deviation-124.md
 
 2026-11-14T09:40:59Z dispatch · item 2b6336e6 TOOL-dDeclaredLoop-12 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-14T10:03:03Z brief · item TOOL-dDeclaredLoop-41 · reason 8b85da835be6 memory/builds/dDeclaredLoop/prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-41-build-brief.md
