@@ -4158,6 +4158,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "build_wake_fixture",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "build_walk",
       "kind": "function",
       "file": "tools/process-monitor/reap.py"
@@ -6223,6 +6228,11 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "check_lease_current",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_lease_fresh",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -7781,6 +7791,11 @@
       "id": "check_tree_clean",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
+      "id": "check_tree_progressing",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_true",
@@ -16656,6 +16671,11 @@
       "id": "print_verdicts",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "print_wake",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "probe",
@@ -32536,6 +32556,31 @@
       "id": "wit",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "wk_age",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "wk_claims_off",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "wk_claims_on",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "wk_full",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "wk_stale",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "wline",
