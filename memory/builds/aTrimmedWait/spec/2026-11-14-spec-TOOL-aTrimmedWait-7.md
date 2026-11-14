@@ -15,6 +15,7 @@
 | [2026-11-14-prompt-TOOL-aTrimmedWait-7-revision.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-revision.md) | research | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-7-ruling.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-ruling.md) | research | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-7-writing-practice.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-writing-practice.md) | research | — |
+| [2026-11-14-review-TOOL-aTrimmedWait-1-diff-review-round1.md](../reviews/2026-11-14-review-TOOL-aTrimmedWait-1-diff-review-round1.md) | diff-review | TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 |
 
 <!-- /gen:spec-records -->
 

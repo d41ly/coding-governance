@@ -13,6 +13,7 @@
 | [2026-11-14-prompt-TOOL-aTrimmedWait-2-divergence.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-2-divergence.md) | research | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-2-fix.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-2-fix.md) | research | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-2-ruling.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-2-ruling.md) | research | — |
+| [2026-11-14-review-TOOL-aTrimmedWait-1-diff-review-round1.md](../reviews/2026-11-14-review-TOOL-aTrimmedWait-1-diff-review-round1.md) | diff-review | TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 |
 
 <!-- /gen:spec-records -->
 

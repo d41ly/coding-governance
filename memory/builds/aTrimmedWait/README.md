@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-14
 streams: tooling
 roster: TOOL
-ids: TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7
+ids: TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9
 ---
 
 # aTrimmedWait — builds stop waiting on checks that grade more than the caller needs, without moving any verdict
@@ -61,11 +61,13 @@ None.
 | 5 | `TOOL-aTrimmedWait-5` | R4: `--resume` and `--status` hash every brief in one `git hash-object --stdin-paths` call, every line byte-identical (owner, 2026-11-14) |
 | 6 | `TOOL-aTrimmedWait-6` | R5: the scratch guard refuses a role agent's polling wait, and G3 reads past `-o pipefail` |
 | 7 | `TOOL-aTrimmedWait-7` | R6: `handoff.py agents` caches parsed calls per transcript and parses only appended bytes |
+| 8 | `TOOL-aTrimmedWait-8` | Closing-review repair, memory-tree: `--write-staged` declines before it writes or stages, its index and decline arms tested, the scoped hygiene fixture arms its edge cutoff, and the branch-guard leg names the hygiene producer (review M1 M3 M4 M5 M6 L1) |
+| 9 | `TOOL-aTrimmedWait-9` | Closing-review repair, hooks and roles: the polling rows read no shell comment as a duration and are tested at the floor, and arm 23 tells a resumed read from a cold re-parse (review M2 L2 M7) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 7 unit(s) · node a · opened 2026-11-14 · streams tooling
-ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7
+ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -79,7 +81,7 @@ ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWai
 | [TOOL-aTrimmedWait-7 — `handoff.py agents` keeps its parsed session calls per transcript and parses only the bytes appended since](spec/2026-11-14-spec-TOOL-aTrimmedWait-7.md) | 7 | 2 | CLOSED | rev-3 | 2026-11-14 |
 <!-- /gen:build-units -->
 
-Records: 33 bound to this build, across 3 record folder(s).
+Records: 36 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
