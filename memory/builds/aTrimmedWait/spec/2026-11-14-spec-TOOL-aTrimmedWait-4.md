@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-4 — `gen_build_index.py --write` writes only the artifacts whose bytes moved
 
-**Status:** SPECCED · rev-3 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 4 · ratified 2026-11-14
+**Status:** INPROGRESS · rev-3 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 4 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
