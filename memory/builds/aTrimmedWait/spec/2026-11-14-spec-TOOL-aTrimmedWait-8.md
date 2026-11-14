@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-8 — a declined staged render leaves the tree as it found it, and the paths the closing review found untested are armed
 
-**Status:** SPECCED · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 8 · ratified 2026-11-14
+**Status:** INPROGRESS · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 8 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
