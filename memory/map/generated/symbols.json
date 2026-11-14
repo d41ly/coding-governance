@@ -6308,6 +6308,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "check_lf_lines",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
       "id": "check_lin_control",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"

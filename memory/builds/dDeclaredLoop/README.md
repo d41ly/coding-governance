@@ -97,7 +97,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 99 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 99 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13
 ids TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26
 ids TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-35 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39
@@ -122,7 +122,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-40 — the trailer reader finds the key table through the kit resolver, and reads a floor of keys where none is installed](spec/2026-10-24-spec-TOOL-dDeclaredLoop-40.md) | 4 | 2 | CLOSED | rev-3 | 2026-11-14 |
 | [TOOL-dDeclaredLoop-57 — `update` refuses a claimed kit whose `requires` it leaves unmet, on every admission path](spec/2026-10-24-spec-TOOL-dDeclaredLoop-57.md) | 4 | 2 | CLOSED | rev-4 | 2026-11-14 |
 | [TOOL-dDeclaredLoop-5 — the witness-class rule: every witness classed, the actor class refused](spec/2026-10-24-spec-TOOL-dDeclaredLoop-5.md) | 5 | 2 | CLOSED | rev-5 | 2026-11-14 |
-| [TOOL-dDeclaredLoop-58 — the LF-only criterion reads a counted, non-empty CLI output before it looks for a CR](spec/2026-10-24-spec-TOOL-dDeclaredLoop-58.md) | 5 | 2 | INPROGRESS | rev-2 | 2026-11-14 |
+| [TOOL-dDeclaredLoop-58 — the LF-only criterion reads a counted, non-empty CLI output before it looks for a CR](spec/2026-10-24-spec-TOOL-dDeclaredLoop-58.md) | 5 | 2 | CLOSED | rev-2 | 2026-11-14 |
 | [TOOL-dDeclaredLoop-73 — the claimed-requires refusal grades each kit's `requires` at the vintage `update --to` installs](spec/2026-10-24-spec-TOOL-dDeclaredLoop-73.md) | 5 | 2 | DEFERRED | rev-3 | 2026-11-14 |
 | [TOOL-dDeclaredLoop-12 — each step a program of items with declared needs, outcomes and routes](spec/2026-10-24-spec-TOOL-dDeclaredLoop-12.md) | 6 | 2 | DEFERRED | rev-4 | 2026-11-05 |
 | [TOOL-dDeclaredLoop-41 — the actor-witness list graded where its builds live, and an adopter's own agent items its own](spec/2026-10-24-spec-TOOL-dDeclaredLoop-41.md) | 6 | 2 | DEFERRED | rev-4 | 2026-10-24 |
@@ -212,7 +212,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 300 bound to this build, across 4 record folder(s).
+Records: 301 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

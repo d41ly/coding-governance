@@ -616,6 +616,23 @@ def check_trailer_parses(root, rev=None) -> list:
     return hits
 
 
+def check_lf_lines(out: bytes, shas: list) -> list:
+    """TOOL-dDeclaredLoop-58 S2: the findings of a `tokens` run's bytes `out` against `shas`, the
+    commits git lists for the same revisions; [] when clean. Each non-empty line must open with the
+    next sha and a space, none missing or extra, before a CR is looked for, so an empty or short
+    output is named as such and never passes on nothing. An empty `shas` is a finding of its own.
+
+    It splits on LF alone, so a CR stays on its line and is named by the CR read, not the match."""
+    if not shas:
+        return ["no commit to compare against: git listed no sha"]
+    lines = [line for line in out.split(b"\n") if line]
+    if ([line[:40].decode("ascii", "replace") for line in lines] != list(shas)
+            or any(line[40:41] != b" " for line in lines)):
+        return [f"{len(lines)} sha-led lines read, {len(shas)} expected: "
+                f"read {[line[:41].decode('ascii', 'replace') for line in lines]!r}, git lists {list(shas)!r}"]
+    return ["a CR reached the output"] if b"\r" in out else []
+
+
 # ------------------------------------------------------------------------------------- self-test
 BASE_EPOCH = 1767225600      # 2026-01-01, after every fixture cutoff
 OLD_EPOCH = 959817600        # 2000-06-01, before the fixture cutoff 2001-01-01
@@ -1256,17 +1273,21 @@ def run_selftest() -> int:
             "and the reader beside it are not, and a revision git cannot grep is a Refusal",
             f"hits {hits!r}\nan unreadable revision: {seen}")
 
-        # ---- TOOL-dDeclaredLoop-38 AC1: the trailer CLI's stdout holds no CR over the planted fixture.
-        # Live on win32 only: where the default newline is LF the arm cannot turn red, and says which ran.
-        # It counts no lines: TOOL-dDeclaredLoop-58's.
+        # ---- TOOL-dDeclaredLoop-38 AC1, TOOL-dDeclaredLoop-58 AC1: the trailer CLI's stdout over the
+        # planted fixture holds one sha-led line per commit `git rev-list HEAD` lists, then no CR.
+        # The CR half is live on win32 only: where the default newline is LF it cannot turn red.
         import commit_trailers  # noqa: E402  already imported above; build_fixture is the reader's own
         fix38 = commit_trailers.build_fixture(root / "lf38")
         out38 = subprocess.run([sys.executable, str(KIT / "commit_trailers.py"), "tokens", "HEAD"], cwd=fix38,
                                capture_output=True,
                                env={k: v for k, v in build_git_env().items() if k not in GIT_ENV_LEAKS}).stdout
-        print_arm(b"\r" not in out38,
-            f"TOOL-dDeclaredLoop-38 AC1 `tokens HEAD` over the planted fixture writes LF only, on {sys.platform}"
-            + ("" if sys.platform == "win32" else " (not live here: the default newline is LF)"), repr(out38))
+        shas38 = run_git(fix38, "rev-list", "HEAD").decode("ascii").split()
+        lf38 = check_lf_lines(out38, shas38)
+        print_arm(not lf38,
+            "TOOL-dDeclaredLoop-38 AC1 TOOL-dDeclaredLoop-58 AC1 `tokens HEAD` over the planted fixture writes "
+            f"one line per listed commit, LF only, on {sys.platform}"
+            + ("" if sys.platform == "win32" else " (the CR half is not live here: the default newline is LF;"
+               " the count half is)"), "\n".join(lf38) + f"\n{out38!r}")
 
         # ---- TOOL-dDeclaredLoop-39 AC4: this kit's copy of the reader drops tree_lib's leak list, the
         # canonical's copy compared with the kit's own tuple, member for member and in order.
