@@ -1,6 +1,6 @@
 # TOOL-aLightenedLoop-7 — the tracked idle-wake cadence retired: its conf key removed everywhere, `--wake` naming the base cadence, and the idle-wake help page's block marked not to run
 
-**Status:** SPECCED · rev-1 · 2026-11-15 · node a · Tier-2 · base 5701fafd · streams tooling · order 7
+**Status:** INPROGRESS · rev-1 · 2026-11-15 · node a · Tier-2 · base 5701fafd · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
