@@ -2882,15 +2882,18 @@ def check_roles_default() -> None:
         _dl_p = run("update", "--target", str(_dl_t))
         _dl_st = subprocess.run(["git", "-C", str(_dl_t), "status", "--porcelain", "--untracked-files=all"],
                                 capture_output=True, text=True, encoding="utf-8").stdout
+        # Graded on the ONE refusal line, never the whole stream, so a name on another line passes nothing.
+        _dl_ln = [ln for ln in _dl_p.stderr.splitlines() if ln.startswith("govkit: update would leave")]
         check("[dDL-57] AC1 an update over a receipt with no gov_commit refuses the roles claim before "
               "any gain line, naming the pair, the reason and the route, and writes nothing",
-              _dl_p.returncode == 2 and all(n in _dl_p.stderr for n in (
+              _dl_p.returncode == 2 and len(_dl_ln) == 1 and all(n in _dl_ln[0] for n in (
                   "'roles' requires 'loop'", "gov_commit", "apply --kits roles,loop"))
               and "default-gained: none computed" not in _dl_p.stdout and _dl_st == "",
               f"rc {_dl_p.returncode} · status {_dl_st!r} · {(_dl_p.stdout + _dl_p.stderr)[-900:]}")
         _dl_p = run("update", "--target", str(_dl_t), "--kits", "roles")
+        _dl_ln = [ln for ln in _dl_p.stderr.splitlines() if ln.startswith("govkit: update would leave")]
         check("[dDL-57] AC1 ...and a --kits-scoped update over it refuses the same pair",
-              _dl_p.returncode == 2 and "'roles' requires 'loop'" in _dl_p.stderr,
+              _dl_p.returncode == 2 and len(_dl_ln) == 1 and "'roles' requires 'loop'" in _dl_ln[0],
               f"rc {_dl_p.returncode} · {(_dl_p.stdout + _dl_p.stderr)[-900:]}")
         # The base vintage holds roles and not loop in its registry default, so the update gains loop.
         _dl_t = build_claim_target("ac4", {"gov_commit": run_gov_git(GOV_ROOT, "rev-parse", "ed497191^{commit}")})
