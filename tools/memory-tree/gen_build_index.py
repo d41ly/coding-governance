@@ -974,6 +974,75 @@ def read_staged_paths(root: str) -> list | None:
     return [rel for rel in out.decode("utf-8", "surrogateescape").split("\0") if rel]
 
 
+def build_render_pathspec(m: str, kit: str | None, carries: str | None, llu: str) -> list:
+    """What the render reads, as a git pathspec: the memory root, the conf, the kit and the carries
+    checker. `[]` under `LIVE_LANDED_UNCLOSED`, meaning the whole tree, because the Landed-unclosed
+    column then reads tracked product source. One definition for `check_staged_render` and
+    `check_staged_write` (TOOL-aTrimmedWait-3 S3)."""
+    if llu:
+        return []
+    return [m + "/", ".memory-tree.conf"] + ([kit + "/"] if kit else []) + ([carries] if carries else [])
+
+
+def check_staged_write(root: str, conf: dict) -> tuple:
+    """`(ok, why)` for `--write-staged`: may the hook's render be staged into the commit at all?
+
+    TOOL-aTrimmedWait-3 S2, cheapest first and before anything renders. The switch, read the way
+    `LIVE_LANDED_UNCLOSED` is; then the index git handed the hook, which must be the repository's own
+    or its `.lock` (a partial commit's `next-index` diverges from the real index); then no unstaged
+    change under the render's pathspec, so the worktree the renderer reads IS what the commit carries.
+    """
+    raw = (conf.get("STAGED_RENDER") or "").strip()
+    if raw not in ("", "1"):
+        raise Problem(f"STAGED_RENDER='{raw}' is not one of its two legal values, blank (off) or 1 (on)")
+    if not raw:
+        return False, "STAGED_RENDER is blank, so the hook does not render"
+    env = _build_git_env()
+    hook_index = os.environ.get("GIT_INDEX_FILE")
+    if hook_index:
+        try:
+            own = subprocess.run(["git", "rev-parse", "--path-format=absolute", "--git-path", "index"],
+                                 cwd=root, capture_output=True, text=True, check=True, env=env).stdout.strip()
+        except (OSError, subprocess.CalledProcessError) as exc:
+            return False, f"git could not name this repository's index ({exc})"
+        # "The same file", so `realpath` over `abspath`: git prints the long form of a path a Windows
+        # %TEMP% spells as a short name (`DAILY-~1`), and abspath alone declined the repository's own index.
+        allowed = {os.path.normcase(os.path.realpath(p)) for p in (own, own + ".lock")}
+        if os.path.normcase(os.path.realpath(hook_index)) not in allowed:
+            return False, (f"the hook's index {hook_index} is neither {own} nor its .lock, "
+                           f"so a staged render would not reach the commit as it reaches the index")
+        env["GIT_INDEX_FILE"] = hook_index
+    kit, carries = resolve_render_inputs(root, conf)
+    specs = build_render_pathspec(conf["MEMORY_ROOT"], kit, carries,
+                                  (conf.get("LIVE_LANDED_UNCLOSED") or "").strip())
+    try:
+        out = subprocess.run(["git", "diff", "--name-only", "--no-renames", "-z"] + (["--", *specs] if specs else []),
+                             cwd=root, capture_output=True, check=True, env=env).stdout
+    except (OSError, subprocess.CalledProcessError) as exc:
+        return False, f"git could not list the unstaged render inputs ({exc})"
+    unstaged = [p for p in out.decode("utf-8", "surrogateescape").split("\0") if p]
+    if unstaged:
+        return False, (f"{len(unstaged)} render input(s) carry an unstaged change, so the render would not "
+                       f"be what the commit carries: {' '.join(unstaged[:5])}")
+    return True, ""
+
+
+def derive_moved_artifacts(root: str, artifacts: dict) -> list:
+    """The repo-relative paths in `artifacts` whose file is missing or whose BYTES differ from the
+    rendered text's UTF-8 encoding, the bytes `write_text` writes. Never `read_text`, which folds CRLF:
+    a CRLF file equal in text would read unmoved where `--write` rewrites it (TOOL-aTrimmedWait-3 S4)."""
+    moved = []
+    for rel, text in sorted(artifacts.items()):
+        try:
+            with open(os.path.join(root, rel), "rb") as fh:
+                if fh.read() == text.encode("utf-8"):
+                    continue
+        except OSError:
+            pass
+        moved.append(rel)
+    return moved
+
+
 def check_staged_render(root: str, conf: dict, here: str | None = None) -> tuple:
     """`(render, reason)` for `--check --staged`: can anything the INDEX stages move the render?
 
@@ -992,7 +1061,6 @@ def check_staged_render(root: str, conf: dict, here: str | None = None) -> tuple
     """
     m = conf["MEMORY_ROOT"]
     kit, carries = resolve_render_inputs(root, conf, here)
-    specs = [m + "/", ".memory-tree.conf"] + ([kit + "/"] if kit else []) + ([carries] if carries else [])
     # THE INDEX THE HOOK WAS HANDED (TOOL-aTrimmedHook-4). `_build_git_env()` drops GIT_INDEX_FILE for
     # every other caller, because an inherited pointer names a different tree. Here the staged set IS
     # that index: under `git commit -a`, `commit <paths>` or `commit -i` git hands the hook a temporary
@@ -1007,8 +1075,9 @@ def check_staged_render(root: str, conf: dict, here: str | None = None) -> tuple
     # pathspec answers "render". Read as `read_landed_unclosed` reads it, except that a value outside
     # blank and `1` counts as on: a render is the safe answer, and the render refuses that value.
     llu = (conf.get("LIVE_LANDED_UNCLOSED") or "").strip()
+    specs = build_render_pathspec(m, kit, carries, llu)
     cmd = ["git", "diff", "--cached", "--name-status", "--no-renames", "-z"]
-    if not llu:
+    if specs:
         cmd += ["--", *specs]
     try:
         out = subprocess.run(cmd, cwd=root, capture_output=True, check=True, env=env).stdout
@@ -3211,7 +3280,16 @@ def cmd_survey(root: str, conf: dict) -> int:
     return 0
 
 
-def cmd_write(root: str, conf: dict) -> int:
+def cmd_write(root: str, conf: dict, staged: bool = False) -> int:
+    # `--write-staged` (TOOL-aTrimmedWait-3): the pre-commit hook's remedy for a check 9 refusal. It
+    # writes only the artifacts whose bytes moved and stages them, with each removed orphan, into the
+    # index the hook was handed; every decline names its reason and exits 1, so the hook refuses as
+    # before. Every other line of the render is this function's, never a copy.
+    if staged:
+        ok, why = check_staged_write(root, conf)
+        if not ok:
+            print(f"build-index: render NOT staged — {why}")
+            return 1
     check_archives_tracked(root, conf)
     # TOOL-dTrueNorth-16 S20 — THE VIEW FIRST. `plan()` renders the coverage regions from DESIGN_VIEW,
     # so writing the view after it left them rendered from the view as it was, and one `--write` was
@@ -3222,9 +3300,32 @@ def cmd_write(root: str, conf: dict) -> int:
         view = render_asbuilt_view(root, conf)
     except Problem as exc:
         refused = exc
+    to_stage, view_prev = [], None
     if view["state"] == "armed":
-        write_text(os.path.join(root, view["rel"]), view["text"])
+        if staged and derive_moved_artifacts(root, {view["rel"]: view["text"]}):
+            to_stage.append(view["rel"])
+            view_path = os.path.join(root, view["rel"])
+            view_prev = pathlib.Path(view_path).read_bytes() if os.path.isfile(view_path) else False
+        if not staged or to_stage:
+            write_text(os.path.join(root, view["rel"]), view["text"])
     artifacts, orphans, unmanaged, verdicts, guarded = plan(root, conf, create_missing=True)
+    if staged and guarded:
+        # The view was written first because `plan()` reads it; a decline writes nothing, so put it back.
+        if view_prev is False:
+            os.remove(os.path.join(root, view["rel"]))
+        elif view_prev is not None:
+            pathlib.Path(root, view["rel"]).write_bytes(view_prev)
+        print(f"build-index: render NOT staged — the data-loss guard holds {' '.join(sorted(guarded))}")
+        print_verdicts(verdicts, guarded, conf)
+        return 1
+    if staged:
+        moved = derive_moved_artifacts(root, artifacts)
+        artifacts = {rel: artifacts[rel] for rel in moved}
+        to_stage += moved + list(orphans)
+        if not to_stage:
+            print("build-index: render NOT staged — no artifact's bytes moved, so check 9's refusal is not "
+                  "drift a render cures")
+            return 1
     for rel, text in sorted(artifacts.items()):
         write_text(os.path.join(root, rel), text)
     for p in orphans:
@@ -3233,6 +3334,18 @@ def cmd_write(root: str, conf: dict) -> int:
     for p in unmanaged:
         print(f"build-index: WARNING unmanaged file under ledger/ left in place: {p}")
     print(f"build-index: wrote {len(artifacts)} artifact(s)")
+    if staged:
+        # `run()` drops GIT_INDEX_FILE; under `git commit -a` only an add through the hook's index lands.
+        env = _build_git_env()
+        if os.environ.get("GIT_INDEX_FILE"):
+            env["GIT_INDEX_FILE"] = os.environ["GIT_INDEX_FILE"]
+        try:
+            subprocess.run(["git", "add", "-A", "--", *to_stage], cwd=root, capture_output=True,
+                           check=True, env=env)
+        except (OSError, subprocess.CalledProcessError) as exc:
+            raise Problem(f"render NOT staged — git add refused the rendered artifacts ({exc})") from None
+        for p in to_stage:
+            print(f"build-index: staged {p}")
     # A RENDER IS NOT A VERDICT (fork F1). One unparseable ask row must not leave a whole tree
     # unrendered — that is the shape this file's own docstring forbids — so every verdict is
     # PRINTED here and the refusal belongs to `--check`. The data-loss guard is the one exception,
@@ -4589,6 +4702,92 @@ def test_staged_render(arm) -> None:
                         == {s: sorted(v, key=_roster_sort_key) for s, v in _union.items()}))
         arm("TOOL-aTrimmedHook-1 AC6 — every artifact plan() renders is a build-index input", "[]",
             lambda: str([p for p in plan(t, conf)[0] if not check_index_input(p, "memory", None)]))
+
+
+def test_staged_write(arm) -> None:
+    """TOOL-aTrimmedWait-3's arms: `--write-staged` stages exactly the moved render, and every decline
+    writes nothing. MODULE-LEVEL, as `test_staged_render` is. The fixture is the spec's §6: a rendered,
+    committed `_fixture` with the switch on, then a spec status change staged and the README unrendered.
+    Each arm reads `ARM-PASS` or `ARM-MISS` followed by the mode's exit and output."""
+    gbi = os.path.abspath(__file__)
+
+    def run_write_staged(t, **extra):
+        p = subprocess.run([sys.executable, gbi, "--write-staged"], cwd=t, capture_output=True, text=True,
+                           encoding="utf-8", env=dict(_build_git_env(), **extra))
+        return p.returncode, p.stdout + p.stderr
+
+    def build_arm_result(ok, rc, out):
+        return f"{'ARM-PASS' if ok else 'ARM-MISS'} rc={rc} {out}"
+
+    with tempfile.TemporaryDirectory() as base:
+        t = os.path.join(base, "sw"); os.makedirs(t)
+        _fixture(t)
+        cpath = os.path.join(t, ".memory-tree.conf")
+        on = read_text(cpath) + 'STAGED_RENDER="1"\n'
+        write_text(cpath, on)
+        write_text(os.path.join(t, "memory", "notes.md"), "# notes\n")
+        write_text(os.path.join(t, "src", "x.sh"), "echo x\n")
+        run(sys.executable, gbi, "--write", cwd=t)
+        run("git", "add", "-A", cwd=t)
+        run("git", "commit", "-q", "-m", "rendered", "--no-verify", cwd=t)
+        spec = "memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md"
+        readme = "memory/builds/tOne/README.md"
+
+        def write_staged_change(conf_text=on):
+            run("git", "reset", "-q", "--hard", cwd=t)
+            sp = os.path.join(t, spec)
+            write_text(sp, read_text(sp).replace("INPROGRESS", "DEFERRED"))
+            run("git", "add", spec, cwd=t)
+            write_text(cpath, conf_text)
+
+        def read_porcelain():
+            return run("git", "status", "--porcelain", cwd=t)
+
+        write_staged_change()
+        rc, out = run_write_staged(t)
+        printed = sorted(ln.split("build-index: staged ", 1)[1] for ln in out.splitlines()
+                         if ln.startswith("build-index: staged "))
+        cached = sorted(p for p in run("git", "diff", "--cached", "--name-only", cwd=t).split("\n") if p and p != spec)
+        unstaged = run("git", "diff", "--name-only", cwd=t)
+        check_rc = subprocess.run([sys.executable, gbi, "--check"], cwd=t, capture_output=True,
+                                  env=_build_git_env()).returncode
+        arm("TOOL-aTrimmedWait-3 AC1 — --write-staged exits 0 and stages the build README", "ARM-PASS",
+            lambda: build_arm_result(rc == 0 and readme in printed, rc, out))
+        arm("TOOL-aTrimmedWait-3 AC1 — nothing is left unstaged, the staged paths are the printed ones, "
+            "and --check exits 0", "ARM-PASS",
+            lambda: build_arm_result(not unstaged and printed == cached and check_rc == 0, rc,
+                         f"unstaged={unstaged!r} printed={printed} cached={cached} check={check_rc}"))
+        rc, out = run_write_staged(t)
+        arm("TOOL-aTrimmedWait-3 AC2 — a second run declines: no artifact's bytes moved", "ARM-PASS",
+            lambda: build_arm_result(rc == 1 and "render NOT staged — no artifact's bytes moved" in out, rc, out))
+        for value, want in (("", "render NOT staged — STAGED_RENDER is blank"), ("yes", "'yes'")):
+            write_staged_change(on.replace('STAGED_RENDER="1"', f'STAGED_RENDER="{value}"'))
+            before = read_porcelain()
+            rc, out = run_write_staged(t)
+            arm(f"TOOL-aTrimmedWait-3 AC2 — STAGED_RENDER=\"{value}\" exits 1 naming {want} and changes no "
+                "status", "ARM-PASS",
+                lambda: build_arm_result(rc == 1 and want in out and read_porcelain() == before, rc, out))
+        write_staged_change()
+        foreign = os.path.join(base, "other-index")
+        shutil.copyfile(os.path.join(t, ".git", "index"), foreign)
+        rc, out = run_write_staged(t, GIT_INDEX_FILE=foreign)
+        arm("TOOL-aTrimmedWait-3 AC3 — a foreign GIT_INDEX_FILE is declined by name", "ARM-PASS",
+            lambda: build_arm_result(rc == 1 and "render NOT staged" in out and "other-index" in out, rc, out))
+        rc, out = run_write_staged(t, GIT_INDEX_FILE=os.path.join(t, ".git", "index"))
+        arm("TOOL-aTrimmedWait-3 AC3 — the repository's own index under an absolute path proceeds", "ARM-PASS",
+            lambda: build_arm_result(rc == 0 and f"build-index: staged {readme}" in out, rc, out))
+        for rel, conf_text, declines in (("memory/notes.md", on, True), ("src/x.sh", on, False),
+                                         ("src/x.sh", on + 'LIVE_LANDED_UNCLOSED="1"\n', True)):
+            write_staged_change(conf_text)
+            run("git", "add", ".memory-tree.conf", cwd=t)
+            write_text(os.path.join(t, rel), read_text(os.path.join(t, rel)) + "edit\n")
+            before = read_porcelain()
+            rc, out = run_write_staged(t)
+            ok = (rc == 1 and rel in out and read_porcelain() == before) if declines else rc == 0
+            arm(f"TOOL-aTrimmedWait-3 AC4 — an unstaged {rel} {'declines' if declines else 'proceeds'}"
+                f"{' under LIVE_LANDED_UNCLOSED=1' if 'LIVE_LANDED' in conf_text else ''}", "ARM-PASS",
+                lambda: build_arm_result(ok, rc, out))
+        run("git", "reset", "-q", "--hard", cwd=t)
 
 
 def test_coverage_region(arm) -> None:
@@ -8495,6 +8694,7 @@ def cmd_selftest() -> int:
         lambda: render_spec_skeleton("# T\n\n" + _q_t2, *_q_args, "", []))
 
     test_staged_render(arm)
+    test_staged_write(arm)
     test_coverage_region(arm)
     test_coverage_stub(arm)
     arm("TOOL-dTrueNorth-16 AC15 — read_header_verbs refuses an expand returning three values with backlog.Problem "
@@ -8836,11 +9036,13 @@ def main(argv: list) -> int:
                           GIT_COMMITTER_EMAIL="t@t.test", GIT_CONFIG_COUNT="1",
                           GIT_CONFIG_KEY_0="core.autocrlf", GIT_CONFIG_VALUE_0="false")
         return cmd_selftest()
-    if mode not in ("--check", "--write", "--check-format", "--print-bindings", "--survey", "--check-asbuilt",
+    if mode not in ("--check", "--write", "--write-staged", "--check-format", "--print-bindings", "--survey",
+                    "--check-asbuilt",
                     "--report", "--bump", "--asks", "--new-build", "--new-spec", "--doctor",
                     "--check-coverage"):
         print("usage: gen_build_index.py "
-              "[--check [--staged|--with-verdicts]|--write|--check-coverage [--staged]|--check-asbuilt [--staged]|"
+              "[--check [--staged|--with-verdicts]|--write|--write-staged|--check-coverage [--staged]|"
+              "--check-asbuilt [--staged]|"
               "--check-format|--survey|--report|--bump|"
               "--print-bindings|--asks|--new-build|--new-spec|--doctor|--selftest]")
         return 2
@@ -8933,6 +9135,8 @@ def main(argv: list) -> int:
                 return cmd_check(root, conf)
             finally:
                 sys.stderr = held
+        if mode == "--write-staged":
+            return cmd_write(root, conf, staged=True)
         return cmd_check(root, conf) if mode == "--check" else cmd_write(root, conf)
     except Problem as exc:
         print(f"build-index: {exc}")

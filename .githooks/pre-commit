@@ -227,7 +227,25 @@ fi
 # memory-tree hygiene, staged leg — only when memory/ is touched
 if git diff --cached --name-only --diff-filter=ACMR -- 'memory/**' | grep -q .; then
   if g=$(resolve_kit_gate memory-tree check-memory-hygiene.sh); then
-    bash "$g" --staged || rc=1
+    # A CHECK 9 REFUSAL RENDERS ITSELF (TOOL-aTrimmedWait-3): the leg's output is captured, and when it
+    # failed on a `HYGIENE check 9 FAILED` line the generator's `--write-staged` renders the moved index
+    # artifacts into the index git handed this hook. Its 0 means it staged one, and the leg grades
+    # again; that run decides. A blank STAGED_RENDER, a declined render, any other failure or a
+    # generator or launcher that does not resolve refuses as before. The output prints after the run.
+    hy_out=$(bash "$g" --staged); hy_rc=$?
+    [ -z "$hy_out" ] || printf '%s\n' "$hy_out"
+    if [ "$hy_rc" != 0 ]; then
+      hy_r=$(git ls-files -- '*resolve-python.sh' | head -n 1)
+      if printf '%s\n' "$hy_out" | grep -q '^HYGIENE check 9 FAILED' \
+          && gb=$(resolve_kit_gate memory-tree gen_build_index.py) \
+          && [ -n "$hy_r" ] && . "./$hy_r" && py=$(resolve_python) \
+          && with_hook_index "$py" "$gb" --write-staged; then
+        echo "pre-commit: the build index was rendered and staged; grading the memory hygiene leg again."
+        bash "$g" --staged || rc=1
+      else
+        rc=1
+      fi
+    fi
   else
     print_kit_miss "memory-tree hygiene" memory-tree check-memory-hygiene.sh
   fi

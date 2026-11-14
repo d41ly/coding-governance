@@ -3543,6 +3543,11 @@
       "file": "tools/playbook/fixtures/row_kind.py"
     },
     {
+      "id": "build_render_pathspec",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "build_reordered_plant",
       "kind": "function",
       "file": "tools/playbook/fixtures/row_kind.py"
@@ -7588,6 +7593,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "check_staged_write",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "check_stalled",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -10566,6 +10576,11 @@
       "id": "derive_module_export_rel",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "derive_moved_artifacts",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "derive_moved_invariants",
@@ -27703,6 +27718,11 @@
       "file": "tools/playbook/overlay.py"
     },
     {
+      "id": "run_render_commit",
+      "kind": "function",
+      "file": ".githooks/pre-commit.test.sh"
+    },
+    {
       "id": "run_render_helper",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -31979,6 +31999,11 @@
     },
     {
       "id": "test_staged_render",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "test_staged_write",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
     },

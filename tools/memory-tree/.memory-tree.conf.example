@@ -476,6 +476,17 @@ LIVE_DORMANT_DAYS=""
 # anything is written. BLANK OR ABSENT RENDERS LIVE.md AS BEFORE, byte for byte, and never imports that kit.
 LIVE_LANDED_UNCLOSED=""
 
+# STAGED_RENDER — blank (off) or 1 (on). Set to 1, the pre-commit hook takes check 9's own remedy when
+# the staged hygiene leg fails with a `HYGIENE check 9 FAILED` line: it runs
+# `gen_build_index.py --write-staged`, which writes only the index artifacts whose bytes moved and
+# stages them into the commit, then grades the leg again, and that run decides. The mode declines,
+# writing nothing, while this key is blank, when the hook's index is not the repository's own or its
+# `.lock` (so never under a partial commit, `git commit <path>`), and when a render input carries an
+# unstaged change; it also declines when nothing moved. A decline refuses the commit as before.
+# BLANK OR ABSENT LEAVES EVERY COMMIT AS IT IS: a hook that adds paths nobody staged is opt-in. A
+# value other than blank or 1 refuses by name.
+STAGED_RENDER=""
+
 # DESIGN_RECORD, DESIGN_BASELINE, DESIGN_VIEW, DESIGN_NODES — the design chain's four keys, gov's own:
 # a frozen design record, the commit it was pinned at, the as-built view rendered from it and the
 # owned-node deriver. `design_lib.read_design_keys` reads them, and the deviation join, the as-built
