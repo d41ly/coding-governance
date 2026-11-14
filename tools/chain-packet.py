@@ -32,7 +32,7 @@ The two reads:
 
 THE FALLBACK. The shortcuts are bound to content: `INSTRUMENT_BLOBS` holds the git blob id of each
 instrument whose internals they rely on, compared with the file's bytes BEFORE anything is loaded.
-With any role moved, with `tree_lib.py` not beside this script, or with no shortcut mode among the
+With any role moved, with `tree_lib.py` not found by `resolve_kit_dir`, or with no shortcut mode among the
 arguments, the door prints one stderr line, `chain-packet: shortcuts off, ...`, naming every
 reason, and runs the instrument as a child. A re-pinned or stubbed instrument is therefore graded
 the slow way, never by a shortcut read against other bytes. The ids are constants with no
@@ -73,6 +73,53 @@ from pathlib import Path
 sys.dont_write_bytecode = True
 
 HERE = Path(__file__).resolve().parent
+
+
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
+# The memory-tree kit is RESOLVED, never spelled (TOOL-aCarriedStop-10); None when it does not resolve.
+try:
+    KIT_DIR = resolve_kit_dir("memory-tree", "tree_lib.py", HERE)
+except LookupError:
+    KIT_DIR = None
 INSTRUMENT_DIR = "memory/builds/dClosedLoop/build"
 # One git blob id per instrument, each with the reliance points read against that blob. A landing
 # that moves an instrument reads its points again against the new bytes, then sets the constant.
@@ -236,13 +283,13 @@ def main(argv):
         return 2
     reasons = scan_moved(found)
     tree_lib = None
-    if not (HERE / "memory-tree" / "tree_lib.py").is_file():
+    if KIT_DIR is None:
         reasons.append("tree_lib.py is not beside this script")
     if not parity and not any(a in FAST_MODES for a in argv):
         reasons.append("no shortcut mode in the arguments")
     if not reasons:     # nothing is loaded before the blobs have been compared
         try:
-            tree_lib = load_module("tree_lib", HERE / "memory-tree" / "tree_lib.py")
+            tree_lib = load_module("tree_lib", KIT_DIR / "tree_lib.py")
         except Exception:
             reasons.append("tree_lib.py is not beside this script")
     if reasons:

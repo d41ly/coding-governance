@@ -1,13 +1,15 @@
 # TOOL-aCarriedStop-10 — the chain-packet door reaches the memory-tree kit through `resolve_kit_dir`, so the install-prefix leg reads no spelled kit path in it
 
-**Status:** SPECCED · rev-1 · 2026-11-14 · node a · Tier-1 · base 0578adb7 · streams tooling · order 5
+**Status:** CLOSED · rev-1 · 2026-11-14 · node a · Tier-1 · base 0578adb7 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md](../build/2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md) | journal | TOOL-aCarriedStop-1 TOOL-aCarriedStop-2 TOOL-aCarriedStop-3 TOOL-aCarriedStop-9 |
+| [2026-11-14-build-TOOL-aCarriedStop-10-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aCarriedStop-10-1-acceptance-ledger.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aCarriedStop-10-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aCarriedStop-10-1-spec-writer.md) | journal | — |
+| [2026-11-14-prompt-TOOL-aCarriedStop-10-2-builder.md](../prompts/2026-11-14-prompt-TOOL-aCarriedStop-10-2-builder.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aCarriedStop-10-brief.md](../prompts/2026-11-14-prompt-TOOL-aCarriedStop-10-brief.md) | research | — |
 | [2026-11-14-prompt-TOOL-aCarriedStop-10-build-brief.md](../prompts/2026-11-14-prompt-TOOL-aCarriedStop-10-build-brief.md) | research | — |
 

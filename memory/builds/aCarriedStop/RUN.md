@@ -76,3 +76,7 @@ base: d646814e4a6a6747d3cdb471128be57a0e24e094
 2026-11-14T05:04:34Z rescope · item add TOOL-aCarriedStop-10 · reason adopted under M10 at the third close: install-prefix reads OWN on the inherited kit-path spellings in tools/chain-packet.py, and the push bar would refuse the same, so the owner's order to land needs them routed through resolve_kit_dir
 
 2026-11-14T05:06:32Z brief · item TOOL-aCarriedStop-9 · reason d24e2a2dd8c9 memory/builds/aCarriedStop/prompts/2026-11-14-prompt-TOOL-aCarriedStop-9-build-brief.md
+
+2026-11-14T05:33:36Z brief · item TOOL-aCarriedStop-10 · reason d9234bdc2404 memory/builds/aCarriedStop/prompts/2026-11-14-prompt-TOOL-aCarriedStop-10-build-brief.md
+
+2026-11-14T05:34:54Z dispatch · item 97dbeb86 TOOL-aCarriedStop-10 · reason tools/chain-packet.py tools/chain-packet.test.sh memory/builds/aCarriedStop/spec/2026-11-14-spec-TOOL-aCarriedStop-10.md memory/builds/aCarriedStop/build/2026-11-14-build-TOOL-aCarriedStop-10-1-acceptance-ledger.md memory/builds/aCarriedStop/README.md memory/LIVE.md memory/builds/aCarriedStop/prompts/2026-11-14-prompt-TOOL-aCarriedStop-10-2-builder.md memory/builds/aCarriedStop/build/2026-11-13-build-TOOL-aCarriedStop-1-agent-ledger.md memory/builds/aCarriedStop/spec/2026-11-13-spec-TOOL-aCarriedStop-1.md memory/builds/aCarriedStop/spec/2026-11-13-spec-TOOL-aCarriedStop-2.md memory/builds/aCarriedStop/spec/2026-11-13-spec-TOOL-aCarriedStop-3.md memory/builds/aCarriedStop/spec/2026-11-14-spec-TOOL-aCarriedStop-9.md memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json

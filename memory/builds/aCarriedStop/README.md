@@ -58,7 +58,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 5 unit(s) · node a · opened 2026-11-13 · streams tooling
+**Build status:** CLOSED · 5 unit(s) · node a · opened 2026-11-13 · streams tooling
 ids TOOL-aCarriedStop-1 TOOL-aCarriedStop-2 TOOL-aCarriedStop-3 TOOL-aCarriedStop-4 TOOL-aCarriedStop-5 TOOL-aCarriedStop-6 TOOL-aCarriedStop-7 TOOL-aCarriedStop-8 TOOL-aCarriedStop-9 TOOL-aCarriedStop-10
 
 <!-- gen:build-units -->
@@ -67,11 +67,11 @@ ids TOOL-aCarriedStop-1 TOOL-aCarriedStop-2 TOOL-aCarriedStop-3 TOOL-aCarriedSto
 | [TOOL-aCarriedStop-2 — the owner-stop path answers to one class: the writer refuses, before any byte, a whole path its reader's grammar would not admit](spec/2026-11-13-spec-TOOL-aCarriedStop-2.md) | 2 | 2 | CLOSED | rev-1 | 2026-11-13 |
 | [TOOL-aCarriedStop-3 — the closing review's mediums and lows, batched: the count test on the audit route only, the owner-stop arms the suite lacks, the base driver's reading and the usage header's padding](spec/2026-11-13-spec-TOOL-aCarriedStop-3.md) | 3 | 2 | CLOSED | rev-1 | 2026-11-13 |
 | [TOOL-aCarriedStop-9 — the routed commits leg's ceiling raised to 3540 s over its recorded contended readings, so the close's bar can finish it](spec/2026-11-14-spec-TOOL-aCarriedStop-9.md) | 4 | 1 | CLOSED | rev-1 | 2026-11-14 |
-| [TOOL-aCarriedStop-10 — the chain-packet door reaches the memory-tree kit through `resolve_kit_dir`, so the install-prefix leg reads no spelled kit path in it](spec/2026-11-14-spec-TOOL-aCarriedStop-10.md) | 5 | 1 | SPECCED | rev-1 | 2026-11-14 |
+| [TOOL-aCarriedStop-10 — the chain-packet door reaches the memory-tree kit through `resolve_kit_dir`, so the install-prefix leg reads no spelled kit path in it](spec/2026-11-14-spec-TOOL-aCarriedStop-10.md) | 5 | 1 | CLOSED | rev-1 | 2026-11-14 |
 | [TOOL-aCarriedStop-1 — the owner-stop row: `--record-round --owner-stop` appends it citing the owner's tracked record, and the one chain verdict reads it as STOP](spec/2026-11-13-spec-TOOL-aCarriedStop-1.md) | — | 2 | CLOSED | rev-2 | 2026-11-13 |
 <!-- /gen:build-units -->
 
-Records: 26 bound to this build, across 4 record folder(s).
+Records: 28 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

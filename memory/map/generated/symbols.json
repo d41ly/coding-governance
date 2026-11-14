@@ -24145,6 +24145,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/chain-packet.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/check-agent-cap-restatement.test.sh"
     },
     {
