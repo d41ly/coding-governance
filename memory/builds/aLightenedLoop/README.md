@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-14
 streams: tooling
 roster: TOOL
-ids: TOOL-aLightenedLoop-1 TOOL-aLightenedLoop-2 TOOL-aLightenedLoop-3 TOOL-aLightenedLoop-4 TOOL-aLightenedLoop-5 TOOL-aLightenedLoop-6
+ids: TOOL-aLightenedLoop-1 TOOL-aLightenedLoop-2 TOOL-aLightenedLoop-3 TOOL-aLightenedLoop-4 TOOL-aLightenedLoop-5 TOOL-aLightenedLoop-6 TOOL-aLightenedLoop-7
 ---
 
 # aLightenedLoop — a build unit's fixed overhead cut, every verdict and byte unchanged
@@ -54,30 +54,32 @@ None.
 | 4 | `TOOL-aLightenedLoop-4` | divergence: a feasibility-first builder brief, spec writers citing their code claims, and the template's re-stamp rule |
 | 5 | `TOOL-aLightenedLoop-5` | the stop-guard caches the liveness verdict, keyed on every input the verdict reads, expired by the liveness clock, with an environment kill switch |
 | 6 | `TOOL-aLightenedLoop-6` | the closing review round 1 repaired: check 39 admits the wake reader, the spec-token key derived inside its stability bracket, check 29 reads chain specs once, and the arms that could not fail made able to |
+| 7 | `TOOL-aLightenedLoop-7` | the tracked idle-wake cadence retired at the owner's call, its conf key removed everywhere, `--wake` naming the base cadence, and the idle-wake help page's block marked not to run |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 6 unit(s) · node a · opened 2026-11-14 · streams tooling
-ids TOOL-aLightenedLoop-1 TOOL-aLightenedLoop-2 TOOL-aLightenedLoop-3 TOOL-aLightenedLoop-4 TOOL-aLightenedLoop-5 TOOL-aLightenedLoop-6
+**Build status:** SPECCED · 7 unit(s) · node a · opened 2026-11-14 · streams tooling
+ids TOOL-aLightenedLoop-1 TOOL-aLightenedLoop-2 TOOL-aLightenedLoop-3 TOOL-aLightenedLoop-4 TOOL-aLightenedLoop-5 TOOL-aLightenedLoop-6 TOOL-aLightenedLoop-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aLightenedLoop-1 — the commit tail: `--write` writes only changed bytes, a render stamp answers the hook, check 9's staged skip admits a records edit, and check 29 exits early](spec/2026-11-14-spec-TOOL-aLightenedLoop-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-11-14 |
-| [TOOL-aLightenedLoop-2 — the idle-wake tick: one cheap `--wake` verb that ends a healthy turn, and a longer cadence while a registered task is open](spec/2026-11-14-spec-TOOL-aLightenedLoop-2.md) | 2 | 2 | INPROGRESS | rev-1 | 2026-11-14 |
+| [TOOL-aLightenedLoop-2 — the idle-wake tick: one cheap `--wake` verb that ends a healthy turn, and a longer cadence while a registered task is open](spec/2026-11-14-spec-TOOL-aLightenedLoop-2.md) | 2 | 2 | CLOSED | rev-1 | 2026-11-14 |
 | [TOOL-aLightenedLoop-3 — `--dispatch` runs before the builder spawns, and its spec-token cache keys on what the checker read](spec/2026-11-14-spec-TOOL-aLightenedLoop-3.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-14 |
 | [TOOL-aLightenedLoop-4 — a builder checks its spec can be built before its first edit, a spec cites where it read the code, and a watched path brings its manifest re-stamp](spec/2026-11-14-spec-TOOL-aLightenedLoop-4.md) | 4 | 2 | CLOSED | rev-1 | 2026-11-14 |
 | [TOOL-aLightenedLoop-5 — the stop-guard caches the `--liveness` verdict, keyed on every input the verdict reads and expired by the liveness clock](spec/2026-11-14-spec-TOOL-aLightenedLoop-5.md) | 5 | 2 | CLOSED | rev-2 | 2026-11-14 |
 | [TOOL-aLightenedLoop-6 — the closing review round 1 repaired: check 39 admits the wake reader, the spec-token key derived inside its stability bracket, check 29 reads chain specs once, and the arms that could not fail made able to](spec/2026-11-14-spec-TOOL-aLightenedLoop-6.md) | 6 | 2 | CLOSED | rev-2 | 2026-11-14 |
+| [TOOL-aLightenedLoop-7 — the tracked idle-wake cadence retired: its conf key removed everywhere, `--wake` naming the base cadence, and the idle-wake help page's block marked not to run](spec/2026-11-15-spec-TOOL-aLightenedLoop-7.md) | 7 | 2 | SPECCED | rev-1 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 26 bound to this build, across 4 record folder(s).
+Records: 28 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aLightenedLoop-1 TOOL-aLightenedLoop-2 TOOL-aLightenedLoop-3 TOOL-aLightenedLoop-4 TOOL-aLightenedLoop-5 TOOL-aLightenedLoop-6.
+Ids no `spec-audit` record has ever named: TOOL-aLightenedLoop-1 TOOL-aLightenedLoop-2 TOOL-aLightenedLoop-3 TOOL-aLightenedLoop-4 TOOL-aLightenedLoop-5 TOOL-aLightenedLoop-6 TOOL-aLightenedLoop-7.
 
-Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -90,6 +92,7 @@ Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry
 | 4 | `TOOL-aLightenedLoop-4` | no |
 | 5 | `TOOL-aLightenedLoop-5` | no |
 | 6 | `TOOL-aLightenedLoop-6` | no |
+| 7 | `TOOL-aLightenedLoop-7` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
