@@ -32,3 +32,6 @@ The owner answered the spec's two open questions on 2026-11-14, asked through th
 - Any change to the code at `4fed38fe1` and `fc4c62bfa` beyond the arm and its fixture.
 - A conf key or switch: F1 is live.
 - `memory/builds/dDeclaredLoop/`, its run's worktree and its branch.
+- ANY SELF-TEST SUITE OR BAR INSIDE THE BUILD PASS, A SLICED SUITE INCLUDED. The pass writes arm A6 and checks it with `bash -n` and the criterion's own probes; the main loop observes it red and then green at the close.
+- A pass commit that leaves the acceptance ledger behind. The pass commit adds AC12 to `memory/builds/aBriskDeclaration/build/2026-11-14-build-TOOL-aBriskDeclaration-1-1-acceptance-ledger.md`, with the backticked token the criterion spells, and keeps every line already there.
+- An edit after the spec goes CLOSED: the arm and the ledger land first, and setting the spec CLOSED is the last change of the pass.
