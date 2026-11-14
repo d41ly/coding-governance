@@ -49,7 +49,6 @@ reads 1.
 """
 import hashlib
 import json
-import os
 import pathlib
 import re
 import shutil
@@ -183,16 +182,21 @@ def render_item_row(row):
 
 # ------------------------------------------------------------------------------------------ the check
 def read_composition(root):
-    """`(exit, payload, lines)` of the playbook kit's `overlay_rows.py compose --kind item` over `root`:
-    exit 0 with the JSON payload, 1 with the refusal's lines, 2 with the unarmed lines."""
+    """`(exit, payload, lines)` of the playbook kit's `overlay_rows.py compose --kind item` over `root`, run
+    with the memory-tree kit's git leaks unset, so an inherited `GIT_DIR` never retargets the read: exit 0
+    with the JSON payload, 1 with the refusal's lines, 2 with the unarmed lines."""
     try:
         script = resolve_kit_dir("playbook", "overlay_rows.py", KIT) / "overlay_rows.py"
     except LookupError as e:
         return 2, None, [str(e)]
     try:
+        from loop_witness import read_clean_env
+        env = read_clean_env(PYTHONIOENCODING="utf-8")
+    except (LookupError, ImportError) as e:
+        return 2, None, [str(e)]
+    try:
         p = subprocess.run([sys.executable, str(script), "compose", "--kind", KIND], cwd=str(root),
-                           capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=300,
-                           env=dict(os.environ, PYTHONIOENCODING="utf-8"))
+                           capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=300, env=env)
     except subprocess.TimeoutExpired:
         return 2, None, ["%s compose did not return within 300 s" % script.as_posix()]
     lines = [ln for ln in (p.stdout + p.stderr).splitlines() if ln.strip()]
@@ -523,11 +527,11 @@ def write_fixture_plant(top, case, pins, bad):
     defn, schema = derive_definition_rel(), (pathlib.Path(derive_definition_rel()).parent / SCHEMA).as_posix()
     gov = {r["tag"]: r for r in tomllib.loads((top / defn).read_text(encoding="utf-8"))["item"]}
 
-    def patch(name, edge, target, **fields):
+    def render_patch_row(name, edge, target, **fields):
         return render_item_row({"tag": "item.test.%s.%s" % (ADOPTER, name),
                                 "edges": "%s=%s@%s" % (edge, target, pins[target]), **fields})
 
-    def bump(text):
+    def write_record_bump(text):
         read_memory_tree("build_records.py")
         from build_records import KINDS
         req = KINDS["acceptance"]["required"]
@@ -558,17 +562,17 @@ def write_fixture_plant(top, case, pins, bad):
         "version-stale-input": [derive_repo_item("reader", ["item.build.acceptance"], [reader])],
     }.get(case)
     text = "\n".join(render_item_row(r) for r in overlay) if overlay else {
-        "patch-witness": patch("select-seen", "amends", "item.test.select",
+        "patch-witness": render_patch_row("select-seen", "amends", "item.test.select",
                                witness={"class": "history", "by": "a patched witness"}),
-        "patch-outcomes": patch("select-skips", "amends", "item.test.select", add={"outcomes": ["skipped"]}),
-        "supersede-floor": patch("verdict-own", "supersedes", FLOOR_ITEM,
+        "patch-outcomes": render_patch_row("select-skips", "amends", "item.test.select", add={"outcomes": ["skipped"]}),
+        "supersede-floor": render_patch_row("verdict-own", "supersedes", FLOOR_ITEM,
                                  **{k: v for k, v in gov.get(FLOOR_ITEM, {}).items() if k != "tag"}),
-        "supersede-exit": patch("build-exit-own", "supersedes", "item.build.exit",
+        "supersede-exit": render_patch_row("build-exit-own", "supersedes", "item.build.exit",
                                 **{k: v for k, v in gov.get("item.build.exit", {}).items() if k != "tag"}),
-        "patch-remove-need": patch("select-free", "amends", "item.test.select", remove={"needs": ["item.test.merge"]}),
-        "patch-add-need": patch("merge-waits", "amends", "item.test.merge", add={"needs": ["item.build.exit"]}),
-        "patch-routes": patch("select-routed", "amends", "item.test.select", routes={"selected": "item.test.merge"}),
-        "amended-cycle": patch("merge-after-verdict", "amends", "item.test.merge", add={"needs": [FLOOR_ITEM]}),
+        "patch-remove-need": render_patch_row("select-free", "amends", "item.test.select", remove={"needs": ["item.test.merge"]}),
+        "patch-add-need": render_patch_row("merge-waits", "amends", "item.test.merge", add={"needs": ["item.build.exit"]}),
+        "patch-routes": render_patch_row("select-routed", "amends", "item.test.select", routes={"selected": "item.test.merge"}),
+        "amended-cycle": render_patch_row("merge-after-verdict", "amends", "item.test.merge", add={"needs": [FLOOR_ITEM]}),
     }.get(case)
     if text:
         write_fixture_files(top, {OVERLAY: text})
@@ -578,7 +582,7 @@ def write_fixture_plant(top, case, pins, bad):
         write_fixture_files(top, {POLICY_FILE: '[instructions]\nexclude = ["item.test.flakes"]\n\n'
                                                '[review]\nbreakpoints = ["item.test.flakes"]\n'})
     elif case in ("version-unbumped", "version-bumped", "version-stale-input"):
-        bump(None if case == "version-unbumped" else "re-pin")
+        write_record_bump(None if case == "version-unbumped" else "re-pin")
     elif case == "exit-unfixed":
         body = (top / schema).read_text(encoding="utf-8")
         block = '[[fixed-row]]\ntag = "item.build.exit"\nfixed-by = ["principle=principle.p20"]\n'
@@ -618,7 +622,7 @@ def run_fixture(case, base):
     for line in said:
         print(line)
 
-    def owe(step, got, owed, needle, line):
+    def check_owed_step(step, got, owed, needle, line):
         print("%s: fixture · %s · exit %d · %s" % (SAY, step, got, line))
         if got != owed or needle not in line:
             bad.append("%s exited %d, owed %d and a line naming %r" % (step, got, owed, needle))
@@ -626,22 +630,22 @@ def run_fixture(case, base):
     defn = derive_definition_rel()
     if case == "factory":
         rc, line = run_factory(top)
-        owe("new again", rc, 2, "item.test.demo", line)
+        check_owed_step("new again", rc, 2, "item.test.demo", line)
     elif case in ("schema-absent", "definition-uncommitted"):
         rc, _p, said = run_scratch_check(top, compose=True)
         path = (pathlib.Path(defn).parent / SCHEMA).as_posix() if case == "schema-absent" else defn
-        owe("compose", rc, 2, path, said[0] if said else "no output")
+        check_owed_step("compose", rc, 2, path, said[0] if said else "no output")
         if not (said and "unarmed" in said[0]):
             bad.append("compose printed no unarmed line: %s" % said[:2])
         rc, line = run_render_probe(top, "rows" if case == "schema-absent" else "delta")
-        owe("render" if case == "schema-absent" else "render before the commit", rc, 0, "0", line)
+        check_owed_step("render" if case == "schema-absent" else "render before the commit", rc, 0, "0", line)
         if line != "0":
             bad.append("the render composed %s item line(s), owed none" % line)
         if case == "definition-uncommitted":
             run_fixture_git(top, "commit", "-qm", "the staged definition")
             count = str(len(gov_rows := tomllib.loads((top / defn).read_text(encoding="utf-8"))["item"]))
             rc, line = run_render_probe(top, "delta")
-            owe("render after the commit", rc, 0, count, "%s gov:item line(s), %d [[item]] table(s)" % (
+            check_owed_step("render after the commit", rc, 0, count, "%s gov:item line(s), %d [[item]] table(s)" % (
                 line, len(gov_rows)))
             if line != count:
                 bad.append("the render after the commit printed %s gov:item line(s), owed %s" % (line, count))
