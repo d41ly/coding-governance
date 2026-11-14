@@ -460,8 +460,9 @@ log record is the source; with only `micro-format` selected, nothing is stored a
 
 - **Check a build's moves:** `check --build <slug>` holds each log record to its move's trailer, names <!-- usage: script:tools/loop/loop_transition.py#check 53beaa6b -->
   a record no trailer backs, and holds the `transition` definition in your `AGENTS.md` to the line the
-  writer prints. It exits 0 clean and 1 on a finding, printing `pending — <n> move(s) before the
-  build's first spec` while moves wait on a spec, or `unstored` where the set stores nothing. Both
+  writer prints. It exits 0 clean and 1 on a finding, printing
+  `pending — <n> move(s) before the build's first spec` while moves wait on a spec, or `unstored`
+  where the set stores nothing. Both
   verbs exit 2 when `transitions.record` does not resolve, and 2 `unarmed` where the policy kit is not
   installed beside the loop kit, never falling back to a default.
 
