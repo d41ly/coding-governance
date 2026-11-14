@@ -51,7 +51,7 @@ every new arm's RED-first observation, and AC9 and AC10 are owed to the close.
   `grep -c '^STAGED_RENDER="1"' .memory-tree.conf` printed 1 and
   `grep -c 'write-staged' tools/memory-tree/README.md` printed 1; each printed 0 at the parent.
 - AC8 — `grep -c 'commit-render.md' help/README.md` printed 1, and `grep -rl 'STAGED_RENDER' help`
-  named `help/commit-render.md`, which names `HYGIENE check 9 FAILED` and `git commit <path>`, the
+  named `help/commit-render.md`, which names `HYGIENE check <N> FAILED`, N = 9, and `git commit <path>`, the
   partial-commit exclusion. Each printed 0 at the parent.
 - AC9 — `git commit -m probe` — not run in the pass: the commit runs the real hygiene gate through
   the hook in two clones, the unit's and base `846d51d3`, and the spec's permission line makes it the
@@ -65,3 +65,12 @@ every new arm's RED-first observation, and AC9 and AC10 are owed to the close.
   with this pass's, its whole output identical under `diff`. The parent's remedy, `--write` and <!-- PINNED 2026-11-14 -->
   `git add -A memory`, took 1328 ms; this pass's `--write-staged` took 1072 ms and staged the same <!-- PINNED 2026-11-14 -->
   three paths. Neither figure includes the second commit the parent's remedy also needs.
+- Fix pass (`2026-11-14-prompt-TOOL-aTrimmedWait-3-fix`) — the `git rev-parse --git-path index` call in
+  `tools/memory-tree/gen_build_index.py#check_staged_write` names `encoding="utf-8"` beside `text=True`, and
+  `` grep -nE 'HYGIENE(\.md)?`? check [0-9]' help/commit-render.md tools/memory-tree/README.md `` printed nothing,
+  exit 1, as did the same pattern over this ledger. `probe_ws.sh` and `probe_hook.sh` printed byte-identical
+  output before and after the edit, under `diff`, the before run over the generator and hook of 634815f08; the
+  `AC3-own` cases run the edited call. Same commands timed one at a time on node a: `probe_ws.sh` 15142 ms <!-- PINNED 2026-11-14 -->
+  before and 12617 ms after, `probe_hook.sh` 8415 ms before and 14589 ms after, the hook unchanged <!-- PINNED 2026-11-14 -->
+  by this pass, so the spread is the node's. The encoding-posture and tags legs that reported both reds are
+  owed to the main loop's pass legs.

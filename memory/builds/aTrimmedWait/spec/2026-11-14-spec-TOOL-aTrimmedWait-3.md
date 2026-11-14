@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-3 — a commit refused on build-index drift renders its own index, stages it and is graded again
 
-**Status:** INPROGRESS · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 3
+**Status:** CLOSED · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 

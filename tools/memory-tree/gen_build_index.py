@@ -1002,7 +1002,8 @@ def check_staged_write(root: str, conf: dict) -> tuple:
     if hook_index:
         try:
             own = subprocess.run(["git", "rev-parse", "--path-format=absolute", "--git-path", "index"],
-                                 cwd=root, capture_output=True, text=True, check=True, env=env).stdout.strip()
+                                 cwd=root, capture_output=True, text=True, encoding="utf-8", check=True,
+                                 env=env).stdout.strip()
         except (OSError, subprocess.CalledProcessError) as exc:
             return False, f"git could not name this repository's index ({exc})"
         # "The same file", so `realpath` over `abspath`: git prints the long form of a path a Windows

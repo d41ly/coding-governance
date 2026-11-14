@@ -22,7 +22,7 @@ Any value other than blank or `1` is refused by name, and the commit is refused 
 ## What the hook does
 
 1. It runs the staged hygiene leg and holds its output, then prints it.
-2. When the leg failed with a line opening `HYGIENE check 9 FAILED`, it runs the generator's
+2. When the leg failed with a line opening `HYGIENE check <N> FAILED`, N = 9, it runs the generator's
    `--write-staged` mode under the index git handed it. Any other failure refuses as before.
 3. The mode writes only the artifacts whose bytes moved and stages them, with any orphaned ledger
    shard it removes, and prints one `build-index: staged <path>` line per path.
