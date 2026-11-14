@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-5 — the witness-class rule: every witness classed, the actor class refused
 
-**Status:** INPROGRESS · rev-4 · 2026-11-14 · node d · Tier-2 · base ed497191 · streams tooling · order 5 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-5 · 2026-11-14 · node d · Tier-2 · base ed497191 · streams tooling · order 5 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0090@e3f362f0 whole
 
@@ -14,10 +14,12 @@
 | [2026-10-25-build-TOOL-dDeclaredLoop-5-deviation-51.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-5-deviation-51.md) | deviation | — |
 | [2026-11-14-build-TOOL-dDeclaredLoop-5-1-builder-return.md](../build/2026-11-14-build-TOOL-dDeclaredLoop-5-1-builder-return.md) | journal | — |
 | [2026-11-14-build-TOOL-dDeclaredLoop-5-deviation-52.md](../build/2026-11-14-build-TOOL-dDeclaredLoop-5-deviation-52.md) | deviation | — |
+| [2026-11-14-build-TOOL-dDeclaredLoop-5-deviation-53.md](../build/2026-11-14-build-TOOL-dDeclaredLoop-5-deviation-53.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-56 |
 | [2026-11-14-prompt-TOOL-dDeclaredLoop-5-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-5-1-spec-writer.md) | journal | — |
+| [2026-11-14-prompt-TOOL-dDeclaredLoop-5-3-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-5-3-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-dDeclaredLoop-5-build-brief.md](../prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-5-build-brief.md) | journal | — |
 | [2026-11-14-prompt-TOOL-dDeclaredLoop-5-reground-brief.md](../prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-5-reground-brief.md) | research | — |
 | [2026-11-14-prompt-TOOL-dDeclaredLoop-5-spec-brief.md](../prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-5-spec-brief.md) | research | — |
@@ -74,8 +76,10 @@ no `witness` key, `tools/loop/loop_lib.py` has no witness reader, and `checker_o
   entry whose word means `actor` and whose `<site>\t<item>` is no list row is refused; and a list row of
   that site whose item is no `actor` entry there is refused. Check 53 of
   `tools/unattended/check-unattended.sh` passes `DOD_CORE` and `DOD_EXTRA` to that verb and fails
-  naming each refusal (§8 F5). The unattended descriptor's `requires` gains `loop`. Observed by AC4,
-  AC6 and AC7.
+  naming each refusal (§8 F5). The unattended descriptor's `requires` gains `loop`. Check 53's two
+  `fail 53` sites take the leg's refusal census from 264 to 266, so the leg's `REFUSAL_CEILINGS` token
+  rises to 266 under the decision row `TOOL-dDeclaredLoop-5`, after the retirement review in §4 finds
+  no candidate (§8 F7). Observed by AC4, AC6, AC7 and AC9.
   **Readers:**
   by name: `tools/unattended/unattended.sh`, whose `verb_close`, `verb_abort` and `verb_attest` each call
   `checker_of`
@@ -223,15 +227,77 @@ against `dod`, which an unclassed entry never matches. The walk of `verb_close` 
 unclassed entry's empty checker to `dod_met`, and check 53 refuses that entry before a run reads it.
 The driver runs under `set -u` without `set -e`, so the new return ends no verb.
 
+### The leg's refusal ceiling
+
+`.memory-tree.conf`'s `REFUSAL_CEILINGS` budgets the leg at 264, under decision
+`TOOL-aSparedSpawn-14`, and the leg's census is 264 at HEAD `157293192`: 264 `fail <n> "` call sites,
+and its one `status=1` line is the `fail` helper's definition, which signature 1 keeps
+(`tools/memory-tree/check-arms.py#discover`, its signature 2 note in the module docstring). Check 53's
+two sites make 266, which `tools/memory-tree/check-arms.py#cmd_check` reds. A one-site check 53 still
+makes 265. The driver's change adds no site: `return 1` is neither `exit 1` nor `status=1`.
+
+**The retirement review** (`tools/memory-tree/README.md`, "Retiring a refusal, and the ceiling on
+adding one"). A site is a candidate only when R1 to R4 all hold, so a row that fails R3 or R4 is not a
+candidate, whatever R1 and R2 read. The population is check 53's two sites and the leg's sites that
+grade the Definition-of-Done set. Those are the sites check 53 could absorb, and the shape
+TOOL-dTrueNorth-27 reviewed, which was its own new sites.
+
+| Site | Condition | R3 — does it survive elsewhere? | R4 | Candidate |
+|---|---|---|---|---|
+| check 53, exit 1 | a DoD entry unclassed, or an actor entry and the list disagreeing | no: no other refusal reads a DoD entry's checker word, and check 16 does not join that column on purpose (`tools/unattended/check-unattended.sh@157293192:4080-4084`) | fails: it refuses an actor-typed witness, a record forgery at a write boundary | no |
+| check 53, any other exit | the loop kit or a python unreachable | no: no other refusal reaches the loop kit | holds | no |
+| `tools/unattended/check-unattended.sh@157293192:811` fail 1 | a core set unreadable | no: it exits before every other check | holds | no |
+| `tools/unattended/check-unattended.sh@157293192:1446` fail 3 | the effective DoD set is blank | no: fail 1 tests `-z`, so a whitespace-only `DOD_CORE` passes it and reaches this site (`check-unattended.test.sh` arms that case). Check 53 would refuse that set only while the list holds `DOD_CORE` rows, and the list is shrink-only towards empty | holds | no |
+| `tools/unattended/check-unattended.sh@157293192:1449`, `:1462` fail 3 | the DoD core set below its floor, and the floor below the core set | no: check 53 reads no floor | holds | no |
+| `tools/unattended/check-unattended.sh@157293192:4087`, `:4092`, `:4093`, `:4100`, `:4115` fail 16 | the protocol's DoD table and count sentence joined to the driver | no: check 53 reads no protocol | holds | no |
+
+No site retires, so no row is written to `memory/project/refusal-retirements.txt`. The closest pair is
+`:1446` and its phase twin, fail 2 on a blank effective phase set. They would become redundant only if
+fail 1 tested for whitespace. That rewrite reaches `PHASES_CORE`, outside this unit's clause, and is
+left to the gate's review at the cadence the README sets. The other 255 sites are not reviewed here.
+
+**The raise.** The pass writes the token `tools/unattended/check-unattended.sh:266:<date>:TOOL-dDeclaredLoop-5`,
+its date the decision row's. Above `REFUSAL_CEILINGS` it adds one comment line in the shape of
+TOOL-dTrueNorth-27's: `TOOL-dDeclaredLoop-5 RAISED the leg 264 -> 266, the census, under decision
+TOOL-dDeclaredLoop-5 (ER:388): the retirement review of check 53's two sites and the leg's
+Definition-of-Done sites found no candidate.` `ARMS_FLOORS` keeps `264:256`: a floor stops shrinking and
+lowers nothing. The arm `FA9 AC15 the leg's census holds`
+(`tools/unattended/unattended.test.sh@157293192:3265`) moves its bound from 264 to 266. That suite is
+waived under README rule 8, so its reading is owed with PLAY-dClosedLoop-13. The token's new text
+`tools/unattended/check-unattended.sh:266` is a live positional reference, so
+`memory/project/positional-refs.txt` gains the row `python tools/playbook/gov_tag.py --list-positional`
+prints for it. The `:264` row stays, because `ARMS_FLOORS` still spells it.
+
+**The decision row** lands before the pass, in the main loop's `Pass: none` records commit, as
+TOOL-dTrueNorth-28 did. `cmd_check` refuses a token whose id no `memory/DECISIONS.md` row carries
+(`tools/memory-tree/check-arms.py#check_id_carried`). `--dispatch` refuses a pass that declares a path
+in `.unattended.conf`'s `SHARED_RECORDS`, and that list holds `memory/DECISIONS.md`. The pass does not
+edit the file. The id is the unit's own, as `TOOL-aSmoothedDispatch-2` was for unit 2's refusal, so
+the run mints no id. The row names its precedent, the older row that check 27 ranks as a near match:
+
+```markdown
+- **TOOL-dDeclaredLoop-5** - **the unattended leg's refusal ceiling rises 264 -> 266 for unit 5's check 53, the two refusals that grade each Definition-of-Done entry's witness class, under TOOL-aSparedSpawn-14's rule, as TOOL-dTrueNorth-28 raised the driver's 319 -> 323**: agent, <date>, under ER:388 (PLAY-dClosedLoop-6). Detail `builds/dDeclaredLoop/`.
+```
+
+The review and the raise are recorded in the pass's deviation record with its `**Surface:**`
+(`REFUSAL_CEILINGS` in `.memory-tree.conf`, its token for the leg) and `**Reason:**`. The decision row
+does not carry them.
+
 ### Inventory
 
 Minted: `[witnesses]` with keys `classes` and `refused`; `[[witness-alias]]` with keys `word` and
 `means`; the `witness` inline table on a `[[step]]` row with keys `class` and `by`; in
 `tools/loop/loop_lib.py` the functions `read_witness_classes`, `check_witness_classes`,
-`check_alias_rows`, `resolve_alias`, `check_actor_list`, `read_actor_base` and
-`check_site_witnesses`, the constant `DECLARATION_SITES`, the flag `--grade-site` and the seven
-plants of §4 The checks; `tools/loop/actor-witnesses.txt`; check 53. Naming cells: each function is
-asked of `python tools/lexicon/lexicon.py --suggest <name> --as py.function` at the pass.
+`check_alias_rows`, `resolve_alias`, `check_actor_list`, `read_actor_base`,
+`check_site_witnesses` and `read_actor_rows`, the constants `DECLARATION_SITES` and `ACTOR_LIST`, the
+flag `--grade-site` and the seven plants of §4 The checks; `tools/loop/actor-witnesses.txt`; check 53.
+`ACTOR_LIST` is the list's file name, `"actor-witnesses.txt"`, which both the base read and the
+working read join. `read_actor_rows(kit_dir)` returns the list's non-blank lines in `kit_dir`, read
+with `encoding="utf-8"`, and raises `LoopError` naming the path when the file cannot be read.
+`check_site_witnesses` and `--check` both call it, so the list has one reader. Naming cells: each
+function is asked of `python tools/lexicon/lexicon.py --suggest <name> --as py.function` at the pass.
+`read_actor_rows` answered OK on 2026-11-14. The lexicon declares no `py.constant` cell, so no
+constant is asked.
 
 ### Migration
 
@@ -257,9 +323,14 @@ Live at landing, in the same close as TOOL-dDeclaredLoop-41 (§8 F6).
 - `tools/unattended/kit.toml`
 - `tools/gate-legs.json`
 - `tools/govkit/usage.toml`
+- `tools/unattended/unattended.test.sh`
 - `help/loop.md`
+- `.memory-tree.conf`
+- `memory/project/positional-refs.txt`
 - `memory/guides/SESSION-KICKOFF.md`
 - `memory/map/generated/symbols.json`
+- `memory/DECISIONS.md`: written by the main loop in a `Pass: none` records commit before the pass, never
+  by the pass (§4 The leg's refusal ceiling)
 
 ### Alternatives rejected
 
@@ -276,6 +347,8 @@ Live at landing, in the same close as TOOL-dDeclaredLoop-41 (§8 F6).
   `resolve_kit_dir`, so one resolver copy serves both.
 - **Witness grading inside `check_loop`**: every reader of `load_loop` would grade it, and the
   playbook kit's drive fixture writes steps with no witness (§5 testing).
+- **Retiring two of the leg's sites, or grading the declaration sites in the loop kit's leg**, in
+  place of the ceiling raise: §8 F7 (b) and (c).
 
 ## 5. Production-readiness checklist
 
@@ -310,7 +383,9 @@ Live at landing, in the same close as TOOL-dDeclaredLoop-41 (§8 F6).
     '*.test.sh'` lists the candidates, 8 files at HEAD `0d9bdeb4` (PINNED); a suite that runs the leg
     unscoped is seeded the same way. They are waived for this build (README rule 8);
   - `harness arms (fail branches armed or pinned)`: check 53's two `fail` sites each get a positive
-    arm in `check-unattended.test.sh`, since the sidecar pin file is shrink-only;
+    arm in `check-unattended.test.sh`, since the sidecar pin file is shrink-only. The leg's census
+    becomes 266, and its `REFUSAL_CEILINGS` token reads 266 under the decision row that lands first
+    (§4 The leg's refusal ceiling). Without that row, `cmd_check` reds on the census and on the id;
   - `python resolver (behaviour + inline parity + idiom ban)`: `loop_lib.py`'s `resolve_kit_dir`
     copy is byte-identical to `tools/lib/resolve_kit_dir.py`;
   - `govkit selfcheck`: the `loop definition` row in `tools/gate-legs.json` and the loop kit's
@@ -318,8 +393,10 @@ Live at landing, in the same close as TOOL-dDeclaredLoop-41 (§8 F6).
     compare base and a green cached on a tree must not outlive a moved base;
   - `docs`: the new fingerprint of the usage row is written into `help/loop.md`'s anchor, read from
     `python tools/govkit/docs_leg.py --fingerprints`;
-  - `kickoff-manifest ratchet`: `tools/gate-legs.json` is a watched path, so `last-audit` in
-    `memory/guides/SESSION-KICKOFF.md` is re-stamped with the change;
+  - `kickoff-manifest ratchet`: `tools/gate-legs.json` and `.memory-tree.conf` are watched paths, so
+    `last-audit` in `memory/guides/SESSION-KICKOFF.md` is re-stamped with the change;
+  - `positional (the citation check alone)`: the token's new `tools/unattended/check-unattended.sh:266`
+    is listed in `memory/project/positional-refs.txt`;
   - `codebase-map coverage + freshness`: `python tools/codebase-map/gen_map.py --write` re-renders the
     generated map; the feature dossier's glob already claims every path under the loop kit;
   - `install-prefix (shipped surface)`: a shipped file and every message spell the tool root
@@ -376,13 +453,21 @@ Live at landing, in the same close as TOOL-dDeclaredLoop-41 (§8 F6).
   Red when: the usage row gains `--grade-site=` and the anchor keeps `9755b4d6`, the fingerprint at
   HEAD `0d9bdeb4`.
   figure: the fingerprint is DERIVED by the command; `9755b4d6` is PINNED, read 2026-11-14.
+- **AC9** — When `grep -cE '(^|[^a-zA-Z_])fail [0-9]+ "' tools/unattended/check-unattended.sh` runs, it
+  prints 266. `grep -oE 'tools/unattended/check-unattended\.sh:[0-9]+:[0-9-]+:TOOL-dDeclaredLoop-5'
+  .memory-tree.conf` prints one token whose count is 266. `grep -c '^- \*\*TOOL-dDeclaredLoop-5\*\*'
+  memory/DECISIONS.md` prints 1.
+  Red when: check 53 lands with the leg's token still at 264, or naming an id no decision row
+  carries. The census then stands above its ceiling with no ruling.
+  figure: 264 is PINNED, the census and the ceiling at HEAD `157293192`, read 2026-11-14; 266 is
+  DERIVED, 264 plus check 53's two sites.
 
 ## 7. Gates
 
 The pass adds no leg: the loop checks run under TOOL-dDeclaredLoop-1's `loop definition` leg, and
 check 53 under the unattended kit's gate.
 
-`loop definition` · `unattended kit gate` · `unattended skill wiring` · `pass-order history` · `brief-recorded` · `harness arms (fail branches armed or pinned)` · `python resolver (behaviour + inline parity + idiom ban)` · `govkit selfcheck` · `govkit selftest` · `docs` · `help page commands` · `kickoff-manifest ratchet` · `codebase-map coverage + freshness` · `install-prefix (shipped surface)` · `encoding posture (text IO names its encoding)` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `roles adopter self-test` · `scratch-guard self-test` · `tier2-review self-test` · `recall floor` · `recall floor arms` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit refusal join` · `govkit acceptance matrix` · `policy fixtures` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`loop definition` · `unattended kit gate` · `unattended skill wiring` · `pass-order history` · `brief-recorded` · `harness arms (fail branches armed or pinned)` · `python resolver (behaviour + inline parity + idiom ban)` · `govkit selfcheck` · `govkit selftest` · `docs` · `help page commands` · `kickoff-manifest ratchet` · `positional (the citation check alone)` · `kit/dogfood doc parity` · `transition-audit arms` · `straggler-guard arms` · `codebase-map coverage + freshness` · `install-prefix (shipped surface)` · `encoding posture (text IO names its encoding)` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `roles adopter self-test` · `scratch-guard self-test` · `tier2-review self-test` · `recall floor` · `recall floor arms` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit refusal join` · `govkit acceptance matrix` · `policy fixtures` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/loop/loop_lib.py · covers AC1 AC2 AC3 · the `loop definition` leg's fixture plants, the failing case staged by the `witness-actor-unlisted` plant · none
 New arm: tools/unattended/check-unattended.test.sh · covers AC7 · check 53's two branches, the failing cases staged by an unclassed entry in the suite's `mkconf` and by a tree with no loop kit beside the copy · none
@@ -391,6 +476,9 @@ What these do not check. The unattended kit gate is held off every automatic bar
 only reader of `DOD_CORE` against the list, runs on demand; the `loop definition` leg never sees
 `DOD_CORE`. The second arm is written and not run in this build, under README rule 8; its RED and
 GREEN reading is owed with PLAY-dClosedLoop-13. Nothing grades that a `by` text is true.
+`harness arms` reads a decision row's presence and never whether that row decided 266. Its population
+is `*.sh`, so the refusals `loop_lib.py` adds sit under no budget. The leg's floor stays `264:256`, so
+the floor alone would pass a later removal of check 53's two sites.
 
 ## 8. Open questions
 
@@ -437,6 +525,34 @@ GREEN reading is owed with PLAY-dClosedLoop-13. Nothing grades that a `by` text 
   - Recommendation: (a). The body is written on it (S3, AC3, §4 Rollout).
   RESOLVED (agent, 2026-11-14, delegated): (a), rung 3: the build run lands every carried unit at
   one close, and 41's contract stands unrevised. widens: none · relaxes: none
+- **F7 — The leg's refusal census is at its ceiling, 264, and check 53 adds two sites. What holds the
+  `harness arms` leg green?** The first dispatch built rev-4, then restored it and returned this
+  divergence (`build/2026-11-14-build-TOOL-dDeclaredLoop-5-1-builder-return.md`). The conf's comment
+  above `REFUSAL_CEILINGS` names no row a run may raise, so moving a ceiling is a governance-carrier
+  change (`memory/guides/BUILD-METHOD.md`, M3, veto 2).
+  - (a) Run the retirement review, then raise 264 to 266 under the decision row `TOOL-dDeclaredLoop-5`.
+    The row lands ahead of the pass, as TOOL-dTrueNorth-27 raised the driver's ceiling under
+    TOOL-dTrueNorth-28. Every refusal and the clause stay whole. It changes `REFUSAL_CEILINGS` and adds
+    a decision row.
+  - (b) Retire or consolidate two of the leg's sites. The review in §4 finds none that is a candidate
+    as the tree stands. The nearest pair becomes redundant only by rewriting fail 1, which reaches
+    `PHASES_CORE` and is a second mechanism (M2). Each retired row is still a decision row, plus a
+    `memory/project/refusal-retirements.txt` row and rewritten armed messages: more governance change
+    than (a).
+  - (c) Grade the declaration sites in the loop kit's own leg. The clause states the rule and names no
+    place, so it allows this. Here `loop_lib.py --check` would read `DOD_CORE` from the driver and
+    `DOD_EXTRA` from `.unattended.conf`. Those would be second readers of values that
+    `tools/unattended/check-unattended.sh#core_of` and the leg's conf read own, against the charter's
+    `[core]` rule. The loop kit would then depend on the unattended kit, reversing F4's edge. And
+    `tools/memory-tree/check-arms.py#discover` reads `*.sh` only, so the refusals would leave the
+    budget rather than pass its review. A new unattended shell script is an unbudgeted gate for the
+    same reason.
+  - Recommendation: (a). It keeps the clause and every refusal whole with the least governance change.
+    The body is written on it (S5, §4 The leg's refusal ceiling, AC9).
+  RESOLVED (agent, 2026-11-14, delegated): (a), rung 5. With (c) discarded on the `[core]` rule, the
+  surviving options both trip veto 2 outside the grant, and (a) is the most capable of them. It cites
+  ER:388 (`PLAY-dClosedLoop-6`) and is recorded in the pass's deviation record with `**Surface:**` and
+  `**Reason:**`. widens: REFUSAL_CEILINGS, the leg's token 264 -> 266 · relaxes: none
 
 ## 9. Revision log
 
@@ -458,6 +574,14 @@ GREEN reading is owed with PLAY-dClosedLoop-13. Nothing grades that a `by` text 
   arm is check 53, selectable by `--only 53` and armed, and the leg reads base is declared. The
   build-folder arm lands with TOOL-dDeclaredLoop-41 (F6). S6 and AC8 carry the pages and the usage
   row, and §5 names each gate the write set reaches.
+- rev-5 · 2026-11-14 · S5 · §4 The leg's refusal ceiling, Inventory, Files touched, Alternatives
+  rejected · §5 · AC9 · §7 · §8 F7 · §10 · for the divergence that
+  `2026-11-14-build-TOOL-dDeclaredLoop-5-1-builder-return` returned: check 53's two sites took the
+  leg's census past its ceiling of 264. The retirement review of check 53's sites and the leg's
+  Definition-of-Done sites finds no candidate. The token rises to 266 under the decision row
+  `TOOL-dDeclaredLoop-5`, which lands ahead of the pass (F7, ER:388). The inventory gains `ACTOR_LIST`
+  and `read_actor_rows`, which the builder needed. The scope, the carries, the order and the status
+  stand.
 
 ## 10. Reuse audit
 
@@ -466,7 +590,9 @@ read by the leg through `tools/unattended/check-unattended.sh#core_of`; the leg'
 shape (`check_selected`) and its sibling-kit call (`tools/unattended/check-unattended.sh#scan_foreign_anchors`);
 the disposition alias check in `tools/loop/loop_lib.py#check_loop`, extracted for its second table;
 and the shrink-only base, `resolve_compare_base`, canonical in `tools/lib/compare_base.py` and
-imported from `tools/memory-tree/coverage_join.py`, as `tools/playbook/edge_grammar.py#run_check` does.
+imported from `tools/memory-tree/coverage_join.py`, as `tools/playbook/edge_grammar.py#run_check` does;
+and the growth budget's own remedy, the retirement review and a dated decision on the
+`REFUSAL_CEILINGS` token, taken as TOOL-dTrueNorth-27 took it (§4 The leg's refusal ceiling).
 `python tools/codebase-map/reuse_lookup.py "classify each witness and refuse an actor-typed witness on
 a shrink-only list compared at the merge base"`, run at HEAD `0d9bdeb4`, ranked `resolve_compare_base`
 a seam with three copies, and `classify`, `read_id_list` and the playbook kit's `read_list` by name
