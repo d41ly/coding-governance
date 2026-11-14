@@ -819,6 +819,10 @@ run_planted "D6 the leg appended to an unexpanded \"\$LOG\" -> deny"        2 "$
 run_planted "D6 the leg behind python3 -m pdb -> deny"                    2 "$B" "python3 -m pdb $M_REST"
 run_planted "D6 a kept gap: a 2>&1 ahead of the flag -> allow"            0 "$B" "${M_FLAG% --selftest} 2>&1 --selftest"
 run_planted "D6 a kept gap: a glued variable prefix -> allow"             0 "$B" 'python3 ${DIR}zz-kit/planted_suite.py --selftest'
+# TOOL-aClearedLedger-14, review item L2: a quoted character glued before a `>` is an argument, as
+# bash passes it, so the leg runs with one more word: a scoped spelling, not the leg.
+run_planted "D6 a quoted & glued before a redirection is an argument -> allow"  0 "$B" "$M_FLAG '&'>x.log"
+run_planted "D6 a quoted > glued before a redirection is an argument -> allow"  0 "$B" "$M_FLAG '>'>x.log"
 F=$(build_fixture VERIFYING)
 run_planted "D6 the over-bound leg at VERIFYING -> allow"                 0 "$F" "$M_FLAG"
 build_manifest 300
@@ -864,7 +868,10 @@ n=$((pass+fail))
 # static count of the arms above at ~10% headroom, because the pass that wrote this file may not
 # run it (the hook it tests denies the invocation at BUILDING); the main loop's first green at
 # VERIFYING confirms the executed count against this floor. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=217
+FLOOR_ASSERTIONS=219
+# RAISED 217 -> 219 at TOOL-aClearedLedger-14, by the static count of the assertions it added to the
+# arm class "a manifest suite in flag form", two: a quoted `&` and a quoted `>`, each glued before a
+# redirection and kept as an argument.
 # RAISED 214 -> 217 at TOOL-aClearedLedger-13, by the static count of the assertions it added to the
 # arm class "a manifest suite in flag form", three: the leg behind `python3 -m pdb`, and the two
 # kept gaps pinned as allows, a `2>&1` ahead of the flag and a glued variable prefix.

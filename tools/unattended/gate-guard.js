@@ -65,7 +65,8 @@
  *       and reads the manifest uncommitted. The spec lint's bar join holds the same rule and reads
  *       these spellings this row does not: a redirection carrying `&`
  *       ahead of the direct-check word, a glued variable prefix (`${DIR}<script>`), a quoted
- *       mention, and a `bash -c` body inside another.
+ *       mention, a quoted operator character before a redirection (`'&'>x.log`, `'>' x.log`),
+ *       which this row keeps as an argument, and a `bash -c` body inside another.
  * A D2, D3 or D4 token is NOT a hit when the same simple command carries one of READ_ONLY_VERBS:
  * those forms answer in seconds and one of them is how the memory-tree kit re-renders its guides.
  * Row D6 does not consult them: a command carrying one is a longer spelling and misses.
@@ -365,15 +366,19 @@ function readQuotedSubstitutions(text, tool) {
  * (closing round 3, T4): pairing the outer `"` with the first `"` inside the span split
  * `msg="$(printf "%s" "run bash <suite> next")"` into an assignment word and a launcher at head.
  * Bash's rule under both tools; the span itself is read back by readQuotedSubstitutions.
- * A word also ends before an unquoted `>` or `<` once it holds anything but a redirection operator,
- * outside `${…}` (TOOL-aClearedLedger-11, narrowed by TOOL-aClearedLedger-12 so a two-character
- * operator is one word). The reader is shared, so rows D2 to D4 see a glued redirection too.
+ * A word also ends before an unquoted `>` or `<` once it holds quoting or anything but descriptor
+ * digits and operator characters, outside `${…}` (TOOL-aClearedLedger-11, narrowed by
+ * TOOL-aClearedLedger-12 so a two-character operator is one word, and by TOOL-aClearedLedger-14 so
+ * a quoted character is never part of an operator). The reader is shared, so rows D2 to D4 see a
+ * glued redirection too. It returns `quotedAt`, the offset in the word where its quoting opened,
+ * -1 for a word with none.
  */
 function readTokenAt(cmd, from, stop) {
   let i = from
   while (i < stop && /\s/.test(cmd[i])) i++
   let out = ''
   let quote = ''
+  let quotedAt = -1   // where in `out` the word's first quote opened; -1 for a word with none
   let brace = false   // inside a `${…}` — its braces are the token's, not grouping (round 2, R4)
   while (i < stop) {
     const ch = cmd[i]
@@ -391,6 +396,7 @@ function readTokenAt(cmd, from, stop) {
       } else out += ch
     } else if (ch === "'" || ch === '"') {
       quote = ch
+      if (quotedAt < 0) quotedAt = out.length
     } else if (ch === '{' && cmd[i - 1] === '$') {
       brace = true
       out += ch
@@ -399,18 +405,20 @@ function readTokenAt(cmd, from, stop) {
       out += ch
     } else if (/[\s;|&(){}`]/.test(ch)) {
       break
-    } else if ((ch === '>' || ch === '<') && !brace && out !== '' && !/^(?:\d*|&)[<>]*$/.test(out)) {
+    } else if ((ch === '>' || ch === '<') && !brace && out !== '' && (quotedAt >= 0 || !/^\d*[<>]*$/.test(out))) {
       // A glued redirection ends the word (TOOL-aClearedLedger-11): `x.py --selftest>x.log` is the
-      // flag and then a redirection word. While the word so far is itself a redirection operator,
-      // the prefix REDIRECT_RE reads, it is read on (TOOL-aClearedLedger-12): `>>`, `2>>` and `<<<`
-      // stay one word, so REDIRECT_RE drops the operator with its target, glued or spaced.
+      // flag and then a redirection word. While the word so far is unquoted descriptor digits and
+      // operator characters, it is read on (TOOL-aClearedLedger-12): `>>`, `2>>` and `<<<` stay one
+      // word, so REDIRECT_RE drops the operator with its target, glued or spaced. A word holding
+      // quoting ends here, as bash ends it: `'&'>x.log` and `'>'>x.log` are an argument and then
+      // a redirection (TOOL-aClearedLedger-14).
       break
     } else {
       out += ch
     }
     i++
   }
-  return { text: out, end: i }
+  return { text: out, end: i, quotedAt }
 }
 
 /**
@@ -421,6 +429,9 @@ function readTokenAt(cmd, from, stop) {
  * whose view is all blank while its text is not can only be a heredoc body — a quoted string keeps
  * its quote marks — and is skipped whole; without that the body of `python - <<EOF` would be read
  * as commands, which is exactly what the view exists to prevent.
+ *
+ * Each token array carries a parallel array `quotedAt` as a property, each word's quoting offset
+ * from readTokenAt; a word that unquotes to empty is kept by that fact (TOOL-aClearedLedger-14).
  */
 function scanSegments(cmd, view) {
   const out = []
@@ -429,15 +440,17 @@ function scanSegments(cmd, view) {
     if (e <= s) return
     if (/\S/.test(cmd.slice(s, e)) && !/\S/.test(view.slice(s, e))) return
     const toks = []
+    const quotedAt = []
     let at = s
     while (at < e) {
       const t = readTokenAt(cmd, at, e)
       if (t.end <= at) break
-      if (t.text !== '' || /["']/.test(cmd.slice(at, t.end))) toks.push(t.text)
+      if (t.text !== '' || t.quotedAt >= 0) { toks.push(t.text); quotedAt.push(t.quotedAt) }
       at = t.end
     }
     // `then`, `do` and `else` open a command position; drop them so the word after is the head.
-    while (toks.length && /^(then|do|else)$/.test(toks[0])) toks.shift()
+    while (toks.length && /^(then|do|else)$/.test(toks[0])) { toks.shift(); quotedAt.shift() }
+    toks.quotedAt = quotedAt
     if (toks.length) out.push(toks)
   }
   let brace = false   // `${…}` is one word, not a group (round 2, R4); readTokenAt agrees
@@ -491,7 +504,10 @@ function resolveFileRow(tok) {
  * launcher words included, with redirections taken out (TOOL-aClearedLedger-11: the head the
  * grammar resolved is not what names the script, and a segment it left with no head, behind
  * `python -m` say, is a candidate too). A redirection is a word to scanSegments, so `> x.log` and
- * `2>` would otherwise be compared as arguments. Both recursions hand the array on.
+ * `2>` would otherwise be compared as arguments. A word whose quoting opens inside the operator
+ * REDIRECT_RE matches, `'&'` or `'>'` say, is a word and not a redirection, as bash reads it; a
+ * quote opening after the operator, `2>"x.log"`, leaves it one (TOOL-aClearedLedger-14). Both
+ * recursions hand the array on.
  */
 function scanDenyHits(cmd, view, depth, tool, candidates) {
   depth = depth || 0
@@ -601,8 +617,9 @@ function scanDenyHits(cmd, view, depth, tool, candidates) {
     if (candidates && !cls) {
       const words = []
       for (let j = 0; j < toks.length; j++) {
+        const q = toks.quotedAt[j]
         const redir = REDIRECT_RE.exec(toks[j])
-        if (!redir) words.push(toks[j])
+        if (!redir || (q >= 0 && q < redir[0].length)) words.push(toks[j])   // quoting inside the operator: a word
         else if (redir[0] === toks[j]) j++   // a bare operator: its target is the next word
       }
       if (words.some((w) => DIRECT_CHECK_WORDS.includes(w))) candidates.push({ words })

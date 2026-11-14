@@ -125,7 +125,9 @@ so the script and its word fall into two commands though bash runs the suite; a 
 manifest does not declare, or declares in another chunk, is not seen, and the manifest is read
 uncommitted. The spec lint's bar join holds the same rule, and reads these spellings the hook does
 not: a redirection carrying `&` ahead of the direct-check word, a glued variable prefix
-(`${DIR}<script>`), a quoted mention, and a `bash -c` body inside another. The
+(`${DIR}<script>`), a quoted mention, a quoted operator character before a redirection
+(`'&'>x.log`, `'>' x.log`), which this row keeps as an argument, and a `bash -c` body inside
+another. The
 read-only verbs — `--list`, `--check`, `--rank`, `--help`, `--render` — pass, the
 plain bar passes, and a quoted mention of any shape is invisible. It keys the record to the branch
 through the `run-branch:` fact `--preflight` writes on both anchors (protocol fact 13), falling

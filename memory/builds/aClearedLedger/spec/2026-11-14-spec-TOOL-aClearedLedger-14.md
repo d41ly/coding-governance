@@ -1,11 +1,12 @@
 # TOOL-aClearedLedger-14 — the gate guard never reads a quoted character as a redirection operator, and the frozen quoted-read regex is restated whole
 
-**Status:** INPROGRESS · rev-2 · 2026-11-14 · node a · Tier-2 · base 8db6f4be · streams tooling · order 14 · ratified 2026-11-14
+**Status:** CLOSED · rev-2 · 2026-11-14 · node a · Tier-2 · base 8db6f4be · streams tooling · order 14 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-14-build-TOOL-aClearedLedger-14-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aClearedLedger-14-1-acceptance-ledger.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aClearedLedger-14-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aClearedLedger-14-1-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aClearedLedger-14-brief.md](../prompts/2026-11-14-prompt-TOOL-aClearedLedger-14-brief.md) | research | — |
 
