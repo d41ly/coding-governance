@@ -349,6 +349,19 @@ verb = "check"
 flags = ["--selftest"]
 
 [[usage]]
+id = "script:{prefix}/loop/loop_parents.py"
+shape = "verb"
+entry = "{prefix}/loop/loop_parents.py"
+flags = ["--selftest", "--fixture", "--plant=", "--value=", "--state="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_parents.py#route"
+shape = "verb"
+entry = "{prefix}/loop/loop_parents.py"
+verb = "route"
+flags = ["--build=", "--state=", "--root="]
+
+[[usage]]
 id = "script:{prefix}/loop/adopt-loop.sh"
 shape = "verb"
 entry = "{prefix}/loop/adopt-loop.sh"

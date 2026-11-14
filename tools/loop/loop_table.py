@@ -8,13 +8,16 @@
 The loop definition beside this file holds `[states]`, each level's open states, and one `[[transition]]`
 row per move of the build, feature and unit tables: its `level`, `from` (states, `none` for the level's
 entry, or `@open`), the `item` whose `outcome` fires it, by tag, its `to` (a state, `@prior` or
-`@reentry`), its `witness`, and optionally a `disposition` and `when = "before-push"`. `[[stand-in]]`
-names the owner of each row item whose owning build has not landed, and `[[owed-row]]` each cross-step
-route whose build row another unit or build writes. `read_transition_rows` and `read_stand_ins` read
-them from a parsed definition, so a plant is made in memory.
+`@reentry`), its `witness`, and optionally a `disposition` and `when = "before-push"`. `[states]`'s
+`terminal` key is no level: it lists the build level's terminal states (TOOL-dDeclaredLoop-15), which a
+build row may enter and no row may leave. `[[stand-in]]` names the owner of each row item whose owning
+build has not landed, and `[[owed-row]]` each cross-step route whose build row another unit or build
+writes. `read_transition_rows` and `read_stand_ins` read them from a parsed definition, so a plant is
+made in memory.
 
 `derive_move` answers a move from the rows alone: the matching row and its resolved `to`, or
-`TransitionRefused` naming the level, state, item and outcome. The match is exact on the level, the state
+`TransitionRefused` naming the level, state, item and outcome, as it does for any move asked from a
+build terminal. The match is exact on the level, the state
 in the row's expanded `from`, the item, the outcome, and the `disposition` fact where the row declares
 one; a `before-push` row matches only with the `pushed` fact `no`. `@prior` takes the `prior` fact, an
 open state of the level, and `@reentry` the state of the step whose item the `reenters` fact names. An
@@ -24,7 +27,9 @@ ValueError, never a default.
 `move` prints `move — <level> · <from> → <to> · <item>`, with `· stand-in <owner>` after it where the
 item is a stand-in, and exits 0; `refused — <level> · <from> · <item> · <outcome>: no row`, exit 1; and
 `unanswered — <level> · <from> · <item> · <outcome>: <why>`, exit 2, on a ValueError. `check` prints one
-`loop: table <level> · <n> row(s) · <m> state(s)` line per level, one `loop: owed <item> · <outcome> ·
+`loop: table <level> · <n> row(s) · <m> state(s)` line per level, then `loop: terminal build · <states>`,
+and refuses a row whose `from` names a terminal and a terminal also listed among the build's open
+states, the refusal that keeps `@open` off a terminal. It prints one `loop: owed <item> · <outcome> ·
 <by>` line per owed row, one `loop: stand-in <item> · <owner>` line per stand-in, and each refusal as
 `loop: refused · ...`, exit 1. Both exit 2 where the definition does not read or holds no
 `[[transition]]` row, never admitting a move. `--fixture --plant <case>` runs `check` with one break of
@@ -41,7 +46,8 @@ stands on the owed list.
 WHAT THIS DOES NOT CHECK: whether a witness holds; whether a stand-in's owner has landed; that every row
 item owned by an unlanded build has a stand-in row; reachability, termination and counted edges; the
 feature rows' last-unit rule; the routes of the feature and unit rows, which the join reads for the build
-table alone; that an owed row's `by` names a real unit or build.
+table alone; that an owed row's `by` names a real unit or build; that every terminal is entered by a row,
+which four are not yet.
 """
 import argparse
 import pathlib
@@ -66,6 +72,8 @@ ANY_ITEM = "@any"
 DYNAMIC_TO = ("@prior", "@reentry")
 #: A row's `when`: it holds only while the build's landing is unpushed.
 BEFORE_PUSH = "before-push"
+#: The `[states]` key listing the build level's terminal states, read beside the levels and never as one.
+TERMINAL = "terminal"
 #: A row item: `item.<seg>.<seg>`.
 ITEM_TAG = re.compile(r"item\.%s\.%s" % (SEG.pattern, SEG.pattern))
 #: A `[[transition]]` row's required keys.
@@ -80,7 +88,9 @@ PLANTS = {"bad-state": ("a unit row entering reviewing, no unit state", "reviewi
                            "item.build.acceptance"),
           "owed-stale": ("an owed row for item.build.exit's recorded, which B7 covers", "owed-row item.build.exit"),
           "stand-in": ("a stand-in row for item.plan.input, which no row names, and item.design.exit's "
-                       "owner set to dRankedPlan", "item.plan.input")}
+                       "owner set to dRankedPlan", "item.plan.input"),
+          "terminal-from": ("a build row whose from is landed", "leaves landed, a terminal"),
+          "terminal-open": ("landed appended to the build's open states", "landed is both")}
 
 
 class TransitionRefused(Exception):
@@ -91,15 +101,17 @@ class TransitionRefused(Exception):
 
 
 def read_transition_rows(data, where):
-    """`{"states": {level: [states]}, "transition": [rows], "owed-row": [rows], "item-states": {item tag:
-    its step's state}}` of a parsed definition, the rows ungraded; LoopError for a `[states]` that is no
-    table of non-empty lists of words, or a `transition` or `owed-row` table that is no array of tables."""
+    """`{"states": {level: [states]}, "terminal": [states], "transition": [rows], "owed-row": [rows],
+    "item-states": {item tag: its step's state}}` of a parsed definition, the rows ungraded. `[states]`'s
+    `terminal` key is split out as the build level's terminal states, never a level, absent reading as
+    none. LoopError for a `[states]` that is no table of non-empty lists of words, `terminal` included,
+    or a `transition` or `owed-row` table that is no array of tables."""
     states = data.get("states", {})
     if not isinstance(states, dict) or not all(
             isinstance(v, list) and v and all(isinstance(s, str) and SEG.fullmatch(s) for s in v)
             for v in states.values()):
         raise LoopError(where, "'states' is not a table of levels, each a non-empty list of state words")
-    out = {"states": states}
+    out = {"states": {k: v for k, v in states.items() if k != TERMINAL}, "terminal": states.get(TERMINAL, [])}
     for table in ("transition", "owed-row"):
         rows = data.get(table, [])
         if not isinstance(rows, list) or not all(isinstance(r, dict) for r in rows):
@@ -128,6 +140,8 @@ def derive_move(level, state, item, outcome, facts, tables=None):
     states = tables["states"]
     if level not in states:
         raise ValueError("the level %s is none of %s" % (level, " ".join(states)))
+    if level == "build" and state in tables["terminal"]:
+        raise TransitionRefused(level, state, item, outcome)  # no row leaves a terminal
     if state != ENTRY and state not in states[level]:
         raise ValueError("the state %s is no %s state, nor %s: %s" % (state, level, ENTRY, " ".join(states[level])))
     hits = []
@@ -170,7 +184,7 @@ def check_transition_tables(data, where, items):
     `[[item]]` rows. LoopError where a table does not read."""
     t, stand = read_transition_rows(data, where), read_stand_ins(data, where)
     loop = check_loop(data, where)
-    members, states = loop["dispositions"], t["states"]
+    members, states, terminal = loop["dispositions"], t["states"], t["terminal"]
     declared = {r.get("tag"): r for r in items}
     sets = {tag: derive_outcome_set(r, members, where) for tag, r in declared.items()}
     stand_owner = {r.get("item"): r.get("owner") for r in stand}
@@ -188,9 +202,11 @@ def check_transition_tables(data, where, items):
             refusals.append("%s names the level %s, which [states] does not declare" % (at, level))
             continue
         for s in src:
-            if s not in (ENTRY, OPEN) and s not in states[level]:
+            if s in terminal:
+                refusals.append("%s leaves %s, a terminal: no move leaves one" % (at, s))
+            elif s not in (ENTRY, OPEN) and s not in states[level]:
                 refusals.append("%s leaves %s, no %s state" % (at, s, level))
-        if to not in states[level] and to not in DYNAMIC_TO:
+        if to not in states[level] and to not in DYNAMIC_TO and not (level == "build" and to in terminal):
             refusals.append("%s enters %s, no %s state nor %s" % (at, to, level, " ".join(DYNAMIC_TO)))
         if item == ANY_ITEM:
             if to != "@reentry":
@@ -218,6 +234,11 @@ def check_transition_tables(data, where, items):
     for level, words in states.items():
         lines.append("%s: table %s · %d row(s) · %d state(s)" % (
             SAY, level, sum(1 for r in t["transition"] if r.get("level") == level), len(words)))
+    if terminal:
+        lines.append("%s: terminal build · %s" % (SAY, " ".join(terminal)))
+    for s in terminal:
+        if s in states.get("build", []):
+            refusals.append("%s is both an open build state and a terminal" % s)
     # S7, the route join over the build table, both ways
     cross = {}
     for tag, r in declared.items():
@@ -302,6 +323,11 @@ def write_table_plant(case, data):
     elif case == "stand-in":
         data["stand-in"].append({"item": "item.plan.input", "owner": "dRankedPlan"})
         next(r for r in data["stand-in"] if r.get("item") == "item.design.exit")["owner"] = "dRankedPlan"
+    elif case == "terminal-from":
+        rows.append({"level": "build", "from": ["landed"], "item": "item.life.request", "outcome": "resume",
+                     "to": "@prior", "witness": "planted"})
+    elif case == "terminal-open":
+        data["states"]["build"].append("landed")
 
 
 def main(argv):
@@ -327,7 +353,10 @@ def main(argv):
     if args.verb == "check" and args.selftest:
         move = ["move", "--level", "build", "--from"]
         cases = [("check", ["check"], 0, "%s: table build" % SAY, ""),
-                 ("owed close", ["check"], 0, "%s: owed item.deploy.close · closed · TOOL-dDeclaredLoop-15" % SAY, "")]
+                 ("terminal", ["check"], 0, "%s: terminal build · landed withdrawn superseded incomplete deferred "
+                                            "retired refused merged answered" % SAY, ""),
+                 ("owed place", ["check"], 0, "%s: owed item.plan.place · unplaced · dRankedPlan" % SAY, ""),
+                 ("stand-in close", ["check"], 0, "%s: stand-in item.life.close · dWellOiledMachine" % SAY, "")]
         cases += [(p, ["--fixture", "--plant", p], 1, "%s: refused · " % SAY, PLANTS[p][1]) for p in PLANTS]
         cases += [("move by order", move + ["planning", "--item", "item.design.exit", "--outcome", "recorded"], 1,
                    "refused — build · planning · item.design.exit · recorded", "no row"),
@@ -345,7 +374,19 @@ def main(argv):
                   ("move no pushed", move + ["building", "--item", "@any", "--outcome", "admitted", "--fact",
                                              "reenters=item.plan.input"], 2, "unanswered — ", "pushed"),
                   ("move stand-in", move + ["planning", "--item", "item.plan.exit", "--outcome", "recorded"], 0,
-                   "move — build · planning → designing · item.plan.exit", "stand-in dRankedPlan")]
+                   "move — build · planning → designing · item.plan.exit", "stand-in dRankedPlan"),
+                  ("move landed", move + ["deploying", "--item", "item.deploy.close", "--outcome", "closed"], 0,
+                   "move — build · deploying → landed · item.deploy.close · stand-in dShippedRelease", ""),
+                  ("move refused", move + ["planning", "--item", "item.plan.triage-judge", "--outcome", "refuse"], 0,
+                   "move — build · planning → refused", ""),
+                  ("move withdrawn", move + ["building", "--item", "item.life.close", "--outcome", "withdrawn",
+                                             "--fact", "pushed=no"], 0, "move — build · building → withdrawn", ""),
+                  ("move withdrawn pushed", move + ["building", "--item", "item.life.close", "--outcome", "withdrawn",
+                                                    "--fact", "pushed=yes"], 1, "refused — ", ""),
+                  ("move parent", move + ["designing", "--item", "item.deploy.parents", "--outcome", "withdrawn"], 0,
+                   "move — build · designing → planning · item.deploy.parents", ""),
+                  ("move from terminal", move + ["landed", "--item", "item.life.request", "--outcome", "resume",
+                                                 "--fact", "prior=testing"], 1, "refused — build · landed", "")]
         return run_selftest_cases(main, cases, "%s: table selftest" % SAY)
     try:
         data, where = read_definition(KIT)

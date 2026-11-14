@@ -261,6 +261,7 @@ feature and unit, as `[[transition]]` rows, and the states of each level in `[st
 build = ["planning", "designing", "building", "testing", "deploying", "paused", "parked"]
 feature = ["decomposed", "designed", "built", "tested", "deployed"]
 unit = ["designed", "built", "tested", "deployed"]
+terminal = ["landed", "withdrawn", "superseded", "incomplete", "deferred", "retired", "refused", "merged", "answered"]
 
 [[transition]]
 level = "build"           # build, feature or unit
@@ -274,7 +275,19 @@ witness = "the transition record"
 ```
 
 A row names its item by tag, never by a position; `check` prints each table's row and state counts.
-No row enters a terminal state such as landed or refused yet: those rows belong to a later unit.
+
+`terminal` is not a level. It lists a build's terminal states, where a build ends: a build row may
+enter one, and no row may leave one, so a move asked from landed is refused. Five rows enter one
+today: triage's refuse enters refused, the Deploy exit's closed enters landed, and the owner's request
+to close the build, withdrawn or superseded, enters that state from any open state while the landing
+is unpushed. The close request has no item row of its own yet, so it is a stand-in:
+
+```text
+item.life.close · withdrawn → withdrawn · superseded → superseded · stand-in dWellOiledMachine
+```
+
+No row enters incomplete, deferred, retired, merged or answered yet: those rows belong to later units
+and builds.
 
 - **Ask for a move:** `python tools/loop/loop_table.py move --level build --from planning --item item.plan.exit --outcome recorded` <!-- usage: script:tools/loop/loop_table.py#move a9f6141c -->
   answers from the rows alone, with one of three answers:
@@ -304,8 +317,9 @@ No row enters a terminal state such as landed or refused yet: those rows belong 
   ```
 
 - **Check the tables:** `check` prints one `loop: table` line per level with its row and state <!-- usage: script:tools/loop/loop_table.py#check 0011b11d -->
-  counts, one `loop: owed` line per owed row and one `loop: stand-in` line per stand-in, and exits
-  0. It exits 1, naming the row, on a state the level does not declare, two rows for one move, an
+  counts, a `loop: terminal build` line naming the terminal states, one `loop: owed` line per owed
+  row and one `loop: stand-in` line per stand-in, and exits 0. It exits 1, naming the row, on a row
+  leaving a terminal, a terminal also listed as an open state, a state the level does not declare, two rows for one move, an
   item that is no tag or resolves to nothing, an outcome outside its item's set, or a disposition
   outside the set. It also joins every item's cross-step routes, an outcome sent to `transition` or
   to an item of another step, with the build table both ways: a route with no row, a row on no
@@ -314,8 +328,8 @@ No row enters a terminal state such as landed or refused yet: those rows belong 
   runs `check`, every case below and each kind of answer, and the `loop transition tables` gate
   runs it on every push and landing.
 
-- **The owed rows:** some cross-step routes enter states other units' rows write, such as the Deploy
-  exit, which enters landed. Each stands on an `[[owed-row]]` naming its item, outcome and the unit or
+- **The owed rows:** some cross-step routes enter states other units' or builds' rows write, such as
+  placement's unplaced. Each stands on an `[[owed-row]]` naming its item, outcome and the unit or
   build that writes the row, and `check` prints it. The list only shrinks: once a row covers a route,
   its owed row is refused as stale until it is deleted.
 
@@ -329,12 +343,73 @@ No row enters a terminal state such as landed or refused yet: those rows belong 
   second row for building's exit), `bad-exit` (rows naming the bare plan.exit, an undeclared item and
   an outcome outside the item's set), `dropped-row` (the building exit's row deleted while its route
   stays), `unrouted-row` (a row on an outcome routed inside its own step), `owed-stale` (an owed row a
-  build row covers) and `stand-in` (a stale and a mis-owned stand-in row). The files on disk are never
-  changed.
+  build row covers), `stand-in` (a stale and a mis-owned stand-in row), `terminal-from` (a row leaving
+  landed) and `terminal-open` (landed added to the open states). The files on disk are never changed.
 
 The tables do not judge whether a move's witness holds, which is the writer's precondition, or
 whether a state is reachable or a cycle terminates. The feature and unit rows are not joined to the
 routes, and a feature's state, its least-advanced unit's, is the mover's call.
+
+## When a parent build is withdrawn
+
+A build whose README front matter names `parents:` depends on them. When a parent is withdrawn, the
+policy key `deps.on-parent-withdrawn` says what the dependent build does, and the loop kit answers it
+as a route. Until a parent's withdrawal is posted, a parent reads withdrawn when its run-state file,
+`RUN.md` in its build folder, holds the run fact `phase: ABORTED`; a parent with no run-state file
+reads live.
+
+- **`replan`**, the default: the build goes back to planning by the parent row, which moves a build in
+  designing, building or deploying on `item.deploy.parents`'s withdrawn.
+- **`adopt-parent-work`**: the same move, and the route names each withdrawn parent's kept branch tip,
+  the commit its `run-branch:` fact names, else `branch-ref:`, as the input your design inventory takes
+  the parent's kept units from. A parent with neither fact, or a ref naming no commit, exits 2
+  `no kept branch`.
+- **`withdraw-too`**: the route proposes the build's withdrawal to you as an owner item and moves
+  nothing. Only your disposition record withdraws it.
+
+In testing or planning, which the parent row does not admit, the route answers `held` and the build
+waits for its next row.
+
+- **Ask for the route:** `python tools/loop/loop_parents.py route --build <slug> --state <state>` <!-- usage: script:tools/loop/loop_parents.py#route c1e3f183 -->
+  reads the build's parents in the repository at `--root`, the current directory by default, and the
+  policy value at the landed revision, and prints one answer. It writes nothing: you record the move,
+  or file the owner item, yourself.
+
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
+  ```bash
+  python tools/loop/loop_parents.py route --build tChild --state designing
+  ```
+
+  ```text
+  route replan · parent tParent · move designing → planning · item.deploy.parents
+  route adopt-parent-work · parent tParent · move designing → planning · item.deploy.parents
+  inventory tParent <sha>
+  route withdraw-too · parent tParent · owner-item · propose item.life.close withdrawn · left by record-kind.disposition
+  route replan · parent tParent · held: testing admits no parent row
+  route none
+  ```
+
+  It prints `route none` when no parent reads withdrawn or the README has no `parents:` key. It exits
+  2 on a `parents:` slug naming no build folder, a state outside the build's open states, a policy
+  value outside the key's set, or no kept branch, and 2 `unarmed` where the policy kit is not
+  installed beside the loop kit, never falling back to a default.
+
+- **See it on a scratch repository:** `--fixture --plant <case>` builds a scratch repository holding a <!-- usage: script:tools/loop/loop_parents.py 5ff32d7b -->
+  child build and its parent, runs the route there, prints whether the tree changed, and removes it.
+  The cases are `withdrawn-parent` (the parent aborted, its kept branch present), `no-kept-branch`
+  (aborted, its kept branch deleted), `live-parent` and `no-parents`. `--value` commits the scratch's
+  policy value and `--state` sets the child's state, `designing` by default. `--selftest` runs every
+  case, and gov's own `loop parent routes` gate runs it.
+
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
+  ```bash
+  python tools/loop/loop_parents.py --fixture --plant withdrawn-parent --value adopt-parent-work
+  python tools/loop/loop_parents.py --selftest
+  ```
+
+The route does not read a parent's planning ending, such as refused or deferred, or a parent held
+past its wait ceiling, and a parent aborted for a reason it later resumes from reads withdrawn until
+its next run.
 
 ## The item kind, `kind.item`
 

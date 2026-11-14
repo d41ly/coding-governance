@@ -200,20 +200,36 @@ python <prefix>/loop/loop_checklist.py show reuse-probed
 ## The transition tables
 
 One table per level, build, feature and unit (TOOL-dDeclaredLoop-13): `[states]` holds each level's
-open states, and each `[[transition]]` row a move, its `level`, `from` (states, `none` for the level's
+open states, and its `terminal` key, which is no level, the build's nine terminal states
+(TOOL-dDeclaredLoop-15): a build row may enter one and no row may leave one. Each `[[transition]]` row is a move, its `level`, `from` (states, `none` for the level's
 entry, or `@open`), the `item` tag and `outcome` that fire it, its `to` (a state, `@prior` or
 `@reentry`), its `witness`, and optionally a `disposition` and `when = "before-push"`. `[[stand-in]]`
 names the owner of each row item whose build has not landed, and `[[owed-row]]` each cross-step route
 whose build row another unit or build writes; both lists only shrink. `loop_lib.py` does not read
 them: `loop_table.py` does, through `read_transition_rows` and `read_stand_ins` over the parsed
-definition, and `derive_move` answers a move from the rows alone, raising `TransitionRefused` where no
-row holds it and ValueError on an unknown level or state or a missing fact a row reads (`prior`,
+definition, `read_transition_rows` splitting `terminal` out of the levels, and `derive_move` answers a
+move from the rows alone, raising `TransitionRefused` where no row holds it or the state asked is a
+terminal, and ValueError on an unknown level or state or a missing fact a row reads (`prior`,
 `reenters`, `pushed`, `disposition`), never a default.
+
+The rows into a terminal are T1 and T2, triage's `refuse` into refused, T3, the Deploy exit's
+`closed` into landed, and T4 and T5, the owner's close request's `withdrawn` and `superseded`, each
+from any open state while the landing is unpushed. That request's item, spelled below, has no
+`[[item]]` row yet and stands on a stand-in row:
+
+```text
+item.life.close · dWellOiledMachine
+```
+
+P1 moves a build in designing, building or deploying back to planning on `item.deploy.parents`'s
+`withdrawn`. No row enters incomplete, deferred, retired, merged or answered yet; those states stay in
+the set.
 
 `move` prints `move — <level> · <from> → <to> · <item>`, with `· stand-in <owner>` for a stand-in item,
 exit 0; `refused — ...: no row`, exit 1; `unanswered — ...: <why>`, exit 2. `check`, by
-`check_transition_tables`, prints a `loop: table` line per level, a `loop: owed` line per owed row and
-a `loop: stand-in` line per stand-in, and refuses an undeclared level or state, two rows for one move,
+`check_transition_tables`, prints a `loop: table` line per level, `loop: terminal build · <states>`, a
+`loop: owed` line per owed row and a `loop: stand-in` line per stand-in, and refuses a row leaving a
+terminal, a terminal also listed among the build's open states, an undeclared level or state, two rows for one move,
 a row item that is no tag or resolves to neither an `[[item]]` row nor a stand-in, an outcome outside
 its item's set, a disposition outside the set, and a stale or mis-owned stand-in. It joins every
 cross-step route, an outcome routed to `transition` or to an item of another step, with the build
@@ -221,15 +237,52 @@ table both ways, an owed row standing for a row another unit writes and refused 
 and each step's exit to a build row out of its state. Both verbs exit 2 where the definition does not
 read or holds no transition row. `--fixture --plant <case>` runs `check` with one break of `PLANTS`
 made in memory by `write_table_plant`: `bad-state`, `two-rows`, `bad-exit`, `dropped-row`,
-`unrouted-row`, `owed-stale` and `stand-in`. `check --selftest` runs `check`, every plant and each
-kind of move through `run_selftest_cases`, the case loop `loop_checklist.py` shares, and is the kit's
-`loop transition tables` gate leg.
+`unrouted-row`, `owed-stale`, `stand-in`, `terminal-from` (a build row leaving landed) and
+`terminal-open` (landed appended to the build's open states). `check --selftest` runs `check`, every
+plant and each kind of move through `run_selftest_cases`, the case loop `loop_checklist.py` shares,
+and is the kit's `loop transition tables` gate leg.
 
 ```bash
 python <prefix>/loop/loop_table.py move --level build --from designing --item item.design.exit --outcome recorded
 python <prefix>/loop/loop_table.py check
 python <prefix>/loop/loop_table.py check --selftest
 python <prefix>/loop/loop_table.py --fixture --plant dropped-row
+```
+
+## The parent route
+
+`loop_parents.py` (TOOL-dDeclaredLoop-15) answers a dependent build's route when a parent its README's
+`parents:` front matter names reads withdrawn. Until a parent's `withdrawn` post lands, the stand-in
+is the parent's run-state file holding the run fact `phase: ABORTED`. `read_withdrawn_parents` reads
+the front matter through the memory-tree kit's `parse_front_matter`, the builds folder from its
+`read_design_conf`, and the run facts through the policy kit's `read_run_fact`. `derive_parent_route`
+reads `deps.on-parent-withdrawn` through the policy kit's `resolve` at the landed revision, its
+default `replan`, and takes the move from P1 by `derive_move`, so a state P1 does not admit answers
+`held`:
+
+```text
+route replan · parent <p> · move <state> → planning · item.deploy.parents
+route adopt-parent-work · parent <p> · move <state> → planning · item.deploy.parents
+inventory <p> <sha>
+route withdraw-too · parent <p> · owner-item · propose item.life.close withdrawn · left by record-kind.disposition
+route <value> · parent <p> · held: <state> admits no parent row
+route none
+```
+
+`adopt-parent-work` names each withdrawn parent's kept branch tip, the ref its `run-branch:` fact
+names, else `branch-ref:`, as the input the design inventory takes its kept units from; a parent with
+neither, or a ref naming no commit, exits 2 `no kept branch`. `withdraw-too` proposes the build's
+withdrawal to the owner and moves nothing. The route writes nothing. It exits 2 on an unreadable
+`parents:` slug, a state outside the build's open states or a policy refusal, and 2 `unarmed` where
+the policy kit does not resolve, since this kit takes no edge to it. `--fixture --plant <case>` runs
+the route over a scratch repository: `withdrawn-parent`, `no-kept-branch`, `live-parent` and
+`no-parents`, with `--value` committing the scratch's one policy revision and `--state` the child's
+state, `designing` by default. `--selftest` runs every case, and is gov's `loop parent routes` leg.
+
+```bash
+python <prefix>/loop/loop_parents.py route --build <slug> --state <state> [--root <path>]
+python <prefix>/loop/loop_parents.py --fixture --plant withdrawn-parent --value adopt-parent-work
+python <prefix>/loop/loop_parents.py --selftest
 ```
 
 ## The item kind
@@ -399,7 +452,9 @@ the `step` namespace. That a `command:` name names a real command, that a `hook:
 that a pending role's slot is the stem a later build ships. A non-role item's allowance beyond being
 non-empty: the allowance vocabulary of a role's `writes` is the roles kit's. A need on an item outside the five programs; that a stand-in path
 exists. The transition tables check no witness, no stand-in owner's landing, no reachability or
-termination, and no feature or unit row against the routes. That a disposition
+termination, and no feature or unit row against the routes, nor that every terminal is entered by
+a row. The parent route reads no parent planning ending, no hold past the wait ceiling, and no
+`withdrawn` post. That a disposition
 record's `Item` names a declared item, which reads `None`, or that a writer resolved an alias before
 it wrote. An unknown key on a row is neither read nor refused. That a witness's `by` is true. That
 the build an actor-list row names will compute its witness.

@@ -10903,6 +10903,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "derive_parent_route",
+      "kind": "function",
+      "file": "tools/loop/loop_parents.py"
+    },
+    {
       "id": "derive_parity_lines",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -14471,6 +14476,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/loop/loop_parents.py"
     },
     {
       "id": "main",
@@ -20178,6 +20188,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_policy_kit",
+      "kind": "function",
+      "file": "tools/loop/loop_parents.py"
+    },
+    {
       "id": "read_policy_members",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
@@ -21776,6 +21791,11 @@
       "id": "read_with_unexercised_refusal",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_withdrawn_parents",
+      "kind": "function",
+      "file": "tools/loop/loop_parents.py"
     },
     {
       "id": "read_withheld_rows",
@@ -24708,6 +24728,11 @@
       "file": "tools/runlog/runlog_lib.py"
     },
     {
+      "id": "resolve_kept_tip",
+      "kind": "function",
+      "file": "tools/loop/loop_parents.py"
+    },
+    {
       "id": "resolve_kickoff_checker",
       "kind": "function",
       "file": "tools/roles/handoff.py"
@@ -27215,6 +27240,11 @@
     {
       "id": "run_fixture",
       "kind": "function",
+      "file": "tools/loop/loop_parents.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
       "file": "tools/loop/loop_witness.py"
     },
     {
@@ -28561,6 +28591,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/loop/loop_items.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/loop/loop_parents.py"
     },
     {
       "id": "run_selftest",
@@ -34276,6 +34311,11 @@
       "id": "write_owner_payload",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
+      "id": "write_parent_plant",
+      "kind": "function",
+      "file": "tools/loop/loop_parents.py"
     },
     {
       "id": "write_pause_row",

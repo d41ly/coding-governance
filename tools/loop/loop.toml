@@ -50,8 +50,10 @@
 #   item      the [[item]] tag whose witness the handle's check reads
 #
 # [states], each level's states (TOOL-dDeclaredLoop-13): `build`, `feature` and `unit`, each the list of
-# that level's open states. A level's entry is "none", never a state. loop_table.py beside this file
-# reads it and the three tables below, and its `check` grades them:
+# that level's open states. A level's entry is "none", never a state. `terminal` is no level: it lists
+# the build level's terminal states (TOOL-dDeclaredLoop-15), which a build row may enter and no row may
+# leave, and none of which is an open state. loop_table.py beside this file reads it and the three
+# tables below, and its `check` grades them:
 #
 # One [[transition]] row per move of a level's table:
 #   level        build, feature or unit, a key of [states]
@@ -388,8 +390,11 @@ item = "item.build.unit-pass"
 build = ["planning", "designing", "building", "testing", "deploying", "paused", "parked"]
 feature = ["decomposed", "designed", "built", "tested", "deployed"]
 unit = ["designed", "built", "tested", "deployed"]
+terminal = ["landed", "withdrawn", "superseded", "incomplete", "deferred", "retired", "refused", "merged", "answered"]
 
-# The build table, B1 to B25: no row enters a terminal or touches parked; those are other units' rows.
+# The build table, B1 to B25 between open states, then T1 to T5 into a terminal and P1 on a parent's
+# withdrawal (TOOL-dDeclaredLoop-15). No row touches parked, and none enters incomplete, deferred,
+# retired, merged or answered yet: those are other units' and builds' rows.
 
 # B1
 [[transition]]
@@ -618,6 +623,62 @@ item = "item.test.route"
 outcome = "inherited"
 to = "designing"
 witness = "the route record naming the inherited red"
+
+# T1
+[[transition]]
+level = "build"
+from = ["planning"]
+item = "item.plan.triage-rule"
+outcome = "refuse"
+to = "refused"
+witness = "the triage record"
+
+# T2
+[[transition]]
+level = "build"
+from = ["planning"]
+item = "item.plan.triage-judge"
+outcome = "refuse"
+to = "refused"
+witness = "the triage record"
+
+# T3
+[[transition]]
+level = "build"
+from = ["deploying"]
+item = "item.deploy.close"
+outcome = "closed"
+to = "landed"
+witness = "the transition record"
+
+# T4
+[[transition]]
+level = "build"
+from = ["@open"]
+item = "item.life.close"
+outcome = "withdrawn"
+when = "before-push"
+to = "withdrawn"
+witness = "the transition record"
+
+# T5
+[[transition]]
+level = "build"
+from = ["@open"]
+item = "item.life.close"
+outcome = "superseded"
+when = "before-push"
+to = "superseded"
+witness = "the transition record"
+
+# P1
+[[transition]]
+level = "build"
+from = ["designing", "building", "deploying"]
+item = "item.deploy.parents"
+outcome = "withdrawn"
+to = "planning"
+witness = "the parent's post or the hold's record, and the plan revision"
 
 # The unit table, U1 to U8: a unit is designed when its spec is committed and derived READY, built when
 # its pass commits and acceptance record hold, tested while the verdict for the build's prepared merge
@@ -861,32 +922,32 @@ owner = "dShippedRelease"
 item = "item.life.request"
 owner = "dWellOiledMachine"
 
-# The owed rows: the cross-step routes whose build row another unit or build writes.
-
-[[owed-row]]
+[[stand-in]]
 item = "item.plan.triage-rule"
-outcome = "refuse"
-by = "TOOL-dDeclaredLoop-15"
+owner = "dRankedPlan"
 
-[[owed-row]]
+[[stand-in]]
 item = "item.plan.triage-judge"
-outcome = "refuse"
-by = "TOOL-dDeclaredLoop-15"
+owner = "dRankedPlan"
+
+[[stand-in]]
+item = "item.deploy.parents"
+owner = "dShippedRelease"
+
+[[stand-in]]
+item = "item.deploy.close"
+owner = "dShippedRelease"
+
+[[stand-in]]
+item = "item.life.close"
+owner = "dWellOiledMachine"
+
+# The owed rows: the cross-step routes whose build row another unit or build writes.
 
 [[owed-row]]
 item = "item.plan.place"
 outcome = "unplaced"
 by = "dRankedPlan"
-
-[[owed-row]]
-item = "item.deploy.parents"
-outcome = "withdrawn"
-by = "TOOL-dDeclaredLoop-15"
-
-[[owed-row]]
-item = "item.deploy.close"
-outcome = "closed"
-by = "TOOL-dDeclaredLoop-15"
 
 [[record-version]]
 kind = "record-kind.acceptance"

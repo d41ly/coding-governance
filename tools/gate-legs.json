@@ -1998,6 +1998,18 @@
     "enforces": ["principle.p16"]
   },
   {
+    "name": "loop parent routes",
+    "argv": [
+      "python",
+      "{prefix}/loop/loop_parents.py",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 120,
+    "enforces": ["principle.p21"]
+  },
+  {
     "name": "loop transition tables",
     "argv": [
       "python",
