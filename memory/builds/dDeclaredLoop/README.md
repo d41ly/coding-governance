@@ -120,10 +120,10 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-38 — the trailer CLI writes LF only, so a shell loop never keeps a CR on its last token](spec/2026-10-24-spec-TOOL-dDeclaredLoop-38.md) | 4 | 2 | CLOSED | rev-3 | 2026-11-14 |
 | [TOOL-dDeclaredLoop-39 — the one trailer reader carries the git pins of the readers it replaces](spec/2026-10-24-spec-TOOL-dDeclaredLoop-39.md) | 4 | 2 | CLOSED | rev-2 | 2026-11-14 |
 | [TOOL-dDeclaredLoop-40 — the trailer reader finds the key table through the kit resolver, and reads a floor of keys where none is installed](spec/2026-10-24-spec-TOOL-dDeclaredLoop-40.md) | 4 | 2 | CLOSED | rev-3 | 2026-11-14 |
-| [TOOL-dDeclaredLoop-57 — `update` refuses a claimed kit whose `requires` it leaves unmet, on every admission path](spec/2026-10-24-spec-TOOL-dDeclaredLoop-57.md) | 4 | 2 | INPROGRESS | rev-3 | 2026-11-14 |
-| [TOOL-dDeclaredLoop-5 — the witness-class rule: every witness classed, the actor class refused](spec/2026-10-24-spec-TOOL-dDeclaredLoop-5.md) | 5 | 2 | DEFERRED | rev-3 | 2026-10-25 |
-| [TOOL-dDeclaredLoop-58 — the LF-only criterion reads a counted, non-empty CLI output before it looks for a CR](spec/2026-10-24-spec-TOOL-dDeclaredLoop-58.md) | 5 | 2 | DEFERRED | rev-1 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-73 — the claimed-requires refusal grades each kit's `requires` at the vintage `update --to` installs](spec/2026-10-24-spec-TOOL-dDeclaredLoop-73.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-57 — `update` refuses a claimed kit whose `requires` it leaves unmet, on every admission path](spec/2026-10-24-spec-TOOL-dDeclaredLoop-57.md) | 4 | 2 | INPROGRESS | rev-4 | 2026-11-14 |
+| [TOOL-dDeclaredLoop-5 — the witness-class rule: every witness classed, the actor class refused](spec/2026-10-24-spec-TOOL-dDeclaredLoop-5.md) | 5 | 2 | DEFERRED | rev-4 | 2026-11-14 |
+| [TOOL-dDeclaredLoop-58 — the LF-only criterion reads a counted, non-empty CLI output before it looks for a CR](spec/2026-10-24-spec-TOOL-dDeclaredLoop-58.md) | 5 | 2 | DEFERRED | rev-2 | 2026-11-14 |
+| [TOOL-dDeclaredLoop-73 — the claimed-requires refusal grades each kit's `requires` at the vintage `update --to` installs](spec/2026-10-24-spec-TOOL-dDeclaredLoop-73.md) | 5 | 2 | DEFERRED | rev-3 | 2026-11-14 |
 | [TOOL-dDeclaredLoop-12 — each step a program of items with declared needs, outcomes and routes](spec/2026-10-24-spec-TOOL-dDeclaredLoop-12.md) | 6 | 2 | DEFERRED | rev-4 | 2026-11-05 |
 | [TOOL-dDeclaredLoop-41 — the actor-witness list graded where its builds live, and an adopter's own agent items its own](spec/2026-10-24-spec-TOOL-dDeclaredLoop-41.md) | 6 | 2 | DEFERRED | rev-4 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-9 — each step's items declared with one actor, inputs, allowance, return schema and witness](spec/2026-10-24-spec-TOOL-dDeclaredLoop-9.md) | 7 | 2 | DEFERRED | rev-1 | 2026-10-24 |
@@ -212,7 +212,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 282 bound to this build, across 4 record folder(s).
+Records: 290 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -223,11 +223,11 @@ TOOL-dDeclaredLoop-2@rev-1 TOOL-dDeclaredLoop-20@rev-1 TOOL-dDeclaredLoop-21@rev
 TOOL-dDeclaredLoop-29@rev-1 TOOL-dDeclaredLoop-3@rev-1 TOOL-dDeclaredLoop-30@rev-1 TOOL-dDeclaredLoop-31@rev-1 TOOL-dDeclaredLoop-32@rev-1 TOOL-dDeclaredLoop-33@rev-1 TOOL-dDeclaredLoop-34@rev-1 TOOL-dDeclaredLoop-36@rev-1 TOOL-dDeclaredLoop-37@rev-1 TOOL-dDeclaredLoop-38@rev-1
 TOOL-dDeclaredLoop-39@rev-1 TOOL-dDeclaredLoop-4@rev-1 TOOL-dDeclaredLoop-40@rev-1 TOOL-dDeclaredLoop-41@rev-1 TOOL-dDeclaredLoop-42@rev-1 TOOL-dDeclaredLoop-43@rev-1 TOOL-dDeclaredLoop-44@rev-1 TOOL-dDeclaredLoop-45@rev-1 TOOL-dDeclaredLoop-46@rev-1 TOOL-dDeclaredLoop-47@rev-1
 TOOL-dDeclaredLoop-48@rev-1 TOOL-dDeclaredLoop-49@rev-1 TOOL-dDeclaredLoop-5@rev-1 TOOL-dDeclaredLoop-50@rev-1 TOOL-dDeclaredLoop-51@rev-1 TOOL-dDeclaredLoop-52@rev-1 TOOL-dDeclaredLoop-53@rev-1 TOOL-dDeclaredLoop-54@rev-1 TOOL-dDeclaredLoop-55@rev-1 TOOL-dDeclaredLoop-56@rev-1
-TOOL-dDeclaredLoop-57@rev-1 TOOL-dDeclaredLoop-59@rev-1 TOOL-dDeclaredLoop-6@rev-1 TOOL-dDeclaredLoop-60@rev-1 TOOL-dDeclaredLoop-61@rev-1 TOOL-dDeclaredLoop-62@rev-1 TOOL-dDeclaredLoop-63@rev-1 TOOL-dDeclaredLoop-64@rev-1 TOOL-dDeclaredLoop-65@rev-1 TOOL-dDeclaredLoop-66@rev-1
-TOOL-dDeclaredLoop-67@rev-1 TOOL-dDeclaredLoop-68@rev-1 TOOL-dDeclaredLoop-69@rev-1 TOOL-dDeclaredLoop-7@rev-1 TOOL-dDeclaredLoop-70@rev-1 TOOL-dDeclaredLoop-71@rev-1 TOOL-dDeclaredLoop-72@rev-1 TOOL-dDeclaredLoop-73@rev-1 TOOL-dDeclaredLoop-74@rev-1 TOOL-dDeclaredLoop-75@rev-1
-TOOL-dDeclaredLoop-76@rev-1 TOOL-dDeclaredLoop-77@rev-1 TOOL-dDeclaredLoop-78@rev-1 TOOL-dDeclaredLoop-79@rev-1 TOOL-dDeclaredLoop-8@rev-1 TOOL-dDeclaredLoop-80@rev-1 TOOL-dDeclaredLoop-81@rev-1 TOOL-dDeclaredLoop-82@rev-1 TOOL-dDeclaredLoop-83@rev-1 TOOL-dDeclaredLoop-84@rev-1
-TOOL-dDeclaredLoop-85@rev-1 TOOL-dDeclaredLoop-86@rev-1 TOOL-dDeclaredLoop-87@rev-1 TOOL-dDeclaredLoop-88@rev-1 TOOL-dDeclaredLoop-89@rev-1 TOOL-dDeclaredLoop-90@rev-1 TOOL-dDeclaredLoop-91@rev-1 TOOL-dDeclaredLoop-92@rev-1 TOOL-dDeclaredLoop-93@rev-1 TOOL-dDeclaredLoop-94@rev-1
-TOOL-dDeclaredLoop-95@rev-1 TOOL-dDeclaredLoop-96@rev-1.
+TOOL-dDeclaredLoop-57@rev-1 TOOL-dDeclaredLoop-58@rev-1 TOOL-dDeclaredLoop-59@rev-1 TOOL-dDeclaredLoop-6@rev-1 TOOL-dDeclaredLoop-60@rev-1 TOOL-dDeclaredLoop-61@rev-1 TOOL-dDeclaredLoop-62@rev-1 TOOL-dDeclaredLoop-63@rev-1 TOOL-dDeclaredLoop-64@rev-1 TOOL-dDeclaredLoop-65@rev-1
+TOOL-dDeclaredLoop-66@rev-1 TOOL-dDeclaredLoop-67@rev-1 TOOL-dDeclaredLoop-68@rev-1 TOOL-dDeclaredLoop-69@rev-1 TOOL-dDeclaredLoop-7@rev-1 TOOL-dDeclaredLoop-70@rev-1 TOOL-dDeclaredLoop-71@rev-1 TOOL-dDeclaredLoop-72@rev-1 TOOL-dDeclaredLoop-73@rev-1 TOOL-dDeclaredLoop-74@rev-1
+TOOL-dDeclaredLoop-75@rev-1 TOOL-dDeclaredLoop-76@rev-1 TOOL-dDeclaredLoop-77@rev-1 TOOL-dDeclaredLoop-78@rev-1 TOOL-dDeclaredLoop-79@rev-1 TOOL-dDeclaredLoop-8@rev-1 TOOL-dDeclaredLoop-80@rev-1 TOOL-dDeclaredLoop-81@rev-1 TOOL-dDeclaredLoop-82@rev-1 TOOL-dDeclaredLoop-83@rev-1
+TOOL-dDeclaredLoop-84@rev-1 TOOL-dDeclaredLoop-85@rev-1 TOOL-dDeclaredLoop-86@rev-1 TOOL-dDeclaredLoop-87@rev-1 TOOL-dDeclaredLoop-88@rev-1 TOOL-dDeclaredLoop-89@rev-1 TOOL-dDeclaredLoop-90@rev-1 TOOL-dDeclaredLoop-91@rev-1 TOOL-dDeclaredLoop-92@rev-1 TOOL-dDeclaredLoop-93@rev-1
+TOOL-dDeclaredLoop-94@rev-1 TOOL-dDeclaredLoop-95@rev-1 TOOL-dDeclaredLoop-96@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
@@ -270,7 +270,7 @@ Coverage of dDeclaredLoop's 34 clause(s) and 49 owned node(s), over 99 spec(s) a
 | 2 | `TOOL-dDeclaredLoop-1` | no |
 | 3 | `TOOL-dDeclaredLoop-23`, `TOOL-dDeclaredLoop-36` | yes |
 | 4 | `TOOL-dDeclaredLoop-16`, `TOOL-dDeclaredLoop-37`, `TOOL-dDeclaredLoop-38`, `TOOL-dDeclaredLoop-39`, `TOOL-dDeclaredLoop-40`, `TOOL-dDeclaredLoop-57` | no |
-| 5 | `TOOL-dDeclaredLoop-5`, `TOOL-dDeclaredLoop-58`, `TOOL-dDeclaredLoop-73` | yes |
+| 5 | `TOOL-dDeclaredLoop-5`, `TOOL-dDeclaredLoop-58`, `TOOL-dDeclaredLoop-73` | no |
 | 6 | `TOOL-dDeclaredLoop-12`, `TOOL-dDeclaredLoop-41` | no |
 | 7 | `TOOL-dDeclaredLoop-9` | no |
 | 8 | `TOOL-dDeclaredLoop-17` | no |

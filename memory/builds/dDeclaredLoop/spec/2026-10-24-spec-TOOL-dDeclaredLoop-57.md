@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-57 — `update` refuses a claimed kit whose `requires` it leaves unmet, on every admission path
 
-**Status:** INPROGRESS · rev-3 · 2026-11-14 · node d · Tier-2 · base ed497191 · streams tooling · order 4 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-4 · 2026-11-14 · node d · Tier-2 · base ed497191 · streams tooling · order 4 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,9 +13,11 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
 | [2026-11-13-build-TOOL-dDeclaredLoop-57-deviation-572.md](../build/2026-11-13-build-TOOL-dDeclaredLoop-57-deviation-572.md) | deviation | — |
 | [2026-11-14-build-TOOL-dDeclaredLoop-57-1-builder-return.md](../build/2026-11-14-build-TOOL-dDeclaredLoop-57-1-builder-return.md) | journal | — |
+| [2026-11-14-build-TOOL-dDeclaredLoop-57-deviation-573.md](../build/2026-11-14-build-TOOL-dDeclaredLoop-57-deviation-573.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
 | [2026-11-13-prompt-TOOL-dDeclaredLoop-57-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-dDeclaredLoop-57-1-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-dDeclaredLoop-57-reground-brief.md](../prompts/2026-11-13-prompt-TOOL-dDeclaredLoop-57-reground-brief.md) | research | — |
+| [2026-11-14-prompt-TOOL-dDeclaredLoop-57-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-57-1-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-dDeclaredLoop-57-build-brief.md](../prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-57-build-brief.md) | journal | — |
 | [2026-11-14-prompt-TOOL-dDeclaredLoop-57-spec-brief.md](../prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-57-spec-brief.md) | research | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
@@ -64,6 +66,10 @@ fix. It repairs `TOOL-dDeclaredLoop-36`.
   sentence stands. Observed by AC5.
 - **S6** — `memory/map/generated/symbols.json` is re-rendered by the codebase-map kit's generator,
   `python tools/codebase-map/gen_map.py --write`, so it lists the new function. Observed by AC6.
+- **S7** — The one existing selftest fixture S1 reaches, the dRB-11 "fixture B" receipt in
+  `tools/govkit/selftest.py`, claims `kickoff-manifest` beside `check-wiring`, so its `update` passes
+  S1's call and its arms observe the settings-merge problem line they were written for. §4 "The
+  fixture the refusal reaches" holds the evidence and §8 F3 the choice. Observed by AC7, AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -139,10 +145,42 @@ The function sits beside `derive_unsatisfied_requires` and `derive_default_gaine
 joins. Its name follows the `demand_` functions `_cmd_update` already calls for a precondition that
 refuses.
 
+### The fixture the refusal reaches
+
+Read at HEAD `0d9bdeb4`, 2026-11-14, after the builder return named in §9's rev-4 line.
+
+- The dRB-11 "fixture B" block builds its target with `stale_target("rq11b", ...)` and no `kits`
+  argument (`tools/govkit/selftest.py@866a0710f:6194`), so `apply --kits check-wiring` writes the
+  receipt and it claims `check-wiring` alone. The block then appends `agent-cap` to the receipt's
+  `kits` by hand (`tools/govkit/selftest.py@866a0710f:6206`) and runs `update --write`
+  (`tools/govkit/selftest.py@866a0710f:6227`).
+- `tools/hooks/kit.toml` declares `agent-cap`'s `requires` as `settings-merge` and
+  `kickoff-manifest`. `OLD` resolves to `24f39915` itself, whose registry default already holds
+  `kickoff-manifest`, so the update never gains it. The gained-only loop leaves `run-gates`,
+  `settings-merge` and `loop` gained, PINNED, measured 2026-11-14 by replaying
+  `derive_default_gained`'s set difference and the loop over the live descriptors.
+- Over that claim and that gained set the predicate answers `[('agent-cap', 'kickoff-manifest')]`,
+  PINNED, measured 2026-11-14. S1's call would refuse the update with exit 2 before the gained
+  settings-merge adopter runs, so the arm `[dRB-11] update over fixture B: exactly one problem line
+  names settings-merge, and it carries the adopter's cannot read`
+  (`tools/govkit/selftest.py@866a0710f:6239`) goes red. The block's "exits non-zero", "no line
+  carries the declared stop's means" and "leaves the receipt's gov_commit where it was" arms stay
+  green, but against the wrong cause.
+- The `rq9p` fixture beside it already passes `kits="check-wiring,kickoff-manifest"` to the same
+  helper (`tools/govkit/selftest.py@866a0710f:6117`). With `kickoff-manifest` added to fixture B's
+  claim, the predicate answers `[]` and the gained set is the same three kits, PINNED, measured
+  2026-11-14, so the update reaches the settings-merge adopter as it does today.
+
+The repair, on F3 (a): fixture B's `stale_target` call passes `kits="check-wiring,kickoff-manifest"`,
+as `rq9p` does, and the block's header comment gains one sentence saying the claim carries
+`kickoff-manifest` because `agent-cap` requires it and the update now refuses a claim that leaves it
+unmet. No arm's text or expectation moves.
+
 ### Files touched (estimate)
 
 - `tools/govkit/govkit.py`
-- `tools/govkit/selftest.py`
+- `tools/govkit/selftest.py`: the new arm in `check_roles_default`, and fixture B's `stale_target`
+  call and header comment (S7)
 - `help/upgrade-steps.md`
 - `memory/map/generated/symbols.json`
 
@@ -168,12 +206,32 @@ the new lines spell no install-prefix path.
   names every pair, never only the first, and its route names the first pair.
 - observability — the refusal text carries the default-gained reason.
 - risks — an adopter that removed the loop kit by hand while its receipt claims roles is now refused
-  on update; that install was already broken, and the route is named. A fixture receipt in
-  `tools/govkit/selftest.py` or `tools/govkit/matrix.py` that claims a kit without its dependency
-  would now refuse at this point. The hand-written receipts read at HEAD claim `memory-tree`,
-  `pytest-parallel-guardrails` and a scratch gov's `demo` kit; that every scratch `demo` descriptor
-  declares no unmet edge is UNVERIFIED, and the close's suite run is what observes it.
-- testing — AC1 to AC6 as probes; the arm under §7, observed at the close.
+  on update; that install was already broken, and the route is named. The refusal reaches an
+  `update` only over a receipt whose claim, after succession, has an edge outside the claimed and
+  gained kits. Every receipt producer in `tools/govkit/selftest.py` and `tools/govkit/matrix.py`,
+  read at HEAD `0d9bdeb4`:
+  - a receipt `apply` writes is closed, since `_cmd_apply` refuses through the same predicate over
+    the same working-tree descriptors the later update reads. Matrix's aged gov (its SHAPE 7) edits
+    only the registry default between the apply and the update, never a descriptor.
+  - a receipt `update --write` writes claims the old claim plus a gained set the gained-only loop
+    has already closed.
+  - a receipt `adopt` writes claims the deploy's `kits` or the registry default, and is not graded
+    by `requires`. Every fixture deploy list names kits whose `requires` is empty, or the default,
+    which `check_roles_default` grades closed. The three lists naming a kit with an edge
+    (`memory-recall` in `pin_target`, `drift-audit` and `codebase-map` in `a_evil_target`) are only
+    run through `apply`, `check` and `plan`.
+  - hand-written receipts claim `pytest-parallel-guardrails` or `memory-tree` (empty `requires`), a
+    scratch gov's `demo`, whose descriptor declares no `requires`, or a `ghost` id, which
+    `upgrade_steps.resolve_claim` refuses before this call. `a_evil_target`'s receipts go only to
+    `check` and `plan`. Matrix's receipt-only hook receipt has no `kits` key and feeds
+    outcome-state checks, not `update`.
+  - the only scratch descriptor that declares an edge is the `demo` of `build_scratch_gov_cross`,
+    and those govs are only run through `selfcheck`.
+  - dRB-11 fixture A (`rq11a`) claims `agent-cap` without `kickoff-manifest` too. Only `apply` runs
+    over it, and this unit leaves `apply` as it is.
+  - dRB-11 fixture B (`rq11b`) is the one hit, and S7 repairs it (§4 "The fixture the refusal
+    reaches").
+- testing — AC1 to AC8 as probes; the arm under §7, observed at the close.
 - migration — none: a refusal on a path that produced a broken install. Reversal is reverting the
   call.
 - user docs — `help/upgrade-steps.md`, S5.
@@ -214,6 +272,22 @@ the new lines spell no install-prefix path.
 - **AC6** — When `grep -c 'demand_claimed_requires' memory/map/generated/symbols.json` runs, it prints
   a count above zero.
   Red when: the generated map was not re-rendered after the function landed.
+- **AC7** — When a probe imports `govkit`, reads the live descriptors and calls
+  `demand_claimed_requires(["check-wiring", "agent-cap"], ["settings-merge"], descs, {"kits":
+  ["check-wiring", "agent-cap"]}, "")`, fixture B's claim before S7, it raises `Refusal` naming
+  `'agent-cap' requires 'kickoff-manifest'`. The same call with `kickoff-manifest` added to the
+  claimed list and to the receipt's `kits` returns.
+  Red when: the first call returns, so the refusal never reached fixture B and S7 repairs nothing,
+  or the second raises, so claiming `kickoff-manifest` does not carry fixture B past the call.
+  fixture: `settings-merge` is the one gained kit `agent-cap` needs; the others the update gains
+  (§4) require nothing fixture B lacks, so the probe leaves them out.
+- **AC8** — When `grep -n -A1 'stale_target("rq11b"' tools/govkit/selftest.py` runs, the call it
+  prints passes `kits="check-wiring,kickoff-manifest"`, and
+  `sed -n '/\[dRB-11\] fixture B: begin/,/\[dRB-11\] fixture B: end/p' tools/govkit/selftest.py | grep -c kickoff-manifest`
+  prints at least `2`, the call and the header comment's sentence.
+  Red when: fixture B still claims `agent-cap` without `kickoff-manifest`, so its settings-merge
+  problem-line arm meets the new refusal instead of the adopter's `cannot read`; the second
+  command prints `0` at HEAD `0d9bdeb4`, measured 2026-11-14.
 
 ## 7. Gates
 
@@ -228,6 +302,14 @@ seconds to a leg whose declared ceiling in `tools/gate-legs.json` does not move.
 What the arm does not check: a `--to` whose descriptors differ from the working tree's
 (`TOOL-dDeclaredLoop-73`); the write path's lock and receipt bytes after a refusal, and a route
 naming every pair (`TOOL-dDeclaredLoop-75`).
+
+The dRB-11 fixture B arms are existing arms, not a new one, and their text does not move. After S7
+the `govkit selftest` leg at the close observes them green over a claim the new refusal passes:
+fixture B's update still exits non-zero on exactly one settings-merge problem line carrying the
+adopter's `cannot read`, prints no declared-stop means, and leaves `gov_commit` where it was. Their
+red, without S7, is §4's measured predicate answer, which AC7 re-observes on the unit's own function.
+What they do not check: an update over a receipt claiming `agent-cap` without `kickoff-manifest`,
+which the new arm's AC1 to AC3 cases grade through the `roles` and `loop` pairs instead.
 
 What `govkit refusal join` does not check here: the leg runs with no reached-set, so it enumerates
 and joins nothing, and the new refusal site is graded by the arm above alone. Its floor is 335 and
@@ -252,6 +334,22 @@ over HEAD.
   widens: none · relaxes: none
   RESOLVED (agent, 2026-11-13, delegated): (a), rung 3: every non-source run takes the refusal, rollback included, one call with no branch.
   widens: none · relaxes: none
+- **F3 — How does the dRB-11 fixture B arm stay green once the update refuses its claim?** Its
+  receipt claims `agent-cap` without `kickoff-manifest`, and §4 "The fixture the refusal reaches"
+  measures that S1 refuses it before the settings-merge adopter runs.
+  - (a) Claim `kickoff-manifest` in fixture B: its `stale_target` call passes
+    `kits="check-wiring,kickoff-manifest"`, as the `rq9p` fixture beside it does. The gained set does
+    not move, so the update still reaches the adopter's `cannot read`, and every arm keeps its text
+    and its subject, the update half of TOOL-dRedressedBar-11. Cost: one fixture argument and one
+    comment sentence.
+  - (b) Let the arm observe the new refusal: fixture B leaves the loop over the three settings-merge
+    runs, and an arm of its own expects `update would leave 'agent-cap' requires 'kickoff-manifest'`.
+    The fixture then grades the new refusal a second time and no longer grades a hook the receipt
+    alone locates through an update's gain, so the dRB-11 update half loses its only fixture.
+  - Recommendation: (a). The body is written on it (S7, AC7, AC8).
+  widens: none · relaxes: none
+  RESOLVED (agent, 2026-11-14, delegated): (a), rung 3: the fixture claims kickoff-manifest as the rq9p fixture beside it does, so its arm still reaches the adopter's line and the update half keeps its only fixture.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -267,6 +365,14 @@ over HEAD.
   set; AC1 and AC4 are probes over a hand-written receipt, run before the commit, and AC2 passes a
   claimed set whose only unmet edge is the loop's; the leg line gains the legs the write set trips;
   every line citation is a symbol citation. F2 is new and open.
+- rev-4 · 2026-11-14 · §2 S7 §4 §5 §6 AC7 AC8 §7 §8 F3 §10 · repaired after the divergence in
+  2026-11-14-build-TOOL-dDeclaredLoop-57-1-builder-return, which found that the dRB-11 fixture B
+  receipt in `tools/govkit/selftest.py` claims `agent-cap` without `kickoff-manifest`, so S1 would
+  red its settings-merge arm. Re-read at 0d9bdeb4: §4 gains the fixture's evidence and its repair,
+  S7 and AC7, AC8 observe it, §5's unverified risk is replaced by every receipt producer read in
+  `tools/govkit/selftest.py` and `tools/govkit/matrix.py`, §7 states what the fixture's arms observe
+  after the repair, and F3 is new and open with (a) recommended. The mechanism, the function, its
+  call site, the edges, the order and the status did not move.
 
 ## 10. Reuse audit
 
@@ -277,6 +383,8 @@ unmet"`, re-run at HEAD, ranks `derive_unsatisfied_requires` and `default_kits` 
 candidates; the others it ranks, `resolve_kit_dir`, `claims`, `kit_rel` and the refusal classes of
 other kits, read no `requires`. The predicate was read above and agrees with source. The arm's
 fixture seam is the hand-written receipt `tools/govkit/selftest.py#main` already writes into a
-scratch target, and its home is `check_roles_default`.
+scratch target, and its home is `check_roles_default`. S7's repair reuses `stale_target`'s own
+`kits` argument, the seam the `rq9p` fixture already uses to claim `kickoff-manifest`, and adds no
+helper.
 
 Recall terms used: govkit update requires claimed gained default-gained gov_commit vintage receipt roles loop refusal
