@@ -87,3 +87,14 @@ then green. With F1 and F2 marked RESOLVED, that pass also set the spec CLOSED, 
   the real trace. With a start, the refusal and a remove, it printed `started refused read kills=0`.
   With the remove deleted, it printed `started refused unread kills=0`. With no start, it printed
   `unstarted no-refusal read kills=0`.
+
+## The close
+
+The main loop's observations at the close, on node a, 2026-11-14.
+
+- The region-2 launcher assertion, run alone over two frozen clones: GREEN on the build's tip, RED on
+  the base driver at `846d51d39`.
+- Arms A1 to A6, red at base and then green: NOT OBSERVED. The owner stopped the driver suite's runs
+  mid-shard and said to skip the unattended tests. Shard 3's partial output on both clones showed no
+  `brisk` arm line yet, and only the two `TOOL-aFrugalTurnstile-12 AC3` reds both trees share.
+- AC12 is therefore graded only by the pass's direct probe of A6's trace reader, not by the arm.
