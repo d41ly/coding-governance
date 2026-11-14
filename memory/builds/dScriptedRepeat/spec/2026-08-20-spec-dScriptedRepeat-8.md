@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-8 — the output-scope refusal, and what it cannot see
 
-**Status:** SPECCED · rev-6 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** WONTDO · rev-6 · 2026-11-13 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20 · withdrawn unbuilt, as the 2026-08-21 acceptance ledger for units 5-11 records
 
 <!-- gen:spec-records -->
 

@@ -1,5 +1,5 @@
 # TOOL-dLandedVerdict-1 — the signal for a spec that landed and never said so
-**Status:** INPROGRESS · rev-1 · 2026-08-19 · node d · Tier-2 · base 098bebd9 · streams tooling
+**Status:** DEFERRED · rev-1 · 2026-11-13 · node d · Tier-2 · base 098bebd9 · streams tooling
 
 <!-- gen:spec-records -->
 

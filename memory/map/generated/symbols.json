@@ -6650,6 +6650,11 @@
     {
       "id": "check_parity",
       "kind": "function",
+      "file": "tools/chain-packet.py"
+    },
+    {
+      "id": "check_parity",
+      "kind": "function",
       "file": "tools/unattended/gate-guard.test.sh"
     },
     {
@@ -9376,6 +9381,11 @@
       "id": "derive_bases",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "derive_blob",
+      "kind": "function",
+      "file": "tools/chain-packet.py"
     },
     {
       "id": "derive_blob_oid",
@@ -13733,6 +13743,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "load_module",
+      "kind": "function",
+      "file": "tools/chain-packet.py"
+    },
+    {
       "id": "load_overlay",
       "kind": "function",
       "file": "tools/govkit/steps/adopter_rules_to_overlay.py"
@@ -13966,6 +13981,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/chain-packet.py"
     },
     {
       "id": "main",
@@ -16305,6 +16325,11 @@
     {
       "id": "print_fail",
       "kind": "function",
+      "file": "tools/chain-packet.test.sh"
+    },
+    {
+      "id": "print_fail",
+      "kind": "function",
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
     },
     {
@@ -16431,6 +16456,11 @@
       "id": "print_own_spec",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "print_pass",
+      "kind": "function",
+      "file": "tools/chain-packet.test.sh"
     },
     {
       "id": "print_pass",
@@ -22830,6 +22860,11 @@
     {
       "id": "render_outcome",
       "kind": "function",
+      "file": "tools/chain-packet.py"
+    },
+    {
+      "id": "render_outcome",
+      "kind": "function",
       "file": "tools/roles/handoff.py"
     },
     {
@@ -24093,6 +24128,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "resolve_instruments",
+      "kind": "function",
+      "file": "tools/chain-packet.py"
+    },
+    {
       "id": "resolve_introducing_commit",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
@@ -24141,6 +24181,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/chain-packet.py"
     },
     {
       "id": "resolve_kit_dir",
@@ -24811,6 +24856,11 @@
       "id": "resolve_python",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
+      "file": "tools/chain-packet.test.sh"
     },
     {
       "id": "resolve_python",
@@ -27003,6 +27053,11 @@
       "file": ".githooks/straggler-guard.test.sh"
     },
     {
+      "id": "run_in",
+      "kind": "function",
+      "file": "tools/chain-packet.test.sh"
+    },
+    {
       "id": "run_in_gov",
       "kind": "function",
       "file": "tools/govkit/matrix.py"
@@ -27011,6 +27066,11 @@
       "id": "run_inproc",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_instrument",
+      "kind": "function",
+      "file": "tools/chain-packet.py"
     },
     {
       "id": "run_ir_push",
@@ -27676,6 +27736,11 @@
       "id": "run_render_helper",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_report",
+      "kind": "function",
+      "file": "tools/chain-packet.py"
     },
     {
       "id": "run_resolution_order",
@@ -28838,6 +28903,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "scan_moved",
+      "kind": "function",
+      "file": "tools/chain-packet.py"
+    },
+    {
       "id": "scan_named",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -29666,6 +29736,11 @@
       "id": "set_other_side",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "set_reads",
+      "kind": "function",
+      "file": "tools/chain-packet.py"
     },
     {
       "id": "set_row_block",
@@ -34021,6 +34096,16 @@
       "id": "write_step_staged",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "write_stop_fixture",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_stop_row",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_su_aborted",

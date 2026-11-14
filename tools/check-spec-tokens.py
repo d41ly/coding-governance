@@ -196,7 +196,9 @@ key, read across their line wraps.
          (TOOL-dGroundRules-63). The instrument is the one tracked `*-build-<id>-packet.py` under the
          dClosedLoop build's `build/` folder and `<id>` is read from its name, so no spec id is
          spelled here. None tracked, the join prints that it is off and grades nothing; more than
-         one refuses. Its line prints on every run. What it does NOT see: a LANDING record's packet,
+         one refuses. When `chain-packet.py` sits beside this file the check runs through that
+         front door, which hands the same arguments to the instrument's own `main`, and the reason
+         keeps its words (TOOL-aBatchedPacket-1). Its line prints on every run. What it does NOT see: a LANDING record's packet,
          because deriving LANDED asks the remote and a join on an unguarded leg reads no network; a
          run whose `RUN.md` this tree does not hold, or whose `RUN.md` carries no phase line; and
          anything the instrument itself does not check, which its own docstring lists.
@@ -1642,6 +1644,8 @@ WONTDO_STATUS = re.compile(r"^\*\*Status:\*\*\s*WONTDO", re.M)
 # shape matches, and the packet's id from its name: spelling the id would cite a live spec from
 # product source.
 PACKET_INSTRUMENT = re.compile(r"memory/builds/dClosedLoop/build/[^/]*-build-([^/]+)-packet\.py")
+# TOOL-aBatchedPacket-1: the instrument's front door, run in its place when it sits beside this file.
+PACKET_DOOR = "chain-packet.py"
 LIVE_EXCLUDED = ("LANDED", "ABORTED", "LANDING")
 RUN_PHASE = re.compile(r"^phase: (\S+)", re.M)
 
@@ -1670,7 +1674,9 @@ def scan_live_packets(root, files):
         if not phases or phases[-1] in LIVE_EXCLUDED:
             continue
         live += 1
-        p = subprocess.run([sys.executable, inst[0], "--check", slug], cwd=root, capture_output=True)
+        door = HERE / PACKET_DOOR
+        cmd = [sys.executable, str(door) if door.is_file() else inst[0], "--check", slug]
+        p = subprocess.run(cmd, cwd=root, capture_output=True)
         checked += 1
         if p.returncode:
             out = p.stdout.decode("utf-8", "replace").replace("\r\n", "\n").splitlines()

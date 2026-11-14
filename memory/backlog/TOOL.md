@@ -16,6 +16,7 @@ Cite ids, never line numbers.
 
 | Ask | Status | Sev | Decided by | Filed | Summary |
 |---|---|---|---|---|---|
+| [TOOL-aBatchedPacket-3](../builds/aBatchedPacket/BACKLOG.md) | OPEN | LOW | — | 2026-11-14 | THE MEMORY-TREE ENGINE VERSION THIS BUILD OWED. TOOL-aBatchedPacket-1… |
 | [TOOL-aBoundedCeiling-8](../builds/aBoundedCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | tools/run-gates/run-gates.turnstile.test.sh arm 4c (AC4c) CANNOT FAIL.… |
 | [TOOL-aBoundedCeiling-9](../builds/aBoundedCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | the unattended kit gate leg is RED ON MAIN and has been since… |
 | [TOOL-aBoundedCeiling-10](../builds/aBoundedCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | A HELD LEG CANNOT NOTICE ITS OWN DRIFT, and two independent instances… |
@@ -50,6 +51,11 @@ Cite ids, never line numbers.
 | [TOOL-aBriskPreflight-18](../builds/aBriskPreflight/BACKLOG.md) | OPEN | BLOCKER | — | 2026-10-12 | inherited red: leg playbook render wiring red at 37200355, older than… |
 | [TOOL-aCandidStub-1](../builds/aCandidStub/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | tools/hooks/agent-cap.js blesses an identifier bound from an EMPTY… |
 | [TOOL-aCandidStub-2](../builds/aCandidStub/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | tools/memory-tree/adopt-memory-tree.sh scaffolds no gotchas/, and… |
+| [TOOL-aCarriedStop-4](../builds/aCarriedStop/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | held red: suite codebase-map adopter e2e red at 8db6f4be on the daily… |
+| [TOOL-aCarriedStop-5](../builds/aCarriedStop/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | held red: suite check-wiring self-test red at 8db6f4be on the daily… |
+| [TOOL-aCarriedStop-6](../builds/aCarriedStop/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | held red: suite playbook render selftest red at 8db6f4be on the daily… |
+| [TOOL-aCarriedStop-7](../builds/aCarriedStop/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | held red: suite scratch-guard self-test red at 8db6f4be on the daily… |
+| [TOOL-aCarriedStop-8](../builds/aCarriedStop/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | held red: suite template size gate selftest red at 8db6f4be on the… |
 | [TOOL-aCollapsedScan-5](../builds/aCollapsedScan/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | THE ORIGINAL FACT IS NOW FALSE and the ASK SURVIVES. Re-measured… |
 | [TOOL-aCollapsedScan-8](../builds/aCollapsedScan/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | tools/drift-audit/drift_report.py at line 65 carries the SAME… |
 | [TOOL-aCollapsedScan-9](../builds/aCollapsedScan/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | a BUDGET_* ceiling is a single integer over a cost that is both… |

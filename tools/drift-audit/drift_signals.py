@@ -396,19 +396,19 @@ BASELINES: dict[str, list[str]] = {
     # drained by removing the annotations describing it. The engine now excludes the project layer
     # from signal 2's evidence, so a listed id drains when its real citations do.
     #
-    # WHAT THE RESIDUAL IS, which is the part worth keeping: both are INPROGRESS with their ids in
-    # tracked kit source, and INPROGRESS means "approved, build underway" — arguably TRUE of a
-    # built-but-unmerged unit. So this is the oracle's known ambiguity rather than proven rot.
-    # Listed rather than gated to zero for exactly that reason; read the detail before deleting one.
+    # WHAT THE RESIDUAL IS, which is the part worth keeping: each listed spec is INPROGRESS with
+    # its id in tracked kit source, and INPROGRESS means "approved, build underway" — arguably
+    # TRUE of a built-but-unmerged unit. So this is the oracle's known ambiguity rather than
+    # proven rot. Listed rather than gated to zero for exactly that reason; read the detail before
+    # deleting one.
     #
     # RE-MEASURED at the unit that took the shipped id grammar and narrowed this signal's globs off
     # test files. The value did not move, and that is the expected result rather than a failed
-    # change: both ids keep non-test product citations that neither the grammar swap nor the
-    # narrowing touches. What DID move is the judgeable population, upward, because the shipped
+    # change: each listed id keeps non-test product citations that neither the grammar swap nor
+    # the narrowing touches. What DID move is the judgeable population, upward, because the shipped
     # grammar matches correction-form ids that the old hand-typed one silently declined to judge.
     "non_terminal_specs_cited_by_product_source": [
         "TOOL-aBatchedLintel-1",
-        "TOOL-dNarrowedAnchor-1",
     ],
     # The oracle's known residual. Its build commits are 59b4710 and its siblings, whose subjects
     # name neither its id nor its slug: it closed on 2026-08-11, hours after the convention it is

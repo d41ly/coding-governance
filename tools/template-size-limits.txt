@@ -184,7 +184,12 @@ memory/guides/UNATTENDED-PROTOCOL.md	68092
 # registered document to, so no prose is coming back. The render measures 10524 CR-stripped, and the
 # row is that figure, with no headroom. A run's raise, on the four terms above (memory/DECISIONS.md,
 # PLAY-dOrderedCharter-3).
-.claude/skills/unattended/SKILL.md	10524
+# RAISED 10524 -> 10580, 2026-11-13, by TOOL-aCarriedStop-1: the `--record-round --owner-stop` form
+# in the fenced verb list, one command line beside the audit form it shares a verb with, so it is a
+# block the gate reads and no prose coming back. The render measures 10580 CR-stripped, and the row
+# is that figure, with no headroom. A run's raise, on the four terms above (memory/DECISIONS.md,
+# TOOL-aCarriedStop-1).
+.claude/skills/unattended/SKILL.md	10580
 
 # --- every LIVE spec, a CLASS row (TOOL-aMendedFleet-25) --------------------------------------
 # 49152 bytes = 48 KiB, CR-stripped, the charter template's own ceiling, so no spec costs more to

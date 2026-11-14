@@ -81,7 +81,13 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # RAISED 248 -> 252 by TOOL-aClearedLedger-11: its two staged assertions, the wrapper spellings and the
 # option pair, and its two command-line arms over a manifest carrying a ceiling, each top-level; the
 # staged spellings assertion it widens was counted already. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=252
+# RAISED 245 -> 246 by TOOL-aBatchedPacket-1: its one packet-join arm, the checker copy with no front
+# door beside it, top-level. Counted by reading; OWED: observed at the close.
+# RAISED 246 -> 247 by TOOL-aBatchedPacket-2: its one packet-join arm, the checker copy with a marker
+# door beside it, top-level. Counted by reading; OWED: observed at the close.
+# RECONCILED to 254 at the merge of origin/main into build/aClearedLedger: 245, plus the seven
+# TOOL-aClearedLedger-5 and -11 added, plus the two TOOL-aBatchedPacket-1 and -2 added. Summed, not counted.
+FLOOR_ASSERTIONS=254
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -2048,6 +2054,21 @@ printf '# packet\n' > "$d/memory/builds/tChain/prompts/2026-10-21-prompt-PLAY-dC
 printf '# tChain - run state\n\nphase: BUILDING\n' > "$d/memory/builds/tChain/RUN.md"
 git -C "$d" add -A >/dev/null; git -C "$d" commit -qm packet --no-verify
 arm "TOOL-dGroundRules-63 a live chain run whose packet check exits 1 REDS as [packet] naming the build" 1 "$d" '[packet] `tChain` — packet.py --check exited 1: packet: tChain - stub - byte compare red'
+# TOOL-aBatchedPacket-1: the arm above prints the stub's line whichever way the join ran, since the
+# front door beside the checker sends a stub down its fallback; the marker arm below is what shows
+# the route. This one runs a copy of the checker in a tool root holding the memory-tree kit and no
+# door, which must run the instrument itself, print the same line and nothing of a marker door.
+nd=$base/nodoor; mkdir -p "$nd"; cp "$LINT" "$nd/"; cp -r "$MEMORY_TREE" "$nd/memory-tree"
+door_lint=$LINT; LINT="$nd/check-spec-tokens.py"
+arm "TOOL-aBatchedPacket-1 a checker with no front door beside it runs the instrument and REDS with the same line" 1 "$d" '[packet] `tChain` — packet.py --check exited 1: packet: tChain - stub - byte compare red' 'marker door'
+# TOOL-aBatchedPacket-2: the same copy in a tool root that also holds a MARKER door, which prints its
+# own line and exits 1 without running anything. The [packet] reason must quote that line, so a
+# checker that stops routing the join through a door sitting beside it reds here.
+md=$base/markerdoor; mkdir -p "$md"; cp "$door_lint" "$md/"; cp -r "$MEMORY_TREE" "$md/memory-tree"
+printf 'import sys\nprint("chain-packet: marker door ran")\nsys.exit(1)\n' > "$md/chain-packet.py"
+LINT="$md/check-spec-tokens.py"
+arm "TOOL-aBatchedPacket-2 a checker with a marker door beside it runs the join through that door and REDS quoting its line" 1 "$d" '[packet] `tChain` — packet.py --check exited 1: chain-packet: marker door ran'
+LINT=$door_lint
 printf 'phase: LANDED\n' >> "$d/memory/builds/tChain/RUN.md"
 git -C "$d" add -A >/dev/null; git -C "$d" commit -qm landed --no-verify
 arm "TOOL-dGroundRules-63 the same run once LANDED is not graded, and the join says so" 0 "$d" "packet join · 0 live chain run(s) · 0 packet(s) checked" "[packet]"
