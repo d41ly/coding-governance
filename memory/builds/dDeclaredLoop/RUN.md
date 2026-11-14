@@ -130,3 +130,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-14T10:51:02Z brief · item TOOL-dDeclaredLoop-9 · reason c7206af26957 memory/builds/dDeclaredLoop/prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-9-build-brief.md
 
 2026-11-14T11:33:30Z dispatch · item 9f835b2b TOOL-dDeclaredLoop-9 · reason tools/loop/loop_lib.py tools/loop/loop.toml tools/loop/kit.toml tools/loop/README.md help/loop.md memory/map/generated/symbols.json memory/builds/dDeclaredLoop/build/2026-11-14-build-TOOL-dDeclaredLoop-9-1-acceptance-ledger.md memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-9.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/backlog/TOOL.md
+
+2026-11-14T12:28:06Z brief · item TOOL-dDeclaredLoop-17 · reason 39e8933389d2 memory/builds/dDeclaredLoop/prompts/2026-11-14-prompt-TOOL-dDeclaredLoop-17-build-brief.md
