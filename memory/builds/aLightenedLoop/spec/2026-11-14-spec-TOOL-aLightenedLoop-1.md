@@ -1,6 +1,6 @@
 # TOOL-aLightenedLoop-1 — the commit tail: `--write` writes only changed bytes, a render stamp answers the hook, check 9's staged skip admits a records edit, and check 29 exits early
 
-**Status:** SPECCED · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 1 · ratified 2026-11-14
+**Status:** INPROGRESS · rev-2 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 1 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
