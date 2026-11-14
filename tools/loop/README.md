@@ -207,7 +207,8 @@ entry, or `@open`), the `item` tag and `outcome` that fire it, its `to` (a state
 names the owner of each row item whose build has not landed, and `[[owed-row]]` each cross-step route
 whose build row another unit or build writes; both lists only shrink. `loop_lib.py` does not read
 them: `loop_table.py` does, through `read_transition_rows` and `read_stand_ins` over the parsed
-definition, `read_transition_rows` splitting `terminal` out of the levels, and `derive_move` answers a
+definition, `read_transition_rows` splitting `terminal` out of the levels and adding `step-order`, each
+step's state to its order, and `derive_move` answers a
 move from the rows alone, raising `TransitionRefused` where no row holds it or the state asked is a
 terminal, and ValueError on an unknown level or state or a missing fact a row reads (`prior`,
 `reenters`, `pushed`, `disposition`), never a default.
@@ -225,8 +226,13 @@ P1 moves a build in designing, building or deploying back to planning on `item.d
 `withdrawn`. No row enters incomplete, deferred, retired, merged or answered yet; those states stay in
 the set.
 
-`move` prints `move — <level> · <from> → <to> · <item>`, with `· stand-in <owner>` for a stand-in item,
-exit 0; `refused — ...: no row`, exit 1; `unanswered — ...: <why>`, exit 2. `check`, by
+`derive_direction(state, to, tables)` answers a resolved build move's direction from `step-order` and
+`terminal`, never typed: `forward` into a terminal or a later step, `backward` into an earlier one, and
+`lateral` where an end has no step (`none`, `paused`, `parked`) or both share one. A backward move is
+recorded through the same writer and channels as a forward one.
+
+`move` prints `move — <level> · <from> → <to> · <item>`, with `· stand-in <owner>` for a stand-in item
+and `· <direction>` last for a build move, exit 0; `refused — ...: no row`, exit 1; `unanswered — ...: <why>`, exit 2. `check`, by
 `check_transition_tables`, prints a `loop: table` line per level, `loop: terminal build · <states>`, a
 `loop: owed` line per owed row and a `loop: stand-in` line per stand-in, and refuses a row leaving a
 terminal, a terminal also listed among the build's open states, an undeclared level or state, two rows for one move,
@@ -239,7 +245,8 @@ read or holds no transition row. `--fixture --plant <case>` runs `check` with on
 made in memory by `write_table_plant`: `bad-state`, `two-rows`, `bad-exit`, `dropped-row`,
 `unrouted-row`, `owed-stale`, `stand-in`, `terminal-from` (a build row leaving landed) and
 `terminal-open` (landed appended to the build's open states). `check --selftest` runs `check`, every
-plant and each kind of move through `run_selftest_cases`, the case loop `loop_checklist.py` shares,
+plant, each kind of move and direction, and `direction-order`, the shipped rows with building's and
+testing's orders swapped, through `run_selftest_cases`, the case loop `loop_checklist.py` shares,
 and is the kit's `loop transition tables` gate leg.
 
 ```bash
@@ -310,11 +317,16 @@ and commits the records, or an empty commit, as `loop transition(<slug>): <from>
 trailer where selected. `check` (`check_transition_channels`) holds each record to its trailer field by
 field, names a record no trailer backs, prints `pending` while moves wait on the first spec and
 `unstored` where the set stores nothing, and holds the definition in `AGENTS.md` to `TRANSITION_LINE`.
-`read_transitions(build, repo)` returns the build's moves newest first. Both verbs exit 2 on a policy
+`read_transitions(build, repo)` returns the build's moves newest first, each with its `direction`
+derived on read by `derive_direction` over this kit's definition. A backward move goes through the same
+writer, channels and fields as a forward one, and `record` prints its direction on its
+`loop: recorded · <from> -> <to> · <direction> · commit <sha8>` line; no trailer or record stores it. Both verbs exit 2 on a policy
 refusal naming `transitions.record`, and 2 `unarmed` where the policy kit does not resolve, since this
 kit takes no edge to it. `--fixture --plant <case>` runs both over a scratch repository: `default`,
 `subset-trailer-line`, `subset-log`, `empty-set`, `log-drift`, `orphan-log`, `no-row`, `line-drift`,
-`pre-spec` and `field`. `check --selftest` holds the tree's own definition, then runs every plant, and
+`pre-spec`, `field`, and the two over `BACKWARD_MOVES`, three moves forward and three back:
+`backward-rows`, printing each trailer and read with its direction, and `skip-backward`, the newest
+record deleted so the check names the move back owing it. `check --selftest` holds the tree's own definition, then runs every plant, and
 is gov's `loop transition record` leg.
 
 ```bash

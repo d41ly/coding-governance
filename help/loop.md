@@ -292,7 +292,10 @@ and builds.
 - **Ask for a move:** `python tools/loop/loop_table.py move --level build --from planning --item item.plan.exit --outcome recorded` <!-- usage: script:tools/loop/loop_table.py#move a9f6141c -->
   answers from the rows alone, with one of three answers:
   - `move` with the state it enters, exit 0, and `stand-in <owner>` after it when the item's own
-    build has not landed yet, so a fixture witness stands in for it;
+    build has not landed yet, so a fixture witness stands in for it. A build move ends with its
+    direction: `forward` into a later step or a terminal, `backward` into an earlier step, testing
+    to building say, and `lateral` into or out of a state with no step, such as paused. The direction
+    is worked out from the steps' order every time, never typed into a row;
   - `refused`, exit 1, when no row holds the move, for instance a build in planning asking to leave
     on Design's exit: stage order alone never admits a move;
   - `unanswered`, exit 2, when the level or state is unknown or a fact the row needs is missing.
@@ -311,9 +314,9 @@ and builds.
   ```
 
   ```text
-  move — build · planning → designing · item.plan.exit · stand-in dRankedPlan
-  move — build · paused → testing · item.life.request · stand-in dWellOiledMachine
-  move — build · building → planning · @any
+  move — build · planning → designing · item.plan.exit · stand-in dRankedPlan · forward
+  move — build · paused → testing · item.life.request · stand-in dWellOiledMachine · lateral
+  move — build · building → planning · @any · backward
   ```
 
 - **Check the tables:** `check` prints one `loop: table` line per level with its row and state <!-- usage: script:tools/loop/loop_table.py#check 0011b11d -->
@@ -451,12 +454,18 @@ log record is the source; with only `micro-format` selected, nothing is stored a
 
   ```text
   loop: wrote memory/builds/<slug>/build/<date>-build-<id>-transition-1.md
-  loop: recorded · planning -> designing · commit <sha8>
+  loop: recorded · planning -> designing · forward · commit <sha8>
   transition — <slug> · planning → designing · item.plan.exit · <sha8>
   ```
 
   A move made before the build has its first spec writes the trailer and no record; the next move
   after the first spec writes the missing records first, in move order.
+
+  A backward move, such as testing back to building on a code miss, is recorded through the same
+  writer and channels as a forward one, with the same trailer fields and record lines, and the check
+  holds it the same way. The `loop: recorded` line names the move's direction, `forward`, `backward`
+  or `lateral`; it is worked out from the steps' order when printed or read, and never stored in the
+  trailer or the record.
 
 - **Check a build's moves:** `check --build <slug>` holds each log record to its move's trailer, names <!-- usage: script:tools/loop/loop_transition.py#check 53beaa6b -->
   a record no trailer backs, and holds the `transition` definition in your `AGENTS.md` to the line the
@@ -474,8 +483,10 @@ log record is the source; with only `micro-format` selected, nothing is stored a
 - **See it on a scratch repository:** `--fixture --plant <case>` builds a scratch repository holding <!-- usage: script:tools/loop/loop_transition.py 930359dc -->
   the build `tFix`, records a move there, runs the check and removes it. The cases are `default`,
   `subset-trailer-line`, `subset-log`, `empty-set`, `log-drift`, `orphan-log`, `no-row`, `line-drift`,
-  `pre-spec` and `field`. `check --selftest` runs every case, and gov's own `loop transition record`
-  gate runs it.
+  `pre-spec`, `field`, `backward-rows` (three moves forward and three back, each trailer and read
+  printed with its direction) and `skip-backward` (the same six moves, the last one's record deleted,
+  so the check names the move back that owes it). `check --selftest` runs every case, and gov's own
+  `loop transition record` gate runs it.
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
   ```bash

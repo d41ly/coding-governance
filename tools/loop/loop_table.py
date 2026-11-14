@@ -24,8 +24,12 @@ open state of the level, and `@reentry` the state of the step whose item the `re
 unknown level or state, an absent or malformed fact a matching row needs, or two matching rows is a
 ValueError, never a default.
 
+`derive_direction` answers a resolved build move's direction from the rows' step orders, never typed:
+`forward` into a terminal or a later step, `backward` into an earlier one, `lateral` where an end has no
+step, so a move back is recorded through the same writer and channels as a move forward.
+
 `move` prints `move — <level> · <from> → <to> · <item>`, with `· stand-in <owner>` after it where the
-item is a stand-in, and exits 0; `refused — <level> · <from> · <item> · <outcome>: no row`, exit 1; and
+item is a stand-in, then `· <direction>` last for a build move, and exits 0; `refused — <level> · <from> · <item> · <outcome>: no row`, exit 1; and
 `unanswered — <level> · <from> · <item> · <outcome>: <why>`, exit 2, on a ValueError. `check` prints one
 `loop: table <level> · <n> row(s) · <m> state(s)` line per level, then `loop: terminal build · <states>`,
 and refuses a row whose `from` names a terminal and a terminal also listed among the build's open
@@ -34,7 +38,8 @@ states, the refusal that keeps `@open` off a terminal. It prints one `loop: owed
 `loop: refused · ...`, exit 1. Both exit 2 where the definition does not read or holds no
 `[[transition]]` row, never admitting a move. `--fixture --plant <case>` runs `check` with one break of
 `PLANTS` made in memory by `write_table_plant`, never on disk. `check --selftest` runs `check`, every
-plant and the moves of each answer through `loop_lib.run_selftest_cases`, exit 0 when every case holds.
+plant, the moves of each answer and direction, and `direction-order`, the rows with two steps' orders
+swapped, through `loop_lib.run_selftest_cases`, exit 0 when every case holds.
 
 The route join (S7) reads each `[[item]]` row's routes: a cross-step route is an outcome routed to
 `transition`, or to a declared item of another step. Forward, each has a build row for its item and
@@ -102,7 +107,8 @@ class TransitionRefused(Exception):
 
 def read_transition_rows(data, where):
     """`{"states": {level: [states]}, "terminal": [states], "transition": [rows], "owed-row": [rows],
-    "item-states": {item tag: its step's state}}` of a parsed definition, the rows ungraded. `[states]`'s
+    "item-states": {item tag: its step's state}, "step-order": {step's state: its order}}` of a parsed
+    definition, the rows ungraded. `[states]`'s
     `terminal` key is split out as the build level's terminal states, never a level, absent reading as
     none. LoopError for a `[states]` that is no table of non-empty lists of words, `terminal` included,
     or a `transition` or `owed-row` table that is no array of tables."""
@@ -117,9 +123,23 @@ def read_transition_rows(data, where):
         if not isinstance(rows, list) or not all(isinstance(r, dict) for r in rows):
             raise LoopError(where, "'%s' is not an array of tables" % table)
         out[table] = rows
-    step_states = {r.get("tag"): r.get("state") for r in check_loop(data, where)["step"]}
+    steps = check_loop(data, where)["step"]
+    step_states = {r.get("tag"): r.get("state") for r in steps}
     out["item-states"] = {r.get("tag"): step_states.get(r.get("step")) for r in read_item_rows(data, where)}
+    out["step-order"] = {r.get("state"): r.get("order") for r in steps}
     return out
+
+
+def derive_direction(state, to, tables):
+    """'forward', 'backward' or 'lateral' for one resolved build move, from tables["step-order"]
+    and tables["terminal"], both of what read_transition_rows returns: forward into a terminal, lateral
+    where either end has no step or both share one, else as the two steps' orders compare."""
+    if to in tables["terminal"]:
+        return "forward"
+    order = tables["step-order"]
+    if state not in order or to not in order or order[state] == order[to]:
+        return "lateral"
+    return "forward" if order[to] > order[state] else "backward"
 
 
 def read_stand_ins(data, where):
@@ -386,8 +406,28 @@ def main(argv):
                   ("move parent", move + ["designing", "--item", "item.deploy.parents", "--outcome", "withdrawn"], 0,
                    "move — build · designing → planning · item.deploy.parents", ""),
                   ("move from terminal", move + ["landed", "--item", "item.life.request", "--outcome", "resume",
-                                                 "--fact", "prior=testing"], 1, "refused — build · landed", "")]
-        return run_selftest_cases(main, cases, "%s: table selftest" % SAY)
+                                                 "--fact", "prior=testing"], 1, "refused — build · landed", ""),
+                  ("direction forward", move + ["building", "--item", "item.build.exit", "--outcome", "recorded"], 0,
+                   "move — build · building → testing · item.build.exit", " · forward"),
+                  ("direction backward", move + ["testing", "--item", "item.test.attribute", "--outcome",
+                                                 "code-miss"], 0, "move — build · testing → building", " · backward"),
+                  ("direction lateral", move + ["building", "--item", "item.life.request", "--outcome", "pause"], 0,
+                   "move — build · building → paused", " · lateral"),
+                  ("direction-order", ["direction-order"], 0,
+                   "%s: direction-order · building → testing · backward" % SAY, "")]
+
+        def run_table_case(argv):
+            """`main(argv)`, or for `direction-order` the shipped rows with building's and testing's step
+            orders swapped, so a direction read from anything but the rows still prints forward."""
+            if argv != ["direction-order"]:
+                return main(argv)
+            tables = read_transition_rows(*read_definition(KIT))
+            order = tables["step-order"]
+            swapped = dict(tables, **{"step-order": dict(order, building=order["testing"], testing=order["building"])})
+            print("%s: direction-order · building → testing · %s" % (
+                SAY, derive_direction("building", "testing", swapped)))
+            return 0
+        return run_selftest_cases(run_table_case, cases, "%s: table selftest" % SAY)
     try:
         data, where = read_definition(KIT)
     except LoopError as e:
@@ -414,8 +454,9 @@ def main(argv):
             print("unanswered — %s: %s" % (said, e))
             return 2
         owner = {r.get("item"): r.get("owner") for r in read_stand_ins(data, where)}.get(args.item)
-        print("move — %s · %s → %s · %s%s" % (args.level, args.state, to, args.item,
-                                             " · stand-in %s" % owner if owner else ""))
+        print("move — %s · %s → %s · %s%s%s" % (
+            args.level, args.state, to, args.item, " · stand-in %s" % owner if owner else "",
+            " · %s" % derive_direction(args.state, to, tables) if args.level == "build" else ""))
         return 0
     try:
         items = read_items(KIT)

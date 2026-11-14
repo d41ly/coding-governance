@@ -24,8 +24,11 @@ record, and the writer's next move after it back-fills one per earlier trailer, 
 table's `derive_move`, printing `refused — ...` and exiting 1 where no row holds it; resolves `--witness`
 to HEAD or an ancestor of it, adding `stand-in=<owner>` where the item has a `[[stand-in]]` row; refuses
 a staged index; back-fills, writes this move's record, commits the records, or an empty commit, as
-`loop transition(<slug>): <from> -> <to>` with the trailer where selected, and prints the line where
-selected. A set storing neither the trailer nor the log writes no commit.
+`loop transition(<slug>): <from> -> <to>` with the trailer where selected, prints
+`loop: recorded · <from> -> <to> · <direction> · commit <sha8>`, and prints the line where selected. A
+set storing neither the trailer nor the log writes no commit. A backward move, testing to building say,
+goes through this one writer, its channels and its fields as a forward move does: the direction is
+`loop_table`'s `derive_direction`, derived on every print and read, and never stored.
 
 `check` (`check_transition_channels`) holds each channel to the trailer: per trailer whose commit's set
 holds `log`, one record with equal `**Key:**` fields; no record left over where its adding commit's set
@@ -34,7 +37,8 @@ equal to `TRANSITION_LINE`. A record whose adding commit's set lacks `trailer` i
 It prints each finding as `loop: transition · ...`, naming the commit, the channel and the field;
 `pending — <n> move(s) before the build's first spec` while trailers wait on a spec; `unstored — ...`
 where the set at HEAD stores nothing; then its summary. `read_transitions(build, repo)` is the build's
-moves newest first, from the trailer where one was written and from the record otherwise.
+moves newest first, from the trailer where one was written and from the record otherwise, each with
+its `direction` derived over this kit's definition.
 
 Exit: `record` 0 recorded, 1 refused by the table; `check` 0 clean, 1 on a finding, `pending` or
 `unstored`. Both exit 2 printing `loop: unanswered · <why>` on a value outside its grammar, a witness
@@ -45,11 +49,15 @@ kit, which is why.
 
 `--fixture --plant <case>` builds a scratch repository under the host temp directory holding the build
 `tFix`, runs `record` and `check` there in process, prints each verdict, removes the scratch and exits
-as its last verb. `check --selftest` holds the definition of `AGENTS.md` in the current directory, then
-runs every plant through `run_selftest_cases`, each plant once however many cases read it.
+as its last verb. `backward-rows` and `skip-backward` record `BACKWARD_MOVES`, three moves forward and
+three back; the first prints every trailer and read with its direction, the second deletes the newest
+record and owes its move's finding. `check --selftest` holds the definition of `AGENTS.md` in the
+current directory, then runs every plant through `run_selftest_cases`, each plant once however many
+cases read it.
 
 WHAT THIS DOES NOT CHECK: that a witness holds beyond resolving; a record's lines after its fields; a
-feature- or unit-level move; a charter other than the one `AGENTS.md`. A record pairs with a trailer by
+feature- or unit-level move; a charter other than the one `AGENTS.md`; an old move's direction against
+the definition at its commit, since it is derived from today's. A record pairs with a trailer by
 order, the n-th owing trailer with the n-th such record, so two records swapped read as two drifts.
 """
 import argparse
@@ -66,7 +74,8 @@ if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from loop_lib import read_definition, read_memory_tree, run_selftest_cases  # noqa: E402
 from loop_parents import read_policy_kit  # noqa: E402
-from loop_table import TransitionRefused, derive_move, read_stand_ins, read_transition_rows  # noqa: E402
+from loop_table import (TransitionRefused, derive_direction, derive_move, read_stand_ins,  # noqa: E402
+                        read_transition_rows)
 from loop_witness import read_git, remove_tree, resolve_commit, run_fixture_git, write_fixture_files  # noqa: E402
 
 SAY = "loop"
@@ -97,7 +106,16 @@ PLANTS = {"default": "the default set, one B4 move with its witness",
           "no-row": "planning to building through item.design.exit, which no row holds",
           "line-drift": "an AGENTS.md whose definition drops <item tag>",
           "pre-spec": "a build with no spec moved once, then a spec planted and a second move",
-          "field": "composition registered, a move with --field composition=3f9c2a71 and one with colour=red"}
+          "field": "composition registered, a move with --field composition=3f9c2a71 and one with colour=red",
+          "backward-rows": "B4, B5 and B7 forward, then B13, B8 and B6 back, each trailer and read printed",
+          "skip-backward": "the six moves of backward-rows, then the newest record, B6's, deleted"}
+#: The moves the backward plants record in order, each an argv tail for `record` before its witness.
+BACKWARD_MOVES = (("--from", "planning", "--item", "item.plan.exit", "--outcome", "recorded"),
+                  ("--from", "designing", "--item", "item.design.exit", "--outcome", "recorded"),
+                  ("--from", "building", "--item", "item.build.exit", "--outcome", "recorded"),
+                  ("--from", "testing", "--item", "item.test.attribute", "--outcome", "code-miss"),
+                  ("--from", "building", "--item", "item.build.unit-pass", "--outcome", "spec-wrong"),
+                  ("--from", "designing", "--item", "item.design.decompose", "--outcome", "goal-fork"))
 #: The plants' policy values, committed as `.governance/policy.toml`; a plant not here commits none.
 PLANT_SETS = {"subset-trailer-line": '["trailer", "micro-format"]', "subset-log": '["log"]', "empty-set": "[]"}
 FX_BUILD = "tFix"
@@ -276,9 +294,11 @@ def read_transition_moves(build, root, cache):
 
 def read_transitions(build, repo):
     """The build's recorded moves, newest first: each the fields of its trailer, or of its record where
-    the move wrote no trailer, with `commit` and `source` (`trailer` or `log`). ValueError or OSError
-    where a read is refused; LookupError where a kit does not resolve."""
+    the move wrote no trailer, with `commit`, `source` (`trailer` or `log`) and `direction`, derived on
+    read by `derive_direction` over this kit's definition and never stored. ValueError or OSError where a
+    read is refused; LookupError where a kit does not resolve."""
     root = pathlib.Path(repo).absolute()
+    tables = read_transition_rows(*read_definition(KIT))
     moves = read_transition_moves(build, root, {})
     out = [dict(t, commit=c["sha"], source="trailer") for c, t in moves["trailers"]]
     if moves["sourced"]:
@@ -286,6 +306,8 @@ def read_transitions(build, repo):
         at = {sha: n for n, sha in enumerate(order)}
         out += [dict(r["fields"], commit=moves["adding"].get(r["path"]), source="log") for r in moves["sourced"]]
         out.sort(key=lambda m: at.get(m["commit"], len(at)))
+    for m in out:
+        m["direction"] = derive_direction(m.get("from"), m.get("to"), tables)
     return out[::-1]
 
 
@@ -453,10 +475,16 @@ def run_transition_fixture(case):
             TRANSITION_FIELDS = registered + ("composition",)
             run_verb(b4 + ["--field", "colour=red"])
             run_verb(b4 + ["--field", "composition=3f9c2a71"])
+        elif case in ("backward-rows", "skip-backward"):
+            for n, tail in enumerate(BACKWARD_MOVES):
+                run_verb(["record", *at, *tail, "--witness", "HEAD" if n else witness])
         else:
             run_verb(b4)
-        value = run_fixture_git(top, "log", "-1", "--format=%%(trailers:key=%s,valueonly)" % TRAILER_KEY)
-        print("%s: fixture · trailer %s" % (SAY, value or "none"))
+        span = "--reverse" if case == "backward-rows" else "-1"
+        values = [v for v in run_fixture_git(top, "log", span, "--format=%%(trailers:key=%s,valueonly)" % TRAILER_KEY)
+                  .splitlines() if v]
+        for value in values or ["none"]:
+            print("%s: fixture · trailer %s" % (SAY, value))
         recs = read_folder()
         if case == "default" and recs:
             read_memory_tree("build_records.py")
@@ -465,9 +493,17 @@ def run_transition_fixture(case):
             with contextlib.redirect_stdout(out):
                 rc = build_records.main(["read", str(top / recs[0]["path"])])
             print("%s: fixture · build_records read · exit %d · %d field(s)" % (SAY, rc, out.getvalue().count("\n")))
-        if case in ("subset-log", "field"):
+        if case in ("subset-log", "field", "backward-rows"):
             for m in read_transitions(FX_BUILD, top):
-                print("%s: fixture · read %s · %s" % (SAY, m["source"], render_transition_trailer(m).split(": ", 1)[1]))
+                print("%s: fixture · read %s · %s · %s" % (
+                    SAY, m["source"], render_transition_trailer(m).split(": ", 1)[1], m["direction"]))
+        if case == "backward-rows":
+            held = [r for r in recs if "direction" in (top / r["path"]).read_bytes().decode("utf-8", "replace")]
+            print("%s: fixture · direction stored · %d trailer(s) · %d record(s)" % (
+                SAY, sum("direction" in v for v in values), len(held)))
+        if case == "skip-backward" and recs:
+            (top / recs[-1]["path"]).unlink()
+            write_commit("the newest record, B6's, deleted")
         if case == "log-drift" and recs:
             path = top / recs[0]["path"]
             path.write_bytes(path.read_bytes().replace(b"- **To:** designing", b"- **To:** building"))
@@ -543,7 +579,20 @@ def run_selftest():
              ("field refused", fx("field"), 0, "%s: unanswered" % SAY, "colour"),
              ("field trailer", fx("field"), 0, trailer, "composition=3f9c2a71"),
              ("field read", fx("field"), 0, "%s: fixture · read trailer · " % SAY, "composition=3f9c2a71"),
-             ("field check", fx("field"), 0, check, "· 0 finding(s)")]
+             ("field check", fx("field"), 0, check, "· 0 finding(s)"),
+             ("backward-rows trailer", fx("backward-rows"), 0, "%s: fixture · trailer testing -> building · build=%s · "
+              "item=item.test.attribute · sha=" % (SAY, FX_BUILD), " · stand-in=dWitnessedBar"),
+             ("backward-rows records", fx("backward-rows"), 0, "%s: fixture · records 6" % SAY,
+              "transition-6 designing -> planning"),
+             ("backward-rows recorded", fx("backward-rows"), 0, "%s: recorded · testing -> building · backward" % SAY,
+              ""),
+             ("backward-rows read", fx("backward-rows"), 0, "%s: fixture · read trailer · designing -> planning" % SAY,
+              " · backward"),
+             ("backward-rows stored", fx("backward-rows"), 0,
+              "%s: fixture · direction stored · 0 trailer(s) · 0 record(s)" % SAY, ""),
+             ("backward-rows check", fx("backward-rows"), 0, check, "· 0 finding(s)"),
+             ("skip-backward", fx("skip-backward"), 1, "%s: transition · commit " % SAY,
+              "· log · the move designing -> planning owes a record, and none holds it")]
     return run_selftest_cases(run_cached_case, cases, "%s: transition selftest" % SAY)
 
 
@@ -590,8 +639,10 @@ def main(argv):
                                                          args.outcome, args.witness, pairs["fact"], pairs["field"])
             for rel in wrote:
                 print("%s: wrote %s" % (SAY, rel))
-            print("%s: recorded · %s -> %s · %s" % (SAY, move["from"], move["to"], "commit %s" % commit[:8] if commit
-                                                  else "no commit: the set stores neither trailer nor log"))
+            direction = derive_direction(move["from"], move["to"], read_transition_rows(*read_definition(KIT)))
+            print("%s: recorded · %s -> %s · %s · %s" % (
+                SAY, move["from"], move["to"], direction,
+                "commit %s" % commit[:8] if commit else "no commit: the set stores neither trailer nor log"))
             if line:
                 print(line)
             return 0
