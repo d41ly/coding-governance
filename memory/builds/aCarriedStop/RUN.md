@@ -18,7 +18,7 @@ hold-until: probe gate
 hold-code: host-degraded
 held-from: VERIFYING
 gates-run: unattended-17945890617045659641-176387 41c93c8b
-parked-surfaced: yes, 0 surfaced
+parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 60a6d0d79abdc5e70747f93bf34d7c1305f4dc65
