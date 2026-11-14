@@ -20,8 +20,7 @@ and each consumer names its own:
     python commit_trailers.py --print-commits                       # the commit class's members
     python commit_trailers.py --fixture                             # three planted commits, both views
 
-NOT here: the git pins of the default runner (TOOL-dDeclaredLoop-39), an LF-only CLI
-(TOOL-dDeclaredLoop-38) and a floor for an install holding no playbook kit (TOOL-dDeclaredLoop-40),
+NOT here: the git pins of the default runner (TOOL-dDeclaredLoop-39) and a floor for an install holding no playbook kit (TOOL-dDeclaredLoop-40),
 where every read refuses with the resolver's own line.
 """
 from __future__ import annotations
@@ -208,6 +207,8 @@ def build_fixture(top) -> pathlib.Path:
 
 
 def main(argv=None) -> int:
+    # LF only, every verb: a shell loop reading this through `< <(...)` keeps a CR on its last token.
+    sys.stdout.reconfigure(newline="\n")
     args = list(sys.argv[1:] if argv is None else argv)
     try:
         if args[:1] == ["tokens"]:

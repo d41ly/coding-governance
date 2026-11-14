@@ -1254,6 +1254,18 @@ def run_selftest() -> int:
             "TOOL-dDeclaredLoop-37 AC3 a planted consumer's trailer parse is named by path and line, the suite "
             "and the reader beside it are not, and a revision git cannot grep is a Refusal",
             f"hits {hits!r}\nan unreadable revision: {seen}")
+
+        # ---- TOOL-dDeclaredLoop-38 AC1: the trailer CLI's stdout holds no CR over the planted fixture.
+        # Live on win32 only: where the default newline is LF the arm cannot turn red, and says which ran.
+        # It counts no lines: TOOL-dDeclaredLoop-58's.
+        import commit_trailers  # noqa: E402  already imported above; build_fixture is the reader's own
+        fix38 = commit_trailers.build_fixture(root / "lf38")
+        out38 = subprocess.run([sys.executable, str(KIT / "commit_trailers.py"), "tokens", "HEAD"], cwd=fix38,
+                               capture_output=True,
+                               env={k: v for k, v in build_git_env().items() if k not in GIT_ENV_LEAKS}).stdout
+        print_arm(b"\r" not in out38,
+            f"TOOL-dDeclaredLoop-38 AC1 `tokens HEAD` over the planted fixture writes LF only, on {sys.platform}"
+            + ("" if sys.platform == "win32" else " (not live here: the default newline is LF)"), repr(out38))
     finally:
         shutil.rmtree(root, ignore_errors=True)
     print(f"{SAY} selftest: {'all arms held' if not failed else f'{len(failed)} arm(s) FAILED'}")
