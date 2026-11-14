@@ -230,7 +230,7 @@ build_cap_repo() {
   cp -R "$_pk/." "$S2/$_pk/" && tr -d '\r' < "$GATE" > "$S2/$GATE" && cp "$_hp" "$S2/$_hp" \
     && tr -d '\r' < AGENTS.md > "$S2/AGENTS.md" || { printf 'harness FAILED — could not copy the charter-cap repository\n'; exit 2; }
   printf '# no AGENTS.md row\n' > "$S2/${PFX}template-size-limits.txt"
-  printf '[budgets]\nenforce = "warn"\n"AGENTS.md" = %s\n' "$1" > "$S2/.governance/policy.toml"
+  printf '[budgets]\nenforce = "%s"\n"AGENTS.md" = %s\n' "${2:-warn}" "$1" > "$S2/.governance/policy.toml"
   git -C "$S2" init -q && git -C "$S2" symbolic-ref HEAD refs/heads/main \
     && git -C "$S2" add -A && git -C "$S2" -c user.name=t -c user.email=t@t.test -c commit.gpgsign=false commit -qm fixture \
     || { printf 'harness FAILED — could not build the charter-cap repository\n'; exit 2; }
@@ -243,6 +243,14 @@ expect_out "A25r ...and its refusal carries check 8 branch 1's remedy sentence w
   "). Lower the cap to CODEX_MAX or under; a harness reading less than the charter drops its tail." 1 run_cap_gate
 build_cap_repo 20480
 expect_out "A25b a charter cap of 20480 passes, the charter measured within it" "/ 20480 bytes" 0 run_cap_gate
+# TOOL-aClearedLedger-13: an `enforce` value the policy reader refuses. It refuses the whole policy
+# file and answers the handed-in default, which is above CODEX_MAX, so check 8 is reached with a
+# refusal to print: the clause names the reader's refusal and no longer the handed-in default.
+build_cap_repo 40960 bogus
+expect_out "A25c a refused policy file reaches check 8, which prints the reader's refusal" \
+  "The policy reader refused:" 1 run_cap_gate
+expect_absent "A25d ...and its clause no longer names the handed-in default as the cause" \
+  "handed-in default because" 1 run_cap_gate
 
 # --- A24 · no python launcher: an over-cap subject refuses at check 5 (TOOL-dGroundRules-25 S35) --
 # Every launcher name on PATH answers as the Microsoft Store stub does, exit 9009, and no override is

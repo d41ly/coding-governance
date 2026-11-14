@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.121 -->
+<!-- gov:kit unattended@1.122 -->
 [memory/guides/UNATTENDED-STOPS.md · Level 3 · Binding for an unattended run that stops without finishing; yields to levels 0 to 2]
 # The unattended stop contract — HELD, the hold codes and the lease
 

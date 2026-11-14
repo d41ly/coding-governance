@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.121 -->
+<!-- gov:kit unattended@1.122 -->
 [memory/guides/UNATTENDED-VERBS.md · Level 3 · Binding with the unattended protocol, the verbs a run calls; yields to levels 0 to 2]
 # Unattended runs — the verbs
 

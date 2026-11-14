@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.121 -->
+<!-- gov:kit unattended@1.122 -->
 [memory/guides/UNATTENDED-PROTOCOL.md · Level 3 · Binding for a run that merges and pushes with no owner turn; yields to levels 0 to 2]
 # Unattended runs — the protocol
 
@@ -724,8 +724,9 @@ unit harness's return carries a `nextAction`, and the MAIN LOOP runs it before t
 the declared pass legs over that pass's diff. A role agent's pass stays gate-free. Under
 `bar.inline-red-fixes` a leg the gate ledger records red, the bar's or a pass leg's, may be fixed
 with NO spec: the commit names the leg in a `Red-fix:` trailer beside `Pass: none`, the fix's typed
-record is the next commit, and the commit grader holds the fix to its limits. Every other product
-write keeps the route above; either key `off` restores it for that mechanism.
+record is the next commit, because it names the fix commit's sha and so cannot ride that commit,
+and the commit grader holds the fix to its limits. Every other product write keeps the route above;
+either key `off` restores it for that mechanism.
 
 ## 13. The kickoff engine's interactive exits
 
