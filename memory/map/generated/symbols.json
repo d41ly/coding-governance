@@ -7118,6 +7118,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "check_render_settled",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "check_rendered",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
@@ -20148,6 +20153,11 @@
       "file": "tools/run-gates/post-merge.sh"
     },
     {
+      "id": "read_render_state",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "read_renderers",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -27526,6 +27536,11 @@
       "id": "run_pin",
       "kind": "function",
       "file": "tools/playbook/positional.py"
+    },
+    {
+      "id": "run_pinned_read",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.test.sh"
     },
     {
       "id": "run_pk_gate",

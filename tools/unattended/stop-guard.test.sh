@@ -633,8 +633,10 @@ for MOVE in record commit checkout remote-ref landed conf config driver session;
   N=$(read_count)
   case $MOVE in
     record)     printf '\n' >> "$F/memory/builds/fx/RUN.md" ;;
-    commit)     run_fxgit commit -q --allow-empty -m move ;;
-    checkout)   run_fxgit checkout -q -b other ;;
+    # the commit move also makes `other` at the new sha, so the checkout move rewrites
+    # <gitDir>/HEAD alone: `show-ref --head` prints the same lines before and after it
+    commit)     run_fxgit commit -q --allow-empty -m move; run_fxgit branch other ;;
+    checkout)   run_fxgit checkout -q other ;;
     remote-ref) run_fxgit update-ref refs/remotes/origin/main HEAD ;;
     landed)     mkdir -p "$F/.git/unattended"; printf 'landed\n' >> "$F/.git/unattended/landed.fx.log" ;;
     conf)       printf '# moved\n' >> "$F/.unattended.conf" ;;
@@ -658,11 +660,24 @@ F=$(build_gitfixture); set_live_clock 0 3600
 STOP_GUARD_LIVENESS_BOUND_MS=1000 run_hook "$(build_payload "$F" "$BG")"
 STOP_GUARD_LIVENESS_BOUND_MS=1000 run_hook "$(build_payload "$F" "$BG")"
 check_same "L5-AC5 a far deadline is served from cache" "$(read_count)" "1"
-F=$(build_gitfixture); set_live_clock 10 5
-STOP_GUARD_LIVENESS_BOUND_MS=1000 run_hook "$(build_payload "$F" "$BG")"
-[ -f "$F/$CACHE_REL" ] && print_ok "L5-AC5 the near-expiry LIVE was stored" || print_bad "L5-AC5 the near-expiry LIVE was not stored"
-STOP_GUARD_LIVENESS_BOUND_MS=1000 run_hook "$(build_payload "$F" "$BG")"
-check_same "L5-AC5 a near deadline spawns the driver again" "$(read_count)" "2"
+# ---- TOOL-aLightenedLoop-6: the margin's boundary, with Date.now pinned to one second T and a 3 s
+# ---- bound (wait 3), so the hit test `T + 3 + 1 <= deadline` is exact. Stale-bound 3 stores
+# ---- deadline T + 3, a miss; stale-bound 4 stores T + 4, a hit. RED when the `+ 1` is dropped
+# ---- (the inside arm counts 1) or the margin widens (the on-margin arm counts 2).
+# run_pinned_read <T> — one readLiveness call through the export with Date.now pinned to T seconds.
+run_pinned_read() {
+  STOP_GUARD_LIVENESS_BOUND_MS=3000 node -e 'const m=require(process.argv[1]);const t=Number(process.argv[4]);Date.now=()=>t*1000;m.readLiveness(process.argv[2],{root:process.argv[3],gitDir:process.argv[3]+"/.git"},{slug:"fx",record:"memory/builds/fx/RUN.md"},"pinned-session")' \
+    "$(resolve_native "$HOOK")" "$(resolve_native "$KIT")" "$(resolve_native "$F")" "$1"
+}
+T=$(date +%s)
+F=$(build_gitfixture); set_live_clock 0 3
+run_pinned_read "$T"
+[ -f "$F/$CACHE_REL" ] && print_ok "L5-AC5 the inside-margin LIVE was stored" || print_bad "L5-AC5 the inside-margin LIVE was not stored"
+run_pinned_read "$T"
+check_same "L5-AC5 a deadline inside the wait+1 margin spawns the driver again" "$(read_count)" "2"
+F=$(build_gitfixture); set_live_clock 0 4
+run_pinned_read "$T"; run_pinned_read "$T"
+check_same "L5-AC5 a deadline on the wait+1 margin is served from cache" "$(read_count)" "1"
 
 # ---- L5-AC6: what is never stored — STALE, a non-zero exit, no verdict line, a LIVE without digit
 # ---- clock lines. RED when the store admits STALE.
@@ -804,7 +819,9 @@ n=$((pass+fail))
 # RAISED 121 -> 163 by TOOL-aLightenedLoop-5: the liveness cache's 42 assertions (4 10 3 10 9 2 4),
 # COUNTED off their own `check_*` and `print_*` lines, every one unconditional; the pass that wrote
 # them ran no suite, and the main loop observes the count at the close.
-FLOOR_ASSERTIONS=163
+# RAISED 163 -> 164 by TOOL-aLightenedLoop-6: the near-expiry arm's 2 assertions replaced by the
+# margin's two arms, 3 (2 1), COUNTED off their own lines; the main loop observes it at the close.
+FLOOR_ASSERTIONS=164
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 # THE TRAILER IS UNCONDITIONAL. `run-selftests.sh --pooled` reads a completed run by its trailer

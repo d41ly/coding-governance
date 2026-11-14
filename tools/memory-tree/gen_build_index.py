@@ -1099,36 +1099,86 @@ def read_record_head(text: str) -> list:
     return list(unfenced(text))[:BIND_HEAD_LINES]
 
 
-def derive_render_key(root: str) -> str:
-    """TOOL-aLightenedLoop-1 S2 — a hex digest of everything the render reads from git and the working
-    tree: the HEAD commit (the carries join reads spec history), the tracked set, each path differing
-    from HEAD with its working-tree bytes or `absent`, and the untracked unignored set (the nodes
-    deriver reads `git status`). `git add` of a modified file moves none of the four. Empty when any
-    git call fails, and an empty key is never stamped nor matched.
-
-    WHAT IT DOES NOT COVER: the interpreter and the process environment beyond git's."""
+def read_render_state(root: str):
+    """TOOL-aLightenedLoop-6 S12 — the render key's four parts, read once: `(head, tracked, differs,
+    untracked)`, the HEAD commit's bytes, the tracked paths in `ls-files` order, a dict from each path
+    differing from HEAD to its working-tree digest or `absent` in `git diff` order, and the untracked
+    unignored paths in order. Paths are the bytes git prints. None when any git call fails."""
     env = _build_git_env()
 
     def run_git(*argv: str) -> bytes:
         return subprocess.run(["git", *argv], cwd=root, capture_output=True, check=True, env=env).stdout
 
     try:
-        h = hashlib.sha256(b"HEAD " + run_git("rev-parse", "--verify", "-q", "HEAD").strip() + b"\n")
-        h.update(b"tracked\0" + run_git("ls-files", "-z") + b"\n")
+        head = run_git("rev-parse", "--verify", "-q", "HEAD").strip()
+        tracked = [p for p in run_git("ls-files", "-z").split(b"\0") if p]
+        differs = {}
         for rel in run_git("diff", "HEAD", "--name-only", "--no-renames", "-z").split(b"\0"):
             if not rel:
                 continue
             path = os.path.join(root, os.fsdecode(rel))
             if os.path.isfile(path):
                 with open(path, "rb") as fh:
-                    digest = hashlib.sha256(fh.read()).hexdigest().encode()
+                    differs[rel] = hashlib.sha256(fh.read()).hexdigest().encode()
             else:
-                digest = b"absent"
-            h.update(b"differs\0" + rel + b"\0" + digest + b"\n")
-        h.update(b"untracked\0" + run_git("ls-files", "--others", "--exclude-standard", "-z"))
+                differs[rel] = b"absent"
+        untracked = [p for p in run_git("ls-files", "--others", "--exclude-standard", "-z").split(b"\0") if p]
     except (OSError, subprocess.CalledProcessError):
+        return None
+    return head, tracked, differs, untracked
+
+
+def derive_render_key(root: str, state=None) -> str:
+    """TOOL-aLightenedLoop-1 S2 — a hex digest of everything the render reads from git and the working
+    tree: the HEAD commit (the carries join reads spec history), the tracked set, each path differing
+    from HEAD with its working-tree bytes or `absent`, and the untracked unignored set (the nodes
+    deriver reads `git status`). `git add` of a modified file moves none of the four. Empty when any
+    git call fails, and an empty key is never stamped nor matched. `state` is a `read_render_state`
+    answer already read (TOOL-aLightenedLoop-6 S12); None reads one now, and the bytes hashed are the
+    same either way.
+
+    WHAT IT DOES NOT COVER: the interpreter and the process environment beyond git's."""
+    if state is None:
+        state = read_render_state(root)
+    if state is None:
         return ""
+    head, tracked, differs, untracked = state
+    h = hashlib.sha256(b"HEAD " + head + b"\n")
+    h.update(b"tracked\0" + b"".join(p + b"\0" for p in tracked) + b"\n")
+    for rel, digest in differs.items():
+        h.update(b"differs\0" + rel + b"\0" + digest + b"\n")
+    h.update(b"untracked\0" + b"".join(p + b"\0" for p in untracked))
     return h.hexdigest()
+
+
+def check_render_settled(root: str, before, after, written: dict, orphans) -> bool:
+    """TOOL-aLightenedLoop-6 S12 — the render stamp's bracket: True when both reads answered, they
+    agree on every part once each path the render wrote (`written`, repo-relative path to text) or
+    removed (`orphans`) is dropped, every written path still holds exactly the bytes written, and every
+    orphan is still absent. So the render's own writes are the only change the bracket explains.
+
+    WHAT IT DOES NOT CHECK: an edit made and reverted inside the window, and an edit to a written path
+    after `after` was read, which the stamped key then misses."""
+    if before is None or after is None:
+        return False
+    drop = {os.fsencode(p.replace("\\", "/")) for p in (*written, *orphans)}
+    if before[0] != after[0]:
+        return False
+    for was, now in zip(before[1:], after[1:]):
+        if isinstance(was, dict):
+            was, now = ({k: v for k, v in s.items() if k not in drop} for s in (was, now))
+        else:
+            was, now = ([p for p in s if p not in drop] for s in (was, now))
+        if was != now:
+            return False
+    for rel, text in written.items():
+        try:
+            with open(os.path.join(root, rel), "rb") as fh:
+                if fh.read() != text.encode("utf-8"):
+                    return False
+        except OSError:
+            return False
+    return not any(os.path.lexists(os.path.join(root, p)) for p in orphans)
 
 
 def resolve_render_stamp(root: str) -> str:
@@ -3301,6 +3351,10 @@ def cmd_write(root: str, conf: dict) -> int:
     if stamp:
         with contextlib.suppress(FileNotFoundError):
             os.remove(stamp)
+    # TOOL-aLightenedLoop-6 S12 — the key's parts read BEFORE any read the render makes, and again at
+    # the stamp: the stamp is written only when the render's own writes are all that moved between.
+    before = read_render_state(root) if stamp else None
+    written = {}
     check_archives_tracked(root, conf)
     # TOOL-dTrueNorth-16 S20 — THE VIEW FIRST. `plan()` renders the coverage regions from DESIGN_VIEW,
     # so writing the view after it left them rendered from the view as it was, and one `--write` was
@@ -3313,9 +3367,11 @@ def cmd_write(root: str, conf: dict) -> int:
         refused = exc
     if view["state"] == "armed":
         write_text(os.path.join(root, view["rel"]), view["text"])
+        written[view["rel"]] = view["text"]
     artifacts, orphans, unmanaged, verdicts, guarded = plan(root, conf, create_missing=True)
     for rel, text in sorted(artifacts.items()):
         write_text(os.path.join(root, rel), text)
+        written[rel] = text
     for p in orphans:
         os.remove(os.path.join(root, p))
         print(f"build-index: removed orphaned shard {p}")
@@ -3338,11 +3394,14 @@ def cmd_write(root: str, conf: dict) -> int:
     if refused:
         raise refused
     # TOOL-aLightenedLoop-1 S2 — the stamp, only when `cmd_check` would exit 0 on the tree just written:
-    # no verdict, no unmanaged file, no guarded view and no view refusal (raised above).
+    # no verdict, no unmanaged file, no guarded view and no view refusal (raised above); and only when
+    # the tree held still around the render but for its own writes (TOOL-aLightenedLoop-6 S12).
     if stamp and rc == 0 and not unmanaged and not guarded:
-        key = derive_render_key(root)
-        if key:
-            write_text(stamp, key + "\n")
+        after = read_render_state(root)
+        if check_render_settled(root, before, after, written, orphans):
+            key = derive_render_key(root, after)
+            if key:
+                write_text(stamp, key + "\n")
     return 1 if guarded else 0
 
 
@@ -4743,8 +4802,8 @@ def test_render_stamp(arm) -> None:
         me = os.path.abspath(__file__)
         spec = os.path.join(t, "memory", "builds", "tOne", "spec", "2026-08-01-spec-tOne-1.md")
 
-        def check_staged() -> str:
-            out = subprocess.run([sys.executable, me, "--check", "--staged"], cwd=t, capture_output=True,
+        def check_staged(root: str = t) -> str:
+            out = subprocess.run([sys.executable, me, "--check", "--staged"], cwd=root, capture_output=True,
                                  text=True, encoding="utf-8", env=_build_git_env())
             return f"rc={out.returncode} {out.stdout}"
 
@@ -4759,6 +4818,61 @@ def test_render_stamp(arm) -> None:
         write_text(spec, read_text(spec) + "one more\n")
         arm("TOOL-aLightenedLoop-1 AC4 — one more working-tree byte renders in full", "False",
             lambda: str("answered by the stamp" in check_staged()))
+        spec_rel = os.path.join("memory", "builds", "tOne", "spec", "2026-08-01-spec-tOne-1.md")
+        # TOOL-aLightenedLoop-6 AC5 — no stamp on a red write: a committed non-shard file in the ledger
+        # folder is unmanaged, which only warns, so `not unmanaged` is the guard's sole decider. Then
+        # the AC3 sequence. RED with `not unmanaged` deleted from the guard.
+        tu = os.path.join(base, "unmanaged"); os.makedirs(tu)
+        _fixture(tu)
+        write_text(os.path.join(tu, "memory", "ledger", "notes.txt"), "authored\n")
+        run("git", "add", "-A", cwd=tu)
+        run("git", "commit", "-q", "-m", "unmanaged", "--no-verify", cwd=tu)
+        write_text(os.path.join(tu, spec_rel), read_text(os.path.join(tu, spec_rel)) + "\na body line\n")
+        run("git", "add", "-A", cwd=tu)
+        run(sys.executable, me, "--write", cwd=tu)
+        run("git", "add", "-u", cwd=tu)
+        tu_stamp, tu_staged = resolve_render_stamp(tu), check_staged(tu)
+        arm("TOOL-aLightenedLoop-6 AC5 — an unmanaged ledger file leaves no stamp, and --check --staged "
+            "does not answer from one", "False False",
+            lambda: (f"{os.path.exists(tu_stamp)} {'answered by the stamp' in tu_staged}" if tu_stamp
+                     else "git named no stamp path"))
+
+        def read_stamp_pair(name: str, move) -> str:
+            """TOOL-aLightenedLoop-6 AC15 AC16 — `<stamped> <stamped>` over two in-process `--write`s of
+            a fresh fixture with a staged spec edit: the first unshimmed, the second with
+            `print_verdicts` shimmed to make `move` inside the window, after every write and before
+            the stamp."""
+            tm = os.path.join(base, name); os.makedirs(tm)
+            conf_m = _fixture(tm)
+            write_text(os.path.join(tm, spec_rel), read_text(os.path.join(tm, spec_rel)) + "\na body line\n")
+            run("git", "add", "-A", cwd=tm)
+            stamp_m = resolve_render_stamp(tm)
+            if not stamp_m:
+                return "git named no stamp path"
+            _read_mode(cmd_write, tm, conf_m)
+            first = os.path.exists(stamp_m)
+            real = globals()["print_verdicts"]
+
+            def run_moved_verdicts(*args):
+                move(tm)
+                return real(*args)
+
+            globals()["print_verdicts"] = run_moved_verdicts
+            try:
+                _read_mode(cmd_write, tm, conf_m)
+            finally:
+                globals()["print_verdicts"] = real
+            return f"{first} {os.path.exists(stamp_m)}"
+
+        arm("TOOL-aLightenedLoop-6 AC15 — a new file the render did not write, landing inside the window, "
+            "withholds the stamp", "True False",
+            lambda: read_stamp_pair("moved-other", lambda r: write_text(os.path.join(r, "memory", "notes.md"),
+                                                                        "# notes\n")))
+        _readme_rel = os.path.join("memory", "builds", "tOne", "README.md")
+        arm("TOOL-aLightenedLoop-6 AC16 — an edit to a path the render wrote, landing inside the window, "
+            "withholds the stamp", "True False",
+            lambda: read_stamp_pair("moved-written", lambda r: write_text(
+                os.path.join(r, _readme_rel), read_text(os.path.join(r, _readme_rel)) + "a line below the region\n")))
 
 
 def test_coverage_region(arm) -> None:
@@ -7234,6 +7348,17 @@ def cmd_selftest() -> int:
             if _code in (15, 16):
                 arm(f"V{_code} names the conf key it disarms", backlog.CUTOFF_KEY,
                     lambda o=_out_check: o)
+        # TOOL-aLightenedLoop-6 AC6 — no stamp on a red write: V7's tree in its own folder, COMMITTED so
+        # the render key answers, has no unmanaged file and no guarded view (the loop's own `--write`
+        # arm above), so `rc == 0` is the guard's sole decider. RED with `rc == 0` deleted from the guard.
+        _v7 = os.path.join(base, "v7stamp"); os.makedirs(_v7)
+        _v7_files, _v7_cut = _build_code_tree(7)
+        _v7_conf = _build_backlog_fixture(_v7, _v7_files, cutoff=_v7_cut)
+        run("git", "commit", "-q", "-m", "v7", "--no-verify", cwd=_v7)
+        _read_mode(cmd_write, _v7, _v7_conf)
+        _v7_stamp = resolve_render_stamp(_v7)
+        arm("TOOL-aLightenedLoop-6 AC6 — a --write whose verdicts exit 1 leaves no render stamp", "False",
+            lambda: str(os.path.exists(_v7_stamp)) if _v7_stamp else "git named no stamp path")
 
         # AC5 and AC3's second half — the data-loss guard over an APPENDED authored row.
         _guard_conf = _build_backlog_fixture(bt, CORE)

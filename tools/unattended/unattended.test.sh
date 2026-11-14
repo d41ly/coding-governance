@@ -7890,7 +7890,25 @@ if [ -f "$STC" ]; then
   o=$( ( load_driver_conf && SPEC_TOKENS_CLI="${PFX}stub-quiet.py" run_spec_token_check tRun ) 2>&1 )
   hit "$o" "spec-token cache not recorded: the checker wrote no input record"
   miss "$o" "spec-token check skipped"
-  rm -f ${PFX}stub-moved.py ${PFX}stub-quiet.py
+  # TOOL-aLightenedLoop-6 AC3: a stub whose `--input-key` call edits a tracked file before it answers
+  # through the real checker's `main`, so the tree moves during the REPLAY and not the run. RED when
+  # `derive_spec_token_key` runs after the second `read_tree_state`: the key is recorded, no line prints.
+  # The key file is removed first, so the lookup does not call the stub and the run itself writes the record.
+  printf 'import importlib.util, sys\nif "--input-key" in sys.argv:\n    open("memory/builds/tRun/README.md", "a", encoding="utf-8").write("raced\\n")\ns = importlib.util.spec_from_file_location("cst", "%scheck-spec-tokens.py")\nm = importlib.util.module_from_spec(s); s.loader.exec_module(m)\nsys.exit(m.main(sys.argv[1:]) if "--input-key" in sys.argv else 0)\n' "$PFX" > ${PFX}stub-raced.py
+  rm -f .git/unattended/spec-tokens.tRun.key
+  o=$( ( load_driver_conf && SPEC_TOKENS_CLI="${PFX}stub-raced.py" run_spec_token_check tRun ) 2>&1 )
+  hit "$o" "spec-token cache not recorded: the tree or HEAD moved while the checker ran, so the next dispatch runs the checker"
+  same "a tree moved during the replay records no spec-token key" "$([ -f .git/unattended/spec-tokens.tRun.key ] && echo written || echo none)" none
+  git checkout -q -- memory/builds/tRun/README.md
+  # TOOL-aLightenedLoop-6 AC12: a record line no replay can repeat. The stub writes a `popen` line to
+  # the record and exits 0, and answers `--input-key` through the real checker's `main`, which exits 1
+  # on it. RED when the replay branch is collapsed into the record branch.
+  printf 'import importlib.util, os, sys\nif "--input-key" in sys.argv:\n    s = importlib.util.spec_from_file_location("cst", "%scheck-spec-tokens.py")\n    m = importlib.util.module_from_spec(s); s.loader.exec_module(m)\n    sys.exit(m.main(sys.argv[1:]))\nopen(os.environ["SPEC_TOKENS_INPUTS"], "w", encoding="utf-8").write(%s)\n' "$PFX" "'{\"kind\":\"popen\",\"argv\":[\"x\"]}\\n'" > ${PFX}stub-popen.py
+  rm -f .git/unattended/spec-tokens.tRun.key
+  o=$( ( load_driver_conf && SPEC_TOKENS_CLI="${PFX}stub-popen.py" run_spec_token_check tRun ) 2>&1 )
+  hit "$o" "spec-token cache not recorded: the input record cannot be replayed, so the next dispatch runs the checker"
+  same "a record that cannot be replayed records no spec-token key" "$([ -f .git/unattended/spec-tokens.tRun.key ] && echo written || echo none)" none
+  rm -f ${PFX}stub-moved.py ${PFX}stub-quiet.py ${PFX}stub-raced.py ${PFX}stub-popen.py
   # TOOL-aSmoothedDispatch-8 AC4 step f: no fingerprint, no key: the cache is off on both calls.
   rm -f .git/unattended/spec-tokens.tRun.key "./${PFX}$_sd_home/gate-fingerprint.sh"
   o=$( ( load_driver_conf && run_spec_token_check tRun ) 2>&1 )
@@ -9817,6 +9835,27 @@ check_wake_full "tree idle" k1 set_wake_age
 set_wake_stale() { mkconf "true" "true" "" "3600" "" "1800" "7" "5400" "" "1800" "6" "60"
   printf 'KEEPALIVE_INTERVAL="every 10 minutes"\n' >> .unattended.conf; touch -d "@$(( $(date -u +%s) - 3600 ))" "$WK_DIR/wkbeat.txt"; }
 check_wake_full "task stalled" k1 set_wake_stale
+# TOOL-aLightenedLoop-6 AC7 — the phase case's three alternatives, each RED with its own alternative
+# deleted from `print_wake`'s phase case.
+check_wake_full "phase absent" k1 mutate memory/builds/tRun/RUN.md '/^phase: /d'
+check_wake_full "phase LANDING" k1 mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: LANDING/'
+check_wake_full "phase LANDED" k1 mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: LANDED/'
+# TOOL-aLightenedLoop-6 AC8 and AC9 — the two probes, written out rather than passed to
+# `check_wake_full`, so the stub `date` is first on PATH for the one `--wake` call alone. AC8's stub
+# exits 1 on every call, RED with the TC_DEAD branch deleted; AC9's exits 1 on `-d` and runs the real
+# `date` otherwise, over a task with no heartbeat file, RED with the TA_DEAD branch deleted.
+WK_DATE=$(command -v date); WK_STUB="$WK_DIR/dstub"; mkdir -p "$WK_STUB"
+build_wake_fixture
+printf '#!/bin/sh\nexit 1\n' > "$WK_STUB/date"; chmod +x "$WK_STUB/date"
+out=$(PATH="$WK_STUB:$PATH" bash "$SCRIPT" --wake tRun --keepalive-id k1 2>&1); rc=$?
+same "wake AC8 clock probe exits 0" "$rc" "0"
+hit "$out" "unattended-wake: tRun · FULL · clock probe · tasks 1 open · "
+build_wake_fixture
+rm -f "$WK_DIR/wkbeat.txt"
+printf '#!/bin/sh\nfor a in "$@"; do [ "$a" = -d ] && exit 1; done\nexec "%s" "$@"\n' "$WK_DATE" > "$WK_STUB/date"; chmod +x "$WK_STUB/date"
+out=$(PATH="$WK_STUB:$PATH" bash "$SCRIPT" --wake tRun --keepalive-id k1 2>&1); rc=$?
+same "wake AC9 task probe exits 0" "$rc" "0"
+hit "$out" "unattended-wake: tRun · FULL · task probe · tasks unknown open · "
 # AC3 — the cadence follows the registry: the tracked key while a task is open, the base key after
 # its release, the base key throughout when the tracked one is blank, and `undeclared` with neither.
 build_wake_fixture

@@ -14524,8 +14524,9 @@ derive_spec_token_key() { # slug · launcher · record -> a 40-hex key, or nothi
 
 # TOOL-aLightenedLoop-3 S6 - THE RUN WINDOW'S GUARD: the run-gates kit's WORKING-TREE fingerprint,
 # resolved as `print_drift_delta` resolves a sibling kit, and HEAD, one line each, or nothing when
-# either is missing. Read before and after the checker runs, and a key is recorded only when the two
-# reads agree, so a tree edited mid-run is never recorded as the tree the checker read.
+# either is missing. Read before the checker runs and again after the key is derived over its input
+# record (TOOL-aLightenedLoop-6), and a key is recorded only when the two reads agree, so a tree
+# edited mid-run or mid-replay is never recorded as the tree the checker read.
 read_tree_state() { # launcher -> the fingerprint line and HEAD, or nothing and status 1
   local d fp hd
   d=$(resolve_kit_dir "$1" run-gates gate-fingerprint.sh "$KIT_DIR" 2>/dev/null) && [ -n "$d" ] || return 1
@@ -14558,9 +14559,10 @@ read_tree_state() { # launcher -> the fingerprint line and HEAD, or nothing and 
 # its last run wrote, `spec-tokens.<slug>.inputs`, and a lookup derives the key over that record, so
 # a commit or an edit that moves nothing the checker read keeps the key. The record is removed and
 # re-written by every run, the variable set for that one call. A key is recorded only when the
-# verdict admits, the tree state read before the run equals the one read after it, and the record
-# is there and replays; otherwise one line says why it is not, and no fingerprint still prints the
-# cache-off line and nothing more.
+# verdict admits, the tree state read before the run equals the one read after the key is derived,
+# so the bracket closes after the replay (TOOL-aLightenedLoop-6), and the record is there and
+# replays; otherwise one line says why it is not, and no fingerprint still prints the cache-off line
+# and nothing more.
 run_spec_token_check() { # slug -> 0 admitted or skipped, 1 refused under check 49
   local slug="$1" _stpy _strc _stq _stkey="" _stdir="" _strec="" _stin="" _stwas="" _stat="" _stnow="" _stwhy=""
   if [ -z "${SPEC_TOKENS_CLI:-}" ]; then
@@ -14593,12 +14595,19 @@ run_spec_token_check() { # slug -> 0 admitted or skipped, 1 refused under check 
     echo "unattended: dispatch — the spec-token checker reds only in other builds' specs, which the bar's whole-tree leg still grades, so this dispatch is admitted: ${BASH_REMATCH[1]:-?} hit(s), first: ${_stq%%$'\n'*}"
   fi
   [ -n "$_stat" ] || return 0
+  # TOOL-aLightenedLoop-6 S3 - the key is derived BEFORE the second read, so the bracket spans the
+  # checker run and the replay: an edit landing during the replay moves `_stnow` and is refused.
+  # Emptied first, because the lookup above may have left a key over the earlier record.
+  _stkey=""
+  if [ -n "$_stin" ] && [ -f "$_stin" ]; then
+    _stkey=$(derive_spec_token_key "$slug" "$_stpy" "$_stin") || _stkey=""
+  fi
   _stnow=$(read_tree_state "$_stpy") || _stnow=""
   if [ "$_stnow" != "$_stat" ]; then
     _stwhy="the tree or HEAD moved while the checker ran"
   elif [ -z "$_stin" ] || [ ! -f "$_stin" ]; then
     _stwhy="the checker wrote no input record"
-  elif ! _stkey=$(derive_spec_token_key "$slug" "$_stpy" "$_stin") || [ -z "$_stkey" ]; then
+  elif [ -z "$_stkey" ]; then
     _stwhy="the input record cannot be replayed"
   else
     { printf '%s\n' "$_stkey" >"$_strec"; } 2>/dev/null || :

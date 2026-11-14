@@ -1,11 +1,12 @@
 # TOOL-aLightenedLoop-6 — the closing review round 1 repaired: check 39 admits the wake reader, the spec-token key derived inside its stability bracket, check 29 reads chain specs once, and the arms that could not fail made able to
 
-**Status:** INPROGRESS · rev-2 · 2026-11-14 · node a · Tier-2 · base 4e2f7d26 · streams tooling · order 6
+**Status:** CLOSED · rev-2 · 2026-11-14 · node a · Tier-2 · base 4e2f7d26 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-14-build-TOOL-aLightenedLoop-6-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aLightenedLoop-6-1-acceptance-ledger.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aLightenedLoop-6-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aLightenedLoop-6-1-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aLightenedLoop-6-2-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aLightenedLoop-6-2-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aLightenedLoop-6-promotion.md](../prompts/2026-11-14-prompt-TOOL-aLightenedLoop-6-promotion.md) | research | — |

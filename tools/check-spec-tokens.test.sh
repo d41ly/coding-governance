@@ -82,7 +82,9 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # RAISED 247 -> 251 by TOOL-aLightenedLoop-3: its four input-record arms, the traced run's parity, the
 # record's reads and run, and --input-key's digest and its popen refusal, each top-level. Counted by
 # reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=251
+# RAISED 251 -> 252 by TOOL-aLightenedLoop-6: its one read-count arm, `AC8 reads 1`, top-level.
+# Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=252
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -1784,15 +1786,26 @@ def read_findings():
 print("AC7 early", read_findings())
 text = open(path, encoding="utf-8").read()
 open(path, "w", encoding="utf-8", newline="\n").write(text.replace("**Status:** OPEN", "**Status:** INPROGRESS", 1))
+reads = []
+real_texts = cst.read_carries_texts
+def read_counted(*a, **k):
+    reads.append(1)
+    return real_texts(*a, **k)
+cst.read_carries_texts = read_counted
 try:
     print("AC8 full", read_findings())
+    print("AC8 reads", len(reads))
 finally:
+    cst.read_carries_texts = real_texts
     open(path, "w", encoding="utf-8", newline="\n").write(text)' "$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md" "$MEMORY_TREE" "$LINT" 2>&1)
 check_cov_probe() {   # $1 label · $2 the probe line it must print
   case "$cov_out" in *"$2"*) echo "arm ok    $1"; pass=$((pass+1)) ;; *) echo "arm FAIL  $1 — expected the probe to print: $2"; printf '%s\n' "$cov_out" | tail -3; fail=$((fail+1)) ;; esac
 }
 check_cov_probe "building=True with no INPROGRESS chain spec returns findings None for every build" "AC7 early ['NoneType']"
 check_cov_probe "building=True with one INPROGRESS chain spec returns the full value's findings lists" "AC8 full ['list']"
+# TOOL-aLightenedLoop-6 AC10 — the INPROGRESS read runs the status pass ONCE: `read_carries_specs`
+# takes the triple the building path read. Red when it re-reads instead of taking `pre`: `AC8 reads 2`.
+check_cov_probe "building=True with one INPROGRESS chain spec reads the chain texts once" "AC8 reads 1"
 # TOOL-dTrueNorth-20 AC18 AC21 AC22 — ONE conf grammar, ONE row grammar and ONE date pattern, in-process.
 # AC18: a cutoff key outside the carries keys, declared twice and then behind `export `, reads its LAST
 # value through `read_conf_key`, red against the base reader, which took the first declaration and read

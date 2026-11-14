@@ -1128,7 +1128,7 @@ SPEC_DATE = load_design_lib().SPEC_FILE_DATE if DESIGN_LIB else None
 NOT_A_TOKEN = load_design_lib().NOT_A_TOKEN if DESIGN_LIB else None
 
 
-def read_carries_specs(root, design, cutoff, files=None, conf=None):
+def read_carries_specs(root, design, cutoff, files=None, conf=None, pre=None):
     """THE CARRIES JOIN'S POPULATION (TOOL-dTrueNorth-2): `(specs, statuses, skipped)`.
 
     `specs` is `{build: [(path, text, revisions)]}`, the shape `scan_carries` reads: every TRACKED spec
@@ -1145,8 +1145,11 @@ def read_carries_specs(root, design, cutoff, files=None, conf=None):
     apart before its history is read and counted under `wontdo`, and a spec whose header does not
     parse, or carries a verb the grammar refuses, under `unparsed`, beside the selector's own reasons.
     Read per path without following a rename, so a rename starts a new history.
+
+    `pre` (TOOL-aLightenedLoop-6 S8) is a `read_carries_texts` answer the caller already read over the
+    same arguments, taken as read so the status pass runs once; None reads it here.
     """
-    texts, statuses, skipped = read_carries_texts(root, design, cutoff, files, conf)
+    texts, statuses, skipped = pre or read_carries_texts(root, design, cutoff, files, conf)
     history = load_design_lib().read_spec_revisions(pathlib.Path(root), list(texts))
     specs = {}
     for p, (build, text) in texts.items():
@@ -1340,8 +1343,9 @@ def derive_carries_coverage(root, files=None, conf=None, building=False):
         raise dl.DesignRefusal(f"{CARRIES_KEY} {cutoff} is set and every DESIGN_* key ({', '.join(dl.DESIGN_KEYS)}) "
                                "is blank, so the carries join has no design to read", blank=dl.DESIGN_KEYS)
     design = dl.read_design(root, conf)
+    pre = None
     if building:
-        texts, statuses, skipped = read_carries_texts(root, design, cutoff, files, conf)
+        pre = texts, statuses, skipped = read_carries_texts(root, design, cutoff, files, conf)
         if "INPROGRESS" not in statuses.values():
             # TOOL-aLightenedLoop-1 S4 — no chain spec is building, so check 29 grades nothing: no
             # history read and no join. `findings` is None, never [], so no reader takes this value
@@ -1349,7 +1353,7 @@ def derive_carries_coverage(root, files=None, conf=None, building=False):
             return {"state": "armed", "cutoff": cutoff, "building": False,
                     "builds": {b: {"specs": [(p, statuses[p]) for p, (at, _t) in texts.items() if at == b],
                                    "findings": None} for b in design["builds"]}}
-    specs, statuses, skipped = read_carries_specs(root, design, cutoff, files, conf)
+    specs, statuses, skipped = read_carries_specs(root, design, cutoff, files, conf, pre=pre)
     scan = scan_carries(design, specs, exit_mode=True)
     carriers, bindings, measured = scan["carriers"], scan["bindings"], scan["measured"]
     home = {p: b for b, ps in measured.items() for p in ps}
