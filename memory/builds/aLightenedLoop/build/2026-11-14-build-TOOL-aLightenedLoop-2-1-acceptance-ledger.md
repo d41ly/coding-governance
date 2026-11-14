@@ -29,7 +29,7 @@ timings are AC5's.
   printed check 106, check 73 and check 58; `git ls-remote "$F.bare" refs/gov/runs/tWake` listed the
   claim; `reaping is OFF because PROCMON_CMD is blank, so 1 orphan(s)`; one `· STALLED` unit line;
   and one `task wf · ` line with `· STALLED`.
-- AC3 — `KEEPALIVE_TRACKED_INTERVAL="every 30 minutes"` — with the key and `<reg>` the line ended
+- AC3 — `run --release-task tWake --task wf` — with the tracked key and `<reg>` the line ended
   `· tasks 1 open · cadence every 30 minutes`, and after `run --release-task tWake --task wf`
   `· tasks 0 open · cadence every 10 minutes`. Without the key both lines named `every 10 minutes`.
   `KEEPALIVE_INTERVAL=""` with no task ended `cadence undeclared`, and so did a conf with no
@@ -42,7 +42,7 @@ timings are AC5's.
   call. Beyond the criterion, the lease row the `check_lease_current` extraction touches: with
   `pid: 999`, `--resume tWake --keepalive-id k1` printed the same normalised output on both drivers
   and staged the same normalised record diff.
-- AC5 — `git clone -q --no-hardlinks` — the clone at `%TEMP%/wkreal`, its origin set to
+- AC5 — `run --wake tWake --keepalive-id k1` — timed in the clone at `%TEMP%/wkreal`, its origin set to
   `%TEMP%/wkreal.bare` and pushed there, this pass's driver and library copied in, a `tWake` README
   and run-state file with `run-branch: refs/heads/branch/alightenedloop-eb7b8b` committed. Node `a`, <!-- PINNED 2026-11-14 -->
   load average 6.07 before and 4.51 after, 16 CPUs. Three `run --wake tWake --keepalive-id k1`: <!-- PINNED 2026-11-14 -->
