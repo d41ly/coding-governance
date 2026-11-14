@@ -7153,6 +7153,11 @@
       "file": "tools/playbook/load_sets.py"
     },
     {
+      "id": "check_requires_vintage",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_residue_gone",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -20235,6 +20240,11 @@
     {
       "id": "read_registry_at",
       "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "read_registry_at",
+      "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
@@ -20301,6 +20311,11 @@
       "id": "read_report",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "read_requires_at",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "read_result_fa5",

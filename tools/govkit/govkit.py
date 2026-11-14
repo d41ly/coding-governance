@@ -1079,20 +1079,64 @@ def derive_default_gained(root: pathlib.Path, base_commit: str | None, to_commit
     """
     if not base_commit:
         return [], "the receipt records no gov_commit, so there is no vintage to compare the default set against"
-    tr = derive_tool_root(root)
-    rel = "/".join(([tr] if tr else []) + [GOVKIT_DIR.name, REGISTRY_NAME])
     sets = []
     for commit in (base_commit, to_commit):
-        blob = blob_at(root, commit, rel)
-        if blob is None:
-            return [], f"{rel} does not resolve at {commit[:8]}, so the default set there is unknown"
-        try:
-            sets.append(default_kits(tomllib.loads(blob.decode("utf-8"))))
-        except (tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
-            return [], f"{rel} at {commit[:8]} does not parse ({e}), so the default set there is unknown"
+        reg, why = read_registry_at(root, commit)
+        if reg is None:
+            return [], f"{why}, so the default set there is unknown"
+        sets.append(default_kits(reg))
     was, now = sets
     claimed = set(receipt.get("kits") or [])
     return [e for e in now if e not in was and e not in claimed and e in descs], ""
+
+
+def read_registry_at(root: pathlib.Path, commit: str) -> tuple[dict | None, str]:
+    """TOOL-dDeclaredLoop-73 S1: gov's registry parsed AT `commit`, and '' — or None and why not.
+
+    The one read both vintage readers make, through the module name `blob_at` with three positional
+    arguments so a selftest stand-in for it still answers. The path is built from the tool root as
+    the working tree's is, never spelled."""
+    tr = derive_tool_root(root)
+    rel = "/".join(([tr] if tr else []) + [GOVKIT_DIR.name, REGISTRY_NAME])
+    blob = blob_at(root, commit, rel)
+    if blob is None:
+        return None, f"{rel} does not resolve at {commit[:8]}"
+    try:
+        return tomllib.loads(blob.decode("utf-8")), ""
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
+        return None, f"{rel} at {commit[:8]} does not parse ({e})"
+
+
+def read_requires_at(root: pathlib.Path, commit: str,
+                     ids: list[str]) -> tuple[dict[str, tuple[dict, str]], dict[str, str]]:
+    """TOOL-dDeclaredLoop-73 S2: each id's `requires` as gov holds it AT `commit`, `(descs_at, unknown)`.
+
+    The descriptor path is the registry's at that commit, so a descriptor that moved is read where
+    that vintage keeps it. An id that registry does not declare has no edge there and maps to an
+    empty `requires`; a declared descriptor absent or unparseable there, or every id when the
+    registry itself is, goes to `unknown` with its reason, never graded as requiring nothing."""
+    reg, why = read_registry_at(root, commit)
+    if reg is None:
+        return {}, {e: why for e in ids}
+    tr = derive_tool_root(root)
+    paths = {e.get("id"): e.get("descriptor") for e in reg.get("entry", [])}
+    out: dict[str, tuple[dict, str]] = {}
+    unknown: dict[str, str] = {}
+    for eid in ids:
+        if eid not in paths:
+            out[eid] = ({"requires": []}, "")
+            continue
+        dpath = resolve_prefix_token(paths[eid] or "", tr)
+        try:
+            desc = read_descriptor_at(root, commit, dpath)
+        except Refusal as e:
+            unknown[eid] = str(e)
+            continue
+        if desc is None:
+            unknown[eid] = f"{dpath} does not resolve at {commit[:8]}"
+            continue
+        out[eid] = ({"requires": list(desc.get("requires") or [])}, dpath)
+    return out, unknown
 
 
 def demand_claimed_requires(claimed: list[str], gained: list[str], descs: dict[str, tuple[dict, str]],
@@ -9740,7 +9784,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                       f"both is the route")
     # TOOL-dDeclaredLoop-57 S1: the CLAIMED kits' edges too, on every non-source run, before any
     # gain line prints and before anything is written, so a refused run reports no gain it never made.
-    demand_claimed_requires(claimed, gained, descs, receipt, _gained_why)
+    # TOOL-dDeclaredLoop-73 S3, S4: the `requires` graded are each kit's AT `to_commit`, the bytes this
+    # run installs, and a kit whose requires that vintage cannot answer is refused, never read as none.
+    _req_at, _unknown_at = read_requires_at(root, to_commit, list(claimed) + list(gained))
+    if _unknown_at:
+        raise Refusal("; ".join(f"'{k}' requires are unknown at {to_commit[:8]}: {why}"
+                                for k, why in sorted(_unknown_at.items())))
+    demand_claimed_requires(claimed, gained, _req_at, receipt, _gained_why)
     if _gained_why:
         print(f"govkit update — default-gained: none computed — {_gained_why}")
     for _ge in gained:

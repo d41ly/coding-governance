@@ -3587,6 +3587,77 @@ def check_succession(tmp: pathlib.Path) -> None:
           all((t / r).is_file() for r in rows) and p.returncode == 0, p.stdout[-900:] + p.stderr)
 
 
+def check_requires_vintage(tmp: pathlib.Path) -> None:
+    """TOOL-dDeclaredLoop-73 AC1 to AC5: `update`'s claimed-requires refusal grades each kit's
+    `requires` at `--to`, not at gov's working tree. A scratch gov's A declares `demo` with no edge;
+    B adds `other` outside the default and makes `demo` require it; C takes `demo`'s descriptor out
+    while the registry still names it. Each way across A and B is run from the other's checkout, so
+    a refusal reading the working tree reds one of the two. WHAT THIS DOES NOT CHECK: a write path's
+    bytes after the refusal, or the gained-prune loop's vintage."""
+    gkn = KIT_NAMES["govkit"]
+    gk = govkit_module()
+    body = ('home = "demo"\nversion_from = { none = "fixture" }\n\n[check]\nnone = "fixture"\n\n'
+            '[[files]]\ninclude = "**"\nrole = "engine"\n\n[adopt]\nargv = []\nmutates_index = false\n')
+    reg = ('[selection]\ndefault = ["demo"]\n\n[surface]\nglobs = ["{prefix}/*"]\n\n'
+           '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n')
+    g = tmp / "rv-gov"
+    a = build_steps_gov(g, {f"{gkn}/registry.toml": reg, "demo/kit.toml": 'id = "demo"\n' + body,
+                            "demo/a.txt": "a\n"})
+    t = build_target(tmp / "rv-t", f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+
+    def run_gk(*args: str) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, str(g / PFX / gkn / "govkit.py"), *args],
+                              capture_output=True, text=True, encoding="utf-8", env=STEPS_ENV)
+
+    def write_file(rel: str, text: str) -> None:
+        (g / PFX / rel).parent.mkdir(parents=True, exist_ok=True)
+        (g / PFX / rel).write_bytes(text.encode("utf-8"))
+
+    p = run_gk("apply", "--target", str(t), "--kits", "demo")
+    check("[dDL-73] the fixture installs `demo` at A, or every arm over it grades nothing",
+          p.returncode == 0, p.stdout[-900:] + p.stderr[-600:])
+    settle(t, "the install")
+    write_file(f"{gkn}/registry.toml", reg + '\n[[entry]]\nid = "other"\ndescriptor = "{prefix}/other/kit.toml"\n')
+    write_file("other/kit.toml", 'id = "other"\n' + body.replace('"demo"', '"other"'))
+    write_file("demo/kit.toml", 'id = "demo"\nrequires = ["other"]\n' + body)
+    settle(g, "B: demo requires other")
+    b = run_gov_git(g, "rev-parse", "HEAD")
+    git(g, "checkout", "-q", "--detach", a)
+    p = run_gk("update", "--target", str(t), "--to", b)
+    _ln = [ln for ln in p.stderr.splitlines() if ln.startswith("govkit: update would leave")]
+    check("[dDL-73] AC1 an update to a vintage whose demo requires other refuses from A's checkout",
+          p.returncode == 2 and len(_ln) == 1 and "'demo' requires 'other'" in _ln[0],
+          f"rc {p.returncode} · {(p.stdout + p.stderr)[-900:]}")
+    git(g, "checkout", "-q", "--detach", b)
+    p = run_gk("update", "--target", str(t), "--to", a)
+    check("[dDL-73] AC2 LIVENESS ...and an update to A from B's checkout, whose newer edge A lacks, is not refused",
+          p.returncode == 0 and "update would leave" not in p.stdout + p.stderr,
+          f"rc {p.returncode} · {(p.stdout + p.stderr)[-900:]}")
+    git(g, "checkout", "-q", "main")
+    git(g, "rm", "-q", f"{PFX}demo/kit.toml")
+    settle(g, "C: the demo descriptor leaves while the registry names it")
+    c = run_gov_git(g, "rev-parse", "HEAD")
+    git(g, "checkout", "-q", "--detach", b)
+    p = run_gk("update", "--target", str(t), "--to", c)
+    _ln = [ln for ln in p.stderr.splitlines() if ln.startswith("govkit: 'demo' requires are unknown at")]
+    _at_c = gk.read_requires_at(g, c, ["demo"])
+    check("[dDL-73] AC3 a descriptor absent at --to refuses as unknown, never as requiring nothing",
+          p.returncode == 2 and len(_ln) == 1 and "does not resolve" in _ln[0] and "demo" in _at_c[1],
+          f"rc {p.returncode} · {_at_c} · {(p.stdout + p.stderr)[-900:]}")
+    _at_a = gk.read_requires_at(g, a, ["other"])
+    check("[dDL-73] AC4 an id the vintage does not declare reads as requiring nothing, not unknown",
+          _at_a == ({"other": ({"requires": []}, "")}, {}), str(_at_a))
+    _blob = gk.blob_at
+    gk.blob_at = lambda _r, _c, _p: None
+    try:
+        _why = gk.derive_default_gained(GOV_ROOT, "a" * 40, "b" * 40, {"kits": []}, {})[1]
+    finally:
+        gk.blob_at = _blob
+    check("[dDL-73] AC5 the shared registry read leaves default-gained's reason byte-identical",
+          _why == f"{PFX}{gkn}/registry.toml does not resolve at aaaaaaaa, so the default set there is unknown",
+          _why)
+
+
 def check_fanout_step(tmp: pathlib.Path) -> None:
     """TOOL-dSafePassage-1 AC10 AC11 AC12 — S6's up, down and witness argvs over scratch targets,
     each run under `-I` as the runner runs it, the limit read back through gov's own policy reader."""
@@ -9884,6 +9955,7 @@ user_skills = "/tmp/gk-fake-skills"
             # ---- rendered, or, with no governing doc, arrives with its Skill and names the doc.
             # ---- Module-level functions, so a slice reaches each without this block.
             check_roles_default()
+            check_requires_vintage(tmp3)
             check_roles_install(tmp3)
             check_roles_install(tmp3, charter=False)
             check_roles_install(tmp3, runner=True)
