@@ -64,7 +64,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 7 unit(s) · node a · opened 2026-11-14 · streams tooling
+**Build status:** INPROGRESS · 7 unit(s) · node a · opened 2026-11-14 · streams tooling
 ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7
 
 <!-- gen:build-units -->
@@ -74,12 +74,12 @@ ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWai
 | [TOOL-aTrimmedWait-2 — hygiene check 12 grades one named spec or one build on request, and the spec writer is told to run it that way](spec/2026-11-14-spec-TOOL-aTrimmedWait-2.md) | 2 | 2 | CLOSED | rev-4 | 2026-11-14 |
 | [TOOL-aTrimmedWait-3 — a commit refused on build-index drift renders its own index, stages it and is graded again](spec/2026-11-14-spec-TOOL-aTrimmedWait-3.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-14 |
 | [TOOL-aTrimmedWait-4 — `gen_build_index.py --write` writes only the artifacts whose bytes moved](spec/2026-11-14-spec-TOOL-aTrimmedWait-4.md) | 4 | 2 | CLOSED | rev-3 | 2026-11-14 |
-| [TOOL-aTrimmedWait-5 — the holder's idle-wake `--resume` stops paying one git process per briefed unit](spec/2026-11-14-spec-TOOL-aTrimmedWait-5.md) | 5 | 2 | CLOSED | rev-3 | 2026-11-14 |
+| [TOOL-aTrimmedWait-5 — the holder's idle-wake `--resume` stops paying one git process per briefed unit](spec/2026-11-14-spec-TOOL-aTrimmedWait-5.md) | 5 | 2 | INPROGRESS | rev-3 | 2026-11-14 |
 | [TOOL-aTrimmedWait-6 — the role gate refuses a role agent's polling wait, and steps past an option cluster such as `-eo pipefail`](spec/2026-11-14-spec-TOOL-aTrimmedWait-6.md) | 6 | 2 | SPECCED | rev-2 | 2026-11-14 |
 | [TOOL-aTrimmedWait-7 — `handoff.py agents` keeps its parsed session calls per transcript and parses only the bytes appended since](spec/2026-11-14-spec-TOOL-aTrimmedWait-7.md) | 7 | 2 | SPECCED | rev-3 | 2026-11-14 |
 <!-- /gen:build-units -->
 
-Records: 29 bound to this build, across 3 record folder(s).
+Records: 30 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
