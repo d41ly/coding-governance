@@ -45,6 +45,9 @@ The driver suite's `--dispatch` arms, run directly. `check-arms` over the driver
 - `gate-fingerprint.sh`.
 - `memory/builds/dDeclaredLoop/`, its run's worktree and its branch.
 - Check 49's index-with-its-generator refusal, which stays exactly as it is.
+- ANY SELF-TEST SUITE OR BAR INSIDE THE BUILD PASS, A SLICED SUITE INCLUDED. The pass runs only direct checks: `bash -n`, `check-arms` over the driver suite, the lexicon, the changed functions invoked over a hand-built fixture, the spec-token checker, and `gen_map.py --write`. The new arms are written and checked with `bash -n`; the main loop observes each red and then green at the close, and AC11's frozen-clone measurement is the main loop's.
+- A pass commit without its acceptance ledger. The pass commit carries `memory/builds/aBriskDeclaration/build/2026-11-14-build-TOOL-aBriskDeclaration-1-1-acceptance-ledger.md`, one `**Evidences:** TOOL-aBriskDeclaration-1` block naming each criterion with the backticked token the criterion itself spells, and AC11 and the arms' red-then-green named as owed to the main loop at the close.
+- An edit after the commit that sets the spec CLOSED: every edit lands first, and the spec's status flip is the last change of the pass.
 
 ### Limitations
 - The spec's acceptance criteria name observations a pass makes directly: suite arms, probes over a fixture tree, a `bash -x` trace. The frozen-clone measurement is the main loop's, and the criterion says so. The acceptance section cites no path the unit has not built yet.
