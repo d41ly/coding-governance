@@ -100,7 +100,7 @@ ids TOOL-aClearedLedger-14 TOOL-aClearedLedger-15 TOOL-aClearedLedger-16
 | [TOOL-aClearedLedger-16 — the drop test's deny side is armed, an empty quoted pair ends its word at a redirection, and three texts state what the code holds](spec/2026-11-14-spec-TOOL-aClearedLedger-16.md) | 16 | 2 | CLOSED | rev-1 | 2026-11-14 |
 <!-- /gen:build-units -->
 
-Records: 35 bound to this build, across 4 record folder(s).
+Records: 36 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-14-build-TOOL-aClearedLedger-1-2-observations.md](../build/2026-11-14-build-TOOL-aClearedLedger-1-2-observations.md) | journal | TOOL-aClearedLedger-1 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-9 TOOL-aClearedLedger-10 TOOL-aClearedLedger-11 TOOL-aClearedLedger-12 TOOL-aClearedLedger-13 TOOL-aClearedLedger-14 TOOL-aClearedLedger-15 TOOL-aClearedLedger-16 |
 | [2026-11-13-prompt-TOOL-aClearedLedger-1-brief.md](../prompts/2026-11-13-prompt-TOOL-aClearedLedger-1-brief.md) | research | TOOL-aClearedLedger-1 TOOL-aClearedLedger-2 TOOL-aClearedLedger-3 TOOL-aClearedLedger-4 TOOL-aClearedLedger-5 TOOL-aClearedLedger-6 TOOL-aClearedLedger-9 TOOL-aClearedLedger-10 |
 | [2026-11-13-prompt-TOOL-aClearedLedger-7-1-spec-writer.md](../prompts/2026-11-13-prompt-TOOL-aClearedLedger-7-1-spec-writer.md) | journal | — |
 | [2026-11-13-prompt-TOOL-aClearedLedger-7-brief.md](../prompts/2026-11-13-prompt-TOOL-aClearedLedger-7-brief.md) | research | — |
