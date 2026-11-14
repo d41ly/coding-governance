@@ -150,15 +150,15 @@ def derive_parent_route(build, state, root):
 def write_parent_plant(top, case, value):
     """The scratch repository at `top` for `case`, committed on `main`; the kept ref's `(ref, sha)` where
     the plant holds it, else None."""
-    def readme(slug, extra=""):
+    def build_readme(slug, extra=""):
         return ("---\nslug: %s\nnode: a\nopened: 2026-01-01\nstreams: tooling\nroster: none\nids: none\n%s---\n"
                 "# %s\n" % (slug, extra, slug))
     phase = "BUILDING" if case == "live-parent" else WITHDRAWN_PHASE
     run_fixture_git(top, "init", "-q", "--template=", "-b", "main")
     write_fixture_files(top, {
         ".memory-tree.conf": "MEMORY_ROOT=memory\n",
-        "memory/builds/tChild/README.md": readme("tChild", "" if case == "no-parents" else "parents: tParent\n"),
-        "memory/builds/tParent/README.md": readme("tParent"),
+        "memory/builds/tChild/README.md": build_readme("tChild", "" if case == "no-parents" else "parents: tParent\n"),
+        "memory/builds/tParent/README.md": build_readme("tParent"),
         "memory/builds/tParent/RUN.md": "# tParent - run state\n\n## Run facts\nphase: %s\nrun-branch: %s\n" % (
             phase, FX_KEPT)})
     if value is not None:
