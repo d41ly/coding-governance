@@ -1960,6 +1960,18 @@
     "enforces": ["principle.p1"]
   },
   {
+    "name": "loop computed witness",
+    "argv": [
+      "python",
+      "{prefix}/loop/loop_witness.py",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "enforces": ["principle.p2"]
+  },
+  {
     "name": "layer dependencies (the core never depends on an expansion)",
     "argv": [
       "python",

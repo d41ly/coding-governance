@@ -11583,10 +11583,11 @@ hit "$out" "HELD is written by --hold alone, because the hold facts — the code
 same "AC13 --phase into HELD wrote nothing" "$(sum)" "$before"
 
 # ---- AC3: the checkpoint composes NO gate verdict. The reason is quoted on its own line and the
-# ---- bar field is a PATH — the dCarriedReceipt class, one field over.
+# ---- bar field is a PATH — the dCarriedReceipt class, one field over. Held under host-degraded, whose
+# ---- code the arm never reads: an inherited-red hold needs a bar behind it (TOOL-dDeclaredLoop-17 S5).
 build_hold_fixture
 mkdir -p "$TMP/.git/gate-logs"; printf 'x\n' > "$TMP/.git/gate-logs/leg-1.txt"
-run --hold tRun --code inherited-red --until owner --reason "gates GREEN was not what I saw" --reaped k1 >/dev/null
+run --hold tRun --code host-degraded --until owner --reason "gates GREEN was not what I saw" --reaped k1 >/dev/null
 out=$(run --status tRun)
 n=$((n+1)); if printf '%s\n' "$out" | grep '^checkpoint · ' | grep -q 'gates GREEN'; then echo "FAIL AC3 the checkpoint line carries the reason's words"; st=1; fi
 n=$((n+1)); printf '%s\n' "$out" | grep -q '^reason · "gates GREEN was not what I saw"$' || { echo "FAIL AC3 the reason is not printed as a quotation on its own line"; st=1; }
@@ -12116,11 +12117,12 @@ for su_case in unsettled settled; do
 done
 
 # ---- AC2: a hold under any other code, merged the same way, stays HELD and is refused naming its
-# ---- code, with the record byte-unchanged (review item M13).
+# ---- code, with the record byte-unchanged (review item M13). host-degraded, since an inherited-red
+# ---- hold needs a bar behind it (TOOL-dDeclaredLoop-17 S5).
 init_su_fixture
 run_su --preflight tRun --keepalive-id k1 >/dev/null
 run_su_git add -A >/dev/null && run_su_git commit -q -m "records(tRun): preflight" --no-verify
-run_su --hold tRun --code inherited-red --until "probe gate" --reason "x leg red, INHERITED" --reaped k1 >/dev/null
+run_su --hold tRun --code host-degraded --until "probe gate" --reason "the host was degraded" --reaped k1 >/dev/null
 run_su_git add -A >/dev/null && run_su_git commit -q -m "records(tRun): hold" --no-verify
 run_su_git push -q origin HEAD:main
 out=$(run_su --status tRun)
@@ -12128,7 +12130,7 @@ hit  "$out" "phase HELD"
 miss "$out" "LANDED (attended)"
 su_b=$(read_su_sum)
 out=$(run_su --settle tRun)
-hit "$out" "--settle settles a HELD record only under a hand-off code, because any other hold is a paused run its owner did not land, and settling it would end it; nothing was written. The hold code is: inherited-red"
+hit "$out" "--settle settles a HELD record only under a hand-off code, because any other hold is a paused run its owner did not land, and settling it would end it; nothing was written. The hold code is: host-degraded"
 same "AC2 the refused settle wrote nothing" "$(read_su_sum)" "$su_b"
 
 # ---- AC8: an unanswered remote refuses before any write.

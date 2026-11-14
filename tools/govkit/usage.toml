@@ -284,6 +284,26 @@ entry = "{prefix}/loop/loop_lib.py"
 flags = ["--check", "--scopes", "--fixture", "--plant=", "--grade-site="]
 
 [[usage]]
+id = "script:{prefix}/loop/loop_witness.py"
+shape = "verb"
+entry = "{prefix}/loop/loop_witness.py"
+flags = ["--fixture", "--plant=", "--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_witness.py#acceptance"
+shape = "verb"
+entry = "{prefix}/loop/loop_witness.py"
+verb = "acceptance"
+flags = ["--build=", "--unit=", "--sha=", "--cmd=", "--root="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_witness.py#rerun"
+shape = "verb"
+entry = "{prefix}/loop/loop_witness.py"
+verb = "rerun"
+flags = ["--sha=", "--cmd=", "--expect="]
+
+[[usage]]
 id = "script:{prefix}/loop/adopt-loop.sh"
 shape = "verb"
 entry = "{prefix}/loop/adopt-loop.sh"

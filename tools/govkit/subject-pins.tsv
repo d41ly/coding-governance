@@ -84,6 +84,7 @@ lexicon selftest	kit	selftests
 lexicon wiring	repo	wiring
 line length	repo	product
 line-length gate selftest	kit	selftests
+loop computed witness	kit	selftests
 loop definition	repo	declarations
 manifest-check self-test	kit	selftests
 marker contracts	repo	declarations

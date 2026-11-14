@@ -17,6 +17,13 @@
 #   word   the checker word, `machine` or `agent`
 #   means  the class it means
 #
+# One [[computed-witness]] row per witness a tool computes rather than the acting agent typing it
+# (TOOL-dDeclaredLoop-17); its class is the class of the item it serves, never typed here:
+#   name      the witness kind, one word
+#   serves    the [[item]] tag it witnesses, or "none" for an item no row below declares
+#   writer    what writes it today: "stand-in:{prefix}/<home>/<file>" or an actor `<kind>:<name>`
+#   armed-by  the build that writes it for real
+#
 # One [[workflow]] row per workflow of the roles kit's workflows.toml, joined by name both ways by that
 # kit's catalogue checker (rule R6):
 #   name   the roles workflow
@@ -100,6 +107,24 @@ means = "history"
 [[witness-alias]]
 word = "agent"
 means = "actor"
+
+[[computed-witness]]
+name = "acceptance"
+serves = "item.build.acceptance"
+writer = "stand-in:{prefix}/loop/loop_witness.py"
+armed-by = "dWellOiledMachine"
+
+[[computed-witness]]
+name = "probe-rerun"
+serves = "none"
+writer = "stand-in:{prefix}/loop/loop_witness.py"
+armed-by = "dPlacedRequest"
+
+[[computed-witness]]
+name = "red-attribution"
+serves = "item.test.route"
+writer = "stand-in:{prefix}/run-gates/run-gates.sh"
+armed-by = "dWitnessedBar"
 
 [[workflow]]
 name = "orient"

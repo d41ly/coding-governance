@@ -4878,6 +4878,11 @@
       "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
+      "id": "check_acceptance_plant",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
+    },
+    {
       "id": "check_accounted",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -5391,6 +5396,11 @@
       "id": "check_composed_run",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "check_computed_witnesses",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "check_conf",
@@ -6063,6 +6073,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "check_hold_plant",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
+    },
+    {
       "id": "check_hold_region",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -6386,6 +6401,11 @@
       "id": "check_m26_probe",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "check_malformed_plant",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
     },
     {
       "id": "check_manifest",
@@ -7186,6 +7206,11 @@
       "id": "check_requires_vintage",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_rerun_plant",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
     },
     {
       "id": "check_residue_gone",
@@ -14370,6 +14395,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/memory-recall/bench.py"
     },
     {
@@ -17283,6 +17313,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "read_acceptance",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
       "id": "read_active_practices",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -17908,6 +17943,11 @@
       "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
+      "id": "read_clean_env",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
+    },
+    {
       "id": "read_cli_help",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -17966,6 +18006,11 @@
       "id": "read_commits",
       "kind": "function",
       "file": "tools/unattended/commit_trailers.py"
+    },
+    {
+      "id": "read_computed_witnesses",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "read_condition_rows",
@@ -18651,6 +18696,11 @@
       "id": "read_git",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "read_git",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
     },
     {
       "id": "read_git",
@@ -19516,6 +19566,11 @@
       "id": "read_memory_root",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "read_memory_tree",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
     },
     {
       "id": "read_merge_answer",
@@ -22000,6 +22055,11 @@
     {
       "id": "remove_tree",
       "kind": "function",
+      "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
@@ -24075,6 +24135,11 @@
     {
       "id": "resolve_bash",
       "kind": "function",
+      "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "resolve_bash",
+      "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
@@ -24186,6 +24251,11 @@
       "id": "resolve_clean_oids",
       "kind": "function",
       "file": "tools/run-gates/check-receipt.py"
+    },
+    {
+      "id": "resolve_commit",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
     },
     {
       "id": "resolve_commit",
@@ -26368,6 +26438,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_acceptance",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
+    },
+    {
       "id": "run_adopter",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -26985,6 +27060,11 @@
     {
       "id": "run_fixture",
       "kind": "function",
+      "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
       "file": "tools/memory-tree/asbuilt_view.py"
     },
     {
@@ -27056,6 +27136,11 @@
       "id": "run_fixture_git",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "run_fixture_git",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
     },
     {
       "id": "run_fixture_git",
@@ -28138,6 +28223,11 @@
       "file": "tools/chain-packet.py"
     },
     {
+      "id": "run_rerun",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
+    },
+    {
       "id": "run_resolution_order",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -28278,6 +28368,11 @@
       "file": "tools/playbook/positional.py"
     },
     {
+      "id": "run_self",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
+    },
+    {
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/gate-lint/encoding_posture.py"
@@ -28291,6 +28386,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
     },
     {
       "id": "run_selftest",
@@ -28696,6 +28796,11 @@
       "id": "run_without_git_env",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "run_witness_commands",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
     },
     {
       "id": "run_worktree_remove",
@@ -33013,6 +33118,11 @@
       "file": "tools/process-monitor/procmon-hook.js"
     },
     {
+      "id": "write_acceptance",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
       "id": "write_aged_commit",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -33516,6 +33626,11 @@
       "id": "write_fixture_commit",
       "kind": "function",
       "file": "tools/playbook/core.py"
+    },
+    {
+      "id": "write_fixture_files",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
     },
     {
       "id": "write_fixture_records",
@@ -34406,6 +34521,11 @@
       "id": "write_sc_legs",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "write_scratch_unit",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
     },
     {
       "id": "write_second_spec",

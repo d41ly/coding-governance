@@ -363,7 +363,10 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   any write: an already-HELD record, a dirty tree, an unpublished tip under `ANCHOR_SCOPE=published`,
   a code or condition outside its grammar, a keepalive neither reaped nor recorded unreachable,
   because a job still firing into a held run re-dispatches its units at the next tick, and a
-  process the slug's driver recorded still alive once its orphans are reaped. One
+  process the slug's driver recorded still alive once its orphans are reaped. `--code inherited-red`
+  is the red attribution's to decide, never the run's: it is refused, check 83, unless the attribution
+  record of the bar the `gates-run` fact names reads every red leg INHERITED on this tree, the
+  run-state file and the paths that close staged excepted, as `--handoff --code owner-landing` is. One
   exception to the published-tip clause: under `--code platform-unavailable`, and only when the
   remote does not ANSWER, it accepts the unpublished tip and records it as `hold-unpushed`. In the
   SAME write it decides whether a DURABLE restart is owed and records `resume-owed` and

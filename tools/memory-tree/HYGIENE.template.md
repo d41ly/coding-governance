@@ -650,8 +650,9 @@ carry it too:
   `exception` (a principle excused for one part, minted by `PLAY-dOrderedCharter-7`'s record factory) ·
   `override` (minted by `PLAY-dOrderedCharter-2`) · `change` (minted by `PLAY-dOrderedCharter-15`) ·
   `red-fix` (the record of an inline red fix, in the grammar under "Red-fix records") ·
-  `disposition` (the owner's disposition of one loop item, in the grammar under "Disposition records").
-  The six after `research` are the typed kinds: each record is named
+  `disposition` (the owner's disposition of one loop item, in the grammar under "Disposition records") ·
+  `acceptance` (a unit's acceptance commands re-run at a commit, in the grammar under "Acceptance
+  records"). The seven after `research` are the typed kinds: each record is named
   `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, and the kind and that name are
   joined both ways. An open kind field stops being groupable the first time two authors spell one
   relation differently.
@@ -729,6 +730,16 @@ answered) and Caused-by (one id), with Reason optional. Write it through the doo
 new disposition --build <slug> --unit <id> --item <tag> --disposition <word> --channel <channel>
 [--reason <text>]`, which refuses a value outside those shapes. The door does not read the item's
 outcome set: that join is the loop kit's `check_disposition_record`, run by whoever reads the record.
+
+**Acceptance records.** A unit's acceptance commands re-run at one commit are an `acceptance` record
+named `<date>-build-<unit id>-acceptance-<n>.md` in a build's `build/` folder. Its fields are
+`- **<Key>:** <value>` bullets, one line each and all required: Sha (the full 40-hex commit the re-run
+read), Writer (`executor` · `stand-in`) and Caused-by (the unit). After one blank line come its run
+lines, one per command, `run · <exit> · <hash> · <command>`: the exit an integer or `timeout`, the
+hash the first twelve hex digits of the SHA-256 of the command's combined output. A record with no
+run line, or with a line opening `run ·` outside that grammar, is malformed. It has no door: the
+lines are computed, never typed, by the loop kit's `loop_witness.py acceptance` until an executor
+writes it, and a hand-typed record reads malformed wherever it lacks them.
 
 ## Acceptance ledger — how a built unit evidences its criteria
 

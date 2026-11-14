@@ -140,6 +140,55 @@ unattended leg refuses it, naming the entry. Append `:machine` or `:agent` to it
 is admitted and printed `adopter-declared`, because `DOD_EXTRA` holds your own items and the actor
 list only governs the ones gov ships. Check 53's report line names each one.
 
+## Computed witnesses
+
+Some witnesses are computed by a tool rather than typed by the agent they judge. The file declares
+each kind as a `[[computed-witness]]` row:
+
+```toml
+[[computed-witness]]
+name = "acceptance"
+serves = "item.build.acceptance"                    # the item it witnesses, or "none"
+writer = "stand-in:{prefix}/loop/loop_witness.py"   # what writes it today
+armed-by = "dWellOiledMachine"                      # the build that writes it for real
+```
+
+Three rows ship: `acceptance`, a unit's acceptance commands re-run at its commit; `probe-rerun`, a
+probe's commands re-run at the commit it pinned, which serves `none` because its item belongs to a
+later build; and `red-attribution`, the bar runner's attribution of each red leg, serving
+`item.test.route`. A row has no `class`: its class is the witness class of the item it serves. `--check`
+refuses a row whose name is not one word or is given twice, a `serves` that is neither `none` nor a
+declared item, a served item whose witness class is `actor`, a `writer` that is neither a
+`stand-in:` path nor an actor, and an empty `armed-by`.
+
+The `acceptance` and `probe-rerun` witnesses are written today by `tools/loop/loop_witness.py`.
+Each re-run checks the commit out into a temporary worktree, runs every command there through the
+shell with the git location variables unset, and keeps its exit code and the first twelve hex digits
+of the SHA-256 of its output. The worktree is removed afterwards, even after a failure. Output is
+hashed exactly as printed, so a command that prints the time never re-runs equal.
+
+<!-- run: no — needs a build folder and a committed unit in the adopter, which a scratch adopter does not hold -->
+```bash
+python tools/loop/loop_witness.py acceptance --build <slug> --unit <id> --sha <commit> --cmd "<command>" --cmd "<command>"
+python tools/loop/loop_witness.py rerun --sha <pinned> --cmd "<command>" --expect <exit>:<hash>
+```
+
+- **`acceptance`** re-runs each `--cmd` at `--sha` and writes the record <!-- usage: script:tools/loop/loop_witness.py#acceptance 55bc486e -->
+  `<date>-build-<unit id>-acceptance-<n>.md` in the build's `build/` folder, through the memory-tree
+  kit's record writer, with `Writer: stand-in`, the full commit, and one
+  `run · <exit> · <hash> · <command>` line per command. `--root` names the repository, the current one by default. It exits 2
+  when no `--cmd` is given or `--sha` names no commit, and 1 when the writer refuses, writing nothing.
+  Commit the record yourself. No flag types a run line: the record's lines are always computed.
+- **`rerun`** pairs each `--cmd` with the `--expect` in the same place, and prints one line per <!-- usage: script:tools/loop/loop_witness.py#rerun 016ed8f7 -->
+  command: `confirmed` when the exit and hash at the pinned commit match, `refuted` when either
+  differs, and `inconclusive` on a timeout or a commit that does not resolve. It exits 0 only when
+  every command is `confirmed`, and 2 on an unpaired `--cmd`.
+
+**Holding on an inherited red.** `--hold --code inherited-red` in the unattended driver is admitted
+only when the attribution record of the bar its `gates-run` fact names reads every red leg
+`INHERITED`, as `--handoff --code owner-landing` already is. A close that prints the inherited-red hold
+also records which paths it staged, so committing them before holding keeps the bar tied.
+
 ## The owner's disposition record
 
 When the owner answers a held item, the answer is one record in the build's `build/` folder, written
@@ -173,8 +222,10 @@ unarmed and never as a pass.
   its fields comes from, or `pending` or `unarmed`, and a `loop: items` count line. Then it
   prints the witness classes, one line per witness alias and per step's and item's witness, one line per
   actor-list row with its build, and the base it compared the list against, or `no comparison` and
-  why. A `loop: actor-list builds` line follows, naming the builds folder, or `foreign` and why. It
-  exits 0, or 1 when an item or the list is refused.
+  why. A `loop: actor-list builds` line follows, naming the builds folder, or `foreign` and why, then
+  one `loop: computed-witness` line per computed witness with the item it serves, its class, its
+  writer and the build that arms it. It exits 0, or 1 when an item, the list or a computed witness is
+  refused.
 
   ```text
   loop: step step.build · order 3 · state building · exit item.build.exit
@@ -189,6 +240,7 @@ unarmed and never as a pass.
   loop: witness classes history hook-record remote-verdict · refused actor
   loop: witness step.build · class history · by the transition record into the next step
   loop: actor witness DOD_CORE · keepalive-reaped · until dWellOiledMachine
+  loop: computed-witness acceptance · serves item.build.acceptance · class history · writer stand-in:{prefix}/loop/loop_witness.py · armed by dWellOiledMachine
   ```
 
 - **Grade a Definition of Done:** `python tools/loop/loop_lib.py --grade-site DOD_CORE gates-green:machine keepalive-reaped:agent parked-decisions-surfaced:agent`
@@ -228,7 +280,18 @@ unarmed and never as a pass.
   item prints `unarmed` and it exits 0). Two cases run `--scopes` after the read and exit 0 when it behaves:
   `scope-selected` scopes one unit to one item in a scratch file and shows it on that item's line
   alone, and `scope-no-kit` looks for the playbook kit in an empty scratch folder and shows every line
-  `unarmed`. The files on disk are never changed.
+  `unarmed`. The computed-witness cases are `computed-actor` (the item the `acceptance` row serves
+  given the `actor` class) and `computed-unserved` (the row serving an item the file does not
+  declare). The files on disk are never changed.
+- **Check the re-run stand-in:** `python tools/loop/loop_witness.py --fixture --plant acceptance` runs <!-- usage: script:tools/loop/loop_witness.py 6de87be4 -->
+  one case in a scratch repository and exits 0 when it holds. The cases are `acceptance` (a unit's
+  commands re-run at its commit while an uncommitted edit sits beside them), `acceptance-malformed`
+  (records typed by hand, with no run line or a writer outside `executor` and `stand-in`, each read
+  as malformed), `probe-rerun` (`confirmed` at the pinned commit, `refuted` at a later one,
+  `inconclusive` at one that does not resolve) and `hold-inherited`, which preflights a run through
+  the unattended driver and holds it under `inherited-red` over an `OWN` leg, an untied bar and an
+  `INHERITED` one. `--selftest` runs every case and the two computed-witness cases above, and the
+  `loop computed witness` gate runs it. A case whose kit is not installed exits 2, never a pass.
 
 ## What stops a read
 
@@ -260,4 +323,6 @@ unattended kit requires the loop kit too, for check 53. The loop kit requires th
 because `--check` reads the actor list at the compare base that kit resolves, and reads
 `DESIGN_RECORD` and `MEMORY_ROOT` through that kit's conf reader. `--check` also reads the roles
 kit's role files for the role items' defaults, without requiring that kit: where it is not
-installed, each role item prints `unarmed`.
+installed, each role item prints `unarmed`. `loop_witness.py` writes its records through the
+memory-tree kit, and its `hold-inherited` case runs the unattended driver without requiring that kit,
+since the unattended kit requires this one; its gate is gov's own and an install does not carry it.

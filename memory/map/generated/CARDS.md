@@ -135,7 +135,7 @@ The loop definition: the five gov steps as data, each roles workflow's build ord
 
 - status `building` · streams `tooling` · dossier `memory/map/features/loop.md`
 - decisions 1: `TOOL-dDeclaredLoop-1`
-- gate-legs 1: `loop definition`
+- gate-legs 2: `loop definition`, `loop computed witness`
 - kits 1: `loop`
 - globs 2: `tools/loop/**`, `help/loop.md`
 

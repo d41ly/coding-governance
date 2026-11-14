@@ -5,7 +5,6 @@
 # the build pass from the tree, its `practice` rows when the catalogue landed (PLAY-dOrderedCharter-1), it only
 # shrinks after: `python <prefix>/playbook/core.py meta-check` reds a row
 # whose item is enforced now, and an item with no row.
-principle	principle.p2	dDeclaredLoop
 principle	principle.p3	dWitnessedBar
 principle	principle.p4	dOrderedCharter
 principle	principle.p5	dPlacedRequest

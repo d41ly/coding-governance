@@ -17,7 +17,11 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # that kit does not resolve, so the check and the verb degrade rather than fail. The read of the roles
 # kit takes no edge either, since the roles kit requires this one (TOOL-dDeclaredLoop-9):
 # `read_role_defaults` imports its roles_lib.py inside the function for each role item's defaults, and
-# where that kit does not resolve every role item prints `unarmed`.
+# where that kit does not resolve every role item prints `unarmed`. The re-run stand-in,
+# loop_witness.py (TOOL-dDeclaredLoop-17), imports the memory-tree kit's tree_lib, build_records and
+# deviation_join inside its functions, under the edge above, and its `hold-inherited` plant runs the
+# unattended driver, which requires this kit, so that reach takes no edge and exits 2 where the driver
+# does not resolve; the plant's leg is gov's own, an [[exempt_leg]] of the registry, no row here.
 requires = ["memory-tree"]
 
 # Everything the kit ships is engine, overwritten on every update: the definition, its reader, the

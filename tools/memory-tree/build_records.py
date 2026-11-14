@@ -59,9 +59,17 @@ such tag, a `--disposition` that is not one word, a `--channel` outside the clos
 here: that the word is a member of the item's closed outcome set, which is the loop kit's
 `check_disposition_record`, since a kit imports no sibling; and that the item is declared.
 
+THE ACCEPTANCE KIND (TOOL-dDeclaredLoop-17 S1): `<date>-build-<unit id>-acceptance-<n>.md`, a unit's
+acceptance commands re-run at one commit: `Sha` (the full commit the re-run read), `Writer` (`executor` or
+`stand-in`) and `Caused-by`, then one `run · <exit> · <hash12> · <command>` line per command, `RUN_LINE`.
+`write_acceptance` is its one writer and `read_acceptance` its reader, which refuses a `Sha` that is not 40
+hex, no run line, and a line opening `run ·` outside the grammar. It has no `new` door, so no flag types a
+run line: the loop kit's re-run stand-in, `loop_witness.py acceptance`, computes them and calls the writer.
+
 ONE LINE PER VALUE, at the one writer (PLAY-dOrderedCharter-49 S53): `write_record` refuses a field value
 holding a CR or an LF, or opening `**<Word>:**`, before it writes anything, so no door's value forges a
-field; every door's refusal exits 1, writing nothing.
+field; every door's refusal exits 1, writing nothing. Its `lines`, written after the fields, are refused
+the same way, and so is a line that reads as a field.
 
 `build_records.py read <path>` prints one record's fields and every refusal: exit 0 well-formed, 1 malformed,
 2 an unreadable path or a pending kind.
@@ -107,6 +115,10 @@ OVERRIDE_TAKEN = ("explicit-override", "live-owner-wins")   # the `charter.overr
 PROOF = re.compile(r"tty-cli|none — \S.*")
 DOOR_PROOF = "none — stand-in door"
 DISPOSITION_CHANNELS = ("mailbox", "terminal", "prompt")   # where the owner answered a held item
+ACCEPTANCE_WRITERS = ("executor", "stand-in")   # who re-ran an acceptance record's commands
+#: one re-run command of an acceptance record: its exit (an integer, or `timeout`), the first twelve hex
+#: digits of the SHA-256 of its combined output, and the command as run
+RUN_LINE = re.compile(r"run · (?P<exit>-?\d+|timeout) · (?P<hash>[0-9a-f]{12}) · (?P<command>\S.*)")
 
 # kind -> its required fields and its closed sets, `(field, allowed values)` in refusal order
 KINDS = {
@@ -137,6 +149,10 @@ KINDS = {
     "disposition": {
         "required": ("Item", "Disposition", "Channel", "Caused-by"),
         "closed": (("Channel", DISPOSITION_CHANNELS),),
+    },
+    "acceptance": {
+        "required": ("Sha", "Writer", "Caused-by"),
+        "closed": (("Writer", ACCEPTANCE_WRITERS),),
     },
 }
 if set(KINDS) != set(TYPED_RECORD_KINDS):
@@ -524,10 +540,55 @@ def write_disposition(root, build, unit, item, disposition, channel, reason=None
     return write_record(root, build, unit, "disposition", f"{item} disposed {disposition}", fields, today)
 
 
-def write_record(root, build, unit, kind, title, fields, today=None):
+# -------------------------------------------------------------------------------- the acceptance kind
+def read_acceptance(path, text):
+    """One acceptance record: its fields under their own names, `runs` its run lines as `(command, exit,
+    hash)`, and `id`, `path`, `build`, `n` and `malformed`. Its own rules: `Sha` is a full 40-hex sha, at
+    least one line reads `RUN_LINE`, and every line opening `run ·` matches it."""
+    opened = [ln.strip() for ln in text.replace("\r\n", "\n").split("\n") if ln.startswith("run ·")]
+    runs = [(m.group("command"), m.group("exit"), m.group("hash")) for ln in opened if (m := RUN_LINE.fullmatch(ln))]
+
+    def check_fields(fields):
+        bad = [("run line", f"{ln!r} is not run · <exit> · <hash12> · <command>")
+               for ln in opened if not RUN_LINE.fullmatch(ln)]
+        if not opened:
+            bad.append(("run line", "is missing: the record holds one run · <exit> · <hash12> · <command> line per "
+                                    "command re-run"))
+        if "Sha" in fields and not SHA40.fullmatch(fields["Sha"]):
+            bad.append(("Sha", f"{fields['Sha']} is not a full 40-hex sha"))
+        return bad
+
+    fields, bad, name = read_record(path, text, "acceptance", check_fields=check_fields)
+    return {**fields, "runs": runs, "id": pathlib.PurePosixPath(path).stem, "path": path,
+            "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None,
+            "malformed": bad}
+
+
+def write_acceptance(root, build, unit, sha, writer, runs, today=None):
+    """The one writer of an acceptance record, under `root`'s own memory tree: `runs` is `[(command, exit,
+    hash12)]`, each written as one run line after the fields. -> its repo-relative path. Every value is
+    validated here, the write boundary; a refusal is ValueError. The kind has no `new` door: its run lines
+    are computed by the caller and never typed from a flag."""
+    bad = []
+    if not SHA40.fullmatch(sha or ""):
+        bad.append(f"Sha {sha!r} is not a full 40-hex sha")
+    if writer not in ACCEPTANCE_WRITERS:
+        bad.append(f"Writer {writer} is outside {' · '.join(ACCEPTANCE_WRITERS)}")
+    if not runs:
+        bad.append("no run: an acceptance record holds one run line per command re-run")
+    lines = [f"run · {code} · {digest} · {command}" for command, code, digest in runs]
+    bad += [f"run line {ln!r} is not run · <exit> · <hash12> · <command>" for ln in lines if not RUN_LINE.fullmatch(ln)]
+    if bad:
+        raise ValueError("; ".join(bad))
+    fields = [("Sha", sha), ("Writer", writer), ("Caused-by", unit)]
+    return write_record(root, build, unit, "acceptance", f"re-run at {sha[:8]}", fields, today, lines)
+
+
+def write_record(root, build, unit, kind, title, fields, today=None, lines=()):
     """The record writer every door shares: the next `kind` record of `build` under `root`'s own memory tree,
-    headed `# <unit> <kind> <n> — <title>`, then `**Serves:** <kind> <unit>` and each `(key, value)` of
-    `fields` as a bold-key bullet. -> its repo-relative path. A refusal is ValueError."""
+    headed `# <unit> <kind> <n> — <title>`, then `**Serves:** <kind> <unit>`, each `(key, value)` of
+    `fields` as a bold-key bullet and, after one blank line, each of `lines` as written (TOOL-dDeclaredLoop-17
+    S1), each refused as a value is. -> its repo-relative path. A refusal is ValueError."""
     if kind not in KINDS:
         raise ValueError(f"{kind!r} is not a typed kind: " + ", ".join(KINDS))
     if "pending" in KINDS[kind]:   # PLAY-dOrderedCharter-55 S8: refused before any write, as `read` refuses it
@@ -541,6 +602,10 @@ def write_record(root, build, unit, kind, title, fields, today=None):
     if forged:
         raise ValueError(f"{', '.join(forged)}: a value is one line and never opens **<Word>:**, so it cannot "
                          f"forge a field")
+    forged = [ln for ln in lines if "\n" in ln or "\r" in ln or FORGED_FIELD.match(ln) or FIELD.match(ln)]
+    if forged:
+        raise ValueError(f"{forged[0]!r}: a line after the fields is one line that never reads as a field, so it "
+                         f"cannot forge one")
     memory_root = (read_design_conf(root).get("MEMORY_ROOT") or "memory").strip().strip("/")
     folder = pathlib.Path(root, memory_root, "builds", build)
     if not folder.is_dir():
@@ -554,6 +619,7 @@ def write_record(root, build, unit, kind, title, fields, today=None):
     path = out / f"{day}-build-{unit}-{kind}-{n}.md"
     body = [f"# {unit} {kind} {n} — {title}", "", f"**Serves:** {kind} {unit}", ""]
     body += [f"- **{key}:** {value}" for key, value in fields]
+    body += [""] + list(lines) if lines else []
     out.mkdir(exist_ok=True)
     with open(path, "x", encoding="utf-8", newline="\n") as fh:   # never over a record already there
         fh.write("\n".join(body) + "\n")
@@ -916,6 +982,8 @@ def main(argv):
         bad = read_red_fix(rel, text)["malformed"]
     elif kind == "disposition":
         bad = read_disposition(rel, text)["malformed"]
+    elif kind == "acceptance":
+        bad = read_acceptance(rel, text)["malformed"]
     else:
         bad = read_exception(rel, text)["malformed"]
     for ln in text.replace("\r\n", "\n").split("\n"):

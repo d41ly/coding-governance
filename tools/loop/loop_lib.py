@@ -61,6 +61,13 @@ item's explicit field equal to its role's (a copy), and a role item's explicit `
 kit does not resolve; neither is a refusal, and the loop kit declares no edge to that kit. Every
 item's `witness` is graded by `check_witness_classes` beside the steps', and joins the actor list.
 
+The definition also declares the computed witness kinds (TOOL-dDeclaredLoop-17): one
+`[[computed-witness]]` row per witness a tool computes rather than the acting agent typing it, its
+`name`, the item it `serves` (or `none`), its `writer` today, a stand-in or an actor, and the build
+`armed-by` that writes it for real. `check_computed_witnesses` grades the rows and derives each one's
+class from its served item's witness, never typed on the row; `read_computed_witnesses` returns them.
+Neither runs inside `load_loop`. The re-run stand-in, `loop_witness.py` beside this file, writes two.
+
 A definition that does not hold is refused with `LoopError`, a `ValueError` naming the file and the row: a
 file that does not read or is no TOML; a `step` or `workflow` table that is no array of tables; the gov
 steps missing, repeated or out of order, a tag that is no gov step, or an `order` that is not the step's
@@ -77,8 +84,9 @@ order, or `loop: inputs unarmed` and why before them where no layer tags resolve
 line per item in file order, each field's source or `pending` or `unarmed`, and `loop: items · <n>
 read · <p> pending · <u> unarmed`. It then prints the witness classes, one line per witness alias and per witness, one
 line per list row with its build and the list's base line, the base or `no comparison` and why, the
-builds line, the folder or `foreign` and why, and each refusal of the items and the list as
-`loop: refused · ...`, exit 1. `--fixture --plant <case>` reads the shipped
+builds line, the folder or `foreign` and why, one `loop: computed-witness <name> · serves <tag> · class
+<class> · writer <writer> · armed by <build>` line per computed witness, and each refusal of the items,
+the list and the computed witnesses as `loop: refused · ...`, exit 1. `--fixture --plant <case>` reads the shipped
 definition and list with the named break made in memory, never on disk, the list's base being the
 shipped list as read, and exits 1 on the refusal the break must draw, 0 if the reader accepted it. The
 plants are `PLANTS`. `--grade-site <site> <entry>...` prints `loop: site <site> · <item> · <word> ·
@@ -156,7 +164,9 @@ PLANTS = {"missing-step": "the step.deploy row taken out",
           "role-copy": "item.build.unit-pass given allowance product, its role's writes",
           "role-widen": "item.design.seams, a role:gov-reuse-scout item, given allowance product",
           "role-pending": "item.build.unit-pass's actor set to role:gov-no-such-role",
-          "roles-no-kit": "the roles kit resolved from an empty scratch directory"}
+          "roles-no-kit": "the roles kit resolved from an empty scratch directory",
+          "computed-actor": "the acceptance computed witness's served item given witness class actor",
+          "computed-unserved": "the acceptance computed witness set to serve item.build.acceptanc"}
 #: The plants whose break is in what the scope verb reads rather than in the definition, so `--check`
 #: runs whole and the scope verb runs after it.
 SCOPE_PLANTS = ("scope-selected", "scope-no-kit")
@@ -301,6 +311,56 @@ def check_witness_classes(data, where):
                 kind, tag, witness["class"], " ".join(members)))
         witnesses.append((tag, witness["class"], witness["by"]))
     return witnesses
+
+
+def check_computed_witnesses(data, where):
+    """`data`'s `[[computed-witness]]` rows graded (TOOL-dDeclaredLoop-17 S7), returned in file order as
+    `{"name", "serves", "class", "writer", "armed-by"}`, `class` the served item's witness class, derived
+    and never typed, `none` for a row serving `none`. LoopError naming `where` and the row: a `name`
+    outside `SEG` or given twice; a `serves` neither `none` nor a declared `[[item]]` tag; a served item
+    whose witness class is refused; a `writer` neither `ROUTE_STAND_IN` nor `<kind>:<name>` of
+    `ACTOR_KINDS`; an empty `armed-by`. A definition with no such table holds no row."""
+    rows = data.get("computed-witness", [])
+    if not isinstance(rows, list) or not all(isinstance(r, dict) for r in rows):
+        raise LoopError(where, "'computed-witness' is not an array of tables")
+    items = {r.get("tag"): r for r in read_item_rows(data, where)}
+    table = data.get("witnesses")
+    refused = table.get("refused", []) if isinstance(table, dict) else []
+    out, names = [], set()
+    for n, row in enumerate(rows, 1):
+        name, serves, writer, armed = row.get("name"), row.get("serves"), row.get("writer"), row.get("armed-by")
+        at = "computed-witness row %d (%s)" % (n, name if isinstance(name, str) and name else "unnamed")
+        if not isinstance(name, str) or not SEG.fullmatch(name):
+            raise LoopError(where, "%s name %r is not one word of the shape %s" % (at, name, SEG.pattern))
+        if name in names:
+            raise LoopError(where, "%s repeats the name of an earlier row" % at)
+        names.add(name)
+        if serves == NO_STEP:
+            cls = NO_STEP
+        elif serves in items:
+            witness = items[serves].get("witness")
+            cls = witness.get("class") if isinstance(witness, dict) else None
+            if cls in refused:
+                raise LoopError(where, "%s serves %s, whose witness class %s is refused: a computed witness "
+                                       "replaces a fact the acting agent typed, never serves one" % (at, serves, cls))
+        else:
+            raise LoopError(where, "%s serves %r, which is neither %s nor a declared [[item]] tag" % (
+                at, serves, NO_STEP))
+        form = ACTOR_FORM.fullmatch(writer) if isinstance(writer, str) else None
+        if not (isinstance(writer, str) and ROUTE_STAND_IN.fullmatch(writer)) and not (
+                form and form.group(1) in ACTOR_KINDS):
+            raise LoopError(where, "%s writer %r is neither stand-in:{prefix}/<home>/<file> nor <kind>:<name> of "
+                                   "%s" % (at, writer, " ".join(ACTOR_KINDS)))
+        if not isinstance(armed, str) or not armed.strip():
+            raise LoopError(where, "%s carries no armed-by, the build that writes it for real" % at)
+        out.append({"name": name, "serves": serves, "class": cls, "writer": writer, "armed-by": armed})
+    return out
+
+
+def read_computed_witnesses(kit_dir):
+    """The `[[computed-witness]]` rows of the definition in `kit_dir`, graded by `check_computed_witnesses`,
+    each with its derived `class`; LoopError where the definition or a row does not hold."""
+    return check_computed_witnesses(*read_definition(kit_dir))
 
 
 def read_witness_classes(kit_dir):
@@ -928,6 +988,13 @@ def write_loop_plant(data, case, rows, base_rows):
         data["dispositions"]["set"].append("ask")
     elif case == "disposition-alias":
         next(r for r in data["disposition-alias"] if r.get("word") == "defer")["means"] = "postpone"
+    elif case in ("computed-actor", "computed-unserved"):
+        row = next(r for r in data.get("computed-witness", []) if r.get("name") == "acceptance")
+        if case == "computed-unserved":
+            row["serves"] = "item.build.acceptanc"
+        else:
+            served = next(r for r in data.get("item", []) if r.get("tag") == row.get("serves"))
+            served["witness"]["class"] = "actor"
     elif case in PLANTS and case not in SCOPE_PLANTS:
         items = {r.get("tag"): r for r in data.get("item", [])}
         if case == "needs-cycle":
@@ -1056,6 +1123,13 @@ def main(argv):
     else:
         print("loop: actor-list builds · %s" % builds_dir.as_posix())
     refusals = item_refusals + check_actor_list(rows, base_rows, sites, builds_dir)
+    try:
+        computed = check_computed_witnesses(data, where)
+    except LoopError as e:
+        computed, refusals = [], refusals + [str(e)]
+    for c in computed:
+        print("loop: computed-witness %s · serves %s · class %s · writer %s · armed by %s" % (
+            c["name"], c["serves"], c["class"], c["writer"], c["armed-by"]))
     if plant in SCOPE_PLANTS and not refusals:
         refusals = check_scope_plant(plant, layers, pathlib.Path(scratch.name), kit_dir, root,
                                      [r["tag"] for r in data.get("item", [])])

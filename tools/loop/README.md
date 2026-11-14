@@ -143,6 +143,29 @@ tree whose `.memory-tree.conf` sets `DESIGN_RECORD`, under `<MEMORY_ROOT>/builds
 tree each row prints `foreign build, not graded`. `DOD_EXTRA` is the adopter's own: its actor entries
 need no row and are admitted, printed `adopter-declared`.
 
+## The computed witnesses
+
+One `[[computed-witness]]` row per witness a tool computes rather than the acting agent typing it
+(TOOL-dDeclaredLoop-17): its `name`, one word; the item it `serves`, a declared `[[item]]` tag or
+`none`; its `writer` today, `stand-in:{prefix}/<home>/<file>` or an actor `<kind>:<name>`; and the
+build `armed-by` that writes it for real. Its class is the served item's witness class, derived and
+never typed, `none` for a row serving `none`, and a served item whose class is refused is refused.
+Three ship: `acceptance` serving `item.build.acceptance` and `probe-rerun` serving `none`, both written
+today by `loop_witness.py` beside this file, and `red-attribution` serving `item.test.route`, written
+by the bar runner.
+
+`loop_witness.py` is the re-run stand-in. `run_witness_commands(repo, sha, commands, timeout)` adds a
+detached worktree of `sha` under the host temp directory, runs each command there through the shell
+with the memory-tree kit's `GIT_ENV_LEAKS` unset, keeps each exit, or `timeout`, and the first twelve
+hex digits of the SHA-256 of its combined output, and removes the worktree on every exit path.
+`acceptance --build --unit --sha --cmd... [--root]` writes the memory-tree kit's acceptance record
+through its `write_acceptance`, `Writer: stand-in`; `rerun --sha --cmd --expect...` answers each command
+`confirmed`, `refuted` or `inconclusive`. Its plants are `acceptance`, `acceptance-malformed`,
+`probe-rerun` and `hold-inherited`, the last running the unattended driver, found by
+`resolve_kit_dir` and run through the inline `resolve_bash`, with no edge to that kit, since it requires
+this one; a kit that does not resolve exits 2, never a pass. `--selftest` runs them and this reader's
+`computed-actor` and `computed-unserved` plants, and is gov's `loop computed witness` gate.
+
 ## The reader, `loop_lib.py`
 
 | function | returns |
@@ -155,6 +178,8 @@ need no row and are admitted, printed `adopter-declared`.
 | `resolve_disposition(kit_dir, word)` | the member a member or an alias means |
 | `read_outcome_set(kit_dir, item)` | the closed outcome set of the `[[item]]` row tagged `item`, or `None` |
 | `check_disposition_record(kit_dir, record)` | `True` where the record's `Disposition` is in its `Item`'s outcome set, `None` for an undeclared item |
+| `check_computed_witnesses(data, where)` | each `[[computed-witness]]` row graded, `{name, serves, class, writer, armed-by}`, its class derived from the served item |
+| `read_computed_witnesses(kit_dir)` | the definition's computed witnesses, graded |
 | `read_witness_classes(kit_dir)` | `{"classes": [...], "refused": [...]}`, the definition's witnesses graded |
 | `check_witness_classes(data, where)` | `(site, class, by)` per witness, after grading `[witnesses]`, the witness aliases, every step's `witness` and every item's |
 | `check_alias_rows(rows, members, table, where)` | nothing; refuses an alias row of either table whose `word` is a member or repeats, or whose `means` is no member |
@@ -206,7 +231,8 @@ drive rows by `order` and pick each role's practices by its reach word.
   witness alias and per witness, one line per actor-list row with its build, and the list's base line:
   the base it compared against, or `no comparison` and why, never read as an empty list. Then
   `loop: actor-list builds · <folder>`, or `loop: actor-list builds · foreign · <why>`, each row's line
-  ending `foreign build, not graded` in that case. Exit 0 read,
+  ending `foreign build, not graded` in that case, then one `loop: computed-witness <name> · serves
+  <tag> · class <class> · writer <writer> · armed by <build>` line per computed witness. Exit 0 read,
   1 refused with the reason on one line or each list refusal as `loop: refused · ...`. It prints
   `loop: program <step> · <n> item(s) · <tags>` per step, after `loop: inputs unarmed` and why where
   the playbook kit's layer tags do not resolve. Then one line per item in file order and the count,
@@ -246,7 +272,9 @@ drive rows by `order` and pick each role's practices by its reach word.
   `scope-no-kit` run the read and then the scope verb, exiting 0 when it behaves: the first over a
   scratch manifest under the host temp directory scoping one unit to one item, which must be listed
   on that item's line alone; the second with a scratch directory as the kit directory, where the
-  inputs and every scope line must read `unarmed`. `PLANTS` names what each breaks. Nothing on disk
+  inputs and every scope line must read `unarmed`. `computed-actor` (the item the `acceptance`
+  computed witness serves given class `actor`) and `computed-unserved` (that row serving
+  `item.build.acceptanc`) each exit 1 naming the row. `PLANTS` names what each breaks. Nothing on disk
   changes but the scratch, which is removed after.
 - `python loop_lib.py --grade-site <site> <entry>...` grades one declaration site, `DOD_CORE` or
   `DOD_EXTRA`, whose entries are `<item>` or `<item>:<word>`. The word resolves through

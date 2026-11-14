@@ -7086,6 +7086,13 @@ run_hold() { # slug · code · until · reason · reaped · unreachable · pendi
     fail 89 "--hold names a hand-off code, and those are written by --handoff alone: a HELD record under one carries the landing recipe and the landing facts, and a hold written without them is a hand-off nothing can land or settle; end the run with --handoff instead: $code"
     return 1
   fi
+  # TOOL-dDeclaredLoop-17 S5 - THE RED ATTRIBUTION JOINED TO THE HOLD. `inherited-red` is a claim about
+  # the bar, so the runner's attribution decides it and never the code the run types: the record the
+  # `gates-run` fact names must read every red leg INHERITED, under the `record-only` tie, because the
+  # hold line the close prints has the run commit its staged records before it holds.
+  if [ "$code" = inherited-red ]; then
+    check_inherited_override "$rel" "--hold --code inherited-red" record-only || return 1
+  fi
   check_verb_flag --hold --until "$until" || return 1
   if ! check_hold_condition "$until"; then
     fail 55 "--hold names a release condition outside the closed grammar, and an unvalidated condition reaches a resume scheduler's fire-instant computation as free prose; the grammar is after <YYYY-MM-DDTHH:MM:SSZ>, probe host|gate|api, or owner: $until"
@@ -10511,8 +10518,9 @@ check_inherited_override() { # run-state file · the verb as the refusal names i
 }
 
 # TOOL-dUnstuckLanding-13 S4 - IS THE BAR TIED TO THIS TREE. Equal heads always are. `record-only`
-# also admits a bar head that differs from HEAD in the run-state file ALONE, and only `--handoff`
-# passes it: `gates-green` writes and stages its `gates-run` fact, and `--hold`'s clean-tree refusal
+# also admits a bar head that differs from HEAD in the run-state file ALONE, and only `--handoff` and
+# `--hold --code inherited-red` (TOOL-dDeclaredLoop-17 S5) pass it: `gates-green` writes and stages its
+# `gates-run` fact, and `--hold`'s clean-tree refusal
 # then makes the run commit that record before it may hold, which moves HEAD off the bar's head by
 # exactly the run's own record. `--close` and `--abort` pass nothing and keep the strict equality.
 # A bar head this clone cannot resolve makes the diff fail, which reads as untied.
@@ -10576,7 +10584,8 @@ check_bar_tied() { # bar head · HEAD · run-state file · [record-only] · [the
 }
 
 # TOOL-dUnstuckLanding-27 S3 - THE STAGED SET, written into the bar's own run record when gates-green
-# reads its bar MET over an inherited-only red: one `path@blob` line per path the close staged, the
+# reads its bar MET over an inherited-only red under `land`, or prints the hold line over one under
+# `park` (TOOL-dDeclaredLoop-17 S6): one `path@blob` line per path the close staged, the
 # blob the index holds for it now, `-` where it holds a deletion. A bar that staged nothing writes no
 # file, and every bar has a run record of its own, so a later bar never inherits an older set.
 write_gates_staged() { # the bar's run record dir · paths staged beside the record, or empty
@@ -11579,6 +11588,8 @@ dod_met() { # slug · run-state file · item · checker
                 return 0
               fi
               if [ "$GR_STATE" = hold ]; then
+                # TOOL-dDeclaredLoop-17 S6: the hold's join reads this set, as the hand-off's does.
+                write_gates_staged "$_gdir" "$WI_STAGED"
                 _hold="$GR_LEGS red at ${_gr:0:8}, INHERITED; INHERITED_RED=$GP_POLICY"
                 DOD_OUT="hold · inherited-red · until probe gate · $_hold"
                 [ -z "$GR_WHY" ] || DOD_OUT="$DOD_OUT"$'\n'"  $GR_WHY"
