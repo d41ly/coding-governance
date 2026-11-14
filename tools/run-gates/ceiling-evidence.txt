@@ -31,25 +31,25 @@ agent-cap restatement self-test	115.4	2	a	2026-09-24	runner
 agent-cap self-test	700.8	2	a	2026-09-24	runner
 branch-guard self-test	28.6	2	a	2026-09-24	runner
 brief-recorded	403.5	2	a	2026-09-24	runner
-build README slot contract	1.5	6	a	2026-09-21	runner
+build README slot contract	1.6	1	a	2026-11-13	runner
 build-index selftest	30.4	2	a	2026-09-24	runner
 build-method size	3.5	2	a	2026-09-24	runner
 charter size	5.2	1	a	2026-09-06	runner
 check-arms selftest	15.7	2	a	2026-09-24	runner
 check-wiring self-test	751.8	2	a	2026-09-24	runner
 codebase-map adopter e2e	56.7	2	a	2026-09-24	runner
-codebase-map coverage + freshness	4.0	6	a	2026-09-21	runner
+codebase-map coverage + freshness	7.6	1	a	2026-11-13	runner
 codebase-map gate coverage	1.0	2	a	2026-09-24	runner
 codebase-map kit selftest	27.5	1	a	2026-09-24	runner
 corpus-ids selftest	165.1	2	a	2026-09-24	runner
 dead-path carriers (deleted files still named)	14.5	1	a	2026-09-06	runner
 dead-path carriers self-test	131.5	2	a	2026-09-24	runner
-docs	2.7	1	d	2026-10-27	docs_leg.py on the worktree at 1b64e20a with the pass staged, timed by bash time, 2.7s wall, build pass of TOOL-dSafePassage-13
-drift-audit records	35.5	2	a	2026-09-24	runner
+docs	7.7	1	a	2026-11-13	runner
+drift-audit records	96.7	1	a	2026-11-13	runner
 drift-audit selftest	292.5	1	a	2026-09-24	runner
 drift-audit wiring	9.8	1	a	2026-09-06	runner
 edges (every declared edge parses, is registered and resolves)	35.0	1	d	2026-11-03	edge_grammar.py --check --base ce13efbe on the worktree with the pass applied and the tag index warm, 35s wall by date arithmetic, under a concurrent foreign gate run, build pass of PLAY-dOrderedCharter-28
-encoding posture (text IO names its encoding)	4.2	2	a	2026-09-24	runner
+encoding posture (text IO names its encoding)	6.2	1	a	2026-11-13	runner
 every held leg is budgeted, every budget row resolves	35.6	2	a	2026-09-24	runner
 extract-arms self-test	23.1	2	a	2026-09-24	runner
 foreign-prefix parity (every self-test at three prefixes)	2494.0	1	a	2026-10-01	the redesigned leg alone at 19ef4230 on node a, PASS at three prefixes, 81 rows each, whole rows serial
@@ -57,9 +57,9 @@ gotchas selftest	21.4	2	a	2026-09-24	runner
 govkit acceptance matrix	218.8	1	a	2026-09-06	runner
 govkit refusal join	2.6	1	a	2026-09-06	runner
 govkit runbook parity	1.3	2	a	2026-09-24	runner
-govkit selfcheck	20.5	2	a	2026-09-24	runner
+govkit selfcheck	29.9	1	a	2026-11-13	runner
 govkit selftest	3358.7	1	a	2026-09-24	runner
-harness arms (fail branches armed or pinned)	2.9	1	a	2026-09-06	runner
+harness arms (fail branches armed or pinned)	3.5	1	a	2026-11-13	runner
 hook destinations (every declared hook path ships)	46.1	1	a	2026-09-24	runner
 hook destinations self-test	801.4	1	a	2026-09-24	runner
 install-prefix (shipped surface)	58.2	2	a	2026-09-24	runner
@@ -68,25 +68,25 @@ instruction edits (manifest checks)	110.0	1	a	2026-11-12	gov_tag.py check raced 
 kickoff engine size <=18KiB	7.6	1	a	2026-09-06	runner
 kickoff-manifest ratchet	15.6	1	a	2026-09-24	runner
 kit epoch (shipped bytes move, the version moves)	30.1	2	a	2026-09-24	runner
-kit placeholders (a declared token its adopter substitutes)	1.2	1	a	2026-09-24	runner
+kit placeholders (a declared token its adopter substitutes)	1.7	1	a	2026-11-13	runner
 kit version markers	22.0	1	a	2026-09-06	runner
 kit-placeholders self-test	9.8	2	a	2026-09-24	runner
 kit/dogfood doc parity	5.2	2	a	2026-09-24	runner
 layer dependencies (the core never depends on an expansion)	3.6	1	a	2026-11-02	check_layers.py on the worktree at 64454cba with the pass staged, timed by bash time, 3.6s wall, build pass of PLAY-dOrderedCharter-16
 leg ceilings clear their evidenced maximum	1.7	2	a	2026-09-24	runner
-lexicon naming predicates	7.3	2	a	2026-09-24	runner
+lexicon naming predicates	11.5	1	a	2026-11-13	runner
 lexicon selftest	287.5	2	a	2026-09-24	runner
-lexicon wiring	15.7	2	a	2026-09-24	runner
+lexicon wiring	16.2	1	a	2026-11-13	runner
 line length	8.9	1	a	2026-09-06	runner
 line-length gate selftest	86.2	2	a	2026-09-24	runner
 manifest-check self-test	1400.7	2	a	2026-09-24	runner
 marker contracts	93.7	1	a	2026-09-06	runner
 memory hygiene	86.8	1	a	2026-09-24	runner
-memory hygiene (the pass checks)	73.7	1	a	2026-11-12	timed alone at the main loop on node a, 2026-11-12, by TOOL-aNimbleMend-4 S5
+memory hygiene (the pass checks)	91.0	1	a	2026-11-13	runner
 memory-hygiene self-test	1970.5	2	a	2026-09-24	runner
 memory-recall kit selftest	270.0	2	a	2026-09-24	runner
 memory-recall skill wiring	6.1	1	a	2026-09-06	runner
-method carriers (every pointer declared)	10.4	2	a	2026-09-24	runner
+method carriers (every pointer declared)	16.2	1	a	2026-11-13	runner
 method-carriers self-test	32.0	2	a	2026-09-24	runner
 micro-format definitions	24.1	1	a	2026-09-06	runner
 micro-format gate selftest	101.5	2	a	2026-09-24	runner
@@ -96,9 +96,10 @@ playbook parity	16.1	1	a	2026-09-06	runner
 playbook parity selftest	128.1	2	a	2026-09-24	runner
 playbook placeholder catalogue	3.7	1	a	2026-09-06	runner
 playbook render selftest	1.5	2	a	2026-09-24	runner
-playbook render wiring	3.0	1	a	2026-09-06	runner
+playbook render wiring	8.1	1	a	2026-11-13	runner
 playbook validity gate	231.1	1	a	2026-09-06	runner
-positional (the citation check alone)	26.2	1	a	2026-11-12	timed alone at the main loop on node a, 2026-11-12, by TOOL-aNimbleMend-4 S5
+policy fixtures	1210.0	1	a	2026-11-13	the leg's own argv alone on a scratch clone of 2ba17e9d6 on node a, one whole run, timed by date arithmetic, close of TOOL-aNimbleMend-15
+positional (the citation check alone)	52.1	1	a	2026-11-13	runner
 pre-push bar self-test	121.1	2	a	2026-09-24	runner
 pre-push run-log line	258.2	1	a	2026-09-24	runner
 pre-push self-test	278.4	2	a	2026-09-24	runner
@@ -116,6 +117,7 @@ review-join ban (no ref-keyed join)	10.8	2	a	2026-09-24	runner
 review-join self-test	110.3	2	a	2026-09-24	runner
 review-protocol parity (kit vs dogfood)	7.0	2	a	2026-09-24	runner
 routed commits name a specced unit	378.7	1	a	2026-10-28	taken by the main loop, the leg alone at ce91bfc2 on node a, its deviation join armed, read twice one after the other: GATE_PUSH_BASE unset so it graded WHOLE as the close's bar does, rc 0, real 378.7s, host free at its start but for an idle run-gates.sh orphan from Oct 23 and an idle python one-off from Oct 26, and a foreign spec-tokens of dSafePassage's dispatch and a staged memory-hygiene check overlapped its last ~2 min; then GATE_PUSH_BASE=1a61f21a from ls-remote so it graded RANGE and WHOLE beside it as the landing push's bar does, rc 0, real 322.1s, no foreign gate work at its start or end; the unset reading governs; killed at its 300 s ceiling under the close's bar at 10ab2148 in the pool, the pool's tail and its serial retry, and 358 s beside spec tokens at ec8ad036
+routed-commits selftest	330.0	1	a	2026-11-13	the leg's own argv alone on a scratch clone of 2ba17e9d6 on node a, one whole run, timed by date arithmetic, close of TOOL-aNimbleMend-15
 row-grammar selftest	42.7	2	a	2026-09-24	runner
 row-keyed merge driver replay	269.1	2	a	2026-09-24	runner
 run-gates adopter e2e	49.4	2	a	2026-09-24	runner
@@ -129,13 +131,13 @@ run-selftests self-test	1010.5	2	a	2026-09-24	runner
 runlog record schema	2.1	5	a	2026-09-21	runner
 runlog selftest	352.4	2	a	2026-09-24	runner
 runlog skill wiring	3.9	2	a	2026-09-24	runner
-scratch-guard self-test	163.5	2	a	2026-09-24	runner
+scratch-guard self-test	187.0	1	a	2026-11-13	the leg's own argv alone on a scratch clone of 2ba17e9d6 on node a, one whole run, timed by date arithmetic, close of TOOL-aNimbleMend-15
 selftest harness self-test	26.8	2	a	2026-09-24	runner
 settings-merge selftest	6.8	2	a	2026-09-24	runner
-shell hygiene (a loop fed by a command substitution)	1.1	1	a	2026-09-24	runner
+shell hygiene (a loop fed by a command substitution)	2.1	1	a	2026-11-13	runner
 shell-hygiene selftest	0.9	2	a	2026-09-24	runner
 spec tokens (a spec's own names resolve)	465.2	1	a	2026-10-28	taken by the main loop, the leg alone at ce91bfc2 on node a, rc 0, its packet join over 1 live chain run, real 465.2s; host free at its start but for an idle run-gates.sh orphan from Oct 23 and an idle python one-off from Oct 26, and a foreign spec-tokens of dSafePassage's dispatch overlapped its last ~20 s; killed at its 390 s ceiling under the close's bar at 10ab2148 in the pool, the pool's tail and its serial retry, and 512 s beside routed commits at ec8ad036
-spec tokens (the pass's own spec)	9.3	1	a	2026-11-12	timed alone at the main loop on node a, 2026-11-12, by TOOL-aNimbleMend-4 S5
+spec tokens (the pass's own spec)	16.8	1	a	2026-11-13	runner
 spec-tokens self-test	156.8	1	a	2026-09-24	runner
 step-gate	4.4	1	d	2026-10-26	step_gate.py --base HEAD timed by bash time over a scratch clone of the branch carrying a source receipt, 4.4s wall, build pass of TOOL-dSafePassage-10
 tags (the resolver's checks)	210.0	1	a	2026-11-10	gov_tag.py check run alone over the tree at de36424bf by the main loop at the dOrderedCharter close, 210s wall, recorded by PLAY-dOrderedCharter-77 S15
@@ -145,13 +147,13 @@ testsuite counts (every bar self-test prints one)	26.4	1	a	2026-09-06	runner
 testsuite counts self-test	41.6	2	a	2026-09-24	runner
 tier2-review self-test	1.7	2	a	2026-09-24	runner
 unattended kit gate	1922.0	2	a	2026-09-24	runner
-unattended protocol size	3.5	2	a	2026-09-24	runner
+unattended protocol size	5.2	1	a	2026-11-13	runner
 unattended skill wiring	10.8	2	a	2026-09-24	runner
 unattended-build self-test	332.0	1	a	2026-09-24	alone in the worktree at 386f168b beside three concurrent suites (govkit selftest, memory-hygiene self-test, check-unattended self-test), real 332s; killed at its 300 s ceiling under the width-8 full bar
 upgrade-walk	7177.0	1	a	2026-10-28	python <prefix>/govkit/upgrade_walk.py, whole leg, timed by date over this worktree at 83817478f, 7177s wall, rc 0 GREEN, under load from a closing review and three suite researchers, close of dSafePassage
-verdict epoch (kit version dates the engine)	4.9	1	a	2026-09-06	runner
+verdict epoch (kit version dates the engine)	5.2	1	a	2026-11-13	runner
 verdict-epoch self-test	112.0	2	a	2026-09-24	runner
 verifier fan-out	7.1	1	a	2026-09-06	runner
 verifier fan-out self-test	51.8	2	a	2026-09-24	runner
 workflow script syntax	0.9	2	a	2026-09-24	runner
-writing practice (records and units)	13.3	1	a	2026-11-12	timed alone at the main loop on node a, 2026-11-12, by TOOL-aNimbleMend-4 S5
+writing practice (records and units)	23.1	1	a	2026-11-13	runner

@@ -193,7 +193,7 @@ tools/run-gates/profile_bar.test.sh	path-subst	4	predates the lint; `${p##*/}` a
 tools/run-gates/run-gates.evidence.test.sh	cat-file	13	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.evidence.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/run-gates/run-gates.evidence.test.sh	printf-subst	2	arrived with origin/main fcba0600 at the TOOL-aSparedSpawn-32 reconcile; `printf -v` is the no-fork form, drained by a follow-up unit
-tools/run-gates/run-gates.evidence.test.sh	var-pipe	43	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.evidence.test.sh	var-pipe	72	rose 43 -> 72 with the arms TOOL-aNimbleMend added, measured by the close's bar at b61832752; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.gov.test.sh	path-subst	6	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/run-gates/run-gates.runlog.test.sh	cat-file	5	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.runlog.test.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
@@ -209,7 +209,7 @@ tools/run-gates/run-gates.test.sh	date-fmt	1	predates the lint; `printf -v v '%(
 tools/run-gates/run-gates.test.sh	path-subst	12	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/run-gates/run-gates.test.sh	printf-subst	2	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.test.sh	pure-fn-subst	11	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: resolve_mp_record×11
-tools/run-gates/run-gates.test.sh	var-pipe	141	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.test.sh	var-pipe	156	rose 141 -> 156 with the arms TOOL-aNimbleMend added, measured by the close's bar at b61832752; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.turnstile.test.sh	cat-file	15	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.turnstile.test.sh	date-fmt	1	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.turnstile.test.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
@@ -309,6 +309,6 @@ tools/workflows/tier2-review.test.sh	path-subst	4	predates the lint; `${p##*/}` 
 tools/workflows/tier2-review.test.sh	var-pipe	1	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/workflows/unattended-build.test.sh	cat-file	1	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
 tools/workflows/unattended-build.test.sh	path-subst	6	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
-tools/workflows/unattended-build.test.sh	printf-subst	66	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/workflows/unattended-build.test.sh	printf-subst	74	rose 66 -> 74 with the arms TOOL-aNimbleMend added, measured by the close's bar at b61832752; `printf -v` is the no-fork form, drained by a follow-up unit
 tools/workflows/unattended-build.test.sh	pure-fn-subst	28	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: build_gh33_writer×14 build_dispose×9 build_gh33_args×5
 tools/workflows/unattended-build.test.sh	var-pipe	62	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit

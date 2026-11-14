@@ -170,7 +170,7 @@ Named here because the research raised each one and an unstated exclusion reads 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 14 unit(s) · node d · opened 2026-08-20 · streams tooling
+**Build status:** CLOSED · 14 unit(s) · node d · opened 2026-08-20 · streams tooling
 ids TOOL-dScriptedRepeat-1 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 TOOL-dScriptedRepeat-12
 ids TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15
 
@@ -189,7 +189,7 @@ ids TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15
 | [TOOL-dScriptedRepeat-5 — the per-piece record: its writer, its reader, and its states](spec/2026-08-20-spec-dScriptedRepeat-5.md) | — | 2 | CLOSED | rev-11 | 2026-08-22 |
 | [TOOL-dScriptedRepeat-6 — `pieces-complete`, the ninth core Definition-of-Done item](spec/2026-08-20-spec-dScriptedRepeat-6.md) | — | 2 | CLOSED | rev-11 | 2026-08-22 |
 | [TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run](spec/2026-08-20-spec-dScriptedRepeat-7.md) | — | 2 | CLOSED | rev-11 | 2026-08-22 |
-| [TOOL-dScriptedRepeat-8 — the output-scope refusal, and what it cannot see](spec/2026-08-20-spec-dScriptedRepeat-8.md) | — | 2 | SPECCED | rev-6 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-8 — the output-scope refusal, and what it cannot see](spec/2026-08-20-spec-dScriptedRepeat-8.md) | — | 2 | WONTDO | rev-6 | 2026-11-13 |
 | [TOOL-dScriptedRepeat-9 — the `proposal` park kind and the `--propose` verb](spec/2026-08-20-spec-dScriptedRepeat-9.md) | — | 2 | CLOSED | rev-6 | 2026-08-21 |
 <!-- /gen:build-units -->
 

@@ -9,9 +9,14 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-aNimbleMend-16=OPEN TOOL-aNimbleMend-17=OPEN TOOL-aNimbleMend-18=OPEN TOOL-aNimbleMend-19=OPEN TOOL-aNimbleMend-20=OPEN TOOL-aNimbleMend-21=OPEN TOOL-aNimbleMend-22=OPEN TOOL-aNimbleMend-23=OPEN TOOL-aNimbleMend-24=OPEN TOOL-aNimbleMend-25=OPEN TOOL-aNimbleMend-26=OPEN TOOL-aNimbleMend-28=OPEN
+units-at-landing: TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-4 TOOL-aNimbleMend-3 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-13 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 TOOL-aNimbleMend-14 TOOL-aNimbleMend-15 TOOL-aNimbleMend-27
+parked-surfaced: yes
+keepalive-reaped: yes
+gates-run: unattended-179455354511218625433-1793 42074190
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 7e785ac21389cfe392533224ac7292c0f3717d6b
-phase: VERIFYING
+witness: 148920512962eb7eddfb7941e7d7a0009b9eb8ca
+phase: LANDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/inline-bar-fixes-pass-legs-1a64f7
@@ -145,3 +150,15 @@ base: 1265772cc365418ac6431a7f0f9e069f3bb79dc0
 2026-11-12T23:42:07Z dispatch · item 8ed4b1d5 TOOL-aNimbleMend-15 · reason tools/run-gates/pass_legs.py tools/run-gates/run-gates.evidence.test.sh tools/run-gates/README.md
 
 2026-11-13T01:22:44Z dispatch · item 369e6922 TOOL-aNimbleMend-15 · reason tools/memory-tree/routed_commits.py tools/memory-tree/README.md
+
+2026-11-13T05:05:09Z dispatch · item 2ba17e9d TOOL-aNimbleMend-15 · reason tools/run-gates/selftest-budgets.txt tools/run-gates/ceiling-evidence.txt tools/run-gates/pass-leg-evidence.txt tools/gate-legs.json memory/guides/SESSION-KICKOFF.md
+
+2026-11-13T05:10:24Z dispatch · item 2ba17e9d TOOL-aNimbleMend-15 · reason memory/LIVE.md memory/builds/aNimbleMend/README.md memory/builds/aNimbleMend/build/2026-11-12-build-TOOL-aNimbleMend-15-1-acceptance-ledger.md memory/builds/aNimbleMend/spec/2026-11-12-spec-TOOL-aNimbleMend-15.md memory/guides/SESSION-KICKOFF.md tools/gate-legs.json tools/run-gates/ceiling-evidence.txt tools/run-gates/pass-leg-evidence.txt tools/run-gates/selftest-budgets.txt
+
+2026-11-13T06:15:34Z rescope · item add TOOL-aNimbleMend-27 · reason the close's full bar on b61832752 red on three legs this build caused — shell hygiene, python reads and spawn budget — repaired as one unit
+
+2026-11-13T06:30:45Z brief · item TOOL-aNimbleMend-27 · reason e0de61e21288 memory/builds/aNimbleMend/prompts/2026-11-13-prompt-TOOL-aNimbleMend-27-build-brief.md
+
+2026-11-13T06:37:06Z dispatch · item a8aa6f8c TOOL-aNimbleMend-27 · reason tools/run-gates/pass-legs.sh tools/gate-legs.json memory/project/spawn-idiom-sites.txt memory/project/fork-ceilings.txt memory/guides/SESSION-KICKOFF.md
+
+2026-11-13T06:50:27Z dispatch · item a8aa6f8c TOOL-aNimbleMend-27 · reason memory/builds/aNimbleMend/README.md memory/builds/aNimbleMend/build/2026-11-13-build-TOOL-aNimbleMend-27-1-acceptance-ledger.md memory/builds/aNimbleMend/spec/2026-11-13-spec-TOOL-aNimbleMend-27.md memory/guides/SESSION-KICKOFF.md memory/project/fork-ceilings.txt memory/project/spawn-idiom-sites.txt tools/gate-legs.json tools/run-gates/pass-legs.sh

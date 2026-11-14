@@ -5,7 +5,7 @@ opened: 2026-11-12
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 TOOL-aNimbleMend-13 TOOL-aNimbleMend-14 TOOL-aNimbleMend-15 TOOL-aNimbleMend-16 TOOL-aNimbleMend-17 TOOL-aNimbleMend-18 TOOL-aNimbleMend-19 TOOL-aNimbleMend-20 TOOL-aNimbleMend-21 TOOL-aNimbleMend-22 TOOL-aNimbleMend-23 TOOL-aNimbleMend-24
+ids: TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 TOOL-aNimbleMend-13 TOOL-aNimbleMend-14 TOOL-aNimbleMend-15 TOOL-aNimbleMend-16 TOOL-aNimbleMend-17 TOOL-aNimbleMend-18 TOOL-aNimbleMend-19 TOOL-aNimbleMend-20 TOOL-aNimbleMend-21 TOOL-aNimbleMend-22 TOOL-aNimbleMend-23 TOOL-aNimbleMend-24 TOOL-aNimbleMend-25 TOOL-aNimbleMend-26 TOOL-aNimbleMend-27 TOOL-aNimbleMend-28
 ---
 
 # aNimbleMend — a red leg is fixed inline with its record written after, and every pass runs a budgeted list of fast legs
@@ -71,12 +71,13 @@ None.
 | 13 | `TOOL-aNimbleMend-13` | added in the run: the findings of the pass legs' first run over this build, repaired, so a pass-leg run grades the whole manifest and holds no declared leg |
 | 14 | `TOOL-aNimbleMend-14` | promoted from the closing review's HIGH: the lane opens only on a red of this branch's present state, bounded by the ledger row's own head |
 | 15 | `TOOL-aNimbleMend-15` | promoted from the closing review: its thirteen mediums and four lows, batched |
+| 16 | `TOOL-aNimbleMend-27` | the three reds of the close's full bar, repaired: shell hygiene, python reads and spawn budget |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 15 unit(s) · node a · opened 2026-11-12 · streams tooling
+**Build status:** CLOSED · 16 unit(s) · node a · opened 2026-11-12 · streams tooling
 ids TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 TOOL-aNimbleMend-13 TOOL-aNimbleMend-14 TOOL-aNimbleMend-15
-ids TOOL-aNimbleMend-16 TOOL-aNimbleMend-17 TOOL-aNimbleMend-18 TOOL-aNimbleMend-19 TOOL-aNimbleMend-20 TOOL-aNimbleMend-21 TOOL-aNimbleMend-22 TOOL-aNimbleMend-23 TOOL-aNimbleMend-24
+ids TOOL-aNimbleMend-16 TOOL-aNimbleMend-17 TOOL-aNimbleMend-18 TOOL-aNimbleMend-19 TOOL-aNimbleMend-20 TOOL-aNimbleMend-21 TOOL-aNimbleMend-22 TOOL-aNimbleMend-23 TOOL-aNimbleMend-24 TOOL-aNimbleMend-25 TOOL-aNimbleMend-26 TOOL-aNimbleMend-27 TOOL-aNimbleMend-28
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -95,17 +96,18 @@ ids TOOL-aNimbleMend-16 TOOL-aNimbleMend-17 TOOL-aNimbleMend-18 TOOL-aNimbleMend
 | [TOOL-aNimbleMend-11 — the documents: a help page per mechanism, and the build method and the unattended protocol saying where the pass legs run and what the lane admits](spec/2026-11-12-spec-TOOL-aNimbleMend-11.md) | 11 | 2 | CLOSED | rev-3 | 2026-11-12 |
 | [TOOL-aNimbleMend-12 — the acceptance suite: one pass-leg run and one inline fix, end to end, in a scratch adopter and in a clone of gov, with each switch on and off](spec/2026-11-12-spec-TOOL-aNimbleMend-12.md) | 12 | 2 | CLOSED | rev-2 | 2026-11-12 |
 | [TOOL-aNimbleMend-14 — the red-fix lane opens only on a red of this branch's present state: an open red is bounded by its row's own head](spec/2026-11-12-spec-TOOL-aNimbleMend-14.md) | 14 | 2 | CLOSED | rev-1 | 2026-11-12 |
-| [TOOL-aNimbleMend-15 — the closing review's thirteen mediums and four lows, batched: the pass-leg tooling, the commit grader, the hooks, three guards and two help pages say and check what they do](spec/2026-11-12-spec-TOOL-aNimbleMend-15.md) | 15 | 2 | INPROGRESS | rev-2 | 2026-11-12 |
+| [TOOL-aNimbleMend-15 — the closing review's thirteen mediums and four lows, batched: the pass-leg tooling, the commit grader, the hooks, three guards and two help pages say and check what they do](spec/2026-11-12-spec-TOOL-aNimbleMend-15.md) | 15 | 2 | CLOSED | rev-2 | 2026-11-12 |
+| [TOOL-aNimbleMend-27 — the close's three red legs repaired: three no-fork forms in the pass-leg adapter, five guards that cover what they import, one manifest bullet inside its cap, and four re-declared rows](spec/2026-11-13-spec-TOOL-aNimbleMend-27.md) | 16 | 1 | CLOSED | rev-1 | 2026-11-13 |
 <!-- /gen:build-units -->
 
-Records: 37 bound to this build, across 4 record folder(s).
+Records: 42 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aNimbleMend-1 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 TOOL-aNimbleMend-13 TOOL-aNimbleMend-14 TOOL-aNimbleMend-15 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7
-TOOL-aNimbleMend-8 TOOL-aNimbleMend-9.
+TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-27.
 
-Ids whose spec moved past its audited revision: none — 0 of 15 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 16 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -126,6 +128,7 @@ Ids whose spec moved past its audited revision: none — 0 of 15 unit id(s) carr
 | 12 | `TOOL-aNimbleMend-12` | no |
 | 14 | `TOOL-aNimbleMend-14` | no |
 | 15 | `TOOL-aNimbleMend-15` | no |
+| 16 | `TOOL-aNimbleMend-27` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

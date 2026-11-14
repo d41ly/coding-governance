@@ -40,7 +40,8 @@
 #
 # WHAT A RUN COSTS THE BAR'S RECORDS is in this kit's README, under the pass-leg runner.
 set -u
-KITDIR=$(cd "$(dirname "$0")" && pwd)
+case "$0" in */*) KITDIR=${0%/*} ;; *) KITDIR=. ;; esac
+KITDIR=$(cd "$KITDIR" && pwd)
 
 # The python-launcher resolver, INLINED byte-identically from its canonical copy: this kit is
 # copy-installed and gov's lib dir travels to nobody. The parity gate finds this copy by its marker.
@@ -323,10 +324,10 @@ case "$PL_DECLARED:$PL_BUDGET:$PL_LIMIT" in
 esac
 
 # ---- 5 to 7. the runner, once, timed by the shell's own clock ------------------------------------
-PL_STARTED=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+TZ=UTC0 printf -v PL_STARTED '%(%Y-%m-%dT%H:%M:%SZ)T' -1
 PL_RUN="-"; PL_RC="-"; PL_WALL=0
 if [ "$PL_DECLARED" -gt 0 ]; then
-  PL_RUN="pass-$(date -u +%Y%m%dT%H%M%SZ)-$$"
+  TZ=UTC0 printf -v PL_RUN 'pass-%(%Y%m%dT%H%M%SZ)T-%s' -1 "$$"
   _pl_t0=$SECONDS
   GATE_LEGS="$PL_GD/gate-pass-legs.json" GATE_BASE="$PL_BASE" GATE_RUN_ID="$PL_RUN" GATE_FULL= GATE_SELFTESTS= \
     GATE_TURNSTILE=0 "${BASH:-bash}" "$KITDIR/run-gates.sh"

@@ -21,6 +21,7 @@ brief-recorded	repo	declarations
 build README slot contract	repo	records
 build-index selftest	kit	selftests
 build-method size	repo	product
+chain-packet self-test	kit	selftests
 charter size	repo	product
 check-arms selftest	kit	selftests
 check-wiring self-test	kit	selftests

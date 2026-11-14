@@ -225,6 +225,7 @@ leg	leg ceilings clear their evidenced maximum	dWitnessedBar
 leg	every held leg is budgeted, every budget row resolves	dWitnessedBar
 leg	receipt sync (installed files match the receipt)	dWitnessedBar
 leg	spec-tokens self-test	dWitnessedBar
+leg	chain-packet self-test	dWitnessedBar
 leg	kit-placeholders self-test	dWitnessedBar
 leg	selftest harness self-test	dWitnessedBar
 leg	extract-arms self-test	dWitnessedBar

@@ -268,6 +268,19 @@ path = "{prefix}/check-spec-tokens.test.sh"
 why = "the red/green self-test for the above, which is itself an exemption. Exemptions are exact-path, so the gate's row does not cover its sibling."
 
 [[exempt]]
+path = "{prefix}/chain-packet.py"
+why = """
+the front door for gov's OWN chain packets: it runs the packet instrument under the dClosedLoop
+build's `build/` folder, a record of THIS tree's memory, and is bound to that instrument's blobs.
+An adopter holds no such instrument and no chain, so there is nothing for it to open. It serves
+check-spec-tokens.py's packet join, itself exempt above. Prescribed for copy nowhere. TOOL-aBatchedPacket-1.
+"""
+
+[[exempt]]
+path = "{prefix}/chain-packet.test.sh"
+why = "the red/green self-test for the above, which is itself an exemption. Exemptions are exact-path, so the door's row does not cover its sibling."
+
+[[exempt]]
 path = "{prefix}/check-kit-placeholders.py"
 why = """
 grades a kit-AUTHORING invariant, and an adopter does not author kit descriptors — they receive
@@ -470,6 +483,13 @@ TOOL-aNimbleMend-4.
 [[exempt_leg]]
 name = "spec-tokens self-test"
 why = "gov's own red/green proof of the leg above; it travels with a gate that does not travel."
+
+[[exempt_leg]]
+name = "chain-packet self-test"
+why = """
+gov's own red/green proof of the chain packet's front door, a registry exemption; it travels with a script that does not travel. TOOL-aBatchedPacket-1.
+Its guard is the tool root and the instrument folder, so the leg is not selected under changed mode by a change that moves only records. The records its fixture T reads are the tracked specs of dGroundRules and dTrueNorth, the first line and front matter of every packet-holding build's README, the tracked packets under `memory/builds/*/prompts/`, the v2 design file the instruments name, and `memory/DECISIONS.md`. After a change to any of them the route is the bar with `GATE_FULL=1`. TOOL-aBatchedPacket-2.
+"""
 
 [[exempt_leg]]
 name = "dead-path carriers (deleted files still named)"

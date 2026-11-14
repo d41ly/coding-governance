@@ -1,12 +1,13 @@
 # TOOL-aNimbleMend-15 — the closing review's thirteen mediums and four lows, batched: the pass-leg tooling, the commit grader, the hooks, three guards and two help pages say and check what they do
 
-**Status:** INPROGRESS · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 15
+**Status:** CLOSED · rev-2 · 2026-11-12 · node a · Tier-2 · base 97e0841d · streams tooling · order 15
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-12-build-TOOL-aNimbleMend-15-1-acceptance-ledger.md](../build/2026-11-12-build-TOOL-aNimbleMend-15-1-acceptance-ledger.md) | journal | — |
+| [2026-11-13-build-TOOL-aNimbleMend-1-runlog-91ca33f2.md](../build/2026-11-13-build-TOOL-aNimbleMend-1-runlog-91ca33f2.md) | journal | TOOL-aNimbleMend-1 TOOL-aNimbleMend-2 TOOL-aNimbleMend-3 TOOL-aNimbleMend-4 TOOL-aNimbleMend-5 TOOL-aNimbleMend-6 TOOL-aNimbleMend-7 TOOL-aNimbleMend-8 TOOL-aNimbleMend-9 TOOL-aNimbleMend-10 TOOL-aNimbleMend-11 TOOL-aNimbleMend-12 TOOL-aNimbleMend-13 TOOL-aNimbleMend-14 TOOL-aNimbleMend-27 |
 | [2026-11-13-build-TOOL-aNimbleMend-15-override-1.md](../build/2026-11-13-build-TOOL-aNimbleMend-15-override-1.md) | override | — |
 | [2026-11-12-prompt-TOOL-aNimbleMend-15-brief.md](../prompts/2026-11-12-prompt-TOOL-aNimbleMend-15-brief.md) | research | — |
 | [2026-11-12-prompt-TOOL-aNimbleMend-15-build-brief.md](../prompts/2026-11-12-prompt-TOOL-aNimbleMend-15-build-brief.md) | research | — |

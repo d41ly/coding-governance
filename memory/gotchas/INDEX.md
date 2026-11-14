@@ -27,6 +27,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [a-runner-knob-owes-a-push-class](a-runner-knob-owes-a-push-class.md) | class | 4 |  | a new GATE_ or GOV_ knob the gate runner reads has no push-boundary class until it joins one, and the arm that says so is guarded away from the unit that adds it |
 | [a-spec-run-close-owes-the-closing-review-override](a-spec-run-close-owes-the-closing-review-override.md) | class | 1 |  | a spec run writes no code, so its close always meets closing-review-recorded unmet, and a first close passed without that override is a close attempt spent learning it |
 | [a-spelling-change-strands-its-readers](a-spelling-change-strands-its-readers.md) | class | 13 |  | a shared file changes how it SPELLS its values, the readers someone migrated resolve the new spelling, and every reader nobody listed compares the raw one and matches nothing |
+| [a-terminal-spec-named-by-a-pass-splits-the-waiver-joins](a-terminal-spec-named-by-a-pass-splits-the-waiver-joins.md) | class | 2 |  | closing a spec makes its spec-token waiver stale to the bar join, while the pass join still grades that spec when a commit names it, so no waiver row satisfies both |
 | [a-view-fix-trades-one-blindness-for-another](a-view-fix-trades-one-blindness-for-another.md) | class | 3 |  | a scanner that grades source through a rendered view has a blind spot, and building a better view moves it rather than closing it, each move a new fail-open or false-deny |
 | [ab-arm-never-did-the-work](ab-arm-never-did-the-work.md) | class | 3 |  | a timing A/B whose arms are not each asserted to have DONE the work measures a refusal against a run, and the fast arm looks like the good one |
 | [absence-assertion-over-whole-file-text](absence-assertion-over-whole-file-text.md) | class | 3 |  | a ban that greps whole file text reds on the comment documenting its own fix |
@@ -184,6 +185,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 | [zero-witness-over-an-unnamed-population](zero-witness-over-an-unnamed-population.md) | class | 5 |  | a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean |
 
-168 record(s): 165 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+169 record(s): 166 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->
