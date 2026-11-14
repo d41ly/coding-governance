@@ -1095,6 +1095,24 @@ def derive_default_gained(root: pathlib.Path, base_commit: str | None, to_commit
     return [e for e in now if e not in was and e not in claimed and e in descs], ""
 
 
+def demand_claimed_requires(claimed: list[str], gained: list[str], descs: dict[str, tuple[dict, str]],
+                            receipt: dict, why: str) -> None:
+    """TOOL-dDeclaredLoop-57 S1, S2: `update` refuses a claimed kit whose `requires` it leaves unmet.
+
+    The claimed kits plus the gained ones go through `derive_unsatisfied_requires`, the predicate
+    `apply` refuses by, so the update and the install answer one question one way. `why` is the
+    reason `derive_default_gained` returned for gaining nothing; it rides in the refusal so "no
+    vintage" and "registry unreadable at a vintage" read differently from "the default never held
+    it", which carries no reason clause. The route names the first pair; the text names every pair.
+    """
+    unmet = derive_unsatisfied_requires(list(claimed) + list(gained), descs, receipt)
+    if unmet:
+        pairs = ", ".join(f"'{k}' requires '{d}'" for k, d in unmet)
+        raise Refusal(f"update would leave {pairs} unmet"
+                      + (f"; default-gained did not cover it: {why}" if why else "")
+                      + f"; `apply --kits {unmet[0][0]},{unmet[0][1]}` installs both")
+
+
 def add_deploy_kits(target: pathlib.Path, ids: list[str]) -> str:
     """TOOL-aRoutedQuill-5 S4: append `ids` to the `kits` list a target's `deploy.toml` declares.
 
@@ -9720,6 +9738,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 print(f"govkit update — default-gained {_ge} NOT installed: it requires '{_gd}', which "
                       f"this receipt does not claim and the default did not gain; `apply --kits` "
                       f"both is the route")
+    # TOOL-dDeclaredLoop-57 S1: the CLAIMED kits' edges too, on every non-source run, before any
+    # gain line prints and before anything is written, so a refused run reports no gain it never made.
+    demand_claimed_requires(claimed, gained, descs, receipt, _gained_why)
     if _gained_why:
         print(f"govkit update — default-gained: none computed — {_gained_why}")
     for _ge in gained:

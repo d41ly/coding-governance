@@ -2847,6 +2847,57 @@ def check_roles_default() -> None:
     check("OC8 AC2 a registry aged before roles joined the default gains it", _gained == (["roles"], ""),
           str(_gained))
     check("OC8 AC2 LIVENESS ...and an unmoved default gains nothing", _same == ([], ""), str(_same))
+    # ---- TOOL-dDeclaredLoop-57: `update` refuses a CLAIMED kit whose `requires` it leaves unmet.
+    # AC2 and AC3 call the function; AC1 and AC4 run the verb over a committed hand-written receipt.
+    _dl_claim = ["kickoff-manifest", "memory-tree", "roles"]
+
+    def derive_claim_refusal(claimed, gained, dd, why):
+        try:
+            gk.demand_claimed_requires(claimed, gained, dd, {"kits": list(claimed)}, why)
+        except gk.Refusal as e:
+            return str(e)
+        return ""
+
+    _dl_r = derive_claim_refusal(_dl_claim, [], descs, "registry.toml does not resolve at 00000000")
+    check("[dDL-57] AC2 a roles claim without loop refuses, carrying the unreadable vintage's reason",
+          "'roles' requires 'loop'" in _dl_r and "does not resolve" in _dl_r, _dl_r or "returned")
+    _dl_r = derive_claim_refusal(_dl_claim, ["loop"], descs, "registry.toml does not resolve at 00000000")
+    check("[dDL-57] AC2 LIVENESS ...and a gained loop satisfies the claim", _dl_r == "", _dl_r)
+    _dl_r = derive_claim_refusal(["loop"], [], {"loop": ({"requires": ["memory-tree"]}, ""),
+                                                "memory-tree": ({}, "")}, "")
+    check("[dDL-57] AC3 a claimed kit other than roles is graded, and an empty reason adds no clause",
+          "'loop' requires 'memory-tree'" in _dl_r and "default-gained did not cover it" not in _dl_r,
+          _dl_r or "returned")
+    with tempfile.TemporaryDirectory(prefix="gk-dl57-") as _dl_td:
+        def build_claim_target(name, extra):
+            t = pathlib.Path(_dl_td) / name
+            (t / ".governance").mkdir(parents=True)
+            git(t, "init", "-q")
+            (t / ".governance" / "install.json").write_text(json.dumps(
+                {"kits": _dl_claim, "files": [], **extra}, indent=2) + "\n", encoding="utf-8", newline="\n")
+            settle(t, "a hand-written receipt")
+            return t
+
+        _dl_t = build_claim_target("ac1", {})
+        _dl_p = run("update", "--target", str(_dl_t))
+        _dl_st = subprocess.run(["git", "-C", str(_dl_t), "status", "--porcelain", "--untracked-files=all"],
+                                capture_output=True, text=True, encoding="utf-8").stdout
+        check("[dDL-57] AC1 an update over a receipt with no gov_commit refuses the roles claim before "
+              "any gain line, naming the pair, the reason and the route, and writes nothing",
+              _dl_p.returncode == 2 and all(n in _dl_p.stderr for n in (
+                  "'roles' requires 'loop'", "gov_commit", "apply --kits roles,loop"))
+              and "default-gained: none computed" not in _dl_p.stdout and _dl_st == "",
+              f"rc {_dl_p.returncode} · status {_dl_st!r} · {(_dl_p.stdout + _dl_p.stderr)[-900:]}")
+        _dl_p = run("update", "--target", str(_dl_t), "--kits", "roles")
+        check("[dDL-57] AC1 ...and a --kits-scoped update over it refuses the same pair",
+              _dl_p.returncode == 2 and "'roles' requires 'loop'" in _dl_p.stderr,
+              f"rc {_dl_p.returncode} · {(_dl_p.stdout + _dl_p.stderr)[-900:]}")
+        # The base vintage holds roles and not loop in its registry default, so the update gains loop.
+        _dl_t = build_claim_target("ac4", {"gov_commit": run_gov_git(GOV_ROOT, "rev-parse", "ed497191^{commit}")})
+        _dl_p = run("update", "--target", str(_dl_t))
+        check("[dDL-57] AC4 LIVENESS a receipt whose default gained loop still gains it and is not refused",
+              "would gain loop" in _dl_p.stdout and "update would leave" not in _dl_p.stdout + _dl_p.stderr,
+              f"rc {_dl_p.returncode} · {(_dl_p.stdout + _dl_p.stderr)[-900:]}")
     d = descs.get("roles", ({}, ""))[0]
     rules = d.get("files") or []
 
@@ -6190,8 +6241,11 @@ def main() -> int:
         # and `gov_oid`, so this block never derives an identity itself (TOOL-dRedressedBar-13). The
         # helper re-sets the rows `stale_target` already rewound to the same values. The two
         # identity checks either side of that call are TOOL-dRedressedBar-17's S3: the row is
-        # appended bare, and the helper is what gives it all three keys.
-        _rb11b = stale_target("rq11b", DEPLOY_FULL + '\n[kit.agent-cap]\nprefix = "scripts"\n')
+        # appended bare, and the helper is what gives it all three keys. The claim carries
+        # kickoff-manifest because agent-cap requires it, and `update` now refuses a claim that
+        # leaves it unmet (TOOL-dDeclaredLoop-57) before the settings-merge adopter runs.
+        _rb11b = stale_target("rq11b", DEPLOY_FULL + '\n[kit.agent-cap]\nprefix = "scripts"\n',
+                              kits="check-wiring,kickoff-manifest")
         _rb11dest = f"scripts/{KIT_NAMES['hooks']}/agent-cap.js"
         _rb11d = _rb11gk.read_descriptors(govroot, _rb11gk.load_toml(
             govroot / PFX / KIT_NAMES["govkit"] / "registry.toml"), _rb11gk.Report())["agent-cap"][0]

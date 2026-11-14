@@ -438,7 +438,10 @@ behind.
 - **The `loop` kit joins the default selection**, because the `roles` kit now requires it: the roles
   kit reads each workflow's order from the loop definition the `loop` kit ships. `update` installs
   it as a default-gained kit, and the receipt claims it from then on. A `--kits`-scoped `update`
-  gains nothing, and a `--kits` selection naming `roles` names `loop` too or is refused.
+  gains nothing, and a `--kits` selection naming `roles` names `loop` too or is refused. An `update`
+  over a receipt claiming `roles` without `loop` that is `--kits`-scoped, or that cannot work the
+  gain out because the receipt records no `gov_commit` or the registry is unreadable at a vintage,
+  is refused before it writes, naming why; `apply --kits roles,loop` installs both.
 
 ## How gov proves a step before you meet it
 

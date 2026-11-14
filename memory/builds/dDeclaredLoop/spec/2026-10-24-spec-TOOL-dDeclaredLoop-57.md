@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-57 — `update` refuses a claimed kit whose `requires` it leaves unmet, on every admission path
 
-**Status:** INPROGRESS · rev-4 · 2026-11-14 · node d · Tier-2 · base ed497191 · streams tooling · order 4 · advances TOOL-dDeclaredLoop-35
+**Status:** CLOSED · rev-4 · 2026-11-14 · node d · Tier-2 · base ed497191 · streams tooling · order 4 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-57-deviation-571.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-57-deviation-571.md) | deviation | — |
 | [2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
 | [2026-11-13-build-TOOL-dDeclaredLoop-57-deviation-572.md](../build/2026-11-13-build-TOOL-dDeclaredLoop-57-deviation-572.md) | deviation | — |
+| [2026-11-14-build-TOOL-dDeclaredLoop-57-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-dDeclaredLoop-57-1-acceptance-ledger.md) | journal | — |
 | [2026-11-14-build-TOOL-dDeclaredLoop-57-1-builder-return.md](../build/2026-11-14-build-TOOL-dDeclaredLoop-57-1-builder-return.md) | journal | — |
 | [2026-11-14-build-TOOL-dDeclaredLoop-57-deviation-573.md](../build/2026-11-14-build-TOOL-dDeclaredLoop-57-deviation-573.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |

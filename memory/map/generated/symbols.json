@@ -8988,6 +8988,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "demand_claimed_requires",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "demand_contained_dest",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
