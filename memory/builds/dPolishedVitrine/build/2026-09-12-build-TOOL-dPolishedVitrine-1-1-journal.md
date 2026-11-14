@@ -737,7 +737,7 @@ the lander's hand-off rather than here, because a record of it would move the ti
   arms 7 to 9 were seen red against the unfixed adopter.
 - AC9 — `python tools/check-kit-placeholders.py` — OBSERVED: exit 0 with the placeholder declared,
   `adopt-unattended.sh --check` in sync, and gov's Skill line 583 unchanged. Item 7 above is the red.
-- AC10 — amended rev-10 — the gate exits 0 at review-harness 1.8, unattended 1.21 and govkit 1.11
+- AC10 — amended rev-10 — the gate, `tools/check-kit-versions.sh`, exits 0 at review-harness 1.8, unattended 1.21 and govkit 1.11
   after the second merge, which renumbered this lineage past `main`'s own 1.20. Item 6 above is
   still the red, and spec section 9's rev-6 and rev-10 lines log the two moves.
 - AC11 — amended rev-4 — the unattended clause now compares the tip's FAIL set with base's, and

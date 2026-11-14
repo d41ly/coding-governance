@@ -20,3 +20,14 @@
 ## Dispositions
 
 - CLOSED · TOOL-dPolishedVitrine-2 · by TOOL-dPolishedVitrine-1 · `tools/check-wiring.sh`'s `first_of` probe for the settings merger tries a `tools/`-prefixed rung and a root rung, so at a `scripts` install it resolves to EMPTY. It is spelled at three arms of that script. NicoCares carries the file verbatim; core carries its own delta. What each arm DOES with an empty answer was not measured — it may skip loudly, skip silently or refuse. Out of `TOOL-dPolishedVitrine-1`'s scope as a Tier-B probe. The fix is the derivation this script already uses for `KIT_REL` since `TOOL-dRetiredFork-8`: build the prefixed rung from the derived kit root instead of spelling `tools/` → tools/check-wiring.sh · CLOSED by `TOOL-aRepatriatedFork-19`: `tools/check-wiring.sh` reads the receipt first (`resolve_receipt_path`), so a `scripts` install resolves the settings merger and every sibling arm instead of an empty probe; observed in an inCMS clone, where scratch, recall, card and merge all printed ok
+- KEEP · DEPL-dPolishedVitrine-1 · open at the 2026-11-13 close; the govkit move's blast radius is the owner's ruling
+- KEEP · DEPL-dPolishedVitrine-2 · open at the 2026-11-13 close; outside the two units this build shipped
+- KEEP · TOOL-dPolishedVitrine-3 · open at the 2026-11-13 close; outside the two units this build shipped
+- KEEP · TOOL-dPolishedVitrine-4 · open at the 2026-11-13 close; outside the two units this build shipped
+- KEEP · TOOL-dPolishedVitrine-7 · open at the 2026-11-13 close; outside the two units this build shipped
+- KEEP · TOOL-dPolishedVitrine-8 · open at the 2026-11-13 close; outside the two units this build shipped
+- KEEP · TOOL-dPolishedVitrine-9 · open at the 2026-11-13 close; outside the two units this build shipped
+- KEEP · TOOL-dPolishedVitrine-10 · open at the 2026-11-13 close; outside the two units this build shipped
+- KEEP · TOOL-dPolishedVitrine-11 · open at the 2026-11-13 close; outside the two units this build shipped
+- KEEP · TOOL-dPolishedVitrine-15 · open at the 2026-11-13 close; outside the two units this build shipped
+- KEEP · TOOL-dPolishedVitrine-16 · open at the 2026-11-13 close; the consumers' re-pull lands in their own trees, never here

@@ -1,5 +1,5 @@
 # TOOL-dLandedVerdict-2 — the close-out: seven builds that landed and never said so
-**Status:** INPROGRESS · rev-1 · 2026-08-19 · node d · Tier-1 · base 098bebd9 · streams tooling
+**Status:** WONTDO · rev-1 · 2026-11-13 · node d · Tier-1 · base 098bebd9 · streams tooling · never built; its seven-build list is a 2026-08-19 snapshot the tree has moved past, retired by the owner 2026-11-13
 
 <!-- gen:spec-records -->
 

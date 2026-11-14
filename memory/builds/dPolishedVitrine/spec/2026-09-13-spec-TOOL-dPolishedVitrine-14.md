@@ -1,6 +1,6 @@
 # TOOL-dPolishedVitrine-14 — brief-recorded grades only the units built while a run was live
 
-**Status:** INPROGRESS · rev-5 · 2026-09-22 · node d · Tier-2 · base 09a22d2b · streams tooling · ratified 2026-09-13
+**Status:** CLOSED · rev-5 · 2026-11-13 · node d · Tier-2 · base 09a22d2b · streams tooling · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 

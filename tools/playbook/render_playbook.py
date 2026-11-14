@@ -3917,4 +3917,4 @@ def run_charter_scope(engine_dir: Path, gov_root: Path, target: Path, charter_pa
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
 
-KIT_PLAYBOOK_RENDER_VERSION = "1.37"  # gov:kit playbook-render@1.37
+KIT_PLAYBOOK_RENDER_VERSION = "1.38"  # gov:kit playbook-render@1.38

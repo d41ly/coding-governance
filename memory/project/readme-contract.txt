@@ -236,4 +236,5 @@ memory/builds/aQueuedIndex/README.md
 memory/builds/aLiftedCeiling/README.md
 memory/builds/aWitnessedCrash/README.md
 memory/builds/aNimbleMend/README.md
+memory/builds/aBatchedPacket/README.md
 memory/builds/aCarriedStop/README.md

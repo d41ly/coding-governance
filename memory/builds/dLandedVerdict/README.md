@@ -76,6 +76,19 @@ Two builds inside the confirmed-landed set are deliberately EXCLUDED from U2: `a
 one non-terminal spec is `DEFERRED` — a chosen state, not an oversight — and `aDeployScout`, a
 research record carrying no status header at all.
 
+## Owner ruling, 2026-11-13
+
+Neither unit was built. Only the specs reached `main`, at `6494ba48c`.
+
+- **U2 is WONTDO.** Its seven-build list was measured at `098bebd` on 2026-08-19. Acting on it now would
+  close builds against a tree that no longer exists.
+- **U1 is DEFERRED, not dropped.** `TOOL-aMendedFleet-13` renders LIVE.md's `Landed-unclosed` count
+  from the source-citation signal, and names this unit's commit-subject predicate as its own non-goal.
+  On 2026-11-13 that count read 1 for `dNarrowedAnchor` and 0 for `dScriptedRepeat` and
+  `dPolishedVitrine`, all three of which had landed. So the gap U1 measures is still open.
+- Rev-2 of both specs and rev-3 of U2 sit only on `branch/dlandedverdict-rev3` at `e17828d05`. They
+  were never merged, and a resumed U1 starts from that branch's rev-2.
+
 <!-- roster:units -->
 
 | # | Unit | Tier | Mechanism |
@@ -86,14 +99,14 @@ research record carrying no status header at all.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 2 unit(s) · node d · opened 2026-08-19 · streams tooling
+**Build status:** DEFERRED · 2 unit(s) · node d · opened 2026-08-19 · streams tooling
 ids TOOL-dLandedVerdict-1 TOOL-dLandedVerdict-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dLandedVerdict-1 — the signal for a spec that landed and never said so](spec/2026-08-19-spec-TOOL-dLandedVerdict-1.md) | — | 2 | INPROGRESS | rev-1 | 2026-08-19 |
-| [TOOL-dLandedVerdict-2 — the close-out: seven builds that landed and never said so](spec/2026-08-19-spec-TOOL-dLandedVerdict-2.md) | — | 1 | INPROGRESS | rev-1 | 2026-08-19 |
+| [TOOL-dLandedVerdict-1 — the signal for a spec that landed and never said so](spec/2026-08-19-spec-TOOL-dLandedVerdict-1.md) | — | 2 | DEFERRED | rev-1 | 2026-11-13 |
+| [TOOL-dLandedVerdict-2 — the close-out: seven builds that landed and never said so](spec/2026-08-19-spec-TOOL-dLandedVerdict-2.md) | — | 1 | WONTDO | rev-1 | 2026-11-13 |
 <!-- /gen:build-units -->
 
 Records: 1 bound to this build, across 2 record folder(s).
