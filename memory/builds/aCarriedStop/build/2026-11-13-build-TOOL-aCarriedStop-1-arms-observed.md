@@ -27,3 +27,8 @@ Observed by the main loop at VERIFYING on node a, 2026-11-13, on frozen worktree
 ## Inherited, not this build's
 
 - Region two of the suite, run once on each tree before the ruling was re-read: 610 assertions and one FAIL line in both, `--record-round takes free text in the driver's usage table and the hostile-value matrix does not drive it`. The driver of `d646814e` reads it red, so the base holds it. <!-- PINNED 2026-11-13 -->
+
+## TOOL-aCarriedStop-9's AC1, observed by the main loop
+
+- Green at `60a6d0d79`: `python tools/run-gates/derive-ceilings.py --check` printed every backed leg clearing its evidenced maximum, the routed commits leg at 3540 s over 1761.4 s.
+- Red with `GATE_LEGS` naming the parent's `tools/gate-legs.json`: `CEILING-EVIDENCE FAILED`, the leg's 760 s ceiling short by 2763s of what its evidence asks (TOOL-aCarriedStop-9).
