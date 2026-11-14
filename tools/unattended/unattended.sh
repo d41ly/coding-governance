@@ -8461,7 +8461,9 @@ $(awk -F' · ' '$1 ~ /^[0-9][0-9-]*T[0-9:]*Z brief$/ && $2 ~ /^item / && $3 ~ /^
 BRIEFROWS
   if [ "${#_bps[@]}" -gt 0 ]; then
     _bout=$(printf '%s\n' "${_bps[@]}" | GIT hash-object --stdin-paths 2>/dev/null); _brc=$?
-    mapfile -t _bnows <<<"$_bout"
+    # An empty capture is zero lines: `mapfile` over an empty here-string reads one, and with one
+    # present brief that would pass the count check (`line-count-reads-empty-capture-as-one`).
+    [ -z "$_bout" ] || mapfile -t _bnows <<<"$_bout"
     if [ "$_brc" -ne 0 ] || [ "${#_bnows[@]}" -ne "${#_bps[@]}" ]; then
       _bnows=()
       for _bi in "${!_bps[@]}"; do _bnows[_bi]=$(GIT hash-object "${_bps[_bi]}" 2>/dev/null); done

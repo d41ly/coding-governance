@@ -26,3 +26,15 @@ main loop at the close.
   A second pair read 8.7 s base and 2.5 s built. <!-- PINNED 2026-11-14 -->
   The built reading is the lower in both pairs. The host was less loaded than when the spec's base
   figure was taken, so these readings stand in for that figure rather than compare with it.
+- Fix pass, an empty batch over one brief (brief `2026-11-14-prompt-TOOL-aTrimmedWait-5-fix`) — the
+  batch result in `tools/unattended/unattended.sh#verb_status` now splits to zero lines when the
+  capture is empty, so S2's count check falls back. `r5.sh` printed the same six lines before and
+  after the fix, `cmp` identical: `status identical`, `resume identical`,
+  `STALE briefs 1 · briefs gone 1`, `calls base 71 new 1 stdin 1`, `fallback identical` and
+  `fallback calls 72`. It took 52.8 s before and 52.2 s after, one at a time on node a. <!-- PINNED 2026-11-14 -->
+  A one-brief copy of the fixture (`r5e.sh`, at `%TEMP%/tw5e`) ran `--status` under a shim whose
+  `--stdin-paths` exits 0 with no output. At 69ed1688d it printed `STALE briefs 1` where the
+  real-git run printed none, and made 0 per-path `hash-object` calls. After the fix the two status
+  lines are identical and it made 1 per-path call after the batch. <!-- DERIVED from the one-brief fixture -->
+  The suite arm's three new region-four assertions and their RED-first observation are owed to the
+  main loop at the close.

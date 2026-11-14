@@ -8118,7 +8118,7 @@ for _tw in 1 2 3; do
     "$_tw" "${_twh:0:12}" "$_tw" >> memory/builds/tRun/RUN.md
 done
 printf 'edited\n' >> memory/builds/tRun/prompts/tw5-2.md; rm -f memory/builds/tRun/prompts/tw5-3.md
-printf '#!/usr/bin/env bash\ncase " $* " in *" hash-object "*) printf "%%s\\n" "$*" >> "$TW5_LOG";; esac\n[ -n "${TW5_FAIL:-}" ] && case " $* " in *" --stdin-paths "*) exit 1;; esac\nexec "%s" "$@"\n' \
+printf '#!/usr/bin/env bash\ncase " $* " in *" hash-object "*) printf "%%s\\n" "$*" >> "$TW5_LOG";; esac\n[ -n "${TW5_FAIL:-}" ] && case " $* " in *" --stdin-paths "*) exit 1;; esac\n[ -n "${TW5_EMPTY:-}" ] && case " $* " in *" --stdin-paths "*) cat >/dev/null; exit 0;; esac\nexec "%s" "$@"\n' \
   "$(command -v git)" > "$TMP/.git/tw5-shim/git"
 chmod +x "$TMP/.git/tw5-shim/git"
 export TW5_LOG="$TMP/.git/tw5.calls"
@@ -8129,6 +8129,15 @@ same "TW5 that one call is the --stdin-paths batch" "$(grep -c -- '--stdin-paths
 : > "$TW5_LOG"; o2=$(TW5_FAIL=1 PATH="$TMP/.git/tw5-shim:$PATH" run_proc --status tRun)
 same "TW5 a failed batch falls back per path and prints the same status line" "$o2" "$o"
 same "TW5 the fallback pays the failed batch and then one call per present brief" "$(grep -c '' "$TW5_LOG")" 3
+# ---- ONE PRESENT BRIEF AND AN EMPTY BATCH. `--stdin-paths` exits 0 and prints nothing: the empty
+# ---- capture must split to ZERO lines, so the count check fails and the per-path call grades the row.
+# ---- Split by `mapfile` alone it reads as one empty line, passes against one path, and grades stale.
+rm -f memory/builds/tRun/prompts/tw5-2.md
+o=$(PATH="$TMP/.git/tw5-shim:$PATH" run_proc --status tRun)
+miss "$o" "STALE briefs"
+: > "$TW5_LOG"; o2=$(TW5_EMPTY=1 PATH="$TMP/.git/tw5-shim:$PATH" run_proc --status tRun)
+same "TW5 an empty batch over one brief falls back and prints the same status line" "$o2" "$o"
+same "TW5 the empty batch is followed by one per-path call" "$(grep -c -- '--stdin-paths' "$TW5_LOG") $(grep -vc -- '--stdin-paths' "$TW5_LOG")" "1 1"
 unset TW5_LOG; rm -rf "$TMP/.git/tw5-shim" "$TMP/.git/tw5.calls"
 
 echo "MARK park-taxonomy" >&2
@@ -19620,7 +19629,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3347 -> 3352 by TOOL-aTrimmedWait-5: the batched brief-hash arm's one `hit` and four `same`
 # lines in region four, every one unconditional, counted off the block's own lines; no suite ran, and
 # its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3352
+# RAISED 3352 -> 3355 by TOOL-aTrimmedWait-5's fix pass: the empty-batch case's one `miss` and two
+# `same` lines in region four, every one unconditional, counted off the block's own lines; no suite
+# ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3355
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -19841,7 +19853,8 @@ FLOOR_SHARD_3=463
 # RAISED 393 -> 403 by TOOL-aSwiftRefusal-4: the same 10 region-four M1 and M3 assertions, see FLOOR_ASSERTIONS.
 # MERGED at TOOL-aSmoothedDispatch-21's reconcile: the base 383, plus 7, plus 20 = 410.
 # RAISED 410 -> 415 by TOOL-aTrimmedWait-5: the same 5 region-four batched brief-hash assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_4=415
+# RAISED 415 -> 418 by TOOL-aTrimmedWait-5's fix pass: the same 3 region-four empty-batch assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_4=418
 FLOOR_SHARD_5=297
 FLOOR_SHARD_6=127
 FLOOR_SHARD_7=311
