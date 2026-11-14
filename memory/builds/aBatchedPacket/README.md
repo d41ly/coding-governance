@@ -27,7 +27,7 @@ are in `build/`, and the prompt is in `prompts/`.
 ## Detriments if this is not built
 
 - Each unit of a chain build run keeps paying the walk at every re-render and every dispatch.
-- A build run of 99 units spends days on overhead that produces nothing.
+- A build run of 99 units spends days on overhead that produces nothing. <!-- PINNED 2026-11-14 -->
 
 ## Build-level rules
 

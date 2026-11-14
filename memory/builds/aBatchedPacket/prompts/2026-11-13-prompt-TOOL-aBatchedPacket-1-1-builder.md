@@ -2,7 +2,7 @@
 
 # gov-builder handoff — TOOL-aBatchedPacket-1
 
-<!-- gov:handoff role=gov-builder build=aBatchedPacket unit=TOOL-aBatchedPacket-1 path=memory/builds/aBatchedPacket/prompts/2026-11-13-prompt-TOOL-aBatchedPacket-1-1-builder.md role-sha=8fbf0460794b task-sha=6f55e303b4d6 -->
+<!-- gov:handoff role=gov-builder build=aBatchedPacket unit=TOOL-aBatchedPacket-1 path=memory/builds/aBatchedPacket/prompts/2026-11-13-prompt-TOOL-aBatchedPacket-1-1-builder.md role-sha=8fbf0460794b task-sha=68a8dc299bb9 -->
 
 ## Role
 
@@ -71,13 +71,29 @@ spec does not name out of what you write and return.
 - [tools] read a tool's refusal rather than routing around it
 - [roles] building runs in a role agent
 [/AGENTS.md#practices-at-build]
+
+## Card
+
+[.claude/orientation-card.md · Level 1 · the build's card: where this session stands; level 0 outranks it]
+- build: aBatchedPacket
+- unit: TOOL-aBatchedPacket-1 · spec memory/builds/aBatchedPacket/spec/2026-11-13-spec-TOOL-aBatchedPacket-1.md
+- unit: TOOL-aBatchedPacket-2 · spec memory/builds/aBatchedPacket/spec/2026-11-13-spec-TOOL-aBatchedPacket-2.md
+- brief: memory/builds/aBatchedPacket/prompts/2026-11-13-prompt-TOOL-aBatchedPacket-2-brief.md
+[/.claude/orientation-card.md]
 [memory/builds/aBatchedPacket/prompts/2026-11-13-prompt-TOOL-aBatchedPacket-1-1-builder.md · Level 6 · The task: this unit's goal, scope and acceptance; yields to levels 0 to 5]
 This handoff is for build `aBatchedPacket`, unit `TOOL-aBatchedPacket-1`.
-Not supplied, optional: `card:route`, `input:code`.
+Not supplied, optional: `input:code`.
 
 ### input:spec
 
 memory/builds/aBatchedPacket/spec/2026-11-13-spec-TOOL-aBatchedPacket-1.md
+
+### card:route
+
+- build: aBatchedPacket
+- unit: TOOL-aBatchedPacket-1 · spec memory/builds/aBatchedPacket/spec/2026-11-13-spec-TOOL-aBatchedPacket-1.md
+- unit: TOOL-aBatchedPacket-2 · spec memory/builds/aBatchedPacket/spec/2026-11-13-spec-TOOL-aBatchedPacket-2.md
+- brief: memory/builds/aBatchedPacket/prompts/2026-11-13-prompt-TOOL-aBatchedPacket-2-brief.md
 
 ### brief:non-goals
 
@@ -85,5 +101,5 @@ memory/builds/aBatchedPacket/spec/2026-11-13-spec-TOOL-aBatchedPacket-1.md
 - `carries.py --build <slug> --exit`, the Design-exit join, which reads every revision and stays as slow as it is.
 - A recorded-verdict cache. The measured cost after the change leaves nothing for one to save.
 - `memory/builds/dDeclaredLoop/` and the driver's `verb_dispatch`.
-- `gen_build_index.py --asks`, 13 seconds of what remains.
+- `gen_build_index.py --asks`, 13 seconds of what remains. <!-- PINNED 2026-11-14 -->
 [/memory/builds/aBatchedPacket/prompts/2026-11-13-prompt-TOOL-aBatchedPacket-1-1-builder.md]
