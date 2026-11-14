@@ -35,8 +35,11 @@
 # of model ids read by `resolve_profile` and by the spawn guard's `resolveModelProfile` over the index
 # rendered from arm 19's policy (arm 20, which SKIPs out loud as arm 6 does); and a profile level
 # edited with no re-render, which the adopter's check names as a drifted index (arm 21); and the spec writer's handoff carrying the brief's `## The prompt`
-# as its `brief:prompt` block, an empty prompt refusing by name (arm 22). Every arm is a self-contained block below the prologue, so a
-# slice of the prologue and one block runs that arm alone; arm 20 reads arm 19's fixture.
+# as its `brief:prompt` block, an empty prompt refusing by name (arm 22); and the agents verb's
+# session record, cold, warm, read, resumed after an append and a torn line, and keyed off by a
+# transcript edit, a foreign key or an unwritable folder (arm 23). Every arm is a self-contained block below the prologue, so a
+# slice of the prologue and one block runs that arm alone; arm 20 reads arm 19's fixture, and arm 23
+# arm 9's writer and lines.
 #
 # WHAT THIS DOES NOT CHECK: what the rendered Skill or an agent type SAYS beyond the citation paths
 # of arms 14 to 17, which the catalogue checker and the renderer's own self-test grade; the
@@ -93,7 +96,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +2 for arm 21 (TOOL-aGuardedEffort-1); arm 20 and arm 6's added payload are out of the floor.
 # +0 for arm 6's harness calls and rendered tables (TOOL-aGuardedEffort-2): on its SKIP path, out of the floor.
 # +2 for arm 22 (TOOL-dPavedRoad-3).
-FLOOR_ASSERTIONS=61
+# +8 for arm 23 (TOOL-aTrimmedWait-7).
+FLOOR_ASSERTIONS=69
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 FX=""; FXK="$KREL"
@@ -1009,6 +1013,63 @@ check_arm "arm 22 the spec writer's handoff carries the brief's prompt verbatim"
 check_arm "arm 22 an empty prompt refuses by name" \
    "$([ "${A22#*$'\n'}" = 'refused 1' ] && echo 1 || echo 0)"
 [ "$A22" = $'rendered 1\nrefused 1' ] || printf '    %s\n' "${A22//$'\n'/$'\n'    }"
+
+# ---- arm 23 (TOOL-aTrimmedWait-7 AC1 to AC7): the agents verb's session record. Arm 9's fixture,
+# ---- written afresh, run through the CLI: cold, which writes one record under the fixture's git
+# ---- common dir; warm, which writes nothing; with the record's `notified` emptied, which drops the
+# ---- `returned` line and so proves the record is read; after an append and after a torn line, each
+# ---- resumed from the record's offset; and with the record keyed off by a transcript edit, a
+# ---- foreign key or an unwritable folder, each printing the cold lines. It reads arm 9's writer and
+# ---- lines. The failing case, observed at the close and not by the pass that wrote this: handoff.py
+# ---- at the base, where no record is written. Not checked: timing, and a forged record.
+build_fixture; _rc23=$?
+A23S="$TMP_ROOT/s23/projects/p/22222222-2222-4222-8222-222222222222.jsonl"
+"$PY" -B -c "$A9_WRITE" "$FX" "$A23S" "$A9H" || echo "    arm 23: the fixture writer exited non-zero"
+A23D="$FX/.git/handoff-calls"; cp "$A23S" "$TMP_ROOT/a23.full"
+A23_EDIT='import json, pathlib, sys
+rp = next(pathlib.Path(sys.argv[1]).glob("*.json"))
+rec = json.loads(rp.read_text(encoding="utf-8"))
+rec["notified"], mode = {}, sys.argv[2]
+if mode == "parser":
+    rec["parser"] = "0" * 64
+elif mode == "session":
+    rec["session"] += ".other"
+elif mode == "offset":
+    rec["offset"] = pathlib.Path(rec["session"]).stat().st_size + 1
+text = json.dumps(rec)
+rp.write_text(text[:len(text) // 2] if mode == "truncated" else text, encoding="utf-8")'
+a23() { out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" agents --handoff "$A9H" --session "$A23S" 2>"$TMP_ROOT/a23.err"); rc=$?; out=${out//$'\r'/}; }
+a23_cold() { [ "$rc" = 0 ] && [ "$out" = "$A9L1"$'\n'"$A9L2" ]; }
+[ ! -e "$A23D" ]; _a=$?; a23
+check_arm "arm 23 a cold call prints arm 9's lines and writes one record under the fixture's git common dir" \
+   "$([ "$_rc23" = 0 ] && [ "$_a" = 0 ] && a23_cold && [ "$(ls "$A23D" | grep -cE '^[0-9a-f]{16}\.json$')" = 1 ] \
+      && [ "$(ls -A "$A23D" | wc -l)" = 1 ] && echo 1 || echo 0)"
+touch -d '2000-01-01 00:00:00' "$A23D"/*.json; a23
+check_arm "arm 23 ...a warm call prints the same lines and leaves the record unwritten" \
+   "$(a23_cold && [ -z "$(find "$A23D" -name '*.json' -newermt '2001-01-01')" ] && echo 1 || echo 0)"
+"$PY" -B -c "$A23_EDIT" "$A23D" poison; a23
+check_arm "arm 23 ...a record whose notifications are emptied drops the returned line, so the record is read" \
+   "$([ "$rc" = 0 ] && [ "$out" = "$A9L1" ] && echo 1 || echo 0)"
+head -n 1 "$TMP_ROOT/a23.full" > "$A23S"; a23; tail -n +2 "$TMP_ROOT/a23.full" >> "$A23S"; a23
+check_arm "arm 23 ...a record taken on the first line, then the rest appended, prints the cold lines" \
+   "$(a23_cold && echo 1 || echo 0)"
+_l1=$(head -n 1 "$TMP_ROOT/a23.full" | wc -c)
+head -c $((_l1 + 40)) "$TMP_ROOT/a23.full" > "$A23S"; a23; tail -c +$((_l1 + 41)) "$TMP_ROOT/a23.full" >> "$A23S"; a23
+check_arm "arm 23 ...a torn last line, then completed, prints the cold lines" \
+   "$(a23_cold && cmp -s "$A23S" "$TMP_ROOT/a23.full" && echo 1 || echo 0)"
+"$PY" -B -c "$A23_EDIT" "$A23D" poison; sed -i 's/async_launched/async_launchex/' "$A23S"; a23
+check_arm "arm 23 a transcript edited at equal length keys the record off and prints the cold lines" \
+   "$(a23_cold && echo 1 || echo 0)"
+_f=""
+for _k in parser session offset truncated; do
+  "$PY" -B -c "$A23_EDIT" "$A23D" "$_k"; a23; a23_cold || _f="$_f $_k"
+done
+check_arm "arm 23 a record with a foreign parser, session or offset, or truncated, prints the cold lines" \
+   "$([ -z "$_f" ] && echo 1 || echo 0)"
+[ -z "$_f" ] || echo "    arm 23: the record was used under:$_f"
+rm -rf "$A23D"; printf x > "$A23D"; a23
+check_arm "arm 23 an unwritable record folder prints the cold lines and leaves no temporary file" \
+   "$(a23_cold && [ -z "$(find "$FX/.git" -name '*.tmp')" ] && echo 1 || echo 0)"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

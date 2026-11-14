@@ -1,11 +1,12 @@
 # TOOL-aTrimmedWait-7 — `handoff.py agents` keeps its parsed session calls per transcript and parses only the bytes appended since
 
-**Status:** INPROGRESS · rev-3 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 7 · ratified 2026-11-14
+**Status:** CLOSED · rev-3 · 2026-11-14 · node a · Tier-2 · base 846d51d3 · streams tooling · order 7 · ratified 2026-11-14
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-14-build-TOOL-aTrimmedWait-7-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aTrimmedWait-7-1-acceptance-ledger.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md) | research | TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-7-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-1-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-7-2-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-7-2-spec-writer.md) | journal | — |

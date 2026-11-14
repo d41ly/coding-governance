@@ -168,6 +168,11 @@ unchanged from `handoff.py agents --handoff <path>` for an agent it spawned itse
   holds every agent of that build, in the order the lines were added. A run without it writes
   nothing, so a mid-pass call leaves your tree clean; pass `--write` only at a bookkeeping step,
   when no pass is running.
+- **The record.** So that a call reads only what the session added since the last one, the verb
+  keeps one record per session file in `handoff-calls/` under the repository's git common dir, the
+  `.git` folder every worktree shares. The folder may be deleted at any time: the next call reads
+  the whole session again and prints the same lines. A record from another version of the verb, or
+  for a session file that was edited, is never used.
 
 ## When no role agent can be spawned
 
