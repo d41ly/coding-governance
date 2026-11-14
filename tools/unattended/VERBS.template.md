@@ -143,7 +143,7 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   reason, first to hold: the phase, then `--resume`'s (`abandoned`, `asks moved`,
   `worktree`, `holder`, `lease`, `claims unread`, `claim`, `orphans`), then `--audit`'s
   (`clock probe`, `tree idle`, `task probe`, `task stalled`); each sufficient, not necessary.
-  `<c>`: `KEEPALIVE_TRACKED_INTERVAL` while a task is open, else `KEEPALIVE_INTERVAL`.
+  `<c>`: `KEEPALIVE_INTERVAL`, or `undeclared` when it is blank.
 - `--register-task` — `--register-task <slug> --task <name> --heartbeat <absolute path>`, run by
   the STARTER of a background task BEFORE it starts it: the main loop for an `Agent` or a background
   leg, a brief's author for a unit's own long command. It appends one row to the per-slug sidecar
@@ -469,9 +469,6 @@ under its Close heading.
      `unattended.sh --audit <slug>`. After either of those outcomes this session does not drive the
      slug: acting on a `STALLED` verdict would re-dispatch units a live holder is driving, or a held
      run's units — the double drive the lease exists to stop.
-   - A `cadence` other than your job's: `KEEPALIVE_DELETE` it, `KEEPALIVE_CREATE` one at that
-     cadence, then `--resume <slug> --keepalive-id <new> --replaces <old>`. The main loop wakes
-     after its own `--register-task` and `--release-task`.
    - A unit line reading `PROGRESSING`: do nothing. `STALLED`: stop the unit's task, record why with
      `--park` or a brief note, then re-dispatch that unit with a brief naming the stalled command and
      that it is skipped. Its figures are the tree's; whether a process is stuck is the

@@ -47,18 +47,14 @@ which costs a tick's time and never a verdict. `HEALTHY` holds only when no row 
 ## The cadence
 
 `tasks <n> open` counts the registered tasks (`--register-task`) not yet released, or reads
-`unknown` when a heartbeat could not be read. The cadence is `KEEPALIVE_TRACKED_INTERVAL` from
-`.unattended.conf` while at least one task is open and that key is set, else `KEEPALIVE_INTERVAL`,
-or `undeclared` when that is blank too. `KEEPALIVE_TRACKED_INTERVAL` is optional and blank by
-default, so a project that never sets it keeps one cadence.
-
-The driver cannot reach the scheduler, so the session acts on the field. When it differs from the
-cadence of the job the session holds, it deletes that job, creates one at the printed cadence, and
-runs `--resume <slug> --keepalive-id <new> --replaces <old>` so the record names the live job.
+`unknown` when a heartbeat could not be read. The cadence is `KEEPALIVE_INTERVAL` from
+`.unattended.conf`, the cadence the run's first act schedules the job at, or `undeclared` when that
+is blank. The task count does not move it.
 
 ## Example
 
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
 ```bash
 bash tools/unattended/unattended.sh --wake aBuild --keepalive-id k1
-# unattended-wake: aBuild · HEALTHY · tasks 1 open · cadence every 30 minutes (cron 7-59/30 * * * *)
+# unattended-wake: aBuild · HEALTHY · tasks 1 open · cadence every 10 minutes (cron 3-59/10 * * * *)
 ```

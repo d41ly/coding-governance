@@ -489,7 +489,6 @@ In the repo-root `.unattended.conf`. Blank or absent turns the corresponding ass
 | `WIRING_CHECK` | the non-repairing wiring check `--preflight` delegates to |
 | `KEEPALIVE_CREATE` · `KEEPALIVE_DELETE` | the agent-facing scheduler tool calls, named for the agent to use |
 | `KEEPALIVE_INTERVAL` | the cadence the agent schedules the keepalive at, rendered into the Skill as prose |
-| `KEEPALIVE_TRACKED_INTERVAL` | the idle-wake's cadence while a registered task is open, printed by `--wake`. OPTIONAL: blank keeps `KEEPALIVE_INTERVAL` |
 | `ANCHOR_SCOPE` | which anchors may authorize a run: the CLOSED set `default-branch`, `published` and `local`. Absent, blank or outside the set keeps `default-branch`, so a typo grants nothing. Gates the DRIVER only — §1 cost 2 |
 | `AUTH_PARAM` | the token an invocation must carry to start a prompt-mode run, rendered into the Skill at its routing row and its opening fence. BLANK or absent is the kit default, stated verbatim by that render. Its ARGUMENT is a prompt file path or the prompt itself. A value that is not a hyphen-led flag, or carries whitespace, a pipe or a backtick, is refused at render time: it lands in a table row and a code span, and each of those ends one early. Gates NOTHING at run time: no script sees the invocation, so this is the gesture and never the authorization, which stays the pushed build folder (§1) |
 | `CORE_FLOOR` | `<phases>:<dod>`, the shrink-only SIZE of the kit's core sets. MANDATORY: undeclared or malformed leaves both pins unenforced, so both are refusals |

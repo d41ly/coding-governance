@@ -9856,18 +9856,16 @@ printf '#!/bin/sh\nfor a in "$@"; do [ "$a" = -d ] && exit 1; done\nexec "%s" "$
 out=$(PATH="$WK_STUB:$PATH" bash "$SCRIPT" --wake tRun --keepalive-id k1 2>&1); rc=$?
 same "wake AC9 task probe exits 0" "$rc" "0"
 hit "$out" "unattended-wake: tRun · FULL · task probe · tasks unknown open · "
-# AC3 — the cadence follows the registry: the tracked key while a task is open, the base key after
-# its release, the base key throughout when the tracked one is blank, and `undeclared` with neither.
+# AC3 — the cadence is KEEPALIVE_INTERVAL whatever the registry holds, and `undeclared` when that is
+# blank; TOOL-aLightenedLoop-7 retired the tracked cadence.
 build_wake_fixture
-printf 'KEEPALIVE_TRACKED_INTERVAL="every 30 minutes"\n' >> .unattended.conf
-hit "$(run --wake tRun --keepalive-id k1)" "· tasks 1 open · cadence every 30 minutes"
+hit "$(run --wake tRun --keepalive-id k1)" "· tasks 1 open · cadence every 10 minutes"
 run --release-task tRun --task wf >/dev/null
 hit "$(run --wake tRun --keepalive-id k1)" "· tasks 0 open · cadence every 10 minutes"
 build_wake_fixture
-printf 'KEEPALIVE_TRACKED_INTERVAL=""\n' >> .unattended.conf
-hit "$(run --wake tRun --keepalive-id k1)" "· tasks 1 open · cadence every 10 minutes"
-run --release-task tRun --task wf >/dev/null
 printf 'KEEPALIVE_INTERVAL=""\n' >> .unattended.conf
+hit "$(run --wake tRun --keepalive-id k1)" "· tasks 1 open · cadence undeclared"
+run --release-task tRun --task wf >/dev/null
 hit "$(run --wake tRun --keepalive-id k1)" "· tasks 0 open · cadence undeclared"
 rm -rf "$WK_REG" "$WK_DIR"
 reset_tree

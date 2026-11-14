@@ -134,10 +134,6 @@ KEEPALIVE_DELETE="<your-schedule-delete-tool>"
 # rendering "at the cadence this project declares — ." with every gate green.
 KEEPALIVE_INTERVAL="<e.g. every 10 minutes (cron 3-59/10 * * * *)>"
 
-# OPTIONAL. The idle-wake's cadence while a registered task is open, printed by `--wake` as the
-# cadence due, so the agent replaces its job when the field moves. Blank keeps KEEPALIVE_INTERVAL.
-KEEPALIVE_TRACKED_INTERVAL=""
-
 # REPLACE with YOUR harness's DURABLE scheduler tool names, or write RESUME_SCHEDULE="off" below.
 # These file the restart a hold owes, and the carrier must be durable — a filed task outlives the
 # session that filed it — and must accept a caller-chosen name. It may NOT be the keepalive pair

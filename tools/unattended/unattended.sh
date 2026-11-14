@@ -683,7 +683,7 @@ CONF="$ROOT/.unattended.conf"
 # misspelling grant what nobody declared. It sits ON the second line because the source-level arm
 # greps the line below with -A1, and anything inserted between them hides it.
 MEMORY_ROOT=memory; LANDER=""; LANDER_MODE=""; SELFTESTS_OWED_PATHS=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
-KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; KEEPALIVE_TRACKED_INTERVAL=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="$SHARED_RECORDS_UNDECLARED"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
+KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="$SHARED_RECORDS_UNDECLARED"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
 ASKS_CMD=""; HELD_CI_WORKFLOW=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""; HANDOFF_CUTOFF=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""; RUN_CLAIMS=""
@@ -8775,15 +8775,14 @@ print_task_audit() { # slug · now (epoch seconds) — sets TA_DEAD to the probe
 # so a FULL may meet a pair with nothing to do, which costs time and never a verdict; HEALTHY holds
 # only when no row does. The phase is the RECORDED one, offline: `read_derived_phase` may ask the
 # remote, and it differs from the record only on LANDING and a hand-off HELD, which read FULL here.
-# The same line names the cadence due: KEEPALIVE_TRACKED_INTERVAL while a registered task is open
-# and that key is declared, else KEEPALIVE_INTERVAL. It writes nothing; the claim read refreshes the
-# private claim cache only, as `--resume`'s does.
+# The same line names the cadence due: KEEPALIVE_INTERVAL, or `undeclared` when that is blank,
+# whatever the registry holds (TOOL-aLightenedLoop-7). It writes nothing; the claim read refreshes
+# the private claim cache only, as `--resume`'s does.
 #
 #   unattended-wake: <slug> · HEALTHY · tasks <n> open · cadence <cadence>
 #   unattended-wake: <slug> · FULL · <reason> · tasks <n> open · cadence <cadence>
 #
-# WHAT IT DOES NOT CHECK: which units are open (an idle tree reads FULL with none), or whether the
-# agent replaces its job when the cadence moves; that is an act no script observes.
+# WHAT IT DOES NOT CHECK: which units are open (an idle tree reads FULL with none).
 print_wake() { # slug
   local slug="$1" rel ph why="" hw=0 ka ls_utc ls_sid ls_pid l now n cad
   read_bound_key TASK_STALL_BOUND "$TASK_STALL_BOUND_DEFAULT" seconds "a registered task reads STALLED after the kit default of ${TASK_STALL_BOUND_DEFAULT}s with no heartbeat"
@@ -8818,7 +8817,7 @@ print_wake() { # slug
     if [ -n "$TC_DEAD" ]; then why="clock probe"
     elif ! check_tree_progressing "$TC_NOW" "$TC_LASTC" "$TC_LASTW"; then why="tree idle"; fi
   fi
-  # THE TASKS ARE COUNTED ON EVERY CALL, because the cadence reads the count. A redirection and not a
+  # THE TASKS ARE COUNTED ON EVERY CALL, because the line prints the count. A redirection and not a
   # substitution, so TA_* survive in this shell.
   now=$TC_NOW; case "$now" in ""|*[!0-9]*) printf -v now '%(%s)T' -1 ;; esac
   print_task_audit "$slug" "$now" >/dev/null
@@ -8827,7 +8826,6 @@ print_wake() { # slug
   fi
   n=$TA_OPEN; [ -z "$TA_DEAD" ] || n=unknown
   cad=${KEEPALIVE_INTERVAL:-undeclared}
-  if [ "$n" != unknown ] && [ "$n" -gt 0 ] && [ -n "$KEEPALIVE_TRACKED_INTERVAL" ]; then cad=$KEEPALIVE_TRACKED_INTERVAL; fi
   if [ -z "$why" ]; then
     printf 'unattended-wake: %s · HEALTHY · tasks %s open · cadence %s\n' "$slug" "$n" "$cad"
   else

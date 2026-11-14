@@ -16,8 +16,7 @@ its steps in that verbs file's section `The paths, in order`, which wins any dif
 
 First act, before orienting: `CronCreate` at every 10 minutes (cron 3-59/10 * * * *); keep the id. Each tick
 runs `unattended.sh --wake <slug> --keepalive-id <id>`. `HEALTHY` ends the turn. `FULL` runs
-`unattended.sh --resume <slug> --keepalive-id <id>`, then `unattended.sh --audit <slug>`. A `cadence`
-other than your job's replaces the job, as the verbs file says. A
+`unattended.sh --resume <slug> --keepalive-id <id>`, then `unattended.sh --audit <slug>`. A
 background task's starter runs `unattended.sh --register-task <slug> --task <name> --heartbeat <path>`,
 later `unattended.sh --release-task <slug> --task <name>`. Readers share
 `unattended.sh --liveness <slug>`. A run that never starts still reaps it.
