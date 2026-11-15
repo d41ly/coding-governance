@@ -57,5 +57,6 @@ Every `New arm:` line in `tools/unattended/unattended.test.sh`, the driver suite
 - Unit 3: the inverted cache arm (steps a, b and c), the moved-tree and untraced-checker calls.
 - Unit 6: AC3 (the raced stub), AC12 (the popen stub), AC7 (three phase arms), AC8 and AC9 (the dead-`date` arms).
 - Unit 7: the rewritten `--wake` cadence block.
+- Unit 8, the reconcile merge: its six arms on the merged split check (the lookup block deleted, the `_stkey` swap, the `_stnow` test deleted, the derive moved below the second read, the replay branch merged, the `init_bounded` line deleted), and the suite's executed counts against its reconciled floors.
 
-The pooled driver suite, `bash tools/unattended/run-unattended-gates.sh --pooled`, did not run either. Both are owed before the build's landing is trusted for `tools/unattended/unattended.sh`.
+The pooled driver suite, `bash tools/unattended/run-unattended-gates.sh --pooled`, did not run either. At the landing the owner first chose to run it. The plain `--pooled` run refused, because node a held no pooled reading for the eight driver shards or the kit gate. A `run-selftests.sh --pooled --calibrate --kit tools/unattended` run was then started at the merge, and the owner stopped it before any suite finished: "skip those selftest suites". It wrote no reading and moved no tracked file. Everything above remains owed, as do this kit's driver-suite verdicts over the merged `run_spec_token_check`, which unit 8's scratch-fixture probe covered and no suite has.
