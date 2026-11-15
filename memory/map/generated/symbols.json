@@ -238,6 +238,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "MemberProbe",
+      "kind": "class",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "MemoryStatus",
       "kind": "class",
       "file": "tools/run-gates/measure_legs.py"
@@ -5906,6 +5911,16 @@
       "id": "check_gov_units",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "check_grade_same",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "check_grade_step",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
     },
     {
       "id": "check_graders",
@@ -11626,6 +11641,11 @@
       "id": "derive_spec_class_plant",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "derive_spec_context",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "derive_spec_token_key",
@@ -20788,6 +20808,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_spec_cache",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "read_spec_disposal",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -27168,6 +27193,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "run_grade_checker",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
       "id": "run_grammar",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -29129,6 +29159,11 @@
     },
     {
       "id": "scan_live_packets",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "scan_live_spec",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
     },
@@ -33503,6 +33538,11 @@
       "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
+      "id": "write_grade_spec",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
       "id": "write_gw_seal",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -34361,6 +34401,11 @@
       "id": "write_spec",
       "kind": "function",
       "file": "tools/unattended/check-pass-order.test.sh"
+    },
+    {
+      "id": "write_spec_cache",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "write_specimen",

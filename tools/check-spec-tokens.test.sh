@@ -97,7 +97,10 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # (TOOL-aLightenedLoop-3's four and -6's one). Summed, not counted.
 # RAISED 259 -> 260 by TOOL-aPiecewiseGrade-3: its one memo arm beside the guards arms, `memo guards
 # hit`, top-level. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=260
+# RAISED 260 -> 275 by TOOL-aPiecewiseGrade-1: its differential arm's 15 assertions, one per step of
+# eleven and the AC4, AC5, AC7 and AC6 checks after them, each top-level. Counted by reading; OWED:
+# observed at the close.
+FLOOR_ASSERTIONS=275
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -2353,6 +2356,131 @@ printf '{"kind":"popen","argv":["x"]}\n' > "$base/inputs.bad"
 li_key=$(cd "$d" && "$PY" "$LINT" --input-key "$base/inputs.bad" 2>&1); li_krc=$?
 [ "$li_krc" = 1 ] && [ -z "$li_key" ]
 check_input_arm "LL3 AC7 --input-key over a record holding a popen line prints nothing and exits 1" $?
+
+# TOOL-aPiecewiseGrade-1 AC2-AC7: THE INCREMENTAL MODE, a differential arm. A copy of the checker and of
+# the memory-tree kit sits in a fixture's tool root, so the kit step edits only the copy. Three live
+# specs across two builds, a CLOSED chain spec a carries design binds, and a packet stub that exits 1.
+# Each step applies one change, runs the plain checker and the one with SPEC_TOKENS_CACHE, compares
+# stdout, stderr and status, and promotes as a caller does. Every plant must move the plain output, so
+# no step passes by comparing two silences. The staged breaks, at the close: a key that leaves out the
+# `read` lines, which reds the cited step, and a mode that reuses the previous run's packet answer,
+# which reds the packet step.
+pd=$base/pgrade; pc=$base/pgcache/c; po=$base/pgout; mkdir -p "$pd" "$base/pgcache" "$po"
+git init -q "$pd"; git -C "$pd" symbolic-ref HEAD refs/heads/main
+git -C "$pd" config user.email t@t.test; git -C "$pd" config user.name t
+printf '%s\n' "${PFX}check-spec-tokens.py" "${PFX}memory-tree/" .memory-tree.conf >> "$pd/.git/info/exclude"
+mkdir -p "$pd/${PFX}" "$pd/memory/project" "$pd/memory/builds/tOne/spec" "$pd/memory/builds/tTwo/spec" \
+  "$pd/memory/builds/dAlpha/spec" "$pd/memory/builds/dAlpha/prompts" "$pd/memory/builds/dClosedLoop/build" "$pd/memory/design"
+cp "$LINT" "$pd/${PFX}check-spec-tokens.py"; cp -r "$MEMORY_TREE" "$pd/${PFX}memory-tree"
+printf '[{"name":"real leg"}]\n' > "$pd/${PFX}gate-legs.json"
+printf '#!/bin/sh\n' > "$pd/${PFX}gate.sh"
+printf 'one\ntwo\nthree\n' > "$pd/${PFX}cited.txt"
+printf '# waivers\nghost leg\t[leg] the closed step\n%snope2.sh\t[path] the retired step\nrun-gates.sh\t[bar] the cutoff step\n' "$PFX" \
+  > "$pd/memory/project/spec-token-waivers.txt"
+pg_a=memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md; pg_b=memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-2.md
+pg_s=memory/builds/tTwo/spec/2026-09-03-spec-TOOL-tTwo-1.md; pg_x=memory/builds/dAlpha/spec/2026-09-02-spec-TOOL-dAlpha-1.md
+write_grade_spec() {   # $1 path · $2 uid · $3 date · $4 section 4 body · $5 section 6 body · $6 section 7 line
+  printf '# %s — a unit\n\n**Status:** OPEN · rev-1 · %s · node t · Tier-2 · base 0123abcd · streams tooling\n\n## 4. Design\n\n%s\n\n## 6. Acceptance criteria\n\n%s\n\n## 7. Gates\n\n%s\n' \
+    "$2" "$3" "$4" "$5" "$6" > "$pd/$1"
+}
+write_grade_spec "$pg_a" TOOL-tOne-1 2026-09-02 "See \`${PFX}cited.txt:3\`."$'\n\n### Files touched\n\n'"- \`${PFX}gate.sh\`" "- **AC1** — \`${PFX}gate-legs.json\` exists." '`real leg`.'
+write_grade_spec "$pg_b" TOOL-tOne-2 2026-09-02 'Prose.' "- **AC1** — \`${PFX}gate.sh\` exists." '`real leg` · `ghost leg`.'
+write_grade_spec "$pg_s" TOOL-tTwo-1 2026-09-03 'Prose.' "- **AC1** — \`${PFX}nope2.sh\` exists."$'\n'"- **AC2** — \`run-gates.sh\` passes." '`real leg`.'
+pg_ca='The checker reads `alpha-one` first.'
+printf '# a design record\n\n## [clause-ids]\n\nRetired: `cl-dAlpha-0009`\n' > "$pd/memory/design/record.md"
+printf '# the view\n\n| Build | Clause | Text | Since |\n|---|---|---|---|\n| dAlpha | `cl-dAlpha-0001` | %s | baseline |\n' "$pg_ca" > "$pd/memory/design/view.md"
+printf 'OWNED = ("item",)\n\n\ndef derive():\n    return None, {"item": [{"key": "alpha-node", "rels": [("owner", ["dAlpha"])]}]}\n' > "$pd/memory/design/nodes.py"
+printf '# TOOL-dAlpha-1 — a unit\n\n**Status:** CLOSED · rev-1 · 2026-09-02 · node t · Tier-2 · base 0123abcd · streams tooling\n\n**Carries:** cl-dAlpha-0001@%s whole\n**Carries:** node:item.alpha-node\n\n%s\n' \
+  "$(derive_carries_pin "$pg_ca")" "$pg_ca" > "$pd/$pg_x"
+printf 'import sys\nprint("packet: stub - byte compare red")\nsys.exit(1)\n' > "$pd/memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py"
+printf '# packet\n' > "$pd/memory/builds/dAlpha/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md"
+git -C "$pd" add -A >/dev/null; git -C "$pd" commit -qm seed --no-verify
+printf 'SPEC_DIRECT_CUTOFF="2026-09-03"\nSPEC_CARRIES_CUTOFF="2026-09-02"\nDESIGN_RECORD="memory/design/record.md"\nDESIGN_BASELINE="%s"\nDESIGN_VIEW="memory/design/view.md"\nDESIGN_NODES="memory/design/nodes.py"\n' \
+  "$(git -C "$pd" rev-parse HEAD)" > "$pd/.memory-tree.conf"
+run_grade_checker() {   # $1 the output stem · rest: the environment the run adds
+  local stem=$1; shift
+  (cd "$pd" && env -u SPEC_TOKENS_CACHE -u SPEC_TOKENS_INPUTS "$@" "$PY" "${PFX}check-spec-tokens.py") >"$po/$stem.out" 2>"$po/$stem.err"; echo $? > "$po/$stem.rc"
+}
+check_grade_same() { cmp -s "$po/$1.out" "$po/$2.out" && cmp -s "$po/$1.err" "$po/$2.err" && cmp -s "$po/$1.rc" "$po/$2.rc"; }
+pg_gen=ok
+check_grade_step() {   # $1 step · $2 the commit message, or - for none · $3 the line the step must print
+  [ "$2" = - ] || { git -C "$pd" add -A >/dev/null; git -C "$pd" commit -qm "$2" --no-verify; }
+  run_grade_checker plain; run_grade_checker inc SPEC_TOKENS_CACHE="$pc"
+  local moved=1 same=0 live nj ni line
+  if [ -e "$po/prev.out" ] && cmp -s "$po/plain.out" "$po/prev.out" && cmp -s "$po/plain.err" "$po/prev.err"; then moved=0; fi
+  check_grade_same plain inc && same=1
+  rm -rf "$pc"; mv "$pc.next" "$pc"
+  live=$(grep -o '^spec-tokens: [0-9]* live spec' "$po/plain.out" | head -1 | grep -o '[0-9]*')
+  nj=$(ls "$pc"/*.json 2>/dev/null | wc -l | tr -d ' '); ni=$(ls "$pc"/*.inputs 2>/dev/null | wc -l | tr -d ' ')
+  { [ ! -e "$pc.next" ] && [ -n "$live" ] && [ "$nj" = "$live" ] && [ "$ni" = "$live" ]; } || pg_gen="bad at $1"
+  line="step $1 moved $moved same $same rc $(tr -d '\r\n' < "$po/plain.rc")/$(tr -d '\r\n' < "$po/inc.rc") graded $(wc -l < "$pc/graded.list" | tr -d ' ')"
+  cp "$po/plain.out" "$po/prev.out"; cp "$po/plain.err" "$po/prev.err"
+  [[ $line == "$3"* ]]
+  check_input_arm "PG1 $1 prints '$3' (got '$line')" $?
+}
+check_grade_step seed - "step seed moved 1 same 1 rc 0/0 graded 3"
+check_grade_step rerun - "step rerun moved 0 same 1 rc 0/0 graded 0"
+sed -i 's/^\*\*Status:\*\* OPEN/**Status:** CLOSED/' "$pd/$pg_b"; check_grade_step closed closed "step closed moved 1 same 1"
+sed -i "s|\`${PFX}nope2.sh\` exists|\`${PFX}gate.sh\` exists|" "$pd/$pg_s"; check_grade_step retired retired "step retired moved 1 same 1"
+sed -i '/^The checker reads/d' "$pd/$pg_x"; check_grade_step carries carries "step carries moved 1 same 1"
+printf '# dAlpha - run state\n\nphase: BUILDING\n' > "$pd/memory/builds/dAlpha/RUN.md"; check_grade_step packet packet "step packet moved 1 same 1"
+mkdir -p "$pd/memory/builds/dGamma/prompts"; printf '# packet\n' > "$pd/memory/builds/dGamma/prompts/2026-10-22-prompt-PLAY-dClosedLoop-1-packet.md"
+printf '# dGamma - run state\n\nphase: BUILDING\n' > "$pd/memory/builds/dGamma/RUN.md"; check_grade_step isfile isfile "step isfile moved 1 same 1"
+printf 'one\ntwo\n' > "$pd/${PFX}cited.txt"; check_grade_step cited cited "step cited moved 1 same 1"
+printf '\n\ndef read_spec_writes(text, *a, **kw):\n    return None\n' >> "$pd/${PFX}memory-tree/design_lib.py"; check_grade_step kit - "step kit moved 1 same 1"
+sed -i 's/^SPEC_DIRECT_CUTOFF=.*/SPEC_DIRECT_CUTOFF="2026-09-04"/' "$pd/.memory-tree.conf"; check_grade_step cutoff - "step cutoff moved 1 same 1"
+printf '\nMore prose.\n' >> "$pd/$pg_a"; check_grade_step onespec onespec "step onespec moved 0 same 1"
+[ "$(tr -d '\r' < "$pc/graded.list")" = "$pg_a" ]
+check_input_arm "PG1 AC4 after one spec's edit the run re-grades that spec alone" $?
+# AC5: one entry's .inputs gains a `run` line under the key a checker replaying it would derive; another's
+# .json does not parse. Both must read as a miss, so both specs land in graded.list.
+pg_ida=$("$PY" -c 'import hashlib, sys; print(hashlib.sha1(sys.argv[1].encode("utf-8")).hexdigest())' "$pg_a" | tr -d '\r')
+pg_ids=$("$PY" -c 'import hashlib, sys; print(hashlib.sha1(sys.argv[1].encode("utf-8")).hexdigest())' "$pg_s" | tr -d '\r')
+cp -r "$pc" "$base/pgcache/ctx"
+(cd "$pd" && SPEC_TOKENS_CACHE="$base/pgcache/ctx" "$PY" -c '
+import importlib.util, io, contextlib, hashlib, json, os, subprocess, sys
+s = importlib.util.spec_from_file_location("cst", sys.argv[3])
+cst = importlib.util.module_from_spec(s); s.loader.exec_module(cst)
+got, real = [], cst.derive_spec_context
+cst.derive_spec_context = lambda ctx: got.append(real(ctx)) or got[-1]
+with contextlib.redirect_stdout(io.StringIO()): cst.main([])
+lines = [x for x in open(sys.argv[1], encoding="utf-8").read().splitlines() if x]
+lines.append(json.dumps({"argv": ["git", "rev-parse", "HEAD"], "cwd": os.getcwd(), "drop": [], "input": "", "kind": "run", "set": {}}, sort_keys=True, separators=(",", ":")))
+open(sys.argv[1], "w", encoding="utf-8", newline="\n").write("".join(x + "\n" for x in sorted(lines)))
+raw = open(sys.argv[1], "rb").read(); h = hashlib.sha1(raw)
+files = set(subprocess.run(["git", "ls-files"], capture_output=True, text=True).stdout.split())
+for x in map(json.loads, raw.decode("utf-8").splitlines()):
+    if x["kind"] == "member": ans = "1" if x["key"] in files else "0"
+    elif x["kind"] == "read": ans = hashlib.sha1(open(x["path"], "rb").read()).hexdigest()
+    else:
+        p = subprocess.run(x["argv"], cwd=x["cwd"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        ans = f"{p.returncode} {hashlib.sha1(p.stdout).hexdigest()}"
+    kind = x["kind"]
+    h.update(f"{kind}\0{ans}\n".encode("utf-8"))
+entry = json.load(open(sys.argv[2], encoding="utf-8"))
+entry["key"] = hashlib.sha1(f"{got[0]}\0{h.hexdigest()}".encode("utf-8")).hexdigest()
+json.dump(entry, open(sys.argv[2], "w", encoding="utf-8"))' "$pc/$pg_ida.inputs" "$pc/$pg_ida.json" "$pd/${PFX}check-spec-tokens.py") >/dev/null 2>&1
+printf '{not json' > "$pc/$pg_ids.json"
+run_grade_checker forge SPEC_TOKENS_CACHE="$pc"
+pg_list=$(tr -d '\r' < "$pc.next/graded.list")
+[[ $'\n'$pg_list$'\n' == *$'\n'$pg_a$'\n'* && $'\n'$pg_list$'\n' == *$'\n'$pg_s$'\n'* ]]
+check_input_arm "PG1 AC5 an entry whose .inputs holds a run line, and one whose .json does not parse, are misses" $?
+rm -rf "$pc"; mv "$pc.next" "$pc"
+# AC7: the SPEC_TOKENS_INPUTS record is the plain run's bytes, on a cold cache and on a warm one.
+rm -rf "$pc"
+run_grade_checker r1 SPEC_TOKENS_INPUTS="$po/r1.rec"; run_grade_checker r2 SPEC_TOKENS_INPUTS="$po/r2.rec" SPEC_TOKENS_CACHE="$pc"
+rm -rf "$pc"; mv "$pc.next" "$pc"
+run_grade_checker r3 SPEC_TOKENS_INPUTS="$po/r3.rec"; run_grade_checker r4 SPEC_TOKENS_INPUTS="$po/r4.rec" SPEC_TOKENS_CACHE="$pc"
+rm -rf "$pc"; mv "$pc.next" "$pc"
+[ -s "$po/r1.rec" ] && cmp -s "$po/r1.rec" "$po/r2.rec" && cmp -s "$po/r3.rec" "$po/r4.rec"
+check_input_arm "PG1 AC7 the input record of a cached run, cold and warm, is the plain run's bytes" $?
+# AC6: one more run leaves the directory it reads untouched, and every promotion above held one entry
+# pair per live spec with the next generation gone.
+pg_before=$(cd "$pc" && find . -type f -exec cksum {} + | sort)
+run_grade_checker untouched SPEC_TOKENS_CACHE="$pc"
+pg_after=$(cd "$pc" && find . -type f -exec cksum {} + | sort)
+[ -n "$pg_before" ] && [ "$pg_before" = "$pg_after" ] && [ "$pg_gen" = ok ]
+check_input_arm "PG1 AC6 the run never writes the directory it reads, and each generation holds the live specs (generation $pg_gen)" $?
 
 # TOOL-dGroundRules-32 S9, TOOL-dGroundRules-40: the build-order render's overlap rule is the
 # dispatcher's, and both are graded against the truth. Each OVERLAP_PAIRS row is two paths relative to

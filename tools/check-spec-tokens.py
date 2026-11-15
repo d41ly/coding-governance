@@ -283,9 +283,27 @@ A variable and not a flag, so a declared checker that does not know it ignores i
 (S5) hashes the record's bytes and the replay of each line against the tree as it is NOW, prints
 the 40-hex digest and exits 0; a record that does not parse, or holds a subprocess the wrapper did
 not see, prints nothing and exits 1. The unattended driver keys its spec-token cache on it.
+
+  SPEC_TOKENS_CACHE=<dir> python <prefix>/check-spec-tokens.py    # reuse each live spec's grading
+
+SPEC_TOKENS_CACHE (TOOL-aPiecewiseGrade-1) set and not empty, with neither --spec nor --pass-spec,
+makes the whole-tree run look each live spec up in <dir>: a hit reuses that spec's raw findings and
+counters, a miss grades it, and every join, the live sort, the waiver filter and the report run
+whole as the plain run runs them, so stdout and the exit status are the plain run's. An entry's key
+is the SHA-1 over the context digest -- the launcher, this checker's bytes and every memory-tree kit
+module's, and the loop's context as sorted JSON: the leg names, guards, manifest path, flag suites
+and the four loop cutoffs -- and the replay of the spec's own inputs: each file its grading read and
+each tracked-set membership it asked. A segment that ran a subprocess or listed a directory writes
+no entry, and a key that does not replay is a miss. The run never writes <dir>: it writes the whole
+next generation, reused and fresh entries and `graded.list` naming the specs it re-graded, to
+<dir>.next. The checker cannot see a file move between its read and the key's replay, so the caller
+promotes <dir>.next only under its own bracket, by removing <dir> and renaming <dir>.next to it. The
+cache's two directories never enter the SPEC_TOKENS_INPUTS record. The bar's leg runs the plain
+check, so a forged entry can hide a finding from a cached run and never from the bar.
 """
 import atexit
 import base64
+import collections
 import datetime
 import functools
 import hashlib
@@ -295,6 +313,7 @@ import locale
 import os
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
 
@@ -334,40 +353,53 @@ def derive_read_path(path, mode, flags):
 # INPUT_LINES holds each input as one compact JSON line, so the record is sorted and de-duplicated.
 # `depth` is how many `run_traced` calls are open: a `subprocess.Popen` event fired inside one is
 # that call's own, and one fired outside every one is a call no replay can repeat.
+# `segment` (TOOL-aPiecewiseGrade-1 S3) is the open per-spec segment, a set of lines, None outside one.
 INPUT_LINES = set()
-INPUT_TRACE = {"path": "", "skip": (), "depth": 0, "run": subprocess.run}
+INPUT_TRACE = {"path": "", "skip": (), "cache": (), "depth": 0, "run": subprocess.run, "segment": None}
 
 
 def add_input_line(kind, **keys):
-    INPUT_LINES.add(json.dumps({"kind": kind, **keys}, sort_keys=True, separators=(",", ":")))
+    line = json.dumps({"kind": kind, **keys}, sort_keys=True, separators=(",", ":"))
+    INPUT_LINES.add(line)
+    if INPUT_TRACE["segment"] is not None:
+        INPUT_TRACE["segment"].add(line)
 
 
-def arm_input_trace(path):
-    """Record this run's inputs to <path> at exit: the checker's own file first, because the
-    interpreter opened it before any hook could exist, then the audit hook, the `subprocess.run`
-    wrapper and the exit handler. The prefixes skipped are the interpreter's, which the launcher in
-    the driver's key stands for."""
+def arm_input_trace(path, cache=""):
+    """Record this run's inputs: the checker's own file first, because the interpreter opened it
+    before any hook could exist, then the audit hook and the `subprocess.run` wrapper, and the exit
+    handler writing them to <path> only when <path> is set. The prefixes skipped are the
+    interpreter's, which the launcher in the driver's key stands for, and the per-spec cache's
+    <cache> and <cache>.next, skipped for listings too, so the cache's own reads never move the
+    whole record (TOOL-aPiecewiseGrade-1 S5)."""
     INPUT_TRACE["path"] = path
+    INPUT_TRACE["cache"] = tuple(sorted({os.path.normcase(os.path.realpath(p)) + os.sep
+                                         for p in ((cache, cache + ".next") if cache else ())}))
     INPUT_TRACE["skip"] = tuple(sorted({os.path.normcase(os.path.realpath(p)) + os.sep
-                                        for p in (sys.prefix, sys.base_prefix, sys.exec_prefix)}))
+                                        for p in (sys.prefix, sys.base_prefix, sys.exec_prefix)}
+                                       | set(INPUT_TRACE["cache"])))
     add_input_line("read", path=os.path.realpath(__file__))
     subprocess.run = run_traced
-    atexit.register(write_input_record)
+    if path:
+        atexit.register(write_input_record)
     sys.addaudithook(add_input_event)
 
 
 def add_input_event(event, args):
     """The audit hook: a kept `open` is a read, `os.listdir` and `os.scandir` a listing, and a
-    `subprocess.Popen` outside `run_traced` a `popen` line that makes the record unreplayable. A hook
-    that raised would fail the very call it audits, so any error records nothing."""
+    `subprocess.Popen` outside `run_traced` a `popen` line that makes the record unreplayable. A path
+    is skipped when it, or the directory it names, sits under a skipped prefix. A hook that raised
+    would fail the very call it audits, so any error records nothing."""
     try:
         if event == "open":
             kept = derive_read_path(args[0], args[1], args[2])
-            if kept is not None and not os.path.normcase(kept[0]).startswith(INPUT_TRACE["skip"]):
+            if kept is not None and not (os.path.normcase(kept[0]) + os.sep).startswith(INPUT_TRACE["skip"]):
                 add_input_line("read", path=kept[0])
         elif event in ("os.listdir", "os.scandir"):
             if not isinstance(args[0], int):
-                add_input_line("list", path=os.path.realpath(os.fsdecode(args[0] if args[0] is not None else ".")))
+                p = os.path.realpath(os.fsdecode(args[0] if args[0] is not None else "."))
+                if not (os.path.normcase(p) + os.sep).startswith(INPUT_TRACE["cache"]):
+                    add_input_line("list", path=p)
         elif event == "subprocess.Popen" and not INPUT_TRACE["depth"]:
             argv = args[1]
             add_input_line("popen", argv=[os.fsdecode(argv)] if isinstance(argv, (str, bytes))
@@ -418,22 +450,29 @@ def write_input_record():
         return
 
 
-def derive_input_digest(record):
+def derive_input_digest(record, names=None):
     """--input-key (TOOL-aLightenedLoop-3 S5): the SHA-1 over the record's own bytes and, line by line
     in record order, its replay against the tree now -- a read's file hash or `absent`, a listing's
     sorted names or `absent`, a run's exit status and stdout hash, re-run with its recorded cwd, input
-    and environment delta. None when the record does not parse or holds a line no replay can repeat."""
+    and environment delta. None when the record does not parse or holds a line no replay can repeat.
+    Given `names`, a per-spec key's sets by name (TOOL-aPiecewiseGrade-1 S3), it admits only `read`
+    and `member` lines, a member replaying as `1` or `0` from `names[of]`; any other line is None."""
     try:
         raw = pathlib.Path(record).read_bytes()
         lines = [json.loads(x) for x in raw.decode("utf-8").splitlines() if x.strip()]
     except (OSError, ValueError):
         return None
-    if not all(isinstance(x, dict) and x.get("kind") in ("read", "list", "run") for x in lines):
+    kinds = ("read", "list", "run") if names is None else ("read", "member")
+    if not all(isinstance(x, dict) and x.get("kind") in kinds for x in lines):
         return None
     h = hashlib.sha1(raw)
     for x in lines:
         try:
-            if x["kind"] == "read":
+            if x["kind"] == "member":
+                if x["of"] not in names:
+                    return None
+                ans = "1" if x["key"] in names[x["of"]] else "0"
+            elif x["kind"] == "read":
                 try:
                     ans = hashlib.sha1(pathlib.Path(x["path"]).read_bytes()).hexdigest()
                 except OSError:
@@ -458,8 +497,9 @@ def derive_input_digest(record):
     return h.hexdigest()
 
 
-if os.environ.get("SPEC_TOKENS_INPUTS"):
-    arm_input_trace(os.environ["SPEC_TOKENS_INPUTS"])
+if os.environ.get("SPEC_TOKENS_INPUTS") or os.environ.get("SPEC_TOKENS_CACHE"):
+    arm_input_trace(os.environ.get("SPEC_TOKENS_INPUTS", ""),
+                    os.environ.get("SPEC_TOKENS_CACHE", "").rstrip("/" + os.sep))
 
 # The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test.
@@ -1954,6 +1994,298 @@ def read_pass_spec(root, files, args):
     return paths[:1]
 
 
+class MemberProbe:
+    """A set `scan_live_spec` may only ask `in` of (TOOL-aPiecewiseGrade-1 S3): each answer comes from
+    the real set, and the question is added to the open trace segment as a `member` line, named by
+    `of`, and to nothing else. Any other use raises TypeError, so a grading that iterates or sizes
+    the set fails loudly rather than caching an answer its key never saw."""
+    __slots__ = ("of", "real")
+
+    def __init__(self, of, real):
+        self.of, self.real = of, real
+
+    def __contains__(self, key):
+        if INPUT_TRACE["segment"] is not None:
+            INPUT_TRACE["segment"].add(json.dumps({"kind": "member", "of": self.of, "key": key},
+                                                  sort_keys=True, separators=(",", ":")))
+        return key in self.real
+
+
+def derive_spec_context(ctx):
+    """The context digest every per-spec key carries (TOOL-aPiecewiseGrade-1 S3): the SHA-1 over the
+    launcher, the bytes of this checker and of every module loaded from the memory-tree kit dir by
+    now, each named by its realpath, and `ctx` as sorted JSON, so a moved conf key moves it."""
+    kit = os.path.normcase(os.path.realpath(KIT_DIR)) if KIT_DIR else None
+    mods = {os.path.realpath(__file__)}
+    for mod in list(sys.modules.values()) + list(KIT_LOADS.values()):
+        p = getattr(mod, "__file__", None)
+        if p and kit and os.path.normcase(os.path.dirname(os.path.realpath(p))) == kit:
+            mods.add(os.path.realpath(p))
+    h = hashlib.sha1(f"{sys.executable}\0{sys.version}\0".encode("utf-8"))
+    for p in sorted(mods):
+        try:
+            ans = hashlib.sha1(pathlib.Path(p).read_bytes()).hexdigest()
+        except OSError:
+            ans = "absent"
+        h.update(f"{p}\0{ans}\n".encode("utf-8"))
+    h.update(json.dumps(ctx, sort_keys=True, default=sorted).encode("utf-8"))
+    return h.hexdigest()
+
+
+def read_spec_cache(cache, f, context, names):
+    """The lookup of live spec `f` in `<cache>` (TOOL-aPiecewiseGrade-1 S3): its `(hits, near,
+    counts)` when the entry parses, names `f`, and its key equals the SHA-1 of `context` and the
+    replay of its `.inputs`; the entry's two files are then copied into `<cache>.next`. Any other
+    answer, an OSError or a parse failure included, is None: a miss."""
+    eid = hashlib.sha1(f.encode("utf-8")).hexdigest()
+    src, dst = pathlib.Path(cache), pathlib.Path(cache + ".next")
+    try:
+        entry = json.loads((src / f"{eid}.json").read_bytes().decode("utf-8"))
+        if entry["path"] != f:
+            return None
+        digest = derive_input_digest(src / f"{eid}.inputs", names)
+        if digest is None or hashlib.sha1(f"{context}\0{digest}".encode("utf-8")).hexdigest() != entry["key"]:
+            return None
+        got = ([tuple(str(x) for x in h) for h in entry["hits"]], [tuple(str(x) for x in n) for n in entry["near"]],
+               {str(k): int(v) for k, v in entry["counts"].items()})
+        for name in (f"{eid}.json", f"{eid}.inputs"):
+            shutil.copyfile(src / name, dst / name)
+        return got
+    except (OSError, ValueError, KeyError, TypeError, AttributeError):
+        return None
+
+
+def write_spec_cache(cache, f, segment, got, context, names):
+    """One entry of the next generation (TOOL-aPiecewiseGrade-1 S3, S4): `f` is appended to
+    `<cache>.next/graded.list`, and, when `segment` holds only `read` and `member` lines, its
+    `.inputs` and then its `.json`, keyed on the replay of the `.inputs` just written, are written
+    beside it. A write that fails leaves that entry out and prints nothing."""
+    nxt = pathlib.Path(cache + ".next")
+    eid = hashlib.sha1(f.encode("utf-8")).hexdigest()
+    try:
+        with open(nxt / "graded.list", "a", encoding="utf-8", newline="\n") as fh:
+            fh.write(f + "\n")
+    except OSError:
+        pass
+    if not all(json.loads(x).get("kind") in ("read", "member") for x in segment):
+        return
+    try:
+        with open(nxt / f"{eid}.inputs", "w", encoding="utf-8", newline="\n") as fh:
+            fh.write("".join(x + "\n" for x in sorted(segment)))
+        digest = derive_input_digest(nxt / f"{eid}.inputs", names)
+        if digest is None:
+            raise OSError("unreplayable")
+        with open(nxt / f"{eid}.json", "w", encoding="utf-8", newline="\n") as fh:
+            json.dump({"path": f, "key": hashlib.sha1(f"{context}\0{digest}".encode("utf-8")).hexdigest(),
+                       "hits": got[0], "near": got[1], "counts": got[2]}, fh)
+    except OSError:
+        for name in (f"{eid}.inputs", f"{eid}.json"):
+            try:
+                (nxt / name).unlink()
+            except OSError:
+                pass
+
+
+def scan_live_spec(root, f, files, bare, ctx):
+    """One live spec's grading, `main`'s per-spec loop body (TOOL-aPiecewiseGrade-1 S1): the leg,
+    legline, paths, bar, guards, cite, claims, covers, source and ac-order joins over spec `f`.
+    Returns `(hits, near, counts)`, the spec's raw findings before any waiver or join and its 24
+    counters by name. It reads the spec's bytes itself, each file a citation names, `files` and the
+    root-install sets `bare` by membership only, and `ctx`, which holds every other value it reads."""
+    legs, guarded, broad, legs_path = ctx["legs"], ctx["guarded"], ctx["broad"], ctx["legs_path"]
+    flag_suites, legline_cut, direct_cut = ctx["flag_suites"], ctx["legline_cut"], ctx["direct_cut"]
+    guards_cut, ac_order_cut = ctx["guards_cut"], ctx["ac_order_cut"]
+    hits, skipped, graded = [], 0, 0
+    ungraded, noheading = 0, 0
+    bar_examined, bar_specs, bar_carriers, near = 0, 0, 0, []
+    g_examined, g_specs, g_carriers, g_nosubhead, g_nogates = 0, 0, 0, 0, 0
+    c_runs, c_specs, c_cleared = 0, 0, 0
+    cv_lines, cv_specs, cv_carriers, cv_graded = 0, 0, 0, 0
+    so_examined, so_specs, so_bare = 0, 0, 0
+    ao_graded, ao_bad = 0, 0
+    text = (root / f).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
+    m = SPEC_DATE.search("/" + f)
+    armed = bool(direct_cut) and bool(m) and m.group(1) >= direct_cut
+    g_armed = bool(guards_cut) and bool(m) and m.group(1) >= guards_cut
+    named = set()                 # the manifest names the leg line contributes
+    pop_toks, bar_toks = [], []   # every graded-population token · the (token, reason) bar hits
+    gates = extract_gates(text)
+    if gates is None:
+        # No Gates heading at all. Silent by design, and counted apart from the section that
+        # exists and contributes nothing: the two silences have different remedies, so a single
+        # "ungraded" number would tell a reader to fix the wrong half.
+        noheading += 1
+        gates = ""
+    contributed = 0
+    for line in gates.splitlines():
+        if not LEG_LINE.match(line):
+            continue
+        for tok in TICK.findall(line):
+            pop_toks.append(tok)
+            # The bar test runs FIRST, on the raw token. NOT_A_TOKEN drops a `GATE_` prefix and
+            # NOT_A_LEG a `bash ` opener or a slash, and the motivating instruction carries all
+            # three; a bar token was never a leg, so it contributes nothing and continues.
+            why = check_bar(tok, flag_suites)
+            if why:
+                bar_toks.append((tok, why))
+                continue
+            if NOT_A_TOKEN.match(tok):
+                continue
+            # A token that IS a manifest name resolves BEFORE the shape exclusions. Those
+            # exclusions exist to drop commands, conf keys and graded files out of the join, and
+            # they were written against tokens that are none of them — but a real leg name
+            # carrying a `/`, or opening with a command verb, was being discarded UNREAD, so a
+            # correct §7 contributed nothing and the spec looked like prose.
+            if tok not in legs and NOT_A_LEG.search(tok):
+                continue
+            graded += 1
+            contributed += 1
+            if tok not in legs:
+                hits.append((f, "leg", tok, f"not a name in {legs_path}"))
+            else:
+                named.add(tok)
+    if not contributed and extract_gates(text) is not None:
+        ungraded += 1
+        if legline_cut:
+            m = SPEC_DATE.search("/" + f)
+            if m and m.group(1) >= legline_cut:
+                hits.append((f, "legline", f,
+                             "section 7 carries a Gates heading and contributes no leg name, "
+                             f"required at/after {LEGLINE_KEY} {legline_cut}"))
+    for bullet in re.findall(r"^- .*(?:\n  .*)*", extract_acceptance(text) or "", re.M):
+        for tok in TICK.findall(bullet):
+            pop_toks.append(tok)
+            # First here too, and the paths join still runs over the token's words: a tracked
+            # runner path resolves either way, and the two joins answer different questions.
+            why = check_bar(tok, flag_suites)
+            if why:
+                bar_toks.append((tok, why))
+            for word in tok.split():
+                if check_path_shaped(word, files):
+                    graded += 1
+                    if word not in files:
+                        hits.append((f, "path", word, "not tracked by git ls-files"))
+                elif bare is not None and check_bare_shaped(word, bare[0]):
+                    graded += 1
+                    if word not in bare[1]:
+                        hits.append((f, "path", word, "not tracked by git ls-files"))
+    if armed:
+        bar_specs += 1
+        bar_examined += len(pop_toks)
+        hits += [(f, "bar", tok, why) for tok, why in bar_toks]
+    elif bar_toks:
+        # Not graded, but COUNTED and listed: a skip that does not announce its size is
+        # indistinguishable from coverage, and the OFF state hides the most.
+        bar_carriers += 1
+        where = f"predates {DIRECT_KEY} {direct_cut}" if direct_cut else f"{DIRECT_KEY} blank (arm off)"
+        near += [(f, "bar", tok, where) for tok, _why in bar_toks]
+    graded_set = set(pop_toks)
+    near += [(f, "bar", tok, "outside the graded population")
+             for tok in TICK.findall(text) if check_bar(tok, flag_suites) and tok not in graded_set]
+    # THE GUARDS JOIN (TOOL-aBlindedTrial-8): the declared write set against every guarded leg.
+    # One hit per MISSING leg, its token naming the first declared path that trips it — the
+    # composite keeps a `[leg]` waiver row keyed on the bare leg name from swallowing it.
+    touched = extract_files_touched(text, files)
+    if touched is None:
+        g_nosubhead += 1
+        touched = ([], [])
+    declared, roots = touched
+    # A one-segment ROOT under the sub-head declares nothing (round 2, R1), and says so.
+    near += [(f, "guards", p, "a one-segment root declares nothing, not joined - name the files or "
+                              "a directory of two or more segments") for p in roots]
+    missing = []
+    # The legline arm's precondition, mirrored (R4): a spec with NO Gates heading is the light
+    # profile's legal shape and is not joined — counted, NOT examined, and every path it declares
+    # that would have tripped a joined guard is named as NEAR, so the skip has a size and a name
+    # (round 2, R8).
+    if declared and extract_gates(text) is None:
+        g_nogates += 1
+        near += [(f, "guards", p, "no Gates heading, not joined") for p in declared
+                 if any(load_design_lib().check_guard_trips(p, g) for _, gs in guarded for g in gs)]
+    elif extract_gates(text) is not None:
+        if g_armed:
+            g_specs += 1
+            g_examined += len(declared)
+        for leg, gs in guarded:
+            if leg in named:
+                continue
+            path = next((p for p in declared if any(load_design_lib().check_guard_trips(p, g) for g in gs)), None)
+            if path is not None:
+                missing.append((leg, path))
+    if g_armed:
+        hits += [(f, "guards", f"{leg} <- {path}",
+                  f"§4 files-touched names {path}, which trips the guard of leg {leg!r}, "
+                  "absent from the §7 leg line") for leg, path in missing]
+    elif missing:
+        g_carriers += 1
+        where = f"predates {GUARDS_KEY} {guards_cut}" if guards_cut else f"{GUARDS_KEY} blank (arm off)"
+        near += [(f, "guards", f"{leg} <- {path}", where) for leg, path in missing]
+    # A path whose only guard matches are BROAD is EXCLUDED, and says so under --list, count and all.
+    for p in declared:
+        if any(load_design_lib().check_guard_trips(p, g) for _, gs in guarded for g in gs):
+            continue
+        hit = [g for g in broad if load_design_lib().check_guard_trips(p, g)]
+        if hit:
+            near.append((f, "guards", p, "matches only the broad guard(s) "
+                         + " ".join(f"{g} ({broad[g]} legs)" for g in hit)
+                         + ", excluded from the join"))
+    for path, line in CITE.findall(text):
+        if path not in files:
+            skipped += 1
+            continue
+        graded += 1
+        n = len((root / path).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n").splitlines())
+        if int(line) > n:
+            hits.append((f, "cite", f"{path}:{line}", f"file has {n} lines"))
+    # THE CLAIMS JOIN (TOOL-dGatedProse-2): every live spec, and no cutoff (owner, 2026-09-21).
+    runs, c_hits, c_clears = scan_claims(text)
+    c_runs += runs
+    c_specs += 1 if runs else 0
+    c_cleared += len(c_clears)
+    # The composite token keeps a `[path]` waiver on the bare string out of this join's key space
+    # in both directions, as the guards join's does (closing review, round 1, R1).
+    hits += [(f, "claims", f"claims <- {obj}", f"{cls} at line {line}, arm(s) {'+'.join(arms)} — "
+              + CLAIMS_WHY.format(cls=cls, cite=cite)) for line, obj, cls, arms, cite in c_hits]
+    near += [(f, "claims", f"claims <- {obj}", f"line {line}, arm(s) {'+'.join(arms)} — {why}")
+             for line, obj, arms, why in c_clears]
+    cv_hits, n, c, k = scan_arm_covers(f, text)
+    hits += cv_hits
+    cv_lines += n
+    cv_specs += 1 if n else 0
+    cv_carriers += c
+    cv_graded += k
+    # THE SOURCE JOIN (TOOL-dGroundRules-46): the acceptance section whole, fences included.
+    n = len(SOURCE_CMD.findall(extract_acceptance(text) or ""))
+    so_examined += n
+    so_specs += 1 if n else 0
+    so_hits = scan_bare_sources(text)
+    so_bare += len(so_hits)
+    hits += [(f, "source", op, SOURCE_WHY) for op in so_hits]
+    # THE AC-ORDER JOIN (TOOL-dSafePassage-41, the predicate of TOOL-dSafePassage-26 S45): a live
+    # spec dated at or after AC_ORDER_KEY lists its section 6 labels ascending, and the first label
+    # listed before a lower one is the finding (AC2 of `AC2, AC1`). A repeated label is no descent.
+    m = SPEC_DATE.search("/" + f)
+    if ac_order_cut and m and m.group(1) >= ac_order_cut:
+        ao_graded += 1
+        labs = [(int(x[2:].rstrip("abcdefghijklmnopqrstuvwxyz")), x[2:].lstrip("0123456789"), x)
+                for x in AC_LABEL.findall(extract_acceptance(text) or "")]
+        bad = next((a for a, b in zip(labs, labs[1:]) if b < a), None)
+        if bad:
+            ao_bad += 1
+            hits.append((f, "ac-order", f"ac-order <- {bad[2]}",
+                         f"section 6 lists {bad[2]} before a lower label; its criteria must ascend at/after "
+                         f"{AC_ORDER_KEY} {ac_order_cut}"))
+    return hits, near, {
+        "skipped": skipped, "graded": graded, "ungraded": ungraded, "noheading": noheading,
+        "bar_examined": bar_examined, "bar_specs": bar_specs, "bar_carriers": bar_carriers,
+        "g_examined": g_examined, "g_specs": g_specs, "g_carriers": g_carriers,
+        "g_nosubhead": g_nosubhead, "g_nogates": g_nogates,
+        "c_runs": c_runs, "c_specs": c_specs, "c_cleared": c_cleared,
+        "cv_lines": cv_lines, "cv_specs": cv_specs, "cv_carriers": cv_carriers, "cv_graded": cv_graded,
+        "so_examined": so_examined, "so_specs": so_specs, "so_bare": so_bare,
+        "ao_graded": ao_graded, "ao_bad": ao_bad}
+
+
 def main(argv):
     if "--input-key" in argv:   # TOOL-aLightenedLoop-3 S5: a query over a record, ahead of the spec walk
         ops = argv[argv.index("--input-key") + 1:]
@@ -2074,187 +2406,46 @@ def main(argv):
     if not troot:
         names = {f.rsplit("/", 1)[-1] for f in files}
         bare = ({pathlib.PurePosixPath(n).suffix for n in names} - {""}, names)
-    hits, skipped, graded, seen_waived = [], 0, 0, set()
-    ungraded, noheading = 0, 0
-    bar_examined, bar_specs, bar_carriers, near = 0, 0, 0, []
-    g_examined, g_specs, g_carriers, g_nosubhead, g_nogates = 0, 0, 0, 0, 0
-    c_runs, c_specs, c_cleared = 0, 0, 0
-    cv_lines, cv_specs, cv_carriers, cv_graded = 0, 0, 0, 0
-    so_examined, so_specs, so_bare = 0, 0, 0
-    ao_graded, ao_bad = 0, 0
+    ctx = {"legs": legs, "guarded": guarded, "broad": broad, "legs_path": LEGS, "flag_suites": flag_suites,
+           "legline_cut": legline_cut, "direct_cut": direct_cut, "guards_cut": guards_cut,
+           "ac_order_cut": ac_order_cut}
+    # THE INCREMENTAL MODE (TOOL-aPiecewiseGrade-1 S2): off under --spec and --pass-spec, and it prints
+    # nothing. It reads <cache> and writes the whole next generation to <cache>.next only.
+    cache = os.environ.get("SPEC_TOKENS_CACHE", "").rstrip("/" + os.sep) if named_specs is None else ""
+    if cache:
+        shutil.rmtree(cache + ".next", ignore_errors=True)
+        try:
+            os.makedirs(cache + ".next")
+            open(os.path.join(cache + ".next", "graded.list"), "w", encoding="utf-8").close()
+        except OSError:
+            pass
+        context = derive_spec_context(ctx)
+        names = {"files": files} if bare is None else {"files": files, "exts": bare[0], "names": bare[1]}
+        probe = {k: MemberProbe(k, v) for k, v in names.items()}
+        probe_bare = None if bare is None else (probe["exts"], probe["names"])
+    hits, near, seen_waived, totals = [], [], set(), collections.Counter()
     for f in specs:
-        text = (root / f).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
-        m = SPEC_DATE.search("/" + f)
-        armed = bool(direct_cut) and bool(m) and m.group(1) >= direct_cut
-        g_armed = bool(guards_cut) and bool(m) and m.group(1) >= guards_cut
-        named = set()                 # the manifest names the leg line contributes
-        pop_toks, bar_toks = [], []   # every graded-population token · the (token, reason) bar hits
-        gates = extract_gates(text)
-        if gates is None:
-            # No Gates heading at all. Silent by design, and counted apart from the section that
-            # exists and contributes nothing: the two silences have different remedies, so a single
-            # "ungraded" number would tell a reader to fix the wrong half.
-            noheading += 1
-            gates = ""
-        contributed = 0
-        for line in gates.splitlines():
-            if not LEG_LINE.match(line):
-                continue
-            for tok in TICK.findall(line):
-                pop_toks.append(tok)
-                # The bar test runs FIRST, on the raw token. NOT_A_TOKEN drops a `GATE_` prefix and
-                # NOT_A_LEG a `bash ` opener or a slash, and the motivating instruction carries all
-                # three; a bar token was never a leg, so it contributes nothing and continues.
-                why = check_bar(tok, flag_suites)
-                if why:
-                    bar_toks.append((tok, why))
-                    continue
-                if NOT_A_TOKEN.match(tok):
-                    continue
-                # A token that IS a manifest name resolves BEFORE the shape exclusions. Those
-                # exclusions exist to drop commands, conf keys and graded files out of the join, and
-                # they were written against tokens that are none of them — but a real leg name
-                # carrying a `/`, or opening with a command verb, was being discarded UNREAD, so a
-                # correct §7 contributed nothing and the spec looked like prose.
-                if tok not in legs and NOT_A_LEG.search(tok):
-                    continue
-                graded += 1
-                contributed += 1
-                if tok not in legs:
-                    hits.append((f, "leg", tok, f"not a name in {LEGS}"))
-                else:
-                    named.add(tok)
-        if not contributed and extract_gates(text) is not None:
-            ungraded += 1
-            if legline_cut:
-                m = SPEC_DATE.search("/" + f)
-                if m and m.group(1) >= legline_cut:
-                    hits.append((f, "legline", f,
-                                 "section 7 carries a Gates heading and contributes no leg name, "
-                                 f"required at/after {LEGLINE_KEY} {legline_cut}"))
-        for bullet in re.findall(r"^- .*(?:\n  .*)*", extract_acceptance(text) or "", re.M):
-            for tok in TICK.findall(bullet):
-                pop_toks.append(tok)
-                # First here too, and the paths join still runs over the token's words: a tracked
-                # runner path resolves either way, and the two joins answer different questions.
-                why = check_bar(tok, flag_suites)
-                if why:
-                    bar_toks.append((tok, why))
-                for word in tok.split():
-                    if check_path_shaped(word, files):
-                        graded += 1
-                        if word not in files:
-                            hits.append((f, "path", word, "not tracked by git ls-files"))
-                    elif bare is not None and check_bare_shaped(word, bare[0]):
-                        graded += 1
-                        if word not in bare[1]:
-                            hits.append((f, "path", word, "not tracked by git ls-files"))
-        if armed:
-            bar_specs += 1
-            bar_examined += len(pop_toks)
-            hits += [(f, "bar", tok, why) for tok, why in bar_toks]
-        elif bar_toks:
-            # Not graded, but COUNTED and listed: a skip that does not announce its size is
-            # indistinguishable from coverage, and the OFF state hides the most.
-            bar_carriers += 1
-            where = f"predates {DIRECT_KEY} {direct_cut}" if direct_cut else f"{DIRECT_KEY} blank (arm off)"
-            near += [(f, "bar", tok, where) for tok, _why in bar_toks]
-        graded_set = set(pop_toks)
-        near += [(f, "bar", tok, "outside the graded population")
-                 for tok in TICK.findall(text) if check_bar(tok, flag_suites) and tok not in graded_set]
-        # THE GUARDS JOIN (TOOL-aBlindedTrial-8): the declared write set against every guarded leg.
-        # One hit per MISSING leg, its token naming the first declared path that trips it — the
-        # composite keeps a `[leg]` waiver row keyed on the bare leg name from swallowing it.
-        touched = extract_files_touched(text, files)
-        if touched is None:
-            g_nosubhead += 1
-            touched = ([], [])
-        declared, roots = touched
-        # A one-segment ROOT under the sub-head declares nothing (round 2, R1), and says so.
-        near += [(f, "guards", p, "a one-segment root declares nothing, not joined - name the files or "
-                                  "a directory of two or more segments") for p in roots]
-        missing = []
-        # The legline arm's precondition, mirrored (R4): a spec with NO Gates heading is the light
-        # profile's legal shape and is not joined — counted, NOT examined, and every path it declares
-        # that would have tripped a joined guard is named as NEAR, so the skip has a size and a name
-        # (round 2, R8).
-        if declared and extract_gates(text) is None:
-            g_nogates += 1
-            near += [(f, "guards", p, "no Gates heading, not joined") for p in declared
-                     if any(load_design_lib().check_guard_trips(p, g) for _, gs in guarded for g in gs)]
-        elif extract_gates(text) is not None:
-            if g_armed:
-                g_specs += 1
-                g_examined += len(declared)
-            for leg, gs in guarded:
-                if leg in named:
-                    continue
-                path = next((p for p in declared if any(load_design_lib().check_guard_trips(p, g) for g in gs)), None)
-                if path is not None:
-                    missing.append((leg, path))
-        if g_armed:
-            hits += [(f, "guards", f"{leg} <- {path}",
-                      f"§4 files-touched names {path}, which trips the guard of leg {leg!r}, "
-                      "absent from the §7 leg line") for leg, path in missing]
-        elif missing:
-            g_carriers += 1
-            where = f"predates {GUARDS_KEY} {guards_cut}" if guards_cut else f"{GUARDS_KEY} blank (arm off)"
-            near += [(f, "guards", f"{leg} <- {path}", where) for leg, path in missing]
-        # A path whose only guard matches are BROAD is EXCLUDED, and says so under --list, count and all.
-        for p in declared:
-            if any(load_design_lib().check_guard_trips(p, g) for _, gs in guarded for g in gs):
-                continue
-            hit = [g for g in broad if load_design_lib().check_guard_trips(p, g)]
-            if hit:
-                near.append((f, "guards", p, "matches only the broad guard(s) "
-                             + " ".join(f"{g} ({broad[g]} legs)" for g in hit)
-                             + ", excluded from the join"))
-        for path, line in CITE.findall(text):
-            if path not in files:
-                skipped += 1
-                continue
-            graded += 1
-            n = len((root / path).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n").splitlines())
-            if int(line) > n:
-                hits.append((f, "cite", f"{path}:{line}", f"file has {n} lines"))
-        # THE CLAIMS JOIN (TOOL-dGatedProse-2): every live spec, and no cutoff (owner, 2026-09-21).
-        runs, c_hits, c_clears = scan_claims(text)
-        c_runs += runs
-        c_specs += 1 if runs else 0
-        c_cleared += len(c_clears)
-        # The composite token keeps a `[path]` waiver on the bare string out of this join's key space
-        # in both directions, as the guards join's does (closing review, round 1, R1).
-        hits += [(f, "claims", f"claims <- {obj}", f"{cls} at line {line}, arm(s) {'+'.join(arms)} — "
-                  + CLAIMS_WHY.format(cls=cls, cite=cite)) for line, obj, cls, arms, cite in c_hits]
-        near += [(f, "claims", f"claims <- {obj}", f"line {line}, arm(s) {'+'.join(arms)} — {why}")
-                 for line, obj, arms, why in c_clears]
-        cv_hits, n, c, k = scan_arm_covers(f, text)
-        hits += cv_hits
-        cv_lines += n
-        cv_specs += 1 if n else 0
-        cv_carriers += c
-        cv_graded += k
-        # THE SOURCE JOIN (TOOL-dGroundRules-46): the acceptance section whole, fences included.
-        n = len(SOURCE_CMD.findall(extract_acceptance(text) or ""))
-        so_examined += n
-        so_specs += 1 if n else 0
-        so_hits = scan_bare_sources(text)
-        so_bare += len(so_hits)
-        hits += [(f, "source", op, SOURCE_WHY) for op in so_hits]
-        # THE AC-ORDER JOIN (TOOL-dSafePassage-41, the predicate of TOOL-dSafePassage-26 S45): a live
-        # spec dated at or after AC_ORDER_KEY lists its section 6 labels ascending, and the first label
-        # listed before a lower one is the finding (AC2 of `AC2, AC1`). A repeated label is no descent.
-        m = SPEC_DATE.search("/" + f)
-        if ac_order_cut and m and m.group(1) >= ac_order_cut:
-            ao_graded += 1
-            labs = [(int(x[2:].rstrip("abcdefghijklmnopqrstuvwxyz")), x[2:].lstrip("0123456789"), x)
-                    for x in AC_LABEL.findall(extract_acceptance(text) or "")]
-            bad = next((a for a, b in zip(labs, labs[1:]) if b < a), None)
-            if bad:
-                ao_bad += 1
-                hits.append((f, "ac-order", f"ac-order <- {bad[2]}",
-                             f"section 6 lists {bad[2]} before a lower label; its criteria must ascend at/after "
-                             f"{AC_ORDER_KEY} {ac_order_cut}"))
+        got = read_spec_cache(cache, f, context, names) if cache else None
+        if got is None and cache:
+            INPUT_TRACE["segment"] = set()
+            try:
+                got = scan_live_spec(root, f, probe["files"], probe_bare, ctx)
+            finally:
+                segment, INPUT_TRACE["segment"] = INPUT_TRACE["segment"], None
+            write_spec_cache(cache, f, segment, got, context, names)
+        elif got is None:
+            got = scan_live_spec(root, f, files, bare, ctx)
+        hits += got[0]
+        near += got[1]
+        totals.update(got[2])
+    skipped, graded, ungraded, noheading = (totals[k] for k in ("skipped", "graded", "ungraded", "noheading"))
+    bar_examined, bar_specs, bar_carriers = (totals[k] for k in ("bar_examined", "bar_specs", "bar_carriers"))
+    g_examined, g_specs, g_carriers, g_nosubhead, g_nogates = (
+        totals[k] for k in ("g_examined", "g_specs", "g_carriers", "g_nosubhead", "g_nogates"))
+    c_runs, c_specs, c_cleared = (totals[k] for k in ("c_runs", "c_specs", "c_cleared"))
+    cv_lines, cv_specs, cv_carriers, cv_graded = (totals[k] for k in ("cv_lines", "cv_specs", "cv_carriers", "cv_graded"))
+    so_examined, so_specs, so_bare = (totals[k] for k in ("so_examined", "so_specs", "so_bare"))
+    ao_graded, ao_bad = totals["ao_graded"], totals["ao_bad"]
 
     # The seventh join, over a population the six above never build: one uid map over the live specs,
     # then one read per graded target. It is folded into `hits` before the waiver pass, so a handoff
