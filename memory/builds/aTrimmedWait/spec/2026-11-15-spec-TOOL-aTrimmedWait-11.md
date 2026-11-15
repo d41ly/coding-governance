@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-11 — close repair, inherited: the hygiene suite's partition arm sets aside check 26's cache-hit count
 
-**Status:** INPROGRESS · rev-3 · 2026-11-15 · node a · Tier-2 · base 846d51d3 · streams tooling · order 10 · ratified 2026-11-15
+**Status:** INPROGRESS · rev-4 · 2026-11-15 · node a · Tier-2 · base 846d51d3 · streams tooling · order 10 · ratified 2026-11-15
 
 <!-- gen:spec-records -->
 
@@ -9,8 +9,10 @@
 | [2026-11-15-prompt-TOOL-aTrimmedWait-11-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTrimmedWait-11-2-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-2-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTrimmedWait-11-3-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-3-spec-writer.md) | journal | — |
+| [2026-11-15-prompt-TOOL-aTrimmedWait-11-4-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-4-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTrimmedWait-11-promotion.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-promotion.md) | research | — |
 | [2026-11-15-prompt-TOOL-aTrimmedWait-11-revision-2.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-revision-2.md) | research | — |
+| [2026-11-15-prompt-TOOL-aTrimmedWait-11-revision-3.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-revision-3.md) | research | — |
 | [2026-11-15-prompt-TOOL-aTrimmedWait-11-revision.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-revision.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -142,16 +144,29 @@ carriage return in place on this node's bash 5.3 (Cygwin), run from a script fil
 
 | Assertion | Compares | Wants |
 |---|---|---|
-| cold equals warm | `"${_hs_c26[0]}"` (hits 0) with `"${_hs_c26[1]}"` (hits 4) | equal |
-| another field still counts | `"${_hs_c26[0]}"` with `"${_hs_c26[2]}"` (merges walked 8, hits 4) | unequal |
-| only check 26's line | `"${_hs_c26[0]/check 26/check 12}"` with `"${_hs_c26[1]/check 26/check 12}"` | unequal |
-| a recompute line is set aside | `"${_hs_c26[0]}"$'\n'"${_hs_c26[3]}"` (the `cache recomputed 1 (foreign inputs)` line) with `"${_hs_c26[0]}"` | `"${_hs_c26[3]}"` non-empty, and equal |
+| cold equals warm | `"${_hs_c26[0]-}"` (hits 0) with `"${_hs_c26[1]-}"` (hits 4) | equal |
+| another field still counts | `"${_hs_c26[0]-}"` with `"${_hs_c26[2]-}"` (merges walked 8, hits 4) | unequal |
+| only check 26's line | `"${_hs_c26[0]+${_hs_c26[0]/check 26/check 12}}"` with `"${_hs_c26[1]+${_hs_c26[1]/check 26/check 12}}"` | unequal |
+| a recompute line is set aside | `"${_hs_c26[0]-}"$'\n'"${_hs_c26[3]-}"` (the `cache recomputed 1 (foreign inputs)` line) with `"${_hs_c26[0]-}"` | `"${_hs_c26[3]-}"` non-empty, and equal |
 
 Each side goes through `derive_partition_lines`. The lines come from the producer, so a rename of
 the field or the prefix in `render_liveness` reds the first assertion, and a rename in
 `print_recomputed` reds the fourth, rather than leaving a `sed` expression to stop matching while
-the arm stays green. An empty render compares equal in the first assertion and reds the other
-three, the fourth by its non-empty test, so the arm cannot pass over nothing.
+the arm stays green.
+
+The suite runs under `set -u` (`tools/memory-tree/check-memory-hygiene.test.sh@0c6a20682257:14`),
+where a read of an unset element ends the whole suite with `unbound variable`: on this node's
+bash 5.3.9 (Cygwin), run from a script file, `"${a[0]}"` and `"${a[0]/check 26/check 12}"` over an
+empty `a` each printed `a[0]: unbound variable` and exited 1, observed 2026-11-15. So every read of
+an `_hs_c26` element takes an unset-safe form, and an unset element reads as empty: the default
+form `"${_hs_c26[N]-}"`, and in the third assertion
+`"${_hs_c26[N]+${_hs_c26[N]/check 26/check 12}}"`. Bash takes no `-` default and a `/` substitution
+in one expansion, and the `+` form expands its word only for a set element, so the substitution
+never reads an unset one. That form over an empty `a` printed an empty line and the script ran on,
+observed the same day. An empty render then compares equal in the first assertion and reds the
+other three, the fourth by its non-empty test. A short render leaves at least `_hs_c26[3]` unset,
+so it reds the fourth. Either way the suite runs on to its next arm, and the arm cannot pass over
+nothing.
 
 ### What it does not check
 
@@ -177,6 +192,15 @@ three, the fourth by its non-empty test, so the arm cannot pass over nothing.
 ### Files touched (estimate)
 
 - `tools/memory-tree/check-memory-hygiene.test.sh`
+- `memory/map/generated/`, the codebase map, re-rendered by the codebase map kit's
+  `gen_map.py --write` for the new function: its `symbols.json` lists the suite's shell functions.
+- `memory/builds/aTrimmedWait/build/`, for the unit's acceptance ledger, named as its siblings'
+  ledgers are.
+- `memory/builds/aTrimmedWait/README.md`, `memory/LIVE.md` and
+  `memory/builds/aTrimmedWait/spec/2026-11-15-spec-TOOL-aTrimmedWait-11.md`: the generated index
+  files check 9 asks for, re-rendered by the memory-tree kit's `gen_build_index.py --write`. They
+  are the three that `TOOL-aTrimmedWait-9`'s builder commit `057f26ba4` moved beside its ledger:
+  the build index region, the live-builds row, and the spec's status header and records region.
 
 ### Alternatives rejected
 
@@ -195,8 +219,10 @@ three, the fourth by its non-empty test, so the arm cannot pass over nothing.
 - perf / scale — One python spawn and eight function calls, about four forks each, for the fixture
   arm, and one more `sed` per side for the partition arm. The suite's worst reading is 808 s against
   its 1220 s row in `tools/run-gates/selftest-budgets.txt` <!-- PINNED 2026-11-15 -->.
-- error / empty / loading states — An empty render reds three of the fixture's four assertions,
-  §4 "The fixture arm".
+- error / empty / loading states — The suite runs under `set -u`, so every read of an `_hs_c26`
+  element takes an unset-safe form and an unset element reads as empty, rather than ending the
+  suite with `unbound variable`. An empty render reds three of the fixture's four assertions, a
+  short render the fourth at least, and the suite runs on, §4 "The fixture arm".
 - observability — The partition arm's `diff` prints the normalized sets, so a red names only lines
   that really differ.
 - risks — F1 is resolved for (B): a cache entry left under other declarations prints a
@@ -256,11 +282,12 @@ one foreign-inputs entry, observed 2026-11-15.
 
 ## 7. Gates
 
-`memory-hygiene self-test` · `shell hygiene (a fork spent on builtin work)` · `shell hygiene (a loop fed by a command substitution)` · `lexicon naming predicates`
+`memory-hygiene self-test` · `shell hygiene (a fork spent on builtin work)` · `shell hygiene (a loop fed by a command substitution)` · `lexicon naming predicates` · `recall floor` · `recall floor arms`
 
 The suite is the one this unit edits. The two shell hygiene legs grade the new pipeline and the
-`mapfile` read, and the lexicon leg grades the new function's name. The main loop runs the merge
-bar once, at the close. No leg is added.
+`mapfile` read, and the lexicon leg grades the new function's name. The two recall floor legs guard
+`memory/`, where the map, the ledger and the index files under "Files touched" sit. The main loop
+runs the merge bar once, at the close. No leg is added.
 
 New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC3 AC6 · the partition arm, moved: RED at `ff4242f8b` on a fresh clone, where the unscoped run reads `cache hits 0` and the scoped run `cache hits 4`, GREEN on a fresh clone of the builder's commit · none
 New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC2 AC4 · the fixture arm after the partition arm: RED with `derive_partition_lines` reduced to `printf '%s\n' "$1" | grep . | sort -u`, the pipeline at `ff4242f8b`, where the cold and warm lines compare unequal and the recompute line is kept · `FLOOR_ASSERTIONS` 745 to 749
@@ -289,6 +316,7 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC2 AC4 ·
 - rev-1 · 2026-11-15 · initial draft.
 - rev-2 · 2026-11-15 · §1 · §2 · §3 · §4 · §5 · AC1 · AC2 · AC4 · §7 · §8 · F1 resolved by the owner for (B): check 26's `cache recomputed` lines set aside on both sides, a fourth fixture assertion, the floor 745 to 749.
 - rev-3 · 2026-11-15 · S1 · §4 · S1 says the `cache recomputed` lines are set aside in the compare, which the pre-commit memory hygiene had read as a retirement. The fixture arm strips the carriage return through `_hs_cr`, since the array expansion's `%$'\r'` leaves it on this node's bash.
+- rev-4 · 2026-11-15 · §4 · §5 · §7 · the fixture arm's element reads take unset-safe forms, since the suite's `set -u` ended the suite on an unset read, the builder's DIVERGENCE of run `wf_0b836e97-5c0` ruled by the owner (2026-11-15-prompt-TOOL-aTrimmedWait-11-revision-3). "Files touched" adds the codebase map, the acceptance ledger and check 9's index files, and §7 names `recall floor` and `recall floor arms`, whose `memory/` guard those paths trip.
 
 ## 10. Reuse audit
 
