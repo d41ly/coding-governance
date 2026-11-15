@@ -2,7 +2,6 @@
 slug: aPiecewiseGrade
 node: a
 opened: 2026-11-15
-status: OPEN
 streams: tooling
 roster: TOOL
 ids: TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2
@@ -48,25 +47,31 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-11-15 · streams tooling
+**Build status:** SPECCED · 2 unit(s) · node a · opened 2026-11-15 · streams tooling
 ids TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aPiecewiseGrade-1 — the spec-token checker's incremental mode: each live spec's findings cached on its own inputs, every join rebuilt whole](spec/2026-11-15-spec-TOOL-aPiecewiseGrade-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-11-15 |
+| [TOOL-aPiecewiseGrade-2 — `run_spec_token_check` runs the checker's incremental mode on a whole-key miss, and promotes its per-spec cache only where the whole key is recorded](spec/2026-11-15-spec-TOOL-aPiecewiseGrade-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 1 record folder(s).
+Records: 2 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aPiecewiseGrade-1` | no |
+| 2 | `TOOL-aPiecewiseGrade-2` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
