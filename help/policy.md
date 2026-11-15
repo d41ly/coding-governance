@@ -295,8 +295,11 @@ graded too. A two-parent merge whose clean re-merge git computes owes the traile
 record itself for each key its result sets to a value other than that re-merge's, a key set back to
 one side's old value included, the trailer's old value the re-merge's, and is refused as the merge's
 own change when it lacks them. A merge equal to its re-merge, a clean merge of two sides' different
-keys say, owes nothing, since its sides' own commits are graded in the same push. Every other merge,
-an octopus merge or one whose re-merge conflicts or cannot be read, is graded against its parents,
+keys say, owes nothing, since its sides' own commits are graded in the same push. A merge whose
+clean re-merge's policy file does not parse, two sides declaring the same table apart say, is refused
+naming the merge and `does not parse at C`, never graded against its parents; one whose own file does
+not parse is refused naming `at M`. Every other merge, an octopus merge or one whose re-merge
+conflicts or cannot be read, is graded against its parents,
 with one line saying so: it owes for each key its result sets to a value no parent holds, the
 trailer's old value the first parent's. With no python launcher or no loop kit, the hook prints one
 line saying the check did not run.

@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-78 — the clean re-merge has three states, and a re-merge that lacks the policy file is graded, never treated as none
 
-**Status:** INPROGRESS · rev-7 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 19 · advances TOOL-dDeclaredLoop-35
+**Status:** CLOSED · rev-7 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 19 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-76-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-76-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-79 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-78-deviation-781.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-78-deviation-781.md) | deviation | — |
 | [2026-10-24-build-TOOL-dDeclaredLoop-78-deviation-782.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-78-deviation-782.md) | deviation | — |
+| [2026-11-15-build-TOOL-dDeclaredLoop-78-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-78-1-acceptance-ledger.md) | journal | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-78-deviation-783.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-78-deviation-783.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-76-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-76-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-79 |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-78-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-78-1-spec-writer.md) | journal | — |
