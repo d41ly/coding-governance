@@ -41,6 +41,9 @@ Cite ids, never line numbers.
 | [TOOL-aBranchedMandate-8](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | --preflight OVERWRITES a live non-terminal run-state file, losing the… |
 | [TOOL-aBranchedMandate-10](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | map_extractors.template.py unions the two JS scans with a bare +,… |
 | [TOOL-aBranchedMandate-11](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | govkit.py's blocked skip reason is unreachable behind cmd_apply's early… |
+| [TOOL-aBriskDeclaration-2](../builds/aBriskDeclaration/BACKLOG.md) | OPEN | MED | — | 2026-11-14 | THE RESOLVER REFUSAL'S PIN OUTLIVED ITS REASON. Arm A5 of… |
+| [TOOL-aBriskDeclaration-3](../builds/aBriskDeclaration/BACKLOG.md) | OPEN | LOW | — | 2026-11-14 | THE OLD ORDER STILL STATED ONE SENTENCE UP. The verbs guide's… |
+| [TOOL-aBriskDeclaration-4](../builds/aBriskDeclaration/BACKLOG.md) | OPEN | LOW | — | 2026-11-14 | NO PLANT FOR AN UNTERMINATED LAST LINE. order_verb_of's read loop sees… |
 | [TOOL-aBriskPreflight-8](../builds/aBriskPreflight/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | owner call: a read-only selector on tools/check-wiring.sh that skips… |
 | [TOOL-aBriskPreflight-9](../builds/aBriskPreflight/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | owner call: preflight reads the unattended kit's own hook wiring before… |
 | [TOOL-aBriskPreflight-13](../builds/aBriskPreflight/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite push-main self-test red at 9b743831 on the daily held… |
@@ -191,17 +194,7 @@ Cite ids, never line numbers.
 | [TOOL-aMeteredTurnstile-5](../builds/aMeteredTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | longest-first dispatch pessimises time-to-first-signal by construction:… |
 | [TOOL-aMeteredTurnstile-6](../builds/aMeteredTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | the bar did not get slower, PROCESS CREATION did: measured 2026-08-20… |
 | [TOOL-aNamedGesture-2](../builds/aNamedGesture/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | the kickoff manifest's last-audit stamp read 2026-08-26T10:10:00+03:00… |
-| [TOOL-aNimbleMend-16](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | INHERITED RED: THE GATE-GUARD SUITE'S TWO MANIFEST PARITY ARMS.… |
-| [TOOL-aNimbleMend-17](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | INHERITED RED: SEVEN CONTEXT ARMS OF THE SCRATCH-GUARD SUITE.… |
-| [TOOL-aNimbleMend-18](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | INHERITED RED: THE SPEC-TOKENS SUITE'S MANIFEST PARITY ARM.… |
-| [TOOL-aNimbleMend-19](../builds/aNimbleMend/BACKLOG.md) | OPEN | MED | — | 2026-11-13 | INHERITED RED: EIGHT LINES OF THE HYGIENE SELF-TEST.… |
-| [TOOL-aNimbleMend-20](../builds/aNimbleMend/BACKLOG.md) | OPEN | MED | — | 2026-11-13 | INHERITED RED: THIRTY-THREE WRONG ASSERTIONS OF THE POLICY FIXTURES… |
-| [TOOL-aNimbleMend-21](../builds/aNimbleMend/BACKLOG.md) | OPEN | MED | — | 2026-11-13 | THE HYGIENE GATE PRINTS AN UNBOUND-VARIABLE ERROR UNDER --staged. Every… |
-| [TOOL-aNimbleMend-22](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | FOUR SUITES RAN PAST THEIR DECLARED COST BUDGETS AT THIS BUILD'S CLOSE.… |
-| [TOOL-aNimbleMend-23](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | A Red-fix: COMMIT THAT TOUCHES NO PATH CAN NEVER BE RECORDED. The door… |
-| [TOOL-aNimbleMend-24](../builds/aNimbleMend/BACKLOG.md) | OPEN | MED | — | 2026-11-13 | OWNER CALL: TWO SENTENCES ABOUT THE LANE THAT ONLY THE OWNER MAY… |
-| [TOOL-aNimbleMend-25](../builds/aNimbleMend/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | inherited red: leg shell hygiene (a fork spent on builtin work) red at… |
-| [TOOL-aNimbleMend-26](../builds/aNimbleMend/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | inherited red: leg spawn budget (forks per hot entrypoint) red at… |
+| [TOOL-aNimbleMend-22](../builds/aNimbleMend/BACKLOG.md) | DEFERRED | LOW | TOOL-aClearedLedger-10 | 2026-11-13 | FOUR SUITES RAN PAST THEIR DECLARED COST BUDGETS AT THIS BUILD'S CLOSE.… |
 | [TOOL-aNimbleMend-28](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | THREE SUITES' FORK-IDIOM ROWS WERE RE-DECLARED UPWARD, NOT DRAINED.… |
 | [TOOL-aNumeralWarden-2](../builds/aNumeralWarden/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | agent-cap's enclosing-opener walk is defeated by two nested wrappers or… |
 | [TOOL-aNumeralWarden-3](../builds/aNumeralWarden/BACKLOG.md) | OPEN | — | — | 2026-08-10 | a drift-audit pin RAISE is indistinguishable from a population drain to… |

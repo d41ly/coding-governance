@@ -1,11 +1,12 @@
 # TOOL-aLightenedLoop-8 — the reconcile with origin/main: the merge, and unit 3's input-keyed spec-token cache carried onto the check's start and read halves
 
-**Status:** INPROGRESS · rev-1 · 2026-11-15 · node a · Tier-2 · base aebbb4a7 · streams tooling · order 8
+**Status:** CLOSED · rev-1 · 2026-11-15 · node a · Tier-2 · base aebbb4a7 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-15-build-TOOL-aLightenedLoop-8-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aLightenedLoop-8-1-acceptance-ledger.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aLightenedLoop-8-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aLightenedLoop-8-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aLightenedLoop-8-reconcile.md](../prompts/2026-11-15-prompt-TOOL-aLightenedLoop-8-reconcile.md) | research | — |
 

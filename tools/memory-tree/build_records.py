@@ -46,8 +46,12 @@ trailer or none naming `--leg`, and an empty text flag. `build_records.py join r
 `check_red_fix_join`: exit 0 clean, 1 on a finding, 2 where git or the tracked population cannot be read,
 its last line a summary. A fix at HEAD with no record is printed as owed, since its record is the next
 commit; `--staged` grades HEAD alone and refuses that same fix, so the commit after a fix is its record's.
-NOT CHECKED: that the record is the fix's direct child, that `Rerun` or `Red line` is true, or that the leg
-was red. `--fixture --plant red-fix-join` stages the door's refusals and each finding.
+A PATH-LESS trailer commit, an empty commit or any merge, whose paths the join's one log pass reads empty,
+owes no record (TOOL-aClearedLedger-9): the door refuses it saying so, and the join holds it out of the fix
+count, prints one `path-less` line per trailer value and counts such commits last on the summary.
+NOT CHECKED: that the record is the fix's direct child, that `Rerun` or `Red line` is true, that the leg
+was red, or whether a merge's resolution changed a file. `--fixture --plant red-fix-join` stages the door's
+refusals, the path-less cases and each finding.
 
 ONE LINE PER VALUE, at the one writer (PLAY-dOrderedCharter-49 S53): `write_record` refuses a field value
 holding a CR or an LF, or opening `**<Word>:**`, before it writes anything, so no door's value forges a
@@ -408,7 +412,7 @@ def write_red_fix(root, build, unit, leg, red_line, commit, rerun, today=None):
         raise ValueError(f"--leg {leg!r} is no `{RED_FIX_TRAILER}:` trailer value of {sha[:8]}, whose legs are: "
                          + " · ".join(fix["red_fix"]))
     if not fix["paths"]:
-        raise ValueError(f"commit {sha[:8]} touches no path, so it has no `Files` to record")
+        raise ValueError(f"commit {sha[:8]} touches no path, so it owes no red-fix record and the join asks none")
     fields = [("Leg", leg), ("Red line", red_line), ("Files", ", ".join(sorted(fix["paths"]))), ("Commit", sha),
               ("Rerun", rerun), ("Caused-by", unit)]
     return write_record(root, build, unit, "red-fix", f"{leg} fixed in {sha[:8]}", fields, today)
@@ -425,7 +429,13 @@ def check_red_fix_join(root, staged=False):
     `read_record`. A value at HEAD with no record is printed as owed and is no finding. `staged` reads HEAD
     alone: an unanswered value there is J1, J2 is not graded since the population is one commit, and a HEAD
     with no trailer is held. Exit 2 where git fails or the tracked population cannot be read; a repository
-    with no commit holds an empty population."""
+    with no commit holds an empty population.
+
+    PATH-LESS (TOOL-aClearedLedger-9): a trailer commit whose `paths` is empty in the one log pass, an empty
+    commit or any merge, owes no record. It is outside the fix set, so it raises no J1 at any depth and a
+    record naming it is J2; each of its trailer values is printed on a `path-less` line and the summary
+    counts such commits last. NOT CHECKED: whether a merge's resolution changed a file, or whether a
+    path-less commit should carry the trailer at all."""
     import routed_commits                  # noqa: E402  imported here so no cycle forms at load
     from design_lib import DesignRefusal   # noqa: E402
     try:
@@ -435,11 +445,15 @@ def check_red_fix_join(root, staged=False):
     except (routed_commits.Refusal, DesignRefusal, OSError, ValueError) as exc:
         return 2, [f"{SAY_JOIN} · refused · {exc}"]
     head = commits[0]["sha"] if commits else None
-    fixes = {c["sha"]: list(dict.fromkeys(c["red_fix"])) for c in commits if c["red_fix"]}
-    paths = {c["sha"]: ", ".join(sorted(c["paths"])) for c in commits if c["red_fix"]}
-    if staged and not fixes:
+    trailed = {c["sha"]: list(dict.fromkeys(c["red_fix"])) for c in commits if c["red_fix"]}
+    paths = {c["sha"]: ", ".join(sorted(c["paths"])) for c in commits if c["red_fix"] and c["paths"]}
+    fixes = {sha: legs for sha, legs in trailed.items() if sha in paths}   # the commits that owe a record
+    bare = {sha: legs for sha, legs in trailed.items() if sha not in paths}
+    if staged and not trailed:
         return 0, [f"{SAY_JOIN} · held under --staged · HEAD carries no `{RED_FIX_TRAILER}:` trailer"]
-    found, said, answers, owed = [], [], {}, 0
+    found, answers, owed = [], {}, 0
+    said = [f"{SAY_JOIN} · path-less · {sha[:8]} · {leg} · touches no path, so it owes no record"
+            for sha, legs in bare.items() for leg in legs]
     for r in records:
         if r["malformed"]:
             found += [f"J6 · {r['path']} · {key} {why}" for key, why in r["malformed"]]
@@ -467,7 +481,8 @@ def check_red_fix_join(root, staged=False):
         else:
             found.append(f"J1 · {sha[:8]} · {leg} · the fix commit has no red-fix record")
     lines = [f"{SAY_JOIN} · {f}" for f in found] + said
-    lines.append(f"{SAY_JOIN} · {len(fixes)} fix commit(s) · {len(records)} record(s) · {owed} owed")
+    lines.append(f"{SAY_JOIN} · {len(fixes)} fix commit(s) · {len(records)} record(s) · {owed} owed · "
+                 f"{len(bare)} path-less")
     return (1 if found else 0), lines
 
 
@@ -619,10 +634,10 @@ def run_fixture(plant):
                                         "--root", str(root), *flags], capture_output=True, text=True, encoding="utf-8")
                     return p.returncode, (p.stdout + p.stderr).strip()
 
-                def write_commit(subject, *trailers):
+                def write_commit(subject, *trailers, verb=("commit", "-q")):
                     run_git("add", "-A")
                     run_git("-c", "user.name=fx", "-c", "user.email=fx@example.invalid", "-c", "commit.gpgsign=false",
-                            "commit", "-qm", subject, *(x for t in trailers for x in ("-m", t)))
+                            *verb, "-m", subject, *(x for t in trailers for x in ("-m", t)))
                     return run_git("rev-parse", "HEAD").strip()
 
                 def check_case(case, got, rc, *needles):
@@ -652,18 +667,35 @@ def run_fixture(plant):
                     check_case("staged, recorded at HEAD", run_join("--staged"), 0, "1 fix commit(s)")
                     plain = write_commit("the record")
                     check_case("clean", run_join(), 0, "1 fix commit(s) · 1 record(s) · 0 owed")
-                    for case, flags in (("a commit with no trailer", door + ["--commit", plain[:8]]),
-                                        ("a --leg no trailer names", ["--leg", "another leg", *door[2:], "--commit", fix[:8]]),
-                                        ("a rev that names no commit", door + ["--commit", "no-such-rev"])):
+                    # TOOL-aClearedLedger-9 S5: a path-less fix commit owes no record, at HEAD and below it
+                    bare = write_commit("an empty fix", f"{RED_FIX_TRAILER}: {leg}", verb=("commit", "-q", "--allow-empty"))
+                    check_case("path-less at HEAD", run_join(), 0, "path-less", bare[:8], leg)
+                    check_case("staged, path-less at HEAD", run_join("--staged"), 0, "path-less", bare[:8], leg)
+                    for case, flags, why in (
+                            ("a commit with no trailer", door + ["--commit", plain[:8]], ""),
+                            ("a --leg no trailer names", ["--leg", "another leg", *door[2:], "--commit", fix[:8]], ""),
+                            ("a rev that names no commit", door + ["--commit", "no-such-rev"], ""),
+                            ("a commit that touches no path", door + ["--commit", bare[:8]], "owes no red-fix record")):
                         rc, said = run_door(root, "red-fix", unit, flags)
                         held = len(list(folder.glob("*-red-fix-*.md")))
                         cases[0] += 1
-                        if rc != 1 or held != 1:
-                            bad.append(f"refusal, {case}: exited {rc}, not 1, with {held} record(s), not 1: {said.strip()[:200]}")
+                        if rc != 1 or held != 1 or why not in said:
+                            bad.append(f"refusal, {case}: exited {rc}, not 1, with {held} record(s), not 1"
+                                       f"{', saying ' + why if why else ''}: {said.strip()[:200]}")
                         print(f"build-records: {plant} · refusal · {case} · exit {rc} · {held} record(s)")
+                    run_git("checkout", "-q", "-b", "side")
+                    (root / "side.txt").write_text("a side branch\n", encoding="utf-8")
+                    write_commit("a side commit")
+                    run_git("checkout", "-q", "main")
+                    write_commit("a merge carrying the trailer", f"{RED_FIX_TRAILER}: {leg}",
+                                 verb=("merge", "-q", "--no-ff", "side"))
+                    (root / "after.txt").write_text("one commit on the merge\n", encoding="utf-8")
+                    write_commit("one commit on two path-less fixes")
+                    check_case("path-less below HEAD", run_join(), 0, "0 owed · 2 path-less")
                     text = (root / rel).read_bytes().decode("utf-8")
                     twin = rel.replace("-red-fix-1.md", "-red-fix-2.md")
                     for case, old, new, needles in (
+                            ("J2, a record naming a path-less commit", fix, bare, (rel, bare)),
                             ("J4", "- **Files:** .memory-tree.conf, ", "- **Files:** ", (rel,)),
                             ("J3", f"- **Leg:** {leg}", "- **Leg:** another leg", (rel, leg)),
                             ("J2", fix, "0" * 40, (rel, "0" * 40)),
@@ -674,7 +706,7 @@ def run_fixture(plant):
                         with open(root / (rel if old is not None else twin), "w", encoding="utf-8", newline="\n") as fh:
                             fh.write(text.replace(old, new) if old is not None else text)
                         run_git("add", "-A")
-                        check_case(case, run_join(), 1, f"· {case} ·", *needles)
+                        check_case(case, run_join(), 1, f"· {case[:2]} ·", *needles)
                         if old is None:
                             run_git("rm", "-qf", "--", twin)
                         with open(root / rel, "w", encoding="utf-8", newline="\n") as fh:
@@ -687,8 +719,8 @@ def run_fixture(plant):
                 for why in bad:
                     print(f"build-records: FAIL {plant} · {why}")
                 if not bad:
-                    print(f"build-records: PASS {plant} — {cases[0]} cases: the door, its refusals, owed, --staged "
-                          f"and J1 to J6")
+                    print(f"build-records: PASS {plant} — {cases[0]} cases: the door, its refusals, owed, --staged, "
+                          f"path-less and J1 to J6")
                 return 1 if bad else 0
             try:
                 read_override_value(root)

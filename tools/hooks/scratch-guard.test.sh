@@ -1537,6 +1537,11 @@ check_ctx() {
   else echo "FAIL $name ($bad)"; sed 's/^/     /' "$TMP/ctx" | head -12; fail=$((fail+1)); fi
 }
 : > "$TMP/ctx-all"
+# The session tree holds NO card file from here to the S-AC8 block: the AC10 arm runs the live
+# writer in this worktree, and since PLAY-dOrderedCharter-8 the writer renders one, which
+# renderRouteContext would wrap around every context below.
+SG_CF="$SG_TOP_WT/.claude/orientation-card.md"
+rm -f "$SG_CF"
 SG_RP_SHOWN="$SGP/ app.md"   # the conf's ROUTED_PATHS value as write_conf wrote it
 
 # ---- AC1: a routed card's lines byte-identical, each unit's verdict, and ROUTED_PATHS ------------
@@ -1641,7 +1646,6 @@ esac
 # lines open and close the text, which is otherwise byte-identical; within the cap on the padded route;
 # and with the file gone, the text is the bare one again. The lines are planted here, so a hook typing
 # its own envelope reds the first arm.
-SG_CF="$SG_TOP_WT/.claude/orientation-card.md"
 SG_CF_OPEN='[.claude/orientation-card.md · Level 1 · a fixture direction]'
 run_sub "S-AC8 setup: the bare context with no card file" json session_id=sgtest-r1 "cwd=$SG_CWD_WT"
 cp "$TMP/ctx" "$TMP/ctx-bare"

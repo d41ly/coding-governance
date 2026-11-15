@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.161 -->
+<!-- gov:kit memory-tree@2.162 -->
 [memory/HYGIENE.md · Level 3 · Read before writing any record, index or id under the memory root; yields to levels 0 to 2]
 # memory/ retention & hygiene
 
@@ -629,8 +629,13 @@ imported, and with a pin set and the file absent the failure is NAMED, not a tra
     record's, and a HEAD with no trailer prints a held line. Delegated to `build_records.py join
     red-fix`, whose summary line, the commits and records it read, is printed on every green run; a
     join that cannot read git or the tracked records fails as well (`TOOL-aNimbleMend-9`).
+    A path-less trailer commit, an empty commit or any merge, whose paths the join's log pass reads
+    empty, owes no record: it is outside the fix count and raises no J1 at any depth, a record naming
+    it is J2, and the join prints a `path-less` line per trailer value and counts such commits last on
+    its summary line, so a path-less HEAD passes under `--staged` too (`TOOL-aClearedLedger-9`).
     NOT GRADED: that the record is the fix's direct child on a full run, a clone with no pre-commit
-    hook having no promptness check at all; that `Rerun` or `Red line` is true; that the leg was red.
+    hook having no promptness check at all; that `Rerun` or `Red line` is true; that the leg was red;
+    whether a merge's resolution changed a file, or whether a path-less commit should carry the trailer.
 
 ## Record bindings — how a record names its spec
 
@@ -717,7 +722,9 @@ paths, sorted, joined by a comma and a space), Commit (the fix commit's full 40-
 command that showed the leg green, and its result) and Caused-by (one id). Write it through the door,
 `build_records.py new red-fix --build <slug> --unit <id> --leg <leg name> --red-line <line> --commit
 <rev> --rerun <command and result>`, which derives Files and Commit from the commit and refuses a
-commit carrying no trailer naming that leg. Check 31 joins every such commit to its record.
+commit carrying no trailer naming that leg. Check 31 joins every such commit to its record. A path-less
+commit carrying the trailer, an empty commit or any merge, owes no red-fix record: its `Files` would be
+the change it accounts for and it holds none, so the door refuses it saying so and check 31 asks none.
 
 ## Acceptance ledger — how a built unit evidences its criteria
 

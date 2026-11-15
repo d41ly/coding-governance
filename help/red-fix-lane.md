@@ -119,18 +119,35 @@ The door refuses, writing nothing, a rev that names no commit reachable from `HE
 no `Red-fix:` trailer or none naming `--leg`, and an empty text flag. The record is the next
 commit after the fix.
 
+A path-less commit owes no record. An empty commit and any merge are path-less: the join reads
+neither as touching a path, whatever a merge's resolution changed. The record's `Files` is the
+change it accounts for, and such a commit holds none. The door refuses it and says why:
+
+```text
+commit <sha8> touches no path, so it owes no red-fix record and the join asks none
+```
+
 `python tools/memory-tree/build_records.py join red-fix` joins every `Red-fix:` commit reachable <!-- usage: script:tools/memory-tree/build_records.py#join 90d1c185 -->
 from `HEAD` to its record, both ways. It exits 0 clean, 1 on a finding and 2 where git or the
 records cannot be read, and its last line is the summary:
 
 ```text
-build-records: red-fix join · <n> fix commit(s) · <n> record(s) · <n> owed
+build-records: red-fix join · <n> fix commit(s) · <n> record(s) · <n> owed · <n> path-less
+```
+
+The fix count is the commits that owe a record. A path-less commit is outside it: the join raises
+no finding for it at any depth, counts it in the last field, and names it on every run, one line
+per trailer value. A record whose `Commit` names a path-less commit is a finding, `J2`.
+
+```text
+build-records: red-fix join · path-less · <sha8> · <leg> · touches no path, so it owes no record
 ```
 
 A fix at `HEAD` with no record is printed as `owed` and is no finding, because its record is the
 next commit. With `--staged` the join grades `HEAD` alone and refuses that same fix, so the commit
-after a fix is its record's. The memory hygiene leg runs the join as its check 31, "a red fix has
-its record".
+after a fix is its record's. A path-less `HEAD` passes there, so the next commit is not held for a
+record no door writes. The memory hygiene leg runs the join as its check 31, "a red fix has its
+record".
 
 That refusal is the pre-commit hook's. The hook runs the staged hygiene leg where the commit stages
 a path under the memory root, and `build_records.py join red-fix --staged` by itself where it
@@ -179,6 +196,7 @@ With the key `off` both still print, and both can still red.
 - The limits do not see whether the change is a fix, a new surface made inside an existing file, a
   deleted path, a record outside `spec/`, or a guarded list the fix commit itself shortened.
 - The join does not check that the record is the fix's direct child, that `Rerun` or `Red line` is
-  true, or that the leg was red.
+  true, or that the leg was red. Nor whether a merge's resolution changed a file, or whether a
+  path-less commit should carry the trailer at all: nothing refuses it at commit time.
 - A leg manifest moved since a `Red-fix:` commit is looked for at the path `HEAD`'s conf names, and
   reads as absent.

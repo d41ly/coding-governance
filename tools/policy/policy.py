@@ -60,7 +60,7 @@ import tomllib
 from collections import namedtuple
 from pathlib import Path
 
-KIT_POLICY_VERSION = "1.6"
+KIT_POLICY_VERSION = "1.7"
 KIT = Path(__file__).resolve().parent
 CATALOGUE = "catalogue.toml"
 POLICY_REL = ".governance/policy.toml"
