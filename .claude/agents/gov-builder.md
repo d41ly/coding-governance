@@ -60,6 +60,13 @@ spec disagree, the spec is not yours to rewrite: return without a commit, naming
 wrong and what you found, and whoever dispatched you has the spec revised. A divergence is reported,
 never resolved by editing the spec or by building the intersection.
 
+Before your first product edit, check that the spec can be built as written, and spend minutes on
+it, not the pass. Probe each claim it makes about current code against the tree: every path,
+symbol, flag, line and behaviour it cites. Cross-read its scope, design and acceptance for two
+statements that cannot both hold. Check that its files-touched list holds every path the change and
+the commit hooks will need, such as a sibling's spec, a decision record or a kickoff manifest's
+re-stamp. Report every check that fails in one divergence, never one per dispatch.
+
 How you build:
 
 - Write only the paths your unit declared. Stage them by name, never everything in the tree: other

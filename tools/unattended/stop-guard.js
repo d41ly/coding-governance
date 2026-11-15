@@ -3,7 +3,7 @@
  * stop-guard — a `Stop` hook that refuses the turn end of a session bound to a non-terminal
  * unattended run, and continues the conversation with the absent-owner instruction instead.
  *
- * gov:kit unattended@1.123 — a courtesy marker; the kit version gate pairs the four named `.sh`
+ * gov:kit unattended@1.124 — a courtesy marker; the kit version gate pairs the four named `.sh`
  * carriers and every `*.template.md`, and does not read this one.
  *
  * Contract: the spec for TOOL-aWokenSentinel-3 under the build folder of that slug.
@@ -37,8 +37,18 @@
  *   verdict FINISHED-UNSTAMPED    BLOCK   `landing-unstamped` — the one act left is `--landed`
  *   otherwise                     BLOCK   `run-open`
  * The verdict comes from `bash <this dir>/unattended.sh --liveness <slug>`, run with cwd at the
- * repo root and bounded at LIVENESS_BOUND_MS; this hook reads no mtime, transcript or git of its
- * own. `stop_hook_active` changes nothing but the reason text, which says so.
+ * repo root and bounded at LIVENESS_BOUND_MS. `stop_hook_active` changes nothing but the reason
+ * text, which says so.
+ *
+ * THE LIVENESS CACHE (TOOL-aLightenedLoop-5). The driver's stdout is kept in
+ * `<git-dir>/unattended/liveness.<slug>.json` under a sha256 of every input its verdict reads but
+ * the clock and the moves: the session, the run-state file, HEAD, `git show-ref --head` (this
+ * hook's one git spawn), the common dir's landed log, the conf, the git config and the driver's
+ * own two files. A stored LIVE expires before a fresh read could say STALE; STALE and any failed
+ * read are never stored. A cache hit does not reproduce a probe fault: while an entry is valid, a
+ * stop is served the last good verdict where a dead or slow driver would have allowed with
+ * `liveness-unreadable`. `STOP_GUARD_LIVENESS_CACHE=off` in the hook's environment restores the
+ * fresh read on every stop, reading and writing no cache file.
  *
  * WHY `landing-unstamped` BLOCKS. `--landed` runs after the lander, so its refusals fire when the
  * witness is already on `origin/<default>` and `--liveness` reads FINISHED-UNSTAMPED; each refusal
@@ -79,7 +89,9 @@
  */
 'use strict'
 
+const fs = require('fs')
 const path = require('path')
+const crypto = require('crypto')
 const { spawnSync } = require('child_process')
 const lease = require(path.join(__dirname, 'run-lease.js'))
 
@@ -112,6 +124,102 @@ function runLiveness(kitDir, root, slug) {
                       { cwd: root, encoding: 'utf8', timeout: bound, killSignal: 'SIGKILL',
                         stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true })
   return { stdout: r.stdout || '', ok: !r.error && r.status === 0 }
+}
+
+/**
+ * The hex sha256 over every input the driver's verdict reads but the clock and the moves (spec
+ * TOOL-aLightenedLoop-5 §4 "The key"), each part written `<name>\0<value>\0`; null when the ref
+ * listing cannot be read or a file that exists cannot be read. An absent file is the value
+ * `absent`. `--git-dir` is explicit so git never walks up from the payload's cwd: a fixture whose
+ * `.git` holds only HEAD fails `show-ref`, and the hook keeps today's spawn there.
+ */
+function deriveLivenessKey(repo, kitDir, record, slug, sessionId) {
+  const readBytes = (file) => {
+    try { return fs.readFileSync(file) } catch (e) {
+      if (e && e.code === 'ENOENT') return Buffer.from('absent')
+      throw e
+    }
+  }
+  const refs = spawnSync('git', ['--git-dir=' + repo.gitDir, 'show-ref', '--head'],
+                         { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], windowsHide: true })
+  if (refs.error || refs.status !== 0) return null
+  let commonDir = repo.gitDir
+  try {
+    commonDir = path.resolve(repo.gitDir, fs.readFileSync(path.join(repo.gitDir, 'commondir'), 'utf8').trim())
+  } catch { /* no commondir file: the git dir is its own common dir */ }
+  try {
+    const parts = [
+      ['session', Buffer.from(sessionId)],
+      ['record', readBytes(path.join(repo.root, record))],
+      ['head', readBytes(path.join(repo.gitDir, 'HEAD'))],
+      ['refs', Buffer.from(refs.stdout)],
+      ['landed', readBytes(path.join(commonDir, lease.SIDECAR_DIRNAME, 'landed.' + slug + '.log'))],
+      ['conf', readBytes(path.join(repo.root, lease.CONF_BASENAME))],
+      ['config', Buffer.concat([readBytes(path.join(commonDir, 'config')),
+                                readBytes(path.join(repo.gitDir, 'config.worktree'))])],
+      ['driver', Buffer.concat([readBytes(path.join(kitDir, 'unattended.sh')),
+                                readBytes(path.join(kitDir, 'lib-unattended.sh'))])],
+    ]
+    const h = crypto.createHash('sha256')
+    for (const [name, value] of parts) h.update(Buffer.concat([Buffer.from(name + '\0'), value, Buffer.from('\0')]))
+    return h.digest('hex')
+  } catch {
+    return null
+  }
+}
+
+/**
+ * `runLiveness`'s `{stdout, ok}` for lease `l`, served from `liveness.<slug>.json` when its key
+ * equals the derived one and, for LIVE, a fresh read could not yet say STALE: the deadline is
+ * `t0 - last-move + stale-bound`, and a hit at second `t` needs `t + W + 1 <= deadline`, `W` the
+ * bound in whole seconds rounded up. A miss spawns and stores a zero-exit, parseable, non-STALE
+ * read, a LIVE one only with digit `last-move` and `stale-bound`. Every cache failure is a miss or
+ * a skipped store, silently. `STOP_GUARD_LIVENESS_CACHE=off` is today's spawn and nothing else.
+ */
+function readLiveness(kitDir, repo, l, sessionId) {
+  if (process.env.STOP_GUARD_LIVENESS_CACHE === 'off') return runLiveness(kitDir, repo.root, l.slug)
+  const key = deriveLivenessKey(repo, kitDir, l.record, l.slug, sessionId)
+  if (!key) return runLiveness(kitDir, repo.root, l.slug)
+  const file = path.join(repo.gitDir, lease.SIDECAR_DIRNAME, 'liveness.' + l.slug + '.json')
+  // The hook's own bound, as runLiveness reads it, in whole seconds rounded up.
+  const bound = Number(process.env.STOP_GUARD_LIVENESS_BOUND_MS) > 0
+    ? Number(process.env.STOP_GUARD_LIVENESS_BOUND_MS) : LIVENESS_BOUND_MS
+  const wait = Math.ceil(bound / 1000)
+  try {
+    const entry = JSON.parse(fs.readFileSync(file, 'utf8'))
+    if (entry && entry.key === key && typeof entry.stdout === 'string') {
+      const stored = parseLiveness(entry.stdout)
+      const now = Math.floor(Date.now() / 1000)
+      if (stored && (stored.verdict !== 'LIVE' ||
+                     (typeof entry.deadline === 'number' && now + wait + 1 <= entry.deadline))) {
+        return { stdout: entry.stdout, ok: true }
+      }
+    }
+  } catch { /* absent, torn or unreadable: a miss */ }
+  const t0 = Math.floor(Date.now() / 1000)
+  const run = runLiveness(kitDir, repo.root, l.slug)
+  const fresh = run.ok ? parseLiveness(run.stdout) : null
+  if (!fresh || fresh.verdict === 'STALE') return run
+  let deadline = null
+  if (fresh.verdict === 'LIVE') {
+    const readDigits = (k) => {
+      const m = new RegExp('^' + k + ':[ \\t]*([0-9]+)\\r?$', 'm').exec(run.stdout)
+      return m ? Number(m[1]) : null
+    }
+    const lastMove = readDigits('last-move')
+    const staleBound = readDigits('stale-bound')
+    if (lastMove === null || staleBound === null) return run
+    deadline = t0 - lastMove + staleBound
+  }
+  const tmp = file + '.' + process.pid + '.tmp'
+  try {
+    fs.mkdirSync(path.dirname(file), { recursive: true })
+    fs.writeFileSync(tmp, JSON.stringify({ key, stdout: run.stdout, deadline }), 'utf8')
+    fs.renameSync(tmp, file)
+  } catch {
+    try { fs.unlinkSync(tmp) } catch { /* nothing was written */ }
+  }
+  return run
 }
 
 /** `{verdict, phase}` from the driver's `key: value` lines; null when no `verdict:` line exists. */
@@ -220,7 +328,7 @@ function checkSession(data, sessionId) {
   // them is read whole, and the first that is open is the one named.
   for (const l of leases) {
     const sidecar = lease.deriveSidecarPath(repo.gitDir, 'stop', l.slug)
-    const run = runLiveness(__dirname, repo.root, l.slug)
+    const run = readLiveness(__dirname, repo, l, sessionId)
     const liveness = run.ok ? parseLiveness(run.stdout) : null
     const before = measureBlocks(sidecar, sessionId)
     const verdict = checkStop(liveness, tasks, knob, before)
@@ -247,6 +355,6 @@ function checkSession(data, sessionId) {
 
 if (require.main === module) main()
 module.exports = {
-  runLiveness, parseLiveness, measureBlocks, checkStop, renderBlock, checkSession, main,
+  runLiveness, deriveLivenessKey, readLiveness, parseLiveness, measureBlocks, checkStop, renderBlock, checkSession, main,
   KIT_STOP_GUARD_VERSION, BLOCKS_DEFAULT, HARNESS_CONSECUTIVE_CAP, LIVENESS_BOUND_MS, REASONS, KNOB,
 }

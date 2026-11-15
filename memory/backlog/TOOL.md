@@ -357,6 +357,12 @@ Cite ids, never line numbers.
 | [TOOL-aTracedSpawn-3](../builds/aTracedSpawn/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THE SHARD-2 FAILURE COUNT AFTER THE FIXTURE-HEADING FIX IS UNMEASURED,… |
 | [TOOL-aTrimmedHook-8](../builds/aTrimmedHook/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | after this build a one-file RUN.md commit's .githooks/pre-commit still… |
 | [TOOL-aTrimmedHook-17](../builds/aTrimmedHook/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite process-monitor census selftest red at 37200355 on the… |
+| [TOOL-aTwinnedPass-6](../builds/aTwinnedPass/BACKLOG.md) | OPEN | MED | — | 2026-11-15 | THE CLOSING REVIEW'S ROUND 2, BATCHED. Five MEDIUM and three LOW items,… |
+| [TOOL-aTwinnedPass-7](../builds/aTwinnedPass/BACKLOG.md) | OPEN | MED | — | 2026-11-15 | THE ROUND-1 LEFT-SHIFT GATES ARE UNBUILT. The closing review's round 1… |
+| [TOOL-aTwinnedPass-8](../builds/aTwinnedPass/BACKLOG.md) | OPEN | LOW | — | 2026-11-15 | THREE COPIES OF ONE QUESTION. check_generated_output in… |
+| [TOOL-aTwinnedPass-9](../builds/aTwinnedPass/BACKLOG.md) | OPEN | LOW | — | 2026-11-15 | M6 CONDITION (1) STILL SAYS THE WRITE SETS DO NOT INTERSECT. After… |
+| [TOOL-aTwinnedPass-10](../builds/aTwinnedPass/BACKLOG.md) | OPEN | LOW | — | 2026-11-15 | THE COMMIT-MSG CHECK IS SILENT IN A PASS WORKTREE. check_commit_message… |
+| [TOOL-aTwinnedPass-12](../builds/aTwinnedPass/BACKLOG.md) | OPEN | MED | — | 2026-11-15 | NO ARM PINS THE INTERIOR OF THE wf_ PASS NAME. TOOL-aTwinnedPass-11's… |
 | [TOOL-aUnblockedFleet-9](../builds/aUnblockedFleet/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-31 | FIVE ACCEPTANCE CRITERIA OF TOOL-aUnblockedFleet-2 ARE WRITTEN,… |
 | [TOOL-aUnmannedHelm-2](../builds/aUnmannedHelm/BACKLOG.md) | OPEN | — | — | 2026-08-10 | the ledger_dir in tools/drift-audit/drift_report.py points at an… |
 | [TOOL-aUnmannedHelm-10](../builds/aUnmannedHelm/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | three root docs (AGENTS.md, WIRE-INTO-PROJECT.md, .gitattributes) come… |
@@ -463,9 +469,7 @@ Cite ids, never line numbers.
 | [TOOL-dDerivedDocket-45](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-16 | NO JOIN COUNTS THE MEMBERS AN S-ITEM OR A REFUSAL LIST ENUMERATES… |
 | [TOOL-dDerivedDocket-46](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-16 | NOTHING ON THE BAR WILL GRADE THE REMOTE-CI WORKFLOW FILE AFTER ITS… |
 | [TOOL-dDerivedDocket-47](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-20 | tools/run-gates/run-selftests.test.sh DECLARES A FLOOR NOTHING READS.… |
-| [TOOL-dDerivedDocket-55](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-21 | tools/workflows/unattended-unit.js CANNOT RUN TWO PASSES AT ONCE. It… |
 | [TOOL-dDerivedDocket-56](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-21 | tools/workflows/unattended-build.js STILL STATES THE SUPERSEDED… |
-| [TOOL-dDerivedDocket-57](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-21 | NOTHING RUNS A WAVE. The driver's --dispatch already decides M6… |
 | [TOOL-dDerivedDocket-58](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-21 | A SPEC CANNOT PROVE ITS OWN DISJOINTNESS. The spec template's… |
 | [TOOL-dDerivedDocket-59](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-21 | AUTHORED ORDERS ARE A TOTAL ORDER. Every dDerivedDocket unit was… |
 | [TOOL-dDerivedDocket-60](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-21 | A DECISION ROW FORCES A PASS TO RUN ALONE. M6 condition 3 names… |
