@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-15
 streams: tooling
 roster: TOOL
-ids: TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3
+ids: TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3 TOOL-aTwinnedPass-4 TOOL-aTwinnedPass-5
 authorized-by: prompt
 ---
 
@@ -31,7 +31,7 @@ filed both halves; the prompt is in `prompts/`.
 
 ## Build-level rules
 
-- **Classification (M2)**: three units, MISSING at open, Tier-2: a changed kit contract (the unit
+- **Classification (M2)**: three units, MISSING at open, and two promoted from the closing review's round 1, Tier-2: a changed kit contract (the unit
   harness's args), a new kit tool, and a changed behaviour of `--dispatch`.
 - `memory/builds/dDeclaredLoop/`, its run's worktree, its branch and its run-state file are a live
   run's, and are not touched. `pass_commit`, `read_attribution_tokens`, `check_pass_open` and
@@ -51,11 +51,13 @@ None.
 | 1 | `TOOL-aTwinnedPass-1` | the unit harness's optional `passBase` key: the builder runs in the runtime's own worktree reset to that commit, and its write set and brief are the main loop's |
 | 2 | `TOOL-aTwinnedPass-2` | the pass-tree tool: merge a pass's branch back `--no-ff` with generated outputs re-rendered, or remove an uncommitted one |
 | 3 | `TOOL-aTwinnedPass-3` | `--dispatch` condition 1 leaves a path every pass may share, an effective generated output, out of the sibling overlap |
+| 4 | `TOOL-aTwinnedPass-4` | the pass's branch, worktree and fork sha cross every handoff only in the runtime's own spelling (review round 1: H1, H2, M1, M3) |
+| 5 | `TOOL-aTwinnedPass-5` | every arm of the build's three suites can go red on the regression it names (review round 1: H3, M2, M4, M5, M6, L1, L2) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 3 unit(s) · node a · opened 2026-11-15 · streams tooling
-ids TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3
+ids TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3 TOOL-aTwinnedPass-4 TOOL-aTwinnedPass-5
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -65,7 +67,7 @@ ids TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3
 | [TOOL-aTwinnedPass-2 — the pass-tree tool: merge a pass's own branch back `--no-ff` with generated outputs re-rendered, or take it away](spec/2026-11-15-spec-TOOL-aTwinnedPass-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 18 bound to this build, across 3 record folder(s).
+Records: 22 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

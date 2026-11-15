@@ -13,6 +13,7 @@
 | [2026-11-15-prompt-TOOL-aTwinnedPass-2-4-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-2-4-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTwinnedPass-2-5-builder.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-2-5-builder.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTwinnedPass-2-pass-brief.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-2-pass-brief.md) | research | — |
+| [2026-11-15-review-TOOL-aTwinnedPass-1-2-3-closing-diff-round1.md](../reviews/2026-11-15-review-TOOL-aTwinnedPass-1-2-3-closing-diff-round1.md) | diff-review | TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-3 |
 
 <!-- /gen:spec-records -->
 
