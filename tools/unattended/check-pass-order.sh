@@ -325,9 +325,9 @@ for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/
   # still authors the value it COMMITS - is in this file's header rather than left to be discovered.
   opened=$(GIT show "HEAD:$readme" 2>/dev/null | sed -n 's/^opened:[[:space:]]*//p' | head -1)
   case "$opened" in [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;; *) skipped_cutoff=$((skipped_cutoff+1)); continue ;; esac
-  # `sort -C` over the pair is the same date comparison the driver's THIN term uses; a build opened
-  # BEFORE the cutoff keeps the grandfathering.
-  if ! printf '%s\n%s\n' "$PASS_ORDER_CUTOFF" "$opened" | sort -C; then
+  # Both values passed an ISO-date shape check, so a bash string compare is their date order and
+  # spawns nothing per README (TOOL-aMeasuredDrag-8); a build opened BEFORE the cutoff is skipped.
+  if [[ "$opened" < "$PASS_ORDER_CUTOFF" ]]; then
     skipped_cutoff=$((skipped_cutoff+1)); continue
   fi
 

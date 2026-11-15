@@ -79,13 +79,13 @@ ids TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasure
 | [TOOL-aMeasuredDrag-5 — procmon-hook decides its throttle before any process spawn, resolving the common dir by reading files](spec/2026-11-15-spec-TOOL-aMeasuredDrag-5.md) | 5 | 1 | CLOSED | rev-1 | 2026-11-15 |
 | [TOOL-aMeasuredDrag-6 — the index renderer groups the tracked list by build once, instead of scanning it per build](spec/2026-11-15-spec-TOOL-aMeasuredDrag-6.md) | 6 | 1 | CLOSED | rev-1 | 2026-11-15 |
 | [TOOL-aMeasuredDrag-7 — the recall cache budget sized above two gov indexes, so two worktrees stop evicting each other](spec/2026-11-15-spec-TOOL-aMeasuredDrag-7.md) | 7 | 1 | CLOSED | rev-2 | 2026-11-15 |
-| [TOOL-aMeasuredDrag-8 — brief-recorded's date cutoff compared in the shell, with no process per README](spec/2026-11-15-spec-TOOL-aMeasuredDrag-8.md) | 8 | 1 | SPECCED | rev-2 | 2026-11-15 |
+| [TOOL-aMeasuredDrag-8 — brief-recorded's date cutoff compared in the shell, with no process per README](spec/2026-11-15-spec-TOOL-aMeasuredDrag-8.md) | 8 | 1 | CLOSED | rev-2 | 2026-11-15 |
 | [TOOL-aMeasuredDrag-9 — `transition_audit.read_modes` parses each distinct conf blob once, not once per commit](spec/2026-11-15-spec-TOOL-aMeasuredDrag-9.md) | 9 | 1 | SPECCED | rev-1 | 2026-11-15 |
 | [TOOL-aMeasuredDrag-10 — `.githooks/pre-commit` reads the staged list once and resolves python once, each leg keeping its own trigger](spec/2026-11-15-spec-TOOL-aMeasuredDrag-10.md) | 10 | 1 | SPECCED | rev-1 | 2026-11-15 |
 | [TOOL-aMeasuredDrag-11 — the merge bar hands its own resolved python to its legs, so no leg re-probes the launcher](spec/2026-11-15-spec-TOOL-aMeasuredDrag-11.md) | 11 | 2 | INPROGRESS | rev-1 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 52 bound to this build, across 4 record folder(s).
+Records: 53 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

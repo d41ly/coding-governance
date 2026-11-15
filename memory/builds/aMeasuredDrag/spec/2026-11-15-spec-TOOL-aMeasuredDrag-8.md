@@ -1,11 +1,12 @@
 # TOOL-aMeasuredDrag-8 — brief-recorded's date cutoff compared in the shell, with no process per README
 
-**Status:** SPECCED · rev-2 · 2026-11-15 · node a · Tier-1 · base aebbb4a7 · streams tooling · order 8
+**Status:** CLOSED · rev-2 · 2026-11-15 · node a · Tier-1 · base aebbb4a7 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-15-build-TOOL-aMeasuredDrag-8-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-8-1-acceptance-ledger.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-brief.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-brief.md) | research | TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-4 TOOL-aMeasuredDrag-5 TOOL-aMeasuredDrag-6 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-9 TOOL-aMeasuredDrag-10 TOOL-aMeasuredDrag-11 |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-ruling-brief.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-ruling-brief.md) | research | TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-7 |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-8-1-builder.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-8-1-builder.md) | journal | — |
