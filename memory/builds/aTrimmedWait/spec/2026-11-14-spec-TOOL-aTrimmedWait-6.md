@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-14-build-TOOL-aTrimmedWait-6-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aTrimmedWait-6-1-acceptance-ledger.md) | journal | — |
+| [2026-11-15-build-TOOL-aTrimmedWait-1-arms-observed.md](../build/2026-11-15-build-TOOL-aTrimmedWait-1-arms-observed.md) | journal | TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-1-brief.md) | research | TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-7 |
 | [2026-11-14-review-TOOL-aTrimmedWait-1-diff-review-round1.md](../reviews/2026-11-14-review-TOOL-aTrimmedWait-1-diff-review-round1.md) | diff-review | TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-7 |
 

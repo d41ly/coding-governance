@@ -37,7 +37,7 @@ measurements and their scripts are recorded in the brief under `prompts/`.
 ## Build-level rules
 
 - **No verdict moves.** Each unit's acceptance is one command timed before and after on node a,
-  plus a fixture showing the same refusals, reds and greens. A speed-up that moves a verdict is out.
+  plus a fixture showing the same refusals, reds and greens. A speed-up that moves a verdict is out. The two owner-accepted moves are refusals: a role agent's polling wait (unit 6) and a suite whose only admitting word sits in a shell comment (unit 9).
 - **Reuse the owner's predicates** ([one-fact]): a pre-check calls the driver's own reader, never a copy.
 - **The full run and the bar keep grading everything**; only the caller-scoped paths narrow.
 - **Re-verified at open, against main `846d51d39`**: R4 shrank to `--resume`, because a refused
@@ -56,7 +56,7 @@ None.
 |---|---|---|
 | 1 | `TOOL-aTrimmedWait-1` | R1: one pre-commit spec validation that runs `--dispatch`'s cheap refusals through the driver's own predicates, wired into the spec stage and the writer's instructions |
 | 2 | `TOOL-aTrimmedWait-2` | R2: hygiene check 12 graded over one named spec or build, with the writer told to use it |
-| 3 | `TOOL-aTrimmedWait-3` | R3: the pre-commit hook renders the staged builds' index before check 9 grades it, and stages what it wrote |
+| 3 | `TOOL-aTrimmedWait-3` | R3: when check 9 refuses a commit, the pre-commit hook renders the moved index, stages it into the hook's index and grades again (`--write-staged`, opt-in by `STAGED_RENDER`) |
 | 4 | `TOOL-aTrimmedWait-4` | R3: `gen_build_index.py --write` writes only the artifacts whose rendered bytes moved (owner, 2026-11-14) |
 | 5 | `TOOL-aTrimmedWait-5` | R4: `--resume` and `--status` hash every brief in one `git hash-object --stdin-paths` call, every line byte-identical (owner, 2026-11-14) |
 | 6 | `TOOL-aTrimmedWait-6` | R5: the scratch guard refuses a role agent's polling wait, and G3 reads past `-o pipefail` |
@@ -83,7 +83,7 @@ ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWai
 | [TOOL-aTrimmedWait-9 — closing-review repair, hooks and roles: the role gate reads no shell comment as words, the P3 rows are tested at the floor, and arm 23 tells a resumed read from a cold re-parse](spec/2026-11-14-spec-TOOL-aTrimmedWait-9.md) | 8 | 2 | CLOSED | rev-3 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 41 bound to this build, across 4 record folder(s).
+Records: 42 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
