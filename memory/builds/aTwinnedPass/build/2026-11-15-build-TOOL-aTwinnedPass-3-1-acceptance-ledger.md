@@ -44,9 +44,9 @@ legs of the spec's Gates section.
 - AC4 — `--dispatch declares a generated index together with its generator` — `ARCH-tRun-3
   --writes gen/mk` exited 1 with that text, over this driver and over the base one. The suite arm
   B4 is owed to the main loop.
-- AC5 — `two passes claiming one file are not disjoint: lane/one also in` — `ARCH-tRun-3 --writes
-  lane/one` exited 1 with today's whole message, naming `ARCH-tRun-1`, over this driver and over the
-  base one. Then `ARCH-tRun-3 --writes work` exited 0 with `dispatch declared` and an empty stderr, so
+- AC5 — `--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint: lane/one also in`
+  — `ARCH-tRun-3 --writes lane/one` exited 1 with that whole message, naming `ARCH-tRun-1`, over this
+  driver and over the base one. Then `ARCH-tRun-3 --writes work` exited 0 with `dispatch declared` and an empty stderr, so
   no note; over the base driver it exited 1 with `work also in`. The suite arms B5 and B6 are owed to
   the main loop.
 - AC6 — `git diff --exit-code` — the criterion's `python -c` probe listed 40 check-49 branches over
