@@ -35,9 +35,9 @@ Owed to the main loop at the close:
   §7's first `New arm:` line names, with `FLOOR_ASSERTIONS` at 1028;
 - the `TP4` block of `tools/unattended/pass-tree.test.sh` red, then green, under the breaks of §7's
   second and third `New arm:` lines;
-- the respelled T1 to T5 arms of `pass-tree.test.sh` green, except `T2 branch worktree-agent-p4
-  remains` and `T5 branch worktree-agent-p7 remains`, which stay red at this tip for
-  `TOOL-aTwinnedPass-5`;
+- the respelled T1 to T5 arms of `pass-tree.test.sh` green, except two that stay red at this tip
+  for `TOOL-aTwinnedPass-5`:
+  `T2 branch worktree-agent-p4 remains` and `T5 branch worktree-agent-p7 remains`;
 - the legs of the spec's Gates section.
 
 **Evidences:** TOOL-aTwinnedPass-4
@@ -59,9 +59,9 @@ Owed to the main loop at the close:
 - AC3 — `pass-tree: REFUSING` — over the fixture, `--remove tRun --branch worktree-agent-q1` with
   the holder at `probe-elsewhere/agent-q1` exited 1 with one REFUSING line naming that holder, and
   the directory, `keep.txt` and the branch remained. Over base's tool it exited 0 and both were gone.
-- AC4 — `where the runtime cuts that pass's worktree` — `--merge tRun --pass TOOL-tRun-4 --branch
-  worktree-agent-q1 --from <C>` exited 1 with that text; `HEAD`, `git status --porcelain` and the
-  outside directory were unchanged. Over base's tool the branch was already gone by then.
+- AC4 — `where the runtime cuts that pass's worktree` — the `--merge` of `worktree-agent-q1` for
+  `TOOL-tRun-4`, with `--from <C>`, exited 1 with that text; `HEAD`, `git status --porcelain` and
+  the outside directory were unchanged. Over base's tool the branch was already gone by then.
 - AC5 — `is not a branch the runtime cuts for a pass` — `--remove` and `--merge` naming `agent-q2`
   each exited 1 with that text, and its worktree remained; `--remove` naming `worktree-agent-q3`,
   held at `.claude/worktrees/agent-zz`, exited 1 naming the wanted `.../agent-q3`, and that worktree
@@ -71,9 +71,9 @@ Owed to the main loop at the close:
   of `worktree-agent-p2` at its own place with `--from <C>` exited 0, printed the merge sha, and
   `git worktree list --porcelain` named no `agent-p2`.
 - AC7 — `names no commit` — `--merge` of `worktree-agent-p2` with 64 hex digits exited 1 with
-  `names no commit here` and no `is not 7 to 64`; with 65 digits and with `HEAD`, `is not 7 to 64
-  lowercase hex digits`. Over base's tool all three carried `is not 7 to 40 lowercase hex digits
-  naming a commit`.
+  `names no commit here` and no `is not 7 to 64`; with 65 digits and with `HEAD`,
+  `is not 7 to 64 lowercase hex digits`. Over base's tool all three carried
+  `is not 7 to 40 lowercase hex digits naming a commit`.
 - AC8 — `check_pass_holder` — `grep -c 'tools/unattended'` over `tools/unattended/pass-tree.sh`
   printed `0`; above its first function the header carries `worktree-agent-<id>` and
   `.claude/worktrees/agent-<id>`. `lexicon.py --suggest check_pass_holder --as sh.function` printed
