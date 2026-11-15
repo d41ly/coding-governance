@@ -818,7 +818,7 @@ why = "it runs `<prefix>/playbook/writing_practice.py check one-owner`, which ho
 
 [[exempt_leg]]
 name = "instruction edits (manifest checks)"
-why = "it runs `<prefix>/playbook/instructions_edit.py check`, the write command's checks over gov's own manifests and change records, among them the tag checks, against the citations of gov's guides, help pages and kit READMEs and the namespaces `<prefix>/playbook/namespaces.toml` registers, read from gov's own index, the reason the `tags` row gives. The command ships with the playbook-render kit's `**` include, but the LEG is gov's: the rows and records it grades are authored here. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-15."
+why = "it runs `<prefix>/playbook/instructions_edit.py check`, the write command's checks over gov's own manifests and change records, resolving the tags they name through gov's own index. The tree's tag checks are the `tags (the resolver's checks)` leg's, which the `check` verb leaves to it (TOOL-aMeasuredDrag-4). The command ships with the playbook-render kit's `**` include, but the LEG is gov's: the rows and records it grades are authored here. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-15."
 
 [[exempt_leg]]
 name = "instruction edits selftest"

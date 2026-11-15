@@ -211,9 +211,10 @@ fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
 # Raised from 12 by TOOL-aShardedFloor-2, which adds the shard-contract arms (forward cover and
 # reverse declaration). Stated ABSOLUTELY, never as a delta.
-FLOOR_ASSERTIONS=17
+FLOOR_ASSERTIONS=18
 # Raised 15 -> 16 by TOOL-dDerivedDocket-23, which adds G1b, the four-leg `signature` pin.
 # Raised 16 -> 17 by PLAY-dOrderedCharter-67, which adds the python-reads scanner's plants.
+# Raised 17 -> 18 by TOOL-aMeasuredDrag-4, which adds G8, the tags leg's unguarded pin.
 
 # The manifest, derived the same way run-gates.sh derives it. GATE_LEGS still outranks it, which is
 # what lets the fixture arms below drive this file without touching the real bar.
@@ -489,6 +490,46 @@ if "guard" in rows[0]:
     print("  control is that this leg runs on BOTH of .githooks/pre-push branches, which is true")
     print("  only while it is unguarded. With a guard, a scoped push skips it and the acceptance")
     print("  ledger is graded at neither boundary. Remove the guard, or retire that exemption.")
+    sys.exit(1)
+' "$LEGS_FILE"; then
+  fail=1
+fi
+
+# ---- G8. `tags (the resolver's checks)` DECLARES NO GUARD, AND SHARES THE INSTRUCTION-EDITS CHUNK --
+# TOOL-aMeasuredDrag-4 took the tree's tag checks out of `instructions_edit.py check`. Its compensating
+# control is that the tags leg runs on every bar that runs `instruction edits (manifest checks)`:
+# unguarded, so a scoped bar never skips it, and in the same chunk, so no chunk selection splits them.
+#
+# WHAT THIS DOES NOT CHECK: a run that names one leg alone, a pass-leg selection, or a cached verdict.
+a=$((a+1))
+if ! "$PYBIN" -c '
+import json, sys
+try:
+    legs = json.load(open(sys.argv[1], encoding="utf-8"))
+except Exception as e:
+    print("gov-canary: %s does not parse: %s" % (sys.argv[1], e)); sys.exit(1)
+
+TAGS, EDITS = "tags (the resolver'"'"'s checks)", "instruction edits (manifest checks)"
+rows = {}
+for name in (TAGS, EDITS):
+    rows[name] = [l for l in legs if isinstance(l, dict) and l.get("name") == name]
+    # LIVENESS, as G7 states it: a renamed or deleted leg selects nothing and would pass in silence.
+    if len(rows[name]) != 1:
+        print("gov-canary: expected exactly one leg named \"%s\", found %d, so this arm graded nothing"
+              % (name, len(rows[name])))
+        sys.exit(1)
+tags, edits = rows[TAGS][0], rows[EDITS][0]
+
+if "guard" in tags:
+    print("gov-canary: the `%s` leg declares a guard (%r)." % (TAGS, tags["guard"]))
+    print("  TOOL-aMeasuredDrag-4 left the tree'"'"'s tag checks to this leg alone, so a scoped bar that")
+    print("  skips it grades no tag check while `%s` still runs. Remove the guard." % EDITS)
+    sys.exit(1)
+if tags.get("chunk") != edits.get("chunk"):
+    print("gov-canary: the `%s` leg'"'"'s chunk %r differs from `%s`'"'"'s chunk %r."
+          % (TAGS, tags.get("chunk"), EDITS, edits.get("chunk")))
+    print("  TOOL-aMeasuredDrag-4 left the tree'"'"'s tag checks to the tags leg, so a chunk selection")
+    print("  that splits the two grades no tag check. Keep them in one chunk.")
     sys.exit(1)
 ' "$LEGS_FILE"; then
   fail=1

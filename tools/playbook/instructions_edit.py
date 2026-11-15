@@ -7,7 +7,7 @@
     python instructions_edit.py propose <write verb> <the same flags>
     python instructions_edit.py list [--manifest <kit id>|overlay]
     python instructions_edit.py render
-    python instructions_edit.py check             # the leg: every check of a write, over the tree
+    python instructions_edit.py check             # the leg: a write's checks over the tree, but the tag checks
     python instructions_edit.py fixture [--plant <case>]
 
 THE MANIFESTS. `read_manifests` lists each kit's `instructions.toml` and the overlay, the one list a write
@@ -25,9 +25,10 @@ the would-be tree, and a green write writes the row, its change record, stages b
 
 THE CHECKS. `check_tree` holds every row of every manifest to the schema, one fact, the statement grammar,
 one tag per row and no retired name minted again; the two arms of this module, conflicts at one level and
-references; the tag checks over the tree; the pack catalogue; and, with the guard's point undeclared, no
-change record but the stand-in door's. Where the tree holds a lock, the grammar's document and lock halves
-join; a tree no render has reached yet owes neither. Exit 0 green, 1 red or refused, 2 a usage or load refusal.
+references; the tag checks over the tree, on a write only, since the `check` verb leaves them to
+`gov_tag.py check`, the tags leg, and run alone does not report them; the pack catalogue; and, with the
+guard's point undeclared, no change record but the stand-in door's. Where the tree holds a lock, the
+grammar's document and lock halves join; a tree no render has reached yet owes neither. Exit 0 green, 1 red or refused, 2 a usage or load refusal.
 
 THE PACKS. `packs.toml` holds one `[[pack]]` row per instruction pack, apart from the policy presets;
 `resolve_practices` turns a `charter.practices` value naming packs and practices into practice tags.
@@ -498,8 +499,10 @@ def check_packs(root) -> tuple[list, list]:
     return [f"{SAY}: packs · {len(packs)} row(s) · {armed}"], reds
 
 
-def check_tree(root, candidate=None) -> tuple[list, list]:
-    """S6 over the tree, `candidate` the would-be manifest: `(reds, the lines a green arm prints)`."""
+def check_tree(root, candidate=None, tags=True) -> tuple[list, list]:
+    """S6 over the tree, `candidate` the would-be manifest: `(reds, the lines a green arm prints)`. `tags`
+    false skips the tag checks: the `check` verb leaves them to `gov_tag.py check`, the tags leg
+    (TOOL-aMeasuredDrag-4)."""
     root = pathlib.Path(root)
     units, tables, faults = read_tree_rows(root, candidate)
     reds = [f"{SAY}: red · {f}" for f in faults]
@@ -522,17 +525,18 @@ def check_tree(root, candidate=None) -> tuple[list, list]:
     reds += check_guard_witness(records, read_declared_points(root))
     if iu.read_lock(root):
         reds += [ln for ln in iu.run_grammar(root)[0] if ": red · " in ln]
-    try:
-        reds += run_tag_check(root)
-    except (PolicyRefused, RuntimeError) as exc:     # RuntimeError: the tag index's TagError
-        reds.append(f"{SAY}: red · tags · {exc}")
+    if tags:
+        try:
+            reds += run_tag_check(root)
+        except (PolicyRefused, RuntimeError) as exc:     # RuntimeError: the tag index's TagError
+            reds.append(f"{SAY}: red · tags · {exc}")
     lines, pack_reds = check_packs(root)
     armed = f"{len(units)} row(s)" if units else "unarmed: the tree holds no unit row"
     return reds + pack_reds, lines + [f"{SAY}: check · {armed}"]
 
 
 def run_check(root) -> tuple[list, int]:
-    reds, lines = check_tree(root)
+    reds, lines = check_tree(root, tags=False)
     return reds + lines + [f"{SAY}: check · {len(reds)} red"], 1 if reds else 0
 
 
