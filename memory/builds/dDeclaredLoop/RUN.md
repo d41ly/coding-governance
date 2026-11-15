@@ -242,3 +242,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-15T20:29:57Z dispatch · item 55275e62 TOOL-dDeclaredLoop-84 · reason memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-82.md memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-84.md memory/builds/dDeclaredLoop/build/2026-11-15-build-TOOL-dDeclaredLoop-84-1-acceptance-ledger.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/backlog/TOOL.md
 
 2026-11-15T21:14:50Z brief · item TOOL-dDeclaredLoop-85 · reason 41298ceb3092 memory/builds/dDeclaredLoop/prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-85-build-brief.md
+
+2026-11-15T21:31:05Z dispatch · item 2b3e80e9 TOOL-dDeclaredLoop-85 · reason tools/loop/guard.py help/policy.md memory/map/generated/symbols.json memory/builds/dDeclaredLoop/build/2026-11-15-build-TOOL-dDeclaredLoop-85-1-acceptance-ledger.md memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-85.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/backlog/TOOL.md

@@ -2793,6 +2793,11 @@
       "file": "tools/playbook/fixtures/row_kind.py"
     },
     {
+      "id": "build_failure_detail",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
+    },
+    {
       "id": "build_feat",
       "kind": "function",
       "file": "tools/push-main.test.sh"
@@ -28554,6 +28559,11 @@
     },
     {
       "id": "run_merge_tree",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
+    },
+    {
+      "id": "run_merge_tree_usage",
       "kind": "function",
       "file": "tools/loop/guard.py"
     },

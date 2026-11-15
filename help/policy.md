@@ -301,7 +301,9 @@ naming the merge and `does not parse at C`, never graded against its parents; on
 not parse is refused naming `at M`. A merge whose clean re-merge fails, an unrelated-history merge
 or a broken object store say, is graded against every parent, with one line naming the failure: it
 owes the trailer and the change record for each key that differs from one parent, the trailer's old
-value the first such parent's. Only an octopus merge, a merge whose re-merge conflicts, or a git
+value the first such parent's. A git whose usage probe fails, cannot start or prints no usage text is
+graded as a failed re-merge too, and only a usage text lacking `--write-tree` reads as a git without
+it. Only an octopus merge, a merge whose re-merge conflicts, or a git
 without `merge-tree --write-tree` is graded against its parents alone,
 with one line saying so: it owes for each key its result sets to a value no parent holds, the
 trailer's old value the first parent's. With no python launcher or no loop kit, the hook prints one
