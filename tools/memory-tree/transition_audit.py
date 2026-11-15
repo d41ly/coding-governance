@@ -366,7 +366,8 @@ def read_modes(root: pathlib.Path, commits: list, conf_rel: str) -> dict:
 
     One `cat-file --batch-check` resolves each commit's conf BLOB ID, then one `cat-file --batch`
     reads the DISTINCT blobs. A history re-uses one conf blob for hundreds of commits at a time, so
-    the second process reads a handful of objects however long the history is.
+    the second process reads a handful of objects however long the history is. `read_mode` runs
+    once per distinct blob, not per commit, because it is a pure function of the blob text.
     """
     if not commits:
         return {}
@@ -377,8 +378,8 @@ def read_modes(root: pathlib.Path, commits: list, conf_rel: str) -> dict:
         bits = line.split()
         blob_of[sha] = bits[0] if len(bits) == 3 and bits[1] == "blob" else None
     texts = read_blobs(root, sorted({b for b in blob_of.values() if b}))
-    return {sha: (read_mode(texts.get(blob) or "") if blob else "shards")
-            for sha, blob in blob_of.items()}
+    mode_of = {blob: read_mode(text or "") for blob, text in texts.items()}
+    return {sha: (mode_of[blob] if blob else "shards") for sha, blob in blob_of.items()}
 
 
 def read_versions(root: pathlib.Path, revs: list, paths: list, anchor, grammar) -> dict:
