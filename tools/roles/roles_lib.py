@@ -37,7 +37,10 @@ READ_KEYS = frozenset(
     ["task:" + f for f in ("title", "goal", "in", "out", "todo", "reuse", "acceptance", "gates")]
     + ["card:" + f for f in ("route", "records", "classes", "read", "open", "reuse")]
     + ["brief:" + f for f in ("prompt", "goal", "items", "acceptance", "gates", "non-goals")]
-    + ["input:" + f for f in ("spec", "diff", "question", "prompt")])
+    + ["input:" + f for f in ("spec", "diff", "question", "prompt")]
+    # the rows an item's upstream items established, handed on by `handoff.py render --upstream`, legal
+    # only optional since only an item naming upstream items has them (TOOL-dDeclaredLoop-29)
+    + ["upstream:rows"])
 
 #: The reasoning-effort levels a role or a stage may take (TOOL-aOrientedCast-10). Read from Claude
 #: Code 2.1.292, whose agent loader and `Workflow` `agent()` options both take these five names; the

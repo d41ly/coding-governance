@@ -12,6 +12,11 @@
 # it declares `widens`, the direction that widens it, and fixed otherwise: by its `fixed-by` sources, or
 # by its undeclared class where it declares neither, so the fixed set is deny-by-default.
 #   needs     a constraint set: removing a need widens
+#   upstream  the items whose commitments it is handed, a set of one-line inline tables { item, gate }
+#             (TOOL-dDeclaredLoop-29): removing an entry widens, since the item answers fewer rows. No
+#             `ref`, since an entry is a table and the exclusion walk reads a ref field's members as tags;
+#             no gov row carries it, so an `amends` adding it to one is held and a repository writes it on
+#             its own row or in a `supersedes`
 #   inputs    a read set: reading more widens
 #   routes    patched whole by an `amends`, every changed route one widening
 #
@@ -58,6 +63,11 @@ shape = "scalar"
 name = "needs"
 shape = "set"
 ref = "needs"
+widens = "remove"
+
+[[field]]
+name = "upstream"
+shape = "set"
 widens = "remove"
 
 [[field]]

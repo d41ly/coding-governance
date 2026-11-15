@@ -521,6 +521,29 @@ python <prefix>/loop/splice.py --fixture --plant two-splices
 python <prefix>/playbook/core.py new stage <name> --after <step> --before <step> --actor <kind:name> --witness-by <text> --owner <build>
 ```
 
+## The upstream field, `upstream.py`
+
+An `[[item]]` row may carry `upstream` (TOOL-dDeclaredLoop-29), a list of one-line inline tables `{ item =
+"<tag>", gate = "record" | "measured" }`, a `measured` entry with `measured-by`, a path HEAD holds, and
+`measured-line`, a line that blob holds whole; `item-schema.toml` declares the field a set that widens by
+removal, with no `ref`, and no gov row carries it. `check_upstream_rows` holds every composed row to that
+shape, reads the measured entries' blobs in one `read_blobs_at` batch, and refuses an item with an
+`upstream` list whose outcome set lacks `finding`; `loop_items.py check` calls it after its own grades and
+prints `loop: upstream edges · <n> record · <m> measured`. `derive_upstream_rows` turns each upstream
+item's return's `## Establishes` rows into handed rows `<upstream item>#<row id> · <kind> · <text>`, and
+`check_upstream_answers` joins them with the item's `## Upstream` answers: each handed id answered,
+`dropped` or `doubled`, an unhanded id `invented`, an answer `bad-answer` or `no-reason`, and `bypassed`
+a finding on either edge, every finding graded on its edge's gate so only a `measured` edge refuses.
+`write_upstream_record` writes the join as a journal record under the build's `build/` folder. Both
+verbs read the composition through `loop_items.read_composed_items`, which `position.py` reads too.
+
+```bash
+python <prefix>/loop/upstream.py rows <item> --return <upstream item>=<path>
+python <prefix>/loop/upstream.py join <item> --rows <rows file> --return <return path> [--write --build <slug> --unit <id>]
+python <prefix>/loop/upstream.py --fixture --plant drop-gating
+python <prefix>/loop/upstream.py --selftest
+```
+
 ## The factories, `factories.py`
 
 Five more kinds of the register take their factory from `factories.py` (TOOL-dDeclaredLoop-6): the

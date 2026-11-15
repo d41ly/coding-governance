@@ -114,7 +114,7 @@ id = "script:{prefix}/roles/handoff.py#render"
 shape = "verb"
 entry = "{prefix}/roles/handoff.py"
 verb = "render"
-flags = ["--role=", "--build=", "--unit=", "--card=", "--input=", "--out=", "--stdout", "--stand-in", "--part="]
+flags = ["--role=", "--build=", "--unit=", "--card=", "--input=", "--upstream=", "--out=", "--stdout", "--stand-in", "--part="]
 
 [[usage]]
 id = "script:{prefix}/roles/handoff.py#roster"
@@ -498,6 +498,26 @@ shape = "verb"
 entry = "{prefix}/loop/splice.py"
 verb = "new"
 flags = ["--after=", "--before=", "--actor=", "--witness-by=", "--owner=", "--input=", "--allowance=", "--returns="]
+
+[[usage]]
+id = "script:{prefix}/loop/upstream.py"
+shape = "verb"
+entry = "{prefix}/loop/upstream.py"
+flags = ["--fixture", "--plant=", "--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/upstream.py#rows"
+shape = "verb"
+entry = "{prefix}/loop/upstream.py"
+verb = "rows"
+flags = ["--return="]
+
+[[usage]]
+id = "script:{prefix}/loop/upstream.py#join"
+shape = "verb"
+entry = "{prefix}/loop/upstream.py"
+verb = "join"
+flags = ["--rows=", "--return=", "--write", "--build=", "--unit="]
 
 [[usage]]
 id = "script:{prefix}/loop/factories.py"

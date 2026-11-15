@@ -37,7 +37,10 @@
 # of model ids read by `resolve_profile` and by the spawn guard's `resolveModelProfile` over the index
 # rendered from arm 19's policy (arm 20, which SKIPs out loud as arm 6 does); and a profile level
 # edited with no re-render, which the adopter's check names as a drifted index (arm 21); and the spec writer's handoff carrying the brief's `## The prompt`
-# as its `brief:prompt` block, an empty prompt refusing by name (arm 22). Every arm is a self-contained block below the prologue, so a
+# as its `brief:prompt` block, an empty prompt refusing by name (arm 22); and a role reading
+# `upstream:rows?` handed the `--upstream` rows file and the row contract, the key named not supplied
+# without one, and R3 refusing a bare `upstream:rows` and an `upstream:` key outside the vocabulary
+# (arm 23). Every arm is a self-contained block below the prologue, so a
 # slice of the prologue and one block runs that arm alone; arm 20 reads arm 19's fixture.
 #
 # WHAT THIS DOES NOT CHECK: what the rendered Skill or an agent type SAYS beyond the citation paths
@@ -96,7 +99,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +0 for arm 6's harness calls and rendered tables (TOOL-aGuardedEffort-2): on its SKIP path, out of the floor.
 # +2 for arm 22 (TOOL-dPavedRoad-3).
 # +1 for arm 10's planted `stage` key (TOOL-dDeclaredLoop-1).
-FLOOR_ASSERTIONS=62
+# +4 for arm 23 (TOOL-dDeclaredLoop-29).
+FLOOR_ASSERTIONS=66
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -1029,6 +1033,59 @@ check_arm "arm 22 the spec writer's handoff carries the brief's prompt verbatim"
 check_arm "arm 22 an empty prompt refuses by name" \
    "$([ "${A22#*$'\n'}" = 'refused 1' ] && echo 1 || echo 0)"
 [ "$A22" = $'rendered 1\nrefused 1' ] || printf '    %s\n' "${A22//$'\n'/$'\n'    }"
+
+# ---- arm 23 (TOOL-dDeclaredLoop-29 AC7 AC8): a role reading `upstream:rows?` is handed the rows file
+# ---- `--upstream` names as its `### upstream:rows` block, the row contract after the rows, and names
+# ---- the key on its `Not supplied` line without one; the catalogue checker's R3 refuses a bare
+# ---- `upstream:rows` as optional-only and an `upstream:` key outside the vocabulary. The fixture kit's
+# ---- gov-builder and gov-skeptic files gain the keys, so the shipped role files are what is edited,
+# ---- and the render's keys are gov-builder's reads filtered to the `upstream:` family, as arm 22
+# ---- filters to `brief:`. The failing case, observed at the close and not by the pass that wrote
+# ---- this: `READ_KEYS` at its base, which holds no `upstream:` family, so the render has no source
+# ---- for the key and R3 reads the bare key as outside the vocabulary, never as optional-only.
+build_fixture; _rc23=$?
+A23=$("$PY" -B -c 'import pathlib, re, subprocess, sys
+fx, kit, mr = pathlib.Path(sys.argv[1]).resolve(), pathlib.Path(sys.argv[2]).resolve(), sys.argv[3]
+sys.path.insert(0, str(kit))
+import handoff, roles_lib as lib
+def set_reads(role, old, new):
+    path = kit / "agents" / (role + ".agent.md")
+    text = path.read_text(encoding="utf-8")
+    path.write_text(re.sub(r"(?m)^(reads:.*?)%s$" % re.escape(old), lambda m: m.group(1) + new, text, count=1),
+                    encoding="utf-8", newline="")
+set_reads("gov-builder", "", ", upstream:rows?")
+reads = lib.load_roles(handoff.KIT_DIR)["gov-builder"]["keys"]["reads"].split(", ")
+keys = {"reads": ", ".join(k for k in reads if k.startswith("upstream:"))}
+(fx / sys.argv[3] / "builds" / "bx").mkdir(parents=True, exist_ok=True)
+rows = ("item.design.seams#seam-1 · seam · the kit resolver finds a sibling kit\n"
+        "item.design.seams#must-2 · criterion · no second copy of the ladder\n")
+(fx / "rows.txt").write_text(rows, encoding="utf-8")
+for up in ("rows.txt", None):
+    task = handoff.render_handoff(fx, mr, lib.resolve_charter_path(fx), "gov-builder", keys, "bx", "TOOL-bx-1",
+                                  None, {}, None, upstream=up)[2]
+    block = task.split("### upstream:rows\n\n", 1)[1] if "### upstream:rows\n\n" in task else ""
+    if up:
+        print("rendered %d" % (block.startswith(rows) and all(w in block for w in ("## Upstream", "used", "bypassed", "not-applicable"))))
+    else:
+        print("absent %d" % (not block and re.search(r"Not supplied, optional: [^\n]*`upstream:rows`", task) is not None))
+set_reads("gov-builder", ", upstream:rows?", ", upstream:rows")
+set_reads("gov-skeptic", "", ", upstream:other?")
+out = subprocess.run([sys.executable, "-B", str(kit / "check_roles.py"), "--root", str(fx)], cwd=str(fx),
+                     capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.splitlines()
+r3 = [ln for ln in out if ": R3 — " in ln]
+print("bare %d" % any("gov-builder" in ln and "upstream:rows must be optional" in ln for ln in r3))
+print("other %d" % any("gov-skeptic" in ln and "upstream:other?" in ln and "outside the vocabulary" in ln for ln in r3))
+' "$FX" "$FX/$KREL" "$MR" 2>&1)
+A23=${A23//$'\r'/}
+check_arm "arm 23 a role reading upstream:rows? is handed the rows and the row contract under --upstream" \
+   "$([ "$_rc23" = 0 ] && [[ $A23 == *'rendered 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 23 ...and without --upstream names the key on its Not supplied line" \
+   "$([[ $A23 == *'absent 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 23 R3 refuses a bare upstream:rows, naming it optional-only" \
+   "$([[ $A23 == *'bare 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 23 R3 refuses upstream:other? as outside the vocabulary" \
+   "$([[ $A23 == *'other 1'* ]] && echo 1 || echo 0)"
+[ "$A23" = $'rendered 1\nabsent 1\nbare 1\nother 1' ] || printf '    %s\n' "${A23//$'\n'/$'\n'    }"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

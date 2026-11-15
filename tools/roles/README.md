@@ -39,7 +39,8 @@ The checker grades that each entry names something, not that the thing exists.
 ## The handoff renderer
 
 `python handoff.py render --role <name> --build <slug> [--unit <id>] [--card <path>]
-[--input <key>=<value>]... [--out <path> | --stdout | --stand-in] [--part full|task]` turns a role and one task
+[--input <key>=<value>]... [--upstream <rows file>] [--out <path> | --stdout | --stand-in] [--part full|task]`
+turns a role and one task
 into the prompt its agent is handed (TOOL-aOrientedCast-2). The file holds the role as `render_role`
 renders it under `## Role`, then `## Task`: one block per key of the role's `reads`, in declared
 order. The charter's blocks ride once, in the role's agent file (described under "The agent types"),
@@ -63,7 +64,12 @@ kit's `loop.toml`: the workflow row's `reach` there, else the last segment of it
 (TOOL-dDeclaredLoop-1). A `task:` key is read from the session card's `## task`
 field by the kickoff checker's field grammar, a `card:` key from that card's section, a `brief:` key
 from the build's brief record, `brief:prompt` from its `## The prompt` section and every other one
-from its `### <sub-head>` under `## The brief`, and an `input:` key from `--input`. A required key
+from its `### <sub-head>` under `## The brief`, an `input:` key from `--input`, and the `upstream:`
+family's one key, `upstream:rows`, from the rows file `--upstream` names, the loop kit's `upstream.py
+rows` output, followed by `UPSTREAM_CONTRACT`, the line each row id is answered by in the return's
+`## Upstream` section (TOOL-dDeclaredLoop-29). The catalogue checker's R3 admits that key only as
+`upstream:rows?`, since only an item naming upstream items is handed rows; `--upstream` for a role not
+reading it is refused, and an empty rows file supplies nothing. A required key
 that resolves to nothing, an empty value or a placeholder refuses by name and writes nothing; an
 optional one is named on the task block's `Not supplied` line.
 

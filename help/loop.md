@@ -650,6 +650,9 @@ routes = { done = "item.test.exit" }
 **What you may change on gov's items.** The schema says, field by field:
 
 - `needs` is open, and removing a need widens it; adding one narrows it.
+- `upstream` is open, and removing an entry widens it, since the item then answers fewer rows. No gov
+  item carries it, so an `amends` adding it to one is held: write it on your own item, or in a
+  `supersedes`.
 - `inputs` and `routes` are open, and adding widens them. An `amends` writes `routes` whole, so every
   changed route reads as a widening, with gov's old table as a narrowing beside it.
 - `step`, `witness` and `outcomes` are fixed by a principle, and `actor`, `allowance`, `returns` and
@@ -712,6 +715,82 @@ version, so after a bump an input still pinned at the old version is refused unt
 compares each row with the record table and reads no earlier revision, so that edit is the review's to
 see. A role item's record kind comes from its role and is not joined. The step gate's `item` class
 grades a gov item that disappears between a landing's base and its tip, as it does any member.
+
+## Handing an item what its upstream items established
+
+An item can name the items whose commitments it must honour, its upstream items, in an `upstream`
+field. Each upstream item's return lists what it establishes; those rows are handed to the item, and
+its return answers every one. The field is a list of one-line entries, the gate `record` where an
+entry gives none:
+
+```toml
+[[item]]
+tag = "item.test.adopter.smoke"
+# ... the row's other keys ...
+outcomes = ["done", "finding"]
+routes = { done = "item.test.exit", finding = "item.test.exit" }
+upstream = [
+  { item = "item.test.select", gate = "record" },
+  { item = "item.test.merge", gate = "measured", measured-by = "memory/builds/your-build/build/2026-11-16-build-FIX-your-build-1-measurement.md", measured-line = "## Verdict: CLEAN" },
+]
+```
+
+**What an upstream item writes.** Its return carries a `## Establishes` section, one row per line,
+`- <row id> · <kind> · <text>`. The kind is one of `seam`, `criterion`, `interface`, `fork`, `finding`
+and `repair`, and the row id is one tag segment, unique in that return.
+
+**What the item answers.** Its return carries a `## Upstream` section answering every row it was handed
+exactly once, `- <row id> · <answer> · <reason>`. The answer is one of three: `used` (the work honours
+the row), `bypassed` (the work departs from it) or `not-applicable` (the row does not bear on the work),
+and every answer carries a reason. A `bypassed` answer is always a finding, and the item's `finding`
+outcome takes it, so an item with an `upstream` list must route `finding`.
+
+**When an edge gates.** Every edge records its answers; only a `measured` edge refuses a return. An
+entry is `measured` once a measurement shows its rows are worth gating: `measured-by` names a record
+your last commit holds, and `measured-line` a line that record holds whole. Until then, keep the edge
+at `record`. On a `record` edge a row left unanswered (`dropped`), answered twice (`doubled`), answered
+with an id nobody handed (`invented`), with a word other than the three (`bad-answer`) or with no reason
+(`no-reason`) is a finding and the return stands. On a `measured` edge each of those refuses the return.
+An invented id that names no edge of the item is graded on the item's strictest gate.
+
+**What `check` refuses.** `python tools/loop/loop_items.py check` prints
+`loop: upstream edges · <n> record · <m> measured` and refuses an entry carrying another key or a gate
+other than the two, an upstream item no item declares or one named twice, a measurement key on a
+`record` entry, a `measured` entry whose record your last commit does not hold or whose line that record
+lacks, and an item with an `upstream` list and no `finding` outcome. Each refusal names the item, the
+upstream item and the key at fault.
+
+- **Hand the rows on:** `python tools/loop/upstream.py rows <item> --return <upstream item>=<path>` <!-- usage: script:tools/loop/upstream.py#rows e6e7132d -->
+  prints the rows of every upstream item's return, one per line, each id written
+  `<upstream item>#<row id>`. Write them to a file and pass it to the roles kit's handoff renderer with
+  `--upstream <rows file>`: the agent's task then lists the rows and the line telling it how to answer.
+  An upstream item handed no return, or whose return has no `## Establishes` section, exits 1, naming it.
+
+- **Join the answers:** `python tools/loop/upstream.py join <item> --rows <rows file> --return <return path>` <!-- usage: script:tools/loop/upstream.py#join 142cdaaa -->
+  prints one line per answered row, one `upstream · finding · <class> · <row id> · <why>` line per
+  finding and `upstream · verdict · clean`, `finding` or `refused` last. It exits 1 on `refused`, or
+  where `check` would refuse the composition, and 0 otherwise. With `--write --build <slug> --unit <id>`
+  it also writes every line into a new journal record under the build's `build/` folder and prints its
+  path. Either verb exits 2 on a bad argument, a path outside your repository, or a composition that
+  does not read.
+
+- **See it on a fixture:** `--fixture --plant <case>` builds a scratch repository holding a measurement <!-- usage: script:tools/loop/upstream.py c8a893f4 -->
+  record, gives gov's `item.design.unit-spec`, in memory, an edge from `item.design.seams`, and runs one
+  case: `clean`, `drop-gating`, `drop-recorded`, `bypassed`, `invented`, `doubled`, `bad-answer`,
+  `no-reason`, `measured-unproven`, `measured-untracked`, `no-establishes`, `no-finding-route` and
+  `record-written`. `--selftest` runs every case. Gov's own `loop upstream fixtures` gate runs it.
+
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries placeholders the shell reads as redirects -->
+  ```bash
+  python tools/loop/upstream.py rows <item> --return <upstream item>=<path> > rows.txt
+  python tools/loop/upstream.py join <item> --rows rows.txt --return <return path>
+  python tools/loop/upstream.py --fixture --plant drop-gating
+  ```
+
+The checks do not tell whether an upstream item comes before the item in the needs graph, whether a
+row's text is true or a `bypassed` reason a good one, or whether the measurement record measured the
+edge it names: they read one line of it. Nothing tells a role to write its `## Establishes` section;
+that is your build's prompt.
 
 ## Adding a stage of your own
 

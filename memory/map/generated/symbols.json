@@ -2905,6 +2905,11 @@
     {
       "id": "build_fixture_repo",
       "kind": "function",
+      "file": "tools/loop/upstream.py"
+    },
+    {
+      "id": "build_fixture_repo",
+      "kind": "function",
       "file": "tools/run-gates/owed_rows.py"
     },
     {
@@ -8198,6 +8203,16 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_upstream_answers",
+      "kind": "function",
+      "file": "tools/loop/upstream.py"
+    },
+    {
+      "id": "check_upstream_rows",
+      "kind": "function",
+      "file": "tools/loop/upstream.py"
+    },
+    {
       "id": "check_user_clash",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -12308,6 +12323,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "derive_upstream_rows",
+      "kind": "function",
+      "file": "tools/loop/upstream.py"
+    },
+    {
       "id": "derive_usage_fingerprint",
       "kind": "function",
       "file": "tools/govkit/docs_leg.py"
@@ -14831,6 +14851,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/loop/stage_coverage.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/loop/upstream.py"
     },
     {
       "id": "main",
@@ -18498,6 +18523,11 @@
       "file": "tools/unattended/commit_trailers.py"
     },
     {
+      "id": "read_composed_items",
+      "kind": "function",
+      "file": "tools/loop/loop_items.py"
+    },
+    {
       "id": "read_composition",
       "kind": "function",
       "file": "tools/loop/loop_items.py"
@@ -21061,6 +21091,11 @@
       "id": "read_retired_rows",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
+    },
+    {
+      "id": "read_return_section",
+      "kind": "function",
+      "file": "tools/loop/upstream.py"
     },
     {
       "id": "read_rev",
@@ -27905,6 +27940,11 @@
     {
       "id": "run_fixture",
       "kind": "function",
+      "file": "tools/loop/upstream.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
       "file": "tools/memory-tree/asbuilt_view.py"
     },
     {
@@ -29361,6 +29401,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/loop/splice.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/loop/upstream.py"
     },
     {
       "id": "run_selftest",
@@ -35881,6 +35926,11 @@
       "id": "write_untracked_snapshot",
       "kind": "function",
       "file": "tools/push-main.sh"
+    },
+    {
+      "id": "write_upstream_record",
+      "kind": "function",
+      "file": "tools/loop/upstream.py"
     },
     {
       "id": "write_verb_plant",

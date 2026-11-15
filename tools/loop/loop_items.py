@@ -21,10 +21,11 @@ its `[[item]]` table: `check_program`, `check_witness_classes` and `check_item_d
 and each record input of a composed item joined to an item of its needs closure that returns that kind at
 that version. The stage kind is composed after the item kind answers, through the same verb, and
 `check_program` admits the items of each composed stage; a stage composition answering unarmed admits none
-(TOOL-dDeclaredLoop-25). It prints `loop: items composed · <n> row(s) · <m> repository`, one `loop: patch <row> on
+(TOOL-dDeclaredLoop-25). Last, `upstream.py`'s `check_upstream_rows` holds each composed row's `upstream`
+field (TOOL-dDeclaredLoop-29). It prints `loop: items composed · <n> row(s) · <m> repository`, one `loop: patch <row> on
 <tag> · <field> <op> · <class>` line per classified patch operation, one `loop: record-version <kind> · <n>
-· <hash>` line per version row, `loop: record inputs · <n> joined`, and each refusal as `loop: refused ·
-...`. Exit 0 green, 1 a refusal, the composition's included, 2 unarmed: the playbook kit unresolved, the
+· <hash>` line per version row, `loop: record inputs · <n> joined`, `loop: upstream edges · <n> record · <m>
+measured`, and each refusal as `loop: refused · ...`. Exit 0 green, 1 a refusal, the composition's included, 2 unarmed: the playbook kit unresolved, the
 kind unregistered, its schema absent, or HEAD holding no definition. `check --selftest` runs `check` over
 the tree, then every plant through `loop_lib.run_selftest_cases`.
 
@@ -40,6 +41,9 @@ the kits the check reaches from this working tree, loop, playbook, memory-tree, 
 their places under the tool root, committed, so a plant reads this tree's code and not HEAD's; it writes
 the plant, commits it, runs `check` there as a subprocess and relays its output and its exit, 1 where a
 step the plant owes beside `check` does not answer as owed. The cases are `PLANTS`.
+
+`read_composed_items` is the composition's rows as `position.py` and `upstream.py` read them: gov's own
+rows where the composition is unarmed, ValueError where it refuses.
 
 `read_item_members` and `write_item_plant` are the step gate's `item` class: every gov item tag of the
 definition under a tree, and the first `[[item]]` table taken out of a clone's definition, staged.
@@ -211,6 +215,18 @@ def read_composition(root, kind=KIND):
     return (p.returncode if p.returncode in (1, 2) else 1), None, lines or ["compose exited %d" % p.returncode]
 
 
+def read_composed_items(root):
+    """The composed `[[item]]` rows of `root` (TOOL-dDeclaredLoop-29 S4): the composition's rows where
+    `read_composition` answers 0, gov's own rows of the definition beside this file where it answers 2,
+    unarmed; ValueError `the item composition does not read: <first line>` where it answers 1, and
+    LoopError where gov's definition does not read."""
+    data, where = read_definition(KIT)
+    rc, payload, lines = read_composition(root)
+    if rc == 1:
+        raise ValueError("the item composition does not read: %s" % (lines[0] if lines else "exit 1"))
+    return payload["rows"] if rc == 0 else read_item_rows(data, where)
+
+
 def check_record_versions(data, rows):
     """`(lines, refusals, versions)`: one `loop: record-version` line per `[[record-version]]` row of `data`,
     a refusal per row naming no typed kind, given twice, with no integer version from 1, or whose `fields`
@@ -347,11 +363,13 @@ def run_check():
         return 2
     join_lines, more = check_item_composition(data, where, rows, fixed, layers, read_role_defaults(KIT), versions,
                                               stages)
-    for line in version_lines + join_lines:
+    from upstream import check_upstream_rows   # it imports this module, so here and not at the top
+    upstream_lines, upstream_refusals = check_upstream_rows(rows, root)
+    for line in version_lines + join_lines + upstream_lines:
         print(line)
-    for r in more + refusals:
+    for r in more + refusals + upstream_refusals:
         print("%s: refused · %s" % (SAY, r))
-    return 1 if more or refusals else 0
+    return 1 if more or refusals or upstream_refusals else 0
 
 
 # ---------------------------------------------------------------------------------------- the factory

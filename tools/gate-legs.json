@@ -2228,6 +2228,19 @@
     "stage": ["step.test"]
   },
   {
+    "name": "loop upstream fixtures",
+    "argv": [
+      "python",
+      "{prefix}/loop/upstream.py",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 120,
+    "enforces": ["principle.p26"],
+    "stage": ["step.test"]
+  },
+  {
     "name": "loop transition tables",
     "argv": [
       "python",

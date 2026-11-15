@@ -20,7 +20,7 @@ touching nothing else, then grades as usual.
       `mandatory` and `output` may not, on any role);
       `name` not the file stem; `writes` outside its set; `agent` not true/false; `tools` or
       `model` absent on an agent role
-  R3  a `reads` key outside the vocabulary, named twice, or `card:reuse` without `?`
+  R3  a `reads` key outside the vocabulary, named twice, or `card:reuse` or `upstream:rows` without `?`
   R4  a `rules` entry that is not a lowercase tag optionally ending in `?`, a tag named twice, or a
       bare tag naming no practice of a tagged charter; an optional (`?`) tag its practices lack
       prints one `roles: note:`. A pre-tag (v3.x) charter resolves no tag and prints one note
@@ -215,6 +215,9 @@ def check_roles(root, kit_dir, write=False):
                 add_defect(p, "R3", "reads key '%s' is named twice" % base)
             if item == "card:reuse":
                 add_defect(p, "R3", "card:reuse must be optional, 'card:reuse?': that section is not on every card")
+            if item == "upstream:rows":
+                add_defect(p, "R3", "upstream:rows must be optional, 'upstream:rows?': only an item naming "
+                                    "upstream items is handed rows")
             seen.add(base)
         entries = [x.strip() for x in keys.get("rules", "").split(",") if x.strip()]
         n_rules += len(entries)

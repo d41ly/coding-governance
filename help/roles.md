@@ -22,8 +22,12 @@ reference; this page is the short version.
 3. **The handoff renderer joins them.** `handoff.py render` writes one prompt file under the build's
    `prompts/` folder, with `## Role` and then `## Task`, filled from the card, the build's brief and
    any `--input` values. A spec writer's task also carries the brief's `## The prompt`, the owner's
-   own words, as its `brief:prompt` block. A required input that is missing or still a placeholder
-   refuses by name. The prompt carries no charter text: the charter rides once, in the agent file.
+   own words, as its `brief:prompt` block. A role reading `upstream:rows?` is handed, beside any
+   `--input`, the rows file `--upstream` names: the commitments its upstream items established, which
+   the loop kit's `upstream.py rows` prints, then the line telling the agent to answer each row
+   `used`, `bypassed` or `not-applicable` in its return. Without `--upstream` the task names the key as
+   not supplied; for a role not reading it, `--upstream` is refused. A required input that is missing
+   or still a placeholder refuses by name. The prompt carries no charter text: the charter rides once, in the agent file.
 4. **The agent runs as a native type.** Each role is rendered into `.claude/agents/gov-<role>.md`,
    which starts without the full charter and at the reasoning effort the policy file sets. It
    carries the practices its role cites and the charter's Protocols and Facts sections, first.
@@ -100,7 +104,7 @@ refuses the render, naming the key.
   python tools/roles/handoff.py render --role gov-builder --build <slug> --unit <unit-id> --part task
   ```
 
-  Pass that output, unchanged, as the prompt of an `Agent` call whose `subagent_type` is <!-- usage: script:tools/roles/handoff.py#render 57cac9a7 -->
+  Pass that output, unchanged, as the prompt of an `Agent` call whose `subagent_type` is <!-- usage: script:tools/roles/handoff.py#render 1e3b1deb -->
   `gov-builder`. An edited prompt is refused. Pass the name it prints on stderr after
   `handoff: description — ` as the call's `description`; any other name is refused.
   That `Agent` call also carries `effort`: the role's value in the JSON

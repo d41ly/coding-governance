@@ -96,6 +96,7 @@ loop transition record	repo	selftests
 loop guard fixtures	kit	selftests
 loop claims fixtures	kit	selftests
 loop position fixtures	kit	selftests
+loop upstream fixtures	kit	selftests
 loop transition tables	repo	declarations
 loop stage coverage	repo	declarations
 manifest-check self-test	kit	selftests

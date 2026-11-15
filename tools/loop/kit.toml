@@ -79,6 +79,12 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # `instructions.exclude` through the policy kit by `read_policy_kit` and the change records and the pin
 # normaliser through the memory-tree kit under the edge above. `check` exits 2 `unarmed` where a kit does not
 # resolve, never a default, and its leg, `loop splice check`, is gov's own [[exempt_leg]], no row here.
+# The upstream field (TOOL-dDeclaredLoop-29): upstream.py reads the composition through loop_items.py's
+# `read_composed_items`, so the playbook kit is reached as a subprocess with no edge and gov's own rows are
+# read where it does not resolve; it reads git blobs through the memory-tree kit's tree_lib and writes its
+# journal record under that kit's conf and id readers, under the edge above. The roles kit's handoff takes
+# the rows as a file and imports nothing here. Its leg, `loop upstream fixtures`, is gov's own
+# [[exempt_leg]], no row here.
 requires = ["memory-tree"]
 
 # Everything the kit ships is engine, overwritten on every update: the definition, its reader, the

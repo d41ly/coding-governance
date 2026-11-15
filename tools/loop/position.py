@@ -11,7 +11,7 @@ holds: the run branch's `--first-parent` commits and their `Pass:` trailers thro
 kit's `read_commits` and `derive_attribution` in the `replace` view; the build's recorded moves through
 `loop_transition.read_transitions`, each checked by `loop_table.check_recorded_move`; the steps,
 `[states]` and the transition rows through `read_transition_rows`; the items through
-`loop_items.read_composition`, gov's own `[[item]]` rows where that composition is unarmed in the tree,
+`loop_items.read_composed_items`, gov's own `[[item]]` rows where that composition is unarmed in the tree,
 or the `[[item]]` rows of `definition` where a caller passes a parsed one;
 the acceptance records through `build_records.read_records` with `read_acceptance`; the run-state file's
 facts and parked rows; the remote-tracking tip of the default branch. No status header, README status
@@ -92,7 +92,7 @@ KIT = pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from claims import derive_claim_key, derive_claim_verdict, resolve_remote  # noqa: E402
-from loop_items import read_composition  # noqa: E402
+from loop_items import read_composed_items  # noqa: E402
 from loop_lib import (NO_STEP, ROUTE_STAND_IN, LoopError, check_computed_witnesses, read_definition,  # noqa: E402
                       read_item_rows, read_memory_tree, resolve_kit_dir, run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
@@ -399,11 +399,8 @@ def derive_position_into(pos, repo, slug, definition):
     handover = read_handover(repo, slug)
     if definition is None:
         data, where = read_definition(KIT)
-        rc, payload, lines = read_composition(repo)
-        if rc == 1:
-            raise ValueError("the item composition does not read: %s" % (lines[0] if lines else "exit 1"))
-        # unarmed, exit 2: no composition in this tree, so gov's own rows alone
-        items = payload["rows"] if rc == 0 else read_item_rows(data, where)
+        # unarmed: no composition in this tree, so gov's own rows alone
+        items = read_composed_items(repo)
     else:
         data, where = definition, "the caller's definition"
         items = read_item_rows(data, where)
@@ -875,11 +872,7 @@ def print_check_refusal(tag, key):
     own rows where it is unarmed; exit 0 held, 1 refused, 2 where the composition does not read."""
     rc, top = read_git(".", "rev-parse", "--show-toplevel")
     try:
-        data, where = read_definition(KIT)
-        crc, payload, lines = read_composition(top if rc == 0 and top else ".")
-        if crc == 1:
-            raise ValueError("the item composition does not read: %s" % (lines[0] if lines else "exit 1"))
-        items = payload["rows"] if crc == 0 else read_item_rows(data, where)
+        items = read_composed_items(top if rc == 0 and top else ".")
     except (LoopError, ValueError, OSError, LookupError, KeyError, TypeError, subprocess.SubprocessError) as e:
         print("loop: unarmed · %s" % (str(e) or type(e).__name__))
         return 2

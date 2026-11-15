@@ -106,6 +106,11 @@
 #              "transition" for a cross-step move, or "stand-in:{prefix}/<home>/<file>", today's tool
 #              where the route reaches a later build. Inline, never an [item.routes] table, so the
 #              tag index reads each row as one span.
+#   upstream   optional, the items whose returns' `## Establishes` rows it is handed and answers in its
+#              own `## Upstream`: one-line inline tables { item = "<tag>", gate = "record" | "measured" },
+#              a `measured` entry with `measured-by`, a path HEAD holds, and `measured-line`, a line it
+#              holds whole; an item carrying one routes the outcome `finding` (TOOL-dDeclaredLoop-29).
+#              No gov row carries it: upstream.py beside this file grades and joins it.
 
 [[step]]
 tag = "step.plan"

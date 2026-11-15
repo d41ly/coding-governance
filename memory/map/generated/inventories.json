@@ -91,6 +91,7 @@
       "loop stage coverage",
       "loop transition record",
       "loop transition tables",
+      "loop upstream fixtures",
       "manifest-check self-test",
       "marker contracts",
       "measure-legs selftest",
