@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-6 — the factories and conformance gates for commands, policy keys, stages, hooks, roles and workflows
 
-**Status:** INPROGRESS · rev-7 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 20 · advances TOOL-dDeclaredLoop-35
+**Status:** CLOSED · rev-7 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 20 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0091@b0158e81 whole
 
@@ -15,6 +15,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-6-deviation-61.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-6-deviation-61.md) | deviation | — |
 | [2026-10-24-build-TOOL-dDeclaredLoop-6-deviation-62.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-6-deviation-62.md) | deviation | — |
 | [2026-10-25-build-TOOL-dDeclaredLoop-6-deviation-63.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-6-deviation-63.md) | deviation | — |
+| [2026-11-15-build-TOOL-dDeclaredLoop-6-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-6-1-acceptance-ledger.md) | journal | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-6-1-builder-return.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-6-1-builder-return.md) | journal | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-6-deviation-64.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-6-deviation-64.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-6-deviation-65.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-6-deviation-65.md) | deviation | — |

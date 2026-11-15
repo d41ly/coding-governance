@@ -148,7 +148,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-4 — stage claims and the coverage gate](spec/2026-10-24-spec-TOOL-dDeclaredLoop-4.md) | 19 | 2 | CLOSED | rev-5 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-78 — the clean re-merge has three states, and a re-merge that lacks the policy file is graded, never treated as none](spec/2026-10-24-spec-TOOL-dDeclaredLoop-78.md) | 19 | 2 | CLOSED | rev-7 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-46 — the `stage` claim follows the whole manifest-key path: descriptors, emitter, runner floor and selfcheck](spec/2026-10-24-spec-TOOL-dDeclaredLoop-46.md) | 20 | 2 | INPROGRESS | rev-5 | 2026-11-15 |
-| [TOOL-dDeclaredLoop-6 — the factories and conformance gates for commands, policy keys, stages, hooks, roles and workflows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-6.md) | 20 | 2 | INPROGRESS | rev-7 | 2026-11-15 |
+| [TOOL-dDeclaredLoop-6 — the factories and conformance gates for commands, policy keys, stages, hooks, roles and workflows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-6.md) | 20 | 2 | CLOSED | rev-7 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-81 — a clean re-merge that fails is its own state and never takes the parent exemption; only a probed absence of the feature does](spec/2026-10-24-spec-TOOL-dDeclaredLoop-81.md) | 20 | 2 | DEFERRED | rev-6 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-25 — a repository's own stages, spliced between two adjacent gov stages](spec/2026-10-24-spec-TOOL-dDeclaredLoop-25.md) | 21 | 2 | DEFERRED | rev-5 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-47 — the stage factory writes a whole conforming stage: its witness, exit item, state and table rows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-47.md) | 21 | 2 | WONTDO | rev-3 | 2026-11-15 |
@@ -213,7 +213,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 512 bound to this build, across 4 record folder(s).
+Records: 513 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

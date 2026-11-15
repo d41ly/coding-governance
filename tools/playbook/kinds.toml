@@ -25,11 +25,11 @@ usage = "a directory {prefix}/<kit>/ holding kit.toml, its adopter and its engin
 tag = "kind.command"
 owner = "dDeclaredLoop"
 binds = ["principle.p16"]
-population = ""
-factory = ""
-gate = ""
-summary = "A slash command an adopter's harness runs."
-usage = "no factory has landed; dDeclaredLoop lands it, and until then the kind has no member"
+population = "{prefix}/*kit.toml"
+factory = "python {prefix}/loop/factories.py command"
+gate = "loop command conformance"
+summary = "A command a kit declares: a [[command]] row of its kit descriptor, its verb and the file it runs."
+usage = "python {prefix}/playbook/core.py new command <verb> --kit <id> --run <path>"
 
 [[kind]]
 tag = "kind.instruction-unit"
@@ -46,20 +46,20 @@ tag = "kind.policy-key"
 owner = "dDeclaredLoop"
 binds = ["principle.p16"]
 population = "{prefix}/policy/catalogue.toml"
-factory = ""
-gate = ""
+factory = "python {prefix}/loop/factories.py policy-key"
+gate = "policy check"
 summary = "A policy key: a [[key]] row of the policy catalogue, read through policy.py get."
-usage = "a [[key]] row in {prefix}/policy/catalogue.toml, its name, allowed values, default, summary and usage"
+usage = "python {prefix}/playbook/core.py new policy-key <name> --allowed <toml> --default <toml> --summary <text> --usage <text> --owner <build>"
 
 [[kind]]
 tag = "kind.preset"
-owner = "dDeclaredLoop"
+owner = "dKeptSession"
 binds = ["principle.p16"]
 population = ""
 factory = ""
 gate = ""
-summary = "A named preset of policy values an adopter selects at once."
-usage = "no factory has landed; dDeclaredLoop lands it, and until then the kind has no member"
+summary = "A named preset of policy values an adopter selects at once; dKeptSession lands its factory, with the preset store."
+usage = "no factory has landed; dKeptSession lands it, and until then the kind has no member"
 
 [[kind]]
 tag = "kind.gate-leg"
@@ -75,31 +75,31 @@ usage = "a row in {prefix}/gate-legs.json, its name, argv, chunk, subject and ce
 tag = "kind.role"
 owner = "dDeclaredLoop"
 binds = ["principle.p16"]
-population = ""
-factory = ""
-gate = ""
-summary = "A role an agent takes in the loop, rendered into its agent file."
-usage = "no factory has landed; dDeclaredLoop lands it, and until then the kind has no member"
+population = "{prefix}/roles/agents/*.agent.md"
+factory = "python {prefix}/loop/factories.py role"
+gate = "roles catalogue"
+summary = "A role an agent takes in the loop: a role file of the roles kit, listed by its workflow and priced by its body ceiling."
+usage = "python {prefix}/playbook/core.py new role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --returns <text> --output <text> --ceiling <bytes>"
 
 [[kind]]
 tag = "kind.workflow"
 owner = "dDeclaredLoop"
 binds = ["principle.p16"]
-population = "{prefix}/workflows/*.js"
-factory = ""
-gate = ""
-summary = "A Workflow script the harness runs as one program."
-usage = "a script {prefix}/workflows/<name>.js"
+population = "{prefix}/roles/workflows.toml"
+factory = "python {prefix}/loop/factories.py workflow"
+gate = "roles catalogue"
+summary = "A workflow the loop runs: a [[workflow]] row of the roles kit's table, placed by its row of the loop definition."
+usage = "python {prefix}/playbook/core.py new workflow <name> --driver <driver> --harness <path|none> --roles <slots> --enforced-by <text> --trigger <text> --order <n> --step <step tag|none>"
 
 [[kind]]
 tag = "kind.hook"
 owner = "dDeclaredLoop"
 binds = ["principle.p16"]
-population = "{prefix}/hooks/*.js"
-factory = ""
-gate = ""
-summary = "A harness hook script and the fragment that wires it."
-usage = "a script {prefix}/hooks/<name>.js with its fragment"
+population = "*.fragment.json"
+factory = "python {prefix}/loop/factories.py hook"
+gate = "hook destinations (every declared hook path ships)"
+summary = "A harness hook script and the fragment that wires it, shipped by its kit's descriptor."
+usage = "python {prefix}/playbook/core.py new hook <name> --kit <id> --event <event> [--matcher <m>]"
 
 [[kind]]
 tag = "kind.skill"

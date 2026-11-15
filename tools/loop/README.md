@@ -491,6 +491,35 @@ python <prefix>/loop/loop_items.py --fixture --plant amended-cycle
 python <prefix>/playbook/core.py new item <name> --step <step> --actor <kind:name> --witness-by <text> --owner <build>
 ```
 
+## The factories, `factories.py`
+
+Five more kinds of the register take their factory from `factories.py` (TOOL-dDeclaredLoop-6): the
+rows `kind.command`, `kind.policy-key`, `kind.hook`, `kind.role` and `kind.workflow` each name one of
+its subcommands, so `core.py new <kind> <name> ...` runs it. Each validates its arguments first and exits
+2 on a bad one, before any write; holds every path it writes, and the path a renderer it runs writes,
+through `write_guarded` from `policy_edit.py`, one call per path, nested; and runs the kind's gate as the
+innermost record step, so a red gate puts every byte back and removes every created path, prints the
+gate's output and exits 1. The gates are the existing ones, wrapped, never copied: `check-commands`
+here for a command, a `[[command]]` row of a kit descriptor; `POLICY_KEY_ARMS`, the four arms of the
+policy kit's `check_policy.py` that read no render at a revision, run in process through its `run_arm`,
+for a policy key, a `[[key]]` row of its catalogue, the mirror left to the caller's next commit;
+`check-hook-destinations.sh` for a hook, run with `GIT_INDEX_FILE` naming a throwaway copy of the
+caller's index holding the written files, since it grades tracked fragments only; and the roles kit's
+`check_roles.py`, through its `--write` render, for a role and a workflow, the workflow's loop row also
+graded by `loop_lib.py --check`. A role and a workflow join the two sets the roles kit closes in code,
+`BODY_CEILINGS` and `WORKFLOW_NAMES`, by one anchored insertion each. The preset kind is pending for
+dKeptSession, and the stage kind for TOOL-dDeclaredLoop-25's repository stage. `--fixture --plant
+<case>` runs one of eleven plants, each factory's instance green and a hand-made one red under the same
+gate plus the restore, in a scratch clone of the working tree the policy kit's `build_source_snapshot`
+builds, and `--selftest` runs `check-commands` and every plant over one such clone through
+`run_selftest_cases`.
+
+```bash
+python <prefix>/loop/factories.py check-commands
+python <prefix>/loop/factories.py --fixture --plant hook-new
+python <prefix>/loop/factories.py --selftest
+```
+
 ## The reader, `loop_lib.py`
 
 | function | returns |

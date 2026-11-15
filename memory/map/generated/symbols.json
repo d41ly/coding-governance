@@ -213,6 +213,11 @@
       "file": "tools/runlog/runlog_lib.py"
     },
     {
+      "id": "KindGateRed",
+      "kind": "class",
+      "file": "tools/loop/factories.py"
+    },
+    {
       "id": "LaunchFailed",
       "kind": "class",
       "file": "tools/run-gates/measure_legs.py"
@@ -401,6 +406,11 @@
       "id": "Refusal",
       "kind": "class",
       "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "Refused",
+      "kind": "class",
+      "file": "tools/loop/factories.py"
     },
     {
       "id": "Refused",
@@ -2861,6 +2871,11 @@
       "id": "build_fixture",
       "kind": "function",
       "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
+      "id": "build_fixture_base",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
     },
     {
       "id": "build_fixture_conf",
@@ -5403,6 +5418,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "check_commands",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
       "id": "check_commit_join",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
@@ -6661,6 +6681,11 @@
       "id": "check_one_fact",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "check_one_line",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
     },
     {
       "id": "check_one_line",
@@ -10760,6 +10785,11 @@
     {
       "id": "derive_layout",
       "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
+      "id": "derive_layout",
+      "kind": "function",
       "file": "tools/playbook/core.py"
     },
     {
@@ -11446,6 +11476,11 @@
       "id": "derive_role_roster",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_roles_kit",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
     },
     {
       "id": "derive_root_confs",
@@ -14690,6 +14725,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/loop/floor.py"
     },
     {
@@ -17778,6 +17818,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "read_arm_findings",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
       "id": "read_arm_lines",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -18336,6 +18381,11 @@
       "id": "read_clean_env",
       "kind": "function",
       "file": "tools/govkit/fixtures/retired_edits.py"
+    },
+    {
+      "id": "read_clean_env",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
     },
     {
       "id": "read_clean_env",
@@ -19606,6 +19656,11 @@
       "id": "read_kit_conf",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "read_kit_descriptor",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
     },
     {
       "id": "read_kit_home",
@@ -21738,6 +21793,11 @@
       "file": "tools/playbook/instructions_edit.py"
     },
     {
+      "id": "read_text_exact",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
       "id": "read_text_history",
       "kind": "function",
       "file": "tools/playbook/edge_grammar.py"
@@ -23388,6 +23448,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "render_closed_set",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
       "id": "render_command",
       "kind": "function",
       "file": "tools/settings-merge.py"
@@ -23556,6 +23621,11 @@
       "id": "render_fixture_row",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "render_front_matter",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
     },
     {
       "id": "render_fx_row",
@@ -24061,6 +24131,11 @@
       "id": "render_row",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "render_row_after",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
     },
     {
       "id": "render_row_order",
@@ -27513,6 +27588,11 @@
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
+      "id": "run_core_new",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
       "id": "run_cov29_gate",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -27706,6 +27786,11 @@
       "id": "run_fixture",
       "kind": "function",
       "file": "tools/govkit/shims.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
     },
     {
       "id": "run_fixture",
@@ -27970,6 +28055,11 @@
     {
       "id": "run_git",
       "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
       "file": "tools/loop/policy_edit.py"
     },
     {
@@ -28188,6 +28278,11 @@
       "file": "tools/unattended/stop-guard.test.sh"
     },
     {
+      "id": "run_hook_gate",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
       "id": "run_hooked",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -28276,6 +28371,11 @@
       "id": "run_killed",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "run_kind_gate",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
     },
     {
       "id": "run_kinds",
@@ -28718,6 +28818,11 @@
       "file": "tools/playbook/overlay.py"
     },
     {
+      "id": "run_policy_key_arms",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
       "id": "run_positional_plant",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
@@ -29106,6 +29211,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
     },
     {
       "id": "run_selftest",
@@ -34163,6 +34273,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "write_command",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
       "id": "write_command_plant",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
@@ -34553,6 +34668,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "write_hand_plant",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
       "id": "write_handoff",
       "kind": "function",
       "file": "tools/hooks/agent-cap.test.sh"
@@ -34581,6 +34701,11 @@
       "id": "write_hold_rounds",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_hook",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
     },
     {
       "id": "write_hook_plant",
@@ -34646,6 +34771,11 @@
       "id": "write_json_line",
       "kind": "function",
       "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "write_kind_instance",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
     },
     {
       "id": "write_kind_plant",
@@ -35013,6 +35143,11 @@
       "file": "tools/loop/policy_edit.py"
     },
     {
+      "id": "write_policy_key",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
       "id": "write_policy_plant",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
@@ -35241,6 +35376,11 @@
       "id": "write_rf31_commit",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "write_role",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
     },
     {
       "id": "write_roles",
@@ -35641,6 +35781,16 @@
       "id": "write_work_owner",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "write_workflow",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
+      "id": "write_workflow_roles",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
     },
     {
       "id": "wrow",

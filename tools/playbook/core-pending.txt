@@ -168,7 +168,6 @@ leg	profile-bar selftest	dWitnessedBar
 leg	held-halves selftest	dWitnessedBar
 leg	measure-legs selftest	dWitnessedBar
 leg	install-prefix (shipped surface)	dWitnessedBar
-leg	hook destinations (every declared hook path ships)	dWitnessedBar
 leg	hook destinations self-test	dWitnessedBar
 leg	agent-cap restatement	dWitnessedBar
 leg	agent-cap restatement self-test	dWitnessedBar
@@ -205,11 +204,9 @@ leg	playbook render selftest	dWitnessedBar
 leg	spec tokens (a spec's own names resolve)	dWitnessedBar
 leg	spec tokens (the pass's own spec)	dWitnessedBar
 leg	kit placeholders (a declared token its adopter substitutes)	dWitnessedBar
-leg	roles catalogue	dWitnessedBar
 leg	roles render wiring	dWitnessedBar
 leg	roles render selftest	dWitnessedBar
 leg	roles adopter self-test	dWitnessedBar
-leg	policy check	dWitnessedBar
 leg	positional (the citation check alone)	dWitnessedBar
 leg	tags positional selftest	dWitnessedBar
 leg	tags bundle selftest	dWitnessedBar
@@ -224,13 +221,8 @@ leg	selftest harness self-test	dWitnessedBar
 leg	extract-arms self-test	dWitnessedBar
 leg	run-selftests self-test	dWitnessedBar
 kind	kind.tool-kit	dShippedRelease
-kind	kind.command	dDeclaredLoop
-kind	kind.policy-key	dDeclaredLoop
-kind	kind.preset	dDeclaredLoop
+kind	kind.preset	dKeptSession
 kind	kind.gate-leg	dWitnessedBar
-kind	kind.role	dDeclaredLoop
-kind	kind.workflow	dDeclaredLoop
-kind	kind.hook	dDeclaredLoop
 kind	kind.record-kind	dConvergedCharter
 kind	kind.stage	dDeclaredLoop
 kind	kind.lens	dCalibratedLens

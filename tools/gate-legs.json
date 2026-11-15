@@ -1470,6 +1470,7 @@
     "subject": "repo",
     "ceiling": 2940,
     "doc_reads": [],
+    "enforces": ["principle.p16"],
     "stage": ["step.test"]
   },
   {
@@ -2040,6 +2041,7 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 120,
+    "enforces": ["principle.p16"],
     "stage": ["step.test"]
   },
   {
@@ -2087,6 +2089,7 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 120,
+    "enforces": ["principle.p16"],
     "stage": ["step.test"]
   },
   {
@@ -2235,6 +2238,32 @@
     "subject": "repo",
     "ceiling": 120,
     "enforces": ["principle.p1"],
+    "stage": ["step.test"]
+  },
+  {
+    "name": "loop command conformance",
+    "argv": [
+      "python",
+      "{prefix}/loop/factories.py",
+      "check-commands"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p16"],
+    "stage": ["step.test"]
+  },
+  {
+    "name": "loop factories fixtures",
+    "argv": [
+      "python",
+      "{prefix}/loop/factories.py",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "enforces": ["principle.p16"],
     "stage": ["step.test"]
   },
   {

@@ -475,6 +475,54 @@ verb = "new"
 flags = ["--step=", "--actor=", "--witness-by=", "--owner=", "--input=", "--allowance=", "--returns="]
 
 [[usage]]
+id = "script:{prefix}/loop/factories.py"
+shape = "verb"
+entry = "{prefix}/loop/factories.py"
+flags = ["--fixture", "--plant=", "--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/factories.py#check-commands"
+shape = "verb"
+entry = "{prefix}/loop/factories.py"
+verb = "check-commands"
+flags = []
+
+[[usage]]
+id = "script:{prefix}/loop/factories.py#command"
+shape = "verb"
+entry = "{prefix}/loop/factories.py"
+verb = "command"
+flags = ["--kit=", "--run="]
+
+[[usage]]
+id = "script:{prefix}/loop/factories.py#policy-key"
+shape = "verb"
+entry = "{prefix}/loop/factories.py"
+verb = "policy-key"
+flags = ["--allowed=", "--default=", "--summary=", "--usage=", "--owner="]
+
+[[usage]]
+id = "script:{prefix}/loop/factories.py#hook"
+shape = "verb"
+entry = "{prefix}/loop/factories.py"
+verb = "hook"
+flags = ["--kit=", "--event=", "--matcher="]
+
+[[usage]]
+id = "script:{prefix}/loop/factories.py#role"
+shape = "verb"
+entry = "{prefix}/loop/factories.py"
+verb = "role"
+flags = ["--workflow=", "--writes=", "--description=", "--reads=", "--returns=", "--output=", "--ceiling="]
+
+[[usage]]
+id = "script:{prefix}/loop/factories.py#workflow"
+shape = "verb"
+entry = "{prefix}/loop/factories.py"
+verb = "workflow"
+flags = ["--driver=", "--harness=", "--roles=", "--enforced-by=", "--trigger=", "--order=", "--step="]
+
+[[usage]]
 id = "script:{prefix}/playbook/overlay_rows.py#compose"
 shape = "verb"
 entry = "{prefix}/playbook/overlay_rows.py"

@@ -85,8 +85,10 @@ lexicon wiring	repo	wiring
 line length	repo	product
 line-length gate selftest	kit	selftests
 loop checklist tags	repo	declarations
+loop command conformance	repo	declarations
 loop computed witness	kit	selftests
 loop definition	repo	declarations
+loop factories fixtures	kit	selftests
 loop item kind	repo	selftests
 loop parent routes	kit	selftests
 loop transition record	repo	selftests

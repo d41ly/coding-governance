@@ -713,6 +713,78 @@ compares each row with the record table and reads no earlier revision, so that e
 see. A role item's record kind comes from its role and is not joined. The step gate's `item` class
 grades a gov item that disappears between a landing's base and its tip, as it does any member.
 
+## Making a new part
+
+Five kinds of the kinds register have a factory in this kit: a command, a policy key, a hook, a role
+and a workflow. A factory writes a new instance that already conforms, then runs the kind's gate over
+the whole population. You reach each one through the register's one verb, which appends your name and
+flags to the factory its row names:
+
+```text
+python <prefix>/playbook/core.py new command <verb> --kit <id> --run <path>
+python <prefix>/playbook/core.py new policy-key <name> --allowed <toml> --default <toml> --summary <text> --usage <text> --owner <build>
+python <prefix>/playbook/core.py new hook <name> --kit <id> --event <event> [--matcher <m>]
+python <prefix>/playbook/core.py new role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --returns <text> --output <text> --ceiling <bytes>
+python <prefix>/playbook/core.py new workflow <name> --driver <driver> --harness <path|none> --roles <slots> --enforced-by <text> --trigger <text> --order <n> --step <step tag|none>
+```
+
+Every factory works the same way. A bad argument exits 2, naming the flag, before anything is written.
+Each file it writes is held at its prior bytes, so when the gate is red the factory prints the gate's
+output, puts every file back, removes every file it created, and exits 1. When the gate is green it
+prints the gate's output and each path it wrote, and exits 0. A kit that is not installed exits 2,
+naming it.
+
+- **A command:** `python tools/loop/factories.py command <verb> --kit <id> --run <path>` appends a <!-- usage: script:tools/loop/factories.py#command a0688757 -->
+  `[[command]]` row, `verb` and `run`, to the kit descriptor whose `id` is `--kit`. `run` is a path
+  relative to that descriptor's directory. Its gate is `check-commands`.
+- **A policy key:** `python tools/loop/factories.py policy-key <name> --allowed <toml> --default <toml> --summary <text> --usage <text> --owner <build>` <!-- usage: script:tools/loop/factories.py#policy-key b76eed28 -->
+  appends a `[[key]]` row to the policy catalogue. Its gate is four arms of `policy check`, run in
+  process: `arm_schema`, `arm_shape`, `arm_summaries` and `arm_direction`, each printed as a
+  `policy-check:` line. A default the row's own `allowed` refuses is red on `arm_shape`. A loop bound or
+  deadline key is red on `arm_direction`, since the factory writes no `direction`. It writes the
+  catalogue only, never `.governance/policy.toml` or the mirror `.governance/policy.json`.
+- **A hook:** `python tools/loop/factories.py hook <name> --kit <id> --event <event> --matcher <m>` <!-- usage: script:tools/loop/factories.py#hook 7f9371c9 -->
+  writes `<name>.js` and `<name>.fragment.json` beside the descriptor whose `id` is `--kit`, and a
+  `[[files]]` row shipping each one where no `include` of that descriptor already does. `--matcher`
+  is `*` when you leave it out. Its gate is `hook destinations (every declared hook path ships)`. That
+  gate reads tracked fragments only, so the factory runs it against a throwaway copy of your index
+  holding the new files, and deletes the copy afterwards. Your own index is never written: nothing is
+  staged for you.
+- **A role:** `python tools/loop/factories.py role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --returns <text> --output <text> --ceiling <bytes>` <!-- usage: script:tools/loop/factories.py#role 33094e4a -->
+  writes `<slot>.agent.md` under the roles kit's `agents/`, lists the slot in its workflow's `roles`,
+  adds its body ceiling to the roles checker's `BODY_CEILINGS`, and re-renders the roles README's
+  catalogue. Its gate is `roles catalogue`.
+- **A workflow:** `python tools/loop/factories.py workflow <name> --driver <driver> --harness <path|none> --roles <slots> --enforced-by <text> --trigger <text> --order <n> --step <step>` <!-- usage: script:tools/loop/factories.py#workflow d7b86fbb -->
+  appends its row to the roles kit's `workflows.toml`, its `name`, `order` and `step` row to this
+  kit's `loop.toml`, and its name to the roles checker's `WORKFLOW_NAMES`. Its gate is `roles
+  catalogue`, then `python tools/loop/loop_lib.py --check`.
+- **Check the commands:** `python tools/loop/factories.py check-commands` reads every kit descriptor <!-- usage: script:tools/loop/factories.py#check-commands dfaea29d -->
+  and refuses, exit 1, a `[[command]]` row whose verb is not one tag segment or repeats in its
+  descriptor, a row whose `run` names no tracked file under the descriptor's directory, and a
+  descriptor that holds rows but no string `id`. With no row anywhere it prints `unarmed` and exits 0,
+  which is not coverage. Gov's `loop command conformance` gate runs it.
+- **See each gate red and green:** `python tools/loop/factories.py --fixture --plant <case>` runs one <!-- usage: script:tools/loop/factories.py c96f4991 -->
+  case in a scratch clone of your working tree. Each `-new` case runs the factory and expects green:
+  `command-new`, `policy-key-new`, `hook-new`, `role-new` and `workflow-new`. Each `-hand` case writes
+  a hand-made instance that does not conform and expects the same gate red: `command-hand`,
+  `policy-key-hand`, `hook-hand`, `role-hand` and `workflow-hand`. `factory-restores` gives a policy
+  key a default its own row refuses, and expects exit 1 with the clone left clean. `--selftest` runs
+  `check-commands` and every case. Gov's `loop factories fixtures` gate runs it.
+
+What is still yours to do, as it would be for a part made by hand. A role needs its agent file
+rendered under `.claude/agents/`. A hook needs wiring into your settings, then its `[[hook]]` stage
+row. A new policy key needs its mirror: commit the catalogue, then run `policy.py mirror --write` at
+that commit. Until then the full `policy check` is red on `arm_mirror_parity`. A key whose owner build
+has landed also needs a reader, and every key needs its section of `help/reference/policy.md`. The
+kit's version marker moves when its shipped bytes do, and the codebase map needs regenerating.
+
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
+```bash
+python tools/loop/factories.py check-commands
+python tools/loop/factories.py --fixture --plant hook-new
+python tools/loop/factories.py policy-key review.example --allowed '["a", "b"]' --default '"a"' --summary "An example." --usage 'review.example = "b"' --owner your-build
+```
+
 ## Stage claims
 
 Every part of the product declares the build stage it serves, so the loop is written on the parts as

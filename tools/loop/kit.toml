@@ -68,6 +68,12 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # this one, and the memory-tree kit's coverage factory under the edge above; it exits 2 `unarmed` where
 # a kit does not resolve, never a default. Its populations are gov's tree, so its leg is gov's own
 # [[exempt_leg]], no row here.
+# The kind factories (TOOL-dDeclaredLoop-6): factories.py writes the roles kit's role files,
+# workflows.toml and check_roles.py, the policy kit's catalogue and a kit descriptor's directory, and runs
+# the roles kit's check_roles.py, the policy kit's arms in process and the tool root's hook-destination
+# gate, each found by `resolve_kit_dir` with no edge; a kit that does not resolve exits 2 naming it, never
+# a default. Both its legs, `loop command conformance` and `loop factories fixtures`, are gov's own
+# [[exempt_leg]] rows, no row here.
 requires = ["memory-tree"]
 
 # Everything the kit ships is engine, overwritten on every update: the definition, its reader, the
