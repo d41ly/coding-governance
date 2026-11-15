@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-15-prompt-TOOL-aTwinnedPass-13-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-13-1-spec-writer.md) | journal | — |
+| [2026-11-15-prompt-TOOL-aTwinnedPass-13-2-builder.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-13-2-builder.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTwinnedPass-13-brief.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-13-brief.md) | research | — |
 
 <!-- /gen:spec-records -->

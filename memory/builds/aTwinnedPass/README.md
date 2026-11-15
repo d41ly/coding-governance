@@ -73,7 +73,7 @@ ids TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3 TOOL-aTwinnedPas
 | [TOOL-aTwinnedPass-13 — the reconcile with local main at a76c6afe7: its four conflicts resolved so the landing merge is clean](spec/2026-11-15-spec-TOOL-aTwinnedPass-13.md) | 6 | 2 | INPROGRESS | rev-1 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 38 bound to this build, across 4 record folder(s).
+Records: 39 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
