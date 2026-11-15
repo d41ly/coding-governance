@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-81 — a clean re-merge that fails is its own state and never takes the parent exemption; only a probed absence of the feature does
 
-**Status:** DEFERRED · rev-5 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 20 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-6 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 20 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -112,7 +112,7 @@ detects the missing feature by a probe instead of an exit code. It repairs `TOOL
 - **hands-off** `TOOL-dDeclaredLoop-75` — the exit table, in which S27's exit 1 stays the one non-zero exit graded on C or on the parents and every other exit is the failed state, refused untrailered, never a fall to the parents
 - **hands-off** `TOOL-dDeclaredLoop-82` — the exit table, beside which that unit restates S27's exit-1 body as present, absent or refused (id 4)
 - **hands-off** `TOOL-dDeclaredLoop-83` — S2's exit table, which that unit writes into 75 S27 in place of its fallback to the parents (the round-6 spec audit's id 1)
-- **hands-off** `TOOL-dDeclaredLoop-84` — S2's exit table, which that unit writes into 78's states and grade and into 82 S4 and AC4 (the round-6 spec audit's id 7)
+- **hands-off** `TOOL-dDeclaredLoop-84` — S2's exit table and S5's `push-merge-tree-fatal` plant, which that unit writes into 82 S4 and AC4 (the round-6 spec audit's id 7)
 - **hands-off** `TOOL-dDeclaredLoop-85` — `resolve_write_tree_support`, `check_write_tree_usage` and S4's plant hook, which that unit gives a third answer, `probe failed`, routed to the `failed` state, and restates in S1, S2, S5, §4, AC4 and AC5 (the round-6 spec audit's id 24)
 - **hands-off** `TOOL-dDeclaredLoop-86` — S3's state names and parent-side parse refusal, the `failed` refusal text for a start failure, a signal and an empty stderr, and §4 Evidence's quotation of 75 S27, which that unit amends (the round-6 spec audit's ids 3, 18, 29)
 - **hands-off** `TOOL-dDeclaredLoop-88` — S1's probe signature and rule, S3's state names, §4's grade and AC5, which that unit restates to the three-answer probe (the round-7 spec audit's ids 3, 6, 9, 12, 19, 21)
@@ -396,6 +396,7 @@ New arm: tools/loop/guard.py · covers AC1 AC2 AC3 AC4 · the three plants besid
   subprocess a stand-in never reaches; S5 folds the trailered plant into a scenario (F4) and gives
   `push-merge-no-write-tree` a history the parents branch reads; S6 brings the docstring and help
   sentence; §5 names the dependencies and what could red; §7 gains the legs the touched paths owe.
+- rev-6 · 2026-11-15 · §3 · the hands-off edge to TOOL-dDeclaredLoop-84 names what that unit's rev-4 consumes: the exit table and the plant, written into 82 alone; nothing else moved.
 
 ## 10. Reuse audit
 

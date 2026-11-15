@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-83 — 75 S27 states 81's exit table, so no merge-tree exit but 0 and 1 falls to the parents
 
-**Status:** DEFERRED · rev-4 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-5 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -51,7 +51,7 @@ parents, and makes 75's own AC27 observe the `failed` route at 75's pass. It bui
   of the clause sits on one line of 75, since AC2 and `TOOL-dDeclaredLoop-88` AC1 grep lines.
   Observed by AC1, AC2.
   **Readers:**
-  by name: `memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md`, the fallback clause of its S27 scope item; `memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-84.md`, the clause's grep in its S4 and AC3; `memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-86.md`, the clause's grep in its AC1
+  by name: `memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md`, the fallback clause of its S27 scope item; `memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-84.md`, the clause's grep in its S2 and AC2; `memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-86.md`, the clause's grep in its AC1
   by value: `tools/loop/guard.py`, its re-merge reader and push arm, which grade each re-merge outcome as the clause states once 81 S2 and S3 are built
 - **S2** — 75 AC27 gains a second observation in the same rev bump, written as §4's "AC27 after this
   unit": at 75's pass, `python guard.py --fixture --plant push-merge-tree-fatal` exits 1 printing
@@ -317,6 +317,7 @@ owed exit 1.
   S2 names the tree-fatal plant in the descriptive form 75's arm line uses; §4 cites 75 by anchor
   and gives the clause and AC27 as written; §5 names the dependencies and what could red; the Files
   touched gain the build README's generated region.
+- rev-5 · 2026-11-15 · §2 S1 · S1's Readers clause names the grep in TOOL-dDeclaredLoop-84's S2 and AC2, where that unit's rev-4 moved it; nothing else moved.
 
 ## 10. Reuse audit
 

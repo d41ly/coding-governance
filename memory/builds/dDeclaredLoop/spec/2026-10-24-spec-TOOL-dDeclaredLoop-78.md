@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-78 — the clean re-merge has three states, and a re-merge that lacks the policy file is graded, never treated as none
 
-**Status:** DEFERRED · rev-6 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 19 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-7 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 19 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -95,7 +95,7 @@ the parents, and plants the deleted, emptied and both-absent histories. It repai
 - **hands-off** `TOOL-dDeclaredLoop-79` — the `absent` state, which that unit's pre-filter counts as a value when it compares M with every parent (ids 7, 12)
 - **hands-off** `TOOL-dDeclaredLoop-81` — the `uncomputable` state, which that unit narrows to an octopus merge or a probed absence of the feature, every other failed re-merge refusing by name and never taking the parent exemption (the round-5 spec audit's id 28)
 - **hands-off** `TOOL-dDeclaredLoop-82` — S4's plant list and AC2, which that unit completes with `push-merge-unparseable-c` and `push-merge-unparseable-parent` and restates to the break AC2 catches (the round-5 spec audit's ids 7, 8, 29)
-- **hands-off** `TOOL-dDeclaredLoop-84` — S1's `uncomputable`, S2's parent-branch sentence and §4's grade block, which that unit restates to 81's exit table (the round-6 spec audit's id 7)
+- **hands-off** `TOOL-dDeclaredLoop-84` — S1's `uncomputable`, S2's parent-branch sentence and §4's grade block, which that unit reads as this spec's record once it lands and leaves as written (the round-6 spec audit's id 7)
 - **hands-off** `TOOL-dDeclaredLoop-86` — S3's parse refusal at a parent, which that unit widens to every branch that reads the parents (the round-6 spec audit's id 3)
 - **hands-off** `TOOL-dDeclaredLoop-88` — S1's state count and §4's grade block, which that unit restates to five states, a five-way dispatch and a failed-probe line (the round-7 spec audit's ids 2, 5, 20)
 - **hands-off** `TOOL-dDeclaredLoop-90` — the H1, S1 and hands-off edge that count C's states, which that unit restates to five (the round-8 spec audit's id 26)
@@ -306,6 +306,7 @@ New arm: tools/loop/guard.py · covers AC1 AC2 AC3 AC4 · the four plants beside
   names `push-merge-unparseable-c`, which AC4 runs, and gives each plant a history the C branch reaches;
   S5 brings the docstring and help sentence; §5 names the dependencies and what could red; §7 gains the
   legs the touched paths owe and states how each arm is staged red.
+- rev-7 · 2026-11-15 · §3 · the hands-off edge to TOOL-dDeclaredLoop-84 reads as that unit's rev-4 consumes it: as this spec's landed record, never restated; nothing else moved.
 
 ## 10. Reuse audit
 
