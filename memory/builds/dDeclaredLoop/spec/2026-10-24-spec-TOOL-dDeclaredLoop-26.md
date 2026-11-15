@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-26 — a build's composition pinned per step, its position read at the pin, and the move at the next step boundary
 
-**Status:** INPROGRESS · rev-5 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 23 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-6 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 23 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0111@313dbc9c whole
 
@@ -16,6 +16,7 @@
 | [2026-11-05-build-TOOL-dDeclaredLoop-26-deviation-263.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-26-deviation-263.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-26-deviation-264.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-26-deviation-264.md) | deviation | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-26-1-builder-return.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-26-1-builder-return.md) | journal | — |
+| [2026-11-16-build-TOOL-dDeclaredLoop-26-deviation-265.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-26-deviation-265.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-56 |
@@ -38,8 +39,9 @@ at its next step boundary, so an update or an overlay change landing mid-step ne
 build is doing (the owner's FA-7, "Next step boundary (Recommended)",
 `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md:376`).
 Today nothing pins a build to a composition: `tools/loop/position.py#derive_position_into` reads the
-item composition at `HEAD` through `tools/loop/loop_items.py#read_composition`, the landed tip
-(`memory/builds/dDeclaredLoop/build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-a.md:33`).
+item composition at `HEAD` through `tools/loop/loop_items.py#read_composed_items`, the composition's
+rows where `read_composition` answers 0 and gov's own rows where it answers 2, unarmed, so a build
+always reads the landed tip (`memory/builds/dDeclaredLoop/build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-a.md:33`).
 
 ## 2. Scope (IN)
 
@@ -62,17 +64,25 @@ item composition at `HEAD` through `tools/loop/loop_items.py#read_composition`, 
   `composition` resolved to its commit, state `pinned`. `read_composition_at(root, rev)` answers what
   `read_composition` answers, composed at `rev`: in place where `rev` is `HEAD`'s commit, and otherwise
   in a scratch worktree detached at `rev`, so every read the `compose --kind item` verb makes at `HEAD`
-  reads the pin (§8 F4) while the code that runs is this tree's. `derive_position_into` reads the build's
-  moves first and its items through `read_composition_at` at `read_step_composition`'s commit, never at
-  the tip, and appends `composition@<sha8> · <state>` to the position's reads. Observed by AC1.
+  reads the pin (§8 F4) while the code that runs is this tree's. `read_composed_items(root, rev=None)`
+  takes the revision: where one is given it reads the triple through `read_composition_at(root, rev)`
+  in place of `read_composition(root)`, and maps it as today, rows on 0, gov's own rows on 2, ValueError
+  on 1, so the mapping keeps its one owner (§8 F9). `derive_position_into` reads the build's moves first
+  and its items through `read_composed_items(repo, <read_step_composition's commit>)`, never at the tip,
+  and appends `composition@<sha8> · <state>` to the position's reads. Observed by AC1.
 - **S4** — The carry. A witness the build holds under an item tag its moves name carries to that
   tag's successor when the tag is absent from the composition at the pin and a change record ended it
   with exactly one successor that the composition holds. `derive_carried_witnesses(root, named, tags)`
   answers the position's named witnesses with each carried entry added under its successor, and
   `derive_position_into` reads its named witnesses through it. A successor is read through
   dOrderedCharter-19's one tag resolver, `tools/playbook/gov_tag.py`'s `show <tag> --json`, run as a
-  subprocess and found by `resolve_kit_dir`: the `Successor` line it answers for a tag no live row
-  defines, extracted from the change records by the playbook kit; this kit parses no change record.
+  subprocess: the copy under the repository being read, found by `resolve_kit_dir` with the playbook
+  home, the anchor `gov_tag.py` and the loop kit's folder under `root`, that folder the parent of the
+  tree-relative path `tools/loop/loop_items.py#derive_definition_rel` answers. A copy found beside
+  `composition.py` would read this tree's tag index whatever its working directory, since
+  `tools/playbook/gov_tag.py#resolve_repo_root` reads `rev-parse --show-toplevel` from the script's own
+  folder. The resolver answers the `Successor` line for a tag no live row defines, extracted from the
+  change records by the playbook kit; this kit parses no change record.
   `read_tag_successors(root, tag)` answers the list, `[]` for an ending with none, or None where no
   record ended the tag. Observed by AC2.
 - **S5** — An item ending under a build. At a move whose previous move was pinned at another commit,
@@ -165,13 +175,20 @@ The read at the pin, in order:
    `read_composition(<scratch>)`, so the `compose --kind item` verb this tree resolves runs with the
    pin as `HEAD`: its overlay, its namespace source, its policy file and its change records. Then
    `git worktree remove --force <scratch>` runs in a `finally`, so a refusal leaves no worktree.
+   `read_composition` runs the verb with the scratch as its working directory, and
+   `tools/playbook/overlay_rows.py#run_compose` composes over `pathlib.Path.cwd()`, so the verb found in this
+   tree reads the scratch's tree;
+4. `read_composed_items(root, rev)` maps that triple as it maps `read_composition`'s, importing
+   `read_composition_at` inside the function, since `composition.py` imports `loop_items`; it is the
+   read position makes.
 
 ### The carry and the orders
 
 One rule serves S4, S5 and S6. A tag absent from the composition at a pin is redirected when
 `read_tag_successors` answers exactly one successor and that successor is in the same composition;
-otherwise it is not redirected. `read_tag_successors` runs `gov_tag.py show <tag> --json` with the
-repository as its working directory and the git leaks unset (`tools/loop/loop_witness.py#read_clean_env`):
+otherwise it is not redirected. `read_tag_successors` runs `gov_tag.py show <tag> --json`, the copy S4
+finds under `root`, with `root` as its working directory and the git leaks unset
+(`tools/loop/loop_witness.py#read_clean_env`):
 exit 1, no row, answers None; exit 0 answers the `Successor` line of its `retired` rows, comma-split,
 `none` as `[]`, and None where every row is live; exit 2, or the playbook kit unresolved, is a
 LookupError naming the resolver.
@@ -207,11 +224,23 @@ with a declared verb. The rev-4 name `compose_at` was refused there, its verb un
 
 The scratch base is `build_scratch_tree`'s, plus the build `tFix`: a README whose front matter
 `parse_front_matter` reads, one spec `TOOL-tFix-1`, and a `.memory-tree.conf` naming the `TOOL`
-family, so the writer has an anchor. Each plant records the move `planning -> designing` on
-`item.plan.exit` and then `designing -> planning` on `item.design.decompose` (outcome `goal-fork`)
-through the writer at commit C1, so the build holds a witness under that tag. It then commits C2,
-where the scratch definition's `item.design.decompose` is re-tagged `item.design.regroup` throughout,
-with one change record through the memory-tree kit's `write_change`:
+family, so the writer has an anchor. The base's branch is renamed `main`, one `branch -M main` through
+`run_fixture_git`. `build_scratch_tree`'s `init` takes the host's default branch name and the scratch
+has no remote, so the policy kit's landed revision (`tools/policy/policy.py#derive_landed_revision`)
+falls back to `refs/heads/main` and refuses where that names no commit. The builder's probe saw the
+scratch's resolver refuse that read until the branch was named `main`, and then answer its `retired`
+row. `GOV_DEFAULT_BRANCH` was not probed, and an environment value would have to reach every
+subprocess the plant starts, where the rename is one call that `build_scratch_tree` and its other
+callers never see.
+
+Each plant records two moves through the writer, which commits each move on `HEAD`
+(`tools/loop/loop_transition.py#write_transition`). The first, `planning -> designing` on
+`item.plan.exit`, is recorded at the base commit and commits C1. The second, `designing -> planning`
+on `item.design.decompose` (outcome `goal-fork`), is recorded at C1, so its `composition` is C1's
+sha8, the pin AC1 reads, and it commits its own commit on C1; the build now holds a witness under
+`item.design.decompose`. The plant then commits C2 on that commit, where the scratch definition's
+`item.design.decompose` is re-tagged `item.design.regroup` throughout, with one change record through
+the memory-tree kit's `write_change`:
 
 | Plant | C2's change record | Owed |
 |---|---|---|
@@ -219,7 +248,7 @@ with one change record through the memory-tree kit's `write_change`:
 | `ended` | remove, successor none | AC4 |
 | `split` | split, successors `item.design.regroup` and `item.design.regroup-b` | AC4 |
 | `policy-rename` | rename, as `rename`; the base's `.governance/policy.toml` sets `review.breakpoints` to `item.design.decompose` | AC3 |
-| `unpinned` | none; the build's one move is a hand-written trailer with no `composition` | AC6 |
+| `unpinned` | none; the build's one move is a hand-written trailer with no `composition`, in place of the two recorded moves | AC6 |
 
 Each plant then records `planning -> designing` on `item.plan.exit` at C2 where it owes it, prints
 each observation, and closes with `loop: fixture · <plant> · held` or `· MISSED <why>`.
@@ -238,8 +267,12 @@ Live at landing: the pin only narrows what a mid-step reader sees, and no caller
 - `tools/loop/composition.py` (new)
 - `tools/loop/loop_transition.py`: `composition` in `TRANSITION_FIELDS`, the derived value and the
   `--field` refusal, `write_ended_orders` called before the records, the order lines, the `field` plant
-- `tools/loop/position.py`: the moves read first, the items through `read_composition_at`, the named
-  witnesses through `derive_carried_witnesses`, the `composition@` read, its docstring
+- `tools/loop/position.py`: the moves read first, the items through `read_composed_items` at the pin,
+  the named witnesses through `derive_carried_witnesses`, the `composition@` read, its docstring
+- `tools/loop/loop_items.py`: `read_composed_items` takes `rev=None`, read through `read_composition_at`
+  where given (§8 F9), its docstring and the module docstring's sentence on it
+- `tools/loop/README.md`: a section on `composition.py` and its commands, and "The position engine"
+  naming the pin and `read_composed_items`
 - `tools/loop/kit.toml`: one comment paragraph on the module's reach
 - `tools/gate-legs.json`: the leg `loop composition fixtures`
 - `tools/govkit/registry.toml`: its `[[exempt_leg]]` row
@@ -249,6 +282,10 @@ Live at landing: the pin only narrows what a mid-step reader sees, and no caller
 - `tools/playbook/core-pending.txt`: the `principle.p8` row
 - `help/loop.md`: the section of S9
 - `memory/guides/SESSION-KICKOFF.md`: the audit block restamped
+- `memory/map/features/loop.md`: `loop composition fixtures` in its `[claims]` `gate-legs` list
+- `memory/map/generated/symbols.json`, `memory/map/generated/MAP.md`,
+  `memory/map/generated/CARDS.md` and `memory/map/generated/inventories.json`: regenerated, §5
+  registry and pins
 
 ### Alternatives rejected
 
@@ -293,7 +330,16 @@ Live at landing: the pin only narrows what a mid-step reader sees, and no caller
     `composition` (`write_position_plant`'s `write_move`), so each composition read is `unpinned`, in
     place, as today, and adds one `read —` entry, while `check_plant` asks only that some read open
     `memory/`.
-  - `loop item kind`: `read_composition` and `build_scratch_tree` are called, never changed.
+  - `loop item kind`: `read_composition` and `build_scratch_tree` are called, never changed;
+    `read_composed_items` gains a parameter defaulting to None, under which it reads as today.
+  - `loop upstream fixtures`: `tools/loop/upstream.py` calls `read_composed_items(root)` with no
+    revision, and `print_check_refusal` in `tools/loop/position.py` does the same, so both read
+    `read_composition` at `HEAD` as before.
+  - `codebase-map gate coverage`: the map's inventories read every leg name in `tools/gate-legs.json`,
+    so the new leg is claimed in `memory/map/features/loop.md`'s `gate-legs` list in the same commit.
+  - `codebase-map coverage + freshness`: `symbols.json` indexes Python functions, so the eight new
+    functions and `read_composed_items`' signature stale it until `gen_map.py --write` regenerates the
+    four generated files in the same commit.
   - `core meta-check`: the leg enforces `principle.p8` and its pending row goes in the same commit.
   - `help page commands`: the new usage row's anchor, its fingerprint printed by
     `python tools/govkit/docs_leg.py --fingerprints`, sits on the S9 section's fixture line; the
@@ -302,7 +348,8 @@ Live at landing: the pin only narrows what a mid-step reader sees, and no caller
     docstring names itself and its siblings by file name or `<prefix>`, never a kit path.
   - `encoding posture (text IO names its encoding)`: `write_loop_order` names UTF-8.
   - `python reads (a name never bound, an import outside its guard)`: `write_transition` imports
-    `composition` inside the function, since `composition.py` imports `loop_transition`.
+    `composition` inside the function, since `composition.py` imports `loop_transition`, and
+    `read_composed_items` does the same, since `composition.py` imports `loop_items`.
   - `lexicon naming predicates`: the eight functions of §4 Inventory each lead with a declared verb, so
     the offender count stays at `VERB_OFFENDER_PIN`, 1209 PINNED at `.lexicon.conf` on the branch
     `dac974418eab`.
@@ -331,15 +378,20 @@ Live at landing: the pin only narrows what a mid-step reader sees, and no caller
   `loop position fixtures` and `loop item kind` carry. The kickoff manifest watches `tools/gate-legs.json`, so the audit block of
   `memory/guides/SESSION-KICKOFF.md` is restamped with a `manifest-audit:` delta line. The verdict-epoch
   gate's delegate list holds memory-tree modules and the spec-token checker, no file of this unit, so it
-  does not move. The map's generated files are regenerated. The kit versions are minted by the lander.
+  does not move. The loop dossier `memory/map/features/loop.md` claims the leg in its `gate-legs` list,
+  and `python tools/codebase-map/gen_map.py --write` regenerates `symbols.json`, `MAP.md`, `CARDS.md`
+  and `inventories.json` under `memory/map/generated/`. `tools/loop/README.md` gains the module's
+  section, as every loop module has one. The kit versions are minted by the lander.
 - testing — the five plants of §4 The plants, and the `field` plant's new case.
 - migration — as §4 says.
-- user docs — `help/loop.md` gains the pin's section and the trailer paragraph names the field.
+- user docs — `help/loop.md` gains the pin's section and the trailer paragraph names the field;
+  `tools/loop/README.md` gains the module's section.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When `python composition.py --fixture --plant rename` reads the build after C2 lands and
-  before its next move, `read_step_composition` answers C1's commit `pinned`,
+  before its next move, `read_step_composition` answers C1's commit `pinned`, C1 being the first move's
+  commit and the one the second move was recorded at (§4 The plants),
   `read_composition_at` at it holds `item.design.decompose` and not `item.design.regroup`, and the
   position `derive_position` derives over the plant lists `composition@<C1's sha8> · pinned` among its
   reads.
@@ -381,7 +433,7 @@ Live at landing: the pin only narrows what a mid-step reader sees, and no caller
 
 ## 7. Gates
 
-`loop transition record` · `loop position fixtures` · `loop guard fixtures` · `loop item kind` · `core meta-check` · `help page commands` · `lexicon naming predicates` · `python reads (a name never bound, an import outside its guard)` · `encoding posture (text IO names its encoding)` · `install-prefix (shipped surface)` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `policy fixtures` · `playbook render selftest` · `recall floor` · `recall floor arms` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`loop transition record` · `loop position fixtures` · `loop guard fixtures` · `loop item kind` · `loop upstream fixtures` · `codebase-map gate coverage` · `codebase-map coverage + freshness` · `core meta-check` · `help page commands` · `lexicon naming predicates` · `python reads (a name never bound, an import outside its guard)` · `encoding posture (text IO names its encoding)` · `install-prefix (shipped surface)` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `policy fixtures` · `playbook render selftest` · `recall floor` · `recall floor arms` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/loop/composition.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · the `loop composition fixtures` leg's plants, its failing case staged by `rename` with the position engine reading the tip · none
 New arm: tools/loop/loop_transition.py · covers none · the `field` plant's `composition=3f9c2a71` move, its failing case staged by accepting the field as given · none
@@ -462,6 +514,19 @@ New arm: tools/loop/loop_transition.py · covers none · the `field` plant's `co
   2026-11-15, delegated): (a), rung 3: the [one-fact] practice, the tag-valued walk kept in its one
   owner.
   widens: none · relaxes: none
+- **F9 — How does position read its items at the pin?** Since unit 29 `derive_position_into` and
+  `print_check_refusal` read through `tools/loop/loop_items.py#read_composed_items`, which maps
+  `read_composition`'s exit 0 to the composed rows, exit 2 to gov's own rows and exit 1 to a
+  ValueError, and `upstream.py` reads the same way. `read_composition_at` answers that triple at a pin,
+  so position needs the mapping there. Options: (a) `read_composed_items` takes `rev=None` and, where
+  one is given, reads the triple through `read_composition_at`, one parameter on a function this unit
+  then edits in `tools/loop/loop_items.py`; (b) `position.py` copies the mapping beside its call of
+  `read_composition_at`. Neither fails an acceptance criterion, gate or non-goal, and neither adds a
+  dependency, a public surface or a write. (b) puts a second owner on the 0/1/2 mapping, which the
+  [reuse] and [one-fact] practices refuse, and the tie-break takes the seam M5 found.
+  Recommendation: (a). RESOLVED (agent, 2026-11-16, delegated): (a), by the ratify rule's tie-break,
+  the reuse of `read_composed_items`.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -492,6 +557,14 @@ New arm: tools/loop/loop_transition.py · covers none · the `field` plant's `co
   `--selftest`; the pending row of `principle.p8` is present and its Readers clause names the tracked
   reader. Forks F6, F7 and F8 settle the order writer, the held items and the policy order's timing.
   §5 names every row, pin, budget and fixture the change reaches.
+- rev-6 · 2026-11-16 · S3 S4 · §1 · §4 · §5 · AC1 · §7 · §8 F9 · §10 · answers the four findings of
+  the builder return `2026-11-16-build-TOOL-dDeclaredLoop-26-1-builder-return`, re-read on branch
+  `unattended-declared-loop-d56bf0` at `fa3b7151c`: Files touched and §5 gain the loop dossier's claim,
+  the four generated map files and `tools/loop/README.md`; §1 and S3 read through `read_composed_items`,
+  which takes the pin's revision (F9 (a)), adding `tools/loop/loop_items.py`; S4 and The carry find the
+  tag resolver under the repository being read; The plants name the scratch's branch `main`; C1 is the
+  first move's commit, the pin the second move records and AC1 reads. §7 gains the upstream and map
+  legs those files trip.
 
 ## 10. Reuse audit
 
@@ -509,6 +582,8 @@ with" ranked `read_change_records`, `write_change`, `read_change` and `derive_su
 practice's `replaces` map and the others the record's own readers, which §4 Alternatives rejected
 weighs. No existing seam pins a composition on a move: scout A found every build reads the landed tip
 (`memory/builds/dDeclaredLoop/build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-a.md:33`). The
-order writer has no reachable seam (§8 F6).
+order writer has no reachable seam (§8 F6). At rev-6, read at `fa3b7151c`, position's item read is
+`read_composed_items` in `tools/loop/loop_items.py`, the seam S3 extends with a revision (§8 F9), and
+the resolver is found by the loop kit's `resolve_kit_dir` under the repository being read.
 
 Recall terms used: composition revision pinned transition record step boundary successor rename change record overlay order worktree tag resolver
