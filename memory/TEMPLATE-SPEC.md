@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.162 -->
+<!-- gov:kit memory-tree@2.163 -->
 [memory/TEMPLATE-SPEC.md · Level 3 · The spec format, read before writing a spec or adding a write path; yields to levels 0 to 2]
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
@@ -104,7 +104,9 @@ an absent region cannot be told from a spec nobody has recorded against.
   can cite them stably — and JOIN them: each scope item names the criterion that observes it, or says
   `NOT OBSERVED` and why. See the §2 body below; machine-checked from `SCOPE_JOIN_CUTOFF`.
 - No narration, no restating the heading as its first sentence, no marketing adjectives.
-- Verify every claim about existing code against source at writing time; mark the rest `UNVERIFIED`.
+- Verify every claim about existing code against source at writing time, and cite where you read
+  it: `path#symbol` for a definition, else the blob-pinned line `<path>@<oid>:<n>`. A bare line
+  number drifts as the file is edited, and neither form does. Mark the rest `UNVERIFIED`.
 - A measured number a spec pins says whether it is PINNED or DERIVED. The rule above verifies at
   WRITING time, so a number true when written goes stale in place and nothing re-checks it: a pinned
   one names when it was measured, a derived one names what re-derives it. This binds every section,
@@ -153,6 +155,11 @@ an absent region cannot be told from a spec nobody has recorded against.
   `### Inventory` (name every identifier the unit will MINT, and where this repo declares naming
   cells, name each one beside the cell that grades it) · `### Migration` · `### Rollout` ·
   `### Files touched (estimate)` · `### Alternatives rejected`.
+- **A watched path brings its manifest.** Where the project keeps a kickoff manifest, a unit that
+  edits a path the manifest's `watch:` line names lists the manifest under
+  `### Files touched (estimate)` as well, with its `last-audit` re-stamp named beside it. The
+  manifest check's staged leg refuses a commit that stages a watched path unless that commit also
+  moves the stamp, so a builder held to its declared paths cannot commit the unit without it.
 - **Resolved forks:** mark each fork in §8 in place — from `FORK_ITEM_CUTOFF`, each F-item in its
   own span — naming the RESOLVER: `RESOLVED (owner,
   <date>): <pick>` for the owner's own decision, `RESOLVED (agent, <date>, delegated): <pick>` when a

@@ -3037,6 +3037,16 @@ const handOut = {
     },
     perUnit: ['unitId', 'specPath', 'briefPath'],
     resolvePathsWith: DRIVER + ' --plan ' + slug + ' --paths',
+    // TOOL-aLightenedLoop-3 S1 - THE FIRST --dispatch IS THE MAIN LOOP'S, before the spawn, so a
+    // refusal costs no child. A Workflow script has no shell, so the instruction travels as a field
+    // beside `resolvePathsWith`, never as a `nextAction` sentence; attended mode has no run-state
+    // file for --dispatch to record against, so there the object carries no such key.
+    ...(mode === 'unattended' ? {
+      declare: "Before each unit's Workflow call, run `" + DRIVER + ' --dispatch ' + slug +
+        ' --pass <unitId> --writes <path>` with one --writes per backticked path under that unit ' +
+        "spec's `### Files touched (estimate)`, in the foreground with the tool's timeout at 600000 ms. " +
+        'A refusal is binding: make no Workflow call for that unit, and act on what the refusal names.',
+    } : {}),
   },
   // THE MODE IS PART OF THE RUN-INTEGRITY REPORT, not decoration. `degradation-known-but-unreported`
   // is the class where a pipeline computes how weak its own run was and then does not say so where a

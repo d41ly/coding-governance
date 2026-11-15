@@ -87,7 +87,15 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # door beside it, top-level. Counted by reading; OWED: observed at the close.
 # RECONCILED to 254 at the merge of origin/main into build/aClearedLedger: 245, plus the seven
 # TOOL-aClearedLedger-5 and -11 added, plus the two TOOL-aBatchedPacket-1 and -2 added. Summed, not counted.
-FLOOR_ASSERTIONS=254
+# RAISED 247 -> 251 by TOOL-aLightenedLoop-3: its four input-record arms, the traced run's parity, the
+# record's reads and run, and --input-key's digest and its popen refusal, each top-level. Counted by
+# reading; OWED: observed at the close.
+# RAISED 251 -> 252 by TOOL-aLightenedLoop-6: its one read-count arm, `AC8 reads 1`, top-level.
+# Counted by reading; OWED: observed at the close.
+# RECONCILED to 259 at TOOL-aLightenedLoop-8's merge of origin/main: the common base 247 at
+# 846d51d39, plus main's 7 (TOOL-aClearedLedger-5 and -11), plus this branch's 5
+# (TOOL-aLightenedLoop-3's four and -6's one). Summed, not counted.
+FLOOR_ASSERTIONS=259
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -1858,6 +1866,44 @@ check_rev_probe "read_spec_revisions reads bytes: the last revision after a mult
 check_rev_probe "read_carries_specs and the deviation population read one revision reader" "AC12 one reader True"
 check_rev_probe "scan_carries parses no status: a WONTDO carrier handed past the filter collides" "AC9 scan_carries parses no status True"
 check_rev_probe "the checker's SPEC_DATE is design_lib's one compiled pattern" "AC32 one date pattern True"
+# TOOL-aLightenedLoop-1 AC7 AC8 — check 29's staged read, in-process over the same fixture: with no
+# chain spec INPROGRESS, `building=True` stops after the statuses and every build carries `findings`
+# None; with dAlpha-1 flipped to INPROGRESS it returns the full value, a findings list per build. Red
+# against a derive with no `building` keyword, and against an early exit that ignores the statuses.
+cov_out=$(cd "$d" && "$PY" -c 'import importlib.util, sys
+path, kit, lint = sys.argv[1:4]
+sys.path.insert(0, kit)
+import design_lib as dl
+spec = importlib.util.spec_from_file_location("cst", lint)
+cst = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(cst)
+conf = dl.read_design_conf(".")
+def read_findings():
+    v = cst.derive_carries_coverage(".", conf=conf, building=True)
+    return sorted({type(e["findings"]).__name__ for e in v["builds"].values()})
+print("AC7 early", read_findings())
+text = open(path, encoding="utf-8").read()
+open(path, "w", encoding="utf-8", newline="\n").write(text.replace("**Status:** OPEN", "**Status:** INPROGRESS", 1))
+reads = []
+real_texts = cst.read_carries_texts
+def read_counted(*a, **k):
+    reads.append(1)
+    return real_texts(*a, **k)
+cst.read_carries_texts = read_counted
+try:
+    print("AC8 full", read_findings())
+    print("AC8 reads", len(reads))
+finally:
+    cst.read_carries_texts = real_texts
+    open(path, "w", encoding="utf-8", newline="\n").write(text)' "$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md" "$MEMORY_TREE" "$LINT" 2>&1)
+check_cov_probe() {   # $1 label · $2 the probe line it must print
+  case "$cov_out" in *"$2"*) echo "arm ok    $1"; pass=$((pass+1)) ;; *) echo "arm FAIL  $1 — expected the probe to print: $2"; printf '%s\n' "$cov_out" | tail -3; fail=$((fail+1)) ;; esac
+}
+check_cov_probe "building=True with no INPROGRESS chain spec returns findings None for every build" "AC7 early ['NoneType']"
+check_cov_probe "building=True with one INPROGRESS chain spec returns the full value's findings lists" "AC8 full ['list']"
+# TOOL-aLightenedLoop-6 AC10 — the INPROGRESS read runs the status pass ONCE: `read_carries_specs`
+# takes the triple the building path read. Red when it re-reads instead of taking `pre`: `AC8 reads 2`.
+check_cov_probe "building=True with one INPROGRESS chain spec reads the chain texts once" "AC8 reads 1"
 # TOOL-dTrueNorth-20 AC18 AC21 AC22 — ONE conf grammar, ONE row grammar and ONE date pattern, in-process.
 # AC18: a cutoff key outside the carries keys, declared twice and then behind `export `, reads its LAST
 # value through `read_conf_key`, red against the base reader, which took the first declaration and read
@@ -2249,6 +2295,35 @@ ARM_ARGS=(--pass-spec)
 GATE_BASE=$ps_base arm "NM4 AC5 --pass-spec with no operand reads the inherited GATE_BASE" 0 "$d" "--pass-spec · $ps_base..HEAD · TOOL-tOne-1"
 GATE_BASE= arm "NM4 AC5 --pass-spec with no operand and a blank GATE_BASE reads the last commit" 0 "$d" "--pass-spec · HEAD~1..HEAD · TOOL-tOne-1"
 ARM_ARGS=()
+
+# TOOL-aLightenedLoop-3 AC5 AC6 AC7: THE INPUT RECORD. A run with SPEC_TOKENS_INPUTS naming a file
+# prints the same bytes and exits as the run without it, and its record names the fixture's spec and
+# leg manifest as reads and its `git ls-files` as a run; `--input-key` over that record prints one
+# 40-hex digest, and over a record holding a `popen` line prints nothing and exits 1. The staged break
+# is a tracer that prints one line, which reds the first arm alone.
+check_input_arm() {   # $1 label · $2 the status of the test that decides it
+  if [ "$2" = 0 ]; then echo "arm ok    $1"; pass=$((pass+1)); else echo "arm FAIL  $1"; fail=$((fail+1)); fi
+}
+d=$base/inputs; scratch "$d"
+li_rec="$base/inputs.rec"
+li_plain=$(cd "$d" && "$PY" "$LINT" 2>&1); li_prc=$?
+li_traced=$(cd "$d" && SPEC_TOKENS_INPUTS="$li_rec" "$PY" "$LINT" 2>&1); li_trc=$?
+[ "$li_plain" = "$li_traced" ] && [ "$li_prc" = "$li_trc" ] && [ -n "$li_plain" ]
+check_input_arm "LL3 AC6 a traced run prints the bytes and exits as the untraced one ($li_prc, $li_trc)" $?
+"$PY" -c '
+import json, os, sys
+L = [json.loads(x) for x in open(sys.argv[1], encoding="utf-8")]
+r = [os.path.basename(x["path"]) for x in L if x["kind"] == "read"]
+ok = "2026-09-02-spec-TOOL-tOne-1.md" in r and "gate-legs.json" in r and any(x["kind"] == "run" and x["argv"][-1:] == ["ls-files"] for x in L)
+sys.exit(0 if ok else 1)' "$li_rec" 2>/dev/null
+check_input_arm "LL3 AC5 the record names the fixture's spec and leg manifest as reads and git ls-files as a run" $?
+li_key=$(cd "$d" && "$PY" "$LINT" --input-key "$li_rec" 2>&1); li_krc=$?; li_key=${li_key//$'\r'/}
+[ "$li_krc" = 0 ] && [[ $li_key =~ ^[0-9a-f]{40}$ ]]
+check_input_arm "LL3 AC7 --input-key over a replayable record prints one 40-hex digest" $?
+printf '{"kind":"popen","argv":["x"]}\n' > "$base/inputs.bad"
+li_key=$(cd "$d" && "$PY" "$LINT" --input-key "$base/inputs.bad" 2>&1); li_krc=$?
+[ "$li_krc" = 1 ] && [ -z "$li_key" ]
+check_input_arm "LL3 AC7 --input-key over a record holding a popen line prints nothing and exits 1" $?
 
 # TOOL-dGroundRules-32 S9, TOOL-dGroundRules-40: the build-order render's overlap rule is the
 # dispatcher's, and both are graded against the truth. Each OVERLAP_PAIRS row is two paths relative to

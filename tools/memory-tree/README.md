@@ -371,7 +371,9 @@ and reference. It exits 1 on a refused spec, 0 otherwise, and 2 when the coverag
 checker that is not there or a design key that does not resolve. With the key blank it prints the one
 line `build-index: coverage off — SPEC_CARRIES_CUTOFF is blank` and exits 0. `--check-coverage --staged`
 runs on the render's trigger, a staged path the build index reads or the carries checker, and
-otherwise prints one held line and exits 0. On a full hygiene run, `--staged` off and no `--only`,
+otherwise prints one held line and exits 0. Once it runs, when no chain spec stands at INPROGRESS it
+reads the statuses only, no spec history and no join, and prints the same count line the full read
+prints (TOOL-aLightenedLoop-1 S4). On a full hygiene run, `--staged` off and no `--only`,
 check 9's `--check --with-verdicts` runs this verb inside its own process and prints its lines under
 `build-index: verdict 29 exit <rc>`, the section check 29 reads in place of a process of its own
 (TOOL-dTrueNorth-27 S4).
@@ -601,6 +603,15 @@ the signature it was recorded with. The replay line is prose; nothing re-runs it
   each says so; a check whose staged selection is empty starts no process. Its check 9 runs
   `gen_build_index.py --check --staged`, which renders only when a staged path can move the index (a structural path, an added or absent file, or a file whose cited ids change) and
   otherwise prints one `render SKIPPED` line; the push boundary renders in full.
+  A modified record in a build's build/ folder counts as structural only when its first
+  `BIND_HEAD_LINES` unfenced lines or its cited ids move; a deviation record and a file in a folder a
+  `DESIGN_*` key names always render (TOOL-aLightenedLoop-1 S3).
+  `--write` leaves a render stamp, a digest of HEAD, the tracked set, the working-tree bytes that
+  differ from HEAD and the untracked set, in the git directory when its own `--check` would be green;
+  once a render is owed, a `--check --staged` on that exact tree prints
+  `render answered by the stamp` and exits 0, so a commit right after `--write` is not rendered
+  twice. The owner set the charter's `[class]` practice aside for this stamp (TOOL-aLightenedLoop-1
+  S2); no other verb reads it.
 - **`memory/project/stale-header-waiver.txt` — a build README header that is PRESENT and unparseable
   is not one that is ABSENT.** The generator raises on the first and would otherwise treat it as the
   second, regenerating the index around a corrupted header. A row here (one build README path, then
