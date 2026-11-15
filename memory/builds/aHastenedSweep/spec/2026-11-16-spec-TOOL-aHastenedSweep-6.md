@@ -1,6 +1,6 @@
 # TOOL-aHastenedSweep-6 — every arm this build added can go red on its regression, and every comment and map line describes the one-process launch
 
-**Status:** INPROGRESS · rev-1 · 2026-11-16 · node a · Tier-1 · base f25308f0 · streams tooling · order 5
+**Status:** INPROGRESS · rev-2 · 2026-11-16 · node a · Tier-1 · base f25308f0 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -154,8 +154,10 @@ A loop over `<RC>` of 0 and 2 runs `GOV_PYTHON=<wrapper> bash check-memory-hygie
 a clean `_b1` copy. Exit 0 reaches the fallback through the split's failed `[[ ]]`, and exit 2 through
 the failed launch, which is the usage exit an older adopter-owned `gotchas.py` gives. Each pass
 asserts a non-zero exit, the line `check 13-16<TAB>wrapper: an unframed answer`, and no log line
-ending `gotchas.py --check`. The fallback's `_idsrc=1` set to 0 reds both passes on the exit and the
-key. Its `_onepy=1` dropped reds both on the log.
+ending `gotchas.py --check`. The fallback's `_idsrc=1` set to 0 reds both passes on the key only: the
+same fallback line sets `_gotrc=1`, and the catalogue block's `status=1` on it keeps the exit at 1, so
+the exit assertion moves only when both `_idsrc=1` and `_gotrc=1` are zeroed and checks neither alone.
+Its `_onepy=1` dropped reds both on the log.
 
 ### The selftest arms (S4, S5)
 
@@ -265,9 +267,10 @@ absolute path.
   fixture: built by the probe; no tree holds one today.
 - **AC2** — When `bash "$SCRATCH/t6-wrap.sh"` runs the S3 wrapper over a clean fixture at wrapper
   exits 0 and 2, it prints `wrap 0 rc 1 keyed 13-16 relaunch 0` and `wrap 2 rc 1 keyed 13-16 relaunch 0`.
-  With the fallback's `_idsrc=1` set to 0 it prints `rc 0` and no key, and with its `_onepy=1`
+  With the fallback's `_idsrc=1` set to 0 it prints `rc 1` and no key, and with its `_onepy=1`
   dropped it prints `relaunch 1`.
-  Red when: the fallback goes green, keys under `check 17-19`, or launches `gotchas.py --check` again.
+  Red when: the fallback keys nothing under `check 13-16`, keys under `check 17-19`, or launches
+  `gotchas.py --check` again; its exit assertion reds only when both `_idsrc=1` and `_gotrc=1` are zeroed.
   fixture: built by the probe; no tree holds one today.
 - **AC3** — When `python "$SCRATCH/t6-frame.py" stderr` runs the S4 case through
   `gotchas.py#cmd_check_with_ids` in-process, it prints `with-ids err-first 3 · second same`. With
@@ -325,6 +328,9 @@ none
 
 - rev-1 · 2026-11-16 · initial draft from `prompts/2026-11-16-prompt-TOOL-aHastenedSweep-5-brief.md` and
   the closing review's round 1, grounded at the build's tip `13863b03e`.
+- rev-2 · 2026-11-16 · the fallback's `_idsrc=1` break reds the S3 arm on its key only, since the same
+  line sets `_gotrc=1` and the run stays at exit 1; section 4 and AC2 say so, and AC2's Red-when names
+  what the exit assertion does not check (the builder's divergence return of 2026-11-16).
 
 ## 9. Reuse audit
 
