@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-84 — 82's restatement of S27 keeps 81's exit table, and 82's pass greps 75 for the fall to the parents
 
-**Status:** DEFERRED · rev-4 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-4 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-84-deviation-842.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-84-deviation-842.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-84-deviation-843.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-84-deviation-843.md) | deviation | — |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-84-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-84-1-spec-writer.md) | journal | — |
+| [2026-11-15-prompt-TOOL-dDeclaredLoop-84-build-brief.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-84-build-brief.md) | journal | — |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-84-reground-brief.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-84-reground-brief.md) | research | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-83-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-83-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 |
 
