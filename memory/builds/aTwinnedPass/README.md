@@ -48,8 +48,8 @@ None.
 
 | # | Unit | Mechanism |
 |---|---|---|
-| 1 | `TOOL-aTwinnedPass-1` | the unit harness's optional `tree` key: the builder works and commits in the pass's own worktree, and its write set and brief are the main loop's |
-| 2 | `TOOL-aTwinnedPass-2` | the pass-tree tool: cut a pass's worktree from the run's tip, and merge it back `--no-ff` with generated outputs re-rendered |
+| 1 | `TOOL-aTwinnedPass-1` | the unit harness's optional `passBase` key: the builder runs in the runtime's own worktree reset to that commit, and its write set and brief are the main loop's |
+| 2 | `TOOL-aTwinnedPass-2` | the pass-tree tool: merge a pass's branch back `--no-ff` with generated outputs re-rendered, or remove an uncommitted one |
 | 3 | `TOOL-aTwinnedPass-3` | `--dispatch` condition 1 leaves a path every pass may share, an effective generated output, out of the sibling overlap |
 <!-- /roster:units -->
 
@@ -60,9 +60,9 @@ ids TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aTwinnedPass-1 — the unit harness builds one pass in a worktree of its own, on a write set the main loop declared](spec/2026-11-15-spec-TOOL-aTwinnedPass-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-11-15 |
+| [TOOL-aTwinnedPass-1 — the unit harness builds one pass in a worktree of its own, on a write set the main loop declared](spec/2026-11-15-spec-TOOL-aTwinnedPass-1.md) | 1 | 2 | INPROGRESS | rev-2 | 2026-11-15 |
 | [TOOL-aTwinnedPass-3 — `--dispatch` condition 1 leaves an effective generated output out of the sibling comparison](spec/2026-11-15-spec-TOOL-aTwinnedPass-3.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-11-15 |
-| [TOOL-aTwinnedPass-2 — the pass-tree tool: cut a pass's worktree from the run's tip, and merge it back `--no-ff` with generated outputs re-rendered](spec/2026-11-15-spec-TOOL-aTwinnedPass-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-15 |
+| [TOOL-aTwinnedPass-2 — the pass-tree tool: merge a pass's own branch back `--no-ff` with generated outputs re-rendered, or take it away](spec/2026-11-15-spec-TOOL-aTwinnedPass-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-11-15 |
 <!-- /gen:build-units -->
 
 Records: 12 bound to this build, across 2 record folder(s).
