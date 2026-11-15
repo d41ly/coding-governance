@@ -559,10 +559,11 @@ fi   # ---- end the HAVE_TIMEOUT gate on arms 1c/1d/1e -------------------------
 _md=$(mktemp -d)
 sed -n '/^# >>> resolve_python/,/^# <<< resolve_python/p' "$KITDIR/run-gates.sh" > "$_md/block.sh"
 _mexe=$("$PYBIN" -I -c 'import sys; print(sys.executable.replace(chr(92), "/"))'); _mexe=${_mexe%$'\r'}
+printf -v _mq '%q' "$_mexe"
 printf '%s\n' '#!/usr/bin/env bash' '[ -z "${RG1M_COUNT:-}" ] || echo spawn >> "$RG1M_COUNT"' \
-  "exec $(printf '%q' "$_mexe") \"\$@\"" > "$_md/py"
+  "exec $_mq \"\$@\"" > "$_md/py"
 chmod +x "$_md/py"
-printf '%s\n' '#!/usr/bin/env bash' 'd=$(cd "$(dirname "$0")" && pwd); . "$d/block.sh"' \
+printf '%s\n' '#!/usr/bin/env bash' 'd=$(cd "${0%/*}" && pwd); . "$d/block.sh"' \
   'printf "%s" "${GATE_RESOLVED_PY-UNSET}" > "$d/memo"' \
   'export RG1M_COUNT="$d/hits"; resolve_python > "$d/launcher" 2>&1' \
   '(unset GATE_RESOLVED_PY; export RG1M_COUNT="$d/misses"; resolve_python >/dev/null 2>&1)' > "$_md/leg.sh"
@@ -575,8 +576,8 @@ MEMOPY
 _mr=$(mktemp -d); ( cd "$_mr" && git init -q --template= . && git commit -q --allow-empty -m base ) >/dev/null 2>&1
 _msent=$'3.99\n/no/such/sentinel\n'"$_md/py"$'\n'"$PATH"
 (cd "$_mr" && GOV_PYTHON="$_md/py" GATE_RESOLVED_PY="$_msent" GATE_LEGS="$_md/legs.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" >/dev/null 2>&1)
-_mmemo=$(cat "$_md/memo" 2>/dev/null) || _mmemo="NO LEG RAN"
-_mlaunch=$(cat "$_md/launcher" 2>/dev/null) || _mlaunch=""
+if [ -f "$_md/memo" ]; then _mmemo=$(<"$_md/memo"); else _mmemo="NO LEG RAN"; fi
+if [ -f "$_md/launcher" ]; then _mlaunch=$(<"$_md/launcher"); else _mlaunch=""; fi
 _mml=${_mmemo#*$'\n'}; _mml=${_mml%%$'\n'*}
 n=$((n+1))
 case "$_mmemo" in
