@@ -19,9 +19,9 @@ text between the two resolver markers of each file `git grep` names with the can
 - AC3 — `GATE_RESOLVED_PY` — `ac3.sh` ran the base block and the built block, each with
   `GATE_RESOLVED_PY` unset and then set to a memo naming the base run's launcher at its probed
   version 3.15: all four runs printed the same launcher, the same empty stderr and exit 0.
-- AC4 — `python tools/lib/python_floor.py check` — the `sed -n` marker range of each of the 80 files
+- AC4 — `python tools/lib/python_floor.py check` — the `sed -n` marker range of each of the 80 files PINNED 2026-11-15
   the S2 `git grep` names (PINNED at 7c0a9bc9c) compared with the canonical's by `cmp`: 0 differ.
-  `python tools/lib/python_floor.py check` exited 0. The re-sync added the same 12 lines to each
+  `python tools/lib/python_floor.py check` exited 0. The re-sync added the same 12 lines to each PINNED 2026-11-15
   file and changed no other line (PINNED at 7c0a9bc9c).
 - AC5 — `PYBIN` — the spec's `grep -nE` over `tools/run-gates/run-gates.sh` prints four lines, in
   the order unset, `PYBIN`, digest, export.
