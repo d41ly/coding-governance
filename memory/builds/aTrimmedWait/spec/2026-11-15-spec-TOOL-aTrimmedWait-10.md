@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-10 — close-bar repair: the commit-render switch becomes the policy key `memory.staged-render`, and the fork sites the shell-hygiene leg names are converted
 
-**Status:** INPROGRESS · rev-2 · 2026-11-15 · node a · Tier-2 · base 846d51d3 · streams tooling · order 9
+**Status:** CLOSED · rev-2 · 2026-11-15 · node a · Tier-2 · base 846d51d3 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
