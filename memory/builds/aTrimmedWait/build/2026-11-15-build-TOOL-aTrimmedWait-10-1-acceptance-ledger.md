@@ -53,6 +53,16 @@ each converted shell form beside its old form over the same inputs. The changed 
   `over <N> spec(s) of aTrimmedWait` with `<N>` the build's spec count. <!-- DERIVED from ls memory/builds/aTrimmedWait/spec/*.md -->
   `--only 12 --spec` over this spec ended `over 1 spec(s) of` this spec's path, as at base. <!-- PINNED 2026-11-15 -->
   `grep -c 'c12_sel" | grep -c' tools/memory-tree/check-memory-hygiene.sh` printed 0.
+  That pass ran only the scoped form, and its count sat outside the scoped branch, so an unscoped
+  `--only` that leaves out check 12 died on `c12_sel: unbound variable`: the fix pass from `5618aceba`
+  (brief `2026-11-15-prompt-TOOL-aTrimmedWait-10-fix.md`) observed `--only 2` exit 1 on that line
+  before its edit, and moved the count inside the scoped branch. After it, both runs, node a, one at a time:
+  the unscoped `bash tools/memory-tree/check-memory-hygiene.sh --only 2` exited 0, printed
+  `HYGIENE --only 2 ran checks 2` and no `unbound variable`; the scoped `--only 12 --build aTrimmedWait`
+  exited 0 and ended `over <N> spec(s) of aTrimmedWait`, `<N>` the build's spec count. <!-- DERIVED from ls memory/builds/aTrimmedWait/spec/*.md -->
+  The fix's arm in `tools/memory-tree/check-memory-hygiene.test.sh`, run as a probe over the arm's
+  tree outside the suite, passed against this engine and failed against the `49cdded06` engine on
+  the unbound variable; its RED-first observation in the suite is owed to the close.
 - AC10 — `grep -c '"$(check_cold23' tools/roles/adopt-roles.test.sh` printed 0,
   `grep -c '$(printf "$TW1_SPEC"' tools/workflows/unattended-build.test.sh` printed 0, and
   `grep -c 'printf -v tw1_in "$TW1_SPEC"' tools/workflows/unattended-build.test.sh` printed 2.
@@ -73,4 +83,6 @@ each converted shell form beside its old form over the same inputs. The changed 
   base 42.76 s, built 47.72 s, base 46.47 s, built 36.14 s: noise, no measurable move. <!-- PINNED 2026-11-15 -->
 - Owed to the close: the `New arm:` line of §7, observed RED-first by the main loop —
   `test_staged_write` with `check_staged_write` reading the conf key again, where the fixture's
-  switch reads blank and AC2's conf line proceeds; and the gate legs §7 lists.
+  switch reads blank and AC2's conf line proceeds; the fix pass's unscoped `--only 2` arm of
+  `tools/memory-tree/check-memory-hygiene.test.sh`, RED with the count hoisted out of the scoped
+  branch as `49cdded06` had it; and the gate legs §7 lists.

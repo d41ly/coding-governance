@@ -1323,6 +1323,12 @@ _sc_full=$(cd "$SC" && bash "$SCRIPT" --only 12 2>/dev/null); _sc_rc=$?
 n=$((n+1)); [ "$_sc_rc" = 1 ] && grep -qF 'tOne-2.md (' <<<"$_sc_full" && grep -qF 'tTwo-1.md (' <<<"$_sc_full" && grep -qF "$_sc_base" <<<"$_sc_full" \
   || { echo "FAIL scoped: the unscoped --only 12 over the scope tree exited $_sc_rc or missed a tracked plant"; st=1; }
 n=$((n+1)); grep -qF 'tOne-4.md (' <<<"$_sc_full" && { echo "FAIL scoped: the unscoped --only 12 graded the untracked tOne-4"; st=1; }
+# TOOL-aTrimmedWait-10 fix: an unscoped --only that leaves out check 12 never assigns `c12_sel`, so its
+# liveness line must not read it. Staged break: the `P`-line count hoisted out of the scoped branch,
+# as 49cdded06 had it, ends the run on `c12_sel: unbound variable` before the liveness line.
+_sc_o=$(cd "$SC" && bash "$SCRIPT" --only 2 2>&1); _sc_rc=$?
+n=$((n+1)); [ "$_sc_rc" = 0 ] && grep -qxF 'HYGIENE --only 2 ran checks 2' <<<"$_sc_o" && ! grep -qF 'unbound variable' <<<"$_sc_o" \
+  || { echo "FAIL unscoped: --only 2 exited $_sc_rc, printed no liveness line or read an unbound variable"; st=1; }
 _sc_o=$(cd "$SC" && bash "$SCRIPT" --only 12 --spec "$_sc_s/2026-08-01-spec-tOne-2.md" 2>/dev/null); _sc_rc=$?
 n=$((n+1)); [ "$_sc_rc" = 1 ] && [ "$(grep -F 'tOne-2.md (' <<<"$_sc_o")" = "$(grep -F 'tOne-2.md (' <<<"$_sc_full")" ] \
   || { echo "FAIL scoped: --spec tOne-2 exited $_sc_rc or its findings differ from the unscoped run's"; st=1; }

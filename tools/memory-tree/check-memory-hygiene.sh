@@ -3768,8 +3768,8 @@ fi
 if [ -n "$ONLY" ]; then
   _ran_sorted=$(printf '%s\n' $RAN | sort -un | tr '\n' ' '); _ran_sorted=${_ran_sorted% }
   # TOOL-aTrimmedWait-2: a scoped run names its scope and the count of specs it graded, `P` lines.
-  _c12_t=$'\n'$c12_sel; _c12_u=${_c12_t//$'\n'P$'\t'/}; _c12_p=$(( (${#_c12_t} - ${#_c12_u}) / 3 ))
   if [ "$SCOPED" = 1 ]; then
+    _c12_t=$'\n'$c12_sel; _c12_u=${_c12_t//$'\n'P$'\t'/}; _c12_p=$(( (${#_c12_t} - ${#_c12_u}) / 3 ))
     echo "HYGIENE --only $ONLY_SEL ran checks ${_ran_sorted:-none} over $_c12_p spec(s) of $SCOPE_ARG"
   else
     echo "HYGIENE --only $ONLY_SEL ran checks ${_ran_sorted:-none}"
