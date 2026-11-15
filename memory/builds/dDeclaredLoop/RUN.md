@@ -26,10 +26,10 @@ mode: slug
 run-branch: refs/heads/branch/unattended-declared-loop-d56bf0
 anchor-kind: default-branch
 cli-version: 2.1.321
-lease-utc: 2026-11-15T19:26:28Z
+lease-utc: 2026-11-15T20:53:32Z
 pid-image: claude.exe
 host: compeeto-agent
-pid: 13712
+pid: 9100
 session: 7c85732c-fa0c-43e9-83f2-238d293195e0
 keepalive: 45e677fb
 anchor-url: https://github.com/d41ly/coding-governance.git
