@@ -812,7 +812,11 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   `by-nature` every `units[]` entry also carries its `planState` and `rev` from
   `--plan <slug> --paths`, because a disposal naming a unit with no `planState` is refused and its
   hand-out carries no roster, and a fold into a unit no audit read compares against that `rev`.
-  The unit harness then builds ONE unit per call from its brief and its spec. Every call is made by
+  The unit harness then builds ONE unit per call from its brief and its spec. A group the build order
+  marks parallel may build at once, each pass on a branch of its own: `--dispatch` and `--brief` for
+  each unit, one records commit, then one harness call per unit carrying that commit as `passBase`
+  and `writes`, run concurrently, then `pass-tree.sh --merge` per committed pass in turn and
+  `--remove` per uncommitted one, as that tool's header states. Every call is made by
   `scriptPath`, never by `name`: the fan-out guard's read-window narrowing is conditional on
   `scriptPath`. **Every harness call also carries `roles`**: the JSON the roles kit's
   `handoff.py harness-args <harness>` prints, `<harness>` being `unattended-build`, `unattended-unit`

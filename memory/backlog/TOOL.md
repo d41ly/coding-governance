@@ -464,7 +464,6 @@ Cite ids, never line numbers.
 | [TOOL-dDerivedDocket-46](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-16 | NOTHING ON THE BAR WILL GRADE THE REMOTE-CI WORKFLOW FILE AFTER ITS… |
 | [TOOL-dDerivedDocket-47](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-20 | tools/run-gates/run-selftests.test.sh DECLARES A FLOOR NOTHING READS.… |
 | [TOOL-dDerivedDocket-56](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-21 | tools/workflows/unattended-build.js STILL STATES THE SUPERSEDED… |
-| [TOOL-dDerivedDocket-57](../builds/dDerivedDocket/BACKLOG.md) | INPROGRESS | — | TOOL-aTwinnedPass-2 | 2026-09-21 | NOTHING RUNS A WAVE. The driver's --dispatch already decides M6… |
 | [TOOL-dDerivedDocket-58](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-21 | A SPEC CANNOT PROVE ITS OWN DISJOINTNESS. The spec template's… |
 | [TOOL-dDerivedDocket-59](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-21 | AUTHORED ORDERS ARE A TOTAL ORDER. Every dDerivedDocket unit was… |
 | [TOOL-dDerivedDocket-60](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-21 | A DECISION ROW FORCES A PASS TO RUN ALONE. M6 condition 3 names… |
