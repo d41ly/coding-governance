@@ -60,8 +60,8 @@ add_fixture_pass() { # n · [noreset] -> worktree $R/.claude/worktrees/agent-p<n
   [ "${2:-}" = noreset ] && return 0
   git -C "$R/.claude/worktrees/agent-p$1" reset -q --hard "$C"
 }
-write_fixture_pass() { # n · product file -> one pass commit in pass n's worktree, the output re-rendered
-  ( cd "$R/.claude/worktrees/agent-p$1" && printf 'pass %s\n' "$1" >"$2" && git add -- "$2" && bash "$FX_REL/render.sh" \
+write_fixture_pass() { # n · product file · [worktree's last segment, default agent-p<n>] -> one pass commit in that worktree, the output re-rendered
+  ( cd "$R/.claude/worktrees/${3:-agent-p$1}" && printf 'pass %s\n' "$1" >"$2" && git add -- "$2" && bash "$FX_REL/render.sh" \
       && git add -A && git commit -q -m "build TOOL-tRun-$1" -m "Pass: TOOL-tRun-$1" )
 }
 
@@ -393,6 +393,35 @@ check_same "T7 the merge commit does not carry fx-stray.txt" "$(git ls-tree --na
 check_has "T7 the NOTE names fx-stray.txt as left untracked" "$err" "no effective generated output covers them: fx-stray.txt"
 check_same "T7 fx-stray.txt is the one path the tree's status lists" "$(git status --porcelain)" "?? fx-stray.txt"
 rm -f fx-stray.txt
+
+# ---- TP11 (TOOL-aTwinnedPass-11 AC4, AC5): the Workflow runtime's spelling, `worktree-wf_<run id>-<n>` --
+# Each tree is cut by hand at C, as TP4's are. Pass 12 conflicts on fx-out.txt and the README region as
+# T1's second merge does, and the tool resolves both; unit 12 has no dispatch row, as unit 11 has none
+# in T7, since `--merge` reads no row. The two refused branches hold no commit no other ref holds, so
+# only the new refusals stand between `--remove` and a forced removal. Staged breaks: check_pass_branch's
+# test put back to `^worktree-agent-[A-Za-z0-9]+$` reds the merge arm; check_pass_holder's comparison
+# widened to a `$primary/.claude/worktrees/` prefix reds the other-wf_-name arm; the tool's wf_
+# alternative written `wf_[A-Za-z0-9_-]+` reds the off-structure arm.
+git -C "$R" worktree add -q -b worktree-wf_0d688c69-edb-1 "$R/.claude/worktrees/wf_0d688c69-edb-1" "$C" >/dev/null 2>&1 \
+  && write_fixture_pass 12 p12.txt wf_0d688c69-edb-1 || { echo "FAIL pass wf_0d688c69-edb-1"; exit 2; }
+P12=$(git rev-parse worktree-wf_0d688c69-edb-1)
+run_tool --merge tRun --pass TOOL-tRun-12 --branch worktree-wf_0d688c69-edb-1 --from "$C"
+check_same "TP11 --merge of a wf_ pass exits 0 (AC4)" "$rc" 0
+check_same "TP11 the wf_ merge prints one sha alone on stdout (AC4)" "$out" "$(git rev-parse HEAD)"
+check_same "TP11 the wf_ merge has the pass commit as its second parent (AC4)" "$(git rev-parse "$out^2")" "$P12"
+check_lacks "TP11 the wf_ pass's worktree is gone (AC4)" "$(git worktree list --porcelain)" "/.claude/worktrees/wf_0d688c69-edb-1"
+git rev-parse --verify -q refs/heads/worktree-wf_0d688c69-edb-1 >/dev/null; check_same "TP11 branch worktree-wf_0d688c69-edb-1 is gone (AC4)" "$?" 1
+git -C "$R" worktree add -q -b worktree-wf_0d688c69-edb-2 "$R/.claude/worktrees/wf_0d688c69-edb-3" "$C" >/dev/null 2>&1 || { echo "FAIL pass wf_0d688c69-edb-2"; exit 2; }
+run_tool --remove tRun --branch worktree-wf_0d688c69-edb-2
+check_same "TP11 --remove of a wf_ branch held at another wf_ name exits 1 (AC5)" "$rc" 1
+check_has "TP11 the other-wf_-name refusal is the holder's (AC5)" "$err" "where the runtime cuts that pass's worktree"
+[ -d "$R/.claude/worktrees/wf_0d688c69-edb-3" ]; check_same "TP11 the tree at the other wf_ name remains (AC5)" "$?" 0
+git rev-parse --verify -q refs/heads/worktree-wf_0d688c69-edb-2 >/dev/null; check_same "TP11 branch worktree-wf_0d688c69-edb-2 remains (AC5)" "$?" 0
+git -C "$R" worktree add -q -b worktree-wf_x "$R/.claude/worktrees/wf_x" "$C" >/dev/null 2>&1 || { echo "FAIL pass wf_x"; exit 2; }
+run_tool --remove tRun --branch worktree-wf_x
+check_same "TP11 --remove of a wf_ name off the runtime's structure exits 1 (AC5)" "$rc" 1
+check_has "TP11 the off-structure refusal is the shape's (AC5)" "$err" "is not a branch the runtime cuts for a pass"
+[ -d "$R/.claude/worktrees/wf_x" ]; check_same "TP11 the off-structure tree remains (AC5)" "$?" 0
 
 [ "$st" = 0 ] && { echo "PASS ($n assertions)"; exit 0; }
 echo "FAIL ($n assertions)"; exit 1

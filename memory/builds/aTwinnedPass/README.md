@@ -71,7 +71,7 @@ ids TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3 TOOL-aTwinnedPas
 | [TOOL-aTwinnedPass-11 — the Workflow runtime's worktree spelling, admitted beside the Agent tool's at both ends of the handoff](spec/2026-11-15-spec-TOOL-aTwinnedPass-11.md) | 5 | 2 | INPROGRESS | rev-1 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 34 bound to this build, across 4 record folder(s).
+Records: 35 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

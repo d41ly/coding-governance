@@ -1485,6 +1485,28 @@ has "TP4 a segment past the id returns an empty worktree (AC2)" "$tp_rs" '"workt
 tp_rs=$(run_wf "$TP4_ARGS" "$(render_pass_returns 'worktree-agent-x1' 'C:\\w\\.claude\\worktrees\\agent-x1')" "$C" | grep '^RESULT')
 has "TP4 the backslash form of the runtime's place is admitted (AC2)" "$tp_rs" '"worktree":"C:\\w\\.claude\\worktrees\\agent-x1"'
 
+# TOOL-aTwinnedPass-11 — THE WORKFLOW RUNTIME'S SPELLING: `worktree-wf_<run id>-<n>` at
+# `<primary>/.claude/worktrees/wf_<run id>-<n>`, the name the bench observed. The hostile payload sits
+# AFTER the name, where only the `wf_` alternative's own class and anchor refuse it. The values carry
+# no backslash and no double quote, so `printf %s` passes them as written.
+o=$(run_wf "$TP4_ARGS" "$(render_pass_returns 'worktree-wf_0d688c69-edb-1' '/w/.claude/worktrees/wf_0d688c69-edb-1')" "$C")
+tp_rs=$(printf '%s\n' "$o" | grep '^RESULT')
+has "TP11 the wf_ branch is carried unchanged (AC2)" "$tp_rs" '"branch":"worktree-wf_0d688c69-edb-1"'
+has "TP11 the wf_ worktree is carried unchanged (AC2)" "$tp_rs" '"worktree":"/w/.claude/worktrees/wf_0d688c69-edb-1"'
+has "TP11 ...and nextAction runs in the wf_ worktree (AC2)" "$(read_next_action "$o")" 'with its working directory at `/w/.claude/worktrees/wf_0d688c69-edb-1`, before that worktree is merged back'
+o=$(run_wf "$TP4_ARGS" "$(render_pass_returns 'worktree-wf_0d688c69-edb-1$(id)' '/w/.claude/worktrees/wf_0d688c69-edb-1;id')" "$C")
+tp_rs=$(printf '%s\n' "$o" | grep '^RESULT')
+has "TP11 a hostile wf_ tail's branch returns empty (AC2)" "$tp_rs" '"branch":""'
+has "TP11 a hostile wf_ tail's worktree returns empty (AC2)" "$tp_rs" '"worktree":""'
+hasnt_ "TP11 ...and the hostile wf_ name reaches no part of the result (AC2)" "$tp_rs" 'wf_0d688c69-edb-1'
+has "TP11 ...and nextAction names the hostile wf_ path unusable (AC2)" "$(read_next_action "$o")" 'whose path the builder returned unusable'
+tp_rs=$(run_wf "$TP4_ARGS" "$(render_pass_returns 'worktree-wf_x' '/w/.claude/worktrees/wf_x')" "$C" | grep '^RESULT')
+has "TP11 a wf_ branch off the runtime's structure returns empty (AC2)" "$tp_rs" '"branch":""'
+has "TP11 a wf_ worktree off the runtime's structure returns empty (AC2)" "$tp_rs" '"worktree":""'
+tp_rs=$(run_wf "$TP4_ARGS" "$(render_pass_returns 'worktree-foo' '/w/.claude/worktrees/foo')" "$C" | grep '^RESULT')
+has "TP11 a branch under neither prefix returns empty (AC2)" "$tp_rs" '"branch":""'
+has "TP11 a worktree under neither prefix returns empty (AC2)" "$tp_rs" '"worktree":""'
+
 # ========================= F4 (closing review, HIGH) — DISPOSED-BUT-STANDING IS NOT DISPOSED
 # `{disposed:true, standing:['b1']}` validated against DISPOSAL_SCHEMA, cleared a guard that tested
 # only `disposed !== true`, logged `disposal: done` and handed out the FULL roster over an undisposed
@@ -4001,7 +4023,8 @@ has    "FA15 AC25 the undeclared throw" "$o" "a disposal passes the hand-out's \
 # spawn, four writes refusals of two, three unpaired calls of two). Counted by reading, not measured by
 # a run: the pass that wrote it runs no suite.
 # RAISED 1000 -> 1028 by TOOL-aTwinnedPass-4: the 28 its TP4 group executes — six hostile cases of four, the old spelling's two, and one each for the segment past the id and the backslash form. Counted by reading, not measured by a run: the pass that wrote it runs no suite.
-FLOOR_ASSERTIONS=1028
+# RAISED 1028 -> 1039 by TOOL-aTwinnedPass-11: the 11 its TP11 group executes — the wf_ return's three, the hostile wf_ tail's four, and two each for the wf_ name off the structure and the name under neither prefix. Counted by reading, not measured by a run: the pass that wrote it runs no suite.
+FLOOR_ASSERTIONS=1039
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

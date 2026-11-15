@@ -28,9 +28,10 @@
 #
 # 4. WHAT `--merge` DOES. It refuses a branch whose merge base with HEAD is not `--from`: a builder
 #    that skipped its reset to `passBase` forked from another line, and merging it would carry that
-#    line's history in. Both verbs refuse a branch outside the runtime's `worktree-agent-<id>` and a
-#    worktree holding it anywhere but `<primary tree>/.claude/worktrees/agent-<id>` for the same `<id>`,
-#    so neither ever removes a tree it did not cut. It merges `--no-ff --no-commit`, and resolves to this side ONLY a conflicted
+#    line's history in. Both verbs refuse a branch outside the runtime's two spellings,
+#    `worktree-agent-<id>` and `worktree-wf_<run id>-<n>`, and a worktree holding it anywhere but
+#    `<primary tree>/.claude/worktrees/<name>` for that branch's own `<name>`, the branch less
+#    `worktree-`, so neither ever removes a tree it did not cut. It merges `--no-ff --no-commit`, and resolves to this side ONLY a conflicted
 #    path an effective generated output covers or one the pass changed inside gen regions alone; any
 #    other conflict is two passes that were not disjoint, so the merge is aborted and refused naming
 #    every such path. It then runs the run-gates kit's `regen.py --write`, found as the lander finds
@@ -118,16 +119,16 @@ check_pass_branch() { # branch -> 0 with PT_BRANCH set · 1 with its refusal pri
     print_pass_tree_refusal "$1 is the run's own branch, not a pass's; nothing was written"
     return 1
   fi
-  if ! [[ $1 =~ ^worktree-agent-[A-Za-z0-9]+$ ]]; then
-    print_pass_tree_refusal "'$1' is not a branch the runtime cuts for a pass (worktree-agent-<id>), so it is not a pass's branch; nothing was written"
+  if ! [[ $1 =~ ^worktree-(agent-[A-Za-z0-9]+|wf_[0-9a-f]+-[0-9a-f]+-[0-9]+)$ ]]; then
+    print_pass_tree_refusal "'$1' is not a branch the runtime cuts for a pass (worktree-agent-<id> or worktree-wf_<run id>-<n>), so it is not a pass's branch; nothing was written"
     return 1
   fi
   PT_BRANCH=$1
 }
 
 # The holder both verbs check before they write: a worktree holding the pass's branch must sit exactly
-# where the runtime cuts that pass's, `<primary tree>/.claude/worktrees/agent-<id>` for the branch's
-# own `<id>`, the primary tree read from the porcelain list `derive_holder_where` reads, so both paths
+# where the runtime cuts that pass's, `<primary tree>/.claude/worktrees/<name>` for the branch's own
+# `<name>`, the branch less `worktree-` (`agent-<id>` or `wf_<run id>-<n>`), the primary tree read from the porcelain list `derive_holder_where` reads, so both paths
 # carry one spelling. An unreadable list leaves the primary empty, which fails the comparison.
 check_pass_holder() { # (PT_BRANCH) -> 0 with PT_WHERE the admitted holder, empty when none holds it · 1 with its refusal printed
   local HW_REF="refs/heads/$PT_BRANCH" where primary want
