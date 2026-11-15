@@ -204,3 +204,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-15T13:12:05Z dispatch · item dac97441 TOOL-dDeclaredLoop-45 · reason tools/loop/position.py help/loop.md tools/loop/README.md tools/run-gates/selftest-budgets.txt memory/builds/dDeclaredLoop/build/2026-11-15-build-TOOL-dDeclaredLoop-45-1-acceptance-ledger.md memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-45.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/backlog/TOOL.md
 
 2026-11-15T14:05:20Z brief · item TOOL-dDeclaredLoop-69 · reason 41622b66a6d8 memory/builds/dDeclaredLoop/prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-69-build-brief.md
+
+2026-11-15T14:52:22Z dispatch · item e9562efa TOOL-dDeclaredLoop-69 · reason tools/loop/guard.py help/policy.md memory/builds/dDeclaredLoop/build/2026-11-15-build-TOOL-dDeclaredLoop-69-1-acceptance-ledger.md memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-69.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/backlog/TOOL.md

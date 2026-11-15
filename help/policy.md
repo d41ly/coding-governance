@@ -291,13 +291,14 @@ the loop kit's `guard.py --push-range` over the pushed commits: each commit that
 policy file must carry one `Gov-Policy:` trailer line per changed key and add a change record naming
 the key's row. One that does not is refused as `policy-unrecorded`, naming the commit and the key. A
 commit that adds the policy file, as an adopter's scaffold does, is printed and not graded. Merges are
-graded too, on git's combined diff: a merge that takes one side's policy file whole owes nothing, since
-that side's own commits are graded in the same push, but a merge owes the trailer and the change
-record itself for each key its result sets to a value no parent and no clean re-merge of its parents
-holds, the trailer's old value the first parent's, and is refused as the merge's own change when it
-lacks them. A clean merge of two sides' different keys therefore owes nothing. An octopus merge, or a
-merge whose re-merge conflicts or cannot be read, is graded against its parents alone, with one line
-saying so. With no python launcher or no loop kit, the hook prints one
+graded too. A two-parent merge whose clean re-merge git computes owes the trailer and the change
+record itself for each key its result sets to a value other than that re-merge's, a key set back to
+one side's old value included, the trailer's old value the re-merge's, and is refused as the merge's
+own change when it lacks them. A merge equal to its re-merge, a clean merge of two sides' different
+keys say, owes nothing, since its sides' own commits are graded in the same push. Every other merge,
+an octopus merge or one whose re-merge conflicts or cannot be read, is graded against its parents,
+with one line saying so: it owes for each key its result sets to a value no parent holds, the
+trailer's old value the first parent's. With no python launcher or no loop kit, the hook prints one
 line saying the check did not run.
 
 **The floor.** Four invariants hold whatever else the file says, each switched by a member of the
