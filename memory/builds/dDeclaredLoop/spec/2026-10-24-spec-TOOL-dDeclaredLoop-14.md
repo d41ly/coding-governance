@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-14 — the default failure route: the refusal recorded and the frontier returned
 
-**Status:** INPROGRESS · rev-5 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 18 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-6 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 18 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0099@60eee5d8 whole
 
@@ -13,8 +13,10 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-11-05-build-TOOL-dDeclaredLoop-14-deviation-141.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-14-deviation-141.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-14-1-builder-return.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-1-builder-return.md) | journal | — |
+| [2026-11-15-build-TOOL-dDeclaredLoop-14-2-builder-return.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-2-builder-return.md) | journal | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-142.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-142.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-143.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-143.md) | deviation | — |
+| [2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-144.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-144.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-14-red-fix-25.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-red-fix-25.md) | red-fix | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-56 |
@@ -189,7 +191,8 @@ composition does not read; the driver records only at exit 0.
 The invocation S6 adds takes the Skill render past its row. The row is raised to the render's measured
 CR-stripped size, with no headroom, under the four terms at the head of
 `tools/template-size-limits.txt`: its `RAISED <old> -> <new>` line above the row names the date, this
-unit and the figure, and `memory/DECISIONS.md` records the unit's row with the raise.
+unit and the figure. `memory/DECISIONS.md` records the unit's row ahead of the pass, in a records commit, so the
+pass raises the row under term 4's "before" clause: that file is a shared record no pass may declare.
 
 ### Inventory
 
@@ -236,7 +239,6 @@ same items: A is `item.build.base`, B `item.build.unit-lease`, C `item.build.uni
 - `tools/unattended/SKILL.template.md`
 - `.claude/skills/unattended/SKILL.md`: re-rendered by the unattended adopter
 - `tools/template-size-limits.txt`: the Skill's row raised
-- `memory/DECISIONS.md`: the raise's row
 - `tools/runlog/model.py`
 - `tools/drift-audit/drift_report.py`
 - `tools/gate-legs.json`: `loop position fixtures` enforcing `principle.p24` too
@@ -437,6 +439,8 @@ New arm: tools/unattended/unattended.test.sh · covers none · arms naming `--re
   other read tags', so each key equals `derive_next_item`'s; `frontier-none` narrows the build's step's
   items in memory; §5 names the parity row, the hostile-value entry and the `case`-pattern guards, and
   §7 the spawn-idiom leg. Mechanism, carries, order and status kept.
+- rev-6 · 2026-11-15 · §4 The Skill's row, Files touched · the decision row lands ahead of the pass and leaves the
+  pass's files, after the second dispatch's return 2026-11-15-build-TOOL-dDeclaredLoop-14-2-builder-return; nothing else moved.
 
 ## 10. Reuse audit
 
