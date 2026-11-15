@@ -1,6 +1,6 @@
 # TOOL-aHastenedSweep-4 — checks 13 to 16 and 17 to 19 run in one Python process over one frozen, memoized walk
 
-**Status:** INPROGRESS · rev-1 · 2026-11-15 · node a · Tier-2 · base f25308f0 · streams tooling · order 3
+**Status:** INPROGRESS · rev-2 · 2026-11-15 · node a · Tier-2 · base f25308f0 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -204,6 +204,7 @@ block from the same lines as today, in the same order.
 - `tools/memory-tree/kit.toml`
 - `memory/map/generated/symbols.json`
 - `memory/builds/aHastenedSweep/build/2026-11-15-build-TOOL-aHastenedSweep-4-1-acceptance-ledger.md`
+- `memory/guides/SESSION-KICKOFF.md`: its `last-audit` re-stamp, which the pre-commit manifest ratchet owes whenever the hygiene shell, a watched file, is staged
 
 ### Rollout
 
@@ -335,6 +336,9 @@ none
 
 - rev-1 · 2026-11-15 · initial draft from `prompts/2026-11-15-prompt-TOOL-aHastenedSweep-1-brief.md`,
   grounded at f25308f0 and against `TOOL-aHastenedSweep-3`'s rev-1 launch line.
+- rev-2 · 2026-11-15 · Files touched names the kickoff manifest's `last-audit` re-stamp, which editing the
+  hygiene shell owes; the builder's divergence return of 2026-11-15 found it missing. The version move stays
+  the lander's mint, as section 3 states.
 
 ## 10. Reuse audit
 
