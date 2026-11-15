@@ -57,7 +57,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 5 unit(s) · node a · opened 2026-11-15 · streams tooling
+**Build status:** INPROGRESS · 6 unit(s) · node a · opened 2026-11-15 · streams tooling
 ids TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3 TOOL-aTwinnedPass-4 TOOL-aTwinnedPass-5 TOOL-aTwinnedPass-6 TOOL-aTwinnedPass-7 TOOL-aTwinnedPass-8 TOOL-aTwinnedPass-9 TOOL-aTwinnedPass-10 TOOL-aTwinnedPass-11
 
 <!-- gen:build-units -->
@@ -68,15 +68,16 @@ ids TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3 TOOL-aTwinnedPas
 | [TOOL-aTwinnedPass-2 — the pass-tree tool: merge a pass's own branch back `--no-ff` with generated outputs re-rendered, or take it away](spec/2026-11-15-spec-TOOL-aTwinnedPass-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-11-15 |
 | [TOOL-aTwinnedPass-4 — a pass's branch, worktree and fork sha cross every handoff only in the runtime's own spelling](spec/2026-11-15-spec-TOOL-aTwinnedPass-4.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-15 |
 | [TOOL-aTwinnedPass-5 — every arm of the build's three suites can go red on the regression it names](spec/2026-11-15-spec-TOOL-aTwinnedPass-5.md) | 4 | 2 | CLOSED | rev-1 | 2026-11-15 |
+| [TOOL-aTwinnedPass-11 — the Workflow runtime's worktree spelling, admitted beside the Agent tool's at both ends of the handoff](spec/2026-11-15-spec-TOOL-aTwinnedPass-11.md) | 5 | 2 | INPROGRESS | rev-1 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 32 bound to this build, across 4 record folder(s).
+Records: 34 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3 TOOL-aTwinnedPass-4 TOOL-aTwinnedPass-5.
+Ids no `spec-audit` record has ever named: TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-11 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3 TOOL-aTwinnedPass-4 TOOL-aTwinnedPass-5.
 
-Ids whose spec moved past its audited revision: none — 0 of 5 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -87,6 +88,7 @@ Ids whose spec moved past its audited revision: none — 0 of 5 unit id(s) carry
 | 2 | `TOOL-aTwinnedPass-2` | no |
 | 3 | `TOOL-aTwinnedPass-4` | no |
 | 4 | `TOOL-aTwinnedPass-5` | no |
+| 5 | `TOOL-aTwinnedPass-11` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
