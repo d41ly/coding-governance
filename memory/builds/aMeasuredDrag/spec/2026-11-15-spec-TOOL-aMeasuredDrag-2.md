@@ -1,6 +1,6 @@
 # TOOL-aMeasuredDrag-2 — the stop-guard decides a terminal lease and a pending background task before it spawns `--liveness`
 
-**Status:** DEFERRED · rev-2 · 2026-11-15 · node a · Tier-1 · base aebbb4a7 · streams tooling · order 2
+**Status:** DEFERRED · rev-2 · 2026-11-15 · node a · Tier-1 · base aebbb4a7 · streams tooling · order 2 · advances TOOL-aMeasuredDrag-14
 
 <!-- gen:spec-records -->
 

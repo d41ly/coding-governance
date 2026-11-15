@@ -1,6 +1,6 @@
 # TOOL-aMeasuredDrag-12 — the closing review's six minor items: an absolute-only launcher memo, and the arms and floor that make units 4, 10 and 11 fail when undone
 
-**Status:** INPROGRESS · rev-1 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 12
+**Status:** CLOSED · rev-1 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
@@ -9,8 +9,10 @@
 | [2026-11-15-build-TOOL-aMeasuredDrag-1-runlog-6d98c39c.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-1-runlog-6d98c39c.md) | journal | TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-4 TOOL-aMeasuredDrag-5 TOOL-aMeasuredDrag-6 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 TOOL-aMeasuredDrag-9 TOOL-aMeasuredDrag-10 TOOL-aMeasuredDrag-11 |
 | [2026-11-15-build-TOOL-aMeasuredDrag-12-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-12-1-acceptance-ledger.md) | journal | — |
 | [2026-11-15-build-TOOL-aMeasuredDrag-12-red-fix-4.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-12-red-fix-4.md) | red-fix | — |
+| [2026-11-15-build-TOOL-aMeasuredDrag-12-red-fix-5.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-12-red-fix-5.md) | red-fix | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-12-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-12-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-12-2-builder.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-12-2-builder.md) | journal | — |
+| [2026-11-15-prompt-TOOL-aMeasuredDrag-12-3-builder.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-12-3-builder.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-12-bar-fix-brief.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-12-bar-fix-brief.md) | research | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-12-promotion-brief.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-12-promotion-brief.md) | research | — |
 

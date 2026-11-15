@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-15
 streams: tooling
 roster: TOOL
-ids: TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-4 TOOL-aMeasuredDrag-5 TOOL-aMeasuredDrag-6 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 TOOL-aMeasuredDrag-9 TOOL-aMeasuredDrag-10 TOOL-aMeasuredDrag-11 TOOL-aMeasuredDrag-12
+ids: TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-4 TOOL-aMeasuredDrag-5 TOOL-aMeasuredDrag-6 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 TOOL-aMeasuredDrag-9 TOOL-aMeasuredDrag-10 TOOL-aMeasuredDrag-11 TOOL-aMeasuredDrag-12 TOOL-aMeasuredDrag-13 TOOL-aMeasuredDrag-14
 ---
 
 # aMeasuredDrag — the performance review's eleven quick wins
@@ -67,8 +67,9 @@ findings and its skeptic verdicts are the research records under `build/` and `r
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 12 unit(s) · node a · opened 2026-11-15 · streams tooling
-ids TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-4 TOOL-aMeasuredDrag-5 TOOL-aMeasuredDrag-6 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 TOOL-aMeasuredDrag-9 TOOL-aMeasuredDrag-10 TOOL-aMeasuredDrag-11 TOOL-aMeasuredDrag-12
+**Build status:** DEFERRED · 12 unit(s) · node a · opened 2026-11-15 · streams tooling
+ids TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-4 TOOL-aMeasuredDrag-5 TOOL-aMeasuredDrag-6 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 TOOL-aMeasuredDrag-9 TOOL-aMeasuredDrag-10 TOOL-aMeasuredDrag-11 TOOL-aMeasuredDrag-12 TOOL-aMeasuredDrag-13
+ids TOOL-aMeasuredDrag-14
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -84,10 +85,10 @@ ids TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasure
 | [TOOL-aMeasuredDrag-9 — `transition_audit.read_modes` parses each distinct conf blob once, not once per commit](spec/2026-11-15-spec-TOOL-aMeasuredDrag-9.md) | 9 | 1 | CLOSED | rev-1 | 2026-11-15 |
 | [TOOL-aMeasuredDrag-10 — `.githooks/pre-commit` reads the staged list once and resolves python once, each leg keeping its own trigger](spec/2026-11-15-spec-TOOL-aMeasuredDrag-10.md) | 10 | 1 | CLOSED | rev-1 | 2026-11-15 |
 | [TOOL-aMeasuredDrag-11 — the merge bar hands its own resolved python to its legs, so no leg re-probes the launcher](spec/2026-11-15-spec-TOOL-aMeasuredDrag-11.md) | 11 | 2 | CLOSED | rev-1 | 2026-11-15 |
-| [TOOL-aMeasuredDrag-12 — the closing review's six minor items: an absolute-only launcher memo, and the arms and floor that make units 4, 10 and 11 fail when undone](spec/2026-11-15-spec-TOOL-aMeasuredDrag-12.md) | 12 | 2 | INPROGRESS | rev-1 | 2026-11-15 |
+| [TOOL-aMeasuredDrag-12 — the closing review's six minor items: an absolute-only launcher memo, and the arms and floor that make units 4, 10 and 11 fail when undone](spec/2026-11-15-spec-TOOL-aMeasuredDrag-12.md) | 12 | 2 | CLOSED | rev-1 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 65 bound to this build, across 4 record folder(s).
+Records: 67 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
