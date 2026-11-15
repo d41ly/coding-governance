@@ -97,7 +97,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 99 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 99 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13
 ids TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26
 ids TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-35 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39
@@ -136,7 +136,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-3 — the transition record three ways, its channels the set `transitions.record` selects](spec/2026-10-24-spec-TOOL-dDeclaredLoop-3.md) | 13 | 2 | CLOSED | rev-5 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-10 — backward transitions recorded like forward ones](spec/2026-10-24-spec-TOOL-dDeclaredLoop-10.md) | 14 | 2 | CLOSED | rev-2 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-2 — the guard, the TTY policy command and the default floor](spec/2026-10-24-spec-TOOL-dDeclaredLoop-2.md) | 15 | 2 | CLOSED | rev-5 | 2026-11-15 |
-| [TOOL-dDeclaredLoop-43 — the guarded write restores each path's prior bytes, and writes each through a sibling temp file](spec/2026-10-24-spec-TOOL-dDeclaredLoop-43.md) | 16 | 2 | INPROGRESS | rev-3 | 2026-11-15 |
+| [TOOL-dDeclaredLoop-43 — the guarded write restores each path's prior bytes, and writes each through a sibling temp file](spec/2026-10-24-spec-TOOL-dDeclaredLoop-43.md) | 16 | 2 | CLOSED | rev-3 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-44 — the policy push arm grades a merge on its combined diff, and a new branch against the remote default tip](spec/2026-10-24-spec-TOOL-dDeclaredLoop-44.md) | 16 | 2 | DEFERRED | rev-3 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-8 — claims keyed and trusted by key and source](spec/2026-10-24-spec-TOOL-dDeclaredLoop-8.md) | 16 | 2 | DEFERRED | rev-4 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-59 — a merge owes a policy trailer only for a key its result sets that no parent and no clean re-merge set](spec/2026-10-24-spec-TOOL-dDeclaredLoop-59.md) | 17 | 2 | DEFERRED | rev-3 | 2026-10-24 |
@@ -212,7 +212,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 401 bound to this build, across 4 record folder(s).
+Records: 403 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

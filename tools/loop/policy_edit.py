@@ -51,10 +51,11 @@ import pathlib
 import re
 import subprocess
 import sys
+import tempfile
 import tomllib
 
 sys.dont_write_bytecode = True
-KIT = pathlib.Path(__file__).absolute().parent
+KIT =pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from floor import FLOOR_INVARIANTS, read_policy_modules  # noqa: E402
@@ -87,21 +88,34 @@ def write_guarded(path, new_text, record):
     """`new_text` written to `path` as UTF-8, or called with the path where it is a callable writing the
     path itself, then `record()`, the caller's record writer, called and its record's path returned.
     Where either step raises, the path's prior bytes are put back, the path removed where it did not
-    exist, and the error raised again: no write lands without its record."""
+    exist, and the error raised again: no write lands without its record.
+    Each write, the restore included, goes to a sibling temp `<name>.<random>.tmp` made by `mkstemp`
+    and is `os.replace`d over the path, so the path holds its prior bytes or the new ones, never a
+    part of either; a callable is handed that temp, already holding the prior bytes. No fsync."""
     path = pathlib.Path(path)
     held = path.read_bytes() if path.is_file() else None
+
+    def write_target(fill):
+        fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=path.name + ".", suffix=".tmp")
+        try:
+            with os.fdopen(fd, "wb") as fh:
+                fh.write(fill if isinstance(fill, bytes) else held or b"")
+            if callable(fill):
+                fill(pathlib.Path(tmp))
+            os.replace(tmp, path)
+        except BaseException:
+            pathlib.Path(tmp).unlink(missing_ok=True)
+            raise
+
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
-        if callable(new_text):
-            new_text(path)
-        else:
-            path.write_bytes(new_text.encode("utf-8"))
+        write_target(new_text if callable(new_text) else new_text.encode("utf-8"))
         return record()
     except BaseException:
         if held is None:
             path.unlink(missing_ok=True)
-        else:
-            path.write_bytes(held)
+        elif path.is_file() and path.read_bytes() != held:
+            write_target(held)
         raise
 # <<< guarded_write_py
 

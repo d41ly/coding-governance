@@ -375,6 +375,8 @@ PLANTS = {
     "proof-signed-fallback": "policy_edit.py set policy-file.proof signed under fallback-reported",
     "set-run-live": "policy_edit.py set on a live run's branch, a key then a floor member",
     "floor-readers": "an unlisted actor witness and an unrecorded transition, under the floor on, then off",
+    "write-guarded-rollback": "policy_edit.py's write_guarded, in process, its os.replace spied: a record refused, "
+                              "a rename interrupted, a callable over its prior bytes",
 }
 
 
@@ -512,6 +514,77 @@ def run_guard_plant(case, top):
         run_scenario("a floor member", edit + ["set", "floor.guard-self", "off", *who], 0, "Proof: none — run mandate")
     elif case == "floor-readers":
         out += run_floor_readers(top)
+    elif case == "write-guarded-rollback":
+        # TOOL-dDeclaredLoop-43: in process over the loop kit's copy of the block, so the spy sees each rename.
+        import unittest.mock
+        import policy_edit
+        target = pathlib.Path(top, mguard.POLICY)
+        absent = pathlib.Path(top, "fx-absent", "policy.toml")
+        committed, real_replace, handed = target.read_bytes(), policy_edit.os.replace, []
+
+        def run_spy(arm=None):
+            renamed = []
+
+            def run_replace(src, dst):
+                renamed.append(pathlib.Path(dst))
+                if arm is not None and len(renamed) == 1:
+                    raise arm
+                return real_replace(src, dst)
+            return renamed, unittest.mock.patch.object(policy_edit.os, "replace", run_replace)
+
+        def read_temps(folder):
+            return sorted(folder.glob("policy.toml.*.tmp"))
+
+        def run_refused_record():
+            raise OSError("fx: record refused")
+
+        def write_appended(path):
+            handed.append(path)
+            path.write_bytes(path.read_bytes() + b"# fx appended\n")
+
+        def check_scenario(name, checks):
+            said = "".join("%s: %s · %s\n" % (SAY, label, "held" if ok else "MISSED") for label, ok in checks)
+            held = all(ok for _label, ok in checks)
+            said += "%s: bytes held\n" % SAY if held else ""
+            sys.stdout.write(said)
+            out.append((name, 0 if held else 1, 0, "bytes held", said))
+
+        for name, path in (("record refused over a prior file", target), ("record refused, no prior file", absent)):
+            renamed, spy = run_spy()
+            reached = False
+            try:
+                with spy:
+                    policy_edit.write_guarded(path, committed.decode("utf-8") + "# fx new\n", run_refused_record)
+            except OSError as e:
+                reached = "fx: record refused" in str(e)
+            after = [("the record's error reached the caller", reached),
+                     ("no temp sibling remains", not read_temps(path.parent))]
+            if path == target:
+                after += [("the policy file's bytes equal the committed bytes", target.read_bytes() == committed),
+                          ("two renames onto it", renamed == [target, target])]
+            else:
+                after += [("the path does not exist", not path.exists()), ("one rename onto it", renamed == [path])]
+            check_scenario(name, after)
+        renamed, spy = run_spy(KeyboardInterrupt())
+        reached = False
+        try:
+            with spy:
+                policy_edit.write_guarded(target, "# fx interrupted\n", lambda: "fx-record")
+        except KeyboardInterrupt:
+            reached = True
+        check_scenario("interrupted at the rename", [
+            ("the interrupt reached the caller", reached),
+            ("the policy file holds the committed bytes", target.read_bytes() == committed),
+            ("no temp sibling remains", not read_temps(target.parent))])
+        renamed, spy = run_spy()
+        with spy:
+            got = policy_edit.write_guarded(target, write_appended, lambda: "fx-record")
+        check_scenario("a callable over its prior bytes", [
+            ("the policy file is the committed bytes plus the line", target.read_bytes() == committed + b"# fx appended\n"),
+            ("the handed path is a sibling, not the target",
+             len(handed) == 1 and handed[0].parent == target.parent and handed[0] != target),
+            ("record()'s value returned", got == "fx-record"),
+            ("no temp sibling remains", not read_temps(target.parent))])
     return out
 
 
