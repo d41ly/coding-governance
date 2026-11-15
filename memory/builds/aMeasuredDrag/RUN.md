@@ -64,3 +64,7 @@ base: a0a1892de069cd2299ba162d885ac283cfa81010
 2026-11-15T04:25:20Z dispatch · item 20e4294f TOOL-aMeasuredDrag-8 · reason tools/unattended/check-brief-recorded.sh tools/unattended/check-pass-order.sh memory/builds/aMeasuredDrag/spec/2026-11-15-spec-TOOL-aMeasuredDrag-8.md memory/builds/aMeasuredDrag/build/2026-11-15-build-TOOL-aMeasuredDrag-8-1-acceptance-ledger.md memory/builds/aMeasuredDrag/README.md memory/map/generated/symbols.json memory/LIVE.md memory/ledger/2026-11.md
 
 2026-11-15T04:30:40Z brief · item TOOL-aMeasuredDrag-8 · reason 286d2d0790dc memory/builds/aMeasuredDrag/prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-8-1-builder.md
+
+2026-11-15T04:49:10Z dispatch · item 662d712d TOOL-aMeasuredDrag-9 · reason tools/memory-tree/transition_audit.py memory/builds/aMeasuredDrag/spec/2026-11-15-spec-TOOL-aMeasuredDrag-9.md memory/builds/aMeasuredDrag/build/2026-11-15-build-TOOL-aMeasuredDrag-9-1-acceptance-ledger.md memory/builds/aMeasuredDrag/README.md memory/map/generated/symbols.json memory/LIVE.md memory/ledger/2026-11.md
+
+2026-11-15T04:49:22Z brief · item TOOL-aMeasuredDrag-9 · reason 7cc8b58e733e memory/builds/aMeasuredDrag/prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-9-1-builder.md
