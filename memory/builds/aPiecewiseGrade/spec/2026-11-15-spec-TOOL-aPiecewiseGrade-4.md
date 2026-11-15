@@ -1,6 +1,6 @@
 # TOOL-aPiecewiseGrade-4 — the spec-token checker writes its next cache generation into a directory the caller names, so no caller renames a fixed-name temp
 
-**Status:** SPECCED · rev-1 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 3 · ratified 2026-11-15
 
 <!-- gen:spec-records -->
 
@@ -64,7 +64,7 @@ checker prints moves.
 ### Edges
 
 - **consumes-from** external — TOOL-aPiecewiseGrade-1's incremental mode, its cache and its `PG1` arm, which this unit changes in where the next generation is written and nothing else. That spec is CLOSED and frozen, and predates this unit, so it declares no hands-off here. The build order is TOOL-aPiecewiseGrade-3 at order 1, TOOL-aPiecewiseGrade-1 at order 2, this unit at order 3 and TOOL-aPiecewiseGrade-2 at order 4
-- **hands-off** `TOOL-aPiecewiseGrade-2` — making the next generation's directory with `mktemp -d` beside the per-slug cache, passing it in `SPEC_TOKENS_CACHE_NEXT`, renaming it into place only where the whole key is recorded, and the lint observation over that promotion. That unit builds at order 4, after this one
+- **hands-off** `TOOL-aPiecewiseGrade-2` — making the next generation's directory with `mktemp -d` beside the per-slug cache, passing it in `SPEC_TOKENS_CACHE_NEXT`, naming it live in a file only where the whole key is recorded, and the lint observation over the driver. That unit builds at order 4, after this one
 
 ## 4. Design
 
@@ -176,7 +176,7 @@ The usage line becomes `SPEC_TOKENS_CACHE=<dir> SPEC_TOKENS_CACHE_NEXT=<new> pyt
 The paragraph's last three sentences say the run writes the whole next generation into the
 directory `SPEC_TOKENS_CACHE_NEXT` names, which the caller made empty with an unpredictable name and
 which the run never creates or removes. They say the caller promotes SPEC_TOKENS_CACHE_NEXT only under
-its own bracket, by removing `<dir>` and renaming the named directory to it, and that with either
+its own bracket, by passing it as a later run's `SPEC_TOKENS_CACHE`, and that with either
 variable empty, or the two naming one directory, the run is the plain run.
 
 ### The two arms
@@ -208,8 +208,8 @@ New with this design:
 - **The named directory's provenance.** The checker does not check that the directory is empty, that
   its name was unpredictable, or that it sits beside the cache. The contract says the caller made it
   with `mktemp -d`; TOOL-aPiecewiseGrade-2's criteria observe that its caller does.
-- **A rename across the driver's two halves** is unfollowed by the lint, so the leg passes and gives
-  no coverage for it. F1.
+- **The caller's promotion** is out of the lint's sight: the lint reads `mv` alone, and F1's pick
+  renames nothing.
 - **One directory nested in the other.** Only the equal pair is refused. A named directory inside
   `<dir>` would put the generation inside the cache it read.
 - **An older checker.** A caller passing both variables to a checker built before this unit gets a
@@ -365,12 +365,19 @@ the spec-token checker's `--spec` over this file.
   Recommendation: (a). It is the smallest change to TOOL-aPiecewiseGrade-2's ratified design, its
   name is unpredictable whether or not the lint can see that, and (b) adds a file that goes to `rm -rf`
   to avoid a rename the lint does not gate.
+  RESOLVED (owner, 2026-11-15): (b) Name file, no rename
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-15 · initial draft from brief `2026-11-15-prompt-TOOL-aPiecewiseGrade-4-forks-brief`,
   the owner's answer (c) to TOOL-aPiecewiseGrade-2's divergence in
   `2026-11-15-prompt-TOOL-aPiecewiseGrade-2-revision`, grounded at `dd9006677`.
+- rev-2 · 2026-11-15 · §8 · §3 · S5 · §4 · from brief
+  `2026-11-15-prompt-TOOL-aPiecewiseGrade-2-1-spec-writer`: F1 RESOLVED as the owner's (b), a name
+  file and no rename, with the ratified pointer. Three sentences the pick made false are rewritten:
+  the hands-off edge's "renaming it into place only where the whole key is recorded", S5's
+  docstring clause "by removing `<dir>` and renaming the named directory to it", and the
+  not-checked bullet "A rename across the driver's two halves". The contract does not move.
 
 ## 10. Reuse audit
 
