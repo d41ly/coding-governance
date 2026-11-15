@@ -141,9 +141,9 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-8 — claims keyed and trusted by key and source](spec/2026-10-24-spec-TOOL-dDeclaredLoop-8.md) | 16 | 2 | CLOSED | rev-4 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-59 — a merge owes a policy trailer only for a key its result sets that no parent and no clean re-merge set](spec/2026-10-24-spec-TOOL-dDeclaredLoop-59.md) | 17 | 2 | DEFERRED | rev-4 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-7 — the position engine: each unit's step, the build's step and the next item, from witnesses](spec/2026-10-24-spec-TOOL-dDeclaredLoop-7.md) | 17 | 2 | DEFERRED | rev-4 | 2026-11-15 |
-| [TOOL-dDeclaredLoop-14 — the default failure route: the refusal recorded and the frontier returned](spec/2026-10-24-spec-TOOL-dDeclaredLoop-14.md) | 18 | 2 | DEFERRED | rev-3 | 2026-11-05 |
-| [TOOL-dDeclaredLoop-45 — a unit reads `built` from its pass commit while no acceptance writer is armed](spec/2026-10-24-spec-TOOL-dDeclaredLoop-45.md) | 18 | 2 | DEFERRED | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-69 — a merge whose clean re-merge is computable is graded against that re-merge alone](spec/2026-10-24-spec-TOOL-dDeclaredLoop-69.md) | 18 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-14 — the default failure route: the refusal recorded and the frontier returned](spec/2026-10-24-spec-TOOL-dDeclaredLoop-14.md) | 18 | 2 | DEFERRED | rev-4 | 2026-11-15 |
+| [TOOL-dDeclaredLoop-45 — a unit reads `built` from its pass commit while no acceptance writer is armed](spec/2026-10-24-spec-TOOL-dDeclaredLoop-45.md) | 18 | 2 | DEFERRED | rev-3 | 2026-11-15 |
+| [TOOL-dDeclaredLoop-69 — a merge whose clean re-merge is computable is graded against that re-merge alone](spec/2026-10-24-spec-TOOL-dDeclaredLoop-69.md) | 18 | 2 | DEFERRED | rev-3 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-4 — stage claims and the coverage gate](spec/2026-10-24-spec-TOOL-dDeclaredLoop-4.md) | 19 | 2 | DEFERRED | rev-3 | 2026-10-25 |
 | [TOOL-dDeclaredLoop-78 — the clean re-merge has three states, and a re-merge that lacks the policy file is graded, never treated as none](spec/2026-10-24-spec-TOOL-dDeclaredLoop-78.md) | 19 | 2 | DEFERRED | rev-5 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-46 — the `stage` claim follows the whole manifest-key path: descriptors, emitter, runner floor and selfcheck](spec/2026-10-24-spec-TOOL-dDeclaredLoop-46.md) | 20 | 2 | DEFERRED | rev-3 | 2026-10-25 |
@@ -212,7 +212,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 416 bound to this build, across 4 record folder(s).
+Records: 425 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
