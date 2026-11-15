@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-75 — the round-3 spec audit's 36 minors, batched
 
-**Status:** DEFERRED · rev-8 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 39 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-9 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 39 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -151,8 +151,13 @@ are not in the disposal population.
   refused until `apply --kits`, and the route names every unmet pair, never only the first.
   Observed by AC26.
 - **S27** — id 41. The clean re-merge C is taken from `git merge-tree --write-tree`'s first output line on
-  exit 0 or exit 1, and used when the policy path is not among the conflicted paths and its blob parses;
-  any other exit code grades against the parents alone with 59 S3's printed line. Observed by AC27.
+  exit 0 or exit 1, and used when the policy path is not among the conflicted paths and its blob parses.
+  A merge-tree exit 1 whose conflicted paths hold the policy path, an octopus merge and a probed
+  absence of `merge-tree --write-tree` grade against the parents alone with 59 S3's printed line, as
+  69 S2 grades them: 81's `conflicted` and `uncomputable` states. Every other outcome of the re-merge
+  is 81 S2's `failed` state, graded by 81 S3 and refused untrailered, never a fall to the parents: an
+  exit 0 printing no tree id, an exit other than 0 and 1, or a re-merge that cannot start.
+  Observed by AC27.
 - **S28** — id 46. An unreadable claim set refuses the patch draw: `read_claims` returning 1 makes the
   driver print `budget: patch draw refused — claims unread: <CL_WHY>` and draw nothing, graded like a
   hold. Observed by AC28.
@@ -395,8 +400,9 @@ no pass commit is recorded `no pass`, never skipped.
   Red when: the route names only the first unmet pair.
 - **AC27** — When `python guard.py --fixture --plant push-merge-conflict-elsewhere` grades a merge whose
   merge-tree exits 1 on a non-policy file while the policy file's two-sided value merged cleanly, it
-  exits 0.
-  Red when: exit 1 drops the clean leg and the value is owed.
+  exits 0; and `python guard.py --fixture --plant push-merge-tree-fatal` exits 1 printing
+  `the clean re-merge failed: 128`.
+  Red when: exit 1 drops the clean leg and the value is owed, or a fatal exit falls to the parents.
 - **AC28** — When a scratch driver run draws for a patch build with its claim remote unreachable, it
   prints `claims unread` and records no draw row.
   Red when: the draw lands with the claim set unread.
@@ -434,7 +440,7 @@ that mints it: `loop budget fixtures`, `loop breakpoints fixtures`, `loop positi
 
 New arm: tools/loop/budget.py · covers AC1 AC2 AC4 AC6 AC9 AC15 AC16 · the same-second, id-less, pre-log twin, unset-root, archived-patch and two grammar plants · none
 New arm: tools/loop/position.py · covers AC12 AC17 AC34 · the other-branch, outside-cwd and no-reflog plants under an empty git config · none
-New arm: tools/loop/guard.py · covers AC27 · the conflict-elsewhere plant, staged against the exit-0-only clean leg · none
+New arm: tools/loop/guard.py · covers AC27 · the conflict-elsewhere plant, staged against the exit-0-only clean leg, and the tree-fatal plant, staged by routing `failed` back to the parents · none
 New arm: tools/loop/loop_table.py · covers AC19 · the stub-bash plant, staged against a bare bash · none
 New arm: tools/govkit/selftest.py · covers AC13 AC14 AC26 · the committed-target refusal on both paths and the every-pair route · none
 New arm: tools/memory-tree/gen_build_index.py · covers AC31 · the directory-in-higher-id fixture group · none
@@ -476,6 +482,7 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC31 · the directory-in
   TOOL-dDeclaredLoop-92, written by the round-9 spec audit's disposal; nothing else moved.
 - rev-8 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-94, written by the round-10 spec audit's disposal; nothing else moved.
+- rev-9 · 2026-11-15 · S27 · AC27 · §7 · S27's fallback clause restated to TOOL-dDeclaredLoop-81's exit table, AC27 re-observing `push-merge-tree-fatal` and the guard arm line naming the tree-fatal plant, written by TOOL-dDeclaredLoop-83 (the round-6 spec audit's id 1); nothing else moved.
 
 ## 10. Reuse audit
 

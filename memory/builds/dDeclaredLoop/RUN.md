@@ -26,10 +26,10 @@ mode: slug
 run-branch: refs/heads/branch/unattended-declared-loop-d56bf0
 anchor-kind: default-branch
 cli-version: 2.1.321
-lease-utc: 2026-11-15T14:35:42Z
+lease-utc: 2026-11-15T19:26:28Z
 pid-image: claude.exe
 host: compeeto-agent
-pid: 22476
+pid: 13712
 session: 7c85732c-fa0c-43e9-83f2-238d293195e0
 keepalive: 45e677fb
 anchor-url: https://github.com/d41ly/coding-governance.git
@@ -232,3 +232,7 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-15T18:45:59Z brief · item TOOL-dDeclaredLoop-25 · reason 4955353b0c06 memory/builds/dDeclaredLoop/prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-25-build-brief.md
 
 2026-11-15T19:10:54Z brief · item TOOL-dDeclaredLoop-83 · reason 2d604fb53e69 memory/builds/dDeclaredLoop/prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-83-build-brief.md
+
+2026-11-15T19:32:01Z dispatch · item 8be303ca TOOL-dDeclaredLoop-83 · reason memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-83.md memory/builds/dDeclaredLoop/build/2026-11-15-build-TOOL-dDeclaredLoop-83-1-acceptance-ledger.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/backlog/TOOL.md
+
+2026-11-15T19:44:16Z dispatch · item 8be303ca TOOL-dDeclaredLoop-83 · reason memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-83.md memory/builds/dDeclaredLoop/build/2026-11-15-build-TOOL-dDeclaredLoop-83-1-acceptance-ledger.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/backlog/TOOL.md
