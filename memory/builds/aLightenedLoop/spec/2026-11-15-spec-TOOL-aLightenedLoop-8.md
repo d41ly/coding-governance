@@ -188,13 +188,13 @@ first tree-state read moved to the read half, the lookup's skip deleted, and the
 `init_bounded` line deleted.
 
 ```bash
-# TOOL-aSmoothedDispatch-4 S2-S4 - MOVED HERE from `verb_dispatch` with its refusal texts and its
+  # TOOL-aSmoothedDispatch-4 S2-S4 - MOVED HERE from `verb_dispatch` with its refusal texts and its
 # announced skip unchanged, then SCOPED and CACHED. It refuses only on a red `check_spec_token_hits`
 # cannot prove foreign. A key is recorded only after the verdict admits, so a refusal re-runs every
 # time. The key is one file per slug under the sidecar root, read with `read -r` and written with one
 # `printf`; a failed read or write costs a later miss and never refuses.
 #
-# TOOL-aLightenedLoop-3 S6 - RE-KEYED on what the checker READ. <this branch's paragraph, unchanged>
+  # TOOL-aLightenedLoop-3 S6 - RE-KEYED on what the checker READ. <this branch's paragraph, unchanged>
 #
 # TWO HALVES, AS `init_bounded` AND `read_bounded` ARE (TOOL-aBriskDeclaration-1 S3, S4), the cache
 # above carried onto them at the reconcile (TOOL-aLightenedLoop-8). The start half,
