@@ -67,9 +67,18 @@
 // `dispatch.args`. Given, and the builder committed, the return carries a `nextAction` ordering the
 // main loop to run it over the pass's commits, from the `base` the builder returns
 // (TOOL-aNimbleMend-15). Absent, the return, log, prompt and options are unchanged.
+//
+// `passBase` IS OPTIONAL (TOOL-aTwinnedPass-1): the commit this pass starts from. Given, the agent
+// runs in a worktree the runtime cuts for it, which may sit on the default branch's tip, so the
+// prompt's first order is a hard reset to `passBase` and its confirmation. `writes`, the write set
+// the main loop declared, travels with it in unattended mode and nowhere else, and the builder then
+// orders neither recording verb, because `--dispatch` and `--brief` both write the run-state file a
+// pass running beside another must not touch. The return carries `branch` and `worktree` after a
+// shape check, and `nextAction` takes its base from `passBase` and names that worktree. Absent, the
+// prompt, options, log and return are unchanged.
 export const meta = {
   name: 'unattended-unit',
-  version: '1.1', // gov:kit unattended-unit@1.1 — engine identity (deployed verbatim)
+  version: '1.2', // gov:kit unattended-unit@1.2 — engine identity (deployed verbatim)
   description:
     'Builds exactly ONE unit of an unattended build, in a sidechain whose orientation is that unit spec and that unit brief. The roster is not in scope here; the parent holds it and holds the order.',
   phases: [{ title: 'Unit', detail: 'read the brief and the spec, declare the write set, build, commit' }],
@@ -162,6 +171,38 @@ if (
   )
 }
 
+// TOOL-aNimbleMend-15 - A COMMIT NAME AN AGENT RETURNED reaches `nextAction` only through this shape.
+// `nextAction` is an instruction to the main loop, which holds grants the builder lacks, and `sha` and
+// `base` are a role agent's free text. The return's own `sha` field and the log line keep the raw value.
+// It also grades `passBase` (TOOL-aTwinnedPass-1), which is spelled into a shell order in the prompt.
+const COMMIT_SHAPE = /^[0-9a-f]{7,64}$/
+
+// `passBase` IS GRADED BY THE COMMIT SHAPE (TOOL-aTwinnedPass-1): the commit this pass starts from. It
+// is spelled into a shell order in the prompt, so it is graded by the commit shape and nothing else passes.
+if (cfg.passBase !== undefined && (typeof cfg.passBase !== 'string' || !COMMIT_SHAPE.test(cfg.passBase))) {
+  throw new Error(
+    'unattended-unit: args `passBase` must be a commit sha of 7 to 64 lower-case hex digits, got ' +
+      JSON.stringify(cfg.passBase) + '. Omit the key and the pass builds in the caller\'s own tree.',
+  )
+}
+if (
+  cfg.writes !== undefined &&
+  (typeof cfg.writes !== 'string' || cfg.writes === '' || /[\r\n`]/.test(cfg.writes))
+) {
+  throw new Error(
+    'unattended-unit: args `writes` must be a non-empty single-line string with no backtick, got ' +
+      JSON.stringify(cfg.writes) + '. It is the write set the main loop declared with --dispatch for this pass.',
+  )
+}
+if ((cfg.passBase !== undefined && cfg.mode === 'unattended') !== (cfg.writes !== undefined)) {
+  throw new Error(
+    'unattended-unit: args `writes` travels with `passBase` in unattended mode and nowhere else: it is the ' +
+      'write set the main loop declared for a pass building in its own worktree, which that builder ' +
+      'then does not declare. Got `passBase` ' + JSON.stringify(cfg.passBase) + ', `mode` ' +
+      JSON.stringify(cfg.mode) + ' and `writes` ' + JSON.stringify(cfg.writes) + '.',
+  )
+}
+
 // `roles` IS NOT A `check()` CALL: it is optional, and its key set is closed. The joined key list is
 // compared with the two legal spellings, so the test needs no loop and no arrow.
 const AGENT_TYPE_SHAPE = /^[A-Za-z][A-Za-z0-9_-]{0,63}$/ // owner: tier2-review.template.js `workerType`
@@ -223,15 +264,18 @@ const effort = effortKeys === 'builder' ? efforts.builder : ''
 // from a clean pass over nothing.
 const UNIT_SCHEMA = {
   type: 'object',
-  required: ['committed', 'sha', 'why', 'summary'],
+  // TOOL-aTwinnedPass-1 - two literal lists and not a `concat`: this file carries no array method.
+  required: cfg.passBase === undefined
+    ? ['committed', 'sha', 'why', 'summary']
+    : ['committed', 'sha', 'why', 'summary', 'branch', 'worktree'],
   additionalProperties: true,
-  properties: {
+  properties: Object.assign({
     committed: { type: 'boolean' },
     sha: { type: 'string' },
     base: { type: 'string' },
     why: { type: 'string' },
     summary: { type: 'string' },
-  },
+  }, cfg.passBase === undefined ? {} : { branch: { type: 'string' }, worktree: { type: 'string' } }),
 }
 
 // TOOL-aOrientedCast-27 - the builder's label and the run's identity, one string: its first log line
@@ -255,12 +299,23 @@ phase('Unit')
 //
 // It is a ternary and not a second definition: the codebase-map JS liveness floor counts the one
 // definition above, and this file keeps exactly one.
+//
+// TOOL-aTwinnedPass-1 - a third branch, for a pass building in its own worktree in unattended mode.
+// It spells neither `cfg.driver` nor `cfg.slug`, so the prompt carries no runnable recording verb.
 const DRIVER_STEPS =
   cfg.mode === 'attended'
     ? 'This run has NO run-state file, so the driver\'s recording verbs are unavailable and you must ' +
       'not call them: --dispatch, --brief and --rescope all refuse without one. Write down the paths ' +
       'each pass will touch before you touch them anyway — the declaration is what makes disjointness ' +
       'checkable, and here only you can check it.\n'
+    : cfg.passBase !== undefined
+    ? 'The main loop declared this pass\'s write set with --dispatch and recorded this brief with ' +
+      '--brief, on the run\'s branch at `' + cfg.passBase + '`, the commit you reset to, so you call ' +
+      'neither: both write the run-state file, which a pass running beside another must not touch. The ' +
+      'declared write set is `' + cfg.writes + '`. Write no path outside it. Where you need one, stop, ' +
+      'restore every path you changed, commit nothing, and return committed:false with a why naming each ' +
+      'such path: a declaration widens only before its pass commits, and only the main loop may widen ' +
+      'this one.\n'
     : 'Declare the write set with `' + cfg.driver + ' --dispatch ' + cfg.slug + ' --pass ' + cfg.unitId +
       ' --writes <path>` before you write anything. A REFUSAL FROM IT IS BINDING — read it and stop. ' +
       'ITS SILENCE IS NOT A CLEARANCE: it refuses this unit only for having no tracked spec or a THIN ' +
@@ -278,6 +333,18 @@ const PROMPT =
   (builder
     ? 'This stage runs as the ' + builder + ' agent type: your role is your system prompt, and this message is your task. '
     : '') +
+  // TOOL-aTwinnedPass-1 - ahead of every order, so the reset is the first command the agent runs.
+  (cfg.passBase === undefined
+    ? ''
+    : '\n\nTHIS PASS BUILDS IN A WORKTREE OF ITS OWN, which the runtime cut for this agent and which may ' +
+      'sit on another commit. BEFORE ANY OTHER COMMAND, run `git reset --hard ' + cfg.passBase + '` there, ' +
+      'then confirm `git rev-parse HEAD` prints a sha beginning with `' + cfg.passBase + '`, the commit ' +
+      'this pass was dispatched from; if it does not, commit nothing and return committed:false with a ' +
+      'why naming what it printed. Run every shell command with its working directory there, resolve ' +
+      'every relative path in this message under it, the brief and the spec included, and write and ' +
+      'commit only there, on the branch it has checked out, never in any other tree. Return that branch ' +
+      'as `branch`, as `git branch --show-current` prints it, and the worktree\'s path as `worktree`, as ' +
+      '`git rev-parse --show-toplevel` prints it.') +
   '\n\nBuild exactly ONE unit: ' + cfg.unitId + '. You are handed two documents' +
   (builder ? '' : ' and you read both whole before you touch code') +
   ': the BRIEF at ' + cfg.briefPath + ' and the SPEC at ' + cfg.specPath + '. ' +
@@ -349,6 +416,8 @@ const PROMPT =
 
 if (cfg.prebuild !== undefined) log('unit ' + cfg.unitId + ': prebuild checklist `' + cfg.prebuild + '`')
 if (cfg.passLegs !== undefined) log('unit ' + cfg.unitId + ': pass legs `' + cfg.passLegs + '`')
+if (cfg.passBase !== undefined) log('unit ' + cfg.unitId + ': own worktree from `' + cfg.passBase + '`' +
+  (cfg.writes === undefined ? '' : ', declared writes `' + cfg.writes + '`'))
 
 log('unit ' + cfg.unitId + ': builder ' + (builder
   ? 'spawns as the ' + builder + ' agent type'
@@ -356,18 +425,24 @@ log('unit ' + cfg.unitId + ': builder ' + (builder
 log(effort ? 'effort builder: ' + effort + ' — efforts.builder'
   : 'effort builder: the agent type\'s own, else the session\'s — no efforts.builder')
 
-// TOOL-aNimbleMend-15 - A COMMIT NAME AN AGENT RETURNED reaches `nextAction` only through this shape.
-// `nextAction` is an instruction to the main loop, which holds grants the builder lacks, and `sha` and
-// `base` are a role agent's free text. The return's own `sha` field and the log line keep the raw value.
-const COMMIT_SHAPE = /^[0-9a-f]{7,64}$/
-
 const r = await agent(
   PROMPT,
   Object.assign({ label: identity, schema: UNIT_SCHEMA },
-    builder ? { agentType: builder } : {}, effort ? { effort: effort } : {}),
+    builder ? { agentType: builder } : {}, effort ? { effort: effort } : {},
+    cfg.passBase === undefined ? {} : { isolation: 'worktree' }),
 )
 
 log('unit ' + cfg.unitId + ': committed=' + String(!!(r && r.committed)) + ' sha=' + ((r && r.sha) || '-'))
+if (cfg.passBase !== undefined) log('unit ' + cfg.unitId + ': branch=' + ((r && r.branch) || '-') + ' worktree=' + ((r && r.worktree) || '-'))
+
+// TOOL-aTwinnedPass-1 - THE BRANCH AND WORKTREE AN AGENT RETURNED reach the return and `nextAction`
+// only through these shapes, as `sha` and `base` reach `nextAction` only through COMMIT_SHAPE. An
+// empty string is the shape check's refusal; the log line above keeps the raw values.
+// owner of the absolute prefix: unattended-build.template.js `scratch`
+const TREE_SHAPE = /^(\/|[A-Za-z]:[\\/])[^\r\n`]*$/
+const BRANCH_SHAPE = /^[A-Za-z0-9][A-Za-z0-9._\/-]{0,254}$/
+const ownBranch = r && typeof r.branch === 'string' && BRANCH_SHAPE.test(r.branch) ? r.branch : ''
+const ownTree = r && typeof r.worktree === 'string' && TREE_SHAPE.test(r.worktree) ? r.worktree : ''
 
 // S8 - `diverged` is a field, so a caller branches on it rather than on the prose of `why`.
 return {
@@ -377,24 +452,37 @@ return {
   why: (r && r.why) || '',
   summary: (r && r.summary) || '',
   diverged: !!(r && r.committed === false && typeof r.why === 'string' && r.why.indexOf('DIVERGENCE:') === 0),
+  // TOOL-aTwinnedPass-1 - on every return of a `passBase` call, `committed:false` included, because
+  // the worktree outlives the pass either way.
+  ...(cfg.passBase === undefined ? {} : { branch: ownBranch, worktree: ownTree }),
   // TOOL-aNimbleMend-7 - THE RUN POINT. Present only when the caller handed `passLegs` AND a commit
   // exists to run it over; it orders the main loop, and says nothing about how a red is fixed.
   // TOOL-aNimbleMend-15 - the command's base is the commit the builder STARTED from, never a relative
   // rev: a pass can make two commits. A `base` that fails the shape, or that names the pass commit
   // itself (one a prefix of the other), is not used, and the sentence hands the main loop the rev it
   // read before the dispatch. A `sha` that fails the shape names no commit here.
+  // TOOL-aTwinnedPass-1 - with `passBase` the base is `passBase`, always: the main loop chose it and
+  // checked its shape, and a builder that skipped the reset would hand back the default branch's tip.
+  // The command then runs in the returned worktree, where the pass commit is HEAD, before the merge.
   ...(cfg.passLegs !== undefined && r && r.committed
     ? {
         nextAction:
           'Run `' + cfg.passLegs + ' --base ' +
-          (typeof r.base === 'string' && COMMIT_SHAPE.test(r.base) &&
-          String(r.sha || '').indexOf(r.base) !== 0 && r.base.indexOf(String(r.sha || '')) !== 0
+          (cfg.passBase !== undefined
+            ? cfg.passBase + '`'
+            : typeof r.base === 'string' && COMMIT_SHAPE.test(r.base) &&
+              String(r.sha || '').indexOf(r.base) !== 0 && r.base.indexOf(String(r.sha || '')) !== 0
             ? r.base + '`'
             : '<rev>`, where the builder returned no usable base, so `<rev>` is the commit HEAD named ' +
               'before the dispatch,') +
-          ' at the main loop before the next dispatch and before any later ' +
-          'commit, where that file exists. The pass commit is ' +
+          (cfg.passBase === undefined
+            ? ' at the main loop before the next dispatch and before any later commit,'
+            : ' at the main loop with its working directory at ' +
+              (ownTree ? '`' + ownTree + '`' : 'the worktree this pass built in, whose path the builder returned unusable') +
+              ', before that worktree is merged back,') +
+          ' where that file exists. The pass commit is ' +
           (typeof r.sha === 'string' && COMMIT_SHAPE.test(r.sha) ? r.sha + ', which is HEAD ' : 'HEAD ') +
+          (cfg.passBase === undefined ? '' : 'there ') +
           'when the command runs. Act on its exit status and on every finding line it prints. The ' +
           'command runs nothing where `pass.fast-legs` is `off`.',
       }
