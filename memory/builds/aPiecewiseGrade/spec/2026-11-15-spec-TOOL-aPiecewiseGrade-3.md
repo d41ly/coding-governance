@@ -1,11 +1,12 @@
 # TOOL-aPiecewiseGrade-3 — the spec-token checker resolves the memory-tree kit's `design_lib` once per process, so no caller pays the kit resolution per call
 
-**Status:** INPROGRESS · rev-1 · 2026-11-15 · node a · Tier-1 · base aebbb4a72 · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-11-15 · node a · Tier-1 · base aebbb4a72 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-15-build-TOOL-aPiecewiseGrade-3-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aPiecewiseGrade-3-1-acceptance-ledger.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aPiecewiseGrade-3-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-3-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aPiecewiseGrade-3-forks-brief.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-3-forks-brief.md) | research | TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 |
 

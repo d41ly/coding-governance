@@ -287,6 +287,7 @@ not see, prints nothing and exits 1. The unattended driver keys its spec-token c
 import atexit
 import base64
 import datetime
+import functools
 import hashlib
 import importlib.util
 import json
@@ -1233,8 +1234,12 @@ def load_kit_module(name):
     return kit
 
 
+@functools.lru_cache(maxsize=None)
 def load_design_lib():
-    """The memory-tree kit's `design_lib.py`, `load_kit_module`'s first caller (TOOL-dTrueNorth-2)."""
+    """The memory-tree kit's `design_lib.py`, `load_kit_module`'s first caller (TOOL-dTrueNorth-2).
+
+    The first load that returns is kept for the process, and a load that raises is not kept
+    (TOOL-aPiecewiseGrade-3)."""
     return load_kit_module("design_lib")
 
 

@@ -95,7 +95,9 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # RECONCILED to 259 at TOOL-aLightenedLoop-8's merge of origin/main: the common base 247 at
 # 846d51d39, plus main's 7 (TOOL-aClearedLedger-5 and -11), plus this branch's 5
 # (TOOL-aLightenedLoop-3's four and -6's one). Summed, not counted.
-FLOOR_ASSERTIONS=259
+# RAISED 259 -> 260 by TOOL-aPiecewiseGrade-3: its one memo arm beside the guards arms, `memo guards
+# hit`, top-level. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=260
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -826,6 +828,33 @@ arm "a post-cutoff spec whose files-touched trips a guard the leg line omits RED
 sed -i 's|^`real leg`\.|`real leg` · `guarded leg`.|' "$spec"
 git -C "$d" add -A >/dev/null
 arm "the same tree with the guarded leg named on the leg line is green and counted as examined" 0 "$d" "guards join · 1 declared path(s) examined in 1 live spec(s) at/after SPEC_GUARD_LEGS_CUTOFF 2026-09-01"
+git -C "$d" reset -q --hard "$clean"
+
+# TOOL-aPiecewiseGrade-3 AC2 — `load_design_lib` keeps its first load for the process: over the AC2
+#      tree, the checker loaded in process with `load_kit_module` wrapped by a counter prints its
+#      [guards] hit and makes no `design_lib` call during `main`, the import-time load already kept.
+#      Red with the `lru_cache` decorator removed: every guard check re-enters `load_kit_module`.
+printf '%s\n' "$GUARD_LEGS" > "$d/${PFX}gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`'"${PFX}x/thing.sh"'`'
+git -C "$d" add -A >/dev/null
+memo_out=$(cd "$d" && "$PY" -c 'import contextlib, importlib.util, io, sys
+spec = importlib.util.spec_from_file_location("cst", sys.argv[1])
+m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+calls, real = [], m.load_kit_module
+def counted(name):
+    calls.append(name)
+    return real(name)
+m.load_kit_module = counted
+buf = io.StringIO()
+with contextlib.redirect_stdout(buf):
+    rc = m.main([])
+hit = "[guards] `guarded leg <- " + sys.argv[2] + "x/thing.sh`" in buf.getvalue()
+print("memo guards hit", hit, "rc", rc, "design_lib loads", calls.count("design_lib"))' "$LINT" "$PFX" 2>&1)
+case "$memo_out" in
+  *"memo guards hit True rc 1 design_lib loads 0"*) echo "arm ok    TOOL-aPiecewiseGrade-3 AC2 the guards join prints its hit and makes no design_lib load after the first"; pass=$((pass+1)) ;;
+  *) echo "arm FAIL  TOOL-aPiecewiseGrade-3 AC2 — expected: memo guards hit True rc 1 design_lib loads 0"; printf '%s\n' "$memo_out" | tail -3; fail=$((fail+1)) ;;
+esac
 git -C "$d" reset -q --hard "$clean"
 
 # AC6 — the PRE-cutoff twin is green, and COUNTED on the guards line rather than silently skipped.
