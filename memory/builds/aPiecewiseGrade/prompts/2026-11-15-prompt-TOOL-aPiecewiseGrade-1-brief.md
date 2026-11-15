@@ -71,4 +71,5 @@ The spec-tokens self-test and the driver suite's dispatch arms, run directly. `c
 Asked: Declare `spec-audit:` for this build, so a spec reviewer audits the spec set before any build?
 Answer: No audit
 
-The go to build is not asked yet: the specs stop at READY for it.
+Asked: Go ahead and build aPiecewiseGrade once aLightenedLoop lands?
+Answer: Go after it lands
