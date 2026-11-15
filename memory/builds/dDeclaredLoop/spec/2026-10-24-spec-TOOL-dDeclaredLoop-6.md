@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-6 — the factories and conformance gates for commands, policy keys, stages, hooks, roles and workflows
 
-**Status:** DEFERRED · rev-4 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 20 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-5 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 20 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0091@b0158e81 whole
 
@@ -162,6 +162,7 @@ to :299, and :383 to :388; P16).
 - **consumes-from** external — dOrderedCharter's `tools/playbook/kinds.toml`, `tools/playbook/core-pending.txt` and `core.py new`; dGroundRules' `policy check` leg and catalogue row shape; unit 18's `[[command]]` rows and `extract_command`
 - **hands-off** `TOOL-dDeclaredLoop-47` — the stage factory's whole conforming instance, which that unit specifies (the round-1 spec audit's id 3) and which §8 F4 leaves pending here
 - **hands-off** `TOOL-dDeclaredLoop-56` — the minors of the round-1 spec audit that land on this unit, ids 9, 26, 39, 59, each a scope item of that unit
+- **hands-off** `TOOL-dDeclaredLoop-25` — the stage kind's register row, left pending by §8 F4, whose factory and gate that unit lands with its repository stage
 
 ## 4. Design
 
@@ -492,6 +493,7 @@ New arm: tools/loop/factories.py · covers AC2 AC3 AC5 AC6 AC7 AC10 · each `-ha
   write and the fixture's scratch the policy kit's snapshot clone; the hook factory writes no stage row;
   both legs register as gov's own with their `stage` (S12). Line citations are symbol citations or
   blob-pinned lines.
+- rev-5 · 2026-11-15 · §3 · the Edges block gains the hands-off mirroring TOOL-dDeclaredLoop-25 rev-5's consumes-from edge; nothing else moved.
 
 ## 10. Reuse audit
 

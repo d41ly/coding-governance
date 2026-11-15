@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-4 — stage claims and the coverage gate
 
-**Status:** DEFERRED · rev-4 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 19 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-5 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 19 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0089@66b8552a whole
 
@@ -133,6 +133,7 @@ I24).
 - **consumes-from** external — dOrderedCharter-19 S9's `compute_coverage` in `tools/memory-tree/coverage_join.py`, and dOrderedCharter-7 S1 to S3's `principle.p<n>` registry, `enforces` key and meta-check, which S5's leg answers, all in the tree
 - **hands-off** `TOOL-dDeclaredLoop-46` — the stage claim's descriptor, emitter and selfcheck path, which that unit completes (the round-1 spec audit's id 25); this pass admits the key to both canary copies (§8 F6) and carries the leg as gov's own (§8 F7), so that unit's S1 and S5 are re-grounded against both
 - **hands-off** `TOOL-dDeclaredLoop-56` — the minors of the round-1 spec audit that land on this unit, ids 9, 26, 36, 40, 58, each a scope item of that unit; its id 26 is re-grounded against this pass's `[[exempt_leg]]` row (§8 F7)
+- **hands-off** `TOOL-dDeclaredLoop-25` — the `stage` key every leg row carries, and the gov-leg registration that unit's new leg follows
 
 ## 4. Design
 
@@ -462,6 +463,7 @@ New arm: tools/codebase-map/selftest.py · covers AC7 · a fence with a list `st
   its plants in memory through `--selftest`; `stage` is admitted to both canary copies here (F6, S7);
   the docs and usage row are S8. The memory-tree edge already stands and leaves scope. Line citations
   become symbol citations or blob-pinned lines.
+- rev-5 · 2026-11-15 · §3 · the Edges block gains the hands-off mirroring TOOL-dDeclaredLoop-25 rev-5's consumes-from edge; nothing else moved.
 
 ## 10. Reuse audit
 

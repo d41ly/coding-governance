@@ -145,16 +145,16 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-14 — the default failure route: the refusal recorded and the frontier returned](spec/2026-10-24-spec-TOOL-dDeclaredLoop-14.md) | 18 | 2 | DEFERRED | rev-4 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-45 — a unit reads `built` from its pass commit while no acceptance writer is armed](spec/2026-10-24-spec-TOOL-dDeclaredLoop-45.md) | 18 | 2 | DEFERRED | rev-3 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-69 — a merge whose clean re-merge is computable is graded against that re-merge alone](spec/2026-10-24-spec-TOOL-dDeclaredLoop-69.md) | 18 | 2 | DEFERRED | rev-3 | 2026-11-15 |
-| [TOOL-dDeclaredLoop-4 — stage claims and the coverage gate](spec/2026-10-24-spec-TOOL-dDeclaredLoop-4.md) | 19 | 2 | DEFERRED | rev-4 | 2026-11-15 |
+| [TOOL-dDeclaredLoop-4 — stage claims and the coverage gate](spec/2026-10-24-spec-TOOL-dDeclaredLoop-4.md) | 19 | 2 | DEFERRED | rev-5 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-78 — the clean re-merge has three states, and a re-merge that lacks the policy file is graded, never treated as none](spec/2026-10-24-spec-TOOL-dDeclaredLoop-78.md) | 19 | 2 | DEFERRED | rev-6 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-46 — the `stage` claim follows the whole manifest-key path: descriptors, emitter, runner floor and selfcheck](spec/2026-10-24-spec-TOOL-dDeclaredLoop-46.md) | 20 | 2 | DEFERRED | rev-4 | 2026-11-15 |
-| [TOOL-dDeclaredLoop-6 — the factories and conformance gates for commands, policy keys, stages, hooks, roles and workflows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-6.md) | 20 | 2 | DEFERRED | rev-4 | 2026-11-15 |
+| [TOOL-dDeclaredLoop-6 — the factories and conformance gates for commands, policy keys, stages, hooks, roles and workflows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-6.md) | 20 | 2 | DEFERRED | rev-5 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-81 — a clean re-merge that fails is its own state and never takes the parent exemption; only a probed absence of the feature does](spec/2026-10-24-spec-TOOL-dDeclaredLoop-81.md) | 20 | 2 | DEFERRED | rev-5 | 2026-11-15 |
-| [TOOL-dDeclaredLoop-25 — a repository's own stages, spliced between two adjacent gov stages](spec/2026-10-24-spec-TOOL-dDeclaredLoop-25.md) | 21 | 2 | DEFERRED | rev-4 | 2026-11-05 |
+| [TOOL-dDeclaredLoop-25 — a repository's own stages, spliced between two adjacent gov stages](spec/2026-10-24-spec-TOOL-dDeclaredLoop-25.md) | 21 | 2 | DEFERRED | rev-5 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-47 — the stage factory writes a whole conforming stage: its witness, exit item, state and table rows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-47.md) | 21 | 2 | DEFERRED | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-83 — 75 S27 states 81's exit table, so no merge-tree exit but 0 and 1 falls to the parents](spec/2026-10-24-spec-TOOL-dDeclaredLoop-83.md) | 21 | 2 | DEFERRED | rev-3 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-83 — 75 S27 states 81's exit table, so no merge-tree exit but 0 and 1 falls to the parents](spec/2026-10-24-spec-TOOL-dDeclaredLoop-83.md) | 21 | 2 | DEFERRED | rev-4 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-84 — the specs that restate the clean re-merge's non-zero exits read 81's exit table: 78's states and 82's S27 restatement](spec/2026-10-24-spec-TOOL-dDeclaredLoop-84.md) | 21 | 2 | DEFERRED | rev-3 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-85 — the write-tree capability probe has three answers, and only a probed absence takes the parent exemption](spec/2026-10-24-spec-TOOL-dDeclaredLoop-85.md) | 21 | 2 | DEFERRED | rev-4 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-85 — the write-tree capability probe has three answers, and only a probed absence takes the parent exemption](spec/2026-10-24-spec-TOOL-dDeclaredLoop-85.md) | 21 | 2 | DEFERRED | rev-5 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-29 — an item's upstream field: commitment rows handed on, answered at the return, gating only a measured edge](spec/2026-10-24-spec-TOOL-dDeclaredLoop-29.md) | 22 | 2 | DEFERRED | rev-3 | 2026-11-05 |
 | [TOOL-dDeclaredLoop-26 — a build's composition pinned per step, its position read at the pin, and the move at the next step boundary](spec/2026-10-24-spec-TOOL-dDeclaredLoop-26.md) | 23 | 2 | DEFERRED | rev-4 | 2026-11-05 |
 | [TOOL-dDeclaredLoop-27 — the scenario kind and namespace: gov's five scenarios, admission, conflicts and the pin per step](spec/2026-10-24-spec-TOOL-dDeclaredLoop-27.md) | 24 | 2 | DEFERRED | rev-3 | 2026-10-25 |
@@ -213,7 +213,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 455 bound to this build, across 4 record folder(s).
+Records: 464 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -287,7 +287,7 @@ Coverage of dDeclaredLoop's 34 clause(s) and 49 owned node(s), over 100 spec(s) 
 | 18 | `TOOL-dDeclaredLoop-112`, `TOOL-dDeclaredLoop-14`, `TOOL-dDeclaredLoop-45`, `TOOL-dDeclaredLoop-69` | no |
 | 19 | `TOOL-dDeclaredLoop-4`, `TOOL-dDeclaredLoop-78` | yes |
 | 20 | `TOOL-dDeclaredLoop-46`, `TOOL-dDeclaredLoop-6`, `TOOL-dDeclaredLoop-81` | no |
-| 21 | `TOOL-dDeclaredLoop-25`, `TOOL-dDeclaredLoop-47`, `TOOL-dDeclaredLoop-83`, `TOOL-dDeclaredLoop-84`, `TOOL-dDeclaredLoop-85` | yes |
+| 21 | `TOOL-dDeclaredLoop-25`, `TOOL-dDeclaredLoop-47`, `TOOL-dDeclaredLoop-83`, `TOOL-dDeclaredLoop-84`, `TOOL-dDeclaredLoop-85` | no |
 | 22 | `TOOL-dDeclaredLoop-29` | no |
 | 23 | `TOOL-dDeclaredLoop-26` | no |
 | 24 | `TOOL-dDeclaredLoop-27` | no |
