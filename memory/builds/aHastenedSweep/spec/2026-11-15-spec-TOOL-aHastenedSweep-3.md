@@ -1,6 +1,6 @@
 # TOOL-aHastenedSweep-3 — the hygiene shell hands `corpus_ids.py --check` its index set when checks 1 to 5 ran clean
 
-**Status:** SPECCED · rev-2 · 2026-11-15 · node a · Tier-2 · base f25308f0 · streams tooling · order 2
+**Status:** INPROGRESS · rev-2 · 2026-11-15 · node a · Tier-2 · base f25308f0 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
