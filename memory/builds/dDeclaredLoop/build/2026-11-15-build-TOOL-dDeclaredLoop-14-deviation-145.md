@@ -1,0 +1,16 @@
+# TOOL-dDeclaredLoop-14 deviation 145 — what the refusal route's build settles beside its spec, and the driver's refusal ceiling it raises
+
+**Serves:** deviation TOOL-dDeclaredLoop-14
+
+- **Departs from:** `TOOL-dDeclaredLoop-14@rev-7` [S3, S4, S5, §4 "The refusal row and its check", §4 Data model, §4 "The refusal budget"]
+- **Hand-off:** spec-to-code
+- **Before:** `--check-refusal` refuses itself, `loop: unarmed` at exit 2, where the composition does not read; `--plan` prints the engine's second line as `frontier:`, or `frontier: none`; a `refusals` entry carries its item, key, reason and time, and the engine prints `refusal — unarmed · <why>` where runlog does not resolve; the driver's `REFUSAL_CEILINGS` token holds its census at the decision TOOL-aSmoothedDispatch-2 recorded.
+- **After:** `--check-refusal` reads the composition as `derive_position` reads it: an unarmed composition, exit 2, reads gov's own `[[item]]` rows from the shipped definition, and only a composition that refuses, exit 1, or a definition that does not read answers `loop: unarmed`, exit 2; `--plan` prints no `frontier:` line where the position engine does not resolve beside the driver, since that engine returned no frontier; where runlog does not resolve, `refusals` holds one entry `{"unarmed": <why>}`, which the line output prints as `refusal — unarmed · <why>`. The driver's token names TOOL-dDeclaredLoop-14 and rises by the one engine refusal `write_refusal` adds, with its `RAISED` line above `REFUSAL_CEILINGS`, as the spec's section 4 spells both.
+- **Cause:** builder discovery
+- **Reason:** a scratch or adopter tree whose playbook kit registers no item kind answers the composition unarmed, so the literal clause would refuse every `--refused` in such a tree, the suite's and the fixture plants' included, while `derive_position` already reads gov's rows there (deviation 1002 of TOOL-dDeclaredLoop-7); a `frontier: none` printed for an engine that did not run claims that nothing can run, and the suite's `--plan` arm over a driver copied without the loop kit reads `next:` as the last line; the data model names no field for an unresolved reader, and the entry keeps the two fields the spec adds. The raise: the retirement review in the memory-tree README, over the engine site and the three field guards `check_step_fields` took from `verb_propose`, found no candidate — the engine site's condition survives nowhere else, and each of the four refuses a record forgery at the run-state write boundary, which R4 bars from retirement — so the census rises by one under decision TOOL-dDeclaredLoop-14 (ER:388), and every family stays flat because the three guards moved rather than being copied.
+- **Surface:** `tools/loop/position.py#print_check_refusal`, `tools/loop/position.py#read_refusals`, `tools/unattended/unattended.sh#verb_plan`, and `REFUSAL_CEILINGS` in `.memory-tree.conf`, the driver's token
+- **Evidence:** the acceptance ledger `2026-11-15-build-TOOL-dDeclaredLoop-14-1-acceptance-ledger.md`, its AC4, AC5, AC7 and AC11 lines.
+- **Risk:** additive
+- **Approver:** author, the builder pass, under the chain's `author-recorded` value (`PLAY-dClosedLoop-4`)
+- **Follow-through:** ask TOOL-dDeclaredLoop-35
+- **Caused-by:** 2026-11-15-build-TOOL-dDeclaredLoop-14-1-acceptance-ledger

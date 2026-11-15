@@ -2455,7 +2455,8 @@ def build_backlog_stragglers(ctx) -> dict:
 # holds each set here to its source in both directions.
 _RUN_PHASES_TERMINAL = frozenset({"LANDED", "ABORTED"})
 _RUN_PARK_KINDS = frozenset({"decision", "abort", "override", "waiver", "proposal", "rescope",
-                             "dispatch", "review", "brief", "hold", "resume", "handoff"})
+                             "dispatch", "review", "brief", "hold", "resume", "handoff", "refusal"})
+# `refusal` joined the driver's PARK_KINDS in TOOL-dDeclaredLoop-14, a history row and not owed.
 # `hold` and `resume` joined the driver's PARK_KINDS in TOOL-dDerivedDocket-5 (auto-resume from
 # HELD). Neither is owed, so a record whose last row is one reads `other`. `handoff` joined both sets
 # in TOOL-dUnstuckLanding-13: its row is the landing recipe the owner is shown, so it is owed.

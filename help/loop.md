@@ -576,22 +576,38 @@ reflog entry only when the tip moves, so a fetch that finds nothing new leaves i
 `awaiting`; a `parents:` build that has not landed answers `blocked`; an undecided ask answers
 `awaiting` only when no item can run.
 
-The unattended driver's `--plan` prints the engine's answer as its `next:` line, in the same five
-shapes it always printed, and `--status` prints the engine's lines after its status line.
+The frontier is every item of the build's step whose witness does not hold and whose needs are
+witnessed, in the order the composition lists them; the next item is its first entry. A refused item
+stays on it, because its witness still does not hold, so one refusal never leaves the build with
+nowhere to go. Record a refusal with the unattended driver's `--refused <slug> --item <tag> --key
+<instance key> --reason <text>`: it writes one `refusal` row to the run-state file, and only where
+the engine holds the tag as one your composition declares and the key as that tag's instance shape.
 
-- **Read a build's position:** `python tools/loop/position.py <slug>` prints a `position —` line with <!-- usage: script:tools/loop/position.py 6220f37c -->
+The unattended driver's `--plan` prints the engine's answer as its `next:` line, in the same five
+shapes it always printed, and beneath it a `frontier:` line naming the frontier's tags, or
+`frontier: none`. `--status` prints the engine's lines after its status line.
+
+- **Read a build's position:** `python tools/loop/position.py <slug>` prints a `position —` line with <!-- usage: script:tools/loop/position.py 8d078234 -->
   the state, the step, the answer and its reason, one `unit —` line per unit, the `next —` item with
-  its actor and its instance key, each `interrupt —`, then every file and ref it read as `read —`
-  lines and every claim it used with its key and verdict as `claim —` lines. `--json` prints the same
-  fields as one object, and `--next-line` the `next:` shape alone. It exits 2 on `invalid-input`,
-  else 0. Run in a repository with the unattended kit installed, it asks the driver's `--plan` for
-  each unit's spec state.
+  its actor and its instance key, a `frontier —` line, one `refusal —` line per refusal the run
+  recorded with its item, key and reason, each `interrupt —`, then every file and ref it read as
+  `read —` lines and every claim it used with its key and verdict as `claim —` lines. Where the runlog
+  kit is not installed it prints `refusal — unarmed` with the reason and still prints the frontier.
+  `--json` prints the same fields as one object, and `--next-line` the `next:` shape alone, with
+  `--frontier` adding the frontier's tags, or `none`, on a second line. It exits 2 on
+  `invalid-input`, else 0. Run in a repository with the unattended kit installed, it asks the driver's
+  `--plan` for each unit's spec state.
+- **Check a refusal before recording it:** `--check-refusal <tag> <key>` prints `loop: refusal
+  held`, exit 0, `loop: refused` with the reason, exit 1, or `loop: unarmed`, exit 2, where your
+  composition does not read. With no composition it checks against gov's own items. The driver's
+  `--refused` runs it and records nothing unless it exits 0.
 - **See it on a fixture:** `--fixture --plant <case>` builds a scratch repository with a bare remote,
   plants one case, prints the engine's lines and one line ending `held` or `MISSED`, and removes it:
   `steps`, `typed-status`, `idempotent`, `owner-decision`, `parent-unlanded`, `terminal`,
-  `stale-remote`, `bad-transition`, `deadlock`, `bar-wait`, `plan-line` and `status-line`, the last
-  two over the unattended driver. `--selftest` runs every case, and gov's own `loop position
-  fixtures` gate runs it.
+  `stale-remote`, `bad-transition`, `deadlock`, `bar-wait`, `frontier-chain`, `frontier-parallel`,
+  `frontier-refused`, `frontier-bad-key`, `frontier-none`, `plan-frontier`, `plan-line` and
+  `status-line`; `frontier-refused`, `frontier-bad-key`, `plan-frontier` and the last two run the
+  unattended driver. `--selftest` runs every case, and gov's own `loop position fixtures` gate runs it.
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries placeholders the shell reads as redirects -->
   ```bash

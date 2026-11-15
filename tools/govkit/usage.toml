@@ -359,7 +359,7 @@ flags = []
 id = "script:{prefix}/loop/position.py"
 shape = "verb"
 entry = "{prefix}/loop/position.py"
-flags = ["--json", "--next-line", "--fixture", "--plant=", "--selftest"]
+flags = ["--json", "--next-line", "--frontier", "--check-refusal=", "--fixture", "--plant=", "--selftest"]
 
 [[usage]]
 id = "script:{prefix}/loop/loop_table.py"

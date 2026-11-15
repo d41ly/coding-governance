@@ -2056,7 +2056,7 @@
     "chunk": "selftests",
     "subject": "kit",
     "ceiling": 300,
-    "enforces": ["principle.p22"]
+    "enforces": ["principle.p22", "principle.p24"]
   },
   {
     "name": "loop transition tables",

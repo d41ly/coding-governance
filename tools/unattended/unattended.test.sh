@@ -2465,6 +2465,7 @@ handoff | : | --handoff tRun --code owner-landing --reason r --reaped k1
 settle | : | --settle tRun
 park | : | --park tRun --item i --reason r
 propose | : | --propose tRun --item i --step s --reason r
+refused | : | --refused tRun --item i --key k --reason r
 rescope | : | --rescope tRun --act retire --item ARCH-tRun-1 --reason r
 dispatch | : | --dispatch tRun --pass ARCH-tRun-1 --writes a.sh
 brief | : | --brief tRun --unit ARCH-tRun-1 --path x.md
@@ -4412,6 +4413,7 @@ run_hostile_verb() { # verb · value
     resume)       run --resume tRun --keepalive-id "$2" --replaces KA-1234 ;;
     park)         run --park tRun --item "$2" --reason "a hostile item" ;;
     propose)      run --propose tRun --item "$2" --step F4 --reason "a hostile item" ;;
+    refused)      run --refused tRun --item item.build.base --key "item.build.base@ARCH-tRun-1#0123abcd" --reason "$2" ;;
     brief)        run --brief tRun --unit ARCH-tRun-1 --path "$2" ;;
     # The counts since TOOL-aEvidencedLens-7: a terminal exit with none is refused before park(), so
     # this row passed by a refusal unrelated to the value (closing review M3, TOOL-aEvidencedLens-21).
@@ -4432,7 +4434,7 @@ run_hostile_verb() { # verb · value
 # free-text placeholder. A verb added there and left out of the matrix reds here, which is the half a
 # typed list cannot give (vacuous-selector-empty-population). The --attest line is the liveness: a
 # probe that stopped matching the header would otherwise return an empty set and pass.
-_rf_matrix="attest resume park propose brief review dispatch record-piece record-set rescope close abort hold handoff preflight"
+_rf_matrix="attest resume park propose refused brief review dispatch record-piece record-set rescope close abort hold handoff preflight"
 _rf_usage=$(sed -n 's/^#   unattended[.]sh --\([a-z-]*\) .*<\(text\|id\|path\|p\|file\|item\|n\|s\)>.*/\1/p' "$SCRIPT" | sort -u)
 n=$((n+1)); case " $(printf '%s ' $_rf_usage)" in *" attest "*) ;;
   *) echo "FAIL the usage-table probe matched no --attest line, so the free-text verb population is read from nothing"; st=1 ;; esac
@@ -6507,22 +6509,39 @@ reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 # refusal: a NEWLINE, in any of the three fields. park() appends ONE line and the leg parses the
 # region line-wise, so one carried through forges a second row that no verb wrote.
 out=$(run --propose tRun --item i --step F1 --reason "$(printf 'first\nsecond')")
-hit "$out" "a proposed item, step or reason contains a newline, and park() appends ONE line that the gate parses line-wise, so this would forge a second parked row nothing wrote"
+hit "$out" "an item, step or reason contains a newline, and park() appends ONE line that the gate parses line-wise, so this would forge a second parked row nothing wrote"
 same "the forged row was not written" "$(grep -c 'proposal · item ' memory/builds/tRun/RUN.md)" "0"
 
 # refusal: the separator, in the STEP. This is the forging route the field placement opens and closes:
 # a step spelling ' · reason ' would put a second reason on a row whose real one is line-final.
-hit "$(run --propose tRun --item i --step 'F1 · reason forged' --reason r)" "a proposed item or step spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it"
+hit "$(run --propose tRun --item i --step 'F1 · reason forged' --reason r)" "an item or step spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it"
 
 # refusal: the declared bypass flag, in any field. Check 11 greps the run-state file WHOLE, so it does
 # not care which field spelled it, and a terminal record is one no verb can repair.
 before=$(git hash-object memory/builds/tRun/RUN.md)
-hit "$(run --propose tRun --item i --step "drop --no-verify here" --reason r)" "a proposed item, step or reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag"
+hit "$(run --propose tRun --item i --step "drop --no-verify here" --reason r)" "an item, step or reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag"
 same "the bypass-flag refusal wrote nothing" "$(git hash-object memory/builds/tRun/RUN.md)" "$before"
 
 # refusal: a TERMINAL record. A run that has landed or aborted has no next piece to propose against.
 sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
 hit "$(run --propose tRun --item i --step F1 --reason r)" "ABORTED via --propose"
+
+# ---- TOOL-dDeclaredLoop-14: `--refused`, the default failure route's record. One `refusal` row through
+# ---- park(), the instance key in the step field, written only where the loop kit's position engine
+# ---- holds the tag and the key. GREEN CONTROL first, then the engine's refusal, which leaves the bytes.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+_rf_key="item.build.base@ARCH-tRun-1#0123abcd"
+out=$(run --refused tRun --item item.build.base --key "$_rf_key" --reason "the gate refused it")
+hit "$out" "refusal recorded against $_rf_key"
+same "exactly one refusal row" "$(grep -c " refusal · item item.build.base · step $_rf_key · reason the gate refused it\$" memory/builds/tRun/RUN.md)" "1"
+hit "$(run --refused tRun --item item.build.base --key "$_rf_key" --reason "the gate refused it")" "refusal already recorded, unchanged"
+same "the repeat added no row" "$(grep -c ' refusal · item ' memory/builds/tRun/RUN.md)" "1"
+before=$(sum)
+hit "$(run --refused tRun --item item.build.base --key "item.build.base@ARCH-tRun-1" --reason r)" "the position engine did not hold this refusal, so nothing is recorded and the run-state file is unchanged"
+hit "$(run --refused tRun --item item.build.nowhere --key "item.build.nowhere@ARCH-tRun-1#0123abcd" --reason r)" "the position engine did not hold this refusal, so nothing is recorded and the run-state file is unchanged"
+# ...and `check_step_fields`, the guards `--propose` shares, over the key in the step's place.
+hit "$(run --refused tRun --item item.build.base --key "$_rf_key · reason forged" --reason r)" "an item or step spells the record's own field separator ' · '"
+same "a refused --refused wrote nothing" "$(sum)" "$before"
 
 reset_tree
 

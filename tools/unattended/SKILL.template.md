@@ -110,6 +110,7 @@ Not a run: the record verbs, slug `-`, `--records-root <root>`.
 unattended.sh --phase <slug> BUILDING --witness $(git rev-parse HEAD)
 unattended.sh --park <slug> --item "<the question>" --reason "<options; why refused>"
 unattended.sh --propose <slug> --item "<amendment>" --step "<step>" --reason "<why>"
+unattended.sh --refused <slug> --item <item tag> --key <instance key> --reason "<why>"
 unattended.sh --brief <slug> --unit <unit-id> --path <the brief file>
 unattended.sh --rescope <slug> --act retire|supersede|add|defer --item <unit-id> --reason "<why>"
 unattended.sh --dispatch <slug> --pass <unit-id> --writes <path> --writes <path>

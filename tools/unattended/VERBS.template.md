@@ -52,6 +52,13 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   rewrites the checklist it is graded by has no rules left. It reuses `--park`'s newline, separator,
   bypass and terminal refusals over the new step field, and its exact-line idempotence — with the
   step inside the identity, so one amendment at two steps is two rows.
+- `--refused` — records a REFUSED item, the default failure route: `--refused <slug> --item <tag>
+  --key <instance key> --reason <text>` writes one `refusal` row through `park()`, the key in the step
+  field, a `history` kind nothing blocks on and the owner is not asked about. It shares `--propose`'s
+  field guards, terminal refusal and exact-line idempotence, and records nothing unless the loop kit's
+  position engine holds the tag as one the composition declares and the key as that tag's instance
+  shape. `--plan` then prints the frontier on a `frontier:` line beneath `next:`: the unwitnessed items
+  of the build's step whose needs are witnessed, the refused instance still among them.
 - `--attest` — **the two agent-attested items have a VERB, and it is the only way to write one.**
   `--attest <slug> --item <item> [--value <text>]` derives the record key so no operator spells
   one, and REFUSES a machine-checked item by reading its declared CHECKER — so a project

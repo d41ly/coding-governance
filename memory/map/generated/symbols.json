@@ -7213,6 +7213,11 @@
       "file": "tools/playbook/instructions_edit.py"
     },
     {
+      "id": "check_refusal",
+      "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
       "id": "check_refusal_sites",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -7821,6 +7826,11 @@
       "id": "check_stderr",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
+      "id": "check_step_fields",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_step_gate",
@@ -10266,6 +10276,11 @@
       "id": "derive_from_states",
       "kind": "function",
       "file": "tools/loop/loop_table.py"
+    },
+    {
+      "id": "derive_frontier",
+      "kind": "function",
+      "file": "tools/loop/position.py"
     },
     {
       "id": "derive_fx_composition",
@@ -16808,6 +16823,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "print_check_refusal",
+      "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
       "id": "print_check_verdicts",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -20776,6 +20796,11 @@
       "id": "read_refusal_token",
       "kind": "function",
       "file": "tools/push-main.test.sh"
+    },
+    {
+      "id": "read_refusals",
+      "kind": "function",
+      "file": "tools/loop/position.py"
     },
     {
       "id": "read_refusals",
@@ -28833,6 +28858,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "run_refusal_plant",
+      "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
       "id": "run_regen",
       "kind": "function",
       "file": "tools/push-main.sh"
@@ -35131,6 +35161,11 @@
       "id": "write_refusal",
       "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "write_refusal",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "write_region",

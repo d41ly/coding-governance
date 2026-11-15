@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """position.py — where a build is and what runs next, from witnesses alone (TOOL-dDeclaredLoop-7).
 
-    python position.py <slug> [--json | --next-line]   # the position of <slug> in this working directory
+    python position.py <slug> [--json | --next-line [--frontier]]   # the position of <slug> in this working directory
+    python position.py --check-refusal <tag> <key>      # may the driver record this refusal row
     python position.py --fixture --plant <case>         # one fixture case
     python position.py --selftest                       # every case
 
@@ -34,6 +35,16 @@ item of that step, in composition order, whose witness does not hold and whose n
 witness is read for three kinds of item only: a step's exit, on a recorded move out of that step's
 state; the unit table's forward items, on the least-advanced unit's step; and an item a recorded move
 names. Every other item's witness is unread, printed as an `evidence` claim, and a need on it is unmet.
+The frontier (TOOL-dDeclaredLoop-14) is every item of that step, in composition order, whose witness
+does not hold and whose needs are witnessed, so a refused instance stays on it; the next item is its
+first entry. The run's `refusal` rows, which the driver's `--refused` writes, are read through runlog's
+`read_run_state`, found by `resolve_kit_dir`; where that kit does not resolve the line output says
+`refusal — unarmed` and still prints the frontier. `--next-line --frontier` prints the frontier's tags,
+space-separated, or `none`, on a second line, which `--plan` prints as its `frontier:` line.
+`--check-refusal <tag> <key>` prints `loop: refusal held`, exit 0, where the composition declares the
+tag and the key is `derive_instance_key`'s shape for it; `loop: refused`, exit 1, otherwise; and
+`loop: unarmed`, exit 2, where the composition does not read. An unarmed composition reads gov's own
+`[[item]]` rows, as `derive_position` does.
 
 The answer is one of `ANSWERS`, the first that holds: `invalid-input` (no build, a README that does not
 parse, a read refusal, a recorded move no build row holds, or a hand-over naming no unit, no MISSING id
@@ -48,8 +59,9 @@ every answer but `invalid-input`, which exits 2.
 `--fixture --plant <case>` builds one scratch repository under the host temp folder, plants the case,
 prints the engine's lines and one `position: fixture · <case> · held` or `· MISSED <why>` line, and
 removes the scratch; it exits as the engine did where the case held, 1 where it missed, 2 where a kit it
-needs does not resolve. `plan-line` and `status-line` run the unattended driver found by
-`resolve_kit_dir`. `--selftest` runs every case through `loop_lib.run_selftest_cases`.
+needs does not resolve. `frontier-refused`, `frontier-bad-key`, `plan-frontier`, `plan-line` and
+`status-line` run the unattended driver found by `resolve_kit_dir`. `--selftest` runs every case
+through `loop_lib.run_selftest_cases`.
 
 WHAT THIS DOES NOT CHECK: a witness reader for any item outside the three kinds above, which lands with
 the build that arms the item; a settling row for a parked entry, which the driver's grammar does not
@@ -61,6 +73,7 @@ import argparse
 import copy
 import datetime
 import hashlib
+import importlib.util
 import json
 import os
 import pathlib
@@ -111,12 +124,24 @@ PLANTS = {"steps": "unit 1 deployed, unit 2 built, unit 3 designed: act at unit 
           "bad-transition": "a recorded move no build row holds: invalid-input, exit 2",
           "deadlock": "the step's root item needs an item of a later step: stuck",
           "bar-wait": "every unit built, no gates-run fact, no ask: act, and the terminal next: shape",
+          "frontier-chain": "A witnessed, B needs A, C needs B, D the next step's root: the frontier is B",
+          "frontier-parallel": "A and B with no needs, neither witnessed: the frontier is A and B",
+          "frontier-refused": "the driver's --refused on A at its key: one refusal row, A on the frontier",
+          "frontier-bad-key": "--refused with a malformed key, then an undeclared tag: exit 1 each, the file unchanged",
+          "frontier-none": "the step narrowed to A witnessed and an item whose need is unmet: no frontier",
+          "plan-frontier": "the frontier-refused repository, then --plan: frontier: A beneath next:",
           "plan-line": "the driver's next: line equals render_next_line's, in three states",
           "status-line": "the driver's --status prints the engine's position line"}
 FX_SLUG = "tPos"
 FX_IDS = ["TOOL-tPos-1", "TOOL-tPos-2", "TOOL-tPos-3"]
 FX_ASK = "TOOL-tAsk-1"
 FX_OWED = ("decision abort override waiver handoff", "retire supersede defer")
+#: The frontier plants' A, B and C, of the build's step, and D, the next step's root, as shipped.
+FX_A, FX_B, FX_C, FX_D = "item.build.base", "item.build.unit-lease", "item.build.unit-pass", "item.test.merge"
+#: The build step's unit-forward item, the one the least-advanced designed unit has not passed.
+FX_UNIT = "item.build.acceptance"
+#: The plants that run the unattended driver, and so copy its conf into the scratch repository.
+FX_DRIVER = ("frontier-refused", "frontier-bad-key", "plan-frontier", "plan-line", "status-line")
 
 
 # ------------------------------------------------------------------------------------------ the reads
@@ -206,10 +231,26 @@ def derive_unit_step(word, passes, records, gates_tip, remote_sha, repo):
     return "deployed", held[0]
 
 
+def derive_frontier(items, witnessed, unheld, unit_id, head):
+    """The rows of `items`, the build's step's in composition order, whose tag is not in `witnessed`
+    and each of whose needs is met by a tag in `witnessed`, a list entry by any one of its tags; each
+    entry as `next` is. `witnessed` maps each held tag to its witness's inputs and `unheld` each tag
+    read and not held to its own, so an unread tag is in neither and meets no need."""
+    out = []
+    for row in items:
+        tag = row.get("tag")
+        if tag in witnessed:
+            continue
+        if all(any(t in witnessed for t in (n if isinstance(n, list) else [n])) for n in row.get("needs") or []):
+            out.append({"item": tag, "unit": unit_id, "actor": row.get("actor", "?"),
+                        "key": derive_instance_key(tag, unit_id, unheld.get(tag) or [head])})
+    return out
+
+
 def derive_next_item(step_items, read_witness, unit_id, head):
-    """`(next item or None, claims)`: the first of `step_items` whose witness does not hold and whose
-    needs are witnessed, and a claim per item read, `evidence` for an unread witness."""
-    claims, found = [], None
+    """`(next item or None, claims, frontier)`: the frontier's first entry, a claim per item read,
+    `evidence` for an unread witness, and the frontier `derive_frontier` returns."""
+    claims, witnessed, unheld = [], {}, {}
     for row in step_items:
         tag = row.get("tag")
         held, inputs = read_witness(tag)
@@ -222,13 +263,47 @@ def derive_next_item(step_items, read_witness, unit_id, head):
             key = derive_claim_key(sources)
             claims.append({"name": derive_instance_key(tag, unit_id, inputs), "key": key,
                            "verdict": derive_claim_verdict(key, key, "history", None, None, None)})
-        if held or found:
-            continue
-        needs = row.get("needs") or []
-        if all(any(read_witness(t)[0] for t in (n if isinstance(n, list) else [n])) for n in needs):
-            found = {"item": tag, "unit": unit_id, "actor": row.get("actor", "?"),
-                     "key": derive_instance_key(tag, unit_id, inputs or [head])}
-    return found, claims
+    tags = [row.get("tag") for row in step_items]
+    for row in step_items:
+        tags += [t for n in row.get("needs") or [] for t in (n if isinstance(n, list) else [n])]
+    for tag in dict.fromkeys(tags):
+        held, inputs = read_witness(tag)
+        if held:
+            witnessed[tag] = inputs
+        elif held is not None:
+            unheld[tag] = inputs
+    frontier = derive_frontier(step_items, witnessed, unheld, unit_id, head)
+    return (frontier[0] if frontier else None), claims, frontier
+
+
+def check_refusal(tag, key, tags):
+    """`(held, why)`: whether a refusal row may name `tag` at `key`, `tag` one of the composed `tags`
+    and `key` `<tag>@<round|pass>#<inputs>`, `<inputs>` eight lowercase hex digits, as
+    `derive_instance_key` writes it."""
+    if tag not in tags:
+        return False, "the item %s is no tag the composition declares" % tag
+    if not re.fullmatch(re.escape(tag) + r"@[^\s@#]+#[0-9a-f]{8}", key):
+        return False, "the key %s is not %s's instance shape <tag>@<round|pass>#<eight hex digits>" % (key, tag)
+    return True, ""
+
+
+def read_refusals(text):
+    """The `refusal` rows of the run-state `text`, through runlog's `read_run_state`, found by
+    `resolve_kit_dir`; one `{"unarmed": why}` entry where that kit does not resolve."""
+    try:
+        path = resolve_kit_dir("runlog", "model.py", KIT) / "model.py"
+        spec = importlib.util.spec_from_file_location("runlog_model", str(path))
+        model = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = model  # its dataclasses look their module up by name
+        spec.loader.exec_module(model)
+    except (LookupError, OSError, ImportError, SyntaxError, AttributeError) as e:
+        sys.modules.pop("runlog_model", None)
+        return [{"unarmed": "runlog's model does not load beside this kit: %s" % (str(e) or type(e).__name__)}]
+    record, _state = model.read_run_state(text)
+    return [{"item": r["item"], "key": r["step"] or "", "reason": r["reason"],
+             "at": datetime.datetime.fromtimestamp(r["t"], datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+             if r["t"] is not None else ""}
+            for r in record["rows"] if r["kind"] == "refusal"]
 
 
 def derive_interrupts(text, handover, owed, parents_open, claims, now):
@@ -284,8 +359,8 @@ def derive_position(repo, slug, definition=None):
     """The `Position` of build `slug` in the repository at `repo` (§4 Data model). `definition`, where
     given, is a parsed definition read instead of the shipped one and the composition."""
     repo = pathlib.Path(repo).absolute()
-    pos = {"slug": slug, "state": "none", "build_step": NO_STEP, "units": [], "next": None, "interrupts": [],
-           "answer": "invalid-input", "reason": "", "read": [], "claims": []}
+    pos = {"slug": slug, "state": "none", "build_step": NO_STEP, "units": [], "next": None, "frontier": [],
+           "refusals": [], "interrupts": [], "answer": "invalid-input", "reason": "", "read": [], "claims": []}
     try:
         derive_position_into(pos, repo, slug, definition)
     except (LoopError, ValueError, OSError, LookupError, KeyError, subprocess.SubprocessError) as e:
@@ -350,6 +425,7 @@ def derive_position_into(pos, repo, slug, definition):
         text = run.read_bytes().decode("utf-8", "replace")
         pos["read"].append("%s@%s" % (run.relative_to(repo).as_posix(), read_blob_id(run)))
         owed = read_policy_kit()[1].read_run_fact
+        pos["refusals"] = read_refusals(text)
     gates = (owed(text, "gates-run") or "").split() if owed else []
     gates_tip = None
     if len(gates) == 2:
@@ -398,11 +474,11 @@ def derive_position_into(pos, repo, slug, definition):
             return True, [named[tag]]
         return None, []
 
-    nxt, item_claims = (None, [])
+    nxt, item_claims, frontier = (None, [], [])
     if least and pos["build_step"] != NO_STEP:
-        nxt, item_claims = derive_next_item([r for r in items if r.get("step") == pos["build_step"]], read_witness,
-                                            least["id"], head)
-    pos["next"] = nxt
+        nxt, item_claims, frontier = derive_next_item([r for r in items if r.get("step") == pos["build_step"]],
+                                                      read_witness, least["id"], head)
+    pos["next"], pos["frontier"] = nxt, frontier
     pos["claims"] += item_claims
     parents_open = []
     for p in (fm.get("parents") or "").split():
@@ -449,6 +525,9 @@ def render_position_lines(pos):
     if pos["next"]:
         n = pos["next"]
         lines.append("next — %s · unit %s · actor %s · key %s" % (n["item"], n["unit"], n["actor"], n["key"]))
+    lines.append("frontier — %s" % (" · ".join(f["item"] for f in pos["frontier"]) or "none"))
+    lines += ["refusal — unarmed · %s" % r["unarmed"] if "unarmed" in r else
+              "refusal — %s · %s · %s" % (r["item"], r["key"], r["reason"]) for r in pos["refusals"]]
     lines += ["interrupt — %s · %s" % (i["kind"], i["subject"]) for i in pos["interrupts"]]
     lines += ["read — %s" % r for r in pos["read"]]
     lines += ["claim — %s · key %s · %s" % (c["name"], c["key"], c["verdict"]) for c in pos["claims"]]
@@ -491,7 +570,7 @@ def write_position_plant(top, case, root):
         files["memory/builds/%s/spec/2026-01-01-spec-%s.md" % (FX_SLUG, uid)] = render_spec(uid, status)
     if case == "parent-unlanded":
         files["memory/builds/tPar/README.md"] = "---\nslug: tPar\nnode: a\nopened: 2026-01-01\nstreams: tooling\n---\n# tPar\n"
-    if case in ("plan-line", "status-line"):
+    if case in FX_DRIVER:
         for name in (".unattended.conf", ".memory-tree.conf"):
             if not (root / name).is_file():
                 raise LookupError("the driver plant copies %s from %s, which holds none" % (name, root.as_posix()))
@@ -536,8 +615,8 @@ def write_position_plant(top, case, root):
     elif case == "bar-wait":
         for uid in ids:
             write_pass(uid)
-    elif case == "idempotent":
-        write_move("building", "building", "item.build.base")
+    elif case in ("idempotent", "frontier-chain", "frontier-none"):
+        write_move("building", "building", FX_A)
     elif case == "terminal":
         write_move("deploying", "landed", "item.deploy.close")
     elif case == "bad-transition":
@@ -553,11 +632,17 @@ def write_position_plant(top, case, root):
         run_fixture_git(repo, "remote", "set-head", "origin", "main")
     definition = None
     data = copy.deepcopy(read_definition(KIT)[0])
-    if case == "idempotent":
-        data["transition"].append({"level": "build", "from": ["building"], "item": "item.build.base",
+    if case in ("idempotent", "frontier-chain", "frontier-none"):
+        data["transition"].append({"level": "build", "from": ["building"], "item": FX_A,
                                    "outcome": "pinned", "to": "building", "witness": "the fixture's move"})
     if case == "deadlock":
-        next(r for r in data["item"] if r.get("tag") == "item.build.base")["needs"] = ["item.test.merge"]
+        next(r for r in data["item"] if r.get("tag") == FX_A)["needs"] = [FX_D]
+    if case == "frontier-parallel":
+        next(r for r in data["item"] if r.get("tag") == FX_B)["needs"] = []
+    if case == "frontier-none":
+        # The step's unit-forward item stays, so the build's step is still step.build, its need unmet.
+        data["item"] = [r for r in data["item"] if r.get("step") != "step.build" or r.get("tag") in (FX_A, FX_UNIT)]
+        next(r for r in data["item"] if r.get("tag") == FX_UNIT)["needs"] = [FX_D]
     if case not in ("plan-line", "status-line"):
         definition = data
     words = {"typed-status": ["READY", "DONE"]}.get(case, ["READY"] * len(ids))
@@ -566,7 +651,7 @@ def write_position_plant(top, case, root):
 
 
 def run_driver(repo, *argv):
-    """The unattended driver's output for `argv` in `repo`, with no hand-over inherited."""
+    """`(output, exit)` of the unattended driver for `argv` in `repo`, with no hand-over inherited."""
     driver = resolve_kit_dir("unattended", "unattended.sh", KIT) / "unattended.sh"
     bash = resolve_bash(driver)
     if bash is None:
@@ -574,7 +659,7 @@ def run_driver(repo, *argv):
     env = {k: v for k, v in os.environ.items() if k not in (HANDOVER, "GOV_DEFAULT_BRANCH")}
     p = subprocess.run([bash, str(driver), *argv], cwd=str(repo), capture_output=True, text=True, encoding="utf-8",
                        errors="replace", env=env, timeout=900)
-    return p.stdout + p.stderr
+    return p.stdout + p.stderr, p.returncode
 
 
 def derive_plant_position(repo, definition, handover):
@@ -597,7 +682,7 @@ def check_plan_line(repo):
     readme = repo / ("memory/builds/%s/README.md" % FX_SLUG)
 
     def check_state(label, want):
-        out = run_driver(repo, "--plan", FX_SLUG)
+        out = run_driver(repo, "--plan", FX_SLUG)[0]
         line = next((ln[len("next: "):] for ln in out.splitlines() if ln.startswith("next: ")), None)
         mine = render_next_line(derive_plant_position(repo, None, ""))
         print("%s: fixture · plan-line %s · driver %r · engine %r" % (SAY, label, line, mine))
@@ -628,12 +713,55 @@ def check_plan_line(repo):
     return misses
 
 
+def run_refusal_plant(case, repo, definition, handover):
+    """The misses of the three driver frontier plants: `--refused` on A at the key the frontier gives
+    it, or with a malformed key and an undeclared tag, then `--plan` for `plan-frontier`."""
+    run_path = repo / ("memory/builds/%s/RUN.md" % FX_SLUG)
+    before = run_path.read_bytes()
+    key = next(f["key"] for f in derive_plant_position(repo, definition, handover)["frontier"] if f["item"] == FX_A)
+    misses = []
+    if case == "frontier-bad-key":
+        for label, tag, k in (("a malformed key", FX_A, "%s@%s" % (FX_A, FX_IDS[0])),
+                              ("an undeclared tag", "item.build.nowhere", "item.build.nowhere@%s#%s" % (FX_IDS[0], "0" * 8))):
+            out, rc = run_driver(repo, "--refused", FX_SLUG, "--item", tag, "--key", k, "--reason", "probe")
+            print("%s: fixture · %s · %s · exit %d · %s" % (SAY, case, label, rc, out.strip().splitlines()[-1:]))
+            if rc != 1 or "UNATTENDED check 48 FAILED" not in out:
+                misses.append("%s: exit %d, %r" % (label, rc, out.strip()[-300:]))
+        if run_path.read_bytes() != before:
+            misses.append("a refused --refused moved the run-state file's bytes")
+        return misses
+    out, rc = run_driver(repo, "--refused", FX_SLUG, "--item", FX_A, "--key", key, "--reason", "probe")
+    print(out.rstrip())
+    row = re.compile(r"\S+ refusal · item %s · step %s · reason probe" % (re.escape(FX_A), re.escape(key)))
+    text = run_path.read_text(encoding="utf-8")
+    rows = [ln for ln in text.splitlines() if row.fullmatch(ln)]
+    for ln in rows:
+        print("%s: fixture · %s · row %s" % (SAY, case, ln))
+    added = len([ln for ln in text.splitlines() if ln.strip()]) - len([ln for ln in before.decode("utf-8").splitlines() if ln.strip()])
+    if rc != 0 or len(rows) != 1 or added != 1:
+        misses.append("--refused exit %d, %d matching row(s), %d line(s) added: %r" % (rc, len(rows), added, out.strip()[-300:]))
+    if case == "plan-frontier":
+        lines = run_driver(repo, "--plan", FX_SLUG)[0].splitlines()
+        at = next((i for i, ln in enumerate(lines) if ln.startswith("next: ")), None)
+        after = lines[at + 1] if at is not None and at + 1 < len(lines) else None
+        print("%s: fixture · %s · after next: %r" % (SAY, case, after))
+        if after != "frontier: %s" % FX_A:
+            misses.append("the line after next: is %r" % after)
+    return misses
+
+
 def check_plant(case, pos, rc, repo):
     """The misses of `case` against the position it derived."""
     steps = [u["step"] for u in pos["units"]]
     claims = {c["name"]: c for c in pos["claims"]}
     kinds = {i["kind"]: i["subject"] for i in pos["interrupts"]}
-    want = {"steps": lambda: steps == ["deployed", "built", "designed"] and pos["answer"] == "act"
+    tags = [f["item"] for f in pos["frontier"]]
+    want = {"frontier-chain": lambda: tags == [FX_B],
+            "frontier-parallel": lambda: tags == [FX_A, FX_B],
+            "frontier-none": lambda: pos["build_step"] == "step.build" and tags == [],
+            "frontier-refused": lambda: FX_A in tags and [(r.get("item"), r.get("reason")) for r in pos["refusals"]]
+            == [(FX_A, "probe")] and pos["refusals"][0]["key"] == next(f["key"] for f in pos["frontier"] if f["item"] == FX_A),
+            "steps": lambda: steps == ["deployed", "built", "designed"] and pos["answer"] == "act"
             and pos["build_step"] == "step.build" and any(r.startswith("memory/") for r in pos["read"])
             and any(c["name"].startswith("remote tip") and c["key"].startswith("k1:") and c["verdict"] == "fresh"
                     for c in pos["claims"]),
@@ -667,18 +795,21 @@ def run_plant(case):
         if case == "plan-line":
             misses, rc = check_plan_line(repo), 0
         elif case == "status-line":
-            out = run_driver(repo, "--status", FX_SLUG)
+            out = run_driver(repo, "--status", FX_SLUG)[0]
             print(out.rstrip())
             rc = 0
             misses = [] if any(ln.startswith("position — %s · " % FX_SLUG) for ln in out.splitlines()) else [
                 "--status printed no position line"]
+        elif case in ("frontier-bad-key", "plan-frontier"):
+            misses, rc = run_refusal_plant(case, repo, definition, handover), 0
         else:
+            misses = run_refusal_plant(case, repo, definition, handover) if case == "frontier-refused" else []
             pos = derive_plant_position(repo, definition, handover)
             rc = 2 if pos["answer"] == "invalid-input" else 0
             for line in render_position_lines(pos):
                 print(line)
             print("next: %s" % render_next_line(pos))
-            misses = check_plant(case, pos, rc, repo)
+            misses += check_plant(case, pos, rc, repo)
     except LookupError as e:
         print("%s: fixture · %s · unarmed: %s" % (SAY, case, e))
         return 2
@@ -695,6 +826,24 @@ def run_selftest():
     return run_selftest_cases(main, cases, "%s: selftest" % SAY)
 
 
+def print_check_refusal(tag, key):
+    """`--check-refusal`: the composition of the working tree read as `derive_position` reads it, gov's
+    own rows where it is unarmed; exit 0 held, 1 refused, 2 where the composition does not read."""
+    rc, top = read_git(".", "rev-parse", "--show-toplevel")
+    try:
+        data, where = read_definition(KIT)
+        crc, payload, lines = read_composition(top if rc == 0 and top else ".")
+        if crc == 1:
+            raise ValueError("the item composition does not read: %s" % (lines[0] if lines else "exit 1"))
+        items = payload["rows"] if crc == 0 else read_item_rows(data, where)
+    except (LoopError, ValueError, OSError, LookupError, KeyError, TypeError, subprocess.SubprocessError) as e:
+        print("loop: unarmed · %s" % (str(e) or type(e).__name__))
+        return 2
+    held, why = check_refusal(tag, key, {r.get("tag") for r in items})
+    print("loop: refusal held · %s · %s" % (tag, key) if held else "loop: refused · %s" % why)
+    return 0 if held else 1
+
+
 def main(argv):
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -703,6 +852,8 @@ def main(argv):
     out = ap.add_mutually_exclusive_group()
     out.add_argument("--json", action="store_true", help="one JSON object")
     out.add_argument("--next-line", action="store_true", help="the next: shape alone")
+    ap.add_argument("--frontier", action="store_true", help="with --next-line, the frontier's tags on a second line")
+    ap.add_argument("--check-refusal", nargs=2, metavar=("TAG", "KEY"), help="may a refusal row name TAG at KEY")
     ap.add_argument("--fixture", action="store_true", help="run one fixture case")
     ap.add_argument("--plant", choices=list(PLANTS))
     ap.add_argument("--selftest", action="store_true", help="run every fixture case")
@@ -711,6 +862,12 @@ def main(argv):
         if args.fixture or args.slug:
             ap.error("--selftest takes no slug and no --fixture")
         return run_selftest()
+    if args.check_refusal:
+        if args.fixture or args.slug or args.json or args.next_line or args.frontier:
+            ap.error("--check-refusal takes a tag and a key and nothing else")
+        return print_check_refusal(*args.check_refusal)
+    if args.frontier and not args.next_line:
+        ap.error("--frontier is a second line of --next-line")
     if args.fixture != bool(args.plant) or (args.fixture and args.slug):
         ap.error("--fixture takes --plant <case> and no slug")
     if args.fixture:
@@ -723,6 +880,8 @@ def main(argv):
         print(json.dumps(pos, ensure_ascii=False))
     elif args.next_line:
         print(render_next_line(pos))
+        if args.frontier:
+            print(" ".join(f["item"] for f in pos["frontier"]) or "none")
     else:
         for line in render_position_lines(pos):
             print(line)

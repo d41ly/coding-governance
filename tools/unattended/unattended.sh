@@ -16,6 +16,7 @@
 #   unattended.sh --landed <slug>                          # after the push: observe, then mark LANDED
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
 #   unattended.sh --propose <slug> --item <text> --step <s> --reason <text>  # amend a playbook LATER
+#   unattended.sh --refused <slug> --item <tag> --key <key> --reason <text>  # record a refused item; --plan prints the frontier
 #   unattended.sh --rescope <slug> --act <retire|supersede|add|defer> --item <id> [--successor <id>] --reason <text>
 #   unattended.sh --dispatch <slug> --pass <id> --writes <path> [<path> ...] [--writes <path> ...]
 #   unattended.sh --brief <slug> --unit <id> --path <file>  # record WHAT a build pass was handed
@@ -111,7 +112,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
 # place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
 # the gate leg, because no runtime derivation crosses a file boundary.
-VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --brief --beat"
+VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --refused --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --brief --beat"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
 VERBS_INLINE="--plan --phase --check-commit --claims --overlaps --version"
@@ -861,7 +862,7 @@ read_bound_key RESUME_STALE_BOUND "$RESUME_STALE_BOUND_DEFAULT" seconds "a run r
 # ARGV STATE, not a conf default. Initialised AFTER the conf is sourced: in the default block above,
 # a tracked `.unattended.conf` could pre-set it and defeat the "--park requires --item" refusal by
 # supplying the item nobody typed.
-PK_ITEM=""; PK_STEP=""
+PK_ITEM=""; PK_STEP=""; RF_KEY=""
 # Internal state for trusted_base, initialised here for PK_ITEM's reason (TOOL-aHomedAnchor-6 S8).
 TB_IGNORE_RECORD=0
 HALT_CODE=""
@@ -956,6 +957,7 @@ VERB_REQUIRES="--abort --reason --code
 --review --subject
 --park --item --reason
 --propose --item --step --reason
+--refused --item --key --reason
 --rescope --reason
 --brief --unit --path
 --record-set --leg --verdict
@@ -1012,7 +1014,7 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 # reader parses BY kind, so it is a row nothing counts and nothing surfaces. It became a declaration
 # when a fifth kind arrived and found the alternation that recognises a row typed into `verb_status`
 # - one spelling of a vocabulary that two files read.
-PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief hold resume handoff"
+PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief hold resume handoff refusal"
 # The BUILD-ORDER verb, in the two shapes `gen_build_index.py` declares. CONFORMING requires the
 # value to be anchored on both sides; LOOSE is anything wearing the verb's name that is not.
 ORDER_OK_RE='·[[:space:]]*order[[:space:]]+[0-9]+[[:space:]]*(·|$)'
@@ -6332,15 +6334,21 @@ ASKROWS
     return 0
   fi
   # ONE ENGINE CALL. Its `invalid-input` exits 2 and still prints its line, so the status is not read.
-  local _nl=""
+  # TOOL-dDeclaredLoop-14 S5 - its SECOND line is the frontier, the stand-in for `next` returning it,
+  # printed beneath `next:` as `frontier:` with the tags space-separated or `none`. An engine that does
+  # not resolve returned no frontier, so no line claims one.
+  local _nl="" _fl=""
   if resolve_position_engine; then
-    _nl=$(GOV_POSITION_STATES="$_ho" "$PE_PY" "$PE_PATH" "$slug" --next-line 2>/dev/null)
+    _nl=$(GOV_POSITION_STATES="$_ho" "$PE_PY" "$PE_PATH" "$slug" --next-line --frontier 2>/dev/null)
+    case "$_nl" in *$'\n'*) _fl=${_nl#*$'\n'}; _fl=${_fl%%$'\n'*}; _fl=${_fl%$'\r'} ;; esac
     _nl=${_nl%%$'\n'*}; _nl=${_nl%$'\r'}
     [ -n "$_nl" ] || _nl="none - invalid-input: the loop kit's position engine printed no line"
+    _fl="frontier: ${_fl:-none}"
   else
     _nl="none - invalid-input: the loop kit's position engine does not resolve beside this kit"
   fi
   echo "next: $_nl"
+  [ -z "$_fl" ] || echo "$_fl"
   return 0
 }
 
@@ -13277,6 +13285,23 @@ PARKED
 # because of a recorded defect, and the STEP is a third place every one of them can be broken: a
 # newline forges a row, the separator makes the row unparseable by the check that grades it, and the
 # bypass flag reds the bar on a record no verb can rewrite.
+# TOOL-dDeclaredLoop-14 - THE THREE FIELD GUARDS, ONCE. `--refused` writes the step field too, with the
+# instance key in it, so at their second user the guards moved here whole, each keeping its test and
+# its check number; the message says "an item" because two verbs print it.
+check_step_fields() { # item · step · reason -> 0 when all three are one-line, separator-free and bypass-free, else check 48 and 1
+  local item="$1" step="$2" reason="$3"
+  if [ "$(printf '%s' "$reason$item$step" | wc -l)" -ne 0 ]; then
+    fail 48 "an item, step or reason contains a newline, and park() appends ONE line that the gate parses line-wise, so this would forge a second parked row nothing wrote"; return 1
+  fi
+  # ITEM AND STEP, not the reason. The reason is the LINE-FINAL field and can hold anything; these
+  # two are read back as the tokens between the separators, so either one spelling a separator makes
+  # its own record unparseable - by the very check that reads it.
+  case "$item$step" in *" · "*) fail 48 "an item or step spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it: $item at step $step"; return 1 ;; esac
+  if [ -n "$BYPASS_BAN" ] && printf '%s%s%s' "$item" "$step" "$reason" | grep -qF -- "$BYPASS_BAN"; then
+    fail 48 "an item, step or reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag: $BYPASS_BAN"; return 1
+  fi
+  return 0
+}
 verb_propose() { # slug · item · step · reason
   local slug="$1" item="$2" step="$3" reason="$4" rel want pl
   check_slug "$slug" || return 1
@@ -13285,16 +13310,7 @@ verb_propose() { # slug · item · step · reason
   check_verb_flag --propose --item "$item" || return 1
   check_verb_flag --propose --step "$step" || return 1
   check_verb_flag --propose --reason "$reason" || return 1
-  if [ "$(printf '%s' "$reason$item$step" | wc -l)" -ne 0 ]; then
-    fail 48 "a proposed item, step or reason contains a newline, and park() appends ONE line that the gate parses line-wise, so this would forge a second parked row nothing wrote"; return 1
-  fi
-  # ITEM AND STEP, not the reason. The reason is the LINE-FINAL field and can hold anything; these
-  # two are read back as the tokens between the separators, so either one spelling a separator makes
-  # its own record unparseable - by the very check that reads it.
-  case "$item$step" in *" · "*) fail 48 "a proposed item or step spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it: $item at step $step"; return 1 ;; esac
-  if [ -n "$BYPASS_BAN" ] && printf '%s%s%s' "$item" "$step" "$reason" | grep -qF -- "$BYPASS_BAN"; then
-    fail 48 "a proposed item, step or reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag: $BYPASS_BAN"; return 1
-  fi
+  check_step_fields "$item" "$step" "$reason" || return 1
   refuse_if_terminal "$rel" --propose || return 1
   # EXACT LINE COMPARE, for verb_park's recorded reason: the reason is line-final, so a `grep -qF`
   # matched any row whose reason merely STARTS with this one, and the verb then reported success
@@ -13310,6 +13326,49 @@ PROPOSED
   park "$rel" proposal "$item" "$reason" "$step" || return 1
   stage_or_fail "$rel" || return 1
   echo "unattended: proposal recorded against step $step — $item"
+  return 0
+}
+
+# TOOL-dDeclaredLoop-14 - THE DEFAULT FAILURE ROUTE'S RECORD. A refused item was a `fail N` line and a
+# number in the machine-local run log, routed nowhere. `--refused` writes it where history reads it, a
+# `refusal` row through park() with the item's instance key in the step field, and `--plan` then
+# prints the frontier beneath `next:`, the refused instance still on it. A `history` kind, in
+# PARK_KINDS and not in the owed set: nothing blocks on it and the owner is asked nothing.
+# THE ENGINE DECIDES WHAT MAY BE RECORDED: `position.py --check-refusal` holds a tag the composition
+# declares at a key of `derive_instance_key`'s shape, and every other answer, the engine unresolved
+# included, is the ONE refusal below, so an unarmed check records nothing.
+write_refusal() { # slug · item tag · instance key · reason
+  local slug="$1" item="$2" key="$3" reason="$4" rel want pl _out _rc _why
+  check_slug "$slug" || return 1
+  runmd_of "$slug" >/dev/null; rel=$_runmd
+  check_run_state "$rel" "run to record a refusal against" || return 1
+  check_verb_flag --refused --item "$item" || return 1
+  check_verb_flag --refused --key "$key" || return 1
+  check_verb_flag --refused --reason "$reason" || return 1
+  check_step_fields "$item" "$key" "$reason" || return 1
+  refuse_if_terminal "$rel" --refused || return 1
+  # EXACT LINE COMPARE, verb_propose's, read in this shell: the timestamp is the first token.
+  want="refusal · item $item · step $key · reason $reason"
+  while IFS= read -r pl || [ -n "$pl" ]; do
+    pl=${pl%$'\r'}
+    [ "${pl#* }" = "$want" ] || continue
+    echo "unattended: refusal already recorded, unchanged — $item at $key"
+    return 0
+  done < "$rel"
+  _why="the loop kit's position engine does not resolve beside this kit"
+  if resolve_position_engine; then
+    _out=$("$PE_PY" "$PE_PATH" --check-refusal "$item" "$key" 2>&1); _rc=$?
+    _why=${_out%%$'\n'*}; _why=${_why%$'\r'}
+    [ -n "$_why" ] || _why="the engine printed nothing and exited $_rc"
+  else
+    _rc=2
+  fi
+  if [ "$_rc" -ne 0 ]; then
+    fail 48 "the position engine did not hold this refusal, so nothing is recorded and the run-state file is unchanged: $_why"; return 1
+  fi
+  park "$rel" refusal "$item" "$reason" "$key" || return 1
+  stage_or_fail "$rel" || return 1
+  echo "unattended: refusal recorded against $key — $item"
   return 0
 }
 
@@ -15286,6 +15345,7 @@ while [ $# -gt 0 ]; do
     --successor)    RS_SUCC="${2:-}"; shift 2 || shift ;;
     --item)         PK_ITEM="${2:-}"; shift 2 || shift ;;
     --step)         PK_STEP="${2:-}"; shift 2 || shift ;;
+    --key)          RF_KEY="${2:-}"; shift 2 || shift ;;
     --unit)         BR_UNIT="${2:-}"; shift 2 || shift ;;
     --path)         RP_PATH="${2:-}"; shift 2 || shift ;;
     --leg)          RP_LEG="${2:-}"; shift 2 || shift ;;
@@ -15425,6 +15485,7 @@ case "$VERB" in
   --settle)    run_settle "$SLUG" ;;
   --park)    verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
   --propose)   verb_propose "$SLUG" "$PK_ITEM" "$PK_STEP" "$REASON" ;;
+  --refused)   write_refusal "$SLUG" "$PK_ITEM" "$RF_KEY" "$REASON" ;;
   --brief)     verb_brief "$SLUG" "$BR_UNIT" "$RP_PATH" ;;
   --review)    verb_review "$SLUG" "$RV_SUBJECT" "$VERDICT" "$RV_BLOCKERS" "$RV_DISPOSITION" "$RV_HIGHS" "$RV_MINORS" "$RV_FOLDED" "$RV_PROMOTED" ;;
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
