@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-25 — a repository's own stages, spliced between two adjacent gov stages
 
-**Status:** INPROGRESS · rev-5 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-6 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0110@c46e726a whole
 
@@ -16,6 +16,7 @@
 | [2026-11-05-build-TOOL-dDeclaredLoop-25-deviation-252.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-25-deviation-252.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-25-1-builder-return.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-25-1-builder-return.md) | journal | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-25-deviation-253.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-25-deviation-253.md) | deviation | — |
+| [2026-11-15-build-TOOL-dDeclaredLoop-25-deviation-254.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-25-deviation-254.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-29 |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
@@ -70,14 +71,16 @@ to :388; P20 as amended).
   "The frame rules", each refusal naming the stage, the rule and the tag at fault. It reads gov's
   steps and build rows from the `data` it is passed; `check` passes the definition once
   `tools/loop/loop_lib.py#check_loop` holds it, which keeps gov's five steps whole and in order, and
-  a plant may pass a definition holding a successor's tag. `check` passes it `exclude`, the members
+  every plant passes the working tree's definition as shipped, since rule 8's `check_program` runs
+  `check_loop` and refuses a step tag outside `tools/loop/loop_lib.py#STEP_TAGS` (§8 F9). `check` passes it `exclude`, the members
   of `instructions.exclude` at HEAD read by the policy kit's `resolve`, the kit found through
   `tools/loop/loop_parents.py#read_policy_kit`; `records`, the change records
   `tools/memory-tree/build_records.py#read_changes` reads; and `items`, the item kind's composed
   rows. Observed by AC2, AC3, AC4, AC7, AC8.
-- **S4** — A gov stage tag succeeded beside a splice: a stage whose `after` or `before` names a gov
-  step tag that a change record ends with a `Successor` resolves through that successor, record by
-  record, to a step tag the definition holds, and its rows derive against it. Each resolution prints
+- **S4** — A gov stage tag succeeded beside a splice: a stage whose `after` or `before` names a tag
+  the definition's steps do not hold, which a change record ends with a `Successor`, resolves through
+  that successor, record by record, to a step tag the definition holds, before the frame rules read
+  it, and its rows derive against it. Each resolution prints
   one line naming the stage, the old tag and the new. A successor of `none`, or of more than one
   tag, is refused naming the record. Observed by AC6.
 - **S5** — The stage's items are the item kind's rows: overlay `[[item]]` tables tagged
@@ -289,6 +292,8 @@ it passes its two neighbours.
 `--fixture --plant <case>` runs one case. Every case but `factory` is made in memory over the working
 tree's definition, as `tools/loop/loop_table.py#write_table_plant` makes its own: the stage rows, the
 items, `exclude` and `records` are planted data passed to `check_splices`, so no case reads HEAD.
+No case edits the definition's steps, and a planted stage's `pin` is `derive_row_pin(R)` over that
+definition unless its row says otherwise.
 `factory` builds a scratch through `tools/loop/loop_items.py#build_scratch_tree`, whose kits hold this
 tree's playbook and loop kits, and runs the register's factory verb there through
 `tools/loop/loop_items.py#run_factory`, which gains an argv argument, its `FACTORY_ARGV` when none is
@@ -305,7 +310,7 @@ given. `check --selftest` runs `check` over the tree, then every case through
 | `after-deploy` | after `step.deploy`, no `before` | exit 1, no gov stage follows it |
 | `non-adjacent` | after `step.build`, before `step.deploy` | exit 1, naming both |
 | `two-splices` | a second stage between `step.test` and `step.deploy` | exit 1, naming both stages |
-| `gov-rename` | `step.test` renamed `step.verify` in the planted steps, a record naming it the successor | exit 0; one re-point line |
+| `gov-rename` | the stage of §4 "Data model" with `after` set to the old tag `step.verify`, and a planted change record with `Unit step.verify` and `Successor step.test` | exit 0; one re-point line, from `step.verify` to `step.test`, and R1 leaving `testing` |
 | `stale-pin` | the stage's `pin` one hex digit off | exit 1, naming the pin |
 | `exit-elsewhere` | `exit` naming a gov item of `step.test` | exit 1, naming the exit |
 | `exit-unwitnessed` | the exit item's `witness` taken out | exit 1, naming the item |
@@ -418,6 +423,10 @@ row is the composition's to refuse, since gov ships no stage row for its pin to 
     re-rendered by `render_playbook.py --reference`, for `help reference pages`.
   - `memory/map/features/loop.md` — the leg in its `gate-legs` claim; its `tools/loop/**` glob covers
     the module and schema; `gen_map.py --write` regenerates the four generated files.
+  - The playbook kit's version, `tools/playbook/render_playbook.py#KIT_PLAYBOOK_RENDER_VERSION`, the
+    marker `tools/playbook/kit.toml`'s `version_from` names, bumps once, after the last move of the
+    kit's shipped bytes in this unit's range, for `kit epoch (shipped bytes move, the version moves)`;
+    the first dispatch's return reads main's marker one step ahead of the branch's.
   - The verdict epoch's delegate list names memory-tree modules only, and this unit edits none.
   - The install-prefix ban: `splice.py` spells every path through its kit directory and `{prefix}`,
     never a quoted tool-root literal.
@@ -430,6 +439,11 @@ row is the composition's to refuse, since gov ships no stage row for its pin to 
   - `playbook render selftest` — the `row_kind.py` and `composition.py` fixtures write an integer
     `owner-seat`, which the reader still admits; a scratch register naming `kind.stage` with its
     schema absent composes no row of it.
+- companion files the commit rewrites, beside §4 "Files touched" — `memory/builds/dDeclaredLoop/README.md`,
+  `memory/builds/dDeclaredLoop/RUN.md`, this spec, this unit's acceptance ledger under
+  `memory/builds/dDeclaredLoop/build/`, `memory/LIVE.md`, `memory/backlog/TOOL.md`, the four
+  `memory/map/generated/` files, `memory/guides/SESSION-KICKOFF.md` for its manifest-audit stamp, and
+  `help/reference/kinds.md`, as the first dispatch's return lists them.
 - dependencies — TOOL-dDeclaredLoop-4, order 19, lands first: every manifest row carries `stage` and
   the canary admits the key, read on its committed spec. TOOL-dDeclaredLoop-6, order 20, lands first:
   it fills five kind rows of `kinds.toml` and keeps `kind.stage` pending (its S10, AC4), read on its
@@ -457,10 +471,10 @@ row is the composition's to refuse, since gov ships no stage row for its pin to 
   exits 1 printing `step-gate: RED stage:step.plan`, and with `--with-row` it exits 0.
   Red when: a gov stage tag removed with no record passes.
   cost: one scratch clone and two gate runs per invocation.
-- **AC6** — When `--plant gov-rename` runs, it exits 0 and prints one line naming
-  `step.adopter.security-review`, `step.test` and `step.verify`, and R1 leaves the renamed stage's
-  state.
-  Red when: a gov rename beside a splice leaves the stage pointing at the old tag, or reds it.
+- **AC6** — When `--plant gov-rename` runs, its stage naming the old tag `step.verify` over the
+  shipped definition beside a record succeeding it by `step.test`, it exits 0 and prints one line
+  naming `step.adopter.security-review`, `step.test` and `step.verify`, and R1 leaves `testing`.
+  Red when: a stage naming a succeeded gov tag is not re-pointed to its successor, or is refused.
 - **AC7** — When `--plant stale-pin` runs, it exits 1 naming the pin.
   Red when: a stage whose pin no longer matches composes.
 - **AC8** — When `--plant exit-elsewhere`, `--plant exit-unwitnessed` and `--plant orphan-item` run,
@@ -549,6 +563,19 @@ New arm: tools/govkit/selftest.py · covers AC5 · the `stage` class row arms it
   Recommendation (b), the body's, the read named as a follow-up for the run to file under
   TOOL-dDeclaredLoop-35. RESOLVED (agent, 2026-11-15, delegated): (b), rung 3: one mechanism per
   unit. widens: none · relaxes: a build's move into a repository stage, refused until that follow-up
+- **F9 — How does the `gov-rename` plant pass frame rule 8, whose `check_program` runs `check_loop`
+  first and refuses any step tag outside `STEP_TAGS`?** Rev-5 planted `step.test` renamed
+  `step.verify` in the definition's steps, which rule 8 refuses before any re-point runs, so the case
+  exits 1 where AC6 needs 0 (`build/2026-11-15-build-TOOL-dDeclaredLoop-25-1-builder-return.md`). (a)
+  Invert the plant: the shipped definition kept, the stage's `after` set to the old tag `step.verify`,
+  and a planted change record with `Unit step.verify` and `Successor step.test`, so S4 resolves the old
+  tag to one the definition holds; (b) `check_splices` takes a second definition, as `check_loop` holds
+  it, for rule 8's `check_program`, apart from the `data` rules 3 to 5 and S4 read; (c) `check_program`
+  skips `check_loop` for a caller that has already checked the steps. (b) widens the signature for one
+  fixture case; (c) changes a function called at four sites in `tools/loop/loop_items.py` and
+  `tools/loop/loop_lib.py`; (a) rewrites one fixture row, keeps the signature and every frame rule, and
+  still exercises a stage left naming a succeeded gov tag. Recommendation (a). RESOLVED (agent,
+  2026-11-15, delegated): (a), rung 3, the run's pick on the return. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -577,6 +604,14 @@ New arm: tools/govkit/selftest.py · covers AC5 · the `stage` class row arms it
   exit's `recorded`; every plant but the factory's runs in memory; the pending `principle.p20` row is
   absent, so its deletion leaves scope; the leg enforces `principle.p16` and `principle.p20`; line
   citations are symbol citations or blob-pinned lines.
+- rev-6 · 2026-11-15 · S3 S4 · §4 The fixture cases · §5 · AC6 · §8 F9 · per the return
+  2026-11-15-build-TOOL-dDeclaredLoop-25-1-builder-return, by the brief
+  2026-11-15-prompt-TOOL-dDeclaredLoop-25-2-spec-writer: the `gov-rename` plant is inverted, the shipped
+  definition kept, the stage naming the old tag `step.verify` and a planted record succeeding it by
+  `step.test`, since rule 8's `check_program` refuses a renamed step; S4 resolves before the frame
+  rules read the stage; every plant derives its pin over the shipped definition; §5 names the
+  companion files and the playbook kit's one version bump. Signature, frame rules, mechanism,
+  carries, order and status kept.
 
 ## 10. Reuse audit
 
