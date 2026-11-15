@@ -2,6 +2,16 @@
 
 **Serves:** research TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2
 
+## The prompt
+
+> Make the unattended build harness able to build two or more units of one build at the same time, as gov work: `/session-kickoff` first, a build of its own with a spec, a gov-builder for the code, landing on main through `bash tools/push-main.sh` on a green bar only under the charter's [land] rule.
+
+> Design target: each parallel pass builds in its own worktree on its own branch cut from the run's tip; product files are checked disjoint by `--dispatch` as now, while generated files are left to the main loop, which merges each pass back (`--no-ff`, or a cherry-pick, your call in the spec) and regenerates the shared indexes once.
+
+> Done looks like: a spec with its forks, the change built and its arms seen red then green, a measured before and after of two disjoint units built serially versus in parallel on a frozen clone, and the work landed on main or left on its branch with a line saying what is left.
+
+The task came from the session that started this one, on the owner's request. It is quoted in part; the passages above are the ones this build serves.
+
 ## The brief
 
 ### Goal
