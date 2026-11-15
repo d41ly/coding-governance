@@ -1,6 +1,6 @@
 # TOOL-aPiecewiseGrade-2 — `run_spec_token_check` runs the checker's incremental mode on a whole-key miss, and promotes its per-spec cache only where the whole key is recorded
 
-**Status:** SPECCED · rev-2 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 3 · ratified 2026-11-15
+**Status:** INPROGRESS · rev-2 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 3 · ratified 2026-11-15
 
 <!-- gen:spec-records -->
 
