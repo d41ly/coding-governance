@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-11 — close repair, inherited: the hygiene suite's partition arm sets aside check 26's cache-hit count
 
-**Status:** INPROGRESS · rev-4 · 2026-11-15 · node a · Tier-2 · base 846d51d3 · streams tooling · order 10 · ratified 2026-11-15
+**Status:** INPROGRESS · rev-5 · 2026-11-15 · node a · Tier-2 · base 846d51d3 · streams tooling · order 10 · ratified 2026-11-15
 
 <!-- gen:spec-records -->
 
@@ -11,9 +11,11 @@
 | [2026-11-15-prompt-TOOL-aTrimmedWait-11-2-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-2-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTrimmedWait-11-3-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-3-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTrimmedWait-11-4-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-4-spec-writer.md) | journal | — |
+| [2026-11-15-prompt-TOOL-aTrimmedWait-11-5-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-5-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTrimmedWait-11-promotion.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-promotion.md) | research | — |
 | [2026-11-15-prompt-TOOL-aTrimmedWait-11-revision-2.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-revision-2.md) | research | — |
 | [2026-11-15-prompt-TOOL-aTrimmedWait-11-revision-3.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-revision-3.md) | research | — |
+| [2026-11-15-prompt-TOOL-aTrimmedWait-11-revision-4.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-revision-4.md) | research | — |
 | [2026-11-15-prompt-TOOL-aTrimmedWait-11-revision.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-revision.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -68,7 +70,7 @@ none
   `resolve_root` walks `KIT.parents` for `.memory-tree.conf`
   (`tools/memory-tree/transition_audit.py@419c2700999d:92-105`). The suite's main block runs the
   engine in a fixture repository under `$TMP` (`tools/memory-tree/check-memory-hygiene.test.sh@0c6a20682257:274`,
-  `:1204`), so its check 26 lines audit the repository that holds the kit.
+  `:1204`), so the lines check 26 prints there audit the repository that holds the kit.
 - The cache sits under that repository's git common dir, `transition-audit-cache`
   (`tools/memory-tree/transition_audit.py@419c2700999d:628-633`). A merge whose entry is absent
   recomputes with an empty reason and is not counted as recomputed (`:672-674`, `:777-782`). A hit
@@ -87,7 +89,7 @@ none
 - Observed 2026-11-15 on node a, in a `git clone --no-local` of `1a8dd930d` with no cache dir:
   `bash tools/memory-tree/check-memory-hygiene.sh --only 26` printed
   `memory-hygiene: check 26 transitions examined 4 · merges walked 690 · pinned 0 · unpinned 4 · cache hits 0`,
-  and a second run printed the same line ending `cache hits 4`. Both exited 0 in 10 s.
+  and a second run printed the same line ending `cache hits 4`. Both exited 0 in 10 s. <!-- PINNED 2026-11-15 -->
 - `tools/` is byte-identical between `ff4242f8b` and `1a8dd930d`, and this build moved neither
   `transition_audit.py` nor lines 1392-1398 of the suite since `846d51d39`. The arm came in with
   `TOOL-aSparedSpawn-7` (`11a69b8bc`) and the field with `TOOL-dDerivedDocket-9` (`d267a9c22`), both
@@ -207,7 +209,7 @@ nothing.
 
 - **Drop check 26's line from both sides with `grep -v`, in the shape of the liveness-line
   exclusion.** Every other field of that line would go unread, and item 1 keeps them.
-- **Run the unscoped check 26 twice first, so both sides read warm.** It costs a 10 s run on every
+- **Run the unscoped check 26 twice first, so both sides read warm.** It costs a 10 s run <!-- PINNED 2026-11-15 --> on every
   suite pass and still fails where an entry of another epoch is rewritten between the runs.
 - **Spell the three fixture lines as literals.** A format change in `render_liveness` would then
   leave the fixture green while the `sed` stopped matching.
@@ -218,8 +220,8 @@ nothing.
 
 - security — N/A — a test-only change. No write path, no new input.
 - perf / scale — One python spawn and eight function calls, about four forks each, for the fixture
-  arm, and one more `sed` per side for the partition arm. The suite's worst reading is 808 s against
-  its 1220 s row in `tools/run-gates/selftest-budgets.txt` <!-- PINNED 2026-11-15 -->.
+  arm, and one more `sed` per side for the partition arm. The suite's worst reading is
+  808 s against its 1220 s row in `tools/run-gates/selftest-budgets.txt` <!-- PINNED 2026-11-15 -->.
 - error / empty / loading states — The suite runs under `set -u`, so every read of an `_hs_c26`
   element takes an unset-safe form and an unset element reads as empty, rather than ending the
   suite with `unbound variable`. An empty render reds three of the fixture's four assertions, a
@@ -278,7 +280,7 @@ one foreign-inputs entry, observed 2026-11-15.
   print the same bytes through `derive_partition_lines`.
   Red when: the set-aside does not cover the line the cold and the warm run print, which is the
   partition arm's red on a fresh clone.
-  cost: about 75 s for the clone and 10 s per run on node a, measured 2026-11-15.
+  cost: about 75 s for the clone and 10 s per run on node a, measured 2026-11-15. <!-- PINNED 2026-11-15 -->
   fixture: the clone is made for the observation, and the tree holds none today.
 
 ## 7. Gates
@@ -318,6 +320,7 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC2 AC4 ·
 - rev-2 · 2026-11-15 · §1 · §2 · §3 · §4 · §5 · AC1 · AC2 · AC4 · §7 · §8 · F1 resolved by the owner for (B): check 26's `cache recomputed` lines set aside on both sides, a fourth fixture assertion, the floor 745 to 749.
 - rev-3 · 2026-11-15 · S1 · §4 · S1 says the `cache recomputed` lines are set aside in the compare, which the pre-commit memory hygiene had read as a retirement. The fixture arm strips the carriage return through `_hs_cr`, since the array expansion's `%$'\r'` leaves it on this node's bash.
 - rev-4 · 2026-11-15 · §4 · §5 · §7 · the fixture arm's element reads take unset-safe forms, since the suite's `set -u` ended the suite on an unset read, the builder's DIVERGENCE of run `wf_0b836e97-5c0` ruled by the owner (2026-11-15-prompt-TOOL-aTrimmedWait-11-revision-3). "Files touched" adds the codebase map, the acceptance ledger and check 9's index files, and §7 names `recall floor` and `recall floor arms`, whose `memory/` guard those paths trip.
+- rev-5 · 2026-11-15 · §4 · §5 · AC6 · each measured figure the `pinned-facts` rows of the pass-legs run over `aa1695886..e99df8a27` named carries its pin on its own line, and §4 "Evidence" rewords the check-26 phrase so no number reads as a figure (2026-11-15-prompt-TOOL-aTrimmedWait-11-5-spec-writer). No value, compare or criterion moves.
 
 ## 10. Reuse audit
 
