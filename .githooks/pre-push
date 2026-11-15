@@ -1095,10 +1095,9 @@ if [ -z "$DECIDE" ] && [ -n "${main_local//0/}" ]; then   # --decide skips it: i
 fi
 
 # ---- THE POLICY FILE'S PUSH ARM — TOOL-dDeclaredLoop-2 S6 -------------------------------------
-# Beside the merge-loss block and under its two conditions: every non-merge commit of the pushed
-# default-branch range that changes a leaf of the policy file owes one `Gov-Policy:` trailer line per
-# changed leaf and a change record naming the leaf's row, as the loop kit's `guard.py --push-range`
-# grades it; a commit adding the file is printed and not graded. The kit is resolved as the merge-loss
+# Beside the merge-loss block and under its two conditions: the loop kit's `guard.py --push-range`
+# grades the pushed default-branch range, and its push arm's docstring is the one statement of which
+# commits, merges included, owe a `Gov-Policy:` trailer and a change record. The kit is resolved as the merge-loss
 # block resolves its own, over the pushing tree and this hook's parent, and a copy under the pushing
 # tree is vetted by check_reviewed_file before it runs. Exit 1 refuses as `policy-unrecorded`, a
 # token no run-log decision pairs with; exit 2 refuses naming the reason, deny by default; no launcher

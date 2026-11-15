@@ -29,13 +29,19 @@ agent's commit. It wraps dGroundRules-6's minimal guard, the policy kit's `guard
 5. Each refusal prints `loop-guard: refused · <path> · <why>` and the remedy; an admission prints
    `loop-guard: admitted · <rule>`; the minimal guard's own lines pass through.
 
-THE PUSH ARM, `check_push_range`. Every non-merge commit of the range, read through the memory-tree
-kit's `read_commits` with the key `Gov-Policy`, whose parent holds the policy file and whose own
-blob of it differs, is graded leaf by leaf: each changed leaf owes one trailer line
-`Gov-Policy: policy.<key> <old> -> <new>`, the key spelled by `render_dotted` and each value compact
-JSON, `none` for a leaf the file did not set; and the commit adds a change record naming the leaf's
-row tag. A commit adding the file is printed and not graded. Exit 1 names the commit and the key;
-at `floor.record-changes` `off` each finding is reported after `floor: record-changes off`, exit 0.
+THE PUSH ARM, `check_push_range` (TOOL-dDeclaredLoop-44). Every commit of the range, merges included,
+read through the memory-tree kit's `read_commits` with the key `Gov-Policy`. A non-merge commit whose
+parent holds the policy file and whose own blob of it differs is graded leaf by leaf: each changed
+leaf owes one trailer line `Gov-Policy: policy.<key> <old> -> <new>`, the key spelled by
+`render_dotted` and each value compact JSON, `none` for a leaf the file did not set; and the commit
+adds a change record naming the leaf's row tag. A merge is graded only where git's combined diff,
+`diff-tree --cc`, lists the file, a blob differing from every parent's: its keys read against its
+first parent, it owes the same trailers, and its records are the change records that same list holds
+at the merge. A merge taking one side's file whole owes nothing, that side's commits being graded in
+the range. A commit or merge whose first parent lacks the file is printed and not graded. An all-zero
+base, a new ref, reads as the policy kit's `derive_landed_revision`, its Refusal an exit 2. Exit 1
+names the commit or merge and the key; at `floor.record-changes` `off` each finding is reported after
+`floor: record-changes off`, exit 0.
 
 THE EXPANSION RULE, `check_expansion_value(key, value, points)`. A `[[selects]]` row of this kit's
 `loop.toml` names a key, a value and the layer point that value needs; where `points`, those the core
@@ -79,6 +85,8 @@ from loop_witness import read_clean_env, read_git, remove_tree, run_fixture_git,
 SAY = "loop-guard"
 TRAILER_KEY = "Gov-Policy"
 LIST_TAG = "kit.policy"
+#: a new ref's old sha, SHA-1 or SHA-256 width, which git reads as no revision at all
+ZERO_SHA = re.compile(r"0{40}|0{64}")
 #: the leaves the guard's own switch holds, each a key path prefix
 SELF_KEYS = (("policy-file", "guard"), ("policy-file", "proof"), ("floor",))
 #: a change record's name, the change kind's grammar under any memory root
@@ -283,16 +291,21 @@ def read_policy_blob(rev, rel):
     return p.stdout
 
 
-def read_added_units(sha):
-    """The `Unit` of each change record the commit `sha` adds."""
+def read_added_units(sha, rels=None):
+    """The `Unit` of each change record the commit `sha` adds, or, for a merge, of each one among `rels`,
+    the paths its combined diff lists, that the merge holds: `--diff-filter=A` prints nothing for a merge."""
     read_memory_tree("build_records.py")
     from build_records import read_change
-    rc, out = read_git(".", "diff-tree", "--no-commit-id", "-r", "--root", "--name-only", "--diff-filter=A", sha)
-    if rc:
-        raise OSError("git diff-tree %s exited %d" % (sha, rc))
+    if rels is None:
+        rc, out = read_git(".", "diff-tree", "--no-commit-id", "-r", "--root", "--name-only", "--diff-filter=A", sha)
+        if rc:
+            raise OSError("git diff-tree %s exited %d" % (sha, rc))
+        rels = out.splitlines()
     units = set()
-    for rel in (n for n in out.splitlines() if CHANGE_NAME.search(n)):
-        units.add(read_change(rel, read_policy_blob(sha, rel).decode("utf-8", "replace")).get("Unit"))
+    for rel in (n for n in rels if CHANGE_NAME.search(n)):
+        blob = read_policy_blob(sha, rel)
+        if blob is not None:
+            units.add(read_change(rel, blob.decode("utf-8", "replace")).get("Unit"))
     return units
 
 
@@ -308,35 +321,47 @@ def check_push_range(base, tip):
         return 0
     try:
         floor = read_floor()
+        if ZERO_SHA.fullmatch(base):
+            base, how = policy.derive_landed_revision(".")
+            print("%s: push · a new ref, graded past %s" % (SAY, how))
         from commit_trailers import read_commits
-        commits = read_commits(".", ["--no-merges", "%s..%s" % (base, tip)], [TRAILER_KEY])
+        commits = read_commits(".", ["%s..%s" % (base, tip)], [TRAILER_KEY])
         findings, graded = [], 0
         for c in commits:
-            sha8 = c["sha"][:8]
+            sha8, listed = c["sha"][:8], None
+            kind, own = ("merge", ", the merge's own change") if len(c["parents"]) > 1 else ("commit", "")
+            if kind == "merge":
+                rc, out = read_git(".", "diff-tree", "--cc", "-r", "--name-only", "--no-commit-id", c["sha"])
+                if rc:
+                    raise OSError("git diff-tree --cc %s exited %d" % (sha8, rc))
+                listed = out.splitlines()
+                if mguard.POLICY not in listed:
+                    continue
             old = read_policy_blob(c["parents"][0], mguard.POLICY) if c["parents"] else None
             new = read_policy_blob(c["sha"], mguard.POLICY)
             if old is None:
                 if new is not None:
-                    print("%s: push · %s adds %s, not graded" % (SAY, sha8, mguard.POLICY))
+                    print("%s: push · %s %s adds %s, not graded" % (SAY, kind, sha8, mguard.POLICY))
                 continue
             if old == new:
                 continue
             graded += 1
             a, b = parse_policy_bytes(old), parse_policy_bytes(new)
             if a is None or b is None:
-                findings.append("commit %s · %s does not parse on one side, so its changed keys are unknown" % (
-                    sha8, mguard.POLICY))
+                findings.append("%s %s · %s does not parse on one side, so its changed keys are unknown" % (
+                    kind, sha8, mguard.POLICY))
                 continue
-            said, units = set(c["trailers"][TRAILER_KEY]), read_added_units(c["sha"])
+            said, units = set(c["trailers"][TRAILER_KEY]), read_added_units(c["sha"], listed)
             for key, (o, n) in sorted(mguard.derive_leaf_changes(a, b).items()):
                 want, tag = render_policy_trailer(policy, key, o, n), derive_row_tag(policy, key)
                 if want not in said:
-                    findings.append("commit %s · %s · %s changed with no `%s: %s` trailer" % (
-                        sha8, mguard.POLICY, policy.render_dotted(key), TRAILER_KEY, want))
+                    findings.append("%s %s · %s · %s changed with no `%s: %s` trailer%s" % (
+                        kind, sha8, mguard.POLICY, policy.render_dotted(key), TRAILER_KEY, want, own))
                 if tag is None or tag not in units:
-                    findings.append("commit %s · %s · %s changed and the commit adds no change record naming %s" % (
-                        sha8, mguard.POLICY, policy.render_dotted(key), tag or "its row, which no catalogue row is"))
-    except (LookupError, LoopError, OSError, ValueError) as e:
+                    findings.append("%s %s · %s · %s changed and the %s adds no change record naming %s%s" % (
+                        kind, sha8, mguard.POLICY, policy.render_dotted(key), kind,
+                        tag or "its row, which no catalogue row is", own))
+    except (LookupError, LoopError, OSError, ValueError, policy.Refusal) as e:
         print("%s: cannot judge · %s" % (SAY, e))
         return 2
     if findings and floor["record-changes"] == "off":
@@ -371,6 +396,9 @@ PLANTS = {
     "mandate-none": "agents-within-mandate on a branch no run names",
     "owner-only-live": "owner-only on a live run's branch",
     "push-no-trailer": "a commit changing the policy file with no Gov-Policy: line, graded by --push-range",
+    "push-merge-carries-trailered": "a --no-ff merge taking a side's trailered, recorded policy change whole",
+    "push-merge-resolution-edit": "a merge resolution setting review.max-rounds, with trailer and record, then neither",
+    "push-new-branch": "an all-zero base read as origin's default tip, then that tracking ref deleted",
     "proof-signed-refuse": "policy_edit.py set policy-file.proof signed under refuse",
     "proof-signed-fallback": "policy_edit.py set policy-file.proof signed under fallback-reported",
     "set-run-live": "policy_edit.py set on a live run's branch, a key then a floor member",
@@ -380,10 +408,11 @@ PLANTS = {
 }
 
 
-def run_fixture_command(top, argv):
-    """A process in the scratch repository: `(exit, stdout and stderr)`, standard error never a terminal."""
+def run_fixture_command(top, argv, **put):
+    """A process in the scratch repository, `put` set in its environment: `(exit, stdout and stderr)`,
+    standard error never a terminal."""
     p = subprocess.run(argv, cwd=top, capture_output=True, text=True, encoding="utf-8", errors="replace",
-                       env=read_clean_env())
+                       env=read_clean_env(**put))
     said = p.stdout + p.stderr
     sys.stdout.write(said)
     return p.returncode, said
@@ -440,8 +469,8 @@ def run_guard_plant(case, top):
     edit = [sys.executable, str(KIT / "policy_edit.py")]
     who = ["--build", FX_BUILD, "--unit", FX_UNIT]
 
-    def run_scenario(name, argv, owed, needle):
-        rc, said = run_fixture_command(top, argv)
+    def run_scenario(name, argv, owed, needle, **put):
+        rc, said = run_fixture_command(top, argv, **put)
         out.append((name, rc, owed, needle, said))
 
     def add_text(extra):
@@ -504,6 +533,49 @@ def run_guard_plant(case, top):
         run_fixture_git(top, "commit", "-q", "-m", "review rounds raised, no trailer")
         sha8 = run_fixture_git(top, "rev-parse", "--short=8", "HEAD")
         run_scenario("graded", me + ["--push-range", "%s..HEAD" % base], 1, "commit %s · %s" % (sha8, mguard.POLICY))
+    elif case in ("push-merge-carries-trailered", "push-merge-resolution-edit"):
+        # TOOL-dDeclaredLoop-44: a merge graded on its combined diff, its record read from that list.
+        base = run_fixture_git(top, "rev-parse", "HEAD")
+        trailer = ["-m", "%s: policy.review.max-rounds none -> 4" % TRAILER_KEY]
+        clean = "1 changing %s · 0 finding(s)" % mguard.POLICY
+        run_fixture_git(top, "checkout", "-q", "-b", "side")
+        if case == "push-merge-carries-trailered":
+            write_staged(top, {mguard.POLICY: add_text(FX_REVIEW)})
+            write_fixture_record(top, "policy.review.max-rounds")
+            run_fixture_git(top, "commit", "-q", "-m", "review rounds raised", *trailer)
+            run_fixture_git(top, "checkout", "-q", "main")
+            write_staged(top, {"fx-main.txt": add_text("main's own line\n")})
+            run_fixture_git(top, "commit", "-q", "-m", "main's own commit")
+            run_fixture_git(top, "merge", "-q", "--no-ff", "-m", "merge side", "side")
+            n = run_fixture_git(top, "rev-list", "--count", "%s..HEAD" % base)
+            run_scenario("graded", me + ["--push-range", "%s..HEAD" % base], 0, "%s commit(s) read · %s" % (n, clean))
+        else:
+            write_staged(top, {"fx-side.txt": add_text("side's own line\n")})
+            run_fixture_git(top, "commit", "-q", "-m", "side's own commit")
+            run_fixture_git(top, "checkout", "-q", "main")
+            for name, recorded in (("with its trailer and record", True), ("with neither", False)):
+                run_fixture_git(top, "merge", "-q", "--no-ff", "--no-commit", "side")
+                write_staged(top, {mguard.POLICY: add_text(FX_REVIEW)})
+                if recorded:
+                    write_fixture_record(top, "policy.review.max-rounds")
+                run_fixture_git(top, "commit", "-q", "-m", "merge side", *(trailer if recorded else []))
+                sha8 = run_fixture_git(top, "rev-parse", "--short=8", "HEAD")
+                run_scenario(name, me + ["--push-range", "%s..HEAD" % base], 0 if recorded else 1,
+                             clean if recorded else "merge %s · %s · review.max-rounds" % (sha8, mguard.POLICY))
+                run_fixture_git(top, "reset", "-q", "--hard", "HEAD~1")
+    elif case == "push-new-branch":
+        write_staged(top, {mguard.POLICY: add_text(FX_REVIEW)})
+        run_fixture_git(top, "commit", "-q", "-m", "review rounds raised, no trailer")
+        run_fixture_git(top, "remote", "add", "origin", "fx-none.invalid")
+        run_fixture_git(top, "update-ref", "refs/remotes/origin/main", "HEAD")
+        run_fixture_git(top, "symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/main")
+        write_staged(top, {"fx-clean.txt": add_text("one clean line\n")})
+        run_fixture_git(top, "commit", "-q", "-m", "one clean commit")
+        n = run_fixture_git(top, "rev-list", "--count", "refs/remotes/origin/main..HEAD")
+        zero, unset = ["--push-range", "%s..HEAD" % ("0" * 40)], {"GOV_REMOTE": "", "GOV_DEFAULT_BRANCH": ""}
+        run_scenario("the all-zero base", me + zero, 0, "push · %s commit(s) read · 0 changing" % n, **unset)
+        run_fixture_git(top, "update-ref", "-d", "refs/remotes/origin/main")
+        run_scenario("the tracking ref deleted", me + zero, 2, "refs/remotes/origin/main", **unset)
     elif case in ("proof-signed-refuse", "proof-signed-fallback"):
         refuse = case == "proof-signed-refuse"
         run_scenario("set signed", edit + ["set", "policy-file.proof", "signed", *who], 2 if refuse else 1,
@@ -653,7 +725,8 @@ def run_selftest():
     """Every plant through `run_selftest_cases`: each owes its last scenario's exit and the all-held line."""
     owed = {"raise-no-record": 1, "raise-lowered": 1, "floor-off-agent": 1, "floor-off-run": 1,
             "other-write-owner-only": 1, "with-reason-no-row": 1, "mandate-none": 1, "push-no-trailer": 1,
-            "proof-signed-refuse": 2, "proof-signed-fallback": 1}
+            "proof-signed-refuse": 2, "proof-signed-fallback": 1, "push-merge-resolution-edit": 1,
+            "push-new-branch": 2}
     cases = [(case, ["--fixture", "--plant", case], owed.get(case, 0), "%s: fixture · plant %s · " % (SAY, case),
               "all held") for case in PLANTS]
     return run_selftest_cases(main, cases, "%s: selftest" % SAY)

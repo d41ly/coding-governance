@@ -290,8 +290,12 @@ with one line saying so, as `policy-file.on-missing-expansion` says.
 the loop kit's `guard.py --push-range` over the pushed commits: each commit that changes a key of the
 policy file must carry one `Gov-Policy:` trailer line per changed key and add a change record naming
 the key's row. One that does not is refused as `policy-unrecorded`, naming the commit and the key. A
-commit that adds the policy file, as an adopter's scaffold does, is printed and not graded. With no
-python launcher or no loop kit, the hook prints one line saying the check did not run.
+commit that adds the policy file, as an adopter's scaffold does, is printed and not graded. Merges are
+graded too, on git's combined diff: a merge that takes one side's policy file whole owes nothing, since
+that side's own commits are graded in the same push, but a merge whose resolution changes a key owes
+the trailer and the change record itself, its keys read against its first parent, and is refused as
+the merge's own change when it lacks them. With no python launcher or no loop kit, the hook prints one
+line saying the check did not run.
 
 **The floor.** Four invariants hold whatever else the file says, each switched by a member of the
 `[floor]` table and every one `on` until the file sets it `off`; `python tools/loop/floor.py get <member>` <!-- usage: script:tools/loop/floor.py#get 8ed45f24 -->
