@@ -178,7 +178,9 @@ when = "a unit whose spec is READY"
 `stage` names a workflow of the roles kit's `workflows.toml`, or `start` for how a session begins; `role`
 is a role slot, or `main` for the main session. Where your template holds a `{{DRIVE}}` line, as gov's
 does, the render writes one line per row of the kits your `.governance/deploy.toml` selects there: the
-`start` rows first, then by the workflow's stage, then kit and row order. A kit you did not select adds
+`start` rows first, then by the workflow's stage, then kit and row order. With no loop kit, or a loop
+definition that does not read, the rows keep kit and row order alone: the loop kit's `loop definition`
+gate is what refuses a definition that does not read, not the render. A kit you did not select adds
 nothing, and a selection with no rows renders no section. A subagent's handoff carries its own role's
 lines under `### Drive`, so it holds the line the main session does.
 

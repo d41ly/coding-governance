@@ -810,11 +810,15 @@ def read_outcome_set(kit_dir, item):
     return None
 
 
-def check_program(data, where, layers):
+def check_program(data, where, layers, stages=()):
     """`data`'s `[[item]]` rows graded as each gov step's program, returned as `{step tag: [item tags in
     needs order]}`. `layers` is the set of layer tags an input may name, or None where none resolved,
-    which leaves the inputs unchecked. LoopError naming `where`, the item and the field that does not
-    hold: a tag opening no `item.<step>.` of a gov step, a `step` other than that one, or a tag given
+    which leaves the inputs unchecked. `stages` are the composed repository stage tags,
+    `step.adopter.<name>` (TOOL-dDeclaredLoop-25): an item tagged `item.adopter.<name>.<item>` whose
+    `step.adopter.<name>` is one of them is that stage's, and the stage's program is returned beside the
+    five. LoopError naming `where`, the item and the field that does not
+    hold: a tag opening no `item.<step>.` of a gov step nor `item.adopter.<stage>.` of a composed stage,
+    a `step` other than that one, or a tag given
     twice; a need naming no declared item, or a needs cycle, each cycle named once; an outcome set that
     does not hold; routes that are not exactly the outcomes, or a target that is no declared item,
     `transition` or `stand-in:{prefix}/<home>/<file>`; an input naming no layer tag; and a step whose
@@ -825,10 +829,19 @@ def check_program(data, where, layers):
     for n, row in enumerate(rows, 1):
         tag = row.get("tag")
         parts = tag.split(".", 2) if isinstance(tag, str) else []
-        if len(parts) != 3 or parts[0] != "item" or parts[1] not in steps or not parts[2]:
+        if len(parts) == 3 and parts[:2] == ["item", "adopter"]:
+            name, _dot, rest = parts[2].partition(".")
+            stage = "step.adopter.%s" % name
+            if stage not in stages or not rest:
+                raise LoopError(where, "item row %d tag %r opens no item.adopter.<stage>.<name> of a composed "
+                                       "stage: %s" % (n, tag, " ".join(stages) or "none composed"))
+            if row.get("step") != stage:
+                raise LoopError(where, "the item %s step %r is not %s, the stage its tag opens" % (
+                    tag, row.get("step"), stage))
+        elif len(parts) != 3 or parts[0] != "item" or parts[1] not in steps or not parts[2]:
             raise LoopError(where, "item row %d tag %r opens no item.<step>. of a gov step: %s" % (
                 n, tag, " ".join(steps)))
-        if row.get("step") != steps[parts[1]]:
+        elif row.get("step") != steps[parts[1]]:
             raise LoopError(where, "the item %s step %r is not %s, the step its tag opens" % (
                 tag, row.get("step"), steps[parts[1]]))
         if tag in declared:
@@ -881,7 +894,7 @@ def check_program(data, where, layers):
         exit_tag = row.get("exit")
         if exit_tag not in declared or declared[exit_tag]["step"] != row.get("tag"):
             raise LoopError(where, "the step %s exit %r is no declared item of that step" % (row.get("tag"), exit_tag))
-    return {s: [t for t in order if declared[t]["step"] == s] for s in STEP_TAGS}
+    return {s: [t for t in order if declared[t]["step"] == s] for s in (*STEP_TAGS, *stages)}
 
 
 def read_role_defaults(kit_dir):

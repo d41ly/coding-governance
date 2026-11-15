@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-25 — a repository's own stages, spliced between two adjacent gov stages
 
-**Status:** INPROGRESS · rev-7 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
+**Status:** CLOSED · rev-7 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0110@c46e726a whole
 
@@ -14,6 +14,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-25-build-TOOL-dDeclaredLoop-25-deviation-251.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-25-deviation-251.md) | deviation | — |
 | [2026-11-05-build-TOOL-dDeclaredLoop-25-deviation-252.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-25-deviation-252.md) | deviation | — |
+| [2026-11-15-build-TOOL-dDeclaredLoop-25-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-25-1-acceptance-ledger.md) | journal | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-25-1-builder-return.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-25-1-builder-return.md) | journal | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-25-2-builder-return.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-25-2-builder-return.md) | journal | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-25-deviation-253.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-25-deviation-253.md) | deviation | — |

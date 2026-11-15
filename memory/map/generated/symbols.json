@@ -7798,6 +7798,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_splices",
+      "kind": "function",
+      "file": "tools/loop/splice.py"
+    },
+    {
       "id": "check_ssh_keepalive",
       "kind": "function",
       "file": "tools/check-wiring.sh"
@@ -11043,6 +11048,11 @@
       "file": "tools/playbook/pins.py"
     },
     {
+      "id": "derive_new_item_row",
+      "kind": "function",
+      "file": "tools/loop/loop_items.py"
+    },
+    {
       "id": "derive_next_item",
       "kind": "function",
       "file": "tools/loop/position.py"
@@ -11545,6 +11555,11 @@
     {
       "id": "derive_row_pin",
       "kind": "function",
+      "file": "tools/loop/splice.py"
+    },
+    {
+      "id": "derive_row_pin",
+      "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
     },
     {
@@ -11976,6 +11991,21 @@
       "id": "derive_spec_unit",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "derive_splice_rows",
+      "kind": "function",
+      "file": "tools/loop/splice.py"
+    },
+    {
+      "id": "derive_spliced_table",
+      "kind": "function",
+      "file": "tools/loop/splice.py"
+    },
+    {
+      "id": "derive_stage_state",
+      "kind": "function",
+      "file": "tools/loop/splice.py"
     },
     {
       "id": "derive_stage_witnesses",
@@ -14791,6 +14821,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/loop/position.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/loop/splice.py"
     },
     {
       "id": "main",
@@ -21558,9 +21593,24 @@
       "file": "tools/playbook/pins.py"
     },
     {
+      "id": "read_splice_inputs",
+      "kind": "function",
+      "file": "tools/loop/splice.py"
+    },
+    {
+      "id": "read_split_row",
+      "kind": "function",
+      "file": "tools/loop/splice.py"
+    },
+    {
       "id": "read_sr_close",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_stage_members",
+      "kind": "function",
+      "file": "tools/loop/splice.py"
     },
     {
       "id": "read_stage_parts",
@@ -24313,6 +24363,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "render_stage_row",
+      "kind": "function",
+      "file": "tools/loop/splice.py"
+    },
+    {
       "id": "render_staged",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -26718,6 +26773,11 @@
       "file": "tools/roles/roles_lib.py"
     },
     {
+      "id": "resolve_stage_steps",
+      "kind": "function",
+      "file": "tools/loop/splice.py"
+    },
+    {
       "id": "resolve_stand_down",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -27455,6 +27515,11 @@
     {
       "id": "run_check",
       "kind": "function",
+      "file": "tools/loop/splice.py"
+    },
+    {
+      "id": "run_check",
+      "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
@@ -27783,6 +27848,11 @@
       "file": "tools/loop/loop_items.py"
     },
     {
+      "id": "run_factory_case",
+      "kind": "function",
+      "file": "tools/loop/splice.py"
+    },
+    {
       "id": "run_fan",
       "kind": "function",
       "file": "tools/workflows/check-verifier-fanout.test.sh"
@@ -27826,6 +27896,11 @@
       "id": "run_fixture",
       "kind": "function",
       "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
+      "file": "tools/loop/splice.py"
     },
     {
       "id": "run_fixture",
@@ -28635,6 +28710,11 @@
     {
       "id": "run_new",
       "kind": "function",
+      "file": "tools/loop/splice.py"
+    },
+    {
+      "id": "run_new",
+      "kind": "function",
       "file": "tools/playbook/core.py"
     },
     {
@@ -29213,6 +29293,11 @@
       "file": "tools/loop/loop_items.py"
     },
     {
+      "id": "run_scratch_splice",
+      "kind": "function",
+      "file": "tools/loop/splice.py"
+    },
+    {
       "id": "run_seed",
       "kind": "function",
       "file": "tools/playbook/positional.py"
@@ -29271,6 +29356,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/loop/position.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/loop/splice.py"
     },
     {
       "id": "run_selftest",
@@ -29431,6 +29521,11 @@
       "id": "run_spec_token_check",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "run_splice_check",
+      "kind": "function",
+      "file": "tools/loop/splice.py"
     },
     {
       "id": "run_sr",
@@ -35028,6 +35123,11 @@
       "file": "tools/unattended/check-unattended.test.sh"
     },
     {
+      "id": "write_overlay_rows",
+      "kind": "function",
+      "file": "tools/loop/splice.py"
+    },
+    {
       "id": "write_overlay_units",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
@@ -35631,6 +35731,11 @@
       "id": "write_sr_units",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_stage_plant",
+      "kind": "function",
+      "file": "tools/loop/splice.py"
     },
     {
       "id": "write_stage_plant",

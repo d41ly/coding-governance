@@ -99,11 +99,11 @@ no factory has landed; dConvergedCharter lands it, and until then the kind has n
 ```
 
 ## `kind.stage`
-<!-- usage: kind:kind.stage 405f4568 -->
-A stage of the loop a drive row names.
+<!-- usage: kind:kind.stage 7fdd6f5a -->
+A stage of the loop: one of gov's steps, or a repository's own spliced between two adjacent ones from its overlay.
 
 ```text
-no factory has landed; dDeclaredLoop lands it, and until then the kind has no member
+python <prefix>/playbook/core.py new stage <name> --after <step> --before <step> --actor <kind:name> --witness-by <text> --owner <build> [--input <layer:what> --allowance <text> --returns <record>]
 ```
 
 ## `kind.product-layer`

@@ -74,6 +74,11 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # gate, each found by `resolve_kit_dir` with no edge; a kit that does not resolve exits 2 naming it, never
 # a default. Both its legs, `loop command conformance` and `loop factories fixtures`, are gov's own
 # [[exempt_leg]] rows, no row here.
+# The stage kind (TOOL-dDeclaredLoop-25): splice.py composes the stage and item kinds through
+# loop_items.py's `read_composition`, so the playbook kit is reached as a subprocess with no edge; it reads
+# `instructions.exclude` through the policy kit by `read_policy_kit` and the change records and the pin
+# normaliser through the memory-tree kit under the edge above. `check` exits 2 `unarmed` where a kit does not
+# resolve, never a default, and its leg, `loop splice check`, is gov's own [[exempt_leg]], no row here.
 requires = ["memory-tree"]
 
 # Everything the kit ships is engine, overwritten on every update: the definition, its reader, the

@@ -491,6 +491,36 @@ python <prefix>/loop/loop_items.py --fixture --plant amended-cycle
 python <prefix>/playbook/core.py new item <name> --step <step> --actor <kind:name> --witness-by <text> --owner <build>
 ```
 
+## The stage kind
+
+A repository's own stage is spliced between two adjacent gov stages (TOOL-dDeclaredLoop-25): the kinds
+register's `kind.stage` row names `splice.py new` as its factory, `stage-schema.toml` beside this file as
+its row schema, owner seat 1, and the leg `loop splice check` as its gate. The stage is a `[[stage]]` row
+of the overlay tagged `step.adopter.<name>`, its `after` and `before` two adjacent gov steps A and B, its
+`pin` the pin of the build row R from A's state on A's exit into B's state, and its `exit` an overlay
+`[[item]]` tagged `item.adopter.<name>.<item>`, which the item schema's owner seats `[2, 1]` and
+`check_program`'s `stages` argument admit. `derive_splice_rows` splits R into R1, from A's state into
+`adopter-<name>`, and R2, from there on the stage's exit into B's state, each with R's outcome and
+witness; every other row stays as shipped, and gov's `loop.toml` is never edited.
+
+`check_splices` holds the frame: a stage naming a gov step tag a change record succeeds is re-pointed
+through its `Successor` first; then the tag, no excluded gov step, adjacency in order, one stage per
+pair, R held and pinned by `derive_row_pin`, the exit an item of the stage routing R's outcome to
+`transition`, each stage item witnessed, and `check_program` over the composed items. `check` composes
+both kinds at HEAD through `loop_items.read_composition` and reads `instructions.exclude` and the change
+records; `new` validates, derives both rows through `loop_items.derive_new_item_row`, grades them in
+memory and appends them to the overlay. Every plant but `factory` runs in memory over the definition.
+`read_stage_members` and `write_stage_plant` are the step gate's `stage` class: gov's `[[step]]` tags,
+witnessed by the change records, as the `item` class is. The move engine does not read the spliced table
+yet.
+
+```bash
+python <prefix>/loop/splice.py check
+python <prefix>/loop/splice.py check --selftest
+python <prefix>/loop/splice.py --fixture --plant two-splices
+python <prefix>/playbook/core.py new stage <name> --after <step> --before <step> --actor <kind:name> --witness-by <text> --owner <build>
+```
+
 ## The factories, `factories.py`
 
 Five more kinds of the register take their factory from `factories.py` (TOOL-dDeclaredLoop-6): the

@@ -140,8 +140,10 @@ def read_kind_schema(root, kind) -> dict:
         reds.append(f"{SAY}: red · {rel} · [kind] · the table is missing")
     elif head.get("name") != kind:
         reds.append(f"{SAY}: red · {rel} · [kind] name · {head.get('name')!r} is not the kind {kind}")
-    if isinstance(head, dict) and (type(seat) is not int or seat < 1):
-        reds.append(f"{SAY}: red · {rel} · [kind] owner-seat · {seat!r} is no positive integer")
+    seats = seat if isinstance(seat, list) and seat else [seat]
+    if isinstance(head, dict) and any(type(s) is not int or s < 1 for s in seats):
+        reds.append(f"{SAY}: red · {rel} · [kind] owner-seat · {seat!r} is no positive integer nor a non-empty "
+                    f"list of them")
     rows = doc.get("field") or []
     for i, f in enumerate(rows if isinstance(rows, list) else [rows], 1):
         name = f.get("name") if isinstance(f, dict) else None
@@ -194,18 +196,21 @@ def read_overlay_rows(root) -> dict:
 
 
 def check_row_owners(schema, rows) -> list:
-    """S2, the `owned` clause over the rows the composer holds: `adopter` at the schema's owner seat on an
-    overlay row and nowhere else. -> one red per row, naming `owned`, the tag and its file."""
+    """S2, the `owned` clause over the rows the composer holds: `adopter` at one of the schema's owner seats
+    on an overlay row and at none of them on any other, the seat an integer or a list of them
+    (TOOL-dDeclaredLoop-25). -> one red per row, naming `owned`, the tag and its file."""
     seat, reds = schema["owner-seat"], []
+    seats = seat if isinstance(seat, list) else [seat]
     for row in rows:
         tag = str(row.get("tag") or "")
         parts = tag.split(".")
-        held = parts[seat] if len(parts) > seat else None
+        held = any(len(parts) > s and parts[s] == ADOPTER for s in seats)
         mine = row.get("origin") == ov.ORIGIN
-        if mine and held != ADOPTER:
+        if mine and not held:
+            where = " or ".join(str(s) for s in seats)
             reds.append(f"{SAY}: red · owned · {tag} · {row.get('source')} · a repository row's tag holds no "
-                        f"`{ADOPTER}` at segment {seat} · remedy: tag it {parts[0]}.{ADOPTER}.<name>")
-        elif not mine and held == ADOPTER:
+                        f"`{ADOPTER}` at segment {where} · remedy: tag it {parts[0]}.{ADOPTER}.<name>")
+        elif not mine and held:
             reds.append(f"{SAY}: red · owned · {tag} · {row.get('source')} · gov's pack ships a tag holding the "
                         f"repository's `{ADOPTER}` seat")
     return reds

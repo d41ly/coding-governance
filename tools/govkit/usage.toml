@@ -98,6 +98,11 @@ class = "item"
 usage = "none"
 why = "an item is a definition row, used by no verb, key, hook, leg or page of its own (TOOL-dDeclaredLoop-24)"
 
+[[class]]
+class = "stage"
+usage = "none"
+why = "a gov stage is a definition row, used by no verb, key, hook, leg or page of its own; a repository's stage is written by the stage kind's factory, documented under its own script rows (TOOL-dDeclaredLoop-25)"
+
 [[usage]]
 id = "command:build"
 shape = "verb"
@@ -473,6 +478,26 @@ shape = "verb"
 entry = "{prefix}/loop/loop_items.py"
 verb = "new"
 flags = ["--step=", "--actor=", "--witness-by=", "--owner=", "--input=", "--allowance=", "--returns="]
+
+[[usage]]
+id = "script:{prefix}/loop/splice.py"
+shape = "verb"
+entry = "{prefix}/loop/splice.py"
+flags = ["--fixture", "--plant="]
+
+[[usage]]
+id = "script:{prefix}/loop/splice.py#check"
+shape = "verb"
+entry = "{prefix}/loop/splice.py"
+verb = "check"
+flags = ["--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/splice.py#new"
+shape = "verb"
+entry = "{prefix}/loop/splice.py"
+verb = "new"
+flags = ["--after=", "--before=", "--actor=", "--witness-by=", "--owner=", "--input=", "--allowance=", "--returns="]
 
 [[usage]]
 id = "script:{prefix}/loop/factories.py"

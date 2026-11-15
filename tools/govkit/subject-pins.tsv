@@ -90,6 +90,7 @@ loop computed witness	kit	selftests
 loop definition	repo	declarations
 loop factories fixtures	kit	selftests
 loop item kind	repo	selftests
+loop splice check	repo	selftests
 loop parent routes	kit	selftests
 loop transition record	repo	selftests
 loop guard fixtures	kit	selftests

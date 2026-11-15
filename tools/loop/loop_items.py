@@ -19,7 +19,9 @@ its `[[item]]` table: `check_program`, `check_witness_classes` and `check_item_d
 `loop_lib.py`; the schema's `[[fixed-row]]` set joined with each step's exit and the floor item
 `item.test.verdict`, both ways; the `[[record-version]]` rows against the memory-tree kit's record table;
 and each record input of a composed item joined to an item of its needs closure that returns that kind at
-that version. It prints `loop: items composed · <n> row(s) · <m> repository`, one `loop: patch <row> on
+that version. The stage kind is composed after the item kind answers, through the same verb, and
+`check_program` admits the items of each composed stage; a stage composition answering unarmed admits none
+(TOOL-dDeclaredLoop-25). It prints `loop: items composed · <n> row(s) · <m> repository`, one `loop: patch <row> on
 <tag> · <field> <op> · <class>` line per classified patch operation, one `loop: record-version <kind> · <n>
 · <hash>` line per version row, `loop: record inputs · <n> joined`, and each refusal as `loop: refused ·
 ...`. Exit 0 green, 1 a refusal, the composition's included, 2 unarmed: the playbook kit unresolved, the
@@ -181,8 +183,9 @@ def render_item_row(row):
 
 
 # ------------------------------------------------------------------------------------------ the check
-def read_composition(root):
-    """`(exit, payload, lines)` of the playbook kit's `overlay_rows.py compose --kind item` over `root`, run
+def read_composition(root, kind=KIND):
+    """`(exit, payload, lines)` of the playbook kit's `overlay_rows.py compose --kind <kind>` over `root`,
+    `kind` the item kind where none is given, run
     with the memory-tree kit's git leaks unset, so an inherited `GIT_DIR` never retargets the read: exit 0
     with the JSON payload, 1 with the refusal's lines, 2 with the unarmed lines."""
     try:
@@ -195,7 +198,7 @@ def read_composition(root):
     except (LookupError, ImportError) as e:
         return 2, None, [str(e)]
     try:
-        p = subprocess.run([sys.executable, str(script), "compose", "--kind", KIND], cwd=str(root),
+        p = subprocess.run([sys.executable, str(script), "compose", "--kind", kind], cwd=str(root),
                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=300, env=env)
     except subprocess.TimeoutExpired:
         return 2, None, ["%s compose did not return within 300 s" % script.as_posix()]
@@ -250,15 +253,16 @@ def check_record_versions(data, rows):
     return lines, refusals, versions
 
 
-def check_item_composition(data, where, rows, fixed, layers, roles, versions):
-    """`(lines, refusals)` of the composed `rows` held as `data`'s `[[item]]` table: `check_program`,
-    `check_witness_classes` and `check_item_declarations`; `fixed`, the schema's `[[fixed-row]]` tags, joined
+def check_item_composition(data, where, rows, fixed, layers, roles, versions, stages=()):
+    """`(lines, refusals)` of the composed `rows` held as `data`'s `[[item]]` table: `check_program`, which
+    admits the items of the composed repository `stages`, `check_witness_classes` and
+    `check_item_declarations`; `fixed`, the schema's `[[fixed-row]]` tags, joined
     both ways with each step's exit and the floor item; then each record input joined to an item of its
     needs closure returning that kind at that version, `versions` the pinned ones and 1 for any other."""
     held = dict(data, item=rows)
     refusals = []
     try:
-        check_program(held, where, layers)
+        check_program(held, where, layers, stages)
         check_witness_classes(held, where)
     except LoopError as e:
         refusals.append(str(e))
@@ -324,6 +328,12 @@ def run_check():
         SAY, len(rows), sum(1 for r in payload["rows"] if r.get("origin") == "repository")))
     for op in payload["operations"]:
         print("%s: patch %s on %s · %s %s · %s" % (SAY, op["row"], op["tag"], op["field"], op["op"], op["class"]))
+    code, staged, said = read_composition(root, "stage")
+    if code == 1:
+        for line in said:
+            print("%s: refused · %s" % (SAY, line))
+        return 1
+    stages = [r.get("tag") for r in staged["rows"]] if code == 0 else []
     try:
         layers = read_layer_tags(KIT)
     except LookupError:
@@ -335,7 +345,8 @@ def run_check():
     except (OSError, tomllib.TOMLDecodeError, LookupError, ImportError) as e:
         print("%s: items unarmed · %s" % (SAY, e))
         return 2
-    join_lines, more = check_item_composition(data, where, rows, fixed, layers, read_role_defaults(KIT), versions)
+    join_lines, more = check_item_composition(data, where, rows, fixed, layers, read_role_defaults(KIT), versions,
+                                              stages)
     for line in version_lines + join_lines:
         print(line)
     for r in more + refusals:
@@ -370,6 +381,26 @@ def write_item_row(row):
     return refusals
 
 
+def derive_new_item_row(tag, step, actor, witness_by, owner, routes, inputs=None, allowance=None, returns=None):
+    """The one row shape both factories write, this module's `new` and the stage factory's exit item
+    (TOOL-dDeclaredLoop-25): no needs, `routes` the outcomes and their targets, a `history` witness, and
+    `inputs`, `allowance` and `returns` for every actor but a `role:` one, which takes them from its role.
+    ValueError naming the flags where a non-role actor lacks one or a role actor is given one."""
+    role = actor.startswith("role:")
+    given = [f for f, v in (("--input", inputs), ("--allowance", allowance), ("--returns", returns)) if v]
+    if role and given:
+        raise ValueError("a %s actor takes %s from its role" % (actor, " and ".join(given)))
+    if not role and len(given) < 3:
+        raise ValueError("a %s actor owes %s" % (actor, " and ".join(
+            f for f in ("--input", "--allowance", "--returns") if f not in given)))
+    row = {"tag": tag, "step": step, "actor": actor, "needs": []}
+    if not role:
+        row.update(inputs=list(inputs), allowance=allowance, returns=returns)
+    row.update(outcomes=list(routes), witness={"class": "history", "by": witness_by}, owner=owner,
+               routes=dict(routes))
+    return row
+
+
 def run_new(argv):
     """The `new` verb: -> its exit."""
     import argparse
@@ -389,25 +420,19 @@ def run_new(argv):
         return 1
     steps = {s["tag"]: s for s in data["step"]}
     tag = "item.%s.%s" % (a.step.rpartition(".")[2], a.name)
-    role = a.actor.startswith("role:")
-    given = [f for f, v in (("--input", a.input), ("--allowance", a.allowance), ("--returns", a.returns)) if v]
     why = ("the name %r is not one tag segment of the shape %s" % (a.name, SEG.pattern)
            if not SEG.fullmatch(a.name) else "the name %s is the repository's seat, never a gov item's" % ADOPTER
            if a.name == ADOPTER else "the step %s is no gov step: %s" % (a.step, " ".join(STEP_TAGS))
            if a.step not in steps else "the definition declares %s already" % tag
-           if tag in {r.get("tag") for r in read_item_rows(data, where)}
-           else "a %s actor takes %s from its role" % (a.actor, " and ".join(given)) if role and given
-           else "a %s actor owes %s" % (a.actor, " and ".join(
-               f for f in ("--input", "--allowance", "--returns") if f not in given))
-           if not role and len(given) < 3 else None)
+           if tag in {r.get("tag") for r in read_item_rows(data, where)} else None)
+    try:
+        row = None if why else derive_new_item_row(tag, a.step, a.actor, a.witness_by, a.owner,
+                                                   {"done": steps[a.step]["exit"]}, a.input, a.allowance, a.returns)
+    except ValueError as e:
+        why = str(e)
     if why:
         print("%s: refused · new %s · %s" % (SAY, tag, why))
         return 2
-    row = {"tag": tag, "step": a.step, "actor": a.actor, "needs": []}
-    if not role:
-        row.update(inputs=a.input, allowance=a.allowance, returns=a.returns)
-    row.update(outcomes=["done"], witness={"class": "history", "by": a.witness_by}, owner=a.owner,
-               routes={"done": steps[a.step]["exit"]})
     refusals = write_item_row(row)
     for r in refusals:
         print("%s: refused · new %s · %s" % (SAY, tag, r))
@@ -500,12 +525,13 @@ def run_render_probe(top, mode):
     return p.returncode, lines[-1] if lines else "no output"
 
 
-def run_factory(top):
-    """`(exit, last line)` of the register's factory verb, `core.py new item demo ...`, in the scratch `top`."""
+def run_factory(top, argv=FACTORY_ARGV):
+    """`(exit, last line)` of the register's factory verb in the scratch `top`, `core.py <argv>`, the item
+    kind's `new item demo ...` where no argv is given."""
     from loop_witness import read_clean_env
     core = top / pathlib.Path(derive_definition_rel()).parent.parent / resolve_kit_dir(
         "playbook", "core.py", KIT).name / "core.py"
-    p = subprocess.run([sys.executable, str(core), *FACTORY_ARGV], cwd=str(top), capture_output=True, text=True,
+    p = subprocess.run([sys.executable, str(core), *argv], cwd=str(top), capture_output=True, text=True,
                        encoding="utf-8", errors="replace", env=read_clean_env(PYTHONIOENCODING="utf-8"), timeout=300)
     said = [ln for ln in (p.stdout + p.stderr).splitlines() if ln.strip()]
     return p.returncode, said[-1] if said else "no output"

@@ -713,6 +713,99 @@ compares each row with the record table and reads no earlier revision, so that e
 see. A role item's record kind comes from its role and is not joined. The step gate's `item` class
 grades a gov item that disappears between a landing's base and its tip, as it does any member.
 
+## Adding a stage of your own
+
+Your repository may add a stage of its own between two adjacent gov stages, a security review between
+Test and Deploy, say. Gov's five stages stay whole and in order: a stage of yours can neither remove,
+reorder nor replace one. Stages are a registered kind: the kinds register's `kind.stage` row names a
+factory, a row schema, `tools/loop/stage-schema.toml`, and a gate, so your stage is a `[[stage]]` table of
+your overlay, `.governance/instructions.toml`, tagged step.adopter.<name>, with its exit item an
+`[[item]]` tagged item.adopter.<name>.<item>:
+
+```toml
+[[stage]]
+tag = "step.adopter.security-review"
+after = "step.test"
+before = "step.deploy"
+pin = "3f1c9a20"
+exit = "item.adopter.security-review.exit"
+
+[[item]]
+tag = "item.adopter.security-review.exit"
+step = "step.adopter.security-review"
+actor = "command:security-review"
+needs = []
+inputs = ["layer.flow:the verified tree"]
+allowance = "the review record"
+returns = "record-kind.security-review"
+outcomes = ["recorded"]
+witness = { class = "history", by = "the review record" }
+owner = "your-build"
+routes = { recorded = "transition" }
+```
+
+**What the splice does.** The build's transition table moves from Test to Deploy on one row: from
+`testing`, on `item.test.exit` and `recorded`, into `deploying`. Your stage splits that row in two:
+from `testing` into your stage's state, `adopter-security-review`, and from that state on your exit item
+into `deploying`, each with the split row's witness. The state is derived from the tag; you never type
+it. `pin` is the split row's eight-hex pin, so a gov update that changes that row turns your stage stale,
+and `check` refuses it until you re-pin. Every other row stays as gov ships it, so a route back from
+Deploy to an earlier gov stage passes over yours.
+
+**What is refused**, each naming the stage, the rule and the tag:
+
+- a tag that is not step.adopter.<name>, one name of its own, or whose name is a gov step's;
+- a gov stage in `instructions.exclude`;
+- an `after` and `before` that are not two gov stages next to each other in order, so a stage before
+  Plan, after Deploy, or between two stages that are not neighbours;
+- a second stage between the same two gov stages;
+- a `pin` that is not the split row's;
+- an `exit` that is no item of your stage routing the split row's outcome to `transition`;
+- an item of your stage with no witness, and an item.adopter.<name>.<item> of no stage you declare.
+
+A gov stage gov renames beside your stage leaves a change record naming its successor; `check` follows
+it and prints one line naming your stage, the old tag and the new, so your stage keeps its place. The
+boundaries your stage creates, the gov exit item before it and your exit item, are item tags
+review.breakpoints may name as it names any other.
+
+- **Check your stages:** `python tools/loop/splice.py check` composes your repository's stages and <!-- usage: script:tools/loop/splice.py#check db341368 -->
+  items at your last commit and prints `loop: splices composed · <n> splice(s)`, one line per re-point
+  and per derived row, and each refusal. It exits 0 green, 1 on a refusal, and 2, `unarmed`, where the
+  playbook, policy or memory-tree kit is not installed. `check --selftest` runs `check` and every case
+  below. Gov's own `loop splice check` gate runs it; an install does not carry that gate, since the
+  check reaches kits the loop kit does not require.
+
+- **Add a stage:** `new` writes your stage and its exit item to your overlay, the pin derived from the <!-- usage: script:tools/loop/splice.py#new ac81e02f -->
+  split row, `python tools/loop/splice.py new <name> --after <step> --before <step> --actor <actor> --witness-by <text> --owner <build>`, with `--input`, `--allowance` and `--returns` owed by every actor but a
+  `role:` one. A name that is not one tag segment, is `adopter` or is a gov step's, two gov stages that
+  are not neighbours, a pair your last commit already splices and a missing flag each exit 2 before any
+  write. It grades both rows before writing and exits 1, writing nothing, when they are refused. The
+  kinds register runs it as the stage kind's factory:
+
+  ```text
+  python <prefix>/playbook/core.py new stage <name> --after <step> --before <step> --actor <kind:name> --witness-by <text> --owner <build> [--input <layer:what> --allowance <text> --returns <record>]
+  ```
+
+- **See a refusal:** `--fixture --plant <case>` runs `check` with one plant made in memory over gov's <!-- usage: script:tools/loop/splice.py 3e214874 -->
+  definition, and prints its output and exit. The cases: `between-test-deploy`, `removes`, `reorders`,
+  `replaces`, `before-plan`, `after-deploy`, `non-adjacent`, `two-splices`, `gov-rename` (a stage naming
+  a renamed gov stage, re-pointed through its change record), `stale-pin`, `exit-elsewhere`,
+  `exit-unwitnessed`, `orphan-item`, and `factory`, which adds a stage in a scratch repository, checks
+  it, and adds it again to see the second refused.
+
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
+  ```bash
+  python tools/loop/splice.py check
+  python tools/loop/splice.py --fixture --plant non-adjacent
+  python tools/loop/splice.py new security-review --after step.test --before step.deploy --actor command:security-review --input "layer.flow:the verified tree" --allowance "the review record" --returns record-kind.security-review --witness-by "the review record" --owner your-build
+  ```
+
+`check` does not move a build into your stage yet: the position engine and the transition record read
+gov's table as shipped, so the derived rows are checked here and nothing moves on them. It does not
+check that your stage's actor exists or its witness holds, nor where breakpoints sit. The step gate's
+`stage` class grades a gov stage tag that disappears between a landing's base and its tip, so a gov
+rename always leaves the record your stage follows; a stage tag of yours that disappears is not graded.
+
 ## Making a new part
 
 Five kinds of the kinds register have a factory in this kit: a command, a policy key, a hook, a role

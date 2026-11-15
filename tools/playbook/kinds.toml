@@ -135,11 +135,12 @@ usage = "no factory has landed; dConvergedCharter lands it, and until then the k
 tag = "kind.stage"
 owner = "dDeclaredLoop"
 binds = ["principle.p16"]
-population = ""
-factory = ""
-gate = ""
-summary = "A stage of the loop a drive row names."
-usage = "no factory has landed; dDeclaredLoop lands it, and until then the kind has no member"
+population = "{prefix}/loop/loop.toml"
+factory = "python {prefix}/loop/splice.py new"
+gate = "loop splice check"
+schema = "{prefix}/loop/stage-schema.toml"
+summary = "A stage of the loop: one of gov's steps, or a repository's own spliced between two adjacent ones from its overlay."
+usage = "python {prefix}/playbook/core.py new stage <name> --after <step> --before <step> --actor <kind:name> --witness-by <text> --owner <build> [--input <layer:what> --allowance <text> --returns <record>]"
 
 [[kind]]
 tag = "kind.product-layer"

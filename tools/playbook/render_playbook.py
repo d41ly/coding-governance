@@ -88,8 +88,8 @@ catalogue nor the key.
 THE DRIVE LINES (PLAY-dOrderedCharter-6). A template's `{{DRIVE}}` line expands, before the placeholder set
 is collected, to `render_drive_line` per `[[drive]]` row of the selected kits' descriptors, in
 `read_drive_rows` order: `start` rows first, then the order the loop definition, the loop kit's `loop.toml`,
-gives the workflow the row names (TOOL-dDeclaredLoop-1), then kit and row order; with no loop kit, kit and row
-order alone. A selection with no row drops the section, heading and region. A selected
+gives the workflow the row names (TOOL-dDeclaredLoop-1), then kit and row order; with no loop kit, or a loop
+definition that does not read, kit and row order alone (TOOL-dDeclaredLoop-25). A selection with no row drops the section, heading and region. A selected
 kit whose descriptor is found neither beside this engine nor at the registry's path refuses the render.
 
 THE RE-FOUNDED CHARTER (PLAY-dOrderedCharter-2). Four more lines expand before the placeholder set is
@@ -1643,7 +1643,8 @@ def read_drive_rows(engine_dir: Path, kits: list[str]) -> list[dict]:
     """Every `[[drive]]` row of the selected `kits`, each with its `kit` and its 1-based `row` there, in render order: `start` rows
     first, then by the order the loop definition gives the workflow the row names, read through the loop kit's
     reader (TOOL-dDeclaredLoop-1), then kit order and row order. A stage no workflow names sorts last. With no
-    loop kit every row keeps kit and row order; a loop definition that does not read refuses, naming it. A selected
+    loop kit every row keeps kit and row order, and so with a loop definition that does not read, whose guard is
+    the `loop definition` leg, never this render (TOOL-dDeclaredLoop-25). A selected
     kit whose descriptor no place holds refuses, naming the kit. A kit id
     that left the registry with a `[[retired]]` row reads as its successor (PLAY-dOrderedCharter-31 S10)."""
     reg = tomllib.loads(read_input(resolve_declaration_paths(engine_dir, engine_dir)[1], 'the govkit registry'))
@@ -1663,10 +1664,8 @@ def read_drive_rows(engine_dir: Path, kits: list[str]) -> list[dict]:
     try:
         loop_lib, loop_kit = load_loop_kit(engine_dir)
         stages = loop_lib.read_workflow_order(loop_kit)
-    except LookupError:
+    except (LookupError, ValueError):   # no loop kit, or the reader's LoopError (TOOL-dDeclaredLoop-25 F10)
         stages = {}
-    except ValueError as e:     # the reader's LoopError
-        raise Refusal(f'the drive section sorts by the loop definition, which does not read: {e}') from None
     last = max(stages.values(), default=0) + 1
     return sorted(rows, key=lambda r: (r.get('stage') != DRIVE_START, stages.get(r.get('stage'), last)))
 

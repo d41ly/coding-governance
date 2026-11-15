@@ -2148,6 +2148,20 @@
     "stage": ["step.test"]
   },
   {
+    "name": "loop splice check",
+    "argv": [
+      "python",
+      "{prefix}/loop/splice.py",
+      "check",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "repo",
+    "ceiling": 300,
+    "enforces": ["principle.p16", "principle.p20"],
+    "stage": ["step.test"]
+  },
+  {
     "name": "loop parent routes",
     "argv": [
       "python",

@@ -224,6 +224,5 @@ kind	kind.tool-kit	dShippedRelease
 kind	kind.preset	dKeptSession
 kind	kind.gate-leg	dWitnessedBar
 kind	kind.record-kind	dConvergedCharter
-kind	kind.stage	dDeclaredLoop
 kind	kind.lens	dCalibratedLens
 kind	kind.scenario	dDeclaredLoop

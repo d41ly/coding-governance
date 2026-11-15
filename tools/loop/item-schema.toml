@@ -3,8 +3,9 @@
 # Read by the playbook kit's overlay_rows.py through the kinds register's `kind.item` row, and by
 # loop_items.py beside this file, which joins the `[[fixed-row]]` set with the definition's step exits.
 #
-# [kind]: `name`, the kind, and `owner-seat`, the tag segment a repository row holds `adopter` at, so a
-# repository item is tagged item.<step>.adopter.<name>.
+# [kind]: `name`, the kind, and `owner-seat`, the tag segments a repository row may hold `adopter` at, so a
+# repository item is tagged item.<step>.adopter.<name>, seat 2, or item.adopter.<stage>.<name>, seat 1, an
+# item of the repository's own stage step.adopter.<stage> (TOOL-dDeclaredLoop-25).
 #
 # One [[field]] row per key of a gov item but `tag`, which is no field: a `supersedes` composes at gov's
 # tag and an `amends` carries no tag of its own, so a gov item's tag never changes. A field is open when
@@ -20,7 +21,7 @@
 
 [kind]
 name = "item"
-owner-seat = 2
+owner-seat = [2, 1]
 
 [[field]]
 name = "step"
