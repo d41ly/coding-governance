@@ -357,6 +357,11 @@ Cite ids, never line numbers.
 | [TOOL-aTracedSpawn-3](../builds/aTracedSpawn/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THE SHARD-2 FAILURE COUNT AFTER THE FIXTURE-HEADING FIX IS UNMEASURED,… |
 | [TOOL-aTrimmedHook-8](../builds/aTrimmedHook/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | after this build a one-file RUN.md commit's .githooks/pre-commit still… |
 | [TOOL-aTrimmedHook-17](../builds/aTrimmedHook/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite process-monitor census selftest red at 37200355 on the… |
+| [TOOL-aTwinnedPass-6](../builds/aTwinnedPass/BACKLOG.md) | OPEN | MED | — | 2026-11-15 | THE CLOSING REVIEW'S ROUND 2, BATCHED. Five MEDIUM and three LOW items,… |
+| [TOOL-aTwinnedPass-7](../builds/aTwinnedPass/BACKLOG.md) | OPEN | MED | — | 2026-11-15 | THE ROUND-1 LEFT-SHIFT GATES ARE UNBUILT. The closing review's round 1… |
+| [TOOL-aTwinnedPass-8](../builds/aTwinnedPass/BACKLOG.md) | OPEN | LOW | — | 2026-11-15 | THREE COPIES OF ONE QUESTION. check_generated_output in… |
+| [TOOL-aTwinnedPass-9](../builds/aTwinnedPass/BACKLOG.md) | OPEN | LOW | — | 2026-11-15 | M6 CONDITION (1) STILL SAYS THE WRITE SETS DO NOT INTERSECT. After… |
+| [TOOL-aTwinnedPass-10](../builds/aTwinnedPass/BACKLOG.md) | OPEN | LOW | — | 2026-11-15 | THE COMMIT-MSG CHECK IS SILENT IN A PASS WORKTREE. check_commit_message… |
 | [TOOL-aUnblockedFleet-9](../builds/aUnblockedFleet/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-31 | FIVE ACCEPTANCE CRITERIA OF TOOL-aUnblockedFleet-2 ARE WRITTEN,… |
 | [TOOL-aUnmannedHelm-2](../builds/aUnmannedHelm/BACKLOG.md) | OPEN | — | — | 2026-08-10 | the ledger_dir in tools/drift-audit/drift_report.py points at an… |
 | [TOOL-aUnmannedHelm-10](../builds/aUnmannedHelm/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | three root docs (AGENTS.md, WIRE-INTO-PROJECT.md, .gitattributes) come… |
