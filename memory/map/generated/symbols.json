@@ -20763,6 +20763,11 @@
       "file": "tools/govkit/shims.py"
     },
     {
+      "id": "read_remerge_policy",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
+    },
+    {
       "id": "read_remote_ci_runs",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"

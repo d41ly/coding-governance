@@ -292,9 +292,12 @@ policy file must carry one `Gov-Policy:` trailer line per changed key and add a 
 the key's row. One that does not is refused as `policy-unrecorded`, naming the commit and the key. A
 commit that adds the policy file, as an adopter's scaffold does, is printed and not graded. Merges are
 graded too, on git's combined diff: a merge that takes one side's policy file whole owes nothing, since
-that side's own commits are graded in the same push, but a merge whose resolution changes a key owes
-the trailer and the change record itself, its keys read against its first parent, and is refused as
-the merge's own change when it lacks them. With no python launcher or no loop kit, the hook prints one
+that side's own commits are graded in the same push, but a merge owes the trailer and the change
+record itself for each key its result sets to a value no parent and no clean re-merge of its parents
+holds, the trailer's old value the first parent's, and is refused as the merge's own change when it
+lacks them. A clean merge of two sides' different keys therefore owes nothing. An octopus merge, or a
+merge whose re-merge conflicts or cannot be read, is graded against its parents alone, with one line
+saying so. With no python launcher or no loop kit, the hook prints one
 line saying the check did not run.
 
 **The floor.** Four invariants hold whatever else the file says, each switched by a member of the

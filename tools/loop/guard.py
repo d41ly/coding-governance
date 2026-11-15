@@ -35,8 +35,10 @@ parent holds the policy file and whose own blob of it differs is graded leaf by 
 leaf owes one trailer line `Gov-Policy: policy.<key> <old> -> <new>`, the key spelled by
 `render_dotted` and each value compact JSON, `none` for a leaf the file did not set; and the commit
 adds a change record naming the leaf's row tag. A merge is graded only where git's combined diff,
-`diff-tree --cc`, lists the file, a blob differing from every parent's: its keys read against its
-first parent, it owes the same trailers, and its records are the change records that same list holds
+`diff-tree --cc`, lists the file, a blob differing from every parent's: it owes only for a key its
+result sets to a value no parent and no clean re-merge holds (TOOL-dDeclaredLoop-59), the re-merge
+`merge-tree --write-tree` of its two parents read by `read_remerge_policy`; each such key owes the
+same trailer, its old value the first parent's, and a change record among those the same list holds
 at the merge. A merge taking one side's file whole owes nothing, that side's commits being graded in
 the range. A commit or merge whose first parent lacks the file is printed and not graded. An all-zero
 base, a new ref, reads as the policy kit's `derive_landed_revision`, its Refusal an exit 2. Exit 1
@@ -63,7 +65,11 @@ WHAT THIS DOES NOT CHECK: a change to the list file alone, which stages no liste
 pre-commit block never calls the verdict; a run's own switch of the floor, which only its change record
 and the push arm witness; a pty wrapper giving an agent a terminal (SA-1), `git commit --no-verify` and
 `git push --no-verify`; that a change record's argument is true; and a commit adding the policy file,
-which the push arm skips (§8 F11) and the verdict refuses off a live run's branch.
+which the push arm skips (§8 F11) and the verdict refuses off a live run's branch. A merge whose
+clean re-merge is not read, an octopus, a conflicting re-merge, a re-merge whose policy file does not
+parse or any other exit of `merge-tree`, is graded against its parents only, one line naming it and
+why: a value git's clean merge would have produced, a multi-line one both sides edited, is owed
+there too, so that grade is stricter than the clean leg's, never looser.
 """
 import argparse
 import json
@@ -309,6 +315,22 @@ def read_added_units(sha, rels=None):
     return units
 
 
+def read_remerge_policy(parents):
+    """The policy file of git's clean re-merge of the two `parents`, `merge-tree --write-tree`, parsed, {}
+    where its tree lacks the file -> `(table, None)`; `(None, why)` where that leg is not read: an octopus
+    merge, a conflicting re-merge, a file that does not parse there, or any other exit of merge-tree."""
+    _policy, mguard = read_policy_modules()
+    if len(parents) != 2:
+        return None, "an octopus merge of %d parents" % len(parents)
+    rc, out = read_git(".", "merge-tree", "--write-tree", *parents)
+    if rc == 1:
+        return None, "its re-merge conflicts, merge-tree exit 1"
+    if rc or not out:
+        return None, "merge-tree --write-tree exited %d" % rc
+    table = parse_policy_bytes(read_policy_blob(out.splitlines()[0], mguard.POLICY))
+    return (None, "its re-merge's %s does not parse" % mguard.POLICY) if table is None else (table, None)
+
+
 def check_push_range(base, tip):
     """The push arm over `<base>..<tip>` -> its exit: 0 clean, reported or unarmed, 1 a commit refused, 2 not
     judged. A tree holding no policy kit or no memory-tree kit has no guarded policy file to grade: one
@@ -347,12 +369,24 @@ def check_push_range(base, tip):
                 continue
             graded += 1
             a, b = parse_policy_bytes(old), parse_policy_bytes(new)
-            if a is None or b is None:
+            # TOOL-dDeclaredLoop-59: a merge owes only a leaf its result sets to a value no parent and no
+            # clean re-merge holds; a parent past the first lacking the file reads as {}.
+            refs = [a] + [parse_policy_bytes(read_policy_blob(p, mguard.POLICY)) for p in c["parents"][1:]]
+            if b is None or None in refs:
                 findings.append("%s %s · %s does not parse on one side, so its changed keys are unknown" % (
                     kind, sha8, mguard.POLICY))
                 continue
+            if kind == "merge":
+                clean, why = read_remerge_policy(c["parents"])
+                if why:
+                    print("%s: push · %s graded against its parents only — %s" % (SAY, sha8, why))
+                else:
+                    refs.append(clean)
+            owed = set.intersection(*(set(mguard.derive_leaf_changes(r, b)) for r in refs))
             said, units = set(c["trailers"][TRAILER_KEY]), read_added_units(c["sha"], listed)
             for key, (o, n) in sorted(mguard.derive_leaf_changes(a, b).items()):
+                if key not in owed:
+                    continue
                 want, tag = render_policy_trailer(policy, key, o, n), derive_row_tag(policy, key)
                 if want not in said:
                     findings.append("%s %s · %s · %s changed with no `%s: %s` trailer%s" % (
@@ -398,6 +432,9 @@ PLANTS = {
     "push-no-trailer": "a commit changing the policy file with no Gov-Policy: line, graded by --push-range",
     "push-merge-carries-trailered": "a --no-ff merge taking a side's trailered, recorded policy change whole",
     "push-merge-resolution-edit": "a merge resolution setting review.max-rounds, with trailer and record, then neither",
+    "push-merge-both-sides-clean": "a clean --no-ff merge of side's cap raise and main's review.max-rounds",
+    "push-merge-conflict-pick": "a conflicting review.max-rounds resolved to side's value, the merge untrailered",
+    "push-merge-octopus": "an octopus merge of b1 and b2, each branch and main setting a different key",
     "push-new-branch": "an all-zero base read as origin's default tip, then that tracking ref deleted",
     "proof-signed-refuse": "policy_edit.py set policy-file.proof signed under refuse",
     "proof-signed-fallback": "policy_edit.py set policy-file.proof signed under fallback-reported",
@@ -453,18 +490,19 @@ def write_staged(top, files):
         run_fixture_git(top, "add", "--", rel)
 
 
-def write_fixture_record(top, tag):
-    """One change record naming `tag`, written through the memory-tree kit's door and staged."""
+def write_fixture_record(top, tag, build=FX_BUILD):
+    """One change record naming `tag` under the build `build`, written through the memory-tree kit's door
+    and staged."""
     read_memory_tree("build_records.py")
     import build_records
-    rel = build_records.write_change(str(top), FX_BUILD, FX_UNIT, tag, "edit", "semantic", "none", "none",
+    rel = build_records.write_change(str(top), build, FX_UNIT, tag, "edit", "semantic", "none", "none",
                                      "none — fixture")
     run_fixture_git(top, "add", "--", rel)
 
 
 def run_guard_plant(case, top):
     """The scenarios of `case` over the scratch at `top`: `[(scenario, exit, owed, needle, output)]`."""
-    _policy, mguard = read_policy_modules()
+    policy, mguard = read_policy_modules()
     me, out = [sys.executable, str(pathlib.Path(__file__).absolute())], []
     edit = [sys.executable, str(KIT / "policy_edit.py")]
     who = ["--build", FX_BUILD, "--unit", FX_UNIT]
@@ -563,6 +601,64 @@ def run_guard_plant(case, top):
                 run_scenario(name, me + ["--push-range", "%s..HEAD" % base], 0 if recorded else 1,
                              clean if recorded else "merge %s · %s · review.max-rounds" % (sha8, mguard.POLICY))
                 run_fixture_git(top, "reset", "-q", "--hard", "HEAD~1")
+    elif case in ("push-merge-both-sides-clean", "push-merge-conflict-pick", "push-merge-octopus"):
+        # TOOL-dDeclaredLoop-59: three keys in separate tables, unchanged lines between, so git merges an
+        # edit of each cleanly; every non-merge commit carries its trailer and its change record, each
+        # branch's records under a build of its own, since a build numbers its records and two branches
+        # adding the same name would conflict.
+        pad = "\n# fx: an unchanged line\n# fx: another\n\n"
+        write_staged(top, {mguard.POLICY: add_text(pad + '[review]\nmax-rounds = 3\n' + pad +
+                                                   '[review.design]\nrounds = "one"\n')})
+        write_staged(top, {"memory/builds/%s/README.md" % b: add_text("# %s\n" % b) for b in ("tSide", "tB1", "tB2")})
+        run_fixture_git(top, "commit", "-q", "-m", "the three tables")
+        base = run_fixture_git(top, "rev-parse", "HEAD")
+        cap = (("budgets", FX_CAP), '"%s" = 100\n' % FX_CAP, '"%s" = 120\n' % FX_CAP, 100, 120)
+        design = (("review", "design", "rounds"), 'rounds = "one"\n', 'rounds = "until-clean"\n', "one", "until-clean")
+
+        def derive_rounds(value):
+            return ("review", "max-rounds"), "max-rounds = 3\n", "max-rounds = %d\n" % value, 3, value
+
+        def write_key_commit(build, key, was_line, now_line, was, now):
+            write_staged(top, {mguard.POLICY: lambda t: t.replace(was_line, now_line)})
+            write_fixture_record(top, derive_row_tag(policy, key), build)
+            run_fixture_git(top, "commit", "-q", "-m", "%s set" % policy.render_dotted(key),
+                            "-m", "%s: %s" % (TRAILER_KEY, render_policy_trailer(policy, key, was, now)))
+
+        if case == "push-merge-both-sides-clean":
+            run_fixture_git(top, "checkout", "-q", "-b", "side")
+            write_key_commit("tSide", *cap)
+            run_fixture_git(top, "checkout", "-q", "main")
+            write_key_commit(FX_BUILD, *derive_rounds(5))
+            run_fixture_git(top, "merge", "-q", "--no-ff", "-m", "merge side", "side")
+            run_scenario("graded", me + ["--push-range", "%s..HEAD" % base], 0,
+                         "3 changing %s · 0 finding(s)" % mguard.POLICY)
+        elif case == "push-merge-conflict-pick":
+            run_fixture_git(top, "checkout", "-q", "-b", "side")
+            write_key_commit("tSide", *derive_rounds(4))
+            run_fixture_git(top, "checkout", "-q", "main")
+            write_key_commit(FX_BUILD, *cap)
+            write_key_commit(FX_BUILD, *derive_rounds(5))
+            mine = run_fixture_git(top, "show", "HEAD:%s" % mguard.POLICY) + "\n"
+            rc, _out = read_git(top, "merge", "--no-ff", "--no-commit", "side")
+            if rc != 1:
+                raise OSError("the conflict pick's merge exited %d, not 1" % rc)
+            write_fixture_files(top, {mguard.POLICY: mine.replace("max-rounds = 5\n", "max-rounds = 4\n")})
+            run_fixture_git(top, "add", "--", mguard.POLICY)
+            run_fixture_git(top, "commit", "-q", "-m", "merge side")
+            sha8 = run_fixture_git(top, "rev-parse", "--short=8", "HEAD")
+            run_scenario("graded", me + ["--push-range", "%s..HEAD" % base], 0,
+                         "%s graded against its parents only" % sha8)
+        else:
+            run_fixture_git(top, "checkout", "-q", "-b", "b1")
+            write_key_commit("tB1", *derive_rounds(4))
+            run_fixture_git(top, "checkout", "-q", "-b", "b2", "main")
+            write_key_commit("tB2", *design)
+            run_fixture_git(top, "checkout", "-q", "main")
+            write_key_commit(FX_BUILD, *cap)
+            run_fixture_git(top, "merge", "-q", "--no-ff", "-m", "octopus", "b1", "b2")
+            sha8 = run_fixture_git(top, "rev-parse", "--short=8", "HEAD")
+            run_scenario("graded", me + ["--push-range", "%s..HEAD" % base], 0,
+                         "%s graded against its parents only" % sha8)
     elif case == "push-new-branch":
         write_staged(top, {mguard.POLICY: add_text(FX_REVIEW)})
         run_fixture_git(top, "commit", "-q", "-m", "review rounds raised, no trailer")
