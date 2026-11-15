@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-15-prompt-TOOL-aPiecewiseGrade-1-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-1-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aPiecewiseGrade-1-brief.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-1-brief.md) | research | TOOL-aPiecewiseGrade-2 |
+| [2026-11-15-prompt-TOOL-aPiecewiseGrade-3-forks-brief.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-3-forks-brief.md) | research | TOOL-aPiecewiseGrade-3 TOOL-aPiecewiseGrade-2 |
 
 <!-- /gen:spec-records -->
 
