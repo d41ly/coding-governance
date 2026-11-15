@@ -93,7 +93,7 @@ As the code stands at `d9f84ee14`, the joins are 40% of the run and the per-spec
 resolves two paths through `Path.resolve`, at `tools/check-spec-tokens.py@6763260c:1097` and
 `tools/check-spec-tokens.py@6763260c:1099`, about 1.4 ms per call on Windows (PINNED d9f84ee14).
 
-TOOL-aPiecewiseGrade-3 binds that function once per process, at order 1, and so removes about 98 s,
+TOOL-aPiecewiseGrade-3 binds that function once per process, at order 1, and so removes about 98 s (PINNED d9f84ee14),
 DERIVED from d9f84ee14's table, from every caller: `--dispatch`, the bar's leg and `--spec` alike.
 The plain run then takes about 69 s, of which the joins are about 96%, both DERIVED from d9f84ee14's
 table. The per-spec grading this unit caches is about 1 s of that (PINNED d9f84ee14). So on the tree
@@ -549,7 +549,7 @@ The seams this unit extends: aLightenedLoop's tracer, `arm_input_trace` with `ad
 the audit hook (`tools/check-spec-tokens.py@6763260c:341`), opened per spec as a segment rather than
 once per run; and its replay, `derive_input_digest` (`tools/check-spec-tokens.py@6763260c:417`),
 given a membership kind and called per spec. Its `--spec` walk is not the seam: it grades named
-specs whatever their status and skips three joins, as TOOL-aLightenedLoop-3 §4 records. The per-spec
+specs whatever their status and skips three joins, as section 4 of TOOL-aLightenedLoop-3 records. The per-spec
 loop of `main` is the seam, extracted. `tools/codebase-map/reuse_lookup.py` for "cache each spec's
 grading on the inputs it read and re-grade only the specs whose inputs moved" ranked generic name
 stems only (`read_text`, `read`, `read_bytes`, `read_spec_revisions`), and no caching seam fits

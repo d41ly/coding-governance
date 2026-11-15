@@ -31,5 +31,5 @@ Owed to the main loop at the close. These were written and not run:
 - The new arm in `tools/check-spec-tokens.test.sh`, `memo guards hit`, covers AC2. It must be seen RED
   with the decorator removed and GREEN once the decorator is restored.
 - `FLOOR_ASSERTIONS` was raised 259 -> 260 by reading. The close confirms the executed count.
-- The §7 legs, among them the suite's TOOL-dTrueNorth-31 AC11 namesake arm, which this change must
+- The legs section 7 names, among them the suite's TOOL-dTrueNorth-31 AC11 namesake arm, which this change must
   leave green.

@@ -240,7 +240,7 @@ close confirms from a real run.
   only the driver writes. Unit 1's per-spec replay runs no process. A forged generation can hide
   findings from a dispatch only, and the bar's plain run still grades them.
 - perf / scale — DERIVED from TOOL-aPiecewiseGrade-1's table, PINNED d9f84ee14: on the tree after
-  TOOL-aPiecewiseGrade-3, a pass commit's dispatch on node `a` saves about 1 s of a checker run near
+  TOOL-aPiecewiseGrade-3, a pass commit's dispatch on node `a` saves about 1 s (DERIVED d9f84ee14) of a checker run near
   69 s (d9f84ee14). AC6 measures the real figure.
 - error / empty / loading states — no sidecar root turns the mode off. A missing or half-promoted
   directory reads as misses. A failed promotion prints nothing.
