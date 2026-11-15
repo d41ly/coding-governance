@@ -2427,7 +2427,7 @@ printf '# dAlpha - run state\n\nphase: BUILDING\n' > "$pd/memory/builds/dAlpha/R
 mkdir -p "$pd/memory/builds/dGamma/prompts"; printf '# packet\n' > "$pd/memory/builds/dGamma/prompts/2026-10-22-prompt-PLAY-dClosedLoop-1-packet.md"
 printf '# dGamma - run state\n\nphase: BUILDING\n' > "$pd/memory/builds/dGamma/RUN.md"; check_grade_step isfile isfile "step isfile moved 1 same 1"
 printf 'one\ntwo\n' > "$pd/${PFX}cited.txt"; check_grade_step cited cited "step cited moved 1 same 1"
-printf '\n\ndef read_spec_writes(text, *a, **kw):\n    return None\n' >> "$pd/${PFX}memory-tree/design_lib.py"; check_grade_step kit - "step kit moved 1 same 1"
+printf '\n\ndef read_spec_writes(text, *a, **kw):\n    return None\n' >> "$pd/${PFX}${MEMORY_TREE_DIR##*/}/design_lib.py"; check_grade_step kit - "step kit moved 1 same 1"
 sed -i 's/^SPEC_DIRECT_CUTOFF=.*/SPEC_DIRECT_CUTOFF="2026-09-04"/' "$pd/.memory-tree.conf"; check_grade_step cutoff - "step cutoff moved 1 same 1"
 printf '\nMore prose.\n' >> "$pd/$pg_a"; check_grade_step onespec onespec "step onespec moved 0 same 1"
 [ "$(tr -d '\r' < "$pc/graded.list")" = "$pg_a" ]

@@ -53,5 +53,5 @@ Owed to the main loop at the close. These were written and not run:
   previous run's packet answer, which reds `PG1 packet`, and GREEN once each is restored.
 - `FLOOR_ASSERTIONS` was raised 260 -> 275 by reading, the arm's 15 `check_input_arm` calls. The
   close confirms the executed count.
-- AC1 over this worktree, and the section 7 legs, the codebase map's freshness over the
+- AC1 over this worktree, and the legs section 7 names, the codebase map's freshness over the
   regenerated `memory/map/generated/symbols.json` among them.

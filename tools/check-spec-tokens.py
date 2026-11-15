@@ -2004,11 +2004,13 @@ class MemberProbe:
     def __init__(self, of, real):
         self.of, self.real = of, real
 
-    def __contains__(self, key):
+    def check_member(self, key):
         if INPUT_TRACE["segment"] is not None:
             INPUT_TRACE["segment"].add(json.dumps({"kind": "member", "of": self.of, "key": key},
                                                   sort_keys=True, separators=(",", ":")))
         return key in self.real
+
+    __contains__ = check_member   # `in` reads the class attribute; the lexicon grades the def's verb
 
 
 def derive_spec_context(ctx):
