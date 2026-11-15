@@ -1271,12 +1271,33 @@ function checkRedLane(w) {
 }
 
 /**
+ * The policy file's arm (TOOL-dDeclaredLoop-2 S10): a deny when `target` is the policy file of the
+ * repository at `top`, the path the policy kit's policy-mirror.js exports as POLICY_REL, found through
+ * agent-cap.js's resolvePolicyHelper; null otherwise, and null with no policy kit beside the hook. A
+ * target that is no `.toml` file reads nothing. The policy file has one door, the loop kit's
+ * policy_edit.py, which checks the value, writes the change record and stages both; the pre-commit
+ * guard judges the commit.
+ */
+function checkPolicyFile(tool, target, top) {
+  const fs = require('fs')
+  const path = require('path')
+  if (path.extname(target).toLowerCase() !== '.toml') return null
+  const helper = require('./agent-cap.js').resolvePolicyHelper()
+  if (!helper || !fs.existsSync(helper)) return null
+  const rel = require(helper).POLICY_REL
+  if (typeof rel !== 'string' || buildComparablePath(target) !== buildComparablePath(path.join(top, buildNativePath(rel)))) return null
+  return { deny: `BLOCKED by scratch-guard: this ${tool} targets the policy file ${rel}, which no tool write changes. Its door is the loop kit's policy_edit.py: \`set <key> <value>\` on a live run's branch or at the owner's terminal, \`raise <cap> <new>\` for one measured-file cap, \`propose <key> <value>\` to print the change; each writes the change record and stages it beside the file (TOOL-dDeclaredLoop-2).\n` }
+}
+
+/**
  * THE ONE EVALUATION ORDER of the write gate. Returns null to print nothing, `{ witness }` to allow
  * with one stderr line, `{ deny }` to refuse.
  *  1. `tool_name` outside WRITE_TOOLS → null
  *  2. no non-empty `file_path` / `notebook_path`, or a relative one with no payload `cwd` → deny
  *  3. session repository = common dir of `CLAUDE_PROJECT_DIR`, else of `cwd`; no `.git` above the
  *     target, no session repository, or a target common dir that differs → null
+ * 3a. the policy file of that repository, with a policy kit beside the hook (checkPolicyFile) → deny
+ *     naming policy_edit.py, before the conf is read, so an unarmed or absent conf does not open it
  *  4. `<target toplevel>/.memory-tree.conf` absent → witness; present and unreadable → deny
  *  5. UNARMED (checkUnarmed) → null when the target is the conf, else deny
  *  6. the target's CLASS: product when it falls under a ROUTED_PATHS entry; spec when its path
@@ -1345,6 +1366,8 @@ function checkRouted(data, env) {
   const mine = resolveComparableCommon(target)
   if (!session.key || !mine.key || session.key !== mine.key) return null
   const top = mine.hit.toplevel
+  const policyFile = checkPolicyFile(tool, target, top)
+  if (policyFile) return policyFile
   const confPath = path.join(top, ROUTE_CONF)
   const confShown = buildComparablePath(confPath)
   let confBytes

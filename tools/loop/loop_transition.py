@@ -387,8 +387,9 @@ def check_transition_channels(build, root):
     head = read_cached_channels(root, "HEAD", cache)
     findings = check_transition_definition(root)
     if not head & {"trailer", "log"}:
-        return (["unstored — %s · %s selects %s at HEAD, which stores no move" % (build, KEY, " ".join(sorted(head))),
-                 "%s: transition check · %s · unstored · %d finding(s)" % (SAY, build, len(findings))], findings)
+        return derive_floor_report(root, [
+            "unstored — %s · %s selects %s at HEAD, which stores no move" % (build, KEY, " ".join(sorted(head))),
+            "%s: transition check · %s · unstored · %d finding(s)" % (SAY, build, len(findings))], findings)
     moves = read_transition_moves(build, root, cache)
     findings += moves["findings"]
     lines = []
@@ -410,7 +411,21 @@ def check_transition_channels(build, root):
                  for rec in moves["paired"][len(moves["owing"]):]]
     lines.append("%s: transition check · %s · %d trailer(s) · %d record(s) · %d finding(s)" % (
         SAY, build, len(moves["trailers"]), len(moves["paired"]) + len(moves["sourced"]), len(findings)))
-    return lines, findings
+    return derive_floor_report(root, lines, findings)
+
+
+def derive_floor_report(root, lines, findings):
+    """`(lines, findings)` as the check owes them, or, where a finding, a `pending` or an `unstored` line
+    stands and `floor.record-changes` reads `off` at `root`'s landed revision (TOOL-dDeclaredLoop-2 S14),
+    `floor: record-changes off` and each of them reported as a line, with no finding left to exit on."""
+    held = [ln for ln in lines if ln.startswith(("pending — ", "unstored — "))]
+    if not (findings or held):
+        return lines, findings
+    from floor import read_floor
+    if read_floor(root)["record-changes"] != "off":
+        return lines, findings
+    return (["floor: record-changes off"] + ["%s: reported · %s" % (SAY, f) for f in findings]
+            + [("%s: reported · %s" % (SAY, ln)) if ln in held else ln for ln in lines]), []
 
 
 # ------------------------------------------------------------------------------------------ the plants

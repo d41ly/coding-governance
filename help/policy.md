@@ -165,8 +165,36 @@ reader coverage: budgets.enforce (owner dGroundRules, landed at 3708a705) has no
 
 ## Who may change the policy file
 
-An agent that could commit any change to the policy file could loosen any rule, so this repository's
-pre-commit hook guards four paths, listed in `tools/policy/guarded-paths.txt`:
+An agent that could commit any change to the policy file could loosen any rule, so the policy file has
+one door, a guard on every commit that changes it, a check on every push that lands it, and a floor
+the guard protects. The owner ruled on 2026-11-12 that no file is owner-only to a run working under
+its build's mandate, so a live unattended run's branch is admitted throughout, and every change it
+makes is recorded.
+
+**The door: `policy_edit.py`.** The harness refuses an agent's Edit, Write, MultiEdit or NotebookEdit
+of `.governance/policy.toml`, naming this command; it writes the file, writes the change record and
+stages both:
+
+- `python tools/loop/policy_edit.py set <key> <value> --build <slug> --unit <id>` sets one key. Its <!-- usage: script:tools/loop/policy_edit.py#set 46041bd3 -->
+  value is checked against the key's catalogue row, and a `floor` member against the four members.
+  It writes when the owner proves themselves, standard error an interactive terminal and then the
+  word `yes` typed at its prompt, or when the branch is a live run's branch, which needs no prompt.
+  Otherwise it prints the proposal and exits 1, writing nothing.
+- `python tools/loop/policy_edit.py raise <cap> <new> --build <slug> --unit <id> --argument <text>` <!-- usage: script:tools/loop/policy_edit.py#raise 9a04e39d -->
+  is the agent's door for one measured-file cap, below, and needs no proof.
+- `python tools/loop/policy_edit.py propose <key> <value>` writes nothing: it prints the row diff <!-- usage: script:tools/loop/policy_edit.py#propose 25930781 -->
+  and the `set` command that would apply it.
+
+Every write prints `Proof: <proof>` (`tty-cli`, `none — run mandate <run-state file>` or
+`none — budgets raise`) and the trailer line the commit must carry, one per changed key:
+`Gov-Policy: policy.<key> <old> -> <new>`, each value as compact JSON and `none` for a key the file
+did not set. Its change record, under the build's `build/` folder, names the key's catalogue row
+(`policy.review.max-rounds`, or `policy.budgets` for any cap). A value the policy file selects whose
+component is not installed, `policy-file.proof = "signed"` say, is refused, or read as its default
+with one line saying so, as `policy-file.on-missing-expansion` says.
+
+**The guard.** This repository's pre-commit hook guards four paths, listed in
+`tools/policy/guarded-paths.txt`:
 
 - `.governance/policy.toml`, the policy file;
 - `.governance/policy.json`, its JSON mirror;
@@ -175,15 +203,38 @@ pre-commit hook guards four paths, listed in `tools/policy/guarded-paths.txt`:
 
 - **The owner commits from a terminal.** A commit made at a terminal is the owner's proof, and the
   hook admits it, printing `policy guard — <paths> staged, admitted on the owner's terminal proof.`
-  An agent's shell has no terminal, so the hook judges its commit instead.
+  An agent's shell has no terminal, so the hook judges its commit instead, through the loop kit's
+  `guard.py --staged` where the loop kit is installed, else the policy kit's minimal guard alone. The
+  verdict reads its rule from the landed revision, never the staged file, so a commit cannot loosen
+  the rule that judges it. In order:
+  1. **The guard's own switch.** A change to `policy-file.guard`, `policy-file.proof`, any `floor`
+     member, or the list of guarded paths is refused, naming `floor.guard-self`, for every agent commit
+     off a live run's branch, whatever `policy-file.guard` reads.
+  2. **Every change recorded.** Each changed key needs a staged change record naming its row, and a
+     change to the list one naming `kit.policy`; a missing one is refused, naming the key.
+  3. **The value of `policy-file.guard`.** Under `owner-only`, the default, and under
+     `agents-within-mandate`, which the ruling widened to the same, an agent's commit is admitted in
+     the shapes below: one cap raised, the mirror's render, or a live run's branch. Under
+     `agents-with-reason` a commit changing the policy file alone is also admitted when it adds a row
+     to `memory/DECISIONS.md`.
+
+  The verdict prints `loop-guard: admitted · <rule>`, or `loop-guard: refused · <path> · <why>` per
+  reason with the remedy; the minimal guard's own `policy-guard:` lines pass through.
 - **An agent may change the policy file one way: raise one measured-file cap.** One key under
   `[budgets]` whose name is the path of a tracked file, set to a larger whole number, and nothing
   else in the four files changed. The commit must carry its argument and its record:
   - comment lines added directly above the cap, one of them `RAISED <old> -> <new>`;
-  - at least one row added to `memory/DECISIONS.md`, with no row removed.
+  - at least one row added to `memory/DECISIONS.md`, with no row removed;
+  - the change record naming `policy.budgets`, and the `Gov-Policy:` trailer.
 
-  Other files may ride in the same commit: a raise belongs in the commit of the unit whose change
-  needed it. Worked example, raising the cap on `AGENTS.md` from 20480 to 24576:
+  `policy_edit.py raise` writes all but the decision row, which it prints for the caller to add. It
+  writes only on the four conditions of the paragraph "WHEN A RUN MAY RAISE A ROW" of
+  `tools/template-size-limits.txt`, each refusal naming its condition: the file, measured without CR
+  bytes, exceeds the old cap; no comment above the cap reads `reserved: owner`; the `RAISED` line; and
+  the record. The cap must be set in the policy file at `HEAD`: a cap still in its legacy home is the
+  owner's to move into the file. Other files may ride in the same commit: a raise belongs in the
+  commit of the unit whose change needed it. Worked example, raising the cap on `AGENTS.md` from
+  20480 to 24576:
 
   ```toml
   [budgets]
@@ -231,7 +282,30 @@ pre-commit hook guards four paths, listed in `tools/policy/guarded-paths.txt`:
   the phase a run-state file records, not the one the unattended kit derives, so a run that has
   landed reads live until a terminal phase is committed. The hook binds once it is on
   `main` in the primary checkout, whose hooks every worktree runs. The push gate does not re-check
-  who made a change.
+  who made a change. A live run may switch a floor member off, or change `policy-file.guard` or
+  `policy-file.proof`: only its change record and the push check below witness it. A change to the
+  list of guarded paths alone stages no guarded path, so the hook never calls the verdict for it.
+
+**The push check.** The pre-push hook, on a push to the default branch the remote already holds, runs
+the loop kit's `guard.py --push-range` over the pushed commits: each commit that changes a key of the
+policy file must carry one `Gov-Policy:` trailer line per changed key and add a change record naming
+the key's row. One that does not is refused as `policy-unrecorded`, naming the commit and the key. A
+commit that adds the policy file, as an adopter's scaffold does, is printed and not graded. With no
+python launcher or no loop kit, the hook prints one line saying the check did not run.
+
+**The floor.** Four invariants hold whatever else the file says, each switched by a member of the
+`[floor]` table and every one `on` until the file sets it `off`; `python tools/loop/floor.py get <member>` <!-- usage: script:tools/loop/floor.py#get 8ed45f24 -->
+prints a member's value:
+
+| Member | What it keeps | Switched `off`, it reports instead of refusing at |
+|---|---|---|
+| `verdict-before-move` | a binding verdict runs before the default branch moves | the pre-push hook's `gate RED` refusal: the push goes through printing `floor: verdict-before-move off`, and no green record is written |
+| `record-changes` | every policy change and stage transition recorded | the verdict's record step, the push check, and the loop kit's transition check |
+| `guard-self` | the guard protects its own switch off a live run's branch | the verdict's first step |
+| `no-actor-witness` | no stage witness reads a fact the acting agent typed | the loop kit's two refusals of an actor witness no list row names |
+
+Switching a member `off` is a change to the guard's own switch, so off a live run's branch it is the
+owner's, committed from a terminal.
 
 ## The keys the file holds today
 

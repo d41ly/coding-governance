@@ -1274,7 +1274,13 @@ run_write "L-AC2 the key on, a red open, the main loop, an unrouted card -> allo
 mkdir -p "$TMP/nopol/hk"; cp "$HERE"/*.js "$TMP/nopol/hk/"
 sg_hook=$HOOK; HOOK="$TMP/nopol/hk/scratch-guard.js"
 run_write "L15 no policy kit beside the hook, a red open, the main loop -> allow, the witness carrying the NOTE" 0 "one;;red-fix lane;;leg one, leg three;;NOTE — no policy kit resolves beside this hook, so bar.inline-red-fixes reads on" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+# TOOL-dDeclaredLoop-2 S10 (AC14): the policy file's arm. Through this copy, with no policy kit beside
+# it, the arm does not fire and the policy file, neither product nor spec, prints nothing; through the
+# real hook, where the policy kit resolves, a Write to it is denied naming the door. Red with
+# checkPolicyFile's call taken out of checkRouted.
+run_write "TDL2 AC14 no policy kit beside the hook, a Write to the policy file -> the arm does not fire, stderr EMPTY" 0 empty Write "$SG_CWD_WT/.governance/policy.toml" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
 HOOK=$sg_hook
+run_write "TDL2 AC14 a Write to the policy file -> deny naming policy_edit.py as its door" 2 "any;;the policy file;;policy_edit.py" Write "$SG_CWD_WT/.governance/policy.toml" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
 # TOOL-aNimbleMend-15 S7: a BLANK LEG_MANIFEST reads as gate-legs.json beside the run-gates kit the
 # hook's own resolver finds, as the commit grader reads it. The real hook's run-gates kit sits
 # outside this fixture, so the two rows run a copy of the hook INSIDE the worktree, under sgk,
@@ -1700,8 +1706,10 @@ n=$((pass+fail))
 # hand under the same rule.
 # 361 = 359 + the 2 blank-LEG_MANIFEST rows of TOOL-aNimbleMend-15 S7 (the kit's manifest present,
 # and none found), counted by hand under the same rule.
+# 363 = 361 + the 2 policy-file rows of TOOL-dDeclaredLoop-2 S10 (the arm silent with no policy kit
+# beside the hook, and the deny naming policy_edit.py), counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=361
+FLOOR_ASSERTIONS=363
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

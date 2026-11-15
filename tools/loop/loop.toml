@@ -1712,3 +1712,33 @@ outcomes = ["closed", "red-wait"]
 witness = { class = "history", by = "the transition record" }
 owner = "dShippedRelease"
 routes = { closed = "transition", red-wait = "stand-in:{prefix}/memory-tree/build_records.py" }
+
+# One [[selects]] row per policy value that selects a component a layer point stands for
+# (TOOL-dDeclaredLoop-2 S8): `key` the policy key, `value` its value, `point` the layer point the value
+# needs. Read by guard.py's `check_expansion_value` alone: where no core row of the playbook kit's
+# layers.toml declares the point, policy-file.on-missing-expansion says whether the value is refused
+# or read as its catalogue default. No check of this file reads the table.
+[[selects]]
+key = "policy-file.proof"
+value = "signed"
+point = "point.instruction.signed-proof"
+
+[[selects]]
+key = "policy-file.proof"
+value = "both"
+point = "point.instruction.signed-proof"
+
+[[selects]]
+key = "instructions.proof"
+value = "signed"
+point = "point.instruction.signed-proof"
+
+[[selects]]
+key = "instructions.proof"
+value = "both"
+point = "point.instruction.signed-proof"
+
+[[selects]]
+key = "instructions.edit"
+value = "flow-only"
+point = "point.instruction.flow"

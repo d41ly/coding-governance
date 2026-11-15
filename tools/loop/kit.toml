@@ -42,6 +42,15 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # policy.py, found through loop_parents.py's `read_policy_kit`. It takes no edge to that kit: `record`
 # and `check` exit 2 `unarmed` where it does not resolve, never a default, and its leg is gov's own
 # [[exempt_leg]].
+# The policy file's guard (TOOL-dDeclaredLoop-2): floor.py reads the `[floor]` table through the policy
+# kit's policy.py; guard.py runs that kit's guard.py, the minimal guard, as a subprocess and calls its
+# helpers, reads `policy-file.guard` and `policy-file.on-missing-expansion` through policy.py, reads the
+# playbook kit's layers.toml for the declared points, and its trailers and change records through the
+# memory-tree kit under the edge above; policy_edit.py writes through policy.py's checks and the
+# memory-tree kit's change door. Each policy-kit read goes through `read_policy_kit`, found by
+# `resolve_kit_dir`, so none takes an edge: the floor reads all on where that kit does not resolve,
+# the push arm prints `unarmed` and exits 0, and the commit verdict, run only where the minimal guard
+# resolves, exits 2 where a reader does not answer. The leg is gov's own [[exempt_leg]].
 requires = ["memory-tree"]
 
 # Everything the kit ships is engine, overwritten on every update: the definition, its reader, the

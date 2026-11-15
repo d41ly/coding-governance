@@ -366,10 +366,19 @@ branch, and a key set to `off` on a branch has no effect until it lands.
 
 ## The guard
 
-The stand-in, until dDeclaredLoop's guard lands, for the defaults of `policy-file.guard` and
-`policy-file.proof`, owner-only outside a live unattended run's branch, and the TTY proof, enforced
-without reading either key: `guard.py`
-imports no reader. gov's `.githooks/pre-commit` carries its block, above the legs. When a path
+The minimal guard: the shapes an agent's commit is admitted in, owner-only outside a live unattended
+run's branch, enforced without reading `policy-file.guard` or `policy-file.proof`: `guard.py` imports
+no reader. The verdict it now serves is the loop kit's `guard.py --staged` (TOOL-dDeclaredLoop-2),
+which reads both keys and the `floor` at the landed revision, refuses a change to the guard's own
+switch off a live run's branch, asks a change record of every change, and runs this file as a
+subprocess for every shape it admits, so the raise, the mirror's render and the run admission each
+have this one implementation; the loop kit calls its helpers, `derive_leaf_changes`,
+`check_decisions_row`, `check_parent_sides` and `check_run_mandate` among them, in process. Where the
+loop kit is not installed, this file is the verdict, alone. gov's `.githooks/pre-commit` carries the
+block, above the legs; it runs the loop kit's guard wherever that resolves, this one where it does
+not. The policy file's write path is the loop kit's `policy_edit.py`, and the hooks kit's write gate
+denies a tool write to `.governance/policy.toml`, finding the path as `policy-mirror.js` exports it,
+`POLICY_REL`. When a path
 `guarded-paths.txt` lists at HEAD is staged, the block admits on the owner's terminal proof,
 `[ -t 2 ]`, since git leaves a hook's stderr as the committer's; otherwise it runs
 `guard.py --staged`, and any exit but 0 refuses, as does a tree whose tracked python resolver yields

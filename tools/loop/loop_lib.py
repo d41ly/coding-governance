@@ -651,13 +651,15 @@ def read_actor_rows(kit_dir):
         raise LoopError(path.as_posix(), "cannot be read: %s" % e)
 
 
-def check_site_witnesses(kit_dir, site, entries):
+def check_site_witnesses(kit_dir, site, entries, root="."):
     """`(lines, refusals)` of the declaration site `site`'s `entries`, each `<item>` or `<item>:<word>`:
     a line per entry whose word resolves through `[[witness-alias]]`; a refusal per entry with no word,
     a word no alias row holds, or an actor word with no `<site> <item>` list row, and per list row of
     `site` whose item is no actor entry. The list is the one in `kit_dir`, read without a base.
     `DOD_EXTRA` is the adopter's own: no list row is read for it, and an actor entry there is admitted,
-    its line ending `· adopter-declared, not on the shipped list`."""
+    its line ending `· adopter-declared, not on the shipped list`. An actor word with no list row is
+    reported, not refused, where `floor.no-actor-witness` reads `off` at `root`'s landed revision
+    (TOOL-dDeclaredLoop-2 S14), read only when such an entry is met."""
     data, where = read_definition(kit_dir)
     check_witness_classes(data, where)
     refused, aliases = data["witnesses"]["refused"], data.get("witness-alias", [])
@@ -668,7 +670,7 @@ def check_site_witnesses(kit_dir, site, entries):
         fields = line.split("\t")
         if len(fields) == 3 and fields[0] == site:
             listed[fields[1]] = fields[2]
-    lines, refusals, actors = [], [], set()
+    lines, refusals, actors, floor_off = [], [], set(), None
     for entry in entries:
         item, _sep, word = entry.partition(":")
         if not word:
@@ -686,13 +688,26 @@ def check_site_witnesses(kit_dir, site, entries):
             if item in listed:
                 line += " · until %s" % listed[item]
             else:
-                refusals.append("%s %s is an actor witness and the list holds no row %s %s naming the build "
-                                "that computes it" % (site, entry, site, item))
+                why = ("%s %s is an actor witness and the list holds no row %s %s naming the build that computes "
+                       "it" % (site, entry, site, item))
+                floor_off = check_floor_off("no-actor-witness", root) if floor_off is None else floor_off
+                if floor_off:
+                    line += " · floor: no-actor-witness off · reported · %s" % why
+                else:
+                    refusals.append(why)
         lines.append(line)
     for item in listed:
         if item not in actors:
             refusals.append("the list row %s %s names no actor entry of %s" % (site, item, site))
     return lines, refusals
+
+
+def check_floor_off(member, root):
+    """Whether the floor member `member` reads `off` at `root`'s landed revision (TOOL-dDeclaredLoop-2 S14),
+    through floor.py beside this file, imported here since it imports this module; LoopError where the
+    floor does not hold."""
+    from floor import read_floor
+    return read_floor(root)[member] == "off"
 
 
 def read_definition(kit_dir):
@@ -1149,7 +1164,7 @@ def main(argv):
     if argv[:1] == ["--grade-site"] and len(argv) >= 2 and argv[1] in DECLARATION_SITES:
         try:
             lines, refusals = check_site_witnesses(kit_dir, argv[1], argv[2:])
-        except LoopError as e:
+        except ValueError as e:   # LoopError, the floor's copy of it included where this file runs as __main__
             print("loop: %s" % e)
             return 1
         for line in lines:
@@ -1237,6 +1252,19 @@ def main(argv):
     else:
         print("loop: actor-list builds · %s" % builds_dir.as_posix())
     refusals = item_refusals + check_actor_list(rows, base_rows, sites, builds_dir)
+    # TOOL-dDeclaredLoop-2 S14: an actor witness no list row names is reported, not refused, where
+    # floor.no-actor-witness reads off at the landed revision; the floor is read only when one is met.
+    unlisted = [r for r in refusals if r.startswith("the actor witness ") and r.endswith(" has no list row naming "
+                                                                                       "the build that computes it")]
+    if unlisted:
+        try:
+            if check_floor_off("no-actor-witness", root):
+                print("floor: no-actor-witness off")
+                for r in unlisted:
+                    print("loop: reported · %s" % r)
+                refusals = [r for r in refusals if r not in unlisted]
+        except ValueError as e:   # LoopError, the floor's copy of it included where this file runs as __main__
+            refusals.append(str(e))
     try:
         computed = check_computed_witnesses(data, where)
     except LoopError as e:

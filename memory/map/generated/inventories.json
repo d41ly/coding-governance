@@ -80,6 +80,7 @@
       "loop checklist tags",
       "loop computed witness",
       "loop definition",
+      "loop guard fixtures",
       "loop item kind",
       "loop parent routes",
       "loop transition record",

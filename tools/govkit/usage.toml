@@ -382,6 +382,34 @@ verb = "check"
 flags = ["--build=", "--root=", "--selftest"]
 
 [[usage]]
+id = "script:{prefix}/loop/policy_edit.py#set"
+shape = "verb"
+entry = "{prefix}/loop/policy_edit.py"
+verb = "set"
+flags = ["--build=", "--unit="]
+
+[[usage]]
+id = "script:{prefix}/loop/policy_edit.py#raise"
+shape = "verb"
+entry = "{prefix}/loop/policy_edit.py"
+verb = "raise"
+flags = ["--build=", "--unit=", "--argument="]
+
+[[usage]]
+id = "script:{prefix}/loop/policy_edit.py#propose"
+shape = "verb"
+entry = "{prefix}/loop/policy_edit.py"
+verb = "propose"
+flags = []
+
+[[usage]]
+id = "script:{prefix}/loop/floor.py#get"
+shape = "verb"
+entry = "{prefix}/loop/floor.py"
+verb = "get"
+flags = ["--root="]
+
+[[usage]]
 id = "script:{prefix}/loop/adopt-loop.sh"
 shape = "verb"
 entry = "{prefix}/loop/adopt-loop.sh"

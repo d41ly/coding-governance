@@ -336,6 +336,44 @@ python <prefix>/loop/loop_transition.py --fixture --plant default
 python <prefix>/loop/loop_transition.py check --selftest
 ```
 
+## The policy file's guard
+
+Contract: TOOL-dDeclaredLoop-2. Three modules, each reading the policy kit through `read_policy_kit`,
+its directory put first on `sys.path` so its `guard` is never this kit's file of that name:
+
+- `floor.py`: `FLOOR_INVARIANTS`, the floor's four members, `verdict-before-move`, `record-changes`,
+  `guard-self` and `no-actor-witness`, and `read_floor(repo, rev=None)`, which reads the `[floor]`
+  table at the landed revision through the policy kit's `read_revision`, every absent member `on`, an
+  unknown member or a value other than `on` and `off` a `LoopError`, and every member `on`, the reason
+  printed once, where the policy kit does not resolve or refuses. `floor.py get <member>` prints it.
+  Its readers report at `off` instead of refusing: the pre-push hook's `gate RED` line, the guard's
+  record step and push arm, `loop_transition.py`'s check, the guard's guard-self step, and
+  `loop_lib.py`'s two refusals of an actor witness no list row names, `--grade-site`'s and `--check`'s.
+- `guard.py`: the commit verdict, `--staged`, which the pre-commit block runs in place of the policy
+  kit's minimal guard wherever this kit resolves; the push arm, `--push-range <base>..<tip>`, which
+  the pre-push hook runs over a default-branch update; and the expansion rule,
+  `check_expansion_value(key, value, points)`, over this definition's `[[selects]]` rows, each a key,
+  a value and the layer point that value needs. The verdict reads its rule from the landed revision:
+  guard-self before the value's rule, the live run's admission before guard-self, a change record for
+  every change, then `policy-file.guard`, the minimal guard run as a subprocess for every shape it
+  admits. The help page's section "Who may change the policy file" is the user's statement.
+- `policy_edit.py`: the policy file's one write path, `set`, `raise` and `propose`, each write through
+  the guarded write, the block `guarded_write_py` it carries inline, writing the file and its change
+  record, both staged, and printing the `Gov-Policy:` trailer line.
+
+`guard.py --fixture --plant <case>` runs one plant's scenarios in a scratch repository under the host
+temp directory, this tree's kits found beside this one, and prints each scenario `held` or `MISSED`;
+`--selftest` runs every plant and is gov's `loop guard fixtures` leg.
+
+```bash
+python <prefix>/loop/guard.py --staged
+python <prefix>/loop/guard.py --push-range <base>..<tip>
+python <prefix>/loop/guard.py --fixture --plant raise-admitted
+python <prefix>/loop/guard.py --selftest
+python <prefix>/loop/floor.py get guard-self
+python <prefix>/loop/policy_edit.py set review.max-rounds 4 --build <slug> --unit <id>
+```
+
 ## The item kind
 
 The items are a registered kind (TOOL-dDeclaredLoop-24): the kinds register's `kind.item` row names
@@ -509,4 +547,7 @@ a row. The parent route reads no parent planning ending, no hold past the wait c
 unit move, and it pairs records with trailers by order. That a disposition
 record's `Item` names a declared item, which reads `None`, or that a writer resolved an alias before
 it wrote. An unknown key on a row is neither read nor refused. That a witness's `by` is true. That
-the build an actor-list row names will compute its witness.
+the build an actor-list row names will compute its witness. The guard does not see a change to the
+list of guarded paths alone, which the pre-commit block never hands it; a live run's own switch of the
+floor, which only its change record and the push arm witness; a pty wrapper giving an agent a
+terminal, `--no-verify`, or that a change record's argument is true.

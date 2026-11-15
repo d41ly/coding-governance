@@ -1935,6 +1935,47 @@ else
   # PLAY-dOrderedCharter-17 S10: the lexicon kit is a declared slot, so its absence is a said skip
   echo "  skip — slot point.flow.leg-pack · not-installed: the merge-loss arms AMF3 AC6 and AC7 skip, the lexicon kit not resolving beside this hook's kit root"
 fi
+# ---- TOOL-dDeclaredLoop-2 S6 and S14 (AC19): THE POLICY PUSH ARM AND THE FLOOR'S FIRST MEMBER ------
+# A fixture whose root holds a stand-in loop kit, committed so check_reviewed_file vets both files:
+# `guard.py` names its call and exits as PG_EXIT says, `floor.py` prints FL_VAL. The push arm grades
+# only a range the remote already holds a base of, so the base is pushed first with --no-verify. A
+# guard exiting 1 refuses as policy-unrecorded; over the declared STUB bar exiting 1, a floor printing
+# `off` lets the push through with its floor line and no gate-bar-green, and `on` refuses as gate-red.
+# Red with the push arm's call, or the floor read, taken out of the hook.
+git init -q --template= --bare "$tmp/pg.git"
+git init -q --template= "$tmp/pg"
+cd "$tmp/pg" || exit 2
+git config core.hooksPath "$tmp/hooks"
+mkdir -p loop
+printf 'import os, sys\nprint("LOOP PUSH ARM RAN", *sys.argv[1:])\nsys.exit(int(os.environ.get("PG_EXIT", "0")))\n' > loop/guard.py
+printf 'import os\nprint(os.environ.get("FL_VAL", "on"))\n' > loop/floor.py
+git add -A; git commit -q -m base; git branch -M main
+git remote add origin "$tmp/pg.git"; git push -q --no-verify origin main
+git -C "$tmp/pg.git" symbolic-ref HEAD refs/heads/main
+touch "$(git rev-parse --git-dir)/push-main-active"
+pg_gd=$(git rev-parse --git-dir)
+git commit -q --allow-empty -m "a change to push"
+msg=$(PG_EXIT=1 GOV_GATE_CMD="bash $green" git push origin main 2>&1)
+case "$msg|$(read_token)" in
+  *"LOOP PUSH ARM RAN --push-range"*"|policy-unrecorded") ok "TDL2 AC19 a loop guard exiting 1 refuses the push as policy-unrecorded" ;;
+  *) bad "TDL2 AC19 expected the policy-unrecorded refusal, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
+esac
+rm -f "$pg_gd"/gate-bar-green*
+msg=$(FL_VAL=off GOV_GATE_CMD="bash $red" git push origin main 2>&1); r=$?
+case "$r|$msg" in
+  0"|"*"floor: verdict-before-move off"*)
+    if ls "$pg_gd"/gate-bar-green* >/dev/null 2>&1; then bad "TDL2 AC19 a red bar read as advisory wrote a gate-bar-green"
+    else ok "TDL2 AC19 floor.py printing off lets a STUB red push through, naming the floor, with no gate-bar-green"; fi ;;
+  *) bad "TDL2 AC19 expected the red bar read as advisory under the floor off, got rc=$r: $msg" ;;
+esac
+git commit -q --allow-empty -m "another change to push"
+msg=$(FL_VAL=on GOV_GATE_CMD="bash $red" git push origin main 2>&1); r=$?
+case "$r|$(read_token)" in
+  0"|"*) bad "TDL2 AC19 floor.py printing on must keep a red bar refusing, and the push went through: $msg" ;;
+  *"|gate-red") ok "TDL2 AC19 floor.py printing on keeps the red bar refusing as gate-red" ;;
+  *) bad "TDL2 AC19 expected the gate-red refusal under the floor on, got rc=$r token '$(read_token)': $msg" ;;
+esac
+cd "$pfx_home" || exit 2
 # ---- TOOL-dThriftyLanding-3: A DOC-ONLY PUSH, CLASSIFIED AGAINST THE DOC CLASS AT R ---------------
 # A scratch repo whose gate-env file at R declares `GATE_DOC_PATHS`, a stub bar that records the docs
 # base it was handed, and a record stamped at R so the decision is scoped unless a predicate forces.

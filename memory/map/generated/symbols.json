@@ -405,6 +405,11 @@
     {
       "id": "Refused",
       "kind": "class",
+      "file": "tools/loop/policy_edit.py"
+    },
+    {
+      "id": "Refused",
+      "kind": "class",
       "file": "tools/playbook/instructions_edit.py"
     },
     {
@@ -4583,6 +4588,11 @@
       "file": "tools/workflows/unattended-build.template.js"
     },
     {
+      "id": "checkPolicyFile",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkPosixRootLitter",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -5763,6 +5773,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "check_expansion_value",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
+    },
+    {
       "id": "check_experiment",
       "kind": "function",
       "file": "tools/workflows/replay_scorer.py"
@@ -5846,6 +5861,11 @@
       "id": "check_floor_copies",
       "kind": "function",
       "file": "tools/lib/python_floor.py"
+    },
+    {
+      "id": "check_floor_off",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "check_fold_refused",
@@ -6623,6 +6643,11 @@
       "file": "tools/branch-reconcile/adopt-branch-reconcile.sh"
     },
     {
+      "id": "check_one_change",
+      "kind": "function",
+      "file": "tools/loop/policy_edit.py"
+    },
+    {
       "id": "check_one_door",
       "kind": "function",
       "file": "tools/playbook/writing_practice.py"
@@ -7001,6 +7026,11 @@
       "id": "check_push_allow",
       "kind": "function",
       "file": "tools/push-main.sh"
+    },
+    {
+      "id": "check_push_range",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
     },
     {
       "id": "check_pytest_ini_probe",
@@ -7723,6 +7753,11 @@
       "file": "tools/run-gates/regen.py"
     },
     {
+      "id": "check_staged",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
+    },
+    {
       "id": "check_staged_backlog",
       "kind": "function",
       "file": ".githooks/straggler-guard.sh"
@@ -7886,6 +7921,21 @@
       "id": "check_template_arm",
       "kind": "function",
       "file": "tools/memory-tree/asbuilt_view.py"
+    },
+    {
+      "id": "check_terminal_proof",
+      "kind": "function",
+      "file": "tools/lib/guarded_write.py"
+    },
+    {
+      "id": "check_terminal_proof",
+      "kind": "function",
+      "file": "tools/loop/policy_edit.py"
+    },
+    {
+      "id": "check_terminal_proof",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "check_time_classes",
@@ -9458,6 +9508,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "derive_all_on",
+      "kind": "function",
+      "file": "tools/loop/floor.py"
+    },
+    {
       "id": "derive_ancestors",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -9576,6 +9631,11 @@
       "id": "derive_blob_oid",
       "kind": "function",
       "file": "tools/run-gates/check-receipt.py"
+    },
+    {
+      "id": "derive_blob_pin",
+      "kind": "function",
+      "file": "tools/loop/policy_edit.py"
     },
     {
       "id": "derive_bm_r3",
@@ -10128,6 +10188,11 @@
       "file": "tools/codebase-map/replay-phrases.py"
     },
     {
+      "id": "derive_floor_report",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
       "id": "derive_fold",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -10513,6 +10578,11 @@
       "file": "tools/playbook/overlay_rows.py"
     },
     {
+      "id": "derive_kit_command",
+      "kind": "function",
+      "file": "tools/loop/policy_edit.py"
+    },
+    {
       "id": "derive_kit_file",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -10681,6 +10751,11 @@
       "id": "derive_list_path",
       "kind": "function",
       "file": "tools/playbook/positional.py"
+    },
+    {
+      "id": "derive_list_rel",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
     },
     {
       "id": "derive_live_rows",
@@ -11338,6 +11413,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "derive_row_tag",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
+    },
+    {
       "id": "derive_rule_kind",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -11661,6 +11741,16 @@
       "id": "derive_serves",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "derive_set_plan",
+      "kind": "function",
+      "file": "tools/loop/policy_edit.py"
+    },
+    {
+      "id": "derive_set_text",
+      "kind": "function",
+      "file": "tools/loop/policy_edit.py"
     },
     {
       "id": "derive_set_value",
@@ -14480,6 +14570,16 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/loop/floor.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/loop/loop_checklist.py"
     },
     {
@@ -14511,6 +14611,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/loop/policy_edit.py"
     },
     {
       "id": "main",
@@ -16098,6 +16203,11 @@
       "file": "tools/process-monitor/census.py"
     },
     {
+      "id": "parse_cli_value",
+      "kind": "function",
+      "file": "tools/loop/policy_edit.py"
+    },
+    {
       "id": "parse_conf",
       "kind": "function",
       "file": "tools/govkit/steps/fanout_cap.py"
@@ -16291,6 +16401,11 @@
       "id": "parse_policy",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "parse_policy_bytes",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
     },
     {
       "id": "parse_posix",
@@ -17458,6 +17573,11 @@
       "file": "tools/loop/loop_lib.py"
     },
     {
+      "id": "read_added_units",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
+    },
+    {
       "id": "read_adding_commits",
       "kind": "function",
       "file": "tools/memory-tree/tree_lib.py"
@@ -18253,6 +18373,11 @@
       "file": "tools/lexicon/subtokens.py"
     },
     {
+      "id": "read_core_points",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
+    },
+    {
       "id": "read_core_registries",
       "kind": "function",
       "file": "tools/loop/loop_checklist.py"
@@ -18761,6 +18886,11 @@
       "id": "read_floor",
       "kind": "function",
       "file": "tools/lib/python_floor.py"
+    },
+    {
+      "id": "read_floor",
+      "kind": "function",
+      "file": "tools/loop/floor.py"
     },
     {
       "id": "read_fm_key_of",
@@ -19643,6 +19773,16 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "read_loop_guard",
+      "kind": "function",
+      "file": "tools/loop/policy_edit.py"
+    },
+    {
+      "id": "read_loop_guard",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
+    },
+    {
       "id": "read_manifest",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -20208,6 +20348,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "read_policy_blob",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
+    },
+    {
       "id": "read_policy_key",
       "kind": "function",
       "file": "tools/push-main.sh"
@@ -20231,6 +20376,11 @@
       "id": "read_policy_members",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "read_policy_modules",
+      "kind": "function",
+      "file": "tools/loop/floor.py"
     },
     {
       "id": "read_policy_reference_rows",
@@ -21181,6 +21331,11 @@
       "id": "read_staged_paths",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_staged_units",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
     },
     {
       "id": "read_staging_journal",
@@ -23538,6 +23693,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "render_policy_trailer",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
+    },
+    {
       "id": "render_population",
       "kind": "function",
       "file": "tools/workflows/replay_scorer.py"
@@ -23556,6 +23716,11 @@
       "id": "render_prof_line",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "render_proposal",
+      "kind": "function",
+      "file": "tools/loop/policy_edit.py"
     },
     {
       "id": "render_proposal",
@@ -27320,6 +27485,11 @@
     {
       "id": "run_fixture",
       "kind": "function",
+      "file": "tools/loop/guard.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
       "file": "tools/loop/loop_items.py"
     },
     {
@@ -27403,6 +27573,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "run_fixture_command",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
+    },
+    {
       "id": "run_fixture_git",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
@@ -27436,6 +27611,11 @@
       "id": "run_fixtures_guard_census",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_floor_readers",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
     },
     {
       "id": "run_fold",
@@ -27561,6 +27741,11 @@
       "id": "run_git",
       "kind": "function",
       "file": "tools/lib/python_floor.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/loop/policy_edit.py"
     },
     {
       "id": "run_git",
@@ -27691,6 +27876,11 @@
       "id": "run_guard_case",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_guard_plant",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
     },
     {
       "id": "run_guards",
@@ -28380,6 +28570,11 @@
     {
       "id": "run_propose",
       "kind": "function",
+      "file": "tools/loop/policy_edit.py"
+    },
+    {
+      "id": "run_propose",
+      "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
     },
     {
@@ -28411,6 +28606,11 @@
       "id": "run_pw",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "run_raise",
+      "kind": "function",
+      "file": "tools/loop/policy_edit.py"
     },
     {
       "id": "run_raw",
@@ -28675,6 +28875,11 @@
     {
       "id": "run_selftest",
       "kind": "function",
+      "file": "tools/loop/guard.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
       "file": "tools/loop/loop_items.py"
     },
     {
@@ -28761,6 +28966,11 @@
       "id": "run_selftest_cases",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
+    },
+    {
+      "id": "run_set",
+      "kind": "function",
+      "file": "tools/loop/policy_edit.py"
     },
     {
       "id": "run_settle",
@@ -33963,6 +34173,11 @@
       "file": "tools/loop/loop_items.py"
     },
     {
+      "id": "write_fixture_record",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
+    },
+    {
       "id": "write_fixture_records",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -34061,6 +34276,26 @@
       "id": "write_gov_files",
       "kind": "function",
       "file": "tools/govkit/fixtures/retired_edits.py"
+    },
+    {
+      "id": "write_guard_plant",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
+    },
+    {
+      "id": "write_guarded",
+      "kind": "function",
+      "file": "tools/lib/guarded_write.py"
+    },
+    {
+      "id": "write_guarded",
+      "kind": "function",
+      "file": "tools/loop/policy_edit.py"
+    },
+    {
+      "id": "write_guarded",
+      "kind": "function",
+      "file": "tools/playbook/instructions_edit.py"
     },
     {
       "id": "write_gw_seal",
@@ -34281,6 +34516,11 @@
       "id": "write_list",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "write_live_run",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
     },
     {
       "id": "write_ln_dod_records",
@@ -34516,6 +34756,11 @@
       "id": "write_policy",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "write_policy_change",
+      "kind": "function",
+      "file": "tools/loop/policy_edit.py"
     },
     {
       "id": "write_policy_plant",
@@ -34961,6 +35206,11 @@
       "id": "write_sr_units",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_staged",
+      "kind": "function",
+      "file": "tools/loop/guard.py"
     },
     {
       "id": "write_staged",

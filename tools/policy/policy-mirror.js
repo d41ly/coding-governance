@@ -185,6 +185,8 @@ function main(argv) {
   return 0;
 }
 
-module.exports = { readPolicy, PolicyRefusal, readLandedRevision };
+// POLICY_REL is exported for the hooks kit's write gate, whose policy-file arm denies a tool write to
+// this path and names the loop kit's policy_edit.py as the door (TOOL-dDeclaredLoop-2 S10).
+module.exports = { readPolicy, PolicyRefusal, readLandedRevision, POLICY_REL };
 
 if (require.main === module) process.exitCode = main(process.argv.slice(2));

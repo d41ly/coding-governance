@@ -12,7 +12,6 @@ principle	principle.p6	dTendedCadence
 principle	principle.p7	dDeclaredLoop
 principle	principle.p8	dOrderedCharter
 principle	principle.p9	dGroundRules
-principle	principle.p10	dGroundRules
 principle	principle.p12	dIndexedDesign
 principle	principle.p15	dOrderedCharter
 principle	principle.p17	dIndexedDesign
