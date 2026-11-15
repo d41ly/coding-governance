@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-14 — the default failure route: the refusal recorded and the frontier returned
 
-**Status:** INPROGRESS · rev-4 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 18 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-5 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 18 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0099@60eee5d8 whole
 
@@ -12,14 +12,18 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-a.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-a.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-26 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-11-05-build-TOOL-dDeclaredLoop-14-deviation-141.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-14-deviation-141.md) | deviation | — |
+| [2026-11-15-build-TOOL-dDeclaredLoop-14-1-builder-return.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-1-builder-return.md) | journal | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-142.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-142.md) | deviation | — |
+| [2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-143.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-143.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-14-red-fix-25.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-red-fix-25.md) | red-fix | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-56 |
 | [2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade.md) | research | TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-14-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-14-1-spec-writer.md) | journal | — |
+| [2026-11-15-prompt-TOOL-dDeclaredLoop-14-2-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-14-2-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-14-build-brief.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-14-build-brief.md) | journal | — |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-14-reground-brief.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-14-reground-brief.md) | research | — |
+| [2026-11-15-prompt-TOOL-dDeclaredLoop-14-spec-brief.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-14-spec-brief.md) | research | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-33 |
 
 <!-- /gen:spec-records -->
@@ -52,10 +56,11 @@ to :33), and `tools/playbook/principles.toml@701c20bb8c9c:150` maps this clause 
   `_RUN_PARK_KINDS` in `tools/drift-audit/drift_report.py@1234f7141273:2457` (§8 F6). Observed by AC4,
   AC9.
 - **S3** — The recording verb, `unattended.sh --refused <slug> --item <tag> --key <key> --reason <text>`,
-  `verb_refused` in `tools/unattended/unattended.sh`, built on `verb_propose`'s
+  `write_refusal` in `tools/unattended/unattended.sh`, built on `verb_propose`'s
   guards: the run-state check, the three required flags through `check_verb_flag`, the line-end,
   separator and bypass-flag refusals over the item, key and reason, `refuse_if_terminal`, and exact-line
-  idempotence. It then asks the engine, `position.py --check-refusal <tag> <key>`, found through the
+  idempotence. Its line-end and bypass-flag refusals are `case` patterns over the joined fields, never
+  `verb_propose`'s `printf | wc -l` and `printf | grep -qF` (§5). It then asks the engine, `position.py --check-refusal <tag> <key>`, found through the
   driver's `resolve_kit_dir` as unit 7's `verb_plan` finds it, which refuses a tag the composition does
   not declare and a key not of `derive_instance_key`'s shape for that tag, and refuses itself where the
   composition does not read. Each refusal is check 48, the number `verb_propose`'s refusals print, and
@@ -78,7 +83,8 @@ to :33), and `tools/playbook/principles.toml@701c20bb8c9c:150` maps this clause 
   `memory/guides/UNATTENDED-VERBS.md`, in one commit; one invocation in the fenced verb list of
   `tools/unattended/SKILL.template.md` and its render `.claude/skills/unattended/SKILL.md`, whose size
   row moves as §4 "The Skill's row" says; and arms in `tools/unattended/unattended.test.sh` naming
-  `--refused`, `--key` and each new refusal message. Observed by AC10.
+  `--refused`, `--key` and each new refusal message, with its parity-table row and its hostile-value
+  matrix entry (§5). Observed by AC10.
 - **S7** — The fixture plants join unit 7's `PLANTS` in `tools/loop/position.py`, so its `--selftest`
   and its leg `loop position fixtures` run them, and that leg's `enforces` in `tools/gate-legs.json`
   gains `principle.p24` (`tools/playbook/core.py`, PLAY-dOrderedCharter-7), the tag of the v2 `[enforcement]` row naming this unit's
@@ -124,7 +130,7 @@ to :33), and `tools/playbook/principles.toml@701c20bb8c9c:150` maps this clause 
   `verb_propose` is the one verb writing the step field, and its guards are the ones S3 reuses
   (`tools/unattended/unattended.sh#verb_propose`).
 - Check 27 of the kit gate reds a declared kind no `park` call site writes, and a call site writing an
-  undeclared one (`tools/unattended/check-unattended.sh@c0b23188d5b4:5011`); `verb_refused`'s call is
+  undeclared one (`tools/unattended/check-unattended.sh@c0b23188d5b4:5011`); `write_refusal`'s call is
   the site. Check 26 reds a declared verb absent from the verb carrier or never invoked in the Skill
   template (:4943, :4949), and a parsed flag on no non-comment line of `unattended.test.sh` (:5007).
 - runlog's `read_run_state` counts a row of a kind its `PARK_KINDS` lacks as unknown and parses
@@ -154,10 +160,19 @@ The two fields `Position` gains, beside unit 7's:
 ### The frontier
 
 ```python
-def derive_frontier(items, witnessed, step) -> list[dict]:
-    """The items of `step` whose witness is not in `witnessed` and each of whose needs is met by a
-    witnessed tag, in composition order; each entry as unit 7's `next`."""
+def derive_frontier(items, witnessed, unheld, unit_id, head) -> list[dict]:
+    """The rows of `items`, the build's step's in composition order, whose tag is not in `witnessed`
+    and each of whose needs is met by a tag in `witnessed`; each entry as unit 7's `next`."""
 ```
+
+`witnessed` maps each held tag to the inputs its witness read, and `unheld` each tag read whose
+witness does not hold to its inputs; an unread tag is in neither, so it meets no need. Both come
+from the `read_witness` results `derive_next_item` already takes, over the step's tags and every tag
+their needs name. An entry is `{"item": tag, "unit": unit_id, "actor": row.get("actor", "?"), "key":
+derive_instance_key(tag, unit_id, unheld.get(tag) or [head])}`, the key byte-equal to the one
+`derive_next_item` writes today (`tools/loop/position.py@b9665504bb47:230`): its pass id is the
+least-advanced unit's id, and its inputs are what the item's reader read, or HEAD where it read
+none, which keeps the pass commit the unit-forward reader returns for an unheld item (:389 to :393).
 
 ### The refusal row and its check
 
@@ -185,7 +200,7 @@ unit and the figure, and `memory/DECISIONS.md` records the unit's row with the r
 | `--frontier`, `--check-refusal` | CLI flags | `tools/loop/position.py` |
 | `frontier-chain`, `frontier-parallel`, `frontier-refused`, `frontier-bad-key`, `frontier-none`, `plan-frontier` | `PLANTS` entries | `tools/loop/position.py` |
 | `refusal` | park kind, a `PARK_KINDS` member | `tools/unattended/unattended.sh`, `tools/runlog/model.py`, `tools/drift-audit/drift_report.py` |
-| `verb_refused` | function | `tools/unattended/unattended.sh` |
+| `write_refusal` | function | `tools/unattended/unattended.sh` |
 | `--refused`, `--key` | driver verb, flag | `tools/unattended/unattended.sh` |
 | `frontier:` | `--plan` output line | `tools/unattended/unattended.sh` |
 
@@ -194,16 +209,18 @@ unit and the figure, and `memory/DECISIONS.md` records the unit's row with the r
 Each plant passes its items to the engine in memory as unit 7's plants do. A, B, C and D stand for item
 tags the shipped definition declares, A, B and C in one step and D in a later one, so the driver's
 `--check-refusal` over the scratch repository's composition and the engine's in-memory rows name the
-same items. `frontier-refused`, `frontier-bad-key` and `plan-frontier` run the driver, found through
+same items: A is `item.build.base`, B `item.build.unit-lease`, C `item.build.unit-pass` and D
+`item.test.merge`, read off the shipped definition 2026-11-15. A witnessed is A witnessed as unit 7's
+`idempotent` plant witnesses it, by a recorded move naming it. `frontier-refused`, `frontier-bad-key` and `plan-frontier` run the driver, found through
 `resolve_kit_dir`, and exit 2 where it does not resolve.
 
 | Case | Plant | Outcome |
 |---|---|---|
 | `frontier-chain` | A, B needs A, C needs B; D with no needs in the next step; A witnessed | `frontier — B` |
-| `frontier-parallel` | A and B with no needs, neither witnessed | `frontier — A · B` |
+| `frontier-parallel` | A and B with no needs, B's needs emptied in the in-memory definition; neither witnessed | `frontier — A · B` |
 | `frontier-refused` | `--refused` on A at its key, its witness unheld | the run-state file gains one `refusal` row; A on the frontier; one `refusal —` line |
 | `frontier-bad-key` | `--refused` with a key not of the instance shape, then with an undeclared tag | exit 1 each, the run-state file's bytes unchanged |
-| `frontier-none` | every item of the step witnessed | `frontier — none` |
+| `frontier-none` | the plant narrows the build's step's items in its in-memory definition, as unit 7's `deadlock` plant edits needs: it keeps A, witnessed, and the step's unit-forward item `item.build.acceptance`, its needs set to D, unwitnessed, and drops the step's other rows; the build's step comes from that unit-forward item, which the least-advanced unit has not passed, so over the shipped rows that item is never witnessed | `frontier — none` |
 | `plan-frontier` | the `frontier-refused` repository, then `--plan` | the line after `next:` is `frontier: A` |
 
 ### Files touched (estimate)
@@ -248,7 +265,8 @@ same items. `frontier-refused`, `frontier-bad-key` and `plan-frontier` run the d
 - perf / scale — the frontier is one pass over the items the engine already read; `--plan` makes the
   one engine call per slug unit 7's S8 makes, so its fork count does not move; `--refused` makes one
   engine call, and no fork-ceiling row measures that verb.
-- error / empty / loading states — a step with every item witnessed prints `frontier — none`; a run
+- error / empty / loading states — a step none of whose unwitnessed items has its needs witnessed
+  prints `frontier — none`; a run
   with no run-state file records nothing and still prints the frontier; runlog unresolved prints
   `refusal — unarmed` and the frontier.
 - observability — each refusal is a dated run-state row, the engine prints every one of the run's, and
@@ -259,9 +277,24 @@ same items. `frontier-refused`, `frontier-bad-key` and `plan-frontier` run the d
   - the kit gate's checks 26, 27, 52 and 10: the header line, `VERBS_SLUG`, the `VERB_REQUIRES` row
     beside its three `check_verb_flag` calls, the `park` call site, the suite's flag line, and the
     verb carrier with its render in one commit (S6).
-  - `harness arms (fail branches armed or pinned)`: each check-48 message `verb_refused` adds is named
+  - `harness arms (fail branches armed or pinned)`: each check-48 message `write_refusal` adds is named
     by a positive assertion in `unattended.test.sh`, read as text; that suite is waived for this build's
     landing (the build README's waiver, owner 2026-10-20) and is not run.
+  - the suite's parity table: every verb `verbs_all` names must have a row
+    (`tools/unattended/unattended.test.sh@ef992d7acaa3:2445`, the loop at :2504), so `PARITY_ROWS` gains a
+    `refused | : | --refused tRun --item i --key k --reason r` row.
+  - the suite's hostile-value matrix: its population is every verb whose header line takes a free-text
+    placeholder, and `--refused`'s `<text>` puts it there, so `refused` joins `_rf_matrix` (:4435) and
+    `run_hostile_verb` (:4407) gains its case, the hostile value in `--reason`.
+  - `shell hygiene (a fork spent on builtin work)`: `verb_propose`'s guards spell the line end as
+    `printf | wc -l` and the bypass flag as `printf | grep -qF`
+    (`tools/unattended/unattended.sh@0c2b6ad26090:13288`, :13295), each a `var-pipe` site
+    (`tools/gate-lint/sh_hygiene.py@448d62cbd57b:626`). `write_refusal` writes both as `case` patterns,
+    `case "$item$key$reason" in *$'\n'*|*$'\r'*)` and, where `BYPASS_BAN` is non-empty,
+    `case "$item$key$reason" in *"$BYPASS_BAN"*)`, so it adds no site.
+  - `lexicon naming predicates`: every function this unit adds, `derive_frontier`, `check_refusal` and
+    `write_refusal`, leads with a declared verb, each asked of `lexicon.py --suggest` 2026-11-15, so the
+    offender count stays at `VERB_OFFENDER_PIN` (`.lexicon.conf@2c348591b068:367`).
   - `unattended skill size` and `unattended skill wiring`: the row raise and the re-render (§4).
   - unit 7's plants, `idempotent` and `deadlock` most: `derive_next_item` answers from the frontier's
     first entry, the same predicate, and `plan-line` still compares the `next:` line alone.
@@ -307,7 +340,8 @@ same items. `frontier-refused`, `frontier-bad-key` and `plan-frontier` run the d
   Red when: a malformed key or an undeclared tag is recorded.
 - **AC6** — When `python position.py --fixture --plant frontier-none` runs, it prints
   `frontier — none`.
-  Red when: a witnessed item appears, or the line is absent.
+  Red when: A, the witnessed item, or `item.build.acceptance`, whose need is unmet, appears, or the line
+  is absent.
 - **AC7** — When `python position.py --fixture --plant plan-frontier` runs, the line after the driver's
   `next:` line is `frontier:` naming A.
   Red when: `--plan` prints no frontier, or prints it anywhere but directly beneath `next:`.
@@ -330,7 +364,7 @@ same items. `frontier-refused`, `frontier-bad-key` and `plan-frontier` run the d
 
 ## 7. Gates
 
-`run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `recall floor` · `recall floor arms` · `memory hygiene` · `core meta-check` · `unattended kit gate` · `unattended skill size` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `runlog selftest` · `drift-audit selftest` · `pre-push run-log line` · `run-gates run-log line` · `policy fixtures` · `scratch-guard self-test` · `tier2-review self-test` · `check-wiring self-test` · `lexicon naming predicates` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest` · `install-prefix (shipped surface)` · `docs` · `kickoff-manifest ratchet` · `codebase-map coverage + freshness`
+`run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `recall floor` · `recall floor arms` · `memory hygiene` · `core meta-check` · `unattended kit gate` · `unattended skill size` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `runlog selftest` · `drift-audit selftest` · `pre-push run-log line` · `run-gates run-log line` · `policy fixtures` · `scratch-guard self-test` · `tier2-review self-test` · `check-wiring self-test` · `lexicon naming predicates` · `shell hygiene (a fork spent on builtin work)` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest` · `install-prefix (shipped surface)` · `docs` · `kickoff-manifest ratchet` · `codebase-map coverage + freshness`
 
 New arm: tools/loop/position.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 · each frontier `--plant` case, and `frontier-chain` red with the needs test removed · none
 New arm: tools/unattended/unattended.test.sh · covers none · arms naming `--refused`, `--key` and each new check-48 message, red with one message's wording changed under the arms check · none, the suite waived for this landing
@@ -395,12 +429,20 @@ New arm: tools/unattended/unattended.test.sh · covers none · arms naming `--re
   with the driver's (F6). The verb's carriers are named: the verb carrier and its render, the Skill and
   its row, the suite's arms. The protocol is untouched (F7). Line citations become symbol citations or
   blob-pinned lines.
+- rev-5 · 2026-11-15 · S3 · S6 · §4 The frontier · §4 Inventory · §4 The fixture cases · §5 · AC6 · §7 ·
+  §10 · per the builder return 2026-11-15-build-TOOL-dDeclaredLoop-14-1-builder-return, by the brief
+  2026-11-15-prompt-TOOL-dDeclaredLoop-14-2-spec-writer: the driver function is `write_refusal`, not a
+  name the lexicon counts as a verb offender, the flag still `--refused`; `derive_frontier` takes the
+  unit id and HEAD its key needs, `witnessed` the held tags mapped to their inputs and `unheld` the
+  other read tags', so each key equals `derive_next_item`'s; `frontier-none` narrows the build's step's
+  items in memory; §5 names the parity row, the hostile-value entry and the `case`-pattern guards, and
+  §7 the spawn-idiom leg. Mechanism, carries, order and status kept.
 
 ## 10. Reuse audit
 
 The seams extended are `park` (`tools/unattended/unattended.sh#park`), the run-state line writer,
 which takes a new kind and no new grammar; `verb_propose`'s guards
-(`tools/unattended/unattended.sh#verb_propose`), which `verb_refused` repeats over its key field;
+(`tools/unattended/unattended.sh#verb_propose`), which `write_refusal` repeats over its key field;
 `PARK_KINDS` and its two copies; runlog's `read_run_state` (`tools/runlog/model.py#read_run_state`),
 which already parses the step field; and unit 7's engine, whose next-item walk becomes the frontier's
 first entry and whose plants, `--selftest` and leg carry this unit's cases. For the frontier walk

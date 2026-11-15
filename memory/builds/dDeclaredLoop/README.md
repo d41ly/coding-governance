@@ -142,7 +142,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-59 — a merge owes a policy trailer only for a key its result sets that no parent and no clean re-merge set](spec/2026-10-24-spec-TOOL-dDeclaredLoop-59.md) | 17 | 2 | CLOSED | rev-4 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-7 — the position engine: each unit's step, the build's step and the next item, from witnesses](spec/2026-10-24-spec-TOOL-dDeclaredLoop-7.md) | 17 | 2 | CLOSED | rev-5 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-112 — the ask plan reads each spec's ask verbs once, so `--status` stops scaling with asks times specs](spec/2026-11-15-spec-TOOL-dDeclaredLoop-112.md) | 18 | 2 | CLOSED | rev-1 | 2026-11-15 |
-| [TOOL-dDeclaredLoop-14 — the default failure route: the refusal recorded and the frontier returned](spec/2026-10-24-spec-TOOL-dDeclaredLoop-14.md) | 18 | 2 | INPROGRESS | rev-4 | 2026-11-15 |
+| [TOOL-dDeclaredLoop-14 — the default failure route: the refusal recorded and the frontier returned](spec/2026-10-24-spec-TOOL-dDeclaredLoop-14.md) | 18 | 2 | INPROGRESS | rev-5 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-45 — a unit reads `built` from its pass commit while no acceptance writer is armed](spec/2026-10-24-spec-TOOL-dDeclaredLoop-45.md) | 18 | 2 | DEFERRED | rev-3 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-69 — a merge whose clean re-merge is computable is graded against that re-merge alone](spec/2026-10-24-spec-TOOL-dDeclaredLoop-69.md) | 18 | 2 | DEFERRED | rev-3 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-4 — stage claims and the coverage gate](spec/2026-10-24-spec-TOOL-dDeclaredLoop-4.md) | 19 | 2 | DEFERRED | rev-5 | 2026-11-15 |
@@ -151,7 +151,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-6 — the factories and conformance gates for commands, policy keys, stages, hooks, roles and workflows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-6.md) | 20 | 2 | DEFERRED | rev-5 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-81 — a clean re-merge that fails is its own state and never takes the parent exemption; only a probed absence of the feature does](spec/2026-10-24-spec-TOOL-dDeclaredLoop-81.md) | 20 | 2 | DEFERRED | rev-5 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-25 — a repository's own stages, spliced between two adjacent gov stages](spec/2026-10-24-spec-TOOL-dDeclaredLoop-25.md) | 21 | 2 | DEFERRED | rev-5 | 2026-11-15 |
-| [TOOL-dDeclaredLoop-47 — the stage factory writes a whole conforming stage: its witness, exit item, state and table rows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-47.md) | 21 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-47 — the stage factory writes a whole conforming stage: its witness, exit item, state and table rows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-47.md) | 21 | 2 | WONTDO | rev-3 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-83 — 75 S27 states 81's exit table, so no merge-tree exit but 0 and 1 falls to the parents](spec/2026-10-24-spec-TOOL-dDeclaredLoop-83.md) | 21 | 2 | DEFERRED | rev-4 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-84 — the specs that restate the clean re-merge's non-zero exits read 81's exit table: 78's states and 82's S27 restatement](spec/2026-10-24-spec-TOOL-dDeclaredLoop-84.md) | 21 | 2 | DEFERRED | rev-3 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-85 — the write-tree capability probe has three answers, and only a probed absence takes the parent exemption](spec/2026-10-24-spec-TOOL-dDeclaredLoop-85.md) | 21 | 2 | DEFERRED | rev-5 | 2026-11-15 |
@@ -213,7 +213,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 466 bound to this build, across 4 record folder(s).
+Records: 475 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -233,7 +233,7 @@ TOOL-dDeclaredLoop-92@rev-1 TOOL-dDeclaredLoop-93@rev-1 TOOL-dDeclaredLoop-94@re
 
 <!-- gen:build-coverage -->
 
-Coverage of dDeclaredLoop's 34 clause(s) and 49 owned node(s), over 100 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dDeclaredLoop's 34 clause(s) and 49 owned node(s), over 99 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 34
 - carried in parts: 0 (none)
@@ -245,20 +245,20 @@ Coverage of dDeclaredLoop's 34 clause(s) and 49 owned node(s), over 100 spec(s) 
 - specs derived from no clause: `spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-36.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-37.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-24-spec-TOOL-dDeclaredLoop-38.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-39.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-40.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-41.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-24-spec-TOOL-dDeclaredLoop-42.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-43.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-44.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-45.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-46.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-47.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-48.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-49.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-50.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-51.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-52.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-53.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-54.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-55.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-56.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-57.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-58.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-59.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-60.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-61.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-62.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-63.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-64.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-65.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-66.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-67.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-68.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-69.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-70.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-71.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-72.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-73.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-74.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-76.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-77.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-78.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-79.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-80.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-81.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-82.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-83.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-84.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-85.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-86.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-87.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-88.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-89.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-90.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-91.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-92.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-93.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-94.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-95.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-96.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-97.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-98.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-99.md` (PLAY-dClosedLoop-2), `spec/2026-11-15-spec-TOOL-dDeclaredLoop-112.md` (TOOL-dDeclaredLoop-7)
+  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-46.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-48.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-49.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-50.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-51.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-52.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-53.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-54.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-55.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-56.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-57.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-58.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-59.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-60.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-61.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-62.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-63.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-64.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-65.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-66.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-67.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-68.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-69.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-70.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-71.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-72.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-73.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-74.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-76.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-77.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-78.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-79.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-80.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-81.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-82.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-83.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-84.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-85.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-86.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-87.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-88.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-89.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-90.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-91.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-92.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-93.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-94.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-95.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-96.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-97.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-98.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-99.md` (PLAY-dClosedLoop-2), `spec/2026-11-15-spec-TOOL-dDeclaredLoop-112.md` (TOOL-dDeclaredLoop-7)
 - clauses the token arm cannot see: cl-dClosedLoop-0086, cl-dClosedLoop-0089, cl-dClosedLoop-0090, cl-dClosedLoop-0091, cl-dClosedLoop-0092, cl-dClosedLoop-0093, cl-dClosedLoop-0094, cl-dClosedLoop-0095, cl-dClosedLoop-0096, cl-dClosedLoop-0097, cl-dClosedLoop-0098, cl-dClosedLoop-0101,
   cl-dClosedLoop-0102, cl-dClosedLoop-0111
 <!-- /gen:build-coverage -->
