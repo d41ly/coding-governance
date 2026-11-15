@@ -298,8 +298,11 @@ own change when it lacks them. A merge equal to its re-merge, a clean merge of t
 keys say, owes nothing, since its sides' own commits are graded in the same push. A merge whose
 clean re-merge's policy file does not parse, two sides declaring the same table apart say, is refused
 naming the merge and `does not parse at C`, never graded against its parents; one whose own file does
-not parse is refused naming `at M`. Every other merge, an octopus merge or one whose re-merge
-conflicts or cannot be read, is graded against its parents,
+not parse is refused naming `at M`. A merge whose clean re-merge fails, an unrelated-history merge
+or a broken object store say, is graded against every parent, with one line naming the failure: it
+owes the trailer and the change record for each key that differs from one parent, the trailer's old
+value the first such parent's. Only an octopus merge, a merge whose re-merge conflicts, or a git
+without `merge-tree --write-tree` is graded against its parents alone,
 with one line saying so: it owes for each key its result sets to a value no parent holds, the
 trailer's old value the first parent's. With no python launcher or no loop kit, the hook prints one
 line saying the check did not run.

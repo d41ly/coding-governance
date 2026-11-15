@@ -40,14 +40,20 @@ re-merge alone (TOOL-dDeclaredLoop-69): it owes for each key its result sets to 
 that re-merge's, a key set back to one side's old value included, the same trailer, its old value the
 re-merge's, and a change record among those git's combined diff, `diff-tree --cc`, lists at the
 merge. A merge equal to its re-merge owes nothing, its sides' commits being graded in the range. That
-re-merge is in one of three states (TOOL-dDeclaredLoop-78): `absent`, its tree lacking the file, read
-as the empty table; `present`, its tree holding it; `uncomputable`, an octopus merge or a merge-tree
-that does not exit 0. A `present` re-merge whose file does not parse is refused, `merge <sha8> · <policy
+re-merge is in one of five states (TOOL-dDeclaredLoop-78, TOOL-dDeclaredLoop-81): `absent`, its tree
+lacking the file, read as the empty table; `present`, its tree holding it; `uncomputable`, an octopus
+merge or a git without `merge-tree --write-tree`, which `resolve_write_tree_support` probes once from
+`git merge-tree -h`, the re-merge never run; `conflicted`, its exit 1; and `failed`, every other
+outcome. A `present` re-merge whose file does not parse is refused, `merge <sha8> · <policy
 path> does not parse at C`, as is a merge whose own file does not parse, `at M`, or a parent's on the
 parents' grade, `at parent <sha8>`; a non-merge commit's reads `on one side`. Every
-`uncomputable` merge is graded against its parents (TOOL-dDeclaredLoop-59), and only where the combined diff
-lists the file with a blob differing from its first parent's: it owes for a key its result sets to a
-value no parent holds, the trailer's old value the first parent's. A commit or merge whose first
+`uncomputable` or `conflicted` merge is graded against its parents (TOOL-dDeclaredLoop-59), and only where the
+combined diff lists the file with a blob differing from its first parent's: it owes for a key its result
+sets to a value no parent holds, the trailer's old value the first parent's. A `failed` merge prints
+`<sha8> graded against every parent — the clean re-merge failed: <detail>`, its exit code and git's
+first standard error line, and owes, with no exemption and whatever the combined diff lists, the
+trailer and record for each key its result sets apart from some parent, the old value the first such
+parent's. A commit or merge whose first
 parent lacks the file is printed and not graded. An all-zero
 base, a new ref, reads as the policy kit's `derive_landed_revision`, its Refusal an exit 2. Exit 1
 names the commit or merge and the key; at `floor.record-changes` `off` each finding is reported after
@@ -73,13 +79,15 @@ WHAT THIS DOES NOT CHECK: a change to the list file alone, which stages no liste
 pre-commit block never calls the verdict; a run's own switch of the floor, which only its change record
 and the push arm witness; a pty wrapper giving an agent a terminal (SA-1), `git commit --no-verify` and
 `git push --no-verify`; that a change record's argument is true; and a commit adding the policy file,
-which the push arm skips (§8 F11) and the verdict refuses off a live run's branch. A merge whose
-clean re-merge is not read, an octopus, a conflicting re-merge or any other exit of `merge-tree`, is
-graded against its parents only, one line naming it and
-why: a key set back to one parent's value passes there unowed, and a value git's clean merge would
-have produced, a multi-line one both sides edited, is owed there.
+which the push arm skips (§8 F11) and the verdict refuses off a live run's branch. Only an octopus
+merge, a conflicting re-merge or a git without `merge-tree --write-tree` is graded against its parents
+alone, one line naming it and why: a key set back to one parent's value passes there unowed, and a
+value git's clean merge would have produced, a multi-line one both sides edited, is owed there. A
+merge whose clean re-merge fails is graded against every parent and owes a trailer and a record for
+each key that differs from one.
 """
 import argparse
+import functools
 import json
 import pathlib
 import re
@@ -323,21 +331,51 @@ def read_added_units(sha, rels=None):
     return units
 
 
+def check_write_tree_usage(text):
+    """True where `git merge-tree -h`'s text names `--write-tree`, the form a git before it lacks."""
+    return "--write-tree" in text
+
+
+@functools.cache
+def resolve_write_tree_support():
+    """Whether this git carries `merge-tree --write-tree`, probed once per process from its usage text,
+    never from a real re-merge's exit (TOOL-dDeclaredLoop-81); OSError where git cannot start."""
+    p = subprocess.run(["git", "merge-tree", "-h"], capture_output=True, text=True, encoding="utf-8",
+                       errors="replace", env=read_clean_env())
+    return check_write_tree_usage(p.stdout + p.stderr)
+
+
+def run_merge_tree(p1, p2):
+    """git's clean re-merge of `p1` and `p2` -> `(exit, stdout, stderr)`; OSError where git cannot start."""
+    p = subprocess.run(["git", "merge-tree", "--write-tree", p1, p2], capture_output=True, text=True,
+                       encoding="utf-8", errors="replace", env=read_clean_env())
+    return p.returncode, p.stdout, p.stderr
+
+
 def read_remerge_policy(parents):
     """The state of git's clean re-merge of the two `parents`, `merge-tree --write-tree`, with its policy
-    table or why it is not read (TOOL-dDeclaredLoop-78) -> `(state, table, why)`: `uncomputable`, table
-    None, for an octopus merge, a conflicting re-merge or any other exit of merge-tree; `absent`, table
-    {}, where it exits 0 and its tree lacks the file; `present` where its tree holds the file, table
-    the file parsed, None where it does not parse. A missing path is never `uncomputable`."""
+    table or why it is not read (TOOL-dDeclaredLoop-78, TOOL-dDeclaredLoop-81) -> `(state, table, why)`:
+    `uncomputable`, table None, for an octopus merge or a git without `merge-tree --write-tree`, the
+    re-merge never run; `conflicted` for its exit 1; `failed`, `why` its detail, for every other outcome:
+    an exit 0 with no tree id, any other exit or a start that fails; `absent`, table {}, where it exits 0
+    and its tree lacks the file; `present` where its tree holds the file, table the file parsed, None
+    where it does not parse. A missing path is never `uncomputable`."""
     _policy, mguard = read_policy_modules()
     if len(parents) != 2:
         return "uncomputable", None, "an octopus merge of %d parents" % len(parents)
-    rc, out = read_git(".", "merge-tree", "--write-tree", *parents)
+    if not resolve_write_tree_support():
+        return "uncomputable", None, "this git has no merge-tree --write-tree"
+    try:
+        rc, out, err = run_merge_tree(*parents)
+    except OSError as e:
+        return "failed", None, "start failed: %s" % e
     if rc == 1:
-        return "uncomputable", None, "its re-merge conflicts, merge-tree exit 1"
-    if rc or not out:
-        return "uncomputable", None, "merge-tree --write-tree exited %d" % rc
-    blob = read_policy_blob(out.splitlines()[0], mguard.POLICY)
+        return "conflicted", None, "its re-merge conflicts, merge-tree exit 1"
+    tree = out.strip().split("\n", 1)[0].strip()
+    if rc or not tree:
+        line = next((ln.strip() for ln in err.splitlines() if ln.strip()), "")
+        return "failed", None, "0 no tree id" if rc == 0 else ("%d %s" % (rc, line)).strip()
+    blob = read_policy_blob(tree, mguard.POLICY)
     return ("absent", {}, None) if blob is None else ("present", parse_policy_bytes(blob), None)
 
 
@@ -376,8 +414,9 @@ def check_push_range(base, tip):
             if kind == "merge":
                 # TOOL-dDeclaredLoop-69: where git's clean re-merge is computable it is the whole reference,
                 # so neither the combined list nor a parent's equal blob skips the merge.
+                # TOOL-dDeclaredLoop-81: a failed re-merge never takes that skip either.
                 state, clean, why = read_remerge_policy(c["parents"])
-                if why and (mguard.POLICY not in listed or old == new):
+                if state in ("uncomputable", "conflicted") and (mguard.POLICY not in listed or old == new):
                     continue
             elif old == new:
                 continue
@@ -389,6 +428,22 @@ def check_push_range(base, tip):
                 side = "at C" if clean is None else "at M" if b is None else None
                 changes = None if side else mguard.derive_leaf_changes(clean, b)
                 if changes == {}:
+                    continue
+                graded += 1
+                if side:
+                    findings.append(unknown % side)
+                    continue
+            elif state == "failed":
+                # TOOL-dDeclaredLoop-81: a re-merge that failed is graded against every parent, no exemption:
+                # each leaf M sets apart from some parent is owed, its old value the first such parent's.
+                print("%s: push · %s graded against every parent — the clean re-merge failed: %s" % (SAY, sha8, why))
+                refs = [a] + [parse_policy_bytes(read_policy_blob(p, mguard.POLICY)) for p in c["parents"][1:]]
+                side = "at M" if b is None else "at parent %s" % c["parents"][refs.index(None)][:8] if None in refs else None
+                changes = {}
+                for r in [] if side else refs:
+                    for k, v in mguard.derive_leaf_changes(r, b).items():
+                        changes.setdefault(k, v)
+                if not (side or changes):
                     continue
                 graded += 1
                 if side:
@@ -466,6 +521,12 @@ PLANTS = {
     "push-merge-both-absent": "a run branch merging main, which deleted the policy file, taking the deletion",
     "push-merge-unparseable-c": "main and a run branch each declaring [leases] apart, git's clean merge "
                                 "declaring it twice, the run keeping its own file, untrailered",
+    "push-merge-unrelated-histories": "an orphan run branch keeping the base's policy file, merged into main with "
+                                      "--allow-unrelated-histories, with trailer and record, then neither",
+    "push-merge-tree-fatal": "a run branch merging main and keeping its own policy file, graded in process with "
+                             "the clean re-merge exiting 128",
+    "push-merge-no-write-tree": "push-merge-both-sides-clean's history graded in process by a git with no "
+                                "merge-tree --write-tree",
     "push-new-branch": "an all-zero base read as origin's default tip, then that tracking ref deleted",
     "proof-signed-refuse": "policy_edit.py set policy-file.proof signed under refuse",
     "proof-signed-fallback": "policy_edit.py set policy-file.proof signed under fallback-reported",
@@ -548,6 +609,27 @@ def run_guard_plant(case, top):
     def run_reset():
         run_fixture_git(top, "reset", "-q", "--hard")
         run_fixture_git(top, "clean", "-qfd")
+
+    def run_grade_in_process(base, swaps, rows):
+        """TOOL-dDeclaredLoop-81: `check_push_range(base, "HEAD")` in this process with `swaps` set on this
+        module for that grade alone, the re-merge counted; one row per `(scenario, owed, needle)`."""
+        import contextlib
+        import io
+        import unittest.mock
+        real, runs, buf = swaps.get("run_merge_tree", run_merge_tree), [], io.StringIO()
+
+        def run_counted_merge_tree(p1, p2):
+            runs.append((p1, p2))
+            return real(p1, p2)
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(contextlib.chdir(top))
+            stack.enter_context(contextlib.redirect_stdout(buf))
+            for attr, value in dict(swaps, run_merge_tree=run_counted_merge_tree).items():
+                stack.enter_context(unittest.mock.patch.object(sys.modules[__name__], attr, value))
+            rc = check_push_range(base, "HEAD")
+        said = buf.getvalue() + "merge-tree runs: %d\n" % len(runs)
+        sys.stdout.write(said)
+        out.extend((name, rc, owed, needle, said) for name, owed, needle in rows)
 
     guard_value = {"with-reason-admitted": "agents-with-reason", "with-reason-no-row": "agents-with-reason",
                    "mandate-live": "agents-within-mandate", "mandate-none": "agents-within-mandate"}.get(case)
@@ -634,7 +716,8 @@ def run_guard_plant(case, top):
                 run_fixture_git(top, "reset", "-q", "--hard", "HEAD~1")
     elif case in ("push-merge-both-sides-clean", "push-merge-conflict-pick", "push-merge-octopus",
                   "push-merge-revert-to-unchanged-side", "push-merge-resurrect-deleted-policy",
-                  "push-merge-resurrect-emptied-policy", "push-merge-both-absent", "push-merge-unparseable-c"):
+                  "push-merge-resurrect-emptied-policy", "push-merge-both-absent", "push-merge-unparseable-c",
+                  "push-merge-no-write-tree"):
         # TOOL-dDeclaredLoop-59: three keys in separate tables, unchanged lines between, so git merges an
         # edit of each cleanly; every non-merge commit carries its trailer and its change record, each
         # branch's records under a build of its own, since a build numbers its records and two branches
@@ -657,14 +740,20 @@ def run_guard_plant(case, top):
             run_fixture_git(top, "commit", "-q", "-m", "%s set" % policy.render_dotted(key),
                             "-m", "%s: %s" % (TRAILER_KEY, render_policy_trailer(policy, key, was, now)))
 
-        if case == "push-merge-both-sides-clean":
+        if case in ("push-merge-both-sides-clean", "push-merge-no-write-tree"):
             run_fixture_git(top, "checkout", "-q", "-b", "side")
             write_key_commit("tSide", *cap)
             run_fixture_git(top, "checkout", "-q", "main")
             write_key_commit(FX_BUILD, *derive_rounds(5))
             run_fixture_git(top, "merge", "-q", "--no-ff", "-m", "merge side", "side")
-            run_scenario("graded", me + ["--push-range", "%s..HEAD" % base], 0,
-                         "2 changing %s · 0 finding(s)" % mguard.POLICY)
+            if case == "push-merge-no-write-tree":
+                # TOOL-dDeclaredLoop-81: the probe answers false, so the re-merge never runs.
+                run_grade_in_process(base, {"resolve_write_tree_support": lambda: False}, [
+                    ("graded", 0, "graded against its parents only — this git has no merge-tree --write-tree"),
+                    ("graded, the re-merge count", 0, "merge-tree runs: 0")])
+            else:
+                run_scenario("graded", me + ["--push-range", "%s..HEAD" % base], 0,
+                             "2 changing %s · 0 finding(s)" % mguard.POLICY)
         elif case == "push-merge-revert-to-unchanged-side":
             # TOOL-dDeclaredLoop-69: the merge's blob equals the run branch's, so the combined list never
             # names it; only the clean re-merge, holding main's value, sees the key set back.
@@ -748,6 +837,48 @@ def run_guard_plant(case, top):
             sha8 = run_fixture_git(top, "rev-parse", "--short=8", "HEAD")
             run_scenario("graded", me + ["--push-range", "%s..HEAD" % base], 0,
                          "%s graded against its parents only" % sha8)
+    elif case in ("push-merge-unrelated-histories", "push-merge-tree-fatal"):
+        # TOOL-dDeclaredLoop-81: main sets review.max-rounds and the run keeps the base's policy file, so the
+        # merge's blob equals the run's and the combined list never names it; only the failed re-merge's
+        # grade against every parent sees main's key dropped.
+        base = run_fixture_git(top, "rev-parse", "HEAD")
+        dropped = "merge %%s · %s · review.max-rounds" % mguard.POLICY
+        if case == "push-merge-tree-fatal":
+            run_fixture_git(top, "checkout", "-q", "-b", "run")
+            write_staged(top, {"fx-run.txt": add_text("the run's own line\n")})
+            run_fixture_git(top, "commit", "-q", "-m", "the run's own commit")
+            run_fixture_git(top, "checkout", "-q", "main")
+        write_staged(top, {mguard.POLICY: add_text(FX_REVIEW)})
+        run_fixture_git(top, "commit", "-q", "-m", "review rounds set on main")
+        tip = run_fixture_git(top, "rev-parse", "HEAD")
+        if case == "push-merge-tree-fatal":
+            run_fixture_git(top, "checkout", "-q", "run")
+            run_fixture_git(top, "merge", "-q", "--no-ff", "--no-commit", "main")
+            run_fixture_git(top, "checkout", "HEAD", "--", mguard.POLICY)
+            run_fixture_git(top, "commit", "-q", "-m", "merge main")
+            sha8 = run_fixture_git(top, "rev-parse", "--short=8", "HEAD")
+            run_grade_in_process(tip, {"run_merge_tree": lambda p1, p2: (128, "", "fatal: fx stand-in\n")}, [
+                ("graded", 1, "the clean re-merge failed: 128 fatal: fx stand-in"),
+                ("graded, the key", 1, dropped % sha8), ("graded, the re-merge count", 1, "merge-tree runs: 1")])
+        else:
+            run_fixture_git(top, "checkout", "-q", "--orphan", "run", base)
+            run_fixture_git(top, "commit", "-q", "-m", "the orphan run")
+            run_fixture_git(top, "checkout", "-q", "main")
+            back = "%s: %s" % (TRAILER_KEY, render_policy_trailer(policy, ("review", "max-rounds"), 4, None))
+            for name, recorded in (("with its trailer and record", True), ("with neither", False)):
+                rc, _out = read_git(top, "merge", "--no-ff", "--no-commit", "--allow-unrelated-histories", "run")
+                if rc != 1:
+                    raise OSError("the unrelated-history merge exited %d, not 1" % rc)
+                run_fixture_git(top, "checkout", "run", "--", mguard.POLICY)
+                if recorded:
+                    write_fixture_record(top, "policy.review.max-rounds")
+                run_fixture_git(top, "commit", "-q", "-m", "merge run", *(["-m", back] if recorded else []))
+                sha8 = run_fixture_git(top, "rev-parse", "--short=8", "HEAD")
+                run_scenario(name, me + ["--push-range", "%s..HEAD" % tip], 0 if recorded else 1,
+                             "0 finding(s)" if recorded else dropped % sha8)
+                out.append(("%s, the failed line" % name, out[-1][1], out[-1][2], "the clean re-merge failed: 128",
+                            out[-1][4]))
+                run_fixture_git(top, "reset", "-q", "--hard", "HEAD~1")
     elif case == "push-new-branch":
         write_staged(top, {mguard.POLICY: add_text(FX_REVIEW)})
         run_fixture_git(top, "commit", "-q", "-m", "review rounds raised, no trailer")
@@ -912,7 +1043,8 @@ def run_selftest():
             "other-write-owner-only": 1, "with-reason-no-row": 1, "mandate-none": 1, "push-no-trailer": 1,
             "proof-signed-refuse": 2, "proof-signed-fallback": 1, "push-merge-resolution-edit": 1,
             "push-merge-revert-to-unchanged-side": 1, "push-merge-resurrect-deleted-policy": 1,
-            "push-merge-resurrect-emptied-policy": 1, "push-merge-unparseable-c": 1, "push-new-branch": 2}
+            "push-merge-resurrect-emptied-policy": 1, "push-merge-unparseable-c": 1, "push-new-branch": 2,
+            "push-merge-unrelated-histories": 1, "push-merge-tree-fatal": 1}
     cases = [(case, ["--fixture", "--plant", case], owed.get(case, 0), "%s: fixture · plant %s · " % (SAY, case),
               "all held") for case in PLANTS]
     return run_selftest_cases(main, cases, "%s: selftest" % SAY)
