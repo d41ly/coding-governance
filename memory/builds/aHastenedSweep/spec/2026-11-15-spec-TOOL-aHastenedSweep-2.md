@@ -1,6 +1,6 @@
 # TOOL-aHastenedSweep-2 — `selectable` computes each basename once, and `walk` derives its roots once
 
-**Status:** SPECCED · rev-1 · 2026-11-15 · node a · Tier-2 · base f25308f0 · streams tooling · order 1
+**Status:** INPROGRESS · rev-1 · 2026-11-15 · node a · Tier-2 · base f25308f0 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

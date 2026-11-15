@@ -31,3 +31,11 @@ base: f25308f019b4fbd05964a81c70ff85d3599ea51b
 ## Parked
 
 2026-11-15T19:26:55Z resume · item aHastenedSweep · reason working · keepalive 7be37e69 · manual
+
+2026-11-15T19:35:24Z dispatch · item bc284c95 TOOL-aHastenedSweep-1 · reason tools/memory-tree/check-memory-hygiene.sh memory/guides/SESSION-KICKOFF.md memory/builds/aHastenedSweep/build/2026-11-15-build-TOOL-aHastenedSweep-1-1-acceptance-ledger.md memory/builds/aHastenedSweep/spec/2026-11-15-spec-TOOL-aHastenedSweep-1.md memory/builds/aHastenedSweep/README.md memory/LIVE.md memory/ledger/2026-11.md memory/map/generated/symbols.json
+
+2026-11-15T19:36:28Z brief · item TOOL-aHastenedSweep-1 · reason 94776d96bb5d memory/builds/aHastenedSweep/prompts/2026-11-15-prompt-TOOL-aHastenedSweep-1-brief.md
+
+2026-11-15T19:36:37Z brief · item TOOL-aHastenedSweep-2 · reason 94776d96bb5d memory/builds/aHastenedSweep/prompts/2026-11-15-prompt-TOOL-aHastenedSweep-1-brief.md
+
+2026-11-15T19:38:09Z dispatch · item bc284c95 TOOL-aHastenedSweep-2 · reason tools/memory-tree/gotchas.py tools/memory-tree/corpus_ids.py memory/builds/aHastenedSweep/build/2026-11-15-build-TOOL-aHastenedSweep-2-1-acceptance-ledger.md memory/builds/aHastenedSweep/spec/2026-11-15-spec-TOOL-aHastenedSweep-2.md memory/LIVE.md memory/ledger/2026-11.md memory/map/generated/symbols.json

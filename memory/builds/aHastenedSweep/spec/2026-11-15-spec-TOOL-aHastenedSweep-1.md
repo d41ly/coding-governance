@@ -1,6 +1,6 @@
 # TOOL-aHastenedSweep-1 — check 25's by-name pass tests `index()` before `test_whole_token`
 
-**Status:** SPECCED · rev-1 · 2026-11-15 · node a · Tier-2 · base f25308f0 · streams tooling · order 1
+**Status:** INPROGRESS · rev-1 · 2026-11-15 · node a · Tier-2 · base f25308f0 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

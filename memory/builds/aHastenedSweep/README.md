@@ -53,14 +53,14 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 4 unit(s) · node a · opened 2026-11-15 · streams tooling
+**Build status:** INPROGRESS · 4 unit(s) · node a · opened 2026-11-15 · streams tooling
 ids TOOL-aHastenedSweep-1 TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-3 TOOL-aHastenedSweep-4
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aHastenedSweep-1 — check 25's by-name pass tests `index()` before `test_whole_token`](spec/2026-11-15-spec-TOOL-aHastenedSweep-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-11-15 |
-| [TOOL-aHastenedSweep-2 — `selectable` computes each basename once, and `walk` derives its roots once](spec/2026-11-15-spec-TOOL-aHastenedSweep-2.md) | 1 | 2 | SPECCED | rev-1 | 2026-11-15 |
+| [TOOL-aHastenedSweep-1 — check 25's by-name pass tests `index()` before `test_whole_token`](spec/2026-11-15-spec-TOOL-aHastenedSweep-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-11-15 |
+| [TOOL-aHastenedSweep-2 — `selectable` computes each basename once, and `walk` derives its roots once](spec/2026-11-15-spec-TOOL-aHastenedSweep-2.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-11-15 |
 | [TOOL-aHastenedSweep-3 — the hygiene shell hands `corpus_ids.py --check` its index set when checks 1 to 5 ran clean](spec/2026-11-15-spec-TOOL-aHastenedSweep-3.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-15 |
 | [TOOL-aHastenedSweep-4 — checks 13 to 16 and 17 to 19 run in one Python process over one frozen, memoized walk](spec/2026-11-15-spec-TOOL-aHastenedSweep-4.md) | 3 | 2 | SPECCED | rev-1 | 2026-11-15 |
 <!-- /gen:build-units -->
