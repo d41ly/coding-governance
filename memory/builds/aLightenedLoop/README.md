@@ -73,7 +73,7 @@ ids TOOL-aLightenedLoop-1 TOOL-aLightenedLoop-2 TOOL-aLightenedLoop-3 TOOL-aLigh
 | [TOOL-aLightenedLoop-7 — the tracked idle-wake cadence retired: its conf key removed everywhere, `--wake` naming the base cadence, and the idle-wake help page's block marked not to run](spec/2026-11-15-spec-TOOL-aLightenedLoop-7.md) | 7 | 2 | CLOSED | rev-1 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 29 bound to this build, across 4 record folder(s).
+Records: 30 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-14-build-TOOL-aLightenedLoop-1-analysis.md](../build/2026-11-14-build-TOOL-aLightenedLoop-1-analysis.md) | research | TOOL-aLightenedLoop-1 TOOL-aLightenedLoop-2 TOOL-aLightenedLoop-4 TOOL-aLightenedLoop-5 |
 | [2026-11-14-build-TOOL-aLightenedLoop-3-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aLightenedLoop-3-1-acceptance-ledger.md) | journal | — |
+| [2026-11-15-build-TOOL-aLightenedLoop-1-arms-observed.md](../build/2026-11-15-build-TOOL-aLightenedLoop-1-arms-observed.md) | journal | TOOL-aLightenedLoop-1 TOOL-aLightenedLoop-2 TOOL-aLightenedLoop-4 TOOL-aLightenedLoop-5 TOOL-aLightenedLoop-6 TOOL-aLightenedLoop-7 |
 | [2026-11-14-prompt-TOOL-aLightenedLoop-1-brief.md](../prompts/2026-11-14-prompt-TOOL-aLightenedLoop-1-brief.md) | research | TOOL-aLightenedLoop-1 TOOL-aLightenedLoop-2 TOOL-aLightenedLoop-4 TOOL-aLightenedLoop-5 |
 | [2026-11-14-prompt-TOOL-aLightenedLoop-1-fork-answers.md](../prompts/2026-11-14-prompt-TOOL-aLightenedLoop-1-fork-answers.md) | research | TOOL-aLightenedLoop-1 TOOL-aLightenedLoop-5 |
 | [2026-11-14-prompt-TOOL-aLightenedLoop-3-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aLightenedLoop-3-1-spec-writer.md) | journal | — |

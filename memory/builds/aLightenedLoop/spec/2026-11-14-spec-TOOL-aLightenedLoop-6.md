@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-14-build-TOOL-aLightenedLoop-6-1-acceptance-ledger.md](../build/2026-11-14-build-TOOL-aLightenedLoop-6-1-acceptance-ledger.md) | journal | — |
+| [2026-11-15-build-TOOL-aLightenedLoop-1-arms-observed.md](../build/2026-11-15-build-TOOL-aLightenedLoop-1-arms-observed.md) | journal | TOOL-aLightenedLoop-1 TOOL-aLightenedLoop-2 TOOL-aLightenedLoop-3 TOOL-aLightenedLoop-4 TOOL-aLightenedLoop-5 TOOL-aLightenedLoop-7 |
 | [2026-11-14-prompt-TOOL-aLightenedLoop-6-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aLightenedLoop-6-1-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aLightenedLoop-6-2-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aLightenedLoop-6-2-spec-writer.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aLightenedLoop-6-promotion.md](../prompts/2026-11-14-prompt-TOOL-aLightenedLoop-6-promotion.md) | research | — |
