@@ -228,7 +228,7 @@ corpus, and it is graded from the landing commit onward.
 
 ## 7. Gates
 
-`spec tokens (a spec's own names resolve)` · `spec-tokens self-test` · `kit/dogfood doc parity` · `kit version markers` · `kickoff-manifest ratchet` · `memory-hygiene self-test` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `testsuite counts (every bar self-test prints one)` · `memory hygiene`
+`spec tokens (a spec's own names resolve)` · `spec-tokens self-test` · `kit/dogfood doc parity` · `kit version markers` · `kickoff-manifest ratchet` · `memory-hygiene self-test` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `testsuite counts (every bar self-test prints one)` · `memory hygiene` · `branch-guard self-test`
 
 `kit version markers` and `kickoff-manifest ratchet` are the two legs the version move arms: the
 first compares every marker to the constant, and the second sees a watched file change.
