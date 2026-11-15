@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-46 — the `stage` claim follows the whole manifest-key path: descriptors, emitter, runner floor and selfcheck
 
-**Status:** INPROGRESS · rev-4 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 20 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-5 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 20 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-10-25-build-TOOL-dDeclaredLoop-46-deviation-462.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-46-deviation-462.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-46-1-builder-return.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-46-1-builder-return.md) | journal | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-46-deviation-463.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-46-deviation-463.md) | deviation | — |
+| [2026-11-15-build-TOOL-dDeclaredLoop-46-deviation-464.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-46-deviation-464.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-56 |
@@ -42,14 +43,18 @@ floor named by a runner version this unit moves. It repairs `TOOL-dDeclaredLoop-
 
 ## 2. Scope (IN)
 
-- **S1** — The floor's version. `KIT_RUN_GATES_VERSION` in `tools/run-gates/run-gates.sh` moves from the
-  value this pass finds to that value with its last dotted component plus one, the step
-  `tools/govkit/govkit.py#cmd_mint` takes, with one history comment line under it naming the canary's
-  admission of `stage`. Then `python tools/govkit/govkit.py selfcheck --fix` moves its carriers: the
-  `gov:kit run-gates@` comment on the same line and the marker on line 3 of `tools/run-gates/README.md`.
-  `STAGE_FLOOR_RUN_GATES` in `tools/govkit/govkit.py` is the new version as a tuple, beside
-  `CEILING_FLOOR_RUN_GATES`, with a comment naming why. It is the first version whose canary admits the
-  key, since `TOOL-dDeclaredLoop-4` lands the admission at order 19 with no version move. Observed by AC1.
+- **S1** — The floor's version. `KIT_RUN_GATES_VERSION` in `tools/run-gates/run-gates.sh` moves to one
+  above the higher of two values read at this pass's start: the branch's own, and the one origin/main's
+  copy of that file reads, through `git show` after a fetch. One above is that value's last
+  dotted component plus one, the step `tools/govkit/govkit.py#cmd_mint` takes. One history comment line
+  under it names the canary's admission of `stage`, and names origin/main's value as the one it steps
+  over when that is the higher. Then `python tools/govkit/govkit.py selfcheck --fix` moves its carriers:
+  the `gov:kit run-gates@` comment on the same line and the marker on line 3 of
+  `tools/run-gates/README.md`. `STAGE_FLOOR_RUN_GATES` in `tools/govkit/govkit.py` is the new version as
+  a tuple, beside `CEILING_FLOOR_RUN_GATES`, with a comment naming why. It is the first version whose
+  canary admits the key, since `TOOL-dDeclaredLoop-4` lands the admission at order 19 with no version
+  move, and it stands above every version origin/main has shipped without that admission. Observed by
+  AC1 and AC5.
 - **S2** — The descriptors. Every `[[gate_leg]]` table of every kit descriptor, `tools/*/kit.toml` and
   `tools/govkit/entries/*.kit.toml`, declares `stage`: a TOML list of step tags equal to its
   `tools/gate-legs.json` row's, written as the table's last key. AC2 derives the population at
@@ -89,25 +94,44 @@ floor named by a runner version this unit moves. It repairs `TOOL-dDeclaredLoop-
 
 ### Evidence
 
-Every reading below was taken on 2026-11-15 from branch/unattended-declared-loop-d56bf0 at
-`89baa328c`, through `git show`, since this worktree is cut from main at `aebbb4a72`, which lacks the
-loop kit. The spec-token check ran on the worktree's own tree.
+Every reading below was taken on 2026-11-15 through `git show`, from branch/unattended-declared-loop-d56bf0
+at `98ba0aec9` unless it names origin/main, which it read at `179486e8f`. This worktree is cut from main
+at `179486e8f`, which lacks the loop kit. The spec-token check ran on the worktree's own tree.
 
-- The canary's two `KNOWN` copies hold `name argv guard impure reads chunk subject ceiling signature
-  doc_reads pack enforces pass_leg scope_of` and no `stage`
-  (`tools/run-gates/run-gates.test.sh@316947ce773c:375`, :711), 14 keys PINNED 2026-11-15.
-  `TOOL-dDeclaredLoop-4` rev-4 S7 adds `stage` to both at order 19, and its §5 leaves kit versions to
-  the lander, so no version names that admission until S1.
-- The runner reads `KIT_RUN_GATES_VERSION=1.47` (`tools/run-gates/run-gates.sh@bfc3ad495ef2:36`), and
-  origin/main reads the same, PINNED 2026-11-15. Its carriers are that line's own marker and
-  `tools/run-gates/README.md@589c15f93b35:3`, the only two hits of the value under `tools/`, `skills/`
-  and `help/`; `selfcheck --fix` writes carriers through `write_version_carriers`
-  (`tools/govkit/govkit.py#selfcheck`).
-- The lander mints each moved entry's last component plus one (`tools/govkit/govkit.py#cmd_mint`), and
-  a commit that changes the version value counts as a bump dating every move before it
-  (`tools/govkit/govkit.py#derive_epoch_state`). So a bump made after `TOOL-dDeclaredLoop-4`'s commit
-  leaves the run-gates entry clean at the landing unless a later commit moves its bytes, and then the
-  mint lands above the floor, never below it.
+- On the branch the canary's two `KNOWN` copies hold `name argv guard impure reads chunk subject
+  ceiling signature doc_reads pack enforces pass_leg scope_of stage`
+  (`tools/run-gates/run-gates.test.sh@eafb5e8934ab:375`, :711), 15 keys PINNED 2026-11-15, as
+  `TOOL-dDeclaredLoop-4` S7 left them; its §5 leaves kit versions to the lander, so no version names
+  that admission until S1. On origin/main both copies hold the first 14 keys PINNED 2026-11-15 and no
+  `stage` (`tools/run-gates/run-gates.test.sh@565cffb55025:391`, :812).
+- The branch's runner reads `KIT_RUN_GATES_VERSION=1.47`
+  (`tools/run-gates/run-gates.sh@bfc3ad495ef2:36`). origin/main's reads `1.48`
+  (`tools/run-gates/run-gates.sh@55bfad7a1a3b:36`), written by the mint into the aMeasuredDrag landing
+  merge `30bb17eb4` against its first parent, and its README marker reads the same
+  (`tools/run-gates/README.md@a21161104542:3`). Their merge base `0578adb73` reads `1.47`, so both
+  lines move that one version line from one base value. So "one above the branch's value" is `1.48`,
+  a number origin/main has shipped with a canary that refuses `stage`; the higher of the two values is
+  what S1 steps from. The builder return
+  `memory/builds/dDeclaredLoop/build/2026-11-15-build-TOOL-dDeclaredLoop-46-1-builder-return.md` found
+  this divergence.
+- The branch's carriers are that line's own marker and `tools/run-gates/README.md@589c15f93b35:3`, the
+  only two hits of the value under `tools/`, `skills/` and `help/`; `selfcheck --fix` writes carriers
+  through `write_version_carriers` (`tools/govkit/govkit.py#selfcheck`). That writer rewrites
+  `gov:kit <entry>@<n>` markers and numbers on a line matching the entry's `version_from` pattern, which
+  for run-gates is `^KIT_RUN_GATES_VERSION=` (`tools/run-gates/kit.toml@ebe7850ef5c4:15`), so it never
+  writes the floor's tuple (`tools/govkit/govkit.py#write_version_carriers`).
+- The lander mints each moved entry's last component plus one, read from the working tree
+  (`tools/govkit/govkit.py#cmd_mint`), and a commit that changes the version value counts as a bump
+  dating every move before it (`tools/govkit/govkit.py#derive_epoch_state`). So a bump made after
+  `TOOL-dDeclaredLoop-4`'s commit leaves the run-gates entry clean at the landing unless a later commit
+  moves its bytes, and then the mint lands above the floor, never below it. When the base already
+  holds the head's value, `derive_epoch_state` reads the entry as moved and the mint steps it again.
+- `tools/push-main.sh#cmd_prepare` merges the branch onto the advertised tip of origin/main; on a
+  conflict it changes nothing and names `git merge` of origin/main on the branch as the remedy. It then
+  runs `run_minter` over the advertised tip and the branch tip, writing the mint into the merge. The
+  runner's history comments record such reconciles as one above the higher of both sides, in the form
+  `1.28 + 1.27 -> 1.29` (`tools/run-gates/run-gates.sh@bfc3ad495ef2:44`, and `1.30 + 1.30 -> 1.31` at
+  :40).
 - The floors are `SUBJECT_FLOOR_RUN_GATES`, `DOC_READS_FLOOR_RUN_GATES` and `CEILING_FLOOR_RUN_GATES`, each
   passed to `check_target_reads_subject`, which reads the target's own runner, admits a target with no
   runner, and treats an unreadable version as below the floor
@@ -116,7 +140,7 @@ loop kit. The spec-token check ran on the worktree's own tree.
   `ceiling` verbatim with no fallback to gov's manifest (`tools/govkit/govkit.py#write_gate_legs`).
 - `govkit apply` withholds the canary: `run-gates.test.sh` is `project-owned`
   (`tools/run-gates/kit.toml@ebe7850ef5c4:45`) and `run-gates canary` is gov's `[[exempt_leg]]`
-  (`tools/govkit/registry.toml@f10f1954f222:727`). The copy-install path is a plain copy of the kit
+  (`tools/govkit/registry.toml@25a20ad7e6cb:727`). The copy-install path is a plain copy of the kit
   directory (`tools/run-gates/kit.toml@ebe7850ef5c4:41`), so a copy-installed adopter's bar runs the
   canary over its manifest, and that is the target a below-floor `stage` would red.
 - 7h reads one dict per manifest field and compares per leg: `subject`, `doc_reads` and `impure` with
@@ -195,6 +219,8 @@ The self-test arms extend two existing functions and mint no symbol of their own
 - **Leaving the version to the lander's mint.** The floor is a constant written at build time, and the
   value a landing mints depends on the default branch's tip at that landing, so the floor could not
   name it.
+- **Stepping from the branch's value alone, as rev-4 did.** origin/main minted its own next number
+  while this build ran, so that step names a runner the default branch ships without the admission.
 - **Keeping the claims out of the manifest, as `[[leg]]` rows in `tools/loop/loop.toml`.** A second
   table keyed by leg name beside the manifest is two spellings of one fact with nothing comparing them.
 - **Falling back to gov's manifest in the emitter.** `ceiling` is carried from the descriptor with no
@@ -216,7 +242,22 @@ The self-test arms extend two existing functions and mint no symbol of their own
     admits it.
   - `kit version markers` and `kit epoch (shipped bytes move, the version moves)`: the constant and both
     carriers move together through `selfcheck --fix`, and the bump follows unit 4's commit.
-  - `kickoff-manifest ratchet`: the watch line of `memory/guides/SESSION-KICKOFF.md@a4e5532a4351:7`
+  - a shipped runner below the admission: origin/main may mint run-gates again after this pass, to or
+    past the floor, with a canary that still lacks `stage`. AC5 is the guard (§8 F5): a probe at the
+    close, observed again over the landing's reconciled tree, which reds when the floor is at or below
+    origin/main's runner version while origin/main's canary lacks `stage`. It does not check a move of
+    origin/main during the landing's own push attempt, which the lander's automatic re-prepare merges
+    with no session turn; that move reds AC5 only where the re-prepare refuses on a conflict.
+- landing — the reconcile of the version marker. Both lines move the version line of
+  `tools/run-gates/run-gates.sh` from merge base `0578adb73`, so `tools/push-main.sh#cmd_prepare`
+  conflicts on it and refuses, naming a `git merge` of origin/main on the branch. That reconcile writes
+  `KIT_RUN_GATES_VERSION` as one above the higher of the two sides, with one history line in the
+  runner's `a + b -> c` form, and runs `selfcheck --fix` for the carriers. Where origin/main's version
+  has reached `STAGE_FLOOR_RUN_GATES` and its canary lacks `stage`, the same merge commit moves the
+  floor to the reconciled value; otherwise the floor stays. AC5 is then observed over the reconciled
+  tree. The prepare's mint that follows only raises the value read from the working tree and never
+  writes the floor (§4 Evidence), so the landed runner stays at or above the floor.
+  - `kickoff-manifest ratchet`: the watch line of `memory/guides/SESSION-KICKOFF.md@67bea2b1b583:7`
     names the runner, so the audit block is restamped with a `manifest-audit:` delta line.
   - `govkit selftest`: the staged edits of `check_benched_probe_arms` still match once (§4 Evidence);
     the L1 fixture carries no `stage` on either side; the `pm fixture leg` plant has no manifest row,
@@ -238,7 +279,7 @@ The self-test arms extend two existing functions and mint no symbol of their own
   45, 69 and 78, at orders 17 to 19, add no descriptor gate leg: unit 7's leg is gov's `[[exempt_leg]]`,
   and units 7 and 14 touch only comments of `tools/loop/kit.toml`, whose `[[gate_leg]]` tables this unit
   edits.
-- testing — AC1 to AC4 as probes; the arm under §7, observed red then green at the close.
+- testing — AC1 to AC5 as probes; the arm under §7, observed red then green at the close.
 - migration — an adopter's rows gain `stage` on its next `apply` or `update` once its runner reaches the
   floor; a row gov writes is gov's, rewritten whole as `subject` is.
 - user docs — `tools/run-gates/README.md` documents no manifest key list today, so only its marker
@@ -247,13 +288,15 @@ The self-test arms extend two existing functions and mint no symbol of their own
 ## 6. Acceptance criteria
 
 - **AC1** — When `grep -n '^KIT_RUN_GATES_VERSION=' tools/run-gates/run-gates.sh` and
-  `grep -n 'gov:kit run-gates@' tools/run-gates/README.md` run, both print one version, the value at
-  the pass's start with its last component plus one; `python -c "import govkit;
-  print(govkit.STAGE_FLOOR_RUN_GATES)"`, run in the govkit kit folder, prints that version as a tuple;
-  and `grep -c '^KNOWN = {.*"stage"' tools/run-gates/run-gates.test.sh` prints 2.
-  Red when: the floor names a version whose canary lacks `stage`, such as the value the pass found, or
-  a carrier disagrees with the constant.
-  figure: the starting value is DERIVED at observation from the pass's base commit.
+  `grep -n 'gov:kit run-gates@' tools/run-gates/README.md` run, both print one version: the higher of
+  the branch's value at the pass's start and origin/main's, with its last component plus one;
+  `python -c "import govkit; print(govkit.STAGE_FLOOR_RUN_GATES)"`, run in the govkit kit folder,
+  prints that version as a tuple; and `grep -c '^KNOWN = {.*"stage"' tools/run-gates/run-gates.test.sh`
+  prints 2.
+  Red when: the floor names a version whose canary lacks `stage`, such as either value the pass found,
+  or a carrier disagrees with the constant.
+  figure: the starting value is DERIVED at observation, as the higher of the value at the pass's base
+  commit and the one origin/main's copy of the runner reads after a fetch.
 - **AC2** — When a `python -c` probe loads every `tools/*/kit.toml` and `tools/govkit/entries/*.kit.toml`
   with `tomllib` and joins each `[[gate_leg]]` table to its `tools/gate-legs.json` row by name, it prints
   the table count with zero tables lacking `stage` and zero differing, and
@@ -273,6 +316,17 @@ The self-test arms extend two existing functions and mint no symbol of their own
   the key taken off that table instead, it exits 1 naming the same leg.
   Red when: 7h compares no `stage`, so the two spellings disagree silently.
   cost: one scratch copy of the tree, as `check_benched_probe_arms` uses.
+- **AC5** — When `git fetch origin` runs and a `python -c` probe reads origin/main's runner version and
+  its two `KNOWN` lines through `git show` of origin/main's copies of the runner and of its canary
+  suite, and reads `STAGE_FLOOR_RUN_GATES` and the
+  tree's own `KIT_RUN_GATES_VERSION`, it prints the three versions and whether origin/main's canary
+  admits `stage`. Where it does not, the floor is above origin/main's version; in every case the floor
+  is at or below the tree's own. The close observes it, and the landing observes it again over the
+  reconciled tree before the prepare (§5 landing).
+  Red when: origin/main has minted run-gates to or past the floor with a canary that lacks `stage`, so
+  the floor names a runner the default branch ships that refuses the key, or the floor stands above
+  the tree's own runner.
+  figure: every version is DERIVED at observation from the fetched origin/main and the tree.
 
 ## 7. Gates
 
@@ -296,7 +350,7 @@ New arm: tools/govkit/selftest.py · covers AC3 AC4 · `check_ceiling_emission` 
   to descriptors and adopters' rows as written; (b) a `[[gate_leg]]` of `tools/loop/kit.toml`, shipping
   the leg here; (c) it stays gov's own and no claim travels: `stage` remains a key of gov's manifest
   alone, as `enforces` does, whose leg `core meta-check` is gov's `[[exempt_leg]]`
-  (`tools/govkit/registry.toml@f10f1954f222:887`), and this unit has nothing left to build. (b) runs
+  (`tools/govkit/registry.toml@25a20ad7e6cb:895`), and this unit has nothing left to build. (b) runs
   the leg over populations an adopter's tree does not hold as gov's does: `[[hook]]` rows naming gov's
   hooks read stale there, the map may be absent, and a below-floor runner's rows carry no claim. That is
   a mechanism of its own, beyond this unit. (c) is the smallest, but leaves every leg gov ships arriving
@@ -311,6 +365,19 @@ New arm: tools/govkit/selftest.py · covers AC3 AC4 · `check_ceiling_emission` 
   under F3 (a), and (b) prints one line for every emitted leg on every below-floor run.
   Recommendation (a), the body's.
   RESOLVED (agent, 2026-11-15, delegated): (a), rung 3: silent below the floor, as the ceiling key is omitted
+  widens: none · relaxes: none
+- **F5 — What keeps the floor above every runner origin/main ships without the admission, if origin/main
+  mints again before this build lands?** Options: (a) AC5, a probe of the floor against origin/main's
+  runner version and canary, observed at the close and again over the landing's reconciled tree, with
+  the reconcile moving the floor to the reconciled value where origin/main has reached it (§5
+  landing); (b) a bar leg making the same compare on every run, which is a gate of its own and so a
+  separate unit, reads a remote-tracking ref the bar's hermetic legs do not read, and passes vacuously
+  once this build lands and origin/main's canary admits `stage`; (c) a floor read at apply time from
+  the target's own canary instead of a version, which replaces the floor pattern the three sibling
+  floors share and is a mechanism beyond this unit. (a) leaves one window open: origin/main moving
+  during the landing's own push attempt, which the lander re-prepares with no session turn (§5).
+  Recommendation (a), the body's.
+  RESOLVED (agent, 2026-11-15, delegated): (a), rung 3: (b) is a separate mechanism needing a remote-tracking ref the bar does not read, and (c) replaces the floor pattern three floors share, so the close probe and the reconcile's floor raise is the option that survives
   widens: none · relaxes: none
 
 ## 9. Revision log
@@ -333,6 +400,8 @@ New arm: tools/govkit/selftest.py · covers AC3 AC4 · `check_ceiling_emission` 
   omission is silent (F4); AC2 reads the tables through `tomllib`, since other descriptor tables carry
   their own `stage`; AC3 observes the below-floor half through the reader, as the ceiling's arm does.
   Line citations become symbol citations or blob-pinned lines.
+- rev-5 · 2026-11-15 · S1 · §4 · §5 · AC1 AC5 · §8 F5 · §10 · re-grounded at `98ba0aec9` and origin/main
+  `179486e8f` by the brief 2026-11-15-prompt-TOOL-dDeclaredLoop-46-2-spec-writer, after the builder return 2026-11-15-build-TOOL-dDeclaredLoop-46-1-builder-return found origin/main already shipping run-gates `1.48` with a canary lacking `stage`; S1 steps from the higher of the branch's and origin/main's values, AC5 and F5 keep the floor above origin/main's runner to the landing, and §5 names the landing's reconcile of the version marker; mechanism, carries, order and status kept.
 
 ## 10. Reuse audit
 
@@ -341,8 +410,10 @@ The seams are govkit's runner-floor pattern, `check_target_reads_subject` with a
 selfcheck 7h's per-field correspondence (`tools/govkit/govkit.py#selfcheck`); this unit adds one
 constant, one emitted key and one compare to them, and its arms extend
 `tools/govkit/selftest.py#check_ceiling_emission` and `tools/govkit/selftest.py#check_benched_probe_arms`. The version move reuses `selfcheck --fix` for its
-carriers. `python tools/codebase-map/reuse_lookup.py "a manifest key carried to adopters under a
+carriers, and the landing's reconcile reuses the lander's own conflict path in
+`tools/push-main.sh#cmd_prepare` and the runner's `a + b -> c` history form; AC5 is a probe, adding no
+code. `python tools/codebase-map/reuse_lookup.py "a manifest key carried to adopters under a
 runner version floor"` ranked `key`, `keys`, `manifest` and `read_conf_key` at rev-1, none of which
 gates an emitted key on the target's runner, so the floor pattern was found by reading the emitter.
 
-Recall terms used: gate-legs stage KNOWN canary write_gate_legs runner floor selfcheck 7h descriptor gate_leg doc_reads ceiling mint carriers
+Recall terms used: gate-legs stage KNOWN canary write_gate_legs runner floor selfcheck 7h descriptor gate_leg doc_reads ceiling mint carriers origin/main reconcile prepare merge-base
