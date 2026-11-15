@@ -8458,6 +8458,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "cmd_check_with_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
+    },
+    {
       "id": "cmd_contribute",
       "kind": "function",
       "file": "tools/govkit/govkit.py"

@@ -134,6 +134,21 @@ def load_conf(root: str) -> dict:
     return conf
 
 
+# TOOL-aHastenedSweep-4 S3: the corpus_ids module `--check-with-ids` loaded and switched its walk memo
+# on in. None at import and outside that verb, so every other caller loads a module of its own.
+_SHARED_CORPUS_IDS = None
+
+
+def _load_corpus_ids():
+    """A fresh `corpus_ids` module, loaded from beside this file: the one load both askers spell."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("corpus_ids", HERE / "corpus_ids.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
 def append_only_re(root: str) -> re.Pattern:
     """The append-only classification, ASKED of the script that owns it — never retyped here.
 
@@ -141,16 +156,12 @@ def append_only_re(root: str) -> re.Pattern:
     two classes with one name are two classes. Every failure crossing this boundary is re-raised as
     ours, so a hygiene gate never emits a traceback.
     """
-    import importlib.util
-
     src = HERE / "corpus_ids.py"
     if not src.is_file():
         raise Problem(f"gotchas: {src} is missing — it owns the append-only classification "
                       f"checks 17-19 read")
     try:
-        spec = importlib.util.spec_from_file_location("corpus_ids", src)
-        mod = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(mod)
+        mod = _load_corpus_ids()
         return re.compile(mod.ask_shell("--print-append-only-ere", root).strip() or r"(?!)")
     except Problem:
         raise
@@ -168,16 +179,14 @@ def load_defined_ids(root: str, grammar_dir=None):
     row resolves exactly as a decision-log row does. `grammar_dir` exists for the self-test's
     absent-kit arm and points the loaded module at a directory holding no grammar.
     """
-    import importlib.util
-
     src = HERE / "corpus_ids.py"
     if not src.is_file():
         raise Problem(f"gotchas: {src} is missing — it owns the defined-id set check 18 resolves "
                       f"an invariant's decision against")
     try:
-        spec = importlib.util.spec_from_file_location("corpus_ids", src)
-        mod = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(mod)
+        # The one-process verb's own module, whose walk is memoized, unless the self-test's absent-kit
+        # arm needs a module of its own to point at a directory holding no grammar.
+        mod = _SHARED_CORPUS_IDS if _SHARED_CORPUS_IDS is not None and grammar_dir is None else _load_corpus_ids()
         if grammar_dir is not None:
             mod.GRAMMAR_DIR = pathlib.Path(grammar_dir)
         if not (mod.GRAMMAR_DIR / "id_grammar.py").is_file():
@@ -662,6 +671,38 @@ def cmd_check(root: str, conf: dict) -> int:
     if advisory:
         print(advisory)
     return 1 if bad else 0
+
+
+def cmd_check_with_ids() -> int:
+    """Checks 13-16 and then 17-19 in ONE interpreter over ONE walk (TOOL-aHastenedSweep-4 S4).
+
+    Runs `corpus_ids.py --check` and then this module's `--check`, each through its own `main` and argv,
+    with corpus_ids' walk memo switched on and that module shared with `load_defined_ids`. Each verb
+    writes into buffers of its own and is framed as `<stderr><stdout>\\x1d<rc>\\n`, stderr first as the
+    two-process `2>&1` capture put it; an exception is that verb's traceback at rc 1. Exits 0; the
+    hygiene shell splits the two frames and keeps each check's print, status and offender lines.
+    """
+    global _SHARED_CORPUS_IDS
+    import contextlib
+    import io
+    import traceback
+
+    ids = _load_corpus_ids()
+    ids._WALK_MEMO = {}
+    _SHARED_CORPUS_IDS = ids
+    try:
+        for argv, verb in ((["corpus_ids.py", "--check"], ids.main), (["gotchas.py", "--check"], main)):
+            out, err = io.StringIO(), io.StringIO()
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                try:
+                    rc = verb(argv)
+                except Exception:  # noqa: BLE001 — the traceback is this verb's output, as it was standalone
+                    traceback.print_exc()
+                    rc = 1
+            sys.stdout.write(f"{err.getvalue()}{out.getvalue()}\x1d{rc}\n")
+    finally:
+        _SHARED_CORPUS_IDS = None
+    return 0
 
 
 def cmd_write(root: str, conf: dict) -> int:
@@ -1225,6 +1266,53 @@ def cmd_selftest() -> int:
             cmd_write(t, c); run("git", "add", "-A", cwd=t); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t)
             return t, c
 
+        # ---- TOOL-aHastenedSweep-4 AC1 AC2: `--check-with-ids` frames each verb's own output and exit
+        # ---- code, corpus_ids first, and the two verbs walk once. Checks 13-16 are clean and check 18
+        # ---- reds, so RED with the frame's rc fields swapped; and RED with the verb's `_WALK_MEMO = {}`
+        # ---- removed, which takes three `git ls-files` calls of the loaded corpus_ids where one walk takes two.
+        tw, _cw = build_tree("with-ids", {
+            "x.md": _rec("x", "d", f"Fires on `{PFX}some-gate.sh`. Nothing said about a gate.\n"),
+            "inv.md": build_invariant("inv")},
+            {".memory-tree.conf": conf_text + 'CHARTER="AGENTS.md"\nORPHAN_ID_PIN="0"\n',
+             "AGENTS.md": "# charter\n\nRead `memory/README.md` first.\n"})
+
+        def check_framed_with_ids():
+            calls, real, here = [], _load_corpus_ids, os.getcwd()
+
+            def load_counted():
+                mod = real()
+                inner = mod.run
+
+                def run_counted(*argv, cwd=None):
+                    if argv[:2] == ("git", "ls-files"):
+                        calls.append(argv)
+                    return inner(*argv, cwd=cwd)
+                mod.run = run_counted
+                return mod
+
+            def run_alone(verb, argv):
+                out, err = io.StringIO(), io.StringIO()
+                with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                    rc = verb(argv)
+                return f"{err.getvalue()}{out.getvalue()}\x1d{rc}\n"
+            buf = io.StringIO()
+            os.chdir(tw)
+            globals()["_load_corpus_ids"] = load_counted
+            try:
+                with contextlib.redirect_stdout(buf):
+                    cmd_check_with_ids()
+            finally:
+                globals()["_load_corpus_ids"] = real
+            try:
+                want = run_alone(real().main, ["corpus_ids.py", "--check"]) + run_alone(main, ["gotchas.py", "--check"])
+            finally:
+                os.chdir(here)
+            rcs = re.findall(r"\x1d([0-9]+)\n", buf.getvalue())
+            print("with-ids", *rcs, "same" if buf.getvalue() == want else "DIFFERENT", "· ls-files", len(calls))
+            return 0
+        arm("--check-with-ids frames corpus_ids then gotchas with each verb's own rc, over one walk",
+            "with-ids 0 1 same · ls-files 2", check_framed_with_ids)
+
         ti, ci = build_tree("inv", {"inv.md": build_invariant("inv-one")})
         arm("an invariant with five sections, a defined decision and a declared guard is clean", None,
             lambda: cmd_check(ti, ci))
@@ -1483,6 +1571,8 @@ def main(argv: list) -> int:
         verdict = declares(text)
         print(f"declares: {'yes' if verdict else 'no'}")
         return 0 if verdict else 1
+    if mode == "--check-with-ids":
+        return cmd_check_with_ids()   # each verb resolves its own root, as it does standalone
     try:
         root = run("git", "rev-parse", "--show-toplevel").strip()
     except Exception:  # noqa: BLE001
@@ -1512,7 +1602,7 @@ def main(argv: list) -> int:
                 print("usage: gotchas.py --for-paths [--base <rev>] <path>...")
                 return 2
             return cmd_for_paths(root, conf, args, base=base)
-        print("usage: gotchas.py [--check|--write|--report|--for-diff <range>|"
+        print("usage: gotchas.py [--check|--check-with-ids|--write|--report|--for-diff <range>|"
               "--for-paths [--base <rev>] <path>...|--declares|--selftest]")
         return 2
     except Problem as exc:

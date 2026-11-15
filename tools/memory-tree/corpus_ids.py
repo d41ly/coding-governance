@@ -31,6 +31,7 @@ never the silent pass a bare `try: import` would produce.
 """
 from __future__ import annotations
 
+import copy
 import io
 import os
 import posixpath
@@ -49,6 +50,11 @@ HYGIENE = HERE / "check-memory-hygiene.sh"
 # refusal names.
 GRAMMAR_DIR = HERE
 GRAMMAR_WHERE = "%s/id_grammar.py" % GRAMMAR_DIR.as_posix()
+
+# TOOL-aHastenedSweep-4 S1: walk()'s per-process memo, OFF (None) at import. Only
+# `gotchas.py --check-with-ids` sets it to {}, so its two verbs walk one unchanged tree once; every
+# caller gets its own deep copy, so neither verb sees what the other did to its result.
+_WALK_MEMO = None
 
 # TOOL-dSpentCeiling-1 — the two keys this engine no longer reads. A conf that still declares one
 # is ANNOUNCED, never refused: the shipped example declared READ_PATH_CEILING blank, so refusing on
@@ -445,6 +451,13 @@ def read_live_readmes(root: str, m: str, tracked_set: set) -> tuple:
 
 
 def walk(root: str, conf: dict) -> dict:
+    # The memo lives INSIDE walk, never as a wrapper round a renamed body: _walk_continues reads this
+    # function's own source, and a wrapper would empty its population (TOOL-aHastenedSweep-4).
+    memo_key = None
+    if _WALK_MEMO is not None:
+        memo_key = (root, tuple(sorted(conf.items())))
+        if memo_key in _WALK_MEMO:
+            return copy.deepcopy(_WALK_MEMO[memo_key])
     E = grammar(root)
     # The kit's one route from a bundle to an answer, HANDED the bundle this function already holds.
     # `resolve_anchor(root)` with no bundle would re-resolve the conf at that root a second time per
@@ -621,11 +634,15 @@ def walk(root: str, conf: dict) -> dict:
         held = len({f for f, _ in advisory})
         notes.append(f"advisory check 15: {len(advisory)} dead repo-path citation(s) in {held} of "
                      f"{len(live_readmes)} live build README(s) — corpus_ids.py --report lists them")
-    return {
+    w = {
         "tracked": tracked_set, "corpus": corpus, "defs": defs, "def_builds": def_builds,
         "cites": cites, "missing": missing, "missing_now": missing_now, "dead": dead, "advisory": advisory, "root": root, "conf": conf, "m": m,
         "notes": notes,
     }
+    if memo_key is None:
+        return w
+    _WALK_MEMO[memo_key] = w
+    return copy.deepcopy(w)
 
 
 def _anchor(E, line):
@@ -1051,6 +1068,33 @@ def cmd_selftest() -> int:
         t = os.path.join(base, "clean"); os.makedirs(t)
         c = _scratch(t)
         arm("a clean corpus produces no finding", None, lambda: checks(walk(t, c)))
+
+        # TOOL-aHastenedSweep-4 AC3: walk()'s memo is off at import, hands every caller its own deep
+        # copy, really is hit, and keys on the conf as well as the root. RED against a walk returning
+        # its stored object, a memo on at import, and a key on `root` alone.
+        def check_walk_memo():
+            said = [f"default {_WALK_MEMO}"]
+            tm = os.path.join(base, "memo"); os.makedirs(tm)
+            cm = _scratch(tm)
+            globals()["_WALK_MEMO"] = {}
+            try:
+                walk(tm, cm)["defs"]["ARCH-tPlanted-1"] = "planted"
+                said.append("frozen " + ("no" if "ARCH-tPlanted-1" in walk(tm, cm)["defs"] else "yes"))
+                _w(tm, "memory/builds/tOne/spec/2026-08-02-spec-tOne-2.md", "# ARCH-tOne-2 — a unit\n\nbody\n")
+                run("git", "add", "-A", cwd=tm)
+                run("git", "commit", "-q", "-m", "g", "--no-verify", cwd=tm)
+                said.append("hit " + ("no" if "ARCH-tOne-2" in walk(tm, cm)["defs"] else "yes"))
+                globals()["_WALK_MEMO"] = None
+                said.append("off " + ("sees new" if "ARCH-tOne-2" in walk(tm, cm)["defs"] else "misses it"))
+                globals()["_WALK_MEMO"] = {}
+                walk(tm, cm)
+                cm2 = dict(cm, ORPHAN_ID_PIN="7")
+                said.append("conf keyed " + ("yes" if walk(tm, cm2)["conf"]["ORPHAN_ID_PIN"] == "7" else "no"))
+            finally:
+                globals()["_WALK_MEMO"] = None
+            return " · ".join(said)
+        arm("walk()'s memo is off by default, frozen per caller, hit, and keyed on root and conf",
+            "default None · frozen yes · hit yes · off sees new · conf keyed yes", check_walk_memo)
         # KICK-aReplayedCard-2: the grammar line is a POSIX ERE that still recognises a defined id
         # (it is valid Python too, which is what lets this arm run it), and the set follows it.
         arm("--print-defined-ids leads with the grammar as an ERE and lists the defined id", "ok",

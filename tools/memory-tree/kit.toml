@@ -436,7 +436,7 @@ probe = ["python3", "{own}", "--print-defined-ids"]
 expect = "(?m)^# id-ere: "
 consumer = "kickoff-manifest:manifest-check.sh"
 [[contract.clause]]
-imports = ["ask_shell"]
+imports = ["ask_shell", "main"]
 consumer = "gotchas.py"
 
 [[contract]]

@@ -53,7 +53,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 4 unit(s) · node a · opened 2026-11-15 · streams tooling
+**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-11-15 · streams tooling
 ids TOOL-aHastenedSweep-1 TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-3 TOOL-aHastenedSweep-4
 
 <!-- gen:build-units -->
@@ -62,10 +62,10 @@ ids TOOL-aHastenedSweep-1 TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-3 TOOL-aHast
 | [TOOL-aHastenedSweep-1 — check 25's by-name pass tests `index()` before `test_whole_token`](spec/2026-11-15-spec-TOOL-aHastenedSweep-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-15 |
 | [TOOL-aHastenedSweep-2 — `selectable` computes each basename once, and `walk` derives its roots once](spec/2026-11-15-spec-TOOL-aHastenedSweep-2.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-15 |
 | [TOOL-aHastenedSweep-3 — the hygiene shell hands `corpus_ids.py --check` its index set when checks 1 to 5 ran clean](spec/2026-11-15-spec-TOOL-aHastenedSweep-3.md) | 2 | 2 | CLOSED | rev-2 | 2026-11-15 |
-| [TOOL-aHastenedSweep-4 — checks 13 to 16 and 17 to 19 run in one Python process over one frozen, memoized walk](spec/2026-11-15-spec-TOOL-aHastenedSweep-4.md) | 3 | 2 | INPROGRESS | rev-2 | 2026-11-15 |
+| [TOOL-aHastenedSweep-4 — checks 13 to 16 and 17 to 19 run in one Python process over one frozen, memoized walk](spec/2026-11-15-spec-TOOL-aHastenedSweep-4.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 3 record folder(s).
+Records: 5 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

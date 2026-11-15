@@ -3389,6 +3389,33 @@ case "$_ixo" in
   *) echo "FAIL the standalone corpus_ids --check did not ask the print mode for the index set:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
 esac
 
+# ---- TOOL-aHastenedSweep-4: an unscoped run takes checks 13-16 and 17-19 from ONE interpreter and
+# ---- SPLITS its two frames. A pinned orphan reds check 14 and a class record naming no gate reds check
+# ---- 18 in one run, so a split handing either block to the other's variables keys a line wrongly.
+_ixt=$(mktemp -d)
+cp -R "$_b1/." "$_ixt/"
+(
+  cd "$_ixt" || exit 1
+  printf 'ORPHAN_ID_PIN="0"\n' >> .memory-tree.conf
+  printf '# r\n\nContext lives in ARCH-tNone-9 upstream.\n' > memory/README.md
+  mkdir -p memory/gotchas
+  printf -- '---\nname: x\ndescription: d\n---\n\nFires on `AGENTS.md`. Nothing said about a gate.\n' > memory/gotchas/x.md
+  "$_PY" "$HERE/gotchas.py" --write
+  git add -A && git -c commit.gpgsign=false commit -q -m t --no-verify
+) >/dev/null 2>&1
+_ixo=$(cd "$_ixt" && bash "$HERE/check-memory-hygiene.sh" --offenders 2>&1)
+n=$((n+1))
+case "$_ixo" in
+  *$'check 13-16\tHYGIENE check 14: id ARCH-tNone-9'*) echo "ok   the one-process run keys check 14's orphan under 13-16" ;;
+  *) echo "FAIL the one-process run did not key check 14's orphan under 13-16:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+esac
+n=$((n+1))
+case "$_ixo" in
+  *$'check 17-19\tHYGIENE check 18: memory/gotchas/x.md names no gate'*) echo "ok   the one-process run keys check 18's ungated record under 17-19" ;;
+  *) echo "FAIL the one-process run did not key check 18's ungated record under 17-19:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+esac
+rm -rf "$_ixt"
+
 # ---- TOOL-dRetiredFork-15: the five project keys -------------------------------------------------
 # Three arms per validated key -- default, valid override, INVALID override -- because the invalid
 # case is the only one that matters here. BUILD_SLUG_RE and RECORD_SERVES_CUTOFF NARROW what is
@@ -4780,7 +4807,9 @@ done
 # RAISED 707 -> 708 by TOOL-aClearedLedger-6: its three resolver-block assertions, each top-level and
 # never skipped, less OSTYPE out of the population loop and GOV_PYTHON out of the exemption loop.
 # Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=708
+# RAISED 708 -> 710 by TOOL-aHastenedSweep-4: its two one-process split assertions, each top-level and
+# never skipped. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=710
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

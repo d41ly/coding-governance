@@ -3202,6 +3202,7 @@ fi
 
 fi
 
+_onepy=""   # 1 once the 13-16 block ran 17-19 in the same interpreter (TOOL-aHastenedSweep-4)
 if check_selected 13 14 15 16; then
 # 13-15 (pinned) + 16 (structural) — id + path corpus classification (delegates to the sibling classifier). ONE grammar and ONE
 # walk: this script owns the append-only and index sets and PRINTS them on demand; the classifier
@@ -3215,7 +3216,25 @@ if [ "$STAGED" = 0 ]; then
   # channel at all and the grace was invisible for its whole life: a skip that looks like a pass.
   # The prefix is written on EVERY run, so an inherited GOV_INDEX_SET_STDIN=1 is blanked whenever the
   # run is not eligible; a here-string is no pipeline, so _idsrc stays the interpreter's own code.
-  ids=$(GOV_INDEX_SET_STDIN=$_IXH "$_PY" "$HERE/corpus_ids.py" --check 2>&1 <<<"${_IXH:+$INDEX_SET}"); _idsrc=$?
+  if [ -z "$ONLY" ]; then
+    # ONE INTERPRETER FOR 13-16 AND 17-19 on an unscoped run, over one memoized walk
+    # (TOOL-aHastenedSweep-4). gotchas.py --check-with-ids prints `<block>\x1d<rc>\n` per verb,
+    # corpus_ids first; the split is parameter expansion only, each block losing its trailing newlines
+    # one at a time as `$( )` stripped them (a CR before each too, where Cygwin's and MSYS's do), so
+    # both blocks print, red and key exactly as two launches did. A frame that does not split reds
+    # LOUDLY under 13-16 with the whole capture, never as a silent second launch.
+    _both=$(GOV_INDEX_SET_STDIN=$_IXH "$_PY" "$HERE/gotchas.py" --check-with-ids 2>&1 <<<"${_IXH:+$INDEX_SET}") && {
+      ids=${_both%%$'\x1d'*}; got=${_both#*$'\x1d'}
+      _idsrc=${got%%$'\n'*}; _idsrc=${_idsrc%$'\r'}; got=${got#*$'\n'}
+      _gotrc=${got#*$'\x1d'}; _gotrc=${_gotrc%$'\r'}; got=${got%%$'\x1d'*}
+      while [[ $ids == *$'\n' ]]; do ids=${ids%$'\n'}; case $OSTYPE in cygwin*|msys*) ids=${ids%$'\r'} ;; esac; done
+      while [[ $got == *$'\n' ]]; do got=${got%$'\n'}; case $OSTYPE in cygwin*|msys*) got=${got%$'\r'} ;; esac; done
+      [[ $_both == *$'\x1d'*$'\x1d'* && $_idsrc =~ ^[0-9]+$ && $_gotrc =~ ^[0-9]+$ ]]
+    } && _onepy=1
+    [ "$_onepy" = 1 ] || { ids=$_both; _idsrc=1; got=""; _gotrc=1; _onepy=1; }
+  else
+    ids=$(GOV_INDEX_SET_STDIN=$_IXH "$_PY" "$HERE/corpus_ids.py" --check 2>&1 <<<"${_IXH:+$INDEX_SET}"); _idsrc=$?
+  fi
   [ -n "$ids" ] && printf '%s
 ' "$ids"
   # The suite's check 13 claimant arm drives this exit through the engine (TOOL-aGraftedHelix-47).
@@ -3235,7 +3254,7 @@ if check_selected 17 18 19; then
 # 19's dead-anchor advisory (TOOL-aMendedFleet-23), and an invariant guard or decision the module
 # could not resolve, ANNOUNCED inside its green output (TOOL-aGraftedHelix-3 S7), as check 20's is.
 if [ "$STAGED" = 0 ]; then
-  got=$("$_PY" "$HERE/gotchas.py" --check 2>&1); _gotrc=$?
+  [ "$_onepy" = 1 ] || { got=$("$_PY" "$HERE/gotchas.py" --check 2>&1); _gotrc=$?; }
   [ -n "$got" ] && printf '%s
 ' "$got"
   [ "$_gotrc" -ne 0 ] && status=1

@@ -1,11 +1,12 @@
 # TOOL-aHastenedSweep-4 — checks 13 to 16 and 17 to 19 run in one Python process over one frozen, memoized walk
 
-**Status:** INPROGRESS · rev-2 · 2026-11-15 · node a · Tier-2 · base f25308f0 · streams tooling · order 3
+**Status:** CLOSED · rev-2 · 2026-11-15 · node a · Tier-2 · base f25308f0 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-15-build-TOOL-aHastenedSweep-4-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aHastenedSweep-4-1-acceptance-ledger.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aHastenedSweep-1-brief.md](../prompts/2026-11-15-prompt-TOOL-aHastenedSweep-1-brief.md) | research | TOOL-aHastenedSweep-1 TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-3 |
 
 <!-- /gen:spec-records -->
