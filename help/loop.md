@@ -562,8 +562,12 @@ The position engine answers "where is this build, and what next" from witnesses 
 is `none`, then `designed` once its spec is committed and grades READY, `built` once a pass commit
 names it in its `Pass:` trailer and an acceptance record names that commit, `tested` once the bar's
 `gates-run` fact in the run-state file graded a tip containing that commit, and `deployed` once the
-default branch's remote-tracking tip contains it. A status word typed in a spec header or the build
-README never moves a step. The build's step is the step its least-advanced unit works in next, and
+default branch's remote-tracking tip contains it. Until an executor writes acceptance records, the
+shipped `acceptance` computed witness names the stand-in writer, and while it does a unit no
+acceptance record names reads `built` from its pass commit alone, its `unit —` line ending
+`· acceptance unarmed`; a unit a record names still needs that record to name its pass commit. The
+executor's build, which gives the row an actor writer, lifts the tag, and so does a definition with no
+`acceptance` row. A status word typed in a spec header or the build README never moves a step. The build's step is the step its least-advanced unit works in next, and
 the next item is the first item of that step whose witness does not hold and whose needs are
 witnessed. Only three kinds of item have a witness reader today: a step's exit, the unit table's four
 forward items, and an item a recorded move names. Every other item prints as an `evidence` claim and
@@ -605,9 +609,9 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
   plants one case, prints the engine's lines and one line ending `held` or `MISSED`, and removes it:
   `steps`, `typed-status`, `idempotent`, `owner-decision`, `parent-unlanded`, `terminal`,
   `stale-remote`, `bad-transition`, `deadlock`, `bar-wait`, `frontier-chain`, `frontier-parallel`,
-  `frontier-refused`, `frontier-bad-key`, `frontier-none`, `plan-frontier`, `plan-line` and
-  `status-line`; `frontier-refused`, `frontier-bad-key`, `plan-frontier` and the last two run the
-  unattended driver. `--selftest` runs every case, and gov's own `loop position fixtures` gate runs it.
+  `frontier-refused`, `frontier-bad-key`, `frontier-none`, `plan-frontier`, `built-unarmed`,
+  `built-unheld`, `built-armed`, `plan-line` and `status-line`; `frontier-refused`,
+  `frontier-bad-key`, `plan-frontier`, `built-unarmed` and the last two run the unattended driver. `--selftest` runs every case, and gov's own `loop position fixtures` gate runs it.
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries placeholders the shell reads as redirects -->
   ```bash

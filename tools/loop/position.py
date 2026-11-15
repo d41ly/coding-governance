@@ -28,7 +28,11 @@ keeps the one M2 classifier and the call is not circular.
 A unit's step is `none`, then `designed` when its state reads READY (a `DONE` row reading as its grade),
 `built` when a pass commit attributed to it has a well-formed acceptance record naming the unit in
 `Caused-by` and that commit in `Sha`, `tested` when the run-state `gates-run` fact's graded tip contains
-that commit, and `deployed` when the remote-tracking tip does; each step needs the one before it. The
+that commit, and `deployed` when the remote-tracking tip does; each step needs the one before it.
+While the definition's `acceptance` computed witness has a writer of the `ROUTE_STAND_IN` form, as
+`check_computed_witnesses` grades it, the acceptance half is unarmed (TOOL-dDeclaredLoop-45): a unit no
+acceptance record names stands on its newest pass commit alone, its unit line ending `· acceptance
+unarmed`, and a unit a record names is read as above. An actor writer, or no `acceptance` row, arms it. The
 build's step is the step tag of the item on the unit table's forward row out of its least-advanced
 unit's state, ties broken by row order, `none` once every unit is deployed. The next item is the first
 item of that step, in composition order, whose witness does not hold and whose needs are witnessed. A
@@ -59,8 +63,8 @@ every answer but `invalid-input`, which exits 2.
 `--fixture --plant <case>` builds one scratch repository under the host temp folder, plants the case,
 prints the engine's lines and one `position: fixture · <case> · held` or `· MISSED <why>` line, and
 removes the scratch; it exits as the engine did where the case held, 1 where it missed, 2 where a kit it
-needs does not resolve. `frontier-refused`, `frontier-bad-key`, `plan-frontier`, `plan-line` and
-`status-line` run the unattended driver found by `resolve_kit_dir`. `--selftest` runs every case
+needs does not resolve. `frontier-refused`, `frontier-bad-key`, `plan-frontier`, `built-unarmed`,
+`plan-line` and `status-line` run the unattended driver found by `resolve_kit_dir`. `--selftest` runs every case
 through `loop_lib.run_selftest_cases`.
 
 WHAT THIS DOES NOT CHECK: a witness reader for any item outside the three kinds above, which lands with
@@ -89,8 +93,8 @@ if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from claims import derive_claim_key, derive_claim_verdict, resolve_remote  # noqa: E402
 from loop_items import read_composition  # noqa: E402
-from loop_lib import (NO_STEP, LoopError, read_definition, read_item_rows, read_memory_tree,  # noqa: E402
-                      resolve_kit_dir, run_selftest_cases)
+from loop_lib import (NO_STEP, ROUTE_STAND_IN, LoopError, check_computed_witnesses, read_definition,  # noqa: E402
+                      read_item_rows, read_memory_tree, resolve_kit_dir, run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_table import check_recorded_move, derive_from_states, read_transition_rows  # noqa: E402
 from loop_transition import read_transitions  # noqa: E402
@@ -130,6 +134,9 @@ PLANTS = {"steps": "unit 1 deployed, unit 2 built, unit 3 designed: act at unit 
           "frontier-bad-key": "--refused with a malformed key, then an undeclared tag: exit 1 each, the file unchanged",
           "frontier-none": "the step narrowed to A witnessed and an item whose need is unmet: no frontier",
           "plan-frontier": "the frontier-refused repository, then --plan: frontier: A beneath next:",
+          "built-unarmed": "A's pass commit and no record under the shipped stand-in writer: A built, tagged; --plan names B",
+          "built-unheld": "built-unarmed and a record naming A at a commit not attributed to A: A designed, no tag",
+          "built-armed": "built-unarmed with the writer executor:build.acceptance, then no acceptance row: A designed",
           "plan-line": "the driver's next: line equals render_next_line's, in three states",
           "status-line": "the driver's --status prints the engine's position line"}
 FX_SLUG = "tPos"
@@ -141,7 +148,7 @@ FX_A, FX_B, FX_C, FX_D = "item.build.base", "item.build.unit-lease", "item.build
 #: The build step's unit-forward item, the one the least-advanced designed unit has not passed.
 FX_UNIT = "item.build.acceptance"
 #: The plants that run the unattended driver, and so copy its conf into the scratch repository.
-FX_DRIVER = ("frontier-refused", "frontier-bad-key", "plan-frontier", "plan-line", "status-line")
+FX_DRIVER = ("frontier-refused", "frontier-bad-key", "plan-frontier", "built-unarmed", "plan-line", "status-line")
 
 
 # ------------------------------------------------------------------------------------------ the reads
@@ -214,21 +221,24 @@ def derive_instance_key(item, pass_id, inputs):
     return "%s@%s#%s" % (item, pass_id, hashlib.sha1(raw).hexdigest()[:8])
 
 
-def derive_unit_step(word, passes, records, gates_tip, remote_sha, repo):
-    """`(step, pass commit or None)` of one unit: `word` its hand-over state, `passes` the pass commits
-    attributed to it newest first, `records` the well-formed acceptance records naming it."""
+def derive_unit_step(word, passes, records, gates_tip, remote_sha, repo, armed=True):
+    """`(step, pass commit or None, unarmed)` of one unit: `word` its hand-over state, `passes` the pass
+    commits attributed to it newest first, `records` the acceptance records naming it, malformed ones
+    included. Unless `armed`, a unit no record names stands on its newest pass commit and `unarmed` is
+    true (TOOL-dDeclaredLoop-45); a unit a record names is read as when armed."""
     m = re.fullmatch(r"DONE \((.+)\)", word)
     grade = m.group(1) if m else ("READY" if word == "DONE" else word)
     if grade != "READY":
-        return "none", None
-    held = [p for p in passes if any(r.get("Sha") == p for r in records)]
+        return "none", None, False
+    unarmed = not armed and not records and bool(passes)
+    held = passes if unarmed else [p for p in passes if any(not r["malformed"] and r.get("Sha") == p for r in records)]
     if not held:
-        return "designed", None
+        return "designed", None, False
     if not check_is_ancestor(repo, held[0], gates_tip):
-        return "built", held[0]
+        return "built", held[0], unarmed
     if not check_is_ancestor(repo, held[0], remote_sha):
-        return "tested", held[0]
-    return "deployed", held[0]
+        return "tested", held[0], unarmed
+    return "deployed", held[0], unarmed
 
 
 def derive_frontier(items, witnessed, unheld, unit_id, head):
@@ -398,6 +408,8 @@ def derive_position_into(pos, repo, slug, definition):
         data, where = definition, "the caller's definition"
         items = read_item_rows(data, where)
     tables = read_transition_rows(data, where)
+    armed = not any(r["name"] == "acceptance" and ROUTE_STAND_IN.fullmatch(r["writer"])
+                    for r in check_computed_witnesses(data, where))
     steps = {r["tag"]: r for r in data["step"]}
     item_step = {r.get("tag"): r.get("step") for r in items}
     moves = read_transitions(slug, repo)
@@ -416,9 +428,10 @@ def derive_position_into(pos, repo, slug, definition):
             passes.setdefault(uid, []).append(c["sha"])
     records = {}
     for r in read_records(repo, conf, "acceptance", read_acceptance):
-        if r["build"] == slug and not r["malformed"]:
+        if r["build"] == slug:
             records.setdefault(r.get("Caused-by", "").strip("`"), []).append(r)
-            pos["read"].append("%s@%s" % (r["path"], read_blob_id(repo / r["path"])))
+            if not r["malformed"]:
+                pos["read"].append("%s@%s" % (r["path"], read_blob_id(repo / r["path"])))
     run = folder / "RUN.md"
     text, owed = "", None
     if run.is_file():
@@ -438,8 +451,9 @@ def derive_position_into(pos, repo, slug, definition):
     order = ["none"] + list(tables["states"].get("unit", []))
     units, pass_of = [], {}
     for uid, word in handover["units"]:
-        step, sha = derive_unit_step(word, passes.get(uid, []), records.get(uid, []), gates_tip, remote_sha, repo)
-        units.append({"id": uid, "step": step, "state": word})
+        step, sha, unarmed = derive_unit_step(word, passes.get(uid, []), records.get(uid, []), gates_tip,
+                                              remote_sha, repo, armed)
+        units.append({"id": uid, "step": step, "state": word, "unarmed": unarmed})
         pass_of[uid] = sha
     pos["units"] = units
     if not units and not handover["ask"]:
@@ -521,7 +535,8 @@ def render_position_lines(pos):
     """The line output (§4 Line output)."""
     lines = ["position — %s · state %s · step %s · answer %s · %s" % (
         pos["slug"], pos["state"], pos["build_step"], pos["answer"], pos["reason"])]
-    lines += ["unit — %s · %s" % (u["id"], u["step"]) for u in pos["units"]]
+    lines += ["unit — %s · %s%s" % (u["id"], u["step"], " · acceptance unarmed" if u.get("unarmed") else "")
+              for u in pos["units"]]
     if pos["next"]:
         n = pos["next"]
         lines.append("next — %s · unit %s · actor %s · key %s" % (n["item"], n["unit"], n["actor"], n["key"]))
@@ -556,7 +571,7 @@ def write_position_plant(top, case, root):
     `(repo, definition, handover)`."""
     repo = top / "r"
     repo.mkdir()
-    ids = FX_IDS[:2] if case in ("typed-status", "bar-wait") else FX_IDS
+    ids = FX_IDS[:2] if case in ("typed-status", "bar-wait") or case.startswith("built-") else FX_IDS
     extra = "parents: tPar\n" if case == "parent-unlanded" else ""
     rows = "".join("| [%s — u](spec/2026-01-01-spec-%s.md) | INPROGRESS | rev-1 | 2026-01-01 |\n" % (u, u) for u in ids)
     files = {".memory-tree.conf": 'MEMORY_ROOT=memory\nFAMILIES="tool:TOOL"\n',
@@ -585,12 +600,15 @@ def write_position_plant(top, case, root):
         run_fixture_git(top, "init", "-q", "--bare", "--template=", str(remote))
         run_fixture_git(repo, "remote", "add", "origin", str(remote))
 
-    def write_pass(uid):
-        """One pass commit for `uid` and the acceptance record naming it; the pass commit's sha."""
+    def write_pass(uid, record=True):
+        """One pass commit for `uid` and, where `record`, the acceptance record naming it; the pass
+        commit's sha."""
         write_fixture_files(repo, {"work/%s.txt" % uid: uid + "\n"})
         run_fixture_git(repo, "add", "-A")
         run_fixture_git(repo, "commit", "-q", "-m", "feat: %s\n\nPass: %s" % (uid, uid))
         sha = run_fixture_git(repo, "rev-parse", "HEAD")
+        if not record:
+            return sha
         read_memory_tree("build_records.py")
         from build_records import write_acceptance
         write_acceptance(repo, FX_SLUG, uid, sha, "stand-in", [("true", 0, "0" * 12)], today="2026-01-01")
@@ -615,6 +633,14 @@ def write_position_plant(top, case, root):
     elif case == "bar-wait":
         for uid in ids:
             write_pass(uid)
+    elif case.startswith("built-"):
+        unattributed = run_fixture_git(repo, "rev-parse", "HEAD")  # the `fixture` commit names no unit
+        write_pass(FX_IDS[0], record=False)
+        if case == "built-unheld":
+            read_memory_tree("build_records.py")
+            from build_records import write_acceptance
+            write_acceptance(repo, FX_SLUG, FX_IDS[0], unattributed, "stand-in", [("true", 0, "0" * 12)],
+                             today="2026-01-01")
     elif case in ("idempotent", "frontier-chain", "frontier-none"):
         write_move("building", "building", FX_A)
     elif case == "terminal":
@@ -643,6 +669,8 @@ def write_position_plant(top, case, root):
         # The step's unit-forward item stays, so the build's step is still step.build, its need unmet.
         data["item"] = [r for r in data["item"] if r.get("step") != "step.build" or r.get("tag") in (FX_A, FX_UNIT)]
         next(r for r in data["item"] if r.get("tag") == FX_UNIT)["needs"] = [FX_D]
+    if case == "built-armed":
+        next(r for r in data["computed-witness"] if r["name"] == "acceptance")["writer"] = "executor:build.acceptance"
     if case not in ("plan-line", "status-line"):
         definition = data
     words = {"typed-status": ["READY", "DONE"]}.get(case, ["READY"] * len(ids))
@@ -756,7 +784,12 @@ def check_plant(case, pos, rc, repo):
     claims = {c["name"]: c for c in pos["claims"]}
     kinds = {i["kind"]: i["subject"] for i in pos["interrupts"]}
     tags = [f["item"] for f in pos["frontier"]]
-    want = {"frontier-chain": lambda: tags == [FX_B],
+    lines = render_position_lines(pos)
+    want = {"built-unarmed": lambda: "unit — %s · built · acceptance unarmed" % FX_IDS[0] in lines
+            and "unit — %s · designed" % FX_IDS[1] in lines,
+            "built-unheld": lambda: "unit — %s · designed" % FX_IDS[0] in lines,
+            "built-armed": lambda: "unit — %s · designed" % FX_IDS[0] in lines,
+"frontier-chain": lambda: tags == [FX_B],
             "frontier-parallel": lambda: tags == [FX_A, FX_B],
             "frontier-none": lambda: pos["build_step"] == "step.build" and tags == [],
             "frontier-refused": lambda: FX_A in tags and [(r.get("item"), r.get("reason")) for r in pos["refusals"]]
@@ -783,6 +816,12 @@ def check_plant(case, pos, rc, repo):
         print("%s: fixture · key %s · one input moved %s" % (SAY, k1, k2))
         if k1.split("#")[1] == k2.split("#")[1]:
             misses.append("an input SHA left the key unchanged")
+    if case == "built-unarmed":
+        out = run_driver(repo, "--plan", FX_SLUG)[0]
+        line = next((ln for ln in out.splitlines() if ln.startswith("next: ")), None)
+        print("%s: fixture · %s · driver %r" % (SAY, case, line))
+        if line != "next: " + NEXT_SHAPES["live-unit"].replace("<id>", FX_IDS[1]):
+            misses.append("the driver's next: line was %r, owed %s's" % (line, FX_IDS[1]))
     return misses
 
 
@@ -804,12 +843,17 @@ def run_plant(case):
             misses, rc = run_refusal_plant(case, repo, definition, handover), 0
         else:
             misses = run_refusal_plant(case, repo, definition, handover) if case == "frontier-refused" else []
-            pos = derive_plant_position(repo, definition, handover)
-            rc = 2 if pos["answer"] == "invalid-input" else 0
-            for line in render_position_lines(pos):
-                print(line)
-            print("next: %s" % render_next_line(pos))
-            misses += check_plant(case, pos, rc, repo)
+            readings = [definition]
+            if case == "built-armed":  # read again with the acceptance row absent
+                readings.append(dict(definition, **{"computed-witness": [
+                    r for r in definition["computed-witness"] if r["name"] != "acceptance"]}))
+            for reading in readings:
+                pos = derive_plant_position(repo, reading, handover)
+                rc = 2 if pos["answer"] == "invalid-input" else 0
+                for line in render_position_lines(pos):
+                    print(line)
+                print("next: %s" % render_next_line(pos))
+                misses += check_plant(case, pos, rc, repo)
     except LookupError as e:
         print("%s: fixture · %s · unarmed: %s" % (SAY, case, e))
         return 2
@@ -877,7 +921,9 @@ def main(argv):
     rc, top = read_git(".", "rev-parse", "--show-toplevel")
     pos = derive_position(top if rc == 0 and top else ".", args.slug)
     if args.json:
-        print(json.dumps(pos, ensure_ascii=False))
+        # ponytail: the unarmed tag stays off --json until TOOL-dDeclaredLoop-67 S50 names its field
+        print(json.dumps(dict(pos, units=[{k: u[k] for k in ("id", "step", "state")} for u in pos["units"]]),
+                         ensure_ascii=False))
     elif args.next_line:
         print(render_next_line(pos))
         if args.frontier:

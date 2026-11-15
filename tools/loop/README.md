@@ -414,7 +414,9 @@ Each unit's M2 state is the unattended driver's: `--plan` hands its rows over in
 `GOV_POSITION_STATES` with the first undecided ask, each parent's derived phase, `RESUME_STALE_BOUND`
 and the owed park sets, and the engine run standalone asks `--plan` with the variable set empty, which
 answers with those lines in place of `next:`. A unit is `designed` on a READY spec, `built` on a pass
-commit an acceptance record names, `tested` on the `gates-run` tip containing it, `deployed` on the
+commit an acceptance record names, or, while the `acceptance` computed witness's writer has the
+`ROUTE_STAND_IN` form, on its pass commit alone where no record names it, its `unit —` line then
+ending `· acceptance unarmed` (TOOL-dDeclaredLoop-45), `tested` on the `gates-run` tip containing it, `deployed` on the
 remote-tracking tip containing it. The build's step is its least-advanced unit's next step, and the
 next item the first of that step whose witness does not hold and whose needs are witnessed, keyed
 `<item>@<unit>#<inputs>` by `derive_instance_key`. The answer is one of `ANSWERS` by the spec's
