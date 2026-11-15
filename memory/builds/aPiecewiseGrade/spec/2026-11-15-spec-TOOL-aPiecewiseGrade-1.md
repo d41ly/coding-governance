@@ -7,6 +7,10 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-15-build-TOOL-aPiecewiseGrade-1-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aPiecewiseGrade-1-1-acceptance-ledger.md) | journal | — |
+| [2026-11-15-build-TOOL-aPiecewiseGrade-1-red-fix-1.md](../build/2026-11-15-build-TOOL-aPiecewiseGrade-1-red-fix-1.md) | red-fix | — |
+| [2026-11-15-build-TOOL-aPiecewiseGrade-1-red-fix-2.md](../build/2026-11-15-build-TOOL-aPiecewiseGrade-1-red-fix-2.md) | red-fix | — |
+| [2026-11-15-build-TOOL-aPiecewiseGrade-1-red-fix-3.md](../build/2026-11-15-build-TOOL-aPiecewiseGrade-1-red-fix-3.md) | red-fix | — |
+| [2026-11-15-build-TOOL-aPiecewiseGrade-1-red-fix-4.md](../build/2026-11-15-build-TOOL-aPiecewiseGrade-1-red-fix-4.md) | red-fix | — |
 | [2026-11-15-prompt-TOOL-aPiecewiseGrade-1-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-1-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aPiecewiseGrade-1-brief.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-1-brief.md) | research | TOOL-aPiecewiseGrade-2 |
 | [2026-11-15-prompt-TOOL-aPiecewiseGrade-3-forks-brief.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-3-forks-brief.md) | research | TOOL-aPiecewiseGrade-3 TOOL-aPiecewiseGrade-2 |
