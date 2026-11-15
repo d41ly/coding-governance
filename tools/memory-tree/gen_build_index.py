@@ -4904,21 +4904,21 @@ def test_coverage_stub(arm) -> None:
             global _COVERAGE_MEMO
             n = []
 
-            def counted(tag):
+            def build_counted_stub(tag):
                 return lambda p: (n.append(tag), lambda root, conf=None: value)[1]
 
-            def refusing(p):
+            def build_refusing_stub(p):
                 n.append("bad")
                 raise ImportError("planted")
 
-            one, two = counted("one"), counted("two")
+            one, two = build_counted_stub("one"), build_counted_stub("two")
             _COVERAGE_MEMO = {}
             try:
                 a, b = read_carries_coverage(t, conf, one), read_carries_coverage(t, conf, one)
                 read_carries_coverage(t, conf, two)
                 for _ in (1, 2):
                     try:
-                        read_carries_coverage(t, conf, refusing)
+                        read_carries_coverage(t, conf, build_refusing_stub)
                     except Problem:
                         pass
             finally:
