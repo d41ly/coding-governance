@@ -362,6 +362,7 @@ Cite ids, never line numbers.
 | [TOOL-aTwinnedPass-8](../builds/aTwinnedPass/BACKLOG.md) | OPEN | LOW | — | 2026-11-15 | THREE COPIES OF ONE QUESTION. check_generated_output in… |
 | [TOOL-aTwinnedPass-9](../builds/aTwinnedPass/BACKLOG.md) | OPEN | LOW | — | 2026-11-15 | M6 CONDITION (1) STILL SAYS THE WRITE SETS DO NOT INTERSECT. After… |
 | [TOOL-aTwinnedPass-10](../builds/aTwinnedPass/BACKLOG.md) | OPEN | LOW | — | 2026-11-15 | THE COMMIT-MSG CHECK IS SILENT IN A PASS WORKTREE. check_commit_message… |
+| [TOOL-aTwinnedPass-12](../builds/aTwinnedPass/BACKLOG.md) | OPEN | MED | — | 2026-11-15 | NO ARM PINS THE INTERIOR OF THE wf_ PASS NAME. TOOL-aTwinnedPass-11's… |
 | [TOOL-aUnblockedFleet-9](../builds/aUnblockedFleet/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-31 | FIVE ACCEPTANCE CRITERIA OF TOOL-aUnblockedFleet-2 ARE WRITTEN,… |
 | [TOOL-aUnmannedHelm-2](../builds/aUnmannedHelm/BACKLOG.md) | OPEN | — | — | 2026-08-10 | the ledger_dir in tools/drift-audit/drift_report.py points at an… |
 | [TOOL-aUnmannedHelm-10](../builds/aUnmannedHelm/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | three root docs (AGENTS.md, WIRE-INTO-PROJECT.md, .gitattributes) come… |

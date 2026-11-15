@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-15
 streams: tooling
 roster: TOOL
-ids: TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3 TOOL-aTwinnedPass-4 TOOL-aTwinnedPass-5 TOOL-aTwinnedPass-6 TOOL-aTwinnedPass-7 TOOL-aTwinnedPass-8 TOOL-aTwinnedPass-9 TOOL-aTwinnedPass-10 TOOL-aTwinnedPass-11
+ids: TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3 TOOL-aTwinnedPass-4 TOOL-aTwinnedPass-5 TOOL-aTwinnedPass-6 TOOL-aTwinnedPass-7 TOOL-aTwinnedPass-8 TOOL-aTwinnedPass-9 TOOL-aTwinnedPass-10 TOOL-aTwinnedPass-11 TOOL-aTwinnedPass-12
 authorized-by: prompt
 ---
 
@@ -58,7 +58,7 @@ None.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 6 unit(s) · node a · opened 2026-11-15 · streams tooling
-ids TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3 TOOL-aTwinnedPass-4 TOOL-aTwinnedPass-5 TOOL-aTwinnedPass-6 TOOL-aTwinnedPass-7 TOOL-aTwinnedPass-8 TOOL-aTwinnedPass-9 TOOL-aTwinnedPass-10 TOOL-aTwinnedPass-11
+ids TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3 TOOL-aTwinnedPass-4 TOOL-aTwinnedPass-5 TOOL-aTwinnedPass-6 TOOL-aTwinnedPass-7 TOOL-aTwinnedPass-8 TOOL-aTwinnedPass-9 TOOL-aTwinnedPass-10 TOOL-aTwinnedPass-11 TOOL-aTwinnedPass-12
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -71,7 +71,7 @@ ids TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3 TOOL-aTwinnedPas
 | [TOOL-aTwinnedPass-11 — the Workflow runtime's worktree spelling, admitted beside the Agent tool's at both ends of the handoff](spec/2026-11-15-spec-TOOL-aTwinnedPass-11.md) | 5 | 2 | CLOSED | rev-1 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 35 bound to this build, across 4 record folder(s).
+Records: 36 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
