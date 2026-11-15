@@ -53,6 +53,7 @@ None.
 | 3 | `TOOL-aTwinnedPass-3` | `--dispatch` condition 1 leaves a path every pass may share, an effective generated output, out of the sibling overlap |
 | 4 | `TOOL-aTwinnedPass-4` | the pass's branch, worktree and fork sha cross every handoff only in the runtime's own spelling (review round 1: H1, H2, M1, M3) |
 | 5 | `TOOL-aTwinnedPass-5` | every arm of the build's three suites can go red on the regression it names (review round 1: H3, M2, M4, M5, M6, L1, L2) |
+| 11 | `TOOL-aTwinnedPass-11` | the Workflow runtime's worktree spelling, `wf_<run>-<n>`, admitted beside the Agent tool's `agent-<id>` at both ends of the handoff (the measurement's finding) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
