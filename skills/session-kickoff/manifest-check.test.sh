@@ -1065,7 +1065,7 @@ cp "$CARD_HOME/$NONCE-t1.md" "$TMP/t1.before"
 cwt_map=$(ROOT="$CWT" MC_DIR="${CHECK%/*}" resolve_kit_file playbook instruction_units.py)
 run_card "AC5 --card --replay prints the stored card" "$CWT" 0 "orientation — $NONCE-t1 · written " --card --replay --session "$NONCE-t1"
 check_eq "AC5 replay = the instruction map, the stored bytes, then exactly one now — line" \
-  "$("$MC_PY" "$cwt_map" map --root "$CWT" </dev/null | tr -d '\r'; cat "$TMP/t1.before"; printf 'now — HEAD %s · card-wt · dirty %s\n' "$wt_head" "$(git -C "$CWT" status --porcelain | wc -l | tr -d '[:space:]')")" "$(cat "$CARD_OUT")"
+  "$("$MC_PY" "$cwt_map" map --root "$CWT" </dev/null | tr -d '\r'; cat "$TMP/t1.before"; printf 'now — HEAD %s · card-wt · dirty %s · %s · keys view fresh · remote evidence\n' "$wt_head" "$(git -C "$CWT" status --porcelain | wc -l | tr -d '[:space:]')" "$wt_top")" "$(cat "$CARD_OUT")"
 cmp -s "$TMP/t1.before" "$CARD_HOME/$NONCE-t1.md" && { echo "ok   AC5 the file on disk is byte-identical after the replay"; pass=$((pass+1)); } \
   || { echo "FAIL AC5 the file on disk is byte-identical after the replay"; fail=$((fail+1)); }
 run_card "AC5 a second replay" "$CWT" 0 - --card --replay --session "$NONCE-t1"
@@ -1077,6 +1077,35 @@ grep -q "^orientation — $NONCE-t5 · written .* · by manifest-check.sh --card
   || { echo "FAIL AC5 the replay-written card names --card --replay as its writer"; head -1 "$CARD_HOME/$NONCE-t5.md" | sed 's/^/    /'; fail=$((fail+1)); }
 check_eq "AC5 the replay-written card resolves the node cell" "node — q · $CUSER" "$(read_cell node "$NONCE-t5")"
 check_eq "AC5 the replay-written card is followed by one now — line" "1" "$(grep -c '^now — ' "$CARD_OUT")"
+
+# TOOL-dDeclaredLoop-8 AC6 — the card's second line is the `keys —` cell over the loop kit's
+# `claims.py card-keys`, found as the checker finds it; with the clone's copy hidden it reads skipped:
+# and the card still writes. RED against a `render_card` that prints no `keys —` cell.
+check_eq "DL8 AC6 the card's second line opens keys — view k1:" "keys — view k1:" "$(sed -n 2p "$CARD_HOME/$NONCE-t1.md" | grep -o '^keys — view k1:')"
+dl_ck=$(ROOT="$CWT" MC_DIR="${CHECK%/*}" resolve_kit_file loop claims.py)
+[ -n "$dl_ck" ] && mv "$dl_ck" "$TMP/claims.py.hidden"
+run_card "DL8 AC6 --card --write with the loop kit hidden" "$CWT" 0 "keys — skipped: no loop kit resolves in this tree" --card --write --session "$NONCE-k6"
+check_eq "DL8 AC6 ...and the card is written, the skipped cell its second line" "keys — skipped: no loop kit resolves in this tree" "$(sed -n 2p "$CARD_HOME/$NONCE-k6.md")"
+[ -n "$dl_ck" ] && mv "$TMP/claims.py.hidden" "$dl_ck"
+# AC7 — a replay in a worktree after a commit moved its HEAD names that worktree's toplevel, reads the
+# view key re-derived, re-renders the `tree —` cell and keeps the stored TAIL (its READY line and
+# `## route`) and `claims —` cell byte for byte; a second replay over the unmoved tree reads fresh and
+# leaves the file byte-identical. The TAIL is written into the stored card here, as an append would.
+# RED against a replay that prints the stored card whatever the key.
+CWT3="$TMP/card-wt3"; git -C "$CCLONE" worktree add -q "$CWT3" -b card-wt3
+run_card "DL8 AC7 setup: --card --write in a third worktree" "$CWT3" 0 - --card --write --session "$NONCE-k7"
+sed -i 's/^READY — none yet$/## route\n- build: zCardFixture\nREADY — kickoff · base 0000000/' "$CARD_HOME/$NONCE-k7.md"
+cp "$CARD_HOME/$NONCE-k7.md" "$TMP/k7.before"
+git -C "$CWT3" commit -q --allow-empty --no-verify -m "move the third worktree's HEAD"
+wt3_top=$(unset GIT_DIR GIT_WORK_TREE; git -C "$CWT3" rev-parse --show-toplevel); wt3_head=$(git -C "$CWT3" rev-parse HEAD)
+run_card "DL8 AC7 --card --replay after the commit" "$CWT3" 0 "· $wt3_top · keys view re-derived · remote evidence" --card --replay --session "$NONCE-k7"
+check_eq "DL8 AC7 the TAIL, READY line and route included, is byte-identical" "$(awk '/^## route/,0' "$TMP/k7.before")" "$(awk '/^## route/,0' "$CARD_HOME/$NONCE-k7.md")"
+check_eq "DL8 AC7 the claims — cell is the stored one" "$(grep -m1 '^claims — ' "$TMP/k7.before")" "$(grep -m1 '^claims — ' "$CARD_HOME/$NONCE-k7.md")"
+check_eq "DL8 AC7 the tree — cell names the moved HEAD" "1" "$(grep -c "^tree — .* · BASE $wt3_head · " "$CARD_HOME/$NONCE-k7.md")"
+cp "$CARD_HOME/$NONCE-k7.md" "$TMP/k7.after"
+run_card "DL8 AC7 a second replay over the unmoved tree reads fresh" "$CWT3" 0 "· $wt3_top · keys view fresh · remote evidence" --card --replay --session "$NONCE-k7"
+cmp -s "$TMP/k7.after" "$CARD_HOME/$NONCE-k7.md" && { echo "ok   DL8 AC7 the fresh replay leaves the card byte-identical"; pass=$((pass+1)); } \
+  || { echo "FAIL DL8 AC7 the fresh replay leaves the card byte-identical"; diff "$TMP/k7.after" "$CARD_HOME/$NONCE-k7.md" | sed 's/^/    /'; fail=$((fail+1)); }
 
 # ---- the card file (PLAY-dOrderedCharter-8 S2, S3) -------------------------------------------------
 # The stored card rendered, inside its level-1 envelope, into the tree of the SessionStart payload's
@@ -2003,7 +2032,7 @@ export CARD_CLAIMS_BOUND=120
 grep -q '^RUN_CLAIMS="on"$' "$CWT/.unattended.conf" || printf 'RUN_CLAIMS="on"\n' >> "$CWT/.unattended.conf"
 # The stored card's `claims —` cell, every numeric beat age masked: the clock moves between seed and read.
 # It ends at the `health —` line TOOL-aGraftedHelix-8 puts between it and `recent —`.
-read_claims_cell() { awk '/^claims — /{f=1} /^(health|recent) —/{exit} f' "$CARD_HOME/$1.md" | sed -E 's/ · beat [0-9]+s · / · beat Ns · /'; }
+read_claims_cell() { awk '/^claims — /{f=1} /^(health|recent) —/{exit} f' "$CARD_HOME/$1.md" | sed -E -e 's/ · beat [0-9]+s · / · beat Ns · /' -e 's/ · key [^ ]+$/ · key K/'; }
 read_lines() { if [ -f "$1" ]; then awk 'END{print NR}' "$1"; else echo 0; fi; }   # 0 for an absent file
 
 # AC1, AC2, AC6 — seven claims: a fresh live one, a held one three days old, a live one two hours
@@ -2018,8 +2047,13 @@ t0=$(date +%s%N)
 run_card "AGH2 AC1 --card --write over the seven-claim remote" "$CWT" 0 "claims — 7 on the remote · 5 shown · 2 hidden" --card --write --session "$NONCE-c1"
 cl_ms_on=$(( ($(date +%s%N) - t0) / 1000000 ))
 check_eq "AGH2 AC1 the five kept claims in verdict order; the three-day stale and aborted ones hidden, the held and unknown ones not" \
-  $'claims — 7 on the remote · 5 shown · 2 hidden\n  zLive · n1 · live · beat Ns · live\n  yHeld · n1 · held · beat Ns · held\n  xBare · n1 · live · beat - · unknown\n  wStale · n1 · live · beat Ns · stale\n  vLanded · n1 · landed · beat Ns · terminal' \
+  $'claims — 7 on the remote · 5 shown · 2 hidden\n  zLive · n1 · live · beat Ns · live · key K\n  yHeld · n1 · held · beat Ns · held · key K\n  xBare · n1 · live · beat - · unknown · key K\n  wStale · n1 · live · beat Ns · stale · key K\n  vLanded · n1 · landed · beat Ns · terminal · key K' \
   "$(read_claims_cell "$NONCE-c1")"
+# TOOL-dDeclaredLoop-8 AC8 — the driver's row is six TAB fields, the sixth a `k1:` key, and the card's
+# row ends ` · key ` and that key's eight characters after `k1:`. RED against a card awk reading five.
+cl_k=$(cd "$CWT" && bash "$CLDRV" --claims 2>/dev/null | awk -F'\t' '$1 == "zLive" { print NF " " $6 }' | tr -d '\r')
+check_eq "DL8 AC8 the driver's zLive row is six fields, the sixth a k1: key, and the card's row ends with its eight characters" \
+  "6 k1: · key ${cl_k:5:8}" "${cl_k:0:5} $(grep -m1 '^  zLive · ' "$CARD_HOME/$NONCE-c1.md" | sed -E 's/.*( · key [^ ]+)$/\1/' | sed 's/^ //')"
 check_eq "AGH2 AC2 the claims — head sits directly below live —, so the startup split files it before recent —" \
   "claims — 7 on the remote · 5 shown · 2 hidden" "$(awk '/^live — /{getline; print; exit}' "$CARD_HOME/$NONCE-c1.md")"
 (cd "$CWT" && bash "$CHECK" --card --check --session "$NONCE-c1" </dev/null > "$CARD_OUT" 2>&1)
@@ -2087,8 +2121,8 @@ for s in bT1 bT2 bT3 bT4 bT5 bT6 bT7 bT8 bT9; do seed_claim "$s" landed 7200; do
 seed_claim zzLive live 60
 run_card "AGH2 AC11 --card --write over ten kept claims" "$CWT" 0 "claims — 10 on the remote · 10 shown · 0 hidden" --card --write --session "$NONCE-c11"
 cl_cap=$(sed -n 's/^CARD_CLAIMS_ROWS=\([0-9][0-9]*\)$/\1/p' "$CHECK")
-cl_want=$(printf 'claims — 10 on the remote · 10 shown · 0 hidden\n  zzLive · n1 · live · beat Ns · live\n'
-  i=1; while [ "$i" -lt "${cl_cap:-0}" ]; do printf '  bT%s · n1 · landed · beat Ns · terminal\n' "$i"; i=$((i+1)); done
+cl_want=$(printf 'claims — 10 on the remote · 10 shown · 0 hidden\n  zzLive · n1 · live · beat Ns · live · key K\n'
+  i=1; while [ "$i" -lt "${cl_cap:-0}" ]; do printf '  bT%s · n1 · landed · beat Ns · terminal · key K\n' "$i"; i=$((i+1)); done
   printf '  … %s more' "$((10 - ${cl_cap:-0}))")
 check_eq "AGH2 AC11 exactly CARD_CLAIMS_ROWS (${cl_cap:-unreadable}) rows, the live claim first, then the more row" "$cl_want" "$(read_claims_cell "$NONCE-c11")"
 
@@ -2220,7 +2254,9 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # block; no suite ran in the pass, the replay was probed alone over a scratch fixture.
 # +7: PLAY-dOrderedCharter-14's `memory —` cell, five run_card and two check_eq calls, counted off the
 # block; no suite ran in the pass, the card write was probed alone over a scratch fixture.
-FLOOR_ASSERTIONS=337
+# +11: TOOL-dDeclaredLoop-8's claim keys, the AC6 keys cell (three), the AC7 re-keyed replay (seven) and
+# the AC8 six-field row (one), counted off the diff; no suite ran in the pass, each probed over a scratch clone.
+FLOOR_ASSERTIONS=348
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

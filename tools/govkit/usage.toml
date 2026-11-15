@@ -329,6 +329,33 @@ verb = "show"
 flags = []
 
 [[usage]]
+id = "script:{prefix}/loop/claims.py"
+shape = "verb"
+entry = "{prefix}/loop/claims.py"
+flags = ["--fixture", "--plant=", "--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/claims.py#key"
+shape = "verb"
+entry = "{prefix}/loop/claims.py"
+verb = "key"
+flags = ["--stdin"]
+
+[[usage]]
+id = "script:{prefix}/loop/claims.py#verdict"
+shape = "verb"
+entry = "{prefix}/loop/claims.py"
+verb = "verdict"
+flags = ["--stored=", "--class=", "--recomputed=", "--at=", "--bound="]
+
+[[usage]]
+id = "script:{prefix}/loop/claims.py#card-keys"
+shape = "verb"
+entry = "{prefix}/loop/claims.py"
+verb = "card-keys"
+flags = []
+
+[[usage]]
 id = "script:{prefix}/loop/loop_table.py"
 shape = "verb"
 entry = "{prefix}/loop/loop_table.py"

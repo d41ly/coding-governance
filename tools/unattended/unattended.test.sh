@@ -16407,8 +16407,9 @@ GH_BOUND=$(sed -n 's/^RESUME_STALE_BOUND="\(.*\)"$/\1/p' .unattended.conf)
 out=$(bash "$SCRIPT" --claims 2>/dev/null); rc=$?
 same "AC1 --claims over an empty namespace prints exactly claims: none" "$out" "claims: none"
 same "AC1 ...and exits 0" "$rc" "0"
-# ---- AC2: five claims, one per verdict, five TAB-separated fields each, sorted by slug, the stale
-# ---- split on the conf's own bound and the unparsed claim's age `-`.
+# ---- AC2: five claims, one per verdict, six TAB-separated fields each, sorted by slug, the stale
+# ---- split on the conf's own bound and the unparsed claim's age `-`; the sixth field is the claim's
+# ---- key (TOOL-dDeclaredLoop-8 S7), RED against the driver's five.
 seed_claim gA s-a k-a live "$(derive_claim_now)"
 seed_claim gB s-b k-b live "$(derive_claim_ago $((GH_BOUND + 600)))"
 seed_claim gC s-c k-c held "$(derive_claim_ago $((GH_BOUND * 3)))"
@@ -16416,7 +16417,7 @@ seed_claim gD s-d k-d landed "$(derive_claim_now)"
 seed_claim gE s-e k-e live ""
 out=$(bash "$SCRIPT" --claims 2>/dev/null)
 same "AC2 --claims prints five rows" "$(printf '%s\n' "$out" | grep -c '')" "5"
-same "AC2 ...of five TAB-separated fields each" "$(printf '%s\n' "$out" | awk -F'\t' 'NF != 5' | grep -c '')" "0"
+same "AC2 ...of six TAB-separated fields each, the sixth a k1: key" "$(printf '%s\n' "$out" | awk -F'\t' 'NF != 6 || $6 !~ /^k1:/' | grep -c '')" "0"
 same "AC2 ...with one verdict per claim, in slug order" "$(printf '%s\n' "$out" | cut -f1,5 | tr '\t\n' ': ')" "gA:live gB:stale gC:held gD:terminal gE:unknown "
 same "AC2 ...and the unparsed claim's age is -" "$(printf '%s\n' "$out" | awk -F'\t' '$1 == "gE" { print $4 }')" "-"
 # ---- AC16: a stamp-shaped but invalid beat sorting first turns every claim of that one date call

@@ -497,6 +497,65 @@ log record is the source; with only `micro-format` selected, nothing is stored a
 Only build-level moves are recorded; nothing calls the writer yet, until the executor that moves a
 build at each item boundary lands.
 
+## Claim keys
+
+A stored claim, such as a cell of your orientation card or a run claim on the remote, carries a key
+over what it was derived from, so a session can tell a fresh claim from a stale one without deriving
+it again. A key is `k1:` and sixteen hex digits over the claim's sources: `<name>=<value>` facts such
+as `commit=`, `base=`, `toplevel=`, `branch=`, `dirty=` and `runstate=`, and refs spelled
+`<ref>@<sha>`. A source that could not be read is spelled `?`, and its key opens `k1:?`, which never
+reads as fresh. The age is not part of the key: it is stored beside it as `at`.
+
+Each source belongs to one of five classes, strongest first: `history` (commits and their trailers),
+`view` (the card's cells and other generated views), `remote` (run claims, leases and mailbox
+entries), `provenance` (your own words and the policy file) and `typed` (status words an agent typed).
+A claim takes the weakest class among its sources. Its verdict is `fresh` when the stored key and a
+recomputed one are equal and, for a `remote` claim, its age is inside the bound you pass; `re-derived`
+when the key moved, so the claim is derived again; and `evidence` for a `typed` claim or one with
+nothing to recompute.
+
+Your orientation card's second line is the `keys —` cell:
+`keys — view <k> · remote <k> · at <time>`. The `overlaps —` and `claims —` cells are read by the
+`remote` key, every other cell by the `view` key. Where the loop kit is not installed the cell reads
+`keys — skipped: no loop kit resolves in this tree` and the card still writes. When the card is
+replayed, the view key is recomputed in the session's own tree: unchanged, the stored card prints as
+it is; moved, the startup cells are rendered again, keeping the stored header, the `overlaps —` and
+`claims —` cells, the remote key, and everything from the kickoff's READY line down. The replay's
+`now —` line names the tree and ends `keys view fresh` or `keys view re-derived`, then
+`remote evidence`, since a replay reads no remote. The `cli —`, `worktrees —`, `drift —`, `memory —`
+and `health —` cells read inputs no key covers, so a fresh view key says nothing about them.
+
+The unattended driver's `--claims` rows carry the claim's key as a sixth field, over the claim's ref
+and its run record at the default branch's tracking ref, and the card's `claims —` rows end
+` · key ` and the key's first eight characters after `k1:`.
+
+- **Key some sources:** `python tools/loop/claims.py key commit=<sha> base=<sha>` prints one key; <!-- usage: script:tools/loop/claims.py#key d36ca5b8 -->
+  `key --stdin` prints one key per input line, the line's sources separated by TABs.
+
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries placeholders the shell reads as redirects -->
+  ```bash
+  python tools/loop/claims.py key commit=<sha> base=<sha> toplevel=<path> branch=main dirty=0
+  ```
+
+- **Judge a stored key:** `python tools/loop/claims.py verdict --stored <k> --class view --recomputed <k>` <!-- usage: script:tools/loop/claims.py#verdict 641f7922 -->
+  prints `fresh`, `re-derived` or `evidence`. `--class` takes a class or several joined by commas,
+  read as the weakest; a `remote` claim needs `--at` and `--bound`, its age bound in seconds, to read
+  fresh. It exits 2 naming a class outside the five.
+
+- **Read the card's keys:** `python tools/loop/claims.py card-keys` prints `view <k>`, `remote <k>`, <!-- usage: script:tools/loop/claims.py#card-keys 909e8102 -->
+  `at <time>` and `remote-cells overlaps claims` for the repository you run it in, and nowhere else.
+
+- **See it on a fixture:** `--fixture --plant <case>` runs one case and prints a line ending `held` or <!-- usage: script:tools/loop/claims.py 89c0ee14 -->
+  `MISSED`: `key-stable`, `key-moves`, `key-unread`, `typed-evidence`, `remote-aged` and
+  `card-keys-worktree`, the last in a scratch repository with a bare remote and a worktree, removed
+  after. `--selftest` runs every case, and gov's own `loop claims fixtures` gate runs it.
+
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
+  ```bash
+  python tools/loop/claims.py --fixture --plant key-moves
+  python tools/loop/claims.py --selftest
+  ```
+
 ## The item kind, `kind.item`
 
 Items are a registered kind: the kinds register's `kind.item` row names a factory, a row schema,
@@ -730,4 +789,6 @@ installed, each role item prints `unarmed`. `loop_witness.py` writes its records
 memory-tree kit, and its `hold-inherited` case runs the unattended driver without requiring that kit,
 since the unattended kit requires this one; its gate is gov's own and an install does not carry it.
 `loop_checklist.py` reads the unattended driver's two registry lines the same way, and its
-`loop checklist tags` gate is gov's own too.
+`loop checklist tags` gate is gov's own too. `claims.py` reads git alone and requires no other kit;
+the orientation card and the unattended driver each find it beside them, and its `loop claims
+fixtures` gate is gov's own.

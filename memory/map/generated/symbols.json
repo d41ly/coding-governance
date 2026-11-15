@@ -9703,6 +9703,11 @@
       "file": "tools/lexicon/scaffold_lexicon.py"
     },
     {
+      "id": "derive_card_keys",
+      "kind": "function",
+      "file": "tools/loop/claims.py"
+    },
+    {
       "id": "derive_carried",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -9798,9 +9803,24 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "derive_claim_key",
+      "kind": "function",
+      "file": "tools/loop/claims.py"
+    },
+    {
+      "id": "derive_claim_keys",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "derive_claim_now",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "derive_claim_verdict",
+      "kind": "function",
+      "file": "tools/loop/claims.py"
     },
     {
       "id": "derive_claims_line",
@@ -12188,6 +12208,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "derive_weakest_class",
+      "kind": "function",
+      "file": "tools/loop/claims.py"
+    },
+    {
       "id": "derive_widenings",
       "kind": "function",
       "file": "tools/playbook/row_checks.py"
@@ -14566,6 +14591,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/lib/python_floor.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/loop/claims.py"
     },
     {
       "id": "main",
@@ -17016,6 +17046,11 @@
       "id": "print_registry",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "print_rekeyed_card",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "print_replay",
@@ -22338,6 +22373,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "remove_readonly_path",
+      "kind": "function",
+      "file": "tools/loop/claims.py"
+    },
+    {
       "id": "remove_red_ref",
       "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
@@ -23471,6 +23511,11 @@
       "id": "render_json",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "render_keys_cell",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "render_kill",
@@ -26155,6 +26200,11 @@
     {
       "id": "resolve_remote",
       "kind": "function",
+      "file": "tools/loop/claims.py"
+    },
+    {
+      "id": "resolve_remote",
+      "kind": "function",
       "file": "tools/memory-tree/coverage_join.py"
     },
     {
@@ -27206,6 +27256,11 @@
       "id": "run_claim_cell",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_claims_plant",
+      "kind": "function",
+      "file": "tools/loop/claims.py"
     },
     {
       "id": "run_claims_scope",
@@ -29331,6 +29386,11 @@
       "id": "run_witness_commands",
       "kind": "function",
       "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "run_worktree_plant",
+      "kind": "function",
+      "file": "tools/loop/claims.py"
     },
     {
       "id": "run_worktree_remove",

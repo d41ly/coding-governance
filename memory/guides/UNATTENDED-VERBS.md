@@ -335,7 +335,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   AMEND of a pass commit is graded too, but an undeclared path in it is refused with no widening:
   a `--dispatch` would anchor at the commit the amend replaces, which check 23 never grades.
 - `--claims` — every run claim on the remote, one TAB-separated row each: slug, node, status,
-  beat age in seconds and verdict, `live`, `stale`, `held`, `terminal` or `unknown`, sorted by slug;
+  beat age in seconds, verdict, `live`, `stale`, `held`, `terminal` or `unknown`, and the claim's
+  key, a `k1:` key over its claim ref and its run record's blob at the default branch's tracking ref
+  (`k1:?` where that record is absent; `-` where python or the loop kit does not resolve), sorted by slug;
   `claims: none` when there is none, and exit 2 with check 109 when the remote does not answer, never
   an empty list. Where `RUN_CLAIMS` is not `on` it prints the single line `claims: off`, exits 0
   and reads nothing, since no verb writes or reads a claim then; `git ls-remote <remote>

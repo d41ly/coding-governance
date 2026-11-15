@@ -374,6 +374,27 @@ python <prefix>/loop/floor.py get guard-self
 python <prefix>/loop/policy_edit.py set review.max-rounds 4 --build <slug> --unit <id>
 ```
 
+## The claim keys
+
+`claims.py` (TOOL-dDeclaredLoop-8) keys a stored claim over its sources and trusts it by that key and
+by its weakest source. `derive_claim_key` is `k1:` and the first sixteen hex digits of the SHA-1 of the
+sources sorted bytewise and joined by NUL, `k1:?` before the digits where a source is spelled `?`.
+`CLAIM_CLASSES` holds the five source classes strongest first, and `derive_claim_verdict` answers
+`evidence`, `fresh` or `re-derived`; the `remote` class's age bound is the caller's, never this
+module's. `derive_card_keys` is the orientation card's view and remote keys over the working directory
+git runs in, and `CARD_CELL_CLASSES` joins each card cell to one of them. The card's `keys —` cell, its
+replay's re-key and the unattended driver's sixth `--claims` field each find the module beside them by
+`resolve_kit_dir`; it reads git alone, through its inline copy of the remote ladder, so it takes no
+edge. `--fixture --plant <case>` runs one of `PLANTS`, and `--selftest` runs every case through
+`run_selftest_cases`; it is gov's `loop claims fixtures` leg.
+
+```bash
+python <prefix>/loop/claims.py key commit=<sha> base=<sha>
+python <prefix>/loop/claims.py verdict --stored <k> --class view --recomputed <k>
+python <prefix>/loop/claims.py card-keys
+python <prefix>/loop/claims.py --selftest
+```
+
 ## The item kind
 
 The items are a registered kind (TOOL-dDeclaredLoop-24): the kinds register's `kind.item` row names

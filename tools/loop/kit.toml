@@ -51,6 +51,10 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # `resolve_kit_dir`, so none takes an edge: the floor reads all on where that kit does not resolve,
 # the push arm prints `unarmed` and exits 0, and the commit verdict, run only where the minimal guard
 # resolves, exits 2 where a reader does not answer. The leg is gov's own [[exempt_leg]].
+# The claim keys (TOOL-dDeclaredLoop-8): claims.py reads git alone, the remote through its inline ladder
+# copy, and imports only loop_lib.py beside it, so its reach takes no edge; the session-kickoff checker
+# and the unattended driver each find it by `resolve_kit_dir` and print a skipped or `-` form where it
+# does not resolve. Its leg is gov's own [[exempt_leg]].
 requires = ["memory-tree"]
 
 # Everything the kit ships is engine, overwritten on every update: the definition, its reader, the

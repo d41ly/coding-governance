@@ -77,6 +77,13 @@ unmerged remote-tracking refs sharing a path with this tree's branch, read once 
 The `cli —` cell (`KICK-aMendedFleet-4`), directly after `node —`, compares PATH's `claude --version`,
 read once under a bounded `timeout`, with the running session's version from `AI_AGENT`, and prints a
 NOTE when PATH is the older, since every session started from PATH runs that CLI.
+The `keys —` cell (`TOOL-dDeclaredLoop-8`), directly after the header, carries the card's two claim
+keys from the loop kit's `claims.py card-keys`, `keys — view <k> · remote <k> · at <iso>`, taken after
+the `claims —` read has fetched: the `overlaps —` and `claims —` cells are the `remote` class's, every
+other cell the `view` class's. No loop kit reads `keys — skipped:`. The replay recomputes the view key
+in its own tree; a moved key re-renders the startup cells, carrying the stored header, remote cells,
+remote key and TAIL, and the `now —` line names the tree and its `keys view` verdict. The `claims —`
+rows end ` · key ` and eight characters of the driver's sixth `--claims` field.
 The `health —` cell (`TOOL-aGraftedHelix-8`), after `claims —` and above `recent —`, counts the last
 24 hours of `<git-common-dir>/health.log`, one TAB-separated line per automatic self-heal any kit
 appended, by kind; the window is fixed, never "since the previous card", because cards are per

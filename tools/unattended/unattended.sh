@@ -2407,12 +2407,40 @@ read_claims() { # strict|soft|quiet -> 0 with CLAIM_ROWS, or 1 with CL_WHY
 # line `claims: off` and reads nothing (TOOL-aGraftedHelix-32): no verb writes or reads a claim then,
 # so a leftover claim is inert and the read bought a SessionStart fetch for nothing; it shows again
 # once the switch is on. WHAT IT DOES NOT CHECK: who drives anything; it reports and decides nothing.
+# TOOL-dDeclaredLoop-8 S7: a SIXTH field, the claim's key, beside the verdict and never in its place.
 print_claims() { # -> the rows on stdout; rc 2 when the remote does not answer
+  local keys
   [ "$RUN_CLAIMS" = on ] || { echo "claims: off"; return 0; }
   read_claims strict || return 2
   if [ -z "$CLAIM_ROWS" ]; then echo "claims: none"; return 0; fi
-  printf '%s\n' "$CLAIM_ROWS" | cut -f1-5
+  keys=$(derive_claim_keys) || keys=""
+  keys=${keys//$'\r'/}
+  [ "$(printf '%s\n' "$keys" | grep -c .)" = "$(printf '%s\n' "$CLAIM_ROWS" | grep -c '')" ] || keys=""
+  printf '%s\n' "$CLAIM_ROWS" | CK_KEYS="$keys" awk -F'\t' -v OFS='\t' '
+    BEGIN { split(ENVIRON["CK_KEYS"], k, "\n") }
+    { print $1, $2, $3, $4, $5, (k[NR] ~ /^k1:/ ? k[NR] : "-") }'
   return 0
+}
+
+# THE CLAIM KEY of each row of CLAIM_ROWS, in row order: the loop kit's `claims.py key --stdin` over the
+# claim's `refs/gov/runs/<slug>@<sha>` and `runstate=`, the blob id of the slug's run record at the
+# claim remote's tracking ref of the default branch, `runstate=?` where that ref or file is absent (the
+# spec's F4). ONE `cat-file --batch-check` for every blob and ONE key spawn for every row, so no claim
+# spawns a process of its own. Returns 1 printing nothing where python or the loop kit does not
+# resolve, and `print_claims` then prints `-`. WHAT THIS DOES NOT CHECK: that the tracking ref is fresh.
+derive_claim_keys() { # CLAIM_ROWS, CR_NAME -> one key per row on stdout
+  local py d br blobs=""
+  py=$(resolve_python 2>/dev/null) && [ -n "$py" ] || return 1
+  d=$(resolve_kit_dir "$py" loop claims.py "$KIT_DIR" 2>/dev/null) && [ -n "$d" ] || return 1
+  br=$(default_branch 2>/dev/null) || br=""
+  if [ -n "$br" ]; then
+    blobs=$(printf '%s\n' "$CLAIM_ROWS" | CK_PRE="refs/remotes/$CR_NAME/$br:$MEMORY_ROOT/builds/" \
+      awk -F'\t' '{ print ENVIRON["CK_PRE"] $1 "/RUN.md" }' | GIT cat-file --batch-check 2>/dev/null) || blobs=""
+  fi
+  printf '%s\n' "$CLAIM_ROWS" | CK_BLOBS="$blobs" CK_NS="$CLAIM_NS" awk -F'\t' '
+    BEGIN { split(ENVIRON["CK_BLOBS"], b, "\n") }
+    { split(b[NR], f, " "); print ENVIRON["CK_NS"] "/" $1 "@" $6 "\trunstate=" (f[2] == "blob" ? f[1] : "?") }' \
+    | "$py" "$d/claims.py" key --stdin
 }
 
 # THE TABLE'S TWO AXES, declared once (TOOL-aGraftedHelix-19): the claim-read classes the function

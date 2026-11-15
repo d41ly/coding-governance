@@ -78,6 +78,7 @@
       "line length",
       "line-length gate selftest",
       "loop checklist tags",
+      "loop claims fixtures",
       "loop computed witness",
       "loop definition",
       "loop guard fixtures",
