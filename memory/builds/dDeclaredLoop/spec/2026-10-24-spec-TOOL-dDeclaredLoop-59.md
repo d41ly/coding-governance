@@ -13,6 +13,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-59-deviation-591.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-59-deviation-591.md) | deviation | — |
 | [2026-10-24-build-TOOL-dDeclaredLoop-59-deviation-592.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-59-deviation-592.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-59-deviation-593.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-59-deviation-593.md) | deviation | — |
+| [2026-11-15-build-TOOL-dDeclaredLoop-59-red-fix-23.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-59-red-fix-23.md) | red-fix | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-59-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-59-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-59-reground-brief.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-59-reground-brief.md) | research | — |
