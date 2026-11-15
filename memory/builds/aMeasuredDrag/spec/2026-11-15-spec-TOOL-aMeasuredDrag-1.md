@@ -28,6 +28,7 @@
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-18-synthesizer.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-18-synthesizer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-19-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-19-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-2-researcher.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-2-researcher.md) | journal | — |
+| [2026-11-15-prompt-TOOL-aMeasuredDrag-1-20-builder.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-20-builder.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-3-researcher.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-3-researcher.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-4-researcher.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-4-researcher.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-5-researcher.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-5-researcher.md) | journal | — |
