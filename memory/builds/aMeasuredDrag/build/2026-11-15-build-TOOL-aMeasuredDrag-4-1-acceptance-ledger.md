@@ -42,3 +42,8 @@ RED-first observation.
 - AC2 and AC5, as above.
 - The gates in spec §7. The `instruction edits selftest` re-observes the fixture's five `check` cases
   and the retired-tag case that calls `run_tag_check` directly.
+
+## Observed at the main loop, 2026-11-15
+
+- AC2: `python tools/playbook/instructions_edit.py check` at `a02057b4b` and at `653ccd404` printed byte-identical output (`instructions-edit: check · 13 row(s)`, `0 red`), both exit 0, compared with `diff` (PINNED 2026-11-15).
+- AC5: the same verb took 774 s at `a02057b4b` and 3 s at `653ccd404`, beside a spawn baseline of 0.510 s for ten `/usr/bin/true` (PINNED 2026-11-15). The base reading waited on the shared tag index, so it is a contended figure; the after-run reads no tag index at all.
