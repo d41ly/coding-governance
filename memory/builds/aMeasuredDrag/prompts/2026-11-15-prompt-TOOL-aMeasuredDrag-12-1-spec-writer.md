@@ -104,7 +104,7 @@ Not supplied, optional: `input:spec`, `input:code`.
 
 > Build quick wins
 
-The closing diff review of this build, round 1 (`memory/builds/aMeasuredDrag/reviews/2026-11-15-review-TOOL-aMeasuredDrag-1-11-closing-diff-round1.md`), exited CONVERGED and CLEAN WITH FIXES, with 0 blockers, 0 highs and 7 confirmed minor findings forming 6 items. BUILD-METHOD M4 (owner ruling, DIFF 2026-10-04) promotes every minor into one batched unit.
+The closing diff review of this build, round 1 (`memory/builds/aMeasuredDrag/reviews/2026-11-15-review-TOOL-aMeasuredDrag-1-11-closing-diff-round1.md`), exited CONVERGED and CLEAN WITH FIXES, with 0 blockers, 0 highs and 7 confirmed minor findings forming 6 items. doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it (owner ruling, DIFF 2026-10-04) promotes every minor into one batched unit.
 
 ### brief:goal
 
