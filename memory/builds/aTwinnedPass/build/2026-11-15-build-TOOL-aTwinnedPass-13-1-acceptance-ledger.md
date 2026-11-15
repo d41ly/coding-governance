@@ -15,17 +15,21 @@ worktree root as `bash t13.sh HEAD MERGE_HEAD` after the resolution and before t
 role's hook refused `gen_build_index.py --check-format` as the leg "build README slot contract", so
 that check and AC8's three `--check` commands are the close's.
 
+The merge committed as `41ab3ec40`. The after-commit halves of AC1, AC8 and AC9 are plain git
+reads, not gate legs, so the pass observed them over that commit and records them here in a records
+commit of their own, before the status flip.
+
 Owed to the main loop at the close:
 - AC2's `python tools/memory-tree/gen_build_index.py --check-format`;
 - AC8's before-commit `gen_build_index.py --check`, `gen_map.py --check` and
-  `adopt-unattended.sh --check`, and its after-commit `--remerge-diff` filter;
-- AC1's after-commit parents and AC9's `merge-tree` and `--is-ancestor`;
+  `adopt-unattended.sh --check`;
 - the legs of the spec's Gates section, the four self-test legs named as tripped and not observed.
 
 **Evidences:** TOOL-aTwinnedPass-13
 - AC1 — `git rev-parse MERGE_HEAD` — printed `a76c6afe7f70b384b7cce7d6bf56e6aed62a2f82`, and
-  `git diff --name-only --diff-filter=U` and `git grep -n '^<<<<<<< '` each printed nothing. The
-  after-commit parents are the close's.
+  `git diff --name-only --diff-filter=U` and `git grep -n '^<<<<<<< '` each printed nothing. After
+  the commit, `git rev-list --parents -n 1 41ab3ec40` printed three ids: `41ab3ec40`, the pre-merge
+  tip `d9a1ea6c6`, then `a76c6afe7f70b384b7cce7d6bf56e6aed62a2f82`.
 - AC2 — `grep -nE '^memory/builds/a(LightenedLoop|TwinnedPass)/README[.]md$' memory/project/readme-contract.txt`
   — printed lines 243 and 244, `aLightenedLoop` first. `--check-format` is the close's.
 - AC3 — `node --check tools/workflows/unattended-unit.js` — exited 0. The probe printed
@@ -43,6 +47,9 @@ Owed to the main loop at the close:
   — exited 0, and the `git grep` for `Declare the write set with` outside the suites printed nothing.
 - AC7 — the probe — printed `window writes 0`, and `grep -c 'NOTHING IN THE WINDOW WRITES THE TREE'`
   printed 1.
-- AC8 — owed to the close: the role refuses the three `--check` commands as gate legs, and the
-  `--remerge-diff` filter reads the commit.
-- AC9 — owed to the close: it reads the commit.
+- AC8 — `git show --remerge-diff --format= --name-only 41ab3ec40` — listed nine paths: the four
+  resolved files, `memory/LIVE.md`, `memory/ledger/2026-11.md`, this build's README, this unit's
+  spec and this ledger. Piped to the criterion's `grep -vE` it printed nothing. The three
+  before-commit `--check` commands are the close's: the role refuses them as gate legs.
+- AC9 — `git merge-tree --write-tree a76c6afe7 41ab3ec40` — exited 0, and
+  `git merge-base --is-ancestor a76c6afe7 41ab3ec40` exited 0.
