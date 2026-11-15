@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-14 — the default failure route: the refusal recorded and the frontier returned
 
-**Status:** INPROGRESS · rev-6 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 18 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-7 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 18 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0099@60eee5d8 whole
 
@@ -14,15 +14,19 @@
 | [2026-11-05-build-TOOL-dDeclaredLoop-14-deviation-141.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-14-deviation-141.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-14-1-builder-return.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-1-builder-return.md) | journal | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-14-2-builder-return.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-2-builder-return.md) | journal | — |
+| [2026-11-15-build-TOOL-dDeclaredLoop-14-3-builder-return.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-3-builder-return.md) | journal | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-142.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-142.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-143.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-143.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-144.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-144.md) | deviation | — |
+| [2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-146.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-146.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-14-red-fix-25.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-red-fix-25.md) | red-fix | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-56 |
 | [2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade.md) | research | TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-14-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-14-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-14-2-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-14-2-spec-writer.md) | journal | — |
+| [2026-11-15-prompt-TOOL-dDeclaredLoop-14-3-spec-brief.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-14-3-spec-brief.md) | research | — |
+| [2026-11-15-prompt-TOOL-dDeclaredLoop-14-4-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-14-4-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-14-build-brief.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-14-build-brief.md) | journal | — |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-14-reground-brief.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-14-reground-brief.md) | research | — |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-14-spec-brief.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-14-spec-brief.md) | research | — |
@@ -59,14 +63,21 @@ to :33), and `tools/playbook/principles.toml@701c20bb8c9c:150` maps this clause 
   AC9.
 - **S3** — The recording verb, `unattended.sh --refused <slug> --item <tag> --key <key> --reason <text>`,
   `write_refusal` in `tools/unattended/unattended.sh`, built on `verb_propose`'s
-  guards: the run-state check, the three required flags through `check_verb_flag`, the line-end,
-  separator and bypass-flag refusals over the item, key and reason, `refuse_if_terminal`, and exact-line
-  idempotence. Its line-end and bypass-flag refusals are `case` patterns over the joined fields, never
-  `verb_propose`'s `printf | wc -l` and `printf | grep -qF` (§5). It then asks the engine, `position.py --check-refusal <tag> <key>`, found through the
-  driver's `resolve_kit_dir` as unit 7's `verb_plan` finds it, which refuses a tag the composition does
-  not declare and a key not of `derive_instance_key`'s shape for that tag, and refuses itself where the
-  composition does not read. Each refusal is check 48, the number `verb_propose`'s refusals print, and
-  leaves the run-state file's bytes unchanged. Then it calls `park`. Observed by AC4, AC5.
+  guards: the run-state check through `check_run_state`, the three required flags through
+  `check_verb_flag`, the field guards through `check_step_fields`, `refuse_if_terminal`, and exact-line
+  idempotence. `check_step_fields` is a new helper defined directly above `verb_propose`, holding
+  `verb_propose`'s three field guards moved out of it whole: the line-end, separator and bypass-flag
+  refusals, each keeping its test and its `fail 48`, its message's subject reworded from "a proposed
+  item" to "an item" (§4 The refusal budget). `verb_propose` calls it in their place, and `write_refusal`
+  calls it with the key in the step's place, the field `park` writes the key into. It then asks the
+  engine, `position.py --check-refusal <tag> <key>`, found through the driver's `resolve_position_engine`
+  as unit 7's `verb_plan` finds it, which refuses a tag the composition does not declare and a key not of
+  `derive_instance_key`'s shape for that tag, and refuses itself where the composition does not read.
+  Every engine answer but exit 0, and an engine that does not resolve, reaches one `fail 48` site that
+  carries the engine's line. Each refusal is check 48, the number `verb_propose`'s refusals print, and
+  leaves the run-state file's bytes unchanged. Then it calls `park`. Observed by AC4, AC5, AC11.
+  **Readers:** by name: `tools/unattended/unattended.test.sh`, whose three `verb_propose` field-guard arms spell the messages the shared helper rewords, and are reworded with them
+  · by value: NO VALUE READERS — a refusal message is matched as text by its arm, never compared or counted as a value.
 - **S4** — The engine reads the build's refusals and prints them with the frontier. Its run-state rows
   are read through runlog's `read_run_state` (`tools/runlog/model.py#read_run_state`), which already
   splits the ` · step ` field, reached through `resolve_kit_dir("runlog", "model.py", here)`; where that
@@ -147,6 +158,23 @@ to :33), and `tools/playbook/principles.toml@701c20bb8c9c:150` maps this clause 
 - The unattended Skill render stands at its row, 10524 bytes PINNED, read 2026-11-15
   (`tools/template-size-limits.txt@a7cfff299935:183`), whose block allows a run's raise for a verb the
   kit gate requires in the fenced list, with no headroom.
+- The driver's refusal budget is full. Measured 2026-11-15 at `d4d80fe38` with check-arms' own readers,
+  `tools/memory-tree/check-arms.py#branches` and `tools/memory-tree/check-arms.py#scan_refusal_sites`,
+  the driver holds 319 fail branches and 5 refusal sites, PINNED, a census of 324 against its
+  `REFUSAL_CEILINGS` token of 324, PINNED (`.memory-tree.conf@884cb38cb972:654`). Its families, by the
+  ERE of each row of `tools/unattended/unattended.families.txt@73bcaac68d7c:11` to :13: `missing-run-state`
+  1 of 1, `required-flag` 11 of 11 and `field-shape` 36 of 37, each PINNED. The leg
+  `tools/unattended/check-unattended.sh` measures 266 against its 266, PINNED, and this unit adds no site
+  to it. `tools/memory-tree/check-arms.py#cmd_check` reds a census past its ceiling, a family past its
+  own, and a token or family row whose decision id no `memory/DECISIONS.md` row carries
+  (`tools/memory-tree/check-arms.py#check_id_carried`).
+- `verb_propose`'s three field guards are the driver's `fail 48` sites at
+  `tools/unattended/unattended.sh@0c2b6ad26090:13289`, :13294 and :13296, armed by the `hit` lines at
+  `tools/unattended/unattended.test.sh@ef992d7acaa3:6510`, :6515 and :6520. Five other verbs hold the
+  same triple under their own messages (:13225, :13352, :13472, :13537, :14026), all in `field-shape`.
+- `park` refuses a line feed and a carriage return in any field as check 17 before its append
+  (`tools/unattended/unattended.sh@0c2b6ad26090:12742`), so a carriage return in `--refused`'s fields is
+  refused with the run-state file untouched, though `verb_propose`'s line-end guard counts lines only.
 
 ### Data model
 
@@ -194,6 +222,77 @@ CR-stripped size, with no headroom, under the four terms at the head of
 unit and the figure. `memory/DECISIONS.md` records the unit's row ahead of the pass, in a records commit, so the
 pass raises the row under term 4's "before" clause: that file is a shared record no pass may declare.
 
+### The refusal budget
+
+The census `REFUSAL_CEILINGS` prices is the gate's fail branches plus its refusal sites (§4 Evidence),
+and a family's count is the sites whose message its ERE matches. What this unit moves (§8 F8):
+
+| Change | Driver census | `field-shape` | `missing-run-state` · `required-flag` |
+|---|---|---|---|
+| `verb_propose`'s three field guards moved into `check_step_fields`, which `write_refusal` also calls | +0 | +0 | +0 |
+| `write_refusal`'s run-state and flag checks, through `check_run_state` and `check_verb_flag` | +0 | +0 | +0 |
+| a carriage return in `--refused`'s fields, refused by `park`'s check 17 | +0 | +0 | +0 |
+| the engine site: exit 1, exit 2 and an unresolved engine in one `fail 48` | +1 | +0 | +0 |
+| at the pass, each PINNED | 325 of 325 | 36 of 37 | 1 of 1 · 11 of 11 |
+
+The four messages, exact, each opening with a literal run long enough to be its own signature, so
+check-arms can arm each one:
+
+```text
+check_step_fields, line end:  an item, step or reason contains a newline, and park() appends ONE line that the gate parses line-wise, so this would forge a second parked row nothing wrote
+check_step_fields, separator: an item or step spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it: $item at step $step
+check_step_fields, bypass:    an item, step or reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag: $BYPASS_BAN
+write_refusal, engine:        the position engine did not hold this refusal, so nothing is recorded and the run-state file is unchanged: $_why
+```
+
+`$_why` is the engine's first printed line, or `the loop kit's position engine does not resolve beside
+this kit` where `resolve_position_engine` returns 1. The engine message spells no `field-shape` term,
+no `requires --` and does not open `no run-state file`, so no family counts it. The three moved guards
+keep `verb_propose`'s tests byte for byte, its `printf | wc -l` and `printf | grep -qF` included.
+
+**The retirement review** (`tools/memory-tree/README.md`, "Retiring a refusal, and the ceiling on adding
+one"), over the site the census gains and the three the helper takes:
+
+| Site | R3 — does its condition survive elsewhere? | R4 | Candidate |
+|---|---|---|---|
+| the engine site | no: no other refusal reads a tag against the composition or a key against `derive_instance_key`'s shape | fails: it refuses a forged row at the run-state write boundary | no |
+| `check_step_fields`, line end | yes: `park`'s check 17 refuses the same line feed | fails: record forgery at a write boundary | no |
+| `check_step_fields`, separator | no: `park` does not read the separator | fails: record forgery at a write boundary | no |
+| `check_step_fields`, bypass flag | no: `park` does not read `BYPASS_BAN` | fails: a record no verb can rewrite | no |
+
+No site retires, so no row is written to `memory/project/refusal-retirements.txt`.
+
+**The raise.** The pass changes the driver's token in `.memory-tree.conf`'s `REFUSAL_CEILINGS`
+(`.memory-tree.conf@884cb38cb972:654`) from `tools/unattended/unattended.sh:324:2026-11-10:TOOL-aSmoothedDispatch-2`
+to the first line below, and adds the second line directly above `REFUSAL_CEILINGS`, after
+TOOL-dDeclaredLoop-5's `RAISED` line (:653):
+
+```text
+tools/unattended/unattended.sh:325:2026-11-15:TOOL-dDeclaredLoop-14
+# TOOL-dDeclaredLoop-14 RAISED the driver 324 -> 325, the census, under decision TOOL-dDeclaredLoop-14 (ER:388): the retirement review of write_refusal's one engine refusal found no candidate.
+```
+
+`ARMS_FLOORS` keeps the driver's `318:309`: a floor stops shrinking and lowers nothing.
+`tools/unattended/unattended.families.txt` does not move. The token's new text
+`tools/unattended/unattended.sh:325` is a live positional reference and `:324` is spelled nowhere else
+in `.memory-tree.conf`, so the row naming `:324` (`memory/project/positional-refs.txt@93dfbf2c6464:33`)
+is replaced by the row `python tools/playbook/gov_tag.py --list-positional` prints for `:325`.
+
+**The decision row** lands before the pass, in the main loop's records commit, as the Skill's row did.
+`cmd_check` refuses a token whose id no `memory/DECISIONS.md` row carries, and `--dispatch` refuses a
+pass declaring that file, which `SHARED_RECORDS` holds (`.unattended.conf@dca9e08e9e22:417`), so the
+pass does not edit it. `memory/HYGIENE.md` check 20 holds one id to one row of the decision index, and the unit's
+own id already heads its Skill row, so that one row carries both raises: the run extends it ahead of the pass to
+name the driver's refusal ceiling beside the Skill's size row. The row names TOOL-aSmoothedDispatch-2, the driver's
+last raise, as the precedent check 27 ranks nearest:
+```markdown
+- **TOOL-dDeclaredLoop-14** - **the `--refused` invocation the unattended Skill gains raises its render's no-headroom size row to the render's measured bytes, `.claude/skills/unattended/SKILL.md`, and the driver's refusal ceiling rises 324 -> 325 for unit 14's `--refused` engine refusal, under TOOL-aSparedSpawn-14's rule, as TOOL-aSmoothedDispatch-2 raised it 323 -> 324**: agent, 2026-11-15, under TOOL-aOrientedCast-23's four raise terms and ER:388 (PLAY-dClosedLoop-6), landed ahead of the pass that makes both raises. Detail `builds/dDeclaredLoop/`.
+```
+
+The token's date is the row's. The review and the raise are recorded in the pass's deviation record
+with its `**Surface:**` (`REFUSAL_CEILINGS` in `.memory-tree.conf`, the driver's token) and
+`**Reason:**`; the decision row does not carry them.
+
 ### Inventory
 
 | Identifier | Kind | Where |
@@ -203,7 +302,7 @@ pass raises the row under term 4's "before" clause: that file is a shared record
 | `--frontier`, `--check-refusal` | CLI flags | `tools/loop/position.py` |
 | `frontier-chain`, `frontier-parallel`, `frontier-refused`, `frontier-bad-key`, `frontier-none`, `plan-frontier` | `PLANTS` entries | `tools/loop/position.py` |
 | `refusal` | park kind, a `PARK_KINDS` member | `tools/unattended/unattended.sh`, `tools/runlog/model.py`, `tools/drift-audit/drift_report.py` |
-| `write_refusal` | function | `tools/unattended/unattended.sh` |
+| `write_refusal`, `check_step_fields` | function | `tools/unattended/unattended.sh` |
 | `--refused`, `--key` | driver verb, flag | `tools/unattended/unattended.sh` |
 | `frontier:` | `--plan` output line | `tools/unattended/unattended.sh` |
 
@@ -232,8 +331,10 @@ same items: A is `item.build.base`, B `item.build.unit-lease`, C `item.build.uni
 - `tools/loop/kit.toml`: a comment naming the reach of runlog's model, taken without an edge
 - `help/loop.md`: the frontier and the two flags in the position section, its usage anchor re-stamped
 - `tools/govkit/usage.toml`: the position script's row gains `--frontier` and `--check-refusal=`
-- `tools/unattended/unattended.sh`
-- `tools/unattended/unattended.test.sh`
+- `tools/unattended/unattended.sh`: `write_refusal`, and `check_step_fields` taken out of `verb_propose`
+- `tools/unattended/unattended.test.sh`: the `--refused` arms, and `verb_propose`'s three arms reworded
+- `.memory-tree.conf`: the driver's `REFUSAL_CEILINGS` token and its `RAISED` line (§4 The refusal budget)
+- `memory/project/positional-refs.txt`: the driver's `:324` row replaced by its `:325` row
 - `tools/unattended/VERBS.template.md`
 - `memory/guides/UNATTENDED-VERBS.md`: re-rendered in the same commit
 - `tools/unattended/SKILL.template.md`
@@ -258,6 +359,9 @@ same items: A is `item.build.base`, B `item.build.unit-lease`, C `item.build.uni
   a budget row and usage rows for a leg whose plants unit 7's leg already runs (§8 F4).
 - **The loop kit parsing `park`'s grammar itself.** A second reader of rows runlog already reads, and
   runlog's and drift-audit's copies left behind the driver's set until unit 56 (§8 F6).
+- **`write_refusal` holding its own field guards and two engine sites, both ceilings raised.** Five new
+  sites past a full census and three past `field-shape`, two decision rows, for guards `verb_propose`
+  already holds (§8 F8).
 
 ## 5. Production-readiness checklist
 
@@ -279,9 +383,21 @@ same items: A is `item.build.base`, B `item.build.unit-lease`, C `item.build.uni
   - the kit gate's checks 26, 27, 52 and 10: the header line, `VERBS_SLUG`, the `VERB_REQUIRES` row
     beside its three `check_verb_flag` calls, the `park` call site, the suite's flag line, and the
     verb carrier with its render in one commit (S6).
-  - `harness arms (fail branches armed or pinned)`: each check-48 message `write_refusal` adds is named
-    by a positive assertion in `unattended.test.sh`, read as text; that suite is waived for this build's
-    landing (the build README's waiver, owner 2026-10-20) and is not run.
+  - `harness arms (fail branches armed or pinned)`, its ceiling and families arms: the driver's census
+    goes from 324 to 325, PINNED, against the token the pass raises to 325 under the decision row the run
+    lands first (§4 The refusal budget). `field-shape` stays at 36 of 37, PINNED;
+    `missing-run-state` at 1 of 1 and `required-flag` at 11 of 11, each PINNED; because `check_step_fields` takes `verb_propose`'s
+    three sites rather than adding three, and the flag and run-state checks are the shared helpers'.
+    The leg's census, 266 of 266, PINNED, takes no site from this unit. `ARMS_FLOORS`' driver pair
+    `318:309` is a floor the census only rises above.
+  - the same leg's arm join: each of the four messages in §4 The refusal budget is named by a positive
+    assertion in `unattended.test.sh`, read as text. The three at :6510, :6515 and :6520 are reworded
+    to `check_step_fields`' messages and still drive `--propose`; one new `--refused` arm names the
+    engine site's message. That suite is waived for this build's landing (the build README's waiver,
+    owner 2026-10-20) and is not run.
+  - `positional (the citation check alone)`: the token's `tools/unattended/unattended.sh:325` is a new
+    positional reference and `:324` leaves the conf, so `memory/project/positional-refs.txt` swaps the
+    one row in the same commit (§4 The refusal budget).
   - the suite's parity table: every verb `verbs_all` names must have a row
     (`tools/unattended/unattended.test.sh@ef992d7acaa3:2445`, the loop at :2504), so `PARITY_ROWS` gains a
     `refused | : | --refused tRun --item i --key k --reason r` row.
@@ -291,12 +407,13 @@ same items: A is `item.build.base`, B `item.build.unit-lease`, C `item.build.uni
   - `shell hygiene (a fork spent on builtin work)`: `verb_propose`'s guards spell the line end as
     `printf | wc -l` and the bypass flag as `printf | grep -qF`
     (`tools/unattended/unattended.sh@0c2b6ad26090:13288`, :13295), each a `var-pipe` site
-    (`tools/gate-lint/sh_hygiene.py@448d62cbd57b:626`). `write_refusal` writes both as `case` patterns,
-    `case "$item$key$reason" in *$'\n'*|*$'\r'*)` and, where `BYPASS_BAN` is non-empty,
-    `case "$item$key$reason" in *"$BYPASS_BAN"*)`, so it adds no site.
-  - `lexicon naming predicates`: every function this unit adds, `derive_frontier`, `check_refusal` and
-    `write_refusal`, leads with a declared verb, each asked of `lexicon.py --suggest` 2026-11-15, so the
-    offender count stays at `VERB_OFFENDER_PIN` (`.lexicon.conf@2c348591b068:367`).
+    (`tools/gate-lint/sh_hygiene.py@448d62cbd57b:626`). `check_step_fields` takes both lines whole and
+    `write_refusal` writes no third, so the driver's `var-pipe` count stays at its registry row's 60,
+    PINNED (`memory/project/spawn-idiom-sites.txt@d43a77448fa2:292`), which the leg holds equal.
+  - `lexicon naming predicates`: every function this unit adds, `derive_frontier`, `check_refusal`,
+    `write_refusal` and `check_step_fields`, leads with a declared verb, each asked of `lexicon.py
+    --suggest` 2026-11-15, the last as `--as sh.function`, so the offender count stays at
+    `VERB_OFFENDER_PIN` (`.lexicon.conf@2c348591b068:367`).
   - `unattended skill size` and `unattended skill wiring`: the row raise and the re-render (§4).
   - unit 7's plants, `idempotent` and `deadlock` most: `derive_next_item` answers from the frontier's
     first entry, the same predicate, and `plan-line` still compares the `next:` line alone.
@@ -317,6 +434,9 @@ same items: A is `item.build.base`, B `item.build.unit-lease`, C `item.build.uni
   `memory/guides/SESSION-KICKOFF.md`'s audit block is restamped with a `manifest-audit:` delta line.
   The verdict-epoch gate's delegate list holds memory-tree modules and the spec-token checker, no file
   of this unit, so it does not move. The map's generated files are regenerated. The kit versions are minted by the lander.
+  The driver's `REFUSAL_CEILINGS` token moves 324 to 325 under TOOL-dDeclaredLoop-14, whose row lands
+  in `memory/DECISIONS.md` before the pass; `ARMS_FLOORS`, `tools/unattended/unattended.families.txt`
+  and `tools/unattended/unarmed-branches.txt` do not move.
 - testing — the six plants, and a `read_run_state` probe over one refusal row.
 - migration — none; a run-state file without refusal rows reads as before.
 - user docs — the `--refused` entry of `tools/unattended/VERBS.template.md` naming the kind and its
@@ -363,13 +483,32 @@ same items: A is `item.build.base`, B `item.build.unit-lease`, C `item.build.uni
   `tools/template-size-limits.txt`.
   figure: DERIVED, the row and the count both read at observation time.
   Red when: the Skill or the verb carrier lacks the verb, the pair differs, or the row is not the count.
+- **AC11** — When `python -c` imports `tools/memory-tree/check-arms.py` by path and adds
+  `len(branches(".", "tools/unattended/unattended.sh"))` to the count of that gate's sites in
+  `scan_refusal_sites(".", "memory")[0]`, the sum equals the count field of the one token
+  `grep -oE 'tools/unattended/unattended\.sh:[0-9]+:[0-9-]+:TOOL-dDeclaredLoop-14' .memory-tree.conf`
+  prints; the `field-shape` row's ERE in `tools/unattended/unattended.families.txt` matches no more of
+  those messages than its ceiling; and `grep -c '^- \*\*TOOL-dDeclaredLoop-14\*\*' memory/DECISIONS.md`
+  prints 1.
+  figure: DERIVED, the census and the family count read at observation time against the token and the
+  row; 324 is PINNED, the census at `d4d80fe38`, read 2026-11-15.
+  Red when: the census passes the driver's ceiling, `field-shape` passes its own, or the token names an
+  id no decision row carries.
 
 ## 7. Gates
 
-`run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `recall floor` · `recall floor arms` · `memory hygiene` · `core meta-check` · `unattended kit gate` · `unattended skill size` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `runlog selftest` · `drift-audit selftest` · `pre-push run-log line` · `run-gates run-log line` · `policy fixtures` · `scratch-guard self-test` · `tier2-review self-test` · `check-wiring self-test` · `lexicon naming predicates` · `shell hygiene (a fork spent on builtin work)` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest` · `install-prefix (shipped surface)` · `docs` · `kickoff-manifest ratchet` · `codebase-map coverage + freshness`
+`run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `recall floor` · `recall floor arms` · `memory hygiene` · `core meta-check` · `unattended kit gate` · `unattended skill size` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `positional (the citation check alone)` · `kit/dogfood doc parity` · `transition-audit arms` · `straggler-guard arms` · `runlog selftest` · `drift-audit selftest` · `pre-push run-log line` · `run-gates run-log line` · `policy fixtures` · `scratch-guard self-test` · `tier2-review self-test` · `check-wiring self-test` · `lexicon naming predicates` · `shell hygiene (a fork spent on builtin work)` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest` · `install-prefix (shipped surface)` · `docs` · `kickoff-manifest ratchet` · `codebase-map coverage + freshness`
+
+At the close, the `harness arms` leg's run prints the ceiling line
+`check-arms: ceiling tools/unattended/unattended.sh 325/325 · 2026-11-15 · TOOL-dDeclaredLoop-14`, the
+`<census>/<ceiling>` the main loop observes, and the family line
+`check-arms: family tools/unattended/unattended.sh field-shape 36/37 · 2026-10-12 · TOOL-aSparedSpawn-14`.
+What these do not check: `harness arms` reads a decision row's presence and never whether that row
+decided 325, and a family counts messages by its ERE, so a field guard worded past the ERE would leave
+the family and nothing reds.
 
 New arm: tools/loop/position.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 · each frontier `--plant` case, and `frontier-chain` red with the needs test removed · none
-New arm: tools/unattended/unattended.test.sh · covers none · arms naming `--refused`, `--key` and each new check-48 message, red with one message's wording changed under the arms check · none, the suite waived for this landing
+New arm: tools/unattended/unattended.test.sh · covers none · arms naming `--refused`, `--key` and the engine site's check-48 message, and `verb_propose`'s three arms reworded to `check_step_fields`' messages, red with one message's wording changed under the arms check · none, the suite waived for this landing
 
 ## 8. Open questions
 
@@ -412,6 +551,31 @@ New arm: tools/unattended/unattended.test.sh · covers none · arms naming `--re
   and unit 56's id 37 would trim what (b) adds. Recommendation (a), the body's.
   RESOLVED (agent, 2026-11-15, delegated): (a), rung 3: the verb carrier is the contract a run reads for its verbs
   widens: none · relaxes: none
+- **F8 — The driver's refusal census is at its ceiling and `field-shape` one under its own; what keeps
+  the `harness arms` leg green?** The third dispatch returned this before any write
+  (`build/2026-11-15-build-TOOL-dDeclaredLoop-14-3-builder-return.md`): 324 of 324 and 36 of 37, PINNED
+  (§4 Evidence). The conf's comment above `REFUSAL_CEILINGS` names no row a run may raise, so moving a
+  ceiling is a governance-carrier change (`memory/guides/BUILD-METHOD.md`, M3, veto 2).
+  - (a) Raise both. `write_refusal` holds its own line-end, separator and bypass-flag guards and an
+    engine site for each of exit 1 and exit 2: census 324 to 329, PINNED, and `field-shape` 36 to 39, PINNED,
+    under two decision rows landed ahead of the pass, as TOOL-dDeclaredLoop-5's row raised the
+    leg's ceiling. Three copies of guards `verb_propose` already holds.
+  - (b) Factor the three field guards `verb_propose` and `write_refusal` share into one helper,
+    `check_step_fields`, so `field-shape` stays flat, with `verb_propose`'s arms at
+    `tools/unattended/unattended.test.sh@ef992d7acaa3:6510`, :6515 and :6520 reworded. Alone it still
+    leaves the engine's refusal past the census: no existing site carries its message, and a `fail`
+    site whose message is all expansion is a hard error in check-arms, so it needs a site of its own.
+  - (c) (b), plus the engine's exit 1, its exit 2 and an unresolved engine in one `fail 48` site, the
+    smallest raise left: census 324 to 325, PINNED, under one decision row, every family flat.
+    Retiring the moved line-end guard, whose condition `park`'s check 17 refuses, would hold the census
+    at 324, but R4 bars a write-boundary forgery refusal from retirement and the owner decides a
+    retirement batch.
+  - Recommendation: (c). It keeps the counts flattest, needs one decision row, and the second verb to
+    hold `verb_propose`'s guards extracts their helper, as the charter's `[reuse]` rule asks. The body
+    is written on it (S3, §4 The refusal budget, AC11).
+  RESOLVED (agent, 2026-11-15, delegated): (c), rung 5. It cites ER:388 (`PLAY-dClosedLoop-6`) and is
+  recorded in the pass's deviation record with `**Surface:**` and `**Reason:**`.
+  widens: REFUSAL_CEILINGS, the driver's token 324 -> 325 · relaxes: none
 
 ## 9. Revision log
 
@@ -441,12 +605,22 @@ New arm: tools/unattended/unattended.test.sh · covers none · arms naming `--re
   §7 the spawn-idiom leg. Mechanism, carries, order and status kept.
 - rev-6 · 2026-11-15 · §4 The Skill's row, Files touched · the decision row lands ahead of the pass and leaves the
   pass's files, after the second dispatch's return 2026-11-15-build-TOOL-dDeclaredLoop-14-2-builder-return; nothing else moved.
+- rev-7 · 2026-11-15 · S3 · §4 Evidence, The refusal budget, Inventory, Files touched, Alternatives rejected · §5 · AC11 · §7 · §8 F8 · §10 ·
+  per the third dispatch's return 2026-11-15-build-TOOL-dDeclaredLoop-14-3-builder-return, by the brief 2026-11-15-prompt-TOOL-dDeclaredLoop-14-4-spec-writer:
+  the field guards move out of `verb_propose` into `check_step_fields`, which `write_refusal` shares, and
+  the engine's refusals are one site, so the driver's census rises by one under decision row
+  TOOL-dDeclaredLoop-14, landed ahead of the pass, and every family stays flat (F8 (c)). Mechanism,
+  carries, order and status kept.
 
 ## 10. Reuse audit
 
 The seams extended are `park` (`tools/unattended/unattended.sh#park`), the run-state line writer,
 which takes a new kind and no new grammar; `verb_propose`'s guards
-(`tools/unattended/unattended.sh#verb_propose`), which `write_refusal` repeats over its key field;
+(`tools/unattended/unattended.sh#verb_propose`): its run-state and flag checks are already shared
+helpers, `check_run_state` and `check_verb_flag`, and its three field guards, at their second user,
+are extracted into `check_step_fields` rather than copied into `write_refusal` (§8 F8);
+`resolve_position_engine` (`tools/unattended/unattended.sh#resolve_position_engine`), which finds the
+engine for `write_refusal` as it does for `verb_plan`;
 `PARK_KINDS` and its two copies; runlog's `read_run_state` (`tools/runlog/model.py#read_run_state`),
 which already parses the step field; and unit 7's engine, whose next-item walk becomes the frontier's
 first entry and whose plants, `--selftest` and leg carry this unit's cases. For the frontier walk
