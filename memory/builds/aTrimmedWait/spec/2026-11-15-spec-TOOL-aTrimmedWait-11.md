@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-11 — close repair, inherited: the hygiene suite's partition arm sets aside check 26's cache-hit count
 
-**Status:** SPECCED · rev-3 · 2026-11-15 · node a · Tier-2 · base 846d51d3 · streams tooling · order 10 · ratified 2026-11-15
+**Status:** INPROGRESS · rev-3 · 2026-11-15 · node a · Tier-2 · base 846d51d3 · streams tooling · order 10 · ratified 2026-11-15
 
 <!-- gen:spec-records -->
 
