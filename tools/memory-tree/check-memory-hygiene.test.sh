@@ -3065,6 +3065,8 @@ _pyparity() {  # $1 module directory · $2 example conf · $3 exemption names
 #     — environment, read or set through os.environ by the engine and by its own fixtures.
 #   GIT_INDEX_FILE — environment: gen_build_index.py carries it from os.environ into the hook's git
 #     environment, so both readers stay on one index (TOOL-aTrimmedHook-4).
+#   GOV_INDEX_SET_STDIN — environment: check-memory-hygiene.sh sets it on its own launch of
+#     corpus_ids.py --check, never in a conf, to hand check 16 its index set (TOOL-aHastenedSweep-3).
 #   GRAMMAR_DIR GRAMMAR_WHERE READ_PATH_RULES_GATE — module-level constants, reached through
 #     globals() by selftest arms that save and restore them. GRAMMAR_WHERE is swapped beside
 #     GRAMMAR_DIR in corpus_ids.py (TOOL-aRepatriatedFork-46 S4).
@@ -3075,7 +3077,7 @@ _pyparity() {  # $1 module directory · $2 example conf · $3 exemption names
 #     on purpose: adopt-memory-tree.sh copies the example and appends the first two only when neither
 #     is assigned, so an uncommented blank would skip that append and leave the write gate unarmed on
 #     every new adopter. Discoverable in the example's comments, not by `^KEY=` (TOOL-dHomedResolver-8).
-_pyexempt="EXMP GATE_PUSH_BASE GIT_AUTHOR_DATE GIT_COMMITTER_DATE GIT_DIR GIT_GRAFT_FILE GIT_INDEX_FILE GOV_BASH GOV_DEFAULT_BRANCH GOV_REMOTE GRAMMAR_DIR GRAMMAR_WHERE PATH READ_PATH_RULES_GATE ROUTED_COMMIT_CUTOFF ROUTED_COMMIT_WAIVED ROUTED_PATHS"
+_pyexempt="EXMP GATE_PUSH_BASE GIT_AUTHOR_DATE GIT_COMMITTER_DATE GIT_DIR GIT_GRAFT_FILE GIT_INDEX_FILE GOV_BASH GOV_DEFAULT_BRANCH GOV_INDEX_SET_STDIN GOV_REMOTE GRAMMAR_DIR GRAMMAR_WHERE PATH READ_PATH_RULES_GATE ROUTED_COMMIT_CUTOFF ROUTED_COMMIT_WAIVED ROUTED_PATHS"
 _pk_real=$(_pykeys "$HERE")
 n=$((n+1))
 [ -n "$_pk_real" ] || { echo "FAIL could not derive a single conf key from $HERE/*.py; the python example-conf arms below would pass by finding nothing"; st=1; }
@@ -3345,6 +3347,46 @@ n=$((n+1))
 case "$_b1out" in
   *"READ_PATH_CEILING is declared"*) : ;;
   *) echo "FAIL the gate exited 0 and said nothing about a conf that still declares the retired READ_PATH_CEILING; corpus_ids.py prints that notice at exit 0 and this wrapper is the only caller an adopter ever runs"; st=1 ;;
+esac
+
+# ---- TOOL-aHastenedSweep-3: check 16's index set is HANDED DOWN on stdin when checks 1 to 5 ran
+# ---- clean, and ASKED of the print mode otherwise. A bash that does not exist proves which route
+# ---- ran: the ask resolves GOV_BASH and names it, the hand-down never spawns a shell. The notice
+# ---- proves the run reached check 16, so silence on both counts is not a run that stopped early.
+_ixo=$(cd "$_b1" && GOV_BASH="$_b1/no-such-bash" bash "$HERE/check-memory-hygiene.sh" 2>&1)
+n=$((n+1))
+case "$_ixo" in
+  *"corpus_ids: GOV_BASH is set"*|*"check 16 rule 3"*) echo "FAIL a clean unscoped run did not hand check 16 its index set: the classifier asked the shell, or was handed an empty set:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+  *"READ_PATH_CEILING is declared"*) echo "ok   a clean unscoped run hands check 16 the index set it already holds" ;;
+  *) echo "FAIL the hand-down arm's run never reached check 16, so its silence proves nothing:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+esac
+# A checks 1 to 5 failure must take the ASK, so the "answered with findings" refusal still fires: a
+# stray file staged at the memory root, run plain, with the variable exported, and under --only 16.
+_ixt=$(mktemp -d)
+cp -R "$_b1/." "$_ixt/"
+( cd "$_ixt" && printf '# stray\n' > memory/stray.md && git add memory/stray.md ) >/dev/null 2>&1
+for _ixm in plain exported; do
+  if [ "$_ixm" = plain ]; then _ixo=$(cd "$_ixt" && bash "$HERE/check-memory-hygiene.sh" 2>&1)
+  else _ixo=$(cd "$_ixt" && GOV_INDEX_SET_STDIN=1 bash "$HERE/check-memory-hygiene.sh" 2>&1); fi
+  n=$((n+1))
+  case "$_ixo" in
+    *"HYGIENE check 3 FAILED"*"answered with findings"*) echo "ok   a checks 1 to 5 failure ($_ixm) is not handed down, so corpus_ids refuses the findings" ;;
+    *) echo "FAIL a checks 1 to 5 failure ($_ixm) did not reach corpus_ids' 'answered with findings' refusal:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+  esac
+done
+_ixo=$(cd "$_ixt" && bash "$HERE/check-memory-hygiene.sh" --only 16 2>&1)
+n=$((n+1))
+case "$_ixo" in
+  *"answered with findings"*) echo "ok   a scoped run that never ran checks 1 to 5 asks for the index set" ;;
+  *) echo "FAIL --only 16 handed down a set although checks 1 to 5 never ran:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+esac
+rm -rf "$_ixt"
+# The standalone CLI keeps the ask: with the variable unset it reads no stdin and resolves GOV_BASH.
+_ixo=$(cd "$_b1" && env -u GOV_INDEX_SET_STDIN GOV_BASH="$_b1/no-such-bash" "$_PY" "$HERE/corpus_ids.py" --check 2>&1 </dev/null)
+n=$((n+1))
+case "$_ixo" in
+  *"corpus_ids: GOV_BASH is set"*) echo "ok   the standalone corpus_ids --check still asks the print mode" ;;
+  *) echo "FAIL the standalone corpus_ids --check did not ask the print mode for the index set:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
 esac
 
 # ---- TOOL-dRetiredFork-15: the five project keys -------------------------------------------------

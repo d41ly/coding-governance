@@ -1182,6 +1182,12 @@ VIEW_SET=""
 [ "$_IDX_STAGED" = 1 ] && [ "$BMODE" = builds ] && VIEW_SET=$(printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$" \
   | while IFS= read -r f; do [ -f "$f" ] && echo "$f"; done)
 case "${1:-}" in --print-index-set) printf '%s\n' "$INDEX_SET"; exit 0 ;; esac   # see the PRINT MODES note above
+# THE HAND-DOWN SNAPSHOT, taken HERE and not at the launch: checks 6 onward also call `fail`, so the
+# launch site's `status` no longer answers "did checks 1 to 5 fail". When an unscoped, unstaged run's
+# checks 1 to 5 recorded none, the print mode would answer exactly this INDEX_SET, so check 16 is
+# handed it on stdin instead of re-running this prologue; otherwise corpus_ids asks as before and its
+# "answered with findings" refusal still fires (TOOL-aHastenedSweep-3).
+_IXH=""; [ "$STAGED" = 0 ] && [ -z "$ONLY" ] && [ "$status" = 0 ] && _IXH=1   # TOOL-aHastenedSweep-3
 
 if check_selected 6 7 8; then
 # 6 — index size caps (grandfather: curation-debt.txt).
@@ -3207,7 +3213,9 @@ if [ "$STAGED" = 0 ]; then
   # — and the old form captured stdout and threw it away unless the run was already red. Every
   # one of those notices was computed and discarded, so the retirement had no notification
   # channel at all and the grace was invisible for its whole life: a skip that looks like a pass.
-  ids=$("$_PY" "$HERE/corpus_ids.py" --check 2>&1); _idsrc=$?
+  # The prefix is written on EVERY run, so an inherited GOV_INDEX_SET_STDIN=1 is blanked whenever the
+  # run is not eligible; a here-string is no pipeline, so _idsrc stays the interpreter's own code.
+  ids=$(GOV_INDEX_SET_STDIN=$_IXH "$_PY" "$HERE/corpus_ids.py" --check 2>&1 <<<"${_IXH:+$INDEX_SET}"); _idsrc=$?
   [ -n "$ids" ] && printf '%s
 ' "$ids"
   # The suite's check 13 claimant arm drives this exit through the engine (TOOL-aGraftedHelix-47).

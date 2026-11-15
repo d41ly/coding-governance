@@ -169,7 +169,11 @@ The merge bar's red attribution grades this leg with it as a SET. `TOOL-dDerived
   exemption key on it, and both guard it for emptiness, because an empty prefix matches every path.
 - `--print-index-set` — the engine OWNS the index-set and read-path populations, and `corpus_ids.py`
   asks for them through this print mode rather than re-deriving them. A transcription of either would
-  be the drift class the kit exists to remove.
+  be the drift class the kit exists to remove. On its own launch of `corpus_ids.py --check`, when an
+  unscoped, unstaged run's checks 1 to 5 recorded no failure, the engine hands the index set down on
+  stdin under `GOV_INDEX_SET_STDIN=1` instead of being asked again; the print mode stays the
+  standalone route, and every other run still asks it, so its refusal of findings still fires
+  (`TOOL-aHastenedSweep-3`).
 - `KIT_MEMORY_TREE_VERSION` — read by `check-verdict-epoch.sh`, `check-kit-versions.sh` and
   `hygiene-parity.test.sh`, and mirrored as a `gov:kit memory-tree@<v>` marker in every shipped
   template.

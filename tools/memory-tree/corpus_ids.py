@@ -722,7 +722,13 @@ def check_read_path(root: str, conf: dict) -> tuple:
         return _resolve_sink(written, bad, notes, found)
 
     members, absent = read_set({"root": root, "conf": conf, "tracked": tracked})
-    capped = {l for l in ask_shell("--print-index-set", root).split("\n") if l.strip()}
+    # HANDED DOWN by check-memory-hygiene.sh when its own checks 1 to 5 ran clean, decoded and
+    # newline-translated as the ask_shell capture is, so both routes parse to the same members.
+    if os.environ.get("GOV_INDEX_SET_STDIN") == "1":   # handed down by check-memory-hygiene.sh
+        raw = sys.stdin.buffer.read().decode("utf-8").replace("\r\n", "\n").replace("\r", "\n")
+    else:
+        raw = ask_shell("--print-index-set", root)
+    capped = {l for l in raw.split("\n") if l.strip()}
     waived = set(conf["READ_PATH_WAIVER"].split())
     for p in members:                                                              # rule 3
         if p not in capped and p not in waived:
