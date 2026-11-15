@@ -3208,6 +3208,8 @@ if check_selected 13 14 15 16; then
 # walk: this script owns the append-only and index sets and PRINTS them on demand; the classifier
 # owns the id grammar it imports from the recall kit. Neither transcribes the other. Every pin the
 # classifier reads is measured per corpus, and checks 13-15 are behind DEAD_PATH_PIN / ORPHAN_ID_PIN; check 16 is STRUCTURAL and behind none.
+# When this script's own checks 1 to 5 ran clean it hands --print-index-set's answer down on stdin
+# under GOV_INDEX_SET_STDIN=1 instead (TOOL-aHastenedSweep-3).
 if [ "$STAGED" = 0 ]; then
   # PRINT WHATEVER IT SAID, then decide the status from the exit code. The classifier has a
   # NON-GATING channel — check 16's not-asked, grace and retired-key notices all print at exit 0

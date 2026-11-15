@@ -3066,7 +3066,8 @@ _pyparity() {  # $1 module directory · $2 example conf · $3 exemption names
 #   GIT_INDEX_FILE — environment: gen_build_index.py carries it from os.environ into the hook's git
 #     environment, so both readers stay on one index (TOOL-aTrimmedHook-4).
 #   GOV_INDEX_SET_STDIN — environment: check-memory-hygiene.sh sets it on its own launch of
-#     corpus_ids.py --check, never in a conf, to hand check 16 its index set (TOOL-aHastenedSweep-3).
+#     corpus_ids.py --check, or of gotchas.py --check-with-ids on an unscoped run, never in a conf,
+#     to hand check 16 its index set (TOOL-aHastenedSweep-3).
 #   GRAMMAR_DIR GRAMMAR_WHERE READ_PATH_RULES_GATE — module-level constants, reached through
 #     globals() by selftest arms that save and restore them. GRAMMAR_WHERE is swapped beside
 #     GRAMMAR_DIR in corpus_ids.py (TOOL-aRepatriatedFork-46 S4).
@@ -3415,6 +3416,65 @@ case "$_ixo" in
   *) echo "FAIL the one-process run did not key check 18's ungated record under 17-19:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
 esac
 rm -rf "$_ixt"
+
+# ---- TOOL-aHastenedSweep-6: ONE side red at a time, so a split that reads one verb's rc for the other
+# ---- reds alone. The arm above reds both, and a swapped rc keys both of its lines anyway. The _b1
+# ---- notice prints at exit 0, so a misread 13-16 rc keys it; a green 17-19 block prints nothing.
+_ixt=$(mktemp -d)
+cp -R "$_b1/." "$_ixt/"
+(
+  cd "$_ixt" || exit 1
+  mkdir -p memory/gotchas
+  printf -- '---\nname: x\ndescription: d\n---\n\nFires on `AGENTS.md`. Nothing said about a gate.\n' > memory/gotchas/x.md
+  "$_PY" "$HERE/gotchas.py" --write
+  git add -A && git -c commit.gpgsign=false commit -q -m t --no-verify
+) >/dev/null 2>&1
+_ixo=$(cd "$_ixt" && bash "$HERE/check-memory-hygiene.sh" --offenders 2>&1)
+n=$((n+1))
+case "$_ixo" in
+  *$'check 13-16\t'*) echo "FAIL a bug-class-only red keyed a line under 13-16, so the split read the gotchas rc for corpus_ids':"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+  *$'check 17-19\tHYGIENE check 18: memory/gotchas/x.md names no gate'*) echo "ok   a bug-class-only red keys check 18 under 17-19 and nothing under 13-16" ;;
+  *) echo "FAIL a bug-class-only red did not key check 18's ungated record under 17-19:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+esac
+rm -rf "$_ixt"
+_ixt=$(mktemp -d)
+cp -R "$_b1/." "$_ixt/"
+(
+  cd "$_ixt" || exit 1
+  printf 'ORPHAN_ID_PIN="0"\n' >> .memory-tree.conf
+  printf '# r\n\nContext lives in ARCH-tNone-9 upstream.\n' > memory/README.md
+  git add -A && git -c commit.gpgsign=false commit -q -m t --no-verify
+) >/dev/null 2>&1
+_ixo=$(cd "$_ixt" && bash "$HERE/check-memory-hygiene.sh" --offenders 2>&1)
+n=$((n+1))
+case "$_ixo" in
+  *$'check 17-19\t'*) echo "FAIL an id-classifier-only red keyed a line under 17-19, so the split read corpus_ids' rc for the gotchas one:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+  *$'check 13-16\tHYGIENE check 14: id ARCH-tNone-9'*) echo "ok   an id-classifier-only red keys check 14 under 13-16 and nothing under 17-19" ;;
+  *) echo "FAIL an id-classifier-only red did not key check 14's orphan under 13-16:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+esac
+rm -rf "$_ixt"
+
+# ---- TOOL-aHastenedSweep-6: a frame that does not split falls back LOUDLY under 13-16, never as a
+# ---- second gotchas.py --check launch. A GOV_PYTHON wrapper answers --check-with-ids with one
+# ---- unframed line, at exit 0 (the split's [[ ]] fails) and at exit 2 (the launch fails, the usage
+# ---- exit an older adopter-owned gotchas.py gives), and passes every other call to the real
+# ---- interpreter, which resolve_python's probe needs. What it does not check: the exit alone, since
+# ---- the fallback's _gotrc=1 keeps the run at 1 with its _idsrc=1 zeroed; the key reds that.
+_ixt=$(mktemp -d)
+cp -R "$_b1/." "$_ixt/"
+_ixw=$(mktemp -d); _ixl="$_ixw/log"
+for _ixm in 0 2; do
+  printf '#!/usr/bin/env bash\ncase " $* " in *" --check-with-ids "*) echo "wrapper: an unframed answer"; exit %s ;; esac\nprintf '"'"'%%s\\n'"'"' "$*" >> "%s"\nexec "%s" "$@"\n' "$_ixm" "$_ixl" "$_PY" > "$_ixw/py.sh"
+  chmod +x "$_ixw/py.sh"; : > "$_ixl"
+  _ixo=$(cd "$_ixt" && GOV_PYTHON="$_ixw/py.sh" bash "$HERE/check-memory-hygiene.sh" --offenders 2>&1); _ixrc=$?
+  _ixc=$(grep -c 'gotchas\.py --check$' "$_ixl")
+  n=$((n+1))
+  case "$_ixc:$_ixrc:$_ixo" in
+    0:[1-9]:*$'check 13-16\twrapper: an unframed answer'*) echo "ok   an unframed --check-with-ids answer (exit $_ixm) reds keyed under 13-16, with no second launch" ;;
+    *) echo "FAIL an unframed --check-with-ids answer (exit $_ixm) left the run green, was not keyed under 13-16, or launched gotchas.py --check again (rc $_ixrc, launches $_ixc):"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+  esac
+done
+rm -rf "$_ixt" "$_ixw"
 
 # ---- TOOL-dRetiredFork-15: the five project keys -------------------------------------------------
 # Three arms per validated key -- default, valid override, INVALID override -- because the invalid
@@ -4809,7 +4869,11 @@ done
 # Counted by reading; OWED: observed at the close.
 # RAISED 708 -> 710 by TOOL-aHastenedSweep-4: its two one-process split assertions, each top-level and
 # never skipped. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=710
+# RAISED 710 -> 719 by TOOL-aHastenedSweep-6: TOOL-aHastenedSweep-3's five hand-down assertions, which
+# its commit never counted, three top-level and two in a two-pass loop; TOOL-aHastenedSweep-4's two are
+# the raise above; and TOOL-aHastenedSweep-6's four, two one-red arms top-level and its frame-fallback
+# arm's two in a two-pass loop, none skipped. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=719
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

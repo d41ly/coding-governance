@@ -1,11 +1,12 @@
 # TOOL-aHastenedSweep-6 — every arm this build added can go red on its regression, and every comment and map line describes the one-process launch
 
-**Status:** INPROGRESS · rev-2 · 2026-11-16 · node a · Tier-1 · base f25308f0 · streams tooling · order 5
+**Status:** CLOSED · rev-2 · 2026-11-16 · node a · Tier-1 · base f25308f0 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-16-build-TOOL-aHastenedSweep-6-1-acceptance-ledger.md](../build/2026-11-16-build-TOOL-aHastenedSweep-6-1-acceptance-ledger.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aHastenedSweep-5-brief.md](../prompts/2026-11-16-prompt-TOOL-aHastenedSweep-5-brief.md) | research | TOOL-aHastenedSweep-5 |
 
 <!-- /gen:spec-records -->

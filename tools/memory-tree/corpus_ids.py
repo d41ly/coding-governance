@@ -17,7 +17,9 @@ NOTHING HERE DECLARES A GRAMMAR OR A SET IT DOES NOT OWN.
   * the append-only areas and the byte-capped index set come from `check-memory-hygiene.sh`, which
     already owns both — asked for through its print modes, never transcribed. Upstream transcribed
     the index set and had to guard the transcription in BOTH directions, because a shell-side
-    addition the Python side still excludes leaves a file under no cap at all.
+    addition the Python side still excludes leaves a file under no cap at all. When the shell's own
+    checks 1 to 5 ran clean it hands `--print-index-set`'s answer down on stdin under
+    `GOV_INDEX_SET_STDIN=1` (TOOL-aHastenedSweep-3).
 
 THE GRAMMAR MODULE IS A LATE IMPORT, and its two states are kept apart: with every pin blank the
 grammar module is never imported and checks 13-16 are simply off, while a pin SET with the module

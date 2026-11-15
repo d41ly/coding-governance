@@ -678,9 +678,12 @@ def cmd_check_with_ids() -> int:
 
     Runs `corpus_ids.py --check` and then this module's `--check`, each through its own `main` and argv,
     with corpus_ids' walk memo switched on and that module shared with `load_defined_ids`. Each verb
-    writes into buffers of its own and is framed as `<stderr><stdout>\\x1d<rc>\\n`, stderr first as the
-    two-process `2>&1` capture put it; an exception is that verb's traceback at rc 1. Exits 0; the
-    hygiene shell splits the two frames and keeps each check's print, status and offender lines.
+    writes into buffers of its own and is framed as `<stderr><stdout>\\x1d<rc>\\n`. Neither `--check`
+    writes stderr on a clean run. On a crash the frame holds the in-process traceback, which starts at
+    this function's frame rather than the standalone `<module>` frame, is written in this process's
+    stream encoding, and sits ahead of all of the verb's stdout, at rc 1 (TOOL-aHastenedSweep-6).
+    Exits 0; the hygiene shell splits the two frames and keeps each check's print, status and
+    offender lines.
     """
     global _SHARED_CORPUS_IDS
     import contextlib
@@ -696,7 +699,7 @@ def cmd_check_with_ids() -> int:
             with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
                 try:
                     rc = verb(argv)
-                except Exception:  # noqa: BLE001 — the traceback is this verb's output, as it was standalone
+                except Exception:  # noqa: BLE001 — the in-process traceback, from this frame, ahead of the verb's stdout
                     traceback.print_exc()
                     rc = 1
             sys.stdout.write(f"{err.getvalue()}{out.getvalue()}\x1d{rc}\n")
@@ -1276,8 +1279,37 @@ def cmd_selftest() -> int:
             {".memory-tree.conf": conf_text + 'CHARTER="AGENTS.md"\nORPHAN_ID_PIN="0"\n',
              "AGENTS.md": "# charter\n\nRead `memory/README.md` first.\n"})
 
+        def run_framed(loader):
+            """`cmd_check_with_ids` in `tw` with `loader` as its corpus_ids loader: the captured frames."""
+            buf, real, here = io.StringIO(), _load_corpus_ids, os.getcwd()
+            os.chdir(tw)
+            globals()["_load_corpus_ids"] = loader
+            try:
+                with contextlib.redirect_stdout(buf):
+                    cmd_check_with_ids()
+            finally:
+                globals()["_load_corpus_ids"] = real
+                os.chdir(here)
+            return buf.getvalue()
+
+        def run_alone(verb, argv):
+            out, err, here = io.StringIO(), io.StringIO(), os.getcwd()
+            os.chdir(tw)
+            try:
+                with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                    rc = verb(argv)
+            finally:
+                os.chdir(here)
+            return f"{err.getvalue()}{out.getvalue()}\x1d{rc}\n"
+
+        def load_with_main(fn):
+            """A loader whose corpus_ids has `main` replaced by `fn`, so `fn` runs in the per-verb loop."""
+            mod = _load_corpus_ids()
+            mod.main = fn
+            return lambda: mod
+
         def check_framed_with_ids():
-            calls, real, here = [], _load_corpus_ids, os.getcwd()
+            calls, real = [], _load_corpus_ids
 
             def load_counted():
                 mod = real()
@@ -1290,28 +1322,42 @@ def cmd_selftest() -> int:
                 mod.run = run_counted
                 return mod
 
-            def run_alone(verb, argv):
-                out, err = io.StringIO(), io.StringIO()
-                with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
-                    rc = verb(argv)
-                return f"{err.getvalue()}{out.getvalue()}\x1d{rc}\n"
-            buf = io.StringIO()
-            os.chdir(tw)
-            globals()["_load_corpus_ids"] = load_counted
-            try:
-                with contextlib.redirect_stdout(buf):
-                    cmd_check_with_ids()
-            finally:
-                globals()["_load_corpus_ids"] = real
-            try:
-                want = run_alone(real().main, ["corpus_ids.py", "--check"]) + run_alone(main, ["gotchas.py", "--check"])
-            finally:
-                os.chdir(here)
-            rcs = re.findall(r"\x1d([0-9]+)\n", buf.getvalue())
-            print("with-ids", *rcs, "same" if buf.getvalue() == want else "DIFFERENT", "· ls-files", len(calls))
+            text = run_framed(load_counted)
+            want = run_alone(real().main, ["corpus_ids.py", "--check"]) + run_alone(main, ["gotchas.py", "--check"])
+            rcs = re.findall(r"\x1d([0-9]+)\n", text)
+            print("with-ids", *rcs, "same" if text == want else "DIFFERENT", "· ls-files", len(calls))
             return 0
         arm("--check-with-ids frames corpus_ids then gotchas with each verb's own rc, over one walk",
             "with-ids 0 1 same · ls-files 2", check_framed_with_ids)
+
+        # ---- TOOL-aHastenedSweep-6 AC3: a verb's stderr leads its frame, then its stdout, at its own rc.
+        # ---- RED with `err.getvalue()` dropped from the frame write, or with stdout put ahead of it.
+        # The arm runs the frames itself, so a raise escaping the per-verb loop reads UNEXPECTED here.
+        alone = run_alone(main, ["gotchas.py", "--check"])
+        arm("--check-with-ids frames a verb's stderr ahead of its stdout, at the verb's rc",
+            "with-ids err-first 3 · second same",
+            lambda: (lambda f: print(
+                "with-ids", "err-first" if f[:1] == [("with-ids stderr line\nwith-ids stdout line\n", "3")]
+                else f"frame-one {f[:1]!r}", f[0][1] if f else "-", "· second",
+                "same" if len(f) == 2 and "%s\x1d%s\n" % f[1] == alone else "DIFFERENT") or 0)(
+                re.findall(r"(.*?)\x1d([0-9]+)\n", run_framed(load_with_main(
+                    lambda argv: print("with-ids stderr line", file=sys.stderr) or print("with-ids stdout line") or 3)),
+                    re.S)))
+
+        # ---- TOOL-aHastenedSweep-6 AC4: a verb that raises in the per-verb loop is framed as the
+        # ---- in-process traceback at rc 1, and the next verb still runs. RED with `traceback.print_exc()`
+        # ---- moved after the redirect; with `except Exception` narrowed, the arm reads UNEXPECTED.
+        arm("--check-with-ids frames a raising verb as its in-process traceback at rc 1, then runs the next",
+            "with-ids raise 1 traceback · second same",
+            lambda: (lambda f: print(
+                "with-ids raise", f[0][1] if f else "-",
+                "traceback" if ((tb := f[0][0] if f else "").startswith("Traceback (most recent call last):")
+                                and "in cmd_check_with_ids" in tb
+                                and "RuntimeError: staged in the with-ids arm" in tb and "in <module>" not in tb)
+                else f"NO-TRACEBACK {tb[:80]!r}",
+                "· second", "same" if len(f) == 2 and "%s\x1d%s\n" % f[1] == alone else "DIFFERENT") or 0)(
+                re.findall(r"(.*?)\x1d([0-9]+)\n", run_framed(load_with_main(
+                    lambda argv: (_ for _ in ()).throw(RuntimeError("staged in the with-ids arm")))), re.S)))
 
         ti, ci = build_tree("inv", {"inv.md": build_invariant("inv-one")})
         arm("an invariant with five sections, a defined decision and a declared guard is clean", None,
