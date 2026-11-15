@@ -56,7 +56,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 5 unit(s) · node a · opened 2026-11-15 · streams tooling
+**Build status:** INPROGRESS · 5 unit(s) · node a · opened 2026-11-15 · streams tooling
 ids TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3 TOOL-aTwinnedPass-4 TOOL-aTwinnedPass-5
 
 <!-- gen:build-units -->
@@ -66,10 +66,10 @@ ids TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3 TOOL-aTwinnedPas
 | [TOOL-aTwinnedPass-3 — `--dispatch` condition 1 leaves an effective generated output out of the sibling comparison](spec/2026-11-15-spec-TOOL-aTwinnedPass-3.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-15 |
 | [TOOL-aTwinnedPass-2 — the pass-tree tool: merge a pass's own branch back `--no-ff` with generated outputs re-rendered, or take it away](spec/2026-11-15-spec-TOOL-aTwinnedPass-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-11-15 |
 | [TOOL-aTwinnedPass-4 — a pass's branch, worktree and fork sha cross every handoff only in the runtime's own spelling](spec/2026-11-15-spec-TOOL-aTwinnedPass-4.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-15 |
-| [TOOL-aTwinnedPass-5 — every arm of the build's three suites can go red on the regression it names](spec/2026-11-15-spec-TOOL-aTwinnedPass-5.md) | 4 | 2 | SPECCED | rev-1 | 2026-11-15 |
+| [TOOL-aTwinnedPass-5 — every arm of the build's three suites can go red on the regression it names](spec/2026-11-15-spec-TOOL-aTwinnedPass-5.md) | 4 | 2 | INPROGRESS | rev-1 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 25 bound to this build, across 4 record folder(s).
+Records: 27 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
