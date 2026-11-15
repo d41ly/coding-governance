@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-25 — a repository's own stages, spliced between two adjacent gov stages
 
-**Status:** INPROGRESS · rev-6 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-7 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0110@c46e726a whole
 
@@ -18,6 +18,7 @@
 | [2026-11-15-build-TOOL-dDeclaredLoop-25-2-builder-return.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-25-2-builder-return.md) | journal | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-25-deviation-253.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-25-deviation-253.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-25-deviation-254.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-25-deviation-254.md) | deviation | — |
+| [2026-11-15-build-TOOL-dDeclaredLoop-25-deviation-255.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-25-deviation-255.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-29 |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
@@ -104,9 +105,13 @@ to :388; P20 as amended).
   `[[step]]` tag of the definition under one tree, read ungraded as the `item` class's reader reads
   its rows; its plant `{prefix}/loop/splice.py:write_stage_plant`, which stages a clone's definition
   holding every `[[step]]` table but the first; and its witness
-  `{prefix}/playbook/pins.py:read_change_successors`, the `item` class's own. A gov stage tag absent
-  at the tip with no change record naming its successor reds the gate, so a splice always has a record
-  to follow (§8 F7). Observed by AC5, AC9.
+  `{prefix}/playbook/pins.py:read_change_successors`, the `item` class's own. The `drive` class's
+  reader sorts its rows through `tools/loop/loop_lib.py#check_loop`, which refuses a definition
+  missing a gov step, so `tools/playbook/render_playbook.py#read_drive_rows` reads a loop definition
+  that does not read as no order, kit and row order alone, as it reads a tree with no loop kit (§8
+  F10); the drive class's members are one set in either order. A gov stage tag absent at the tip with
+  no change record naming its successor then reds the gate, so a splice always has a record to follow
+  (§8 F7). Observed by AC5, AC9.
 - **S7** — The boundaries reviewed through `review.breakpoints`: the two item boundaries a splice
   creates, A's exit item and the stage's exit item, are item tags `review.breakpoints` may name as it
   names any other; `check_splices` adds no breakpoint and refuses nothing about them.
@@ -196,7 +201,20 @@ to :388; P20 as amended).
   `transition`, into the next step's state; Deploy's exit, `item.deploy.close`, fires on `closed`
   into `landed`, so no pair after Deploy exists to split.
 - A step-gate class joins by adding its row with a reader and a plant, and its case in govkit's
-  selftest is armed by that row alone (`tools/govkit/selftest.py#check_step_gate_fixture`).
+  selftest is armed by that row alone (`tools/govkit/selftest.py#check_step_gate_fixture`). A
+  reader that raises on either side is the gate's refusal, exit 2, read before any witness
+  (`tools/govkit/step_gate.py#read_surface_population`, `tools/govkit/step_gate.py#check_step_gate`).
+- The `drive` class's reader, `tools/playbook/render_playbook.py#read_drive_members`, reaches
+  `tools/playbook/render_playbook.py#read_drive_rows` through
+  `tools/playbook/render_playbook.py#read_drive_reference_rows` and
+  `tools/playbook/instruction_units.py#read_drive`; `read_drive_rows` sorts by
+  `tools/loop/loop_lib.py#read_workflow_order`, reads a missing loop kit, a `LookupError`, as no order,
+  and turns the reader's `LoopError`, a `ValueError`, into a refusal. `tools/loop/loop_lib.py#check_loop`
+  closes the definition's `[[step]]` tags to `STEP_TAGS` both ways, so a definition missing
+  `step.plan` refuses `the step step.plan is missing`. The class modules load from the tip before any
+  reader runs, `tools/loop/loop_items.py` importing `loop_lib` from the tip's loop kit
+  (`tools/govkit/step_gate.py#read_surface_classes`), so the `import loop_lib` of
+  `tools/playbook/render_playbook.py#load_loop_kit` reads both sides through the tip's `STEP_TAGS`.
 - The one pin normaliser is `tools/memory-tree/design_lib.py#derive_pin_hash`, reached from the loop
   kit through `tools/loop/loop_lib.py#read_memory_tree`; change records are read by
   `tools/memory-tree/build_records.py#read_changes`; a policy key at a revision is read by the policy
@@ -340,6 +358,7 @@ row is the composition's to refuse, since gov ships no stage row for its pin to 
 | `read_composition`, `run_factory`, `run_check` | function, an argument gained or a stage composition read | `tools/loop/loop_items.py` |
 | `check_program` | function, its `stages` argument | `tools/loop/loop_lib.py` |
 | `read_kind_schema`, `check_row_owners` | function, a seat list admitted | `tools/playbook/overlay_rows.py` |
+| `read_drive_rows` | function, a definition that does not read read as no order | `tools/playbook/render_playbook.py` |
 | `stage` | step-gate class row | `tools/govkit/surface-classes.toml` |
 | `loop splice check` | gate leg | `tools/gate-legs.json` |
 
@@ -353,16 +372,18 @@ row is the composition's to refuse, since gov ships no stage row for its pin to 
 - `tools/loop/kit.toml`
 - `tools/loop/README.md`
 - `tools/playbook/overlay_rows.py`
-- `tools/playbook/render_playbook.py`: its version marker, where the kit epoch leg asks
+- `tools/playbook/render_playbook.py`: `read_drive_rows`, its docstring and the module's "THE DRIVE
+  LINES" paragraph (§8 F10)
 - `tools/playbook/kinds.toml`
 - `tools/playbook/core-pending.txt`
 - `tools/govkit/surface-classes.toml`
 - `tools/govkit/registry.toml`
 - `tools/govkit/subject-pins.tsv`
-- `tools/govkit/usage.toml`
+- `tools/govkit/usage.toml`: the three `script:` rows and the `[[class]] class = "stage"` row
 - `tools/gate-legs.json`
 - `tools/run-gates/selftest-budgets.txt`
 - `help/loop.md`
+- `help/charter.md`
 - `help/overlay-rows.md`
 - `help/reference/kinds.md`
 - `memory/map/features/loop.md`
@@ -399,12 +420,16 @@ row is the composition's to refuse, since gov ships no stage row for its pin to 
   row prints one line.
 - risks — a gov table change that moves the split row turns the pin stale and `check` reds, the FA-2
   order's job to surface. The help page's examples spell adopter tags, as the item section's
-  `item.test.adopter.smoke` already does.
+  `item.test.adopter.smoke` already does. A charter render over a loop definition that does not read
+  sorts its drive lines in kit and row order where it refused (§8 F10); the `loop definition` leg and
+  `loop_lib.py --check` stay the definition's guard.
 - testing — the fourteen fixture cases and the step-gate class's own plant.
 - migration — none: no repository holds a `[[stage]]` row at base, and the item schema's seat list
   keeps seat 2.
 - user docs — `help/loop.md` gains "Adding a stage of your own"; `help/overlay-rows.md`'s "Your own
-  tag" says a schema may list more than one seat; `help/reference/kinds.md` is re-rendered.
+  tag" says a schema may list more than one seat; `help/charter.md`'s "The drive section" says a loop
+  definition that does not read leaves kit and row order, as no loop kit does; `help/reference/kinds.md`
+  is re-rendered.
 - what this unit now owns — the stage kind's factory and gate, moved here by TOOL-dDeclaredLoop-6's
   §8 F4 (b) and deviation 64: `kind.stage`'s row filled and its pending row taken. Its non-goal
   naming that unit as a writer of gov `[[step]]` rows is gone: no factory writes one.
@@ -417,7 +442,9 @@ row is the composition's to refuse, since gov ships no stage row for its pin to 
   - `tools/run-gates/selftest-budgets.txt` — the leg's row, priced from the pass's first reading of
     the leg alone, for `every held leg is budgeted, every budget row resolves`.
   - `tools/govkit/usage.toml` — `script:{prefix}/loop/splice.py` rows for the bare script, `#check`
-    and `#new`, anchored in `help/loop.md` as the item section's are, for `docs`.
+    and `#new`, anchored in `help/loop.md` as the item section's are, and a `[[class]] class = "stage"`
+    row, `usage = "none"`, as the `item` class has, since the file reads a registered class with no row
+    there as a finding, for `docs`.
   - `tools/govkit/surface-classes.toml` — the `stage` row arms its own case in
     `tools/govkit/selftest.py#check_step_gate_fixture`, red with no witness row and green with one;
     the class is joining in the landing's range, so `step-gate` reads it as joining.
@@ -427,9 +454,10 @@ row is the composition's to refuse, since gov ships no stage row for its pin to 
   - `memory/map/features/loop.md` — the leg in its `gate-legs` claim; its `tools/loop/**` glob covers
     the module and schema; `gen_map.py --write` regenerates the four generated files.
   - The playbook kit's version, `tools/playbook/render_playbook.py#KIT_PLAYBOOK_RENDER_VERSION`, the
-    marker `tools/playbook/kit.toml`'s `version_from` names, bumps once, after the last move of the
-    kit's shipped bytes in this unit's range, for `kit epoch (shipped bytes move, the version moves)`;
-    the first dispatch's return reads main's marker one step ahead of the branch's.
+    marker `tools/playbook/kit.toml`'s `version_from` names: this unit does not bump it. The bump is
+    the close's, owed once after the last move of the kit's shipped bytes in the run's range, for
+    `kit epoch (shipped bytes move, the version moves)`; the second dispatch's return reads 1.38 on
+    the branch and 1.40 on origin/main.
   - The verdict epoch's delegate list names memory-tree modules only, and this unit edits none.
   - The install-prefix ban: `splice.py` spells every path through its kit directory and `{prefix}`,
     never a quoted tool-root literal.
@@ -441,7 +469,13 @@ row is the composition's to refuse, since gov ships no stage row for its pin to 
     `read_composition`'s kind to `item`, so their callers read as before.
   - `playbook render selftest` — the `row_kind.py` and `composition.py` fixtures write an integer
     `owner-seat`, which the reader still admits; a scratch register naming `kind.stage` with its
-    schema absent composes no row of it.
+    schema absent composes no row of it; the drive arms of `tools/playbook/instruction_units.py`,
+    `arm_drive_order` among them, write a definition that reads, and no arm plants one that does not:
+    a grep for `sorts by the loop definition` and `does not read` over `tools/` finds only the refusal
+    in `read_drive_rows` itself.
+  - `step-gate` and `govkit selftest` — the `drive` class's own case plants a drive table under a
+    definition that reads, so it reds as before; the `stage` case reds through the `stage` class once
+    `read_drive_rows` reads the plant's definition as no order.
 - companion files the commit rewrites, beside §4 "Files touched" — `memory/builds/dDeclaredLoop/README.md`,
   `memory/builds/dDeclaredLoop/RUN.md`, this spec, this unit's acceptance ledger under
   `memory/builds/dDeclaredLoop/build/`, `memory/LIVE.md`, `memory/backlog/TOOL.md`, the four
@@ -472,7 +506,8 @@ row is the composition's to refuse, since gov ships no stage row for its pin to 
   Red when: a splice joining two non-adjacent gov stages passes, or two stages share one pair.
 - **AC5** — When `python tools/govkit/step_gate.py --fixture --plant stage` runs on the built tree, it
   exits 1 printing `step-gate: RED stage:step.plan`, and with `--with-row` it exits 0.
-  Red when: a gov stage tag removed with no record passes.
+  Red when: a gov stage tag removed with no record passes, or the gate refuses the plant, exit 2,
+  through the `drive` class's reader.
   cost: one scratch clone and two gate runs per invocation.
 - **AC6** — When `--plant gov-rename` runs, its stage naming the old tag `step.verify` over the
   shipped definition beside a record succeeding it by `step.test`, it exits 0 and prints one line
@@ -511,7 +546,7 @@ row is the composition's to refuse, since gov ships no stage row for its pin to 
 `core kinds` · `core meta-check` · `policy fixtures` · `loop item kind` · `loop definition` · `loop transition tables` · `loop position fixtures` · `step-gate` · `govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest` · `help reference pages` · `docs` · `codebase-map coverage + freshness` · `every held leg is budgeted, every budget row resolves` · `kit epoch (shipped bytes move, the version moves)` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `recall floor` · `recall floor arms` · `memory hygiene`
 
 New arm: tools/loop/splice.py · covers AC1 AC2 AC3 AC4 AC6 AC7 AC8 AC10 AC12 · each in-memory plant, and `between-test-deploy` red with the adjacency rule inverted · none
-New arm: tools/govkit/selftest.py · covers AC5 · the `stage` class row arms its own step-gate fixture case, a gov step table taken out of a scratch clone · none
+New arm: tools/govkit/selftest.py · covers AC5 · the `stage` class row arms its own step-gate fixture case, the first `[[step]]` table taken out of a scratch clone's definition, refused at exit 2 while `read_drive_rows` refuses that definition · none
 
 ## 8. Open questions
 
@@ -557,7 +592,13 @@ New arm: tools/govkit/selftest.py · covers AC5 · the `stage` class row arms it
   stage row, so its half grades an empty population. (a) guards the tags a stage names in `after` and
   `before`, so a gov rename always leaves the record S4 follows. Recommendation (a), the body's.
   RESOLVED (agent, 2026-11-15, delegated): (a), rung 3. widens: none · relaxes: the step gate's reach
-  to repository stage tags at this unit
+  to repository stage tags at this unit. Corrected at rev-7: rev-6 read a gov stage tag absent at the
+  tip with no record as redding the gate. On the tree as built the gate refuses instead, exit 2: the
+  `drive` class's reader raises through `check_loop` before any witness is read
+  (`build/2026-11-15-build-TOOL-dDeclaredLoop-25-2-builder-return.md`), so a landing stops but the
+  `stage` class's red is never seen and no witness row clears it. It reds, exit 1, once F10 (a)
+  lands. What the gate does not check: the order of gov's step tags, which `check_loop` holds, and a
+  step's `state` or `exit`, which the class does not read.
 - **F8 — Does the move engine read the spliced table?** (a) This unit feeds R1 and R2, the stage's
   state among the build's open states and four-segment items among its row items, to
   `derive_move`, `position.py` and `loop_transition.py`; (b) the rows are derived and checked here,
@@ -579,6 +620,31 @@ New arm: tools/govkit/selftest.py · covers AC5 · the `stage` class row arms it
   `tools/loop/loop_lib.py`; (a) rewrites one fixture row, keeps the signature and every frame rule, and
   still exercises a stage left naming a succeeded gov tag. Recommendation (a). RESOLVED (agent,
   2026-11-15, delegated): (a), rung 3, the run's pick on the return. widens: none · relaxes: none
+- **F10 — How does the `stage` plant red the step gate, when the `drive` class's reader refuses a
+  definition missing a gov step?** S6's plant stages a definition holding every `[[step]]` table but
+  the first. The `drive` class's reader sorts through `read_workflow_order`, whose `check_loop` raises
+  `the step step.plan is missing`; `read_drive_rows` turns that into a refusal, and
+  `tools/govkit/step_gate.py#read_surface_population` turns a raising reader into the gate's refusal,
+  exit 2, where AC5 needs exit 1 and govkit selftest's `[dSP-10] step-gate fixture stage` arm needs
+  `^step-gate: RED stage:\S` (`build/2026-11-15-build-TOOL-dDeclaredLoop-25-2-builder-return.md`).
+  (a) `read_drive_rows` reads a loop definition that does not read as no order, as it reads a tree
+  with no loop kit, changing the playbook kit's documented refusal and its help page; (b)
+  `tools/govkit/selftest.py#check_step_gate_fixture` admits the `stage` case at exit 2 with the drive
+  refusal named, which weakens AC5 and the class registry's rule that a row arms its own red; (c) a
+  member source for the class whose loss leaves `check_loop` passing. (c) has no candidate in the
+  tree as built: `check_loop` closes the definition's `[[step]]` tags to `STEP_TAGS` both ways and each
+  workflow row's `step` to `STEP_TAGS` or `none`, and both sides read through the tip's `loop_lib`, so a
+  gov step tag cannot leave the definition, `STEP_TAGS`, or both, without the drive reader raising on
+  the tip side or the base side; a source outside the two, the `step` of the `[[item]]` rows or a
+  leg's `stage` key, is not the set of gov's stage tags. (b) keeps a class whose red is never seen, and
+  a real gov rename would still refuse the gate with no witness row able to clear it. (a) is one
+  caught exception and two docstrings in a kit this unit already edits, plus one help sentence; it
+  keeps every written criterion and every existing arm green, since no arm plants an unreadable
+  definition into a render, and it leaves the definition's guard with the `loop definition` leg.
+  Recommendation (a), the body's. RESOLVED (agent, 2026-11-15, delegated): (a), rung 3, the
+  recommendation the brief's rule picks: every written criterion and every existing arm kept green
+  with the smallest change to another kit. widens: none · relaxes: the playbook render's refusal of a
+  loop definition that does not read, whose drive lines now sort in kit and row order
 
 ## 9. Revision log
 
@@ -615,6 +681,13 @@ New arm: tools/govkit/selftest.py · covers AC5 · the `stage` class row arms it
   rules read the stage; every plant derives its pin over the shipped definition; §5 names the
   companion files and the playbook kit's one version bump. Signature, frame rules, mechanism,
   carries, order and status kept.
+- rev-7 · 2026-11-15 · S6 · §4 Evidence, Inventory, Files touched · §5 · AC5 · §7 · §8 F7 F10 · §10 ·
+  per the return 2026-11-15-build-TOOL-dDeclaredLoop-25-2-builder-return, by the brief
+  2026-11-15-prompt-TOOL-dDeclaredLoop-25-4-spec-writer: the `stage` plant made the `drive` class's
+  reader refuse, exit 2, where AC5 needs a red, so `read_drive_rows` reads a definition that does not
+  read as no order (F10 (a)); F7 says the gate as built refuses rather than reds; `usage.toml` gains the
+  `stage` class row; the playbook kit's version bump is the close's, not this unit's. Mechanism,
+  carries, order and status kept.
 
 ## 10. Reuse audit
 
@@ -627,7 +700,9 @@ taught a composed stage and called, never copied; the item factory's row builder
 `tools/loop/loop_items.py#run_new` at its second consumer; `build_scratch_tree`, `run_factory` and
 `tools/loop/loop_lib.py#run_selftest_cases` for the fixture; the one pin normaliser,
 `tools/memory-tree/design_lib.py#derive_pin_hash`; and the step gate's class registry with the `item`
-class's witness, `tools/playbook/pins.py#read_change_successors`. For the expansion and the frame
+class's witness, `tools/playbook/pins.py#read_change_successors`; and the no-order branch of
+`tools/playbook/render_playbook.py#read_drive_rows`, which already reads a missing loop kit as no
+order and now reads a definition that does not read the same way (§8 F10). For the expansion and the frame
 rules no seam fits: `python tools/codebase-map/reuse_lookup.py "splice a repository stage between two
 adjacent gov steps of the build transition table"`, run on 2026-11-15 over the tip of
 branch/unattended-declared-loop-d56bf0 extracted to a scratch directory, ranked `read_steps` and
