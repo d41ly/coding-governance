@@ -27,6 +27,9 @@ TOOL="$HERE/pass-tree.sh"
 # and `derive_self_rel`, so the fixture's copy of regen.py sits where the tool will look for it.
 # shellcheck source=unattended.sh
 . "$HERE/unattended.sh" || { echo "FAIL the driver did not source"; exit 2; }
+# The driver exports its graft pin for its own reads; this suite's plain `git` would print git's
+# graft-file deprecation hint under it, so it is dropped here. The tool sources the driver again.
+unset GIT_GRAFT_FILE
 KIT_REL=$(derive_self_rel "$HERE") || { echo "FAIL this suite is not inside a git repository"; exit 2; }
 case "$KIT_REL" in */*) TOOL_REL="${KIT_REL%/*}" ;; *) TOOL_REL="" ;; esac
 REPO=${HERE%/"$KIT_REL"}
@@ -147,13 +150,13 @@ check_same "T1 --merge of pass 2 exits 0 (AC1)" "$rc" 0
 if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 M2=$out
 check_same "T1 pass 2's merge prints one sha alone on stdout (AC1)" "$M2" "$(git rev-parse HEAD)"
-check_same "T1 pass 2's merge has the pre-merge HEAD as its first parent" "$(git rev-parse "$M2^1" 2>&1)" "$h0"
-check_same "T1 pass 2's merge has pass 2's commit as its second parent (AC1)" "$(git rev-parse "$M2^2" 2>&1)" "$P2"
+check_same "T1 pass 2's merge has the pre-merge HEAD as its first parent" "$(git rev-parse "$M2^1")" "$h0"
+check_same "T1 pass 2's merge has pass 2's commit as its second parent (AC1)" "$(git rev-parse "$M2^2")" "$P2"
 run_tool --merge tRun --pass TOOL-tRun-3 --branch agent-p3 --from "$C"
 check_same "T1 --merge of pass 3, whose output and region conflict, exits 0 (AC1)" "$rc" 0
 M3=$out
 check_same "T1 pass 3's merge prints one sha alone on stdout (AC1)" "$M3" "$(git rev-parse HEAD)"
-check_same "T1 pass 3's merge has pass 3's commit as its second parent (AC1)" "$(git rev-parse "$M3^2" 2>&1)" "$P3"
+check_same "T1 pass 3's merge has pass 3's commit as its second parent (AC1)" "$(git rev-parse "$M3^2")" "$P3"
 check_same "T1 fx-out.txt lists both passes' files (AC1)" "$(<fx-out.txt)" "p2.txt
 p3.txt"
 bash "$FX_REL/render.sh" --check; check_same "T1 render.sh --check confirms the output and the README region fresh (AC1)" "$?" 0
@@ -206,13 +209,17 @@ check_merge_refused "with an untracked file present" "$R" agent-p4 "$C"
 check_has "T3 the untracked-file refusal names the clean test" "$err" "not clean"
 rm -f stray.txt
 check_merge_refused "for branch agent-none, which does not exist" "$R" agent-none "$C"
+check_has "T3 the absent-branch refusal names the branch" "$err" "no branch agent-none exists"
 check_merge_refused "for the run's own branch" "$R" run "$C"
+check_has "T3 the run-branch refusal says so" "$err" "run is the run's own branch"
 check_merge_refused "for branch -x" "$R" -x "$C"
+check_has "T3 the -x refusal is the branch-name check" "$err" "'-x' is not a branch name git admits"
 check_merge_refused "for pass 5, which committed nothing" "$R" agent-p5 "$C"
 check_has "T3 the no-commit refusal names --remove" "$err" "--remove"
 check_merge_refused "for pass 8, which wrote the run-state file" "$R" agent-p8 "$C"
 check_has "T3 the run-state refusal names the file" "$err" "$RUNMD"
 check_merge_refused "with --from HEAD" "$R" agent-p4 HEAD
+check_has "T3 the --from refusal names the value" "$err" "--from 'HEAD' is not 7 to 40 lowercase hex digits"
 check_merge_refused "for pass 9, cut from main with no reset" "$R" agent-p9 "$C"
 check_has "T3 the fork-point refusal names the reset" "$err" "did not reset its worktree"
 check_has "T3 the fork-point refusal names C's first eight digits" "$err" "${C:0:8}"
@@ -223,6 +230,7 @@ add_fixture_pass 7 && write_fixture_pass 7 p7.txt || { echo "FAIL pass 7"; exit 
 h0=$(git rev-parse HEAD)
 out=$(FX_RENDER_FAIL=1 bash "$TOOL" --merge tRun --pass TOOL-tRun-7 --branch agent-p7 --from "$C" 2>"$T/err"); rc=$?
 check_same "T4 --merge with a failing regeneration exits 1 (AC4)" "$rc" 1
+check_has "T4 the refusal is the regeneration's, so the restore ran after the merge (AC4)" "$(<"$T/err")" "the regeneration failed"
 check_same "T4 HEAD is the pre-merge sha (AC4)" "$(git rev-parse HEAD)" "$h0"
 check_same "T4 the tree is clean (AC4)" "$(git status --porcelain)" ""
 [ -e fx-partial.txt ]; check_same "T4 fx-partial.txt is gone (AC4)" "$?" 1
