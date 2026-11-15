@@ -206,7 +206,7 @@ out=$( cd "$d" || exit 2
   git commit -q -m template 2>&1 ); rc=$?
 case "$out" in *"--- the template commit"*"TEMPLATE-SIZE RAN"*) r=$rc ;; *) r=1 ;; esac
 ck "S11 a staged template runs the template-size gate and the commit exits 0" "$r" 0
-n_runs=0; while IFS= read -r l; do [[ $l == *'TEMPLATE-SIZE RAN'* ]] && n_runs=$((n_runs+1)); done <<<"$out"
+_p='TEMPLATE-SIZE RAN'; _t=${out//"$_p"/}; n_runs=$(( (${#out} - ${#_t}) / ${#_p} ))
 [ "$n_runs" = 1 ] && r=0 || r=1
 ck "S11 the template-size gate runs once across an unrelated commit and the template's (ran $n_runs)" "$r" 0
 
