@@ -20,6 +20,7 @@
 | [2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-144.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-144.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-146.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-deviation-146.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-14-red-fix-25.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-red-fix-25.md) | red-fix | — |
+| [2026-11-15-build-TOOL-dDeclaredLoop-14-red-fix-29.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-14-red-fix-29.md) | red-fix | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-56 |
 | [2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade.md) | research | TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 |
@@ -281,7 +282,7 @@ is replaced by the row `python tools/playbook/gov_tag.py --list-positional` prin
 **The decision row** lands before the pass, in the main loop's records commit, as the Skill's row did.
 `cmd_check` refuses a token whose id no `memory/DECISIONS.md` row carries, and `--dispatch` refuses a
 pass declaring that file, which `SHARED_RECORDS` holds (`.unattended.conf@dca9e08e9e22:417`), so the
-pass does not edit it. `memory/HYGIENE.md` check 20 holds one id to one row of the decision index, and the unit's
+pass does not edit it. The decision index holds one row per id (`doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home`), and the unit's
 own id already heads its Skill row, so that one row carries both raises: the run extends it ahead of the pass to
 name the driver's refusal ceiling beside the Skill's size row. The row names TOOL-aSmoothedDispatch-2, the driver's
 last raise, as the precedent check 27 ranks nearest:
