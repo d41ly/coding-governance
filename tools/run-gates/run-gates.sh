@@ -147,6 +147,18 @@ resolve_python() {
   # over and named, exactly as a candidate that does not run.
   _rp_floor="3.15"
   _rp_fv=$(( ${_rp_floor%%.*} * 1000 + ${_rp_floor#*.} ))
+  # THE BAR'S OWN RESOLUTION, taken with no spawn (TOOL-aMeasuredDrag-11). The run-gates runner
+  # exports GATE_RESOLVED_PY as four lines: the version, the launcher it resolved, and GOV_PYTHON and
+  # PATH as it saw them. With no caller override the loop below is decided by GOV_PYTHON, PATH and the
+  # floor, so a memo matching both byte for byte, at or above THIS floor, is what the loop would print.
+  # Anything else, malformed or partial included, is ignored and the loop runs.
+  _rp_re=$'^([0-9]+)\\.([0-9]+)\n([^\n]+)\n([^\n]*)\n(.*)$'
+  if [ -z "${1:-}" ] && [[ ${GATE_RESOLVED_PY:-} =~ $_rp_re ]] \
+    && [ "${BASH_REMATCH[4]}" = "${GOV_PYTHON:-}" ] && [ "${BASH_REMATCH[5]}" = "$PATH" ] \
+    && [ $(( 10#${BASH_REMATCH[1]} * 1000 + 10#${BASH_REMATCH[2]} )) -ge "$_rp_fv" ]; then
+    printf '%s\n' "${BASH_REMATCH[3]}"
+    return 0
+  fi
   _rp_tried=""; _rp_seen=""; _rp_best=""; _rp_bv=0; _rp_bver=""; _rp_o1=""; _rp_og=""; _rp_i=0
   for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
     _rp_i=$((_rp_i + 1))
@@ -335,6 +347,9 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
+# AN INHERITED MEMO IS NEVER ADMITTED (TOOL-aMeasuredDrag-11): this bar resolves for itself, and
+# exports its own GATE_RESOLVED_PY for its legs only after the toolchain digest below is taken.
+unset GATE_RESOLVED_PY
 PYBIN=$(resolve_python) || { echo "run-gates: no usable python — required to parse the leg manifest"; exit 2; }
 # ---- THE THREE REGEN VERBS hand over before any bar machinery exists (TOOL-aPrimedIndex-2 S6) -----
 # `regen.py`, beside this runner, regenerates or proves fresh every generated output the kits
@@ -3549,6 +3564,12 @@ REUSE_DIGEST=$(
     esac
   done
 ) && REUSE_DIGEST=$(git hash-object --stdin 2>/dev/null <<<"$REUSE_DIGEST") || REUSE_DIGEST=""
+# THIS BAR'S RESOLUTION, HANDED TO ITS LEGS (TOOL-aMeasuredDrag-11): the version from PY_ID, PYBIN,
+# and GOV_PYTHON and PATH as this bar saw them, one per line. A leg's resolver block echoes PYBIN with
+# no spawn while GOV_PYTHON and PATH are unchanged; any other leg probes as before. Exported AFTER the
+# digest above, so neither digest mode reads it and a direct bar's key equals a push bar's.
+PY_MM=""; [[ ${PY_ID:-} =~ ^([0-9]+\.[0-9]+) ]] && PY_MM=${BASH_REMATCH[1]}
+export GATE_RESOLVED_PY="$PY_MM"$'\n'"$PYBIN"$'\n'"${GOV_PYTHON:-}"$'\n'"$PATH"
 # THE SAMPLE RATE (S6, owner ruling F2: 0.25, uniform per leg), as parts in 10000. A value that is no
 # decimal from 0 to 1 is refused back to the default, loudly: a typo must not switch the sample off.
 REUSE_SAMPLE=${GATE_REUSE_SAMPLE:-0.25}; SAMPLE_PM=2500

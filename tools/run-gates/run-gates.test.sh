@@ -41,6 +41,18 @@ resolve_python() {
   # over and named, exactly as a candidate that does not run.
   _rp_floor="3.15"
   _rp_fv=$(( ${_rp_floor%%.*} * 1000 + ${_rp_floor#*.} ))
+  # THE BAR'S OWN RESOLUTION, taken with no spawn (TOOL-aMeasuredDrag-11). The run-gates runner
+  # exports GATE_RESOLVED_PY as four lines: the version, the launcher it resolved, and GOV_PYTHON and
+  # PATH as it saw them. With no caller override the loop below is decided by GOV_PYTHON, PATH and the
+  # floor, so a memo matching both byte for byte, at or above THIS floor, is what the loop would print.
+  # Anything else, malformed or partial included, is ignored and the loop runs.
+  _rp_re=$'^([0-9]+)\\.([0-9]+)\n([^\n]+)\n([^\n]*)\n(.*)$'
+  if [ -z "${1:-}" ] && [[ ${GATE_RESOLVED_PY:-} =~ $_rp_re ]] \
+    && [ "${BASH_REMATCH[4]}" = "${GOV_PYTHON:-}" ] && [ "${BASH_REMATCH[5]}" = "$PATH" ] \
+    && [ $(( 10#${BASH_REMATCH[1]} * 1000 + 10#${BASH_REMATCH[2]} )) -ge "$_rp_fv" ]; then
+    printf '%s\n' "${BASH_REMATCH[3]}"
+    return 0
+  fi
   _rp_tried=""; _rp_seen=""; _rp_best=""; _rp_bv=0; _rp_bver=""; _rp_o1=""; _rp_og=""; _rp_i=0
   for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
     _rp_i=$((_rp_i + 1))
@@ -525,6 +537,38 @@ case "$_uout" in
 esac
 rm -rf "$_cd" "$_cr"
 fi   # ---- end the HAVE_TIMEOUT gate on arms 1c/1d/1e ----------------------------------------------
+
+# ---- 1m. THE BAR HANDS ITS OWN RESOLUTION TO ITS LEGS, AND ONLY ITS OWN. TOOL-aMeasuredDrag-11 ----
+#     A scratch bar, as 1e drives one, inherits a sentinel memo that matches this shell's GOV_PYTHON
+#     and PATH and names a launcher that does not exist. Its one leg records the memo it sees and the
+#     launcher the runner's own resolver block prints. The leg must see a memo naming a real launcher,
+#     and resolve that launcher. Staged red by deleting the runner's `unset GATE_RESOLVED_PY`: the
+#     bar then takes the sentinel as PYBIN and the leg never runs. WHAT THIS DOES NOT CHECK: that the
+#     export follows the toolchain digest, which is the spec's grep over the runner.
+_md=$(mktemp -d)
+sed -n '/^# >>> resolve_python/,/^# <<< resolve_python/p' "$KITDIR/run-gates.sh" > "$_md/block.sh"
+printf '%s\n' '#!/usr/bin/env bash' 'd=$(cd "$(dirname "$0")" && pwd); . "$d/block.sh"' \
+  'printf "%s" "${GATE_RESOLVED_PY-UNSET}" > "$d/memo"; resolve_python > "$d/launcher" 2>&1' > "$_md/leg.sh"
+"$PYBIN" - "$_md" <<'MEMOPY'
+import io, json, sys
+d = sys.argv[1]
+legs = [{"name": "memo leg", "argv": ["bash", d + "/leg.sh"], "subject": "repo", "ceiling": 60}]
+io.open(d + "/legs.json", "w", encoding="utf-8", newline="\n").write(json.dumps(legs, indent=2) + "\n")
+MEMOPY
+_mr=$(mktemp -d); ( cd "$_mr" && git init -q --template= . && git commit -q --allow-empty -m base ) >/dev/null 2>&1
+_msent=$'3.99\n/no/such/sentinel\n'"${GOV_PYTHON:-}"$'\n'"$PATH"
+(cd "$_mr" && GATE_RESOLVED_PY="$_msent" GATE_LEGS="$_md/legs.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" >/dev/null 2>&1)
+_mmemo=$(cat "$_md/memo" 2>/dev/null) || _mmemo="NO LEG RAN"
+_mlaunch=$(cat "$_md/launcher" 2>/dev/null) || _mlaunch=""
+_mml=${_mmemo#*$'\n'}; _mml=${_mml%%$'\n'*}
+n=$((n+1))
+case "$_mmemo" in
+  *sentinel*|UNSET|"NO LEG RAN") echo "canary: 1m the leg saw '$(head -c 80 <<<"$_mmemo")', not the bar's own memo"; fail=1 ;;
+esac
+n=$((n+1))
+{ [ -n "$_mml" ] && [ "$_mlaunch" = "$_mml" ] && "$_mlaunch" -c 'pass' >/dev/null 2>&1; } \
+  || { echo "canary: 1m the leg resolved '$_mlaunch', not the runnable launcher its memo names ('$_mml')"; fail=1; }
+rm -rf "$_md" "$_mr"
 
 # ---- 1r. THE REGEN VERB READS THE DECLARED OUTPUTS. TOOL-aPrimedIndex-2 ----------------------------
 #     A scratch repo holding one fixture kit at THIS kit's tool root, whose tracked descriptor declares

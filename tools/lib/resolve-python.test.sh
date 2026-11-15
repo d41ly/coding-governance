@@ -107,6 +107,29 @@ grep -qF "the caller's override '$C/py' was tried FIRST and did not run" <<<"$ou
 out=$(PATH="$C:$PATH" bash -c 'set -u; . "$1"; PY=$(resolve_python) || { echo HALTED; exit 3; }; echo "NOTHALTED $PY"' _ "$CANON" 2>/dev/null); rc=$?
 [ "$out" = HALTED ] && [ "$rc" = 3 ] || bad "the caller could not halt on failure (out='$out' rc=$rc)"; ok
 
+# (e2) TOOL-aMeasuredDrag-11: the bar's memo. A memo matching GOV_PYTHON and PATH at the floor is
+# echoed with no probe: its launcher does not exist, so a probe would refuse it. Every other memo is a
+# miss, and the shadowed PATH, an unusable GOV_PYTHON, a caller override, a version below the floor
+# and a three-line memo each read what they read with no memo at all. Staged red by deleting the memo
+# rung (the hit arm) or by dropping PATH from its key compare (the shadowed-PATH arm). WHAT THIS DOES
+# NOT CHECK: that run-gates.sh exports the memo, which run-gates.test.sh's own arm drives.
+mf=$(tr -d '\r\n' < "$HERE/python-floor.txt")
+mm="$mf"$'\n/no/such/py\n'"${GOV_PYTHON:-}"$'\n'"$PATH"
+out=$(GATE_RESOLVED_PY="$mm" bash -c '. "$1"; resolve_python' _ "$CANON" 2>"$TMP/memo.err"); rc=$?
+{ [ "$out" = /no/such/py ] && [ "$rc" = 0 ] && [ ! -s "$TMP/memo.err" ]; } \
+  || bad "a matching memo was not echoed with no probe: rc=$rc out='$out' $(head -c 200 "$TMP/memo.err")"; ok
+out=$(GATE_RESOLVED_PY="$mm" PATH="$C:$PATH" bash -c '. "$1"; resolve_python' _ "$CANON" 2>&1); rc=$?
+{ [ "$rc" != 0 ] && grep -qF 'tried: python3 python py' <<<"$out"; } \
+  || bad "a memo was admitted under a shadowed PATH: rc=$rc $(head -c 200 <<<"$out")"; ok
+out=$(GATE_RESOLVED_PY="$mm" GOV_PYTHON="$C/python3" PATH="$C:$PATH" bash -c '. "$1"; resolve_python' _ "$CANON" 2>&1)
+grep -qF "GOV_PYTHON is set to '$C/python3' and did not run" <<<"$out" || bad "a memo was admitted over a changed GOV_PYTHON: $out"; ok
+got=$(GATE_RESOLVED_PY="$mm" bash -c '. "$1"; resolve_python "$2"' _ "$CANON" "$REALPY_ABS" 2>/dev/null)
+[ "$got" = "$REALPY_ABS" ] || bad "a memo was admitted over a caller override (got '$got')"; ok
+for mb in "${mf%%.*}.$(( ${mf#*.} - 1 ))${mm#"$mf"}" "$mf"$'\n/no/such/py\n'"${GOV_PYTHON:-}"; do
+  got=$(GATE_RESOLVED_PY="$mb" bash -c '. "$1"; resolve_python' _ "$CANON" 2>/dev/null)
+  [ -n "$got" ] && [ "$got" != /no/such/py ] || bad "a below-floor or three-line memo was admitted (got '$got')"; ok
+done
+
 # TOOL-aRepatriatedFork-46: the kickoff region's canonical copy lives in a SIBLING kit, found through the
 # resolver rather than by typing that kit's name after the prefix.
 # The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the

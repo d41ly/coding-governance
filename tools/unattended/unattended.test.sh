@@ -57,6 +57,18 @@ resolve_python() {
   # over and named, exactly as a candidate that does not run.
   _rp_floor="3.15"
   _rp_fv=$(( ${_rp_floor%%.*} * 1000 + ${_rp_floor#*.} ))
+  # THE BAR'S OWN RESOLUTION, taken with no spawn (TOOL-aMeasuredDrag-11). The run-gates runner
+  # exports GATE_RESOLVED_PY as four lines: the version, the launcher it resolved, and GOV_PYTHON and
+  # PATH as it saw them. With no caller override the loop below is decided by GOV_PYTHON, PATH and the
+  # floor, so a memo matching both byte for byte, at or above THIS floor, is what the loop would print.
+  # Anything else, malformed or partial included, is ignored and the loop runs.
+  _rp_re=$'^([0-9]+)\\.([0-9]+)\n([^\n]+)\n([^\n]*)\n(.*)$'
+  if [ -z "${1:-}" ] && [[ ${GATE_RESOLVED_PY:-} =~ $_rp_re ]] \
+    && [ "${BASH_REMATCH[4]}" = "${GOV_PYTHON:-}" ] && [ "${BASH_REMATCH[5]}" = "$PATH" ] \
+    && [ $(( 10#${BASH_REMATCH[1]} * 1000 + 10#${BASH_REMATCH[2]} )) -ge "$_rp_fv" ]; then
+    printf '%s\n' "${BASH_REMATCH[3]}"
+    return 0
+  fi
   _rp_tried=""; _rp_seen=""; _rp_best=""; _rp_bv=0; _rp_bver=""; _rp_o1=""; _rp_og=""; _rp_i=0
   for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
     _rp_i=$((_rp_i + 1))
