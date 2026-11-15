@@ -9,7 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-179473687407959022931-1810123 a0086761
+gates-run: unattended-17947447355844549680-2086024 0a866a35
 parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: aebbb4a725d58dd69b12f1f319e82f5b5d8a8e8e · park · 0 touching
@@ -21,12 +21,12 @@ mode: slug
 run-branch: refs/heads/branch/project-performance-review-a0e38f
 anchor-kind: local
 cli-version: 2.1.325
-lease-utc: 2026-11-15T00:14:20Z
+lease-utc: 2026-11-15T14:27:51Z
 pid-image: claude.exe
 host: compeeto-agent
-pid: 26284
+pid: 8724
 session: a276aab6-03b0-4e70-8fa7-5c727e305da2
-keepalive: ac213550
+keepalive: 03c5adbe
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: aebbb4a725d58dd69b12f1f319e82f5b5d8a8e8e
 anchor-ref: refs/heads/main
