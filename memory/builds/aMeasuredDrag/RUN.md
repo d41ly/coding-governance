@@ -9,13 +9,15 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-17947447355844549680-2086024 0a866a35
+asks-at-landing: TOOL-aMeasuredDrag-13=OPEN TOOL-aMeasuredDrag-14=DEFERRED
+units-at-landing: TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-4 TOOL-aMeasuredDrag-5 TOOL-aMeasuredDrag-6 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 TOOL-aMeasuredDrag-9 TOOL-aMeasuredDrag-10 TOOL-aMeasuredDrag-11 TOOL-aMeasuredDrag-12
+gates-run: unattended-179475438386735327482-126551 4f17c1a8
 parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: aebbb4a725d58dd69b12f1f319e82f5b5d8a8e8e · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 03ace0266997b46871fe43d2b8e4fa3d17820d3f
-phase: VERIFYING
+phase: LANDING
 may: none
 mode: slug
 run-branch: refs/heads/branch/project-performance-review-a0e38f
