@@ -9,6 +9,7 @@
 | [2026-11-15-prompt-TOOL-aTwinnedPass-1-brief.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-1-brief.md) | research | TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 |
 | [2026-11-15-prompt-TOOL-aTwinnedPass-3-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-3-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTwinnedPass-3-2-builder.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-3-2-builder.md) | journal | — |
+| [2026-11-15-prompt-TOOL-aTwinnedPass-3-3-builder.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-3-3-builder.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTwinnedPass-3-pass-brief.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-3-pass-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
