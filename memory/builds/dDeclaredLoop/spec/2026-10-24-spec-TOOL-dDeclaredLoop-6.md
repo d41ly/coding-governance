@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-6 — the factories and conformance gates for commands, policy keys, stages, hooks, roles and workflows
 
-**Status:** DEFERRED · rev-5 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 20 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-6 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 20 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0091@b0158e81 whole
 
@@ -186,7 +186,7 @@ to :299, and :383 to :388; P16).
 - The gov steps are a closed tuple, `STEP_TAGS` (`tools/loop/loop_lib.py@3ac2c9502a12:144`), and
   `tools/loop/loop_lib.py#check_loop` refuses a `[[step]]` row naming any other tag, so no factory can
   write a gov step that conforms. Clause 0110 keeps gov's five whole and in order, and a repository's
-  own stage is TOOL-dDeclaredLoop-25's `[[splice]]` row.
+  own stage is TOOL-dDeclaredLoop-25's `[[stage]]` row.
 - The roles kit closes two sets in code: `WORKFLOW_NAMES`, the ten workflows R6 requires each once and
   refuses any other name of, and `BODY_CEILINGS`, without whose row R5 reds a role file
   (`tools/roles/check_roles.py@29a89906d1bb:95` and :100).
@@ -445,7 +445,7 @@ New arm: tools/loop/factories.py · covers AC2 AC3 AC5 AC6 AC7 AC10 · each `-ha
 - **F4 — The stage kind: a gov step factory here, or pending until the repository stage lands?**
   (a) `new stage` writes a gov `[[step]]` row, as rev-3 and TOOL-dDeclaredLoop-47 read; (b) the kind
   keeps its pending row and its factory lands with TOOL-dDeclaredLoop-25's repository stage, the
-  `[[splice]]` row, the one stage a factory can add. (a) cannot be green: `check_loop` refuses a step
+  `[[stage]]` row, the one stage a factory can add. (a) cannot be green: `check_loop` refuses a step
   tag outside the closed `STEP_TAGS`, and clause 0110 keeps gov's five whole, so a factory would have to
   edit the tuple and the five-step rule with it, and the restore would undo every stage it wrote.
   Recommendation (b), the body's: the stage words of this unit's clause land in this build through
@@ -494,6 +494,7 @@ New arm: tools/loop/factories.py · covers AC2 AC3 AC5 AC6 AC7 AC10 · each `-ha
   both legs register as gov's own with their `stage` (S12). Line citations are symbol citations or
   blob-pinned lines.
 - rev-5 · 2026-11-15 · §3 · the Edges block gains the hands-off mirroring TOOL-dDeclaredLoop-25 rev-5's consumes-from edge; nothing else moved.
+- rev-6 · 2026-11-15 · §4 · §8 F4 · TOOL-dDeclaredLoop-25's repository stage row is named `[[stage]]`, as its rev-5 renamed it; nothing else moved.
 
 ## 10. Reuse audit
 
