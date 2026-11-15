@@ -45,8 +45,10 @@ resolve_python() {
   # exports GATE_RESOLVED_PY as four lines: the version, the launcher it resolved, and GOV_PYTHON and
   # PATH as it saw them. With no caller override the loop below is decided by GOV_PYTHON, PATH and the
   # floor, so a memo matching both byte for byte, at or above THIS floor, is what the loop would print.
-  # Anything else, malformed or partial included, is ignored and the loop runs.
-  _rp_re=$'^([0-9]+)\\.([0-9]+)\n([^\n]+)\n([^\n]*)\n(.*)$'
+  # Anything else, malformed or partial included, is ignored and the loop runs. Only an absolute
+  # launcher is admitted (TOOL-aMeasuredDrag-12): a relative one names another file once a leg
+  # changes directory, and a bare name does too under a PATH holding `.`.
+  _rp_re=$'^([0-9]+)\\.([0-9]+)\n(/[^\n]*|[A-Za-z]:/[^\n]*|[A-Za-z]:\\\\[^\n]*)\n([^\n]*)\n(.*)$'
   if [ -z "${1:-}" ] && [[ ${GATE_RESOLVED_PY:-} =~ $_rp_re ]] \
     && [ "${BASH_REMATCH[4]}" = "${GOV_PYTHON:-}" ] && [ "${BASH_REMATCH[5]}" = "$PATH" ] \
     && [ $(( 10#${BASH_REMATCH[1]} * 1000 + 10#${BASH_REMATCH[2]} )) -ge "$_rp_fv" ]; then
@@ -286,7 +288,9 @@ fail=0
 # 440 -> 450, TOOL-aNimbleMend-15: arm 9f's ledger status of a failed retry, behind the `timeout` gate
 # and counted on a host without one as well (40 -> 41); arm 14i's six through the freshness preflight;
 # and arm 14j's three on a refused key read, counted where no policy kit resolves too. Counted by reading.
-FLOOR_ASSERTIONS=450
+# 450 -> 456, TOOL-aMeasuredDrag-12: arm 1m's four, arm 1m2's one and arm 1m3's one, none gated.
+# Counted off the arms; this pass runs no suite.
+FLOOR_ASSERTIONS=456
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -543,12 +547,25 @@ fi   # ---- end the HAVE_TIMEOUT gate on arms 1c/1d/1e -------------------------
 #     and PATH and names a launcher that does not exist. Its one leg records the memo it sees and the
 #     launcher the runner's own resolver block prints. The leg must see a memo naming a real launcher,
 #     and resolve that launcher. Staged red by deleting the runner's `unset GATE_RESOLVED_PY`: the
-#     bar then takes the sentinel as PYBIN and the leg never runs. WHAT THIS DOES NOT CHECK: that the
-#     export follows the toolchain digest, which is the spec's grep over the runner.
+#     bar then takes the sentinel as PYBIN and the leg never runs.
+#     A HIT, NOT A RE-PROBE (TOOL-aMeasuredDrag-12): the bar runs with GOV_PYTHON set to a counting
+#     wrapper, which appends a line to the file RG1M_COUNT names and execs this suite's interpreter, so
+#     the runner's PYBIN is that wrapper. The leg resolves once with its inherited memo and RG1M_COUNT
+#     naming a hit counter, which must stay empty, then once with no memo and RG1M_COUNT naming a miss
+#     counter, which must fill: the control that proves the counter moves. Staged red by swapping the
+#     GOV_PYTHON and PATH fields of the export, or by replacing PY_MM with an empty string: the memo
+#     then misses and the hit counter fills. WHAT THIS DOES NOT CHECK: that the export follows the
+#     toolchain digest, which arm 1m3 holds, or a non-absolute PYBIN, which arm 1m2 drives.
 _md=$(mktemp -d)
 sed -n '/^# >>> resolve_python/,/^# <<< resolve_python/p' "$KITDIR/run-gates.sh" > "$_md/block.sh"
+_mexe=$("$PYBIN" -I -c 'import sys; print(sys.executable.replace(chr(92), "/"))'); _mexe=${_mexe%$'\r'}
+printf '%s\n' '#!/usr/bin/env bash' '[ -z "${RG1M_COUNT:-}" ] || echo spawn >> "$RG1M_COUNT"' \
+  "exec $(printf '%q' "$_mexe") \"\$@\"" > "$_md/py"
+chmod +x "$_md/py"
 printf '%s\n' '#!/usr/bin/env bash' 'd=$(cd "$(dirname "$0")" && pwd); . "$d/block.sh"' \
-  'printf "%s" "${GATE_RESOLVED_PY-UNSET}" > "$d/memo"; resolve_python > "$d/launcher" 2>&1' > "$_md/leg.sh"
+  'printf "%s" "${GATE_RESOLVED_PY-UNSET}" > "$d/memo"' \
+  'export RG1M_COUNT="$d/hits"; resolve_python > "$d/launcher" 2>&1' \
+  '(unset GATE_RESOLVED_PY; export RG1M_COUNT="$d/misses"; resolve_python >/dev/null 2>&1)' > "$_md/leg.sh"
 "$PYBIN" - "$_md" <<'MEMOPY'
 import io, json, sys
 d = sys.argv[1]
@@ -556,8 +573,8 @@ legs = [{"name": "memo leg", "argv": ["bash", d + "/leg.sh"], "subject": "repo",
 io.open(d + "/legs.json", "w", encoding="utf-8", newline="\n").write(json.dumps(legs, indent=2) + "\n")
 MEMOPY
 _mr=$(mktemp -d); ( cd "$_mr" && git init -q --template= . && git commit -q --allow-empty -m base ) >/dev/null 2>&1
-_msent=$'3.99\n/no/such/sentinel\n'"${GOV_PYTHON:-}"$'\n'"$PATH"
-(cd "$_mr" && GATE_RESOLVED_PY="$_msent" GATE_LEGS="$_md/legs.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" >/dev/null 2>&1)
+_msent=$'3.99\n/no/such/sentinel\n'"$_md/py"$'\n'"$PATH"
+(cd "$_mr" && GOV_PYTHON="$_md/py" GATE_RESOLVED_PY="$_msent" GATE_LEGS="$_md/legs.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" >/dev/null 2>&1)
 _mmemo=$(cat "$_md/memo" 2>/dev/null) || _mmemo="NO LEG RAN"
 _mlaunch=$(cat "$_md/launcher" 2>/dev/null) || _mlaunch=""
 _mml=${_mmemo#*$'\n'}; _mml=${_mml%%$'\n'*}
@@ -568,7 +585,46 @@ esac
 n=$((n+1))
 { [ -n "$_mml" ] && [ "$_mlaunch" = "$_mml" ] && "$_mlaunch" -c 'pass' >/dev/null 2>&1; } \
   || { echo "canary: 1m the leg resolved '$_mlaunch', not the runnable launcher its memo names ('$_mml')"; fail=1; }
+n=$((n+1))
+[ ! -s "$_md/hits" ] || { echo "canary: 1m the leg's resolver spawned its launcher $(wc -l < "$_md/hits") time(s) with the bar's memo in hand: a re-probe, not a hit"; fail=1; }
+n=$((n+1))
+[ -s "$_md/misses" ] || { echo "canary: 1m the leg's resolver with no memo never spawned the counting wrapper, so an empty hit counter proves nothing"; fail=1; }
 rm -rf "$_md" "$_mr"
+
+# ---- 1m2. ONLY AN ABSOLUTE PYBIN IS EXPORTED. TOOL-aMeasuredDrag-12 ---------------------------------
+#     The runner's lines from `PY_MM=""` to the next column-0 `esac`, sourced five times: an absolute,
+#     two drive-letter and a relative and a bare-name PYBIN. The first three export a memo whose line 2
+#     is that PYBIN, the last two leave GATE_RESOLVED_PY unset. The three absolute cases are the
+#     control: an empty extraction exports nothing and fails them. Staged red by dropping the `case`,
+#     so the export is unconditional. WHAT THIS DOES NOT CHECK: where the lines sit, which arm 1m3 holds.
+_m2=$(mktemp -d)
+sed -n '/^PY_MM=""/,/^esac/p' "$KITDIR/run-gates.sh" > "$_m2/export.sh"
+printf '%s\n' '. "$1"' 'if [ "${GATE_RESOLVED_PY+set}" = set ]; then l=${GATE_RESOLVED_PY#*$'"'\\n'"'}; printf "%s" "${l%%$'"'\\n'"'*}"; else printf UNSET; fi' > "$_m2/read.sh"
+_m2bad=""
+for _m2p in '/abs/py' 'C:/abs/py' 'C:\abs\py' 'rel/py' 'py'; do
+  _m2got=$(unset GATE_RESOLVED_PY; PY_ID='3.15.0' PYBIN="$_m2p" bash "$_m2/read.sh" "$_m2/export.sh")
+  case $_m2p in /*|C:*) _m2want=$_m2p ;; *) _m2want=UNSET ;; esac
+  [ "$_m2got" = "$_m2want" ] || _m2bad="$_m2bad $_m2p->$_m2got"
+done
+n=$((n+1))
+[ -z "$_m2bad" ] || { echo "canary: 1m2 the runner's export read wrong for:$_m2bad"; fail=1; }
+rm -rf "$_m2"
+
+# ---- 1m3. THE MEMO IS EXPORTED AFTER THE TOOLCHAIN DIGEST. TOOL-aMeasuredDrag-12 --------------------
+#     Four lines of the runner, in this order: the unset of an inherited memo, the PYBIN resolution,
+#     the digest's close and the export. Staged red by moving the export above the digest, or by a
+#     `case` that hides the export from the pattern. WHAT THIS DOES NOT CHECK: what the export holds.
+_m3=""
+while IFS= read -r _m3l; do
+  case $_m3l in
+    'unset GATE_RESOLVED_PY'*) _m3="$_m3 unset" ;;
+    'PYBIN=$(resolve_python)'*) _m3="$_m3 PYBIN" ;;
+    ') && REUSE_DIGEST='*) _m3="$_m3 digest" ;;
+    *'export GATE_RESOLVED_PY'*) _m3="$_m3 export" ;;
+  esac
+done < <(grep -E '^unset GATE_RESOLVED_PY|^PYBIN=\$\(resolve_python\)|^\) && REUSE_DIGEST=|^[^#]*export GATE_RESOLVED_PY' "$KITDIR/run-gates.sh")
+n=$((n+1))
+[ "$_m3" = " unset PYBIN digest export" ] || { echo "canary: 1m3 the runner's memo lines read '$_m3', not the unset, PYBIN, digest and export in that order"; fail=1; }
 
 # ---- 1r. THE REGEN VERB READS THE DECLARED OUTPUTS. TOOL-aPrimedIndex-2 ----------------------------
 #     A scratch repo holding one fixture kit at THIS kit's tool root, whose tracked descriptor declares

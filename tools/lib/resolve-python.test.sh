@@ -111,8 +111,10 @@ out=$(PATH="$C:$PATH" bash -c 'set -u; . "$1"; PY=$(resolve_python) || { echo HA
 # echoed with no probe: its launcher does not exist, so a probe would refuse it. Every other memo is a
 # miss, and the shadowed PATH, an unusable GOV_PYTHON, a caller override, a version below the floor
 # and a three-line memo each read what they read with no memo at all. Staged red by deleting the memo
-# rung (the hit arm) or by dropping PATH from its key compare (the shadowed-PATH arm). WHAT THIS DOES
-# NOT CHECK: that run-gates.sh exports the memo, which run-gates.test.sh's own arm drives.
+# rung (the hit arm) or by dropping PATH from its key compare (the shadowed-PATH arm). The miss loop's
+# relative `no/such/py` and bare-name `nosuchpy` memos (TOOL-aMeasuredDrag-12) are staged red by a
+# block whose line-2 group admits any launcher. WHAT THIS DOES NOT CHECK: that run-gates.sh exports
+# the memo, which run-gates.test.sh's own arm drives.
 mf=$(tr -d '\r\n' < "$HERE/python-floor.txt")
 mm="$mf"$'\n/no/such/py\n'"${GOV_PYTHON:-}"$'\n'"$PATH"
 out=$(GATE_RESOLVED_PY="$mm" bash -c '. "$1"; resolve_python' _ "$CANON" 2>"$TMP/memo.err"); rc=$?
@@ -125,9 +127,11 @@ out=$(GATE_RESOLVED_PY="$mm" GOV_PYTHON="$C/python3" PATH="$C:$PATH" bash -c '. 
 grep -qF "GOV_PYTHON is set to '$C/python3' and did not run" <<<"$out" || bad "a memo was admitted over a changed GOV_PYTHON: $out"; ok
 got=$(GATE_RESOLVED_PY="$mm" bash -c '. "$1"; resolve_python "$2"' _ "$CANON" "$REALPY_ABS" 2>/dev/null)
 [ "$got" = "$REALPY_ABS" ] || bad "a memo was admitted over a caller override (got '$got')"; ok
-for mb in "${mf%%.*}.$(( ${mf#*.} - 1 ))${mm#"$mf"}" "$mf"$'\n/no/such/py\n'"${GOV_PYTHON:-}"; do
+for mb in "${mf%%.*}.$(( ${mf#*.} - 1 ))${mm#"$mf"}" "$mf"$'\n/no/such/py\n'"${GOV_PYTHON:-}" \
+  "$mf"$'\nno/such/py\n'"${GOV_PYTHON:-}"$'\n'"$PATH" "$mf"$'\nnosuchpy\n'"${GOV_PYTHON:-}"$'\n'"$PATH"; do
+  l2=${mb#*$'\n'}; l2=${l2%%$'\n'*}
   got=$(GATE_RESOLVED_PY="$mb" bash -c '. "$1"; resolve_python' _ "$CANON" 2>/dev/null)
-  [ -n "$got" ] && [ "$got" != /no/such/py ] || bad "a below-floor or three-line memo was admitted (got '$got')"; ok
+  [ -n "$got" ] && [ "$got" != "$l2" ] || bad "a below-floor, three-line, relative or bare-name memo was admitted (got '$got')"; ok
 done
 
 # TOOL-aRepatriatedFork-46: the kickoff region's canonical copy lives in a SIBLING kit, found through the

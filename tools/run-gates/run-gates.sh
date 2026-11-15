@@ -151,8 +151,10 @@ resolve_python() {
   # exports GATE_RESOLVED_PY as four lines: the version, the launcher it resolved, and GOV_PYTHON and
   # PATH as it saw them. With no caller override the loop below is decided by GOV_PYTHON, PATH and the
   # floor, so a memo matching both byte for byte, at or above THIS floor, is what the loop would print.
-  # Anything else, malformed or partial included, is ignored and the loop runs.
-  _rp_re=$'^([0-9]+)\\.([0-9]+)\n([^\n]+)\n([^\n]*)\n(.*)$'
+  # Anything else, malformed or partial included, is ignored and the loop runs. Only an absolute
+  # launcher is admitted (TOOL-aMeasuredDrag-12): a relative one names another file once a leg
+  # changes directory, and a bare name does too under a PATH holding `.`.
+  _rp_re=$'^([0-9]+)\\.([0-9]+)\n(/[^\n]*|[A-Za-z]:/[^\n]*|[A-Za-z]:\\\\[^\n]*)\n([^\n]*)\n(.*)$'
   if [ -z "${1:-}" ] && [[ ${GATE_RESOLVED_PY:-} =~ $_rp_re ]] \
     && [ "${BASH_REMATCH[4]}" = "${GOV_PYTHON:-}" ] && [ "${BASH_REMATCH[5]}" = "$PATH" ] \
     && [ $(( 10#${BASH_REMATCH[1]} * 1000 + 10#${BASH_REMATCH[2]} )) -ge "$_rp_fv" ]; then
@@ -3567,9 +3569,13 @@ REUSE_DIGEST=$(
 # THIS BAR'S RESOLUTION, HANDED TO ITS LEGS (TOOL-aMeasuredDrag-11): the version from PY_ID, PYBIN,
 # and GOV_PYTHON and PATH as this bar saw them, one per line. A leg's resolver block echoes PYBIN with
 # no spawn while GOV_PYTHON and PATH are unchanged; any other leg probes as before. Exported AFTER the
-# digest above, so neither digest mode reads it and a direct bar's key equals a push bar's.
+# digest above, so neither digest mode reads it and a direct bar's key equals a push bar's. Only an
+# absolute PYBIN is handed on (TOOL-aMeasuredDrag-12): a relative one resolved at the root names
+# another file in a leg that runs elsewhere, so it exports nothing and every leg probes as before.
 PY_MM=""; [[ ${PY_ID:-} =~ ^([0-9]+\.[0-9]+) ]] && PY_MM=${BASH_REMATCH[1]}
-export GATE_RESOLVED_PY="$PY_MM"$'\n'"$PYBIN"$'\n'"${GOV_PYTHON:-}"$'\n'"$PATH"
+case $PYBIN in
+  /*|[A-Za-z]:/*|[A-Za-z]:\\*) export GATE_RESOLVED_PY="$PY_MM"$'\n'"$PYBIN"$'\n'"${GOV_PYTHON:-}"$'\n'"$PATH" ;;
+esac
 # THE SAMPLE RATE (S6, owner ruling F2: 0.25, uniform per leg), as parts in 10000. A value that is no
 # decimal from 0 to 1 is refused back to the default, loudly: a typo must not switch the sample off.
 REUSE_SAMPLE=${GATE_REUSE_SAMPLE:-0.25}; SAMPLE_PM=2500

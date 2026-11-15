@@ -1062,6 +1062,16 @@ def arm_retired_rows(c):
     reds = run_tag_check(root)
     c.check("new text citing unit.old reds the tag check", any("new text cites retired unit.old" in r for r in reds),
             str(reds))
+    # Both sides of check_tree's `tags` switch (TOOL-aMeasuredDrag-12): the write path takes the default and
+    # reds the citation; the check verb passes tags=False and leaves it to the tags leg. Staged red by flipping
+    # the default to tags=False (the write half) or by passing tags=True from run_check (the check half).
+    rc, said = run_cli(root, "add", "--manifest", "corekit", "--tag", "unit.fresh", "--type", "directive", "--level", "3",
+                       "--trigger", "always", "--text", "MUST fresh.", *FX_RECORD)
+    c.check("an add over a tree citing unit.old is refused naming it, through check_tree's tags default",
+            rc == 1 and "cites retired unit.old" in said, said)
+    lines = run_check(root)[0]
+    c.check("the check verb does not name unit.old's citation: it leaves the tags to their own leg",
+            not any("cites retired" in ln for ln in lines), "\n".join(lines))
     rel = f"memory/builds/{FX_BUILD}/build/2026-01-01-build-{FX_UNIT}-change-3.md"
     edges = edge_grammar.read_change_edges(record, rel)
     c.check("read_change_edges returns the promoted-from edge at site instructions.edit",
