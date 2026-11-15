@@ -9,6 +9,7 @@
 | [2026-11-15-build-TOOL-aTrimmedWait-10-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aTrimmedWait-10-1-acceptance-ledger.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTrimmedWait-10-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-10-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTrimmedWait-10-2-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-10-2-spec-writer.md) | journal | — |
+| [2026-11-15-prompt-TOOL-aTrimmedWait-10-fix.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-10-fix.md) | research | — |
 | [2026-11-15-prompt-TOOL-aTrimmedWait-10-promotion.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-10-promotion.md) | research | — |
 | [2026-11-15-prompt-TOOL-aTrimmedWait-10-revision.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-10-revision.md) | research | — |
 
@@ -182,7 +183,7 @@ names.
 
 | File and line at `078eb5c58` | Class, row | Today | Becomes |
 |---|---|---|---|
-| `.githooks/pre-commit@14e9c510dcd6:239` | `var-pipe`, 4 | `printf '%s\n' "$hy_out" \| grep -q '^HYGIENE check 9 FAILED'` | `[[ $'\n'$hy_out == *$'\n''HYGIENE check 9 FAILED'* ]]` |
+| `.githooks/pre-commit@14e9c510dcd6:239` | `var-pipe`, 4 | `printf '%s\n' "$hy_out" \| grep -q '^HYGIENE check <N> FAILED'` (N = 9) | `[[ $'\n'$hy_out == *$'\n''HYGIENE check <N> FAILED'* ]]` (N = 9) |
 | `.githooks/pre-commit.test.sh@6afa5a00ae82:325` | `cat-file`, none | `$(cat .hy-runs)` | `$(<.hy-runs)` |
 | `tools/memory-tree/check-memory-hygiene.sh@e3771865393b:3772` | `var-pipe`, 25 | `$(printf '%s\n' "$c12_sel" \| grep -c $'^P\t')` | `$_c12_p`, below |
 | `tools/roles/adopt-roles.test.sh@98423a10fd38:1053` and `:1079` | `pure-fn-subst`, none | `"$(check_cold23 && … && echo 1 \|\| echo 0)"` | `_w23=0; check_cold23 && … && _w23=1`, then `"$_w23"` |
@@ -285,8 +286,8 @@ clears a check 9 refusal. A check 9 refusal in the pass is cleared by
   after check 9 refused. `test_staged_write` holds 14 `run_write_staged(` calls today
   <!-- DERIVED from tools/memory-tree/gen_build_index.py@1eda60a27f2e by grep -c 'run_write_staged(' less its definition -->
   and gains no generator run: the off and refused arms take the two runs of the loop they replace,
-  and the no-kit arm calls `check_staged_write` in-process. The leg's worst reading stays 88 s
-  against its 140 s row in `tools/run-gates/selftest-budgets.txt`. <!-- PINNED 2026-11-15, selftest-budgets.txt:54 -->
+  and the no-kit arm calls `check_staged_write` in-process. The leg's worst reading stays 88 s against its 140 s row <!-- PINNED 2026-11-15 -->
+  in `tools/run-gates/selftest-budgets.txt`.
   The three converted counts each remove one fork per run.
 - error / empty / loading states — Four answers, four lines, §4 "The read". Each declines and
   exits 1, and the hook refuses as before.
@@ -328,8 +329,8 @@ commit. `<gbi>` is `tools/memory-tree/gen_build_index.py` in this worktree, run 
   reader coverage cannot see once this build lands.
 - **AC5** — When `python tools/policy/policy.py lists --check` runs, it exits 0 and prints no line
   naming `STAGED_RENDER`. At base it prints `RED · 2 finding(s)`, observed 2026-11-15.
-  `git grep -c STAGED_RENDER -- ':!memory/'` prints the one row
-  `tools/memory-tree/gen_build_index.py:1`, and that line, by `git grep -n`, lies inside
+  `git grep -c STAGED_RENDER -- ':!memory/'` prints one row, the path
+  `tools/memory-tree/gen_build_index.py` with the count 1 after its colon, and that line, by `git grep -n`, lies inside
   `test_staged_write`: the AC2 off arm's planted conf line of S3.
   Red when: a conf still assigns the key, or a doc, comment, code line or arm name still spells it,
   which adds a row or raises the count; or the planted line is gone, which drops the row.
@@ -343,7 +344,7 @@ commit. `<gbi>` is `tools/memory-tree/gen_build_index.py` in this worktree, run 
   it exits 0, and `grep -c '"memory.staged-render"' .governance/policy.json` prints 1.
   Red when: the mirror was not re-rendered, so its catalogue blob is the old one.
 - **AC8** — When `grep -n 'hy_out' .githooks/pre-commit` runs, no line it prints holds `| grep`, and
-  the line holding `HYGIENE check 9 FAILED` outside a comment opens `if [[`.
+  the line holding `HYGIENE check <N> FAILED` (N = 9) outside a comment opens `if [[`.
   `grep -c 'RUNS=$(cat .hy-runs)' .githooks/pre-commit.test.sh` prints 0.
   Red when: either site keeps its fork.
 - **AC9** — When `bash tools/memory-tree/check-memory-hygiene.sh --only 12 --build aTrimmedWait`
