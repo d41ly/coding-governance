@@ -85,7 +85,7 @@ ids TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasure
 | [TOOL-aMeasuredDrag-11 — the merge bar hands its own resolved python to its legs, so no leg re-probes the launcher](spec/2026-11-15-spec-TOOL-aMeasuredDrag-11.md) | 11 | 2 | INPROGRESS | rev-1 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 49 bound to this build, across 4 record folder(s).
+Records: 50 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
