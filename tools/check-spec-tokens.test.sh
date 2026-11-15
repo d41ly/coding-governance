@@ -100,7 +100,9 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # RAISED 260 -> 275 by TOOL-aPiecewiseGrade-1: its differential arm's 15 assertions, one per step of
 # eleven and the AC4, AC5, AC7 and AC6 checks after them, each top-level. Counted by reading; OWED:
 # observed at the close.
-FLOOR_ASSERTIONS=275
+# RAISED 275 -> 278 by TOOL-aPiecewiseGrade-4: its PG4 arm's 3 assertions after the PG1 arm, each
+# top-level. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=278
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -2399,20 +2401,22 @@ printf 'SPEC_DIRECT_CUTOFF="2026-09-03"\nSPEC_CARRIES_CUTOFF="2026-09-02"\nDESIG
   "$(git -C "$pd" rev-parse HEAD)" > "$pd/.memory-tree.conf"
 run_grade_checker() {   # $1 the output stem · rest: the environment the run adds
   local stem=$1; shift
-  (cd "$pd" && env -u SPEC_TOKENS_CACHE -u SPEC_TOKENS_INPUTS "$@" "$PY" "${PFX}check-spec-tokens.py") >"$po/$stem.out" 2>"$po/$stem.err"; echo $? > "$po/$stem.rc"
+  (cd "$pd" && env -u SPEC_TOKENS_CACHE -u SPEC_TOKENS_CACHE_NEXT -u SPEC_TOKENS_INPUTS "$@" "$PY" "${PFX}check-spec-tokens.py") >"$po/$stem.out" 2>"$po/$stem.err"; echo $? > "$po/$stem.rc"
 }
 check_grade_same() { cmp -s "$po/$1.out" "$po/$2.out" && cmp -s "$po/$1.err" "$po/$2.err" && cmp -s "$po/$1.rc" "$po/$2.rc"; }
 pg_gen=ok
 check_grade_step() {   # $1 step · $2 the commit message, or - for none · $3 the line the step must print
   [ "$2" = - ] || { git -C "$pd" add -A >/dev/null; git -C "$pd" commit -qm "$2" --no-verify; }
-  run_grade_checker plain; run_grade_checker inc SPEC_TOKENS_CACHE="$pc"
-  local moved=1 same=0 live nj ni line
+  local moved=1 same=0 live nj ni line dotnext=0 nx
+  nx=$(mktemp -d "$pc.XXXXXXXX")
+  run_grade_checker plain; run_grade_checker inc SPEC_TOKENS_CACHE="$pc" SPEC_TOKENS_CACHE_NEXT="$nx"
+  [ -e "$pc.next" ] && dotnext=1
   if [ -e "$po/prev.out" ] && cmp -s "$po/plain.out" "$po/prev.out" && cmp -s "$po/plain.err" "$po/prev.err"; then moved=0; fi
   check_grade_same plain inc && same=1
-  rm -rf "$pc"; mv "$pc.next" "$pc"
+  rm -rf "$pc"; mv "$nx" "$pc"
   live=$(grep -o '^spec-tokens: [0-9]* live spec' "$po/plain.out" | head -1 | grep -o '[0-9]*')
   nj=$(ls "$pc"/*.json 2>/dev/null | wc -l | tr -d ' '); ni=$(ls "$pc"/*.inputs 2>/dev/null | wc -l | tr -d ' ')
-  { [ ! -e "$pc.next" ] && [ -n "$live" ] && [ "$nj" = "$live" ] && [ "$ni" = "$live" ]; } || pg_gen="bad at $1"
+  { [ "$dotnext" = 0 ] && [ -n "$live" ] && [ "$nj" = "$live" ] && [ "$ni" = "$live" ]; } || pg_gen="bad at $1"
   line="step $1 moved $moved same $same rc $(tr -d '\r\n' < "$po/plain.rc")/$(tr -d '\r\n' < "$po/inc.rc") graded $(wc -l < "$pc/graded.list" | tr -d ' ')"
   cp "$po/plain.out" "$po/prev.out"; cp "$po/plain.err" "$po/prev.err"
   [[ $line == "$3"* ]]
@@ -2437,7 +2441,7 @@ check_input_arm "PG1 AC4 after one spec's edit the run re-grades that spec alone
 pg_ida=$("$PY" -c 'import hashlib, sys; print(hashlib.sha1(sys.argv[1].encode("utf-8")).hexdigest())' "$pg_a" | tr -d '\r')
 pg_ids=$("$PY" -c 'import hashlib, sys; print(hashlib.sha1(sys.argv[1].encode("utf-8")).hexdigest())' "$pg_s" | tr -d '\r')
 cp -r "$pc" "$base/pgcache/ctx"
-(cd "$pd" && SPEC_TOKENS_CACHE="$base/pgcache/ctx" "$PY" -c '
+(cd "$pd" && SPEC_TOKENS_CACHE="$base/pgcache/ctx" SPEC_TOKENS_CACHE_NEXT="$(mktemp -d "$pc.XXXXXXXX")" "$PY" -c '
 import importlib.util, io, contextlib, hashlib, json, os, subprocess, sys
 s = importlib.util.spec_from_file_location("cst", sys.argv[3])
 cst = importlib.util.module_from_spec(s); s.loader.exec_module(cst)
@@ -2461,26 +2465,51 @@ entry = json.load(open(sys.argv[2], encoding="utf-8"))
 entry["key"] = hashlib.sha1(f"{got[0]}\0{h.hexdigest()}".encode("utf-8")).hexdigest()
 json.dump(entry, open(sys.argv[2], "w", encoding="utf-8"))' "$pc/$pg_ida.inputs" "$pc/$pg_ida.json" "$pd/${PFX}check-spec-tokens.py") >/dev/null 2>&1
 printf '{not json' > "$pc/$pg_ids.json"
-run_grade_checker forge SPEC_TOKENS_CACHE="$pc"
-pg_list=$(tr -d '\r' < "$pc.next/graded.list")
+pg_nx=$(mktemp -d "$pc.XXXXXXXX")
+run_grade_checker forge SPEC_TOKENS_CACHE="$pc" SPEC_TOKENS_CACHE_NEXT="$pg_nx"
+pg_list=$(tr -d '\r' < "$pg_nx/graded.list")
 [[ $'\n'$pg_list$'\n' == *$'\n'$pg_a$'\n'* && $'\n'$pg_list$'\n' == *$'\n'$pg_s$'\n'* ]]
 check_input_arm "PG1 AC5 an entry whose .inputs holds a run line, and one whose .json does not parse, are misses" $?
-rm -rf "$pc"; mv "$pc.next" "$pc"
+rm -rf "$pc"; mv "$pg_nx" "$pc"
 # AC7: the SPEC_TOKENS_INPUTS record is the plain run's bytes, on a cold cache and on a warm one.
 rm -rf "$pc"
-run_grade_checker r1 SPEC_TOKENS_INPUTS="$po/r1.rec"; run_grade_checker r2 SPEC_TOKENS_INPUTS="$po/r2.rec" SPEC_TOKENS_CACHE="$pc"
-rm -rf "$pc"; mv "$pc.next" "$pc"
-run_grade_checker r3 SPEC_TOKENS_INPUTS="$po/r3.rec"; run_grade_checker r4 SPEC_TOKENS_INPUTS="$po/r4.rec" SPEC_TOKENS_CACHE="$pc"
-rm -rf "$pc"; mv "$pc.next" "$pc"
+pg_nx=$(mktemp -d "$pc.XXXXXXXX")
+run_grade_checker r1 SPEC_TOKENS_INPUTS="$po/r1.rec"; run_grade_checker r2 SPEC_TOKENS_INPUTS="$po/r2.rec" SPEC_TOKENS_CACHE="$pc" SPEC_TOKENS_CACHE_NEXT="$pg_nx"
+rm -rf "$pc"; mv "$pg_nx" "$pc"
+pg_nx=$(mktemp -d "$pc.XXXXXXXX")
+run_grade_checker r3 SPEC_TOKENS_INPUTS="$po/r3.rec"; run_grade_checker r4 SPEC_TOKENS_INPUTS="$po/r4.rec" SPEC_TOKENS_CACHE="$pc" SPEC_TOKENS_CACHE_NEXT="$pg_nx"
+rm -rf "$pc"; mv "$pg_nx" "$pc"
 [ -s "$po/r1.rec" ] && cmp -s "$po/r1.rec" "$po/r2.rec" && cmp -s "$po/r3.rec" "$po/r4.rec"
 check_input_arm "PG1 AC7 the input record of a cached run, cold and warm, is the plain run's bytes" $?
 # AC6: one more run leaves the directory it reads untouched, and every promotion above held one entry
 # pair per live spec with the next generation gone.
 pg_before=$(cd "$pc" && find . -type f -exec cksum {} + | sort)
-run_grade_checker untouched SPEC_TOKENS_CACHE="$pc"
+run_grade_checker untouched SPEC_TOKENS_CACHE="$pc" SPEC_TOKENS_CACHE_NEXT="$(mktemp -d "$pc.XXXXXXXX")"
 pg_after=$(cd "$pc" && find . -type f -exec cksum {} + | sort)
 [ -n "$pg_before" ] && [ "$pg_before" = "$pg_after" ] && [ "$pg_gen" = ok ]
 check_input_arm "PG1 AC6 the run never writes the directory it reads, and each generation holds the live specs (generation $pg_gen)" $?
+
+# TOOL-aPiecewiseGrade-4 AC1-AC3: the next generation lands in the directory SPEC_TOKENS_CACHE_NEXT
+# names, over the PG1 fixture's warm cache. The staged breaks, at the close: the old rmtree and makedirs
+# of the fixed next name, which reds the first two, and the mode run on SPEC_TOKENS_CACHE alone, which
+# reds the third.
+pg_nx=$(mktemp -d "$pc.XXXXXXXX")
+run_grade_checker named SPEC_TOKENS_CACHE="$pc" SPEC_TOKENS_CACHE_NEXT="$pg_nx"
+pg_nj=$(ls "$pg_nx"/*.json 2>/dev/null | wc -l | tr -d ' ')
+[ -f "$pg_nx/graded.list" ] && [ "$pg_nj" -gt 0 ] && [ "$pg_nj" = "$(ls "$pc"/*.json 2>/dev/null | wc -l | tr -d ' ')" ] && [ ! -e "$pc.next" ]
+check_input_arm "PG4 AC1 the generation lands in the named directory, every hit copied, and no .next name appears" $?
+run_grade_checker gone SPEC_TOKENS_CACHE="$pc" SPEC_TOKENS_CACHE_NEXT="$pc.gone"
+pg_nx=$(mktemp -d "$pc.XXXXXXXX"); printf 'keep\n' > "$pg_nx/keep.me"
+run_grade_checker planted SPEC_TOKENS_CACHE="$pc" SPEC_TOKENS_CACHE_NEXT="$pg_nx"
+[ ! -e "$pc.gone" ] && [ -f "$pg_nx/keep.me" ] && [ -f "$pg_nx/graded.list" ]
+check_input_arm "PG4 AC2 a named directory that does not exist is not created, and a file already in one survives the run" $?
+# The fixture's own status joins the snapshot: a mode run with no named directory writes into its cwd.
+pg_before=$(git -C "$pd" status --porcelain; ls -a "${pc%/*}"; cd "$pc" && find . -type f -exec cksum {} + | sort)
+run_grade_checker alone SPEC_TOKENS_CACHE="$pc"
+run_grade_checker selfnamed SPEC_TOKENS_CACHE="$pc" SPEC_TOKENS_CACHE_NEXT="$pc"
+pg_after=$(git -C "$pd" status --porcelain; ls -a "${pc%/*}"; cd "$pc" && find . -type f -exec cksum {} + | sort)
+[ -n "$pg_before" ] && [ "$pg_before" = "$pg_after" ]
+check_input_arm "PG4 AC3 SPEC_TOKENS_CACHE alone, and both variables naming one directory, leave the cache and its parent as they were" $?
 
 # TOOL-dGroundRules-32 S9, TOOL-dGroundRules-40: the build-order render's overlap rule is the
 # dispatcher's, and both are graded against the truth. Each OVERLAP_PAIRS row is two paths relative to

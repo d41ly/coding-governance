@@ -1,11 +1,12 @@
 # TOOL-aPiecewiseGrade-4 — the spec-token checker writes its next cache generation into a directory the caller names, so no caller renames a fixed-name temp
 
-**Status:** INPROGRESS · rev-2 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 3 · ratified 2026-11-15
+**Status:** CLOSED · rev-2 · 2026-11-16 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 3 · ratified 2026-11-15
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-15-build-TOOL-aPiecewiseGrade-4-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aPiecewiseGrade-4-1-acceptance-ledger.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aPiecewiseGrade-2-forks-brief.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-2-forks-brief.md) | research | TOOL-aPiecewiseGrade-2 |
 | [2026-11-15-prompt-TOOL-aPiecewiseGrade-4-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-4-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aPiecewiseGrade-4-forks-brief.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-4-forks-brief.md) | research | TOOL-aPiecewiseGrade-2 |

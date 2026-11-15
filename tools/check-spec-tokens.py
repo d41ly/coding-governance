@@ -284,10 +284,11 @@ A variable and not a flag, so a declared checker that does not know it ignores i
 the 40-hex digest and exits 0; a record that does not parse, or holds a subprocess the wrapper did
 not see, prints nothing and exits 1. The unattended driver keys its spec-token cache on it.
 
-  SPEC_TOKENS_CACHE=<dir> python <prefix>/check-spec-tokens.py    # reuse each live spec's grading
+  SPEC_TOKENS_CACHE=<dir> SPEC_TOKENS_CACHE_NEXT=<new> python <prefix>/check-spec-tokens.py    # reuse each live spec's grading
 
-SPEC_TOKENS_CACHE (TOOL-aPiecewiseGrade-1) set and not empty, with neither --spec nor --pass-spec,
-makes the whole-tree run look each live spec up in <dir>: a hit reuses that spec's raw findings and
+SPEC_TOKENS_CACHE (TOOL-aPiecewiseGrade-1) and SPEC_TOKENS_CACHE_NEXT (TOOL-aPiecewiseGrade-4) set
+and not empty and naming two directories, with neither --spec nor --pass-spec, makes the whole-tree
+run look each live spec up in <dir>: a hit reuses that spec's raw findings and
 counters, a miss grades it, and every join, the live sort, the waiver filter and the report run
 whole as the plain run runs them, so stdout and the exit status are the plain run's. An entry's key
 is the SHA-1 over the context digest -- the launcher, this checker's bytes and every memory-tree kit
@@ -295,10 +296,12 @@ module's, and the loop's context as sorted JSON: the leg names, guards, manifest
 and the four loop cutoffs -- and the replay of the spec's own inputs: each file its grading read and
 each tracked-set membership it asked. A segment that ran a subprocess or listed a directory writes
 no entry, and a key that does not replay is a miss. The run never writes <dir>: it writes the whole
-next generation, reused and fresh entries and `graded.list` naming the specs it re-graded, to
-<dir>.next. The checker cannot see a file move between its read and the key's replay, so the caller
-promotes <dir>.next only under its own bracket, by removing <dir> and renaming <dir>.next to it. The
-cache's two directories never enter the SPEC_TOKENS_INPUTS record. The bar's leg runs the plain
+next generation, reused and fresh entries and `graded.list` naming the specs it re-graded, into the
+directory SPEC_TOKENS_CACHE_NEXT names, which the caller made empty with an unpredictable name and
+which the run never creates or removes. The checker cannot see a file move between its read and the
+key's replay, so the caller promotes SPEC_TOKENS_CACHE_NEXT only under its own bracket, by passing
+it as a later run's SPEC_TOKENS_CACHE. With either variable empty, or the two naming one directory,
+the run is the plain run. The cache's two directories never enter the SPEC_TOKENS_INPUTS record. The bar's leg runs the plain
 check, so a forged entry can hide a finding from a cached run and never from the bar.
 """
 import atexit
@@ -365,16 +368,16 @@ def add_input_line(kind, **keys):
         INPUT_TRACE["segment"].add(line)
 
 
-def arm_input_trace(path, cache=""):
+def arm_input_trace(path, cache="", nxt=""):
     """Record this run's inputs: the checker's own file first, because the interpreter opened it
     before any hook could exist, then the audit hook and the `subprocess.run` wrapper, and the exit
     handler writing them to <path> only when <path> is set. The prefixes skipped are the
     interpreter's, which the launcher in the driver's key stands for, and the per-spec cache's
-    <cache> and <cache>.next, skipped for listings too, so the cache's own reads never move the
-    whole record (TOOL-aPiecewiseGrade-1 S5)."""
+    <cache> and the next generation's directory <nxt>, skipped for listings too, so the cache's own
+    reads never move the whole record (TOOL-aPiecewiseGrade-1 S5, TOOL-aPiecewiseGrade-4 S3)."""
     INPUT_TRACE["path"] = path
     INPUT_TRACE["cache"] = tuple(sorted({os.path.normcase(os.path.realpath(p)) + os.sep
-                                         for p in ((cache, cache + ".next") if cache else ())}))
+                                         for p in ((cache, nxt) if cache else ()) if p}))
     INPUT_TRACE["skip"] = tuple(sorted({os.path.normcase(os.path.realpath(p)) + os.sep
                                         for p in (sys.prefix, sys.base_prefix, sys.exec_prefix)}
                                        | set(INPUT_TRACE["cache"])))
@@ -499,7 +502,8 @@ def derive_input_digest(record, names=None):
 
 if os.environ.get("SPEC_TOKENS_INPUTS") or os.environ.get("SPEC_TOKENS_CACHE"):
     arm_input_trace(os.environ.get("SPEC_TOKENS_INPUTS", ""),
-                    os.environ.get("SPEC_TOKENS_CACHE", "").rstrip("/" + os.sep))
+                    os.environ.get("SPEC_TOKENS_CACHE", "").rstrip("/" + os.sep),
+                    os.environ.get("SPEC_TOKENS_CACHE_NEXT", "").rstrip("/" + os.sep))
 
 # The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test.
@@ -2034,13 +2038,14 @@ def derive_spec_context(ctx):
     return h.hexdigest()
 
 
-def read_spec_cache(cache, f, context, names):
+def read_spec_cache(cache, nxt, f, context, names):
     """The lookup of live spec `f` in `<cache>` (TOOL-aPiecewiseGrade-1 S3): its `(hits, near,
     counts)` when the entry parses, names `f`, and its key equals the SHA-1 of `context` and the
-    replay of its `.inputs`; the entry's two files are then copied into `<cache>.next`. Any other
-    answer, an OSError or a parse failure included, is None: a miss."""
+    replay of its `.inputs`; the entry's two files are then copied into the caller's next-generation
+    directory `<nxt>` (TOOL-aPiecewiseGrade-4 S2). Any other answer, an OSError or a parse failure
+    included, is None: a miss."""
     eid = hashlib.sha1(f.encode("utf-8")).hexdigest()
-    src, dst = pathlib.Path(cache), pathlib.Path(cache + ".next")
+    src, dst = pathlib.Path(cache), pathlib.Path(nxt)
     try:
         entry = json.loads((src / f"{eid}.json").read_bytes().decode("utf-8"))
         if entry["path"] != f:
@@ -2057,12 +2062,13 @@ def read_spec_cache(cache, f, context, names):
         return None
 
 
-def write_spec_cache(cache, f, segment, got, context, names):
+def write_spec_cache(nxt, f, segment, got, context, names):
     """One entry of the next generation (TOOL-aPiecewiseGrade-1 S3, S4): `f` is appended to
-    `<cache>.next/graded.list`, and, when `segment` holds only `read` and `member` lines, its
-    `.inputs` and then its `.json`, keyed on the replay of the `.inputs` just written, are written
-    beside it. A write that fails leaves that entry out and prints nothing."""
-    nxt = pathlib.Path(cache + ".next")
+    `<nxt>/graded.list`, `<nxt>` the directory the caller named (TOOL-aPiecewiseGrade-4 S2), and,
+    when `segment` holds only `read` and `member` lines, its `.inputs` and then its `.json`, keyed on
+    the replay of the `.inputs` just written, are written beside it. A write that fails leaves that
+    entry out and prints nothing."""
+    nxt = pathlib.Path(nxt)
     eid = hashlib.sha1(f.encode("utf-8")).hexdigest()
     try:
         with open(nxt / "graded.list", "a", encoding="utf-8", newline="\n") as fh:
@@ -2412,13 +2418,16 @@ def main(argv):
            "legline_cut": legline_cut, "direct_cut": direct_cut, "guards_cut": guards_cut,
            "ac_order_cut": ac_order_cut}
     # THE INCREMENTAL MODE (TOOL-aPiecewiseGrade-1 S2): off under --spec and --pass-spec, and it prints
-    # nothing. It reads <cache> and writes the whole next generation to <cache>.next only.
+    # nothing. It reads <cache> and writes the whole next generation only into <nxt>, the directory
+    # the caller made and named (TOOL-aPiecewiseGrade-4 S1, S2), which it never creates or removes.
+    # Two names for one directory would write the directory the run reads, so that pair is the plain run.
     cache = os.environ.get("SPEC_TOKENS_CACHE", "").rstrip("/" + os.sep) if named_specs is None else ""
+    nxt = os.environ.get("SPEC_TOKENS_CACHE_NEXT", "").rstrip("/" + os.sep)
+    if not nxt or (cache and os.path.normcase(os.path.realpath(cache)) == os.path.normcase(os.path.realpath(nxt))):
+        cache = ""
     if cache:
-        shutil.rmtree(cache + ".next", ignore_errors=True)
         try:
-            os.makedirs(cache + ".next")
-            open(os.path.join(cache + ".next", "graded.list"), "w", encoding="utf-8").close()
+            open(os.path.join(nxt, "graded.list"), "w", encoding="utf-8").close()
         except OSError:
             pass
         context = derive_spec_context(ctx)
@@ -2427,14 +2436,14 @@ def main(argv):
         probe_bare = None if bare is None else (probe["exts"], probe["names"])
     hits, near, seen_waived, totals = [], [], set(), collections.Counter()
     for f in specs:
-        got = read_spec_cache(cache, f, context, names) if cache else None
+        got = read_spec_cache(cache, nxt, f, context, names) if cache else None
         if got is None and cache:
             INPUT_TRACE["segment"] = set()
             try:
                 got = scan_live_spec(root, f, probe["files"], probe_bare, ctx)
             finally:
                 segment, INPUT_TRACE["segment"] = INPUT_TRACE["segment"], None
-            write_spec_cache(cache, f, segment, got, context, names)
+            write_spec_cache(nxt, f, segment, got, context, names)
         elif got is None:
             got = scan_live_spec(root, f, files, bare, ctx)
         hits += got[0]
