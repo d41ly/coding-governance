@@ -2,7 +2,7 @@
 
 # Evidence brief — performance review, base aebbb4a72 (2026-11-15, node a, Windows+MSYS)
 
-## Gate ledger aggregate (all worktree ledgers, 1972 rows, 49 bar runs). Columns: median_s max_s n leg
+## Gate ledger aggregate (all worktree ledgers, 1972 rows, 49 bar runs). Columns: median_s max_s n leg PINNED 2026-11-15
   2038.7   7932.6   17 unattended kit gate
    701.0   1041.7   24 memory hygiene
    676.4   3183.7   23 govkit acceptance matrix
@@ -20,7 +20,7 @@
     78.1    316.3    8 help page commands
     54.5    165.1    8 edges (every declared edge parses, is registered and resolves)
     51.3    145.6    9 positional (the citation check alone)
-    46.3     80.1   23 spec tokens (a spec's own names resolve)
+    46.3     80.1   23 spec tokens (a spec's own names resolve) PINNED 2026-11-15
     45.4     83.1   23 review-protocol parity (kit vs dogfood)
     45.2    497.2   25 hook destinations (every declared hook path ships)
     41.0     78.8   23 recall floor
@@ -32,10 +32,10 @@
     29.9     94.5    8 instruction render (one renderer of record)
     27.0    210.7   23 kit version markers
     25.8    213.0   25 testsuite counts (every bar self-test prints one)
-    24.2     44.6   13 step-gate
+    24.2     44.6   13 step-gate PINNED 2026-11-15
     23.8     36.1   11 writing practice (records and units)
     23.8     63.5   23 verifier fan-out
-    21.4     78.7   13 step-rows-frozen
+    21.4     78.7   13 step-rows-frozen PINNED 2026-11-15
     20.9    113.6   26 method carriers (every pointer declared)
     18.3     61.5   25 lexicon wiring
     16.7     22.6    8 python reads (a name never bound, an import outside its guard)
@@ -59,17 +59,17 @@
      6.8     22.2   23 unattended skill size
      6.6     27.2   23 charter size
      6.5     30.5   25 playbook render wiring
-     6.4     20.8   23 template size <=48KiB
+     6.4     20.8   23 template size <=48KiB PINNED 2026-11-15
      5.5     21.5   22 roles render wiring
      5.4     22.2   22 kit/dogfood doc parity
      5.3     13.3   26 encoding posture (text IO names its encoding)
 bar runs 49 median summed leg-seconds/run 2039 max 23427
 
-gate-legs.json: 175 legs; chunks selftests 75, declarations 57, product 22, wiring 13, records 5, e2e 3; declared ceilings sum 215924 s
-health.log last 24h: run-gates retry-passed x22 (legs retried after 420s timeout: tags, instruction edits); drift signal legs_retried_after_timeout=91/102
+gate-legs.json: 175 legs; chunks selftests 75, declarations 57, product 22, wiring 13, records 5, e2e 3; declared ceilings sum 215924 s PINNED 2026-11-15
+health.log last 24h: run-gates retry-passed x22 (legs retried after 420s timeout: tags, instruction edits); drift signal legs_retried_after_timeout=91/102 PINNED 2026-11-15
 
-## Commit mix since 2026-10-15 (gov, non-merge, 2745 commits)
-   1537 records
+## Commit mix since 2026-10-15 (gov, non-merge, 2745 commits) PINNED 2026-11-15
+   1537 records PINNED 2026-11-15
     504 spec
     264 build
     176 tool
@@ -78,7 +78,7 @@ health.log last 24h: run-gates retry-passed x22 (legs retried after 420s timeout
      16 tools
       6 mint
 lines changed: memory/ 1,263,948 vs tools/+skills/ 184,388 (about 7:1)
-Adopters since 2026-10-01: incms/main fix 326 records 277 docs 182 chore 171 spec 140 feat 135; nicocares/main records 386 build 233 fix 195 docs 153 spec 149 feat 117
+Adopters since 2026-10-01: incms/main fix 326 records 277 docs 182 chore 171 spec 140 feat 135; nicocares/main records 386 build 233 fix 195 docs 153 spec 149 feat 117 PINNED 2026-11-15
 
 ## Prior owner-side measurements (auto-memory, re-verify before trusting)
 ### slowdown-audit-2026-11-14
@@ -91,15 +91,15 @@ On 2026-11-14 I audited session c5f50d22: 458 h wall, 157 workflows and 469 agen
 - `--dispatch`: about 5.3 min per call, about 19 h in total.
 - Commits plus `gen_build_index --write`: about 17 h.
 - Divergences: 23 runs, about 8 h of builders.
-- stop-guard: 9.3 s on each of 1028 Stops.
+- stop-guard: 9.3 s on each of 1028 Stops. PINNED 2026-11-15
 
 **Still true on main 846d51d39:**
-- `gen_build_index.py --write` takes 68–106 s, rewrites all 3206 artifacts when none changed, and adds about 3 s to the next `git status`.
-- A one-line ledger commit's pre-commit hook takes about 230 s:
-  - `gen_build_index --check --staged` takes 67 s and does not skip.
-  - `--check-coverage --staged` takes 34 s to grade nothing.
-- `--dispatch` runs the whole-tree spec-token check (62 s). Its cache key includes HEAD, so every pass commit misses. The builder runs it itself, so a refusal costs a spawned builder.
-- `--liveness` takes 13 s, and the stop-guard runs it on every Stop.
+- `gen_build_index.py --write` takes 68–106 s, rewrites all 3206 artifacts when none changed, and adds about 3 s to the next `git status`. PINNED 2026-11-15
+- A one-line ledger commit's pre-commit hook takes about 230 s: PINNED 2026-11-15
+  - `gen_build_index --check --staged` takes 67 s and does not skip. PINNED 2026-11-15
+  - `--check-coverage --staged` takes 34 s to grade nothing. PINNED 2026-11-15
+- `--dispatch` runs the whole-tree spec-token check (62 s). Its cache key includes HEAD, so every pass commit misses. The builder runs it itself, so a refusal costs a spawned builder. PINNED 2026-11-15
+- `--liveness` takes 13 s, and the stop-guard runs it on every Stop. PINNED 2026-11-15
 
 **Already fixed since the session:**
 - aSwiftRefusal, aSmoothedDispatch and aBatchedPacket fixed the dispatch costs.
@@ -127,7 +127,7 @@ spawn count.
 |---|---|---|
 | before | 10,184 | 2.8 h, exit 0 — red on COST, green on CONTENT |
 | after | 591 | same tree, summary line byte-identical, all seven counters |
-| after, at a tip grading 108 units not 89 | 510 | ceiling is 5400 |
+| after, at a tip grading 108 units not 89 | 510 | ceiling is 5400 | PINNED 2026-11-15
 
 The fix was **one pass over history into a cache, not a bigger ceiling**. Its ceiling had already
 been re-declared 900 → 2400 → 5400 by successive sessions and it still redded; the population had
@@ -141,7 +141,7 @@ get your own push through is the "claiming the key IS the unblock" move the char
 ## Diagnosing a gate timeout, in order
 
 1. Count concurrent bars: `ps -ef | grep '[r]un-gates.sh'`. Contention inflated this leg 1.6x once
-   (597 s alone, 968 s under six sibling bars) and I twice drew a wrong conclusion from a contended
+   (597 s alone, 968 s under six sibling bars) and I twice drew a wrong conclusion from a contended PINNED 2026-11-15
    reading — see [[redirected-gate-output-looks-stalled]] and the open row `TOOL-aUnblockedFleet-8`.
 2. Re-run the single leg ALONE and time it.
 3. Read per-leg seconds from `<git-dir>/gate-ledger.tsv`, one row per leg.
@@ -174,12 +174,12 @@ before killing — another session's bar looks identical from the process list.
 ### slow-spawns-are-a-kernel-pool-leak
 
 On 2026-10-11 an unattended `--preflight` took 14-26 minutes. Profiling the code
-(`tools/check-wiring.sh --check` 787 s, `read_derived_phase` 306 s) was real but secondary: the
+(`tools/check-wiring.sh --check` 787 s, `read_derived_phase` 306 s) was real but secondary: the PINNED 2026-11-15
 host spawned EVERY process slowly with the CPU at 40%. `/usr/bin/true` cost 1120 ms, a bare
 `$(...)` fork 794 ms, and native `cmd /c exit` from PowerShell 706 ms, so MSYS was not the cause.
 `Get-Counter '\Memory\Pool Paged Bytes','\Memory\Pool Nonpaged Bytes'` read 18.2 GB paged and
 6.6 GB nonpaged after 6.5 days of uptime. The commit charge was 60.8 of 67.7 GB, free pages were
-48 MB, and processes' private memory summed to only about 25 GB.
+48 MB, and processes' private memory summed to only about 25 GB. PINNED 2026-11-15
 
 Still unrebooted on 2026-10-12: 20.2 GB paged + 6.2 GB nonpaged at 7.3 days, `/usr/bin/true` 408 ms.
 aPairedSlots's two-bar A/B ran entirely on that leak, so its "one slot" verdict wants a re-measure
@@ -218,10 +218,10 @@ Measured 2026-08-27, node `a`, uncontended, 16 cores, on `coding-governance` at 
 
 So check 23 is **94% of the pre-commit leg's wall clock** and the fix is 17.8x.
 
-**The defect.** `tools/memory-tree/check-memory-hygiene.sh:1114` opens `if [ -n "$alcut" ]; then` —
+**The defect.** `tools/memory-tree/check-memory-hygiene.sh@d9ce5710:1114` opens `if [ -n "$alcut" ]; then` —
 the cutoff only, never `$STAGED`. Its four structural siblings all guard on `[ "$STAGED" = 0 ]`
 (`:667`, `:1051`, `:1066`, `:1076`). It is the one delegating corpus-walker that never got the guard,
-so it walks all 317 specs and 307 records on every commit regardless of what is staged. The fix is
+so it walks all 317 specs and 307 records on every commit regardless of what is staged. The fix is PINNED 2026-11-15
 `if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then`. No coverage moves: `.githooks/pre-push:229` runs the
 full `run-gates.sh` at the push boundary, where the unguarded pass already lives.
 
@@ -241,23 +241,23 @@ they were told not to on 2026-08-27 and did anyway, invalidating one run.
 
 Static command-shape attribution from a `bash -x` trace put check 23 at only 69%; the A/B says 94%.
 Trust the A/B — summing recognised command shapes undercounts loop internals.
-### live-chain-packet-join-costs-170s-at-close
+### live-chain-packet-join-costs-170s-at-close PINNED 2026-11-15
 
-At dGroundRules' close (2026-10-25, node a) the `spec tokens` leg took 170s alone and timed out at its 180s ceiling twice in the bar (attributed CONTENDED, which the close reads as the run's own). At origin/main the same leg took 5s. The whole cost is the packet join's `packet.py --check <slug>`, and inside it `carries.py --report <slug>`, which spawns `git show` once per chain spec revision (4095 spawns, 143s). It only runs while the build's chain run is live, which is exactly its own close.
+At dGroundRules' close (2026-10-25, node a) the `spec tokens` leg took 170s alone and timed out at its 180s ceiling twice in the bar (attributed CONTENDED, which the close reads as the run's own). At origin/main the same leg took 5s. The whole cost is the packet join's `packet.py --check <slug>`, and inside it `carries.py --report <slug>`, which spawns `git show` once per chain spec revision (4095 spawns, 143s). It only runs while the build's chain run is live, which is exactly its own close. PINNED 2026-11-15
 
 **Why:** `carries.py` is a pinned packet instrument; only the owner moves a pin (`packet.py --repin`), so a run cannot batch it through `git cat-file --batch` itself. The run was handed off HELD owner-decision.
 
-**How to apply:** before a chain build's close, time `python tools/check-spec-tokens.py` alone; near 180s, raise it with the owner early instead of spending two hour-long closes. Also: the lander's `--prepare` kit mint touches watched files, so a re-stamp commit of the kickoff manifest on top of the prepared merge is owed (precedent `6d2ed123a`). Related: [[in-place-close-attest-before-prepare]], [[no-selftests-in-the-final-bar]].
+**How to apply:** before a chain build's close, time `python tools/check-spec-tokens.py` alone; near 180s, raise it with the owner early instead of spending two hour-long closes. Also: the lander's `--prepare` kit mint touches watched files, so a re-stamp commit of the kickoff manifest on top of the prepared merge is owed (precedent `6d2ed123a`). Related: [[in-place-close-attest-before-prepare]], [[no-selftests-in-the-final-bar]]. PINNED 2026-11-15
 
-**Recurred 2026-10-27, dWellOiledMachine (125 specs):** the ceiling had been raised to 390s (TOOL-dGroundRules-87, from a 195s reading), but spec tokens ran 512s alone and routed commits ran 358s alone against 300s. Both were green unbounded. The close redded both as CONTENDED, and a gates-green override needs all-INHERITED. The run was handed off HELD owner-decision at 0075cd1c4. The cost grows with chain size, so a fixed ceiling keeps losing. The real fix is carries.py batching under an owner repin.
+**Recurred 2026-10-27, dWellOiledMachine (125 specs):** the ceiling had been raised to 390s (TOOL-dGroundRules-87, from a 195s reading), but spec tokens ran 512s alone and routed commits ran 358s alone against 300s. Both were green unbounded. The close redded both as CONTENDED, and a gates-green override needs all-INHERITED. The run was handed off HELD owner-decision at 0075cd1c4. The cost grows with chain size, so a fixed ceiling keeps losing. The real fix is carries.py batching under an owner repin. PINNED 2026-11-15
 
-**Resolved 2026-10-28.** TOOL-dWellOiledMachine-127 raised spec tokens to 940 s and routed commits to 760 s, sized from main-loop solo readings: R1 465.2 s; R2a 378.7 s WHOLE; R2b 322.1 s RANGE plus WHOLE. It landed at 1c31d2602.
+**Resolved 2026-10-28.** TOOL-dWellOiledMachine-127 raised spec tokens to 940 s and routed commits to 760 s, sized from main-loop solo readings: R1 465.2 s; R2a 378.7 s WHOLE; R2b 322.1 s RANGE plus WHOLE. It landed at 1c31d2602. PINNED 2026-11-15
 - The scratch-guard hook refuses ANY agent a gate leg's argv, so the main loop must take the readings, and the spec must say so.
-- Even at 760 s, routed commits timed out once in the pre-push pool and passed on its serial retry.
+- Even at 760 s, routed commits timed out once in the pre-push pool and passed on its serial retry. PINNED 2026-11-15
 - dRankedPlan raised the same two ceilings in parallel (TOOL-dRankedPlan-82: 830 s; TOOL-dRankedPlan-83: 710 s). It reconciled onto dWellOiledMachine's higher values, taking main's side and re-stamping `last-audit` after the reconcile. It landed at ec469ed88. Before raising a ceiling, check other live chain branches for the same raise.
 
 ## Environment facts
-- 34 worktrees; 43 non-terminal builds in memory/LIVE.md; memory/ holds 12038 files (205 MB); tools/ 499 files
+- 34 worktrees; 43 non-terminal builds in memory/LIVE.md; memory/ holds 12038 files (205 MB); tools/ 499 files PINNED 2026-11-15
 - A git/process spawn under MSYS on node a: ~21 ms quiet, 0.6-0.8 s loaded
 - In-flight speed-up build aTrimmedWait on branch/speedups-9c2e63 (tip 057f26ba4); earlier ones: aSwiftRefusal, aSmoothedDispatch, aBatchedPacket, aLightenedLoop, aSparedSpawn, aFrugalTurnstile, aQueuedIndex, aLiftedCeiling
 - agent-cap hook rule 6: every Agent/Workflow call must be a rendered handoff or a harness listed in .claude/roles.json

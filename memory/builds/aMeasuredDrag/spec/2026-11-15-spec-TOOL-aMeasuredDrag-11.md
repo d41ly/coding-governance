@@ -264,7 +264,7 @@ none
 
 The seam is `tools/lib/resolve-python.sh#resolve_python`, edited in place: `reuse_lookup.py` ranks
 `resolve_python` a SEAM with 81 installs (PINNED at `aebbb4a72`), and the runner's `PYBIN` at
-`run-gates.sh:338` is the value it hands on. The copy re-sync follows TOOL-dSafePassage-23 S4, which
+`tools/run-gates/run-gates.sh@bfc3ad49:338` is the value it hands on. The copy re-sync follows TOOL-dSafePassage-23 S4, which
 changed the same block across the same population and bumped no kit version. The reuse probe was
 `python tools/codebase-map/reuse_lookup.py "hand the resolved python launcher to child legs so they skip the probe"`.
 Recall returned TOOL-dSafePassage-75, which keeps `GOV_PYTHON` through the step environment, and

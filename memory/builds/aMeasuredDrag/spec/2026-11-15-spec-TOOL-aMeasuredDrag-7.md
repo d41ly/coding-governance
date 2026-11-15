@@ -50,7 +50,7 @@ their caches. It also records the disk this costs and keeps the kit README's siz
 Read at `6d98c39ca`. Every file cited here has the same blob at the base `aebbb4a7`.
 
 - The key is `.memory-tree.conf@35c3d111603d:663`, under its comment block at `:655-662`. The block
-  says a cache measured about 113 MB per worktree at `6e7022f3f`, which is no longer true.
+  says a cache measured about 113 MB per worktree at `6e7022f3f`, which is no longer true. PINNED 2026-11-15
 - The budget reads through `tools/memory-tree/id_grammar.py@790b06816d0c:134-145` into
   `Conf.cache_budget_mb`. `Conf.digest` hashes the resolved values the budget is not part of
   (`:203-206`), so a new value invalidates no warm cache.
@@ -60,7 +60,7 @@ Read at `6d98c39ca`. Every file cited here has the same blob at the base `aebbb4
 - The one cache in this repo measured 402 MB, PINNED at `6d98c39ca` (`du -sm` over
   `<git-common-dir>/recall/cache`). Two caches are about 804 MB, PINNED at `6d98c39ca`, over the
   512 budget, so the second build evicts the first.
-- The corpus under `memory/` grew from 46 MB at `6e7022f3f` (2026-10-05) to 173 MB at `6d98c39ca`
+- The corpus under `memory/` grew from 46 MB at `6e7022f3f` (2026-10-05) to 173 MB at `6d98c39ca` PINNED 2026-11-15
   (`git ls-tree -r -l`, PINNED). The cache grew from 113 MB to 402 MB over those same shas, so it
   grows at about 7 MB a day, PINNED over `6e7022f3f..6d98c39ca`.
 - A rebuild took 32 s and 62 s, PINNED at `6d98c39ca` (the manifest's `built_s`, two builds that
@@ -78,7 +78,7 @@ Read at `6d98c39ca`. Every file cited here has the same blob at the base `aebbb4
 2. In the comment block at `:656-657`, the clause that gives the cache size measured at `6e7022f3f`
    is replaced by the facts below, wrapped at 100 columns. Each figure in the conf carries its sha on
    the same line, as every figure in this list does:
-   - a cache here measured 402 MB at `6d98c39ca` (2026-11-15), up from 113 MB at `6e7022f3f`;
+   - a cache here measured 402 MB at `6d98c39ca` (2026-11-15), up from 113 MB at `6e7022f3f`; PINNED 2026-11-15
    - the old value held one cache at `6d98c39ca`, so two worktrees evicted each other
      (TOOL-aMeasuredDrag-7);
    - the new value holds two caches until each passes half of it, which is about three months at
@@ -106,7 +106,7 @@ Read at `6d98c39ca`. Every file cited here has the same blob at the base `aebbb4
 
 `memory/guides/SESSION-KICKOFF.md` is a shared record. Every unit in this build that changes a
 watched file re-stamps it. So this unit's write set intersects theirs, and its pass runs in sequence
-with them, never beside them (BUILD-METHOD M6 clause 3). Two unlanded branches also move the same
+with them, never beside them (doc.build-method#m6-passes-commits-parallelism clause 3). Two unlanded branches also move the same
 stamp line. The manifest's stamp-conflict rule reconciles that line at their landing.
 
 ### Alternatives rejected
@@ -168,10 +168,10 @@ spelled absolute. Each figure below is for 2048, the value F1 resolved.
   Red when: the second run still rebuilds, so it prints a rebuild cause and costs about `built_s`.
   cost: one rebuild, about 32 s to 62 s, PINNED at `6d98c39ca`, because the conf is a recall source.
   figure: DERIVED at observation time.
-- **AC4** — At `6d98c39ca` `grep -n "measured about 113 MB\|~115 MiB" .memory-tree.conf tools/memory-recall/README.md`
+- **AC4** — At `6d98c39ca` `grep -n "measured about 113 MB\|~115 MiB" .memory-tree.conf tools/memory-recall/README.md` PINNED 2026-11-15
   prints the two stale clauses, `:656` and `:126`. After the change it prints nothing, so the new
   text must not say "measured about" before the old figure. When
-  `grep -n "402 MB" .memory-tree.conf` runs, it prints one comment line that also carries `6d98c39ca`. `git diff HEAD~1 -- .memory-tree.conf` shows changed lines only between
+  `grep -n "402 MB" .memory-tree.conf` runs, it prints one comment line that also carries `6d98c39ca`. `git diff HEAD~1 -- .memory-tree.conf` shows changed lines only between PINNED 2026-11-15
   the block's first line and the key.
   Red when: the stale figure survives in either file, or the edit reaches line 653 or 664.
 - **AC5** — When `git diff HEAD~1 HEAD -- memory/guides/SESSION-KICKOFF.md` runs on the unit's commit,

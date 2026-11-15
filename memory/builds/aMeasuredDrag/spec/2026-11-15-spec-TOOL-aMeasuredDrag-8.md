@@ -21,11 +21,11 @@ as F1 resolved. Which builds are graded does not change.
 
 ## 2. Scope (IN)
 
-- **S1** — `tools/unattended/check-brief-recorded.sh:368` tests
+- **S1** — `tools/unattended/check-brief-recorded.sh@626764ee:368` tests
   `[[ "$opened" < "$BRIEF_RECORDED_CUTOFF" ]]` in place of the `printf | sort -C` pipeline, and
   skips the same builds. The comment at `:366-367` says why the compare is a date order and why it
   is in the shell. Observed by AC1, AC2 and AC3.
-- **S2** — Under F1 (b), `tools/unattended/check-pass-order.sh:330` makes the same change against
+- **S2** — Under F1 (b), `tools/unattended/check-pass-order.sh@023376a0:330` makes the same change against
   `PASS_ORDER_CUTOFF`, with its comment at `:328-329` reworded the same way. Observed by AC1, AC2
   and AC3.
 
@@ -73,8 +73,8 @@ Read at `6d98c39ca`. Every file cited here has the same blob at the base `aebbb4
 - In that run the pipeline form took 13.2 s and 12.5 s for the 213 compares, PINNED at `6d98c39ca`.
   The shell form took 24 ms for each, and ten `/usr/bin/true` took 0.55 s to 0.62 s, PINNED at
   `6d98c39ca` too.
-- The live run's branch inserts 156 lines at `check-brief-recorded.sh:129` and at
-  `check-pass-order.sh:57`. Neither insert touches the lines this unit edits.
+- The live run's branch inserts 156 lines at `tools/unattended/check-brief-recorded.sh@626764ee:129` and at PINNED 2026-11-15
+  `tools/unattended/check-pass-order.sh@023376a0:57`. Neither insert touches the lines this unit edits.
 
 ### The change
 
@@ -168,15 +168,15 @@ added or moved.
 
 ## 7. Open questions
 
-- **F1 — Does the twin cutoff in `check-pass-order.sh:330` move with this one?**
+- **F1 — Does the twin cutoff in `tools/unattended/check-pass-order.sh@023376a0:330` move with this one?**
   RESOLVED (agent, 2026-11-15, delegated): (b) — both per-README loops lose the same measured cost
   and no verdict moves.
   The brief offers both choices: move the sibling cutoffs the `:366-367` comment names, or state why
   this one differs.
-  - (a) Only `check-brief-recorded.sh:368`. The comment at `:366-367` then says the other legs keep
+  - (a) Only `tools/unattended/check-brief-recorded.sh@626764ee:368`. The comment at `:366-367` then says the other legs keep
     `sort -C` because the review measured the per-README cost only here. S2 and AC2's and AC3's
     `check-pass-order.sh` halves drop.
-  - (b) This line and `check-pass-order.sh:330`. That line is the same per-README loop with the same
+  - (b) This line and `tools/unattended/check-pass-order.sh@023376a0:330`. That line is the same per-README loop with the same
     pipeline, at the same cost, PINNED at `6d98c39ca` by AC1's block. The concurrent branches leave
     it untouched. The cutoffs in the driver, `check-unattended.sh` and `lib-unattended.sh` stay
     (§3).
@@ -199,7 +199,7 @@ added or moved.
 
 The seam is the comparison line itself, edited in place. The repo's existing form for a date
 compared against a cutoff is the bash string compare at `tools/unattended/lib-unattended.sh#check_landed_facts_due`
-(`:1809`, `:1812`) and `tools/unattended/check-unattended.sh:2547`, and this unit adopts it. No
+(`:1809`, `:1812`) and `tools/unattended/check-unattended.sh@434b64be:2547`, and this unit adopts it. No
 existing seam fits a shared helper. `python tools/codebase-map/reuse_lookup.py "compare an ISO date against a cutoff in a shell leg"`
 ranked cutoff readers (`read_fold_cutoff`, `read_fork_cutoff`) and no comparer. Recall returned
 TOOL-aHoistedPass-7, which chose `sort -C` because the sibling cutoffs already used it. It also

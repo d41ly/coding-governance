@@ -148,7 +148,7 @@ bound stop, against a driver spawn. `gate-guard.js` loads `stop-guard.js` only i
   again, every case counts 1 call, and every sidecar line equals the base kit's once `utc` is
   dropped.
   Red when: the missing file throws out of `checkSession`, or S1 is asked with no terminal set and
-  LANDED TERMINAL 1 records `background-tasks`.
+  LANDED TERMINAL 1 records `background-tasks`. PINNED 2026-11-15
 - **AC4** — When `time bash tools/unattended/unattended.sh --liveness aMeasuredDrag` runs in this
   worktree, and `time` wraps the built and base kits' BUILDING LIVE 2 stop of AC1, each beside
   `time (for i in 1 2 3 4 5 6 7 8 9 10; do /usr/bin/true; done)` taken in the same shell, the

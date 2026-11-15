@@ -87,7 +87,7 @@ Not supplied, optional: `card:route`, `input:code`.
 
 > Build quick wins
 
-The run holds the owner's delegation for this build's forks (BUILD-METHOD M3). Each fork below was resolved by M3's rule against the build README's rule: "a unit whose spec finds it must move a verdict, refusal or printed line parks that change".
+The run holds the owner's delegation for this build's forks (doc.build-method#m3-forks-the-decision-rule-and-the-limit-of-your-authority). Each fork below was resolved by M3's rule against the build README's rule: "a unit whose spec finds it must move a verdict, refusal or printed line parks that change".
 
 ### brief:goal
 

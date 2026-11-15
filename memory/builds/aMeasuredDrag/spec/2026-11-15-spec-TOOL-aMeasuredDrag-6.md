@@ -17,7 +17,7 @@
 build for its specs, up to four times per build for its record kinds, and once per build with a
 per-kind test for its documents. This unit groups the tracked list by build slug once, and each build
 filters only its own paths. Every rendered artifact stays byte-identical. Finding records-8 of the
-2026-11-15 performance review, CONFIRMED at about 3 s of the renderer's wall time.
+2026-11-15 performance review, CONFIRMED at about 3 s of the renderer's wall time. PINNED 2026-11-15
 
 ## 2. Scope (IN)
 

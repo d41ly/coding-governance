@@ -16,7 +16,7 @@
 
 ## 1. Goal
 
-A full hygiene run's check 9 calls `gen_build_index.py --check --with-verdicts`, and that one process
+A full hygiene run's check 9 calls `gen_build_index.py --check --with-verdicts`, and that one process PINNED 2026-11-15
 derives the carries coverage twice: check 29's verb reads it, then `plan()` reads it again under
 `cmd_check`. This unit derives it once per `--check --with-verdicts` call. Every verdict, refusal and
 printed line stays as it is.
@@ -54,7 +54,7 @@ staged records commit keeps its three generator processes.
 - `check_staged_render`, the render trigger, and the verbs' own staged triggers.
 - `memory/HYGIENE.md` and `tools/memory-tree/HYGIENE.template.md`. No route of checks 29 and 30
   moves, so their text stays true. They are governance carriers, so nothing here edits them.
-- `tools/memory-tree/gen_build_index.py:1199-1212`, the per-build grouping, which is
+- `tools/memory-tree/gen_build_index.py@5a0864b8:1199-1212`, the per-build grouping, which is
   `TOOL-aMeasuredDrag-6`'s.
 - The kit version: the lander's mint moves it.
 - Any verdict, refusal or printed line. None moves.
@@ -270,9 +270,9 @@ New arm: tools/memory-tree/gen_build_index.py --selftest · covers AC2 · `main(
   under --staged, a printed line under the README's rule (M3 veto 1); the memo ships alone and the
   --staged --with-verdicts half is parked for the owner.
   A verb raising anything but a `Problem` prints today, standalone, a traceback with exit 1, which
-  check 29 files under "a chain build's spec is INPROGRESS while its build's coverage is red". In
+  check 29 files under "a chain build's spec is INPROGRESS while its build's coverage is red". In PINNED 2026-11-15
   check 9's process it prints `build-index: <type>: <message>` under exit 2 (`TOOL-dTrueNorth-31`
-  S12), which check 29 files under "the coverage could not be read". The check fails either way, and
+  S12), which check 29 files under "the coverage could not be read". The check fails either way, and PINNED 2026-11-15
   the hygiene exit does not move. (a) Accept: the in-process heading is the truthful one, the full
   run already prints it, and the brief's item 3 orders this route. (b) Park the flag half and ship
   the memo alone, which keeps the staged path's two extra processes. Recommendation: (a).

@@ -158,7 +158,7 @@ amend case of TOOL-aWindowedPass-6 among them) through its selftest shards. No a
   The brief orders the status test (`:14200-14208`) ahead of `check_pass_open` (`:14199`) and also
   orders that the stderr naming of keys a status skip releases is kept (`:14186`). Today only an
   OPEN key of a terminal or deferred unit is named, and deciding which keys are open is the walk
-  the reorder exists to skip. On the review's measured case, dOrderedCharter, the walk was 71 s
+  the reorder exists to skip. On the review's measured case, dOrderedCharter, the walk was 71 s PINNED 2026-11-15
   PINNED (skeptic verdict, 2026-11-15) over 89 closed keys of terminal units.
   - Option A — leave `read_open_passes` as it is, build S1 to S4 only, and park the reorder in
     this run's record with this question, for the owner. Every byte is unchanged, and the
@@ -172,7 +172,7 @@ amend case of TOOL-aWindowedPass-6 among them) through its selftest shards. No a
     of `check_pass_open` for a CLOSED unit's keys, and a rev-2 line.
   - Option C — status first, with terminal and deferred keys left out silently. The brief's own
     text refuses it.
-  - Recommendation: A. Under BUILD-METHOD M3, B fails the first veto, because it moves printed
+  - Recommendation: A. Under doc.build-method#m3-forks-the-decision-rule-and-the-limit-of-your-authority, B fails the first veto, because it moves printed
     lines against this build's non-goal and README rule "a unit whose spec finds it must move a
     verdict, refusal or printed line parks that change". A is the one survivor, and the park
     puts B in front of the owner with its price.
