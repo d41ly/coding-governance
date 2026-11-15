@@ -1,5 +1,5 @@
 {
-  "catalogue_blob": "9ce5a224c3e6ec3c462f228f1c2ed443eaf56515",
+  "catalogue_blob": "9d43738cca727d03cb43c81c40e059ef74c8cd50",
   "keys": {
     "actions.free": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
@@ -677,6 +677,11 @@
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
       "source": "default",
       "value": "structural-roles"
+    },
+    "memory.staged-render": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "off"
     },
     "memory.superseded-slices": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
