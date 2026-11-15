@@ -1,6 +1,6 @@
 # TOOL-aTwinnedPass-4 — a pass's branch, worktree and fork sha cross every handoff only in the runtime's own spelling
 
-**Status:** INPROGRESS · rev-1 · 2026-11-15 · node a · Tier-2 · base c40c39fb6 · streams tooling · order 3
+**Status:** CLOSED · rev-2 · 2026-11-15 · node a · Tier-2 · base c40c39fb6 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -183,7 +183,7 @@ expected answer for each on node a, 2026-11-15.
    `derive_holder_where`. A line that is not a directory means no worktree holds the branch: return 0.
 2. The primary tree is the first `worktree ` line of `GIT worktree list --porcelain`, the same
    output `derive_holder_where` reads, so both paths carry one spelling. The wanted path is
-   `<primary>/.claude/worktrees/agent-${PT_BRANCH#worktree-}`.
+   `<primary>/.claude/worktrees/${PT_BRANCH#worktree-}`.
 3. A holder that is not that string exactly is refused, and the function returns 1:
    `pass-tree: REFUSING - <branch> is checked out at <holder>, not at <wanted>, where the runtime cuts that pass's worktree, so that tree is not a pass's and is left as it is; nothing was written`
 4. Otherwise `PT_WHERE` is the holder.
@@ -440,6 +440,7 @@ JavaScript, so neither is in its population.
 
 - rev-1 · 2026-11-15 · initial draft, from the brief
   `2026-11-15-prompt-TOOL-aTwinnedPass-4-brief` and the closing review round 1's H1, H2, M1 and M3.
+- rev-2 · 2026-11-15 · §4 step 2 of `check_pass_holder`: the holder path is `<primary>/.claude/worktrees/${PT_BRANCH#worktree-}`, not `agent-${PT_BRANCH#worktree-}`, which doubled the `agent-` prefix; S5, AC5 and AC6 already said so, and the builder built to them (its report, merge `850143b3b`). Status CLOSED with the pass's code merged.
 
 ## 10. Reuse audit
 
