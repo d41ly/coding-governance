@@ -1,12 +1,13 @@
 # TOOL-aMeasuredDrag-12 — the closing review's six minor items: an absolute-only launcher memo, and the arms and floor that make units 4, 10 and 11 fail when undone
 
-**Status:** SPECCED · rev-1 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 12
+**Status:** INPROGRESS · rev-1 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-12-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-12-1-spec-writer.md) | journal | — |
+| [2026-11-15-prompt-TOOL-aMeasuredDrag-12-2-builder.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-12-2-builder.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-12-promotion-brief.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-12-promotion-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
