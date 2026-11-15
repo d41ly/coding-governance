@@ -16907,13 +16907,6 @@ memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-34.md	tools/
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-34.md	tools/memory-tree/kit.toml:8
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-34.md	tools/memory-tree/routed_commits.py:660-670
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-34.md	tools/memory-tree/tree_lib.py:28
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-4.md	map_extractors.py:193
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-4.md	tools/codebase-map/kit.toml:7
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-4.md	tools/codebase-map/map_extractors.py:193-215
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-4.md	tools/codebase-map/map_lib.py:1042
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-4.md	tools/codebase-map/map_lib.py:1042-1048
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-4.md	tools/codebase-map/map_lib.py:1404
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-4.md	tools/codebase-map/map_lib.py:1404-1432
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-46.md	run-gates.test.sh:244
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-46.md	run-gates.test.sh:580
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-46.md	tools/govkit/govkit.py:4400-4450
