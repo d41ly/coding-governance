@@ -463,7 +463,7 @@ Cite ids, never line numbers.
 | [TOOL-dDerivedDocket-45](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-16 | NO JOIN COUNTS THE MEMBERS AN S-ITEM OR A REFUSAL LIST ENUMERATES… |
 | [TOOL-dDerivedDocket-46](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-16 | NOTHING ON THE BAR WILL GRADE THE REMOTE-CI WORKFLOW FILE AFTER ITS… |
 | [TOOL-dDerivedDocket-47](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-20 | tools/run-gates/run-selftests.test.sh DECLARES A FLOOR NOTHING READS.… |
-| [TOOL-dDerivedDocket-55](../builds/dDerivedDocket/BACKLOG.md) | SPECCED | — | TOOL-aTwinnedPass-1 | 2026-09-21 | tools/workflows/unattended-unit.js CANNOT RUN TWO PASSES AT ONCE. It… |
+| [TOOL-dDerivedDocket-55](../builds/dDerivedDocket/BACKLOG.md) | INPROGRESS | — | TOOL-aTwinnedPass-1 | 2026-09-21 | tools/workflows/unattended-unit.js CANNOT RUN TWO PASSES AT ONCE. It… |
 | [TOOL-dDerivedDocket-56](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-21 | tools/workflows/unattended-build.js STILL STATES THE SUPERSEDED… |
 | [TOOL-dDerivedDocket-57](../builds/dDerivedDocket/BACKLOG.md) | SPECCED | — | TOOL-aTwinnedPass-2 | 2026-09-21 | NOTHING RUNS A WAVE. The driver's --dispatch already decides M6… |
 | [TOOL-dDerivedDocket-58](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-21 | A SPEC CANNOT PROVE ITS OWN DISJOINTNESS. The spec template's… |
