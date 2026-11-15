@@ -6708,6 +6708,11 @@
       "file": "tools/run-gates/pass_legs.py"
     },
     {
+      "id": "check_pass_holder",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.sh"
+    },
+    {
       "id": "check_pass_open",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -22966,6 +22971,11 @@
       "id": "render_pass_field",
       "kind": "function",
       "file": "tools/run-gates/pass_legs.py"
+    },
+    {
+      "id": "render_pass_returns",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.test.sh"
     },
     {
       "id": "render_patch",

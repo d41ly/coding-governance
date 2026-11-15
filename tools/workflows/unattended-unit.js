@@ -438,9 +438,13 @@ if (cfg.passBase !== undefined) log('unit ' + cfg.unitId + ': branch=' + ((r && 
 // TOOL-aTwinnedPass-1 - THE BRANCH AND WORKTREE AN AGENT RETURNED reach the return and `nextAction`
 // only through these shapes, as `sha` and `base` reach `nextAction` only through COMMIT_SHAPE. An
 // empty string is the shape check's refusal; the log line above keeps the raw values.
+// TOOL-aTwinnedPass-4 - the shapes are the runtime's own spelling, `worktree-agent-<id>` at
+// `<primary tree>/.claude/worktrees/agent-<id>`, and `pass-tree.sh` refuses the same branch shape at
+// the other end; TREE_SHAPE's lookahead is the template's `..` test, copied, as a workflow script is
+// evaluated alone.
 // owner of the absolute prefix: unattended-build.template.js `scratch`
-const TREE_SHAPE = /^(\/|[A-Za-z]:[\\/])[^\r\n`]*$/
-const BRANCH_SHAPE = /^[A-Za-z0-9][A-Za-z0-9._\/-]{0,254}$/
+const TREE_SHAPE = /^(?!.*(^|[\\/])\.\.([\\/]|$))(\/|[A-Za-z]:[\\/])([A-Za-z0-9._ -]+[\\/])*\.claude[\\/]worktrees[\\/]agent-[A-Za-z0-9]+$/
+const BRANCH_SHAPE = /^worktree-agent-[A-Za-z0-9]+$/
 const ownBranch = r && typeof r.branch === 'string' && BRANCH_SHAPE.test(r.branch) ? r.branch : ''
 const ownTree = r && typeof r.worktree === 'string' && TREE_SHAPE.test(r.worktree) ? r.worktree : ''
 
