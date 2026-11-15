@@ -1,6 +1,6 @@
 # TOOL-aMeasuredDrag-4 — the instruction-edits leg stops re-running the tags check the tags leg already runs
 
-**Status:** SPECCED · rev-1 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 4
+**Status:** INPROGRESS · rev-1 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 

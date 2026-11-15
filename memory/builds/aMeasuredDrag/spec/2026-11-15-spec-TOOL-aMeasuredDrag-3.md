@@ -1,6 +1,6 @@
 # TOOL-aMeasuredDrag-3 — carries coverage derived once per `--check --with-verdicts` call
 
-**Status:** SPECCED · rev-2 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 3
+**Status:** INPROGRESS · rev-2 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
