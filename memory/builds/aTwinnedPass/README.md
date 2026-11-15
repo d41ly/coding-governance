@@ -65,7 +65,7 @@ ids TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3
 | [TOOL-aTwinnedPass-2 — the pass-tree tool: cut a pass's worktree from the run's tip, and merge it back `--no-ff` with generated outputs re-rendered](spec/2026-11-15-spec-TOOL-aTwinnedPass-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 9 bound to this build, across 2 record folder(s).
+Records: 10 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
