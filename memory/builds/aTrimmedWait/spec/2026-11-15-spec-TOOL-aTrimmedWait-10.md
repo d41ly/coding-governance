@@ -1,13 +1,15 @@
 # TOOL-aTrimmedWait-10 — close-bar repair: the commit-render switch becomes the policy key `memory.staged-render`, and the fork sites the shell-hygiene leg names are converted
 
-**Status:** INPROGRESS · rev-1 · 2026-11-15 · node a · Tier-2 · base 846d51d3 · streams tooling · order 9
+**Status:** SPECCED · rev-2 · 2026-11-15 · node a · Tier-2 · base 846d51d3 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-15-prompt-TOOL-aTrimmedWait-10-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-10-1-spec-writer.md) | journal | — |
+| [2026-11-15-prompt-TOOL-aTrimmedWait-10-2-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-10-2-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTrimmedWait-10-promotion.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-10-promotion.md) | research | — |
+| [2026-11-15-prompt-TOOL-aTrimmedWait-10-revision.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-10-revision.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -30,7 +32,10 @@ their no-fork form.
   read" tabulates. Observed by AC1, AC2, AC3.
 - **S3** — `STAGED_RENDER` is retired: its line and comment leave `.memory-tree.conf` and
   `tools/memory-tree/.memory-tree.conf.example`, and every other spelling outside `memory/` is
-  rewritten to name the key. Observed by AC5.
+  rewritten to name the key, but one. The one kept spelling is the fixture line of
+  `test_staged_write` in `tools/memory-tree/gen_build_index.py` that plants `STAGED_RENDER="1"` in
+  the AC2 off arm's conf (§4 "The fixtures of `test_staged_write`"): the arm proves a stale conf line
+  no longer turns the render on, so it spells the line it plants. Observed by AC5.
   **Readers:**
   by name: `tools/memory-tree/gen_build_index.py` (`check_staged_write` and the arms of
   `test_staged_write`), `.githooks/pre-commit` (the comment above the hygiene branch),
@@ -153,16 +158,18 @@ Both fixtures, `t` and `d`, drop `STAGED_RENDER="1"` from their conf text and wr
 `.governance/policy.toml` as `[memory]` then `staged-render = "on"` before the `rendered` commit.
 `run_write_staged` adds `GOV_DEFAULT_BRANCH`, the tree's `git symbolic-ref --short HEAD`, and
 `GOV_REMOTE=""` to its environment, so the landed revision is the fixture's own branch on any
-machine; an `extra` entry overrides either. The unit-3 arms keep their names and verdicts. Two arms
-change their staged condition, and one is added:
+machine; an `extra` entry overrides either. The unit-3 arms keep their names and verdicts, but the
+two arms of the loop over `STAGED_RENDER` values, whose names spell the retired key. Those two
+change their staged condition and are renamed to name the key, and one arm is added:
 
 | Arm | Staged by | Wants |
 |---|---|---|
-| AC2 off (was the blank key) | a branch `policy-absent` whose tip deletes the policy file, read through `GOV_DEFAULT_BRANCH`, with `STAGED_RENDER="1"` in the conf | exit 1, `memory.staged-render reads off`, porcelain unchanged |
-| AC2 refused (was the value `yes`) | `GOV_DEFAULT_BRANCH=no-such-branch` | exit 1, `memory.staged-render did not read`, porcelain unchanged |
+| AC2 off (was the blank key), named `TOOL-aTrimmedWait-10 AC2 — memory.staged-render reads off at the landed revision, a stale conf line moves nothing, and no status changes` | a branch `policy-absent` whose tip deletes the policy file, read through `GOV_DEFAULT_BRANCH`, with `STAGED_RENDER="1"` in the conf | exit 1, `memory.staged-render reads off`, porcelain unchanged |
+| AC2 refused (was the value `yes`), named `TOOL-aTrimmedWait-10 AC3 — memory.staged-render at a missing branch does not read, and no status changes` | `GOV_DEFAULT_BRANCH=no-such-branch` | exit 1, `memory.staged-render did not read`, porcelain unchanged |
 | AC3 no kit | `check_staged_write(t, conf)` in-process, `read_policy_value` stubbed in module globals to raise LookupError, restored in a `finally` | `(False, <the no-kit line>)` |
 
-The no-kit arm stubs the reader, as `routed_commits.py`'s selftest stubs it
+The AC2 off arm's conf text is the fixture's conf plus the one line `STAGED_RENDER="1"`, written by
+one source line, the kept spelling of S3. The no-kit arm stubs the reader, as `routed_commits.py`'s selftest stubs it
 (`tools/memory-tree/routed_commits.py@5e29003bb174:946-966`). It proves the LookupError branch of
 `check_staged_write`, not `resolve_kit_dir`'s miss, which the kit's resolver tests own.
 
@@ -214,6 +221,11 @@ trailing-newline strip that `$( )` performs and `printf -v` does not changes no 
    guard admits a mirror equal to its render at HEAD (`tools/policy/guard.py@a5d4f9583a5a:9-11`).
 3. The owner commits `.governance/policy.toml` from a terminal, then step 2 runs again.
 
+Once `check_staged_write` reads the key, `--write-staged` declines in this repository until the
+owner's line of S8 reaches `origin/main`, as "What it does not check" states, so the hook no longer
+clears a check 9 refusal. A check 9 refusal in the pass is cleared by
+`python tools/memory-tree/gen_build_index.py --write` and staging the rendered files by hand.
+
 ### Inventory
 
 | Minted | Kind | Graded by |
@@ -241,6 +253,11 @@ trailing-newline strip that `$( )` performs and `printf -v` does not changes no 
 - `.githooks/pre-commit.test.sh`
 - `tools/roles/adopt-roles.test.sh`
 - `tools/workflows/unattended-build.test.sh`
+- `memory/guides/SESSION-KICKOFF.md`, whose `last-audit` the builder's commit re-stamps: it stages
+  `tools/memory-tree/check-memory-hygiene.sh` and `.memory-tree.conf`, both on the manifest's
+  `watch:` line (`memory/guides/SESSION-KICKOFF.md@1e3ccd1af015:7`), and C5 of
+  `skills/session-kickoff/manifest-check.sh@4d3d63c0fad1:1835-1844` reds a watch-touching commit
+  that no `last-audit` stamp follows
 
 ### Alternatives rejected
 
@@ -264,10 +281,11 @@ trailing-newline strip that `$( )` performs and `printf -v` does not changes no 
   owner-only file read at the landed revision, so an agent's branch cannot turn the hook's staging
   on. Every answer but `on` declines, the absent kit included.
 - perf / scale — One `policy.py get` per `--write-staged` run, 0.44 s (PINNED 2026-11-15, §4), only
-  after check 9 refused. `test_staged_write` makes 14 generator runs today
+  after check 9 refused. `test_staged_write` holds 14 `run_write_staged(` calls today
   <!-- DERIVED from tools/memory-tree/gen_build_index.py@1eda60a27f2e by grep -c 'run_write_staged(' less its definition -->
-  and gains one, about 6 s on a leg whose worst reading is 88 s against its 140 s row in
-  `tools/run-gates/selftest-budgets.txt`. <!-- PINNED 2026-11-15, selftest-budgets.txt:54 -->
+  and gains no generator run: the off and refused arms take the two runs of the loop they replace,
+  and the no-kit arm calls `check_staged_write` in-process. The leg's worst reading stays 88 s
+  against its 140 s row in `tools/run-gates/selftest-budgets.txt`. <!-- PINNED 2026-11-15, selftest-budgets.txt:54 -->
   The three converted counts each remove one fork per run.
 - error / empty / loading states — Four answers, four lines, §4 "The read". Each declines and
   exits 1, and the hook refuses as before.
@@ -309,8 +327,11 @@ commit. `<gbi>` is `tools/memory-tree/gen_build_index.py` in this worktree, run 
   reader coverage cannot see once this build lands.
 - **AC5** — When `python tools/policy/policy.py lists --check` runs, it exits 0 and prints no line
   naming `STAGED_RENDER`. At base it prints `RED · 2 finding(s)`, observed 2026-11-15.
-  `git grep -n STAGED_RENDER -- ':!memory/'` prints nothing.
-  Red when: a conf still assigns the key, or a doc or comment still spells it.
+  `git grep -c STAGED_RENDER -- ':!memory/'` prints the one row
+  `tools/memory-tree/gen_build_index.py:1`, and that line, by `git grep -n`, lies inside
+  `test_staged_write`: the AC2 off arm's planted conf line of S3.
+  Red when: a conf still assigns the key, or a doc, comment, code line or arm name still spells it,
+  which adds a row or raises the count; or the planted line is gone, which drops the row.
 - **AC6** — When `grep -c '<!-- usage: policy:memory.staged-render ' help/commit-render.md` runs, it
   prints 1. `grep -c 'memory.staged-render' help/README.md help/policy.md tools/memory-tree/README.md`
   prints at least 1 for each file. `grep -A1 '^## .memory.staged-render.$' help/reference/policy.md`
@@ -348,10 +369,10 @@ commit. `<gbi>` is `tools/memory-tree/gen_build_index.py` in this worktree, run 
 
 ## 7. Gates
 
-`policy check` · `shell hygiene (a fork spent on builtin work)` · `shell hygiene (a loop fed by a command substitution)` · `build-index selftest` · `memory hygiene` · `memory-hygiene self-test` · `branch-guard self-test` · `roles adopter self-test` · `unattended-build self-test` · `docs` · `help reference pages` · `help page commands` · `lexicon naming predicates` · `policy fixtures` · `scratch-guard self-test` · `routed-commits selftest` · `tier2-review self-test` · `verifier fan-out self-test` · `review-join self-test` · `kit/dogfood doc parity` · `recall floor` · `transition-audit arms` · `straggler-guard arms`
+`policy check` · `shell hygiene (a fork spent on builtin work)` · `shell hygiene (a loop fed by a command substitution)` · `build-index selftest` · `memory hygiene` · `memory-hygiene self-test` · `branch-guard self-test` · `roles adopter self-test` · `unattended-build self-test` · `docs` · `help reference pages` · `help page commands` · `lexicon naming predicates` · `policy fixtures` · `scratch-guard self-test` · `routed-commits selftest` · `tier2-review self-test` · `verifier fan-out self-test` · `review-join self-test` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `transition-audit arms` · `straggler-guard arms`
 
 The first two are the legs this unit turns green, and the third is the leg §4 rejects a loop for.
-The suites re-observe each converted line, and `docs` and the two help legs grade S5. The last nine
+The suites re-observe each converted line, and `docs` and the two help legs grade S5. The last ten
 are owed by a guard a path of the estimate trips. The main loop runs the merge bar once, at the
 close. No leg is added.
 
@@ -364,6 +385,12 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-15 · initial draft.
+- rev-2 · 2026-11-15 · the builder's DIVERGENCE before any edit and the owner's ruling to keep the
+  stale-conf arm (2026-11-15-prompt-TOOL-aTrimmedWait-10-revision): S3 keeps one fixture spelling of
+  the retired key and AC5 counts it; the loop's two AC2 arms are renamed to name the key; §5 keeps
+  the generator-run count; "Files touched" adds the manifest's `last-audit` re-stamp; "Rollout"
+  states how a check 9 refusal is cleared before S8 lands; §7 adds `recall floor arms`, the leg
+  the manifest path's guard owes.
 
 ## 10. Reuse audit
 
