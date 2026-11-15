@@ -2,7 +2,7 @@
 
 # gov-spec-writer handoff — TOOL-aTwinnedPass-11
 
-<!-- gov:handoff role=gov-spec-writer build=aTwinnedPass unit=TOOL-aTwinnedPass-11 path=memory/builds/aTwinnedPass/prompts/2026-11-15-prompt-TOOL-aTwinnedPass-11-1-spec-writer.md role-sha=a3bc1199e30f task-sha=07db94c9b4cb -->
+<!-- gov:handoff role=gov-spec-writer build=aTwinnedPass unit=TOOL-aTwinnedPass-11 path=memory/builds/aTwinnedPass/prompts/2026-11-15-prompt-TOOL-aTwinnedPass-11-1-spec-writer.md role-sha=a3bc1199e30f task-sha=7eea42ebf583 -->
 
 ## Role
 
@@ -83,10 +83,11 @@ refusing, not a hit: name it in your return.
 ## Card
 
 [.claude/orientation-card.md · Level 1 · the build's card: where this session stands; level 0 outranks it]
-- build: aBenchedTwin
-- unit: TOOL-aBenchedTwin-1 · spec memory/builds/aBenchedTwin/spec/2026-11-15-spec-TOOL-aBenchedTwin-1.md
-- unit: TOOL-aBenchedTwin-2 · spec memory/builds/aBenchedTwin/spec/2026-11-15-spec-TOOL-aBenchedTwin-2.md
-- brief: memory/builds/aBenchedTwin/prompts/2026-11-15-prompt-TOOL-aBenchedTwin-1-brief.md
+- build: aTwinnedPass
+- unit: TOOL-aTwinnedPass-4 · spec memory/builds/aTwinnedPass/spec/2026-11-15-spec-TOOL-aTwinnedPass-4.md
+- unit: TOOL-aTwinnedPass-5 · spec memory/builds/aTwinnedPass/spec/2026-11-15-spec-TOOL-aTwinnedPass-5.md
+- brief: memory/builds/aTwinnedPass/prompts/2026-11-15-prompt-TOOL-aTwinnedPass-11-brief.md
+UNVERIFIED — TOOL-aTwinnedPass-11
 [/.claude/orientation-card.md]
 [memory/builds/aTwinnedPass/prompts/2026-11-15-prompt-TOOL-aTwinnedPass-11-1-spec-writer.md · Level 6 · The task: this unit's goal, scope and acceptance; yields to levels 0 to 5]
 This handoff is for build `aTwinnedPass`, unit `TOOL-aTwinnedPass-11`.
@@ -140,8 +141,9 @@ lib-unattended.sh resolve_generated_indexes, check_gen_region_only, covers; unat
 
 ### card:route
 
-- build: aBenchedTwin
-- unit: TOOL-aBenchedTwin-1 · spec memory/builds/aBenchedTwin/spec/2026-11-15-spec-TOOL-aBenchedTwin-1.md
-- unit: TOOL-aBenchedTwin-2 · spec memory/builds/aBenchedTwin/spec/2026-11-15-spec-TOOL-aBenchedTwin-2.md
-- brief: memory/builds/aBenchedTwin/prompts/2026-11-15-prompt-TOOL-aBenchedTwin-1-brief.md
+- build: aTwinnedPass
+- unit: TOOL-aTwinnedPass-4 · spec memory/builds/aTwinnedPass/spec/2026-11-15-spec-TOOL-aTwinnedPass-4.md
+- unit: TOOL-aTwinnedPass-5 · spec memory/builds/aTwinnedPass/spec/2026-11-15-spec-TOOL-aTwinnedPass-5.md
+- brief: memory/builds/aTwinnedPass/prompts/2026-11-15-prompt-TOOL-aTwinnedPass-11-brief.md
+UNVERIFIED — TOOL-aTwinnedPass-11
 [/memory/builds/aTwinnedPass/prompts/2026-11-15-prompt-TOOL-aTwinnedPass-11-1-spec-writer.md]
