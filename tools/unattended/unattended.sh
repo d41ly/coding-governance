@@ -14578,17 +14578,24 @@ read_tree_state() { # launcher -> the fingerprint line and HEAD, or nothing and 
 # above carried onto them at the reconcile (TOOL-aLightenedLoop-8). The start half,
 # `init_spec_token_check`, looks the key up over the record, reads the tree state and starts the
 # checker with the record armed, all before the open-pass reader, so the two run side by side; it
-# prints nothing and refuses nothing, and records what it decided in the seven ST_ globals. This read
+# prints nothing and refuses nothing, and records what it decided in the nine ST_ globals. This read
 # half prints every line and makes every refusal where the call always sat, from those globals, then
 # derives the key over the new record and closes the bracket; it empties the globals so a later call
 # in the same shell never reads them. The bracket so spans the window between the halves, and a write
 # there costs a not-recorded line, never a wrong key. A checker discarded by a refusal in the window
 # leaves its record behind, which the next lookup reads safely because the key folds the record's
 # bytes. A direct call with no start before it runs the two back to back, as `run_bounded` does.
-ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""
+#
+# THE PER-SPEC CACHE (TOOL-aPiecewiseGrade-2), one per slug beside its key: each generation is a
+# `mktemp -d` directory `spec-tokens.<slug>.specs.XXXXXXXX`, and the name file `spec-tokens.<slug>.live`
+# holds the live one's base name. The start half reads that name ONCE, behind an anchored shape check
+# before any `rm -rf` sees it, sweeps every other generation of the slug, and hands the checker the
+# live one as SPEC_TOKENS_CACHE and a fresh one as SPEC_TOKENS_CACHE_NEXT. The read half names the
+# fresh one live, and removes the old, only where the whole key is recorded. Nothing is renamed.
+ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""; ST_NEXT=""; ST_CACHE=""
 init_spec_token_check() { # slug -> the decision in ST_STATE, and under `run` the checker started; prints nothing
-  local _stdir="" _stwas=""
-  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""
+  local _stdir="" _stwas="" _stlive="" _stold=""
+  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""; ST_NEXT=""; ST_CACHE=""
   if [ -z "${SPEC_TOKENS_CLI:-}" ]; then ST_STATE=blank; return 0; fi
   [ -f "$ROOT/$SPEC_TOKENS_CLI" ] || { ST_STATE=missing; return 0; }
   # SILENCED HERE, re-run for its print at the read. Printing the resolver's diagnosis now would put
@@ -14603,24 +14610,33 @@ init_spec_token_check() { # slug -> the decision in ST_STATE, and under `run` th
   fi
   ST_TREE=$(read_tree_state "$ST_PY") || ST_TREE=""
   ST_STATE=run
-  if [ -n "$ST_IN" ]; then rm -f "$ST_IN" 2>/dev/null; mkdir -p "$_stdir" 2>/dev/null; fi
+  if [ -n "$ST_IN" ]; then
+    rm -f "$ST_IN" 2>/dev/null; mkdir -p "$_stdir" 2>/dev/null
+    { read -r _stlive <"${ST_REC%.key}.live"; } 2>/dev/null || :
+    [[ $_stlive =~ ^"spec-tokens.$1.specs."[A-Za-z0-9]{8}$ ]] || _stlive=""
+    for _stold in "$_stdir/spec-tokens.$1.specs."*; do
+      [ "$_stold" = "$_stdir/$_stlive" ] || [ ! -d "$_stold" ] || rm -rf "$_stold" 2>/dev/null
+    done
+    ST_NEXT=$(mktemp -d "$_stdir/spec-tokens.$1.specs.XXXXXXXX" 2>/dev/null) || ST_NEXT=""
+    [ -z "$ST_NEXT" ] || ST_CACHE="$_stdir/${_stlive:-spec-tokens.$1.specs.none}"
+  fi
   # A start that cannot make its capture leaves ST_HANDLE empty, and the read half then runs the
   # synchronous form, which prints that sentence where it always did.
-  SPEC_TOKENS_INPUTS=$ST_IN init_bounded "$ST_PY" "$SPEC_TOKENS_CLI" && ST_HANDLE=$RB_HANDLE
+  SPEC_TOKENS_INPUTS=$ST_IN SPEC_TOKENS_CACHE=$ST_CACHE SPEC_TOKENS_CACHE_NEXT=$ST_NEXT init_bounded "$ST_PY" "$SPEC_TOKENS_CLI" && ST_HANDLE=$RB_HANDLE
   return 0
 }
 # NO CHECKER OUTLIVES THE VERB UNREAD. A refusal between the start and the read waits for the started
 # checker and discards its answer -- never a kill, for the reason `read_preflight_probes` gives.
 remove_spec_token_check() { # -> a started checker waited for and its answer discarded; prints nothing
   [ -z "${ST_HANDLE:-}" ] || read_bounded "$ST_HANDLE" || :
-  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""
+  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""; ST_NEXT=""; ST_CACHE=""
   return 0
 }
 run_spec_token_check() { # slug -> 0 admitted or skipped, 1 refused under check 49
-  local slug="$1" _stst _stpy _stkey _strec _stin _stat _sth _strc _stq _stnow="" _stwhy=""
+  local slug="$1" _stst _stpy _stkey _strec _stin _stat _sth _stnext _stcache _strc _stq _stnow="" _stwhy=""
   [ -n "${ST_STATE:-}" ] || init_spec_token_check "$slug"
-  _stst=$ST_STATE; _stpy=$ST_PY; _stkey=$ST_KEY; _strec=$ST_REC; _stin=$ST_IN; _stat=$ST_TREE; _sth=$ST_HANDLE
-  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""
+  _stst=$ST_STATE; _stpy=$ST_PY; _stkey=$ST_KEY; _strec=$ST_REC; _stin=$ST_IN; _stat=$ST_TREE; _sth=$ST_HANDLE; _stnext=$ST_NEXT; _stcache=$ST_CACHE
+  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""; ST_NEXT=""; ST_CACHE=""
   if [ "$_stst" = blank ]; then
     echo "unattended: dispatch — SPEC_TOKENS_CLI is blank or undeclared, so no spec-token check ran over the live tree before this dispatch: an announced skip, not a pass"
     return 0
@@ -14638,7 +14654,7 @@ run_spec_token_check() { # slug -> 0 admitted or skipped, 1 refused under check 
   if [ -n "$_sth" ]; then
     read_bounded "$_sth"; _strc=$?
   else
-    SPEC_TOKENS_INPUTS=$_stin run_bounded "$_stpy" "$SPEC_TOKENS_CLI"; _strc=$?
+    SPEC_TOKENS_INPUTS=$_stin SPEC_TOKENS_CACHE=$_stcache SPEC_TOKENS_CACHE_NEXT=$_stnext run_bounded "$_stpy" "$SPEC_TOKENS_CLI"; _strc=$?
   fi
   if ! _stq=$(check_spec_token_hits "$slug" "$_strc" "$RB_OUT"); then
     fail 49 "--dispatch refuses: the declared spec-token checker reds over the live tree, so a live spec names a bar, a suite or a token that does not resolve and the unit would build against it ($SPEC_TOKENS_CLI exited $_strc in ${RB_TOOK}s): ${_stq//$'\n'/ }"
@@ -14665,6 +14681,11 @@ run_spec_token_check() { # slug -> 0 admitted or skipped, 1 refused under check 
     _stwhy="the input record cannot be replayed"
   else
     { printf '%s\n' "$_stkey" >"$_strec"; } 2>/dev/null || :
+    # The generation goes live here and only here, under the bracket the key is recorded under; the
+    # old one is removed only once the name is written (TOOL-aPiecewiseGrade-2 S2).
+    if [ -n "$_stnext" ] && [ -d "$_stnext" ]; then
+      { printf '%s\n' "${_stnext##*/}" >"${_strec%.key}.live" && rm -rf "$_stcache"; } 2>/dev/null || :
+    fi
     return 0
   fi
   echo "unattended: dispatch — spec-token cache not recorded: $_stwhy, so the next dispatch runs the checker"

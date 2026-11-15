@@ -7913,6 +7913,56 @@ if [ -f "$STC" ]; then
   o=$( ( load_driver_conf && SPEC_TOKENS_CLI="${PFX}stub-popen.py" run_spec_token_check tRun ) 2>&1 )
   hit "$o" "spec-token cache not recorded: the input record cannot be replayed, so the next dispatch runs the checker"
   same "a record that cannot be replayed records no spec-token key" "$([ -f .git/unattended/spec-tokens.tRun.key ] && echo written || echo none)" none
+  # ---- TOOL-aPiecewiseGrade-2 AC1 AC2 AC3 AC8 - THE PER-SPEC CACHE'S LIVE GENERATION IS NAMED IN A
+  # ---- FILE, and only where the whole key is recorded. The name file `spec-tokens.tRun.live` holds the
+  # ---- live `mktemp -d` generation's base name; a moved tree and a refusal leave it and that generation
+  # ---- byte-unmoved, the start's sweep leaves one unnamed generation at most, and a planted name of the
+  # ---- wrong shape never reaches `rm -rf`. RED-first, staged at the close: naming on every branch reds
+  # ---- the moved and refused `kept`; dropping the shape check removes the planted directory; a sweep
+  # ---- that does not spare the live generation reds the refused `kept`.
+  pg_d=.git/unattended; pg_n=.git/unattended/spec-tokens.tRun.live
+  rm -f .git/unattended/spec-tokens.tRun.key
+  ( load_driver_conf && run_spec_token_check tRun ) >/dev/null 2>&1
+  pg_live=""; read -r pg_live <"$pg_n"
+  same "an admitted dispatch names a well-formed spec-token generation" "$([[ $pg_live =~ ^spec-tokens\.tRun\.specs\.[A-Za-z0-9]{8}$ ]] && [ -d "$pg_d/$pg_live" ] && echo named || echo unnamed)" named
+  pg_g=("$pg_d"/spec-tokens.tRun.specs.*)
+  same "an admitted dispatch leaves one spec-token generation" "${#pg_g[@]}" 1
+  # AC2: a one-spec commit re-grades that spec alone, names a new generation and removes the old one.
+  printf '%s\n\nProse moved.\n' "$sd_clean" > "$sd_spec"
+  git commit -q --only "$sd_spec" -m "pg2 onespec" --no-verify
+  pg_was=$pg_live
+  ( load_driver_conf && run_spec_token_check tRun ) >/dev/null 2>&1
+  pg_live=""; read -r pg_live <"$pg_n"
+  mapfile -t pg_l <"$pg_d/$pg_live/graded.list"
+  same "a one-spec commit re-grades that spec alone" "${#pg_l[@]} ${pg_l[0]-}" "1 $sd_spec"
+  same "a one-spec commit names a new spec-token generation" "$([ "$pg_live" != "$pg_was" ] && [ -d "$pg_d/$pg_live" ] && echo moved || echo kept)" moved
+  pg_g=("$pg_d"/spec-tokens.tRun.specs.*)
+  same "a one-spec commit leaves one spec-token generation" "${#pg_g[@]}" 1
+  git reset -q --soft HEAD~1
+  printf '%s\n' "$sd_clean" > "$sd_spec"; git add "$sd_spec"
+  # AC3: a moved tree and a refusal record no key, so neither names its generation.
+  pg_was=$( { cat "$pg_n"; ls "$pg_d/$pg_live"; cat "$pg_d/$pg_live"/*; } 2>/dev/null | git hash-object --stdin)
+  ( load_driver_conf && SPEC_TOKENS_CLI="${PFX}stub-moved.py" run_spec_token_check tRun ) >/dev/null 2>&1
+  git checkout -q -- memory/builds/tRun/README.md
+  same "a moved tree keeps the live spec-token generation and its name" "$( { cat "$pg_n"; ls "$pg_d/$pg_live"; cat "$pg_d/$pg_live"/*; } 2>/dev/null | git hash-object --stdin)" "$pg_was"
+  pg_g=("$pg_d"/spec-tokens.tRun.specs.*)
+  same "a moved tree leaves its generation unnamed beside the live one" "${#pg_g[@]}" 2
+  printf '%s\n' "$sd_red" > "$sd_spec"
+  hit "$( ( load_driver_conf && run_spec_token_check tRun ) 2>&1 )" "$sd_refuse"
+  printf '%s\n' "$sd_clean" > "$sd_spec"
+  same "a refusal keeps the live spec-token generation and its name" "$( { cat "$pg_n"; ls "$pg_d/$pg_live"; cat "$pg_d/$pg_live"/*; } 2>/dev/null | git hash-object --stdin)" "$pg_was"
+  pg_g=("$pg_d"/spec-tokens.tRun.specs.*)
+  same "a refusal's start sweeps the unnamed generation and leaves its own" "${#pg_g[@]}" 2
+  # AC8: a name that fails the shape check is no name, so the directory it points at is spared.
+  rm -f .git/unattended/spec-tokens.tRun.key
+  printf '../planted\n' > "$pg_n"; mkdir -p .git/planted; : > .git/planted/keep
+  ( load_driver_conf && run_spec_token_check tRun ) >/dev/null 2>&1
+  same "a planted malformed spec-token name spares its target" "$([ -f .git/planted/keep ] && echo spared || echo removed)" spared
+  pg_live=""; read -r pg_live <"$pg_n"
+  same "a planted malformed spec-token name is replaced by a well-formed one" "$([[ $pg_live =~ ^spec-tokens\.tRun\.specs\.[A-Za-z0-9]{8}$ ]] && [ -d "$pg_d/$pg_live" ] && echo named || echo unnamed)" named
+  pg_g=("$pg_d"/spec-tokens.tRun.specs.*)
+  same "a planted malformed spec-token name leaves one generation" "${#pg_g[@]}" 1
+  rm -rf .git/planted
   rm -f ${PFX}stub-moved.py ${PFX}stub-quiet.py ${PFX}stub-raced.py ${PFX}stub-popen.py
   # TOOL-aSmoothedDispatch-8 AC4 step f: no fingerprint, no key: the cache is off on both calls.
   rm -f .git/unattended/spec-tokens.tRun.key "./${PFX}$_sd_home/gate-fingerprint.sh"

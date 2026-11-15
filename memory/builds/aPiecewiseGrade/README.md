@@ -49,7 +49,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 4 unit(s) · node a · opened 2026-11-15 · streams tooling
+**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-11-15 · streams tooling
 ids TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-3 TOOL-aPiecewiseGrade-4
 
 <!-- gen:build-units -->
@@ -58,10 +58,10 @@ ids TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-3 TOOL-aP
 | [TOOL-aPiecewiseGrade-3 — the spec-token checker resolves the memory-tree kit's `design_lib` once per process, so no caller pays the kit resolution per call](spec/2026-11-15-spec-TOOL-aPiecewiseGrade-3.md) | 1 | 1 | CLOSED | rev-1 | 2026-11-15 |
 | [TOOL-aPiecewiseGrade-1 — the spec-token checker's incremental mode: each live spec's findings cached on its own inputs, every join rebuilt whole](spec/2026-11-15-spec-TOOL-aPiecewiseGrade-1.md) | 2 | 2 | CLOSED | rev-2 | 2026-11-15 |
 | [TOOL-aPiecewiseGrade-4 — the spec-token checker writes its next cache generation into a directory the caller names, so no caller renames a fixed-name temp](spec/2026-11-15-spec-TOOL-aPiecewiseGrade-4.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-16 |
-| [TOOL-aPiecewiseGrade-2 — `run_spec_token_check` runs the checker's incremental mode on a whole-key miss, and names its per-spec cache's live generation in a file only where the whole key is recorded](spec/2026-11-15-spec-TOOL-aPiecewiseGrade-2.md) | 4 | 2 | INPROGRESS | rev-4 | 2026-11-15 |
+| [TOOL-aPiecewiseGrade-2 — `run_spec_token_check` runs the checker's incremental mode on a whole-key miss, and names its per-spec cache's live generation in a file only where the whole key is recorded](spec/2026-11-15-spec-TOOL-aPiecewiseGrade-2.md) | 4 | 2 | CLOSED | rev-4 | 2026-11-16 |
 <!-- /gen:build-units -->
 
-Records: 16 bound to this build, across 3 record folder(s).
+Records: 17 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
