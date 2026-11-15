@@ -61,7 +61,7 @@ ids TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aTwinnedPass-1 — the unit harness builds one pass in a worktree of its own, on a write set the main loop declared](spec/2026-11-15-spec-TOOL-aTwinnedPass-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-11-15 |
-| [TOOL-aTwinnedPass-3 — `--dispatch` condition 1 leaves an effective generated output out of the sibling comparison](spec/2026-11-15-spec-TOOL-aTwinnedPass-3.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-11-15 |
+| [TOOL-aTwinnedPass-3 — `--dispatch` condition 1 leaves an effective generated output out of the sibling comparison](spec/2026-11-15-spec-TOOL-aTwinnedPass-3.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-15 |
 | [TOOL-aTwinnedPass-2 — the pass-tree tool: cut a pass's worktree from the run's tip, and merge it back `--no-ff` with generated outputs re-rendered](spec/2026-11-15-spec-TOOL-aTwinnedPass-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-15 |
 <!-- /gen:build-units -->
 
