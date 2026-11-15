@@ -1,12 +1,13 @@
-# TOOL-aMeasuredDrag-3 — carries coverage derived once per process, and the staged hygiene run reads checks 29 and 30 from check 9's process
+# TOOL-aMeasuredDrag-3 — carries coverage derived once per `--check --with-verdicts` call
 
-**Status:** SPECCED · rev-1 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-brief.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-brief.md) | research | TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-4 TOOL-aMeasuredDrag-5 TOOL-aMeasuredDrag-6 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 TOOL-aMeasuredDrag-9 TOOL-aMeasuredDrag-10 TOOL-aMeasuredDrag-11 |
+| [2026-11-15-prompt-TOOL-aMeasuredDrag-1-ruling-brief.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-ruling-brief.md) | research | TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-3-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-3-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-3-readers-brief.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-3-readers-brief.md) | research | TOOL-aMeasuredDrag-4 |
 
@@ -14,11 +15,15 @@
 
 ## 1. Goal
 
-A staged records commit runs the build-index generator three times, for checks 9, 29 and 30, and
-the coverage join is derived in two of them. A full hygiene run derives it twice in one process.
-This unit derives the coverage once per `--with-verdicts` call and admits `--with-verdicts` beside
-`--staged`, so the staged hygiene run reads checks 29 and 30 from check 9's one process. Every
-verdict and every line checks 9, 29 and 30 print stays as it is.
+A full hygiene run's check 9 calls `gen_build_index.py --check --with-verdicts`, and that one process
+derives the carries coverage twice: check 29's verb reads it, then `plan()` reads it again under
+`cmd_check`. This unit derives it once per `--check --with-verdicts` call. Every verdict, refusal and
+printed line stays as it is.
+
+The brief's second half, admitting `--with-verdicts` beside `--staged` so that a staged hygiene run
+reads checks 29 and 30 from check 9's process, is not built. F1 resolved as option (b): that half
+moves the printed heading of a verb's crash under `--staged`, so it is parked for the owner, and a
+staged records commit keeps its three generator processes.
 
 ## 2. Scope (IN)
 
@@ -26,59 +31,39 @@ verdict and every line checks 9, 29 and 30 print stays as it is.
   value while the module global `_COVERAGE_MEMO` is a dict, keyed on `(root, path, resolve)`, where
   `path` is the carries checker's path the function already computes. With `_COVERAGE_MEMO` at
   `None`, its default, every call derives as today. A refusal is never memoised. Observed by AC1.
-- **S2** — `main()` admits `--check --staged --with-verdicts`. It sets `_COVERAGE_MEMO = {}` on
-  each of the two `--with-verdicts` paths and resets it to `None` in a `finally` on its handler.
-  Under `--staged` it prints the verdict sections first, flushes stdout, then runs today's staged
-  block unchanged. Without `--staged` the call runs as today. Observed by AC2, AC5, AC6.
-- **S3** — `print_check_verdicts(root, conf, staged=False)` calls each verb as
-  `verb(root, conf, staged=True)` when `staged` is true, and as `verb(root, conf)` otherwise, so a
-  verb under `--staged` prints its held line exactly as its standalone run does. Observed by AC2.
-- **S4** — The usage refusal keeps `--with-verdicts` to `--check` alone and drops its `--staged`
-  half: its text loses "and never --staged", and the usage line spells `--check [--staged]
-  [--with-verdicts]`. Observed by AC3.
-  **Readers:**
-  by name: `tools/memory-tree/gen_build_index.py` is the only tracked file outside the build
-  records that spells the retired text, by a git grep at writing. Its `main` prints the refusal at
-  `:8851`, with the text split across two string literals so that no file spells the phrase whole,
-  and the comment above it at `:8847` says the flag is never beside `--staged`.
-  by value: `read_flag_refusals`, the selftest arm at `:5209`, counts the refusal output's
-  `the flag takes --check alone`, a phrase the edit keeps. Its refused tuples and its expected
-  count move with §4's A3. AC3 reads the output for `never --staged`. No other reader compares,
-  counts or derives from the text.
-- **S5** — `tools/memory-tree/check-memory-hygiene.sh`: check 9 passes `--with-verdicts` whenever
-  `ONLY` is empty, `--staged` included. Checks 29 and 30 read check 9's section on a full run as
-  today, and under `--staged` only when check 9's capture holds the end marker; otherwise they run
-  their own verb as today. The comments that say a staged run spawns its own verbs are made true.
-  Observed by AC4, AC5, AC7.
-- **S6** — The kit README's two paragraphs on `--check-coverage` and `--check-asbuilt`
-  (`tools/memory-tree/README.md@86d507b0:373`, `:389`) say the staged form is admitted, and that a
-  staged hygiene run reads both verdicts from check 9's process. Observed by AC8.
+- **S2** — `main()` declares `global _COVERAGE_MEMO`, sets `_COVERAGE_MEMO = {}` in its
+  `--with-verdicts` block (`gen_build_index.py@5a0864b8:8925`) before `print_check_verdicts` runs,
+  and resets it to `None` in that block's `finally`, beside the `sys.stderr` restore. The usage
+  refusal, the staged block and every other mode run as today. Observed by AC2 and AC6.
 - **S7** — The selftest arms of §4, "The arms", in `tools/memory-tree/gen_build_index.py`.
-  Observed by AC1, AC2, AC3.
-- **S8** — A measured before and after of the staged hygiene run and of `--check --with-verdicts`,
-  each beside a spawn baseline, written into this unit's acceptance ledger. Observed by AC9.
+  Observed by AC1 and AC2.
+- **S8** — A measured before and after of `--check --with-verdicts`, beside a spawn baseline,
+  written into this unit's acceptance ledger. Observed by AC9.
 
 ## 3. Non-goals (OUT)
 
 - A cross-process or content-keyed cache of the coverage, the review's §5 structural item.
-- A memo on any path but the two `--with-verdicts` calls. `cmd_write`, `cmd_check` alone and
-  `--check-coverage` alone each read the coverage once and stay unmemoised.
+- A memo on any path but the `--check --with-verdicts` call. `cmd_write`, `cmd_check` alone,
+  `--check --staged` and `--check-coverage` alone each read the coverage at most once and stay
+  unmemoised.
+- The staged half, parked under F1 (b). `--with-verdicts` beside `--staged` stays refused, with the
+  usage refusal at `gen_build_index.py@5a0864b8:8850` and its text unchanged. `print_check_verdicts`,
+  `tools/memory-tree/check-memory-hygiene.sh` and `tools/memory-tree/README.md` are not edited, so a
+  staged hygiene run still runs the verbs of checks 29 and 30 in processes of their own.
 - `check_staged_render`, the render trigger, and the verbs' own staged triggers.
-- `memory/HYGIENE.md` and `tools/memory-tree/HYGIENE.template.md`. Their checks 29 and 30 say "A
-  full run, `--staged` off and no `--only`, reads this verdict from check 9's generator process",
-  and "Under `--staged` the check passes `--staged` through". Both stay true: the staged run passes
-  `--staged` to the verb inside check 9's process. They are governance carriers, so nothing here
-  edits them.
+- `memory/HYGIENE.md` and `tools/memory-tree/HYGIENE.template.md`. No route of checks 29 and 30
+  moves, so their text stays true. They are governance carriers, so nothing here edits them.
 - `tools/memory-tree/gen_build_index.py:1199-1212`, the per-build grouping, which is
   `TOOL-aMeasuredDrag-6`'s.
 - The kit version: the lander's mint moves it.
-- Any verdict, refusal or printed line other than the three S4 names, which the brief's item 3
-  orders. F1 states the one crash-path difference.
+- Any verdict, refusal or printed line. None moves.
 
 ### Edges
 
 - **hands-off** external — a coverage cache that outlives one process is the review's §5 structural
   work, outside this build.
+- **hands-off** external — the staged half, `--check --staged --with-verdicts` with checks 29 and 30
+  reading check 9's section, parked for the owner by F1 (b) with the price F1 states.
 
 ## 4. Design
 
@@ -90,26 +75,25 @@ Read at base `aebbb4a72`. Lines name blobs of that tree.
 |---|---|
 | `tools/memory-tree/gen_build_index.py@5a0864b8:1990` | `read_carries_coverage`: blank key returns the off value; else loads the checker and derives |
 | `tools/memory-tree/gen_build_index.py@5a0864b8:2748` | `plan()` reads the coverage once per render |
-| `tools/memory-tree/gen_build_index.py@5a0864b8:2960` | `cmd_check_coverage` under `staged` prints its held line and returns before any read |
 | `tools/memory-tree/gen_build_index.py@5a0864b8:2967` | `cmd_check_coverage` reads the coverage |
 | `tools/memory-tree/gen_build_index.py@5a0864b8:3048` | `print_check_verdicts` calls each verb as `verb(root, conf)` under captured stdout and stderr |
 | `tools/memory-tree/gen_build_index.py@5a0864b8:8850` | the usage refusal of `--with-verdicts` beside `--staged` or any mode but `--check` |
-| `tools/memory-tree/gen_build_index.py@5a0864b8:8919` | the staged block: the render decision, its SKIPPED or owed line, then `cmd_check` |
 | `tools/memory-tree/gen_build_index.py@5a0864b8:8925` | the `--with-verdicts` block, `sys.stderr` bound to stdout for the call |
 | `tools/memory-tree/check-memory-hygiene.sh@d9ce5710:1496` | check 9 adds `--with-verdicts` only when `STAGED` is 0 and `ONLY` is empty |
-| `tools/memory-tree/check-memory-hygiene.sh@d9ce5710:1937` | check 29 reads check 9's section when `_v9on` is 1; check 30's twin is at `:1978` |
 | `tools/memory-tree/gen_build_index.py@5a0864b8:2306` | `_SLOT_MODE`, the module's "asked once per run and kept" global |
 
-Under `--staged`, check 9 runs only when `STAGED_MD` is non-empty (`:1494`), so a commit staging
-only the conf leaves `_v9on` at 0 and checks 29 and 30 run their own verbs, as today.
+`:2748` and `:2967` are the only callers of `read_carries_coverage` outside the selftest at base. In
+a `--check --with-verdicts` call, check 29's verb reads it first, under `print_check_verdicts`, and
+`plan()` reads it second, under `cmd_check`. `cmd_check_asbuilt` does not read the coverage. Both
+readers call it with `resolve` at `None`, so they share one key.
 
 ### The memo
 
 ```python
-# TOOL-aMeasuredDrag-3. The coverage, derived once per `--with-verdicts` call. `main()` sets a dict for
-# that call alone, where check 29's verb and `plan()` read it over one root and one conf, and resets it
-# to None after. None reads through, which the selftest needs: its arms re-read one fixture root after
-# changing its tree.
+# TOOL-aMeasuredDrag-3. The coverage, derived once per `--check --with-verdicts` call. `main()` sets a
+# dict for that call alone, where check 29's verb and `plan()` read it over one root and one conf, and
+# resets it to None after. None reads through, which the selftest needs: its arms re-read one fixture
+# root after changing its tree.
 _COVERAGE_MEMO = None
 ```
 
@@ -129,73 +113,31 @@ A process memo would hand the second read the first tree's value and red those a
 Neither reader mutates the value. `plan()` stores the off value itself on each build, or builds a new
 dict from its fields. `cmd_check_coverage` reads `builds`, `specs`, `findings` and `cutoff`.
 
-### The two `--with-verdicts` paths in `main()`
+### The `--with-verdicts` block in `main()`
 
-The refusal keeps one condition, `with_verdicts and mode != "--check"`, with the text
-`usage: gen_build_index.py --check --with-verdicts — the flag takes --check alone; given <argv>`.
-The usage line's `[--check [--staged|--with-verdicts]|` becomes `[--check [--staged] [--with-verdicts]|`.
-
-Under `--staged` with the flag, before the render decision:
+`main()` gains `global _COVERAGE_MEMO` as its first statement. The block becomes:
 
 ```python
-            if with_verdicts:
-                _COVERAGE_MEMO = {}
-                print_check_verdicts(root, conf, staged=True)
-                sys.stdout.flush()
+        if with_verdicts:
+            held = sys.stderr
+            sys.stderr = sys.stdout
+            _COVERAGE_MEMO = {}
+            try:
+                print_check_verdicts(root, conf)
+                return cmd_check(root, conf)
+            finally:
+                sys.stderr = held
+                _COVERAGE_MEMO = None
 ```
 
-Then the staged block runs unchanged: SKIPPED and exit 0, or the owed line and `cmd_check`. Its
-`sys.stderr` is not rebound. The flush puts the end marker on the pipe before `cmd_check` writes any
-stderr line, so the hygiene capture holds, after the marker, exactly what today's `--check --staged`
-capture holds, in the same order.
-
-The full path, `--with-verdicts` without `--staged`, keeps its block and its stderr binding, and
-sets `_COVERAGE_MEMO = {}` first. The handler's `try` gains `finally: _COVERAGE_MEMO = None`.
-
-The verdict sections print before the render decision. So a staged render that skips still prints
-each verb's held line, and a staged render that is owed derives the coverage once: the verb stores it
-and `plan()` reads it back.
-
-### Check 9's capture under `--staged`
-
-```
--  [ "$STAGED" = 0 ] && [ -z "$ONLY" ] && { _c9+=(--with-verdicts); _v9on=1; }
-+  [ -z "$ONLY" ] && { _c9+=(--with-verdicts); _v9on=1; }
-```
-
-Checks 29 and 30 each change one condition:
-
-```
--if [ "${_v9on:-0}" = 1 ]; then
-+if [ "${_v9on:-0}" = 1 ] && { [ "$STAGED" = 0 ] || [ "$_v9end" = 1 ]; }; then
-```
-
-Under `--staged`, a capture with no end marker is a generator that died before its sections ended.
-Each check then runs its own verb as today, so a crash before the marker prints what it prints today.
-On a full run the unmarked capture stays the unreadable branch, as dTrueNorth-27 set it.
-
-The shell keeps the three constraints `TOOL-dTrueNorth-27` S4 states: no new `fail` call, no new
-`<<<` site, no new spawn-idiom site. Check 9's `if ! drift=$(…)` form is kept.
-
-Comments made true: the block above check 9 (`check-memory-hygiene.sh@d9ce5710:1486`) says the
-process prints both verdicts whenever `--only` is empty, `--staged` included, and names the
-fallback. Check 29's "UNDER --staged THE VERB DECIDES" paragraph (`:1925`) says the verb decides
-inside check 9's process. "ON A FULL RUN THE VERDICT IS CHECK 9'S SECTION" (`:1932`) and check 30's
-one-line twin (`:1976`) say the section is read whenever check 9 ran with the flag.
+Check 29's verb derives the coverage and stores it, and `plan()` under `cmd_check` reads it back.
+Nothing else in the block moves, so the sections, their order and the stderr binding are today's.
 
 ### Output parity
 
-| Run | Check 9 | Checks 29 and 30 |
-|---|---|---|
-| full | unchanged | unchanged |
-| `--staged`, check 9 runs, render skips | the SKIPPED line, as today | each verb's held line, from the section |
-| `--staged`, check 9 runs, render owed | today's message, its stderr order unchanged | the verb's lines, from the section |
-| `--staged`, check 9 does not run | not run | their own verbs, as today |
-| `--staged`, generator dies before the marker | today's failure | their own verbs, as today |
-| `--staged`, a verb raises a non-`Problem` | unchanged | the section's `exit 2` line: F1 |
-| `--only` set | as today | their own verbs, as today |
-
-A verb's `Problem` prints `build-index: <message>` under exit 2 in-process and standalone alike.
+Both readers receive the one value a fresh derivation would give, because nothing writes between
+them (§4, "What the design does not check") and neither mutates it. So `--check --with-verdicts`
+prints what it prints today, and every other mode reads through. AC6 compares the outputs.
 
 ### The arms
 
@@ -205,24 +147,14 @@ In `tools/memory-tree/gen_build_index.py`:
   one counting stub derive once and return one object, and a second stub derives once more. A stub
   raising `ImportError` is a `Problem` on each of two reads and is called twice. With
   `_COVERAGE_MEMO` back at `None`, two reads derive twice. The arm restores `None` in a `finally`.
-- **A2, the staged verdicts** (beside `_read_ordered31`). A child, built as `child31` is, stubs the
-  three verbs to record whether `staged` came in true and whether the memo was set, and runs
-  `main(['x', '--check', '--staged', '--with-verdicts'])` in its scratch repository, which stages
-  nothing. Its merged output opens `build-index: verdict 29 exit 0`, the stub's line, `build-index:
-  verdict 30 exit 0`, the stub's line and `build-index: verdicts end`, then the SKIPPED line. Both
-  verbs saw `staged` true with the memo set, and `_COVERAGE_MEMO` is `None` after `main` returns.
-- **A3, the usage refusal** (`read_flag_refusals`). The `("--check", "--staged", "--with-verdicts")`
-  tuple leaves the refused list, and the expectation becomes `[2, 2] 2`. The arm's label drops
-  "beside --staged".
-
-The hygiene suite's staged arms (`tools/memory-tree/check-memory-hygiene.test.sh@4c50ac3a:4489` and
-`:4554`) now reach the held lines through check 9's section and assert them unchanged.
+- **A2, the memo's lifetime** (beside `_read_ordered31`). A child, built as `child31` is, stubs
+  `cmd_check_coverage`, `cmd_check_asbuilt` and `cmd_check` to record whether the memo was set, and
+  runs `main(['x', '--check', '--with-verdicts'])` in its scratch repository. All three saw the memo
+  set, and `_COVERAGE_MEMO` is `None` after `main` returns.
 
 ### Files touched (estimate)
 
 - `tools/memory-tree/gen_build_index.py`
-- `tools/memory-tree/check-memory-hygiene.sh`
-- `tools/memory-tree/README.md`
 
 ### Inventory
 
@@ -230,8 +162,7 @@ The hygiene suite's staged arms (`tools/memory-tree/check-memory-hygiene.test.sh
 |---|---|---|
 | `_COVERAGE_MEMO` | module global | named as `_SLOT_MODE` and `_SLOT_DATA_DIR` are; not at base; no declared lexicon cell grades it, since `lexicon.py --suggest _COVERAGE_MEMO --as py.constant` answers that cell is undeclared |
 
-`print_check_verdicts` gains a keyword parameter. No function is added, so
-`memory/map/generated/symbols.json` does not move.
+No function is added and no signature changes, so `memory/map/generated/symbols.json` does not move.
 
 ### Rollout
 
@@ -243,37 +174,31 @@ Live, with no switch: no verdict moves, and a dark path would be exercised by no
   process-lifetime cache reds the selftest's re-reads (§4, "The memo").
 - **Handing the value from `print_check_verdicts` to `cmd_check`.** It threads a parameter through
   `cmd_check` and `plan()`, which the three unlanded branches the build README names also edit.
-- **Rebinding `sys.stderr` under `--staged` as the full path does.** It reorders check 9's red
-  message under `--staged`: today the stderr notices of `cmd_check` precede its buffered stdout.
-- **No fallback in checks 29 and 30.** A generator that dies before the marker under `--staged`
-  would then red checks 29 and 30 as unreadable, where today they run in processes of their own.
 - **Skipping the coverage read when no chain spec is INPROGRESS** (githooks-2's second fix). The
   region renders the coverage whatever the statuses, so `plan()` still owes the read.
 
 ### What the design does not check
 
-- That a later edit leaves a write between the verdicts and `plan()`. The verbs and
-  `check_staged_render` write nothing at base. A writer added there would let `plan()` read a value
-  derived before the write.
+- That a later edit leaves a write between the verdicts and `plan()`. The verbs write nothing at
+  base. A writer added there would let `plan()` read a value derived before the write.
 - A call of `main()` from inside another `main()`. Nothing does that today.
 
 ## 5. Production-readiness checklist
 
 - security — no new input, write path or surface; the generator reads the same files.
-- perf / scale — removes one coverage derivation per `--with-verdicts` call, and two generator
-  processes per staged hygiene run that reaches check 9.
+- perf / scale — removes one coverage derivation per `--check --with-verdicts` call, which a full
+  hygiene run makes once, through check 9.
   records-3 profiled `read_carries_coverage` at 31.1 s of 89.9 s, PINNED 2026-11-15.
-  githooks-2 measured `--check-coverage --staged` at 19.5 s, PINNED 2026-11-15.
   AC9 measures this unit's code.
-- error / empty / loading states — a `Problem` is never memoised; a crash before the marker falls
-  back to today's processes; a commit that leaves check 9 unrun is unchanged.
-- observability — no line moves outside S4 and the F1 case.
-- risks — an adopter with a new hygiene script beside an old generator reds check 9 under
-  `--staged` on the usage refusal; the kit installs both files together, and checks 29 and 30 fall
-  back to their own verbs on that capture.
-- testing — AC1 to AC9 and the arms on the `New arm:` lines in §7.
+- error / empty / loading states — a `Problem` is never memoised, and the `finally` resets the memo
+  on every exit of the block.
+- observability — no line moves.
+- risks — a writer later added between the verdicts and `plan()` (§4, "What the design does not
+  check").
+- testing — AC1, AC2, AC6, AC9 and the arms on the `New arm:` lines in §7.
 - migration — N/A: no data or record shape moves.
-- user docs — the kit README (S6); no page under `help/` describes checks 29 and 30.
+- user docs — N/A: no flag, line or behaviour a user sees moves; no page under `help/` describes
+  checks 29 and 30.
 
 ## 6. Acceptance criteria
 
@@ -301,66 +226,33 @@ Live, with no switch: no verdict moves, and a dark path would be exercised by no
   python -c "
   import sys, io, contextlib; sys.path.insert(0, 'tools/memory-tree'); import gen_build_index as g
   seen = []
-  def cov(root, conf, staged=False): seen.append(('29', staged, g._COVERAGE_MEMO is not None)); print('c29'); return 0
-  def ab(root, conf, staged=False, here=None): seen.append(('30', staged, g._COVERAGE_MEMO is not None)); print('c30'); return 0
-  def chk(root, conf): seen.append(('9', g._COVERAGE_MEMO is not None)); print('drift'); return 0
+  def cov(root, conf, staged=False): seen.append(('29', g._COVERAGE_MEMO is not None)); return 0
+  def ab(root, conf, staged=False, here=None): seen.append(('30', g._COVERAGE_MEMO is not None)); return 0
+  def chk(root, conf): seen.append(('9', g._COVERAGE_MEMO is not None)); return 0
   g.cmd_check_coverage, g.cmd_check_asbuilt, g.cmd_check = cov, ab, chk
-  out = io.StringIO()
-  with contextlib.redirect_stdout(out): rc = g.main(['x', '--check', '--staged', '--with-verdicts'])
-  head = out.getvalue().splitlines()[:5]
-  assert head == ['build-index: verdict 29 exit 0', 'c29', 'build-index: verdict 30 exit 0', 'c30', 'build-index: verdicts end'], head
-  assert seen[:2] == [('29', True, True), ('30', True, True)] and g._COVERAGE_MEMO is None, seen
+  with contextlib.redirect_stdout(io.StringIO()): rc = g.main(['x', '--check', '--with-verdicts'])
+  assert rc == 0 and seen == [('29', True), ('30', True), ('9', True)] and g._COVERAGE_MEMO is None, seen
   seen.clear()
-  with contextlib.redirect_stdout(io.StringIO()): g.main(['x', '--check', '--with-verdicts'])
-  assert seen == [('29', False, True), ('30', False, True), ('9', True)] and g._COVERAGE_MEMO is None, seen
+  with contextlib.redirect_stdout(io.StringIO()): g.main(['x', '--check-coverage'])
+  assert seen == [('29', False)] and g._COVERAGE_MEMO is None, seen
   print('OK')"
   ```
-  Red when: `--staged` is still refused, the verbs are not handed `staged`, the sections print after
-  the render decision, or the memo outlives `main`.
-- **AC3** — When `python tools/memory-tree/gen_build_index.py --write --with-verdicts` and
-  `python tools/memory-tree/gen_build_index.py --check-coverage --with-verdicts` run, each exits 2
-  printing `the flag takes --check alone`, and neither output carries `never --staged`.
-  Red when: the refusal is lifted for any mode but `--check`, or its text still names `--staged`.
-- **AC4** — When `bash -x tools/memory-tree/check-memory-hygiene.sh --staged` runs in the AC5 clone
-  over case B, its trace carries one line spelling `gen_build_index.py --check --staged
-  --with-verdicts`, and `grep -c` for `gen_build_index.py --check-coverage` and for
-  `gen_build_index.py --check-asbuilt` over it prints 0 each.
-  Red when: check 9 still withholds the flag under `--staged`, or check 29 or 30 still spawns.
-  fixture: as AC5.
-- **AC5** — When `bash tools/memory-tree/check-memory-hygiene.sh --staged > out 2>&1; echo $? >> out`
-  runs in a clone at `%TEMP%/md3`, once at the unit's parent commit and once at the unit's commit,
-  over each case below, `diff` of the two `out` files prints nothing for each case. In each
-  checkout, `python tools/memory-tree/gen_build_index.py --write` runs first, then the case's edit is
-  made and staged, and `git reset -q --hard` follows.
-  - case A, render skips: `printf '\n' >> memory/README.md && git add memory/README.md`.
-  - case B, render owed: `printf '\n' >> memory/builds/aBriskDeclaration/README.md`, then `git add`.
-  Red when: any line or the exit differs, such as a held line missing from check 29 or 30.
-  fixture: the clone; it holds every build of this tree, a chain build under `SPEC_CARRIES_CUTOFF`
-  included.
-  cost: case B renders the whole index.
-  githooks-1 timed a whole staged hygiene run at 78.7 s, PINNED 2026-11-15.
+  Red when: `main()` sets no memo for the `--with-verdicts` call, sets one on another mode, or the
+  memo outlives `main`.
 - **AC6** — When `python tools/memory-tree/gen_build_index.py --check --with-verdicts` and
-  `python tools/memory-tree/gen_build_index.py --check-coverage` run in the AC5 clone at the parent
-  and at the unit's commit, after the same `--write`, each pair's stdout and exit compare equal by
-  `diff`.
+  `python tools/memory-tree/gen_build_index.py --check-coverage` run in a clone of this repository at
+  `%TEMP%/md3`, once at the unit's parent commit and once at the unit's commit, each checkout first
+  running `python tools/memory-tree/gen_build_index.py --write` and ending with `git reset -q --hard`,
+  each pair's stdout and exit compare equal by `diff`.
   Red when: the memoised value differs from a fresh derivation, which the second read would show.
-  fixture: as AC5.
-- **AC7** — When, in the AC5 clone at the unit's commit over case B, `gen_build_index.py` is edited
-  in the work tree to raise `RuntimeError("planted")` at the top of `main()` whenever
-  `--with-verdicts` is in its argv, `bash tools/memory-tree/check-memory-hygiene.sh --staged` prints
-  check 9's failure carrying `planted`, and its `memory-hygiene: check 29:` and `check 30:` lines equal
-  those of the unplanted case B run.
-  Red when: the fallback condition is missing, so checks 29 and 30 read the unmarked capture and
-  fail as unreadable.
-  fixture: as AC5, the edit unstaged.
-- **AC8** — When `grep -c 'beside \`--staged\`' tools/memory-tree/README.md` runs it prints 0, and
-  `grep -c -- '--check --staged --with-verdicts' tools/memory-tree/README.md` prints at least 1.
-  Red when: the README still states the staged form is refused, or never names it.
-- **AC9** — When the AC5 case B run and the AC6 `--check --with-verdicts` run are each timed with
-  `time`, at the parent and at the unit's commit, and `time (for i in 1 2 3 4 5 6 7 8 9 10; do
-  /usr/bin/true; done)` is timed beside each, the acceptance ledger records the eight wall times and
-  each after-run is shorter than its before-run.
-  Red when: an after-run is not shorter than its before-run.
+  fixture: the clone; it holds every build of this tree, a chain build under `SPEC_CARRIES_CUTOFF`
+  included, so the coverage is armed and not empty.
+  cost: each checkout renders the whole index once.
+- **AC9** — When the AC6 `--check --with-verdicts` run is timed with `time`, at the parent and at the
+  unit's commit, and `time (for i in 1 2 3 4 5 6 7 8 9 10; do /usr/bin/true; done)` is timed beside
+  each, the acceptance ledger records the four wall times and the after-run is shorter than the
+  before-run.
+  Red when: the after-run is not shorter than the before-run.
   figure: every time is DERIVED at observation and recorded in the ledger with its date.
 
 ## 7. Gates
@@ -368,41 +260,45 @@ Live, with no switch: no verdict moves, and a dark path would be exercised by no
 `memory hygiene` · `memory hygiene (the pass checks)` · `memory-hygiene self-test` · `build-index selftest` · `tier2-review self-test` · `policy fixtures` · `harness arms (fail branches armed or pinned)` · `kit/dogfood doc parity` · `spec tokens (a spec's own names resolve)` · `docs`
 
 New arm: tools/memory-tree/gen_build_index.py --selftest · covers AC1 · `read_carries_coverage` at base, which has no memo, so the set-memo reads derive twice; and a key without `resolve`, under which the second stub reads the first stub's value · none
-New arm: tools/memory-tree/gen_build_index.py --selftest · covers AC2 · `main()` at base, which refuses `--check --staged --with-verdicts` with exit 2 and prints no section · none
-New arm: tools/memory-tree/gen_build_index.py --selftest · covers AC3 · the refusal at base, which also refuses the staged tuple, so the list reads `[2, 2, 2] 3` · none
-
-The close's hygiene suite run re-observes, unchanged, the check 29 and check 30 staged held-line arms,
-which now read check 9's section.
+New arm: tools/memory-tree/gen_build_index.py --selftest · covers AC2 · `main()` at base, which sets no memo, so every stub records it unset · none
 
 ## 8. Open questions
 
-- **F1 — Under `--staged`, may a verb's own crash print the in-process heading?** A verb raising
-  anything but a `Problem` prints today, standalone, a traceback with exit 1, which check 29 files
-  under "a chain build's spec is INPROGRESS while its build's coverage is red". In check 9's process
-  it prints `build-index: <type>: <message>` under exit 2 (`TOOL-dTrueNorth-31` S12), which check 29
-  files under "the coverage could not be read". The check fails either way, and the hygiene exit
-  does not move. (a) Accept: the in-process heading is the truthful one, the full run already prints
-  it, and the brief's item 3 orders this route. (b) Park the flag half and ship the memo alone,
-  which keeps the staged path's two extra processes. Recommendation: (a).
+- **F1 — Under `--staged`, may a verb's own crash print the in-process heading?**
+  RESOLVED (agent, 2026-11-15, delegated): (b) — (a) changes the printed heading of a verb's crash
+  under --staged, a printed line under the README's rule (M3 veto 1); the memo ships alone and the
+  --staged --with-verdicts half is parked for the owner.
+  A verb raising anything but a `Problem` prints today, standalone, a traceback with exit 1, which
+  check 29 files under "a chain build's spec is INPROGRESS while its build's coverage is red". In
+  check 9's process it prints `build-index: <type>: <message>` under exit 2 (`TOOL-dTrueNorth-31`
+  S12), which check 29 files under "the coverage could not be read". The check fails either way, and
+  the hygiene exit does not move. (a) Accept: the in-process heading is the truthful one, the full
+  run already prints it, and the brief's item 3 orders this route. (b) Park the flag half and ship
+  the memo alone, which keeps the staged path's two extra processes. Recommendation: (a).
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-15 · initial draft.
+- rev-2 · 2026-11-15 · §1 · S2 · S3 · S4 · S5 · S6 · S8 · §3 · §4 · §5 · AC2 · AC3 · AC4 · AC5 · AC6 ·
+  AC7 · AC8 · AC9 · §7 · §8 · §10 · F1 resolved as (b) under the run's delegation
+  (`2026-11-15-prompt-TOOL-aMeasuredDrag-1-ruling-brief`): the staged half is parked for the owner
+  and the memo ships alone. S3 to S6 are removed, S4's Readers clause with them, and so are AC3, AC4,
+  AC5, AC7, AC8 and the A3 arm; no removed number is reused. S2, S8, AC2 and AC9 are cut to the
+  `--check --with-verdicts` call, and AC6 carries its own clone fixture. S1 and AC1 are unchanged.
 
 ## 10. Reuse audit
 
 The seam is `read_carries_coverage` in `tools/memory-tree/gen_build_index.py`, the one reader the
 region and check 29's verb share, edited in place as the brief's Reuse names; the memo follows
-`_SLOT_MODE` and `read_slot_mode` in the same module, its "asked once per run and kept" global. The
-staged route extends `print_check_verdicts` and check 9's existing section split
-(`TOOL-dTrueNorth-27` S4) rather than adding a reader. `tools/codebase-map/reuse_lookup.py`, given
-"memoise a derived value once per process", ranked `read_policy_value`, `derive_kit_prefix` and
-other `derive_*` names by name stem, none a memo, so no existing seam fits a shared cache and the
-module's own global is the precedent. Recall returned `TOOL-dTrueNorth-27` S4, whose refusal of the
-staged form this unit lifts for the reason that spec gave: the staged skip would print no verdict,
-and here the sections print before the skip. `gotchas.py --for-paths` selected
-`swallowed-delegate-reads-as-clean`, answered by checks 29 and 30 reading the section only under the
-end marker, and `fixture-passes-by-finding-nothing`, answered by AC5's case B, which renders.
+`_SLOT_MODE` and `read_slot_mode` in the same module, its "asked once per run and kept" global, and
+it is set inside the existing `--with-verdicts` block of `main()` rather than on a new path.
+`tools/codebase-map/reuse_lookup.py`, given "memoise a derived value once per process", ranked
+`read_policy_value`, `derive_kit_prefix` and other `derive_*` names by name stem, none a memo, so no
+existing seam fits a shared cache and the module's own global is the precedent. Recall returned
+`TOOL-dTrueNorth-27` S4, whose refusal of the staged form this unit keeps under F1 (b).
+`gotchas.py --for-paths` selected `swallowed-delegate-reads-as-clean`, which no longer applies
+because no capture route moves, and `fixture-passes-by-finding-nothing`, answered by AC6's clone,
+whose coverage is armed over a chain build.
 
 Recall terms used: `python tools/memory-recall/query.py "carries coverage derived twice in the staged
 hygiene run, and with-verdicts refused beside staged" --terms "carries coverage memo with-verdicts

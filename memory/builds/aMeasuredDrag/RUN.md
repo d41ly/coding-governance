@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: aebbb4a725d58dd69b12f1f319e82f5b5d8a8e8e · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 6d98c39caeab14cf088d3dc941ebfc7d7cb6bf5b
 phase: BUILDING
@@ -29,3 +30,9 @@ anchor-ref: refs/heads/main
 base: a0a1892de069cd2299ba162d885ac283cfa81010
 
 ## Parked
+
+2026-11-15T01:35:20Z decision · item TOOL-aMeasuredDrag-1 F1: test status before the pass walk in read_open_passes? · reason Options: A leave read_open_passes as is (taken); B status first, naming every key of a terminal or deferred unit on stderr, which recovers the measured ~71 s walk on dOrderedCharter but adds stderr lines (89 per --dispatch there); C status first silently. Refused B and C: both move printed lines against the README rule; an owner call.
+
+2026-11-15T01:35:25Z decision · item TOOL-aMeasuredDrag-3 F1: the --staged --with-verdicts half (one generator process for checks 9, 29 and 30 in pre-commit) · reason Options: (a) ship it, saving ~15-20 s per structural memory commit, but a verb crash under --staged prints the in-process heading instead of a traceback; (b) ship the per-process memo alone (taken). Refused (a): it moves a printed line against the README rule; an owner call.
+
+2026-11-15T01:35:28Z rescope · item defer TOOL-aMeasuredDrag-2 · reason F1 resolved C: every spawn-skipping stop-guard option moves check 54's refusal text on the driver-failure case, a printed line under the README rule; aLightenedLoop's unlanded liveness cache works the same area

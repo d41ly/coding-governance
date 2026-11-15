@@ -1,12 +1,13 @@
 # TOOL-aMeasuredDrag-8 — brief-recorded's date cutoff compared in the shell, with no process per README
 
-**Status:** OPEN · rev-1 · 2026-11-15 · node a · Tier-1 · base aebbb4a7 · streams tooling · order 8
+**Status:** SPECCED · rev-2 · 2026-11-15 · node a · Tier-1 · base aebbb4a7 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-brief.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-brief.md) | research | TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-4 TOOL-aMeasuredDrag-5 TOOL-aMeasuredDrag-6 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-9 TOOL-aMeasuredDrag-10 TOOL-aMeasuredDrag-11 |
+| [2026-11-15-prompt-TOOL-aMeasuredDrag-1-ruling-brief.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-ruling-brief.md) | research | TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-7 |
 
 <!-- /gen:spec-records -->
 
@@ -14,8 +15,8 @@
 
 The `brief-recorded` leg decides each build README's date cutoff with `printf | sort -C`, a pipeline
 of processes per README, over every README at HEAD (finding spawns-4). This unit makes that one test
-a bash string compare, which spawns nothing. Its twin in the `pass-order history` leg moves too, per
-F1's recommendation. Which builds are graded does not change.
+a bash string compare, which spawns nothing. Its twin in the `pass-order history` leg moves too,
+as F1 resolved. Which builds are graded does not change.
 
 ## 2. Scope (IN)
 
@@ -167,6 +168,8 @@ added or moved.
 ## 7. Open questions
 
 - **F1 — Does the twin cutoff in `check-pass-order.sh:330` move with this one?**
+  RESOLVED (agent, 2026-11-15, delegated): (b) — both per-README loops lose the same measured cost
+  and no verdict moves.
   The brief offers both choices: move the sibling cutoffs the `:366-367` comment names, or state why
   this one differs.
   - (a) Only `check-brief-recorded.sh:368`. The comment at `:366-367` then says the other legs keep
@@ -187,6 +190,9 @@ added or moved.
 - rev-1 · 2026-11-15 · initial draft from the build brief
   `2026-11-15-prompt-TOOL-aMeasuredDrag-1-brief`, item 8, grounded at `6d98c39ca`, whose cited files
   match the base `aebbb4a7`.
+- rev-2 · 2026-11-15 · §1 · §7 · F1 resolved as (b) under the run's delegation
+  (`2026-11-15-prompt-TOOL-aMeasuredDrag-1-ruling-brief`), so S2 and the `check-pass-order.sh`
+  halves of AC1 to AC3 stand. The status moves to SPECCED, as the build's other Tier-1 specs read.
 
 ## 9. Reuse audit
 

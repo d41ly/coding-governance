@@ -1,12 +1,13 @@
 # TOOL-aMeasuredDrag-2 — the stop-guard decides a terminal lease and a pending background task before it spawns `--liveness`
 
-**Status:** SPECCED · rev-1 · 2026-11-15 · node a · Tier-1 · base aebbb4a7 · streams tooling · order 2
+**Status:** DEFERRED · rev-2 · 2026-11-15 · node a · Tier-1 · base aebbb4a7 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-brief.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-brief.md) | research | TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-4 TOOL-aMeasuredDrag-5 TOOL-aMeasuredDrag-6 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 TOOL-aMeasuredDrag-9 TOOL-aMeasuredDrag-10 TOOL-aMeasuredDrag-11 |
+| [2026-11-15-prompt-TOOL-aMeasuredDrag-1-ruling-brief.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-ruling-brief.md) | research | TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 |
 
 <!-- /gen:spec-records -->
 
@@ -20,6 +21,9 @@ review's skeptic counted 5,492 of 5,653 bound Stops PINNED (verdicts record, 202
 background tasks, each paying the spawn first. This unit decides the two allows that need no driver
 before the spawn, with the block or allow decision unchanged for every payload over a record the
 driver wrote.
+
+F1 resolved as option C: the unit is deferred whole, and no pass of this run builds it. The scope,
+design and criteria below are the parked design, kept for the owner with the price F1 states.
 
 ## 2. Scope (IN)
 
@@ -59,7 +63,7 @@ driver wrote.
 - What moves, stated rather than hidden. On a record the driver wrote, the decision, stdout,
   stderr and exit status never move.
   On a stop S1 decides, the sidecar's `verdict` reads `unknown`. Its `reason` differs from today's
-  in two cases only, and F1 asks whether that is admitted: a payload cwd in a worktree off the
+  in two cases only, and F1 parks the unit on them: a payload cwd in a worktree off the
   run's branch with tasks pending, today `elsewhere`; and a driver that would have failed, today
   `liveness-unreadable`, where `phase` also reads the lease's phase instead of `unknown`.
 - The terminal test reads the lease's phase as `scanLeases` trims it, as the question arm of
@@ -167,6 +171,9 @@ observed by AC1 to AC3 and by no arm. No arm is added or moved.
 
 - **F1 — On a stop S1 decides, may the sidecar's `reason` read `background-tasks` where the driver
   would have answered `elsewhere`, or `liveness-unreadable`?**
+  RESOLVED (agent, 2026-11-15, delegated): C — every spawn-skipping option moves check 54's refusal
+  text on the driver-failure case, a printed line under the README's rule (M3 veto 1); the unit is
+  deferred whole, and aLightenedLoop's liveness cache already works this area.
   The brief admits only the line's `phase` and `verdict` reading `unknown` for these stops. The
   `reason` cannot match today's in the two cases §3 names, because only the driver can tell them.
   Nothing in the tree reads `reason` but the stop-guard suite:
@@ -195,6 +202,9 @@ observed by AC1 to AC3 and by no arm. No arm is added or moved.
 ## 8. Revision log
 
 - rev-1 · 2026-11-15 · initial draft from brief item 2 of the aMeasuredDrag brief.
+- rev-2 · 2026-11-15 · §1 · §3 · §7 · F1 resolved as option C under the run's delegation
+  (`2026-11-15-prompt-TOOL-aMeasuredDrag-1-ruling-brief`): the unit is deferred whole, and S1 to S6
+  and AC1 to AC4 stand as the parked design. The status is the run's `--rescope` to set.
 
 ## 9. Reuse audit
 

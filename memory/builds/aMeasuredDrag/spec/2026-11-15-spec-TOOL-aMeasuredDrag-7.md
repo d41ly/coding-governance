@@ -1,12 +1,13 @@
 # TOOL-aMeasuredDrag-7 — the recall cache budget sized above two gov indexes, so two worktrees stop evicting each other
 
-**Status:** OPEN · rev-1 · 2026-11-15 · node a · Tier-1 · base aebbb4a7 · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-11-15 · node a · Tier-1 · base aebbb4a7 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-brief.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-brief.md) | research | TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-4 TOOL-aMeasuredDrag-5 TOOL-aMeasuredDrag-6 TOOL-aMeasuredDrag-8 TOOL-aMeasuredDrag-9 TOOL-aMeasuredDrag-10 TOOL-aMeasuredDrag-11 |
+| [2026-11-15-prompt-TOOL-aMeasuredDrag-1-ruling-brief.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-ruling-brief.md) | research | TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-8 |
 
 <!-- /gen:spec-records -->
 
@@ -124,7 +125,7 @@ stamp line. The manifest's stamp-conflict rule reconciles that line at their lan
 ## 5. Acceptance criteria
 
 All commands run from the worktree root in Git Bash. `$SCRATCH` is the run's scratch directory,
-spelled absolute. Each figure below is for F1's recommended 2048. Under option (a) it reads 1024.
+spelled absolute. Each figure below is for 2048, the value F1 resolved.
 
 - **AC1** — When the block below runs after the change, it prints `budget_mb 2048.0`, `lines []` and
   `sibling_kept True`. Before the change it printed `budget_mb 512.0`, one
@@ -189,6 +190,8 @@ source, so the comment edit is one chunk it ranks. No arm is added or moved.
 ## 7. Open questions
 
 - **F1 — Which value does `RECALL_CACHE_BUDGET_MB` take?**
+  RESOLVED (agent, 2026-11-15, delegated): (b) 2048 — the longest-lasting bounded value; no veto
+  applies.
   The brief asks for a value above two gov caches. Two caches are 804 MB, PINNED at `6d98c39ca`, and
   each grows about 7 MB a day, PINNED over `6e7022f3f..6d98c39ca`.
   - (a) `1024`. Two caches fit for about 16 days at the rate PINNED over `6e7022f3f..6d98c39ca`, and
@@ -205,6 +208,10 @@ source, so the comment edit is one chunk it ranks. No arm is added or moved.
 - rev-1 · 2026-11-15 · initial draft from the build brief
   `2026-11-15-prompt-TOOL-aMeasuredDrag-1-brief`, item 7, grounded at `6d98c39ca`, whose cited files
   match the base `aebbb4a7`.
+- rev-2 · 2026-11-15 · §5 · §7 · F1 resolved as (b) 2048 under the run's delegation
+  (`2026-11-15-prompt-TOOL-aMeasuredDrag-1-ruling-brief`), so the §5 preamble drops the option (a)
+  figure. S1 to S4 and AC1 to AC5 were already written for 2048. The status moves to SPECCED, as
+  the build's other Tier-1 specs read.
 
 ## 9. Reuse audit
 

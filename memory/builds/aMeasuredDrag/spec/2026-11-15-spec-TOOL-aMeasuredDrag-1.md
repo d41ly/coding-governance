@@ -1,6 +1,6 @@
 # TOOL-aMeasuredDrag-1 — `--check-commit` reads its `Pass:` trailer before it walks any pass, and walks only the units the message names
 
-**Status:** SPECCED · rev-1 · 2026-11-15 · node a · Tier-1 · base aebbb4a7 · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-11-15 · node a · Tier-1 · base aebbb4a7 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -26,6 +26,7 @@
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-16-skeptic.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-16-skeptic.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-17-skeptic.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-17-skeptic.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-18-synthesizer.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-18-synthesizer.md) | journal | — |
+| [2026-11-15-prompt-TOOL-aMeasuredDrag-1-19-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-19-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-2-researcher.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-2-researcher.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-3-researcher.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-3-researcher.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-4-researcher.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-4-researcher.md) | journal | — |
@@ -35,6 +36,7 @@
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-8-researcher.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-8-researcher.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-9-researcher.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-9-researcher.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-brief.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-brief.md) | research | TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-4 TOOL-aMeasuredDrag-5 TOOL-aMeasuredDrag-6 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 TOOL-aMeasuredDrag-9 TOOL-aMeasuredDrag-10 TOOL-aMeasuredDrag-11 |
+| [2026-11-15-prompt-TOOL-aMeasuredDrag-1-ruling-brief.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-ruling-brief.md) | research | TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 |
 | [2026-11-15-review-TOOL-aMeasuredDrag-1-performance.md](../reviews/2026-11-15-review-TOOL-aMeasuredDrag-1-performance.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -47,7 +49,8 @@ reads the `Pass: none` that ends most checks, so a records commit pays one `pass
 dispatched unit for an answer it discards. This unit reads the trailer first and asks openness only
 of the units the message names, with every exit status and printed line unchanged. The brief's
 second half, the status test ahead of openness in `read_open_passes`, cannot keep its stderr lines
-unchanged, and is fork F1.
+unchanged. F1 resolved it as option A: that reorder is parked for the owner with its price, and this
+unit does not build it.
 
 ## 2. Scope (IN)
 
@@ -68,9 +71,10 @@ unchanged, and is fork F1.
 
 ## 3. Non-goals (OUT)
 
-- `read_open_passes` (`:14192-14211`) is not edited while F1 is open. Its order is the stated
-  design of TOOL-dGroundRules-66: openness is asked first so that "a closed key of a terminal unit
-  prints nothing" (its spec, lines 127-128).
+- `read_open_passes` (`:14192-14211`) is not edited: F1 resolved as option A, and the status-first
+  reorder is parked for the owner with the price F1 states. Its order is the stated design of
+  TOOL-dGroundRules-66: openness is asked first so that "a closed key of a terminal unit prints
+  nothing" (its spec, lines 127-128).
 - `pass_commit` in `tools/unattended/lib-unattended.sh` is not edited. One `git log` walk shared by
   every key is the finding's second fix, and a cache of it is the review's section 5 work.
 - `--dispatch`, `--audit` and the check 23 leg are not edited.
@@ -147,6 +151,8 @@ amend case of TOOL-aWindowedPass-6 among them) through its selftest shards. No a
 ## 7. Open questions
 
 - **F1 — Does `read_open_passes` test status before openness, given that this moves stderr lines?**
+  RESOLVED (agent, 2026-11-15, delegated): A — B moves stderr lines against the README's
+  printed-line rule (M3 veto 1); the reorder is parked for the owner with its price.
   The brief orders the status test (`:14200-14208`) ahead of `check_pass_open` (`:14199`) and also
   orders that the stderr naming of keys a status skip releases is kept (`:14186`). Today only an
   OPEN key of a terminal or deferred unit is named, and deciding which keys are open is the walk
@@ -172,6 +178,9 @@ amend case of TOOL-aWindowedPass-6 among them) through its selftest shards. No a
 ## 8. Revision log
 
 - rev-1 · 2026-11-15 · initial draft from brief item 1 of the aMeasuredDrag brief.
+- rev-2 · 2026-11-15 · §1 · §3 · §7 · F1 resolved as option A under the run's delegation
+  (`2026-11-15-prompt-TOOL-aMeasuredDrag-1-ruling-brief`): the `read_open_passes` reorder is parked
+  for the owner, and no scope item or criterion grades it. S1 to S4 and AC1 to AC3 are unchanged.
 
 ## 9. Reuse audit
 
