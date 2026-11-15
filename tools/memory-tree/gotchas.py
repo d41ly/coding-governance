@@ -332,6 +332,9 @@ def load_records_at(root: str, m: str, sha: str) -> tuple:
     return recs, unparsed
 
 
+_BASENAMES: dict = {}   # path -> os.path.basename(path), once per process (TOOL-aHastenedSweep-2 S1)
+
+
 def selectable(anchor: str, paths, m: str) -> set:
     """The paths an anchor can select. THE ONE COPY of the selection predicate.
 
@@ -343,11 +346,25 @@ def selectable(anchor: str, paths, m: str) -> set:
     class, and with basename matching a record naming `INDEX.md` would select every `INDEX.md` in the
     tree — so a diff that touches the catalogue would emit most of the catalogue. Noise on a
     checklist is how reviewers learn to skip it.
+
+    Each path's basename is read from `_BASENAMES`, computed once per process, and the anchor's once
+    per call, so the tests and their order are the expression's they replaced.
     """
     skip = f"{m}/gotchas/"
-    return {p for p in paths
-            if not p.startswith(skip)
-            and (anchor in p or p in anchor or os.path.basename(p) == os.path.basename(anchor))}
+    base = os.path.basename(anchor)
+    out = set()
+    for p in paths:
+        if p.startswith(skip):
+            continue
+        if anchor in p or p in anchor:
+            out.add(p)
+            continue
+        b = _BASENAMES.get(p)
+        if b is None:
+            b = _BASENAMES[p] = os.path.basename(p)
+        if b == base:
+            out.add(p)
+    return out
 
 
 def derive_anchor_tier(anchor: str, path: str) -> int:

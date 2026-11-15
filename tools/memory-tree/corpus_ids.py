@@ -454,6 +454,7 @@ def walk(root: str, conf: dict) -> dict:
     m = conf["MEMORY_ROOT"]
     tracked = [p for p in run("git", "ls-files", cwd=root).split("\n") if p]
     tracked_set = set(tracked)
+    roots = _roots(tracked_set)   # once per walk: _roots is pure and the loop never changes tracked_set (TOOL-aHastenedSweep-2 S2)
     corpus = [p for p in tracked if p.startswith(m + "/")]
     build_re = re.compile(r"^" + re.escape(m) + r"/builds/([^/]+)/")
     h1_re = re.compile(r"^#\s+[`*]*(" + E.ID + r")\b")
@@ -566,7 +567,7 @@ def walk(root: str, conf: dict) -> dict:
                 # `<prefix>/` install: seven dead kit paths in a scaffolded `HYGIENE.md` and the gate
                 # exited 0. A tail match is deliberately narrow — an unresolvable token that matches
                 # nothing tracked is still prose, not a finding.
-                if cited.split("/", 1)[0] + "/" not in _roots(tracked_set):
+                if cited.split("/", 1)[0] + "/" not in roots:
                     # RELATIVE TO THE CITING FILE first. Inside the memory tree the ordinary link
                     # shape is `builds/<slug>/README.md` written from `LIVE.md`, and it is correct.
                     # Measured on the first run of the tail rule below: 17 such links reported dead,
