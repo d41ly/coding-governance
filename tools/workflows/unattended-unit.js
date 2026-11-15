@@ -438,13 +438,17 @@ if (cfg.passBase !== undefined) log('unit ' + cfg.unitId + ': branch=' + ((r && 
 // TOOL-aTwinnedPass-1 - THE BRANCH AND WORKTREE AN AGENT RETURNED reach the return and `nextAction`
 // only through these shapes, as `sha` and `base` reach `nextAction` only through COMMIT_SHAPE. An
 // empty string is the shape check's refusal; the log line above keeps the raw values.
-// TOOL-aTwinnedPass-4 - the shapes are the runtime's own spelling, `worktree-agent-<id>` at
-// `<primary tree>/.claude/worktrees/agent-<id>`, and `pass-tree.sh` refuses the same branch shape at
-// the other end; TREE_SHAPE's lookahead is the template's `..` test, copied, as a workflow script is
-// evaluated alone.
+// TOOL-aTwinnedPass-4 - the shapes are the runtime's own spelling; TREE_SHAPE's lookahead is the
+// template's `..` test, copied, as a workflow script is evaluated alone.
+// TOOL-aTwinnedPass-11 - the runtime cuts two spellings. The Agent tool cuts `agent-<id>` at
+// `<primary tree>/.claude/worktrees/agent-<id>` on `worktree-agent-<id>`. A Workflow cuts
+// `wf_<run id>-<n>` at `<primary tree>/.claude/worktrees/wf_<run id>-<n>` on `worktree-wf_<run id>-<n>`.
+// PASS_NAME states that name once for both shapes. `pass-tree.sh`'s `check_pass_branch` spells the
+// same alternation, held to this one by no gate, owed under ask TOOL-aTwinnedPass-7.
 // owner of the absolute prefix: unattended-build.template.js `scratch`
-const TREE_SHAPE = /^(?!.*(^|[\\/])\.\.([\\/]|$))(\/|[A-Za-z]:[\\/])([A-Za-z0-9._ -]+[\\/])*\.claude[\\/]worktrees[\\/]agent-[A-Za-z0-9]+$/
-const BRANCH_SHAPE = /^worktree-agent-[A-Za-z0-9]+$/
+const PASS_NAME = 'agent-[A-Za-z0-9]+|wf_[0-9a-f]+-[0-9a-f]+-[0-9]+'
+const TREE_SHAPE = new RegExp(/^(?!.*(^|[\\/])\.\.([\\/]|$))(\/|[A-Za-z]:[\\/])([A-Za-z0-9._ -]+[\\/])*\.claude[\\/]worktrees[\\/]/.source + '(?:' + PASS_NAME + ')$')
+const BRANCH_SHAPE = new RegExp('^worktree-(?:' + PASS_NAME + ')$')
 const ownBranch = r && typeof r.branch === 'string' && BRANCH_SHAPE.test(r.branch) ? r.branch : ''
 const ownTree = r && typeof r.worktree === 'string' && TREE_SHAPE.test(r.worktree) ? r.worktree : ''
 
