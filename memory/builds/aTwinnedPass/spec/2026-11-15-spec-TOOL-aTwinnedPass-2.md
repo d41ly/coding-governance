@@ -1,6 +1,6 @@
 # TOOL-aTwinnedPass-2 — the pass-tree tool: merge a pass's own branch back `--no-ff` with generated outputs re-rendered, or take it away
 
-**Status:** INPROGRESS · rev-2 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 2 · closes TOOL-dDerivedDocket-57
+**Status:** CLOSED · rev-2 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 2 · closes TOOL-dDerivedDocket-57
 
 <!-- gen:spec-records -->
 
