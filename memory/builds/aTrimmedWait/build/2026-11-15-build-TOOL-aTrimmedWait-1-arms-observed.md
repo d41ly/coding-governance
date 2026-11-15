@@ -1,6 +1,6 @@
 # aTrimmedWait — the new arms observed red and green by the main loop
 
-**Serves:** journal TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10
+**Serves:** journal TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10 TOOL-aTrimmedWait-11
 
 Observed by the main loop on node a, 2026-11-14 and 2026-11-15, on a frozen clone of `057f26ba4`,
 one suite at a time with nothing running beside it. Every `New arm:` line of the nine specs.
@@ -98,3 +98,21 @@ It is inherited: the arm came in with `TOOL-aSparedSpawn-7` and the field with
 `TOOL-dDerivedDocket-9`, both ancestors of the base `846d51d39`, and this build moves neither the arm
 nor `tools/memory-tree/transition_audit.py`. The owner ruled on 2026-11-15 to repair it here anyway,
 as `TOOL-aTrimmedWait-11`.
+
+## TOOL-aTrimmedWait-11's arms, observed by the main loop
+
+Fresh `git clone --no-local` copies with no `transition-audit-cache` under their git dir, one at a
+time, 2026-11-15:
+
+- RED, the partition arm: the hygiene suite at `ff4242f8b` on such a clone printed `FAIL the scoped
+  runs do not partition the unscoped run's lines`, its diff the `cache hits 0` against `cache hits 4`
+  line, as recorded under unit 10's GREEN above.
+- RED, the fixture arm: at `ff9bb395c` with `derive_partition_lines` reduced to the `ff4242f8b`
+  pipeline, the suite printed `FAIL check 26's cold and warm liveness lines compare unequal through
+  derive_partition_lines` and `FAIL check 26's cache recomputed line was not set aside, or the
+  producer rendered none`, and was stopped once the arm's last assertion had spoken.
+- GREEN: the hygiene suite at `ff9bb395c` on a cold clone exited 1 on the seven conf-example rows
+  listed under "Inherited" and nothing else; neither unit-11 arm printed a FAIL.
+- AC6: two `check-memory-hygiene.sh --only 26` runs on a cold clone of `ff9bb395c` printed check 26's
+  line ending `cache hits 0`, then `cache hits 4`; the raw outputs differ and read the same through
+  `derive_partition_lines`.
