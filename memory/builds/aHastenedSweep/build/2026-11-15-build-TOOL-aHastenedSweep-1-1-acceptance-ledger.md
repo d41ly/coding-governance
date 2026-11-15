@@ -13,7 +13,7 @@ suite, gate leg or bar ran in the pass.
 Owed to the main loop at the close:
 - AC3, the live-tree A/B: `check-memory-hygiene.sh --only 25`, changed against shipped at one commit,
   `cmp`-identical with the same exit code, with both wall times and the output's line count recorded here.
-- The §7 legs, and in the `memory-hygiene self-test` leg the check 25 arms `tFixture-208`,
+- The legs §7 lists, and in the `memory-hygiene self-test` leg the check 25 arms `tFixture-208`,
   `tFixture-209`, `tFixture-216` and the word-boundary fixtures 218 to 221 keeping their red verdicts.
   This unit adds no arm, so no `New arm:` red-then-green is owed.
 

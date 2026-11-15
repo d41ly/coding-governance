@@ -1,6 +1,6 @@
 # TOOL-aHastenedSweep-3 — the hygiene shell hands `corpus_ids.py --check` its index set when checks 1 to 5 ran clean
 
-**Status:** SPECCED · rev-1 · 2026-11-15 · node a · Tier-2 · base f25308f0 · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-11-15 · node a · Tier-2 · base f25308f0 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -185,9 +185,9 @@ Neither name occurs in the tree at base outside this build's records, by `git gr
   ignores the variable, so `ask_shell` resolves the missing bash; or the handed set is empty, so rule 3
   names `memory/README.md`.
   fixture: `_b1` in the hygiene suite, at its base conf; at base f25308f0 the arm is red.
-- **AC2** — When a copy of the `_b1` tree stages a stray `stray.md` at the memory root, which check 3 refuses, and
+- **AC2** — When a copy of the `_b1` tree stages a stray `stray.md` at the memory root, which the root-file check refuses, and
   `bash check-memory-hygiene.sh` runs there, once plain and once with `GOV_INDEX_SET_STDIN=1`
-  exported, both outputs carry `HYGIENE check 3 FAILED` and `answered with findings`.
+  exported, both outputs carry that check's `FAILED` line and `answered with findings`.
   Red when: `_IXH` ignores `status`, or the launch sets the variable only when eligible so the
   exported value reaches the child.
 - **AC3** — When `bash check-memory-hygiene.sh --only 16` runs in the AC2 tree, its output carries
@@ -232,6 +232,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-15 · initial draft.
+- rev-2 · 2026-11-15 · AC2 names the stray-file refusal by what it checks, not by its number, which the positional leg reds as an unlisted citation (main loop, pass legs after unit 1).
 
 ## 10. Reuse audit
 
