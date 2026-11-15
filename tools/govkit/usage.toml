@@ -356,6 +356,12 @@ verb = "card-keys"
 flags = []
 
 [[usage]]
+id = "script:{prefix}/loop/position.py"
+shape = "verb"
+entry = "{prefix}/loop/position.py"
+flags = ["--json", "--next-line", "--fixture", "--plant=", "--selftest"]
+
+[[usage]]
 id = "script:{prefix}/loop/loop_table.py"
 shape = "verb"
 entry = "{prefix}/loop/loop_table.py"

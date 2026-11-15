@@ -84,6 +84,7 @@
       "loop guard fixtures",
       "loop item kind",
       "loop parent routes",
+      "loop position fixtures",
       "loop transition record",
       "loop transition tables",
       "manifest-check self-test",

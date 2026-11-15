@@ -92,6 +92,7 @@ loop parent routes	kit	selftests
 loop transition record	repo	selftests
 loop guard fixtures	kit	selftests
 loop claims fixtures	kit	selftests
+loop position fixtures	kit	selftests
 loop transition tables	repo	declarations
 manifest-check self-test	kit	selftests
 marker contracts	repo	declarations

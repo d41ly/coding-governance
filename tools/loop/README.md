@@ -395,6 +395,42 @@ python <prefix>/loop/claims.py card-keys
 python <prefix>/loop/claims.py --selftest
 ```
 
+## The position engine
+
+`position.py` (TOOL-dDeclaredLoop-7) answers where a build is and what runs next from witnesses alone.
+`derive_position(repo, slug, definition=None)` reads the run branch's `--first-parent` commits and
+their `Pass:` trailers through the memory-tree kit's `read_commits` and `derive_attribution` in the
+`replace` view, the build's moves through `read_transitions`, each held by a build row through
+`loop_table.check_recorded_move`, the tables through `read_transition_rows`, the items through
+`read_composition`, gov's own rows where that composition is unarmed in the tree, the acceptance
+records through `read_records` with `read_acceptance`, the run-state file's facts through the policy
+kit's `read_run_fact`, and the default branch's remote-tracking tip. A parsed `definition` replaces the
+shipped one and the composition for that call, which is how the plants are made in memory.
+`check_recorded_move` matches a move to a build row by its item, its `from` through the expansion
+`derive_from_states` shares with `derive_move`, and its `to`, `@prior` or `@reentry`, since a record
+holds no outcome to replay.
+
+Each unit's M2 state is the unattended driver's: `--plan` hands its rows over in
+`GOV_POSITION_STATES` with the first undecided ask, each parent's derived phase, `RESUME_STALE_BOUND`
+and the owed park sets, and the engine run standalone asks `--plan` with the variable set empty, which
+answers with those lines in place of `next:`. A unit is `designed` on a READY spec, `built` on a pass
+commit an acceptance record names, `tested` on the `gates-run` tip containing it, `deployed` on the
+remote-tracking tip containing it. The build's step is its least-advanced unit's next step, and the
+next item the first of that step whose witness does not hold and whose needs are witnessed, keyed
+`<item>@<unit>#<inputs>` by `derive_instance_key`. The answer is one of `ANSWERS` by the spec's
+precedence, `render_next_line` maps it onto `--plan`'s five shapes in `NEXT_SHAPES`, and every claim
+prints with its key and verdict through `claims.py`. The driver's `--plan` prints that line as `next:`
+and `--status` prints the engine's lines after its own; both find the module by `resolve_kit_dir`.
+`--fixture --plant <case>` runs one of `PLANTS` over a scratch repository and bare remote, the last two
+over the unattended driver, and `--selftest` runs every case through `run_selftest_cases`; it is gov's
+`loop position fixtures` leg.
+
+```bash
+python <prefix>/loop/position.py <slug> [--json | --next-line]
+python <prefix>/loop/position.py --fixture --plant steps
+python <prefix>/loop/position.py --selftest
+```
+
 ## The item kind
 
 The items are a registered kind (TOOL-dDeclaredLoop-24): the kinds register's `kind.item` row names

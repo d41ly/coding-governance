@@ -3976,52 +3976,48 @@ same "--plan --paths: a spec at rev-5 keeps its path" \
 same "--plan default: a spec at rev-5 adds no TAB" "$(run --plan tPlan | grep -cF "$TAB")" "0"
 git reset -q --hard HEAD~1; git clean -qfd
 
-# ---- TOOL-dDerivedDocket-49: the `next:` line comes off a DECLARED ladder ------------------------
-# The precedence between the shapes used to be whichever of `verb_plan`'s two loops bash reached
-# first: three guarded assignments, a rule that existed only in prose, and a fourth shape addable
-# only by typing a fourth assignment and arguing about where. It is a table in the driver now, one
-# line per rung, and these arms read the ORDER back out of the source and then exercise every rung
-# and every adjacent-rung boundary that exists at this unit's order.
+# ---- TOOL-dDeclaredLoop-7: the `next:` line comes off the POSITION ENGINE ------------------------
+# TOOL-dDerivedDocket-49's ladder, five rungs over the roster's typed state, is retired: the line is
+# the loop kit's `position.py <slug> --next-line`, which derives each unit's step from witnesses and
+# renders the same five shapes from its `NEXT_SHAPES`. Each arm below replaced one of the ladder's, so
+# the floors do not move: the source arms read the engine's table, and the runtime arms assert the
+# engine's choice, which names the LEAST-ADVANCED unit where the ladder named the first READY one.
+_pos_rel=$(resolve_kit_dir "$_rkd_py" loop position.py "$HERE" 2>/dev/null) || _pos_rel=""
+POS_PY="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$_pos_rel/position.py"
 
-# AC1 — no guarded assignment to the line survives, and the ladder is called exactly once. Full-line
+# AC1 — no guarded assignment to the line survives, and the engine is called exactly once. Full-line
 # COMMENTS are stripped first, and deliberately: the driver's own comment QUOTES the retired shape
 # so the next reader knows what was removed, and an arm that reds on that prose teaches whoever
 # meets it to delete the explanation rather than the code.
 same "no guarded next assignment survives in the driver's code" \
   "$(grep -v '^[[:space:]]*#' "$SCRIPT" | grep -c '|| next=')" "0"
-same "the ladder has exactly one call site" \
-  "$(grep -c 'derive_next_shape "' "$SCRIPT")" "1"
+same "the engine's next line has exactly one call site" \
+  "$(grep -c '"$PE_PATH" "$slug" --next-line' "$SCRIPT")" "1"
 
-# AC5 — the DECLARED rung order, read back out of the driver rather than out of a copy of it. Five
-# rungs, in order, with the undecided-ask rung THIRD: after both unit rungs and before both terminal
-# ones. That position is what TOOL-dDerivedDocket-16 consumes, and moving a line in the table moves
-# the rule — which is the whole reason the table exists instead of three assignments and a paragraph.
-rungs=$(grep '^rung ' "$SCRIPT" | awk '{print $2}')
-same "the ladder declares exactly five rungs" "$(printf '%s\n' "$rungs" | grep -c .)" "5"
-same "rung 1 is the live unit"            "$(printf '%s\n' "$rungs" | sed -n 1p)" "live-unit"
-same "rung 2 is the missing unit"         "$(printf '%s\n' "$rungs" | sed -n 2p)" "missing-unit"
-same "rung 3 is the undecided ask"        "$(printf '%s\n' "$rungs" | sed -n 3p)" "undecided-ask"
-same "rung 4 is the nothing-graded shape" "$(printf '%s\n' "$rungs" | sed -n 4p)" "nothing-graded"
-same "rung 5 is the terminal shape"       "$(printf '%s\n' "$rungs" | sed -n 5p)" "everything-terminal"
+# AC10 — the engine's DECLARED shapes, read back out of `position.py` rather than out of a copy of it:
+# seven entries, the five shapes `--plan` printed, the THIN/FORKED form of the live one, and the
+# fall-through no reader matches as an all-clear.
+shapes=$(sed -n '/^NEXT_SHAPES = {/,/}$/p' "$POS_PY" | grep -oE '"[a-z-]+": "' | cut -d'"' -f2)
+same "the engine declares exactly seven shapes" "$(grep -c . <<< "$shapes")" "7"
+same "the engine declares the live-unit shape"      "$(grep -cx live-unit <<< "$shapes")" "1"
+same "the engine declares the missing-unit shape"   "$(grep -cx missing-unit <<< "$shapes")" "1"
+same "the engine declares the undecided-ask shape"  "$(grep -cx undecided-ask <<< "$shapes")" "1"
+same "the engine declares the nothing-graded shape" "$(grep -cx nothing-graded <<< "$shapes")" "1"
+same "the engine declares the terminal shape"       "$(grep -cx everything-terminal <<< "$shapes")" "1"
 
 # AC6 — the two terminal shapes stay DISTINCT strings, each present verbatim exactly once. Leg
-# check 30 reads the conjunction of a NOT A UNIT row with the LAST rung's wording, and the runtime
-# arms below match on the same words, so reflowing one of these unwires three readers at once while
-# the ladder goes on reporting itself correct.
-#
-# THE LITERALS ARE RETYPED HERE, AND THAT IS THE MECHANISM RATHER THAN A SECOND COPY TO KEEP IN
-# STEP. The sibling `RB_TAIL_` pins in this file were sourced from the driver precisely so a moved
-# pin could not leave the arms cutting at the old value; these two must NOT be, because the question
-# they ask is whether the driver still spells this exact wording, and a value read out of the driver
-# and compared against itself answers that for every wording equally.
-same "the terminal rung's wording is in the table verbatim, once" \
-  "$(grep -c '^rung everything-terminal none - every tracked spec is terminal$' "$SCRIPT")" "1"
-same "the nothing-graded rung's wording is in the table verbatim, once" \
-  "$(grep -c '^rung nothing-graded none - no tracked spec grades as a unit (see the NOT A UNIT rows above)$' "$SCRIPT")" "1"
+# check 30 reads the conjunction of a NOT A UNIT row with the terminal wording, and the harness's
+# close cue ends the build loop on it, so reflowing one unwires both while the engine goes on
+# reporting itself correct. THE LITERALS ARE RETYPED HERE ON PURPOSE: a value read out of the engine
+# and compared against itself answers "is this still the wording" for every wording equally.
+same "the terminal shape's wording is in the engine verbatim, once" \
+  "$(grep -cF '"everything-terminal": "none - every tracked spec is terminal"' "$POS_PY")" "1"
+same "the nothing-graded shape's wording is in the engine verbatim, once" \
+  "$(grep -cF '"nothing-graded": "none - no tracked spec grades as a unit (see the NOT A UNIT rows above)"' "$POS_PY")" "1"
 
-# AC3 — rung 1 over rung 2. A build with work ready to do reports the READY unit and never the
-# roster id nobody has specced. The MISSING arm further up asserts the ROW and says nothing at all
-# about which of the two rungs took the line, which is the gap this closes.
+# AC10 — the least-advanced unit takes the line. A READY unit and a roster id nobody has specced: the
+# MISSING one is `none`, below the READY one's `designed`, so it is named, and the harness holds on it
+# rather than dispatching the READY one (TOOL-dDeclaredLoop-7 section 5). The ladder named the READY one.
 reset_tree; readme tPlan
 mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
 roster tPlan "1. ARCH-tPlan-1 the specced one
@@ -4029,12 +4025,11 @@ roster tPlan "1. ARCH-tPlan-1 the specced one
 fixture
 out=$(run --plan tPlan)
 same "the MISSING roster id still gets its own row" "$(printf '%s\n' "$out" | grep -c 'MISSING$')" "1"
-hit "$out" "next: ARCH-tPlan-1 (READY - build it)"
-miss "$out" "next: ARCH-tPlan-7"
+hit "$out" "next: ARCH-tPlan-7 (MISSING - spec it first)"
+miss "$out" "next: ARCH-tPlan-1"
 git reset -q --hard HEAD~1; git clean -qfd
 
-# AC2 — rung 2 over rung 5, the boundary the promoting record found stated in prose and observed by
-# nothing: a roster id with no tracked spec while every tracked spec IS terminal. The build is not
+# AC2 — a roster id with no tracked spec beside a unit whose header is typed CLOSED. The build is not
 # finished, and the one verb an agent reads to pick up work must not tell it otherwise.
 reset_tree; readme tRun
 mutate memory/builds/tRun/README.md 's/ARCH/EXMP/g'
@@ -4045,18 +4040,18 @@ fixture
 out=$(run --plan tRun)
 hit "$out" "next: EXMP-tRun-2 (MISSING - spec it first)"
 miss "$out" "next: none - every tracked spec is terminal"
-# ...and with that one id out of the roster, rung 5 takes the line. Same tree, one roster row fewer:
-# without this half the arm above is satisfied by a driver that prints the MISSING shape whatever
-# the roster holds, which is the could-not-fail shape this build keeps finding one level up.
+# ...and with that one id out of the roster, the typed CLOSED header decides nothing: the unit has no
+# pass commit and no acceptance record, so it reads `designed` and takes the line, where the ladder
+# read its status word and printed the terminal shape (TOOL-dDeclaredLoop-7 AC1, `typed-status`).
 mutate memory/builds/tRun/README.md '/^2\. EXMP-tRun-2 the one nobody has specced$/d'
 fixture
 out=$(run --plan tRun)
-hit "$out" "next: none - every tracked spec is terminal"
+hit "$out" "next: EXMP-tRun-1 (READY - build it)"
 miss "$out" "MISSING"
 git reset -q --hard HEAD~2; git clean -qfd
 
-# AC4 — rung 4 fires and rung 5 does not, with the WHOLE line pinned rather than the two phrases.
-# The sibling arm above asserts the wording; a caller parses the shape.
+# AC4 — nothing grades and nothing is MISSING: the nothing-graded shape, with the WHOLE line pinned
+# rather than the two phrases. The sibling arm above asserts the wording; a caller parses the shape.
 reset_tree; readme tPlan
 mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
 mutate memory/builds/tPlan/spec/2026-08-01-spec-tPlan-1.md 's/^\*\*Status:\*\*/  **Status:**/'
@@ -4068,9 +4063,8 @@ hit "$out" "next: none - no tracked spec grades as a unit (see the NOT A UNIT ro
 miss "$out" "next: none - every tracked spec is terminal"
 git reset -q --hard HEAD~1; git clean -qfd
 
-# ...and rung 4 sits BELOW rung 2, which is today's behaviour and is now said by an arm rather than
-# by a sentence. Same unparseable spec, with the roster naming its id: nothing grades, and the line
-# still names the unit nobody has specced rather than announcing that nothing graded.
+# ...and a MISSING roster id outranks it: same unparseable spec, with the roster naming its id, the
+# line names the unit nobody has specced rather than announcing that nothing graded.
 reset_tree; readme tPlan
 mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
 mutate memory/builds/tPlan/spec/2026-08-01-spec-tPlan-1.md 's/^\*\*Status:\*\*/  **Status:**/'

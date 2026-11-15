@@ -5,7 +5,7 @@
 #   unattended.sh --preflight <slug> --keepalive-id <id> [--waive <item> --reason <text>]   # assert, pin, record, render
 #   unattended.sh --plan <slug> [<slug> ...] [--paths] [--asks] [--framed]   # per-unit state, and the next unit
 #   unattended.sh --phase <slug> <phase> --witness <sha>   # move the run, with its witness
-#   unattended.sh --status <slug>                          # one line: phase · witness · next unit
+#   unattended.sh --status <slug>                          # phase · witness · next unit, then the position engine's lines
 #   unattended.sh --audit <slug>                           # one line per open dispatched unit: idle time, PROGRESSING|STALLED
 #   unattended.sh --register-task <slug> --task <name> --heartbeat <absolute path>   # BEFORE starting a background task
 #   unattended.sh --release-task <slug> --task <name>      # the task ended; --audit stops grading its heartbeat
@@ -6062,96 +6062,36 @@ read_spec_rev() { # spec path -> the N of its header's rev-N, empty when it has 
   awk '/^\*\*Status:\*\* [A-Z]+ / { if (match($0, / rev-[0-9]+/)) print substr($0, RSTART + 5, RLENGTH - 5); exit }' "$1"
 }
 
-# ------------------------------------------------------------------- THE `next:` LADDER, DECLARED
-# WHAT THIS REPLACES. The line `--plan` closes with was built by three guarded assignments spread
-# across two loops of `verb_plan` - `[ -n "$next" ] || next=...` - so the PRECEDENCE between the
-# shapes was whichever loop bash reached first. It was real, it was correct, and it was stated
-# nowhere, which means a fourth shape could only be added by typing a fourth guarded assignment and
-# arguing in prose about where it went. That is how one spec of this build came to hold a design
-# sentence and a fixture that could not both be true (TOOL-dDerivedDocket-49 section 8 F1).
-#
-# ONE LINE PER RUNG, IN RUNG ORDER, AND THE ORDER OF THESE LINES IS THE RULE. The selector below
-# walks them top to bottom and returns the first rung whose input is non-empty, so moving a line
-# moves the precedence - and the sibling suite reads that order back out of THIS block. A position
-# in a declared table is gradeable by an arm; a sentence in a design section is not.
-#
-# `rung ` AT COLUMN 0 IS THE HANDLE. Nothing else in this file begins with it, so the arm counts the
-# rungs and reads their order without parsing shell and without a second copy of the table.
-#
-# THE UNDECIDED-ASK RUNG SITS THIRD, after both unit rungs and before both terminal rungs. Its input
-# is the empty string on every call until TOOL-dDerivedDocket-16 builds the predicate that fills it,
-# so the ladder prints today exactly what the three assignments printed. The position is pinned here
-# rather than in that unit because it is the half that can be graded before the predicate exists,
-# and the rule it encodes is that a run with a planned unit nobody has specced is told to spec it,
-# never to go dispose an ask.
-#
-# WHY RUNG 4 SITS BELOW RUNG 2 - today's behaviour, not a change. The MISSING loop assigned the line
-# whether or not anything graded, so a roster id with no spec already outranked the nothing-graded
-# wording, and leg check 30 reads the conjunction of a NOT A UNIT row with the LAST rung's wording.
-#
-# THE THREE SHAPE LITERALS BELOW ARE BYTE FOR BYTE THE ONES THAT STOOD IN `verb_plan`, and the two
-# terminal ones stay distinct strings. That check and the sibling suite both match on the wording,
-# so reflowing one here silently unwires both while this table reports itself correct.
-#
-# RUNGS 1 AND 3 CARRY A BARE `<id>` ON PURPOSE. The words inside those two shapes belong to whoever
-# supplies them - the state word is the caller's, and the undecided shape is unit 16's - so what the
-# table owns for those two is their POSITION, which is the whole subject of the unit that wrote it.
-#
-# `<id>` IS SUBSTITUTED, NEVER `printf`-ed. The id arrives from a build README, a `%` in one would
-# make the shape a format string, and a `printf` handed a spare argument reuses its format rather
-# than ignoring it.
-# BOTH QUOTES SIT ALONE, so every rung line is the rung and nothing else. The opening one buys the
-# fifth rung a column-0 start; the closing one keeps the last rung's wording a WHOLE line, which
-# is what an arm asserting that literal verbatim can anchor on. `read` skips both blanks the same
-# way it skips any line whose first word is not `rung`.
-NEXT_RUNGS='
-rung live-unit <id>
-rung missing-unit <id> (MISSING - spec it first)
-rung undecided-ask <id>
-rung nothing-graded none - no tracked spec grades as a unit (see the NOT A UNIT rows above)
-rung everything-terminal none - every tracked spec is terminal
-'
+# ------------------------------------------------------------------- THE `next:` LINE, FROM THE ENGINE
+# TOOL-dDeclaredLoop-7 retired the ladder that stood here: five rungs over the README roster's TYPED
+# state. The line is the loop kit's position engine's now, `position.py <slug> --next-line`, which
+# derives each unit's step from witnesses and renders the same five shapes byte for byte; the words
+# are its `NEXT_SHAPES`. This verb keeps the one M2 classifier, `plan_state`, and HANDS its answer
+# over in `GOV_POSITION_STATES`, TAB-separated lines the engine reads: `unit <id> <state>` per row in
+# build order, MISSING rows included, `ask <id>`, `parent <slug> <derived phase>`, `bound
+# <RESUME_STALE_BOUND>` and `owed <PARK_KINDS_OWED> <PARK_ACTS_OWED>`. The engine run standalone calls
+# this verb with the variable SET AND EMPTY, and is answered with those lines in place of `next:`, so
+# the call is never circular. Where python or the engine does not resolve, the line says so in the
+# fall-through shape, which no reader matches as an all-clear.
 
-# FOUR INPUTS AND NO STATE. Every one is derived by the caller from data it already holds, so this
-# runs once per `--plan` and performs no read of its own.
-#
-# THE TWO TERMINAL RUNGS TAKE A SENTINEL, never an id: "nothing graded" and "everything terminal"
-# are conditions rather than subjects, so their input is the word `yes` or nothing at all, and their
-# shapes carry no `<id>` for one to reach.
-#
-# FED BY A HERE-STRING OVER A VARIABLE, never by a command substitution: the loop stays in this
-# shell, and the kit's own shell-hygiene leg has nothing to declare.
-derive_next_shape() { # live-unit shape . first MISSING id . undecided-ask shape . graded flag
-  local _tag _rung _tmpl _in
-  while read -r _tag _rung _tmpl; do
-    [ "$_tag" = rung ] || continue
-    case "$_rung" in
-      live-unit)           _in="$1" ;;
-      missing-unit)        _in="$2" ;;
-      undecided-ask)       _in="$3" ;;
-      nothing-graded)      [ "$4" = 0 ] && _in=yes || _in="" ;;
-      everything-terminal) _in=yes ;;
-      *)                   _in="" ;;
-    esac
-    [ -n "$_in" ] || continue
-    printf '%s\n' "${_tmpl//<id>/$_in}"
-    return 0
-  done <<< "$NEXT_RUNGS"
-  # UNREACHABLE while the last rung's input is the constant above, and it still says something. An
-  # empty tail on a `next:` line is a verb that answered nothing while looking like it answered, and
-  # this is the one state in which the ladder itself is the thing that is broken.
-  printf 'none - the rung table named no shape, which cannot happen while its last rung is unconditional\n'
-  return 0
+# THE ENGINE, ABSOLUTE: `resolve_kit_dir` answers relative to the tree holding this kit, which is the
+# working tree in every install, and the engine's own driver plants run this kit over a scratch
+# repository, where a relative answer would name a file that is not there.
+resolve_position_engine() { # -> sets PE_PY and PE_PATH; 1 where python or the loop kit's engine does not resolve
+  local _d _r=$KIT_DIR
+  PE_PATH=""
+  PE_PY=$(resolve_python 2>/dev/null) && [ -n "$PE_PY" ] || return 1
+  _d=$(resolve_kit_dir "$PE_PY" loop position.py "$KIT_DIR" 2>/dev/null) && [ -n "$_d" ] || return 1
+  while [ -n "$_r" ] && [ ! -e "$_r/.git" ]; do _r=${_r%/*}; done
+  PE_PATH="${_r:-.}/$_d/position.py"
+  [ -f "$PE_PATH" ]
 }
-
 verb_plan() { # slug
   local slug="$1" dir specs spec id st state miss nmiss=0 _ar_id _ar_sum _rev
-  # THE LADDER'S INPUTS, collected by the two loops below and read ONCE at the bottom. They
-  # are not the line: `_live` and `_miss1` are first-wins captures of data each loop already
-  # has, `_ask1` is the undecided-ask rung's input and stays EMPTY here until
-  # TOOL-dDerivedDocket-16 fills it, and `_graded` is set beside the unit rows further down.
-  # No branch of this verb assigns the printed line any more.
-  local _live="" _miss1="" _ask1=""
+  # THE ENGINE'S HAND-OVER (TOOL-dDeclaredLoop-7), collected by the loops below and read ONCE at the
+  # bottom: one `unit` line per printed row, then the ask, the parents, the bound and the owed sets.
+  # Appended in this shell, so it costs no fork. No branch of this verb assigns the printed line.
+  local _ho="" _pl _pp _pin=0
   check_slug "$slug" || return 1
   load_fork_cutoff || return 1
   dir="$M/builds/$slug"
@@ -6264,7 +6204,7 @@ verb_plan() { # slug
   # a state this verb can SEE. Iterating the substitution directly made it indistinguishable from an
   # empty region, and the verb answered `next: none - every tracked spec is terminal` at exit 0 — a
   # false all-clear on the one verb an agent reads to pick up work.
-  local _ids _graded=0
+  local _ids
   # TOOL-aCollapsedScan-1 - ONE awk over the whole region, where this ran a printf, a grep and a
   # head PER ROW. `match` returns the FIRST occurrence on the line, which is exactly what the
   # `head -1` bought and for the same reason: a rendered row spells its id twice, once as the
@@ -6296,15 +6236,7 @@ verb_plan() { # slug
     case "$st" in CLOSED|WONTDO) [ "$state" = "READY" ] && state="DONE" || state="DONE ($state)" ;; esac
     _rev=""; [ -z "$PLAN_PATHS" ] || _rev=$(read_spec_rev "$spec")
     plan_row "$id" "${st:-?}" "$state" "$spec" "$_rev"
-    _graded=1
-    # FIRST WINS, and what wins is an INPUT rather than the line. The guarded assignments to
-    # `next` that stood here and in the loop below settled the precedence between the shapes
-    # by whichever loop bash reached first. The order is declared at NEXT_RUNGS now, and this
-    # branch says only which id and which state word the live-unit rung takes.
-    case "$state" in
-      THIN|FORKED) [ -n "$_live" ] || _live="$id ($state)" ;;
-      READY)       [ -n "$_live" ] || _live="$id (READY - build it)" ;;
-    esac
+    _ho+="unit	$id	$state"$'\n'
   done
   # The planned units nobody has specced. These are what M2 calls MISSING, and until this
   # unit they were simply absent from the listing rather than reported.
@@ -6316,7 +6248,7 @@ verb_plan() { # slug
   for miss in $(missing_units "$slug" "$dir" | sort -t- -k1,1 -k2,2 -k3,3n); do
     plan_row "$miss" "-" "MISSING" ""
     nmiss=$((nmiss + 1))
-    [ -n "$_miss1" ] || _miss1="$miss"
+    _ho+="unit	$miss	MISSING"$'\n'
   done
   # TOOL-dDerivedDocket-16 S8 - THE ASK ROWS, after every unit row and before the roster line, so
   # the unit projection is byte-identical to what it was for a build that files no asks and declares
@@ -6333,10 +6265,10 @@ verb_plan() { # slug
 $ASK_PLAN_ROWS
 ASKROWS
     fi
-    # THE UNDECIDED SHAPE'S WORDS ARE THIS UNIT'S and the rung's POSITION is the ladder's, which is
-    # why the table carries a bare `<id>` for it. Supplied whether or not `--asks` printed the rows:
-    # the false "every tracked spec is terminal" is a lie about the BUILD, not about an output mode.
-    [ -z "$ASK_PLAN_NEXT" ] || _ask1="$ASK_PLAN_NEXT (UNDECIDED - plan a unit that closes it, or dispose it)"
+    # THE UNDECIDED ASK IS HANDED OVER whether or not `--asks` printed the rows: the false "every
+    # tracked spec is terminal" is a lie about the BUILD, not about an output mode. Its shape's words
+    # are the engine's, and so is its rank, below a next item (TOOL-dDeclaredLoop-7 section 8 F4).
+    [ -z "$ASK_PLAN_NEXT" ] || _ho+="ask	$ASK_PLAN_NEXT"$'\n'
   fi
   # The value resolved at the top of this verb, not re-derived. R2-M3: two `$( )` calls here meant two
   # discarded exit-3s, and the guard that replaced them still sat AFTER the listing.
@@ -6354,16 +6286,35 @@ ASKROWS
     read_spec_disposal "$_runmd" "$slug"
     printf 'spec-disposal: %s\n' "$_sd_value${_se_why:+ - ${_se_why%%$'\n'*}}"
   fi
-  # R3-B1 — THE TERMINAL WORDING IS EARNED, not defaulted. "every tracked spec is terminal" was
-  # printed at exit 0 over builds where no spec graded as a unit at all, one line below the NOT A
-  # UNIT rows saying so. A reader — or an agent picking up work — is told the build is finished.
-  # It is earned by the ladder's LAST rung now, which is the same rule carrying a name and a place.
-  #
-  # ONE WRITER, ONE CALL. Three branches stood here, fed by three guarded assignments in two loops,
-  # and the order among them was an artefact of iteration: a fourth shape could be added only by
-  # arguing in prose about where to type it. `_ask1` is empty on every call until
-  # TOOL-dDerivedDocket-16 supplies it, so this prints byte for byte what the three branches did.
-  echo "next: $(derive_next_shape "$_live" "$_miss1" "$_ask1" "$_graded")"
+  # EACH PARENT'S DERIVED PHASE, so the engine reads a parent landed by its recorded move OR by the
+  # derivation this driver owns (TOOL-dDeclaredLoop-7 section 8 F6). The front matter is read in this
+  # shell, from line 1's `---` to the next, as the index generator's parser reads it.
+  while IFS= read -r _pl || [ -n "$_pl" ]; do
+    _pl=${_pl%$'\r'}
+    if [ "$_pl" = "---" ]; then _pin=$((_pin + 1)); [ "$_pin" -lt 2 ] && continue; break; fi
+    [ "$_pin" = 1 ] || break
+    case "$_pl" in parents:*) _pl=${_pl#parents:} ;; *) continue ;; esac
+    for _pp in $_pl; do
+      if [ -f "$M/builds/$_pp/RUN.md" ]; then read_derived_phase "$M/builds/$_pp/RUN.md"; else DP_PHASE="-"; fi
+      _ho+="parent	$_pp	${DP_PHASE:--}"$'\n'
+    done
+  done < "$_rmp"
+  _ho+="bound	$RESUME_STALE_BOUND"$'\n'"owed	$PARK_KINDS_OWED	$PARK_ACTS_OWED"$'\n'
+  # THE ENGINE'S OWN STANDALONE CALL sets the variable EMPTY and reads these lines in place of `next:`.
+  if [ "${GOV_POSITION_STATES+set}" = set ] && [ -z "$GOV_POSITION_STATES" ]; then
+    printf '%s' "$_ho"
+    return 0
+  fi
+  # ONE ENGINE CALL. Its `invalid-input` exits 2 and still prints its line, so the status is not read.
+  local _nl=""
+  if resolve_position_engine; then
+    _nl=$(GOV_POSITION_STATES="$_ho" "$PE_PY" "$PE_PATH" "$slug" --next-line 2>/dev/null)
+    _nl=${_nl%%$'\n'*}; _nl=${_nl%$'\r'}
+    [ -n "$_nl" ] || _nl="none - invalid-input: the loop kit's position engine printed no line"
+  else
+    _nl="none - invalid-input: the loop kit's position engine does not resolve beside this kit"
+  fi
+  echo "next: $_nl"
   return 0
 }
 
@@ -8410,20 +8361,25 @@ verb_status() { # slug
   elif [ "$p" = LANDING ] && [ -n "$DP_REASON" ]; then
     pshow="LANDING (not on the remote: $DP_REASON)"
   fi
-  # The first non-terminal unit, DERIVED from the build README on every read. It used to be read
-  # from a copy inside this file, which is exactly the staleness that design removes — main's
-  # redesign, taken here over this branch's terminal-exemption workaround for the same problem.
-  # TOOL-aPromptedMandate-12 - through `nonterminal_units`, not a second copy of its pipeline. This
-  # line open-coded the identical `region | grep | grep -v | head -1 | sed` and never called either
-  # helper, so narrowing `unit_rows` alone would have left --close reading the units table while
-  # --status and --resume kept reading the records table - two answers to one question about one
-  # region, which is what the extraction exists to prevent. It was already wrong before the narrowing:
-  # --status on a landed build offered a `build/` record filename as the next unit, measured on
-  # aBranchedMandate by BOTH nodes independently.
-  # `](spec/` and not a bare `]`: the selector deliberately admits a unit whose TITLE contains one,
-  # so cutting at the first `]` would display a truncated id for exactly the row the narrowing was
-  # written to keep. Cut at the link instead, which is the only `](spec/` a unit row carries.
-  readme_of "$slug" >/dev/null; unit=$(nonterminal_units "$_readme" | head -1 | sed -e 's/^| \[//' -e 's/\](spec\/.*//')
+  # TOOL-dDeclaredLoop-7 S9 - THE NEXT UNIT IS THE POSITION ENGINE'S LEAST-ADVANCED UNIT now, the first
+  # `unit —` line at the lowest step, and no longer the first row whose typed status is not terminal.
+  # The engine runs standalone, so it asks `--plan` for the hand-over itself; its `position —`,
+  # `unit —`, `next —` and `interrupt —` lines print after the status line. Where python or the engine
+  # does not resolve, or the build is terminal, the field reads `(no non-terminal unit)`.
+  local _pout="" _plines="" _pl _pu _pr _pbest=9
+  unit=""
+  resolve_position_engine && _pout=$(GOV_POSITION_STATES="" "$PE_PY" "$PE_PATH" "$slug" 2>/dev/null)
+  while IFS= read -r _pl; do
+    _pl=${_pl%$'\r'}
+    case "$_pl" in
+      "position — "*|"next — "*|"interrupt — "*) _plines+="$_pl"$'\n' ;;
+      "unit — "*)
+        _plines+="$_pl"$'\n'; _pu=${_pl#unit — }
+        case "${_pu##* · }" in none) _pr=0 ;; designed) _pr=1 ;; built) _pr=2 ;; tested) _pr=3 ;; *) _pr=4 ;; esac
+        [ "$_pr" -lt "$_pbest" ] && [ "$_pr" -lt 4 ] && { _pbest=$_pr; unit=${_pu%% · *}; } ;;
+    esac
+  done <<< "$_pout"
+  case "$_plines" in *" · answer terminal · "*) unit="" ;; esac
   [ -n "$unit" ] || unit="(no non-terminal unit)"
   # PARKED COUNT, when there is one. `--park` writes a decision the owner does not hear until the
   # wrap-up; the verb an agent checks itself with should say something is waiting rather than leave
@@ -8551,6 +8507,7 @@ BRIEFROWS
     [ -n "$_sa" ] && hc="$hc · spec-audit $_sa"
   printf 'unattended: %s · phase %s · witness %s%s · next %s%s
 ' "$slug" "$pshow" "${w:-NONE}" "$hc" "$unit" "$parked"
+  printf '%s' "$_plines"
   # TOOL-dDerivedDocket-3 - THE LANDING SHAPE, on the status a reader actually opens, and printed
   # only where it DIFFERS from what every other run does. `primary` is announced at conf load like
   # any other defaulted value, so naming it again here would add a line to every adopter's status

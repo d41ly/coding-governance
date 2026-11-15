@@ -8,7 +8,7 @@ streams = ["tooling"]
 decisions = ["TOOL-dDeclaredLoop-1"]
 
 [claims]
-gate-legs = ["loop definition", "loop computed witness", "loop checklist tags", "loop transition tables", "loop item kind", "loop parent routes", "loop transition record", "loop guard fixtures", "loop claims fixtures"]
+gate-legs = ["loop definition", "loop computed witness", "loop checklist tags", "loop transition tables", "loop item kind", "loop parent routes", "loop transition record", "loop guard fixtures", "loop claims fixtures", "loop position fixtures"]
 kits = ["loop"]
 git-hooks = []
 harness-hooks = []

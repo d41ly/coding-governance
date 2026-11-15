@@ -2047,6 +2047,18 @@
     "enforces": ["principle.p23"]
   },
   {
+    "name": "loop position fixtures",
+    "argv": [
+      "python",
+      "{prefix}/loop/position.py",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "enforces": ["principle.p22"]
+  },
+  {
     "name": "loop transition tables",
     "argv": [
       "python",

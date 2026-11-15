@@ -6253,6 +6253,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "check_is_ancestor",
+      "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
       "id": "check_is_root",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
@@ -6898,6 +6903,16 @@
       "file": "tools/roles/handoff.py"
     },
     {
+      "id": "check_plan_line",
+      "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
+      "id": "check_plant",
+      "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
       "id": "check_plant_rows",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
@@ -7146,6 +7161,11 @@
       "id": "check_record_versions",
       "kind": "function",
       "file": "tools/loop/loop_items.py"
+    },
+    {
+      "id": "check_recorded_move",
+      "kind": "function",
+      "file": "tools/loop/loop_table.py"
     },
     {
       "id": "check_records",
@@ -9523,6 +9543,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "derive_answer",
+      "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
       "id": "derive_archive_name",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -10238,6 +10263,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "derive_from_states",
+      "kind": "function",
+      "file": "tools/loop/loop_table.py"
+    },
+    {
       "id": "derive_fx_composition",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
@@ -10523,6 +10553,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "derive_instance_key",
+      "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
       "id": "derive_instruction_files",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -10541,6 +10576,11 @@
       "id": "derive_int_slots",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "derive_interrupts",
+      "kind": "function",
+      "file": "tools/loop/position.py"
     },
     {
       "id": "derive_introduced",
@@ -10943,9 +10983,9 @@
       "file": "tools/playbook/pins.py"
     },
     {
-      "id": "derive_next_shape",
+      "id": "derive_next_item",
       "kind": "function",
-      "file": "tools/unattended/unattended.sh"
+      "file": "tools/loop/position.py"
     },
     {
       "id": "derive_node_table",
@@ -11098,6 +11138,11 @@
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
+      "id": "derive_plant_position",
+      "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
       "id": "derive_policy_adopter",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
@@ -11106,6 +11151,16 @@
       "id": "derive_policy_reader",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "derive_position",
+      "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
+      "id": "derive_position_into",
+      "kind": "function",
+      "file": "tools/loop/position.py"
     },
     {
       "id": "derive_predictor_verdict",
@@ -12111,6 +12166,11 @@
       "id": "derive_unit_selection",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "derive_unit_step",
+      "kind": "function",
+      "file": "tools/loop/position.py"
     },
     {
       "id": "derive_unit_targets",
@@ -14646,6 +14706,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/loop/policy_edit.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/loop/position.py"
     },
     {
       "id": "main",
@@ -17875,6 +17940,11 @@
     {
       "id": "read_blob_id",
       "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
+      "id": "read_blob_id",
+      "kind": "function",
       "file": "tools/policy/guard.py"
     },
     {
@@ -19156,6 +19226,11 @@
       "id": "read_handoff_row",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_handover",
+      "kind": "function",
+      "file": "tools/loop/position.py"
     },
     {
       "id": "read_handpicked_copies",
@@ -20771,6 +20846,11 @@
       "id": "read_remote_ci_runs",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "read_remote_claim",
+      "kind": "function",
+      "file": "tools/loop/position.py"
     },
     {
       "id": "read_remote_heads",
@@ -23463,6 +23543,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "render_handover",
+      "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
       "id": "render_heads",
       "kind": "function",
       "file": "tools/workflows/check_by_design_parity.py"
@@ -23658,6 +23743,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "render_next_line",
+      "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
       "id": "render_offender_keys",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -23751,6 +23841,11 @@
       "id": "render_population",
       "kind": "function",
       "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "render_position_lines",
+      "kind": "function",
+      "file": "tools/loop/position.py"
     },
     {
       "id": "render_practice_lines",
@@ -24051,6 +24146,11 @@
       "id": "render_spawn_summary",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "render_spec",
+      "kind": "function",
+      "file": "tools/loop/position.py"
     },
     {
       "id": "render_spec",
@@ -25646,6 +25746,11 @@
       "id": "resolve_placeholder_value",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "resolve_position_engine",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "resolve_posix_shell",
@@ -27450,6 +27555,11 @@
     {
       "id": "run_driver",
       "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
+      "id": "run_driver",
+      "kind": "function",
       "file": "tools/unattended/runlog-writer.test.sh"
     },
     {
@@ -28490,6 +28600,11 @@
     {
       "id": "run_plant",
       "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
+      "id": "run_plant",
+      "kind": "function",
       "file": "tools/playbook/fixtures/row_kind.py"
     },
     {
@@ -28956,6 +29071,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/loop/position.py"
     },
     {
       "id": "run_selftest",
@@ -34831,6 +34951,11 @@
       "id": "write_policy_plant",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "write_position_plant",
+      "kind": "function",
+      "file": "tools/loop/position.py"
     },
     {
       "id": "write_post_merge_record",

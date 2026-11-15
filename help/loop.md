@@ -556,6 +556,50 @@ and its run record at the default branch's tracking ref, and the card's `claims 
   python tools/loop/claims.py --selftest
   ```
 
+## Where a build is, and what runs next
+
+The position engine answers "where is this build, and what next" from witnesses alone. A unit's step
+is `none`, then `designed` once its spec is committed and grades READY, `built` once a pass commit
+names it in its `Pass:` trailer and an acceptance record names that commit, `tested` once the bar's
+`gates-run` fact in the run-state file graded a tip containing that commit, and `deployed` once the
+default branch's remote-tracking tip contains it. A status word typed in a spec header or the build
+README never moves a step. The build's step is the step its least-advanced unit works in next, and
+the next item is the first item of that step whose witness does not hold and whose needs are
+witnessed. Only three kinds of item have a witness reader today: a step's exit, the unit table's four
+forward items, and an item a recorded move names. Every other item prints as an `evidence` claim and
+counts as not yet done.
+
+The answer is one of `act`, `awaiting`, `blocked`, `terminal`, `stuck`, `invalid-input` and
+`stale-remote`. A remote-tracking tip whose newest reflog entry is older than the unattended kit's
+`RESUME_STALE_BOUND`, or no remote at all, answers `stale-remote` before anything else. Git writes a
+reflog entry only when the tip moves, so a fetch that finds nothing new leaves it stale. An owed parked decision or an unpassed hold answers
+`awaiting`; a `parents:` build that has not landed answers `blocked`; an undecided ask answers
+`awaiting` only when no item can run.
+
+The unattended driver's `--plan` prints the engine's answer as its `next:` line, in the same five
+shapes it always printed, and `--status` prints the engine's lines after its status line.
+
+- **Read a build's position:** `python tools/loop/position.py <slug>` prints a `position —` line with <!-- usage: script:tools/loop/position.py 6220f37c -->
+  the state, the step, the answer and its reason, one `unit —` line per unit, the `next —` item with
+  its actor and its instance key, each `interrupt —`, then every file and ref it read as `read —`
+  lines and every claim it used with its key and verdict as `claim —` lines. `--json` prints the same
+  fields as one object, and `--next-line` the `next:` shape alone. It exits 2 on `invalid-input`,
+  else 0. Run in a repository with the unattended kit installed, it asks the driver's `--plan` for
+  each unit's spec state.
+- **See it on a fixture:** `--fixture --plant <case>` builds a scratch repository with a bare remote,
+  plants one case, prints the engine's lines and one line ending `held` or `MISSED`, and removes it:
+  `steps`, `typed-status`, `idempotent`, `owner-decision`, `parent-unlanded`, `terminal`,
+  `stale-remote`, `bad-transition`, `deadlock`, `bar-wait`, `plan-line` and `status-line`, the last
+  two over the unattended driver. `--selftest` runs every case, and gov's own `loop position
+  fixtures` gate runs it.
+
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries placeholders the shell reads as redirects -->
+  ```bash
+  python tools/loop/position.py <slug> --json
+  python tools/loop/position.py --fixture --plant steps
+  python tools/loop/position.py --selftest
+  ```
+
 ## The item kind, `kind.item`
 
 Items are a registered kind: the kinds register's `kind.item` row names a factory, a row schema,

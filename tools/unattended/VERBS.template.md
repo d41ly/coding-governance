@@ -86,7 +86,15 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   skips any line with fewer than four fields. The `roster:` and `next:` lines are unchanged, which is
   what makes one `--paths` invocation the resume path's single source for both "which unit is next" and
   "where is its spec". A `spec-disposal:` line sits between those two, carries no TAB and holds the value
-  a caller copies as `disposal`.
+  a caller copies as `disposal`. The `next:` line is the loop kit's position engine's, `position.py
+  <slug> --next-line`, handed this verb's rows, the first undecided ask, each `parents:` build's derived
+  phase, `RESUME_STALE_BOUND` and the owed park sets in `GOV_POSITION_STATES`. It names the
+  LEAST-ADVANCED unit, a unit's step read from witnesses — its pass commit and acceptance record, the
+  bar's `gates-run` tip, the remote-tracking tip — and never from a typed status word, so a MISSING,
+  THIN or FORKED unit beside a READY one takes the line and the loop holds on it. A build whose
+  least-advanced unit is built and waiting on its bar prints the terminal shape, or the ask's where one
+  is undecided; any answer the five shapes do not carry prints `none - <answer>: <reason>`, a
+  stale remote-tracking tip among them, which no reader matches as an all-clear.
   SEVERAL SLUGS may be given, and the single-slug form is then byte-identical to what it always
   was, because the framing appears only for two or more. Each build's output is opened by
   `unattended-plan-open: <slug>` and closed by `unattended-plan-rc: <slug> <rc>`, and each runs in
@@ -98,14 +106,15 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   format from the slug COUNT gives a caller two output shapes for one verb: a frame-reading caller
   handed a single-build corpus finds none of the lines it parses and reads the run as having graded
   NOTHING. Without the flag the one-slug form stays byte-identical to what it has always been.
-- `--status` — ONE line, opened by `unattended: <slug>`, with every field after it joined by ` · `
-  in the order this entry names them. The phase, the witness and the next unit print on every line:
+- `--status` — ONE status line, then the position engine's `position —`, `unit —`, `next —` and
+  `interrupt —` lines for the slug. The status line is opened by `unattended: <slug>`, with every
+  field after it joined by ` · ` in the order this entry names them. The phase, the witness and the next unit print on every line:
   `phase <phase>`, where a LANDED an owner's hand-off made, derived or settled, reads
   `LANDED (attended)`, any other derived LANDED reads `LANDED (derived: <sha8> on <ref> at <tip8>)`,
   and a LANDING the derivation explains reads `LANDING (not on the remote: <reason>)`;
   `witness <sha>`, the sha reading `NONE` on a record that names none, which the verb then refuses;
-  and `next <unit>`, the link label of the first non-terminal row in the generated units region, or
-  `(no non-terminal unit)`. Every other field is OPTIONAL and prints only under the condition named
+  and `next <unit>`, the position engine's least-advanced unit, or `(no non-terminal unit)` where the
+  build is terminal, every unit is deployed or the engine does not resolve. Every other field is OPTIONAL and prints only under the condition named
   beside it, so a record none of them applies to prints only the fields above. Between the witness
   and `next`: `halt-code <code>` when the record carries one, then `spec-audit <date>` when it pins
   one. After `next`, in order: `parked <n>` when owed parked rows exist; `noted <n>` when rows the
@@ -127,7 +136,7 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   refusals use, so neither refuses anything here. LAST,
   `keepalive <id> present|absent in the harness listing at <utc>` from the stop-guard's newest
   sidecar line, whatever its phase, when the record names a keepalive id and that line exists. The
-  line stays ONE line: a field joins it or does not print, and the suite arms that.
+  status line stays ONE line: a field joins it or does not print, and the engine's lines follow it.
 - `--audit` — one line per unit whose dispatch rows at their newest anchor, taken together, are still
   open and whose spec is neither terminal nor deferred (DEFERRED, with its latest rescope defer row
   after every dispatch row naming it): how long the TREE has been idle (newest write, newest commit)

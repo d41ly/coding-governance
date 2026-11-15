@@ -288,13 +288,13 @@ tools/unattended/unattended.sh	cat-file	6	predates the lint; `$(<file)` is the n
 tools/unattended/unattended.sh	date-fmt	8	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
 tools/unattended/unattended.sh	path-subst	13	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/unattended/unattended.sh	printf-subst	8	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
-tools/unattended/unattended.sh	pure-fn-subst	41	declared_list and declared_scalar keep their substitution: check 28 of check-unattended.sh enumerates refusing-parser calls and key reads by the `$(declared_* ` spelling; callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: ask_sev_rank×1 declared_list×2 declared_scalar×5 derive_next_shape×1 directives×2 dod×4 grep×5 halt_codes×2 id_rows×1 kinds_re×1 park_kinds_unowed×1 phases×1 read_cli_version×2 read_hold_codes×2 read_policy_key×5 resolve_shared_records×1 review_exit_note×2 review_state×1 set×1 verbs_all×1
+tools/unattended/unattended.sh	pure-fn-subst	40	declared_list and declared_scalar keep their substitution: check 28 of check-unattended.sh enumerates refusing-parser calls and key reads by the `$(declared_* ` spelling; callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: ask_sev_rank×1 declared_list×2 declared_scalar×5 directives×2 dod×4 grep×5 halt_codes×2 id_rows×1 kinds_re×1 park_kinds_unowed×1 phases×1 read_cli_version×2 read_hold_codes×2 read_policy_key×5 resolve_shared_records×1 review_exit_note×2 review_state×1 set×1 verbs_all×1
 tools/unattended/unattended.sh	var-pipe	60	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/unattended/unattended.test.sh	cat-file	17	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
 tools/unattended/unattended.test.sh	date-fmt	2	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
 tools/unattended/unattended.test.sh	path-subst	13	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/unattended/unattended.test.sh	printf-subst	23	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
-tools/unattended/unattended.test.sh	var-pipe	20	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/unattended/unattended.test.sh	var-pipe	19	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/workflows/check-protocol-parity.test.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/workflows/check-protocol-parity.test.sh	var-pipe	2	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/workflows/check-review-join.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit

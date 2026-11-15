@@ -55,6 +55,11 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # copy, and imports only loop_lib.py beside it, so its reach takes no edge; the session-kickoff checker
 # and the unattended driver each find it by `resolve_kit_dir` and print a skipped or `-` form where it
 # does not resolve. Its leg is gov's own [[exempt_leg]].
+# The position engine (TOOL-dDeclaredLoop-7): position.py reads commits, acceptance records and the
+# front matter through the memory-tree kit under the edge above, the run facts through the policy kit
+# by `read_policy_kit`, and each unit's M2 state from the unattended driver's `--plan`, found by
+# `resolve_kit_dir`, so neither takes an edge: a read that does not resolve answers `invalid-input`,
+# never a default. The driver finds the engine the same way. Its leg is gov's own [[exempt_leg]].
 requires = ["memory-tree"]
 
 # Everything the kit ships is engine, overwritten on every update: the definition, its reader, the

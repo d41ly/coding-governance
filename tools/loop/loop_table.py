@@ -151,6 +151,24 @@ def read_stand_ins(data, where):
     return rows
 
 
+def derive_from_states(row, open_states):
+    """The states a row's `from` holds, `@open` expanded to `open_states`, its level's open states: the
+    one spelling of the expansion, which `derive_move` and `check_recorded_move` both read."""
+    return sum((list(open_states) if s == OPEN else [s] for s in row.get("from", [])), [])
+
+
+def check_recorded_move(move, tables):
+    """Whether a build row holds a recorded move, `move` carrying `from`, `to` and `item`: a row whose
+    `item` is the move's, whose expanded `from` holds the move's `from`, and whose `to` is the move's,
+    `@prior` or `@reentry`. A record holds no outcome and no facts, so this matches the row and never
+    resolves its guard. `tables` is what read_transition_rows returns (TOOL-dDeclaredLoop-7)."""
+    open_states = tables["states"].get("build", [])
+    return any(row.get("level") == "build" and row.get("item") == move.get("item")
+               and move.get("from") in derive_from_states(row, open_states)
+               and row.get("to") in (move.get("to"),) + DYNAMIC_TO
+               for row in tables["transition"])
+
+
 def derive_move(level, state, item, outcome, facts, tables=None):
     """The row the table holds for this move, and its resolved `to`. `tables` is what
     read_transition_rows returns, the shipped definition's when None. Raises TransitionRefused when
@@ -168,7 +186,7 @@ def derive_move(level, state, item, outcome, facts, tables=None):
     for row in tables["transition"]:
         if (row.get("level"), row.get("item"), row.get("outcome")) != (level, item, outcome):
             continue
-        if state not in sum((states[level] if s == OPEN else [s] for s in row.get("from", [])), []):
+        if state not in derive_from_states(row, states[level]):
             continue
         if "disposition" in row:
             if "disposition" not in facts:
