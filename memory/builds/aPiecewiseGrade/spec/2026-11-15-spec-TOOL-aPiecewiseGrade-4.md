@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-15-prompt-TOOL-aPiecewiseGrade-2-forks-brief.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-2-forks-brief.md) | research | TOOL-aPiecewiseGrade-2 |
 | [2026-11-15-prompt-TOOL-aPiecewiseGrade-4-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-4-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aPiecewiseGrade-4-forks-brief.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-4-forks-brief.md) | research | TOOL-aPiecewiseGrade-2 |
 
