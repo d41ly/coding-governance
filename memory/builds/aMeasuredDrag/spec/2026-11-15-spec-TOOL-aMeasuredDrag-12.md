@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-15-build-TOOL-aMeasuredDrag-1-runlog-6d98c39c.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-1-runlog-6d98c39c.md) | journal | TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-4 TOOL-aMeasuredDrag-5 TOOL-aMeasuredDrag-6 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 TOOL-aMeasuredDrag-9 TOOL-aMeasuredDrag-10 TOOL-aMeasuredDrag-11 |
 | [2026-11-15-build-TOOL-aMeasuredDrag-12-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-12-1-acceptance-ledger.md) | journal | — |
 | [2026-11-15-build-TOOL-aMeasuredDrag-12-red-fix-4.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-12-red-fix-4.md) | red-fix | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-12-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-12-1-spec-writer.md) | journal | — |

@@ -15,6 +15,7 @@
 | [2026-11-15-build-TOOL-aMeasuredDrag-1-findings-process.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-1-findings-process.md) | research | — |
 | [2026-11-15-build-TOOL-aMeasuredDrag-1-findings-records.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-1-findings-records.md) | research | — |
 | [2026-11-15-build-TOOL-aMeasuredDrag-1-review-brief.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-1-review-brief.md) | research | — |
+| [2026-11-15-build-TOOL-aMeasuredDrag-1-runlog-6d98c39c.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-1-runlog-6d98c39c.md) | journal | TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-4 TOOL-aMeasuredDrag-5 TOOL-aMeasuredDrag-6 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 TOOL-aMeasuredDrag-9 TOOL-aMeasuredDrag-10 TOOL-aMeasuredDrag-11 TOOL-aMeasuredDrag-12 |
 | [2026-11-15-build-TOOL-aMeasuredDrag-1-synthesis-brief.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-1-synthesis-brief.md) | research | — |
 | [2026-11-15-build-TOOL-aMeasuredDrag-1-verdicts.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-1-verdicts.md) | research | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-1-researcher.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-1-researcher.md) | journal | — |
