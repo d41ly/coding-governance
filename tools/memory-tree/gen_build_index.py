@@ -1136,6 +1136,15 @@ def collect(root: str, conf: dict, backlog_out: dict | None = None) -> list:
     # wrong tree reds there, by name, before any roster is rendered.
     builds = []
     spec_index: dict = {}
+    # Each build folder's tracked paths, grouped ONCE in `tracked` order (TOOL-aMeasuredDrag-6):
+    # the per-build filters below read their own build's list, not the whole tree's.
+    in_builds = f"{m}/builds/"
+    by_slug: dict = {}
+    for p in tracked:
+        if p.startswith(in_builds):
+            head, sep, _ = p[len(in_builds):].partition("/")
+            if sep:
+                by_slug.setdefault(head, []).append(p)
     for slug in slugs:
         readme = f"{m}/builds/{slug}/README.md"
         if readme not in tracked:
@@ -1176,7 +1185,7 @@ def collect(root: str, conf: dict, backlog_out: dict | None = None) -> list:
         for value in fm["roster"].split("+"):
             if families and value.strip() not in families:
                 raise Problem(f"{readme}: roster value '{value.strip()}' is outside the FAMILIES set")
-        specs = sorted(p for p in tracked if p.startswith(f"{m}/builds/{slug}/spec/") and p.endswith(".md"))
+        specs = sorted(p for p in by_slug.get(slug, []) if p.startswith(f"{m}/builds/{slug}/spec/") and p.endswith(".md"))
         units = [parse_spec(os.path.join(root, p), _id_alternation(conf)) for p in specs]
         # THE SPEC INDEX THE FOLD READS, built from the parse this loop already performs and keyed
         # by the spec's H1 id. The path stored is the REPO-RELATIVE one, not `parse_spec`'s
@@ -1197,7 +1206,7 @@ def collect(root: str, conf: dict, backlog_out: dict | None = None) -> list:
         # in 15 of them: the sentence is written when a build opens, predicting the folders it will
         # grow, and nothing revisits it. Seven claim a build/ that was never created.
         kinds = [k for k in RECORD_KINDS
-                 if any(t.startswith(f"{m}/builds/{slug}/{k}/") for t in tracked)]
+                 if any(t.startswith(f"{m}/builds/{slug}/{k}/") for t in by_slug.get(slug, []))]
         builds.append(
             {
                 "slug": slug,
@@ -1208,7 +1217,7 @@ def collect(root: str, conf: dict, backlog_out: dict | None = None) -> list:
                 # Every tracked record, for the document-inventory region. The filename grammar is
                 # NOT parsed: five files under legacy-files.txt carry grandfathered names, and a
                 # renderer that parsed names would have to waive them or render them degraded.
-                "docs": sorted(t for t in tracked
+                "docs": sorted(t for t in by_slug.get(slug, [])
                                if any(t.startswith(f"{m}/builds/{slug}/{k}/") for k in RECORD_KINDS)),
                 "parents": [s.strip() for s in fm.get("parents", "").split() if s.strip()],
                 "units": [u for u in units if u],

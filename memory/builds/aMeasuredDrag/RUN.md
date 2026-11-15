@@ -52,3 +52,7 @@ base: a0a1892de069cd2299ba162d885ac283cfa81010
 2026-11-15T03:10:18Z dispatch · item f2c00165 TOOL-aMeasuredDrag-5 · reason tools/process-monitor/procmon-hook.js tools/process-monitor/adopt-process-monitor.test.sh memory/builds/aMeasuredDrag/spec/2026-11-15-spec-TOOL-aMeasuredDrag-5.md memory/builds/aMeasuredDrag/build/2026-11-15-build-TOOL-aMeasuredDrag-5-1-acceptance-ledger.md memory/builds/aMeasuredDrag/README.md memory/LIVE.md memory/ledger/2026-11.md memory/map/generated/symbols.json
 
 2026-11-15T03:10:21Z brief · item TOOL-aMeasuredDrag-5 · reason 4192eee987ed memory/builds/aMeasuredDrag/prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-5-1-builder.md
+
+2026-11-15T03:32:55Z dispatch · item b4ef72d0 TOOL-aMeasuredDrag-6 · reason tools/memory-tree/gen_build_index.py memory/builds/aMeasuredDrag/spec/2026-11-15-spec-TOOL-aMeasuredDrag-6.md memory/builds/aMeasuredDrag/build/2026-11-15-build-TOOL-aMeasuredDrag-6-1-acceptance-ledger.md memory/builds/aMeasuredDrag/README.md memory/map/generated/symbols.json
+
+2026-11-15T03:33:00Z brief · item TOOL-aMeasuredDrag-6 · reason ff80778af646 memory/builds/aMeasuredDrag/prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-6-1-builder.md
