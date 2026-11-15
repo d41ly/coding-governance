@@ -1,6 +1,6 @@
 # TOOL-aTwinnedPass-11 — the Workflow runtime's worktree spelling, admitted beside the Agent tool's at both ends of the handoff
 
-**Status:** INPROGRESS · rev-1 · 2026-11-15 · node a · Tier-2 · base 900f656d0 · streams tooling · order 5
+**Status:** CLOSED · rev-1 · 2026-11-15 · node a · Tier-2 · base 900f656d0 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
