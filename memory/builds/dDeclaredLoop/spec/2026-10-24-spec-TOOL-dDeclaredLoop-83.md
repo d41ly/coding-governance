@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-83 — 75 S27 states 81's exit table, so no merge-tree exit but 0 and 1 falls to the parents
 
-**Status:** DEFERRED · rev-5 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-5 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-83-deviation-832.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-83-deviation-832.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-83-deviation-833.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-83-deviation-833.md) | deviation | — |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-83-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-83-1-spec-writer.md) | journal | — |
+| [2026-11-15-prompt-TOOL-dDeclaredLoop-83-build-brief.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-83-build-brief.md) | journal | — |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-83-reground-brief.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-83-reground-brief.md) | research | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-83-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-83-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 |
 

@@ -152,7 +152,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-81 — a clean re-merge that fails is its own state and never takes the parent exemption; only a probed absence of the feature does](spec/2026-10-24-spec-TOOL-dDeclaredLoop-81.md) | 20 | 2 | CLOSED | rev-6 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-25 — a repository's own stages, spliced between two adjacent gov stages](spec/2026-10-24-spec-TOOL-dDeclaredLoop-25.md) | 21 | 2 | INPROGRESS | rev-5 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-47 — the stage factory writes a whole conforming stage: its witness, exit item, state and table rows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-47.md) | 21 | 2 | WONTDO | rev-3 | 2026-11-15 |
-| [TOOL-dDeclaredLoop-83 — 75 S27 states 81's exit table, so no merge-tree exit but 0 and 1 falls to the parents](spec/2026-10-24-spec-TOOL-dDeclaredLoop-83.md) | 21 | 2 | DEFERRED | rev-5 | 2026-11-15 |
+| [TOOL-dDeclaredLoop-83 — 75 S27 states 81's exit table, so no merge-tree exit but 0 and 1 falls to the parents](spec/2026-10-24-spec-TOOL-dDeclaredLoop-83.md) | 21 | 2 | INPROGRESS | rev-5 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-84 — 82's restatement of S27 keeps 81's exit table, and 82's pass greps 75 for the fall to the parents](spec/2026-10-24-spec-TOOL-dDeclaredLoop-84.md) | 21 | 2 | DEFERRED | rev-4 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-85 — the write-tree capability probe has three answers, and only a probed absence takes the parent exemption](spec/2026-10-24-spec-TOOL-dDeclaredLoop-85.md) | 21 | 2 | DEFERRED | rev-5 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-29 — an item's upstream field: commitment rows handed on, answered at the return, gating only a measured edge](spec/2026-10-24-spec-TOOL-dDeclaredLoop-29.md) | 22 | 2 | DEFERRED | rev-4 | 2026-11-15 |
@@ -213,7 +213,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 528 bound to this build, across 4 record folder(s).
+Records: 529 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
