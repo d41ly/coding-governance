@@ -87,7 +87,7 @@ ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWai
 | [TOOL-aTrimmedWait-11 — close repair, inherited: the hygiene suite's partition arm sets aside check 26's cache-hit count](spec/2026-11-15-spec-TOOL-aTrimmedWait-11.md) | 10 | 2 | INPROGRESS | rev-4 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 56 bound to this build, across 4 record folder(s).
+Records: 57 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

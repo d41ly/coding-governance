@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-15-build-TOOL-aTrimmedWait-11-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aTrimmedWait-11-1-acceptance-ledger.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTrimmedWait-11-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTrimmedWait-11-2-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-2-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTrimmedWait-11-3-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-3-spec-writer.md) | journal | — |

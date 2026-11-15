@@ -1389,14 +1389,30 @@ rm -rf "$SC"
 # ---- AC8: the PARTITION. Over this red tree the SET of lines the unscoped run printed (`out`, above)
 # ---- equals the union of the scoped runs' lines, liveness lines set aside, over one selection per
 # ---- `check_selected` call, named by its first id. The list is this suite's pin of the population.
+derive_partition_lines() { printf '%s\n' "$1" | grep . | sed -E -e '/^memory-hygiene: check 26 cache recomputed /d' -e 's/^(memory-hygiene: check 26 transitions examined .* cache hits )[0-9]+/\1<n>/' | sort -u; }
 _hs_union=""
 for _hs_s in 1 2 3 4 5 6 9 10 11 12 13 17 20 21 22 23 24 26 27 28 29 30 31; do
   run_scoped "$_hs_s"
   _hs_union+=$(grep -v '^HYGIENE --only ' <<<"$sout" || true)$'\n'
 done
-n=$((n+1)); [ "$(printf '%s\n' "$_hs_union" | grep . | sort -u)" = "$(printf '%s\n' "$out" | grep . | sort -u)" ] \
-  || { echo "FAIL the scoped runs do not partition the unscoped run's lines:"; diff <(printf '%s\n' "$out" | grep . | sort -u) <(printf '%s\n' "$_hs_union" | grep . | sort -u) | head -20; st=1; }
+# TOOL-aTrimmedWait-11: check 26's cache-hit count and its `cache recomputed` lines are what the
+# cache's state moves (the unscoped run reads it cold, the scoped one warm), so both sides set them aside.
+n=$((n+1)); [ "$(derive_partition_lines "$_hs_union")" = "$(derive_partition_lines "$out")" ] \
+  || { echo "FAIL the scoped runs do not partition the unscoped run's lines:"; diff <(derive_partition_lines "$out") <(derive_partition_lines "$_hs_union") | head -20; st=1; }
 n=$((n+1)); grep -qF 'HYGIENE --only' <<<"$out" && { echo "FAIL the unscoped run printed a liveness line"; st=1; }
+# ---- TOOL-aTrimmedWait-11: the set-aside, over lines the producer itself renders.
+mapfile -t _hs_c26 < <("$_PY" -I -c 'import sys; sys.path.insert(0, sys.argv[1]); import transition_audit as t
+r = lambda m, h: t.render_liveness({"registry": [], "transitions": ["a"] * 4, "merges": m, "hits": h}, True)
+print(r(9, 0)); print(r(9, 4)); print(r(8, 4)); t.print_recomputed({"recomputed": {"foreign inputs": 1}})' "$HERE")
+_hs_cr=$'\r'; _hs_c26=("${_hs_c26[@]%"$_hs_cr"}")
+n=$((n+1)); [ "$(derive_partition_lines "${_hs_c26[0]-}")" = "$(derive_partition_lines "${_hs_c26[1]-}")" ] \
+  || { echo "FAIL check 26's cold and warm liveness lines compare unequal through derive_partition_lines"; st=1; }
+n=$((n+1)); [ "$(derive_partition_lines "${_hs_c26[0]-}")" != "$(derive_partition_lines "${_hs_c26[2]-}")" ] \
+  || { echo "FAIL check 26's liveness lines differing in merges walked compare equal through derive_partition_lines"; st=1; }
+n=$((n+1)); [ "$(derive_partition_lines "${_hs_c26[0]+${_hs_c26[0]/check 26/check 12}}")" != "$(derive_partition_lines "${_hs_c26[1]+${_hs_c26[1]/check 26/check 12}}")" ] \
+  || { echo "FAIL a line outside check 26 had its cache-hit count set aside"; st=1; }
+n=$((n+1)); [ -n "${_hs_c26[3]-}" ] && [ "$(derive_partition_lines "${_hs_c26[0]-}"$'\n'"${_hs_c26[3]-}")" = "$(derive_partition_lines "${_hs_c26[0]-}")" ] \
+  || { echo "FAIL check 26's cache recomputed line was not set aside, or the producer rendered none"; st=1; }
 # ---- check 22: the acceptance ledger (TOOL-dUnstalledConvoy-12).
 hit  'ARCH-tFixture-70/AC2'                    # numbered, unevidenced — the defect this exists for
 miss 'ARCH-tFixture-70/AC1'                    # ...and the evidenced sibling is silent
@@ -4807,7 +4823,9 @@ done
 # plus TOOL-aNimbleMend-9's 11 = 707. Counted by reading; OWED: observed at the close.
 # RAISED 707 -> 745 by TOOL-aTrimmedWait-2: its scope arms, eleven top-level and twenty-seven in a
 # nine-pass refusal loop, none skipped. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=745
+# RAISED 745 -> 749 by TOOL-aTrimmedWait-11: its four check 26 set-aside fixture assertions, each
+# top-level and never skipped. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=749
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
