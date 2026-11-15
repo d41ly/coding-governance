@@ -1,6 +1,6 @@
 # TOOL-aTwinnedPass-13 — the reconcile with local main at a76c6afe7: its four conflicts resolved so the landing merge is clean
 
-**Status:** INPROGRESS · rev-1 · 2026-11-15 · node a · Tier-2 · base a76c6afe7 · streams tooling · order 6
+**Status:** CLOSED · rev-1 · 2026-11-15 · node a · Tier-2 · base a76c6afe7 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
