@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-15-build-TOOL-aMeasuredDrag-12-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-12-1-acceptance-ledger.md) | journal | — |
+| [2026-11-15-build-TOOL-aMeasuredDrag-12-red-fix-4.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-12-red-fix-4.md) | red-fix | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-12-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-12-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-12-2-builder.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-12-2-builder.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-12-promotion-brief.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-12-promotion-brief.md) | research | — |
@@ -16,7 +17,7 @@
 ## 1. Goal
 
 The round-1 closing review of this build (`2026-11-15-review-TOOL-aMeasuredDrag-1-11-closing-diff-round1`)
-confirmed six minor items, which BUILD-METHOD M4 batches into this one unit. One is a narrow spurious
+confirmed six minor items, which doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it batches into this one unit. One is a narrow spurious
 red: a relative launcher can enter the bar's memo. The other five are verification gaps that leave
 units 4, 10 and 11 able to regress with every gate green. Each fix is the one the review's skeptic
 judged sound or class-level, and no verdict, refusal or printed line moves for a correct input.
