@@ -1385,7 +1385,7 @@ printf -v _wfj "$CHILD_ARGS" unattended
 TP_U=${_wfj%\}}',"passBase":"fedcba9","writes":"P1 P2"}'
 TP_PB=${_wfj%\}}',"writes":"w","passBase":%s}'
 TP_WR=${_wfj%\}}',"passBase":"fedcba9","writes":%s}'
-TP_OK='{"build":{"committed":true,"sha":"abc1234","base":"def5678","why":"","summary":"s","branch":"worktree-agent-x1","worktree":"/w/agent-x1"}}'
+TP_OK='{"build":{"committed":true,"sha":"abc1234","base":"def5678","why":"","summary":"s","branch":"worktree-agent-x1","worktree":"/w/.claude/worktrees/agent-x1"}}'
 # T1 — the unattended prompt, the spawn options, the return and the log.
 o=$(run_wf "$TP_U" "$TP_OK" "$C")
 tp_pr=$(printf '%s\n' "$o" | grep '^prompt:build:'); tp_rs=$(printf '%s\n' "$o" | grep '^RESULT')
@@ -1396,7 +1396,7 @@ hasnt_ "TP1 T1 ...and orders no --dispatch" "$tp_pr" '--dispatch tB'
 hasnt_ "TP1 T1 ...and orders no --brief" "$tp_pr" '--brief tB'
 has "TP1 T1 the spawn asks for a worktree" "$o" 'isolation:build:worktree'
 has "TP1 T1 the result carries the branch" "$tp_rs" '"branch":"worktree-agent-x1"'
-has "TP1 T1 the result carries the worktree" "$tp_rs" '"worktree":"/w/agent-x1"'
+has "TP1 T1 the result carries the worktree" "$tp_rs" '"worktree":"/w/.claude/worktrees/agent-x1"'
 has "TP1 T1 the log names passBase and the declared writes" "$o" 'log:unit A-tB-1: own worktree from `fedcba9`, declared writes `P1 P2`'
 # T2 — the attended prompt moves by its one paragraph alone, cut out by a fixed-string sed: the
 # paragraph's regex metacharacters are escaped first, so the pattern matches only its own bytes.
@@ -1419,7 +1419,7 @@ for m in childU childA; do
 done
 # T4 — the nextAction takes its base from passBase and runs in the returned worktree.
 o=$(run_wf "${TP_U%\}}"',"passLegs":"PL"}' "$TP_OK" "$C")
-has "TP1 T4 nextAction runs from passBase in the returned worktree" "$(read_next_action "$o")" 'Run `PL --base fedcba9` at the main loop with its working directory at `/w/agent-x1`, before that worktree is merged back'
+has "TP1 T4 nextAction runs from passBase in the returned worktree" "$(read_next_action "$o")" 'Run `PL --base fedcba9` at the main loop with its working directory at `/w/.claude/worktrees/agent-x1`, before that worktree is merged back'
 has "TP1 T4 ...where the pass commit is HEAD there" "$(read_next_action "$o")" 'which is HEAD there when the command runs'
 hasnt_ "TP1 T4 ...and never the builder's base" "$(read_next_action "$o")" 'def5678'
 # T5 — an ill-shaped branch and worktree reach neither the return nor the nextAction.
@@ -1446,6 +1446,40 @@ for a in "$tp_un1" "$tp_un2" "$tp_un3"; do
   has "TP1 T6 the child REFUSES an unpaired key: ${a#*\"mode\":}" "$o" "THROW unattended-unit: args \`writes\`"
   hasnt_ "TP1 T6 ...before any spawn: ${a#*\"mode\":}" "$o" "agent:build"
 done
+
+# TOOL-aTwinnedPass-4 — THE PASS IDENTITY ONLY IN THE RUNTIME'S SPELLING: `worktree-agent-<id>` at
+# `<primary>/.claude/worktrees/agent-<id>`. Each hostile worktree carries its payload in an EARLIER
+# segment, where only the segment class or the `..` lookahead refuses it; past the id, the id's own
+# class would refuse it and the arm could not tell a loosened class from a strict one. The values are
+# JSON-escaped in single quotes, and `printf %s` passes them through without reading a backslash.
+# The absence reads the whole RESULT line, not `read_next_action`, which stops at the first `"`.
+TP4_ARGS=${TP_U%\}}',"passLegs":"PL"}'
+render_pass_returns() { # branch · worktree, both JSON-escaped -> the returns map
+  printf '{"build":{"committed":true,"sha":"abc1234","base":"def5678","why":"","summary":"s","branch":"%s","worktree":"%s"}}' "$1" "$2"
+}
+tp4_hostile=(
+  '$(id)'        'worktree-agent-x1$(id)'  '/w/$(id)/.claude/worktrees/agent-x1'
+  'double quote' 'worktree-agent-x1\"'     '/w/a\"b/.claude/worktrees/agent-x1'
+  ';'            'worktree-agent-x1;id'    '/w/a;id/.claude/worktrees/agent-x1'
+  '..'           'worktree-agent-x1/../x'  '/w/../.claude/worktrees/agent-x1'
+  'backtick'     'worktree-agent-x1`id`'   '/w/a`id`/.claude/worktrees/agent-x1'
+  'newline'      'worktree-agent-x1\nb'    '/w/a\nb/.claude/worktrees/agent-x1'
+)
+for ((i = 0; i < ${#tp4_hostile[@]}; i += 3)); do
+  o=$(run_wf "$TP4_ARGS" "$(render_pass_returns "${tp4_hostile[i+1]}" "${tp4_hostile[i+2]}")" "$C")
+  tp_rs=$(printf '%s\n' "$o" | grep '^RESULT')
+  has "TP4 a ${tp4_hostile[i]} branch returns empty (AC2)" "$tp_rs" '"branch":""'
+  has "TP4 a ${tp4_hostile[i]} worktree returns empty (AC2)" "$tp_rs" '"worktree":""'
+  hasnt_ "TP4 ...and the ${tp4_hostile[i]} worktree reaches no part of the result (AC2)" "$tp_rs" 'worktrees/agent-x1'
+  has "TP4 ...and nextAction names the ${tp4_hostile[i]} path unusable (AC2)" "$(read_next_action "$o")" 'whose path the builder returned unusable'
+done
+tp_rs=$(run_wf "$TP4_ARGS" "$(render_pass_returns 'agent-x1' '/w/agent-x1')" "$C" | grep '^RESULT')
+has "TP4 the old branch spelling returns empty (AC2)" "$tp_rs" '"branch":""'
+has "TP4 the old worktree spelling returns empty (AC2)" "$tp_rs" '"worktree":""'
+tp_rs=$(run_wf "$TP4_ARGS" "$(render_pass_returns 'worktree-agent-x1' '/w/.claude/worktrees/agent-x1/sub')" "$C" | grep '^RESULT')
+has "TP4 a segment past the id returns an empty worktree (AC2)" "$tp_rs" '"worktree":""'
+tp_rs=$(run_wf "$TP4_ARGS" "$(render_pass_returns 'worktree-agent-x1' 'C:\\w\\.claude\\worktrees\\agent-x1')" "$C" | grep '^RESULT')
+has "TP4 the backslash form of the runtime's place is admitted (AC2)" "$tp_rs" '"worktree":"C:\\w\\.claude\\worktrees\\agent-x1"'
 
 # ========================= F4 (closing review, HIGH) — DISPOSED-BUT-STANDING IS NOT DISPOSED
 # `{disposed:true, standing:['b1']}` validated against DISPOSAL_SCHEMA, cleared a guard that tested
@@ -3962,7 +3996,8 @@ has    "FA15 AC25 the undeclared throw" "$o" "a disposal passes the hand-out's \
 # absences on each of two fixtures), T4 3, T5 3, and T6 25 (five passBase refusals of two, the full-sha
 # spawn, four writes refusals of two, three unpaired calls of two). Counted by reading, not measured by
 # a run: the pass that wrote it runs no suite.
-FLOOR_ASSERTIONS=1000
+# RAISED 1000 -> 1028 by TOOL-aTwinnedPass-4: the 28 its TP4 group executes — six hostile cases of four, the old spelling's two, and one each for the segment past the id and the backslash form. Counted by reading, not measured by a run: the pass that wrote it runs no suite.
+FLOOR_ASSERTIONS=1028
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

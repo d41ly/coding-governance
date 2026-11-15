@@ -28,7 +28,9 @@
 #
 # 4. WHAT `--merge` DOES. It refuses a branch whose merge base with HEAD is not `--from`: a builder
 #    that skipped its reset to `passBase` forked from another line, and merging it would carry that
-#    line's history in. It merges `--no-ff --no-commit`, and resolves to this side ONLY a conflicted
+#    line's history in. Both verbs refuse a branch outside the runtime's `worktree-agent-<id>` and a
+#    worktree holding it anywhere but `<primary tree>/.claude/worktrees/agent-<id>` for the same `<id>`,
+#    so neither ever removes a tree it did not cut. It merges `--no-ff --no-commit`, and resolves to this side ONLY a conflicted
 #    path an effective generated output covers or one the pass changed inside gen regions alone; any
 #    other conflict is two passes that were not disjoint, so the merge is aborted and refused naming
 #    every such path. It then runs the run-gates kit's `regen.py --write`, found as the lander finds
@@ -56,6 +58,12 @@
 #      stays, since git will not delete a branch a worktree has checked out.
 #    - A pass whose return carried no branch: nothing here can find its worktree.
 #    - How many passes run at once.
+#    - The holder comparison is textual: a worktree registered under another spelling of the same path,
+#      by drive-letter case, an 8.3 short name or a link, is refused, which is the safe direction.
+#    - A branch no worktree holds is deleted by `--remove` without a holder check, since there is no
+#      tree to lose; the lost-commit refusal still guards its commits.
+#    - A runtime that cuts passes under another name or place: each such pass is refused, never merged
+#      or removed, until this tool learns the spelling.
 set -u
 case "${BASH_SOURCE[0]}" in */*) _pt_dir=${BASH_SOURCE[0]%/*} ;; *) _pt_dir=. ;; esac
 [ -f "$_pt_dir/unattended.sh" ] || {
@@ -65,7 +73,7 @@ case "${BASH_SOURCE[0]}" in */*) _pt_dir=${BASH_SOURCE[0]%/*} ;; *) _pt_dir=. ;;
 # shellcheck source=unattended.sh
 . "$_pt_dir/unattended.sh"
 PT_USAGE="usage: pass-tree.sh --merge <slug> --pass <unit-id> --branch <branch> --from <sha> | --remove <slug> --branch <branch>"
-PT_BRANCH=""; PT_FROM=""
+PT_BRANCH=""; PT_FROM=""; PT_WHERE=""
 
 print_pass_tree_refusal() { # text -> one REFUSING line on stderr
   printf 'pass-tree: REFUSING - %s\n' "$1" >&2
@@ -110,7 +118,29 @@ check_pass_branch() { # branch -> 0 with PT_BRANCH set · 1 with its refusal pri
     print_pass_tree_refusal "$1 is the run's own branch, not a pass's; nothing was written"
     return 1
   fi
+  if ! [[ $1 =~ ^worktree-agent-[A-Za-z0-9]+$ ]]; then
+    print_pass_tree_refusal "'$1' is not a branch the runtime cuts for a pass (worktree-agent-<id>), so it is not a pass's branch; nothing was written"
+    return 1
+  fi
   PT_BRANCH=$1
+}
+
+# The holder both verbs check before they write: a worktree holding the pass's branch must sit exactly
+# where the runtime cuts that pass's, `<primary tree>/.claude/worktrees/agent-<id>` for the branch's
+# own `<id>`, the primary tree read from the porcelain list `derive_holder_where` reads, so both paths
+# carry one spelling. An unreadable list leaves the primary empty, which fails the comparison.
+check_pass_holder() { # (PT_BRANCH) -> 0 with PT_WHERE the admitted holder, empty when none holds it · 1 with its refusal printed
+  local HW_REF="refs/heads/$PT_BRANCH" where primary want
+  PT_WHERE=""
+  where=$(derive_holder_where)
+  [ -d "$where" ] || return 0
+  primary=$(GIT worktree list --porcelain 2>/dev/null | awk '/^worktree /{ print substr($0, 10); exit }')
+  want="$primary/.claude/worktrees/${PT_BRANCH#worktree-}"
+  if [ "$where" != "$want" ]; then
+    print_pass_tree_refusal "$PT_BRANCH is checked out at $where, not at $want, where the runtime cuts that pass's worktree, so that tree is not a pass's and is left as it is; nothing was written"
+    return 1
+  fi
+  PT_WHERE=$where
 }
 
 # The resolution rule: an effective generated output, or a change the pass made inside gen regions
@@ -145,12 +175,10 @@ remove_merge_attempt() { # -> 0 the tree is at HEAD, nothing staged, no merge in
   GIT reset -q --hard HEAD && GIT clean -qfd
 }
 
-# The pass's worktree, found from its branch by the driver's own reader, then the branch.
-remove_pass_tree() { # (PT_BRANCH) -> 0 both gone · 1 with what is left printed
-  local HW_REF="refs/heads/$PT_BRANCH" where
-  where=$(derive_holder_where)
-  if [ -d "$where" ] && ! GIT worktree remove --force "$where" >&2; then
-    echo "pass-tree: NOTE - git could not remove the worktree $where, so it and branch $PT_BRANCH are left" >&2
+# The pass's worktree, only the one `check_pass_holder` admitted, then the branch.
+remove_pass_tree() { # (PT_BRANCH, PT_WHERE) -> 0 both gone · 1 with what is left printed
+  if [ -n "$PT_WHERE" ] && ! GIT worktree remove --force "$PT_WHERE" >&2; then
+    echo "pass-tree: NOTE - git could not remove the worktree $PT_WHERE, so it and branch $PT_BRANCH are left" >&2
     return 1
   fi
   if ! GIT branch -q -D "$PT_BRANCH" >&2; then
@@ -171,14 +199,20 @@ cmd_merge_tree() { # slug · unit · branch · from -> 0 merged, its sha printed
     print_pass_tree_refusal "no branch $PT_BRANCH exists, so there is no pass of $unit to merge; nothing was written"
     return 1
   fi
+  check_pass_holder || return 1
   head=$(GIT rev-parse --verify -q HEAD) || { print_pass_tree_refusal "HEAD does not resolve; nothing was written"; return 1; }
   if [ "$(GIT rev-list --count "HEAD..refs/heads/$PT_BRANCH" 2>/dev/null)" = 0 ]; then
     print_pass_tree_refusal "$unit's branch $PT_BRANCH holds no commit HEAD lacks, so the pass committed nothing to merge; take it away with --remove $slug --branch $PT_BRANCH. Nothing was written"
     return 1
   fi
-  if ! [[ $4 =~ ^[0-9a-f]{7,40}$ ]] || ! PT_FROM=$(GIT rev-parse --verify -q "$4^{commit}"); then
+  if ! [[ $4 =~ ^[0-9a-f]{7,64}$ ]]; then
     PT_FROM=""
-    print_pass_tree_refusal "--from '$4' is not 7 to 40 lowercase hex digits naming a commit, so the fork point cannot be compared; nothing was written"
+    print_pass_tree_refusal "--from '$4' is not 7 to 64 lowercase hex digits, so the fork point cannot be compared; nothing was written"
+    return 1
+  fi
+  if ! PT_FROM=$(GIT rev-parse --verify -q "$4^{commit}"); then
+    PT_FROM=""
+    print_pass_tree_refusal "--from '$4' names no commit here, so the fork point cannot be compared; nothing was written"
     return 1
   fi
   mb=$(GIT merge-base HEAD "refs/heads/$PT_BRANCH") || { print_pass_tree_refusal "$PT_BRANCH and HEAD share no merge base; nothing was written"; return 1; }
@@ -254,6 +288,7 @@ cmd_remove_tree() { # slug · branch -> 0 taken away or already absent · 1 refu
     echo "pass-tree: NOTE - no branch $PT_BRANCH exists, so no worktree can hold it and there is nothing to take away" >&2
     return 0
   fi
+  check_pass_holder || return 1
   n=$(GIT rev-list --count "refs/heads/$PT_BRANCH" --not --exclude="$PT_BRANCH" --branches --remotes --tags 2>/dev/null) || n=""
   if [ "$n" != 0 ]; then
     print_pass_tree_refusal "$PT_BRANCH holds ${n:-an uncounted number of} commit(s) no other branch, remote-tracking ref or tag holds, so deleting it would lose the pass's work; bring it back with --merge. Nothing was written"

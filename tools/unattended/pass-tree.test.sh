@@ -11,7 +11,8 @@
 # run-gates kit's `regen.py` with what it imports, at that kit's place under this suite's tool root.
 #
 # A PASS IS SIMULATED, NEVER BUILT. `add_fixture_pass` does what the runtime and the builder's first
-# order do, a worktree on a new branch at `main` and then the hard reset to C; `noreset` stops before
+# order do, a worktree on a new branch at `main`, both in the runtime's spelling (`worktree-agent-<id>`
+# at `.claude/worktrees/agent-<id>` in the primary tree), and then the hard reset to C; `noreset` stops before
 # the reset. `write_fixture_pass` commits one product file there, re-rendered, with its `Pass:` trailer.
 #
 # NO `<prefix>/<kit>/` LITERAL: every path is derived from this file's own directory, because the
@@ -47,21 +48,24 @@ check_same()  { n=$((n+1)); if [ "$2" = "$3" ]; then echo "ok   $1"; else echo "
 # One tool call from the current directory: stdout in `out`, stderr in `err`, the exit in `rc`.
 run_tool() { out=$(bash "$TOOL" "$@" 2>"$T/err"); rc=$?; err=$(<"$T/err"); }
 measure_refusals() { grep -c '^pass-tree: REFUSING' "$T/err" || true; }
-add_fixture_pass() { # n · [noreset] -> worktree $T/wt/p<n> on branch agent-p<n>, at C unless noreset
-  git -C "$R" worktree add -q -b "agent-p$1" "$T/wt/p$1" main >/dev/null 2>&1 || return 1
+add_fixture_pass() { # n · [noreset] -> worktree $R/.claude/worktrees/agent-p<n> on branch worktree-agent-p<n>, at C unless noreset
+  git -C "$R" worktree add -q -b "worktree-agent-p$1" "$R/.claude/worktrees/agent-p$1" main >/dev/null 2>&1 || return 1
   [ "${2:-}" = noreset ] && return 0
-  git -C "$T/wt/p$1" reset -q --hard "$C"
+  git -C "$R/.claude/worktrees/agent-p$1" reset -q --hard "$C"
 }
 write_fixture_pass() { # n · product file -> one pass commit in pass n's worktree, the output re-rendered
-  ( cd "$T/wt/p$1" && printf 'pass %s\n' "$1" >"$2" && git add -- "$2" && bash "$FX_REL/render.sh" \
+  ( cd "$R/.claude/worktrees/agent-p$1" && printf 'pass %s\n' "$1" >"$2" && git add -- "$2" && bash "$FX_REL/render.sh" \
       && git add -A && git commit -q -m "build TOOL-tRun-$1" -m "Pass: TOOL-tRun-$1" )
 }
 
 # ---- the fixture repository -------------------------------------------------------------------------
-mkdir -p "$R" "$T/wt" "$T/hooks"
+mkdir -p "$R" "$T/hooks"
 cd "$R" || exit 2
 git init -q -b main . && git config user.email t@t.test && git config user.name t \
   && git config core.autocrlf false && git config core.hooksPath "$T/hooks" || { echo "FAIL git init"; exit 2; }
+# The pass worktrees sit inside this tree, where the runtime cuts them, and are excluded as node a's
+# common info/exclude excludes them, so the clean test and the untracked walk do not see them.
+printf '.claude/worktrees/\n' >> .git/info/exclude
 # The conf in the driver suite's `mkconf` shape, every key that NOTEs when blank declared.
 cat > .unattended.conf <<'EOF'
 MEMORY_ROOT=memory
@@ -142,9 +146,9 @@ RUNMD=memory/builds/tRun/RUN.md
 # ---- T1 (AC1, AC6): passes 2 and 3 merged in turn, the generated output and region re-rendered ---------
 add_fixture_pass 2 && write_fixture_pass 2 p2.txt || { echo "FAIL pass 2"; exit 2; }
 add_fixture_pass 3 && write_fixture_pass 3 p3.txt || { echo "FAIL pass 3"; exit 2; }
-P2=$(git rev-parse agent-p2); P3=$(git rev-parse agent-p3)
+P2=$(git rev-parse worktree-agent-p2); P3=$(git rev-parse worktree-agent-p3)
 h0=$(git rev-parse HEAD)
-run_tool --merge tRun --pass TOOL-tRun-2 --branch agent-p2 --from "$C"
+run_tool --merge tRun --pass TOOL-tRun-2 --branch worktree-agent-p2 --from "$C"
 check_same "T1 --merge of pass 2 exits 0 (AC1)" "$rc" 0
 # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
 if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
@@ -152,7 +156,7 @@ M2=$out
 check_same "T1 pass 2's merge prints one sha alone on stdout (AC1)" "$M2" "$(git rev-parse HEAD)"
 check_same "T1 pass 2's merge has the pre-merge HEAD as its first parent" "$(git rev-parse "$M2^1")" "$h0"
 check_same "T1 pass 2's merge has pass 2's commit as its second parent (AC1)" "$(git rev-parse "$M2^2")" "$P2"
-run_tool --merge tRun --pass TOOL-tRun-3 --branch agent-p3 --from "$C"
+run_tool --merge tRun --pass TOOL-tRun-3 --branch worktree-agent-p3 --from "$C"
 check_same "T1 --merge of pass 3, whose output and region conflict, exits 0 (AC1)" "$rc" 0
 M3=$out
 check_same "T1 pass 3's merge prints one sha alone on stdout (AC1)" "$M3" "$(git rev-parse HEAD)"
@@ -162,11 +166,11 @@ p3.txt"
 bash "$FX_REL/render.sh" --check; check_same "T1 render.sh --check confirms the output and the README region fresh (AC1)" "$?" 0
 check_same "T1 the second merge's subject names its unit (AC1)" "$(git log -1 --format=%s)" "merge(tRun): TOOL-tRun-3's pass tree"
 check_same "T1 the merge carries the Pass: none trailer (AC1)" "$(git log -1 --format='%(trailers:key=Pass,valueonly)' | tr -d '\n')" "none"
-check_has "T1 the merge body names the branch, its tip and --from" "$(git log -1 --format=%b)" "Merges agent-p3 at ${P3:0:8}, dispatched from ${C:0:8}."
+check_has "T1 the merge body names the branch, its tip and --from" "$(git log -1 --format=%b)" "Merges worktree-agent-p3 at ${P3:0:8}, dispatched from ${C:0:8}."
 wl=$(git worktree list --porcelain)
-check_lacks "T1 pass 2's worktree is gone (AC1)" "$wl" "/wt/p2"
-check_lacks "T1 pass 3's worktree is gone (AC1)" "$wl" "/wt/p3"
-check_same "T1 neither pass branch remains (AC1)" "$(git branch --list 'agent-p*')" ""
+check_lacks "T1 pass 2's worktree is gone (AC1)" "$wl" "/.claude/worktrees/agent-p2"
+check_lacks "T1 pass 3's worktree is gone (AC1)" "$wl" "/.claude/worktrees/agent-p3"
+check_same "T1 neither pass branch remains (AC1)" "$(git branch --list 'worktree-agent-p*')" ""
 check_same "T1 the tree is clean after both merges (AC1)" "$(git status --porcelain)" ""
 got=$( . "$HERE/lib-unattended.sh" && pass_commit "$BASE" TOOL-tRun-2 "$RUNMD" )
 check_same "T1 pass_commit names pass 2's own commit, not the merge (AC6)" "$got" "$P2"
@@ -177,19 +181,19 @@ check_same "T1 --check-commit over the merge's message exits 0 (AC6)" "$?" 0
 # ---- T2 (AC2): pass 4 rewrites pass 2's product file; the merge is aborted and refused -----------------
 add_fixture_pass 4 && write_fixture_pass 4 p2.txt || { echo "FAIL pass 4"; exit 2; }
 h0=$(git rev-parse HEAD)
-run_tool --merge tRun --pass TOOL-tRun-4 --branch agent-p4 --from "$C"
+run_tool --merge tRun --pass TOOL-tRun-4 --branch worktree-agent-p4 --from "$C"
 check_same "T2 --merge of a pass that rewrote another's product file exits 1 (AC2)" "$rc" 1
 check_has "T2 the refusal names p2.txt (AC2)" "$err" "p2.txt"
 check_lacks "T2 the refusal does not name fx-out.txt (AC2)" "$err" "fx-out.txt"
 check_same "T2 HEAD is the pre-merge sha (AC2)" "$(git rev-parse HEAD)" "$h0"
 check_same "T2 the tree is clean (AC2)" "$(git status --porcelain)" ""
 git rev-parse -q --verify MERGE_HEAD >/dev/null; check_same "T2 no merge is in progress (AC2)" "$?" 1
-check_same "T2 branch agent-p4 remains (AC2)" "$(git branch --list agent-p4 | tr -d ' *')" "agent-p4"
-check_has "T2 pass 4's worktree remains (AC2)" "$(git worktree list --porcelain)" "/wt/p4"
+check_same "T2 branch worktree-agent-p4 remains (AC2)" "$(git branch --list worktree-agent-p4 | tr -d ' *')" "worktree-agent-p4"
+check_has "T2 pass 4's worktree remains (AC2)" "$(git worktree list --porcelain)" "/.claude/worktrees/agent-p4"
 
 # ---- T3 (AC3): each merge refusal, with HEAD and the tree as they were --------------------------------
 add_fixture_pass 5 || { echo "FAIL pass 5"; exit 2; }
-add_fixture_pass 8 && ( cd "$T/wt/p8" && printf 'stray row\n' >>"$RUNMD" && printf 'pass 8\n' > p8.txt \
+add_fixture_pass 8 && ( cd "$R/.claude/worktrees/agent-p8" && printf 'stray row\n' >>"$RUNMD" && printf 'pass 8\n' > p8.txt \
   && git add -A && git commit -q -m "build TOOL-tRun-8" -m "Pass: TOOL-tRun-8" ) || { echo "FAIL pass 8"; exit 2; }
 add_fixture_pass 9 noreset && write_fixture_pass 9 p9.txt || { echo "FAIL pass 9"; exit 2; }
 check_merge_refused() { # label · directory · branch · from -> four assertions
@@ -202,25 +206,25 @@ check_merge_refused() { # label · directory · branch · from -> four assertion
   check_same "T3 $1: HEAD is unchanged (AC3)" "$(git -C "$R" rev-parse HEAD)" "$h"
   check_same "T3 $1: the tree's status is unchanged (AC3)" "$(git -C "$R" status --porcelain)" "$s"
 }
-check_merge_refused "from a tree on another branch" "$T/wt/p5" agent-p4 "$C"
+check_merge_refused "from a tree on another branch" "$R/.claude/worktrees/agent-p5" worktree-agent-p4 "$C"
 check_has "T3 the other-branch refusal names the run's branch" "$err" "refs/heads/run"
 printf 'stray\n' > stray.txt
-check_merge_refused "with an untracked file present" "$R" agent-p4 "$C"
+check_merge_refused "with an untracked file present" "$R" worktree-agent-p4 "$C"
 check_has "T3 the untracked-file refusal names the clean test" "$err" "not clean"
 rm -f stray.txt
-check_merge_refused "for branch agent-none, which does not exist" "$R" agent-none "$C"
-check_has "T3 the absent-branch refusal names the branch" "$err" "no branch agent-none exists"
+check_merge_refused "for branch worktree-agent-none, which does not exist" "$R" worktree-agent-none "$C"
+check_has "T3 the absent-branch refusal names the branch" "$err" "no branch worktree-agent-none exists"
 check_merge_refused "for the run's own branch" "$R" run "$C"
 check_has "T3 the run-branch refusal says so" "$err" "run is the run's own branch"
 check_merge_refused "for branch -x" "$R" -x "$C"
 check_has "T3 the -x refusal is the branch-name check" "$err" "'-x' is not a branch name git admits"
-check_merge_refused "for pass 5, which committed nothing" "$R" agent-p5 "$C"
+check_merge_refused "for pass 5, which committed nothing" "$R" worktree-agent-p5 "$C"
 check_has "T3 the no-commit refusal names --remove" "$err" "--remove"
-check_merge_refused "for pass 8, which wrote the run-state file" "$R" agent-p8 "$C"
+check_merge_refused "for pass 8, which wrote the run-state file" "$R" worktree-agent-p8 "$C"
 check_has "T3 the run-state refusal names the file" "$err" "$RUNMD"
-check_merge_refused "with --from HEAD" "$R" agent-p4 HEAD
-check_has "T3 the --from refusal names the value" "$err" "--from 'HEAD' is not 7 to 40 lowercase hex digits"
-check_merge_refused "for pass 9, cut from main with no reset" "$R" agent-p9 "$C"
+check_merge_refused "with --from HEAD" "$R" worktree-agent-p4 HEAD
+check_has "T3 the --from refusal names the value" "$err" "--from 'HEAD' is not 7 to 64 lowercase hex digits"
+check_merge_refused "for pass 9, cut from main with no reset" "$R" worktree-agent-p9 "$C"
 check_has "T3 the fork-point refusal names the reset" "$err" "did not reset its worktree"
 check_has "T3 the fork-point refusal names C's first eight digits" "$err" "${C:0:8}"
 check_same "T3 pass 9's merge did not carry m1.txt into run (AC3)" "$(git ls-files m1.txt)" ""
@@ -228,7 +232,7 @@ check_same "T3 pass 9's merge did not carry m1.txt into run (AC3)" "$(git ls-fil
 # ---- T4 (AC4): a failed regeneration restores the pre-merge tree ---------------------------------------
 add_fixture_pass 7 && write_fixture_pass 7 p7.txt || { echo "FAIL pass 7"; exit 2; }
 h0=$(git rev-parse HEAD)
-out=$(FX_RENDER_FAIL=1 bash "$TOOL" --merge tRun --pass TOOL-tRun-7 --branch agent-p7 --from "$C" 2>"$T/err"); rc=$?
+out=$(FX_RENDER_FAIL=1 bash "$TOOL" --merge tRun --pass TOOL-tRun-7 --branch worktree-agent-p7 --from "$C" 2>"$T/err"); rc=$?
 check_same "T4 --merge with a failing regeneration exits 1 (AC4)" "$rc" 1
 check_has "T4 the refusal is the regeneration's, so the restore ran after the merge (AC4)" "$(<"$T/err")" "the regeneration failed"
 check_same "T4 HEAD is the pre-merge sha (AC4)" "$(git rev-parse HEAD)" "$h0"
@@ -237,23 +241,66 @@ check_same "T4 the tree is clean (AC4)" "$(git status --porcelain)" ""
 git rev-parse -q --verify MERGE_HEAD >/dev/null; check_same "T4 no merge is in progress (AC4)" "$?" 1
 
 # ---- T5 (AC5): --remove takes away an uncommitted pass and refuses a committed one ----------------------
-run_tool --remove tRun --branch agent-p5
+run_tool --remove tRun --branch worktree-agent-p5
 check_same "T5 --remove of pass 5, reset and never committed, exits 0 (AC5)" "$rc" 0
-check_same "T5 branch agent-p5 is gone (AC5)" "$(git branch --list agent-p5)" ""
-check_lacks "T5 pass 5's worktree is gone (AC5)" "$(git worktree list --porcelain)" "/wt/p5"
+check_same "T5 branch worktree-agent-p5 is gone (AC5)" "$(git branch --list worktree-agent-p5)" ""
+check_lacks "T5 pass 5's worktree is gone (AC5)" "$(git worktree list --porcelain)" "/.claude/worktrees/agent-p5"
 add_fixture_pass 10 noreset || { echo "FAIL pass 10"; exit 2; }
-run_tool --remove tRun --branch agent-p10
+run_tool --remove tRun --branch worktree-agent-p10
 check_same "T5 --remove of pass 10, cut with no reset and never committed, exits 0 (AC5)" "$rc" 0
-check_same "T5 branch agent-p10 is gone (AC5)" "$(git branch --list agent-p10)" ""
-check_lacks "T5 pass 10's worktree is gone (AC5)" "$(git worktree list --porcelain)" "/wt/p10"
-run_tool --remove tRun --branch agent-p7
+check_same "T5 branch worktree-agent-p10 is gone (AC5)" "$(git branch --list worktree-agent-p10)" ""
+check_lacks "T5 pass 10's worktree is gone (AC5)" "$(git worktree list --porcelain)" "/.claude/worktrees/agent-p10"
+run_tool --remove tRun --branch worktree-agent-p7
 check_same "T5 --remove of pass 7, holding a commit no other ref holds, exits 1 (AC5)" "$rc" 1
 check_has "T5 the refusal names --merge (AC5)" "$err" "--merge"
-check_same "T5 branch agent-p7 remains (AC5)" "$(git branch --list agent-p7 | tr -d ' *')" "agent-p7"
-check_has "T5 pass 7's worktree remains (AC5)" "$(git worktree list --porcelain)" "/wt/p7"
-run_tool --remove tRun --branch agent-none
+check_same "T5 branch worktree-agent-p7 remains (AC5)" "$(git branch --list worktree-agent-p7 | tr -d ' *')" "worktree-agent-p7"
+check_has "T5 pass 7's worktree remains (AC5)" "$(git worktree list --porcelain)" "/.claude/worktrees/agent-p7"
+run_tool --remove tRun --branch worktree-agent-none
 check_same "T5 --remove of an absent branch exits 0 (AC5)" "$rc" 0
-check_same "T5 one stderr line names agent-none (AC5)" "$(grep -c agent-none "$T/err" || true)" 1
+check_same "T5 one stderr line names worktree-agent-none (AC5)" "$(grep -c worktree-agent-none "$T/err" || true)" 1
+
+# ---- TP4 (TOOL-aTwinnedPass-4 AC3 to AC7): a branch or holder outside the runtime's spelling ------------
+# Every branch here is cut at C, which `run` holds, so none holds a commit no other ref holds and only
+# the new refusals stand between `--remove` and a forced removal.
+git -C "$R" worktree add -q -b worktree-agent-q1 "$T/elsewhere/agent-q1" "$C" >/dev/null 2>&1 \
+  && printf 'keep\n' > "$T/elsewhere/agent-q1/keep.txt" || { echo "FAIL pass q1"; exit 2; }
+run_tool --remove tRun --branch worktree-agent-q1
+check_same "TP4 --remove of a branch held outside .claude/worktrees exits 1 (AC3)" "$rc" 1
+check_same "TP4 the outside-holder --remove prints one REFUSING line (AC3)" "$(measure_refusals)" 1
+check_has "TP4 the outside-holder refusal names the holder (AC3)" "$err" "elsewhere/agent-q1"
+[ -d "$T/elsewhere/agent-q1" ]; check_same "TP4 the outside holder's directory remains (AC3)" "$?" 0
+[ -f "$T/elsewhere/agent-q1/keep.txt" ]; check_same "TP4 the outside holder's keep.txt remains (AC3)" "$?" 0
+git rev-parse --verify -q refs/heads/worktree-agent-q1 >/dev/null; check_same "TP4 branch worktree-agent-q1 remains (AC3)" "$?" 0
+h0=$(git rev-parse HEAD); s0=$(git status --porcelain)
+run_tool --merge tRun --pass TOOL-tRun-4 --branch worktree-agent-q1 --from "$C"
+check_same "TP4 --merge of a branch held outside .claude/worktrees exits 1 (AC4)" "$rc" 1
+check_has "TP4 the outside-holder --merge is the holder refusal (AC4)" "$err" "where the runtime cuts that pass's worktree"
+check_same "TP4 HEAD is unchanged by the outside-holder --merge (AC4)" "$(git rev-parse HEAD)" "$h0"
+check_same "TP4 the status is unchanged by the outside-holder --merge (AC4)" "$(git status --porcelain)" "$s0"
+[ -d "$T/elsewhere/agent-q1" ]; check_same "TP4 the outside holder's directory remains after --merge (AC4)" "$?" 0
+git -C "$R" worktree add -q -b agent-q2 "$R/.claude/worktrees/agent-q2" "$C" >/dev/null 2>&1 || { echo "FAIL pass q2"; exit 2; }
+run_tool --remove tRun --branch agent-q2
+check_same "TP4 --remove of agent-q2, outside the branch shape, exits 1 (AC5)" "$rc" 1
+check_has "TP4 the agent-q2 --remove refusal is the shape's (AC5)" "$err" "is not a branch the runtime cuts for a pass"
+run_tool --merge tRun --pass TOOL-tRun-4 --branch agent-q2 --from "$C"
+check_same "TP4 --merge of agent-q2, outside the branch shape, exits 1 (AC5)" "$rc" 1
+check_has "TP4 the agent-q2 --merge refusal is the shape's (AC5)" "$err" "is not a branch the runtime cuts for a pass"
+[ -d "$R/.claude/worktrees/agent-q2" ]; check_same "TP4 agent-q2's worktree remains (AC5)" "$?" 0
+git -C "$R" worktree add -q -b worktree-agent-q3 "$R/.claude/worktrees/agent-zz" "$C" >/dev/null 2>&1 || { echo "FAIL pass q3"; exit 2; }
+run_tool --remove tRun --branch worktree-agent-q3
+check_same "TP4 --remove of a branch held at another pass's place exits 1 (AC5)" "$rc" 1
+[ -d "$R/.claude/worktrees/agent-zz" ]; check_same "TP4 the worktree at another pass's place remains (AC5)" "$?" 0
+git -C "$R" worktree add -q -b worktree-agent-q4 "$R/.claude/worktrees/agent-q4" "$C" >/dev/null 2>&1 \
+  && printf 'scratch\n' > "$R/.claude/worktrees/agent-q4/scratch.txt" || { echo "FAIL pass q4"; exit 2; }
+run_tool --remove tRun --branch worktree-agent-q4
+check_same "TP4 --remove of a confined holder with untracked scratch exits 0 (AC6)" "$rc" 0
+[ -d "$R/.claude/worktrees/agent-q4" ]; check_same "TP4 the confined holder's directory is gone (AC6)" "$?" 1
+run_tool --merge tRun --pass TOOL-tRun-4 --branch worktree-agent-p4 --from "$(printf '%064d' 0)"
+check_same "TP4 --merge with a 64-digit --from naming nothing exits 1 (AC7)" "$rc" 1
+check_has "TP4 the 64-digit --from reaches the lookup (AC7)" "$err" "names no commit"
+check_lacks "TP4 the 64-digit --from passes the shape (AC7)" "$err" "is not 7 to 64"
+run_tool --merge tRun --pass TOOL-tRun-4 --branch worktree-agent-p4 --from "$(printf '%065d' 0)"
+check_has "TP4 a 65-digit --from is refused by the shape (AC7)" "$err" "is not 7 to 64"
 
 [ "$st" = 0 ] && { echo "PASS ($n assertions)"; exit 0; }
 echo "FAIL ($n assertions)"; exit 1
