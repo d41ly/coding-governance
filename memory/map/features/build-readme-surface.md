@@ -7,6 +7,8 @@ status = "shipped"
 streams = ["tooling"]
 decisions = []
 
+stage = ["step.test"]
+
 [claims]
 gate-legs = ["build README slot contract"]
 kits = []

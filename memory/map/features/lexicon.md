@@ -7,6 +7,8 @@ status = "shipped"
 streams = ["tooling", "playbook"]
 decisions = []
 
+stage = ["step.test"]
+
 [claims]
 gate-legs = [
   "lexicon naming predicates",

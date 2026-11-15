@@ -7,6 +7,8 @@ status = "shipped"
 streams = ["tooling"]
 decisions = ["TOOL-aRelaxedShard-1", "TOOL-aWidenedGuide-1", "TOOL-dDerivedDocket-31"]
 
+stage = ["step.build", "step.test"]
+
 [claims]
 gate-legs = ["memory hygiene", "memory hygiene (the pass checks)", "memory-hygiene self-test", "verdict epoch (kit version dates the engine)", "verdict-epoch self-test", "kit version markers", "kit/dogfood doc parity", "transition-audit arms", "backlog migration selftest", "straggler-guard arms", "routed commits name a specced unit", "routed-commits selftest"]
 kits = ["memory-tree"]

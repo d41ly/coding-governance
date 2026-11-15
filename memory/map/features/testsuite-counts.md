@@ -7,6 +7,8 @@ status = "shipped"
 streams = ["tooling"]
 decisions = []
 
+stage = ["step.test"]
+
 [claims]
 gate-legs = ["testsuite counts (every bar self-test prints one)", "testsuite counts self-test"]
 kits = []

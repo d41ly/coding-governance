@@ -9,7 +9,8 @@
     "reads": {"history": "it asks `rev-list` and `git log` whether a watched file moved since the last audit (TOOL-aSparedSpawn-13 S3)."},
     "chunk": "records",
     "subject": "repo",
-    "ceiling": 640
+    "ceiling": 640,
+    "stage": ["step.build", "step.test"]
   },
   {
     "name": "template size <=48KiB",
@@ -19,7 +20,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.build", "step.test"]
   },
   {
     "name": "charter size",
@@ -30,7 +32,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "micro-format definitions",
@@ -40,7 +43,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 650
+    "ceiling": 650,
+    "stage": ["step.test"]
   },
   {
     "name": "micro-format gate selftest",
@@ -54,7 +58,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 560
+    "ceiling": 560,
+    "stage": ["step.test"]
   },
   {
     "name": "line length",
@@ -64,7 +69,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "line-length gate selftest",
@@ -78,7 +84,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 930
+    "ceiling": 930,
+    "stage": ["step.test"]
   },
   {
     "name": "playbook parity",
@@ -92,7 +99,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 560
+    "ceiling": 560,
+    "stage": ["step.test"]
   },
   {
     "name": "playbook parity selftest",
@@ -108,7 +116,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 1380
+    "ceiling": 1380,
+    "stage": ["step.test"]
   },
   {
     "name": "template size gate selftest",
@@ -118,7 +127,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 710
+    "ceiling": 710,
+    "stage": ["step.test"]
   },
   {
     "name": "build-method size",
@@ -129,7 +139,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "unattended protocol size",
@@ -141,7 +152,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "unattended skill size",
@@ -152,7 +164,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "kickoff engine size <=18KiB",
@@ -163,7 +176,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "shell hygiene (a loop fed by a command substitution)",
@@ -175,7 +189,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "shell hygiene (a location probe asked from a moved directory)",
@@ -190,7 +205,8 @@
     "chunk": "product",
     "subject": "repo",
     "ceiling": 300,
-    "enforces": ["practice.portable.paths"]
+    "enforces": ["practice.portable.paths"],
+    "stage": ["step.test"]
   },
   {
     "name": "shell hygiene (a fork spent on builtin work)",
@@ -205,7 +221,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "shell hygiene (a fixed-name temp renamed into place)",
@@ -221,7 +238,8 @@
     "chunk": "product",
     "subject": "repo",
     "ceiling": 300,
-    "enforces": ["practice.portable.temp-files"]
+    "enforces": ["practice.portable.temp-files"],
+    "stage": ["step.test"]
   },
   {
     "name": "spawn budget (forks per hot entrypoint)",
@@ -233,7 +251,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 2400
+    "ceiling": 2400,
+    "stage": ["step.test"]
   },
   {
     "name": "shell-hygiene selftest",
@@ -247,7 +266,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "encoding posture (text IO names its encoding)",
@@ -263,7 +283,8 @@
     "chunk": "product",
     "subject": "repo",
     "ceiling": 300,
-    "enforces": ["practice.portable.encoding"]
+    "enforces": ["practice.portable.encoding"],
+    "stage": ["step.test"]
   },
   {
     "name": "kit version markers",
@@ -274,7 +295,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 660,
-    "doc_reads": []
+    "doc_reads": [],
+    "stage": ["step.test"]
   },
   {
     "name": "verdict epoch (kit version dates the engine)",
@@ -286,7 +308,8 @@
     "reads": {"base": "it grades from GATE_PUSH_BASE, else the mainline merge-base (TOOL-aSparedSpawn-13 S3).", "history": "it walks `rev-list` and `git log` from that base to HEAD (TOOL-aSparedSpawn-13 S3)."},
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "verdict-epoch self-test",
@@ -300,7 +323,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 1130
+    "ceiling": 1130,
+    "stage": ["step.test"]
   },
   {
     "name": "agent-instructions wiring",
@@ -315,7 +339,8 @@
     ],
     "chunk": "wiring",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "manifest-check self-test",
@@ -329,7 +354,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 4370
+    "ceiling": 4370,
+    "stage": ["step.test"]
   },
   {
     "name": "python resolver (behaviour + inline parity + idiom ban)",
@@ -345,7 +371,8 @@
     "chunk": "wiring",
     "subject": "kit",
     "ceiling": 350,
-    "enforces": ["practice.portable.launch", "practice.portable.interpreter-floor"]
+    "enforces": ["practice.portable.launch", "practice.portable.interpreter-floor"],
+    "stage": ["step.test"]
   },
   {
     "name": "agent-cap self-test",
@@ -360,7 +387,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 1800
+    "ceiling": 1800,
+    "stage": ["step.test"]
   },
   {
     "name": "scratch-guard self-test",
@@ -377,7 +405,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 490
+    "ceiling": 490,
+    "stage": ["step.test"]
   },
   {
     "name": "format-guard self-test",
@@ -396,7 +425,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "memory-hygiene self-test",
@@ -411,7 +441,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 4800
+    "ceiling": 4800,
+    "stage": ["step.test"]
   },
   {
     "name": "row-driver view refusal",
@@ -422,7 +453,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "row-keyed merge driver replay",
@@ -437,7 +469,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 2750
+    "ceiling": 2750,
+    "stage": ["step.test"]
   },
   {
     "name": "kit/dogfood doc parity",
@@ -456,7 +489,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "method carriers (every pointer declared)",
@@ -467,7 +501,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 1230
+    "ceiling": 1230,
+    "stage": ["step.test"]
   },
   {
     "name": "method-carriers self-test",
@@ -477,7 +512,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 460
+    "ceiling": 460,
+    "stage": ["step.test"]
   },
   {
     "name": "build-index selftest",
@@ -495,7 +531,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 350
+    "ceiling": 350,
+    "stage": ["step.test"]
   },
   {
     "name": "build README slot contract",
@@ -507,7 +544,8 @@
     ],
     "chunk": "records",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "corpus-ids selftest",
@@ -522,7 +560,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 2690
+    "ceiling": 2690,
+    "stage": ["step.test"]
   },
   {
     "name": "gotchas selftest",
@@ -539,7 +578,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "routed-commits selftest",
@@ -556,7 +596,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 660
+    "ceiling": 660,
+    "stage": ["step.test"]
   },
   {
     "name": "row-grammar selftest",
@@ -571,7 +612,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "backlog migration selftest",
@@ -586,7 +628,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "harness arms (fail branches armed or pinned)",
@@ -598,7 +641,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "check-arms selftest",
@@ -613,7 +657,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "branch-guard self-test",
@@ -627,7 +672,8 @@
     ],
     "chunk": "selftests",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "pre-push self-test",
@@ -641,7 +687,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 1780
+    "ceiling": 1780,
+    "stage": ["step.test"]
   },
   {
     "name": "pre-push run-log line",
@@ -656,7 +703,8 @@
     ],
     "chunk": "selftests",
     "subject": "repo",
-    "ceiling": 600
+    "ceiling": 600,
+    "stage": ["step.test"]
   },
   {
     "name": "pre-push bar self-test",
@@ -669,7 +717,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 600
+    "ceiling": 600,
+    "stage": ["step.test"]
   },
   {
     "name": "push-main self-test",
@@ -684,7 +733,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 580
+    "ceiling": 580,
+    "stage": ["step.test"]
   },
   {
     "name": "check-wiring self-test",
@@ -699,7 +749,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 2320
+    "ceiling": 2320,
+    "stage": ["step.test"]
   },
   {
     "name": "verifier fan-out self-test",
@@ -714,7 +765,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "review-protocol parity (kit vs dogfood)",
@@ -725,7 +777,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 300,
-    "doc_reads": ["memory/guides/"]
+    "doc_reads": ["memory/guides/"],
+    "stage": ["step.test"]
   },
   {
     "name": "review-join ban (no ref-keyed join)",
@@ -735,7 +788,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "workflow script syntax",
@@ -745,7 +799,8 @@
     ],
     "chunk": "wiring",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "tier2-review self-test",
@@ -760,7 +815,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 1800
+    "ceiling": 1800,
+    "stage": ["step.test"]
   },
   {
     "name": "unattended-build self-test",
@@ -773,7 +829,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 700
+    "ceiling": 700,
+    "stage": ["step.test"]
   },
   {
     "name": "review-join self-test",
@@ -788,7 +845,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "spec-audit opt-in pack self-test",
@@ -798,7 +856,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "review-replay selftest",
@@ -809,7 +868,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "pytest-guardrails self-test",
@@ -823,7 +883,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "codebase-map kit selftest",
@@ -839,7 +900,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "codebase-map gate coverage",
@@ -854,7 +916,8 @@
       ".codebase-map.conf",
       "{prefix}/memory-tree/coverage_join.py"
     ],
-    "ceiling": 180
+    "ceiling": 180,
+    "stage": ["step.test"]
   },
   {
     "name": "codebase-map coverage + freshness",
@@ -866,7 +929,8 @@
     "reads": {"base": "its baseline is the one carried at the merge-base with the remote default branch (TOOL-aSparedSpawn-13 S3).", "history": "it reads that baseline out of history (TOOL-aSparedSpawn-13 S3)."},
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.build", "step.test"]
   },
   {
     "name": "codebase-map adopter e2e",
@@ -880,7 +944,8 @@
     ],
     "chunk": "e2e",
     "subject": "kit",
-    "ceiling": 540
+    "ceiling": 540,
+    "stage": ["step.test"]
   },
   {
     "name": "settings-merge selftest",
@@ -895,7 +960,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "memory-recall kit selftest",
@@ -914,7 +980,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 2730
+    "ceiling": 2730,
+    "stage": ["step.test"]
   },
   {
     "name": "recall floor",
@@ -934,7 +1001,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "recall floor arms",
@@ -954,7 +1022,8 @@
     ],
     "chunk": "selftests",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "memory-recall skill wiring",
@@ -965,7 +1034,8 @@
     ],
     "chunk": "wiring",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "drift-audit selftest",
@@ -987,7 +1057,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 2300
+    "ceiling": 2300,
+    "stage": ["step.test"]
   },
   {
     "name": "drift-audit wiring",
@@ -998,7 +1069,8 @@
     ],
     "chunk": "wiring",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "process-monitor wiring",
@@ -1010,7 +1082,8 @@
     "chunk": "records",
     "subject": "repo",
     "ceiling": 180,
-    "doc_reads": []
+    "doc_reads": [],
+    "stage": ["step.test"]
   },
   {
     "name": "process-monitor census selftest",
@@ -1027,7 +1100,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 180
+    "ceiling": 180,
+    "stage": ["step.test"]
   },
   {
     "name": "process-monitor adopter selftest",
@@ -1041,7 +1115,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 420
+    "ceiling": 420,
+    "stage": ["step.test"]
   },
   {
     "name": "runlog selftest",
@@ -1054,7 +1129,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 720
+    "ceiling": 720,
+    "stage": ["step.test"]
   },
   {
     "name": "runlog record schema",
@@ -1065,7 +1141,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 180
+    "ceiling": 180,
+    "stage": ["step.test"]
   },
   {
     "name": "runlog skill wiring",
@@ -1076,7 +1153,8 @@
     ],
     "chunk": "wiring",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "cleanup skill wiring",
@@ -1087,7 +1165,8 @@
     ],
     "chunk": "wiring",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "branch-reconcile selftest",
@@ -1101,7 +1180,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 600
+    "ceiling": 600,
+    "stage": ["step.test"]
   },
   {
     "name": "drift-audit records",
@@ -1118,7 +1198,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 540
+    "ceiling": 540,
+    "stage": ["step.test"]
   },
   {
     "name": "unattended kit gate",
@@ -1130,7 +1211,8 @@
     "chunk": "declarations",
     "subject": "kit",
     "ceiling": 16040,
-    "doc_reads": ["memory/builds/", "memory/guides/", "memory/archive/"]
+    "doc_reads": ["memory/builds/", "memory/guides/", "memory/archive/"],
+    "stage": ["step.test"]
   },
   {
     "name": "pass-order history",
@@ -1143,7 +1225,8 @@
     "subject": "repo",
     "guard": [],
     "ceiling": 5400,
-    "doc_reads": ["memory/builds/", "memory/project/"]
+    "doc_reads": ["memory/builds/", "memory/project/"],
+    "stage": ["step.test"]
   },
   {
     "name": "routed commits name a specced unit",
@@ -1155,7 +1238,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "guard": [],
-    "ceiling": 760
+    "ceiling": 760,
+    "stage": ["step.test"]
   },
   {
     "name": "brief-recorded",
@@ -1168,7 +1252,8 @@
     "subject": "repo",
     "guard": [],
     "ceiling": 900,
-    "doc_reads": ["memory/builds/", "memory/project/"]
+    "doc_reads": ["memory/builds/", "memory/project/"],
+    "stage": ["step.test"]
   },
   {
     "name": "playbook validity gate",
@@ -1178,7 +1263,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 4940
+    "ceiling": 4940,
+    "stage": ["step.test"]
   },
   {
     "name": "unattended skill wiring",
@@ -1189,7 +1275,8 @@
     ],
     "chunk": "wiring",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.build", "step.test"]
   },
   {
     "name": "run-gates canary",
@@ -1204,7 +1291,8 @@
     ],
     "chunk": "selftests",
     "subject": "repo",
-    "ceiling": 13200
+    "ceiling": 13200,
+    "stage": ["step.test"]
   },
   {
     "name": "run-gates evidence",
@@ -1218,7 +1306,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 7040
+    "ceiling": 7040,
+    "stage": ["step.test"]
   },
   {
     "name": "run-gates turnstile",
@@ -1232,7 +1321,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 8210
+    "ceiling": 8210,
+    "stage": ["step.test"]
   },
   {
     "name": "run-gates gov canary",
@@ -1246,7 +1336,8 @@
     ],
     "chunk": "selftests",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "foreign-prefix parity (every self-test at three prefixes)",
@@ -1259,7 +1350,8 @@
     ],
     "chunk": "selftests",
     "subject": "repo",
-    "ceiling": 7500
+    "ceiling": 7500,
+    "stage": ["step.test"]
   },
   {
     "name": "run-gates run-log line",
@@ -1273,7 +1365,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 1200
+    "ceiling": 1200,
+    "stage": ["step.test"]
   },
   {
     "name": "run-gates adopter e2e",
@@ -1286,7 +1379,8 @@
     ],
     "chunk": "e2e",
     "subject": "kit",
-    "ceiling": 460
+    "ceiling": 460,
+    "stage": ["step.test"]
   },
   {
     "name": "run-gates wiring",
@@ -1298,7 +1392,8 @@
     "guard": [],
     "chunk": "wiring",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "profile-bar selftest",
@@ -1311,7 +1406,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 1910
+    "ceiling": 1910,
+    "stage": ["step.test"]
   },
   {
     "name": "held-halves selftest",
@@ -1322,7 +1418,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "measure-legs selftest",
@@ -1342,7 +1439,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 500
+    "ceiling": 500,
+    "stage": ["step.test"]
   },
   {
     "name": "install-prefix (shipped surface)",
@@ -1358,7 +1456,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 2940
+    "ceiling": 2940,
+    "stage": ["step.test"]
   },
   {
     "name": "hook destinations (every declared hook path ships)",
@@ -1370,7 +1469,8 @@
     "chunk": "product",
     "subject": "repo",
     "ceiling": 2940,
-    "doc_reads": []
+    "doc_reads": [],
+    "stage": ["step.test"]
   },
   {
     "name": "hook destinations self-test",
@@ -1388,7 +1488,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 1620
+    "ceiling": 1620,
+    "stage": ["step.test"]
   },
   {
     "name": "agent-cap restatement",
@@ -1398,7 +1499,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 640
+    "ceiling": 640,
+    "stage": ["step.test"]
   },
   {
     "name": "agent-cap restatement self-test",
@@ -1408,7 +1510,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 1100
+    "ceiling": 1100,
+    "stage": ["step.test"]
   },
   {
     "name": "install-prefix self-test",
@@ -1422,7 +1525,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 1670
+    "ceiling": 1670,
+    "stage": ["step.test"]
   },
   {
     "name": "dead-path carriers (deleted files still named)",
@@ -1434,7 +1538,8 @@
     "reads": {"history": "it reads every deletion and rename `git log` reaches (TOOL-aSparedSpawn-13 S3)."},
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 430
+    "ceiling": 430,
+    "stage": ["step.test"]
   },
   {
     "name": "dead-path carriers self-test",
@@ -1447,7 +1552,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 2070
+    "ceiling": 2070,
+    "stage": ["step.test"]
   },
   {
     "name": "remote literals (kit code names no remote)",
@@ -1457,7 +1563,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "remote literals self-test",
@@ -1471,7 +1578,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 600
+    "ceiling": 600,
+    "stage": ["step.test"]
   },
   {
     "name": "govkit selfcheck",
@@ -1484,7 +1592,8 @@
     "reads": {"history": "its arm 11 finds the commit that landed each closed shim row with `git log --first-parent -S` and counts the releases descending from it (TOOL-dSafePassage-6)."},
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 310
+    "ceiling": 310,
+    "stage": ["step.test"]
   },
   {
     "name": "kit epoch (shipped bytes move, the version moves)",
@@ -1497,7 +1606,8 @@
     "reads": {"base": "it grades from GATE_PUSH_BASE, else the merge-base with the default branch (TOOL-aSparedSpawn-13 S3).", "history": "it asks `merge-base --is-ancestor` of the commits HEAD carries (TOOL-aSparedSpawn-13 S3)."},
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "step-rows-frozen",
@@ -1509,7 +1619,8 @@
     "reads": {"base": "it grades from GATE_PUSH_BASE, else the merge-base with the default branch, through the step module's resolve_landing_base, the base kit epoch reads (TOOL-dSafePassage-1, -26).", "history": "it reads every landed row and program at that base out of the object store and compares them with HEAD's (TOOL-dSafePassage-1)."},
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 120
+    "ceiling": 120,
+    "stage": ["step.test"]
   },
   {
     "name": "step-gate",
@@ -1520,7 +1631,8 @@
     "reads": {"base": "it grades from GATE_PUSH_BASE, else the merge-base with the default branch, through govkit's resolve_landing_base, the base kit epoch reads (TOOL-dSafePassage-10).", "history": "it checks the base out in a detached sparse worktree and reads the adopter-visible population there with the tip's readers (TOOL-dSafePassage-10)."},
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 130
+    "ceiling": 130,
+    "stage": ["step.test"]
   },
   {
     "name": "docs",
@@ -1533,7 +1645,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 130,
-    "doc_reads": ["help/", "memory/project/docs-undocumented.txt"]
+    "doc_reads": ["help/", "memory/project/docs-undocumented.txt"],
+    "stage": ["step.test"]
   },
   {
     "name": "help reference pages",
@@ -1546,7 +1659,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 130,
-    "enforces": ["principle.p42"]
+    "enforces": ["principle.p42"],
+    "stage": ["step.test"]
   },
   {
     "name": "help page commands",
@@ -1559,7 +1673,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 600,
-    "enforces": ["principle.p42"]
+    "enforces": ["principle.p42"],
+    "stage": ["step.test"]
   },
   {
     "name": "upgrade-walk",
@@ -1571,7 +1686,8 @@
     "chunk": "e2e",
     "subject": "kit",
     "ceiling": 14360,
-    "doc_reads": []
+    "doc_reads": [],
+    "stage": ["step.test"]
   },
   {
     "name": "govkit selftest",
@@ -1588,7 +1704,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 11750
+    "ceiling": 11750,
+    "stage": ["step.test"]
   },
   {
     "name": "lexicon naming predicates",
@@ -1613,7 +1730,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 300,
-    "doc_reads": ["memory/builds/"]
+    "doc_reads": ["memory/builds/"],
+    "stage": ["step.test"]
   },
   {
     "name": "lexicon selftest",
@@ -1626,7 +1744,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 880
+    "ceiling": 880,
+    "stage": ["step.test"]
   },
   {
     "name": "lexicon wiring",
@@ -1640,7 +1759,8 @@
     "chunk": "wiring",
     "subject": "repo",
     "ceiling": 330,
-    "doc_reads": ["memory/builds/"]
+    "doc_reads": ["memory/builds/"],
+    "stage": ["step.test"]
   },
   {
     "name": "playbook placeholder catalogue",
@@ -1650,7 +1770,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "placeholder-catalogue self-test",
@@ -1664,7 +1785,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "memory hygiene",
@@ -1680,7 +1802,8 @@
     ],
     "chunk": "records",
     "subject": "repo",
-    "ceiling": 12720
+    "ceiling": 12720,
+    "stage": ["step.build", "step.test"]
   },
   {
     "name": "memory hygiene (the pass checks)",
@@ -1695,7 +1818,8 @@
     "reads": {"base": "its later checks diff what was added since the mainline merge-base (TOOL-aSparedSpawn-13 S3).", "clock": "it compares the date against RECORD_SERVES_CUTOFF (TOOL-aSparedSpawn-13 S3).", "history": "it reads commits since that merge-base (TOOL-aSparedSpawn-13 S3)."},
     "chunk": "records",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "transition-audit arms",
@@ -1714,7 +1838,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 900,
-    "doc_reads": []
+    "doc_reads": [],
+    "stage": ["step.test"]
   },
   {
     "name": "straggler-guard arms",
@@ -1734,7 +1859,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 300,
-    "doc_reads": []
+    "doc_reads": [],
+    "stage": ["step.test"]
   },
   {
     "name": "marker contracts",
@@ -1745,7 +1871,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 1840,
-    "doc_reads": []
+    "doc_reads": [],
+    "stage": ["step.test"]
   },
   {
     "name": "verifier fan-out",
@@ -1755,7 +1882,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "govkit refusal join",
@@ -1768,7 +1896,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "govkit runbook parity",
@@ -1779,7 +1908,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "govkit acceptance matrix",
@@ -1796,7 +1926,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 7030
+    "ceiling": 7030,
+    "stage": ["step.test"]
   },
   {
     "name": "testsuite counts (every bar self-test prints one)",
@@ -1807,7 +1938,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 630
+    "ceiling": 630,
+    "stage": ["step.test"]
   },
   {
     "name": "testsuite counts self-test",
@@ -1817,7 +1949,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 350
+    "ceiling": 350,
+    "stage": ["step.test"]
   },
   {
     "name": "playbook render wiring",
@@ -1831,7 +1964,8 @@
     ],
     "chunk": "wiring",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "playbook render selftest",
@@ -1855,7 +1989,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "spec tokens (a spec's own names resolve)",
@@ -1866,7 +2001,8 @@
     "reads": {"history": "it dates a token by `git log -1 --pickaxe-regex` (TOOL-aSparedSpawn-13 S3)."},
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 940
+    "ceiling": 940,
+    "stage": ["step.test"]
   },
   {
     "name": "spec tokens (the pass's own spec)",
@@ -1880,7 +2016,8 @@
     "reads": {"history": "it names the pass's unit from the `git log` of `$GATE_BASE..HEAD`, else of the last commit (TOOL-aNimbleMend-4 S2)."},
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "kit placeholders (a declared token its adopter substitutes)",
@@ -1891,7 +2028,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 180
+    "ceiling": 180,
+    "stage": ["step.test"]
   },
   {
     "name": "roles catalogue",
@@ -1901,7 +2039,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 120
+    "ceiling": 120,
+    "stage": ["step.test"]
   },
   {
     "name": "roles render wiring",
@@ -1912,7 +2051,8 @@
     ],
     "chunk": "wiring",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "roles render selftest",
@@ -1923,7 +2063,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "roles adopter self-test",
@@ -1933,7 +2074,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "policy check",
@@ -1944,7 +2086,8 @@
     "reads": {"base": "its shrink-only list is compared with the one carried at the merge-base with the remote default branch (TOOL-dGroundRules-1).", "history": "it reads that list out of history (TOOL-dGroundRules-1)."},
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 120
+    "ceiling": 120,
+    "stage": ["step.test"]
   },
   {
     "name": "loop definition",
@@ -1957,7 +2100,8 @@
     "subject": "repo",
     "ceiling": 120,
     "reads": {"base": "it compares the actor-witness list with itself at the compare base, the merge-base with the default branch, so a verdict cached against one base says nothing about another (TOOL-dDeclaredLoop-5)."},
-    "enforces": ["principle.p1"]
+    "enforces": ["principle.p1"],
+    "stage": ["step.test"]
   },
   {
     "name": "loop computed witness",
@@ -1969,7 +2113,8 @@
     "chunk": "selftests",
     "subject": "kit",
     "ceiling": 300,
-    "enforces": ["principle.p2"]
+    "enforces": ["principle.p2"],
+    "stage": ["step.test"]
   },
   {
     "name": "loop checklist tags",
@@ -1982,7 +2127,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 120,
-    "enforces": ["principle.p11"]
+    "enforces": ["principle.p11"],
+    "stage": ["step.test"]
   },
   {
     "name": "loop item kind",
@@ -1995,7 +2141,8 @@
     "chunk": "selftests",
     "subject": "repo",
     "ceiling": 300,
-    "enforces": ["principle.p16"]
+    "enforces": ["principle.p16"],
+    "stage": ["step.test"]
   },
   {
     "name": "loop parent routes",
@@ -2007,7 +2154,8 @@
     "chunk": "selftests",
     "subject": "kit",
     "ceiling": 120,
-    "enforces": ["principle.p21"]
+    "enforces": ["principle.p21"],
+    "stage": ["step.test"]
   },
   {
     "name": "loop transition record",
@@ -2020,7 +2168,8 @@
     "chunk": "selftests",
     "subject": "repo",
     "ceiling": 120,
-    "enforces": ["principle.p20"]
+    "enforces": ["principle.p20"],
+    "stage": ["step.test"]
   },
   {
     "name": "loop guard fixtures",
@@ -2032,7 +2181,8 @@
     "chunk": "selftests",
     "subject": "kit",
     "ceiling": 300,
-    "enforces": ["principle.p10"]
+    "enforces": ["principle.p10"],
+    "stage": ["step.test"]
   },
   {
     "name": "loop claims fixtures",
@@ -2044,7 +2194,8 @@
     "chunk": "selftests",
     "subject": "kit",
     "ceiling": 120,
-    "enforces": ["principle.p23"]
+    "enforces": ["principle.p23"],
+    "stage": ["step.test"]
   },
   {
     "name": "loop position fixtures",
@@ -2056,7 +2207,8 @@
     "chunk": "selftests",
     "subject": "kit",
     "ceiling": 300,
-    "enforces": ["principle.p22", "principle.p24"]
+    "enforces": ["principle.p22", "principle.p24"],
+    "stage": ["step.test"]
   },
   {
     "name": "loop transition tables",
@@ -2069,7 +2221,21 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 120,
-    "enforces": ["principle.p20"]
+    "enforces": ["principle.p20"],
+    "stage": ["step.test"]
+  },
+  {
+    "name": "loop stage coverage",
+    "argv": [
+      "python",
+      "{prefix}/loop/stage_coverage.py",
+      "--selftest"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": ["principle.p1"],
+    "stage": ["step.test"]
   },
   {
     "name": "layer dependencies (the core never depends on an expansion)",
@@ -2080,7 +2246,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 124,
-    "enforces": ["principle.p28", "principle.p16"]
+    "enforces": ["principle.p28", "principle.p16"],
+    "stage": ["step.test"]
   },
   {
     "name": "core meta-check",
@@ -2092,7 +2259,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 120,
-    "enforces": ["principle.p16"]
+    "enforces": ["principle.p16"],
+    "stage": ["step.test"]
   },
   {
     "name": "core kinds",
@@ -2104,7 +2272,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 120,
-    "enforces": ["principle.p16"]
+    "enforces": ["principle.p16"],
+    "stage": ["step.test"]
   },
   {
     "name": "core skills conformance",
@@ -2117,7 +2286,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 120,
-    "enforces": ["principle.p16"]
+    "enforces": ["principle.p16"],
+    "stage": ["step.test"]
   },
   {
     "name": "core practices conformance",
@@ -2130,7 +2300,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 120,
-    "enforces": ["principle.p14", "principle.p16"]
+    "enforces": ["principle.p14", "principle.p16"],
+    "stage": ["step.test"]
   },
   {
     "name": "core selftest",
@@ -2142,7 +2313,8 @@
     "chunk": "selftests",
     "subject": "kit",
     "ceiling": 300,
-    "enforces": ["principle.p16"]
+    "enforces": ["principle.p16"],
+    "stage": ["step.test"]
   },
   {
     "name": "instruction ladder (level is the one term)",
@@ -2154,7 +2326,8 @@
     "chunk": "product",
     "subject": "repo",
     "ceiling": 120,
-    "enforces": ["principle.p13", "principle.p11"]
+    "enforces": ["principle.p13", "principle.p11"],
+    "stage": ["step.test"]
   },
   {
     "name": "instruction grammar (statement types, provenance lock)",
@@ -2166,7 +2339,8 @@
     "chunk": "product",
     "subject": "repo",
     "ceiling": 120,
-    "enforces": ["principle.p11"]
+    "enforces": ["principle.p11"],
+    "stage": ["step.test"]
   },
   {
     "name": "instruction units (schema, one fact)",
@@ -2179,7 +2353,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 120,
-    "enforces": ["principle.p11", "principle.p13", "principle.p16"]
+    "enforces": ["principle.p11", "principle.p13", "principle.p16"],
+    "stage": ["step.test"]
   },
   {
     "name": "instruction render (one renderer of record)",
@@ -2191,7 +2366,8 @@
     "chunk": "wiring",
     "subject": "repo",
     "ceiling": 560,
-    "enforces": ["principle.p11", "principle.p13"]
+    "enforces": ["principle.p11", "principle.p13"],
+    "stage": ["step.test"]
   },
   {
     "name": "instruction envelopes",
@@ -2204,7 +2380,8 @@
     "chunk": "product",
     "subject": "repo",
     "ceiling": 120,
-    "enforces": ["principle.p13"]
+    "enforces": ["principle.p13"],
+    "stage": ["step.test"]
   },
   {
     "name": "instruction units selftest",
@@ -2216,7 +2393,8 @@
     "chunk": "selftests",
     "subject": "kit",
     "ceiling": 300,
-    "enforces": ["principle.p16"]
+    "enforces": ["principle.p16"],
+    "stage": ["step.test"]
   },
   {
     "name": "instruction edits (manifest checks)",
@@ -2228,7 +2406,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 420,
-    "enforces": ["principle.p11", "principle.p13"]
+    "enforces": ["principle.p11", "principle.p13"],
+    "stage": ["step.test"]
   },
   {
     "name": "instruction edits selftest",
@@ -2240,7 +2419,8 @@
     "chunk": "selftests",
     "subject": "kit",
     "ceiling": 300,
-    "enforces": ["principle.p16"]
+    "enforces": ["principle.p16"],
+    "stage": ["step.test"]
   },
   {
     "name": "tags (the resolver's checks)",
@@ -2253,7 +2433,8 @@
     "subject": "repo",
     "ceiling": 420,
     "pack": "tags",
-    "enforces": ["practice.writing.address", "practice.writing.retirement"]
+    "enforces": ["practice.writing.address", "practice.writing.retirement"],
+    "stage": ["step.test"]
   },
   {
     "name": "positional (the citation check alone)",
@@ -2267,7 +2448,8 @@
     "reads": {"history": "it reads when each line holding a citation was written, by `git blame -M` (TOOL-aNimbleMend-4 S1)."},
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "tags positional selftest",
@@ -2279,7 +2461,8 @@
     "chunk": "selftests",
     "subject": "kit",
     "ceiling": 300,
-    "pack": "tags"
+    "pack": "tags",
+    "stage": ["step.test"]
   },
   {
     "name": "tags bundle selftest",
@@ -2291,7 +2474,8 @@
     "chunk": "selftests",
     "subject": "kit",
     "ceiling": 300,
-    "pack": "tags"
+    "pack": "tags",
+    "stage": ["step.test"]
   },
   {
     "name": "edges (every declared edge parses, is registered and resolves)",
@@ -2304,7 +2488,8 @@
     "subject": "repo",
     "ceiling": 180,
     "pack": "tags",
-    "enforces": ["practice.writing.typed-relations"]
+    "enforces": ["practice.writing.typed-relations"],
+    "stage": ["step.test"]
   },
   {
     "name": "writing practice (records and units)",
@@ -2319,7 +2504,8 @@
     "ceiling": 180,
     "pack": "tags",
     "enforces": ["practice.writing.one-subject", "practice.writing.pinned-facts", "practice.writing.one-door",
-                 "practice.writing.rationale-apart"]
+                 "practice.writing.rationale-apart"],
+    "stage": ["step.test"]
   },
   {
     "name": "one-owner",
@@ -2333,7 +2519,8 @@
     "subject": "repo",
     "ceiling": 180,
     "pack": "tags",
-    "enforces": ["practice.writing.one-owner"]
+    "enforces": ["practice.writing.one-owner"],
+    "stage": ["step.test"]
   },
   {
     "name": "policy fixtures",
@@ -2418,7 +2605,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 2420
+    "ceiling": 2420,
+    "stage": ["step.test"]
   },
   {
     "name": "leg ceilings clear their evidenced maximum",
@@ -2431,7 +2619,8 @@
     "reads": {"history": "it reads the last commit's date through `git log -1` (TOOL-aSparedSpawn-13 S3)."},
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "every held leg is budgeted, every budget row resolves",
@@ -2444,7 +2633,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 300,
-    "doc_reads": ["AGENTS.md", "CLAUDE.md"]
+    "doc_reads": ["AGENTS.md", "CLAUDE.md"],
+    "stage": ["step.test"]
   },
   {
     "name": "python reads (a name never bound, an import outside its guard)",
@@ -2455,7 +2645,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 120,
-    "enforces": ["principle.p16"]
+    "enforces": ["principle.p16"],
+    "stage": ["step.test"]
   },
   {
     "name": "receipt sync (installed files match the receipt)",
@@ -2466,7 +2657,8 @@
     "guard": [],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "spec-tokens self-test",
@@ -2479,7 +2671,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 330
+    "ceiling": 330,
+    "stage": ["step.test"]
   },
   {
     "name": "chain-packet self-test",
@@ -2493,7 +2686,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 900
+    "ceiling": 900,
+    "stage": ["step.test"]
   },
   {
     "name": "kit-placeholders self-test",
@@ -2506,7 +2700,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 180
+    "ceiling": 180,
+    "stage": ["step.test"]
   },
   {
     "name": "selftest harness self-test",
@@ -2520,7 +2715,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 370
+    "ceiling": 370,
+    "stage": ["step.test"]
   },
   {
     "name": "extract-arms self-test",
@@ -2535,7 +2731,8 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 300,
+    "stage": ["step.test"]
   },
   {
     "name": "run-selftests self-test",
@@ -2549,6 +2746,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 2040
+    "ceiling": 2040,
+    "stage": ["step.test"]
   }
 ]

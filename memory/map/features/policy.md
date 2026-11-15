@@ -7,6 +7,8 @@ status = "shipped"
 streams = ["tooling"]
 decisions = ["TOOL-dGroundRules-1"]
 
+stage = ["step.test"]
+
 [claims]
 gate-legs = ["policy check", "policy fixtures"]
 kits = ["policy"]

@@ -7,6 +7,8 @@ status = "shipped"
 streams = ["kickoff"]
 decisions = []
 
+stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
+
 [claims]
 gate-legs = ["kickoff engine size <=18KiB"]
 kits = []

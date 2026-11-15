@@ -433,6 +433,30 @@ python <prefix>/loop/position.py --fixture --plant steps
 python <prefix>/loop/position.py --selftest
 ```
 
+## The stage claims
+
+`stage_coverage.py` (TOOL-dDeclaredLoop-4) joins every part of the product both ways to the stage it
+serves. A claim is a non-empty list of the `[[step]]` tags `check_loop` admits, or `["none"]`; any other
+value is no claim. A dossier keeps its claim in its fence's top-level `stage` key, read through the
+codebase-map kit's `load_map_tree`; a gate leg in its manifest row's last key `stage`; a workflow in
+its `[[workflow]]` row's `step`; a role through its `workflow:` front-matter key, read by
+`read_role_defaults`, and that row; and a hook in a `[[hook]]` row of the definition, one per key of the
+map's `git-hooks` and `harness-hooks` inventories, its `{prefix}/` expanded to the tool root's
+repo-relative path. `derive_part_claims` feeds the five populations and one owner, `stage-claims`, to
+the memory-tree kit's `compute_coverage` with an empty baseline, so an unclaimed part and a stale claim
+are each red; an empty population prints `unarmed` and is red. `derive_stage_witnesses` prints each
+step's exit item and its witness class through `check_loop` and `check_witness_classes`, whose refusal
+is the red. The codebase-map and roles kits are found by `resolve_kit_dir` with no edge, and the
+module exits 2 `unarmed` where either does not resolve. `--fixture --plant <case>` runs one of
+`PLANTS` in memory, and `--selftest` runs the tree, then every case, through `run_selftest_cases`; it
+is gov's `loop stage coverage` leg.
+
+```bash
+python <prefix>/loop/stage_coverage.py
+python <prefix>/loop/stage_coverage.py --fixture --plant stale-hook
+python <prefix>/loop/stage_coverage.py --selftest
+```
+
 ## The item kind
 
 The items are a registered kind (TOOL-dDeclaredLoop-24): the kinds register's `kind.item` row names

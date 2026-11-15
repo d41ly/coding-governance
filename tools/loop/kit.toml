@@ -63,6 +63,11 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # Its refusal rows (TOOL-dDeclaredLoop-14) are read through runlog's model, `read_run_state`, found by
 # `resolve_kit_dir` too, so that reach takes no edge either: where runlog does not resolve, the engine
 # prints `refusal — unarmed` and still prints the frontier.
+# The stage claims (TOOL-dDeclaredLoop-4): stage_coverage.py reads the codebase-map kit's map_lib.py and
+# the roles kit's roles_lib.py, each found by `resolve_kit_dir` with no edge, the roles kit requiring
+# this one, and the memory-tree kit's coverage factory under the edge above; it exits 2 `unarmed` where
+# a kit does not resolve, never a default. Its populations are gov's tree, so its leg is gov's own
+# [[exempt_leg]], no row here.
 requires = ["memory-tree"]
 
 # Everything the kit ships is engine, overwritten on every update: the definition, its reader, the

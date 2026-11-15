@@ -82,6 +82,12 @@
 #            canonical JSON. A row whose fields hash moved while its version did not is refused: a bump
 #            re-pins it. An untyped kind reads version 1 and has no row.
 #
+# One [[hook]] row per key of the codebase map's `git-hooks` and `harness-hooks` inventories, the stage
+# claim of that hook (TOOL-dDeclaredLoop-4); stage_coverage.py beside this file joins them both ways:
+#   key    the inventory key, a git hook's name or `<event> <script>`, a script under the tool root
+#          spelled `{prefix}/<path>`, which the join expands to the tool root's repo-relative path
+#   stage  a non-empty list of [[step]] tags, or ["none"] for a hook serving no build stage
+#
 # One [[item]] row per item of a gov step's program (TOOL-dDeclaredLoop-12), after every table above:
 #   tag        the item's tag, `item.<step>.<name>`, a member of the `item` namespace
 #   step       the [[step]] tag its tag opens
@@ -963,6 +969,78 @@ fields = "f5e4fde2"
 kind = "record-kind.transition"
 version = 1
 fields = "55701546"
+
+# The hooks' stage claims (TOOL-dDeclaredLoop-4): one row per git and harness hook the map inventories.
+# A git hook serves the step its act sits in; a harness hook on an event every session raises serves all
+# five, and the SubagentStart one the steps of the workflows that have roles.
+
+[[hook]]
+key = "commit-msg"
+stage = ["step.build"]
+
+[[hook]]
+key = "pre-commit"
+stage = ["step.build"]
+
+[[hook]]
+key = "pre-push"
+stage = ["step.test"]
+
+[[hook]]
+key = "pre-rebase"
+stage = ["step.build"]
+
+[[hook]]
+key = "PostToolUse {prefix}/memory-recall/recall-opened.js"
+stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
+
+[[hook]]
+key = "PostToolUse {prefix}/process-monitor/procmon-hook.js"
+stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
+
+[[hook]]
+key = "PreToolUse {prefix}/hooks/agent-cap.js"
+stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
+
+[[hook]]
+key = "PreToolUse {prefix}/hooks/scratch-guard.js"
+stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
+
+[[hook]]
+key = "PreToolUse {prefix}/unattended/gate-guard.js"
+stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
+
+[[hook]]
+key = "PreToolUse {prefix}/workflows/spec-audit-optin.js"
+stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
+
+[[hook]]
+key = "SessionStart skills/session-kickoff/manifest-check.sh"
+stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
+
+[[hook]]
+key = "SessionStart {prefix}/check-wiring.sh"
+stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
+
+[[hook]]
+key = "SessionStart {prefix}/process-monitor/procmon-hook.js"
+stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
+
+[[hook]]
+key = "Stop {prefix}/hooks/format-guard.js"
+stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
+
+[[hook]]
+key = "Stop {prefix}/unattended/stop-guard.js"
+stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
+
+[[hook]]
+key = "StopFailure {prefix}/unattended/stall-recorder.js"
+stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
+
+[[hook]]
+key = "SubagentStart {prefix}/hooks/scratch-guard.js"
+stage = ["step.plan", "step.design", "step.build"]
 
 # ---- Plan's program ----------------------------------------------------------------------------------
 

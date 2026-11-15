@@ -7,6 +7,8 @@ status = "shipped"
 streams = ["tooling", "playbook", "kickoff", "deployer"]
 decisions = ["TOOL-aOrientedCast-22"]
 
+stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
+
 [claims]
 gate-legs = ["unattended kit gate", "unattended skill wiring", "pass-order history", "brief-recorded", "unattended protocol size", "unattended skill size"]
 kits = ["unattended"]

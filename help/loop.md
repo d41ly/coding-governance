@@ -713,6 +713,60 @@ compares each row with the record table and reads no earlier revision, so that e
 see. A role item's record kind comes from its role and is not joined. The step gate's `item` class
 grades a gov item that disappears between a landing's base and its tip, as it does any member.
 
+## Stage claims
+
+Every part of the product declares the build stage it serves, so the loop is written on the parts as
+well as in the definition. A claim is a non-empty list of the definition's step tags, such as
+`["step.build", "step.test"]`, or `["none"]` for a part that serves no build stage. Any other value,
+an empty list, a tag the definition does not declare, or `none` beside a tag, is no claim. Where each
+kind keeps its claim:
+
+- a feature dossier of the codebase map: a top-level `stage` key in its fence, above `[claims]`;
+- a gate leg: a `stage` key, the last key of its row in the gate manifest;
+- a workflow: the `step` of its `[[workflow]]` row in the definition;
+- a role: derived from its role file's `workflow:` through that workflow's row, never typed on the role;
+- a hook: one `[[hook]]` row of the definition per key of the map's `git-hooks` and `harness-hooks`
+  inventories, with `key` and `stage`. A key naming a script under the tool root spells that root
+  `{prefix}/`, which the check expands before it joins.
+
+```toml
+[[hook]]
+key = "PreToolUse {prefix}/hooks/scratch-guard.js"
+stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
+```
+
+- **Check the claims:** `python tools/loop/stage_coverage.py` joins every dossier, leg, workflow, <!-- usage: script:tools/loop/stage_coverage.py 2f7dd348 -->
+  role and hook both ways to its claim, then reads each step's exit item and its witness class. It
+  prints one line per kind and per role, then one line per step, then each finding, and exits 0, or
+  1 on a finding:
+
+  ```text
+  stage-coverage: part · leg · <n> parts · <u> unclaimed · <s> stale
+  stage-coverage: role gov-builder · workflow build · step.build
+  stage-coverage: stage · step.build · exit item.build.exit · witness history
+  stage-coverage: unclaimed leg <name> · no claim
+  stage-coverage: stale hook <key>
+  stage-coverage: refused · <the definition reader's refusal>
+  ```
+
+  A part with no claim, or one carrying an invalid value, is `unclaimed` and the value is printed. A
+  `[[hook]]` row naming a hook the map no longer holds is `stale`. A kind with no parts in the tree
+  prints `unarmed` and exits 1, never green. A step whose exit item declares no witness is the
+  definition reader's refusal, printed as it words it. It exits 2 `unarmed` where the codebase-map,
+  roles or memory-tree kit does not resolve. It does not judge whether a claimed stage is the right
+  one, nor whether a dossier's stage agrees with the stages of the parts it claims.
+- **See a refusal:** `--fixture --plant <case>` reads the tree with one break made in memory:
+  `unclaimed-leg`, `unclaimed-hook`, `stale-hook`, `bad-tag` (the first dossier claiming step.ship),
+  `stage-no-witness` and `no-legs` each exit 1 naming the break; `role-derived` (the `build` workflow
+  moved to `step.test`) exits 0 with `gov-builder` reading `step.test`. `--selftest` runs the tree,
+  then every case, and gov's own `loop stage coverage` gate runs it.
+
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
+  ```bash
+  python tools/loop/stage_coverage.py --fixture --plant stale-hook
+  python tools/loop/stage_coverage.py --selftest
+  ```
+
 ## The owner's disposition record
 
 When the owner answers a held item, the answer is one record in the build's `build/` folder, written

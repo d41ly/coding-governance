@@ -362,6 +362,12 @@ entry = "{prefix}/loop/position.py"
 flags = ["--json", "--next-line", "--frontier", "--check-refusal=", "--fixture", "--plant=", "--selftest"]
 
 [[usage]]
+id = "script:{prefix}/loop/stage_coverage.py"
+shape = "verb"
+entry = "{prefix}/loop/stage_coverage.py"
+flags = ["--fixture", "--plant=", "--selftest"]
+
+[[usage]]
 id = "script:{prefix}/loop/loop_table.py"
 shape = "verb"
 entry = "{prefix}/loop/loop_table.py"

@@ -94,6 +94,7 @@ loop guard fixtures	kit	selftests
 loop claims fixtures	kit	selftests
 loop position fixtures	kit	selftests
 loop transition tables	repo	declarations
+loop stage coverage	repo	declarations
 manifest-check self-test	kit	selftests
 marker contracts	repo	declarations
 measure-legs selftest	kit	selftests

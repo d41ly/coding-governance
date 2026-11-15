@@ -7,6 +7,8 @@ status = "shipped"
 streams = ["tooling"]
 decisions = ["TOOL-aWrittenMethod-1"]
 
+stage = ["step.test"]
+
 [claims]
 gate-legs = ["method carriers (every pointer declared)", "method-carriers self-test", "build-method size"]
 kits = []

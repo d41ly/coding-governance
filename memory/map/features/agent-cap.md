@@ -7,6 +7,8 @@ status = "shipped"
 streams = ["tooling"]
 decisions = ["TOOL-aOrientedCast-21"]
 
+stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
+
 [claims]
 gate-legs = [
   "agent-cap self-test",

@@ -7778,6 +7778,11 @@
       "file": "tools/run-gates/regen.py"
     },
     {
+      "id": "check_stage_claim",
+      "kind": "function",
+      "file": "tools/loop/stage_coverage.py"
+    },
+    {
       "id": "check_staged",
       "kind": "function",
       "file": "tools/loop/guard.py"
@@ -11078,6 +11083,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_part_claims",
+      "kind": "function",
+      "file": "tools/loop/stage_coverage.py"
+    },
+    {
       "id": "derive_pass_legs",
       "kind": "function",
       "file": "tools/run-gates/pass_legs.py"
@@ -11921,6 +11931,11 @@
       "id": "derive_spec_unit",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "derive_stage_witnesses",
+      "kind": "function",
+      "file": "tools/loop/stage_coverage.py"
     },
     {
       "id": "derive_stall_window",
@@ -14726,6 +14741,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/loop/position.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/loop/stage_coverage.py"
     },
     {
       "id": "main",
@@ -21476,6 +21496,11 @@
       "id": "read_sr_close",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_stage_parts",
+      "kind": "function",
+      "file": "tools/loop/stage_coverage.py"
     },
     {
       "id": "read_staged_paths",
@@ -33283,6 +33308,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_stage_key",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_staged_render",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -35436,6 +35466,11 @@
       "id": "write_sr_units",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_stage_plant",
+      "kind": "function",
+      "file": "tools/loop/stage_coverage.py"
     },
     {
       "id": "write_staged",
