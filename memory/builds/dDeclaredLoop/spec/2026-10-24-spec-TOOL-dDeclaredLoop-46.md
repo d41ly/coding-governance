@@ -13,6 +13,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-46-deviation-461.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-46-deviation-461.md) | deviation | — |
 | [2026-10-25-build-TOOL-dDeclaredLoop-46-deviation-462.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-46-deviation-462.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-46-1-builder-return.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-46-1-builder-return.md) | journal | — |
+| [2026-11-15-build-TOOL-dDeclaredLoop-46-2-builder-return.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-46-2-builder-return.md) | journal | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-46-deviation-463.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-46-deviation-463.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-46-deviation-464.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-46-deviation-464.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |

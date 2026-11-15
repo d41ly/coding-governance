@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-6 — the factories and conformance gates for commands, policy keys, stages, hooks, roles and workflows
 
-**Status:** INPROGRESS · rev-6 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 20 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-7 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 20 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0091@b0158e81 whole
 
@@ -17,6 +17,7 @@
 | [2026-10-25-build-TOOL-dDeclaredLoop-6-deviation-63.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-6-deviation-63.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-6-1-builder-return.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-6-1-builder-return.md) | journal | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-6-deviation-64.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-6-deviation-64.md) | deviation | — |
+| [2026-11-15-build-TOOL-dDeclaredLoop-6-deviation-65.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-6-deviation-65.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
@@ -60,8 +61,8 @@ to :299, and :383 to :388; P16).
   subcommand validates its arguments against the kind's grammar and exits 2 before any write. It then
   holds every path it writes, and every path a renderer it runs writes, through the guarded write the
   loop kit already carries, `tools/loop/policy_edit.py#write_guarded`, the copy of
-  `tools/lib/guarded_write.py#write_guarded`: one call per path, nested, the kind's gate run as the
-  innermost record step and raising on a red. On a green gate it prints each path written and exits 0;
+  `tools/lib/guarded_write.py#write_guarded`: one call per path, nested, the kind's gate, as §4 "The
+  factory contract" names it per kind, run as the innermost record step and raising on a red. On a green gate it prints each path written and exits 0;
   on a red it prints the gate's output and exits 1, every held path at its prior bytes and every path
   it created absent. Observed by AC2, AC3, AC5, AC6, AC7, AC10, AC13.
 - **S3** — command: `new command <verb> --kit <id> --run <path>` appends one `[[command]]` row holding
@@ -77,14 +78,21 @@ to :299, and :383 to :388; P16).
 - **S4** — policy key: `new policy-key <name> --allowed <toml> --default <toml> --summary <text>
   --usage <text> --owner <build>` appends one `[[key]]` row to the policy kit's `catalogue.toml` with
   the four fields `tools/policy/policy.py#check_shape` requires and both of `summary` and `usage`, so
-  the kit's shrink-only list of unsummarised rows is never touched. Its gate is the leg `policy check`,
-  `check_policy.py`, wrapped. Observed by AC3, AC10.
+  the kit's shrink-only list of unsummarised rows is never touched. The kind row's gate is the leg
+  `policy check`, `check_policy.py`, wrapped. The factory's own gate is narrower, the four arms of that
+  leg whose inputs are the working tree's catalogue and policy file and the kit's own list, never a
+  render at a revision: `arm_schema`, `arm_shape`, `arm_summaries` and `arm_direction`, run in process
+  through `tools/policy/check_policy.py#run_arm` over its `ARM` table. It writes no
+  `.governance/policy.json`: the mirror is the caller's (§4 "What a factory leaves to its caller", §8
+  F7). Observed by AC3, AC10.
 - **S5** — hook: `new hook <name> --kit <id> --event <event> [--matcher <m>]` writes a script
   `<name>.js` and its fragment `<name>.fragment.json` in the directory of the descriptor whose `id` is
   `<id>`, the fragment holding `name`, `event`, `matcher` (`*` unless given), `marker` and `hook_path`
   in the shape the hooks kit's fragments carry, and appends a `[[files]]` row shipping each file to
   `{prefix}/<home>/<file>` where no `include` of the descriptor already matches it. Its gate is the leg
-  `hook destinations (every declared hook path ships)`, `check-hook-destinations.sh`, wrapped. It writes
+  `hook destinations (every declared hook path ships)`, `check-hook-destinations.sh`, wrapped. That gate
+  grades tracked fragments only, so the factory runs it under a throwaway index holding the files it
+  wrote, as §4 "The factory contract" states (§8 F8), and never writes the caller's index. It writes
   no `[[hook]]` stage row, for the reason §4 "What a factory leaves to its caller" gives. Observed by
   AC5.
 - **S6** — role: `new role <slot> --workflow <name> --writes <class> --description <text> --reads
@@ -195,8 +203,27 @@ to :299, and :383 to :388; P16).
   refuses any other name of, and `BODY_CEILINGS`, without whose row R5 reds a role file
   (`tools/roles/check_roles.py@29a89906d1bb:95` and :100).
 - `tools/check-hook-destinations.sh@5fbf2c189144:210` takes every tracked `*.fragment.json` as its
-  population, and the harness-hook inventory is read from the hooks `.claude/settings.json` wires
+  population, through `git ls-files`, which reads the index `GIT_INDEX_FILE` names where it is set; a
+  fragment written and not staged is outside it. It prints one `hook-dest: ok` or `hook-dest: FAIL`
+  line naming each fragment it grades (:329 to :359), and also reads every tracked adopter script
+  (:373). The harness-hook inventory is read from the hooks `.claude/settings.json` wires
   (`tools/codebase-map/map_extractors.py@302cdbd33b5b:141`).
+- `tools/policy/check_policy.py#main` runs every row of `ARMS` and takes no arm flag;
+  `tools/policy/check_policy.py#arm_mirror_parity` compares the working tree's `.governance/policy.json`
+  with `tools/policy/policy.py#render_mirror` at HEAD, whose `tools/policy/policy.py#read_revision`
+  reads the working tree's catalogue, so a catalogue row the mirror lacks is a finding until the mirror
+  is re-rendered, as the first builder return observed. `.governance/policy.json` is a guarded path
+  (`tools/policy/guarded-paths.txt@16afba2735ed:6`), and `tools/policy/guard.py#check_mirror_render`
+  admits an agent's mirror only where the catalogue is committed as HEAD holds it, so a catalogue
+  change is one commit and its mirror the next, or the landing's render.
+- Of the arms, `tools/policy/check_policy.py#arm_shape` and `tools/policy/check_policy.py#arm_direction`
+  read the catalogue alone; `tools/policy/check_policy.py#arm_summaries` reads it with the kit's
+  unsummarised list and that list at the compare base; `tools/policy/check_policy.py#arm_schema` reads
+  it with the working tree's policy file, overlay and cap census. `tools/policy/policy.py#check_shape`
+  reds a row lacking a `REQUIRED` field, `owner` among them, and a row whose own `allowed` refuses its
+  `default`; `tools/policy/policy.py#check_direction` reds a loop bound or deadline row with no
+  `direction`. `tools/loop/floor.py#read_policy_modules` puts the policy kit's directory at the head of
+  `sys.path`, the loop kit's one door to that kit's modules.
 - The guarded write is extracted at its second instance and carried inline, byte-identical, by the loop
   kit's `policy_edit.py` (`tools/lib/guarded_write.py#write_guarded`): it restores a path's prior bytes,
   or removes a path it created, where the record step raises, `KeyboardInterrupt` included.
@@ -248,6 +275,20 @@ validates only its kind's grammar: a value the gate grades, a policy default its
 included, is the gate's to refuse, so no predicate is written twice. A factory never writes outside
 the files its kind names, the roles kit's `check_roles.py` among them for role and workflow (§8 F5).
 
+Two kinds run their gate otherwise than by its leg's argv:
+
+- policy key: the module constant `POLICY_KEY_ARMS`, the four arm names S4 gives, each run through
+  `check_policy.run_arm(check_policy.ARM[name], top, check_policy.KIT)` after
+  `tools/loop/floor.py#read_policy_modules`, printing `policy-check: <arm> · <verdict>` and its
+  findings as `check_policy.py#main` does; any finding is the red. The other arms read a revision, the
+  mirror or files the factory never writes, so over a written catalogue they are either unmoved or red
+  on the caller's step; §5 "testing" names what they check that this gate does not. A loop bound or
+  deadline key reds `arm_direction`, since S4 writes no `direction`.
+- hook: the leg's argv run with `GIT_INDEX_FILE` naming a copy of the caller's index, taken from
+  `git rev-parse --git-path index` into a temporary directory, into which `git add` has put the files
+  the factory wrote; a copy, never an empty index, since the gate also reads every tracked adopter. The
+  directory is removed on the way out, green or red, and the caller's index is never written (§8 F8).
+
 WHAT `check-commands` DOES NOT CHECK: that a `run` file is executable or does what its verb says, that
 any harness wires the command, and a `[[command]]` row in a descriptor outside the kind's population.
 Over a tree holding no row it prints `unarmed`, which is no coverage: its red is seen only through the
@@ -262,6 +303,8 @@ instance, and each stays red until the caller does it:
 |---|---|
 | a role's agent render under `.claude/agents/`, `adopt-roles.sh` | `roles render wiring` |
 | a hook's wiring into settings, then its `[[hook]]` stage row, keyed by the harness-hook inventory TOOL-dDeclaredLoop-4's coverage reads | that coverage, once the hook is wired and the map regenerated |
+| a new key's mirror `.governance/policy.json`: the catalogue committed, then `policy.py mirror --write` at that HEAD in the next commit, or the landing's render | `policy check`, its `arm_mirror_parity` |
+| a reader of a new key whose `--owner` names a build that has landed | `policy check`, its `arm_reader_coverage` |
 | a new key's section of `help/reference/policy.md`, `render_playbook.py --reference` | `help reference pages` |
 | the kit's version marker, where shipped bytes moved | `kit epoch (shipped bytes move, the version moves)` |
 | the generated map, `gen_map.py --write` | `codebase-map coverage + freshness` |
@@ -275,6 +318,7 @@ reds as stale, so the factory writes none.
 |---|---|---|
 | `write_command`, `write_policy_key`, `write_hook`, `write_role`, `write_workflow` | function | `tools/loop/factories.py` |
 | `check_commands`, `read_kit_descriptor`, `run_kind_gate` | function | `tools/loop/factories.py` |
+| `POLICY_KEY_ARMS` | constant | `tools/loop/factories.py` |
 | `run_fixture`, `run_selftest`, `PLANTS` | function, constant | `tools/loop/factories.py` |
 | `command`, `policy-key`, `hook`, `role`, `workflow`, `check-commands` | CLI verbs | `tools/loop/factories.py` |
 | `--fixture --plant <case>`, `--selftest` | CLI flags | `tools/loop/factories.py` |
@@ -285,11 +329,11 @@ reds as stale, so the factory writes none.
 | Case | Plant | Outcome |
 |---|---|---|
 | `command-new`, `command-hand` | `new command check --kit loop --run loop_lib.py`; a hand row whose `run` names no file | `check-commands` green, then red naming the row |
-| `policy-key-new`, `policy-key-hand` | `new policy-key fixture.knob ... --owner dDeclaredLoop`; a hand row with no `owner` | `policy check` green, then red naming the key |
-| `hook-new`, `hook-hand` | `new hook fixture-hook --kit agent-cap --event Stop`; a hand fragment naming a path no rule ships | the hook gate green, then red naming the fragment |
+| `policy-key-new`, `policy-key-hand` | `new policy-key fixture.knob ... --owner dDeclaredLoop`; a hand row `fixture.hand` with no `owner`, run under `POLICY_KEY_ARMS` | each of the four arms green and the catalogue the one path changed, then `arm_shape` red naming `fixture.hand`'s missing `owner` |
+| `hook-new`, `hook-hand` | `new hook fixture-hook --kit agent-cap --event Stop`; a hand fragment naming a path no rule ships | the factory's own gate run green with a `hook-dest: ok` line naming `fixture-hook.fragment.json` and nothing staged, then red naming the hand fragment |
 | `role-new`, `role-hand` | `new role gov-fixture --workflow build --writes none ...`; a hand role file missing `writes` | `check_roles.py` green, then red naming R2 |
 | `workflow-new`, `workflow-hand` | `new workflow fixture --driver program --harness none ...`; a hand row listing a slot with no role file | `check_roles.py` and `loop_lib.py --check` green, then red naming R8 |
-| `factory-restores` | `new policy-key fixture.bad` whose `--default` its `--allowed` refuses | exit 1, the catalogue's bytes as before |
+| `factory-restores` | `new policy-key fixture.bad` whose `--default` its `--allowed` refuses | exit 1 on `arm_shape` naming `fixture.bad`, the catalogue's bytes as before |
 
 ### Files touched (estimate)
 
@@ -329,7 +373,10 @@ reds as stale, so the factory writes none.
 
 - security — the factories write only the files their kind names, from arguments validated first; a
   red gate puts every byte back and removes every created path. The policy key factory writes the
-  catalogue, never `.governance/policy.toml`, the guarded policy file.
+  catalogue, never `.governance/policy.toml` or `.governance/policy.json`, both guarded paths (§8 F7).
+  The hook factory writes no index the caller holds: its gate's index is a copy in a temporary
+  directory it removes, and the one write past the kind's files is the loose objects `git add` stores
+  for the two files it wrote, which nothing references.
 - perf / scale — each factory runs its kind's gate once; the fixture builds one clone and runs eleven
   plants over it, its cost read at the pass and priced into the budget row.
 - error / empty / loading states — a bad argument exits 2 before writing; a red gate exits 1 after
@@ -341,7 +388,14 @@ reds as stale, so the factory writes none.
   adopter's update overwrites (§8 F5). The role factory spells the `tools` front-matter key from
   `roles_lib.py`'s key list, never as a quoted literal beside a path segment, which the install-prefix
   ban reads as a kit path.
-- testing — the eleven fixture cases, each gate seen red on its planted hand instance.
+- testing — the eleven fixture cases, each gate seen red on its planted hand instance. WHAT THE POLICY
+  KEY FACTORY'S GATE DOES NOT CHECK, which the whole `policy check` leg still does at the merge bar:
+  the mirror against its render at HEAD (`arm_mirror_parity`), red until the caller's mirror commit;
+  the policy file at HEAD (`arm_on_invalid`) and the mirror at the landed revision
+  (`arm_mirror_landed`), neither of which the factory's write reaches; a reader for each key whose owner
+  build has landed (`arm_reader_coverage`), red for a new key naming one until the caller writes the
+  reader; and the single-reader joins, the legacy homes and the cap census (`arm_mirror_readers`,
+  `arm_limits_readers`, `arm_legacy_homes`, `arm_cap_census`), whose inputs it never writes.
 - migration — none; the register rows, the pending rows and the leg rows change in one commit.
 - user docs — `help/loop.md` gains "Making a new part"; `help/reference/kinds.md` is re-rendered.
 - what keeps each touched registry green:
@@ -379,16 +433,23 @@ reds as stale, so the factory writes none.
   `tools/loop/`, the first exits 0 with `check-commands` green over the written row, and the second
   exits 1 naming the hand row.
   Red when: the factory's row fails its gate, or the hand row passes.
-- **AC3** — When `--plant policy-key-new` and `--plant policy-key-hand` run there, `policy check` is green
-  and then red naming the key.
-  Red when: the hand row with no `owner` passes.
+- **AC3** — When `--plant policy-key-new` and `--plant policy-key-hand` run there, the first exits 0, the
+  factory printing the `policy-check:` line of each of `arm_schema`, `arm_shape`, `arm_summaries` and
+  `arm_direction` with no finding under it, and no `arm_mirror_parity` line, the scratch's `git status
+  --porcelain` naming `tools/policy/catalogue.toml` alone; and the second exits 1, an `arm_shape`
+  finding naming `fixture.hand` and its missing `owner`.
+  Red when: the hand row with no `owner` passes, the factory's gate runs an arm outside the four, or
+  the factory writes `.governance/policy.json`.
 - **AC4** — When `grep -nP '^kind\tkind\.stage\t' tools/playbook/core-pending.txt` runs on the built
   tree, it prints the row naming dDeclaredLoop, and the `kind.stage` row of `tools/playbook/kinds.toml`
   still carries `factory = ""`.
   Red when: the stage kind leaves the list with no factory a gov step could conform under.
-- **AC5** — When `--plant hook-new` and `--plant hook-hand` run there, the hook-destination gate is green
-  and then red naming the fragment.
-  Red when: a fragment naming an unshipped path passes.
+- **AC5** — When `--plant hook-new` and `--plant hook-hand` run there, the first exits 0, the factory's
+  own gate run printing a `hook-dest: ok` line naming `fixture-hook.fragment.json` and the scratch's
+  `git diff --cached --name-only` printing nothing; and the second exits 1, a `hook-dest: FAIL` line
+  naming the hand fragment.
+  Red when: a fragment naming an unshipped path passes, the factory's gate run never names the fragment
+  it wrote, or the factory stages a file.
 - **AC6** — When `--plant role-new` and `--plant role-hand` run there, `check_roles.py` is green and then
   red naming R2.
   Red when: a role missing `writes` passes, or the factory's role reds R5 for want of its ceiling row.
@@ -405,9 +466,11 @@ reds as stale, so the factory writes none.
   row naming dKeptSession, and the `kind.preset` row of `tools/playbook/kinds.toml` reads
   `owner = "dKeptSession"`.
   Red when: the preset kind leaves the list with no factory, or names this build.
-- **AC10** — When `--plant factory-restores` runs there, the factory exits 1 printing the gate's red, and
-  the scratch's `git status --porcelain` prints nothing.
-  Red when: a red gate leaves a written file behind.
+- **AC10** — When `--plant factory-restores` runs there, the factory exits 1 printing an `arm_shape`
+  finding naming `fixture.bad` and its own row refusing its default, and no `arm_mirror_parity` line,
+  and the scratch's `git status --porcelain` prints nothing.
+  Red when: a red gate leaves a written file behind, or the exit 1 comes from an arm other than the one
+  the planted default reds.
 - **AC11** — When `grep -c 'core.py new \(command\|policy-key\|hook\|role\|workflow\) ' kinds.md` runs
   in `help/reference/` on the built tree, it prints 5 (PINNED, one usage line per kind), and
   the page's `kind.preset` section names dKeptSession.
@@ -476,6 +539,39 @@ New arm: tools/loop/factories.py · covers AC2 AC3 AC5 AC6 AC7 AC10 · each `-ha
   driver's row. (a) The `workflows.toml` row, its loop row and its closed name; (b) the script.
   (b) leaves the three other drivers outside the kind and has no gate that grades it. Recommendation
   (a), the body's. RESOLVED (agent, 2026-11-15, delegated): (a), rung 3. widens: none · relaxes: none
+- **F7 — The policy-key factory's mirror: the factory's write, or the caller's step?** The whole
+  `policy check` is red over every written key on `arm_mirror_parity`, which compares the working
+  tree's `.governance/policy.json` with its render at HEAD over the working tree's catalogue (§4
+  Evidence; the first builder return). (a) The factory runs `policy.py mirror --write` as a held
+  renderer, so the whole leg can be its gate; (b) the mirror is the caller's, a row of §4 "What a factory
+  leaves to its caller", and the factory's gate is the four arms that read no render at a revision,
+  `POLICY_KEY_ARMS`. (a) writes `.governance/policy.json`, a guarded path
+  (`tools/policy/guarded-paths.txt@16afba2735ed:6`), past §5's priced write surface, the build
+  method's veto 3; and `tools/policy/guard.py#check_mirror_render` would refuse it in the catalogue's
+  own commit anyway. (b) leaves the mirror, and a reader for a key of a landed build, red at the bar
+  until the caller does them, as §5 "testing" states. Recommendation (b), the body's. RESOLVED (agent,
+  2026-11-15, delegated): (b), the run's pick in the brief 2026-11-15-prompt-TOOL-dDeclaredLoop-6-2-spec-writer:
+  (a) fails veto 3 and (b) is the one survivor. widens: none · relaxes: the policy-key factory's gate,
+  narrowed from the whole `policy check` leg to four of its arms
+- **F8 — The hook factory's gate reads tracked fragments only: how does it see the one it wrote?**
+  `check-hook-destinations.sh` takes its population from `git ls-files` (§4 Evidence), so run as the
+  leg's argv over the factory's write it never grades the new fragment, its red and the restore
+  unreachable for the factory's own instance. (a) State the limit in S5 and here, and have the hook-new
+  plant stage the factory's files in its scratch and run the gate again, as the first builder return's
+  plant did; (b) the factory stages its own files in the caller's index; (c) the factory runs the gate
+  with `GIT_INDEX_FILE` naming a throwaway copy of the caller's index holding its files, the copy
+  removed on the way out. (a) passes every criterion but leaves the factory's own gate run a probe that
+  cannot move on the instance it guards, which the charter's gate rule refuses to read as coverage.
+  (b) writes the caller's index, a path the guarded write does not hold, so a red leaves entries for
+  removed files and a hand edit in the descriptor staged with them: veto 3. (c) grades the new fragment
+  inside the hold, so a red restores, and writes no index the caller holds; its one write past the
+  kind's files is the unreferenced loose objects `git add` stores, priced in §5. Recommendation (c),
+  the body's: the most feature-rich survivor by M3, the factory contract holding for hook as for the
+  other kinds. Should the run read the loose objects as a widened write surface, (a) is the survivor,
+  and S5, the contract's hook paragraph, AC5 and the hook-new plant revert to staging in the scratch.
+  RESOLVED (agent, 2026-11-15, delegated): (c), rung 3: (b) writes the caller's index, the build method's veto 3,
+  and (a) leaves the factory's own gate run blind to the fragment it wrote; (c) grades it, and its loose objects are priced in §5.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -499,6 +595,14 @@ New arm: tools/loop/factories.py · covers AC2 AC3 AC5 AC6 AC7 AC10 · each `-ha
   blob-pinned lines.
 - rev-5 · 2026-11-15 · §3 · the Edges block gains the hands-off mirroring TOOL-dDeclaredLoop-25 rev-5's consumes-from edge; nothing else moved.
 - rev-6 · 2026-11-15 · §4 · §8 F4 · TOOL-dDeclaredLoop-25's repository stage row is named `[[stage]]`, as its rev-5 renamed it; nothing else moved.
+- rev-7 · 2026-11-15 · S2 S4 S5 · §4 · §5 · AC3 AC5 AC10 · §8 F7 F8 · the first builder return,
+  2026-11-15-build-TOOL-dDeclaredLoop-6-1-builder-return, found the whole `policy check` always red on
+  `arm_mirror_parity` over the policy-key factory's own key, and the hook gate blind to an unstaged
+  fragment; folded by the brief 2026-11-15-prompt-TOOL-dDeclaredLoop-6-2-spec-writer. The mirror is
+  the caller's and the policy-key factory's gate is four arms, `arm_direction` added to the return's
+  three since it reads the catalogue alone (F7); the hook factory's gate runs under a throwaway index
+  (F8, open); AC3, AC5, AC10 and their plants observe the narrowed gates. Mechanism, carries, order and
+  status kept.
 
 ## 10. Reuse audit
 
@@ -506,7 +610,9 @@ The seams extended are dOrderedCharter's kinds register and its one `new` verb,
 `tools/playbook/core.py#run_new`, which runs the factory each row names; the existing gates,
 `check_roles.py`, `check_policy.py` and `tools/check-hook-destinations.sh`, each named as a row's gate
 and given `enforces`; unit 18's `[[command]]` rows; the guarded write,
-`tools/loop/policy_edit.py#write_guarded`, for the restore; `tools/policy/check_policy.py#build_source_snapshot`
+`tools/loop/policy_edit.py#write_guarded`, for the restore; `tools/policy/check_policy.py#run_arm` over
+its `ARM` table, reached through `tools/loop/floor.py#read_policy_modules`, for the policy-key factory's
+four arms; `tools/policy/check_policy.py#build_source_snapshot`
 for the fixture's clone; and `tools/loop/loop_lib.py#run_selftest_cases` for its cases. For the five
 writers themselves no seam fits: `python tools/codebase-map/reuse_lookup.py "write a kind's files, run
 its gate and restore the prior bytes on a red"`, run over the branch tip, ranked `run_selftest_cases`
