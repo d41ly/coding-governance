@@ -6,7 +6,6 @@ streams: tooling
 roster: TOOL
 ids: TOOL-aHastenedSweep-1 TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-3 TOOL-aHastenedSweep-4
 authorized-by: prompt
-status: OPEN
 ---
 
 # aHastenedSweep — the memory-hygiene runner's per-item rescans removed, every verdict byte-identical
@@ -54,25 +53,34 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-11-15 · streams tooling
+**Build status:** SPECCED · 4 unit(s) · node a · opened 2026-11-15 · streams tooling
 ids TOOL-aHastenedSweep-1 TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-3 TOOL-aHastenedSweep-4
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aHastenedSweep-1 — check 25's by-name pass tests `index()` before `test_whole_token`](spec/2026-11-15-spec-TOOL-aHastenedSweep-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-11-15 |
+| [TOOL-aHastenedSweep-2 — `selectable` computes each basename once, and `walk` derives its roots once](spec/2026-11-15-spec-TOOL-aHastenedSweep-2.md) | 1 | 2 | SPECCED | rev-1 | 2026-11-15 |
+| [TOOL-aHastenedSweep-3 — the hygiene shell hands `corpus_ids.py --check` its index set when checks 1 to 5 ran clean](spec/2026-11-15-spec-TOOL-aHastenedSweep-3.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-15 |
+| [TOOL-aHastenedSweep-4 — checks 13 to 16 and 17 to 19 run in one Python process over one frozen, memoized walk](spec/2026-11-15-spec-TOOL-aHastenedSweep-4.md) | 3 | 2 | SPECCED | rev-1 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aHastenedSweep-1 TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-3 TOOL-aHastenedSweep-4.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aHastenedSweep-1`, `TOOL-aHastenedSweep-2` | yes |
+| 2 | `TOOL-aHastenedSweep-3` | no |
+| 3 | `TOOL-aHastenedSweep-4` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

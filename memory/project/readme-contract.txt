@@ -242,3 +242,4 @@ memory/builds/aClearedLedger/README.md
 memory/builds/aBriskDeclaration/README.md
 memory/builds/aLightenedLoop/README.md
 memory/builds/aTwinnedPass/README.md
+memory/builds/aHastenedSweep/README.md
