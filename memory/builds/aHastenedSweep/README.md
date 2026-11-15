@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-15
 streams: tooling
 roster: TOOL
-ids: TOOL-aHastenedSweep-1 TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-3 TOOL-aHastenedSweep-4
+ids: TOOL-aHastenedSweep-1 TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-3 TOOL-aHastenedSweep-4 TOOL-aHastenedSweep-5 TOOL-aHastenedSweep-6
 authorized-by: prompt
 ---
 
@@ -50,11 +50,13 @@ None.
 | 2 | `TOOL-aHastenedSweep-2` | `gotchas.selectable` computes basenames once, and `corpus_ids.walk` computes `_roots` once per walk |
 | 3 | `TOOL-aHastenedSweep-3` | the hygiene shell hands `corpus_ids.py --check` its index set when checks 1 to 5 recorded no failure |
 | 4 | `TOOL-aHastenedSweep-4` | checks 13 to 16 and 17 to 19 run in one Python process over one frozen, memoized walk |
+| 5 | `TOOL-aHastenedSweep-5` | the memory-tree kit contract names every `gotchas.py` verb the hygiene shell launches (closing review round 1: H1) |
+| 6 | `TOOL-aHastenedSweep-6` | every arm this build added can go red on its regression, and every comment and map line describes the one-process launch (closing review round 1: M1 to M4, L1 to L4) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 4 unit(s) · node a · opened 2026-11-15 · streams tooling
-ids TOOL-aHastenedSweep-1 TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-3 TOOL-aHastenedSweep-4
+ids TOOL-aHastenedSweep-1 TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-3 TOOL-aHastenedSweep-4 TOOL-aHastenedSweep-5 TOOL-aHastenedSweep-6
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -65,7 +67,7 @@ ids TOOL-aHastenedSweep-1 TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-3 TOOL-aHast
 | [TOOL-aHastenedSweep-4 — checks 13 to 16 and 17 to 19 run in one Python process over one frozen, memoized walk](spec/2026-11-15-spec-TOOL-aHastenedSweep-4.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 3 record folder(s).
+Records: 7 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

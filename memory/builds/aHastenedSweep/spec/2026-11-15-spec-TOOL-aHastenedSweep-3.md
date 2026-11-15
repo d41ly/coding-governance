@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-15-build-TOOL-aHastenedSweep-3-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aHastenedSweep-3-1-acceptance-ledger.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aHastenedSweep-1-brief.md](../prompts/2026-11-15-prompt-TOOL-aHastenedSweep-1-brief.md) | research | TOOL-aHastenedSweep-1 TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-4 |
+| [2026-11-16-review-TOOL-aHastenedSweep-1-2-3-4-diff-review-round1.md](../reviews/2026-11-16-review-TOOL-aHastenedSweep-1-2-3-4-diff-review-round1.md) | diff-review | TOOL-aHastenedSweep-1 TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-4 |
 
 <!-- /gen:spec-records -->
 
