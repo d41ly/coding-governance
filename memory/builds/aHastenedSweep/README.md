@@ -55,7 +55,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-11-15 · streams tooling
+**Build status:** SPECCED · 6 unit(s) · node a · opened 2026-11-15 · streams tooling
 ids TOOL-aHastenedSweep-1 TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-3 TOOL-aHastenedSweep-4 TOOL-aHastenedSweep-5 TOOL-aHastenedSweep-6
 
 <!-- gen:build-units -->
@@ -65,15 +65,17 @@ ids TOOL-aHastenedSweep-1 TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-3 TOOL-aHast
 | [TOOL-aHastenedSweep-2 — `selectable` computes each basename once, and `walk` derives its roots once](spec/2026-11-15-spec-TOOL-aHastenedSweep-2.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-15 |
 | [TOOL-aHastenedSweep-3 — the hygiene shell hands `corpus_ids.py --check` its index set when checks 1 to 5 ran clean](spec/2026-11-15-spec-TOOL-aHastenedSweep-3.md) | 2 | 2 | CLOSED | rev-2 | 2026-11-15 |
 | [TOOL-aHastenedSweep-4 — checks 13 to 16 and 17 to 19 run in one Python process over one frozen, memoized walk](spec/2026-11-15-spec-TOOL-aHastenedSweep-4.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-15 |
+| [TOOL-aHastenedSweep-5 — the memory-tree kit contract names every `gotchas.py` verb the hygiene shell launches](spec/2026-11-16-spec-TOOL-aHastenedSweep-5.md) | 4 | 2 | SPECCED | rev-1 | 2026-11-16 |
+| [TOOL-aHastenedSweep-6 — every arm this build added can go red on its regression, and every comment and map line describes the one-process launch](spec/2026-11-16-spec-TOOL-aHastenedSweep-6.md) | 5 | 1 | SPECCED | rev-1 | 2026-11-16 |
 <!-- /gen:build-units -->
 
 Records: 7 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aHastenedSweep-1 TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-3 TOOL-aHastenedSweep-4.
+Ids no `spec-audit` record has ever named: TOOL-aHastenedSweep-1 TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-3 TOOL-aHastenedSweep-4 TOOL-aHastenedSweep-5 TOOL-aHastenedSweep-6.
 
-Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -83,6 +85,8 @@ Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry
 | 1 | `TOOL-aHastenedSweep-1`, `TOOL-aHastenedSweep-2` | yes |
 | 2 | `TOOL-aHastenedSweep-3` | no |
 | 3 | `TOOL-aHastenedSweep-4` | no |
+| 4 | `TOOL-aHastenedSweep-5` | no |
+| 5 | `TOOL-aHastenedSweep-6` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
