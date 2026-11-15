@@ -1049,9 +1049,9 @@ check_arm "arm 23 a cold call prints arm 9's lines and writes one record under t
    "$([ "$_rc23" = 0 ] && [ "$_a" = 0 ] && check_cold23 && [ "$(ls "$A23D" | grep -cE '^[0-9a-f]{16}\.json$')" = 1 ] \
       && [ "$(ls -A "$A23D" | wc -l)" = 1 ] && echo 1 || echo 0)"
 touch -d '2000-01-01 00:00:00' "$A23D"/*.json; run_agents23
-check_arm "arm 23 ...a warm call prints the same lines and leaves the record unwritten" \
-   "$(check_cold23 && [ -n "$(find "$A23D" -name '*.json')" ] \
-      && [ -z "$(find "$A23D" -name '*.json' -newermt '2001-01-01')" ] && echo 1 || echo 0)"
+_w23=0; check_cold23 && [ -n "$(find "$A23D" -name '*.json')" ] \
+   && [ -z "$(find "$A23D" -name '*.json' -newermt '2001-01-01')" ] && _w23=1
+check_arm "arm 23 ...a warm call prints the same lines and leaves the record unwritten" "$_w23"
 "$PY" -B -c "$A23_EDIT" "$A23D" poison; _e23=$?; run_agents23
 check_arm "arm 23 ...a record whose notifications are emptied drops the returned line, so the record is read" \
    "$([ "$_e23" = 0 ] && [ "$rc" = 0 ] && [ "$out" = "$A9L1" ] && echo 1 || echo 0)"
@@ -1075,8 +1075,8 @@ check_arm "arm 23 a record with a foreign parser, session or offset, or truncate
    "$([ -z "$_f" ] && echo 1 || echo 0)"
 [ -z "$_f" ] || echo "    arm 23: the record was used under:$_f"
 rm -rf "$A23D"; printf x > "$A23D"; run_agents23
-check_arm "arm 23 an unwritable record folder prints the cold lines and leaves no temporary file" \
-   "$(check_cold23 && [ -z "$(find "$FX/.git" -name '*.tmp')" ] && echo 1 || echo 0)"
+_w23=0; check_cold23 && [ -z "$(find "$FX/.git" -name '*.tmp')" ] && _w23=1
+check_arm "arm 23 an unwritable record folder prints the cold lines and leaves no temporary file" "$_w23"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

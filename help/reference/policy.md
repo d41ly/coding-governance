@@ -90,6 +90,9 @@ Documented on [help/red-fix-lane.md](../red-fix-lane.md).
 ## `pass.fast-legs`
 Documented on [help/pass-legs.md](../pass-legs.md).
 
+## `memory.staged-render`
+Documented on [help/commit-render.md](../commit-render.md).
+
 ## `help.enforce`
 Documented on [help/docs-leg.md](../docs-leg.md).
 

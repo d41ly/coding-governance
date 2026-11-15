@@ -188,8 +188,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from tree_lib import (  # noqa: E402  the kit's shared helpers
     BIND_HEAD_LINES, BIND_RE, GIT_ENV_LEAKS, HDR_RE, RECORD_KIND_TOKENS, RECORD_KINDS, STATUS_TOKENS, TERMINAL,
     UNBOUND_RE, _expand_ids, _id_alternation, build_id_token_re, build_spec_path_re, kit_rel, parse_conf,
-    parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at, read_id_pins, read_text, record_paths,
-    scan_missing_citations, unfenced, unfenced_lines,
+    parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at, read_id_pins, read_policy_value, read_text,
+    record_paths, scan_missing_citations, unfenced, unfenced_lines,
 )
 
 
@@ -987,16 +987,20 @@ def build_render_pathspec(m: str, kit: str | None, carries: str | None, llu: str
 def check_staged_write(root: str, conf: dict) -> tuple:
     """`(ok, why)` for `--write-staged`: may the hook's render be staged into the commit at all?
 
-    TOOL-aTrimmedWait-3 S2, cheapest first and before anything renders. The switch, read the way
-    `LIVE_LANDED_UNCLOSED` is; then the index git handed the hook, which must be the repository's own
-    or its `.lock` (a partial commit's `next-index` diverges from the real index); then no unstaged
-    change under the render's pathspec, so the worktree the renderer reads IS what the commit carries.
+    TOOL-aTrimmedWait-3 S2, before anything renders. The switch, the policy key `memory.staged-render`
+    at the landed revision (TOOL-aTrimmedWait-10 S2), where every answer but `on` declines; then the
+    index git handed the hook, which must be the repository's own or its `.lock` (a partial commit's
+    `next-index` diverges from the real index); then no unstaged change under the render's pathspec,
+    so the worktree the renderer reads IS what the commit carries.
     """
-    raw = (conf.get("STAGED_RENDER") or "").strip()
-    if raw not in ("", "1"):
-        raise Problem(f"STAGED_RENDER='{raw}' is not one of its two legal values, blank (off) or 1 (on)")
-    if not raw:
-        return False, "STAGED_RENDER is blank, so the hook does not render"
+    try:
+        value = read_policy_value("memory.staged-render", root)
+    except LookupError:
+        return False, "no policy kit resolves beside this kit, so memory.staged-render reads off"
+    except ValueError as exc:
+        return False, str(exc)
+    if value != "on":
+        return False, f"memory.staged-render reads {value}, so the hook does not render"
     env = _build_git_env()
     hook_index = os.environ.get("GIT_INDEX_FILE")
     if hook_index:
@@ -4730,28 +4734,39 @@ def test_staged_write(arm) -> None:
     """TOOL-aTrimmedWait-3's arms: `--write-staged` stages exactly the moved render, and every decline
     writes nothing. MODULE-LEVEL, as `test_staged_render` is. The fixture is the spec's §6: a rendered,
     committed `_fixture` with the switch on, then a spec status change staged and the README unrendered.
+    The switch is `memory.staged-render` in the fixture's committed `.governance/policy.toml`, read at
+    the fixture's own branch (TOOL-aTrimmedWait-10 S4).
     Each arm reads `ARM-PASS` or `ARM-MISS` followed by the mode's exit and output."""
     gbi = os.path.abspath(__file__)
 
     def run_write_staged(t, **extra):
+        landed = {"GOV_DEFAULT_BRANCH": run("git", "symbolic-ref", "--short", "HEAD", cwd=t).strip(),
+                  "GOV_REMOTE": ""}
         p = subprocess.run([sys.executable, gbi, "--write-staged"], cwd=t, capture_output=True, text=True,
-                           encoding="utf-8", env=dict(_build_git_env(), **extra))
+                           encoding="utf-8", env=dict(_build_git_env(), **dict(landed, **extra)))
         return p.returncode, p.stdout + p.stderr
 
     def build_arm_result(ok, rc, out):
         return f"{'ARM-PASS' if ok else 'ARM-MISS'} rc={rc} {out}"
 
+    policy_rel, policy_on = os.path.join(".governance", "policy.toml"), '[memory]\nstaged-render = "on"\n'
+
     with tempfile.TemporaryDirectory() as base:
         t = os.path.join(base, "sw"); os.makedirs(t)
-        _fixture(t)
+        conf = _fixture(t)
         cpath = os.path.join(t, ".memory-tree.conf")
-        on = read_text(cpath) + 'STAGED_RENDER="1"\n'
-        write_text(cpath, on)
+        on = read_text(cpath)
+        write_text(os.path.join(t, policy_rel), policy_on)
         write_text(os.path.join(t, "memory", "notes.md"), "# notes\n")
         write_text(os.path.join(t, "src", "x.sh"), "echo x\n")
         run(sys.executable, gbi, "--write", cwd=t)
         run("git", "add", "-A", cwd=t)
         run("git", "commit", "-q", "-m", "rendered", "--no-verify", cwd=t)
+        # The AC2 off arm's landed revision: a branch whose tip deletes the policy file, HEAD left where it is.
+        run("git", "checkout", "-q", "-b", "policy-absent", cwd=t)
+        run("git", "rm", "-q", "--", ".governance/policy.toml", cwd=t)
+        run("git", "commit", "-q", "-m", "policy absent", "--no-verify", cwd=t)
+        run("git", "checkout", "-q", "-", cwd=t)
         spec = "memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md"
         readme = "memory/builds/tOne/README.md"
 
@@ -4782,13 +4797,27 @@ def test_staged_write(arm) -> None:
         rc, out = run_write_staged(t)
         arm("TOOL-aTrimmedWait-3 AC2 — a second run declines: no artifact's bytes moved", "ARM-PASS",
             lambda: build_arm_result(rc == 1 and "render NOT staged — no artifact's bytes moved" in out, rc, out))
-        for value, want in (("", "render NOT staged — STAGED_RENDER is blank"), ("yes", "'yes'")):
-            write_staged_change(on.replace('STAGED_RENDER="1"', f'STAGED_RENDER="{value}"'))
+        stale = on + 'STAGED_RENDER="1"\n'  # TOOL-aTrimmedWait-10 S3: the retired conf line, planted
+        for landed, conf_text, want, label in (
+                ("policy-absent", stale, "render NOT staged — memory.staged-render reads off",
+                 "AC2 — memory.staged-render reads off at the landed revision, a stale conf line moves nothing, "
+                 "and no status changes"),
+                ("no-such-branch", on, "render NOT staged — memory.staged-render did not read",
+                 "AC3 — memory.staged-render at a missing branch does not read, and no status changes")):
+            write_staged_change(conf_text)
             before = read_porcelain()
-            rc, out = run_write_staged(t)
-            arm(f"TOOL-aTrimmedWait-3 AC2 — STAGED_RENDER=\"{value}\" exits 1 naming {want} and changes no "
-                "status", "ARM-PASS",
+            rc, out = run_write_staged(t, GOV_DEFAULT_BRANCH=landed)
+            arm(f"TOOL-aTrimmedWait-10 {label}", "ARM-PASS",
                 lambda: build_arm_result(rc == 1 and want in out and read_porcelain() == before, rc, out))
+        orig_reader = globals()["read_policy_value"]
+        globals()["read_policy_value"] = lambda *_a: (_ for _ in ()).throw(LookupError("no policy kit here"))
+        try:
+            no_kit = check_staged_write(t, conf)
+        finally:
+            globals()["read_policy_value"] = orig_reader
+        arm("TOOL-aTrimmedWait-10 AC3 — with no policy kit the switch reads off and the mode declines",
+            "(False, 'no policy kit resolves beside this kit, so memory.staged-render reads off')",
+            lambda: str(no_kit))
         write_staged_change()
         foreign = os.path.join(base, "other-index")
         shutil.copyfile(os.path.join(t, ".git", "index"), foreign)
@@ -4852,8 +4881,9 @@ def test_staged_write(arm) -> None:
         d = os.path.join(base, "sd"); os.makedirs(d)
         _texts, record_rel, view_rel, sha = _build_design_fixture(d)
         on_d = (_render_fixture_conf() + f'DESIGN_RECORD="{record_rel}"\nDESIGN_BASELINE="{sha}"\n'
-                f'DESIGN_VIEW="{view_rel}"\nDESIGN_NODES="memory/design/nodes.py"\nSTAGED_RENDER="1"\n')
+                f'DESIGN_VIEW="{view_rel}"\nDESIGN_NODES="memory/design/nodes.py"\n')
         write_text(os.path.join(d, ".memory-tree.conf"), on_d)
+        write_text(os.path.join(d, policy_rel), policy_on)
         run(sys.executable, gbi, "--write", cwd=d)
         run("git", "add", "-A", cwd=d)
         run("git", "commit", "-q", "-m", "rendered", "--no-verify", cwd=d)

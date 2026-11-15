@@ -322,7 +322,7 @@ EOF
     git add -A; git commit -q --no-verify -m fixture
     echo x > memory/note.md; git add memory/note.md
     git commit -q -m note 2>&1; echo "COMMIT RC=$?"
-    echo "HYGIENE RUNS=$(cat .hy-runs)"
+    echo "HYGIENE RUNS=$(<.hy-runs)"
     echo "HEAD CARRIES $(git show --name-only --format= HEAD | tr '\n' ' ')" )
 }
 out=$(run_render_commit 9 0)

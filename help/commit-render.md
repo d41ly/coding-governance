@@ -9,15 +9,18 @@ manual remedy gets.
 
 ## Turn it on
 
-The switch is `STAGED_RENDER` in the repository's `.memory-tree.conf`. It is blank, which is off,
-in the memory-tree kit's example conf, because a hook that adds paths nobody staged is new
-behaviour in an adopter. Set it to `1` to turn it on:
+`memory.staged-render` in `.governance/policy.toml` turns the render on or off. <!-- usage: policy:memory.staged-render e73726fb -->
+Its default is `off`, because a hook that adds paths nobody staged is new behaviour in an adopter.
+Set it to `on` to turn it on:
 
-```text
-STAGED_RENDER="1"
+```toml
+[memory]
+staged-render = "on"
 ```
 
-Any value other than blank or `1` is refused by name, and the commit is refused as before.
+The key is read at the landed revision, the default branch as the remote holds it, so a branch
+cannot turn its own render on: the hook declines until the line reaches the default branch. Where
+no policy kit is installed beside the memory-tree kit, the switch reads off.
 
 ## What the hook does
 
@@ -38,7 +41,8 @@ pre-commit: the build index was rendered and staged; grading the memory hygiene 
 The mode writes nothing, prints `build-index: render NOT staged — <why>`, exits 1, and the hook
 refuses the commit as it does today, when:
 
-- `STAGED_RENDER` is blank;
+- `memory.staged-render` reads anything but `on`, or the policy reader refuses, which the line
+  names with the reader's own words;
 - the hook's index is neither the repository's own index nor its `.lock`. A partial commit,
   `git commit <path>`, hands the hook a separate index, so the render is never staged there;
 - a render input, a path under the memory root, the conf or the kit, carries an unstaged change,
