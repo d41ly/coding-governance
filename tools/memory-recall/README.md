@@ -123,7 +123,8 @@ write was merely hidden by an ignore rule. `sys.dont_write_bytecode = True` sits
 it, importing the sibling modules drops `__pycache__` next to the source, inside the adopter's tree.
 An adopter therefore needs **no** `.gitignore` entry from this kit.
 
-The cache is not small: upstream measures ~115 MiB per live worktree against a 40 MB corpus, and only
+The cache is not small: it runs to more than twice the corpus it indexes, and upstream keeps its
+measured size beside `RECALL_CACHE_BUDGET_MB` in its `.memory-tree.conf`. Only
 37.9% of a 552.6 MB tree was evictable by liveness alone — which is why the budget is a size, not an
 age. Two passes run after a successful build, never before (a cache is replaceable only once its
 replacement exists):
