@@ -192,3 +192,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-15T07:52:04Z brief · item TOOL-dDeclaredLoop-112 · reason aa185d8ff5c6 memory/builds/dDeclaredLoop/prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-112-build-brief.md
 
 2026-11-15T08:08:54Z dispatch · item 27143aff TOOL-dDeclaredLoop-112 · reason tools/unattended/unattended.sh tools/unattended/lib-unattended.sh memory/project/fork-ceilings.txt memory/project/spawn-idiom-sites.txt memory/map/generated/symbols.json memory/builds/dDeclaredLoop/build/2026-11-15-build-TOOL-dDeclaredLoop-112-1-acceptance-ledger.md memory/builds/dDeclaredLoop/spec/2026-11-15-spec-TOOL-dDeclaredLoop-112.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md
+
+2026-11-15T09:29:38Z brief · item TOOL-dDeclaredLoop-14 · reason ebc183d5298e memory/builds/dDeclaredLoop/prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-14-build-brief.md
