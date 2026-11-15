@@ -42,9 +42,10 @@ the legs of the spec's Gates section. The group's three `New arm:` lines of §7 
   to that token was present in the JSON prompt line, the line with it cut out equalled the `"$A}"`
   prompt line, and the `opts:` line carried `"isolation":"worktree"`. The suite arm T2 is owed to the
   main loop.
-- AC5 — ``Run `PL --base fedcba9` at the main loop with its working directory at `/w/agent-x1`, before that worktree is merged back``
-  — the `nextAction` carried it and `which is HEAD there when the command runs`, and not `def5678`;
-  with `$K` it carried `--base fedcba9`. The suite arm T4 is owed to the main loop.
+- AC5 — `--base fedcba9` — with `$W` the `nextAction` carried
+  ``Run `PL --base fedcba9` at the main loop with its working directory at `/w/agent-x1`, before that worktree is merged back``
+  and `which is HEAD there when the command runs`, and not `def5678`; with `$K` it carried
+  `--base fedcba9`. The suite arm T4 is owed to the main loop.
 - AC6 — ``THROW unattended-unit: args `passBase` `` — each of `7`, `""`, `"abc"`, `"ABC1234"` and
   `` "fedcba9`" `` printed it and no `prompt:` line; a forty-digit lower-case hex value printed a
   `prompt:` line. The suite arm T6 is owed to the main loop.
@@ -55,9 +56,9 @@ the legs of the spec's Gates section. The group's three `New arm:` lines of §7 
 - AC8 — `whose path the builder returned unusable` — with `$X` the result carried `"branch":""` and
   `"worktree":""`, the `nextAction` carried that phrase and neither `rel/w` nor `a b`, and the log
   carried `branch=a b worktree=rel/w`. The suite arm T5 is owed to the main loop.
-- AC9 — `version: '1.2', // gov:kit unattended-unit@1.2` — `grep -c` printed `1`, as it did for
-  ``^// `passBase` IS OPTIONAL (TOOL-aTwinnedPass-1)``, and `grep -c "unattended-unit@1.1"` printed `0`.
-- AC10 — `names that worktree as the command's working directory` — `grep -cF` over
+- AC9 — `grep -c "unattended-unit@1.1"` — printed `0`, and `grep -c` printed `1` for
+  `version: '1.2', // gov:kit unattended-unit@1.2` and for ``^// `passBase` IS OPTIONAL (TOOL-aTwinnedPass-1)``.
+- AC10 — `grep -cF "names that worktree as the command's working directory"` — over
   `help/pass-legs.md` printed `1`.
 - AC11 — `bash -n tools/workflows/unattended-build.test.sh` — exited 0; `grep -c` printed `1` for
   `RAISED 950 -> .* by TOOL-aTwinnedPass-1` and `1` for `trace.push("isolation:"`. The arms'
