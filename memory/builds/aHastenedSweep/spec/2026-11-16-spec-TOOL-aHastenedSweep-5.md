@@ -1,6 +1,6 @@
 # TOOL-aHastenedSweep-5 — the memory-tree kit contract names every `gotchas.py` verb the hygiene shell launches
 
-**Status:** SPECCED · rev-1 · 2026-11-16 · node a · Tier-2 · base f25308f0 · streams tooling · order 4
+**Status:** INPROGRESS · rev-1 · 2026-11-16 · node a · Tier-2 · base f25308f0 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
