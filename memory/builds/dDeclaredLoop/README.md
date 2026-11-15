@@ -153,7 +153,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-25 — a repository's own stages, spliced between two adjacent gov stages](spec/2026-10-24-spec-TOOL-dDeclaredLoop-25.md) | 21 | 2 | INPROGRESS | rev-6 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-47 — the stage factory writes a whole conforming stage: its witness, exit item, state and table rows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-47.md) | 21 | 2 | WONTDO | rev-3 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-83 — 75 S27 states 81's exit table, so no merge-tree exit but 0 and 1 falls to the parents](spec/2026-10-24-spec-TOOL-dDeclaredLoop-83.md) | 21 | 2 | CLOSED | rev-5 | 2026-11-15 |
-| [TOOL-dDeclaredLoop-84 — 82's restatement of S27 keeps 81's exit table, and 82's pass greps 75 for the fall to the parents](spec/2026-10-24-spec-TOOL-dDeclaredLoop-84.md) | 21 | 2 | INPROGRESS | rev-4 | 2026-11-15 |
+| [TOOL-dDeclaredLoop-84 — 82's restatement of S27 keeps 81's exit table, and 82's pass greps 75 for the fall to the parents](spec/2026-10-24-spec-TOOL-dDeclaredLoop-84.md) | 21 | 2 | CLOSED | rev-4 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-85 — the write-tree capability probe has three answers, and only a probed absence takes the parent exemption](spec/2026-10-24-spec-TOOL-dDeclaredLoop-85.md) | 21 | 2 | DEFERRED | rev-5 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-29 — an item's upstream field: commitment rows handed on, answered at the return, gating only a measured edge](spec/2026-10-24-spec-TOOL-dDeclaredLoop-29.md) | 22 | 2 | DEFERRED | rev-4 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-26 — a build's composition pinned per step, its position read at the pin, and the move at the next step boundary](spec/2026-10-24-spec-TOOL-dDeclaredLoop-26.md) | 23 | 2 | DEFERRED | rev-5 | 2026-11-15 |
@@ -195,7 +195,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-75 — the round-3 spec audit's 36 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md) | 39 | 2 | DEFERRED | rev-9 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-77 — a FETCH_HEAD URL is compared in the spelling git writes it, its user part stripped from both sides](spec/2026-10-24-spec-TOOL-dDeclaredLoop-77.md) | 39 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-79 — the round-4 spec audit's 28 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-79.md) | 40 | 2 | DEFERRED | rev-5 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-82 — the round-5 spec audit's 23 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-82.md) | 41 | 2 | DEFERRED | rev-5 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-82 — the round-5 spec audit's 23 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-82.md) | 41 | 2 | DEFERRED | rev-6 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-86 — the round-6 spec audit's 22 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-86.md) | 42 | 2 | DEFERRED | rev-7 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-87 — the conf-constant kind is stated as a class: any module-level binding whose value holds a conf name, and every import that binds it](spec/2026-10-24-spec-TOOL-dDeclaredLoop-87.md) | 43 | 2 | DEFERRED | rev-5 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-88 — the round-7 spec audit's 36 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-88.md) | 44 | 2 | DEFERRED | rev-5 | 2026-10-24 |
@@ -213,7 +213,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 534 bound to this build, across 4 record folder(s).
+Records: 535 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

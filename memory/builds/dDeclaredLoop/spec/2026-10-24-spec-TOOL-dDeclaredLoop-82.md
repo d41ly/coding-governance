@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-82 — the round-5 spec audit's 23 minors, batched
 
-**Status:** DEFERRED · rev-5 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 41 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-6 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 41 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -71,7 +71,10 @@ and 26, are not in the disposal population.
   carries `SECRET`. Observed by AC3.
 - **S4** — id 4. `TOOL-dDeclaredLoop-75` S27's body is restated, as a rev bump of 75 with its §9 line:
   on exit 1 with the policy path outside the conflicted paths, C is 78's `present` or `absent`, or
-  refused by 78 S3, in place of "its blob parses". The plant
+  refused by 78 S3, in place of "its blob parses". The restatement keeps the rest of S27 as
+  `TOOL-dDeclaredLoop-83` writes it: the three cases that grade against the parents alone, and every
+  other outcome of the re-merge as 81 S2's `failed` state, graded by 81 S3 and
+  never a fall to the parents. The plant
   `push-merge-resurrect-deleted-policy-conflict-elsewhere` joins `guard.py --fixture`: main's tip lacks
   the policy file, a run branch that never touched it conflicts with main on another file, and the
   resolution keeps the run branch's policy bytes with no trailer. Observed by AC4.
@@ -285,8 +288,13 @@ derive_conf_reads(path):
   never reached.
 - **AC4** — When `python guard.py --fixture --plant push-merge-resurrect-deleted-policy-conflict-elsewhere`
   runs, it exits 1 naming each key M holds, and `grep -c "its blob parses"` over
-  `memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md` prints 0.
-  Red when: an absent C at exit 1 falls to the parents and the exemption skips the merge.
+  `memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md` prints 0. Over the same
+  file `grep -c "any other exit code grades against the parents alone"` prints 0, and
+  `awk '/^- \*\*S27\*\*/,/^- \*\*S28\*\*/'` piped to `grep -c "never a fall to the parents"` prints at
+  least 1. And `python guard.py --fixture --plant push-merge-tree-fatal` exits 1 printing
+  `the clean re-merge failed: 128`.
+  Red when: an absent C at exit 1 falls to the parents and the exemption skips the merge, or the pass
+  rewords S27 so an exit other than 0 and 1 grades against the parents alone.
 - **AC5** — When a probe loads `tools/check-spec-tokens.py` by `importlib` and, for each spec under
   this build's `spec/` folder that is not CLOSED or WONTDO, applies `check_guard_trips` to each path of
   its Files touched against the guards of the `loop selftest` and `loop breakpoints fixtures` rows of
@@ -414,6 +422,10 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC8 · the glob-reader a
   TOOL-dDeclaredLoop-89 and TOOL-dDeclaredLoop-90, written by the round-8 spec audit's disposal; nothing else moved.
 - rev-5 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-97 and TOOL-dDeclaredLoop-98, written by the round-12 spec audit's disposal; nothing else moved.
+- rev-6 · 2026-11-15 · S4 · AC4 · written by the repair unit TOOL-dDeclaredLoop-84 for id 7 of
+  2026-10-24-review-TOOL-dDeclaredLoop-80-spec-audit: S4 keeps the rest of 75 S27's exit table as
+  TOOL-dDeclaredLoop-83 writes it, and AC4 greps 75 for the retired fallback and for 83's clause and
+  re-runs 81's `push-merge-tree-fatal` plant; nothing else moved.
 
 ## 10. Reuse audit
 
