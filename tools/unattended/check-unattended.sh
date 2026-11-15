@@ -60,7 +60,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.123 # gov:kit unattended@1.123 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.124 # gov:kit unattended@1.124 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -6238,7 +6238,8 @@ if check_selected 39; then
 # the fact as written, after the verb that wrote it. It used to read it nested inside a runmd_of
 # substitution, a spelling this classifier could not see; the fork-free form made it visible
 # (TOOL-aSparedSpawn-8).
-PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness run_settle check_commit_message main"
+# print_wake (TOOL-aLightenedLoop-2) is --wake, offline, so it reads the RECORDED phase; it answers FULL on LANDING and HELD, the two phases where the derived phase can differ.
+PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness run_settle check_commit_message print_wake main"
 # ---- LIVENESS: the classifier must RECOGNISE the readers' own reads. The two readers are the one
 # ---- place a read of the fact is certain to exist, so each must hold a line the read predicate
 # ---- matches, or the driver reads the fact in a spelling this check no longer sees and the routing

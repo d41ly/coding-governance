@@ -287,12 +287,14 @@ cp "$HERE/stop-guard.js" "$HERE/run-lease.js" "$KIT/" 2>/dev/null
 HOOK="$KIT/stop-guard.js"
 cat > "$KIT/unattended.sh" <<'EOF'
 #!/usr/bin/env bash
+[ -n "${STOP_GUARD_TEST_COUNT:-}" ] && printf x >> "$STOP_GUARD_TEST_COUNT"
 [ -n "${STOP_GUARD_TEST_LIVENESS_SLEEP:-}" ] && sleep "$STOP_GUARD_TEST_LIVENESS_SLEEP" >/dev/null 2>&1 </dev/null
 [ "${1:-}" = --liveness ] && [ -n "${STOP_GUARD_TEST_LIVENESS:-}" ] && cat "$STOP_GUARD_TEST_LIVENESS"
 exit "${STOP_GUARD_TEST_LIVENESS_RC:-0}"
 EOF
 export STOP_GUARD_TEST_LIVENESS="$TMP/liveness.txt"
-unset STOP_GUARD_TEST_LIVENESS_RC STOP_GUARD_TEST_LIVENESS_SLEEP STOP_GUARD_LIVENESS_BOUND_MS
+unset STOP_GUARD_TEST_LIVENESS_RC STOP_GUARD_TEST_LIVENESS_SLEEP STOP_GUARD_LIVENESS_BOUND_MS \
+      STOP_GUARD_TEST_COUNT STOP_GUARD_LIVENESS_CACHE
 SID="11111111-2222-3333-4444-555555555555"
 
 # set_liveness <phase> <verdict> — what the stub prints, in the driver's own key: value shape.
@@ -603,6 +605,157 @@ check_same "AC19 hung liveness stdout empty" "$OUT" ""
 derive_sidecar "$F" >/dev/null; check_same "AC19 hung liveness line reason" "$(read_field "$_sidecar" reason)" "liveness-unreadable"
 [ $((T1 - T0)) -lt 10000 ] && print_ok "AC19 the bound fired well inside the 30 s sleep it bounded ($((T1 - T0)) ms)" || print_bad "AC19 the bound did not fire: $((T1 - T0)) ms"
 
+# ---- TOOL-aLightenedLoop-5: THE LIVENESS CACHE. Each arm runs on a `git init` fixture, whose real
+# ---- git dir lets `show-ref` answer, with the stub counting its own spawns into STOP_GUARD_TEST_COUNT:
+# ---- a stop served from `liveness.fx.json` leaves the counter where it was. The stub fixtures above
+# ---- carry a `.git` holding only HEAD, so the key is null there and every arm above runs uncached.
+COUNT="$TMP/count"; export STOP_GUARD_TEST_COUNT="$COUNT"
+run_fxgit() { GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git -C "$F" -c user.name=t -c user.email=t@t "$@" >/dev/null 2>&1; }
+# build_gitfixture -> build_fixture's tree at BUILDING bound to $SID, made a repository with one
+# commit on main; the spawn counter is emptied.
+build_gitfixture() {
+  local F; F=$(build_fixture BUILDING "$SID"); rm -rf "$F/.git"
+  run_fxgit init -q -b main; run_fxgit add -A; run_fxgit commit -q -m seed
+  : > "$COUNT"; printf '%s' "$F"
+}
+read_count() { wc -c < "$COUNT" | tr -d ' '; }
+# set_live_clock <last-move> <stale-bound> — the stub prints LIVE with the two clock lines.
+set_live_clock() { printf 'phase: BUILDING\nstate: live\nsession: %s\nverdict: LIVE\nlast-move: %s\nstale-bound: %s\n' "$SID" "$1" "$2" > "$STOP_GUARD_TEST_LIVENESS"; }
+CACHE_REL=.git/unattended/liveness.fx.json
+BG='{"background_tasks":[{"id":"t1"}]}'
+
+# ---- L5-AC3: two stops, nothing moved between them — one spawn, the same stdout and sidecar line,
+# ---- and the cache file. RED when checkSession calls runLiveness directly: the counter reads 2.
+F=$(build_gitfixture); set_live_clock 0 3600
+run_hook "$(build_payload "$F" "$BG")"; OUT1=$OUT
+run_hook "$(build_payload "$F" "$BG")"
+check_same "L5-AC3 two unchanged stops spawn the driver once" "$(read_count)" "1"
+check_same "L5-AC3 the two stdouts are identical" "$OUT" "$OUT1"
+derive_sidecar "$F" >/dev/null; check_same "L5-AC3 the two sidecar lines match but for utc" "$("$TESTPY" -c 'import json,sys
+ls=[json.loads(l) for l in open(sys.argv[1],encoding="utf-8").read().splitlines() if l.strip()]
+[l.pop("utc") for l in ls]
+print("same" if len(ls)==2 and ls[0]==ls[1] and ls[1]["verdict"]=="LIVE" else "differs")' "$_sidecar")" "same"
+[ -f "$F/$CACHE_REL" ] && print_ok "L5-AC3 liveness.fx.json exists" || print_bad "L5-AC3 no $F/$CACHE_REL"
+
+# ---- L5-AC4: one input moved between two stops — each move costs one spawn. RED when
+# ---- deriveLivenessKey drops the part that move reaches.
+F=$(build_gitfixture); set_live_clock 0 3600
+P=$(build_payload "$F" "$BG")
+run_hook "$P"; run_hook "$P"
+check_same "L5-AC4 the baseline second stop is served from cache" "$(read_count)" "1"
+for MOVE in record commit checkout remote-ref landed conf config driver session; do
+  N=$(read_count)
+  case $MOVE in
+    record)     printf '\n' >> "$F/memory/builds/fx/RUN.md" ;;
+    # the commit move also makes `other` at the new sha, so the checkout move rewrites
+    # <gitDir>/HEAD alone: `show-ref --head` prints the same lines before and after it
+    commit)     run_fxgit commit -q --allow-empty -m move; run_fxgit branch other ;;
+    checkout)   run_fxgit checkout -q other ;;
+    remote-ref) run_fxgit update-ref refs/remotes/origin/main HEAD ;;
+    landed)     mkdir -p "$F/.git/unattended"; printf 'landed\n' >> "$F/.git/unattended/landed.fx.log" ;;
+    conf)       printf '# moved\n' >> "$F/.unattended.conf" ;;
+    config)     run_fxgit config branch.fx.remote origin ;;
+    driver)     printf '# moved\n' >> "$KIT/unattended.sh" ;;
+  esac
+  if [ "$MOVE" = session ]; then
+    # a second session bound by the same RUN.md: one record names one session, so the read is
+    # called directly with the other id against the same lease
+    node -e 'const m=require(process.argv[1]);m.readLiveness(process.argv[2],{root:process.argv[3],gitDir:process.argv[3]+"/.git"},{slug:"fx",record:"memory/builds/fx/RUN.md"},"other-session")' \
+      "$(resolve_native "$HOOK")" "$(resolve_native "$KIT")" "$(resolve_native "$F")"
+  else
+    run_hook "$P"
+  fi
+  check_same "L5-AC4 a moved $MOVE spawns the driver again" "$(read_count)" "$((N + 1))"
+done
+
+# ---- L5-AC5: the clock — a LIVE entry whose deadline is past the 1 s bound plus one second is
+# ---- served; one that a fresh read could already call STALE is not. RED when the deadline is ignored.
+F=$(build_gitfixture); set_live_clock 0 3600
+STOP_GUARD_LIVENESS_BOUND_MS=1000 run_hook "$(build_payload "$F" "$BG")"
+STOP_GUARD_LIVENESS_BOUND_MS=1000 run_hook "$(build_payload "$F" "$BG")"
+check_same "L5-AC5 a far deadline is served from cache" "$(read_count)" "1"
+# ---- TOOL-aLightenedLoop-6: the margin's boundary, with Date.now pinned to one second T and a 3 s
+# ---- bound (wait 3), so the hit test `T + 3 + 1 <= deadline` is exact. Stale-bound 3 stores
+# ---- deadline T + 3, a miss; stale-bound 4 stores T + 4, a hit. RED when the `+ 1` is dropped
+# ---- (the inside arm counts 1) or the margin widens (the on-margin arm counts 2).
+# run_pinned_read <T> — one readLiveness call through the export with Date.now pinned to T seconds.
+run_pinned_read() {
+  STOP_GUARD_LIVENESS_BOUND_MS=3000 node -e 'const m=require(process.argv[1]);const t=Number(process.argv[4]);Date.now=()=>t*1000;m.readLiveness(process.argv[2],{root:process.argv[3],gitDir:process.argv[3]+"/.git"},{slug:"fx",record:"memory/builds/fx/RUN.md"},"pinned-session")' \
+    "$(resolve_native "$HOOK")" "$(resolve_native "$KIT")" "$(resolve_native "$F")" "$1"
+}
+T=$(date +%s)
+F=$(build_gitfixture); set_live_clock 0 3
+run_pinned_read "$T"
+[ -f "$F/$CACHE_REL" ] && print_ok "L5-AC5 the inside-margin LIVE was stored" || print_bad "L5-AC5 the inside-margin LIVE was not stored"
+run_pinned_read "$T"
+check_same "L5-AC5 a deadline inside the wait+1 margin spawns the driver again" "$(read_count)" "2"
+F=$(build_gitfixture); set_live_clock 0 4
+run_pinned_read "$T"; run_pinned_read "$T"
+check_same "L5-AC5 a deadline on the wait+1 margin is served from cache" "$(read_count)" "1"
+
+# ---- L5-AC6: what is never stored — STALE, a non-zero exit, no verdict line, a LIVE without digit
+# ---- clock lines. RED when the store admits STALE.
+# test_nostore <label> [rc] — two stops on a fresh fixture over the stub's current output.
+test_nostore() {
+  F=$(build_gitfixture)
+  STOP_GUARD_TEST_LIVENESS_RC=${2:-0} run_hook "$(build_payload "$F" "$BG")"
+  [ ! -e "$F/$CACHE_REL" ] && print_ok "L5-AC6 $1 writes no liveness.fx.json" || print_bad "L5-AC6 $1 wrote $F/$CACHE_REL"
+  STOP_GUARD_TEST_LIVENESS_RC=${2:-0} run_hook "$(build_payload "$F" "$BG")"
+  check_same "L5-AC6 $1 spawns the driver on the second stop" "$(read_count)" "2"
+}
+printf 'phase: BUILDING\nstate: live\nverdict: STALE\nlast-move: 0\nstale-bound: 3600\n' > "$STOP_GUARD_TEST_LIVENESS"; test_nostore STALE
+set_live_clock 0 3600; test_nostore "a non-zero exit" 1
+printf 'phase: BUILDING\nstate: live\n' > "$STOP_GUARD_TEST_LIVENESS"; test_nostore "no verdict line"
+set_live_clock unknown 3600; test_nostore "LIVE without a digit last-move"
+set_live_clock 0 unknown; test_nostore "LIVE without a digit stale-bound"
+
+# ---- L5-AC7: a torn cache file, and a cache path that cannot hold the file, each stop exactly as a
+# ---- run with no cache: stdout, exit code, stderr and the sidecar line but its utc, by cmp. RED when
+# ---- a parse error escapes readLiveness, so main's fail-open catch exits with no sidecar line.
+# write_capture <prefix> — the last run_hook's four outputs, as files cmp can compare.
+write_capture() {
+  printf '%s' "$OUT" > "$1.out"; printf '%s' "$RC" > "$1.rc"; printf '%s' "$ERR" > "$1.err"
+  derive_sidecar "$F" >/dev/null
+  "$TESTPY" -c 'import json,sys
+ls=[json.loads(l) for l in open(sys.argv[1],encoding="utf-8").read().splitlines() if l.strip()]
+[l.pop("utc") for l in ls]
+print(json.dumps(ls))' "$_sidecar" > "$1.line" 2>&1
+}
+set_live_clock 0 3600
+F=$(build_gitfixture); STOP_GUARD_LIVENESS_CACHE=off run_hook "$(build_payload "$F")"; write_capture "$TMP/nocache"
+F=$(build_gitfixture); mkdir -p "$F/.git/unattended"; printf '{"key":' > "$F/$CACHE_REL"
+run_hook "$(build_payload "$F")"; write_capture "$TMP/torn"
+F=$(build_gitfixture); mkdir -p "$F/$CACHE_REL"
+run_hook "$(build_payload "$F")"; write_capture "$TMP/unholdable"
+for K in out rc err line; do
+  cmp -s "$TMP/torn.$K" "$TMP/nocache.$K" && print_ok "L5-AC7 a torn cache file: the $K equals a run with no cache" || print_bad "L5-AC7 a torn cache file: the $K differs"
+  cmp -s "$TMP/unholdable.$K" "$TMP/nocache.$K" && print_ok "L5-AC7 an unholdable cache path: the $K equals a run with no cache" || print_bad "L5-AC7 an unholdable cache path: the $K differs"
+done
+check_hit "$(<"$TMP/nocache.line")" '"reason": "run-open"' "L5-AC7 the no-cache capture holds its sidecar line"
+
+# ---- L5-AC8: the stub fixture, whose `.git` holds only HEAD, nested inside a repository: the key is
+# ---- null and nothing is stored. RED when show-ref runs without --git-dir and resolves the outer repo.
+O="$TMP/outer"; mkdir -p "$O"; F="$O"; run_fxgit init -q; run_fxgit commit -q --allow-empty -m outer
+F=$(build_fixture BUILDING "$SID"); mv "$F" "$O/"; F="$O/${F##*/}"; set_live_clock 0 3600
+check_same "L5-AC8 deriveLivenessKey is null on a HEAD-only .git" "$(cd "$F" && node -e 'const m=require(process.argv[1]);const r=process.argv[2];console.log(String(m.deriveLivenessKey({root:r,gitDir:r+"/.git"},process.argv[3],"memory/builds/fx/RUN.md","fx","s")))' \
+  "$(resolve_native "$HOOK")" "$(resolve_native "$F")" "$(resolve_native "$KIT")")" "null"
+run_hook "$(build_payload "$F" "$BG")"
+[ ! -e "$F/$CACHE_REL" ] && print_ok "L5-AC8 no liveness.fx.json under a HEAD-only .git" || print_bad "L5-AC8 wrote $F/$CACHE_REL"
+
+# ---- L5-AC11: STOP_GUARD_LIVENESS_CACHE=off is today's spawn on every stop: no file is written, and
+# ---- an existing valid one is neither served nor touched. RED when readLiveness ignores the switch.
+F=$(build_gitfixture); set_live_clock 0 3600
+STOP_GUARD_LIVENESS_CACHE=off run_hook "$(build_payload "$F" "$BG")"
+STOP_GUARD_LIVENESS_CACHE=off run_hook "$(build_payload "$F" "$BG")"
+check_same "L5-AC11 two stops with the switch off spawn twice" "$(read_count)" "2"
+[ ! -e "$F/$CACHE_REL" ] && print_ok "L5-AC11 the switch off writes no liveness.fx.json" || print_bad "L5-AC11 the switch off wrote $F/$CACHE_REL"
+run_hook "$(build_payload "$F" "$BG")"
+cp "$F/$CACHE_REL" "$TMP/cache.before" 2>/dev/null
+STOP_GUARD_LIVENESS_CACHE=off run_hook "$(build_payload "$F" "$BG")"
+check_same "L5-AC11 a valid entry is not served with the switch off" "$(read_count)" "4"
+cmp -s "$F/$CACHE_REL" "$TMP/cache.before" && print_ok "L5-AC11 the switch off leaves the entry's bytes unchanged" || print_bad "L5-AC11 the entry moved or is absent"
+unset STOP_GUARD_TEST_COUNT
+
 # ---- AC11: ONE arm against the REAL driver, on a `git init` fixture seeded by the adopter suite's
 # ---- own seed() — extracted as one function, never the suite — which commits once so HEAD is
 # ---- born and the driver's clock probe is live. The line's verdict is whatever the copied driver's
@@ -677,7 +830,12 @@ n=$((pass+fail))
 # RAISED 116 -> 121 by TOOL-dDerivedDocket-62: the ELSEWHERE arm's 5 assertions beside the HELD arm,
 # COUNTED off its own `check_*` lines, every one unconditional; the pass that wrote it ran no suite,
 # and it was run alone over a replica of this prologue against the hook and a copy without the row.
-FLOOR_ASSERTIONS=121
+# RAISED 121 -> 163 by TOOL-aLightenedLoop-5: the liveness cache's 42 assertions (4 10 3 10 9 2 4),
+# COUNTED off their own `check_*` and `print_*` lines, every one unconditional; the pass that wrote
+# them ran no suite, and the main loop observes the count at the close.
+# RAISED 163 -> 164 by TOOL-aLightenedLoop-6: the near-expiry arm's 2 assertions replaced by the
+# margin's two arms, 3 (2 1), COUNTED off their own lines; the main loop observes it at the close.
+FLOOR_ASSERTIONS=164
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 # THE TRAILER IS UNCONDITIONAL. `run-selftests.sh --pooled` reads a completed run by its trailer

@@ -400,6 +400,7 @@ render_envelope|$ROOT/$KIT_REL/envelope.py|$KIT_REL/envelope
 envelope_sh|$ROOT/$KIT_REL/envelope.sh|$KIT_REL/envelope
 auto_memory|$ROOT/$KIT_REL/auto_memory.py|$KIT_REL/auto_memory
 retired_kits|$ROOT/$KIT_REL/retired_kits.py|$KIT_REL/retired_kits
+read_open_py|$ROOT/$KIT_REL/read_open.py|$KIT_REL/read_open
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -444,6 +445,8 @@ retired_kits|$ROOT/$KIT_REL/retired_kits.py|$KIT_REL/retired_kits
 # retired_kits (PLAY-dOrderedCharter-31 S10) is a target's kit selection read through the registry's
 # `[[retired]]` rows; govkit's selection resolver and the playbook renderer's kit readers each carry it
 # inline, both kits copy-installed, and part 2l below holds the canonical to its behaviour.
+# read_open_py (TOOL-aLightenedLoop-3 S3) is the `open` audit event's read filter: the policy kit's
+# guard trace and the spec-token checker's input record each carry it inline, both copy-installed.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one

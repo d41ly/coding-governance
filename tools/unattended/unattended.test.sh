@@ -2466,6 +2466,7 @@ plan framed over two slugs | : | --plan tRun tNone --framed
 preflight | : | --preflight tRun --keepalive-id k1
 phase | : | --phase tRun BUILDING --witness abc
 audit | : | --audit tRun
+wake | : | --wake tRun --keepalive-id k1
 register-task | : | --register-task tRun --task t --heartbeat /no/such/beat
 release-task | : | --release-task tRun --task t
 liveness | : | --liveness tRun
@@ -7825,9 +7826,9 @@ if [ -f "$STC" ]; then
   # ---- tRun's spec is clean and a second build tOther's live spec names the flagged bar. The cache
   # ---- steps call `run_spec_token_check` in process, because every refusal that writes no row now
   # ---- precedes the check (TOOL-aSwiftRefusal-1), so no row is written and the tree does not move
-  # ---- between them; step a's glob dispatch is kept for its glob assertions. The first call re-runs
-  # ---- the checker (the declared dispatch moved the run-state file) and records the key, the second
-  # ---- reads it. The run-gates fingerprint is copied where the driver resolves it, or the cache is announced off. RED-first:
+  # ---- between them; step a's glob dispatch is kept for its glob assertions. Under the key over
+  # ---- what the checker read (TOOL-aLightenedLoop-3), both calls read the key the declared dispatch
+  # ---- recorded. The run-gates fingerprint is copied where the driver resolves it, or the cache is announced off. RED-first:
   # ---- the inline block refused the first dispatch with check 49 and ran the checker on both calls.
   sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI="'"${PFX}check-spec-tokens.py"'"|' .unattended.conf
   printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md
@@ -7841,6 +7842,7 @@ if [ -f "$STC" ]; then
   o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
   hit "$o" "the spec-token checker reds only in other builds' specs, which the bar's whole-tree leg still grades, so this dispatch is admitted: 1 hit(s), first: spec-tokens: memory/builds/tOther/"
   hit "$o" "dispatch declared"
+  miss "$o" "spec-token cache off"
   # ---- TOOL-aSmoothedDispatch-8 S4: each call that must RE-RUN the checker asserts the admit note AND
   # ---- no skip line, so a key that leaves out a part reds the step that moves only that part.
   sd_admit="the spec-token checker reds only in other builds' specs, which the bar's whole-tree leg still grades, so this dispatch is admitted"
@@ -7848,32 +7850,36 @@ if [ -f "$STC" ]; then
   sd_spec=memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md
   sd_clean=$(cat "$sd_spec"); sd_bar='AC1 `GATE_SELFTESTS=1 bash run-gates.sh` is green.'
   sd_red=${sd_clean/'AC1 observable.'/$sd_bar}
-  # TOOL-aSmoothedDispatch-8 AC4 step a: call 1's declared row moved the run-state file, so only $fp moved.
+  # TOOL-aSmoothedDispatch-8 AC4 step a, INVERTED by TOOL-aLightenedLoop-3 AC8: call 1's declared row
+  # moved the run-state file, which only the packet join reads and only for a chain run with a packet,
+  # so it moves the fingerprint and not the key, and this call SKIPS the check call 1 admitted.
   o=$( ( load_driver_conf && run_spec_token_check tRun ) 2>&1 )
-  hit "$o" "$sd_admit"
-  miss "$o" "spec-token check skipped"
+  hit "$o" "spec-token check skipped: its inputs match the check last admitted for tRun"
+  miss "$o" "spec-tokens: "
   hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")" "--dispatch was given a --writes path carrying a glob metacharacter"
   o=$( ( load_driver_conf && run_spec_token_check tRun ) 2>&1 )
   hit "$o" "spec-token check skipped: its inputs match the check last admitted for tRun"
   miss "$o" "spec-tokens: "
   hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes "${PFX}*.sh")" "--dispatch was given a --writes path carrying a glob metacharacter"
-  # TOOL-aSmoothedDispatch-8 AC4 step b: an edited tracked file moves the fingerprint.
+  # TOOL-aSmoothedDispatch-8 AC4 step b, INVERTED by TOOL-aLightenedLoop-3 AC8: an edited tracked file
+  # the checker never reads moves the fingerprint and not the key, which is a digest over what the
+  # checker's last admitted run read, so the call SKIPS and the checker prints nothing.
   printf '\n' >> memory/builds/tRun/README.md
   o=$( ( load_driver_conf && run_spec_token_check tRun ) 2>&1 )
-  hit "$o" "$sd_admit"
-  miss "$o" "spec-token check skipped"
-  # TOOL-aSmoothedDispatch-8 AC4 step c: an empty commit moves HEAD and nothing the fingerprint reads.
-  # `--only` with no path commits HEAD's own tree: a bare --allow-empty would commit the staged specs,
-  # which moves HEAD^{tree} and the porcelain, so the step would re-run with $hd dropped too.
+  hit "$o" "spec-token check skipped: its inputs match the check last admitted for tRun"
+  miss "$o" "spec-tokens: "
+  # TOOL-aSmoothedDispatch-8 AC4 step c, INVERTED by TOOL-aLightenedLoop-3 AC8: an empty commit moves
+  # HEAD, and HEAD is out of the key, so the call SKIPS. `--only` with no path commits HEAD's own tree:
+  # a bare --allow-empty would commit the staged specs, which the checker does read.
   git commit -q --allow-empty --only -m "sd8 empty" --no-verify
   o=$( ( load_driver_conf && run_spec_token_check tRun ) 2>&1 )
-  hit "$o" "$sd_admit"
-  miss "$o" "spec-token check skipped"
+  hit "$o" "spec-token check skipped: its inputs match the check last admitted for tRun"
+  miss "$o" "spec-tokens: "
   git reset -q --soft HEAD~1
   git checkout -q -- memory/builds/tRun/README.md
   # TOOL-aSmoothedDispatch-8 AC4 step d: a second slug over the tree tRun's record was just written for.
-  # The tRun call re-records at this HEAD, or step c's record would miss on HEAD alone. In process,
-  # because a --dispatch tOther needs a run-state file, a chain and a spec of its own.
+  # The tRun call is kept from the HEAD-keyed cut, where it re-recorded at this HEAD; it now skips. In
+  # process, because a --dispatch tOther needs a run-state file, a chain and a spec of its own.
   ( load_driver_conf && run_spec_token_check tRun ) >/dev/null 2>&1
   o=$( ( load_driver_conf && run_spec_token_check tOther ) 2>&1 )
   hit "$o" "$sd_refuse"
@@ -7888,6 +7894,40 @@ if [ -f "$STC" ]; then
   hit "$o" "$sd_refuse"
   miss "$o" "spec-token check skipped"
   printf '%s\n' "$sd_clean" > "$sd_spec"
+  # TOOL-aLightenedLoop-3 AC9: a checker that edits a tracked file while it runs is admitted and its key
+  # is NOT recorded, and one that writes no input record is admitted twice with the line naming that.
+  # Both are stubs declared for their calls alone. The moving one loads the real checker module, so
+  # the module-level tracer arms and writes a real record, and only the tree's movement withholds it.
+  printf 'import importlib.util\ns = importlib.util.spec_from_file_location("cst", "%scheck-spec-tokens.py")\nm = importlib.util.module_from_spec(s); s.loader.exec_module(m)\nopen("memory/builds/tRun/README.md", "a").write("moved\\n")\n' "$PFX" > ${PFX}stub-moved.py
+  printf 'import sys\nsys.exit(0)\n' > ${PFX}stub-quiet.py
+  o=$( ( load_driver_conf && SPEC_TOKENS_CLI="${PFX}stub-moved.py" run_spec_token_check tRun ) 2>&1 )
+  hit "$o" "spec-token cache not recorded: the tree or HEAD moved while the checker ran, so the next dispatch runs the checker"
+  miss "$o" "spec-token check skipped"
+  git checkout -q -- memory/builds/tRun/README.md
+  o=$( ( load_driver_conf && SPEC_TOKENS_CLI="${PFX}stub-quiet.py" run_spec_token_check tRun ) 2>&1 )
+  hit "$o" "spec-token cache not recorded: the checker wrote no input record, so the next dispatch runs the checker"
+  o=$( ( load_driver_conf && SPEC_TOKENS_CLI="${PFX}stub-quiet.py" run_spec_token_check tRun ) 2>&1 )
+  hit "$o" "spec-token cache not recorded: the checker wrote no input record"
+  miss "$o" "spec-token check skipped"
+  # TOOL-aLightenedLoop-6 AC3: a stub whose `--input-key` call edits a tracked file before it answers
+  # through the real checker's `main`, so the tree moves during the REPLAY and not the run. RED when
+  # `derive_spec_token_key` runs after the second `read_tree_state`: the key is recorded, no line prints.
+  # The key file is removed first, so the lookup does not call the stub and the run itself writes the record.
+  printf 'import importlib.util, sys\nif "--input-key" in sys.argv:\n    open("memory/builds/tRun/README.md", "a", encoding="utf-8").write("raced\\n")\ns = importlib.util.spec_from_file_location("cst", "%scheck-spec-tokens.py")\nm = importlib.util.module_from_spec(s); s.loader.exec_module(m)\nsys.exit(m.main(sys.argv[1:]) if "--input-key" in sys.argv else 0)\n' "$PFX" > ${PFX}stub-raced.py
+  rm -f .git/unattended/spec-tokens.tRun.key
+  o=$( ( load_driver_conf && SPEC_TOKENS_CLI="${PFX}stub-raced.py" run_spec_token_check tRun ) 2>&1 )
+  hit "$o" "spec-token cache not recorded: the tree or HEAD moved while the checker ran, so the next dispatch runs the checker"
+  same "a tree moved during the replay records no spec-token key" "$([ -f .git/unattended/spec-tokens.tRun.key ] && echo written || echo none)" none
+  git checkout -q -- memory/builds/tRun/README.md
+  # TOOL-aLightenedLoop-6 AC12: a record line no replay can repeat. The stub writes a `popen` line to
+  # the record and exits 0, and answers `--input-key` through the real checker's `main`, which exits 1
+  # on it. RED when the replay branch is collapsed into the record branch.
+  printf 'import importlib.util, os, sys\nif "--input-key" in sys.argv:\n    s = importlib.util.spec_from_file_location("cst", "%scheck-spec-tokens.py")\n    m = importlib.util.module_from_spec(s); s.loader.exec_module(m)\n    sys.exit(m.main(sys.argv[1:]))\nopen(os.environ["SPEC_TOKENS_INPUTS"], "w", encoding="utf-8").write(%s)\n' "$PFX" "'{\"kind\":\"popen\",\"argv\":[\"x\"]}\\n'" > ${PFX}stub-popen.py
+  rm -f .git/unattended/spec-tokens.tRun.key
+  o=$( ( load_driver_conf && SPEC_TOKENS_CLI="${PFX}stub-popen.py" run_spec_token_check tRun ) 2>&1 )
+  hit "$o" "spec-token cache not recorded: the input record cannot be replayed, so the next dispatch runs the checker"
+  same "a record that cannot be replayed records no spec-token key" "$([ -f .git/unattended/spec-tokens.tRun.key ] && echo written || echo none)" none
+  rm -f ${PFX}stub-moved.py ${PFX}stub-quiet.py ${PFX}stub-raced.py ${PFX}stub-popen.py
   # TOOL-aSmoothedDispatch-8 AC4 step f: no fingerprint, no key: the cache is off on both calls.
   rm -f .git/unattended/spec-tokens.tRun.key "./${PFX}$_sd_home/gate-fingerprint.sh"
   o=$( ( load_driver_conf && run_spec_token_check tRun ) 2>&1 )
@@ -9833,6 +9873,92 @@ mkconf
 mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: LANDED/'
 hit "$(run --register-task tRun --task leg-c --heartbeat "$TK_BEAT")" "the run is already finished and a finished record is not something to move, re-open or re-pin"
 rm -rf "$TK_REG" "$TK_DIR"
+reset_tree
+
+# ---- TOOL-aLightenedLoop-2: `--wake`, the idle-wake's first act. One line, HEALTHY or FULL with the
+# ---- first reason that holds, then the open-task count and the cadence due. Each arm starts from
+# ---- `build_audit_fixture`, whose preflight leased k1 to the prologue's session and pid, and
+# ---- registers one task beating outside the scratch repo, so its file is no untracked path the tree
+# ---- clock stats. Against the 846d51d39 driver `--wake` is check 14's unknown argument.
+build_wake_fixture() { # reset, preflight, one fresh registered task
+  build_audit_fixture
+  WK_REG="$(git rev-parse --git-dir)/unattended/tasks.tRun.tsv"; rm -rf "$WK_REG"
+  printf 'KEEPALIVE_INTERVAL="every 10 minutes"\n' >> .unattended.conf
+  echo beat > "$WK_DIR/wkbeat.txt"
+  run --register-task tRun --task wf --heartbeat "$WK_DIR/wkbeat.txt" >/dev/null
+}
+WK_DIR=$(mktemp -d)
+# AC1 — a leased holder record with a fresh task reads HEALTHY, and nothing is written.
+build_wake_fixture
+wk_h=$(git hash-object memory/builds/tRun/RUN.md); wk_s=$(git status --porcelain)
+out=$(run --wake tRun --keepalive-id k1); rc=$?
+same "wake AC1 a healthy record exits 0" "$rc" "0"
+same "wake AC1 the one line" "$out" "unattended-wake: tRun · HEALTHY · tasks 1 open · cadence every 10 minutes"
+same "wake AC1 the record's hash is unchanged" "$(git hash-object memory/builds/tRun/RUN.md)" "$wk_h"
+same "wake AC1 the tree is unchanged" "$(git status --porcelain)" "$wk_s"
+hit "$(run --wake tRun)" "--wake requires --keepalive-id, because the verb's row in VERB_REQUIRES lists it"
+# AC2 — each staged break reads FULL with its reason. `check_wake_full` resets, applies the break, then reads.
+check_wake_full() { # reason · keepalive id · break command...
+  local why="$1" kid="$2"; shift 2
+  build_wake_fixture
+  "$@"
+  out=$(run --wake tRun --keepalive-id "$kid"); rc=$?
+  same "wake AC2 $why exits 0" "$rc" "0"
+  hit "$out" "unattended-wake: tRun · FULL · $why · tasks 1 open · "
+}
+check_wake_full "phase HELD" k1 mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: HELD/'
+check_wake_full abandoned k1 mutate memory/builds/tRun/RUN.md 's/^\(phase: .*\)/\1\nabandoned: x/'
+check_wake_full "asks moved" k1 mutate memory/builds/tRun/RUN.md 's/^\(phase: .*\)/\1\nasks: X-1/'
+check_wake_full worktree k1 mutate memory/builds/tRun/RUN.md 's|^run-branch: .*|run-branch: refs/heads/other|'
+check_wake_full holder k2 true
+check_wake_full lease k1 mutate memory/builds/tRun/RUN.md 's/^pid: .*/pid: 999/'
+# A second remote is check 24 inside the claim read, so the read fails without reaching the network.
+# The fixture's own bare origin answers the read, and with no claim of this lease on it a write is
+# due, so `claim` holds whatever an earlier arm left there.
+set_wake_claims_on() { printf 'RUN_CLAIMS="on"\n' >> .unattended.conf; }
+set_wake_claims_off() { set_wake_claims_on; git remote add wk-second /no/such/remote; }
+check_wake_full "claims unread" k1 set_wake_claims_off
+git remote remove wk-second 2>/dev/null
+check_wake_full claim k1 set_wake_claims_on
+set_wake_age() { mkconf "true" "true" "" "3600" "" "60"; printf 'KEEPALIVE_INTERVAL="every 10 minutes"\n' >> .unattended.conf
+  git add -A && GIT_COMMITTER_DATE="$(( $(date -u +%s) - 3600 )) +0000" git commit -q -m "fixture: age the clocks" --no-verify; }
+check_wake_full "tree idle" k1 set_wake_age
+set_wake_stale() { mkconf "true" "true" "" "3600" "" "1800" "7" "5400" "" "1800" "6" "60"
+  printf 'KEEPALIVE_INTERVAL="every 10 minutes"\n' >> .unattended.conf; touch -d "@$(( $(date -u +%s) - 3600 ))" "$WK_DIR/wkbeat.txt"; }
+check_wake_full "task stalled" k1 set_wake_stale
+# TOOL-aLightenedLoop-6 AC7 — the phase case's three alternatives, each RED with its own alternative
+# deleted from `print_wake`'s phase case.
+check_wake_full "phase absent" k1 mutate memory/builds/tRun/RUN.md '/^phase: /d'
+check_wake_full "phase LANDING" k1 mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: LANDING/'
+check_wake_full "phase LANDED" k1 mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: LANDED/'
+# TOOL-aLightenedLoop-6 AC8 and AC9 — the two probes, written out rather than passed to
+# `check_wake_full`, so the stub `date` is first on PATH for the one `--wake` call alone. AC8's stub
+# exits 1 on every call, RED with the TC_DEAD branch deleted; AC9's exits 1 on `-d` and runs the real
+# `date` otherwise, over a task with no heartbeat file, RED with the TA_DEAD branch deleted.
+WK_DATE=$(command -v date); WK_STUB="$WK_DIR/dstub"; mkdir -p "$WK_STUB"
+build_wake_fixture
+printf '#!/bin/sh\nexit 1\n' > "$WK_STUB/date"; chmod +x "$WK_STUB/date"
+out=$(PATH="$WK_STUB:$PATH" bash "$SCRIPT" --wake tRun --keepalive-id k1 2>&1); rc=$?
+same "wake AC8 clock probe exits 0" "$rc" "0"
+hit "$out" "unattended-wake: tRun · FULL · clock probe · tasks 1 open · "
+build_wake_fixture
+rm -f "$WK_DIR/wkbeat.txt"
+printf '#!/bin/sh\nfor a in "$@"; do [ "$a" = -d ] && exit 1; done\nexec "%s" "$@"\n' "$WK_DATE" > "$WK_STUB/date"; chmod +x "$WK_STUB/date"
+out=$(PATH="$WK_STUB:$PATH" bash "$SCRIPT" --wake tRun --keepalive-id k1 2>&1); rc=$?
+same "wake AC9 task probe exits 0" "$rc" "0"
+hit "$out" "unattended-wake: tRun · FULL · task probe · tasks unknown open · "
+# AC3 — the cadence is KEEPALIVE_INTERVAL whatever the registry holds, and `undeclared` when that is
+# blank; TOOL-aLightenedLoop-7 retired the tracked cadence.
+build_wake_fixture
+hit "$(run --wake tRun --keepalive-id k1)" "· tasks 1 open · cadence every 10 minutes"
+run --release-task tRun --task wf >/dev/null
+hit "$(run --wake tRun --keepalive-id k1)" "· tasks 0 open · cadence every 10 minutes"
+build_wake_fixture
+printf 'KEEPALIVE_INTERVAL=""\n' >> .unattended.conf
+hit "$(run --wake tRun --keepalive-id k1)" "· tasks 1 open · cadence undeclared"
+run --release-task tRun --task wf >/dev/null
+hit "$(run --wake tRun --keepalive-id k1)" "· tasks 0 open · cadence undeclared"
+rm -rf "$WK_REG" "$WK_DIR"
 reset_tree
 
 # ---- TOOL-aWokenSentinel-1: the LEASE. `--preflight` records `session:` and `pid:` beside the
@@ -16576,6 +16702,8 @@ init_pl_fixture
 printf 'PROCMON_CMD=""\n' >> "$pl_dir/.unattended.conf"
 run_pl_git add -A >/dev/null; run_pl_git commit -q -m blank-reaper --no-verify
 write_pl_orphan 47
+# TOOL-aLightenedLoop-2 AC2 — the holder's `--wake` reads the orphan the reap below acts on as FULL.
+hit  "$(run_pl --wake tRun --keepalive-id k1)" "unattended-wake: tRun · FULL · orphans · "
 out=$(run_pl --resume tRun --keepalive-id k1)
 hit  "$out" "unattended: reaping is OFF because PROCMON_CMD is blank, so 1 orphan(s) of tRun are counted and left running: $PL_ORPH"
 hit  "$out" "· orphans 1"
@@ -19634,7 +19762,15 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # five `hit`/`miss` lines and the M3 block's two `mutate`s and three `same`/`miss`/`hit` lines, every one
 # unconditional, counted off the blocks' own lines; no suite ran, and their RED-first observation is the close's.
 # MERGED at TOOL-aSmoothedDispatch-21's reconcile: the base 3256, plus 42, plus 31 = 3329.
-FLOOR_ASSERTIONS=3329
+# RAISED 3329 -> 3334 by TOOL-aLightenedLoop-3: 5 region-three spec-token cache assertions (3 `hit`,
+# 2 `miss`) for the moved-tree and untraced-checker calls; steps b and c are inverted at 2 each, net 0,
+# so FLOOR_SHARD_3 carries the same 5. COUNTED off the block's own lines; no suite ran, and their
+# RED-first observation is the close's.
+# MERGED at TOOL-aLightenedLoop-8's reconcile of origin/main: the base 3329 at 846d51d39, plus main's
+# 0 (TOOL-aBriskDeclaration-1 raised no floor), plus this branch's 5 (TOOL-aLightenedLoop-3) = 3334.
+# RAISED 3334 -> 3335 by TOOL-aLightenedLoop-8: one region-three `miss`, no cache-off line on a first
+# admitted dispatch, so FLOOR_SHARD_3 carries the same 1. Counted off the line; OWED: observed at the close.
+FLOOR_ASSERTIONS=3335
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -19845,7 +19981,10 @@ FLOOR_SHARD_2=229
 # RAISED 411 -> 434 by TOOL-aSmoothedDispatch-8 on 2026-11-10: the same 23 region-three spec-token assertions, see FLOOR_ASSERTIONS.
 # RAISED 405 -> 416 by TOOL-aSwiftRefusal-4: the same 11 region-three spec-token arm and L1 assertions, see FLOOR_ASSERTIONS.
 # MERGED at TOOL-aSmoothedDispatch-21's reconcile: the base 405, plus 29, plus 11 = 445.
-FLOOR_SHARD_3=445
+# RAISED 445 -> 450 by TOOL-aLightenedLoop-3: the same 5 region-three spec-token cache assertions, see FLOOR_ASSERTIONS.
+# MERGED at TOOL-aLightenedLoop-8's reconcile: the base 445, plus main's 0, plus this branch's 5 = 450.
+# RAISED 450 -> 451 by TOOL-aLightenedLoop-8: the same 1 region-three assertion, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_3=451
 # RAISED 373 -> 382 by TOOL-dGroundRules-66: the same 9 region-four terminal-unit assertions, see FLOOR_ASSERTIONS.
 # RAISED 382 -> 383 by TOOL-dGroundRules-70: the same 1 region-four reader assertion, see FLOOR_ASSERTIONS.
 # RAISED 383 -> 386 by TOOL-aSmoothedDispatch-1 on 2026-11-10: the same net 3 region-four --writes split assertions, see FLOOR_ASSERTIONS.
