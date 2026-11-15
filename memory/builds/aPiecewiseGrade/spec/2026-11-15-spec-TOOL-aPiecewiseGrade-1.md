@@ -1,6 +1,6 @@
 # TOOL-aPiecewiseGrade-1 — the spec-token checker's incremental mode: each live spec's findings cached on its own inputs, every join rebuilt whole
 
-**Status:** SPECCED · rev-1 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 2 · ratified 2026-11-15
 
 <!-- gen:spec-records -->
 
@@ -17,8 +17,9 @@
 When `SPEC_TOKENS_CACHE` names a directory, the whole-tree spec-token checker reuses each live
 spec's raw findings while that spec's own inputs hold, re-grades the rest, and runs every
 cross-spec join whole over the full finding set. Its stdout, stderr and exit status equal the plain
-run's on every tree. The first finding in §4 says this saves little once one call overhead is
-gone, so F1 asks the owner whether to build it.
+run's on every tree. It builds on TOOL-aPiecewiseGrade-3, which removes the call overhead the first
+finding in §4 names, so it saves about 1 s of about 69 s (DERIVED d9f84ee14). The owner chose to build
+both (F1).
 
 ## 2. Scope (IN)
 
@@ -53,14 +54,15 @@ gone, so F1 asks the owner whether to build it.
   for the reasons in §4.
 - No change to `--spec`, `--pass-spec`, `--legs-for`, `--input-key` or `--list` behaviour. The mode
   is off under the first four.
-- No removal of the `load_kit_module` overhead the first finding names. That is F1's option (b),
-  and it would be its own unit.
+- No removal of the `load_kit_module` overhead the first finding names. That is
+  TOOL-aPiecewiseGrade-3's, built first.
 - No driver change: unit 2 sets the variable and promotes the next generation.
 - No kit version bump by hand. The lander's mint moves `KIT_SPEC_TOKENS_VERSION`.
 
 ### Edges
 
-- **hands-off** `TOOL-aPiecewiseGrade-2` — setting `SPEC_TOKENS_CACHE` on the dispatch's checker call, and promoting `<dir>.next` to `<dir>` only where the whole key is recorded
+- **consumes-from** `TOOL-aPiecewiseGrade-3` — `load_design_lib` answering from one load per process, which `scan_live_spec` keeps calling; without it every miss pays the per-call kit resolution. That unit builds at order 1, this one at order 2
+- **hands-off** `TOOL-aPiecewiseGrade-2` — setting `SPEC_TOKENS_CACHE` on the dispatch's checker call, and promoting `<dir>.next` to `<dir>` only where the whole key is recorded. That unit builds at order 3, after this one
 - **consumes-from** external — aLightenedLoop landed and reconciled onto main: the tracer, `read_open_py`, `--input-key` and `SPEC_TOKENS_INPUTS` this unit extends
 
 ## 4. Design
@@ -91,13 +93,13 @@ As the code stands at `d9f84ee14`, the joins are 40% of the run and the per-spec
 resolves two paths through `Path.resolve`, at `tools/check-spec-tokens.py@6763260c:1097` and
 `tools/check-spec-tokens.py@6763260c:1099`, about 1.4 ms per call on Windows (PINNED d9f84ee14).
 
-Binding that function once per run would remove about 98 s, DERIVED from d9f84ee14's table, from
-every caller: `--dispatch`, the bar's leg and `--spec` alike. Nothing would be cached. The plain run
-would then take about 69 s, of which the joins are about 96%, both DERIVED from d9f84ee14's table.
-The per-spec grading this unit caches is about 1 s of that (PINNED d9f84ee14). So the brief's
-condition holds once the overhead is gone: the joins cost most of the run, and the incremental
-mode, which must run every join whole, can save at most that second (PINNED d9f84ee14). As briefed,
-the build would earn its keep only while the overhead stays in place. F1 asks the owner. The remaining cost is the carries join's history read,
+TOOL-aPiecewiseGrade-3 binds that function once per process, at order 1, and so removes about 98 s,
+DERIVED from d9f84ee14's table, from every caller: `--dispatch`, the bar's leg and `--spec` alike.
+The plain run then takes about 69 s, of which the joins are about 96%, both DERIVED from d9f84ee14's
+table. The per-spec grading this unit caches is about 1 s of that (PINNED d9f84ee14). So on the tree
+this unit builds against, the joins cost most of the run, and the incremental mode, which must run
+every join whole, saves at most that second (PINNED d9f84ee14). The owner chose to build both (F1).
+The remaining cost is the carries join's history read,
 `read_spec_revisions` (`tools/memory-tree/design_lib.py@82906599:661`), with one `git log` and one
 `git cat-file --batch` over 1536 chain specs (PINNED d9f84ee14). Only a cache keyed on that join's
 own inputs could cut it, which is a different mechanism.
@@ -409,7 +411,7 @@ place, not minted. No conf key, no check number and no refusal line is minted.
 ### Rollout
 
 This unit builds after aLightenedLoop lands and this build reconciles onto it, against the
-reconciled checker. Every line cited above moves, so the builder finds each site by its text.
+reconciled checker, and after TOOL-aPiecewiseGrade-3. Every line cited above moves, so the builder finds each site by its text.
 `FLOOR_ASSERTIONS` in the spec-tokens self-test rises by the new assertions, which the close
 confirms from a real run. The mode is dark until unit 2 sets the variable.
 
@@ -422,7 +424,7 @@ confirms from a real run. The mode is dark until unit 2 sets the variable.
 ### Alternatives rejected
 
 - **Hoisting the overhead instead.** It is the better buy by the first finding, and a different
-  mechanism. F1 holds it for the owner.
+  mechanism. The owner chose both (F1), so TOOL-aPiecewiseGrade-3 hoists it first.
 - **Keying each spec on the whole `git ls-files` answer.** Every pass commit adds a record, so every
   spec would re-grade every time. Membership lines key a spec only on the paths its grading asked
   about.
@@ -449,9 +451,9 @@ confirms from a real run. The mode is dark until unit 2 sets the variable.
   replay reads and hashes files and answers membership, and runs no process. A forged entry can
   only hide findings from a dispatch, and the bar's plain run still grades them.
 - perf / scale — a hit costs one hash per recorded file and a dictionary lookup per member line. A
-  miss costs today's per-spec grading: per spec on node `a`, PINNED d9f84ee14, about 3.3 s while
-  the overhead stands and about 34 ms after it, DERIVED from d9f84ee14's table. The joins' about 66 s is unchanged
-  (PINNED d9f84ee14).
+  miss costs the per-spec grading on the tree after TOOL-aPiecewiseGrade-3: about 34 ms per spec on
+  node `a`, DERIVED from d9f84ee14's table. The joins' about 66 s is unchanged (PINNED d9f84ee14), so
+  a whole-tree run stays near 69 s (DERIVED d9f84ee14).
 - error / empty / loading states — an absent, unreadable or corrupt entry is a miss. A write failure
   costs that entry. The mode prints nothing in any case.
 - observability — `graded.list` names every re-graded spec of the run.
@@ -473,7 +475,7 @@ pass.
   `python tools/check-spec-tokens.py`.
   Red when: the extraction drops, reorders or re-spells a hit, a near-miss or a counter.
   permission: the whole-tree run over the real tree is the main loop's.
-  cost: two whole-tree runs, about 150 s each on node `a`. <!-- PINNED d9f84ee14 -->
+  cost: two whole-tree runs, about 69 s each on node `a` after TOOL-aPiecewiseGrade-3. <!-- DERIVED from d9f84ee14's table -->
 - **AC2** — When `bash "$SCRATCH/pg1.sh"` runs, every `step` line it prints reads `same 1`, and the
   `closed`, `retired`, `carries`, `packet`, `isfile`, `cited`, `kit` and `cutoff` lines also read
   `moved 1`.
@@ -529,12 +531,17 @@ the spec-token checker's `--spec` over this file and the positional check.
   Recommendation: (b). It cuts the same seconds from every caller with a few lines and no new
   surface, and the incremental mode cannot reach the cost that is left. (a) is the feature-rich
   survivor only if the owner wants `--dispatch` faster without touching the guards join.
+  RESOLVED (owner, 2026-11-15): (c) Both
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-15 · initial draft from brief `2026-11-15-prompt-TOOL-aPiecewiseGrade-1-brief`,
   grounded at `aebbb4a72` and at aLightenedLoop's head `d9f84ee14`, and measured there on node `a`.
   The measurement is §4's first finding and F1.
+- rev-2 · 2026-11-15 · §1 · §3 · §4 · §5 · AC1 · §8 · from brief
+  `2026-11-15-prompt-TOOL-aPiecewiseGrade-3-forks-brief`, item 3: F1 RESOLVED as the owner's (c),
+  order 1 to 2 with the ratified pointer, a consumes-from edge on TOOL-aPiecewiseGrade-3, and the gain, cost and non-goal
+  statements read against the tree after that unit.
 
 ## 10. Reuse audit
 

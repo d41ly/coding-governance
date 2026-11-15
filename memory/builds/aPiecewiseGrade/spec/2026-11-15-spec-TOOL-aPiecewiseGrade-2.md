@@ -1,6 +1,6 @@
 # TOOL-aPiecewiseGrade-2 — `run_spec_token_check` runs the checker's incremental mode on a whole-key miss, and promotes its per-spec cache only where the whole key is recorded
 
-**Status:** SPECCED · rev-1 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 3 · ratified 2026-11-15
 
 <!-- gen:spec-records -->
 
@@ -17,14 +17,16 @@ When aLightenedLoop's whole key misses, `--dispatch` runs the spec-token checker
 `SPEC_TOKENS_CACHE` naming a per-slug directory under the sidecar root. A pass commit that moves one
 spec then re-grades that spec alone, and every join still runs whole. The driver promotes the
 checker's next generation only where it records the whole key, so the per-spec cache holds only
-what a still tree produced. Not one printed byte of `--dispatch` moves. This unit builds only if F1
-of TOOL-aPiecewiseGrade-1 keeps the incremental mode.
+what a still tree produced. Not one printed byte of `--dispatch` moves. This unit builds third, after
+TOOL-aPiecewiseGrade-3 and TOOL-aPiecewiseGrade-1, because the owner kept the incremental mode at
+TOOL-aPiecewiseGrade-1's F1.
 
 ## 2. Scope (IN)
 
 - **S1** — Every checker call that `run_spec_token_check`'s two halves make with
   `SPEC_TOKENS_INPUTS` set also sets `SPEC_TOKENS_CACHE` to `spec-tokens.<slug>.specs` under the
-  sidecar root, or to nothing when the sidecar root does not resolve. Observed by AC1 and AC2.
+  sidecar root, or to nothing when the sidecar root does not resolve. The cache is one per slug,
+  its only layout (F1). Observed by AC1 and AC2.
 - **S2** — Where the driver writes the whole key, it then promotes `<dir>.next`, when it exists,
   into the per-slug directory's place, with the two commands §4 shows. No other branch promotes.
   Observed by AC1, AC2 and AC3.
@@ -49,7 +51,7 @@ of TOOL-aPiecewiseGrade-1 keeps the incremental mode.
 
 ### Edges
 
-- **consumes-from** `TOOL-aPiecewiseGrade-1` — the incremental mode behind `SPEC_TOKENS_CACHE`, and its contract that the checker writes only `<dir>.next` and the caller promotes it
+- **consumes-from** `TOOL-aPiecewiseGrade-1` — the incremental mode behind `SPEC_TOKENS_CACHE`, and its contract that the checker writes only `<dir>.next` and the caller promotes it. TOOL-aPiecewiseGrade-3 builds at order 1, that unit at order 2, and this one at order 3
 - **consumes-from** external — aLightenedLoop's whole key reconciled onto main's two-half `run_spec_token_check`
 
 ## 4. Design
@@ -92,7 +94,9 @@ because no sha holds the reconciled text yet.
 ### S1 — the variable on every checker call
 
 Beside the record path, the driver sets `_stspecs="$_stdir/spec-tokens.$slug.specs"`, or leaves it
-empty when the sidecar root does not resolve. Every checker call that carries
+empty when the sidecar root does not resolve. That per-slug directory is the cache's only layout:
+each slug's entries sit beside that slug's whole key and record, and each slug promotes only its own
+next generation. Every checker call that carries
 `SPEC_TOKENS_INPUTS=$_stin`, the start half's `init_bounded` and the read half's `run_bounded`
 fallback, also carries `SPEC_TOKENS_CACHE=$_stspecs`. An empty value turns the mode off, and the
 checker then runs exactly the plain run.
@@ -203,7 +207,7 @@ No shell function, conf key, check number or refusal line is minted. `SPEC_TOKEN
 
 ### Rollout
 
-This unit builds after unit 1, against the reconciled driver. Every cited line moves, so the builder
+This unit builds after units 3 and 1, against the reconciled driver. Every cited line moves, so the builder
 finds each site by its text: the record path's assignment, each `SPEC_TOKENS_INPUTS=` prefix, and the
 whole key's `printf`. The driver suite's assertion floor rises by the new assertions, which the
 close confirms from a real run.
@@ -224,6 +228,9 @@ close confirms from a real run.
 - **A promotion helper function.** It would have one caller and two lines.
 - **Let the checker promote itself.** The checker cannot see the run-gates fingerprint or the replay
   window. The bracket is the driver's, so the promotion is too.
+- **One cache per worktree, shared by every slug.** Two slugs' dispatches would share one
+  `<dir>.next`, and one could promote the other's entries outside the other's bracket. The owner
+  chose one per slug (F1).
 - **Set the variable only when the cache is on.** Reading entries promoted under an earlier bracket
   is sound with no fingerprint, so withholding it only costs time.
 
@@ -232,9 +239,9 @@ close confirms from a real run.
 - security — the directory lives in the worktree's git dir beside the whole key and its record, which
   only the driver writes. Unit 1's per-spec replay runs no process. A forged generation can hide
   findings from a dispatch only, and the bar's plain run still grades them.
-- perf / scale — DERIVED from TOOL-aPiecewiseGrade-1's table, PINNED d9f84ee14: a pass commit's
-  dispatch on node `a` drops from about 167 s to about 71 s (d9f84ee14) while the guards join's
-  overhead stands. AC6 measures the real figure.
+- perf / scale — DERIVED from TOOL-aPiecewiseGrade-1's table, PINNED d9f84ee14: on the tree after
+  TOOL-aPiecewiseGrade-3, a pass commit's dispatch on node `a` saves about 1 s of a checker run near
+  69 s (d9f84ee14). AC6 measures the real figure.
 - error / empty / loading states — no sidecar root turns the mode off. A missing or half-promoted
   directory reads as misses. A failed promotion prints nothing.
 - observability — the checker's `graded.list` names what each run re-graded. No new driver line.
@@ -274,7 +281,7 @@ pass.
   records.
   Red when: the outputs differ, or the built run re-grades more than the one spec the commit moved.
   permission: it runs the whole-tree checker, which only the main loop may run.
-  cost: two primed runs and two timed runs, near 150 s each on node `a` while the overhead stands. <!-- PINNED d9f84ee14 -->
+  cost: two primed runs and two timed runs, near 69 s each on node `a` after TOOL-aPiecewiseGrade-3. <!-- DERIVED from TOOL-aPiecewiseGrade-1's table, PINNED d9f84ee14 -->
   figure: both times are DERIVED at observation.
 
 ## 7. Gates
@@ -299,11 +306,16 @@ the spec-token checker's `--spec` over this file and the positional check.
     without the other's bracket.
   Recommendation: (a). The sidecar is per worktree and a run lives in one worktree, so a second
   slug there is rare, and (b) adds a cross-slug promotion race to save its first miss.
+  RESOLVED (owner, 2026-11-15): (a) One per slug
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-15 · initial draft from brief `2026-11-15-prompt-TOOL-aPiecewiseGrade-1-brief`,
   item 8, grounded at `aebbb4a72` and at aLightenedLoop's head `d9f84ee14`.
+- rev-2 · 2026-11-15 · §1 · S1 · §3 · §4 · §5 · AC6 · §8 · from brief
+  `2026-11-15-prompt-TOOL-aPiecewiseGrade-3-forks-brief`, item 4: F1 RESOLVED as the owner's (a), the
+  per-slug cache stated as the only layout, order 2 to 3 with the ratified pointer, the build order on the edge, and the perf
+  and AC6 cost lines read against the tree after TOOL-aPiecewiseGrade-3 so they agree with unit 1.
 
 ## 10. Reuse audit
 
