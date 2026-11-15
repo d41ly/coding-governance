@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-7 — the position engine: each unit's step, the build's step and the next item, from witnesses
 
-**Status:** DEFERRED · rev-4 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 17 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-5 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 17 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0092@0abbde28 whole
 
@@ -13,10 +13,13 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-11-05-build-TOOL-dDeclaredLoop-7-deviation-71.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-7-deviation-71.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-7-deviation-72.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-7-deviation-72.md) | deviation | — |
+| [2026-11-15-build-TOOL-dDeclaredLoop-7-deviation-73.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-7-deviation-73.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-7-red-fix-24.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-7-red-fix-24.md) | red-fix | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade.md) | research | TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-7-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-7-1-spec-writer.md) | journal | — |
+| [2026-11-15-prompt-TOOL-dDeclaredLoop-7-2-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-7-2-spec-writer.md) | journal | — |
+| [2026-11-15-prompt-TOOL-dDeclaredLoop-7-act-brief.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-7-act-brief.md) | research | — |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-7-reground-brief.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-7-reground-brief.md) | research | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-33 |
 
@@ -112,7 +115,10 @@ reads typed state, is retired (gap-orient-03; the orientation record's `[positio
   roster rows it prints above the line are unchanged. The engine reads each unit's M2 state from those
   rows, handed over in `GOV_POSITION_STATES` with the MISSING rows, the first undecided ask, each
   parent's derived phase and `RESUME_STALE_BOUND`, so `plan_state` keeps one implementation and the
-  call is not circular (§8 F1). Observed by AC10.
+  call is not circular (§8 F1). The live-unit shape names only a least-advanced unit in `none` or
+  `designed`: an `act` answer whose least-advanced unit is `built` or `tested`, a build waiting on its
+  bar, renders the shape the `terminal` answer renders (§4 "The `next:` line", §8 F7), so the
+  harness's close cue still fires once no unit is left to build. Observed by AC10.
   **Readers:** by name: `tools/unattended/unattended.sh` spells `NEXT_RUNGS` and `derive_next_shape`
   in the ladder's table, its function and `verb_plan`'s one call, and is re-pointed in this unit;
   `tools/unattended/unattended.test.sh` spells `derive_next_shape` in its one-call-site arm and reads
@@ -246,8 +252,9 @@ claim — <name> · key <k> · <verdict>
 
 | Engine answer | `next:` shape, as printed today |
 |---|---|
-| `act`, its unit's spec tracked | the live-unit shape for `<id>`: `<id> (READY - build it)`, or `<id> (<state>)` for THIN or FORKED |
-| `act`, its unit's spec missing | `<id> (MISSING - spec it first)` |
+| `act`, its least-advanced unit `none` or `designed` and its spec tracked | the live-unit shape for `<id>`: `<id> (READY - build it)`, or `<id> (<state>)` for THIN or FORKED |
+| `act`, its least-advanced unit `none` and its spec missing | `<id> (MISSING - spec it first)` |
+| `act`, its least-advanced unit `built` or `tested`: the build waits on its bar | the `terminal` row's shape, `none - every tracked spec is terminal`; where the hand-over names an undecided ask, the ask's shape, as an all-deployed build answers `awaiting` on it (§8 F4, F7) |
 | `invalid-input`, no tracked spec grades as a unit | `none - no tracked spec grades as a unit (see the NOT A UNIT rows above)` |
 | `terminal` | `none - every tracked spec is terminal` |
 | `awaiting` on an undecided ask | `<ask id> (UNDECIDED - plan a unit that closes it, or dispose it)` |
@@ -287,6 +294,7 @@ driver, found through `resolve_kit_dir`, and exit 2 where it does not resolve.
 | `stale-remote` | the remote-tracking ref unreadable | `stale-remote` |
 | `bad-transition` | a recorded move no build row holds | `invalid-input`, exit 2 |
 | `deadlock` | the step's only unwitnessed item needs an item of a later step | `stuck` |
+| `bar-wait` | every unit built: a pass commit and an acceptance record each, no `gates-run` fact, no undecided ask | `act` at the step of the item out of `built`; `render_next_line` prints `none - every tracked spec is terminal` |
 | `plan-line` | the `steps` repository, then a READY unit beside an undecided ask, then every unit deployed beside it | `--plan`'s `next:` line equals `render_next_line`'s each time |
 | `status-line` | the `steps` repository with a run-state file | `--status` prints the engine's `position —` line |
 
@@ -348,7 +356,14 @@ driver, found through `resolve_kit_dir`, and exit 2 where it does not resolve.
   hold under §8 F4, and `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` do not move, each moved arm replacing
   one. That suite is waived for this build's landing (the build README's waiver, owner 2026-10-20).
   `--status`'s `· next` field changes value where the two answers differ; the suite's `extract_next`
-  callers read it.
+  callers read it. Two readers act on the terminal words, `none - every tracked spec is terminal`:
+  check 30 of `tools/unattended/check-unattended.sh`, which reds a build whose `--plan` prints them
+  beside a NOT A UNIT row (`tools/unattended/check-unattended.sh@c0b23188d5b4:5984`), and the
+  harness's close cue, which ends the build loop on them
+  (`tools/unattended/VERBS.template.md@3e6e3ec597a5:839`, `.claude/skills/build/SKILL.md@7c5b7ea3e7b6:66`).
+  §8 F7 (a) keeps both green: a build waiting on its bar prints those bytes, so the cue closes it and
+  runs its bar rather than re-dispatching a built unit, and the engine prints them only once no unit
+  is left to build, as the ladder does at a build's close, so check 30's pairing gains no new cause.
 - dependency — `claims.py` is TOOL-dDeclaredLoop-8's, order 16, built before this unit at order 17;
   S6 is written on its committed spec at rev-4. That unit also edits `unattended.sh`, its suite,
   `VERBS.template.md` and its render, in `print_claims` and the `--claims` row, away from the lines
@@ -404,10 +419,12 @@ driver, found through `resolve_kit_dir`, and exit 2 where it does not resolve.
   Red when: a claim prints without its key or verdict.
 - **AC10** — When `python position.py --fixture --plant plan-line` runs, the driver's
   `next:` line equals `render_next_line`'s shape in each of its three states, the READY unit taking
-  the line beside the ask and the ask's shape taking it once every unit is deployed, and
+  the line beside the ask and the ask's shape taking it once every unit is deployed; when
+  `python position.py --fixture --plant bar-wait` runs, every unit seeded `built`, the answer is `act`
+  and `render_next_line` prints `none - every tracked spec is terminal`; and
   `grep -c NEXT_RUNGS tools/unattended/unattended.sh` prints 0.
-  Red when: the line differs from the mapped shape, the ask preempts the READY unit, or the ladder
-  remains.
+  Red when: the line differs from the mapped shape, the ask preempts the READY unit, a `built` or
+  `tested` least-advanced unit renders the live-unit shape, or the ladder remains.
 - **AC11** — When `python position.py --fixture --plant status-line` runs, the driver's
   `--status` prints the engine's `position —` line for the slug.
   Red when: `--status` prints no position.
@@ -469,6 +486,20 @@ New arm: tools/unattended/unattended.test.sh · covers AC10 · the ladder's arms
   read per LANDING parent.
   RESOLVED (agent, 2026-11-15, delegated): (b), rung 3: a recorded landed move, or the driver's derived LANDED passed in by --plan
   widens: none · relaxes: none
+- **F7 — What does `--plan` print while every unit is built and the build waits on its bar?** The
+  least-advanced unit is `built` or `tested`, the engine answers `act` on its test step, and the
+  live-unit shape would tell the harness to build a unit it already built. (a) The `terminal`
+  answer's shape, `none - every tracked spec is terminal`, or the ask's shape where an undecided ask
+  stands, as for an all-deployed build: today's bytes in today's state, so the harness's close cue
+  (`tools/unattended/VERBS.template.md@3e6e3ec597a5:839`, `.claude/skills/build/SKILL.md@7c5b7ea3e7b6:66`
+  and `tools/roles/SKILL.template.md`) closes the build and runs its bar, and check 30 of
+  `tools/unattended/check-unattended.sh` and the terminal arms of `tools/unattended/unattended.test.sh`
+  read the words they read today; (b) a sixth shape for a build waiting on its bar, which moves every
+  reader of the five: the two harness texts and the VERBS render, each re-taught that the new shape
+  also ends the loop, check 30's pattern, the suite's terminal arms, and `NEXT_SHAPES`. (b) buys a
+  word no reader acts on differently from the terminal one. Recommendation (a), rung 3.
+  RESOLVED (agent, 2026-11-15, delegated): (a), rung 3: the terminal shape keeps today's bytes and the harness's close cue, and a sixth shape would buy a word no reader acts on differently
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -489,6 +520,11 @@ New arm: tools/unattended/unattended.test.sh · covers AC10 · the ladder's arms
   `--next-line` renders the shape, `--selftest` runs the plants, the leg is an `[[exempt_leg]]`, the
   pending row is in the tree, the VERBS render and the fork row move with it, and AC10 and AC11 become
   plants. Line citations become symbol citations or blob-pinned lines.
+- rev-5 · 2026-11-15 · S8 · §4 The `next:` line, The fixture cases · §5 · AC10 · §8 F7 · by the brief
+  2026-11-15-prompt-TOOL-dDeclaredLoop-7-2-spec-writer, on the re-ground writer of TOOL-dDeclaredLoop-45's
+  finding: an `act` answer whose least-advanced unit is `built` or `tested` rendered the live-unit
+  shape and would re-dispatch a built unit; it now renders the `terminal` row's shape, the `bar-wait`
+  plant pins it, and F7 records the choice. Mechanism, carries, order and status kept.
 
 ## 10. Reuse audit
 
