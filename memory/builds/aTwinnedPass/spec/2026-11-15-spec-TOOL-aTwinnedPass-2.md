@@ -1,6 +1,6 @@
 # TOOL-aTwinnedPass-2 — the pass-tree tool: merge a pass's own branch back `--no-ff` with generated outputs re-rendered, or take it away
 
-**Status:** SPECCED · rev-2 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 2 · closes TOOL-dDerivedDocket-57
+**Status:** INPROGRESS · rev-2 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 2 · closes TOOL-dDerivedDocket-57
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,8 @@
 | [2026-11-15-prompt-TOOL-aTwinnedPass-1-revision.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-1-revision.md) | research | TOOL-aTwinnedPass-1 |
 | [2026-11-15-prompt-TOOL-aTwinnedPass-2-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-2-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTwinnedPass-2-4-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-2-4-spec-writer.md) | journal | — |
+| [2026-11-15-prompt-TOOL-aTwinnedPass-2-5-builder.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-2-5-builder.md) | journal | — |
+| [2026-11-15-prompt-TOOL-aTwinnedPass-2-pass-brief.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-2-pass-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
