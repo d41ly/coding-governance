@@ -3100,7 +3100,8 @@ if [ -n "$_rdtok" ]; then
       left = np
       for (c = 1; c <= nr && left > 0; c++) {
         while (left > 0 && (getline ln < rdr[c]) > 0)
-          for (i = 1; i <= np; i++) if (!(pl[i] in got) && test_whole_token(ln, pl[i])) { got[pl[i]] = 1; left-- }
+          # index() first: test_whole_token returns 0 whenever index() does, so this skips only the line copy (TOOL-aHastenedSweep-1)
+          for (i = 1; i <= np; i++) if (!(pl[i] in got) && index(ln, pl[i]) && test_whole_token(ln, pl[i])) { got[pl[i]] = 1; left-- }
         close(rdr[c])
       }
       for (k = 1; k <= nt; k++) {

@@ -1,11 +1,12 @@
 # TOOL-aHastenedSweep-1 — check 25's by-name pass tests `index()` before `test_whole_token`
 
-**Status:** INPROGRESS · rev-1 · 2026-11-15 · node a · Tier-2 · base f25308f0 · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-11-15 · node a · Tier-2 · base f25308f0 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-15-build-TOOL-aHastenedSweep-1-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aHastenedSweep-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aHastenedSweep-1-brief.md](../prompts/2026-11-15-prompt-TOOL-aHastenedSweep-1-brief.md) | research | TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-3 TOOL-aHastenedSweep-4 |
 
 <!-- /gen:spec-records -->
