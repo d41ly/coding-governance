@@ -72,7 +72,7 @@ ids TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasure
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aMeasuredDrag-1 — `--check-commit` reads its `Pass:` trailer before it walks any pass, and walks only the units the message names](spec/2026-11-15-spec-TOOL-aMeasuredDrag-1.md) | 1 | 1 | SPECCED | rev-2 | 2026-11-15 |
+| [TOOL-aMeasuredDrag-1 — `--check-commit` reads its `Pass:` trailer before it walks any pass, and walks only the units the message names](spec/2026-11-15-spec-TOOL-aMeasuredDrag-1.md) | 1 | 1 | CLOSED | rev-2 | 2026-11-15 |
 | [TOOL-aMeasuredDrag-2 — the stop-guard decides a terminal lease and a pending background task before it spawns `--liveness`](spec/2026-11-15-spec-TOOL-aMeasuredDrag-2.md) | 2 | 1 | DEFERRED | rev-2 | 2026-11-15 |
 | [TOOL-aMeasuredDrag-3 — carries coverage derived once per `--check --with-verdicts` call](spec/2026-11-15-spec-TOOL-aMeasuredDrag-3.md) | 3 | 2 | INPROGRESS | rev-2 | 2026-11-15 |
 | [TOOL-aMeasuredDrag-4 — the instruction-edits leg stops re-running the tags check the tags leg already runs](spec/2026-11-15-spec-TOOL-aMeasuredDrag-4.md) | 4 | 2 | INPROGRESS | rev-1 | 2026-11-15 |
@@ -85,7 +85,7 @@ ids TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasure
 | [TOOL-aMeasuredDrag-11 — the merge bar hands its own resolved python to its legs, so no leg re-probes the launcher](spec/2026-11-15-spec-TOOL-aMeasuredDrag-11.md) | 11 | 2 | INPROGRESS | rev-1 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 44 bound to this build, across 4 record folder(s).
+Records: 45 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

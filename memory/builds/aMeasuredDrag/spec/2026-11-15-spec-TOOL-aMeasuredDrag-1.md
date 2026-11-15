@@ -1,11 +1,12 @@
 # TOOL-aMeasuredDrag-1 — `--check-commit` reads its `Pass:` trailer before it walks any pass, and walks only the units the message names
 
-**Status:** SPECCED · rev-2 · 2026-11-15 · node a · Tier-1 · base aebbb4a7 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-11-15 · node a · Tier-1 · base aebbb4a7 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-15-build-TOOL-aMeasuredDrag-1-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-15-build-TOOL-aMeasuredDrag-1-evidence.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-1-evidence.md) | research | — |
 | [2026-11-15-build-TOOL-aMeasuredDrag-1-findings-adopters.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-1-findings-adopters.md) | research | — |
 | [2026-11-15-build-TOOL-aMeasuredDrag-1-findings-gate.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-1-findings-gate.md) | research | — |

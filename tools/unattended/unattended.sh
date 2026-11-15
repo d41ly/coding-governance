@@ -14298,17 +14298,23 @@ check_commit_message() { # commit message file
   # closed BECAUSE ITS PASS COMMIT IS HEAD is kept apart (`O`): that is `git commit --amend` on the
   # pass commit, whose HEAD is the commit being replaced (closing review r1, M4). Only a trailer naming
   # the unit reopens it, so a records commit after a pass is never asked for a trailer it does not owe.
+  # THE TRAILER FIRST, then only the units the message names (TOOL-aMeasuredDrag-1): `Pass: none` asks
+  # no pass at all, and a key whose unit the message does not name is never asked - each `pass_commit`
+  # walk is one `git log`, and the loops below read only the rows of named units. Named is a token of
+  # a non-empty trailer, else a whole token of the subject (`id_in`), which is each loop's own test.
+  case " $trl " in *" none "*) return 0 ;; esac
   head=$(GIT rev-parse -q --verify HEAD 2>/dev/null)
   rows=$(read_pass_declarations "$rel" current | while IFS= read -r r; do
       [ -n "$r" ] || continue
       d=${r#* dispatch · item }; d=${d%% · reason *}
+      if [ -n "${trl// /}" ]; then case " $trl " in *" ${d#* } "*) ;; *) continue ;; esac
+      else id_in "$subj" "${d#* }" || continue; fi
       if check_pass_open "${d%% *}" "${d#* }" "$rel" "${r#* · reason }"; then
         printf 'o %s %s %s\n' "${d#* }" "${d%% *}" "${r#* · reason }"
       elif [ -n "$head" ] && [ "$(pass_commit "${d%% *}" "${d#* }" "$rel" || true)" = "$head" ]; then
         printf 'O %s %s %s\n' "${d#* }" "${d%% *}" "${r#* · reason }"
       fi
     done)
-  case " $trl " in *" none "*) return 0 ;; esac
   # EVERY LOOP BELOW READS A SCRATCH FILE, `CC_TMP`, never a heredoc over command output: such a loop
   # reads until EOF, and the shell-hygiene leg bans it. The dispatch arm creates and removes the file.
   if [ -z "${trl// /}" ]; then

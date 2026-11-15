@@ -36,3 +36,7 @@ base: a0a1892de069cd2299ba162d885ac283cfa81010
 2026-11-15T01:35:25Z decision · item TOOL-aMeasuredDrag-3 F1: the --staged --with-verdicts half (one generator process for checks 9, 29 and 30 in pre-commit) · reason Options: (a) ship it, saving ~15-20 s per structural memory commit, but a verb crash under --staged prints the in-process heading instead of a traceback; (b) ship the per-process memo alone (taken). Refused (a): it moves a printed line against the README rule; an owner call.
 
 2026-11-15T01:35:28Z rescope · item defer TOOL-aMeasuredDrag-2 · reason F1 resolved C: every spawn-skipping stop-guard option moves check 54's refusal text on the driver-failure case, a printed line under the README rule; aLightenedLoop's unlanded liveness cache works the same area
+
+2026-11-15T01:45:53Z dispatch · item 1c3d2821 TOOL-aMeasuredDrag-1 · reason tools/unattended/unattended.sh memory/builds/aMeasuredDrag/spec/2026-11-15-spec-TOOL-aMeasuredDrag-1.md memory/builds/aMeasuredDrag/build/2026-11-15-build-TOOL-aMeasuredDrag-1-1-acceptance-ledger.md memory/builds/aMeasuredDrag/README.md memory/LIVE.md memory/ledger/2026-11.md memory/map/generated/symbols.json
+
+2026-11-15T01:45:58Z brief · item TOOL-aMeasuredDrag-1 · reason 638cfc7c4fdd memory/builds/aMeasuredDrag/prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-20-builder.md
