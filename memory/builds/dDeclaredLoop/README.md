@@ -157,7 +157,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-85 — the write-tree capability probe has three answers, and only a probed absence takes the parent exemption](spec/2026-10-24-spec-TOOL-dDeclaredLoop-85.md) | 21 | 2 | DEFERRED | rev-5 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-29 — an item's upstream field: commitment rows handed on, answered at the return, gating only a measured edge](spec/2026-10-24-spec-TOOL-dDeclaredLoop-29.md) | 22 | 2 | DEFERRED | rev-4 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-26 — a build's composition pinned per step, its position read at the pin, and the move at the next step boundary](spec/2026-10-24-spec-TOOL-dDeclaredLoop-26.md) | 23 | 2 | DEFERRED | rev-5 | 2026-11-15 |
-| [TOOL-dDeclaredLoop-27 — the scenario kind and namespace: gov's five scenarios, admission, conflicts and the pin per step](spec/2026-10-24-spec-TOOL-dDeclaredLoop-27.md) | 24 | 2 | DEFERRED | rev-3 | 2026-10-25 |
+| [TOOL-dDeclaredLoop-27 — the scenario kind and namespace: gov's five scenarios, admission, conflicts and the pin per step](spec/2026-10-24-spec-TOOL-dDeclaredLoop-27.md) | 24 | 2 | DEFERRED | rev-4 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-28 — a build's recorded changes under flow.adapt, applied at its next step boundary, and its witnessed path held to its composition](spec/2026-10-24-spec-TOOL-dDeclaredLoop-28.md) | 25 | 2 | DEFERRED | rev-4 | 2026-11-05 |
 | [TOOL-dDeclaredLoop-21 — the review round bounds as policy keys: review.max-rounds, the design rounds and follow-ups, REVIEW_ROUNDS and RUNAWAY_CEILING retired](spec/2026-10-24-spec-TOOL-dDeclaredLoop-21.md) | 26 | 2 | DEFERRED | rev-4 | 2026-11-05 |
 | [TOOL-dDeclaredLoop-34 — the deviation approval route read from deviation.approval: by its risk, the owner for all, or its author recorded](spec/2026-10-24-spec-TOOL-dDeclaredLoop-34.md) | 27 | 2 | DEFERRED | rev-3 | 2026-11-05 |
@@ -213,7 +213,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 521 bound to this build, across 4 record folder(s).
+Records: 523 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
