@@ -68,3 +68,11 @@ Owed to the main loop at the close:
   `check_pass_holder` in `tools/unattended/pass-tree.sh`; `grep -c 'tools/unattended'` over
   `pass-tree.sh` printed `0`. After `gen_map.py --write`,
   `git diff --quiet -- memory/map/generated/symbols.json` exited 0, and no generated output moved.
+
+## The close
+
+The main loop's observations at the close, on node a, 2026-11-15, at `1bf0e9f78`.
+
+- `tools/unattended/pass-tree.test.sh`: GREEN, 169 assertions and 0 FAIL lines; RED with `pass-tree.sh` put back to `43c8c6773`, 6 FAIL lines, every one a `TP11` arm (PINNED 2026-11-15).
+- `tools/workflows/unattended-build.test.sh`: GREEN, 1541 assertions and 0 FAIL lines; RED with `unattended-unit.js` put back to `43c8c6773`, 3 FAIL lines, every one a `TP11` arm (PINNED 2026-11-15).
+- The per-group staged breaks of the `wf_` pattern were not staged; the closing review's round 3 filed the missing interior arms as `TOOL-aTwinnedPass-12`.
