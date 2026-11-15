@@ -6,9 +6,12 @@
 # ONE fixture repository under one `mktemp -d`, removed on exit. `main` carries the base commit and
 # then `m1.txt`, the default branch moving on; `run`, checked out, is cut from the base and carries the
 # records commit C, the run-state file with one dispatch row per merged unit. The base holds the conf,
-# a fixture kit whose one `[[generated]]` row is `fx-out.txt`, its generator `render.sh` (the sorted
-# tracked `p*.txt` files, into `fx-out.txt` and a `gen:fx` region of the README), and a copy of the
-# run-gates kit's `regen.py` with what it imports, at that kit's place under this suite's tool root.
+# a fixture kit whose two `[[generated]]` rows, `fx-out.txt` and `fx-new.txt`, share one generator
+# `render.sh` (the sorted tracked `p*.txt` files, into `fx-out.txt` and a `gen:fx` region of the
+# README), and a copy of the run-gates kit's `regen.py` with what it imports, at that kit's place under
+# this suite's tool root. `render.sh` takes three switches, each off unless a block sets it:
+# `FX_RENDER_FAIL` (T4), and `FX_RENDER_NEW` and `FX_RENDER_STRAY` (T7), which make the write create
+# `fx-new.txt`, a generated output never tracked before, and `fx-stray.txt`, which no row covers.
 #
 # A PASS IS SIMULATED, NEVER BUILT. `add_fixture_pass` does what the runtime and the builder's first
 # order do, a worktree on a new branch at `main`, both in the runtime's spelling (`worktree-agent-<id>`
@@ -20,7 +23,11 @@
 #
 # WHAT IT DOES NOT CHECK: a run whose tree is a linked worktree of a real build; the `merge=ours`
 # attribute, which this fixture does not declare; a refused merge commit, since the fixture installs
-# no hook; and a Windows process holding a pass's worktree open.
+# no hook; and a Windows process holding a pass's worktree open. Nor (TOOL-aTwinnedPass-5) `--remove`'s
+# own path through the run check, which shares it with `--merge` and is not armed; that the generic
+# four assertions of a T3 run-check case come from the run check rather than the clean-tree refusal
+# after it, which only each case's text arm tells; regen.py's reading of the two fixture rows as ONE
+# item, which T7 relies on and cannot tell from two renders; and which stream the T7 NOTE goes to.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 TOOL="$HERE/pass-tree.sh"
@@ -106,16 +113,27 @@ generator = "render.sh"
 write = ["bash", "{kit}/render.sh"]
 check = ["bash", "{kit}/render.sh", "--check"]
 stage = 1
+
+[[generated]]
+path = "fx-new.txt"
+generator = "render.sh"
+write = ["bash", "{kit}/render.sh"]
+check = ["bash", "{kit}/render.sh", "--check"]
+stage = 1
 EOF
 cat > "$FX_REL/render.sh" <<'EOF'
 #!/usr/bin/env bash
 # The fixture generator: the tracked p*.txt files, sorted, into fx-out.txt and README.md's gen:fx region.
 # With FX_RENDER_FAIL set, the write first leaves fx-partial.txt behind, and both modes exit 1.
+# With FX_RENDER_NEW set the write also creates fx-new.txt, and with FX_RENDER_STRAY fx-stray.txt;
+# --check reads neither.
 set -u
 if [ -n "${FX_RENDER_FAIL:-}" ]; then
   [ "${1:-}" = --check ] || : > fx-partial.txt
   exit 1
 fi
+[ -z "${FX_RENDER_NEW:-}" ] || [ "${1:-}" = --check ] || printf 'new\n' > fx-new.txt
+[ -z "${FX_RENDER_STRAY:-}" ] || [ "${1:-}" = --check ] || printf 'stray\n' > fx-stray.txt
 list=$(git ls-files -- 'p*.txt' | sort)
 readme=$(awk -v l="$list" '/^<!-- gen:fx -->$/ { print; if (l != "") print l; s = 1; next } /^<!-- \/gen:fx -->$/ { s = 0 } !s' README.md)
 if [ "${1:-}" = --check ]; then
@@ -174,12 +192,21 @@ check_same "T1 neither pass branch remains (AC1)" "$(git branch --list 'worktree
 check_same "T1 the tree is clean after both merges (AC1)" "$(git status --porcelain)" ""
 got=$( . "$HERE/lib-unattended.sh" && pass_commit "$BASE" TOOL-tRun-2 "$RUNMD" )
 check_same "T1 pass_commit names pass 2's own commit, not the merge (AC6)" "$got" "$P2"
+# L1 (TOOL-aTwinnedPass-5 S6): the admission arm below has a negative control on the same tree and
+# HEAD, so its exit 0 is the hook grading here and not a hook that binds no run. Units 4 and 7 have
+# rows and no pass commit yet. Staged break: `check_commit_message`'s binding loop given an empty
+# list admits every message, and both control arms go red.
+printf 'build TOOL-tRun-4\n' > "$T/msg4"
+cc=$(bash "$HERE/unattended.sh" --check-commit "$T/msg4" 2>&1); rc=$?
+check_same "T1 --check-commit over a trailerless subject naming open pass 4 exits 1, so the hook grades in this tree" "$rc" 1
+check_has "T1 ...with check 49's subject refusal" "$cc" "this commit's subject names TOOL-tRun-4, an open dispatched pass of tRun"
 git log -1 --format=%B > "$T/msg"
 bash "$HERE/unattended.sh" --check-commit "$T/msg" >/dev/null 2>&1
 check_same "T1 --check-commit over the merge's message exits 0 (AC6)" "$?" 0
 
 # ---- T2 (AC2): pass 4 rewrites pass 2's product file; the merge is aborted and refused -----------------
 add_fixture_pass 4 && write_fixture_pass 4 p2.txt || { echo "FAIL pass 4"; exit 2; }
+P4=$(git rev-parse worktree-agent-p4)
 h0=$(git rev-parse HEAD)
 run_tool --merge tRun --pass TOOL-tRun-4 --branch worktree-agent-p4 --from "$C"
 check_same "T2 --merge of a pass that rewrote another's product file exits 1 (AC2)" "$rc" 1
@@ -188,7 +215,10 @@ check_lacks "T2 the refusal does not name fx-out.txt (AC2)" "$err" "fx-out.txt"
 check_same "T2 HEAD is the pre-merge sha (AC2)" "$(git rev-parse HEAD)" "$h0"
 check_same "T2 the tree is clean (AC2)" "$(git status --porcelain)" ""
 git rev-parse -q --verify MERGE_HEAD >/dev/null; check_same "T2 no merge is in progress (AC2)" "$?" 1
-check_same "T2 branch worktree-agent-p4 remains (AC2)" "$(git branch --list worktree-agent-p4 | tr -d ' *')" "worktree-agent-p4"
+# The ref itself against its captured tip, never `git branch --list`, which prints git's `+` marker for
+# a branch a worktree holds (TOOL-aTwinnedPass-5 S2). Staged break: `remove_pass_tree` called in the
+# not-disjoint refusal deletes the branch, and this arm reads the empty string.
+check_same "T2 branch worktree-agent-p4 remains at its tip (AC2)" "$(git rev-parse --verify -q refs/heads/worktree-agent-p4)" "$P4"
 check_has "T2 pass 4's worktree remains (AC2)" "$(git worktree list --porcelain)" "/.claude/worktrees/agent-p4"
 
 # ---- T3 (AC3): each merge refusal, with HEAD and the tree as they were --------------------------------
@@ -228,9 +258,31 @@ check_merge_refused "for pass 9, cut from main with no reset" "$R" worktree-agen
 check_has "T3 the fork-point refusal names the reset" "$err" "did not reset its worktree"
 check_has "T3 the fork-point refusal names C's first eight digits" "$err" "${C:0:8}"
 check_same "T3 pass 9's merge did not carry m1.txt into run (AC3)" "$(git ls-files m1.txt)" ""
+# M4 (TOOL-aTwinnedPass-5 S3): the run check's other refusals. The run-state file is edited in the
+# work tree only and restored after each case. The run check precedes the clean-tree refusal, so each
+# edit leaves the tree dirty on purpose, and the generic four assertions stay green under a break that
+# skips the run check, because the dirty RUN.md is refused next: ONLY THE TEXT ARM tells the run's
+# refusal from that one. Staged breaks, one at a time: the LANDED|ABORTED case deleted reds both phase
+# arms; it reading LANDED alone reds the ABORTED arm; the rc-2 case folded into `*)` reds the
+# no-run-branch arm; the file test deleted reds the missing-file arm. `--remove`'s path is not armed.
+for ph in LANDED ABORTED; do
+  sed -i "s/^phase: BUILDING\$/phase: $ph/" "$RUNMD"
+  check_merge_refused "for a run recorded $ph" "$R" worktree-agent-p4 "$C"
+  check_has "T3 the $ph refusal names the phase" "$err" "the run of tRun is $ph, so it takes no pass back"
+  git checkout -q -- "$RUNMD"
+done
+sed -i '/^run-branch: /d' "$RUNMD"
+check_merge_refused "for a run-state file naming no run branch" "$R" worktree-agent-p4 "$C"
+check_has "T3 the no-run-branch refusal says so" "$err" "names no run branch (neither run-branch nor branch-ref)"
+git checkout -q -- "$RUNMD"
+mv "$RUNMD" "$T/runmd.away"
+check_merge_refused "with no run-state file" "$R" worktree-agent-p4 "$C"
+check_has "T3 the missing-file refusal names the file" "$err" "build tRun has no run-state file at $RUNMD"
+mv "$T/runmd.away" "$RUNMD"
 
 # ---- T4 (AC4): a failed regeneration restores the pre-merge tree ---------------------------------------
 add_fixture_pass 7 && write_fixture_pass 7 p7.txt || { echo "FAIL pass 7"; exit 2; }
+P7=$(git rev-parse worktree-agent-p7)
 h0=$(git rev-parse HEAD)
 out=$(FX_RENDER_FAIL=1 bash "$TOOL" --merge tRun --pass TOOL-tRun-7 --branch worktree-agent-p7 --from "$C" 2>"$T/err"); rc=$?
 check_same "T4 --merge with a failing regeneration exits 1 (AC4)" "$rc" 1
@@ -253,7 +305,9 @@ check_lacks "T5 pass 10's worktree is gone (AC5)" "$(git worktree list --porcela
 run_tool --remove tRun --branch worktree-agent-p7
 check_same "T5 --remove of pass 7, holding a commit no other ref holds, exits 1 (AC5)" "$rc" 1
 check_has "T5 the refusal names --merge (AC5)" "$err" "--merge"
-check_same "T5 branch worktree-agent-p7 remains (AC5)" "$(git branch --list worktree-agent-p7 | tr -d ' *')" "worktree-agent-p7"
+# As T2's: the ref against pass 7's tip captured in T4. Staged break: `--remove`'s lost-commit test
+# made `false` deletes the branch.
+check_same "T5 branch worktree-agent-p7 remains at its tip (AC5)" "$(git rev-parse --verify -q refs/heads/worktree-agent-p7)" "$P7"
 check_has "T5 pass 7's worktree remains (AC5)" "$(git worktree list --porcelain)" "/.claude/worktrees/agent-p7"
 run_tool --remove tRun --branch worktree-agent-none
 check_same "T5 --remove of an absent branch exits 0 (AC5)" "$rc" 0
@@ -301,6 +355,44 @@ check_has "TP4 the 64-digit --from reaches the lookup (AC7)" "$err" "names no co
 check_lacks "TP4 the 64-digit --from passes the shape (AC7)" "$err" "is not 7 to 64"
 run_tool --merge tRun --pass TOOL-tRun-4 --branch worktree-agent-p4 --from "$(printf '%065d' 0)"
 check_has "TP4 a 65-digit --from is refused by the shape (AC7)" "$err" "is not 7 to 64"
+
+# ---- T6 (TOOL-aTwinnedPass-5 S4): every exit-2 path of main, each before load_driver_conf, HEAD as it was --
+# Pass 4's branch is every call's operand: it holds a commit nothing else holds and does not merge
+# cleanly, so a call that slips past its usage exit reaches a verb that refuses with exit 1 and loses
+# nothing. Staged breaks, one at a time, each redding its call's exit and text arms: the `--from`
+# requirement deleted; the duplicate-flag test deleted; `--remove`'s `--pass`/`--from` test deleted;
+# `check_slug_shape` returning 0; the `$mid` test deleted. Not checked: an exit-2 path a later edit
+# adds, which no arm here names.
+check_usage_refused() { # label · stderr needle · tool argv... -> three assertions
+  local l=$1 w=$2 h
+  shift 2
+  h=$(git rev-parse HEAD)
+  run_tool "$@"
+  check_same "T6 $l: exits 2" "$rc" 2
+  check_same "T6 $l: HEAD is unchanged" "$(git rev-parse HEAD)" "$h"
+  check_has "T6 $l: stderr names the refusal" "$err" "$w"
+}
+check_usage_refused "--merge without --from" "usage: pass-tree.sh" --merge tRun --pass TOOL-tRun-4 --branch worktree-agent-p4
+check_usage_refused "a second --branch" "usage: pass-tree.sh" --merge tRun --pass TOOL-tRun-4 --branch worktree-agent-p4 --branch worktree-agent-p4 --from "$C"
+check_usage_refused "--remove carrying --pass" "usage: pass-tree.sh" --remove tRun --branch worktree-agent-p4 --pass TOOL-tRun-4
+check_usage_refused "slug ../x" "'../x' is not a build-folder name" --remove ../x --branch worktree-agent-p4
+check_usage_refused "a unit of another build" "'TOOL-other-2' is not a unit id of build tRun" --merge tRun --pass TOOL-other-2 --branch worktree-agent-p4 --from "$C"
+
+# ---- T7 (TOOL-aTwinnedPass-5 S5): the regeneration creates a generated file and leaves a stray one ------
+# Only the first is committed. Pass 11 conflicts on fx-out.txt and the README region as pass 3 did, and
+# the tool resolves both. The NOTE needle carries the colon and the one space before the first path, so
+# a path git lists before fx-stray.txt, such as an unignored pass worktree, reds it: a fixture fault
+# this arm names. Staged breaks: the staging loop's `check_generated_output` made `false` leaves
+# fx-new.txt out and the NOTE naming it (arms 2, 4, 5 red); made `true` commits fx-stray.txt (arms 3, 5
+# red); the loop deleted stages neither (arms 2, 4 red).
+add_fixture_pass 11 && write_fixture_pass 11 p11.txt || { echo "FAIL pass 11"; exit 2; }
+out=$(FX_RENDER_NEW=1 FX_RENDER_STRAY=1 bash "$TOOL" --merge tRun --pass TOOL-tRun-11 --branch worktree-agent-p11 --from "$C" 2>"$T/err"); rc=$?; err=$(<"$T/err")
+check_same "T7 --merge whose regeneration creates fx-new.txt and leaves fx-stray.txt exits 0" "$rc" 0
+check_same "T7 the merge commit carries fx-new.txt, a generated output the render created fresh" "$(git ls-tree --name-only "$out" -- fx-new.txt)" "fx-new.txt"
+check_same "T7 the merge commit does not carry fx-stray.txt" "$(git ls-tree --name-only "$out" -- fx-stray.txt)" ""
+check_has "T7 the NOTE names fx-stray.txt as left untracked" "$err" "no effective generated output covers them: fx-stray.txt"
+check_same "T7 fx-stray.txt is the one path the tree's status lists" "$(git status --porcelain)" "?? fx-stray.txt"
+rm -f fx-stray.txt
 
 [ "$st" = 0 ] && { echo "PASS ($n assertions)"; exit 0; }
 echo "FAIL ($n assertions)"; exit 1

@@ -1,11 +1,12 @@
 # TOOL-aTwinnedPass-5 — every arm of the build's three suites can go red on the regression it names
 
-**Status:** INPROGRESS · rev-1 · 2026-11-15 · node a · Tier-2 · base c40c39fb6 · streams tooling · order 4
+**Status:** CLOSED · rev-1 · 2026-11-15 · node a · Tier-2 · base c40c39fb6 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-15-build-TOOL-aTwinnedPass-5-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aTwinnedPass-5-1-acceptance-ledger.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTwinnedPass-4-brief.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-4-brief.md) | research | TOOL-aTwinnedPass-4 |
 | [2026-11-15-prompt-TOOL-aTwinnedPass-5-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-5-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTwinnedPass-5-2-builder.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-5-2-builder.md) | journal | — |
