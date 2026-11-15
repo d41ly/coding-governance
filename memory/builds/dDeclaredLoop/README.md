@@ -139,7 +139,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-43 — the guarded write restores each path's prior bytes, and writes each through a sibling temp file](spec/2026-10-24-spec-TOOL-dDeclaredLoop-43.md) | 16 | 2 | CLOSED | rev-3 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-44 — the policy push arm grades a merge on its combined diff, and a new branch against the remote default tip](spec/2026-10-24-spec-TOOL-dDeclaredLoop-44.md) | 16 | 2 | DEFERRED | rev-3 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-8 — claims keyed and trusted by key and source](spec/2026-10-24-spec-TOOL-dDeclaredLoop-8.md) | 16 | 2 | DEFERRED | rev-4 | 2026-11-15 |
-| [TOOL-dDeclaredLoop-59 — a merge owes a policy trailer only for a key its result sets that no parent and no clean re-merge set](spec/2026-10-24-spec-TOOL-dDeclaredLoop-59.md) | 17 | 2 | DEFERRED | rev-3 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-59 — a merge owes a policy trailer only for a key its result sets that no parent and no clean re-merge set](spec/2026-10-24-spec-TOOL-dDeclaredLoop-59.md) | 17 | 2 | DEFERRED | rev-4 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-7 — the position engine: each unit's step, the build's step and the next item, from witnesses](spec/2026-10-24-spec-TOOL-dDeclaredLoop-7.md) | 17 | 2 | DEFERRED | rev-3 | 2026-11-05 |
 | [TOOL-dDeclaredLoop-14 — the default failure route: the refusal recorded and the frontier returned](spec/2026-10-24-spec-TOOL-dDeclaredLoop-14.md) | 18 | 2 | DEFERRED | rev-3 | 2026-11-05 |
 | [TOOL-dDeclaredLoop-45 — a unit reads `built` from its pass commit while no acceptance writer is armed](spec/2026-10-24-spec-TOOL-dDeclaredLoop-45.md) | 18 | 2 | DEFERRED | rev-2 | 2026-10-24 |
@@ -212,7 +212,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 403 bound to this build, across 4 record folder(s).
+Records: 408 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -282,7 +282,7 @@ Coverage of dDeclaredLoop's 34 clause(s) and 49 owned node(s), over 99 spec(s) a
 | 14 | `TOOL-dDeclaredLoop-10` | no |
 | 15 | `TOOL-dDeclaredLoop-2` | no |
 | 16 | `TOOL-dDeclaredLoop-43`, `TOOL-dDeclaredLoop-44`, `TOOL-dDeclaredLoop-8` | no |
-| 17 | `TOOL-dDeclaredLoop-59`, `TOOL-dDeclaredLoop-7` | yes |
+| 17 | `TOOL-dDeclaredLoop-59`, `TOOL-dDeclaredLoop-7` | no |
 | 18 | `TOOL-dDeclaredLoop-14`, `TOOL-dDeclaredLoop-45`, `TOOL-dDeclaredLoop-69` | no |
 | 19 | `TOOL-dDeclaredLoop-4`, `TOOL-dDeclaredLoop-78` | yes |
 | 20 | `TOOL-dDeclaredLoop-46`, `TOOL-dDeclaredLoop-6`, `TOOL-dDeclaredLoop-81` | no |
