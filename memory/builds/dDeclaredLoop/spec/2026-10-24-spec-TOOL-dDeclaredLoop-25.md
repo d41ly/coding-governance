@@ -15,6 +15,7 @@
 | [2026-10-25-build-TOOL-dDeclaredLoop-25-deviation-251.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-25-deviation-251.md) | deviation | — |
 | [2026-11-05-build-TOOL-dDeclaredLoop-25-deviation-252.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-25-deviation-252.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-25-1-builder-return.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-25-1-builder-return.md) | journal | — |
+| [2026-11-15-build-TOOL-dDeclaredLoop-25-2-builder-return.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-25-2-builder-return.md) | journal | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-25-deviation-253.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-25-deviation-253.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-25-deviation-254.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-25-deviation-254.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-29 |
@@ -24,6 +25,8 @@
 | [2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade.md) | research | TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-25-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-25-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-25-2-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-25-2-spec-writer.md) | journal | — |
+| [2026-11-15-prompt-TOOL-dDeclaredLoop-25-3-spec-brief.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-25-3-spec-brief.md) | research | — |
+| [2026-11-15-prompt-TOOL-dDeclaredLoop-25-4-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-25-4-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-25-build-brief.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-25-build-brief.md) | journal | — |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-25-reground-brief.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-25-reground-brief.md) | research | — |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-25-spec-brief.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-25-spec-brief.md) | research | — |
