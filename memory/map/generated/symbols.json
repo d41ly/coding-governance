@@ -21368,6 +21368,11 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "read_spec_asks",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_spec_audit_ids",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"

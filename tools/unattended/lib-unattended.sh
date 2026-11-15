@@ -2370,9 +2370,21 @@ asks_unit_in() { # BACKLOG.md text -> every filed `unit` ask id, one per line, i
 # this corpus: 18 of 123 tracked `spec-audit` binding lines use the range form. A join that does not
 # expand blocks a unit that WAS audited under `TOOL-x-1..5`; a join that matches as a SUBSTRING lets
 # `TOOL-x-19` satisfy `TOOL-x-1`. This emits whole tokens, one per line, for a `grep -qxF` join.
-expand_id_runs() { # stdin: binding-line text -> stdout: ids, ranges expanded, one per line
-  awk '{
-    n = split($0, w, /[ \t]+/)
+# `--keyed` (TOOL-dDeclaredLoop-112) reads `<a> TAB <b> TAB <words>` rows and prints `<a> TAB <b> TAB
+# <id>` per id the words name, through this same program, so a batched reader of many specs' headers
+# expands exactly as the per-spec one does. A keyed row with fewer than two TABs prints nothing.
+expand_id_runs() { # [--keyed] · stdin: binding-line text, or keyed rows -> stdout: ids, ranges expanded, one per line
+  local _keyed=""
+  [ "${1:-}" != --keyed ] || _keyed=1
+  awk -v keyed="$_keyed" '{
+    s = $0; pre = ""
+    if (keyed) {
+      p = index(s, "\t"); if (p == 0) next
+      pre = substr(s, 1, p); s = substr(s, p + 1)
+      p = index(s, "\t"); if (p == 0) next
+      pre = pre substr(s, 1, p); s = substr(s, p + 1)
+    }
+    n = split(s, w, /[ \t]+/)
     for (i = 1; i <= n; i++) {
       t = w[i]
       sub(/@rev-[0-9]+$/, "", t)
@@ -2381,8 +2393,8 @@ expand_id_runs() { # stdin: binding-line text -> stdout: ids, ranges expanded, o
         head = substr(t, 1, p - 1); hi = substr(t, p + 2) + 0
         match(head, /[0-9]+$/); lo = substr(head, RSTART) + 0
         stem = substr(head, 1, RSTART - 1)
-        for (k = lo; k <= hi; k++) print stem k
-      } else if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/) print t
+        for (k = lo; k <= hi; k++) print pre stem k
+      } else if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/) print pre t
     }
   }'
 }

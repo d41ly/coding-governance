@@ -5120,19 +5120,31 @@ asks_ids_of() { # asks: value -> the mandated ids, one per line; rc 1 and nothin
 # separator and its anchored value. `order_verb_of` reads the third verb the same way and for the
 # same recorded reason: a bespoke reader disagreed with the generator on a doubled separator space
 # and read EMPTY, which skips the join silently while reporting nothing.
-spec_ask_verbs() { # spec file · closes|advances -> the ids that verb names, one per line
-  local hdr
-  hdr=$(grep -m1 '^\*\*Status:\*\*' "$1" 2>/dev/null) || return 0
-  printf '%s' "$hdr" | SAV_V="$2" awk '
-    BEGIN { v = ENVIRON["SAV_V"] }
+# BOTH VERBS OF MANY SPECS IN ONE PASS (TOOL-dDeclaredLoop-112): `build_ask_plan` asked this per
+# (ask, spec) pair, a spawn chain each, and `--status` paid for it through the position engine's
+# `--plan`. One awk reads the first `**Status:**` line of every spec, the way `spec_facts` reads its
+# facts, and one keyed expander expands the ids. AN UNREADABLE PATH IS FILTERED OUT FIRST, because awk
+# is fatal on a file it cannot open and would lose every row after it (`spec_facts`, round 4).
+read_spec_asks() { # spec paths... -> one "<path>\t<closes|advances>\t<ask id>" row per id, ranges expanded
+  local _ok=() _p
+  for _p in "$@"; do [ ! -r "$_p" ] || _ok+=("$_p"); done
+  [ "${#_ok[@]}" -gt 0 ] || return 0
+  awk '
+    FNR == 1 { seen = 0 }
+    seen || !/^\*\*Status:\*\*/ { next }
     {
+      seen = 1
       n = split($0, f, "·")
       for (i = 1; i <= n; i++) {
         t = f[i]
         gsub(/^[ \t]+|[ \t]+$/, "", t)
-        if (substr(t, 1, length(v) + 1) == v " ") print substr(t, length(v) + 2)
+        if (substr(t, 1, 7) == "closes ") print FILENAME "\tcloses\t" substr(t, 8)
+        else if (substr(t, 1, 9) == "advances ") print FILENAME "\tadvances\t" substr(t, 10)
       }
-    }' | expand_id_runs
+    }' "${_ok[@]}" | expand_id_runs --keyed
+}
+spec_ask_verbs() { # spec file · closes|advances -> the ids that verb names, one per line
+  read_spec_asks "$1" | SAV_V="$2" awk -F'\t' '$2 == ENVIRON["SAV_V"] { print $3 }'
 }
 # A disposition row's VERB for one ask, out of a build's own `BACKLOG.md`. The row shape is
 # `- <VERB> · <id> · <slot> <value> · <why>`, so the verb is the first field and the id the second;
@@ -5280,21 +5292,28 @@ ask_sort_key() { # ask id -> "<sev>-<pos>-<seq>", every field fixed width
 # generator's V6 to report rather than a second verdict invented here.
 ask_rank_order() { # ids… -> those ids in rank order, space separated
   local _left="$*" _out="" _id _h _blocked _best _bestkey _key
+  # EACH ID'S HOLDS AND KEY READ ONCE, not once per round (TOOL-dDeclaredLoop-112): both are pure in
+  # the id while this runs, since nothing here moves AW_ROWS or ASK_POSITIONS.
+  local -A _keys=() _holds=()
+  for _id in $_left; do
+    _keys[$_id]=$(ask_sort_key "$_id")
+    _holds[$_id]=$(ask_field "$_id" holds)
+  done
   while [ -n "${_left// /}" ]; do
     _best=""; _bestkey=""
     for _id in $_left; do
       _blocked=0
-      for _h in $(ask_field "$_id" holds | tr ',' ' '); do
+      for _h in ${_holds[$_id]//,/ }; do
         [ -n "$_h" ] && [ "$_h" != "-" ] || continue
         case " $_left " in *" $_h "*) _blocked=1 ;; esac
       done
       [ "$_blocked" = 0 ] || continue
-      _key=$(ask_sort_key "$_id")
+      _key=${_keys[$_id]}
       if [ -z "$_bestkey" ] || [ "$_key" \< "$_bestkey" ]; then _best="$_id"; _bestkey="$_key"; fi
     done
     if [ -z "$_best" ]; then
       for _id in $_left; do
-        _key=$(ask_sort_key "$_id")
+        _key=${_keys[$_id]}
         if [ -z "$_bestkey" ] || [ "$_key" \< "$_bestkey" ]; then _best="$_id"; _bestkey="$_key"; fi
       done
     fi
@@ -5980,14 +5999,21 @@ build_ask_plan() { # slug · spec paths… -> sets ASK_PLAN_ROWS, ASK_PLAN_NEXT,
     ASK_PLAN_WHY="$AW_WHY"
   fi
   _pop=$(ask_rank_order $_pop)
+  # EACH SPEC'S ASK VERBS READ ONCE, not once per ask (TOOL-dDeclaredLoop-112): every ask id maps to
+  # the specs naming it by `closes` or `advances`, in argument order, each path once, so the first
+  # path is the first spec the per-pair scan this replaced matched.
+  local -A _covers=()
+  local _cp _cid
+  while IFS=$'\t' read -r _cp _ _cid; do
+    case " ${_covers[$_cid]:-} " in *" $_cp "*) continue ;; esac
+    _covers[$_cid]="${_covers[$_cid]:-}${_covers[$_cid]:+ }$_cp"
+  done < <(read_spec_asks "$@")
   for _id in $_pop; do
     _n=$((_n + 1))
     _live=""; _cover=""
     # THIS BUILD'S OWN SPECS FIRST, read off their status headers, because a spec that has ALREADY
     # closed an ask still covers it and the projection's closers field lists LIVE specs only.
-    for _sp in "$@"; do
-      spec_ask_verbs "$_sp" closes | grep -qxF -- "$_id" || {
-        spec_ask_verbs "$_sp" advances | grep -qxF -- "$_id" || continue; }
+    for _sp in ${_covers[$_id]:-}; do
       _spid="${SPEC_ID[$_sp]:-}"
       [ -n "$_spid" ] || continue
       [ -n "$_cover" ] || _cover="$_spid"

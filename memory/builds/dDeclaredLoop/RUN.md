@@ -190,3 +190,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-15T07:13:32Z rescope · item add TOOL-dDeclaredLoop-112 · reason TOOL-dDeclaredLoop-7 S9 made --status, and --resume through it, run the position engine, which runs --plan for its hand-over: --plan took 11m25s (PINNED) on node a at 1e11500da, so every --status and every idle-wake --resume now costs over 11 minutes against about one before; a repair unit restores the verb's cost
 
 2026-11-15T07:52:04Z brief · item TOOL-dDeclaredLoop-112 · reason aa185d8ff5c6 memory/builds/dDeclaredLoop/prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-112-build-brief.md
+
+2026-11-15T08:08:54Z dispatch · item 27143aff TOOL-dDeclaredLoop-112 · reason tools/unattended/unattended.sh tools/unattended/lib-unattended.sh memory/project/fork-ceilings.txt memory/project/spawn-idiom-sites.txt memory/map/generated/symbols.json memory/builds/dDeclaredLoop/build/2026-11-15-build-TOOL-dDeclaredLoop-112-1-acceptance-ledger.md memory/builds/dDeclaredLoop/spec/2026-11-15-spec-TOOL-dDeclaredLoop-112.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md
