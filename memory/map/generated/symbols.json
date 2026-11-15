@@ -7968,6 +7968,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_usage_refused",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.test.sh"
+    },
+    {
       "id": "check_user_clash",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"

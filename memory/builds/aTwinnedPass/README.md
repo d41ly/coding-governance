@@ -69,7 +69,7 @@ ids TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 TOOL-aTwinnedPass-3 TOOL-aTwinnedPas
 | [TOOL-aTwinnedPass-5 — every arm of the build's three suites can go red on the regression it names](spec/2026-11-15-spec-TOOL-aTwinnedPass-5.md) | 4 | 2 | INPROGRESS | rev-1 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 27 bound to this build, across 4 record folder(s).
+Records: 28 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -1411,10 +1411,14 @@ same "TP1 T2 ...and without it equals the default attended prompt" \
 same "TP1 T2 the attended spawn's type is the default's" \
   "$(printf '%s\n' "$o" | grep '^type:')" "$(printf '%s\n' "$childA" | grep '^type:')"
 has "TP1 T2 the attended spawn asks for a worktree" "$o" 'isolation:build:worktree'
-# T3 — the default carries none of it; T1 is the positive control on the same fixture.
+# T3 — the default carries none of it; T1 is the positive control on the same fixture, and the
+# paragraph's absence reads the very opening T1 reads present (TOOL-aTwinnedPass-5 S1: the needle was
+# `OWN WORKTREE`, which the harness never emits, since the matcher is case-sensitive). Staged break:
+# the paragraph's `cfg.passBase` condition made `false` emits the shipped paragraph on every call, and
+# both runs of that arm go red. Not checked: the other `hasnt_` needles of this suite.
 for m in childU childA; do
   hasnt_ "TP1 T3 $m asks for no isolation" "${!m}" 'isolation:'
-  hasnt_ "TP1 T3 $m has no worktree paragraph" "${!m}" 'OWN WORKTREE'
+  hasnt_ "TP1 T3 $m has no worktree paragraph" "${!m}" 'THIS PASS BUILDS IN A WORKTREE OF ITS OWN'
   hasnt_ "TP1 T3 $m returns no branch" "${!m}" '"branch"'
 done
 # T4 — the nextAction takes its base from passBase and runs in the returned worktree.
