@@ -1,6 +1,6 @@
 # TOOL-aHastenedSweep-6 — every arm this build added can go red on its regression, and every comment and map line describes the one-process launch
 
-**Status:** SPECCED · rev-1 · 2026-11-16 · node a · Tier-1 · base f25308f0 · streams tooling · order 5
+**Status:** INPROGRESS · rev-1 · 2026-11-16 · node a · Tier-1 · base f25308f0 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
