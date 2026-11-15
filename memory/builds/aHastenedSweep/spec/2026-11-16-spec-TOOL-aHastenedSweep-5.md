@@ -1,6 +1,6 @@
 # TOOL-aHastenedSweep-5 — the memory-tree kit contract names every `gotchas.py` verb the hygiene shell launches
 
-**Status:** INPROGRESS · rev-1 · 2026-11-16 · node a · Tier-2 · base f25308f0 · streams tooling · order 4
+**Status:** CLOSED · rev-1 · 2026-11-16 · node a · Tier-2 · base f25308f0 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -183,7 +183,7 @@ change.
   hygiene shell as consumer.
 - risks — A target owning an older copy turns `govkit check` red where the hygiene shell is wired on
   an emitted leg. The leg is red there already, and this names the cause.
-- testing — The pass runs AC1 to AC6 by hand over fixtures under `%TEMP%/hs5f`. AC7 and the §7 legs
+- testing — The pass runs AC1 to AC6 by hand over fixtures under `%TEMP%/hs5f`. AC7 and the legs §7 lists
   run at the close.
 - migration — N/A — no data, conf key or adopter step changes. An adopter that owns `gotchas.py`
   reads the new clause on its next `update`.
