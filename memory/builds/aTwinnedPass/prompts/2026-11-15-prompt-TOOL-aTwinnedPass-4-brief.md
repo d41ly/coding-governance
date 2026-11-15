@@ -15,7 +15,7 @@ The task came from the session that started this one, on the owner's request. It
 ## The brief
 
 ### Goal
-Close every confirmed item of the closing review's round 1, `memory/builds/aTwinnedPass/reviews/2026-11-15-review-TOOL-aTwinnedPass-1-2-3-closing-diff-round1.md`, by severity as BUILD-METHOD M8 disposes them: its three HIGH items become units whose mechanism closes them, and its MEDIUM and LOW items are batched. The pass's identity, the branch and worktree a builder returns and the sha the main loop merges from, crosses every handoff only in the spelling the runtime cuts; and every suite arm this build added can go red on the regression it names.
+Close every confirmed item of the closing review's round 1, `memory/builds/aTwinnedPass/reviews/2026-11-15-review-TOOL-aTwinnedPass-1-2-3-closing-diff-round1.md`, by severity as `doc.build-method#m8-closing-the-build` disposes them: its three HIGH items become units whose mechanism closes them, and its MEDIUM and LOW items are batched. The pass's identity, the branch and worktree a builder returns and the sha the main loop merges from, crosses every handoff only in the spelling the runtime cuts; and every suite arm this build added can go red on the regression it names.
 
 ### Items
 Two units. Read the review report whole first; each item below names its finding by the report's label, and the report's Fix and corrected-fix text is the starting design, to be verified against the code at the build's tip.

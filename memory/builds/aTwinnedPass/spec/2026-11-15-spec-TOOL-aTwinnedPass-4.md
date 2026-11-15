@@ -273,8 +273,8 @@ commit no other ref holds:
 `--merge` reaches `--from` for `worktree-agent-p4` because that branch exists, is held at its own
 place, and holds a commit `HEAD` lacks. The suite carries no floor, so no line is raised there.
 
-Ceilings: the `TP4` group adds nine `node` launches to a suite whose budget row declares 500 s; the
-`pass-tree.test.sh` block adds nine tool processes, about 10 s at the 1.16 s driver launch spec 2
+Ceilings: the `TP4` group adds nine `node` launches to a suite whose budget row declares 500 s; the (PINNED 2026-11-15)
+`pass-tree.test.sh` block adds nine tool processes, about 10 s at the 1.16 s driver launch spec 2 (PINNED 2026-11-15)
 pinned, to a row declaring 300 s. Neither row moves, an ESTIMATE PINNED 2026-11-15 that the close's
 run confirms.
 

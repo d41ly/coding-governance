@@ -31,7 +31,7 @@ change.
 - **S1** — H3. In `tools/workflows/unattended-build.test.sh`, T3's paragraph absence reads the
   needle `THIS PASS BUILDS IN A WORKTREE OF ITS OWN`, the paragraph's own opening, which T1 already
   reads as its positive control. It no longer reads `OWN WORKTREE`. Spec 1 is CLOSED and stays
-  frozen (BUILD-METHOD M4, F1 (c)); this spec carries the corrected needle. Observed by AC1.
+  frozen (`doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it`, F1 (c)); this spec carries the corrected needle. Observed by AC1.
   **Readers:** by name: `tools/workflows/unattended-build.test.sh` alone spells the old needle, at the
   arm this item edits, and spec 1's frozen T3 bullet · by value: NO VALUE READERS, an absence needle
   is read only by its own arm.
@@ -78,7 +78,7 @@ change.
 - A floor for `tools/unattended/pass-tree.test.sh`, which has none at base. Its summary line counts
   what ran, and a block that cannot run exits 2 before the summary.
 - The budget row `unattended pass-tree selftest` in `tools/run-gates/selftest-budgets.txt`. It is
-  300 s for about 25 tool processes, and this unit adds about 12 (§4, "Cost").
+  300 s for about 25 tool processes, and this unit adds about 12 (§4, "Cost"). (PINNED 2026-11-15)
 - `pass_commit`, `read_attribution_tokens`, `check_pass_open` and `read_open_passes`, and every path
   of the live dDeclaredLoop run.
 - Any self-test suite or bar run inside the pass. The arms are checked with `bash -n`, and the main
@@ -158,7 +158,7 @@ refs/heads/agent-p4` prints the tip and exits 0.
 The needle is the opening that T1 asserts present on the passBase fixture, so the absence and the
 presence read one string. Its count of executed assertions does not move.
 
-Spec 1 is CLOSED and is not edited (F1 (c)): BUILD-METHOD M4 keeps a CLOSED spec frozen, so its T3
+Spec 1 is CLOSED and is not edited (F1 (c)): `doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it` keeps a CLOSED spec frozen, so its T3
 bullet keeps the old needle and this spec, with its arm, is the record of the corrected one.
 
 F1 asks whether this edit also owes a deviation record.
@@ -188,9 +188,9 @@ is listed. Each stays one assertion.
 
 Staged breaks:
 
-- T2: in `cmd_merge_tree`'s not-disjoint branch at `pass-tree.sh:208`, call `remove_pass_tree`
+- T2: in `cmd_merge_tree`'s not-disjoint branch at `tools/unattended/pass-tree.sh@def02e16:208`, call `remove_pass_tree`
   before the refusal. The branch is then deleted on refusal, and the arm reads the empty string.
-- T5: in `cmd_remove_tree` at `pass-tree.sh:258`, the lost-commit test becomes `false`. Pass 7's
+- T5: in `cmd_remove_tree` at `tools/unattended/pass-tree.sh@def02e16:258`, the lost-commit test becomes `false`. Pass 7's
   branch is then deleted.
 
 ### M4 — the run check's other refusals
@@ -335,7 +335,7 @@ That makes 2 assertions. The arm at `:174` and `:175` stays as it is, so its exi
 an exit 1 from the same hook, the same tree and the same `HEAD`. Spec 2's AC6 sentence on
 `--check-commit` keeps an arm. F2 records the alternative, dropping the arm.
 
-Staged break: `check_commit_message`'s binding loop at `unattended.sh:14269` reads `for f in ;`, so
+Staged break: `check_commit_message`'s binding loop at `tools/unattended/unattended.sh@dba68e98:14269` reads `for f in ;`, so
 no run binds and every message is admitted. The control goes red on both arms.
 
 ### M2 and L2 — the driver suite
@@ -390,10 +390,10 @@ Staged breaks:
 Declared bounds, PINNED 2026-11-15 and not measured. The close's runs measure them.
 
 - The pass-tree suite: 4 refused merges, 5 usage calls, 1 merge with its regeneration, 1
-  `--check-commit` call and one pass cut. That adds at most 40 s on node a, against a budget row of
-  300 s.
+  `--check-commit` call and one pass cut. That adds at most 40 s on node a, against a budget row of (PINNED 2026-11-15)
+  300 s. (PINNED 2026-11-15)
 - Shard 4 of the driver suite: one driver call more, since B1's call is replaced and not added. That
-  adds at most 10 s.
+  adds at most 10 s. (PINNED 2026-11-15)
 - The harness suite: no new call.
 
 ### The left-shift asks
@@ -484,7 +484,7 @@ No break is committed.
 - security — no product code, input or surface moves. The arms add coverage for the refusals that
   stop `--merge` writing into a finished run, and for the usage refusal that stops another build's
   unit id reaching a merge subject.
-- perf / scale — §4 "Cost": at most 40 s more for the pass-tree suite and 10 s more for shard 4.
+- perf / scale — §4 "Cost": at most 40 s more for the pass-tree suite and 10 s more for shard 4. (PINNED 2026-11-15)
 - error / empty / loading states — M4 arms the missing file and the record naming no run branch,
   and M5 arms every exit-2 path.
 - observability — each arm's label names its case, and each `FAIL` line carries the output.
@@ -584,7 +584,7 @@ line, and that observation is the main loop's.
   spec 1 frozen at rev-2, and let this spec and its arm carry the corrected needle. That leaves the
   CLOSED spec naming a needle its arm no longer reads, against the brief's item 2. Recommendation:
   (a).
-  RESOLVED (agent, 2026-11-15, delegated): (c). BUILD-METHOD M4 ("a CLOSED spec stays frozen, and its correction is a new unit on
+  RESOLVED (agent, 2026-11-15, delegated): (c). `doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it` ("a CLOSED spec stays frozen, and its correction is a new unit on
   top") outranks the recommendation, as `TOOL-aTwinnedPass-4` left spec 2 frozen; S1, §4 "H3" and AC1
   are written to (c).
 - **F2 — L1: keep the admission arm with a negative control, or drop it?** (a) Keep it, and put the

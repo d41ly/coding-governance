@@ -8,7 +8,7 @@ F1 (a), the two observed spellings and no others; F2 (a), the `wf_` alternative 
 and not its group lengths.
 
 The spec's line citations are at its base `900f656d0`; at the dispatch commit the shape test of
-`check_pass_branch` sits at `pass-tree.sh:120`, not `:121`. The line is the same one, so nothing
+`check_pass_branch` sits at `tools/unattended/pass-tree.sh@7b91eac6:120`, not `:121`. The line is the same one, so nothing
 diverges.
 
 The observations below are each criterion's own command, or the changed code run over a hand-built

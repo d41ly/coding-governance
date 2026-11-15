@@ -349,7 +349,7 @@ so passes 2 and 3 each rewrite `fx-out.txt` and the README region differently fr
 | T1 | passes 2 and 3 commit; `--merge` 2 then 3, each `--from C`; parents, regenerated output, subject, trailer, worktrees and branches gone, `pass_commit`, `--check-commit` | AC1, AC6 |
 | T2 | pass 4 from `C` writes `p2.txt`; `--merge` 4 after 2 | AC2 |
 | T3 | the merge refusals: a tree on another branch, an untracked file, branch `agent-none`, branch `run`, branch `-x`, pass 5 never committing, pass 8 committing a `RUN.md` line, `--from HEAD`, and pass 9 cut `noreset` and committing `p9.txt` | AC3 |
-| T4 | pass 7 commits `p7.txt`; `--merge` 7 with `FX_RENDER_FAIL=1` | AC4 |
+| T4 (PINNED 2026-11-15) | pass 7 commits `p7.txt`; `--merge` 7 with `FX_RENDER_FAIL=1` | AC4 |
 | T5 | `--remove` 5, reset and never committed; `--remove` 10, cut `noreset` and never committed; `--remove` 7, committed and left unmerged by T4, refused; `--remove agent-none` | AC5 |
 
 Ceiling: about twenty-five tool processes, each sourcing the driver, and four regenerations of

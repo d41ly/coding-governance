@@ -56,7 +56,7 @@ Owed to the main loop at the close, each red under its break and then green, one
   wrote nothing; a plain write left no untracked file; `FX_RENDER_NEW` alone left `fx-new.txt`; both
   left `fx-new.txt` and `fx-stray.txt`, and `--check` after them exited 0.
 - AC6 — `subject names TOOL-tRun-4` — counted `1`, at line 202, before the arm reading the merge's
-  message exits 0 at line 205. The needle was read against check 49's text at `unattended.sh:14319`.
+  message exits 0 at line 205. The needle was read against check 49's text at `tools/unattended/unattended.sh@dba68e98:14319`.
 - AC7 — `tp5-b1.err` — counted `2`, and `--pass ARCH-tRun-4 --writes work/idx)` counted `1`. The
   floor lines printed, after the shadowed 675 one, `FLOOR_ASSERTIONS=3342` and `FLOOR_SHARD_4=423`,
   each below a `RAISED` line naming `TOOL-aTwinnedPass-5`. `run_main_at_head` runs its command

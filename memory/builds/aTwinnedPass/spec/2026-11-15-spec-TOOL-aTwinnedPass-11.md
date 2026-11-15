@@ -218,8 +218,8 @@ reads no row. The two refused trees are cut at `$C`, which `run` holds, so neith
 commit no other ref holds, and only the new refusals stand between `--remove` and a forced removal.
 The suite carries no floor.
 
-Ceilings: the harness group adds four `node` launches to a suite whose budget row declares 500 s,
-and the pass-tree block three tool calls and one fixture commit to a row declaring 300 s. Neither
+Ceilings: the harness group adds four `node` launches to a suite whose budget row declares 500 s, (PINNED 2026-11-15)
+and the pass-tree block three tool calls and one fixture commit to a row declaring 300 s. Neither (PINNED 2026-11-15)
 row moves, an ESTIMATE PINNED 2026-11-15 that the close's run confirms.
 
 ### Inventory

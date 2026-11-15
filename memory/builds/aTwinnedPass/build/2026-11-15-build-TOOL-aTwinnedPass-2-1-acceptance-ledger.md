@@ -28,7 +28,7 @@ observed red at base `aebbb4a72`, where the tool is absent and every arm's run e
 under each mutation its `New arm:` lines name (`--no-ff` dropped, the `Pass: none` line dropped,
 `check_resolvable_path` returning 0, the fork-point and run-state refusals removed, the restore's
 `git clean -qfd` removed, `--remove`'s lost-commit refusal removed and widened to an ahead-of-`HEAD`
-test), then green; its first run confirms or re-declares the 300 s budget row; AC9's measurement;
+test), then green; its first run confirms or re-declares the 300 s budget row; AC9's measurement; (PINNED 2026-11-15)
 and the legs of the spec's Gates section.
 
 **Evidences:** TOOL-aTwinnedPass-2
