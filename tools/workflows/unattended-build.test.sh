@@ -682,6 +682,10 @@ o=$(run_wf "$UNITS" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused
 has  "default mode: the round IS recorded through the driver" "$o" "agent:record"
 has  "default mode: the return names the child the caller dispatches" "$o" '"scriptPath":"'"${PFX}${KIT}/unattended-unit.js"'"'
 has  "default mode: hands out a roster" "$o" '"roster":[{'
+# TOOL-aLightenedLoop-3 AC1: the first --dispatch is the main loop's, so the unattended hand-out tells
+# it so in `dispatch.declare`, and the attended one, with no run-state file to record against, carries
+# no such key. Staged break: the mode test on the field dropped, which reds the attended arm below.
+has  "LL3 AC1 default mode: the hand-out carries dispatch.declare" "$o" '"declare":"Before each unit'"'"'s Workflow call, run `'
 
 # ---- AC1: attended mode reaches BUILD and spawns NO recorder agent.
 A_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","base":"5eed5eed5eed5eed5eed5eed5eed5eed5eed5eed","mode":"attended","subjects":[{"path":"s1","blob":"abc1234","id":"A-tB-1","rev":1}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1","planState":"READY"}]}'
@@ -689,6 +693,7 @@ o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refus
 has   "attended: hands out a roster" "$o" '"roster":[{'
 hasnt_ "attended: no round is recorded through the driver" "$o" "agent:record"
 has   "attended: it SAYS the round was not recorded" "$o" "no round was recorded"
+hasnt_ "LL3 AC1 attended: the hand-out carries no dispatch.declare" "$o" '"declare"'
 
 # ---- AC8: the BUILD prompt drops the verbs that refuse without a run-state file — AND still carries
 # ---- the surrounding instruction. The paired positive is the point: an absence assertion passes just
@@ -1283,6 +1288,10 @@ else echo "FAIL F2 no derived flag reaches the refusing handler(s): $norun_miss"
 has "F2 the UNATTENDED child prompt orders --dispatch" "$childU" "--dispatch tB"
 has "F2 the UNATTENDED child prompt orders --brief" "$childU" "--brief tB"
 has "F2 the UNATTENDED child prompt still says a refusal is BINDING" "$childU" "A REFUSAL FROM IT IS BINDING"
+# TOOL-aLightenedLoop-3 AC2: the main loop ran the first --dispatch before the spawn, so the child is
+# told its write set is declared and to declare only the paths it adds, never to declare it first.
+has "LL3 AC2 the UNATTENDED child prompt says the main loop declared its write set" "$childU" "The main loop declared this unit's write set"
+hasnt_ "LL3 AC2 the UNATTENDED child prompt no longer orders the first declaration" "$childU" "Declare the write set with"
 has "F2 the ATTENDED child prompt says the recording verbs are unavailable" "$childA" "recording verbs are unavailable"
 has "F2 the ATTENDED child prompt orders the paths written down instead" "$childA" "Write down the paths"
 has "aProbedUnit-1 the child prompt forbids a gate, suite or bar inside the pass" "$childU" "NO GATE, SUITE OR BAR RUNS INSIDE THIS PASS"
@@ -3311,6 +3320,7 @@ for m in unattended attended; do
   same "OC4 AC1 child $m untyped: its prompt equals the empty-roles run's, byte for byte" \
     "$(printf '%s\n' "$o" | grep '^promptjson:')" "$(run_wf "$(printf "$CHILD_ARGS" $m | sed "$OC_EMPTY")" '{}' "$C" | grep '^promptjson:')"
   has    "OC4 AC1 child $m untyped: it is told to change its spec first" "$o" "CHANGE THE SPEC FIRST"
+  has    "aLightenedLoop-4 AC3 child $m untyped: it checks its spec can be built first" "$o" "check that the spec can be built as written"
   hasnt_ "OC4 AC1 child $m untyped: ...and not to hand a divergence back" "$o" "a why that opens DIVERGENCE:"
   hasnt_ "OC4 AC1 child $m untyped: ...nor the status-only flip" "$o" "changes nothing else in the spec"
   hasnt_ "OC4 AC1 child $m untyped: ...nor a role stamp" "$(printf '%s\n' "$o" | grep '^prompt:')" "This stage runs as the"
@@ -3323,6 +3333,7 @@ has    "OC4 AC4 ...handing a divergence back" "$o" "a why that opens DIVERGENCE:
 has    "OC4 AC4 ...with the status-only flip" "$o" "changes nothing else in the spec"
 hasnt_ "OC4 AC4 ...and never told to edit its spec" "$o" "CHANGE THE SPEC FIRST"
 hasnt_ "OC4 AC4 ...nor to close as WONTDO" "$o" "or to WONTDO with a reason"
+hasnt_ "aLightenedLoop-4 AC3 ...and its prompt leaves the feasibility check to the role" "$o" "check that the spec can be built as written"
 o=$(run_wf "$OC_CT" '{"build":{"committed":false,"sha":"","why":"DIVERGENCE: §4 names a verb the code lacks","summary":"s"}}' "$C")
 has    "OC4 AC4 a DIVERGENCE: why returns diverged true" "$o" '"diverged":true'
 o=$(run_wf "$OC_CT" '{"build":{"committed":false,"sha":"","why":"tests red","summary":"s"}}' "$C")
@@ -4018,13 +4029,18 @@ has    "FA15 AC25 the undeclared throw" "$o" "a disposal passes the hand-out's \
 # RAISED 940 -> 950 by TOOL-aNimbleMend-15: ten `passLegs` sites on the child, the absent relative rev,
 # the prompt's request for a base in two modes, the fallback sentence three times with one absence, and the
 # ill-shaped sha's three. Counted by reading, not measured by a run: the pass that wrote it runs no suite.
+# RAISED 950 -> 954 by TOOL-aLightenedLoop-3: the four `LL3` sites, `dispatch.declare` in the default
+# return and absent from the attended one, and the child's new opening present and its old one absent.
+# Counted by reading, not measured by a run: the pass that wrote it runs no suite.
 # RAISED 950 -> 1000 by TOOL-aTwinnedPass-1: the 50 its `TP1` group executes — T1 9, T2 4, T3 6 (three
 # absences on each of two fixtures), T4 3, T5 3, and T6 25 (five passBase refusals of two, the full-sha
 # spawn, four writes refusals of two, three unpaired calls of two). Counted by reading, not measured by
 # a run: the pass that wrote it runs no suite.
 # RAISED 1000 -> 1028 by TOOL-aTwinnedPass-4: the 28 its TP4 group executes — six hostile cases of four, the old spelling's two, and one each for the segment past the id and the backslash form. Counted by reading, not measured by a run: the pass that wrote it runs no suite.
 # RAISED 1028 -> 1039 by TOOL-aTwinnedPass-11: the 11 its TP11 group executes — the wf_ return's three, the hostile wf_ tail's four, and two each for the wf_ name off the structure and the name under neither prefix. Counted by reading, not measured by a run: the pass that wrote it runs no suite.
-FLOOR_ASSERTIONS=1039
+# MERGED at TOOL-aTwinnedPass-13's reconcile of local main at a76c6afe7: the base 950 at aebbb4a72, plus main's 4
+# (TOOL-aLightenedLoop-3), plus this branch's 89 (TOOL-aTwinnedPass-1's 50, -4's 28 and -11's 11) = 1043.
+FLOOR_ASSERTIONS=1043
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

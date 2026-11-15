@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.123 -->
+<!-- gov:kit unattended@1.124 -->
 [memory/guides/UNATTENDED-PROTOCOL.md · Level 3 · Binding for a run that merges and pushes with no owner turn; yields to levels 0 to 2]
 # Unattended runs — the protocol
 
@@ -388,7 +388,7 @@ every start path, and reaps it last — a run that never starts still owns it. I
 the `keepalive` fact and attested as `keepalive-reaped`; that fact, that DoD item, `--keepalive-id`
 and the `KEEPALIVE_*` keys keep their names: each has readers. It fires only while the session
 is idle (documented); nine jobs never fired in 30 h of pending background work (2026-10-10). Its
-prompt is `--resume --keepalive-id` with its own id, then `--audit`.
+prompt is `--wake --keepalive-id` with its own id, and `--resume --keepalive-id` then `--audit` on `FULL`.
 A background task's starter registers it (`--register-task`); `--audit` grades its heartbeat until
 `--release-task`.
 Presume a job you did not schedule ALIVE until a delete says so (`TOOL-aPromptedMandate-11`: two

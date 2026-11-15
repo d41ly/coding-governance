@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.123 -->
+<!-- gov:kit unattended@1.124 -->
 [memory/guides/UNATTENDED-VERBS.md · Level 3 · Binding with the unattended protocol, the verbs a run calls; yields to levels 0 to 2]
 # Unattended runs — the verbs
 
@@ -138,6 +138,12 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   or `none`, and `PROGRESSING` or `STALLED` against `TASK_STALL_BOUND`, a `STALLED` line again
   followed by one remedy line — or `no heartbeat-bearing tasks registered`. A heartbeat that exists
   and cannot be dated is check 51; one not written yet is graded from its registration.
+- `--wake` — `--wake <slug> --keepalive-id <id>`, the tick's first act, one line, exit 0:
+  `unattended-wake: <slug> · HEALTHY|FULL · [<reason> · ]tasks <n> open · cadence <c>`. The
+  reason, first to hold: the phase, then `--resume`'s (`abandoned`, `asks moved`,
+  `worktree`, `holder`, `lease`, `claims unread`, `claim`, `orphans`), then `--audit`'s
+  (`clock probe`, `tree idle`, `task probe`, `task stalled`); each sufficient, not necessary.
+  `<c>`: `KEEPALIVE_INTERVAL`, or `undeclared` when it is blank.
 - `--register-task` — `--register-task <slug> --task <name> --heartbeat <absolute path>`, run by
   the STARTER of a background task BEFORE it starts it: the main loop for an `Agent` or a background
   leg, a brief's author for a unit's own long command. It appends one row to the per-slug sidecar
@@ -246,8 +252,10 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   spec headers or `git`. It refuses on any red but a hit in another build's spec,
   which it notes and admits, because the bar's whole-tree leg still grades that build.
   It skips the run when its inputs match the last check it admitted for this build, keyed on the
-  slug, the checker, the launcher, HEAD and the run-gates working-tree fingerprint, recorded under
-  the sidecar root; with no fingerprint it announces that the cache is off and runs the checker. A blank or absent key is an ANNOUNCED skip on stdout,
+  slug, the checker, the launcher and
+  a digest of every file and git answer its last admitted run read,
+  recorded under the sidecar root only when the tree and HEAD held still while it ran; with no
+  fingerprint it announces that the cache is off and runs the checker. A blank or absent key is an ANNOUNCED skip on stdout,
   never a silent pass. Where `RUN_CLAIMS` is `on` it reads the run's claim as the holder after every
   local refusal and before the row: another session's claim is check 108 and no row is written.
 - `--review` — records ONE review round for a subject and reports what the loop is doing:
@@ -444,7 +452,7 @@ under its Close heading.
    unattended stretch a run has; a step written inside one path is a step the others do not run.
    `Resume` is the one path it does not bind: a resumed session inherits a job it did not schedule,
    so that path reaps before it schedules.
-2. **What the tick runs: TWO acts, in order**, and only once this session's `--preflight` has written
+2. **What the tick runs, in order**, and only once this session's `--preflight` has written
    the run's record; before that it does nothing. A tick issued earlier meets a refusal that is
    expected and is never a signal to reap the keepalive `--preflight` is about to need: `--resume`
    refuses with check 10 when no run-state file exists, with check 26 on a re-run build whose
@@ -452,6 +460,8 @@ under its Close heading.
    a HELD or working record carrying a lease and this worktree is not on its run branch; under
    `in-place`, where a landed record stays LANDING until the next `--preflight` retires it, `--resume`
    prints nothing to resume and `--audit` then refuses with check 51.
+   - `unattended.sh --wake <slug> --keepalive-id <your own id>`: `HEALTHY` ends the turn; `FULL`
+     runs the two below.
    - FIRST, `unattended.sh --resume <slug> --keepalive-id <your own id>`. For the holder it writes
      nothing to the record, because liveness is derived from what `--liveness` reads and this tick
      moves it; where `RUN_CLAIMS` is `on` it reads the run's claim on the remote and renews it when

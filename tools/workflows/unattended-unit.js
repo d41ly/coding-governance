@@ -316,8 +316,10 @@ const DRIVER_STEPS =
       'restore every path you changed, commit nothing, and return committed:false with a why naming each ' +
       'such path: a declaration widens only before its pass commits, and only the main loop may widen ' +
       'this one.\n'
-    : 'Declare the write set with `' + cfg.driver + ' --dispatch ' + cfg.slug + ' --pass ' + cfg.unitId +
-      ' --writes <path>` before you write anything. A REFUSAL FROM IT IS BINDING — read it and stop. ' +
+    : "The main loop declared this unit's write set with `" + cfg.driver + ' --dispatch ' + cfg.slug +
+      ' --pass ' + cfg.unitId + ' --writes <path>` before it spawned you, from the spec\'s Files touched ' +
+      'estimate. Before you write a path outside that set, declare it with the same command, naming ' +
+      'only the paths you add. A REFUSAL FROM IT IS BINDING — read it and stop. ' +
       'ITS SILENCE IS NOT A CLEARANCE: it refuses this unit only for having no tracked spec or a THIN ' +
       'one, plus the shape of the paths you declared; its ORDER gate runs only where this unit AND the ' +
       'blocking sibling both carry an `order` verb, and a sibling that merely declared a dispatch stops ' +
@@ -348,12 +350,17 @@ const PROMPT =
   '\n\nBuild exactly ONE unit: ' + cfg.unitId + '. You are handed two documents' +
   (builder ? '' : ' and you read both whole before you touch code') +
   ': the BRIEF at ' + cfg.briefPath + ' and the SPEC at ' + cfg.specPath + '. ' +
+  // TOOL-aLightenedLoop-4 - the feasibility check is reading craft: the role carries it for a typed builder, and the untyped arm carries it inline.
   (builder
     ? 'The spec is the design and you do not edit it. Where the code you are about to write would diverge ' +
       'from it, stop before writing that code, restore every path you changed, commit nothing, and return ' +
       'committed:false with a why that opens DIVERGENCE: and names the spec section and what it would have ' +
       'to say. The caller has the spec revised by the spec-writer role and dispatches this unit again.\n'
-    : 'The spec is the design; where you must diverge, CHANGE THE SPEC FIRST as a rev-N bump with its ' +
+    : 'Before your first product edit, check that the spec can be built as written: probe each claim it ' +
+      'makes about current code against the tree, cross-read its scope, design and acceptance for two ' +
+      'statements that cannot both hold, and check that its files-touched list holds every path the ' +
+      'change and the commit hooks will need. ' +
+      'The spec is the design; where you must diverge, CHANGE THE SPEC FIRST as a rev-N bump with its ' +
       'section 9 line, then write the code.\n') +
   // TOOL-aNimbleMend-15 - asked in BOTH modes and with or without `passLegs`, so the prompt stays the
   // same either way: a pass can make more than one commit, and only the builder saw where it started.
