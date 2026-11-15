@@ -68,7 +68,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 10 unit(s) · node a · opened 2026-11-14 · streams tooling
+**Build status:** SPECCED · 11 unit(s) · node a · opened 2026-11-14 · streams tooling
 ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10 TOOL-aTrimmedWait-11
 
 <!-- gen:build-units -->
@@ -84,15 +84,16 @@ ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWai
 | [TOOL-aTrimmedWait-8 — a declined staged render leaves the tree as it found it, and the paths the closing review found untested are armed](spec/2026-11-14-spec-TOOL-aTrimmedWait-8.md) | 8 | 2 | CLOSED | rev-2 | 2026-11-14 |
 | [TOOL-aTrimmedWait-9 — closing-review repair, hooks and roles: the role gate reads no shell comment as words, the P3 rows are tested at the floor, and arm 23 tells a resumed read from a cold re-parse](spec/2026-11-14-spec-TOOL-aTrimmedWait-9.md) | 8 | 2 | CLOSED | rev-3 | 2026-11-15 |
 | [TOOL-aTrimmedWait-10 — close-bar repair: the commit-render switch becomes the policy key `memory.staged-render`, and the fork sites the shell-hygiene leg names are converted](spec/2026-11-15-spec-TOOL-aTrimmedWait-10.md) | 9 | 2 | CLOSED | rev-2 | 2026-11-15 |
+| [TOOL-aTrimmedWait-11 — close repair, inherited: the hygiene suite's partition arm sets aside check 26's cache-hit count](spec/2026-11-15-spec-TOOL-aTrimmedWait-11.md) | 10 | 2 | SPECCED | rev-3 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 49 bound to this build, across 4 record folder(s).
+Records: 54 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10.
+Ids no `spec-audit` record has ever named: TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10 TOOL-aTrimmedWait-11.
 
-Ids whose spec moved past its audited revision: none — 0 of 10 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -108,6 +109,7 @@ Ids whose spec moved past its audited revision: none — 0 of 10 unit id(s) carr
 | 7 | `TOOL-aTrimmedWait-7` | no |
 | 8 | `TOOL-aTrimmedWait-8`, `TOOL-aTrimmedWait-9` | yes |
 | 9 | `TOOL-aTrimmedWait-10` | no |
+| 10 | `TOOL-aTrimmedWait-11` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
