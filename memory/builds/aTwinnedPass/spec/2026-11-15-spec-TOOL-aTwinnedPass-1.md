@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-15-build-TOOL-aTwinnedPass-1-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aTwinnedPass-1-1-acceptance-ledger.md) | journal | — |
+| [2026-11-15-build-TOOL-aTwinnedPass-2-measurement.md](../build/2026-11-15-build-TOOL-aTwinnedPass-2-measurement.md) | research | TOOL-aTwinnedPass-2 |
 | [2026-11-15-prompt-TOOL-aTwinnedPass-1-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-1-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTwinnedPass-1-2-builder.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-1-2-builder.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTwinnedPass-1-4-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-1-4-spec-writer.md) | journal | — |
