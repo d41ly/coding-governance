@@ -239,6 +239,7 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   several pass kinds per unit, and a later row is read the same way whichever it is. What the verb
   REFUSES is overlap with a SIBLING pass still open, the disjointness question it exists for and the
   one thing here that is unchanged; a unit's own rows are never siblings of each other.
+  A declared path that an effective generated output covers, a kit's `[[generated]]` row or a `GENERATED_INDEXES` pair, is left out of that comparison on either side, because every pass may rewrite one and `--check-commit` admits it undeclared; the call names its own such paths in one stderr note, and its row still records them and the generator pairing still reads them.
   A pass of a unit whose spec is CLOSED or WONTDO is not a sibling: it reserves nothing, and a later pass for such a unit reserves its paths only once its spec is set back to INPROGRESS. A pass of a deferred unit, whose spec reads DEFERRED and whose latest rescope defer row follows every dispatch row naming it, is not a sibling either, until the unit is dispatched again.
   A pass's COMMIT is the one whose `Pass: <unit-id>` trailer names it; a commit with no trailer falls back to
   its subject, and `Pass: none` names no unit. After every cheap refusal and before the claim read it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
@@ -795,7 +796,7 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   cover; `add` stays history.
 - **Before dispatching a pass, DECLARE its write set** (M6): `--dispatch <slug> --pass <unit-id>
   --writes <path> <path>`. `--writes` takes every path up to the next flag: a whitespace-joined
-  value splits into its paths, and the flag may repeat. It refuses two passes claiming one file
+  value splits into its paths, and the flag may repeat. It refuses two passes claiming one file other than a generated output
   and a pass claiming a shared mutable record; a generated index alone is fine and only the index
   WITH its generator is refused. A `--writes` naming the run's own run-state file is removed from
   the declaration with a note, because every pass commit carries that file, and a path containing it
@@ -821,7 +822,11 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   `by-nature` every `units[]` entry also carries its `planState` and `rev` from
   `--plan <slug> --paths`, because a disposal naming a unit with no `planState` is refused and its
   hand-out carries no roster, and a fold into a unit no audit read compares against that `rev`.
-  The unit harness then builds ONE unit per call from its brief and its spec. Every call is made by
+  The unit harness then builds ONE unit per call from its brief and its spec. A group the build order
+  marks parallel may build at once, each pass on a branch of its own: `--dispatch` and `--brief` for
+  each unit, one records commit, then one harness call per unit carrying that commit as `passBase`
+  and `writes`, run concurrently, then `pass-tree.sh --merge` per committed pass in turn and
+  `--remove` per uncommitted one, as that tool's header states. Every call is made by
   `scriptPath`, never by `name`: the fan-out guard's read-window narrowing is conditional on
   `scriptPath`. **Every harness call also carries `roles`**: the JSON the roles kit's
   `handoff.py harness-args <harness>` prints, `<harness>` being `unattended-build`, `unattended-unit`

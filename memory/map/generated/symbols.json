@@ -658,6 +658,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "add_fixture_pass",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.test.sh"
+    },
+    {
       "id": "add_fixture_remote",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
@@ -5863,6 +5868,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "check_generated_output",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
       "id": "check_generated_render",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
@@ -5971,6 +5981,11 @@
       "id": "check_has",
       "kind": "function",
       "file": "tools/unattended/check-arms-groups.test.sh"
+    },
+    {
+      "id": "check_has",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.test.sh"
     },
     {
       "id": "check_has_delta",
@@ -6243,6 +6258,11 @@
       "file": "tools/unattended/check-arms-groups.test.sh"
     },
     {
+      "id": "check_lacks",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.test.sh"
+    },
+    {
       "id": "check_landed_facts_due",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -6421,6 +6441,11 @@
       "id": "check_merge_ours",
       "kind": "function",
       "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "check_merge_refused",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.test.sh"
     },
     {
       "id": "check_merge_rows",
@@ -6708,6 +6733,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "check_pass_branch",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.sh"
+    },
+    {
       "id": "check_pass_budget",
       "kind": "function",
       "file": "tools/run-gates/pass_legs.py"
@@ -6718,9 +6748,19 @@
       "file": "tools/run-gates/pass_legs.py"
     },
     {
+      "id": "check_pass_holder",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.sh"
+    },
+    {
       "id": "check_pass_open",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_pass_tree_run",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.sh"
     },
     {
       "id": "check_path_inside",
@@ -7168,6 +7208,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "check_resolvable_path",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.sh"
+    },
+    {
       "id": "check_resolves",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
@@ -7336,6 +7381,11 @@
       "id": "check_same",
       "kind": "function",
       "file": "tools/unattended/check-arms-groups.test.sh"
+    },
+    {
+      "id": "check_same",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.test.sh"
     },
     {
       "id": "check_same",
@@ -7968,6 +8018,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_usage_refused",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.test.sh"
+    },
+    {
       "id": "check_user_clash",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -8513,6 +8568,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "cmd_merge_tree",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.sh"
+    },
+    {
       "id": "cmd_mint",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -8596,6 +8656,11 @@
       "id": "cmd_relocate",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "cmd_remove_tree",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.sh"
     },
     {
       "id": "cmd_report",
@@ -14605,6 +14670,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/unattended/pass-tree.sh"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/unattended/stall-recorder.js"
     },
     {
@@ -15061,6 +15131,11 @@
       "id": "measure_red_streak",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "measure_refusals",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.test.sh"
     },
     {
       "id": "measure_rendered_rows",
@@ -16556,6 +16631,11 @@
       "id": "print_pass",
       "kind": "function",
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
+    },
+    {
+      "id": "print_pass_tree_refusal",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.sh"
     },
     {
       "id": "print_pb_out",
@@ -21713,9 +21793,19 @@
       "file": "tools/unattended/resume-tick.test.sh"
     },
     {
+      "id": "remove_merge_attempt",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.sh"
+    },
+    {
       "id": "remove_new_untracked",
       "kind": "function",
       "file": "tools/push-main.sh"
+    },
+    {
+      "id": "remove_pass_tree",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.sh"
     },
     {
       "id": "remove_procs_ledger",
@@ -23016,6 +23106,11 @@
       "id": "render_pass_field",
       "kind": "function",
       "file": "tools/run-gates/pass_legs.py"
+    },
+    {
+      "id": "render_pass_returns",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.test.sh"
     },
     {
       "id": "render_patch",
@@ -27563,6 +27658,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "run_pass_tree_regen",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.sh"
+    },
+    {
       "id": "run_pathless",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
@@ -28351,6 +28451,11 @@
       "id": "run_tool",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "run_tool",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.test.sh"
     },
     {
       "id": "run_touching_probe",
@@ -33291,6 +33396,11 @@
       "id": "write_fixture_commit",
       "kind": "function",
       "file": "tools/playbook/core.py"
+    },
+    {
+      "id": "write_fixture_pass",
+      "kind": "function",
+      "file": "tools/unattended/pass-tree.test.sh"
     },
     {
       "id": "write_fixture_records",

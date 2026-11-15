@@ -14673,7 +14673,7 @@ run_spec_token_check() { # slug -> 0 admitted or skipped, 1 refused under check 
 
 verb_dispatch() { # slug · unit · writes...
   local slug="$1" unit="$2"; shift 2
-  local rel shaped grp p q sib sibpaths want cur curpaths gen idx pair _dk
+  local rel shaped grp p q sib sibpaths want cur curpaths gen idx pair _dk _c1_own _c1_gen
   check_slug "$slug" || return 1
   runmd_of "$slug" >/dev/null; rel=$_runmd
   check_run_state "$rel" "run to declare a dispatch against" || return 1
@@ -14903,6 +14903,12 @@ verb_dispatch() { # slug · unit · writes...
     [ "${#_rw_keep[@]}" -gt 0 ] || { fail 49 "--dispatch was given no --writes path except the run's run-state file, which is never declared, so the declaration would name no path: $unit"; return 1; }
     set -- "${_rw_keep[@]}"
   fi
+  # CONDITION 1 LEAVES AN EFFECTIVE GENERATED OUTPUT OUT (TOOL-aTwinnedPass-3): see the comment above condition 1.
+  _c1_own=""; _c1_gen=""
+  for p in "$@"; do
+    if check_generated_output "$p" "${GENERATED_INDEXES:-}"; then _c1_gen="$_c1_gen $p"; else _c1_own="$_c1_own $p"; fi
+  done
+  [ -z "$_c1_gen" ] || echo "unattended: dispatch — an effective generated output covers these declared paths, which every pass may rewrite and --check-commit admits undeclared, so condition 1 leaves them out of the sibling comparison while the row records them and the generator pairing reads them, for $unit:$_c1_gen" >&2
   # CONDITION 3, FLAT HALF. The run-state file is DERIVED rather than declared - it is the one member
   # the kit already knows how to locate - and the rest come from the project's own declaration, so an
   # adopter whose layout differs gets refusals about THEIR paths and not this repo's.
@@ -15013,11 +15019,24 @@ verb_dispatch() { # slug · unit · writes...
   done
   # CONDITION 1. Two passes in one group claiming one path are not disjoint, and this is decidable the
   # moment the second declaration arrives.
+  #
+  # AN EFFECTIVE GENERATED OUTPUT IS LEFT OUT, ON BOTH SIDES (TOOL-aTwinnedPass-3). A path that the
+  # index half of a `GENERATED_INDEXES` pair covers, through `check_generated_output`, is not compared:
+  # this call's own such paths were sorted into `_c1_gen` above and the outer loop reads `_c1_own`, and
+  # a sibling's are skipped in the inner loop. SOUND because `--check-commit` admits such a path
+  # undeclared, as check 23 does at the close, so refusing it bound only the pass that declared it
+  # honestly. ONE-WAY, by `covers` and never `overlaps`: a path that CONTAINS an index, such as
+  # `--writes memory/map`, is still compared on either side, so the exemption stays narrower than the
+  # writes it forgives. The generator pairing above still reads every path, `"$@"` and `$sibpaths`
+  # whole, and so does the parked row. NOT CHECKED: that a covered path is ever re-rendered. Two passes
+  # that hand-edit one index are both admitted, as `--check-commit` already admits each, and whichever
+  # render runs last wins.
   while IFS= read -r sib; do
     [ -n "$sib" ] || continue
     case "$sib" in *" $unit · reason "*) continue ;; esac   # our own row is not a sibling
-    for p in "$@"; do
+    for p in $_c1_own; do
       for q in ${sib#* · reason }; do
+        check_generated_output "$q" "${GENERATED_INDEXES:-}" && continue
         # OVERLAP, never equality. Two passes declaring `memory/builds/x/` and
         # `memory/builds/x/spec/s.md` collide on every write, and string equality calls them disjoint.
         overlaps "$p" "$q" || continue

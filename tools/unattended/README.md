@@ -41,6 +41,15 @@ open pass's commit that stages a path outside its declaration while `--dispatch`
 because a hook file is copied whole and would overwrite yours. Its limits: a `--no-verify` commit
 skips it, `Pass: none` is taken at its word, and check 23 grades both at the close.
 
+**Parallel passes come back through `pass-tree.sh`** (`TOOL-aTwinnedPass-2`), which the main loop runs
+in the run's own tree, paired with the unit harness's `passBase` key. `--merge <slug> --pass <unit>
+--branch <branch> --from <sha>` takes the branch the harness returned and the commit that key carried,
+merges it `--no-ff` with a `Pass: none` merge commit whose second parent is the pass commit, resolves
+only a conflict on an effective generated output or a gen-region-only change, re-renders the outputs,
+and takes the pass's worktree and branch away; `--remove <slug> --branch <branch>` takes away those of
+a pass that committed nothing. It finds `regen.py` beside the run-gates kit, and without it announces
+the skip and merges what the resolution left. Its header states the order the main loop runs it in.
+
 **Why the verb entries are not in the protocol.** The move was a BYTE decision and is recorded as
 one. That document had reached its cap EXACTLY, and a contract with no room left to state its next
 rule has stopped being amendable — which is a failure mode of the contract, not of whoever wrote the
