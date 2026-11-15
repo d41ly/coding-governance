@@ -39,6 +39,7 @@
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-9-researcher.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-9-researcher.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-brief.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-brief.md) | research | TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-4 TOOL-aMeasuredDrag-5 TOOL-aMeasuredDrag-6 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 TOOL-aMeasuredDrag-9 TOOL-aMeasuredDrag-10 TOOL-aMeasuredDrag-11 |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-1-ruling-brief.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-ruling-brief.md) | research | TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 |
+| [2026-11-15-review-TOOL-aMeasuredDrag-1-11-closing-diff-round1.md](../reviews/2026-11-15-review-TOOL-aMeasuredDrag-1-11-closing-diff-round1.md) | diff-review | TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-4 TOOL-aMeasuredDrag-5 TOOL-aMeasuredDrag-6 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 TOOL-aMeasuredDrag-9 TOOL-aMeasuredDrag-10 TOOL-aMeasuredDrag-11 |
 | [2026-11-15-review-TOOL-aMeasuredDrag-1-performance.md](../reviews/2026-11-15-review-TOOL-aMeasuredDrag-1-performance.md) | research | — |
 
 <!-- /gen:spec-records -->

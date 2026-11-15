@@ -13,6 +13,7 @@
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-3-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-3-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-3-2-builder.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-3-2-builder.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-3-readers-brief.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-3-readers-brief.md) | research | TOOL-aMeasuredDrag-4 |
+| [2026-11-15-review-TOOL-aMeasuredDrag-1-11-closing-diff-round1.md](../reviews/2026-11-15-review-TOOL-aMeasuredDrag-1-11-closing-diff-round1.md) | diff-review | TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-4 TOOL-aMeasuredDrag-5 TOOL-aMeasuredDrag-6 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 TOOL-aMeasuredDrag-9 TOOL-aMeasuredDrag-10 TOOL-aMeasuredDrag-11 |
 
 <!-- /gen:spec-records -->
 
