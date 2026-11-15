@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-85 — the write-tree capability probe has three answers, and only a probed absence takes the parent exemption
 
-**Status:** DEFERRED · rev-5 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-5 · 2026-11-15 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-11-15-build-TOOL-dDeclaredLoop-85-deviation-853.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-85-deviation-853.md) | deviation | — |
 | [2026-11-15-build-TOOL-dDeclaredLoop-85-red-fix-28.md](../build/2026-11-15-build-TOOL-dDeclaredLoop-85-red-fix-28.md) | red-fix | — |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-85-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-85-1-spec-writer.md) | journal | — |
+| [2026-11-15-prompt-TOOL-dDeclaredLoop-85-build-brief.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-85-build-brief.md) | journal | — |
 | [2026-11-15-prompt-TOOL-dDeclaredLoop-85-reground-brief.md](../prompts/2026-11-15-prompt-TOOL-dDeclaredLoop-85-reground-brief.md) | research | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-83-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-83-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-86 |
 
