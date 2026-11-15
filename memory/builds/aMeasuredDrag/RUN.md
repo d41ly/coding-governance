@@ -40,3 +40,7 @@ base: a0a1892de069cd2299ba162d885ac283cfa81010
 2026-11-15T01:45:53Z dispatch · item 1c3d2821 TOOL-aMeasuredDrag-1 · reason tools/unattended/unattended.sh memory/builds/aMeasuredDrag/spec/2026-11-15-spec-TOOL-aMeasuredDrag-1.md memory/builds/aMeasuredDrag/build/2026-11-15-build-TOOL-aMeasuredDrag-1-1-acceptance-ledger.md memory/builds/aMeasuredDrag/README.md memory/LIVE.md memory/ledger/2026-11.md memory/map/generated/symbols.json
 
 2026-11-15T01:45:58Z brief · item TOOL-aMeasuredDrag-1 · reason 638cfc7c4fdd memory/builds/aMeasuredDrag/prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-1-20-builder.md
+
+2026-11-15T02:15:34Z dispatch · item a2c11ce6 TOOL-aMeasuredDrag-3 · reason tools/memory-tree/gen_build_index.py memory/builds/aMeasuredDrag/spec/2026-11-15-spec-TOOL-aMeasuredDrag-3.md memory/builds/aMeasuredDrag/build/2026-11-15-build-TOOL-aMeasuredDrag-3-1-acceptance-ledger.md memory/builds/aMeasuredDrag/README.md memory/map/generated/symbols.json
+
+2026-11-15T02:15:39Z brief · item TOOL-aMeasuredDrag-3 · reason f866dfa53633 memory/builds/aMeasuredDrag/prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-3-2-builder.md

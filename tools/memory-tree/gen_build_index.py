@@ -1987,6 +1987,13 @@ def read_landed_unclosed(root: str, conf: dict, resolve=None) -> dict | None:
     return record
 
 
+# TOOL-aMeasuredDrag-3. The coverage, derived once per `--check --with-verdicts` call. `main()` sets a
+# dict for that call alone, where check 29's verb and `plan()` read it over one root and one conf, and
+# resets it to None after. None reads through, which the selftest needs: its arms re-read one fixture
+# root after changing its tree.
+_COVERAGE_MEMO = None
+
+
 def read_carries_coverage(root: str, conf: dict, resolve=None) -> dict:
     """TOOL-dTrueNorth-3 S2 — the carries join's coverage, the ONE read the coverage region and
     `--check-coverage` share, so the two cannot disagree.
@@ -2010,6 +2017,9 @@ def read_carries_coverage(root: str, conf: dict, resolve=None) -> dict:
     if not (conf.get(CARRIES_KEY) or "").strip():
         return {"state": "off", "key": CARRIES_KEY}
     path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), CARRIES_CHECKER)
+    key = (root, path, resolve)
+    if _COVERAGE_MEMO is not None and key in _COVERAGE_MEMO:
+        return _COVERAGE_MEMO[key]
     if resolve is None and not os.path.isfile(path):
         raise Problem(f"{CARRIES_KEY} is set and {CARRIES_CHECKER} is not in this kit directory's parent "
                       f"({path}), so the coverage cannot be read")
@@ -2045,7 +2055,9 @@ def read_carries_coverage(root: str, conf: dict, resolve=None) -> dict:
     finally:
         sys.dont_write_bytecode = cache
     if value.get("state") != "armed":
-        return {"state": "off", "key": CARRIES_KEY}
+        value = {"state": "off", "key": CARRIES_KEY}
+    if _COVERAGE_MEMO is not None:
+        _COVERAGE_MEMO[key] = value
     return value
 
 
@@ -4884,6 +4896,39 @@ def test_coverage_stub(arm) -> None:
                 lambda: read_carries_coverage(t, conf))
         finally:
             CARRIES_CHECKER = held
+
+        # TOOL-aMeasuredDrag-3 AC1 (S1): with the memo set, one stub derives once and hands back one object,
+        # a second stub derives once more, and a refusal is a Problem on each read, never stored; with the
+        # memo at None every read derives. Red against no memo, a key without `resolve`, or a stored refusal.
+        def read_memo():
+            global _COVERAGE_MEMO
+            n = []
+
+            def counted(tag):
+                return lambda p: (n.append(tag), lambda root, conf=None: value)[1]
+
+            def refusing(p):
+                n.append("bad")
+                raise ImportError("planted")
+
+            one, two = counted("one"), counted("two")
+            _COVERAGE_MEMO = {}
+            try:
+                a, b = read_carries_coverage(t, conf, one), read_carries_coverage(t, conf, one)
+                read_carries_coverage(t, conf, two)
+                for _ in (1, 2):
+                    try:
+                        read_carries_coverage(t, conf, refusing)
+                    except Problem:
+                        pass
+            finally:
+                _COVERAGE_MEMO = None
+            read_carries_coverage(t, conf, one)
+            read_carries_coverage(t, conf, one)
+            return f"{a is b is value} {n}"
+
+        arm("TOOL-aMeasuredDrag-3 AC1 — a set memo derives once per resolver and never stores a refusal; None "
+            "reads through", "True ['one', 'two', 'bad', 'bad', 'one', 'one']", read_memo)
         # TOOL-dTrueNorth-32 S12 (AC12): the catch reads the refusal class the checker itself loaded. A
         # scratch checker whose `load_design_lib` returns one object holding its own `DesignRefusal`, and
         # whose `derive_carries_coverage` raises that class, is named by its absolute path, which
@@ -5199,6 +5244,37 @@ def test_asbuilt_view(arm) -> None:
         arm("TOOL-dTrueNorth-31 AC2 AC12 — under --with-verdicts every stderr line lands in its verb's section or "
             "after the end marker, in order, and a verb's crash is its own section's line under exit 2 while "
             "--check still runs", "plain=True crash=True", _read_ordered31)
+
+        # TOOL-aMeasuredDrag-3 AC2 (S2): a child, built as `child31` is, stubs the three readers to record
+        # whether the coverage memo was set when each ran: all three under --check --with-verdicts, and the
+        # memo is None once main returns. Red against a main that sets no memo or leaves it set.
+        memo3 = "\n".join([
+            "import importlib.util, sys",
+            "spec = importlib.util.spec_from_file_location('gen_build_index_memo3', sys.argv[1])",
+            "mod = importlib.util.module_from_spec(spec)",
+            "spec.loader.exec_module(mod)",
+            "seen = []",
+            "def coverage(root, conf):",
+            "    seen.append(mod._COVERAGE_MEMO is not None)",
+            "    return 0",
+            "def asbuilt(root, conf):",
+            "    seen.append(mod._COVERAGE_MEMO is not None)",
+            "    return 0",
+            "def check(root, conf):",
+            "    seen.append(mod._COVERAGE_MEMO is not None)",
+            "    return 0",
+            "mod.cmd_check_coverage, mod.cmd_check_asbuilt, mod.cmd_check = coverage, asbuilt, check",
+            "rc = mod.main(['x', '--check', '--with-verdicts'])",
+            "sys.stderr.write('memo %s %s %s\\n' % (rc, seen, mod._COVERAGE_MEMO))", ""])
+
+        def _read_memo_lifetime3():
+            cli = subprocess.run([sys.executable, "-c", memo3, os.path.abspath(__file__)], cwd=tmp,
+                                 capture_output=True, text=True, encoding="utf-8", errors="replace",
+                                 env=_build_git_env())
+            return cli.stderr.strip()
+
+        arm("TOOL-aMeasuredDrag-3 AC2 — --check --with-verdicts sets the coverage memo for both verbs and --check, "
+            "and main returns with it None", "memo 0 [True, True, True] None", _read_memo_lifetime3)
 
         def read_flag_refusals():
             said = io.StringIO()
@@ -8828,6 +8904,7 @@ def cmd_new_spec(root: str, conf: dict, args: dict) -> int:
 
 
 def main(argv: list) -> int:
+    global _COVERAGE_MEMO
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
         # TOOL-aSparedSpawn-9 S1: the fixtures' identity and line endings, once for every git the
@@ -8928,11 +9005,13 @@ def main(argv: list) -> int:
             # block-buffered stdout ahead of the markers the hygiene capture splits at.
             held = sys.stderr
             sys.stderr = sys.stdout
+            _COVERAGE_MEMO = {}
             try:
                 print_check_verdicts(root, conf)
                 return cmd_check(root, conf)
             finally:
                 sys.stderr = held
+                _COVERAGE_MEMO = None
         return cmd_check(root, conf) if mode == "--check" else cmd_write(root, conf)
     except Problem as exc:
         print(f"build-index: {exc}")
