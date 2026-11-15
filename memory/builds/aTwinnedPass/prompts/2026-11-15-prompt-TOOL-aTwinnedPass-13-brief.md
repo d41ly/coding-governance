@@ -40,3 +40,7 @@ The merge bar once at the close, without the self-test suites, run by the main l
 - ANY SELF-TEST SUITE OR BAR INSIDE THE PASS, A SLICED SUITE INCLUDED.
 - A pass commit without its acceptance ledger: the pass commit carries `memory/builds/aTwinnedPass/build/2026-11-15-build-TOOL-aTwinnedPass-13-1-acceptance-ledger.md`.
 - An edit after the commit that sets the spec CLOSED: the status flip is the last change of the pass.
+
+## Owner confirmation
+
+> merge to local main
