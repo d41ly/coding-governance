@@ -6,7 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-15-build-TOOL-aTrimmedWait-1-arms-observed.md](../build/2026-11-15-build-TOOL-aTrimmedWait-1-arms-observed.md) | journal | TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 |
+| [2026-11-15-build-TOOL-aTrimmedWait-1-arms-observed.md](../build/2026-11-15-build-TOOL-aTrimmedWait-1-arms-observed.md) | journal | TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-10 |
 | [2026-11-15-build-TOOL-aTrimmedWait-9-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aTrimmedWait-9-1-acceptance-ledger.md) | journal | — |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-8-ruling.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-8-ruling.md) | research | TOOL-aTrimmedWait-8 |
 | [2026-11-14-prompt-TOOL-aTrimmedWait-9-1-spec-writer.md](../prompts/2026-11-14-prompt-TOOL-aTrimmedWait-9-1-spec-writer.md) | journal | — |

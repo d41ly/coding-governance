@@ -1,6 +1,6 @@
 # aTrimmedWait — the new arms observed red and green by the main loop
 
-**Serves:** journal TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9
+**Serves:** journal TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10
 
 Observed by the main loop on node a, 2026-11-14 and 2026-11-15, on a frozen clone of `057f26ba4`,
 one suite at a time with nothing running beside it. Every `New arm:` line of the nine specs.
@@ -72,3 +72,24 @@ Two clones, the hook pointed at each clone's own `.githooks`, one staged status 
   `--write`, `git add` and the second commit, took 187.8 s more. <!-- PINNED 2026-11-15 -->
 - AC10: the unit clone with `STAGED_RENDER` blank exited 1; its hygiene lines equal the base clone's
   line for line, and the one added line is the hook's decline.
+
+## TOOL-aTrimmedWait-10's arms, observed by the main loop
+
+Frozen clones of `ff4242f8b`, one suite at a time, 2026-11-15:
+
+- RED under G10, `check_staged_write` reading the switch from the conf key again:
+  `gen_build_index.py --selftest` exited 1, and its three unit-10 arms failed, the two AC3 arms among
+  them. The unit-3 staged arms failed beside them, since no conf key turns the render on any more.
+- RED with `check-memory-hygiene.sh` checked out at `49cdded06`: the unscoped `--only 2` arm failed on
+  the unbound variable. The run was stopped once that arm had failed, as every later arm of that
+  engine fails the same way and each scoped run walks the whole tree.
+- GREEN: `gen_build_index.py --selftest` exited 0, all three unit-10 arms ok. The hygiene suite
+  exited 1 on eight rows, none of them unit 10's: the seven conf-example rows listed under
+  "Inherited" above, and the partition arm below.
+
+## Found at the close: the partition arm reads a warm cache
+
+TOOL-aTrimmedWait-2's AC8 arm compares the unscoped run's lines with the union of the scoped runs'
+lines, and check 26's line carries `cache hits N`. On a cold clone the unscoped run goes first and
+reads 0, then the scoped run of check 26 reads the cache that run wrote and prints 4, so the arm reds
+on every fresh checkout and stays green in a tree whose check 26 cache is already warm.
