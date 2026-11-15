@@ -9527,6 +9527,32 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/idx.md --writes work
 miss "$(run --dispatch tRun --pass ARCH-tRun-3 --writes work/idx.md)" "--dispatch declares a generated index together with its generator"
 mv .unattended.conf.bak .unattended.conf
 
+# ---- TOOL-aTwinnedPass-3: CONDITION 1 LEAVES AN EFFECTIVE GENERATED OUTPUT OUT, ON BOTH SIDES. Two
+# ---- siblings declaring one index are both admitted, each naming it in the stderr note, and the row
+# ---- still records it. B4 and B5 are the controls, green at base: the pairing still sees the index,
+# ---- and a sibling's product path still refuses. B6 is the sibling-side skip: `work` contains the
+# ---- index, so it is compared, against a sibling whose only overlapping path is the index. RED-first:
+# ---- the driver at aebbb4a72 refused B2 and B6 under condition 1 and printed no note. Ten assertions.
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+cp .unattended.conf .unattended.conf.bak
+printf '\nGENERATED_INDEXES="work/idx:gen/mk"\n' >> .unattended.conf
+out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/idx --writes lane/one)
+hit "$out" "dispatch declared"
+hit "$out" "for ARCH-tRun-1: work/idx"
+out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/idx --writes lane/two)
+hit  "$out" "dispatch declared"
+miss "$out" "two passes claiming one file are not disjoint"
+hit  "$out" "for ARCH-tRun-2: work/idx"
+n=$((n+1))
+grep -q ' dispatch · item .* ARCH-tRun-2 · reason work/idx lane/two$' memory/builds/tRun/RUN.md \
+  || { echo "FAIL the parked row dropped the generated output it declared: $(grep ' ARCH-tRun-2 · reason ' memory/builds/tRun/RUN.md | tail -1)"; st=1; }
+hit "$(run --dispatch tRun --pass ARCH-tRun-3 --writes gen/mk)" "--dispatch declares a generated index together with its generator"
+hit "$(run --dispatch tRun --pass ARCH-tRun-3 --writes lane/one)" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint: lane/one also in"
+out=$(run --dispatch tRun --pass ARCH-tRun-3 --writes work)
+hit  "$out" "dispatch declared"
+miss "$out" "so condition 1 leaves them out of the sibling comparison"
+mv .unattended.conf.bak .unattended.conf
+
 # ---- L2: THE MISSING-LIBRARY REFUSAL, observed. Landed unobserved in both scripts and sitting
 # ---- outside every armed population, it is the one branch whose failure mode is a silent exit 2.
 n=$((n+1))
@@ -19620,7 +19646,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # five `hit`/`miss` lines and the M3 block's two `mutate`s and three `same`/`miss`/`hit` lines, every one
 # unconditional, counted off the blocks' own lines; no suite ran, and their RED-first observation is the close's.
 # MERGED at TOOL-aSmoothedDispatch-21's reconcile: the base 3256, plus 42, plus 31 = 3329.
-FLOOR_ASSERTIONS=3329
+# RAISED 3329 -> 3339 by TOOL-aTwinnedPass-3 on 2026-11-15: the region-four generated-output block after
+# the M1 one, nine `hit`/`miss` lines and one counted `grep -q`, every one unconditional, counted off
+# the block's own lines; no suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3339
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -19839,7 +19868,8 @@ FLOOR_SHARD_3=445
 # RAISED 383 -> 393 by TOOL-aSwiftRefusal-3: the same 10 region-four deferred-unit assertions, see FLOOR_ASSERTIONS.
 # RAISED 393 -> 403 by TOOL-aSwiftRefusal-4: the same 10 region-four M1 and M3 assertions, see FLOOR_ASSERTIONS.
 # MERGED at TOOL-aSmoothedDispatch-21's reconcile: the base 383, plus 7, plus 20 = 410.
-FLOOR_SHARD_4=410
+# RAISED 410 -> 420 by TOOL-aTwinnedPass-3 on 2026-11-15: the same 10 region-four generated-output assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_4=420
 FLOOR_SHARD_5=297
 FLOOR_SHARD_6=127
 FLOOR_SHARD_7=311

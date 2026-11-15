@@ -1,11 +1,12 @@
 # TOOL-aTwinnedPass-3 — `--dispatch` condition 1 leaves an effective generated output out of the sibling comparison
 
-**Status:** INPROGRESS · rev-1 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-15-build-TOOL-aTwinnedPass-3-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aTwinnedPass-3-1-acceptance-ledger.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTwinnedPass-1-brief.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-1-brief.md) | research | TOOL-aTwinnedPass-1 TOOL-aTwinnedPass-2 |
 | [2026-11-15-prompt-TOOL-aTwinnedPass-3-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-3-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aTwinnedPass-3-2-builder.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-3-2-builder.md) | journal | — |

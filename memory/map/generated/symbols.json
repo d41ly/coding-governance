@@ -5833,6 +5833,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "check_generated_output",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
       "id": "check_generated_render",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
