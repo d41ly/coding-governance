@@ -18,7 +18,7 @@ sat under the `md5` folder of `%TEMP%`. The new arm's RED-first observation is o
   `process-monitor: could NOT run — spawnSync nonesuch-python-shim ENOENT` first. The before run is
   the red the criterion names.
 - AC3 — `grep -n "'git'"` — over `tools/process-monitor/procmon-hook.js` it printed nothing, exit 1.
-  Timed over 10 throttled runs from the fixture's worktree, within the 300 s window of AC2's probe
+  Timed over 10 throttled runs from the fixture's worktree, within the 300 s window of AC2's probe PINNED 2026-11-15
   (PINNED, `.process-monitor.conf@60c3d42027a9:78`):
   - before, `hook-before.js` at f2c00165: 2.282 s per 10 runs, PINNED at f2c00165. The spec's
     figure at 6d98c39ca is 2.43 s, PINNED at 6d98c39ca.
