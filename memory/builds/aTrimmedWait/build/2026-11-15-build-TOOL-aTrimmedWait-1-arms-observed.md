@@ -89,7 +89,12 @@ Frozen clones of `ff4242f8b`, one suite at a time, 2026-11-15:
 
 ## Found at the close: the partition arm reads a warm cache
 
-TOOL-aTrimmedWait-2's AC8 arm compares the unscoped run's lines with the union of the scoped runs'
-lines, and check 26's line carries `cache hits N`. On a cold clone the unscoped run goes first and
-reads 0, then the scoped run of check 26 reads the cache that run wrote and prints 4, so the arm reds
-on every fresh checkout and stays green in a tree whose check 26 cache is already warm.
+The hygiene suite's partition arm compares the unscoped run's lines with the union of the scoped
+runs' lines, and check 26's line carries `cache hits N`. On a cold clone the unscoped run goes first
+and reads 0, then the scoped run of check 26 reads the cache that run wrote and prints 4, so the arm
+reds on every fresh checkout and stays green in a tree whose check 26 cache is already warm.
+
+It is inherited: the arm came in with `TOOL-aSparedSpawn-7` and the field with
+`TOOL-dDerivedDocket-9`, both ancestors of the base `846d51d39`, and this build moves neither the arm
+nor `tools/memory-tree/transition_audit.py`. The owner ruled on 2026-11-15 to repair it here anyway,
+as `TOOL-aTrimmedWait-11`.

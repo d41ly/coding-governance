@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-14
 streams: tooling
 roster: TOOL
-ids: TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10
+ids: TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10 TOOL-aTrimmedWait-11
 ---
 
 # aTrimmedWait — builds stop waiting on checks that grade more than the caller needs, without moving any verdict
@@ -64,11 +64,12 @@ None.
 | 8 | `TOOL-aTrimmedWait-8` | Closing-review repair, memory-tree: `--write-staged` declines before it writes or stages, its index and decline arms tested, the scoped hygiene fixture arms its edge cutoff, and the branch-guard leg names the hygiene producer (review M1 M3 M4 M5 M6 L1) |
 | 9 | `TOOL-aTrimmedWait-9` | Closing-review repair, hooks and roles: the polling rows read no shell comment as a duration and are tested at the floor, and arm 23 tells a resumed read from a cold re-parse (review M2 L2 M7) |
 | 10 | `TOOL-aTrimmedWait-10` | Close-bar repair: the commit-render switch moves from `.memory-tree.conf` to a policy catalogue key, and the fork sites the shell-hygiene leg names are converted (owner, 2026-11-15) |
+| 11 | `TOOL-aTrimmedWait-11` | Close repair, inherited: the hygiene suite's partition arm stops reading check 26's cache-hit count, so a cold clone reads it green (owner, 2026-11-15) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 10 unit(s) · node a · opened 2026-11-14 · streams tooling
-ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10
+ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10 TOOL-aTrimmedWait-11
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -85,7 +86,7 @@ ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWai
 | [TOOL-aTrimmedWait-10 — close-bar repair: the commit-render switch becomes the policy key `memory.staged-render`, and the fork sites the shell-hygiene leg names are converted](spec/2026-11-15-spec-TOOL-aTrimmedWait-10.md) | 9 | 2 | CLOSED | rev-2 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 48 bound to this build, across 4 record folder(s).
+Records: 49 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
