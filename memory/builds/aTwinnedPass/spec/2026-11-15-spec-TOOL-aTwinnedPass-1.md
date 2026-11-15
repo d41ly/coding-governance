@@ -1,6 +1,6 @@
 # TOOL-aTwinnedPass-1 — the unit harness builds one pass in a worktree of its own, on a write set the main loop declared
 
-**Status:** INPROGRESS · rev-2 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 1 · closes TOOL-dDerivedDocket-55
+**Status:** CLOSED · rev-2 · 2026-11-15 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 1 · closes TOOL-dDerivedDocket-55
 
 <!-- gen:spec-records -->
 
