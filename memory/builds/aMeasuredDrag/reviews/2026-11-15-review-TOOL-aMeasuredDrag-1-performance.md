@@ -250,10 +250,10 @@ Do not rebuild these.
 - TOOL-aTrimmedWait-6/-9: role-gate refusals (sessionhooks-7, refuted on these grounds).
 
 **Filed asks:**
-- TOOL-aTimedTurnstile-2: leg guards (#10, #48).
-- TOOL-aBriskPreflight-8: SessionStart (#28).
+- Leg guards (#10, #48): the open ask `TOOL-aTimedTurnstile-2`.
+- SessionStart (#28): the open ask `TOOL-aBriskPreflight-8`.
 - TOOL-aNimbleMend-26 and TOOL-aSparedSpawn-26: CI spawn budget (#1).
-- TOOL-dDerivedDocket-32: held suites (#55).
+- Held suites (#55): `TOOL-dDerivedDocket-32`.
 - incms ARCH-aYieldedFork-2: memory-only scoping (adopters-12).
 
 **Existing modes that a fix should use instead of re-implementing:**
