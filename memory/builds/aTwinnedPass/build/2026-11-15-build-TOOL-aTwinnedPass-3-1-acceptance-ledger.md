@@ -60,3 +60,11 @@ legs of the spec's Gates section.
   printed `OK — check_generated_output leads with check`. After `gen_map.py --write`,
   `memory/map/generated/symbols.json` gained one function entry for the name, in
   `tools/unattended/lib-unattended.sh`, and nothing else.
+
+## The close
+
+The main loop's observations at the close, on node a, 2026-11-15, at the build tip `39a71c080` unless named.
+
+- The region-4 block of `tools/unattended/unattended.test.sh`, run as a main-loop slice (the suite's prologue and the block): GREEN at `22ce73e14`, 30 assertions and 0 FAIL lines; RED with `unattended.sh` and `lib-unattended.sh` put back to `4f819220f`, 6 FAIL lines naming B1's note, B2's not-disjoint refusal and B6 (PINNED 2026-11-15).
+- The whole shard 4/8 run did not finish inside 3000 s on this node and is not a verdict (PINNED 2026-11-15).
+- At the tip the slice is GREEN with 33 assertions (PINNED 2026-11-15).

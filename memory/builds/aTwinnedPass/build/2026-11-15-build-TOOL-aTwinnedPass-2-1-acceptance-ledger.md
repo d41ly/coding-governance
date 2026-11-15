@@ -78,3 +78,11 @@ and the legs of the spec's Gates section.
   `tools/run-gates/selftest-budgets.txt`; `grep -c "pass-tree.sh"` printed 1 over the kit README.
 - AC9 — `tools/workflows/unattended-unit.js` — not observed in the pass: the serial and parallel
   measurement is the main loop's at the close, as the criterion's permission line says.
+
+## The close
+
+The main loop's observations at the close, on node a, 2026-11-15, at the build tip `39a71c080` unless named.
+
+- `tools/unattended/pass-tree.test.sh` at `c40c39fb6`: 89 of 91 green; the two `remains` arms were red on git's `+` worktree marker with the tool correct, closed by `TOOL-aTwinnedPass-5` (PINNED 2026-11-15).
+- At the tip: GREEN, 157 assertions, 0 FAIL lines (PINNED 2026-11-15).
+- The red at base, where the tool is absent, is every arm; not run, as the spec's first `New arm:` line predicts it.

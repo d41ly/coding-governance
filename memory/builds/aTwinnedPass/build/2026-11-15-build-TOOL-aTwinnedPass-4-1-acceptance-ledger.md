@@ -80,3 +80,11 @@ Owed to the main loop at the close:
   `OK — check_pass_holder leads with check`. After `gen_map.py --write`,
   `memory/map/generated/symbols.json` gained `check_pass_holder` in `tools/unattended/pass-tree.sh`
   and the suite helper `render_pass_returns`, whose name the lexicon also printed `OK` for.
+
+## The close
+
+The main loop's observations at the close, on node a, 2026-11-15, at the build tip `39a71c080` unless named.
+
+- `pass-tree.test.sh` with `pass-tree.sh` put back to `c40c39fb6`: RED, 18 FAIL lines, every one a `TP4` arm or the `--from` shape's text; GREEN at the tip, 157 assertions (PINNED 2026-11-15).
+- `unattended-build.test.sh` with `unattended-unit.js` put back to `c40c39fb6`: RED, 16 FAIL lines, every one a `TP4` hostile-value arm; GREEN at the tip, 1530 assertions (PINNED 2026-11-15).
+- The short-name temp root the builder could not test did not move the holder check: T1, T5 and TP4's q4 arm are green at the tip.

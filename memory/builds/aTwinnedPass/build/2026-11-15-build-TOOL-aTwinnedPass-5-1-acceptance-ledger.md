@@ -67,3 +67,12 @@ Owed to the main loop at the close, each red under its break and then green, one
   `OK — check_usage_refused leads with check`; after `gen_map.py --write`,
   `memory/map/generated/symbols.json` carries `"check_usage_refused"` once, and no other generated
   file moved. `check-spec-tokens.py --spec` over this unit's spec exited 0.
+
+## The close
+
+The main loop's observations at the close, on node a, 2026-11-15, at the build tip `39a71c080` unless named.
+
+- `pass-tree.test.sh` under three staged breaks at once (the LANDED and ABORTED case renamed, the other-build unit test dropped from the usage parse, the staging loop's generated test replaced by `true`): RED, 8 FAIL lines naming the M4 phase texts, T6's other-build unit and T7's stray file; GREEN once restored, 157 assertions (PINNED 2026-11-15).
+- The region-4 slice with the note's `>&2` dropped and condition 1's own loop put back to `"$@"`: RED, 4 FAIL lines naming B1's stdout miss and M2's refusal; GREEN once restored, 33 assertions (PINNED 2026-11-15).
+- The corrected T3 needle is green at the tip; its staged break, a paragraph emitted without `passBase`, was not staged.
+- The no-run-branch and no-run-state M4 arms were not broken separately; they are green at the tip.

@@ -66,3 +66,11 @@ the legs of the spec's Gates section. The group's three `New arm:` lines of §7 
 - AC12 — `python tools/codebase-map/gen_map.py --write` — after it, `gen_map.py --check` exited 0 and
   `git diff --exit-code -- memory/map/generated/symbols.json` printed nothing.
 - AC13 — `git show --stat HEAD` — the pass commit lists this ledger under the build folder.
+
+## The close
+
+The main loop's observations at the close, on node a, 2026-11-15, at the build tip `39a71c080` unless named.
+
+- The `TP1` group of `tools/workflows/unattended-build.test.sh`: GREEN at `2360bc3cb`, 1502 assertions and 0 FAIL lines; RED with `unattended-unit.js` put back to its `aebbb4a72` blob, 41 FAIL lines, every one a `TP1` assertion (PINNED 2026-11-15).
+- At the tip, after units 4 and 5: GREEN, 1530 assertions, 0 FAIL lines (PINNED 2026-11-15).
+- `check-arms` does not grade this suite's JavaScript subject, as the spec's section 7 says.
