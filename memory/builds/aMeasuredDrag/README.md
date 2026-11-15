@@ -88,7 +88,7 @@ ids TOOL-aMeasuredDrag-14
 | [TOOL-aMeasuredDrag-12 — the closing review's six minor items: an absolute-only launcher memo, and the arms and floor that make units 4, 10 and 11 fail when undone](spec/2026-11-15-spec-TOOL-aMeasuredDrag-12.md) | 12 | 2 | CLOSED | rev-1 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 67 bound to this build, across 4 record folder(s).
+Records: 68 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

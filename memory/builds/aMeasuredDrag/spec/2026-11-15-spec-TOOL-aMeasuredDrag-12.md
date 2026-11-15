@@ -10,6 +10,7 @@
 | [2026-11-15-build-TOOL-aMeasuredDrag-12-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-12-1-acceptance-ledger.md) | journal | — |
 | [2026-11-15-build-TOOL-aMeasuredDrag-12-red-fix-4.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-12-red-fix-4.md) | red-fix | — |
 | [2026-11-15-build-TOOL-aMeasuredDrag-12-red-fix-5.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-12-red-fix-5.md) | red-fix | — |
+| [2026-11-15-build-TOOL-aMeasuredDrag-12-red-fix-6.md](../build/2026-11-15-build-TOOL-aMeasuredDrag-12-red-fix-6.md) | red-fix | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-12-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-12-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-12-2-builder.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-12-2-builder.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aMeasuredDrag-12-3-builder.md](../prompts/2026-11-15-prompt-TOOL-aMeasuredDrag-12-3-builder.md) | journal | — |
