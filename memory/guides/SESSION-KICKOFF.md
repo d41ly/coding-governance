@@ -3,10 +3,10 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-11-15T14:50:15+02:00 @ 5618acebac7b11ab81849a65f60fb6e926070764
+last-audit: 2026-11-15T15:05:35+02:00 @ c83653a2606aa2b0ea164a9ddb814a1213d24123
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: a8aa6f8c5ffbfdba1af3958c5fd59ae011fc24e5
+last-body-change: c83653a2606aa2b0ea164a9ddb814a1213d24123
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -193,6 +193,9 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
   across repos. `both expired ... unproven either way` means contention, and now SKIPS that arm
   loudly rather than redding — re-run quiet before believing a latency claim.
   `TOOL-aPacedTurnstile-2`.
+- The pre-commit hook renders a check 9 refusal's index only where `memory.staged-render` reads
+  `on` at the landed revision, so a branch never arms its own switch: there, clear the refusal
+  with `gen_build_index.py --write` and stage it by hand. `TOOL-aTrimmedWait-10`.
 - The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
   `git add` returns a clean exit that proves nothing. Stage first, then run it: checks
   5, 9 and 21 all fired only once the folder was staged.
