@@ -108,6 +108,7 @@ name = "memory-recall skill wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-memory-recall.sh", "--check"]
 guard = []
+stage = ["step.test"]
 
 # Line-ending pins this kit needs in a TARGET. Emitted into the target's own
 # .gitattributes as one govkit-owned block; the renormalize that follows reads git's

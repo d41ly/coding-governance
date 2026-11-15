@@ -192,6 +192,7 @@ subject = "repo"
 argv = ["bash", "{kit}/check-memory-hygiene.sh"]
 guard = []
 history_depth = "full"
+stage = ["step.build", "step.test"]
 
 [[hole]]
 id = "memory-tree-taxonomy"
@@ -251,12 +252,14 @@ name = "verdict epoch (kit version dates the engine)"
 subject = "repo"
 argv = ["bash", "{kit}/check-verdict-epoch.sh"]
 guard = []
+stage = ["step.test"]
 
 [[gate_leg]]
 name = "kit/dogfood doc parity"
 subject = "repo"
 argv = ["bash", "{kit}/kit-dogfood-parity.test.sh"]
 guard = ["{memory_root}/HYGIENE.md", "{memory_root}/TEMPLATE-SPEC.md", "{memory_root}/guides/BUILD-METHOD.md", "{memory_root}/guides/ANNOTATION-STYLE.md", "{kit}/", ".memory-tree.conf"]
+stage = ["step.test"]
 # `.memory-tree.conf` joined the guard under TOOL-dDerivedDocket-21: the suite names it, govkit
 # classes a declared `[config] file` as `root-conf`, and its selfcheck reds a guarded bar leg whose
 # argv names such a conf its guard lacks. The reasoning below holds for it unchanged.
@@ -275,36 +278,42 @@ name = "method carriers (every pointer declared)"
 subject = "repo"
 argv = ["bash", "{kit}/check-method-carriers.sh"]
 guard = []
+stage = ["step.test"]
 
 [[gate_leg]]
 name = "build README slot contract"
 subject = "repo"
 argv = ["python3", "{kit}/gen_build_index.py", "--check-format"]
 guard = []
+stage = ["step.test"]
 
 [[gate_leg]]
 name = "build-index selftest"
 subject = "kit"
 argv = ["python3", "{kit}/gen_build_index.py", "--selftest"]
 guard = ["{kit}/"]
+stage = ["step.test"]
 
 [[gate_leg]]
 name = "corpus-ids selftest"
 subject = "kit"
 argv = ["python3", "{kit}/corpus_ids.py", "--selftest"]
 guard = ["{kit}/"]
+stage = ["step.test"]
 
 [[gate_leg]]
 name = "gotchas selftest"
 subject = "kit"
 argv = ["python3", "{kit}/gotchas.py", "--selftest"]
 guard = ["{kit}/"]
+stage = ["step.test"]
 
 [[gate_leg]]
 name = "row-grammar selftest"
 subject = "kit"
 argv = ["python3", "{kit}/row_grammar.py", "--selftest"]
 guard = ["{kit}/"]
+stage = ["step.test"]
 
 # The migration planner's suite. DECLARED HERE rather than exempted in the govkit registry (unit 11
 # fork F8): `migrate_backlog.py` ships to every memory-tree adopter and each of them runs `--plan` in
@@ -315,6 +324,7 @@ name = "backlog migration selftest"
 subject = "kit"
 argv = ["python3", "{kit}/migrate_backlog.py", "--selftest"]
 guard = ["{kit}/"]
+stage = ["step.test"]
 
 [[gate_leg]]
 name = "marker contracts"
@@ -322,18 +332,21 @@ subject = "repo"
 argv = ["bash", "{kit}/marker-contract.test.sh"]
 guard = []
 doc_reads = []
+stage = ["step.test"]
 
 [[gate_leg]]
 name = "harness arms (fail branches armed or pinned)"
 subject = "repo"
 argv = ["python3", "{kit}/check-arms.py", "--check"]
 guard = []
+stage = ["step.test"]
 
 [[gate_leg]]
 name = "check-arms selftest"
 subject = "kit"
 argv = ["python3", "{kit}/check-arms.py", "--selftest"]
 guard = ["{kit}/"]
+stage = ["step.test"]
 
 # TOOL-aRoutedQuill-3: every pushed commit touching ROUTED_PATHS names a unit specced before it. No
 # guard and no `doc_reads`: its subject is the commit history, which moves with nobody editing this
@@ -346,12 +359,14 @@ argv = ["python3", "{kit}/routed_commits.py"]
 reads = { base = "it grades the commits past the GATE_PUSH_BASE the pre-push hook exports, so a verdict cached against one base says nothing about another (TOOL-aRoutedQuill-3).", history = "its verdict is a function of the commit GRAPH, not of the tree alone: two commits with one tree and different messages grade differently (TOOL-aRoutedQuill-3)." }
 guard = []
 history_depth = "full"
+stage = ["step.test"]
 
 [[gate_leg]]
 name = "routed-commits selftest"
 subject = "kit"
 argv = ["python3", "{kit}/routed_commits.py", "--selftest"]
 guard = ["{kit}/"]
+stage = ["step.test"]
 
 # Line-ending pins this kit needs in a TARGET. Emitted into the target's own
 # .gitattributes as one govkit-owned block; the renormalize that follows reads git's

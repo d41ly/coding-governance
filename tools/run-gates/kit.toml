@@ -183,6 +183,7 @@ name = "run-gates wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-run-gates.sh", "--check"]
 guard = []
+stage = ["step.test"]
 
 # THE INTEGRITY HALF OF `check`, ON A BAR THAT NEEDS NO GOV CHECKOUT. `check` answers three
 # questions and two of them — descriptor and provenance — resolve only against gov's own blobs, so
@@ -201,6 +202,7 @@ name = "receipt sync (installed files match the receipt)"
 subject = "repo"
 argv = ["python", "{kit}/check-receipt.py"]
 guard = []
+stage = ["step.test"]
 
 # THE SPLIT-TIER COMBINER'S SELF-TEST. TOOL-aSparedSpawn-5, mirroring `review-replay selftest` in the
 # workflows kit. It SHIPS: `held_halves.py` is an engine file under `**`, and `--selftest` builds its
@@ -213,6 +215,7 @@ name = "held-halves selftest"
 subject = "kit"
 argv = ["python3", "{kit}/held_halves.py", "--selftest"]
 guard = []
+stage = ["step.test"]
 
 # The seed for a target's own [gate_runner] declaration. `cmd_intake` emits this block when this
 # entry is selected (S9), resolving the path tokens ONLY: the runner's own `{name}` placeholder in

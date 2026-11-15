@@ -105,6 +105,7 @@ argv = ["python", "{kit}/loop_lib.py", "--check"]
 reads = { base = "it compares the actor-witness list with itself at the compare base, the merge-base with the default branch, so a verdict cached against one base says nothing about another (TOOL-dDeclaredLoop-5)." }
 guard = []
 ceiling = 120
+stage = ["step.test"]
 
 # THE TRANSITION TABLES' LEG SHIPS, for the reason the definition's does: its subject is the tables every
 # mover in the target reads, so a failure means the target's moves do not hold (TOOL-dDeclaredLoop-13).
@@ -114,3 +115,4 @@ subject = "repo"
 argv = ["python", "{kit}/loop_table.py", "check", "--selftest"]
 guard = []
 ceiling = 120
+stage = ["step.test"]

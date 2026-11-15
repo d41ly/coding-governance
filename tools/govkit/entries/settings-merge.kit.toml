@@ -68,3 +68,4 @@ name = "settings-merge selftest"
 subject = "kit"
 argv = ["python3", "{prefix}/settings-merge.py", "--selftest"]
 guard = ["{prefix}/"]
+stage = ["step.test"]

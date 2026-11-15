@@ -105,6 +105,7 @@ subject = "repo"
 argv = ["python", "{gate_file}"]
 guard = []
 history_depth = "full"
+stage = ["step.build", "step.test"]
 
 [[hole]]
 id = "map-extractors"
@@ -137,6 +138,7 @@ name = "codebase-map gate coverage"
 subject = "repo"
 argv = ["python", "{kit}/check_gate_coverage.py"]
 guard = ["{kit}/", ".codebase-map.conf"]
+stage = ["step.test"]
 
 [[lf_pin]]
 pattern = ".codebase-map.conf"

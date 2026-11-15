@@ -1740,6 +1740,20 @@ def check_benched_probe_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
           o2[-1500:])
     for f, b in keep.items():
         f.write_bytes(b)
+    # Runs d and e (TOOL-dDeclaredLoop-46 AC4): 7h compares `stage` presence included, so a
+    # descriptor value the manifest does not hold reds, and so does the key taken off the table.
+    _st = next(x for x in json.loads(man.read_text(encoding="utf-8")) if x.get("name") == leg)["stage"]
+    _anchor = f"ceiling = 1780\nstage = {json.dumps(_st)}"
+    for tag, new, shown in (("d", 'ceiling = 1780\nstage = ["step.disagree"]', "['step.disagree']"),
+                            ("e", "ceiling = 1780", "None")):
+        write_staged(desc, _anchor, new, f"{tag} stage")
+        rs = run_selfcheck(gcopy)
+        out_st = rs.stdout + rs.stderr
+        check(f"[dDL-46] {tag}: 7h reds a descriptor stage of {shown} against the manifest's, naming both",
+              rs.returncode != 0 and check_line(out_st, "entry 'push-main'", f"gate leg '{leg}' with stage {shown}",
+                                                f"says {_st!r}"), out_st[-1500:])
+        for f, b in keep.items():
+            f.write_bytes(b)
     # Run 3 (c, H-L1): no manifest. 7h's block is skipped, so 7j4 must still answer for itself, and
     # with the dead pre-initialisation gone a reader outside its own guard would raise here.
     man.unlink()
@@ -2719,6 +2733,17 @@ def check_ceiling_emission(tmp: pathlib.Path) -> None:
           gk.CEILING_FLOOR_RUN_GATES == (1, 2), str(gk.CEILING_FLOOR_RUN_GATES))
     check("CE2: the manifest writer routes the ceiling through its own floor",
           "floor=CEILING_FLOOR_RUN_GATES)" in GOVKIT.read_text(encoding="utf-8"), "")
+    # TOOL-dDeclaredLoop-46 AC3: the stage floor, one version below it and at it, both derived from
+    # the constant so a reconcile that raises the floor moves both sides with it.
+    _fl = gk.STAGE_FLOOR_RUN_GATES
+    for ver, want in ((".".join(map(str, _fl[:-1] + (_fl[-1] - 1,))), False), (".".join(map(str, _fl)), True)):
+        _rgs.write_text(f"#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION={ver}\n",
+                        encoding="utf-8", newline="\n")
+        check(f"ST1: a target at run-gates {ver} {'gets' if want else 'does not get'} a stage",
+              gk.check_target_reads_subject(_rg, {"prefix": PFX[:-1]},
+                                            floor=gk.STAGE_FLOOR_RUN_GATES) is want, ver)
+    check("ST1: the manifest writer routes the stage through its own floor",
+          "floor=STAGE_FLOOR_RUN_GATES)" in GOVKIT.read_text(encoding="utf-8"), "")
 
     # AC1/AC3: an applied push-main carries 1780 on the declaring leg, row and receipt, and no other.
     t = tmp / "ceiling-install"
@@ -2764,6 +2789,15 @@ def check_ceiling_emission(tmp: pathlib.Path) -> None:
     for other in ("push-main self-test", "pre-push bar self-test"):
         check(f"CE3: '{other}' declares no ceiling and its row carries none, never a fallback",
               other in rows and "ceiling" not in rows[other], str(rows.get(other)))
+    # TOOL-dDeclaredLoop-46 AC3: the reader answers True here, so every row the apply emitted
+    # carries its descriptor's stage, as the row's last key.
+    _rep = gk.Report()
+    _pm = gk.read_descriptors(GOV_ROOT, gk.load_registry(GOV_ROOT), _rep)["push-main"][0]
+    for dl in _pm.get("gate_leg", []):
+        _row = rows.get(dl.get("name"), {})
+        check(f"ST2: '{dl.get('name')}' carries its descriptor's stage as its last key",
+              dl.get("stage") is not None and _row.get("stage") == dl["stage"]
+              and list(_row)[-1:] == ["stage"], str(_row))
 
     # AC4: a hand-raised ceiling is the adopter's own, kept and reported, never refused as drift.
     settle(t, "the push-main install")

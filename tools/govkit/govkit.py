@@ -2754,6 +2754,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
         manifest_impure = {leg.get("name"): leg.get("impure") for leg in _legs_json}
         manifest_reads = {leg.get("name"): leg.get("reads") for leg in _legs_json}
         manifest_ceiling = {leg.get("name"): leg.get("ceiling") for leg in _legs_json}
+        manifest_stage = {leg.get("name"): leg.get("stage") for leg in _legs_json}
         claimed_legs: dict[str, str] = {}
         for eid, (d, _dpath) in descs.items():
             for leg in d.get("gate_leg", []):
@@ -2829,6 +2830,13 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                                f"{leg.get('impure')!r} while <prefix>/gate-legs.json says "
                                f"{manifest_impure.get(nm)!r} — the descriptor and the manifest "
                                f"disagree about whether a verdict cached on a tree may be reused")
+                    # AND ABOUT STAGE (TOOL-dDeclaredLoop-46 S4), presence included: the emitter
+                    # carries the descriptor's claim into adopters, so it must be the manifest's.
+                    if leg.get("stage") != manifest_stage.get(nm):
+                        r.fail(f"entry '{eid}' declares gate leg '{nm}' with stage "
+                               f"{leg.get('stage')!r} while <prefix>/gate-legs.json says "
+                               f"{manifest_stage.get(nm)!r} — the descriptor and the manifest "
+                               f"disagree about which step this leg serves")
                     # AND ABOUT THE READ CLASSES, where the descriptor declares them, as with ceiling
                     # (TOOL-aSparedSpawn-13 S1): the classes decide what enters a leg's reuse key, so a
                     # descriptor and a manifest that disagree key one leg two ways. A descriptor that
@@ -4486,6 +4494,12 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                     existing[by_name[nm]] = row
                 else:
                     existing.append(row)
+                # THE STAGE CLAIM TRAVELS like the ceiling, verbatim with no fallback and silent
+                # below STAGE_FLOOR_RUN_GATES, and is set on the placed row after the keep rule,
+                # which can append `ceiling`, so it stays the row's last key. TOOL-dDeclaredLoop-46.
+                if leg.get("stage") is not None and check_target_reads_subject(
+                        target, deploy, descs, floor=STAGE_FLOOR_RUN_GATES):
+                    row["stage"] = leg["stage"]
                 # THE RECEIPT CARRIES SUBJECT TOO, and not only so the caller's summary can count
                 # it. The receipt is what a later run reads to decide what this deployer owns; a
                 # field that reaches the target's manifest but not the receipt is a field no drift
@@ -6011,6 +6025,10 @@ DOC_READS_FLOOR_RUN_GATES = (1, 25)
 # while the runner still read 1.1, and 836e4e27b is the first commit at 1.2, so 1.1 is ambiguous and
 # 1.2 is the first version that cannot red a target's canary on the key. DEPL-aBenchedProbe-2.
 CEILING_FLOOR_RUN_GATES = (1, 2)
+# The run-gates version that first admits `stage`. TOOL-dDeclaredLoop-4 put the key in the canary's
+# key set with no version move, and origin/main had already shipped 1.48 without it, so the first
+# runner certainly carrying the admission is one above both. TOOL-dDeclaredLoop-46.
+STAGE_FLOOR_RUN_GATES = (1, 49)
 
 
 def derive_doc_reads(leg: dict, ctx: dict[str, str], have: set[str]) -> tuple[list[str] | None, str]:

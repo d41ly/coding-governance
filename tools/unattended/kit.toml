@@ -282,6 +282,7 @@ reads = { remote = "its verdict is a function of the REMOTE as well as of the tr
 guard = []
 doc_reads = ["{memory_root}/builds/", "{memory_root}/guides/", "{memory_root}/archive/"]
 red_after_land = true
+stage = ["step.test"]
 
 # the playbook validity leg. No guard: it grades an adopter's playbooks and
 # the kit's own fixture, so a guard scoped to this kit dir would skip it on exactly the commits that
@@ -292,6 +293,7 @@ subject = "repo"
 argv = ["bash", "{kit}/check-playbook.sh"]
 guard = []
 red_after_land = true
+stage = ["step.test"]
 
 [[gate_leg]]
 name = "pass-order history"
@@ -301,6 +303,7 @@ reads = { remote = "its verdict is a function of the REMOTE as well as of the tr
 guard = []
 doc_reads = ["{memory_root}/builds/", "{memory_root}/project/"]
 red_after_land = true
+stage = ["step.test"]
 
 # the brief-recorded leg. No guard, for `pass-order history`'s reason: its subject is the
 # REPOSITORY's run-state records, so it goes stale with nobody editing this kit, and a guard scoped
@@ -317,6 +320,7 @@ reads = { remote = "its verdict is a function of the REMOTE as well as of the tr
 guard = []
 doc_reads = ["{memory_root}/builds/", "{memory_root}/project/"]
 red_after_land = true
+stage = ["step.test"]
 
 [[gate_leg]]
 name = "unattended skill wiring"
@@ -324,6 +328,7 @@ subject = "repo"
 argv = ["bash", "{kit}/adopt-unattended.sh", "--check"]
 guard = []
 red_after_land = true
+stage = ["step.build", "step.test"]
 
 # the structural group linter's self-test (TOOL-aBatchedArm-2). A KIT leg, held off the automatic
 # bar like every `subject = kit` row. This kit declares NO self-test as a leg: the arms-groups
