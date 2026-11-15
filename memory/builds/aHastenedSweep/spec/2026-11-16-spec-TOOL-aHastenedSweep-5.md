@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-16-build-TOOL-aHastenedSweep-5-1-acceptance-ledger.md](../build/2026-11-16-build-TOOL-aHastenedSweep-5-1-acceptance-ledger.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aHastenedSweep-5-brief.md](../prompts/2026-11-16-prompt-TOOL-aHastenedSweep-5-brief.md) | research | TOOL-aHastenedSweep-6 |
 
 <!-- /gen:spec-records -->

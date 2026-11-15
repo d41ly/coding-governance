@@ -69,7 +69,7 @@ ids TOOL-aHastenedSweep-1 TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-3 TOOL-aHast
 | [TOOL-aHastenedSweep-6 — every arm this build added can go red on its regression, and every comment and map line describes the one-process launch](spec/2026-11-16-spec-TOOL-aHastenedSweep-6.md) | 5 | 1 | SPECCED | rev-1 | 2026-11-16 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 4 record folder(s).
+Records: 8 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
