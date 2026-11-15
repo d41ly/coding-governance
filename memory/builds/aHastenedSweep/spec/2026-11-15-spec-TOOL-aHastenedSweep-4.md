@@ -1,6 +1,6 @@
 # TOOL-aHastenedSweep-4 — checks 13 to 16 and 17 to 19 run in one Python process over one frozen, memoized walk
 
-**Status:** SPECCED · rev-1 · 2026-11-15 · node a · Tier-2 · base f25308f0 · streams tooling · order 3
+**Status:** INPROGRESS · rev-1 · 2026-11-15 · node a · Tier-2 · base f25308f0 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 

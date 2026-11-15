@@ -47,3 +47,7 @@ base: f25308f019b4fbd05964a81c70ff85d3599ea51b
 2026-11-15T20:37:37Z brief · item TOOL-aHastenedSweep-3 · reason 94776d96bb5d memory/builds/aHastenedSweep/prompts/2026-11-15-prompt-TOOL-aHastenedSweep-1-brief.md
 
 2026-11-15T20:54:27Z resume · item aHastenedSweep · reason working · keepalive 4d7b7935 · manual
+
+2026-11-15T21:11:39Z dispatch · item c0008f70 TOOL-aHastenedSweep-4 · reason tools/memory-tree/gotchas.py tools/memory-tree/corpus_ids.py tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/README.md tools/memory-tree/kit.toml tools/memory-tree/HYGIENE.template.md tools/memory-tree/BUILD-METHOD.template.md tools/memory-tree/SPEC-TEMPLATE.template.md tools/memory-tree/ANNOTATION-STYLE.template.md memory/HYGIENE.md memory/guides/BUILD-METHOD.md memory/TEMPLATE-SPEC.md memory/guides/ANNOTATION-STYLE.md memory/guides/SESSION-KICKOFF.md memory/map/features/memory-tree-hygiene.md memory/builds/aHastenedSweep/build/2026-11-15-build-TOOL-aHastenedSweep-4-1-acceptance-ledger.md memory/builds/aHastenedSweep/spec/2026-11-15-spec-TOOL-aHastenedSweep-4.md memory/builds/aHastenedSweep/README.md memory/LIVE.md memory/ledger/2026-11.md memory/map/generated/symbols.json
+
+2026-11-15T21:11:40Z brief · item TOOL-aHastenedSweep-4 · reason 94776d96bb5d memory/builds/aHastenedSweep/prompts/2026-11-15-prompt-TOOL-aHastenedSweep-1-brief.md
