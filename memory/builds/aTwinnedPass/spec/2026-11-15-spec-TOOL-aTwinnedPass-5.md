@@ -1,6 +1,6 @@
 # TOOL-aTwinnedPass-5 — every arm of the build's three suites can go red on the regression it names
 
-**Status:** INPROGRESS · rev-1 · 2026-11-15 · node a · Tier-2 · base c40c39fb6 · streams tooling · order 4
+**Status:** CLOSED · rev-1 · 2026-11-15 · node a · Tier-2 · base c40c39fb6 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
