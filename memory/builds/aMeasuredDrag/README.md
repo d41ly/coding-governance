@@ -3,7 +3,6 @@ slug: aMeasuredDrag
 node: a
 opened: 2026-11-15
 streams: tooling
-status: OPEN
 roster: TOOL
 ids: TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-4 TOOL-aMeasuredDrag-5 TOOL-aMeasuredDrag-6 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 TOOL-aMeasuredDrag-9 TOOL-aMeasuredDrag-10 TOOL-aMeasuredDrag-11
 ---
@@ -64,25 +63,49 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-11-15 · streams tooling
+**Build status:** OPEN · 11 unit(s) · node a · opened 2026-11-15 · streams tooling
 ids TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-4 TOOL-aMeasuredDrag-5 TOOL-aMeasuredDrag-6 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 TOOL-aMeasuredDrag-9 TOOL-aMeasuredDrag-10 TOOL-aMeasuredDrag-11
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aMeasuredDrag-1 — `--check-commit` reads its `Pass:` trailer before it walks any pass, and walks only the units the message names](spec/2026-11-15-spec-TOOL-aMeasuredDrag-1.md) | 1 | 1 | SPECCED | rev-1 | 2026-11-15 |
+| [TOOL-aMeasuredDrag-2 — the stop-guard decides a terminal lease and a pending background task before it spawns `--liveness`](spec/2026-11-15-spec-TOOL-aMeasuredDrag-2.md) | 2 | 1 | SPECCED | rev-1 | 2026-11-15 |
+| [TOOL-aMeasuredDrag-3 — carries coverage derived once per process, and the staged hygiene run reads checks 29 and 30 from check 9's process](spec/2026-11-15-spec-TOOL-aMeasuredDrag-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-11-15 |
+| [TOOL-aMeasuredDrag-4 — the instruction-edits leg stops re-running the tags check the tags leg already runs](spec/2026-11-15-spec-TOOL-aMeasuredDrag-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-11-15 |
+| [TOOL-aMeasuredDrag-5 — procmon-hook decides its throttle before any process spawn, resolving the common dir by reading files](spec/2026-11-15-spec-TOOL-aMeasuredDrag-5.md) | 5 | 1 | SPECCED | rev-1 | 2026-11-15 |
+| [TOOL-aMeasuredDrag-6 — the index renderer groups the tracked list by build once, instead of scanning it per build](spec/2026-11-15-spec-TOOL-aMeasuredDrag-6.md) | 6 | 1 | SPECCED | rev-1 | 2026-11-15 |
+| [TOOL-aMeasuredDrag-7 — the recall cache budget sized above two gov indexes, so two worktrees stop evicting each other](spec/2026-11-15-spec-TOOL-aMeasuredDrag-7.md) | 7 | 1 | OPEN | rev-1 | 2026-11-15 |
+| [TOOL-aMeasuredDrag-8 — brief-recorded's date cutoff compared in the shell, with no process per README](spec/2026-11-15-spec-TOOL-aMeasuredDrag-8.md) | 8 | 1 | OPEN | rev-1 | 2026-11-15 |
+| [TOOL-aMeasuredDrag-9 — `transition_audit.read_modes` parses each distinct conf blob once, not once per commit](spec/2026-11-15-spec-TOOL-aMeasuredDrag-9.md) | 9 | 1 | SPECCED | rev-1 | 2026-11-15 |
+| [TOOL-aMeasuredDrag-10 — `.githooks/pre-commit` reads the staged list once and resolves python once, each leg keeping its own trigger](spec/2026-11-15-spec-TOOL-aMeasuredDrag-10.md) | 10 | 1 | SPECCED | rev-1 | 2026-11-15 |
+| [TOOL-aMeasuredDrag-11 — the merge bar hands its own resolved python to its legs, so no leg re-probes the launcher](spec/2026-11-15-spec-TOOL-aMeasuredDrag-11.md) | 11 | 2 | SPECCED | rev-1 | 2026-11-15 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 0 record folder(s).
+Records: 32 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aMeasuredDrag-1 TOOL-aMeasuredDrag-10 TOOL-aMeasuredDrag-11 TOOL-aMeasuredDrag-2 TOOL-aMeasuredDrag-3 TOOL-aMeasuredDrag-4 TOOL-aMeasuredDrag-5 TOOL-aMeasuredDrag-6 TOOL-aMeasuredDrag-7 TOOL-aMeasuredDrag-8 TOOL-aMeasuredDrag-9.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aMeasuredDrag-1` | no |
+| 2 | `TOOL-aMeasuredDrag-2` | no |
+| 3 | `TOOL-aMeasuredDrag-3` | no |
+| 4 | `TOOL-aMeasuredDrag-4` | no |
+| 5 | `TOOL-aMeasuredDrag-5` | no |
+| 6 | `TOOL-aMeasuredDrag-6` | no |
+| 7 | `TOOL-aMeasuredDrag-7` | no |
+| 8 | `TOOL-aMeasuredDrag-8` | no |
+| 9 | `TOOL-aMeasuredDrag-9` | no |
+| 10 | `TOOL-aMeasuredDrag-10` | no |
+| 11 | `TOOL-aMeasuredDrag-11` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
