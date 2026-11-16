@@ -17,7 +17,9 @@ NOTHING HERE DECLARES A GRAMMAR OR A SET IT DOES NOT OWN.
   * the append-only areas and the byte-capped index set come from `check-memory-hygiene.sh`, which
     already owns both — asked for through its print modes, never transcribed. Upstream transcribed
     the index set and had to guard the transcription in BOTH directions, because a shell-side
-    addition the Python side still excludes leaves a file under no cap at all.
+    addition the Python side still excludes leaves a file under no cap at all. When the shell's own
+    checks 1 to 5 ran clean it hands `--print-index-set`'s answer down on stdin under
+    `GOV_INDEX_SET_STDIN=1` (TOOL-aHastenedSweep-3).
 
 THE GRAMMAR MODULE IS A LATE IMPORT, and its two states are kept apart: with every pin blank the
 grammar module is never imported and checks 13-16 are simply off, while a pin SET with the module
@@ -31,6 +33,7 @@ never the silent pass a bare `try: import` would produce.
 """
 from __future__ import annotations
 
+import copy
 import io
 import os
 import posixpath
@@ -49,6 +52,11 @@ HYGIENE = HERE / "check-memory-hygiene.sh"
 # refusal names.
 GRAMMAR_DIR = HERE
 GRAMMAR_WHERE = "%s/id_grammar.py" % GRAMMAR_DIR.as_posix()
+
+# TOOL-aHastenedSweep-4 S1: walk()'s per-process memo, OFF (None) at import. Only
+# `gotchas.py --check-with-ids` sets it to {}, so its two verbs walk one unchanged tree once; every
+# caller gets its own deep copy, so neither verb sees what the other did to its result.
+_WALK_MEMO = None
 
 # TOOL-dSpentCeiling-1 — the two keys this engine no longer reads. A conf that still declares one
 # is ANNOUNCED, never refused: the shipped example declared READ_PATH_CEILING blank, so refusing on
@@ -445,6 +453,13 @@ def read_live_readmes(root: str, m: str, tracked_set: set) -> tuple:
 
 
 def walk(root: str, conf: dict) -> dict:
+    # The memo lives INSIDE walk, never as a wrapper round a renamed body: _walk_continues reads this
+    # function's own source, and a wrapper would empty its population (TOOL-aHastenedSweep-4).
+    memo_key = None
+    if _WALK_MEMO is not None:
+        memo_key = (root, tuple(sorted(conf.items())))
+        if memo_key in _WALK_MEMO:
+            return copy.deepcopy(_WALK_MEMO[memo_key])
     E = grammar(root)
     # The kit's one route from a bundle to an answer, HANDED the bundle this function already holds.
     # `resolve_anchor(root)` with no bundle would re-resolve the conf at that root a second time per
@@ -454,6 +469,7 @@ def walk(root: str, conf: dict) -> dict:
     m = conf["MEMORY_ROOT"]
     tracked = [p for p in run("git", "ls-files", cwd=root).split("\n") if p]
     tracked_set = set(tracked)
+    roots = _roots(tracked_set)   # once per walk: _roots is pure and the loop never changes tracked_set (TOOL-aHastenedSweep-2 S2)
     corpus = [p for p in tracked if p.startswith(m + "/")]
     build_re = re.compile(r"^" + re.escape(m) + r"/builds/([^/]+)/")
     h1_re = re.compile(r"^#\s+[`*]*(" + E.ID + r")\b")
@@ -566,7 +582,7 @@ def walk(root: str, conf: dict) -> dict:
                 # `<prefix>/` install: seven dead kit paths in a scaffolded `HYGIENE.md` and the gate
                 # exited 0. A tail match is deliberately narrow — an unresolvable token that matches
                 # nothing tracked is still prose, not a finding.
-                if cited.split("/", 1)[0] + "/" not in _roots(tracked_set):
+                if cited.split("/", 1)[0] + "/" not in roots:
                     # RELATIVE TO THE CITING FILE first. Inside the memory tree the ordinary link
                     # shape is `builds/<slug>/README.md` written from `LIVE.md`, and it is correct.
                     # Measured on the first run of the tail rule below: 17 such links reported dead,
@@ -620,11 +636,15 @@ def walk(root: str, conf: dict) -> dict:
         held = len({f for f, _ in advisory})
         notes.append(f"advisory check 15: {len(advisory)} dead repo-path citation(s) in {held} of "
                      f"{len(live_readmes)} live build README(s) — corpus_ids.py --report lists them")
-    return {
+    w = {
         "tracked": tracked_set, "corpus": corpus, "defs": defs, "def_builds": def_builds,
         "cites": cites, "missing": missing, "missing_now": missing_now, "dead": dead, "advisory": advisory, "root": root, "conf": conf, "m": m,
         "notes": notes,
     }
+    if memo_key is None:
+        return w
+    _WALK_MEMO[memo_key] = w
+    return copy.deepcopy(w)
 
 
 def _anchor(E, line):
@@ -721,7 +741,13 @@ def check_read_path(root: str, conf: dict) -> tuple:
         return _resolve_sink(written, bad, notes, found)
 
     members, absent = read_set({"root": root, "conf": conf, "tracked": tracked})
-    capped = {l for l in ask_shell("--print-index-set", root).split("\n") if l.strip()}
+    # HANDED DOWN by check-memory-hygiene.sh when its own checks 1 to 5 ran clean, decoded and
+    # newline-translated as the ask_shell capture is, so both routes parse to the same members.
+    if os.environ.get("GOV_INDEX_SET_STDIN") == "1":   # handed down by check-memory-hygiene.sh
+        raw = sys.stdin.buffer.read().decode("utf-8").replace("\r\n", "\n").replace("\r", "\n")
+    else:
+        raw = ask_shell("--print-index-set", root)
+    capped = {l for l in raw.split("\n") if l.strip()}
     waived = set(conf["READ_PATH_WAIVER"].split())
     for p in members:                                                              # rule 3
         if p not in capped and p not in waived:
@@ -1044,6 +1070,33 @@ def cmd_selftest() -> int:
         t = os.path.join(base, "clean"); os.makedirs(t)
         c = _scratch(t)
         arm("a clean corpus produces no finding", None, lambda: checks(walk(t, c)))
+
+        # TOOL-aHastenedSweep-4 AC3: walk()'s memo is off at import, hands every caller its own deep
+        # copy, really is hit, and keys on the conf as well as the root. RED against a walk returning
+        # its stored object, a memo on at import, and a key on `root` alone.
+        def check_walk_memo():
+            said = [f"default {_WALK_MEMO}"]
+            tm = os.path.join(base, "memo"); os.makedirs(tm)
+            cm = _scratch(tm)
+            globals()["_WALK_MEMO"] = {}
+            try:
+                walk(tm, cm)["defs"]["ARCH-tPlanted-1"] = "planted"
+                said.append("frozen " + ("no" if "ARCH-tPlanted-1" in walk(tm, cm)["defs"] else "yes"))
+                _w(tm, "memory/builds/tOne/spec/2026-08-02-spec-tOne-2.md", "# ARCH-tOne-2 — a unit\n\nbody\n")
+                run("git", "add", "-A", cwd=tm)
+                run("git", "commit", "-q", "-m", "g", "--no-verify", cwd=tm)
+                said.append("hit " + ("no" if "ARCH-tOne-2" in walk(tm, cm)["defs"] else "yes"))
+                globals()["_WALK_MEMO"] = None
+                said.append("off " + ("sees new" if "ARCH-tOne-2" in walk(tm, cm)["defs"] else "misses it"))
+                globals()["_WALK_MEMO"] = {}
+                walk(tm, cm)
+                cm2 = dict(cm, ORPHAN_ID_PIN="7")
+                said.append("conf keyed " + ("yes" if walk(tm, cm2)["conf"]["ORPHAN_ID_PIN"] == "7" else "no"))
+            finally:
+                globals()["_WALK_MEMO"] = None
+            return " · ".join(said)
+        arm("walk()'s memo is off by default, frozen per caller, hit, and keyed on root and conf",
+            "default None · frozen yes · hit yes · off sees new · conf keyed yes", check_walk_memo)
         # KICK-aReplayedCard-2: the grammar line is a POSIX ERE that still recognises a defined id
         # (it is valid Python too, which is what lets this arm run it), and the set follows it.
         arm("--print-defined-ids leads with the grammar as an ERE and lists the defined id", "ok",

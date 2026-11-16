@@ -35,6 +35,20 @@ resolve_python() {
   # over and named, exactly as a candidate that does not run.
   _rp_floor="3.15"
   _rp_fv=$(( ${_rp_floor%%.*} * 1000 + ${_rp_floor#*.} ))
+  # THE BAR'S OWN RESOLUTION, taken with no spawn (TOOL-aMeasuredDrag-11). The run-gates runner
+  # exports GATE_RESOLVED_PY as four lines: the version, the launcher it resolved, and GOV_PYTHON and
+  # PATH as it saw them. With no caller override the loop below is decided by GOV_PYTHON, PATH and the
+  # floor, so a memo matching both byte for byte, at or above THIS floor, is what the loop would print.
+  # Anything else, malformed or partial included, is ignored and the loop runs. Only an absolute
+  # launcher is admitted (TOOL-aMeasuredDrag-12): a relative one names another file once a leg
+  # changes directory, and a bare name does too under a PATH holding `.`.
+  _rp_re=$'^([0-9]+)\\.([0-9]+)\n(/[^\n]*|[A-Za-z]:/[^\n]*|[A-Za-z]:\\\\[^\n]*)\n([^\n]*)\n(.*)$'
+  if [ -z "${1:-}" ] && [[ ${GATE_RESOLVED_PY:-} =~ $_rp_re ]] \
+    && [ "${BASH_REMATCH[4]}" = "${GOV_PYTHON:-}" ] && [ "${BASH_REMATCH[5]}" = "$PATH" ] \
+    && [ $(( 10#${BASH_REMATCH[1]} * 1000 + 10#${BASH_REMATCH[2]} )) -ge "$_rp_fv" ]; then
+    printf '%s\n' "${BASH_REMATCH[3]}"
+    return 0
+  fi
   _rp_tried=""; _rp_seen=""; _rp_best=""; _rp_bv=0; _rp_bver=""; _rp_o1=""; _rp_og=""; _rp_i=0
   for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
     _rp_i=$((_rp_i + 1))
@@ -349,7 +363,17 @@ if [ -f "$HOOK" ] && command -v node >/dev/null 2>&1; then
 
   # The throttled path must spawn NOTHING. Shimming python to a name that cannot exist proves it:
   # had the early exit run a census, this would report the failure instead of staying silent.
-  _out=$(run_clean_hook '{"hook_event_name":"PostToolUse"}' nonesuch-python-shim)
+  # It runs from a LINKED-WORKTREE layout of the clean fixture with no git on PATH
+  # (TOOL-aMeasuredDrag-5): a hook that still spawned git to find its stamp gets null, skips the
+  # throttle, and the shim's failure prints. The layout is hand-written, not `git worktree add`,
+  # because a git command here can be steered by an inherited GIT_DIR (as gate-guard.test.sh does).
+  _cleanwt="$WORK/cleanwt"; mkdir -p "$_cleanwt" "$CLEAN_GD/worktrees/cleanwt"
+  printf 'gitdir: %s/worktrees/cleanwt\n' "$CLEAN_GD" > "$_cleanwt/.git"
+  printf '../..\n' > "$CLEAN_GD/worktrees/cleanwt/commondir"
+  cp "$_cleandir/.process-monitor.conf" "$_cleanwt/.process-monitor.conf"
+  _node=$(command -v node)
+  _out=$(printf '%s' '{"hook_event_name":"PostToolUse"}' | CLAUDE_PROJECT_DIR="$_cleanwt" \
+    PROCMON_PYTHON=nonesuch-python-shim PATH=/nonexistent "$_node" "$HOOK" 2>&1)
   if [ -z "$_out" ]; then add_pass "test_throttled_path_spawns_nothing"; else add_fail "test_throttled_path_spawns_nothing (got: $_out)"; fi
 
   # SessionStart ignores the window: a fresh session inherits another session's stamp, and that is
