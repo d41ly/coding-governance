@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-54 — a terminal set declared per level, and the termination rule run over each table with its own
 
-**Status:** INPROGRESS · rev-3 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 35 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-4 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 35 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -29,9 +29,9 @@ its item H5) confirmed finding **id 5 at HIGH**. `TOOL-dDeclaredLoop-33` S2 requ
 level to reach a terminal. `[states]` in `tools/loop/loop.toml` declares feature and unit states that end
 at `deployed`, while its one terminal key, `terminal`, lists the build's terminals alone
 (`tools/loop/loop_table.py#read_transition_rows`). So `TOOL-dDeclaredLoop-33`, built at order 34 on its
-rev-6, walks the build level and prints the feature and unit levels unchecked (its §8 F11). This unit
-declares a terminal set per level, reads it through one reader, keys the from-terminal refusal by level,
-and runs the termination rule over all three tables. It takes the report's first fix and repairs
+rev-9 at `aeef7e3c8`, walks the build level and prints the feature and unit levels unchecked (its §8
+F11). This unit declares a terminal set per level, reads it through one reader, keys the from-terminal
+refusal by level, and runs the termination rule over all three tables. It takes the report's first fix and repairs
 `TOOL-dDeclaredLoop-33`.
 
 ## 2. Scope (IN)
@@ -55,20 +55,33 @@ and runs the termination rule over all three tables. It takes the report's first
   (§8 F5). `check` prints one `loop: terminal <level> · <states>` line per level, the build's first and
   unchanged. Two plants join `PLANTS`, `unit-terminal-from` and `level-no-terminal`, and the selftest
   gains a `terminal unit` case. Observed by AC1, AC2.
-- **S4** — The termination rule, in `TOOL-dDeclaredLoop-33`'s `tools/loop/termination.py`.
-  `read_termination_inputs` fills the composition's `terminal` for every level of the tables through
-  `read_terminal_set`, and `check_terminal` walks each level by reverse reachability over its own rows,
-  an empty set still a finding. The branch printing `unchecked — no terminal set` goes with its line and
-  every selftest expectation of it, since every level now declares a set or the composition does not
-  read (§8 F4). A plant `unit-dead-end` joins that module's plants. Observed by AC3.
+- **S4** — The termination rule, in `TOOL-dDeclaredLoop-33`'s `tools/loop/termination.py`, §4 "The
+  termination rule". `tools/loop/termination.py#derive_termination_composition`, which builds every
+  composition, gov's and a build's through `read_termination_inputs` and each in-memory plant's
+  directly, fills the composition's `terminal` with `read_terminal_set(tables, level)` for each level of
+  the `tables` it already reads, in place of the build-only `{"build": ...}` it fills at the tip. Its
+  ValueError reaches the callers' existing handlers: exit 2 at `check`, the plant's `UNARMED` exit 2, and
+  the step boundary's refused move. `check_terminal` is unchanged and so walks each level against its
+  own set. `derive_unchecked_levels` goes, with the `unchecked — no terminal set` line
+  `print_termination` prints from it, since every composition that reads now holds a set for every
+  level (§8 F4). The `dead-end` entry of `check_plant_found` stops reading `derive_unchecked_levels`
+  and owes the build finding as the only `terminal` finding. A plant `unit-dead-end` joins that module's
+  `PLANTS`, `run_termination_plant` and `check_plant_found`. Observed by AC3.
   **Readers:**
-  by name: READER NOT IN TREE — the line and its one selftest expectation live in the termination module, which lands one build order before this unit and is absent at the branch tip
-  by value: NO VALUE READERS — the line is printed for a person, and no code compares, counts or derives from it
+  by name: `tools/loop/termination.py`, whose `print_termination` prints the line, `derive_unchecked_levels` its one source and `check_plant_found`'s `dead-end` entry the function's one other caller, all three changed here; `help/loop.md`'s termination section names the line, changed by S5
+  by value: NO VALUE READERS — the line is printed for a person, and no selftest needle, leg or other code compares, counts or derives from it
 - **S5** — The carriers. `help/loop.md`'s transition-table section names the per-level sets, the
-  per-level line and the two plants, and the termination section `TOOL-dDeclaredLoop-33` adds loses any
-  sentence saying the feature and unit levels print unchecked. `tools/loop/README.md`'s transition-table
-  section and `tools/loop/loop_table.py`'s module docstring say the same, the docstring's "WHAT THIS DOES
-  NOT CHECK" gaining §3's last item. Observed by AC4.
+  per-level line and the two plants. Its termination section loses the sentence saying the feature and
+  unit levels print `unchecked — no terminal set` and the words `each unchecked level` from the `check`
+  bullet, and its plant list gains `unit-dead-end`. `tools/loop/README.md`'s transition-table section
+  and `tools/loop/loop_table.py`'s module docstring say the same as the transition-table section, the
+  docstring's "WHAT THIS DOES NOT CHECK" gaining §3's last item. `tools/loop/termination.py`'s module
+  docstring loses three passages: under THE RULES, the `terminal` rule's last sentence, that a level
+  with no terminal set prints unchecked, the rule's first sentence then reading each level against its
+  own set; the `check` paragraph's `each unchecked level`; and, under WHAT THIS DOES NOT CHECK, the
+  feature and unit levels' termination until this unit declares their sets. The docstrings of
+  `print_termination`, which names its unchecked levels, and `derive_termination_composition`, which
+  names the build level's terminal set, say each level's set instead. Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -87,7 +100,7 @@ and runs the termination rule over all three tables. It takes the report's first
 
 ### Edges
 
-- **consumes-from** `TOOL-dDeclaredLoop-33` — `tools/loop/termination.py`, its `read_termination_inputs` and `check_terminal`, which this unit runs per level
+- **consumes-from** `TOOL-dDeclaredLoop-33` — `tools/loop/termination.py`, its `derive_termination_composition` and `check_terminal`, which this unit runs per level
 - **consumes-from** `TOOL-dDeclaredLoop-15` — `terminal` in `[states]` and the terminal refusals in `check_transition_tables`, which this unit keys by level
 - **hands-off** `TOOL-dDeclaredLoop-67` — the round-2 minors ids 44 and 45: this pass keeps the loop transition tables and loop termination legs green, and its arms live in those modules' own selftests (§8 F3), so the loop selftest leg that unit adds runs none of them
 
@@ -95,8 +108,11 @@ and runs the termination rule over all three tables. It takes the report's first
 
 ### Evidence
 
-Read on `branch/unattended-declared-loop-d56bf0` at `a7b10569`, through `git show` and a scratch export
-made by `git archive`, where each probe below ran.
+Read on `branch/unattended-declared-loop-d56bf0` at `a7b10569` for rev-3 and re-read at `685e2195` for
+rev-4, through `git show` and a scratch export made by `git archive`, where each probe below ran. Between
+the two, `tools/loop/loop_table.py` gained `TOOL-dDeclaredLoop-52`'s phase map and `tools/loop/termination.py`
+landed with `TOOL-dDeclaredLoop-33` at `aeef7e3c8`; `read_transition_rows`, `derive_from_states`,
+`derive_move` and the terminal refusals in `check_transition_tables` read as at `a7b10569`.
 
 - `[states]` holds `build`, `feature`, `unit` and `terminal`. The feature list is `decomposed`,
   `designed`, `built`, `tested`, `deployed`; the unit list is `designed`, `built`, `tested`, `deployed`.
@@ -107,17 +123,36 @@ made by `git archive`, where each probe below ran.
 - `tools/loop/loop_table.py#check_transition_tables` refuses a written `from` state found in
   `terminal`, the build's list, at every level. With a unit row from `deployed` and one from `@open`
   added in memory, `check` printed no refusal.
-- The readers of `tables["terminal"]` are `derive_direction`, `derive_move` and
-  `check_transition_tables` in `tools/loop/loop_table.py`, and
-  `tools/loop/position.py#derive_position_into`, which hands it to `derive_answer`.
-  `TOOL-dDeclaredLoop-52` rev-3 §4 "The check" hands it to `check_phase_rows`. The list stays.
-- Every feature state reaches `deployed` by F2 to F5 and every unit state by U2 to U4, measured by a
-  reverse walk over the rows in the export.
-- `tools/loop/composition.py`'s module docstring: a build's composition reads the definition's steps and
-  transition tables from the kit's own file, never at a pin, so no composition reads a definition
-  lacking the keys.
-- `TOOL-dDeclaredLoop-33` rev-6 §4 "Data model" carries `"terminal": {level: [state]}`, build only until
-  this unit, and its S2 prints the unchecked line for a level with no set.
+- The readers of `tables["terminal"]` are `derive_direction`, `derive_move`, `check_transition_tables`
+  and `main` in `tools/loop/loop_table.py`, `main` handing it to `check_phase_rows`;
+  `tools/loop/position.py#derive_position_into`, which hands it to `derive_answer`; and in
+  `tools/loop/termination.py`, `read_live_builds`, and `derive_termination_composition`, whose
+  `terminal["build"]` `derive_row_class` reads. The list stays.
+- No feature or unit row of `tools/loop/loop.toml` holds `@open`: the `@open` rows are build rows.
+- `tools/loop/termination.py#derive_termination_composition` calls `read_transition_rows` and sets
+  `"terminal": {"build": list(tables["terminal"])}`. Its callers are both branches of
+  `read_termination_inputs` and `run_termination_plant`, which builds every plant but `deadline-patch`
+  and `boundary` through it, then edits the composition in memory.
+- `tools/loop/termination.py#read_termination_inputs` and `#read_plant_base` both read the definition
+  through `read_definition(KIT)`, the kit's own file, for a build's composition too, so no composition
+  reads a definition lacking the keys.
+- `tools/loop/termination.py#check_terminal` iterates `composition["terminal"]` and walks each level's
+  own rows; `#derive_unchecked_levels` returns each level of `states` missing from `terminal`, and
+  `#print_termination` prints `unchecked — no terminal set` for each. `#check_plant_found`'s `dead-end`
+  entry owes the build finding and `derive_unchecked_levels(composition) == ["feature", "unit"]`.
+- The plants' exit contract, `tools/loop/termination.py#run_termination_plant`: exit 0 when the plant
+  holds, 1 when missed, 2 where it could not be built, a ValueError among the caught; it prints the inner
+  check's exit as `loop: fixture · <case> · check exit <n>` and closes `loop: fixture · <case> · held`.
+  `#run_selftest` runs every `PLANTS` member owing exit 0 and that closing line. Run in the export,
+  `python termination.py --fixture --plant dead-end` printed both unchecked lines, the `build stuck`
+  finding, `check exit 1` and `held`, and exited 0. `run_termination_plant` resolves its owed findings
+  through `check_plant_found`'s dict, so a plant named in `PLANTS` with no entry there is a KeyError, exit
+  2.
+- With `feature` and `unit` given `["deployed"]` in memory over the export's plant base,
+  `check_terminal` returned no finding; with a unit state `reviewed` and a unit row from `built` into it
+  added, it returned the one finding `terminal · unit reviewed`; with both levels given `["landed"]`,
+  every feature and unit state was a finding.
+- `tools/loop/loop_lib.py#LoopError` is a ValueError.
 
 ### Data model
 
@@ -168,12 +203,29 @@ refusal its needle `landed is both` names.
 
 ### The termination rule
 
-`read_termination_inputs` reads the tables through `read_transition_rows` over the definition it
-already reads, and sets `terminal` to `read_terminal_set(tables, level)` for each level of
-`tables["states"]`; a ValueError reaches `TOOL-dDeclaredLoop-33`'s exit 2 for a composition that does not
-read. `check_terminal` walks each level against its own set. `unit-dead-end` plants a unit state
-`reviewed` and a unit row from `built` into it, and owes a `terminal` finding naming `reviewed` and exit
-1. The `dead-end` case `TOOL-dDeclaredLoop-33`'s AC2 stages owes the build finding alone.
+```
+derive_termination_composition(label, data, where, items, stages, flow, pending, gov=None):
+  tables = read_transition_rows(data, where)                 # as at the tip
+  "terminal": {level: read_terminal_set(tables, level) for level in tables["states"]}
+  ValueError from read_terminal_set -> raised, as a refused read
+    read_termination_inputs -> run_check: "loop: termination · unreadable · ...", exit 2
+    run_termination_plant   -> "loop: fixture · <case> · UNARMED · ...", exit 2
+    loop_transition.py's step boundary -> the move refused, the composition does not read
+```
+
+The spliced stage states join `states["build"]` as at the tip and are walked against the build's set.
+`print_termination` loses its loop over `derive_unchecked_levels`, and the function goes.
+
+| Plant | The break, in memory, after `derive_termination_composition` | `check_plant_found` owes |
+|---|---|---|
+| `dead-end` | as at the tip | the `terminal` findings are exactly `("terminal", "build stuck")` |
+| `unit-dead-end` | `reviewed` appended to `comp["states"]["unit"]`, and a row `{level unit, from [built], item item.test.exit, outcome recorded, to reviewed, witness the plant}` appended to `comp["rows"]` | the `terminal` findings are exactly `("terminal", "unit reviewed")` |
+
+Each plant holds, so `python termination.py --fixture --plant <case>` exits 0, prints `loop: fixture ·
+<case> · check exit 1` for the planted finding and closes `loop: fixture · <case> · held`; a miss exits
+1 closing `· MISSED`. `run_selftest` picks the new plant up from `PLANTS` with no case of its own. The
+`dead-end` entry's exact match is what makes the per-level walk observable on that plant: a feature or
+unit level walked toward the build's terminals adds a finding per state (§4 "Evidence").
 
 ### Inventory
 
@@ -234,11 +286,12 @@ at the tip, unmoved by the landed units that added rows to the file.
 | Reached | Readers and populations | What keeps it green |
 |---|---|---|
 | `[states]` in `tools/loop/loop.toml` | `tools/loop/loop_table.py#read_transition_rows`, its one reader (`tools/loop/loop_lib.py`'s docstring: nothing there reads it); the copies `tools/unattended/check-unattended.test.sh` and `tools/unattended/cross-component.test.sh` make beside `loop_lib.py`; `tools/playbook/tag_index.py#extract_step` and `#extract_item` | the split keeps `tables["states"]` at three levels; the copies are read by `loop_lib.py` alone; the tag index reads `[[step]]` and `[[item]]` spans only |
-| `tables["states"]`, `tables["terminal"]` | `derive_move`, `derive_direction`, `check_recorded_move`; `tools/loop/loop_parents.py`, `tools/loop/loop_transition.py`, `tools/loop/scenario.py`, `tools/loop/position.py` and `tools/loop/splice.py`, the importers of `loop_table.py`'s names; `TOOL-dDeclaredLoop-52`'s `check_phase_rows` | both keep their shape and content; `level-terminal` is new and read by `read_terminal_set` alone |
-| `check_transition_tables` | the `loop transition tables` leg's selftest: `check`, `terminal`, `terminal-from`, `terminal-open` and the moves | the build line keeps its text; `terminal-from` draws its message as before; `terminal-open` keeps its needle (§4 "The refusals"); no move's answer moves |
-| `PLANTS`, `write_table_plant` | `--plant`'s choices; `TOOL-dDeclaredLoop-52`'s four phase plants (order 34), `TOOL-dDeclaredLoop-63`'s `phases-extra` beside this unit, `TOOL-dDeclaredLoop-70`'s at order 36 | keyed by name, so each addition merges as a neighbour; the usage row lists `--plant=`, never its choices |
-| `tools/loop/termination.py` | its selftest's `dead-end` case; `tools/loop/loop_transition.py#write_transition`'s step-boundary call (`TOOL-dDeclaredLoop-33` S11); the `loop termination` leg | the `dead-end` case owes the build finding alone; every gov feature and unit state reaches `deployed` (§4 "Evidence"), so neither the boundary nor the leg gains a finding |
-| `help/loop.md` | `docs`, `help page commands` | no usage row moves, so every anchor's fingerprint holds; the section's fenced commands carry `run: no` |
+| `tables["states"]`, `tables["terminal"]` | `derive_move`, `derive_direction`, `check_recorded_move`, and `main`'s call of `check_phase_rows`; `tools/loop/loop_parents.py`, `tools/loop/loop_transition.py`, `tools/loop/scenario.py`, `tools/loop/position.py`, `tools/loop/splice.py` and `tools/loop/termination.py`, the importers of `loop_table.py`'s names; in `termination.py`, `read_live_builds` and `derive_row_class` over `terminal["build"]` | both keep their shape and content, and `terminal["build"]` keeps the build's list; `level-terminal` is new and read by `read_terminal_set` alone |
+| `check_transition_tables` | the `loop transition tables` leg's selftest: `check`, `terminal`, `terminal-from`, `terminal-open`, the phase cases and the moves | the build line keeps its text; `terminal-from` draws its message as before; `terminal-open` keeps its needle (§4 "The refusals"); no move's answer moves; `main` reads `read_transition_rows` again after the plant, which never calls `read_terminal_set`, so `level-no-terminal` reaches `check_phase_rows` with the build's list |
+| `PLANTS`, `write_table_plant`, the selftest cases | `--plant`'s choices and `main`'s case list; `TOOL-dDeclaredLoop-52`'s four phase plants, landed; `TOOL-dDeclaredLoop-63` rev-3's five phase cases beside this unit; `TOOL-dDeclaredLoop-70` rev-3's cases at order 36 | keyed by name or appended, so each addition merges as a neighbour; the usage row lists `--plant=`, never its choices |
+| `tools/loop/termination.py` | `derive_termination_composition`'s three callers; its selftest's `dead-end` and `empty-states` plants; `tools/loop/loop_transition.py`'s step-boundary call, which catches the ValueError (`TOOL-dDeclaredLoop-33` S11); the `loop termination` leg, `check --selftest` | `dead-end` owes the build finding as the one `terminal` finding; `empty-states` keeps its `terminal · build` finding; every gov feature and unit state reaches `deployed` (§4 "Evidence"), so neither the boundary nor the leg gains a finding |
+| `termination.py`'s `PLANTS` | `main`'s usage line, which joins the names; `run_selftest`'s cases | the usage row `script:{prefix}/loop/termination.py` lists `--plant=`, never its choices, so its fingerprint holds; the selftest owes `held` of the new plant as of every other |
+| `help/loop.md` | `docs`, `help page commands` | no usage row moves, so every anchor's fingerprint holds (`tools/govkit/docs_leg.py#derive_usage_fingerprint` hashes the row); the section's fenced commands carry `run: no` |
 | shipped bytes | `install-prefix (shipped surface)` | the docstring and README name siblings by file name |
 | a new symbol | `codebase-map coverage + freshness` | `python tools/codebase-map/gen_map.py --write` |
 | other units' plans | `TOOL-dDeclaredLoop-67` S29 and S30 | S29's legs stay green; S30's leg for a new `tools/loop/selftest.py` runs none of this unit's arms (§8 F3) |
@@ -247,22 +300,26 @@ at the tip, unmoved by the landed units that added rows to the file.
 B=branch/unattended-declared-loop-d56bf0
 git grep -n -E 'from loop_table import|tables\["terminal"\]|tables\["states"\]' "$B" -- tools/loop
 git grep -n -E 'terminal build|table unit ·' "$B" -- tools skills help
+git grep -n -E 'derive_unchecked_levels|derive_termination_composition|no terminal set' "$B" -- tools skills help
 git grep -n 'VERB_OFFENDER_PIN=' "$B" -- .lexicon.conf
 git grep -n 'REFUSAL_CEILINGS=' "$B" -- .memory-tree.conf
 git diff --name-only <base>.. -- '*.sh'
 ```
 
+The third command's hits outside `tools/loop/termination.py` and `help/loop.md`, in
+`tools/unattended/check-brief-recorded.test.sh`, name the driver's phase declaration, not a level's set.
+
 ### Budgets and records
 
-- `VERB_OFFENDER_PIN` in `.lexicon.conf` stays 1215 PINNED at `a7b10569`: `python
+- `VERB_OFFENDER_PIN` in `.lexicon.conf` stays 1215 PINNED at `685e2195`: `python
   tools/lexicon/lexicon.py --suggest read_terminal_set --as py.function` prints `OK`, run on this
   worktree's main at `179486e8`, whose declared verbs the branch's `.lexicon.conf` does not move.
 - The shared records: `.unattended.conf`'s `SHARED_RECORDS` names `memory/DECISIONS.md` and
   `memory/project/readme-contract.txt`. The pass writes neither, and no decision row is owed, since no
   ceiling or census moves.
-- The refusal ceilings: `REFUSAL_CEILINGS` holds the driver at 340 PINNED at `a7b10569`, raised to 342
-  PINNED by `TOOL-dDeclaredLoop-19`'s landed decision row and to 343 PINNED by
-  `TOOL-dDeclaredLoop-52`'s. Its population is shell scripts, as are the families of
+- The refusal ceilings: `REFUSAL_CEILINGS` holds the driver at 343 PINNED at `685e2195`, raised from 340
+  to 342 by `TOOL-dDeclaredLoop-19`'s landed decision row and to 343 by `TOOL-dDeclaredLoop-52`'s. Its
+  population is shell scripts, as are the families of
   `tools/unattended/unattended.families.txt` and the census `tools/memory-tree/check-arms.py` reads. This
   unit edits no shell script, so the last command above prints nothing and none of them moves.
 - Help anchors and usage rows: no verb or flag is added, so `tools/govkit/usage.toml` gains no row.
@@ -274,15 +331,16 @@ git diff --name-only <base>.. -- '*.sh'
 
 ### Dependency
 
-Order 35, beside `TOOL-dDeclaredLoop-55`, `TOOL-dDeclaredLoop-63` and `TOOL-dDeclaredLoop-64`. Read on
-committed specs: `TOOL-dDeclaredLoop-33` rev-6 at order 34, the module, its two functions, its plants and
-its composition's `terminal`; `TOOL-dDeclaredLoop-52` rev-3 at order 34, its plants and its
-`check_phase_rows` handed the build's list; `TOOL-dDeclaredLoop-63` rev-2, which adds a plant to
-`loop_table.py` beside this unit; `TOOL-dDeclaredLoop-70` at order 36, which adds more. Units 53, 55 and
-64 share no file with this one. `TOOL-dDeclaredLoop-34` is deferred against ask TOOL-dDeclaredLoop-113 and
+Order 35, beside `TOOL-dDeclaredLoop-55`, `TOOL-dDeclaredLoop-63` and `TOOL-dDeclaredLoop-64`.
+`TOOL-dDeclaredLoop-33` is CLOSED at rev-9 and its module read as built at `aeef7e3c8`;
+`TOOL-dDeclaredLoop-52` is CLOSED at rev-3, its plants and `check_phase_rows` read as built. Read on
+committed specs: `TOOL-dDeclaredLoop-63` rev-3, which adds selftest cases to `loop_table.py` beside this
+unit and touches neither the terminal reader nor the refusals; `TOOL-dDeclaredLoop-70` rev-3 at order 36,
+which adds more cases and a plant in `tools/loop/loop_parents.py`. Units 53, 55 and 64 share no file with
+this one. `TOOL-dDeclaredLoop-34` is deferred against ask TOOL-dDeclaredLoop-113 and
 unit 33's numeric direction against ask TOOL-dDeclaredLoop-114; neither reaches `[states]`. Units 13, 15,
-22, 31, 50 and 51 are CLOSED and read on landed code; `TOOL-dDeclaredLoop-19`, building on its rev-3,
-adds no `[states]` key.
+19, 22, 31, 50, 51 and 53 are CLOSED and read on landed code, and none of the landed changes since
+`a7b10569` adds a `[states]` key.
 
 ## 6. Acceptance criteria
 
@@ -301,15 +359,19 @@ runs at the top of the repository.
   Red when: the from-refusal reads the build's set at every level, or the written `from` without
   expanding `@open`, as the tip's does.
 - **AC3** — When `python termination.py check` runs over this repository, it prints no line holding
-  `unchecked` and no `terminal` finding naming the feature or unit level; and `python termination.py
-  --fixture --plant unit-dead-end` exits 1 printing a `terminal` finding naming `reviewed`.
-  Red when: the feature and unit levels stay unchecked, or are walked toward the build's terminals so
-  every state of theirs is a finding.
-  fixture: the termination module lands with `TOOL-dDeclaredLoop-33` at order 34 and is absent at the
-  branch tip; the observation runs at this unit's base.
-- **AC4** — When `grep -c 'unit-terminal'` and `grep -c 'level-no-terminal'` run over the loop kit's help
-  page, each prints a count above 0.
-  Red when: the page still names `terminal` as the one terminal key.
+  `unchecked` and no `loop: termination · terminal · feature` or `· terminal · unit` finding. When
+  `python termination.py --fixture --plant unit-dead-end` runs, it exits 0, printing a `loop: termination
+  · terminal · unit reviewed` finding, then `loop: fixture · unit-dead-end · check exit 1`, and closing
+  `loop: fixture · unit-dead-end · held`; and `--plant dead-end` exits 0 closing `loop: fixture ·
+  dead-end · held`, with no `unchecked` line and no `terminal · feature` or `terminal · unit` finding.
+  Red when: the feature and unit levels stay unchecked, so `unit-dead-end` closes `MISSED` and exits 1,
+  or are walked toward the build's terminals, so every state of theirs is a finding and `dead-end`
+  closes `MISSED`.
+- **AC4** — When `grep -c 'unit-terminal'`, `grep -c 'level-no-terminal'` and `grep -c 'unit-dead-end'`
+  run over the loop kit's help page, each prints a count above 0; and when `grep -c 'no terminal set'`
+  runs over that page and over the loop kit's termination module, each prints 0.
+  Red when: the page still names `terminal` as the one terminal key, or the page or the module's
+  docstring still says a level prints unchecked.
 
 ## 7. Gates
 
@@ -322,7 +384,7 @@ and `TOOL-dDeclaredLoop-33`'s `loop termination`.
 
 New arm: tools/loop/loop_table.py · covers AC1 AC2 · the `unit-terminal-from` and `level-no-terminal` plants and the `terminal unit` case, staged against the base reader, which reads `unit-terminal` as a level and refuses a terminal in `from` against the build's set alone · none
 
-New arm: tools/loop/termination.py · covers AC3 · the `unit-dead-end` plant, staged against `TOOL-dDeclaredLoop-33`'s build-only set, under which the unit level prints unchecked and draws no finding · none
+New arm: tools/loop/termination.py · covers AC3 · the `unit-dead-end` plant, staged against `TOOL-dDeclaredLoop-33`'s build-only set in `derive_termination_composition`, under which the unit level prints unchecked, draws no finding, and the plant closes MISSED, exit 1; and the `dead-end` plant's exact `terminal` findings, staged with the feature and unit sets filled with the build's list, under which every feature and unit state is a finding and the plant closes MISSED · none
 
 ## 8. Open questions
 
@@ -338,17 +400,21 @@ New arm: tools/loop/termination.py · covers AC3 · the `unit-dead-end` plant, s
   `loop_table.py check --selftest` and `termination.py check --selftest`, run by live legs, as units 13,
   15, 31, 41 and 50 placed theirs; (b) the new module, an arm no leg runs between orders 35 and 38.
   Recommendation (a); the spec body is written on it.
+  RESOLVED (agent, 2026-11-16, delegated): (a).
 - **F4 — What becomes of the termination check's unchecked line once every level declares a set?**
-  Options: (a) the branch goes: `read_terminal_set` refuses a level with no set, so the composition does
-  not read and the check exits 2, and `check` refuses the file at the tables leg; (b) the branch stays as
-  a fallback. No composition reaches (b)'s branch, since every composition reads the kit's own file
-  (§4 "Evidence"), so it is a branch no arm can red. Recommendation (a); the spec body is written on it.
+  Options: (a) the branch goes, `derive_unchecked_levels` with it: `read_terminal_set` refuses a level
+  with no set, so the composition does not read and the check exits 2, and `check` refuses the file at
+  the tables leg; (b) the branch stays as a fallback. No composition reaches (b)'s branch, since every
+  composition reads the kit's own file (§4 "Evidence"), so it is a branch no arm can red.
+  Recommendation (a); the spec body is written on it.
+  RESOLVED (agent, 2026-11-16, delegated): (a).
 - **F5 — Does the from-terminal refusal read `@open`'s expansion?** The feature and unit levels list
   `deployed` among their states, so `@open` holds it. Options: (a) the refusal reads the expanded `from`
   at every level; (b) the written `from` only, as at the tip. Under (b) a feature or unit row from
   `@open` leaves `deployed` unrefused, which the tip's probe shows. Under (a) the build level reads as
   before, since its `@open` holds no terminal while `terminal-open`'s refusal holds. Recommendation (a);
   the spec body is written on it.
+  RESOLVED (agent, 2026-11-16, delegated): (a).
 
 ## 9. Revision log
 
@@ -362,6 +428,14 @@ New arm: tools/loop/termination.py · covers AC3 · the `unit-dead-end` plant, s
   the tables; the from-refusal over the expanded `from` (F5); the termination rule on unit 33's rev-6
   module, its unchecked line gone (F4); the arms in the modules' own selftests (F3); help, README and
   docstring carriers; the sweep, budgets and dependency.
+- rev-4 · 2026-11-16 · §1 · S4 · S5 · §3 · §4 · AC3 · AC4 · §7 · §8 F3 F4 F5 · §10 · per the builder return
+  `2026-11-16-build-TOOL-dDeclaredLoop-54-1-builder-return`, re-grounded on unit 33's module as built at
+  `aeef7e3c8`, read at `685e2195`: F3 to F5 each carry their resolution mark; S4 and §4 move the
+  per-level fill into `derive_termination_composition`, which every composition and in-memory plant is
+  built through, and name `derive_unchecked_levels`, its print and the `dead-end` expectation as what S4
+  changes; AC3 reads the plants' exit contract, 0 when held with the inner check's exit printed as a
+  line; S5 and AC4 name the termination module's docstring passages and the help page's plant list; the
+  sweep and dependency re-read on the landed units 19, 33, 52 and 53.
 
 ## 10. Reuse audit
 
@@ -369,7 +443,9 @@ The seams are `tools/loop/loop_table.py#read_transition_rows`, which already spl
 levels and gains the per-level keys beside it; `tools/loop/loop_table.py#check_transition_tables`, its
 `PLANTS`, `write_table_plant` and `tools/loop/loop_lib.py#run_selftest_cases`;
 `tools/loop/loop_table.py#derive_from_states`, the one spelling of `@open`'s expansion; and
-`TOOL-dDeclaredLoop-33`'s `read_termination_inputs` and `check_terminal`. `python
+`TOOL-dDeclaredLoop-33`'s `tools/loop/termination.py#derive_termination_composition`, the one builder of
+every composition the rule walks, its `PLANTS`, `run_termination_plant` and `check_plant_found`, and
+`check_terminal`, which already walks every level its composition's `terminal` holds. `python
 tools/codebase-map/reuse_lookup.py "terminal states declared per level of a transition table, read by one
 reader"`, run in the scratch export of the branch tip `a7b10569`, ranked `read_transition_rows` a SEAM
 by fan-in, beside `derive_from_states` and name-stem neighbours (`read_text`, `read_definition`,
