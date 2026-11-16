@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-32 — the convergence routing: every closing-review and fix-pass loop ends on a non-decrease of its blocker and high count, its findings promoted by budget
 
-**Status:** INPROGRESS · rev-5 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 29 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-6 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 29 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0117@afb50a20 whole
 
@@ -17,6 +17,7 @@
 | [2026-11-05-build-TOOL-dDeclaredLoop-32-deviation-321.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-32-deviation-321.md) | deviation | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-32-1-builder-return.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-32-1-builder-return.md) | journal | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-32-deviation-322.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-32-deviation-322.md) | deviation | — |
+| [2026-11-16-build-TOOL-dDeclaredLoop-32-deviation-323.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-32-deviation-323.md) | deviation | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-32-red-fix-46.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-32-red-fix-46.md) | red-fix | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-56 |
@@ -110,8 +111,11 @@ so no rule bounds one (`gap-flow-23`, `gap-flow-24`).
   fenced verb list. `help/loop.md` states the new `show` fields, the `target` verb and the `--fix-pass`
   verb, each command line carrying its `<!-- usage: ... -->` anchor, and `tools/govkit/usage.toml` gains
   the row `script:{prefix}/loop/budget.py#target`. Observed by AC9, AC13.
-- **S9** — The suite arms the `New arm:` lines in §7 declare. Observed by AC1, AC3, AC4, AC5, AC6, AC7,
-  AC8, AC10, AC11, AC12 through those lines, RED first at the close.
+- **S9** — The suite arms the `New arm:` lines in §7 declare, and the existing driver-suite arms §5's
+  sweep moves: five spec-subject arms re-planted as §8 F9 resolves, and eight exact-row assertions
+  re-pointed to carry ` · to units` before the disposition, the moves the first `New arm:` line
+  carries. Observed by AC1, AC3, AC4, AC5, AC6, AC7, AC8, AC10, AC11, AC12 through those lines, RED
+  first at the close.
 
 ## 3. Non-goals (OUT)
 
@@ -222,7 +226,9 @@ satisfy a reader's ` · highs [0-9]+` match, since `round-` sits between the sep
 after `run_budget_draw` and before `park`, both answers feeding one `_bd_rc`, so a non-zero answer of
 either reaches the existing relay `fail 37 "the rework budget refused this review round, so no round is
 recorded: $_bd_why"`; a spec subject's `exhausted` draw still clears `_bd_rc` as today. The field sits
-after the counts and before ` · disposition promote`, which check 2 reads as the row's last field.
+after the counts and before ` · disposition promote`, which check 2 reads as the row's last field. The
+printed state line keeps `<counts> · disposition <value>` with no target field: the target is read from
+the row, and a ` · to asks` exit says so in its `closing-asks` sentence.
 
 ### The fix-pass loop
 
@@ -306,7 +312,14 @@ reads as today. Check 2 stops redding a flat spec subject that carries no exit t
 - `memory/guides/UNATTENDED-VERBS.md`
 - `tools/unattended/SKILL.template.md`
 - `.claude/skills/unattended/SKILL.md`
-- `tools/unattended/unattended.test.sh`
+- `tools/unattended/unattended.test.sh`: the new arms of §7; the five spec-subject arms §8 F9 re-plants;
+  the kit-defaults parity arm read over seven constants; and the eight exact-row assertions re-pointed
+  to carry ` · to units` before ` · disposition promote`, by label: "AC8 today's row has no new field",
+  "AC7 the old value writes the new row", "the promote is written into the converged round's reason,
+  after its counts", "the promote disposition is written into the round's own reason", "the bounded
+  exit is written into the round's own reason", "a bounded spec exit's counts sit before the
+  disposition", "a spec exit's counts sit before the disposition" and "the counts sit before the
+  disposition, the field check 2 reads last" (§5 The sweep)
 - `tools/unattended/check-unattended.test.sh`
 - `tools/loop/review_bounds.py`
 - `tools/loop/budget.py`
@@ -363,13 +376,26 @@ Each render is its template's copy: `memory/guides/UNATTENDED-VERBS.md`,
 ### The sweep
 
 Read at branch `unattended-declared-loop-d56bf0`, `50f5dea5d`, through `git show`; counts PINNED there.
+The `review_state` and `verb_review` rows were re-run at rev-6 over the branch tip `fd9a90840`, where
+`tools/unattended/unattended.test.sh` is blob `1e64a58c`, unchanged since `50f5dea5d`; each arm is named
+by its `same` label or its subject, and its lines are cited at that blob.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
-| `review_state` | `verb_review`; `run_fix_pass` (new); the tier2-review parity arm's three-argument slice; the driver suite's slice arms | arguments 4 to 6 empty keep every three-argument answer; the slice markers stay at column 0 |
-| `review_counts`, `review_last_reason` | `verb_review`; `dod_met`'s read of the slug's last round for the closing-review item; `check_fix_pass_open` (new) | the kind argument defaults to `review`; an absent `round-highs` reads 0 |
+| `review_state` | `verb_review`; `run_fix_pass` (new); the tier2-review parity arm's three-argument slice; the driver suite's 15 PINNED slice rows, `tools/unattended/unattended.test.sh@1e64a58c:8680` to `:8706` | every slice row passes two or three arguments, so arguments 4 to 6 empty keep each answer; the slice markers stay at column 0 |
+| `review_counts`, `review_last_reason` | `verb_review`; `dod_met`'s read of the slug's last round for the closing-review item, which the `closing-review-recorded` arms drive over rows `crround` plants by hand; `check_fix_pass_open` (new) | the kind argument defaults to `review`; an absent `round-highs` reads 0; a planted row carries neither, so each arm reads as today |
 | `verb_review`'s flags | 89 PINNED `--review` lines in `tools/unattended/unattended.test.sh`, one in `tools/unattended/runlog-writer.test.sh`, two `run_round` calls in `budget.py`'s driver plants, `writeRound` and the harness's hand-record note | optional flags, so every landed caller reads as today (§8 F6) |
-| `load_review_bounds`, `render_bounds_line` | the driver suite's parity arm on the kit defaults; check 2's `read_review_bounds_line`, which `sed`s the first three fields; `review_bounds.py`'s `PLANTS` needles and the driver suite's `hit` on the `show` line, all substrings; `loop_lib.py --check`, which prints the line | the fields append after `follow-up=`; three kit defaults join the four; the parse refuses a line of other than seven fields, the NOTE names all seven |
+| `verb_review`'s state on a spec subject: `no-fall`, no route-backs | every driver-suite arm that records a second round on one spec subject, under the fixture's `fixed-count` bound of 7 | a falling sequence reads `CONVERGING` as today: S7's `3` then `2` under `rework-budget = 0`, and `budget.py`'s `driver-draws` and `spent-spec-round` plants, `3` then `2`. Every other spec-subject arm records one round per subject (C1 to C3, S9, B1 to B3, R1, the surfaced-count arm's S1 at `:8778`, the fold and chain fixtures' exits, the verb matrix's subject `s`, the hostile-value subjects), whose state the rule leaves as today, and the verdict, count and subject-shape refusals run before any state. A flat sequence no longer ends: the five arms below are re-planted (§8 F9) |
+| the same, flat | `F1 (fork)`, the subject-as-regex arm (`:8731` to `:8739`) | its second round reaches `BOUNDED` under a bound of 2 that `write_tracking_policy` lands; the subject keeps its `(` |
+| the same, flat | S1, "the exit token is written into the round's own reason" and the terminal refusal after it (`:8742` to `:8750`) | re-planted on the build slug `tRun`, the block opening with `crdrop` |
+| the same, flat | D1, the flat pair whose second round expects "blocker(s) standing and requires --disposition promote" (`:8795`, `:8796`); absent from the builder return's list, found by this re-run | the pair re-planted on `tRun` after `crdrop`; the block's three refusals before it keep D1 |
+| the same, flat | D2, "--review exits NON-CONVERGENT on a spec audit, which folds nothing", "a refused fold wrote nothing", "the promote disposition is written into the round's own reason" and "the pre-existing substring the leg reads still matches" (`:8805` to `:8817`) | re-planted on `tRun` after `crdrop`; its fold sentence becomes the closing diff review's, the spec audit's twin staying with B2 |
+| the same, flat | S8, "a spec exit's counts sit before the disposition" and its two `hit`s (`:8920` to `:8924`) | re-planted on `tRun` in a `bcopen; crdrop` block of its own after the zero-standing closing block, because its present block records the slug's own `CONVERGED` exit |
+| `verb_review`'s state on the build slug: the count, `CLOSING_TARGET`, `ROUTE_BACKS` | every slug arm: `tRun`'s rounds in the review-loop, rework-budget and closing-exit blocks, `tFix`'s and `dFix`'s closing rounds and the `iprun` closing round | no arm passes `--round-highs`, and `closing-target=highs` with none reads the blockers; no slug arm records a third round, and `ROUTE_BACKS` of 3 first ends a loop at its fifth; each state reads as today |
+| `verb_review`'s promotion target | the eight exact-row assertions that end ` · minors <N> · disposition promote` or ` · promoted <N> · disposition promote`: "AC8 today's row has no new field" (`:2727`), "AC7 the old value writes the new row" (`:2773`), "the promote is written into the converged round's reason, after its counts" (`:8767`), "the promote disposition is written into the round's own reason" (`:8815`), "the bounded exit is written into the round's own reason" (`:8842`), "a bounded spec exit's counts sit before the disposition" (`:8863`), "a spec exit's counts sit before the disposition" (`:8924`), "the counts sit before the disposition, the field check 2 reads last" (`:8944`) | each re-pointed to carry ` · to units` before ` · disposition promote`; the D2 and S8 ones also on `tRun` (§8 F9). The slug's promoting exits read `budget.py target` under the catalogue default `4+2`, whose budget stands, so `unit` |
+| the same, printed | the `hit`s on `<STATE> · highs <H> · minors <M> · disposition promote` and on "this exit owes at least <N> new unit(s)", and every row read by a prefix that ends at the state token or the counts | the printed state line carries no target field (§4 The promotion target), a ` · to units` exit keeps the `closing` sentence, and a prefix ends before the new field |
+| `verb_dispatch`'s `check_fix_pass_open` | every `--dispatch` arm | no fixture plants a `fix-pass` row, so none refuses |
+| `load_review_bounds`, `render_bounds_line` | the driver suite's parity arm "AC11 the four review-bound kit defaults are the line review_bounds.py show prints with no policy file" (`:2622`), whose `sed` reads the four constants; check 2's `read_review_bounds_line`, which `sed`s the first three fields; `review_bounds.py`'s `PLANTS` needles and the driver suite's `hit` on the `show` line, all substrings; `loop_lib.py --check`, which prints the line | the fields append after `follow-up=`; three kit defaults join the four, and the parity arm's `sed` reads all seven constants, its label naming seven; the parse refuses a line of other than seven fields, the NOTE names all seven |
 | `run_budget_draw` | its two calls, in `verb_review` and `verb_dispatch` | it keeps its name and arguments and calls `run_budget_verb draw` |
 | `budget.py`'s `main` | `loop budget fixtures`' plants; the `#draw` and `#value` usage rows and anchors | a `target` branch beside them; the other verbs byte-identical |
 | `PARK_KINDS` and its copies | check 27's call-site join, which needs a literal `park "$rel" fix-pass`; check 2's dead-member grep; `runlog selftest` and `drift-audit selftest`, each holding its copy to the driver both ways; `drift_report.py`'s `_RUN_ROW`; `--status`'s `noted` count | the three copies move together; `_RUN_ROW` reads `[a-z][a-z-]*`, as `tools/runlog/model.py#ROW_RE` does; the row is unowed, so it joins `noted` |
@@ -525,7 +551,7 @@ suggest and the reuse probe ran on the worktree at `179486e8f`; every other clai
 
 `unattended kit gate` · `harness arms (fail branches armed or pinned)` · `scratch-guard self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `verifier fan-out self-test` · `runlog selftest` · `pre-push run-log line` · `run-gates run-log line` · `drift-audit selftest` · `loop budget fixtures` · `loop review bounds fixtures` · `loop definition` · `policy fixtures` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `kit/dogfood doc parity` · `transition-audit arms` · `straggler-guard arms` · `check-wiring self-test` · `lexicon naming predicates` · `unattended skill size` · `unattended skill wiring` · `docs` · `help page commands` · `codebase-map coverage + freshness` · `positional (the citation check alone)` · `install-prefix (shipped surface)` · `encoding posture (text IO names its encoding)` · `python reads (a name never bound, an import outside its guard)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC10 AC11 · the planted flat follow-up, the route-back sequence, the spent-budget target, the never-greening fix pass and a positive assertion of each new `fail 37` text, staged against the base driver, which counts blockers alone and has no fix-pass verb · waived for this build's landing by README rule 8, its text still read by check 26 and the harness arms leg
+New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC10 AC11 · the planted flat follow-up, the route-back sequence, the spent-budget target, the never-greening fix pass and a positive assertion of each new `fail 37` text, staged against the base driver, which counts blockers alone and has no fix-pass verb; the five spec-subject arms §8 F9 re-plants and the eight exact-row assertions §5 re-points move in the same suite, each green on the built driver: the eight red on the base driver, which writes no target field, and the five green on both, a move that keeps coverage and stages no failing case · waived for this build's landing by README rule 8, its text still read by check 26 and the harness arms leg
 
 New arm: tools/unattended/check-unattended.test.sh · covers AC7 · a `to asks` exit with no ask filed, a flat non-terminal spec subject and a flat fix-pass unit, staged against the base check; the arm at line 1220 re-planted on the slug · waived as above
 
@@ -585,6 +611,43 @@ New arm: tools/drift-audit/selftest.py · covers AC6 · a run-state whose last r
   derives it from `draw`'s printed figure. (b) is a target rule of the driver's own and reads nothing on
   a round that draws nothing. Recommendation: (a). RESOLVED (agent, 2026-11-16, delegated): (a), by rung 3.
   widens: none · relaxes: none
+- **F9 — Where do the driver-suite arms that drive a spec subject flat to `NON-CONVERGENT` go?** Under
+  `no-fall` (S3) and no route-backs on a spec subject (S2), a flat second round on a spec subject reads
+  `CONVERGING` under the fixture's bound of 7, so five arms of `tools/unattended/unattended.test.sh`
+  are refused "names a disposition on a round that is not a terminal exit" or record a round they
+  expect refused: `F1 (fork)`, S1, D1, D2 and S8 (§5 The sweep). The builder return named four; this
+  revision's re-run of the sweep found D1. Options: (a) every arm on the build slug, whose closing
+  loop still reaches `NON-CONVERGENT` and promotes; (b) every arm at a `BOUNDED` exit on its own spec
+  subject, under a bound landed by `write_tracking_policy`; (c) retire every arm, as a path that no
+  longer exists, with its readers; (d) per arm, the option that keeps what it tests. (a) cannot hold
+  `F1 (fork)`, whose point is a subject carrying `(`, which no slug spells. (b) keeps the subjects but
+  turns D1, D2 and S8 into copies of B1, B2 and B3, and leaves the `NON-CONVERGENT` exit's
+  disposition refusal, its row shape after the token and the slug's terminal line with no exact
+  assertion. (c) drops the regex defect's arm and those same assertions. Recommendation: (d), the
+  option that satisfies the most stated criteria with no follow-up and reuses the suite's own seams,
+  `crdrop` and `write_tracking_policy`. RESOLVED (agent, 2026-11-16, delegated): (d), by the ratify
+  rule. Each arm:
+  - `F1 (fork)` stays on its subject. Its block lands `[review]` `max-rounds = 7` and
+    `[review.design]` `rounds = "fixed-count"`, `round-count = 2` through `write_tracking_policy`, whose
+    definition moves above this block, its first caller; the second round reads `BOUNDED` and records
+    its promote, the third is refused as terminal, and `refs/remotes/origin/main` returns to `$BASE`
+    before `reset_tree`, as the B1 block does.
+  - S1 moves to `tRun`, `crdrop` after `bcopen`: round 2 reads `NON-CONVERGENT` and prints `PROMOTED`,
+    "the exit token is written into the round's own reason" greps `review · item tRun · reason verdict
+    BLOCKED · blockers 2 · NON-CONVERGENT`, and the third round meets the terminal refusal; that row is
+    the slug's terminal line `dod_met` reads for the closing-review item.
+  - D1's flat pair moves to `tRun`, `crdrop` after `bcopen`, and its second round meets "exits
+    NON-CONVERGENT with 3 blocker(s) standing and requires --disposition promote"; the three refusals
+    before the pair keep D1.
+  - D2 moves to `tRun`, `crdrop` after `bcopen`: the fold refusal hits "--review exits NON-CONVERGENT on
+    the closing diff review, which folds nothing", the state gate's sentence before any count is
+    required; its `miss` stays, its three greps name `item tRun`, and its row assertion carries
+    ` · to units`.
+  - S8 moves to `tRun` in a `bcopen; crdrop` block of its own after the zero-standing closing block: the
+    `NON-CONVERGENT · highs 1 · minors 4 · disposition promote` hit and "this exit owes at least 3 new
+    unit(s)" hold, and the row assertion reads `review · item tRun · reason verdict BLOCKED · blockers 1
+    · NON-CONVERGENT · highs 1 · minors 4 · to units · disposition promote$`.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -610,6 +673,12 @@ New arm: tools/drift-audit/selftest.py · covers AC6 · a run-state whose last r
   329 -> 332 PINNED and the Skill row 10755 -> 10815 PINNED under a decision row landed ahead; `_RUN_ROW` reads a
   hyphenated kind; check 2's stalled arm re-planted on the slug; the harness's `specTarget` (F7); the
   help page and usage row for the new verbs; the sweep and budgets in §5.
+- rev-6 · 2026-11-16 · §2 §4 §5 §7 §8 · S9 · §8 F9 · the builder return
+  `2026-11-16-build-TOOL-dDeclaredLoop-32-1-builder-return` found driver-suite arms rev-5 reddens and §5
+  did not name: the sweep's `review_state` and `verb_review` rows re-run at `fd9a90840` name every arm
+  with its fate; F9 re-plants the five flat spec-subject arms, D1 found by the re-run; the eight
+  exact-row assertions carry ` · to units`; the printed state line carries no target field; the
+  kit-defaults parity arm reads seven constants.
 
 ## 10. Reuse audit
 
