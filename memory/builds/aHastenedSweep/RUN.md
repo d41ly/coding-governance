@@ -9,10 +9,19 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: 179486e8f11f868ed7d7fa40757bf8a9849c9a84 · park · 15 touching
+units-at-landing: TOOL-aHastenedSweep-1 TOOL-aHastenedSweep-2 TOOL-aHastenedSweep-3 TOOL-aHastenedSweep-4 TOOL-aHastenedSweep-5 TOOL-aHastenedSweep-6 TOOL-aHastenedSweep-7
+hold-run: 
+hold-streak: 1 · at 73a6dd68
+resume-owed: none · owner
+held-at: 2026-11-16T02:55:40Z
+hold-reason: the build is GREEN at e2697345b, but it sits on local main's unpushed aTwinnedPass landing, which is held for the owner's ask, and push-main --carry refuses to publish another build's commits from this run
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
+refreshed-at: 179486e8f11f868ed7d7fa40757bf8a9849c9a84 · handoff · 15 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: ad4580d4689388e43a22b72ed0f93615214180e1
-phase: VERIFYING
+witness: 73a6dd681177f90241309ed242785fedf5e9b1a1
+phase: HELD
 may: none
 mode: prompt
 run-branch: refs/heads/branch/zealous-kalam-1911a4
@@ -78,3 +87,7 @@ base: f25308f019b4fbd05964a81c70ff85d3599ea51b
 2026-11-16T00:39:10Z brief · item TOOL-aHastenedSweep-7 · reason a4fc54a7b773 memory/builds/aHastenedSweep/prompts/2026-11-16-prompt-TOOL-aHastenedSweep-7-brief.md
 
 2026-11-16T02:55:05Z decision · item Land aTwinnedPass first? This build is GREEN at e2697345b but sits on local main 5d48501da, which holds aTwinnedPass's landing, unpushed and held for your ask; push-main --carry refuses to publish its commits from this run · reason Options: (a) push aTwinnedPass from local main with bash tools/push-main.sh in the primary tree, then land this build with push-main --prepare and --land --slug aHastenedSweep; (b) land both together, attended, from the primary tree after merging this branch into local main; (c) rebuild this branch on origin/main without aTwinnedPass. Refused here: the push of aTwinnedPass is the owner's reserved step, and the lander forbids a run publishing another build's commits.
+
+2026-11-16T02:55:46Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug aHastenedSweep && bash tools/push-main.sh --land --slug aHastenedSweep && bash tools/unattended/unattended.sh --settle aHastenedSweep
+
+2026-11-16T02:55:46Z hold · item owner-decision · reason until owner · reaped 4d7b7935 · resume none(owner)
