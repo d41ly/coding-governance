@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-54 — a terminal set declared per level, and the termination rule run over each table with its own
 
-**Status:** DEFERRED · rev-3 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 35 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-3 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 35 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-54-deviation-541.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-54-deviation-541.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-54-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-54-1-spec-writer.md) | journal | — |
+| [2026-11-16-prompt-TOOL-dDeclaredLoop-54-build-brief.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-54-build-brief.md) | journal | — |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-54-reground-brief.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-54-reground-brief.md) | research | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
 
