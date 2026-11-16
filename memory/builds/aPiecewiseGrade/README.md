@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-15
 streams: tooling
 roster: TOOL
-ids: TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-3 TOOL-aPiecewiseGrade-4 TOOL-aPiecewiseGrade-5 TOOL-aPiecewiseGrade-6 TOOL-aPiecewiseGrade-7 TOOL-aPiecewiseGrade-8
+ids: TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-3 TOOL-aPiecewiseGrade-4 TOOL-aPiecewiseGrade-5 TOOL-aPiecewiseGrade-6 TOOL-aPiecewiseGrade-7 TOOL-aPiecewiseGrade-8 TOOL-aPiecewiseGrade-9
 ---
 
 # aPiecewiseGrade — the spec-token checker re-grades only the specs whose inputs moved
@@ -54,7 +54,7 @@ None.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 8 unit(s) · node a · opened 2026-11-15 · streams tooling
-ids TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-3 TOOL-aPiecewiseGrade-4 TOOL-aPiecewiseGrade-5 TOOL-aPiecewiseGrade-6 TOOL-aPiecewiseGrade-7 TOOL-aPiecewiseGrade-8
+ids TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-3 TOOL-aPiecewiseGrade-4 TOOL-aPiecewiseGrade-5 TOOL-aPiecewiseGrade-6 TOOL-aPiecewiseGrade-7 TOOL-aPiecewiseGrade-8 TOOL-aPiecewiseGrade-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
