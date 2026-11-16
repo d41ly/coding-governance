@@ -68,7 +68,7 @@ set -u
 if [ -n "${EPOCHREALTIME:-}" ]; then DRIVER_T0_US=${EPOCHREALTIME//[!0-9]/}
 else printf -v DRIVER_T0_US '%(%s)T' -1; DRIVER_T0_US="${DRIVER_T0_US}000000"; fi
 readonly DRIVER_T0_US
-KIT_UNATTENDED_VERSION=1.124 # gov:kit unattended@1.124 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.125 # gov:kit unattended@1.125 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -405,6 +405,20 @@ resolve_python() {
   # over and named, exactly as a candidate that does not run.
   _rp_floor="3.15"
   _rp_fv=$(( ${_rp_floor%%.*} * 1000 + ${_rp_floor#*.} ))
+  # THE BAR'S OWN RESOLUTION, taken with no spawn (TOOL-aMeasuredDrag-11). The run-gates runner
+  # exports GATE_RESOLVED_PY as four lines: the version, the launcher it resolved, and GOV_PYTHON and
+  # PATH as it saw them. With no caller override the loop below is decided by GOV_PYTHON, PATH and the
+  # floor, so a memo matching both byte for byte, at or above THIS floor, is what the loop would print.
+  # Anything else, malformed or partial included, is ignored and the loop runs. Only an absolute
+  # launcher is admitted (TOOL-aMeasuredDrag-12): a relative one names another file once a leg
+  # changes directory, and a bare name does too under a PATH holding `.`.
+  _rp_re=$'^([0-9]+)\\.([0-9]+)\n(/[^\n]*|[A-Za-z]:/[^\n]*|[A-Za-z]:\\\\[^\n]*)\n([^\n]*)\n(.*)$'
+  if [ -z "${1:-}" ] && [[ ${GATE_RESOLVED_PY:-} =~ $_rp_re ]] \
+    && [ "${BASH_REMATCH[4]}" = "${GOV_PYTHON:-}" ] && [ "${BASH_REMATCH[5]}" = "$PATH" ] \
+    && [ $(( 10#${BASH_REMATCH[1]} * 1000 + 10#${BASH_REMATCH[2]} )) -ge "$_rp_fv" ]; then
+    printf '%s\n' "${BASH_REMATCH[3]}"
+    return 0
+  fi
   _rp_tried=""; _rp_seen=""; _rp_best=""; _rp_bv=0; _rp_bver=""; _rp_o1=""; _rp_og=""; _rp_i=0
   for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
     _rp_i=$((_rp_i + 1))
@@ -14379,17 +14393,23 @@ check_commit_message() { # commit message file
   # closed BECAUSE ITS PASS COMMIT IS HEAD is kept apart (`O`): that is `git commit --amend` on the
   # pass commit, whose HEAD is the commit being replaced (closing review r1, M4). Only a trailer naming
   # the unit reopens it, so a records commit after a pass is never asked for a trailer it does not owe.
+  # THE TRAILER FIRST, then only the units the message names (TOOL-aMeasuredDrag-1): `Pass: none` asks
+  # no pass at all, and a key whose unit the message does not name is never asked - each `pass_commit`
+  # walk is one `git log`, and the loops below read only the rows of named units. Named is a token of
+  # a non-empty trailer, else a whole token of the subject (`id_in`), which is each loop's own test.
+  case " $trl " in *" none "*) return 0 ;; esac
   head=$(GIT rev-parse -q --verify HEAD 2>/dev/null)
   rows=$(read_pass_declarations "$rel" current | while IFS= read -r r; do
       [ -n "$r" ] || continue
       d=${r#* dispatch · item }; d=${d%% · reason *}
+      if [ -n "${trl// /}" ]; then case " $trl " in *" ${d#* } "*) ;; *) continue ;; esac
+      else id_in "$subj" "${d#* }" || continue; fi
       if check_pass_open "${d%% *}" "${d#* }" "$rel" "${r#* · reason }"; then
         printf 'o %s %s %s\n' "${d#* }" "${d%% *}" "${r#* · reason }"
       elif [ -n "$head" ] && [ "$(pass_commit "${d%% *}" "${d#* }" "$rel" || true)" = "$head" ]; then
         printf 'O %s %s %s\n' "${d#* }" "${d%% *}" "${r#* · reason }"
       fi
     done)
-  case " $trl " in *" none "*) return 0 ;; esac
   # EVERY LOOP BELOW READS A SCRATCH FILE, `CC_TMP`, never a heredoc over command output: such a loop
   # reads until EOF, and the shell-hygiene leg bans it. The dispatch arm creates and removes the file.
   if [ -z "${trl// /}" ]; then

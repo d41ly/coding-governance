@@ -189,6 +189,27 @@ n_runs=$(printf '%s
 [ "$n_runs" = 1 ] && r=0 || r=1
 ck "AC2 an unrelated staged file does not run the adopter (one run, not $n_runs)" "$r" 0
 
+# ---- the template-size leg, TOOL-aMeasuredDrag-12 S11 ---------------------------------------------
+# TOOL-aMeasuredDrag-10 moved this leg's trigger into the one staged-list read, as `st_template`. A
+# stand-in gate at the root says it ran. Staging the template runs it and the commit exits 0; the
+# unrelated commit before it runs nothing, the control that the marker is the trigger's and not every
+# commit's. Staged red by misspelling the `st_template` case pattern.
+d="$tmp/template"; rm -rf "$d"; mkdir -p "$d"
+out=$( cd "$d" || exit 2
+  git init -q --template= -b main
+  mkdir hk; cp "$HOOK" hk/pre-commit; chmod +x hk/pre-commit; git config core.hooksPath hk
+  printf '%s\n' '#!/usr/bin/env bash' 'echo "TEMPLATE-SIZE RAN"' > check-template-size.sh
+  git add -A; git commit -q --no-verify -m fixture
+  echo x > other.txt; git add other.txt; git commit -q -m other 2>&1
+  echo '--- the template commit'
+  echo '# charter' > coding-governance-agents.template.md; git add coding-governance-agents.template.md
+  git commit -q -m template 2>&1 ); rc=$?
+case "$out" in *"--- the template commit"*"TEMPLATE-SIZE RAN"*) r=$rc ;; *) r=1 ;; esac
+ck "S11 a staged template runs the template-size gate and the commit exits 0" "$r" 0
+_p='TEMPLATE-SIZE RAN'; _t=${out//"$_p"/}; n_runs=$(( (${#out} - ${#_t}) / ${#_p} ))
+[ "$n_runs" = 1 ] && r=0 || r=1
+ck "S11 the template-size gate runs once across an unrelated commit and the template's (ran $n_runs)" "$r" 0
+
 # ---- the policy guard, TOOL-dGroundRules-6 AC9 ----------------------------------------------------
 # A stand-in guard at the root install says it ran and exits as written; its list, committed, names
 # one path. Every commit below captures stderr, so none sits at a terminal and the owner's proof never

@@ -69,7 +69,7 @@ esac
 # no key at all, which the bar reads as a probe that could not answer rather than as a clean set.
 OFFENDERS=0; OFFENDER_KEYS=""
 if [ "${1:-}" = "--offenders" ]; then OFFENDERS=1; exec 3>&1 1>/dev/null; fi
-KIT_MEMORY_TREE_VERSION=2.163   # gov:kit memory-tree@2.163 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.164   # gov:kit memory-tree@2.164 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -472,6 +472,20 @@ resolve_python() {
   # over and named, exactly as a candidate that does not run.
   _rp_floor="3.15"
   _rp_fv=$(( ${_rp_floor%%.*} * 1000 + ${_rp_floor#*.} ))
+  # THE BAR'S OWN RESOLUTION, taken with no spawn (TOOL-aMeasuredDrag-11). The run-gates runner
+  # exports GATE_RESOLVED_PY as four lines: the version, the launcher it resolved, and GOV_PYTHON and
+  # PATH as it saw them. With no caller override the loop below is decided by GOV_PYTHON, PATH and the
+  # floor, so a memo matching both byte for byte, at or above THIS floor, is what the loop would print.
+  # Anything else, malformed or partial included, is ignored and the loop runs. Only an absolute
+  # launcher is admitted (TOOL-aMeasuredDrag-12): a relative one names another file once a leg
+  # changes directory, and a bare name does too under a PATH holding `.`.
+  _rp_re=$'^([0-9]+)\\.([0-9]+)\n(/[^\n]*|[A-Za-z]:/[^\n]*|[A-Za-z]:\\\\[^\n]*)\n([^\n]*)\n(.*)$'
+  if [ -z "${1:-}" ] && [[ ${GATE_RESOLVED_PY:-} =~ $_rp_re ]] \
+    && [ "${BASH_REMATCH[4]}" = "${GOV_PYTHON:-}" ] && [ "${BASH_REMATCH[5]}" = "$PATH" ] \
+    && [ $(( 10#${BASH_REMATCH[1]} * 1000 + 10#${BASH_REMATCH[2]} )) -ge "$_rp_fv" ]; then
+    printf '%s\n' "${BASH_REMATCH[3]}"
+    return 0
+  fi
   _rp_tried=""; _rp_seen=""; _rp_best=""; _rp_bv=0; _rp_bver=""; _rp_o1=""; _rp_og=""; _rp_i=0
   for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
     _rp_i=$((_rp_i + 1))
