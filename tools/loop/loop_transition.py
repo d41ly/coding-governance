@@ -29,7 +29,11 @@ may not give; adds `scenario=<tags>`, the scenarios the build runs under joined 
 `derive_move_scenarios` and never given, printing `loop: scenario · unread · <why>` and recording neither
 where the scenario composition at HEAD is unarmed (TOOL-dDeclaredLoop-27); refuses a staged index; where the build's previous move was pinned at another commit,
 files `composition.py`'s `item-ended` orders, printing `loop: order · <path>` per order or
-`loop: composition · unread · <why>` where the composition at HEAD does not answer; back-fills, writes this move's record, commits the records, or an empty commit, as
+`loop: composition · unread · <why>` where the composition at HEAD does not answer; on a forward move
+prints `adapt.py`'s path comparison, `loop: path · ...`, filing a `flow-deviation` order per deviation it
+reads, and on a forward or backward move gives each pending flow change of the build its state row in
+`RUN.md` under `flow.adapt`, the file staged beside the records and cut back to its length where the move
+does not record (TOOL-dDeclaredLoop-28); back-fills, writes this move's record, commits the records, or an empty commit, as
 `loop transition(<slug>): <from> -> <to>` with the trailer where selected, prints
 `loop: recorded · <from> -> <to> · <direction> · commit <sha8>`, and prints the line where selected. A
 set storing neither the trailer nor the log writes no commit. A backward move, testing to building say,
@@ -387,33 +391,53 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
             raise ValueError(str(e)) from None
         said += ["%s: order · %s" % (SAY, p) for p in orders]
         said += ["%s: composition · unread · %s" % (SAY, unread)] if unread else []
+    # the build's own flow changes at this boundary (TOOL-dDeclaredLoop-28): the walked path held to the
+    # composition on a forward move, then each pending change given its state row in RUN.md, which rides
+    # this move's commit and is cut back to its length here where the move does not record
+    from adapt import read_adapt_mode, read_pending_rows, read_run_file, write_flow_states, write_path_orders
+    direction = derive_direction(state, to, read_transition_rows(data, where))
+    if direction == "forward":
+        said += write_path_orders(root, build, state)
+    run, size = read_run_file(root, build), None
+    if direction in ("forward", "backward") and read_pending_rows(root, build):
+        mode = read_adapt_mode(root)
+        size = run.stat().st_size
+        write_flow_states(root, build, mode)
+    staged = [run.relative_to(root).as_posix()] if size is not None else []
     wrote = []
-    if "log" in chosen:
-        anchor = resolve_build_anchor(build, root)
-        if anchor is None and "trailer" not in chosen:
-            raise ValueError("%s selects log without trailer and %s defines no spec, so the move has no record to "
-                             "write and no trailer to back-fill one from" % (KEY, build))
-        if anchor:
-            moves = read_transition_moves(build, root, cache)
-            try:
-                for _c, t in moves["owing"][len(moves["paired"]):]:
-                    wrote.append(write_transition_record(root, anchor, t))
-                wrote.append(write_transition_record(root, anchor, move))
-            except (ValueError, OSError):
+    try:
+        if "log" in chosen:
+            anchor = resolve_build_anchor(build, root)
+            if anchor is None and "trailer" not in chosen:
+                raise ValueError("%s selects log without trailer and %s defines no spec, so the move has no record "
+                                 "to write and no trailer to back-fill one from" % (KEY, build))
+            if anchor:
+                moves = read_transition_moves(build, root, cache)
+                try:
+                    for _c, t in moves["owing"][len(moves["paired"]):]:
+                        wrote.append(write_transition_record(root, anchor, t))
+                    wrote.append(write_transition_record(root, anchor, move))
+                except (ValueError, OSError):
+                    for rel in wrote:
+                        pathlib.Path(root, rel).unlink()
+                    raise
+        commit = None
+        if wrote or "trailer" in chosen:
+            argv = ["commit", "-q", "--allow-empty", "-m", "loop transition(%s): %s -> %s" % (build, state, to)]
+            argv += ["-m", render_transition_trailer(move)] if "trailer" in chosen else []
+            if ((wrote or staged) and read_git(root, "add", "--", *wrote, *staged)[0] != 0) \
+                    or read_git(root, *argv)[0] != 0:
+                if wrote or staged:
+                    read_git(root, "reset", "-q", "--", *wrote, *staged)
                 for rel in wrote:
                     pathlib.Path(root, rel).unlink()
-                raise
-    commit = None
-    if wrote or "trailer" in chosen:
-        argv = ["commit", "-q", "--allow-empty", "-m", "loop transition(%s): %s -> %s" % (build, state, to)]
-        argv += ["-m", render_transition_trailer(move)] if "trailer" in chosen else []
-        if (wrote and read_git(root, "add", "--", *wrote)[0] != 0) or read_git(root, *argv)[0] != 0:
-            if wrote:
-                read_git(root, "reset", "-q", "--", *wrote)
-            for rel in wrote:
-                pathlib.Path(root, rel).unlink()
-            raise ValueError("git could not commit the move in %s, so nothing is recorded" % root.as_posix())
-        commit = read_git(root, "rev-parse", "HEAD")[1]
+                raise ValueError("git could not commit the move in %s, so nothing is recorded" % root.as_posix())
+            commit = read_git(root, "rev-parse", "HEAD")[1]
+    except (ValueError, OSError):
+        if size is not None:
+            with open(run, "r+b") as fh:
+                fh.truncate(size)
+        raise
     return move, commit, wrote, render_transition_line(move) if "micro-format" in chosen else None, said
 
 

@@ -18,6 +18,7 @@
 #   unattended.sh --propose <slug> --item <text> --step <s> --reason <text>  # amend a playbook LATER
 #   unattended.sh --refused <slug> --item <tag> --key <key> --reason <text>  # record a refused item; --plan prints the frontier
 #   unattended.sh --rescope <slug> --act <retire|supersede|add|defer> --item <id> [--successor <id>] --reason <text>
+#   unattended.sh --rescope <slug> --flow <tag> --act <add|amend|exclude|supersede> --item <id> [--row <path>] --reason <text>
 #   unattended.sh --dispatch <slug> --pass <id> --writes <path> [<path> ...] [--writes <path> ...]
 #   unattended.sh --brief <slug> --unit <id> --path <file>  # record WHAT a build pass was handed
 #   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--highs <N> --minors <N>] [--folded <N> --promoted <N>] [--disposition fold|promote]
@@ -6104,14 +6105,15 @@ read_spec_rev() { # spec path -> the N of its header's rev-N, empty when it has 
 
 # THE ENGINE, ABSOLUTE: `resolve_kit_dir` answers relative to the tree holding this kit, which is the
 # working tree in every install, and the engine's own driver plants run this kit over a scratch
-# repository, where a relative answer would name a file that is not there.
-resolve_position_engine() { # -> sets PE_PY and PE_PATH; 1 where python or the loop kit's engine does not resolve
-  local _d _r=$KIT_DIR
+# repository, where a relative answer would name a file that is not there. A script name, where given,
+# finds that loop kit script the same way: `--rescope --flow` runs `adapt.py` (TOOL-dDeclaredLoop-28).
+resolve_position_engine() { # [script] -> sets PE_PY and PE_PATH; 1 where python or the loop kit's script does not resolve
+  local _d _r=$KIT_DIR _s=${1:-position.py}
   PE_PATH=""
   PE_PY=$(resolve_python 2>/dev/null) && [ -n "$PE_PY" ] || return 1
-  _d=$(resolve_kit_dir "$PE_PY" loop position.py "$KIT_DIR" 2>/dev/null) && [ -n "$_d" ] || return 1
+  _d=$(resolve_kit_dir "$PE_PY" loop "$_s" "$KIT_DIR" 2>/dev/null) && [ -n "$_d" ] || return 1
   while [ -n "$_r" ] && [ ! -e "$_r/.git" ]; do _r=${_r%/*}; done
-  PE_PATH="${_r:-.}/$_d/position.py"
+  PE_PATH="${_r:-.}/$_d/$_s"
   [ -f "$PE_PATH" ]
 }
 verb_plan() { # slug
@@ -14049,11 +14051,40 @@ check_chain_dispatch() { # run-state file · slug -> 0 when the chain admits thi
 # THE ID SHAPE IS THE DRIVER'S OWN `_ids_of`, never the memory-tree kit's `id_pattern`: that is a
 # PYTHON function in a different kit, each kit is copy-installed standalone, and check 10's own
 # header records that an adopter may hold one and not the other.
-verb_rescope() { # slug · act · unit · successor · reason
-  local slug="$1" act="$2" unit="$3" succ="$4" reason="$5" rel want pl ids shaped _rs_bl
+verb_rescope() { # slug · act · unit · successor · reason · [flow row tag · row file]
+  local slug="$1" act="$2" unit="$3" succ="$4" reason="$5" flow="${6:-}" row="${7:-}" rel want pl ids shaped _rs_bl
+  local _fl_out _fl_rc _fl_why
   check_slug "$slug" || return 1
   runmd_of "$slug" >/dev/null; rel=$_runmd
   check_run_state "$rel" "run to record an amendment against" || return 1
+  # TOOL-dDeclaredLoop-28 - THE FLOW FORM, taken on --flow before the unit form's act case, whose case
+  # and row keep their bytes, so every reader anchored on ` rescope · item ` reads the same rows. A
+  # role proposes a change of its own build's flow; the loop kit's `adapt.py propose` makes every
+  # check of the proposal and writes its change record and its `rescope · flow` row, and this form is
+  # its adapter: the run-state, reason and terminal checks the unit form makes, then ONE refusal
+  # relaying the verb's first line, so the checks live once, in the loop kit.
+  if [ -n "$flow" ]; then
+    check_verb_flag --rescope --reason "$reason" || return 1
+    refuse_if_terminal "$rel" --rescope || return 1
+    # Each value JOINED to its flag, so one opening `-`, the bypass flag above all, is never read as a flag.
+    set -- propose "--build=$slug" "--flow=$flow" "--act=$act" "--item=$unit" "--reason=$reason"
+    [ -n "$row" ] && set -- "$@" "--row=$row"
+    [ -n "$BYPASS_BAN" ] && set -- "$@" "--ban=$BYPASS_BAN"
+    _fl_why="the loop kit's adapt.py does not resolve beside this kit"
+    if resolve_position_engine adapt.py; then
+      _fl_out=$("$PE_PY" "$PE_PATH" "$@" 2>&1); _fl_rc=$?
+      [ -n "$_fl_out" ] && printf '%s\n' "$_fl_out"
+      _fl_why=${_fl_out%%$'\n'*}; _fl_why=${_fl_why%$'\r'}
+      [ -n "$_fl_why" ] || _fl_why="the verb printed nothing and exited $_fl_rc"
+    else
+      _fl_rc=2
+    fi
+    if [ "$_fl_rc" -ne 0 ]; then
+      fail 48 "the loop kit refused this flow proposal, so nothing is recorded and the run-state file is unchanged: $_fl_why"; return 1
+    fi
+    stage_or_fail "$rel" || return 1
+    return 0
+  fi
   # CLOSED SET. A value outside it is a refusal and never a default: defaulting an unrecognised act
   # would let a typo select an amendment nobody asked for, which is the shape ANCHOR_SCOPE's own
   # value guard exists to avoid.
@@ -15293,7 +15324,7 @@ VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
 # refusal nobody typed an argument for.
 HOLD_UNTIL=""; HOLD_REAPED=""; HOLD_UNREACH=""; HOLD_RUN=""; RS_REPLACES=""; RS_SCHEDULED=""
 RP_PATH=""; RP_LEG=""; VERDICT=""; RP_ROOT=""; RP_PBSHA=""; RP_RUN=""; RP_SET=""; BR_UNIT=""
-RS_ACT=""; RS_SUCC=""
+RS_ACT=""; RS_SUCC=""; RS_FLOW=""; RS_ROW=""
 DP_WRITES=()
 RR_AUDITED=""; RR_FINDINGS=(); RR_SIBLINGS=()
 OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
@@ -15343,6 +15374,8 @@ while [ $# -gt 0 ]; do
                     [ "$_dw_n" -gt 0 ] || DP_WRITES+=("") ;;
     --act)          RS_ACT="${2:-}"; shift 2 || shift ;;
     --successor)    RS_SUCC="${2:-}"; shift 2 || shift ;;
+    --flow)         RS_FLOW="${2:-}"; shift 2 || shift ;;
+    --row)          RS_ROW="${2:-}"; shift 2 || shift ;;
     --item)         PK_ITEM="${2:-}"; shift 2 || shift ;;
     --step)         PK_STEP="${2:-}"; shift 2 || shift ;;
     --key)          RF_KEY="${2:-}"; shift 2 || shift ;;
@@ -15493,7 +15526,7 @@ case "$VERB" in
   --record-set)   verb_record_set "$SLUG" "$RP_LEG" "$VERDICT" ;;
   --record-round) write_chain_round "$SLUG" "$RV_SUBJECT" "$RR_AUDITED" "$RV_BLOCKERS" "$RV_HIGHS" ;;
   --chain-verdict) print_chain_verdict "$SLUG" ;;
-  --rescope)   verb_rescope "$SLUG" "$RS_ACT" "$PK_ITEM" "$RS_SUCC" "$REASON" ;;
+  --rescope)   verb_rescope "$SLUG" "$RS_ACT" "$PK_ITEM" "$RS_SUCC" "$REASON" "$RS_FLOW" "$RS_ROW" ;;
   --dispatch)  verb_dispatch "$SLUG" "$PK_ITEM" "${DP_WRITES[@]}" ;;
   --beat)      write_claim_beat "$SLUG" ;;
 esac

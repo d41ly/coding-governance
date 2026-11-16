@@ -337,9 +337,11 @@ def read_changes(root, conf=None):
 
 
 def write_change(root, build, unit, tag, action, mark, before, after, proof, successor=None, promoted_from=None,
-                 today=None):
+                 today=None, lines=()):
     """The one writer of a change record, under `root`'s own memory tree. -> its repo-relative path. Every value
-    is validated here, the write boundary; a refusal is ValueError."""
+    is validated here, the write boundary; a refusal is ValueError. `lines`, written after the fields, are
+    `write_record`'s, as the acceptance kind's are: the loop kit's flow proposal holds its row there
+    (TOOL-dDeclaredLoop-28)."""
     fields = [("Unit", tag), ("Action", action), ("Before", before), ("After", after), ("Mark", mark)]
     fields += [("Successor", successor)] * (successor is not None)
     fields += [("Proof", proof)] + [("Promoted-from", promoted_from)] * (promoted_from is not None)
@@ -350,7 +352,7 @@ def write_change(root, build, unit, tag, action, mark, before, after, proof, suc
     bad += [f"{k} {why}" for k, why in check_change_fields(held)]
     if bad:
         raise ValueError("; ".join(bad))
-    return write_record(root, build, unit, "change", f"{action} {tag}", fields, today)
+    return write_record(root, build, unit, "change", f"{action} {tag}", fields, today, lines)
 
 
 # -------------------------------------------------------------------------------- the override kind

@@ -512,6 +512,12 @@ entry = "{prefix}/loop/composition.py"
 flags = ["--fixture", "--plant=", "--selftest"]
 
 [[usage]]
+id = "script:{prefix}/loop/adapt.py"
+shape = "verb"
+entry = "{prefix}/loop/adapt.py"
+flags = ["--fixture", "--plant=", "--selftest"]
+
+[[usage]]
 id = "script:{prefix}/loop/scenario.py"
 shape = "verb"
 entry = "{prefix}/loop/scenario.py"

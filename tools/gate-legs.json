@@ -2254,6 +2254,19 @@
     "stage": ["step.test"]
   },
   {
+    "name": "loop adapt fixtures",
+    "argv": [
+      "python",
+      "{prefix}/loop/adapt.py",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "enforces": ["principle.p8"],
+    "stage": ["step.test"]
+  },
+  {
     "name": "loop scenario fixtures",
     "argv": [
       "python",

@@ -42,7 +42,11 @@ where the kind is not registered with a schema, its schema file is absent, or HE
 `source`, and on a usage error. `--rows -` reads a JSON array of rows on standard input, the rows the
 scenarios a build was placed under activate (TOOL-dDeclaredLoop-27): each joins after the overlay's own
 rows as the repository's, keeping its `source`, and meets every refusal an overlay row meets; a row that
-is no object or types `origin` is refused, exit 1. Any other `--rows` value is a usage error.
+is no object or types `origin` is refused, exit 1. Any other `--rows` value is a usage error. One more
+element form rides the same array (TOOL-dDeclaredLoop-28): an object whose only key is `exclude`, holding
+a tag, the exclusion a build applied in its own layer. Its tag joins `instructions.exclude`'s tags before
+the composition runs, so it meets every check an `instructions.exclude` entry meets, and those refusals
+name `instructions.exclude`.
 """
 from __future__ import annotations
 
@@ -395,9 +399,11 @@ def derive_kind_composition(root, kind, exclude, records, extra=None):
                                   exclude, "order", records, policy)
 
 
-def read_extra_rows(text) -> list:
-    """TOOL-dDeclaredLoop-27 S6: the JSON array `--rows -` reads on standard input, each row's `origin` the
-    repository's and its `source` kept; one OverlayRefused naming a row that is no object or types `origin`."""
+def read_extra_rows(text) -> tuple:
+    """TOOL-dDeclaredLoop-27 S6: `(rows, excluded tags)` of the JSON array `--rows -` reads on standard input,
+    each row's `origin` the repository's and its `source` kept, and the tag of each `{"exclude": <tag>}`
+    element apart (TOOL-dDeclaredLoop-28 S6); one OverlayRefused naming a row that is no object or types
+    `origin`, or an `exclude` element whose value is no string."""
     try:
         rows = json.loads(text)
     except ValueError as exc:
@@ -407,8 +413,11 @@ def read_extra_rows(text) -> list:
     reds = [f"{SAY}: red · --rows · row {i} is no object" for i, r in enumerate(rows, 1) if not isinstance(r, dict)]
     reds += [f"{SAY}: red · --rows · row {i} ({r.get('tag')}) · types `origin`, which is derived · remedy: drop "
              f"the key" for i, r in enumerate(rows, 1) if isinstance(r, dict) and "origin" in r]
+    excluded = [r for r in rows if isinstance(r, dict) and list(r) == ["exclude"]]
+    reds += [f"{SAY}: red · --rows · exclude {r['exclude']!r} is no tag" for r in excluded
+             if not isinstance(r["exclude"], str) or not r["exclude"]]
     check_reds(reds)
-    return [{**r, "origin": ov.ORIGIN} for r in rows]
+    return [{**r, "origin": ov.ORIGIN} for r in rows if list(r) != ["exclude"]], {r["exclude"] for r in excluded}
 
 
 def run_compose(argv) -> int:
@@ -419,7 +428,7 @@ def run_compose(argv) -> int:
         return 2
     root, kind = pathlib.Path.cwd(), argv[2]
     try:
-        extra = read_extra_rows(sys.stdin.read()) if argv[3:] else None
+        extra, excluded = read_extra_rows(sys.stdin.read()) if argv[3:] else (None, set())
         if not any(r.get("tag") == f"kind.{kind}" for r in pins.read_row_kinds(root)):
             print(f"{SAY}: unarmed · kind {kind} · {iu.derive_kit_file(root, 'kinds.toml').relative_to(root).as_posix()} "
                   f"lists no such kind with a `schema`")
@@ -430,7 +439,8 @@ def run_compose(argv) -> int:
             print(f"{SAY}: unarmed · kind {kind} · " + (f"{schema_rel}, its schema, is absent" if absent else
                                                        f"HEAD holds no {source_rel}, its namespace source"))
             return 2
-        got = derive_kind_composition(root, kind, ov.read_excluded_tags(root), iu.read_change_records(root), extra)
+        got = derive_kind_composition(root, kind, ov.read_excluded_tags(root) | excluded, iu.read_change_records(root),
+                                      extra)
         schema = read_kind_schema(root, kind)
     except PolicyRefused as exc:
         print(f"{SAY}: red · the composition is refused: policy {exc.key}: {exc.line}")

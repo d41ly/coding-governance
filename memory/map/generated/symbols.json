@@ -410,6 +410,11 @@
     {
       "id": "Refused",
       "kind": "class",
+      "file": "tools/loop/adapt.py"
+    },
+    {
+      "id": "Refused",
+      "kind": "class",
       "file": "tools/loop/factories.py"
     },
     {
@@ -2401,6 +2406,11 @@
       "id": "build_aborted_work_landed",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "build_adapt_base",
+      "kind": "function",
+      "file": "tools/loop/adapt.py"
     },
     {
       "id": "build_age_fixture",
@@ -7083,6 +7093,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_proposal_fields",
+      "kind": "function",
+      "file": "tools/loop/adapt.py"
+    },
+    {
       "id": "check_provenance_chain",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -9913,6 +9928,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "derive_change_class",
+      "kind": "function",
+      "file": "tools/loop/adapt.py"
+    },
+    {
       "id": "derive_change_commit",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -11226,6 +11246,11 @@
       "id": "derive_patch_class",
       "kind": "function",
       "file": "tools/playbook/row_checks.py"
+    },
+    {
+      "id": "derive_path_deviations",
+      "kind": "function",
+      "file": "tools/loop/adapt.py"
     },
     {
       "id": "derive_path_key",
@@ -14860,6 +14885,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/loop/adapt.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/loop/claims.py"
     },
     {
@@ -17923,6 +17953,11 @@
       "file": "tools/loop/loop_lib.py"
     },
     {
+      "id": "read_adapt_mode",
+      "kind": "function",
+      "file": "tools/loop/adapt.py"
+    },
+    {
       "id": "read_added_units",
       "kind": "function",
       "file": "tools/loop/guard.py"
@@ -18928,6 +18963,11 @@
       "file": "tools/memory-tree/build_records.py"
     },
     {
+      "id": "read_disposition_release",
+      "kind": "function",
+      "file": "tools/loop/adapt.py"
+    },
+    {
       "id": "read_dispositions",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
@@ -19103,6 +19143,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_fenced_row",
+      "kind": "function",
+      "file": "tools/loop/adapt.py"
+    },
+    {
       "id": "read_field",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
@@ -19271,6 +19316,16 @@
       "id": "read_floor",
       "kind": "function",
       "file": "tools/loop/floor.py"
+    },
+    {
+      "id": "read_flow_layer",
+      "kind": "function",
+      "file": "tools/loop/adapt.py"
+    },
+    {
+      "id": "read_flow_rows",
+      "kind": "function",
+      "file": "tools/loop/adapt.py"
     },
     {
       "id": "read_fm_key_of",
@@ -20588,6 +20643,11 @@
       "file": "tools/playbook/core.py"
     },
     {
+      "id": "read_pending_rows",
+      "kind": "function",
+      "file": "tools/loop/adapt.py"
+    },
+    {
       "id": "read_pf_at",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -20916,6 +20976,11 @@
       "id": "read_proof_tree",
       "kind": "function",
       "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "read_proposal_row",
+      "kind": "function",
+      "file": "tools/loop/adapt.py"
     },
     {
       "id": "read_public_times",
@@ -21396,6 +21461,11 @@
       "id": "read_run_fact",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_run_file",
+      "kind": "function",
+      "file": "tools/loop/adapt.py"
     },
     {
       "id": "read_run_state",
@@ -24573,6 +24643,11 @@
       "file": "tools/playbook/pins.py"
     },
     {
+      "id": "render_state_row",
+      "kind": "function",
+      "file": "tools/loop/adapt.py"
+    },
+    {
       "id": "render_status_row",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -27408,6 +27483,11 @@
       "file": "tools/loop/loop_witness.py"
     },
     {
+      "id": "run_adapt_plant",
+      "kind": "function",
+      "file": "tools/loop/adapt.py"
+    },
+    {
       "id": "run_adopter",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -29215,6 +29295,11 @@
     {
       "id": "run_propose",
       "kind": "function",
+      "file": "tools/loop/adapt.py"
+    },
+    {
+      "id": "run_propose",
+      "kind": "function",
       "file": "tools/loop/policy_edit.py"
     },
     {
@@ -29541,6 +29626,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/loop/adapt.py"
     },
     {
       "id": "run_selftest",
@@ -34928,6 +35018,16 @@
       "file": "tools/lib/python_floor.py"
     },
     {
+      "id": "write_flow_proposal",
+      "kind": "function",
+      "file": "tools/loop/adapt.py"
+    },
+    {
+      "id": "write_flow_states",
+      "kind": "function",
+      "file": "tools/loop/adapt.py"
+    },
+    {
       "id": "write_fold_commit",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -35403,6 +35503,11 @@
       "file": "tools/loop/loop_parents.py"
     },
     {
+      "id": "write_path_orders",
+      "kind": "function",
+      "file": "tools/loop/adapt.py"
+    },
+    {
       "id": "write_pause_row",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -35851,6 +35956,11 @@
       "id": "write_run_record",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_run_row",
+      "kind": "function",
+      "file": "tools/loop/adapt.py"
     },
     {
       "id": "write_run_state",

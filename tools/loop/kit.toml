@@ -100,6 +100,11 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # that does not resolve exits 2 `unarmed`, never a default, and the transition writer records no scenario
 # where the composition is unarmed. Its leg, `loop scenario fixtures`, is gov's own [[exempt_leg]], no row
 # here.
+# A build's own flow changes (TOOL-dDeclaredLoop-28): adapt.py writes a proposal's change record through the
+# memory-tree kit's `write_change` and its row in the build's RUN.md, composes each pending change through
+# loop_items.py's `read_composition`, so the playbook kit is reached as a subprocess with no edge, and reads
+# `flow.adapt` through the policy kit by `read_policy_kit`. A kit that does not resolve exits 2 `unarmed`,
+# never a default. Its leg, `loop adapt fixtures`, is gov's own [[exempt_leg]], no row here.
 requires = ["memory-tree"]
 
 # Everything the kit ships is engine, overwritten on every update: the definition, its reader, the

@@ -17,7 +17,9 @@ rows where that composition is unarmed in the tree, or the `[[item]]` rows of `d
 passes a parsed one, the read printed `composition@<sha8> · pinned` or `· unpinned`; the item rows the
 newest move's `scenario` activates, read at the same pin through `scenario.read_activated_rows` and
 composed with the items, the read printed `scenario=<value> · <n> activated`, and nothing where that move
-carries no scenario (TOOL-dDeclaredLoop-27); the witnesses its
+carries no scenario (TOOL-dDeclaredLoop-27); the build's own applied flow changes, `adapt.py`'s
+`read_flow_layer`, composed after those rows as the build's last layer, so a held, refused or pending
+change is absent (TOOL-dDeclaredLoop-28); the witnesses its
 moves name through `composition.derive_carried_witnesses`, so a witness under a renamed item reads under
 its successor;
 the acceptance records through `build_records.read_records` with `read_acceptance`; the run-state file's
@@ -50,7 +52,10 @@ The frontier (TOOL-dDeclaredLoop-14) is every item of that step, in composition 
 does not hold and whose needs are witnessed, so a refused instance stays on it; the next item is its
 first entry. The run's `refusal` rows, which the driver's `--refused` writes, are read through runlog's
 `read_run_state`, found by `resolve_kit_dir`; where that kit does not resolve the line output says
-`refusal — unarmed` and still prints the frontier. `--next-line --frontier` prints the frontier's tags,
+`refusal — unarmed` and still prints the frontier. Two fields serve the transition writer's path
+comparison (TOOL-dDeclaredLoop-28): `witnesses`, each item of the build's step mapped to `held`, `unheld`
+or `unread` by the same witness read, and `undeclared`, each tag a recorded move names that the
+composition at the pin lacks, mapped to the states the moves naming it left. `--next-line --frontier` prints the frontier's tags,
 space-separated, or `none`, on a second line, which `--plan` prints as its `frontier:` line.
 `--check-refusal <tag> <key>` prints `loop: refusal held`, exit 0, where the composition declares the
 tag and the key is `derive_instance_key`'s shape for it; `loop: refused`, exit 1, otherwise; and
@@ -379,7 +384,8 @@ def derive_position(repo, slug, definition=None):
     given, is a parsed definition read instead of the shipped one and the composition."""
     repo = pathlib.Path(repo).absolute()
     pos = {"slug": slug, "state": "none", "build_step": NO_STEP, "units": [], "next": None, "frontier": [],
-           "refusals": [], "interrupts": [], "answer": "invalid-input", "reason": "", "read": [], "claims": []}
+           "refusals": [], "interrupts": [], "answer": "invalid-input", "reason": "", "read": [], "claims": [],
+           "witnesses": {}, "undeclared": {}}
     try:
         derive_position_into(pos, repo, slug, definition)
     except (LoopError, ValueError, OSError, LookupError, KeyError, subprocess.SubprocessError) as e:
@@ -416,8 +422,11 @@ def derive_position_into(pos, repo, slug, definition):
         activated = read_activated_rows(repo, pin, placed.split("+")).get("kind.item", []) if placed else []
         if placed:
             pos["read"].append("scenario=%s · %d activated" % (placed, len(activated)))
+        # the build's own applied changes, its last layer, after them (TOOL-dDeclaredLoop-28)
+        from adapt import read_flow_layer   # it imports loop_transition, as this module does, so here
+        layer = read_flow_layer(repo, slug, "item")
         # unarmed: no composition in this tree, so gov's own rows alone; else the composition at the pin
-        items = read_composed_items(repo, pin, activated or None)
+        items = read_composed_items(repo, pin, (activated + layer) or None)
     else:
         data, where = definition, "the caller's definition"
         items = read_item_rows(data, where)
@@ -508,6 +517,19 @@ def derive_position_into(pos, repo, slug, definition):
                                                       read_witness, least["id"], head)
     pos["next"], pos["frontier"] = nxt, frontier
     pos["claims"] += item_claims
+    # the walked path's two reads (TOOL-dDeclaredLoop-28): each item of the step as the engine reads its
+    # witness, and each tag a recorded move names that the composition at the pin lacks, with the states
+    # the moves naming it left
+    if least and pos["build_step"] != NO_STEP:
+        for r in items:
+            if r.get("step") == pos["build_step"]:
+                held = read_witness(r.get("tag"))[0]
+                pos["witnesses"][r.get("tag")] = "unread" if held is None else "held" if held else "unheld"
+    for m in moves:
+        if m.get("item") and m["item"] not in item_step:
+            pos["undeclared"].setdefault(m["item"], [])
+            if m.get("from") and m["from"] not in pos["undeclared"][m["item"]]:
+                pos["undeclared"][m["item"]].append(m["from"])
     parents_open = []
     for p in (fm.get("parents") or "").split():
         landed = handover["parents"].get(p) == "LANDED"

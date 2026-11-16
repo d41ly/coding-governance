@@ -498,6 +498,79 @@ log record is the source; with only `micro-format` selected, nothing is stored a
 Only build-level moves are recorded; nothing calls the writer yet, until the executor that moves a
 build at each item boundary lands.
 
+Each move is also a step boundary for the build's own changes, described next. Before it writes its
+records, `record` runs two steps: on a forward move it holds the path the build walked against its
+composition, printing `loop: path · ...` and filing a `flow-deviation` order per deviation; on a
+forward or backward move it gives each pending change of the build its state row in the build's
+`RUN.md`, which rides the move's commit and is cut back where the move does not record.
+
+## A build's own changes to its flow
+
+A role can change its own build's flow mid-build without moving any other build: it proposes a row
+for its own build, and the change takes effect at the build's next step boundary, never inside the
+step it was proposed in. A change that only adds applies there on its own and is recorded; one that
+takes away or loosens waits for you, while the build carries on without it.
+
+- **Propose a change:** `bash tools/unattended/unattended.sh --rescope <slug> --flow <tag> --act add --item <unit-id> --row <path> --reason <text>` <!-- usage: verb:unattended.sh:--rescope a2a815d5 -->
+  records one proposal through the loop kit's `adapt.py propose`. `--act` is `add` (a new row of your
+  own, tagged with `adopter`, no `edges`), `amend` (a patch row whose `edges` reads
+  `amends=<gov tag>@<hash8>`), `supersede` (a replacing row whose `edges` reads
+  `supersedes=<gov tag>@<hash8>`) or `exclude` (gov's tag as `--flow`, no `--row`). The row file holds
+  exactly one table, such as `[[item]]`, whose `tag` is `--flow`. An `add`, `amend` or `supersede`
+  writes one change record in the build's `build/` folder holding the row in a TOML fence, its `After`
+  pinning the row's bytes; every act appends `rescope · flow <act> <tag>[ · change <record>] · reason
+  <text>` to `RUN.md`. A field holding a line end or ` · `, an act its row's `edges` disagrees with, and
+  a missing or extra `--row` are refused, writing nothing; the driver prints the loop kit's line.
+
+  <!-- run: no — runs the driver over a live run's state file, which a scratch adopter does not hold -->
+  ```bash
+  bash tools/unattended/unattended.sh --rescope <slug> --flow item.build.adopter.lint-pass --act add --item <unit-id> --row lint-pass.toml --reason "the lint gate needs a pass item"
+  ```
+
+**What decides.** The policy key `flow.adapt` in `.governance/policy.toml` takes three values:
+
+- `additive-recorded`, the default: an additive change applies at the next boundary, and a loosening
+  one waits for you.
+- `owner-approves`: every change waits for you.
+- `off`: every change is refused at the boundary.
+
+The class is derived, never typed: an `add` is additive, and so is an `amend` whose every operation
+the composition reads as narrowing; an `exclude`, a `supersede` and an `amend` with any widening
+operation are loosening. At the boundary each pending change is composed with the build's applied
+changes first, so a change the composition refuses, whose record's pin no longer matches its row, or
+whose kind the compose verb answers unarmed is refused with `class none`. Each answer is a row in
+`RUN.md`: `rescope · flow-state <tag> · applied|held|refused · class <class> · flow.adapt <value>`.
+
+**Releasing a held change.** A held change waits until you write a disposition record whose `Item` is
+the change's tag, as [the owner's disposition record](#the-owners-disposition-record) describes:
+`continue` applies it at the next boundary and `none` refuses it, and the state row names the record.
+The build's moves still record while a change is held.
+
+**Where the changes go.** A build's applied changes are the last layer of its composition, after the
+rows its scenarios activate: the position engine composes them through `compose --rows -`, an added or
+replacing row as a row and an exclusion as an `{"exclude": "<tag>"}` element. A held, refused or
+pending change is never part of it.
+
+**The walked path.** On a forward move, where the driver hands the position engine its unit states in
+`GOV_POSITION_STATES`, the writer reads the build's position and, for the step the move leaves, files
+one order, `.governance/outbox/loop-flow-deviation-<build>-<item>.md`, per `skip`, an item of the step
+the engine reads unheld but the step's exit, and per `extra`, an item a move out of that step named
+that the composition lacks. An item whose witness the engine does not read is never a skip: the line
+`loop: path · <build> · <step> · <n> unread` counts them. Without the hand-over, or where the position
+reads another step, the line reads `loop: path · <build> · unread — <why>` and the move records.
+
+- **See it on a fixture:** `python tools/loop/adapt.py --fixture --plant <case>` builds a scratch <!-- usage: script:tools/loop/adapt.py 36358c6c -->
+  repository holding gov's kits and the build `tFix`, plays the case and ends `loop: fixture · <case> ·
+  held` or `· MISSED <why>`. The cases are `additive`, `owner-approves`, `off`, `loosening`,
+  `unrecorded-skip`, `act-mismatch`, `unit-row` and `mid-step`. `--selftest` runs every case, and gov's
+  own `loop adapt fixtures` gate runs it.
+
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
+  ```bash
+  python tools/loop/adapt.py --fixture --plant additive
+  python tools/loop/adapt.py --selftest
+  ```
+
 ## When a build moves to a newer composition
 
 A build runs each step under the composition it entered that step with, and moves to a newer one only

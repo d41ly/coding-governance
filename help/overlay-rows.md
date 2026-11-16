@@ -28,6 +28,12 @@ your overlay meets, the owned seat, a fixed field, a fixed row, an edge's pin an
 keeps the `source` it arrived with, the scenario's tag, so a refusal names it. A row that is no object,
 or one typing `origin`, is refused, exit 1; any `--rows` value but `-` is a usage error, exit 2.
 
+The array takes one more element form, `{"exclude": "<tag>"}`, an object whose only key is `exclude`:
+an exclusion a build applied to its own flow (see [the loop definition](loop.md), a build's own
+changes). Its tag joins `instructions.exclude`'s tags before the composition runs, so it meets every
+check an entry of that set meets, a fixed row, a tag a composed row still needs, a policy key naming
+it, and those refusals name `instructions.exclude`. An `exclude` holding no tag is refused, exit 1.
+
 <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
 ```bash
 python tools/playbook/overlay_rows.py compose --kind item

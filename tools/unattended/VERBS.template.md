@@ -235,6 +235,12 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   checking it. Nothing forces the call to precede the edit, so the row is a declaration in shape
   rather than in enforced ordering: the pair catches an amendment made with NO record, never a
   truthful-looking row attached to a different edit.
+  With `--flow <tag>` it records a change of the build's own FLOW instead (TOOL-dDeclaredLoop-28):
+  `--act add|amend|exclude|supersede`, the proposing unit as `--item`, the row file as `--row` on every
+  act but `exclude`, and a reason. The loop kit's `adapt.py propose` makes every check of the proposal and
+  writes its change record and its `rescope · flow` row; this verb stages the run-state file, and any
+  refusal of that verb is its one refusal, naming the verb's first line. The change applies, waits for
+  the owner or is refused at the build's next step boundary under `flow.adapt`.
 - `--dispatch` — records the WRITE-SET DECLARATION a concurrent dispatch owes: `--pass <unit-id>`
   and `--writes`, which takes every path up to the next flag: a whitespace-joined value splits into
   its paths, and the flag may repeat. The build method requires two path

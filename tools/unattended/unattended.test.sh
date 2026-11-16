@@ -6543,6 +6543,17 @@ hit "$(run --refused tRun --item item.build.nowhere --key "item.build.nowhere@AR
 hit "$(run --refused tRun --item item.build.base --key "$_rf_key · reason forged" --reason r)" "an item or step spells the record's own field separator ' · '"
 same "a refused --refused wrote nothing" "$(sum)" "$before"
 
+# ---- TOOL-dDeclaredLoop-28: `--rescope --flow`, a build's own flow change proposed through the loop
+# ---- kit's `adapt.py propose`. Its ONE refusal relays the verb's first line: an `add` over a row whose
+# ---- `edges` amends a gov row is refused naming the act and the row, and the run-state file keeps its bytes.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+printf '[[item]]\ntag = "item.build.adopter.lint-pass"\nedges = "amends=item.build.unit-pass@0123abcd"\n' > flow-row.toml
+before=$(sum)
+out=$(run --rescope tRun --flow item.build.adopter.lint-pass --act add --item ARCH-tRun-1 --row flow-row.toml --reason "the lint gate needs a pass item")
+hit "$out" "the loop kit refused this flow proposal, so nothing is recorded and the run-state file is unchanged: loop: refused · --act add disagrees with the row flow-row.toml"
+same "a refused flow proposal wrote nothing" "$(sum)" "$before"
+rm -f flow-row.toml
+
 reset_tree
 
 # ---- check 47: --record-piece. Every refusal, plus the two PASSING directions that tell a working
