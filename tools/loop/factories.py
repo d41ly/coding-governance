@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""factories.py — the factories of five registered kinds and the command kind's gate (TOOL-dDeclaredLoop-6).
+"""factories.py — the factories of six registered kinds and the command kind's gate (TOOL-dDeclaredLoop-6).
 
     python factories.py command <verb> --kit <id> --run <path>
     python factories.py policy-key <name> --allowed <toml> --default <toml> --summary <text> --usage <text> --owner <build>
