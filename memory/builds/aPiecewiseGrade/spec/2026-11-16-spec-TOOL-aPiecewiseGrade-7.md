@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-16-build-TOOL-aPiecewiseGrade-1-arms-observed.md](../build/2026-11-16-build-TOOL-aPiecewiseGrade-1-arms-observed.md) | journal | TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-3 TOOL-aPiecewiseGrade-4 TOOL-aPiecewiseGrade-5 TOOL-aPiecewiseGrade-6 TOOL-aPiecewiseGrade-8 |
 | [2026-11-16-build-TOOL-aPiecewiseGrade-7-1-acceptance-ledger.md](../build/2026-11-16-build-TOOL-aPiecewiseGrade-7-1-acceptance-ledger.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aPiecewiseGrade-7-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-aPiecewiseGrade-7-1-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aPiecewiseGrade-7-2-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-aPiecewiseGrade-7-2-spec-writer.md) | journal | — |

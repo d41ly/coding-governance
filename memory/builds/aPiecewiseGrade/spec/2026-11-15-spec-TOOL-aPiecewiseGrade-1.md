@@ -11,6 +11,7 @@
 | [2026-11-15-build-TOOL-aPiecewiseGrade-1-red-fix-2.md](../build/2026-11-15-build-TOOL-aPiecewiseGrade-1-red-fix-2.md) | red-fix | — |
 | [2026-11-15-build-TOOL-aPiecewiseGrade-1-red-fix-3.md](../build/2026-11-15-build-TOOL-aPiecewiseGrade-1-red-fix-3.md) | red-fix | — |
 | [2026-11-15-build-TOOL-aPiecewiseGrade-1-red-fix-4.md](../build/2026-11-15-build-TOOL-aPiecewiseGrade-1-red-fix-4.md) | red-fix | — |
+| [2026-11-16-build-TOOL-aPiecewiseGrade-1-arms-observed.md](../build/2026-11-16-build-TOOL-aPiecewiseGrade-1-arms-observed.md) | journal | TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-3 TOOL-aPiecewiseGrade-4 TOOL-aPiecewiseGrade-5 TOOL-aPiecewiseGrade-6 TOOL-aPiecewiseGrade-7 TOOL-aPiecewiseGrade-8 |
 | [2026-11-15-prompt-TOOL-aPiecewiseGrade-1-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-1-1-spec-writer.md) | journal | — |
 | [2026-11-15-prompt-TOOL-aPiecewiseGrade-1-brief.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-1-brief.md) | research | TOOL-aPiecewiseGrade-2 |
 | [2026-11-15-prompt-TOOL-aPiecewiseGrade-3-forks-brief.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-3-forks-brief.md) | research | TOOL-aPiecewiseGrade-3 TOOL-aPiecewiseGrade-2 |

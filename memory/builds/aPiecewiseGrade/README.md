@@ -69,7 +69,7 @@ ids TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-3 TOOL-aP
 | [TOOL-aPiecewiseGrade-8 — two permanent arms hold the spec-token checker's counter key-set guards](spec/2026-11-16-spec-TOOL-aPiecewiseGrade-8.md) | 6 | 1 | CLOSED | rev-1 | 2026-11-16 |
 <!-- /gen:build-units -->
 
-Records: 35 bound to this build, across 4 record folder(s).
+Records: 36 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
