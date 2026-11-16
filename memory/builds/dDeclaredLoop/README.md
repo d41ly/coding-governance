@@ -159,7 +159,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-26 — a build's composition pinned per step, its position read at the pin, and the move at the next step boundary](spec/2026-10-24-spec-TOOL-dDeclaredLoop-26.md) | 23 | 2 | CLOSED | rev-6 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-27 — the scenario kind and namespace: gov's five scenarios, admission, conflicts and the pin per step](spec/2026-10-24-spec-TOOL-dDeclaredLoop-27.md) | 24 | 2 | CLOSED | rev-4 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-28 — a build's recorded changes under flow.adapt, applied at its next step boundary, and its witnessed path held to its composition](spec/2026-10-24-spec-TOOL-dDeclaredLoop-28.md) | 25 | 2 | CLOSED | rev-6 | 2026-11-16 |
-| [TOOL-dDeclaredLoop-21 — the review round bounds as policy keys: review.max-rounds, the design rounds and follow-ups, REVIEW_ROUNDS and RUNAWAY_CEILING retired](spec/2026-10-24-spec-TOOL-dDeclaredLoop-21.md) | 26 | 2 | INPROGRESS | rev-7 | 2026-11-16 |
+| [TOOL-dDeclaredLoop-21 — the review round bounds as policy keys: review.max-rounds, the design rounds and follow-ups, REVIEW_ROUNDS and RUNAWAY_CEILING retired](spec/2026-10-24-spec-TOOL-dDeclaredLoop-21.md) | 26 | 2 | INPROGRESS | rev-8 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-34 — the deviation approval route read from deviation.approval: by its risk, the owner for all, or its author recorded](spec/2026-10-24-spec-TOOL-dDeclaredLoop-34.md) | 27 | 2 | DEFERRED | rev-4 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-30 — the rework budget: one per build on its transition record, frozen at Design's exit, drawn by every repetition and never by contention](spec/2026-10-24-spec-TOOL-dDeclaredLoop-30.md) | 28 | 2 | DEFERRED | rev-5 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-32 — the convergence routing: every closing-review and fix-pass loop ends on a non-decrease of its blocker and high count, its findings promoted by budget](spec/2026-10-24-spec-TOOL-dDeclaredLoop-32.md) | 29 | 2 | DEFERRED | rev-4 | 2026-11-05 |
@@ -213,7 +213,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 589 bound to this build, across 4 record folder(s).
+Records: 590 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
