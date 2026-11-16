@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-16-prompt-TOOL-aPiecewiseGrade-7-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-aPiecewiseGrade-7-1-spec-writer.md) | journal | — |
+| [2026-11-16-prompt-TOOL-aPiecewiseGrade-7-2-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-aPiecewiseGrade-7-2-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aPiecewiseGrade-7-review-brief.md](../prompts/2026-11-16-prompt-TOOL-aPiecewiseGrade-7-review-brief.md) | research | — |
 | [2026-11-16-prompt-TOOL-aPiecewiseGrade-7-revision.md](../prompts/2026-11-16-prompt-TOOL-aPiecewiseGrade-7-revision.md) | research | — |
 

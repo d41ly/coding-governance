@@ -2,6 +2,12 @@
 
 **Serves:** research TOOL-aPiecewiseGrade-7
 
+## The prompt
+
+> DIVERGENCE: section 5, AC2 cannot hold as written.
+
+The first sentence of TOOL-aPiecewiseGrade-7's builder's `why`, returned `diverged: true` at base `ad94c0603`; the whole `why` is the Goal below. The owner's go for this build stands; the fix is local to one criterion.
+
 ## The brief
 
 ### Goal
