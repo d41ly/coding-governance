@@ -69,7 +69,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 12 unit(s) · node a · opened 2026-11-14 · streams tooling
+**Build status:** CLOSED · 12 unit(s) · node a · opened 2026-11-14 · streams tooling
 ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10 TOOL-aTrimmedWait-11 TOOL-aTrimmedWait-12
 
 <!-- gen:build-units -->
@@ -86,7 +86,7 @@ ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWai
 | [TOOL-aTrimmedWait-9 — closing-review repair, hooks and roles: the role gate reads no shell comment as words, the P3 rows are tested at the floor, and arm 23 tells a resumed read from a cold re-parse](spec/2026-11-14-spec-TOOL-aTrimmedWait-9.md) | 8 | 2 | CLOSED | rev-3 | 2026-11-15 |
 | [TOOL-aTrimmedWait-10 — close-bar repair: the commit-render switch becomes the policy key `memory.staged-render`, and the fork sites the shell-hygiene leg names are converted](spec/2026-11-15-spec-TOOL-aTrimmedWait-10.md) | 9 | 2 | CLOSED | rev-2 | 2026-11-15 |
 | [TOOL-aTrimmedWait-11 — close repair, inherited: the hygiene suite's partition arm sets aside check 26's cache-hit count](spec/2026-11-15-spec-TOOL-aTrimmedWait-11.md) | 10 | 2 | CLOSED | rev-5 | 2026-11-15 |
-| [TOOL-aTrimmedWait-12 — the reconcile with local main at 5d48501da: its eight conflicts resolved so the landing merge is clean](spec/2026-11-16-spec-TOOL-aTrimmedWait-12.md) | 11 | 2 | INPROGRESS | rev-1 | 2026-11-16 |
+| [TOOL-aTrimmedWait-12 — the reconcile with local main at 5d48501da: its eight conflicts resolved so the landing merge is clean](spec/2026-11-16-spec-TOOL-aTrimmedWait-12.md) | 11 | 2 | CLOSED | rev-1 | 2026-11-16 |
 <!-- /gen:build-units -->
 
 Records: 62 bound to this build, across 4 record folder(s).
