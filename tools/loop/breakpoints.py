@@ -70,10 +70,10 @@ if str(KIT) not in sys.path:
 from adapt import read_disposition_release  # noqa: E402
 from composition import build_composition_base, read_step_composition, read_tag_policy  # noqa: E402
 from loop_items import read_composed_items  # noqa: E402
-from loop_lib import read_memory_tree, read_steps, resolve_kit_dir, run_selftest_cases  # noqa: E402
+from loop_lib import read_memory_tree, read_steps, resolve_kit_dir, resolve_memory_root, run_selftest_cases  # noqa: E402
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_transition import (FX_BUILD, FX_SPEC, FX_UNIT, read_build_headers, read_build_specs,  # noqa: E402
-                             read_memory_root, read_transitions, write_transition_plant)
+                             read_transitions, write_transition_plant)
 from loop_witness import (read_clean_env, read_git, remove_tree, resolve_bash, run_fixture_git,  # noqa: E402
                           write_fixture_files)
 from position import check_is_ancestor  # noqa: E402
@@ -113,7 +113,10 @@ PLANTS = {"values": "no policy file, then autonomy three-gates and every-stage, 
                                   "sourced check_owner_gates over the build opened before and the one after",
           "pre-placement-records-root": "the same history under MEMORY_ROOT=records, build tRec opened under "
                                         "records/builds/ and tWrong under memory/builds/, listed by the scratch's "
-                                        "own module, then tWrong again with no policy file"}
+                                        "own module, then tWrong again with no policy file",
+          "unattended-root": "the same history under .unattended.conf's MEMORY_ROOT=records and a memory tree's conf "
+                             "naming none, build tRec opened under records/builds/, listed by the scratch's own module",
+          "confs-disagree": ".unattended.conf naming MEMORY_ROOT=records beside the memory tree's memory, then the list"}
 
 
 # ------------------------------------------------------------------------------------------ the rule
@@ -235,7 +238,7 @@ def read_breakpoints(build, root, spec_audit=False, delegated=False):
         except ValueError:
             placement = None
         if placement:
-            readme = "%s/builds/%s/README.md" % (read_memory_root(root), build)
+            readme = "%s/builds/%s/README.md" % (resolve_memory_root(root), build)
             opening = read_first_add(root, readme)
             early = bool(opening) and not check_is_ancestor(root, placement, opening)
             unopened = None if opening else readme   # TOOL-dDeclaredLoop-64: the path a hold looked for
@@ -269,11 +272,13 @@ def read_stage_review(build, root, stage, rev=None):
 
 
 # ------------------------------------------------------------------------------------------ the plants
-def write_pre_placement_tree(memory_root="memory", opened=("memory/builds/tPre/README.md",)):
+def write_pre_placement_tree(memory_root="memory", opened=("memory/builds/tPre/README.md",), confs=None):
     """`(top, the scratch's loop kit)`: `build_scratch_tree`'s kits commit, the placement; each README of
-    `opened` added on a root commit it does not precede and merged in; then `MEMORY_ROOT=<memory_root>`,
-    `autonomy = "three-gates"`, `decisions.major = "author-owner-ratifies"` and build `tPost` committed; and
-    `tNone`'s README written, never committed, both under `memory_root`."""
+    `opened` added on a root commit it does not precede and merged in; then `confs`, `{path: text}`, else
+    `.memory-tree.conf` at `MEMORY_ROOT=<memory_root>`, with `autonomy = "three-gates"`,
+    `decisions.major = "author-owner-ratifies"` and build `tPost` committed; and `tNone`'s README written,
+    never committed, both under `memory_root`."""
+    confs = confs or {".memory-tree.conf": "MEMORY_ROOT=%s\n" % memory_root}
     from loop_items import POLICY_FILE, build_scratch_tree, derive_definition_rel
     top = build_scratch_tree()[0]
     readme = memory_root + "/builds/%s/README.md"
@@ -287,9 +292,8 @@ def write_pre_placement_tree(memory_root="memory", opened=("memory/builds/tPre/R
         run_fixture_git(top, "checkout", "-q", "-f", "main")
         run_fixture_git(top, "merge", "-q", "--allow-unrelated-histories", "-m", "the builds merged in", "pre")
         write_fixture_files(top, {readme % "tPost": "# tPost\n", POLICY_FILE: 'autonomy = "three-gates"\n\n'
-                                  '[decisions]\nmajor = "author-owner-ratifies"\n',
-                                  ".memory-tree.conf": "MEMORY_ROOT=%s\n" % memory_root})
-        run_fixture_git(top, "add", readme % "tPost", POLICY_FILE, ".memory-tree.conf")
+                                  '[decisions]\nmajor = "author-owner-ratifies"\n', **confs})
+        run_fixture_git(top, "add", readme % "tPost", POLICY_FILE, *confs)
         run_fixture_git(top, "commit", "-q", "-m", "tPost opened after the placement, three gates")
         write_fixture_files(top, {readme % "tNone": "# tNone\n"})
         return top, top / pathlib.PurePosixPath(derive_definition_rel()).parent
@@ -373,7 +377,7 @@ def run_breakpoint_plant(case):
         gate = "breakpoint: owner gate · %s %s · owner · autonomy · held"
         owner = "breakpoint: owner item · at item.build.ratify · owner · ratification · "
         listed = ["list", "--build", FX_BUILD]
-        if case in ("values", "ratification", "stage"):
+        if case in ("values", "ratification", "stage", "confs-disagree"):
             write_transition_plant(top, "default")
         if case == "values":   # AC1, AC7
             three = [plan, gate % ("at", "item.design.exit"), closing, gate % ("before", "item.deploy.mandate")]
@@ -441,13 +445,24 @@ def run_breakpoint_plant(case):
             print("%s: fixture · headers %s · specs %s" % (SAY, heads, specs))
             check(heads == [(FX_UNIT, "INPROGRESS", "1")] and specs == [(FX_UNIT, "INPROGRESS")],
                   "read_build_headers %s beside read_build_specs %s" % (heads, specs))
-        elif case in ("pre-placement", "driver-pre-placement", "pre-placement-records-root"):
-            # TOOL-dDeclaredLoop-53 AC1 to AC4; TOOL-dDeclaredLoop-64 AC1 to AC3 under the records root
+        elif case == "confs-disagree":   # TOOL-dDeclaredLoop-72 AC3: two confs naming two roots
+            write_fixture_files(top, {".unattended.conf": "MEMORY_ROOT=records\n"})
+            rc, lines = run_verb(top, listed)
+            owed = ("%s: refused · records root: .unattended.conf says records, .memory-tree.conf says memory — the "
+                    "driver writes under records" % SAY)
+            check(rc == 2 and lines == [owed], "the list read exit %d, %s" % (rc, lines))
+        elif case in ("pre-placement", "driver-pre-placement", "pre-placement-records-root", "unattended-root"):
+            # TOOL-dDeclaredLoop-53 AC1 to AC4; TOOL-dDeclaredLoop-64 AC1 to AC3 under the records root;
+            # TOOL-dDeclaredLoop-72 AC2 under the root the driver's conf names
             readme = "%s/builds/%s/README.md"
             records = case == "pre-placement-records-root"
-            scratch, kit = (write_pre_placement_tree("records", (readme % ("records", "tRec"),
-                                                                 readme % ("memory", "tWrong")))
-                            if records else write_pre_placement_tree())
+            if case == "unattended-root":
+                scratch, kit = write_pre_placement_tree("records", (readme % ("records", "tRec"),), {
+                    ".unattended.conf": "MEMORY_ROOT=records\n", ".memory-tree.conf": ""})
+            else:
+                scratch, kit = (write_pre_placement_tree("records", (readme % ("records", "tRec"),
+                                                                     readme % ("memory", "tWrong")))
+                                if records else write_pre_placement_tree())
             try:
                 three = [plan, gate % ("at", "item.design.exit"), closing, gate % ("before", "item.deploy.mandate")]
                 pre = "breakpoint: owner gate · %s %s · owner · autonomy · " + PRE_PLACEMENT
@@ -464,7 +479,13 @@ def run_breakpoint_plant(case):
                         SAY, " ".join((build,) + flags), p.returncode, " / ".join(lines) or p.stderr.strip()))
                     return p.returncode, lines
 
-                if records:
+                if case == "unattended-root":
+                    rc, lines = run_scratch_breakpoints("tRec")
+                    check(rc == 0 and lines == [pre % ("at", PLAN_GATE), pre % ("at", "item.design.exit"), closing,
+                                                pre % ("before", "item.deploy.mandate")],
+                          "the build opened under the driver's records root read %s" % lines)
+                    check_owner_lines(lines)
+                elif records:
                     rc, lines = run_scratch_breakpoints("tRec")   # AC1
                     check(rc == 0 and lines == [pre % ("at", PLAN_GATE), pre % ("at", "item.design.exit"), closing,
                                                 pre % ("before", "item.deploy.mandate")],

@@ -85,9 +85,8 @@ KIT = pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from loop_items import read_composition  # noqa: E402
-from loop_lib import read_definition, read_memory_tree, run_selftest_cases  # noqa: E402
+from loop_lib import read_definition, read_memory_tree, resolve_memory_root, run_selftest_cases  # noqa: E402
 from loop_parents import read_policy_kit  # noqa: E402
-from loop_transition import read_memory_root  # noqa: E402
 from loop_witness import read_git, remove_tree, run_fixture_git, write_fixture_files  # noqa: E402
 from policy_edit import derive_blob_pin  # noqa: E402
 
@@ -145,7 +144,7 @@ def read_adapt_mode(root):
 
 def read_run_file(root, build):
     """The path of `build`'s run-state file under `root`, whether or not it exists."""
-    return pathlib.Path(root, read_memory_root(root), "builds", build, "RUN.md")
+    return pathlib.Path(root, resolve_memory_root(root), "builds", build, "RUN.md")
 
 
 def read_flow_rows(root, build):
@@ -178,7 +177,7 @@ def read_fenced_row(root, build, stem):
     """`(kind, row, text, after)` of the change record `stem` of `build`: the one `[[<kind>]]` table its TOML
     fence holds, the fence's text LF-joined, and its `After` field. ValueError naming the record where it
     does not read."""
-    path = pathlib.Path(root, read_memory_root(root), "builds", build, "build", "%s.md" % stem)
+    path = pathlib.Path(root, resolve_memory_root(root), "builds", build, "build", "%s.md" % stem)
     if not path.is_file():
         raise ValueError("the change record %s is no file of %s's build folder" % (stem, build))
     lines = path.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n").split("\n")

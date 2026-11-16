@@ -93,7 +93,7 @@ sys.dont_write_bytecode = True
 KIT = pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
-from loop_lib import read_definition, read_memory_tree, run_selftest_cases  # noqa: E402
+from loop_lib import read_definition, read_memory_tree, resolve_memory_root, run_selftest_cases  # noqa: E402
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_table import (TransitionRefused, derive_direction, derive_move, read_stand_ins,  # noqa: E402
                         read_transition_rows)
@@ -244,13 +244,6 @@ def read_cached_channels(root, rev, cache):
     return cache[rev]
 
 
-def read_memory_root(root):
-    """The memory root `<root>`'s `.memory-tree.conf` names, `memory` where unset."""
-    read_memory_tree("design_lib.py")
-    from design_lib import read_design_conf
-    return (read_design_conf(root).get("MEMORY_ROOT") or "memory").strip().strip("/")
-
-
 def resolve_build_anchor(build, root):
     """The lowest unit id a tracked spec H1 under `build` defines, by its number, or None."""
     ids = read_build_unit_ids(build, root)
@@ -278,7 +271,7 @@ def read_build_headers(build, root):
     from design_lib import read_design_conf, read_tracked_builds
     from tree_lib import parse_spec_h1
     conf = read_design_conf(root)
-    memory_root = read_memory_root(root)
+    memory_root = resolve_memory_root(root)
     families = [p.split(":", 1)[1] for p in conf.get("FAMILIES", "").split() if ":" in p]
     prefix = "%s/builds/%s/spec/" % (memory_root, build)
     ids = []
@@ -321,7 +314,7 @@ def read_transition_records(build, root):
     kit's `read_transition`, with `fields`, its `**Key:**` fields under their lowercase names."""
     read_memory_tree("build_records.py")
     from build_records import read_transition
-    folder = pathlib.Path(root, read_memory_root(root), "builds", build, "build")
+    folder = pathlib.Path(root, resolve_memory_root(root), "builds", build, "build")
     out = []
     for p in folder.glob("*-%s-*.md" % KIND) if folder.is_dir() else ():
         rec = read_transition(p.relative_to(root).as_posix(), p.read_bytes().decode("utf-8", "replace"))
@@ -340,7 +333,7 @@ def read_transition_moves(build, root, cache):
     from tree_lib import read_adding_commits
     trailers, findings = read_transition_commits(build, root)
     records = read_transition_records(build, root)
-    glob = "%s/builds/%s/build/*-%s-*.md" % (read_memory_root(root), build, KIND)
+    glob = "%s/builds/%s/build/*-%s-*.md" % (resolve_memory_root(root), build, KIND)
     adding = read_adding_commits(str(root), glob, [r["path"] for r in records])
     paired = [r for r in records if "trailer" in read_cached_channels(root, adding.get(r["path"], "HEAD"), cache)]
     return {"trailers": trailers, "owing": [(c, t) for c, t in trailers

@@ -102,10 +102,10 @@ KIT = pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from adapt import read_disposition_release, read_run_file  # noqa: E402
-from loop_lib import read_memory_tree, run_selftest_cases  # noqa: E402
+from loop_lib import read_memory_tree, resolve_memory_root, run_selftest_cases  # noqa: E402
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_transition import (BUDGET_FIELDS, FX_BUILD, FX_SPEC, FX_UNIT, VALUE,  # noqa: E402
-                             check_transition_channels, read_build_specs, read_build_unit_ids, read_memory_root,
+                             check_transition_channels, read_build_specs, read_build_unit_ids,
                              read_record_channels, read_transition_commits, read_transition_records,
                              read_transitions, render_transition_trailer, write_transition, write_transition_plant,
                              write_transition_record)
@@ -164,7 +164,10 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
           "ending": "a CLOSED and an INPROGRESS unit under flow.rework-budget = 0 and a continue disposition, "
                     "then the default value",
           "driver-exhausted": "the driver's --exhausted unspent, then spent under close-incomplete with one unit "
-                              "open: the rounds, the dispatches and the budget-exhausted abort"}
+                              "open: the rounds, the dispatches and the budget-exhausted abort",
+          "unattended-root": "the build moved under records, .unattended.conf naming MEMORY_ROOT=records and the "
+                             "memory tree's conf none, two draws",
+          "confs-disagree": ".unattended.conf naming MEMORY_ROOT=records beside the memory tree's memory, one draw"}
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
 PLANT_TRAILER = '[transitions]\nrecord = ["trailer"]\n'
 PLANT_SPEC = "# TOOL-%s-%d — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n"
@@ -289,7 +292,7 @@ def derive_patch_origin(build, root, moves=None):
         return None
     read_memory_tree("gen_build_index.py")
     from gen_build_index import Problem, parse_front_matter
-    readme = pathlib.Path(root, read_memory_root(root), "builds", build, "README.md")
+    readme = pathlib.Path(root, resolve_memory_root(root), "builds", build, "README.md")
     try:
         parents = parse_front_matter(str(readme), build).get("parents", "").split()
     except (Problem, OSError) as e:
@@ -487,7 +490,7 @@ def write_budget_plant(top, case):
     if case == "ending":   # the second unit witnessed green, the first open, and nothing left to draw
         files[FX_SPEC.replace(FX_UNIT, "TOOL-%s-2" % FX_BUILD)] = (PLANT_SPEC % (FX_BUILD, 2)).replace("INPROGRESS", CLOSED)
         files[".governance/policy.toml"] = "[flow]\nrework-budget = 0\n"
-    if case in ("pre-spec", "unrecorded", "trailer-only", "draws-survive-rotation"):
+    if case in ("pre-spec", "unrecorded", "trailer-only", "draws-survive-rotation", "confs-disagree"):
         files["memory/builds/%s/RUN.md" % FX_BUILD] = PLANT_RUN
     if case == "route-backs":
         files[".governance/policy.toml"] = "[flow]\nroute-backs = 3\nrework-budget = 6\n"
@@ -963,6 +966,31 @@ def run_budget_plant(case):
             print("%s: fixture · budget_state · %s" % (SAY, state))
             check(state == "open 3/6", "budget_state answers %s" % state)
             check("budget · " not in run.read_text(encoding="utf-8"), "the fresh RUN.md holds a budget · row")
+        elif case == "unattended-root":   # TOOL-dDeclaredLoop-72 AC1: the root the driver's conf names
+            run_fixture_git(top, "mv", "memory", "records")
+            write_fixture_files(top, {".memory-tree.conf": 'FAMILIES="tool:TOOL"\n', ".unattended.conf": "MEMORY_ROOT=records\n",
+                                      "records/builds/%s/RUN.md" % FX_BUILD: PLANT_RUN})
+            run_fixture_git(top, "add", "-A")
+            run_fixture_git(top, "commit", "-q", "-m", "the driver's records root")
+            rcs = [run_verb(draw + [FX_UNIT])[0] for _n in range(2)]
+            text = (top / "records" / "builds" / FX_BUILD / "RUN.md").read_text(encoding="utf-8")
+            state = budget_state(FX_BUILD, top)
+            print("%s: fixture · budget_state · %s" % (SAY, state))
+            check(rcs == [0, 0], "the draws exited %s" % rcs)
+            check(FREEZE_ROW % (1, 6) in text and all("fix-pass · %s · %d/6 · " % (FX_UNIT, n) in text for n in (1, 2)),
+                  "the run-state file under records/ does not hold the freeze row and both draws")
+            check(state == "open 2/6", "budget_state answers %s" % state)
+        elif case == "confs-disagree":   # TOOL-dDeclaredLoop-72 AC3: two confs naming two roots
+            write_fixture_files(top, {".unattended.conf": "MEMORY_ROOT=records\n"})
+            run_fixture_git(top, "add", "-A")
+            run_fixture_git(top, "commit", "-q", "-m", "the driver's conf naming another root")
+            run = top / "memory" / "builds" / FX_BUILD / "RUN.md"
+            before = run.read_bytes()
+            rc, out = run_verb(draw + [FX_UNIT])
+            owed = ("%s: budget · refused · records root: .unattended.conf says records, .memory-tree.conf says memory "
+                    "— the driver writes under records" % SAY)
+            check(rc == 2 and out.strip() == owed, "the draw answered %r, exit %d" % (out.strip(), rc))
+            check(run.read_bytes() == before, "the refused draw changed the run-state file")
     except LookupError as e:
         print("%s: fixture · %s · unarmed: %s" % (SAY, case, e))
         return 2

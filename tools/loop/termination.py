@@ -78,11 +78,11 @@ from budget import CAUSES  # noqa: E402
 from composition import read_composition_at, read_step_composition  # noqa: E402
 from loop_items import OVERLAY, read_composed_items, read_composition, render_item_row  # noqa: E402
 from loop_lib import (LoopError, check_loop, check_program, derive_outcome_set, read_definition,  # noqa: E402
-                      read_item_rows, read_memory_tree, run_selftest_cases, scan_cycles)
+                      read_item_rows, read_memory_tree, resolve_memory_root, run_selftest_cases, scan_cycles)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_table import (DYNAMIC_TO, ENDING_OUTCOMES, derive_direction, derive_from_states,  # noqa: E402
                         read_terminal_set, read_transition_rows)
-from loop_transition import TRAILER_KEY, read_memory_root, read_transitions  # noqa: E402
+from loop_transition import TRAILER_KEY, read_transitions  # noqa: E402
 from loop_witness import read_git, remove_tree, run_fixture_git, write_fixture_files  # noqa: E402
 from position import read_build_items  # noqa: E402
 from scenario import read_activated_rows  # noqa: E402
@@ -221,7 +221,7 @@ def read_live_builds(root):
     for c in read_commits(str(root), ["--grep=^%s: " % TRAILER_KEY, "HEAD"], [TRAILER_KEY]):
         for value in c["trailers"][TRAILER_KEY]:
             slugs.update(p[len("build="):] for p in (value or "").split(SEP) if p.startswith("build="))
-    builds = pathlib.Path(root, read_memory_root(root), "builds")
+    builds = pathlib.Path(root, resolve_memory_root(root), "builds")
     slugs.update(p.parent.parent.name for p in builds.glob("*/build/*-transition-*.md"))
     terminal = read_transition_rows(*read_definition(KIT))["terminal"]
     return sorted(s for s in slugs if (read_transitions(s, root) or [{"to": terminal[0]}])[0].get("to") not in terminal)

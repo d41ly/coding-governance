@@ -754,6 +754,7 @@ python <prefix>/loop/factories.py --selftest
 | `read_actor_base(kit_dir)` | `(rows, base)` of the list at the compare base, or `(None, why)` for no comparison |
 | `read_builds_dir(kit_dir, root)` | `(builds_dir, "")` where the conf at `root` sets `DESIGN_RECORD`, or `(None, why)`: no memory-tree kit, or no `DESIGN_RECORD` |
 | `read_driver_conf(tree, names)` | `{name: value}` for each of `names` the unattended driver's `.unattended.conf` at the top of `tree`'s work tree sets, sourced in bash as the driver sources it, `{}` where the file is absent, held for the process; `ValueError` on a name that is no variable name, `LoopError` `driver conf unreadable` where the conf does not source |
+| `resolve_memory_root(tree)` | the root a build's records sit under: `.unattended.conf`'s `MEMORY_ROOT` through `read_driver_conf`, `memory` where unset, wherever that conf is a file, else `.memory-tree.conf`'s or `memory`, held per tree and conf bytes; `ValueError` `records root:` where the two confs name different roots, the one reader every loop module takes the root from |
 | `check_actor_list(rows, base_rows, sites, builds_dir)` | one refusal per list row not three fields, absent at the base, naming no actor witness of its site or a site that is neither a step nor `DOD_CORE`, or, with a `builds_dir`, naming a build with no folder there; and per actor witness no row lists |
 | `check_site_witnesses(kit_dir, site, entries)` | `(lines, refusals)` for one declaration site's `<item>:<word>` entries, joined to the aliases, and for `DOD_CORE` to the list both ways; a `DOD_EXTRA` actor entry is admitted, `adopter-declared` |
 | `derive_outcome_set(row, members, where)` | one item row's closed outcome set, `members` for `"dispositions"`; the rule `read_outcome_set` and `check_program` share |
@@ -781,10 +782,11 @@ The witnesses are graded by `check_witness_classes` alone, called from `read_wit
 definition holding no witness keeps reading. `read_actor_base` takes the repository root and the
 list's path from `git rev-parse`, finds the memory-tree kit with its inline `resolve_kit_dir`, and
 imports that kit's `resolve_compare_base` inside the function. `read_builds_dir` finds the same kit
-the same way and imports its `read_design_conf` inside the function, and `read_role_defaults` finds
-the roles kit the same way and imports its `roles_lib` there. `read_driver_conf` sources the
-driver's `.unattended.conf` in the bash `loop_witness.py`'s `resolve_bash` finds, imported inside the
-function. Those four are the only reaches outside the standard library.
+the same way and imports its `read_design_conf` inside the function, as `resolve_memory_root` does,
+and `read_role_defaults` finds the roles kit the same way and imports its `roles_lib` there.
+`read_driver_conf` sources the driver's `.unattended.conf` in the bash `loop_witness.py`'s
+`resolve_bash` finds, imported inside the function. Those five are the only reaches outside the
+standard library.
 
 A kit reads it by finding this kit's directory with its own `resolve_kit_dir` and importing the
 module from there. Three readers do today: the roles kit's `roles_lib.read_workflow_order`, which its

@@ -1515,7 +1515,8 @@ instead of reading as an ordinary hold; a build with no held gate prints no such
   `design` this way to decide whether the build owes a spec audit.
 - **See it on a fixture:** `python tools/loop/breakpoints.py --fixture --plant <case>` runs one case in <!-- usage: script:tools/loop/breakpoints.py bd781c1c -->
   a scratch repository: `values`, `placed`, `ratification`, `stage`, `driver-close`, `driver-optin`,
-  `driver-plan`, `pre-placement`, `driver-pre-placement` or `pre-placement-records-root`. `--selftest` runs them all, and gov's own `loop breakpoint fixtures` gate runs them.
+  `driver-plan`, `pre-placement`, `driver-pre-placement`, `pre-placement-records-root`, `unattended-root`
+  or `confs-disagree`. `--selftest` runs them all, and gov's own `loop breakpoint fixtures` gate runs them.
 
 The list does not fire a review: you, or the run, fire each review line through the driver's
 `--trigger` with its cause. A run may still move past an owner gate before its close, and anyone who
@@ -1796,6 +1797,14 @@ It refuses an item with no `witness`, as it does a step. `--check` also refuses 
 one string of a known kind, a non-role item missing its `inputs`, `allowance` or `returns`, and a
 role item that copies its role or writes an allowance other than `none`.
 The `loop definition` gate runs the read on every push and landing.
+
+A loop command finds a build's records under the root the unattended driver writes them under. Where
+the repository has a `.unattended.conf`, that root is its `MEMORY_ROOT`, read as the driver reads it,
+or `memory` where the conf leaves it unset; with no such file, it is the `MEMORY_ROOT` of
+`.memory-tree.conf`, or `memory`. Where both files name a root and the two differ, every loop command
+that reads a build's records refuses and exits 2, its reason opening `records root:` and naming each
+file with the root it says, then the root the driver writes under. Set the two files to the same root,
+or drop the memory tree's line, to clear it.
 
 The roles kit's `roles catalogue` gate joins the two files by workflow name, both ways: a workflow
 in `workflows.toml` with no row here, or a row here naming no workflow there, is one `R6` line.

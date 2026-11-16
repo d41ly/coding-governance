@@ -20950,11 +20950,6 @@
     {
       "id": "read_memory_root",
       "kind": "function",
-      "file": "tools/loop/loop_transition.py"
-    },
-    {
-      "id": "read_memory_root",
-      "kind": "function",
       "file": "tools/playbook/positional.py"
     },
     {
@@ -26926,6 +26921,11 @@
       "id": "resolve_measurer_currency",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_memory_root",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "resolve_memory_root",

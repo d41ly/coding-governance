@@ -704,6 +704,38 @@ def read_driver_conf(tree, names):
     return dict(DRIVER_CONF_READS[key])
 
 
+#: The driver's root `resolve_memory_root` took, held per resolved tree and the bytes of its conf (TOOL-dDeclaredLoop-72).
+DRIVER_ROOTS = {}
+
+
+def resolve_memory_root(tree):
+    """The root a build's records sit under in `tree`: the `MEMORY_ROOT` the driver's `.unattended.conf`
+    sets, read through `read_driver_conf`, `memory` where it leaves the key unset, wherever that conf is a
+    file; else the `MEMORY_ROOT` of `.memory-tree.conf`, or `memory`. Each value stripped of whitespace
+    and slashes, a blank one unset. ValueError `records root:` where both confs name a root and the two
+    differ; LookupError where the memory-tree kit does not resolve (TOOL-dDeclaredLoop-72). The kit's
+    `read_design_conf` is imported inside the function, as `read_builds_dir` imports it."""
+    read_memory_tree("design_lib.py")
+    from design_lib import read_design_conf
+    mt = (read_design_conf(tree).get("MEMORY_ROOT") or "").strip().strip("/")
+    conf = pathlib.Path(tree).resolve() / ".unattended.conf"
+    if not conf.is_file():
+        return mt or "memory"
+    key = (str(conf), conf.read_bytes())
+    if key not in DRIVER_ROOTS:
+        # ponytail: read_driver_conf holds its answer per conf path, so a conf rewritten in this process is
+        # dropped there before it is read again
+        for held in [k for k in DRIVER_CONF_READS if k[1] == ("MEMORY_ROOT",)]:
+            del DRIVER_CONF_READS[held]
+        ua = (read_driver_conf(tree, ["MEMORY_ROOT"]).get("MEMORY_ROOT") or "").strip().strip("/")
+        DRIVER_ROOTS[key] = ua or "memory"
+    ua = DRIVER_ROOTS[key]
+    if mt and mt != ua:
+        raise ValueError("records root: .unattended.conf says %s, .memory-tree.conf says %s — the driver writes "
+                         "under %s" % (ua, mt, ua))
+    return ua
+
+
 def read_actor_rows(kit_dir):
     """The actor-witness list's lines in `kit_dir`, blank lines dropped; LoopError where it does not read."""
     path = pathlib.Path(kit_dir) / ACTOR_LIST
