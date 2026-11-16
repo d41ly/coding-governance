@@ -8023,8 +8023,9 @@ if [ -f "$STC" ]; then
   same "a cache-off run gives the spec-token lock back" "$([ -e "$pg6_l" ] && echo left || echo none)" none
   # ---- TOOL-aPiecewiseGrade-6 AC10 AC11 AC12 AC13 AC14 - THE LOCK RECORDS ITS DRIVER AND ITS CHECKER,
   # ---- and is stale once both are gone. RED-first, staged at the close: dropping the pid loop from
-  # ---- `check_dir_lock_stale`, dropping its end-file clause, reading a non-digit first field as gone,
-  # ---- reading an empty population as gone, and skipping the start half's real `pid.checker` write.
+  # ---- `check_dir_lock_stale`, dropping its end-file clause, dropping its runtime clause, reading a
+  # ---- non-digit first field as gone, reading an empty population as gone, and skipping the start
+  # ---- half's real `pid.checker` write.
   rm -f "$pg6_k"
   pg6_r=$( ( load_driver_conf && init_spec_token_check tRun
     read -r p _ <"$pg6_l/pid.driver"; [ "$p" = "$DRIVER_PID" ] && printf 'driver ' || printf 'nodriver '
@@ -8057,22 +8058,24 @@ if [ -f "$STC" ]; then
   write_pg6_lock 600 w-x; write_pg6_pid "$pg6_l" driver "$(read_pg6_dead_pid)"
   miss "$(measure_pg6_call)" "$pg6_busy"
   same "three locks whose recorded processes are gone are broken and logged" "$(( $(grep -c '' "$pg6_h" 2>/dev/null) - ${pg6_e:-0} ))" 3
-  # AC13: four live plants are held.
+  # AC13: five plants are held: four live, and a dead driver pid recorded by a foreign runtime, written
+  # directly because `write_pg6_pid` stamps this shell's runtime and so cannot grade the runtime clause.
   sleep 120 & pg6_sp=$!
   pg6_r=""
-  for pg6_kind in driver checker stampless pending; do
+  for pg6_kind in driver checker stampless pending foreign; do
     write_pg6_lock 600 w-x
     case $pg6_kind in
       driver) write_pg6_pid "$pg6_l" driver $$; write_pg6_pid "$pg6_l" checker "$(read_pg6_dead_pid)" .git/pg6-cap/up.end ;;
       checker) write_pg6_pid "$pg6_l" driver "$(read_pg6_dead_pid)"; write_pg6_pid "$pg6_l" checker "$pg6_sp" .git/pg6-cap/live.end ;;
       stampless) write_pg6_pid "$pg6_l" driver "$(read_pg6_dead_pid)"; write_pg6_pid "$pg6_l" checker "$(read_pg6_dead_pid)" .git/pg6-cap/none.end ;;
       pending) write_pg6_pid "$pg6_l" driver "$(read_pg6_dead_pid)"; write_pg6_pid "$pg6_l" checker - ;;
+      foreign) printf '%s - otherhost:otheros\n' "$(read_pg6_dead_pid)" > "$pg6_l/pid.driver" ;;
     esac
     pg6_o=$(measure_pg6_call)
     pg6_r="$pg6_r $pg6_kind:$(grep -cF -- "$pg6_busy" <<<"$pg6_o"):$(cat "$pg6_l/owner" 2>/dev/null)"
   done
   kill "$pg6_sp" 2>/dev/null; wait "$pg6_sp" 2>/dev/null
-  same "a live driver, a live wrapper, a stampless wrapper and a pending checker each hold the lock" "$pg6_r" " driver:1:w-x checker:1:w-x stampless:1:w-x pending:1:w-x"
+  same "a live driver, a live wrapper, a stampless wrapper, a pending checker and a foreign runtime's dead driver each hold the lock" "$pg6_r" " driver:1:w-x checker:1:w-x stampless:1:w-x pending:1:w-x foreign:1:w-x"
   rm -rf "$pg6_l" .git/pg6-cap
   # AC14: claim-push-shaped locks with no pid file keep the deadline and age verdicts.
   pg6_r=""

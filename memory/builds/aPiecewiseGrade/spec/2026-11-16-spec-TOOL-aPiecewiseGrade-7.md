@@ -1,11 +1,12 @@
 # TOOL-aPiecewiseGrade-7 — an arm for the stale check's foreign-runtime clause
 
-**Status:** INPROGRESS · rev-2 · 2026-11-16 · node a · Tier-1 · base aebbb4a72 · streams tooling · order 6
+**Status:** CLOSED · rev-2 · 2026-11-16 · node a · Tier-1 · base aebbb4a72 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-16-build-TOOL-aPiecewiseGrade-7-1-acceptance-ledger.md](../build/2026-11-16-build-TOOL-aPiecewiseGrade-7-1-acceptance-ledger.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aPiecewiseGrade-7-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-aPiecewiseGrade-7-1-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aPiecewiseGrade-7-2-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-aPiecewiseGrade-7-2-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aPiecewiseGrade-7-review-brief.md](../prompts/2026-11-16-prompt-TOOL-aPiecewiseGrade-7-review-brief.md) | research | — |
