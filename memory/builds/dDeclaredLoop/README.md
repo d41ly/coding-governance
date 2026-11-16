@@ -179,7 +179,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-53 — an owner gate holds only builds opened after the gate was placed](spec/2026-10-24-spec-TOOL-dDeclaredLoop-53.md) | 34 | 2 | CLOSED | rev-3 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-54 — a terminal set declared per level, and the termination rule run over each table with its own](spec/2026-10-24-spec-TOOL-dDeclaredLoop-54.md) | 35 | 2 | INPROGRESS | rev-3 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-55 — the `loop termination` leg declares no guard, so no input it reads can skip it](spec/2026-10-24-spec-TOOL-dDeclaredLoop-55.md) | 35 | 2 | DEFERRED | rev-4 | 2026-11-16 |
-| [TOOL-dDeclaredLoop-63 — an adopter's extra phase reads as ungated through the driver's own phase set, never refused for lacking a row](spec/2026-10-24-spec-TOOL-dDeclaredLoop-63.md) | 35 | 2 | DEFERRED | rev-3 | 2026-11-16 |
+| [TOOL-dDeclaredLoop-63 — an adopter's extra phase reads as ungated through the driver's own phase set, never refused for lacking a row](spec/2026-10-24-spec-TOOL-dDeclaredLoop-63.md) | 35 | 2 | INPROGRESS | rev-3 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-64 — a build's opening commit is found under the resolved `MEMORY_ROOT`, never a literal `memory/`](spec/2026-10-24-spec-TOOL-dDeclaredLoop-64.md) | 35 | 2 | DEFERRED | rev-4 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-56 — the round-1 spec audit's 47 minors: owed leg rows, one reader each, honest skew and failure paths, and the citations that drifted](spec/2026-10-24-spec-TOOL-dDeclaredLoop-56.md) | 36 | 2 | DEFERRED | rev-6 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-70 — every caller of the phase reading takes the adopter population from one driver-conf reader](spec/2026-10-24-spec-TOOL-dDeclaredLoop-70.md) | 36 | 2 | DEFERRED | rev-3 | 2026-11-16 |
@@ -213,7 +213,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 741 bound to this build, across 4 record folder(s).
+Records: 742 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
