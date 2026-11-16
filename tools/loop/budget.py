@@ -137,6 +137,8 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
           "log-dropped": "planning to designing under the default set, then [\"trailer\"] and designing back",
           "parallel-append": "one item drawn alike on main and on a branch, the rows differing in their draw id alone, "
                              "merged under this tree's attribute, then drawn",
+          "parallel-append-uneven": "one item drawn on main and two others on a branch, each draw only appending, "
+                                    "merged under this tree's attribute",
           "draw-id-rows": "one log record given two identical id-less draw rows, one id-bearing row twice, then a "
                           "malformed id",
           "draws-survive-rotation": "two draws, the run-state file rotated as an aborted run's, then a third draw",
@@ -740,7 +742,7 @@ def run_budget_plant(case):
             check(newest in shown.split("\n") and "draw=" not in shown,
                   "the move's commit does not hold %s alone of the budget, its trailer free of draw=" % newest)
             check(state == "unfrozen 1/4", "budget_state answers %s" % state)
-        elif case == "parallel-append":
+        elif case in ("parallel-append", "parallel-append-uneven"):
             run_move("planning", "item.plan.exit", "recorded")
             rel = read_transition_records(FX_BUILD, top)[0]["path"]
             # the merge attribute this tree answers for the record's path, never a literal in the plant
@@ -754,14 +756,29 @@ def run_budget_plant(case):
                 run_fixture_git(top, "add", "-A")
                 run_fixture_git(top, "commit", "-q", "-m", "the merge attribute")
             run_fixture_git(top, "branch", "side")
-            record_draw(FX_BUILD, "fix-pass", "TOOL-%s-1" % FX_BUILD, top)
-            run_fixture_git(top, "checkout", "-q", "side")
-            record_draw(FX_BUILD, "fix-pass", "TOOL-%s-1" % FX_BUILD, top)   # the same draw, its id alone differing
+            path = pathlib.Path(top, rel)
+            # parallel-append draws main's item again on side, its id alone differing; the uneven case two others
+            for branch, n in [("main", 1)] + [("side", n) for n in ((1,) if case == "parallel-append" else (2, 3))]:
+                run_fixture_git(top, "checkout", "-q", branch)
+                before = path.read_bytes()
+                record_draw(FX_BUILD, "fix-pass", "TOOL-%s-%d" % (FX_BUILD, n), top)
+                after = path.read_bytes()
+                check(after.startswith(before) and len(after) > len(before),
+                      "the draw of TOOL-%s-%d on %s rewrote %s rather than appending to it" % (FX_BUILD, n, branch, rel))
             run_fixture_git(top, "checkout", "-q", "main")
             rc = read_git(top, "merge", "--no-edit", "side")[0]
             print("%s: fixture · merge side · exit %d" % (SAY, rc))
             check(rc == 0, "the merge of side conflicted on %s, whose merge attribute here is %s" % (rel, attr))
-            if rc == 0:
+            if rc == 0 and case == "parallel-append-uneven":
+                try:
+                    state, rows = budget_state(FX_BUILD, top), read_rows()
+                except ValueError as e:
+                    state, rows = "refused: %s" % e, []
+                print("%s: fixture · budget_state · %s" % (SAY, state))
+                check(len(rows) == 3 and all(r.startswith("draw · ") for r in rows) and len(set(rows)) == 3,
+                      "the merged record does not carry three distinct draw rows, none twice")
+                check(state == "unfrozen 3/4", "budget_state answers %s" % state)
+            elif rc == 0:
                 try:   # the typed-figure refusal reads as a miss, not a traceback
                     state = budget_state(FX_BUILD, top)
                     rows = read_rows()

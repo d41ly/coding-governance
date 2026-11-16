@@ -110,7 +110,13 @@ memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md 
 # worktrees drawing on one build's budget each append a row at its end, where a text merge
 # conflicts. `union` is git's built-in driver and needs no per-node config: it keeps both sides'
 # appended rows, ours first, and the budget's reader re-derives the count from them. It keeps two
-# byte-identical appended rows once.
+# byte-identical appended rows once, and every draw row ends in its own draw id
+# (TOOL-dDeclaredLoop-61), so no two draws are byte-identical. Weighed against the two drivers
+# above (TOOL-dDeclaredLoop-62): `merge=rows` conflicts on every such pair, since a draw row is no
+# `- ` bullet and the row driver merges it as text; and `union` introduced a duplicate in 147 of
+# 151 DECISIONS.md conflicts, while a draw row is only appended. The budget's plant
+# `parallel-append-uneven` observes each draw keeping the record's bytes before it as a prefix,
+# and one draw merged against two keeping all three rows, none twice.
 memory/builds/*/build/*-transition-*.md merge=union
 
 # The governance template is under a STRICT byte gate — pin it (+ companions) to LF so a CRLF
