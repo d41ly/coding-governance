@@ -16839,7 +16839,6 @@ memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-32.md	BUILD-
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-5.md	tools/unattended/check-unattended.sh:266
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-56.md	BUILD-METHOD M4
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-56.md	BUILD-METHOD M6
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-65.md	tools/unattended/unattended.sh:2109
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-66.md	BUILD-METHOD M6
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-66.md	gen_build_index.py:1732
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-66.md	tools/check-spec-tokens.py:530
@@ -16863,16 +16862,12 @@ memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-67.md	tools/
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-67.md	tools/unattended/unattended.sh:7012
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-67.md	tree_lib.py:27
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-67.md	tree_lib.py:278-297
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-68.md	tools/lib/resolve-python.test.sh:166-182
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-68.md	tools/run-gates/lib-attribute.sh:39-53
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md	BUILD-METHOD M4
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md	tools/check-spec-tokens.py:331
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md	tools/govkit/govkit.py:7039
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md	tools/unattended/unattended.sh:1348
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md	tools/unattended/unattended.sh:2117-2140
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md	tools/unattended/unattended.sh:560
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-76.md	tools/gate-lint/encoding_posture.py:149
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-76.md	tools/govkit/refusal_join.py:214
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-77.md	tools/run-gates/measure_legs.py:531
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-79.md	BUILD-METHOD M4
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-79.md	check-unattended.sh:297
