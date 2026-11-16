@@ -462,6 +462,7 @@ Cite ids, never line numbers.
 | [TOOL-dDeclaredLoop-110](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE LOOP KIT REFUSES A CADENCE STEP VALUE. TOOL-dDeclaredLoop-50 S3… |
 | [TOOL-dDeclaredLoop-111](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | REVIEW.COST WRITES NO SHAPE-RUN RECORD. TOOL-dDeclaredLoop-20 S3 only… |
 | [TOOL-dDeclaredLoop-113](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-16 | A pins.py mark VERB FOR THE DEVIATION CLASSIFIER.… |
+| [TOOL-dDeclaredLoop-114](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-16 | A NUMERIC PATCH DIRECTION FOR THE CLASSIFIER. TOOL-dDeclaredLoop-33's… |
 | [TOOL-dDerivedDocket-38](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/run-gates/run-selftests.sh SELECTS SUITES ONLY BY A --kit <dir>… |
 | [TOOL-dDerivedDocket-39](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-14 | govkit's requires_if SELECTS NO KIT AT APPLY. Its one reader is… |
 | [TOOL-dDerivedDocket-40](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-16 | NO LEASE-MATRIX ROW NAMES WHO REACHES IT, AND NOTHING COUNTS ROWS… |

@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-50 — the review program's item rows pass the program and declaration checks
 
-**Status:** INPROGRESS · rev-3 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 32 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-4 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 32 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -38,17 +38,22 @@ every tag whose middle segment is no gov step and no composed adopter stage, so 
 is refused before its actor is read. Measured on a scratch copy of the branch tip with the four rows as
 `TOOL-dDeclaredLoop-20` §4 gives them, `loop_lib.py --check` exits 1 naming
 `item row 62 tag 'item.review.trigger' opens no item.<step>. of a gov step`. This unit takes the report's
-fix, and it repairs `TOOL-dDeclaredLoop-20`.
+fix, and it repairs `TOOL-dDeclaredLoop-20`. That unit closed writing no row and naming the four rows'
+outcomes and routes in prose only, so this unit sets every field of the six rows, grounded on the
+verbs `TOOL-dDeclaredLoop-20` built.
 
 ## 2. Scope (IN)
 
-- **S1** — The four rows `TOOL-dDeclaredLoop-20` lands in `tools/loop/loop.toml` carry `step = "none"`
-  and actors in the item grammar. `item.review.trigger`, `item.review.dispose` and `item.review.cost`
-  carry `command:review.trigger`, `command:review.dispose` and `command:review.cost`, the tag-derived
-  form every command row of the definition spells (§8 F4), each with the `inputs`, `allowance` and
-  `returns` §4 "The rows" gives, which a non-role actor owes. `item.review.fold` carries
-  `role:gov-spec-writer`, its inputs, allowance and returns its role's. Their needs, outcomes, witnesses
-  and routes stay as `TOOL-dDeclaredLoop-20` §4 gives them. Observed by AC1.
+- **S1** — The four rows `TOOL-dDeclaredLoop-20` specifies land in `tools/loop/loop.toml` with
+  `step = "none"` and actors in the item grammar. `item.review.trigger`, `item.review.dispose` and
+  `item.review.cost` carry `command:review.trigger`, `command:review.dispose` and `command:review.cost`,
+  the tag-derived form every command row of the definition spells (§8 F4), each with the `inputs`,
+  `allowance` and `returns` §4 "The rows" gives, which a non-role actor owes. `item.review.fold` carries
+  `role:gov-spec-writer`, its inputs, allowance and returns its role's. Each row's needs, outcomes,
+  routes, witness and owner are the ones §4 "The rows" gives, which this unit sets from what
+  `TOOL-dDeclaredLoop-20`'s verbs do (§8 F6 to F10). The dispose row keeps the owner its `[[stand-in]]`
+  row names and routes the outcome `unit` to `transition`, the route build row B10 fires on; its
+  plan-revision route stands on one new `[[owed-row]]` (§5). Observed by AC1, AC4.
   **Readers:**
   by name: `tools/loop/loop.toml`, the four rows themselves; no other tracked file spells the bare actor values.
   by value: `tools/loop/loop_lib.py`, its item declaration check matching each actor against the actor form.
@@ -72,8 +77,10 @@ fix, and it repairs `TOOL-dDeclaredLoop-20`.
 
 ## 3. Non-goals (OUT)
 
-- The review program's verbs, record fields, counts, outcomes, witnesses and routes:
-  `TOOL-dDeclaredLoop-20`'s, unchanged.
+- The review program's verbs, record fields and counts: `TOOL-dDeclaredLoop-20`'s built code, unchanged.
+  The rows declare what that code does; no verb, harness prompt or driver row moves.
+- Arming the plan-revision route: its build row is owed to `dRankedPlan` (§8 F8). The asks and the
+  patch-build intake keep today's stand-in, a filed ask (§8 F9).
 - An assertion added to `TOOL-dDeclaredLoop-20` AC1, rev-2's S4. That unit builds at order 31 and is
   CLOSED, its spec frozen, before this one builds at order 32; this unit's AC1 makes the observation.
 - The ten routes into `stand-in:{prefix}/workflows/tier2-review.js` the five programs carry today: no
@@ -86,7 +93,7 @@ fix, and it repairs `TOOL-dDeclaredLoop-20`.
 
 ### Edges
 
-- **consumes-from** `TOOL-dDeclaredLoop-20` — `item.review.trigger`, `item.review.dispose`, `item.review.fold` and `item.review.cost`, the rows this unit makes conform
+- **consumes-from** `TOOL-dDeclaredLoop-20` — `item.review.trigger`, `item.review.dispose`, `item.review.fold` and `item.review.cost`, the rows this unit makes conform, their outcomes and routes read from that unit's built verbs
 - **consumes-from** `TOOL-dDeclaredLoop-12` — `check_program` and the `step` key of each `[[item]]` row, which S3 opens to `none` for the breakpoint program alone
 - **hands-off** `TOOL-dDeclaredLoop-67` — the round-2 minors ids 39, 44 and 45: this pass keeps the loop definition leg green and writes command actors in the verb form, scope items of that unit
 
@@ -94,7 +101,9 @@ fix, and it repairs `TOOL-dDeclaredLoop-20`.
 
 Every claim below was read at the tip of branch `unattended-declared-loop-d56bf0`, `02524cadf`, through
 a `git archive` extraction to a scratch directory; this worktree is cut from main, which holds no loop
-kit. The prototype runs named here edited that scratch copy only.
+kit. The prototype runs named here edited that scratch copy only. Rev-4's claims were read the same
+way at `250b236fe`, where the dispatch-1 builder found the rest of this section unchanged; the tip
+`697e7fce9` moves no file under `tools/`.
 
 ### Evidence
 
@@ -118,29 +127,156 @@ kit. The prototype runs named here edited that scratch copy only.
   form `{prefix}/` is what the stand-in routes spell.
 - The flow record's `review.pin` reads `review.trigger` and routes to `review.lens`
   (`memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md@d73cb002:570`).
+  Its table names each item's owner: `dDeclaredLoop` for trigger, dispose, fold and cost, `dFairHearing`
+  for pin and report (`memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md@d73cb002:567-576`).
+- `tools/loop/loop_table.py#check_transition_tables` reads a route as cross-step where its target is
+  `transition`, or a declared item whose `step` differs from the routing row's. Each such route needs a
+  build row on its item and outcome or an `[[owed-row]]`, and each build row on a declared item must
+  fire on one, entering the target's step state where the target is an item. A stand-in target, or a
+  route between two rows of step `none`, is never cross-step. The same function refuses a `[[stand-in]]`
+  row whose owner differs from its declared item's.
+- Build row B10 fires on `item.review.dispose` · `unit`, from `building` to `designing`
+  (`tools/loop/loop.toml@901d5f99:497-504`), and the item's `[[stand-in]]` row names `dDeclaredLoop`
+  (`tools/loop/loop.toml@901d5f99:962-964`). Undeclared today, the item is graded as a stand-in alone;
+  declared, B10 holds only while `unit` is a cross-step route. The one owed row today is
+  `item.plan.place` · `unplaced` · `dRankedPlan` (`tools/loop/loop.toml@901d5f99:1018-1023`).
+- `TOOL-dDeclaredLoop-20`'s built verbs, the outcomes the rows declare:
+  - `tools/unattended/unattended.sh#run_trigger` prints the line or lines the harness call takes, or
+    exits 37. Its
+    ended-subject refusal says the findings "went where the terminal round disposed them and the review
+    is never fired again" (`tools/unattended/unattended.sh@3259719f:13683`). It has no not-fired path: a
+    caller that fires no review never calls it.
+  - `tools/unattended/unattended.sh#verb_review`'s terminal row records `disposition fold` or
+    `promote`, a promotion ` · to units`, or ` · to asks` once the rework budget is spent
+    (`tools/unattended/unattended.sh@3259719f:13595-13600`). A CONVERGED exit with no disposition prints
+    that the loop is done for this subject (`tools/unattended/unattended.sh@3259719f:13639`).
+  - the build harness's DISPOSAL stage files an unverified finding as an ask in the build's
+    `BACKLOG.md` under `ask`, and lists it and files nothing under `record`
+    (`tools/workflows/unattended-build.template.js@05ea767e:2592-2594`). It files each earned gate
+    `review_dispose.py classes` prints as an ask naming `item.review.dispose`, the stand-in
+    `TOOL-dDeclaredLoop-20` §3 names for the patch-build intake.
+  - the harness's CONVERGING return orders the fold, then a re-invoke at the next round, and names
+    `item.review.fold` and the spec subject's terminal states, BOUNDED or CEILING
+    (`tools/workflows/unattended-build.template.js@05ea767e:2241-2250`).
+- `tools/memory-tree/backlog.py` holds the grammar of a build's `BACKLOG.md`, where an ask is filed, and
+  nine routes of the definition already name it as their stand-in.
 
 ### The rows
 
-The four rows of `TOOL-dDeclaredLoop-20` take only the columns below from this unit; the two rows of
-S2 take every field from it. An input is prose after its layer tag, never a `record-kind.` reference,
-so the record-input join of `tools/loop/loop_items.py#check_record_versions` reads none; every
-`returns` is an untyped kind, which needs no `[[record-version]]` row.
+The six rows, every field set here, written in this order under a `# ---- The review program` header
+comment after the Deploy program's last `[[item]]` row; `check_program` reads the rows wherever they
+sit. An input is prose after its layer tag, never a
+`record-kind.` reference, so the record-input join of `tools/loop/loop_items.py#check_record_versions`
+reads none; every `returns` is an untyped kind, which needs no `[[record-version]]` row. Every witness is
+`history`, a record a tool writes, so no row joins the actor list. The fold row's inputs, allowance and
+returns are its role's, absent from the row.
 
-| Tag | Step | Actor | Needs | Inputs | Allowance | Returns |
-|---|---|---|---|---|---|---|
-| `item.review.trigger` | `none` | `command:review.trigger` | as unit 20 | `layer.flow:the subject's review rows and the review policy keys` | `none` | `record-kind.review-trigger` |
-| `item.review.pin` | `none` | `command:review.pin` | `item.review.trigger` | `layer.memory:the subject paths and the trigger line` | `none` | `record-kind.review-pin` |
-| `item.review.report` | `none` | `command:review.report` | `item.review.pin` | `layer.memory:the pinned subjects` | `the review record` | `record-kind.review` |
-| `item.review.dispose` | `none` | `command:review.dispose` | as unit 20 | `layer.memory:the review record` | `the build's units and asks` | `record-kind.review-disposal` |
-| `item.review.fold` | `none` | `role:gov-spec-writer` | as unit 20 | its role's | its role's | its role's |
-| `item.review.cost` | `none` | `command:review.cost` | as unit 20 | `layer.memory:the review record's review-shape line` | `the review-shape line` | `record-kind.review-shape` |
+```toml
+[[item]]
+tag = "item.review.trigger"
+step = "none"
+actor = "command:review.trigger"
+needs = []
+inputs = ["layer.flow:the subject's review rows and the review policy keys"]
+allowance = "none"
+returns = "record-kind.review-trigger"
+outcomes = ["fired", "refused"]
+witness = { class = "history", by = "the trigger line the trigger verb prints, joined to the review record's trigger= field" }
+owner = "dDeclaredLoop"
+routes = { fired = "item.review.pin", refused = "stand-in:{prefix}/unattended/unattended.sh" }
 
-`item.review.pin`: outcomes `["pinned"]`, routes `{ pinned = "item.review.report" }`, witness
-`{ class = "history", by = "the pin line, joined to the trigger line" }`, owner `dFairHearing`.
-`item.review.report`: outcomes `["reported"]`, routes `{ reported = "item.review.dispose" }`, witness
-`{ class = "history", by = "the review record" }`, owner `dFairHearing`. Both routes stay among rows of
-step `none`, so neither is a cross-step route the transition table's route join reads. The definition's
-header comment for `[[item]]` says a tag `item.review.<name>` carries `step = "none"`.
+[[item]]
+tag = "item.review.pin"
+step = "none"
+actor = "command:review.pin"
+needs = ["item.review.trigger"]
+inputs = ["layer.memory:the subject paths and the trigger line"]
+allowance = "none"
+returns = "record-kind.review-pin"
+outcomes = ["pinned"]
+witness = { class = "history", by = "the pin line, joined to the trigger line" }
+owner = "dFairHearing"
+routes = { pinned = "item.review.report" }
+
+[[item]]
+tag = "item.review.report"
+step = "none"
+actor = "command:review.report"
+needs = ["item.review.pin"]
+inputs = ["layer.memory:the pinned subjects"]
+allowance = "the review record"
+returns = "record-kind.review"
+outcomes = ["reported"]
+witness = { class = "history", by = "the review record" }
+owner = "dFairHearing"
+routes = { reported = "item.review.dispose" }
+
+[[item]]
+tag = "item.review.dispose"
+step = "none"
+actor = "command:review.dispose"
+needs = ["item.review.report"]
+inputs = ["layer.memory:the review record"]
+allowance = "the build's units and asks"
+returns = "record-kind.review-disposal"
+outcomes = ["fold", "unit", "ask", "intake", "plan-revision", "released"]
+witness = { class = "history", by = "each confirmed finding joined to its fold, unit or ask" }
+owner = "dDeclaredLoop"
+routes = { fold = "item.review.fold", unit = "transition", ask = "stand-in:{prefix}/memory-tree/backlog.py", intake = "stand-in:{prefix}/memory-tree/backlog.py", plan-revision = "item.plan.record", released = "stand-in:{prefix}/unattended/unattended.sh" }
+
+[[item]]
+tag = "item.review.fold"
+step = "none"
+actor = "role:gov-spec-writer"
+needs = ["item.review.dispose"]
+outcomes = ["next-round", "released", "at-bound"]
+witness = { class = "history", by = "each confirmed finding joined to its fold at the spec's new blob, which the re-invoke's prevSubjects pins" }
+owner = "dDeclaredLoop"
+routes = { next-round = "item.review.trigger", released = "stand-in:{prefix}/unattended/unattended.sh", at-bound = "item.review.dispose" }
+
+[[item]]
+tag = "item.review.cost"
+step = "none"
+actor = "command:review.cost"
+needs = ["item.review.report"]
+inputs = ["layer.memory:the review record's review-shape line"]
+allowance = "the review-shape line"
+returns = "record-kind.review-shape"
+outcomes = ["done"]
+witness = { class = "history", by = "the review-shape line's cost fields" }
+owner = "dDeclaredLoop"
+routes = { done = "stand-in:{prefix}/unattended/unattended.sh" }
+```
+
+And after today's owed row, the one the plan-revision route needs (§8 F8):
+
+```toml
+[[owed-row]]
+item = "item.review.dispose"
+outcome = "plan-revision"
+by = "dRankedPlan"
+```
+
+What each outcome is, read from the verbs in §4 "Evidence":
+
+| Row | Outcome | When | Route |
+|---|---|---|---|
+| trigger | `fired` | the verb prints what the harness call takes | `item.review.pin` |
+| trigger | `refused` | the subject's loop already ended, its findings disposed at its terminal round | the program's end (§8 F6, F7) |
+| dispose | `fold` | a local finding on an unbuilt spec, the terminal row's `disposition fold` | `item.review.fold` |
+| dispose | `unit` | a promotion ` · to units`, an unverified finding adjudicated under `block` included | `transition`, build row B10 |
+| dispose | `ask` | a promotion ` · to asks`, or an unverified finding filed under `ask` | the filed ask (§8 F9) |
+| dispose | `intake` | an earned gate, or a landing record's finding, filed as an ask until the patch-build intake lands | the filed ask (§8 F9) |
+| dispose | `plan-revision` | a plan revision's findings, declared and unarmed | `item.plan.record`, owed (§8 F8) |
+| dispose | `released` | nothing left to dispose: no disposition, or every finding refuted or listed under `record` | the program's end (§8 F7) |
+| fold | `next-round` | the CONVERGING return's re-invoke | `item.review.trigger` (§8 F10) |
+| fold | `released` | the spec subject at its target, no round left | the program's end (§8 F7) |
+| fold | `at-bound` | BOUNDED or CEILING, its new mechanism promoted | `item.review.dispose` (§8 F10) |
+| cost | `done` | the cost fields written on the review-shape line | the program's end (§8 F7) |
+
+A malformed trigger call, a cause outside its set or a read that fails, also exits 37: that is the
+call's error, and records no outcome. The definition's header comment for `[[item]]` says a tag
+`item.review.<name>` carries `step = "none"`.
 
 ### The check
 
@@ -171,7 +307,8 @@ rows only, so a review row is never an exit. The module docstring, the function'
 Both sit in `tools/loop/loop_lib.py#write_loop_plant`'s item branch beside `needs-cycle`. A prototype
 of this section on the scratch copy, the six rows added, printed the review program line, its count
 `6 item(s)` PINNED 2026-11-16, in the order trigger, pin, report, cost, dispose, fold, and each plant
-exited 1 on its owed line.
+exited 1 on its owed line. Rev-4's prototype, S3's branch and the six rows of §4 "The rows" on a scratch
+copy of `250b236fe`, printed the same line in the same order, and one `loop: item` line per row.
 
 ### Inventory
 
@@ -181,6 +318,8 @@ exited 1 on its owed line.
 | `step-none-outside-review`, `review-step-named` | `PLANTS` keys | none |
 | `item.review.pin`, `item.review.report` | `item` namespace tags | none |
 | `command:review.trigger`, `command:review.pin`, `command:review.report`, `command:review.dispose`, `command:review.cost` | actor values | none |
+| `fired`, `refused`, `pinned`, `reported`, `fold`, `unit`, `ask`, `intake`, `plan-revision`, `released`, `next-round`, `at-bound`, `done` | outcome words of the six rows | none |
+| `item.review.dispose` · `plan-revision` · `dRankedPlan` | `[[owed-row]]` row | none |
 
 No function is minted.
 
@@ -191,7 +330,7 @@ admitted.
 
 ### Files touched (estimate)
 
-- `tools/loop/loop.toml`
+- `tools/loop/loop.toml`, the six `[[item]]` rows and the one `[[owed-row]]` row of §4 "The rows"
 - `tools/loop/loop_lib.py`
 - `tools/loop/README.md`
 - `help/loop.md`
@@ -210,8 +349,8 @@ admitted.
 ## 5. Production-readiness checklist
 
 - security — no new write surface; the check admits `none` for one tag shape and refuses it elsewhere.
-- perf / scale — two more rows and one filter over the needs order. `--scopes` runs one `derive` per
-  item, so two more runs, about 1.6 s PINNED at `TOOL-dDeclaredLoop-12`'s 0.79 s per run, PINNED
+- perf / scale — six more rows and one filter over the needs order. `--scopes` runs one `derive` per
+  item, so six more runs, about 4.7 s DERIVED at `TOOL-dDeclaredLoop-12`'s 0.79 s per run, PINNED
   2026-11-14; `--check` runs none, and the `loop definition` leg keeps its 120 s ceiling, PINNED from
   `tools/gate-legs.json`.
 - error / empty / loading states — a review row with a step other than `none` is refused by name; a
@@ -219,20 +358,29 @@ admitted.
 - observability — `--check` prints `loop: program review` with its tags, and one `loop: item` line per
   review row naming its actor and each field's source.
 - risks — the sweep, with what keeps each green:
-  - dependency on `TOOL-dDeclaredLoop-20`, order 31, read on its committed spec rev-4: it lands the four
-    rows with bare actors and no step, which `check_program` at the tip refuses (§1, measured), so its
-    own close meets a red `loop definition` leg unless it lands S1 and S3 first. §8 F3 records the
-    reading this spec is written on: an item `TOOL-dDeclaredLoop-20`'s pass already lands leaves this
-    unit's scope at dispatch, said so in its ledger.
+  - dependency on `TOOL-dDeclaredLoop-20`, order 31, CLOSED at rev-5: it wrote no row (its §8 F4), so
+    nothing of S1 is on the tree and §8 F3's reading leaves this unit's scope whole. Its built verbs are
+    what the rows declare (§4 "Evidence").
   - `TOOL-dDeclaredLoop-22` builds beside this unit at order 32 and also lists `tools/loop/loop.toml`;
     the two touch different rows, and the second to merge rebases its rows past the first's.
   - `TOOL-dDeclaredLoop-67` S25, order 38, spells other command actors for these rows; §8 F4 records
     why the tag-derived form is the one written, and that unit re-grounds on it.
-  - `tools/loop/loop_table.py`: `read_transition_rows` maps a `none` step to no state, and the S7 route
-    join reads a route as cross-step only where its target's step differs, so S2's two routes add no
-    cross-step route and need no build row or owed row. A prototype of the six rows on the scratch copy
-    ran `loop_table.py check` to exit 0. Build row B10 and the stand-in row on `item.review.dispose`
-    are `TOOL-dDeclaredLoop-20`'s to keep true.
+  - `tools/loop/loop_table.py#check_transition_tables`: `read_transition_rows` maps a `none` step to no
+    state. Of the six rows' 14 routes, two are cross-step, each covered:
+    - `item.review.dispose` · `unit` → `transition`: build row B10, today's. Declared, B10 fires on this
+      route, and the target names no item, so no state join applies.
+    - `item.review.dispose` · `plan-revision` → `item.plan.record`, a row of `step.plan`: the new
+      `[[owed-row]]` `item.review.dispose` · `plan-revision` · `dRankedPlan` this unit adds.
+    The other 12 stay among rows of step `none` or name a stand-in, which the join never reads as
+    cross-step. The stand-in row on `item.review.dispose` names `dDeclaredLoop`, the dispose row's
+    owner. On rev-4's prototype, `loop_table.py check` exited 0 printing both owed lines; with the owed
+    row taken out it refused `the item item.review.dispose routes plan-revision to item.plan.record, a
+    cross-step route no build row and no [[owed-row]] covers`, and with `unit` routed to
+    `stand-in:{prefix}/memory-tree/backlog.py` it refused `build row 10 (item.review.dispose · unit)
+    fires on no cross-step route`. The `owed place` case of `tools/loop/loop_table.py`'s selftest
+    matches its own line among the owed lines, so a second owed row leaves it holding.
+    `loop_table.py move` on `item.review.dispose` still prints `· stand-in dDeclaredLoop`, the stand-in
+    row staying.
   - `tools/loop/loop_checklist.py`, `tools/loop/loop_items.py`, `tools/loop/splice.py` and
     `tools/loop/scenario.py` reach `check_program`, which admits the rows; `loop_checklist.py check`
     exited 0 on the prototype. `tools/loop/position.py` steps only through a build step's rows, and a
@@ -246,11 +394,13 @@ admitted.
     `loop_lib.py` and `loop.toml` and run `--grade-site` or `load_loop`, neither of which runs
     `check_program`.
   - the `item` namespace: `tools/playbook/tag_index.py#extract_item` reads every `[[item]]` tag, so the
-    two new tags become members. The `resolves` arm of `tags (the resolver's checks)` grades each whole
+    six new tags become members; an outcome word is no tag. The `resolves` arm of `tags (the resolver's checks)` grades each whole
     backticked span of Markdown outside `memory/builds/` that `SPAN_RE` fullmatches
     (`tools/playbook/tag_index.py#extract_citations`): S4's pages spell only declared tags in
     backticks and never the bare two-segment `item.review`, which resolves to no row.
-  - the install-prefix ban: the actors spell no kit path; `help/loop.md` is outside its population and
+  - the install-prefix ban: the actors spell no kit path, and the new stand-in target
+    `{prefix}/unattended/unattended.sh` takes the drained form the definition's nine
+    `{prefix}/memory-tree/backlog.py` routes already pass with; `help/loop.md` is outside its population and
     `tools/loop/README.md` spells kit paths as `<prefix>/`, as it does today.
   - the lexicon offender pin: no function is minted, so `VERB_OFFENDER_PIN` in `.lexicon.conf` holds at
     1215, PINNED; the one constant is in no graded cell.
@@ -277,7 +427,7 @@ admitted.
     `python tools/loop/loop_lib.py --check | grep -c "^loop: item item.review"` prints 6, PINNED; and
     `python -c "import tomllib; r=tomllib.load(open('tools/loop/loop.toml','rb'))['item']; c=[x for x in r if x['actor'].startswith('command:')]; print(len(r), len(c), sum(x['actor']=='command:'+x['tag'][5:] for x in c))"`
     prints `61 40 40` at the tip and `67 45 45` after this unit, PINNED 2026-11-16.
-- testing — AC1 to AC3 as probes and plants. No leg runs a `loop_lib.py` plant until
+- testing — AC1 to AC4 as probes and plants. No leg runs a `loop_lib.py` plant until
   `TOOL-dDeclaredLoop-67` S30's `loop definition fixtures` leg, so the arm under §7 is observed by the
   main loop RED then GREEN at the close.
 - migration — none.
@@ -294,8 +444,7 @@ admitted.
   nothing.
   Red when: a review row keeps the bare actor `command`, which the declaration check refuses, or a tag
   `item.review.<name>` is refused as opening no gov step.
-  figure: 6 is PINNED, the four rows of `TOOL-dDeclaredLoop-20` and the two of S2.
-  fixture: `TOOL-dDeclaredLoop-20`'s four rows on the tree, which order 31 lands.
+  figure: 6 is PINNED, the four rows of S1 and the two of S2.
 - **AC2** — When `python tools/loop/loop_lib.py --fixture --plant step-none-outside-review` runs, it
   exits 1 printing `the item item.plan.place step 'none' is not step.plan`; and
   `--plant review-step-named` exits 1 printing `the item item.review.pin step 'step.design' is not none`.
@@ -306,6 +455,13 @@ admitted.
   ``git grep -n -F '`item.review`' -- help/loop.md tools/loop/README.md`` prints nothing.
   Red when: the page lists the plants without the two new ones, so a user cannot see the review step
   refused.
+- **AC4** — When `python tools/loop/loop_table.py check` runs on the built tree, it exits 0 with no
+  `loop: refused` line, printing `loop: owed item.review.dispose · plan-revision · dRankedPlan` and
+  `loop: stand-in item.review.dispose · dDeclaredLoop`; and, run in `tools/loop`,
+  `python -c "import tomllib; r={x['tag']:x['routes'] for x in tomllib.load(open('loop.toml','rb'))['item']}; d=r['item.review.dispose']; f=r['item.review.fold']; print(d['unit'], d['plan-revision'], d['fold'], f['next-round'], f['at-bound'], sum(v.startswith('stand-in:') for t in r if t.startswith('item.review.') for v in r[t].values()))"`
+  prints `transition item.plan.record item.review.fold item.review.trigger item.review.dispose 6`.
+  Red when: the dispose row routes `unit` anywhere but `transition`, so build row B10 fires on no
+  cross-step route, or the plan-revision route stands on no owed row.
 
 ## 7. Gates
 
@@ -313,9 +469,10 @@ admitted.
 
 New arm: tools/loop/loop_lib.py · covers AC2 · the step-none-outside-review and review-step-named plants, staged against a check_program that admits none on every row and a review row at any step · none
 
-What these legs do not check: that a `command:` name names a real command, and that the review rows'
-routes reach the build table rows `TOOL-dDeclaredLoop-20` owes; no leg runs AC2's plants before
-`TOOL-dDeclaredLoop-67` S30.
+What these legs do not check: that a `command:` name names a real command; that a route's outcome is
+what the verb behind it returns; that the owed row's `by` names the build that writes its row; and
+that a stand-in tool does what its route says. No leg runs AC2's plants before `TOOL-dDeclaredLoop-67`
+S30.
 
 ## 8. Open questions
 
@@ -345,6 +502,48 @@ routes reach the build table rows `TOOL-dDeclaredLoop-20` owes; no leg runs AC2'
   With the rows on disk, (a) repeats what `--check` shows and grades nothing the new branch refuses.
   Recommendation: (b). RESOLVED (agent, 2026-11-16, delegated): (b), by rung 3.
   widens: none · relaxes: none
+- **F6 — Which outcomes does the trigger row carry, and where does its refusal route?**
+  `TOOL-dDeclaredLoop-20` §4 writes "refused, its open findings to `item.review.dispose`" and "not
+  fired, the flow continues". Options: (a) `fired` and `refused`, the refusal routed to the program's
+  end (F7), no not-fired outcome; (b) `refused` routed to `item.review.dispose`, as that prose reads;
+  (c) a third outcome, `not-fired`. The built refusal takes only a subject whose terminal round already
+  disposed its findings, and `item.review.dispose` needs `item.review.report`, which a refused trigger
+  never reaches, so (b) disposes them twice past an unmet need. `run_trigger` has no not-fired path, and
+  a caller that fires nothing takes its own `no-review` route, so (c) declares an outcome no code
+  returns. Recommendation: (a). RESOLVED (agent, 2026-11-16, delegated): (a), by rung 1.
+  widens: none · relaxes: none
+- **F7 — Where does an outcome that ends the review program route?** These are the trigger's `refused`,
+  the dispose and fold rows' `released`, and the cost row's `done`. Options: (a)
+  `stand-in:{prefix}/unattended/unattended.sh`, the driver, whose `--review` terminal row records the
+  loop's end and whose run takes the caller's flow on, until a build points the five programs' review
+  routes at `item.review.trigger` (§3); (b) `stand-in:{prefix}/workflows/tier2-review.js`, the act those
+  review routes enter, which reads as a second review; (c) `transition` on an owed row each, a
+  cross-step move that changes no build state and owes a build row no one writes. Recommendation: (a).
+  RESOLVED (agent, 2026-11-16, delegated): (a), by rung 3.
+  widens: none · relaxes: none
+- **F8 — Where does the dispose row's plan-revision route go?** Options: (a) `item.plan.record`, the
+  target `TOOL-dDeclaredLoop-20` and the flow record name, on a new `[[owed-row]]` by `dRankedPlan`, the
+  owner of `item.plan.record` and of the one owed row today; (b) the same target on a build row written
+  now, which arms a route `TOOL-dDeclaredLoop-20` §3 declares unarmed and fixes a from-state no plan
+  record yet witnesses; (c) a stand-in, which drops the step move the route names. Recommendation: (a).
+  RESOLVED (agent, 2026-11-16, delegated): (a), by rung 3.
+  widens: none · relaxes: none
+- **F9 — Where do the dispose row's asks and patch-build intakes route?** Options: (a) two outcomes,
+  `ask` and `intake`, both to `stand-in:{prefix}/memory-tree/backlog.py`, the grammar every filed ask
+  follows, so the build that lands the intake re-points one route; (b) one `ask` outcome for both, which
+  leaves that build to split an outcome every disposal already records; (c)
+  `stand-in:{prefix}/memory-tree/build_records.py`, the owner-question stand-in, where no ask is filed.
+  Recommendation: (a). RESOLVED (agent, 2026-11-16, delegated): (a), by rung 3.
+  widens: none · relaxes: none
+- **F10 — Where do the fold row's next round and its bound route?** Options for the next round: (a)
+  `item.review.trigger`, which refuses a round on a subject whose rows carry a terminal token, CEILING
+  among them, the per-round refusal the flow record gives the trigger; (b) `item.review.pin`, which
+  skips that refusal. For
+  BOUNDED or CEILING: (a) `item.review.dispose`, which promotes a spec subject's new mechanism to units,
+  as `TOOL-dDeclaredLoop-20` §4 says the fold row's bound does; (b) a `unit` outcome on the fold row
+  routed to `transition`, which owes a second build row beside B10. Recommendation: (a) for both.
+  RESOLVED (agent, 2026-11-16, delegated): (a) for both, by rung 3.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -359,6 +558,15 @@ routes reach the build table rows `TOOL-dDeclaredLoop-20` owes; no leg runs AC2'
   prints the program under its key; `review-step-named` in place of `review-program` (F5); S4, an edit
   to a sibling frozen at order 31, goes to §3 and S4 becomes the help and README pages; the order
   hazard with unit 20 (F3); the sweep.
+- rev-4 · 2026-11-16 · §1 to §10 · S1 · AC1 · AC4 · §8 F6 to F10 · the six review rows defined in full,
+  for the builder return `2026-11-16-build-TOOL-dDeclaredLoop-50-1-builder-return`, which found units 20
+  and 50 each leaving the four rows' outcomes, routes, witness and owner to the other; per the brief
+  `2026-11-16-prompt-TOOL-dDeclaredLoop-50-3-spec-writer`: §4 "The rows" gives every row as written,
+  grounded on unit 20's built trigger, terminal row, DISPOSAL stage and fold instruction; the dispose
+  row routes `unit` to `transition` for B10, and its plan revision stands on a new owed row by
+  `dRankedPlan` (§5); AC4 observes the table check and the routes; the trigger's set (F6), the
+  program's ends (F7), the plan revision (F8), the asks and intakes (F9), the fold's routes (F10); the
+  sweep re-run at `250b236fe`.
 
 ## 10. Reuse audit
 
@@ -371,4 +579,9 @@ run on the scratch copy of the tip, ranked generic row helpers (`rows`, `row`, `
 `step`, and `read_item_rows` and `read_steps` of `tools/loop/loop_lib.py`; none is a program check, and
 `read_item_rows` is the reader `check_program` already calls.
 
-Recall terms used: review trigger dispose fold cost pin report item rows actor step none NO_STEP check_program breakpoint adopter stage
+The routes extend `tools/loop/loop_table.py#check_transition_tables` through the forms it already
+reads: build row B10, the `[[owed-row]]` table beside its one row, and the stand-in targets the
+definition already spells, `{prefix}/memory-tree/backlog.py` for a filed ask among them. No new route
+form, table or check is added.
+
+Recall terms used: review trigger dispose fold cost pin report item rows actor step none NO_STEP check_program breakpoint adopter stage owed-row stand-in transition route B10
