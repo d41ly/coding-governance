@@ -164,7 +164,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-30 — the rework budget: one per build on its transition record, frozen at Design's exit, drawn by every repetition and never by contention](spec/2026-10-24-spec-TOOL-dDeclaredLoop-30.md) | 28 | 2 | CLOSED | rev-5 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-32 — the convergence routing: every closing-review and fix-pass loop ends on a non-decrease of its blocker and high count, its findings promoted by budget](spec/2026-10-24-spec-TOOL-dDeclaredLoop-32.md) | 29 | 2 | DEFERRED | rev-5 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-48 — the rework budget keeps a home under every channel set `transitions.record` admits](spec/2026-10-24-spec-TOOL-dDeclaredLoop-48.md) | 29 | 2 | CLOSED | rev-3 | 2026-11-16 |
-| [TOOL-dDeclaredLoop-49 — a draw row's typed figure is advisory, and two worktrees' draw rows merge by union](spec/2026-10-24-spec-TOOL-dDeclaredLoop-49.md) | 29 | 2 | INPROGRESS | rev-3 | 2026-11-16 |
+| [TOOL-dDeclaredLoop-49 — a draw row's typed figure is advisory, and two worktrees' draw rows merge by union](spec/2026-10-24-spec-TOOL-dDeclaredLoop-49.md) | 29 | 2 | INPROGRESS | rev-4 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-31 — `flow.on-exhausted`: a build whose budget is spent ends by a transition row, and never laps again](spec/2026-10-24-spec-TOOL-dDeclaredLoop-31.md) | 30 | 2 | DEFERRED | rev-3 | 2026-11-05 |
 | [TOOL-dDeclaredLoop-60 — the budget reader counts draws in every run record, rotated archives included, under `MEMORY_ROOT`](spec/2026-10-24-spec-TOOL-dDeclaredLoop-60.md) | 30 | 2 | DEFERRED | rev-3 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-61 — every draw row carries a draw id, so two identical parallel draws stay two rows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-61.md) | 30 | 2 | DEFERRED | rev-2 | 2026-10-24 |
@@ -213,7 +213,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 610 bound to this build, across 4 record folder(s).
+Records: 612 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

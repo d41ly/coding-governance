@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-49 — a draw row's typed figure is advisory, and two worktrees' draw rows merge by union
 
-**Status:** INPROGRESS · rev-3 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 29 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-4 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 29 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,7 +11,9 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82 TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 TOOL-dDeclaredLoop-87 TOOL-dDeclaredLoop-88 TOOL-dDeclaredLoop-89 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-91 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-96 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-100 TOOL-dDeclaredLoop-112 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-36-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-36-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-49-deviation-491.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-49-deviation-491.md) | deviation | — |
+| [2026-11-16-build-TOOL-dDeclaredLoop-49-1-builder-return.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-49-1-builder-return.md) | journal | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-49-deviation-492.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-49-deviation-492.md) | deviation | — |
+| [2026-11-16-build-TOOL-dDeclaredLoop-49-deviation-493.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-49-deviation-493.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
 | [2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-56 |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-49-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-49-1-spec-writer.md) | journal | — |
@@ -189,7 +191,7 @@ No function, constant or flag is minted, so no name goes to `python tools/lexico
   - the callers of the reader and the draw: `git grep -n -e read_budget_rows -e record_draw <tip> -- tools`
     names `tools/loop/budget.py` and `write_transition` alone. Each reads the answer by key, so the added
     key moves nothing, and `notes` defaults to None, which the transition writer's call keeps.
-  - `loop budget fixtures`: the thirteen plants' rows are written by one history, so none disagrees, and
+  - `loop budget fixtures`: the fifteen plants' rows are written by one history, so none disagrees, and
     no plant observes the refusal. `driver-draws` compares the run-state rows, which the notes never
     enter. `run_selftest` reads `PLANTS`, so the new plant joins the leg with no edit.
   - `loop transition record`, `loop adapt fixtures` and `loop composition fixtures`: their moves reach
@@ -205,9 +207,9 @@ No function, constant or flag is minted, so no name goes to `python tools/lexico
     fingerprints `python tools/govkit/docs_leg.py --fingerprints` prints for the three budget rows keep
     the anchors on `help/loop.md`. The new paragraph carries no command, so `--run` runs nothing new.
   - `every held leg is budgeted, every budget row resolves`: the leg keeps its row in
-    `tools/run-gates/selftest-budgets.txt`. Its 315 PINNED proxy, 210 seconds of thirteen direct-CLI plant
+    `tools/run-gates/selftest-budgets.txt`. Its 328 PINNED proxy, 219 seconds of fifteen direct-CLI plant
     readings x1.5, is re-priced with the new plant's direct-CLI reading added, x1.5, and its prose says
-    fourteen plants. The leg's `ceiling` of 300 PINNED in `tools/gate-legs.json` is a hang bound the
+    sixteen plants. The leg's `ceiling` of 300 PINNED in `tools/gate-legs.json` is a hang bound the
     direct readings stay under, so the manifest is not written.
   - `install-prefix (shipped surface)`: the module ships under the loop kit, so its docstring and messages
     name no kit path; `.gitattributes` and the help page do not ship with the kit.
@@ -300,6 +302,7 @@ New arm: tools/loop/budget.py · covers AC2 · the `parallel-append` plant, its 
   `notes` (F3) in the module's `loop: budget ·` form; the plant built on the tree's own attribute answer
   and on two items, since union keeps identical rows once; AC1 a direct `git check-attr` probe; S5 the
   help paragraph; §5 the sweep, with the selftest budget row re-priced.
+- rev-4 · 2026-11-16 · §5 · the `loop budget fixtures` row's figures and plant count re-read after TOOL-dDeclaredLoop-48 re-priced it (328 PINNED, 219 seconds of fifteen plants, sixteen after this unit), per `build/2026-11-16-build-TOOL-dDeclaredLoop-49-1-builder-return.md`; no scope moved.
 
 ## 10. Reuse audit
 
