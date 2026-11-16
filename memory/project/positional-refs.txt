@@ -16841,12 +16841,6 @@ memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-56.md	BUILD-
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-56.md	BUILD-METHOD M6
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-67.md	BUILD-METHOD M4
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md	BUILD-METHOD M4
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md	tools/check-spec-tokens.py:331
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md	tools/govkit/govkit.py:7039
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md	tools/unattended/unattended.sh:1348
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md	tools/unattended/unattended.sh:2117-2140
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md	tools/unattended/unattended.sh:560
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-77.md	tools/run-gates/measure_legs.py:531
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-79.md	BUILD-METHOD M4
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-79.md	check-unattended.sh:297
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-79.md	tools/check-spec-tokens.py:331
