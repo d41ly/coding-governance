@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-15
 streams: tooling
 roster: TOOL
-ids: TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-3 TOOL-aPiecewiseGrade-4
+ids: TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-3 TOOL-aPiecewiseGrade-4 TOOL-aPiecewiseGrade-5 TOOL-aPiecewiseGrade-6
 ---
 
 # aPiecewiseGrade — the spec-token checker re-grades only the specs whose inputs moved
@@ -29,7 +29,7 @@ prompt is in `prompts/`.
 
 ## Build-level rules
 
-- **Classification (M2)**: two units, MISSING at open, Tier-2: a new mode of a kit's checker, and the driver's call to it. A third, MISSING, added on the owner's answer to TOOL-aPiecewiseGrade-1's F1: the checker resolves `design_lib` once per run, built first. A fourth, MISSING, added on the owner's answer to TOOL-aPiecewiseGrade-2's divergence: the checker's next cache generation is promoted with no fixed-name temp, built before unit 2.
+- **Classification (M2)**: two units, MISSING at open, Tier-2: a new mode of a kit's checker, and the driver's call to it. A third, MISSING, added on the owner's answer to TOOL-aPiecewiseGrade-1's F1: the checker resolves `design_lib` once per run, built first. A fourth, MISSING, added on the owner's answer to TOOL-aPiecewiseGrade-2's divergence: the checker's next cache generation is promoted with no fixed-name temp, built before unit 2. Units 5 and 6, MISSING, promoted from the closing review's two medium items on the owner's word, built concurrently.
 - No unit builds before aLightenedLoop lands on main; this build then reconciles onto it.
 - No landing without the owner's explicit ask.
 - No spec audit: not declared.
@@ -46,11 +46,13 @@ None.
 | 2 | `TOOL-aPiecewiseGrade-2` | `run_spec_token_check` runs the incremental mode on a whole-key miss |
 | 3 | `TOOL-aPiecewiseGrade-3` | the checker resolves the memory-tree kit's `design_lib` once per run |
 | 4 | `TOOL-aPiecewiseGrade-4` | the checker's next cache generation is promoted with no fixed-name temp |
+| 5 | `TOOL-aPiecewiseGrade-5` | the per-spec counter names spelled once, and every mismatch loud |
+| 6 | `TOOL-aPiecewiseGrade-6` | one per-slug lock over the driver's spec-token cache state |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 4 unit(s) · node a · opened 2026-11-15 · streams tooling
-ids TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-3 TOOL-aPiecewiseGrade-4
+ids TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-3 TOOL-aPiecewiseGrade-4 TOOL-aPiecewiseGrade-5 TOOL-aPiecewiseGrade-6
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -61,7 +63,7 @@ ids TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-3 TOOL-aP
 | [TOOL-aPiecewiseGrade-2 — `run_spec_token_check` runs the checker's incremental mode on a whole-key miss, and names its per-spec cache's live generation in a file only where the whole key is recorded](spec/2026-11-15-spec-TOOL-aPiecewiseGrade-2.md) | 4 | 2 | CLOSED | rev-4 | 2026-11-16 |
 <!-- /gen:build-units -->
 
-Records: 17 bound to this build, across 3 record folder(s).
+Records: 20 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

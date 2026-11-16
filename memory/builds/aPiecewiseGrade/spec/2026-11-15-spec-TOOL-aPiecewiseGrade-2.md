@@ -13,6 +13,7 @@
 | [2026-11-15-prompt-TOOL-aPiecewiseGrade-2-revision.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-2-revision.md) | research | — |
 | [2026-11-15-prompt-TOOL-aPiecewiseGrade-3-forks-brief.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-3-forks-brief.md) | research | TOOL-aPiecewiseGrade-3 TOOL-aPiecewiseGrade-1 |
 | [2026-11-15-prompt-TOOL-aPiecewiseGrade-4-forks-brief.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-4-forks-brief.md) | research | TOOL-aPiecewiseGrade-4 |
+| [2026-11-16-review-TOOL-aPiecewiseGrade-1-diff-review-round1.md](../reviews/2026-11-16-review-TOOL-aPiecewiseGrade-1-diff-review-round1.md) | diff-review | TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-3 TOOL-aPiecewiseGrade-4 |
 
 <!-- /gen:spec-records -->
 
