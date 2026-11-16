@@ -22638,6 +22638,11 @@
       "file": "tools/playbook/edge_grammar.py"
     },
     {
+      "id": "read_trailer_rows",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
+    },
+    {
       "id": "read_transition",
       "kind": "function",
       "file": "tools/memory-tree/build_records.py"
@@ -24111,6 +24116,11 @@
       "id": "render_broad",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "render_budget_fields",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
     },
     {
       "id": "render_build_backlog",
@@ -35134,6 +35144,11 @@
     },
     {
       "id": "write_budget_plant",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
+    },
+    {
+      "id": "write_budget_rows",
       "kind": "function",
       "file": "tools/loop/budget.py"
     },

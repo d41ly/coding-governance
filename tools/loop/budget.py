@@ -19,8 +19,14 @@ record's lines after its fields, read in record order:
 
 `total` is the freeze row's figure, else the base; `spent` is the count of draw rows, and a draw row
 whose typed figure is not its ordinal is a refusal naming it. Before the build's first log record the
-same rows sit in its run-state file and each rotated `RUN.LANDED.<blob8>.md` beside it, each prefixed by
-its UTC timestamp, oldest first; the transition writer copies them into the first record it writes.
+same rows sit in three homes (TOOL-dDeclaredLoop-48): its run-state file and each rotated
+`RUN.LANDED.<blob8>.md` beside it, each prefixed by its UTC timestamp; the `budget` and `draw` fields of
+its `Gov-Transition` trailers, `budget=frozen@<units>@<total>` and `draw=<cause>@<item>@<spent>+<total>`,
+each stamped with its commit's committer date in UTC (`read_trailer_rows`); and each row of a `RUN.md`
+under the memory root's `builds/` folders suffixed ` · budget <slug>`, read without the suffix, a
+suffixed row counting for the build it names and never for its file's own. They are read oldest first
+by UTC second, a tie broken by the typed `spent` with a freeze row first, and the transition writer
+copies them into the first record it writes.
 
 THE FREEZE. `freeze_budget` answers the row the transition writer writes on the move `designing` to
 `building`: the base plus the per-unit share for each unit a tracked spec H1 of the build defines, once,
@@ -33,8 +39,11 @@ and answers `drawn`; once spent equals total it writes nothing and answers `exha
 derived, never given: a build whose newest recorded move carries `scenario.patch` draws on the first
 build its README's `parents:` names, as `patch:<its slug>`. `draw` appends the rows to the build's
 newest log record and commits that record alone, its subject `loop budget(<slug>): <cause> <spent>/<total>`,
-or, with no log record, appends them to the run-state file; a build with neither refuses the draw, and so
-does a `transitions.record` set without `log`. `classify_repeat` answers `contention` for a repetition
+or, with no log record, appends them to the run-state file (`write_budget_rows`), under any
+`transitions.record` set; a build with neither refuses the draw. Where the originating build of a patch
+draw holds no log record and the set holds no `log`, the rows go to the patch build's own run-state
+file, each suffixed ` · budget <origin>`, and a patch build with none refuses the draw. The transition
+writer's rows under a set without `log` take `render_budget_fields`. `classify_repeat` answers `contention` for a repetition
 another build or the remote caused, which draws nothing; `count_returns` counts one item's draws against
 `flow.route-backs`, a spec subject's `review-round` draws never ending its loop; `promotion_target` answers
 `unit`, `ask` or `on-exhausted`; `budget_state` answers `open <spent>/<total>`, `spent` or
@@ -67,9 +76,10 @@ if str(KIT) not in sys.path:
 from adapt import read_run_file  # noqa: E402
 from loop_lib import read_memory_tree, run_selftest_cases  # noqa: E402
 from loop_parents import read_policy_kit  # noqa: E402
-from loop_transition import (FX_BUILD, FX_SPEC, FX_UNIT, KEY, VALUE, read_build_unit_ids,  # noqa: E402
-                             read_memory_root, read_record_channels, read_transition_records, read_transitions,
-                             render_transition_trailer, write_transition, write_transition_plant,
+from loop_transition import (BUDGET_FIELDS, FX_BUILD, FX_SPEC, FX_UNIT, VALUE,  # noqa: E402
+                             check_transition_channels, read_build_unit_ids, read_memory_root,
+                             read_record_channels, read_transition_commits, read_transition_records,
+                             read_transitions, render_transition_trailer, write_transition, write_transition_plant,
                              write_transition_record)
 from loop_witness import read_git, remove_tree, run_fixture_git, write_fixture_files  # noqa: E402
 
@@ -87,6 +97,11 @@ FREEZE_ROW = "budget · frozen · %d unit(s) · %d"
 STAMP = "%Y-%m-%dT%H:%M:%SZ"
 ROW = re.compile(r"budget · frozen · (\d+) unit\(s\) · (\d+)|draw · (\S+) · (\S+) · (\d+)/(\d+)")
 RUN_ROW = re.compile(r"(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ) ((?:budget|draw) · .*)")
+#: A run-state row a patch build wrote for its originating build, ` · budget <slug>` after the row.
+SUFFIXED = re.compile(r"(.*) · budget (\S+)")
+#: The trailer values of the two budget fields, `budget` and `draw`: a cause never holds `@`, so a
+#: `draw` value splits at its first `@` and its last.
+TRAILER_ROWS = {"budget": re.compile(r"frozen@(\d+)@(\d+)"), "draw": re.compile(r"([^@]+)@(.+)@(\d+)\+(\d+)")}
 ROTATED = "RUN.LANDED.*.md"
 PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass drawn on each lap, nine laps",
           "before-freeze": "designing back to planning and forward again, four laps, then a fifth route back",
@@ -99,9 +114,12 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
           "spent-spec-round": "flow.rework-budget = 0, a spec subject's and the build slug's second rounds",
           "re-entry": "designing to building at three units, back, then building again at four",
           "pre-spec": "two draws before any spec or move, then a spec, the first move and a third draw",
-          "no-log": "a draw under transitions.record without log",
-          "unrecorded": "a draw on two specs and no move, the run-state file rotated, then a second draw"}
+          "unrecorded": "a draw on two specs and no move, the run-state file rotated, then a second draw",
+          "trailer-only": "transitions.record = [\"trailer\"]: designing to building, fix-pass drawn, then back",
+          "patch-trailer-only": "transitions.record = [\"trailer\"]: tFix landed by a trailer, tFixPatch drawing on it",
+          "log-dropped": "planning to designing under the default set, then [\"trailer\"] and designing back"}
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
+PLANT_TRAILER = '[transitions]\nrecord = ["trailer"]\n'
 PLANT_SPEC = "# TOOL-%s-%d — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n"
 PATCH_BUILD = "tFixPatch"
 
@@ -128,8 +146,9 @@ def read_budget_value(root):
 
 def read_budget_rows(build, root, moves=None):
     """The build's budget, re-derived from its rows: `rows` its home's rows oldest first, `home` the path a
-    draw appends to or None, `record` True where that home is a log record, `carried` the run-state rows
-    the build's first log record copies, `frozen_any` whether any home holds a freeze row, `spent`,
+    draw appends to or None, `record` True where that home is a log record, `carried` the rows of its
+    run-state files, its trailers and the ` · budget <slug>` rows, which the build's first log record
+    copies, `frozen_any` whether any home holds a freeze row, `spent`,
     `total`, `freeze` the row a draw writes first under the unrecorded-build rule or None, `draws` each
     draw row's `(cause, item)`, and `route-backs`. `moves`, the build's recorded moves where the caller
     read them. ValueError on a row outside its grammar or a typed ordinal that disagrees; LookupError
@@ -137,14 +156,25 @@ def read_budget_rows(build, root, moves=None):
     root = pathlib.Path(root)
     records = read_transition_records(build, root)
     run = read_run_file(root, build)
-    carried = []
-    for path in sorted(run.parent.glob(ROTATED)) + [run]:
+    # its own run-state files, each row it holds for itself; and, for a build holding no log record, its
+    # trailers' fields and the rows each build's RUN.md holds for it under ` · budget <slug>` (TOOL-dDeclaredLoop-48)
+    files = [(path, None) for path in sorted(run.parent.glob(ROTATED)) + [run]]
+    files += [] if records else [(path, build) for path in sorted(run.parent.parent.glob("*/RUN.md"))]
+    carried = [] if records else read_trailer_rows(build, root)
+    for path, owner in files:
         if path.is_file():
             for ln in path.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n").split("\n"):
                 hit = RUN_ROW.fullmatch(ln.rstrip())
-                if hit:
+                mark = SUFFIXED.fullmatch(hit.group(2)) if hit else None
+                if hit and owner is None and not mark:
                     carried.append((hit.group(1), hit.group(2)))
-    carried = [text for _ts, text in sorted(carried, key=lambda r: r[0])]
+                elif mark and owner is not None and mark.group(2) == owner:
+                    carried.append((hit.group(1), mark.group(1)))
+    order = []
+    for ts, text in carried:   # oldest first by UTC second, a tie broken by the typed spent, a freeze row first
+        hit = ROW.fullmatch(text)
+        order.append((ts, -1 if hit and hit.group(2) is not None else int(hit.group(5)) if hit else 0, text))
+    carried = [text for _ts, _n, text in sorted(order, key=lambda r: r[:2])]
     held = []
     for rec in records:
         text = pathlib.Path(root, rec["path"]).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
@@ -174,6 +204,26 @@ def read_budget_rows(build, root, moves=None):
     return {"rows": rows, "home": home, "record": bool(records), "carried": [] if records else carried,
             "frozen_any": frozen_any, "spent": len(draws), "total": total, "freeze": freeze, "draws": draws,
             "route-backs": route_backs}
+
+
+def read_trailer_rows(build, root):
+    """The build's `(stamp, row)` pairs from the `budget` and `draw` fields of its `Gov-Transition`
+    trailers, oldest first, each stamped with its commit's committer date in UTC. ValueError naming the
+    commit on a value outside its grammar."""
+    out = []
+    for commit, fields in read_transition_commits(build, root)[0]:
+        when = datetime.datetime.fromisoformat(commit["date"].replace("Z", "+00:00"))
+        stamp = when.astimezone(datetime.timezone.utc).strftime(STAMP)
+        for name in BUDGET_FIELDS:
+            hit = TRAILER_ROWS[name].fullmatch(fields[name]) if name in fields else None
+            if name in fields and not hit:
+                raise ValueError("commit %s carries %s=%s, outside its grammar %s" % (
+                    commit["sha"][:8], name, fields[name], TRAILER_ROWS[name].pattern))
+            if hit and name == "budget":
+                out.append((stamp, FREEZE_ROW % (int(hit.group(1)), int(hit.group(2)))))
+            elif hit:
+                out.append((stamp, "draw · %s · %s · %s/%s" % hit.groups()))
+    return out
 
 
 def derive_patch_origin(build, root, moves=None):
@@ -248,8 +298,10 @@ def record_draw(build, cause, item, root=".", lines=None, moves=None):
     """`("drawn", row)` after writing one draw row of `build`, a freeze row before it where one is owed,
     or `("exhausted", "<slug> · <spent>/<total>")` writing nothing. Where `lines` is a list the rows are
     added to it, the transition writer's record, and no file is written, save a patch build's, which
-    lands on its originating build's home. ValueError on a cause outside `CAUSES`, a derived cause
-    given, an item outside `VALUE`, a set without `log`, or a build with no home."""
+    lands on its originating build's home, or, where that build holds no log record and the set holds no
+    `log`, on the patch build's own run-state file, each row suffixed ` · budget <origin>` and the answer
+    with it. ValueError on a cause outside `CAUSES`, a derived cause given, an item outside `VALUE`, or a
+    build with no home, a patch build with no run-state file under that rule among them."""
     if cause.startswith(PATCH):
         raise ValueError("the cause %s is derived: a patch build's draw is named patch:<its slug> from its "
                          "scenario, so it is never given" % cause)
@@ -258,13 +310,17 @@ def record_draw(build, cause, item, root=".", lines=None, moves=None):
     if not VALUE.fullmatch(item or ""):
         raise ValueError("the item %r is outside [A-Za-z0-9._:+@-]+" % item)
     root = pathlib.Path(root).absolute()
-    if "log" not in read_record_channels(root, "HEAD"):
-        raise ValueError("%s selects no log at HEAD, so the budget has no record to draw on" % KEY)
     moves = read_transitions(build, root) if moves is None else moves
-    origin = derive_patch_origin(build, root, moves)
+    origin, suffix = derive_patch_origin(build, root, moves), ""
     if origin:
-        build, cause, lines, moves = origin, PATCH + build, None, None
+        patch, build, cause, lines, moves = build, origin, PATCH + build, None, None
     held = read_budget_rows(build, root, moves)
+    if origin and not held["record"] and "log" not in read_record_channels(root, "HEAD"):
+        run = read_run_file(root, patch)
+        if not run.is_file():
+            raise ValueError("the patch build %s has no run-state file, and its draw on %s, which holds no transition "
+                             "log record under a set without log, has no other home" % (patch, origin))
+        held["home"], suffix = run.relative_to(root).as_posix(), " · budget %s" % origin
     if held["spent"] >= held["total"]:
         return "exhausted", "%s · %d/%d" % (build, held["spent"], held["total"])
     row = "draw · %s · %s · %d/%d" % (cause, item, held["spent"] + 1, held["total"])
@@ -276,15 +332,11 @@ def record_draw(build, cause, item, root=".", lines=None, moves=None):
         raise ValueError("%s has neither a transition log record nor a run-state file, so the draw has no "
                          "home" % build)
     path = pathlib.Path(root, held["home"])
-    before = path.read_bytes()
     if not held["record"]:
-        stamp = datetime.datetime.now(datetime.timezone.utc).strftime(STAMP)
-        with open(path, "ab") as fh:
-            fh.write(("" if before.endswith(b"\n") or not before else "\n").encode("utf-8"))
-            fh.write("".join("%s %s\n" % (stamp, r) for r in add).encode("utf-8"))
-        return "drawn", row
-    with open(path, "ab") as fh:
-        fh.write(("\n" if not held["rows"] else "").encode("utf-8") + "".join(r + "\n" for r in add).encode("utf-8"))
+        write_budget_rows(path, [r + suffix for r in add], False)
+        return "drawn", row + suffix
+    before = path.read_bytes()
+    write_budget_rows(path, add, True)
     subject = "loop budget(%s): %s %d/%d" % (build, cause, held["spent"] + 1, held["total"])
     if read_git(root, "commit", "-q", "--only", "-m", subject, "--", held["home"])[0] != 0:
         path.write_bytes(before)
@@ -292,18 +344,55 @@ def record_draw(build, cause, item, root=".", lines=None, moves=None):
     return "drawn", row
 
 
+def write_budget_rows(path, rows, record):
+    """`rows` appended to the file at `path`: to a log record where `record`, its first rows after one
+    blank line, else to a run-state file, each after its UTC stamp."""
+    text = path.read_bytes().decode("utf-8", "replace")
+    if record:
+        lead = "" if any(ln.startswith(("budget · ", "draw · ")) for ln in text.split("\n")) else "\n"
+        body = "".join(r + "\n" for r in rows)
+    else:
+        stamp = datetime.datetime.now(datetime.timezone.utc).strftime(STAMP)
+        lead = "" if text.endswith("\n") or not text else "\n"
+        body = "".join("%s %s\n" % (stamp, r) for r in rows)
+    with open(path, "ab") as fh:
+        fh.write((lead + body).encode("utf-8"))
+
+
+def render_budget_fields(rows):
+    """The trailer fields of a move's budget `rows`: `budget=frozen@<units>@<total>` for a freeze row and
+    `draw=<cause>@<item>@<spent>+<total>` for a draw row. ValueError on a row outside the grammar, a second
+    row of one kind, or a value outside `VALUE`."""
+    out = {}
+    for row in rows:
+        hit = ROW.fullmatch(row)
+        if not hit:
+            raise ValueError("the budget row %r is outside its grammar" % row)
+        name = "budget" if hit.group(2) is not None else "draw"
+        value = "frozen@%s@%s" % hit.group(1, 2) if name == "budget" else "%s@%s@%s+%s" % hit.group(3, 4, 5, 6)
+        if name in out:
+            raise ValueError("the move carries a second %s row, %r, and its trailer holds one %s field" % (
+                name, row, name))
+        if not VALUE.fullmatch(value):
+            raise ValueError("the %s field %r is outside [A-Za-z0-9._:+@-]+" % (name, value))
+        out[name] = value
+    return out
+
+
 # ------------------------------------------------------------------------------------------ the plants
 def write_budget_plant(top, case):
     """The scratch repository at `top` for `case`: the transition writer's plant, then this case's specs,
     run-state file and policy file, committed."""
-    write_transition_plant(top, {"pre-spec": "pre-spec", "no-log": "subset-trailer-line"}.get(case, "default"))
+    write_transition_plant(top, {"pre-spec": "pre-spec"}.get(case, "default"))
     units = {"mint-each-lap": 2, "unrecorded": 2, "re-entry": 3}.get(case, 1)
     files = {FX_SPEC.replace(FX_UNIT, "TOOL-%s-%d" % (FX_BUILD, n)): PLANT_SPEC % (FX_BUILD, n)
              for n in range(2, units + 1)}
-    if case in ("pre-spec", "no-log", "unrecorded"):
+    if case in ("pre-spec", "unrecorded", "trailer-only"):
         files["memory/builds/%s/RUN.md" % FX_BUILD] = PLANT_RUN
     if case == "route-backs":
         files[".governance/policy.toml"] = "[flow]\nroute-backs = 3\nrework-budget = 6\n"
+    if case in ("trailer-only", "patch-trailer-only"):
+        files[".governance/policy.toml"] = PLANT_TRAILER
     write_fixture_files(top, files)
     run_fixture_git(top, "add", "-A")
     run_fixture_git(top, "commit", "-q", "--allow-empty", "-m", "the budget plant")
@@ -329,10 +418,10 @@ def run_budget_plant(case):
             print(out.getvalue().rstrip())
             return rc, out.getvalue()
 
-        def run_move(state, item, outcome):
-            """One move of the plant's build through the transition writer: None, or the refusal."""
+        def run_move(state, item, outcome, fields=None):
+            """One move of the plant's build through the transition writer, given `fields`: None, or the refusal."""
             try:
-                write_transition(top, FX_BUILD, state, item, outcome, "HEAD", {}, {})
+                write_transition(top, FX_BUILD, state, item, outcome, "HEAD", {}, fields or {})
             except ValueError as e:
                 print("%s: fixture · move %s · refused · %s" % (SAY, state, e))
                 return str(e)
@@ -465,29 +554,45 @@ def run_budget_plant(case):
                 record_draw(FX_BUILD, answer, FX_UNIT, top)
             check(answer == "contention", "a verdict staled by another build's landing classified %s" % answer)
             check(read_rows() == before, "the re-verification wrote a draw row")
-        elif case == "patch-draw":
+        elif case in ("patch-draw", "patch-trailer-only"):
             head = run_fixture_git(top, "rev-parse", "HEAD")
             move = {"build": FX_BUILD, "from": "deploying", "to": "landed", "item": "item.deploy.close", "sha": head[:8]}
-            write_transition_record(top, FX_UNIT, move)
-            write_fixture_files(top, {"memory/builds/%s/README.md" % PATCH_BUILD:
-                                      "---\nslug: %s\nnode: a\nopened: 2026-01-01\nstreams: tooling\nroster: TOOL\n"
-                                      "ids: TOOL-%s-1\nparents: %s\n---\n# %s\n" % (
-                                          PATCH_BUILD, PATCH_BUILD, FX_BUILD, PATCH_BUILD)})
+            files = {"memory/builds/%s/README.md" % PATCH_BUILD:
+                     "---\nslug: %s\nnode: a\nopened: 2026-01-01\nstreams: tooling\nroster: TOOL\n"
+                     "ids: TOOL-%s-1\nparents: %s\n---\n# %s\n" % (PATCH_BUILD, PATCH_BUILD, FX_BUILD, PATCH_BUILD)}
+            if case == "patch-draw":
+                write_transition_record(top, FX_UNIT, move)
+            else:   # tFix lands by its trailer alone, and the patch build holds a run-state file
+                files["memory/builds/%s/RUN.md" % PATCH_BUILD] = PLANT_RUN.replace(FX_BUILD, PATCH_BUILD)
+            write_fixture_files(top, files)
             run_fixture_git(top, "add", "-A")
             run_fixture_git(top, "commit", "-q", "-m", "landed\n\n%s" % render_transition_trailer(move))
             patch = {"build": PATCH_BUILD, "from": "planning", "to": "designing", "item": "item.plan.exit",
                      "sha": head[:8], "scenario": PATCH_SCENARIO}
             run_fixture_git(top, "commit", "-q", "--allow-empty", "-m", "patch\n\n%s" % render_transition_trailer(patch))
-            rc, out = run_verb(["draw", "--build", PATCH_BUILD, "--cause", "fix-pass", "--item", "item.deploy.close"])
+            patch_draw = ["draw", "--build", PATCH_BUILD, "--cause", "fix-pass", "--item", "item.deploy.close"]
+            rc, out = run_verb(patch_draw)
             row = "draw · patch:%s · item.deploy.close · 1/4" % PATCH_BUILD
             check(rc == 0 and row in out, "the patch build's draw printed %r" % out.strip())
-            newest = read_transition_records(FX_BUILD, top)[-1]["path"]
-            check(row in pathlib.Path(top, newest).read_text(encoding="utf-8"), "%s does not carry the row" % newest)
-            state = read_transitions(FX_BUILD, top)[0]["to"]
-            print("%s: fixture · %s reads %s" % (SAY, FX_BUILD, state))
-            check(state == "landed", "%s reads %s after the draw" % (FX_BUILD, state))
-            rc, out = run_verb(["draw", "--build", FX_BUILD, "--cause", "patch:%s" % PATCH_BUILD, "--item", "x"])
-            check(rc == 2 and "derived" in out, "the derived cause given was not refused as derived")
+            if case == "patch-trailer-only":
+                patch_run = read_run_file(top, PATCH_BUILD)
+                check("%s · budget %s\n" % (row, FX_BUILD) in patch_run.read_text(encoding="utf-8"),
+                      "the run-state file of %s does not carry %s · budget %s" % (PATCH_BUILD, row, FX_BUILD))
+                states = (budget_state(FX_BUILD, top), budget_state(PATCH_BUILD, top))
+                print("%s: fixture · budget_state · %s %s · %s %s" % (SAY, FX_BUILD, states[0], PATCH_BUILD, states[1]))
+                check(states == ("unfrozen 1/4", "unfrozen 0/4"), "the states read %s and %s" % states)
+                patch_run.unlink()
+                rc, out = run_verb(patch_draw)
+                check(rc == 2 and "refused" in out and PATCH_BUILD in out,
+                      "the draw with no run-state file of %s was not refused naming it" % PATCH_BUILD)
+            else:
+                newest = read_transition_records(FX_BUILD, top)[-1]["path"]
+                check(row in pathlib.Path(top, newest).read_text(encoding="utf-8"), "%s does not carry the row" % newest)
+                state = read_transitions(FX_BUILD, top)[0]["to"]
+                print("%s: fixture · %s reads %s" % (SAY, FX_BUILD, state))
+                check(state == "landed", "%s reads %s after the draw" % (FX_BUILD, state))
+                rc, out = run_verb(["draw", "--build", FX_BUILD, "--cause", "patch:%s" % PATCH_BUILD, "--item", "x"])
+                check(rc == 2 and "derived" in out, "the derived cause given was not refused as derived")
         elif case == "route-backs":
             run_move("planning", "item.plan.exit", "recorded")
             for item in ["TOOL-%s-1" % FX_BUILD] * 4 + ["TOOL-%s-2" % FX_BUILD]:
@@ -529,9 +634,44 @@ def run_budget_plant(case):
                   "the run-state file does not carry the first two rows alone")
             check([ln for ln in text.split("\n") if ln.startswith("draw · ")] == owed,
                   "the first log record does not carry the three rows in order")
-        elif case == "no-log":
-            rc, out = run_verb(draw + [FX_UNIT])
-            check(rc == 2 and KEY in out, "the draw under a set without log was not refused naming %s" % KEY)
+        elif case == "trailer-only":
+            run_move("designing", "item.design.exit", "recorded")
+            run_verb(draw + [FX_UNIT])
+            run_move("building", "item.build.unit-pass", "spec-wrong")
+            trailers = [t for _c, t in read_transition_commits(FX_BUILD, top)[0]]
+            for t in trailers:
+                print("%s: fixture · trailer %s" % (SAY, render_transition_trailer(t).split(": ", 1)[1]))
+            run_text = read_run_file(top, FX_BUILD).read_text(encoding="utf-8")
+            state = budget_state(FX_BUILD, top)
+            print("%s: fixture · budget_state · %s" % (SAY, state))
+            check(len(trailers) == 2 and trailers[0].get("budget") == "frozen@1@6",
+                  "the move into building does not carry budget=frozen@1@6")
+            check("draw · fix-pass · %s · 1/6\n" % FX_UNIT in run_text, "RUN.md does not carry the fix-pass draw 1/6")
+            check(len(trailers) == 2 and trailers[1].get("draw") == "route-back@item.build.unit-pass@2+6",
+                  "the backward move does not carry draw=route-back@item.build.unit-pass@2+6")
+            check(state == "open 2/6", "budget_state answers %s" % state)
+            lines, findings = check_transition_channels(FX_BUILD, top)
+            for text in findings + lines:
+                print("%s: fixture · check · %s" % (SAY, text))
+            check(not findings and lines[-1].endswith(" 0 finding(s)"), "the channel check reads %s" % lines[-1])
+            refused = run_move("designing", "item.design.exit", "recorded", {"draw": "x"})
+            check(refused and "--field draw is derived" in refused, "the field draw=x was not refused as derived")
+        elif case == "log-dropped":
+            run_move("planning", "item.plan.exit", "recorded")
+            write_fixture_files(top, {".governance/policy.toml": PLANT_TRAILER})
+            run_fixture_git(top, "add", "-A")
+            run_fixture_git(top, "commit", "-q", "-m", "transitions.record drops log")
+            run_move("designing", "item.design.decompose", "goal-fork")
+            newest = read_transition_records(FX_BUILD, top)[-1]["path"]
+            row = "draw · route-back · item.design.decompose · 1/4"
+            shown = run_fixture_git(top, "show", "--name-only", "--format=%(trailers:key=Gov-Transition,valueonly)")
+            state = budget_state(FX_BUILD, top)
+            print("%s: fixture · move · %s · budget_state · %s" % (SAY, " / ".join(ln for ln in shown.split("\n") if ln), state))
+            check(row + "\n" in pathlib.Path(top, newest).read_text(encoding="utf-8"), "%s does not carry %s" % (
+                newest, row))
+            check(newest in shown.split("\n") and "draw=" not in shown,
+                  "the move's commit does not hold %s alone of the budget, its trailer free of draw=" % newest)
+            check(state == "unfrozen 1/4", "budget_state answers %s" % state)
         elif case == "unrecorded":
             run_verb(draw + [FX_UNIT])
             run = read_run_file(top, FX_BUILD)

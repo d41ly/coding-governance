@@ -41,8 +41,11 @@ goes through this one writer, its channels and its fields as a forward move does
 `loop_table`'s `derive_direction`, derived on every print and read, and never stored. The rework budget
 rides the same records (`budget.py`, TOOL-dDeclaredLoop-30): a backward move draws `route-back`, refused
 before any write where the budget is spent, and the move from `designing` to `building` writes the freeze
-row, once; each row is a line after the record's fields, the build's first record copying the run-state
-rows before it, and where the move writes no record its row is a run-state line.
+row, once; each row is a line after the record's fields, the build's first record copying the rows before
+it. Where the move writes no record its rows take the first home that exists (TOOL-dDeclaredLoop-48):
+under a set without `log`, the build's newest record, staged into the move's commit, else the trailer's
+derived `BUDGET_FIELDS`, `budget=` and `draw=`, where the set holds `trailer`; else run-state lines. With
+none, a route-back is refused naming the build and the freeze writes nothing.
 
 `check` (`check_transition_channels`) holds each channel to the trailer: per trailer whose commit's set
 holds `log`, one record with equal `**Key:**` fields; no record left over where its adding commit's set
@@ -77,7 +80,6 @@ order, the n-th owing trailer with the n-th such record, so two records swapped 
 """
 import argparse
 import contextlib
-import datetime
 import io
 import pathlib
 import re
@@ -98,10 +100,14 @@ SAY = "loop"
 KEY = "transitions.record"
 TRAILER_KEY = "Gov-Transition"
 KIND = "transition"
+#: The rework budget's fields (`budget.py`, TOOL-dDeclaredLoop-48), `budget=frozen@<units>@<total>` and
+#: `draw=<cause>@<item>@<spent>+<total>`: the writer puts a move's rows on its trailer where the set holds
+#: `trailer` and no `log` and the build holds no log record, and refuses either from a `--field`.
+BUDGET_FIELDS = ("budget", "draw")
 #: The extension fields a trailer and a record may carry after `build`, `item` and `sha`, in the order
-#: they are written; later units extend it. `composition`, `scenario` and `scenario-settled` are derived by
-#: the writer, never given.
-TRANSITION_FIELDS = ("stand-in", "composition", "scenario", "scenario-settled")
+#: they are written; later units extend it. `composition`, `scenario`, `scenario-settled` and the
+#: `BUDGET_FIELDS` it ends with are derived by the writer, never given.
+TRANSITION_FIELDS = ("stand-in", "composition", "scenario", "scenario-settled") + BUDGET_FIELDS
 #: The fields `scenario.py`'s `derive_move_scenarios` derives for each move (TOOL-dDeclaredLoop-27).
 DERIVED_SCENARIO_FIELDS = ("scenario", "scenario-settled")
 #: The micro-format definition `render_transition_line` fills, held equal to `AGENTS.md`'s by `check`.
@@ -376,6 +382,9 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
         if name in DERIVED_SCENARIO_FIELDS:
             raise ValueError("--field %s is derived: the writer places the build's scenarios from the move's facts "
                              "and the previous move, so it is never given" % name)
+        if name in BUDGET_FIELDS:
+            raise ValueError("--field %s is derived: the writer places the move's rework budget rows on the trailer "
+                             "where no log record holds them, so it is never given" % name)
         move[name] = value
     owner = {r.get("item"): r.get("owner") for r in read_stand_ins(data, where)}.get(item)
     if owner:
@@ -398,23 +407,30 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
         raise ValueError("the index holds staged changes, and a transition commit carries its own records alone")
     # the rework budget (TOOL-dDeclaredLoop-30): a backward move draws `route-back`, refused here before any
     # write where the budget is spent, and the move from designing to building freezes it, once. The rows
-    # are lines of this move's record, the build's first record copying the run-state rows before them, or,
-    # where the move writes no record, run-state lines; a route-back draw with neither home is refused
+    # are lines of this move's record, the build's first record copying the rows before them, or, where the
+    # move writes no record, the first home that exists (TOOL-dDeclaredLoop-48): under a set without log
+    # the build's newest record, staged into this commit, else the trailer where the set holds trailer;
+    # else run-state lines. A route-back draw with no home is refused, and a freeze with none writes nothing
     from adapt import read_adapt_mode, read_pending_rows, read_run_file, write_flow_states, write_path_orders
-    from budget import STAMP, freeze_budget, read_budget_rows, record_draw   # it imports this module, so here
+    # budget.py imports this module, so its names are imported here
+    from budget import freeze_budget, read_budget_rows, record_draw, render_budget_fields, write_budget_rows
     direction = derive_direction(state, to, read_transition_rows(data, where))
     anchor = resolve_build_anchor(build, root) if "log" in chosen else None
+    records = [] if "log" in chosen else read_transition_records(build, root)
+    newest = pathlib.Path(root, records[-1]["path"]) if records else None
+    on_trailer = "trailer" in chosen and "log" not in chosen
     run, rows = read_run_file(root, build), []
+    homed = bool(anchor or newest or on_trailer or run.is_file())
     if direction == "backward":
         answer, drawn = record_draw(build, "route-back", item, root, lines=rows, moves=before)
         if answer == "exhausted":
             raise ValueError("the rework budget is spent, %s, so the backward move is refused and nothing is "
                              "recorded; flow.on-exhausted names the ending" % drawn)
-        if rows and not anchor and not run.is_file():
-            raise ValueError("%s has neither a transition log record nor a run-state file, so the route-back "
-                             "draw has no home" % build)
+        if rows and not homed:
+            raise ValueError("%s has neither a transition log record nor a run-state file, and %s holds no trailer "
+                             "to carry it, so the route-back draw has no home" % (build, KEY))
     elif (state, to) == ("designing", "building"):
-        rows += [r for r in (freeze_budget(build, root),) if r and (anchor or run.is_file())]
+        rows += [r for r in (freeze_budget(build, root),) if r and homed]
     carried = read_budget_rows(build, root, before)["carried"] if anchor and not read_transition_records(
         build, root) else []
     pin, state_read = read_step_composition(root, before)
@@ -436,7 +452,7 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
         size = run.stat().st_size
         write_flow_states(root, build, mode)
     staged = [run.relative_to(root).as_posix()] if size is not None else []
-    wrote = []
+    wrote, prior = [], None
     try:
         if "log" in chosen:
             if anchor is None and "trailer" not in chosen:
@@ -452,12 +468,15 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
                     for rel in wrote:
                         pathlib.Path(root, rel).unlink()
                     raise
-        if rows and not wrote:
+        if rows and not wrote and newest:   # its bytes written back below where the move does not commit
+            prior = newest.read_bytes()
+            write_budget_rows(newest, rows, True)
+            staged.append(newest.relative_to(root).as_posix())
+        elif rows and not wrote and on_trailer:
+            move.update(render_budget_fields(rows))
+        elif rows and not wrote:
             size = run.stat().st_size if size is None else size
-            stamp = datetime.datetime.now(datetime.timezone.utc).strftime(STAMP)
-            lead = "" if run.read_bytes().endswith(b"\n") or not run.stat().st_size else "\n"
-            with open(run, "ab") as fh:
-                fh.write((lead + "".join("%s %s\n" % (stamp, r) for r in rows)).encode("utf-8"))
+            write_budget_rows(run, rows, False)
             staged = [run.relative_to(root).as_posix()]
         commit = None
         if wrote or "trailer" in chosen:
@@ -475,6 +494,8 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
         if size is not None:
             with open(run, "r+b") as fh:
                 fh.truncate(size)
+        if prior is not None:
+            newest.write_bytes(prior)
         raise
     return move, commit, wrote, render_transition_line(move) if "micro-format" in chosen else None, said
 

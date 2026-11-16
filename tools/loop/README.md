@@ -312,7 +312,10 @@ trailer. The micro-format line is printed, never stored, by `render_transition_l
 `TRANSITION_FIELDS`, which holds `stand-in`, written where the item has a `[[stand-in]]` row,
 `composition`, the pin the writer derives on every move and refuses from a `--field` (`composition.py`),
 and `scenario` and `scenario-settled`, the build's scenarios and any conflict settled between them, which
-the writer derives through `scenario.py`'s `derive_move_scenarios` and refuses from a `--field` too.
+the writer derives through `scenario.py`'s `derive_move_scenarios` and refuses from a `--field` too, and
+`budget` and `draw`, `BUDGET_FIELDS`, a move's rework budget rows, which the writer derives through
+`budget.py`'s `render_budget_fields` where a set without `log` leaves the build no record, and refuses
+from a `--field` as well.
 
 `record` (`write_transition`) answers the move by `derive_move` first, so a move no row holds prints
 `refused` and writes nothing; it resolves the witness to HEAD or its ancestor, refuses a staged index,

@@ -422,7 +422,8 @@ policy key `transitions.record` in `.governance/policy.toml` says which:
 - **`trailer`**: the move's commit carries
   `Gov-Transition: <from> -> <to> · build=<slug> · item=<tag> · sha=<sha8>`, with any extra field, such
   as `stand-in=<owner>`, `composition=<sha8>`, `scenario=<tags>` and `scenario-settled=<entries>`,
-  after it.
+  after it. The rework budget's `budget=` and `draw=` are derived fields too: the writer adds them,
+  and a `--field` giving either is refused.
 - **`log`**: a record in the build's `build/` folder, `<date>-build-<id>-transition-<n>.md`, holding
   the same fields as `- **Build:**`, `- **From:**`, `- **To:**`, `- **Item:**` and `- **Sha:**` lines,
   where `<id>` is the lowest unit id a spec under the build defines.
@@ -1297,6 +1298,15 @@ first record copies them. Once spent equals the total, the next draw writes noth
 when the budget is spent, and ends at its target or its bound; the closing review's round and a
 dispatch are refused. A patch build draws on the build it patches, as `patch:<its slug>`.
 
+A `transitions.record` set without `log` keeps the budget too. A build that already has a transition
+record keeps drawing into its newest one, and a move that draws stages the row into its own commit. A
+build with no record keeps a move's rows on that move's trailer where the set holds `trailer`, as
+`budget=frozen@<units>@<total>` and `draw=<cause>@<item>@<spent>+<total>`, and otherwise in its
+`RUN.md`, where a draw made through `budget.py draw` goes as well. A patch build's draw on a build with
+no record goes in the patch build's own `RUN.md`, as the row followed by ` · budget <slug>`, and counts
+for the patched build `<slug>` alone. These rows are read oldest first by their time, and the build's
+first record copies them.
+
 Contention draws nothing: a verdict staled by another build's landing, a merge conflicted by another
 build's landing, a wait on a lease another build holds and an unreachable remote are re-run in their
 turn and spend none of this build's budget. `flow.route-backs`, default 3, counts one item's draws:
@@ -1307,8 +1317,9 @@ past it, that item's loop is non-converging, though a spec subject's review roun
   `loop: budget · exhausted · <slug> · <spent>/<total> · flow.on-exhausted` and exits 3, or
   `loop: budget · refused` and why, exit 2, for a cause outside `route-back`, `fix-pass`,
   `review-round`, `re-dispatch` and `research`, a `patch:` cause given, which is derived, a build with
-  no record and no `RUN.md`, or a `transitions.record` without `log`. The unattended driver draws
-  through it on `--review` and `--dispatch`.
+  no record and no `RUN.md`, so no home for the row, or a patch build with no `RUN.md` of its own where
+  the build it patches has no record and the set has no `log`. The unattended driver draws through it
+  on `--review` and `--dispatch`.
 
 - **See the value:** `python tools/loop/budget.py value` prints `base <n> per-unit <n>` from the policy <!-- usage: script:tools/loop/budget.py#value 689b423c -->
   file at HEAD, or refuses a value of another shape naming the key.
