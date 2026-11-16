@@ -1,0 +1,599 @@
+#!/usr/bin/env python3
+"""budget.py — a build's rework budget: one per build, frozen at Design's exit, drawn by every repetition and never by contention (TOOL-dDeclaredLoop-30).
+
+    python budget.py draw --build <slug> --cause <cause> --item <item>
+    python budget.py value
+    python budget.py --fixture --plant <case>
+    python budget.py --selftest
+
+THE VALUE. `flow.rework-budget` is `<base>+<per-unit>`, or a bare count, a base with no per-unit share,
+default `4+2`; `flow.route-backs` is a count, default 3. Both are read at HEAD through the policy kit's
+`resolve`, the kit found by `loop_parents.py`'s `read_policy_kit`, and the catalogue's own pattern
+refuses a value of another shape. Each row declares `raise-loosens`, so raising either is the owner's.
+
+THE ROWS. A build's budget is the rows of its transition log records (`loop_transition.py`), each
+record's lines after its fields, read in record order:
+
+    budget · frozen · <units> unit(s) · <total>
+    draw · <cause> · <item> · <spent>/<total>
+
+`total` is the freeze row's figure, else the base; `spent` is the count of draw rows, and a draw row
+whose typed figure is not its ordinal is a refusal naming it. Before the build's first log record the
+same rows sit in its run-state file and each rotated `RUN.LANDED.<blob8>.md` beside it, each prefixed by
+its UTC timestamp, oldest first; the transition writer copies them into the first record it writes.
+
+THE FREEZE. `freeze_budget` answers the row the transition writer writes on the move `designing` to
+`building`: the base plus the per-unit share for each unit a tracked spec H1 of the build defines, once,
+since a build holding a freeze row in any home writes no second. A build no recorded move names freezes
+at its first draw made while it defines a spec, counting its units then.
+
+THE DRAW. `record_draw(build, cause, item)` writes one draw row, the freeze row first where one is owed,
+and answers `drawn`; once spent equals total it writes nothing and answers `exhausted`, the ending
+`flow.on-exhausted` names being another unit's. The cause is one of `CAUSES`, and `patch:<slug>` is
+derived, never given: a build whose newest recorded move carries `scenario.patch` draws on the first
+build its README's `parents:` names, as `patch:<its slug>`. `draw` appends the rows to the build's
+newest log record and commits that record alone, its subject `loop budget(<slug>): <cause> <spent>/<total>`,
+or, with no log record, appends them to the run-state file; a build with neither refuses the draw, and so
+does a `transitions.record` set without `log`. `classify_repeat` answers `contention` for a repetition
+another build or the remote caused, which draws nothing; `count_returns` counts one item's draws against
+`flow.route-backs`, a spec subject's `review-round` draws never ending its loop; `promotion_target` answers
+`unit`, `ask` or `on-exhausted`; `budget_state` answers `open <spent>/<total>`, `spent` or
+`unfrozen <spent>/<total>`.
+
+Exit: `draw` prints `loop: budget · drawn · <row>` and exits 0, `loop: budget · exhausted · <slug> ·
+<spent>/<total> · flow.on-exhausted` and exits 3, `loop: budget · refused · <why>` and exits 2, and
+`loop: unarmed · <why>`, exit 2, where the policy or memory-tree kit does not resolve, never a default.
+`value` prints `base <n> per-unit <n>`. `--fixture --plant <case>` builds a scratch repository under the
+host temp directory, runs the case and prints `held` or `MISSED`; `--selftest` runs every plant.
+
+WHAT THIS DOES NOT CHECK: two racing draws, which are two rows; a row typed by hand with a right
+ordinal; the `research` cause's site, which no writer reaches yet.
+"""
+import argparse
+import contextlib
+import datetime
+import io
+import os
+import pathlib
+import re
+import shutil
+import sys
+import tempfile
+
+sys.dont_write_bytecode = True
+KIT = pathlib.Path(__file__).absolute().parent
+if str(KIT) not in sys.path:
+    sys.path.insert(0, str(KIT))
+from adapt import read_run_file  # noqa: E402
+from loop_lib import read_memory_tree, run_selftest_cases  # noqa: E402
+from loop_parents import read_policy_kit  # noqa: E402
+from loop_transition import (FX_BUILD, FX_SPEC, FX_UNIT, KEY, VALUE, read_build_unit_ids,  # noqa: E402
+                             read_memory_root, read_record_channels, read_transition_records, read_transitions,
+                             render_transition_trailer, write_transition, write_transition_plant,
+                             write_transition_record)
+from loop_witness import read_git, remove_tree, run_fixture_git, write_fixture_files  # noqa: E402
+
+SAY = "loop"
+BUDGET_KEY = "flow.rework-budget"
+ROUTE_KEY = "flow.route-backs"
+ENDING_KEY = "flow.on-exhausted"
+CAUSES = ("route-back", "fix-pass", "review-round", "re-dispatch", "research")
+PATCH = "patch:"
+PATCH_SCENARIO = "scenario.patch"
+#: The repetitions another build or the remote caused: each re-verifies in its turn and draws nothing.
+CONTENTION = ("stale-verdict", "conflicted-merge", "lease-wait", "remote-unreachable")
+FREEZE_ROW = "budget · frozen · %d unit(s) · %d"
+#: The UTC timestamp a run-state row opens with.
+STAMP = "%Y-%m-%dT%H:%M:%SZ"
+ROW = re.compile(r"budget · frozen · (\d+) unit\(s\) · (\d+)|draw · (\S+) · (\S+) · (\d+)/(\d+)")
+RUN_ROW = re.compile(r"(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ) ((?:budget|draw) · .*)")
+ROTATED = "RUN.LANDED.*.md"
+PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass drawn on each lap, nine laps",
+          "before-freeze": "designing back to planning and forward again, four laps, then a fifth route back",
+          "stale-verdict": "a gates verdict staled by another build's landing, re-verified",
+          "patch-draw": "fix-pass drawn by tFixPatch, a patch of the landed tFix, then the derived cause given",
+          "route-backs": "one item drawn four times under flow.route-backs = 3, another once, then spent",
+          "value": "flow.rework-budget set to 4+2, 6 and 4+, each the policy file's one revision",
+          "unknown-cause": "a draw given the cause retry",
+          "driver-draws": "the driver's two review rounds of one subject, a second generation, two dispatches",
+          "spent-spec-round": "flow.rework-budget = 0, a spec subject's and the build slug's second rounds",
+          "re-entry": "designing to building at three units, back, then building again at four",
+          "pre-spec": "two draws before any spec or move, then a spec, the first move and a third draw",
+          "no-log": "a draw under transitions.record without log",
+          "unrecorded": "a draw on two specs and no move, the run-state file rotated, then a second draw"}
+PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
+PLANT_SPEC = "# TOOL-%s-%d — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n"
+PATCH_BUILD = "tFixPatch"
+
+
+# ------------------------------------------------------------------------------------------ the reads
+def read_budget_value(root):
+    """`(base, per-unit, route-backs)` at HEAD of `root`. ValueError naming the key on a policy refusal
+    or a value of neither form; LookupError where the policy kit does not resolve."""
+    policy, _guard = read_policy_kit()
+    got = {}
+    for key in (BUDGET_KEY, ROUTE_KEY):
+        try:
+            got[key] = policy.resolve(key, str(root), "HEAD").value
+        except policy.Refusal as e:
+            raise ValueError("%s does not resolve at HEAD: %s" % (key, e)) from None
+    value = got[BUDGET_KEY]
+    hit = re.fullmatch(r"([0-9]+)\+([0-9]+)", value) if isinstance(value, str) else None
+    if hit:
+        return int(hit.group(1)), int(hit.group(2)), got[ROUTE_KEY]
+    if isinstance(value, int) and not isinstance(value, bool):
+        return value, 0, got[ROUTE_KEY]
+    raise ValueError("%s is %r, neither <base>+<per-unit> nor a bare count" % (BUDGET_KEY, value))
+
+
+def read_budget_rows(build, root, moves=None):
+    """The build's budget, re-derived from its rows: `rows` its home's rows oldest first, `home` the path a
+    draw appends to or None, `record` True where that home is a log record, `carried` the run-state rows
+    the build's first log record copies, `frozen_any` whether any home holds a freeze row, `spent`,
+    `total`, `freeze` the row a draw writes first under the unrecorded-build rule or None, `draws` each
+    draw row's `(cause, item)`, and `route-backs`. `moves`, the build's recorded moves where the caller
+    read them. ValueError on a row outside its grammar or a typed ordinal that disagrees; LookupError
+    where a kit does not resolve."""
+    root = pathlib.Path(root)
+    records = read_transition_records(build, root)
+    run = read_run_file(root, build)
+    carried = []
+    for path in sorted(run.parent.glob(ROTATED)) + [run]:
+        if path.is_file():
+            for ln in path.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n").split("\n"):
+                hit = RUN_ROW.fullmatch(ln.rstrip())
+                if hit:
+                    carried.append((hit.group(1), hit.group(2)))
+    carried = [text for _ts, text in sorted(carried, key=lambda r: r[0])]
+    held = []
+    for rec in records:
+        text = pathlib.Path(root, rec["path"]).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
+        held += [ln.rstrip() for ln in text.split("\n") if ln.startswith(("budget · ", "draw · "))]
+    rows = held if records else carried
+    frozen, draws = None, []
+    for row in rows:
+        hit = ROW.fullmatch(row)
+        if not hit:
+            raise ValueError("the budget row %r of %s is outside its grammar" % (row, build))
+        if hit.group(2) is not None:
+            frozen = int(hit.group(2)) if frozen is None else frozen
+            continue
+        draws.append((hit.group(3), hit.group(4)))
+        if int(hit.group(5)) != len(draws):
+            raise ValueError("the budget row %r of %s types %s spent, and it is draw %d of the build's rows" % (
+                row, build, hit.group(5), len(draws)))
+    base, per, route_backs = read_budget_value(root)
+    frozen_any = any(r.startswith("budget · ") for r in held + carried)
+    total, freeze = (frozen if frozen is not None else base), None
+    if not frozen_any:
+        units = read_build_unit_ids(build, root)
+        if units and not (read_transitions(build, root) if moves is None else moves):
+            total = base + per * len(units)
+            freeze = FREEZE_ROW % (len(units), total)
+    home = records[-1]["path"] if records else (run.relative_to(root).as_posix() if run.is_file() else None)
+    return {"rows": rows, "home": home, "record": bool(records), "carried": [] if records else carried,
+            "frozen_any": frozen_any, "spent": len(draws), "total": total, "freeze": freeze, "draws": draws,
+            "route-backs": route_backs}
+
+
+def derive_patch_origin(build, root, moves=None):
+    """The build whose budget `build`'s draws land on where `build` is a patch build, its newest recorded
+    move carrying `scenario.patch`: the first slug its README's `parents:` names. None for any other
+    build; ValueError where a patch build's README names no parent."""
+    moves = read_transitions(build, root) if moves is None else moves
+    if not moves or PATCH_SCENARIO not in moves[0].get("scenario", "").split("+"):
+        return None
+    read_memory_tree("gen_build_index.py")
+    from gen_build_index import Problem, parse_front_matter
+    readme = pathlib.Path(root, read_memory_root(root), "builds", build, "README.md")
+    try:
+        parents = parse_front_matter(str(readme), build).get("parents", "").split()
+    except (Problem, OSError) as e:
+        raise ValueError("the patch build %s's README does not read: %s" % (build, e)) from None
+    if not parents:
+        raise ValueError("%s is a patch build and its README names no parents:, so its draw has no originating "
+                         "budget" % build)
+    return parents[0]
+
+
+def budget_state(build, root="."):
+    """`open <spent>/<total>`, `spent`, or `unfrozen <spent>/<total>` where no freeze row is held."""
+    held = read_budget_rows(build, root)
+    if held["spent"] >= held["total"]:
+        return "spent"
+    return "%s %d/%d" % ("open" if held["frozen_any"] else "unfrozen", held["spent"], held["total"])
+
+
+def classify_repeat(event):
+    """The cause a repetition `event` draws, or `contention` for one another build or the remote caused,
+    which draws nothing. ValueError on an event of neither set."""
+    if event in CONTENTION:
+        return "contention"
+    if event in CAUSES:
+        return event
+    raise ValueError("the repetition %r is neither a cause, %s, nor contention, %s" % (
+        event, " ".join(CAUSES), " ".join(CONTENTION)))
+
+
+def count_returns(build, item, root="."):
+    """`(n, converging or non-converging)`: the draws naming `item`, and whether they passed
+    `flow.route-backs`. A spec subject's `review-round` draws are counted and never end its loop."""
+    held = read_budget_rows(build, root)
+    mine = [cause for cause, it in held["draws"] if it == item]
+    spec_rounds = item != build and mine and all(c == "review-round" for c in mine)
+    return len(mine), "non-converging" if len(mine) > held["route-backs"] and not spec_rounds else "converging"
+
+
+def promotion_target(build, item, blocking, root="."):
+    """Where an item past its early limit goes: `unit` for a blocking item while the budget remains,
+    `ask` for a non-blocking one, `on-exhausted` for a blocking one once the budget is spent."""
+    if not blocking:
+        return "ask"
+    return "on-exhausted" if budget_state(build, root) == "spent" else "unit"
+
+
+# ------------------------------------------------------------------------------------------ the writers
+def freeze_budget(build, root):
+    """The freeze row of `build` at HEAD, `budget · frozen · <units> unit(s) · <total>`, or None where any
+    home of the build already holds one. The transition writer writes it on `designing` to `building`."""
+    held = read_budget_rows(build, root, moves=[None])   # a non-empty `moves` skips the unrecorded-build read
+    if held["frozen_any"]:
+        return None
+    base, per, _routes = read_budget_value(root)
+    units = len(read_build_unit_ids(build, root))
+    return FREEZE_ROW % (units, base + per * units)
+
+
+def record_draw(build, cause, item, root=".", lines=None, moves=None):
+    """`("drawn", row)` after writing one draw row of `build`, a freeze row before it where one is owed,
+    or `("exhausted", "<slug> · <spent>/<total>")` writing nothing. Where `lines` is a list the rows are
+    added to it, the transition writer's record, and no file is written, save a patch build's, which
+    lands on its originating build's home. ValueError on a cause outside `CAUSES`, a derived cause
+    given, an item outside `VALUE`, a set without `log`, or a build with no home."""
+    if cause.startswith(PATCH):
+        raise ValueError("the cause %s is derived: a patch build's draw is named patch:<its slug> from its "
+                         "scenario, so it is never given" % cause)
+    if cause not in CAUSES:
+        raise ValueError("the cause %s is outside the closed set: %s %s<slug>" % (cause, " ".join(CAUSES), PATCH))
+    if not VALUE.fullmatch(item or ""):
+        raise ValueError("the item %r is outside [A-Za-z0-9._:+@-]+" % item)
+    root = pathlib.Path(root).absolute()
+    if "log" not in read_record_channels(root, "HEAD"):
+        raise ValueError("%s selects no log at HEAD, so the budget has no record to draw on" % KEY)
+    moves = read_transitions(build, root) if moves is None else moves
+    origin = derive_patch_origin(build, root, moves)
+    if origin:
+        build, cause, lines, moves = origin, PATCH + build, None, None
+    held = read_budget_rows(build, root, moves)
+    if held["spent"] >= held["total"]:
+        return "exhausted", "%s · %d/%d" % (build, held["spent"], held["total"])
+    row = "draw · %s · %s · %d/%d" % (cause, item, held["spent"] + 1, held["total"])
+    add = ([held["freeze"]] if held["freeze"] else []) + [row]
+    if lines is not None:
+        lines.extend(add)
+        return "drawn", row
+    if held["home"] is None:
+        raise ValueError("%s has neither a transition log record nor a run-state file, so the draw has no "
+                         "home" % build)
+    path = pathlib.Path(root, held["home"])
+    before = path.read_bytes()
+    if not held["record"]:
+        stamp = datetime.datetime.now(datetime.timezone.utc).strftime(STAMP)
+        with open(path, "ab") as fh:
+            fh.write(("" if before.endswith(b"\n") or not before else "\n").encode("utf-8"))
+            fh.write("".join("%s %s\n" % (stamp, r) for r in add).encode("utf-8"))
+        return "drawn", row
+    with open(path, "ab") as fh:
+        fh.write(("\n" if not held["rows"] else "").encode("utf-8") + "".join(r + "\n" for r in add).encode("utf-8"))
+    subject = "loop budget(%s): %s %d/%d" % (build, cause, held["spent"] + 1, held["total"])
+    if read_git(root, "commit", "-q", "--only", "-m", subject, "--", held["home"])[0] != 0:
+        path.write_bytes(before)
+        raise ValueError("git could not commit the draw on %s, so nothing is drawn" % held["home"])
+    return "drawn", row
+
+
+# ------------------------------------------------------------------------------------------ the plants
+def write_budget_plant(top, case):
+    """The scratch repository at `top` for `case`: the transition writer's plant, then this case's specs,
+    run-state file and policy file, committed."""
+    write_transition_plant(top, {"pre-spec": "pre-spec", "no-log": "subset-trailer-line"}.get(case, "default"))
+    units = {"mint-each-lap": 2, "unrecorded": 2, "re-entry": 3}.get(case, 1)
+    files = {FX_SPEC.replace(FX_UNIT, "TOOL-%s-%d" % (FX_BUILD, n)): PLANT_SPEC % (FX_BUILD, n)
+             for n in range(2, units + 1)}
+    if case in ("pre-spec", "no-log", "unrecorded"):
+        files["memory/builds/%s/RUN.md" % FX_BUILD] = PLANT_RUN
+    if case == "route-backs":
+        files[".governance/policy.toml"] = "[flow]\nroute-backs = 3\nrework-budget = 6\n"
+    write_fixture_files(top, files)
+    run_fixture_git(top, "add", "-A")
+    run_fixture_git(top, "commit", "-q", "--allow-empty", "-m", "the budget plant")
+
+
+def run_budget_plant(case):
+    """One plant: its lines, then `loop: fixture · <case> · held` or `MISSED <why>`; 0 held, 1 missed, 2
+    where a kit does not resolve."""
+    top = pathlib.Path(tempfile.mkdtemp(prefix="loop-budget-")).absolute()
+    misses, here = [], os.getcwd()
+    try:
+        print("%s: fixture · plant %s · %s" % (SAY, case, PLANTS[case]))
+
+        def run_verb(argv, repo=top):
+            """`(exit, output)` of this module's `main(argv)` run at `repo`'s top level, the output echoed."""
+            out = io.StringIO()
+            os.chdir(repo)
+            try:
+                with contextlib.redirect_stdout(out):
+                    rc = main(argv)
+            finally:
+                os.chdir(here)
+            print(out.getvalue().rstrip())
+            return rc, out.getvalue()
+
+        def run_move(state, item, outcome):
+            """One move of the plant's build through the transition writer: None, or the refusal."""
+            try:
+                write_transition(top, FX_BUILD, state, item, outcome, "HEAD", {}, {})
+            except ValueError as e:
+                print("%s: fixture · move %s · refused · %s" % (SAY, state, e))
+                return str(e)
+            return None
+
+        def write_spec(n):
+            """The plant build's n-th unit, its spec committed."""
+            write_fixture_files(top, {FX_SPEC.replace(FX_UNIT, "TOOL-%s-%d" % (FX_BUILD, n)): PLANT_SPEC % (FX_BUILD, n)})
+            run_fixture_git(top, "add", "-A")
+            run_fixture_git(top, "commit", "-q", "-m", "unit %d" % n)
+
+        def read_rows(build=FX_BUILD):
+            """The build's rows, printed."""
+            rows = read_budget_rows(build, top)["rows"]
+            print("%s: fixture · rows %s · %s" % (SAY, build, " | ".join(rows) or "none"))
+            return rows
+
+        def check(cond, why):
+            """A miss named where `cond` does not hold."""
+            if not cond:
+                misses.append(why)
+
+        def run_driver_case():
+            """The driver plants: this tree's unattended driver run in a scratch repository through `position.py`'s
+            plant and `run_driver`; the misses."""
+            from position import FX_IDS, FX_SLUG, run_driver, write_position_plant
+            root = next((d for d in (KIT, *KIT.parents) if (d / ".git").exists()), KIT)
+            repo = write_position_plant(top, "plan-line", root)[0]
+            policy = '[review.design]\nrounds = "fixed-count"\nround-count = 3\n'
+            policy += "\n[flow]\nrework-budget = 0\n" if case == "spent-spec-round" else ""
+            write_fixture_files(repo, {".governance/policy.toml": policy})
+            with open(repo / ".unattended.conf", "a", encoding="utf-8", newline="\n") as fh:
+                fh.write('\nSPEC_TOKENS_CLI=""\nRUN_CLAIMS="off"\n')
+            run_fixture_git(repo, "add", "-A")
+            run_fixture_git(repo, "commit", "-q", "-m", "the budget plant's policy")
+            run_fixture_git(repo, "push", "-q", "origin", "main")   # the review bounds read the landed revision
+            run = repo / "memory" / "builds" / FX_SLUG / "RUN.md"
+            missed = []
+
+            def run_round(subject, blockers):
+                """One `--review` round: `(exit, output)`, echoed."""
+                out, rc = run_driver(repo, "--review", FX_SLUG, "--subject", subject, "--verdict", "BLOCKED", "--blockers",
+                                     str(blockers))
+                print("%s: fixture · review %s · exit %d · %s" % (SAY, subject, rc, out.strip().replace("\n", " / ")[:400]))
+                return rc, out
+
+            def read_count(text):
+                """How many lines of the run-state file hold `text`."""
+                return run.read_text(encoding="utf-8").count(text)
+
+            if case == "driver-draws":
+                unit = FX_IDS[0]
+                run_round(unit, 3)
+                check_one = read_count("draw · ")
+                run_round(unit, 2)
+                run_round("%s-spec-set-r2" % FX_SLUG, 1)
+                for _n in range(2):
+                    out, rc = run_driver(repo, "--dispatch", FX_SLUG, "--pass", unit, "--writes", "work/a.txt")
+                    print("%s: fixture · dispatch · exit %d · %s" % (SAY, rc, out.strip().replace("\n", " / ")[:300]))
+                rows = [ln.split(" ", 1)[1] for ln in run.read_text(encoding="utf-8").split("\n") if RUN_ROW.fullmatch(ln)]
+                print("%s: fixture · rows %s · %s" % (SAY, FX_SLUG, " | ".join(rows) or "none"))
+                owed = [FREEZE_ROW % (3, 10), "draw · review-round · %s · 1/10" % unit,
+                        "draw · review-round · %s-spec-set-r2 · 2/10" % FX_SLUG, "draw · re-dispatch · %s · 3/10" % unit]
+                if check_one != 0:
+                    missed.append("the first round drew")
+                if rows != owed:
+                    missed.append("the rows read %s" % " | ".join(rows))
+            else:
+                run_round(FX_IDS[0], 3)
+                rc, out = run_round(FX_IDS[0], 2)
+                if rc != 0 or read_count("review · item %s · " % FX_IDS[0]) != 2:
+                    missed.append("the spec subject's second round under a spent budget was not recorded")
+                run_round(FX_SLUG, 3)
+                rc, out = run_round(FX_SLUG, 2)
+                if rc != 1 or ENDING_KEY not in out or read_count("review · item %s · " % FX_SLUG) != 1:
+                    missed.append("the build slug's second round was not refused naming %s" % ENDING_KEY)
+                if read_count("draw · ") or read_count("budget · "):
+                    missed.append("a spent budget wrote a row")
+            return missed
+
+        if case in ("driver-draws", "spent-spec-round"):
+            misses += run_driver_case()
+        elif case == "value":
+            for value, owed in (('"4+2"', "base 4 per-unit 2"), ("6", "base 6 per-unit 0"), ('"4+"', BUDGET_KEY)):
+                repo = top / ("v%d" % len(value))
+                repo.mkdir()
+                run_fixture_git(repo, "init", "-q", "--template=", "-b", "main")
+                write_fixture_files(repo, {".governance/policy.toml": "[flow]\nrework-budget = %s\n" % value})
+                run_fixture_git(repo, "add", "-A")
+                run_fixture_git(repo, "commit", "-q", "-m", "policy")
+                rc, out = run_verb(["value"], repo)
+                check(owed in out and rc == (2 if owed == BUDGET_KEY else 0), "value %s read %r, exit %d" % (
+                    value, out.strip(), rc))
+        else:
+            write_budget_plant(top, case)
+        draw = ["draw", "--build", FX_BUILD, "--cause", "fix-pass", "--item"]
+        if case == "mint-each-lap":
+            run_move("designing", "item.design.exit", "recorded")
+            for lap in range(1, 10):
+                write_spec(lap + 2)
+                rc, out = run_verb(draw + ["TOOL-%s-%d" % (FX_BUILD, lap + 2)])
+                owed = (0, "drawn · draw · fix-pass") if lap < 9 else (3, "exhausted · %s · 8/8" % FX_BUILD)
+                check(rc == owed[0] and owed[1] in out and ("%d/8" % lap in out or lap == 9),
+                      "lap %d answered %r" % (lap, out.strip()))
+            rows = read_rows()
+            check(rows.count(FREEZE_ROW % (2, 8)) == 1, "the freeze row is not budget · frozen · 2 unit(s) · 8")
+            check(sum(r.startswith("draw · ") for r in rows) == 8 and all(r.endswith("/8") for r in rows[1:]),
+                  "the draws are not eight, each of 8")
+        elif case == "before-freeze":
+            run_move("planning", "item.plan.exit", "recorded")
+            for _lap in range(4):
+                run_move("designing", "item.design.decompose", "goal-fork")
+                run_move("planning", "item.plan.exit", "recorded")
+            count = len(read_transition_records(FX_BUILD, top))
+            refused = run_move("designing", "item.design.decompose", "goal-fork")
+            check(refused and "spent" in refused, "the fifth route back was not refused as spent")
+            check(len(read_transition_records(FX_BUILD, top)) == count, "the refused move wrote a record")
+            homes = [r for r in read_transition_records(FX_BUILD, top) if "draw · route-back" in pathlib.Path(
+                top, r["path"]).read_text(encoding="utf-8")]
+            rows = read_rows()
+            check(rows == ["draw · route-back · item.design.decompose · %d/4" % n for n in range(1, 5)],
+                  "the draws do not read 1/4 to 4/4")
+            check(len(homes) == 4, "the four draws sit on %d record(s), not four" % len(homes))
+        elif case == "stale-verdict":
+            run_move("planning", "item.plan.exit", "recorded")
+            before = read_rows()
+            answer = classify_repeat("stale-verdict")
+            print("%s: fixture · classify_repeat · stale-verdict · %s" % (SAY, answer))
+            if answer != "contention":   # a repetition that is not contention draws, as the driver's sites do
+                record_draw(FX_BUILD, answer, FX_UNIT, top)
+            check(answer == "contention", "a verdict staled by another build's landing classified %s" % answer)
+            check(read_rows() == before, "the re-verification wrote a draw row")
+        elif case == "patch-draw":
+            head = run_fixture_git(top, "rev-parse", "HEAD")
+            move = {"build": FX_BUILD, "from": "deploying", "to": "landed", "item": "item.deploy.close", "sha": head[:8]}
+            write_transition_record(top, FX_UNIT, move)
+            write_fixture_files(top, {"memory/builds/%s/README.md" % PATCH_BUILD:
+                                      "---\nslug: %s\nnode: a\nopened: 2026-01-01\nstreams: tooling\nroster: TOOL\n"
+                                      "ids: TOOL-%s-1\nparents: %s\n---\n# %s\n" % (
+                                          PATCH_BUILD, PATCH_BUILD, FX_BUILD, PATCH_BUILD)})
+            run_fixture_git(top, "add", "-A")
+            run_fixture_git(top, "commit", "-q", "-m", "landed\n\n%s" % render_transition_trailer(move))
+            patch = {"build": PATCH_BUILD, "from": "planning", "to": "designing", "item": "item.plan.exit",
+                     "sha": head[:8], "scenario": PATCH_SCENARIO}
+            run_fixture_git(top, "commit", "-q", "--allow-empty", "-m", "patch\n\n%s" % render_transition_trailer(patch))
+            rc, out = run_verb(["draw", "--build", PATCH_BUILD, "--cause", "fix-pass", "--item", "item.deploy.close"])
+            row = "draw · patch:%s · item.deploy.close · 1/4" % PATCH_BUILD
+            check(rc == 0 and row in out, "the patch build's draw printed %r" % out.strip())
+            newest = read_transition_records(FX_BUILD, top)[-1]["path"]
+            check(row in pathlib.Path(top, newest).read_text(encoding="utf-8"), "%s does not carry the row" % newest)
+            state = read_transitions(FX_BUILD, top)[0]["to"]
+            print("%s: fixture · %s reads %s" % (SAY, FX_BUILD, state))
+            check(state == "landed", "%s reads %s after the draw" % (FX_BUILD, state))
+            rc, out = run_verb(["draw", "--build", FX_BUILD, "--cause", "patch:%s" % PATCH_BUILD, "--item", "x"])
+            check(rc == 2 and "derived" in out, "the derived cause given was not refused as derived")
+        elif case == "route-backs":
+            run_move("planning", "item.plan.exit", "recorded")
+            for item in ["TOOL-%s-1" % FX_BUILD] * 4 + ["TOOL-%s-2" % FX_BUILD]:
+                record_draw(FX_BUILD, "fix-pass", item, top)
+            looped = count_returns(FX_BUILD, "TOOL-%s-1" % FX_BUILD, top)
+            other = count_returns(FX_BUILD, "TOOL-%s-2" % FX_BUILD, top)
+            targets = [promotion_target(FX_BUILD, "TOOL-%s-1" % FX_BUILD, b, top) for b in (True, False)]
+            record_draw(FX_BUILD, "fix-pass", "TOOL-%s-2" % FX_BUILD, top)
+            targets.append(promotion_target(FX_BUILD, "TOOL-%s-1" % FX_BUILD, True, top))
+            print("%s: fixture · returns %s · %s · targets %s" % (SAY, looped, other, " ".join(targets)))
+            check(looped == (4, "non-converging"), "the item returned four times reads %s" % (looped,))
+            check(other == (1, "converging"), "the other item reads %s" % (other,))
+            check(targets == ["unit", "ask", "on-exhausted"], "the targets read %s" % " ".join(targets))
+        elif case == "unknown-cause":
+            run_move("planning", "item.plan.exit", "recorded")
+            rc, out = run_verb(["draw", "--build", FX_BUILD, "--cause", "retry", "--item", FX_UNIT])
+            check(rc == 2 and "retry" in out and "route-back" in out, "the cause retry was not refused by name")
+            check(read_rows() == [], "the refused cause wrote a row")
+        elif case == "re-entry":
+            run_move("designing", "item.design.exit", "recorded")
+            run_move("building", "item.build.unit-pass", "spec-wrong")
+            write_spec(4)
+            run_move("designing", "item.design.exit", "recorded")
+            rows = read_rows()
+            check([r for r in rows if r.startswith("budget · ")] == [FREEZE_ROW % (3, 10)],
+                  "the records do not carry one budget · frozen · 3 unit(s) · 10 row")
+        elif case == "pre-spec":
+            run_verb(draw + [FX_UNIT])
+            run_verb(draw + [FX_UNIT])
+            write_spec(1)
+            run_move("planning", "item.plan.exit", "recorded")
+            run_verb(draw + [FX_UNIT])
+            run_text = read_run_file(top, FX_BUILD).read_text(encoding="utf-8")
+            first = read_transition_records(FX_BUILD, top)[0]["path"]
+            text = pathlib.Path(top, first).read_text(encoding="utf-8")
+            owed = ["draw · fix-pass · %s · %d/4" % (FX_UNIT, n) for n in (1, 2, 3)]
+            print("%s: fixture · first record %s" % (SAY, first))
+            check(sum(r in run_text for r in owed[:2]) == 2 and owed[2] not in run_text,
+                  "the run-state file does not carry the first two rows alone")
+            check([ln for ln in text.split("\n") if ln.startswith("draw · ")] == owed,
+                  "the first log record does not carry the three rows in order")
+        elif case == "no-log":
+            rc, out = run_verb(draw + [FX_UNIT])
+            check(rc == 2 and KEY in out, "the draw under a set without log was not refused naming %s" % KEY)
+        elif case == "unrecorded":
+            run_verb(draw + [FX_UNIT])
+            run = read_run_file(top, FX_BUILD)
+            rotated = run.with_name("RUN.LANDED.0000aaaa.md")
+            shutil.move(str(run), str(rotated))
+            write_fixture_files(top, {run.relative_to(top).as_posix(): PLANT_RUN})
+            run_verb(draw + [FX_UNIT])
+            old, new = rotated.read_text(encoding="utf-8"), run.read_text(encoding="utf-8")
+            check(FREEZE_ROW % (2, 8) in old and "fix-pass · %s · 1/8" % FX_UNIT in old,
+                  "the first file does not carry the freeze at 2 units and 1/8")
+            check("fix-pass · %s · 2/8" % FX_UNIT in new and "budget · " not in new,
+                  "the new file does not carry 2/8 alone")
+    except LookupError as e:
+        print("%s: fixture · %s · unarmed: %s" % (SAY, case, e))
+        return 2
+    finally:
+        os.chdir(here)
+        remove_tree(top)
+    print("%s: fixture · %s · %s" % (SAY, case, "held" if not misses else "MISSED " + "; ".join(misses)))
+    return 0 if not misses else 1
+
+
+def run_selftest():
+    """Every plant, each held."""
+    cases = [(c, ["--fixture", "--plant", c], 0, "%s: fixture · %s · held" % (SAY, c), "") for c in PLANTS]
+    return run_selftest_cases(main, cases, "%s: budget selftest" % SAY)
+
+
+def main(argv):
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if argv == ["--selftest"]:
+        return run_selftest()
+    if len(argv) == 3 and argv[:2] == ["--fixture", "--plant"] and argv[2] in PLANTS:
+        return run_budget_plant(argv[2])
+    root = pathlib.Path.cwd()
+    try:
+        if argv == ["value"]:
+            base, per, _routes = read_budget_value(root)
+            print("base %d per-unit %d" % (base, per))
+            return 0
+        if argv[:1] == ["draw"]:
+            ap = argparse.ArgumentParser(prog="budget.py draw", description="draw one repetition on a build's budget")
+            for flag in ("--build", "--cause", "--item"):
+                ap.add_argument(flag, required=True)
+            args = ap.parse_args(argv[1:])
+            answer, said = record_draw(args.build, args.cause, args.item, root)
+            if answer == "exhausted":
+                print("%s: budget · exhausted · %s · %s" % (SAY, said, ENDING_KEY))
+                return 3
+            print("%s: budget · drawn · %s" % (SAY, said))
+            return 0
+    except LookupError as e:
+        print("%s: unarmed · %s" % (SAY, e))
+        return 2
+    except (ValueError, OSError) as e:
+        print("%s: budget · refused · %s" % (SAY, e))
+        return 2
+    print("usage: python budget.py draw --build <slug> --cause <%s> --item <item> | value | --fixture --plant <%s> "
+          "| --selftest" % ("|".join(CAUSES), "|".join(PLANTS)), file=sys.stderr)
+    return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

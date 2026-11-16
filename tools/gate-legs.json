@@ -2280,6 +2280,19 @@
     "stage": ["step.test"]
   },
   {
+    "name": "loop budget fixtures",
+    "argv": [
+      "python",
+      "{prefix}/loop/budget.py",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "enforces": ["principle.p39"],
+    "stage": ["step.test"]
+  },
+  {
     "name": "loop scenario fixtures",
     "argv": [
       "python",

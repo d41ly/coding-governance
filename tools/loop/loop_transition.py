@@ -38,7 +38,11 @@ does not record (TOOL-dDeclaredLoop-28); back-fills, writes this move's record, 
 `loop: recorded · <from> -> <to> · <direction> · commit <sha8>`, and prints the line where selected. A
 set storing neither the trailer nor the log writes no commit. A backward move, testing to building say,
 goes through this one writer, its channels and its fields as a forward move does: the direction is
-`loop_table`'s `derive_direction`, derived on every print and read, and never stored.
+`loop_table`'s `derive_direction`, derived on every print and read, and never stored. The rework budget
+rides the same records (`budget.py`, TOOL-dDeclaredLoop-30): a backward move draws `route-back`, refused
+before any write where the budget is spent, and the move from `designing` to `building` writes the freeze
+row, once; each row is a line after the record's fields, the build's first record copying the run-state
+rows before it, and where the move writes no record its row is a run-state line.
 
 `check` (`check_transition_channels`) holds each channel to the trailer: per trailer whose commit's set
 holds `log`, one record with equal `**Key:**` fields; no record left over where its adding commit's set
@@ -73,6 +77,7 @@ order, the n-th owing trailer with the n-th such record, so two records swapped 
 """
 import argparse
 import contextlib
+import datetime
 import io
 import pathlib
 import re
@@ -233,6 +238,13 @@ def read_memory_root(root):
 
 def resolve_build_anchor(build, root):
     """The lowest unit id a tracked spec H1 under `build` defines, by its number, or None."""
+    ids = read_build_unit_ids(build, root)
+    return min(ids, key=lambda i: (int(i.rsplit("-", 1)[1]), i), default=None)
+
+
+def read_build_unit_ids(build, root):
+    """The unit ids the tracked spec H1s under `build` define, in `git ls-files` order: the anchor's walk,
+    and the units the rework budget counts at its freeze (`budget.py`)."""
     read_memory_tree("tree_lib.py")
     from design_lib import read_design_conf, read_tracked_builds
     from tree_lib import parse_spec_h1
@@ -247,7 +259,7 @@ def resolve_build_anchor(build, root):
             hit = parse_spec_h1(rel, path.read_bytes().decode("utf-8", "replace"), memory_root, families)
             if hit:
                 ids.append(hit[1])
-    return min(ids, key=lambda i: (int(i.rsplit("-", 1)[1]), i), default=None)
+    return ids
 
 
 def read_transition_commits(build, root):
@@ -326,13 +338,14 @@ def read_transitions(build, repo):
 
 
 # ------------------------------------------------------------------------------------------ the writer
-def write_transition_record(root, anchor, move):
-    """The next transition record of the move's build, under `anchor`, from `move`'s fields: its path."""
+def write_transition_record(root, anchor, move, lines=()):
+    """The next transition record of the move's build, under `anchor`, from `move`'s fields, then `lines`,
+    the rework budget's rows: its path."""
     read_memory_tree("build_records.py")
     from build_records import write_record
     names = ("build", "from", "to", "item", "sha") + tuple(n for n in TRANSITION_FIELDS if n in move)
     return write_record(root, move["build"], anchor, KIND, "%s -> %s" % (move["from"], move["to"]),
-                        [(render_record_key(n), move[n]) for n in names])
+                        [(render_record_key(n), move[n]) for n in names], lines=tuple(lines))
 
 
 def write_transition(root, build, state, item, outcome, witness, facts, fields):
@@ -383,6 +396,27 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
         raise ValueError("the value of %s, %r, is outside [A-Za-z0-9._:+@-]+" % (bad[0], move[bad[0]]))
     if read_git(root, "diff", "--cached", "--quiet")[0] != 0:
         raise ValueError("the index holds staged changes, and a transition commit carries its own records alone")
+    # the rework budget (TOOL-dDeclaredLoop-30): a backward move draws `route-back`, refused here before any
+    # write where the budget is spent, and the move from designing to building freezes it, once. The rows
+    # are lines of this move's record, the build's first record copying the run-state rows before them, or,
+    # where the move writes no record, run-state lines; a route-back draw with neither home is refused
+    from adapt import read_adapt_mode, read_pending_rows, read_run_file, write_flow_states, write_path_orders
+    from budget import STAMP, freeze_budget, read_budget_rows, record_draw   # it imports this module, so here
+    direction = derive_direction(state, to, read_transition_rows(data, where))
+    anchor = resolve_build_anchor(build, root) if "log" in chosen else None
+    run, rows = read_run_file(root, build), []
+    if direction == "backward":
+        answer, drawn = record_draw(build, "route-back", item, root, lines=rows, moves=before)
+        if answer == "exhausted":
+            raise ValueError("the rework budget is spent, %s, so the backward move is refused and nothing is "
+                             "recorded; flow.on-exhausted names the ending" % drawn)
+        if rows and not anchor and not run.is_file():
+            raise ValueError("%s has neither a transition log record nor a run-state file, so the route-back "
+                             "draw has no home" % build)
+    elif (state, to) == ("designing", "building"):
+        rows += [r for r in (freeze_budget(build, root),) if r and (anchor or run.is_file())]
+    carried = read_budget_rows(build, root, before)["carried"] if anchor and not read_transition_records(
+        build, root) else []
     pin, state_read = read_step_composition(root, before)
     if state_read == PINNED and not pin.startswith(move["composition"]):
         try:
@@ -394,11 +428,9 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
     # the build's own flow changes at this boundary (TOOL-dDeclaredLoop-28): the walked path held to the
     # composition on a forward move, then each pending change given its state row in RUN.md, which rides
     # this move's commit and is cut back to its length here where the move does not record
-    from adapt import read_adapt_mode, read_pending_rows, read_run_file, write_flow_states, write_path_orders
-    direction = derive_direction(state, to, read_transition_rows(data, where))
     if direction == "forward":
         said += write_path_orders(root, build, state)
-    run, size = read_run_file(root, build), None
+    size = None
     if direction in ("forward", "backward") and read_pending_rows(root, build):
         mode = read_adapt_mode(root)
         size = run.stat().st_size
@@ -407,7 +439,6 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
     wrote = []
     try:
         if "log" in chosen:
-            anchor = resolve_build_anchor(build, root)
             if anchor is None and "trailer" not in chosen:
                 raise ValueError("%s selects log without trailer and %s defines no spec, so the move has no record "
                                  "to write and no trailer to back-fill one from" % (KEY, build))
@@ -415,12 +446,19 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
                 moves = read_transition_moves(build, root, cache)
                 try:
                     for _c, t in moves["owing"][len(moves["paired"]):]:
-                        wrote.append(write_transition_record(root, anchor, t))
-                    wrote.append(write_transition_record(root, anchor, move))
+                        wrote.append(write_transition_record(root, anchor, t, () if wrote else carried))
+                    wrote.append(write_transition_record(root, anchor, move, ([] if wrote else carried) + rows))
                 except (ValueError, OSError):
                     for rel in wrote:
                         pathlib.Path(root, rel).unlink()
                     raise
+        if rows and not wrote:
+            size = run.stat().st_size if size is None else size
+            stamp = datetime.datetime.now(datetime.timezone.utc).strftime(STAMP)
+            lead = "" if run.read_bytes().endswith(b"\n") or not run.stat().st_size else "\n"
+            with open(run, "ab") as fh:
+                fh.write((lead + "".join("%s %s\n" % (stamp, r) for r in rows)).encode("utf-8"))
+            staged = [run.relative_to(root).as_posix()]
         commit = None
         if wrote or "trailer" in chosen:
             argv = ["commit", "-q", "--allow-empty", "-m", "loop transition(%s): %s -> %s" % (build, state, to)]

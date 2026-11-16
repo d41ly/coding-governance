@@ -1274,6 +1274,51 @@ moves the spec bound.
 The bounds do not tell whether a round's recorded counts are true, or whether a raise of a bound was
 yours; check 19 grades only a run's own commits.
 
+## How much rework a build may do
+
+Every build has one rework budget, the policy key `flow.rework-budget`, and every repetition draws on
+it: a route back to an earlier step, a fix pass, a review round after a subject's first, a unit
+dispatched again, and the first round of each spec-set generation after the first. The value is
+`<base>+<per-unit>`, default `4+2`, or a bare count such as `6`, which is a base with no per-unit share.
+Any other shape is refused, naming the key. Raising it is yours, the owner's: the key loosens as it
+rises, so an agent's run never writes it.
+
+The budget freezes at Design's exit. When a build moves from `designing` to `building`, its total
+becomes the base plus the per-unit share for each unit its specs define then, written once as
+`budget · frozen · <units> unit(s) · <total>` in that move's transition record. A unit minted after
+the freeze adds nothing, and a route back into building does not re-size it. A build that has recorded
+no move freezes at its first draw made while it has a spec, counting its units then. Before that, its
+total is the base.
+
+Each draw is one row, `draw · <cause> · <item> · <spent>/<total>`, in the build's newest transition
+record, committed on its own. Before the build's first record, the rows go in its `RUN.md`, and the
+first record copies them. Once spent equals the total, the next draw writes nothing and answers
+`exhausted`; what the build does then is `flow.on-exhausted`'s. A spec audit's round is still recorded
+when the budget is spent, and ends at its target or its bound; the closing review's round and a
+dispatch are refused. A patch build draws on the build it patches, as `patch:<its slug>`.
+
+Contention draws nothing: a verdict staled by another build's landing, a merge conflicted by another
+build's landing, a wait on a lease another build holds and an unreachable remote are re-run in their
+turn and spend none of this build's budget. `flow.route-backs`, default 3, counts one item's draws:
+past it, that item's loop is non-converging, though a spec subject's review rounds never end its loop.
+
+- **Draw on a budget:** `python tools/loop/budget.py draw --build <slug> --cause <cause> --item <item>` <!-- usage: script:tools/loop/budget.py#draw 7c651ac5 -->
+  runs at your repository's top level. It prints `loop: budget · drawn · <row>` and exits 0,
+  `loop: budget · exhausted · <slug> · <spent>/<total> · flow.on-exhausted` and exits 3, or
+  `loop: budget · refused` and why, exit 2, for a cause outside `route-back`, `fix-pass`,
+  `review-round`, `re-dispatch` and `research`, a `patch:` cause given, which is derived, a build with
+  no record and no `RUN.md`, or a `transitions.record` without `log`. The unattended driver draws
+  through it on `--review` and `--dispatch`.
+
+- **See the value:** `python tools/loop/budget.py value` prints `base <n> per-unit <n>` from the policy <!-- usage: script:tools/loop/budget.py#value 689b423c -->
+  file at HEAD, or refuses a value of another shape naming the key.
+
+- **See it on a fixture:** `python tools/loop/budget.py --fixture --plant <case>` runs one case in a <!-- usage: script:tools/loop/budget.py 8248cc63 -->
+  scratch repository, and `--selftest` runs them all. Gov's own `loop budget fixtures` gate runs them.
+
+The budget does not serialize two draws made at once, which are two rows, and does not say what a
+build does once it is spent.
+
 ## How to use it
 
 - **Read the loop:** `python tools/loop/loop_lib.py --check` prints one line per step and per <!-- usage: script:tools/loop/loop_lib.py 8a025e56 -->

@@ -97,7 +97,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 100 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 100 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13
 ids TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26
 ids TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-35 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39
@@ -161,7 +161,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-28 — a build's recorded changes under flow.adapt, applied at its next step boundary, and its witnessed path held to its composition](spec/2026-10-24-spec-TOOL-dDeclaredLoop-28.md) | 25 | 2 | CLOSED | rev-6 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-21 — the review round bounds as policy keys: review.max-rounds, the design rounds and follow-ups, REVIEW_ROUNDS and RUNAWAY_CEILING retired](spec/2026-10-24-spec-TOOL-dDeclaredLoop-21.md) | 26 | 2 | CLOSED | rev-8 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-34 — the deviation approval route read from deviation.approval: by its risk, the owner for all, or its author recorded](spec/2026-10-24-spec-TOOL-dDeclaredLoop-34.md) | 27 | 2 | DEFERRED | rev-4 | 2026-11-16 |
-| [TOOL-dDeclaredLoop-30 — the rework budget: one per build on its transition record, frozen at Design's exit, drawn by every repetition and never by contention](spec/2026-10-24-spec-TOOL-dDeclaredLoop-30.md) | 28 | 2 | INPROGRESS | rev-5 | 2026-11-16 |
+| [TOOL-dDeclaredLoop-30 — the rework budget: one per build on its transition record, frozen at Design's exit, drawn by every repetition and never by contention](spec/2026-10-24-spec-TOOL-dDeclaredLoop-30.md) | 28 | 2 | CLOSED | rev-5 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-32 — the convergence routing: every closing-review and fix-pass loop ends on a non-decrease of its blocker and high count, its findings promoted by budget](spec/2026-10-24-spec-TOOL-dDeclaredLoop-32.md) | 29 | 2 | DEFERRED | rev-4 | 2026-11-05 |
 | [TOOL-dDeclaredLoop-48 — the rework budget keeps a home under every channel set `transitions.record` admits](spec/2026-10-24-spec-TOOL-dDeclaredLoop-48.md) | 29 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-49 — the budget's `spent` counts every draw of the build, across every record, in commit order](spec/2026-10-24-spec-TOOL-dDeclaredLoop-49.md) | 29 | 2 | DEFERRED | rev-2 | 2026-10-24 |
@@ -213,7 +213,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 595 bound to this build, across 4 record folder(s).
+Records: 596 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

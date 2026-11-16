@@ -524,6 +524,26 @@ entry = "{prefix}/loop/adapt.py"
 flags = ["--fixture", "--plant=", "--selftest"]
 
 [[usage]]
+id = "script:{prefix}/loop/budget.py"
+shape = "verb"
+entry = "{prefix}/loop/budget.py"
+flags = ["--fixture", "--plant=", "--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/budget.py#draw"
+shape = "verb"
+entry = "{prefix}/loop/budget.py"
+verb = "draw"
+flags = ["--build=", "--cause=", "--item="]
+
+[[usage]]
+id = "script:{prefix}/loop/budget.py#value"
+shape = "verb"
+entry = "{prefix}/loop/budget.py"
+verb = "value"
+flags = []
+
+[[usage]]
 id = "script:{prefix}/loop/scenario.py"
 shape = "verb"
 entry = "{prefix}/loop/scenario.py"

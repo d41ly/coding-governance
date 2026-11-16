@@ -2288,6 +2288,11 @@
       "file": "tools/unattended/check-unattended.test.sh"
     },
     {
+      "id": "budget_state",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
+    },
+    {
       "id": "build",
       "kind": "function",
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
@@ -8698,6 +8703,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "classify_repeat",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
+    },
+    {
       "id": "classify_row",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -9361,6 +9371,11 @@
       "id": "count_over",
       "kind": "function",
       "file": "tools/check-line-length.sh"
+    },
+    {
+      "id": "count_returns",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
     },
     {
       "id": "counts",
@@ -11456,6 +11471,11 @@
       "id": "derive_patch_class",
       "kind": "function",
       "file": "tools/playbook/row_checks.py"
+    },
+    {
+      "id": "derive_patch_origin",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
     },
     {
       "id": "derive_path_deviations",
@@ -13728,6 +13748,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "freeze_budget",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
+    },
+    {
       "id": "fresh_gitdir",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
@@ -15156,6 +15181,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/loop/adapt.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
     },
     {
       "id": "main",
@@ -17848,6 +17878,11 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
+      "id": "promotion_target",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
+    },
+    {
       "id": "prose",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.test.sh"
@@ -18653,9 +18688,19 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "read_budget_rows",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
+    },
+    {
       "id": "read_budget_rule",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "read_budget_value",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
     },
     {
       "id": "read_budgets",
@@ -18666,6 +18711,11 @@
       "id": "read_build_slug",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "read_build_unit_ids",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
     },
     {
       "id": "read_builds_dir",
@@ -23036,6 +23086,11 @@
       "id": "reconcile",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "record_draw",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
     },
     {
       "id": "record_for",
@@ -28063,9 +28118,19 @@
       "file": "tools/playbook/load_sets.py"
     },
     {
+      "id": "run_budget_draw",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "run_budget_home",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_budget_plant",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
     },
     {
       "id": "run_budgets",
@@ -30071,6 +30136,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/loop/adapt.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
     },
     {
       "id": "run_selftest",
@@ -35061,6 +35131,11 @@
       "id": "write_brief_record",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_budget_plant",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
     },
     {
       "id": "write_c42_conf",

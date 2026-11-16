@@ -8873,6 +8873,28 @@ same "a round under a refused bound wrote nothing" "$(grep -c 'review · item R1
 git update-ref refs/remotes/origin/main "$BASE"
 reset_tree
 
+# ---- TOOL-dDeclaredLoop-30: THE REWORK BUDGET REFUSES A ROUND AND A DISPATCH. A policy file at HEAD setting
+# ---- flow.rework-budget = 0 leaves nothing to draw, through this tree's budget.py: the build slug's second
+# ---- round is refused in verb_review's `fail 37` and a unit's second dispatch in verb_dispatch's `fail 49`,
+# ---- each writing no row, while a spec subject's second round is recorded all the same.
+bcopen; crdrop
+printf '# ARCH-tRun-1 — the unit\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-1 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n' > memory/builds/tRun/spec/one.md
+printf '\n[flow]\nrework-budget = 0\n' >> .governance/policy.toml
+fixture
+run --review tRun --subject tRun --verdict BLOCKED --blockers 3 >/dev/null
+out=$(run --review tRun --subject tRun --verdict BLOCKED --blockers 2)
+hit "$out" "the rework budget refused this review round, so no round is recorded: "
+hit "$out" "flow.on-exhausted"
+same "a closing round the budget refused wrote nothing" "$(grep -c ' review · item tRun · reason' memory/builds/tRun/RUN.md)" "1"
+run --review tRun --subject S7 --verdict BLOCKED --blockers 3 >/dev/null
+hit "$(run --review tRun --subject S7 --verdict BLOCKED --blockers 2)" "S7 · round 2"
+same "a spec subject's round under a spent budget is recorded" "$(grep -c ' review · item S7 · reason' memory/builds/tRun/RUN.md)" "2"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes src/rb.sh)" "dispatch declared"
+out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes src/rb.sh)
+hit "$out" "the rework budget refused this dispatch, so no dispatch is recorded: "
+same "a dispatch the budget refused wrote nothing" "$(grep -c ' ARCH-tRun-1 · reason src/rb.sh' memory/builds/tRun/RUN.md)" "1"
+reset_tree
+
 # ---- TOOL-aBatchedMinors-2: THE CLOSING REVIEW PROMOTES EVERY FINDING, and its exit COUNTS them. The
 # ---- owner ruled on 2026-10-04 that a closing diff review's mediums and lows are promoted too,
 # ---- batched into one unit or two, so the slug subject's terminal round records the highs and

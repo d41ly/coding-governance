@@ -6177,6 +6177,20 @@ resolve_position_engine() { # [script] -> sets PE_PY and PE_PATH; 1 where python
   PE_PATH="${_r:-.}/$_d/$_s"
   [ -f "$PE_PATH" ]
 }
+# THE REWORK BUDGET'S DRAW (TOOL-dDeclaredLoop-30): the loop kit's `budget.py draw`, found as the engine is,
+# each value JOINED to its flag so one opening `-` is never read as a flag. It prints the script's output and
+# calls no `fail`: each verb relays a refusal in its own literal branch, which check-arms reads by its code.
+run_budget_draw() { # slug · cause · item -> sets _bd_why to the script's first line and _bd_rc to its exit, 2 where it does not resolve
+  local _bd_out
+  _bd_why="the loop kit's budget.py or python does not resolve beside this kit, so the draw cannot be made"
+  _bd_rc=2
+  resolve_position_engine budget.py || return 0
+  _bd_out=$("$PE_PY" "$PE_PATH" draw "--build=$1" "--cause=$2" "--item=$3" 2>&1); _bd_rc=$?
+  [ -n "$_bd_out" ] && printf '%s\n' "$_bd_out"
+  _bd_why=${_bd_out%%$'\n'*}; _bd_why=${_bd_why%$'\r'}
+  [ -n "$_bd_why" ] || _bd_why="budget.py draw printed nothing and exited $_bd_rc"
+  return 0
+}
 verb_plan() { # slug
   local slug="$1" dir specs spec id st state miss nmiss=0 _ar_id _ar_sum _rev
   # THE ENGINE'S HAND-OVER (TOOL-dDeclaredLoop-7), collected by the loops below and read ONCE at the
@@ -13341,6 +13355,21 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   # the count. No new field, no new grammar, no new authored fact: an append-only history of rounds is
   # what a park KIND is for, and the sibling unit takes the FACT route for a per-run singleton instead.
   disp=""; [ -n "$disposition" ] && disp=" · disposition $disposition"
+  # THE REWORK BUDGET (TOOL-dDeclaredLoop-30): every round of a subject after its first, and the first round
+  # of a spec-set generation after the first, draws `review-round`, after every refusal above and before its
+  # row, so a refused round spends nothing and a first round calls nothing. A spec subject's `exhausted`,
+  # exit 3, records its round all the same, which ends at its target or its bound; any other answer but
+  # drawn refuses the round.
+  local _rv_gen=0
+  case "$subj" in "$slug"-spec-set-r[0-9]*) _rv_gen=${subj##*-spec-set-r} ;; esac
+  case "$_rv_gen" in ""|*[!0-9]*|??????????*) _rv_gen=0 ;; esac
+  if [ -n "${prior//[[:space:]]/}" ] || [ "$((10#$_rv_gen))" -gt 1 ]; then
+    run_budget_draw "$slug" review-round "$subj"
+    if [ "$_bd_rc" -ne 0 ] && { [ "$_bd_rc" -ne 3 ] || [ "$subj" = "$slug" ]; }; then
+      fail 37 "the rework budget refused this review round, so no round is recorded: $_bd_why"
+      return 1
+    fi
+  fi
   # THE COUNTS SIT BEFORE THE DISPOSITION: check 2 reads the disposition as the LAST ` · ` field.
   park "$rel" review "$subj" "verdict $verdict · blockers $blockers$note$counts$disp" || return 1
   stage_or_fail "$rel" || return 1
@@ -15274,6 +15303,22 @@ SIBS
       1) return 1 ;;
       0) write_claim "$slug" live "$_dk" holder "$rel" || [ "$?" = 2 ] || return 1 ;;
     esac
+  fi
+  # THE REWORK BUDGET (TOOL-dDeclaredLoop-30): a unit dispatched again draws, after every refusal above and
+  # before its row, so a refused dispatch spends nothing: `re-dispatch` where its newest earlier dispatch row
+  # left no pass commit, read by `pass_commit`, and `fix-pass` where that pass committed. A first dispatch
+  # calls nothing, and any answer but drawn refuses the dispatch.
+  local _bd_last _bd_cause
+  _bd_last=$(grep -F -- " dispatch · item " "$rel" 2>/dev/null | grep -F -- " $unit · reason " | tail -n 1)
+  if [ -n "$_bd_last" ]; then
+    _bd_last=${_bd_last#* dispatch · item }; _bd_last=${_bd_last%% *}
+    _bd_cause=re-dispatch
+    [ -z "$(pass_commit "$_bd_last" "$unit" "$rel" || true)" ] || _bd_cause=fix-pass
+    run_budget_draw "$slug" "$_bd_cause" "$unit"
+    if [ "$_bd_rc" -ne 0 ]; then
+      fail 49 "the rework budget refused this dispatch, so no dispatch is recorded: $_bd_why"
+      return 1
+    fi
   fi
   park "$rel" dispatch "$grp $unit" "$want" || return 1
   stage_or_fail "$rel" || return 1
