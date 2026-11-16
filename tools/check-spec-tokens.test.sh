@@ -104,7 +104,9 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # top-level. Counted by reading; OWED: observed at the close.
 # RAISED 278 -> 282 by TOOL-aPiecewiseGrade-5: its four nonzero-counter arms, each top-level. Counted by
 # reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=282
+# RAISED 282 -> 284 by TOOL-aPiecewiseGrade-8: its two counter key-set arms after the PG4 block, each
+# top-level. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=284
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -2524,6 +2526,33 @@ run_grade_checker selfnamed SPEC_TOKENS_CACHE="$pc" SPEC_TOKENS_CACHE_NEXT="$pc"
 pg_after=$(git -C "$pd" status --porcelain; ls -a "${pc%/*}"; cd "$pc" && find . -type f -exec cksum {} + | sort)
 [ -n "$pg_before" ] && [ "$pg_before" = "$pg_after" ]
 check_input_arm "PG4 AC3 SPEC_TOKENS_CACHE alone, and both variables naming one directory, leave the cache and its parent as they were" $?
+
+# TOOL-aPiecewiseGrade-8 AC1 AC2: the per-spec counter key-set guards, over the PG1 fixture's warm
+# cache. A cached entry whose counts lack ao_bad is a miss, regraded with the plain run's bytes; a fresh
+# counts set lacking it raises KeyError before the summary. The staged breaks, at the close: S4's two
+# lines in read_spec_cache deleted whole, which reds the first, and S3's two lines in main, the second.
+cp -r "$pc" "$base/pgcache/drop"
+"$PY" -c 'import json, sys
+p = sys.argv[1]; e = json.load(open(p, encoding="utf-8")); del e["counts"]["ao_bad"]
+json.dump(e, open(p, "w", encoding="utf-8"))' "$base/pgcache/drop/$pg_ida.json"
+pg_nx=$(mktemp -d "$pc.XXXXXXXX")
+run_grade_checker kdplain
+run_grade_checker kdrop SPEC_TOKENS_CACHE="$base/pgcache/drop" SPEC_TOKENS_CACHE_NEXT="$pg_nx"
+pg_list=$(tr -d '\r' < "$pg_nx/graded.list")
+[[ $'\n'$pg_list$'\n' == *$'\n'$pg_a$'\n'* ]] && check_grade_same kdplain kdrop
+check_input_arm "PG8 AC1 a cached entry whose counts lack ao_bad is a miss, and the run prints the plain run's bytes" $?
+(cd "$pd" && env -u SPEC_TOKENS_CACHE -u SPEC_TOKENS_CACHE_NEXT -u SPEC_TOKENS_INPUTS "$PY" -c 'import importlib.util, sys
+sys.stdout.reconfigure(encoding="utf-8")
+s = importlib.util.spec_from_file_location("cst", sys.argv[1])
+cst = importlib.util.module_from_spec(s); s.loader.exec_module(cst)
+real = cst.scan_live_spec
+def drop(*a):
+    hits, near, counts = real(*a)
+    return hits, near, {k: v for k, v in counts.items() if k != "ao_bad"}
+cst.scan_live_spec = drop
+sys.exit(cst.main([]))' "${PFX}check-spec-tokens.py") >"$po/fresh.out" 2>"$po/fresh.err"
+[ $? = 1 ] && grep -q KeyError "$po/fresh.err" && grep -q ao_bad "$po/fresh.err" && ! grep -q 'live spec(s) ·' "$po/fresh.out"
+check_input_arm "PG8 AC2 a fresh counts set lacking ao_bad raises KeyError naming it, with no summary line" $?
 
 # TOOL-dGroundRules-32 S9, TOOL-dGroundRules-40: the build-order render's overlap rule is the
 # dispatcher's, and both are graded against the truth. Each OVERLAP_PAIRS row is two paths relative to

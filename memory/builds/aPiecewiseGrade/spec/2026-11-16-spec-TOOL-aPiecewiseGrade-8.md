@@ -1,11 +1,12 @@
 # TOOL-aPiecewiseGrade-8 — two permanent arms hold the spec-token checker's counter key-set guards
 
-**Status:** INPROGRESS · rev-1 · 2026-11-16 · node a · Tier-1 · base aebbb4a72 · streams tooling · order 6
+**Status:** CLOSED · rev-1 · 2026-11-16 · node a · Tier-1 · base aebbb4a72 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-16-build-TOOL-aPiecewiseGrade-8-1-acceptance-ledger.md](../build/2026-11-16-build-TOOL-aPiecewiseGrade-8-1-acceptance-ledger.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aPiecewiseGrade-8-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-aPiecewiseGrade-8-1-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aPiecewiseGrade-8-review-brief.md](../prompts/2026-11-16-prompt-TOOL-aPiecewiseGrade-8-review-brief.md) | research | — |
 
