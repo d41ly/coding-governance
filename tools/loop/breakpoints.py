@@ -110,7 +110,10 @@ PLANTS = {"values": "no policy file, then autonomy three-gates and every-stage, 
                            "and merged in, one opened after it and one uncommitted, listed by the scratch's own "
                            "module, then the first read by this tree's",
           "driver-pre-placement": "the same history with the driver copied beside the scratch's loop kit, its "
-                                  "sourced check_owner_gates over the build opened before and the one after"}
+                                  "sourced check_owner_gates over the build opened before and the one after",
+          "pre-placement-records-root": "the same history under MEMORY_ROOT=records, build tRec opened under "
+                                        "records/builds/ and tWrong under memory/builds/, listed by the scratch's "
+                                        "own module, then tWrong again with no policy file"}
 
 
 # ------------------------------------------------------------------------------------------ the rule
@@ -214,7 +217,8 @@ def read_first_add(root, rel):
 def read_breakpoints(build, root, spec_audit=False, delegated=False):
     """`derive_breakpoints` over `build`'s policy, steps, composed tags and tiers, each owner line's release
     read: `passed before placement` on each owner gate of a build opened before this module was placed,
-    else `released <stem> <word>` where the owner's disposition record of its tag answers."""
+    else `released <stem> <word>` where the owner's disposition record of its tag answers. An owner gate
+    still `held` where the opening read found no commit adding the README carries `unopened`, that path."""
     check_slug(build)
     root = pathlib.Path(root).absolute()
     values = read_policy_values(root)
@@ -224,14 +228,17 @@ def read_breakpoints(build, root, spec_audit=False, delegated=False):
     tiers = [tier for _uid, _status, tier in read_build_headers(build, root)]
     out = derive_breakpoints(values, read_steps(KIT), tags,
                              {"spec_audit": spec_audit, "delegated": delegated, "tiers": tiers})
-    early = False
+    early, unopened = False, None
     if any(b["name"] == "owner gate" for b in out):   # TOOL-dDeclaredLoop-53: opened before the placement
         try:
             placement = read_first_add(root, (KIT / "breakpoints.py").resolve().relative_to(root.resolve()).as_posix())
         except ValueError:
             placement = None
-        opening = placement and read_first_add(root, "%s/builds/%s/README.md" % (read_memory_root(root), build))
-        early = bool(opening) and not check_is_ancestor(root, placement, opening)
+        if placement:
+            readme = "%s/builds/%s/README.md" % (read_memory_root(root), build)
+            opening = read_first_add(root, readme)
+            early = bool(opening) and not check_is_ancestor(root, placement, opening)
+            unopened = None if opening else readme   # TOOL-dDeclaredLoop-64: the path a hold looked for
     for b in out:
         if early and b["name"] == "owner gate":
             b["release"] = PRE_PLACEMENT
@@ -239,6 +246,8 @@ def read_breakpoints(build, root, spec_audit=False, delegated=False):
             hit = read_disposition_release(root, build, b["position"], ())
             if hit:
                 b["release"] = "released %s %s" % hit
+            elif unopened and b["name"] == "owner gate":
+                b["unopened"] = unopened
     return out
 
 
@@ -260,25 +269,27 @@ def read_stage_review(build, root, stage, rev=None):
 
 
 # ------------------------------------------------------------------------------------------ the plants
-def write_pre_placement_tree():
-    """`(top, the scratch's loop kit)`: `build_scratch_tree`'s kits commit, the placement; build `tPre` opened
-    on a root commit it does not precede and merged in; then `autonomy = "three-gates"`, `decisions.major =
-    "author-owner-ratifies"` and build `tPost` committed; and `tNone`'s README written, never committed."""
+def write_pre_placement_tree(memory_root="memory", opened=("memory/builds/tPre/README.md",)):
+    """`(top, the scratch's loop kit)`: `build_scratch_tree`'s kits commit, the placement; each README of
+    `opened` added on a root commit it does not precede and merged in; then `MEMORY_ROOT=<memory_root>`,
+    `autonomy = "three-gates"`, `decisions.major = "author-owner-ratifies"` and build `tPost` committed; and
+    `tNone`'s README written, never committed, both under `memory_root`."""
     from loop_items import POLICY_FILE, build_scratch_tree, derive_definition_rel
     top = build_scratch_tree()[0]
-    readme = "memory/builds/%s/README.md"
+    readme = memory_root + "/builds/%s/README.md"
     try:
         run_fixture_git(top, "branch", "-M", "main")   # the policy kit's landed read, with no remote
         run_fixture_git(top, "checkout", "-q", "--orphan", "pre")
         run_fixture_git(top, "rm", "-r", "-q", "--cached", ".")
-        write_fixture_files(top, {readme % "tPre": "# tPre\n"})
-        run_fixture_git(top, "add", readme % "tPre")
-        run_fixture_git(top, "commit", "-q", "-m", "tPre opened on history the placement does not reach")
+        write_fixture_files(top, {rel: "# %s\n" % rel.split("/")[-2] for rel in opened})
+        run_fixture_git(top, "add", *opened)
+        run_fixture_git(top, "commit", "-q", "-m", "builds opened on history the placement does not reach")
         run_fixture_git(top, "checkout", "-q", "-f", "main")
-        run_fixture_git(top, "merge", "-q", "--allow-unrelated-histories", "-m", "tPre merged in", "pre")
+        run_fixture_git(top, "merge", "-q", "--allow-unrelated-histories", "-m", "the builds merged in", "pre")
         write_fixture_files(top, {readme % "tPost": "# tPost\n", POLICY_FILE: 'autonomy = "three-gates"\n\n'
-                                  '[decisions]\nmajor = "author-owner-ratifies"\n'})
-        run_fixture_git(top, "add", readme % "tPost", POLICY_FILE)
+                                  '[decisions]\nmajor = "author-owner-ratifies"\n',
+                                  ".memory-tree.conf": "MEMORY_ROOT=%s\n" % memory_root})
+        run_fixture_git(top, "add", readme % "tPost", POLICY_FILE, ".memory-tree.conf")
         run_fixture_git(top, "commit", "-q", "-m", "tPost opened after the placement, three gates")
         write_fixture_files(top, {readme % "tNone": "# tNone\n"})
         return top, top / pathlib.PurePosixPath(derive_definition_rel()).parent
@@ -430,23 +441,43 @@ def run_breakpoint_plant(case):
             print("%s: fixture · headers %s · specs %s" % (SAY, heads, specs))
             check(heads == [(FX_UNIT, "INPROGRESS", "1")] and specs == [(FX_UNIT, "INPROGRESS")],
                   "read_build_headers %s beside read_build_specs %s" % (heads, specs))
-        elif case in ("pre-placement", "driver-pre-placement"):   # TOOL-dDeclaredLoop-53 AC1 to AC4
-            scratch, kit = write_pre_placement_tree()
+        elif case in ("pre-placement", "driver-pre-placement", "pre-placement-records-root"):
+            # TOOL-dDeclaredLoop-53 AC1 to AC4; TOOL-dDeclaredLoop-64 AC1 to AC3 under the records root
+            readme = "%s/builds/%s/README.md"
+            records = case == "pre-placement-records-root"
+            scratch, kit = (write_pre_placement_tree("records", (readme % ("records", "tRec"),
+                                                                 readme % ("memory", "tWrong")))
+                            if records else write_pre_placement_tree())
             try:
                 three = [plan, gate % ("at", "item.design.exit"), closing, gate % ("before", "item.deploy.mandate")]
-                if case == "pre-placement":
-                    def run_scratch_breakpoints(build, *flags):
-                        """`(exit, lines)` of the scratch's own module listing `build` in the scratch, echoed."""
-                        p = subprocess.run([sys.executable, str(kit / "breakpoints.py"), "list", "--build", build,
-                                            *flags], cwd=str(scratch), capture_output=True, text=True,
-                                           encoding="utf-8", errors="replace",
-                                           env=read_clean_env(PYTHONIOENCODING="utf-8"), timeout=300)
-                        lines = p.stdout.splitlines()
-                        print("%s: fixture · scratch list %s · exit %d · %s" % (
-                            SAY, " ".join((build,) + flags), p.returncode, " / ".join(lines) or p.stderr.strip()))
-                        return p.returncode, lines
+                pre = "breakpoint: owner gate · %s %s · owner · autonomy · " + PRE_PLACEMENT
+                unopened = "%s: held · no commit adds %s" % (SAY, readme)
 
-                    pre = "breakpoint: owner gate · %s %s · owner · autonomy · " + PRE_PLACEMENT
+                def run_scratch_breakpoints(build, *flags):
+                    """`(exit, lines)` of the scratch's own module listing `build` in the scratch, echoed."""
+                    p = subprocess.run([sys.executable, str(kit / "breakpoints.py"), "list", "--build", build,
+                                        *flags], cwd=str(scratch), capture_output=True, text=True,
+                                       encoding="utf-8", errors="replace",
+                                       env=read_clean_env(PYTHONIOENCODING="utf-8"), timeout=300)
+                    lines = p.stdout.splitlines()
+                    print("%s: fixture · scratch list %s · exit %d · %s" % (
+                        SAY, " ".join((build,) + flags), p.returncode, " / ".join(lines) or p.stderr.strip()))
+                    return p.returncode, lines
+
+                if records:
+                    rc, lines = run_scratch_breakpoints("tRec")   # AC1
+                    check(rc == 0 and lines == [pre % ("at", PLAN_GATE), pre % ("at", "item.design.exit"), closing,
+                                                pre % ("before", "item.deploy.mandate")],
+                          "the build opened under the records root read %s" % lines)
+                    check_owner_lines(lines)
+                    rc, lines = run_scratch_breakpoints("tWrong")   # AC2
+                    check(rc == 0 and lines == three + [unopened % ("records", "tWrong")],
+                          "the build opened under memory/ in a records tree read %s" % lines)
+                    check_owner_lines(lines)
+                    write_policy(scratch, None, "no policy file")   # AC3
+                    rc, lines = run_scratch_breakpoints("tWrong")
+                    check(rc == 0 and lines == [plan, closing], "tWrong with no policy file read %s" % lines)
+                elif case == "pre-placement":
                     rc, lines = run_scratch_breakpoints("tPre")   # AC1
                     check(rc == 0 and lines == [pre % ("at", PLAN_GATE), pre % ("at", "item.design.exit"), closing,
                                                 pre % ("before", "item.deploy.mandate")],
@@ -459,7 +490,8 @@ def run_breakpoint_plant(case):
                         check(rc == 0 and owner + "held" in lines and closing in lines,
                               "%s with a delegated fork read %s" % (build, lines))
                     rc, lines = run_scratch_breakpoints("tNone")   # AC3
-                    check(rc == 0 and lines == three, "the build whose README no commit adds read %s" % lines)
+                    check(rc == 0 and lines == three + [unopened % ("memory", "tNone")],
+                          "the build whose README no commit adds read %s" % lines)
                     try:
                         lines = [render_breakpoint_line(b) for b in read_breakpoints("tPre", scratch)]
                     except ValueError as e:
@@ -585,8 +617,12 @@ def main(argv):
             ap.add_argument("--spec-audit", action="store_true")
             ap.add_argument("--delegated-fork", action="store_true")
             args = ap.parse_args(argv[1:])
-            for b in read_breakpoints(args.build, root, args.spec_audit, args.delegated_fork):
+            found = read_breakpoints(args.build, root, args.spec_audit, args.delegated_fork)
+            for b in found:
                 print(render_breakpoint_line(b))
+            unopened = next((b["unopened"] for b in found if b.get("unopened")), None)
+            if unopened:   # TOOL-dDeclaredLoop-64: its own head, never an owner line's bytes
+                print("%s: held · no commit adds %s" % (SAY, unopened))
             return 0
         if argv[:1] == ["stage"]:
             ap = argparse.ArgumentParser(prog="breakpoints.py stage", description="one stage's review reading")

@@ -1476,7 +1476,10 @@ build's README does not contain the commit that first added the loop kit's `brea
 gate of that build, the plan gate included, reads `passed before placement` instead, so a run already in
 flight when the module landed is not held for positions it crossed before the gate existed. The owner item
 and the review lines keep their answers. Where either commit cannot be found, a README not yet committed
-for one, the gate holds as above.
+for one, the gate holds as above. Where an owner gate reads `held` and no commit adds the README under the
+memory root your `.memory-tree.conf` names, the list ends with one more line,
+`breakpoints: held · no commit adds <path>`, the README path it looked for, so a misread root shows
+instead of reading as an ordinary hold; a build with no held gate prints no such line.
 
 - **List a build's breakpoints:** `python tools/loop/breakpoints.py list --build <slug>` runs at your <!-- usage: script:tools/loop/breakpoints.py#list 74c047ff -->
   repository's top level and prints one line per breakpoint, in item order:
@@ -1492,7 +1495,7 @@ for one, the gate holds as above.
   `design` this way to decide whether the build owes a spec audit.
 - **See it on a fixture:** `python tools/loop/breakpoints.py --fixture --plant <case>` runs one case in <!-- usage: script:tools/loop/breakpoints.py bd781c1c -->
   a scratch repository: `values`, `placed`, `ratification`, `stage`, `driver-close`, `driver-optin`,
-  `driver-plan`, `pre-placement` or `driver-pre-placement`. `--selftest` runs them all, and gov's own `loop breakpoint fixtures` gate runs them.
+  `driver-plan`, `pre-placement`, `driver-pre-placement` or `pre-placement-records-root`. `--selftest` runs them all, and gov's own `loop breakpoint fixtures` gate runs them.
 
 The list does not fire a review: you, or the run, fire each review line through the driver's
 `--trigger` with its cause. A run may still move past an owner gate before its close, and anyone who
