@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-70 — every caller of the phase reading takes the adopter population from one driver-conf reader
 
-**Status:** DEFERRED · rev-3 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-4 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -89,7 +89,7 @@ through one reader of the driver's conf. It repairs `TOOL-dDeclaredLoop-63`.
 ### Edges
 
 - **consumes-from** `TOOL-dDeclaredLoop-63` — the `extra` parameter of `derive_phase_position`, the verb's `--extra` and the adopter-phase reading and marker, whose absent value this unit makes the work tree's own population
-- **hands-off** `TOOL-dDeclaredLoop-56` — S18's `read_withdrawn_parents` call, which takes S3's default by passing `tree=root` and no explicit `extra`; this unit writes `tree=root` on that call where 56 lands first in order 36 (§8 F4)
+- **consumes-from** `TOOL-dDeclaredLoop-56` — S18's `read_withdrawn_parents` call, which takes S3's default by passing `tree=root` and no explicit `extra`; 56 lands first in order 36 and this unit writes `tree=root` on that call (§8 F4)
 - **hands-off** `TOOL-dDeclaredLoop-67` — S13's held-from lookup, which takes S3's default and passes no explicit `extra`
 - **hands-off** `TOOL-dDeclaredLoop-72` — `read_driver_conf`, through which that unit reads the driver's `MEMORY_ROOT`
 - **hands-off** `TOOL-dDeclaredLoop-75` — `read_driver_conf`, to which that unit points `check_transition_tables` (ids 20, 21)
@@ -417,6 +417,8 @@ New arm: tools/loop/loop_parents.py · covers AC2 · the `parent-in-extra-phase`
   the callers table; the `tree` argument (F3) and the parent call's `tree=root` (F4); the plants move from
   `loop_table.py --fixture` to the selftest's scratch-tree cases and a `loop_parents.py` plant; unit 52's
   `DRAFTING` case pinned to `--extra=`; carriers and the sweep.
+- rev-4 · 2026-11-16 · §3 · the edge with `TOOL-dDeclaredLoop-56` reads consumes-from, since 56 builds first and this unit
+  writes onto its call, per 56's first builder return; nothing else moves.
 
 ## 10. Reuse audit
 

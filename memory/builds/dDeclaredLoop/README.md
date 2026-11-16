@@ -182,7 +182,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-63 — an adopter's extra phase reads as ungated through the driver's own phase set, never refused for lacking a row](spec/2026-10-24-spec-TOOL-dDeclaredLoop-63.md) | 35 | 2 | CLOSED | rev-3 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-64 — a build's opening commit is found under the resolved `MEMORY_ROOT`, never a literal `memory/`](spec/2026-10-24-spec-TOOL-dDeclaredLoop-64.md) | 35 | 2 | CLOSED | rev-4 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-56 — the round-1 spec audit's 47 minors: owed leg rows, one reader each, honest skew and failure paths, and the citations that drifted](spec/2026-10-24-spec-TOOL-dDeclaredLoop-56.md) | 36 | 2 | INPROGRESS | rev-6 | 2026-11-16 |
-| [TOOL-dDeclaredLoop-70 — every caller of the phase reading takes the adopter population from one driver-conf reader](spec/2026-10-24-spec-TOOL-dDeclaredLoop-70.md) | 36 | 2 | DEFERRED | rev-3 | 2026-11-16 |
+| [TOOL-dDeclaredLoop-70 — every caller of the phase reading takes the adopter population from one driver-conf reader](spec/2026-10-24-spec-TOOL-dDeclaredLoop-70.md) | 36 | 2 | DEFERRED | rev-4 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-71 — the breakpoints fixture runs under its own gate leg, so its plants are lasting coverage](spec/2026-10-24-spec-TOOL-dDeclaredLoop-71.md) | 36 | 2 | DEFERRED | rev-4 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-72 — the loop kit reads the records root the driver reads, and refuses two confs that disagree](spec/2026-10-24-spec-TOOL-dDeclaredLoop-72.md) | 36 | 2 | DEFERRED | rev-6 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-65 — the remote's freshness is the time of the last fetch, read from what a fetch and a clone write](spec/2026-10-24-spec-TOOL-dDeclaredLoop-65.md) | 37 | 2 | DEFERRED | rev-3 | 2026-11-16 |
@@ -213,7 +213,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 756 bound to this build, across 4 record folder(s).
+Records: 761 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
