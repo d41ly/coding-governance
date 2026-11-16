@@ -13727,10 +13727,12 @@ run_trigger() { # slug · subject · cause · pin path...
     return 0
   fi
   # A pin line is `json.dumps` output, so the two fields go before its closing brace.
-  while IFS= read -r _tr_p; do
+  local -a _tr_lines
+  mapfile -t _tr_lines <<<"$_tr_out"
+  for _tr_p in "${_tr_lines[@]}"; do
     _tr_p=${_tr_p%$'\r'}
     case "$_tr_p" in *"}") printf '%s, %s\n' "${_tr_p%\}}" "$_tr_pol" ;; esac
-  done <<<"$_tr_out"
+  done
   return 0
 }
 
