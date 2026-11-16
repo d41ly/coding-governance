@@ -318,3 +318,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-16T13:45:58Z brief · item TOOL-dDeclaredLoop-51 · reason fdc7e218930a memory/builds/dDeclaredLoop/prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-51-build-brief.md
 
 2026-11-16T13:54:15Z dispatch · item 597c1373 TOOL-dDeclaredLoop-51 · reason tools/loop/loop.toml help/loop.md memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-51.md memory/builds/dDeclaredLoop/build/2026-11-16-build-TOOL-dDeclaredLoop-51-1-acceptance-ledger.md memory/builds/dDeclaredLoop/build/2026-11-16-build-TOOL-dDeclaredLoop-51-deviation-512.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/backlog/TOOL.md memory/ledger/2026-11.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json
+
+2026-11-16T14:04:35Z brief · item TOOL-dDeclaredLoop-19 · reason ab0485e392ab memory/builds/dDeclaredLoop/prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-19-build-brief.md
