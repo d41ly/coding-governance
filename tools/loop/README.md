@@ -309,7 +309,8 @@ through its `write_record` under the lowest unit id a spec H1 under the build de
 before the build's first spec writes none, and the next move after it back-fills one per earlier
 trailer. The micro-format line is printed, never stored, by `render_transition_line` from
 `TRANSITION_LINE`, and the charter's micro-format block defines it. An extension field's name is one of
-`TRANSITION_FIELDS`, which holds `stand-in`, written where the item has a `[[stand-in]]` row.
+`TRANSITION_FIELDS`, which holds `stand-in`, written where the item has a `[[stand-in]]` row, and
+`composition`, the pin the writer derives on every move and refuses from a `--field` (`composition.py`).
 
 `record` (`write_transition`) answers the move by `derive_move` first, so a move no row holds prints
 `refused` and writes nothing; it resolves the witness to HEAD or its ancestor, refuses a staged index,
@@ -402,7 +403,10 @@ python <prefix>/loop/claims.py --selftest
 their `Pass:` trailers through the memory-tree kit's `read_commits` and `derive_attribution` in the
 `replace` view, the build's moves through `read_transitions`, each held by a build row through
 `loop_table.check_recorded_move`, the tables through `read_transition_rows`, the items through
-`read_composition`, gov's own rows where that composition is unarmed in the tree, the acceptance
+`loop_items.read_composed_items` at the build's pin (TOOL-dDeclaredLoop-26), the commit
+`read_step_composition` reads from its newest move, or HEAD's where that move carries none, printed as
+the read `composition@<sha8> · pinned` or `· unpinned`, gov's own rows where that composition is
+unarmed in the tree, the witnesses its moves name through `derive_carried_witnesses`, the acceptance
 records through `read_records` with `read_acceptance`, the run-state file's facts through the policy
 kit's `read_run_fact`, and the default branch's remote-tracking tip. A parsed `definition` replaces the
 shipped one and the composition for that call, which is how the plants are made in memory.
@@ -542,6 +546,33 @@ python <prefix>/loop/upstream.py rows <item> --return <upstream item>=<path>
 python <prefix>/loop/upstream.py join <item> --rows <rows file> --return <return path> [--write --build <slug> --unit <id>]
 python <prefix>/loop/upstream.py --fixture --plant drop-gating
 python <prefix>/loop/upstream.py --selftest
+```
+
+## The composition pin, `composition.py`
+
+A build runs each step under the composition it entered that step with and moves to a newer one at its
+next step boundary (TOOL-dDeclaredLoop-26). `derive_composition_revision` is the commit HEAD names, and
+the transition writer records its first eight hex digits on every move as `composition`.
+`read_step_composition(root, moves)` answers the newest move's pin, `pinned`, or HEAD's commit,
+`unpinned`, where no move or the newest carries none, so a build recorded before this module reads the
+tip until its next move pins. `read_composition_at(root, rev)` answers `read_composition`'s triple at
+`rev`, in place at HEAD and otherwise in a scratch worktree detached at `rev` and removed in a
+`finally`; `loop_items.read_composed_items(root, rev)` reads through it and keeps the one mapping of its
+exits. A tag absent from the composition at a pin is redirected where the playbook kit's tag resolver,
+`gov_tag.py show <tag> --json`, found by `resolve_kit_dir` under the repository being read, answers
+exactly one successor that the composition holds: `derive_carried_witnesses` carries a witness to it,
+`write_ended_orders` files one `item-ended` order per held tag that is not redirected at a move whose
+previous pin is another commit, and `read_tag_policy(key, root, build)` reads a tag-valued key at the
+pin through the policy kit's `resolve`, redirecting each member and filing one `policy-renamed` order
+for the owner to re-pin the guarded file. `write_loop_order` writes each order as
+`.governance/outbox/loop-<kind>-<slug>.md`. This kit parses no change record. `--fixture --plant
+<case>` runs one of `PLANTS`, `rename`, `ended`, `split`, `policy-rename` and `unpinned`, over a
+`build_scratch_tree` repository whose branch is named `main`, and `--selftest` runs every plant over one
+base reset per plant; it is gov's `loop composition fixtures` leg.
+
+```bash
+python <prefix>/loop/composition.py --fixture --plant rename
+python <prefix>/loop/composition.py --selftest
 ```
 
 ## The factories, `factories.py`

@@ -421,7 +421,7 @@ policy key `transitions.record` in `.governance/policy.toml` says which:
 
 - **`trailer`**: the move's commit carries
   `Gov-Transition: <from> -> <to> · build=<slug> · item=<tag> · sha=<sha8>`, with any extra field, such
-  as `stand-in=<owner>`, after it.
+  as `stand-in=<owner>` and `composition=<sha8>`, after it.
 - **`log`**: a record in the build's `build/` folder, `<date>-build-<id>-transition-<n>.md`, holding
   the same fields as `- **Build:**`, `- **From:**`, `- **To:**`, `- **Item:**` and `- **Sha:**` lines,
   where `<id>` is the lowest unit id a spec under the build defines.
@@ -496,6 +496,45 @@ log record is the source; with only `micro-format` selected, nothing is stored a
 
 Only build-level moves are recorded; nothing calls the writer yet, until the executor that moves a
 build at each item boundary lands.
+
+## When a build moves to a newer composition
+
+A build runs each step under the composition it entered that step with, and moves to a newer one only
+at its next step boundary. An update to gov or a change to your overlay that lands mid-step never
+changes what the build is doing until it records its next move.
+
+**The pin.** Every move the writer records carries a `composition` field: the first eight hex digits of
+the commit `HEAD` named when the move was recorded, as `composition=<sha8>` on the trailer and a
+`- **Composition:**` line on the log record. The writer sets it; `--field composition=<value>` is
+refused, exit 2, because the value is derived. The position engine reads the build's items at the pin
+of its newest move, so `python tools/loop/position.py <slug>` lists `composition@<sha8> · pinned` among
+its reads. A build whose newest move carries no pin, recorded before this field existed, or a build
+with no move, reads the current `HEAD` and lists `composition@<sha8> · unpinned`; its next move pins it.
+
+**An item that ended under a build.** When gov renames an item with a change record, a witness the
+build holds under the old tag carries to the new one, as long as the record names exactly one
+successor and the new composition holds it. Where the item was removed, or split into several, nothing
+carries: at the build's next move the writer files one order, `.governance/outbox/loop-item-ended-<build>-<tag>.md`,
+naming the build, the item, both revisions and the successors read, and prints
+`loop: order · <path>`. Decide where that work goes. Where the composition at the move does not read,
+the move records anyway and prints `loop: composition · unread · <why>`.
+
+**A policy value naming a renamed boundary.** A tag-valued key such as `review.breakpoints` that names a
+renamed item is read as its successor from the boundary the build moved at, so the breakpoint keeps
+firing. Each redirected value files one order, `.governance/outbox/loop-policy-renamed-<key>-<tag>.md`,
+asking you to re-pin the key in `.governance/policy.toml`, which only you edit.
+
+- **See it on a fixture:** `python tools/loop/composition.py --fixture --plant <case>` builds a scratch <!-- usage: script:tools/loop/composition.py cd4da641 -->
+  repository holding gov's kits, records a build's moves across a commit that re-tags an item, prints
+  each observation and ends `loop: fixture · <case> · held` or `· MISSED <why>`. The cases are
+  `rename`, `ended`, `split`, `policy-rename` and `unpinned`. `--selftest` runs every case, and gov's
+  own `loop composition fixtures` gate runs it.
+
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
+  ```bash
+  python tools/loop/composition.py --fixture --plant rename
+  python tools/loop/composition.py --selftest
+  ```
 
 ## Claim keys
 

@@ -43,7 +43,8 @@ the plant, commits it, runs `check` there as a subprocess and relays its output 
 step the plant owes beside `check` does not answer as owed. The cases are `PLANTS`.
 
 `read_composed_items` is the composition's rows as `position.py` and `upstream.py` read them: gov's own
-rows where the composition is unarmed, ValueError where it refuses.
+rows where the composition is unarmed, ValueError where it refuses; given a revision, it reads the
+composition at that pin through `composition.py`'s `read_composition_at`, as `position.py` does.
 
 `read_item_members` and `write_item_plant` are the step gate's `item` class: every gov item tag of the
 definition under a tree, and the first `[[item]]` table taken out of a clone's definition, staged.
@@ -215,13 +216,18 @@ def read_composition(root, kind=KIND):
     return (p.returncode if p.returncode in (1, 2) else 1), None, lines or ["compose exited %d" % p.returncode]
 
 
-def read_composed_items(root):
+def read_composed_items(root, rev=None):
     """The composed `[[item]]` rows of `root` (TOOL-dDeclaredLoop-29 S4): the composition's rows where
     `read_composition` answers 0, gov's own rows of the definition beside this file where it answers 2,
     unarmed; ValueError `the item composition does not read: <first line>` where it answers 1, and
-    LoopError where gov's definition does not read."""
+    LoopError where gov's definition does not read. With `rev`, the triple is `composition.py`'s
+    `read_composition_at(root, rev)`, the composition at that pin (TOOL-dDeclaredLoop-26)."""
     data, where = read_definition(KIT)
-    rc, payload, lines = read_composition(root)
+    if rev is None:
+        rc, payload, lines = read_composition(root)
+    else:
+        from composition import read_composition_at   # it imports this module, so here and not at the top
+        rc, payload, lines = read_composition_at(root, rev)
     if rc == 1:
         raise ValueError("the item composition does not read: %s" % (lines[0] if lines else "exit 1"))
     return payload["rows"] if rc == 0 else read_item_rows(data, where)

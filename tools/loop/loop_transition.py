@@ -22,8 +22,11 @@ record, and the writer's next move after it back-fills one per earlier trailer, 
 
 `record` (`write_transition`) reads the set at HEAD, the move's parent; answers the move by the build
 table's `derive_move`, printing `refused — ...` and exiting 1 where no row holds it; resolves `--witness`
-to HEAD or an ancestor of it, adding `stand-in=<owner>` where the item has a `[[stand-in]]` row; refuses
-a staged index; back-fills, writes this move's record, commits the records, or an empty commit, as
+to HEAD or an ancestor of it, adding `stand-in=<owner>` where the item has a `[[stand-in]]` row and
+`composition=<sha8>`, the commit HEAD names (`composition.py`, TOOL-dDeclaredLoop-26), which a `--field`
+may not give; refuses a staged index; where the build's previous move was pinned at another commit,
+files `composition.py`'s `item-ended` orders, printing `loop: order · <path>` per order or
+`loop: composition · unread · <why>` where the composition at HEAD does not answer; back-fills, writes this move's record, commits the records, or an empty commit, as
 `loop transition(<slug>): <from> -> <to>` with the trailer where selected, prints
 `loop: recorded · <from> -> <to> · <direction> · commit <sha8>`, and prints the line where selected. A
 set storing neither the trailer nor the log writes no commit. A backward move, testing to building say,
@@ -49,7 +52,8 @@ kit, which is why.
 
 `--fixture --plant <case>` builds a scratch repository under the host temp directory holding the build
 `tFix`, runs `record` and `check` there in process, prints each verdict, removes the scratch and exits
-as its last verb. `backward-rows` and `skip-backward` record `BACKWARD_MOVES`, three moves forward and
+as its last verb. `field` records a `colour=red` move and a `composition=3f9c2a71` move, each refused,
+then a plain move carrying its derived `composition`. `backward-rows` and `skip-backward` record `BACKWARD_MOVES`, three moves forward and
 three back; the first prints every trailer and read with its direction, the second deletes the newest
 record and owes its move's finding. `check --selftest` holds the definition of `AGENTS.md` in the
 current directory, then runs every plant through `run_selftest_cases`, each plant once however many
@@ -83,8 +87,8 @@ KEY = "transitions.record"
 TRAILER_KEY = "Gov-Transition"
 KIND = "transition"
 #: The extension fields a trailer and a record may carry after `build`, `item` and `sha`, in the order
-#: they are written; later units extend it.
-TRANSITION_FIELDS = ("stand-in",)
+#: they are written; later units extend it. `composition` is derived by the writer, never given.
+TRANSITION_FIELDS = ("stand-in", "composition")
 #: The micro-format definition `render_transition_line` fills, held equal to `AGENTS.md`'s by `check`.
 TRANSITION_LINE = "transition — <slug> · <from> → <to> · <item tag> · <sha>"
 #: Each placeholder of `TRANSITION_LINE` and the field that fills it.
@@ -106,7 +110,7 @@ PLANTS = {"default": "the default set, one B4 move with its witness",
           "no-row": "planning to building through item.design.exit, which no row holds",
           "line-drift": "an AGENTS.md whose definition drops <item tag>",
           "pre-spec": "a build with no spec moved once, then a spec planted and a second move",
-          "field": "composition registered, a move with --field composition=3f9c2a71 and one with colour=red",
+          "field": "a move with --field colour=red, one with composition=3f9c2a71, refused as derived, then a plain move",
           "backward-rows": "B4, B5 and B7 forward, then B13, B8 and B6 back, each trailer and read printed",
           "skip-backward": "the six moves of backward-rows, then the newest record, B6's, deleted"}
 #: The moves the backward plants record in order, each an argv tail for `record` before its witness.
@@ -323,9 +327,11 @@ def write_transition_record(root, anchor, move):
 
 def write_transition(root, build, state, item, outcome, witness, facts, fields):
     """Record one build move in the repository at `root`, an absolute path: `(move fields, the commit's
-    sha or None, [record paths], the line or None)`. TransitionRefused where no row holds the move;
-    ValueError on a value, witness, index or policy read refused, writing nothing; LookupError where a
-    kit it reads does not resolve."""
+    sha or None, [record paths], the line or None, [order lines])`, the order lines `loop: order · <path>`
+    per `item-ended` order or one `loop: composition · unread · <why>`. TransitionRefused where no row
+    holds the move; ValueError on a value, witness, index, policy read or tag resolver refused, writing
+    no record; LookupError where a kit it reads does not resolve."""
+    from composition import PINNED, derive_composition_revision, read_step_composition, write_ended_orders
     cache = {}
     chosen = read_cached_channels(root, "HEAD", cache)
     data, where = read_definition(KIT)
@@ -339,15 +345,29 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
     for name, value in fields.items():
         if name not in TRANSITION_FIELDS:
             raise ValueError("--field %s is no registered extension field: %s" % (name, " ".join(TRANSITION_FIELDS)))
+        if name == "composition":
+            raise ValueError("--field composition is derived: the writer sets it to the commit HEAD names, so it "
+                             "is never given")
         move[name] = value
     owner = {r.get("item"): r.get("owner") for r in read_stand_ins(data, where)}.get(item)
     if owner:
         move["stand-in"] = owner
+    move["composition"] = derive_composition_revision(root)[:8]
     bad = [n for n, v in move.items() if not (isinstance(v, str) and VALUE.fullmatch(v))]
     if bad:
         raise ValueError("the value of %s, %r, is outside [A-Za-z0-9._:+@-]+" % (bad[0], move[bad[0]]))
     if read_git(root, "diff", "--cached", "--quiet")[0] != 0:
         raise ValueError("the index holds staged changes, and a transition commit carries its own records alone")
+    said = []
+    before = read_transitions(build, root)
+    pin, state_read = read_step_composition(root, before)
+    if state_read == PINNED and not pin.startswith(move["composition"]):
+        try:
+            orders, unread = write_ended_orders(root, build, before)
+        except LookupError as e:   # the writer answers an unanswered resolver exit 2, `unanswered`
+            raise ValueError(str(e)) from None
+        said = ["%s: order · %s" % (SAY, p) for p in orders]
+        said += ["%s: composition · unread · %s" % (SAY, unread)] if unread else []
     wrote = []
     if "log" in chosen:
         anchor = resolve_build_anchor(build, root)
@@ -375,7 +395,7 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
                 pathlib.Path(root, rel).unlink()
             raise ValueError("git could not commit the move in %s, so nothing is recorded" % root.as_posix())
         commit = read_git(root, "rev-parse", "HEAD")[1]
-    return move, commit, wrote, render_transition_line(move) if "micro-format" in chosen else None
+    return move, commit, wrote, render_transition_line(move) if "micro-format" in chosen else None, said
 
 
 # ------------------------------------------------------------------------------------------ the check
@@ -452,8 +472,6 @@ def write_transition_plant(top, case):
 
 def run_transition_fixture(case):
     """`record` and `check` over a scratch repository planted as `case`: the last verb's exit."""
-    global TRANSITION_FIELDS
-    registered = TRANSITION_FIELDS
     top = pathlib.Path(tempfile.mkdtemp(prefix="loop-transition-")).absolute()
     try:
         print("%s: fixture · plant %s · %s" % (SAY, case, PLANTS[case]))
@@ -487,9 +505,9 @@ def run_transition_fixture(case):
             print("%s: fixture · commits %s" % (SAY, "unchanged" if read_count() == before else "changed"))
             return rc if case == "no-row" else run_verb(["check", *at])
         if case == "field":
-            TRANSITION_FIELDS = registered + ("composition",)
             run_verb(b4 + ["--field", "colour=red"])
             run_verb(b4 + ["--field", "composition=3f9c2a71"])
+            run_verb(b4)
         elif case in ("backward-rows", "skip-backward"):
             for n, tail in enumerate(BACKWARD_MOVES):
                 run_verb(["record", *at, *tail, "--witness", "HEAD" if n else witness])
@@ -535,7 +553,6 @@ def run_transition_fixture(case):
             read_folder()
         return run_verb(["check", *at])
     finally:
-        TRANSITION_FIELDS = registered
         remove_tree(top)
 
 
@@ -592,8 +609,9 @@ def run_selftest():
               "transition-1 planning -> designing · transition-2 designing -> building"),
              ("pre-spec check", fx("pre-spec"), 0, check, "· 0 finding(s)"),
              ("field refused", fx("field"), 0, "%s: unanswered" % SAY, "colour"),
-             ("field trailer", fx("field"), 0, trailer, "composition=3f9c2a71"),
-             ("field read", fx("field"), 0, "%s: fixture · read trailer · " % SAY, "composition=3f9c2a71"),
+             ("field derived", fx("field"), 0, "%s: unanswered" % SAY, "composition is derived"),
+             ("field trailer", fx("field"), 0, trailer, " · composition="),
+             ("field read", fx("field"), 0, "%s: fixture · read trailer · " % SAY, " · composition="),
              ("field check", fx("field"), 0, check, "· 0 finding(s)"),
              ("backward-rows trailer", fx("backward-rows"), 0, "%s: fixture · trailer testing -> building · build=%s · "
               "item=item.test.attribute · sha=" % (SAY, FX_BUILD), " · stand-in=dWitnessedBar"),
@@ -650,8 +668,10 @@ def main(argv):
     root = pathlib.Path(args.root).absolute()
     try:
         if args.verb == "record":
-            move, commit, wrote, line = write_transition(root, args.build, getattr(args, "from"), args.item,
-                                                         args.outcome, args.witness, pairs["fact"], pairs["field"])
+            move, commit, wrote, line, said = write_transition(root, args.build, getattr(args, "from"), args.item,
+                                                               args.outcome, args.witness, pairs["fact"], pairs["field"])
+            for text in said:
+                print(text)
             for rel in wrote:
                 print("%s: wrote %s" % (SAY, rel))
             direction = derive_direction(move["from"], move["to"], read_transition_rows(*read_definition(KIT)))

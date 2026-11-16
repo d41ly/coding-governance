@@ -10,7 +10,7 @@ decisions = ["TOOL-dDeclaredLoop-1"]
 stage = ["step.test"]
 
 [claims]
-gate-legs = ["loop definition", "loop computed witness", "loop checklist tags", "loop transition tables", "loop item kind", "loop splice check", "loop parent routes", "loop transition record", "loop guard fixtures", "loop claims fixtures", "loop position fixtures", "loop upstream fixtures", "loop stage coverage", "loop command conformance", "loop factories fixtures"]
+gate-legs = ["loop definition", "loop computed witness", "loop checklist tags", "loop transition tables", "loop item kind", "loop splice check", "loop parent routes", "loop transition record", "loop guard fixtures", "loop claims fixtures", "loop position fixtures", "loop upstream fixtures", "loop composition fixtures", "loop stage coverage", "loop command conformance", "loop factories fixtures"]
 kits = ["loop"]
 git-hooks = []
 harness-hooks = []

@@ -11,8 +11,12 @@ holds: the run branch's `--first-parent` commits and their `Pass:` trailers thro
 kit's `read_commits` and `derive_attribution` in the `replace` view; the build's recorded moves through
 `loop_transition.read_transitions`, each checked by `loop_table.check_recorded_move`; the steps,
 `[states]` and the transition rows through `read_transition_rows`; the items through
-`loop_items.read_composed_items`, gov's own `[[item]]` rows where that composition is unarmed in the tree,
-or the `[[item]]` rows of `definition` where a caller passes a parsed one;
+`loop_items.read_composed_items` at the build's pin, the commit `composition.read_step_composition` reads
+from its newest move, or HEAD's where that move carries none (TOOL-dDeclaredLoop-26), gov's own `[[item]]`
+rows where that composition is unarmed in the tree, or the `[[item]]` rows of `definition` where a caller
+passes a parsed one, the read printed `composition@<sha8> · pinned` or `· unpinned`; the witnesses its
+moves name through `composition.derive_carried_witnesses`, so a witness under a renamed item reads under
+its successor;
 the acceptance records through `build_records.read_records` with `read_acceptance`; the run-state file's
 facts and parked rows; the remote-tracking tip of the default branch. No status header, README status
 word or `phase:` fact decides a step.
@@ -92,6 +96,7 @@ KIT = pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from claims import derive_claim_key, derive_claim_verdict, resolve_remote  # noqa: E402
+from composition import derive_carried_witnesses, read_step_composition  # noqa: E402
 from loop_items import read_composed_items  # noqa: E402
 from loop_lib import (NO_STEP, ROUTE_STAND_IN, LoopError, check_computed_witnesses, read_definition,  # noqa: E402
                       read_item_rows, read_memory_tree, resolve_kit_dir, run_selftest_cases)
@@ -397,10 +402,13 @@ def derive_position_into(pos, repo, slug, definition):
         raise ValueError("the build README does not parse: %s" % e) from None
     pos["read"].append("%s@%s" % ((folder / "README.md").relative_to(repo).as_posix(), read_blob_id(folder / "README.md")))
     handover = read_handover(repo, slug)
+    moves = read_transitions(slug, repo)
+    pin, pin_state = read_step_composition(repo, moves)
+    pos["read"].append("composition@%s · %s" % (pin[:8], pin_state))
     if definition is None:
         data, where = read_definition(KIT)
-        # unarmed: no composition in this tree, so gov's own rows alone
-        items = read_composed_items(repo)
+        # unarmed: no composition in this tree, so gov's own rows alone; else the composition at the pin
+        items = read_composed_items(repo, pin)
     else:
         data, where = definition, "the caller's definition"
         items = read_item_rows(data, where)
@@ -409,7 +417,6 @@ def derive_position_into(pos, repo, slug, definition):
                     for r in check_computed_witnesses(data, where))
     steps = {r["tag"]: r for r in data["step"]}
     item_step = {r.get("tag"): r.get("step") for r in items}
-    moves = read_transitions(slug, repo)
     for m in moves:
         if not check_recorded_move(m, tables):
             raise ValueError("the recorded move %s -> %s on %s at %s is held by no build row" % (
@@ -470,6 +477,7 @@ def derive_position_into(pos, repo, slug, definition):
     named = {}
     for m in moves:
         named.setdefault(m.get("item"), m.get("commit"))
+    named = derive_carried_witnesses(repo, named, set(item_step))
     exits = {r["exit"]: r["state"] for r in data["step"]}
     unit_items = {row["item"]: row["to"] for row in forward.values()}
 

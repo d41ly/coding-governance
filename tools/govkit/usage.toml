@@ -506,6 +506,12 @@ entry = "{prefix}/loop/upstream.py"
 flags = ["--fixture", "--plant=", "--selftest"]
 
 [[usage]]
+id = "script:{prefix}/loop/composition.py"
+shape = "verb"
+entry = "{prefix}/loop/composition.py"
+flags = ["--fixture", "--plant=", "--selftest"]
+
+[[usage]]
 id = "script:{prefix}/loop/upstream.py#rows"
 shape = "verb"
 entry = "{prefix}/loop/upstream.py"
