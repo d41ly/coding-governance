@@ -6843,6 +6843,16 @@
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
+      "id": "check_normalise_plant",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "check_normaliser_missing_plant",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
+    },
+    {
       "id": "check_old_render",
       "kind": "function",
       "file": "tools/branch-reconcile/adopt-branch-reconcile.sh"
@@ -29906,6 +29916,11 @@
       "id": "run_node",
       "kind": "function",
       "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
+      "id": "run_normaliser",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
     },
     {
       "id": "run_on_invalid_classes",

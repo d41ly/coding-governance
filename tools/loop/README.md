@@ -161,7 +161,15 @@ by the bar runner.
 `loop_witness.py` is the re-run stand-in. `run_witness_commands(repo, sha, commands, timeout)` adds a
 detached worktree of `sha` under the host temp directory, runs each command there as `bash -c <command>`
 with the memory-tree kit's `GIT_ENV_LEAKS` unset, keeps each exit, or `timeout`, and the first twelve
-hex digits of the SHA-256 of its combined output, and removes the worktree on every exit path. The bash
+hex digits of the SHA-256 of its combined output after the run-gates kit's `write_normaliser` program,
+and removes the worktree on every exit path. `run_normaliser` runs that program in place: one bash,
+started in the worktree as each command's is, sources the kit's `lib-attribute.sh`, found by
+`resolve_kit_dir` before the worktree is added, writes the program once over the worktree's path, its
+realpath, the worktree as that bash's `pwd` prints it and the repository's path, and applies it with
+`LC_ALL=C sed -E -f` to each output, hashed as the `.norm` file beside it; the program strips those
+roots in each spelling, `tmp.` names, durations, CRs and trailing whitespace. A kit that does not
+resolve, or a step that fails or passes the bound, raises `LookupError`
+`witness: normaliser unavailable — <reason>`, a failing apply step's reason opening `sed:`. The bash
 is the inline `resolve_bash`'s, one that can see this file, and a call with none raises `LookupError`.
 Each command's output goes to `cmd-<n>.out` beside the worktree, never a pipe, read once the wait
 returns; on the timeout the inline `run_tree_kill`, the `run_tree_kill_py` block the run-gates kit's
@@ -169,9 +177,12 @@ returns; on the timeout the inline `run_tree_kill`, the `run_tree_kill_py` block
 on stderr, `loop-witness: leaked <path>`, never raised.
 `acceptance --build --unit --sha --cmd... [--root]` writes the memory-tree kit's acceptance record
 through its `write_acceptance`, `Writer: stand-in`; `rerun --sha --cmd --expect...` answers each command
-`confirmed`, `refuted` or `inconclusive`. Its plants are `acceptance`, `acceptance-malformed`,
+`confirmed`, `refuted` or `inconclusive`, printing a refused re-run's reason on stderr as
+`loop-witness: inconclusive · <reason>`. Its plants are `acceptance`, `acceptance-malformed`,
 `probe-rerun`, `bash-syntax`, a command only bash runs, `timeout-grandchild`, a grandchild outliving
-the bound, and `hold-inherited`, the last running the unattended driver, found by
+the bound, `normalise`, one command printing its worktree and a duration re-run twice to one hash,
+`normaliser-missing`, the module's `KIT` rebound to an empty directory so the re-run refuses by name
+and `rerun` reads inconclusive, and `hold-inherited`, the last running the unattended driver, found by
 `resolve_kit_dir` and run through the inline `resolve_bash`, with no edge to that kit, since it requires
 this one; a kit that does not resolve exits 2, never a pass. `--selftest` runs them and this reader's
 `computed-actor` and `computed-unserved` plants, and is gov's `loop computed witness` gate.

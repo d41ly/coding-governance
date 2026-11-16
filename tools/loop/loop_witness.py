@@ -14,8 +14,12 @@ of its combined output kept, and the worktree removed on every exit path. The ba
 file beside the worktree, never a pipe, read once the wait returns, so a grandchild holding it cannot hold
 the call; on the timeout the command's process tree is killed through the inline `run_tree_kill`. A
 worktree still on disk after the teardown is named on stderr, `loop-witness: leaked <path>`, never
-raised. Output is hashed raw, so a command whose output carries a timestamp never re-runs equal; that is
-reported, never normalised.
+raised. The hash is taken after the run-gates kit's `write_normaliser` program, written once by one bash
+started in the worktree and applied with `LC_ALL=C sed -E -f` to each output: it strips the worktree's
+path, its realpath, the worktree as that bash's `pwd` prints it and the repository's path in each
+spelling, `tmp.` names, durations, CRs and trailing whitespace. A kit that does not resolve, found before
+the worktree is added, or a step that fails or passes the bound raises LookupError
+`witness: normaliser unavailable — <reason>`, and no hash is returned.
 
 `acceptance` is the acceptance stand-in until dWellOiledMachine's executor writes the record: `--sha`
 resolved to its full commit in the tree at `--root`, the commands re-run there, and the record written
@@ -25,8 +29,9 @@ does not resolve; 1 where the writer refuses, writing nothing.
 
 `rerun` is the probe stand-in, run in the repository at the current directory: each `--cmd` paired in
 order with one `--expect`, answered `confirmed` when its exit and hash at the pinned SHA equal the
-expectation, `refuted` when either differs, and `inconclusive` on a timeout or a SHA that does not
-resolve. It prints `loop-witness: rerun · <verdict> · <exit> · <hash> · <command>` per command, exit 0
+expectation, `refuted` when either differs, and `inconclusive` on a timeout, a SHA that does not
+resolve or a refused re-run, whose reason it prints on stderr as `loop-witness: inconclusive · <reason>`.
+It prints `loop-witness: rerun · <verdict> · <exit> · <hash> · <command>` per command, exit 0
 when every verdict is `confirmed`, 1 otherwise, 2 on a usage error, an unpaired `--cmd` included.
 
 `--fixture --plant <case>` runs one plant of `PLANTS` in a scratch repository under the host temp
@@ -68,7 +73,9 @@ PLANTS = {"acceptance": "a unit's two commands re-run at its commit, an uncommit
           "hold-inherited": "a preflighted run held under inherited-red over an OWN attribution, an untied bar, and "
                             "an INHERITED one with its staged set",
           "bash-syntax": "a command only bash can run, re-run at its commit",
-          "timeout-grandchild": "a command whose grandchild outlives its bound, re-run and torn down"}
+          "timeout-grandchild": "a command whose grandchild outlives its bound, re-run and torn down",
+          "normalise": "a command printing its worktree and a duration, re-run twice at one commit",
+          "normaliser-missing": "the run-gates kit looked for from an empty directory, the re-run refused by name"}
 #: The loop reader's plants this leg runs too, each owed exit 1 with a refusal naming the acceptance row.
 READER_PLANTS = ("computed-actor", "computed-unserved")
 FX_UNIT = "TOOL-tFix-1"
@@ -151,14 +158,52 @@ def remove_tree(path):
     deviation_join.remove_tree(path)
 
 
+def run_normaliser(bash, lib, prog, roots, outs, tree, env, timeout):
+    """Write `<out>.norm` beside each of `outs` through the run-gates kit's `write_normaliser`, run in
+    one bash started in `tree` as each command's is: it sources the kit's library, writes the program
+    once over `roots` with the worktree as its own `pwd` prints it third, and applies it with sed.
+    LookupError `witness: normaliser unavailable — ` naming the step and its exit, where the bash does
+    not start, a step exits non-zero or the run passes `timeout`; a timed-out bash is killed through
+    `run_tree_kill` before this returns."""
+    unavailable = "witness: normaliser unavailable — "
+    steps = {3: "source:", 4: "write_normaliser:", 5: "sed:"}
+    script = ('. "$1" || exit 3; p=$2; t=$(pwd) || exit 4; '
+              'write_normaliser "$p" "$3" "$4" "$t" "$5" || exit 4; shift 5; '
+              'for f in "$@"; do LC_ALL=C sed -E -f "$p" < "$f" > "$f.norm" || exit 5; done')
+    err = os.path.join(os.path.dirname(prog), "normalise.err")
+    argv = [bash, "-c", script, "_", lib.as_posix(), pathlib.Path(prog).as_posix(), *roots,
+            *(pathlib.Path(o).as_posix() for o in outs)]
+    with open(err, "wb") as sink:
+        try:
+            p = subprocess.Popen(argv, cwd=tree, env=env, stdin=subprocess.DEVNULL, stdout=sink,
+                                 stderr=subprocess.STDOUT, **({} if os.name == "nt" else {"start_new_session": True}))
+        except OSError as exc:
+            raise LookupError(unavailable + "bash: did not start: %s" % exc) from None
+        try:
+            code = p.wait(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            run_tree_kill(p)
+            raise LookupError(unavailable + "bash: past the %s s bound" % timeout) from None
+    if code != 0:
+        with open(err, encoding="utf-8", errors="replace") as fh:
+            said = fh.read().strip().splitlines()
+        raise LookupError(unavailable + "%s exit %d%s" % (steps.get(code, "bash:"), code,
+                                                          (" · " + said[-1]) if said else ""))
+
+
 def run_witness_commands(repo, sha, commands, timeout=TIMEOUT):
     """[(command, exit, hash12)] for each command run in a detached worktree of `sha`, `exit` an int or
-    `timeout`. LookupError where no bash can see this file, or where the worktree cannot be added, `sha`
-    naming no commit among the causes."""
+    `timeout`, the hash over the output after the run-gates kit's `write_normaliser` program. LookupError
+    where no bash can see this file, where the run-gates kit does not resolve or its normaliser fails,
+    or where the worktree cannot be added, `sha` naming no commit among the causes."""
     script = pathlib.Path(__file__).absolute()
     bash = resolve_bash(script)
     if bash is None:
         raise LookupError("no bash that can see %s: GOV_BASH, PATH and Git for Windows looked in" % script.as_posix())
+    try:   # before the worktree is added, so a missing kit adds none
+        lib = resolve_kit_dir("run-gates", "lib-attribute.sh", KIT) / "lib-attribute.sh"
+    except LookupError as exc:
+        raise LookupError("witness: normaliser unavailable — %s" % exc) from None
     env = read_clean_env()
     tmp = tempfile.mkdtemp(prefix="lw-")
     tree = os.path.join(tmp, "tree")
@@ -168,7 +213,7 @@ def run_witness_commands(repo, sha, commands, timeout=TIMEOUT):
         if rc != 0:
             raise LookupError("git worktree add --detach of %s failed in %s" % (sha, repo))
         added = True
-        runs = []
+        codes, outs = [], []
         for n, command in enumerate(commands, 1):
             # output to a file beside the worktree, never a pipe: a grandchild holding a pipe holds the
             # read past the bound (gotcha bounded-through-a-pipe-is-unbounded)
@@ -182,7 +227,14 @@ def run_witness_commands(repo, sha, commands, timeout=TIMEOUT):
                 except subprocess.TimeoutExpired:
                     run_tree_kill(p)
                     code = "timeout"
-            with open(out, "rb") as fh:
+            codes.append(code)
+            outs.append(out)
+        roots = [pathlib.Path(tree).absolute().as_posix(), pathlib.Path(os.path.realpath(tree)).as_posix(),
+                 pathlib.Path(repo).absolute().as_posix()]
+        run_normaliser(bash, lib, os.path.join(tmp, "normalise.sed"), roots, outs, tree, env, timeout)
+        runs = []
+        for command, code, out in zip(commands, codes, outs):
+            with open(out + ".norm", "rb") as fh:
                 runs.append((command, code, hashlib.sha256(fh.read()).hexdigest()[:12]))
         return runs
     finally:
@@ -240,7 +292,8 @@ def run_rerun(args):
     sha = resolve_commit(root, args.sha)
     try:
         runs = run_witness_commands(root, sha, cmds) if sha else None
-    except LookupError:
+    except LookupError as exc:
+        print("%s: inconclusive · %s" % (SAY, exc), file=sys.stderr)
         runs = None
     ok = True
     for n, command in enumerate(cmds):
@@ -405,6 +458,61 @@ def check_grandchild_plant(root, bad):
         bad.append("worktree(s) left with no leaked line naming them: %s" % unnamed)
 
 
+def check_normalise_plant(root, bad):
+    """TOOL-dDeclaredLoop-68 AC1: one command printing its working directory three ways and a duration
+    that differs per run re-runs twice at one commit to one hash, never the hash of empty output."""
+    write_scratch_unit(root)
+    run_fixture_git(root, "add", "-A")
+    run_fixture_git(root, "commit", "-qm", "the scratch unit")
+    sha = run_fixture_git(root, "rev-parse", "HEAD")
+    count = pathlib.Path(root, "count.txt").absolute().as_posix()   # outside the worktree, untracked
+    cmd = ('pwd; "%s" -c "import os; print(os.getcwd())"; git rev-parse --show-toplevel; '
+           'n=$(cat "%s" 2>/dev/null || echo 0); n=$((n + 1)); echo "$n" > "%s"; echo "took $n.5s"'
+           % (pathlib.Path(sys.executable).as_posix(), count, count))
+    digests = [run_witness_commands(root, sha, [cmd])[0][1:] for _ in range(2)]
+    empty = hashlib.sha256(b"").hexdigest()[:12]
+    print("%s: normalise · %s" % (SAY, " · ".join("exit %s %s" % d for d in digests)))
+    if digests[0] != digests[1] or digests[0][0] != 0 or digests[0][1] == empty:
+        bad.append("the two re-runs read %s, not one exit 0 hash other than the empty %s" % (digests, empty))
+
+
+def check_normaliser_missing_plant(root, bad):
+    """TOOL-dDeclaredLoop-68 AC4: with the run-gates kit looked for from an empty scratch directory the
+    re-run refuses by name before it adds a worktree, and `rerun` reads inconclusive printing why."""
+    global KIT
+    write_scratch_unit(root)
+    run_fixture_git(root, "add", "-A")
+    run_fixture_git(root, "commit", "-qm", "the scratch unit")
+    sha = run_fixture_git(root, "rev-parse", "HEAD")
+    empty = pathlib.Path(root, "nokit", "loop")
+    empty.mkdir(parents=True)
+    kit, cwd, out, err = KIT, os.getcwd(), io.StringIO(), io.StringIO()
+    KIT = empty
+    try:
+        try:
+            run_witness_commands(root, sha, ["true"])
+            raised = "no LookupError"
+        except LookupError as exc:
+            raised = str(exc)
+        trees = [ln for ln in run_fixture_git(root, "worktree", "list", "--porcelain").splitlines()
+                 if ln.startswith("worktree ")]
+        os.chdir(root)
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            rc = main(["rerun", "--sha", sha, "--cmd", "true", "--expect", "0:" + "0" * 12])
+    finally:
+        KIT = kit
+        os.chdir(cwd)
+    print("%s: normaliser-missing · %s · %d worktree(s) · rerun exit %d" % (SAY, raised[:200], len(trees), rc))
+    if not raised.startswith("witness: normaliser unavailable"):
+        bad.append("run_witness_commands raised %r, not witness: normaliser unavailable" % raised[:300])
+    if len(trees) != 1:
+        bad.append("git worktree list shows %d worktrees, not the fixture's one: %s" % (len(trees), trees))
+    if rc != 1 or "rerun · inconclusive · " not in out.getvalue() \
+            or "witness: normaliser unavailable" not in err.getvalue():
+        bad.append("rerun exited %d, not 1 reading inconclusive with the reason on stderr: %s | %s" % (
+            rc, out.getvalue()[:300], err.getvalue()[:300]))
+
+
 #: The conf the hold-inherited plant's driver reads: every key the driver NOTEs about when blank, declared.
 HOLD_CONF = """MEMORY_ROOT=memory
 UNITS_REGION_CUTOFF="2026-08-19"
@@ -533,7 +641,9 @@ def run_fixture(plant):
     try:
         rc = {"acceptance": check_acceptance_plant, "acceptance-malformed": check_malformed_plant,
               "probe-rerun": check_rerun_plant, "hold-inherited": check_hold_plant,
-              "bash-syntax": check_bash_syntax_plant, "timeout-grandchild": check_grandchild_plant}[plant](root, bad)
+              "bash-syntax": check_bash_syntax_plant, "timeout-grandchild": check_grandchild_plant,
+              "normalise": check_normalise_plant,
+              "normaliser-missing": check_normaliser_missing_plant}[plant](root, bad)
     except (subprocess.CalledProcessError, OSError, LookupError, ImportError) as exc:
         detail = getattr(exc, "stderr", "") or ""
         bad.append("the fixture could not be built: %s %s" % (exc, detail.strip()[:300]))

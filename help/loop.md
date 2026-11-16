@@ -183,8 +183,14 @@ criterion's `[[ ]]` and pipes work as written; where no bash can be found the re
 Output goes to a file, never a pipe, so a command that leaves a background process behind cannot
 keep the re-run waiting. A command that runs past its time limit is stopped with every process it
 started and recorded as `timeout`. The worktree is removed afterwards, even after a failure, and one
-still on disk is named on stderr as `loop-witness: leaked <path>`. Output is hashed exactly as
-printed, so a command that prints the time never re-runs equal.
+still on disk is named on stderr as `loop-witness: leaked <path>`. Before it is hashed, the output
+is normalised by the run-gates kit's program, its `write_normaliser`, run once in bash in the
+worktree: it strips the worktree's path, its real path, the worktree as bash's `pwd` prints it (under
+Git Bash a `/tmp/` path) and the repository's path, each in its forward-slash, backslash and `/c/`
+spelling, then `tmp.` directory names, durations such as `1.5s` or `20ms`, carriage returns and
+trailing spaces. So a command that prints its working directory or how long it took re-runs equal,
+while one that prints the time of day still does not. Where the run-gates kit is not installed, or
+the normaliser fails, the re-run is refused with `witness: normaliser unavailable — <reason>`.
 
 <!-- run: no — needs a build folder and a committed unit in the adopter, which a scratch adopter does not hold -->
 ```bash
@@ -200,7 +206,8 @@ python tools/loop/loop_witness.py rerun --sha <pinned> --cmd "<command>" --expec
   Commit the record yourself. No flag types a run line: the record's lines are always computed.
 - **`rerun`** pairs each `--cmd` with the `--expect` in the same place, and prints one line per <!-- usage: script:tools/loop/loop_witness.py#rerun 016ed8f7 -->
   command: `confirmed` when the exit and hash at the pinned commit match, `refuted` when either
-  differs, and `inconclusive` on a timeout or a commit that does not resolve. It exits 0 only when
+  differs, and `inconclusive` on a timeout, a commit that does not resolve or a refused re-run, whose
+  reason it prints on stderr as `loop-witness: inconclusive · <reason>`. It exits 0 only when
   every command is `confirmed`, and 2 on an unpaired `--cmd`.
 
 **Holding on an inherited red.** `--hold --code inherited-red` in the unattended driver is admitted
@@ -1784,7 +1791,10 @@ outside the flow, such as the lander's wait on a claim lock, which the loop kit'
   the unattended driver and holds it under `inherited-red` over an `OWN` leg, an untied bar and an
   `INHERITED` one, `bash-syntax` (a command only bash can run, re-run with exit 0 and the hash of its
   `0`) and `timeout-grandchild` (`sleep 30 & wait` under a two-second limit, which must come back
-  within ten seconds as `timeout`, its worktree removed or named as leaked). `--selftest` runs every case and the two computed-witness cases above, and the
+  within ten seconds as `timeout`, its worktree removed or named as leaked), `normalise` (a command
+  printing its working directory three ways and a duration that changes per run, re-run twice to one
+  hash) and `normaliser-missing` (the run-gates kit looked for from an empty directory: the re-run is
+  refused by name before it adds a worktree, and `rerun` answers `inconclusive` printing why). `--selftest` runs every case and the two computed-witness cases above, and the
   `loop computed witness` gate runs it. A case whose kit is not installed exits 2, never a pass.
 
 ## What stops a read

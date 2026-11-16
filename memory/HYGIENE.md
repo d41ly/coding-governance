@@ -745,7 +745,7 @@ named `<date>-build-<unit id>-acceptance-<n>.md` in a build's `build/` folder. I
 `- **<Key>:** <value>` bullets, one line each and all required: Sha (the full 40-hex commit the re-run
 read), Writer (`executor` · `stand-in`) and Caused-by (the unit). After one blank line come its run
 lines, one per command, `run · <exit> · <hash> · <command>`: the exit an integer or `timeout`, the
-hash the first twelve hex digits of the SHA-256 of the command's combined output. A record with no
+hash the first twelve hex digits of the SHA-256 of the command's combined output after the run-gates kit's `write_normaliser` program strips its roots and durations. A record with no
 run line, or with a line opening `run ·` outside that grammar, is malformed. It has no door: the
 lines are computed, never typed, by the loop kit's `loop_witness.py acceptance` until an executor
 writes it, and a hand-typed record reads malformed wherever it lacks them.
