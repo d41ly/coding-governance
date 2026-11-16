@@ -1364,11 +1364,53 @@ past it, that item's loop is non-converging, though a spec subject's review roun
   ` · to on-exhausted` once it is spent. A unit whose fix-pass loop ended takes no further fix pass and
   no dispatch.
 
+Once the budget is spent, the build ends and never laps again. The policy key `flow.on-exhausted` says
+how. `best-effort-ending`, the default, takes the ending your units support: `land-green` where every
+unit not `WONTDO` is `CLOSED`, `descope` where some unit is `CLOSED`, and otherwise `close-incomplete`,
+so a build with no units lands nothing. `park-for-owner` hands the build to you, and
+`close-incomplete` closes it incomplete, its branch and records kept. Each ending is a row of the
+build's transition table, on the item `@any` with the ending as its outcome, and none of them draws on
+the budget:
+
+| Row | From | Outcome | Fact | To |
+|---|---|---|---|---|
+| E1 | planning, designing, building, testing or deploying | `close-incomplete` | before the push | `incomplete` |
+| E2 | the same five | `park-for-owner` | | `parked` |
+| E3 | `parked` | `disposed` | your disposition `continue` | the state it was parked from |
+| E4 | `parked` | `disposed` | your disposition `none`, before the push | `incomplete` |
+| E5 | `testing` | `descope` | | `building` |
+
+No ending raises `flow.rework-budget`: raising it stays yours.
+
+- **See the ending:** `python tools/loop/budget.py ending --build <slug>` runs at your repository's top <!-- usage: script:tools/loop/budget.py#ending 004f19ef -->
+  level and prints `loop: budget · ending · <ending|none> · <open|unfrozen|spent> <spent>/<total> ·
+  open <ids|none> · disposed <word|unrecorded>`, exit 0. The ending is `none` until the budget is
+  spent, the ids are the units whose status is neither `CLOSED` nor `WONTDO`, and `disposed` is the
+  word of your newest disposition record of the build's exhaustion item. It refuses a value outside
+  the three, exit 2.
+
+- **End a spent build:** `bash tools/unattended/unattended.sh --exhausted <slug>` records the ending <!-- usage: verb:unattended.sh:--exhausted 40c08fe9 -->
+  once, as a `decision` row the wrap-up shows you, and prints what comes next: `close-incomplete`
+  files each open unit with `--rescope <slug> --act defer` and then runs `--abort <slug> --code
+  budget-exhausted`, which is refused while an open unit has no deferral; `park-for-owner` hands off
+  with `--handoff <slug> --code owner-decision`; `land-green` and `descope` go on to `--close`. A second
+  call prints the recorded ending and writes nothing, and a budget not yet spent is refused. Once the
+  budget is spent, a refused review round or dispatch tells the run to call it.
+
+A parked build resumes only after you record a disposition of its exhaustion item, `continue` to go
+on, or `none`, after which the run ends it through the same abort:
+
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries a placeholder the shell reads as a redirect -->
+```bash
+python tools/memory-tree/build_records.py new disposition --build <slug> --unit <unit-id> --item item.flow.on-exhausted --disposition continue --channel terminal
+```
+
 - **See it on a fixture:** `python tools/loop/budget.py --fixture --plant <case>` runs one case in a <!-- usage: script:tools/loop/budget.py 8248cc63 -->
   scratch repository, and `--selftest` runs them all. Gov's own `loop budget fixtures` gate runs them.
 
-The budget does not serialize two draws made at once, which are two rows, and does not say what a
-build does once it is spent.
+The budget does not serialize two draws made at once, which are two rows. The ending reads each unit's
+status header and not its derived state, and anyone who can write a disposition record releases a
+parked build.
 
 ## How to use it
 

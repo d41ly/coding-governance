@@ -5883,6 +5883,11 @@
       "file": "tools/playbook/core.py"
     },
     {
+      "id": "check_exhausted_close",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_exit_fold",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -6926,6 +6931,11 @@
       "id": "check_owned",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
+    },
+    {
+      "id": "check_owner_disposition",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_owner_row",
@@ -10421,6 +10431,11 @@
       "id": "derive_effort_index",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
+    },
+    {
+      "id": "derive_ending",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
     },
     {
       "id": "derive_enforcer_imports",
@@ -18718,6 +18733,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "read_build_specs",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
       "id": "read_build_unit_ids",
       "kind": "function",
       "file": "tools/loop/loop_transition.py"
@@ -19428,6 +19448,11 @@
       "file": "tools/playbook/edge_grammar.py"
     },
     {
+      "id": "read_ending",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
+    },
+    {
       "id": "read_engine_conf_reader",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -19496,6 +19521,16 @@
       "id": "read_excluded_tags",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "read_exhausted_ending",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_exhausted_row",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "read_expand_rows",
@@ -28601,6 +28636,11 @@
       "id": "run_exceptions",
       "kind": "function",
       "file": "tools/playbook/core.py"
+    },
+    {
+      "id": "run_exhausted",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "run_expand",

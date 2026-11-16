@@ -40,7 +40,8 @@ set storing neither the trailer nor the log writes no commit. A backward move, t
 goes through this one writer, its channels and its fields as a forward move does: the direction is
 `loop_table`'s `derive_direction`, derived on every print and read, and never stored. The rework budget
 rides the same records (`budget.py`, TOOL-dDeclaredLoop-30): a backward move draws `route-back`, refused
-before any write where the budget is spent, and the move from `designing` to `building` writes the freeze
+before any write where the budget is spent, save on a row reading `draws = "none"`, an ending, which draws
+nothing (TOOL-dDeclaredLoop-31); and the move from `designing` to `building` writes the freeze
 row, once; each row is a line after the record's fields, the build's first record copying the rows before
 it. Where the move writes no record its rows take the first home that exists (TOOL-dDeclaredLoop-48):
 under a set without `log`, the build's newest record, staged into the move's commit, else the trailer's
@@ -121,7 +122,9 @@ VALUE = re.compile(r"[A-Za-z0-9._:+@-]+")
 STATE = re.compile(r"[a-z0-9][a-z0-9-]*")
 SHA = re.compile(r"[0-9a-f]{8,40}")
 SEP = " · "
-FENCE = ("<!-- microformats -->", "<!-- /microformats -->")
+#: A spec's status header, its first word the unit's status.
+STATUS_HEADER = re.compile(r"^\*\*Status:\*\* ([A-Z]+)", re.M)
+FENCE =("<!-- microformats -->", "<!-- /microformats -->")
 PLANTS = {"default": "the default set, one B4 move with its witness",
           "subset-trailer-line": "the set [\"trailer\", \"micro-format\"], one B4 move",
           "subset-log": "the set [\"log\"], one B4 move",
@@ -133,7 +136,9 @@ PLANTS = {"default": "the default set, one B4 move with its witness",
           "pre-spec": "a build with no spec moved once, then a spec planted and a second move",
           "field": "a move with --field colour=red, one with composition=3f9c2a71, refused as derived, then a plain move",
           "backward-rows": "B4, B5 and B7 forward, then B13, B8 and B6 back, each trailer and read printed",
-          "skip-backward": "the six moves of backward-rows, then the newest record, B6's, deleted"}
+          "skip-backward": "the six moves of backward-rows, then the newest record, B6's, deleted",
+          "descope-spent": "flow.rework-budget = 0: B4, B5 and B7 forward, B13 back refused as spent, then "
+                           "@any's descope from testing"}
 #: The moves the backward plants record in order, each an argv tail for `record` before its witness.
 BACKWARD_MOVES = (("--from", "planning", "--item", "item.plan.exit", "--outcome", "recorded"),
                   ("--from", "designing", "--item", "item.design.exit", "--outcome", "recorded"),
@@ -251,6 +256,13 @@ def resolve_build_anchor(build, root):
 def read_build_unit_ids(build, root):
     """The unit ids the tracked spec H1s under `build` define, in `git ls-files` order: the anchor's walk,
     and the units the rework budget counts at its freeze (`budget.py`)."""
+    return [uid for uid, _status in read_build_specs(build, root)]
+
+
+def read_build_specs(build, root):
+    """`[(unit id, status)]` of each tracked spec H1 under `build`, in `git ls-files` order: the status the
+    word its `**Status:**` header opens with, empty where it carries none. `budget.py`'s ending reads the
+    statuses (TOOL-dDeclaredLoop-31)."""
     read_memory_tree("tree_lib.py")
     from design_lib import read_design_conf, read_tracked_builds
     from tree_lib import parse_spec_h1
@@ -262,9 +274,11 @@ def read_build_unit_ids(build, root):
     for rel in read_tracked_builds(root, memory_root):
         path = pathlib.Path(root, rel)
         if rel.startswith(prefix) and rel.endswith(".md") and path.is_file():
-            hit = parse_spec_h1(rel, path.read_bytes().decode("utf-8", "replace"), memory_root, families)
+            text = path.read_bytes().decode("utf-8", "replace")
+            hit = parse_spec_h1(rel, text, memory_root, families)
             if hit:
-                ids.append(hit[1])
+                status = STATUS_HEADER.search(text)
+                ids.append((hit[1], status.group(1) if status else ""))
     return ids
 
 
@@ -366,7 +380,7 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
     cache = {}
     chosen = read_cached_channels(root, "HEAD", cache)
     data, where = read_definition(KIT)
-    _row, to = derive_move("build", state, item, outcome, facts, read_transition_rows(data, where))
+    row, to = derive_move("build", state, item, outcome, facts, read_transition_rows(data, where))
     sha = resolve_commit(root, witness)
     if sha is None:
         raise ValueError("--witness %s names no commit in %s" % (witness, root.as_posix()))
@@ -421,7 +435,7 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
     on_trailer = "trailer" in chosen and "log" not in chosen
     run, rows = read_run_file(root, build), []
     homed = bool(anchor or newest or on_trailer or run.is_file())
-    if direction == "backward":
+    if direction == "backward" and row.get("draws") != "none":   # an ending row draws nothing (TOOL-dDeclaredLoop-31)
         answer, drawn = record_draw(build, "route-back", item, root, lines=rows, moves=before)
         if answer == "exhausted":
             raise ValueError("the rework budget is spent, %s, so the backward move is refused and nothing is "
@@ -566,6 +580,8 @@ def write_transition_plant(top, case):
         files[FX_SPEC] = "# %s — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n" % FX_UNIT
     if case in PLANT_SETS:
         files[".governance/policy.toml"] = "[transitions]\nrecord = %s\n" % PLANT_SETS[case]
+    if case == "descope-spent":
+        files[".governance/policy.toml"] = "[flow]\nrework-budget = 0\n"
     write_fixture_files(top, files)
     run_fixture_git(top, "add", "-A")
     run_fixture_git(top, "commit", "-q", "-m", "fixture")
@@ -600,6 +616,23 @@ def run_transition_fixture(case):
             run_fixture_git(top, "add", "-A")
             run_fixture_git(top, "commit", "-q", "-m", subject)
 
+        if case == "descope-spent":   # the ending row E5 records a backward move on a spent budget, drawing nothing
+            for n, tail in enumerate(BACKWARD_MOVES[:3]):
+                run_verb(["record", *at, *tail, "--witness", "HEAD" if n else witness])
+            before = read_count()
+            refused = run_verb(["record", *at, *BACKWARD_MOVES[3], "--witness", "HEAD"])
+            kept = read_count() == before
+            rc = run_verb(["record", *at, "--from", "testing", "--item", "@any", "--outcome", "descope", "--witness", "HEAD"])
+            from budget import read_budget_rows   # it imports this module, so here
+            held, moves = read_budget_rows(FX_BUILD, top), read_transitions(FX_BUILD, top)
+            print("%s: fixture · rows %s" % (SAY, " | ".join(held["rows"]) or "none"))
+            misses = [why for ok, why in (
+                (refused == 2 and kept, "the backward move on item.test.attribute's code-miss was not refused"),
+                (rc == 0 and bool(moves) and (moves[0]["from"], moves[0]["to"], moves[0]["item"]) == (
+                    "testing", "building", "@any"), "the descope did not record testing -> building on @any"),
+                (not held["draws"], "the descope drew a row")) if not ok]
+            print("%s: fixture · descope-spent · %s" % (SAY, "held" if not misses else "MISSED " + "; ".join(misses)))
+            return 0 if not misses else 1
         if case in ("no-row", "empty-set"):
             before = read_count()
             argv = b4 if case == "empty-set" else b4[:7] + ["--item", "item.design.exit"] + b4[9:]
@@ -727,7 +760,9 @@ def run_selftest():
               "%s: fixture · direction stored · 0 trailer(s) · 0 record(s)" % SAY, ""),
              ("backward-rows check", fx("backward-rows"), 0, check, "· 0 finding(s)"),
              ("skip-backward", fx("skip-backward"), 1, "%s: transition · commit " % SAY,
-              "· log · the move designing -> planning owes a record, and none holds it")]
+              "· log · the move designing -> planning owes a record, and none holds it"),
+             ("descope-spent refused", fx("descope-spent"), 0, "%s: unanswered · the rework budget is spent" % SAY, ""),
+             ("descope-spent", fx("descope-spent"), 0, "%s: fixture · descope-spent · held" % SAY, "")]
     return run_selftest_cases(run_cached_case, cases, "%s: transition selftest" % SAY)
 
 

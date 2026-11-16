@@ -551,6 +551,13 @@ verb = "target"
 flags = ["--build=", "--item="]
 
 [[usage]]
+id = "script:{prefix}/loop/budget.py#ending"
+shape = "verb"
+entry = "{prefix}/loop/budget.py"
+verb = "ending"
+flags = ["--build="]
+
+[[usage]]
 id = "script:{prefix}/loop/scenario.py"
 shape = "verb"
 entry = "{prefix}/loop/scenario.py"

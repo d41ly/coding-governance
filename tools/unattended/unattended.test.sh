@@ -8894,19 +8894,42 @@ reset_tree
 # ---- each writing no row, while a spec subject's second round is recorded all the same.
 bcopen; crdrop
 printf '# ARCH-tRun-1 — the unit\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-1 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n' > memory/builds/tRun/spec/one.md
+# ---- TOOL-dDeclaredLoop-31: under the default budget `--exhausted` is refused in its one `fail 37`, naming
+# ---- the unspent state and writing nothing, and the budget-exhausted abort with no exhaustion row is refused
+# ---- in its guard's one `fail 33`. Against the base driver the verb is unknown and the code is no halt code.
+fixture; before=$(sum)
+out=$(run --exhausted tRun)
+hit "$out" "--exhausted ends a build only once its rework budget is spent, and budget.py ending reads otherwise or does not answer, so nothing is recorded"
+hit "$out" "unfrozen"
+same "an unspent --exhausted wrote nothing" "$(sum)" "$before"
+out=$(run --abort tRun --code budget-exhausted --reason r)
+hit "$out" "--abort --code budget-exhausted ends only a build whose exhaustion row reads close-incomplete, or park-for-owner with the owner's disposition none, every open unit deferred; the condition that failed"
+hit "$out" "the record holds no exhaustion row"
+same "a budget-exhausted abort with no exhaustion row wrote nothing" "$(sum)" "$before"
 printf '\n[flow]\nrework-budget = 0\n' >> .governance/policy.toml
 fixture
 run --review tRun --subject tRun --verdict BLOCKED --blockers 3 >/dev/null
 out=$(run --review tRun --subject tRun --verdict BLOCKED --blockers 2)
 hit "$out" "the rework budget refused this review round, so no round is recorded: "
 hit "$out" "flow.on-exhausted"
+hit "$out" "end the build with --exhausted tRun"
 same "a closing round the budget refused wrote nothing" "$(grep -c ' review · item tRun · reason' memory/builds/tRun/RUN.md)" "1"
+# ---- ...then `--exhausted` parks ONE exhaustion row, a second call writes none, and the next refused round
+# ---- names the recorded ending and that only the owner raises the budget.
+out=$(run --exhausted tRun)
+hit "$out" "unattended: exhausted — ending close-incomplete · spent 0/0"
+hit "$out" "only the owner raises flow.rework-budget"
+same "--exhausted parks one exhaustion row" "$(grep -c ' decision · item flow.on-exhausted · reason ending close-incomplete · spent 0/0' memory/builds/tRun/RUN.md)" "1"
+hit "$(run --exhausted tRun)" "the build's ending is already recorded, unchanged — close-incomplete"
+same "a second --exhausted adds no row" "$(grep -c ' decision · item flow.on-exhausted · reason ' memory/builds/tRun/RUN.md)" "1"
+hit "$(run --review tRun --subject tRun --verdict BLOCKED --blockers 2)" "the build's ending is close-incomplete, and only the owner raises flow.rework-budget"
 run --review tRun --subject S7 --verdict BLOCKED --blockers 3 >/dev/null
 hit "$(run --review tRun --subject S7 --verdict BLOCKED --blockers 2)" "S7 · round 2"
 same "a spec subject's round under a spent budget is recorded" "$(grep -c ' review · item S7 · reason' memory/builds/tRun/RUN.md)" "2"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes src/rb.sh)" "dispatch declared"
 out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes src/rb.sh)
 hit "$out" "the rework budget refused this dispatch, so no dispatch is recorded: "
+hit "$out" "the build's ending is close-incomplete, and only the owner raises flow.rework-budget"
 same "a dispatch the budget refused wrote nothing" "$(grep -c ' ARCH-tRun-1 · reason src/rb.sh' memory/builds/tRun/RUN.md)" "1"
 reset_tree
 
@@ -12486,6 +12509,33 @@ for _ho_case in "2026-01-01 external-prerequisite yes" "2099-01-01 external-prer
     soon)  hit "$out" "unattended: NOTE - HANDOFF_CUTOFF is not a YYYY-MM-DD date, so no record can be dated against it and no hand-off notice is printed: soon" ;;
   esac
 done
+
+# ---- TOOL-dDeclaredLoop-31 AC5: THE EXHAUSTION PARK IS THE OWNER'S TO LEAVE. A spent budget under
+# ---- park-for-owner hands off under owner-decision, the exhaustion row its parked decision; `--resume` is
+# ---- refused in its `fail 57` until the owner's disposition record of the item reads continue, and an
+# ---- owner-decision hand-off with no exhaustion row resumes as before. Against the base driver the
+# ---- verb is unknown and the park's resume takes the run over with no record.
+build_hold_fixture
+printf '\n[flow]\nrework-budget = 0\non-exhausted = "park-for-owner"\n' >> .governance/policy.toml; fixture
+out=$(run --exhausted tRun)
+hit  "$out" "unattended: exhausted — ending park-for-owner · spent 0/0"
+hit  "$out" "--handoff tRun --code owner-decision"
+fixture
+hit  "$(run --handoff tRun --code owner-decision --reason r --reaped k1)" "phase HELD · code owner-decision · until owner"
+fixture; before=$(sum)
+out=$(run --resume tRun --keepalive-id k2)
+hit  "$out" "this run is parked for its owner on a spent rework budget, and only the owner's disposition record of item.flow.on-exhausted reading continue releases it, so nothing was written and no lease was taken"
+hit  "$out" "the owner's disposition reads unrecorded"
+same "AC5 a resume refused before the owner's record wrote nothing" "$(sum)" "$before"
+"$_rkd_py" "$HERE/../$MT_KIT/build_records.py" new disposition --build tRun --unit ARCH-tRun-1 \
+  --item item.flow.on-exhausted --disposition continue --channel terminal >/dev/null; fixture
+hit  "$(run --resume tRun --keepalive-id k2)" "unattended: taken over — phase"
+build_hold_fixture
+run --park tRun --item "which order lands it" --reason "options seen: a first or b first; refused: the order is the owner's" >/dev/null; fixture
+run --handoff tRun --code owner-decision --reason r --reaped k1 >/dev/null; fixture
+out=$(run --resume tRun --keepalive-id k2)
+hit  "$out" "unattended: taken over — phase"
+miss "$out" "parked for its owner on a spent rework budget"
 
 fi   # ---- region 6 continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams

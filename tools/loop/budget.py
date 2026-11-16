@@ -4,6 +4,7 @@
     python budget.py draw --build <slug> --cause <cause> --item <item>
     python budget.py value
     python budget.py target --build <slug> --item <item>
+    python budget.py ending --build <slug>
     python budget.py --fixture --plant <case>
     python budget.py --selftest
 
@@ -42,8 +43,8 @@ since a build holding a freeze row in any home writes no second. A build no reco
 at its first draw made while it defines a spec, counting its units then.
 
 THE DRAW. `record_draw(build, cause, item)` writes one draw row, the freeze row first where one is owed,
-and answers `drawn`; once spent equals total it writes nothing and answers `exhausted`, the ending
-`flow.on-exhausted` names being another unit's. The cause is one of `CAUSES`, and `patch:<slug>` is
+and answers `drawn`; once spent equals total it writes nothing and answers `exhausted`, and the build
+ends as `flow.on-exhausted` names. The cause is one of `CAUSES`, and `patch:<slug>` is
 derived, never given: a build whose newest recorded move carries `scenario.patch` draws on the first
 build its README's `parents:` names, as `patch:<its slug>`. `draw` appends the rows to the build's
 newest log record and commits that record alone, its subject `loop budget(<slug>): <cause> <spent>/<total>`,
@@ -57,6 +58,14 @@ another build or the remote caused, which draws nothing; `count_returns` counts 
 `unit`, `ask` or `on-exhausted`; `budget_state` answers `open <spent>/<total>`, `spent` or
 `unfrozen <spent>/<total>`.
 
+THE ENDING (TOOL-dDeclaredLoop-31). `derive_ending(value, units)` answers the ending a spent budget takes
+under `flow.on-exhausted`'s `value`, `units` each unit's status: `park-for-owner` and `close-incomplete`
+answer themselves; `best-effort-ending`, the default, answers `land-green` where every unit not `WONTDO`
+is `CLOSED` and one is, `descope` where some unit is `CLOSED`, else `close-incomplete`. `read_ending`
+answers the ending line from one `read_budget_rows` read, the value at HEAD, each spec's status header
+through `loop_transition.py`'s `read_build_specs`, and the owner's newest disposition record of
+`EXHAUSTED_ITEM` through `adapt.py`'s `read_disposition_release`.
+
 Exit: `draw` prints `loop: budget · drawn · <row>` and exits 0, `loop: budget · exhausted · <slug> ·
 <spent>/<total> · flow.on-exhausted` and exits 3, `loop: budget · refused · <why>` and exits 2, and
 `loop: unarmed · <why>`, exit 2, where the policy or memory-tree kit does not resolve, never a default.
@@ -64,7 +73,11 @@ After a `drawn` or `exhausted` verdict, one `loop: budget · disagrees · <row> 
 line per disagreeing row of the build drawn on, in the order read, so the verdict stays the first line.
 `value` prints `base <n> per-unit <n>`. `target` prints `loop: budget · target · <answer>`, exit 0,
 `promotion_target`'s answer for a blocking item as the budget stands, `unit` or `on-exhausted`, which
-the unattended driver reads after a round's draw (TOOL-dDeclaredLoop-32); it draws nothing. `--fixture --plant <case>` builds a scratch repository under the
+the unattended driver reads after a round's draw (TOOL-dDeclaredLoop-32); it draws nothing. `ending` prints
+`loop: budget · ending · <ending|none> · <open|unfrozen|spent> <spent>/<total> · open <ids|none> ·
+disposed <word|unrecorded>`, exit 0, the ending `derive_ending`'s where the state is `spent` and `none`
+otherwise, the ids the units whose status is neither `CLOSED` nor `WONTDO`; the unattended driver's
+`--exhausted` reads it. `--fixture --plant <case>` builds a scratch repository under the
 host temp directory, runs the case and prints `held` or `MISSED`; `--selftest` runs every plant.
 
 WHAT THIS DOES NOT CHECK: two racing draws, which are two rows; a row typed by hand with a right
@@ -88,11 +101,11 @@ sys.dont_write_bytecode = True
 KIT = pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
-from adapt import read_run_file  # noqa: E402
+from adapt import read_disposition_release, read_run_file  # noqa: E402
 from loop_lib import read_memory_tree, run_selftest_cases  # noqa: E402
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_transition import (BUDGET_FIELDS, FX_BUILD, FX_SPEC, FX_UNIT, VALUE,  # noqa: E402
-                             check_transition_channels, read_build_unit_ids, read_memory_root,
+                             check_transition_channels, read_build_specs, read_build_unit_ids, read_memory_root,
                              read_record_channels, read_transition_commits, read_transition_records,
                              read_transitions, render_transition_trailer, write_transition, write_transition_plant,
                              write_transition_record)
@@ -102,6 +115,10 @@ SAY = "loop"
 BUDGET_KEY = "flow.rework-budget"
 ROUTE_KEY = "flow.route-backs"
 ENDING_KEY = "flow.on-exhausted"
+#: The `Item` of the owner's disposition record that leaves an exhaustion park (TOOL-dDeclaredLoop-31).
+EXHAUSTED_ITEM = "item.flow.on-exhausted"
+#: The statuses `derive_ending` reads: a unit witnessed green, and one that counts for nothing.
+CLOSED, WONTDO = "CLOSED", "WONTDO"
 CAUSES = ("route-back", "fix-pass", "review-round", "re-dispatch", "research")
 PATCH = "patch:"
 PATCH_SCENARIO = "scenario.patch"
@@ -143,7 +160,11 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
                           "malformed id",
           "draws-survive-rotation": "two draws, the run-state file rotated as an aborted run's, then a third draw",
           "patch-archived": "patch-trailer-only through its patch draw, then tFixPatch's run-state file rotated "
-                            "as an aborted run's"}
+                            "as an aborted run's",
+          "ending": "a CLOSED and an INPROGRESS unit under flow.rework-budget = 0 and a continue disposition, "
+                    "then the default value",
+          "driver-exhausted": "the driver's --exhausted unspent, then spent under close-incomplete with one unit "
+                              "open: the rounds, the dispatches and the budget-exhausted abort"}
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
 PLANT_TRAILER = '[transitions]\nrecord = ["trailer"]\n'
 PLANT_SPEC = "# TOOL-%s-%d — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n"
@@ -279,9 +300,10 @@ def derive_patch_origin(build, root, moves=None):
     return parents[0]
 
 
-def budget_state(build, root="."):
-    """`open <spent>/<total>`, `spent`, or `unfrozen <spent>/<total>` where no freeze row is held."""
-    held = read_budget_rows(build, root)
+def budget_state(build, root=".", held=None):
+    """`open <spent>/<total>`, `spent`, or `unfrozen <spent>/<total>` where no freeze row is held; `held`,
+    what `read_budget_rows` answered where the caller read it, else a fresh read."""
+    held = read_budget_rows(build, root) if held is None else held
     if held["spent"] >= held["total"]:
         return "spent"
     return "%s %d/%d" % ("open" if held["frozen_any"] else "unfrozen", held["spent"], held["total"])
@@ -313,6 +335,43 @@ def promotion_target(build, item, blocking, root="."):
     if not blocking:
         return "ask"
     return "on-exhausted" if budget_state(build, root) == "spent" else "unit"
+
+
+def derive_ending(value, units):
+    """The ending a spent budget takes under `flow.on-exhausted` = `value`, `units` `{id: status}`: the value
+    itself for `park-for-owner` and `close-incomplete`; under `best-effort-ending`, `land-green` where every
+    unit not WONTDO is CLOSED and one is, `descope` where some unit is CLOSED, else `close-incomplete`, so a
+    build with no units lands nothing. ValueError naming the key on any other value. Never a draw."""
+    if value in ("park-for-owner", "close-incomplete"):
+        return value
+    if value != "best-effort-ending":
+        raise ValueError("%s is %r, none of best-effort-ending, park-for-owner and close-incomplete" % (
+            ENDING_KEY, value))
+    counted = [s for s in units.values() if s != WONTDO]
+    if counted and all(s == CLOSED for s in counted):
+        return "land-green"
+    return "descope" if CLOSED in counted else "close-incomplete"
+
+
+def read_ending(build, root):
+    """The ending line of `build` at HEAD of `root`: `loop: budget · ending · <ending|none> · <state word>
+    <spent>/<total> · open <ids|none> · disposed <word|unrecorded>`. ValueError on a value or a row the
+    grammar refuses; LookupError where a kit does not resolve."""
+    root = pathlib.Path(root)
+    held = read_budget_rows(build, root)
+    state = budget_state(build, root, held).split(" ", 1)[0]
+    policy, _guard = read_policy_kit()
+    try:
+        value = policy.resolve(ENDING_KEY, str(root), "HEAD").value
+    except policy.Refusal as e:
+        raise ValueError("%s does not resolve at HEAD: %s" % (ENDING_KEY, e)) from None
+    units = dict(read_build_specs(build, root))
+    ending = derive_ending(value, units) if state == "spent" else "none"
+    opened = [uid for uid, status in units.items() if status not in (CLOSED, WONTDO)]
+    disposed = read_disposition_release(root, build, EXHAUSTED_ITEM, ())
+    return "%s: budget · ending · %s · %s %d/%d · open %s · disposed %s" % (
+        SAY, ending, state, held["spent"], held["total"], " ".join(opened) or "none",
+        disposed[1] if disposed else "unrecorded")
 
 
 # ------------------------------------------------------------------------------------------ the writers
@@ -422,9 +481,12 @@ def write_budget_plant(top, case):
     """The scratch repository at `top` for `case`: the transition writer's plant, then this case's specs,
     run-state file and policy file, committed."""
     write_transition_plant(top, {"pre-spec": "pre-spec"}.get(case, "default"))
-    units = {"mint-each-lap": 2, "unrecorded": 2, "re-entry": 3}.get(case, 1)
+    units = {"mint-each-lap": 2, "unrecorded": 2, "re-entry": 3, "ending": 2}.get(case, 1)
     files = {FX_SPEC.replace(FX_UNIT, "TOOL-%s-%d" % (FX_BUILD, n)): PLANT_SPEC % (FX_BUILD, n)
              for n in range(2, units + 1)}
+    if case == "ending":   # the second unit witnessed green, the first open, and nothing left to draw
+        files[FX_SPEC.replace(FX_UNIT, "TOOL-%s-2" % FX_BUILD)] = (PLANT_SPEC % (FX_BUILD, 2)).replace("INPROGRESS", CLOSED)
+        files[".governance/policy.toml"] = "[flow]\nrework-budget = 0\n"
     if case in ("pre-spec", "unrecorded", "trailer-only", "draws-survive-rotation"):
         files["memory/builds/%s/RUN.md" % FX_BUILD] = PLANT_RUN
     if case == "route-backs":
@@ -539,6 +601,58 @@ def run_budget_plant(case):
                     missed.append("the first round drew")
                 if rows != owed:
                     missed.append("the rows read %s" % " | ".join(rows))
+            elif case == "driver-exhausted":   # TOOL-dDeclaredLoop-31: AC2, AC3 and AC4
+                before = run.read_bytes()
+                out, rc = run_driver(repo, "--exhausted", FX_SLUG)
+                print("%s: fixture · exhausted unspent · exit %d · %s" % (SAY, rc, out.strip().replace("\n", " / ")[:400]))
+                if rc != 1 or "unfrozen" not in out or run.read_bytes() != before:
+                    missed.append("--exhausted under the default budget was not refused naming unfrozen, the file unchanged")
+                abort = ("--abort", FX_SLUG, "--code", "budget-exhausted", "--reason", "r")
+                out, rc = run_driver(repo, *abort)
+                print("%s: fixture · abort unrecorded · exit %d · %s" % (SAY, rc, out.strip().replace("\n", " / ")[:400]))
+                if rc != 1 or run.read_bytes() != before:
+                    missed.append("the budget-exhausted abort with no exhaustion row was not refused")
+                for uid in FX_IDS[1:]:   # one unit left open, the others witnessed green
+                    spec = repo / "memory" / "builds" / FX_SLUG / "spec" / ("2026-01-01-spec-%s.md" % uid)
+                    text = spec.read_text(encoding="utf-8").replace("**Status:** INPROGRESS", "**Status:** " + CLOSED)
+                    write_fixture_files(repo, {spec.relative_to(repo).as_posix(): text})
+                write_fixture_files(repo, {".governance/policy.toml": policy + '\n[flow]\nrework-budget = 0\n'
+                                                                               'on-exhausted = "close-incomplete"\n'})
+                run_fixture_git(repo, "add", "-A")
+                run_fixture_git(repo, "commit", "-q", "-m", "the budget spent, one unit open")
+                run_fixture_git(repo, "push", "-q", "origin", "main")
+                owner = "only the owner raises %s" % BUDGET_KEY
+                row = "decision · item %s · reason ending close-incomplete · spent 0/0 · open %s" % (ENDING_KEY, FX_IDS[0])
+                run_round(FX_SLUG, 3)
+                rc, out = run_round(FX_SLUG, 2)
+                if rc != 1 or "--exhausted %s" % FX_SLUG not in out:
+                    missed.append("the build slug's second round was not refused naming --exhausted")
+                for n in (1, 2):
+                    out, rc = run_driver(repo, "--exhausted", FX_SLUG)
+                    print("%s: fixture · exhausted %d · exit %d · %s" % (SAY, n, rc, out.strip().replace("\n", " / ")[:400]))
+                    if rc != 0 or read_count(row) != 1 or owner not in out:
+                        missed.append("--exhausted %d did not leave one row %s, naming that %s" % (n, row, owner))
+                rc, out = run_round(FX_SLUG, 1)
+                if rc != 1 or "close-incomplete" not in out or owner not in out:
+                    missed.append("a round after the exhaustion row was not refused naming its ending")
+                for _n in range(2):
+                    out, rc = run_driver(repo, "--dispatch", FX_SLUG, "--pass", FX_IDS[0], "--writes", "work/a.txt")
+                    print("%s: fixture · dispatch · exit %d · %s" % (SAY, rc, out.strip().replace("\n", " / ")[:300]))
+                if rc != 1 or "close-incomplete" not in out or owner not in out:
+                    missed.append("the second dispatch was not refused naming the ending")
+                for item in ("keepalive-reaped", "parked-decisions-surfaced"):
+                    run_driver(repo, "--attest", FX_SLUG, "--item", item)
+                out, rc = run_driver(repo, *abort)
+                print("%s: fixture · abort unfiled · exit %d · %s" % (SAY, rc, out.strip().replace("\n", " / ")[:400]))
+                if rc != 1 or FX_IDS[0] not in out:
+                    missed.append("the abort with %s unfiled was not refused naming it" % FX_IDS[0])
+                run_driver(repo, "--rescope", FX_SLUG, "--act", "defer", "--item", FX_IDS[0], "--reason", "r")
+                out, rc = run_driver(repo, *abort)
+                print("%s: fixture · abort filed · exit %d · %s" % (SAY, rc, out.strip().replace("\n", " / ")[:400]))
+                text = run.read_text(encoding="utf-8") if run.is_file() else ""
+                if rc != 0 or "phase: ABORTED" not in text or "halt-code: budget-exhausted" not in text \
+                        or read_git(repo, "rev-parse", "--verify", "main")[0] != 0:
+                    missed.append("the abort with every open unit filed did not end the run ABORTED under budget-exhausted")
             else:
                 run_round(FX_IDS[0], 3)
                 rc, out = run_round(FX_IDS[0], 2)
@@ -552,7 +666,7 @@ def run_budget_plant(case):
                     missed.append("a spent budget wrote a row")
             return missed
 
-        if case in ("driver-draws", "spent-spec-round"):
+        if case in ("driver-draws", "spent-spec-round", "driver-exhausted"):
             misses += run_driver_case()
         elif case == "value":
             for value, owed in (('"4+2"', "base 4 per-unit 2"), ("6", "base 6 per-unit 0"), ('"4+"', BUDGET_KEY)):
@@ -824,6 +938,20 @@ def run_budget_plant(case):
                   "the first file does not carry the freeze at 2 units and 1/8")
             check("fix-pass · %s · 2/8" % FX_UNIT in new and "budget · " not in new,
                   "the new file does not carry 2/8 alone")
+        elif case == "ending":   # TOOL-dDeclaredLoop-31: AC1's line under a spent budget, then the default value
+            read_memory_tree("build_records.py")
+            from build_records import write_disposition
+            write_disposition(top, FX_BUILD, FX_UNIT, EXHAUSTED_ITEM, "continue", "terminal")
+            run_fixture_git(top, "add", "-A")
+            run_fixture_git(top, "commit", "-q", "-m", "the owner's disposition")
+            rc, out = run_verb(["ending", "--build", FX_BUILD])
+            owed = "%s: budget · ending · descope · spent 0/0 · open %s · disposed continue" % (SAY, FX_UNIT)
+            check(rc == 0 and out.strip() == owed, "the spent build's ending read %r, exit %d" % (out.strip(), rc))
+            write_fixture_files(top, {".governance/policy.toml": "[flow]\n"})
+            run_fixture_git(top, "add", "-A")
+            run_fixture_git(top, "commit", "-q", "-m", "the default value")
+            rc, out = run_verb(["ending", "--build", FX_BUILD])
+            check(rc == 0 and "ending · none · unfrozen" in out, "the default value's ending read %r" % out.strip())
         elif case == "draws-survive-rotation":
             run_verb(draw + [FX_UNIT])
             run_verb(draw + [FX_UNIT])
@@ -885,13 +1013,18 @@ def main(argv):
             args = ap.parse_args(argv[1:])
             print("%s: budget · target · %s" % (SAY, promotion_target(args.build, args.item, True, root)))
             return 0
+        if argv[:1] == ["ending"]:
+            ap = argparse.ArgumentParser(prog="budget.py ending", description="the ending a spent budget takes")
+            ap.add_argument("--build", required=True)
+            print(read_ending(ap.parse_args(argv[1:]).build, root))
+            return 0
     except LookupError as e:
         print("%s: unarmed · %s" % (SAY, e))
         return 2
     except (ValueError, OSError) as e:
         print("%s: budget · refused · %s" % (SAY, e))
         return 2
-    print("usage: python budget.py draw --build <slug> --cause <%s> --item <item> | value | target --build <slug> --item <item> | --fixture --plant <%s> "
+    print("usage: python budget.py draw --build <slug> --cause <%s> --item <item> | value | target --build <slug> --item <item> | ending --build <slug> | --fixture --plant <%s> "
           "| --selftest" % ("|".join(CAUSES), "|".join(PLANTS)), file=sys.stderr)
     return 2
 

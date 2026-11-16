@@ -59,13 +59,16 @@
 #   level        build, feature or unit, a key of [states]
 #   from         a list of the level's states, "none" for its entry, or "@open" for every open state
 #   item         the item whose outcome fires the row, by tag; "@any" on the one row re-entering a step,
-#                the re-entered item named by the move's `reenters` fact
+#                the re-entered item named by the move's `reenters` fact, and on an ending row, whose
+#                outcome is an ending word: close-incomplete, park-for-owner, descope or disposed
 #   outcome      one word of that item's closed outcome set
 #   to           a state of the level, "@prior" for the state the move's `prior` fact names, or
 #                "@reentry" for the state of the re-entered item's step
 #   witness      what witnesses the move
 #   disposition  optional, the member of [dispositions] the move's `disposition` fact must be
 #   when         optional, "before-push": the row holds only while the move's `pushed` fact is no
+#   draws        optional, "none": the row is an ending, and a backward move on it draws nothing from the
+#                rework budget; a row without it draws as any move does
 #
 # One [[stand-in]] row per row item whose owning build has not landed, shrink-only: `item`, its tag,
 # and `owner`, that build, which deletes the row in the landing that arms the item's witness.
@@ -403,9 +406,10 @@ feature = ["decomposed", "designed", "built", "tested", "deployed"]
 unit = ["designed", "built", "tested", "deployed"]
 terminal = ["landed", "withdrawn", "superseded", "incomplete", "deferred", "retired", "refused", "merged", "answered"]
 
-# The build table, B1 to B25 between open states, then T1 to T5 into a terminal and P1 on a parent's
-# withdrawal (TOOL-dDeclaredLoop-15). No row touches parked, and none enters incomplete, deferred,
-# retired, merged or answered yet: those are other units' and builds' rows.
+# The build table, B1 to B25 between open states, then T1 to T5 into a terminal, P1 on a parent's
+# withdrawal (TOOL-dDeclaredLoop-15), and E1 to E5, the endings of a build whose rework budget is spent
+# (TOOL-dDeclaredLoop-31). No row enters deferred, retired, merged or answered yet: those are other
+# units' and builds' rows.
 
 # B1
 [[transition]]
@@ -690,6 +694,64 @@ item = "item.deploy.parents"
 outcome = "withdrawn"
 to = "planning"
 witness = "the parent's post or the hold's record, and the plan revision"
+
+# E1 to E5: the endings `flow.on-exhausted` names once the rework budget is spent (TOOL-dDeclaredLoop-31),
+# each on `@any` with the ending as its outcome and drawing nothing. The five step states are written
+# out, because `@open` holds paused and parked too.
+
+# E1
+[[transition]]
+level = "build"
+from = ["planning", "designing", "building", "testing", "deploying"]
+item = "@any"
+outcome = "close-incomplete"
+when = "before-push"
+to = "incomplete"
+witness = "the exhaustion record, and every open unit's defer row"
+draws = "none"
+
+# E2
+[[transition]]
+level = "build"
+from = ["planning", "designing", "building", "testing", "deploying"]
+item = "@any"
+outcome = "park-for-owner"
+to = "parked"
+witness = "the exhaustion record and the hand-off"
+draws = "none"
+
+# E3
+[[transition]]
+level = "build"
+from = ["parked"]
+item = "@any"
+outcome = "disposed"
+disposition = "continue"
+to = "@prior"
+witness = "the owner's disposition record"
+draws = "none"
+
+# E4
+[[transition]]
+level = "build"
+from = ["parked"]
+item = "@any"
+outcome = "disposed"
+disposition = "none"
+when = "before-push"
+to = "incomplete"
+witness = "the owner's disposition record, and every open unit's defer row"
+draws = "none"
+
+# E5
+[[transition]]
+level = "build"
+from = ["testing"]
+item = "@any"
+outcome = "descope"
+to = "building"
+witness = "the exhaustion record naming the descoped unit, and the revert commit"
+draws = "none"
 
 # The unit table, U1 to U8: a unit is designed when its spec is committed and derived READY, built when
 # its pass commits and acceptance record hold, tested while the verdict for the build's prepared merge

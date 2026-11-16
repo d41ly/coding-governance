@@ -203,7 +203,9 @@ One table per level, build, feature and unit (TOOL-dDeclaredLoop-13): `[states]`
 open states, and its `terminal` key, which is no level, the build's nine terminal states
 (TOOL-dDeclaredLoop-15): a build row may enter one and no row may leave one. Each `[[transition]]` row is a move, its `level`, `from` (states, `none` for the level's
 entry, or `@open`), the `item` tag and `outcome` that fire it, its `to` (a state, `@prior` or
-`@reentry`), its `witness`, and optionally a `disposition` and `when = "before-push"`. `[[stand-in]]`
+`@reentry`), its `witness`, and optionally a `disposition`, `when = "before-push"` and `draws = "none"`.
+`@any` fires B11, the one row entering `@reentry`, and the ending rows, whose outcome is one of
+`ENDING_OUTCOMES`: `check_transition_tables` refuses an `@any` row that is neither. `[[stand-in]]`
 names the owner of each row item whose build has not landed, and `[[owed-row]]` each cross-step route
 whose build row another unit or build writes; both lists only shrink. `loop_lib.py` does not read
 them: `loop_table.py` does, through `read_transition_rows` and `read_stand_ins` over the parsed
@@ -223,8 +225,17 @@ item.life.close · dWellOiledMachine
 ```
 
 P1 moves a build in designing, building or deploying back to planning on `item.deploy.parents`'s
-`withdrawn`. No row enters incomplete, deferred, retired, merged or answered yet; those states stay in
-the set.
+`withdrawn`. No row enters deferred, retired, merged or answered yet; those states stay in the set.
+
+E1 to E5 are the endings of a build whose rework budget is spent (TOOL-dDeclaredLoop-31), each on
+`@any` with `draws = "none"`, so an ending is never a lap: E1 `close-incomplete` from the five step
+states into incomplete while the landing is unpushed, E2 `park-for-owner` from them into parked, E3
+and E4 `disposed` out of parked on the owner's `disposition` fact, `continue` to `@prior` and `none`
+into incomplete while unpushed, and E5 `descope` from testing back to building. The transition
+writer's backward move draws `route-back` unless the matched row reads `draws = "none"`, so E5
+records on a spent budget. Which ending a build takes is `budget.py`'s `derive_ending` over
+`flow.on-exhausted` and each unit's status header, and the unattended driver's `--exhausted` records
+it.
 
 `derive_direction(state, to, tables)` answers a resolved build move's direction from `step-order` and
 `terminal`, never typed: `forward` into a terminal or a later step, `backward` into an earlier one, and

@@ -8,7 +8,10 @@
 The loop definition beside this file holds `[states]`, each level's open states, and one `[[transition]]`
 row per move of the build, feature and unit tables: its `level`, `from` (states, `none` for the level's
 entry, or `@open`), the `item` whose `outcome` fires it, by tag, its `to` (a state, `@prior` or
-`@reentry`), its `witness`, and optionally a `disposition` and `when = "before-push"`. `[states]`'s
+`@reentry`), its `witness`, and optionally a `disposition`, `when = "before-push"` and `draws = "none"`,
+which the transition writer reads to record a backward ending with no draw. `@any` fires a row entering
+`@reentry`, or one whose outcome is one of `ENDING_OUTCOMES`, a build's ending once its rework budget is
+spent (TOOL-dDeclaredLoop-31). `[states]`'s
 `terminal` key is no level: it lists the build level's terminal states (TOOL-dDeclaredLoop-15), which a
 build row may enter and no row may leave. `[[stand-in]]` names the owner of each row item whose owning
 build has not landed, and `[[owed-row]]` each cross-step route whose build row another unit or build
@@ -71,8 +74,10 @@ SAY = "loop"
 ENTRY = "none"
 #: A row's `from` standing for every open state of its level.
 OPEN = "@open"
-#: The one row item that is no tag: the re-entry row, its item named by the `reenters` fact.
+#: The one row item that is no tag: the re-entry row, its item named by the `reenters` fact, and the ending rows.
 ANY_ITEM = "@any"
+#: The outcomes an `@any` row may record besides a re-entry: the endings of a spent budget (TOOL-dDeclaredLoop-31).
+ENDING_OUTCOMES = ("close-incomplete", "park-for-owner", "descope", "disposed")
 #: A row's `to` read from the move's facts.
 DYNAMIC_TO = ("@prior", "@reentry")
 #: A row's `when`: it holds only while the build's landing is unpushed.
@@ -95,7 +100,9 @@ PLANTS = {"bad-state": ("a unit row entering reviewing, no unit state", "reviewi
           "stand-in": ("a stand-in row for item.plan.input, which no row names, and item.design.exit's "
                        "owner set to dRankedPlan", "item.plan.input"),
           "terminal-from": ("a build row whose from is landed", "leaves landed, a terminal"),
-          "terminal-open": ("landed appended to the build's open states", "landed is both")}
+          "terminal-open": ("landed appended to the build's open states", "landed is both"),
+          "any-unending": ("an @any row from testing on the outcome lap, entering building",
+                           "only a row entering @reentry")}
 
 
 class TransitionRefused(Exception):
@@ -247,7 +254,7 @@ def check_transition_tables(data, where, items):
         if to not in states[level] and to not in DYNAMIC_TO and not (level == "build" and to in terminal):
             refusals.append("%s enters %s, no %s state nor %s" % (at, to, level, " ".join(DYNAMIC_TO)))
         if item == ANY_ITEM:
-            if to != "@reentry":
+            if to != "@reentry" and outcome not in ENDING_OUTCOMES:
                 refusals.append("%s fires on %s, which only a row entering @reentry may" % (at, ANY_ITEM))
         elif not ITEM_TAG.fullmatch(item):
             refusals.append("%s names %s, which is no item.<step>.<name> tag" % (at, item))
@@ -366,6 +373,9 @@ def write_table_plant(case, data):
                      "to": "@prior", "witness": "planted"})
     elif case == "terminal-open":
         data["states"]["build"].append("landed")
+    elif case == "any-unending":
+        rows.append({"level": "build", "from": ["testing"], "item": ANY_ITEM, "outcome": "lap", "to": "building",
+                     "witness": "planted"})
 
 
 def main(argv):
@@ -423,6 +433,17 @@ def main(argv):
                                                     "--fact", "pushed=yes"], 1, "refused — ", ""),
                   ("move parent", move + ["designing", "--item", "item.deploy.parents", "--outcome", "withdrawn"], 0,
                    "move — build · designing → planning · item.deploy.parents", ""),
+                  ("move ending", move + ["building", "--item", "@any", "--outcome", "close-incomplete", "--fact",
+                                          "pushed=no"], 0, "move — build · building → incomplete", ""),
+                  ("move ending landed", move + ["landed", "--item", "@any", "--outcome", "close-incomplete",
+                                                 "--fact", "pushed=no"], 1, "refused — build · landed", ""),
+                  ("move ending parked", move + ["testing", "--item", "@any", "--outcome", "park-for-owner"], 0,
+                   "move — build · testing → parked", ""),
+                  ("move disposed", move + ["parked", "--item", "@any", "--outcome", "disposed", "--fact",
+                                            "disposition=continue", "--fact", "prior=testing"], 0,
+                   "move — build · parked → testing", ""),
+                  ("move descope", move + ["testing", "--item", "@any", "--outcome", "descope"], 0,
+                   "move — build · testing → building", " · backward"),
                   ("move from terminal", move + ["landed", "--item", "item.life.request", "--outcome", "resume",
                                                  "--fact", "prior=testing"], 1, "refused — build · landed", ""),
                   ("direction forward", move + ["building", "--item", "item.build.exit", "--outcome", "recorded"], 0,

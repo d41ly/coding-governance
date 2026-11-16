@@ -24,6 +24,7 @@
 #   unattended.sh --brief <slug> --unit <id> --path <file>  # record WHAT a build pass was handed
 #   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--round-highs <N> --round-minors <N>] [--highs <N> --minors <N>] [--folded <N> --promoted <N>] [--disposition fold|promote]
 #   unattended.sh --fix-pass <slug> --unit <id> --reds <N>   # record one fix pass against a unit's acceptance, N its criteria still red
+#   unattended.sh --exhausted <slug>                       # end a build whose rework budget is spent: park its ending, print its act
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
 #   unattended.sh --hold <slug> --code <c> --until <cond> --reason <text> --reaped <id>|--keepalive-unreachable <node> [--pending-run <runId>]
 #   unattended.sh --handoff <slug> --code owner-landing|owner-decision --reason <text> --reaped <id>|--keepalive-unreachable <node>   # HELD for an owner to land or decide
@@ -116,7 +117,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
 # place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
 # the gate leg, because no runtime derivation crosses a file boundary.
-VERBS_SLUG="--preflight --status --audit --wake --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --refused --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --fix-pass --brief --beat"
+VERBS_SLUG="--preflight --status --audit --wake --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --refused --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --fix-pass --exhausted --brief --beat"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
 VERBS_INLINE="--plan --phase --check-commit --claims --overlaps --version"
@@ -1133,6 +1134,9 @@ DOD_NO_OVERRIDE="authorization-reachable pieces-complete"
 #   gate-red-out-of-scope     a gate is red and its fix lies outside the mandate scope.
 #   claim-lost                another session holds this run's claim on the remote, so the run must
 #                             not drive its slug any more (TOOL-aGraftedHelix-1); check 108 names it.
+#   budget-exhausted          the build's rework budget is spent and its recorded ending is
+#                             close-incomplete: the build ends incomplete, its branch and records kept
+#                             (TOOL-dDeclaredLoop-31); --abort refuses it without that row.
 # THE REVIEW VERDICT VOCABULARY, closed and kit-owned. Its CANONICAL home is the memory-tree kit,
 # which enforces review-record grammar and renders the build method; a copy-installed kit cannot
 # import across that boundary, so this is a STATED duplication whose drift is armed by a row in that
@@ -1203,7 +1207,7 @@ CHAIN_NATURES='local|new-mechanism'
 # The class of a cited path, whole (TOOL-aCarriedStop-2): the bracket expression and no quantifier, so
 # the writer's refusal prints it and the reader's awk anchors it.
 CHAIN_PATH_CLASS='[A-Za-z0-9._/-]'
-HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed external-prerequisite acceptance-underivable repo-state-out-of-mandate gate-red-out-of-scope claim-lost"
+HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed external-prerequisite acceptance-underivable repo-state-out-of-mandate gate-red-out-of-scope claim-lost budget-exhausted"
 # THE HOLD VOCABULARY, a SECOND closed set beside the halt one and never an extension of it. Each
 # names a stop the run cannot fix and did not cause; none of them ends the run. A project extends
 # through HOLD_CODES_EXTRA and deletes nothing, which HOLD_FLOOR pins the way HALT_FLOOR pins the
@@ -6207,8 +6211,101 @@ run_budget_verb() { # verb · flag=value... -> sets _bd_why to the script's firs
   [ -n "$_bd_why" ] || _bd_why="budget.py $1 printed nothing and exited $_bd_rc"
   return 0
 }
-run_budget_draw() { # slug · cause · item -> as run_budget_verb
+run_budget_draw() { # slug · cause · item -> as run_budget_verb; on `exhausted`, _bd_why names the remedy
   run_budget_verb draw "--build=$1" "--cause=$2" "--item=$3"
+  # THE LAP REFUSAL NAMES ITS REMEDY (TOOL-dDeclaredLoop-31 S5), after the module's line, which keeps naming
+  # flow.on-exhausted: end the build while no exhaustion row stands, else the ending that row recorded.
+  [ "$_bd_rc" = 3 ] || return 0
+  runmd_of "$1" >/dev/null
+  read_exhausted_row "$_runmd"
+  if [ -z "$_ex_row" ]; then
+    _bd_why="$_bd_why · end the build with --exhausted $1"
+  else
+    _bd_why="$_bd_why · the build's ending is $_ex_row, and only the owner raises flow.rework-budget"
+  fi
+  return 0
+}
+# THE ENDING OF A SPENT BUDGET (TOOL-dDeclaredLoop-31). `flow.on-exhausted` names it and `budget.py ending`
+# derives it; `--exhausted` parks it as ONE `decision · item flow.on-exhausted` row, owed at the wrap-up and
+# the question `--handoff --code owner-decision` hands the owner, and names the act that row owes. The acts
+# are the existing verbs: `--abort --code budget-exhausted`, guarded by `check_exhausted_close`; the
+# hand-off, whose resume `check_owner_disposition` holds until the owner's disposition record; `--close`.
+read_exhausted_row() { # run-state file -> sets _ex_row to the newest exhaustion row's ending, empty where none stands
+  _ex_row=$(grep -E '^[0-9][0-9-]*T[0-9:]*Z decision · item flow[.]on-exhausted · reason ending ' "$1" 2>/dev/null | tail -n 1)
+  _ex_row=${_ex_row#* · reason ending }; _ex_row=${_ex_row%% *}; _ex_row=${_ex_row%$'\r'}
+}
+read_exhausted_ending() { # slug -> sets _ex_end _ex_state _ex_open _ex_disp and _ex_why from the ending line; 1 where the module does not answer
+  local _el
+  _ex_end=""; _ex_state=""; _ex_open=""; _ex_disp=""
+  run_budget_verb ending "--build=$1"
+  _ex_why=$_bd_why
+  [ "$_bd_rc" = 0 ] || return 1
+  case "$_bd_why" in "loop: budget · ending · "*" · open "*" · disposed "*) ;; *) return 1 ;; esac
+  _el=${_bd_why#loop: budget · ending · }
+  _ex_end=${_el%% · *}; _el=${_el#* · }
+  _ex_state=${_el%% · *}; _el=${_el#* · open }
+  _ex_open=${_el%% · *}; _ex_disp=${_el##* · disposed }
+  [ "$_ex_open" != none ] || _ex_open=""
+  return 0
+}
+run_exhausted() { # slug
+  local slug="$1" rel _xe
+  check_slug "$slug" || return 1
+  runmd_of "$slug" >/dev/null; rel=$_runmd
+  check_run_state "$rel" "run to end on a spent rework budget" || return 1
+  refuse_if_terminal "$rel" --exhausted || return 1
+  # A STANDING ROW is printed and nothing is written: the first ending stands, a second exhaustion after the
+  # owner's raise included.
+  read_exhausted_row "$rel"; _xe=$_ex_row
+  if [ -n "$_xe" ]; then
+    echo "unattended: the build's ending is already recorded, unchanged — $_xe"
+  else
+    if ! read_exhausted_ending "$slug" || [ "${_ex_state%% *}" != spent ]; then
+      fail 37 "--exhausted ends a build only once its rework budget is spent, and budget.py ending reads otherwise or does not answer, so nothing is recorded: $_ex_why"
+      return 1
+    fi
+    _xe=$_ex_end
+    park "$rel" decision flow.on-exhausted "ending $_xe · spent ${_ex_state#* } · open ${_ex_open:-none}" || return 1
+    stage_or_fail "$rel" || return 1
+    echo "unattended: exhausted — ending $_xe · spent ${_ex_state#* } · open ${_ex_open:-none}"
+  fi
+  case "$_xe" in
+    close-incomplete) echo "unattended: next — file each open unit with --rescope $slug --act defer --item <id> --reason <text>, attest keepalive-reaped and parked-decisions-surfaced, then --abort $slug --code budget-exhausted --reason <text>" ;;
+    park-for-owner)   echo "unattended: next — reap the keepalive, then --handoff $slug --code owner-decision --reason <text> --reaped <id>; the owner's disposition record of item.flow.on-exhausted, continue or none, leaves the park" ;;
+    land-green)       echo "unattended: next — every counted unit is CLOSED: go on to --close $slug" ;;
+    descope)          echo "unattended: next — defer each open unit against an ask it files, recorded with --rescope $slug --act defer --item <id> --reason <text>, then --close $slug, which lands the CLOSED units" ;;
+  esac
+  echo "unattended: only the owner raises flow.rework-budget, and no ending raises it"
+  return 0
+}
+check_exhausted_close() { # slug · run-state file -> 0 admitted; 1 refused through its one fail 33
+  local _cx_why="" _cx_u
+  read_exhausted_row "$2"
+  if [ -z "$_ex_row" ]; then
+    _cx_why="the record holds no exhaustion row; run --exhausted $1 first"
+  elif ! read_exhausted_ending "$1"; then
+    _cx_why="budget.py ending does not answer: $_ex_why"
+  elif [ "$_ex_row" != close-incomplete ] && ! { [ "$_ex_row" = park-for-owner ] && [ "$_ex_disp" = none ]; }; then
+    _cx_why="the exhaustion row reads $_ex_row, and the owner's disposition reads $_ex_disp"
+  else
+    for _cx_u in $_ex_open; do
+      check_unit_deferred "$2" "$_cx_u" DEFERRED && continue
+      _cx_why="$_cx_u is open with no defer row in force; file it with --rescope $1 --act defer --item $_cx_u --reason <text>"
+      break
+    done
+  fi
+  [ -z "$_cx_why" ] && return 0
+  fail 33 "--abort --code budget-exhausted ends only a build whose exhaustion row reads close-incomplete, or park-for-owner with the owner's disposition none, every open unit deferred; the condition that failed: $_cx_why"
+  return 1
+}
+check_owner_disposition() { # slug -> 0 where the ending line's disposed field reads continue, else 1 with _od_why
+  _od_why=""
+  if ! read_exhausted_ending "$1"; then
+    _od_why="budget.py ending does not answer: $_ex_why"; return 1
+  fi
+  [ "$_ex_disp" = continue ] && return 0
+  _od_why="the owner's disposition reads ${_ex_disp:-unrecorded}"
+  return 1
 }
 verb_plan() { # slug
   local slug="$1" dir specs spec id st state miss nmiss=0 _ar_id _ar_sum _rev
@@ -7041,6 +7138,11 @@ verb_abort() { # slug · reason · code
   # a bar that ran at HEAD over a clean tree that did not move.
   if [ "$code" = gate-red-out-of-scope ]; then
     check_inherited_override "$rel" "--abort --code gate-red-out-of-scope" || return 1
+  fi
+  # TOOL-dDeclaredLoop-31 S4 - a spent budget's `close-incomplete` ending is backed by its exhaustion row and
+  # every open unit's defer row, or refused, before the attestations below.
+  if [ "$code" = budget-exhausted ]; then
+    check_exhausted_close "$slug" "$rel" || return 1
   fi
   # TOOL-dUnstuckLanding-13 S9 - a NOTICE, never a refusal: printed for a hand-off-shaped code and
   # the abort then proceeds exactly as before, because this verb cannot know the work is sound.
@@ -9680,6 +9782,18 @@ verb_resume() { # slug
       verb_status "$slug" || true
       echo "unattended: still held — the release condition is not met, so nothing was written and no lease was taken: $cond"
       return 0
+    fi
+    # TOOL-dDeclaredLoop-31 S6 - THE EXHAUSTION PARK IS THE OWNER'S TO LEAVE: a hold under owner-decision whose
+    # exhaustion row reads park-for-owner resumes only once the owner's disposition record reads continue.
+    # Every other hold resumes as before.
+    fact "$rel" hold-code >/dev/null
+    if [ "$_fact" = owner-decision ]; then
+      read_exhausted_row "$rel"
+      if [ "$_ex_row" = park-for-owner ] && ! check_owner_disposition "$slug"; then
+        verb_status "$slug" || true
+        fail 57 "this run is parked for its owner on a spent rework budget, and only the owner's disposition record of item.flow.on-exhausted reading continue releases it, so nothing was written and no lease was taken: $_od_why"
+        return 1
+      fi
     fi
     # THE TAKE-OVER'S CRASH WINDOW: a take-over records its lease BEFORE it moves the phase, so a
     # record still HELD whose `lease-utc` follows its `held-at` was resumed by a session that has not
@@ -16054,6 +16168,7 @@ case "$VERB" in
   --brief)     verb_brief "$SLUG" "$BR_UNIT" "$RP_PATH" ;;
   --review)    verb_review "$SLUG" "$RV_SUBJECT" "$VERDICT" "$RV_BLOCKERS" "$RV_DISPOSITION" "$RV_HIGHS" "$RV_MINORS" "$RV_FOLDED" "$RV_PROMOTED" "$RV_RHIGHS" "$RV_RMINORS" ;;
   --fix-pass)  run_fix_pass "$SLUG" "$BR_UNIT" "$FP_REDS" ;;
+  --exhausted) run_exhausted "$SLUG" ;;
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
   --record-piece) verb_record_piece "$SLUG" "$RP_PATH" "$RP_LEG" "$VERDICT" ;;
   --record-set)   verb_record_set "$SLUG" "$RP_LEG" "$VERDICT" ;;

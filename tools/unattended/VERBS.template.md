@@ -346,6 +346,21 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `fix-pass` row is terminal takes no further `--fix-pass` and no `--dispatch`. It refuses a unit that
   is not id-shaped or a reds count off the canonical decimal, and relays a review bound or budget
   target that does not read. Check 2 reds a unit whose passes stay flat with no exit token.
+- `--exhausted` — `--exhausted <slug>` ends a build whose rework budget is spent (TOOL-dDeclaredLoop-31).
+  It reads `budget.py ending`, whose ending `flow.on-exhausted` names: `best-effort-ending`, the
+  default, reads `land-green` where every unit not `WONTDO` is `CLOSED`, `descope` where some unit is,
+  else `close-incomplete`; `park-for-owner` and `close-incomplete` read themselves. It parks ONE
+  `decision · item flow.on-exhausted · reason ending <e> · spent <s>/<t> · open <ids>` row, owed at the
+  wrap-up, stages it, and prints the act that ending owes: `close-incomplete` files each open unit with
+  `--rescope --act defer`, then `--abort --code budget-exhausted`; `park-for-owner` reaps the keepalive,
+  then `--handoff --code owner-decision`, the row its parked decision; `land-green` and `descope` go on
+  to `--close`, a descope first deferring each open unit against an ask. It prints that only the owner
+  raises `flow.rework-budget`. A standing exhaustion row is printed and nothing is written, and a
+  budget that is not spent, or a module that does not answer, is refused writing nothing. Once the
+  budget is spent, a refused round or dispatch names `--exhausted <slug>`, or the recorded ending once
+  the row stands. A hold under `owner-decision` whose exhaustion row reads `park-for-owner` is refused
+  by `--resume` until the owner's newest disposition record of the item `flow.on-exhausted` names reads
+  `continue`; it releases on `continue`, and on `none` the abort above ends the build.
 - `--record-round` — `--record-round <slug> --subject <s> --audited "<ids>" --blockers <b> --highs <h>`
   with a repeatable `--finding <id>/<severity>/<nature>/<spec>[,<spec>]/<unit>/<rev>` and a repeatable
   `--sibling <unit>@rev-<n>`: appends ONE spec-audit round to the build's one tracked chain record,
@@ -480,7 +495,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   With both attested items met it makes `--park`'s refresh and records `refreshed-at` beside the phase.
   Where `RUN_CLAIMS` is `on` it writes `aborted` into the run's claim once the record is staged;
   a claim another session holds is announced and the abort still lands, which is how a run
-  that lost its claim ends: `--abort <slug> --code claim-lost`.
+  that lost its claim ends: `--abort <slug> --code claim-lost`. `budget-exhausted` ends a build whose
+  spent budget's exhaustion row reads `close-incomplete`, or `park-for-owner` with the owner's
+  disposition `none`, and is refused without that row or while an open unit has no defer row in force.
 
 ## The paths, in order
 
@@ -1181,7 +1198,9 @@ landed `abandoned`, and refuses anything git does not prove.
 `--abort <slug> --code <halt-code> --reason "<what stopped it, and what you refused to decide>"`.
 Both are required: the reason is prose for the owner, the code is what the status line, the resume
 path and the gate leg join on. No catch-all member exists: take the closest code, put the specifics
-in the reason, and say so. Both attestations come first. An abort neither merges nor pushes, and the
+in the reason, and say so. A build whose rework budget is spent ends through `--exhausted <slug>`
+first, and its `close-incomplete` ending through `--code budget-exhausted`, once every open unit is
+filed with `--rescope --act defer`. Both attestations come first. An abort neither merges nor pushes, and the
 verb stages the run record beside the ABORTED record, so commit them together.
 
 ### Reap
