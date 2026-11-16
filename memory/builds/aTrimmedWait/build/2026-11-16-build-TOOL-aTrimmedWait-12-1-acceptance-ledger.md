@@ -11,10 +11,9 @@ probe is §4's text verbatim, run as `python -I "$SCRATCH/t12-stamp.py" "$PWD/to
 the spec's relative `tools/memory-tree` argument made the probe's first `--write` exit 2, since the
 generator path it builds is relative and the probe runs it with the fixture as its cwd.
 
-**Evidences:** TOOL-aTrimmedWait-12
-
 ## The criteria
 
+**Evidences:** TOOL-aTrimmedWait-12
 - AC1 — `git rev-parse MERGE_HEAD` printed `5d48501da9e5e07b0796bd935aaf4eae8cd4b804`, and both
   `git diff --name-only --diff-filter=U` and `git grep -n '^<<<<<<< '` printed nothing. The
   after-commit half, `git rev-list --merges -n 1 HEAD` and `git rev-list --parents -n 1` over it,
