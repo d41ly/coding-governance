@@ -3,10 +3,10 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-11-16T02:08:14+02:00 @ 87cdf25aef551d2951536567c4a506d0d38dcc5c
+last-audit: 2026-11-16T02:18:17+02:00 @ 3236833e8081d72179ce6c1d8ac99f05aecc120a
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: e46c8e59985b4a98e8827858aa71cf82a3536d84
+last-body-change: 3236833e8081d72179ce6c1d8ac99f05aecc120a
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -79,6 +79,7 @@ lives where each bullet points.
 - This repository's policy values live in `.governance/policy.toml`, checked against `tools/policy/catalogue.toml`; an agent writes it only through `tools/loop/policy_edit.py`, whose change record every commit and push of it owes, and the pre-commit guard admits an agent's change to it as one raised measured-file cap or on a live run's branch (`help/policy.md`).
 - `--dispatch` refuses one write set naming a generated index with its generator (check 49): a unit that edits a generator builds in two passes, the generator edit first and the re-rendered index second (`TOOL-dDeclaredLoop-12`).
 - The loop kit's definition `tools/loop/loop.toml` is checked one concern per module, each its own leg: `loop_lib.py --check`, and `check` on `loop_table.py`, `loop_checklist.py` and `loop_items.py` (`help/loop.md`).
+- A repository's own loop rows each have their own module and fixture leg: its stages `splice.py check`, an item's upstream rows `upstream.py`, the composition pinned per move `composition.py`, and the build's position from witnesses `position.py` (`help/loop.md`).
 
 ### Pointer map (load the row(s) the task touches)
 
