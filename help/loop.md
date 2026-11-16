@@ -1307,6 +1307,14 @@ no record goes in the patch build's own `RUN.md`, as the row followed by ` · bu
 for the patched build `<slug>` alone. These rows are read oldest first by their time, and the build's
 first record copies them.
 
+A row's `<spent>` is what its writer counted when it wrote the row. Two worktrees drawing at once each
+count their own, so after a merge two rows can both read `1/4`. The count is re-derived from the rows
+alone, so it reads 2 there. A draw whose build holds such a row prints, after its verdict line, one
+`loop: budget · disagrees · <row> · typed <a>, derived <b>` line per such row. The line refuses nothing,
+and the verdict stays the first line, the one the unattended driver reads. Gov's own `.gitattributes`
+merges transition records with git's built-in `union` driver, so both appended rows survive a merge
+instead of conflicting; two byte-identical rows are kept once.
+
 Contention draws nothing: a verdict staled by another build's landing, a merge conflicted by another
 build's landing, a wait on a lease another build holds and an unreachable remote are re-run in their
 turn and spend none of this build's budget. `flow.route-backs`, default 3, counts one item's draws:

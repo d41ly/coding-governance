@@ -17,8 +17,11 @@ record's lines after its fields, read in record order:
     budget · frozen · <units> unit(s) · <total>
     draw · <cause> · <item> · <spent>/<total>
 
-`total` is the freeze row's figure, else the base; `spent` is the count of draw rows, and a draw row
-whose typed figure is not its ordinal is a refusal naming it. Before the build's first log record the
+`total` is the freeze row's figure, else the base; `spent` is the count of draw rows, re-derived from
+the rows alone. A draw row's typed `spent` is what its writer counted, and two worktrees drawing at once
+each count their own, so a row whose typed figure is not its ordinal is named in the reader's
+`disagree` list and refuses nothing (TOOL-dDeclaredLoop-49); the typed `total` is not compared, since a
+row drawn before the freeze carries the base. Before the build's first log record the
 same rows sit in three homes (TOOL-dDeclaredLoop-48): its run-state file and each rotated
 `RUN.LANDED.<blob8>.md` beside it, each prefixed by its UTC timestamp; the `budget` and `draw` fields of
 its `Gov-Transition` trailers, `budget=frozen@<units>@<total>` and `draw=<cause>@<item>@<spent>+<total>`,
@@ -52,11 +55,14 @@ another build or the remote caused, which draws nothing; `count_returns` counts 
 Exit: `draw` prints `loop: budget · drawn · <row>` and exits 0, `loop: budget · exhausted · <slug> ·
 <spent>/<total> · flow.on-exhausted` and exits 3, `loop: budget · refused · <why>` and exits 2, and
 `loop: unarmed · <why>`, exit 2, where the policy or memory-tree kit does not resolve, never a default.
+After a `drawn` or `exhausted` verdict, one `loop: budget · disagrees · <row> · typed <a>, derived <b>`
+line per disagreeing row of the build drawn on, in the order read, so the verdict stays the first line.
 `value` prints `base <n> per-unit <n>`. `--fixture --plant <case>` builds a scratch repository under the
 host temp directory, runs the case and prints `held` or `MISSED`; `--selftest` runs every plant.
 
 WHAT THIS DOES NOT CHECK: two racing draws, which are two rows; a row typed by hand with a right
-ordinal; the `research` cause's site, which no writer reaches yet.
+ordinal; two byte-identical rows, which a union merge of the record keeps once; the `research` cause's
+site, which no writer reaches yet.
 """
 import argparse
 import contextlib
@@ -117,7 +123,8 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
           "unrecorded": "a draw on two specs and no move, the run-state file rotated, then a second draw",
           "trailer-only": "transitions.record = [\"trailer\"]: designing to building, fix-pass drawn, then back",
           "patch-trailer-only": "transitions.record = [\"trailer\"]: tFix landed by a trailer, tFixPatch drawing on it",
-          "log-dropped": "planning to designing under the default set, then [\"trailer\"] and designing back"}
+          "log-dropped": "planning to designing under the default set, then [\"trailer\"] and designing back",
+          "parallel-append": "one record drawn on main and on a branch, merged under this tree's attribute, then drawn"}
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
 PLANT_TRAILER = '[transitions]\nrecord = ["trailer"]\n'
 PLANT_SPEC = "# TOOL-%s-%d — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n"
@@ -150,9 +157,11 @@ def read_budget_rows(build, root, moves=None):
     run-state files, its trailers and the ` · budget <slug>` rows, which the build's first log record
     copies, `frozen_any` whether any home holds a freeze row, `spent`,
     `total`, `freeze` the row a draw writes first under the unrecorded-build rule or None, `draws` each
-    draw row's `(cause, item)`, and `route-backs`. `moves`, the build's recorded moves where the caller
-    read them. ValueError on a row outside its grammar or a typed ordinal that disagrees; LookupError
-    where a kit does not resolve."""
+    draw row's `(cause, item)`, `route-backs`, and `disagree`, each draw row whose typed spent is not its
+    ordinal as `<row> · typed <a>, derived <b>`, in the order read: the figure is what its writer
+    counted, and the count is re-derived from the rows. `moves`, the build's recorded moves where the
+    caller read them. ValueError on a row outside its grammar; LookupError where a kit does not
+    resolve."""
     root = pathlib.Path(root)
     records = read_transition_records(build, root)
     run = read_run_file(root, build)
@@ -180,7 +189,7 @@ def read_budget_rows(build, root, moves=None):
         text = pathlib.Path(root, rec["path"]).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
         held += [ln.rstrip() for ln in text.split("\n") if ln.startswith(("budget · ", "draw · "))]
     rows = held if records else carried
-    frozen, draws = None, []
+    frozen, draws, disagree = None, [], []
     for row in rows:
         hit = ROW.fullmatch(row)
         if not hit:
@@ -189,9 +198,8 @@ def read_budget_rows(build, root, moves=None):
             frozen = int(hit.group(2)) if frozen is None else frozen
             continue
         draws.append((hit.group(3), hit.group(4)))
-        if int(hit.group(5)) != len(draws):
-            raise ValueError("the budget row %r of %s types %s spent, and it is draw %d of the build's rows" % (
-                row, build, hit.group(5), len(draws)))
+        if int(hit.group(5)) != len(draws):   # what its writer counted; two worktrees each count their own
+            disagree.append("%s · typed %s, derived %d" % (row, hit.group(5), len(draws)))
     base, per, route_backs = read_budget_value(root)
     frozen_any = any(r.startswith("budget · ") for r in held + carried)
     total, freeze = (frozen if frozen is not None else base), None
@@ -203,7 +211,7 @@ def read_budget_rows(build, root, moves=None):
     home = records[-1]["path"] if records else (run.relative_to(root).as_posix() if run.is_file() else None)
     return {"rows": rows, "home": home, "record": bool(records), "carried": [] if records else carried,
             "frozen_any": frozen_any, "spent": len(draws), "total": total, "freeze": freeze, "draws": draws,
-            "route-backs": route_backs}
+            "route-backs": route_backs, "disagree": disagree}
 
 
 def read_trailer_rows(build, root):
@@ -294,13 +302,14 @@ def freeze_budget(build, root):
     return FREEZE_ROW % (units, base + per * units)
 
 
-def record_draw(build, cause, item, root=".", lines=None, moves=None):
+def record_draw(build, cause, item, root=".", lines=None, moves=None, notes=None):
     """`("drawn", row)` after writing one draw row of `build`, a freeze row before it where one is owed,
     or `("exhausted", "<slug> · <spent>/<total>")` writing nothing. Where `lines` is a list the rows are
     added to it, the transition writer's record, and no file is written, save a patch build's, which
     lands on its originating build's home, or, where that build holds no log record and the set holds no
     `log`, on the patch build's own run-state file, each row suffixed ` · budget <origin>` and the answer
-    with it. ValueError on a cause outside `CAUSES`, a derived cause given, an item outside `VALUE`, or a
+    with it. Where `notes` is a list it is extended with the `disagree` entries of the build drawn on.
+    ValueError on a cause outside `CAUSES`, a derived cause given, an item outside `VALUE`, or a
     build with no home, a patch build with no run-state file under that rule among them."""
     if cause.startswith(PATCH):
         raise ValueError("the cause %s is derived: a patch build's draw is named patch:<its slug> from its "
@@ -321,6 +330,8 @@ def record_draw(build, cause, item, root=".", lines=None, moves=None):
             raise ValueError("the patch build %s has no run-state file, and its draw on %s, which holds no transition "
                              "log record under a set without log, has no other home" % (patch, origin))
         held["home"], suffix = run.relative_to(root).as_posix(), " · budget %s" % origin
+    if notes is not None:
+        notes.extend(held["disagree"])
     if held["spent"] >= held["total"]:
         return "exhausted", "%s · %d/%d" % (build, held["spent"], held["total"])
     row = "draw · %s · %s · %d/%d" % (cause, item, held["spent"] + 1, held["total"])
@@ -672,6 +683,42 @@ def run_budget_plant(case):
             check(newest in shown.split("\n") and "draw=" not in shown,
                   "the move's commit does not hold %s alone of the budget, its trailer free of draw=" % newest)
             check(state == "unfrozen 1/4", "budget_state answers %s" % state)
+        elif case == "parallel-append":
+            run_move("planning", "item.plan.exit", "recorded")
+            rel = read_transition_records(FX_BUILD, top)[0]["path"]
+            # the merge attribute this tree answers for the record's path, never a literal in the plant
+            rc, repo_top = read_git(KIT, "rev-parse", "--show-toplevel")
+            attr = "unspecified"
+            if rc == 0:
+                attr = read_git(repo_top, "check-attr", "merge", "--", rel)[1].rsplit(": ", 1)[-1] or attr
+            print("%s: fixture · this tree's merge attribute for %s · %s" % (SAY, rel, attr))
+            if attr not in ("unspecified", "unset"):
+                write_fixture_files(top, {".gitattributes": "%s merge=%s\n" % (rel, attr)})
+                run_fixture_git(top, "add", "-A")
+                run_fixture_git(top, "commit", "-q", "-m", "the merge attribute")
+            run_fixture_git(top, "branch", "side")
+            record_draw(FX_BUILD, "fix-pass", "TOOL-%s-1" % FX_BUILD, top)
+            run_fixture_git(top, "checkout", "-q", "side")
+            record_draw(FX_BUILD, "fix-pass", "TOOL-%s-2" % FX_BUILD, top)
+            run_fixture_git(top, "checkout", "-q", "main")
+            rc = read_git(top, "merge", "--no-edit", "side")[0]
+            print("%s: fixture · merge side · exit %d" % (SAY, rc))
+            check(rc == 0, "the merge of side conflicted on %s, whose merge attribute here is %s" % (rel, attr))
+            if rc == 0:
+                try:   # the typed-figure refusal reads as a miss, not a traceback
+                    state = budget_state(FX_BUILD, top)
+                    rows = read_rows()
+                except ValueError as e:
+                    state, rows = "refused: %s" % e, []
+                print("%s: fixture · budget_state · %s" % (SAY, state))
+                check(state == "unfrozen 2/4", "budget_state answers %s" % state)
+                check(rows == ["draw · fix-pass · TOOL-%s-%d · 1/4" % (FX_BUILD, n) for n in (1, 2)],
+                      "the record does not carry both 1/4 rows")
+                rc, out = run_verb(draw + ["TOOL-%s-3" % FX_BUILD])
+                lines = out.strip().split("\n")
+                check(rc == 0 and lines[0].startswith("%s: budget · drawn · " % SAY) and lines[0].endswith(" 3/4")
+                      and len(lines) == 2 and lines[1].endswith("typed 1, derived 2"),
+                      "the third draw answered %r, exit %d" % (out.strip(), rc))
         elif case == "unrecorded":
             run_verb(draw + [FX_UNIT])
             run = read_run_file(top, FX_BUILD)
@@ -718,12 +765,15 @@ def main(argv):
             for flag in ("--build", "--cause", "--item"):
                 ap.add_argument(flag, required=True)
             args = ap.parse_args(argv[1:])
-            answer, said = record_draw(args.build, args.cause, args.item, root)
+            notes = []
+            answer, said = record_draw(args.build, args.cause, args.item, root, notes=notes)
             if answer == "exhausted":
                 print("%s: budget · exhausted · %s · %s" % (SAY, said, ENDING_KEY))
-                return 3
-            print("%s: budget · drawn · %s" % (SAY, said))
-            return 0
+            else:
+                print("%s: budget · drawn · %s" % (SAY, said))
+            for note in notes:   # after the verdict, which the driver keeps as the first line
+                print("%s: budget · disagrees · %s" % (SAY, note))
+            return 3 if answer == "exhausted" else 0
     except LookupError as e:
         print("%s: unarmed · %s" % (SAY, e))
         return 2

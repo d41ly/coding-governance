@@ -106,6 +106,12 @@ memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md 
 # lander's `regen.py --write` re-renders it through the playbook kit's `[[regenerate]]` row, which names it
 # in `writes`, so the merged lock is the render's and never a line merge of two.
 .governance/instructions.lock merge=ours
+# The loop kit's transition records (TOOL-dDeclaredLoop-49 S3): a record only gains rows, so two
+# worktrees drawing on one build's budget each append a row at its end, where a text merge
+# conflicts. `union` is git's built-in driver and needs no per-node config: it keeps both sides'
+# appended rows, ours first, and the budget's reader re-derives the count from them. It keeps two
+# byte-identical appended rows once.
+memory/builds/*/build/*-transition-*.md merge=union
 
 # The governance template is under a STRICT byte gate — pin it (+ companions) to LF so a CRLF
 # checkout can't inflate the count past the limit. (The gate also normalizes, belt-and-suspenders.)
