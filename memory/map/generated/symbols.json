@@ -28,6 +28,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "BoundsRefused",
+      "kind": "class",
+      "file": "tools/loop/review_bounds.py"
+    },
+    {
       "id": "Candidate",
       "kind": "class",
       "file": "tools/codebase-map/reuse_lookup.py"
@@ -3293,6 +3298,11 @@
       "file": "tools/check-line-length.test.sh"
     },
     {
+      "id": "build_line_re",
+      "kind": "function",
+      "file": "tools/govkit/steps/conf_to_policy.py"
+    },
+    {
       "id": "build_live_backlog_rows",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -3516,6 +3526,11 @@
       "id": "build_plan",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "build_plant_repo",
+      "kind": "function",
+      "file": "tools/loop/review_bounds.py"
     },
     {
       "id": "build_plant_tree",
@@ -5133,6 +5148,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_assigned",
+      "kind": "function",
+      "file": "tools/govkit/steps/conf_to_policy.py"
+    },
+    {
       "id": "check_attr_line",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -5516,6 +5536,11 @@
       "id": "check_commitment",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "check_committed",
+      "kind": "function",
+      "file": "tools/govkit/steps/conf_to_policy.py"
     },
     {
       "id": "check_committed",
@@ -7528,6 +7553,16 @@
       "file": "tools/check-spec-tokens.test.sh"
     },
     {
+      "id": "check_review_bounds",
+      "kind": "function",
+      "file": "tools/loop/review_bounds.py"
+    },
+    {
+      "id": "check_review_rounds_step",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_revision",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -8848,6 +8883,11 @@
       "file": "tools/govkit/steps/receipt_schema_4.py"
     },
     {
+      "id": "cmd_down",
+      "kind": "function",
+      "file": "tools/govkit/steps/review_rounds.py"
+    },
+    {
       "id": "cmd_emit_floors",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -9143,6 +9183,11 @@
       "file": "tools/govkit/steps/receipt_schema_4.py"
     },
     {
+      "id": "cmd_up",
+      "kind": "function",
+      "file": "tools/govkit/steps/review_rounds.py"
+    },
+    {
       "id": "cmd_update",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -9166,6 +9211,11 @@
       "id": "cmd_witness",
       "kind": "function",
       "file": "tools/govkit/steps/receipt_schema_4.py"
+    },
+    {
+      "id": "cmd_witness",
+      "kind": "function",
+      "file": "tools/govkit/steps/review_rounds.py"
     },
     {
       "id": "cmd_write",
@@ -11758,6 +11808,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "derive_review_bounds",
+      "kind": "function",
+      "file": "tools/loop/review_bounds.py"
+    },
+    {
       "id": "derive_review_exit",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -12201,6 +12256,11 @@
       "id": "derive_set_value",
       "kind": "function",
       "file": "tools/playbook/row_checks.py"
+    },
+    {
+      "id": "derive_settings",
+      "kind": "function",
+      "file": "tools/govkit/steps/review_rounds.py"
     },
     {
       "id": "derive_shim_window",
@@ -14453,6 +14513,11 @@
       "file": "tools/process-monitor/scope.py"
     },
     {
+      "id": "load_conf_to_policy",
+      "kind": "function",
+      "file": "tools/govkit/steps/review_rounds.py"
+    },
+    {
       "id": "load_corpus",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
@@ -14703,6 +14768,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "load_review_bounds",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "load_roles",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
@@ -14751,6 +14821,11 @@
       "id": "load_steps",
       "kind": "function",
       "file": "tools/govkit/steps/adopter_rules_to_overlay.py"
+    },
+    {
+      "id": "load_steps",
+      "kind": "function",
+      "file": "tools/govkit/steps/conf_to_policy.py"
     },
     {
       "id": "load_steps",
@@ -15030,6 +15105,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/govkit/steps/review_rounds.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
@@ -15146,6 +15226,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/loop/position.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/loop/review_bounds.py"
     },
     {
       "id": "main",
@@ -16766,6 +16851,11 @@
       "id": "parse_cli_value",
       "kind": "function",
       "file": "tools/loop/policy_edit.py"
+    },
+    {
+      "id": "parse_conf",
+      "kind": "function",
+      "file": "tools/govkit/steps/conf_to_policy.py"
     },
     {
       "id": "parse_conf",
@@ -21073,6 +21163,11 @@
       "file": "tools/govkit/step_gate.py"
     },
     {
+      "id": "read_policy_module",
+      "kind": "function",
+      "file": "tools/loop/review_bounds.py"
+    },
+    {
       "id": "read_policy_modules",
       "kind": "function",
       "file": "tools/loop/floor.py"
@@ -21551,6 +21646,16 @@
       "id": "read_reverse_walk_callers",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "read_review_bounds",
+      "kind": "function",
+      "file": "tools/loop/review_bounds.py"
+    },
+    {
+      "id": "read_review_bounds_line",
+      "kind": "function",
+      "file": "tools/unattended/check-unattended.sh"
     },
     {
       "id": "read_review_records",
@@ -23943,6 +24048,11 @@
       "file": "skills/session-kickoff/manifest-check.test.sh"
     },
     {
+      "id": "render_bounds_line",
+      "kind": "function",
+      "file": "tools/loop/review_bounds.py"
+    },
+    {
       "id": "render_broad",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -24041,6 +24151,11 @@
       "id": "render_conf",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "render_conf_rest",
+      "kind": "function",
+      "file": "tools/govkit/steps/conf_to_policy.py"
     },
     {
       "id": "render_conf_rest",
@@ -24536,6 +24651,11 @@
       "id": "render_pointer",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "render_policy_bytes",
+      "kind": "function",
+      "file": "tools/govkit/steps/conf_to_policy.py"
     },
     {
       "id": "render_policy_bytes",
@@ -26066,6 +26186,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/loop/review_bounds.py"
     },
     {
       "id": "resolve_kit_dir",
@@ -28730,6 +28855,11 @@
     {
       "id": "run_git",
       "kind": "function",
+      "file": "tools/loop/review_bounds.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
       "file": "tools/memory-tree/commit_trailers.py"
     },
     {
@@ -29446,6 +29576,11 @@
       "id": "run_plant",
       "kind": "function",
       "file": "tools/loop/position.py"
+    },
+    {
+      "id": "run_plant",
+      "kind": "function",
+      "file": "tools/loop/review_bounds.py"
     },
     {
       "id": "run_plant",
@@ -31491,6 +31626,11 @@
       "id": "seed_ambiguous_registry",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "seed_bound_kits",
+      "kind": "function",
+      "file": "tools/unattended/check-unattended.test.sh"
     },
     {
       "id": "seed_brange_fixture",
@@ -36581,6 +36721,11 @@
       "id": "write_text",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "write_tracking_policy",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_transcript",

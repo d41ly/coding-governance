@@ -1239,6 +1239,41 @@ write a member and never an alias. For an item the file declares it answers true
 outside that item's outcomes. For an item the file does not declare it answers `None`, which reads as
 unarmed and never as a pass.
 
+## How many rounds a review takes
+
+Every review loop stops at a bound you set in `.governance/policy.toml`, under four keys:
+
+- `review.max-rounds`, default 3: the ceiling of every loop. A round one past it reads `CEILING`.
+- `review.design.rounds`, default `one`: how many rounds a spec audit takes. `one` is one round,
+  `fixed-count` is `review.design.round-count` rounds, and each `until-*` value runs to
+  `review.max-rounds`.
+- `review.design.round-count`, default 2: the count `fixed-count` reads.
+- `review.follow-up`, default `after-high`: whether the closing review takes follow-up rounds. `never`
+  gives it one round. `after-high` and `while-finding` run to `review.max-rounds`.
+
+From these the loop kit derives two bounds: the spec bound, which a spec audit stops at with
+`BOUNDED`, and the closing bound, which the closing review stops at. A `review.design.round-count`
+equal to `review.max-rounds` is admitted, and the audit reaches it as `BOUNDED`. A count above it is
+refused, naming both keys, and so is any value below 1. Raising any of the four is yours, the owner's:
+an agent's run never writes the policy file, and the unattended leg's check 19 fails a run commit that
+moves the spec bound.
+
+- **See the bounds:** `python tools/loop/review_bounds.py show` prints <!-- usage: script:tools/loop/review_bounds.py#show e8e581b9 -->
+  `max-rounds=<n> spec-bound=<n> closing-bound=<n> follow-up=<value>` from the policy file at your
+  default branch's landed revision, or at `--rev <rev>`. It exits 2, printing `review-bounds: refused`
+  and why, on a refused bound, or `review-bounds: unarmed` where the policy kit is not installed. The
+  unattended driver's `--review` reads the same line, and refuses the round on a refusal. Where the
+  module or the policy kit is not installed, the driver uses the defaults above and prints a NOTE.
+  `python tools/loop/loop_lib.py --check` refuses a bad bound in your committed policy file too.
+
+- **See it on a fixture:** `python tools/loop/review_bounds.py --fixture` runs every case, each in a <!-- usage: script:tools/loop/review_bounds.py f9f7e230 -->
+  scratch repository with a policy file of its own: `defaults`, `count-equal`, `count-above`,
+  `count-zero`, `max-zero`, `until`, `never`, `while-finding`, `no-driver` and `no-policy-kit`.
+  `--plant <case>` runs one. Gov's own `loop review bounds fixtures` gate runs them all.
+
+The bounds do not tell whether a round's recorded counts are true, or whether a raise of a bound was
+yours; check 19 grades only a run's own commits.
+
 ## How to use it
 
 - **Read the loop:** `python tools/loop/loop_lib.py --check` prints one line per step and per <!-- usage: script:tools/loop/loop_lib.py 8a025e56 -->

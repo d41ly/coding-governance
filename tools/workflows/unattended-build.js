@@ -250,7 +250,7 @@ function chunk(a, n) {
 // was terminal after its one round, `verb_review` refused a second, and the promoted spec was built
 // unaudited. The key is `<slug>-spec-set-r<N>` where N is the round the generation was FIRST audited
 // at — `subjectRound` when the caller carries it, this invocation's round otherwise. Keying on the
-// invocation round ALONE would reset the driver's sequence on every fold under `REVIEW_ROUNDS` > 1,
+// invocation round ALONE would reset the driver's sequence on every fold under a spec bound above 1,
 // so BOUNDED and NON-CONVERGENT could never fire and the loop had no end; the CONVERGING return
 // carries `subjectRound` back so the caller copies it rather than derives it.
 //
@@ -343,7 +343,7 @@ if (!units.length) {
 // PRESENT-BUT-WRONG-TYPED REFUSES BY NAME (closing review round 2, cluster G), like `mode`, `scratch`
 // and `units` below. These three used to fold to their defaults: a string `subjectRound` — the `"2"` an
 // agent copying a log line produces — became the invocation round, which keys a FRESH subject on every
-// fold and resets the driver's sequence, so under `REVIEW_ROUNDS` > 1 BOUNDED and NON-CONVERGENT could
+// fold and resets the driver's sequence, so under a spec bound above 1 BOUNDED and NON-CONVERGENT could
 // never fire; a string `auditIds` became the whole set, re-auditing the subject a terminal round closed.
 // `specAudit` joins the table (TOOL-aBlindedTrial-3): a truthy non-string — `true`, `1`, the
 // `"later"` a README typo produces — must refuse rather than switch the audit ON, and a string that is

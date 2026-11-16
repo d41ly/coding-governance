@@ -506,6 +506,12 @@ entry = "{prefix}/loop/upstream.py"
 flags = ["--fixture", "--plant=", "--selftest"]
 
 [[usage]]
+id = "script:{prefix}/loop/review_bounds.py"
+shape = "verb"
+entry = "{prefix}/loop/review_bounds.py"
+flags = ["--fixture", "--plant="]
+
+[[usage]]
 id = "script:{prefix}/loop/composition.py"
 shape = "verb"
 entry = "{prefix}/loop/composition.py"
@@ -550,6 +556,13 @@ shape = "verb"
 entry = "{prefix}/loop/upstream.py"
 verb = "join"
 flags = ["--rows=", "--return=", "--write", "--build=", "--unit="]
+
+[[usage]]
+id = "script:{prefix}/loop/review_bounds.py#show"
+shape = "verb"
+entry = "{prefix}/loop/review_bounds.py"
+verb = "show"
+flags = ["--rev="]
 
 [[usage]]
 id = "script:{prefix}/loop/factories.py"
@@ -706,6 +719,27 @@ flags = []
 id = "script:{prefix}/govkit/steps/fanout_cap.py#down"
 shape = "verb"
 entry = "{prefix}/govkit/steps/fanout_cap.py"
+verb = "down"
+flags = []
+
+[[usage]]
+id = "script:{prefix}/govkit/steps/review_rounds.py#up"
+shape = "verb"
+entry = "{prefix}/govkit/steps/review_rounds.py"
+verb = "up"
+flags = []
+
+[[usage]]
+id = "script:{prefix}/govkit/steps/review_rounds.py#witness"
+shape = "verb"
+entry = "{prefix}/govkit/steps/review_rounds.py"
+verb = "witness"
+flags = []
+
+[[usage]]
+id = "script:{prefix}/govkit/steps/review_rounds.py#down"
+shape = "verb"
+entry = "{prefix}/govkit/steps/review_rounds.py"
 verb = "down"
 flags = []
 

@@ -105,6 +105,11 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # loop_items.py's `read_composition`, so the playbook kit is reached as a subprocess with no edge, and reads
 # `flow.adapt` through the policy kit by `read_policy_kit`. A kit that does not resolve exits 2 `unarmed`,
 # never a default. Its leg, `loop adapt fixtures`, is gov's own [[exempt_leg]], no row here.
+# The review bounds (TOOL-dDeclaredLoop-21): review_bounds.py reads the four review bound keys through the
+# policy kit, found by its inline `resolve_kit_dir` with no edge, derives the spec and closing bounds and
+# refuses a fixed count above the ceiling; `loop_lib.py --check` runs it over the tree's policy file and
+# prints `review bounds unarmed` where the policy kit does not resolve. Its plants' leg, `loop review
+# bounds fixtures`, is gov's own [[exempt_leg]], no row here.
 requires = ["memory-tree"]
 
 # Everything the kit ships is engine, overwritten on every update: the definition, its reader, the

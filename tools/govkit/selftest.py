@@ -3839,6 +3839,82 @@ def check_fanout_step(tmp: pathlib.Path) -> None:
           and (t / ".governance" / "policy.toml").read_bytes() == pol0, up.stdout + up.stderr)
 
 
+def check_review_rounds_step(tmp: pathlib.Path) -> None:
+    """TOOL-dDeclaredLoop-21 AC7 — S7's up, down and witness argvs over scratch targets, each run under
+    `-I` as the runner runs it, with every `raise Refusal` site of `review_rounds.py` and of the shared
+    `conf_to_policy.py` it loads reached: a value that is no integer of at least 1, a conf that is not
+    UTF-8, and a conf that differs from its blob at HEAD. The written keys are read back through gov's
+    own policy reader."""
+    step_py = HERE / "steps" / "review_rounds.py"
+    policy_py = KIT_DIRS["policy"] / "policy.py"
+
+    def run_step(verb: str, t: pathlib.Path) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, "-I", str(step_py), verb, str(t)], capture_output=True,
+                              text=True, encoding="utf-8")
+
+    def read_key(t: pathlib.Path, key: str) -> str:
+        return subprocess.run([sys.executable, str(policy_py), "get", key, "--rev", "HEAD"],
+                              cwd=str(t), capture_output=True, text=True, encoding="utf-8").stdout.strip()
+
+    def build_bounded(tag: str, conf: bytes) -> pathlib.Path:
+        t = build_target(tmp / tag, None)
+        (t / ".unattended.conf").write_bytes(conf)
+        settle(t, "a target with a round bound")
+        return t
+
+    def read_tree(t: pathlib.Path) -> dict:
+        return {q.relative_to(t).as_posix(): q.read_bytes() for q in t.rglob("*")
+                if q.is_file() and ".git" not in q.relative_to(t).parts}
+
+    for n, keys in (("1", {}), ("2", {"review.design.rounds": "fixed-count", "review.design.round-count": "2",
+                                      "review.max-rounds": "3"}),
+                    ("5", {"review.design.rounds": "fixed-count", "review.design.round-count": "5",
+                           "review.max-rounds": "5"})):
+        t = build_bounded(f"rr-ac7-{n}", f'MEMORY_ROOT=memory\nREVIEW_ROUNDS="{n}"\nLANDER="echo land"\n'.encode())
+        pre = read_tree(t)
+        w0, up = run_step("witness", t), run_step("up", t)
+        w1 = run_step("witness", t)
+        settle(t, "the step")
+        got = {k: read_key(t, k) for k in keys}
+        check(f"[dDL-21 AC7] REVIEW_ROUNDS={n}: the up takes the line out of the conf, keeps the conf and writes "
+              f"{'no policy key' if not keys else 'the keys that read the same bound back'}, its witness exiting 1 before and 0 after",
+              up.returncode == 0 and w0.returncode == 1 and w1.returncode == 0
+              and (t / ".unattended.conf").read_bytes() == b'MEMORY_ROOT=memory\nLANDER="echo land"\n'
+              and got == keys and (bool(keys) == (t / ".governance" / "policy.toml").is_file()
+                                   or ".governance/policy.toml" in pre),
+              up.stdout + up.stderr + repr(got))
+        run_gov_git(t, "reset", "-q", "--soft", "HEAD~1")
+        down = run_step("down", t)
+        w2 = run_step("witness", t)
+        check(f"[dDL-21 AC7] REVIEW_ROUNDS={n}: the down restores the conf and the policy file byte-identical, "
+              f"and the witness exits 1 again",
+              down.returncode == 0 and read_tree(t) == pre and w2.returncode == 1, down.stdout + down.stderr)
+
+    t = build_bounded("rr-bad", b"REVIEW_ROUNDS=abc\n")
+    pre = read_tree(t)
+    up = run_step("up", t)
+    check("[dDL-21 S8] a REVIEW_ROUNDS that is no integer: the up exits 1 naming the conf's line and writes no byte",
+          up.returncode == 1 and ".unattended.conf:1: REVIEW_ROUNDS must be an integer of at least 1" in up.stderr
+          and read_tree(t) == pre, up.stdout + up.stderr)
+    t = build_bounded("rr-utf8", b"REVIEW_ROUNDS=\xff\n")
+    pre = read_tree(t)
+    up = run_step("up", t)
+    check("[dDL-21 S8] a conf that is not UTF-8: the up exits 1 naming it and writes no byte",
+          up.returncode == 1 and ".unattended.conf: not UTF-8" in up.stderr and read_tree(t) == pre,
+          up.stdout + up.stderr)
+    t = build_bounded("rr-dirty", b"REVIEW_ROUNDS=2\n")
+    (t / ".unattended.conf").write_bytes(b"REVIEW_ROUNDS=3\n")
+    pre = read_tree(t)
+    up = run_step("up", t)
+    check("[dDL-21 S7] a conf differing from its blob at HEAD: the up exits 1 naming it and writes no byte",
+          up.returncode == 1 and ".unattended.conf: differs from its blob at HEAD" in up.stderr
+          and read_tree(t) == pre, up.stdout + up.stderr)
+    steps = govkit_module().upgrade_steps
+    got = steps.render_policy_text("[review]\nmax-rounds = 5\n", "review.design", "round-count", 5)
+    check("[dDL-21 S8] render_policy_text sets a key under a dotted table and reads it back",
+          got == "[review]\nmax-rounds = 5\n\n[review.design]\nround-count = 5\n", repr(got))
+
+
 def check_steps_recordable() -> None:
     """TOOL-dSafePassage-16 AC1 AC2 — the step record's precondition and its one writer over the
     spec's five receipt shapes: the predicate reads the table's answer and writes nothing, and the
@@ -5923,6 +5999,7 @@ def main() -> int:
         check_upgrade_steps(tmp / "dsp")
         check_succession(tmp / "dsc")
         check_fanout_step(tmp / "dfs")
+        check_review_rounds_step(tmp / "drr")
         check_receipt_schema(tmp / "drs")
         check_steps_recordable()
         check_step_isolation(tmp / "dsi")

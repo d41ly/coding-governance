@@ -89,6 +89,7 @@
       "loop item kind",
       "loop parent routes",
       "loop position fixtures",
+      "loop review bounds fixtures",
       "loop scenario fixtures",
       "loop splice check",
       "loop stage coverage",

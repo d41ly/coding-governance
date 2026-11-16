@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-21 — the review round bounds as policy keys: review.max-rounds, the design rounds and follow-ups, REVIEW_ROUNDS and RUNAWAY_CEILING retired
 
-**Status:** INPROGRESS · rev-8 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 26 · advances TOOL-dDeclaredLoop-35
+**Status:** CLOSED · rev-8 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 26 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0106@90aa01b6 whole
 **Carries:** node:policy-key.review.follow-up
@@ -22,6 +22,7 @@
 | [2026-11-05-build-TOOL-dDeclaredLoop-1-reground-returns.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-1-reground-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 |
 | [2026-11-05-build-TOOL-dDeclaredLoop-21-deviation-212.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-21-deviation-212.md) | deviation | — |
 | [2026-11-05-build-TOOL-dDeclaredLoop-21-deviation-213.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-21-deviation-213.md) | deviation | — |
+| [2026-11-16-build-TOOL-dDeclaredLoop-21-1-acceptance-ledger.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-1-acceptance-ledger.md) | journal | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-21-1-builder-return.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-1-builder-return.md) | journal | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-21-2-builder-return.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-2-builder-return.md) | journal | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-21-3-builder-return.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-3-builder-return.md) | journal | — |
@@ -30,6 +31,7 @@
 | [2026-11-16-build-TOOL-dDeclaredLoop-21-deviation-215.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-deviation-215.md) | deviation | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-21-deviation-216.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-deviation-216.md) | deviation | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-21-deviation-217.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-deviation-217.md) | deviation | — |
+| [2026-11-16-build-TOOL-dDeclaredLoop-21-deviation-218.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-deviation-218.md) | deviation | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-21-red-fix-39.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-red-fix-39.md) | red-fix | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-21-red-fix-42.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-red-fix-42.md) | red-fix | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 |

@@ -1368,7 +1368,8 @@ def render_policy_text(text: str | None, table: str, key: str, value) -> str:
     A line editor: the key's line in the table is rewritten, else one line is added after the
     table's last non-blank line, else the table is appended; the file's line ending and any BOM are
     kept. It refuses its own output unless tomllib reads `value` back at `table.key`, so a key held
-    elsewhere (a dotted key, an inline table) is refused rather than shadowed."""
+    elsewhere (a dotted key, an inline table) is refused rather than shadowed. `table` may be a
+    dotted table name, `review.design`, read back segment by segment (TOOL-dDeclaredLoop-21)."""
     text = text or ""
     nl = "\r\n" if "\r\n" in text else "\n"
     kspell = key if re.fullmatch(r"[A-Za-z0-9_-]+", key) else json.dumps(key)
@@ -1395,7 +1396,10 @@ def render_policy_text(text: str | None, table: str, key: str, value) -> str:
             lines.insert(last + 1, f"{line}{nl}")
     out = "".join(lines)
     try:
-        got = tomllib.loads(out.removeprefix("\ufeff")).get(table, {}).get(key)
+        got = tomllib.loads(out.removeprefix("\ufeff"))
+        for seg in table.split("."):  # a dotted table, `[review.design]`, is read back segment by segment
+            got = got.get(seg, {})
+        got = got.get(key)
     except (tomllib.TOMLDecodeError, AttributeError) as e:
         raise Refusal(f"setting {table}.{key} leaves text tomllib does not read: {e}") from None
     if got != value or type(got) is not type(value):

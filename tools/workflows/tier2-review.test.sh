@@ -500,8 +500,8 @@ arm('round state: round 3 with priorCounts [4, 2] and roundLimit 3 -> proceeds',
 }
 
 // ---- TOOL-dFairHearing-17 AC6 — THE PARITY ARM: deriveRoundState against the driver's review_state.
-// The shell block before this runner sliced `review_state()` and the `RUNAWAY_CEILING=` line out of the
-// unattended kit's driver and ran them over every row of the domain both can see: 0 to 3 prior counts,
+// The shell block before this runner sliced `review_state()` out of the unattended kit's driver, its ceiling
+// `MAX_ROUNDS` set to each row's limit, and ran them over every row of the domain both can see: 0 to 3 prior counts,
 // each 0 to 3, a count of 0 to 3 and a limit of 1 to 4 with the round at or below it. Highs are 0 there,
 // so the driver's blocker count and the harness's count are one number. The domain stops at the limit on
 // purpose: past it the driver refuses the round outright where the harness reports CEILING, so the two
@@ -3784,8 +3784,10 @@ fi
 # which reds them by name rather than skipping them.
 case "$bd_why" in "no usable python"*) lens_py="" ;; *) lens_py=$bd_py ;; esac
 
-# ---- TOOL-dFairHearing-17 S5: the driver's `review_state()` and its `RUNAWAY_CEILING=` line, sliced out of the
-# unattended kit beside this one and run over the parity domain, one `<priors>|<count>|<limit>|<token>` row each.
+# ---- TOOL-dFairHearing-17 S5: the driver's `review_state()`, sliced out of the unattended kit beside this one
+# and run over the parity domain, one `<priors>|<count>|<limit>|<token>` row each. Since TOOL-dDeclaredLoop-21 the
+# function reads its ceiling from `MAX_ROUNDS`, one round past it, as `deriveRoundState` reads `roundLimit`, so the
+# arm sets `MAX_ROUNDS` to each row's limit and the limit-4 row reads BOUNDED in both.
 # The runner compares every row with deriveRoundState; a driver that cannot be read or sliced writes
 # PRODUCER-FAILED, which reds the arm by name rather than skipping it.
 RS_OUT="$TMP/review-state.out"; rs_why=""; rs_src=""
@@ -3793,12 +3795,12 @@ RS_OUT="$TMP/review-state.out"; rs_why=""; rs_src=""
 RS_DRIVER=$(resolve_kit_dir "$bd_py" unattended unattended.sh "$HERE" 2>/dev/null) && RS_DRIVER="$ROOT/$RS_DRIVER/unattended.sh" || RS_DRIVER=""
 if [ ! -f "$RS_DRIVER" ]; then rs_why="the driver '$RS_DRIVER' is not a file: the unattended kit did not resolve to one"
 else
-  rs_src=$(tr -d '\r' < "$RS_DRIVER" | sed -n -e '/^RUNAWAY_CEILING=/p' -e '/^review_state() {/,/^}$/p')
-  case "$rs_src" in RUNAWAY_CEILING=*'review_state() {'*) ;; *) rs_why="could not slice RUNAWAY_CEILING= and review_state() out of $RS_DRIVER" ;; esac
+  rs_src=$(tr -d '\r' < "$RS_DRIVER" | sed -n -e '/^review_state() {/,/^}$/p')
+  case "$rs_src" in 'review_state() {'*'MAX_ROUNDS'*) ;; *) rs_why="could not slice review_state() reading MAX_ROUNDS out of $RS_DRIVER" ;; esac
 fi
 if [ -z "$rs_why" ]; then
   ( eval "$rs_src" || exit 1
-    for l in 1 2 3 4; do for c in 0 1 2 3; do
+    for l in 1 2 3 4; do MAX_ROUNDS=$l; for c in 0 1 2 3; do
       printf '|%s|%s|%s\n' "$c" "$l" "$(review_state "" "$c" "$l")"
       for p1 in 0 1 2 3; do
         [ "$l" -ge 2 ] && printf '%s|%s|%s|%s\n' "$p1" "$c" "$l" "$(review_state "$p1" "$c" "$l")"

@@ -391,18 +391,16 @@ file constants of the driver, `WIRING_CEILING` and `PREFLIGHT_CEILING` in second
 ## Two restatements moved out of the protocol's key table
 
 `TOOL-dDerivedDocket-27` widened the key table's `GATE_CMD` cell to carry the two keys above and
-funded the bytes by moving one RESTATEMENT and one ARGUMENT here. Both RULES stay in the table:
-`UNIT_STALL_BOUND` and `TASK_STALL_BOUND` are OPTIONAL on `GATE_BOUND`'s terms, and `REVIEW_ROUNDS` also refuses a value at
-or above the runaway ceiling.
+funded the bytes by moving one RESTATEMENT and one ARGUMENT here. The RULE stays in the table:
+`UNIT_STALL_BOUND` and `TASK_STALL_BOUND` are OPTIONAL on `GATE_BOUND`'s terms. The argument's key,
+the spec audit's old round bound, is retired into the policy keys of the review bounds (TOOL-dDeclaredLoop-21), and
+the loop kit's `review_bounds.py` refuses a fixed count above `review.max-rounds` and admits one equal
+to it.
 
 **What `GATE_BOUND`'s terms are, for `UNIT_STALL_BOUND`.** The row keeps the pointer, and the sibling
 `GATE_BOUND` row states the terms in full. Spelled out, on one line so a reader can grep for the
 passage the row gave up:
 absent takes the kit default and says so on stderr; non-numeric or zero is a refusal.
-
-**Why `REVIEW_ROUNDS` refuses a value at or above the runaway ceiling.** The row keeps the refusal;
-this is its reason:
-because the ceiling would fire first and the declared bound could never be reached.
 
 ## The overlap probe at `--preflight`
 

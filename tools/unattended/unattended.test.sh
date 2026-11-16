@@ -344,11 +344,13 @@ git init -q -b main . && git config user.email t@t.test && git config user.name 
 # reconcile took main's (e197267e, the later and the one its spec-audit call sites already spell):
 # RESUME_STALE_BOUND eighth, SPEC_AUDIT_DEFAULT ninth, and this branch's two schedule bounds
 # stay tenth and eleventh.
-mkconf() { # wiring · gate · UNITS_REGION_CUTOFF · GATE_BOUND · SPEC_THIN_CUTOFF · UNIT_STALL_BOUND · REVIEW_ROUNDS · RESUME_STALE_BOUND · SPEC_AUDIT_DEFAULT · RESUME_SCHEDULE_DELAY · RESUME_SCHEDULE_LIMIT · TASK_STALL_BOUND
+mkconf() { # wiring · gate · UNITS_REGION_CUTOFF · GATE_BOUND · SPEC_THIN_CUTOFF · UNIT_STALL_BOUND · (unused) · RESUME_STALE_BOUND · SPEC_AUDIT_DEFAULT · RESUME_SCHEDULE_DELAY · RESUME_SCHEDULE_LIMIT · TASK_STALL_BOUND
   # ELEVEN SLOTS, NOT EIGHT. `RESUME_STALE_BOUND` and `SPEC_AUDIT_DEFAULT` both read ${8-}: the
   # liveness arms pass a seconds bound there and the spec-audit arms a DATE, so those arms set
   # RESUME_STALE_BOUND to a date and the driver refused at exit 2 before any verb ran. One slot
-  # per key, and the call sites that meant the date now spell it ninth.
+  # per key, and the call sites that meant the date now spell it ninth. The SEVENTH slot is unread since
+  # TOOL-dDeclaredLoop-21 retired the conf's round bound into the policy keys; it keeps its position so
+  # no later slot moves, and the review bounds are the policy file the fixture's base commit holds.
   cat > .unattended.conf <<EOF
 MEMORY_ROOT=memory
 UNITS_REGION_CUTOFF="${3-2026-08-19}"
@@ -374,7 +376,6 @@ GATE_BOUND="${4-3600}"
 GATE_WALL="21600"
 UNIT_STALL_BOUND="${6-1800}"
 TASK_STALL_BOUND="${12-5400}"
-REVIEW_ROUNDS="${7-7}"
 RESUME_STALE_BOUND="${8-5400}"
 WIRING_CHECK="${1-true}"
 KEEPALIVE_CREATE="CronCreate"
@@ -593,6 +594,12 @@ mutate memory/builds/tUnpaired/README.md 's|^<!-- /gen:build-index -->$||'
 # `reset_tree`, which runs `git clean -qfd`, and an untracked stub would be deleted by the first one.
 mkdir -p memory/guides
 printf '# build method (stub)\n\n## M1\n\nExistence is what the driver tests.\n' > memory/guides/BUILD-METHOD.md
+# TOOL-dDeclaredLoop-21 §8 F7: THE REVIEW BOUNDS EVERY ARM RUNS UNDER, a policy file on `main` in the base
+# commit, because `review_bounds.py show` reads the LANDED revision, the clone's refs/remotes/origin/main,
+# and every arm works on `unit`. A spec bound of 7 under `fixed-count`, with the ceiling raised to 7, so no
+# arm but the bounded ones stops early; the one arm with a bound of its own lands it on the tracking ref.
+mkdir -p .governance
+printf '[review]\nmax-rounds = 7\n\n[review.design]\nrounds = "fixed-count"\nround-count = 7\n' > .governance/policy.toml
 git add -A && git commit -q -m base --no-verify
 # A REMOTE-TRACKING anchor, because that is now the only thing resolve_base will measure against: a
 # bare local branch is a ref the run can move with `git branch -f`, and moving it to HEAD was a
@@ -2589,8 +2596,8 @@ hit "$out" "disposal"
 hit "$out" "chain-stop"
 hit "$out" "chain-ceiling"
 if [ -z "$_sw_rel" ]; then
-  n=$((n+23))   # COUNTED EITHER WAY, so the floor grades this suite and not which kits sit beside it
-  echo "  SKIP the spec-audit switch arms over a policy kit: no policy kit resolves beside this one, so nothing answers them; their 23 assertions are counted, not run"
+  n=$((n+24))   # COUNTED EITHER WAY, so the floor grades this suite and not which kits sit beside it
+  echo "  SKIP the spec-audit switch arms over a policy kit: no policy kit resolves beside this one, so nothing answers them; their 24 assertions are counted, not run"
 else
   _sw_src="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$_sw_rel"
   # AC1 and AC5: with no policy file the reader answers the catalogue's defaults, and those are the
@@ -2604,6 +2611,15 @@ else
     _sw_answers="$_sw_answers $out"
   done
   same "AC5 the kit defaults are the catalogue's" "$_sw_answers" "$_sw_defaults"
+  # TOOL-dDeclaredLoop-21 AC11: THE REVIEW BOUNDS' FOUR KIT DEFAULTS ARE THE LINE `show` PRINTS over the
+  # same fixture, which holds no policy file yet, so the driver's copy of the derived bounds cannot drift
+  # from the loop kit's derivation. The module is the loop kit's own, found as the policy kit is above.
+  _rb_rel=$(resolve_kit_dir "$_rkd_py" loop review_bounds.py "$HERE" 2>/dev/null) || _rb_rel=""
+  _rb_line=$( [ -n "$_rb_rel" ] && cd "$_sw_tmp/k" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$_rkd_py" \
+    "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$_rb_rel/review_bounds.py" show 2>&1 )
+  _rb_want=$(sed -n -e 's/^REVIEW_MAX_ROUNDS_DEFAULT="\(.*\)"$/max-rounds=\1/p' -e 's/^REVIEW_SPEC_BOUND_DEFAULT="\(.*\)"$/spec-bound=\1/p' \
+    -e 's/^REVIEW_CLOSING_BOUND_DEFAULT="\(.*\)"$/closing-bound=\1/p' -e 's/^REVIEW_FOLLOW_UP_DEFAULT="\(.*\)"$/follow-up=\1/p' "$SCRIPT" | tr '\n' ' ')
+  same "AC11 the four review-bound kit defaults are the line review_bounds.py show prints with no policy file" "${_rb_line//$'\r'/}" "${_rb_want% }"
   # AC2: a committed file moves all three onto the old rule.
   mkdir -p "$_sw_tmp/k/.governance"
   printf '[review.spec-audit]\ndisposal = "promote-all"\nchain-stop = "clean-only"\nchain-ceiling = 2\n' > "$_sw_tmp/k/.governance/policy.toml"
@@ -2637,8 +2653,8 @@ fi
 # ---- TOOL-dFoldedAudit-2: --review RECORDS A SPEC AUDIT'S EXIT THAT FOLDS. Each case takes a fresh
 # ---- repository off `write_switch_fixture`, with no policy kit beside the driver unless the arm is about
 # ---- the switch: the reader then answers its kit default, by-nature, and says so on stderr, which is
-# ---- what lets AC8 tell an exit that read the switch from one that did not. REVIEW_ROUNDS is 1 so a
-# ---- first blocked round exits. The record's first commit is pinned either side of the cutoff, so no
+# ---- what lets AC8 tell an exit that read the switch from one that did not. With no loop kit beside the
+# ---- driver the review bounds take the kit defaults, a spec bound of 1, so a first blocked round exits. The record's first commit is pinned either side of the cutoff, so no
 # ---- arm depends on the day it runs. The hand-written rows beside these are the gate suite's.
 _fa_r="$_sw_tmp/r"; _fa_run="$_fa_r/memory/builds/tFix/RUN.md"
 _fa_dated="2026-11-02T12:00:00 +0000"; _fa_early="2026-10-30T12:00:00 +0000"; _fa_cf="CLEAN WITH FIXES"
@@ -2652,7 +2668,7 @@ write_fold_commit() { # committer date · message · the repository, the fold fi
 write_fold_fixture() { # the record's first commit, or nothing for no record · SPEC_FOLD_CUTOFF's value · 1 for the policy kit beside the driver · the policy file's text
   rm -rf "$_fa_r"
   write_switch_fixture "$_fa_r" "${3:-0}" "${4:-}"
-  printf 'DISPOSITION_CUTOFF="2000-01-01"\nREVIEW_ROUNDS="1"\nSPEC_FOLD_CUTOFF="%s"\n' "$2" >> "$_fa_r/.unattended.conf"
+  printf 'DISPOSITION_CUTOFF="2000-01-01"\nSPEC_FOLD_CUTOFF="%s"\n' "$2" >> "$_fa_r/.unattended.conf"
   mkdir -p "${_fa_run%/*}"
   [ -n "$1" ] || return 0
   write_fold_commit "$1" conf
@@ -2774,7 +2790,7 @@ fi
 # ---- hand-written short row last is the control that the leg reached the new tenant's rows at all. The
 # ---- floors are declared because check 2 refuses a conf without them, ahead of any record.
 rm -rf "$_fa_r"; write_switch_fixture "$_fa_r" 0 ""
-printf 'DISPOSITION_CUTOFF="2000-01-01"\nREVIEW_ROUNDS="1"\nSPEC_FOLD_CUTOFF="2026-11-02"\nHALT_FLOOR="1"\nHOLD_FLOOR="1"\n' >> "$_fa_r/.unattended.conf"
+printf 'DISPOSITION_CUTOFF="2000-01-01"\nSPEC_FOLD_CUTOFF="2026-11-02"\nHALT_FLOOR="1"\nHOLD_FLOOR="1"\n' >> "$_fa_r/.unattended.conf"
 write_fold_commit "2026-10-19T12:00:00 +0000" conf
 _fa_base=$(git -C "$_fa_r" rev-parse HEAD)
 mkdir -p "${_fa_run%/*}"
@@ -3172,7 +3188,7 @@ _cg_census='(^|[^a-zA-Z_])fail [0-9]+ "'
 write_gate_fixture() { # the record's first commit · SPEC_FOLD_CUTOFF at BASE · 1 for the policy kit · the policy file's text · a line opening the conf at BASE, restored above it
   write_chain_fixture "${3:-0}" "${4:-}"
   sed -i '/^SPEC_FOLD_CUTOFF=/d' "$_cg_conf"
-  printf 'DISPOSITION_CUTOFF="2000-01-01"\nREVIEW_ROUNDS="1"\nSPEC_FOLD_CUTOFF="%s"\n' "$2" >> "$_cg_conf"
+  printf 'DISPOSITION_CUTOFF="2000-01-01"\nSPEC_FOLD_CUTOFF="%s"\n' "$2" >> "$_cg_conf"
   [ -z "${5:-}" ] || sed -i "1i $5" "$_cg_conf"
   write_fold_commit "$1" conf "$_fc_r"
   _cg_base=$(git -C "$_fc_r" rev-parse HEAD)
@@ -8654,9 +8670,12 @@ echo "MARK review-loop" >&2
 # was applied to two of the three; this one kept `+ 9`. Same defect, same silence: a truncated body
 # still defines the function, so the liveness check passes and every verdict comes back empty.
 slice_fn review_state
-RUNAWAY_CEILING=$(sed -n 's/^RUNAWAY_CEILING="\([0-9]*\)".*/\1/p' "$SCRIPT" | head -1)
+# TOOL-dDeclaredLoop-21: the ceiling is `review.max-rounds`, which `verb_review` reads through
+# `load_review_bounds` into MAX_ROUNDS and a slice sets itself; CEILING is one round PAST it. 7 keeps the
+# arms below on their old sequences, and AC4's pair below takes the key's default of 3.
+MAX_ROUNDS=7
 n=$((n+1)); declare -F review_state >/dev/null || { echo "FAIL review_state was not sliced out of the driver, so every predicate arm below graded nothing"; st=1; }
-n=$((n+1)); [ -n "$RUNAWAY_CEILING" ] || { echo "FAIL the runaway ceiling could not be read out of the driver, so the ceiling arm below would compare against an empty string"; st=1; }
+same "AC4 the driver keeps no runaway ceiling constant" "$(grep -c 'RUNAWAY''_CEILING' "$SCRIPT")" "0"
 
 same "first round, no predecessor to shrink against"  "$(review_state '' 3)"        "CONVERGING"
 same "a strictly smaller count re-arms the loop"      "$(review_state '3' 2)"       "CONVERGING"
@@ -8676,10 +8695,16 @@ same "a long shrinking sequence hits the ceiling"     "$(review_state '9 8 7 6 5
 # ---- and after the ceiling, so a clean round, a flat round and a ceiling hit each keep their own exit.
 same "a bound of 1 makes the first blocked round terminal"    "$(review_state '' 3 1)"      "BOUNDED"
 same "a bound of 2 ends a strictly smaller second round"      "$(review_state '3' 2 2)"     "BOUNDED"
-same "a bound equal to the ceiling arms round 1 as before"    "$(review_state '' 3 8)"      "CONVERGING"
+same "a bound past the ceiling arms round 1 as before"        "$(review_state '' 3 8)"      "CONVERGING"
 same "a flat count is NON-CONVERGENT before it is BOUNDED"    "$(review_state '2' 2 1)"     "NON-CONVERGENT"
 same "zero blockers is CONVERGED before it is BOUNDED"        "$(review_state '' 0 1)"      "CONVERGED"
-same "the ceiling fires before a bound equal to it"           "$(review_state '9 8 7 6 5 4 3' 2 8)" "CEILING"
+same "the ceiling fires one round past a bound equal to it"  "$(review_state '9 8 7 6 5 4 3' 2 7)" "CEILING"
+# ---- TOOL-dDeclaredLoop-21 AC4: at the key's default of 3, a third round at a bound of 3 is BOUNDED, the
+# ---- equality the loop kit admits, and a fourth is CEILING; the base driver's `>=` read the first CEILING.
+MAX_ROUNDS=3
+same "AC4 a bound equal to the ceiling is reached as BOUNDED"   "$(review_state '5 4' 3 3)"   "BOUNDED"
+same "AC4 one round past the ceiling reads CEILING"             "$(review_state '5 4 3' 2)"   "CEILING"
+MAX_ROUNDS=7
 
 # ---- the verb's refusals, on disk
 bcopen
@@ -8791,13 +8816,21 @@ same "the promote disposition is written into the round's own reason" "$(grep -c
 same "the pre-existing substring the leg reads still matches" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "1"
 reset_tree
 
-# ---- TOOL-aProbedUnit-6: A SPEC SUBJECT IS BOUNDED, THE SLUG SUBJECT IS NOT. The conf below declares
-# ---- REVIEW_ROUNDS=1 through mkconf's SEVENTH positional; every other review arm in this file runs at
-# ---- the default, ONE BELOW the ceiling (a bound equal to it is refused at startup, cluster H of
-# ---- aProbedUnit's closing review), which is why none of them moved. Against the base driver every arm
-# ---- here reads CONVERGING where BOUNDED is expected and refuses the explicit disposition.
+# ---- TOOL-aProbedUnit-6: A SPEC SUBJECT IS BOUNDED, THE SLUG SUBJECT IS NOT. Since TOOL-dDeclaredLoop-21
+# ---- the bound is the LANDED policy file's, so the arm lands `review.design.rounds = "one"` on the clone's
+# ---- tracking ref alone, a commit on $BASE, and puts the ref back before its reset: the bare ORIGIN's
+# ---- main, the tip the anchor reads through `ls-remote`, never moves, so the run's BASE stays $BASE.
+# ---- Every other review arm in this file runs at the fixture's spec bound of 7. Against the base driver
+# ---- every arm here reads CONVERGING where BOUNDED is expected and refuses the explicit disposition.
+write_tracking_policy() { # the policy file's text -> refs/remotes/origin/main at a commit on $BASE holding it
+  local _tp_blob _tp_gov _tp_tree
+  _tp_blob=$(printf '%b' "$1" | git hash-object -w --stdin)
+  _tp_gov=$(printf '100644 blob %s\tpolicy.toml\n' "$_tp_blob" | git mktree)
+  _tp_tree=$( { git ls-tree "$BASE" | grep -v "	.governance$"; printf '040000 tree %s\t.governance\n' "$_tp_gov"; } | git mktree)
+  git update-ref refs/remotes/origin/main "$(git commit-tree "$_tp_tree" -p "$BASE" -m "the review bounds under test")"
+}
 bcopen
-mkconf "true" "true" "2026-08-19" "3600" "" "1800" "1"
+write_tracking_policy '[review]\nmax-rounds = 7\n\n[review.design]\nrounds = "one"\n'
 hit "$(run --review tRun --subject B1 --verdict BLOCKED --blockers 3)" "--review exits BOUNDED with 3 blocker(s) standing and requires --disposition promote"
 same "a refused bounded round wrote nothing" "$(grep -c 'review · item B1' memory/builds/tRun/RUN.md)" "0"
 out=$(run --review tRun --subject B1 --verdict BLOCKED --blockers 3 --highs 0 --minors 0 --disposition promote)
@@ -8828,6 +8861,16 @@ hit "$out" "blockers 1 · BOUNDED · highs 1 · minors 4 · disposition promote"
 hit "$out" "this exit owes at least 3 new unit(s)"
 hit "$out" "the MEDIUMs and LOWs batched into one unit, two only across disjoint write sets"
 same "a bounded spec exit's counts sit before the disposition" "$(grep -c 'review · item B3 · reason verdict BLOCKED · blockers 1 · BOUNDED · highs 1 · minors 4 · disposition promote$' memory/builds/tRun/RUN.md)" "1"
+# ---- TOOL-dDeclaredLoop-21 S4: A REFUSED BOUND REFUSES THE ROUND. A fixed count of 4 over the ceiling's
+# ---- default of 3, landed the same way: `verb_review` relays the module's refusal in its one `fail 37`
+# ---- and writes nothing. The load-time refusal of a bound at the ceiling this replaces is gone: a count
+# ---- equal to it is admitted, and one below 1 is the module's own plants'.
+write_tracking_policy '[review.design]\nrounds = "fixed-count"\nround-count = 4\n'
+out=$(run --review tRun --subject R1 --verdict BLOCKED --blockers 3)
+hit "$out" "the review bounds do not read, so this round cannot be bounded and nothing is recorded: "
+hit "$out" "review.design.round-count is 4, above review.max-rounds 3"
+same "a round under a refused bound wrote nothing" "$(grep -c 'review · item R1' memory/builds/tRun/RUN.md)" "0"
+git update-ref refs/remotes/origin/main "$BASE"
 reset_tree
 
 # ---- TOOL-aBatchedMinors-2: THE CLOSING REVIEW PROMOTES EVERY FINDING, and its exit COUNTS them. The
@@ -11110,32 +11153,18 @@ hit "$out" "declares no GATE_WALL, so the unattended bar runs under the gate run
 # ...and the fourth bound's default is DERIVED from the two above it, 3600 + 1800, so the NOTE
 # reds if the derivation or either addend moves (TOOL-aWokenSentinel-2).
 same "the derived RESUME_STALE_BOUND default is announced once" "$(grep -c 'declares no RESUME_STALE_BOUND, so a run reads STALE after the derived default of 5400s' <<<"$out")" "1"
-# THE DEFAULT IS READ OUT OF THE DRIVER, not retyped: the NOTE interpolates `REVIEW_ROUNDS_DEFAULT`
-# exactly as its two siblings interpolate theirs, so a raised argument cannot leave the sentence
-# saying 1 (cluster I of aProbedUnit's closing review). A literal-digit default in any
-# `read_bound_key` call is what that fold removed, and the count below pins it at zero.
-RR_DEF=$(sed -n 's/^REVIEW_ROUNDS_DEFAULT=\([0-9]*\).*/\1/p' "$SCRIPT" | head -1)
-n=$((n+1)); [ -n "$RR_DEF" ] || { echo "FAIL REVIEW_ROUNDS_DEFAULT could not be read out of the driver, so the NOTE arm below would assert an empty default"; st=1; }
-hit "$out" "declares no REVIEW_ROUNDS, so a spec-audit subject exits BOUNDED after the kit default of ${RR_DEF} round"
+# THE REVIEW BOUNDS ARE THE MODULE'S (TOOL-dDeclaredLoop-21): the conf no longer carries a round bound, so
+# no NOTE names one; the bounds the fixture's review arms run under are what the loop kit's
+# review_bounds.py reads from the policy file on the fixture's main. A literal-digit default in any
+# `read_bound_key` call is what cluster I of aProbedUnit's closing review removed, and the count below
+# pins it at zero.
+_rb_rel=$(resolve_kit_dir "$_rkd_py" loop review_bounds.py "$HERE" 2>/dev/null) || _rb_rel=""
+RB_SHOW=$( [ -n "$_rb_rel" ] && "$_rkd_py" "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$_rb_rel/review_bounds.py" show 2>&1 )
+n=$((n+1)); [ -n "$_rb_rel" ] || { echo "FAIL the loop kit's review_bounds.py did not resolve beside this kit, so the bounds arm below reads nothing"; st=1; }
+hit "${RB_SHOW//$'\r'/}" "max-rounds=7 spec-bound=7 closing-bound=7 follow-up=after-high"
 same "no read_bound_key call types its default as a literal digit" "$(grep -cE '^read_bound_key [A-Z_]+ [0-9]' "$SCRIPT")" "0"
 reset_tree
 
-# ---- TOOL-aProbedUnit-6: REVIEW_ROUNDS above the runaway ceiling is a refusal, because the ceiling
-# ---- would fire first and the declared bound could never be reached; zero is the reader's own refusal,
-# ---- naming the key. Both exit 2 before any verb runs.
-reset_tree; mkconf "true" "true" "" "3600" "" "1800" "9"
-out=$(run --status tRun)
-hit "$out" "above the runaway ceiling of 8"
-# ...and EQUAL to it (cluster H of the closing review): `review_state` tests the ceiling first, so a
-# bound of 8 is exactly the value the sentence refuses and `-le` let through; `-lt` closes it.
-reset_tree; mkconf "true" "true" "" "3600" "" "1800" "8"
-out=$(run --status tRun); rc=$?
-same "a bound equal to the ceiling exits 2" "$rc" "2"
-hit "$out" "REFUSING - REVIEW_ROUNDS is 8, at or above the runaway ceiling of 8"
-reset_tree; mkconf "true" "true" "" "3600" "" "1800" "0"
-out=$(run --status tRun)
-hit "$out" "REFUSING - REVIEW_ROUNDS is declared as '0', which is not a positive integer"
-reset_tree
 
 
 # ==================================================================================================
@@ -12359,7 +12388,6 @@ GATE_CMD="true"
 GATE_BOUND="600"
 GATE_WALL="21600"
 UNIT_STALL_BOUND="1800"
-REVIEW_ROUNDS="7"
 WIRING_CHECK="true"
 KEEPALIVE_CREATE="CronCreate"
 KEEPALIVE_DELETE="CronDelete"
@@ -13382,7 +13410,6 @@ GATE_CMD="bash bin/bar.sh"
 GATE_BOUND="600"
 GATE_WALL="21600"
 UNIT_STALL_BOUND="1800"
-REVIEW_ROUNDS="7"
 WIRING_CHECK="true"
 KEEPALIVE_CREATE="CronCreate"
 KEEPALIVE_DELETE="CronDelete"
@@ -15248,7 +15275,6 @@ GATE_CMD="bash bin/bar.sh"
 GATE_BOUND="600"
 GATE_WALL="21600"
 UNIT_STALL_BOUND="1800"
-REVIEW_ROUNDS="7"
 WIRING_CHECK="true"
 KEEPALIVE_CREATE="CronCreate"
 KEEPALIVE_DELETE="CronDelete"
@@ -15735,7 +15761,6 @@ GATE_CMD="bash bin/bar.sh"
 GATE_BOUND="600"
 GATE_WALL="21600"
 UNIT_STALL_BOUND="1800"
-REVIEW_ROUNDS="7"
 WIRING_CHECK="true"
 KEEPALIVE_CREATE="CronCreate"
 KEEPALIVE_DELETE="CronDelete"
@@ -16355,7 +16380,6 @@ GATE_CMD="bash bin/bar.sh"
 GATE_BOUND="600"
 GATE_WALL="21600"
 UNIT_STALL_BOUND="1800"
-REVIEW_ROUNDS="7"
 WIRING_CHECK="true"
 KEEPALIVE_CREATE="CronCreate"
 KEEPALIVE_DELETE="CronDelete"
@@ -16608,7 +16632,6 @@ GATE_CMD="bash bin/bar.sh"
 GATE_BOUND="600"
 GATE_WALL="21600"
 UNIT_STALL_BOUND="1800"
-REVIEW_ROUNDS="7"
 RESUME_STALE_BOUND="5400"
 WIRING_CHECK="bash bin/wire.sh"
 KEEPALIVE_CREATE="CronCreate"
@@ -18372,7 +18395,6 @@ GATE_BOUND="$3"
 GATE_WALL="$1"
 GATE_PROFILE_CMD="$2"
 UNIT_STALL_BOUND="1800"
-REVIEW_ROUNDS="7"
 RESUME_STALE_BOUND="5400"
 WIRING_CHECK="true"
 KEEPALIVE_CREATE="CronCreate"
@@ -18933,7 +18955,7 @@ build_rx_fixture() { # fetch: yes|no -> RX_TIP, the remote's main after the thre
     git remote add origin "$rx_root/origin.git"
     mkdir -p memory/guides memory/builds/tRx work
     printf '# build method\n' > memory/guides/BUILD-METHOD.md
-    printf 'MEMORY_ROOT=memory\nUNITS_REGION_CUTOFF="2026-08-19"\nLANDER="echo land"\nLANDER_MODE="primary"\nSELFTESTS_OWED_PATHS=""\nBYPASS_BAN="--no-verify"\nGATE_CMD="true"\nGATE_BOUND="600"\nGATE_WALL="21600"\nUNIT_STALL_BOUND="1800"\nREVIEW_ROUNDS="7"\nWIRING_CHECK="true"\nKEEPALIVE_CREATE="CronCreate"\nKEEPALIVE_DELETE="CronDelete"\nRESUME_SCHEDULE="on"\nRESUME_SCHEDULE_CREATE="TheScheduleCreate"\nRESUME_SCHEDULE_DELETE="TheScheduleDelete"\nRESUME_SCHEDULE_DELAY="1800"\nRESUME_SCHEDULE_LIMIT="6"\nPHASES_EXTRA=""\nDOD_EXTRA=""\n' > .unattended.conf
+    printf 'MEMORY_ROOT=memory\nUNITS_REGION_CUTOFF="2026-08-19"\nLANDER="echo land"\nLANDER_MODE="primary"\nSELFTESTS_OWED_PATHS=""\nBYPASS_BAN="--no-verify"\nGATE_CMD="true"\nGATE_BOUND="600"\nGATE_WALL="21600"\nUNIT_STALL_BOUND="1800"\nWIRING_CHECK="true"\nKEEPALIVE_CREATE="CronCreate"\nKEEPALIVE_DELETE="CronDelete"\nRESUME_SCHEDULE="on"\nRESUME_SCHEDULE_CREATE="TheScheduleCreate"\nRESUME_SCHEDULE_DELETE="TheScheduleDelete"\nRESUME_SCHEDULE_DELAY="1800"\nRESUME_SCHEDULE_LIMIT="6"\nPHASES_EXTRA=""\nDOD_EXTRA=""\n' > .unattended.conf
     printf -- '---\nslug: tRx\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tRx-1\n---\n\n# tRx\n\n<!-- gen:build-index -->\n**Build status:** OPEN · 1 unit(s)\n\n<!-- gen:build-units -->\n| Unit | Status | Rev | Last change |\n|---|---|---|---|\n| [ARCH-tRx-1 — the unit](spec/one.md) | OPEN | rev-1 | 2026-08-01 |\n<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n' > memory/builds/tRx/README.md
     printf 'a\n' > work/a.txt; printf 'o\n' > other.txt
     printf '# tRx — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Mandate\n<!-- run:mandate -->\nThe owner authorizes build tRx to merge to main and to push.\n<!-- /run:mandate -->\n\n## Run facts\n\n## Parked\n' \
@@ -19071,7 +19093,7 @@ build_ln_fixture() { # LANDING_NODES at BASE, `-` for undeclared · the run's ow
     printf '%s\n' 'd="$(git rev-parse --git-dir)/gate-run/$GATE_RUN_ID"; mkdir -p "$d"' \
       'printf "head\t%s\ntree_clean\tyes\n" "$(git rev-parse HEAD)" > "$d/header"' \
       'printf "verdict\tGREEN\ntree_moved\tno\n" > "$d/verdict"' > bar.sh
-    printf 'MEMORY_ROOT=memory\nUNITS_REGION_CUTOFF="2026-08-19"\nLANDER="echo land"\nLANDER_MODE="primary"\nBYPASS_BAN="--no-verify"\nGATE_CMD="bash bar.sh"\nGATE_BOUND="600"\nGATE_WALL="21600"\nUNIT_STALL_BOUND="1800"\nREVIEW_ROUNDS="7"\nRESUME_STALE_BOUND="5400"\nWIRING_CHECK="true"\nKEEPALIVE_CREATE="CronCreate"\nKEEPALIVE_DELETE="CronDelete"\nRESUME_SCHEDULE="on"\nRESUME_SCHEDULE_CREATE="TheScheduleCreate"\nRESUME_SCHEDULE_DELETE="TheScheduleDelete"\nRESUME_SCHEDULE_DELAY="1800"\nRESUME_SCHEDULE_LIMIT="6"\nPHASES_EXTRA=""\nDOD_EXTRA=""\n' > .unattended.conf
+    printf 'MEMORY_ROOT=memory\nUNITS_REGION_CUTOFF="2026-08-19"\nLANDER="echo land"\nLANDER_MODE="primary"\nBYPASS_BAN="--no-verify"\nGATE_CMD="bash bar.sh"\nGATE_BOUND="600"\nGATE_WALL="21600"\nUNIT_STALL_BOUND="1800"\nRESUME_STALE_BOUND="5400"\nWIRING_CHECK="true"\nKEEPALIVE_CREATE="CronCreate"\nKEEPALIVE_DELETE="CronDelete"\nRESUME_SCHEDULE="on"\nRESUME_SCHEDULE_CREATE="TheScheduleCreate"\nRESUME_SCHEDULE_DELETE="TheScheduleDelete"\nRESUME_SCHEDULE_DELAY="1800"\nRESUME_SCHEDULE_LIMIT="6"\nPHASES_EXTRA=""\nDOD_EXTRA=""\n' > .unattended.conf
     [ "$1" = - ] || [ "${3:-}" = older ] || printf 'LANDING_NODES="%s"\n' "$1" >> .unattended.conf
     printf -- '---\nslug: tLn\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tLn-1\n---\n\n# tLn\n\n<!-- gen:build-index -->\n**Build status:** CLOSED · 1 unit(s)\n\n<!-- gen:build-units -->\n| Unit | Status | Rev | Last change |\n|---|---|---|---|\n| [ARCH-tLn-1 — the unit](spec/one.md) | CLOSED | rev-1 | 2026-08-01 |\n<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n\n<!-- roster:units -->\n1. ARCH-tLn-1 — the unit\n<!-- /roster:units -->\n' > memory/builds/tLn/README.md
     printf '# ARCH-tLn-1 the unit\n\n**Status:** CLOSED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture\n' > memory/builds/tLn/spec/one.md
@@ -19844,7 +19866,12 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ran, and their RED-first observation is the close's.
 # MERGED at TOOL-aTwinnedPass-13's reconcile of local main at a76c6afe7: the base 3329 at aebbb4a72, plus main's 6
 # (TOOL-aLightenedLoop-3's 5 and -8's 1), plus this branch's 13 (TOOL-aTwinnedPass-3's 10 and -5's 3) = 3348.
-FLOOR_ASSERTIONS=3348
+# RAISED 3348 -> 3350 by TOOL-dDeclaredLoop-21 on 2026-11-16, the net of three regions: region one +1, the
+# kit defaults' parity `same` (counted in its skip branch too); region four +5, AC4's two `same`s and the
+# relay arm's two `hit`s and one `same`, the ceiling read's counted check traded for AC4's grep `same`;
+# region five -4, the load-time refusal arms' three `hit`s and one `same`, the default read's two traded
+# one for one. COUNTED off the diff by region; no suite ran, and the RED-first observation is the close's.
+FLOOR_ASSERTIONS=3350
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -19990,7 +20017,8 @@ PROLOGUE_ARMS=20
 # RAISED 524 -> 565 by TOOL-dFoldedAudit-11: the same 41 region-one fold join assertions, see FLOOR_ASSERTIONS.
 # RAISED 565 -> 676 by TOOL-dFoldedAudit-9: the same 111 region-one chain gate assertions, see FLOOR_ASSERTIONS.
 # RAISED 676 -> 734 by TOOL-dFoldedAudit-15: the same 58 region-one batch assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_1=734
+# RAISED 734 -> 735 by TOOL-dDeclaredLoop-21: the same 1 region-one parity assertion, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_1=735
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
@@ -20068,8 +20096,10 @@ FLOOR_SHARD_3=451
 # MERGED at TOOL-aSmoothedDispatch-21's reconcile: the base 383, plus 7, plus 20 = 410.
 # RAISED 410 -> 420 by TOOL-aTwinnedPass-3 on 2026-11-15: the same 10 region-four generated-output assertions, see FLOOR_ASSERTIONS.
 # RAISED 420 -> 423 by TOOL-aTwinnedPass-5 on 2026-11-15: the same 3 region-four assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_4=423
-FLOOR_SHARD_5=297
+# RAISED 423 -> 428 by TOOL-dDeclaredLoop-21: the same net 5 region-four review-bound assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_4=428
+# LOWERED 297 -> 293 by TOOL-dDeclaredLoop-21: the 4 region-five load-time refusal assertions that went, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_5=293
 FLOOR_SHARD_6=127
 FLOOR_SHARD_7=311
 FLOOR_SHARD_8=646

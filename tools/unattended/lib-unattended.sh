@@ -220,7 +220,7 @@ derive_index_repair() {
 # library from an unsourced shell refuses on its first run instead of taking the defaults silently.
 # A BOUND KEY: DEFAULTED, VALIDATED, AND ANNOUNCED. TOOL-aBoundedCeiling-6, hoisted at its second
 # instance by TOOL-aProbedUnit-3 — the charter's section 12 extracts the shared contract when the
-# second caller arrives, and the third (`REVIEW_ROUNDS`) is a call, never a third `case`.
+# second caller arrives, and a later one is a call, never a third `case`.
 #
 # A conf that declares nothing still gets a bound, because the population that produced the observed
 # 3h19m hang is exactly the one that never edits this key. What it does NOT get is silence: the line

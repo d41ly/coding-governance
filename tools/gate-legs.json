@@ -2241,6 +2241,19 @@
     "stage": ["step.test"]
   },
   {
+    "name": "loop review bounds fixtures",
+    "argv": [
+      "python",
+      "{prefix}/loop/review_bounds.py",
+      "--fixture"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 120,
+    "enforces": ["principle.p38"],
+    "stage": ["step.test"]
+  },
+  {
     "name": "loop composition fixtures",
     "argv": [
       "python",

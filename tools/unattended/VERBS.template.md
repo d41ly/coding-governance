@@ -285,9 +285,12 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `review` line in the parked region, a `history` kind, so it never inflates the count of decisions
   the owner must be shown. A round re-arms the loop only if its confirmed-blocker count is STRICTLY
   smaller than the round before — and a subject that is NOT the build slug, a spec audit, takes at
-  most the declared `REVIEW_ROUNDS` rounds (kit default 1) before it exits `BOUNDED`; the build slug
-  is the closing diff review and its bound is the runaway ceiling, so it converges or backstops as it
-  always did. At a TERMINAL exit — `CONVERGED`, `NON-CONVERGENT`, `CEILING` or `BOUNDED` — on EVERY
+  most its spec bound before it exits `BOUNDED`, and the build slug, the closing diff review, its
+  closing bound: both are policy keys, read by the loop kit's `review_bounds.py show` (one round under
+  the default `review.design.rounds`, `review.max-rounds` under the default `review.follow-up`), and a
+  round one past `review.max-rounds`, default 3, reads `CEILING`. Where that module or the policy kit
+  does not resolve, the driver takes its four `REVIEW_*_DEFAULT` constants and says so on stderr; a
+  bound the module refuses refuses the round, writing nothing. At a TERMINAL exit — `CONVERGED`, `NON-CONVERGENT`, `CEILING` or `BOUNDED` — on EVERY
   subject, spec subjects included, the round REQUIRES `--highs <n>` and `--minors <n>`, the confirmed
   HIGH and MEDIUM-plus-LOW findings standing at the exit, and writes them before the disposition.
   The build slug, and a spec subject before `SPEC_FOLD_CUTOFF` or under a blank one, write
@@ -930,7 +933,7 @@ state it answers (the rule is M4 and M8; the verb entry above states the recordi
   run added only from a spec run whose `--rescope --act add` row stands, and the build run after it
   must build it. Record `--highs`, `--minors` and `--disposition promote`; `fold` is refused at this
   exit. A spec subject past `SPEC_FOLD_CUTOFF` takes **BOUNDED**'s disposal instead.
-- **BOUNDED** — `REVIEW_ROUNDS` (kit default 1) reached on a subject that is not the build slug.
+- **BOUNDED** — the subject's bound reached: the spec bound on a spec subject, the closing bound on the build slug.
   Before `SPEC_FOLD_CUTOFF`, disposed exactly as `NON-CONVERGENT`, recorded with both counts and
   `promote`. Past it the build harness's DISPOSAL stage disposes by nature: a LOCAL finding, a BLOCKER
   too, folds into each spec it touches, a NEW MECHANISM finding is PROMOTED, and a repair's sibling
@@ -941,7 +944,7 @@ state it answers (the rule is M4 and M8; the verb entry above states the recordi
   declared `disposal` the ids `--chain-verdict` names, and no `subjectRound`, a fold re-invoke copies
   the `subjectRound` the CONVERGING return handed back, and `auditIds` and `subjects` are never
   passed together. Skip it and `specs-audited` refuses at `--close` where an audit is declared.
-- **CEILING** — the runaway backstop fired: a defect in the predicate. Promote, land anyway, and
+- **CEILING** — a round one past `review.max-rounds`: a defect in the predicate. Promote, land anyway, and
   record it in the build README. A chain's `review.spec-audit.chain-ceiling` is another bound, which
   HOLDs a chain of subjects for the owner and is a `--chain-verdict` word, never this state.
 

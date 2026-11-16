@@ -2518,7 +2518,7 @@ def run_guard_case(name):
 
 # ---- the legacy policy homes (TOOL-dGroundRules-7) ----------------------------------------------
 
-LEGACY_CONF = 'REVIEW_ROUNDS="3"\nKEPT_KEY="1"\n'
+LEGACY_CONF = 'GATE_BOUND="3"\nKEPT_KEY="1"\n'
 LEGACY_GATE = "#!/usr/bin/env sh\n# The fixture's gate file.\n#   GOV_PYTHON=<launcher>  a documented key\nINHERITED_RED=land\n"
 LEGACY_HOUSE = '[effort]\ndefault = "medium"\n\n[gates]\n'
 LEGACY_REPORT = "  legacy homes: "

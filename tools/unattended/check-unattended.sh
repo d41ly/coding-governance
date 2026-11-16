@@ -760,9 +760,51 @@ core_of PARK_KINDS_OWED >/dev/null; PARK_KINDS_OWED=$_core_of
 core_of PARK_ACTS_OWED >/dev/null; PARK_ACTS_OWED=$_core_of
 # The non-overridable Definition-of-Done set, read for arm 16d below.
 core_of DOD_NO_OVERRIDE >/dev/null; DOD_NO_OVERRIDE=$_core_of
-# The review loop's runaway backstop, read the same way. The leg holds NO copy of the number: a
-# second spelling of a bound is a bound that goes wrong silently when one copy moves.
-core_of RUNAWAY_CEILING >/dev/null; RUNAWAY_CEILING=$_core_of
+# THE REVIEW BOUNDS (TOOL-dDeclaredLoop-21 S6), which check 2 grades each subject's rounds against and
+# check 19 reads at each commit. The leg holds NO copy of a bound: it runs the loop kit's
+# review_bounds.py, found as check 53 finds loop_lib.py, with the policy kit it reads found the same way,
+# never by a typed kit path. Where python, the module or the policy kit does not resolve, the driver's
+# four REVIEW_*_DEFAULT constants answer, read by `core_of`, the bounds that driver itself then runs
+# under; check 2 announces which source it read. RB_PY empty is that fallback.
+RB_PY=$(resolve_python 2>/dev/null) || RB_PY=""
+RB_MOD=""
+if [ -n "$RB_PY" ] && RB_MOD=$(resolve_kit_dir "$RB_PY" loop review_bounds.py "$HERE" 2>/dev/null) \
+   && resolve_kit_dir "$RB_PY" policy policy.py "$HERE" >/dev/null 2>&1; then
+  RB_MOD="${RB_MOD%$'\r'}/review_bounds.py"
+else
+  RB_PY=""; RB_MOD=""
+fi
+core_of REVIEW_MAX_ROUNDS_DEFAULT >/dev/null; REVIEW_MAX_ROUNDS_DEFAULT=$_core_of
+core_of REVIEW_SPEC_BOUND_DEFAULT >/dev/null; REVIEW_SPEC_BOUND_DEFAULT=$_core_of
+core_of REVIEW_CLOSING_BOUND_DEFAULT >/dev/null; REVIEW_CLOSING_BOUND_DEFAULT=$_core_of
+# The day check 2 began grading a record's round count by its subject's bound, read and named exactly
+# as FOLD_CUTOFF is below, for the same reason.
+core_of ROUND_BOUND_CUTOFF >/dev/null; ROUND_BOUND_CUTOFF=$_core_of
+# Check 2's read of the three bounds into RV_MAX, RV_SPEC and RV_CLOSE, naming its source in RB_SRC: the
+# module's `show` where it resolves, else the driver's kit defaults. 1 with RB_WHY where the module
+# refuses, prints no line of the four fields, or a default constant does not read as a whole number.
+read_review_bounds_line() { # -> RV_MAX RV_SPEC RV_CLOSE RB_SRC; 1 and RB_WHY where they do not read
+  local _rb_out
+  RV_MAX=""; RV_SPEC=""; RV_CLOSE=""; RB_WHY=""
+  if [ -n "$RB_MOD" ]; then
+    RB_SRC="the loop kit's review_bounds.py over the landed policy file"
+    if ! _rb_out=$("$RB_PY" "$RB_MOD" show 2>&1); then
+      RB_WHY=$(printf '%s\n' "$_rb_out" | sed -n 1p); return 1
+    fi
+    _rb_out=${_rb_out//$'\r'/}
+    RV_MAX=$(printf '%s\n' "$_rb_out" | sed -n '1s/^max-rounds=\([0-9][0-9]*\) .*/\1/p')
+    RV_SPEC=$(printf '%s\n' "$_rb_out" | sed -n '1s/.* spec-bound=\([0-9][0-9]*\) .*/\1/p')
+    RV_CLOSE=$(printf '%s\n' "$_rb_out" | sed -n '1s/.* closing-bound=\([0-9][0-9]*\) .*/\1/p')
+  else
+    RB_SRC="the driver's REVIEW_*_DEFAULT kit defaults, because python, the loop kit's review_bounds.py or the policy kit it reads does not resolve beside this kit"
+    RV_MAX=$REVIEW_MAX_ROUNDS_DEFAULT; RV_SPEC=$REVIEW_SPEC_BOUND_DEFAULT; RV_CLOSE=$REVIEW_CLOSING_BOUND_DEFAULT
+    _rb_out="max-rounds=$RV_MAX spec-bound=$RV_SPEC closing-bound=$RV_CLOSE"
+  fi
+  case "$RV_MAX:$RV_SPEC:$RV_CLOSE" in
+    *::*|:*|*:|*[!0-9:]*) RB_WHY="no whole number of rounds reads out of $RB_SRC: $(printf '%s\n' "$_rb_out" | sed -n 1p)"; return 1 ;;
+  esac
+  return 0
+}
 # READ FROM THE DRIVER, never restated — this file's own rule, and fifteen other closed sets
 # already obey it. A restatement drifts silently: widen the driver's set and this leg tells a
 # record it was hand-edited when the driver itself wrote the value.
@@ -829,7 +871,7 @@ PHASES="$PHASES_CORE $PHASES_EXTRA"
 DOD="$DOD_CORE $DOD_EXTRA"
 
 # ---- THE REVIEW LOOP, graded from the parked region. Three clauses, and each exists because the
-# ---- corpus cannot exercise it: no group may exceed the runaway ceiling; no group's blocker counts
+# ---- corpus cannot exercise it: no group may exceed its subject's round bound; no group's blocker counts
 # ---- may fail to shrink without carrying a TERMINAL LINE recording the exit; and a group that DID
 # ---- exit must have been disposed of, observed as a unit row the generated region gained.
 # ----
@@ -839,14 +881,14 @@ DOD="$DOD_CORE $DOD_EXTRA"
 _disp_ok=1
 # ---- THE SET MUST BE READABLE, or the two clauses that compare against it grade every value as
 # ---- illegal or none as illegal, and both look like a working check. Same liveness shape as
-# ---- RUNAWAY_CEILING and AUTH_MODES above.
+# ---- the review bounds and AUTH_MODES.
 if [ -z "$REVIEW_DISPOSITIONS" ]; then
   fail 2 "the driver declares no readable REVIEW_DISPOSITIONS, so the clause that grades a recorded disposition would compare every value against an empty set and report whatever that produces as a verdict"
   _disp_ok=0
 fi
 # ---- DISPOSITION_CUTOFF: malformed is a REFUSAL, never a defaulted value, because a cutoff that
 # ---- quietly defaults grades every record or none and nobody can tell which. Same shape as the
-# ---- RUNAWAY_CEILING refusal below it and as check-pass-order.sh's own cutoff guard.
+# ---- review-bounds refusal below it and as check-pass-order.sh's own cutoff guard.
 if [ -n "$DISPOSITION_CUTOFF" ]; then
   case "$DISPOSITION_CUTOFF" in
     [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
@@ -867,12 +909,15 @@ fi
 if [ "$_disp_ok" != 1 ]; then
   # ---- AND THE LOOP BELOW IS SKIPPED ENTIRELY. An unreadable cutoff means this leg cannot decide
   # ---- WHICH predicate applies, and grading every record on the other one is precisely the silent
-  # ---- choice the refusal above exists to prevent. Same shape as the RUNAWAY_CEILING arm beside it:
+  # ---- choice the refusal above exists to prevent. Same shape as the review-bounds arm beside it:
   # ---- a term that cannot be read says so instead of quietly picking a default.
-  echo "unattended: check 2 graded NO record and skipped ALL THREE of its review-loop clauses — the runaway-ceiling and stalled-loop arms as well as the disposition one. A term this check cannot read leaves it unable to decide which predicate applies, and choosing one silently would be the fault the refusal above names"
-elif [ -z "$RUNAWAY_CEILING" ]; then
-  fail 2 "the driver declares no readable RUNAWAY_CEILING, so the review-loop check below would be skipped entirely and its absence would look exactly like a clean corpus"
+  echo "unattended: check 2 graded NO record and skipped ALL THREE of its review-loop clauses — the round-bound and stalled-loop arms as well as the disposition one. A term this check cannot read leaves it unable to decide which predicate applies, and choosing one silently would be the fault the refusal above names"
+elif ! read_review_bounds_line; then
+  fail 2 "the review bounds do not read, so the review-loop check below would be skipped entirely and its absence would look exactly like a clean corpus: $RB_WHY"
 else
+  # ---- ANNOUNCED UNCONDITIONALLY, as the cutoffs above are: which source the bounds came from, so a
+  # ---- tree grading by the kit defaults never reads like one grading by its policy file.
+  echo "unattended: check 2 grades each subject's review rounds against $RB_SRC: max-rounds=$RV_MAX spec-bound=$RV_SPEC closing-bound=$RV_CLOSE"
   rv_bad=""
   # ---- A CUTOFF NOTHING CAN COMPARE grades every record or none: an empty one sorts before every
   # ---- date and reds the whole grandfathered population, a malformed one sorts after and disarms
@@ -881,6 +926,12 @@ else
     [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
     *) rv_bad="$rv_bad
   (the driver declares no readable ISO-date FOLD_CUTOFF, so the fold-beside-blockers clause cannot tell a record written under the old contract from one graded by the severity rule and would red every record or none: '$FOLD_CUTOFF')" ;;
+  esac
+  rv_roundcut=$ROUND_BOUND_CUTOFF
+  case "$ROUND_BOUND_CUTOFF" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
+    *) rv_roundcut=""; rv_bad="$rv_bad
+  (the driver declares no readable ISO-date ROUND_BOUND_CUTOFF, so the round-bound clause cannot tell a record written under the retired backstop of eight rounds from one graded by its subject's bound, and would red every record or none: '$ROUND_BOUND_CUTOFF')" ;;
   esac
   rv_speccut=$SPEC_COUNTS_CUTOFF
   case "$SPEC_COUNTS_CUTOFF" in
@@ -995,7 +1046,7 @@ else
         rv_foldpast=1
       fi
     fi
-    rv_bad="$rv_bad$(awk -v ceil="$RUNAWAY_CEILING" -v f="$rvf" -v readable="$rv_readable" -v newids="${rv_new:-0}" -v graded="$rv_graded" -v foldgraded="$rv_foldgraded" -v foldpast="$rv_foldpast" -v fc="$rv_fc" -v speccut="$rv_speccut" -v slug="$rv_slug" -v disps="|$REVIEW_DISPOSITIONS|" '
+    rv_bad="$rv_bad$(awk -v maxr="$RV_MAX" -v specb="$RV_SPEC" -v closeb="$RV_CLOSE" -v roundcut="$rv_roundcut" -v f="$rvf" -v readable="$rv_readable" -v newids="${rv_new:-0}" -v graded="$rv_graded" -v foldgraded="$rv_foldgraded" -v foldpast="$rv_foldpast" -v fc="$rv_fc" -v speccut="$rv_speccut" -v slug="$rv_slug" -v disps="|$REVIEW_DISPOSITIONS|" '
       /^[0-9][0-9-]*T[0-9:]*Z review · item / {
         line = $0; sub(/\r$/, "", line)
         i = index(line, " · item "); if (i == 0) next
@@ -1068,8 +1119,13 @@ else
       END {
         nneed = 0; nsubj = 0; nomiss = ""; illegal = ""; foldbad = ""; closefold = ""
         for (it in n) {
-          if (n[it] > ceil)
-            printf "\n  %s (subject %s: %d review rounds against a runaway ceiling of %d, so the loop ran past its own backstop)", f, it, n[it], ceil
+          # THE ROUND BOUND IS PER SUBJECT (TOOL-dDeclaredLoop-21 S6): the closing bound on the build slug,
+          # the spec bound on every other, each at or below review.max-rounds. Graded only in a record
+          # first-committed on or after ROUND_BOUND_CUTOFF, or not yet committed (an empty date); one
+          # before it ran under the retired backstop of eight and its round count is graded by nothing.
+          bnd = (it == slug) ? closeb : specb
+          if ((fc == "" || fc >= roundcut) && n[it] > bnd + 0)
+            printf "\n  %s (subject %s: %d review rounds against its %s bound of %d, read from %s, so the loop ran past its own bound)", f, it, n[it], (it == slug ? "closing" : "spec"), bnd, (it == slug ? "review.follow-up and review.max-rounds" : "review.design.rounds")
           else if (flat[it] >= 1 && !(it in term))
             printf "\n  %s (subject %s: blocker counts did not shrink across consecutive rounds and no round carries an exit token, so the loop is non-convergent and nothing recorded that it stopped)", f, it
           if (it in needs) {
@@ -1600,7 +1656,7 @@ core_of REMOTE_LOWSPEED_BYTES >/dev/null; REMOTE_LOWSPEED_BYTES=$_core_of
 # core_of matches only KEY="value", and every read returned empty. The defaults then restated the
 # driver's numbers from memory, so the single-source comment above described something the code did
 # not do and tuning the driver moved nothing here. An unreadable bound now refuses, the way
-# RUNAWAY_CEILING already does.
+# the review bounds do.
 if [ -z "$REMOTE_BOUND" ] || [ -z "$REMOTE_CONNECT_BOUND" ] || [ -z "$REMOTE_LOWSPEED_BYTES" ]; then
   fail 2 "the driver declares no readable REMOTE_BOUND, REMOTE_CONNECT_BOUND or REMOTE_LOWSPEED_BYTES, so this leg would observe the remote under bounds it invented rather than the ones the driver uses; core_of reads a double-quoted value only, so an unquoted constant reads as absent"
   REMOTE_BOUND=60; REMOTE_CONNECT_BOUND=20; REMOTE_LOWSPEED_BYTES=1000
@@ -2181,50 +2237,40 @@ scan_grant_writes() { # stdin: commit ids -> `<commit> <file> <key>` per commit 
       done
 }
 
-# ---- TOOL-aEvidencedLens-9 S1 - THE ROUND BOUND a `.unattended.conf` blob gives the driver, which
-# ---- SOURCES the conf, so the LAST `REVIEW_ROUNDS=` assignment line wins and an empty or absent one
-# ---- falls to `REVIEW_ROUNDS_DEFAULT`, read from `$DRIVER` because that line is unquoted and
-# ---- `core_of` reads only `KEY="…"`. A comment spelling the key is no assignment. Quotes, a trailing
-# ---- `# comment`, trailing whitespace and a CR are stripped, so `1` and `"1"` are one bound.
-# ---- TOOL-aEvidencedLens-21 S6 (closing review L1): leading zeros of an all-digit value are stripped
-# ---- too, an all-zero value reading `0`, so `01` and `1` are one bound and `00` never reads as
-# ---- absent. MORE THAN ONE assignment line prints `rounds=multi:<v1>,<v2>…`, every value in file
-# ---- order: which one the driver sources is not decidable without running the blob, so the string
-# ---- differs from any single-line parent's and the scan names the commit, fail-closed.
-read_rounds_of() { # conf blob text -> `rounds=<effective bound>`
-  printf '%s\n' "$1" | DRV="${DRIVER:-}" awk '
-    function clean(v) {
-      sub(/\r$/, "", v); sub(/[[:space:]]+#.*$/, "", v); sub(/[[:space:]]+$/, "", v)
-      if (v ~ /^".*"$/ || v ~ /^\047.*\047$/) v = substr(v, 2, length(v) - 2)
-      if (v ~ /^[0-9]+$/) { sub(/^0+/, "", v); if (v == "") v = "0" }
-      return v
-    }
-    /^[[:space:]]*REVIEW_ROUNDS=/ { v = $0; sub(/^[[:space:]]*REVIEW_ROUNDS=/, "", v); r = clean(v); all = all (n++ ? "," : "") r }
-    END {
-      if (n > 1) { print "rounds=multi:" all; exit }
-      if (r == "" && ENVIRON["DRV"] != "")
-        while ((getline l < ENVIRON["DRV"]) > 0)
-          if (l ~ /^REVIEW_ROUNDS_DEFAULT=/) { sub(/^REVIEW_ROUNDS_DEFAULT=/, "", l); r = clean(l); break }
-      print "rounds=" r
-    }'
+# ---- TOOL-aEvidencedLens-9 S1, re-pointed by TOOL-dDeclaredLoop-21 S6 - THE SPEC BOUND a commit gives
+# ---- the driver, which reads it from the policy file through the loop kit's review_bounds.py: `show
+# ---- --rev <commit>` at that commit, printed `rounds=<spec bound>`. Read by the bound the module
+# ---- derives, never the file's bytes, so a respelling or a change to an unrelated key moves nothing.
+# ---- A refusal prints `rounds=unread:<its first line>`, which differs from any readable parent's, so
+# ---- the scan names the commit, fail-closed. Where the module or the policy kit does not resolve, every
+# ---- commit reads the driver's REVIEW_SPEC_BOUND_DEFAULT, so no commit reads as a move: that driver
+# ---- reads no policy file either.
+read_rounds_of() { # commit -> `rounds=<the spec bound at that commit>`
+  local _ro
+  if [ -z "$RB_MOD" ]; then printf 'rounds=%s\n' "$REVIEW_SPEC_BOUND_DEFAULT"; return 0; fi
+  _ro=$("$RB_PY" "$RB_MOD" show --rev "$1" 2>&1); _ro=${_ro//$'\r'/}
+  case "$_ro" in
+    *" spec-bound="[0-9]*) _ro=${_ro#* spec-bound=}; printf 'rounds=%s\n' "${_ro%% *}" ;;
+    *) printf 'rounds=unread:%s\n' "$(printf '%s\n' "$_ro" | sed -n 1p)" ;;
+  esac
 }
 
-# ---- TOOL-aEvidencedLens-9 S2 - given commit ids on stdin, every commit whose EFFECTIVE round bound
+# ---- TOOL-aEvidencedLens-9 S2 - given commit ids on stdin, every commit whose EFFECTIVE spec bound
 # ---- differs from the bound at EVERY one of its parents, printed `<commit> <old> <new>` (old read
 # ---- at the first parent). `scan_grant_writes`' two stages: one `diff-tree --stdin` restricted to
-# ---- the conf names the candidates - `-c` lists a merge only where its blob differs from every
+# ---- the policy file names the candidates - `-c` lists a merge only where its blob differs from every
 # ---- parent's - and each is settled by `read_rounds_of` at the commit and each parent, so a merge
-# ---- taking one side's value wrote nothing. A blob unreadable at a parent reads as the default.
-scan_round_writes() { # stdin: commit ids -> `<commit> <old> <new>` per commit that changes the round bound
+# ---- taking one side's value wrote nothing. A parent with no policy file reads the catalogue's default.
+scan_round_writes() { # stdin: commit ids -> `<commit> <old> <new>` per commit that changes the spec bound
   local _sr_c _sr_new _sr_old _sr_o _sr_par _sr_hit
-  GIT diff-tree --stdin -r -c --name-only --no-renames --format='commit %H' -- .unattended.conf 2>/dev/null \
-    | awk '/^commit [0-9a-f]+/ { c = $2; next } $0 == ".unattended.conf" && c != "" { print c }' | sort -u \
+  GIT diff-tree --stdin -r -c --name-only --no-renames --format='commit %H' -- .governance/policy.toml 2>/dev/null \
+    | awk '/^commit [0-9a-f]+/ { c = $2; next } $0 == ".governance/policy.toml" && c != "" { print c }' | sort -u \
     | while read -r _sr_c; do
         [ -n "$_sr_c" ] || continue
-        _sr_new=$(read_rounds_of "$(GIT show "$_sr_c:.unattended.conf" 2>/dev/null)")
+        _sr_new=$(read_rounds_of "$_sr_c")
         _sr_hit=1; _sr_old=""
         for _sr_par in $(GIT rev-list --parents -n 1 "$_sr_c" 2>/dev/null | cut -d' ' -f2-); do
-          _sr_o=$(read_rounds_of "$(GIT show "$_sr_par:.unattended.conf" 2>/dev/null)")
+          _sr_o=$(read_rounds_of "$_sr_par")
           [ "$_sr_o" = "$_sr_new" ] && _sr_hit=0
           [ -n "$_sr_old" ] || _sr_old=$_sr_o
         done
@@ -2979,7 +3025,7 @@ while IFS= read -r f; do
     # ---- THE WALK'S TRIGGER IS SHARED BY EVERY SCAN THAT SHARES THE WALK (TOOL-aEvidencedLens-14):
     # ---- it fires when the grant scan OR the round scan hits the superset, and both re-scan the one
     # ---- walked list. A scan that grades the superset without the walk reds the default branch's own
-    # ---- commits - an owner's REVIEW_ROUNDS raise merged into the run would red an archived,
+    # ---- commits - an owner's round-bound raise merged into the run would red an archived,
     # ---- append-only record on every later bar. The walk keeps a merge commit itself and drops only
     # ---- its non-run parent's side, so an evil merge raising the bound is still a run write.
     mayend=""; mayex=""; maywhy=""; maywalk=0
@@ -3047,24 +3093,20 @@ while IFS= read -r f; do
       # ---- 2026-10-05 that the spec-audit round bound is the owner's and an agent never decides it
       # ---- (run mandate memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-0-run-mandate.md,
       # ---- decision 4). Same own-commit list as the grant arm above, same walk, no second definition.
-      # ---- EFFECTIVE, NOT RAW: a commit counts only where the bound the driver would apply moved, so
-      # ---- `c117d0007` (TOOL-aProbedUnit-6), which ADDED `REVIEW_ROUNDS="1"` inside aProbedUnit's
-      # ---- landed range when the default was already 1, changed nothing and needs no cutoff; a
-      # ---- respelling such as `1` to `"1"` changes nothing; a run commit setting the default's value
+      # ---- Since TOOL-dDeclaredLoop-21 the bound is the spec bound the policy file .governance/policy.toml
+      # ---- sets, read through the loop kit's review_bounds.py at each commit and each parent.
+      # ---- EFFECTIVE, NOT RAW: a commit counts only where the bound the driver would apply moved, so a
+      # ---- respelling, a key the spec bound does not read, or a run commit setting the default's value
       # ---- passes by design.
-      # ---- This clause does NOT check: an edit committed outside any run, a preflight `--waive`,
-      # ---- a value set by a shell construct other than a
-      # ---- `REVIEW_ROUNDS=` assignment line, a second file the conf sources, a change in the driver's
-      # ---- own REVIEW_ROUNDS_DEFAULT, or an uncommitted working-copy edit the driver sources for the
-      # ---- current run, which raises that run's bound and leaves no commit to read. An assignment
-      # ---- masked by a later one inside a dead block, a function body or a heredoc is not resolved:
-      # ---- a blob with more than one assignment line reads FAIL-CLOSED as `multi:` (TOOL-aEvidencedLens-21
-      # ---- S6), so the commit writing it is named even where the bound the driver sources held. The terminal walk
+      # ---- This clause does NOT check: an edit committed outside any run, a preflight `--waive`, a
+      # ---- move of `review.max-rounds` or `review.follow-up` that leaves the spec bound where it was, a
+      # ---- change in the driver's own REVIEW_SPEC_BOUND_DEFAULT, or a tree where the module or the policy
+      # ---- kit does not resolve, where both sides read that default. The terminal walk
       # ---- fires on a hit by EITHER scan (TOOL-aEvidencedLens-14), so a round write is graded over
       # ---- the walked list, never the unwalked superset.
       while read -r maysha mayold maynew; do
         [ -n "$maysha" ] || continue
-        fail 19 "a commit among a run's own commits changes the effective REVIEW_ROUNDS bound in .unattended.conf, and the round bound is the owner's, set by an owner commit outside any run (run mandate memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-0-run-mandate.md, decision 4) - commit and bound follow: $maysha $mayold -> $maynew, run $f"
+        fail 19 "a commit among a run's own commits changes the effective spec bound the policy file .governance/policy.toml sets, and the round bound is the owner's, set by an owner commit outside any run (run mandate memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-0-run-mandate.md, decision 4) - commit and bound follow: $maysha $mayold -> $maynew, run $f"
       done < <(printf '%s\n' "$mayrw")
     fi
   fi

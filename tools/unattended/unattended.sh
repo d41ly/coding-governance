@@ -582,10 +582,6 @@ UNIT_STALL_BOUND_DEFAULT=1800
 # 5400s: three of the thirty-minute beats the build briefs ask for, on the three-cadence rule the line
 # above records for its own figure, so one late beat never reads STALLED. TOOL-aRepatriatedFork-53.
 TASK_STALL_BOUND_DEFAULT=5400
-# 1 round: a spec-audit subject exits BOUNDED after its first blocked round (owner ruling
-# 2026-09-14, TOOL-aProbedUnit-6). ONE constant, interpolated into the NOTE the reader prints, so the
-# argument and the sentence cannot say two numbers — the closing review found them typed twice.
-REVIEW_ROUNDS_DEFAULT=1
 # 1800s: a `probe` hold is a stop whose own release is a probe, and half an hour is the shortest
 # gap at which a restarted session is not simply re-asking the question the hold just answered.
 # 6 holds: the no-progress ceiling. A run that has held six times with nothing changed but its own
@@ -645,8 +641,8 @@ observe_remote() { # <outfile> · <git args…> -> rc (124 = the bound fired)
 # ------------------------------------------------------------------------------ THE CONF PREAMBLE
 # load_driver_conf - every top-level step that depends on the conf, the cwd or a per-call seam, in
 # the order it always ran: the backstop seam, the two NOTEs, the repo root and the `cd`, the conf
-# and its refusals, the closed sets and the bound reads, REVIEW_ROUNDS and its runaway check, and
-# the procfs seam. ONE FUNCTION so a SOURCED driver runs it once per call, in the subshell its caller
+# and its refusals, the closed sets and the bound reads, and the procfs seam. The review bounds are
+# not read here: `load_review_bounds` reads them for `verb_review` alone (TOOL-dDeclaredLoop-21). ONE FUNCTION so a SOURCED driver runs it once per call, in the subshell its caller
 # opens: `( load_driver_conf && main "$@" )`. It EXITS on a refusal, as it always did, which is why
 # that subshell belongs to every call. An EXECUTED driver calls it right below its definition, so
 # every top-level line after it still runs AFTER the conf, and a conf still cannot pre-set the state
@@ -703,7 +699,7 @@ KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTI
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
 ASKS_CMD=""; HELD_CI_WORKFLOW=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""; HANDOFF_CUTOFF=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""; RUN_CLAIMS=""
-GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; TASK_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
+GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; TASK_STALL_BOUND=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
 DISPOSITION_CUTOFF=""; SPEC_FOLD_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; PROMPT_BRIEF_CUTOFF=""; PROMPT_BRIEF_SKELETON_CUTOFF=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
 # TOOL-dLoggedFlight-2 - the run log's two inputs, on the init block's LAST line so the suite's
 # contiguous-block read still covers them (a comment inside the block ends it). RUNLOG_SESSION_VARS
@@ -920,24 +916,6 @@ if [ -n "$_two_key" ]; then
   RUNLOG_CLEAN=1; exit 2
 fi
 
-# THE RUNAWAY CEILING, and it is a BACKSTOP rather than the mechanism. A SPEC subject is bounded by
-# `REVIEW_ROUNDS` and exits in a disposition; the DIFF review is bounded by the convergence predicate;
-# this ceiling backstops both, so a defect in the predicate cannot produce an unbounded loop. It is
-# set well above any observed converging sequence, so REACHING it is itself a defect worth reporting
-# rather than a routine outcome — and under the owner resolution the run promotes and lands anyway
-# rather than halting, which is why it must be loud in two carriers.
-# A file constant, not a conf key and not an environment variable, on the argument this repo already
-# recorded for its agent fan-out bound: a ceiling raisable from the environment leaves no diff behind.
-RUNAWAY_CEILING="8"
-# THE ROUND BOUND FOR A SPEC SUBJECT, TOOL-aProbedUnit-6. The third caller of `read_bound_key`, placed
-# here and not beside the other two because the one arm those keys lack — the upper bound — IS the
-# constant above, and a comparison written above its definition reads an empty string. A tracked conf
-# key rather than a constant because a conf leaves a diff behind, the property the header above wants.
-read_bound_key REVIEW_ROUNDS "$REVIEW_ROUNDS_DEFAULT" rounds "a spec-audit subject exits BOUNDED after the kit default of ${REVIEW_ROUNDS_DEFAULT} round(s)"
-# STRICTLY BELOW. `review_state` tests the ceiling BEFORE the bound, so a bound EQUAL to the ceiling
-# is the one value the sentence below refuses and `-le` accepted: at that value the loud CEILING
-# exit fires and the declared bound is never reached, exactly as the sentence says.
-[ "$REVIEW_ROUNDS" -lt "$RUNAWAY_CEILING" ] || { echo "unattended: REFUSING - REVIEW_ROUNDS is $REVIEW_ROUNDS, at or above the runaway ceiling of $RUNAWAY_CEILING, so the ceiling would fire first and the declared bound could never be reached." >&2; exit 2; }
 # `UNATTENDED_PROCFS` is read per call, for the reason the process-ledger block below gives it.
 PROCFS_ROOT=${UNATTENDED_PROCFS:-/proc}
 }
@@ -1183,6 +1161,15 @@ FOLD_CUTOFF="2026-09-15"
 # reading). Dated by FOLD_CUTOFF's idiom, strictly past the newest record any branch could still
 # write under the old contract: the newest spec-subject `review` row on any ref was 2026-10-05.
 SPEC_COUNTS_CUTOFF="2026-10-06"
+# THE DAY A SUBJECT'S ROUND COUNT BEGAN TO BE GRADED BY ITS OWN BOUND (TOOL-dDeclaredLoop-21 S6). Before
+# it every subject ran under the retired runaway backstop of eight rounds, so a record first-committed
+# earlier may hold more rounds than today's bounds admit, written under the contract then in force; check
+# 2 grades the round count of a record first-committed on or after it, or not yet committed, against its
+# subject's bound, and of no record before it. No driver line reads it, as none reads FOLD_CUTOFF: check
+# 2 reads it by `core_of`. Dated by FOLD_CUTOFF's idiom, strictly past the newest record any branch could
+# still write under the old contract: `git log --all --diff-filter=A --format=%cs --
+# ":(glob)memory/builds/*/RUN*.md"` printed 2026-11-15 as its newest date at the pass.
+ROUND_BOUND_CUTOFF="2026-11-16"
 # THE THREE SPEC-AUDIT SWITCHES' KIT DEFAULTS (TOOL-dFoldedAudit-7 S3), which `read_spec_audit_switch`
 # answers when no policy kit resolves. They repeat the catalogue's defaults because a copy-installed
 # kit cannot read a kit that is not there, and the suite's AC5 arm compares the two. File constants
@@ -1190,6 +1177,15 @@ SPEC_COUNTS_CUTOFF="2026-10-06"
 SPEC_AUDIT_DISPOSAL_DEFAULT="by-nature"
 SPEC_AUDIT_CHAIN_STOP_DEFAULT="own-work"
 SPEC_AUDIT_CHAIN_CEILING_DEFAULT="4"
+# THE REVIEW BOUNDS' KIT DEFAULTS (TOOL-dDeclaredLoop-21 §8 F9), which `load_review_bounds` takes where the
+# loop kit's review_bounds.py or the policy kit it reads does not resolve. They are the line `show`
+# prints under the catalogue's defaults, the DERIVED bounds and not the four keys' defaults, so the
+# derivation stays the module's alone; the suite's parity arm holds them to `show`. Double-quoted, so
+# check 2 of the leg reads them by `core_of` where it cannot run the module either.
+REVIEW_MAX_ROUNDS_DEFAULT="3"
+REVIEW_SPEC_BOUND_DEFAULT="1"
+REVIEW_CLOSING_BOUND_DEFAULT="3"
+REVIEW_FOLLOW_UP_DEFAULT="after-high"
 # THE CHAIN RECORD'S GRAMMAR, ONE SPELLING EACH (TOOL-dFoldedAudit-15 S22): `_ids_of`, `write_chain_round`
 # and `derive_chain_verdict` read these, the awk through `-v` and dynamic regexes. Which two severities
 # are major stays in that awk, because it asks a different question from which four exist.
@@ -1504,6 +1500,37 @@ read_spec_audit_switch() { # disposal|chain-stop|chain-ceiling -> the value on s
       return 1 ;;
   esac
   printf '%s\n' "$out"
+}
+# THE REVIEW BOUNDS (TOOL-dDeclaredLoop-21 S3). The loop kit's review_bounds.py derives them from the four
+# policy keys and refuses a bound no loop could hold; this runs its `show` and splits the one line, so no
+# shell copy of the policy parse or of the derivation exists here. The module is found as `--rescope
+# --flow` finds adapt.py, the policy kit by the probe `read_spec_audit_switch` makes. Where python, the
+# module or the policy kit does not resolve, an install the kits' descriptors admit, the four kit defaults
+# above answer and a NOTE says so: an `echo` and a `return 0`, never a refusal. A refusal, or a line that
+# is not the four fields, returns 1 with the module's first line in `_rb_why`, which `verb_review` relays.
+# Called by `verb_review` alone, so a verb that reads no review bound starts no python (§8 F10).
+load_review_bounds() { # -> sets MAX_ROUNDS SPEC_BOUND CLOSING_BOUND FOLLOW_UP; 1 and the module's first line in _rb_why
+  local _rb_out _rb_d _rb_m _rb_s _rb_c _rb_f _rb_x
+  _rb_why=""
+  if ! resolve_position_engine review_bounds.py \
+     || ! _rb_d=$(resolve_kit_dir "$PE_PY" policy policy.py "$KIT_DIR" 2>/dev/null) || [ -z "$_rb_d" ]; then
+    MAX_ROUNDS=$REVIEW_MAX_ROUNDS_DEFAULT; SPEC_BOUND=$REVIEW_SPEC_BOUND_DEFAULT
+    CLOSING_BOUND=$REVIEW_CLOSING_BOUND_DEFAULT; FOLLOW_UP=$REVIEW_FOLLOW_UP_DEFAULT
+    echo "unattended: NOTE - the loop kit's review_bounds.py or the policy kit it reads does not resolve beside this kit, so the review bounds take the kit defaults: max-rounds=$MAX_ROUNDS spec-bound=$SPEC_BOUND closing-bound=$CLOSING_BOUND follow-up=$FOLLOW_UP" >&2
+    return 0
+  fi
+  _rb_out=$("$PE_PY" "$PE_PATH" show 2>&1) || { _rb_why=$(printf '%s\n' "$_rb_out" | sed -n 1p); return 1; }
+  _rb_out=${_rb_out//$'\r'/}
+  read -r _rb_m _rb_s _rb_c _rb_f _rb_x <<<"$_rb_out"
+  MAX_ROUNDS=${_rb_m#max-rounds=}; SPEC_BOUND=${_rb_s#spec-bound=}
+  CLOSING_BOUND=${_rb_c#closing-bound=}; FOLLOW_UP=${_rb_f#follow-up=}
+  case "$MAX_ROUNDS $SPEC_BOUND $CLOSING_BOUND" in *[!0-9\ ]*|' '*|*'  '*|*' ') _rb_x=bad ;; esac
+  if [ -n "$_rb_x" ] || [ "$_rb_out" != "${_rb_out%%$'\n'*}" ] || [ "$_rb_m" = "$MAX_ROUNDS" ] \
+     || [ "$_rb_s" = "$SPEC_BOUND" ] || [ "$_rb_c" = "$CLOSING_BOUND" ] || [ "$_rb_f" = "$FOLLOW_UP" ] || [ -z "$FOLLOW_UP" ]; then
+    _rb_why="review_bounds.py show printed no line of the four fields: $(printf '%s\n' "$_rb_out" | sed -n 1p)"
+    return 1
+  fi
+  return 0
 }
 # NO SILENT DEFAULT (TOOL-dDeclaredLoop-5 S5): an entry that declares no `:<class>` has no checker, so
 # this returns 1 and prints nothing, and check 53 of the leg refuses that entry before a run reads it.
@@ -12190,9 +12217,9 @@ $_bcopen"
       # whether the blockers were real. It reads that a loop for this build ran and reached one of
       # its declared exits. `NON-CONVERGENT` and `CEILING` are legitimate exits whose own
       # obligations the leg's promotion clause grades; this term only refuses the absence of any exit.
-      # `BOUNDED` is listed for VOCABULARY PARITY and is UNREACHABLE here: this subject is the build
-      # slug, whose bound is the runaway ceiling, and `CEILING` fires at equality before `BOUNDED`
-      # can, so no round on this subject can ever carry the token (TOOL-aProbedUnit-6).
+      # `BOUNDED` is a legitimate exit here too since TOOL-dDeclaredLoop-21: this subject is the build
+      # slug, whose closing bound `review.follow-up` sets, one round under `never` and `review.max-rounds`
+      # otherwise, and a bound equal to the ceiling is reached as `BOUNDED` before `CEILING` can fire.
       #
       # THE SUBJECT IS THE BUILD SLUG, exactly, because `review_last_reason` compares the item with
       # `!=` as its sibling does. A spec-audit round keyed `<slug>-specs` is a different subject and
@@ -12914,23 +12941,27 @@ verb_attest() { # slug · item · value
 # changed", and deliberately so: an oscillating sequence 2, 1, 2 converges under a changed-test and
 # never terminates, which is the shape this exists to stop.
 #
-# TWO BOUNDS, ONE PREDICATE. A SPEC subject is bounded by `REVIEW_ROUNDS` (owner ruling 2026-09-14,
-# TOOL-aProbedUnit-6: one round by default) and exits BOUNDED in a disposition; the DIFF review — the
-# subject that IS the build slug — is bounded by convergence alone; and the runaway ceiling backstops
-# both. `BOUNDED` is tested AFTER the two facts about THIS round and after the ceiling, so a clean
-# round, a flat round and a ceiling hit each keep their own exit, and the default bound (the ceiling)
-# makes a two-argument call byte-for-byte the pre-bound behaviour.
+# TWO BOUNDS AND A CEILING, ONE PREDICATE (TOOL-dDeclaredLoop-21). A SPEC subject is bounded by its spec
+# bound, `review.design.rounds` (one round by default, the owner ruling of 2026-09-14), and exits
+# BOUNDED in a disposition; the DIFF review — the subject that IS the build slug — by its closing bound,
+# `review.follow-up` (one round under `never`, else `review.max-rounds`); and `review.max-rounds` is the
+# ceiling of both, read as ONE ROUND PAST it, `n + 1 > MAX_ROUNDS`, the harness's `deriveRoundState` order.
+# A bound EQUAL to the ceiling is therefore reached as BOUNDED, the equality the loop kit admits.
+# `BOUNDED` is tested AFTER the two facts about THIS round and after the ceiling, so a clean round, a
+# flat round and a ceiling hit each keep their own exit; a two-argument call takes the ceiling as its
+# bound. `MAX_ROUNDS` is the caller's: `verb_review` sets it through `load_review_bounds`, and an arm
+# that slices this function sets it itself.
 #
 # The verb reports one of five states and refuses none of them at the ceiling: CONVERGED (nothing
 # left), NON-CONVERGENT (stop and dispose), CEILING (the backstop fired, which is a defect in the
 # predicate — reported loudly and survived), BOUNDED (the declared round bound is reached; stop and
 # dispose), CONVERGING (go again).
 review_state() { # prior-counts (space separated) · this count · [bound, default the ceiling] -> the state
-  local prev="" n=0 c bound="${3:-$RUNAWAY_CEILING}"
+  local prev="" n=0 c bound="${3:-$MAX_ROUNDS}"
   for c in $1; do prev=$c; n=$((n+1)); done
   if [ "$2" = 0 ]; then printf 'CONVERGED\n'; return 0; fi
   if [ "$n" -gt 0 ] && [ "$2" -ge "$prev" ]; then printf 'NON-CONVERGENT\n'; return 0; fi
-  if [ "$((n + 1))" -ge "$RUNAWAY_CEILING" ]; then printf 'CEILING\n'; return 0; fi
+  if [ "$((n + 1))" -gt "$MAX_ROUNDS" ]; then printf 'CEILING\n'; return 0; fi
   if [ "$((n + 1))" -ge "$bound" ]; then printf 'BOUNDED\n'; return 0; fi
   printf 'CONVERGING\n'
 }
@@ -13104,7 +13135,7 @@ check_exit_fold() { # state · review kind · disposition -> 1 on a fold the exi
 }
 
 verb_review() { # slug · subject · verdict · blockers · disposition · highs · minors · folded · promoted
-  local slug="$1" subj="$2" verdict="$3" blockers="$4" disposition="${5:-}" highs="${6:-}" minors="${7:-}" folded="${8:-}" promoted="${9:-}" rel prior state note disp bound counts owe exitnote rkind rround rexit route dby dword
+  local slug="$1" subj="$2" verdict="$3" blockers="$4" disposition="${5:-}" highs="${6:-}" minors="${7:-}" folded="${8:-}" promoted="${9:-}" rel prior state note disp bound bkey counts owe exitnote rkind rround rexit route dby dword
   check_slug "$slug" || return 1
   runmd_of "$slug" >/dev/null; rel=$_runmd
   check_run_state "$rel" "run to record a review round against" || return 1
@@ -13209,10 +13240,19 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
     fail 37 "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now $route: $subj"
     return 1
   fi
-  # THE BOUND IS THE SUBJECT'S. The closing diff review's subject IS the build slug and keeps the
-  # ceiling, so it converges or backstops exactly as before; every other subject is a spec audit and
-  # takes the declared REVIEW_ROUNDS. The same equality `review_last_reason` and the --close term make.
-  bound=$RUNAWAY_CEILING; [ "$subj" = "$slug" ] || bound=$REVIEW_ROUNDS
+  # THE BOUND IS THE SUBJECT'S (TOOL-dDeclaredLoop-21). The closing diff review's subject IS the build
+  # slug and takes the closing bound; every other subject is a spec audit and takes the spec bound; both,
+  # and the ceiling past which a round reads CEILING, are the policy keys `load_review_bounds` reads. The
+  # same equality `review_last_reason` and the --close term make. A bound that does not read records nothing.
+  if ! load_review_bounds; then
+    fail 37 "the review bounds do not read, so this round cannot be bounded and nothing is recorded: $_rb_why"
+    return 1
+  fi
+  if [ "$subj" = "$slug" ]; then
+    bound=$CLOSING_BOUND; bkey=review.max-rounds; [ "$FOLLOW_UP" != never ] || bkey="review.follow-up never"
+  else
+    bound=$SPEC_BOUND; bkey=review.design.rounds
+  fi
   state=$(review_state "$prior" "$blockers" "$bound")
   check_spec_exit "$rel" "$slug" "$subj" "$state" "$blockers" "$disposition" "$highs" "$minors" "$folded" "$promoted" || return 1
   # THE STATE GATE. Keyed on the COMPUTED state and never on --verdict, whose closed set holds none
@@ -13256,8 +13296,8 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   # promoted minors one. A fold spent on a major lowers the first term and cannot also leave no minor, so
   # past the folds' reach the minors still owe their one, and inside it one unit stands for all
   # (TOOL-dFoldedAudit-15 S2). Under `counted` `folded` is 0, so this is the severity rule's own count.
-  # BOUNDED is reachable on a spec subject only: the slug's bound is the ceiling, which `review_state`
-  # tests first.
+  # BOUNDED is reachable on either subject: each takes its own bound, the ceiling one round past it
+  # (TOOL-dDeclaredLoop-21).
   counts=""; owe=0
   # THE WORD NAMES THE RULE THAT APPLIED (TOOL-dFoldedAudit-15 S3): under `folds` a finding may fold, so
   # `promoted` would be false. The `exits <state>` clause never moves, because a harness's bare first
@@ -13321,8 +13361,8 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
                       echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers 0 · CONVERGED$counts — the loop is done for this subject"
                     fi ;;
     NON-CONVERGENT) echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · NON-CONVERGENT$counts · disposition $disposition — the count did not shrink, so the loop STOPS here and $exitnote" ;;
-    CEILING)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · CEILING$counts · disposition $disposition — the runaway backstop fired at $RUNAWAY_CEILING rounds and THE CONVERGENCE PREDICATE DID NOT TERMINATE, which is a defect in the predicate rather than a routine outcome. The run lands anyway and $exitnote; record this in the build README, because a fact that lives only in a transcript is a fact nobody reads" ;;
-    BOUNDED)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · BOUNDED$counts · disposition $disposition — the declared round bound of $REVIEW_ROUNDS is reached, so the loop STOPS here and every CONFIRMED finding is DISPOSED BY $dby: $exitnote" ;;
+    CEILING)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · CEILING$counts · disposition $disposition — the backstop review.max-rounds of $MAX_ROUNDS round(s) was passed and THE CONVERGENCE PREDICATE DID NOT TERMINATE, which is a defect in the predicate rather than a routine outcome. The run lands anyway and $exitnote; record this in the build README, because a fact that lives only in a transcript is a fact nobody reads" ;;
+    BOUNDED)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · BOUNDED$counts · disposition $disposition — the declared round bound of $bound is reached (the key $bkey), so the loop STOPS here and every CONFIRMED finding is DISPOSED BY $dby: $exitnote" ;;
     *)              if [ -z "${prior//[[:space:]]/}" ]; then
                       echo "unattended: review $subj · round 1 · $verdict · blockers $blockers · CONVERGING — the first round for a subject has no predecessor to shrink against, so the loop arms"
                     else
@@ -13796,7 +13836,7 @@ verb_record_piece() { # slug · piece · leg · verdict
 }
 # TOOL-dFoldedAudit-5 - THE SPEC-AUDIT CHAIN'S RECORD AND ITS VERDICT. Each promotion is a fresh review
 # subject, so no `--review` row can say a chain is done: a row names no spec, an attended run writes
-# none, and `REVIEW_ROUNDS` bounds one subject and no chain of them. `--record-round` appends what a
+# none, and a round bound bounds one subject and no chain of them. `--record-round` appends what a
 # round audited and how it disposed to one tracked file under the build's `build/` folder, and
 # `--chain-verdict` derives CONTINUE, STOP or HOLD from that file and the roster alone. BOTH ANSWER WITH
 # NO RUN-STATE FILE, so an attended run takes the same route, and the verdict lives here and nowhere
@@ -13868,7 +13908,7 @@ check_chain_fold() { # unit · the row's rev, with `load_spec_facts` already rea
   return 1
 }
 # THE ROUND IS THE RECORD'S OWN ORDINAL, the last round plus one and never the harness's `round`: under
-# `REVIEW_ROUNDS` above 1 one generation spends several invocation rounds, which would burn the ceiling
+# a spec bound above 1 one generation spends several invocation rounds, which would burn the ceiling
 # faster than generations pass. `--subject` is the generation key, which is what refuses a replay.
 #
 # EVERY REFUSAL RUNS BEFORE ANY BYTE IS WRITTEN. These tokens reach a tracked record the verdict parses,

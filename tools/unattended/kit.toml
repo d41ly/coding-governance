@@ -182,7 +182,7 @@ file = ".unattended.conf"
 owner = "unattended"
 required_keys_gate = ["LANDER", "BYPASS_BAN", "GATE_CMD", "WIRING_CHECK", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "CORE_FLOOR", "DIRECTIVES_FLOOR"]
 required_keys_render = ["LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL"]
-optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI", "MAP_CLI", "SPEC_TOKENS_CLI", "UNIT_STALL_BOUND", "TASK_STALL_BOUND", "REVIEW_ROUNDS", "RESUME_SCHEDULE", "RESUME_SCHEDULE_DELAY", "RESUME_SCHEDULE_LIMIT", "RESUME_STALE_BOUND", "STOP_GUARD_BLOCKS", "RESUME_ATTEMPTS", "RESUME_TURNS", "HELD_CI_WORKFLOW"]
+optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI", "MAP_CLI", "SPEC_TOKENS_CLI", "UNIT_STALL_BOUND", "TASK_STALL_BOUND", "RESUME_SCHEDULE", "RESUME_SCHEDULE_DELAY", "RESUME_SCHEDULE_LIMIT", "RESUME_STALE_BOUND", "STOP_GUARD_BLOCKS", "RESUME_ATTEMPTS", "RESUME_TURNS", "HELD_CI_WORKFLOW"]
 # REQUIRED UNLESS `RESUME_SCHEDULE="off"`, so neither list above can hold them: govkit reads the
 # two required lists against the target conf (DEPL-aHalvedInstall-1), and a condition is the
 # `keepalive-tool-names` hole's to grade. Listed here so check 7 still knows them as keys.
@@ -441,3 +441,17 @@ stage = "start"
 role = "main"
 command = "/unattended <slug>"
 when = "a build is requested: it runs unattended by default, its committed README at BASE being the mandate"
+
+# TOOL-dDeclaredLoop-21 S7: `.unattended.conf`'s spec-audit round bound moves into the policy keys
+# `review.design.rounds` and `review.design.round-count`, with `review.max-rounds` raised to it above
+# the catalogue's 3, so a spec audit's bound reads the same on either side; a bound of 1 is the default
+# and writes no key. The program is gov's, run by its own argv until the walk lands;
+# `<prefix>/govkit/upgrade_steps.py list` prints the order. Once landed this row is frozen: a correction
+# is a new step, a retirement a `[[retired]]` row in the registry.
+[[upgrade]]
+id = "unattended/review-rounds-to-policy"
+up = ["python", "{gov}/govkit/steps/review_rounds.py", "up", "{target}"]
+down = ["python", "{gov}/govkit/steps/review_rounds.py", "down", "{target}"]
+witness = ["python", "{gov}/govkit/steps/review_rounds.py", "witness", "{target}"]
+surfaces = ["conf-key:.unattended.conf#REVIEW_ROUNDS"]
+needs-target = false

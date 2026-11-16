@@ -104,8 +104,10 @@ line per item in file order, each field's source or `pending` or `unarmed`, and 
 read · <p> pending · <u> unarmed`. It then prints the witness classes, one line per witness alias and per witness, one
 line per list row with its build and the list's base line, the base or `no comparison` and why, the
 builds line, the folder or `foreign` and why, one `loop: computed-witness <name> · serves <tag> · class
-<class> · writer <writer> · armed by <build>` line per computed witness, and each refusal of the items,
-the list and the computed witnesses as `loop: refused · ...`, exit 1. `--fixture --plant <case>` reads the shipped
+<class> · writer <writer> · armed by <build>` line per computed witness, then `review_bounds.py`'s
+`check_review_bounds` over the policy file at HEAD as `loop: review bounds · <bounds>`, or `loop: review
+bounds unarmed · <why>` where the policy kit does not resolve (TOOL-dDeclaredLoop-21), and each refusal of
+the items, the list, the computed witnesses and the review bounds as `loop: refused · ...`, exit 1. `--fixture --plant <case>` reads the shipped
 definition and list with the named break made in memory, never on disk, the list's base being the
 shipped list as read, and exits 1 on the refusal the break must draw, 0 if the reader accepted it. The
 plants are `PLANTS`. `--grade-site <site> <entry>...` prints `loop: site <site> · <item> · <word> ·
@@ -1285,6 +1287,18 @@ def main(argv):
     for c in computed:
         print("loop: computed-witness %s · serves %s · class %s · writer %s · armed by %s" % (
             c["name"], c["serves"], c["class"], c["writer"], c["armed-by"]))
+    if not plant:
+        # TOOL-dDeclaredLoop-21 S2: the review bounds of the tree's policy file at HEAD, refused here so the
+        # refusal holds with no unattended kit; an install without the policy kit grades nothing.
+        from review_bounds import check_review_bounds
+        try:
+            bounds, bound_refusals = check_review_bounds(root)
+        except LookupError as e:
+            print("loop: review bounds unarmed · %s" % e)
+        else:
+            if bounds:
+                print("loop: review bounds · %s" % bounds)
+            refusals = refusals + bound_refusals
     if plant in SCOPE_PLANTS and not refusals:
         refusals = check_scope_plant(plant, layers, pathlib.Path(scratch.name), kit_dir, root,
                                      [r["tag"] for r in data.get("item", [])])

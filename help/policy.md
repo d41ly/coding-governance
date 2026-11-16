@@ -348,7 +348,7 @@ list alone. The
 deployer's `plan` shows the list as an `ORDER [project-owned]` row: that row is for information, and
 the list is not yours to write.
 
-- **A row** is `<place> <key> <mark>`, for example `.unattended.conf REVIEW_ROUNDS owner-policy`. The
+- **A row** is `<place> <key> <mark>`, for example `.unattended.conf GATE_BOUND owner-policy`. The
   roles file's place is written `<tool-root>/roles/house/policy.toml`, which means the roles kit
   wherever this repository installed it, and its keys are its tables, `[effort]` and `[gates]`.
 - **The marks.** `owner-policy` is a choice the owner makes, which a later build moves into
