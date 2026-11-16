@@ -102,7 +102,9 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # observed at the close.
 # RAISED 275 -> 278 by TOOL-aPiecewiseGrade-4: its PG4 arm's 3 assertions after the PG1 arm, each
 # top-level. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=278
+# RAISED 278 -> 282 by TOOL-aPiecewiseGrade-5: its four nonzero-counter arms, each top-level. Counted by
+# reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=282
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -562,6 +564,8 @@ d=$base/skip; scratch "$d"
 sed -i 's|`'"${PFX}gate-legs.json"'` exists|see `run-gates.sh:407`|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
 git -C "$d" add -A >/dev/null
 arm "an untracked citation path is skipped, not red" 0 "$d" "citation(s) skipped"
+# TOOL-aPiecewiseGrade-5 S5: the `skipped` counter read back nonzero, so a misspelled name reds here.
+arm "PG5 AC5 the skip fixture's summary counts its one skipped citation" 0 "$d" "token(s) graded · 1 citation(s) skipped (untracked path)"
 
 # 6 — a waiver with a reason silences the hit and the count is printed
 d=$base/waived; scratch "$d"
@@ -1062,12 +1066,20 @@ sed -i 's|^- \*\*AC1\*\* — |- **AC2** — a second criterion.\n- **AC1** — |
 printf 'SPEC_AC_ORDER_CUTOFF="2026-09-02"\n' > "$d/.memory-tree.conf"
 git -C "$d" add -A >/dev/null
 arm "TOOL-dSafePassage-41 a spec dated at SPEC_AC_ORDER_CUTOFF listing AC2 before AC1 REDS naming both" 1 "$d" '2026-09-02-spec-TOOL-tOne-1.md [ac-order] `ac-order <- AC2`'
+# TOOL-aPiecewiseGrade-5 S5: the `ao_bad` counter read back nonzero, over the same state.
+arm "PG5 AC5 the out-of-order spec's ac-order line counts it out of order" 1 "$d" "graded at/after SPEC_AC_ORDER_CUTOFF 2026-09-02 · 1 out of order"
 printf 'SPEC_AC_ORDER_CUTOFF=""\n' > "$d/.memory-tree.conf"
 git -C "$d" add -A >/dev/null
 arm "TOOL-dSafePassage-41 the out-of-order spec passes with SPEC_AC_ORDER_CUTOFF blank" 0 "$d" "ac-order join · 0 of 1 live spec(s) · SPEC_AC_ORDER_CUTOFF blank (arm off)"
 printf 'SPEC_AC_ORDER_CUTOFF="2026-09-03"\n' > "$d/.memory-tree.conf"
 git -C "$d" add -A >/dev/null
 arm "TOOL-dSafePassage-41 the out-of-order spec dated a day before SPEC_AC_ORDER_CUTOFF is held out" 0 "$d" "ac-order join · 0 of 1 live spec(s) · graded at/after SPEC_AC_ORDER_CUTOFF 2026-09-03 · 0 out of order"
+git -C "$d" reset -q --hard "$clean"
+# TOOL-aPiecewiseGrade-5 S5: the `ao_graded` counter read back nonzero, over a spec in order, so this
+# arm stays green when only `ao_bad` is misspelled.
+printf 'SPEC_AC_ORDER_CUTOFF="2026-09-02"\n' > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null
+arm "PG5 AC5 a spec in order dated at SPEC_AC_ORDER_CUTOFF is counted graded by the ac-order join" 0 "$d" "ac-order join · 1 of 1 live spec(s) · graded at/after SPEC_AC_ORDER_CUTOFF 2026-09-02 · 0 out of order"
 git -C "$d" reset -q --hard "$clean"
 
 # AC17's relation, for the new key — a COMMITTED value not strictly past its own commit day is
@@ -2116,6 +2128,8 @@ seed_source() {
 d=$base/source-bare; scratch "$d"
 seed_source "$d" "PROBE = bash -c '. helper.sh; f'" fence
 arm "TOOL-dGroundRules-46 a bare-name source in a fenced acceptance literal REDS as [source]" 1 "$d" '[source] `helper.sh` — sources a shell file by bare name'
+# TOOL-aPiecewiseGrade-5 S5: the `so_bare` counter read back nonzero, over the same fixture.
+arm "PG5 AC5 the source join counts the bare-name source" 1 "$d" "1 sourced file(s) examined in 1 live spec(s) · 1 by bare name"
 d=$base/source-whole; scratch "$d"
 seed_source "$d" "PROBE = bash -c '. sub/helper.sh; f'" fence
 arm "TOOL-dGroundRules-46 the same source by a path carrying a slash is no hit, and is counted" 0 "$d" "source join · 1 sourced file(s) examined in 1 live spec(s)" "[source]"
