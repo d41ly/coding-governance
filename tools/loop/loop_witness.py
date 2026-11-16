@@ -484,7 +484,7 @@ def check_normaliser_missing_plant(root, bad):
     run_fixture_git(root, "add", "-A")
     run_fixture_git(root, "commit", "-qm", "the scratch unit")
     sha = run_fixture_git(root, "rev-parse", "HEAD")
-    empty = pathlib.Path(root, "nokit", "loop")
+    empty = pathlib.Path(root, "nokit", KIT.name)
     empty.mkdir(parents=True)
     kit, cwd, out, err = KIT, os.getcwd(), io.StringIO(), io.StringIO()
     KIT = empty
