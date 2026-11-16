@@ -9249,6 +9249,24 @@ same "AC7 a copy with no policy kit exits 1" "$rc" "1"
 hit "$out" "--recommend wrote no record, because the policy reader or the record factory refused or a kit did not resolve: the policy kit does not resolve"
 rm -rf "$_rc_kc"
 reset_tree
+# ---- TOOL-dDeclaredLoop-19: an owner gate the policy file places holds `--close` in check_owner_gates' one
+# ---- `fail 82`, naming each held item and the act; a policy file that does not read at the default-branch
+# ---- side of BASE is read_design_review's one `fail 55`. Against the base driver neither refusal exists:
+# ---- the close runs on under any `autonomy`, and the opt-in reads the README and the conf alone.
+bcopen
+write_tracking_policy 'autonomy = "three-gates"\n\n[review]\nmax-rounds = 7\n\n[review.design]\nrounds = "fixed-count"\nround-count = 7\n'
+out=$(run --close tRun); rc=$?
+same "AC3 an owner gate under three-gates holds the close" "$rc" "1"
+hit "$out" "UNATTENDED check 82 FAILED — --close is held at an owner breakpoint the policy file places, or the list of them did not answer, so the Definition of Done is not evaluated past a gate only the owner releases"
+hit "$out" "held at item.design.exit item.deploy.mandate; park the question with --park tRun --item <tag>"
+git update-ref refs/remotes/origin/main "$BASE"
+_dr_pol=$(printf '100644 blob %s\tpolicy.toml\n' "$(printf '[review\n' | git hash-object -w --stdin)" | git mktree)
+_dr_tree=$( { git ls-tree "$BASE" | grep -v "	.governance$"; printf '040000 tree %s\t.governance\n' "$_dr_pol"; } | git mktree)
+_dr_orphan=$(git commit-tree "$_dr_tree" -m "a policy file with no valid revision")
+out=$( load_driver_conf && ANCHOR_KIND="" && check_authorization tRun "$_dr_orphan" 2>&1 ); rc=$?
+same "AC5 a policy file that does not read refuses the opt-in's derivation" "$rc" "1"
+hit "$out" "UNATTENDED check 55 FAILED — the policy file's review.design does not read at the default-branch side of the pinned BASE, so whether this build owes the pre-code spec audit is unknown and is not read as opt-in"
+reset_tree
 # ---- The arms below are REGION TWO's, and they sit before its closing `fi`. Both sides of this
 # ---- merge edited this seam: main sharded the suite into two regions with mode-selected floors,
 # ---- while this branch appended new `--rescope` and `--dispatch` arms to the end of the file.

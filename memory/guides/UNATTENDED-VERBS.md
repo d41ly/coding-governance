@@ -59,6 +59,14 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   position engine holds the tag as one the composition declares and the key as that tag's instance
   shape. `--plan` then prints the frontier on a `frontier:` line beneath `next:`: the unwitnessed items
   of the build's step whose needs are witnessed, the refused instance still among them.
+  Beneath `frontier:`, `--plan <slug>` prints the build's breakpoints, the loop kit's
+  `breakpoints.py list` verbatim (`TOOL-dDeclaredLoop-19`): one
+  `breakpoint: <name> · <before|at|after> <item tag> · <reviewer|owner> · <cause>[ · <release>]` line each,
+  the reviews `review.<stage>` places, the owner gates `autonomy` places, each `review.breakpoints`
+  member, and under `decisions.major = "author-owner-ratifies"` the owner item at `item.build.ratify`
+  where a tracked spec carries a fork resolved `(agent, <date>, delegated)`. An owner line's release is
+  `authorization`, `held` or `released <record> <word>`. Fire a review line through `--trigger` with its
+  cause. None print under `--paths` or `--framed`, nor where the loop kit does not resolve.
 - `--attest` — **the two agent-attested items have a VERB, and it is the only way to write one.**
   `--attest <slug> --item <item> [--value <text>]` derives the record key so no operator spells
   one, and REFUSES a machine-checked item by reading its declared CHECKER — so a project
@@ -202,6 +210,11 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   Where `RUN_CLAIMS` is `on`, before any item is graded, a run that does not hold its claim
   on the remote is check 108 and a claim that cannot be read or renewed is check 109: a close
   that lands a claim it never read is a double landing.
+  An owner breakpoint the policy file places holds the close before the anchor round-trip, check 82,
+  while its `breakpoint:` line reads `held`, naming each item: park the question with `--park <slug>
+  --item <tag> --reason <question>`, hand over with `--handoff <slug> --code owner-decision`, and the
+  owner's disposition record whose `Item` is that tag releases it at the next `--close`. A list that
+  refuses is relayed through the same check; where the loop kit does not resolve nothing is read.
 - `--authorization` — `--authorization <slug>` grades `authorization-reachable` alone, by the arm
   `--close` grades it with, so it answers what the close would from the same tree. Run it after any
   merge of the remote's default branch into the run branch, mid-build included, and under
@@ -667,7 +680,12 @@ one are two acts with two authorizations.
    `unattended: spec-audit — opted in by README spec-audit: <date>`;
    `unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: <date>` when the README
    declares no key (`TOOL-aBlindedTrial-7`; the README key wins whatever it says); or
-   `unattended: spec-audit — not owed (opt-in)`. The audit is OPT-IN per build (owner ruling of
+   `unattended: spec-audit — not owed (opt-in)`; or, where the policy key `review.design` read at the
+   default-branch side of BASE decides (`TOOL-dDeclaredLoop-19`), `unattended: spec-audit — opted in
+   by policy review.design: <value> · <date>` under `owed` or a Tier-2 spec under `owed-above-tier`,
+   the date BASE's, and `unattended: spec-audit — not owed by policy review.design: <value>` under
+   `off` or `owed-above-tier` with no Tier-2 spec; a policy file that does not read there is check 55.
+   The audit is OPT-IN per build (owner ruling of
    2026-09-20, `TOOL-aBlindedTrial-6`); the README key is read at BASE and the project default at
    the default-branch side of it, so a working-copy edit opts nothing in or out, and a value that is
    not a date is a refusal. **The opt-in is the OWNER's, never yours** (`TOOL-aWardedAudit-4`): do

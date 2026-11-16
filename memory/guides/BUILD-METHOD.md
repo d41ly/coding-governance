@@ -114,9 +114,9 @@ AGAINST the better measurement for that reason, so a testing rule without this e
 
 ## M4 — The spec audit — owed only where the build or its project declares it
 
-**When**, and `specs-reviewed` is owed only then: the front matter of a `slug` README the owner landed carries
-`spec-audit: <date>`, or `.unattended.conf` on the default branch declares a dated `SPEC_AUDIT_DEFAULT` and the README declares no key
-(TOOL-aBlindedTrial-7). Under neither, none is owed, and the tooling says so instead of running one. **The opt-in is
+**When**, and `specs-reviewed` is owed only then: `review.design` is `owed`, `owed-above-tier` over a Tier-2 spec, or
+`opt-in` (its default) and a `slug` README the owner landed carries `spec-audit: <date>`, or `.unattended.conf` on the
+default branch a dated `SPEC_AUDIT_DEFAULT` and the README no key (TOOL-aBlindedTrial-7). Else none is owed. **The opt-in is
 the OWNER's** (TOOL-aWardedAudit-4): a run never writes the key nor passes `specAudit` on its own reading, unless its prompt record quotes the owner asking (check 89); an audit that
 seems owed goes to the wrap-up. **Which**, once declared: every spec with no review record naming it; a spec whose rev moved since its last review —
 by anything but that review's own fold or its disposal's sibling edit — or that you authored this run, is unreviewed.

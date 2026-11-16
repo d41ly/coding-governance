@@ -13,13 +13,26 @@ and the hook for [the docs leg](docs-leg.md), which reds a landing that changes 
 
 ## When a chain runs
 
-A spec audit is owed only where the build or its project declares it:
+A spec audit is owed only where your policy file, the build or its project declares it. The policy
+key `review.design` in `.governance/policy.toml`, read on the default branch, decides first:
+
+- `owed`: every build owes the audit, whatever its README says;
+- `owed-above-tier`: a build owes it when one of its specs is Tier-2, and none is owed otherwise;
+- `off`: no build owes it, whatever its README or the project default says;
+- `opt-in`, the default: the build or its project decides, as below.
+
+Under `opt-in` an audit is owed where:
 
 - the front matter of the build's README, as the owner landed it, carries `spec-audit: <date>`; or
 - `.unattended.conf` on the default branch declares a dated `SPEC_AUDIT_DEFAULT`, and the README
   declares no key.
 
-Under neither, none is owed, and the tooling says so instead of running one. The opt-in is the
+Under neither, none is owed, and the tooling says so instead of running one. The unattended
+driver's preflight names the source it read: `opted in by policy review.design: <value> · <date>`, or
+`not owed by policy review.design: <value>`, beside the README and project forms. One `[review]`
+table cannot hold `design = "owed"` beside the `[review.design]` table that `review.design.rounds`
+lives in, so set the key only where you set no round keys. In an attended session the opt-in pack
+below still reads the README and the conf alone. The opt-in is the
 owner's: a run never writes the key, nor passes `specAudit` on its own reading, unless its prompt
 record quotes the owner asking. An audit that seems owed goes to the wrap-up.
 

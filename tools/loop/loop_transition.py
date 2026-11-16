@@ -124,6 +124,8 @@ SHA = re.compile(r"[0-9a-f]{8,40}")
 SEP = " · "
 #: A spec's status header, its first word the unit's status.
 STATUS_HEADER = re.compile(r"^\*\*Status:\*\* ([A-Z]+)", re.M)
+#: That header's tier, the digits of its `Tier-<n>` (TOOL-dDeclaredLoop-19).
+TIER_HEADER = re.compile(r"^\*\*Status:\*\* .*?\bTier-(\d+)", re.M)
 FENCE =("<!-- microformats -->", "<!-- /microformats -->")
 PLANTS = {"default": "the default set, one B4 move with its witness",
           "subset-trailer-line": "the set [\"trailer\", \"micro-format\"], one B4 move",
@@ -261,8 +263,15 @@ def read_build_unit_ids(build, root):
 
 def read_build_specs(build, root):
     """`[(unit id, status)]` of each tracked spec H1 under `build`, in `git ls-files` order: the status the
-    word its `**Status:**` header opens with, empty where it carries none. `budget.py`'s ending reads the
-    statuses (TOOL-dDeclaredLoop-31)."""
+    word its `**Status:**` header opens with, empty where it carries none, `read_build_headers`' pairs.
+    `budget.py`'s ending reads the statuses (TOOL-dDeclaredLoop-31)."""
+    return [(uid, status) for uid, status, _tier in read_build_headers(build, root)]
+
+
+def read_build_headers(build, root):
+    """`[(unit id, status, tier)]` of each tracked spec H1 under `build`, in `git ls-files` order: the status
+    the word its `**Status:**` header opens with, the tier the digits of that header's `Tier-<n>`, each empty
+    where the header carries none. `breakpoints.py` reads the tiers (TOOL-dDeclaredLoop-19)."""
     read_memory_tree("tree_lib.py")
     from design_lib import read_design_conf, read_tracked_builds
     from tree_lib import parse_spec_h1
@@ -277,8 +286,8 @@ def read_build_specs(build, root):
             text = path.read_bytes().decode("utf-8", "replace")
             hit = parse_spec_h1(rel, text, memory_root, families)
             if hit:
-                status = STATUS_HEADER.search(text)
-                ids.append((hit[1], status.group(1) if status else ""))
+                status, tier = STATUS_HEADER.search(text), TIER_HEADER.search(text)
+                ids.append((hit[1], status.group(1) if status else "", tier.group(1) if tier else ""))
     return ids
 
 

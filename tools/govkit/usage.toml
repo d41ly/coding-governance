@@ -558,6 +558,26 @@ verb = "ending"
 flags = ["--build="]
 
 [[usage]]
+id = "script:{prefix}/loop/breakpoints.py"
+shape = "verb"
+entry = "{prefix}/loop/breakpoints.py"
+flags = ["--fixture", "--plant=", "--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/breakpoints.py#list"
+shape = "verb"
+entry = "{prefix}/loop/breakpoints.py"
+verb = "list"
+flags = ["--build=", "--spec-audit", "--delegated-fork"]
+
+[[usage]]
+id = "script:{prefix}/loop/breakpoints.py#stage"
+shape = "verb"
+entry = "{prefix}/loop/breakpoints.py"
+verb = "stage"
+flags = ["--stage=", "--build=", "--rev="]
+
+[[usage]]
 id = "script:{prefix}/loop/scenario.py"
 shape = "verb"
 entry = "{prefix}/loop/scenario.py"

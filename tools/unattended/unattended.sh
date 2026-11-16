@@ -2270,6 +2270,10 @@ AUTH_MAY_SET=0
 AUTH_SPEC_AUDIT=""
 AUTH_SPEC_AUDIT_DERIVED=""
 AUTH_SPEC_AUDIT_FROM=""
+# TOOL-dDeclaredLoop-19 S8 - a third source, `policy`: the `review.design` value read at `_cb`, and the
+# answer `breakpoints.py stage` gave for it, `opt-in` wherever nothing was read.
+AUTH_DESIGN_REVIEW=""
+_dr_answer=opt-in
 # TOOL-aQuotedBrief-4 S2 - the DEFAULT-BRANCH SIDE of the pinned BASE, check_authorization's `_cb`,
 # kept so `read_brief_cutoff`'s two callers read the conf at the commit that read SPEC_AUDIT_DEFAULT
 # and never re-derive it. Cleared on that function's entry, so a refusal before the derivation
@@ -4347,6 +4351,15 @@ check_authorization() { # slug · base
          return 1 ;;
     esac
   fi
+  # TOOL-dDeclaredLoop-19 S8 - THE POLICY READS FIRST, at the same `_cb`, so a run can no more write
+  # `review.design: owed` than a README opt-in: `owed` pins the BASE commit's date, `not-owed` leaves the
+  # audit unowed whatever the README key or the project default said, both from the source `policy`, and
+  # `opt-in`, the default, keeps the derivation above. The key's own refusals above ran under every reading.
+  read_design_review "$slug" "$_cb" || return 1
+  case "$_dr_answer" in
+    owed)     AUTH_SPEC_AUDIT=$(GIT show -s --format=%cs "$base" 2>/dev/null); AUTH_SPEC_AUDIT_FROM=policy ;;
+    not-owed) AUTH_SPEC_AUDIT=""; AUTH_SPEC_AUDIT_FROM=policy ;;
+  esac
   # Set AFTER BOTH halves (round 2, R2): a refusing return above - fail 52, 54 or 55 - leaves it
   # blank, so the specs-audited grader lands on its NOT GRADABLE branch instead of printing the
   # absence the refusal just declined to assert.
@@ -4598,6 +4611,23 @@ check_authorization() { # slug · base
   fi
   return 0
 }
+# TOOL-dDeclaredLoop-19 S8 - `review.design` at the default-branch side of BASE, through the loop kit's
+# `breakpoints.py stage`. A module that does not resolve, its `unarmed` line, or an empty `_cb` reads
+# `opt-in`, today's derivation; a refusal is this one site, and leaves the derivation unfinished.
+read_design_review() { # slug · rev -> sets AUTH_DESIGN_REVIEW and _dr_answer; 1 after its one fail 55
+  AUTH_DESIGN_REVIEW=""; _dr_answer=opt-in
+  [ -n "$2" ] || return 0
+  run_loop_verb breakpoints.py stage --stage=design "--build=$1" "--rev=$2" || return 0
+  case "$_bd_rc:$_bd_why" in
+    "0:breakpoints: stage design · "*" · "*)
+      _dr_answer=${_bd_why##* · }
+      AUTH_DESIGN_REVIEW=${_bd_why#breakpoints: stage design · }; AUTH_DESIGN_REVIEW=${AUTH_DESIGN_REVIEW%% · *} ;;
+    "2:breakpoints: unarmed · "*) ;;
+    *) fail 55 "the policy file's review.design does not read at the default-branch side of the pinned BASE, so whether this build owes the pre-code spec audit is unknown and is not read as opt-in: $_bd_why"
+       return 1 ;;
+  esac
+  return 0
+}
 
 # S2 - the run-state file is CREATED by --preflight rather than asserted. It holds no owner bytes now,
 # so there is nothing for the owner to author and nothing for a truncation to destroy.
@@ -4767,9 +4797,13 @@ refuse_if_terminal() { # run-state file · verb · [--recorded]
 # that span. The shape makes a declared fork gradeable; it cannot find an undeclared one. Blank, an
 # absent key, or an earlier date keeps the section-wide reading below, byte for byte.
 # The cutoff is passed IN rather than read here, so the function stays pure and sliceable.
-plan_state() { # spec file · FORK_ITEM_CUTOFF, blank = off -> prints the M2 state
+# TOOL-dDeclaredLoop-19 S10 - THE `delegated` MODE, a third argument of this same program, so the owner item's
+# fork read is this grammar and never a second section-8 parser: `check_mark`'s shape narrowed to `agent` and
+# `delegated`, over each F-item span at or after the cutoff and over the whole section before it, code and
+# quoted spans removed as `check_span_mark` removes them. It prints DELEGATED or NONE, THIN or not.
+plan_state() { # spec file · FORK_ITEM_CUTOFF, blank = off · [delegated] -> prints the M2 state, or DELEGATED or NONE
   local _psb="${1##*/}"
-  awk -v icut="${2:-}" -v fbase="$_psb" '
+  awk -v icut="${2:-}" -v fbase="$_psb" -v mode="${3:-}" '
     BEGIN { fdate = ""
             if (match(fbase, /[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/)) fdate = substr(fbase, RSTART, RLENGTH) }
     # THE SECTION-8 GRAMMAR, ONCE for this program: the documented mark, the F-item opener, and a
@@ -4778,6 +4812,7 @@ plan_state() { # spec file · FORK_ITEM_CUTOFF, blank = off -> prints the M2 sta
     function check_mark(s) { return (s ~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/) }
     function check_fitem_open(s) { return (s ~ /^- \*\*(FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+(\*\*| )/ || s ~ /^### (FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+([^A-Za-z0-9]|$)/) }
     function check_span_mark(s) { gsub(/`[^`]*`/, "", s); gsub(/"[^"]*"/, "", s); gsub(/[[:space:]]+/, " ", s); return check_mark(s) }
+    function check_delegated_mark(s) { gsub(/`[^`]*`/, "", s); gsub(/"[^"]*"/, "", s); gsub(/[[:space:]]+/, " ", s); return (s ~ /RESOLVED \(agent, [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9], delegated\)/) }
     # TOOL-dBriefedPass-1 - KEYED ON THE HEADING TITLE, NOT ON THE ORDINAL. A TIER-1 SPEC LEGITIMATELY
     # DROPS `## 5. Production-readiness checklist`, so every section from five onward renumbers: the
     # ordinal form read a Tier-1 spec`s GATES as its acceptance criteria, its OPEN QUESTIONS as its
@@ -4814,6 +4849,17 @@ plan_state() { # spec file · FORK_ITEM_CUTOFF, blank = off -> prints the M2 sta
     { seen[cur] = seen[cur] 1
       if (cur == "forks") { fl[++nf] = line; fr[nf] = raw; if (forkline == "") forkline = line } }
     END {
+      if (mode == "delegated") {
+        nfi = 0; dblob = ""; found = 0
+        for (i = 1; i <= nf; i++) {
+          dblob = dblob " " fl[i]
+          if (check_fitem_open(fr[i])) dspan[++nfi] = fl[i]
+          else if (nfi > 0) dspan[nfi] = dspan[nfi] " " fl[i]
+        }
+        if (icut != "" && fdate != "" && fdate >= icut) { for (k = 1; k <= nfi; k++) if (check_delegated_mark(dspan[k])) found = 1 }
+        else found = check_delegated_mark(dblob)
+        print (found ? "DELEGATED" : "NONE"); exit
+      }
       thin = (seen["scope"] == "" || seen["acc"] == "" || seen["gates"] == "")
       # M2 orders the checks and the FIRST match wins, so THIN is decided before FORKED.
       if (thin) { print "THIN"; exit }
@@ -4890,6 +4936,16 @@ load_fork_cutoff() { # -> sets FORK_CUTOFF; rc 1 after a numbered refusal
     return 1
   fi
   FORK_CUTOFF="$_fc"
+}
+# TOOL-dDeclaredLoop-19 S5 - A FORK THE AGENT RESOLVED UNDER DELEGATION, read by `plan_state`'s `delegated`
+# mode over each tracked spec of the build, one awk pass per spec. No fork record carries a class, so every
+# such fork reads as major: the owner item it places asks the owner once too often, never once too few.
+check_delegated_fork() { # slug -> 0 where a tracked spec of the build carries one; FORK_CUTOFF loaded by the caller
+  local _df
+  for _df in $(git ls-files "$M/builds/$1/spec/*.md" 2>/dev/null | drop_working_specs); do
+    [ "$(plan_state "$_df" "$FORK_CUTOFF" delegated)" = DELEGATED ] && return 0
+  done
+  return 1
 }
 
 # TOOL-cBriefedPilot-6 - the roster join. M2 makes the README's authored Units table the roster and
@@ -6224,15 +6280,23 @@ resolve_position_engine() { # [script] -> sets PE_PY and PE_PATH; 1 where python
 # calls no `fail`: each verb relays a refusal in its own literal branch, which check-arms reads by its code.
 # `run_budget_verb` runs any one verb of the module, `draw` or `target` (TOOL-dDeclaredLoop-32), and
 # `run_budget_draw` keeps its name as the `draw` caller.
-run_budget_verb() { # verb · flag=value... -> sets _bd_why to the script's first line and _bd_rc to its exit, 2 where it does not resolve
-  local _bd_out
-  _bd_why="the loop kit's budget.py or python does not resolve beside this kit, so the $1 cannot be made"
+# ONE RUNNER FOR EVERY LOOP KIT VERB (TOOL-dDeclaredLoop-19 S10): `run_loop_verb` runs one verb of any loop
+# kit script, keeping its whole output in `_bd_out` and printing nothing, and answers 1 where the script
+# does not resolve, so a caller that reads nothing then can tell that apart from a refusal. `run_budget_verb`
+# is it over `budget.py`, its output printed, its texts and globals byte for byte what they were.
+run_loop_verb() { # script · verb · flag=value... -> sets _bd_out, _bd_why to its first line and _bd_rc to its exit; 1 where it does not resolve
+  _bd_out=""
+  _bd_why="the loop kit's $1 or python does not resolve beside this kit, so the $2 cannot be made"
   _bd_rc=2
-  resolve_position_engine budget.py || return 0
-  _bd_out=$("$PE_PY" "$PE_PATH" "$@" 2>&1); _bd_rc=$?
-  [ -n "$_bd_out" ] && printf '%s\n' "$_bd_out"
+  resolve_position_engine "$1" || return 1
+  _bd_out=$("$PE_PY" "$PE_PATH" "${@:2}" 2>&1); _bd_rc=$?
   _bd_why=${_bd_out%%$'\n'*}; _bd_why=${_bd_why%$'\r'}
-  [ -n "$_bd_why" ] || _bd_why="budget.py $1 printed nothing and exited $_bd_rc"
+  [ -n "$_bd_why" ] || _bd_why="$1 $2 printed nothing and exited $_bd_rc"
+  return 0
+}
+run_budget_verb() { # verb · flag=value... -> sets _bd_why to the script's first line and _bd_rc to its exit, 2 where it does not resolve
+  run_loop_verb budget.py "$@" || return 0
+  [ -n "$_bd_out" ] && printf '%s\n' "$_bd_out"
   return 0
 }
 run_budget_draw() { # slug · cause · item -> as run_budget_verb; on `exhausted`, _bd_why names the remedy
@@ -8376,11 +8440,18 @@ print_spec_audit_line() { # slug · run-state file
   local sa why=""
   fact "$2" spec-audit >/dev/null; sa=$_fact
   if [ -n "$sa" ]; then
-    if [ "${AUTH_SPEC_AUDIT_FROM:-}" = project ]; then
+    if [ "${AUTH_SPEC_AUDIT_FROM:-}" = policy ]; then
+      echo "unattended: spec-audit — opted in by policy review.design: ${AUTH_DESIGN_REVIEW:-owed} · $sa"
+    elif [ "${AUTH_SPEC_AUDIT_FROM:-}" = project ]; then
       echo "unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: $sa"
     else
       echo "unattended: spec-audit — opted in by README spec-audit: $sa"
     fi
+    return 0
+  fi
+  # TOOL-dDeclaredLoop-19 S8 - the policy's own not-owed, which no README key or project default reopens.
+  if [ "${AUTH_SPEC_AUDIT_FROM:-}" = policy ]; then
+    echo "unattended: spec-audit — not owed by policy review.design: ${AUTH_DESIGN_REVIEW:-off}"
     return 0
   fi
   derive_review_signals "$1" design; why=$_rs_why
@@ -11344,6 +11415,9 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     fail 82 "the run is HELD, so the Definition-of-Done set would be evaluated against a run that stopped part-way for a cause outside itself; --resume it first, and close it when the work it paused in the middle of is done"
     return 1
   fi
+  # TOOL-dDeclaredLoop-19 S6 - AN OWNER GATE THE POLICY PLACES HOLDS THE CLOSE until the owner's disposition
+  # record of its item, free and before the anchor round-trip, as the HELD refusal above is.
+  check_owner_gates "$slug" || return 1
   # TOOL-dUnstuckLanding-20 S5 - THIS NODE'S OWN ANSWER DECIDES, resolved again here: a run resumed
   # on another node carries the first node's `landing` fact, and trusting it would land from a node
   # nobody declared. A disagreement is printed. On a hand-off node an override is a free refusal,
@@ -11604,6 +11678,49 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   # run whose Definition of Done was in fact evaluated. TOOL-dUnstalledConvoy-24.
   echo "unattended: close OK — every declared DoD item met; phase LANDING. COMMIT the run-state file, then land with: $LANDER"
   return 0
+}
+# TOOL-dDeclaredLoop-19 S6 - THE OWNER GATES, from the loop kit's `breakpoints.py list`, with
+# `--delegated-fork` where a tracked spec of the build carries a fork the agent resolved under delegation.
+# An owner line reading `held` holds the close, naming its item and today's door: the `decision` park, the
+# `owner-decision` hand-off and the owner's disposition record whose `Item` is that tag, which the next close
+# reads. The plan gate's release is the authorization, so a default build holds nothing new. A list that
+# refuses is relayed through the same site; a loop kit that does not resolve reads nothing (§8 F10).
+# TOOL-dDeclaredLoop-19 S9 - THE BREAKPOINT LINES OF `--plan <slug>`, after `next:` and `frontier:`: the
+# module's output verbatim, its refusal line included, the list run with `--spec-audit` where the run-state
+# file's `spec-audit` fact holds a date and `--delegated-fork` as the close derives it. Nothing where the
+# module does not resolve. The dispatch calls it for the single-slug human form alone.
+print_breakpoint_lines() { # slug -> prints the list's lines; 0 always
+  local -a _pb_flags=()
+  load_fork_cutoff >/dev/null || return 0
+  runmd_of "$1" >/dev/null
+  fact "$_runmd" spec-audit >/dev/null 2>&1
+  case "${_fact:-}" in [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) _pb_flags+=(--spec-audit) ;; esac
+  check_delegated_fork "$1" && _pb_flags+=(--delegated-fork)
+  run_loop_verb breakpoints.py list "--build=$1" ${_pb_flags[@]+"${_pb_flags[@]}"} || return 0
+  [ -z "$_bd_out" ] || printf '%s\n' "$_bd_out"
+  return 0
+}
+check_owner_gates() { # slug -> 0 where no owner line reads held or the module does not resolve; 1 after its one fail 82
+  local _og_why="" _og_held="" _og_flag="" _og_ln
+  local -a _og_lines=()
+  load_fork_cutoff || return 1
+  check_delegated_fork "$1" && _og_flag=--delegated-fork
+  run_loop_verb breakpoints.py list "--build=$1" ${_og_flag:+"$_og_flag"} || return 0
+  if [ "$_bd_rc" != 0 ]; then
+    _og_why=$_bd_why
+  else
+    mapfile -t _og_lines < <(printf '%s\n' "$_bd_out")
+    for _og_ln in ${_og_lines[@]+"${_og_lines[@]}"}; do
+      _og_ln=${_og_ln%$'\r'}
+      case "$_og_ln" in
+        "breakpoint: "*" · owner · "*" · held") _og_ln=${_og_ln#breakpoint: * · }; _og_ln=${_og_ln%% · *}; _og_held="$_og_held ${_og_ln#* }" ;;
+      esac
+    done
+    [ -z "$_og_held" ] || _og_why="held at$_og_held; park the question with --park $1 --item <tag> --reason <question>, hand the run over with --handoff $1 --code owner-decision, and the owner's disposition record whose Item is that tag releases it at the next --close"
+  fi
+  [ -n "$_og_why" ] || return 0
+  fail 82 "--close is held at an owner breakpoint the policy file places, or the list of them did not answer, so the Definition of Done is not evaluated past a gate only the owner releases: $_og_why"
+  return 1
 }
 
 # write_bar_green <git dir> <head before> <rc> <kind> <base> <bar> <run id> — the close's bar's own
@@ -12503,6 +12620,10 @@ $_bcopen"
       if [ "${AUTH_SPEC_AUDIT:+1}" != "${_sa_fact:+1}" ]; then
         fail 53 "the spec-audit fact in the run-state file and the spec-audit: key in the build README at the pinned BASE, or the SPEC_AUDIT_DEFAULT the project conf declares at its default-branch side, disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: ${AUTH_SPEC_AUDIT:-(none)}; recorded: ${_sa_fact:-(none)}"
         return 1
+      fi
+      if [ -z "${AUTH_SPEC_AUDIT:-}" ] && [ "${AUTH_SPEC_AUDIT_FROM:-}" = policy ]; then
+        DOD_OUT="specs-audited — not owed by policy review.design: ${AUTH_DESIGN_REVIEW:-off}, read at the default-branch side of BASE, so this build owes no pre-code audit evidence whatever its README key or the project default says (TOOL-dDeclaredLoop-19)"
+        return 0
       fi
       if [ -z "${AUTH_SPEC_AUDIT:-}" ]; then
         DOD_OUT="specs-audited — not owed: the spec audit is opt-in, the build README at BASE declares no spec-audit: key and the project conf at the default-branch side of BASE declares no SPEC_AUDIT_DEFAULT, so this build owes no pre-code audit evidence (TOOL-aBlindedTrial-6)"
@@ -16425,7 +16546,15 @@ while [ $# -gt 0 ]; do
                     # happened: `check-unattended.sh` check 30 red on every fixture holding a
                     # single build, while the real corpus always gave it several and looked fine.
                     # A caller that wants frames now SAYS so, and gets them at any arity.
-                    if [ $# -le 1 ] && [ -z "$_pl_framed" ]; then verb_plan "${1:-}"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc"; fi
+                    # TOOL-dDeclaredLoop-19 S9 - the breakpoint lines follow, for the human form alone: never
+                    # under --paths or --framed, and never on the position engine's hand-over call.
+                    if [ $# -le 1 ] && [ -z "$_pl_framed" ]; then
+                      verb_plan "${1:-}"; _rl_rc=$?
+                      if [ "$_rl_rc" = 0 ] && [ -z "$PLAN_PATHS" ] && [ "${GOV_POSITION_STATES+set}" != set ]; then
+                        print_breakpoint_lines "${1:-}"
+                      fi
+                      RUNLOG_CLEAN=1; exit "$_rl_rc"
+                    fi
                     for _pl_s in "$@"; do
                       printf 'unattended-plan-open: %s\n' "$_pl_s"
                       ( verb_plan "$_pl_s" ); _pl_one=$?

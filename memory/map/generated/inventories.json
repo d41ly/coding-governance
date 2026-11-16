@@ -78,6 +78,7 @@
       "line length",
       "line-length gate selftest",
       "loop adapt fixtures",
+      "loop breakpoint fixtures",
       "loop budget fixtures",
       "loop checklist tags",
       "loop claims fixtures",

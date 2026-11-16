@@ -1358,6 +1358,55 @@ record kit is not installed, or refuses a value, such as a reason holding a line
 units region names no unit gets the line and no record. The answer is recorded and never acted on: the
 spec audit's opt-in stays yours.
 
+## Where a build stops for a review or for you
+
+A breakpoint is a place at an item boundary where a build stops, before, at or after an item, for a
+reviewer or for you, the owner. Reviews and owner gates are one list, and four keys in
+`.governance/policy.toml` place them:
+
+- `review.<stage>`, one per stage: `off` places no review, `opt-in` places one only where the build opts
+  in, `owed` always places it, and `owed-above-tier` places it where one of the build's specs is
+  Tier-2. Plan's review sits before `item.plan.exit`, Design's spec audit after `item.design.reason`,
+  Build's closing review after `item.build.recommend`, Test's gate review before `item.test.exit` and
+  Deploy's landing review before `item.deploy.notify`. Build defaults to `owed` and the others to
+  `opt-in`. Only Design has an opt-in of its own, the build README's `spec-audit:` key, which
+  [the spec audit page](spec-audit.md) describes.
+- `autonomy`, default `plan-only`: an owner gate at `item.plan.exit`. `three-gates` adds one at
+  `item.design.exit` and one before `item.deploy.mandate`; `every-stage` adds one at each stage's exit
+  item besides.
+- `review.breakpoints`, default empty: each item tag you list places a review before that item. A tag
+  the build's items do not declare is refused, naming the key and the tag, and a renamed tag follows
+  its item.
+- `decisions.major`, default `author-rubric`: under `author-owner-ratifies`, a build whose specs carry
+  a fork an agent resolved under delegation, marked `RESOLVED (agent, <date>, delegated)`, gets an owner
+  item at `item.build.ratify`. No fork records its class yet, so every such fork counts as major.
+
+The plan gate is released by the build README you landed, which authorizes the run. Every other owner
+gate stays `held` until your disposition record names its item, written as
+[the owner's disposition record](#the-owners-disposition-record) above shows with `--item` the gate's
+tag. While one is held, the unattended driver's `--close` refuses, naming each held item and how to
+hand the question to you. Under the defaults nothing new is held.
+
+- **List a build's breakpoints:** `python tools/loop/breakpoints.py list --build <slug>` runs at your <!-- usage: script:tools/loop/breakpoints.py#list 74c047ff -->
+  repository's top level and prints one line per breakpoint, in item order:
+  `breakpoint: <name> · <before|at|after> <item tag> · <reviewer|owner> · <cause>`, and for an owner
+  line ` · authorization`, ` · held` or ` · released <record> <word>`. `--spec-audit` lists Design's
+  opted-in audit, and `--delegated-fork` the owner item. The unattended driver's `--plan <slug>` prints
+  the same lines after its `frontier:` line. It exits 2 printing `breakpoints: refused` and why on a
+  value outside its key's set or an undeclared tag, and `breakpoints: unarmed` where the policy or
+  memory-tree kit is not installed.
+- **Read one stage:** `python tools/loop/breakpoints.py stage --stage <stage> --build <slug>` prints <!-- usage: script:tools/loop/breakpoints.py#stage 1a9b01b0 -->
+  `breakpoints: stage <stage> · <value> · <owed|opt-in|not-owed>`, read from the policy file at your
+  default branch's landed revision, or at `--rev <rev>`. The unattended driver's preflight reads
+  `design` this way to decide whether the build owes a spec audit.
+- **See it on a fixture:** `python tools/loop/breakpoints.py --fixture --plant <case>` runs one case in <!-- usage: script:tools/loop/breakpoints.py bd781c1c -->
+  a scratch repository: `values`, `placed`, `ratification`, `stage`, `driver-close`, `driver-optin` or
+  `driver-plan`. `--selftest` runs them all, and gov's own `loop breakpoint fixtures` gate runs them.
+
+The list does not fire a review: you, or the run, fire each review line through the driver's
+`--trigger` with its cause. A run may still move past an owner gate before its close, and anyone who
+can write a disposition record releases a gate.
+
 ## How much rework a build may do
 
 Every build has one rework budget, the policy key `flow.rework-budget`, and every repetition draws on

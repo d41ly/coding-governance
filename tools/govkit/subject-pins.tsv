@@ -85,6 +85,7 @@ lexicon wiring	repo	wiring
 line length	repo	product
 line-length gate selftest	kit	selftests
 loop adapt fixtures	kit	selftests
+loop breakpoint fixtures	kit	selftests
 loop budget fixtures	kit	selftests
 loop checklist tags	repo	declarations
 loop claims fixtures	kit	selftests

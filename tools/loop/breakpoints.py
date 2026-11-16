@@ -1,0 +1,475 @@
+#!/usr/bin/env python3
+"""breakpoints.py — a build's breakpoints at any item boundary: reviews and owner gates one list (TOOL-dDeclaredLoop-19).
+
+    python breakpoints.py list --build <slug> [--spec-audit] [--delegated-fork]
+    python breakpoints.py stage --stage <stage> --build <slug> [--rev <rev>]
+    python breakpoints.py --fixture --plant <case>
+    python breakpoints.py --selftest
+
+THE LIST. A breakpoint is a position at an item boundary, `before`, `at` or `after` an item tag, a
+disposer, a `reviewer` or the `owner`, and a cause. `derive_breakpoints` is the one rule that lists them:
+`review.<stage>`, per gov step in its order, places the stage's review of `STAGE_REVIEWS` under `owed`, and
+under `owed-above-tier` where some unit's spec header reads Tier-2; under `opt-in` it places Design's spec
+audit only where `--spec-audit` says the run pinned a dated opt-in, and nothing at the other four; `off`
+places nothing. `autonomy` places an owner gate at `item.plan.exit` under `plan-only`, its default; adds one
+at `item.design.exit` and one before `item.deploy.mandate` under `three-gates`; and adds one at each step's
+`exit` item under `every-stage`. Each member of `review.breakpoints`, read at the build's composition pin by
+`composition.py`'s `read_tag_policy`, places a reviewer `breakpoint` before it with cause `placement`. Under
+`decisions.major = "author-owner-ratifies"`, given `--delegated-fork`, the owner item sits at
+`item.build.ratify` with cause `ratification`. One position from two declarations is listed once, and the
+list is sorted by the position item's place among the composed rows, then before, at, after.
+
+THE RELEASE. An owner line's last field is its release: `authorization` for the plan gate, which the
+unattended driver's `check_authorization` verifies at the pinned BASE; `released <stem> <word>` where the
+owner's newest disposition record whose `Item` is the line's tag answers, read by `adapt.py`'s
+`read_disposition_release`; else `held`. `run.on-owner-question` is not read here.
+
+THE READS. `autonomy`, `decisions.major` and the five `review.<stage>` keys at the landed revision, or at
+`--rev`, through the policy kit's `resolve_read` over one `read_revision`, the kit found by
+`loop_parents.py`'s `read_policy_kit`; an unset `review.<stage>` reads the catalogue's derived default,
+`owed` for `build` and `opt-in` for the other four. The steps are `loop_lib.py`'s `read_steps`, the
+composed tags at the pin `loop_items.py`'s `read_composed_items`, and each unit's tier
+`loop_transition.py`'s `read_build_headers`.
+
+Exit: `list` prints one line per breakpoint and exits 0,
+
+    breakpoint: <name> · <before|at|after> <item tag> · <reviewer|owner> · <cause>[ · <release>]
+
+`stage` prints `breakpoints: stage <stage> · <value> · <owed|opt-in|not-owed>` and exits 0, `owed` under
+`owed` or under `owed-above-tier` where a unit reads Tier-2, `not-owed` under `off` or `owed-above-tier`
+with none, `opt-in` under `opt-in`. Both exit 2 printing `breakpoints: refused · <why>` on a policy refusal,
+a slug outside `[A-Za-z0-9_-]+`, a stage outside the five, a value outside its key's set or a position the
+composed rows do not declare, and `breakpoints: unarmed · <why>` where a kit does not resolve, never a
+default. `--fixture --plant <case>` builds a scratch repository under the host temp directory, runs the case
+and prints `held` or `MISSED`; `--selftest` runs every plant.
+
+WHAT THIS DOES NOT CHECK: a fork's class, since no fork record carries one, so every fork the agent
+resolved under delegation reads as major; whether the disposition record's writer is the owner; a review
+breakpoint firing, which is the main loop's `--trigger`.
+"""
+import argparse
+import contextlib
+import io
+import os
+import pathlib
+import re
+import subprocess
+import sys
+import tempfile
+
+sys.dont_write_bytecode = True
+KIT = pathlib.Path(__file__).absolute().parent
+if str(KIT) not in sys.path:
+    sys.path.insert(0, str(KIT))
+from adapt import read_disposition_release  # noqa: E402
+from composition import build_composition_base, read_step_composition, read_tag_policy  # noqa: E402
+from loop_items import read_composed_items  # noqa: E402
+from loop_lib import read_memory_tree, read_steps, resolve_kit_dir, run_selftest_cases  # noqa: E402
+from loop_parents import read_policy_kit  # noqa: E402
+from loop_transition import (FX_BUILD, FX_SPEC, FX_UNIT, read_build_headers, read_build_specs,  # noqa: E402
+                             read_transitions, write_transition_plant)
+from loop_witness import read_clean_env, remove_tree, resolve_bash, run_fixture_git, write_fixture_files  # noqa: E402
+
+SAY = "breakpoints"
+#: Which review each stage owns and where, the one typed fact (the flow-steps record).
+STAGE_REVIEWS = {"plan": ("breakpoint", "before", "item.plan.exit"),
+                 "design": ("spec audit", "after", "item.design.reason"),
+                 "build": ("closing review", "after", "item.build.recommend"),
+                 "test": ("gate review", "before", "item.test.exit"),
+                 "deploy": ("landing review", "before", "item.deploy.notify")}
+#: Each key's catalogued values; `review.<stage>`'s derived default, `owed` for Build, `opt-in` elsewhere.
+REVIEW_VALUES = ("off", "opt-in", "owed", "owed-above-tier")
+AUTONOMY_VALUES = ("plan-only", "three-gates", "every-stage")
+MAJOR_VALUES = ("author-rubric", "author-owner-ratifies", "owner-only")
+REVIEW_DEFAULTS = {"build": "owed"}
+PLAN_GATE = "item.plan.exit"
+RATIFY = "item.build.ratify"
+RELATIONS = ("before", "at", "after")
+SLUG = re.compile(r"[A-Za-z0-9_-]+")
+PLANTS = {"values": "no policy file, then autonomy three-gates and every-stage, then review.test owed",
+          "placed": "review.breakpoints naming item.build.unit-pass, then item.build.nothing",
+          "ratification": "decisions.major author-owner-ratifies with and without --delegated-fork, a disposition "
+                          "record of item.build.ratify, author-rubric, and the driver's plan_state delegated mode",
+          "stage": "review.design owed-above-tier over a Tier-2 and a Tier-1 spec, then no policy file",
+          "driver-close": "the driver's --close over a delegated fork under author-owner-ratifies, then the "
+                          "disposition record and the sourced check_owner_gates",
+          "driver-optin": "the sourced driver's check_authorization under review.design owed and off, then none",
+          "driver-plan": "the driver's --plan under autonomy three-gates, and --plan --paths"}
+
+
+# ------------------------------------------------------------------------------------------ the rule
+def derive_breakpoints(values, steps, tags, facts):
+    """`[{name, relation, position, disposer, cause, release}]`: the breakpoints `values`, `{key: value}`,
+    place over the gov `steps` and the composed `tags`, in composed order, given `facts`: `spec_audit` and
+    `delegated` true or false and `tiers` each unit's tier. An owner line's release is `authorization` at
+    the plan gate and `held` elsewhere. ValueError naming the key on a value outside its set, and on a
+    position `tags` lacks."""
+    for key, allowed in [("autonomy", AUTONOMY_VALUES), ("decisions.major", MAJOR_VALUES)] + [
+            ("review." + s, REVIEW_VALUES) for s in STAGE_REVIEWS]:
+        if values.get(key) not in allowed:
+            raise ValueError("%s is %r, none of %s" % (key, values.get(key), ", ".join(allowed)))
+    out = []
+
+    def write_line(name, relation, position, disposer, cause, why):
+        """One breakpoint appended, unless one at that position and disposer stands."""
+        if position not in tags:
+            raise ValueError("%s places %s %s, an item the composed rows do not declare" % (why, relation, position))
+        if any((b["relation"], b["position"], b["disposer"]) == (relation, position, disposer) for b in out):
+            return
+        release = "" if disposer == "reviewer" else "authorization" if position == PLAN_GATE else "held"
+        out.append({"name": name, "relation": relation, "position": position, "disposer": disposer,
+                    "cause": cause, "release": release})
+
+    tier2 = "2" in facts.get("tiers", ())
+    for step in steps:
+        stage = step["tag"].rsplit(".", 1)[-1]
+        if stage not in STAGE_REVIEWS:
+            continue
+        value, (name, relation, position) = values["review." + stage], STAGE_REVIEWS[stage]
+        if value == "owed" or (value == "owed-above-tier" and tier2):
+            write_line(name, relation, position, "reviewer", "owed", "review." + stage)
+        elif value == "opt-in" and stage == "design" and facts.get("spec_audit"):
+            write_line(name, relation, position, "reviewer", "opt-in", "review." + stage)
+    autonomy = values["autonomy"]
+    write_line("owner gate", "at", PLAN_GATE, "owner", "autonomy", "autonomy")
+    if autonomy in ("three-gates", "every-stage"):
+        write_line("owner gate", "at", "item.design.exit", "owner", "autonomy", "autonomy")
+        write_line("owner gate", "before", "item.deploy.mandate", "owner", "autonomy", "autonomy")
+    if autonomy == "every-stage":
+        for step in steps:
+            write_line("owner gate", "at", step["exit"], "owner", "autonomy", "autonomy")
+    for member in values.get("review.breakpoints") or ():
+        if member not in tags:
+            raise ValueError("review.breakpoints names %s, an item the composed rows at the build's pin do not "
+                             "declare" % member)
+        write_line("breakpoint", "before", member, "reviewer", "placement", "review.breakpoints")
+    if values["decisions.major"] == "author-owner-ratifies" and facts.get("delegated"):
+        write_line("owner item", "at", RATIFY, "owner", "ratification", "decisions.major")
+    order = {t: n for n, t in enumerate(tags)}
+    return sorted(out, key=lambda b: (order[b["position"]], RELATIONS.index(b["relation"])))
+
+
+def render_breakpoint_line(b):
+    """`breakpoint: <name> · <relation> <tag> · <disposer> · <cause>[ · <release>]`."""
+    return "breakpoint: %s · %s %s · %s · %s%s" % (b["name"], b["relation"], b["position"], b["disposer"],
+                                                   b["cause"], " · " + b["release"] if b["release"] else "")
+
+
+# ------------------------------------------------------------------------------------------ the reads
+def read_policy_values(root, rev=None):
+    """`{key: value}` of `autonomy`, `decisions.major` and the five `review.<stage>` keys at `rev`, else the
+    landed revision, over one policy read. ValueError on a refusal; LookupError where the kit does not resolve."""
+    policy, _guard = read_policy_kit()
+    try:
+        read = policy.read_revision(str(root), rev)
+    except policy.Refusal as e:
+        raise ValueError("the policy file does not read: %s" % e) from None
+
+    def read_value(key):
+        """One key's value over the read; a `review.<stage>` key's derived default where the file sets none."""
+        path = policy.parse_key(key)
+        try:
+            return policy.resolve_read(path, policy.read_catalogue_row(path, read["rows"]), read).value
+        except policy.DerivedDefault:
+            return REVIEW_DEFAULTS.get(key.rsplit(".", 1)[-1], "opt-in")
+        except policy.Refusal as e:
+            raise ValueError("%s does not resolve: %s" % (key, e)) from None
+
+    # Each key a string literal at its read, the policy kit's reader coverage counting no other shape.
+    return {"autonomy": read_value("autonomy"), "decisions.major": read_value("decisions.major"),
+            "review.plan": read_value("review.plan"), "review.design": read_value("review.design"),
+            "review.build": read_value("review.build"), "review.test": read_value("review.test"),
+            "review.deploy": read_value("review.deploy")}
+
+
+def check_slug(build):
+    """ValueError where `build` is outside the slug grammar, before it reaches a path."""
+    if not SLUG.fullmatch(build or ""):
+        raise ValueError("the build %r is outside [A-Za-z0-9_-]+" % build)
+
+
+def read_breakpoints(build, root, spec_audit=False, delegated=False):
+    """`derive_breakpoints` over `build`'s policy, steps, composed tags and tiers, each owner line's release
+    read: `released <stem> <word>` where the owner's disposition record of its tag answers."""
+    check_slug(build)
+    root = pathlib.Path(root).absolute()
+    values = read_policy_values(root)
+    values["review.breakpoints"] = read_tag_policy("review.breakpoints", root, build)
+    rev = read_step_composition(root, read_transitions(build, root))[0]
+    tags = [r.get("tag") for r in read_composed_items(root, rev)]
+    tiers = [tier for _uid, _status, tier in read_build_headers(build, root)]
+    out = derive_breakpoints(values, read_steps(KIT), tags,
+                             {"spec_audit": spec_audit, "delegated": delegated, "tiers": tiers})
+    for b in out:
+        if b["release"] == "held":
+            hit = read_disposition_release(root, build, b["position"], ())
+            if hit:
+                b["release"] = "released %s %s" % hit
+    return out
+
+
+def read_stage_review(build, root, stage, rev=None):
+    """`(value, answer)` of `review.<stage>` at `rev`, else the landed revision: `owed`, `not-owed` or
+    `opt-in`, `owed-above-tier` reading `owed` where a unit of `build` reads Tier-2."""
+    check_slug(build)
+    if stage not in STAGE_REVIEWS:
+        raise ValueError("--stage %s is none of %s" % (stage, ", ".join(STAGE_REVIEWS)))
+    value = read_policy_values(root, rev)["review." + stage]
+    if value not in REVIEW_VALUES:
+        raise ValueError("review.%s is %r, none of %s" % (stage, value, ", ".join(REVIEW_VALUES)))
+    if value == "owed-above-tier":
+        tiered = any(tier == "2" for _uid, _status, tier in read_build_headers(build, root))
+        return value, "owed" if tiered else "not-owed"
+    return value, {"owed": "owed", "off": "not-owed", "opt-in": "opt-in"}[value]
+
+
+
+
+# ------------------------------------------------------------------------------------------ the plants
+def run_sourced(repo, script):
+    """`(exit, output)` of `script` run by bash in `repo` after this tree's unattended driver is sourced;
+    LookupError where the driver or a bash to run it does not resolve."""
+    driver = resolve_kit_dir("unattended", "unattended.sh", KIT) / "unattended.sh"
+    bash = resolve_bash(driver)
+    if bash is None:
+        raise LookupError("no bash can run %s" % driver.as_posix())
+    env = {k: v for k, v in read_clean_env().items() if k not in ("GOV_POSITION_STATES", "GOV_DEFAULT_BRANCH")}
+    p = subprocess.run([bash, "-c", '. "$1" || exit 2; ' + script, "_", driver.as_posix()],
+                       cwd=str(repo), capture_output=True, text=True, encoding="utf-8", errors="replace", env=env,
+                       timeout=900)
+    return p.returncode, p.stdout + p.stderr
+
+
+def run_breakpoint_plant(case):
+    """One plant: its lines, then `breakpoints: fixture · <case> · held` or `MISSED <why>`; 0 held, 1 missed,
+    2 where a kit does not resolve."""
+    top = pathlib.Path(tempfile.mkdtemp(prefix="loop-breakpoints-")).absolute()
+    misses, here = [], os.getcwd()
+    try:
+        print("%s: fixture · plant %s · %s" % (SAY, case, PLANTS[case]))
+
+        def check(cond, why):
+            """A miss named where `cond` does not hold."""
+            if not cond:
+                misses.append(why)
+
+        def run_verb(repo, argv):
+            """`(exit, lines)` of this module's `main(argv)` run in process at `repo`, echoed."""
+            out = io.StringIO()
+            os.chdir(repo)
+            try:
+                with contextlib.redirect_stdout(out):
+                    rc = main(argv)
+            finally:
+                os.chdir(here)
+            lines = out.getvalue().splitlines()
+            print("%s: fixture · %s · exit %d · %s" % (SAY, " ".join(argv), rc, " / ".join(lines) or "nothing"))
+            return rc, lines
+
+        def write_policy(repo, text, message):
+            """The policy file `text`, removed where None, committed, and pushed where `repo` has a remote."""
+            path = pathlib.Path(repo, ".governance", "policy.toml")
+            if text is None:
+                path.unlink(missing_ok=True)
+            else:
+                write_fixture_files(repo, {".governance/policy.toml": text})
+            run_fixture_git(repo, "add", "-A")
+            run_fixture_git(repo, "commit", "-q", "--allow-empty", "-m", message)
+            if run_fixture_git(repo, "remote"):
+                run_fixture_git(repo, "push", "-q", "origin", "main")
+
+        def check_owner_lines(lines):
+            """A miss for each owner line ending in no release, and for an owner item not caused by ratification."""
+            for ln in lines:
+                if " · owner · " in ln and not re.search(r" · (authorization|held|released \S+ \S+)$", ln):
+                    misses.append("an owner line names no release: %s" % ln)
+                if ln.startswith("breakpoint: owner item ") and " · ratification · " not in ln:
+                    misses.append("the owner item's cause is not ratification: %s" % ln)
+
+        def write_disposition_record(repo, build, unit):
+            """The owner's committed disposition record of the owner item, `ratified`: its stem."""
+            read_memory_tree("build_records.py")
+            from build_records import write_disposition
+            rel = write_disposition(repo, build, unit, RATIFY, "ratified", "terminal")
+            run_fixture_git(repo, "add", "-A")
+            run_fixture_git(repo, "commit", "-q", "-m", "the owner's disposition")
+            return pathlib.PurePosixPath(rel).stem
+
+        plan = "breakpoint: owner gate · at item.plan.exit · owner · autonomy · authorization"
+        closing = "breakpoint: closing review · after item.build.recommend · reviewer · owed"
+        gate = "breakpoint: owner gate · %s %s · owner · autonomy · held"
+        owner = "breakpoint: owner item · at item.build.ratify · owner · ratification · "
+        listed = ["list", "--build", FX_BUILD]
+        if case in ("values", "ratification", "stage"):
+            write_transition_plant(top, "default")
+        if case == "values":   # AC1, AC7
+            three = [plan, gate % ("at", "item.design.exit"), closing, gate % ("before", "item.deploy.mandate")]
+            every = three[:3] + [gate % ("at", "item.build.exit"), gate % ("at", "item.test.exit"), three[3],
+                                 gate % ("at", "item.deploy.close")]
+            for policy, owed in ((None, [plan, closing]), ('autonomy = "three-gates"\n', three),
+                                 ('autonomy = "every-stage"\n', every),
+                                 ('[review]\ntest = "owed"\n',
+                                  [plan, closing, "breakpoint: gate review · before item.test.exit · reviewer · owed"])):
+                write_policy(top, policy, "the policy %r" % policy)
+                rc, lines = run_verb(top, listed)
+                check(rc == 0 and lines == owed, "under %r the list read %s" % (policy, lines))
+                check_owner_lines(lines)
+        elif case == "placed":   # AC2, over a tree holding this tree's kits, whose tag resolver reads a member
+            repo = build_composition_base()[0]
+            try:
+                write_policy(repo, '[review]\nbreakpoints = ["item.build.unit-pass"]\n', "placed")
+                rc, lines = run_verb(repo, listed)
+                check(rc == 0 and lines == [plan, "breakpoint: breakpoint · before item.build.unit-pass · reviewer · "
+                                                  "placement", closing], "the placed member read %s" % lines)
+                write_policy(repo, '[review]\nbreakpoints = ["item.build.nothing"]\n', "undeclared")
+                rc, lines = run_verb(repo, listed)
+                check(rc == 2 and len(lines) == 1 and lines[0].startswith("%s: refused · " % SAY)
+                      and "review.breakpoints" in lines[0] and "item.build.nothing" in lines[0],
+                      "the undeclared member read exit %d, %s" % (rc, lines))
+            finally:
+                remove_tree(repo)
+        elif case == "ratification":   # AC3, AC4, AC7
+            write_policy(top, '[decisions]\nmajor = "author-owner-ratifies"\n', "ratifies")
+            rc, lines = run_verb(top, listed + ["--delegated-fork"])
+            check(rc == 0 and owner + "held" in lines, "the delegated fork's list read %s" % lines)
+            check_owner_lines(lines)
+            rc, lines = run_verb(top, listed)
+            check(rc == 0 and not any("owner item" in ln for ln in lines), "with no delegated fork it read %s" % lines)
+            stem = write_disposition_record(top, FX_BUILD, FX_UNIT)
+            rc, lines = run_verb(top, listed + ["--delegated-fork"])
+            check(rc == 0 and owner + "released %s ratified" % stem in lines, "the released item read %s" % lines)
+            check_owner_lines(lines)
+            write_policy(top, '[decisions]\nmajor = "author-rubric"\n', "rubric")
+            rc, lines = run_verb(top, listed + ["--delegated-fork"])
+            check(rc == 0 and not any("owner item" in ln for ln in lines), "under author-rubric it read %s" % lines)
+            fork = "## 8. Open questions\n\n- **F1 — which way?** Options: (a) or (b). %s: (a).\n"
+            forks = {"delegated": "RESOLVED (agent, 2026-01-01, delegated)", "owner": "RESOLVED (owner, 2026-01-01)",
+                     "quoted": "`RESOLVED (agent, 2026-01-01, delegated)` quoted, RESOLVED (owner, 2026-01-01)"}
+            write_fixture_files(top, {"s/2026-01-01-spec-%s.md" % k: fork % v for k, v in forks.items()})
+            for name, owed in (("delegated", "DELEGATED"), ("owner", "NONE"), ("quoted", "NONE")):
+                for cutoff in ("", "2025-01-01"):
+                    rc, out = run_sourced(top, 'plan_state s/2026-01-01-spec-%s.md "%s" delegated' % (name, cutoff))
+                    print("%s: fixture · plan_state %s, cutoff %s · %s" % (SAY, name, cutoff or "none", out.strip()))
+                    check(out.strip() == owed, "plan_state over the %s fork, cutoff %r, read %r" % (name, cutoff, out))
+        elif case == "stage":   # AC6
+            header = "# %s — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01 · node a · Tier-%d\n"
+            for tier, owed in ((2, "owed"), (1, "not-owed")):
+                write_fixture_files(top, {FX_SPEC: header % (FX_UNIT, tier)})
+                write_policy(top, '[review]\ndesign = "owed-above-tier"\n', "Tier-%d" % tier)
+                rc, lines = run_verb(top, ["stage", "--stage", "design", "--build", FX_BUILD])
+                check(rc == 0 and lines == ["%s: stage design · owed-above-tier · %s" % (SAY, owed)],
+                      "over a Tier-%d spec it read %s" % (tier, lines))
+            write_policy(top, None, "no policy")
+            for stage, owed in (("design", "opt-in"), ("build", "owed")):
+                rc, lines = run_verb(top, ["stage", "--stage", stage, "--build", FX_BUILD])
+                check(rc == 0 and lines == ["%s: stage %s · %s · %s" % (SAY, stage, owed, owed)],
+                      "with no policy file %s read %s" % (stage, lines))
+            heads, specs = read_build_headers(FX_BUILD, top), read_build_specs(FX_BUILD, top)
+            print("%s: fixture · headers %s · specs %s" % (SAY, heads, specs))
+            check(heads == [(FX_UNIT, "INPROGRESS", "1")] and specs == [(FX_UNIT, "INPROGRESS")],
+                  "read_build_headers %s beside read_build_specs %s" % (heads, specs))
+        else:
+            from position import FX_IDS, FX_SLUG, run_driver, write_position_plant
+            root = next((d for d in (KIT, *KIT.parents) if (d / ".git").exists()), KIT)
+            repo = write_position_plant(top, "plan-line", root)[0]
+            with open(repo / ".unattended.conf", "a", encoding="utf-8", newline="\n") as fh:
+                fh.write('\nSPEC_TOKENS_CLI=""\nRUN_CLAIMS="off"\n')
+            if case == "driver-close":   # AC3
+                spec = repo / "memory" / "builds" / FX_SLUG / "spec" / ("2026-01-01-spec-%s.md" % FX_IDS[0])
+                text = spec.read_text(encoding="utf-8").replace(
+                    "## 8. Open questions\nnone\n", "## 8. Open questions\n- **F1 — which way?** Options: (a) or (b). "
+                                                    "RESOLVED (agent, 2026-01-01, delegated): (a).\n")
+                write_fixture_files(repo, {spec.relative_to(repo).as_posix(): text})
+                write_policy(repo, '[decisions]\nmajor = "author-owner-ratifies"\n', "a delegated fork the owner ratifies")
+                out, rc = run_driver(repo, "--close", FX_SLUG)
+                print("%s: fixture · --close · exit %d · %s" % (SAY, rc, out.strip().replace("\n", " / ")[:600]))
+                check(rc == 1 and "UNATTENDED check 82 FAILED" in out and RATIFY in out,
+                      "--close over the delegated fork was not refused naming %s" % RATIFY)
+                write_disposition_record(repo, FX_SLUG, FX_IDS[0])
+                rc, out = run_sourced(repo, "load_driver_conf && check_owner_gates %s" % FX_SLUG)
+                print("%s: fixture · check_owner_gates · exit %d · %s" % (SAY, rc, out.strip().replace("\n", " / ")))
+                check(rc == 0, "check_owner_gates after the disposition record exited %d" % rc)
+            elif case == "driver-optin":   # AC5
+                readme = repo / "memory" / "builds" / FX_SLUG / "README.md"
+                bare = readme.read_text(encoding="utf-8")
+                keyed = bare.replace("slug: %s\n" % FX_SLUG, "slug: %s\nspec-audit: 2026-01-01\n" % FX_SLUG, 1)
+                for policy, text, owed in (('[review]\ndesign = "owed"\n', bare, None),
+                                           ('[review]\ndesign = "off"\n', keyed, ("", "policy")),
+                                           (None, keyed, ("2026-01-01", "readme"))):
+                    write_fixture_files(repo, {readme.relative_to(repo).as_posix(): text})
+                    write_policy(repo, policy, "the opt-in under %r" % policy)
+                    owed = owed or (run_fixture_git(repo, "show", "-s", "--format=%cs", "HEAD"), "policy")
+                    rc, out = run_sourced(repo, 'load_driver_conf; check_authorization %s "$(git rev-parse HEAD)" >/dev/null; printf '
+                                                '"\\nauth=%%s from=%%s\\n" "$AUTH_SPEC_AUDIT" "$AUTH_SPEC_AUDIT_FROM"'
+                                                % FX_SLUG)
+                    said = out.strip().splitlines()[-1] if out.strip() else ""
+                    print("%s: fixture · check_authorization under %r · %s" % (SAY, policy, said))
+                    check(said == "auth=%s from=%s" % owed, "under %r it read %r, owed %s" % (policy, said, owed))
+            elif case == "driver-plan":   # AC8
+                write_policy(repo, 'autonomy = "three-gates"\n', "three gates")
+                out, rc = run_driver(repo, "--plan", FX_SLUG)
+                said = [ln.rstrip("\r") for ln in out.splitlines()]
+                print("%s: fixture · --plan · exit %d · %s" % (SAY, rc, " / ".join(said[-8:])))
+                at = next((n for n, ln in enumerate(said) if ln.startswith("frontier: ")), None)
+                _rc, lines = run_verb(repo, ["list", "--build", FX_SLUG])
+                check(rc == 0 and at is not None and said[at - 1].startswith("next: ") and said[at + 1:] == lines
+                      and len(lines) == 4, "--plan's lines after frontier: are not the list's four")
+                out, rc = run_driver(repo, "--plan", FX_SLUG, "--paths")
+                check(rc == 0 and "breakpoint: " not in out, "--plan --paths printed a breakpoint: line")
+    except LookupError as e:
+        print("%s: fixture · %s · unarmed: %s" % (SAY, case, e))
+        return 2
+    finally:
+        os.chdir(here)
+        remove_tree(top)
+    print("%s: fixture · %s · %s" % (SAY, case, "held" if not misses else "MISSED " + "; ".join(misses)))
+    return 0 if not misses else 1
+
+
+def run_selftest():
+    """Every plant, each held."""
+    cases = [(c, ["--fixture", "--plant", c], 0, "%s: fixture · %s · held" % (SAY, c), "") for c in PLANTS]
+    return run_selftest_cases(main, cases, "%s: selftest" % SAY)
+
+
+def main(argv):
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if argv == ["--selftest"]:
+        return run_selftest()
+    if len(argv) == 3 and argv[:2] == ["--fixture", "--plant"] and argv[2] in PLANTS:
+        return run_breakpoint_plant(argv[2])
+    root = pathlib.Path.cwd()
+    try:
+        if argv[:1] == ["list"]:
+            ap = argparse.ArgumentParser(prog="breakpoints.py list", description="a build's breakpoints, one per line")
+            ap.add_argument("--build", required=True)
+            ap.add_argument("--spec-audit", action="store_true")
+            ap.add_argument("--delegated-fork", action="store_true")
+            args = ap.parse_args(argv[1:])
+            for b in read_breakpoints(args.build, root, args.spec_audit, args.delegated_fork):
+                print(render_breakpoint_line(b))
+            return 0
+        if argv[:1] == ["stage"]:
+            ap = argparse.ArgumentParser(prog="breakpoints.py stage", description="one stage's review reading")
+            for flag in ("--stage", "--build"):
+                ap.add_argument(flag, required=True)
+            ap.add_argument("--rev")
+            args = ap.parse_args(argv[1:])
+            value, answer = read_stage_review(args.build, root, args.stage, args.rev)
+            print("%s: stage %s · %s · %s" % (SAY, args.stage, value, answer))
+            return 0
+    except LookupError as e:
+        print("%s: unarmed · %s" % (SAY, str(e).replace("\n", " ")))
+        return 2
+    except (ValueError, OSError) as e:
+        print("%s: refused · %s" % (SAY, str(e).replace("\n", " ")))
+        return 2
+    print("usage: python breakpoints.py list --build <slug> [--spec-audit] [--delegated-fork] | stage --stage <%s> "
+          "--build <slug> [--rev <rev>] | --fixture --plant <%s> | --selftest" % ("|".join(STAGE_REVIEWS), "|".join(PLANTS)),
+          file=sys.stderr)
+    return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

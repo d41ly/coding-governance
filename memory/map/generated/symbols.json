@@ -5703,6 +5703,11 @@
       "file": "tools/loop/scenario.py"
     },
     {
+      "id": "check_delegated_fork",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_derived",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -6943,6 +6948,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_owner_gates",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_owner_row",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -7956,6 +7966,11 @@
       "id": "check_slots_rendered",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "check_slug",
+      "kind": "function",
+      "file": "tools/loop/breakpoints.py"
     },
     {
       "id": "check_slug",
@@ -10056,6 +10071,11 @@
       "id": "derive_bounds",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "derive_breakpoints",
+      "kind": "function",
+      "file": "tools/loop/breakpoints.py"
     },
     {
       "id": "derive_budget_cut",
@@ -15250,6 +15270,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/loop/breakpoints.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/loop/budget.py"
     },
     {
@@ -17458,6 +17483,11 @@
       "file": "tools/memory-tree/design_lib.py"
     },
     {
+      "id": "print_breakpoint_lines",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "print_canon_posture",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -18738,6 +18768,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_breakpoints",
+      "kind": "function",
+      "file": "tools/loop/breakpoints.py"
+    },
+    {
       "id": "read_brief_cutoff",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -18781,6 +18816,11 @@
       "id": "read_budgets",
       "kind": "function",
       "file": "tools/gate-lint/fork-count.sh"
+    },
+    {
+      "id": "read_build_headers",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
     },
     {
       "id": "read_build_slug",
@@ -19381,6 +19421,11 @@
       "id": "read_design_keys",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
+    },
+    {
+      "id": "read_design_review",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "read_design_view",
@@ -21348,6 +21393,11 @@
       "file": "tools/playbook/policy_value.py"
     },
     {
+      "id": "read_policy_values",
+      "kind": "function",
+      "file": "tools/loop/breakpoints.py"
+    },
+    {
       "id": "read_population",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
@@ -22366,6 +22416,11 @@
       "id": "read_stage_parts",
       "kind": "function",
       "file": "tools/loop/stage_coverage.py"
+    },
+    {
+      "id": "read_stage_review",
+      "kind": "function",
+      "file": "tools/loop/breakpoints.py"
     },
     {
       "id": "read_staged_paths",
@@ -24221,6 +24276,11 @@
       "id": "render_bounds_line",
       "kind": "function",
       "file": "tools/loop/review_bounds.py"
+    },
+    {
+      "id": "render_breakpoint_line",
+      "kind": "function",
+      "file": "tools/loop/breakpoints.py"
     },
     {
       "id": "render_broad",
@@ -28233,6 +28293,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_breakpoint_plant",
+      "kind": "function",
+      "file": "tools/loop/breakpoints.py"
+    },
+    {
       "id": "run_budget_case",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -29523,6 +29588,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "run_loop_verb",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "run_main",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -30285,6 +30355,11 @@
     {
       "id": "run_selftest",
       "kind": "function",
+      "file": "tools/loop/breakpoints.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
       "file": "tools/loop/budget.py"
     },
     {
@@ -30466,6 +30541,11 @@
       "id": "run_slot_bar",
       "kind": "function",
       "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
+      "id": "run_sourced",
+      "kind": "function",
+      "file": "tools/loop/breakpoints.py"
     },
     {
       "id": "run_sp_bar",

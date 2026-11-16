@@ -2293,6 +2293,19 @@
     "stage": ["step.test"]
   },
   {
+    "name": "loop breakpoint fixtures",
+    "argv": [
+      "python",
+      "{prefix}/loop/breakpoints.py",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "enforces": ["principle.p7"],
+    "stage": ["step.test"]
+  },
+  {
     "name": "loop scenario fixtures",
     "argv": [
       "python",
