@@ -9,6 +9,7 @@
 | [2026-11-16-build-TOOL-aPiecewiseGrade-5-1-acceptance-ledger.md](../build/2026-11-16-build-TOOL-aPiecewiseGrade-5-1-acceptance-ledger.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aPiecewiseGrade-5-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-aPiecewiseGrade-5-1-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aPiecewiseGrade-5-review-brief.md](../prompts/2026-11-16-prompt-TOOL-aPiecewiseGrade-5-review-brief.md) | research | — |
+| [2026-11-16-review-TOOL-aPiecewiseGrade-5-diff-review-round2.md](../reviews/2026-11-16-review-TOOL-aPiecewiseGrade-5-diff-review-round2.md) | diff-review | TOOL-aPiecewiseGrade-6 |
 
 <!-- /gen:spec-records -->
 

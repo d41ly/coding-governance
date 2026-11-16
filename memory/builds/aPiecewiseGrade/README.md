@@ -65,7 +65,7 @@ ids TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-3 TOOL-aP
 | [TOOL-aPiecewiseGrade-6 — one per-slug lock in the sidecar holds a dispatch's spec-token state from the start half to the end of the read half](spec/2026-11-16-spec-TOOL-aPiecewiseGrade-6.md) | 5 | 2 | CLOSED | rev-2 | 2026-11-16 |
 <!-- /gen:build-units -->
 
-Records: 26 bound to this build, across 4 record folder(s).
+Records: 27 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

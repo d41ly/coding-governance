@@ -11,6 +11,7 @@
 | [2026-11-16-prompt-TOOL-aPiecewiseGrade-6-2-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-aPiecewiseGrade-6-2-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aPiecewiseGrade-6-forks-brief.md](../prompts/2026-11-16-prompt-TOOL-aPiecewiseGrade-6-forks-brief.md) | research | — |
 | [2026-11-16-prompt-TOOL-aPiecewiseGrade-6-review-brief.md](../prompts/2026-11-16-prompt-TOOL-aPiecewiseGrade-6-review-brief.md) | research | — |
+| [2026-11-16-review-TOOL-aPiecewiseGrade-5-diff-review-round2.md](../reviews/2026-11-16-review-TOOL-aPiecewiseGrade-5-diff-review-round2.md) | diff-review | TOOL-aPiecewiseGrade-5 |
 
 <!-- /gen:spec-records -->
 
