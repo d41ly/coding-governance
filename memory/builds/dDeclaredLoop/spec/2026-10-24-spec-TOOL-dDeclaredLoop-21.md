@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-21 — the review round bounds as policy keys: review.max-rounds, the design rounds and follow-ups, REVIEW_ROUNDS and RUNAWAY_CEILING retired
 
-**Status:** INPROGRESS · rev-6 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 26 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-7 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 26 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0106@90aa01b6 whole
 **Carries:** node:policy-key.review.follow-up
@@ -27,6 +27,7 @@
 | [2026-11-16-build-TOOL-dDeclaredLoop-21-3-builder-return.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-3-builder-return.md) | journal | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-21-deviation-214.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-deviation-214.md) | deviation | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-21-deviation-215.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-deviation-215.md) | deviation | — |
+| [2026-11-16-build-TOOL-dDeclaredLoop-21-deviation-216.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-deviation-216.md) | deviation | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-21-red-fix-39.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-red-fix-39.md) | red-fix | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-21-red-fix-42.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-red-fix-42.md) | red-fix | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 |
@@ -122,7 +123,21 @@ v2:1253-1255).
   the round-bound arms of `tools/unattended/check-unattended.test.sh` through its `write_rounds_line`,
   is re-pointed to a committed policy file setting `review.design.rounds = "fixed-count"` and
   `review.design.round-count` at the value, with `review.max-rounds` raised to the value where it
-  exceeds 3, as S7 maps an adopter's value, since S2 refuses a count above the ceiling. An arm that read
+  exceeds 3, as S7 maps an adopter's value, since S2 refuses a count above the ceiling. In the driver
+  suite that file is the landed one, because `review_bounds.py show` reads the clone's
+  `refs/remotes/origin/main` and every arm runs on branch `unit` (§8 F7). The default, `fixed-count` at 7
+  with `review.max-rounds` 7, is committed on the fixture's `main` in its base commit, before the push to
+  the bare ORIGIN (`tools/unattended/unattended.test.sh@8aae640b:596-617`), and each sub-fixture of that
+  suite whose arms run `--review` commits it on its own `main` before its own push. The one arm with a
+  value of its own, the spec bound of 1 (`tools/unattended/unattended.test.sh@8aae640b:8799-8832`), lands
+  it after its `bcopen` as a commit parented on `$BASE` whose policy file sets `review.design.rounds =
+  "one"` with `review.max-rounds` 7, and points only the clone's `refs/remotes/origin/main` at it,
+  putting that ref back to `$BASE` before the arm's closing `reset_tree`. The bare ORIGIN's `main`, the
+  tip `tools/unattended/unattended.sh#observe_anchor` reads through `ls-remote`, never moves, so the
+  merge-base `tools/unattended/unattended.sh#resolve_base` takes, the run's BASE, stays `$BASE`. The arms
+  at 9, 8 and 0 (`tools/unattended/unattended.test.sh@8aae640b:11123-11137`) assert the load-time
+  refusal this unit retires and go with it: a count equal to the ceiling is admitted (§4 "The bounds"),
+  and a count below 1 is the module's refusal, which the leg's plants observe. An arm that read
   the slug subject's `CEILING` at round 8 reads `BOUNDED` at that closing bound, as §4 "The bounds" says.
   The driver suite's default read (`tools/unattended/unattended.test.sh@8aae640b:11113-11119`) reads
   `review_bounds.py show` instead, the copied refusal of `tools/unattended/runlog-writer.test.sh`
@@ -142,7 +157,24 @@ v2:1253-1255).
   today (`tools/unattended/check-unattended.sh@f86fd49d:873-874`), and its awk arm
   (`tools/unattended/check-unattended.sh@f86fd49d:998`, compared at
   `tools/unattended/check-unattended.sh@f86fd49d:1071-1072`) compares each subject's rounds with that
-  subject's bound. Check 19's round-bound arm
+  subject's bound, the closing bound on the build slug and the spec bound on every other, its sentence
+  naming that bound and its key. It does so in a record first-committed on or after `ROUND_BOUND_CUTOFF`
+  or not yet committed, and grades the round count of no record first-committed before it (§8 F6).
+  `ROUND_BOUND_CUTOFF` is a driver constant declared after `FOLD_CUTOFF` and `SPEC_COUNTS_CUTOFF`
+  (`tools/unattended/unattended.sh@a47450e4:1175` and `tools/unattended/unattended.sh@a47450e4:1185`),
+  which no driver line reads, as none reads `FOLD_CUTOFF`; check 2 reads it by `core_of` beside
+  `FOLD_CUTOFF`'s read (`tools/unattended/check-unattended.sh@f86fd49d:776`). The date compared is
+  `rv_fc`, the record's first-commit date through `--follow`
+  (`tools/unattended/check-unattended.sh@f86fd49d:960`), passed to the awk, which tests it as it tests
+  `SPEC_COUNTS_CUTOFF`: an empty date, the in-flight record, grades. A cutoff that is no ISO date is
+  named into `rv_bad`, as `FOLD_CUTOFF`'s is (`tools/unattended/check-unattended.sh@f86fd49d:880-883`).
+  Its value is the day after the newest date
+  `git log --all --diff-filter=A --format=%cs -- ":(glob)memory/builds/*/RUN*.md"` prints at the pass,
+  PINNED in the constant's comment with that probe, by `FOLD_CUTOFF`'s idiom, strictly past the newest
+  record any branch can still write under the old contract
+  (`tools/unattended/unattended.sh@a47450e4:1171-1174`). A record a ref first-commits on or after it
+  before the landing reds check 2 at the merge, and the close moves the date past it, as `FOLD_CUTOFF`
+  was moved. Check 19's round-bound arm
   (`tools/unattended/check-unattended.sh@f86fd49d:3046-3068`), the owner-only round bound, is re-pointed
   and kept: `tools/unattended/check-unattended.sh#read_rounds_of`, called by
   `tools/unattended/check-unattended.sh#scan_round_writes` at each commit and each parent, reads the
@@ -243,6 +275,15 @@ reads the bound it prints, which AC4 and AC6 observe in the waived unattended su
 round's recorded counts are true, nor that an owner's raise was the owner's, which check 19 grades
 only over a run's own commits.
 
+Check 2 grades the round count of a record first-committed on or after `ROUND_BOUND_CUTOFF`, or not
+yet committed, against its subject's bound. A record first-committed before it, written under the
+retired backstop of 8, is graded by check 2's other clauses alone, the stalled-loop arm among them, and
+its round count by nothing: the driver of its day stopped it at 8, and the record is append-only. A
+pre-cutoff record a run still appends to after the landing has its rounds bounded by the driver's
+`review_state`, not by check 2. A graded record is read against the bounds the tree's landed policy
+file sets now, not those at its own BASE, so an owner lowering a bound reds a graded record that ran to
+the higher one; reading each record's BASE was §8 F6's option (b).
+
 ### Files touched (estimate)
 
 - `tools/loop/review_bounds.py` (new)
@@ -261,8 +302,9 @@ only over a run's own commits.
 - `help/loop.md`: the section of S10 and the two anchors
 - `help/upgrade-steps.md`: the step's section and its three anchors
 - `help/policy.md`: the example row
-- `tools/unattended/unattended.sh`
-- `tools/unattended/check-unattended.sh`
+- `tools/unattended/unattended.sh`: with the constant `ROUND_BOUND_CUTOFF` and its comment (S6, §8 F6)
+- `tools/unattended/check-unattended.sh`: with check 2's `ROUND_BOUND_CUTOFF` read and its cutoff in the
+  awk (S6, §8 F6)
 - `tools/unattended/kit.toml`
 - `tools/unattended/.unattended.conf.example`
 - `.unattended.conf`
@@ -276,7 +318,8 @@ only over a run's own commits.
   `tools/govkit/steps/fanout_cap.py`
 - `tools/unattended/unattended.test.sh`, `tools/unattended/check-unattended.test.sh`,
   `tools/unattended/resume-tick.test.sh`, `tools/unattended/runlog-writer.test.sh`,
-  `tools/unattended/pass-tree.test.sh`
+  `tools/unattended/pass-tree.test.sh`; in `tools/unattended/unattended.test.sh`, the fixture's policy
+  file committed on `main` before the ORIGIN push and the bound-1 arm's tracking-ref commit (S4, §8 F7)
 - `tools/workflows/tier2-review.test.sh`: dFairHearing-17's parity arm
 - `memory/map/features/loop.md`: the leg's claim
 - `memory/map/generated/symbols.json`, `memory/map/generated/MAP.md`, `memory/map/generated/CARDS.md`,
@@ -310,7 +353,12 @@ only over a run's own commits.
     missing-run-state 1 of 1, required-flag 11 of 11 and field-shape 36 of 37 PINNED; the new
     message spells none of its three patterns, so it holds no `requires --`.
   - The leg: `tools/unattended/check-unattended.sh` stays at 266 PINNED, its ceiling: S6 re-words
-    check 2's unreadable-ceiling `fail 2` in place and adds no branch to check 19.
+    check 2's unreadable-ceiling `fail 2` in place and adds no branch to check 19, and its
+    `ROUND_BOUND_CUTOFF` reading feeds `rv_bad`, whose one `fail 2`
+    (`tools/unattended/check-unattended.sh@f86fd49d:1267`) already stands, so it adds no `fail` site.
+  - After §8 F6 and F7 the counts are unchanged: `ROUND_BOUND_CUTOFF` is an assignment, and the
+    fixture's policy commits are suite lines, so the driver stays at 327 after the pass, the leg at 266
+    of 266, and the families at 1 of 1, 11 of 11 and 36 of 37.
   - TOOL-dDeclaredLoop-30's raise by two then starts from 327, as the decision row records.
 - `memory/guides/BUILD-METHOD.md` measures 30709 bytes against its 30720 cap in
   `tools/template-size-limits.txt`, 11 spare. S4's M4 rewording is exactly two substitutions, in the
@@ -391,8 +439,12 @@ only over a run's own commits.
 - **AC6** — When `bash tools/unattended/check-unattended.sh` runs in a scratch repository whose run's
   own commit raises `review.design.round-count` in the policy file, it fails check 19 naming the
   commit; and with `review_bounds.py` absent from the scratch tree it fails check 2 naming the unread
-  ceiling.
-  Red when: check 19 still reads `.unattended.conf`, so the raise in the policy file passes.
+  ceiling. In a scratch repository holding a record committed under `GIT_COMMITTER_DATE` before
+  `ROUND_BOUND_CUTOFF` whose spec subject records 4 review rounds, check 2 names no round count for it;
+  the same rows in an uncommitted record, whose empty first-commit date grades, fail check 2 naming the
+  subject, its 4 rounds and its spec bound of 1.
+  Red when: check 19 still reads `.unattended.conf`, so the raise in the policy file passes; or check 2
+  compares every record with its subject's bound, so the pre-cutoff record reds.
 - **AC7** — When `python review_rounds.py up` runs over three scratch targets whose conf holds
   `REVIEW_ROUNDS="1"`, `"2"` and `"5"`, the first gains no policy key, the second gains
   `review.design.rounds = "fixed-count"` and `review.design.round-count = 2`, the third those with 5
@@ -461,6 +513,39 @@ New arm: tools/unattended/unattended.test.sh and tools/unattended/check-unattend
   follow-up; the row `TOOL-dDeclaredLoop-21` in `memory/DECISIONS.md` landed ahead of the pass, and
   §4 "Budgets and records" states the raise, its token, comment line and positional row.
   widens: none · relaxes: none
+- **F6 — How does check 2 grade a record written under the retired backstop of 8?** Check 2 reads
+  every tracked `RUN*.md`, and its one `fail 2` takes every subject past its limit. The third builder
+  return measured, with check 2's own subject split over the tracked records at `c28d4e5f`, 69 subjects
+  over their subject's bound after this unit and 4 over `review.max-rounds` alone, all in append-only
+  records no verb rewrites, so the `unattended kit gate` would red at the close. Options: (a) grandfather
+  by the record's first-commit date, `rv_fc` (`tools/unattended/check-unattended.sh@f86fd49d:960`), the
+  idiom check 2 applies to `FOLD_CUTOFF` and `SPEC_COUNTS_CUTOFF`, with a new driver constant
+  `ROUND_BOUND_CUTOFF`; (b) read each record's bound at its own BASE, as
+  `tools/unattended/lib-unattended.sh#read_fold_cutoff` does, a
+  record before the keys reading the retired 8: a python start per record, a record naming no base
+  unreadable, and a BASE with no policy file reads the catalogue's 3, so it still needs (a)'s date for
+  the 4; (c) keep a named historical backstop of 8 for the corpus and compare per-subject bounds only on
+  the uncommitted in-flight record, which grades a run's record by its bound only until its first commit
+  and keeps 8 as a value no driver reads. Recommendation: (a). RESOLVED (agent, 2026-11-16, delegated):
+  (a), by M3's ratify rule: no option trips a veto, and (a) grades every record begun after the landing
+  by its subject's bound, which (c) gives up at a record's first commit, with none of (b)'s unreadable
+  bases; it reuses the seam check 2 already applies to two cutoffs. S6 states the constant's home, value
+  and reading; §4 "What this does not check" and AC6 state how a pre-cutoff record is graded.
+  widens: none · relaxes: check 2's round count over a record first-committed before `ROUND_BOUND_CUTOFF`, which the retired 8 graded
+- **F7 — How does the driver suite's per-arm round bound reach `review_bounds.py show`, which reads the
+  landed revision?** With no `--rev`, `show` reads `refs/remotes/<remote>/<branch>` through
+  `tools/policy/policy.py#resolve` and `tools/policy/policy.py#derive_landed_revision`. The suite pushes
+  `main` to its bare ORIGIN once (`tools/unattended/unattended.test.sh@8aae640b:617`) and every arm
+  works on branch `unit`, so a policy file an arm commits there is never read, and the arms would run at
+  the catalogue defaults (third builder return). Options: (a) seed the default `fixed-count` 7 and
+  `review.max-rounds` 7 policy on the fixture's `main` before the ORIGIN push, a per-arm value landing
+  without moving the anchor; (b) the driver calls `show --rev HEAD`, a change to §4 "How the shell reads
+  it". Recommendation: (a). RESOLVED (agent, 2026-11-16, delegated): (a), by M3's ratify rule: (b) is
+  discarded by veto 3, since a bound read at HEAD lets a run's own commit loosen the bound it runs
+  under, a write surface the landed read keeps the owner's; (a) keeps §4's reader and leaves no
+  follow-up. S4 states the seed and how the one per-arm value, the bound of 1, lands on the clone's
+  tracking ref while the advertised anchor stays.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -498,6 +583,13 @@ New arm: tools/unattended/unattended.test.sh and tools/unattended/check-unattend
   with the conf token, its comment line and its positional row in Files touched, and the M4 rewording
   worded to fit the 11 bytes `BUILD-METHOD.md` has left; §7's line gains `transition-audit arms` and
   `straggler-guard arms`, the legs whose guard holds `.memory-tree.conf`.
+- rev-7 · 2026-11-16 · S4 · S6 · §4 What this does not check · §4 Budgets and records · §4 Files touched ·
+  AC6 · F6 · F7 · §10 · the divergence of the third builder return,
+  build/2026-11-16-build-TOOL-dDeclaredLoop-21-3-builder-return.md, re-grounded at `c28d4e5f`: check 2
+  grades a record's round count from `ROUND_BOUND_CUTOFF` by its first-commit date and a pre-cutoff
+  record's by nothing; the driver suite's default policy is committed on the fixture's `main` before
+  the ORIGIN push, the bound-1 arm landing its value on the tracking ref alone, and the 9, 8 and 0
+  arms going with the retired refusal; the census and families unchanged.
 
 ## 10. Reuse audit
 
@@ -505,7 +597,10 @@ The seams extended are the driver's round predicate `tools/unattended/unattended
 its caller `tools/unattended/unattended.sh#verb_review`, the leg's ceiling read (`core_of` at
 `tools/unattended/check-unattended.sh@f86fd49d:765`) and check 19's
 `tools/unattended/check-unattended.sh#read_rounds_of`, and dSafePassage-1's step kind with its first
-conf-to-policy program, `tools/govkit/steps/fanout_cap.py`, whose shared part S8 extracts.
+conf-to-policy program, `tools/govkit/steps/fanout_cap.py`, whose shared part S8 extracts. At rev-7
+check 2's first-commit cutoff idiom, `rv_fc` with `FOLD_CUTOFF` and `SPEC_COUNTS_CUTOFF`, is the seam
+`ROUND_BOUND_CUTOFF` extends, and the driver suite's base commit before its ORIGIN push is the seam the
+fixture's policy file joins.
 `python tools/codebase-map/reuse_lookup.py "move a conf round bound into a policy key with an upgrade step"`
 ranked name stems (`key`, `load_conf`, `parse_conf`, `step` in `tools/govkit/govkit.py`) and found no
 upgrade-step code at base. At rev-5's re-grounding, `131629c6`, the step kind is built:
