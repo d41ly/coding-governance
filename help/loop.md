@@ -1520,8 +1520,9 @@ instead of reading as an ordinary hold; a build with no held gate prints no such
   `design` this way to decide whether the build owes a spec audit.
 - **See it on a fixture:** `python tools/loop/breakpoints.py --fixture --plant <case>` runs one case in <!-- usage: script:tools/loop/breakpoints.py bd781c1c -->
   a scratch repository: `values`, `placed`, `ratification`, `stage`, `driver-close`, `driver-optin`,
-  `driver-plan`, `pre-placement`, `driver-pre-placement`, `pre-placement-records-root`, `unattended-root`
-  or `confs-disagree`. `--selftest` runs them all, and gov's own `loop breakpoint fixtures` gate runs them.
+  `driver-plan`, `pre-placement`, `driver-pre-placement`, `pre-placement-records-root`, `unattended-root`,
+  `confs-disagree` or `no-own-conf-read`, the one that reads the module's own file and no scratch
+  repository, naming each conf name or conf reader call in its code. `--selftest` runs them all, and gov's own `loop breakpoint fixtures` gate runs them.
 
 The list does not fire a review: you, or the run, fire each review line through the driver's
 `--trigger` with its cause. A run may still move past an owner gate before its close, and anyone who

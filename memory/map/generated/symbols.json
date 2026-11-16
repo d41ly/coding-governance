@@ -10378,6 +10378,11 @@
       "file": "tools/playbook/tag_index.py"
     },
     {
+      "id": "derive_conf_reads",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "derive_conf_rel",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -26941,6 +26946,11 @@
       "id": "resolve_memory_root",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
+    },
+    {
+      "id": "resolve_memory_root_source",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "resolve_model_sources",

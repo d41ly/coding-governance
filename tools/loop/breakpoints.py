@@ -70,7 +70,8 @@ if str(KIT) not in sys.path:
 from adapt import read_disposition_release  # noqa: E402
 from composition import build_composition_base, read_step_composition, read_tag_policy  # noqa: E402
 from loop_items import read_composed_items  # noqa: E402
-from loop_lib import read_memory_tree, read_steps, resolve_kit_dir, resolve_memory_root, run_selftest_cases  # noqa: E402
+from loop_lib import (derive_conf_reads, read_memory_tree, read_steps, resolve_kit_dir,  # noqa: E402
+                      resolve_memory_root, run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_transition import (FX_BUILD, FX_SPEC, FX_UNIT, read_build_headers, read_build_specs,  # noqa: E402
                              read_transitions, write_transition_plant)
@@ -116,7 +117,9 @@ PLANTS = {"values": "no policy file, then autonomy three-gates and every-stage, 
                                         "own module, then tWrong again with no policy file",
           "unattended-root": "the same history under .unattended.conf's MEMORY_ROOT=records and a memory tree's conf "
                              "naming none, build tRec opened under records/builds/, listed by the scratch's own module",
-          "confs-disagree": ".unattended.conf naming MEMORY_ROOT=records beside the memory tree's memory, then the list"}
+          "confs-disagree": ".unattended.conf naming MEMORY_ROOT=records beside the memory tree's memory, then the list",
+          "no-own-conf-read": "this module's own file graded on its syntax tree for a reader call or a conf name, "
+                              "no scratch repository"}
 
 
 # ------------------------------------------------------------------------------------------ the rule
@@ -451,6 +454,16 @@ def run_breakpoint_plant(case):
             owed = ("%s: refused · records root: .unattended.conf says records, .memory-tree.conf says memory — the "
                     "driver writes under records" % SAY)
             check(rc == 2 and lines == [owed], "the list read exit %d, %s" % (rc, lines))
+        elif case == "no-own-conf-read":   # TOOL-dDeclaredLoop-76 AC1: this module's own file, no scratch tree
+            own = pathlib.Path(__file__)
+            try:
+                hits = derive_conf_reads(own)
+            except SyntaxError as e:
+                hits = []
+                check(False, "%s does not parse: %s" % (own.name, e))
+            for line, kind in hits:
+                print("%s: fixture · conf read · %s:%d %s" % (SAY, own.name, line, kind))
+            check(not hits, "%d conf read(s) in %s" % (len(hits), own.name))
         elif case in ("pre-placement", "driver-pre-placement", "pre-placement-records-root", "unattended-root"):
             # TOOL-dDeclaredLoop-53 AC1 to AC4; TOOL-dDeclaredLoop-64 AC1 to AC3 under the records root;
             # TOOL-dDeclaredLoop-72 AC2 under the root the driver's conf names

@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-76 — the loop readers' no-own-conf-read rule is graded on the syntax tree, and the root's source is a value
 
-**Status:** INPROGRESS · rev-6 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 37 · advances TOOL-dDeclaredLoop-35
+**Status:** CLOSED · rev-6 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 37 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,8 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-76-deviation-761.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-76-deviation-761.md) | deviation | — |
 | [2026-10-24-build-TOOL-dDeclaredLoop-76-deviation-762.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-76-deviation-762.md) | deviation | — |
 | [2026-10-24-build-TOOL-dDeclaredLoop-76-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-76-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 |
+| [2026-11-17-build-TOOL-dDeclaredLoop-76-1-acceptance-ledger.md](../build/2026-11-17-build-TOOL-dDeclaredLoop-76-1-acceptance-ledger.md) | journal | — |
+| [2026-11-17-build-TOOL-dDeclaredLoop-76-deviation-763.md](../build/2026-11-17-build-TOOL-dDeclaredLoop-76-deviation-763.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-76-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-76-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-76-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-76-1-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-76-reground-brief.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-76-reground-brief.md) | research | — |

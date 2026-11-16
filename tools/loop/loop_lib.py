@@ -708,19 +708,21 @@ def read_driver_conf(tree, names):
 DRIVER_ROOTS = {}
 
 
-def resolve_memory_root(tree):
-    """The root a build's records sit under in `tree`: the `MEMORY_ROOT` the driver's `.unattended.conf`
-    sets, read through `read_driver_conf`, `memory` where it leaves the key unset, wherever that conf is a
-    file; else the `MEMORY_ROOT` of `.memory-tree.conf`, or `memory`. Each value stripped of whitespace
-    and slashes, a blank one unset. ValueError `records root:` where both confs name a root and the two
-    differ; LookupError where the memory-tree kit does not resolve (TOOL-dDeclaredLoop-72). The kit's
-    `read_design_conf` is imported inside the function, as `read_builds_dir` imports it."""
+def resolve_memory_root_source(tree):
+    """`(root, source)`: the root a build's records sit under in `tree` and the conf it came from. The
+    `MEMORY_ROOT` the driver's `.unattended.conf` sets, read through `read_driver_conf`, `memory` where it
+    leaves the key unset, wherever that conf is a file, source `.unattended.conf`; else the `MEMORY_ROOT`
+    of `.memory-tree.conf`, source `.memory-tree.conf`; else `memory`, source `default`. Each value
+    stripped of whitespace and slashes, a blank one unset. ValueError `records root:` where both confs
+    name a root and the two differ; LookupError where the memory-tree kit does not resolve
+    (TOOL-dDeclaredLoop-72, TOOL-dDeclaredLoop-76). The kit's `read_design_conf` is imported inside the
+    function, as `read_builds_dir` imports it."""
     read_memory_tree("design_lib.py")
     from design_lib import read_design_conf
     mt = (read_design_conf(tree).get("MEMORY_ROOT") or "").strip().strip("/")
     conf = pathlib.Path(tree).resolve() / ".unattended.conf"
     if not conf.is_file():
-        return mt or "memory"
+        return (mt, ".memory-tree.conf") if mt else ("memory", "default")
     key = (str(conf), conf.read_bytes())
     if key not in DRIVER_ROOTS:
         # ponytail: read_driver_conf holds its answer per conf path, so a conf rewritten in this process is
@@ -733,7 +735,39 @@ def resolve_memory_root(tree):
     if mt and mt != ua:
         raise ValueError("records root: .unattended.conf says %s, .memory-tree.conf says %s — the driver writes "
                          "under %s" % (ua, mt, ua))
-    return ua
+    return ua, ".unattended.conf"
+
+
+def resolve_memory_root(tree):
+    """The root of `resolve_memory_root_source`'s pair: the one reader every loop module takes the root from."""
+    return resolve_memory_root_source(tree)[0]
+
+
+def derive_conf_reads(path):
+    """`[(line, kind)]` sorted by line, one per conf read in the module at `path`, graded on its syntax
+    tree: kind `reader call` for a call whose callee, a name or an attribute, is `read_design_conf`,
+    `read_driver_conf` or `parse_conf`; kind `conf name` for a string constant ending `.memory-tree.conf`
+    or `.unattended.conf`, an f-string's literal part included, that is not the docstring of the module,
+    a class, a function or an `async def`. A comment is not in the tree. SyntaxError where the module
+    does not parse (TOOL-dDeclaredLoop-76)."""
+    import ast
+    tree = ast.parse(pathlib.Path(path).read_text(encoding="utf-8"), str(path))
+    # ponytail: gen_build_index.py's scan_glob_readers builds the same set; one copy once 82 S8 shares it
+    docs = {id(node.body[0].value) for node in ast.walk(tree)
+            if isinstance(node, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+            and node.body and isinstance(node.body[0], ast.Expr)
+            and isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str)}
+    hits = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            callee = node.func
+            name = callee.id if isinstance(callee, ast.Name) else getattr(callee, "attr", None)
+            if name in ("read_design_conf", "read_driver_conf", "parse_conf"):
+                hits.append((node.lineno, "reader call"))
+        elif isinstance(node, ast.Constant) and isinstance(node.value, str) \
+                and node.value.endswith((".memory-tree.conf", ".unattended.conf")) and id(node) not in docs:
+            hits.append((node.lineno, "conf name"))
+    return sorted(hits)
 
 
 def read_actor_rows(kit_dir):

@@ -187,7 +187,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-72 — the loop kit reads the records root the driver reads, and refuses two confs that disagree](spec/2026-10-24-spec-TOOL-dDeclaredLoop-72.md) | 36 | 2 | CLOSED | rev-6 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-65 — the remote's freshness is the time of the last fetch, read from what a fetch and a clone write](spec/2026-10-24-spec-TOOL-dDeclaredLoop-65.md) | 37 | 2 | CLOSED | rev-3 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-68 — the witness normaliser has one owner, the run-gates program, before unit 67 reads it](spec/2026-10-24-spec-TOOL-dDeclaredLoop-68.md) | 37 | 2 | INPROGRESS | rev-3 | 2026-11-17 |
-| [TOOL-dDeclaredLoop-76 — the loop readers' no-own-conf-read rule is graded on the syntax tree, and the root's source is a value](spec/2026-10-24-spec-TOOL-dDeclaredLoop-76.md) | 37 | 2 | INPROGRESS | rev-6 | 2026-11-17 |
+| [TOOL-dDeclaredLoop-76 — the loop readers' no-own-conf-read rule is graded on the syntax tree, and the root's source is a value](spec/2026-10-24-spec-TOOL-dDeclaredLoop-76.md) | 37 | 2 | CLOSED | rev-6 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-66 — the build-order region derives `Parallel` from the group's write sets and edges, never from a shared order alone](spec/2026-10-24-spec-TOOL-dDeclaredLoop-66.md) | 38 | 2 | DEFERRED | rev-4 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-67 — the round-2 spec audit's 54 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-67.md) | 38 | 2 | DEFERRED | rev-4 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-74 — a FETCH_HEAD counts as a fetch only when it holds the default branch of the resolved remote](spec/2026-10-24-spec-TOOL-dDeclaredLoop-74.md) | 38 | 2 | DEFERRED | rev-3 | 2026-11-16 |
@@ -213,7 +213,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 792 bound to this build, across 4 record folder(s).
+Records: 794 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

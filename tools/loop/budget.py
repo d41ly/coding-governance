@@ -102,7 +102,8 @@ KIT = pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from adapt import read_disposition_release, read_run_file  # noqa: E402
-from loop_lib import read_memory_tree, resolve_memory_root, run_selftest_cases  # noqa: E402
+from loop_lib import (derive_conf_reads, read_memory_tree, resolve_memory_root,  # noqa: E402
+                      resolve_memory_root_source, run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_transition import (BUDGET_FIELDS, FX_BUILD, FX_SPEC, FX_UNIT, VALUE,  # noqa: E402
                              check_transition_channels, read_build_specs, read_build_unit_ids,
@@ -167,7 +168,11 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
                               "open: the rounds, the dispatches and the budget-exhausted abort",
           "unattended-root": "the build moved under records, .unattended.conf naming MEMORY_ROOT=records and the "
                              "memory tree's conf none, two draws",
-          "confs-disagree": ".unattended.conf naming MEMORY_ROOT=records beside the memory tree's memory, one draw"}
+          "confs-disagree": ".unattended.conf naming MEMORY_ROOT=records beside the memory tree's memory, one draw",
+          "no-own-conf-read": "this module's own file graded on its syntax tree for a reader call or a conf name, "
+                              "no scratch repository",
+          "root-source": "MEMORY_ROOT=records in .unattended.conf, then in .memory-tree.conf, then neither, each "
+                         "folder's root and the conf it came from"}
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
 PLANT_TRAILER = '[transitions]\nrecord = ["trailer"]\n'
 PLANT_SPEC = "# TOOL-%s-%d — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n"
@@ -682,6 +687,30 @@ def run_budget_plant(case):
                 rc, out = run_verb(["value"], repo)
                 check(owed in out and rc == (2 if owed == BUDGET_KEY else 0), "value %s read %r, exit %d" % (
                     value, out.strip(), rc))
+        elif case == "no-own-conf-read":   # TOOL-dDeclaredLoop-76 AC1: this module's own file, no scratch tree
+            own = pathlib.Path(__file__)
+            try:
+                hits = derive_conf_reads(own)
+            except SyntaxError as e:
+                hits = []
+                check(False, "%s does not parse: %s" % (own.name, e))
+            for line, kind in hits:
+                print("%s: fixture · conf read · %s:%d %s" % (SAY, own.name, line, kind))
+            check(not hits, "%d conf read(s) in %s" % (len(hits), own.name))
+        elif case == "root-source":   # TOOL-dDeclaredLoop-76 AC3: each root paired with the conf it came from
+            for name, confs, owed in (("driver", {".unattended.conf": "MEMORY_ROOT=records\n"}, ("records", ".unattended.conf")),
+                                      ("tree", {".memory-tree.conf": "MEMORY_ROOT=records\n"}, ("records", ".memory-tree.conf")),
+                                      ("neither", {}, ("memory", "default"))):
+                folder = top / name
+                folder.mkdir()
+                run_fixture_git(folder, "init", "-q", "--template=", "-b", "main")
+                write_fixture_files(folder, confs)
+                try:
+                    got = (resolve_memory_root_source(folder), resolve_memory_root(folder))
+                except ValueError as e:   # a read_driver_conf refusal, a LoopError, is a ValueError
+                    got = ("refused", str(e))
+                print("%s: fixture · root-source · %s · %s · %s" % (SAY, name, got[0], got[1]))
+                check(got == (owed, owed[0]), "%s answered %s, owed %s" % (name, got, owed))
         else:
             write_budget_plant(top, case)
         draw = ["draw", "--build", FX_BUILD, "--cause", "fix-pass", "--item"]
