@@ -1,6 +1,6 @@
 # TOOL-aPiecewiseGrade-5 — the spec-token checker's 24 per-spec counter names live in one tuple, and a mismatch is loud or a miss, never a silent 0
 
-**Status:** SPECCED · rev-1 · 2026-11-16 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 5
+**Status:** INPROGRESS · rev-1 · 2026-11-16 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
