@@ -27,7 +27,8 @@ gotcha-classes = ["reflowed-prompt-string-reads-as-a-deleted-stop.md", "text-mod
   "destructive-step-before-its-precondition.md", "line-count-reads-empty-capture-as-one.md",
   "guard-fed-the-value-it-supersedes.md", "witness-graded-against-a-fact-written-after-it.md",
   "porcelain-diff-names-a-rename-by-its-destination.md", "a-helper-extraction-blinds-a-per-function-rule.md",
-  "agent-output-interpolated-into-an-instruction.md", "fixed-base-assumes-one-commit-per-pass.md"]
+  "agent-output-interpolated-into-an-instruction.md", "fixed-base-assumes-one-commit-per-pass.md",
+  "refusal-branch-with-no-arm.md"]
 guides = ["UNATTENDED-PROTOCOL.md", "UNATTENDED-VERBS.md", "UNATTENDED-STOPS.md", "UNATTENDED-ASKS.md"]
 backlog-shards = []
 lexicon-verbs = []
@@ -81,7 +82,7 @@ the stated boundary and the ask mandate are `unattended-mandate`.
 
 **Nothing in a script can reach the scheduler.** The job the agent schedules there is the IDLE-WAKE:
 it fires only while the session is idle, so it cannot wake a stalled one; its prompt runs
-`--resume --keepalive-id`, then `--audit`, the unit stall probe. What wakes a run is the keepalive —
+`--wake`, and on `FULL` `--resume --keepalive-id` and `--audit`, the unit stall probe. What wakes a run is the keepalive —
 the stop-guard at turn end, the stall-recorder at error end, the resume tick from the OS scheduler —
 three actors outside the session, reading one predicate, `--liveness`, whose clock counts a bar
 queued at the turnstile by the runner's heartbeat (`TOOL-dDerivedDocket-64`) and a session waiting

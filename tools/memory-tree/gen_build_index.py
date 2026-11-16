@@ -74,6 +74,7 @@ from __future__ import annotations
 import ast
 import contextlib
 import datetime
+import fnmatch
 import hashlib
 import importlib.util
 import io
@@ -81,6 +82,7 @@ import itertools
 import json
 import os
 import pathlib
+import posixpath
 import re
 import shlex
 import shutil
@@ -296,9 +298,16 @@ def read_text_or_none(path: str) -> tuple[str | None, str]:
 def write_text(path: str, text: str) -> None:
     # BYTES, never write_text(): on Windows the text mode would re-expand \n to \r\n and the very
     # next --check would report the file this call just wrote as stale.
+    # TOOL-aLightenedLoop-1 S1: bytes already on disk are left alone, so an unchanged artifact keeps
+    # its mtime and git's stat cache stays valid for the render key's diff (S2).
+    data = text.encode("utf-8")
+    if os.path.isfile(path):
+        with open(path, "rb") as fh:
+            if fh.read() == data:
+                return
     os.makedirs(os.path.dirname(path), exist_ok=True) if os.path.dirname(path) else None
     with open(path, "wb") as fh:
-        fh.write(text.encode("utf-8"))
+        fh.write(data)
 
 
 # TOOL-dDerivedDocket-6 -- the backlog grammar, the two status-header verbs and the status fold. The
@@ -1089,17 +1098,31 @@ def check_staged_render(root: str, conf: dict, here: str | None = None) -> tuple
     except (OSError, subprocess.CalledProcessError) as exc:
         return True, f"git could not list the staged set ({exc})"
     fields = out.decode("utf-8", "surrogateescape").split("\0")
-    modified = []
+    # TOOL-aLightenedLoop-1 S3 — a modified record under a build's `build/` folder is ADMITTED: it is
+    # structural as before, but renders only when its binding head or its cited ids move. Never a
+    # deviation record, whose body the as-built view reads, and never a file in a folder a DESIGN_*
+    # key names, whose siblings the view, the design record or the nodes deriver read. `first` is the
+    # reason today's loop returned first, so a render still owed prints today's reason byte for byte.
+    design_dirs = {posixpath.dirname(str(conf.get(k) or "").strip())
+                   for k in ("DESIGN_RECORD", "DESIGN_VIEW", "DESIGN_NODES") if str(conf.get(k) or "").strip()}
+    pre = f"{m}/builds/"
+    modified, admitted, first = [], set(), None
     for k in range(0, len(fields) - 1, 2):
         st, rel = fields[k], fields[k + 1]
         if llu and not (rel.startswith(m + "/") or rel == ".memory-tree.conf"
                         or (kit and rel.startswith(kit + "/"))):
-            return True, (f"{rel} is staged outside the memory root while LIVE_LANDED_UNCLOSED is on, "
-                          f"and the Landed-unclosed column reads tracked product source")
+            return True, first or (f"{rel} is staged outside the memory root while LIVE_LANDED_UNCLOSED is on, "
+                                   f"and the Landed-unclosed column reads tracked product source")
         if not st.startswith("M"):
-            return True, f"{rel} is staged as {st}, and an added or deleted path moves the record set"
+            return True, first or f"{rel} is staged as {st}, and an added or deleted path moves the record set"
         if check_index_input(rel, m, kit, carries):
-            return True, f"{rel} is a build-index input or output"
+            parts = rel[len(pre):].split("/") if rel.startswith(pre) else []
+            if not (len(parts) >= 3 and parts[1] == "build"
+                    and not fnmatch.fnmatchcase(parts[-1], "*-deviation-*.md")
+                    and posixpath.dirname(rel) not in design_dirs):
+                return True, first or f"{rel} is a build-index input or output"
+            first = first or f"{rel} is a build-index input or output"
+            admitted.add(rel)
         modified.append(rel)
     if not modified:
         return False, "nothing is staged under the memory root, the conf or the kit"
@@ -1121,21 +1144,127 @@ def check_staged_render(root: str, conf: dict, here: str | None = None) -> tuple
             blobs.append(cat[pos:pos + size])
             pos += size + 1
     except (OSError, subprocess.CalledProcessError, ValueError) as exc:
-        return True, f"git could not read the staged blobs ({exc})"
+        return True, first or f"git could not read the staged blobs ({exc})"
     for k, rel in enumerate(modified):
         old, new = blobs[2 * k], blobs[2 * k + 1]
         if old is None or new is None:
-            return True, f"{rel} has no readable blob at HEAD or in the index"
+            return True, first or f"{rel} has no readable blob at HEAD or in the index"
         try:
-            was = {i for i, _s in extract_roster_ids(old.decode("utf-8").replace("\r\n", "\n"), id_re)}
-            now = {i for i, _s in extract_roster_ids(new.decode("utf-8").replace("\r\n", "\n"), id_re)}
+            old, new = old.decode("utf-8").replace("\r\n", "\n"), new.decode("utf-8").replace("\r\n", "\n")
+            was = {i for i, _s in extract_roster_ids(old, id_re)}
+            now = {i for i, _s in extract_roster_ids(new, id_re)}
         except UnicodeDecodeError:
-            return True, f"{rel} does not decode as text, so the ids it cites cannot be compared"
+            return True, first or f"{rel} does not decode as text, so the ids it cites cannot be compared"
+        if rel in admitted and (was != now or read_record_head(old) != read_record_head(new)):
+            return True, first
         if was != now:
-            return True, (f"{rel} changes the ids it cites ({len(now - was)} added, "
-                          f"{len(was - now)} removed), which moves a roster")
+            return True, first or (f"{rel} changes the ids it cites ({len(now - was)} added, "
+                                   f"{len(was - now)} removed), which moves a roster")
+    if admitted:
+        return False, (f"{len(modified)} modified file(s), none a build-index input, {len(admitted)} of them "
+                       f"build records whose binding head is unchanged, none changing the ids it cites")
     return False, (f"{len(modified)} modified file(s), none a build-index input and none changing "
                    f"the ids it cites")
+
+
+def read_record_head(text: str) -> list:
+    """The head `read_bindings` reads: the first `BIND_HEAD_LINES` unfenced lines of a record, whole,
+    so any edit there renders (TOOL-aLightenedLoop-1 S3). Over-sensitive is the safe direction."""
+    return list(unfenced(text))[:BIND_HEAD_LINES]
+
+
+def read_render_state(root: str):
+    """TOOL-aLightenedLoop-6 S12 — the render key's four parts, read once: `(head, tracked, differs,
+    untracked)`, the HEAD commit's bytes, the tracked paths in `ls-files` order, a dict from each path
+    differing from HEAD to its working-tree digest or `absent` in `git diff` order, and the untracked
+    unignored paths in order. Paths are the bytes git prints. None when any git call fails."""
+    env = _build_git_env()
+
+    def run_git(*argv: str) -> bytes:
+        return subprocess.run(["git", *argv], cwd=root, capture_output=True, check=True, env=env).stdout
+
+    try:
+        head = run_git("rev-parse", "--verify", "-q", "HEAD").strip()
+        tracked = [p for p in run_git("ls-files", "-z").split(b"\0") if p]
+        differs = {}
+        for rel in run_git("diff", "HEAD", "--name-only", "--no-renames", "-z").split(b"\0"):
+            if not rel:
+                continue
+            path = os.path.join(root, os.fsdecode(rel))
+            if os.path.isfile(path):
+                with open(path, "rb") as fh:
+                    differs[rel] = hashlib.sha256(fh.read()).hexdigest().encode()
+            else:
+                differs[rel] = b"absent"
+        untracked = [p for p in run_git("ls-files", "--others", "--exclude-standard", "-z").split(b"\0") if p]
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    return head, tracked, differs, untracked
+
+
+def derive_render_key(root: str, state=None) -> str:
+    """TOOL-aLightenedLoop-1 S2 — a hex digest of everything the render reads from git and the working
+    tree: the HEAD commit (the carries join reads spec history), the tracked set, each path differing
+    from HEAD with its working-tree bytes or `absent`, and the untracked unignored set (the nodes
+    deriver reads `git status`). `git add` of a modified file moves none of the four. Empty when any
+    git call fails, and an empty key is never stamped nor matched. `state` is a `read_render_state`
+    answer already read (TOOL-aLightenedLoop-6 S12); None reads one now, and the bytes hashed are the
+    same either way.
+
+    WHAT IT DOES NOT COVER: the interpreter and the process environment beyond git's."""
+    if state is None:
+        state = read_render_state(root)
+    if state is None:
+        return ""
+    head, tracked, differs, untracked = state
+    h = hashlib.sha256(b"HEAD " + head + b"\n")
+    h.update(b"tracked\0" + b"".join(p + b"\0" for p in tracked) + b"\n")
+    for rel, digest in differs.items():
+        h.update(b"differs\0" + rel + b"\0" + digest + b"\n")
+    h.update(b"untracked\0" + b"".join(p + b"\0" for p in untracked))
+    return h.hexdigest()
+
+
+def check_render_settled(root: str, before, after, written: dict, orphans) -> bool:
+    """TOOL-aLightenedLoop-6 S12 — the render stamp's bracket: True when both reads answered, they
+    agree on every part once each path the render wrote (`written`, repo-relative path to text) or
+    removed (`orphans`) is dropped, every written path still holds exactly the bytes written, and every
+    orphan is still absent. So the render's own writes are the only change the bracket explains.
+
+    WHAT IT DOES NOT CHECK: an edit made and reverted inside the window, and an edit to a written path
+    after `after` was read, which the stamped key then misses."""
+    if before is None or after is None:
+        return False
+    drop = {os.fsencode(p.replace("\\", "/")) for p in (*written, *orphans)}
+    if before[0] != after[0]:
+        return False
+    for was, now in zip(before[1:], after[1:]):
+        if isinstance(was, dict):
+            was, now = ({k: v for k, v in s.items() if k not in drop} for s in (was, now))
+        else:
+            was, now = ([p for p in s if p not in drop] for s in (was, now))
+        if was != now:
+            return False
+    for rel, text in written.items():
+        try:
+            with open(os.path.join(root, rel), "rb") as fh:
+                if fh.read() != text.encode("utf-8"):
+                    return False
+        except OSError:
+            return False
+    return not any(os.path.lexists(os.path.join(root, p)) for p in orphans)
+
+
+def resolve_render_stamp(root: str) -> str:
+    """The render stamp's absolute path, `gen-build-index-render-stamp` in this worktree's git
+    directory: never tracked and never seen by `git status`, so it is no input of the key. Empty when
+    git cannot name it (TOOL-aLightenedLoop-1 S2)."""
+    try:
+        rel = subprocess.run(["git", "rev-parse", "--git-path", "gen-build-index-render-stamp"], cwd=root,
+                             capture_output=True, text=True, encoding="utf-8", check=True, env=_build_git_env()).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return ""
+    return os.path.join(root, rel) if rel else ""
 
 
 # --------------------------------------------------------------------------------------- collecting
@@ -2061,7 +2190,7 @@ def read_landed_unclosed(root: str, conf: dict, resolve=None) -> dict | None:
     return record
 
 
-def read_carries_coverage(root: str, conf: dict, resolve=None) -> dict:
+def read_carries_coverage(root: str, conf: dict, resolve=None, building: bool = False) -> dict:
     """TOOL-dTrueNorth-3 S2 — the carries join's coverage, the ONE read the coverage region and
     `--check-coverage` share, so the two cannot disagree.
 
@@ -2099,7 +2228,9 @@ def read_carries_coverage(root: str, conf: dict, resolve=None) -> dict:
                 mod = importlib.util.module_from_spec(spec)
                 spec.loader.exec_module(mod)
                 derive = mod.derive_carries_coverage
-            value = derive(root, conf=conf)
+            # TOOL-aLightenedLoop-1 S4: `building` is passed only when asked, so a two-argument
+            # stand-in still serves every reader that does not ask.
+            value = derive(root, conf=conf, building=True) if building else derive(root, conf=conf)
     except Exception as exc:  # noqa: BLE001 — narrowed below: only the checker's own refusals are Problems
         # The refusal class is the one the checker loaded, read through its own cached load
         # (TOOL-dTrueNorth-31 S11), so a namesake `design_lib` in the slot cannot hide it; an injected
@@ -3038,7 +3169,9 @@ def cmd_check_coverage(root: str, conf: dict, staged: bool = False, resolve=None
             print("build-index: coverage held under --staged — no staged path is a build-index input or the "
                   "carries checker, so no chain spec's coverage can have moved")
             return 0
-    value = read_carries_coverage(root, conf, resolve)
+    # TOOL-aLightenedLoop-1 S4: under `staged` the read stops after the statuses when no chain spec is
+    # INPROGRESS, its `findings` None, so the count line below prints as the full read prints it.
+    value = read_carries_coverage(root, conf, resolve, building=staged)
     if value["state"] == "off":
         # TOOL-dTrueNorth-20 S3 — THE OFF LINE'S SPELLING, so the contract clause's
         # `(?m)^build-index: coverage` matches it in an adopter, where the key is blank.
@@ -3286,6 +3419,12 @@ def cmd_survey(root: str, conf: dict) -> int:
 
 
 def cmd_write(root: str, conf: dict, staged: bool = False) -> int:
+    # TOOL-aLightenedLoop-1 S2 — any stamp goes before anything is written, so a write that refuses
+    # part way leaves none behind.
+    stamp = resolve_render_stamp(root)
+    if stamp:
+        with contextlib.suppress(FileNotFoundError):
+            os.remove(stamp)
     # `--write-staged` (TOOL-aTrimmedWait-3): the pre-commit hook's remedy for a check 9 refusal. It
     # writes only the artifacts whose bytes moved and stages them, with each removed orphan, into the
     # index the hook was handed; every decline names its reason and exits 1, so the hook refuses as
@@ -3295,6 +3434,10 @@ def cmd_write(root: str, conf: dict, staged: bool = False) -> int:
         if not ok:
             print(f"build-index: render NOT staged — {why}")
             return 1
+    # TOOL-aLightenedLoop-6 S12 — the key's parts read BEFORE any read the render makes, and again at
+    # the stamp: the stamp is written only when the render's own writes are all that moved between.
+    before = read_render_state(root) if stamp else None
+    written = {}
     check_archives_tracked(root, conf)
     # TOOL-dTrueNorth-16 S20 — THE VIEW FIRST. `plan()` renders the coverage regions from DESIGN_VIEW,
     # so writing the view after it left them rendered from the view as it was, and one `--write` was
@@ -3325,6 +3468,7 @@ def cmd_write(root: str, conf: dict, staged: bool = False) -> int:
                 view_path = os.path.join(root, view["rel"])
                 undo[view["rel"]] = pathlib.Path(view_path).read_bytes() if os.path.isfile(view_path) else None
             write_text(os.path.join(root, view["rel"]), view["text"])
+            written[view["rel"]] = view["text"]
         artifacts, orphans, unmanaged, verdicts, guarded = plan(root, conf, create_missing=True)
         if staged and guarded:
             print(f"build-index: render NOT staged — the data-loss guard holds {' '.join(sorted(guarded))}")
@@ -3344,6 +3488,7 @@ def cmd_write(root: str, conf: dict, staged: bool = False) -> int:
                 undo.setdefault(rel, pathlib.Path(path).read_bytes() if os.path.isfile(path) else None)
         for rel, text in sorted(artifacts.items()):
             write_text(os.path.join(root, rel), text)
+            written[rel] = text
         for p in orphans:
             os.remove(os.path.join(root, p))
             print(f"build-index: removed orphaned shard {p}")
@@ -3377,7 +3522,7 @@ def cmd_write(root: str, conf: dict, staged: bool = False) -> int:
     # PRINTED here and the refusal belongs to `--check`. The data-loss guard is the one exception,
     # and it earns it: the view it names is the only artifact this verb did NOT write, and exiting
     # 0 after skipping a write would read as a successful render of it.
-    print_verdicts(verdicts, guarded, conf)
+    rc = print_verdicts(verdicts, guarded, conf)
     # TOOL-dTrueNorth-6 S5 — the as-built view, written above before every other artifact, and its
     # findings printed by the same rule: a render is not a verdict.
     if view["state"] == "off":
@@ -3387,6 +3532,15 @@ def cmd_write(root: str, conf: dict, staged: bool = False) -> int:
         print_asbuilt_verdicts(view["findings"])
     if refused:
         raise refused
+    # TOOL-aLightenedLoop-1 S2 — the stamp, only when `cmd_check` would exit 0 on the tree just written:
+    # no verdict, no unmanaged file, no guarded view and no view refusal (raised above); and only when
+    # the tree held still around the render but for its own writes (TOOL-aLightenedLoop-6 S12).
+    if stamp and rc == 0 and not unmanaged and not guarded:
+        after = read_render_state(root)
+        if check_render_settled(root, before, after, written, orphans):
+            key = derive_render_key(root, after)
+            if key:
+                write_text(stamp, key + "\n")
     return 1 if guarded else 0
 
 
@@ -4728,6 +4882,136 @@ def test_staged_render(arm) -> None:
                         == {s: sorted(v, key=_roster_sort_key) for s, v in _union.items()}))
         arm("TOOL-aTrimmedHook-1 AC6 — every artifact plan() renders is a build-index input", "[]",
             lambda: str([p for p in plan(t, conf)[0] if not check_index_input(p, "memory", None)]))
+        # TOOL-aLightenedLoop-1 AC5 AC6 — a modified record under a build's `build/` folder skips while
+        # its binding head and cited ids hold; a head edit, a new id, a deviation record and a file in a
+        # DESIGN_VIEW folder each render, and a later-listed structural path still names the record.
+        t2 = os.path.join(base, "admit"); os.makedirs(t2)
+        conf2 = dict(_fixture(t2), DESIGN_VIEW="memory/builds/tTwo/build/2026-08-01-build-ARCH-tTwo-1-as-built.md")
+        rec = "memory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-notes.md"
+        dev = "memory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-deviation-1.md"
+        near = "memory/builds/tTwo/build/2026-08-01-build-ARCH-tTwo-1-notes.md"
+        # The body sits past the BIND_HEAD_LINES head, as a long record's tail does.
+        for rel in (rec, dev, near):
+            write_text(os.path.join(t2, rel), "# a record\n\n**Serves:** research ARCH-tOne-1\n\n"
+                       + "a filler line\n" * BIND_HEAD_LINES + "body\n")
+        run("git", "add", "-A", cwd=t2)
+        run("git", "commit", "-q", "-m", "records", "--no-verify", cwd=t2)
+
+        def write_staged_record(*edits):
+            run("git", "reset", "-q", "--hard", cwd=t2)
+            for rel, old, new in edits:
+                path = os.path.join(t2, rel)
+                write_text(path, read_text(path).replace(old, new))
+            run("git", "add", "-A", cwd=t2)
+            return "%s %s" % check_staged_render(t2, conf2)
+
+        arm("TOOL-aLightenedLoop-1 AC5 — a no-id append to a build record skips, naming the record",
+            "False 1 modified file(s), none a build-index input, 1 of them build records whose binding head is "
+            "unchanged", lambda: write_staged_record((rec, "body\n", "body\na plain line\n")))
+        arm("TOOL-aLightenedLoop-1 AC6 — a binding head edit renders with today's reason",
+            f"True {rec} is a build-index input or output",
+            lambda: write_staged_record((rec, "research", "journal")))
+        arm("TOOL-aLightenedLoop-1 AC6 — a build record citing a new id renders", "True",
+            lambda: write_staged_record((rec, "body\n", "body\nnow ARCH-tOne-7\n")))
+        arm("TOOL-aLightenedLoop-1 AC6 — a deviation record's body edit renders",
+            f"True {dev} is a build-index input or output", lambda: write_staged_record((dev, "body\n", "body\nplain\n")))
+        arm("TOOL-aLightenedLoop-1 AC6 — a file in a DESIGN_VIEW folder renders",
+            f"True {near} is a build-index input or output", lambda: write_staged_record((near, "body\n", "body\nplain\n")))
+        arm("TOOL-aLightenedLoop-1 AC6 — a quiet record beside a later-listed spec edit names the record",
+            f"True {rec} is a build-index input or output",
+            lambda: write_staged_record((rec, "body\n", "body\nplain\n"),
+                                 ("memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md", "base 0123abcd\n",
+                                  "base 0123abcd\n\nplain\n")))
+
+
+def test_render_stamp(arm) -> None:
+    """TOOL-aLightenedLoop-1's S1 and S2 arms: `write_text` leaves identical bytes alone, and the render
+    stamp `--write` leaves answers `--check --staged` on that exact tree and on no other."""
+    with tempfile.TemporaryDirectory() as base:
+        f = os.path.join(base, "same.txt")
+        write_text(f, "x\n")
+        os.utime(f, (1000000000, 1000000000))
+        write_text(f, "x\n")
+        kept = os.path.getmtime(f) == 1000000000
+        write_text(f, "y\n")
+        arm("TOOL-aLightenedLoop-1 AC1 — write_text keeps an aged mtime over identical bytes and moves it "
+            "over different ones", "True True", lambda: f"{kept} {os.path.getmtime(f) != 1000000000}")
+        t = os.path.join(base, "stamp"); os.makedirs(t)
+        _fixture(t)
+        me = os.path.abspath(__file__)
+        spec = os.path.join(t, "memory", "builds", "tOne", "spec", "2026-08-01-spec-tOne-1.md")
+
+        def check_staged(root: str = t) -> str:
+            out = subprocess.run([sys.executable, me, "--check", "--staged"], cwd=root, capture_output=True,
+                                 text=True, encoding="utf-8", env=_build_git_env())
+            return f"rc={out.returncode} {out.stdout}"
+
+        write_text(spec, read_text(spec) + "\na body line\n")
+        run("git", "add", "-A", cwd=t)
+        run(sys.executable, me, "--write", cwd=t)
+        run("git", "add", "-u", cwd=t)
+        arm("TOOL-aLightenedLoop-1 AC3 — --write, git add -u, then --check --staged answers from the stamp",
+            "rc=0 build-index: render owed under --staged", check_staged)
+        arm("TOOL-aLightenedLoop-1 AC3 — the stamp line, never the SKIPPED prefix",
+            "build-index: render answered by the stamp --write left on this exact tree", check_staged)
+        write_text(spec, read_text(spec) + "one more\n")
+        arm("TOOL-aLightenedLoop-1 AC4 — one more working-tree byte renders in full", "False",
+            lambda: str("answered by the stamp" in check_staged()))
+        spec_rel = os.path.join("memory", "builds", "tOne", "spec", "2026-08-01-spec-tOne-1.md")
+        # TOOL-aLightenedLoop-6 AC5 — no stamp on a red write: a committed non-shard file in the ledger
+        # folder is unmanaged, which only warns, so `not unmanaged` is the guard's sole decider. Then
+        # the AC3 sequence. RED with `not unmanaged` deleted from the guard.
+        tu = os.path.join(base, "unmanaged"); os.makedirs(tu)
+        _fixture(tu)
+        write_text(os.path.join(tu, "memory", "ledger", "notes.txt"), "authored\n")
+        run("git", "add", "-A", cwd=tu)
+        run("git", "commit", "-q", "-m", "unmanaged", "--no-verify", cwd=tu)
+        write_text(os.path.join(tu, spec_rel), read_text(os.path.join(tu, spec_rel)) + "\na body line\n")
+        run("git", "add", "-A", cwd=tu)
+        run(sys.executable, me, "--write", cwd=tu)
+        run("git", "add", "-u", cwd=tu)
+        tu_stamp, tu_staged = resolve_render_stamp(tu), check_staged(tu)
+        arm("TOOL-aLightenedLoop-6 AC5 — an unmanaged ledger file leaves no stamp, and --check --staged "
+            "does not answer from one", "False False",
+            lambda: (f"{os.path.exists(tu_stamp)} {'answered by the stamp' in tu_staged}" if tu_stamp
+                     else "git named no stamp path"))
+
+        def read_stamp_pair(name: str, move) -> str:
+            """TOOL-aLightenedLoop-6 AC15 AC16 — `<stamped> <stamped>` over two in-process `--write`s of
+            a fresh fixture with a staged spec edit: the first unshimmed, the second with
+            `print_verdicts` shimmed to make `move` inside the window, after every write and before
+            the stamp."""
+            tm = os.path.join(base, name); os.makedirs(tm)
+            conf_m = _fixture(tm)
+            write_text(os.path.join(tm, spec_rel), read_text(os.path.join(tm, spec_rel)) + "\na body line\n")
+            run("git", "add", "-A", cwd=tm)
+            stamp_m = resolve_render_stamp(tm)
+            if not stamp_m:
+                return "git named no stamp path"
+            _read_mode(cmd_write, tm, conf_m)
+            first = os.path.exists(stamp_m)
+            real = globals()["print_verdicts"]
+
+            def run_moved_verdicts(*args):
+                move(tm)
+                return real(*args)
+
+            globals()["print_verdicts"] = run_moved_verdicts
+            try:
+                _read_mode(cmd_write, tm, conf_m)
+            finally:
+                globals()["print_verdicts"] = real
+            return f"{first} {os.path.exists(stamp_m)}"
+
+        arm("TOOL-aLightenedLoop-6 AC15 — a new file the render did not write, landing inside the window, "
+            "withholds the stamp", "True False",
+            lambda: read_stamp_pair("moved-other", lambda r: write_text(os.path.join(r, "memory", "notes.md"),
+                                                                        "# notes\n")))
+        _readme_rel = os.path.join("memory", "builds", "tOne", "README.md")
+        arm("TOOL-aLightenedLoop-6 AC16 — an edit to a path the render wrote, landing inside the window, "
+            "withholds the stamp", "True False",
+            lambda: read_stamp_pair("moved-written", lambda r: write_text(
+                os.path.join(r, _readme_rel), read_text(os.path.join(r, _readme_rel)) + "a line below the region\n")))
 
 
 def test_staged_write(arm) -> None:
@@ -7486,6 +7770,17 @@ def cmd_selftest() -> int:
             if _code in (15, 16):
                 arm(f"V{_code} names the conf key it disarms", backlog.CUTOFF_KEY,
                     lambda o=_out_check: o)
+        # TOOL-aLightenedLoop-6 AC6 — no stamp on a red write: V7's tree in its own folder, COMMITTED so
+        # the render key answers, has no unmanaged file and no guarded view (the loop's own `--write`
+        # arm above), so `rc == 0` is the guard's sole decider. RED with `rc == 0` deleted from the guard.
+        _v7 = os.path.join(base, "v7stamp"); os.makedirs(_v7)
+        _v7_files, _v7_cut = _build_code_tree(7)
+        _v7_conf = _build_backlog_fixture(_v7, _v7_files, cutoff=_v7_cut)
+        run("git", "commit", "-q", "-m", "v7", "--no-verify", cwd=_v7)
+        _read_mode(cmd_write, _v7, _v7_conf)
+        _v7_stamp = resolve_render_stamp(_v7)
+        arm("TOOL-aLightenedLoop-6 AC6 — a --write whose verdicts exit 1 leaves no render stamp", "False",
+            lambda: str(os.path.exists(_v7_stamp)) if _v7_stamp else "git named no stamp path")
 
         # AC5 and AC3's second half — the data-loss guard over an APPENDED authored row.
         _guard_conf = _build_backlog_fixture(bt, CORE)
@@ -8919,6 +9214,7 @@ def cmd_selftest() -> int:
     test_staged_render(arm)
     test_staged_write(arm)
     test_write_moved(arm)
+    test_render_stamp(arm)
     test_coverage_region(arm)
     test_coverage_stub(arm)
     arm("TOOL-dTrueNorth-16 AC15 — read_header_verbs refuses an expand returning three values with backlog.Problem "
@@ -9348,6 +9644,14 @@ def main(argv: list) -> int:
                 print(f"build-index: render SKIPPED under --staged — {why}; the push boundary renders in full")
                 return 0
             print(f"build-index: render owed under --staged — {why}")
+            # TOOL-aLightenedLoop-1 S2 — a stamp `--write` left on this exact tree answers; any
+            # other case renders in full, as before. The owner set `[class]` aside for this read.
+            stamp = resolve_render_stamp(root)
+            key = (read_text_or_none(stamp)[0] or "").strip() if stamp else ""
+            if key and key == derive_render_key(root):
+                print("build-index: render answered by the stamp --write left on this exact tree; "
+                      "the push boundary renders in full")
+                return 0
         if with_verdicts:
             # TOOL-dTrueNorth-31 S2: stderr IS stdout for the whole `--with-verdicts` call, so a line
             # `--check` writes to stderr follows `build-index: verdicts end` in order instead of racing the

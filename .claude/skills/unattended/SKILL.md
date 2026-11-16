@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.121 -->
+<!-- gov:kit unattended@1.124 -->
 [.claude/skills/unattended/SKILL.md · Level 4 · A Skill, followed when its trigger holds; yields to levels 0 to 3]
 
 # Unattended runs
@@ -15,7 +15,8 @@ its steps in that verbs file's section `The paths, in order`, which wins any dif
 ## Before any path — schedule the idle-wake NOW
 
 First act, before orienting: `CronCreate` at every 10 minutes (cron 3-59/10 * * * *); keep the id. Each tick
-runs `unattended.sh --resume <slug> --keepalive-id <id>`, then `unattended.sh --audit <slug>`. A
+runs `unattended.sh --wake <slug> --keepalive-id <id>`. `HEALTHY` ends the turn. `FULL` runs
+`unattended.sh --resume <slug> --keepalive-id <id>`, then `unattended.sh --audit <slug>`. A
 background task's starter runs `unattended.sh --register-task <slug> --task <name> --heartbeat <path>`,
 later `unattended.sh --release-task <slug> --task <name>`. Readers share
 `unattended.sh --liveness <slug>`. A run that never starts still reaps it.

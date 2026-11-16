@@ -263,6 +263,8 @@ tools/unattended/gate-guard.test.sh	path-subst	4	predates the lint; `${p##*/}` a
 tools/unattended/gate-guard.test.sh	var-pipe	1	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/unattended/lib-unattended.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/unattended/lib-unattended.sh	var-pipe	6	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/unattended/pass-tree.test.sh	path-subst	1	arrived with TOOL-aTwinnedPass-2's new suite, measured by aTwinnedPass's close bar at 11dcec2fe; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/pass-tree.test.sh	printf-subst	2	arrived with TOOL-aTwinnedPass-2's new suite, measured by aTwinnedPass's close bar at 11dcec2fe; `printf -v` is the no-fork form, drained by a follow-up unit
 tools/unattended/resume-tick.sh	date-fmt	3	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
 tools/unattended/resume-tick.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/unattended/resume-tick.sh	var-pipe	1	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
@@ -309,6 +311,6 @@ tools/workflows/tier2-review.test.sh	path-subst	4	predates the lint; `${p##*/}` 
 tools/workflows/tier2-review.test.sh	var-pipe	1	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/workflows/unattended-build.test.sh	cat-file	1	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
 tools/workflows/unattended-build.test.sh	path-subst	6	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
-tools/workflows/unattended-build.test.sh	printf-subst	74	rose 66 -> 74 with the arms TOOL-aNimbleMend added, measured by the close's bar at b61832752; `printf -v` is the no-fork form, drained by a follow-up unit
-tools/workflows/unattended-build.test.sh	pure-fn-subst	28	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: build_gh33_writer×14 build_dispose×9 build_gh33_args×5
-tools/workflows/unattended-build.test.sh	var-pipe	62	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/workflows/unattended-build.test.sh	printf-subst	77	rose 66 -> 74 with the arms TOOL-aNimbleMend added, measured by the close's bar at b61832752; `printf -v` is the no-fork form, drained by a follow-up unit; rose 74 -> 77 with TOOL-aTwinnedPass-1, -4 and -11's TP arms, measured by aTwinnedPass's close bar at 11dcec2fe
+tools/workflows/unattended-build.test.sh	pure-fn-subst	36	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: build_gh33_writer×14 build_dispose×9 build_gh33_args×5; rose 28 -> 36 with TOOL-aTwinnedPass-4's render_pass_returns and the TP arms, measured by aTwinnedPass's close bar at 11dcec2fe
+tools/workflows/unattended-build.test.sh	var-pipe	64	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit; rose 62 -> 64 with TOOL-aTwinnedPass-1's TP1 arms, measured by aTwinnedPass's close bar at 11dcec2fe

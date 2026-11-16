@@ -9,6 +9,8 @@ the close, and a pass itself still runs no gate.
 Under the unit harness, `tools/workflows/unattended-unit.js`, the return of a pass that committed
 carries a `nextAction` when its caller handed it a `passLegs` command. It orders the main loop to
 run that command before the next dispatch and before any later commit.
+When the pass was built in its own worktree, the harness's `passBase` argument, the `nextAction`
+names that worktree as the command's working directory and the merge back as its deadline.
 
 The runner is `<prefix>/run-gates/pass-legs.sh` and the declaration is
 `<prefix>/run-gates/pass_legs.py`, which are under `tools/run-gates/` in this repository. The

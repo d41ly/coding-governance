@@ -1,4 +1,4 @@
-<!-- gov:kit roles@1.19 -->
+<!-- gov:kit roles@1.20 -->
 # roles — the role catalogue: one agent definition per role, the workflow table, and the checker
 
 A governed session runs its LLM work through ten declared WORKFLOWS — `orient`, `research`, `reuse`,

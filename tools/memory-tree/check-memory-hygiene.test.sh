@@ -3081,13 +3081,32 @@ _engpresets=$(sed 's/[[:space:]]#.*$//; s/^[[:space:]]*#.*$//' "$HERE/check-memo
   | grep -oE '^[A-Z][A-Z0-9_]*_CUTOFF=' | sed 's/=$//' | sort -u)
 n=$((n+1))
 [ -n "$_engpresets" ] || { echo "FAIL could not derive any bare *_CUTOFF preset from the engine, so the parity arm is back to the blind spot TOOL-aProvenReuse-5 closed"; st=1; }
-_engreads=$( { sed 's/[[:space:]]#.*$//; s/^[[:space:]]*#.*$//' "$HERE/check-memory-hygiene.sh" \
-  | grep -oE '\$\{[A-Z][A-Z0-9_]+:[-=]' | sed 's/^\${//; s/:[-=]$//'
+# ---- THE CARRIED RESOLVER BLOCK IS LEFT OUT (TOOL-aClearedLedger-6). The engine carries the python
+# ---- launcher resolver inline between two marker lines, a byte-identical copy another suite holds.
+# ---- It reads the environment and no key a conf declares, so its reads are no adopter override.
+# ---- $1 is the file read. A PARAMETER, so the staged arm below grades a file the suite built.
+derive_engreads() { sed '/^# >>> resolve_python /,/^# <<< resolve_python$/d; s/[[:space:]]#.*$//; s/^[[:space:]]*#.*$//' "$1" | grep -oE '\$\{[A-Z][A-Z0-9_]+:[-=]' | sed 's/^\${//; s/:[-=]$//'; }
+# A range whose closing line is missing deletes to the end of the file, and one whose opening line
+# is missing deletes nothing: the first passes by reading less, the second hides nothing. So each
+# marker matches exactly once in the engine.
+n=$((n+1))
+[ "$(grep -c '^# >>> resolve_python ' "$HERE/check-memory-hygiene.sh")" = 1 ] && [ "$(grep -c '^# <<< resolve_python$' "$HERE/check-memory-hygiene.sh")" = 1 ] \
+  || { echo "FAIL the engine does not carry each resolve_python marker line exactly once, so the override derivation's range would read less or leave nothing out"; st=1; }
+# The staged file: one read before the block, one inside it, one after it.
+printf '%s\n' 'BEFORE="${EXAMPLE_BEFORE_KEY:-}"' '# >>> resolve_python — a staged block' \
+  'INSIDE="${EXAMPLE_INSIDE_KEY:-}"' '# <<< resolve_python' 'AFTER="${EXAMPLE_AFTER_KEY:-}"' > "$TMP/engreads-staged.sh"
+n=$((n+1))
+derive_engreads "$TMP/engreads-staged.sh" | grep -qx 'EXAMPLE_INSIDE_KEY' \
+  && { echo "FAIL the override derivation read EXAMPLE_INSIDE_KEY, staged inside a resolve_python marker block"; st=1; }
+n=$((n+1))
+derive_engreads "$TMP/engreads-staged.sh" | sort -u | tr '\n' ' ' | grep -qx 'EXAMPLE_AFTER_KEY EXAMPLE_BEFORE_KEY ' \
+  || { echo "FAIL the override derivation did not read exactly the keys staged before and after a resolve_python marker block"; st=1; }
+_engreads=$( { derive_engreads "$HERE/check-memory-hygiene.sh"
   printf '%s\n' "$_engpresets"; } | grep . | sort -u)
-# NOT conf keys, and each says why. GOV_PYTHON is an environment override for the python launcher and
-# belongs to no conf; MAP_ROOT is the codebase-map kit's key, read from ITS conf by a check that
-# integrates with it. Declaring either here would tell adopters to set a key this kit does not own.
-_engexempt="GOV_PYTHON MAP_ROOT"
+# NOT a conf key, and it says why. MAP_ROOT is the codebase-map kit's key, read from ITS conf by a
+# check that integrates with it. Declaring it here would tell adopters to set a key this kit does
+# not own.
+_engexempt="MAP_ROOT"
 n=$((n+1))
 [ -n "$_engreads" ] || { echo "FAIL could not derive the engine's conf reads; the cutoff-parity arm below would pass by finding nothing"; st=1; }
 for _k in $_engexempt; do
@@ -4821,11 +4840,17 @@ done
 # each, top-level and never skipped. Counted by reading; OWED: observed at the close.
 # MERGED at this build's reconcile of origin/main cac14c195: the base 690, plus TOOL-aWitnessedCrash-1's 6,
 # plus TOOL-aNimbleMend-9's 11 = 707. Counted by reading; OWED: observed at the close.
+# RAISED 707 -> 708 by TOOL-aClearedLedger-6: its three resolver-block assertions, each top-level and
+# never skipped, less OSTYPE out of the population loop and GOV_PYTHON out of the exemption loop.
+# Counted by reading; OWED: observed at the close.
 # RAISED 707 -> 745 by TOOL-aTrimmedWait-2: its scope arms, eleven top-level and twenty-seven in a
 # nine-pass refusal loop, none skipped. Counted by reading; OWED: observed at the close.
 # RAISED 745 -> 749 by TOOL-aTrimmedWait-11: its four check 26 set-aside fixture assertions, each
 # top-level and never skipped. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=749
+# MERGED at TOOL-aTrimmedWait-12's reconcile of local main at 5d48501da: the base 707 at 846d51d39, plus main's 1
+# (TOOL-aClearedLedger-6), plus this branch's 42 (TOOL-aTrimmedWait-2's 38 and -11's 4) = 750.
+# Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=750
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

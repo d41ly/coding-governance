@@ -60,7 +60,7 @@ role = "engine"
 # Gov's pins for the branches no fixture reaches ship beside the gates too, in this directory's
 # `unarmed-branches.txt`, keyed relative to it, through the `**` rule above.
 [[files]]
-include = ["adopt-unattended.test.sh", "check-arms-groups.test.sh", "check-pass-order.test.sh", "cross-component.test.sh", "gate-guard.test.sh", "resume-tick.test.sh", "runlog-writer.test.sh", "stall-recorder.test.sh", "stop-guard.test.sh"]
+include = ["adopt-unattended.test.sh", "check-arms-groups.test.sh", "check-pass-order.test.sh", "cross-component.test.sh", "gate-guard.test.sh", "pass-tree.test.sh", "resume-tick.test.sh", "runlog-writer.test.sh", "stall-recorder.test.sh", "stop-guard.test.sh"]
 role = "project-owned"
 
 # `MEMORY_TREE_DIR` is the directory holding the memory-tree kit's `gotchas.py`, which the Skill's
