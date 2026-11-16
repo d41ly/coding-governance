@@ -1,6 +1,6 @@
 # TOOL-aPiecewiseGrade-7 — an arm for the stale check's foreign-runtime clause
 
-**Status:** INPROGRESS · rev-1 · 2026-11-16 · node a · Tier-1 · base aebbb4a72 · streams tooling · order 6
+**Status:** INPROGRESS · rev-2 · 2026-11-16 · node a · Tier-1 · base aebbb4a72 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -108,11 +108,16 @@ green under the break. AC12's dead plants carry the same exposure.
   copy is not cut, so the probe cannot tell the clause from its absence.
   fixture: the probe and its lock directory are made by the pass under `$SCRATCH`; the tree holds
   neither today.
-- **AC2** — When `sed -n '/# AC13: /,/each hold the lock/p' tools/unattended/unattended.test.sh`
+- **AC2** — When `sed -n '/# AC13: /,/each hold the lock/{p;/each hold the lock/q;}' tools/unattended/unattended.test.sh`
   runs, its output holds exactly one line opening `foreign)` that carries `printf` and
   `otherhost:otheros` and not `write_pg6_pid`, and its last line ends `foreign:1:w-x"`.
   Red when: the foreign plant is written through `write_pg6_pid`, which stamps the local runtime, or
   the expected string omits the kind, so the loop never grades it.
+  fixture: the range is the `q` form. It opens at the first `# AC13: ` line, the loop's at
+  `tools/unattended/unattended.test.sh@6d3ce6ef:8060`, and the `q` stops sed at the loop's `same`
+  line (`:8075`), before the S7 block's `# AC13: ` at `:16139` can reopen it. Run against HEAD at
+  writing time it printed lines 8060 through 8075 alone, 16 lines (DERIVED, wc -l), ending on the
+  `same` line. The start is not anchored on the comment's own words because S2 rewrites them.
 - **AC3** — When `git diff -U0 3300b594c -- tools/unattended/unattended.test.sh | grep -cE '^[-+] *(hit|miss|same) '`
   runs, it prints 2, and the same diff piped to `grep -cE '^[-+]FLOOR_'` prints 0.
   Red when: the arm is written as a new assertion, so the count moves and a floor is owed, or a floor
@@ -137,6 +142,9 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-11-16 · initial draft.
+- rev-2 · 2026-11-16 · §5 · AC2 · from the builder's divergence
+  `2026-11-16-prompt-TOOL-aPiecewiseGrade-7-revision`: AC2's `sed` range reopened at the S7 block's
+  `# AC13: ` line and ran to the end of the file, so it now quits at the loop's `same` line.
 
 ## 9. Reuse audit
 

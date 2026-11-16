@@ -65,7 +65,7 @@ ids TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-3 TOOL-aP
 | [TOOL-aPiecewiseGrade-2 — `run_spec_token_check` runs the checker's incremental mode on a whole-key miss, and names its per-spec cache's live generation in a file only where the whole key is recorded](spec/2026-11-15-spec-TOOL-aPiecewiseGrade-2.md) | 4 | 2 | CLOSED | rev-4 | 2026-11-16 |
 | [TOOL-aPiecewiseGrade-5 — the spec-token checker's 24 per-spec counter names live in one tuple, and a mismatch is loud or a miss, never a silent 0](spec/2026-11-16-spec-TOOL-aPiecewiseGrade-5.md) | 5 | 2 | CLOSED | rev-1 | 2026-11-16 |
 | [TOOL-aPiecewiseGrade-6 — one per-slug lock in the sidecar holds a dispatch's spec-token state from the start half to the end of the read half](spec/2026-11-16-spec-TOOL-aPiecewiseGrade-6.md) | 5 | 2 | CLOSED | rev-2 | 2026-11-16 |
-| [TOOL-aPiecewiseGrade-7 — an arm for the stale check's foreign-runtime clause](spec/2026-11-16-spec-TOOL-aPiecewiseGrade-7.md) | 6 | 1 | INPROGRESS | rev-1 | 2026-11-16 |
+| [TOOL-aPiecewiseGrade-7 — an arm for the stale check's foreign-runtime clause](spec/2026-11-16-spec-TOOL-aPiecewiseGrade-7.md) | 6 | 1 | INPROGRESS | rev-2 | 2026-11-16 |
 | [TOOL-aPiecewiseGrade-8 — two permanent arms hold the spec-token checker's counter key-set guards](spec/2026-11-16-spec-TOOL-aPiecewiseGrade-8.md) | 6 | 1 | SPECCED | rev-1 | 2026-11-16 |
 <!-- /gen:build-units -->
 
