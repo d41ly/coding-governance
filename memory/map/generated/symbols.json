@@ -238,6 +238,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "MemberProbe",
+      "kind": "class",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "MemoryStatus",
       "kind": "class",
       "file": "tools/run-gates/measure_legs.py"
@@ -5333,11 +5338,6 @@
       "file": "tools/push-main.sh"
     },
     {
-      "id": "check_claim_push_lock_stale",
-      "kind": "function",
-      "file": "tools/unattended/unattended.sh"
-    },
-    {
       "id": "check_claim_writable",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -5536,6 +5536,11 @@
       "id": "check_deviation_line",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "check_dir_lock_stale",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_dir_shaped",
@@ -5906,6 +5911,16 @@
       "id": "check_gov_units",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "check_grade_same",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "check_grade_step",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
     },
     {
       "id": "check_graders",
@@ -11633,6 +11648,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "derive_spec_context",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "derive_spec_token_key",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -15076,6 +15096,11 @@
       "id": "measure_pass",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "measure_pg6_call",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "measure_phrase",
@@ -19768,6 +19793,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_pg6_dead_pid",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "read_phase",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -20793,6 +20823,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_spec_cache",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "read_spec_disposal",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -21723,11 +21758,6 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
-      "id": "remove_claim_push_lock",
-      "kind": "function",
-      "file": "tools/unattended/unattended.sh"
-    },
-    {
       "id": "remove_claim_refs",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -21751,6 +21781,11 @@
       "id": "remove_descendants",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "remove_dir_lock",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "remove_drive_section",
@@ -27173,6 +27208,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "run_grade_checker",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
       "id": "run_grammar",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -29134,6 +29174,11 @@
     },
     {
       "id": "scan_live_packets",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "scan_live_spec",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
     },
@@ -33143,11 +33188,6 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
-      "id": "write_claim_push_lock",
-      "kind": "function",
-      "file": "tools/unattended/unattended.sh"
-    },
-    {
       "id": "write_class_row_plant",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
@@ -33246,6 +33286,16 @@
       "id": "write_design_fixture",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
+    },
+    {
+      "id": "write_dir_lock",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_dir_lock_pid",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "write_disposal_fixture",
@@ -33506,6 +33556,11 @@
       "id": "write_gov_files",
       "kind": "function",
       "file": "tools/govkit/fixtures/retired_edits.py"
+    },
+    {
+      "id": "write_grade_spec",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
     },
     {
       "id": "write_gw_seal",
@@ -33866,6 +33921,16 @@
       "id": "write_pfx_stamp",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "write_pg6_lock",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_pg6_pid",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_pk_conf",
@@ -34366,6 +34431,11 @@
       "id": "write_spec",
       "kind": "function",
       "file": "tools/unattended/check-pass-order.test.sh"
+    },
+    {
+      "id": "write_spec_cache",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "write_specimen",

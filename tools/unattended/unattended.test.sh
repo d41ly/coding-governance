@@ -7927,6 +7927,185 @@ if [ -f "$STC" ]; then
   o=$( ( load_driver_conf && SPEC_TOKENS_CLI="${PFX}stub-popen.py" run_spec_token_check tRun ) 2>&1 )
   hit "$o" "spec-token cache not recorded: the input record cannot be replayed, so the next dispatch runs the checker"
   same "a record that cannot be replayed records no spec-token key" "$([ -f .git/unattended/spec-tokens.tRun.key ] && echo written || echo none)" none
+  # ---- TOOL-aPiecewiseGrade-2 AC1 AC2 AC3 AC8 - THE PER-SPEC CACHE'S LIVE GENERATION IS NAMED IN A
+  # ---- FILE, and only where the whole key is recorded. The name file `spec-tokens.tRun.live` holds the
+  # ---- live `mktemp -d` generation's base name; a moved tree and a refusal leave it and that generation
+  # ---- byte-unmoved, the start's sweep leaves one unnamed generation at most, and a planted name of the
+  # ---- wrong shape never reaches `rm -rf`. RED-first, staged at the close: naming on every branch reds
+  # ---- the moved and refused `kept`; dropping the shape check removes the planted directory; a sweep
+  # ---- that does not spare the live generation reds the refused `kept`.
+  pg_d=.git/unattended; pg_n=.git/unattended/spec-tokens.tRun.live
+  rm -f .git/unattended/spec-tokens.tRun.key
+  ( load_driver_conf && run_spec_token_check tRun ) >/dev/null 2>&1
+  pg_live=""; read -r pg_live <"$pg_n"
+  same "an admitted dispatch names a well-formed spec-token generation" "$([[ $pg_live =~ ^spec-tokens\.tRun\.specs\.[A-Za-z0-9]{8}$ ]] && [ -d "$pg_d/$pg_live" ] && echo named || echo unnamed)" named
+  pg_g=("$pg_d"/spec-tokens.tRun.specs.*)
+  same "an admitted dispatch leaves one spec-token generation" "${#pg_g[@]}" 1
+  # AC2: a one-spec commit re-grades that spec alone, names a new generation and removes the old one.
+  printf '%s\n\nProse moved.\n' "$sd_clean" > "$sd_spec"
+  git commit -q --only "$sd_spec" -m "pg2 onespec" --no-verify
+  pg_was=$pg_live
+  ( load_driver_conf && run_spec_token_check tRun ) >/dev/null 2>&1
+  pg_live=""; read -r pg_live <"$pg_n"
+  mapfile -t pg_l <"$pg_d/$pg_live/graded.list"
+  same "a one-spec commit re-grades that spec alone" "${#pg_l[@]} ${pg_l[0]-}" "1 $sd_spec"
+  same "a one-spec commit names a new spec-token generation" "$([ "$pg_live" != "$pg_was" ] && [ -d "$pg_d/$pg_live" ] && echo moved || echo kept)" moved
+  pg_g=("$pg_d"/spec-tokens.tRun.specs.*)
+  same "a one-spec commit leaves one spec-token generation" "${#pg_g[@]}" 1
+  git reset -q --soft HEAD~1
+  printf '%s\n' "$sd_clean" > "$sd_spec"; git add "$sd_spec"
+  # AC3: a moved tree and a refusal record no key, so neither names its generation.
+  pg_was=$( { cat "$pg_n"; ls "$pg_d/$pg_live"; cat "$pg_d/$pg_live"/*; } 2>/dev/null | git hash-object --stdin)
+  ( load_driver_conf && SPEC_TOKENS_CLI="${PFX}stub-moved.py" run_spec_token_check tRun ) >/dev/null 2>&1
+  git checkout -q -- memory/builds/tRun/README.md
+  same "a moved tree keeps the live spec-token generation and its name" "$( { cat "$pg_n"; ls "$pg_d/$pg_live"; cat "$pg_d/$pg_live"/*; } 2>/dev/null | git hash-object --stdin)" "$pg_was"
+  pg_g=("$pg_d"/spec-tokens.tRun.specs.*)
+  same "a moved tree leaves its generation unnamed beside the live one" "${#pg_g[@]}" 2
+  printf '%s\n' "$sd_red" > "$sd_spec"
+  hit "$( ( load_driver_conf && run_spec_token_check tRun ) 2>&1 )" "$sd_refuse"
+  printf '%s\n' "$sd_clean" > "$sd_spec"
+  same "a refusal keeps the live spec-token generation and its name" "$( { cat "$pg_n"; ls "$pg_d/$pg_live"; cat "$pg_d/$pg_live"/*; } 2>/dev/null | git hash-object --stdin)" "$pg_was"
+  pg_g=("$pg_d"/spec-tokens.tRun.specs.*)
+  same "a refusal's start sweeps the unnamed generation and leaves its own" "${#pg_g[@]}" 2
+  # AC8: a name that fails the shape check is no name, so the directory it points at is spared.
+  rm -f .git/unattended/spec-tokens.tRun.key
+  printf '../planted\n' > "$pg_n"; mkdir -p .git/planted; : > .git/planted/keep
+  ( load_driver_conf && run_spec_token_check tRun ) >/dev/null 2>&1
+  same "a planted malformed spec-token name spares its target" "$([ -f .git/planted/keep ] && echo spared || echo removed)" spared
+  pg_live=""; read -r pg_live <"$pg_n"
+  same "a planted malformed spec-token name is replaced by a well-formed one" "$([[ $pg_live =~ ^spec-tokens\.tRun\.specs\.[A-Za-z0-9]{8}$ ]] && [ -d "$pg_d/$pg_live" ] && echo named || echo unnamed)" named
+  pg_g=("$pg_d"/spec-tokens.tRun.specs.*)
+  same "a planted malformed spec-token name leaves one generation" "${#pg_g[@]}" 1
+  rm -rf .git/planted
+  # ---- TOOL-aPiecewiseGrade-6 AC1 AC2 AC3 AC4 - ONE DISPATCH OF A SLUG HOLDS ITS SPEC-TOKEN STATE.
+  # ---- The start half takes `spec-tokens.tRun.lock`; a second start half of the slug runs busy, so
+  # ---- the first's next generation, `.inputs` and name survive; a planted live lock runs the cache
+  # ---- off, grades, records nothing and stays held; a lock past its deadline with a live recorded
+  # ---- driver is broken and logged; and the lock is gone after each of the five paths out. RED-first,
+  # ---- staged at the close: ignoring the take's status, dropping the busy branch's ST_STATE, making
+  # ---- `check_dir_lock_stale` answer busy, and cutting the skip return's release.
+  pg6_l=$pg_d/spec-tokens.tRun.lock; pg6_k=$pg_d/spec-tokens.tRun.key; pg6_i=$pg_d/spec-tokens.tRun.inputs
+  pg6_busy="spec-token cache off: another dispatch of tRun holds its lock"
+  pg6_h=$( ( load_driver_conf && resolve_health_log "$ROOT" ) )
+  measure_pg6_call() { rm -f "$pg6_k"; ( load_driver_conf && run_spec_token_check tRun ) 2>&1; }
+  write_pg6_lock() { rm -rf "$pg6_l"; mkdir -p "$pg6_l"; echo "$(( $(date +%s) + $1 ))" > "$pg6_l/until"; echo "$2" > "$pg6_l/owner"; }
+  write_pg6_pid() { ( load_driver_conf && write_dir_lock_pid "$@" ); }
+  read_pg6_dead_pid() { ( : ) & local p=$!; wait "$p"; echo "$p"; }
+  # AC1: the overlap. The first start half's checker is let finish, so `.inputs` exists before the second starts.
+  rm -f "$pg6_k"
+  pg6_r=$( ( load_driver_conf && init_spec_token_check tRun
+    e="${ST_HANDLE#* * }/up.end"; i=0; while [ ! -e "$e" ] && [ "$i" -lt 600 ]; do sleep 0.1; i=$((i+1)); done
+    o=$( ( ST_STATE=""; ST_HANDLE=""; run_spec_token_check tRun ) 2>&1 )
+    printf '%s ' "$(grep -cF -- "$pg6_busy" <<<"$o")"
+    [ -d "$ST_NEXT" ] && printf 'next ' || printf 'gone ' ; [ -f "$pg6_i" ] && printf 'inputs ' || printf 'none '
+    f=${ST_NEXT##*/}; run_spec_token_check tRun >/dev/null 2>&1
+    l=""; read -r l <"$pg_n"; [ "$l" = "$f" ] && printf 'first' || printf 'other' ) 2>/dev/null )
+  same "a second same-slug start half runs busy, and the first's generation, input record and name survive" "$pg6_r" "1 next inputs first"
+  # AC2: a planted live lock with no pid file.
+  write_pg6_lock 600 w-other
+  pg6_was=$( { cat "$pg_n" "$pg6_i"; ls -d "$pg_d"/spec-tokens.tRun.specs.*; } 2>/dev/null | git hash-object --stdin)
+  pg6_o=$(measure_pg6_call)
+  hit  "$pg6_o" "$pg6_busy"
+  hit  "$pg6_o" "$sd_admit"
+  same "a busy dispatch records no spec-token key" "$([ -f "$pg6_k" ] && echo written || echo none)" none
+  same "a busy dispatch leaves the name, the input record and the generations" "$( { cat "$pg_n" "$pg6_i"; ls -d "$pg_d"/spec-tokens.tRun.specs.*; } 2>/dev/null | git hash-object --stdin)" "$pg6_was"
+  same "a busy dispatch leaves the lock it does not hold" "$(cat "$pg6_l/owner" 2>/dev/null)" w-other
+  printf '%s\n' "$sd_red" > "$sd_spec"
+  hit  "$(measure_pg6_call)" "$sd_refuse"
+  printf '%s\n' "$sd_clean" > "$sd_spec"
+  same "a busy refusal leaves the lock it does not hold" "$(cat "$pg6_l/owner" 2>/dev/null)" w-other
+  # AC3: past its deadline, with a live recorded driver, the lock is broken under the guard and logged.
+  write_pg6_lock -5 w-dead; write_pg6_pid "$pg6_l" driver $$
+  pg6_e=$(grep -c 'spec-tokens-lock-broken' "$pg6_h" 2>/dev/null); pg6_o=$(measure_pg6_call)
+  miss "$pg6_o" "$pg6_busy"
+  same "a lock past its deadline is broken and the key recorded" "$([ -f "$pg6_k" ] && echo written || echo none)" written
+  same "...and its breaker gives the lock back" "$([ -e "$pg6_l" ] && echo left || echo none)" none
+  same "...and one spec-tokens-lock-broken event is logged" "$(( $(grep -c 'spec-tokens-lock-broken' "$pg6_h" 2>/dev/null) - ${pg6_e:-0} ))" 1
+  # AC4: the lock is gone after the skip, the refusal, the not-recorded line, a window refusal and cache off.
+  measure_pg6_call >/dev/null; ( load_driver_conf && run_spec_token_check tRun ) >/dev/null 2>&1
+  same "a skip gives the spec-token lock back" "$([ -e "$pg6_l" ] && echo left || echo none)" none
+  printf '%s\n' "$sd_red" > "$sd_spec"; measure_pg6_call >/dev/null; printf '%s\n' "$sd_clean" > "$sd_spec"
+  same "a refusal gives the spec-token lock back" "$([ -e "$pg6_l" ] && echo left || echo none)" none
+  ( load_driver_conf && SPEC_TOKENS_CLI="${PFX}stub-moved.py" run_spec_token_check tRun ) >/dev/null 2>&1
+  git checkout -q -- memory/builds/tRun/README.md
+  same "a not-recorded run gives the spec-token lock back" "$([ -e "$pg6_l" ] && echo left || echo none)" none
+  ( load_driver_conf && init_spec_token_check tRun && remove_spec_token_check ) >/dev/null 2>&1
+  same "a window refusal gives the spec-token lock back" "$([ -e "$pg6_l" ] && echo left || echo none)" none
+  mv "./${PFX}$_sd_home/gate-fingerprint.sh" .git/pg6-fp.sh
+  hit  "$(measure_pg6_call)" "no run-gates gate-fingerprint.sh resolves"
+  mv .git/pg6-fp.sh "./${PFX}$_sd_home/gate-fingerprint.sh"
+  same "a cache-off run gives the spec-token lock back" "$([ -e "$pg6_l" ] && echo left || echo none)" none
+  # ---- TOOL-aPiecewiseGrade-6 AC10 AC11 AC12 AC13 AC14 - THE LOCK RECORDS ITS DRIVER AND ITS CHECKER,
+  # ---- and is stale once both are gone. RED-first, staged at the close: dropping the pid loop from
+  # ---- `check_dir_lock_stale`, dropping its end-file clause, dropping its runtime clause, reading a
+  # ---- non-digit first field as gone, reading an empty population as gone, and skipping the start
+  # ---- half's real `pid.checker` write.
+  rm -f "$pg6_k"
+  pg6_r=$( ( load_driver_conf && init_spec_token_check tRun
+    read -r p _ <"$pg6_l/pid.driver"; [ "$p" = "$DRIVER_PID" ] && printf 'driver ' || printf 'nodriver '
+    read -r p t w e <"$pg6_l/pid.checker"; [ "$p" = "${ST_HANDLE%% *}" ] && printf 'checker ' || printf 'nochecker '
+    [ "$e" = "${ST_HANDLE#* * }/up.end" ] && printf 'end' || printf 'noend'
+    remove_spec_token_check ) 2>/dev/null )
+  same "the start half records its driver and its checker's wrapper with the end stamp" "$pg6_r" "driver checker end"
+  # AC11: a driver killed while its checker holds; the next call runs busy, the call after the stamp breaks and records.
+  printf 'import os, time\nfor _ in range(300):\n    if os.path.exists(".git/pg6-go"): break\n    time.sleep(0.1)\n' > ${PFX}stub-wait.py
+  rm -f "$pg6_k" .git/pg6-go
+  ( load_driver_conf; DRIVER_PID=$BASHPID; SPEC_TOKENS_CLI="${PFX}stub-wait.py"; init_spec_token_check tRun; wait ) >/dev/null 2>&1 &
+  pg6_kp=$!
+  i=0; pg6_wp=""; while [ "$i" -lt 600 ]; do pg6_wp=""; { read -r pg6_wp _ _ pg6_we <"$pg6_l/pid.checker"; } 2>/dev/null; case "$pg6_wp" in [0-9]*) break ;; esac; sleep 0.1; i=$((i+1)); done
+  kill -9 "$pg6_kp" 2>/dev/null; wait "$pg6_kp" 2>/dev/null
+  pg6_e=$(grep -c 'spec-tokens-lock-broken' "$pg6_h" 2>/dev/null)
+  hit  "$(measure_pg6_call)" "$pg6_busy"
+  : > .git/pg6-go
+  i=0; while { kill -0 "${pg6_wp:-0}" 2>/dev/null || [ ! -e "${pg6_we:-.git/pg6-none}" ]; } && [ "$i" -lt 300 ]; do sleep 0.1; i=$((i+1)); done
+  miss "$(measure_pg6_call)" "$pg6_busy"
+  same "a killed driver's lock breaks once its checker stamped its end, and the key is recorded" "$([ -f "$pg6_k" ] && echo written || echo none)" written
+  same "...with one spec-tokens-lock-broken event" "$(( $(grep -c 'spec-tokens-lock-broken' "$pg6_h" 2>/dev/null) - ${pg6_e:-0} ))" 1
+  rm -rf "$pg6_l" .git/pg6-go ${PFX}stub-wait.py "${pg6_we%/*}"
+  # AC12: three dead plants are broken.
+  mkdir -p .git/pg6-cap; : > .git/pg6-cap/up.end
+  pg6_e=$(grep -c '' "$pg6_h" 2>/dev/null)
+  write_pg6_lock 600 w-x; write_pg6_pid "$pg6_l" driver "$(read_pg6_dead_pid)"; write_pg6_pid "$pg6_l" checker "$(read_pg6_dead_pid)" .git/pg6-cap/up.end
+  miss "$(measure_pg6_call)" "$pg6_busy"
+  write_pg6_lock 600 w-x; write_pg6_pid "$pg6_l" driver "$(read_pg6_dead_pid)"; write_pg6_pid "$pg6_l" checker "$(read_pg6_dead_pid)" .git/pg6-nodir/up.end
+  miss "$(measure_pg6_call)" "$pg6_busy"
+  write_pg6_lock 600 w-x; write_pg6_pid "$pg6_l" driver "$(read_pg6_dead_pid)"
+  miss "$(measure_pg6_call)" "$pg6_busy"
+  same "three locks whose recorded processes are gone are broken and logged" "$(( $(grep -c '' "$pg6_h" 2>/dev/null) - ${pg6_e:-0} ))" 3
+  # AC13: five plants are held: four live, and a dead driver pid recorded by a foreign runtime, written
+  # directly because `write_pg6_pid` stamps this shell's runtime and so cannot grade the runtime clause.
+  sleep 120 & pg6_sp=$!
+  pg6_r=""
+  for pg6_kind in driver checker stampless pending foreign; do
+    write_pg6_lock 600 w-x
+    case $pg6_kind in
+      driver) write_pg6_pid "$pg6_l" driver $$; write_pg6_pid "$pg6_l" checker "$(read_pg6_dead_pid)" .git/pg6-cap/up.end ;;
+      checker) write_pg6_pid "$pg6_l" driver "$(read_pg6_dead_pid)"; write_pg6_pid "$pg6_l" checker "$pg6_sp" .git/pg6-cap/live.end ;;
+      stampless) write_pg6_pid "$pg6_l" driver "$(read_pg6_dead_pid)"; write_pg6_pid "$pg6_l" checker "$(read_pg6_dead_pid)" .git/pg6-cap/none.end ;;
+      pending) write_pg6_pid "$pg6_l" driver "$(read_pg6_dead_pid)"; write_pg6_pid "$pg6_l" checker - ;;
+      foreign) printf '%s - otherhost:otheros\n' "$(read_pg6_dead_pid)" > "$pg6_l/pid.driver" ;;
+    esac
+    pg6_o=$(measure_pg6_call)
+    pg6_r="$pg6_r $pg6_kind:$(grep -cF -- "$pg6_busy" <<<"$pg6_o"):$(cat "$pg6_l/owner" 2>/dev/null)"
+  done
+  kill "$pg6_sp" 2>/dev/null; wait "$pg6_sp" 2>/dev/null
+  same "a live driver, a live wrapper, a stampless wrapper, a pending checker and a foreign runtime's dead driver each hold the lock" "$pg6_r" " driver:1:w-x checker:1:w-x stampless:1:w-x pending:1:w-x foreign:1:w-x"
+  rm -rf "$pg6_l" .git/pg6-cap
+  # AC14: claim-push-shaped locks with no pid file keep the deadline and age verdicts.
+  pg6_r=""
+  for pg6_kind in live passed young aged; do
+    pg6_c=.git/pg6-claim/$pg6_kind/claim-push.lock; mkdir -p "$pg6_c"
+    case $pg6_kind in
+      live) echo "$(( $(date +%s) + 600 ))" > "$pg6_c/until" ;;
+      passed) echo "$(( $(date +%s) - 5 ))" > "$pg6_c/until" ;;
+      aged) touch -d "@$(( $(date +%s) - 180 ))" "$pg6_c" ;;
+    esac
+    ( load_driver_conf && write_dir_lock "$pg6_c" w-me 70 claim-push ) >/dev/null 2>&1
+    pg6_r="$pg6_r $pg6_kind:$?"
+  done
+  same "a lock with no pid file keeps the deadline and age verdicts" "$pg6_r" " live:1 passed:0 young:1 aged:0"
+  rm -rf .git/pg6-claim
+  unset -f measure_pg6_call write_pg6_lock write_pg6_pid read_pg6_dead_pid
   rm -f ${PFX}stub-moved.py ${PFX}stub-quiet.py ${PFX}stub-raced.py ${PFX}stub-popen.py
   # TOOL-aSmoothedDispatch-8 AC4 step f: no fingerprint, no key: the cache is off on both calls.
   rm -f .git/unattended/spec-tokens.tRun.key "./${PFX}$_sd_home/gate-fingerprint.sh"
@@ -17952,7 +18131,7 @@ remove_claim_refs; reset_tree
 # ---- the suite's own shell keeps the clean functions; the block unsets them and re-sources the
 # ---- library its health stubs shadow on the way out. No fixture repository and no remote.
 gh_d=$(mktemp -d); gh_fn="$gh_d/fn.sh"; gh_cp="$gh_d/cp.sh"
-for gh_f in check_claim_push_lock_stale write_claim_push_lock remove_claim_push_lock; do
+for gh_f in check_dir_lock_stale write_dir_lock remove_dir_lock; do
   gh_x=$(sed -n "/^$gh_f() {/,/^}\$/p" "$SCRIPT")
   [ -n "$gh_x" ] || { echo "FAIL could not extract $gh_f from $SCRIPT — the GH37 arms would grade nothing"; st=1; }
   printf '%s\n' "$gh_x" >> "$gh_fn"
@@ -18007,9 +18186,9 @@ measure_gh37_race() { # functions file -> `<trials two writers took the lock> <t
     x="$gh_d/trial$t"; mkdir -p "$x"; lk="$x/claim-push.lock"
     mkdir "$lk"; echo "$(( $(date +%s) - 5 ))" > "$lk/until"
     ( export GH37_X="$x"; PATH="$gh_d/bin-race2:$PATH"
-      write_claim_push_lock "$lk" w2; echo $? > "$x/v2" ) &
+      write_dir_lock "$lk" w2 "$(( REMOTE_BOUND + 10 ))" claim-push; echo $? > "$x/v2" ) &
     i=0; while [ ! -e "$x/in2" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done
-    ( write_claim_push_lock "$lk" w1; echo $? > "$x/v1" ) &
+    ( write_dir_lock "$lk" w1 "$(( REMOTE_BOUND + 10 ))" claim-push; echo $? > "$x/v1" ) &
     wait
     p=$(cat "$x/v1" "$x/v2" 2>/dev/null | grep -c '^0$')
     [ "$p" != 2 ] || two=$((two+1)); [ "$p" != 1 ] || one=$((one+1))
@@ -18026,10 +18205,10 @@ measure_gh37_interleave() { # functions file -> how many of the two writers took
   mkdir -p "$x"; lk="$x/claim-push.lock"
   mkdir "$lk" "$lk.break"; echo "$(( $(date +%s) - 5 ))" > "$lk/until"; touch -d "@$(( $(date +%s) - 120 ))" "$lk.break"
   ( export GH37_X="$x"; PATH="$gh_d/bin-inter2:$PATH"
-    write_claim_push_lock "$lk" w2; echo $? > "$x/v2" ) &
+    write_dir_lock "$lk" w2 "$(( REMOTE_BOUND + 10 ))" claim-push; echo $? > "$x/v2" ) &
   i=0; while [ ! -e "$x/read2" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done
   ( export GH37_X="$x"; PATH="$gh_d/bin-inter1:$PATH"
-    write_claim_push_lock "$lk" w1; echo $? > "$x/v1" ) &
+    write_dir_lock "$lk" w1 "$(( REMOTE_BOUND + 10 ))" claim-push; echo $? > "$x/v1" ) &
   wait
   cat "$x/v1" "$x/v2" 2>/dev/null | grep -c '^0$'
   rm -rf "$x"
@@ -18039,22 +18218,22 @@ gh_r=$(measure_gh37_race "$gh_fn")
 same "GH37 AC1 no race trial lets two writers take a stale lock" "${gh_r% *}" "0"
 same "GH37 AC1 ...and every trial lets exactly one take it" "${gh_r#* }" "5"
 cp "$gh_fn" "$gh_cp"
-mutate "$gh_cp" '/^    if ! check_claim_push_lock_stale "\$lk"; then rmdir/d'
+mutate "$gh_cp" '/^    if ! check_dir_lock_stale "\$lk"; then rmdir/d'
 gh_r=$(measure_gh37_race "$gh_cp")
 same "GH37 AC1 a copy with the re-read under the guard cut lets two writers in" "$([ "${gh_r% *}" -ge 1 ] && echo yes || echo "no: $gh_r")" "yes"
 # ---- AC3: the bound. A fresh guard stays; an aged one is removed and logged, the call busy; the call
 # ---- after it breaks the lock. RED when an aged guard is never removed: every later call stays busy.
 gh_lk="$gh_d/bound/claim-push.lock"; mkdir -p "$gh_lk" "$gh_lk.break"; : > "$gh_d/health"
 echo "$(( $(date +%s) - 5 ))" > "$gh_lk/until"
-write_claim_push_lock "$gh_lk" w-me; gh_rc=$?
+write_dir_lock "$gh_lk" w-me "$(( REMOTE_BOUND + 10 ))" claim-push; gh_rc=$?
 same "GH37 AC3 a stale lock under a fresh guard leaves the call busy" "$gh_rc" "1"
 same "GH37 AC3 ...and the guard in place" "$([ -d "$gh_lk.break" ] && echo kept || echo gone)" "kept"
 touch -d "@$(( $(date +%s) - 120 ))" "$gh_lk.break"
-write_claim_push_lock "$gh_lk" w-me; gh_rc=$?
+write_dir_lock "$gh_lk" w-me "$(( REMOTE_BOUND + 10 ))" claim-push; gh_rc=$?
 same "GH37 AC3 a guard aged two minutes leaves the call busy" "$gh_rc" "1"
 same "GH37 AC3 ...and removes the guard" "$([ -d "$gh_lk.break" ] && echo kept || echo gone)" "gone"
 hit  "$(cat "$gh_d/health")" "claim-push-guard-cleared"
-write_claim_push_lock "$gh_lk" w-me; gh_rc=$?
+write_dir_lock "$gh_lk" w-me "$(( REMOTE_BOUND + 10 ))" claim-push; gh_rc=$?
 same "GH37 AC3 the next call breaks and takes the stale lock" "$gh_rc" "0"
 same "GH37 AC3 ...its until is a deadline in the future" "$(u=""; read -r u <"$gh_lk/until"; case "$u" in ''|*[!0-9]*) echo none ;; *) [ "$u" -gt "$(date +%s)" ] && echo future || echo past ;; esac)" "future"
 same "GH37 AC3 ...its owner is the token passed" "$(cat "$gh_lk/owner" 2>/dev/null)" "w-me"
@@ -18064,7 +18243,7 @@ cp "$gh_fn" "$gh_cp"
 mutate "$gh_cp" '/^        rm -rf "\$g"$/d'
 same "GH37 AC3 a copy that never removes an aged guard leaves the call after it busy" "$( . "$gh_cp"; l="$gh_d/bound2/claim-push.lock"
   mkdir -p "$l" "$l.break"; echo "$(( $(date +%s) - 5 ))" > "$l/until"; touch -d "@$(( $(date +%s) - 120 ))" "$l.break"
-  write_claim_push_lock "$l" w-me; write_claim_push_lock "$l" w-me; echo $? )" "1"
+  write_dir_lock "$l" w-me "$(( REMOTE_BOUND + 10 ))" claim-push; write_dir_lock "$l" w-me "$(( REMOTE_BOUND + 10 ))" claim-push; echo $? )" "1"
 # ---- AC4: the interleaved abandoned guard. RED when the remover takes the guard in the same call.
 gh_r=$(measure_gh37_interleave "$gh_fn")
 same "GH37 AC4 two writers acting on one aged guard reading never both take the lock" "$([ "$gh_r" -lt 2 ] && echo under-two || echo "$gh_r")" "under-two"
@@ -18073,15 +18252,15 @@ mutate "$gh_cp" 's/^      return 1$/      mkdir "$g" 2>\/dev\/null || return 1/'
 same "GH37 AC4 a copy whose remover takes the guard lets both writers in" "$(measure_gh37_interleave "$gh_cp")" "2"
 # ---- AC5: the owner. RED with the owner comparison cut: a foreign release removes the lock.
 gh_lk="$gh_d/own/claim-push.lock"; mkdir -p "$gh_lk"; echo w-other > "$gh_lk/owner"
-remove_claim_push_lock "$gh_lk" w-me
+remove_dir_lock "$gh_lk" w-me
 same "GH37 AC5 a release under another token leaves the lock" "$([ -d "$gh_lk" ] && echo kept || echo gone)" "kept"
-remove_claim_push_lock "$gh_lk" w-other
+remove_dir_lock "$gh_lk" w-other
 same "GH37 AC5 ...and the owner's own token removes it" "$([ -d "$gh_lk" ] && echo kept || echo gone)" "gone"
 cp "$gh_fn" "$gh_cp"
 mutate "$gh_cp" 's/\[ "\$o" = "\$2" \] && //'
 same "GH37 AC5 a copy with the owner comparison cut removes another writer's lock" "$( . "$gh_cp"; mkdir -p "$gh_lk"; echo w-other > "$gh_lk/owner"
-  remove_claim_push_lock "$gh_lk" w-me; [ -d "$gh_lk" ] && echo kept || echo gone )" "gone"
-unset -f check_claim_push_lock_stale write_claim_push_lock remove_claim_push_lock measure_gh37_race measure_gh37_interleave
+  remove_dir_lock "$gh_lk" w-me; [ -d "$gh_lk" ] && echo kept || echo gone )" "gone"
+unset -f check_dir_lock_stale write_dir_lock remove_dir_lock measure_gh37_race measure_gh37_interleave
 unset REMOTE_BOUND GH37_FIND GH37_RM GH37_MKDIR
 # shellcheck source=lib-unattended.sh
 . "$HERE/lib-unattended.sh"
@@ -19816,7 +19995,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ran, and their RED-first observation is the close's.
 # MERGED at TOOL-aTwinnedPass-13's reconcile of local main at a76c6afe7: the base 3329 at aebbb4a72, plus main's 6
 # (TOOL-aLightenedLoop-3's 5 and -8's 1), plus this branch's 13 (TOOL-aTwinnedPass-3's 10 and -5's 3) = 3348.
-FLOOR_ASSERTIONS=3348
+# RAISED 3348 -> 3377 by TOOL-aPiecewiseGrade-6 on 2026-11-16: the spec-token lock's two arms after
+# TOOL-aPiecewiseGrade-2's block (+29), every one unconditional inside the checker's block, counted
+# off the block's own lines; no suite ran, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=3377
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in

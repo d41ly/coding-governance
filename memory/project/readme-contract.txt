@@ -243,4 +243,5 @@ memory/builds/aBriskDeclaration/README.md
 memory/builds/aMeasuredDrag/README.md
 memory/builds/aLightenedLoop/README.md
 memory/builds/aTwinnedPass/README.md
+memory/builds/aPiecewiseGrade/README.md
 memory/builds/aHastenedSweep/README.md

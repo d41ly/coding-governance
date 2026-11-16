@@ -211,6 +211,7 @@ Cite ids, never line numbers.
 | [TOOL-aPairedSlots-18](../builds/aPairedSlots/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite memory-hygiene self-test red at 9b743831 on the daily… |
 | [TOOL-aPairedSlots-19](../builds/aPairedSlots/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite unattended driver selftest shard 5/8 red at 9b743831 on… |
 | [TOOL-aPairedSlots-20](../builds/aPairedSlots/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite unattended driver selftest shard 7/8 red at 9b743831 on… |
+| [TOOL-aPiecewiseGrade-9](../builds/aPiecewiseGrade/BACKLOG.md) | OPEN | MED | — | 2026-11-16 | THE CARRIES JOIN STILL READS HISTORY ON EVERY RUN. The spec-token… |
 | [TOOL-aPooledSweep-4](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THREE HELD SUITES ARE RED AT HEAD AND THIS BUILD DID NOT CAUSE ANY OF… |
 | [TOOL-aPooledSweep-5](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE WHOLE-POPULATION SWEEP IS UNMEASURED, and the 4.0x figure this… |
 | [TOOL-aPooledSweep-6](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE PEAK-CONCURRENCY ARM DOES NOT DISCRIMINATE THE COMPARISON IT EXISTS… |

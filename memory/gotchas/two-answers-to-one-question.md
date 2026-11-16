@@ -239,3 +239,18 @@ it was typed once and re-derived by nobody.
 **The check:** an authority record that states a population names it by id and id range, never
 by a spelled-out count, so each id it names can be joined to the derived roster and a count can
 never disagree with it.
+
+## The read-back form — counters returned by one function and read back by typed names
+
+`scan_live_spec` in `tools/check-spec-tokens.py` returned its counters as a literal dict, and `main`
+summed them into a `collections.Counter` and read them back by names typed a second time. A Counter
+answers 0 for a key it does not hold, so a name misspelled on either side printed a 0 in the summary
+and raised nothing, and the cached entries' `counts` were never checked either (closing review
+`2026-11-16-review-TOOL-aPiecewiseGrade-1-diff-review-round1`, item 2, ids 2, 3 and 5).
+`TOOL-aPiecewiseGrade-5` spelled the names once, in `SPEC_COUNTERS`, summed them into a plain dict
+seeded from it, raised on any other key set, made a cached entry of another shape a miss, and added
+an arm expecting a nonzero value for each counter the suite had only ever seen at 0. No gate covers
+the class: nothing grades the other `collections.Counter` read-backs under `tools/`.
+
+**The check:** a dict returned by one function and read back by typed names elsewhere is
+single-sourced, and is not read through a defaulting container.

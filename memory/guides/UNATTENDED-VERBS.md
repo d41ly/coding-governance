@@ -255,7 +255,15 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   slug, the checker, the launcher and
   a digest of every file and git answer its last admitted run read,
   recorded under the sidecar root only when the tree and HEAD held still while it ran; with no
-  fingerprint it announces that the cache is off and runs the checker. A blank or absent key is an ANNOUNCED skip on stdout,
+  fingerprint it announces that the cache is off and runs the checker.
+  On a miss it runs the checker's incremental mode, which reuses each live spec's findings from a
+  per-spec cache under the sidecar root while that spec's own inputs hold,
+  re-grades the rest and runs every cross-build join whole,
+  so its output is the whole-tree run's; a new generation of that cache goes live only where the key is recorded.
+  One dispatch of a build at a time holds that cache, under a lock in the sidecar root; a dispatch
+  that cannot take the lock says so, runs the checker whole and records nothing, and a dispatch
+  breaks a lock whose driver is gone and whose checker has ended.
+  A blank or absent key is an ANNOUNCED skip on stdout,
   never a silent pass. Where `RUN_CLAIMS` is `on` it reads the run's claim as the holder after every
   local refusal and before the row: another session's claim is check 108 and no row is written.
 - `--review` — records ONE review round for a subject and reports what the loop is doing:

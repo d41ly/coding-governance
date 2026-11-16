@@ -95,7 +95,18 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # RECONCILED to 259 at TOOL-aLightenedLoop-8's merge of origin/main: the common base 247 at
 # 846d51d39, plus main's 7 (TOOL-aClearedLedger-5 and -11), plus this branch's 5
 # (TOOL-aLightenedLoop-3's four and -6's one). Summed, not counted.
-FLOOR_ASSERTIONS=259
+# RAISED 259 -> 260 by TOOL-aPiecewiseGrade-3: its one memo arm beside the guards arms, `memo guards
+# hit`, top-level. Counted by reading; OWED: observed at the close.
+# RAISED 260 -> 275 by TOOL-aPiecewiseGrade-1: its differential arm's 15 assertions, one per step of
+# eleven and the AC4, AC5, AC7 and AC6 checks after them, each top-level. Counted by reading; OWED:
+# observed at the close.
+# RAISED 275 -> 278 by TOOL-aPiecewiseGrade-4: its PG4 arm's 3 assertions after the PG1 arm, each
+# top-level. Counted by reading; OWED: observed at the close.
+# RAISED 278 -> 282 by TOOL-aPiecewiseGrade-5: its four nonzero-counter arms, each top-level. Counted by
+# reading; OWED: observed at the close.
+# RAISED 282 -> 284 by TOOL-aPiecewiseGrade-8: its two counter key-set arms after the PG4 block, each
+# top-level. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=284
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -569,6 +580,8 @@ d=$base/skip; scratch "$d"
 sed -i 's|`'"${PFX}gate-legs.json"'` exists|see `run-gates.sh:407`|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
 git -C "$d" add -A >/dev/null
 arm "an untracked citation path is skipped, not red" 0 "$d" "citation(s) skipped"
+# TOOL-aPiecewiseGrade-5 S5: the `skipped` counter read back nonzero, so a misspelled name reds here.
+arm "PG5 AC5 the skip fixture's summary counts its one skipped citation" 0 "$d" "token(s) graded · 1 citation(s) skipped (untracked path)"
 
 # 6 — a waiver with a reason silences the hit and the count is printed
 d=$base/waived; scratch "$d"
@@ -842,6 +855,33 @@ git -C "$d" add -A >/dev/null
 arm "the same tree with the guarded leg named on the leg line is green and counted as examined" 0 "$d" "guards join · 1 declared path(s) examined in 1 live spec(s) at/after SPEC_GUARD_LEGS_CUTOFF 2026-09-01"
 git -C "$d" reset -q --hard "$clean"
 
+# TOOL-aPiecewiseGrade-3 AC2 — `load_design_lib` keeps its first load for the process: over the AC2
+#      tree, the checker loaded in process with `load_kit_module` wrapped by a counter prints its
+#      [guards] hit and makes no `design_lib` call during `main`, the import-time load already kept.
+#      Red with the `lru_cache` decorator removed: every guard check re-enters `load_kit_module`.
+printf '%s\n' "$GUARD_LEGS" > "$d/${PFX}gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`'"${PFX}x/thing.sh"'`'
+git -C "$d" add -A >/dev/null
+memo_out=$(cd "$d" && "$PY" -c 'import contextlib, importlib.util, io, sys
+spec = importlib.util.spec_from_file_location("cst", sys.argv[1])
+m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+calls, real = [], m.load_kit_module
+def counted(name):
+    calls.append(name)
+    return real(name)
+m.load_kit_module = counted
+buf = io.StringIO()
+with contextlib.redirect_stdout(buf):
+    rc = m.main([])
+hit = "[guards] `guarded leg <- " + sys.argv[2] + "x/thing.sh`" in buf.getvalue()
+print("memo guards hit", hit, "rc", rc, "design_lib loads", calls.count("design_lib"))' "$LINT" "$PFX" 2>&1)
+case "$memo_out" in
+  *"memo guards hit True rc 1 design_lib loads 0"*) echo "arm ok    TOOL-aPiecewiseGrade-3 AC2 the guards join prints its hit and makes no design_lib load after the first"; pass=$((pass+1)) ;;
+  *) echo "arm FAIL  TOOL-aPiecewiseGrade-3 AC2 — expected: memo guards hit True rc 1 design_lib loads 0"; printf '%s\n' "$memo_out" | tail -3; fail=$((fail+1)) ;;
+esac
+git -C "$d" reset -q --hard "$clean"
+
 # AC6 — the PRE-cutoff twin is green, and COUNTED on the guards line rather than silently skipped.
 printf '%s\n' "$GUARD_LEGS" > "$d/${PFX}gate-legs.json"
 printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
@@ -1042,12 +1082,20 @@ sed -i 's|^- \*\*AC1\*\* — |- **AC2** — a second criterion.\n- **AC1** — |
 printf 'SPEC_AC_ORDER_CUTOFF="2026-09-02"\n' > "$d/.memory-tree.conf"
 git -C "$d" add -A >/dev/null
 arm "TOOL-dSafePassage-41 a spec dated at SPEC_AC_ORDER_CUTOFF listing AC2 before AC1 REDS naming both" 1 "$d" '2026-09-02-spec-TOOL-tOne-1.md [ac-order] `ac-order <- AC2`'
+# TOOL-aPiecewiseGrade-5 S5: the `ao_bad` counter read back nonzero, over the same state.
+arm "PG5 AC5 the out-of-order spec's ac-order line counts it out of order" 1 "$d" "graded at/after SPEC_AC_ORDER_CUTOFF 2026-09-02 · 1 out of order"
 printf 'SPEC_AC_ORDER_CUTOFF=""\n' > "$d/.memory-tree.conf"
 git -C "$d" add -A >/dev/null
 arm "TOOL-dSafePassage-41 the out-of-order spec passes with SPEC_AC_ORDER_CUTOFF blank" 0 "$d" "ac-order join · 0 of 1 live spec(s) · SPEC_AC_ORDER_CUTOFF blank (arm off)"
 printf 'SPEC_AC_ORDER_CUTOFF="2026-09-03"\n' > "$d/.memory-tree.conf"
 git -C "$d" add -A >/dev/null
 arm "TOOL-dSafePassage-41 the out-of-order spec dated a day before SPEC_AC_ORDER_CUTOFF is held out" 0 "$d" "ac-order join · 0 of 1 live spec(s) · graded at/after SPEC_AC_ORDER_CUTOFF 2026-09-03 · 0 out of order"
+git -C "$d" reset -q --hard "$clean"
+# TOOL-aPiecewiseGrade-5 S5: the `ao_graded` counter read back nonzero, over a spec in order, so this
+# arm stays green when only `ao_bad` is misspelled.
+printf 'SPEC_AC_ORDER_CUTOFF="2026-09-02"\n' > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null
+arm "PG5 AC5 a spec in order dated at SPEC_AC_ORDER_CUTOFF is counted graded by the ac-order join" 0 "$d" "ac-order join · 1 of 1 live spec(s) · graded at/after SPEC_AC_ORDER_CUTOFF 2026-09-02 · 0 out of order"
 git -C "$d" reset -q --hard "$clean"
 
 # AC17's relation, for the new key — a COMMITTED value not strictly past its own commit day is
@@ -2096,6 +2144,8 @@ seed_source() {
 d=$base/source-bare; scratch "$d"
 seed_source "$d" "PROBE = bash -c '. helper.sh; f'" fence
 arm "TOOL-dGroundRules-46 a bare-name source in a fenced acceptance literal REDS as [source]" 1 "$d" '[source] `helper.sh` — sources a shell file by bare name'
+# TOOL-aPiecewiseGrade-5 S5: the `so_bare` counter read back nonzero, over the same fixture.
+arm "PG5 AC5 the source join counts the bare-name source" 1 "$d" "1 sourced file(s) examined in 1 live spec(s) · 1 by bare name"
 d=$base/source-whole; scratch "$d"
 seed_source "$d" "PROBE = bash -c '. sub/helper.sh; f'" fence
 arm "TOOL-dGroundRules-46 the same source by a path carrying a slash is no hit, and is counted" 0 "$d" "source join · 1 sourced file(s) examined in 1 live spec(s)" "[source]"
@@ -2338,6 +2388,185 @@ printf '{"kind":"popen","argv":["x"]}\n' > "$base/inputs.bad"
 li_key=$(cd "$d" && "$PY" "$LINT" --input-key "$base/inputs.bad" 2>&1); li_krc=$?
 [ "$li_krc" = 1 ] && [ -z "$li_key" ]
 check_input_arm "LL3 AC7 --input-key over a record holding a popen line prints nothing and exits 1" $?
+
+# TOOL-aPiecewiseGrade-1 AC2-AC7: THE INCREMENTAL MODE, a differential arm. A copy of the checker and of
+# the memory-tree kit sits in a fixture's tool root, so the kit step edits only the copy. Three live
+# specs across two builds, a CLOSED chain spec a carries design binds, and a packet stub that exits 1.
+# Each step applies one change, runs the plain checker and the one with SPEC_TOKENS_CACHE, compares
+# stdout, stderr and status, and promotes as a caller does. Every plant must move the plain output, so
+# no step passes by comparing two silences. The staged breaks, at the close: a key that leaves out the
+# `read` lines, which reds the cited step, and a mode that reuses the previous run's packet answer,
+# which reds the packet step.
+pd=$base/pgrade; pc=$base/pgcache/c; po=$base/pgout; mkdir -p "$pd" "$base/pgcache" "$po"
+git init -q "$pd"; git -C "$pd" symbolic-ref HEAD refs/heads/main
+git -C "$pd" config user.email t@t.test; git -C "$pd" config user.name t
+printf '%s\n' "${PFX}check-spec-tokens.py" "${PFX}memory-tree/" .memory-tree.conf >> "$pd/.git/info/exclude"
+mkdir -p "$pd/${PFX}" "$pd/memory/project" "$pd/memory/builds/tOne/spec" "$pd/memory/builds/tTwo/spec" \
+  "$pd/memory/builds/dAlpha/spec" "$pd/memory/builds/dAlpha/prompts" "$pd/memory/builds/dClosedLoop/build" "$pd/memory/design"
+cp "$LINT" "$pd/${PFX}check-spec-tokens.py"; cp -r "$MEMORY_TREE" "$pd/${PFX}memory-tree"
+printf '[{"name":"real leg"}]\n' > "$pd/${PFX}gate-legs.json"
+printf '#!/bin/sh\n' > "$pd/${PFX}gate.sh"
+printf 'one\ntwo\nthree\n' > "$pd/${PFX}cited.txt"
+printf '# waivers\nghost leg\t[leg] the closed step\n%snope2.sh\t[path] the retired step\nrun-gates.sh\t[bar] the cutoff step\n' "$PFX" \
+  > "$pd/memory/project/spec-token-waivers.txt"
+pg_a=memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md; pg_b=memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-2.md
+pg_s=memory/builds/tTwo/spec/2026-09-03-spec-TOOL-tTwo-1.md; pg_x=memory/builds/dAlpha/spec/2026-09-02-spec-TOOL-dAlpha-1.md
+write_grade_spec() {   # $1 path · $2 uid · $3 date · $4 section 4 body · $5 section 6 body · $6 section 7 line
+  printf '# %s — a unit\n\n**Status:** OPEN · rev-1 · %s · node t · Tier-2 · base 0123abcd · streams tooling\n\n## 4. Design\n\n%s\n\n## 6. Acceptance criteria\n\n%s\n\n## 7. Gates\n\n%s\n' \
+    "$2" "$3" "$4" "$5" "$6" > "$pd/$1"
+}
+write_grade_spec "$pg_a" TOOL-tOne-1 2026-09-02 "See \`${PFX}cited.txt:3\`."$'\n\n### Files touched\n\n'"- \`${PFX}gate.sh\`" "- **AC1** — \`${PFX}gate-legs.json\` exists." '`real leg`.'
+write_grade_spec "$pg_b" TOOL-tOne-2 2026-09-02 'Prose.' "- **AC1** — \`${PFX}gate.sh\` exists." '`real leg` · `ghost leg`.'
+write_grade_spec "$pg_s" TOOL-tTwo-1 2026-09-03 'Prose.' "- **AC1** — \`${PFX}nope2.sh\` exists."$'\n'"- **AC2** — \`run-gates.sh\` passes." '`real leg`.'
+pg_ca='The checker reads `alpha-one` first.'
+printf '# a design record\n\n## [clause-ids]\n\nRetired: `cl-dAlpha-0009`\n' > "$pd/memory/design/record.md"
+printf '# the view\n\n| Build | Clause | Text | Since |\n|---|---|---|---|\n| dAlpha | `cl-dAlpha-0001` | %s | baseline |\n' "$pg_ca" > "$pd/memory/design/view.md"
+printf 'OWNED = ("item",)\n\n\ndef derive():\n    return None, {"item": [{"key": "alpha-node", "rels": [("owner", ["dAlpha"])]}]}\n' > "$pd/memory/design/nodes.py"
+printf '# TOOL-dAlpha-1 — a unit\n\n**Status:** CLOSED · rev-1 · 2026-09-02 · node t · Tier-2 · base 0123abcd · streams tooling\n\n**Carries:** cl-dAlpha-0001@%s whole\n**Carries:** node:item.alpha-node\n\n%s\n' \
+  "$(derive_carries_pin "$pg_ca")" "$pg_ca" > "$pd/$pg_x"
+printf 'import sys\nprint("packet: stub - byte compare red")\nsys.exit(1)\n' > "$pd/memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py"
+printf '# packet\n' > "$pd/memory/builds/dAlpha/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md"
+git -C "$pd" add -A >/dev/null; git -C "$pd" commit -qm seed --no-verify
+printf 'SPEC_DIRECT_CUTOFF="2026-09-03"\nSPEC_CARRIES_CUTOFF="2026-09-02"\nDESIGN_RECORD="memory/design/record.md"\nDESIGN_BASELINE="%s"\nDESIGN_VIEW="memory/design/view.md"\nDESIGN_NODES="memory/design/nodes.py"\n' \
+  "$(git -C "$pd" rev-parse HEAD)" > "$pd/.memory-tree.conf"
+run_grade_checker() {   # $1 the output stem · rest: the environment the run adds
+  local stem=$1; shift
+  (cd "$pd" && env -u SPEC_TOKENS_CACHE -u SPEC_TOKENS_CACHE_NEXT -u SPEC_TOKENS_INPUTS "$@" "$PY" "${PFX}check-spec-tokens.py") >"$po/$stem.out" 2>"$po/$stem.err"; echo $? > "$po/$stem.rc"
+}
+check_grade_same() { cmp -s "$po/$1.out" "$po/$2.out" && cmp -s "$po/$1.err" "$po/$2.err" && cmp -s "$po/$1.rc" "$po/$2.rc"; }
+pg_gen=ok
+check_grade_step() {   # $1 step · $2 the commit message, or - for none · $3 the line the step must print
+  [ "$2" = - ] || { git -C "$pd" add -A >/dev/null; git -C "$pd" commit -qm "$2" --no-verify; }
+  local moved=1 same=0 live nj ni line dotnext=0 nx
+  nx=$(mktemp -d "$pc.XXXXXXXX")
+  run_grade_checker plain; run_grade_checker inc SPEC_TOKENS_CACHE="$pc" SPEC_TOKENS_CACHE_NEXT="$nx"
+  [ -e "$pc.next" ] && dotnext=1
+  if [ -e "$po/prev.out" ] && cmp -s "$po/plain.out" "$po/prev.out" && cmp -s "$po/plain.err" "$po/prev.err"; then moved=0; fi
+  check_grade_same plain inc && same=1
+  rm -rf "$pc"; mv "$nx" "$pc"
+  live=$(grep -o '^spec-tokens: [0-9]* live spec' "$po/plain.out" | head -1 | grep -o '[0-9]*')
+  nj=$(ls "$pc"/*.json 2>/dev/null | wc -l | tr -d ' '); ni=$(ls "$pc"/*.inputs 2>/dev/null | wc -l | tr -d ' ')
+  { [ "$dotnext" = 0 ] && [ -n "$live" ] && [ "$nj" = "$live" ] && [ "$ni" = "$live" ]; } || pg_gen="bad at $1"
+  line="step $1 moved $moved same $same rc $(tr -d '\r\n' < "$po/plain.rc")/$(tr -d '\r\n' < "$po/inc.rc") graded $(wc -l < "$pc/graded.list" | tr -d ' ')"
+  cp "$po/plain.out" "$po/prev.out"; cp "$po/plain.err" "$po/prev.err"
+  [[ $line == "$3"* ]]
+  check_input_arm "PG1 $1 prints '$3' (got '$line')" $?
+}
+check_grade_step seed - "step seed moved 1 same 1 rc 0/0 graded 3"
+check_grade_step rerun - "step rerun moved 0 same 1 rc 0/0 graded 0"
+sed -i 's/^\*\*Status:\*\* OPEN/**Status:** CLOSED/' "$pd/$pg_b"; check_grade_step closed closed "step closed moved 1 same 1"
+sed -i "s|\`${PFX}nope2.sh\` exists|\`${PFX}gate.sh\` exists|" "$pd/$pg_s"; check_grade_step retired retired "step retired moved 1 same 1"
+sed -i '/^The checker reads/d' "$pd/$pg_x"; check_grade_step carries carries "step carries moved 1 same 1"
+printf '# dAlpha - run state\n\nphase: BUILDING\n' > "$pd/memory/builds/dAlpha/RUN.md"; check_grade_step packet packet "step packet moved 1 same 1"
+mkdir -p "$pd/memory/builds/dGamma/prompts"; printf '# packet\n' > "$pd/memory/builds/dGamma/prompts/2026-10-22-prompt-PLAY-dClosedLoop-1-packet.md"
+printf '# dGamma - run state\n\nphase: BUILDING\n' > "$pd/memory/builds/dGamma/RUN.md"; check_grade_step isfile isfile "step isfile moved 1 same 1"
+printf 'one\ntwo\n' > "$pd/${PFX}cited.txt"; check_grade_step cited cited "step cited moved 1 same 1"
+printf '\n\ndef read_spec_writes(text, *a, **kw):\n    return None\n' >> "$pd/${PFX}${MEMORY_TREE_DIR##*/}/design_lib.py"; check_grade_step kit - "step kit moved 1 same 1"
+sed -i 's/^SPEC_DIRECT_CUTOFF=.*/SPEC_DIRECT_CUTOFF="2026-09-04"/' "$pd/.memory-tree.conf"; check_grade_step cutoff - "step cutoff moved 1 same 1"
+printf '\nMore prose.\n' >> "$pd/$pg_a"; check_grade_step onespec onespec "step onespec moved 0 same 1"
+[ "$(tr -d '\r' < "$pc/graded.list")" = "$pg_a" ]
+check_input_arm "PG1 AC4 after one spec's edit the run re-grades that spec alone" $?
+# AC5: one entry's .inputs gains a `run` line under the key a checker replaying it would derive; another's
+# .json does not parse. Both must read as a miss, so both specs land in graded.list.
+pg_ida=$("$PY" -c 'import hashlib, sys; print(hashlib.sha1(sys.argv[1].encode("utf-8")).hexdigest())' "$pg_a" | tr -d '\r')
+pg_ids=$("$PY" -c 'import hashlib, sys; print(hashlib.sha1(sys.argv[1].encode("utf-8")).hexdigest())' "$pg_s" | tr -d '\r')
+cp -r "$pc" "$base/pgcache/ctx"
+(cd "$pd" && SPEC_TOKENS_CACHE="$base/pgcache/ctx" SPEC_TOKENS_CACHE_NEXT="$(mktemp -d "$pc.XXXXXXXX")" "$PY" -c '
+import importlib.util, io, contextlib, hashlib, json, os, subprocess, sys
+s = importlib.util.spec_from_file_location("cst", sys.argv[3])
+cst = importlib.util.module_from_spec(s); s.loader.exec_module(cst)
+got, real = [], cst.derive_spec_context
+cst.derive_spec_context = lambda ctx: got.append(real(ctx)) or got[-1]
+with contextlib.redirect_stdout(io.StringIO()): cst.main([])
+lines = [x for x in open(sys.argv[1], encoding="utf-8").read().splitlines() if x]
+lines.append(json.dumps({"argv": ["git", "rev-parse", "HEAD"], "cwd": os.getcwd(), "drop": [], "input": "", "kind": "run", "set": {}}, sort_keys=True, separators=(",", ":")))
+open(sys.argv[1], "w", encoding="utf-8", newline="\n").write("".join(x + "\n" for x in sorted(lines)))
+raw = open(sys.argv[1], "rb").read(); h = hashlib.sha1(raw)
+files = set(subprocess.run(["git", "ls-files"], capture_output=True, text=True).stdout.split())
+for x in map(json.loads, raw.decode("utf-8").splitlines()):
+    if x["kind"] == "member": ans = "1" if x["key"] in files else "0"
+    elif x["kind"] == "read": ans = hashlib.sha1(open(x["path"], "rb").read()).hexdigest()
+    else:
+        p = subprocess.run(x["argv"], cwd=x["cwd"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        ans = f"{p.returncode} {hashlib.sha1(p.stdout).hexdigest()}"
+    kind = x["kind"]
+    h.update(f"{kind}\0{ans}\n".encode("utf-8"))
+entry = json.load(open(sys.argv[2], encoding="utf-8"))
+entry["key"] = hashlib.sha1(f"{got[0]}\0{h.hexdigest()}".encode("utf-8")).hexdigest()
+json.dump(entry, open(sys.argv[2], "w", encoding="utf-8"))' "$pc/$pg_ida.inputs" "$pc/$pg_ida.json" "$pd/${PFX}check-spec-tokens.py") >/dev/null 2>&1
+printf '{not json' > "$pc/$pg_ids.json"
+pg_nx=$(mktemp -d "$pc.XXXXXXXX")
+run_grade_checker forge SPEC_TOKENS_CACHE="$pc" SPEC_TOKENS_CACHE_NEXT="$pg_nx"
+pg_list=$(tr -d '\r' < "$pg_nx/graded.list")
+[[ $'\n'$pg_list$'\n' == *$'\n'$pg_a$'\n'* && $'\n'$pg_list$'\n' == *$'\n'$pg_s$'\n'* ]]
+check_input_arm "PG1 AC5 an entry whose .inputs holds a run line, and one whose .json does not parse, are misses" $?
+rm -rf "$pc"; mv "$pg_nx" "$pc"
+# AC7: the SPEC_TOKENS_INPUTS record is the plain run's bytes, on a cold cache and on a warm one.
+rm -rf "$pc"
+pg_nx=$(mktemp -d "$pc.XXXXXXXX")
+run_grade_checker r1 SPEC_TOKENS_INPUTS="$po/r1.rec"; run_grade_checker r2 SPEC_TOKENS_INPUTS="$po/r2.rec" SPEC_TOKENS_CACHE="$pc" SPEC_TOKENS_CACHE_NEXT="$pg_nx"
+rm -rf "$pc"; mv "$pg_nx" "$pc"
+pg_nx=$(mktemp -d "$pc.XXXXXXXX")
+run_grade_checker r3 SPEC_TOKENS_INPUTS="$po/r3.rec"; run_grade_checker r4 SPEC_TOKENS_INPUTS="$po/r4.rec" SPEC_TOKENS_CACHE="$pc" SPEC_TOKENS_CACHE_NEXT="$pg_nx"
+rm -rf "$pc"; mv "$pg_nx" "$pc"
+[ -s "$po/r1.rec" ] && cmp -s "$po/r1.rec" "$po/r2.rec" && cmp -s "$po/r3.rec" "$po/r4.rec"
+check_input_arm "PG1 AC7 the input record of a cached run, cold and warm, is the plain run's bytes" $?
+# AC6: one more run leaves the directory it reads untouched, and every promotion above held one entry
+# pair per live spec with the next generation gone.
+pg_before=$(cd "$pc" && find . -type f -exec cksum {} + | sort)
+run_grade_checker untouched SPEC_TOKENS_CACHE="$pc" SPEC_TOKENS_CACHE_NEXT="$(mktemp -d "$pc.XXXXXXXX")"
+pg_after=$(cd "$pc" && find . -type f -exec cksum {} + | sort)
+[ -n "$pg_before" ] && [ "$pg_before" = "$pg_after" ] && [ "$pg_gen" = ok ]
+check_input_arm "PG1 AC6 the run never writes the directory it reads, and each generation holds the live specs (generation $pg_gen)" $?
+
+# TOOL-aPiecewiseGrade-4 AC1-AC3: the next generation lands in the directory SPEC_TOKENS_CACHE_NEXT
+# names, over the PG1 fixture's warm cache. The staged breaks, at the close: the old rmtree and makedirs
+# of the fixed next name, which reds the first two, and the mode run on SPEC_TOKENS_CACHE alone, which
+# reds the third.
+pg_nx=$(mktemp -d "$pc.XXXXXXXX")
+run_grade_checker named SPEC_TOKENS_CACHE="$pc" SPEC_TOKENS_CACHE_NEXT="$pg_nx"
+pg_nj=$(ls "$pg_nx"/*.json 2>/dev/null | wc -l | tr -d ' ')
+[ -f "$pg_nx/graded.list" ] && [ "$pg_nj" -gt 0 ] && [ "$pg_nj" = "$(ls "$pc"/*.json 2>/dev/null | wc -l | tr -d ' ')" ] && [ ! -e "$pc.next" ]
+check_input_arm "PG4 AC1 the generation lands in the named directory, every hit copied, and no .next name appears" $?
+run_grade_checker gone SPEC_TOKENS_CACHE="$pc" SPEC_TOKENS_CACHE_NEXT="$pc.gone"
+pg_nx=$(mktemp -d "$pc.XXXXXXXX"); printf 'keep\n' > "$pg_nx/keep.me"
+run_grade_checker planted SPEC_TOKENS_CACHE="$pc" SPEC_TOKENS_CACHE_NEXT="$pg_nx"
+[ ! -e "$pc.gone" ] && [ -f "$pg_nx/keep.me" ] && [ -f "$pg_nx/graded.list" ]
+check_input_arm "PG4 AC2 a named directory that does not exist is not created, and a file already in one survives the run" $?
+# The fixture's own status joins the snapshot: a mode run with no named directory writes into its cwd.
+pg_before=$(git -C "$pd" status --porcelain; ls -a "${pc%/*}"; cd "$pc" && find . -type f -exec cksum {} + | sort)
+run_grade_checker alone SPEC_TOKENS_CACHE="$pc"
+run_grade_checker selfnamed SPEC_TOKENS_CACHE="$pc" SPEC_TOKENS_CACHE_NEXT="$pc"
+pg_after=$(git -C "$pd" status --porcelain; ls -a "${pc%/*}"; cd "$pc" && find . -type f -exec cksum {} + | sort)
+[ -n "$pg_before" ] && [ "$pg_before" = "$pg_after" ]
+check_input_arm "PG4 AC3 SPEC_TOKENS_CACHE alone, and both variables naming one directory, leave the cache and its parent as they were" $?
+
+# TOOL-aPiecewiseGrade-8 AC1 AC2: the per-spec counter key-set guards, over the PG1 fixture's warm
+# cache. A cached entry whose counts lack ao_bad is a miss, regraded with the plain run's bytes; a fresh
+# counts set lacking it raises KeyError before the summary. The staged breaks, at the close: S4's two
+# lines in read_spec_cache deleted whole, which reds the first, and S3's two lines in main, the second.
+cp -r "$pc" "$base/pgcache/drop"
+"$PY" -c 'import json, sys
+p = sys.argv[1]; e = json.load(open(p, encoding="utf-8")); del e["counts"]["ao_bad"]
+json.dump(e, open(p, "w", encoding="utf-8"))' "$base/pgcache/drop/$pg_ida.json"
+pg_nx=$(mktemp -d "$pc.XXXXXXXX")
+run_grade_checker kdplain
+run_grade_checker kdrop SPEC_TOKENS_CACHE="$base/pgcache/drop" SPEC_TOKENS_CACHE_NEXT="$pg_nx"
+pg_list=$(tr -d '\r' < "$pg_nx/graded.list")
+[[ $'\n'$pg_list$'\n' == *$'\n'$pg_a$'\n'* ]] && check_grade_same kdplain kdrop
+check_input_arm "PG8 AC1 a cached entry whose counts lack ao_bad is a miss, and the run prints the plain run's bytes" $?
+(cd "$pd" && env -u SPEC_TOKENS_CACHE -u SPEC_TOKENS_CACHE_NEXT -u SPEC_TOKENS_INPUTS "$PY" -c 'import importlib.util, sys
+sys.stdout.reconfigure(encoding="utf-8")
+s = importlib.util.spec_from_file_location("cst", sys.argv[1])
+cst = importlib.util.module_from_spec(s); s.loader.exec_module(cst)
+real = cst.scan_live_spec
+def drop(*a):
+    hits, near, counts = real(*a)
+    return hits, near, {k: v for k, v in counts.items() if k != "ao_bad"}
+cst.scan_live_spec = drop
+sys.exit(cst.main([]))' "${PFX}check-spec-tokens.py") >"$po/fresh.out" 2>"$po/fresh.err"
+[ $? = 1 ] && grep -q KeyError "$po/fresh.err" && grep -q ao_bad "$po/fresh.err" && ! grep -q 'live spec(s) ·' "$po/fresh.out"
+check_input_arm "PG8 AC2 a fresh counts set lacking ao_bad raises KeyError naming it, with no summary line" $?
 
 # TOOL-dGroundRules-32 S9, TOOL-dGroundRules-40: the build-order render's overlap rule is the
 # dispatcher's, and both are graded against the truth. Each OVERLAP_PAIRS row is two paths relative to
