@@ -33,13 +33,16 @@ schema file is absent from `root`, so a target without the kit that ships it com
 and where HEAD is unborn or holds no blob at the `source`, so a first install's render, its rows staged and
 not committed, composes none either. `render_playbook.read_kind_rows` calls it per kind.
 
-    python overlay_rows.py compose --kind <kind>
+    python overlay_rows.py compose --kind <kind> [--rows -]
 
 composes the repository at the working directory and prints one JSON object: `rows`, `states`, `held`,
 `stale`, `operations` (the row checks' classified patch operations) and `pins`, each gov row's eight-hex
 pin over its canonical form. Exit 0; 1 with each red line of a refusal; 2 naming `unarmed` and the path
 where the kind is not registered with a schema, its schema file is absent, or HEAD holds no blob at its
-`source`, and on a usage error.
+`source`, and on a usage error. `--rows -` reads a JSON array of rows on standard input, the rows the
+scenarios a build was placed under activate (TOOL-dDeclaredLoop-27): each joins after the overlay's own
+rows as the repository's, keeping its `source`, and meets every refusal an overlay row meets; a row that
+is no object or types `origin` is refused, exit 1. Any other `--rows` value is a usage error.
 """
 from __future__ import annotations
 
@@ -376,28 +379,47 @@ def read_kind_source(root, kind) -> tuple:
     return schema_rel, source_rel, [{**r, "origin": kind, "source": source} for r in tomllib.loads(text).get(kind, [])]
 
 
-def derive_kind_composition(root, kind, exclude, records):
+def derive_kind_composition(root, kind, exclude, records, extra=None):
     """What `derive_row_composition` returns for `kind` composed at HEAD under `root`, or None where the
     kind's schema file is absent from `root`, or HEAD is unborn or holds no blob at its namespace `source`
-    (TOOL-dDeclaredLoop-24 S3, section 8 F9). The overlay and the exclusions are read at HEAD as well."""
+    (TOOL-dDeclaredLoop-24 S3, section 8 F9). The overlay and the exclusions are read at HEAD as well.
+    `extra`, rows a placed scenario activates, joins after the overlay's own rows and meets every refusal
+    an overlay row meets (TOOL-dDeclaredLoop-27 S6)."""
     from policy_value import read_tag_policy
     _schema_rel, _source_rel, gov = read_kind_source(root, kind)
     if gov is None:
         return None
     schema = read_kind_schema(root, kind)
     policy = read_tag_policy(root, "HEAD") if exclude else {}
-    return derive_row_composition(kind, schema, gov, read_overlay_rows(root).get(kind, []), exclude, "order",
-                                  records, policy)
+    return derive_row_composition(kind, schema, gov, read_overlay_rows(root).get(kind, []) + list(extra or []),
+                                  exclude, "order", records, policy)
+
+
+def read_extra_rows(text) -> list:
+    """TOOL-dDeclaredLoop-27 S6: the JSON array `--rows -` reads on standard input, each row's `origin` the
+    repository's and its `source` kept; one OverlayRefused naming a row that is no object or types `origin`."""
+    try:
+        rows = json.loads(text)
+    except ValueError as exc:
+        check_reds([f"{SAY}: red · --rows · standard input holds no JSON array: {exc}"])
+    if not isinstance(rows, list):
+        check_reds([f"{SAY}: red · --rows · standard input holds no JSON array of rows"])
+    reds = [f"{SAY}: red · --rows · row {i} is no object" for i, r in enumerate(rows, 1) if not isinstance(r, dict)]
+    reds += [f"{SAY}: red · --rows · row {i} ({r.get('tag')}) · types `origin`, which is derived · remedy: drop "
+             f"the key" for i, r in enumerate(rows, 1) if isinstance(r, dict) and "origin" in r]
+    check_reds(reds)
+    return [{**r, "origin": ov.ORIGIN} for r in rows]
 
 
 def run_compose(argv) -> int:
-    """The `compose --kind <kind>` verb over the repository at the working directory: -> its exit."""
+    """The `compose --kind <kind> [--rows -]` verb over the repository at the working directory: -> its exit."""
     from policy_value import PolicyRefused
-    if len(argv) != 3 or argv[:2] != ["compose", "--kind"] or not argv[2]:
-        print(f"{SAY}: usage: python overlay_rows.py compose --kind <kind>", file=sys.stderr)
+    if len(argv) not in (3, 5) or argv[:2] != ["compose", "--kind"] or not argv[2] or argv[3:] not in ([], ["--rows", "-"]):
+        print(f"{SAY}: usage: python overlay_rows.py compose --kind <kind> [--rows -]", file=sys.stderr)
         return 2
     root, kind = pathlib.Path.cwd(), argv[2]
     try:
+        extra = read_extra_rows(sys.stdin.read()) if argv[3:] else None
         if not any(r.get("tag") == f"kind.{kind}" for r in pins.read_row_kinds(root)):
             print(f"{SAY}: unarmed · kind {kind} · {iu.derive_kit_file(root, 'kinds.toml').relative_to(root).as_posix()} "
                   f"lists no such kind with a `schema`")
@@ -408,7 +430,7 @@ def run_compose(argv) -> int:
             print(f"{SAY}: unarmed · kind {kind} · " + (f"{schema_rel}, its schema, is absent" if absent else
                                                        f"HEAD holds no {source_rel}, its namespace source"))
             return 2
-        got = derive_kind_composition(root, kind, ov.read_excluded_tags(root), iu.read_change_records(root))
+        got = derive_kind_composition(root, kind, ov.read_excluded_tags(root), iu.read_change_records(root), extra)
         schema = read_kind_schema(root, kind)
     except PolicyRefused as exc:
         print(f"{SAY}: red · the composition is refused: policy {exc.key}: {exc.line}")

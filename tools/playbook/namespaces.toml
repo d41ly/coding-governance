@@ -132,6 +132,16 @@ purpose-source = "{prefix}/loop/loop.toml"
 join-armed-by = "dDeclaredLoop"
 
 [[namespace]]
+ns = "scenario"
+owner = "dDeclaredLoop"
+layer = "layer.flow"
+source = "{prefix}/loop/scenarios.toml"
+extractor = "tag_index:extract_scenario"
+role = "describes"
+purpose-source = "{prefix}/loop/scenarios.toml"
+join-armed-by = "dDeclaredLoop"
+
+[[namespace]]
 ns = "policy"
 owner = "dDeclaredLoop"
 layer = "layer.instruction"

@@ -92,6 +92,14 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # `read_policy_kit`, and writes order files under the outbox alone. A resolver or kit that does not answer
 # is a refusal, never a default. Its leg, `loop composition fixtures`, is gov's own [[exempt_leg]], no row
 # here.
+# The scenario kind (TOOL-dDeclaredLoop-27): scenario.py composes the scenario kind, and each kind a
+# scenario activates with its rows, through loop_items.py's `read_composition` and composition.py's
+# `read_composition_at`, so the playbook kit is reached as a subprocess with no edge; it imports that
+# kit's pins.py, found by `resolve_kit_dir`, only to read the register's row kinds, and reads
+# `flow.scenario-default` and `flow.scenario-conflict` through the policy kit by `read_policy_kit`. A kit
+# that does not resolve exits 2 `unarmed`, never a default, and the transition writer records no scenario
+# where the composition is unarmed. Its leg, `loop scenario fixtures`, is gov's own [[exempt_leg]], no row
+# here.
 requires = ["memory-tree"]
 
 # Everything the kit ships is engine, overwritten on every update: the definition, its reader, the

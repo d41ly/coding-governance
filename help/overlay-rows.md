@@ -12,7 +12,7 @@ and `needs`, the open scalar `ceiling`, and its owner seat at segment 1.
 
 ## See one kind's composition
 
-`python tools/playbook/overlay_rows.py compose --kind item` composes the repository you run it in at <!-- usage: script:tools/playbook/overlay_rows.py#compose 28f85325 -->
+`python tools/playbook/overlay_rows.py compose --kind item` composes the repository you run it in at <!-- usage: script:tools/playbook/overlay_rows.py#compose dd930bb1 -->
 its last commit and prints one JSON object: `rows`, the composed rows; `states`, each gov row's state;
 `held` and `stale`, the held patches and the stale edges; `operations`, each patch operation classified
 `widens` or `narrows`; and `pins`, each gov row's eight-hex pin, the one an `amends` or `supersedes`
@@ -20,6 +20,13 @@ names. It exits 1 with each line of a refusal, and 2 naming `unarmed` and the pa
 not registered with a schema, its schema file is absent, or your last commit holds no copy of the
 kind's gov rows yet, as right after a first install, before its commit. A render passes over such a kind
 and composes none of its rows.
+
+`compose --kind <kind> --rows -` also reads a JSON array of rows on standard input and adds them after
+your overlay's own rows, each as one of yours: the rows a scenario a build was placed under activates
+(see [the loop definition](loop.md), choosing a build's scenario). Each meets every refusal a row of
+your overlay meets, the owned seat, a fixed field, a fixed row, an edge's pin and the row checks, and
+keeps the `source` it arrived with, the scenario's tag, so a refusal names it. A row that is no object,
+or one typing `origin`, is refused, exit 1; any `--rows` value but `-` is a usage error, exit 2.
 
 <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
 ```bash

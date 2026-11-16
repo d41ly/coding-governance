@@ -444,6 +444,15 @@ def extract_item(ctx, path, text=None):
     return derive_tag_rows(text, "item")
 
 
+def extract_scenario(ctx, path, text=None):
+    """The `scenario` namespace: the `tag` of each `[[scenario]]` row of gov's scenario pack, the loop kit's
+    `scenarios.toml` under the tool root (TOOL-dDeclaredLoop-27 S2). A repository's own rows are composed,
+    never indexed, as its items are."""
+    if text is None:
+        return "" if _read_tool_file(ctx, path, "loop", "scenarios.toml") else None
+    return derive_tag_rows(text, "scenario")
+
+
 def extract_policy(ctx, path, text=None):
     """The `policy` namespace: `policy.<name>` for each `[[key]]` row of the policy catalogue,
     the policy kit's `catalogue.toml`, whose `name` is all literal segments. A name carrying a

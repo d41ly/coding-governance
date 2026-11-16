@@ -175,7 +175,8 @@ def derive_record_ref(text):
 def render_toml_value(value):
     """`value` as TOML: an inline table, an array, or a JSON-spelled string, number or boolean."""
     if isinstance(value, dict):
-        return "{ %s }" % ", ".join("%s = %s" % (k, render_toml_value(v)) for k, v in value.items())
+        return "{ %s }" % ", ".join("%s = %s" % (k if re.fullmatch(r"[A-Za-z0-9_-]+", k) else json.dumps(k),
+                                                 render_toml_value(v)) for k, v in value.items())
     if isinstance(value, list):
         return "[%s]" % ", ".join(render_toml_value(v) for v in value)
     return json.dumps(value, ensure_ascii=False)
@@ -188,9 +189,10 @@ def render_item_row(row):
 
 
 # ------------------------------------------------------------------------------------------ the check
-def read_composition(root, kind=KIND):
+def read_composition(root, kind=KIND, rows=None):
     """`(exit, payload, lines)` of the playbook kit's `overlay_rows.py compose --kind <kind>` over `root`,
-    `kind` the item kind where none is given, run
+    `kind` the item kind where none is given, `rows`, where given, the activated rows handed on standard
+    input through `--rows -` (TOOL-dDeclaredLoop-27), run
     with the memory-tree kit's git leaks unset, so an inherited `GIT_DIR` never retargets the read: exit 0
     with the JSON payload, 1 with the refusal's lines, 2 with the unarmed lines."""
     try:
@@ -203,8 +205,10 @@ def read_composition(root, kind=KIND):
     except (LookupError, ImportError) as e:
         return 2, None, [str(e)]
     try:
-        p = subprocess.run([sys.executable, str(script), "compose", "--kind", kind], cwd=str(root),
-                           capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=300, env=env)
+        tail = [] if rows is None else ["--rows", "-"]
+        p = subprocess.run([sys.executable, str(script), "compose", "--kind", kind, *tail], cwd=str(root),
+                           input=None if rows is None else json.dumps(rows), capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", timeout=300, env=env)
     except subprocess.TimeoutExpired:
         return 2, None, ["%s compose did not return within 300 s" % script.as_posix()]
     lines = [ln for ln in (p.stdout + p.stderr).splitlines() if ln.strip()]
@@ -216,18 +220,19 @@ def read_composition(root, kind=KIND):
     return (p.returncode if p.returncode in (1, 2) else 1), None, lines or ["compose exited %d" % p.returncode]
 
 
-def read_composed_items(root, rev=None):
+def read_composed_items(root, rev=None, rows=None):
     """The composed `[[item]]` rows of `root` (TOOL-dDeclaredLoop-29 S4): the composition's rows where
     `read_composition` answers 0, gov's own rows of the definition beside this file where it answers 2,
     unarmed; ValueError `the item composition does not read: <first line>` where it answers 1, and
     LoopError where gov's definition does not read. With `rev`, the triple is `composition.py`'s
-    `read_composition_at(root, rev)`, the composition at that pin (TOOL-dDeclaredLoop-26)."""
+    `read_composition_at(root, rev)`, the composition at that pin (TOOL-dDeclaredLoop-26). `rows`, the
+    item rows a build's scenarios activate, join the composition (TOOL-dDeclaredLoop-27)."""
     data, where = read_definition(KIT)
     if rev is None:
-        rc, payload, lines = read_composition(root)
+        rc, payload, lines = read_composition(root, rows=rows)
     else:
         from composition import read_composition_at   # it imports this module, so here and not at the top
-        rc, payload, lines = read_composition_at(root, rev)
+        rc, payload, lines = read_composition_at(root, rev, rows=rows)
     if rc == 1:
         raise ValueError("the item composition does not read: %s" % (lines[0] if lines else "exit 1"))
     return payload["rows"] if rc == 0 else read_item_rows(data, where)

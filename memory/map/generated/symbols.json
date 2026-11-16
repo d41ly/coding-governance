@@ -483,6 +483,11 @@
       "file": "tools/memory-tree/hygiene-parity.test.sh"
     },
     {
+      "id": "ScenarioConflict",
+      "kind": "class",
+      "file": "tools/loop/scenario.py"
+    },
+    {
       "id": "ScopeRefused",
       "kind": "class",
       "file": "tools/process-monitor/scope.py"
@@ -3803,6 +3808,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_scenario_base",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
+    },
+    {
       "id": "build_schema_copy",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -5591,6 +5601,11 @@
       "id": "check_declared_class",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "check_default",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
     },
     {
       "id": "check_derived",
@@ -7566,6 +7581,11 @@
       "id": "check_sc_value",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "check_scenarios",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
     },
     {
       "id": "check_schema_keys",
@@ -9593,9 +9613,19 @@
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
+      "id": "derive_activated_rows",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
+    },
+    {
       "id": "derive_admission",
       "kind": "function",
       "file": "tools/playbook/core.py"
+    },
+    {
+      "id": "derive_admitted_scenarios",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
     },
     {
       "id": "derive_age",
@@ -10223,6 +10253,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "derive_extended_rows",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
+    },
+    {
       "id": "derive_extractor_versions",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
@@ -10266,6 +10301,11 @@
       "id": "derive_family_tags",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
+    },
+    {
+      "id": "derive_farm_row",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
     },
     {
       "id": "derive_first_bound",
@@ -11018,6 +11058,11 @@
       "file": "tools/loop/loop_table.py"
     },
     {
+      "id": "derive_move_scenarios",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
+    },
+    {
       "id": "derive_moved_invariants",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
@@ -11246,6 +11291,11 @@
       "id": "derive_plant_position",
       "kind": "function",
       "file": "tools/loop/position.py"
+    },
+    {
+      "id": "derive_plant_scenario",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
     },
     {
       "id": "derive_policy_adopter",
@@ -12086,6 +12136,11 @@
       "id": "derive_step_mode",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "derive_step_scenarios",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
     },
     {
       "id": "derive_stream_verdict",
@@ -13166,6 +13221,11 @@
       "id": "extract_runner_function",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "extract_scenario",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "extract_section",
@@ -14866,6 +14926,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/loop/position.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
     },
     {
       "id": "main",
@@ -17828,6 +17893,16 @@
       "file": "tools/memory-tree/build_records.py"
     },
     {
+      "id": "read_activatable_kinds",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
+    },
+    {
+      "id": "read_activated_rows",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
+    },
+    {
       "id": "read_active_practices",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -19006,6 +19081,11 @@
       "id": "read_export_cap",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "read_extra_rows",
+      "kind": "function",
+      "file": "tools/playbook/overlay_rows.py"
     },
     {
       "id": "read_fact_counts",
@@ -21085,6 +21165,11 @@
     {
       "id": "read_repo_root",
       "kind": "function",
+      "file": "tools/loop/scenario.py"
+    },
+    {
+      "id": "read_repo_root",
+      "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
     },
     {
@@ -21346,6 +21431,16 @@
       "id": "read_scan_overlaps",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "read_scenario_policy",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
+    },
+    {
+      "id": "read_scenario_rows",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
     },
     {
       "id": "read_scope_reds",
@@ -24326,6 +24421,11 @@
       "id": "render_scaffold",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "render_scenario_row",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
     },
     {
       "id": "render_schema",
@@ -27605,6 +27705,11 @@
     {
       "id": "run_check",
       "kind": "function",
+      "file": "tools/loop/scenario.py"
+    },
+    {
+      "id": "run_check",
+      "kind": "function",
       "file": "tools/loop/splice.py"
     },
     {
@@ -29368,6 +29473,11 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
+      "id": "run_scenario_plant",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
+    },
+    {
       "id": "run_schema",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -29398,9 +29508,19 @@
       "file": "tools/loop/splice.py"
     },
     {
+      "id": "run_scratch_verb",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
+    },
+    {
       "id": "run_seed",
       "kind": "function",
       "file": "tools/playbook/positional.py"
+    },
+    {
+      "id": "run_select",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
     },
     {
       "id": "run_self",
@@ -29461,6 +29581,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/loop/position.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
     },
     {
       "id": "run_selftest",
@@ -35761,6 +35886,16 @@
       "id": "write_sc_legs",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "write_scenario",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
+      "id": "write_scenario_plant",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
     },
     {
       "id": "write_scratch_unit",

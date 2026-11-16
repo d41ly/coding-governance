@@ -24,7 +24,10 @@ record, and the writer's next move after it back-fills one per earlier trailer, 
 table's `derive_move`, printing `refused — ...` and exiting 1 where no row holds it; resolves `--witness`
 to HEAD or an ancestor of it, adding `stand-in=<owner>` where the item has a `[[stand-in]]` row and
 `composition=<sha8>`, the commit HEAD names (`composition.py`, TOOL-dDeclaredLoop-26), which a `--field`
-may not give; refuses a staged index; where the build's previous move was pinned at another commit,
+may not give; adds `scenario=<tags>`, the scenarios the build runs under joined by `+`, and
+`scenario-settled=<entries>` where a conflict settled, both derived by `scenario.py`'s
+`derive_move_scenarios` and never given, printing `loop: scenario · unread · <why>` and recording neither
+where the scenario composition at HEAD is unarmed (TOOL-dDeclaredLoop-27); refuses a staged index; where the build's previous move was pinned at another commit,
 files `composition.py`'s `item-ended` orders, printing `loop: order · <path>` per order or
 `loop: composition · unread · <why>` where the composition at HEAD does not answer; back-fills, writes this move's record, commits the records, or an empty commit, as
 `loop transition(<slug>): <from> -> <to>` with the trailer where selected, prints
@@ -87,8 +90,11 @@ KEY = "transitions.record"
 TRAILER_KEY = "Gov-Transition"
 KIND = "transition"
 #: The extension fields a trailer and a record may carry after `build`, `item` and `sha`, in the order
-#: they are written; later units extend it. `composition` is derived by the writer, never given.
-TRANSITION_FIELDS = ("stand-in", "composition")
+#: they are written; later units extend it. `composition`, `scenario` and `scenario-settled` are derived by
+#: the writer, never given.
+TRANSITION_FIELDS = ("stand-in", "composition", "scenario", "scenario-settled")
+#: The fields `scenario.py`'s `derive_move_scenarios` derives for each move (TOOL-dDeclaredLoop-27).
+DERIVED_SCENARIO_FIELDS = ("scenario", "scenario-settled")
 #: The micro-format definition `render_transition_line` fills, held equal to `AGENTS.md`'s by `check`.
 TRANSITION_LINE = "transition — <slug> · <from> → <to> · <item tag> · <sha>"
 #: Each placeholder of `TRANSITION_LINE` and the field that fills it.
@@ -328,10 +334,12 @@ def write_transition_record(root, anchor, move):
 def write_transition(root, build, state, item, outcome, witness, facts, fields):
     """Record one build move in the repository at `root`, an absolute path: `(move fields, the commit's
     sha or None, [record paths], the line or None, [order lines])`, the order lines `loop: order · <path>`
-    per `item-ended` order or one `loop: composition · unread · <why>`. TransitionRefused where no row
-    holds the move; ValueError on a value, witness, index, policy read or tag resolver refused, writing
+    per `item-ended` order or one `loop: composition · unread · <why>`, after a `loop: scenario · unread`
+    line where the scenario composition is unarmed. TransitionRefused where no row holds the move;
+    ValueError on a value, witness, index, policy read, tag resolver or scenario conflict refused, writing
     no record; LookupError where a kit it reads does not resolve."""
     from composition import PINNED, derive_composition_revision, read_step_composition, write_ended_orders
+    from scenario import derive_move_scenarios   # it imports this module through composition.py, so here
     cache = {}
     chosen = read_cached_channels(root, "HEAD", cache)
     data, where = read_definition(KIT)
@@ -348,25 +356,36 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
         if name == "composition":
             raise ValueError("--field composition is derived: the writer sets it to the commit HEAD names, so it "
                              "is never given")
+        if name in DERIVED_SCENARIO_FIELDS:
+            raise ValueError("--field %s is derived: the writer places the build's scenarios from the move's facts "
+                             "and the previous move, so it is never given" % name)
         move[name] = value
     owner = {r.get("item"): r.get("owner") for r in read_stand_ins(data, where)}.get(item)
     if owner:
         move["stand-in"] = owner
     move["composition"] = derive_composition_revision(root)[:8]
+    said = []
+    before = read_transitions(build, root)
+    placed = derive_move_scenarios(root, state, facts, before)
+    if placed is None:
+        said.append("%s: scenario · unread · the scenario composition at HEAD answers unarmed, so the move records "
+                    "no scenario" % SAY)
+    else:
+        move["scenario"] = placed[0]
+        if placed[1]:
+            move["scenario-settled"] = placed[1]
     bad = [n for n, v in move.items() if not (isinstance(v, str) and VALUE.fullmatch(v))]
     if bad:
         raise ValueError("the value of %s, %r, is outside [A-Za-z0-9._:+@-]+" % (bad[0], move[bad[0]]))
     if read_git(root, "diff", "--cached", "--quiet")[0] != 0:
         raise ValueError("the index holds staged changes, and a transition commit carries its own records alone")
-    said = []
-    before = read_transitions(build, root)
     pin, state_read = read_step_composition(root, before)
     if state_read == PINNED and not pin.startswith(move["composition"]):
         try:
             orders, unread = write_ended_orders(root, build, before)
         except LookupError as e:   # the writer answers an unanswered resolver exit 2, `unanswered`
             raise ValueError(str(e)) from None
-        said = ["%s: order · %s" % (SAY, p) for p in orders]
+        said += ["%s: order · %s" % (SAY, p) for p in orders]
         said += ["%s: composition · unread · %s" % (SAY, unread)] if unread else []
     wrote = []
     if "log" in chosen:

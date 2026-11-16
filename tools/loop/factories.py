@@ -8,6 +8,7 @@
                         --returns <text> --output <text> --ceiling <bytes>
     python factories.py workflow <name> --driver <driver> --harness <path|none> --roles <slots>
                         --enforced-by <text> --trigger <text> --order <n> --step <step tag|none>
+    python factories.py scenario <name> --extends <tag|none> --admit <fact>=<value>... --entry <step tag>
     python factories.py check-commands
     python factories.py --fixture --plant <case>
     python factories.py --selftest
@@ -39,6 +40,10 @@ conforms, then runs the kind's gate over the whole population:
 - `workflow` appends a `[[workflow]]` row to the roles kit's `workflows.toml`, its `name`, `order` and
   `step` row to the loop definition beside this file, and its name to the roles kit's `WORKFLOW_NAMES`,
   then re-renders the README region; its gate is `check_roles.py --write`, then `loop_lib.py --check`.
+- `scenario` appends one gov `[[scenario]]` row to the pack `scenarios.toml` beside this file, `activates`
+  and `then` empty, each `--admit` a value its fact admits; the name `adopter` is refused, a repository
+  writing its own row in its overlay by hand. Its gate is `scenario.py check`, the `kind.scenario` row's
+  (TOOL-dDeclaredLoop-27).
 
 The contract every subcommand keeps: its arguments are checked against the kind's grammar first, and one
 that fails exits 2 naming it, before any write. Each path it writes, and each path the renderer it runs
@@ -96,7 +101,7 @@ EVENT_RE = re.compile(r"[A-Z][A-Za-z]*")
 #: The gate each kind's row names, as the factory prints it.
 GATES = {"command": "loop command conformance", "policy-key": "policy check",
          "hook": "hook destinations (every declared hook path ships)", "role": "roles catalogue",
-         "workflow": "roles catalogue"}
+         "workflow": "roles catalogue", "scenario": "loop scenario fixtures"}
 #: The policy key factory's gate: the arms of `check_policy.py` that read the working tree's catalogue, its
 #: policy file and the kit's own list, never a render at a revision (TOOL-dDeclaredLoop-6 F7).
 POLICY_KEY_ARMS = ("arm_schema", "arm_shape", "arm_summaries", "arm_direction")
@@ -114,6 +119,8 @@ PLANTS = {
     "workflow-new": "core.py new workflow fixture --driver program --harness none, then check_roles.py and loop_lib.py --check",
     "workflow-hand": "a hand [[workflow]] row listing a slot with no role file",
     "factory-restores": "core.py new policy-key fixture.bad whose --default its --allowed refuses",
+    "scenario-new": "core.py new scenario trial --extends scenario.feature --admit entry=trial, then scenario.py check",
+    "scenario-hand": "a hand [[scenario]] row in gov's pack whose entry names no step",
 }
 #: The register's factory verb each `-new` case and `factory-restores` runs, after `core.py new`.
 NEW_ARGV = {
@@ -129,6 +136,8 @@ NEW_ARGV = {
                      "--step", "none"],
     "factory-restores": ["policy-key", "fixture.bad", "--allowed", '["a", "b"]', "--default", '"c"', "--summary",
                          "A fixture knob.", "--usage", 'fixture.bad = "a"', "--owner", "dDeclaredLoop"],
+    "scenario-new": ["scenario", "trial", "--extends", "scenario.feature", "--admit", "entry=trial", "--entry",
+                     "step.plan"],
 }
 #: Each selftest case: the case, its owed exit, and the opening and needle of the line it owes.
 CASES = (("check-commands", 0, "factories: check-commands", "descriptor(s)"),
@@ -142,7 +151,9 @@ CASES = (("check-commands", 0, "factories: check-commands", "descriptor(s)"),
          ("role-hand", 1, "factories: gate", "R2"),
          ("workflow-new", 0, "factories: fixture · workflow-new", "gate green"),
          ("workflow-hand", 1, "factories: gate", "R8"),
-         ("factory-restores", 1, "factories: fixture · factory-restores", "porcelain clean"))
+         ("factory-restores", 1, "factories: fixture · factory-restores", "porcelain clean"),
+         ("scenario-new", 0, "factories: fixture · scenario-new", "gate green"),
+         ("scenario-hand", 1, "factories: gate", "step.nowhere"))
 
 
 class Refused(Exception):
@@ -335,7 +346,9 @@ def run_kind_gate(kind, top, kit_rel, render=False, written=()):
         return run_policy_key_arms(top, kit_rel)
     here = top / kit_rel
     try:
-        if kind == "hook":
+        if kind == "scenario":
+            argvs = [[sys.executable, str(here / "scenario.py"), "check"]]
+        elif kind == "hook":
             from loop_witness import resolve_bash
             gate = resolve_kit_dir(".", "check-hook-destinations.sh", here) / "check-hook-destinations.sh"
             argv = [resolve_bash(gate.as_posix()) or "bash", gate.as_posix()]
@@ -450,6 +463,32 @@ def write_hook(top, kit_rel, name, kit, event, matcher):
             " to write.\nprocess.exit(0);\n" % (name, event))
     return write_kind_instance("hook", name, top, kit_rel,
                                [(script, body), (fragment, json.dumps(frag, indent=2) + "\n"), (desc, text)])
+
+
+def write_scenario(top, kit_rel, name, extends, admits, entry):
+    """TOOL-dDeclaredLoop-27 S11: one gov `[[scenario]]` row appended to the pack beside this file, `activates`
+    and `then` empty, its gate `scenario.py check`. A name that is not one tag segment or is `adopter`, a
+    tag the pack holds and an `--admit` not shaped `<fact>=<value>` are refused before any write; a
+    repository writes its own row in its overlay by hand."""
+    if not SEG.fullmatch(name) or name == "adopter":
+        raise Refused("the name %r is not one tag segment other than adopter, the repository's seat" % name)
+    path = top / kit_rel / "scenarios.toml"
+    text = read_text_exact(path)
+    tag = "scenario.%s" % name
+    if any(r.get("tag") == tag for r in tomllib.loads(text).get("scenario", [])):
+        raise Refused("%s is a tag the pack already holds" % tag)
+    table = {}
+    for pair in admits:
+        fact, eq, value = pair.partition("=")
+        if not (SEG.fullmatch(fact) and eq and value.strip()):
+            raise Refused("--admit %r is not <fact>=<value>" % pair)
+        table.setdefault(fact, []).append(check_one_line("--admit", value))
+    lines = ["[[scenario]]", "tag = %s" % json.dumps(tag), "extends = %s" % json.dumps(check_one_line("--extends", extends)),
+             "admits = { %s }" % ", ".join("%s = %s" % (json.dumps(k), json.dumps(v, ensure_ascii=False))
+                                          for k, v in table.items()),
+             "entry = %s" % json.dumps(check_one_line("--entry", entry)), "activates = {}", "then = []", ""]
+    return write_kind_instance("scenario", name, top, kit_rel,
+                               [(path, render_row_after(text, "scenario", chr(10).join(lines)))])
 
 
 def render_front_matter(keys, values):
@@ -569,6 +608,11 @@ def write_hand_plant(clone, kit_rel, case):
         p = resolve_kit_dir("roles", "check_roles.py", here) / "agents" / "gov-hand.agent.md"
         text = ("---\nname: gov-hand\ndescription: A hand role.\ntools: Read\nmodel: inherit\nworkflow: build\n"
                 "reads: input:question\nrules:\nreturns: x\nmandatory: no\noutput: x\n---\n\nA hand body.\n")
+    elif case == "scenario-hand":
+        p = here / "scenarios.toml"
+        row = ['[[scenario]]', 'tag = "scenario.hand"', 'extends = "none"', 'admits = { entry = ["hand"] }',
+               'entry = "step.nowhere"', 'activates = {}', 'then = []', '']
+        text = render_row_after(read_text_exact(p), "scenario", chr(10).join(row))
     else:
         p = resolve_kit_dir("roles", "check_roles.py", here) / "workflows.toml"
         text = render_row_after(read_text_exact(p), "workflow", '[[workflow]]\nname = "handoff-hand"\n'
@@ -612,6 +656,11 @@ def run_fixture(case, base, kit_rel):
         cat = (resolve_kit_dir("policy", "catalogue.toml", clone / kit_rel) / "catalogue.toml").relative_to(clone).as_posix()
         why = ("the gate ran %s, not the four arms" % sorted(arms) if sorted(arms) != sorted(POLICY_KEY_ARMS) else
                "porcelain holds %s, not %s alone" % (dirty, cat) if dirty != [cat] else "")
+    elif case == "scenario-new":
+        rows = tomllib.loads((clone / kit_rel / "scenarios.toml").read_text(encoding="utf-8")).get("scenario", [])
+        row = next((r for r in rows if r.get("tag") == "scenario.trial"), None)
+        lack = [k for k in ("extends", "admits", "entry", "activates", "then") if k not in (row or {})]
+        why = "the pack holds no scenario.trial" if row is None else "scenario.trial lacks %s" % lack if lack else ""
     elif case == "hook-new":
         staged = run_git(clone, "diff", "--cached", "--name-only").split()
         why = ("the index holds %s" % staged if staged else
@@ -687,7 +736,8 @@ def main(argv):
                 ("policy-key", "name", ("--allowed", "--default", "--summary", "--usage", "--owner")),
                 ("hook", "name", ("--kit", "--event")),
                 ("role", "slot", ("--workflow", "--writes", "--description", "--reads", "--returns", "--output")),
-                ("workflow", "name", ("--driver", "--harness", "--roles", "--enforced-by", "--trigger", "--step"))):
+                ("workflow", "name", ("--driver", "--harness", "--roles", "--enforced-by", "--trigger", "--step")),
+                ("scenario", "name", ("--extends", "--entry"))):
             sp = sub.add_parser(kind)
             sp.add_argument(pos)
             for f in flags:
@@ -698,6 +748,8 @@ def main(argv):
                 sp.add_argument("--ceiling", required=True, type=int)
             if kind == "workflow":
                 sp.add_argument("--order", required=True, type=int)
+            if kind == "scenario":
+                sp.add_argument("--admit", required=True, action="append")
         a = ap.parse_args(argv)
         if a.kind == "command":
             return write_command(top, kit_rel, a.verb, a.kit, a.run)
@@ -705,6 +757,8 @@ def main(argv):
             return write_policy_key(top, kit_rel, a.name, a.allowed, a.default, a.summary, a.usage, a.owner)
         if a.kind == "hook":
             return write_hook(top, kit_rel, a.name, a.kit, a.event, a.matcher)
+        if a.kind == "scenario":
+            return write_scenario(top, kit_rel, a.name, a.extends, a.admit, a.entry)
         if a.kind == "role":
             return write_role(top, kit_rel, a.slot, a.workflow, a.writes, a.description, a.reads, a.returns, a.output,
                               a.ceiling)

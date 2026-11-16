@@ -309,8 +309,10 @@ through its `write_record` under the lowest unit id a spec H1 under the build de
 before the build's first spec writes none, and the next move after it back-fills one per earlier
 trailer. The micro-format line is printed, never stored, by `render_transition_line` from
 `TRANSITION_LINE`, and the charter's micro-format block defines it. An extension field's name is one of
-`TRANSITION_FIELDS`, which holds `stand-in`, written where the item has a `[[stand-in]]` row, and
-`composition`, the pin the writer derives on every move and refuses from a `--field` (`composition.py`).
+`TRANSITION_FIELDS`, which holds `stand-in`, written where the item has a `[[stand-in]]` row,
+`composition`, the pin the writer derives on every move and refuses from a `--field` (`composition.py`),
+and `scenario` and `scenario-settled`, the build's scenarios and any conflict settled between them, which
+the writer derives through `scenario.py`'s `derive_move_scenarios` and refuses from a `--field` too.
 
 `record` (`write_transition`) answers the move by `derive_move` first, so a move no row holds prints
 `refused` and writes nothing; it resolves the witness to HEAD or its ancestor, refuses a staged index,
@@ -575,11 +577,45 @@ python <prefix>/loop/composition.py --fixture --plant rename
 python <prefix>/loop/composition.py --selftest
 ```
 
+## The scenario kind, `scenario.py`
+
+A build records what kind of work it is, and the flow it runs follows (TOOL-dDeclaredLoop-27). The
+register's `kind.scenario` row names `scenario-schema.toml` as its schema, owner seat 1 and five scalar
+fields, `extends`, `admits`, `entry`, `activates` and `then`; gov's pack is `scenarios.toml`, the
+`scenario` namespace's source, holding five rows that activate nothing, and a repository adds its own
+in its overlay. Every read composes through the playbook kit's `compose --kind scenario`, reached by
+`loop_items.read_composition`, and `derive_extended_rows` reads each row through its `extends` chain.
+`derive_admitted_scenarios(facts, rows, default)` places a request under every scenario whose `admits`
+holds over its facts, `scenario.<default>` where none does, the default `flow.scenario-default` read
+through the policy kit. `derive_activated_rows(placed, rows, mode)` merges the placed scenarios'
+activated rows per kind and row tag in declared order; a field two of them set differently raises
+`ScenarioConflict` under `flow.scenario-conflict = "refuse"` and is settled for the later one under
+`declared-order`. Each kind's rows reach its composition as `compose --kind <kind> --rows -`, through
+`read_composition`'s `rows` and `composition.read_composition_at`'s `kind` and `rows`, so every refusal
+an overlay row meets an activated one meets. The transition writer derives `scenario` and
+`scenario-settled` on every move through `derive_move_scenarios`: admission over the move's facts at a
+build's first pinned move, the previous move's scenarios after, each whose `then` names the step the
+move leaves giving way (`derive_step_scenarios`). `position.py` reads the newest move's scenarios'
+activated item rows at its pin through `read_activated_rows` and lists `scenario=<tags> · <n>
+activated`. `check_scenarios(rows, data, kinds)` holds the rules, the activatable kinds read from the
+register through the playbook kit's `pins.read_row_kinds` and the cycles through `scan_cycles`.
+`select` and `check` are the CLI, and `--fixture --plant <case>` runs one of `PLANTS` over
+`composition.py`'s base with a second build `tFix2`; `check --selftest` is gov's `loop scenario
+fixtures` leg.
+
+```bash
+python <prefix>/loop/scenario.py select --fact entry=patch
+python <prefix>/loop/scenario.py check
+python <prefix>/loop/scenario.py check --selftest
+```
+
 ## The factories, `factories.py`
 
-Five more kinds of the register take their factory from `factories.py` (TOOL-dDeclaredLoop-6): the
-rows `kind.command`, `kind.policy-key`, `kind.hook`, `kind.role` and `kind.workflow` each name one of
-its subcommands, so `core.py new <kind> <name> ...` runs it. Each validates its arguments first and exits
+Six more kinds of the register take their factory from `factories.py` (TOOL-dDeclaredLoop-6): the
+rows `kind.command`, `kind.policy-key`, `kind.hook`, `kind.role`, `kind.workflow` and `kind.scenario`
+each name one of its subcommands, so `core.py new <kind> <name> ...` runs it; the scenario factory
+appends a gov row to `scenarios.toml` and refuses the name `adopter`, its gate `scenario.py check`
+(TOOL-dDeclaredLoop-27). Each validates its arguments first and exits
 2 on a bad one, before any write; holds every path it writes, and the path a renderer it runs writes,
 through `write_guarded` from `policy_edit.py`, one call per path, nested; and runs the kind's gate as the
 innermost record step, so a red gate puts every byte back and removes every created path, prints the
@@ -593,7 +629,7 @@ caller's index holding the written files, since it grades tracked fragments only
 graded by `loop_lib.py --check`. A role and a workflow join the two sets the roles kit closes in code,
 `BODY_CEILINGS` and `WORKFLOW_NAMES`, by one anchored insertion each. The preset kind is pending for
 dKeptSession, and the stage kind for TOOL-dDeclaredLoop-25's repository stage. `--fixture --plant
-<case>` runs one of eleven plants, each factory's instance green and a hand-made one red under the same
+<case>` runs one of thirteen plants, each factory's instance green and a hand-made one red under the same
 gate plus the restore, in a scratch clone of the working tree the policy kit's `build_source_snapshot`
 builds, and `--selftest` runs `check-commands` and every plant over one such clone through
 `run_selftest_cases`.

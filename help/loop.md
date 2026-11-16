@@ -421,7 +421,8 @@ policy key `transitions.record` in `.governance/policy.toml` says which:
 
 - **`trailer`**: the move's commit carries
   `Gov-Transition: <from> -> <to> · build=<slug> · item=<tag> · sha=<sha8>`, with any extra field, such
-  as `stand-in=<owner>` and `composition=<sha8>`, after it.
+  as `stand-in=<owner>`, `composition=<sha8>`, `scenario=<tags>` and `scenario-settled=<entries>`,
+  after it.
 - **`log`**: a record in the build's `build/` folder, `<date>-build-<id>-transition-<n>.md`, holding
   the same fields as `- **Build:**`, `- **From:**`, `- **To:**`, `- **Item:**` and `- **Sha:**` lines,
   where `<id>` is the lowest unit id a spec under the build defines.
@@ -535,6 +536,90 @@ asking you to re-pin the key in `.governance/policy.toml`, which only you edit.
   python tools/loop/composition.py --fixture --plant rename
   python tools/loop/composition.py --selftest
   ```
+
+## Choosing a build's scenario
+
+A build records what kind of work it is, and the flow it runs follows. That kind is a scenario: a row of
+the `scenario` kind, `kind.scenario`, which says which request facts admit it, the step a build placed
+under it enters at, and the rows of other kinds it activates for that build alone. Gov ships five, in
+`tools/loop/scenarios.toml`:
+
+- `scenario.feature`, admitted by the fact `entry=feature`, entering at `step.plan`;
+- `scenario.amendment`, by `entry=amendment`, at `step.plan`;
+- `scenario.patch`, by `entry=patch`, at `step.design`, the step a patch build enters;
+- `scenario.playbook-run`, by `entry=playbook-run`, at `step.plan`;
+- `scenario.design-only`, by `entry=feature` together with `design-only=true`; it extends
+  `scenario.feature`.
+
+None of gov's five activates a row or hands over to another, so a gov build's flow does not move.
+
+**Admission.** A build is placed under every scenario whose facts all hold, in the composition's order,
+gov's five before yours. Where none holds, it is placed under the default, `scenario.<value>` for the
+value of `flow.scenario-default` in `.governance/policy.toml`, `feature` when unset. A default naming no
+scenario the composition holds, one your `instructions.exclude` leaves out for instance, and a value the
+policy kit refuses are each refused, naming the key and the value. Until placement supplies a request's
+facts, they are the `--fact <name>=<value>` flags of `select` and of the transition writer.
+
+**Your own scenario.** Add a `[[scenario]]` row to your overlay, `.governance/instructions.toml`, tagged
+with `adopter` at its second segment. `extends` names the scenario whose facts, entry step, activated
+rows and hand-overs it starts from, each key you set standing in place of the parent's whole. Its
+`activates` holds, per kind tag, the rows it adds to that kind's composition for a build placed under
+it, each meeting every refusal an overlay row of that kind meets:
+
+```toml
+[[scenario]]
+tag = "scenario.adopter.mobile"
+extends = "scenario.feature"
+admits = { entry = ["feature"], platform = ["mobile"] }
+entry = "step.plan"
+activates = { "kind.item" = [ { tag = "item.test.adopter.device-farm", step = "step.test", actor = "command:device-farm", needs = ["item.test.verdict"], inputs = ["layer.flow:the verified tree"], allowance = "the farm's report", returns = "record-kind.device-farm", outcomes = ["done"], witness = { class = "history", by = "the farm's report" }, owner = "your-build", routes = { done = "item.test.exit" } } ] }
+then = []
+```
+
+**Conflicts.** Two scenarios a build is placed under that set one field of one activated row to
+different values conflict. Under `flow.scenario-conflict = "refuse"`, the default, the selection and the
+move are refused, naming both scenarios, the row and the field. Under `"declared-order"` the later
+scenario in the declared order wins, and the settlement `<row tag>:<field>:<winner>:<loser>` is recorded
+on the move as `scenario-settled=<entries>`, so the record says which variant ran.
+
+**The switch at a step boundary.** The transition writer records the scenarios on every move as
+`scenario=<tags>`, joined by `+`; you never give it, and `--field scenario=...` is refused, exit 2. A
+build's first move to carry the field places it from that move's facts. Every later move carries the
+previous move's scenarios, and a scenario whose `then` holds `{ at = "<step>", scenario = "<tag>" }`
+gives way to that scenario when the build leaves that step. Between boundaries the build reads its
+scenarios' rows at its pin, so a change to a scenario landing mid-step reaches the build at its next
+move, and two builds placed under different scenarios each read their own composition at once:
+`python tools/loop/position.py <slug>` lists `scenario=<tags> · <n> activated` among its reads, `<n>`
+the activated item rows. Where your tree has no scenario composition, the move records neither field and
+prints `loop: scenario · unread · <why>`.
+
+- **See where a request goes:** `python tools/loop/scenario.py select --fact entry=patch` prints the <!-- usage: script:tools/loop/scenario.py#select de95f97d -->
+  scenarios on one line, one `loop: settled · <entry>` line per settlement and the facts it read. It
+  exits 1 on a conflict under `refuse` or a refused default.
+- **Check the scenarios:** `python tools/loop/scenario.py check` holds every scenario row, gov's pack <!-- usage: script:tools/loop/scenario.py#check eb5f8807 -->
+  and yours: its keys, its parent, its facts, its entry step, the kinds it activates (every kind the
+  register lists with a schema but the scenario kind itself), its hand-overs, the parent and hand-over
+  chains free of cycles, and each activated kind's composition with its rows. It prints each refusal as
+  `loop: refused · <scenario> · ...`, then `loop: scenarios composed · <n> scenario(s) · <m> repository`,
+  and exits 2 `unarmed` where the playbook or policy kit is not installed beside the loop kit.
+- **See it on a fixture:** `python tools/loop/scenario.py --fixture --plant <case>` builds a scratch <!-- usage: script:tools/loop/scenario.py 0cdf3527 -->
+  repository holding gov's kits, plants the case and ends `loop: fixture · <case> · held` or
+  `· MISSED <why>`. The cases are `two-builds`, `drops-stage`, `reorders-stage`, `replaces-stage`,
+  `conflict`, `conflict-ordered`, `bad-default`, `default-excluded`, `then`, `mid-step-switch`,
+  `derived-field`, `then-cycle` and `extends-cycle`. `check --selftest` runs `check` and `select` over
+  your tree, then every case, and gov's own `loop scenario fixtures` gate runs it.
+
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
+  ```bash
+  python tools/loop/scenario.py select --fact entry=feature --fact design-only=true
+  python tools/loop/scenario.py check
+  python tools/loop/scenario.py --fixture --plant two-builds
+  ```
+
+What `check` does not check: that placement will supply a fact your scenario's predicate names, so a
+scenario no request ever admits passes; that the first move enters at the scenario's entry step; an
+activated row repeating a tag of your overlay, which composes as two rows; and the item and stage
+kinds' own checks over activated rows, beyond their compositions.
 
 ## Claim keys
 
@@ -926,8 +1011,8 @@ rename always leaves the record your stage follows; a stage tag of yours that di
 
 ## Making a new part
 
-Five kinds of the kinds register have a factory in this kit: a command, a policy key, a hook, a role
-and a workflow. A factory writes a new instance that already conforms, then runs the kind's gate over
+Six kinds of the kinds register have a factory in this kit: a command, a policy key, a hook, a role,
+a workflow and a scenario. A factory writes a new instance that already conforms, then runs the kind's gate over
 the whole population. You reach each one through the register's one verb, which appends your name and
 flags to the factory its row names:
 
@@ -937,6 +1022,7 @@ python <prefix>/playbook/core.py new policy-key <name> --allowed <toml> --defaul
 python <prefix>/playbook/core.py new hook <name> --kit <id> --event <event> [--matcher <m>]
 python <prefix>/playbook/core.py new role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --returns <text> --output <text> --ceiling <bytes>
 python <prefix>/playbook/core.py new workflow <name> --driver <driver> --harness <path|none> --roles <slots> --enforced-by <text> --trigger <text> --order <n> --step <step tag|none>
+python <prefix>/playbook/core.py new scenario <name> --extends <tag|none> --admit <fact>=<value> --entry <step tag>
 ```
 
 Every factory works the same way. A bad argument exits 2, naming the flag, before anything is written.
@@ -969,6 +1055,12 @@ naming it.
   appends its row to the roles kit's `workflows.toml`, its `name`, `order` and `step` row to this
   kit's `loop.toml`, and its name to the roles checker's `WORKFLOW_NAMES`. Its gate is `roles
   catalogue`, then `python tools/loop/loop_lib.py --check`.
+- **A scenario:** `python tools/loop/factories.py scenario <name> --extends <tag|none> --admit <fact>=<value> --entry <step tag>` <!-- usage: script:tools/loop/factories.py#scenario 490958b5 -->
+  appends a gov `[[scenario]]` row to this kit's `scenarios.toml`, with `activates` and `then` empty;
+  repeat `--admit` for each value a fact admits. The name `adopter`, a tag the pack already holds and an
+  `--admit` not shaped `<fact>=<value>` exit 2 before anything is written. Its gate is
+  `python tools/loop/scenario.py check`. A scenario of your own goes in your overlay by hand, as the
+  section on choosing a build's scenario shows, never through this factory.
 - **Check the commands:** `python tools/loop/factories.py check-commands` reads every kit descriptor <!-- usage: script:tools/loop/factories.py#check-commands dfaea29d -->
   and refuses, exit 1, a `[[command]]` row whose verb is not one tag segment or repeats in its
   descriptor, a row whose `run` names no tracked file under the descriptor's directory, and a
@@ -978,7 +1070,8 @@ naming it.
   case in a scratch clone of your working tree. Each `-new` case runs the factory and expects green:
   `command-new`, `policy-key-new`, `hook-new`, `role-new` and `workflow-new`. Each `-hand` case writes
   a hand-made instance that does not conform and expects the same gate red: `command-hand`,
-  `policy-key-hand`, `hook-hand`, `role-hand` and `workflow-hand`. `factory-restores` gives a policy
+  `policy-key-hand`, `hook-hand`, `role-hand` and `workflow-hand`. `scenario-new` and `scenario-hand`
+  do the same for a scenario, the hand row naming an entry step that does not exist. `factory-restores` gives a policy
   key a default its own row refuses, and expects exit 1 with the clone left clean. `--selftest` runs
   `check-commands` and every case. Gov's `loop factories fixtures` gate runs it.
 

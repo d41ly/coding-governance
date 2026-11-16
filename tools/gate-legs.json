@@ -2254,6 +2254,20 @@
     "stage": ["step.test"]
   },
   {
+    "name": "loop scenario fixtures",
+    "argv": [
+      "python",
+      "{prefix}/loop/scenario.py",
+      "check",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "repo",
+    "ceiling": 300,
+    "enforces": ["principle.p16", "principle.p8"],
+    "stage": ["step.test"]
+  },
+  {
     "name": "loop transition tables",
     "argv": [
       "python",

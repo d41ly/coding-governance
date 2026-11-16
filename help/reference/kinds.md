@@ -131,9 +131,9 @@ no factory has landed; dCalibratedLens lands it, and until then the kind has no 
 ```
 
 ## `kind.scenario`
-<!-- usage: kind:kind.scenario 7e1f2422 -->
-A scenario the loop is exercised against.
+<!-- usage: kind:kind.scenario f87dc072 -->
+A scenario a build runs under: what kind of work it is, the request facts that admit it, its entry step and the rows of other kinds it activates.
 
 ```text
-no factory has landed; dDeclaredLoop lands it, and until then the kind has no member
+python <prefix>/playbook/core.py new scenario <name> --extends <tag|none> --admit <fact>=<value> --entry <step tag>
 ```

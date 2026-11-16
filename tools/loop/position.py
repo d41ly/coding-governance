@@ -14,7 +14,10 @@ kit's `read_commits` and `derive_attribution` in the `replace` view; the build's
 `loop_items.read_composed_items` at the build's pin, the commit `composition.read_step_composition` reads
 from its newest move, or HEAD's where that move carries none (TOOL-dDeclaredLoop-26), gov's own `[[item]]`
 rows where that composition is unarmed in the tree, or the `[[item]]` rows of `definition` where a caller
-passes a parsed one, the read printed `composition@<sha8> · pinned` or `· unpinned`; the witnesses its
+passes a parsed one, the read printed `composition@<sha8> · pinned` or `· unpinned`; the item rows the
+newest move's `scenario` activates, read at the same pin through `scenario.read_activated_rows` and
+composed with the items, the read printed `scenario=<value> · <n> activated`, and nothing where that move
+carries no scenario (TOOL-dDeclaredLoop-27); the witnesses its
 moves name through `composition.derive_carried_witnesses`, so a witness under a renamed item reads under
 its successor;
 the acceptance records through `build_records.read_records` with `read_acceptance`; the run-state file's
@@ -103,6 +106,7 @@ from loop_lib import (NO_STEP, ROUTE_STAND_IN, LoopError, check_computed_witness
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_table import check_recorded_move, derive_from_states, read_transition_rows  # noqa: E402
 from loop_transition import read_transitions  # noqa: E402
+from scenario import read_activated_rows  # noqa: E402
 from loop_witness import read_git, remove_tree, resolve_bash, run_fixture_git, write_fixture_files  # noqa: E402
 
 SAY = "position"
@@ -407,8 +411,13 @@ def derive_position_into(pos, repo, slug, definition):
     pos["read"].append("composition@%s · %s" % (pin[:8], pin_state))
     if definition is None:
         data, where = read_definition(KIT)
+        # the newest move's scenarios, their activated item rows composed at the same pin (TOOL-dDeclaredLoop-27)
+        placed = moves[0].get("scenario") if moves else None
+        activated = read_activated_rows(repo, pin, placed.split("+")).get("kind.item", []) if placed else []
+        if placed:
+            pos["read"].append("scenario=%s · %d activated" % (placed, len(activated)))
         # unarmed: no composition in this tree, so gov's own rows alone; else the composition at the pin
-        items = read_composed_items(repo, pin)
+        items = read_composed_items(repo, pin, activated or None)
     else:
         data, where = definition, "the caller's definition"
         items = read_item_rows(data, where)

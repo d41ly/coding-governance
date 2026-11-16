@@ -512,6 +512,26 @@ entry = "{prefix}/loop/composition.py"
 flags = ["--fixture", "--plant=", "--selftest"]
 
 [[usage]]
+id = "script:{prefix}/loop/scenario.py"
+shape = "verb"
+entry = "{prefix}/loop/scenario.py"
+flags = ["--fixture", "--plant="]
+
+[[usage]]
+id = "script:{prefix}/loop/scenario.py#select"
+shape = "verb"
+entry = "{prefix}/loop/scenario.py"
+verb = "select"
+flags = ["--fact="]
+
+[[usage]]
+id = "script:{prefix}/loop/scenario.py#check"
+shape = "verb"
+entry = "{prefix}/loop/scenario.py"
+verb = "check"
+flags = ["--selftest"]
+
+[[usage]]
 id = "script:{prefix}/loop/upstream.py#rows"
 shape = "verb"
 entry = "{prefix}/loop/upstream.py"
@@ -574,11 +594,18 @@ verb = "workflow"
 flags = ["--driver=", "--harness=", "--roles=", "--enforced-by=", "--trigger=", "--order=", "--step="]
 
 [[usage]]
+id = "script:{prefix}/loop/factories.py#scenario"
+shape = "verb"
+entry = "{prefix}/loop/factories.py"
+verb = "scenario"
+flags = ["--extends=", "--admit=", "--entry="]
+
+[[usage]]
 id = "script:{prefix}/playbook/overlay_rows.py#compose"
 shape = "verb"
 entry = "{prefix}/playbook/overlay_rows.py"
 verb = "compose"
-flags = ["--kind="]
+flags = ["--kind=", "--rows="]
 
 [[usage]]
 id = "script:{prefix}/policy/budgets.py#resolve"

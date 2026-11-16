@@ -16,7 +16,9 @@ THE READ AT THE PIN. `read_composition_at(root, rev)` answers what `loop_items.r
 composed at `rev`: in place where `rev` is HEAD's commit, otherwise in a scratch worktree detached at
 `rev` under the host temp directory, removed in a `finally`, so every read the `compose --kind item`
 verb makes at HEAD reads the pin while the code that runs is this tree's. `loop_items.read_composed_items`
-takes the revision and reads through it, and `position.py` reads a build's items there.
+takes the revision and reads through it, and `position.py` reads a build's items there. Its `kind` and
+`rows` reach the verb's `--kind` and `--rows -`, so `scenario.py` reads the scenario composition at a
+pin and hands a placed scenario's activated rows to their kind's composition (TOOL-dDeclaredLoop-27).
 
 THE CARRY. A tag absent from the composition at a pin is redirected when the one tag resolver, the
 playbook kit's `gov_tag.py show <tag> --json`, found under the repository being read, answers exactly one
@@ -40,7 +42,7 @@ observation and closes with `loop: fixture · <case> · held` or `· MISSED <why
 `--selftest` runs every plant through `loop_lib.run_selftest_cases` over one scratch base, reset per plant.
 Exit 0 held, 1 missed, 2 where the scratch could not be built.
 
-WHAT THIS DOES NOT CHECK: any kind but the item kind at a pin; the definition's steps and transition
+WHAT THIS DOES NOT CHECK: any kind but the item and scenario kinds at a pin; the definition's steps and transition
 tables at a pin, which are read from this kit's own file; that the owner acted on an order; a successor
 chain longer than one record, since the resolver answers the record that ended the tag.
 """
@@ -109,21 +111,22 @@ def read_step_composition(root, moves):
     return sha, PINNED
 
 
-def read_composition_at(root, rev):
-    """`(exit, payload, lines)` of `read_composition` composed at `rev`: in place where `rev` is HEAD's
-    commit, otherwise in a scratch worktree detached at it and removed in a `finally`. ValueError where
-    `rev` names no commit or git cannot check it out."""
+def read_composition_at(root, rev, kind="item", rows=None):
+    """`(exit, payload, lines)` of `read_composition` of `kind` composed at `rev`, `rows` the activated
+    rows it hands on (TOOL-dDeclaredLoop-27): in place where `rev` is HEAD's commit, otherwise in a scratch
+    worktree detached at it and removed in a `finally`. ValueError where `rev` names no commit or git
+    cannot check it out."""
     root = pathlib.Path(root).absolute()
     sha = resolve_commit(root, rev)
     if sha is None:
         raise ValueError("the pin %s names no commit in %s" % (rev, root.as_posix()))
     if sha == derive_composition_revision(root):
-        return read_composition(root)
+        return read_composition(root, kind, rows)
     scratch = pathlib.Path(tempfile.mkdtemp(prefix="pin-")).absolute()
     try:
         if read_git(root, "worktree", "add", "--detach", str(scratch), sha)[0] != 0:
             raise ValueError("git could not check out %s in a scratch worktree of %s" % (sha[:8], root.as_posix()))
-        return read_composition(scratch)
+        return read_composition(scratch, kind, rows)
     finally:
         read_git(root, "worktree", "remove", "--force", str(scratch))
         if scratch.exists():
