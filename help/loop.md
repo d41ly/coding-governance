@@ -1321,7 +1321,8 @@ draw id: its commit is its identity, and two such draws are two commits. A patch
 build with no record goes in the patch build's own `RUN.md`, as the row, its draw id included,
 followed by ` · budget <slug>`, and counts
 for the patched build `<slug>` alone. These rows are read oldest first by their time, and the build's
-first record copies them.
+first record copies them. A `RUN.md` that `--preflight` has rotated to `RUN.<phase>.<blob8>.md` keeps
+counting, an aborted run's included, and so do a patch build's rows in its own rotated records.
 
 A row's `<spent>` is what its writer counted when it wrote the row. Two worktrees drawing at once each
 count their own, so after a merge two rows can both read `1/4`. The count is re-derived from the rows

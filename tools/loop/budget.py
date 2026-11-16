@@ -26,11 +26,12 @@ carries none, counts as its own (TOOL-dDeclaredLoop-61). A draw row's typed `spe
 each count their own, so a row whose typed figure is not its ordinal is named in the reader's
 `disagree` list and refuses nothing (TOOL-dDeclaredLoop-49); the typed `total` is not compared, since a
 row drawn before the freeze carries the base. Before the build's first log record the
-same rows sit in three homes (TOOL-dDeclaredLoop-48): its run-state file and each rotated
-`RUN.LANDED.<blob8>.md` beside it, each prefixed by its UTC timestamp; the `budget` and `draw` fields of
+same rows sit in three homes (TOOL-dDeclaredLoop-48): its run-state file and each record the driver's
+preflight rotated beside it, `RUN.<phase>.<blob8>.md`, an aborted or abandoned run's as a landed one's
+(TOOL-dDeclaredLoop-60), each row prefixed by its UTC timestamp; the `budget` and `draw` fields of
 its `Gov-Transition` trailers, `budget=frozen@<units>@<total>` and `draw=<cause>@<item>@<spent>+<total>`,
 the `draw=` field carrying no id since its commit is its identity, each stamped with its commit's committer date in UTC (`read_trailer_rows`); and each row of a `RUN.md`
-under the memory root's `builds/` folders suffixed ` · budget <slug>` after its id, read without the suffix, a
+or a rotated record under the memory root's `builds/` folders suffixed ` · budget <slug>` after its id, read without the suffix, a
 suffixed row counting for the build it names and never for its file's own. They are read oldest first
 by UTC second, a tie broken by the typed `spent` with a freeze row first, and the transition writer
 copies them into the first record it writes.
@@ -117,7 +118,8 @@ SUFFIXED = re.compile(r"(.*) · budget (\S+)")
 #: The trailer values of the two budget fields, `budget` and `draw`: a cause never holds `@`, so a
 #: `draw` value splits at its first `@` and its last.
 TRAILER_ROWS = {"budget": re.compile(r"frozen@(\d+)@(\d+)"), "draw": re.compile(r"([^@]+)@(.+)@(\d+)\+(\d+)")}
-ROTATED = "RUN.LANDED.*.md"
+#: The driver's archive pathspec: every record its preflight rotated, whatever phase it ended in.
+ROTATED = "RUN.*.md"
 PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass drawn on each lap, nine laps",
           "before-freeze": "designing back to planning and forward again, four laps, then a fifth route back",
           "stale-verdict": "a gates verdict staled by another build's landing, re-verified",
@@ -136,7 +138,10 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
           "parallel-append": "one item drawn alike on main and on a branch, the rows differing in their draw id alone, "
                              "merged under this tree's attribute, then drawn",
           "draw-id-rows": "one log record given two identical id-less draw rows, one id-bearing row twice, then a "
-                          "malformed id"}
+                          "malformed id",
+          "draws-survive-rotation": "two draws, the run-state file rotated as an aborted run's, then a third draw",
+          "patch-archived": "patch-trailer-only through its patch draw, then tFixPatch's run-state file rotated "
+                            "as an aborted run's"}
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
 PLANT_TRAILER = '[transitions]\nrecord = ["trailer"]\n'
 PLANT_SPEC = "# TOOL-%s-%d — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n"
@@ -178,9 +183,12 @@ def read_budget_rows(build, root, moves=None):
     records = read_transition_records(build, root)
     run = read_run_file(root, build)
     # its own run-state files, each row it holds for itself; and, for a build holding no log record, its
-    # trailers' fields and the rows each build's RUN.md holds for it under ` · budget <slug>` (TOOL-dDeclaredLoop-48)
+    # trailers' fields and the rows each build's RUN.md and rotated records hold for it under ` · budget <slug>`
+    # (TOOL-dDeclaredLoop-48)
     files = [(path, None) for path in sorted(run.parent.glob(ROTATED)) + [run]]
-    files += [] if records else [(path, build) for path in sorted(run.parent.parent.glob("*/RUN.md"))]
+    # `RUN.*.md` never matches `RUN.md`, so no file is read twice under one owner (TOOL-dDeclaredLoop-60)
+    named = sorted(run.parent.parent.glob("*/RUN.md")) + sorted(run.parent.parent.glob("*/" + ROTATED))
+    files += [] if records else [(path, build) for path in named]
     carried = [] if records else read_trailer_rows(build, root)
     for path, owner in files:
         if path.is_file():
@@ -415,11 +423,11 @@ def write_budget_plant(top, case):
     units = {"mint-each-lap": 2, "unrecorded": 2, "re-entry": 3}.get(case, 1)
     files = {FX_SPEC.replace(FX_UNIT, "TOOL-%s-%d" % (FX_BUILD, n)): PLANT_SPEC % (FX_BUILD, n)
              for n in range(2, units + 1)}
-    if case in ("pre-spec", "unrecorded", "trailer-only"):
+    if case in ("pre-spec", "unrecorded", "trailer-only", "draws-survive-rotation"):
         files["memory/builds/%s/RUN.md" % FX_BUILD] = PLANT_RUN
     if case == "route-backs":
         files[".governance/policy.toml"] = "[flow]\nroute-backs = 3\nrework-budget = 6\n"
-    if case in ("trailer-only", "patch-trailer-only"):
+    if case in ("trailer-only", "patch-trailer-only", "patch-archived"):
         files[".governance/policy.toml"] = PLANT_TRAILER
     write_fixture_files(top, files)
     run_fixture_git(top, "add", "-A")
@@ -594,7 +602,7 @@ def run_budget_plant(case):
                 record_draw(FX_BUILD, answer, FX_UNIT, top)
             check(answer == "contention", "a verdict staled by another build's landing classified %s" % answer)
             check(read_rows() == before, "the re-verification wrote a draw row")
-        elif case in ("patch-draw", "patch-trailer-only"):
+        elif case in ("patch-draw", "patch-trailer-only", "patch-archived"):
             head = run_fixture_git(top, "rev-parse", "HEAD")
             move = {"build": FX_BUILD, "from": "deploying", "to": "landed", "item": "item.deploy.close", "sha": head[:8]}
             files = {"memory/builds/%s/README.md" % PATCH_BUILD:
@@ -630,6 +638,13 @@ def run_budget_plant(case):
                 rc, out = run_verb(patch_draw)
                 check(rc == 2 and "refused" in out and PATCH_BUILD in out,
                       "the draw with no run-state file of %s was not refused naming it" % PATCH_BUILD)
+            elif case == "patch-archived":   # the patch build's record rotated as the driver's preflight rotates it
+                patch_run = read_run_file(top, PATCH_BUILD)
+                shutil.move(str(patch_run), str(patch_run.with_name("RUN.ABORTED.0000bbbb.md")))
+                write_fixture_files(top, {patch_run.relative_to(top).as_posix(): PLANT_RUN.replace(FX_BUILD, PATCH_BUILD)})
+                states = (budget_state(FX_BUILD, top), budget_state(PATCH_BUILD, top))
+                print("%s: fixture · budget_state · %s %s · %s %s" % (SAY, FX_BUILD, states[0], PATCH_BUILD, states[1]))
+                check(states == ("unfrozen 1/4", "unfrozen 0/4"), "the states read %s and %s" % states)
             else:
                 newest = read_transition_records(FX_BUILD, top)[-1]["path"]
                 check(row in pathlib.Path(top, newest).read_text(encoding="utf-8"), "%s does not carry the row" % newest)
@@ -792,6 +807,17 @@ def run_budget_plant(case):
                   "the first file does not carry the freeze at 2 units and 1/8")
             check("fix-pass · %s · 2/8" % FX_UNIT in new and "budget · " not in new,
                   "the new file does not carry 2/8 alone")
+        elif case == "draws-survive-rotation":
+            run_verb(draw + [FX_UNIT])
+            run_verb(draw + [FX_UNIT])
+            run = read_run_file(top, FX_BUILD)
+            shutil.move(str(run), str(run.with_name("RUN.ABORTED.0000aaaa.md")))   # an aborted run's record
+            write_fixture_files(top, {run.relative_to(top).as_posix(): PLANT_RUN})
+            run_verb(draw + [FX_UNIT])
+            state = budget_state(FX_BUILD, top)
+            print("%s: fixture · budget_state · %s" % (SAY, state))
+            check(state == "open 3/6", "budget_state answers %s" % state)
+            check("budget · " not in run.read_text(encoding="utf-8"), "the fresh RUN.md holds a budget · row")
     except LookupError as e:
         print("%s: fixture · %s · unarmed: %s" % (SAY, case, e))
         return 2

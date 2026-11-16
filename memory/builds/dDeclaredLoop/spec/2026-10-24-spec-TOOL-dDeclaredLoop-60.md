@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-60 — the budget reader counts draws in every run record, rotated archives included, under `MEMORY_ROOT`
 
-**Status:** INPROGRESS · rev-4 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 30 · advances TOOL-dDeclaredLoop-35
+**Status:** CLOSED · rev-4 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 30 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,7 +12,9 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-60-deviation-601.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-60-deviation-601.md) | deviation | — |
 | [2026-10-24-build-TOOL-dDeclaredLoop-60-deviation-602.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-60-deviation-602.md) | deviation | — |
+| [2026-11-16-build-TOOL-dDeclaredLoop-60-1-acceptance-ledger.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-60-1-acceptance-ledger.md) | journal | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-60-deviation-603.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-60-deviation-603.md) | deviation | — |
+| [2026-11-16-build-TOOL-dDeclaredLoop-60-deviation-604.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-60-deviation-604.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-60-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-60-1-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-60-build-brief.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-60-build-brief.md) | journal | — |
