@@ -170,8 +170,8 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-61 — every draw row carries a draw id, so two identical parallel draws stay two rows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-61.md) | 30 | 2 | CLOSED | rev-3 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-62 — the transition-record merge driver chosen against the recorded union measurement and the row driver's own refusal](spec/2026-10-24-spec-TOOL-dDeclaredLoop-62.md) | 30 | 2 | CLOSED | rev-4 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-20 — the breakpoint program's own items: trigger, dispose, fold and cost, and the four keys `review.dispose` reads](spec/2026-10-24-spec-TOOL-dDeclaredLoop-20.md) | 31 | 2 | CLOSED | rev-5 | 2026-11-16 |
-| [TOOL-dDeclaredLoop-22 — the stage-exit recommendation: a command scores it, the producing role reasons it, one record carries both](spec/2026-10-24-spec-TOOL-dDeclaredLoop-22.md) | 32 | 2 | DEFERRED | rev-3 | 2026-10-25 |
-| [TOOL-dDeclaredLoop-50 — the review program's item rows pass the program and declaration checks](spec/2026-10-24-spec-TOOL-dDeclaredLoop-50.md) | 32 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-22 — the stage-exit recommendation: a command scores it, the producing role reasons it, one record carries both](spec/2026-10-24-spec-TOOL-dDeclaredLoop-22.md) | 32 | 2 | DEFERRED | rev-4 | 2026-11-16 |
+| [TOOL-dDeclaredLoop-50 — the review program's item rows pass the program and declaration checks](spec/2026-10-24-spec-TOOL-dDeclaredLoop-50.md) | 32 | 2 | DEFERRED | rev-3 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-19 — breakpoints at any item boundary: reviews and owner gates one mechanism under `review.breakpoints`, `review.<stage>` and `autonomy`](spec/2026-10-24-spec-TOOL-dDeclaredLoop-19.md) | 33 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-51 — the eight recommendation rows amended in place, their actors in the declaration grammar](spec/2026-10-24-spec-TOOL-dDeclaredLoop-51.md) | 33 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-33 — the static termination check on every composition, at the push and at each step boundary](spec/2026-10-24-spec-TOOL-dDeclaredLoop-33.md) | 34 | 2 | DEFERRED | rev-5 | 2026-11-05 |
@@ -213,7 +213,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 660 bound to this build, across 4 record folder(s).
+Records: 662 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
