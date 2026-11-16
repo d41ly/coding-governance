@@ -33,7 +33,7 @@ callers share.
   by name: `tools/unattended/unattended.sh`, at `write_claim` and the header comments; `tools/unattended/unattended.test.sh`, the GH37 block's extraction loop, its calls, one `mutate` pattern and its `unset -f` line; `memory/map/generated/symbols.json`, three symbol ids.
   by value: NO VALUE READERS — a function name carries no value that any reader compares or counts.
 - **S2** — The start half takes `spec-tokens.<slug>.lock` under the sidecar root before its skip
-  lookup, with a hold of `GATE_BOUND` plus 60 seconds and the stem `spec-tokens`. Holding it, the
+  lookup, with a hold of `GATE_BOUND` plus 60 seconds (DERIVED) and the stem `spec-tokens`. Holding it, the
   start half does everything it does today. Observed by AC1 and AC3.
 - **S3** — A start half that cannot take the lock sets `ST_STATE` to `busy`. It makes no lookup, reads
   no tree state, and leaves the input record, the sweep and `mktemp` alone. It starts the checker with
@@ -108,7 +108,7 @@ Read at HEAD `fccef94ef`, where the driver's blob is `e57e48e3` (the review's), 
 - `GATE_BOUND` is the checker's bound: `init_bounded` reads `${RB_BOUND:-${GATE_BOUND:-0}}`
   (`tools/unattended/unattended.sh#init_bounded`), and `RB_BOUND` is empty at the dispatch. The conf
   reader refuses a `GATE_BOUND` of 0 (`tools/unattended/unattended.sh@e57e48e3:3187`), and the default
-  is 3600 s.
+  is 3600 s (DERIVED from the driver at fccef94ef).
 - `add_health_event` accepts an event that is a lowercase token of letters, digits and dashes
   (`tools/unattended/lib-unattended.sh#add_health_event`). `check_slug_shape` admits letters, digits
   and dashes only (`tools/unattended/unattended.sh@e57e48e3:3107`), so `spec-tokens.<slug>.lock`
@@ -219,7 +219,7 @@ running dispatch depends on. Its later check-108 refusal leaves state that a rea
 
 The lock's `until` is the take's time plus `GATE_BOUND` plus 60 seconds (PINNED literal, chosen not
 measured). The checker starts after the take and is killed at `GATE_BOUND` plus the 5-second `-k`
-grace, so a live holder's `until` passes after its checker is bounded out. The 60 seconds also cover
+grace, so a live holder's `until` passes after its checker is bounded out. The 60 seconds (DERIVED) also cover
 the lookup's replay before the checker and the key's replay after it. Staleness is the factory's
 rule, unchanged: a passed `until`, or no `until` and an age over two minutes.
 
@@ -227,7 +227,7 @@ rule, unchanged: a passed `until`, or no `until` and an age over two minutes.
 |---|---|---|
 | between the take's `mkdir` and its `until` write | a lock with no `until` | runs busy until the lock is two minutes old, then breaks it |
 | anywhere between the take and the release | a lock with `until`, maybe a next generation, maybe an `.inputs` | runs busy, grading correctly, until `until` passes. Then it breaks the lock under the guard, logs `spec-tokens-lock-broken`, and sweeps what the killed run left |
-| a surviving checker (the driver died, its child did not) | a process still writing the next generation and `.inputs` | where `timeout -k` runs, that child is killed at `GATE_BOUND` plus 5 s from its start, before `until` passes, so no breaker races it |
+| a surviving checker (the driver died, its child did not) | a process still writing the next generation and `.inputs` | where `timeout -k` runs, that child is killed at `GATE_BOUND` plus 5 s (DERIVED) from its start, before `until` passes, so no breaker races it |
 | inside the release's `rm -rf` | part of a lock directory, maybe without `owner` or `until` | the age rule breaks it after two minutes |
 
 ### What the design does not check
@@ -238,7 +238,7 @@ rule, unchanged: a passed `until`, or no `until` and an age over two minutes.
   claim-push lock's own stated limits.
 - **The factory's abandoned-guard gap**, carried from TOOL-aGraftedHelix-37's header: two writers
   removing one abandoned guard while a third takes a fresh one can admit two breakers.
-- **A killed run's window.** For up to `GATE_BOUND` plus 60 s after a kill, every dispatch of that
+- **A killed run's window.** For up to `GATE_BOUND` plus 60 s (DERIVED) after a kill, every dispatch of that
   slug in that worktree runs whole and prints the busy line. Findings stay correct. F1 is the choice
   of whether that cost is worth a pid check.
 - **A driver from before this unit** takes no lock, so it still races a new one in the same worktree.
@@ -258,9 +258,9 @@ primes the cache before the first step.
 | step | what happens | the line it prints |
 |---|---|---|
 | `overlap` | `K` removed. In a subshell, `init_spec_token_check tA` runs, then the probe polls for the started checker's `up.end` stamp (600 polls of 0.1 s). A nested subshell then runs `run_spec_token_check tA` whole, its output captured. Then the first subshell runs `run_spec_token_check tA` | `overlap second-busy <n> next <0|1> inputs <0|1> named-first <0|1>` |
-| `busy` | `K` removed, and `L` planted with `until` 600 s ahead and `owner` `w-other`. Then the call | `busy said <n> admitted <n> key <0|1> kept <0|1> held <0|1>` |
+| `busy` | `K` removed, and `L` planted with `until` 600 s (DERIVED) ahead and `owner` `w-other`. Then the call | `busy said <n> admitted <n> key <0|1> kept <0|1> held <0|1>` |
 | `busyred` | `L` still planted, a `tA` spec made to red, then the call. Then the red edit and `L` are undone | `busyred refused <n> held <0|1>` |
-| `stale` | `K` removed, and `L` planted with `until` 5 s past and `owner` `w-dead`. Then the call | `stale said <n> key <0|1> named <0|1> lock <0|1> event <n>` |
+| `stale` | `K` removed, and `L` planted with `until` 5 s (DERIVED) past and `owner` `w-dead`. Then the call | `stale said <n> key <0|1> named <0|1> lock <0|1> event <n>` |
 | `release` | five calls, each followed by a test for `L`: a repeat call over the same tree (skip), a `tA` spec made to red (refusal), unit 2's `moved` stub (not recorded), `init_spec_token_check tA` then `remove_spec_token_check` (window refusal), and the fingerprint script moved aside (cache off) | `release skip <0|1> refused <0|1> moved <0|1> window <0|1> cacheoff <0|1>` |
 
 In the `overlap` step, `second-busy` counts the busy line in the nested call's output. `next` is 1
@@ -338,8 +338,8 @@ the count of new assertions, which the close confirms from a real run.
 
 ### Alternatives rejected
 
-- **Call the claim-push trio as it stands.** Its deadline is `REMOTE_BOUND` plus 10 s, which is 70 s,
-  and a checker run near 69 s would see its lock broken mid-run. Its event names would also misname
+- **Call the claim-push trio as it stands.** Its deadline is `REMOTE_BOUND` plus 10 s (DERIVED from the driver at fccef94ef), which is 70 s,
+  and a checker run near 69 s (DERIVED) would see its lock broken mid-run. Its event names would also misname
   the lock.
 - **A second lock written beside it for spec tokens.** A copy of the first, which the charter's
   `[reuse]` rule forbids at a kind's second instance.
@@ -435,10 +435,10 @@ spec-token checker's `--spec` over this file and the memory hygiene gate.
 - **F1 — How is a killed run's lock judged stale?**
   Options:
   - (a) By the factory's rule, unchanged: `until` passed, or no `until` and an age over two minutes,
-    with `until` set to `GATE_BOUND` plus 60 s. No new code in the factory. A surviving checker is
+    with `until` set to `GATE_BOUND` plus 60 s (DERIVED). No new code in the factory. A surviving checker is
     bounded out before `until` passes, so no breaker races it. The cost is that for up to
-    `GATE_BOUND` plus 60 s after a kill, which is 3660 s at the default, every dispatch of that slug
-    in that worktree runs whole, about 43 s each, and prints the busy line.
+    `GATE_BOUND` plus 60 s after a kill, which is 3660 s (DERIVED) at the default, every dispatch of that slug
+    in that worktree runs whole, about 43 s (DERIVED) each, and prints the busy line.
   - (b) As (a), or when the owner is gone. The take also writes a `pid` file holding `$BASHPID` and
     its `read_proc_token` token, and `check_dir_lock_stale` reads a lock stale when
     `check_proc_gone` says that process is gone. The claim-push lock writes no `pid` file, so its rule
