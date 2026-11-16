@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-14
 streams: tooling
 roster: TOOL
-ids: TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10 TOOL-aTrimmedWait-11 TOOL-aTrimmedWait-12
+ids: TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10 TOOL-aTrimmedWait-11 TOOL-aTrimmedWait-12 TOOL-aTrimmedWait-13
 ---
 
 # aTrimmedWait — builds stop waiting on checks that grade more than the caller needs, without moving any verdict
@@ -66,11 +66,12 @@ None.
 | 10 | `TOOL-aTrimmedWait-10` | Close-bar repair: the commit-render switch moves from `.memory-tree.conf` to a policy catalogue key, and the fork sites the shell-hygiene leg names are converted (owner, 2026-11-15) |
 | 11 | `TOOL-aTrimmedWait-11` | Close repair, inherited: the hygiene suite's partition arm stops reading check 26's cache-hit count, so a cold clone reads it green (owner, 2026-11-15) |
 | 12 | `TOOL-aTrimmedWait-12` | Reconcile with local main at `5d48501da` before the landing merge: eight conflicts resolved, `derive_partition_lines` kept over main's `extract_hs_lines` (owner, 2026-11-16) |
+| 13 | `TOOL-aTrimmedWait-13` | Close repair: the driver suite's parity table gains the `--check-specs` row unit 1 owed (owner, 2026-11-16) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 12 unit(s) · node a · opened 2026-11-14 · streams tooling
-ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10 TOOL-aTrimmedWait-11 TOOL-aTrimmedWait-12
+ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10 TOOL-aTrimmedWait-11 TOOL-aTrimmedWait-12 TOOL-aTrimmedWait-13
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -89,7 +90,7 @@ ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWai
 | [TOOL-aTrimmedWait-12 — the reconcile with local main at 5d48501da: its eight conflicts resolved so the landing merge is clean](spec/2026-11-16-spec-TOOL-aTrimmedWait-12.md) | 11 | 2 | CLOSED | rev-2 | 2026-11-16 |
 <!-- /gen:build-units -->
 
-Records: 64 bound to this build, across 4 record folder(s).
+Records: 65 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
