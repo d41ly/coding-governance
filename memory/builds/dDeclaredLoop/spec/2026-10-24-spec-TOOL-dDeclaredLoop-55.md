@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-55 — the `loop termination` leg declares no guard, so no input it reads can skip it
 
-**Status:** DEFERRED · rev-3 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 35 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-4 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 35 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -163,6 +163,7 @@ lands the row and the `[[exempt_leg]]` row this unit reads.
   scope moved, which a re-ground may not do; (c) the run closes this unit unbuilt, satisfied by unit
   33's landing, a status move outside a spec. (a) keeps the unit, its order and its status, and leaves
   (c) the run's at dispatch. Recommendation (a); the spec body is written on it.
+  RESOLVED (agent, 2026-11-16, delegated): (a).
 
 ## 9. Revision log
 
@@ -175,6 +176,8 @@ lands the row and the `[[exempt_leg]]` row this unit reads.
   row with no guard and the leg as gov's own exempt row with no descriptor table, so this pass writes
   nothing and observes (F3); AC2 reads the descriptor's absent table; the review record's path; the
   README citation blob-pinned; §5's sweep.
+- rev-4 · 2026-11-16 · §8 F3 · the fork the body is written on carries its resolution mark, (a); nothing else
+  moves.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-71 — the breakpoints fixture runs under its own gate leg, so its plants are lasting coverage
 
-**Status:** DEFERRED · rev-3 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-4 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -211,6 +211,7 @@ against ask TOOL-dDeclaredLoop-114; neither reaches the leg.
   this unit unbuilt, satisfied by unit 19's landing, a status move outside a spec. (a) keeps the unit, its
   order and its status, as `TOOL-dDeclaredLoop-55` rev-3 §8 F3 does for its landed leg, and leaves (c) the
   run's at dispatch. Recommendation (a); the spec body is written on it.
+  RESOLVED (agent, 2026-11-16, delegated): (a).
 
 ## 9. Revision log
 
@@ -224,6 +225,8 @@ against ask TOOL-dDeclaredLoop-114; neither reaches the leg.
   row, so this pass writes nothing and observes (F3); S2 inverts rev-2's descriptor row; S5's ruling on
   unit 53's arm gives way to unit 53 rev-3's §7; the `New arm:` line goes, its red being unit 19's; the
   sweep.
+- rev-4 · 2026-11-16 · §8 F3 · the fork the body is written on carries its resolution mark, (a); nothing else
+  moves.
 
 ## 10. Reuse audit
 

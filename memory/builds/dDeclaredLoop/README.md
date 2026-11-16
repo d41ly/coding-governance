@@ -178,18 +178,18 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-52 — the phase-to-state-and-step map shipped as rows with one reader](spec/2026-10-24-spec-TOOL-dDeclaredLoop-52.md) | 34 | 2 | CLOSED | rev-3 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-53 — an owner gate holds only builds opened after the gate was placed](spec/2026-10-24-spec-TOOL-dDeclaredLoop-53.md) | 34 | 2 | CLOSED | rev-3 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-54 — a terminal set declared per level, and the termination rule run over each table with its own](spec/2026-10-24-spec-TOOL-dDeclaredLoop-54.md) | 35 | 2 | INPROGRESS | rev-3 | 2026-11-16 |
-| [TOOL-dDeclaredLoop-55 — the `loop termination` leg declares no guard, so no input it reads can skip it](spec/2026-10-24-spec-TOOL-dDeclaredLoop-55.md) | 35 | 2 | DEFERRED | rev-3 | 2026-11-16 |
+| [TOOL-dDeclaredLoop-55 — the `loop termination` leg declares no guard, so no input it reads can skip it](spec/2026-10-24-spec-TOOL-dDeclaredLoop-55.md) | 35 | 2 | DEFERRED | rev-4 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-63 — an adopter's extra phase reads as ungated through the driver's own phase set, never refused for lacking a row](spec/2026-10-24-spec-TOOL-dDeclaredLoop-63.md) | 35 | 2 | DEFERRED | rev-3 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-64 — a build's opening commit is found under the resolved `MEMORY_ROOT`, never a literal `memory/`](spec/2026-10-24-spec-TOOL-dDeclaredLoop-64.md) | 35 | 2 | DEFERRED | rev-4 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-56 — the round-1 spec audit's 47 minors: owed leg rows, one reader each, honest skew and failure paths, and the citations that drifted](spec/2026-10-24-spec-TOOL-dDeclaredLoop-56.md) | 36 | 2 | DEFERRED | rev-6 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-70 — every caller of the phase reading takes the adopter population from one driver-conf reader](spec/2026-10-24-spec-TOOL-dDeclaredLoop-70.md) | 36 | 2 | DEFERRED | rev-3 | 2026-11-16 |
-| [TOOL-dDeclaredLoop-71 — the breakpoints fixture runs under its own gate leg, so its plants are lasting coverage](spec/2026-10-24-spec-TOOL-dDeclaredLoop-71.md) | 36 | 2 | DEFERRED | rev-3 | 2026-11-16 |
+| [TOOL-dDeclaredLoop-71 — the breakpoints fixture runs under its own gate leg, so its plants are lasting coverage](spec/2026-10-24-spec-TOOL-dDeclaredLoop-71.md) | 36 | 2 | DEFERRED | rev-4 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-72 — the loop kit reads the records root the driver reads, and refuses two confs that disagree](spec/2026-10-24-spec-TOOL-dDeclaredLoop-72.md) | 36 | 2 | DEFERRED | rev-6 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-65 — the remote's freshness is the time of the last fetch, read from what a fetch and a clone write](spec/2026-10-24-spec-TOOL-dDeclaredLoop-65.md) | 37 | 2 | DEFERRED | rev-3 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-68 — the witness normaliser has one owner, the run-gates program, before unit 67 reads it](spec/2026-10-24-spec-TOOL-dDeclaredLoop-68.md) | 37 | 2 | DEFERRED | rev-3 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-76 — the loop readers' no-own-conf-read rule is graded on the syntax tree, and the root's source is a value](spec/2026-10-24-spec-TOOL-dDeclaredLoop-76.md) | 37 | 2 | DEFERRED | rev-6 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-66 — the build-order region derives `Parallel` from the group's write sets and edges, never from a shared order alone](spec/2026-10-24-spec-TOOL-dDeclaredLoop-66.md) | 38 | 2 | DEFERRED | rev-4 | 2026-11-16 |
-| [TOOL-dDeclaredLoop-67 — the round-2 spec audit's 54 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-67.md) | 38 | 2 | DEFERRED | rev-3 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-67 — the round-2 spec audit's 54 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-67.md) | 38 | 2 | DEFERRED | rev-4 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-74 — a FETCH_HEAD counts as a fetch only when it holds the default branch of the resolved remote](spec/2026-10-24-spec-TOOL-dDeclaredLoop-74.md) | 38 | 2 | DEFERRED | rev-3 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-80 — the no-own-conf-read rule stops at a named fixture boundary, so the plants that write the confs are outside its population](spec/2026-10-24-spec-TOOL-dDeclaredLoop-80.md) | 38 | 2 | DEFERRED | rev-6 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-75 — the round-3 spec audit's 36 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md) | 39 | 2 | DEFERRED | rev-9 | 2026-11-15 |
@@ -213,7 +213,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 738 bound to this build, across 4 record folder(s).
+Records: 741 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
