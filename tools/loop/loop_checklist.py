@@ -52,10 +52,10 @@ PLANTS = {"missing-handle": ("a DoD handle unmapped-check added to DOD_CORE as r
           "bad-registry": ("a row whose registry is DOD_EXTRA", "registry DOD_EXTRA")}
 
 
-def read_core_registries(kit_dir):
-    """`{registry: [handles in order]}` for each of `CHECKLIST_REGISTRIES`, from the unattended driver
-    found from `kit_dir`; LookupError where the driver does not resolve or read, or a line is absent or
-    empty."""
+def read_core_registries(kit_dir, names=CHECKLIST_REGISTRIES):
+    """`{registry: [handles in order]}` for each of `names`, `CHECKLIST_REGISTRIES` by default, from the
+    unattended driver found from `kit_dir`; LookupError where the driver does not resolve or read, or a
+    line is absent or empty. `loop_table.py` reads `PHASES_CORE` through it (TOOL-dDeclaredLoop-52)."""
     driver = resolve_kit_dir("unattended", "unattended.sh", kit_dir) / "unattended.sh"
     try:
         text = driver.read_text(encoding="utf-8")
@@ -64,11 +64,11 @@ def read_core_registries(kit_dir):
     found = {}
     for line in text.splitlines():
         line = line.rstrip("\r").rstrip()
-        for name in CHECKLIST_REGISTRIES:
+        for name in names:
             m = re.fullmatch(r'%s="(.*)"' % name, line)
             if m and name not in found:
                 found[name] = [member.split(":", 1)[0] for member in m.group(1).split()]
-    for name in CHECKLIST_REGISTRIES:
+    for name in names:
         if not found.get(name):
             raise LookupError("%s holds no %s=\"<members>\" line with a member: nothing to check the map "
                               "against" % (driver.as_posix(), name))

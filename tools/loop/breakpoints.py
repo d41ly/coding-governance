@@ -94,7 +94,9 @@ PLANTS = {"values": "no policy file, then autonomy three-gates and every-stage, 
           "driver-close": "the driver's --close over a delegated fork under author-owner-ratifies, then the "
                           "disposition record and the sourced check_owner_gates",
           "driver-optin": "the sourced driver's check_authorization under review.design owed and off, then none",
-          "driver-plan": "the driver's --plan under autonomy three-gates, and --plan --paths"}
+          "driver-plan": "the driver's --plan under autonomy three-gates, and --plan --paths, then the sourced "
+                         "check_phase_gates past item.design.exit and item.build.exit, before and after "
+                         "item.design.exit's disposition record"}
 
 
 # ------------------------------------------------------------------------------------------ the rule
@@ -286,11 +288,11 @@ def run_breakpoint_plant(case):
                 if ln.startswith("breakpoint: owner item ") and " · ratification · " not in ln:
                     misses.append("the owner item's cause is not ratification: %s" % ln)
 
-        def write_disposition_record(repo, build, unit):
-            """The owner's committed disposition record of the owner item, `ratified`: its stem."""
+        def write_disposition_record(repo, build, unit, item=RATIFY, word="ratified"):
+            """The owner's committed disposition record of `item`, the owner item by default, `word`: its stem."""
             read_memory_tree("build_records.py")
             from build_records import write_disposition
-            rel = write_disposition(repo, build, unit, RATIFY, "ratified", "terminal")
+            rel = write_disposition(repo, build, unit, item, word, "terminal")
             run_fixture_git(repo, "add", "-A")
             run_fixture_git(repo, "commit", "-q", "-m", "the owner's disposition")
             return pathlib.PurePosixPath(rel).stem
@@ -416,6 +418,21 @@ def run_breakpoint_plant(case):
                       and len(lines) == 4, "--plan's lines after frontier: are not the list's four")
                 out, rc = run_driver(repo, "--plan", FX_SLUG, "--paths")
                 check(rc == 0 and "breakpoint: " not in out, "--plan --paths printed a breakpoint: line")
+                # TOOL-dDeclaredLoop-52 AC5: the --phase hold reads only the gates at the exits a move crosses
+                def check_sourced(call, owed, needle=""):
+                    """A miss where the sourced `call`, given the slug, does not exit `owed`, or exits 1 naming no
+                    `needle` in a check 82 refusal."""
+                    call = call % FX_SLUG
+                    rc, out = run_sourced(repo, "load_driver_conf && " + call)
+                    print("%s: fixture · %s · exit %d · %s" % (SAY, call, rc, out.strip().replace("\n", " / ")[:600]))
+                    check(rc == owed and (not owed or "UNATTENDED check 82 FAILED" in out and needle in out),
+                          "%s exited %d, owed %d naming %r" % (call, rc, owed, needle))
+
+                check_sourced("check_phase_gates %s SPECCING BUILDING", 1, "item.design.exit")
+                check_sourced("check_phase_gates %s BUILDING VERIFYING", 0)
+                write_disposition_record(repo, FX_SLUG, FX_IDS[0], "item.design.exit", "recorded")
+                check_sourced("check_phase_gates %s SPECCING BUILDING", 0)
+                check_sourced("check_owner_gates %s", 1, "held at item.deploy.mandate;")
     except LookupError as e:
         print("%s: fixture · %s · unarmed: %s" % (SAY, case, e))
         return 2

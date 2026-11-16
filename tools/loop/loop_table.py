@@ -3,6 +3,7 @@
 
     python loop_table.py move --level <level> --from <state> --item <tag> --outcome <word> [--fact k=v]...
     python loop_table.py check [--selftest]
+    python loop_table.py phase --from <PHASE> [--to <PHASE>] [--fact k=v]...
     python loop_table.py --fixture --plant <case>
 
 The loop definition beside this file holds `[states]`, each level's open states, and one `[[transition]]`
@@ -31,6 +32,20 @@ ValueError, never a default.
 `forward` into a terminal or a later step, `backward` into an earlier one, `lateral` where an end has no
 step, so a move back is recorded through the same writer and channels as a move forward.
 
+THE PHASE MAP (TOOL-dDeclaredLoop-52). One `[[phase]]` row per phase of the unattended driver's
+`PHASES_CORE`, carrying `step`, the `[[step]]` tag whose state the phase reads, or `state`, a build
+state, a terminal or `none`, where the phase has no step; a qualified row adds `QUALIFIERS`, each matched
+against the run's fact of that key. `read_phase_map` reads the rows, `derive_phase_position` answers a
+phase's `(state, step)` from the first qualified row whose every qualifier matches, else the unqualified
+one, and `derive_crossed_exits` the step exits a move between two steps crosses: each step's from the
+first step's own, the first step where it is `none`, up to the target step's, none where the target is
+`none`. `phase` prints `phase <PHASE> · state <state> · step <tag|none>`, with `· to <PHASE> · crosses
+<tags|none>` after it given `--to`, whose phase reads its unqualified row, and exits 0; `refused —
+phase <PHASE>: no row`, exit 1. `check` grades the rows by `check_phase_rows` and joins the unqualified
+rows with the driver's `PHASES_CORE` line both ways, read through `loop_checklist.py`'s
+`read_core_registries`, printing the join `unarmed` where the driver does not resolve; every plant
+passes the shipped rows' unqualified phases in its place, taken before the break.
+
 `move` prints `move — <level> · <from> → <to> · <item>`, with `· stand-in <owner>` after it where the
 item is a stand-in, then `· <direction>` last for a build move, and exits 0; `refused — <level> · <from> · <item> · <outcome>: no row`, exit 1; and
 `unanswered — <level> · <from> · <item> · <outcome>: <why>`, exit 2, on a ValueError. `check` prints one
@@ -55,7 +70,8 @@ WHAT THIS DOES NOT CHECK: whether a witness holds; whether a stand-in's owner ha
 item owned by an unlanded build has a stand-in row; reachability, termination and counted edges; the
 feature rows' last-unit rule; the routes of the feature and unit rows, which the join reads for the build
 table alone; that an owed row's `by` names a real unit or build; that every terminal is entered by a row,
-which four are not yet.
+which four are not yet; a phase row's qualifier value against the driver's halt and hold codes; the
+driver's `PHASES_EXTRA` members, which have no row and are refused by name.
 """
 import argparse
 import pathlib
@@ -66,6 +82,7 @@ sys.dont_write_bytecode = True
 KIT = pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
+from loop_checklist import read_core_registries  # noqa: E402
 from loop_lib import (ROUTE_TRANSITION, SEG, LoopError, check_loop, derive_outcome_set,  # noqa: E402
                       read_definition, read_item_rows, read_items, run_selftest_cases)
 
@@ -88,6 +105,11 @@ TERMINAL = "terminal"
 ITEM_TAG = re.compile(r"item\.%s\.%s" % (SEG.pattern, SEG.pattern))
 #: A `[[transition]]` row's required keys.
 ROW_KEYS = ("level", "from", "item", "outcome", "to", "witness")
+#: A `[[phase]]` row's keys, and the qualifiers a row matches against the run's facts (TOOL-dDeclaredLoop-52).
+PHASE_KEYS = ("phase", "state", "step")
+QUALIFIERS = ("halt-code", "hold-code", "ending")
+#: A phase, as the unattended driver spells one.
+PHASE_WORD = re.compile(r"[A-Z][A-Z_]*")
 #: `--plant`'s cases, each a break made in memory on the rows as read, and the text its refusal must name.
 PLANTS = {"bad-state": ("a unit row entering reviewing, no unit state", "reviewing"),
           "two-rows": ("a second row for B7's move", "matched by two rows"),
@@ -102,7 +124,11 @@ PLANTS = {"bad-state": ("a unit row entering reviewing, no unit state", "reviewi
           "terminal-from": ("a build row whose from is landed", "leaves landed, a terminal"),
           "terminal-open": ("landed appended to the build's open states", "landed is both"),
           "any-unending": ("an @any row from testing on the outcome lap, entering building",
-                           "only a row entering @reentry")}
+                           "only a row entering @reentry"),
+          "phase-missing": ("the REVIEWING phase row taken out", "REVIEWING"),
+          "phase-stale": ("a phase row for DRAFTING on step.design", "DRAFTING"),
+          "phase-shape": ("the REVIEWING phase row given state designing beside its step", "both state and step"),
+          "phase-twice": ("a second unqualified BUILDING phase row", "two unqualified rows")}
 
 
 class TransitionRefused(Exception):
@@ -343,8 +369,95 @@ def check_transition_tables(data, where, items):
     return lines, refusals
 
 
+def read_phase_map(data, where):
+    """`{"rows": the [[phase]] rows ungraded, "steps": the [[step]] rows check_loop grades}` of a parsed
+    definition; LoopError where `phase` is no array of tables."""
+    rows = data.get("phase", [])
+    if not isinstance(rows, list) or not all(isinstance(r, dict) for r in rows):
+        raise LoopError(where, "'phase' is not an array of tables")
+    return {"rows": rows, "steps": check_loop(data, where)["step"]}
+
+
+def derive_phase_position(phase, facts, phase_map=None):
+    """`(state, step)` of `phase`: its first row carrying a qualifier whose every qualifier equals the fact
+    of that key in `facts`, else its row carrying none; `step` the row's, else "none", and `state` the
+    row's, else its [[step]] row's. `phase_map` is what read_phase_map returns, the shipped definition's
+    when None. LookupError naming the phase where no row reads it."""
+    if phase_map is None:
+        phase_map = read_phase_map(*read_definition(KIT))
+    rows = [r for r in phase_map["rows"] if r.get("phase") == phase]
+    row = next((r for r in rows if any(q in r for q in QUALIFIERS)
+                and all(facts.get(q) == r[q] for q in QUALIFIERS if q in r)), None)
+    row = row or next((r for r in rows if not any(q in r for q in QUALIFIERS)), None)
+    if row is None:
+        raise LookupError("phase %s: no row" % phase)
+    step = row.get("step") or "none"
+    state = row.get("state") or next((s.get("state") for s in phase_map["steps"] if s.get("tag") == step), None)
+    return state, step
+
+
+def derive_crossed_exits(from_step, to_step, steps):
+    """The `exit` of each [[step]] row of `steps`, in step order, whose order is at least `from_step`'s, 1
+    where it is "none", and below `to_step`'s; [] where `to_step` is "none". LookupError on a step tag
+    `steps` lacks."""
+    if to_step == "none":
+        return []
+    order = {s.get("tag"): s.get("order") for s in steps}
+    for tag in (from_step, to_step):
+        if tag != "none" and tag not in order:
+            raise LookupError("step %s: no [[step]] row" % tag)
+    low = 1 if from_step == "none" else order[from_step]
+    return [s.get("exit") for s in sorted(steps, key=lambda s: s.get("order")) if low <= s.get("order") < order[to_step]]
+
+
+def check_phase_rows(phase_map, core, states, terminal):
+    """`(lines, refusals)` of the [[phase]] rows of `phase_map`, what read_phase_map returns, against
+    `states`, the build level's open states, and `terminal`, its terminal states; the unqualified rows
+    joined both ways with `core`, the driver's PHASES_CORE members, or the join printed unarmed where
+    `core` is None."""
+    tags = {s.get("tag") for s in phase_map["steps"]}
+    lines, refusals, plain, named = [], [], {}, set()
+    rows = phase_map["rows"]
+    for n, row in enumerate(rows, 1):
+        phase = row.get("phase")
+        at = "phase row %d (%s)" % (n, phase)
+        if not (isinstance(phase, str) and PHASE_WORD.fullmatch(phase)):
+            refusals.append("%s names no phase, a word of [A-Z][A-Z_]*" % at)
+            continue
+        named.add(phase)
+        extra = sorted(k for k in row if k not in PHASE_KEYS + QUALIFIERS)
+        if extra:
+            refusals.append("%s carries %s, no key of a phase row" % (at, " ".join(extra)))
+        if "state" in row and "step" in row:
+            refusals.append("%s carries both state and step: a stepped phase's state is its step's" % at)
+        elif "state" not in row and "step" not in row:
+            refusals.append("%s carries neither state nor step" % at)
+        elif "step" in row and row["step"] not in tags:
+            refusals.append("%s reads the step %r, no [[step]] tag" % (at, row["step"]))
+        elif "state" in row and row["state"] not in list(states) + list(terminal) + ["none"]:
+            refusals.append("%s reads the state %r, no build state, terminal nor none" % (at, row["state"]))
+        quals = [q for q in QUALIFIERS if q in row]
+        refusals += ["%s qualifies on %s, which is no non-empty string" % (at, q) for q in quals
+                     if not (isinstance(row[q], str) and row[q])]
+        if not quals and phase in plain:
+            refusals.append("%s and phase row %d are two unqualified rows of %s: one per phase" % (
+                at, plain[phase], phase))
+        elif not quals:
+            plain[phase] = n
+    lines.append("%s: phase map · %d row(s) · %d qualified" % (
+        SAY, len(rows), sum(1 for r in rows if any(q in r for q in QUALIFIERS))))
+    if core is None:
+        lines.append("%s: phase join · unarmed · the unattended driver's PHASES_CORE line does not resolve beside "
+                     "this kit, so no phase is joined" % SAY)
+        return lines, refusals
+    refusals += ["the phase %s of PHASES_CORE has no unqualified phase row" % p for p in core if p not in plain]
+    refusals += ["the phase row of %s names no member of PHASES_CORE" % p for p in sorted(named - set(core))]
+    lines.append("%s: phase join · PHASES_CORE · %d phase(s)" % (SAY, len(core)))
+    return lines, refusals
+
+
 def write_table_plant(case, data):
-    """`data`, a parsed definition, with the break `case` names made in its transition rows, in place."""
+    """`data`, a parsed definition, with the break `case` names made in its rows, in place."""
     rows = data["transition"]
     if case == "bad-state":
         rows.append({"level": "unit", "from": ["tested"], "item": "item.deploy.land", "outcome": "refused",
@@ -376,6 +489,14 @@ def write_table_plant(case, data):
     elif case == "any-unending":
         rows.append({"level": "build", "from": ["testing"], "item": ANY_ITEM, "outcome": "lap", "to": "building",
                      "witness": "planted"})
+    elif case == "phase-missing":
+        data["phase"][:] = [r for r in data["phase"] if r.get("phase") != "REVIEWING"]
+    elif case == "phase-stale":
+        data["phase"].append({"phase": "DRAFTING", "step": "step.design"})
+    elif case == "phase-shape":
+        next(r for r in data["phase"] if r.get("phase") == "REVIEWING")["state"] = "designing"
+    elif case == "phase-twice":
+        data["phase"].append({"phase": "BUILDING", "step": "step.build"})
 
 
 def main(argv):
@@ -391,13 +512,17 @@ def main(argv):
     mv.add_argument("--item", required=True)
     mv.add_argument("--outcome", required=True)
     mv.add_argument("--fact", action="append", default=[], help="k=v, a fact a row's guard or target reads")
-    chk = sub.add_parser("check", help="check the tables, their route join and the stand-ins")
+    ph = sub.add_parser("phase", help="a phase's build state and step, and the step exits a move crosses")
+    ph.add_argument("--from", dest="phase_from", required=True)
+    ph.add_argument("--to")
+    ph.add_argument("--fact", action="append", default=[], help="k=v, a fact a qualified row matches")
+    chk = sub.add_parser("check", help="check the tables, their route join, the stand-ins and the phase map")
     chk.add_argument("--selftest", action="store_true", help="check, every plant, and the moves")
     args = ap.parse_args(argv)
     if args.fixture != bool(args.plant) or (args.fixture and args.verb):
         ap.error("--fixture takes --plant <case> and no verb")
     if not args.fixture and not args.verb:
-        ap.error("a verb, move or check, or --fixture --plant <case>")
+        ap.error("a verb, move, phase or check, or --fixture --plant <case>")
     if args.verb == "check" and args.selftest:
         move = ["move", "--level", "build", "--from"]
         cases = [("check", ["check"], 0, "%s: table build" % SAY, ""),
@@ -405,7 +530,25 @@ def main(argv):
                                             "retired refused merged answered" % SAY, ""),
                  ("owed place", ["check"], 0, "%s: owed item.plan.place · unplaced · dRankedPlan" % SAY, ""),
                  ("stand-in close", ["check"], 0, "%s: stand-in item.life.close · dWellOiledMachine" % SAY, "")]
+        cases += [("phase join", ["check"], 0, "%s: phase join · " % SAY, "")]
         cases += [(p, ["--fixture", "--plant", p], 1, "%s: refused · " % SAY, PLANTS[p][1]) for p in PLANTS]
+        cases += [("phase step", ["phase", "--from", "REVIEWING"], 0,
+                   "phase REVIEWING · state designing · step step.design", ""),
+                  ("phase halt", ["phase", "--from", "ABORTED", "--fact", "halt-code=budget-exhausted"], 0,
+                   "phase ABORTED · state incomplete · step none", ""),
+                  ("phase other halt", ["phase", "--from", "ABORTED", "--fact", "halt-code=fork-unresolvable"], 0,
+                   "phase ABORTED · state withdrawn · step none", ""),
+                  ("phase no row", ["phase", "--from", "DRAFTING"], 1, "refused — phase DRAFTING: no row", ""),
+                  ("phase parked", ["phase", "--from", "HELD", "--fact", "hold-code=owner-decision", "--fact",
+                                    "ending=park-for-owner"], 0, "phase HELD · state parked · step none", ""),
+                  ("phase one qualifier", ["phase", "--from", "HELD", "--fact", "hold-code=owner-decision"], 0,
+                   "phase HELD · state paused · step none", ""),
+                  ("phase crosses design", ["phase", "--from", "SPECCING", "--to", "BUILDING"], 0,
+                   "phase SPECCING · state designing · step step.design · to BUILDING · crosses item.design.exit", ""),
+                  ("phase crosses plan", ["phase", "--from", "PREFLIGHT", "--to", "SPECCING"], 0,
+                   "phase PREFLIGHT · state none · step none · to SPECCING · crosses item.plan.exit", ""),
+                  ("phase crosses back", ["phase", "--from", "VERIFYING", "--to", "BUILDING"], 0,
+                   "phase VERIFYING · state testing · step step.test · to BUILDING · crosses none", "")]
         cases += [("move by order", move + ["planning", "--item", "item.design.exit", "--outcome", "recorded"], 1,
                    "refused — build · planning · item.design.exit · recorded", "no row"),
                   ("move designing", move + ["designing", "--item", "item.design.exit", "--outcome", "recorded"], 0,
@@ -475,13 +618,31 @@ def main(argv):
     if not data.get("transition"):
         print("%s: unarmed · %s holds no [[transition]] row: no move is admitted" % (SAY, where))
         return 2
+    facts = {}
+    for fact in getattr(args, "fact", None) or []:
+        k, eq, v = fact.partition("=")
+        if not (k and eq):
+            ap.error("--fact takes k=v, and %r is not" % fact)
+        facts[k] = v
+    if args.verb == "phase":
+        try:
+            phase_map = read_phase_map(data, where)
+        except LoopError as e:
+            print("%s: refused · %s" % (SAY, e))
+            return 1
+        try:
+            state, step = derive_phase_position(args.phase_from, facts, phase_map)
+            said = "phase %s · state %s · step %s" % (args.phase_from, state, step)
+            if args.to is not None:
+                to_step = derive_phase_position(args.to, {}, phase_map)[1]
+                said += " · to %s · crosses %s" % (
+                    args.to, " ".join(derive_crossed_exits(step, to_step, phase_map["steps"])) or "none")
+        except LookupError as e:
+            print("refused — %s" % e)
+            return 1
+        print(said)
+        return 0
     if args.verb == "move":
-        facts = {}
-        for fact in args.fact:
-            k, eq, v = fact.partition("=")
-            if not (k and eq):
-                ap.error("--fact takes k=v, and %r is not" % fact)
-            facts[k] = v
         said = "%s · %s · %s · %s" % (args.level, args.state, args.item, args.outcome)
         try:
             tables = read_transition_rows(data, where)
@@ -501,13 +662,23 @@ def main(argv):
         items = read_items(KIT)
         read_transition_rows(data, where)
         read_stand_ins(data, where)
+        phase_map = read_phase_map(data, where)
     except LoopError as e:
         print("%s: refused · %s" % (SAY, e))
         return 1
     if args.plant:
+        core = [r.get("phase") for r in phase_map["rows"] if not any(q in r for q in QUALIFIERS)]
         print("%s: fixture · plant %s · %s" % (SAY, args.plant, PLANTS[args.plant][0]))
         write_table_plant(args.plant, data)
+    else:
+        try:
+            core = read_core_registries(KIT, ("PHASES_CORE",))["PHASES_CORE"]
+        except LookupError:
+            core = None
     lines, refusals = check_transition_tables(data, where, items)
+    tables = read_transition_rows(data, where)
+    more = check_phase_rows(read_phase_map(data, where), core, tables["states"].get("build", []), tables["terminal"])
+    lines, refusals = lines + more[0], refusals + more[1]
     for line in lines:
         print(line)
     for why in refusals:

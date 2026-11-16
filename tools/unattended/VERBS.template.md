@@ -33,7 +33,10 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `UNATTENDED-STOPS.md` §7 is the contract; undeclared, the switch is `off` and one NOTE says so.
 - `--phase` — writes a phase and its witness. Without it the vocabulary is decorative: only
   `--preflight` and `--close` ever wrote one, so every member between them entered the file only by
-  hand-editing an artifact this kit calls generated.
+  hand-editing an artifact this kit calls generated. A move past a step exit is held, before anything is
+  written, while an owner gate at that exit reads `held` in the loop kit's breakpoint list, or while
+  that kit's phase map refuses either phase; the refusal names the gate and the act that releases it,
+  as at `--close`. Where the loop kit does not resolve, nothing is read and the move goes on.
 - `--park` — writes a decision the run REFUSED to take: the question, the options seen, the reason.
   Refused on a terminal record, and with no run-state file: a park minted for a run that never
   started records nothing about a run. **A fork with no delegated resolver is parked THROUGH THE

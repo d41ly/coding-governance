@@ -264,8 +264,29 @@ plant, each kind of move and direction, and `direction-order`, the shipped rows 
 testing's orders swapped, through `run_selftest_cases`, the case loop `loop_checklist.py` shares,
 and is the kit's `loop transition tables` gate leg.
 
+The phase map (TOOL-dDeclaredLoop-52): one `[[phase]]` row per phase of the unattended driver's
+`PHASES_CORE`, carrying `step`, the `[[step]]` tag whose state the phase reads, or `state`, a build
+state, a terminal or `none`, where it has no step. A qualified row adds `QUALIFIERS`, `halt-code`,
+`hold-code` and `ending`, each matched against the run's fact of that key: `ABORTED` with `halt-code =
+"budget-exhausted"` reads incomplete, and `HELD` with `hold-code = "owner-decision"` and `ending =
+"park-for-owner"` reads parked. `read_phase_map` reads the rows, `derive_phase_position(phase, facts,
+phase_map=None)` answers `(state, step)` from the first qualified row whose every qualifier matches,
+else the unqualified one, raising LookupError on a phase with no row, and `derive_crossed_exits(from_step,
+to_step, steps)` the exits a move crosses, from the first step where `from_step` is `none`. `phase
+--from <PHASE> [--to <PHASE>] [--fact k=v]...` prints `phase <PHASE> · state <state> · step <tag|none>`,
+with `· to <PHASE> · crosses <tags|none>` given `--to`, exit 0, or `refused — phase <PHASE>: no row`,
+exit 1. `check` runs `check_phase_rows` after `check_transition_tables`, refusing a row whose phase is
+no word, an unknown key, both or neither of `state` and `step`, an undeclared step or state, an empty
+qualifier and two unqualified rows of one phase, and joins the unqualified rows with the driver's
+`PHASES_CORE` line both ways, read as text through `loop_checklist.py`'s `read_core_registries`; where
+the driver does not resolve the join prints `unarmed`. The plants `phase-missing`, `phase-stale`,
+`phase-shape` and `phase-twice` pass the shipped rows' unqualified phases in the driver's place. The
+driver's `--phase` reads `phase --from --to` before its first write and refuses a move past a step exit
+an owner gate `at` it holds, through `check_phase_gates`.
+
 ```bash
 python <prefix>/loop/loop_table.py move --level build --from designing --item item.design.exit --outcome recorded
+python <prefix>/loop/loop_table.py phase --from SPECCING --to BUILDING
 python <prefix>/loop/loop_table.py check
 python <prefix>/loop/loop_table.py check --selftest
 python <prefix>/loop/loop_table.py --fixture --plant dropped-row

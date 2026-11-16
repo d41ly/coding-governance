@@ -393,6 +393,13 @@ verb = "check"
 flags = ["--selftest"]
 
 [[usage]]
+id = "script:{prefix}/loop/loop_table.py#phase"
+shape = "verb"
+entry = "{prefix}/loop/loop_table.py"
+verb = "phase"
+flags = ["--from=", "--to=", "--fact="]
+
+[[usage]]
 id = "script:{prefix}/loop/loop_parents.py"
 shape = "verb"
 entry = "{prefix}/loop/loop_parents.py"

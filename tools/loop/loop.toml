@@ -76,6 +76,14 @@
 # One [[owed-row]] row per cross-step route whose build row another unit or build writes, shrink-only:
 # `item` and `outcome`, the route, and `by`, the writer, which deletes the row in the same landing.
 #
+# One [[phase]] row per phase of the unattended driver's PHASES_CORE, in its order (TOOL-dDeclaredLoop-52):
+#   phase  the phase, as the driver spells it
+#   step   the [[step]] tag whose state the phase reads, its state never typed beside it; or
+#   state  a build state of [states], a terminal, or "none", where the phase has no step
+# A qualified row follows its phase's unqualified one and carries qualifiers, each matched against the
+# run's fact of that key: `halt-code`, `hold-code` and `ending`. The first qualified row whose every
+# qualifier matches is read, else the unqualified row. loop_table.py beside this file reads and checks them.
+#
 # One [[record-version]] row per typed record kind an item returns or reads (TOOL-dDeclaredLoop-24),
 # read by loop_items.py beside this file:
 #   kind     record-kind.<name>, a key of the memory-tree kit's record table
@@ -1027,6 +1035,71 @@ by = "dRankedPlan"
 item = "item.review.dispose"
 outcome = "plan-revision"
 by = "dRankedPlan"
+
+# The phase map (TOOL-dDeclaredLoop-52): each unattended phase's build state and step.
+
+[[phase]]
+phase = "PREFLIGHT"
+state = "none"
+
+[[phase]]
+phase = "RESEARCHING"
+step = "step.design"
+
+[[phase]]
+phase = "TESTING"
+step = "step.design"
+
+[[phase]]
+phase = "SPECCING"
+step = "step.design"
+
+[[phase]]
+phase = "REVIEWING"
+step = "step.design"
+
+[[phase]]
+phase = "FOLDING"
+step = "step.design"
+
+[[phase]]
+phase = "BUILDING"
+step = "step.build"
+
+[[phase]]
+phase = "RUNNING"
+step = "step.build"
+
+[[phase]]
+phase = "HELD"
+state = "paused"
+
+[[phase]]
+phase = "HELD"
+hold-code = "owner-decision"
+ending = "park-for-owner"
+state = "parked"
+
+[[phase]]
+phase = "VERIFYING"
+step = "step.test"
+
+[[phase]]
+phase = "LANDING"
+step = "step.deploy"
+
+[[phase]]
+phase = "LANDED"
+state = "landed"
+
+[[phase]]
+phase = "ABORTED"
+state = "withdrawn"
+
+[[phase]]
+phase = "ABORTED"
+halt-code = "budget-exhausted"
+state = "incomplete"
 
 [[record-version]]
 kind = "record-kind.acceptance"

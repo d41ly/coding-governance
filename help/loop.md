@@ -353,6 +353,61 @@ The tables do not judge whether a move's witness holds, which is the writer's pr
 whether a state is reachable or a cycle terminates. The feature and unit rows are not joined to the
 routes, and a feature's state, its least-advanced unit's, is the mover's call.
 
+## Which state and step each run phase reads
+
+An unattended run moves through phases, `PREFLIGHT` to `LANDED` or `ABORTED`. The file maps each one
+to the build state and step it stands for, one `[[phase]]` row per phase of the driver's `PHASES_CORE`:
+
+```toml
+[[phase]]
+phase = "REVIEWING"
+step = "step.design"        # its state is the step's, designing, never typed here
+
+[[phase]]
+phase = "ABORTED"
+state = "withdrawn"         # a phase with no step names its state: a build state, a terminal or "none"
+
+[[phase]]
+phase = "ABORTED"
+halt-code = "budget-exhausted"
+state = "incomplete"
+```
+
+A row may add qualifiers, `halt-code`, `hold-code` and `ending`, matched against the run's facts of
+those names: an aborted run whose rework budget ran out reads incomplete, and a run held for the
+owner's decision whose budget ending is `park-for-owner` reads parked. Every other aborted run reads
+withdrawn, and every other held run paused.
+
+- **Read a phase:** `python tools/loop/loop_table.py phase --from REVIEWING` prints the phase's state <!-- usage: script:tools/loop/loop_table.py#phase 8b6c4f5f -->
+  and step. Each `--fact k=v` qualifies the `--from` phase. With `--to <PHASE>` it also names the step
+  exits the move between the two crosses, in step order, or `none`; a move out of `PREFLIGHT`, which
+  has no step, counts from the first step, so it crosses the plan step's exit. A phase with no row
+  is refused by name, exit 1.
+
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
+  ```bash
+  python tools/loop/loop_table.py phase --from ABORTED --fact halt-code=budget-exhausted
+  python tools/loop/loop_table.py phase --from SPECCING --to BUILDING
+  ```
+
+  ```text
+  phase ABORTED · state incomplete · step none
+  phase SPECCING · state designing · step step.design · to BUILDING · crosses item.design.exit
+  ```
+
+- **The check:** `check` prints `loop: phase map` with the row and qualified counts and joins the
+  rows with the driver's `PHASES_CORE` both ways, refusing a phase with no row and a row for no phase,
+  as well as a row with both a state and a step or neither, an unknown step or state, and two rows
+  for one phase without qualifiers. Where the driver is not installed beside this kit, the join prints
+  `unarmed` and grades nothing. The cases `phase-missing`, `phase-stale`, `phase-shape` and
+  `phase-twice` show each refusal.
+
+- **The hold:** the driver's `--phase` asks this map which step exits a move crosses. When an owner
+  gate sits at one of them and still reads `held`, the move is refused before anything is written,
+  naming the gate and how to release it, as `--close` is held. A move that crosses no exit, or only
+  exits no gate holds, goes through as before. Under the default `autonomy`, the only owner gate is the
+  plan gate, which the authorization releases, so nothing new is held.
+
 ## When a parent build is withdrawn
 
 A build whose README front matter names `parents:` depends on them. When a parent is withdrawn, the

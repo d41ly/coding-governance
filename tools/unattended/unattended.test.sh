@@ -9259,6 +9259,14 @@ out=$(run --close tRun); rc=$?
 same "AC3 an owner gate under three-gates holds the close" "$rc" "1"
 hit "$out" "UNATTENDED check 82 FAILED — --close is held at an owner breakpoint the policy file places, or the list of them did not answer, so the Definition of Done is not evaluated past a gate only the owner releases"
 hit "$out" "held at item.design.exit item.deploy.mandate; park the question with --park tRun --item <tag>"
+# ---- TOOL-dDeclaredLoop-52: the same gate holds a `--phase` move past item.design.exit in check_phase_gates' one
+# ---- `fail 82`, and a move past item.build.exit, where no owner gate stands, is not held. Against the base
+# ---- driver no such function exists, so neither line is printed.
+out=$( load_driver_conf && check_phase_gates tRun SPECCING BUILDING 2>&1 ); rc=$?
+same "AC5 an owner gate at item.design.exit holds the move past it" "$rc" "1"
+hit "$out" "UNATTENDED check 82 FAILED — the move SPECCING -> BUILDING passes a step exit, and the loop kit's phase map or an owner gate at that exit holds it: held at item.design.exit;"
+out=$( load_driver_conf && check_phase_gates tRun BUILDING VERIFYING 2>&1 ); rc=$?
+same "AC5 a move past an exit no owner gate holds goes on" "$rc" "0"
 git update-ref refs/remotes/origin/main "$BASE"
 _dr_pol=$(printf '100644 blob %s\tpolicy.toml\n' "$(printf '[review\n' | git hash-object -w --stdin)" | git mktree)
 _dr_tree=$( { git ls-tree "$BASE" | grep -v "	.governance$"; printf '040000 tree %s\t.governance\n' "$_dr_pol"; } | git mktree)

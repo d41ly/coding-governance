@@ -7098,6 +7098,16 @@
       "file": "tools/unattended/stall-recorder.test.sh"
     },
     {
+      "id": "check_phase_gates",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_phase_rows",
+      "kind": "function",
+      "file": "tools/loop/loop_table.py"
+    },
+    {
       "id": "check_pid_alive",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -10358,6 +10368,11 @@
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
+      "id": "derive_crossed_exits",
+      "kind": "function",
+      "file": "tools/loop/loop_table.py"
+    },
+    {
       "id": "derive_dead_streaks",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -11591,6 +11606,11 @@
       "id": "derive_phase",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "derive_phase_position",
+      "kind": "function",
+      "file": "tools/loop/loop_table.py"
     },
     {
       "id": "derive_pin",
@@ -20113,6 +20133,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "read_held_gates",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_held_reds",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -21191,6 +21216,11 @@
       "id": "read_phase_into",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_phase_map",
+      "kind": "function",
+      "file": "tools/loop/loop_table.py"
     },
     {
       "id": "read_pid_and_swap",

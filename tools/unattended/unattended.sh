@@ -6690,6 +6690,8 @@ verb_phase() { # slug · phase · witness
     return 1
   fi
   [ -n "$wit" ] || { fail 11 "a phase claim carries a WITNESS - a sha, a tag or a run id - and presence is its own refusal because an unwitnessed claim is the one an oracle skips: $want"; return 1; }
+  # TOOL-dDeclaredLoop-52 S4 - a move past a step exit an owner gate holds is refused before the first write.
+  check_phase_gates "$slug" "$DP_PHASE" "$want" || return 1
   set_fact "$rel" phase "$want" || return 1
   set_fact "$rel" witness "$wit" || return 1
   # TOOL-aBoundedVerdict-15 S1 - the SECOND omission, and the reason rev-1's "the only phase writer
@@ -11700,9 +11702,13 @@ print_breakpoint_lines() { # slug -> prints the list's lines; 0 always
   [ -z "$_bd_out" ] || printf '%s\n' "$_bd_out"
   return 0
 }
-check_owner_gates() { # slug -> 0 where no owner line reads held or the module does not resolve; 1 after its one fail 82
-  local _og_why="" _og_held="" _og_flag="" _og_ln
+# TOOL-dDeclaredLoop-52 S4 - THE HELD-GATE READ, extracted at its second reader: `check_owner_gates` reads every
+# owner line, and the `--phase` hold only those positioned `at` a step exit the move crosses. It sets the
+# caller's `_og_why` and refuses nothing, so each caller keeps its own refusal.
+read_held_gates() { # slug · [tags] -> sets _og_why where an owner line reads held, at one of the tags where given, or the list refuses; 1 where the fork cutoff does not load
+  local _og_held="" _og_flag="" _og_ln
   local -a _og_lines=()
+  _og_why=""
   load_fork_cutoff || return 1
   check_delegated_fork "$1" && _og_flag=--delegated-fork
   run_loop_verb breakpoints.py list "--build=$1" ${_og_flag:+"$_og_flag"} || return 0
@@ -11713,13 +11719,44 @@ check_owner_gates() { # slug -> 0 where no owner line reads held or the module d
     for _og_ln in ${_og_lines[@]+"${_og_lines[@]}"}; do
       _og_ln=${_og_ln%$'\r'}
       case "$_og_ln" in
-        "breakpoint: "*" · owner · "*" · held") _og_ln=${_og_ln#breakpoint: * · }; _og_ln=${_og_ln%% · *}; _og_held="$_og_held ${_og_ln#* }" ;;
+        "breakpoint: "*" · owner · "*" · held") _og_ln=${_og_ln#breakpoint: * · }; _og_ln=${_og_ln%% · *} ;;
+        *) continue ;;
       esac
+      if [ -n "${2:-}" ]; then
+        case "$_og_ln" in "at "*) ;; *) continue ;; esac
+        case " $2 " in *" ${_og_ln#at } "*) ;; *) continue ;; esac
+      fi
+      _og_held="$_og_held ${_og_ln#* }"
     done
     [ -z "$_og_held" ] || _og_why="held at$_og_held; park the question with --park $1 --item <tag> --reason <question>, hand the run over with --handoff $1 --code owner-decision, and the owner's disposition record whose Item is that tag releases it at the next --close"
   fi
+  return 0
+}
+check_owner_gates() { # slug -> 0 where no owner line reads held or the module does not resolve; 1 after its one fail 82
+  local _og_why=""
+  read_held_gates "$1" || return 1
   [ -n "$_og_why" ] || return 0
   fail 82 "--close is held at an owner breakpoint the policy file places, or the list of them did not answer, so the Definition of Done is not evaluated past a gate only the owner releases: $_og_why"
+  return 1
+}
+# TOOL-dDeclaredLoop-52 S4 - THE `--phase` HOLD PAST A STEP EXIT, which TOOL-dDeclaredLoop-19 handed here: the loop
+# kit's phase map names the step exits the move crosses, and an owner gate `at` one of them reading `held`
+# holds the move, as a map that refuses does. A move crossing no exit reads no list; a loop kit that does
+# not resolve reads nothing, and the move goes on. The values are named locals, never positional ones.
+check_phase_gates() { # slug · from · to -> 0 where the move crosses no held exit or the loop kit does not resolve; 1 after its one fail 82
+  local _pg_from="$2" _pg_to="$3" _pg_why="" _og_why=""
+  run_loop_verb loop_table.py phase "--from=$2" "--to=$3" >/dev/null || return 0
+  if [ "$_bd_rc" != 0 ]; then
+    _pg_why=$_bd_why
+  else
+    case "$_bd_why" in
+      *" · crosses none") return 0 ;;
+      *" · crosses "*) read_held_gates "$1" "${_bd_why##* · crosses }" || return 1; _pg_why=$_og_why ;;
+      *) _pg_why=$_bd_why ;;
+    esac
+  fi
+  [ -n "$_pg_why" ] || return 0
+  fail 82 "the move $_pg_from -> $_pg_to passes a step exit, and the loop kit's phase map or an owner gate at that exit holds it: $_pg_why"
   return 1
 }
 
