@@ -1,6 +1,6 @@
 # TOOL-aPiecewiseGrade-8 — two permanent arms hold the spec-token checker's counter key-set guards
 
-**Status:** SPECCED · rev-1 · 2026-11-16 · node a · Tier-1 · base aebbb4a72 · streams tooling · order 6
+**Status:** INPROGRESS · rev-1 · 2026-11-16 · node a · Tier-1 · base aebbb4a72 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
