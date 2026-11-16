@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-33 — the static termination check on every composition, at the push and at each step boundary
 
-**Status:** INPROGRESS · rev-6 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 34 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-7 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 34 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0118@4c8ef789 whole
 
@@ -64,9 +64,13 @@ build's change. Today nothing checks that a flow can finish (`gap-flow-24`, C2-F
   unit levels each print `loop: termination · terminal · <level> · unchecked — no terminal set`, never a
   pass, until `TOOL-dDeclaredLoop-54` declares theirs (§8 F11). Observed by AC2, AC4.
 - **S3** — Rule `reachable`: every item of each program `check_program` returns, the five steps, each
-  composed stage and, by `TOOL-dDeclaredLoop-50` S3, `review`, is reached from that program's entry, its
-  items with no needs, along item routes to declared items and from each need to the item needing it.
-  Observed by AC3.
+  composed stage and, by `TOOL-dDeclaredLoop-50` S3, `review`, is reached by one walk from every
+  program's entry, its items with no needs. The walk follows every item route to a declared item, and
+  follows a need to the item needing it only where both items lie in one program. A route from another
+  program's item enters this program, as `item.test.merge`'s `conflict` route enters
+  `item.build.resolve`, whose one need lies in the test program. A need across programs is never
+  followed: every item's needs lead back to some entry, so a walk along them could flag nothing (§8
+  F12). Observed by AC3, AC10.
 - **S4** — Rule `counted`: with every set-aside edge left out, the build table's rows and the item routes
   between declared items are acyclic, each cycle found by `scan_cycles`, the inline copy
   `tools/loop/loop_lib.py` carries of `tools/lib/needs_graph.py#scan_cycles`, and reported once. Set aside
@@ -165,7 +169,7 @@ build's change. Today nothing checks that a flow can finish (`gap-flow-24`, C2-F
 | Rule | Reads | Finding |
 |---|---|---|
 | `terminal` | each level's states, rows and declared terminal set | a state with no path to a terminal; an empty state set |
-| `reachable` | each program's items, routes and needs | an item no route or need reaches from the program's entry |
+| `reachable` | every program's entries and items, every route, each need within one program | an item the walk from every entry does not reach |
 | `counted` | the build table and the item routes, less the set-aside edges | a cycle, once, rotated to its smallest member |
 | `wait` | each item with `waits` or an owner actor, the pending list | no `deadline` or `on-deadline`; a deadline of the wrong type; a stale pending row |
 | `raise` | the build's state rows | an `applied · class loosening` row naming no disposition |
@@ -204,20 +208,34 @@ rules, in order, recorded per cycle in the acceptance ledger:
 
 1. A route of an item to itself on which the item waits on another party is a wait: the item lists the
    outcome in `waits` and declares `deadline = "policy.flow.wait-ceiling"` and an `on-deadline`.
-2. A route into an item the unattended driver dispatches again as the same unit's pass, an item whose
-   actor is `role:gov-builder`, names the cause that dispatch draws, `fix-pass`, in `draws`
-   (`verb_dispatch`'s draw in `tools/unattended/unattended.sh`, where the unit's earlier pass committed).
+2. A route into a repetition whose draw site exists names, in `draws`, the cause that site draws. A
+   route into an item the unattended driver dispatches again as the same unit's pass, an item whose
+   actor is `role:gov-builder`, names `fix-pass` (`verb_dispatch`'s draw in
+   `tools/unattended/unattended.sh`, where the unit's earlier pass committed). `item.review.fold`'s
+   `next-round` route into `item.review.trigger` names `review-round`, which
+   `tools/unattended/unattended.sh#verb_review` draws on every round of a subject after its first
+   (`tools/loop/loop.toml@44ea9acb:1935`). That route bounds unit 50's cycle `item.review.dispose ->
+   item.review.fold -> item.review.trigger -> item.review.pin -> item.review.report`.
 3. Every other cycle, of the build table or the item routes, is a `cycle` row of the pending list naming
    the owner of the item whose row or route re-enters it, by its `[[item]]` or `[[stand-in]]` row, the
-   build that declares its bound when it lands that item.
+   build that declares its bound when it lands that item. Unit 50's cycle `item.review.dispose ->
+   item.review.fold` is one: `item.review.fold`'s `at-bound` route re-enters `item.review.dispose` and
+   no site draws on it, so its row names `dDeclaredLoop`, the owner of `item.review.fold`'s row.
 4. An item with an owner actor is a `wait` row naming `run.owner-deadline` and dWellOiledMachine.
 
-Measured over gov's `[[item]]` rows at the branch tip `250b236f` by `scan_cycles` over every route
-between declared items: 21 cycles over 39 edges, PINNED on 2026-11-16 at that tip. Rule 1 covers four
-items, `item.build.unit-lease` on `waiting`, `item.deploy.core` on `running`, `item.deploy.land` on
-`unreachable` and `item.deploy.parents` on `held` and `moved`. Units 50, 19, 51, 52 and 53 land rows
-before or beside this unit, so the population is re-derived at the builder's base by the module's own
-`check` before rule 1 to 4 are applied, never read off this paragraph.
+Measured over gov's `[[item]]` rows at the branch tip `e8018d94f` by `scan_cycles` over every route
+between declared items: 23 cycles over 45 edges, PINNED on 2026-11-16 at that tip. The count was 21
+over 39 at `250b236f`, and the two added are unit 50's review cycles that rules 2 and 3 name above.
+Rule 1 covers four items, `item.build.unit-lease` on `waiting`, `item.deploy.core` on `running`,
+`item.deploy.land` on `unreachable` and `item.deploy.parents` on `held` and `moved`. Units 52 and 53,
+beside this unit at order 34, may land rows, so the population is re-derived at the builder's base by
+the module's own `check` before rule 1 to 4 are applied, never read off this paragraph.
+
+Over the same rows the `reachable` rule prints no finding, PINNED on 2026-11-16 at `e8018d94f` and
+re-derived by the same `check` at the builder's base. `item.build.resolve` needs only
+`item.test.merge` (`tools/loop/loop.toml@44ea9acb:1567`) and is reached through that item's
+`conflict` route (`tools/loop/loop.toml@44ea9acb:1589`), which the walk follows across programs. No
+pending row is owed for reachability.
 
 ### The pending list
 
@@ -345,9 +363,18 @@ lexicon ran on this worktree's main at `179486e8`.
 | reader coverage | `check_reader_coverage` over `flow.wait-ceiling` | `termination.py`'s literal `resolve` call |
 | the install-prefix ban | `check-install-prefix.sh` | the kit's files spell `<prefix>` or `{prefix}`, never the tool root |
 
-Sibling code this spec is written on: `TOOL-dDeclaredLoop-50` S3's `review` program key, building now;
-units 19 and 51 at order 33, which may add item rows and routes; units 52 and 53 beside this one at
-order 34, which may edit `tools/loop/loop.toml`. The builder re-derives gov's cycles at its base (§4).
+Rev-7 re-read what its change reaches at `e8018d94f`: gov's `[[item]]` rows, the review program's among
+them, `tools/loop/loop_lib.py#check_program`, `tools/loop/position.py#derive_next_item`,
+`tools/loop/budget.py#CAUSES` and `tools/unattended/unattended.sh#verb_review`. Outside
+`tools/loop/loop.toml`, `item.review.fold` is named only in prompt text, in
+`tools/workflows/unattended-build.template.js`, `tools/workflows/unattended-build.js` and that
+workflow's test, none of which reads a row field, so its `draws` reaches no reader the table lacks. The walk S3 gives reads the rows `check_program` already
+grades and adds no reader.
+
+Sibling code this spec is written on: units 50, 19 and 51 landed by `e8018d94f`, unit 50's review
+program adding the two cycles §4 bounds; units 52 and 53 beside this one at order 34, unit 52
+INPROGRESS and unit 53 DEFERRED at `a737706a7`, either of which may edit `tools/loop/loop.toml`. The builder re-derives gov's cycles and the
+reachable walk at its base (§4).
 
 ## 6. Acceptance criteria
 
@@ -360,9 +387,12 @@ order 34, which may edit `tools/loop/loop.toml`. The builder re-derives gov's cy
 - **AC2** — When `--plant dead-end` plants a build state no row leaves, the check prints a `terminal`
   finding naming the state, and the feature and unit levels each print `unchecked — no terminal set`.
   Red when: reachability is computed forward from the entry, so a dead-end state still passes.
-- **AC3** — When `--plant orphan-item` plants an item no route or need reaches from its program's entry,
-  the check prints a `reachable` finding naming the item.
-  Red when: the walk starts from every item rather than the entry, so the orphan reaches itself.
+- **AC3** — When `--plant orphan-item` adds to gov's composition an item of the build program whose one
+  need is `item.test.merge` and which no route names, the check prints one `reachable` finding, naming
+  that item, and none naming `item.build.resolve`, which holds the same need and which
+  `item.test.merge`'s `conflict` route names.
+  Red when: the walk follows a need across programs, so the orphan is reached through
+  `item.test.merge`, as every item then is.
 - **AC4** — When `--plant empty-states` plants a build level declaring no states, the plant prints a
   `terminal` finding naming the empty set and its exit as 1.
   Red when: an empty table passes because no state fails.
@@ -389,7 +419,8 @@ order 34, which may edit `tools/loop/loop.toml`. The builder re-derives gov's cy
   termination` whose argv runs `termination.py check --selftest`, carrying no `guard` key, `enforces`
   holding `principle.p39` and `stage` holding `step.test`; and `python termination.py check` over
   this repository's composition exits 0 and prints both pending counts.
-  Red when: gov's own composition reds at landing, a gov cycle with no bound.
+  Red when: gov's own composition reds at landing, on a gov cycle with no bound or on an item such as
+  `item.build.resolve` that only another program's route reaches.
 - **AC11** — When `--plant boundary` records a forward move in a scratch repository whose build holds an
   additive flow change adding an item that routes back into itself with no `draws`, the move is refused
   naming the `counted` finding and `RUN.md` keeps its length; without the change the move records.
@@ -442,9 +473,10 @@ New arm: tools/loop/termination.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 AC9 AC1
   drew otherwise. F1's field stays the marker on item routes, which have no direction. Measured at the
   tip, (a) leaves one build cycle, `paused` re-entered by B19's pause from `@open`, whose item is
   dWellOiledMachine's stand-in, a `cycle` row by §4's rule 3. Recommendation (a); the body is written on it.
-- **F6 — How do gov's own item-route cycles pass the counted rule at landing?** 21 cycles PINNED at
-  `250b236f` on 2026-11-16: waits on a lease, the remote and a parent, fix passes, and design and test
-  loops no draw site records. Options: (a) §4 "Gov's own cycles at landing"'s four rules; (b) every
+- **F6 — How do gov's own item-route cycles pass the counted rule at landing?** 23 cycles PINNED at
+  `e8018d94f` on 2026-11-16: waits on a lease, the remote and a parent, fix passes, review rounds, and
+  design, test and disposal loops no draw site records. Options: (a) §4 "Gov's own cycles at
+  landing"'s four rules; (b) every
   cycle a pending row; (c) the item routes left out of the rule. (b) leaves the waits this unit's key
   bounds unbounded and the fix-pass loops pending though their draw site exists. (c) cannot catch the
   clause's discriminating case. Recommendation (a); the spec body is written on it.
@@ -485,6 +517,25 @@ New arm: tools/loop/termination.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 AC9 AC1
   unchecked, never a pass; (b) it walks them toward the build's terminals, every feature and unit state a
   finding, so gov's composition reds at landing; (c) this unit declares the sets, that unit's S1. (c)
   moves a sibling's scope. Recommendation (a); the spec body is written on it.
+- **F12 — How does the reachable rule count an item that only another program reaches?**
+  `item.build.resolve`, of the build program, needs only `item.test.merge`, a test item, and only that
+  item's `conflict` route names it (`tools/loop/loop.toml@44ea9acb:1567` and `:1589`). Inside its own
+  step that need is met only by a recorded move naming `item.test.merge`
+  (`tools/loop/position.py#derive_next_item`). Rev-6's walk from each program's own entry, along every
+  route and every need, leaves it unreached, so gov's composition reds and AC10 cannot hold, as the
+  builder return 2026-11-16-build-TOOL-dDeclaredLoop-33-1-builder-return measured. Options: (a) one walk
+  from every program's entries grading each program's items, following a route across programs and a
+  need only between two items of one program, with AC3's orphan rebuilt as a build item needing
+  `item.test.merge` that no route names; (b) rev-6's walk, with `item.build.resolve` and any item like
+  it carrying a declared bound, a `reach` row as a third kind of the pending list. Measured at
+  `e8018d94f` on 2026-11-16 over gov's rows, bare and with that orphan added: (a) prints nothing on gov
+  and the orphan alone on the plant; (b) prints nothing on gov beside one pending row, and the orphan
+  on the plant. Following every need across programs under (a), or counting an item whose needs all
+  leave its program as an entry, prints nothing on either: every item's needs lead back to some entry,
+  so the rule could never red. (b) adds a pending kind and its staleness rule for a row no build
+  retires, since the route from the test program is `item.build.resolve`'s design, and a standing
+  exemption read as coverage. RESOLVED (agent, 2026-11-16, delegated): (a), the smallest change that
+  keeps the rule able to red; S3, AC3, AC10 and §4 are written on it.
 
 ## 9. Revision log
 
@@ -508,6 +559,11 @@ New arm: tools/loop/termination.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 AC9 AC1
   prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-33-1-spec-writer.md: symbol citations; the landed
   composition readers and `read_build_items`; `scan_cycles`; F5 to F11; S6 and AC6 out, built by unit
   27; the help page that now exists; §5's sweep.
+- rev-7 · 2026-11-16 · S3 · §4 · §5 · AC3 · AC10 · §8 F6 F12 · per the builder return
+  2026-11-16-build-TOOL-dDeclaredLoop-33-1-builder-return: the reachable walk starts from every
+  program's entry and follows a need only within one program (F12), so `item.build.resolve` holds and
+  AC3's orphan still reds; gov's cycles re-pinned at 23 at `e8018d94f`, unit 50's two review cycles
+  bounded by §4's rules 2 and 3.
 
 ## 10. Reuse audit
 
