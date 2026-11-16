@@ -19653,6 +19653,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "read_driver_conf",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "read_dump",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"

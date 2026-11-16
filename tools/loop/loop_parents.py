@@ -11,7 +11,9 @@ that kit's `read_design_conf`, `memory` where unset. A parent reads withdrawn on
 `withdrawn` post: its run-state file `RUN.md`, read at the tip of `refs/remotes/<remote>/<run-branch>`
 where that ref holds it, else in the tree (TOOL-dDeclaredLoop-56 S39), has a run fact `phase` that
 `loop_table.py`'s `derive_phase_position` maps, with `halt-code` and `hold-code` where set, to the state
-`withdrawn` (S18), so an `ABORTED` parent halted `budget-exhausted` reads `incomplete`. The facts are
+`withdrawn` (S18), so an `ABORTED` parent halted `budget-exhausted` reads `incomplete`; a phase no row
+reads is an adopter phase where the `PHASES_EXTRA` of `<root>`'s `.unattended.conf` names it, read with
+`tree=root` (TOOL-dDeclaredLoop-70), and reads no state, as the plant `parent-in-extra-phase` shows. The facts are
 read by the policy kit's `read_run_fact`, the remote by `claims.py`'s inline ladder and the branch by the
 tree copy's `run-branch:` fact. A phase the map refuses exits 2 `unanswered` naming the parent. A parent
 with no run-state file anywhere prints `parent <p> · not withdrawn (no run record)` before the route.
@@ -75,7 +77,8 @@ PLANTS = {"withdrawn-parent": "phase: ABORTED, run-branch naming a branch the sc
           "no-parents": "the child README carries no parents: key",
           "incomplete-parent": "phase: ABORTED with halt-code: budget-exhausted, which maps to incomplete",
           "aborted-on-run-branch": "the tree's copy phase: BUILDING, the run branch's tracking tip phase: ABORTED",
-          "no-run-record": "the parent's build folder holds no RUN.md"}
+          "no-run-record": "the parent's build folder holds no RUN.md",
+          "parent-in-extra-phase": "phase: STAGING, which the scratch's .unattended.conf sets in PHASES_EXTRA"}
 FX_KEPT = "refs/heads/branch/tParent-run"
 
 
@@ -128,7 +131,8 @@ def read_withdrawn_parents(build, root):
         facts = {k: guard.read_run_fact(text, k) for k in ("halt-code", "hold-code")}
         facts = {k: v for k, v in facts.items() if v}
         try:
-            state = derive_phase_position(phase, facts)[0]
+            # tree=root: a phase no row reads is read against the conf of the tree that wrote it (TOOL-dDeclaredLoop-70)
+            state = derive_phase_position(phase, facts, tree=root)[0]
         except LookupError as e:
             raise ValueError("the parent %s's phase %s maps to no state: %s" % (slug, phase, e)) from None
         if state == "withdrawn":
@@ -185,7 +189,8 @@ def write_parent_plant(top, case, value):
     def build_readme(slug, extra=""):
         return ("---\nslug: %s\nnode: a\nopened: 2026-01-01\nstreams: tooling\nroster: none\nids: none\n%s---\n"
                 "# %s\n" % (slug, extra, slug))
-    phase = "BUILDING" if case in ("live-parent", "aborted-on-run-branch") else WITHDRAWN_PHASE
+    phase = {"live-parent": "BUILDING", "aborted-on-run-branch": "BUILDING", "parent-in-extra-phase": "STAGING"}.get(
+        case, WITHDRAWN_PHASE)
     run_text = "# tParent - run state\n\n## Run facts\nphase: %%s\n%srun-branch: %s\n" % (
         "halt-code: budget-exhausted\n" if case == "incomplete-parent" else "", FX_KEPT)
     run_fixture_git(top, "init", "-q", "--template=", "-b", "main")
@@ -195,6 +200,8 @@ def write_parent_plant(top, case, value):
         "memory/builds/tParent/README.md": build_readme("tParent")})
     if case != "no-run-record":
         write_fixture_files(top, {"memory/builds/tParent/RUN.md": run_text % phase})
+    if case == "parent-in-extra-phase":
+        write_fixture_files(top, {".unattended.conf": 'PHASES_EXTRA="STAGING"\n'})
     if value is not None:
         write_fixture_files(top, {".governance/policy.toml": '[deps]\non-parent-withdrawn = "%s"\n' % value})
     run_fixture_git(top, "add", "-A")
@@ -255,6 +262,7 @@ def run_selftest():
              ("no run record", fx + ["no-run-record"], 0, "parent tParent · not withdrawn (no run record)", ""),
              ("no run record route", fx + ["no-run-record"], 0, "route none", ""),
              ("default", fx + ["withdrawn-parent"], 0, move % "replan", ""),
+             ("extra phase", fx + ["parent-in-extra-phase"], 0, "route none", ""),
              ("bogus", fx + ["withdrawn-parent", "--value", "bogus"], 2, "%s: unanswered" % SAY, KEY)]
     return run_selftest_cases(main, cases, "%s: parents selftest" % SAY)
 

@@ -127,8 +127,10 @@ which `loop_table.py` beside this file checks, both ways (TOOL-dDeclaredLoop-13)
 `Item` names a declared item, which reads None; or that a writer resolved an alias before it wrote. An
 unknown key on a row is not read and not refused. That a witness's `by` is true. Stdlib only, but for
 `read_actor_base` and `read_builds_dir`, which import the memory-tree kit's compare base and its conf
-reader inside the function, and `read_role_defaults`, which imports the roles kit's library there, so a
-reader calling `load_loop` never reaches them.
+reader inside the function, `read_role_defaults`, which imports the roles kit's library there, and
+`read_driver_conf`, which sources the unattended driver's `.unattended.conf` in the bash `loop_witness.py`'s
+`resolve_bash` finds, imported inside the function (TOOL-dDeclaredLoop-70), so a reader calling
+`load_loop` never reaches them.
 """
 import contextlib
 import io
@@ -648,6 +650,58 @@ def read_builds_dir(kit_dir, root):
             (pathlib.Path(root) / ".memory-tree.conf").as_posix())
     memory_root = (conf.get("MEMORY_ROOT") or "memory").strip().strip("/")
     return pathlib.Path(root) / memory_root / "builds", ""
+
+
+#: The driver conf's answers held for the process, keyed by the conf and the names read (TOOL-dDeclaredLoop-70).
+DRIVER_CONF_READS = {}
+#: The pair the conf subshell prints last, the read's verdict, as the unattended kit gate imports a conf.
+CONF_SENTINEL = "__CONF_IMPORT_OK__\0\0"
+#: A name `read_driver_conf` reads: a shell variable's shape, held before it reaches `eval`.
+CONF_NAME = re.compile(r"[A-Z][A-Z0-9_]*")
+
+
+def read_driver_conf(tree, names):
+    """`{name: value}` for each of `names` the unattended driver's `.unattended.conf` sets, the conf at the
+    top of `tree`'s work tree, the first of `tree` and its parents holding `.git`, else `tree`: sourced in
+    bash with the top as the working directory, as the driver sources it, each value read back with a
+    sentinel after them. `{}` where the file is absent; each answer held for the process. ValueError on a
+    name outside `[A-Z][A-Z0-9_]*`, before any bash starts; LoopError `driver conf unreadable` naming the
+    conf and why, where no bash sees it, it does not start, exits non-zero or prints no sentinel
+    (TOOL-dDeclaredLoop-70). `loop_witness.py`'s `resolve_bash` is imported inside the function, since
+    that module imports this one."""
+    import subprocess
+    names = tuple(names)
+    bad = [n for n in names if not CONF_NAME.fullmatch(str(n))]
+    if bad:
+        raise ValueError("read_driver_conf: %s is no variable name" % bad[0])
+    tree = pathlib.Path(tree).absolute()
+    top = next((d for d in (tree, *tree.parents) if (d / ".git").exists()), tree)
+    conf = top / ".unattended.conf"
+    if not conf.is_file():
+        return {}
+    key = (str(conf), names)
+    if key not in DRIVER_CONF_READS:
+        from loop_witness import resolve_bash
+        bash = resolve_bash(conf.as_posix())
+        if bash is None:
+            raise LoopError("driver conf unreadable", "%s — no bash that can see it" % conf.as_posix())
+        script = ('__rdc_conf=$1; shift; __rdc_names=("$@")\n'
+                  '. "$__rdc_conf" >/dev/null 2>&1 || exit 9\n'
+                  'for n in "${__rdc_names[@]}"; do eval "v=\\${$n-__UNSET__}"; printf "%s\\0%s\\0" "$n" "$v"; done\n'
+                  'printf "__CONF_IMPORT_OK__\\0\\0"')
+        try:
+            p = subprocess.run([bash, "-c", script, "_", conf.as_posix(), *names], cwd=str(top),
+                               stdin=subprocess.DEVNULL, capture_output=True)
+        except OSError as e:
+            raise LoopError("driver conf unreadable", "%s — %s" % (conf.as_posix(), e)) from None
+        if p.returncode != 0:
+            raise LoopError("driver conf unreadable", "%s — exit %d" % (conf.as_posix(), p.returncode))
+        out = p.stdout.decode("utf-8", "replace")
+        if not out.endswith(CONF_SENTINEL):
+            raise LoopError("driver conf unreadable", "%s — no __CONF_IMPORT_OK__ sentinel" % conf.as_posix())
+        fields = out[:-len(CONF_SENTINEL)].split("\0")[:-1]
+        DRIVER_CONF_READS[key] = {n: v for n, v in zip(fields[::2], fields[1::2]) if v != "__UNSET__"}
+    return dict(DRIVER_CONF_READS[key])
 
 
 def read_actor_rows(kit_dir):

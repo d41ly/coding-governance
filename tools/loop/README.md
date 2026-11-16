@@ -276,8 +276,11 @@ state, a terminal or `none`, where it has no step. A qualified row adds `QUALIFI
 `hold-code` and `ending`, each matched against the run's fact of that key: `ABORTED` with `halt-code =
 "budget-exhausted"` reads incomplete, and `HELD` with `hold-code = "owner-decision"` and `ending =
 "park-for-owner"` reads parked. `read_phase_map` reads the rows, `derive_phase_position(phase, facts,
-phase_map=None)` answers `(state, step)` from the first qualified row whose every qualifier matches,
-else the unqualified one, raising LookupError on a phase with no row, and `derive_crossed_exits(from_step,
+phase_map=None, extra=None, tree=".")` answers `(state, step)` from the first qualified row whose every qualifier matches,
+else the unqualified one, `("none", "none")` for a phase with no row that is a member of `extra`,
+raising LookupError on any other; `extra` None reads `PHASES_EXTRA` through `loop_lib.py`'s
+`read_driver_conf(tree, ...)`, only for a phase with no row, and `phase` without `--extra` passes None,
+so it reads the conf of the work tree it runs in (TOOL-dDeclaredLoop-70); and `derive_crossed_exits(from_step,
 to_step, steps)` the exits a move crosses, from the first step where `from_step` is `none`. `phase
 --from <PHASE> [--to <PHASE>] [--fact k=v]...` prints `phase <PHASE> · state <state> · step <tag|none>`,
 with `· to <PHASE> · crosses <tags|none>` given `--to`, exit 0, or `refused — phase <PHASE>: no row`,
@@ -331,7 +334,8 @@ withdrawal to the owner and moves nothing. The route writes nothing. It exits 2 
 `parents:` slug, a state outside the build's open states or a policy refusal, and 2 `unarmed` where
 the policy kit does not resolve, since this kit takes no edge to it. `--fixture --plant <case>` runs
 the route over a scratch repository: `withdrawn-parent`, `no-kept-branch`, `live-parent`,
-`no-parents`, `incomplete-parent`, `aborted-on-run-branch` and `no-run-record`, with `--value` committing the scratch's one policy revision and `--state` the child's
+`no-parents`, `incomplete-parent`, `aborted-on-run-branch`, `no-run-record` and `parent-in-extra-phase`,
+a parent in an adopter phase its scratch's `.unattended.conf` declares, read with `tree=root`, with `--value` committing the scratch's one policy revision and `--state` the child's
 state, `designing` by default. `--selftest` runs every case, and is gov's `loop parent routes` leg.
 
 ```bash
@@ -749,6 +753,7 @@ python <prefix>/loop/factories.py --selftest
 | `read_actor_rows(kit_dir)` | the actor list's non-blank lines, the list's one reader |
 | `read_actor_base(kit_dir)` | `(rows, base)` of the list at the compare base, or `(None, why)` for no comparison |
 | `read_builds_dir(kit_dir, root)` | `(builds_dir, "")` where the conf at `root` sets `DESIGN_RECORD`, or `(None, why)`: no memory-tree kit, or no `DESIGN_RECORD` |
+| `read_driver_conf(tree, names)` | `{name: value}` for each of `names` the unattended driver's `.unattended.conf` at the top of `tree`'s work tree sets, sourced in bash as the driver sources it, `{}` where the file is absent, held for the process; `ValueError` on a name that is no variable name, `LoopError` `driver conf unreadable` where the conf does not source |
 | `check_actor_list(rows, base_rows, sites, builds_dir)` | one refusal per list row not three fields, absent at the base, naming no actor witness of its site or a site that is neither a step nor `DOD_CORE`, or, with a `builds_dir`, naming a build with no folder there; and per actor witness no row lists |
 | `check_site_witnesses(kit_dir, site, entries)` | `(lines, refusals)` for one declaration site's `<item>:<word>` entries, joined to the aliases, and for `DOD_CORE` to the list both ways; a `DOD_EXTRA` actor entry is admitted, `adopter-declared` |
 | `derive_outcome_set(row, members, where)` | one item row's closed outcome set, `members` for `"dispositions"`; the rule `read_outcome_set` and `check_program` share |
@@ -777,8 +782,9 @@ definition holding no witness keeps reading. `read_actor_base` takes the reposit
 list's path from `git rev-parse`, finds the memory-tree kit with its inline `resolve_kit_dir`, and
 imports that kit's `resolve_compare_base` inside the function. `read_builds_dir` finds the same kit
 the same way and imports its `read_design_conf` inside the function, and `read_role_defaults` finds
-the roles kit the same way and imports its `roles_lib` there. Those three are the only reaches
-outside the standard library.
+the roles kit the same way and imports its `roles_lib` there. `read_driver_conf` sources the
+driver's `.unattended.conf` in the bash `loop_witness.py`'s `resolve_bash` finds, imported inside the
+function. Those four are the only reaches outside the standard library.
 
 A kit reads it by finding this kit's directory with its own `resolve_kit_dir` and importing the
 module from there. Three readers do today: the roles kit's `roles_lib.read_workflow_order`, which its

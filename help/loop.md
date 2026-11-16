@@ -410,6 +410,9 @@ withdrawn, and every other held run paused.
   phase map: named in `--extra "<phases>"`, as the driver passes it, it reads state none and step none,
   marked `adopter phase`, a move into it crosses no step exit, and a move out of it counts from the
   first step, as a move out of PREFLIGHT does.
+  Run without --extra, the phase verb reads PHASES_EXTRA from the .unattended.conf at the top of the work tree
+  it runs in, sourced in bash as the driver sources it; a conf that does not source refuses the reading of a
+  phase the map holds no row of, and a phase the map holds a row of never reads the conf.
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
   ```bash
@@ -492,7 +495,9 @@ waits for its next row.
   The cases are `withdrawn-parent` (the parent aborted, its kept branch present), `no-kept-branch`
   (aborted, its kept branch deleted), `live-parent`, `no-parents`, `incomplete-parent` (aborted,
   halted `budget-exhausted`), `aborted-on-run-branch` (building in the tree, aborted at its run
-  branch's tracking tip) and `no-run-record` (no `RUN.md` at all). `--value` commits the scratch's
+  branch's tracking tip), `no-run-record` (no `RUN.md` at all) and `parent-in-extra-phase` (the parent
+  in `STAGING`, an adopter phase the scratch's own `.unattended.conf` declares, read against the
+  repository at `--root`, so the route is `route none`). `--value` commits the scratch's
   policy value and `--state` sets the child's state, `designing` by default. `--selftest` runs every
   case, and gov's own `loop parent routes` gate runs it.
 

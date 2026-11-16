@@ -47,7 +47,12 @@ first step's own, the first step where it is `none`, up to the target step's, no
 phase <PHASE>: no row`, exit 1. An adopter phase (TOOL-dDeclaredLoop-63), a member of `--extra`, the
 driver's `PHASES_EXTRA`, that no row reads, reads `state none · step none` with `· adopter phase` after
 the reading it qualifies, so a move into it crosses nothing and a move out counts from the first step;
-`crosses` stays the line's last field. `check` grades the rows by `check_phase_rows` and joins the unqualified
+`crosses` stays the line's last field. Run without `--extra`, `phase` reads `PHASES_EXTRA` from the
+`.unattended.conf` at the top of the work tree it runs in, through `loop_lib.read_driver_conf`, sourced as
+the driver sources it, only for a phase no row reads; a conf that does not source prints `loop: refused ·
+driver conf unreadable: <conf> — <reason>`, exit 1. `--extra=` reads no conf (TOOL-dDeclaredLoop-70). Of
+`check --selftest`'s cases, those opening `tree <name>` run in one of three scratch work trees it builds:
+`extra`, whose conf sets `PHASES_EXTRA="STAGING"`, `broken`, whose conf exits 3, and `bare`, with none. `check` grades the rows by `check_phase_rows` and joins the unqualified
 rows with the driver's `PHASES_CORE` line both ways, read through `loop_checklist.py`'s
 `read_core_registries`, printing the join `unarmed` where the driver does not resolve; every plant
 passes the shipped rows' unqualified phases in its place, taken before the break.
@@ -78,7 +83,7 @@ item owned by an unlanded build has a stand-in row; reachability, termination an
 feature rows' last-unit rule; the routes of the feature and unit rows, which the join reads for the build
 table alone; that an owed row's `by` names a real unit or build; that every terminal is entered by a row,
 which four are not yet; a phase row's qualifier value against the driver's halt and hold codes; that
-`--extra` is the driver's `PHASES_EXTRA`, which the caller passes and this module never reads; that each
+an explicit `--extra` is the driver's `PHASES_EXTRA`, which the caller passes and wins over the conf; that each
 member of a level's terminal set is a state of that level, or that a `-terminal` key names a level: a
 misspelt key leaves its level with no set, which `check` refuses, and a member no state reaches reds the
 termination check.
@@ -94,7 +99,7 @@ if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from loop_checklist import read_core_registries  # noqa: E402
 from loop_lib import (ROUTE_TRANSITION, SEG, LoopError, check_loop, derive_outcome_set,  # noqa: E402
-                      read_definition, read_item_rows, read_items, run_selftest_cases)
+                      read_definition, read_driver_conf, read_item_rows, read_items, run_selftest_cases)
 
 SAY = "loop"
 #: A level's entry in a row's `from`, never a state.
@@ -413,12 +418,14 @@ def read_phase_map(data, where):
     return {"rows": rows, "steps": check_loop(data, where)["step"]}
 
 
-def derive_phase_position(phase, facts, phase_map=None, extra=()):
+def derive_phase_position(phase, facts, phase_map=None, extra=None, tree="."):
     """`(state, step)` of `phase`: its first row carrying a qualifier whose every qualifier equals the fact
     of that key in `facts`, else its row carrying none; `step` the row's, else "none", and `state` the
     row's, else its [[step]] row's. `phase_map` is what read_phase_map returns, the shipped definition's
     when None. Where no row reads it, `("none", "none")` for a member of `extra`, the adopter's phases
-    (TOOL-dDeclaredLoop-63), else LookupError naming the phase."""
+    (TOOL-dDeclaredLoop-63), else LookupError naming the phase. `extra` None reads `PHASES_EXTRA` from the
+    driver conf of `tree`'s work tree through `loop_lib.read_driver_conf`, only for a phase no row reads,
+    and its LoopError passes through (TOOL-dDeclaredLoop-70)."""
     if phase_map is None:
         phase_map = read_phase_map(*read_definition(KIT))
     rows = [r for r in phase_map["rows"] if r.get("phase") == phase]
@@ -426,6 +433,8 @@ def derive_phase_position(phase, facts, phase_map=None, extra=()):
                 and all(facts.get(q) == r[q] for q in QUALIFIERS if q in r)), None)
     row = row or next((r for r in rows if not any(q in r for q in QUALIFIERS)), None)
     if row is None:
+        if extra is None:
+            extra = read_driver_conf(tree, ("PHASES_EXTRA",)).get("PHASES_EXTRA", "").split()
         if phase in extra:
             return "none", "none"
         raise LookupError("phase %s: no row" % phase)
@@ -559,7 +568,8 @@ def main(argv):
     ph.add_argument("--from", dest="phase_from", required=True)
     ph.add_argument("--to")
     ph.add_argument("--fact", action="append", default=[], help="k=v, a fact a qualified row matches")
-    ph.add_argument("--extra", default="", help="the adopter's phases, the driver's PHASES_EXTRA, space-separated")
+    ph.add_argument("--extra", default=None, help="the adopter's phases, the driver's PHASES_EXTRA, space-separated; "
+                    "absent, read from the .unattended.conf of the work tree it runs in")
     chk = sub.add_parser("check", help="check the tables, their route join, the stand-ins and the phase map")
     chk.add_argument("--selftest", action="store_true", help="check, every plant, and the moves")
     args = ap.parse_args(argv)
@@ -583,7 +593,9 @@ def main(argv):
                    "phase ABORTED · state incomplete · step none", ""),
                   ("phase other halt", ["phase", "--from", "ABORTED", "--fact", "halt-code=fork-unresolvable"], 0,
                    "phase ABORTED · state withdrawn · step none", ""),
-                  ("phase no row", ["phase", "--from", "DRAFTING"], 1, "refused — phase DRAFTING: no row", ""),
+                  # TOOL-dDeclaredLoop-70: --extra= reads no conf of the tree the leg runs in
+                  ("phase no row", ["phase", "--from", "DRAFTING", "--extra="], 1,
+                   "refused — phase DRAFTING: no row", ""),
                   ("phase parked", ["phase", "--from", "HELD", "--fact", "hold-code=owner-decision", "--fact",
                                     "ending=park-for-owner"], 0, "phase HELD · state parked · step none", ""),
                   ("phase one qualifier", ["phase", "--from", "HELD", "--fact", "hold-code=owner-decision"], 0,
@@ -610,6 +622,21 @@ def main(argv):
                   ("phase row over extra", ["phase", "--from", "REVIEWING", "--to", "REVIEWING", "--extra",
                                             "REVIEWING"], 0,
                    "phase REVIEWING · state designing · step step.design · to REVIEWING · crosses none", "")]
+        # TOOL-dDeclaredLoop-70: no --extra reads PHASES_EXTRA from the scratch work tree the case runs in
+        cases += [("tree adopter", ["tree", "extra", "phase", "--from", "STAGING"], 0,
+                   "phase STAGING · state none · step none · adopter phase", ""),
+                  ("tree into adopter", ["tree", "extra", "phase", "--from", "REVIEWING", "--to", "STAGING"], 0,
+                   "phase REVIEWING · ", "adopter phase · crosses none"),
+                  ("tree misspelt", ["tree", "extra", "phase", "--from", "STAGNG"], 1,
+                   "refused — phase STAGNG: no row", ""),
+                  ("tree explicit empty", ["tree", "extra", "phase", "--from", "STAGING", "--extra="], 1,
+                   "refused — phase STAGING: no row", ""),
+                  ("tree broken conf", ["tree", "broken", "phase", "--from", "STAGING"], 1,
+                   "%s: refused · driver conf unreadable: " % SAY, "exit 3"),
+                  ("tree broken row", ["tree", "broken", "phase", "--from", "REVIEWING"], 0,
+                   "phase REVIEWING · state designing · step step.design", ""),
+                  ("tree bare", ["tree", "bare", "phase", "--from", "STAGING"], 1,
+                   "refused — phase STAGING: no row", "")]
         cases += [("move by order", move + ["planning", "--item", "item.design.exit", "--outcome", "recorded"], 1,
                    "refused — build · planning · item.design.exit · recorded", "no row"),
                   ("move designing", move + ["designing", "--item", "item.design.exit", "--outcome", "recorded"], 0,
@@ -661,7 +688,15 @@ def main(argv):
 
         def run_table_case(argv):
             """`main(argv)`, or for `direction-order` the shipped rows with building's and testing's step
-            orders swapped, so a direction read from anything but the rows still prints forward."""
+            orders swapped, so a direction read from anything but the rows still prints forward; an argv
+            opening `tree <name>` runs the rest with the scratch work tree `<name>` as the working directory."""
+            if argv[:1] == ["tree"]:
+                here = os.getcwd()
+                os.chdir(scratch / argv[1])
+                try:
+                    return main(argv[2:])
+                finally:
+                    os.chdir(here)
             if argv != ["direction-order"]:
                 return main(argv)
             tables = read_transition_rows(*read_definition(KIT))
@@ -670,7 +705,19 @@ def main(argv):
             print("%s: direction-order · building → testing · %s" % (
                 SAY, derive_direction("building", "testing", swapped)))
             return 0
-        return run_selftest_cases(run_table_case, cases, "%s: table selftest" % SAY)
+        import os
+        import tempfile
+        from loop_witness import remove_tree, run_fixture_git, write_fixture_files
+        scratch = pathlib.Path(tempfile.mkdtemp(prefix="loop-table-"))
+        try:
+            for name, conf in (("extra", 'PHASES_EXTRA="STAGING"\n'), ("broken", "exit 3\n"), ("bare", None)):
+                (scratch / name).mkdir()
+                run_fixture_git(scratch / name, "init", "-q", "--template=")
+                if conf is not None:
+                    write_fixture_files(scratch / name, {".unattended.conf": conf})
+            return run_selftest_cases(run_table_case, cases, "%s: table selftest" % SAY)
+        finally:
+            remove_tree(scratch)
     try:
         data, where = read_definition(KIT)
     except LoopError as e:
@@ -691,20 +738,24 @@ def main(argv):
         except LoopError as e:
             print("%s: refused · %s" % (SAY, e))
             return 1
-        extra = set(args.extra.split())
+        # absent --extra is None: the population is read from the working directory's tree (TOOL-dDeclaredLoop-70)
+        extra = None if args.extra is None else set(args.extra.split())
         mapped = {r.get("phase") for r in phase_map["rows"]}
         try:
             state, step = derive_phase_position(args.phase_from, facts, phase_map, extra)
             said = "phase %s · state %s · step %s" % (args.phase_from, state, step)
-            if args.phase_from in extra - mapped:
+            if args.phase_from not in mapped:
                 said += " · adopter phase"
             if args.to is not None:
                 to_step = derive_phase_position(args.to, {}, phase_map, extra)[1]
                 said += " · to %s%s · crosses %s" % (
-                    args.to, " · adopter phase" if args.to in extra - mapped else "",
+                    args.to, " · adopter phase" if args.to not in mapped else "",
                     " ".join(derive_crossed_exits(step, to_step, phase_map["steps"])) or "none")
         except LookupError as e:
             print("refused — %s" % e)
+            return 1
+        except LoopError as e:
+            print("%s: refused · %s" % (SAY, e))
             return 1
         print(said)
         return 0
