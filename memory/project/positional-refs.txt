@@ -16839,15 +16839,6 @@ memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-32.md	BUILD-
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-5.md	tools/unattended/check-unattended.sh:266
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-56.md	BUILD-METHOD M4
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-56.md	BUILD-METHOD M6
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-66.md	BUILD-METHOD M6
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-66.md	gen_build_index.py:1732
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-66.md	tools/check-spec-tokens.py:530
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-66.md	tools/memory-tree/check-memory-hygiene.sh:2474
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-66.md	tools/memory-tree/gen_build_index.py:1716
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-66.md	tools/memory-tree/gen_build_index.py:1732
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-66.md	tools/memory-tree/gen_build_index.py:522
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-66.md	tools/unattended/unattended.sh:3389
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-66.md	tools/workflows/unattended-build.js:76-81
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-67.md	BUILD-METHOD M4
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-67.md	run-gates.gov.test.sh:340-372
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-67.md	tools/govkit/selftest.py:2723-2725
@@ -16885,7 +16876,6 @@ memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-79.md	tools/
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-79.md	tools/unattended/unattended.sh:546-548
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-79.md	tools/unattended/unattended.sh:548
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-79.md	tools/unattended/unattended.sh:560-561
-memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-80.md	tools/memory-tree/deviation_join.py:1085
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-82.md	BUILD-METHOD M4
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-82.md	gen_build_index.py:5191
 memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-82.md	tools/check-spec-tokens.py:581

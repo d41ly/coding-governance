@@ -13,6 +13,8 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-67-deviation-671.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-67-deviation-671.md) | deviation | — |
 | [2026-10-24-build-TOOL-dDeclaredLoop-67-deviation-672.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-67-deviation-672.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 |
+| [2026-11-16-prompt-TOOL-dDeclaredLoop-67-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-67-1-spec-writer.md) | journal | — |
+| [2026-11-16-prompt-TOOL-dDeclaredLoop-67-reground-brief.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-67-reground-brief.md) | research | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 |
 
 <!-- /gen:spec-records -->

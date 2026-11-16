@@ -1,8 +1,8 @@
 # TOOL-dDeclaredLoop-33 — the static termination check on every composition, at the push and at each step boundary
 
-**Status:** INPROGRESS · rev-7 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 34 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-8 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 34 · advances TOOL-dDeclaredLoop-35
 
-**Carries:** cl-dClosedLoop-0118@4c8ef789 whole
+**Carries:** cl-dClosedLoop-0118@ae61aaf4 whole
 
 **Carries:** node:policy-key.flow.wait-ceiling
 
@@ -18,6 +18,7 @@
 | [2026-11-05-build-TOOL-dDeclaredLoop-33-deviation-333.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-33-deviation-333.md) | deviation | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-33-1-builder-return.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-33-1-builder-return.md) | journal | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-33-2-builder-return.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-33-2-builder-return.md) | journal | — |
+| [2026-11-16-build-TOOL-dDeclaredLoop-33-deviation-334.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-33-deviation-334.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-34 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-56 |
@@ -89,10 +90,13 @@ build's change. Today nothing checks that a flow can finish (`gap-flow-24`, C2-F
   `tools/policy/policy.py#derive_bounds` selects with a type of `DEADLINE_TYPES`, and `on-deadline`, an
   outcome of its set outside `waits` whose route it takes past the deadline. A wait whose deadline key
   belongs to a build that has not landed is a `wait` row of the shrink-only list
-  `tools/loop/termination-pending.txt`, naming that build; a row whose build `derive_landed_owners` in
+  `tools/loop/termination-pending.txt`, naming that build. A row whose build `derive_landed_owners` in
   `tools/policy/check_policy.py` reads landed, or whose item declares its deadline or is gone, is a
-  stale finding. The check reads `flow.wait-ceiling` through the policy kit's `resolve` with the key as
-  its literal, the reader `check_reader_coverage` counts, and prints its value. Observed by AC5.
+  stale finding. Staleness is graded only by `check` without `--build`, over gov's definition, the rows
+  the list describes. `check --build` and the step boundary read the list only to excuse the cycles
+  and waits it names (§4 "The pending list", §8 F14). The check reads `flow.wait-ceiling` through the
+  policy kit's `resolve` with the key as its literal, the reader `check_reader_coverage` counts, and
+  prints its value. Observed by AC5.
 - **S6** — The scenario successor chains need no code here: `tools/loop/scenario.py#check_scenarios`
   already reports each cycle of the composed scenarios' `then` edges once, through the same `scan_cycles`,
   and its `then-cycle` plant runs under the leg `loop scenario fixtures` (`TOOL-dDeclaredLoop-27`).
@@ -122,7 +126,12 @@ build's change. Today nothing checks that a flow can finish (`gap-flow-24`, C2-F
   `tools/loop/adapt.py#write_flow_states` writes a state row reading `applied`, runs `check_termination`
   on the build's composition at HEAD with its scenarios and its applied changes, and refuses the move on
   a finding, naming it, inside the span whose refusal cuts `RUN.md` back to its length, so nothing is
-  recorded. Observed by AC11.
+  recorded. A composition `check_program` refuses is refused the same way, naming that refusal, so a
+  flow change that breaks a program never applies (§8 F13). The four `loop adapt fixtures` plants whose
+  move applies a change are `additive`, `owner-approves`, `mid-step` and `loosening`. Each composes a
+  program `check_program` holds, through two edits to `tools/loop/adapt.py#run_adapt_plant`. Its add
+  row gains `outcomes = ["clean"]` and `routes = { clean = "transition" }`. `FX_EXCLUDE` becomes
+  `item.review.cost`, and `PLANTS`' loosening line names it. Observed by AC9, AC11.
 - **S12** — The waits outside the composition, named. `tools/loop/README.md` gains a section listing
   the code-level waits the check does not grade, each with its declared deadline: the lander's wait on
   a claim lock, `tools/push-main.sh#CLAIM_WAIT_CEILING`. Observed by AC12.
@@ -134,8 +143,8 @@ build's change. Today nothing checks that a flow can finish (`gap-flow-24`, C2-F
 
 - The tables, items, stages, scenarios and flow changes the check reads: `TOOL-dDeclaredLoop-13`, `-12`,
   `-24`, `-25`, `-27` and `-28`'s. The check reads the composition and refuses on it. It writes the
-  four new item fields on gov's own rows, the pending list and the one field S9 names, and nothing else
-  of theirs.
+  four new item fields on gov's own rows, the pending list, the one field S9 names and S11's two plant
+  edits, and nothing else of theirs.
 - The budget and the endings: `TOOL-dDeclaredLoop-30` and `-31`'s. The check reads `CAUSES`, the
   writer's backward draw and the ending rows, which make a counted edge and an ending.
 - The feature and unit tables' cycles: the clause names the build table and the item routes, and a unit
@@ -174,7 +183,7 @@ build's change. Today nothing checks that a flow can finish (`gap-flow-24`, C2-F
 | `terminal` | each level's states, rows and declared terminal set | a state with no path to a terminal; an empty state set |
 | `reachable` | every program's entries and items, every route, each need within one program | an item the walk from every entry does not reach |
 | `counted` | the build table and the item routes, less the set-aside edges | a cycle, once, rotated to its smallest member |
-| `wait` | each item with `waits` or an owner actor, the pending list | no `deadline` or `on-deadline`; a deadline of the wrong type; a stale pending row |
+| `wait` | each item with `waits` or an owner actor, the pending list | no `deadline` or `on-deadline`; a deadline of the wrong type; a stale pending row, over `gov` alone |
 | `raise` | the build's state rows | an `applied · class loosening` row naming no disposition |
 | `decline` | the build's state rows | a `held · class loosening` row not recommending `decline` |
 
@@ -191,7 +200,9 @@ build row r, from s to t (each `@open` from expanded, `@prior` and `@reentry` to
   ending   r.outcome in loop_table.ENDING_OUTCOMES          # fires only on a spent budget (unit 31)
   dynamic  r.to in ("@prior", "@reentry")                   # a resume, a park's continue, a re-entry
   owner    the actor of r.item is owner or owner:<name>
-  counted  derive_direction(s, t) == "backward" and r.draws != "none"   # write_transition draws route-back
+  counted  derive_direction(s, t, {"step-order": c["step-order"], "terminal": c["terminal"]["build"]})
+           == "backward" and r.draws != "none"
+           # write_transition draws route-back; a state with no step order reads lateral, never counted
 item route a --o--> b, b a declared item:
   counted  a.draws[o] in budget.CAUSES; or b is another step's, and the build row it fires is counted
   owner    a's actor is owner or owner:<name>
@@ -218,7 +229,15 @@ rules, in order, recorded per cycle in the acceptance ledger:
    `next-round` route into `item.review.trigger` names `review-round`, which
    `tools/unattended/unattended.sh#verb_review` draws on every round of a subject after its first
    (`tools/loop/loop.toml@44ea9acb:1935`). That route bounds unit 50's cycle `item.review.dispose ->
-   item.review.fold -> item.review.trigger -> item.review.pin -> item.review.report`.
+   item.review.fold -> item.review.trigger -> item.review.pin -> item.review.report`. Rule 2 marks a
+   route only where it lies on a cycle. The first dispatch, `item.build.unit-lease`'s `held` route
+   into `item.build.unit-pass`, lies on none, so it carries no `draws`: `verb_dispatch` draws
+   `fix-pass` only where the unit's earlier pass committed. A route into another step's
+   `role:gov-builder` item carries no `draws` either. Those routes are `item.test.merge`'s `conflict`
+   into `item.build.resolve`, and `item.test.attribute`'s `code-miss` and `item.test.seen-red`'s
+   `missing` into `item.build.fix-pass`. Each takes the class of the build row it fires, testing to
+   building, which `derive_direction` reads backward and which reads no `draws = "none"`, so each is
+   counted (§4 "The edges").
 3. Every other cycle, of the build table or the item routes, is a `cycle` row of the pending list naming
    the owner of the item whose row or route re-enters it, by its `[[item]]` or `[[stand-in]]` row, the
    build that declares its bound when it lands that item. Unit 50's cycle `item.review.dispose ->
@@ -245,12 +264,22 @@ pending row is owed for reachability.
 ```
 # tools/loop/termination-pending.txt — shrink-only
 wait · <item tag> · <deadline key> · <build that lands it>
-cycle · <tag> -> <tag> -> ... · <owner build of the re-entering item>
+cycle · <node> -> <node> -> ... · <owner build of the re-entering item>
 ```
 
-A `wait` row is stale once `derive_landed_owners` reads its build landed, or once its item declares its
-deadline or is gone. A `cycle` row is stale once the graph `check_counted` builds no longer holds that
-cycle. A stale row is a finding, so the list only shrinks, and the check prints both counts on every run.
+A `cycle` row's node is an item tag on an item-route cycle and a build state on a build-table cycle,
+as `scan_cycles` rotates either. The build-table cycle F5 leaves is `cycle · paused -> paused ·
+dWellOiledMachine`: B19's pause re-enters `paused` from `@open`, and its item, `item.life.request`, is
+dWellOiledMachine's by its `[[stand-in]]` row.
+
+The list describes gov's definition, so its staleness is graded there alone (§8 F14). A `wait` row is
+stale once `derive_landed_owners` reads its build landed, or once its item declares its deadline or is
+gone. A `cycle` row is stale once the graph `check_counted` builds over gov's definition no longer
+holds that cycle. A stale row is a finding of `check` without `--build`, so the list only shrinks, and
+the check prints both counts on every run. Over any other composition, a build's at `check --build` or
+at the step boundary, the list's rows only excuse the cycles and waits they name. A row whose item or
+cycle that composition lacks excuses nothing and is no finding, so a build that excludes, supersedes or
+re-routes an item a row names is graded on its own rows alone.
 
 ### Data model
 
@@ -258,10 +287,12 @@ cycle. A stale row is a finding, so the list only shrinks, and the check prints 
 composition = {
   "label":    "gov" | "<slug>@<pin8>",
   "states":   {level: [state]}, "terminal": {level: [state]},       # build only, until unit 54
+  "step-order": {state: order},                                     # derive_direction's, below
   "rows":     the spliced build rows, the feature rows, the unit rows,
   "items":    [composed item row], "programs": {program: [item tag]},
   "flow":     read_flow_rows(root, build) | [],                     # raise and decline
   "pending":  [{"kind", "subject", "key", "build"}],
+  "gov":      {"items": [definition item row], "rows": [definition build row]} | None,
 }
 [[item]] fields, each optional, each fixed in item-schema.toml:
   draws        { <outcome> = "<cause of CAUSES>" }
@@ -270,6 +301,13 @@ composition = {
   on-deadline  <outcome of its set outside waits>
 state row      ... · flow.adapt <value>[ · recommend <option>][ · disposition <stem>]
 ```
+
+`step-order` is `read_transition_rows`' own key, the step states' orders, which
+`tools/loop/loop_table.py#derive_direction` reads beside the build level's terminal set. The composed
+rows do not hold it, so `read_termination_inputs` copies it from the definition's tables, as
+`write_transition` reads them. `gov` holds the definition's own `[[item]]` rows and build rows, before any
+overlay, stage, scenario or flow change composes. It is set only by `check` without `--build`, and the
+pending list's staleness reads it alone (§4 "The pending list").
 
 ### Inventory
 
@@ -328,14 +366,16 @@ The leg lands with the check. Gov's own composition must be green at landing, ev
 ## 5. Production-readiness checklist
 
 - security — read-only over composed rows; its writes are the item fields on gov's rows, the pending
-  list and the one state row field S9 names. The new item fields are fixed, deny by default, so no
-  overlay or flow change patches gov's bound.
+  list, the one state row field S9 names and the two plant rows S11 names. The new item fields are
+  fixed, deny by default, so no overlay or flow change patches gov's bound. At the boundary a
+  composition `check_program` refuses refuses the move, so a broken program never applies.
 - perf / scale — each rule is linear in rows and edges; the push composes gov's once and each live
   build's at its pin, a scratch worktree per pin not HEAD; live builds number 0 PINNED at `250b236f` on
   2026-11-16 (`git log --grep=Gov-Transition:` prints none). The step boundary composes only on a move
   that applies a change. The leg's ceiling is 300 PINNED; its budget row is a proxy of each plant alone.
 - error / empty / loading states — an empty state set is a finding; a level with no terminal set prints
-  unchecked; an unreadable composition or an unresolved kit exits 2 naming the reader's refusal, never 0.
+  unchecked; an unreadable composition or an unresolved kit exits 2 naming the reader's refusal, never 0;
+  at the step boundary the same refusal refuses the move (S11).
 - observability — each finding names its rule and row; the pending counts and the ceiling print.
 - risks — the check trusts `draws` and `waits` as declared, so a false mark hides a loop; the ledger's
   per-cycle line is what a reviewer reads. A loop through a dynamic return or an ending is bounded by
@@ -353,7 +393,10 @@ lexicon ran on this worktree's main at `179486e8`.
 | Reached | Readers and populations | What keeps it green |
 |---|---|---|
 | `render_state_row`, `STATE_ROW` | writer `write_flow_states`; reader `read_flow_rows`, and through it `read_pending_rows` and `read_flow_layer`; `grep -rn "flow-state" tools skills` names `tools/loop/adapt.py` alone | the group is optional, before `disposition`, so every landed row reads; the `loosening` plant expects it; `help/loop.md`'s row grammar gains it |
-| `write_transition` | the `record` verb, `budget.py`'s plants, the driver through `record` | the call runs only after an `applied` row; `adapt.py`'s `additive`, `owner-approves` and `loosening` plants compose gov's green composition; `loop adapt fixtures`' budget row, 225 PINNED, is re-read |
+| `write_transition` | the `record` verb, `budget.py`'s plants, the driver through `record`; `adapt.py` is the one writer of a flow row (`grep -rln "write_flow_proposal\|rescope · flow " tools`) | the call runs only after an `applied` row, so only `adapt.py`'s `additive`, `owner-approves`, `mid-step` and `loosening` plants reach it; each composes a program `check_program` holds once S11's two plant edits land, measured at `440236882` (§8 F13); `off` refuses, and `unrecorded-skip`, `act-mismatch` and `unit-row` apply nothing; `loop adapt fixtures`' budget row, 225 PINNED, is re-read |
+| `run_adapt_plant`'s add row, `FX_EXCLUDE`, `PLANTS` | `run_adapt_plant` alone: `grep -rn "FX_EXCLUDE\|item.test.flakes" tools help` names `adapt.py`, `loop.toml`'s own rows and `loop_items.py`'s `exclude-breakpoint` plant, which writes its own literal | the add row keeps its tag, step, actor and needs, so `act-mismatch` and `unit-row` read as before; `help/loop.md`'s `--rescope` example names the tag and a row file, never the row's fields |
+| the pending list's staleness | `check` without `--build`; `check --build` and the boundary read the list to excuse its rows | graded over `gov` alone (§8 F14), so the `loosening` plant's composition, which drops no gov cycle and no wait row's item, and any build's exclusion grade no stale row |
+| `cl-dClosedLoop-0118`'s as-built row | the carries join, its stale and token arms, and the coverage regions `gen_build_index.py --write` renders | deviation 334's `amends` moves the row's text and hash to `ae61aaf4`, which the Carries line pins; the row's tokens `flow.wait-ceiling` and `flow.adapt` both stand in this spec; no other spec carries the clause, and the dispatcher's one `--write` re-renders the view |
 | `derive_position_into` | `derive_position`, `write_path_orders`, the driver through `position.py` | `read_build_items` holds the same lines |
 | gov's `[[item]]` rows | `check_program`, which reads no unknown key; `read_composed_items`; `splice.py`; `upstream.py` | each new key is optional; the rows' pins move, and the plants amending a gov row compute the pin live (`adapt.py`'s `act-mismatch`, `scenario.py`'s `write_scenario_plant`); `.governance/instructions.toml` holds no `[[item]]` |
 | `item-schema.toml` | `read_kind_schema`, `check_rows`, `loop_items.py check` | four `[[field]]` rows, no `widens`; no `[[fixed-row]]` moves |
@@ -374,6 +417,13 @@ them, `tools/loop/loop_lib.py#check_program`, `tools/loop/position.py#derive_nex
 workflow's test, none of which reads a row field, so its `draws` reaches no reader the table lacks. The walk S3 gives reads the rows `check_program` already
 grades and adds no reader.
 
+Rev-8 re-read what its change reaches at `440236882`, the code unchanged at the tip `e0a7e54b3`:
+`tools/loop/adapt.py#run_adapt_plant` and `#write_flow_states`, `tools/loop/loop_transition.py#write_transition`,
+`tools/loop/loop_lib.py#check_program`, `tools/loop/loop_table.py#derive_direction`, the `[[stand-in]]`
+rows, and `tools/memory-tree/asbuilt_view.py#render_view` with `tools/check-spec-tokens.py#scan_carries`.
+Gov's composition still holds 23 cycles over 45 edges, and the reachable walk still leaves no item
+unreached.
+
 Sibling code this spec is written on: units 50, 19 and 51 landed by `e8018d94f`, unit 50's review
 program adding the two cycles §4 bounds; units 52 and 53 beside this one at order 34, unit 52
 INPROGRESS and unit 53 DEFERRED at `a737706a7`, either of which may edit `tools/loop/loop.toml`. The builder re-derives gov's cycles and the
@@ -389,6 +439,9 @@ reachable walk at its base (§4).
   Red when: the counted-edge rule is absent, so the planted stage passes on soundness alone.
 - **AC2** — When `--plant dead-end` plants a build state no row leaves, the check prints a `terminal`
   finding naming the state, and the feature and unit levels each print `unchecked — no terminal set`.
+  In gov's table the three `@open` rows, B19's pause and T4 and T5's closes, leave every open state.
+  The ending rows E1 and E2 leave each step state. So the plant adds a state `stuck` that one row
+  enters, and narrows each `@open` row's `from` to the open states other than `stuck`.
   Red when: reachability is computed forward from the entry, so a dead-end state still passes.
 - **AC3** — When `--plant orphan-item` adds to gov's composition an item of the build program whose one
   need is `item.test.merge` and which no route names, the check prints one `reachable` finding, naming
@@ -402,7 +455,9 @@ reachable walk at its base (§4).
 - **AC5** — When `--plant wait-no-deadline` plants an item whose `waits` holds `waiting` and that declares
   no `deadline`, the check prints a `wait` finding; `wait-declared`, with `deadline =
   "policy.flow.wait-ceiling"` and `on-deadline = "refused"`, holds; `wait-stale` plants a pending row
-  whose build the planted landed set names and prints a stale finding.
+  whose build the planted landed set names and prints a stale finding; `stale-build` plants a pending
+  `cycle` row over a composition labelled `<slug>@<pin8>` whose own rows break that cycle, with
+  `gov` unset, and prints no stale finding.
   Red when: a wait with no deadline passes.
 - **AC7** — When `--plant raise-unattended` plants a build's state row `applied · class loosening ·
   flow.adapt additive-recorded` naming no disposition, the check prints one `raise` finding naming its
@@ -416,7 +471,8 @@ reachable walk at its base (§4).
 - **AC9** — When `--plant decline` plants a held loosening recommending `apply`, the check prints a
   `decline` finding; one recommending `decline` holds; one with no recommendation prints the finding.
   When `python tools/loop/adapt.py --fixture --plant loosening` runs, the held state row it checks in
-  the scratch `RUN.md` ends `· recommend decline`.
+  the scratch `RUN.md` ends `· recommend decline`. Its second move applies the exclusion of
+  `item.review.cost` through the boundary's check and records, and the plant prints `held`.
   Red when: a held loosening with no recommendation passes.
 - **AC10** — When a probe loads `tools/gate-legs.json` with `json.load`, it finds one row named `loop
   termination` whose argv runs `termination.py check --selftest`, carrying no `guard` key, `enforces`
@@ -427,6 +483,8 @@ reachable walk at its base (§4).
 - **AC11** — When `--plant boundary` records a forward move in a scratch repository whose build holds an
   additive flow change adding an item that routes back into itself with no `draws`, the move is refused
   naming the `counted` finding and `RUN.md` keeps its length; without the change the move records.
+  With the change's row carrying no `outcomes`, the move is refused naming `check_program`'s refusal,
+  and `RUN.md` keeps its length.
   Red when: the step boundary moves without calling the check.
   cost: a scratch repository and two composition reads, tens of seconds.
 - **AC12** — When `grep -c 'CLAIM_WAIT_CEILING'` runs over `tools/loop/README.md`, it prints at least 1.
@@ -493,7 +551,12 @@ New arm: tools/loop/termination.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 AC9 AC1
   policy value, a second write path into the guarded file and another unit's mechanism. Under (a) a
   run's raise on its own branch is the guard's admission, recorded but not held for the owner, a
   departure from the clause's three policy plants the run records. Recommendation (a); the body is
-  written on it.
+  written on it. The departure is recorded as
+  `memory/builds/dDeclaredLoop/build/2026-11-16-build-TOOL-dDeclaredLoop-33-deviation-334.md`. That
+  record is an `amends` of `cl-dClosedLoop-0118@4c8ef789` whose **After:** also states F9's fixed
+  deadline, since both departures sit in the clause's one raise sentence. `derive_clause_hash` over the
+  as-built row it renders reads `ae61aaf4`, which this spec's Carries line pins, as deviation 61 re-pinned
+  unit 6's.
 - **FACT-QUESTION · F8 — Is F4's ask filed, and does the classifier order a number?** Probe: `git grep -n
   -i "numeric" branch/unattended-declared-loop-d56bf0 -- memory/builds/dOrderedCharter/BACKLOG.md` and
   `tools/playbook/row_checks.py#derive_patch_class`, read at `250b236f`. Observation, 2026-11-16: the
@@ -539,6 +602,58 @@ New arm: tools/loop/termination.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 AC9 AC1
   retires, since the route from the test program is `item.build.resolve`'s design, and a standing
   exemption read as coverage. RESOLVED (agent, 2026-11-16, delegated): (a), the smallest change that
   keeps the rule able to red; S3, AC3, AC10 and §4 are written on it.
+- **F13 — What does the step boundary do with a build's composition that `check_program` refuses?**
+  The builder return 2026-11-16-build-TOOL-dDeclaredLoop-33-2-builder-return measured, at `440236882`,
+  that every composition the `loop adapt fixtures` plants apply is refused by `check_program`:
+  - `run_adapt_plant`'s add row, `item.build.adopter.lint-pass`, carries no outcomes;
+  - the `loosening` plant's exclusion of `item.test.flakes` leaves `item.test.route`'s `nondeterministic`
+    route aimed at no declared item.
+
+  The composition admits both with exit 0, and the four plants whose move applies a change are
+  `additive`, `owner-approves`, `mid-step` and `loosening`. Options:
+  - (a) The boundary refuses such a composition as a finding of its own, the plants unchanged.
+  - (b) The same refusal, with the plants changed to compose a program `check_program` holds. The add
+    row gains `outcomes = ["clean"]` and `routes = { clean = "transition" }`, and `FX_EXCLUDE` becomes
+    `item.review.cost`. That puts `tools/loop/adapt.py`'s plants in this unit's write set.
+  - (c) The boundary reads the build's items without `check_program`, walking only routes between
+    declared items.
+
+  Measured by a probe calling `read_composition` and `check_program` over gov's rows at `440236882`.
+  Gov's composition holds 23 cycles over 45 edges, with no item unreached. The old add row and the
+  flakes exclusion are each refused. The new add row and the exclusion of `item.review.cost` each hold:
+  23 cycles, no gov cycle gone, no wait row's item gone, no item unreached. Of gov's 67 items, 17
+  exclusions compose, and `item.review.cost`'s is the one `check_program` holds: no item needs it and
+  no route names it.
+  - Under (a), the move applying each change is refused. By `run_adapt_plant`'s checks, read and not
+    run, `additive` then misses `move`, `owner-approves` and `loosening` miss `released`, and
+    `mid-step` misses `after the boundary`.
+  - Under (b), the compositions the four plants apply, and gov's, all pass the revised checks.
+  - Under (c), the four plants pass unchanged, but a program `check_program` refuses passes the
+    boundary. The `reachable` walk would then read a population nothing validated, an empty route set
+    read as coverage.
+
+  RESOLVED (agent, 2026-11-16, delegated): (b). It is the one option that keeps every `loop adapt
+  fixtures` case green and keeps the boundary able to refuse a broken program, at the cost of two row
+  edits in one plant function. S11, AC9, AC11 and §5's sweep are written on it.
+- **F14 — Over which composition is the pending list's staleness graded?** The list is gov's, and
+  rev-7 graded staleness over every composition the check reads. A build that excludes or supersedes
+  an item a row names would then report a stale row and be refused at every boundary. Excluding
+  `item.test.flakes` drops two pending test cycles, `item.test.flakes -> item.test.select ->
+  item.test.verdict -> item.test.route` and `item.test.flakes -> item.test.verdict -> item.test.route`.
+  Options:
+  - (a) Graded over gov's definition alone, by `check` without `--build`. Every other composition reads
+    the list only to excuse the cycles and waits it names.
+  - (b) Every composition grades it, with rows naming an item the build excluded or superseded set
+    aside.
+  - (c) Graded by `check` without `--build` over the composed rows, the overlay included.
+
+  (b) still reds a build whose `amend` re-routes an item so that a pending cycle breaks, with no item
+  excluded. It also makes every reader re-derive a build's exclusions. (c) reds an adopter whose overlay
+  excludes such an item, though the list describes gov's rows and not theirs. Under (a), the `loosening`
+  plant's composition grades no staleness. Its exclusion, `item.review.cost` by F13, drops none of
+  gov's 23 cycles and names no wait row's item, measured at `440236882`. RESOLVED (agent, 2026-11-16,
+  delegated): (a), the list graded where its rows were measured. §4 "The pending list", the data model's
+  `gov`, S5 and AC5 are written on it.
 
 ## 9. Revision log
 
@@ -567,6 +682,12 @@ New arm: tools/loop/termination.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 AC9 AC1
   program's entry and follows a need only within one program (F12), so `item.build.resolve` holds and
   AC3's orphan still reds; gov's cycles re-pinned at 23 at `e8018d94f`, unit 50's two review cycles
   bounded by §4's rules 2 and 3.
+- rev-8 · 2026-11-16 · Carries · S5 · S11 · §3 · §4 · §5 · AC2 · AC5 · AC9 · AC11 · §8 F7 F13 F14 · per the
+  builder return 2026-11-16-build-TOOL-dDeclaredLoop-33-2-builder-return: a composition `check_program`
+  refuses refuses the move, and the adapt plants compose well-formed programs (F13); the pending list's
+  staleness is graded over gov's definition alone (F14); F7's departure is recorded as deviation 334, an
+  `amends` of `cl-dClosedLoop-0118` re-pinned to `ae61aaf4`; the cycle row's nodes, the step orders,
+  rule 2's uncycled and cross-step routes and AC2's plant are spelled out.
 
 ## 10. Reuse audit
 
