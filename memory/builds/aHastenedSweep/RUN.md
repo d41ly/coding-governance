@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: e5758fbace4d1715bc9f056b6664116a7ee7afc3
-phase: VERIFYING
+witness: b503bf99d626987a0d54bcc6c78ff56a8cd43e76
+phase: BUILDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/zealous-kalam-1911a4
@@ -71,3 +71,7 @@ base: f25308f019b4fbd05964a81c70ff85d3599ea51b
 2026-11-15T22:41:21Z brief · item TOOL-aHastenedSweep-6 · reason 6774b88f4114 memory/builds/aHastenedSweep/prompts/2026-11-16-prompt-TOOL-aHastenedSweep-5-brief.md
 
 2026-11-16T00:25:30Z rescope · item add TOOL-aHastenedSweep-7 · reason adopted at the close: the full suite printed 742 assertions against the 719 floor, so unit 6's floor arm cannot go red; a closed spec stays frozen, so the correction is a new unit
+
+2026-11-16T00:39:08Z dispatch · item b503bf99 TOOL-aHastenedSweep-7 · reason tools/memory-tree/check-memory-hygiene.test.sh memory/builds/aHastenedSweep/build/2026-11-16-build-TOOL-aHastenedSweep-7-1-acceptance-ledger.md memory/builds/aHastenedSweep/spec/2026-11-16-spec-TOOL-aHastenedSweep-7.md memory/builds/aHastenedSweep/README.md memory/LIVE.md memory/ledger/2026-11.md
+
+2026-11-16T00:39:10Z brief · item TOOL-aHastenedSweep-7 · reason a4fc54a7b773 memory/builds/aHastenedSweep/prompts/2026-11-16-prompt-TOOL-aHastenedSweep-7-brief.md
