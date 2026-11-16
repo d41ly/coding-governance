@@ -198,7 +198,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-82 — the round-5 spec audit's 23 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-82.md) | 41 | 2 | DEFERRED | rev-7 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-86 — the round-6 spec audit's 22 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-86.md) | 42 | 2 | DEFERRED | rev-8 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-87 — the conf-constant kind is stated as a class: any module-level binding whose value holds a conf name, and every import that binds it](spec/2026-10-24-spec-TOOL-dDeclaredLoop-87.md) | 43 | 2 | DEFERRED | rev-6 | 2026-11-17 |
-| [TOOL-dDeclaredLoop-88 — the round-7 spec audit's 36 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-88.md) | 44 | 2 | DEFERRED | rev-5 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-88 — the round-7 spec audit's 36 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-88.md) | 44 | 2 | DEFERRED | rev-6 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-89 — the conf-constant class covers a module name a global loader rebinds, and module-level walrus, for and with targets](spec/2026-10-24-spec-TOOL-dDeclaredLoop-89.md) | 44 | 2 | DEFERRED | rev-5 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-90 — the round-8 spec audit's 22 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-90.md) | 45 | 2 | DEFERRED | rev-5 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-91 — derive_conf_rebinds reads every position a module evaluates: class bodies, defaults, decorators and bases](spec/2026-10-24-spec-TOOL-dDeclaredLoop-91.md) | 45 | 2 | DEFERRED | rev-2 | 2026-10-24 |
@@ -213,7 +213,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 798 bound to this build, across 4 record folder(s).
+Records: 799 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
