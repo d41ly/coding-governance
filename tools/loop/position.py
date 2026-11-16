@@ -65,7 +65,10 @@ tag and the key is `derive_instance_key`'s shape for it; `loop: refused`, exit 1
 The answer is one of `ANSWERS`, the first that holds: `invalid-input` (no build, a README that does not
 parse, a read refusal, a recorded move no build row holds, or a hand-over naming no unit, no MISSING id
 and no undecided ask), `stale-remote` (the remote tip's claim not `fresh`: a remote the ladder refuses,
-or a tracking tip whose newest reflog entry is older than the bound), `terminal` (the state is a `[states]` terminal, or every unit is deployed
+or a tracking tip last fetched longer ago than the bound, the fetch read as the newest of the mtime of
+each `FETCH_HEAD` under the common git directory and its `worktrees/*/`, and the tracking ref's newest
+reflog entry, or, where none of those is read, the default branch's newest `clone: ` reflog entry; the
+ref's `read —` line ends `fetched <n>s ago · from FETCH_HEAD|reflog|clone`, or `fetched never`), `terminal` (the state is a `[states]` terminal, or every unit is deployed
 and no ask stands), `awaiting` on an owed parked entry or an unpassed hold, `blocked` on a `parents:`
 build neither recorded nor derived `LANDED`, `act` with a next item, `awaiting` on an undecided ask, and
 `stuck` naming the step's unwitnessed exit. Line output is §4's six line kinds; `--json` the same fields
@@ -88,8 +91,9 @@ through `loop_lib.run_selftest_cases`.
 WHAT THIS DOES NOT CHECK: a witness reader for any item outside the three kinds above, which lands with
 the build that arms the item; a settling row for a parked entry, which the driver's grammar does not
 have yet, so every owed entry stands; the mailbox, printed `unarmed`; that a `gates-run` fact names a
-green bar rather than the last bar run; that the remote-tracking ref was fetched recently rather than
-moved recently, since a fetch that finds nothing new writes no reflog entry.
+green bar rather than the last bar run; a fetch run with `--no-write-fetch-head`, which leaves no
+`FETCH_HEAD` and so reads by the reflog where the ref moved, and as stale where it did not; a
+`FETCH_HEAD`'s content, whose mtime alone is read.
 """
 import argparse
 import copy
@@ -144,8 +148,11 @@ PLANTS = {"steps": "unit 1 deployed, unit 2 built, unit 3 designed: act at unit 
           "owner-decision": "an owed decision park, unsettled: awaiting",
           "parent-unlanded": "parents: names a build with no landed move and no derived LANDED: blocked",
           "terminal": "the newest recorded move enters landed: terminal",
-          "stale-remote": "a remote whose tracking tip's newest reflog entry predates the bound: stale-remote",
+          "stale-remote": "a remote whose tracking tip's newest reflog entry predates the bound: stale-remote, read from reflog",
           "no-remote": "no remote at all: act on local witnesses, interrupt remote · none, no remote tip claim",
+          "fresh-clone": "a clone with no tracking reflog and no FETCH_HEAD: not stale-remote, read from clone",
+          "quiet-remote": "stale-remote's aged reflog, then a fetch from a linked worktree: not stale-remote, read from FETCH_HEAD",
+          "offline-stale": "fresh-clone, then a fetch whose FETCH_HEAD is dated past the bound: stale-remote, read from FETCH_HEAD",
           "bad-transition": "a recorded move no build row holds: invalid-input, exit 2",
           "deadlock": "the step's root item needs an item of a later step: stuck",
           "bar-wait": "every unit built, no gates-run fact, no ask: act, and the terminal next: shape",
@@ -164,6 +171,8 @@ FX_SLUG = "tPos"
 FX_IDS = ["TOOL-tPos-1", "TOOL-tPos-2", "TOOL-tPos-3"]
 FX_ASK = "TOOL-tAsk-1"
 FX_OWED = ("decision abort override waiver handoff", "retire supersede defer")
+#: The hand-over's bound, in seconds.
+FX_BOUND = 5400
 #: The frontier plants' A, B and C, of the build's step, and D, the next step's root, as shipped.
 FX_A, FX_B, FX_C, FX_D = "item.build.base", "item.build.unit-lease", "item.build.unit-pass", "item.test.merge"
 #: The build step's unit-forward item, the one the least-advanced designed unit has not passed.
@@ -211,27 +220,61 @@ def read_handover(repo, slug):
     return out
 
 
+def read_fetch_time(repo, ref, branch):
+    """`(at, source)` of the last fetch of `ref` (TOOL-dDeclaredLoop-65 S1, S2): the newest of the mtime
+    of each `FETCH_HEAD` under the common git directory and its `worktrees/*/`, source `FETCH_HEAD`, and
+    the time of `ref`'s newest reflog entry, source `reflog`, the first listed on a tie; where none is
+    read, the newest `clone: ` entry of `refs/heads/<branch>`'s reflog, source `clone`; else
+    `(None, None)`. A file whose mtime does not read is skipped."""
+    rc, out = read_git(repo, "rev-parse", "--git-common-dir")
+    times = []
+    if rc == 0 and out:
+        common = pathlib.Path(repo) / out
+        for f in [common / "FETCH_HEAD"] + sorted(common.glob("worktrees/*/FETCH_HEAD")):
+            try:
+                times.append((f.stat().st_mtime, "FETCH_HEAD"))
+            except OSError:
+                continue
+    rc, out = read_git(repo, "reflog", "show", "--date=unix", "-n1", "--format=%gd", ref)
+    m = re.search(r"@\{(\d+)\}", out) if rc == 0 else None
+    if m:
+        times.append((int(m.group(1)), "reflog"))
+    if not times:
+        rc, out = read_git(repo, "reflog", "show", "--date=unix", "--format=%gd%x09%gs", "refs/heads/%s" % branch)
+        for ln in out.splitlines() if rc == 0 else []:
+            m = re.search(r"@\{(\d+)\}\t(.*)", ln)
+            if m and m.group(2).startswith("clone: "):
+                times.append((int(m.group(1)), "clone"))
+                break
+    if not times:
+        return None, None
+    at, source = max(times, key=lambda t: t[0])  # max keeps the first of equal times
+    return datetime.datetime.fromtimestamp(at, datetime.timezone.utc), source
+
+
 def read_remote_claim(repo, bound, now):
-    """`(sha or None, ref, claim)` of the default branch's remote-tracking tip: the claim keyed over
-    `<ref>@<sha>`, `at` its newest reflog entry, judged `remote` against `bound`. The claim is None where
-    the remote reads absent (TOOL-dDeclaredLoop-56 S36): the ladder names no remote and refuses nothing,
-    or the tracking ref of its default branch does not resolve. A ladder refusal keeps the claim."""
+    """`(sha or None, entry, claim)` of the default branch's remote-tracking tip: the claim keyed over
+    `<ref>@<sha>`, `at` its last fetch by `read_fetch_time`, judged `remote` against `bound`; `entry` the
+    ref's `read` row, `<ref>@<sha8> · fetched <n>s ago · from <source>` or `<ref>@<sha8> · fetched never`
+    (TOOL-dDeclaredLoop-65 S3), the bare ref where the claim is None. The claim is None where the remote
+    reads absent (TOOL-dDeclaredLoop-56 S36): the ladder names no remote and refuses nothing, or the
+    tracking ref of its default branch does not resolve. A ladder refusal keeps the claim."""
     remote, branch, _observed, refusal = resolve_remote(repo)
     ref = "refs/remotes/%s/%s" % (remote, branch) if remote and branch else "refs/remotes/?"
-    sha, at = None, None
+    sha, at, entry = None, None, ref
     if remote and branch:
         rc, out = read_git(repo, "rev-parse", "-q", "--verify", "%s^{commit}" % ref)
         sha = out if rc == 0 and out else None
     if not refusal and not sha:
         return None, ref, None
     if sha:
-        rc, out = read_git(repo, "reflog", "show", "--date=unix", "-n1", "--format=%gd", ref)
-        m = re.search(r"@\{(\d+)\}", out) if rc == 0 else None
-        at = datetime.datetime.fromtimestamp(int(m.group(1)), datetime.timezone.utc) if m else None
+        at, fetched = read_fetch_time(repo, ref, branch)
+        entry = "%s@%s · %s" % (ref, sha[:8], "fetched %ds ago · from %s" % (
+            max(0, int((now - at).total_seconds())), fetched) if at else "fetched never")
     source = "%s@%s" % (ref, sha or "?")
     key = derive_claim_key([source])
     verdict = derive_claim_verdict(key, key, "remote", at, now, bound)
-    return sha, ref, {"name": "remote tip %s" % ref, "key": key, "verdict": verdict}
+    return sha, entry, {"name": "remote tip %s" % ref, "key": key, "verdict": verdict}
 
 
 def check_is_ancestor(repo, sha, tip):
@@ -486,9 +529,9 @@ def derive_position_into(pos, repo, slug, definition):
     if len(gates) == 2:
         rc, out = read_git(repo, "rev-parse", "-q", "--verify", "%s^{commit}" % gates[1])
         gates_tip = out if rc == 0 else None
-    remote_sha, ref, remote_claim = read_remote_claim(repo, handover["bound"], now)
+    remote_sha, remote_read, remote_claim = read_remote_claim(repo, handover["bound"], now)
     if remote_sha:
-        pos["read"].append("%s@%s" % (ref, remote_sha[:8]))
+        pos["read"].append(remote_read)
     if remote_claim:
         pos["claims"].append(remote_claim)
     order = ["none"] + list(tables["states"].get("unit", []))
@@ -618,14 +661,15 @@ def render_spec(uid, status):
 
 def render_handover(units, ask=None, parents=None):
     """The hand-over text a fixture plants where the driver does not run."""
-    lines = ["bound\t5400", "owed\t%s\t%s" % FX_OWED] + ["unit\t%s\t%s" % u for u in units]
+    lines = ["bound\t%d" % FX_BOUND, "owed\t%s\t%s" % FX_OWED] + ["unit\t%s\t%s" % u for u in units]
     lines += ["ask\t%s" % ask] if ask else []
     lines += ["parent\t%s\t%s" % p for p in (parents or {}).items()]
     return "\n".join(lines) + "\n"
 
 
 def write_position_plant(top, case, root):
-    """The scratch repository `top/r` for `case`, with its bare remote `top/o.git` where it has one;
+    """The scratch repository `top/r` for `case`, with its bare remote `top/o.git` where it has one,
+    and the clone `top/c` of that remote as the repository for `fresh-clone` and `offline-stale`;
     `(repo, definition, handover)`."""
     repo = top / "r"
     repo.mkdir()
@@ -714,7 +758,7 @@ def write_position_plant(top, case, root):
         run_fixture_git(repo, "push", "-q", "origin", "main")
     if remote:
         run_fixture_git(repo, "remote", "set-head", "origin", "main")
-    if case == "stale-remote":  # the tracking tip kept, its one reflog entry dated 2000-01-01, past any bound
+    if case in ("stale-remote", "quiet-remote"):  # the tracking tip kept, its one reflog entry dated 2000-01-01, past any bound
         tip = run_fixture_git(repo, "rev-parse", "refs/remotes/origin/main")
         run_fixture_git(repo, "update-ref", "-d", "refs/remotes/origin/main")
         rc, out = read_git(repo, "update-ref", "--create-reflog", "-m", "aged", "refs/remotes/origin/main", tip,
@@ -722,6 +766,17 @@ def write_position_plant(top, case, root):
                                               GIT_COMMITTER_DATE="946684800 +0000"))
         if rc:
             raise subprocess.CalledProcessError(rc, "git update-ref", out)
+    if case == "quiet-remote":  # a fetch from a linked worktree, which moves nothing and writes its own FETCH_HEAD
+        run_fixture_git(repo, "worktree", "add", "-q", "--detach", str(top / "w"))
+        run_fixture_git(top / "w", "fetch", "-q", "origin")
+    if case in ("fresh-clone", "offline-stale"):  # the engine reads the clone, whose remote's HEAD names main
+        run_fixture_git(remote, "symbolic-ref", "HEAD", "refs/heads/main")
+        run_fixture_git(top, "clone", "-q", "--template=", str(remote), str(top / "c"))
+        repo = top / "c"
+    if case == "offline-stale":  # a fetch that moves nothing, its FETCH_HEAD dated back by twice the bound
+        run_fixture_git(repo, "fetch", "-q", "origin")
+        aged = datetime.datetime.now().timestamp() - 2 * FX_BOUND
+        os.utime(repo / ".git" / "FETCH_HEAD", (aged, aged))
     definition = None
     data = copy.deepcopy(read_definition(KIT)[0])
     if case in ("idempotent", "frontier-chain", "frontier-none"):
@@ -851,6 +906,7 @@ def check_plant(case, pos, rc, repo):
     kinds = {i["kind"]: i["subject"] for i in pos["interrupts"]}
     tags = [f["item"] for f in pos["frontier"]]
     lines = render_position_lines(pos)
+    ref_line = next((ln for ln in lines if ln.startswith("read — refs/remotes/origin/main@")), "")
     want = {"built-unarmed": lambda: "unit — %s · built · acceptance unarmed" % FX_IDS[0] in lines
             and "unit — %s · designed" % FX_IDS[1] in lines,
             "built-unheld": lambda: "unit — %s · designed" % FX_IDS[0] in lines,
@@ -870,8 +926,10 @@ def check_plant(case, pos, rc, repo):
             "owner-decision": lambda: pos["answer"] == "awaiting" and "which-way" in kinds.get("owner-decision", ""),
             "parent-unlanded": lambda: pos["answer"] == "blocked" and "tPar" in pos["reason"],
             "terminal": lambda: pos["answer"] == "terminal",
-            "stale-remote": lambda: pos["answer"] == "stale-remote" and any(r.startswith("refs/remotes/origin/main@")
-                                                                           for r in pos["read"]),
+            "stale-remote": lambda: pos["answer"] == "stale-remote" and ref_line.endswith(" · from reflog"),
+            "fresh-clone": lambda: pos["answer"] != "stale-remote" and ref_line.endswith(" · from clone"),
+            "quiet-remote": lambda: pos["answer"] != "stale-remote" and ref_line.endswith(" · from FETCH_HEAD"),
+            "offline-stale": lambda: pos["answer"] == "stale-remote" and ref_line.endswith(" · from FETCH_HEAD"),
             "no-remote": lambda: pos["answer"] == "act" and "interrupt — remote · none" in lines
             and not any("remote tip" in ln for ln in lines),
             "bad-transition": lambda: pos["answer"] == "invalid-input" and rc == 2,

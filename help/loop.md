@@ -870,10 +870,13 @@ forward items, and an item a recorded move names. Every other item prints as an 
 counts as not yet done.
 
 The answer is one of `act`, `awaiting`, `blocked`, `terminal`, `stuck`, `invalid-input` and
-`stale-remote`. A remote-tracking tip whose newest reflog entry is older than the unattended kit's
+`stale-remote`. A remote-tracking tip last fetched longer ago than the unattended kit's
 `RESUME_STALE_BOUND`, or a remote the ladder cannot choose, answers `stale-remote` before anything
-else. Git writes a reflog entry only when the tip moves, so a fetch that finds nothing new leaves it
-stale. With no remote at all, or no tracking ref of the default branch, the remote reads absent: the
+else. The last fetch is the newest of three readings: the time of each `FETCH_HEAD` git wrote, in
+the repository's own git directory or under any of its worktrees, so a fetch that finds nothing new
+still counts; the tracking ref's newest reflog entry; and, only where neither is there, as on a fresh
+clone, the clone itself. The tracking ref's `read —` line says which, ending `fetched <n>s ago · from
+FETCH_HEAD`, `from reflog` or `from clone`, or `fetched never`. With no remote at all, or no tracking ref of the default branch, the remote reads absent: the
 engine answers on your local witnesses, so no unit reads `deployed`, and prints
 `interrupt — remote · none` with no remote-tip claim. A tracking ref you deleted reads the same. An owed parked decision or an unpassed hold answers
 `awaiting`; a `parents:` build that has not landed answers `blocked`; an undecided ask answers
@@ -907,7 +910,9 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
 - **See it on a fixture:** `--fixture --plant <case>` builds a scratch repository with a bare remote,
   but none for `no-remote`, plants one case, prints the engine's lines and one line ending `held` or
   `MISSED`, and removes it: `steps`, `typed-status`, `idempotent`, `owner-decision`, `parent-unlanded`,
-  `terminal`, `stale-remote` (its tracking tip's reflog entry aged past the bound), `no-remote`, `bad-transition`, `deadlock`, `bar-wait`, `frontier-chain`, `frontier-parallel`,
+  `terminal`, `stale-remote` (its tracking tip's reflog entry aged past the bound), `no-remote`,
+  `fresh-clone` (a clone read from clone), `quiet-remote` (a fetch from a linked worktree after the
+  aged reflog, read from `FETCH_HEAD`), `offline-stale` (a clone's `FETCH_HEAD` dated past the bound), `bad-transition`, `deadlock`, `bar-wait`, `frontier-chain`, `frontier-parallel`,
   `frontier-refused`, `frontier-bad-key`, `frontier-none`, `plan-frontier`, `built-unarmed`,
   `built-unheld`, `built-armed`, `plan-line` and `status-line`; `frontier-refused`,
   `frontier-bad-key`, `plan-frontier`, `built-unarmed` and the last two run the unattended driver. `--selftest` runs every case, and gov's own `loop position fixtures` gate runs it.
