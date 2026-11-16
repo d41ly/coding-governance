@@ -3,10 +3,10 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-11-16T08:11:26+02:00 @ 1db46de2664a31c1101dd6f19b20449bd3c3d53a
+last-audit: 2026-11-16T08:22:43+02:00 @ 975e27fa07f2010e170d3cba6c6a2a9d643ab9aa
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 3236833e8081d72179ce6c1d8ac99f05aecc120a
+last-body-change: 975e27fa07f2010e170d3cba6c6a2a9d643ab9aa
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -80,6 +80,7 @@ lives where each bullet points.
 - `--dispatch` refuses one write set naming a generated index with its generator (check 49): a unit that edits a generator builds in two passes, the generator edit first and the re-rendered index second (`TOOL-dDeclaredLoop-12`).
 - The loop kit's definition `tools/loop/loop.toml` is checked one concern per module, each its own leg: `loop_lib.py --check`, and `check` on `loop_table.py`, `loop_checklist.py` and `loop_items.py` (`help/loop.md`).
 - A repository's own loop rows each have their own module and fixture leg: its stages `splice.py check`, an item's upstream rows `upstream.py`, the composition pinned per move `composition.py`, and the build's position from witnesses `position.py` (`help/loop.md`).
+- The review round bounds are policy keys read through `tools/loop/review_bounds.py`; the driver falls back to four defaults with a NOTE where the module or the policy kit does not resolve (`help/loop.md`).
 
 ### Pointer map (load the row(s) the task touches)
 

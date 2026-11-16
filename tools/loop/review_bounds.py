@@ -188,14 +188,15 @@ def build_plant_repo(scratch, case):
     text = PLANTS[case][0]
     module = pathlib.Path(__file__).absolute()
     if case in ("no-driver", "no-policy-kit"):
-        (scratch / "kits" / "loop").mkdir(parents=True)
-        shutil.copy2(module, scratch / "kits" / "loop" / module.name)
-        module = scratch / "kits" / "loop" / module.name
+        loop_dir = scratch / "kits" / module.parent.name
+        loop_dir.mkdir(parents=True)
+        shutil.copy2(module, loop_dir / module.name)
+        module = loop_dir / module.name
         if case == "no-driver":
-            (scratch / "kits" / "policy").mkdir()
             policy_dir = read_policy_module().KIT
+            (scratch / "kits" / policy_dir.name).mkdir()
             for name in POLICY_FILES:
-                shutil.copy2(policy_dir / name, scratch / "kits" / "policy" / name)
+                shutil.copy2(policy_dir / name, scratch / "kits" / policy_dir.name / name)
     if text is not None:
         (scratch / ".governance").mkdir()
         (scratch / ".governance" / "policy.toml").write_bytes(text.encode("utf-8"))
