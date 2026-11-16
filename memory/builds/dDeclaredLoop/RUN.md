@@ -362,3 +362,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-16T20:58:43Z brief · item TOOL-dDeclaredLoop-70 · reason b29b5cd59ed6 memory/builds/dDeclaredLoop/prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-70-build-brief.md
 
 2026-11-16T21:10:07Z dispatch · item ce77ae9f TOOL-dDeclaredLoop-70 · reason tools/loop/loop_lib.py tools/loop/loop_table.py tools/loop/loop_parents.py tools/loop/README.md help/loop.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/map/features/loop.md memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-70.md memory/builds/dDeclaredLoop/build/2026-11-16-build-TOOL-dDeclaredLoop-70-1-acceptance-ledger.md memory/builds/dDeclaredLoop/build/2026-11-16-build-TOOL-dDeclaredLoop-70-deviation-702.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/backlog/TOOL.md memory/ledger/2026-11.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-16T21:20:55Z brief · item TOOL-dDeclaredLoop-72 · reason 4222701bbb8b memory/builds/dDeclaredLoop/prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-72-build-brief.md

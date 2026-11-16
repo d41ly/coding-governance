@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-72 — the loop kit reads the records root the driver reads, and refuses two confs that disagree
 
-**Status:** DEFERRED · rev-6 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-6 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-72-deviation-722.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-72-deviation-722.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-68-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-68-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-72-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-72-1-spec-writer.md) | journal | — |
+| [2026-11-16-prompt-TOOL-dDeclaredLoop-72-build-brief.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-72-build-brief.md) | journal | — |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-72-reground-brief.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-72-reground-brief.md) | research | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 |
 
