@@ -116,3 +116,24 @@ time, 2026-11-15:
 - AC6: two `check-memory-hygiene.sh --only 26` runs on a cold clone of `ff9bb395c` printed check 26's
   line ending `cache hits 0`, then `cache hits 4`; the raw outputs differ and read the same through
   `derive_partition_lines`.
+
+## TOOL-aTrimmedWait-12's reconcile, its suites run by the main loop
+
+Unit 12 adds no arm. The four suites its merge touches each ran once, one at a time, on a frozen
+`git clone --no-local` of `c50583f10`, 2026-11-16:
+
+- `gen_build_index.py --selftest` exited 0 in 268 s. <!-- PINNED 2026-11-16 -->
+- The hygiene suite exited 0 in 2411 s: main's side carried the conf-example rows' repair, so none <!-- PINNED 2026-11-16 -->
+  of the seven rows listed under "Inherited" redded on the merged tree.
+- The build-workflow suite exited 0 in 1035 s. <!-- PINNED 2026-11-16 -->
+- The driver suite exited 1 in 22604 s on 24 FAIL lines. One was this build's: the verb <!-- PINNED 2026-11-16 -->
+  `--check-specs` that unit 1 added had no row in the parity table, which unit 13 repairs. The
+  other 23 are inherited, and none names a verb, check or arm this build moved.
+
+## TOOL-aTrimmedWait-13's arm, observed by the main loop
+
+- RED: the driver suite at `c50583f10` printed `FAIL parity: the verb --check-specs has no row in
+  the parity table`, the run above.
+- GREEN: the driver suite on a frozen clone of `ebf9919de` exited 1 in 26637 s on 23 FAIL lines; <!-- PINNED 2026-11-16 -->
+  the parity FAIL was gone and no new FAIL line appeared. The aFrugalTurnstile-9 AC2 and AC3 lines
+  print again with a fresh base and run id, the same two assertions.
