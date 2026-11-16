@@ -36,3 +36,11 @@ Owed to the main loop at the close:
   removed after.
 - AC3 — `cmp` — NOT OBSERVED in this pass: the live-tree A/B is the main loop's at the close, as the
   criterion's permission line assigns, and its wall times and line counts are recorded here then.
+
+## Close observations, by the main loop
+
+The live-tree A/B, run by the main loop: the shipped kit at `f25308f01` overlaid on `tools/memory-tree/` in a detached worktree frozen at the subject commit, against that commit's own kit, both over the same tree, stdout, stderr and exit code each compared with `cmp`. Every run shared node a with other work, so the walls are contended (PINNED, 2026-11-15 and 2026-11-16).
+- `gotchas.py --check` at `59f970047`: shipped 140.0 s, changed 15.7 s, stdout, stderr and exit code identical (PINNED). A first run with the shipped copy outside the repository read the catalogue index as stale, because the index renders the kit's own relative path; the copy was then overlaid at its real path and the outputs matched. This is AC3's observation for `gotchas.py`.
+- `corpus_ids.py --check` at `59f970047`: shipped 66.0 s, changed 52.4 s, identical (PINNED). This is AC3's observation for `corpus_ids.py`.
+- The whole `check-memory-hygiene.sh` run at `e30d94df9`, every unit of the build in: shipped 663.3 s, changed 239.2 s, 173 lines each, stdout, stderr and exit code identical (PINNED).
+- `gotchas.py --selftest` and `corpus_ids.py --selftest` were green at `0c1935569`.

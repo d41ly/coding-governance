@@ -36,3 +36,10 @@ Owed to the main loop at the close:
 - AC4 — `git show --stat HEAD -- memory/guides/SESSION-KICKOFF.md` — the pass commit stages the
   manifest with `last-audit` re-stamped at `deef46d66706f10b0d46f7d4b6d50fa6a98e8839`, the dispatch
   HEAD; `git log -1 --format=%H -G'^last-audit:'` over the manifest is read after the commit.
+
+## Close observations, by the main loop
+
+The live-tree A/B, run by the main loop: the shipped kit at `f25308f01` overlaid on `tools/memory-tree/` in a detached worktree frozen at the subject commit, against that commit's own kit, both over the same tree, stdout, stderr and exit code each compared with `cmp`. Every run shared node a with other work, so the walls are contended (PINNED, 2026-11-15 and 2026-11-16).
+- `--only 25` at `ab3bde2b6`: shipped 484.0 s, changed 117.9 s, 121 lines, stdout, stderr and exit code identical (PINNED). This is AC3's observation.
+- The whole `check-memory-hygiene.sh` run at `e30d94df9`, every unit of the build in: shipped 663.3 s, changed 239.2 s, 173 lines each, stdout, stderr and exit code identical (PINNED).
+- The by-name pass's suite fixtures stayed green in the full suite run at `e30d94df9`, which printed `PASS (742 assertions)` (PINNED). The unit adds no arm, so no red-then-green is owed.

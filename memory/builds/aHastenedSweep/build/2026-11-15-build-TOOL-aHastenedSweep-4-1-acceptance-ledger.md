@@ -55,3 +55,13 @@ Owed to the main loop at the close:
   printed a usage line naming it.
 - AC9 — `cmp` — NOT OBSERVED in this pass: the live-tree A/B is the main loop's at the close, as the
   criterion's permission line assigns.
+
+## Close observations, by the main loop
+
+The live-tree A/B, run by the main loop: the shipped kit at `f25308f01` overlaid on `tools/memory-tree/` in a detached worktree frozen at the subject commit, against that commit's own kit, both over the same tree, stdout, stderr and exit code each compared with `cmp`. Every run shared node a with other work, so the walls are contended (PINNED, 2026-11-15 and 2026-11-16).
+- The whole run at `cf64f39df`: shipped 907.8 s, changed 244.9 s, 173 lines, identical (PINNED). This is AC9's observation.
+- The whole `check-memory-hygiene.sh` run at `e30d94df9`, every unit of the build in: shipped 663.3 s, changed 239.2 s, 173 lines each, stdout, stderr and exit code identical (PINNED).
+The hygiene suite's arms were observed through a slice: the suite's prologue, its `_b1` fixture and the new arm blocks, run from the kit directory, 13 assertions green at `0c1935569` (PINNED). Each staged break was applied to the working copy, the slice or selftest run, and the file restored with `git checkout --`.
+- The split arm went red with the two blocks swapped in the split; green at the tip.
+- `gotchas.py --selftest` went red with the frame's rc fields swapped and with `_WALK_MEMO = {}` removed from `cmd_check_with_ids`; green at the tip.
+- `corpus_ids.py --selftest` went red with `walk` returning its stored object, with `_WALK_MEMO` set to a dict at import, and with the key on `root` alone; green at the tip.

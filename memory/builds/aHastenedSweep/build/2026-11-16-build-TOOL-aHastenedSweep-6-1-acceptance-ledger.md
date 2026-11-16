@@ -57,3 +57,14 @@ Owed to the main loop at the close:
   0. `check-arms.py --check` is NOT OBSERVED in this pass: owed above.
 - AC8 — `cmp` — NOT OBSERVED in this pass: the live-tree A/B is the main loop's at the close, as the
   criterion's permission line assigns.
+
+## Close observations, by the main loop
+
+The live-tree A/B, run by the main loop: the shipped kit at `f25308f01` overlaid on `tools/memory-tree/` in a detached worktree frozen at the subject commit, against that commit's own kit, both over the same tree, stdout, stderr and exit code each compared with `cmp`. Every run shared node a with other work, so the walls are contended (PINNED, 2026-11-15 and 2026-11-16).
+- AC8's observation: The whole `check-memory-hygiene.sh` run at `e30d94df9`, every unit of the build in: shipped 663.3 s, changed 239.2 s, 173 lines each, stdout, stderr and exit code identical (PINNED).
+The hygiene suite's arms were observed through a slice: the suite's prologue, its `_b1` fixture and the new arm blocks, run from the kit directory, 13 assertions green at `0c1935569` (PINNED). Each staged break was applied to the working copy, the slice or selftest run, and the file restored with `git checkout --`.
+- `check-arms.py --check` exited 0, AC7's leg the builder's role could not run.
+- Both one-red arms went red with `_idsrc` and `_gotrc` exchanged at the end of the split; green at the tip.
+- Both wrapper passes went red with the fallback's `_idsrc=1` set to 0 (on the key) and with its `_onepy=1` dropped (on the relaunch); green at the tip.
+- `gotchas.py --selftest` went red with `err.getvalue()` dropped from the frame write and with the traceback written outside the redirect; green at the tip.
+- The floor arm did NOT go red at `0c1935569`: with unit 3's block stranded the suite printed `PASS (737 assertions)` against the floor of 719 (PINNED), because the floor sat below the count before this build. AC5's own command held, its side note that the floor equals the count did not. `TOOL-aHastenedSweep-7` pins the floor to the count, and its ledger records the red.

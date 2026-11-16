@@ -28,3 +28,10 @@ Owed to the main loop at the close:
 - AC3 — `PASS (742 assertions)` (PINNED) — NOT OBSERVED in this pass: the suite run and its staged
   `FAIL executed 737 assertions against a floor of 742` (PINNED) are the main loop's at the close, as the
   criterion's permission line assigns.
+
+## Close observations, by the main loop
+
+The live-tree A/B, run by the main loop: the shipped kit at `f25308f01` overlaid on `tools/memory-tree/` in a detached worktree frozen at the subject commit, against that commit's own kit, both over the same tree, stdout, stderr and exit code each compared with `cmp`. Every run shared node a with other work, so the walls are contended (PINNED, 2026-11-15 and 2026-11-16).
+- The whole `check-memory-hygiene.sh` run at `e30d94df9`, every unit of the build in: shipped 663.3 s, changed 239.2 s, 173 lines each, stdout, stderr and exit code identical (PINNED).
+- AC3: the full suite at `e30d94df9` printed `PASS (742 assertions)`, equal to the floor (PINNED).
+- The floor arm went red with unit 3's block wrapped in `if false; then … fi`: `FAIL executed 737 assertions against a floor of 742` (PINNED); green again at the tip.
