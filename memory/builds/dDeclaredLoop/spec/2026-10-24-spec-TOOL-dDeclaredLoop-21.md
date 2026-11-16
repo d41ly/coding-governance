@@ -24,6 +24,7 @@
 | [2026-11-05-build-TOOL-dDeclaredLoop-21-deviation-213.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-21-deviation-213.md) | deviation | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-21-1-builder-return.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-1-builder-return.md) | journal | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-21-2-builder-return.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-2-builder-return.md) | journal | — |
+| [2026-11-16-build-TOOL-dDeclaredLoop-21-3-builder-return.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-3-builder-return.md) | journal | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-21-deviation-214.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-deviation-214.md) | deviation | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-21-deviation-215.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-deviation-215.md) | deviation | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-21-red-fix-39.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-red-fix-39.md) | red-fix | — |
@@ -38,6 +39,8 @@
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-21-3-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-21-3-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-21-4-spec-brief.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-21-4-spec-brief.md) | research | — |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-21-5-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-21-5-spec-writer.md) | journal | — |
+| [2026-11-16-prompt-TOOL-dDeclaredLoop-21-6-spec-brief.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-21-6-spec-brief.md) | research | — |
+| [2026-11-16-prompt-TOOL-dDeclaredLoop-21-7-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-21-7-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-21-build-brief.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-21-build-brief.md) | journal | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-33 |
 
