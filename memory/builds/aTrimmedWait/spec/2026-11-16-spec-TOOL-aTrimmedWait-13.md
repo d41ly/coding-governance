@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-13 — close repair: the driver suite's parity table gains the `--check-specs` row unit 1 owed
 
-**Status:** INPROGRESS · rev-1 · 2026-11-16 · node a · Tier-1 · base 5d48501da · streams tooling · order 12
+**Status:** CLOSED · rev-1 · 2026-11-16 · node a · Tier-1 · base 5d48501da · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
