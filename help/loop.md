@@ -1301,8 +1301,12 @@ the freeze adds nothing, and a route back into building does not re-size it. A b
 no move freezes at its first draw made while it has a spec, counting its units then. Before that, its
 total is the base.
 
-Each draw is one row, `draw · <cause> · <item> · <spent>/<total>`, in the build's newest transition
-record, committed on its own. Before the build's first record, the rows go in its `RUN.md`, and the
+Each draw is one row, `draw · <cause> · <item> · <spent>/<total> · <draw-id>`, in the build's newest
+transition record, committed on its own. The draw id, a UTC time to the second then six random hex
+digits, such as `20261024T153012Z-4fa1c9`, is minted once per draw and written on every place the row
+goes, so two worktrees making the same draw on the same item still write two different rows. Rows
+carrying one id count as one draw. A row written before draws carried an id counts as its own draw, and
+a row whose last field is neither the figure nor a draw id is refused as outside the grammar. Before the build's first record, the rows go in its `RUN.md`, and the
 first record copies them. Once spent equals the total, the next draw writes nothing and answers
 `exhausted`; what the build does then is `flow.on-exhausted`'s. A spec audit's round is still recorded
 when the budget is spent, and ends at its target or its bound; the closing review's round and a
@@ -1312,8 +1316,10 @@ A `transitions.record` set without `log` keeps the budget too. A build that alre
 record keeps drawing into its newest one, and a move that draws stages the row into its own commit. A
 build with no record keeps a move's rows on that move's trailer where the set holds `trailer`, as
 `budget=frozen@<units>@<total>` and `draw=<cause>@<item>@<spent>+<total>`, and otherwise in its
-`RUN.md`, where a draw made through `budget.py draw` goes as well. A patch build's draw on a build with
-no record goes in the patch build's own `RUN.md`, as the row followed by ` · budget <slug>`, and counts
+`RUN.md`, where a draw made through `budget.py draw` goes as well. The trailer's `draw=` carries no
+draw id: its commit is its identity, and two such draws are two commits. A patch build's draw on a
+build with no record goes in the patch build's own `RUN.md`, as the row, its draw id included,
+followed by ` · budget <slug>`, and counts
 for the patched build `<slug>` alone. These rows are read oldest first by their time, and the build's
 first record copies them.
 
@@ -1323,7 +1329,8 @@ alone, so it reads 2 there. A draw whose build holds such a row prints, after it
 `loop: budget · disagrees · <row> · typed <a>, derived <b>` line per such row. The line refuses nothing,
 and the verdict stays the first line, the one the unattended driver reads. Gov's own `.gitattributes`
 merges transition records with git's built-in `union` driver, so both appended rows survive a merge
-instead of conflicting; two byte-identical rows are kept once.
+instead of conflicting. Union keeps two byte-identical rows once, and the draw id is what keeps two
+parallel draws apart: their rows differ by the id, so the merge keeps both.
 
 Contention draws nothing: a verdict staled by another build's landing, a merge conflicted by another
 build's landing, a wait on a lease another build holds and an unreachable remote are re-run in their

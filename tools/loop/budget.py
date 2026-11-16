@@ -16,18 +16,21 @@ THE ROWS. A build's budget is the rows of its transition log records (`loop_tran
 record's lines after its fields, read in record order:
 
     budget · frozen · <units> unit(s) · <total>
-    draw · <cause> · <item> · <spent>/<total>
+    draw · <cause> · <item> · <spent>/<total> · <draw-id>
 
 `total` is the freeze row's figure, else the base; `spent` is the count of draw rows, re-derived from
-the rows alone. A draw row's typed `spent` is what its writer counted, and two worktrees drawing at once
+the rows alone. The draw id, `<UTC yyyymmddThhmmssZ>-<6 hex>`, is minted once per draw and written on
+every home of that draw, so two worktrees making the same draw append two distinct rows that a union
+merge keeps both of; rows carrying one id count as one draw, and a row written before the id, which
+carries none, counts as its own (TOOL-dDeclaredLoop-61). A draw row's typed `spent` is what its writer counted, and two worktrees drawing at once
 each count their own, so a row whose typed figure is not its ordinal is named in the reader's
 `disagree` list and refuses nothing (TOOL-dDeclaredLoop-49); the typed `total` is not compared, since a
 row drawn before the freeze carries the base. Before the build's first log record the
 same rows sit in three homes (TOOL-dDeclaredLoop-48): its run-state file and each rotated
 `RUN.LANDED.<blob8>.md` beside it, each prefixed by its UTC timestamp; the `budget` and `draw` fields of
 its `Gov-Transition` trailers, `budget=frozen@<units>@<total>` and `draw=<cause>@<item>@<spent>+<total>`,
-each stamped with its commit's committer date in UTC (`read_trailer_rows`); and each row of a `RUN.md`
-under the memory root's `builds/` folders suffixed ` · budget <slug>`, read without the suffix, a
+the `draw=` field carrying no id since its commit is its identity, each stamped with its commit's committer date in UTC (`read_trailer_rows`); and each row of a `RUN.md`
+under the memory root's `builds/` folders suffixed ` · budget <slug>` after its id, read without the suffix, a
 suffixed row counting for the build it names and never for its file's own. They are read oldest first
 by UTC second, a tie broken by the typed `spent` with a freeze row first, and the transition writer
 copies them into the first record it writes.
@@ -64,8 +67,9 @@ the unattended driver reads after a round's draw (TOOL-dDeclaredLoop-32); it dra
 host temp directory, runs the case and prints `held` or `MISSED`; `--selftest` runs every plant.
 
 WHAT THIS DOES NOT CHECK: two racing draws, which are two rows; a row typed by hand with a right
-ordinal; two byte-identical rows, which a union merge of the record keeps once; the `research` cause's
-site, which no writer reaches yet.
+ordinal; two distinct draws minting one id, in one second with the same 24 random bits, which count
+as one; two byte-identical rows written before the id, which a union merge of the record keeps once;
+the `research` cause's site, which no writer reaches yet.
 """
 import argparse
 import contextlib
@@ -74,6 +78,7 @@ import io
 import os
 import pathlib
 import re
+import secrets
 import shutil
 import sys
 import tempfile
@@ -104,7 +109,8 @@ CONTENTION = ("stale-verdict", "conflicted-merge", "lease-wait", "remote-unreach
 FREEZE_ROW = "budget · frozen · %d unit(s) · %d"
 #: The UTC timestamp a run-state row opens with.
 STAMP = "%Y-%m-%dT%H:%M:%SZ"
-ROW = re.compile(r"budget · frozen · (\d+) unit\(s\) · (\d+)|draw · (\S+) · (\S+) · (\d+)/(\d+)")
+#: A draw row's id is the optional seventh group, so a row written before it still reads (TOOL-dDeclaredLoop-61).
+ROW = re.compile(r"budget · frozen · (\d+) unit\(s\) · (\d+)|draw · (\S+) · (\S+) · (\d+)/(\d+)(?: · ([0-9]{8}T[0-9]{6}Z-[0-9a-f]{6}))?")
 RUN_ROW = re.compile(r"(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ) ((?:budget|draw) · .*)")
 #: A run-state row a patch build wrote for its originating build, ` · budget <slug>` after the row.
 SUFFIXED = re.compile(r"(.*) · budget (\S+)")
@@ -127,7 +133,10 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
           "trailer-only": "transitions.record = [\"trailer\"]: designing to building, fix-pass drawn, then back",
           "patch-trailer-only": "transitions.record = [\"trailer\"]: tFix landed by a trailer, tFixPatch drawing on it",
           "log-dropped": "planning to designing under the default set, then [\"trailer\"] and designing back",
-          "parallel-append": "one record drawn on main and on a branch, merged under this tree's attribute, then drawn"}
+          "parallel-append": "one item drawn alike on main and on a branch, the rows differing in their draw id alone, "
+                             "merged under this tree's attribute, then drawn",
+          "draw-id-rows": "one log record given two identical id-less draw rows, one id-bearing row twice, then a "
+                          "malformed id"}
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
 PLANT_TRAILER = '[transitions]\nrecord = ["trailer"]\n'
 PLANT_SPEC = "# TOOL-%s-%d — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n"
@@ -162,7 +171,7 @@ def read_budget_rows(build, root, moves=None):
     `total`, `freeze` the row a draw writes first under the unrecorded-build rule or None, `draws` each
     draw row's `(cause, item)`, `route-backs`, and `disagree`, each draw row whose typed spent is not its
     ordinal as `<row> · typed <a>, derived <b>`, in the order read: the figure is what its writer
-    counted, and the count is re-derived from the rows. `moves`, the build's recorded moves where the
+    counted, and the count is re-derived from the rows, rows carrying one draw id counting once. `moves`, the build's recorded moves where the
     caller read them. ValueError on a row outside its grammar; LookupError where a kit does not
     resolve."""
     root = pathlib.Path(root)
@@ -192,7 +201,7 @@ def read_budget_rows(build, root, moves=None):
         text = pathlib.Path(root, rec["path"]).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
         held += [ln.rstrip() for ln in text.split("\n") if ln.startswith(("budget · ", "draw · "))]
     rows = held if records else carried
-    frozen, draws, disagree = None, [], []
+    frozen, draws, disagree, seen = None, [], [], set()
     for row in rows:
         hit = ROW.fullmatch(row)
         if not hit:
@@ -200,6 +209,9 @@ def read_budget_rows(build, root, moves=None):
         if hit.group(2) is not None:
             frozen = int(hit.group(2)) if frozen is None else frozen
             continue
+        if hit.group(7) is not None and hit.group(7) in seen:   # a copy of a draw already counted
+            continue
+        seen.add(hit.group(7))
         draws.append((hit.group(3), hit.group(4)))
         if int(hit.group(5)) != len(draws):   # what its writer counted; two worktrees each count their own
             disagree.append("%s · typed %s, derived %d" % (row, hit.group(5), len(draws)))
@@ -337,7 +349,9 @@ def record_draw(build, cause, item, root=".", lines=None, moves=None, notes=None
         notes.extend(held["disagree"])
     if held["spent"] >= held["total"]:
         return "exhausted", "%s · %d/%d" % (build, held["spent"], held["total"])
-    row = "draw · %s · %s · %d/%d" % (cause, item, held["spent"] + 1, held["total"])
+    # the draw id, one per draw and the same on every home it is written to (TOOL-dDeclaredLoop-61)
+    row = "draw · %s · %s · %d/%d · %s-%s" % (cause, item, held["spent"] + 1, held["total"], datetime.datetime.now(
+        datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ"), secrets.token_hex(3))
     add = ([held["freeze"]] if held["freeze"] else []) + [row]
     if lines is not None:
         lines.extend(add)
@@ -447,11 +461,19 @@ def run_budget_plant(case):
             run_fixture_git(top, "add", "-A")
             run_fixture_git(top, "commit", "-q", "-m", "unit %d" % n)
 
+        def parse_draw_id(row):
+            """`(row, id)`: a budget row with its draw id cut by `ROW`'s id group, and the id, None where it
+            carries none."""
+            hit = ROW.fullmatch(row)
+            return (row[:hit.end(6)], hit.group(7)) if hit and hit.group(7) else (row, None)
+
         def read_rows(build=FX_BUILD):
-            """The build's rows, printed."""
+            """The build's rows, printed, each answered with its draw id cut; a miss where a draw row carries none."""
             rows = read_budget_rows(build, top)["rows"]
             print("%s: fixture · rows %s · %s" % (SAY, build, " | ".join(rows) or "none"))
-            return rows
+            cut = [parse_draw_id(r) for r in rows]
+            check(all(i for r, i in cut if r.startswith("draw · ")), "a draw row carries no draw id")
+            return [r for r, _i in cut]
 
         def check(cond, why):
             """A miss named where `cond` does not hold."""
@@ -495,8 +517,12 @@ def run_budget_plant(case):
                 for _n in range(2):
                     out, rc = run_driver(repo, "--dispatch", FX_SLUG, "--pass", unit, "--writes", "work/a.txt")
                     print("%s: fixture · dispatch · exit %d · %s" % (SAY, rc, out.strip().replace("\n", " / ")[:300]))
-                rows = [ln.split(" ", 1)[1] for ln in run.read_text(encoding="utf-8").split("\n") if RUN_ROW.fullmatch(ln)]
+                cut = [parse_draw_id(ln.split(" ", 1)[1]) for ln in run.read_text(encoding="utf-8").split("\n")
+                       if RUN_ROW.fullmatch(ln)]
+                rows = [r for r, _i in cut]
                 print("%s: fixture · rows %s · %s" % (SAY, FX_SLUG, " | ".join(rows) or "none"))
+                if not all(i for r, i in cut if r.startswith("draw · ")):
+                    missed.append("a draw row carries no draw id")
                 owed = [FREEZE_ROW % (3, 10), "draw · review-round · %s · 1/10" % unit,
                         "draw · review-round · %s-spec-set-r2 · 2/10" % FX_SLUG, "draw · re-dispatch · %s · 3/10" % unit]
                 if check_one != 0:
@@ -590,8 +616,13 @@ def run_budget_plant(case):
             check(rc == 0 and row in out, "the patch build's draw printed %r" % out.strip())
             if case == "patch-trailer-only":
                 patch_run = read_run_file(top, PATCH_BUILD)
-                check("%s · budget %s\n" % (row, FX_BUILD) in patch_run.read_text(encoding="utf-8"),
-                      "the run-state file of %s does not carry %s · budget %s" % (PATCH_BUILD, row, FX_BUILD))
+                marks = [SUFFIXED.fullmatch(hit.group(2)) for hit in map(
+                    RUN_ROW.fullmatch, patch_run.read_text(encoding="utf-8").split("\n")) if hit]
+                held = [parse_draw_id(m.group(1)) + (m.group(2),) for m in marks if m]
+                check(len(held) == len(marks) and (row, FX_BUILD) in [(r, b) for r, _i, b in held]
+                      and all(i for r, i, _b in held if r.startswith("draw · ")),
+                      "the run-state file of %s does not carry %s, its draw id, then · budget %s" % (
+                          PATCH_BUILD, row, FX_BUILD))
                 states = (budget_state(FX_BUILD, top), budget_state(PATCH_BUILD, top))
                 print("%s: fixture · budget_state · %s %s · %s %s" % (SAY, FX_BUILD, states[0], PATCH_BUILD, states[1]))
                 check(states == ("unfrozen 1/4", "unfrozen 0/4"), "the states read %s and %s" % states)
@@ -646,8 +677,11 @@ def run_budget_plant(case):
             print("%s: fixture · first record %s" % (SAY, first))
             check(sum(r in run_text for r in owed[:2]) == 2 and owed[2] not in run_text,
                   "the run-state file does not carry the first two rows alone")
-            check([ln for ln in text.split("\n") if ln.startswith("draw · ")] == owed,
-                  "the first log record does not carry the three rows in order")
+            held = [parse_draw_id(ln) for ln in text.split("\n") if ln.startswith("draw · ")]
+            copied = [parse_draw_id(hit.group(2))[1] for hit in map(RUN_ROW.fullmatch, run_text.split("\n")) if hit]
+            check([r for r, _i in held] == owed, "the first log record does not carry the three rows in order")
+            check(all(i for _r, i in held) and [i for _r, i in held[:2]] == copied,
+                  "the first log record's rows do not carry draw ids, its two copies the ids of the run-state rows")
         elif case == "trailer-only":
             run_move("designing", "item.design.exit", "recorded")
             run_verb(draw + [FX_UNIT])
@@ -660,7 +694,10 @@ def run_budget_plant(case):
             print("%s: fixture · budget_state · %s" % (SAY, state))
             check(len(trailers) == 2 and trailers[0].get("budget") == "frozen@1@6",
                   "the move into building does not carry budget=frozen@1@6")
-            check("draw · fix-pass · %s · 1/6\n" % FX_UNIT in run_text, "RUN.md does not carry the fix-pass draw 1/6")
+            held = [parse_draw_id(hit.group(2)) for hit in map(RUN_ROW.fullmatch, run_text.split("\n")) if hit]
+            check(any(r == "draw · fix-pass · %s · 1/6" % FX_UNIT for r, _i in held)
+                  and all(i for r, i in held if r.startswith("draw · ")),
+                  "RUN.md does not carry the fix-pass draw 1/6, each of its draw rows with a draw id")
             check(len(trailers) == 2 and trailers[1].get("draw") == "route-back@item.build.unit-pass@2+6",
                   "the backward move does not carry draw=route-back@item.build.unit-pass@2+6")
             check(state == "open 2/6", "budget_state answers %s" % state)
@@ -681,8 +718,10 @@ def run_budget_plant(case):
             shown = run_fixture_git(top, "show", "--name-only", "--format=%(trailers:key=Gov-Transition,valueonly)")
             state = budget_state(FX_BUILD, top)
             print("%s: fixture · move · %s · budget_state · %s" % (SAY, " / ".join(ln for ln in shown.split("\n") if ln), state))
-            check(row + "\n" in pathlib.Path(top, newest).read_text(encoding="utf-8"), "%s does not carry %s" % (
-                newest, row))
+            held = [parse_draw_id(ln) for ln in pathlib.Path(top, newest).read_text(encoding="utf-8").split("\n")
+                    if ln.startswith("draw · ")]
+            check(any(r == row for r, _i in held) and all(i for _r, i in held),
+                  "%s does not carry %s, each of its draw rows with a draw id" % (newest, row))
             check(newest in shown.split("\n") and "draw=" not in shown,
                   "the move's commit does not hold %s alone of the budget, its trailer free of draw=" % newest)
             check(state == "unfrozen 1/4", "budget_state answers %s" % state)
@@ -702,7 +741,7 @@ def run_budget_plant(case):
             run_fixture_git(top, "branch", "side")
             record_draw(FX_BUILD, "fix-pass", "TOOL-%s-1" % FX_BUILD, top)
             run_fixture_git(top, "checkout", "-q", "side")
-            record_draw(FX_BUILD, "fix-pass", "TOOL-%s-2" % FX_BUILD, top)
+            record_draw(FX_BUILD, "fix-pass", "TOOL-%s-1" % FX_BUILD, top)   # the same draw, its id alone differing
             run_fixture_git(top, "checkout", "-q", "main")
             rc = read_git(top, "merge", "--no-edit", "side")[0]
             print("%s: fixture · merge side · exit %d" % (SAY, rc))
@@ -711,17 +750,36 @@ def run_budget_plant(case):
                 try:   # the typed-figure refusal reads as a miss, not a traceback
                     state = budget_state(FX_BUILD, top)
                     rows = read_rows()
+                    ids = {parse_draw_id(r)[1] for r in read_budget_rows(FX_BUILD, top)["rows"]}
                 except ValueError as e:
-                    state, rows = "refused: %s" % e, []
+                    state, rows, ids = "refused: %s" % e, [], set()
                 print("%s: fixture · budget_state · %s" % (SAY, state))
                 check(state == "unfrozen 2/4", "budget_state answers %s" % state)
-                check(rows == ["draw · fix-pass · TOOL-%s-%d · 1/4" % (FX_BUILD, n) for n in (1, 2)],
-                      "the record does not carry both 1/4 rows")
+                check(rows == ["draw · fix-pass · TOOL-%s-1 · 1/4" % FX_BUILD] * 2 and len(ids) == 2 and None not in ids,
+                      "the record does not carry both 1/4 rows of one item, their draw ids differing")
                 rc, out = run_verb(draw + ["TOOL-%s-3" % FX_BUILD])
                 lines = out.strip().split("\n")
-                check(rc == 0 and lines[0].startswith("%s: budget · drawn · " % SAY) and lines[0].endswith(" 3/4")
-                      and len(lines) == 2 and lines[1].endswith("typed 1, derived 2"),
+                third = parse_draw_id(lines[0].split(" · drawn · ", 1)[-1])
+                check(rc == 0 and lines[0].startswith("%s: budget · drawn · " % SAY) and third[0].endswith(" 3/4")
+                      and third[1] and len(lines) == 2 and lines[1].endswith("typed 1, derived 2"),
                       "the third draw answered %r, exit %d" % (out.strip(), rc))
+        elif case == "draw-id-rows":
+            run_move("planning", "item.plan.exit", "recorded")
+            path = pathlib.Path(top, read_transition_records(FX_BUILD, top)[-1]["path"])
+            row = "draw · fix-pass · %s · %%d/4" % FX_UNIT
+            bad = "%s · not-an-id" % (row % 4)
+            states = []
+            for add in ([row % 1] * 2, ["%s · 20261116T000000Z-0a1b2c" % (row % 3)] * 2, [bad]):
+                write_budget_rows(path, add, True)
+                try:
+                    states.append(budget_state(FX_BUILD, top))
+                except ValueError as e:
+                    states.append("refused: %s" % e)
+            print("%s: fixture · budget_state · %s" % (SAY, " / ".join(states)))
+            check(states[0] == "unfrozen 2/4", "two identical id-less rows read %s" % states[0])
+            check(states[1] == "unfrozen 3/4", "one id-bearing row twice reads %s" % states[1])
+            check(states[2].startswith("refused: ") and repr(bad) in states[2] and "outside its grammar" in states[2],
+                  "the row ending · not-an-id reads %s" % states[2])
         elif case == "unrecorded":
             run_verb(draw + [FX_UNIT])
             run = read_run_file(top, FX_BUILD)
