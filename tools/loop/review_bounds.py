@@ -16,12 +16,19 @@ convergence routing's. The CLOSING bound, the closing review's: 1 under `review.
 `review.max-rounds` otherwise. `review.max-rounds` is the ceiling of every loop: the driver reads
 `CEILING` one round past it.
 
+THE TWO TARGET WORDS (TOOL-dDeclaredLoop-32), each `blockers`, `highs` or `all`: the count a loop
+converges at when it reads zero. The SPEC target is `review.design.rounds`' word, `highs` under
+`until-no-high`, `all` under `until-clean` and `blockers` under the other three; the CLOSING target is
+`review.follow-up`'s, `highs` under `after-high`, `all` under `while-finding` and `blockers` under
+`never`. `flow.route-backs`, read as the four keys are, is printed beside them as `route-backs=`.
+
 THE REFUSAL, `BoundsRefused`. A value below 1, a value outside its key's catalogued values, and under
 `fixed-count` a `review.design.round-count` above `review.max-rounds`, naming both keys and both
 values; a count EQUAL to the ceiling is admitted. A policy kit refusal is relayed as one. Where the
 policy kit does not resolve, `LookupError`: an install may carry this kit without it.
 
-`show` prints `max-rounds=<n> spec-bound=<n> closing-bound=<n> follow-up=<value>` on one line, exit 0;
+`show` prints `max-rounds=<n> spec-bound=<n> closing-bound=<n> follow-up=<value> spec-target=<word>
+closing-target=<word> route-backs=<n>` on one line, exit 0;
 `review-bounds: refused · <why>` on a refusal and `review-bounds: unarmed · <why>` where the policy
 kit does not resolve, each exit 2. `check_review_bounds(root)` is the same read at HEAD for
 `loop_lib.py --check`, the leg `loop definition`.
@@ -48,6 +55,8 @@ KIT = pathlib.Path(__file__).absolute().parent
 SAY = "review-bounds"
 DESIGN_ROUNDS = ("one", "until-no-blocker", "until-no-high", "until-clean", "fixed-count")
 FOLLOW_UPS = ("after-high", "while-finding", "never")
+SPEC_TARGETS = {"until-no-high": "highs", "until-clean": "all"}        # every other value: blockers
+CLOSING_TARGETS = {"after-high": "highs", "while-finding": "all", "never": "blockers"}
 POLICY_FILES = ("policy.py", "budgets.py", "catalogue.toml")
 
 
@@ -104,14 +113,16 @@ def read_policy_module():
     return policy
 
 
-def derive_review_bounds(max_rounds, design, count, follow):
-    """-> {max-rounds, spec-bound, closing-bound, follow-up} from the four values; BoundsRefused on a
-    value below 1, one outside its catalogued values, or a fixed count above the ceiling."""
-    for key, value in (("review.max-rounds", max_rounds), ("review.design.round-count", count)):
+def derive_review_bounds(max_rounds, design, count, follow, route_backs=3):
+    """-> {max-rounds, spec-bound, closing-bound, follow-up, spec-target, closing-target, route-backs}
+    from the five values; BoundsRefused on a value below 1 (below 0 for `route_backs`), one outside its
+    catalogued values, or a fixed count above the ceiling."""
+    for key, value, low in (("review.max-rounds", max_rounds, 1), ("review.design.round-count", count, 1),
+                            ("flow.route-backs", route_backs, 0)):
         if isinstance(value, bool) or not isinstance(value, int):
             raise BoundsRefused("%s is %r, which is no whole number of rounds" % (key, value))
-        if value < 1:
-            raise BoundsRefused("%s is %d, below 1, so no round could be held" % (key, value))
+        if value < low:
+            raise BoundsRefused("%s is %d, below %d, so no round could be held" % (key, value, low))
     if design not in DESIGN_ROUNDS:
         raise BoundsRefused("review.design.rounds is %r, outside %s" % (design, " ".join(DESIGN_ROUNDS)))
     if follow not in FOLLOW_UPS:
@@ -122,7 +133,9 @@ def derive_review_bounds(max_rounds, design, count, follow):
                             "the ceiling is admitted" % (count, max_rounds))
     spec = {"one": 1, "fixed-count": count}.get(design, max_rounds)
     return {"max-rounds": max_rounds, "spec-bound": spec,
-            "closing-bound": 1 if follow == "never" else max_rounds, "follow-up": follow}
+            "closing-bound": 1 if follow == "never" else max_rounds, "follow-up": follow,
+            "spec-target": SPEC_TARGETS.get(design, "blockers"), "closing-target": CLOSING_TARGETS[follow],
+            "route-backs": route_backs}
 
 
 def read_review_bounds(root=".", rev=None):
@@ -136,15 +149,17 @@ def read_review_bounds(root=".", rev=None):
         design = policy.resolve("review.design.rounds", root, rev).value
         count = policy.resolve("review.design.round-count", root, rev).value
         follow = policy.resolve("review.follow-up", root, rev).value
+        route_backs = policy.resolve("flow.route-backs", root, rev).value
     except policy.Refusal as e:
         raise BoundsRefused(str(e)) from None
-    return derive_review_bounds(max_rounds, design, count, follow)
+    return derive_review_bounds(max_rounds, design, count, follow, route_backs)
 
 
 def render_bounds_line(bounds):
     """The one line `show` prints."""
-    return "max-rounds=%d spec-bound=%d closing-bound=%d follow-up=%s" % (
-        bounds["max-rounds"], bounds["spec-bound"], bounds["closing-bound"], bounds["follow-up"])
+    return "max-rounds=%d spec-bound=%d closing-bound=%d follow-up=%s spec-target=%s closing-target=%s route-backs=%d" % (
+        bounds["max-rounds"], bounds["spec-bound"], bounds["closing-bound"], bounds["follow-up"],
+        bounds["spec-target"], bounds["closing-target"], bounds["route-backs"])
 
 
 def check_review_bounds(root):
@@ -160,7 +175,10 @@ def check_review_bounds(root):
 # `no-policy-kit` run a copy of this module in a tree holding no unattended kit.
 COUNT_ABOVE = '[review]\nmax-rounds = 3\n\n[review.design]\nrounds = "fixed-count"\nround-count = 4\n'
 PLANTS = {
-    "defaults": (None, 0, "max-rounds=3 spec-bound=1 closing-bound=3 follow-up=after-high"),
+    "defaults": (None, 0, "max-rounds=3 spec-bound=1 closing-bound=3 follow-up=after-high spec-target=blockers "
+                          "closing-target=highs route-backs=3"),
+    "targets": ('[review]\nfollow-up = "while-finding"\n\n[review.design]\nrounds = "until-clean"\n\n[flow]\n'
+                'route-backs = 2\n', 0, "spec-target=all closing-target=all route-backs=2"),
     "count-equal": ('[review]\nmax-rounds = 3\n\n[review.design]\nrounds = "fixed-count"\nround-count = 3\n',
                     0, "spec-bound=3"),
     "count-above": (COUNT_ABOVE, 2, "review.design.round-count is 4, above review.max-rounds 3"),

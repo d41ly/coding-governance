@@ -949,7 +949,7 @@ else
   esac
   for rvf in $(GIT ls-files ":(glob)$M/builds/*/RUN*.md" 2>/dev/null); do
     [ -f "$rvf" ] || continue
-    grep -q '^[0-9][0-9-]*T[0-9:]*Z review · item ' "$rvf" 2>/dev/null || continue
+    grep -qE '^[0-9][0-9-]*T[0-9:]*Z (review|fix-pass) · item ' "$rvf" 2>/dev/null || continue
     rv_readme=${rvf%/RUN*.md}/README.md
     # THE THIRD CLAUSE GRADES A DELTA, and the first cut did not — which made it the FOURTH silent
     # skip found in this one check. It tested whether the SUBJECT appeared anywhere in the units
@@ -1046,7 +1046,21 @@ else
         rv_foldpast=1
       fi
     fi
-    rv_bad="$rv_bad$(awk -v maxr="$RV_MAX" -v specb="$RV_SPEC" -v closeb="$RV_CLOSE" -v roundcut="$rv_roundcut" -v f="$rvf" -v readable="$rv_readable" -v newids="${rv_new:-0}" -v graded="$rv_graded" -v foldgraded="$rv_foldgraded" -v foldpast="$rv_foldpast" -v fc="$rv_fc" -v speccut="$rv_speccut" -v slug="$rv_slug" -v disps="|$REVIEW_DISPOSITIONS|" '
+    # AN EXIT PROMOTING TO ASKS OWES ASKS (TOOL-dDeclaredLoop-32 S6): an exit row recording ` · to asks`, the
+    # rework budget being spent, owes its floor in asks the build's BACKLOG.md holds at HEAD and not at the
+    # run's BASE, counted with `asks_filed_in` as the units side counts ids. Read only for a record holding
+    # such a row, so every other record spawns nothing more.
+    rv_newasks=0; rv_asksread=0
+    if grep -qF ' · to asks · disposition promote' "$rvf" 2>/dev/null && [ -n "$rv_base" ] && check_rev "$rv_base"; then
+      declare -A _rv_ab=()
+      while IFS= read -r _rv_l; do [ -z "$_rv_l" ] || _rv_ab[$_rv_l]=1; done \
+        < <(asks_filed_in "$(GIT show "$rv_base:${rvf%/RUN*.md}/BACKLOG.md" 2>/dev/null)")
+      while IFS= read -r _rv_l; do
+        [ -z "$_rv_l" ] || [ -n "${_rv_ab[$_rv_l]:-}" ] || rv_newasks=$((rv_newasks + 1))
+      done < <(asks_filed_in "$(GIT show "HEAD:${rvf%/RUN*.md}/BACKLOG.md" 2>/dev/null)")
+      rv_asksread=1
+    fi
+    rv_bad="$rv_bad$(awk -v newasks="$rv_newasks" -v asksread="$rv_asksread" -v maxr="$RV_MAX" -v specb="$RV_SPEC" -v closeb="$RV_CLOSE" -v roundcut="$rv_roundcut" -v f="$rvf" -v readable="$rv_readable" -v newids="${rv_new:-0}" -v graded="$rv_graded" -v foldgraded="$rv_foldgraded" -v foldpast="$rv_foldpast" -v fc="$rv_fc" -v speccut="$rv_speccut" -v slug="$rv_slug" -v disps="|$REVIEW_DISPOSITIONS|" '
       /^[0-9][0-9-]*T[0-9:]*Z review · item / {
         line = $0; sub(/\r$/, "", line)
         i = index(line, " · item "); if (i == 0) next
@@ -1071,8 +1085,13 @@ else
         fo = -1; pr = -1
         if (match(rs, / · folded [0-9]+/)) { fo = substr(rs, RSTART, RLENGTH); sub(/^.* /, "", fo); fo += 0 }
         if (match(rs, / · promoted [0-9]+/)) { pr = substr(rs, RSTART, RLENGTH); sub(/^.* /, "", pr); pr += 0 }
-        if (it in last && b >= last[it]) flat[it] = flat[it] + 1; else flat[it] = 0
-        last[it] = b
+        # THE STALLED READING COUNTS BLOCKERS PLUS THE ROUND HIGHS, and only on the build slug
+        # (TOOL-dDeclaredLoop-32 S6): a spec subject loop takes no strict-fall rule, so it is legally flat
+        # while it runs, and ends at its target or its bound. An absent `round-highs` reads 0.
+        fb = b
+        if (match(rs, / · round-highs [0-9]+/)) { rh = substr(rs, RSTART, RLENGTH); sub(/^.* /, "", rh); fb += rh }
+        if (it == slug && it in last && fb >= last[it]) flat[it] = flat[it] + 1; else flat[it] = 0
+        last[it] = fb
         if (rs ~ /CONVERGED|NON-CONVERGENT|CEILING|BOUNDED/) term[it] = 1
         nf = split(rs, fld, " · ")
         # A COUNTED SPEC ROW (TOOL-aEvidencedLens-9 S7). In a record first-committed on or after
@@ -1094,6 +1113,7 @@ else
           got  = (nf > 0 && fld[nf] ~ /^disposition /) ? substr(fld[nf], 13) : ""
           if (fo < 0 || pr < 0 || fo + pr < b + hi + mi || want != got) rowbad[it] = 1
         }
+        ta[it] = (index(rs, " · to asks · disposition ") > 0)
         if (rs ~ /NON-CONVERGENT|CEILING|BOUNDED/) {
           needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi; fg[it] = fo; nw[it] = nr
           disp[it] = (nf > 0 && fld[nf] ~ /^disposition /) ? substr(fld[nf], length("disposition ") + 1) : ""
@@ -1116,8 +1136,26 @@ else
           needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi; fg[it] = fo; nw[it] = nr; disp[it] = ""
         }
       }
+      # A FIX PASS (TOOL-dDeclaredLoop-32 S6), keyed apart from the review subjects so the round-bound
+      # clause never grades it: a unit whose `reds` did not fall across consecutive passes with no pass
+      # carrying an exit token is a stalled loop nothing recorded stopping.
+      /^[0-9][0-9-]*T[0-9:]*Z fix-pass · item / {
+        line = $0; sub(/\r$/, "", line)
+        i = index(line, " · item "); if (i == 0) next
+        rest = substr(line, i + length(" · item "))
+        j = index(rest, " · reason "); if (j == 0) next
+        it = substr(rest, 1, j - 1); rs = substr(rest, j + length(" · reason "))
+        r = -1
+        if (match(rs, /^reds [0-9]+/)) r = substr(rs, 6, RLENGTH - 5) + 0
+        if (it in fplast && r >= fplast[it]) fpflat[it] = fpflat[it] + 1; else fpflat[it] = 0
+        fplast[it] = r
+        if (rs ~ /CONVERGED|NON-CONVERGENT|CEILING|BOUNDED/) fpterm[it] = 1
+      }
       END {
-        nneed = 0; nsubj = 0; nomiss = ""; illegal = ""; foldbad = ""; closefold = ""
+        for (it in fplast)
+          if (fpflat[it] >= 1 && !(it in fpterm))
+            printf "\n  %s (unit %s: fix-pass reds counts did not fall across consecutive passes and no pass carries an exit token, so the fix-pass loop is non-convergent and nothing recorded that it stopped)", f, it
+        nneed = 0; nsubj = 0; nask = 0; nasubj = 0; nomiss = ""; illegal = ""; foldbad = ""; closefold = ""
         for (it in n) {
           # THE ROUND BOUND IS PER SUBJECT (TOOL-dDeclaredLoop-21 S6): the closing bound on the build slug,
           # the spec bound on every other, each at or below review.max-rounds. Graded only in a record
@@ -1147,9 +1185,10 @@ else
             else if (disp[it] == "") nomiss = nomiss " " it
             else if (index(disps, "|" disp[it] "|") == 0) illegal = illegal " " it "=" disp[it]
             else if (disp[it] == "promote") {
-              nsubj++
               owe = hc[it] ? bl[it] + hh[it] + (mm[it] > 0 ? 1 : 0) : 1
-              nneed += (owe > 0 ? owe : 1)
+              # ...an exit whose findings went to asks owes asks, never unit ids (TOOL-dDeclaredLoop-32).
+              if (ta[it]) { nasubj++; nask += (owe > 0 ? owe : 1) }
+              else { nsubj++; nneed += (owe > 0 ? owe : 1) }
             }
             else if (hc[it] && foldgraded == 1) closefold = closefold " " it
             else if (bl[it] > 0 && foldgraded == 1) foldbad = foldbad " " it "=" bl[it]
@@ -1175,6 +1214,12 @@ else
             printf "\n  %s (subject(s)%s record disposition fold on a row carrying highs and minors, and a counted exit folds nothing on any subject: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two)", f, closefold
           if (foldbad != "")
             printf "\n  %s (exited subject(s)%s record disposition fold beside a NON-ZERO blocker count in a record first-committed on or after FOLD_CUTOFF, after which the driver refuses this at write time, and the severity rule promotes every blocker, so a fold there is a blocker left standing under a field that says nothing was)", f, foldbad
+          if (nask > 0) {
+            if (asksread != 1)
+              printf "\n  %s (%d subject(s) EXITED recording disposition promote to asks and the build backlog at this run BASE cannot be read, so whether a finding became an ask CANNOT BE OBSERVED - a check that cannot look says so rather than passing)", f, nasubj
+            else if (newasks + 0 < nask)
+              printf "\n  %s (%d subject(s) EXITED recording disposition promote to asks, the rework budget being spent, and the build backlog gained only %d ask id(s) this run BASE lacked, against a floor of %d - one per blocker and high plus one for its minors - so at least one promoted finding has no ask)", f, nasubj, newasks + 0, nask
+          }
           if (nneed > 0) {
             if (readable != 1)
               printf "\n  %s (%d subject(s) EXITED recording disposition promote and the roster at this run BASE cannot be read, so whether a blocker was promoted CANNOT BE OBSERVED - a check that cannot look says so rather than passing)", f, nsubj

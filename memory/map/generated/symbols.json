@@ -5978,6 +5978,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_fix_pass_open",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_fixed_sources",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
@@ -28143,6 +28148,11 @@
       "file": "tools/loop/budget.py"
     },
     {
+      "id": "run_budget_verb",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "run_budgets",
       "kind": "function",
       "file": "tools/playbook/load_sets.py"
@@ -28621,6 +28631,11 @@
       "id": "run_fan",
       "kind": "function",
       "file": "tools/workflows/check-verifier-fanout.test.sh"
+    },
+    {
+      "id": "run_fix_pass",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "run_fixture",

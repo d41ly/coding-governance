@@ -1210,10 +1210,11 @@ reset_tree; mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh
 sed -i 's/^REMOTE_CONNECT_BOUND=.*/REMOTE_CONNECT_BOUND=20/' $KIT_REL/unattended.sh
 hit "$(run)" "the driver declares no readable REMOTE_BOUND, REMOTE_CONNECT_BOUND or REMOTE_LOWSPEED_BYTES, so this leg would observe the remote under bounds it invented rather than the ones the driver uses; core_of reads a double-quoted value only, so an unquoted constant reads as absent"
 
-# a group whose counts do not shrink and which records no exit
+# a group whose counts do not shrink and which records no exit. On the build slug `tRev`: a spec
+# subject takes no strict-fall rule, so it is legally flat while it runs (TOOL-dDeclaredLoop-32 S6).
 reset_tree; mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh; mkconf
 mkdir -p memory/builds/tRev
-printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2\n\n2026-08-20T02:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2\n\n2026-08-20T03:00:00Z review · item S1 · reason verdict BLOCKED · blockers 3\n' > memory/builds/tRev/RUN.md
+printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z review · item tRev · reason verdict BLOCKED · blockers 2\n\n2026-08-20T02:00:00Z review · item tRev · reason verdict BLOCKED · blockers 2\n\n2026-08-20T03:00:00Z review · item tRev · reason verdict BLOCKED · blockers 3\n' > memory/builds/tRev/RUN.md
 git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m rev --no-verify >/dev/null 2>&1
 out=$(run)
 hit "$out" "review loops that ran past the ceiling, stalled without recording it, or exited without accounting for their blockers"
@@ -1221,9 +1222,29 @@ hit "$out" "blocker counts did not shrink across consecutive rounds and no round
 
 # ...and the SAME sequence carrying an exit token is green. Without this the arm above could be
 # passing because the check reds on any review group at all.
-printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2\n\n2026-08-20T02:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT\n' > memory/builds/tRev/RUN.md
+printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z review · item tRev · reason verdict BLOCKED · blockers 2\n\n2026-08-20T02:00:00Z review · item tRev · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT\n' > memory/builds/tRev/RUN.md
 git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m rev2 --no-verify >/dev/null 2>&1
 miss "$(run)" "blocker counts did not shrink across consecutive rounds"
+
+# ---- TOOL-dDeclaredLoop-32 AC7: THE STALLED READING COUNTS BLOCKERS PLUS ROUND-HIGHS, ON THE BUILD SLUG AND
+# ---- ON FIX PASSES ONLY. Against the base check a flat spec subject redded, the round-highs were not
+# ---- read, and a `fix-pass` row was never read at all.
+# a falling blocker count whose blockers plus round-highs is flat, carrying its exit, is no stall
+printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z review · item tRev · reason verdict BLOCKED · blockers 2 · round-highs 1\n\n2026-08-20T02:00:00Z review · item tRev · reason verdict BLOCKED · blockers 1 · round-highs 2 · NON-CONVERGENT\n' > memory/builds/tRev/RUN.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m rev3 --no-verify >/dev/null 2>&1
+miss "$(run)" "blocker counts did not shrink across consecutive rounds"
+# a spec subject flat with no exit token is a loop still running, and green
+printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 1 · round-highs 0\n\n2026-08-20T02:00:00Z review · item S1 · reason verdict BLOCKED · blockers 1 · round-highs 0\n' > memory/builds/tRev/RUN.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m rev4 --no-verify >/dev/null 2>&1
+miss "$(run)" "blocker counts did not shrink across consecutive rounds"
+# ...the same two rows on the build slug red as stalled
+printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z review · item tRev · reason verdict BLOCKED · blockers 1 · round-highs 0\n\n2026-08-20T02:00:00Z review · item tRev · reason verdict BLOCKED · blockers 1 · round-highs 0\n' > memory/builds/tRev/RUN.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m rev5 --no-verify >/dev/null 2>&1
+hit "$(run)" "subject tRev: blocker counts did not shrink across consecutive rounds and no round carries an exit token"
+# ...and two non-terminal fix passes of `reds 1` red as a stalled fix-pass loop
+printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z fix-pass · item TOOL-tRev-1 · reason reds 1\n\n2026-08-20T02:00:00Z fix-pass · item TOOL-tRev-1 · reason reds 1\n' > memory/builds/tRev/RUN.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m rev6 --no-verify >/dev/null 2>&1
+hit "$(run)" "unit TOOL-tRev-1: fix-pass reds counts did not fall across consecutive passes and no pass carries an exit token"
 reset_tree
 
 
@@ -1586,6 +1607,20 @@ hit "$(run)" "EXITED recording disposition promote and the generated units regio
 # ...and its green control: the same promote exit WITH the id present passes.
 reset_tree; dispconf 2000-01-01
 mkdisp "$D_ONE" "$D_TWO" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition promote\n'
+miss "$(run)" "check 2 FAILED"
+
+# ---- TOOL-dDeclaredLoop-32 AC7: AN EXIT PROMOTING TO ASKS OWES ASKS. The rework budget spent, the build
+# ---- slug's exit records ` · to asks`, and its floor is counted in asks the build's BACKLOG.md holds at
+# ---- HEAD and not at BASE, never in unit ids. Against the base check this exit owed a unit id.
+reset_tree; dispconf 2000-01-01
+mkdir -p memory/builds/tDisp; printf '# tDisp backlog\n\n' > memory/builds/tDisp/BACKLOG.md
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict BLOCKED · blockers 1 · NON-CONVERGENT · to asks · disposition promote\n'
+out=$(run)
+hit "$out" "1 subject(s) EXITED recording disposition promote to asks, the rework budget being spent, and the build backlog gained only 0 ask id(s) this run BASE lacked, against a floor of 1"
+miss "$out" "non-WONTDO unit id(s) this run BASE lacked"
+# ...its green control: one ask filed since BASE, and no unit id owed
+printf -- '- TOOL-tDisp-9 · filed 2026-08-20 · the promoted blocker\n' >> memory/builds/tDisp/BACKLOG.md
+git add -A >/dev/null 2>&1; GIT_COMMITTER_DATE="2026-09-01T12:00:00 +0000" git -c commit.gpgsign=false commit -q -m asks --no-verify >/dev/null 2>&1
 miss "$(run)" "check 2 FAILED"
 
 # ---- TOOL-aBatchedMinors-3: A CLOSING-REVIEW ROW CARRYING COUNTS OWES ONE UNIT PER BLOCKER AND HIGH,

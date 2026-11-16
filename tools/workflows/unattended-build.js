@@ -188,6 +188,9 @@ function chunk(a, n) {
 //                                                   //   preflighted before SPEC_FOLD_CUTOFF: today's prompt,
 //                                                   //   today's row and no `dispositions`. Not audit-shaped:
 //                                                   //   with the audit off the stage never reads it
+//   specTarget: "blockers" | "highs" | "all",       // optional: the `spec-target=` word `review_bounds.py show`
+//                                                   //   prints, which this runtime cannot read. ABSENT reads
+//                                                   //   `blockers`, today's prompts but for the round flags
 //   briefDir: "memory/builds/<slug>/prompts",
 //   reviewDir: "memory/builds/<slug>/reviews",
 //   round: <integer>,                               // which audit round this invocation is
@@ -355,6 +358,7 @@ const TYPED = [
   ['auditIds', Array.isArray(a.auditIds), 'an array of unit ids'],
   ['specAudit', typeof a.specAudit === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(a.specAudit), 'a YYYY-MM-DD date string'],
   ['disposal', a.disposal === 'by-nature' || a.disposal === 'promote-all', 'one of by-nature, promote-all'],
+  ['specTarget', ['blockers', 'highs', 'all'].indexOf(a.specTarget) !== -1, 'one of blockers, highs, all'],
 ]
 for (const t of TYPED) {
   if (a[t[0]] !== undefined && !t[1]) {
@@ -392,6 +396,9 @@ const auditIds = a.auditIds === undefined ? [] : a.auditIds
 // no new mechanism. `promote-all` keeps today's rule and refuses a fold, and both declared values write
 // the counted row and return `dispositions`.
 const disposalDeclared = a.disposal !== undefined
+// TOOL-dDeclaredLoop-32 S7 - THE SPEC TARGET, the count a spec subject's loop converges at when it reads zero:
+// `blockers`, `highs` (plus the round's highs) or `all` (every confirmed finding). Absent reads `blockers`.
+const specTarget = a.specTarget === undefined ? 'blockers' : a.specTarget
 const byNature = a.disposal === 'by-nature'
 // THE AUDIT IS OPT-IN, and absent means OFF (TOOL-aBlindedTrial-3, F1 resolved). Every audit-shaped
 // argument beside no declaration is an IMPOSSIBLE PAIRING, refused by name like the others below: a
@@ -1989,21 +1996,28 @@ const auUnverified = !specAudit ? null : cleanRound ? 0 : auRaw.unverified
 // <p>`, a third argument because `folded` and `promoted` are in their temporal dead zone when `verdict`
 // first calls this. A non-empty one carries the `--highs` and `--minors` counts at any blocker count,
 // and at a positive count it spawns as `record-exit`, so a trace tells the two spawns apart.
+//
+// TOOL-dDeclaredLoop-32 S7 - EVERY ROUND CARRIES ITS OWN HIGHS AND MINORS, ` --round-highs <h> --round-minors <m>`
+// after `--review <slug>`, `m` the round's confirmed minors, so the driver counts blockers plus highs and
+// reads the spec target. Every prediction from a zero count reads `auTarget`, the target count of
+// `specTarget`'s word; the `--verdict` word and attended mode's token keep the blocker count.
 async function writeRound(disposition, adjudicated, tally) {
   const minorsCount = au.confirmed - au.blockers - au.highs + (adjudicated || 0)
   const counts = ' --highs ' + au.highs + ' --minors ' + minorsCount
+  const roundMinors = au.confirmed - au.blockers - au.highs
   const rv = attended
     ? { token: au.blockers === 0 ? 'CONVERGED' : 'CONVERGING', exitCode: 0 }
     : await agent(
     GROUND +
       'Record AUDIT round ' + roundNo + ' with the driver and return its convergence token.\n\n' +
-      'Run exactly:\n  ' + DRIVER + ' --review ' + slug + ' --subject ' + subject +
+      'Run exactly:\n  ' + DRIVER + ' --review ' + slug + ' --round-highs ' + au.highs + ' --round-minors ' + roundMinors +
+      ' --subject ' + subject +
       ' --verdict ' + (au.blockers > 0 ? '"BLOCKED"' : '"CLEAN"') +
-      ' --blockers ' + au.blockers + (au.blockers === 0 || tally ? counts : '') + (tally || '') + disposition + '\n\n' +
+      ' --blockers ' + au.blockers + (auTarget === 0 || tally ? counts : '') + (tally || '') + disposition + '\n\n' +
       'Return the CONVERGENCE token it prints — one of CONVERGING, CONVERGED, NON-CONVERGENT, ' +
       'CEILING, BOUNDED — verbatim, and the command\'s exit code. Do not infer the token from the ' +
       'blocker count: it is a property of the SEQUENCE of rounds, which only the driver can see. ' +
-      (au.blockers === 0 || tally
+      (auTarget === 0 || tally
         ? ''
         : disposalDeclared
           ? 'If the command REFUSES naming --disposition, --highs or --minors, this round is a terminal ' +
@@ -2015,7 +2029,7 @@ async function writeRound(disposition, adjudicated, tally) {
       'If the command REFUSES saying the subject already carries a terminal review ' +
       'round, return terminalSubject: true with its stderr and no token — do not retry under another ' +
       'subject. If the command fails for any other reason, return its stderr rather than a token.',
-    { label: renderAgentLabel('audit round ' + roundNo, au.blockers > 0 && tally ? 'record-exit' : 'record'), phase: 'Audit', schema: REVIEW_RECORD_SCHEMA },
+    { label: renderAgentLabel('audit round ' + roundNo, auTarget > 0 && tally ? 'record-exit' : 'record'), phase: 'Audit', schema: REVIEW_RECORD_SCHEMA },
   )
   if (attended) log('attended mode: verdict computed from the blocker count; no round was recorded')
   // THE TERMINAL-SUBJECT REFUSAL IS ITS OWN THROW. It used to surface as "the round was not
@@ -2034,7 +2048,7 @@ async function writeRound(disposition, adjudicated, tally) {
   // THE HELD EXIT. Only a first call at a positive count under a declared value can hold one, because
   // the row is unwritten there; a held exit on a `tally` call would read as recorded. A state word
   // outside the three throws by name: a reworded driver sentence that drops `exits` lands here.
-  if (disposalDeclared && !tally && au.blockers > 0 && rv && rv.terminalExit === true) {
+  if (disposalDeclared && !tally && auTarget > 0 && rv && rv.terminalExit === true) {
     const HELD_EXITS = ['NON-CONVERGENT', 'CEILING', 'BOUNDED']
     if (HELD_EXITS.indexOf(rv.exitState) === -1) {
       throw new Error(
@@ -2073,10 +2087,12 @@ async function writeRound(disposition, adjudicated, tally) {
   // count is a token no driver printed. The second direction is what makes the ordering above hold:
   // a CONVERGED exit is never reached on the record-first path, so a disposition it owed is never
   // left off the row.
-  if ((rv.token === 'CONVERGED') !== (au.blockers === 0)) {
+  if ((rv.token === 'CONVERGED') !== (auTarget === 0)) {
     throw new Error(
-      'unattended-build: the AUDIT stage returned ' + rv.token + ' paired with ' + au.blockers +
-        ' blockers at round ' + roundNo + '. Those two cannot both be true — the driver converges at 0 ' +
+      'unattended-build: the AUDIT stage returned ' + rv.token + ' paired with ' +
+        (specTarget === 'blockers' || attended ? au.blockers + ' blockers'
+          : 'a target count of ' + auTarget + ' under specTarget ' + specTarget) +
+        ' at round ' + roundNo + '. Those two cannot both be true — the driver converges at 0 ' +
         'and only at 0 — and this pairing is this repo\'s signature for a record no verb produced. ' +
         'REFUSING rather than emitting it.',
     )
@@ -2084,21 +2100,25 @@ async function writeRound(disposition, adjudicated, tally) {
   return rv.token
 }
 const au = { blockers: auBlockers, confirmed: auConfirmed, highs: auHighs, unverified: auUnverified, reportPath: lastReport }
+// THE TARGET COUNT (TOOL-dDeclaredLoop-32 S7), the driver's map of the word over this round's counts. Attended
+// mode reaches no driver and keeps the blocker count.
+const auTarget = attended || specTarget === 'blockers' ? au.blockers
+  : specTarget === 'highs' ? au.blockers + au.highs : au.confirmed
 // OUTSTANDING is the callee's word and covers two populations (see the DISPOSAL stage). It decides
 // the ORDER here: zero blockers with something to dispose records AFTER the disposal; every other
 // shape records first, because at a positive count only the driver knows whether the loop ended.
 const outstanding = specAudit ? au.confirmed + au.unverified : 0
-const disposeFirst = au.blockers === 0 && outstanding > 0
+const disposeFirst = auTarget === 0 && outstanding > 0
 // `NOT-OWED` IS THE OFF PATH'S VERDICT, and it is deliberately NOT in `REVIEW_TOKENS`: the driver
 // never prints it, because no round was recorded for it to grade. It is a harness word for "no audit
 // was declared", distinct from every terminal token so nothing downstream can read it as CONVERGED.
 // A DECLARED ROUND WITH NOTHING TO DISPOSE (TOOL-dFoldedAudit-3 S7) records its zero counts here, since
 // no stage will; at a positive count the first call stays bare, because a CONVERGING row carries none.
 const verdict = !specAudit ? 'NOT-OWED' : disposeFirst ? 'CONVERGED'
-  : await writeRound('', 0, disposalDeclared && au.blockers === 0 ? ' --folded 0 --promoted 0' : '')
+  : await writeRound('', 0, disposalDeclared && auTarget === 0 ? ' --folded 0 --promoted 0' : '')
 // WHETHER THE RECORD WAITS FOR THE STAGE. A held exit joins `disposeFirst` here. Attended mode never
 // reaches the second half, because `writeRound` answers CONVERGING at any positive count there.
-const recordAfter = disposeFirst || (disposalDeclared && au.blockers > 0 && verdict !== 'CONVERGING')
+const recordAfter = disposeFirst || (disposalDeclared && auTarget > 0 && verdict !== 'CONVERGING')
 log(!specAudit
   ? 'audit round ' + roundNo + ': NOT-OWED — off by declaration, so no round was recorded and no count exists'
   : 'audit round ' + roundNo + ': ' + verdict + ' · blockers ' + au.blockers + ' · unverified ' + au.unverified +

@@ -3,6 +3,7 @@
 
     python budget.py draw --build <slug> --cause <cause> --item <item>
     python budget.py value
+    python budget.py target --build <slug> --item <item>
     python budget.py --fixture --plant <case>
     python budget.py --selftest
 
@@ -57,7 +58,9 @@ Exit: `draw` prints `loop: budget · drawn · <row>` and exits 0, `loop: budget 
 `loop: unarmed · <why>`, exit 2, where the policy or memory-tree kit does not resolve, never a default.
 After a `drawn` or `exhausted` verdict, one `loop: budget · disagrees · <row> · typed <a>, derived <b>`
 line per disagreeing row of the build drawn on, in the order read, so the verdict stays the first line.
-`value` prints `base <n> per-unit <n>`. `--fixture --plant <case>` builds a scratch repository under the
+`value` prints `base <n> per-unit <n>`. `target` prints `loop: budget · target · <answer>`, exit 0,
+`promotion_target`'s answer for a blocking item as the budget stands, `unit` or `on-exhausted`, which
+the unattended driver reads after a round's draw (TOOL-dDeclaredLoop-32); it draws nothing. `--fixture --plant <case>` builds a scratch repository under the
 host temp directory, runs the case and prints `held` or `MISSED`; `--selftest` runs every plant.
 
 WHAT THIS DOES NOT CHECK: two racing draws, which are two rows; a row typed by hand with a right
@@ -774,13 +777,20 @@ def main(argv):
             for note in notes:   # after the verdict, which the driver keeps as the first line
                 print("%s: budget · disagrees · %s" % (SAY, note))
             return 3 if answer == "exhausted" else 0
+        if argv[:1] == ["target"]:
+            ap = argparse.ArgumentParser(prog="budget.py target", description="where a blocking item's open work goes")
+            for flag in ("--build", "--item"):
+                ap.add_argument(flag, required=True)
+            args = ap.parse_args(argv[1:])
+            print("%s: budget · target · %s" % (SAY, promotion_target(args.build, args.item, True, root)))
+            return 0
     except LookupError as e:
         print("%s: unarmed · %s" % (SAY, e))
         return 2
     except (ValueError, OSError) as e:
         print("%s: budget · refused · %s" % (SAY, e))
         return 2
-    print("usage: python budget.py draw --build <slug> --cause <%s> --item <item> | value | --fixture --plant <%s> "
+    print("usage: python budget.py draw --build <slug> --cause <%s> --item <item> | value | target --build <slug> --item <item> | --fixture --plant <%s> "
           "| --selftest" % ("|".join(CAUSES), "|".join(PLANTS)), file=sys.stderr)
     return 2
 

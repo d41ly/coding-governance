@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-32 — the convergence routing: every closing-review and fix-pass loop ends on a non-decrease of its blocker and high count, its findings promoted by budget
 
-**Status:** INPROGRESS · rev-6 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 29 · advances TOOL-dDeclaredLoop-35
+**Status:** CLOSED · rev-6 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 29 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0117@afb50a20 whole
 
@@ -15,6 +15,7 @@
 | [2026-11-05-build-TOOL-dDeclaredLoop-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-1-parents-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 |
 | [2026-11-05-build-TOOL-dDeclaredLoop-1-reground-returns.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-1-reground-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 |
 | [2026-11-05-build-TOOL-dDeclaredLoop-32-deviation-321.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-32-deviation-321.md) | deviation | — |
+| [2026-11-16-build-TOOL-dDeclaredLoop-32-1-acceptance-ledger.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-32-1-acceptance-ledger.md) | journal | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-32-1-builder-return.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-32-1-builder-return.md) | journal | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-32-deviation-322.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-32-deviation-322.md) | deviation | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-32-deviation-323.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-32-deviation-323.md) | deviation | — |

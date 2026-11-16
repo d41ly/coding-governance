@@ -323,6 +323,29 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   or no disposition and, on `promote`, one per blocker and high its folds cannot account for plus one
   for its minors, at least one, and reds a short sum or a disposition its counts do not derive; every
   other row keeps the floor of one.
+  THE ROUND COUNT (TOOL-dDeclaredLoop-32) is blockers plus THIS round's highs: `--round-highs <n>` and
+  `--round-minors <n>`, optional on every round of every subject and held to the canonical decimal,
+  write ` · round-highs <n>` and ` · round-minors <n>` directly after `blockers <b>`, and a round
+  recorded without them reads as its blockers alone. They are not `--highs` and `--minors`, which keep
+  their meaning and their terminal-only refusal. Each subject converges at its TARGET count reading
+  zero: `review_bounds.py show` prints `spec-target=` and `closing-target=`, each `blockers`, `highs`
+  (plus round-highs) or `all` (plus round-minors too). The build slug also ends `NON-CONVERGENT` once its
+  rounds before this one are past `flow.route-backs`, default 3; a spec subject takes no strict-fall
+  rule and ends at its target or its bound. Every exit row recording `disposition promote` records
+  its target before it: ` · to units`, or on the build slug ` · to asks` once `budget.py target`, read
+  after the round's draw, answers `on-exhausted`. Check 2 reads a ` · to asks` exit as owing its floor in
+  asks the build's `BACKLOG.md` gained since BASE, never unit ids.
+- `--fix-pass` — `--fix-pass <slug> --unit <id> --reds <n>` records ONE fix pass against a unit's
+  acceptance, `<n>` its criteria still red after the pass, as a `fix-pass` row
+  `reds <n>[ · <EXIT>][ · to <target>]`, a history kind like `review`. Its state is the review loop's
+  over the unit's earlier passes, the count and the target both the reds, under `flow.route-backs`
+  and the strict-fall rule, so an acceptance red that never greens records `reds 1` twice and the
+  second pass reads `NON-CONVERGENT`. A terminal pass with reds standing records ` · to units` while
+  the rework budget remains and ` · to on-exhausted` once it is spent, the build then ending as
+  `flow.on-exhausted` says. It draws nothing: the dispatch before a pass draws it. A unit whose last
+  `fix-pass` row is terminal takes no further `--fix-pass` and no `--dispatch`. It refuses a unit that
+  is not id-shaped or a reds count off the canonical decimal, and relays a review bound or budget
+  target that does not read. Check 2 reds a unit whose passes stay flat with no exit token.
 - `--record-round` — `--record-round <slug> --subject <s> --audited "<ids>" --blockers <b> --highs <h>`
   with a repeatable `--finding <id>/<severity>/<nature>/<spec>[,<spec>]/<unit>/<rev>` and a repeatable
   `--sibling <unit>@rev-<n>`: appends ONE spec-audit round to the build's one tracked chain record,
@@ -911,7 +934,8 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
 
 ### Review rounds, and the loop that ends itself
 
-Record EVERY round: `--review <slug> --subject <id-or-slug> --verdict <verdict> --blockers <N>`.
+Record EVERY round: `--review <slug> --subject <id-or-slug> --verdict <verdict> --blockers <N>`,
+with `--round-highs <H> --round-minors <M>` where the round's highs and minors are known.
 `--subject` is the spec for a spec audit and the BUILD SLUG for the closing diff review; the verdict
 is `CLEAN`, `CLEAN WITH FIXES` or `BLOCKED`; `--blockers` is THIS round's confirmed count. Act on the
 state it answers (the rule is M4 and M8; the verb entry above states the recording):
@@ -959,6 +983,20 @@ spec subject recorded by hand they are that exit round's `highs`, and its `confi
 highs` plus every UNVERIFIED finding the disposal promoted, with no summing, because a spec round's
 fold fixes everything that round confirmed. Strictly smaller, never merely different: 2, 1, 2
 changes forever. A subject whose loop ended takes no further round.
+
+**The count is blockers plus the round's highs, and each subject has a target** (TOOL-dDeclaredLoop-32).
+Every state above reads `blockers + round-highs` where it says blockers, and `CONVERGED` is the
+subject's TARGET count at zero: `blockers` under `review.design.rounds` `one`, `fixed-count` and
+`until-no-blocker` and under `review.follow-up` `never`; `highs`, blockers plus round-highs, under
+`until-no-high` and `after-high`; `all`, every confirmed finding, under `until-clean` and
+`while-finding`. A spec subject's loop never ends on a flat count; it ends at its target or its bound.
+The build slug's ends `NON-CONVERGENT` too once its earlier rounds are past `flow.route-backs`. Its
+promoting exit goes ` · to units` while the rework budget remains and ` · to asks` once it is spent, an
+ask per BLOCKER and HIGH and one for the minors, filed in the build's `BACKLOG.md`; a spec subject's
+always goes ` · to units`. The build harness passes the round flags on every round it records and
+reads its `specTarget` arg, the `spec-target=` word `show` prints, default `blockers`, so a spec
+target of `highs` or `all` is never predicted converged at zero blockers. A fix pass ends the same
+way through `--fix-pass`, its count the unit's reds.
 
 **A spec subject past `SPEC_FOLD_CUTOFF` COUNTS its disposal.** Its terminal round also carries
 `--folded <F> --promoted <P>`, and the build harness, given `disposal`, records the exit after the

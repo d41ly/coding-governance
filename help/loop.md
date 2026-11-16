@@ -1259,9 +1259,18 @@ refused, naming both keys, and so is any value below 1. Raising any of the four 
 an agent's run never writes the policy file, and the unattended leg's check 19 fails a run commit that
 moves the spec bound.
 
+Each loop also has a target: the count that ends it as `CONVERGED` when it reads zero. A spec audit's
+target follows `review.design.rounds`: `highs` under `until-no-high`, `all` under `until-clean`, and
+`blockers` under the other three. The closing review's follows `review.follow-up`: `highs` under
+`after-high`, `all` under `while-finding` and `blockers` under `never`. `blockers` counts the round's
+blockers, `highs` adds its highs, and `all` adds its mediums and lows too. A round's count is its
+blockers plus its highs. The closing review also stops `NON-CONVERGENT` when that count does not fall,
+or once its rounds pass `flow.route-backs`, default 3. A spec audit runs to its target or its bound.
+
 - **See the bounds:** `python tools/loop/review_bounds.py show` prints <!-- usage: script:tools/loop/review_bounds.py#show e8e581b9 -->
-  `max-rounds=<n> spec-bound=<n> closing-bound=<n> follow-up=<value>` from the policy file at your
-  default branch's landed revision, or at `--rev <rev>`. It exits 2, printing `review-bounds: refused`
+  `max-rounds=<n> spec-bound=<n> closing-bound=<n> follow-up=<value> spec-target=<word>
+  closing-target=<word> route-backs=<n>` from the policy file at your default branch's landed
+  revision, or at `--rev <rev>`. It exits 2, printing `review-bounds: refused`
   and why, on a refused bound, or `review-bounds: unarmed` where the policy kit is not installed. The
   unattended driver's `--review` reads the same line, and refuses the round on a refusal. Where the
   module or the policy kit is not installed, the driver uses the defaults above and prints a NOTE.
@@ -1269,7 +1278,8 @@ moves the spec bound.
 
 - **See it on a fixture:** `python tools/loop/review_bounds.py --fixture` runs every case, each in a <!-- usage: script:tools/loop/review_bounds.py f9f7e230 -->
   scratch repository with a policy file of its own: `defaults`, `count-equal`, `count-above`,
-  `count-zero`, `max-zero`, `until`, `never`, `while-finding`, `no-driver` and `no-policy-kit`.
+  `count-zero`, `max-zero`, `until`, `never`, `while-finding`, `no-driver`, `no-policy-kit` and
+  `targets`.
   `--plant <case>` runs one. Gov's own `loop review bounds fixtures` gate runs them all.
 
 The bounds do not tell whether a round's recorded counts are true, or whether a raise of a bound was
@@ -1331,6 +1341,20 @@ past it, that item's loop is non-converging, though a spec subject's review roun
 
 - **See the value:** `python tools/loop/budget.py value` prints `base <n> per-unit <n>` from the policy <!-- usage: script:tools/loop/budget.py#value 689b423c -->
   file at HEAD, or refuses a value of another shape naming the key.
+
+- **See where open work goes:** `python tools/loop/budget.py target --build <slug> --item <item>` <!-- usage: script:tools/loop/budget.py#target d06981ab -->
+  runs at your repository's top level and prints `loop: budget · target · unit` while the budget
+  remains, or `loop: budget · target · on-exhausted` once it is spent. It draws nothing. The unattended
+  driver reads it after a round's draw: a closing review's exit that promotes records ` · to units`,
+  or ` · to asks` once the budget is spent, and files its findings as asks in the build's
+  `BACKLOG.md`. A spec audit's exit always records ` · to units`.
+
+- **Record a fix pass:** `bash tools/unattended/unattended.sh --fix-pass <slug> --unit <id> --reds <n>` <!-- usage: verb:unattended.sh:--fix-pass 3696cb6a -->
+  records one fix pass against a unit's acceptance, `<n>` the count of its criteria still red after
+  the pass. Two passes whose reds do not fall end the loop `NON-CONVERGENT`, and so does a pass past
+  `flow.route-backs`. The ending pass records ` · to units` while the budget remains, or
+  ` · to on-exhausted` once it is spent. A unit whose fix-pass loop ended takes no further fix pass and
+  no dispatch.
 
 - **See it on a fixture:** `python tools/loop/budget.py --fixture --plant <case>` runs one case in a <!-- usage: script:tools/loop/budget.py 8248cc63 -->
   scratch repository, and `--selftest` runs them all. Gov's own `loop budget fixtures` gate runs them.

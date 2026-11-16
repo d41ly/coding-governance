@@ -3907,6 +3907,23 @@ has    "FA15 AC25 the declared throw" "$o" 'a disposal passes the ids `--chain-v
 o=$(run_strict_fa3 "$UNITS" '{"terminalSubject":true,"stderr":"x"}')
 has    "FA15 AC25 the undeclared throw" "$o" "a disposal passes the hand-out's \`promotedIds\` as \`auditIds\`"
 
+# ================================================== TOOL-dDeclaredLoop-32 S7 — THE SPEC TARGET AND THE ROUND FLAGS
+# Every recorded round carries its own highs and minors, and `specTarget` `highs` reads a zero-blocker round
+# standing on a high as no exit: it records BARE and returns the driver's CONVERGING. The staged break, observed
+# RED at the close: the base harness, which reads zero blockers as the exit and spawns no record agent here.
+DL32_HIGHS="${UNITS/\"specAudit\"/\"specTarget\":\"highs\",\"specAudit\"}"
+review_out 0 1 1 >/dev/null; rec CONVERGING >/dev/null
+o=$(run_wf "$DL32_HIGHS" "$(printf '{"spec-write":%s,"workflow":%s,"record":%s,"dispose":%s}' "$SPEC_C" "$_review_out" "$_rec" "$DISPOSE_OK")")
+p=$(printf '%s\n' "$o" | grep '^prompt:record:')
+has    "DL32 AC8 a highs target records the zero-blocker round" "$p" "--review tB --round-highs 1 --round-minors 0 --subject tB-spec-set-r1 --verdict \"CLEAN\" --blockers 0  Return"
+hasnt_ "DL32 AC8 ...bare, with no exit counts" "$p" "--blockers 0 --highs"
+has    "DL32 AC8 ...and returns the driver's CONVERGING" "$o" "log:audit round 1: CONVERGING"
+hasnt_ "DL32 AC8 ...with no disposal before the record" "$(printf '%s\n' "$o" | grep '^agent:')" "agent:dispose"
+# ...an unknown word is refused by name before any agent spawns
+o=$(run_wf "${UNITS/\"specAudit\"/\"specTarget\":\"nope\",\"specAudit\"}" '{}')
+has    "DL32 AC8 an unknown specTarget word refuses by name" "$o" 'THROW unattended-build: `specTarget` must be one of blockers, highs, all'
+hasnt_ "DL32 AC8 ...before any agent spawns" "$o" "agent:"
+
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Authored from a
 # static count of the `same`/`has`/`hasnt_` sites in this file — `grep -cE '^\s*(same|has|hasnt_) '`
 # over it, 326 at 1d8530e7 (TOOL-aWokenSentinel-21) — at ~10 % headroom, rounded down, because the

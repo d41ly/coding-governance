@@ -121,6 +121,7 @@ unattended.sh --claims  # RUN_CLAIMS on
 unattended.sh --overlaps  # local
 unattended.sh --beat <slug>
 unattended.sh --review <slug> --subject <id-or-slug> --verdict <verdict> --blockers <N>
+unattended.sh --fix-pass <slug> --unit <unit-id> --reds <N>
 unattended.sh --record-round <slug> --subject <s> --audited "<ids>" --blockers <N> --highs <N>
 unattended.sh --record-round <slug> --owner-stop <path>
 unattended.sh --chain-verdict <slug>
