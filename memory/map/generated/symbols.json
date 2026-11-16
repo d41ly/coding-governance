@@ -5338,11 +5338,6 @@
       "file": "tools/push-main.sh"
     },
     {
-      "id": "check_claim_push_lock_stale",
-      "kind": "function",
-      "file": "tools/unattended/unattended.sh"
-    },
-    {
       "id": "check_claim_writable",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -5541,6 +5536,11 @@
       "id": "check_deviation_line",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "check_dir_lock_stale",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_dir_shaped",
@@ -15093,6 +15093,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "measure_pg6_call",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "measure_phrase",
       "kind": "function",
       "file": "tools/codebase-map/replay-phrases.py"
@@ -19783,6 +19788,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_pg6_dead_pid",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "read_phase",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -21743,11 +21753,6 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
-      "id": "remove_claim_push_lock",
-      "kind": "function",
-      "file": "tools/unattended/unattended.sh"
-    },
-    {
       "id": "remove_claim_refs",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -21771,6 +21776,11 @@
       "id": "remove_descendants",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "remove_dir_lock",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "remove_drive_section",
@@ -33173,11 +33183,6 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
-      "id": "write_claim_push_lock",
-      "kind": "function",
-      "file": "tools/unattended/unattended.sh"
-    },
-    {
       "id": "write_class_row_plant",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
@@ -33276,6 +33281,16 @@
       "id": "write_design_fixture",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
+    },
+    {
+      "id": "write_dir_lock",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_dir_lock_pid",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "write_disposal_fixture",
@@ -33901,6 +33916,16 @@
       "id": "write_pfx_stamp",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "write_pg6_lock",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_pg6_pid",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_pk_conf",

@@ -1,11 +1,12 @@
 # TOOL-aPiecewiseGrade-6 — one per-slug lock in the sidecar holds a dispatch's spec-token state from the start half to the end of the read half
 
-**Status:** INPROGRESS · rev-2 · 2026-11-16 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 5 · ratified 2026-11-16
+**Status:** CLOSED · rev-2 · 2026-11-16 · node a · Tier-2 · base aebbb4a72 · streams tooling · order 5 · ratified 2026-11-16
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-16-build-TOOL-aPiecewiseGrade-6-1-acceptance-ledger.md](../build/2026-11-16-build-TOOL-aPiecewiseGrade-6-1-acceptance-ledger.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aPiecewiseGrade-6-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-aPiecewiseGrade-6-1-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aPiecewiseGrade-6-2-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-aPiecewiseGrade-6-2-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aPiecewiseGrade-6-forks-brief.md](../prompts/2026-11-16-prompt-TOOL-aPiecewiseGrade-6-forks-brief.md) | research | — |
