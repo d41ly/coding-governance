@@ -276,6 +276,8 @@ build = ["planning", "designing", "building", "testing", "deploying", "paused", 
 feature = ["decomposed", "designed", "built", "tested", "deployed"]
 unit = ["designed", "built", "tested", "deployed"]
 terminal = ["landed", "withdrawn", "superseded", "incomplete", "deferred", "retired", "refused", "merged", "answered"]
+feature-terminal = ["deployed"]
+unit-terminal = ["deployed"]
 
 [[transition]]
 level = "build"           # build, feature or unit
@@ -299,6 +301,11 @@ is unpushed. The close request has no item row of its own yet, so it is a stand-
 ```text
 item.life.close · withdrawn → withdrawn · superseded → superseded · stand-in dWellOiledMachine
 ```
+
+`feature-terminal` and `unit-terminal` are not levels either. Each lists where a feature or a unit
+ends, `deployed`, which is also one of that level's own states: no feature or unit row may leave it,
+written by name or through `@open`, which holds it. Every level declares its set, and `check`
+refuses a level that does not.
 
 No row enters incomplete, deferred, retired, merged or answered yet: those rows belong to later units
 and builds.
@@ -334,9 +341,10 @@ and builds.
   ```
 
 - **Check the tables:** `check` prints one `loop: table` line per level with its row and state <!-- usage: script:tools/loop/loop_table.py#check 0011b11d -->
-  counts, a `loop: terminal build` line naming the terminal states, one `loop: owed` line per owed
-  row and one `loop: stand-in` line per stand-in, and exits 0. It exits 1, naming the row, on a row
-  leaving a terminal, a terminal also listed as an open state, a state the level does not declare, two rows for one move, an
+  counts, one `loop: terminal <level>` line per level naming its terminal states, the build's first and
+  `loop: terminal unit · deployed` among them, one `loop: owed` line per owed
+  row and one `loop: stand-in` line per stand-in, and exits 0. It exits 1, naming the row, on a level
+  missing its terminal set, a row leaving a terminal of its own level, a terminal also listed as an open build state, a state the level does not declare, two rows for one move, an
   item that is no tag or resolves to nothing, an outcome outside its item's set, or a disposition
   outside the set. It also joins every item's cross-step routes, an outcome sent to `transition` or
   to an item of another step, with the build table both ways: a route with no row, a row on no
@@ -361,7 +369,9 @@ and builds.
   an outcome outside the item's set), `dropped-row` (the building exit's row deleted while its route
   stays), `unrouted-row` (a row on an outcome routed inside its own step), `owed-stale` (an owed row a
   build row covers), `stand-in` (a stale and a mis-owned stand-in row), `terminal-from` (a row leaving
-  landed) and `terminal-open` (landed added to the open states). The files on disk are never changed.
+  landed), `terminal-open` (landed added to the open states), `unit-terminal-from` (a unit row from
+  `@open`, so leaving deployed) and `level-no-terminal` (`unit-terminal` taken out of `[states]`). The
+  files on disk are never changed.
 
 The tables do not judge whether a move's witness holds, which is the writer's precondition, or
 whether a state is reachable or a cycle terminates. The feature and unit rows are not joined to the
@@ -1621,9 +1631,9 @@ Before a flow runs, one check asks whether it can finish. It reads the compositi
 with your overlay's items and stages, and for a build, the scenarios it was placed under and its own
 applied flow changes. Six rules hold it:
 
-- **`terminal`:** every build state reaches a terminal state. A row into `@prior` or `@reentry` counts as
-  reaching every open state. A level that declares no states is a finding. The feature and unit levels
-  declare no terminal set yet, so the check prints `unchecked — no terminal set` for each, never a pass.
+- **`terminal`:** every state of the build, feature and unit levels reaches its own level's terminal
+  set, `deployed` for a feature or a unit. A row into `@prior` or `@reentry` counts as reaching every
+  open state. A level that declares no states is a finding.
 - **`reachable`:** every item of every program is reached from some program's entry, an item with no
   needs. The walk follows every route, and follows a need only inside one program, so an item needing
   another program's item is reached only if some route names it.
@@ -1647,14 +1657,14 @@ the definition's check refuses is refused the same way.
 
 - **Check the flow:** `python tools/loop/termination.py check` checks gov's composition at your <!-- usage: script:tools/loop/termination.py#check 84d96b33 -->
   repository's top level, and `--build <slug>` checks that build's at its pinned composition. It prints
-  the value of `flow.wait-ceiling`, each `unchecked` level, the pending list's counts, each finding as
+  the value of `flow.wait-ceiling`, the pending list's counts, each finding as
   `loop: termination · <rule> · <subject> · <why>`, and a summary. It exits 0 with no finding, 1 on a
   finding, and 2 where a composition does not read or a kit is not installed, naming why. `--selftest`
   also checks every live build, one whose newest move entered no terminal state, then runs every plant.
 
 - **See it on a fixture:** `python tools/loop/termination.py --fixture --plant <case>` runs one planted <!-- usage: script:tools/loop/termination.py e4ce3401 -->
   break and prints `held` or `MISSED`: `stage-self-loop`, `stage-self-loop-drawn`, `dead-end`,
-  `orphan-item`, `empty-states`, `wait-no-deadline`, `wait-declared`, `wait-stale`, `stale-build`,
+  `unit-dead-end` (a unit state no row leaves), `orphan-item`, `empty-states`, `wait-no-deadline`, `wait-declared`, `wait-stale`, `stale-build`,
   `raise-unattended`, `raise-released`, `raise-held` and `decline` in memory, and `deadline-patch` and
   `boundary` each in a scratch repository.
 

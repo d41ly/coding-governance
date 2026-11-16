@@ -18,9 +18,9 @@ through `adapt.py`'s `read_flow_rows`. A program `check_program` refuses is a re
 THE RULES. `check_termination(composition)` runs one function per rule and returns every finding,
 `(rule, subject, why)`:
 
-    terminal   every state of a level that declares a terminal set reaches one, by reverse reachability
-               over its rows, a row into @prior or @reentry reaching every open state; an empty state set
-               is a finding. A level with no terminal set prints `unchecked — no terminal set`.
+    terminal   every state of a level reaches the level's own terminal set, by reverse reachability over
+               its rows, a row into @prior or @reentry reaching every open state; an empty state set is a
+               finding.
     reachable  one walk from every program's entries, its items with no needs, along every route to a
                declared item and along a need only between two items of one program, reaches every item.
     counted    with every set-aside edge left out, the build table and the item routes between declared
@@ -43,7 +43,7 @@ THE PENDING LIST, `termination-pending.txt` beside this file, shrink-only: `wait
 each cycle rotated as `scan_cycles` rotates it. Staleness is graded only by `check` without `--build`;
 every other composition reads the rows only to excuse the cycles and waits they name.
 
-`check` prints one composition's header, each unchecked level, `raise` and `decline` as `0 build(s)` over
+`check` prints one composition's header, `raise` and `decline` as `0 build(s)` over
 gov's, the pending counts, the value `flow.wait-ceiling` resolves to, each finding as `loop: termination ·
 <rule> · <subject> · <why>` and the summary; exit 0 clean, 1 on a finding, 2 where a read is refused or a
 kit does not resolve, never 0. `check --selftest` checks gov's composition and every live build's, a slug
@@ -58,8 +58,7 @@ after `adapt.py`'s `write_flow_states` writes a state row reading `applied`, and
 finding or a refused read, cutting `RUN.md` back to its length.
 
 WHAT THIS DOES NOT CHECK: that a `draws` or `waits` mark is true, which the acceptance ledger's per-cycle
-line answers; the feature and unit levels' termination, until TOOL-dDeclaredLoop-54 declares their sets;
-the scenario successor chains, `scenario.py`'s `check_scenarios`; the code-level waits outside the
+line answers; the scenario successor chains, `scenario.py`'s `check_scenarios`; the code-level waits outside the
 composition, which the kit's README lists; a raise of a policy bound, the policy guard's; a run-time
 stall, which no static check sees.
 """
@@ -82,7 +81,7 @@ from loop_lib import (LoopError, check_loop, check_program, derive_outcome_set, 
                       read_item_rows, read_memory_tree, run_selftest_cases, scan_cycles)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_table import (DYNAMIC_TO, ENDING_OUTCOMES, derive_direction, derive_from_states,  # noqa: E402
-                        read_transition_rows)
+                        read_terminal_set, read_transition_rows)
 from loop_transition import TRAILER_KEY, read_memory_root, read_transitions  # noqa: E402
 from loop_witness import read_git, remove_tree, run_fixture_git, write_fixture_files  # noqa: E402
 from position import read_build_items  # noqa: E402
@@ -101,6 +100,7 @@ FX_LOOP = "item.build.adopter.spin"
 PLANTS = {"stage-self-loop": "a repository stage whose exit routes pass to transition and retry back to its first item",
           "stage-self-loop-drawn": "the same stage, its retry route under draws = { retry = \"route-back\" }",
           "dead-end": "a build state stuck one row enters, each @open row narrowed to the other open states",
+          "unit-dead-end": "a unit state reviewed one row from built enters, and no row leaves",
           "orphan-item": "a build item needing item.test.merge that no route names",
           "empty-states": "a build level declaring no states",
           "wait-no-deadline": "item.build.unit-lease waiting on waiting with no deadline",
@@ -148,9 +148,10 @@ def derive_stage_rows(code, payload, lines):
 
 def derive_termination_composition(label, data, where, items, stages, flow, pending, gov=None):
     """One composition (§4 Data model) of `data`, a parsed definition, with the composed `items` and
-    `stages`: its states, each spliced stage's state among the build level's, the build level's terminal
-    set, the step orders, the spliced rows, the items with each outcome set resolved, the programs
-    `check_program` returns, `flow`, `pending` and `gov`. LoopError where a program does not hold."""
+    `stages`: its states, each spliced stage's state among the build level's, each level's terminal set
+    through `read_terminal_set` (TOOL-dDeclaredLoop-54), the step orders, the spliced rows, the items with
+    each outcome set resolved, the programs `check_program` returns, `flow`, `pending` and `gov`.
+    LoopError where a program does not hold; ValueError, `read_terminal_set`'s, where a level's set is absent."""
     tables = read_transition_rows(data, where)
     tags = [s.get("tag") for s in stages if isinstance(s.get("tag"), str)]
     programs = check_program(dict(data, item=list(items)), where, None, tags)
@@ -158,7 +159,8 @@ def derive_termination_composition(label, data, where, items, stages, flow, pend
     spliced = [s for s in stages if read_split_row(s, data) is not None]
     states = {level: list(v) for level, v in tables["states"].items()}
     states["build"] = states.get("build", []) + [derive_stage_state(s["tag"]) for s in spliced]
-    return {"label": label, "states": states, "terminal": {"build": list(tables["terminal"])},
+    terminal = {level: read_terminal_set(tables, level) for level in tables["states"]}
+    return {"label": label, "states": states, "terminal": terminal,
             "step-order": dict(tables["step-order"]), "rows": derive_spliced_table(spliced, data),
             "items": [dict(r, outcomes=derive_outcome_set(r, members, where)) for r in items],
             "programs": programs, "flow": flow, "pending": pending, "gov": gov}
@@ -313,11 +315,6 @@ def check_terminal(composition):
     return out
 
 
-def derive_unchecked_levels(composition):
-    """The levels holding states that declare no terminal set, in the composition's order."""
-    return [level for level in composition["states"] if level not in composition["terminal"]]
-
-
 def check_reachable(composition):
     """The `reachable` rule: each item of a program that one walk from every program's entries misses, the
     walk following every route to a declared item and a need only within one program."""
@@ -430,15 +427,13 @@ def check_termination(composition):
 
 # ------------------------------------------------------------------------------------------ the verb
 def print_termination(composition):
-    """Print one composition's check: its header, its unchecked levels, the build rules' population over
-    gov, the pending counts, each finding and the summary. -> its findings."""
+    """Print one composition's check, each level walked against its own terminal set: its header, the
+    build rules' population over gov, the pending counts, each finding and the summary. -> its findings."""
     found = check_termination(composition)
     label = composition["label"]
     print("%s · %s · %d build state(s) · %d row(s) · %d item(s) · %d program(s)" % (
         LEAD, label, len(composition["states"].get("build", [])), len(composition["rows"]),
         len(composition["items"]), len(composition["programs"])))
-    for level in derive_unchecked_levels(composition):
-        print("%s · terminal · %s · unchecked — no terminal set" % (LEAD, level))
     for rule in ("raise", "decline"):
         print("%s · %s · %s" % (LEAD, rule, "0 build(s)" if label == "gov" else "1 build(s) · %d flow row(s)" % len(
             composition["flow"])))
@@ -602,6 +597,10 @@ def run_termination_plant(case):
                         row["from"] = [s for s in comp["states"]["build"] if s != "stuck"]
                 comp["rows"].append({"level": "build", "from": ["planning"], "item": "item.plan.exit",
                                      "outcome": "recorded", "to": "stuck", "witness": "the plant"})
+            elif case == "unit-dead-end":
+                comp["states"]["unit"].append("reviewed")
+                comp["rows"].append({"level": "unit", "from": ["built"], "item": "item.test.exit",
+                                     "outcome": "recorded", "to": "reviewed", "witness": "the plant"})
             elif case == "empty-states":
                 comp["states"]["build"] = []
             runs = [comp]
@@ -612,7 +611,7 @@ def run_termination_plant(case):
                 got = print_termination(one)
                 print("%s: fixture · %s · check exit %d" % (SAY, case, 1 if got else 0))
                 found.append(got)
-            check_plant_found(case, found, runs[0], misses)
+            check_plant_found(case, found, misses)
     except (subprocess.CalledProcessError, OSError, ValueError, LookupError, KeyError, StopIteration) as exc:
         print("%s: fixture · %s · UNARMED · the plant could not be built: %s %s" % (
             SAY, case, exc, (getattr(exc, "stderr", "") or "").strip()[:300]))
@@ -621,7 +620,7 @@ def run_termination_plant(case):
     return 1 if misses else 0
 
 
-def check_plant_found(case, found, composition, misses):
+def check_plant_found(case, found, misses):
     """Append to `misses` each way the in-memory plant `case`'s findings, `found` one list per run, miss
     what its criterion owes."""
     first = found[0]
@@ -629,8 +628,8 @@ def check_plant_found(case, found, composition, misses):
     owed = {
         "stage-self-loop": rules == ["counted"] and first[0][1] == render_cycle((FX_EXIT, FX_RUN)),
         "stage-self-loop-drawn": not first,
-        "dead-end": ("terminal", "build stuck") in [f[:2] for f in first]
-                    and derive_unchecked_levels(composition) == ["feature", "unit"],
+        "dead-end": [f[:2] for f in first if f[0] == "terminal"] == [("terminal", "build stuck")],
+        "unit-dead-end": [f[:2] for f in first if f[0] == "terminal"] == [("terminal", "unit reviewed")],
         "orphan-item": [f[:2] for f in first if f[0] == "reachable"] == [("reachable", "item.build.orphan")],
         "empty-states": ("terminal", "build") in [f[:2] for f in first],
         "wait-no-deadline": ("wait", "item.build.unit-lease") in [f[:2] for f in first],

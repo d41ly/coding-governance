@@ -12803,11 +12803,6 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
-      "id": "derive_unchecked_levels",
-      "kind": "function",
-      "file": "tools/loop/termination.py"
-    },
-    {
       "id": "derive_unit_class",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
@@ -22801,6 +22796,11 @@
       "id": "read_temp_binders",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "read_terminal_set",
+      "kind": "function",
+      "file": "tools/loop/loop_table.py"
     },
     {
       "id": "read_termination_inputs",

@@ -52,8 +52,10 @@
 # [states], each level's states (TOOL-dDeclaredLoop-13): `build`, `feature` and `unit`, each the list of
 # that level's open states. A level's entry is "none", never a state. `terminal` is no level: it lists
 # the build level's terminal states (TOOL-dDeclaredLoop-15), which a build row may enter and no row may
-# leave, and none of which is an open state. loop_table.py beside this file reads it and the three
-# tables below, and its `check` grades them:
+# leave, and none of which is an open state. `feature-terminal` and `unit-terminal` are no levels either:
+# each lists its level's terminal set, members of that level's own states, which no row of the level may
+# leave (TOOL-dDeclaredLoop-54). loop_table.py beside this file reads them and the three tables below,
+# and its `check` grades them:
 #
 # One [[transition]] row per move of a level's table:
 #   level        build, feature or unit, a key of [states]
@@ -422,6 +424,8 @@ build = ["planning", "designing", "building", "testing", "deploying", "paused", 
 feature = ["decomposed", "designed", "built", "tested", "deployed"]
 unit = ["designed", "built", "tested", "deployed"]
 terminal = ["landed", "withdrawn", "superseded", "incomplete", "deferred", "retired", "refused", "merged", "answered"]
+feature-terminal = ["deployed"]
+unit-terminal = ["deployed"]
 
 # The build table, B1 to B25 between open states, then T1 to T5 into a terminal, P1 on a parent's
 # withdrawal (TOOL-dDeclaredLoop-15), and E1 to E5, the endings of a build whose rework budget is spent

@@ -205,7 +205,10 @@ python <prefix>/loop/loop_checklist.py show reuse-probed
 
 One table per level, build, feature and unit (TOOL-dDeclaredLoop-13): `[states]` holds each level's
 open states, and its `terminal` key, which is no level, the build's nine terminal states
-(TOOL-dDeclaredLoop-15): a build row may enter one and no row may leave one. Each `[[transition]]` row is a move, its `level`, `from` (states, `none` for the level's
+(TOOL-dDeclaredLoop-15): a build row may enter one and no row may leave one. `feature-terminal` and
+`unit-terminal`, no levels either, each list their level's terminal set, `deployed`, a member of that
+level's own states, which no row of the level may leave (TOOL-dDeclaredLoop-54); `read_terminal_set(tables,
+level)` reads any level's set and raises ValueError naming the level and its key where it is absent. Each `[[transition]]` row is a move, its `level`, `from` (states, `none` for the level's
 entry, or `@open`), the `item` tag and `outcome` that fire it, its `to` (a state, `@prior` or
 `@reentry`), its `witness`, and optionally a `disposition`, `when = "before-push"` and `draws = "none"`.
 `@any` fires B11, the one row entering `@reentry`, and the ending rows, whose outcome is one of
@@ -213,7 +216,8 @@ entry, or `@open`), the `item` tag and `outcome` that fire it, its `to` (a state
 names the owner of each row item whose build has not landed, and `[[owed-row]]` each cross-step route
 whose build row another unit or build writes; both lists only shrink. `loop_lib.py` does not read
 them: `loop_table.py` does, through `read_transition_rows` and `read_stand_ins` over the parsed
-definition, `read_transition_rows` splitting `terminal` out of the levels and adding `step-order`, each
+definition, `read_transition_rows` splitting `terminal` and each `<level>-terminal` key, under
+`level-terminal`, out of the levels and adding `step-order`, each
 step's state to its order, and `derive_move` answers a
 move from the rows alone, raising `TransitionRefused` where no row holds it or the state asked is a
 terminal, and ValueError on an unknown level or state or a missing fact a row reads (`prior`,
@@ -248,9 +252,10 @@ recorded through the same writer and channels as a forward one.
 
 `move` prints `move — <level> · <from> → <to> · <item>`, with `· stand-in <owner>` for a stand-in item
 and `· <direction>` last for a build move, exit 0; `refused — ...: no row`, exit 1; `unanswered — ...: <why>`, exit 2. `check`, by
-`check_transition_tables`, prints a `loop: table` line per level, `loop: terminal build · <states>`, a
-`loop: owed` line per owed row and a `loop: stand-in` line per stand-in, and refuses a row leaving a
-terminal, a terminal also listed among the build's open states, an undeclared level or state, two rows for one move,
+`check_transition_tables`, prints a `loop: table` line per level, a `loop: terminal <level> · <states>`
+line per level, the build's first, a `loop: owed` line per owed row and a `loop: stand-in` line per
+stand-in, and refuses a level declaring no terminal set, a row whose `from`, `@open` expanded, leaves a
+terminal of its own level's set, a terminal also listed among the build's open states, an undeclared level or state, two rows for one move,
 a row item that is no tag or resolves to neither an `[[item]]` row nor a stand-in, an outcome outside
 its item's set, a disposition outside the set, and a stale or mis-owned stand-in. It joins every
 cross-step route, an outcome routed to `transition` or to an item of another step, with the build
@@ -258,8 +263,9 @@ table both ways, an owed row standing for a row another unit writes and refused 
 and each step's exit to a build row out of its state. Both verbs exit 2 where the definition does not
 read or holds no transition row. `--fixture --plant <case>` runs `check` with one break of `PLANTS`
 made in memory by `write_table_plant`: `bad-state`, `two-rows`, `bad-exit`, `dropped-row`,
-`unrouted-row`, `owed-stale`, `stand-in`, `terminal-from` (a build row leaving landed) and
-`terminal-open` (landed appended to the build's open states). `check --selftest` runs `check`, every
+`unrouted-row`, `owed-stale`, `stand-in`, `terminal-from` (a build row leaving landed),
+`terminal-open` (landed appended to the build's open states), `unit-terminal-from` (a unit row from
+`@open`, which holds deployed) and `level-no-terminal` (`unit-terminal` taken out of `[states]`). `check --selftest` runs `check`, every
 plant, each kind of move and direction, and `direction-order`, the shipped rows with building's and
 testing's orders swapped, through `run_selftest_cases`, the case loop `loop_checklist.py` shares,
 and is the kit's `loop transition tables` gate leg.

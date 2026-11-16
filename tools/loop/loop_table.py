@@ -14,7 +14,10 @@ which the transition writer reads to record a backward ending with no draw. `@an
 `@reentry`, or one whose outcome is one of `ENDING_OUTCOMES`, a build's ending once its rework budget is
 spent (TOOL-dDeclaredLoop-31). `[states]`'s
 `terminal` key is no level: it lists the build level's terminal states (TOOL-dDeclaredLoop-15), which a
-build row may enter and no row may leave. `[[stand-in]]` names the owner of each row item whose owning
+build row may enter and no row may leave. Each `<level>-terminal` key, `feature-terminal` and
+`unit-terminal`, is no level either: it lists that level's terminal set, members of its own states,
+which no row of the level may leave (TOOL-dDeclaredLoop-54); `read_terminal_set(tables, level)` reads
+any level's set, a ValueError naming the level and its key where the set is absent. `[[stand-in]]` names the owner of each row item whose owning
 build has not landed, and `[[owed-row]]` each cross-step route whose build row another unit or build
 writes. `read_transition_rows` and `read_stand_ins` read them from a parsed definition, so a plant is
 made in memory.
@@ -52,9 +55,10 @@ passes the shipped rows' unqualified phases in its place, taken before the break
 `move` prints `move — <level> · <from> → <to> · <item>`, with `· stand-in <owner>` after it where the
 item is a stand-in, then `· <direction>` last for a build move, and exits 0; `refused — <level> · <from> · <item> · <outcome>: no row`, exit 1; and
 `unanswered — <level> · <from> · <item> · <outcome>: <why>`, exit 2, on a ValueError. `check` prints one
-`loop: table <level> · <n> row(s) · <m> state(s)` line per level, then `loop: terminal build · <states>`,
-and refuses a row whose `from` names a terminal and a terminal also listed among the build's open
-states, the refusal that keeps `@open` off a terminal. It prints one `loop: owed <item> · <outcome> ·
+`loop: table <level> · <n> row(s) · <m> state(s)` line per level, then one `loop: terminal <level> ·
+<states>` line per level, the build's first, and refuses a level declaring no terminal set, a row whose
+`from`, `@open` expanded, holds a state of its own level's set, and a terminal also listed among the
+build's open states, the refusal that keeps `@open` off a build terminal. It prints one `loop: owed <item> · <outcome> ·
 <by>` line per owed row, one `loop: stand-in <item> · <owner>` line per stand-in, and each refusal as
 `loop: refused · ...`, exit 1. Both exit 2 where the definition does not read or holds no
 `[[transition]]` row, never admitting a move. `--fixture --plant <case>` runs `check` with one break of
@@ -74,7 +78,10 @@ item owned by an unlanded build has a stand-in row; reachability, termination an
 feature rows' last-unit rule; the routes of the feature and unit rows, which the join reads for the build
 table alone; that an owed row's `by` names a real unit or build; that every terminal is entered by a row,
 which four are not yet; a phase row's qualifier value against the driver's halt and hold codes; that
-`--extra` is the driver's `PHASES_EXTRA`, which the caller passes and this module never reads.
+`--extra` is the driver's `PHASES_EXTRA`, which the caller passes and this module never reads; that each
+member of a level's terminal set is a state of that level, or that a `-terminal` key names a level: a
+misspelt key leaves its level with no set, which `check` refuses, and a member no state reaches reds the
+termination check.
 """
 import argparse
 import pathlib
@@ -104,6 +111,8 @@ DYNAMIC_TO = ("@prior", "@reentry")
 BEFORE_PUSH = "before-push"
 #: The `[states]` key listing the build level's terminal states, read beside the levels and never as one.
 TERMINAL = "terminal"
+#: The tail of a `[states]` key listing another level's terminal set, `<level>-terminal`, never a level.
+TERMINAL_SUFFIX = "-terminal"
 #: A row item: `item.<seg>.<seg>`.
 ITEM_TAG = re.compile(r"item\.%s\.%s" % (SEG.pattern, SEG.pattern))
 #: A `[[transition]]` row's required keys.
@@ -126,6 +135,8 @@ PLANTS = {"bad-state": ("a unit row entering reviewing, no unit state", "reviewi
                        "owner set to dRankedPlan", "item.plan.input"),
           "terminal-from": ("a build row whose from is landed", "leaves landed, a terminal"),
           "terminal-open": ("landed appended to the build's open states", "landed is both"),
+          "unit-terminal-from": ("a unit row from @open into designed", "leaves deployed, a terminal"),
+          "level-no-terminal": ("unit-terminal taken out of [states]", "the level unit declares no terminal set"),
           "any-unending": ("an @any row from testing on the outcome lap, entering building",
                            "only a row entering @reentry"),
           "phase-missing": ("the REVIEWING phase row taken out", "REVIEWING"),
@@ -142,18 +153,21 @@ class TransitionRefused(Exception):
 
 
 def read_transition_rows(data, where):
-    """`{"states": {level: [states]}, "terminal": [states], "transition": [rows], "owed-row": [rows],
-    "item-states": {item tag: its step's state}, "step-order": {step's state: its order}}` of a parsed
-    definition, the rows ungraded. `[states]`'s
-    `terminal` key is split out as the build level's terminal states, never a level, absent reading as
-    none. LoopError for a `[states]` that is no table of non-empty lists of words, `terminal` included,
+    """`{"states": {level: [states]}, "terminal": [states], "level-terminal": {level: [states]},
+    "transition": [rows], "owed-row": [rows], "item-states": {item tag: its step's state}, "step-order":
+    {step's state: its order}}` of a parsed definition, the rows ungraded. `[states]`'s `terminal` key is
+    split out as the build level's terminal states, never a level, absent reading as none, and each
+    `<level>-terminal` key as that level's terminal set under `level-terminal` (TOOL-dDeclaredLoop-54).
+    LoopError for a `[states]` that is no table of non-empty lists of words, the terminal keys included,
     or a `transition` or `owed-row` table that is no array of tables."""
     states = data.get("states", {})
     if not isinstance(states, dict) or not all(
             isinstance(v, list) and v and all(isinstance(s, str) and SEG.fullmatch(s) for s in v)
             for v in states.values()):
         raise LoopError(where, "'states' is not a table of levels, each a non-empty list of state words")
-    out = {"states": {k: v for k, v in states.items() if k != TERMINAL}, "terminal": states.get(TERMINAL, [])}
+    out = {"states": {k: v for k, v in states.items() if k != TERMINAL and not k.endswith(TERMINAL_SUFFIX)},
+           "terminal": states.get(TERMINAL, []),
+           "level-terminal": {k[:-len(TERMINAL_SUFFIX)]: v for k, v in states.items() if k.endswith(TERMINAL_SUFFIX)}}
     for table in ("transition", "owed-row"):
         rows = data.get(table, [])
         if not isinstance(rows, list) or not all(isinstance(r, dict) for r in rows):
@@ -176,6 +190,17 @@ def derive_direction(state, to, tables):
     if state not in order or to not in order or order[state] == order[to]:
         return "lateral"
     return "forward" if order[to] > order[state] else "backward"
+
+
+def read_terminal_set(tables, level):
+    """`level`'s terminal set from `tables`, what read_transition_rows returns: `terminal` for the build
+    level, its `<level>-terminal` key otherwise. ValueError naming the level and its key where the set is
+    absent or empty (TOOL-dDeclaredLoop-54)."""
+    ends = tables["terminal"] if level == "build" else tables.get("level-terminal", {}).get(level)
+    if not ends:
+        raise ValueError("the level %s declares no terminal set: [states] holds no %s" % (
+            level, TERMINAL if level == "build" else level + TERMINAL_SUFFIX))
+    return list(ends)
 
 
 def read_stand_ins(data, where):
@@ -262,7 +287,13 @@ def check_transition_tables(data, where, items):
     declared = {r.get("tag"): r for r in items}
     sets = {tag: derive_outcome_set(r, members, where) for tag, r in declared.items()}
     stand_owner = {r.get("item"): r.get("owner") for r in stand}
-    lines, refusals, graded = [], [], []
+    lines, refusals, graded, ends = [], [], [], {}
+    for level in states:
+        try:
+            ends[level] = read_terminal_set(t, level)
+        except ValueError as e:
+            refusals.append(str(e))
+            ends[level] = []
     for n, row in enumerate(t["transition"], 1):
         level, src, item, outcome, to = (row.get(k) for k in ("level", "from", "item", "outcome", "to"))
         at = "transition row %d (%s · %s · %s · %s)" % (
@@ -275,10 +306,10 @@ def check_transition_tables(data, where, items):
         if level not in states:
             refusals.append("%s names the level %s, which [states] does not declare" % (at, level))
             continue
-        for s in src:
-            if s in terminal:
+        for s in derive_from_states(row, states[level]):
+            if s in ends[level]:
                 refusals.append("%s leaves %s, a terminal: no move leaves one" % (at, s))
-            elif s not in (ENTRY, OPEN) and s not in states[level]:
+            elif s != ENTRY and s not in states[level]:
                 refusals.append("%s leaves %s, no %s state" % (at, s, level))
         if to not in states[level] and to not in DYNAMIC_TO and not (level == "build" and to in terminal):
             refusals.append("%s enters %s, no %s state nor %s" % (at, to, level, " ".join(DYNAMIC_TO)))
@@ -308,8 +339,9 @@ def check_transition_tables(data, where, items):
     for level, words in states.items():
         lines.append("%s: table %s · %d row(s) · %d state(s)" % (
             SAY, level, sum(1 for r in t["transition"] if r.get("level") == level), len(words)))
-    if terminal:
-        lines.append("%s: terminal build · %s" % (SAY, " ".join(terminal)))
+    for level in sorted(states, key=lambda v: v != "build"):
+        if ends[level]:
+            lines.append("%s: terminal %s · %s" % (SAY, level, " ".join(ends[level])))
     for s in terminal:
         if s in states.get("build", []):
             refusals.append("%s is both an open build state and a terminal" % s)
@@ -492,6 +524,11 @@ def write_table_plant(case, data):
                      "to": "@prior", "witness": "planted"})
     elif case == "terminal-open":
         data["states"]["build"].append("landed")
+    elif case == "unit-terminal-from":
+        rows.append({"level": "unit", "from": [OPEN], "item": "item.plan.exit", "outcome": "recorded",
+                     "to": "designed", "witness": "planted"})
+    elif case == "level-no-terminal":
+        del data["states"]["unit" + TERMINAL_SUFFIX]
     elif case == "any-unending":
         rows.append({"level": "build", "from": ["testing"], "item": ANY_ITEM, "outcome": "lap", "to": "building",
                      "witness": "planted"})
@@ -535,6 +572,7 @@ def main(argv):
         cases = [("check", ["check"], 0, "%s: table build" % SAY, ""),
                  ("terminal", ["check"], 0, "%s: terminal build · landed withdrawn superseded incomplete deferred "
                                             "retired refused merged answered" % SAY, ""),
+                 ("terminal unit", ["check"], 0, "%s: terminal unit · deployed" % SAY, ""),
                  ("owed place", ["check"], 0, "%s: owed item.plan.place · unplaced · dRankedPlan" % SAY, ""),
                  ("stand-in close", ["check"], 0, "%s: stand-in item.life.close · dWellOiledMachine" % SAY, "")]
         cases += [("phase join", ["check"], 0, "%s: phase join · " % SAY, "")]
