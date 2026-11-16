@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-33 — the static termination check on every composition, at the push and at each step boundary
 
-**Status:** INPROGRESS · rev-8 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 34 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-9 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 34 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0118@ae61aaf4 whole
 
@@ -534,6 +534,7 @@ New arm: tools/loop/termination.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 AC9 AC1
   drew otherwise. F1's field stays the marker on item routes, which have no direction. Measured at the
   tip, (a) leaves one build cycle, `paused` re-entered by B19's pause from `@open`, whose item is
   dWellOiledMachine's stand-in, a `cycle` row by §4's rule 3. Recommendation (a); the body is written on it.
+  RESOLVED (agent, 2026-11-16, delegated): (a).
 - **F6 — How do gov's own item-route cycles pass the counted rule at landing?** 23 cycles PINNED at
   `e8018d94f` on 2026-11-16: waits on a lease, the remote and a parent, fix passes, review rounds, and
   design, test and disposal loops no draw site records. Options: (a) §4 "Gov's own cycles at
@@ -541,6 +542,7 @@ New arm: tools/loop/termination.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 AC9 AC1
   cycle a pending row; (c) the item routes left out of the rule. (b) leaves the waits this unit's key
   bounds unbounded and the fix-pass loops pending though their draw site exists. (c) cannot catch the
   clause's discriminating case. Recommendation (a); the spec body is written on it.
+  RESOLVED (agent, 2026-11-16, delegated): (a).
 - **F7 — Where can a build raise the budget, a round count or a retry count?** The clause plants an
   unattended raise of each. At the tip a build's recorded changes are row changes of a composed kind
   (`tools/loop/adapt.py#write_flow_proposal`), no row kind holds one of those three counts, and an agent's
@@ -551,7 +553,8 @@ New arm: tools/loop/termination.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 AC9 AC1
   policy value, a second write path into the guarded file and another unit's mechanism. Under (a) a
   run's raise on its own branch is the guard's admission, recorded but not held for the owner, a
   departure from the clause's three policy plants the run records. Recommendation (a); the body is
-  written on it. The departure is recorded as
+  written on it.
+  RESOLVED (agent, 2026-11-16, delegated): (a). The departure is recorded as
   `memory/builds/dDeclaredLoop/build/2026-11-16-build-TOOL-dDeclaredLoop-33-deviation-334.md`. That
   record is an `amends` of `cl-dClosedLoop-0118@4c8ef789` whose **After:** also states F9's fixed
   deadline, since both departures sit in the clause's one raise sentence. `derive_clause_hash` over the
@@ -573,16 +576,19 @@ New arm: tools/loop/termination.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 AC9 AC1
   whole unit deferred against that ask, as unit 34 is; (c) F4's (a), which the owner declined. (a) is
   deny by default, stricter than the clause until the pick lands; (b) holds every rule and units 54
   and 55 behind one join. Recommendation (a); the spec body is written on it.
+  RESOLVED (agent, 2026-11-16, delegated): (a).
 - **F10 — Does the leg declare a guard?** No `loop` leg at the tip declares one, and
   `TOOL-dDeclaredLoop-55` S1 rules this one carries none, since `{prefix}/loop/` misses the overlay, the
   scenarios and a build's changes. Options: (a) no `guard`, that unit's S1 holding at this landing; (b)
   guarded, that unit taking the key away one order later, a leg that meanwhile skips what it grades.
   Recommendation (a); the spec body is written on it.
+  RESOLVED (agent, 2026-11-16, delegated): (a).
 - **F11 — How does the terminal rule read the feature and unit levels before `TOOL-dDeclaredLoop-54`
   declares their sets?** Options: (a) it walks each level that declares a set and prints the others
   unchecked, never a pass; (b) it walks them toward the build's terminals, every feature and unit state a
   finding, so gov's composition reds at landing; (c) this unit declares the sets, that unit's S1. (c)
   moves a sibling's scope. Recommendation (a); the spec body is written on it.
+  RESOLVED (agent, 2026-11-16, delegated): (a).
 - **F12 — How does the reachable rule count an item that only another program reaches?**
   `item.build.resolve`, of the build program, needs only `item.test.merge`, a test item, and only that
   item's `conflict` route names it (`tools/loop/loop.toml@44ea9acb:1567` and `:1589`). Inside its own
@@ -682,6 +688,8 @@ New arm: tools/loop/termination.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 AC9 AC1
   program's entry and follows a need only within one program (F12), so `item.build.resolve` holds and
   AC3's orphan still reds; gov's cycles re-pinned at 23 at `e8018d94f`, unit 50's two review cycles
   bounded by §4's rules 2 and 3.
+- rev-9 · 2026-11-16 · §8 F5 F6 F7 F9 F10 F11 · per the builder return 2026-11-16-build-TOOL-dDeclaredLoop-33-3-builder-return: each
+  fork the body is already written on carries its resolution mark, (a); nothing else moves.
 - rev-8 · 2026-11-16 · Carries · S5 · S11 · §3 · §4 · §5 · AC2 · AC5 · AC9 · AC11 · §8 F7 F13 F14 · per the
   builder return 2026-11-16-build-TOOL-dDeclaredLoop-33-2-builder-return: a composition `check_program`
   refuses refuses the move, and the adapt plants compose well-formed programs (F13); the pending list's
