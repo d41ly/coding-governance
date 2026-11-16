@@ -181,7 +181,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-55 — the `loop termination` leg declares no guard, so no input it reads can skip it](spec/2026-10-24-spec-TOOL-dDeclaredLoop-55.md) | 35 | 2 | CLOSED | rev-4 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-63 — an adopter's extra phase reads as ungated through the driver's own phase set, never refused for lacking a row](spec/2026-10-24-spec-TOOL-dDeclaredLoop-63.md) | 35 | 2 | CLOSED | rev-3 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-64 — a build's opening commit is found under the resolved `MEMORY_ROOT`, never a literal `memory/`](spec/2026-10-24-spec-TOOL-dDeclaredLoop-64.md) | 35 | 2 | CLOSED | rev-4 | 2026-11-16 |
-| [TOOL-dDeclaredLoop-56 — the round-1 spec audit's 47 minors: owed leg rows, one reader each, honest skew and failure paths, and the citations that drifted](spec/2026-10-24-spec-TOOL-dDeclaredLoop-56.md) | 36 | 2 | INPROGRESS | rev-6 | 2026-11-16 |
+| [TOOL-dDeclaredLoop-56 — the round-1 spec audit's 47 minors: owed leg rows, one reader each, honest skew and failure paths, and the citations that drifted](spec/2026-10-24-spec-TOOL-dDeclaredLoop-56.md) | 36 | 2 | INPROGRESS | rev-7 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-70 — every caller of the phase reading takes the adopter population from one driver-conf reader](spec/2026-10-24-spec-TOOL-dDeclaredLoop-70.md) | 36 | 2 | DEFERRED | rev-4 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-71 — the breakpoints fixture runs under its own gate leg, so its plants are lasting coverage](spec/2026-10-24-spec-TOOL-dDeclaredLoop-71.md) | 36 | 2 | CLOSED | rev-4 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-72 — the loop kit reads the records root the driver reads, and refuses two confs that disagree](spec/2026-10-24-spec-TOOL-dDeclaredLoop-72.md) | 36 | 2 | DEFERRED | rev-6 | 2026-11-16 |
@@ -194,7 +194,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-80 — the no-own-conf-read rule stops at a named fixture boundary, so the plants that write the confs are outside its population](spec/2026-10-24-spec-TOOL-dDeclaredLoop-80.md) | 38 | 2 | DEFERRED | rev-6 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-75 — the round-3 spec audit's 36 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md) | 39 | 2 | DEFERRED | rev-10 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-77 — a FETCH_HEAD URL is compared in the spelling git writes it, its user part stripped from both sides](spec/2026-10-24-spec-TOOL-dDeclaredLoop-77.md) | 39 | 2 | DEFERRED | rev-3 | 2026-11-16 |
-| [TOOL-dDeclaredLoop-79 — the round-4 spec audit's 28 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-79.md) | 40 | 2 | DEFERRED | rev-5 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-79 — the round-4 spec audit's 28 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-79.md) | 40 | 2 | DEFERRED | rev-6 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-82 — the round-5 spec audit's 23 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-82.md) | 41 | 2 | DEFERRED | rev-6 | 2026-11-15 |
 | [TOOL-dDeclaredLoop-86 — the round-6 spec audit's 22 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-86.md) | 42 | 2 | DEFERRED | rev-7 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-87 — the conf-constant kind is stated as a class: any module-level binding whose value holds a conf name, and every import that binds it](spec/2026-10-24-spec-TOOL-dDeclaredLoop-87.md) | 43 | 2 | DEFERRED | rev-5 | 2026-10-24 |
@@ -213,7 +213,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 763 bound to this build, across 4 record folder(s).
+Records: 764 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

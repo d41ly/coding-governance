@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-56 — the round-1 spec audit's 47 minors: owed leg rows, one reader each, honest skew and failure paths, and the citations that drifted
 
-**Status:** INPROGRESS · rev-6 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-7 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-10-25-build-TOOL-dDeclaredLoop-56-deviation-563.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-56-deviation-563.md) | deviation | — |
 | [2026-11-05-build-TOOL-dDeclaredLoop-56-deviation-564.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-56-deviation-564.md) | deviation | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-56-1-builder-return.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-56-1-builder-return.md) | journal | — |
+| [2026-11-16-build-TOOL-dDeclaredLoop-56-red-fix-54.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-56-red-fix-54.md) | red-fix | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 |
@@ -129,8 +130,10 @@ The labels keep their rev-5 numbers, which sibling specs cite; every other rev-5
 - **S36** — id 56. In `tools/loop/position.py`, where the remote ladder `resolve_remote` names no remote,
   or the remote-tracking ref of its default branch does not resolve, the remote reads absent: the answer is
   taken on local witnesses, no unit reads `deployed`, and the interrupt line `interrupt — remote · none`
-  prints. A ladder refusal, and a tracking ref whose newest reflog entry is older than the bound, still
-  answer `stale-remote`. The plant `stale-remote` is staged anew as a remote whose tracking ref carries an
+  prints. An absent remote adds no remote-tip claim and no `read` row, so no
+  `interrupt — invalidated · remote tip` line and no `claim — remote tip` line prints (§8 F9). A ladder
+  refusal, and a tracking ref whose newest reflog entry is older than the bound, still add today's claim
+  and answer `stale-remote`. The plant `stale-remote` is staged anew as a remote whose tracking ref carries an
   aged reflog entry, and the plant `no-remote` joins `PLANTS`. Observed by AC31.
 - **S37** — id 59. The plant `factory-restores-create` joins `tools/loop/factories.py`'s `PLANTS`: the
   hook factory, which creates its files, run with its gate red, after which no created file is on disk and
@@ -253,7 +256,7 @@ Read on branch `unattended-declared-loop-d56bf0` at `e8018d94f`.
 - **hands-off** `TOOL-dDeclaredLoop-65` — the remote-freshness age source of S36, which that unit reads from what a fetch and a clone write (the round-2 spec audit's id 55)
 - **hands-off** `TOOL-dDeclaredLoop-67` — the round-2 minors ids 3, 4, 12, 22, 23, 24, 36, 50, 66 and 67, each a scope item of that unit
 - **hands-off** `TOOL-dDeclaredLoop-68` — the witness normaliser of rev-5's S27, which that unit builds on the run-gates program directly, with no inline copy here to replace (§8 F7; the round-3 spec audit's id 1)
-- **hands-off** `TOOL-dDeclaredLoop-70` — S18's `read_withdrawn_parents` call, onto which that unit writes `tree=root` after this unit lands (the round-3 spec audit's id 19)
+- **hands-off** `TOOL-dDeclaredLoop-70` — S18's `derive_phase_position` call in `read_withdrawn_parents`, onto which that unit writes `tree=root` when it builds after this one in order 36; S18 passes no `extra` and takes the `extra=()` default the tip already has (§4 Dependency; the round-3 spec audit's id 19; reciprocal to that unit's rev-4 consumes-from edge)
 
 ## 4. Design
 
@@ -267,7 +270,9 @@ unit, sequenced.
 ### Evidence
 
 Read in an export of branch `unattended-declared-loop-d56bf0` at `e8018d94f`; this worktree is cut from
-main at `179486e8f`, which holds no loop kit.
+main at `179486e8f`, which holds no loop kit. Rev-7 re-read the edge with `TOOL-dDeclaredLoop-70`, the
+counts and the three gaps the first builder return names at the tip `8b06bb0a4`, where that return found
+every other claim below held.
 
 - `tools/unattended/unattended.sh#print_claims` prints six TAB fields on every row, the sixth from
   `derive_claim_keys`, one python spawn per call; the `--claims)` arm of the dispatch passes no argument.
@@ -289,7 +294,13 @@ main at `179486e8f`, which holds no loop kit.
   beside the roles kit; no arm reaches `roles_lib.py`'s `no loop kit places the workflows` refusal.
 - `tools/loop/position.py#read_remote_claim` keys the remote claim over the ladder's tracking ref and its
   newest reflog entry, and `derive_answer` answers `stale-remote` whenever that claim is not `fresh`; the
-  plant `stale-remote` stages no remote at all.
+  plant `stale-remote` stages no remote at all. Where the ladder names no remote, `read_remote_claim` keys
+  its claim over `refs/remotes/?@?` with no reflog time, `derive_claim_verdict` in `tools/loop/claims.py`
+  reads it `re-derived`, and `derive_interrupts` prints it as `interrupt — invalidated · remote tip
+  refs/remotes/?`.
+- `tools/loop/adapt.py`'s `mid-step` plant and `tools/loop/composition.py`'s `rename` plant each call
+  `position.derive_position` over a scratch with no remote: the first compares `witnesses` and `frontier`,
+  the second looks for its `composition@` row in `read`, and neither reads the answer or the claims.
 - `tools/lib/guarded_write.py#write_guarded` removes a path that did not exist on any exception; the only
   restore plant, `factory-restores`, runs the policy-key factory, which writes existing files.
 - `tools/govkit/steps/review_rounds.py` writes the mapped keys through `conf_to_policy.py`'s
@@ -297,7 +308,9 @@ main at `179486e8f`, which holds no loop kit.
   `179486e8f` holds no such program, so its `[[upgrade]]` row in `tools/unattended/kit.toml` is unlanded
   and the frozen-row check reads none of its bytes.
 - `tools/workflows/review_dispose.py#measure_class_occurrences` counts every record but `--record`, and its
-  docstring names "two prior rows from two distinct reviews" among what it does not check.
+  docstring names "two prior rows from two distinct reviews" among what it does not check;
+  `tools/workflows/README.md` says `review_dispose.py classes` counts each slug "against every other
+  review record under `--builds`".
 - `tools/unattended/lib-unattended.sh#build_commit` falls back to `read_attribution_tokens -1` per commit on
   a cache miss; the driver's DoD read calls it per CLOSED unit with no `_SUBJ` declared.
 
@@ -368,12 +381,14 @@ No function is minted.
 - `tools/unattended/kit.toml`: the comment above the step's `[[upgrade]]` row, which says the step writes the keys
 - `tools/govkit/selftest.py`
 - `tools/workflows/review_dispose.py`
+- `tools/workflows/README.md`: the `review_dispose.py classes` sentence, which counts "against every other
+  review record" and comes to count each slug once per other review, a review a record's file stem less a
+  leading `<date>-review-` and a trailing `-round<n>`, `--record`'s own review skipped (S41)
 - `tools/workflows/unattended-build.test.sh`
 - `tools/run-gates/selftest-budgets.txt`
 - `help/loop.md`
 - `help/upgrade-steps.md`
 - `memory/project/docs-undocumented.txt`
-- `memory/project/positional-refs.txt`
 
 ### Alternatives rejected
 
@@ -401,18 +416,20 @@ No function is minted.
 
 ### The sweep
 
-Read at the tip `e8018d94f`; counts PINNED there unless named DERIVED.
+Read at the tip `e8018d94f`, and the rows rev-7 moved at `8b06bb0a4`; counts PINNED there unless named
+DERIVED.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
 | `--claims` prints five fields by default | `derive_claims_line`; the DL8 AC8 arm of `skills/session-kickoff/manifest-check.test.sh`; the AC2 arm of `tools/unattended/unattended.test.sh` | the card asks `--with-key`; both arms ask it too (S9) |
-| the same | the six other `--claims` reads of `tools/unattended/unattended.test.sh`, each reading fields 1, 3 or 5 | field positions unchanged |
+| the same | the nine other `--claims` calls of `tools/unattended/unattended.test.sh`, PINNED at `8b06bb0a4`: seven field reads, AC16's of fields 1, 4 and 5 and the six others' of fields 1, 3 and 5; AC1's `claims: none`; AC3's exit 2 | no read reaches the sixth field, and field positions are unchanged |
 | the same | `tools/loop/README.md`'s sentence on the sixth field; `help/loop.md`'s; the VERBS entry and its render | each restated with the flag, the render re-copied byte for byte |
 | `--with-key` added to the usage line | `docs` and `help page commands` through `tools/govkit/step_gate.py#VERB_SOURCES` | the anchor `verb:unattended.sh:--claims` lands on `help/loop.md`, its fingerprint from `docs_leg.py --fingerprints`, and its row leaves the shrink-only `memory/project/docs-undocumented.txt` |
 | `read_withdrawn_parents` maps a no-record parent to None | `derive_parent_route`, its one caller; `TOOL-dDeclaredLoop-70` S5's planned fixture, which reads a `STAGING` parent | the route skips None; a `STAGING` parent is not withdrawn either way |
 | the parent read takes `derive_phase_position` | the four existing plants of `tools/loop/loop_parents.py` | `ABORTED` with no halt code reads `withdrawn` and `BUILDING` reads `building`, by `TOOL-dDeclaredLoop-52`'s rows |
 | `PLANTS` of `loop_parents.py` gains three | `loop parent routes` and its budget row, 60 seconds PINNED | each plant is one scratch; the row is re-priced from a timed run where a reading passes it |
 | the no-remote reading | the plant `stale-remote`; `plan-line` and `status-line`, whose scratch has a bare remote; `tools/loop/breakpoints.py`'s `driver-plan`, which checks only that a `next:` line prints | `stale-remote` restaged with a remote; the others keep their remote |
+| the same | `tools/loop/adapt.py`'s `mid-step` plant and `tools/loop/composition.py`'s `rename` plant, each calling `position.derive_position` over a scratch with no remote | their answers move off `stale-remote` and their claims lose the remote tip, and neither reads either: `mid-step` compares `witnesses` and `frontier`, and `rename` finds its `composition@` row in `read`, which held no remote row before |
 | `PLANTS` of `position.py` gains `no-remote` | `loop position fixtures` and its budget row, 411 seconds PINNED | re-priced from a timed run where a reading passes it; `TOOL-dDeclaredLoop-65`'s `offline-stale` plant re-grounds on the restaged `stale-remote` at its own pass |
 | `PLANTS` of `factories.py` gains a plant | `loop factories fixtures` and its budget row, 882 seconds PINNED | re-priced from a timed run where a reading passes it |
 | `check_terminal_proof` | `tools/loop/policy_edit.py` and `tools/playbook/instructions_edit.py`, their inline copies; the parity row `guarded_write_py` under `python resolver (behaviour + inline parity + idiom ban)` | both copies re-copied byte for byte in the same commit |
@@ -421,19 +438,19 @@ Read at the tip `e8018d94f`; counts PINNED there unless named DERIVED.
 | the roles adopter arm | `roles adopter self-test` and its suite's assertion floor | the floor rises by the arm's assertions |
 | the review-rounds up | `check_review_rounds_step` in `tools/govkit/selftest.py`; `upgrade-walk`; `step-rows-frozen` | the arm's rows for 2 and 5 expect the refusal and then, with the keys set, the line taken out; the walk drives no `REVIEW_ROUNDS` fixture; the row is unlanded on main |
 | `render_policy_text` loses this caller | `tools/govkit/steps/fanout_cap.py`, `tools/govkit/steps/conf_to_policy.py` | kept: the landed fan-out step still writes through it |
-| the class count's review key | the DL20 AC7 arm of `tools/workflows/unattended-build.test.sh`, its records `r1.md`, `r2.md`, `r3.md` | each stem is its own review, so its expectations hold |
+| the class count's review key | the DL20 AC7 arm of `tools/workflows/unattended-build.test.sh`, its records `r1.md`, `r2.md`, `r3.md`; the `review_dispose.py classes` sentence of `tools/workflows/README.md` | each stem is its own review, so its expectations hold; the sentence is restated with the review key |
 | `build_commit`'s token read | `tools/unattended/check-pass-order.sh` and `tools/unattended/check-brief-recorded.sh`, which declare `_SUBJ`; the driver's DoD read; the arms of `tools/unattended/check-unattended.test.sh` and `tools/push-main.test.sh` | a declared cache takes today's path; an undeclared one reads the same tokens once |
-| `memory/project/positional-refs.txt` | its 18 rows PINNED for this spec, rev-5's line citations, under `positional (the citation check alone)` | this revision cites symbols only, so the commit landing it runs `python tools/playbook/positional.py shrink` |
+| `memory/project/positional-refs.txt` | its 2 rows PINNED at `8b06bb0a4` for this spec, `BUILD-METHOD M4` and `BUILD-METHOD M6`, under `positional (the citation check alone)` | §1 still cites M4 and §4 M6, so no row moves and the pass leaves the file alone |
 | sibling specs | `TOOL-dDeclaredLoop-65` (S36's age source), `TOOL-dDeclaredLoop-67` (AC30, AC41, S19, S20 and the items this revision moves to §3), `TOOL-dDeclaredLoop-68` (S27), `TOOL-dDeclaredLoop-70` (S18) | each re-grounds on this revision at its own pass; the labels S18, S20 and S36 keep their meaning |
 
 ```
 B=branch/unattended-declared-loop-d56bf0
-git show "$B:.memory-tree.conf" | grep '^REFUSAL_CEILINGS'                       # the driver's token, 342
+git show "$B:.memory-tree.conf" | grep '^REFUSAL_CEILINGS'                       # the driver's token, 343
 git show "$B:.lexicon.conf" | grep '^VERB_OFFENDER_PIN'                          # "1215"
 git show "$B:.unattended.conf" | grep '^SHARED_RECORDS'
 git show "$B:memory/guides/SESSION-KICKOFF.md" | grep '^watch:'
 git show "$B:tools/govkit/check_runbook_parity.py" | grep '^PROBLEM_PIN'          # 17
-git show "$B:memory/project/positional-refs.txt" | grep -c 'spec-TOOL-dDeclaredLoop-56.md'   # 18
+git show "$B:memory/project/positional-refs.txt" | grep -c 'spec-TOOL-dDeclaredLoop-56.md'   # 2
 git grep -n -e '--claims' "$B" -- tools skills help
 git grep -n -e 'read_withdrawn_parents' -e 'derive_parent_route' "$B" -- tools help
 git grep -n -e 'stale-remote' "$B" -- tools help
@@ -452,8 +469,8 @@ git grep -n -e 'REVIEW_ROUNDS' -e 'render_policy_text' "$B" -- tools help
 - The refusal ceilings and families: `tools/memory-tree/check-arms.py#branches` and
   `tools/memory-tree/check-arms.py#scan_refusal_sites` read the edited `*.sh` files, the driver,
   `lib-unattended.sh` and `manifest-check.sh`, and no `fail` call or refusal site is added to any. The
-  driver's ceiling is 342 PINNED at the tip and 343 PINNED once `TOOL-dDeclaredLoop-52` lands under its
-  decision row; `tools/unattended/unattended.families.txt` does not move.
+  driver's ceiling is 343 PINNED at the tip `8b06bb0a4`, under `TOOL-dDeclaredLoop-52`'s decision row;
+  `tools/unattended/unattended.families.txt` does not move.
 - Help anchors: the one flag added, `--with-key`, is anchored by S10; no verb is added.
 - Subject pins, epoch delegates, upgrade rows and the kickoff watch list: no leg is added; no file of the
   memory-tree engine `check-verdict-epoch.sh` delegates to is edited; the one `[[upgrade]]` program edited is
@@ -464,12 +481,13 @@ git grep -n -e 'REVIEW_ROUNDS' -e 'render_policy_text' "$B" -- tools help
 
 ### Dependency
 
-`TOOL-dDeclaredLoop-52` (order 34, committed rev-3) is read for `derive_phase_position(phase, facts,
-phase_map=None)` and the `[[phase]]` rows, `TOOL-dDeclaredLoop-63` (order 35, committed rev-3) for its
-`extra` keyword, and `TOOL-dDeclaredLoop-70` (order 36, committed rev-2) for that keyword's default; S18
-passes no `extra` and reads the same under either default. `TOOL-dDeclaredLoop-33` (order 34, committed
-rev-6) edits `tools/loop/position.py`, `help/loop.md` and `tools/run-gates/selftest-budgets.txt` at other
-sections and rows, and S36 builds over its landed engine. `TOOL-dDeclaredLoop-53` and `TOOL-dDeclaredLoop-64`
+`TOOL-dDeclaredLoop-52` (order 34) and `TOOL-dDeclaredLoop-63` (order 35) are CLOSED, and at the tip
+`8b06bb0a4` `tools/loop/loop_table.py#derive_phase_position` reads `(phase, facts, phase_map=None,
+extra=())` beside 52's `[[phase]]` rows. S18 passes no `extra` and takes that `()` default, which builds
+nothing on another unit. `TOOL-dDeclaredLoop-70` (order 36, DEFERRED, rev-4) builds after this unit: it adds
+`tree`, moves the `extra` default, and writes `tree=root` onto S18's call, by the hands-off edge in §3.
+`TOOL-dDeclaredLoop-33` (order 34, CLOSED) edits `tools/loop/position.py`, `help/loop.md` and
+`tools/run-gates/selftest-budgets.txt` at other sections and rows, and S36 builds over its landed engine. `TOOL-dDeclaredLoop-53` and `TOOL-dDeclaredLoop-64`
 edit `help/loop.md` and the verbs carrier at other sections. `TOOL-dDeclaredLoop-54` and
 `TOOL-dDeclaredLoop-55` share no file. At order 36, `TOOL-dDeclaredLoop-71` and `TOOL-dDeclaredLoop-72`
 share no file with this unit. At order 37, `TOOL-dDeclaredLoop-65` edits `tools/loop/position.py` after
@@ -504,9 +522,9 @@ Each `python <module>.py` command below runs in the loop kit's folder unless it 
 - **AC28** — When the roles adopter suite's no-loop arm runs the adopter's `--check` over a fixture without
   the loop kit, it exits non-zero and prints `no loop kit places the workflows`.
   Red when: the absent kit reads as an empty workflow table.
-- **AC31** — When `python position.py --fixture --plant no-remote` runs, the answer is `act` and the line
-  `interrupt — remote · none` prints; `--plant stale-remote`, a remote whose tracking ref's newest reflog
-  entry predates the bound, answers `stale-remote`.
+- **AC31** — When `python position.py --fixture --plant no-remote` runs, the answer is `act`, the line
+  `interrupt — remote · none` prints, and no line names `remote tip`; `--plant stale-remote`, a remote
+  whose tracking ref's newest reflog entry predates the bound, answers `stale-remote`.
   Red when: a scratch with no remote answers `stale-remote`.
 - **AC32** — When `python factories.py --fixture --plant factory-restores-create` runs, the hook factory's
   gate is red, it exits 1, and none of the files it created is on disk.
@@ -549,41 +567,54 @@ rule; S9's edit to `tools/unattended/unattended.test.sh` keeps that suite truthf
 
 ## 8. Open questions
 
-- **F1 — Which binding line does a unit the spec audit promoted carry?** RESOLVED (agent, 2026-10-24,
-  delegated): `**Derived:** PLAY-dClosedLoop-2`, rung 3, as `TOOL-dDeclaredLoop-36` §8 F1 records.
-  widens: none · relaxes: none
+- **F1 — Which binding line does a unit the spec audit promoted carry?** Options: (a)
+  `**Derived:** PLAY-dClosedLoop-2`, as `TOOL-dDeclaredLoop-36` §8 F1 records for every promoted unit; (b) no
+  binding line beyond the header's `advances`. (b) leaves the unit with no clause to answer to. First
+  resolved 2026-10-24 by rung 3 and re-affirmed at rev-7. widens: none · relaxes: none ·
+  RESOLVED (agent, 2026-11-16, delegated): (a)
 - **F2 — One batch unit or two?** Options: (a) one; (b) two halves by write set. §4 shows the kept items
-  meet in shared files, failing M6's clause 1. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3.
-  widens: none · relaxes: none
+  meet in shared files, failing M6's clause 1. First resolved 2026-10-24 by rung 3 and re-affirmed at
+  rev-7. widens: none · relaxes: none · RESOLVED (agent, 2026-11-16, delegated): (a)
 - **F3 — How does `--claims` survive kit skew (S10)?** Options: (a) six fields by default with a tolerant
   card; (b) five by default, six under `--with-key`. (a) still breaks an old card over a new driver, the
-  skeptic's reason for judging the finder's fix unsound. RESOLVED (agent, 2026-10-24, delegated): (b), rung
-  3; the flag serves the clause's keyed claims, the surface `PLAY-dClosedLoop-3` grants for this build's
-  clauses. grants: PLAY-dClosedLoop-3 the --claims --with-key flag · widens: none · relaxes: none
+  skeptic's reason for judging the finder's fix unsound. The flag serves the clause's keyed claims, the
+  surface `PLAY-dClosedLoop-3` grants for this build's clauses. First resolved 2026-10-24 by rung 3 and
+  re-affirmed at rev-7. grants: PLAY-dClosedLoop-3 the --claims --with-key flag · widens: none ·
+  relaxes: none · RESOLVED (agent, 2026-11-16, delegated): (b)
 - **F4 — Where does the review-rounds upgrade write (S40)?** Options: (a) a proposal the owner lands; (b) a
   new admitted shape in the guard. (b) widens the guard's write surface, veto 3, and the skeptic judged it
-  unsound. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: none · relaxes: none
+  unsound. First resolved 2026-10-24 by rung 3 and re-affirmed at rev-7. widens: none · relaxes: none ·
+  RESOLVED (agent, 2026-11-16, delegated): (a)
 - **F5 — Who writes `enforces` for a leg whose own unit names none?** Options: (a) each such unit's own pass
-  writes the key, and S4 only observes; (b) S4 writes the keys at order 36; (c) a pending-list row.
-  RESOLVED (owner, 2026-11-05): (a) each unit's own pass writes the key.
+  writes the key, and S4 only observes; (b) S4 writes the keys at order 36; (c) a pending-list row. The
+  owner's own pick, kept under the owner's mark, since an agent mark would sign the owner's decision as the
+  agent's. RESOLVED (owner, 2026-11-05): (a)
 - **F6 — Does the mandate arm read the driver's derived phase (rev-5 S22)?** The built guard admits a run's
   branch through the policy kit's `check_run_mandate`, which reads the raw `phase` at HEAD by its own
   contract. Options: (a) the loop guard, after that admission, runs the driver's `--status <slug>` and
   refuses a terminal phase on its first line; (b) leave the read where it is and state what it does not
   check; (c) source the driver and call its internal `read_derived_phase`. (a) runs the position engine and
   the driver's `--plan` inside a commit hook; (c) binds the guard to a function no contract declares.
-  Recommendation: (b). RESOLVED (agent, 2026-11-16, delegated): (b), by rung 3. widens: none · relaxes: none
+  Recommendation: (b), by rung 3. widens: none · relaxes: none · RESOLVED (agent, 2026-11-16, delegated): (b)
 - **F7 — Does S27's inline normaliser land here (rev-5 S27)?** `TOOL-dDeclaredLoop-68`, at order 37,
   replaces it with the run-gates program. Options: (a) build the inline copy and its parity row here, for 68
   to replace one order later; (b) leave the normaliser to 68, which builds it on the run-gates program
-  directly. (a) writes code whose only future is deletion. Recommendation: (b). RESOLVED (agent,
-  2026-11-16, delegated): (b), by rung 3. widens: none · relaxes: none
+  directly. (a) writes code whose only future is deletion. Recommendation: (b), by rung 3. widens: none ·
+  relaxes: none · RESOLVED (agent, 2026-11-16, delegated): (b)
 - **F8 — Does the upstream join write through the record factory (rev-5 S29)?** Options: (a) register an
   `upstream` typed kind, in `tools/memory-tree/tree_lib.py#TYPED_RECORD_KINDS` and the factory's kind table,
   with its grammar section in the hygiene guide and its row in the typed-kinds plant, and write through
   `write_record`; (b) keep the module's `journal` record, created exclusively, which no reader reads. (a)
   moves the memory-tree kit's vocabulary, its guide and its verdict epoch for a record nothing reads.
-  Recommendation: (b). RESOLVED (agent, 2026-11-16, delegated): (b), by rung 3. widens: none · relaxes: none
+  Recommendation: (b), by rung 3. widens: none · relaxes: none · RESOLVED (agent, 2026-11-16, delegated): (b)
+- **F9 — What does an absent remote do with the remote-tip claim (S36)?** At the tip `8b06bb0a4`,
+  `read_remote_claim` keys a claim over `refs/remotes/?@?` with no reflog time, which reads `re-derived`
+  and prints `interrupt — invalidated · remote tip refs/remotes/?`. Options: (a) an absent remote adds no
+  remote-tip claim, and `interrupt — remote · none` alone names the absence; (b) the claim stays and prints
+  its `claim —` line, and `derive_interrupts` skips it where the remote reads absent; (c) both interrupts
+  print. (c) calls a witness invalidated that was never read, against "the remote reads absent"; (b) keeps
+  a claim keyed over no ref, which nothing can re-derive. Recommendation: (a), by rung 3. widens: none ·
+  relaxes: none · RESOLVED (agent, 2026-11-16, delegated): (a)
 
 ## 9. Revision log
 
@@ -609,6 +640,14 @@ rule; S9's edit to `tools/unattended/unattended.test.sh` keeps that suite truthf
   S10's card needs no fallback call; S18 reads through `derive_phase_position`; S20's EOF clause binds
   nothing; S36 keeps the reflog age built and adds the no-remote reading; S37 is the created-path plant;
   S40 proposes and never overwrites; the runbook pin is 17; line citations made symbol citations; the sweep.
+- rev-7 · 2026-11-16 · §2 S36 · §3 Edges · §4 Evidence, Files touched, the sweep, Budgets and records,
+  Dependency · §6 AC31 · §8 F1 to F9 · per the return `2026-11-16-build-TOOL-dDeclaredLoop-56-1-builder-return`,
+  whose dispatch check 49 refused this unit's edge to TOOL-dDeclaredLoop-70: that edge reads hands-off,
+  naming S18's `derive_phase_position` call, reciprocal to 70's rev-4; Dependency reads the tip's `extra=()`
+  default; the positional rows are 2, no row moves and the registry leaves Files touched; the suite's other
+  `--claims` calls are nine; `tools/workflows/README.md` joins Files touched for S41; S36 adds no remote-tip
+  claim for an absent remote, by the new F9; the sweep gains the `mid-step` and `rename` plants; the
+  driver's ceiling reads 343; every agent fork ends on its delegated mark, F5 keeping the owner's.
 
 ## 10. Reuse audit
 
