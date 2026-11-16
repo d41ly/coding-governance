@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-21 — the review round bounds as policy keys: review.max-rounds, the design rounds and follow-ups, REVIEW_ROUNDS and RUNAWAY_CEILING retired
 
-**Status:** INPROGRESS · rev-4 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 26 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-5 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 26 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0106@90aa01b6 whole
 **Carries:** node:policy-key.review.follow-up
@@ -23,6 +23,7 @@
 | [2026-11-05-build-TOOL-dDeclaredLoop-21-deviation-212.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-21-deviation-212.md) | deviation | — |
 | [2026-11-05-build-TOOL-dDeclaredLoop-21-deviation-213.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-21-deviation-213.md) | deviation | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-21-1-builder-return.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-1-builder-return.md) | journal | — |
+| [2026-11-16-build-TOOL-dDeclaredLoop-21-deviation-214.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-21-deviation-214.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-56 |
@@ -41,10 +42,10 @@
 Every review loop's bound becomes a policy value the owner sets in one file: `review.max-rounds` bounds
 every loop, the closing review's follow-ups included, the design audit's rounds follow
 `review.design.rounds` and `review.design.round-count`, and the closing review's follow-ups follow
-`review.follow-up`. Today the backstop is a file constant, `RUNAWAY_CEILING="8"`
-(`tools/unattended/unattended.sh:774`), the spec bound a conf key, `REVIEW_ROUNDS`
-(`tools/unattended/unattended.sh:779`), and the closing review had no bound but the constant (the
-stall-and-loop round, P39; v2:1253-1255).
+`review.follow-up`. Today the backstop is a file constant, `RUNAWAY_CEILING="8"`, set inside
+`tools/unattended/unattended.sh#load_driver_conf`, the spec bound is a conf key, `REVIEW_ROUNDS`, read in
+the same function, and the closing review has no bound but the constant (the stall-and-loop round, P39;
+v2:1253-1255).
 
 ## 2. Scope (IN)
 
@@ -55,93 +56,117 @@ stall-and-loop round, P39; v2:1253-1255).
   1 under `one`, `review.design.round-count` under `fixed-count`, and `review.max-rounds` under each
   `until-*` value; and the closing bound, 1 under `never` and `review.max-rounds` otherwise. Its CLI,
   `python tools/loop/review_bounds.py show [--rev <rev>]`, prints
-  `max-rounds=<n> spec-bound=<n> closing-bound=<n> follow-up=<value>` on one line. Observed by AC1, AC3.
-- **S2** — The refusal. A `review.design.round-count` above `review.max-rounds` is refused under
-  `fixed-count`, naming both keys and both values, and a count equal to it is admitted (v2:1254). Any
-  value below 1 or outside a key's catalogued values is refused. The refusal lives in the loop kit, so it
-  holds with `unattended.sh` absent: `check_review_bounds` runs as an arm of `loop_lib.py --check`, the
-  leg `loop definition` (TOOL-dDeclaredLoop-1 S7), over the tree's policy file, and the module's plants
-  run by `python tools/loop/review_bounds.py --fixture`, the leg `loop review bounds fixtures` in
-  `tools/gate-legs.json`, carrying `enforces = ["principle.p38"]` (dOrderedCharter-7 S2), the tag of the
-  v2 `[enforcement]` row naming this unit's clause `cl-dClosedLoop-0106`, declared in
-  `tools/loop/kit.toml`. Where the pending list holds a `principle` row for that tag, this pass deletes
-  it, as the meta-check reds it stale. Observed by AC1, AC2 and AC10.
-  **Readers:** by name: READER NOT IN TREE — the pending list and its reader, the meta-check verb of the
-  playbook kit's core.py, are minted by PLAY-dOrderedCharter-7, DEFERRED, so no tracked file spells the
-  row of `principle.p38` at this spec's base · by value: NO VALUE READERS — a pending row's value is its
-  arming build, which the meta-check prints only in its pending count.
-- **S3** — `RUNAWAY_CEILING` retired into `review.max-rounds`. `review_state`
-  (`tools/unattended/unattended.sh:12610-12618`) keeps its test order, zero, then non-decrease, then the
-  ceiling, then the bound, with the ceiling read as one round past `review.max-rounds`
-  (`n + 1 > max-rounds`), dFairHearing-17's `deriveRoundState` order; `verb_review`'s bound
-  (:12769) takes the closing bound on the slug subject and the spec bound on every other, and the exit
-  sentences (:12857-12858) name the key. **Readers:** by name: `tools/unattended/unattended.sh`
-  (:774, :12611, :12615, :12769, :12857), `tools/unattended/check-unattended.sh` (:624, :726-727, :821,
-  :876), `tools/unattended/unattended.test.sh` (:7073-7075), `tools/unattended/check-unattended.test.sh`
-  (:1097-1100), `tools/unattended/runlog-writer.test.sh` (:396), and `tools/workflows/tier2-review.test.sh`,
-  whose parity arm dFairHearing-17 S5 adds slices the constant's line and takes the ceiling as its
-  own variable instead, which the arm sets to each row's limit, so the driver's ceiling
+  `max-rounds=<n> spec-bound=<n> closing-bound=<n> follow-up=<value>` on one line, and
+  `python tools/loop/review_bounds.py --fixture [--plant <case>]` runs S2's plants. Each verb has a
+  `tools/govkit/usage.toml` row and a usage anchor on `help/loop.md` (S10). Observed by AC1, AC3, AC9.
+- **S2** — The refusal and its leg. A `review.design.round-count` above `review.max-rounds` is refused
+  under `fixed-count`, naming both keys and both values, and a count equal to it is admitted (v2:1254).
+  Any value below 1 or outside a key's catalogued values is refused. The refusal lives in the loop kit,
+  so it holds with `unattended.sh` absent: `check_review_bounds` runs as an arm of `loop_lib.py --check`,
+  the leg `loop definition` (TOOL-dDeclaredLoop-1 S7), over the tree's policy file, and the module's
+  plants run by `python tools/loop/review_bounds.py --fixture`, the new leg `loop review bounds fixtures`
+  in `tools/gate-legs.json`. Its row carries `enforces = ["principle.p38"]` (dOrderedCharter-7 S2), the
+  tag of the v2 `[enforcement]` row naming this unit's clause `cl-dClosedLoop-0106`, and
+  `stage = ["step.test"]`, the key every leg row carries, with chunk `selftests`, subject `kit` and a
+  ceiling of 120 seconds. The leg is gov's own: an `[[exempt_leg]]` row in `tools/govkit/registry.toml`
+  and the row `python tools/govkit/govkit.py selfcheck --write` writes into
+  `tools/govkit/subject-pins.tsv`, with a comment in `tools/loop/kit.toml` naming the module and its leg,
+  as `loop upstream fixtures` is declared. It gains a `tools/run-gates/selftest-budgets.txt` row priced
+  from a timed run of its plants, PINNED with date and node by that file's rule, and the claim in
+  `memory/map/features/loop.md`, with `python tools/codebase-map/gen_map.py --write` regenerating the
+  four files under `memory/map/generated/`. The pending list holds the row
+  `principle principle.p38 dGroundRules`, which this pass deletes, as the meta-check reds a pending row
+  whose item is now enforced. Observed by AC1, AC2 and AC10.
+  **Readers:** by name: `tools/playbook/core-pending.txt`, the pending list that spells `principle.p38`, and `tools/playbook/core.py`, whose `meta-check` verb reads that list and reds a row whose item a leg now enforces
+  by value: NO VALUE READERS — a pending row's value is its arming build, which the meta-check prints only in its pending count.
+- **S3** — `RUNAWAY_CEILING` retired into `review.max-rounds`. `tools/unattended/unattended.sh#review_state`
+  keeps its test order, zero, then non-decrease, then the ceiling, then the bound, with the ceiling read
+  as one round past `review.max-rounds` (`n + 1 > max-rounds`), dFairHearing-17's `deriveRoundState`
+  order. `tools/unattended/unattended.sh#verb_review` takes the closing bound on the slug subject and the
+  spec bound on every other (`tools/unattended/unattended.sh@a47450e4:13215`), and its `CEILING` and
+  `BOUNDED` exit sentences (`tools/unattended/unattended.sh@a47450e4:13324-13325`) name the key they
+  stopped at. The constant's own line and its comment block go out of
+  `tools/unattended/unattended.sh#load_driver_conf` (`tools/unattended/unattended.sh@a47450e4:923-931`).
+  The parity arm dFairHearing-17 S5 added to `tools/workflows/tier2-review.test.sh`
+  (`tools/workflows/tier2-review.test.sh@e7cbf525:3787-3797`) slices the constant's line and takes the
+  ceiling as its own variable instead, which the arm sets to each row's limit, so the driver's ceiling
   sits one round past it as dFairHearing-17 §4 "The rule" puts the harness's, and the limit-4 row reads
-  `BOUNDED` in both · by value: the `ceiling of 8` arms of `tools/unattended/unattended.test.sh`
-  (:9310, :9316), each re-pointed to `review.max-rounds`'s default of 3. Observed by AC4.
+  `BOUNDED` in both. Observed by AC4.
+  **Readers:** by name: `tools/unattended/unattended.sh` (`load_driver_conf`, `review_state`, `verb_review`), `tools/unattended/check-unattended.sh`, `tools/unattended/unattended.test.sh`, `tools/unattended/check-unattended.test.sh`, `tools/unattended/runlog-writer.test.sh`, `tools/workflows/tier2-review.test.sh`
+  by value: the `ceiling of 8` arms of `tools/unattended/unattended.test.sh` (`tools/unattended/unattended.test.sh@8aae640b:11128` and `tools/unattended/unattended.test.sh@8aae640b:11134`), each re-pointed to `review.max-rounds`'s default of 3, the ceiling read of that suite (`tools/unattended/unattended.test.sh@8aae640b:8657-8659`), and check 2's awk arm in `tools/unattended/check-unattended.sh`, which S6 re-points.
 - **S4** — `REVIEW_ROUNDS` retired into `review.design.rounds` and `review.design.round-count`, with
-  `REVIEW_ROUNDS_DEFAULT` (:447), its `read_bound_key` call (:779), its strict-below refusal (:783) and
-  the NOTE it prints. **Readers:** by name: `tools/unattended/unattended.sh` (:447, :507, :565, :767,
-  :779-783, :12599, :12768, :12858), `tools/unattended/check-unattended.sh` (:1850-1876, :1881-1892,
-  :2652, :2721-2737), `tools/unattended/kit.toml` (:174, `optional_keys`), `.unattended.conf` (:111),
-  `tools/unattended/.unattended.conf.example` (:118), `tools/unattended/lib-unattended.sh` (:222),
-  `tools/unattended/README.md` (:359, :367), `tools/unattended/PROTOCOL.template.md` (:487) and its
-  render `memory/guides/UNATTENDED-PROTOCOL.md`, `tools/unattended/VERBS.template.md` (:243, :798) and
-  its render `memory/guides/UNATTENDED-VERBS.md`, `tools/memory-tree/BUILD-METHOD.template.md` (:144,
-  and :148, M4's chain paragraph, whose "so `REVIEW_ROUNDS` bounds no chain" becomes "so no round bound
-  bounds a chain", naming no policy key a reader could take for a chain stop) and its render
-  `memory/guides/BUILD-METHOD.md`, and `tools/workflows/unattended-build.template.js`
-  (:224, :317) and its render `tools/workflows/unattended-build.js` · by value: the `REVIEW_ROUNDS="7"`
-  fixture lines of `tools/unattended/unattended.test.sh` (the `mkconf` default at :243 and its
-  seventh-positional caller at :7211, the seven conf heredocs from :10543 to :16542, and the two
-  `printf` confs at :17103 and :17241) and `tools/unattended/resume-tick.test.sh` (:166), the default read at
-  `tools/unattended/unattended.test.sh:9295-9301`, and the round-bound arms of
-  `tools/unattended/check-unattended.test.sh` (:756, :5958-6019), and the copied refusal of
-  `tools/unattended/runlog-writer.test.sh` (:388, :396), each re-pointed to a policy file
-  setting `review.design.rounds = "fixed-count"` and `review.design.round-count`. Observed by AC5.
+  `REVIEW_ROUNDS_DEFAULT` (`tools/unattended/unattended.sh@a47450e4:588`), its `read_bound_key` call, its
+  strict-below refusal and the NOTE it prints (`tools/unattended/unattended.sh@a47450e4:932-940`, inside
+  `load_driver_conf`). Every line `git grep -n REVIEW_ROUNDS` prints in a by-name reader below is
+  re-worded to the policy keys or goes, DERIVED by that command at the pass rather than pinned here.
+  BUILD-METHOD M4's chain paragraph, whose "so `REVIEW_ROUNDS` bounds no chain" becomes "so no round
+  bound bounds a chain", names no policy key a reader could take for a chain stop. The generated
+  `tools/policy/legacy-homes.txt` loses its row `.unattended.conf REVIEW_ROUNDS owner-policy` through
+  `python tools/policy/policy.py lists --write`, run after S9, since `lists --check` reds a row no
+  home yields; `help/policy.md`'s example row becomes `.unattended.conf GATE_BOUND owner-policy`, a row
+  the list keeps. The by-value fixtures split in two. A fixture conf that declares the key only so the
+  driver prints no blank-key NOTE and runs no review round loses the line:
+  `tools/loop/loop_witness.py#HOLD_CONF`, the conf of `tools/unattended/pass-tree.test.sh`, the conf of
+  `tools/unattended/resume-tick.test.sh`, and each conf heredoc and `printf` conf of
+  `tools/unattended/unattended.test.sh` whose arm runs no `--review`. A fixture that bounds a review,
+  `tools/unattended/unattended.test.sh#mkconf`'s seventh positional, default 7, with its callers, and
+  the round-bound arms of `tools/unattended/check-unattended.test.sh` through its `write_rounds_line`,
+  is re-pointed to a committed policy file setting `review.design.rounds = "fixed-count"` and
+  `review.design.round-count` at the value, with `review.max-rounds` raised to the value where it
+  exceeds 3, as S7 maps an adopter's value, since S2 refuses a count above the ceiling. An arm that read
+  the slug subject's `CEILING` at round 8 reads `BOUNDED` at that closing bound, as §4 "The bounds" says.
+  The driver suite's default read (`tools/unattended/unattended.test.sh@8aae640b:11113-11119`) reads
+  `review_bounds.py show` instead, the copied refusal of `tools/unattended/runlog-writer.test.sh`
+  (`tools/unattended/runlog-writer.test.sh@2c1687bc:522-530`) goes with the driver's, and
+  `tools/policy/check_policy.py#LEGACY_CONF` plants `GATE_BOUND="3"` where it planted the retired key,
+  which changes no expected report, because that fixture seeds its own list. Observed by AC5.
+  **Readers:** by name: `tools/unattended/unattended.sh` (`REVIEW_ROUNDS_DEFAULT`, `load_driver_conf`, `verb_review`), `tools/unattended/check-unattended.sh` (`read_rounds_of`, `scan_round_writes`), `tools/unattended/kit.toml`, `.unattended.conf`, `tools/unattended/.unattended.conf.example`, `tools/unattended/lib-unattended.sh`, `tools/unattended/README.md`, `tools/unattended/PROTOCOL.template.md` and its render `memory/guides/UNATTENDED-PROTOCOL.md`, `tools/unattended/VERBS.template.md` and its render `memory/guides/UNATTENDED-VERBS.md`, `tools/memory-tree/BUILD-METHOD.template.md` and its render `memory/guides/BUILD-METHOD.md`, `tools/workflows/unattended-build.template.js` and its render `tools/workflows/unattended-build.js`, `tools/policy/legacy-homes.txt`, `help/policy.md`
+  by value: `tools/unattended/unattended.test.sh` (`mkconf`, its conf heredocs and `printf` confs), `tools/unattended/check-unattended.test.sh` (`write_rounds_line` and the round-bound arms), `tools/unattended/runlog-writer.test.sh`, `tools/unattended/resume-tick.test.sh`, `tools/unattended/pass-tree.test.sh`, `tools/loop/loop_witness.py` (`HOLD_CONF`), `tools/policy/check_policy.py` (`LEGACY_CONF`), each treated as the paragraph above says.
 - **S5** — `review.follow-up` on the closing review's subject: `never` gives it one round; `after-high`
   re-arms a follow-up only after a round standing on a blocker or a high, read from the count the
   round records, which TOOL-dDeclaredLoop-32 widens to blockers and highs; `while-finding` is admitted
   and bounded by `review.max-rounds` here, its stopping rule TOOL-dDeclaredLoop-32's, as every
   `until-*` value of `review.design.rounds` is. Observed by AC3.
-- **S6** — `tools/unattended/check-unattended.sh` re-pointed. Check 2's ceiling (:624) is read from
+- **S6** — `tools/unattended/check-unattended.sh` re-pointed. Check 2's ceiling, read today by
+  `core_of RUNAWAY_CEILING` (`tools/unattended/check-unattended.sh@f86fd49d:765`), is read from
   `python <prefix>/loop/review_bounds.py show`, an unreadable value refusing as the empty ceiling does
-  today (:726-727), and its awk arm (:821, :876) compares each subject's rounds with that subject's
-  bound. Check 19 (:2719-2738), the owner-only round bound, is re-pointed and kept: its
-  `read_rounds_of` (:1859-1876) reads the spec bound at each commit and each parent through
-  `review_bounds.py show --rev`, so a run commit moving the effective bound in `.governance/policy.toml`
-  reds as a conf edit does today. Observed by AC6.
+  today (`tools/unattended/check-unattended.sh@f86fd49d:873-874`), and its awk arm
+  (`tools/unattended/check-unattended.sh@f86fd49d:998`, compared at
+  `tools/unattended/check-unattended.sh@f86fd49d:1071-1072`) compares each subject's rounds with that
+  subject's bound. Check 19's round-bound arm
+  (`tools/unattended/check-unattended.sh@f86fd49d:3046-3068`), the owner-only round bound, is re-pointed
+  and kept: `tools/unattended/check-unattended.sh#read_rounds_of`, called by
+  `tools/unattended/check-unattended.sh#scan_round_writes` at each commit and each parent, reads the
+  spec bound through `review_bounds.py show --rev`, so a run commit moving the effective bound in
+  `.governance/policy.toml` reds as a conf edit does today, and the arm's comment block and failure
+  sentence name the policy file. Observed by AC6.
 - **S7** — The upgrade step (I25). An `[[upgrade]]` row `unattended/review-rounds-to-policy` in
-  `tools/unattended/kit.toml`, its program `tools/govkit/steps/review_rounds.py`, on dSafePassage-1's
-  step kind: up reads an adopter's effective `REVIEW_ROUNDS`, writes nothing for 1, which is the
-  catalogue default `one`, and for N above 1 writes `review.design.rounds = "fixed-count"` and
-  `review.design.round-count = N`, adding `review.max-rounds = N` when N exceeds 3 so the adopter's
-  bound reads the same; then it deletes the conf line. Down restores both files byte-identical.
-  Observed by AC7.
-  **Readers:** by name: in an adopter's tree the line is read only by its installed copy of this kit,
-  the same files S4 re-points in this unit, so the release that ships the step ships no reader of it:
-  `tools/unattended/unattended.sh` (:779, its `read_bound_key` call), `tools/unattended/check-unattended.sh`
-  (:1859-1876, `read_rounds_of`), `tools/unattended/kit.toml` (:174, `optional_keys`) and
-  `tools/unattended/.unattended.conf.example` (:118); S4 carries the full list, and gov's own line,
-  `.unattended.conf` (:111), is S9's · by value: the adopter's N, read today by `verb_review`'s bound
-  in `tools/unattended/unattended.sh` (:12769) and by check 19 through `read_rounds_of` in
-  `tools/unattended/check-unattended.sh`, each reading `review.design.round-count` after S4 and S6, the
-  key the step writes N into.
+  `tools/unattended/kit.toml`, shaped as the `agent-cap/fanout-cap-to-agents-in-flight` row of
+  `tools/hooks/kit.toml`: `up`, `down` and `witness` argv on its program
+  `tools/govkit/steps/review_rounds.py`, `surfaces = ["conf-key:.unattended.conf#REVIEW_ROUNDS"]` and
+  `needs-target`. On dSafePassage-1's step kind, up reads an adopter's effective `REVIEW_ROUNDS`,
+  writes nothing for 1, which is the catalogue default `one`, and for N above 1 writes
+  `review.design.rounds = "fixed-count"` and `review.design.round-count = N`, adding
+  `review.max-rounds = N` when N exceeds 3 so the adopter's bound reads the same; then it deletes the
+  conf line. Down restores both files byte-identical. Witness exits 0 when no `REVIEW_ROUNDS`
+  assignment is left in the conf. Each of the three verbs has a `tools/govkit/usage.toml` row and a
+  usage anchor on `help/upgrade-steps.md`, beside `fanout_cap.py`'s three, and its arms join
+  dSafePassage-1's in `tools/govkit/selftest.py`. Observed by AC7, AC9.
+  **Readers:** by name: in an adopter's tree the line is read only by its installed copy of this kit, the same files S4 re-points in this unit, so the release that ships the step ships no reader of it: `tools/unattended/unattended.sh` (`load_driver_conf`), `tools/unattended/check-unattended.sh` (`read_rounds_of`), `tools/unattended/kit.toml` and `tools/unattended/.unattended.conf.example`; S4 carries the full list, and gov's own line, in `.unattended.conf`, is S9's
+  by value: the adopter's N, read today by `verb_review`'s bound in `tools/unattended/unattended.sh` and by check 19 through `read_rounds_of` in `tools/unattended/check-unattended.sh`, each reading `review.design.round-count` after S4 and S6, the key the step writes N into.
 - **S8** — The shared step, extracted at this second instance (I25): the move of one conf key into
   policy keys and back, `tools/govkit/steps/conf_to_policy.py`, which dSafePassage-1 S6's
   `tools/govkit/steps/fanout_cap.py` and S7's program both call, re-pointed in this unit with their
   bytes out unchanged. Observed by AC8.
 - **S9** — Gov migrated first: S7's up runs on gov's own tree in this unit's commit, and gov's
-  `REVIEW_ROUNDS="1"` (`.unattended.conf:111`) maps to the default, so the line goes and no policy key is
-  written. Observed by AC7.
+  `REVIEW_ROUNDS="1"` in `.unattended.conf` maps to the default, so the step leaves no line and writes
+  no policy key; S4's regeneration of `tools/policy/legacy-homes.txt` follows it. Observed by AC5, AC7.
 - **S10** — The page `help/loop.md` (TOOL-dDeclaredLoop-1 S7) gains a section on the review bounds:
-  the four keys, the two derived bounds, and that a count equal to `review.max-rounds` is admitted and
-  raising any of them is the owner's. Observed by AC9.
+  the four keys, the two derived bounds, that a count equal to `review.max-rounds` is admitted and
+  raising any of them is the owner's, and the usage anchors of `review_bounds.py show` and
+  `review_bounds.py --fixture`. The page `help/upgrade-steps.md` gains the step's section with its
+  three anchors, each anchor's fingerprint as `python tools/govkit/docs_leg.py --fingerprints` prints
+  it. Observed by AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -177,17 +202,19 @@ stall-and-loop round, P39; v2:1253-1255).
 count did not fall; `CEILING` when `r > max-rounds`; `BOUNDED` when `r >= bound`; `CONVERGING`
 otherwise. The non-decrease reading applies to the closing review's subject: a spec audit passes
 `no-fall` (TOOL-dDeclaredLoop-32 S3) and ends at its target or its bound, `CONVERGED`, `BOUNDED` or
-`CEILING`, never `NON-CONVERGENT`. A bound equal to the ceiling is reached as `BOUNDED`, the equality S2 admits; today the
-ceiling's `>=` test fired first, which is why `:783` refused equality.
+`CEILING`, never `NON-CONVERGENT`. A bound equal to the ceiling is reached as `BOUNDED`, the equality S2
+admits; today the ceiling's `>=` test in `tools/unattended/unattended.sh#review_state` fires first, which
+is why `load_driver_conf` refuses equality.
 
 ### How the shell reads it
 
-`verb_review` and `--preflight` call `"$py" "<prefix>/loop/review_bounds.py" show`, the python from
-the driver's inlined `resolve_python` (`tools/unattended/unattended.sh:392-422`), and split the one
-line on spaces into `MAX_ROUNDS`, `SPEC_BOUND`, `CLOSING_BOUND` and `FOLLOW_UP`; nothing is sourced, and
-no shell copy of the policy parse is added (I10). A refusal's stderr is passed through and the verb
-fails 37. The load-time refusal at `:783` moves into these two callers, so a driver verb that reads no
-review bound starts no python.
+One driver function, `load_review_bounds`, runs `"$py" "<prefix>/loop/review_bounds.py" show`, the
+python from the driver's inlined `tools/unattended/unattended.sh#resolve_python`, and splits the one
+line on spaces into `MAX_ROUNDS`, `SPEC_BOUND`, `CLOSING_BOUND` and `FOLLOW_UP`; nothing is sourced,
+and no shell copy of the policy parse is added (I10). `tools/unattended/unattended.sh#verb_review` and
+`tools/unattended/unattended.sh#verb_preflight` call it. On a refusal it passes the module's stderr
+through, and `verb_review` fails 37. The load-time refusal leaves `load_driver_conf` for this one
+function, so a driver verb that reads no review bound starts no python.
 
 ### Migration
 
@@ -199,20 +226,38 @@ an unknown key once `kit.toml` drops it from `optional_keys`, which govkit's con
 Live at landing. Gov's spec bound stays 1; the closing review's backstop moves from 8 rounds to 3,
 v2:1255's default, and a round past 3 now reads `CEILING`.
 
+### What this does not check
+
+The leg `loop review bounds fixtures` checks the module's derivation and refusal over its plants, and
+`check_review_bounds` checks the tree's own policy file. Neither checks that the driver or check 2
+reads the bound it prints, which AC4 and AC6 observe in the waived unattended suites, nor that a
+round's recorded counts are true, nor that an owner's raise was the owner's, which check 19 grades
+only over a run's own commits.
+
 ### Files touched (estimate)
 
 - `tools/loop/review_bounds.py` (new)
 - `tools/loop/loop_lib.py`: `--check` calling `check_review_bounds`
-- `tools/loop/kit.toml`: the module and the leg declared
-- `tools/gate-legs.json`: the leg `loop review bounds fixtures`, its `enforces` holding `principle.p38`
-- `tools/playbook/core-pending.txt`: the stale `principle` row of S2's tag, where it holds one
-- `help/loop.md`: the section of S10
+- `tools/loop/kit.toml`: the comment naming the module and its leg
+- `tools/loop/loop_witness.py`: the line out of `HOLD_CONF`
+- `tools/gate-legs.json`: the leg `loop review bounds fixtures`, its `enforces` holding `principle.p38` and its `stage`
+- `tools/govkit/registry.toml`: the leg's `[[exempt_leg]]` row
+- `tools/govkit/subject-pins.tsv`: the leg's row, written by govkit's `selfcheck --write` (S2)
+- `tools/govkit/usage.toml`: the rows of `review_bounds.py` and `review_bounds.py#show`, and of `review_rounds.py#up`, `#witness` and `#down`
+- `tools/govkit/selftest.py`: the arms of AC7 and AC8
+- `tools/run-gates/selftest-budgets.txt`: the leg's row
+- `tools/playbook/core-pending.txt`: the row of `principle.p38`
+- `tools/policy/check_policy.py`: `LEGACY_CONF`
+- `tools/policy/legacy-homes.txt`: regenerated by the policy kit's `lists --write` (S4)
+- `help/loop.md`: the section of S10 and the two anchors
+- `help/upgrade-steps.md`: the step's section and its three anchors
+- `help/policy.md`: the example row
 - `tools/unattended/unattended.sh`
 - `tools/unattended/check-unattended.sh`
 - `tools/unattended/kit.toml`
 - `tools/unattended/.unattended.conf.example`
 - `.unattended.conf`
-- `tools/unattended/lib-unattended.sh`: the comment at :222
+- `tools/unattended/lib-unattended.sh`: the comment naming the key's `read_bound_key` call
 - `tools/unattended/README.md`
 - `tools/unattended/PROTOCOL.template.md` and its render `memory/guides/UNATTENDED-PROTOCOL.md`
 - `tools/unattended/VERBS.template.md` and its render `memory/guides/UNATTENDED-VERBS.md`
@@ -221,8 +266,28 @@ v2:1255's default, and a round past 3 now reads `CEILING`.
 - `tools/govkit/steps/conf_to_policy.py` (new), `tools/govkit/steps/review_rounds.py` (new),
   `tools/govkit/steps/fanout_cap.py`
 - `tools/unattended/unattended.test.sh`, `tools/unattended/check-unattended.test.sh`,
-  `tools/unattended/resume-tick.test.sh`, `tools/unattended/runlog-writer.test.sh`
+  `tools/unattended/resume-tick.test.sh`, `tools/unattended/runlog-writer.test.sh`,
+  `tools/unattended/pass-tree.test.sh`
 - `tools/workflows/tier2-review.test.sh`: dFairHearing-17's parity arm
+- `memory/map/features/loop.md`: the leg's claim
+- `memory/map/generated/symbols.json`, `memory/map/generated/MAP.md`, `memory/map/generated/CARDS.md`,
+  `memory/map/generated/inventories.json`: regenerated by the codebase-map kit's `--write` (S2)
+- `memory/guides/SESSION-KICKOFF.md`: the manifest's `last-audit` re-stamp, since its `watch:` line
+  names `tools/gate-legs.json`, `.unattended.conf` and `memory/guides/BUILD-METHOD.md`
+
+### Budgets and records
+
+- `REFUSAL_CEILINGS` in `.memory-tree.conf` prices the driver and `tools/unattended/check-unattended.sh`.
+  The driver's load-time refusal moves into `load_review_bounds`, one site for one, and check 2's
+  unreadable-ceiling failure is re-pointed in place, so neither count is designed to rise; the leg
+  `harness arms (fail branches armed or pinned)` on §7's line observes it, and a count above its
+  ceiling is a raise the pass records under the ruling the conf's comments cite, never a silent one.
+- The loop, unattended, govkit, policy and workflows kits' versions are owed at the lander, as
+  `kit epoch (shipped bytes move, the version moves)` prints.
+- This revision turns the spec's file-and-line code citations into symbol citations and blob-pinned
+  lines, so the commit landing it runs `python tools/playbook/positional.py shrink`, which takes their
+  rows out of `memory/project/positional-refs.txt` before `positional (the citation check alone)` reds
+  them stale.
 
 ### Alternatives rejected
 
@@ -232,6 +297,13 @@ v2:1255's default, and a round past 3 now reads `CEILING`.
   `fixed-count` (v2:1254), so a moved value under the default `one` would change nothing an adopter set.
 - **A third copied step program.** dSafePassage-1 S6 and S7 already move conf files into policy keys;
   the [reuse] rule extracts the shared step here.
+- **A `[[gate_leg]]` row for the new leg in `tools/loop/kit.toml`.** The leg's subject is the module
+  itself, so it has no job in a tree that copy-installs the kit, the owner's 2026-08-23 ruling for a
+  kit's self-test, and every loop fixtures leg is gov's `[[exempt_leg]]` for that reason, as the
+  registry row of `loop upstream fixtures` records.
+- **One policy file per fixture at the catalogue defaults.** The driver suite's review arms run at a
+  bound of 7 so that no arm but the bounded ones stops early; moving them to a spec bound of 1 would
+  rewrite every arm's expected exit instead of its conf.
 
 ## 5. Production-readiness checklist
 
@@ -245,8 +317,9 @@ v2:1255's default, and a round past 3 now reads `CEILING`.
 - testing — direct probes of `review_bounds.py`, the driver and the leg in scratch repositories; the
   suite arms in §7, the unattended ones waived for this landing.
 - migration — the step of S7; gov's own value maps to the default.
-- user docs — `help/loop.md` gains the bounds' section; the unattended README, protocol and verbs
-  reference are re-worded.
+- user docs — `help/loop.md` gains the bounds' section, `help/upgrade-steps.md` the step's, and
+  `help/policy.md` a kept example row; the unattended README, protocol and verbs reference are
+  re-worded.
 
 ## 6. Acceptance criteria
 
@@ -271,10 +344,13 @@ v2:1255's default, and a round past 3 now reads `CEILING`.
   `5 4 3` and `2` it prints `CEILING`; `grep -c RUNAWAY_CEILING tools/unattended/unattended.sh` prints 0.
   Red when: the ceiling is tested as `r >= max-rounds`, so the bound equal to it reads `CEILING`.
 - **AC5** — When `git grep -n REVIEW_ROUNDS -- tools .unattended.conf` runs at this unit's commit, it
-  prints only the upgrade step's program and its row in `tools/unattended/kit.toml`, the one place the
-  retired key's name is still read.
-  Red when: a by-value fixture still writes `REVIEW_ROUNDS="7"`, so a suite arm grades a key no reader
+  prints only lines of the step's program `review_rounds.py`, its `[[upgrade]]` row in
+  `tools/unattended/kit.toml` and its arms in govkit's self-test, the places the retired key's name is
+  still read or planted, and `grep -c REVIEW_ROUNDS help/policy.md` prints 0.
+  Red when: a by-value fixture such as `HOLD_CONF` in `tools/loop/loop_witness.py` still writes the
+  line, or `tools/policy/legacy-homes.txt` still lists it, so a suite or a list grades a key no reader
   reads.
+  figure: DERIVED, the grep's own output at the commit.
 - **AC6** — When `bash tools/unattended/check-unattended.sh` runs in a scratch repository whose run's
   own commit raises `review.design.round-count` in the policy file, it fails check 19 naming the
   commit; and with `review_bounds.py` absent from the scratch tree it fails check 2 naming the unread
@@ -283,24 +359,34 @@ v2:1255's default, and a round past 3 now reads `CEILING`.
 - **AC7** — When `python review_rounds.py up` runs over three scratch targets whose conf holds
   `REVIEW_ROUNDS="1"`, `"2"` and `"5"`, the first gains no policy key, the second gains
   `review.design.rounds = "fixed-count"` and `review.design.round-count = 2`, the third those with 5
-  and `review.max-rounds = 5`, each conf losing the line; `down` restores each pair byte-identical.
+  and `review.max-rounds = 5`, each conf losing the line, and `witness` exits 0 on each; `down`
+  restores each pair byte-identical, after which `witness` exits 1 on the second and third.
   Red when: N above 3 is written without raising `review.max-rounds`, so the adopter's own bound is
   refused after the step.
 - **AC8** — When `python fanout_cap.py up` runs over dSafePassage-1 S6's scratch target before and after
   the extraction, the files it writes are byte-identical, and the program imports `conf_to_policy`.
   Red when: the shared step is copied into the new program and the first keeps its own.
 - **AC9** — When `grep -n "review.max-rounds" loop.md` runs over the help page at this unit's commit, it
-  finds the section naming the four keys and the admitted equality.
-  Red when: the keys move into the policy file and no page says where an owner sets the bound.
+  finds the section naming the four keys and the admitted equality;
+  `grep -o "usage: script:[^ ]*review_bounds.py[#a-z]*" help/loop.md` prints two anchors, the bare
+  script's and `#show`, and `grep -o "usage: script:[^ ]*review_rounds.py#[a-z]*" help/upgrade-steps.md`
+  prints three, `#up`, `#witness` and `#down`, one anchor per row S1 and S7 add to
+  `tools/govkit/usage.toml`.
+  Red when: the keys move into the policy file and no page says where an owner sets the bound, or a new
+  verb has a usage row and no anchor, which the `docs` leg reds.
 - **AC10** — When `python -m json.tool gate-legs.json` runs in the tools folder, the row named
-  `loop review bounds fixtures` carries `enforces` holding `principle.p38`, and
+  `loop review bounds fixtures` carries `enforces` holding `principle.p38` and `stage` holding
+  `step.test`; `grep -c "principle.p38" tools/playbook/core-pending.txt` prints 0;
+  `grep -c "loop review bounds fixtures"` prints 1 over each of `tools/run-gates/selftest-budgets.txt`,
+  `tools/govkit/registry.toml` and `memory/map/features/loop.md`; and
   `python tools/playbook/core.py meta-check` on this unit's pass exits 0, naming neither that leg nor a
   stale pending row.
-  Red when: the leg carries no `enforces`, which dOrderedCharter-7 S3's meta-check reds.
+  Red when: the leg carries no `enforces`, which dOrderedCharter-7 S3's meta-check reds, or the
+  pending row stays, which it reds stale.
 
 ## 7. Gates
 
-`unattended kit gate` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `unattended-build self-test` · `tier2-review self-test` · `verifier fan-out self-test` · `review-join self-test` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `kit/dogfood doc parity` · `routed-commits selftest` · `build-method size` · `unattended protocol size` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`unattended kit gate` · `loop definition` · `loop computed witness` · `loop stage coverage` · `core meta-check` · `playbook render selftest` · `policy check` · `policy fixtures` · `scratch-guard self-test` · `step-rows-frozen` · `docs` · `help page commands` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `every held leg is budgeted, every budget row resolves` · `unattended-build self-test` · `tier2-review self-test` · `verifier fan-out self-test` · `review-join self-test` · `govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix` · `codebase-map gate coverage` · `codebase-map coverage + freshness` · `kickoff-manifest ratchet` · `recall floor` · `recall floor arms` · `kit/dogfood doc parity` · `routed-commits selftest` · `harness arms (fail branches armed or pinned)` · `build-method size` · `unattended protocol size` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `positional (the citation check alone)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/loop/review_bounds.py · covers AC1 AC2 AC3 · the `loop review bounds fixtures` leg's plants, its failing case staged by a count above the ceiling read with the strict-below form · none
 New arm: tools/govkit/selftest.py · covers AC7 AC8 · a step tree with no `review_rounds.py` and with `fanout_cap.py` unextracted · none
@@ -309,9 +395,9 @@ New arm: tools/unattended/unattended.test.sh and tools/unattended/check-unattend
 ## 8. Open questions
 
 - **FACT-QUESTION · F1 — The brief gives this spec's status header the token `DRAFT`; is that a
-  legal status?** Probe: `STATUS_TOKENS` at `tools/memory-tree/tree_lib.py:28`. Observation,
-  2026-10-24: `DRAFT` is not in the tuple. Liveness: the tuple would list it if the vocabulary admitted
-  it. RESOLVED (agent, 2026-10-24, delegated): `OPEN`.
+  legal status?** Probe: `tools/memory-tree/tree_lib.py#STATUS_TOKENS`. Observation, 2026-10-24:
+  `DRAFT` is not in the tuple. Liveness: the tuple would list it if the vocabulary admitted it.
+  RESOLVED (agent, 2026-10-24, delegated): `OPEN`.
 - **F2 — Where does the round-count refusal live, so it holds with `unattended.sh` deleted?** Options:
   (a) the loop kit's `review_bounds.py`, called by the driver and run as an arm of the loop kit's
   check; (b) `check-unattended.sh`, reading the policy file; (c) a new catalogue field in dGroundRules'
@@ -344,21 +430,40 @@ New arm: tools/unattended/unattended.test.sh and tools/unattended/check-unattend
   disposal named as M4's spec-audit rule's through TOOL-dDeclaredLoop-20's dispose row; the `roundLimit`
   claim dropped from the non-goal and the edge, by the brief
   prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-reground.md
+- rev-5 · 2026-11-16 · §1 · S1 · S2 · S3 · S4 · S6 · S7 · S9 · S10 · §4 · AC5 · AC7 · AC9 · AC10 · §7 · F1 · §10 ·
+  the six findings of the first builder return,
+  build/2026-11-16-build-TOOL-dDeclaredLoop-21-1-builder-return.md, re-grounded at `131629c6`:
+  S4 and AC5 gain the readers `tools/loop/loop_witness.py`, `tools/unattended/pass-tree.test.sh`,
+  `tools/policy/check_policy.py` and `tools/policy/legacy-homes.txt`, regenerated by its generator, and
+  `help/policy.md`'s example row, with the by-value fixtures split into lines deleted and confs raised
+  to a ceiling S2 admits; Files touched gains `tools/govkit/selftest.py`, the usage rows and help
+  anchors of `review_bounds.py` and the step's three verbs, on `help/loop.md` and
+  `help/upgrade-steps.md`, and the new leg's companions, its `stage` key, `[[exempt_leg]]` row, subject
+  pin, budget row, dossier claim, the four generated map files and the manifest re-stamp; §7's line
+  gains `scratch-guard self-test`, `playbook render selftest`, `policy fixtures` and the legs those
+  companions owe; S2's Readers name the tracked `meta-check` and pending list, and the row's deletion
+  is unconditional; S7 gains the step kind's `witness`; every moved line number is a symbol citation or
+  a blob-pinned line.
 
 ## 10. Reuse audit
 
-The seams extended are the driver's round predicate `review_state`
-(`tools/unattended/unattended.sh:12610-12618`) and its caller (:12769), the leg's ceiling read (`core_of`
-at `tools/unattended/check-unattended.sh:624`) and check 19's `read_rounds_of` (:1859-1876), and
-dSafePassage-1's step kind with its first conf-to-policy program, whose shared part S8 extracts.
+The seams extended are the driver's round predicate `tools/unattended/unattended.sh#review_state` and
+its caller `tools/unattended/unattended.sh#verb_review`, the leg's ceiling read (`core_of` at
+`tools/unattended/check-unattended.sh@f86fd49d:765`) and check 19's
+`tools/unattended/check-unattended.sh#read_rounds_of`, and dSafePassage-1's step kind with its first
+conf-to-policy program, `tools/govkit/steps/fanout_cap.py`, whose shared part S8 extracts.
 `python tools/codebase-map/reuse_lookup.py "move a conf round bound into a policy key with an upgrade step"`
 ranked name stems (`key`, `load_conf`, `parse_conf`, `step` in `tools/govkit/govkit.py`) and found no
-upgrade-step code, since `tools/govkit/upgrade_steps.py` is specced and unbuilt. `python
+upgrade-step code at base. At rev-5's re-grounding, `131629c6`, the step kind is built:
+`tools/govkit/upgrade_steps.py` is tracked and `fanout_cap.py` loads it, and the other step programs
+under `tools/govkit/steps/` move a schema, a floor or the charter's adopter rules, none a conf key into
+a policy key, so `fanout_cap.py` stays the one prior instance and S8 extracts at the second. The new
+leg's companions follow the `loop upstream fixtures` leg's, TOOL-dDeclaredLoop-29. `python
 tools/memory-recall/query.py` returned scout C's row, the packet's clause and aWokenSentinel's
 measurement that `REVIEW_ROUNDS` bounds one subject while promotions mint fresh ones
 (`memory/builds/aWokenSentinel/BACKLOG.md:5`), the cascade TOOL-dDeclaredLoop-30's budget closes. Scout
-C's line numbers agree with source at base, and its eleven by-value fixtures are the ten lines of the
-driver's suite, the `mkconf` default and two `printf` confs among them, and one in the resume suite,
-which S4 lists by line.
+C's eleven by-value fixtures were read at base; the tree has since gained more, so S4 derives them with
+`git grep` at the pass rather than listing lines, and the gotcha
+`memory/gotchas/retirement-inventory-misses-readers-by-value.md` is the class that rule answers.
 
-Recall terms used: REVIEW_ROUNDS RUNAWAY_CEILING review.max-rounds round bound BOUNDED CEILING review_state upgrade step policy key
+Recall terms used: REVIEW_ROUNDS RUNAWAY_CEILING review.max-rounds round bound BOUNDED CEILING review_state upgrade step policy key legacy-homes exempt_leg
