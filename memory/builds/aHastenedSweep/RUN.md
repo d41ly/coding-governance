@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 179486e8f11f868ed7d7fa40757bf8a9849c9a84 · park · 15 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: ad4580d4689388e43a22b72ed0f93615214180e1
 phase: VERIFYING
@@ -75,3 +76,5 @@ base: f25308f019b4fbd05964a81c70ff85d3599ea51b
 2026-11-16T00:39:08Z dispatch · item b503bf99 TOOL-aHastenedSweep-7 · reason tools/memory-tree/check-memory-hygiene.test.sh memory/builds/aHastenedSweep/build/2026-11-16-build-TOOL-aHastenedSweep-7-1-acceptance-ledger.md memory/builds/aHastenedSweep/spec/2026-11-16-spec-TOOL-aHastenedSweep-7.md memory/builds/aHastenedSweep/README.md memory/LIVE.md memory/ledger/2026-11.md
 
 2026-11-16T00:39:10Z brief · item TOOL-aHastenedSweep-7 · reason a4fc54a7b773 memory/builds/aHastenedSweep/prompts/2026-11-16-prompt-TOOL-aHastenedSweep-7-brief.md
+
+2026-11-16T02:55:05Z decision · item Land aTwinnedPass first? This build is GREEN at e2697345b but sits on local main 5d48501da, which holds aTwinnedPass's landing, unpushed and held for your ask; push-main --carry refuses to publish its commits from this run · reason Options: (a) push aTwinnedPass from local main with bash tools/push-main.sh in the primary tree, then land this build with push-main --prepare and --land --slug aHastenedSweep; (b) land both together, attended, from the primary tree after merging this branch into local main; (c) rebuild this branch on origin/main without aTwinnedPass. Refused here: the push of aTwinnedPass is the owner's reserved step, and the lander forbids a run publishing another build's commits.
