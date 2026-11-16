@@ -68,7 +68,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   the reviews `review.<stage>` places, the owner gates `autonomy` places, each `review.breakpoints`
   member, and under `decisions.major = "author-owner-ratifies"` the owner item at `item.build.ratify`
   where a tracked spec carries a fork resolved `(agent, <date>, delegated)`. An owner line's release is
-  `authorization`, `held` or `released <record> <word>`. Fire a review line through `--trigger` with its
+  `authorization`, `held` or `released <record> <word>`, and `passed before placement` on each owner gate
+  of a build whose README's first commit does not contain the loop kit's placement of the module
+  (`TOOL-dDeclaredLoop-53`), which no hold reads as `held`. Fire a review line through `--trigger` with its
   cause. None print under `--paths` or `--framed`, nor where the loop kit does not resolve.
 - `--attest` — **the two agent-attested items have a VERB, and it is the only way to write one.**
   `--attest <slug> --item <item> [--value <text>]` derives the record key so no operator spells

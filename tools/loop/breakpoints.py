@@ -22,7 +22,12 @@ list is sorted by the position item's place among the composed rows, then before
 THE RELEASE. An owner line's last field is its release: `authorization` for the plan gate, which the
 unattended driver's `check_authorization` verifies at the pinned BASE; `released <stem> <word>` where the
 owner's newest disposition record whose `Item` is the line's tag answers, read by `adapt.py`'s
-`read_disposition_release`; else `held`. `run.on-owner-question` is not read here.
+`read_disposition_release`; else `held`. `run.on-owner-question` is not read here. An owner GATE of a build
+opened before the placement reads `passed before placement` ahead of those answers (TOOL-dDeclaredLoop-53):
+the placement is the oldest commit adding this module's own file, the opening the oldest adding the build's
+README under the memory root, and the build was opened before it where both are found and the opening does
+not contain the placement. Either not found reads as after, so the gate keeps its answer; the owner item
+and the review lines always do.
 
 THE READS. `autonomy`, `decisions.major` and the five `review.<stage>` keys at the landed revision, or at
 `--rev`, through the policy kit's `resolve_read` over one `read_revision`, the kit found by
@@ -53,6 +58,7 @@ import io
 import os
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -67,8 +73,10 @@ from loop_items import read_composed_items  # noqa: E402
 from loop_lib import read_memory_tree, read_steps, resolve_kit_dir, run_selftest_cases  # noqa: E402
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_transition import (FX_BUILD, FX_SPEC, FX_UNIT, read_build_headers, read_build_specs,  # noqa: E402
-                             read_transitions, write_transition_plant)
-from loop_witness import read_clean_env, remove_tree, resolve_bash, run_fixture_git, write_fixture_files  # noqa: E402
+                             read_memory_root, read_transitions, write_transition_plant)
+from loop_witness import (read_clean_env, read_git, remove_tree, resolve_bash, run_fixture_git,  # noqa: E402
+                          write_fixture_files)
+from position import check_is_ancestor  # noqa: E402
 
 SAY = "breakpoints"
 #: Which review each stage owns and where, the one typed fact (the flow-steps record).
@@ -85,6 +93,7 @@ REVIEW_DEFAULTS = {"build": "owed"}
 PLAN_GATE = "item.plan.exit"
 RATIFY = "item.build.ratify"
 RELATIONS = ("before", "at", "after")
+PRE_PLACEMENT = "passed before placement"
 SLUG = re.compile(r"[A-Za-z0-9_-]+")
 PLANTS = {"values": "no policy file, then autonomy three-gates and every-stage, then review.test owed",
           "placed": "review.breakpoints naming item.build.unit-pass, then item.build.nothing",
@@ -96,7 +105,12 @@ PLANTS = {"values": "no policy file, then autonomy three-gates and every-stage, 
           "driver-optin": "the sourced driver's check_authorization under review.design owed and off, then none",
           "driver-plan": "the driver's --plan under autonomy three-gates, and --plan --paths, then the sourced "
                          "check_phase_gates past item.design.exit and item.build.exit, before and after "
-                         "item.design.exit's disposition record"}
+                         "item.design.exit's disposition record",
+          "pre-placement": "under autonomy three-gates, a build opened on history the kits' commit does not reach "
+                           "and merged in, one opened after it and one uncommitted, listed by the scratch's own "
+                           "module, then the first read by this tree's",
+          "driver-pre-placement": "the same history with the driver copied beside the scratch's loop kit, its "
+                                  "sourced check_owner_gates over the build opened before and the one after"}
 
 
 # ------------------------------------------------------------------------------------------ the rule
@@ -190,9 +204,17 @@ def check_slug(build):
         raise ValueError("the build %r is outside [A-Za-z0-9_-]+" % build)
 
 
+def read_first_add(root, rel):
+    """The oldest commit on `HEAD`'s history of `root` that adds `rel`, or None where none does or git refuses."""
+    rc, out = read_git(root, "log", "--diff-filter=A", "--format=%H", "--", rel)
+    found = out.split()
+    return found[-1] if rc == 0 and found else None
+
+
 def read_breakpoints(build, root, spec_audit=False, delegated=False):
     """`derive_breakpoints` over `build`'s policy, steps, composed tags and tiers, each owner line's release
-    read: `released <stem> <word>` where the owner's disposition record of its tag answers."""
+    read: `passed before placement` on each owner gate of a build opened before this module was placed,
+    else `released <stem> <word>` where the owner's disposition record of its tag answers."""
     check_slug(build)
     root = pathlib.Path(root).absolute()
     values = read_policy_values(root)
@@ -202,8 +224,18 @@ def read_breakpoints(build, root, spec_audit=False, delegated=False):
     tiers = [tier for _uid, _status, tier in read_build_headers(build, root)]
     out = derive_breakpoints(values, read_steps(KIT), tags,
                              {"spec_audit": spec_audit, "delegated": delegated, "tiers": tiers})
+    early = False
+    if any(b["name"] == "owner gate" for b in out):   # TOOL-dDeclaredLoop-53: opened before the placement
+        try:
+            placement = read_first_add(root, (KIT / "breakpoints.py").resolve().relative_to(root.resolve()).as_posix())
+        except ValueError:
+            placement = None
+        opening = placement and read_first_add(root, "%s/builds/%s/README.md" % (read_memory_root(root), build))
+        early = bool(opening) and not check_is_ancestor(root, placement, opening)
     for b in out:
-        if b["release"] == "held":
+        if early and b["name"] == "owner gate":
+            b["release"] = PRE_PLACEMENT
+        elif b["release"] == "held":
             hit = read_disposition_release(root, build, b["position"], ())
             if hit:
                 b["release"] = "released %s %s" % hit
@@ -228,10 +260,37 @@ def read_stage_review(build, root, stage, rev=None):
 
 
 # ------------------------------------------------------------------------------------------ the plants
-def run_sourced(repo, script):
-    """`(exit, output)` of `script` run by bash in `repo` after this tree's unattended driver is sourced;
-    LookupError where the driver or a bash to run it does not resolve."""
-    driver = resolve_kit_dir("unattended", "unattended.sh", KIT) / "unattended.sh"
+def write_pre_placement_tree():
+    """`(top, the scratch's loop kit)`: `build_scratch_tree`'s kits commit, the placement; build `tPre` opened
+    on a root commit it does not precede and merged in; then `autonomy = "three-gates"`, `decisions.major =
+    "author-owner-ratifies"` and build `tPost` committed; and `tNone`'s README written, never committed."""
+    from loop_items import POLICY_FILE, build_scratch_tree, derive_definition_rel
+    top = build_scratch_tree()[0]
+    readme = "memory/builds/%s/README.md"
+    try:
+        run_fixture_git(top, "branch", "-M", "main")   # the policy kit's landed read, with no remote
+        run_fixture_git(top, "checkout", "-q", "--orphan", "pre")
+        run_fixture_git(top, "rm", "-r", "-q", "--cached", ".")
+        write_fixture_files(top, {readme % "tPre": "# tPre\n"})
+        run_fixture_git(top, "add", readme % "tPre")
+        run_fixture_git(top, "commit", "-q", "-m", "tPre opened on history the placement does not reach")
+        run_fixture_git(top, "checkout", "-q", "-f", "main")
+        run_fixture_git(top, "merge", "-q", "--allow-unrelated-histories", "-m", "tPre merged in", "pre")
+        write_fixture_files(top, {readme % "tPost": "# tPost\n", POLICY_FILE: 'autonomy = "three-gates"\n\n'
+                                  '[decisions]\nmajor = "author-owner-ratifies"\n'})
+        run_fixture_git(top, "add", readme % "tPost", POLICY_FILE)
+        run_fixture_git(top, "commit", "-q", "-m", "tPost opened after the placement, three gates")
+        write_fixture_files(top, {readme % "tNone": "# tNone\n"})
+        return top, top / pathlib.PurePosixPath(derive_definition_rel()).parent
+    except BaseException:
+        remove_tree(top)
+        raise
+
+
+def run_sourced(repo, script, driver=None):
+    """`(exit, output)` of `script` run by bash in `repo` after the unattended `driver` is sourced, this
+    tree's where None; LookupError where the driver or a bash to run it does not resolve."""
+    driver = driver or resolve_kit_dir("unattended", "unattended.sh", KIT) / "unattended.sh"
     bash = resolve_bash(driver)
     if bash is None:
         raise LookupError("no bash can run %s" % driver.as_posix())
@@ -283,7 +342,8 @@ def run_breakpoint_plant(case):
         def check_owner_lines(lines):
             """A miss for each owner line ending in no release, and for an owner item not caused by ratification."""
             for ln in lines:
-                if " · owner · " in ln and not re.search(r" · (authorization|held|released \S+ \S+)$", ln):
+                if " · owner · " in ln and not re.search(r" · (authorization|held|released \S+ \S+|%s)$"
+                                                         % PRE_PLACEMENT, ln):
                     misses.append("an owner line names no release: %s" % ln)
                 if ln.startswith("breakpoint: owner item ") and " · ratification · " not in ln:
                     misses.append("the owner item's cause is not ratification: %s" % ln)
@@ -370,6 +430,60 @@ def run_breakpoint_plant(case):
             print("%s: fixture · headers %s · specs %s" % (SAY, heads, specs))
             check(heads == [(FX_UNIT, "INPROGRESS", "1")] and specs == [(FX_UNIT, "INPROGRESS")],
                   "read_build_headers %s beside read_build_specs %s" % (heads, specs))
+        elif case in ("pre-placement", "driver-pre-placement"):   # TOOL-dDeclaredLoop-53 AC1 to AC4
+            scratch, kit = write_pre_placement_tree()
+            try:
+                three = [plan, gate % ("at", "item.design.exit"), closing, gate % ("before", "item.deploy.mandate")]
+                if case == "pre-placement":
+                    def run_scratch_breakpoints(build, *flags):
+                        """`(exit, lines)` of the scratch's own module listing `build` in the scratch, echoed."""
+                        p = subprocess.run([sys.executable, str(kit / "breakpoints.py"), "list", "--build", build,
+                                            *flags], cwd=str(scratch), capture_output=True, text=True,
+                                           encoding="utf-8", errors="replace",
+                                           env=read_clean_env(PYTHONIOENCODING="utf-8"), timeout=300)
+                        lines = p.stdout.splitlines()
+                        print("%s: fixture · scratch list %s · exit %d · %s" % (
+                            SAY, " ".join((build,) + flags), p.returncode, " / ".join(lines) or p.stderr.strip()))
+                        return p.returncode, lines
+
+                    pre = "breakpoint: owner gate · %s %s · owner · autonomy · " + PRE_PLACEMENT
+                    rc, lines = run_scratch_breakpoints("tPre")   # AC1
+                    check(rc == 0 and lines == [pre % ("at", PLAN_GATE), pre % ("at", "item.design.exit"), closing,
+                                                pre % ("before", "item.deploy.mandate")],
+                          "the build opened before the placement read %s" % lines)
+                    check_owner_lines(lines)
+                    rc, lines = run_scratch_breakpoints("tPost")
+                    check(rc == 0 and lines == three, "the build opened after the placement read %s" % lines)
+                    for build in ("tPre", "tPost"):   # AC2
+                        rc, lines = run_scratch_breakpoints(build, "--delegated-fork")
+                        check(rc == 0 and owner + "held" in lines and closing in lines,
+                              "%s with a delegated fork read %s" % (build, lines))
+                    rc, lines = run_scratch_breakpoints("tNone")   # AC3
+                    check(rc == 0 and lines == three, "the build whose README no commit adds read %s" % lines)
+                    try:
+                        lines = [render_breakpoint_line(b) for b in read_breakpoints("tPre", scratch)]
+                    except ValueError as e:
+                        lines = ["refused: %s" % e]
+                    print("%s: fixture · this tree's module over the scratch, tPre · %s" % (SAY, " / ".join(lines)))
+                    check(lines == three, "this tree's module, outside the scratch, read tPre as %s" % lines)
+                else:   # AC4
+                    src = resolve_kit_dir("unattended", "unattended.sh", KIT)
+                    shutil.copytree(src, kit.parent / src.name, ignore=shutil.ignore_patterns("__pycache__"))
+                    root = next((d for d in (KIT, *KIT.parents) if (d / ".git").exists()), KIT)
+                    if not (root / ".unattended.conf").is_file():
+                        raise LookupError("the driver plant copies .unattended.conf from %s, which holds none"
+                                          % root.as_posix())
+                    write_fixture_files(scratch, {".unattended.conf": (root / ".unattended.conf").read_text(
+                        encoding="utf-8") + '\nSPEC_TOKENS_CLI=""\nRUN_CLAIMS="off"\n'})
+                    for build, owed, needle in (("tPre", 0, ""), ("tPost", 1, "item.design.exit")):
+                        rc, out = run_sourced(scratch, "load_driver_conf && check_owner_gates %s" % build,
+                                              kit.parent / src.name / "unattended.sh")
+                        print("%s: fixture · the scratch's check_owner_gates %s · exit %d · %s" % (
+                            SAY, build, rc, out.strip().replace("\n", " / ")[:600]))
+                        check(rc == owed and (not owed or "UNATTENDED check 82 FAILED" in out and needle in out),
+                              "check_owner_gates %s exited %d, owed %d naming %r" % (build, rc, owed, needle))
+            finally:
+                remove_tree(scratch)
         else:
             from position import FX_IDS, FX_SLUG, run_driver, write_position_plant
             root = next((d for d in (KIT, *KIT.parents) if (d / ".git").exists()), KIT)

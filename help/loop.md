@@ -1442,11 +1442,18 @@ gate stays `held` until your disposition record names its item, written as
 tag. While one is held, the unattended driver's `--close` refuses, naming each held item and how to
 hand the question to you. Under the defaults nothing new is held.
 
+An owner gate holds only a build opened after the gate was placed. Where the commit that first added your
+build's README does not contain the commit that first added the loop kit's `breakpoints.py`, every owner
+gate of that build, the plan gate included, reads `passed before placement` instead, so a run already in
+flight when the module landed is not held for positions it crossed before the gate existed. The owner item
+and the review lines keep their answers. Where either commit cannot be found, a README not yet committed
+for one, the gate holds as above.
+
 - **List a build's breakpoints:** `python tools/loop/breakpoints.py list --build <slug>` runs at your <!-- usage: script:tools/loop/breakpoints.py#list 74c047ff -->
   repository's top level and prints one line per breakpoint, in item order:
   `breakpoint: <name> · <before|at|after> <item tag> · <reviewer|owner> · <cause>`, and for an owner
-  line ` · authorization`, ` · held` or ` · released <record> <word>`. `--spec-audit` lists Design's
-  opted-in audit, and `--delegated-fork` the owner item. The unattended driver's `--plan <slug>` prints
+  line ` · authorization`, ` · held`, ` · released <record> <word>` or ` · passed before placement`.
+  `--spec-audit` lists Design's opted-in audit, and `--delegated-fork` the owner item. The unattended driver's `--plan <slug>` prints
   the same lines after its `frontier:` line. It exits 2 printing `breakpoints: refused` and why on a
   value outside its key's set or an undeclared tag, and `breakpoints: unarmed` where the policy or
   memory-tree kit is not installed.
@@ -1455,8 +1462,8 @@ hand the question to you. Under the defaults nothing new is held.
   default branch's landed revision, or at `--rev <rev>`. The unattended driver's preflight reads
   `design` this way to decide whether the build owes a spec audit.
 - **See it on a fixture:** `python tools/loop/breakpoints.py --fixture --plant <case>` runs one case in <!-- usage: script:tools/loop/breakpoints.py bd781c1c -->
-  a scratch repository: `values`, `placed`, `ratification`, `stage`, `driver-close`, `driver-optin` or
-  `driver-plan`. `--selftest` runs them all, and gov's own `loop breakpoint fixtures` gate runs them.
+  a scratch repository: `values`, `placed`, `ratification`, `stage`, `driver-close`, `driver-optin`,
+  `driver-plan`, `pre-placement` or `driver-pre-placement`. `--selftest` runs them all, and gov's own `loop breakpoint fixtures` gate runs them.
 
 The list does not fire a review: you, or the run, fire each review line through the driver's
 `--trigger` with its cause. A run may still move past an owner gate before its close, and anyone who

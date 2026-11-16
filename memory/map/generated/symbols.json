@@ -19773,6 +19773,11 @@
       "file": "tools/govkit/docs_leg.py"
     },
     {
+      "id": "read_first_add",
+      "kind": "function",
+      "file": "tools/loop/breakpoints.py"
+    },
+    {
       "id": "read_first_column",
       "kind": "function",
       "file": "tools/run-gates/owed_rows.py"
@@ -36506,6 +36511,11 @@
       "id": "write_pre_fix_spelling",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "write_pre_placement_tree",
+      "kind": "function",
+      "file": "tools/loop/breakpoints.py"
     },
     {
       "id": "write_preflight_record",
