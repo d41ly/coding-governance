@@ -13,6 +13,8 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-88-deviation-882.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-88-deviation-882.md) | deviation | — |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-88-reground-brief.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-88-reground-brief.md) | research | — |
 | [2026-11-17-prompt-TOOL-dDeclaredLoop-88-1-spec-writer.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-88-1-spec-writer.md) | journal | — |
+| [2026-11-17-prompt-TOOL-dDeclaredLoop-88-2-spec-brief.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-88-2-spec-brief.md) | research | — |
+| [2026-11-17-prompt-TOOL-dDeclaredLoop-88-3-spec-writer.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-88-3-spec-writer.md) | journal | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-87-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-87-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-87 |
 
 <!-- /gen:spec-records -->
