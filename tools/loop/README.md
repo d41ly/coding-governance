@@ -681,7 +681,7 @@ its own, and the check does not grade them:
 
 | Wait | Its deadline |
 |---|---|
-| the lander's wait on another session's claim lock | `push-main.sh#CLAIM_WAIT_CEILING`, 120 seconds PINNED |
+| the lander's wait on another session's claim lock | the lander's `CLAIM_WAIT_CEILING`, 120 seconds PINNED |
 
 ## The factories, `factories.py`
 
