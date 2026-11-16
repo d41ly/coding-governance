@@ -16563,6 +16563,7 @@ memory/builds/dDeclaredLoop/build/2026-11-05-build-TOOL-dDeclaredLoop-30-deviati
 memory/builds/dDeclaredLoop/build/2026-11-14-build-TOOL-dDeclaredLoop-5-1-acceptance-ledger.md	tools/unattended/check-unattended.sh:266
 memory/builds/dDeclaredLoop/build/2026-11-14-build-TOOL-dDeclaredLoop-5-1-builder-return.md	tools/unattended/check-unattended.sh:264
 memory/builds/dDeclaredLoop/build/2026-11-14-build-TOOL-dDeclaredLoop-5-deviation-54.md	tools/unattended/check-unattended.sh:266
+memory/builds/dDeclaredLoop/build/2026-11-16-build-TOOL-dDeclaredLoop-21-2-builder-return.md	tools/unattended/unattended.sh:326
 memory/builds/dDeclaredLoop/prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-owner-review-cap.md	BUILD-METHOD M4
 memory/builds/dDeclaredLoop/prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md	BUILD-METHOD M2
 memory/builds/dDeclaredLoop/prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md	BUILD-METHOD M4

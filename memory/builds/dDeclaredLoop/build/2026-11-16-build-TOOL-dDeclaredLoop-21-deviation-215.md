@@ -5,7 +5,7 @@
 - **Departs from:** `TOOL-dDeclaredLoop-21@rev-5`
 - **Hand-off:** spec-revised
 - **Before:** `TOOL-dDeclaredLoop-21`'s spec as the revision at `TOOL-dDeclaredLoop-21@rev-5` reads it.
-- **After:** the spec at rev-6: §8 F5 resolved (a): verb_review keeps its fail 37 and the driver's refusal ceiling rises 326 -> 327 under the decision row landed ahead; §4 names the token, its comment line and the positional row, and fixes BUILD-METHOD M4's two substitutions to fit its cap.
+- **After:** the spec at rev-6: §8 F5 resolved (a): verb_review keeps its fail 37 and the driver's refusal ceiling rises 326 -> 327 under the decision row landed ahead; §4 names the token, its comment line and the positional row, and fixes the two substitutions in `doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it` to fit its cap.
 - **Cause:** builder discovery
 - **Reason:** rev-5 said no count rises, but the retired refusal was an echo the census never counted while fail 37 is a new census branch.
 - **Evidence:** `memory/builds/dDeclaredLoop/build/2026-11-16-build-TOOL-dDeclaredLoop-21-2-builder-return.md`, and the rev-6 line in this spec's §9.
