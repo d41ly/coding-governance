@@ -350,7 +350,6 @@ verb:unattended.sh:--record-piece	undocumented when the docs leg landed
 verb:unattended.sh:--record-set	undocumented when the docs leg landed
 verb:unattended.sh:--register-task	undocumented when the docs leg landed
 verb:unattended.sh:--release-task	undocumented when the docs leg landed
-verb:unattended.sh:--rescope	undocumented when the docs leg landed
 verb:unattended.sh:--resume	undocumented when the docs leg landed
 verb:unattended.sh:--review	undocumented when the docs leg landed
 verb:unattended.sh:--settle	undocumented when the docs leg landed
