@@ -97,7 +97,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 100 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 100 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13
 ids TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26
 ids TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-35 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39
@@ -169,7 +169,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-60 — the budget reader counts draws in every run record, rotated archives included, under `MEMORY_ROOT`](spec/2026-10-24-spec-TOOL-dDeclaredLoop-60.md) | 30 | 2 | CLOSED | rev-4 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-61 — every draw row carries a draw id, so two identical parallel draws stay two rows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-61.md) | 30 | 2 | CLOSED | rev-3 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-62 — the transition-record merge driver chosen against the recorded union measurement and the row driver's own refusal](spec/2026-10-24-spec-TOOL-dDeclaredLoop-62.md) | 30 | 2 | CLOSED | rev-4 | 2026-11-16 |
-| [TOOL-dDeclaredLoop-20 — the breakpoint program's own items: trigger, dispose, fold and cost, and the four keys `review.dispose` reads](spec/2026-10-24-spec-TOOL-dDeclaredLoop-20.md) | 31 | 2 | DEFERRED | rev-5 | 2026-11-16 |
+| [TOOL-dDeclaredLoop-20 — the breakpoint program's own items: trigger, dispose, fold and cost, and the four keys `review.dispose` reads](spec/2026-10-24-spec-TOOL-dDeclaredLoop-20.md) | 31 | 2 | INPROGRESS | rev-5 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-22 — the stage-exit recommendation: a command scores it, the producing role reasons it, one record carries both](spec/2026-10-24-spec-TOOL-dDeclaredLoop-22.md) | 32 | 2 | DEFERRED | rev-3 | 2026-10-25 |
 | [TOOL-dDeclaredLoop-50 — the review program's item rows pass the program and declaration checks](spec/2026-10-24-spec-TOOL-dDeclaredLoop-50.md) | 32 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-19 — breakpoints at any item boundary: reviews and owner gates one mechanism under `review.breakpoints`, `review.<stage>` and `autonomy`](spec/2026-10-24-spec-TOOL-dDeclaredLoop-19.md) | 33 | 2 | DEFERRED | rev-2 | 2026-10-24 |
@@ -213,7 +213,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 656 bound to this build, across 4 record folder(s).
+Records: 657 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
