@@ -2449,6 +2449,7 @@ slug refusal | : | --status ../etc
 status with no run | : | --status tRun
 plan | : | --plan tRun
 plan framed over two slugs | : | --plan tRun tNone --framed
+check-specs | : | --check-specs tRun ARCH-tRun-1
 preflight | : | --preflight tRun --keepalive-id k1
 phase | : | --phase tRun BUILDING --witness abc
 audit | : | --audit tRun
@@ -19893,7 +19894,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # MERGED at TOOL-aTrimmedWait-12's reconcile of local main at 5d48501da: the base 3329 at 846d51d39, plus main's 19
 # (TOOL-aLightenedLoop-3's 5 and -8's 1, TOOL-aTwinnedPass-3's 10 and -5's 3), plus this branch's 26
 # (TOOL-aTrimmedWait-1's 18 and -5's 8) = 3374.
-FLOOR_ASSERTIONS=3374
+# RAISED 3374 -> 3377 by TOOL-aTrimmedWait-13: the parity table's `--check-specs` row, the loop's three `same`
+# lines run once more in region one, every one unconditional, counted off the loop's own lines; no suite
+# ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3377
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -20039,7 +20043,8 @@ PROLOGUE_ARMS=20
 # RAISED 524 -> 565 by TOOL-dFoldedAudit-11: the same 41 region-one fold join assertions, see FLOOR_ASSERTIONS.
 # RAISED 565 -> 676 by TOOL-dFoldedAudit-9: the same 111 region-one chain gate assertions, see FLOOR_ASSERTIONS.
 # RAISED 676 -> 734 by TOOL-dFoldedAudit-15: the same 58 region-one batch assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_1=734
+# RAISED 734 -> 737 by TOOL-aTrimmedWait-13: the same 3 region-one parity-row assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_1=737
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.

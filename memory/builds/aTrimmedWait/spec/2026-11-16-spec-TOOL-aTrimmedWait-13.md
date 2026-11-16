@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-16-build-TOOL-aTrimmedWait-13-1-acceptance-ledger.md](../build/2026-11-16-build-TOOL-aTrimmedWait-13-1-acceptance-ledger.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aTrimmedWait-13-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-aTrimmedWait-13-1-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aTrimmedWait-13-brief.md](../prompts/2026-11-16-prompt-TOOL-aTrimmedWait-13-brief.md) | research | — |
 

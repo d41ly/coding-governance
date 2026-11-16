@@ -91,7 +91,7 @@ ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWai
 | [TOOL-aTrimmedWait-13 — close repair: the driver suite's parity table gains the `--check-specs` row unit 1 owed](spec/2026-11-16-spec-TOOL-aTrimmedWait-13.md) | 12 | 1 | INPROGRESS | rev-1 | 2026-11-16 |
 <!-- /gen:build-units -->
 
-Records: 66 bound to this build, across 4 record folder(s).
+Records: 67 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
