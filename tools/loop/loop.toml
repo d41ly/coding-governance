@@ -1037,6 +1037,11 @@ kind = "record-kind.transition"
 version = 1
 fields = "55701546"
 
+[[record-version]]
+kind = "record-kind.recommendation"
+version = 1
+fields = "ad896b7b"
+
 # The hooks' stage claims (TOOL-dDeclaredLoop-4): one row per git and harness hook the map inventories.
 # A git hook serves the step its act sits in; a harness hook on an event every session raises serves all
 # five, and the SubagentStart one the steps of the workflows that have roles.

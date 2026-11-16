@@ -9147,6 +9147,108 @@ done
 same "AC5 derive_owed_units under the counted rule, all-own reads the promoted count" "$(derive_owed_units all-own counted 1 1 3 0 4)" "4"
 same "AC5 derive_owed_units under the counted rule, blocker-own folds against blockers alone" "$(derive_owed_units blocker-own counted 2 1 0 1 3)" "2"
 same "AC3 the terminal predicate has one spelling, in check_review_ended" "$(grep -c "grep -qE '(CONVERGED|NON-CONVERGENT|CEILING|BOUNDED)'" "$SCRIPT")" "1"
+
+# ---- TOOL-dDeclaredLoop-22: `--recommend` scores a stage exit's review from `derive_review_signals`, writes
+# ---- the score record through the record factory's door under the build's anchor unit, and records
+# ---- Design's reason answering it. Against the base driver `--recommend` was no verb, and refusal 14
+# ---- answered every call below. Each case plants its roster in the generated region and its specs, three
+# ---- of them unforked, and reads the record the verb staged.
+write_rc_tree() { # roster rows · section 8 of the second spec
+  reset_tree
+  git rm -rq --cached memory/builds/tRun/spec >/dev/null 2>&1; rm -rf memory/builds/tRun/spec memory/builds/tRun/build
+  mkdir -p memory/builds/tRun/spec
+  for _rc in 1 2 3; do
+    _rc8=none; [ "$_rc" != 2 ] || _rc8=$2
+    printf '# ARCH-tRun-%s — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-1 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\n%s\n' "$_rc" "$_rc8" > "memory/builds/tRun/spec/r$_rc.md"
+  done
+  setunits tRun "$1"
+  fixture
+}
+RC3='| [ARCH-tRun-1 — u](spec/r1.md) | 1 | 1 | SPECCED | rev-1 | 2026-08-20 |
+| [ARCH-tRun-2 — u](spec/r2.md) | 1 | 1 | SPECCED | rev-1 | 2026-08-20 |
+| [ARCH-tRun-3 — u](spec/r3.md) | 1 | 1 | SPECCED | rev-1 | 2026-08-20 |'
+RC1='| [ARCH-tRun-1 — u](spec/r1.md) | 1 | 1 | SPECCED | rev-1 | 2026-08-20 |'
+RC2='| [ARCH-tRun-1 — u](spec/r1.md) | 1 | 1 | SPECCED | rev-1 | 2026-08-20 |
+| [ARCH-tRun-2 — u](spec/r2.md) | 1 | 1 | SPECCED | rev-1 | 2026-08-20 |'
+RCB=memory/builds/tRun/build/2026-
+# ...AC2: three units score Design `review`, the reason pending; one unforked unit `no-review`; one forked `review`
+write_rc_tree "$RC3" none
+out=$(run --recommend tRun --stage design); rc=$?
+same "AC2 a design score over three units exits 0" "$rc" "0"
+hit "$out" "recommendation — design · review · 3 units in the generated region · source scored-signals-and-reasoning · binds no · "
+hit "$out" "spawn gov-spec-writer through handoff.py render --role gov-spec-writer"
+miss "$out" "--trigger tRun"
+same "AC2 the score record reads its four fields" "$(grep -cxE -e '- \*\*Score:\*\* review' -e '- \*\*Signals:\*\* 3 units in the generated region' -e '- \*\*Binds:\*\* no' -e '- \*\*Reason:\*\* pending' -e '- \*\*Role:\*\* command' ${RCB}*-ARCH-tRun-1-recommendation-1.md)" "5"
+same "AC2 the verb staged the score record" "$(git diff --cached --name-only | grep -c 'ARCH-tRun-1-recommendation-1\.md$')" "1"
+# ...AC4: the reason answers the score, and a line feed in it is the factory's refusal, relayed
+out=$(run --recommend tRun --stage design --reason "two units share a seam" --verdict review); rc=$?
+same "AC4 the design reason exits 0" "$rc" "0"
+same "AC4 the reason record answers the score record" "$(grep -cxE -e '- \*\*Score:\*\* review' -e '- \*\*Role:\*\* gov-spec-writer' -e '- \*\*Answers:\*\* 2026-[0-9-]+-build-ARCH-tRun-1-recommendation-1' ${RCB}*-ARCH-tRun-1-recommendation-2.md)" "3"
+out=$(run --recommend tRun --stage design --reason "$(printf 'a line\nand another')" --verdict review); rc=$?
+same "AC7 a reason holding a line feed exits 1" "$rc" "1"
+hit "$out" "UNATTENDED check 37 FAILED — --recommend wrote no record, because the policy reader or the record factory refused or a kit did not resolve"
+hit "$out" "cannot forge a field"
+same "AC7 the refused reason wrote no record" "$(ls memory/builds/tRun/build | grep -c recommendation)" "2"
+# ...AC4's shapes, each the one shape refusal, writing nothing
+for _rc_a in "--stage build --reason x --verdict review" "--stage plan --reason x --verdict review" \
+             "--stage design --reason x --verdict maybe" "--stage design --reason x"; do
+  out=$(run --recommend tRun $_rc_a); rc=$?
+  same "AC4 $_rc_a exits 1" "$rc" "1"
+  hit "$out" "UNATTENDED check 37 FAILED — --recommend refuses this call and writes no record"
+done
+same "AC4 no refused shape wrote a record" "$(ls memory/builds/tRun/build | grep -c recommendation)" "2"
+write_rc_tree "$RC1" none
+same "AC4 a reason with no design score exits 1" "$(run --recommend tRun --stage design --reason x --verdict review >/dev/null; echo $?)" "1"
+out=$(run --recommend tRun --stage design)
+hit "$out" "recommendation — design · no-review · none · "
+same "AC2 one unforked unit reads no-review" "$(grep -cxE -e '- \*\*Score:\*\* no-review' -e '- \*\*Signals:\*\* none' ${RCB}*-recommendation-1.md)" "2"
+write_rc_tree '| [ARCH-tRun-2 — u](spec/r2.md) | 1 | 1 | SPECCED | rev-1 | 2026-08-20 |' "- F1 — which way? open"
+out=$(run --recommend tRun --stage design)
+hit "$out" "recommendation — design · review · a spec grading FORKED · "
+# ...AC3: a stage with no signal source is unarmed, never no-review; build reads the Tier column; ship refuses
+write_rc_tree '| [ARCH-tRun-1 — u](spec/r1.md) | 1 | 2 | SPECCED | rev-1 | 2026-08-20 |' none
+for _rc_s in plan test deploy; do
+  hit "$(run --recommend tRun --stage $_rc_s)" "recommendation — $_rc_s · unarmed · none · "
+done
+same "AC3 the three unarmed records" "$(grep -lx -- '- \*\*Score:\*\* unarmed' memory/builds/tRun/build/*-recommendation-*.md | grep -c .)" "3"
+hit "$(run --recommend tRun --stage build)" "recommendation — build · review · a Tier-2 spec · "
+out=$(run --recommend tRun --stage ship); rc=$?
+same "AC3 a stage outside the five exits 1" "$rc" "1"
+hit "$out" "UNATTENDED check 37 FAILED — --recommend refuses this call and writes no record: --stage ship is none of plan, design, build, test and deploy"
+same "AC3 the refused stage wrote nothing" "$(ls memory/builds/tRun/build | grep -c recommendation)" "4"
+# ...AC4's sources: signals-only takes no reason and pends none; agent-judgment scores Design none
+write_rc_tree "$RC3" none
+write_tracking_policy '[review.recommendation]\nsource = "signals-only"\n'
+run --recommend tRun --stage design >/dev/null
+same "AC4 signals-only pends no reason" "$(grep -cx -- '- \*\*Reason:\*\* none' ${RCB}*-recommendation-1.md)" "1"
+hit "$(run --recommend tRun --stage design --reason x --verdict review)" "--recommend refuses this call and writes no record: review.recommendation.source is signals-only"
+write_tracking_policy '[review.recommendation]\nsource = "agent-judgment"\n'
+hit "$(run --recommend tRun --stage design)" "recommendation — design · none · 3 units in the generated region · source agent-judgment · "
+git update-ref refs/remotes/origin/main "$BASE"
+# ...AC6: `binding` prints the trigger line where the deciding record reads review; above-tier binds Tier 2 alone
+write_rc_tree "$RC2" none
+write_tracking_policy '[review]\nrecommendation = "binding"\n'
+out=$(run --recommend tRun --stage build)
+hit "$out" "unattended: recommendation binds — unattended.sh --trigger tRun --subject tRun --cause recommendation"
+same "AC6 the binding build record" "$(grep -cx -- '- \*\*Binds:\*\* yes' ${RCB}*-recommendation-1.md)" "1"
+out=$(run --recommend tRun --stage design)
+miss "$out" "--trigger tRun"
+hit "$(run --recommend tRun --stage design --reason x --verdict review)" "unattended.sh --trigger tRun --subject tRun-specs --cause recommendation"
+write_rc_tree "$RC2" none
+write_tracking_policy '[review]\nrecommendation = "binding-above-tier"\n'
+out=$(run --recommend tRun --stage build)
+miss "$out" "--trigger tRun"
+same "AC6 binding-above-tier binds no Tier-1 build" "$(grep -cx -- '- \*\*Binds:\*\* no' ${RCB}*-recommendation-1.md)" "1"
+git update-ref refs/remotes/origin/main "$BASE"
+write_rc_tree "$RC2" none
+miss "$(run --recommend tRun --stage build)" "--trigger tRun"
+# ...AC7: a driver copy with no policy kit beside it refuses through the relay, naming the kit
+_rc_kc=$(mktemp -d); mkdir -p "$_rc_kc/u"; cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" "$_rc_kc/u/"
+out=$(bash "$_rc_kc/u/unattended.sh" --recommend tRun --stage design 2>&1); rc=$?
+same "AC7 a copy with no policy kit exits 1" "$rc" "1"
+hit "$out" "--recommend wrote no record, because the policy reader or the record factory refused or a kit did not resolve: the policy kit does not resolve"
+rm -rf "$_rc_kc"
+reset_tree
 # ---- The arms below are REGION TWO's, and they sit before its closing `fi`. Both sides of this
 # ---- merge edited this seam: main sharded the suite into two regions with mode-selected floors,
 # ---- while this branch appended new `--rescope` and `--dispatch` arms to the end of the file.

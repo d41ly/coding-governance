@@ -24,6 +24,7 @@
 #   unattended.sh --brief <slug> --unit <id> --path <file>  # record WHAT a build pass was handed
 #   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--round-highs <N> --round-minors <N>] [--highs <N> --minors <N>] [--folded <N> --promoted <N>] [--disposition fold|promote]
 #   unattended.sh --trigger <slug> --subject <s> --cause owed|opt-in|recommendation|placement [--pin <path>]...   # fire a review: print its call's pin, trigger and review policy
+#   unattended.sh --recommend <slug> --stage <s> [--reason <text> --verdict review|no-review]   # score a stage exit's review, or record its role's reason
 #   unattended.sh --fix-pass <slug> --unit <id> --reds <N>   # record one fix pass against a unit's acceptance, N its criteria still red
 #   unattended.sh --exhausted <slug>                       # end a build whose rework budget is spent: park its ending, print its act
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
@@ -118,7 +119,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
 # place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
 # the gate leg, because no runtime derivation crosses a file boundary.
-VERBS_SLUG="--preflight --status --audit --wake --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --refused --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --trigger --fix-pass --exhausted --brief --beat"
+VERBS_SLUG="--preflight --status --audit --wake --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --refused --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --trigger --recommend --fix-pass --exhausted --brief --beat"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
 VERBS_INLINE="--plan --phase --check-commit --claims --overlaps --version"
@@ -893,7 +894,7 @@ PLAN_PATHS=""
 PLAN_ASKS=""
 RV_SUBJECT=""; RV_BLOCKERS=""; RV_DISPOSITION=""; RV_HIGHS=""; RV_MINORS=""; RV_FOLDED=""; RV_PROMOTED=""
 RV_RHIGHS=""; RV_RMINORS=""; FP_REDS=""
-TR_CAUSE=""; TR_PINS=()
+TR_CAUSE=""; TR_PINS=(); RC_STAGE=""
 M="$MEMORY_ROOT"
 # SHARED_RECORDS's DEFAULT IS RESOLVED HERE, not in the block above, because it is expressed in terms
 # of MEMORY_ROOT and the conf is what sets that. Computed before the source it baked in this kit's own
@@ -959,6 +960,7 @@ VERB_REQUIRES="--abort --reason --code
 --attest --item
 --review --subject
 --trigger --subject --cause
+--recommend --stage
 --fix-pass --unit --reds
 --park --item --reason
 --propose --item --step --reason
@@ -8331,8 +8333,47 @@ write_landed_record() { # run-state file · the LANDED copy -> 0 staged as named
 # recommendation clause: a one-unit build with no open fork is what the trial measured the audit
 # buying nothing on, so the clause rides only where the build has two or more units in its
 # generated region or a tracked spec grades FORKED.
+# THE REVIEW SIGNALS, ONCE (TOOL-dDeclaredLoop-22 S2), read from the build README's generated units region
+# in one pass: `print_spec_audit_line` takes Design's clause from it and `--recommend` scores from it, so no
+# caller keeps a count of its own. `design` holds two or more units and a tracked spec grading FORKED under
+# FORK_CUTOFF, which its caller loads; `build` two or more units and a row whose Tier cell reads 2, counted
+# from the row's end because a title may hold a `|`. It SETS GLOBALS rather than printing, so no caller
+# wraps it in a substitution: `_rs_why` the signals joined by `, `, `_rs_tier2` 1 where any row reads Tier
+# 2, and `_rs_anchor` the lowest-numbered unit id of the region, the build's record anchor. `plan`, `test`
+# and `deploy` read no artifact this tree holds, so they hold no signal and answer 3.
+derive_review_signals() { # slug · stage -> sets _rs_why _rs_tier2 _rs_anchor; 3 for a stage with no signal source
+  local _rs_row _rs_id _rs_t _rs_sp _rs_n=0 _rs_seen=" "
+  local -a _rs_rows=()
+  _rs_why=""; _rs_tier2=""; _rs_anchor=""
+  readme_of "$1" >/dev/null
+  mapfile -t _rs_rows < <(unit_rows "$_readme" 2>/dev/null)
+  for _rs_row in ${_rs_rows[@]+"${_rs_rows[@]}"}; do
+    [[ $_rs_row =~ [A-Z]+-[A-Za-z0-9]+-[0-9]+ ]] || continue
+    _rs_id=${BASH_REMATCH[0]}
+    case "$_rs_seen" in *" $_rs_id "*) ;; *)
+      _rs_seen="$_rs_seen$_rs_id "; _rs_n=$((_rs_n + 1))
+      if [ -z "$_rs_anchor" ] || [ "$((10#${_rs_id##*-}))" -lt "$((10#${_rs_anchor##*-}))" ]; then _rs_anchor=$_rs_id; fi ;;
+    esac
+    _rs_t=${_rs_row%|*}; _rs_t=${_rs_t%|*}; _rs_t=${_rs_t%|*}; _rs_t=${_rs_t%|*}; _rs_t=${_rs_t##*|}
+    [ "${_rs_t//[[:space:]]/}" != 2 ] || _rs_tier2=1
+  done
+  case "${2:-}" in
+    design|build) [ "$_rs_n" -lt 2 ] || _rs_why="$_rs_n units in the generated region" ;;
+    *) return 3 ;;
+  esac
+  if [ "$2" = build ]; then
+    [ -z "$_rs_tier2" ] || _rs_why="${_rs_why:+$_rs_why, }a Tier-2 spec"
+    return 0
+  fi
+  for _rs_sp in $(git ls-files "$M/builds/$1/spec/*.md" 2>/dev/null | drop_working_specs); do
+    [ "$(plan_state "$_rs_sp" "$FORK_CUTOFF")" = FORKED ] || continue
+    _rs_why="${_rs_why:+$_rs_why, }a spec grading FORKED"; break
+  done
+  return 0
+}
+
 print_spec_audit_line() { # slug · run-state file
-  local sa why="" n=0 _sp
+  local sa why=""
   fact "$2" spec-audit >/dev/null; sa=$_fact
   if [ -n "$sa" ]; then
     if [ "${AUTH_SPEC_AUDIT_FROM:-}" = project ]; then
@@ -8342,12 +8383,7 @@ print_spec_audit_line() { # slug · run-state file
     fi
     return 0
   fi
-  readme_of "$1" >/dev/null; n=$(unit_rows "$_readme" 2>/dev/null | row_ids_of | grep -c .)
-  [ "${n:-0}" -ge 2 ] && why="$n units in the generated region"
-  for _sp in $(git ls-files "$M/builds/$1/spec/*.md" 2>/dev/null | drop_working_specs); do
-    [ "$(plan_state "$_sp" "$FORK_CUTOFF")" = FORKED ] || continue
-    why="${why:+$why, }a spec grading FORKED"; break
-  done
+  derive_review_signals "$1" design; why=$_rs_why
   # TOOL-aWardedAudit-1 S3 - the clause is addressed to the OWNER. Its first wording told the run
   # to write the key, and a run did; the opt-in is the owner's, so the run carries it to the wrap-up.
   echo "unattended: spec-audit — not owed (opt-in)${why:+; the opt-in belongs to the owner alone and this run never declares it - name it in the wrap-up for the owner: $why}"
@@ -13736,6 +13772,142 @@ run_trigger() { # slug · subject · cause · pin path...
   return 0
 }
 
+# THE STAGE-EXIT RECOMMENDATION (TOOL-dDeclaredLoop-22 S3, S4), `item.<stage>.recommend` and `.reason`:
+#
+#   --recommend <slug> --stage <s> [--reason <text> --verdict review|no-review]
+#
+# The SCORE form reads `review.recommendation` and `review.recommendation.source` through the policy kit's
+# `policy.py get`, each key spelled whole on its own line as `read_spec_audit_switch` spells its keys,
+# scores the stage from `derive_review_signals` (`unarmed` where the stage has no signal source, `none` for
+# Design under `agent-judgment`, else `review` on any signal and `no-review` on none) and binds it (`no`
+# under `advice`, `yes` under `binding`, under `binding-above-tier` `yes` where a row reads Tier 2). It writes
+# a score record through the record factory's `new recommendation` door under the build's anchor unit and
+# stages it; a build with no unit gets the score line and no record. The REASON form, Design's alone, writes
+# the role's answer as a reason record answering the stage's newest score record. Under `signals-only`, and
+# for every stage but Design, the score record decides; for Design under the other two sources the reason
+# record does. Where the deciding record reads `review` and binds, it prints the `--trigger` line. One `fail
+# 37` refuses every shape; a second relays the policy reader's or the factory's refusal, or names the kit
+# that did not resolve (§8 F7). It needs no run-state file and writes no row.
+run_recommend() { # slug · stage · reason · verdict
+  local slug="$1" stage="$2" reason="$3" verdict="$4" py="" d="" kr _rc_rec="" _rc_src="" _rc_why="" _rc_shape=""
+  local score binds="no" role=command rtext signals answers="" decides="" subj rel _rc_f _rc_n _rc_top=0 _rc_l _rc_st _rc_sg
+  local -a _rc_lines=() _rc_args=()
+  check_slug "$slug" || return 1
+  check_verb_flag --recommend --stage "$stage" || return 1
+  load_fork_cutoff || return 1
+  kr=$KIT_DIR
+  while [ -n "$kr" ] && [ ! -e "$kr/.git" ]; do kr=${kr%/*}; done
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! d=$(resolve_kit_dir "$py" policy policy.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
+    _rc_why="the policy kit does not resolve beside this kit, so review.recommendation and its source cannot be read"
+  elif ! _rc_rec=$("$py" "${kr:-.}/$d/policy.py" get review.recommendation 2>&1); then
+    _rc_why=$_rc_rec
+  elif ! _rc_src=$("$py" "${kr:-.}/$d/policy.py" get review.recommendation.source 2>&1); then
+    _rc_why=$_rc_src
+  fi
+  _rc_rec=${_rc_rec%$'\r'}; _rc_src=${_rc_src%$'\r'}
+  if [ -z "$_rc_why" ]; then
+    case "$_rc_rec" in
+      advice|binding|binding-above-tier) ;;
+      *) _rc_why="review.recommendation answered '$_rc_rec', outside advice, binding and binding-above-tier" ;;
+    esac
+    case "$_rc_src" in
+      scored-signals-and-reasoning|agent-judgment|signals-only) ;;
+      *) _rc_why="review.recommendation.source answered '$_rc_src', outside scored-signals-and-reasoning, agent-judgment and signals-only" ;;
+    esac
+  fi
+  if [ -z "$_rc_why" ]; then
+    case "$stage" in
+      plan|design|build|test|deploy) ;;
+      *) _rc_shape="--stage $stage is none of plan, design, build, test and deploy" ;;
+    esac
+    if [ -z "$_rc_shape" ] && { [ -n "$reason" ] || [ -n "$verdict" ]; }; then
+      if [ -z "$reason" ] || [ -z "$verdict" ]; then
+        _rc_shape="the reason form takes --reason and --verdict together"
+      elif [ "$verdict" != review ] && [ "$verdict" != no-review ]; then
+        _rc_shape="--verdict $verdict is neither review nor no-review"
+      elif [ "$stage" = plan ] || [ "$stage" = test ]; then
+        _rc_shape="--stage $stage takes no reason, because no role in this tree produces its work"
+      elif [ "$stage" != design ]; then
+        _rc_shape="--stage $stage takes no reason, because the stage has no single producing role"
+      elif [ "$_rc_src" = signals-only ]; then
+        _rc_shape="review.recommendation.source is signals-only, so the score record decides and no reason is recorded"
+      else
+        for _rc_f in "$M/builds/$slug/build/"*-recommendation-*.md; do
+          [ -f "$_rc_f" ] || continue
+          _rc_n=${_rc_f##*-recommendation-}; _rc_n=${_rc_n%.md}
+          case "$_rc_n" in ''|*[!0-9]*) continue ;; esac
+          _rc_st=""; _rc_sg=""
+          mapfile -t _rc_lines < "$_rc_f"
+          for _rc_l in ${_rc_lines[@]+"${_rc_lines[@]}"}; do
+            case "${_rc_l%$'\r'}" in
+              "- **Stage:** $stage") _rc_st=1 ;;
+              "- **Signals:** "*) _rc_sg=1 ;;
+            esac
+          done
+          if [ "$_rc_st$_rc_sg" = 11 ] && [ "$((10#$_rc_n))" -gt "$_rc_top" ]; then
+            _rc_top=$((10#$_rc_n)); answers=${_rc_f##*/}; answers=${answers%.md}
+          fi
+        done
+        [ -n "$answers" ] || _rc_shape="no score record of --stage $stage stands in this build for the reason to answer"
+      fi
+    fi
+    if [ -n "$_rc_shape" ]; then
+      fail 37 "--recommend refuses this call and writes no record: $_rc_shape"
+      return 1
+    fi
+  fi
+  if [ -z "$_rc_why" ]; then
+    derive_review_signals "$slug" "$stage"
+    case "$stage" in
+      plan|test|deploy) score=unarmed ;;
+      design) if [ "$_rc_src" = agent-judgment ]; then score=none; else score=${_rs_why:+review}; score=${score:-no-review}; fi ;;
+      *) score=${_rs_why:+review}; score=${score:-no-review} ;;
+    esac
+    case "$_rc_rec" in
+      binding) binds=yes ;;
+      binding-above-tier) [ -z "$_rs_tier2" ] || binds=yes ;;
+    esac
+    signals=${_rs_why:-none}; rtext=none
+    [ "$stage" != design ] || [ "$_rc_src" = signals-only ] || rtext=pending
+    if [ -n "$answers" ]; then
+      score=$verdict; role=gov-spec-writer; rtext=$reason; decides=1
+    elif [ "$rtext" = none ]; then
+      decides=1
+    fi
+    subj=$slug; [ "$stage" != design ] || subj=$slug-specs
+    if [ -z "$_rs_anchor" ]; then
+      echo "unattended: recommendation — $stage · $score · $signals · source $_rc_src · binds $binds · no record: the build's generated units region names no unit to anchor it"
+      return 0
+    fi
+    _rc_args=(--stage "$stage" --score "$score" --source "$_rc_src" --binds "$binds" --reason "$rtext" --role "$role")
+    if [ -n "$answers" ]; then _rc_args+=(--answers "$answers"); else _rc_args+=(--signals "$signals"); fi
+    if ! d=$(resolve_kit_dir "$py" memory-tree build_records.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
+      _rc_why="the memory-tree kit's build_records.py does not resolve beside this kit, so the record cannot be written"
+    else
+      run_bounded "$py" -B "${kr:-.}/$d/build_records.py" new recommendation --root . --build "$slug" --unit "$_rs_anchor" "${_rc_args[@]}"
+      rel=${RB_STDOUT#build-records: wrote }; rel=${rel%%$'\n'*}; rel=${rel%$'\r'}
+      case "$RB_STDOUT" in
+        "build-records: wrote "*) ;;
+        *) _rc_why=${RB_OUT:-the record factory printed nothing}; _rc_why=${_rc_why%%$'\n'*} ;;
+      esac
+    fi
+  fi
+  if [ -n "$_rc_why" ]; then
+    fail 37 "--recommend wrote no record, because the policy reader or the record factory refused or a kit did not resolve: $_rc_why"
+    return 1
+  fi
+  stage_runmd "$rel" || print_env_failure 37 "--recommend wrote a record git could not stage: $rel"
+  [ -z "$answers" ] || signals="answers $answers"
+  echo "unattended: recommendation — $stage · $score · $signals · source $_rc_src · binds $binds · $rel"
+  if [ -z "$decides" ]; then
+    echo "unattended: recommendation — a reason decides: spawn gov-spec-writer through handoff.py render --role gov-spec-writer, handed the line above and one question, should this be reviewed and why, then record its answer: unattended.sh --recommend $slug --stage $stage --reason <why> --verdict review|no-review"
+  elif [ "$score" = review ] && [ "$binds" = yes ]; then
+    echo "unattended: recommendation binds — unattended.sh --trigger $slug --subject $subj --cause recommendation"
+  fi
+  return 0
+}
+
 # THE FIX-PASS LOOP (TOOL-dDeclaredLoop-32 S5). `--fix-pass <slug> --unit <id> --reds <N>` records one fix
 # pass against a unit's acceptance, `<N>` its criteria still red after the pass, as a `fix-pass` row:
 #
@@ -16210,6 +16382,7 @@ while [ $# -gt 0 ]; do
     --round-minors) RV_RMINORS="${2:-}"; shift 2 || shift ;;
     --reds)         FP_REDS="${2:-}"; shift 2 || shift ;;
     --cause)        TR_CAUSE="${2:-}"; shift 2 || shift ;;
+    --stage)        RC_STAGE="${2:-}"; shift 2 || shift ;;
     --pin)          TR_PINS+=("${2:-}"); shift 2 || shift ;;
     --audited)     RR_AUDITED="${2:-}"; shift 2 || shift ;;
     --finding)      RR_FINDINGS+=("${2:-}"); shift 2 || shift ;;
@@ -16317,6 +16490,7 @@ case "$VERB" in
   --brief)     verb_brief "$SLUG" "$BR_UNIT" "$RP_PATH" ;;
   --review)    verb_review "$SLUG" "$RV_SUBJECT" "$VERDICT" "$RV_BLOCKERS" "$RV_DISPOSITION" "$RV_HIGHS" "$RV_MINORS" "$RV_FOLDED" "$RV_PROMOTED" "$RV_RHIGHS" "$RV_RMINORS" ;;
   --trigger)   run_trigger "$SLUG" "$RV_SUBJECT" "$TR_CAUSE" ${TR_PINS[@]+"${TR_PINS[@]}"} ;;
+  --recommend) run_recommend "$SLUG" "$RC_STAGE" "$REASON" "$VERDICT" ;;
   --fix-pass)  run_fix_pass "$SLUG" "$BR_UNIT" "$FP_REDS" ;;
   --exhausted) run_exhausted "$SLUG" ;;
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;

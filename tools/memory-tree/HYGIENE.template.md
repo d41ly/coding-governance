@@ -657,8 +657,9 @@ carry it too:
   `red-fix` (the record of an inline red fix, in the grammar under "Red-fix records") ·
   `disposition` (the owner's disposition of one loop item, in the grammar under "Disposition records") ·
   `acceptance` (a unit's acceptance commands re-run at a commit, in the grammar under "Acceptance
-  records") · `transition` (one build stage move, in the grammar under "Transition records"). The
-  eight after `research` are the typed kinds: each record is named
+  records") · `transition` (one build stage move, in the grammar under "Transition records") ·
+  `recommendation` (a stage exit's review recommendation, in the grammar under "Recommendation
+  records"). The nine after `research` are the typed kinds: each record is named
   `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, and the kind and that name are
   joined both ways. An open kind field stops being groupable the first time two authors spell one
   relation differently.
@@ -758,6 +759,20 @@ field the move carries, its name capitalised (`Stand-in`). It has no door: the l
 `loop_transition.py record` writes it from the move, beside the move's `Gov-Transition` trailer, and
 its `check` holds the record to that trailer field by field. A move made before the build's first spec
 writes no record; the next move after it back-fills one per earlier trailer.
+
+**Recommendation records.** A stage exit's review recommendation is a `recommendation` record named
+`<date>-build-<anchor id>-recommendation-<n>.md` in the build's `build/` folder, the anchor the lowest unit
+id of the build README's generated units region, `<n>` following the order written, so a stage scored
+twice keeps both. Its fields are `- **<Key>:** <value>` bullets, one line each: Stage, Source and Role (one
+word each), Score (`review` · `no-review` · `unarmed` · `none`), Binds (`yes` · `no`), Reason and
+Caused-by, all required, and exactly one of Signals and Answers. A SCORE record carries Signals, the
+signals that held or `none`, and Role `command`; a REASON record carries Answers, the stem of the score
+record it answers, and the answering role. Write it through the door, `build_records.py new
+recommendation --build <slug> --unit <id> --stage <stage> --score <score> --source <source> --binds
+yes|no --reason <text> --role <role> [--signals <text>] [--answers <stem>]`, which refuses a value outside
+those shapes and an Answers naming no recommendation record of the build. The unattended driver's
+`--recommend` calls it; the newest score record of a stage and the reason answering it are the pair
+that decides.
 
 ## Acceptance ledger — how a built unit evidences its criteria
 

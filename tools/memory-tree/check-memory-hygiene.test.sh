@@ -3192,6 +3192,12 @@ cnot 12 'memory/builds/tTen/spec/2026-08-01-spec-tTen-1.md'
 out=$("$_PY" "$HERE/build_records.py" --fixture --plant typed-kinds 2>&1)
 hit 'build-records: PASS typed-kinds'
 
+# --- TOOL-dDeclaredLoop-22 S1 (AC1) — the recommendation door: a score record and the reason answering it,
+# --- each read back with every field, five refusals naming their field and writing nothing, and both
+# --- bound. Red on a factory that writes a score outside its set or a reason answering no record.
+out=$("$_PY" "$HERE/build_records.py" --fixture --plant recommendation 2>&1)
+hit 'build-records: PASS recommendation'
+
 # --- PLAY-dOrderedCharter-55 S8 (AC8) — a pending kind: a copy of the record factory with one kind's
 # --- entry declared pending imports, `read` exits 2 naming the unit, and `write_record` refuses it
 # --- naming the unit with no file written. Red on a write_record that writes a pending kind.
@@ -4752,7 +4758,9 @@ done
 # RAISED 707 -> 708 by TOOL-aClearedLedger-6: its three resolver-block assertions, each top-level and
 # never skipped, less OSTYPE out of the population loop and GOV_PYTHON out of the exemption loop.
 # Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=708
+# RAISED 708 -> 709 by TOOL-dDeclaredLoop-22: its recommendation plant assertion, top-level and never
+# skipped. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=709
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

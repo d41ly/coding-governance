@@ -352,6 +352,28 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `{findings, unverified, leftShift, blocks}`, `blocks` `yes` under `review.blocks every-review`, under
   `owed-only` when the cause is `owed`, else `no`. It writes no row: a non-round `review` row would hide the
   subject's terminal token. The build harness takes the `trigger` and `reviewPolicy` it prints.
+- `--recommend` — `--recommend <slug> --stage <s> [--reason <text> --verdict review|no-review]` scores ONE
+  stage exit's review recommendation (TOOL-dDeclaredLoop-22), `item.<stage>.recommend`, and records Design's
+  reason, `item.design.reason`. The SCORE form reads `review.recommendation` and
+  `review.recommendation.source` through the policy kit, scores the stage from the build README's generated
+  units region (`unarmed` for `plan`, `test` and `deploy`, which hold no signal source; `none` for `design`
+  under `agent-judgment`; else `review` on any signal and `no-review` on none, the signals two or more units,
+  a spec grading `FORKED` for `design` and a Tier-2 row for `build`) and binds it (`no` under `advice`, `yes`
+  under `binding`, under `binding-above-tier` `yes` where a row reads Tier 2). It writes a score record
+  through the record factory's `new recommendation` door under the build's lowest-numbered unit and stages
+  it; a build with no unit gets the line and no record. The main loop calls it at each stage exit, Design's
+  once the spec set is committed. The REASON form, `design` alone, writes the role's answer as a reason
+  record answering the stage's newest score record. THE DECIDING RECORD is the score record under
+  `signals-only` and for every stage but `design`; for `design` under the other two sources it is the reason,
+  and the score line then names the spawn: the main loop runs `handoff.py render --role gov-spec-writer`,
+  hands it the score line and one question, should this be reviewed and why, and records its `review` or
+  `no-review` with the reason form. Where the deciding record reads `review` and binds, it prints
+  `unattended.sh --trigger <slug> --subject <s> --cause recommendation`, `<s>` `<slug>-specs` for `design`
+  and `<slug>` for `build`. It refuses, writing nothing, a stage outside the five, one of `--reason` and
+  `--verdict` alone, a verdict outside the two, a reason for any stage but `design` or under `signals-only`,
+  and a reason with no score record to answer; and it relays the policy reader's or the factory's refusal,
+  or names the kit that did not resolve. It needs no run-state file and writes no row; the answer is
+  recorded, never acted on, since the spec audit's opt-in is the owner's.
 - `--fix-pass` — `--fix-pass <slug> --unit <id> --reds <n>` records ONE fix pass against a unit's
   acceptance, `<n>` its criteria still red after the pass, as a `fix-pass` row
   `reds <n>[ · <EXIT>][ · to <target>]`, a history kind like `review`. Its state is the review loop's

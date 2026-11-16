@@ -5228,6 +5228,11 @@
       "file": "tools/gate-lint/encoding_posture.py"
     },
     {
+      "id": "check_bindings",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
       "id": "check_blob_reader",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
@@ -7341,6 +7346,16 @@
       "id": "check_receipt_vintage",
       "kind": "function",
       "file": "tools/memory-tree/check-verdict-epoch.sh"
+    },
+    {
+      "id": "check_recommendation_fields",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
+      "id": "check_recommendation_plant",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "check_record",
@@ -10628,6 +10643,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "derive_flags",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
       "id": "derive_floor_breaches",
       "kind": "function",
       "file": "tools/codebase-map/replay-phrases.py"
@@ -11876,6 +11896,11 @@
       "id": "derive_review_exit",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "derive_review_signals",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "derive_review_verdict",
@@ -21483,6 +21508,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_recommendation",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
       "id": "read_record",
       "kind": "function",
       "file": "tools/memory-tree/build_records.py"
@@ -29998,6 +30028,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "run_recommend",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "run_refusal_plant",
       "kind": "function",
       "file": "tools/loop/position.py"
@@ -36428,6 +36463,11 @@
       "file": "tools/unattended/check-pass-order.test.sh"
     },
     {
+      "id": "write_rc_tree",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "write_readers_spec",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -36451,6 +36491,11 @@
       "id": "write_reclaimed_lock",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "write_recommendation",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "write_record",

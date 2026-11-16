@@ -1322,6 +1322,42 @@ row, and the unattended leg's check 2 counts the units owed by it. The review's 
 `trigger=` with the cause, and `shape=`, `efforts=` and `role-sha=`, which read `-` until a role's shape
 supplies them.
 
+## Whether a stage's work should be reviewed
+
+At each stage's exit a command scores whether the stage's work should be reviewed, and for Design the
+role that produced the work then answers the same question, why included. Both answers are
+`recommendation` records in the build's `build/` folder, named under the build's lowest-numbered unit,
+and two keys in `.governance/policy.toml` say what they mean:
+
+- `review.recommendation`, default `advice`: `advice` never binds; `binding` binds every
+  recommendation; `binding-above-tier` binds only a build whose units include a Tier-2 spec.
+- `review.recommendation.source`, default `scored-signals-and-reasoning`: what decides. Under it the
+  score decides Build, and Design's reason decides Design. `agent-judgment` leaves Design's score
+  `none`, so the reason alone decides. `signals-only` takes no reason, and the score decides.
+
+The score reads your build README's generated units region. Design scores `review` when the build has
+two or more units or a spec with an unresolved open question, and Build when it has two or more units
+or a Tier-2 spec; otherwise `no-review`. Plan, Test and Deploy score `unarmed`, never `no-review`,
+because nothing they produce is read for a signal yet. One `[review]` table cannot set both keys, so
+`binding` under `signals-only` cannot be declared until the catalogue renames one of them.
+
+- **Score a stage:** `bash tools/unattended/unattended.sh --recommend <slug> --stage <stage>` writes <!-- usage: verb:unattended.sh:--recommend 7c91eefd -->
+  the score record and stages it, and prints one line: the stage, the score, the signals, the source,
+  whether it binds and the record. The stage is `plan`, `design`, `build`, `test` or `deploy`. Where
+  Design's reason decides, it names the next step: spawn `gov-spec-writer` through
+  `handoff.py render --role gov-spec-writer`, hand it that line and the question, and record its answer.
+- **Record Design's reason:** `bash tools/unattended/unattended.sh --recommend <slug> --stage design --reason <why> --verdict review`
+  writes a reason record answering the newest Design score, with `review` or `no-review` as its score.
+  Where the deciding record reads `review` and binds, the verb prints the `--trigger` call that fires the
+  review, with the subject `<slug>-specs` for Design and `<slug>` for Build.
+
+It writes nothing, and exits 1, for a stage outside the five, a `--reason` without `--verdict` or the
+reverse, a verdict other than `review` or `no-review`, a reason for any stage but Design or under
+`signals-only`, and a reason with no Design score to answer. It exits 1 too when the policy kit or the
+record kit is not installed, or refuses a value, such as a reason holding a line break. A build whose
+units region names no unit gets the line and no record. The answer is recorded and never acted on: the
+spec audit's opt-in stays yours.
+
 ## How much rework a build may do
 
 Every build has one rework budget, the policy key `flow.rework-budget`, and every repetition draws on
