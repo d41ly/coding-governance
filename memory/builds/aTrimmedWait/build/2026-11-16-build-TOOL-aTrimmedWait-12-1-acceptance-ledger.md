@@ -68,7 +68,9 @@ generator path it builds is relative and the probe runs it with the fixture as i
   `git diff --name-only HEAD MERGE_HEAD` names, and `.governance/instructions.lock` read identical to main's.
 - AC12 — owed to the main loop after the re-stamp commit: `bash skills/session-kickoff/manifest-check.sh`,
   `git merge-tree --write-tree 5d48501da HEAD` and `git merge-base --is-ancestor 5d48501da HEAD`.
-- AC13 — owed to the main loop on a frozen clone: `python tools/memory-tree/gen_build_index.py --selftest`.
+
+The spec's rev-2 moved the selftest out of §6 into the runs §7 says the close owes; the main loop
+runs `python tools/memory-tree/gen_build_index.py --selftest` there, on a frozen clone.
 
 ## Before and after, on this node
 

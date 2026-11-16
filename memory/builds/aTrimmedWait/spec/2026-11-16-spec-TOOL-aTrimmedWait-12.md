@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-12 — the reconcile with local main at 5d48501da: its eight conflicts resolved so the landing merge is clean
 
-**Status:** CLOSED · rev-1 · 2026-11-16 · node a · Tier-2 · base 5d48501da · streams tooling · order 11 · ratified 2026-11-16
+**Status:** CLOSED · rev-2 · 2026-11-16 · node a · Tier-2 · base 5d48501da · streams tooling · order 11 · ratified 2026-11-16
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,9 @@
 |---|---|---|
 | [2026-11-16-build-TOOL-aTrimmedWait-12-1-acceptance-ledger.md](../build/2026-11-16-build-TOOL-aTrimmedWait-12-1-acceptance-ledger.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aTrimmedWait-12-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-aTrimmedWait-12-1-spec-writer.md) | journal | — |
+| [2026-11-16-prompt-TOOL-aTrimmedWait-12-2-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-aTrimmedWait-12-2-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aTrimmedWait-12-brief.md](../prompts/2026-11-16-prompt-TOOL-aTrimmedWait-12-brief.md) | research | — |
+| [2026-11-16-prompt-TOOL-aTrimmedWait-12-revision.md](../prompts/2026-11-16-prompt-TOOL-aTrimmedWait-12-revision.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -70,7 +72,8 @@ function, and §4 shows that no decline and no undo can leave a stamp behind.
 - **S11** — The generated outputs are regenerated after the resolution and committed in the merge.
   Observed by AC11.
 - **S12** — The landing merge of the branch onto `5d48501da` reports no conflict, and the build
-  index selftest passes on a frozen clone of the merge. Observed by AC12 and AC13.
+  index selftest passes on a frozen clone of the merge. Observed by AC12, and the selftest by the
+  close's run in §7.
 
 ## 3. Non-goals (OUT)
 
@@ -534,11 +537,6 @@ commit.
   Red when: the stamp does not follow the merge, the landing merge would conflict, or `5d48501da` is
   not in the branch's history.
   permission: the main loop's, as in AC1.
-- **AC13** — On a frozen clone of the branch after the re-stamp commit,
-  `python tools/memory-tree/gen_build_index.py --selftest` exits 0.
-  Red when: a selftest arm of either side fails over the merged `cmd_write`.
-  permission: the main loop's, per the brief.
-  cost: minutes, on the clone.
 
 ## 7. Gates
 
@@ -547,7 +545,9 @@ commit.
 The first eight grade this unit's resolutions directly. The last eight are owed because a path of the
 estimate trips their guard, by `python tools/check-spec-tokens.py --legs-for` at `766048903`, less
 the broad guards. Per the brief, the main loop runs the bar once at the close without the self-test
-suites, and the three conflicted suites and the build index selftest once on a frozen clone. No arm
+suites, and, once on a frozen clone of the branch after the re-stamp commit, the three conflicted
+suites and `python tools/memory-tree/gen_build_index.py --selftest`, each exiting 0. The selftest
+reds when an arm of either side fails over the merged `cmd_write`, and costs minutes on the clone. No arm
 is added or moved, so there is no `New arm:` line. Both sides' arms are each side's own, already
 observed red and then green by the units that wrote them.
 
@@ -564,6 +564,10 @@ observed red and then green by the units that wrote them.
 - rev-1 · 2026-11-16 · initial draft from `prompts/2026-11-16-prompt-TOOL-aTrimmedWait-12-1-spec-writer.md`,
   grounded at `766048903` and `5d48501da`. The eight resolutions and both probes were run on the
   trial merge's files in the scratch directory.
+- rev-2 · 2026-11-16 · S12 · AC13 · §7 · AC13 leaves §6 and its run, the build index selftest exiting
+  0 on a frozen clone, is stated in §7 beside the three conflicted suites, since the pass-legs run over
+  `7c3e4d4e5..c50583f10` read a selftest as an acceptance observation (2026-11-16-prompt-TOOL-aTrimmedWait-12-2-spec-writer).
+  S12 points at §7. No resolution, figure or other criterion moves.
 
 ## 10. Reuse audit
 
