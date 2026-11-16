@@ -1,6 +1,6 @@
 # TOOL-aPiecewiseGrade-7 — an arm for the stale check's foreign-runtime clause
 
-**Status:** SPECCED · rev-1 · 2026-11-16 · node a · Tier-1 · base aebbb4a72 · streams tooling · order 6
+**Status:** INPROGRESS · rev-1 · 2026-11-16 · node a · Tier-1 · base aebbb4a72 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
