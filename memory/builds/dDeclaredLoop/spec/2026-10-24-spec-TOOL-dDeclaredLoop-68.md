@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-68 — the witness normaliser has one owner, the run-gates program, before unit 67 reads it
 
-**Status:** INPROGRESS · rev-3 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 37 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-4 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 37 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -41,11 +41,13 @@ the program route as landed. It repairs `TOOL-dDeclaredLoop-56`.
 - **S1** — `run_witness_commands` hashes each command's output after the run-gates program normalises it,
   never a copy of the program's rules. It resolves `resolve_kit_dir("run-gates", "lib-attribute.sh", KIT)`
   before it adds the worktree. Once every command has run, one bash, the one the inline `resolve_bash`
-  answers, sources `lib-attribute.sh`, writes the program once with `write_normaliser` into the re-run's
-  temporary directory, and applies it with `LC_ALL=C sed -E -f` to each output file, writing a `.norm`
-  file beside it. The hash is taken over the `.norm` bytes. The roots handed to `write_normaliser`, in
-  order, are the worktree's absolute path, the worktree's `os.path.realpath`, and the repository's
-  absolute path, each in forward-slash form from `Path.as_posix()`. No Python argv under `tools/loop/`
+  answers, started in the worktree with the commands' environment as each command's bash is, sources
+  `lib-attribute.sh`, writes the program once with `write_normaliser` into the re-run's temporary
+  directory, and applies it with `LC_ALL=C sed -E -f` to each output file, writing a `.norm` file beside
+  it. The hash is taken over the `.norm` bytes. The roots handed to `write_normaliser`, in order, are the
+  worktree's absolute path, the worktree's `os.path.realpath`, each in forward-slash form from
+  `Path.as_posix()`, the worktree's path as that bash's own `pwd` prints it, read inside that bash (§8
+  F4), and the repository's absolute path from `Path.as_posix()`. No Python argv under `tools/loop/`
   names `sed`. Observed by AC1, AC2, AC3.
 - **S3** — A run-gates kit that does not resolve, a bash that does not start, and a source,
   `write_normaliser` or `sed` step that exits non-zero or runs past the re-run's bound each refuse the
@@ -56,8 +58,9 @@ the program route as landed. It repairs `TOOL-dDeclaredLoop-56`.
   also prints the reason on stderr as `loop-witness: inconclusive · <reason>`. Observed by AC4.
 - **S4** — The plants `normalise` and `normaliser-missing` join `PLANTS` and the `--selftest` run.
   `normalise` re-runs one command twice at one commit. The command prints its working directory through
-  bash's `pwd`, Python's `os.getcwd()` and `git rev-parse --show-toplevel`, then a duration whose digits
-  come from a counter file outside the worktree, so the two runs print different durations.
+  bash's `pwd`, which under Git Bash spells a worktree under the host temp directory through the `/tmp`
+  mount, Python's `os.getcwd()` and `git rev-parse --show-toplevel`, then a duration whose digits come
+  from a counter file outside the worktree, so the two runs print different durations.
   `normaliser-missing` rebinds the module's `KIT` to an empty scratch directory for its calls, runs the
   `rerun` verb in process from the fixture repository, and restores both the binding and the working
   directory before returning. Observed by AC1, AC4.
@@ -93,14 +96,30 @@ the program route as landed. It repairs `TOOL-dDeclaredLoop-56`.
 
 - **consumes-from** `TOOL-dDeclaredLoop-56` — §8 F7 (b), which builds no inline normaliser and no `normalise_output` row and leaves the normaliser of `run_witness_commands` to this unit
 - **hands-off** `TOOL-dDeclaredLoop-67` — the program-route normaliser and the absent `normalise_output` row, which S24 and AC17 read as landed, AC17 over the `normalise` plant
-- **hands-off** `TOOL-dDeclaredLoop-79` — the normaliser route and its named refusal in `tools/loop/loop_witness.py`, built here inside the resolved bash with forward-slash roots and a `sed:` reason (§8 F3), which S6, S7 and S12 re-ground onto; the descriptor's `requires` edge to run-gates and its probe (S4, S5; ids 4, 23); and the sibling-minted `loop computed witness` leg this pass keeps green (id 3)
+- **hands-off** `TOOL-dDeclaredLoop-79` — the normaliser route and its named refusal in `tools/loop/loop_witness.py`, built here inside the resolved bash with forward-slash roots, the worktree as that bash's `pwd` prints it among them, and a `sed:` reason (§8 F3, F4), which S6, S7 and S12 re-ground onto; the descriptor's `requires` edge to run-gates and its probe (S4, S5; ids 4, 23); and the sibling-minted `loop computed witness` leg this pass keeps green (id 3)
 
 ## 4. Design
 
 ### Evidence
 
 Every code claim below was read with `git show` on branch `unattended-declared-loop-d56bf0` at
-`dca74c239`, the tip after `TOOL-dDeclaredLoop-53` landed.
+`dca74c239`, the tip after `TOOL-dDeclaredLoop-53` landed, and re-read for rev-4 at `a339daae2`, where
+`git diff --stat dca74c239 a339daae2 -- tools/loop/loop_witness.py tools/run-gates/lib-attribute.sh tools/run-gates/run-gates.sh tools/run-gates/run-selftests.sh`
+prints nothing, PINNED 2026-11-17, and the `tools/loop/loop_lib.py` diff between them leaves
+`resolve_kit_dir` alone.
+
+- Under Git Bash the temp folder is mounted at `/tmp`. A bash started by `subprocess` with its `cwd` a
+  `tempfile.mkdtemp` directory prints `pwd` as `/tmp/<name>/tree` and `pwd -P` as
+  `/c/Users/<user>/AppData/Local/Temp/<name>/tree`, while Python's `as_posix()` spells the same
+  directory `C:/Users/<8.3 name>/AppData/Local/Temp/<name>/tree`: the first dispatch's return
+  (`2026-11-17-build-TOOL-dDeclaredLoop-68-1-builder-return`) observed the `pwd` line through
+  `run_witness_commands`, and a scratch probe on node d on 2026-11-17 observed all four. No spelling
+  `render_path_spellings` derives from an `X:/` root is a `/tmp/` path.
+- Both run-gates runners place their scratch worktree under the git common dir and hand
+  `write_normaliser` `$ROOT`, git's `--show-toplevel`, and that worktree's path
+  (`tools/run-gates/run-gates.sh@069eea5d97:5157`, `tools/run-gates/run-selftests.sh@fa74eed834:1916`).
+- `tools/loop/loop_witness.py#run_fixture` builds each plant's repository in a `tempfile.mkdtemp`
+  directory, under the same temp folder as the re-run's worktree.
 
 - `tools/loop/loop_witness.py#run_witness_commands` writes each command's output to `cmd-<n>.out` beside
   the worktree and keeps `hashlib.sha256` of its raw bytes; the module docstring says the output is
@@ -132,22 +151,32 @@ lib   = resolve_kit_dir("run-gates", "lib-attribute.sh", KIT) / "lib-attribute.s
 ...     the worktree added and every command run as today, each into <tmp>/cmd-<n>.out
 roots = [Path(tree).absolute().as_posix(), Path(os.path.realpath(tree)).as_posix(),
          Path(repo).absolute().as_posix()]
-run_normaliser(bash, lib, <tmp>/normalise.sed, roots, outs, env, timeout):
-    [bash, "-c", '. "$1" || exit 3; p=$2; write_normaliser "$p" "$3" "$4" "$5" || exit 4; shift 5;
-                  for f in "$@"; do LC_ALL=C sed -E -f "$p" < "$f" > "$f.norm" || exit 5; done',
-     "_", lib.as_posix(), prog, *roots, *outs]
+run_normaliser(bash, lib, <tmp>/normalise.sed, roots, outs, tree, env, timeout):
+    Popen([bash, "-c", '. "$1" || exit 3; p=$2; t=$(pwd) || exit 4;
+                        write_normaliser "$p" "$3" "$4" "$t" "$5" || exit 4; shift 5;
+                        for f in "$@"; do LC_ALL=C sed -E -f "$p" < "$f" > "$f.norm" || exit 5; done',
+           "_", lib.as_posix(), prog, *roots, *outs],
+          cwd=tree, env=env, stdin=DEVNULL, stdout and stderr to <tmp>/normalise.err,
+          its own session on POSIX, as each command's Popen is)
+    past `timeout` -> run_tree_kill(p), as a command's bound does, before the worktree is removed
     exit 3, 4 or 5, any other non-zero, an OSError, past `timeout`
         -> LookupError("witness: normaliser unavailable — <source|write_normaliser|sed>: <exit or why>")
 hash  = sha256(<tmp>/cmd-<n>.out.norm bytes)[:12]
 ```
 
-The worktree's two spellings come first, because a command run in the worktree prints that path; the
+The worktree's spellings come first, because a command run in the worktree prints that path; the
 realpath form covers a temporary directory reached through a short or linked name, which
-`git rev-parse --show-toplevel` may print expanded. A root equal to another only writes duplicate rules.
-`LC_ALL=C` makes `\b` and `[[:space:]]` byte rules, so two nodes with different locales hash one output
-alike. The bash runs with `read_clean_env()`, as the commands do. Every path reaches it as a positional
-argument, never inside the script text. Its stderr is read as UTF-8 with `errors="replace"` for the
-reason, and the `.norm` files are read as bytes.
+`git rev-parse --show-toplevel` may print expanded. The added root, `$t`, third in order, is the worktree as bash's
+`pwd` prints it, read by a bash started exactly as each command's bash is, the same binary, `cwd` and
+environment, so it is the spelling a command's `pwd` prints on every node: `/tmp/lw-<random>/tree`
+under Git Bash, whose runtime alone knows its mounts, and a duplicate of the first or second root
+where no mount stands between them (§8 F4). `pwd`, never `pwd -P`, because `-P` resolves the mount and
+prints the `/c/` spelling the realpath root already yields. A root equal to another only writes
+duplicate rules. `LC_ALL=C` makes `\b` and `[[:space:]]` byte rules, so two nodes with different
+locales hash one output alike. The bash runs with `read_clean_env()`, as the commands do. Every path
+reaches it as a positional argument, never inside the script text. `<tmp>/normalise.err` is a file
+beside the worktree, never a pipe, for the reason the commands' output is; it is read as UTF-8 with
+`errors="replace"` for the reason, and the `.norm` files are read as bytes.
 
 ### Inventory
 
@@ -197,11 +226,18 @@ No flag, verb, constant, leg, record kind or parity row is minted.
   the empty string does. A timed-out command's partial output is normalised and hashed beside the exit
   `timeout`, as it is hashed raw today.
 - observability — S3's text names the step and its exit, and `rerun` now prints it.
-- risks — a path printed in a spelling none of the three roots produces, such as a relative path, stays
-  in the output and reads as a difference: the direction `lib-attribute.sh`'s header chooses, failing
-  toward noise. The `timeout-grandchild` plant's ten-second window now holds the normaliser's bash too;
-  the pass reads the plant's printed time, and a reading over the window is a red of this pass, never a
-  wider window. An install without the run-gates kit refuses every re-run until 79 S4 lands the edge.
+- risks — a path printed in a spelling none of the four roots produces, such as a relative path, the
+  repository's path as bash would spell it through a mount, or `pwd -P`'s answer from a worktree reached
+  through a link Python's realpath does not follow, stays in the output and reads as a difference: the
+  direction `lib-attribute.sh`'s header chooses, failing toward noise. AC1 exercises the `pwd` root
+  only where a mount stands between the temp folder and bash, as Git Bash's `/tmp` does; on a node with
+  none the root duplicates the first or second and AC1 does not check it. The normaliser's bash holds
+  the worktree as its `cwd`, so on Windows the tree cannot be removed while it lives: it is waited for,
+  or killed through `run_tree_kill` on the bound, before the `finally` removes the worktree, and a tree
+  still on disk is named by the existing `leaked` line. The `timeout-grandchild` plant's ten-second
+  window now holds the normaliser's bash too; the pass reads the plant's printed time, and a reading over
+  the window is a red of this pass, never a wider window. An install without the run-gates kit refuses
+  every re-run until 79 S4 lands the edge.
 - testing — AC1 to AC6 as plants and greps; the arm under §7, observed RED then GREEN at the close.
 - migration — none: §4 Evidence shows no recorded hash under the raw rule, so no recorded `--expect`
   turns `refuted`.
@@ -222,13 +258,17 @@ TOOL-dDeclaredLoop-114. Neither shares a line with this unit.
 
 ### The sweep
 
-Read at `dca74c239`. Each figure is PINNED 2026-11-16 and re-derived by the command beside it.
+Read at `dca74c239`. Each figure is PINNED 2026-11-16 and re-derived by the command beside it; for
+rev-4 the counts were re-derived at `a339daae2` on 2026-11-17, the `run_witness_commands(` lines, the
+importers, the conf count, the encoding and size-cap rows and the budget row, and only the importers
+row moved. The usage fingerprints were not re-derived. The rows the `pwd` root and the normaliser's
+`cwd` reach, the parity blocks, the refusal ceilings and the encoding posture, were re-read and hold.
 
 | What moves | Its readers, pins and populations | What keeps each green |
 |---|---|---|
 | the hash `run_witness_commands` returns | `git grep -n "run_witness_commands(" -- tools/` prints 8 lines PINNED: the definition, the five callers §4 names, the docstring and the README | `check_rerun_plant` derives its expectation through the same call, so its three verdicts hold; `check_bash_syntax_plant`'s `0` line carries nothing the program strips, so its owed hash holds (AC3); `check_acceptance_plant` compares exits; `check_grandchild_plant` reads the exit and the time |
 | what the hash is taken over | `tools/memory-tree/build_records.py#read_acceptance` and `#write_acceptance` grade the `<hash12>` shape; `tools/loop/position.py` reads an acceptance record's `Sha` and `malformed`, never a hash | the shape is unchanged; S5 states the meaning in the grammar |
-| the module's helpers | `git grep -l "from loop_witness import" -- tools/` lists 13 files PINNED, importing `read_git`, `read_clean_env`, `remove_tree`, `resolve_bash`, `resolve_commit`, `run_fixture_git` and `write_fixture_files` | none of them moves, and the run-gates kit is resolved inside the call, never at import |
+| the module's helpers | `git grep -l "from loop_witness import" -- tools/` lists 16 files PINNED 2026-11-17, importing `read_git`, `read_clean_env`, `remove_tree`, `resolve_bash`, `resolve_commit`, `run_fixture_git` and `write_fixture_files` | none of them moves, and the run-gates kit is resolved inside the call, never at import |
 | the module's `KIT` | `check_hold_plant` and `run_selftest` read it | `normaliser-missing` restores it before it returns, and plants run one at a time |
 | the parity blocks | `tools/lib/resolve-python.test.sh`'s `resolve_bash_py`, `run_tree_kill_py` and `resolve_kit_dir` rows | no byte between their markers moves, and no row is added |
 | `write_normaliser` | `run-gates.sh` and `run-selftests.sh`, and their suites | `lib-attribute.sh` takes no edit |
@@ -252,9 +292,12 @@ Read at `dca74c239`. Each figure is PINNED 2026-11-16 and re-derived by the comm
 ## 6. Acceptance criteria
 
 - **AC1** — When `python loop_witness.py --fixture --plant normalise` runs in `tools/loop/`, it exits 0:
-  the two re-runs' hashes are equal, and neither is `e3b0c44298fc`, the hash of empty output.
+  the two re-runs' hashes are equal, and neither is `e3b0c44298fc`, the hash of empty output. On a Git
+  Bash node the command's `pwd` line is a `/tmp/lw-` path, so the equality holds there only through the
+  `pwd` root.
   Red when: the raw output is hashed, a root reaches `write_normaliser` in a spelling the command does not
-  print, or the apply step leaves the `.norm` file empty.
+  print, the worktree as bash's `pwd` prints it reaches no root, or the apply step leaves the `.norm` file
+  empty.
 - **AC2** — When `grep -c write_normaliser loop_witness.py` runs in `tools/loop/`, it prints at least 1,
   and `git grep -n '"sed"' -- tools/loop/` prints nothing.
   Red when: the re-run carries a Python copy of the rules, or spawns `sed` from Python.
@@ -303,6 +346,19 @@ New arm: tools/loop/loop_witness.py · covers AC1 AC3 AC4 · the normalise and n
   re-ground. (a) builds a route the round-4 audit judged defective (ids 10, 11 and 30) for a later unit to
   rewrite, the reason 56 §8 F7 gave for its own (b). Recommendation: (b). RESOLVED (agent, 2026-11-16,
   delegated): (b), by rung 3. widens: none · relaxes: none
+- **F4 — How does bash's `pwd` of the worktree re-run equal under Git Bash's `/tmp` mount?** The first
+  dispatch's return, `2026-11-17-build-TOOL-dDeclaredLoop-68-1-builder-return`, found that rev-3's
+  three roots spell no form of `/tmp/lw-<random>/tree`, so the `normalise` plant's two re-runs differ
+  and AC1 reds on node d (§4 Evidence). Options: (a) a fourth root, the worktree as the normaliser's own
+  bash prints it, passed to `write_normaliser` inside that bash; (b) the worktree placed outside the
+  `/tmp` mount, under the git common dir as both run-gates runners place theirs; (c) bash's `pwd`
+  dropped from S4's command. (b) holds only where the repository also sits outside every mount: the
+  plant's fixture repository is itself a `tempfile.mkdtemp` directory (`tools/loop/loop_witness.py#run_fixture`),
+  so its common dir prints through `/tmp` too, and any further mount a node declares breaks it again.
+  (c) keeps AC1 green by no longer printing the spelling a bash command in a probe prints, so the
+  probes it stands for still read `refuted`. (a) asks the runtime that prints the path, started as the
+  commands are, so it holds on every node, and keeps every line AC1 hashes. Recommendation: (a).
+  RESOLVED (agent, 2026-11-17, delegated): (a), by rung 3. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -317,6 +373,12 @@ New arm: tools/loop/loop_witness.py · covers AC1 AC3 AC4 · the normalise and n
   S3 covers the apply step and `rerun` prints the reason; S4 names the plants; S5 brings the help page,
   the carriers and the record grammar; §7 names the leg and its keep-green sentence; §5 the sweep; line
   citations made symbol citations.
+- rev-4 · 2026-11-17 · S1, S4 · §3 Edges · §4 Evidence and The route · §5 risks and the sweep · AC1 ·
+  §8 F4 · the divergence `2026-11-17-build-TOOL-dDeclaredLoop-68-1-builder-return` found Git Bash's
+  `pwd` prints the worktree through the `/tmp` mount, which no root of rev-3 spells, so AC1 could not
+  hold on node d. By F4 (a) the normaliser's bash starts in the worktree and adds the tree as its own
+  `pwd` prints it as a root; the route spawns that bash as the commands are, killed through
+  `run_tree_kill` on the bound; the sweep's importer count is 16, not 13, re-derived at `a339daae2`.
 
 ## 10. Reuse audit
 
