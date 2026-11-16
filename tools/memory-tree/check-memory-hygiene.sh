@@ -1196,6 +1196,12 @@ VIEW_SET=""
 [ "$_IDX_STAGED" = 1 ] && [ "$BMODE" = builds ] && VIEW_SET=$(printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$" \
   | while IFS= read -r f; do [ -f "$f" ] && echo "$f"; done)
 case "${1:-}" in --print-index-set) printf '%s\n' "$INDEX_SET"; exit 0 ;; esac   # see the PRINT MODES note above
+# THE HAND-DOWN SNAPSHOT, taken HERE and not at the launch: checks 6 onward also call `fail`, so the
+# launch site's `status` no longer answers "did checks 1 to 5 fail". When an unscoped, unstaged run's
+# checks 1 to 5 recorded none, the print mode would answer exactly this INDEX_SET, so check 16 is
+# handed it on stdin instead of re-running this prologue; otherwise corpus_ids asks as before and its
+# "answered with findings" refusal still fires (TOOL-aHastenedSweep-3).
+_IXH=""; [ "$STAGED" = 0 ] && [ -z "$ONLY" ] && [ "$status" = 0 ] && _IXH=1   # TOOL-aHastenedSweep-3
 
 if check_selected 6 7 8; then
 # 6 — index size caps (grandfather: curation-debt.txt).
@@ -3114,7 +3120,8 @@ if [ -n "$_rdtok" ]; then
       left = np
       for (c = 1; c <= nr && left > 0; c++) {
         while (left > 0 && (getline ln < rdr[c]) > 0)
-          for (i = 1; i <= np; i++) if (!(pl[i] in got) && test_whole_token(ln, pl[i])) { got[pl[i]] = 1; left-- }
+          # index() first: test_whole_token returns 0 whenever index() does, so this skips only the line copy (TOOL-aHastenedSweep-1)
+          for (i = 1; i <= np; i++) if (!(pl[i] in got) && index(ln, pl[i]) && test_whole_token(ln, pl[i])) { got[pl[i]] = 1; left-- }
         close(rdr[c])
       }
       for (k = 1; k <= nt; k++) {
@@ -3209,18 +3216,41 @@ fi
 
 fi
 
+_onepy=""   # 1 once the 13-16 block ran 17-19 in the same interpreter (TOOL-aHastenedSweep-4)
 if check_selected 13 14 15 16; then
 # 13-15 (pinned) + 16 (structural) — id + path corpus classification (delegates to the sibling classifier). ONE grammar and ONE
 # walk: this script owns the append-only and index sets and PRINTS them on demand; the classifier
 # owns the id grammar it imports from the recall kit. Neither transcribes the other. Every pin the
 # classifier reads is measured per corpus, and checks 13-15 are behind DEAD_PATH_PIN / ORPHAN_ID_PIN; check 16 is STRUCTURAL and behind none.
+# When this script's own checks 1 to 5 ran clean it hands --print-index-set's answer down on stdin
+# under GOV_INDEX_SET_STDIN=1 instead (TOOL-aHastenedSweep-3).
 if [ "$STAGED" = 0 ]; then
   # PRINT WHATEVER IT SAID, then decide the status from the exit code. The classifier has a
   # NON-GATING channel — check 16's not-asked, grace and retired-key notices all print at exit 0
   # — and the old form captured stdout and threw it away unless the run was already red. Every
   # one of those notices was computed and discarded, so the retirement had no notification
   # channel at all and the grace was invisible for its whole life: a skip that looks like a pass.
-  ids=$("$_PY" "$HERE/corpus_ids.py" --check 2>&1); _idsrc=$?
+  # The prefix is written on EVERY run, so an inherited GOV_INDEX_SET_STDIN=1 is blanked whenever the
+  # run is not eligible; a here-string is no pipeline, so _idsrc stays the interpreter's own code.
+  if [ -z "$ONLY" ]; then
+    # ONE INTERPRETER FOR 13-16 AND 17-19 on an unscoped run, over one memoized walk
+    # (TOOL-aHastenedSweep-4). gotchas.py --check-with-ids prints `<block>\x1d<rc>\n` per verb,
+    # corpus_ids first; the split is parameter expansion only, each block losing its trailing newlines
+    # one at a time as `$( )` stripped them (a CR before each too, where Cygwin's and MSYS's do), so
+    # both blocks print, red and key exactly as two launches did. A frame that does not split reds
+    # LOUDLY under 13-16 with the whole capture, never as a silent second launch.
+    _both=$(GOV_INDEX_SET_STDIN=$_IXH "$_PY" "$HERE/gotchas.py" --check-with-ids 2>&1 <<<"${_IXH:+$INDEX_SET}") && {
+      ids=${_both%%$'\x1d'*}; got=${_both#*$'\x1d'}
+      _idsrc=${got%%$'\n'*}; _idsrc=${_idsrc%$'\r'}; got=${got#*$'\n'}
+      _gotrc=${got#*$'\x1d'}; _gotrc=${_gotrc%$'\r'}; got=${got%%$'\x1d'*}
+      while [[ $ids == *$'\n' ]]; do ids=${ids%$'\n'}; case $OSTYPE in cygwin*|msys*) ids=${ids%$'\r'} ;; esac; done
+      while [[ $got == *$'\n' ]]; do got=${got%$'\n'}; case $OSTYPE in cygwin*|msys*) got=${got%$'\r'} ;; esac; done
+      [[ $_both == *$'\x1d'*$'\x1d'* && $_idsrc =~ ^[0-9]+$ && $_gotrc =~ ^[0-9]+$ ]]
+    } && _onepy=1
+    [ "$_onepy" = 1 ] || { ids=$_both; _idsrc=1; got=""; _gotrc=1; _onepy=1; }
+  else
+    ids=$(GOV_INDEX_SET_STDIN=$_IXH "$_PY" "$HERE/corpus_ids.py" --check 2>&1 <<<"${_IXH:+$INDEX_SET}"); _idsrc=$?
+  fi
   [ -n "$ids" ] && printf '%s
 ' "$ids"
   # The suite's check 13 claimant arm drives this exit through the engine (TOOL-aGraftedHelix-47).
@@ -3240,7 +3270,7 @@ if check_selected 17 18 19; then
 # 19's dead-anchor advisory (TOOL-aMendedFleet-23), and an invariant guard or decision the module
 # could not resolve, ANNOUNCED inside its green output (TOOL-aGraftedHelix-3 S7), as check 20's is.
 if [ "$STAGED" = 0 ]; then
-  got=$("$_PY" "$HERE/gotchas.py" --check 2>&1); _gotrc=$?
+  [ "$_onepy" = 1 ] || { got=$("$_PY" "$HERE/gotchas.py" --check 2>&1); _gotrc=$?; }
   [ -n "$got" ] && printf '%s
 ' "$got"
   [ "$_gotrc" -ne 0 ] && status=1

@@ -140,7 +140,7 @@ tools/memory-tree/check-memory-hygiene.test.sh	cat-file	1	predates the lint; `$(
 tools/memory-tree/check-memory-hygiene.test.sh	path-subst	7	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/memory-tree/check-memory-hygiene.test.sh	printf-subst	19	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
 tools/memory-tree/check-memory-hygiene.test.sh	pure-fn-subst	8	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: derive_bm_r3×8
-tools/memory-tree/check-memory-hygiene.test.sh	var-pipe	48	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/memory-tree/check-memory-hygiene.test.sh	var-pipe	60	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit; rose 48 -> 60 with the arms TOOL-aHastenedSweep-3 and TOOL-aHastenedSweep-6 added, each a failure branch indenting its capture through `sed`, measured by the close's bar at 1af04fd6c
 tools/memory-tree/check-method-carriers.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/memory-tree/check-method-carriers.sh	var-pipe	6	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/memory-tree/check-method-carriers.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
