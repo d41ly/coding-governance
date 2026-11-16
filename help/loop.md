@@ -392,21 +392,26 @@ those names: an aborted run whose rework budget ran out reads incomplete, and a 
 owner's decision whose budget ending is `park-for-owner` reads parked. Every other aborted run reads
 withdrawn, and every other held run paused.
 
-- **Read a phase:** `python tools/loop/loop_table.py phase --from REVIEWING` prints the phase's state <!-- usage: script:tools/loop/loop_table.py#phase 8b6c4f5f -->
+- **Read a phase:** `python tools/loop/loop_table.py phase --from REVIEWING` prints the phase's state <!-- usage: script:tools/loop/loop_table.py#phase 01f88f39 -->
   and step. Each `--fact k=v` qualifies the `--from` phase. With `--to <PHASE>` it also names the step
   exits the move between the two crosses, in step order, or `none`; a move out of `PREFLIGHT`, which
   has no step, counts from the first step, so it crosses the plan step's exit. A phase with no row
-  is refused by name, exit 1.
+  is refused by name, exit 1. An adopter phase, a member of PHASES_EXTRA, has no row in the loop kit's
+  phase map: named in `--extra "<phases>"`, as the driver passes it, it reads state none and step none,
+  marked `adopter phase`, a move into it crosses no step exit, and a move out of it counts from the
+  first step, as a move out of PREFLIGHT does.
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
   ```bash
   python tools/loop/loop_table.py phase --from ABORTED --fact halt-code=budget-exhausted
   python tools/loop/loop_table.py phase --from SPECCING --to BUILDING
+  python tools/loop/loop_table.py phase --from STAGING --to BUILDING --extra STAGING
   ```
 
   ```text
   phase ABORTED · state incomplete · step none
   phase SPECCING · state designing · step step.design · to BUILDING · crosses item.design.exit
+  phase STAGING · state none · step none · adopter phase · to BUILDING · crosses item.plan.exit item.design.exit
   ```
 
 - **The check:** `check` prints `loop: phase map` with the row and qualified counts and joins the

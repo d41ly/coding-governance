@@ -397,7 +397,7 @@ id = "script:{prefix}/loop/loop_table.py#phase"
 shape = "verb"
 entry = "{prefix}/loop/loop_table.py"
 verb = "phase"
-flags = ["--from=", "--to=", "--fact="]
+flags = ["--from=", "--to=", "--fact=", "--extra="]
 
 [[usage]]
 id = "script:{prefix}/loop/loop_parents.py"

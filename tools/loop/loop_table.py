@@ -3,7 +3,7 @@
 
     python loop_table.py move --level <level> --from <state> --item <tag> --outcome <word> [--fact k=v]...
     python loop_table.py check [--selftest]
-    python loop_table.py phase --from <PHASE> [--to <PHASE>] [--fact k=v]...
+    python loop_table.py phase --from <PHASE> [--to <PHASE>] [--fact k=v]... [--extra "<phases>"]
     python loop_table.py --fixture --plant <case>
 
 The loop definition beside this file holds `[states]`, each level's open states, and one `[[transition]]`
@@ -41,7 +41,10 @@ one, and `derive_crossed_exits` the step exits a move between two steps crosses:
 first step's own, the first step where it is `none`, up to the target step's, none where the target is
 `none`. `phase` prints `phase <PHASE> · state <state> · step <tag|none>`, with `· to <PHASE> · crosses
 <tags|none>` after it given `--to`, whose phase reads its unqualified row, and exits 0; `refused —
-phase <PHASE>: no row`, exit 1. `check` grades the rows by `check_phase_rows` and joins the unqualified
+phase <PHASE>: no row`, exit 1. An adopter phase (TOOL-dDeclaredLoop-63), a member of `--extra`, the
+driver's `PHASES_EXTRA`, that no row reads, reads `state none · step none` with `· adopter phase` after
+the reading it qualifies, so a move into it crosses nothing and a move out counts from the first step;
+`crosses` stays the line's last field. `check` grades the rows by `check_phase_rows` and joins the unqualified
 rows with the driver's `PHASES_CORE` line both ways, read through `loop_checklist.py`'s
 `read_core_registries`, printing the join `unarmed` where the driver does not resolve; every plant
 passes the shipped rows' unqualified phases in its place, taken before the break.
@@ -70,8 +73,8 @@ WHAT THIS DOES NOT CHECK: whether a witness holds; whether a stand-in's owner ha
 item owned by an unlanded build has a stand-in row; reachability, termination and counted edges; the
 feature rows' last-unit rule; the routes of the feature and unit rows, which the join reads for the build
 table alone; that an owed row's `by` names a real unit or build; that every terminal is entered by a row,
-which four are not yet; a phase row's qualifier value against the driver's halt and hold codes; the
-driver's `PHASES_EXTRA` members, which have no row and are refused by name.
+which four are not yet; a phase row's qualifier value against the driver's halt and hold codes; that
+`--extra` is the driver's `PHASES_EXTRA`, which the caller passes and this module never reads.
 """
 import argparse
 import pathlib
@@ -378,11 +381,12 @@ def read_phase_map(data, where):
     return {"rows": rows, "steps": check_loop(data, where)["step"]}
 
 
-def derive_phase_position(phase, facts, phase_map=None):
+def derive_phase_position(phase, facts, phase_map=None, extra=()):
     """`(state, step)` of `phase`: its first row carrying a qualifier whose every qualifier equals the fact
     of that key in `facts`, else its row carrying none; `step` the row's, else "none", and `state` the
     row's, else its [[step]] row's. `phase_map` is what read_phase_map returns, the shipped definition's
-    when None. LookupError naming the phase where no row reads it."""
+    when None. Where no row reads it, `("none", "none")` for a member of `extra`, the adopter's phases
+    (TOOL-dDeclaredLoop-63), else LookupError naming the phase."""
     if phase_map is None:
         phase_map = read_phase_map(*read_definition(KIT))
     rows = [r for r in phase_map["rows"] if r.get("phase") == phase]
@@ -390,6 +394,8 @@ def derive_phase_position(phase, facts, phase_map=None):
                 and all(facts.get(q) == r[q] for q in QUALIFIERS if q in r)), None)
     row = row or next((r for r in rows if not any(q in r for q in QUALIFIERS)), None)
     if row is None:
+        if phase in extra:
+            return "none", "none"
         raise LookupError("phase %s: no row" % phase)
     step = row.get("step") or "none"
     state = row.get("state") or next((s.get("state") for s in phase_map["steps"] if s.get("tag") == step), None)
@@ -516,6 +522,7 @@ def main(argv):
     ph.add_argument("--from", dest="phase_from", required=True)
     ph.add_argument("--to")
     ph.add_argument("--fact", action="append", default=[], help="k=v, a fact a qualified row matches")
+    ph.add_argument("--extra", default="", help="the adopter's phases, the driver's PHASES_EXTRA, space-separated")
     chk = sub.add_parser("check", help="check the tables, their route join, the stand-ins and the phase map")
     chk.add_argument("--selftest", action="store_true", help="check, every plant, and the moves")
     args = ap.parse_args(argv)
@@ -549,6 +556,22 @@ def main(argv):
                    "phase PREFLIGHT · state none · step none · to SPECCING · crosses item.plan.exit", ""),
                   ("phase crosses back", ["phase", "--from", "VERIFYING", "--to", "BUILDING"], 0,
                    "phase VERIFYING · state testing · step step.test · to BUILDING · crosses none", "")]
+        # TOOL-dDeclaredLoop-63: an adopter phase, a member of --extra with no row, reads ungated
+        cases += [("phase adopter", ["phase", "--from", "STAGING", "--extra", "STAGING"], 0,
+                   "phase STAGING · state none · step none · adopter phase", ""),
+                  ("phase adopter misspelt", ["phase", "--from", "STAGNG", "--extra", "STAGING"], 1,
+                   "refused — phase STAGNG: no row", ""),
+                  ("phase into adopter", ["phase", "--from", "REVIEWING", "--to", "STAGING", "--extra", "STAGING QA"], 0,
+                   "phase REVIEWING · state designing · step step.design · to STAGING · adopter phase · crosses none",
+                   ""),
+                  ("phase out of adopter", ["phase", "--from", "STAGING", "--to", "BUILDING", "--extra", "STAGING"], 0,
+                   "phase STAGING · state none · step none · adopter phase · to BUILDING · crosses item.plan.exit "
+                   "item.design.exit", ""),
+                  # ponytail: --to REVIEWING puts `crosses` after both readings, so a marker at either breaks
+                  # the opening; a case is a prefix match and cannot see a marker at the line's end
+                  ("phase row over extra", ["phase", "--from", "REVIEWING", "--to", "REVIEWING", "--extra",
+                                            "REVIEWING"], 0,
+                   "phase REVIEWING · state designing · step step.design · to REVIEWING · crosses none", "")]
         cases += [("move by order", move + ["planning", "--item", "item.design.exit", "--outcome", "recorded"], 1,
                    "refused — build · planning · item.design.exit · recorded", "no row"),
                   ("move designing", move + ["designing", "--item", "item.design.exit", "--outcome", "recorded"], 0,
@@ -630,13 +653,18 @@ def main(argv):
         except LoopError as e:
             print("%s: refused · %s" % (SAY, e))
             return 1
+        extra = set(args.extra.split())
+        mapped = {r.get("phase") for r in phase_map["rows"]}
         try:
-            state, step = derive_phase_position(args.phase_from, facts, phase_map)
+            state, step = derive_phase_position(args.phase_from, facts, phase_map, extra)
             said = "phase %s · state %s · step %s" % (args.phase_from, state, step)
+            if args.phase_from in extra - mapped:
+                said += " · adopter phase"
             if args.to is not None:
-                to_step = derive_phase_position(args.to, {}, phase_map)[1]
-                said += " · to %s · crosses %s" % (
-                    args.to, " ".join(derive_crossed_exits(step, to_step, phase_map["steps"])) or "none")
+                to_step = derive_phase_position(args.to, {}, phase_map, extra)[1]
+                said += " · to %s%s · crosses %s" % (
+                    args.to, " · adopter phase" if args.to in extra - mapped else "",
+                    " ".join(derive_crossed_exits(step, to_step, phase_map["steps"])) or "none")
         except LookupError as e:
             print("refused — %s" % e)
             return 1

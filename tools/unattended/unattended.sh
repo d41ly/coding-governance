@@ -11745,7 +11745,7 @@ check_owner_gates() { # slug -> 0 where no owner line reads held or the module d
 # not resolve reads nothing, and the move goes on. The values are named locals, never positional ones.
 check_phase_gates() { # slug · from · to -> 0 where the move crosses no held exit or the loop kit does not resolve; 1 after its one fail 82
   local _pg_from="$2" _pg_to="$3" _pg_why="" _og_why=""
-  run_loop_verb loop_table.py phase "--from=$2" "--to=$3" >/dev/null || return 0
+  run_loop_verb loop_table.py phase "--from=$2" "--to=$3" "--extra=$PHASES_EXTRA" >/dev/null || return 0
   if [ "$_bd_rc" != 0 ]; then
     _pg_why=$_bd_why
   else

@@ -104,8 +104,8 @@ PLANTS = {"values": "no policy file, then autonomy three-gates and every-stage, 
                           "disposition record and the sourced check_owner_gates",
           "driver-optin": "the sourced driver's check_authorization under review.design owed and off, then none",
           "driver-plan": "the driver's --plan under autonomy three-gates, and --plan --paths, then the sourced "
-                         "check_phase_gates past item.design.exit and item.build.exit, before and after "
-                         "item.design.exit's disposition record",
+                         "check_phase_gates past item.design.exit and item.build.exit, into and out of the conf's "
+                         "adopter phase STAGING, before and after item.design.exit's disposition record",
           "pre-placement": "under autonomy three-gates, a build opened on history the kits' commit does not reach "
                            "and merged in, one opened after it and one uncommitted, listed by the scratch's own "
                            "module, then the first read by this tree's",
@@ -490,6 +490,8 @@ def run_breakpoint_plant(case):
             repo = write_position_plant(top, "plan-line", root)[0]
             with open(repo / ".unattended.conf", "a", encoding="utf-8", newline="\n") as fh:
                 fh.write('\nSPEC_TOKENS_CLI=""\nRUN_CLAIMS="off"\n')
+                if case == "driver-plan":   # TOOL-dDeclaredLoop-63 AC2: an adopter phase the loop kit has no row of
+                    fh.write('PHASES_EXTRA="STAGING"\n')
             if case == "driver-close":   # AC3
                 spec = repo / "memory" / "builds" / FX_SLUG / "spec" / ("2026-01-01-spec-%s.md" % FX_IDS[0])
                 text = spec.read_text(encoding="utf-8").replace(
@@ -544,6 +546,11 @@ def run_breakpoint_plant(case):
 
                 check_sourced("check_phase_gates %s SPECCING BUILDING", 1, "item.design.exit")
                 check_sourced("check_phase_gates %s BUILDING VERIFYING", 0)
+                # TOOL-dDeclaredLoop-63 AC2: the conf's adopter phase STAGING, which no phase row reads, is
+                # entered crossing nothing and left counting from the first step, so the held design exit
+                # holds it; observed before the record below releases that exit
+                check_sourced("check_phase_gates %s REVIEWING STAGING", 0)
+                check_sourced("check_phase_gates %s STAGING BUILDING", 1, "item.design.exit")
                 write_disposition_record(repo, FX_SLUG, FX_IDS[0], "item.design.exit", "recorded")
                 check_sourced("check_phase_gates %s SPECCING BUILDING", 0)
                 check_sourced("check_owner_gates %s", 1, "held at item.deploy.mandate;")
