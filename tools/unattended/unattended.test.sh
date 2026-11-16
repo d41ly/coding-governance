@@ -9039,7 +9039,7 @@ hit "$(run --fix-pass tRun --unit ARCH-tRun-1 --reds 1)" "fix-pass ARCH-tRun-1 �
 out=$(run --fix-pass tRun --unit ARCH-tRun-1 --reds 1)
 hit "$out" "fix-pass ARCH-tRun-1 · pass 2 · reds 1 · NON-CONVERGENT · to units"
 same "AC5 the second flat pass is terminal and names its target" "$(grep -c 'fix-pass · item ARCH-tRun-1 · reason reds 1 · NON-CONVERGENT · to units$' memory/builds/tRun/RUN.md)" "1"
-hit "$(run --fix-pass tRun --unit ARCH-tRun-1 --reds 0)" "--fix-pass and --dispatch take no unit whose fix-pass loop already ended, because a further pass would rewrite that history"
+hit "$(run --fix-pass tRun --unit ARCH-tRun-1 --reds 0)" "--fix-pass and --dispatch take no unit whose fix-pass loop already ended, because a further pass would rewrite that history and its open work went where the terminal pass recorded"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}fp.sh)" "--fix-pass and --dispatch take no unit whose fix-pass loop already ended"
 same "AC5 a refused pass wrote nothing" "$(grep -c 'fix-pass · item ARCH-tRun-1 · ' memory/builds/tRun/RUN.md)" "2"
 same "AC5 a refused dispatch wrote nothing" "$(grep -c " ARCH-tRun-1 · reason ${PFX}fp.sh" memory/builds/tRun/RUN.md)" "0"
