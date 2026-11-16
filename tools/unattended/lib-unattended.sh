@@ -1278,6 +1278,19 @@ build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · sh
   else
     _bc_list=$(GIT rev-list $_bc_ord $_bc_mc $_bc_range 2>/dev/null)
   fi
+  # NO CALLER CACHE, ONE READ (TOOL-dDeclaredLoop-56 S42): a caller that declares no `_SUBJ`, the
+  # driver's DoD read among them, gets a map local to this call, filled from ONE
+  # `read_attribution_tokens` over the walk's own revision arguments before the walk, so no commit
+  # starts an interpreter of its own. The per-commit read below runs only for a commit a caller's
+  # declared `_SUBJ` lacks.
+  local -A _bc_tok=()
+  local _bc_lines _bc_l
+  if [ "$_bc_cache" = 0 ]; then
+    mapfile -t _bc_lines < <(read_attribution_tokens $_bc_ord $_bc_mc $_bc_range 2>/dev/null)
+    for _bc_l in "${_bc_lines[@]}"; do
+      case "$_bc_l" in *" "*) _bc_tok[${_bc_l%% *}]=" ${_bc_l#* } " ;; ?*) _bc_tok[$_bc_l]="  " ;; esac
+    done
+  fi
   for _bc_c in $_bc_list; do
     _bc_n=$((_bc_n+1))
     # the (cap+1)-th commit is the SENTINEL: proof that more exists, never graded.
@@ -1296,7 +1309,7 @@ build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · sh
     #
     # THE PROBE IS DECLARED-ONCE, not per commit: `declare -p` is a builtin but this loop runs tens of
     # thousands of times, and a caller that declares no `_SUBJ` must not error under `set -u`.
-    if [ "$_bc_cache" = 1 ]; then _bc_subj=${_SUBJ[$_bc_c]-}; else _bc_subj=""; fi
+    if [ "$_bc_cache" = 1 ]; then _bc_subj=${_SUBJ[$_bc_c]-}; else _bc_subj=${_bc_tok[$_bc_c]-}; fi
     # A cached value is ALREADY tokenised and space-padded on both ends, so an empty read is a MISS
     # and nothing else — an empty subject caches as two spaces. A miss falls back to the pair of
     # processes the cache replaced rather than reading as "this commit does not name the id", which
@@ -1304,7 +1317,7 @@ build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · sh
     #
     # THE WHOLE-TOKEN MATCH is `memory/gotchas/id-matched-as-a-substring`: every id ending in a 1-up
     # sequence is a prefix of nine others, so an unanchored `TOOL-x-1` matches `TOOL-x-19`'s commit.
-    [ -n "$_bc_subj" ] || _bc_subj=" $(read_attribution_tokens -1 "$_bc_c" | cut -d' ' -f2-) "
+    [ -n "$_bc_subj" ] || [ "$_bc_cache" = 0 ] || _bc_subj=" $(read_attribution_tokens -1 "$_bc_c" | cut -d' ' -f2-) "
     case "$_bc_subj" in *" $_bc_id "*) ;; *) continue ;; esac
     # Did it touch anything outside this build's own record surface?
     if GIT show --pretty=format: --name-only "$_bc_c" 2>/dev/null \

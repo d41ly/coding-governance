@@ -17227,14 +17227,18 @@ same "AC1 --claims over an empty namespace prints exactly claims: none" "$out" "
 same "AC1 ...and exits 0" "$rc" "0"
 # ---- AC2: five claims, one per verdict, six TAB-separated fields each, sorted by slug, the stale
 # ---- split on the conf's own bound and the unparsed claim's age `-`; the sixth field is the claim's
-# ---- key (TOOL-dDeclaredLoop-8 S7), RED against the driver's five.
+# ---- key (TOOL-dDeclaredLoop-8 S7), RED against the driver's five. The sixth field is printed under
+# ---- `--claims --with-key` alone, and plain `--claims` prints the same rows in five fields
+# ---- (TOOL-dDeclaredLoop-56 S9), RED against a driver printing six by default.
 seed_claim gA s-a k-a live "$(derive_claim_now)"
 seed_claim gB s-b k-b live "$(derive_claim_ago $((GH_BOUND + 600)))"
 seed_claim gC s-c k-c held "$(derive_claim_ago $((GH_BOUND * 3)))"
 seed_claim gD s-d k-d landed "$(derive_claim_now)"
 seed_claim gE s-e k-e live ""
-out=$(bash "$SCRIPT" --claims 2>/dev/null)
-same "AC2 --claims prints five rows" "$(printf '%s\n' "$out" | grep -c '')" "5"
+same "AC2 plain --claims prints the five rows in five TAB-separated fields each" \
+  "$(bash "$SCRIPT" --claims 2>/dev/null | awk -F'\t' 'NF == 5 { n++ } END { print NR + 0, n + 0 }')" "5 5"
+out=$(bash "$SCRIPT" --claims --with-key 2>/dev/null)
+same "AC2 --claims --with-key prints five rows" "$(printf '%s\n' "$out" | grep -c '')" "5"
 same "AC2 ...of six TAB-separated fields each, the sixth a k1: key" "$(printf '%s\n' "$out" | awk -F'\t' 'NF != 6 || $6 !~ /^k1:/' | grep -c '')" "0"
 same "AC2 ...with one verdict per claim, in slug order" "$(printf '%s\n' "$out" | cut -f1,5 | tr '\t\n' ': ')" "gA:live gB:stale gC:held gD:terminal gE:unknown "
 same "AC2 ...and the unparsed claim's age is -" "$(printf '%s\n' "$out" | awk -F'\t' '$1 == "gE" { print $4 }')" "-"

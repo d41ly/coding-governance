@@ -100,7 +100,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +2 for arm 22 (TOOL-dPavedRoad-3).
 # +1 for arm 10's planted `stage` key (TOOL-dDeclaredLoop-1).
 # +4 for arm 23 (TOOL-dDeclaredLoop-29).
-FLOOR_ASSERTIONS=66
+# +1 for arm 24 (TOOL-dDeclaredLoop-56).
+FLOOR_ASSERTIONS=67
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -1086,6 +1087,16 @@ check_arm "arm 23 R3 refuses a bare upstream:rows, naming it optional-only" \
 check_arm "arm 23 R3 refuses upstream:other? as outside the vocabulary" \
    "$([[ $A23 == *'other 1'* ]] && echo 1 || echo 0)"
 [ "$A23" = $'rendered 1\nabsent 1\nbare 1\nother 1' ] || printf '    %s\n' "${A23//$'\n'/$'\n'    }"
+
+# ---- arm 24 (TOOL-dDeclaredLoop-56 AC28): a fixture whose copy of the loop kit is taken away after its
+# ---- scaffold: the adopter's `--check` exits non-zero naming the library's refusal, never reading the
+# ---- absent kit as an empty workflow table. The failing case, observed at the close and not by the
+# ---- pass that wrote this: a `read_workflow_order` answering an empty table for an absent kit.
+build_fixture; rm -rf "${FX:?}/$FXL"
+A24=$(run_adopter --check); _rc24=$?
+check_arm "arm 24 --check with no loop kit exits non-zero naming no loop kit places the workflows: " \
+   "$([ "$_rc24" != 0 ] && [[ $A24 == *'no loop kit places the workflows: '* ]] && echo 1 || echo 0)"
+[ "$_rc24" != 0 ] && [[ $A24 == *'no loop kit places the workflows: '* ]] || printf '    exit %s\n    %s\n' "$_rc24" "${A24//$'\n'/$'\n'    }"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

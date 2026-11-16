@@ -878,6 +878,16 @@ else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`scope_of\` and FAIL a near-miss of it; one of the two did not hold"
   fail=1
 fi
+# ...and `stage` (TOOL-dDeclaredLoop-56 S24), by the same two halves, in both KNOWN copies: the step tags
+# every leg row carries, and the near-miss is the plural a hand would type.
+n=$((n+1))
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"stage":["step.test"]}]' > "$ctl/st.json"
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"stages":["step.test"]}]' > "$ctl/sttypo.json"
+if keyset_probe "$ctl/st.json" && ! keyset_probe "$ctl/sttypo.json"; then :
+else
+  echo "canary: the manifest key-set predicate must PASS a row carrying \`stage\` and FAIL a near-miss of it; one of the two did not hold"
+  fail=1
+fi
 rm -rf "$ctl"
 # 1a-owed: the owed-rows probe's own fixtures (PLAY-dOrderedCharter-50 S4), each population's failing
 #     case and a tree owing nothing, planted in a scratch repository the probe builds and removes.

@@ -80,8 +80,19 @@ class Refused(Exception):
 def check_terminal_proof():
     """The owner's proof `tty-cli` where standard error is an interactive terminal, else None: the one
     stream dOrderedCharter-15 S5 tests, and the one an agent's shell lacks. A pty wrapper giving an agent
-    a terminal passes it, the threat the owner accepted (SA-1)."""
-    return "tty-cli" if sys.stderr.isatty() else None
+    a terminal passes it, the threat the owner accepted (SA-1). On win32 `isatty` is true for `NUL`, a
+    character device, so there the stream's handle must also answer `GetConsoleMode`, which only a
+    console does (TOOL-dDeclaredLoop-56 S20); elsewhere `isatty` alone."""
+    if not sys.stderr.isatty():
+        return None
+    if sys.platform == "win32":
+        import ctypes
+        import msvcrt
+        mode = ctypes.c_uint32()
+        handle = ctypes.c_void_p(msvcrt.get_osfhandle(sys.stderr.fileno()))
+        if not ctypes.windll.kernel32.GetConsoleMode(handle, ctypes.byref(mode)):
+            return None
+    return "tty-cli"
 
 
 def write_guarded(path, new_text, record):

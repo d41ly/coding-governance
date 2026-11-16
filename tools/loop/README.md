@@ -302,9 +302,15 @@ python <prefix>/loop/loop_table.py --fixture --plant dropped-row
 
 `loop_parents.py` (TOOL-dDeclaredLoop-15) answers a dependent build's route when a parent its README's
 `parents:` front matter names reads withdrawn. Until a parent's `withdrawn` post lands, the stand-in
-is the parent's run-state file holding the run fact `phase: ABORTED`. `read_withdrawn_parents` reads
-the front matter through the memory-tree kit's `parse_front_matter`, the builds folder from its
-`read_design_conf`, and the run facts through the policy kit's `read_run_fact`. `derive_parent_route`
+is the parent's run-state file holding a `phase` that `loop_table.py`'s `derive_phase_position` maps,
+with `halt-code` and `hold-code` where set, to the state `withdrawn` (TOOL-dDeclaredLoop-56 S18), so an
+`ABORTED` parent halted `budget-exhausted` reads `incomplete`, and a phase no row maps exits 2 naming the
+parent. `read_withdrawn_parents` reads the front matter through the memory-tree kit's
+`parse_front_matter`, the builds folder from its `read_design_conf`, and the run facts through the
+policy kit's `read_run_fact`, from the file at `refs/remotes/<remote>/<run-branch>` where that ref holds
+it, the remote by `claims.py`'s inline ladder and the branch by the tree copy's `run-branch:` fact, else
+from the tree's copy (S39); a parent with neither prints `parent <p> · not withdrawn (no run record)`
+before the route. `derive_parent_route`
 reads `deps.on-parent-withdrawn` through the policy kit's `resolve` at the landed revision, its
 default `replan`, and takes the move from P1 by `derive_move`, so a state P1 does not admit answers
 `held`:
@@ -324,8 +330,8 @@ neither, or a ref naming no commit, exits 2 `no kept branch`. `withdraw-too` pro
 withdrawal to the owner and moves nothing. The route writes nothing. It exits 2 on an unreadable
 `parents:` slug, a state outside the build's open states or a policy refusal, and 2 `unarmed` where
 the policy kit does not resolve, since this kit takes no edge to it. `--fixture --plant <case>` runs
-the route over a scratch repository: `withdrawn-parent`, `no-kept-branch`, `live-parent` and
-`no-parents`, with `--value` committing the scratch's one policy revision and `--state` the child's
+the route over a scratch repository: `withdrawn-parent`, `no-kept-branch`, `live-parent`,
+`no-parents`, `incomplete-parent`, `aborted-on-run-branch` and `no-run-record`, with `--value` committing the scratch's one policy revision and `--state` the child's
 state, `designing` by default. `--selftest` runs every case, and is gov's `loop parent routes` leg.
 
 ```bash
@@ -431,7 +437,7 @@ sources sorted bytewise and joined by NUL, `k1:?` before the digits where a sour
 `evidence`, `fresh` or `re-derived`; the `remote` class's age bound is the caller's, never this
 module's. `derive_card_keys` is the orientation card's view and remote keys over the working directory
 git runs in, and `CARD_CELL_CLASSES` joins each card cell to one of them. The card's `keys —` cell, its
-replay's re-key and the unattended driver's sixth `--claims` field each find the module beside them by
+replay's re-key and the sixth field of the unattended driver's `--claims --with-key` each find the module beside them by
 `resolve_kit_dir`; it reads git alone, through its inline copy of the remote ladder, so it takes no
 edge. `--fixture --plant <case>` runs one of `PLANTS`, and `--selftest` runs every case through
 `run_selftest_cases`; it is gov's `loop claims fixtures` leg.

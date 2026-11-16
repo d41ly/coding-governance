@@ -3,29 +3,34 @@
 
     python <prefix>/govkit/steps/review_rounds.py up|down|witness <target>
 
-Its row is the unattended descriptor's `[[upgrade]]`. The UP moves `.unattended.conf`'s
-`REVIEW_ROUNDS`, the spec audit's round bound the driver no longer reads, into the policy keys that
-now carry it, so the adopter's bound reads the same on either side; the DOWN restores both files
-byte-identical; the WITNESS exits 0 when no `REVIEW_ROUNDS` assignment is left in the conf, or there
-is no conf, which is the step applied.
+Its row is the unattended descriptor's `[[upgrade]]`. The UP takes `.unattended.conf`'s
+`REVIEW_ROUNDS`, the spec audit's round bound the driver no longer reads, out of the conf once the
+policy keys that now carry it read the same bound, and it never writes the policy file, which stays
+the owner's (TOOL-dDeclaredLoop-56 S40); the DOWN restores the conf byte-identical; the WITNESS exits
+0 when no `REVIEW_ROUNDS` assignment is left in the conf, or there is no conf, which is the step applied.
 
 THE UP, in order. No `.unattended.conf`, or no `REVIEW_ROUNDS` line in it: exit 0, nothing written.
 Otherwise the conf is read in `conf_to_policy.py`'s grammar, the last assignment winning and a blank
 reading as unset. The up exits 1 WRITING NOTHING on a value that is not an integer of at least 1, or
 where the conf or the policy file differs from its blob at HEAD. An unset value and 1 are the
-catalogue's default, `review.design.rounds = "one"`, so the policy file is left byte-identical. A
-value N above 1 writes `review.design.rounds = "fixed-count"` and `review.design.round-count = N`,
-and `review.max-rounds = N` where N exceeds the catalogue's ceiling of 3, since the loop kit refuses
-a fixed count above the ceiling. Then every `REVIEW_ROUNDS` line is taken out of the conf, which is
-kept. The conf is rewritten LAST, so the witness changes last. A re-run over a killed up recomputes
+catalogue's default, `review.design.rounds = "one"`, and map to no key. A value N above 1 maps to
+`review.design.rounds = "fixed-count"` and `review.design.round-count = N`, and `review.max-rounds = N`
+where N exceeds the catalogue's ceiling of 3, since the loop kit refuses a fixed count above the
+ceiling. The policy file is parsed with `tomllib`, an absent one setting nothing: each mapped key it
+does not set prints `policy_edit.py set <key> <value>` for the owner to run, each it sets to another
+value prints `conflict · <key> · policy <value> · conf <value>`, and either exits 1 WRITING NOTHING,
+the conf line kept. Once every mapped key reads its value, every `REVIEW_ROUNDS` line is taken out of
+the conf, which is kept; the before-image lists the conf alone. A re-run over a killed up recomputes
 from the first before-image and converges.
 
-Exit 0 done, 1 refused naming the file (nothing written), 2 a usage error.
+Exit 0 done, 1 refused naming the file or a policy key proposed or in conflict (nothing written), 2 a
+usage error.
 """
 
 import importlib.util
 import pathlib
 import sys
+import tomllib
 
 STEP_ID = "unattended/review-rounds-to-policy"
 CONF = ".unattended.conf"
@@ -65,33 +70,40 @@ def cmd_up(target: pathlib.Path) -> int:
     if not conf.is_file() or not C2P.check_assigned(conf.read_bytes(), KEY):
         print(f"review-rounds: up · no {KEY} in {CONF} at {target.as_posix()}, so there is nothing to move")
         return 0
+    rows = derive_settings(C2P.parse_conf(conf.read_bytes(), CONF, KEY))
+    for rel in (CONF, POLICY):
+        if not C2P.check_committed(target, rel):
+            raise Refusal(f"{rel}: differs from its blob at HEAD, and the policy reader reads "
+                          f"committed revisions only; commit it, then re-run the step")
+    # THE OWNER WRITES THE POLICY FILE (TOOL-dDeclaredLoop-56 S40): each mapped key the file does not set
+    # is a proposal, and each it sets otherwise a conflict; either writes nothing and exits 1.
+    pol = target / POLICY
+    # ponytail: a policy file that does not parse raises here; the policy leg grades that file at HEAD.
+    held = tomllib.loads(pol.read_bytes().decode("utf-8")) if pol.is_file() else {}
+    owed = []
+    for table, key, value in rows:
+        node = held
+        for part in table.split("."):
+            node = node.get(part) if isinstance(node, dict) else None
+        have = node.get(key) if isinstance(node, dict) else None
+        if have is None:
+            owed.append(f"policy_edit.py set {table}.{key} {value}")
+        elif have != value:
+            owed.append(f"conflict · {table}.{key} · policy {have} · conf {value}")
+    if owed:
+        for line in owed:
+            print(line)
+        print(f"review-rounds: up · {POLICY} does not set every key {CONF}'s {KEY} maps to; run each "
+              f"policy_edit.py line above, settle each conflict, commit, then re-run the step; nothing written")
+        return 1
 
     def derive_after(before):
-        if before is not None:
-            rows = derive_settings(C2P.parse_conf(before[CONF], CONF, KEY))
-            after = {CONF: C2P.render_conf_rest(before[CONF], KEY)}
-            if POLICY in before:
-                after[POLICY] = C2P.render_policy_bytes(before[POLICY], rows)
-            return after
-        data = conf.read_bytes()
-        rows = derive_settings(C2P.parse_conf(data, CONF, KEY))
-        for rel in (CONF, POLICY):
-            if not C2P.check_committed(target, rel):
-                raise Refusal(f"{rel}: differs from its blob at HEAD, and the policy reader reads "
-                              f"committed revisions only; commit it, then re-run the step")
-        after = {CONF: C2P.render_conf_rest(data, KEY)}
-        if rows:
-            pol = target / POLICY
-            after[POLICY] = C2P.render_policy_bytes(pol.read_bytes() if pol.is_file() else None, rows)
-        return after
+        return {CONF: C2P.render_conf_rest(conf.read_bytes() if before is None else before[CONF], KEY)}
 
     after = C2P.STEPS.write_before_image(target, STEP_ID, derive_after)
-    if after.get(POLICY) is not None:
-        (target / POLICY).parent.mkdir(parents=True, exist_ok=True)
-        (target / POLICY).write_bytes(after[POLICY])
-    conf.write_bytes(after[CONF])  # LAST: the witness reads the line's absence
+    conf.write_bytes(after[CONF])  # the witness reads the line's absence
     print(f"review-rounds: up · {CONF} kept, its {KEY} taken out"
-          + (f" · the review bound keys set in {POLICY}" if POLICY in after else
+          + (f" · {POLICY} already sets the review bound keys" if rows else
              f" · its bound is the catalogue default, so {POLICY} is unchanged"))
     return 0
 

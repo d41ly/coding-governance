@@ -2065,7 +2065,8 @@ check_eq "AGH2 AC1 the five kept claims in verdict order; the three-day stale an
   "$(read_claims_cell "$NONCE-c1")"
 # TOOL-dDeclaredLoop-8 AC8 — the driver's row is six TAB fields, the sixth a `k1:` key, and the card's
 # row ends ` · key ` and that key's eight characters after `k1:`. RED against a card awk reading five.
-cl_k=$(cd "$CWT" && bash "$CLDRV" --claims 2>/dev/null | awk -F'\t' '$1 == "zLive" { print NF " " $6 }' | tr -d '\r')
+# The row is read through `--claims --with-key`, the one form printing the sixth field (TOOL-dDeclaredLoop-56 S9).
+cl_k=$(cd "$CWT" && bash "$CLDRV" --claims --with-key 2>/dev/null | awk -F'\t' '$1 == "zLive" { print NF " " $6 }' | tr -d '\r')
 check_eq "DL8 AC8 the driver's zLive row is six fields, the sixth a k1: key, and the card's row ends with its eight characters" \
   "6 k1: · key ${cl_k:5:8}" "${cl_k:0:5} $(grep -m1 '^  zLive · ' "$CARD_HOME/$NONCE-c1.md" | sed -E 's/.*( · key [^ ]+)$/\1/' | sed 's/^ //')"
 check_eq "AGH2 AC2 the claims — head sits directly below live —, so the startup split files it before recent —" \
@@ -2126,6 +2127,16 @@ cl_s=$(( $(date +%s) - t0 )); export CARD_CLAIMS_BOUND=120
 grep -qE '^CARD_CLAIMS_BOUND=\$\{CARD_CLAIMS_BOUND:-15\}$' "$CHECK" && grep -qE '^CARD_CLAIMS_HIDE_S=86400$' "$CHECK" \
   && { echo "ok   AGH2 S4 S5 the shipped CARD_CLAIMS_BOUND default is 15 and CARD_CLAIMS_HIDE_S is 86400"; pass=$((pass+1)); } \
   || { echo "FAIL AGH2 S4 S5 the shipped CARD_CLAIMS_BOUND default is 15 and CARD_CLAIMS_HIDE_S is 86400"; grep -nE '^CARD_CLAIMS_(BOUND|HIDE_S)=' "$CHECK" | sed 's/^/    /'; fail=$((fail+1)); }
+git -C "$CWT" checkout -q -- "$CLDRV_REL"
+
+# TOOL-dDeclaredLoop-56 AC5 — kit skew: a stand-in driver released before `--with-key`, which ignores
+# the flag and prints one five-field row, still fills the cell, the row's key read `-`. RED against
+# the card awk placing `NF == 6` alone, which reads the row as a line it cannot read.
+printf '%s\n' '#!/bin/sh' '[ "$1" = --claims ] || exit 0' "printf 'zFive\\tn1\\tlive\\t60\\tlive\\n'" > "$CLDRV"
+run_card "DL56 AC5 --card --write over a driver printing five fields" "$CWT" 0 \
+  "claims — 1 on the remote · 1 shown · 0 hidden" --card --write --session "$NONCE-c56"
+check_eq "DL56 AC5 the five-field row is placed and its key prints -" \
+  "  zFive · n1 · live · beat 60s · live · key -" "$(grep -m1 '^  zFive · ' "$CARD_HOME/$NONCE-c56.md" 2>/dev/null)"
 git -C "$CWT" checkout -q -- "$CLDRV_REL"
 
 # AC11 — ten kept claims, nine terminal ones and a live one whose slug sorts last: exactly
@@ -2270,7 +2281,9 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # block; no suite ran in the pass, the card write was probed alone over a scratch fixture.
 # +11: TOOL-dDeclaredLoop-8's claim keys, the AC6 keys cell (three), the AC7 re-keyed replay (seven) and
 # the AC8 six-field row (one), counted off the diff; no suite ran in the pass, each probed over a scratch clone.
-FLOOR_ASSERTIONS=348
+# +2: TOOL-dDeclaredLoop-56 AC5's five-field stand-in driver, one run_card and one check_eq, counted off
+# the block; no suite ran in the pass, the card's awk was probed alone over the stand-in's row.
+FLOOR_ASSERTIONS=350
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

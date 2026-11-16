@@ -64,13 +64,19 @@ tag and the key is `derive_instance_key`'s shape for it; `loop: refused`, exit 1
 
 The answer is one of `ANSWERS`, the first that holds: `invalid-input` (no build, a README that does not
 parse, a read refusal, a recorded move no build row holds, or a hand-over naming no unit, no MISSING id
-and no undecided ask), `stale-remote` (the remote tip's claim not `fresh`: unread, or its newest reflog
-entry older than the bound), `terminal` (the state is a `[states]` terminal, or every unit is deployed
+and no undecided ask), `stale-remote` (the remote tip's claim not `fresh`: a remote the ladder refuses,
+or a tracking tip whose newest reflog entry is older than the bound), `terminal` (the state is a `[states]` terminal, or every unit is deployed
 and no ask stands), `awaiting` on an owed parked entry or an unpassed hold, `blocked` on a `parents:`
 build neither recorded nor derived `LANDED`, `act` with a next item, `awaiting` on an undecided ask, and
 `stuck` naming the step's unwitnessed exit. Line output is §4's six line kinds; `--json` the same fields
 as one object; `--next-line` the `next:` shape `render_next_line` picks from `NEXT_SHAPES`. Exit 0 for
 every answer but `invalid-input`, which exits 2.
+
+THE ABSENT REMOTE (TOOL-dDeclaredLoop-56 S36). Where the ladder names no remote and refuses nothing, or
+the tracking ref of its default branch does not resolve, the remote reads absent: the answer is taken on
+local witnesses, so no unit reads `deployed`, the interrupt `remote · none` prints, and no remote-tip
+claim and no `read` row is added. A tracking ref deleted by hand reads the same, so such a node acts on
+its local witnesses.
 
 `--fixture --plant <case>` builds one scratch repository under the host temp folder, plants the case,
 prints the engine's lines and one `position: fixture · <case> · held` or `· MISSED <why>` line, and
@@ -112,7 +118,7 @@ from loop_parents import read_policy_kit  # noqa: E402
 from loop_table import check_recorded_move, derive_from_states, read_transition_rows  # noqa: E402
 from loop_transition import read_transitions  # noqa: E402
 from scenario import read_activated_rows  # noqa: E402
-from loop_witness import read_git, remove_tree, resolve_bash, run_fixture_git, write_fixture_files  # noqa: E402
+from loop_witness import read_clean_env, read_git, remove_tree, resolve_bash, run_fixture_git, write_fixture_files  # noqa: E402
 
 SAY = "position"
 ANSWERS = ("act", "awaiting", "blocked", "terminal", "stuck", "invalid-input", "stale-remote")
@@ -138,7 +144,8 @@ PLANTS = {"steps": "unit 1 deployed, unit 2 built, unit 3 designed: act at unit 
           "owner-decision": "an owed decision park, unsettled: awaiting",
           "parent-unlanded": "parents: names a build with no landed move and no derived LANDED: blocked",
           "terminal": "the newest recorded move enters landed: terminal",
-          "stale-remote": "no remote-tracking tip: stale-remote",
+          "stale-remote": "a remote whose tracking tip's newest reflog entry predates the bound: stale-remote",
+          "no-remote": "no remote at all: act on local witnesses, interrupt remote · none, no remote tip claim",
           "bad-transition": "a recorded move no build row holds: invalid-input, exit 2",
           "deadlock": "the step's root item needs an item of a later step: stuck",
           "bar-wait": "every unit built, no gates-run fact, no ask: act, and the terminal next: shape",
@@ -205,14 +212,19 @@ def read_handover(repo, slug):
 
 
 def read_remote_claim(repo, bound, now):
-    """`(sha or None, claim)` of the default branch's remote-tracking tip: the claim keyed over
-    `<ref>@<sha>`, `at` its newest reflog entry, judged `remote` against `bound`."""
-    remote, branch, _observed, _refusal = resolve_remote(repo)
+    """`(sha or None, ref, claim)` of the default branch's remote-tracking tip: the claim keyed over
+    `<ref>@<sha>`, `at` its newest reflog entry, judged `remote` against `bound`. The claim is None where
+    the remote reads absent (TOOL-dDeclaredLoop-56 S36): the ladder names no remote and refuses nothing,
+    or the tracking ref of its default branch does not resolve. A ladder refusal keeps the claim."""
+    remote, branch, _observed, refusal = resolve_remote(repo)
     ref = "refs/remotes/%s/%s" % (remote, branch) if remote and branch else "refs/remotes/?"
     sha, at = None, None
     if remote and branch:
         rc, out = read_git(repo, "rev-parse", "-q", "--verify", "%s^{commit}" % ref)
         sha = out if rc == 0 and out else None
+    if not refusal and not sha:
+        return None, ref, None
+    if sha:
         rc, out = read_git(repo, "reflog", "show", "--date=unix", "-n1", "--format=%gd", ref)
         m = re.search(r"@\{(\d+)\}", out) if rc == 0 else None
         at = datetime.datetime.fromtimestamp(int(m.group(1)), datetime.timezone.utc) if m else None
@@ -330,10 +342,11 @@ def read_refusals(text):
             for r in record["rows"] if r["kind"] == "refusal"]
 
 
-def derive_interrupts(text, handover, owed, parents_open, claims, now):
-    """The interrupts in `[position]`'s order: owner decisions, the mailbox, invalidated witnesses,
-    dependency gates, the undecided ask. `text` is the run-state file's text, `owed` the policy kit's
-    `read_run_fact` where that file exists, `parents_open` the parents not landed."""
+def derive_interrupts(text, handover, owed, parents_open, claims, now, remote_absent=False):
+    """The interrupts in `[position]`'s order: owner decisions, the mailbox, invalidated witnesses, an
+    absent remote, dependency gates, the undecided ask. `text` is the run-state file's text, `owed` the
+    policy kit's `read_run_fact` where that file exists, `parents_open` the parents not landed,
+    `remote_absent` the remote reading absent, `remote · none` (TOOL-dDeclaredLoop-56 S36)."""
     out = []
     kinds, acts = handover["owed"]
     for ln in text.splitlines():
@@ -350,6 +363,7 @@ def derive_interrupts(text, handover, owed, parents_open, claims, now):
             out.append({"kind": "owner-decision", "subject": "hold %s · until %s" % (code, until or "-")})
     out.append({"kind": "mailbox", "subject": "unarmed"})
     out += [{"kind": "invalidated", "subject": c["name"]} for c in claims if c["verdict"] == "re-derived"]
+    out += [{"kind": "remote", "subject": "none"}] if remote_absent else []
     out += [{"kind": "dependency", "subject": p} for p in parents_open]
     if handover["ask"]:
         out.append({"kind": "ask", "subject": handover["ask"]})
@@ -475,7 +489,8 @@ def derive_position_into(pos, repo, slug, definition):
     remote_sha, ref, remote_claim = read_remote_claim(repo, handover["bound"], now)
     if remote_sha:
         pos["read"].append("%s@%s" % (ref, remote_sha[:8]))
-    pos["claims"].append(remote_claim)
+    if remote_claim:
+        pos["claims"].append(remote_claim)
     order = ["none"] + list(tables["states"].get("unit", []))
     units, pass_of = [], {}
     for uid, word in handover["units"]:
@@ -543,8 +558,9 @@ def derive_position_into(pos, repo, slug, definition):
             landed = bool((read_transitions(p, repo) or [{}])[0].get("to") == "landed")
         if not landed:
             parents_open.append(p)
-    pos["interrupts"] = derive_interrupts(text, handover, owed, parents_open, pos["claims"], now)
-    pos["answer"], pos["reason"] = derive_answer(pos, tables["terminal"], remote_claim["verdict"] == "fresh",
+    pos["interrupts"] = derive_interrupts(text, handover, owed, parents_open, pos["claims"], now, remote_claim is None)
+    pos["answer"], pos["reason"] = derive_answer(pos, tables["terminal"],
+                                                 remote_claim is None or remote_claim["verdict"] == "fresh",
                                                  every_deployed and bool(units), nxt, exit_item)
 
 
@@ -637,7 +653,7 @@ def write_position_plant(top, case, root):
     write_fixture_files(repo, files)
     run_fixture_git(repo, "add", "-A")
     run_fixture_git(repo, "commit", "-q", "-m", "fixture")
-    remote = None if case == "stale-remote" else top / "o.git"
+    remote = None if case == "no-remote" else top / "o.git"
     if remote:
         run_fixture_git(top, "init", "-q", "--bare", "--template=", str(remote))
         run_fixture_git(repo, "remote", "add", "origin", str(remote))
@@ -698,6 +714,14 @@ def write_position_plant(top, case, root):
         run_fixture_git(repo, "push", "-q", "origin", "main")
     if remote:
         run_fixture_git(repo, "remote", "set-head", "origin", "main")
+    if case == "stale-remote":  # the tracking tip kept, its one reflog entry dated 2000-01-01, past any bound
+        tip = run_fixture_git(repo, "rev-parse", "refs/remotes/origin/main")
+        run_fixture_git(repo, "update-ref", "-d", "refs/remotes/origin/main")
+        rc, out = read_git(repo, "update-ref", "--create-reflog", "-m", "aged", "refs/remotes/origin/main", tip,
+                           env=read_clean_env(GIT_COMMITTER_NAME="fx", GIT_COMMITTER_EMAIL="fx@example.invalid",
+                                              GIT_COMMITTER_DATE="946684800 +0000"))
+        if rc:
+            raise subprocess.CalledProcessError(rc, "git update-ref", out)
     definition = None
     data = copy.deepcopy(read_definition(KIT)[0])
     if case in ("idempotent", "frontier-chain", "frontier-none"):
@@ -846,7 +870,10 @@ def check_plant(case, pos, rc, repo):
             "owner-decision": lambda: pos["answer"] == "awaiting" and "which-way" in kinds.get("owner-decision", ""),
             "parent-unlanded": lambda: pos["answer"] == "blocked" and "tPar" in pos["reason"],
             "terminal": lambda: pos["answer"] == "terminal",
-            "stale-remote": lambda: pos["answer"] == "stale-remote",
+            "stale-remote": lambda: pos["answer"] == "stale-remote" and any(r.startswith("refs/remotes/origin/main@")
+                                                                           for r in pos["read"]),
+            "no-remote": lambda: pos["answer"] == "act" and "interrupt — remote · none" in lines
+            and not any("remote tip" in ln for ln in lines),
             "bad-transition": lambda: pos["answer"] == "invalid-input" and rc == 2,
             "deadlock": lambda: pos["answer"] == "stuck" and "item.build.exit" in pos["reason"],
             "bar-wait": lambda: pos["answer"] == "act" and pos["build_step"] == "step.test"

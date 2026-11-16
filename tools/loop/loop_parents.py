@@ -8,8 +8,13 @@
 `read_withdrawn_parents(build, root)` reads the slugs of the build README's `parents:` front matter
 through the memory-tree kit's `parse_front_matter`, the builds folder `<root>/<MEMORY_ROOT>/builds` by
 that kit's `read_design_conf`, `memory` where unset. A parent reads withdrawn on today's stand-in for its
-`withdrawn` post: its run-state file `RUN.md` holds the run fact `phase: ABORTED`, read by the policy
-kit's `read_run_fact`. A parent with no run-state file reads live.
+`withdrawn` post: its run-state file `RUN.md`, read at the tip of `refs/remotes/<remote>/<run-branch>`
+where that ref holds it, else in the tree (TOOL-dDeclaredLoop-56 S39), has a run fact `phase` that
+`loop_table.py`'s `derive_phase_position` maps, with `halt-code` and `hold-code` where set, to the state
+`withdrawn` (S18), so an `ABORTED` parent halted `budget-exhausted` reads `incomplete`. The facts are
+read by the policy kit's `read_run_fact`, the remote by `claims.py`'s inline ladder and the branch by the
+tree copy's `run-branch:` fact. A phase the map refuses exits 2 `unanswered` naming the parent. A parent
+with no run-state file anywhere prints `parent <p> · not withdrawn (no run record)` before the route.
 
 `derive_parent_route(build, state, root)` answers as `deps.on-parent-withdrawn`, read by the policy
 kit's `resolve` at the landed revision, says. The move is the definition's parent row,
@@ -67,7 +72,10 @@ KEPT_FACTS = ("run-branch", "branch-ref")
 PLANTS = {"withdrawn-parent": "phase: ABORTED, run-branch naming a branch the scratch holds",
           "no-kept-branch": "phase: ABORTED, its run-branch ref deleted from the scratch",
           "live-parent": "phase: BUILDING",
-          "no-parents": "the child README carries no parents: key"}
+          "no-parents": "the child README carries no parents: key",
+          "incomplete-parent": "phase: ABORTED with halt-code: budget-exhausted, which maps to incomplete",
+          "aborted-on-run-branch": "the tree's copy phase: BUILDING, the run branch's tracking tip phase: ABORTED",
+          "no-run-record": "the parent's build folder holds no RUN.md"}
 FX_KEPT = "refs/heads/branch/tParent-run"
 
 
@@ -82,12 +90,19 @@ def read_policy_kit():
 
 
 def read_withdrawn_parents(build, root):
-    """`{parent slug: its run-state text}` for each parent in `build`'s README `parents:` that reads
-    withdrawn, in `parents:` order. ValueError on an unreadable README or a slug naming no build
-    folder; LookupError where the memory-tree or policy kit does not resolve."""
+    """`{parent slug: its run-state text, or None for no run record}` for each parent in `build`'s
+    README `parents:` that reads withdrawn or has no run record, in `parents:` order. A parent's text is
+    its `RUN.md` at the tip of `refs/remotes/<remote>/<run-branch>` where that ref holds the file, the
+    remote by the loop kit's inline ladder and the branch the `run-branch:` fact of the tree's own copy,
+    else the tree's copy (TOOL-dDeclaredLoop-56 S39). It reads withdrawn where `derive_phase_position`
+    maps its `phase`, with its `halt-code` and `hold-code` where set, to the state `withdrawn`
+    (TOOL-dDeclaredLoop-56 S18). ValueError on an unreadable README, a slug naming no build folder or a
+    phase the map refuses; LookupError where the memory-tree or policy kit does not resolve."""
     read_memory_tree("gen_build_index.py")
+    from claims import resolve_remote
     from design_lib import read_design_conf
     from gen_build_index import Problem, parse_front_matter
+    from loop_table import derive_phase_position
     _policy, guard = read_policy_kit()
     memory_root = (read_design_conf(root).get("MEMORY_ROOT") or "memory").strip().strip("/")
     builds = pathlib.Path(root) / memory_root / "builds"
@@ -95,13 +110,28 @@ def read_withdrawn_parents(build, root):
         fm = parse_front_matter(str(builds / build / "README.md"), build)
     except (Problem, OSError) as e:
         raise ValueError("the build %s's README does not read: %s" % (build, e)) from None
+    remote = resolve_remote(root)[0]
     out = {}
     for slug in fm.get("parents", "").split():
         if not (builds / slug).is_dir():
             raise ValueError("parents: names %s, which is not a build folder under %s" % (slug, builds.as_posix()))
         run = builds / slug / "RUN.md"
-        text = run.read_bytes().decode("utf-8", "replace") if run.is_file() else ""
-        if guard.read_run_fact(text, "phase") == WITHDRAWN_PHASE:
+        text = run.read_bytes().decode("utf-8", "replace") if run.is_file() else None
+        branch = (guard.read_run_fact(text, "run-branch") or "").strip().removeprefix("refs/heads/") if text else ""
+        if remote and branch:
+            rc, tip = read_git(root, "show", "refs/remotes/%s/%s:%s/builds/%s/RUN.md" % (remote, branch, memory_root, slug))
+            text = tip if rc == 0 else text
+        if text is None:
+            out[slug] = None
+            continue
+        phase = guard.read_run_fact(text, "phase")
+        facts = {k: guard.read_run_fact(text, k) for k in ("halt-code", "hold-code")}
+        facts = {k: v for k, v in facts.items() if v}
+        try:
+            state = derive_phase_position(phase, facts)[0]
+        except LookupError as e:
+            raise ValueError("the parent %s's phase %s maps to no state: %s" % (slug, phase, e)) from None
+        if state == "withdrawn":
             out[slug] = text
     return out
 
@@ -131,17 +161,19 @@ def derive_parent_route(build, state, root):
         value = policy.resolve(KEY, str(root)).value
     except policy.Refusal as e:
         raise ValueError("%s does not resolve: %s" % (KEY, e)) from None
-    withdrawn = read_withdrawn_parents(build, root)
+    read = read_withdrawn_parents(build, root)
+    lines = ["parent %s · not withdrawn (no run record)" % p for p, text in read.items() if text is None]
+    withdrawn = {p: text for p, text in read.items() if text is not None}
     if not withdrawn:
-        return ["route none"]
+        return lines + ["route none"]
     head = "route %s · parent %s" % (value, " ".join(withdrawn))
     if value == "withdraw-too":
-        return ["%s · owner-item · propose item.life.close withdrawn · left by record-kind.disposition" % head]
+        return lines + ["%s · owner-item · propose item.life.close withdrawn · left by record-kind.disposition" % head]
     try:
         _row, to = derive_move("build", state, PARENT_ITEM, "withdrawn", {}, tables)
     except TransitionRefused:
-        return ["%s · held: %s admits no parent row" % (head, state)]
-    lines = ["%s · move %s → %s · %s" % (head, state, to, PARENT_ITEM)]
+        return lines + ["%s · held: %s admits no parent row" % (head, state)]
+    lines += ["%s · move %s → %s · %s" % (head, state, to, PARENT_ITEM)]
     if value == "adopt-parent-work":
         lines += ["inventory %s %s" % (p, resolve_kept_tip(p, text, root)[1]) for p, text in withdrawn.items()]
     return lines
@@ -153,14 +185,16 @@ def write_parent_plant(top, case, value):
     def build_readme(slug, extra=""):
         return ("---\nslug: %s\nnode: a\nopened: 2026-01-01\nstreams: tooling\nroster: none\nids: none\n%s---\n"
                 "# %s\n" % (slug, extra, slug))
-    phase = "BUILDING" if case == "live-parent" else WITHDRAWN_PHASE
+    phase = "BUILDING" if case in ("live-parent", "aborted-on-run-branch") else WITHDRAWN_PHASE
+    run_text = "# tParent - run state\n\n## Run facts\nphase: %%s\n%srun-branch: %s\n" % (
+        "halt-code: budget-exhausted\n" if case == "incomplete-parent" else "", FX_KEPT)
     run_fixture_git(top, "init", "-q", "--template=", "-b", "main")
     write_fixture_files(top, {
         ".memory-tree.conf": "MEMORY_ROOT=memory\n",
         "memory/builds/tChild/README.md": build_readme("tChild", "" if case == "no-parents" else "parents: tParent\n"),
-        "memory/builds/tParent/README.md": build_readme("tParent"),
-        "memory/builds/tParent/RUN.md": "# tParent - run state\n\n## Run facts\nphase: %s\nrun-branch: %s\n" % (
-            phase, FX_KEPT)})
+        "memory/builds/tParent/README.md": build_readme("tParent")})
+    if case != "no-run-record":
+        write_fixture_files(top, {"memory/builds/tParent/RUN.md": run_text % phase})
     if value is not None:
         write_fixture_files(top, {".governance/policy.toml": '[deps]\non-parent-withdrawn = "%s"\n' % value})
     run_fixture_git(top, "add", "-A")
@@ -169,9 +203,16 @@ def write_parent_plant(top, case, value):
         return None
     run_fixture_git(top, "checkout", "-q", "-b", FX_KEPT.removeprefix("refs/heads/"))
     write_fixture_files(top, {"kept.txt": "the parent's kept work\n"})
-    run_fixture_git(top, "add", "kept.txt")
+    if case == "aborted-on-run-branch":  # the run branch's copy aborted and published; the tree's still building
+        write_fixture_files(top, {"memory/builds/tParent/RUN.md": run_text % WITHDRAWN_PHASE})
+    run_fixture_git(top, "add", "-A")
     run_fixture_git(top, "commit", "-q", "-m", "kept")
     run_fixture_git(top, "checkout", "-q", "main")
+    if case == "aborted-on-run-branch":
+        run_fixture_git(top, "remote", "add", "origin", (top / "origin.git").as_posix())
+        run_fixture_git(top, "update-ref", "refs/remotes/origin/" + FX_KEPT.removeprefix("refs/heads/"), FX_KEPT)
+        run_fixture_git(top, "update-ref", "refs/remotes/origin/main", "main")  # the policy's landed revision
+        run_fixture_git(top, "remote", "set-head", "origin", "main")
     return FX_KEPT, run_fixture_git(top, "rev-parse", FX_KEPT)
 
 
@@ -209,6 +250,10 @@ def run_selftest():
               "%s: fixture · tree unchanged" % SAY, ""),
              ("live", fx + ["live-parent"], 0, "route none", ""),
              ("no parents", fx + ["no-parents"], 0, "route none", ""),
+             ("incomplete", fx + ["incomplete-parent"], 0, "route none", ""),
+             ("run branch", fx + ["aborted-on-run-branch"], 0, move % "replan", ""),
+             ("no run record", fx + ["no-run-record"], 0, "parent tParent · not withdrawn (no run record)", ""),
+             ("no run record route", fx + ["no-run-record"], 0, "route none", ""),
              ("default", fx + ["withdrawn-parent"], 0, move % "replan", ""),
              ("bogus", fx + ["withdrawn-parent", "--value", "bogus"], 2, "%s: unanswered" % SAY, KEY)]
     return run_selftest_cases(main, cases, "%s: parents selftest" % SAY)

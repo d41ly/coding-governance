@@ -6,8 +6,11 @@
 
 `measure_class_occurrences` reads every `*/reviews/*.md` under `--builds` through `replay_scorer.py`'s
 `parse_appendix_rows`, the appendix reader beside this file, and counts each `class:<slug>` of the
-confirmed rows' disposition column across every record other than `--record`. It answers one line per
-slug of `--record` that earns a gate under the `review.left-shift` value:
+confirmed rows' disposition column once per distinct review (TOOL-dDeclaredLoop-56 S41): a record's
+review is its file stem less a leading `<date>-review-` and a trailing `-round<n>`, a stem of no such
+shape its own review, and every record of `--record`'s own review is skipped, so a review's earlier
+round is never a prior occurrence. It answers one line per slug of `--record` that earns a gate under
+the `review.left-shift` value:
 
     review-dispose: gate <slug> · prior <n> · <value>[ · owner]
 
@@ -19,12 +22,13 @@ parser refuses counts nothing and prints `review-dispose: skipped <path> · <why
 Exit 0 answered, any number of gates · 2 `--record` unreadable or refused by the parser, or an
 argument error.
 
-WHAT IT DOES NOT CHECK: that two prior rows come from two distinct reviews (a record counts each of its
-rows), that a slug names a real class, or that a gate was filed. The DISPOSAL stage files each earned
+WHAT IT DOES NOT CHECK: that a record is named by the hygiene guide's grammar, so a misnamed round counts
+as its own review; that a slug names a real class; or that a gate was filed. The DISPOSAL stage files each earned
 gate as an ask; this module only counts.
 """
 import argparse
 import pathlib
+import re
 import sys
 
 sys.dont_write_bytecode = True
@@ -32,6 +36,9 @@ import replay_scorer  # noqa: E402  the appendix reader, beside this file
 
 SAY = "review-dispose"
 LEFT_SHIFTS = ("second-occurrence", "every-class", "owner-selects")
+#: A record's review (TOOL-dDeclaredLoop-56 S41): its file stem less a leading `<date>-review-` and a
+#: trailing `-round<n>`, each where present, so every round of one review is one review.
+REVIEW_STEM = re.compile(r"(?:\d{4}-\d\d-\d\d-review-)?(.+?)(?:-round\d+)?")
 
 
 def read_record_slugs(text):
@@ -57,9 +64,11 @@ def measure_class_occurrences(builds, record, value):
         mine, err = None, str(e)
     if err:
         raise ValueError("%s: refused · %s · %s" % (SAY, record.as_posix(), err))
+    own = REVIEW_STEM.fullmatch(record.stem).group(1)
     prior, skipped = {}, []
     for path in sorted(pathlib.Path(builds).glob("*/reviews/*.md")):
-        if path.resolve() == record:
+        review = REVIEW_STEM.fullmatch(path.stem).group(1)
+        if path.resolve() == record or review == own:
             continue
         try:
             got, why = read_record_slugs(path.read_text(encoding="utf-8"))
@@ -70,13 +79,13 @@ def measure_class_occurrences(builds, record, value):
             continue
         for form, slug in got:
             if form == "class":
-                prior[slug] = prior.get(slug, 0) + 1
+                prior.setdefault(slug, set()).add(review)
     gates, seen = [], set()
     for form, slug in mine:
         if slug in seen:
             continue
         seen.add(slug)
-        n = prior.get(slug, 0)
+        n = len(prior.get(slug, ()))
         if value == "second-occurrence" and not (form == "class" and n >= 1):
             continue
         gates.append("%s: gate %s · prior %d · %s%s" % (SAY, slug, n, value, " · owner" if value == "owner-selects" else ""))

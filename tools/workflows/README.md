@@ -571,8 +571,9 @@ its batching sentences; `unverified` routes an UNVERIFIED finding: `ask` files i
 `BACKLOG.md`, `record` lists it in the summary, each counted as the return's `routed`, which joins the
 reconciling sum and, beside `refuted`, is bounded by the unverified count, a promotion above `confirmed`
 refused by name; `block` adjudicates it as before, `routed` 0. `leftShift` is the value the stage passes to
-`review_dispose.py classes`, which counts each `class:<slug>` of the report's appendix against every other
-review record under `--builds`, read through `replay_scorer.py`'s `parse_appendix_rows`, and prints one
+`review_dispose.py classes`, which counts each `class:<slug>` of the report's appendix once per other
+review under `--builds`, a review being a record's file stem less a leading `<date>-review-` and a
+trailing `-round<n>` and every round of `--record`'s own review skipped, read through `replay_scorer.py`'s `parse_appendix_rows`, and prints one
 `review-dispose: gate <slug> · prior <n> · <value>[ · owner]` line per earned gate, which the stage files as an
 ask, and one `review-dispose: skipped <path> · <why>` line per record the parser refuses; it exits 2 on a
 `--record` it cannot read. `blocks` `no` hands the roster out on the CONVERGING return, which logs the review

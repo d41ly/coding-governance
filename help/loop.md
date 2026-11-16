@@ -442,8 +442,14 @@ withdrawn, and every other held run paused.
 A build whose README front matter names `parents:` depends on them. When a parent is withdrawn, the
 policy key `deps.on-parent-withdrawn` says what the dependent build does, and the loop kit answers it
 as a route. Until a parent's withdrawal is posted, a parent reads withdrawn when its run-state file,
-`RUN.md` in its build folder, holds the run fact `phase: ABORTED`; a parent with no run-state file
-reads live.
+`RUN.md` in its build folder, holds a `phase` that the definition's phase rows map to the state
+`withdrawn`, read with its `halt-code` and `hold-code` where set: `phase: ABORTED` does, but an
+`ABORTED` parent halted `budget-exhausted` reads `incomplete` and fires no route. The file is read
+where the parent's run branch publishes it, at `refs/remotes/<remote>/<run-branch>`, the branch
+named by the `run-branch:` fact of your tree's copy, so a parent that aborted on its own node is seen
+once you fetch; otherwise your tree's copy is read. A parent with no run-state file anywhere prints
+`parent <p> · not withdrawn (no run record)` before the route, and a phase no row maps exits 2
+naming the parent.
 
 - **`replan`**, the default: the build goes back to planning by the parent row, which moves a build in
   designing, building or deploying on `item.deploy.parents`'s withdrawn.
@@ -484,7 +490,9 @@ waits for its next row.
 - **See it on a scratch repository:** `--fixture --plant <case>` builds a scratch repository holding a <!-- usage: script:tools/loop/loop_parents.py 5ff32d7b -->
   child build and its parent, runs the route there, prints whether the tree changed, and removes it.
   The cases are `withdrawn-parent` (the parent aborted, its kept branch present), `no-kept-branch`
-  (aborted, its kept branch deleted), `live-parent` and `no-parents`. `--value` commits the scratch's
+  (aborted, its kept branch deleted), `live-parent`, `no-parents`, `incomplete-parent` (aborted,
+  halted `budget-exhausted`), `aborted-on-run-branch` (building in the tree, aborted at its run
+  branch's tracking tip) and `no-run-record` (no `RUN.md` at all). `--value` commits the scratch's
   policy value and `--state` sets the child's state, `designing` by default. `--selftest` runs every
   case, and gov's own `loop parent routes` gate runs it.
 
@@ -807,9 +815,10 @@ it is; moved, the startup cells are rendered again, keeping the stored header, t
 `remote evidence`, since a replay reads no remote. The `cli —`, `worktrees —`, `drift —`, `memory —`
 and `health —` cells read inputs no key covers, so a fresh view key says nothing about them.
 
-The unattended driver's `--claims` rows carry the claim's key as a sixth field, over the claim's ref
-and its run record at the default branch's tracking ref, and the card's `claims —` rows end
-` · key ` and the key's first eight characters after `k1:`.
+The unattended driver's `--claims` rows carry five fields, and `bash tools/unattended/unattended.sh --claims --with-key` adds the claim's key as a sixth, over the claim's ref <!-- usage: verb:unattended.sh:--claims 946a3549 -->
+and its run record at the default branch's tracking ref. The card asks for the key, and its
+`claims —` rows end ` · key ` and the key's first eight characters after `k1:`, or ` · key -` where
+the driver is older than the flag and prints five fields.
 
 - **Key some sources:** `python tools/loop/claims.py key commit=<sha> base=<sha>` prints one key; <!-- usage: script:tools/loop/claims.py#key d36ca5b8 -->
   `key --stdin` prints one key per input line, the line's sources separated by TABs.
@@ -857,8 +866,11 @@ counts as not yet done.
 
 The answer is one of `act`, `awaiting`, `blocked`, `terminal`, `stuck`, `invalid-input` and
 `stale-remote`. A remote-tracking tip whose newest reflog entry is older than the unattended kit's
-`RESUME_STALE_BOUND`, or no remote at all, answers `stale-remote` before anything else. Git writes a
-reflog entry only when the tip moves, so a fetch that finds nothing new leaves it stale. An owed parked decision or an unpassed hold answers
+`RESUME_STALE_BOUND`, or a remote the ladder cannot choose, answers `stale-remote` before anything
+else. Git writes a reflog entry only when the tip moves, so a fetch that finds nothing new leaves it
+stale. With no remote at all, or no tracking ref of the default branch, the remote reads absent: the
+engine answers on your local witnesses, so no unit reads `deployed`, and prints
+`interrupt — remote · none` with no remote-tip claim. A tracking ref you deleted reads the same. An owed parked decision or an unpassed hold answers
 `awaiting`; a `parents:` build that has not landed answers `blocked`; an undecided ask answers
 `awaiting` only when no item can run.
 
@@ -888,9 +900,9 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
   composition does not read. With no composition it checks against gov's own items. The driver's
   `--refused` runs it and records nothing unless it exits 0.
 - **See it on a fixture:** `--fixture --plant <case>` builds a scratch repository with a bare remote,
-  plants one case, prints the engine's lines and one line ending `held` or `MISSED`, and removes it:
-  `steps`, `typed-status`, `idempotent`, `owner-decision`, `parent-unlanded`, `terminal`,
-  `stale-remote`, `bad-transition`, `deadlock`, `bar-wait`, `frontier-chain`, `frontier-parallel`,
+  but none for `no-remote`, plants one case, prints the engine's lines and one line ending `held` or
+  `MISSED`, and removes it: `steps`, `typed-status`, `idempotent`, `owner-decision`, `parent-unlanded`,
+  `terminal`, `stale-remote` (its tracking tip's reflog entry aged past the bound), `no-remote`, `bad-transition`, `deadlock`, `bar-wait`, `frontier-chain`, `frontier-parallel`,
   `frontier-refused`, `frontier-bad-key`, `frontier-none`, `plan-frontier`, `built-unarmed`,
   `built-unheld`, `built-armed`, `plan-line` and `status-line`; `frontier-refused`,
   `frontier-bad-key`, `plan-frontier`, `built-unarmed` and the last two run the unattended driver. `--selftest` runs every case, and gov's own `loop position fixtures` gate runs it.
@@ -1230,7 +1242,10 @@ naming it.
   a hand-made instance that does not conform and expects the same gate red: `command-hand`,
   `policy-key-hand`, `hook-hand`, `role-hand` and `workflow-hand`. `scenario-new` and `scenario-hand`
   do the same for a scenario, the hand row naming an entry step that does not exist. `factory-restores` gives a policy
-  key a default its own row refuses, and expects exit 1 with the clone left clean. `--selftest` runs
+  key a default its own row refuses, and expects exit 1 with the clone left clean.
+  `factory-restores-create` runs the hook factory, which creates its files, after committing a hand
+  fragment that holds the hook gate red, and expects exit 1 with no created file left on disk and the
+  clone clean. `--selftest` runs
   `check-commands` and every case. Gov's `loop factories fixtures` gate runs it.
 
 What is still yours to do, as it would be for a part made by hand. A role needs its agent file

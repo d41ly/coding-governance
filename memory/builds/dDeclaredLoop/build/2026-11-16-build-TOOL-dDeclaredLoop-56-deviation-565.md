@@ -1,0 +1,15 @@
+# TOOL-dDeclaredLoop-56 deviation 565 — the details rev-7 does not state: the run-branch ref, the plant's landed revision, the absent-remote interrupt's place and the pages beside S37
+
+**Serves:** deviation TOOL-dDeclaredLoop-56
+
+- **Departs from:** `TOOL-dDeclaredLoop-56@rev-7` [§2, §4, §5]
+- **Hand-off:** spec-to-code
+- **Before:** S39 reads a parent's run record at `refs/remotes/<remote>/<run-branch>`, `<run-branch>` the fact the tree's own copy carries; §6 AC34's `aborted-on-run-branch` plant stages a tracking tip reading `ABORTED`; S36 prints `interrupt — remote · none` without placing it among the interrupts; §4 "Files touched" names `help/loop.md` and `tools/loop/README.md` for S10, S18, S36 and S39, and S37's plant is named in `tools/loop/factories.py` alone; S40 says nothing of a policy file that does not parse.
+- **After:** the `run-branch:` fact holds a full ref, `refs/heads/branch/<name>`, so `tools/loop/loop_parents.py#read_withdrawn_parents` strips a leading `refs/heads/` before forming the tracking ref. The `aborted-on-run-branch` plant also points `refs/remotes/origin/main` and its `HEAD` at `main`, since with a remote present the policy kit resolves `deps.on-parent-withdrawn` at the landed revision that ref names and refused it without one. `tools/loop/position.py#derive_interrupts` places `remote · none` after the invalidated witnesses and before the dependency gates, its docstring naming that order. The plant lists of `help/loop.md` and `tools/loop/README.md` name the three parent plants, `no-remote` and `factory-restores-create`, so each list stays whole. `tools/govkit/steps/review_rounds.py#cmd_up` reads the policy file with `tomllib` and adds no refusal for one that does not parse: it raises, and the `policy check` leg grades that file at HEAD; a `ponytail:` comment names the gap.
+- **Cause:** builder discovery
+- **Reason:** the driver writes `run-branch:` as a full ref, so the spec's literal spelling would name `refs/remotes/<remote>/refs/heads/...`, which no fetch writes; the first run of the plant as the spec stages it exited 2 `unanswered`, naming `refs/remotes/origin/main`; a refusal for an unparsable policy file would be a new refusal site with no arm, which `govkit refusal join` grades.
+- **Evidence:** the dDeclaredLoop run record's own `run-branch:` fact reads `refs/heads/branch/unattended-declared-loop-d56bf0`; `python tools/loop/loop_parents.py --fixture --plant aborted-on-run-branch` printed `loop: unanswered · deps.on-parent-withdrawn does not resolve` before the two refs were planted and `route replan · parent tParent` after; `python tools/govkit/docs_leg.py --fingerprints` printed every script anchor of the two pages unchanged.
+- **Risk:** editorial
+- **Approver:** author, the builder pass, under the chain's `author-recorded` value (`PLAY-dClosedLoop-4`)
+- **Follow-through:** usage — the close's `loop parent routes`, `loop position fixtures`, `docs` and `govkit selftest` legs read the code and the pages as built
+- **Caused-by:** PLAY-dClosedLoop-2

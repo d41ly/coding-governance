@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-56 — the round-1 spec audit's 47 minors: owed leg rows, one reader each, honest skew and failure paths, and the citations that drifted
 
-**Status:** INPROGRESS · rev-7 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
+**Status:** CLOSED · rev-7 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,7 +14,9 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-56-deviation-562.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-56-deviation-562.md) | deviation | — |
 | [2026-10-25-build-TOOL-dDeclaredLoop-56-deviation-563.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-56-deviation-563.md) | deviation | — |
 | [2026-11-05-build-TOOL-dDeclaredLoop-56-deviation-564.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-56-deviation-564.md) | deviation | — |
+| [2026-11-16-build-TOOL-dDeclaredLoop-56-1-acceptance-ledger.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-56-1-acceptance-ledger.md) | journal | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-56-1-builder-return.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-56-1-builder-return.md) | journal | — |
+| [2026-11-16-build-TOOL-dDeclaredLoop-56-deviation-565.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-56-deviation-565.md) | deviation | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-56-red-fix-54.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-56-red-fix-54.md) | red-fix | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 |
 | [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 |

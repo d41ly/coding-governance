@@ -39,7 +39,7 @@
 #   unattended.sh --record-round <slug> --owner-stop <path>        # append the owner's stop, citing a tracked record under the build's prompts/ folder
 #   unattended.sh --chain-verdict <slug>                           # CONTINUE, STOP or HOLD, derived from that record and the roster; writes nothing
 #   unattended.sh --check-commit <message file>                    # from commit-msg: refuse an open pass's undeclared staged path
-#   unattended.sh --claims                                         # every run claim on the remote: slug, node, status, beat-age-s, verdict
+#   unattended.sh --claims [--with-key]                            # every run claim on the remote: slug, node, status, beat-age-s, verdict[, key]
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
 #   unattended.sh --version                                        # the kit version, then exit
 #   unattended.sh --help                                           # the verb list, the verb carrier's path and this text, then exit 0; -h is the same
@@ -2505,12 +2505,16 @@ read_claims() { # strict|soft|quiet -> 0 with CLAIM_ROWS, or 1 with CL_WHY
 # line `claims: off` and reads nothing (TOOL-aGraftedHelix-32): no verb writes or reads a claim then,
 # so a leftover claim is inert and the read bought a SessionStart fetch for nothing; it shows again
 # once the switch is on. WHAT IT DOES NOT CHECK: who drives anything; it reports and decides nothing.
-# TOOL-dDeclaredLoop-8 S7: a SIXTH field, the claim's key, beside the verdict and never in its place.
-print_claims() { # -> the rows on stdout; rc 2 when the remote does not answer
+# TOOL-dDeclaredLoop-8 S7: a SIXTH field, the claim's key, beside the verdict and never in its place,
+# printed only under `--claims --with-key` (TOOL-dDeclaredLoop-56 S10), the one form that spends the key
+# spawn: the plain form keeps the five fields every released card reads, and a released driver ignores
+# the flag, so a card that asks for the key over an older driver reads five and prints `-`.
+print_claims() { # [--with-key] -> the rows on stdout; rc 2 when the remote does not answer
   local keys
   [ "$RUN_CLAIMS" = on ] || { echo "claims: off"; return 0; }
   read_claims strict || return 2
   if [ -z "$CLAIM_ROWS" ]; then echo "claims: none"; return 0; fi
+  [ "${1:-}" = --with-key ] || { printf '%s\n' "$CLAIM_ROWS" | cut -f1-5; return 0; }
   keys=$(derive_claim_keys) || keys=""
   keys=${keys//$'\r'/}
   [ "$(printf '%s\n' "$keys" | grep -c .)" = "$(printf '%s\n' "$CLAIM_ROWS" | grep -c '')" ] || keys=""
@@ -16608,7 +16612,7 @@ while [ $# -gt 0 ]; do
                     check_commit_message "${1:-}"; _rl_rc=$?; rm -f "$CC_TMP"; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     # TOOL-aGraftedHelix-1 - the remote's claims, read and printed; no slug, because it lists them all.
     --claims)       refuse_waive_unless_preflight --claims || { RUNLOG_CLEAN=1; exit 1; }
-                    print_claims; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+                    print_claims "${2:-}"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; RUNLOG_CLEAN=1; exit 0 ;;
     --help|-h)      echo "unattended: the verbs are $(verb_list); each verb's contract is $MEMORY_ROOT/guides/UNATTENDED-VERBS.md"
                     usage; RUNLOG_CLEAN=1; exit 0 ;;

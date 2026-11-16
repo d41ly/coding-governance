@@ -119,6 +119,7 @@ PLANTS = {
     "workflow-new": "core.py new workflow fixture --driver program --harness none, then check_roles.py and loop_lib.py --check",
     "workflow-hand": "a hand [[workflow]] row listing a slot with no role file",
     "factory-restores": "core.py new policy-key fixture.bad whose --default its --allowed refuses",
+    "factory-restores-create": "core.py new hook fixture-hook over a committed hand fragment that holds its gate red",
     "scenario-new": "core.py new scenario trial --extends scenario.feature --admit entry=trial, then scenario.py check",
     "scenario-hand": "a hand [[scenario]] row in gov's pack whose entry names no step",
 }
@@ -139,6 +140,7 @@ NEW_ARGV = {
     "scenario-new": ["scenario", "trial", "--extends", "scenario.feature", "--admit", "entry=trial", "--entry",
                      "step.plan"],
 }
+NEW_ARGV["factory-restores-create"] = NEW_ARGV["hook-new"]
 #: Each selftest case: the case, its owed exit, and the opening and needle of the line it owes.
 CASES = (("check-commands", 0, "factories: check-commands", "descriptor(s)"),
          ("command-new", 0, "factories: fixture · command-new", "gate green"),
@@ -152,6 +154,7 @@ CASES = (("check-commands", 0, "factories: check-commands", "descriptor(s)"),
          ("workflow-new", 0, "factories: fixture · workflow-new", "gate green"),
          ("workflow-hand", 1, "factories: gate", "R8"),
          ("factory-restores", 1, "factories: fixture · factory-restores", "porcelain clean"),
+         ("factory-restores-create", 1, "factories: fixture · factory-restores-create", "porcelain clean"),
          ("scenario-new", 0, "factories: fixture · scenario-new", "gate green"),
          ("scenario-hand", 1, "factories: gate", "step.nowhere"))
 
@@ -637,11 +640,27 @@ def run_fixture(case, base, kit_rel):
             print("%s: gate · %s" % (SAY, line))
         print("%s: fixture · %s · gate %s exit %d" % (SAY, case, GATES[kind], rc))
         return rc
+    created = []
+    if case == "factory-restores-create":  # TOOL-dDeclaredLoop-56 S37: a gate red before the factory writes
+        write_hand_plant(clone, kit_rel, "hook-hand")
+        run_fixture_git(clone, "commit", "-q", "--no-verify", "-m", "a hand fragment the hook gate refuses")
+        home = resolve_kit_dir("hooks", "agent-cap.js", clone / kit_rel)
+        created = [home / "fixture-hook.js", home / "fixture-hook.fragment.json"]
     rc, lines = run_core_new(clone, kit_rel, NEW_ARGV[case])
     for line in lines:
         print("    " + line)
     dirty = [ln[3:] for ln in run_git(clone, "status", "--porcelain").splitlines()]
     arms = read_arm_findings(lines)
+    if case == "factory-restores-create":
+        left = [p.relative_to(clone).as_posix() for p in created if p.exists()]
+        why = ("the factory exited %d, not 1" % rc if rc != 1 else
+               "%s on disk" % ", ".join(left) if left else
+               "porcelain holds %s" % "; ".join(dirty) if dirty else
+               "no gate line names fixture-hand.fragment.json" if not any(
+                   "fixture-hand.fragment.json" in ln for ln in lines) else "")
+        print("%s: fixture · %s · factory exit %d · %s" % (SAY, case, rc, "FAIL, " + why if why else
+                                                           "no created file on disk · porcelain clean"))
+        return rc if not why else 3
     if case == "factory-restores":
         why = ("porcelain holds %s" % "; ".join(dirty) if dirty else
                "no arm_shape finding names fixture.bad" if not any("fixture.bad" in f for f in arms.get("arm_shape", ())) else

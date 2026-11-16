@@ -725,7 +725,9 @@ render_health_cell() {
 # this card never reads the conf's switch itself, so the driver stays its one reader. WHAT THIS DOES
 # NOT CHECK: who drives a slug, or whether a claim is honest — it prints what the driver answered.
 # Each row is six TAB fields, the sixth the claim's key or `-` (TOOL-dDeclaredLoop-8 S7), printed as
-# ` · key ` and the eight characters after `k1:`.
+# ` · key ` and the eight characters after `k1:`. The read asks `--claims --with-key`, and a row of five,
+# from a driver released before the flag, which ignores it, prints ` · key -` (TOOL-dDeclaredLoop-56 S8),
+# so neither side of a kit skew loses the cell.
 derive_claims_line() {   # $1 = the writer verb → the cell's head line and its rows
   local drv sd rc
   [ "$1" = replay ] && { printf 'claims — skipped: --card --replay reads no remote\n'; return 0; }
@@ -736,7 +738,7 @@ derive_claims_line() {   # $1 = the writer verb → the cell's head line and its
     || { printf 'claims — skipped: this node has no working timeout -k, so the read would be unbounded and none ran\n'; return 0; }
   sd=$(mkdir -p "$CARD_DIR" && mktemp -d "$CARD_DIR/.claims.XXXXXX") \
     || { printf 'claims — skipped: no scratch directory under %s to capture the read in\n' "$CARD_DIR"; return 0; }
-  GOV_RUNLOG=0 timeout -k 2 "$CARD_CLAIMS_BOUND" bash "$drv" --claims </dev/null >"$sd/out" 2>"$sd/err"; rc=$?
+  GOV_RUNLOG=0 timeout -k 2 "$CARD_CLAIMS_BOUND" bash "$drv" --claims --with-key </dev/null >"$sd/out" 2>"$sd/err"; rc=$?
   case "$rc" in
     0)
       # Split on the TAB in awk, never `read`: an empty field collapses under `read`. Ordered by
@@ -747,11 +749,11 @@ derive_claims_line() {   # $1 = the writer verb → the cell's head line and its
         { sub(/\r$/, "") }
         $0 == "claims: none" { none = 1; next }
         $0 == "claims: off" { off = 1; next }
-        NF == 6 && ($5 in rk) {
+        (NF == 5 || NF == 6) && ($5 in rk) {
           all++
           if (($5 == "stale" || $5 == "terminal") && $4 ~ /^[0-9]+$/ && $4 + 0 > hide + 0) { hid++; next }
           k = rk[$5] "\t" $1
-          r = "  " $1 " · " $2 " · " $3 " · beat " ($4 ~ /^[0-9]+$/ ? $4 "s" : "-") " · " $5 " · key " ($6 ~ /^k1:/ ? substr($6, 4, 8) : "-")
+          r = "  " $1 " · " $2 " · " $3 " · beat " ($4 ~ /^[0-9]+$/ ? $4 "s" : "-") " · " $5 " · key " (NF == 6 && $6 ~ /^k1:/ ? substr($6, 4, 8) : "-")
           for (i = ++m; i > 1 && key[i - 1] > k; i--) { key[i] = key[i - 1]; row[i] = row[i - 1] }
           key[i] = k; row[i] = r; next
         }

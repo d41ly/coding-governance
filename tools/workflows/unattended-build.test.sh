@@ -3993,6 +3993,17 @@ has    "DL20 AC7 ...and the fresh one" "$o" 'review-dispose: gate fresh-slug · 
 o=$("$_rkd_py" "$HERE/review_dispose.py" classes --builds "$_dl20_b" --record "$_dl20_b/bC/reviews/r3.md" --left-shift owner-selects 2>&1)
 has    "DL20 AC7 owner-selects marks the prior slug an owner item" "$o" 'review-dispose: gate stale-pin · prior 1 · owner-selects · owner'
 has    "DL20 AC7 ...and the fresh one" "$o" 'review-dispose: gate fresh-slug · prior 0 · owner-selects · owner'
+# TOOL-dDeclaredLoop-56 AC36: two rounds of one review, each disposing class:stale-pin, the second as
+# --record: the first round is the same review, never a prior occurrence, so no gate is earned. RED
+# against the count over every other record, which reads the first round as prior 1.
+mkdir -p "$_dl20_b/bD/reviews"
+printf "## Verdict: CLEAN\n\nreview-shape kind=diff-review round=1 confirmed=1\n\n## Appendix — every finding\n\n${_dl20_t}| 1 | c | a.sh | medium | confirmed | class:stale-pin |\n" > "$_dl20_b/bD/reviews/2026-01-01-review-TOOL-bD-1-diff-review-round1.md"
+printf "## Verdict: CLEAN\n\nreview-shape kind=diff-review round=2 confirmed=1\n\n## Appendix — every finding\n\n${_dl20_t}| 1 | c | a.sh | medium | confirmed | class:stale-pin |\n" > "$_dl20_b/bD/reviews/2026-01-02-review-TOOL-bD-1-diff-review-round2.md"
+rm -f "$_dl20_b/bA/reviews/r1.md" "$_dl20_b/bC/reviews/r3.md"
+o=$("$_rkd_py" "$HERE/review_dispose.py" classes --builds "$_dl20_b" --record "$_dl20_b/bD/reviews/2026-01-02-review-TOOL-bD-1-diff-review-round2.md" --left-shift second-occurrence 2>&1)
+hasnt_ "DL56 AC36 a review's own earlier round earns no second-occurrence gate" "$o" 'gate stale-pin'
+o=$("$_rkd_py" "$HERE/review_dispose.py" classes --builds "$_dl20_b" --record "$_dl20_b/bD/reviews/2026-01-02-review-TOOL-bD-1-diff-review-round2.md" --left-shift every-class 2>&1)
+has    "DL56 AC36 ...and counts it prior 0" "$o" 'review-dispose: gate stale-pin · prior 0 · every-class'
 rm -rf "$_dl20_b"
 
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Authored from a
@@ -4145,7 +4156,9 @@ rm -rf "$_dl20_b"
 # RAISED 1043 -> 1069 by TOOL-dDeclaredLoop-20: the 26 its `DL20` group executes — AC1's three, AC8's six, AC6's
 # three bounds, its routes' five and the prompt's ask sentence, AC7's prompt command and its seven class-count
 # sites. Counted by reading, not measured by a run: the pass that wrote it runs no suite.
-FLOOR_ASSERTIONS=1069
+# RAISED 1069 -> 1071 by TOOL-dDeclaredLoop-56: AC36's two class-count sites over two rounds of one review.
+# Counted by reading, not measured by a run: the pass that wrote it runs no suite.
+FLOOR_ASSERTIONS=1071
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The
