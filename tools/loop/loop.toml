@@ -1370,8 +1370,9 @@ routes = { scored = "item.design.reason", review = "stand-in:{prefix}/workflows/
 [[item]]
 tag = "item.design.reason"
 step = "step.design"
-actor = "role:gov-architect"
+actor = "role:gov-spec-writer"
 needs = ["item.design.recommend"]
+allowance = "none"
 outcomes = ["review", "no-review"]
 witness = { class = "history", by = "the schema check, its answer joined to the recommendation record" }
 owner = "dDeclaredLoop"

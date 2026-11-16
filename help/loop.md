@@ -1511,7 +1511,7 @@ parked build.
   loop: item item.plan.place · command:plan.place · inputs from item · allowance the plan view from item · returns from item
   loop: item item.build.unit-pass · role:gov-builder · inputs from role:gov-builder · allowance product from role:gov-builder · returns from role:gov-builder
   loop: item item.design.inventory · role:gov-architect · pending · the roles kit holds no gov-architect role
-  loop: items · 61 read · 9 pending · 0 unarmed
+  loop: items · 67 read · 8 pending · 0 unarmed
   loop: witness classes history hook-record remote-verdict · refused actor
   loop: witness step.build · class history · by the transition record into the next step
   loop: actor witness DOD_CORE · keepalive-reaped · until dWellOiledMachine
