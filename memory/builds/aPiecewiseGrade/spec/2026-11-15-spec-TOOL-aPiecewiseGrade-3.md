@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-15-build-TOOL-aPiecewiseGrade-3-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aPiecewiseGrade-3-1-acceptance-ledger.md) | journal | — |
+| [2026-11-16-build-TOOL-aPiecewiseGrade-1-agent-ledger.md](../build/2026-11-16-build-TOOL-aPiecewiseGrade-1-agent-ledger.md) | journal | TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-4 TOOL-aPiecewiseGrade-5 TOOL-aPiecewiseGrade-6 TOOL-aPiecewiseGrade-7 TOOL-aPiecewiseGrade-8 |
 | [2026-11-16-build-TOOL-aPiecewiseGrade-1-arms-observed.md](../build/2026-11-16-build-TOOL-aPiecewiseGrade-1-arms-observed.md) | journal | TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-4 TOOL-aPiecewiseGrade-5 TOOL-aPiecewiseGrade-6 TOOL-aPiecewiseGrade-7 TOOL-aPiecewiseGrade-8 |
 | [2026-11-16-build-TOOL-aPiecewiseGrade-2-close-observations.md](../build/2026-11-16-build-TOOL-aPiecewiseGrade-2-close-observations.md) | journal | TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-1 |
 | [2026-11-15-prompt-TOOL-aPiecewiseGrade-3-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-3-1-spec-writer.md) | journal | — |
