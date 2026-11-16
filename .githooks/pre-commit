@@ -183,6 +183,41 @@ print_kit_miss() { # <leg> <kit dir, or ""> <file> [home] -> the announced skip,
   echo "pre-commit: $1 leg SKIPPED — no kit root: no install-receipt row for $rel, no ${4:+$4/$3 or }$rel at the root, and ${kitroot_declared:+no $rel under GOV_KITROOT=$kitroot_declared}${kitroot_declared:-no GOV_KITROOT declared in .githooks/gate-env.sh}."
 }
 
+# ONE staged read and ONE python resolution per hook run (TOOL-aMeasuredDrag-10). Each leg below
+# tests a flag set here from one read of the REAL index, with the pattern its own pathspec used:
+# `--no-renames` lists a rename as D plus A, which is what a pathspec, applied before rename pairing,
+# saw. Git C-quotes a non-ASCII name, so a trigger matches the name with its quotes stripped, and
+# `st_names` keeps git's spelling for the policy guard's `grep -xF`. The guard reads the index git
+# HANDED the hook: on a plain commit that is the real index under another spelling (an 8.3 short
+# path), so `-ef` and not a string compare decides it, and under `commit -a` or `commit <path>` it is
+# a temporary index the guard reads itself. Only a resolved launcher is kept, so a failed resolution
+# runs again at the next leg and prints its diagnosis there as it did.
+st_list=$(git diff --cached --name-status --no-renames)
+st_names="" st_memory="" st_wiring="" st_template="" st_map=""
+while IFS=$'\t' read -r st_status st_path; do
+  [ -n "$st_path" ] || continue
+  st_names+=$st_path$'\n'
+  st_bare=$st_path; case $st_bare in \"*\") st_bare=${st_bare#\"}; st_bare=${st_bare%\"} ;; esac
+  case $st_status:$st_bare in [AM]:memory/*) st_memory=1 ;; esac
+  case $st_bare in .unattended.conf|.unattended.conf/*|*SKILL.template.md|.claude/skills/unattended/SKILL.md|.claude/skills/unattended/SKILL.md/*) st_wiring=1 ;; esac
+  case $st_bare in coding-governance-agents.template.md|coding-governance-agents.template.md/*) st_template=1 ;; esac
+  case $st_bare in *.py|*.js) st_map=1 ;; esac
+done <<< "$st_list"
+read_hook_staged() { # the names staged in the index git handed this hook (TOOL-dGroundRules-72)
+  if [ -z "$hook_index" ] || [ "$hook_index" -ef "${gd:-}/index" ]; then printf '%s' "$st_names"
+  else with_hook_index git diff --cached --name-only --no-renames; fi
+}
+hook_py=""
+resolve_hook_python() { # -> py; rc 1 when no tracked resolver or no usable launcher
+  local r p
+  if [ -z "$hook_py" ]; then
+    r=$(git ls-files -- '*resolve-python.sh' | head -n 1)
+    [ -n "$r" ] && . "./$r" && p=$(resolve_python) || return 1
+    hook_py=$p
+  fi
+  py=$hook_py
+}
+
 # policy guard (TOOL-dGroundRules-6) — the minimal guard over the paths the policy kit's
 # guarded-paths.txt lists at HEAD: owner-only outside a live unattended run's branch, and the TTY
 # proof, enforced without reading
@@ -201,13 +236,12 @@ if g=$(resolve_kit_gate "$pg_kit" guard.py); then
   pg_list=$(git show "HEAD:${g%guard.py}guarded-paths.txt" 2>/dev/null | tr -d '\r' |
             sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | grep -vE '^(#|$)' || true)
   pg_hit=""
-  [ -z "$pg_list" ] || pg_hit=$(with_hook_index git diff --cached --name-only --no-renames | grep -xF -- "$pg_list" || true)
+  [ -z "$pg_list" ] || pg_hit=$(read_hook_staged | grep -xF -- "$pg_list" || true)
   if [ -n "$pg_hit" ]; then
     pg_names="${pg_hit//$'\n'/ } "
-    pg_r=$(git ls-files -- '*resolve-python.sh' | head -n 1)
     if [ -t 2 ]; then
       echo "pre-commit: policy guard — ${pg_names}staged, admitted on the owner's terminal proof."
-    elif [ -z "$pg_r" ] || ! . "./$pg_r" || ! py=$(resolve_python); then
+    elif ! resolve_hook_python; then
       echo "pre-commit: policy guard REFUSING — ${pg_names}staged and no python launcher to judge them."
       rc=1
     elif ! with_hook_index "$py" "$g" --staged; then
@@ -217,7 +251,7 @@ if g=$(resolve_kit_gate "$pg_kit" guard.py); then
 else
   pg_list=$(git show "HEAD:${kitroot_declared:+$kitroot_declared/}$pg_kit/guarded-paths.txt" 2>/dev/null | tr -d '\r' |
             sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | grep -vE '^(#|$)' || true)
-  if [ -n "$pg_list" ] && with_hook_index git diff --cached --name-only --no-renames | grep -qxF -- "$pg_list"; then
+  if [ -n "$pg_list" ] && read_hook_staged | grep -qxF -- "$pg_list"; then
     print_kit_miss "policy guard" "$pg_kit" guard.py
     echo "pre-commit: policy guard REFUSING — a guarded path is staged and no guard.py resolves to judge it."
     rc=1
@@ -225,7 +259,7 @@ else
 fi
 
 # memory-tree hygiene, staged leg — only when memory/ is touched
-if git diff --cached --name-only --diff-filter=ACMR -- 'memory/**' | grep -q .; then
+if [ -n "$st_memory" ]; then
   if g=$(resolve_kit_gate memory-tree check-memory-hygiene.sh); then
     bash "$g" --staged || rc=1
   else
@@ -239,8 +273,7 @@ else
   # The launcher is the tracked resolver the policy guard above sources. A kit or a launcher that
   # does not resolve is an announced skip, as for every leg of this hook.
   if g=$(resolve_kit_gate memory-tree build_records.py); then
-    rf_r=$(git ls-files -- '*resolve-python.sh' | head -n 1)
-    if [ -z "$rf_r" ] || ! . "./$rf_r" || ! py=$(resolve_python); then
+    if ! resolve_hook_python; then
       echo "pre-commit: red-fix join leg SKIPPED — no tracked python resolver, or no usable launcher, to run $g."
     elif ! "$py" "$g" join red-fix --staged; then
       rc=1
@@ -262,7 +295,7 @@ fi
 # unattended skill wiring — only when an input of the rendered Skill, or the Skill itself, is staged:
 # the conf it interpolates, a kit template, or the render. TOOL-aHomedAnchor-4 left-shifts the bar's
 # `unattended skill wiring` leg, so a hand-edited render reds here rather than at the push.
-if git diff --cached --name-only -- .unattended.conf '*SKILL.template.md' .claude/skills/unattended/SKILL.md | grep -q .; then
+if [ -n "$st_wiring" ]; then
   if g=$(resolve_kit_gate unattended adopt-unattended.sh); then
     bash "$g" --check || rc=1
   else
@@ -271,7 +304,7 @@ if git diff --cached --name-only -- .unattended.conf '*SKILL.template.md' .claud
 fi
 
 # template size — only when the template is staged
-if git diff --cached --name-only -- coding-governance-agents.template.md | grep -q .; then
+if [ -n "$st_template" ]; then
   if g=$(resolve_kit_gate "" check-template-size.sh); then
     bash "$g" || rc=1
   else
@@ -295,13 +328,12 @@ fi
 #   still reds first at the bar.
 # - It grades the WORKTREE, not the index, so an unstaged edit to a mapped file can move the verdict
 #   either way. The one mismatch it closes is its own remedy's: artifacts regenerated and not staged.
-if [ -f .codebase-map.conf ] && git diff --cached --name-only -- '*.py' '*.js' | grep -q .; then
+if [ -f .codebase-map.conf ] && [ -n "$st_map" ]; then
   g=$(. ./.codebase-map.conf >/dev/null 2>&1; printf '%s' "${GATE_FILE:-}")
-  r=$(git ls-files -- '*resolve-python.sh' | head -n 1)
   if [ -z "$g" ] || [ ! -f "$g" ]; then
     echo "pre-commit: codebase-map leg REFUSING — GATE_FILE in .codebase-map.conf names no file: '$g'."
     rc=1
-  elif [ -z "$r" ] || ! . "./$r" || ! py=$(resolve_python); then
+  elif ! resolve_hook_python; then
     echo "pre-commit: codebase-map leg cannot run $g — no tracked python resolver, or no usable launcher."
     rc=1
   elif ! out=$("$py" "$g" 2>&1); then

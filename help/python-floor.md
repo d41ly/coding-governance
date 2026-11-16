@@ -17,6 +17,15 @@ executable's path when the probe named a file.
 An override, `GOV_PYTHON` or the caller's own, is handed back and spawned as named.
 That holds for a wrapper or a venv launcher, and for an override spelled `python`.
 
+Inside a bar, the resolver first takes the runner's own resolution, `GATE_RESOLVED_PY`, and runs no
+probe. It does so only when the caller passed no override of its own, `GOV_PYTHON` and `PATH` are
+byte for byte what the runner saw, the runner's interpreter is at or above the resolver's floor, and
+the launcher it names is an absolute path. The runner hands on only an absolute launcher, one that
+begins with `/` or with a drive letter, a colon and a slash: a relative one would name another file
+in a leg that runs in another directory, so the legs then probe for themselves.
+Otherwise it tries the candidates above, as outside a bar. Only `run-gates.sh` sets the value: it
+discards one it inherits, and the push hook drops it.
+
 The resolver's file test holds on a Windows App Execution Alias too. So a Store Python whose own
 executable is an alias is handed back as printed, and a consumer still spawns the alias. This gap is
 closed for the legs the run-gates kit measures, by its `check_app_alias`, and not by the resolver.
