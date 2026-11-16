@@ -1658,6 +1658,26 @@ hit "$(run)" "record NO disposition while this record is graded against DISPOSIT
 reset_tree; dispconf 2000-01-01
 mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 0\n'
 miss "$(run)" "check 2 FAILED"
+# ---- TOOL-dDeclaredLoop-20: THE FLOOR FOLLOWS THE ROW'S review.findings FIELD. One blocker, one high and three
+# ---- minors owe 3 under the default, 5 under all-own and 2 under blocker-own; an absent field reads the default.
+# ---- Against the base check the field is not read, so all-own's row passes on three ids and blocker-own's reds
+# ---- on two.
+D_FIVE='| TOOL-tDisp-1 | CLOSED |\n| TOOL-tDisp-2 | CLOSED |\n| TOOL-tDisp-3 | CLOSED |\n| TOOL-tDisp-4 | CLOSED |\n| TOOL-tDisp-5 | CLOSED |\n| TOOL-tDisp-6 | CLOSED |\n'
+D_FOUR='| TOOL-tDisp-1 | CLOSED |\n| TOOL-tDisp-2 | CLOSED |\n| TOOL-tDisp-3 | CLOSED |\n| TOOL-tDisp-4 | CLOSED |\n'
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_FOUR" '2026-08-20T01:00:00Z review · item tDisp · reason verdict BLOCKED · blockers 1 · BOUNDED · highs 1 · minors 3 · findings all-own · to units · disposition promote\n'
+out=$(run)
+hit "$out" "gained only 3 non-WONTDO unit id(s) this run BASE lacked, against a floor of 5"
+hit "$out" "or under the review.findings value a row records, the promoted count for all-own and one per blocker plus one for the highs and minors for blocker-own: tDisp=all-own"
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_FIVE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict BLOCKED · blockers 1 · BOUNDED · highs 1 · minors 3 · findings all-own · to units · disposition promote\n'
+miss "$(run)" "check 2 FAILED"
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_THREE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict BLOCKED · blockers 1 · BOUNDED · highs 1 · minors 3 · findings blocker-own · to units · disposition promote\n'
+miss "$(run)" "check 2 FAILED"
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_THREE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict BLOCKED · blockers 1 · BOUNDED · highs 1 · minors 3 · to units · disposition promote\n'
+hit "$(run)" "gained only 2 non-WONTDO unit id(s) this run BASE lacked, against a floor of 3"
 # ...and the closing review folds nothing, at the fold cutoff and after it (round 1, L7: both dates armed)
 reset_tree; dispconf 2000-01-01
 DISPDATE="2026-09-15T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 2 · disposition fold\n'

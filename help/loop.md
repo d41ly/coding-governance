@@ -1269,7 +1269,8 @@ or once its rounds pass `flow.route-backs`, default 3. A spec audit runs to its 
 
 - **See the bounds:** `python tools/loop/review_bounds.py show` prints <!-- usage: script:tools/loop/review_bounds.py#show e8e581b9 -->
   `max-rounds=<n> spec-bound=<n> closing-bound=<n> follow-up=<value> spec-target=<word>
-  closing-target=<word> route-backs=<n>` from the policy file at your default branch's landed
+  closing-target=<word> route-backs=<n> findings=<value> unverified=<value> left-shift=<value>
+  blocks=<value>` from the policy file at your default branch's landed
   revision, or at `--rev <rev>`. It exits 2, printing `review-bounds: refused`
   and why, on a refused bound, or `review-bounds: unarmed` where the policy kit is not installed. The
   unattended driver's `--review` reads the same line, and refuses the round on a refusal. Where the
@@ -1278,12 +1279,48 @@ or once its rounds pass `flow.route-backs`, default 3. A spec audit runs to its 
 
 - **See it on a fixture:** `python tools/loop/review_bounds.py --fixture` runs every case, each in a <!-- usage: script:tools/loop/review_bounds.py f9f7e230 -->
   scratch repository with a policy file of its own: `defaults`, `count-equal`, `count-above`,
-  `count-zero`, `max-zero`, `until`, `never`, `while-finding`, `no-driver`, `no-policy-kit` and
-  `targets`.
+  `count-zero`, `max-zero`, `until`, `never`, `while-finding`, `no-driver`, `no-policy-kit`,
+  `targets`, `disposal-keys`, `pin` and `opt-in-set`.
   `--plant <case>` runs one. Gov's own `loop review bounds fixtures` gate runs them all.
 
 The bounds do not tell whether a round's recorded counts are true, or whether a raise of a bound was
 yours; check 19 grades only a run's own commits.
+
+## How a review fires and what its findings become
+
+A review breakpoint fires through the unattended driver, and four more keys in `.governance/policy.toml`
+decide what its findings become. `review_bounds.py show` prints each after `route-backs=`:
+
+- `findings=`, the key `review.findings`, default `blocker-high-own`: how many units the promoted
+  findings become. `blocker-high-own` gives each blocker and each high its own unit and batches the
+  mediums and lows into one; `all-own` gives every finding its own unit; `blocker-own` gives each
+  blocker its own unit and batches everything else.
+- `unverified=`, the key `review.unverified`, default `ask`: what happens to a finding no skeptic could
+  judge. `ask` files it as an ask in the build's backlog with its evidence, and never makes it a unit;
+  `block` has the disposal read the code and promote it at the severity it finds, or refute it; `record`
+  lists it in the disposal's summary and files nothing.
+- `left-shift=`, the key `review.left-shift`, default `second-occurrence`: which bug classes the review
+  disposed earn a gate. `second-occurrence` earns a class an earlier review record already disposed;
+  `every-class` earns every class the review named; `owner-selects` names each one as yours to choose.
+  The disposal counts them with the workflows kit's `review_dispose.py classes` and files each earned
+  gate as an ask.
+- `blocks=`, the key `review.blocks`, default `every-review`: whether the build waits for the review.
+  `every-review` holds the roster until the review's loop ends; `owed-only` holds it only for a review
+  the method owes; `none` never holds it, and the review runs alongside the build.
+
+- **Fire a review:** `bash tools/unattended/unattended.sh --trigger <slug> --subject <s> --cause <cause> --pin <path>` <!-- usage: verb:unattended.sh:--trigger 8ab2e327 -->
+  prints one line per review call, the call's preset from the pinned spec or design paths, your
+  `review.unclassed` and `review.twin` values, `"trigger"` and a `"reviewPolicy"` of the four keys, its
+  `blocks` already `yes` or `no` for this cause. The cause is `owed`, `opt-in`, `recommendation` or
+  `placement`. With no `--pin`, a closing diff review's call, it prints one line with no preset. It
+  refuses a cause outside the four, a subject whose review loop already ended, and a policy file it cannot
+  read, among them a non-empty `review.opt-in`, which no lens map turns into a lens swap yet. It writes
+  nothing to the run's record. The build harness takes `trigger` and `reviewPolicy` as its arguments.
+
+A closing review's exit under a `review.findings` value other than the default records the value on its
+row, and the unattended leg's check 2 counts the units owed by it. The review's record line carries
+`trigger=` with the cause, and `shape=`, `efforts=` and `role-sha=`, which read `-` until a role's shape
+supplies them.
 
 ## How much rework a build may do
 

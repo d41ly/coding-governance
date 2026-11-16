@@ -7578,6 +7578,11 @@
       "file": "tools/loop/review_bounds.py"
     },
     {
+      "id": "check_review_ended",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_review_rounds_step",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -9808,6 +9813,16 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "deriveUnitBounds",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "deriveUnitBounds",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
       "id": "deriveWalkGaps",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -11441,6 +11456,11 @@
       "id": "derive_owed_rows",
       "kind": "function",
       "file": "tools/run-gates/owed_rows.py"
+    },
+    {
+      "id": "derive_owed_units",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "derive_owned_engine_refusals",
@@ -15695,6 +15715,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/workflows/review_dispose.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/workflows/review_pin.py"
     },
     {
@@ -15816,6 +15841,11 @@
       "id": "measure_class_cells",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "measure_class_occurrences",
+      "kind": "function",
+      "file": "tools/workflows/review_dispose.py"
     },
     {
       "id": "measure_commitment",
@@ -21503,6 +21533,11 @@
       "file": "tools/workflows/replay_scorer.py"
     },
     {
+      "id": "read_record_slugs",
+      "kind": "function",
+      "file": "tools/workflows/review_dispose.py"
+    },
+    {
       "id": "read_recorded_phase",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -21746,6 +21781,11 @@
       "id": "read_review_bounds_line",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
+    },
+    {
+      "id": "read_review_pin",
+      "kind": "function",
+      "file": "tools/loop/review_bounds.py"
     },
     {
       "id": "read_review_records",
@@ -24741,6 +24781,11 @@
       "id": "render_pause_summary",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
+      "id": "render_pin_flags",
+      "kind": "function",
+      "file": "tools/loop/review_bounds.py"
     },
     {
       "id": "render_pin_rows",
@@ -30636,6 +30681,11 @@
       "id": "run_tree_kill",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
+    },
+    {
+      "id": "run_trigger",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "run_unchecked",

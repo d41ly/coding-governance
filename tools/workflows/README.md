@@ -557,8 +557,26 @@ printed as `twin` when given and checked against the four values only; absent, n
 `--unclassed` is the `review.unclassed` value, printed as `unclassed` the same way and checked against
 the three values only.
 `unattended-build.js` forwards a
-caller's `optIn`, `preset`, `lensNotes`, `twin`, `unclassed`, `fixJudge` and `walk` to its audit stage's
-review call unchanged, and unchecked.
+caller's `optIn`, `preset`, `lensNotes`, `twin`, `unclassed`, `fixJudge`, `walk` and `trigger` to its audit
+stage's review call unchanged, and unchecked.
+
+The unattended driver's `--trigger` prints these lines for the caller (TOOL-dDeclaredLoop-20): it runs
+`review_pin.py` with the five pin values the policy file sets and adds `trigger`, the cause the review fired
+on, and `reviewPolicy`, `{findings, unverified, leftShift, blocks}`. The review harness checks `trigger`
+beside `unclassed` against `TRIGGERS`, `owed`, `opt-in`, `recommendation` and `placement`, and records it as
+the review-shape line's `trigger=`; it joins no review key. `unattended-build.js` takes `reviewPolicy`, refusing
+an object missing a key or carrying a value outside its set by the key's name, and an absent one reads the four
+defaults and logs that it did. `findings` sets the DISPOSAL stage's unit bounds through `deriveUnitBounds` and
+its batching sentences; `unverified` routes an UNVERIFIED finding: `ask` files it as an ask in the build's
+`BACKLOG.md`, `record` lists it in the summary, each counted as the return's `routed`, which joins the
+reconciling sum and, beside `refuted`, is bounded by the unverified count, a promotion above `confirmed`
+refused by name; `block` adjudicates it as before, `routed` 0. `leftShift` is the value the stage passes to
+`review_dispose.py classes`, which counts each `class:<slug>` of the report's appendix against every other
+review record under `--builds`, read through `replay_scorer.py`'s `parse_appendix_rows`, and prints one
+`review-dispose: gate <slug> · prior <n> · <value>[ · owner]` line per earned gate, which the stage files as an
+ask, and one `review-dispose: skipped <path> · <why>` line per record the parser refuses; it exits 2 on a
+`--record` it cannot read. `blocks` `no` hands the roster out on the CONVERGING return, which logs the review
+as running alongside; `yes` holds it as before.
 
 Every finding carries `lens`, the key of the lens the harness dispatched, never the label the agent
 echoed back, and every finding line in a skeptic prompt, the synthesis prompt and the run log names
@@ -601,8 +619,9 @@ Every return carries seven fields beside the counts:
   the counts may take its `0` and `CONVERGED` as one.
 
 - `shape` — one record line, also logged, in this fixed grammar:
-  `review-shape kind=<diff-review|spec-audit> round=<n> intensity=<full|light> at=<find|verify|synth> raw=<n|-> confirmed=<n|-> refuted=<n|-> merged=<n|-> unverified=<n|-> blocker=<n|-> high=<n|-> medium=<n|-> low=<n|-> agents=<n> out-tokens=<n|unknown>`.
-  `at` is the stage the exit reached; a count that stage has not produced is `-`, never `0`, and the
+  `review-shape kind=<diff-review|spec-audit> round=<n> intensity=<full|light> at=<find|verify|synth> raw=<n|-> confirmed=<n|-> refuted=<n|-> merged=<n|-> unverified=<n|-> blocker=<n|-> high=<n|-> medium=<n|-> low=<n|-> agents=<n> out-tokens=<n|unknown> trigger=<cause|-> shape=- efforts=- role-sha=-`.
+  `trigger`, `shape`, `efforts` and `role-sha` are `review.cost`'s fields (TOOL-dDeclaredLoop-20): the cause the
+  caller passed, and three a shape registry will supply, each `-` while absent. `at` is the stage the exit reached; a count that stage has not produced is `-`, never `0`, and the
   every-lens-dead exit prints `raw=-`. `merged` counts the findings a skeptic refuted as `duplicate of
   id=<n>` of a confirmed finding in the same batch: they leave `refuted`, count as confirmations in
   `precision`, `(confirmed + merged) / (confirmed + merged + refuted)`, and never join the confirmed

@@ -3,6 +3,7 @@
 (TOOL-dDeclaredLoop-21).
 
     python review_bounds.py show [--rev <rev>]
+    python review_bounds.py pin [--rev <rev>]
     python review_bounds.py --fixture [--plant <case>]
 
 THE FOUR KEYS. `read_review_bounds(root, rev=None)` reads `review.max-rounds`,
@@ -22,19 +23,33 @@ converges at when it reads zero. The SPEC target is `review.design.rounds`' word
 `review.follow-up`'s, `highs` under `after-high`, `all` under `while-finding` and `blockers` under
 `never`. `flow.route-backs`, read as the four keys are, is printed beside them as `route-backs=`.
 
+THE FOUR DISPOSAL KEYS `review.dispose` reads (TOOL-dDeclaredLoop-20), each through `resolve` as the
+others are and printed after `route-backs=`: `review.findings` (`findings=`, default `blocker-high-own`),
+`review.unverified` (`unverified=`, default `ask`), `review.left-shift` (`left-shift=`, default
+`second-occurrence`) and `review.blocks` (`blocks=`, default `every-review`). The policy kit holds each
+to its catalogued values.
+
+THE PIN VALUES, `read_review_pin(root, rev=None)`: `review.opt-in`, `review.unclassed`, `review.twin`,
+`review.design-audit.runs` and `review.design-audit.seed`, which `pin` prints as the five flags the
+workflows kit's `review_pin.py` takes. An empty `review.opt-in` passes as `none`; a non-empty one is
+refused by name, because no lens map turns a set of lens names into `review_pin.py`'s object yet.
+
 THE REFUSAL, `BoundsRefused`. A value below 1, a value outside its key's catalogued values, and under
 `fixed-count` a `review.design.round-count` above `review.max-rounds`, naming both keys and both
 values; a count EQUAL to the ceiling is admitted. A policy kit refusal is relayed as one. Where the
 policy kit does not resolve, `LookupError`: an install may carry this kit without it.
 
 `show` prints `max-rounds=<n> spec-bound=<n> closing-bound=<n> follow-up=<value> spec-target=<word>
-closing-target=<word> route-backs=<n>` on one line, exit 0;
+closing-target=<word> route-backs=<n> findings=<value> unverified=<value> left-shift=<value>
+blocks=<value>` on one line, exit 0; `pin` prints `--opt-in none --unclassed <value> --twin <value>
+--design-audit-runs <n> --design-audit-seed <value>` on one line, exit 0;
 `review-bounds: refused · <why>` on a refusal and `review-bounds: unarmed · <why>` where the policy
 kit does not resolve, each exit 2. `check_review_bounds(root)` is the same read at HEAD for
 `loop_lib.py --check`, the leg `loop definition`.
 
 `--fixture` runs every plant of `PLANTS`, `--plant <case>` one, each in a scratch repository of its
-own under the system temp directory: a policy file committed there, then `show --rev HEAD` run in it.
+own under the system temp directory: a policy file committed there, then `show --rev HEAD` run in it,
+or `pin --rev HEAD` for the `pin` and `opt-in-set` plants.
 The `no-driver` plant copies this module and the policy kit's three files into a tree holding no
 unattended kit, and the `no-policy-kit` plant this module alone. Each prints `review-bounds: fixture ·
 <case> · held` or `· MISSED <why>`. Exit 0 held, 1 missed, 2 where a scratch could not be built.
@@ -139,9 +154,10 @@ def derive_review_bounds(max_rounds, design, count, follow, route_backs=3):
 
 
 def read_review_bounds(root=".", rev=None):
-    """-> the derived bounds over the policy file of `root` at `rev`, else the landed revision.
-    BoundsRefused on a refusal, the policy kit's included; LookupError where that kit does not resolve.
-    Each key reaches `resolve` as a literal, the shape the policy kit's reader coverage reads."""
+    """-> the derived bounds over the policy file of `root` at `rev`, else the landed revision, with the
+    four disposal keys beside them. BoundsRefused on a refusal, the policy kit's included; LookupError
+    where that kit does not resolve. Each key reaches `resolve` as a literal, the shape the policy kit's
+    reader coverage reads."""
     policy = read_policy_module()
     root = str(root)
     try:
@@ -150,16 +166,51 @@ def read_review_bounds(root=".", rev=None):
         count = policy.resolve("review.design.round-count", root, rev).value
         follow = policy.resolve("review.follow-up", root, rev).value
         route_backs = policy.resolve("flow.route-backs", root, rev).value
+        disposal = {"findings": policy.resolve("review.findings", root, rev).value,
+                    "unverified": policy.resolve("review.unverified", root, rev).value,
+                    "left-shift": policy.resolve("review.left-shift", root, rev).value,
+                    "blocks": policy.resolve("review.blocks", root, rev).value}
     except policy.Refusal as e:
         raise BoundsRefused(str(e)) from None
-    return derive_review_bounds(max_rounds, design, count, follow, route_backs)
+    bounds = derive_review_bounds(max_rounds, design, count, follow, route_backs)
+    bounds.update(disposal)
+    return bounds
+
+
+def read_review_pin(root=".", rev=None):
+    """-> {opt-in, unclassed, twin, runs, seed}, the five values `review_pin.py` takes, over the policy
+    file of `root` at `rev`, else the landed revision. BoundsRefused on a non-empty `review.opt-in` and
+    on a policy kit refusal; LookupError where that kit does not resolve."""
+    policy = read_policy_module()
+    root = str(root)
+    try:
+        opt_in = policy.resolve("review.opt-in", root, rev).value
+        pin = {"unclassed": policy.resolve("review.unclassed", root, rev).value,
+               "twin": policy.resolve("review.twin", root, rev).value,
+               "runs": policy.resolve("review.design-audit.runs", root, rev).value,
+               "seed": policy.resolve("review.design-audit.seed", root, rev).value}
+    except policy.Refusal as e:
+        raise BoundsRefused(str(e)) from None
+    if opt_in:
+        raise BoundsRefused("review.opt-in is %s, and no lens map turns a set of lens names into the object "
+                            "review_pin.py takes, so only the empty set is read" % " ".join(map(str, opt_in)))
+    pin["opt-in"] = "none"
+    return pin
+
+
+def render_pin_flags(pin):
+    """The one line `pin` prints: the five flags `review_pin.py` takes."""
+    return "--opt-in %s --unclassed %s --twin %s --design-audit-runs %d --design-audit-seed %s" % (
+        pin["opt-in"], pin["unclassed"], pin["twin"], pin["runs"], pin["seed"])
 
 
 def render_bounds_line(bounds):
     """The one line `show` prints."""
-    return "max-rounds=%d spec-bound=%d closing-bound=%d follow-up=%s spec-target=%s closing-target=%s route-backs=%d" % (
+    return ("max-rounds=%d spec-bound=%d closing-bound=%d follow-up=%s spec-target=%s closing-target=%s route-backs=%d "
+            "findings=%s unverified=%s left-shift=%s blocks=%s") % (
         bounds["max-rounds"], bounds["spec-bound"], bounds["closing-bound"], bounds["follow-up"],
-        bounds["spec-target"], bounds["closing-target"], bounds["route-backs"])
+        bounds["spec-target"], bounds["closing-target"], bounds["route-backs"], bounds["findings"],
+        bounds["unverified"], bounds["left-shift"], bounds["blocks"])
 
 
 def check_review_bounds(root):
@@ -172,11 +223,19 @@ def check_review_bounds(root):
 
 
 # Each plant: (policy file text or None, owed exit, a needle the output holds). `no-driver` and
-# `no-policy-kit` run a copy of this module in a tree holding no unattended kit.
+# `no-policy-kit` run a copy of this module in a tree holding no unattended kit. A plant `PLANT_VERBS` names
+# runs that verb in place of `show`.
 COUNT_ABOVE = '[review]\nmax-rounds = 3\n\n[review.design]\nrounds = "fixed-count"\nround-count = 4\n'
 PLANTS = {
     "defaults": (None, 0, "max-rounds=3 spec-bound=1 closing-bound=3 follow-up=after-high spec-target=blockers "
-                          "closing-target=highs route-backs=3"),
+                          "closing-target=highs route-backs=3 findings=blocker-high-own unverified=ask "
+                          "left-shift=second-occurrence blocks=every-review"),
+    "disposal-keys": ('[review]\nfindings = "all-own"\nunverified = "block"\nleft-shift = "every-class"\n'
+                      'blocks = "none"\n', 0, "route-backs=3 findings=all-own unverified=block left-shift=every-class "
+                                              "blocks=none"),
+    "pin": ('[review]\nunclassed = "reason"\n', 0, "--opt-in none --unclassed reason --twin never "
+                                                     "--design-audit-runs 2 --design-audit-seed reverted-escapes"),
+    "opt-in-set": ('[review]\nopt-in = ["fresh-eyes"]\n', 2, "%s: refused · review.opt-in is fresh-eyes" % SAY),
     "targets": ('[review]\nfollow-up = "while-finding"\n\n[review.design]\nrounds = "until-clean"\n\n[flow]\n'
                 'route-backs = 2\n', 0, "spec-target=all closing-target=all route-backs=2"),
     "count-equal": ('[review]\nmax-rounds = 3\n\n[review.design]\nrounds = "fixed-count"\nround-count = 3\n',
@@ -191,6 +250,7 @@ PLANTS = {
     "no-driver": (COUNT_ABOVE, 2, "review.design.round-count is 4, above review.max-rounds 3"),
     "no-policy-kit": (None, 2, "%s: unarmed · " % SAY),
 }
+PLANT_VERBS = {"pin": "pin", "opt-in-set": "pin"}
 
 
 def run_git(repo, *args):
@@ -236,7 +296,7 @@ def run_plant(case):
             print("%s: fixture · %s · MISSED the scratch could not be built: %s" % (SAY, case, e))
             return 2
         env = {k: v for k, v in os.environ.items() if k not in ("GOV_REMOTE", "GOV_DEFAULT_BRANCH")}
-        p = subprocess.run([sys.executable, "-I", str(module), "show", "--rev", "HEAD"], cwd=str(scratch),
+        p = subprocess.run([sys.executable, "-I", str(module), PLANT_VERBS.get(case, "show"), "--rev", "HEAD"], cwd=str(scratch),
                            capture_output=True, text=True, encoding="utf-8", errors="replace", env=env)
         said = (p.stdout + p.stderr).strip()
         print("%s: fixture · %s · exit %d · %s" % (SAY, case, p.returncode, said.splitlines()[0] if said else ""))
@@ -252,7 +312,7 @@ def run_plant(case):
 def main(argv):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     ap = argparse.ArgumentParser(prog="review_bounds.py")
-    ap.add_argument("verb", nargs="?", choices=["show"])
+    ap.add_argument("verb", nargs="?", choices=["show", "pin"])
     ap.add_argument("--rev")
     ap.add_argument("--fixture", action="store_true")
     ap.add_argument("--plant", choices=sorted(PLANTS))
@@ -267,7 +327,8 @@ def main(argv):
                                                           (": " + " ".join(missed)) if missed else ""))
         return max(rcs)
     try:
-        print(render_bounds_line(read_review_bounds(".", a.rev)))
+        print(render_pin_flags(read_review_pin(".", a.rev)) if a.verb == "pin"
+              else render_bounds_line(read_review_bounds(".", a.rev)))
     except BoundsRefused as e:
         print("%s: refused · %s" % (SAY, e))
         return 2

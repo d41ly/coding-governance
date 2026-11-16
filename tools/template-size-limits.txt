@@ -217,7 +217,11 @@ memory/guides/UNATTENDED-PROTOCOL.md	68130
 # gains, which the kit gate requires of every declared verb. The render measures 10848 CR-stripped, and the
 # row is that figure, with no headroom. A run's raise, on the four terms above (memory/DECISIONS.md,
 # TOOL-dDeclaredLoop-31).
-.claude/skills/unattended/SKILL.md	10848
+# RAISED 10848 -> 10922, 2026-11-16, by TOOL-dDeclaredLoop-20: the `--trigger` line the fenced verb list
+# gains, which the kit gate requires of every declared verb. The render measures 10922 CR-stripped, and the
+# row is that figure, with no headroom. A run's raise, on the four terms above (memory/DECISIONS.md,
+# TOOL-dDeclaredLoop-20).
+.claude/skills/unattended/SKILL.md	10922
 
 # --- every LIVE spec, a CLASS row (TOOL-aMendedFleet-25) --------------------------------------
 # 49152 bytes = 48 KiB, CR-stripped, the charter template's own ceiling, so no spec costs more to

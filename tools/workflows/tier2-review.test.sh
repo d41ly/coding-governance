@@ -2050,7 +2050,7 @@ async function runLedgerArms() {
   const regradedWrong = []
   // TOOL-aMendedFleet-18 - each exit's `shape` matches the S1 grammar at the stage its path reaches,
   // is logged, and reads `out-tokens=unknown` because the stub runtime's `budget` has no `spent`.
-  const SHAPE_RE = /^review-shape kind=(diff-review|spec-audit) round=\d+ intensity=(full|light) at=(find|verify|synth) raw=(\d+|-) confirmed=(\d+|-) refuted=(\d+|-) merged=(\d+|-) unverified=(\d+|-) blocker=(\d+|-) high=(\d+|-) medium=(\d+|-) low=(\d+|-) agents=\d+ out-tokens=unknown$/
+  const SHAPE_RE = /^review-shape kind=(diff-review|spec-audit) round=\d+ intensity=(full|light) at=(find|verify|synth) raw=(\d+|-) confirmed=(\d+|-) refuted=(\d+|-) merged=(\d+|-) unverified=(\d+|-) blocker=(\d+|-) high=(\d+|-) medium=(\d+|-) low=(\d+|-) agents=\d+ out-tokens=unknown trigger=- shape=- efforts=- role-sha=-$/
   const shapeStage = { 'every lens dead': 'find', 'no finding raised': 'find', 'every finding refuted': 'verify',
     'one skeptic batch dead': 'verify', 'the synthesis dead': 'synth', complete: 'synth' }
   let shapeSeen = 0
@@ -3083,6 +3083,15 @@ async function runDispositionArms() {
   ck(!!r.threw && r.threw.indexOf('tier2-review: `unclassed` must be one of refuse | reason | owner-rules') === 0 && r.trace.length === 0,
     'unclassed: maybe is refused before any spawn, naming the three values')
   ck(synthCall(ra).prompt.indexOf('\nunclassed: refuse - none is refused') !== -1, 'unclassed: absent, the synthesis prompt states refuse')
+  // ---- TOOL-dDeclaredLoop-20 AC4: `trigger`, a closed set checked beside `unclassed`, rides the review-shape
+  // line after `out-tokens=` with the three cost fields printing `-`. RED against the base harness, whose line
+  // ends at out-tokens and which reads no `trigger`.
+  r = await runReview(Object.assign({}, DIFF, { trigger: 'later' }), ALL_OK)
+  ck(!!r.threw && r.threw.indexOf('tier2-review: `trigger` must be one of owed | opt-in | recommendation | placement') === 0 && r.trace.length === 0,
+    'trigger: later is refused before any spawn, naming the four causes')
+  r = await runReview(Object.assign({}, DIFF, { trigger: 'owed' }), ALL_OK)
+  ck(!r.threw && typeof r.result.shape === 'string' && / out-tokens=unknown trigger=owed shape=- efforts=- role-sha=-$/.test(r.result.shape),
+    'trigger: owed rides the review-shape line after out-tokens, shape, efforts and role-sha printing -')
   // ---- AC5: `gateManifest` refused on the specs rule, rendered into the probe, and no legs refusing every gate:.
   r = await runReview(Object.assign({}, DIFF, { gateManifest: '../x.json' }), ALL_OK)
   ck(!!r.threw && r.threw.indexOf('tier2-review: `gateManifest` must be a repo-relative path') === 0 && r.trace.length === 0,
@@ -4007,7 +4016,10 @@ printf '%s\n' "$out"
 # RAISED 629 -> 638 by TOOL-dFairHearing-43: 9 assertions, the `FH43` arms — AC1's refusals and admissions (2), AC2's
 # three in place of the one it moved (2 net), and AC7's four runs and its command check (5). Counted by hand and by
 # scratch probes of the same calls, not by a run: the pass runs no suite.
-FLOOR_ASSERTIONS=638
+# RAISED 638 -> 640 by TOOL-dDeclaredLoop-20: 2 assertions, the `trigger:` arms — the refused cause (1) and the
+# owed cause on the review-shape line (1). The re-pinned SHAPE_RE adds none. Counted by hand, not by a run: the
+# pass runs no suite.
+FLOOR_ASSERTIONS=640
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

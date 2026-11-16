@@ -1085,6 +1085,11 @@ else
         fo = -1; pr = -1
         if (match(rs, / · folded [0-9]+/)) { fo = substr(rs, RSTART, RLENGTH); sub(/^.* /, "", fo); fo += 0 }
         if (match(rs, / · promoted [0-9]+/)) { pr = substr(rs, RSTART, RLENGTH); sub(/^.* /, "", pr); pr += 0 }
+        # THE COUNT RULE (TOOL-dDeclaredLoop-20 S4): a terminal row the driver wrote under a review.findings
+        # value other than the default carries ` · findings <value>` before its target; an absent field reads
+        # the default, blocker-high-own. This check never reads the policy file: the row is the one fact.
+        fv = "blocker-high-own"
+        if (match(rs, / · findings [a-z-]+/)) { fv = substr(rs, RSTART, RLENGTH); sub(/^.* /, "", fv) }
         # THE STALLED READING COUNTS BLOCKERS PLUS THE ROUND HIGHS, and only on the build slug
         # (TOOL-dDeclaredLoop-32 S6): a spec subject loop takes no strict-fall rule, so it is legally flat
         # while it runs, and ends at its target or its bound. An absent `round-highs` reads 0.
@@ -1115,7 +1120,7 @@ else
         }
         ta[it] = (index(rs, " · to asks · disposition ") > 0)
         if (rs ~ /NON-CONVERGENT|CEILING|BOUNDED/) {
-          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi; fg[it] = fo; nw[it] = nr
+          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi; fg[it] = fo; nw[it] = nr; pp[it] = pr; fvv[it] = fv
           disp[it] = (nf > 0 && fld[nf] ~ /^disposition /) ? substr(fld[nf], length("disposition ") + 1) : ""
         }
         # A CONVERGED ROW CARRYING A DISPOSITION IS READ TOO (closing review of aProbedUnit, cluster
@@ -1125,7 +1130,7 @@ else
         # proxy predates the field and never read a converged row, and a converged subject is not
         # one that "EXITED without converging".
         else if (rs ~ /CONVERGED/ && graded == 1 && nf > 0 && fld[nf] ~ /^disposition /) {
-          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi; fg[it] = fo; nw[it] = nr
+          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi; fg[it] = fo; nw[it] = nr; pp[it] = pr; fvv[it] = fv
           disp[it] = substr(fld[nf], length("disposition ") + 1)
         }
         # ...and a converged CLOSING row standing on a high or a minor with NO disposition owes one:
@@ -1133,7 +1138,7 @@ else
         # rather than reading as the ordinary converged round that demands nothing. The exit-row
         # clause above grades a row past SPEC_FOLD_CUTOFF instead, so this one leaves it alone.
         else if (rs ~ /CONVERGED/ && graded == 1 && cnt && hi + mi > 0 && !nr) {
-          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi; fg[it] = fo; nw[it] = nr; disp[it] = ""
+          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi; fg[it] = fo; nw[it] = nr; pp[it] = pr; fvv[it] = fv; disp[it] = ""
         }
       }
       # A FIX PASS (TOOL-dDeclaredLoop-32 S6), keyed apart from the review subjects so the round-bound
@@ -1155,7 +1160,7 @@ else
         for (it in fplast)
           if (fpflat[it] >= 1 && !(it in fpterm))
             printf "\n  %s (unit %s: fix-pass reds counts did not fall across consecutive passes and no pass carries an exit token, so the fix-pass loop is non-convergent and nothing recorded that it stopped)", f, it
-        nneed = 0; nsubj = 0; nask = 0; nasubj = 0; nomiss = ""; illegal = ""; foldbad = ""; closefold = ""
+        nneed = 0; nsubj = 0; nask = 0; nasubj = 0; nomiss = ""; illegal = ""; foldbad = ""; closefold = ""; fvseen = ""
         for (it in n) {
           # THE ROUND BOUND IS PER SUBJECT (TOOL-dDeclaredLoop-21 S6): the closing bound on the build slug,
           # the spec bound on every other, each at or below review.max-rounds. Graded only in a record
@@ -1177,7 +1182,12 @@ else
             if (nw[it]) {
               if (disp[it] == "promote") {
                 nsubj++; nwfloor = 1
-                owe = (hc[it] && fg[it] >= 0 && bl[it] + hh[it] > fg[it]) ? bl[it] + hh[it] - fg[it] + (mm[it] > 0 ? 1 : 0) : 1
+                # ...by the review.findings value its row records: all-own owes the promoted count, blocker-own one per
+                # blocker its folds cannot account for plus one for the highs and minors (TOOL-dDeclaredLoop-20).
+                if (fvv[it] == "all-own") owe = pp[it] >= 0 ? pp[it] : 1
+                else if (fvv[it] == "blocker-own") owe = (hc[it] && fg[it] >= 0 && bl[it] > fg[it]) ? bl[it] - fg[it] + (hh[it] + mm[it] > 0 ? 1 : 0) : 1
+                else owe = (hc[it] && fg[it] >= 0 && bl[it] + hh[it] > fg[it]) ? bl[it] + hh[it] - fg[it] + (mm[it] > 0 ? 1 : 0) : 1
+                if (fvv[it] != "blocker-high-own") fvseen = fvseen " " it "=" fvv[it]
                 nneed += (owe > 0 ? owe : 1)
               }
             }
@@ -1185,7 +1195,9 @@ else
             else if (disp[it] == "") nomiss = nomiss " " it
             else if (index(disps, "|" disp[it] "|") == 0) illegal = illegal " " it "=" disp[it]
             else if (disp[it] == "promote") {
-              owe = hc[it] ? bl[it] + hh[it] + (mm[it] > 0 ? 1 : 0) : 1
+              owe = !hc[it] ? 1 : fvv[it] == "all-own" ? bl[it] + hh[it] + mm[it] \
+                : fvv[it] == "blocker-own" ? bl[it] + (hh[it] + mm[it] > 0 ? 1 : 0) : bl[it] + hh[it] + (mm[it] > 0 ? 1 : 0)
+              if (fvv[it] != "blocker-high-own") fvseen = fvseen " " it "=" fvv[it]
               # ...an exit whose findings went to asks owes asks, never unit ids (TOOL-dDeclaredLoop-32).
               if (ta[it]) { nasubj++; nask += (owe > 0 ? owe : 1) }
               else { nsubj++; nneed += (owe > 0 ? owe : 1) }
@@ -1218,13 +1230,13 @@ else
             if (asksread != 1)
               printf "\n  %s (%d subject(s) EXITED recording disposition promote to asks and the build backlog at this run BASE cannot be read, so whether a finding became an ask CANNOT BE OBSERVED - a check that cannot look says so rather than passing)", f, nasubj
             else if (newasks + 0 < nask)
-              printf "\n  %s (%d subject(s) EXITED recording disposition promote to asks, the rework budget being spent, and the build backlog gained only %d ask id(s) this run BASE lacked, against a floor of %d - one per blocker and high plus one for its minors - so at least one promoted finding has no ask)", f, nasubj, newasks + 0, nask
+              printf "\n  %s (%d subject(s) EXITED recording disposition promote to asks, the rework budget being spent, and the build backlog gained only %d ask id(s) this run BASE lacked, against a floor of %d - one per blocker and high plus one for its minors%s - so at least one promoted finding has no ask)", f, nasubj, newasks + 0, nask, (fvseen != "" ? ", or under the review.findings value a row records, one per confirmed finding for all-own and one per blocker plus one for the highs and minors for blocker-own:" fvseen : "")
           }
           if (nneed > 0) {
             if (readable != 1)
               printf "\n  %s (%d subject(s) EXITED recording disposition promote and the roster at this run BASE cannot be read, so whether a blocker was promoted CANNOT BE OBSERVED - a check that cannot look says so rather than passing)", f, nsubj
             else if (newids + 0 < nneed)
-              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the generated units region gained only %d non-WONTDO unit id(s) this run BASE lacked, against a floor of %d - %s - so at least one promoted finding has no unit. A subject recording disposition fold beside zero blockers demands nothing here)", f, nsubj, newids + 0, nneed, (nwfloor ? "on a row past SPEC_FOLD_CUTOFF, one per blocker and high its folds cannot account for, plus one for its minors" : "one per subject, or on a row carrying highs and minors counts, on any subject, one per blocker and high plus one for its minors")
+              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the generated units region gained only %d non-WONTDO unit id(s) this run BASE lacked, against a floor of %d - %s - so at least one promoted finding has no unit. A subject recording disposition fold beside zero blockers demands nothing here)", f, nsubj, newids + 0, nneed, (nwfloor ? "on a row past SPEC_FOLD_CUTOFF, one per blocker and high its folds cannot account for, plus one for its minors" : "one per subject, or on a row carrying highs and minors counts, on any subject, one per blocker and high plus one for its minors") (fvseen != "" ? ", or under the review.findings value a row records, the promoted count for all-own and one per blocker plus one for the highs and minors for blocker-own:" fvseen : "")
           }
         }
         else {

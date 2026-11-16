@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-20 — the breakpoint program's own items: trigger, dispose, fold and cost, and the four keys `review.dispose` reads
 
-**Status:** INPROGRESS · rev-5 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 31 · advances TOOL-dDeclaredLoop-35
+**Status:** CLOSED · rev-5 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 31 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0105@cab8e16c whole
 
@@ -30,7 +30,9 @@
 | [2026-11-05-build-TOOL-dDeclaredLoop-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-1-parents-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 |
 | [2026-11-05-build-TOOL-dDeclaredLoop-1-reground-returns.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-1-reground-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 |
 | [2026-11-05-build-TOOL-dDeclaredLoop-20-deviation-201.md](../build/2026-11-05-build-TOOL-dDeclaredLoop-20-deviation-201.md) | deviation | — |
+| [2026-11-16-build-TOOL-dDeclaredLoop-20-1-acceptance-ledger.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-20-1-acceptance-ledger.md) | journal | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-20-deviation-202.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-20-deviation-202.md) | deviation | — |
+| [2026-11-16-build-TOOL-dDeclaredLoop-20-deviation-203.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-20-deviation-203.md) | deviation | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-20-red-fix-49.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-20-red-fix-49.md) | red-fix | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 |

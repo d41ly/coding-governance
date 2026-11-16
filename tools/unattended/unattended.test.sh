@@ -2620,8 +2620,11 @@ else
   _rb_want=$(sed -n -e 's/^REVIEW_MAX_ROUNDS_DEFAULT="\(.*\)"$/max-rounds=\1/p' -e 's/^REVIEW_SPEC_BOUND_DEFAULT="\(.*\)"$/spec-bound=\1/p' \
     -e 's/^REVIEW_CLOSING_BOUND_DEFAULT="\(.*\)"$/closing-bound=\1/p' -e 's/^REVIEW_FOLLOW_UP_DEFAULT="\(.*\)"$/follow-up=\1/p' \
     -e 's/^REVIEW_SPEC_TARGET_DEFAULT="\(.*\)"$/spec-target=\1/p' -e 's/^REVIEW_CLOSING_TARGET_DEFAULT="\(.*\)"$/closing-target=\1/p' \
-    -e 's/^REVIEW_ROUTE_BACKS_DEFAULT="\(.*\)"$/route-backs=\1/p' "$SCRIPT" | tr '\n' ' ')
-  same "AC11 the seven review-bound kit defaults are the line review_bounds.py show prints with no policy file" "${_rb_line//$'\r'/}" "${_rb_want% }"
+    -e 's/^REVIEW_ROUTE_BACKS_DEFAULT="\(.*\)"$/route-backs=\1/p' \
+    -e 's/^REVIEW_FINDINGS_DEFAULT="\(.*\)"$/findings=\1/p' -e 's/^REVIEW_UNVERIFIED_DEFAULT="\(.*\)"$/unverified=\1/p' \
+    -e 's/^REVIEW_LEFT_SHIFT_DEFAULT="\(.*\)"$/left-shift=\1/p' -e 's/^REVIEW_BLOCKS_DEFAULT="\(.*\)"$/blocks=\1/p' "$SCRIPT" | tr '\n' ' ')
+  # TOOL-dDeclaredLoop-20 S11: the four `review.dispose` defaults join the line, so eleven fields.
+  same "AC11 the eleven review-bound kit defaults are the line review_bounds.py show prints with no policy file" "${_rb_line//$'\r'/}" "${_rb_want% }"
   # AC2: a committed file moves all three onto the old rule.
   mkdir -p "$_sw_tmp/k/.governance"
   printf '[review.spec-audit]\ndisposal = "promote-all"\nchain-stop = "clean-only"\nchain-ceiling = 2\n' > "$_sw_tmp/k/.governance/policy.toml"
@@ -9096,6 +9099,54 @@ hit "$(run --fix-pass tRun --unit ARCH-tRun-1 --reds 1)" "NON-CONVERGENT · to o
 same "AC5 a spent budget's terminal fix pass records to on-exhausted" "$(grep -c 'fix-pass · item ARCH-tRun-1 · reason reds 1 · NON-CONVERGENT · to on-exhausted$' memory/builds/tRun/RUN.md)" "1"
 git update-ref refs/remotes/origin/main "$BASE"
 reset_tree
+
+# ---- TOOL-dDeclaredLoop-20: `--trigger` fires a review and prints its call's pin, trigger and review policy,
+# ---- refusing a subject whose loop ended by `verb_review`'s own predicate, and `review.findings` decides the
+# ---- owed count. Against the base driver `--trigger` was no verb, and every exit owed one unit per blocker and
+# ---- high plus one for the minors whatever the policy file said.
+bcopen; crdrop
+write_tracking_policy '[review]\nmax-rounds = 7\nfollow-up = "never"\nunclassed = "reason"\nblocks = "owed-only"\n'
+out=$(run --trigger tRun --subject tRun --cause owed --pin memory/builds/tRun/spec/one.md); rc=$?
+same "AC2 a pinned owed trigger exits 0" "$rc" "0"
+hit "$out" '"preset": "unit-spec"'
+hit "$out" '"unclassed": "reason", "trigger": "owed", "reviewPolicy": {"findings": "blocker-high-own", "unverified": "ask", "leftShift": "second-occurrence", "blocks": "yes"}}'
+out=$(run --trigger tRun --subject tRun --cause placement)
+hit "$out" '{"unclassed": "reason", "twin": "never", "trigger": "placement", "reviewPolicy": {'
+hit "$out" '"blocks": "no"}}'
+miss "$out" '"preset"'
+out=$(run --trigger tRun --subject tRun --cause later); rc=$?
+same "AC2 a cause outside the set exits 1" "$rc" "1"
+hit "$out" "UNATTENDED check 37 FAILED — --trigger names a cause outside the closed set, so no review is fired; legal causes: "
+run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs 0 --minors 0 >/dev/null
+out=$(run --trigger tRun --subject tRun --cause owed --pin memory/builds/tRun/spec/one.md); rc=$?
+same "AC2 a trigger on an ended subject exits 1" "$rc" "1"
+hit "$out" "--trigger takes no subject whose review loop already ended, because its findings went where the terminal round disposed them and the review is never fired again: tRun"
+same "AC2 a trigger writes no row" "$(grep -c 'review · item tRun · ' memory/builds/tRun/RUN.md)" "1"
+write_tracking_policy '[review]\nmax-rounds = 3\n\n[review.design]\nrounds = "fixed-count"\nround-count = 4\n'
+hit "$(run --trigger tRun --subject S20 --cause owed)" "--trigger cannot read the review policy or the pin, so no review is fired: review-bounds: refused"
+write_tracking_policy '[review]\nopt-in = ["fresh-eyes"]\n'
+hit "$(run --trigger tRun --subject S20 --cause opt-in)" "--trigger cannot read the review policy or the pin, so no review is fired: review-bounds: refused · review.opt-in is fresh-eyes"
+git update-ref refs/remotes/origin/main "$BASE"
+reset_tree
+# ...AC5: one blocker, one high and three minors at the closing review's first and only round owe 3 units
+# under the default, 5 under all-own and 2 under blocker-own; a non-default value rides the row before its target.
+for _dl20 in blocker-high-own:3 all-own:5 blocker-own:2; do
+  bcopen; crdrop
+  write_tracking_policy "[review]\nmax-rounds = 7\nfollow-up = \"never\"\nfindings = \"${_dl20%%:*}\"\n"
+  out=$(run --review tRun --subject tRun --verdict BLOCKED --blockers 1 --highs 1 --minors 3 --disposition promote)
+  hit "$out" "BOUNDED · highs 1 · minors 3 · disposition promote"
+  hit "$out" "this exit owes at least ${_dl20#*:} new unit(s)"
+  if [ "${_dl20%%:*}" = blocker-high-own ]; then
+    same "AC5 the default value writes no findings field" "$(grep -c 'review · item tRun · .* · findings ' memory/builds/tRun/RUN.md)" "0"
+  else
+    same "AC5 ${_dl20%%:*} rides the row before its target" "$(grep -c "review · item tRun · reason verdict BLOCKED · blockers 1 · BOUNDED · highs 1 · minors 3 · findings ${_dl20%%:*} · to units · disposition promote\$" memory/builds/tRun/RUN.md)" "1"
+  fi
+  git update-ref refs/remotes/origin/main "$BASE"
+  reset_tree
+done
+same "AC5 derive_owed_units under the counted rule, all-own reads the promoted count" "$(derive_owed_units all-own counted 1 1 3 0 4)" "4"
+same "AC5 derive_owed_units under the counted rule, blocker-own folds against blockers alone" "$(derive_owed_units blocker-own counted 2 1 0 1 3)" "2"
+same "AC3 the terminal predicate has one spelling, in check_review_ended" "$(grep -c "grep -qE '(CONVERGED|NON-CONVERGENT|CEILING|BOUNDED)'" "$SCRIPT")" "1"
 # ---- The arms below are REGION TWO's, and they sit before its closing `fi`. Both sides of this
 # ---- merge edited this seam: main sharded the suite into two regions with mode-selected floors,
 # ---- while this branch appended new `--rescope` and `--dispatch` arms to the end of the file.

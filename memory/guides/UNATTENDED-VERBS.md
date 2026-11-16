@@ -335,6 +335,23 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   its target before it: ` · to units`, or on the build slug ` · to asks` once `budget.py target`, read
   after the round's draw, answers `on-exhausted`. Check 2 reads a ` · to asks` exit as owing its floor in
   asks the build's `BACKLOG.md` gained since BASE, never unit ids.
+  THE COUNT'S RULE (TOOL-dDeclaredLoop-20) is `review.findings`, read with the bounds: `blocker-high-own`, the
+  default, owes the floors above; `all-own` one unit per confirmed finding, the promoted count past
+  `SPEC_FOLD_CUTOFF`; `blocker-own` one per blocker plus one for the highs and minors when any stood. A terminal
+  row under a value other than the default records ` · findings <value>` after its counts and before
+  ` · to <target>`, the exit note names that value's clause, and check 2 computes the row's floor from the field,
+  an absent one reading the default.
+- `--trigger` — `--trigger <slug> --subject <s> --cause owed|opt-in|recommendation|placement [--pin <path>]...`
+  fires ONE review (TOOL-dDeclaredLoop-20) and prints what its call takes, so no caller types a pin value. It
+  refuses a cause outside `TRIGGER_CAUSES` and a subject whose review loop already ended, by `--review`'s own
+  terminal predicate, and relays a review policy or pin that does not read. It reads the four `review.dispose`
+  keys through `review_bounds.py show` and the five pin values through `review_bounds.py pin`, refusing a
+  non-empty `review.opt-in`. With a `--pin`, it runs the workflows kit's `review_pin.py` with one `--subject` per
+  path and prints each line that prints with `"trigger"` and `"reviewPolicy"` added; with none, a diff
+  review's call, it prints one line of `unclassed`, `twin`, `trigger` and `reviewPolicy`. `reviewPolicy` is
+  `{findings, unverified, leftShift, blocks}`, `blocks` `yes` under `review.blocks every-review`, under
+  `owed-only` when the cause is `owed`, else `no`. It writes no row: a non-round `review` row would hide the
+  subject's terminal token. The build harness takes the `trigger` and `reviewPolicy` it prints.
 - `--fix-pass` — `--fix-pass <slug> --unit <id> --reds <n>` records ONE fix pass against a unit's
   acceptance, `<n>` its criteria still red after the pass, as a `fix-pass` row
   `reds <n>[ · <EXIT>][ · to <target>]`, a history kind like `review`. Its state is the review loop's
