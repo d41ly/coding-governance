@@ -6104,6 +6104,8 @@ memory/builds/aTrimmedHook/spec/2026-10-11-spec-TOOL-aTrimmedHook-3.md	50 s
 memory/builds/aTrimmedHook/spec/2026-10-11-spec-TOOL-aTrimmedHook-7.md	101 files
 memory/builds/aTrimmedWait/prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-5-spec-writer.md	26 lines
 memory/builds/aTrimmedWait/prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-revision-4.md	26 lines
+memory/builds/aTrimmedWait/prompts/2026-11-16-prompt-TOOL-aTrimmedWait-13-1-spec-writer.md	23 rows
+memory/builds/aTrimmedWait/prompts/2026-11-16-prompt-TOOL-aTrimmedWait-13-brief.md	23 rows
 memory/builds/aTunedCompass/README.md	261 KB
 memory/builds/aTunedCompass/RUN.md	100 seconds
 memory/builds/aTunedCompass/build/2026-09-05-build-TOOL-aTunedCompass-1-run-outcome.md	100 seconds
