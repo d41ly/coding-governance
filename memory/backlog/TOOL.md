@@ -178,6 +178,8 @@ Cite ids, never line numbers.
 | [TOOL-aLexedStripper-4](../builds/aLexedStripper/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | STILL OPEN after TOOL-dMispairedQuote-1, which changed that function's… |
 | [TOOL-aLexedStripper-7](../builds/aLexedStripper/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | scan_js_definitions in tools/codebase-map/map_lib.py strips BLOCK… |
 | [TOOL-aLexedStripper-8](../builds/aLexedStripper/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | the codebase-map 1.3 and agent-cap 1.9 fixes land upstream, but an… |
+| [TOOL-aMeasuredDrag-13](../builds/aMeasuredDrag/BACKLOG.md) | OPEN | HIGH | — | 2026-11-15 | held red: suite unattended kit gate red at 846d51d3 on the daily held… |
+| [TOOL-aMeasuredDrag-14](../builds/aMeasuredDrag/BACKLOG.md) | DEFERRED | MED | TOOL-aMeasuredDrag-2 | 2026-11-15 | the stop-guard spawns the driver's --liveness on every Stop of a bound… |
 | [TOOL-aMendedFleet-95](../builds/aMendedFleet/BACKLOG.md) | OPEN | LOW | — | 2026-10-04 | WIRE-INTO-PROJECT.md tells an adopter that the charter's node registry… |
 | [TOOL-aMendedFleet-96](../builds/aMendedFleet/BACKLOG.md) | OPEN | LOW | — | 2026-10-05 | tools/drift-audit/drift_report.py keeps its own _read_defs_at_sha, a… |
 | [TOOL-aMendedFleet-106](../builds/aMendedFleet/BACKLOG.md) | OPEN | LOW | — | 2026-10-05 | OWNER TRIAGE OF THE AGED UNLABELLED ASKS. TOOL-aMendedFleet-14 deferred… |

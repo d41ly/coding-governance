@@ -7,7 +7,7 @@
     python instructions_edit.py propose <write verb> <the same flags>
     python instructions_edit.py list [--manifest <kit id>|overlay]
     python instructions_edit.py render
-    python instructions_edit.py check             # the leg: every check of a write, over the tree
+    python instructions_edit.py check             # the leg: a write's checks over the tree, but the tag checks
     python instructions_edit.py fixture [--plant <case>]
 
 THE MANIFESTS. `read_manifests` lists each kit's `instructions.toml` and the overlay, the one list a write
@@ -25,9 +25,10 @@ the would-be tree, and a green write writes the row, its change record, stages b
 
 THE CHECKS. `check_tree` holds every row of every manifest to the schema, one fact, the statement grammar,
 one tag per row and no retired name minted again; the two arms of this module, conflicts at one level and
-references; the tag checks over the tree; the pack catalogue; and, with the guard's point undeclared, no
-change record but the stand-in door's. Where the tree holds a lock, the grammar's document and lock halves
-join; a tree no render has reached yet owes neither. Exit 0 green, 1 red or refused, 2 a usage or load refusal.
+references; the tag checks over the tree, on a write only, since the `check` verb leaves them to
+`gov_tag.py check`, the tags leg, and run alone does not report them; the pack catalogue; and, with the
+guard's point undeclared, no change record but the stand-in door's. Where the tree holds a lock, the
+grammar's document and lock halves join; a tree no render has reached yet owes neither. Exit 0 green, 1 red or refused, 2 a usage or load refusal.
 
 THE PACKS. `packs.toml` holds one `[[pack]]` row per instruction pack, apart from the policy presets;
 `resolve_practices` turns a `charter.practices` value naming packs and practices into practice tags.
@@ -564,8 +565,10 @@ def check_packs(root) -> tuple[list, list]:
     return [f"{SAY}: packs · {len(packs)} row(s) · {armed}"], reds
 
 
-def check_tree(root, candidate=None) -> tuple[list, list]:
-    """S6 over the tree, `candidate` the would-be manifest: `(reds, the lines a green arm prints)`."""
+def check_tree(root, candidate=None, tags=True) -> tuple[list, list]:
+    """S6 over the tree, `candidate` the would-be manifest: `(reds, the lines a green arm prints)`. `tags`
+    false skips the tag checks: the `check` verb leaves them to `gov_tag.py check`, the tags leg
+    (TOOL-aMeasuredDrag-4)."""
     root = pathlib.Path(root)
     units, tables, faults = read_tree_rows(root, candidate)
     reds = [f"{SAY}: red · {f}" for f in faults]
@@ -588,17 +591,18 @@ def check_tree(root, candidate=None) -> tuple[list, list]:
     reds += check_guard_witness(records, read_declared_points(root))
     if iu.read_lock(root):
         reds += [ln for ln in iu.run_grammar(root)[0] if ": red · " in ln]
-    try:
-        reds += run_tag_check(root)
-    except (PolicyRefused, RuntimeError) as exc:     # RuntimeError: the tag index's TagError
-        reds.append(f"{SAY}: red · tags · {exc}")
+    if tags:
+        try:
+            reds += run_tag_check(root)
+        except (PolicyRefused, RuntimeError) as exc:     # RuntimeError: the tag index's TagError
+            reds.append(f"{SAY}: red · tags · {exc}")
     lines, pack_reds = check_packs(root)
     armed = f"{len(units)} row(s)" if units else "unarmed: the tree holds no unit row"
     return reds + pack_reds, lines + [f"{SAY}: check · {armed}"]
 
 
 def run_check(root) -> tuple[list, int]:
-    reds, lines = check_tree(root)
+    reds, lines = check_tree(root, tags=False)
     return reds + lines + [f"{SAY}: check · {len(reds)} red"], 1 if reds else 0
 
 
@@ -1124,6 +1128,16 @@ def arm_retired_rows(c):
     reds = run_tag_check(root)
     c.check("new text citing unit.old reds the tag check", any("new text cites retired unit.old" in r for r in reds),
             str(reds))
+    # Both sides of check_tree's `tags` switch (TOOL-aMeasuredDrag-12): the write path takes the default and
+    # reds the citation; the check verb passes tags=False and leaves it to the tags leg. Staged red by flipping
+    # the default to tags=False (the write half) or by passing tags=True from run_check (the check half).
+    rc, said = run_cli(root, "add", "--manifest", "corekit", "--tag", "unit.fresh", "--type", "directive", "--level", "3",
+                       "--trigger", "always", "--text", "MUST fresh.", *FX_RECORD)
+    c.check("an add over a tree citing unit.old is refused naming it, through check_tree's tags default",
+            rc == 1 and "cites retired unit.old" in said, said)
+    lines = run_check(root)[0]
+    c.check("the check verb does not name unit.old's citation: it leaves the tags to their own leg",
+            not any("cites retired" in ln for ln in lines), "\n".join(lines))
     rel = f"memory/builds/{FX_BUILD}/build/2026-01-01-build-{FX_UNIT}-change-3.md"
     edges = edge_grammar.read_change_edges(record, rel)
     c.check("read_change_edges returns the promoted-from edge at site instructions.edit",

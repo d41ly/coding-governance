@@ -2,7 +2,7 @@
 /**
  * procmon-hook — put the process monitor's verdict where a session actually reads it.
  *
- * gov:kit process-monitor@0.22
+ * gov:kit process-monitor@0.23
  *
  * Contract: memory/builds/aReapedSpinner/spec/2026-09-08-spec-TOOL-aReapedSpinner-5.md
  *
@@ -18,10 +18,10 @@
  *                           "the probe could not run" are different facts and this is the file
  *                           where they would otherwise become the same one.
  *
- * THE THROTTLE CHECK IS ONE `stat` AND NOTHING ELSE. It runs on the overwhelming majority of tool
- * calls, so the early-exit path parses no conf, imports no python and spawns no census. A census
- * measured ~1.2s over a 320ms PowerShell floor; at the declared window that is a fraction of a
- * percent of a session's tool-call time, and paying it per call would not be.
+ * THE THROTTLE CHECK STARTS NO PROCESS. It runs on the overwhelming majority of tool calls, so the
+ * early-exit path reads the conf and the `.git` pointer files, stats the stamp, and spawns neither
+ * git nor a census. A census measured ~1.2s over a 320ms PowerShell floor; at the declared window
+ * that is a fraction of a percent of a session's tool-call time, and paying it per call would not be.
  *
  * IT FAILS OPEN, ALWAYS. A monitoring fault may not block a tool call. Every path here exits 0.
  *
@@ -73,15 +73,25 @@ function readThrottleSeconds(root) {
  * lander marker: in a linked worktree `.git` is a FILE, so a tree-relative path fails outright.
  * It also makes the window shared across concurrent sessions on one repo, which is correct — the
  * standing population is shared too, and N sessions should not each pay for a census of it.
+ * It is found by READING the `.git` pointer files — `gitdir:`, then `commondir` — the walk
+ * `recall-opened.js#gitCommonDir` does, and never by spawning git: this runs on the throttled path,
+ * which starts no process (TOOL-aMeasuredDrag-5). Any failure answers null, and a null stamp is
+ * never throttled.
  */
 function resolveStamp(root) {
   try {
-    const common = execFileSync('git', ['-C', root, 'rev-parse', '--git-common-dir'], {
-      encoding: 'utf8',
-      timeout: 10000,
-    }).trim()
-    const dir = path.isAbsolute(common) ? common : path.join(root, common)
-    return path.join(dir, 'procmon-stamp')
+    const dot = path.join(root, '.git')
+    let common = dot
+    if (!fs.statSync(dot).isDirectory()) {
+      const m = /^gitdir:\s*(.+)$/m.exec(fs.readFileSync(dot, 'utf8'))
+      if (!m) return null
+      const gitdir = path.resolve(root, m[1].trim())
+      const cd = path.join(gitdir, 'commondir')
+      common = fs.existsSync(cd) ? path.resolve(gitdir, fs.readFileSync(cd, 'utf8').trim()) : gitdir
+    }
+    // Only under a common dir that EXISTS: writeStamp creates the stamp's parent, so a pointer
+    // naming a missing path must not make the hook create one.
+    return fs.statSync(common).isDirectory() ? path.join(common, 'procmon-stamp') : null
   } catch {
     return null
   }

@@ -110,7 +110,7 @@
 # post-run subset joined it rather than moving the increment, which would change what the sibling's
 # identically named count means.
 set -u
-KIT_UNATTENDED_VERSION=1.124 # gov:kit unattended@1.124 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.125 # gov:kit unattended@1.125 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and
@@ -519,9 +519,9 @@ for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/
   slug=${bdir##*/}
   opened=$(GIT show "HEAD:$readme" 2>/dev/null | sed -n 's/^opened:[[:space:]]*//p' | head -1)
   case "$opened" in [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;; *) skipped_cutoff=$((skipped_cutoff+1)); continue ;; esac
-  # `sort -C` over the pair is the same date comparison every sibling cutoff uses; a build opened
-  # BEFORE the cutoff keeps the grandfathering.
-  if ! printf '%s\n%s\n' "$BRIEF_RECORDED_CUTOFF" "$opened" | sort -C; then
+  # Both values passed an ISO-date shape check, so a bash string compare is their date order and
+  # spawns nothing per README (TOOL-aMeasuredDrag-8); a build opened BEFORE the cutoff is skipped.
+  if [[ "$opened" < "$BRIEF_RECORDED_CUTOFF" ]]; then
     skipped_cutoff=$((skipped_cutoff+1)); continue
   fi
 
