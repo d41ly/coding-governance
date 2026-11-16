@@ -51,7 +51,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-11-15 · streams tooling
+**Build status:** SPECCED · 6 unit(s) · node a · opened 2026-11-15 · streams tooling
 ids TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-3 TOOL-aPiecewiseGrade-4 TOOL-aPiecewiseGrade-5 TOOL-aPiecewiseGrade-6
 
 <!-- gen:build-units -->
@@ -61,15 +61,17 @@ ids TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-3 TOOL-aP
 | [TOOL-aPiecewiseGrade-1 — the spec-token checker's incremental mode: each live spec's findings cached on its own inputs, every join rebuilt whole](spec/2026-11-15-spec-TOOL-aPiecewiseGrade-1.md) | 2 | 2 | CLOSED | rev-2 | 2026-11-15 |
 | [TOOL-aPiecewiseGrade-4 — the spec-token checker writes its next cache generation into a directory the caller names, so no caller renames a fixed-name temp](spec/2026-11-15-spec-TOOL-aPiecewiseGrade-4.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-16 |
 | [TOOL-aPiecewiseGrade-2 — `run_spec_token_check` runs the checker's incremental mode on a whole-key miss, and names its per-spec cache's live generation in a file only where the whole key is recorded](spec/2026-11-15-spec-TOOL-aPiecewiseGrade-2.md) | 4 | 2 | CLOSED | rev-4 | 2026-11-16 |
+| [TOOL-aPiecewiseGrade-5 — the spec-token checker's 24 per-spec counter names live in one tuple, and a mismatch is loud or a miss, never a silent 0](spec/2026-11-16-spec-TOOL-aPiecewiseGrade-5.md) | 5 | 2 | SPECCED | rev-1 | 2026-11-16 |
+| [TOOL-aPiecewiseGrade-6 — one per-slug lock in the sidecar holds a dispatch's spec-token state from the start half to the end of the read half](spec/2026-11-16-spec-TOOL-aPiecewiseGrade-6.md) | 5 | 2 | SPECCED | rev-1 | 2026-11-16 |
 <!-- /gen:build-units -->
 
 Records: 22 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-3 TOOL-aPiecewiseGrade-4.
+Ids no `spec-audit` record has ever named: TOOL-aPiecewiseGrade-1 TOOL-aPiecewiseGrade-2 TOOL-aPiecewiseGrade-3 TOOL-aPiecewiseGrade-4 TOOL-aPiecewiseGrade-5 TOOL-aPiecewiseGrade-6.
 
-Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -80,6 +82,7 @@ Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry
 | 2 | `TOOL-aPiecewiseGrade-1` | no |
 | 3 | `TOOL-aPiecewiseGrade-4` | no |
 | 4 | `TOOL-aPiecewiseGrade-2` | no |
+| 5 | `TOOL-aPiecewiseGrade-5`, `TOOL-aPiecewiseGrade-6` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
