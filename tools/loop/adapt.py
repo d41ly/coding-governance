@@ -440,6 +440,8 @@ def run_adapt_plant(case, base):
     print("%s: fixture · plant %s · %s" % (SAY, case, PLANTS[case]))
     misses = []
     run = read_run_file(top, FX_BUILD)
+    # no hand-over inherited from the caller's shell: a plant sets it for the one read that owes it
+    ambient = os.environ.pop(HANDOVER, None)
 
     def check_owed(label, held, said):
         print("%s: fixture · %s · %s" % (SAY, label, said))
@@ -588,6 +590,9 @@ def run_adapt_plant(case, base):
                     os.environ[HANDOVER] = os_before
     except (subprocess.CalledProcessError, OSError, ValueError, LookupError, KeyError) as exc:
         misses.append("the plant could not run: %s %s" % (exc, (getattr(exc, "stderr", "") or "").strip()[:300]))
+    finally:
+        if ambient is not None:
+            os.environ[HANDOVER] = ambient
     print("%s: fixture · %s · %s" % (SAY, case, "held" if not misses else "MISSED " + "; ".join(misses)))
     return 1 if misses else 0
 
