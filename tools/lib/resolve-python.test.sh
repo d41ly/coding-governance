@@ -377,6 +377,7 @@ commit_trailers_py|$ROOT/$KIT_REL/commit_trailers.py|$KIT_REL/commit_trailers
 needs_graph_py|$ROOT/$KIT_REL/needs_graph.py|$KIT_REL/needs_graph
 run_tree_kill_py|$ROOT/$KIT_REL/run_tree_kill.py|$KIT_REL/run_tree_kill
 guarded_write_py|$ROOT/$KIT_REL/guarded_write.py|$KIT_REL/guarded_write
+read_open_py|$ROOT/$KIT_REL/read_open.py|$KIT_REL/read_open
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -434,6 +435,8 @@ guarded_write_py|$ROOT/$KIT_REL/guarded_write.py|$KIT_REL/guarded_write
 # the owner's terminal proof, standard error a terminal, and the write-then-record that puts a target's
 # prior bytes back when its record is refused; the playbook kit's instruction command and the loop kit's
 # policy command each carry it inline.
+# read_open_py (TOOL-aLightenedLoop-3 S3) is the `open` audit event's read filter: the policy kit's
+# guard trace and the spec-token checker's input record each carry it inline, both copy-installed.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one

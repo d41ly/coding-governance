@@ -329,7 +329,7 @@ The joins that resolve a live spec's leg names, witness paths and line citations
 - status `shipped` · streams `tooling` · dossier `memory/map/features/spec-tokens.md`
 - decisions 0
 - gate-legs 4: `spec tokens (a spec's own names resolve)`, `spec tokens (the pass's own spec)`, `spec-tokens self-test`, `chain-packet self-test`
-- gotcha-classes 1: `a-terminal-spec-named-by-a-pass-splits-the-waiver-joins.md`
+- gotcha-classes 2: `a-terminal-spec-named-by-a-pass-splits-the-waiver-joins.md`, `hot-path-reads-its-input-twice.md`
 - globs 5: `tools/check-spec-tokens.py`, `tools/check-spec-tokens.test.sh`, `tools/chain-packet.py`, `tools/chain-packet.test.sh`, `memory/project/spec-token-waivers.txt`
 
 ## testsuite-counts
@@ -354,10 +354,10 @@ Unattended runs — a mandate on disk, not a block of chat
 - workflow-scripts 2: `unattended-build.js`, `unattended-unit.js`
 - skill-engines 1: `session-kickoff`
 - rendered-skills 1: `unattended`
-- gotcha-classes 27: `reflowed-prompt-string-reads-as-a-deleted-stop.md`, `text-mode-read-eats-a-bare-cr.md`, `assertion-between-two-derived-values.md`, `second-implementation-is-not-a-second-opinion.md`
+- gotcha-classes 28: `reflowed-prompt-string-reads-as-a-deleted-stop.md`, `text-mode-read-eats-a-bare-cr.md`, `assertion-between-two-derived-values.md`, `second-implementation-is-not-a-second-opinion.md`
 - guides 4
 - globs 3
-- cut 30 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 31 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## unattended-mandate
 
@@ -374,5 +374,5 @@ The unattended run's stops: HELD, the lease and the process ledger
 
 - status `building` · streams `tooling` · dossier `memory/map/features/unattended-stops.md`
 - decisions 2: `TOOL-dDerivedDocket-4`, `TOOL-dDerivedDocket-28`
-- gotcha-classes 4: `liveness-negative-from-another-population.md`, `orchestrator-hand-off-owed-a-disposition.md`, `an-attested-count-must-count-what-the-grader-counts.md`, `a-spec-run-close-owes-the-closing-review-override.md`
+- gotcha-classes 5: `liveness-negative-from-another-population.md`, `orchestrator-hand-off-owed-a-disposition.md`, `an-attested-count-must-count-what-the-grader-counts.md`, `a-spec-run-close-owes-the-closing-review-override.md`, `boundary-arm-sits-past-its-margin.md`
 - globs 4: `tools/unattended/unattended.sh`, `tools/unattended/STOPS.template.md`, `memory/guides/UNATTENDED-STOPS.md`, `.unattended.conf`

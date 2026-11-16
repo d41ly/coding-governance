@@ -344,7 +344,13 @@ if [ "$key" = AGENTS.md ]; then
   CODEX_MAX=${CODEX_MAX%$'\r'}
   if [ "$_hrc" != 0 ] || ! [[ $CODEX_MAX =~ ^[0-9]+$ ]] || [ "$MAX_BYTES" -gt "$CODEX_MAX" ]; then
     FAIL_CODE=1; [ "$_hrc" = 2 ] && FAIL_CODE=2
-    fail 8 "the rendered charter's cap is not held inside the smallest harness's limit, CODEX_MAX: $_name's cap is $MAX_BYTES (source $SOURCE), and budgets.py home codex-instructions answered '${_home%%$'\n'*}' (exit $_hrc). Lower the cap to CODEX_MAX or under; a harness reading less than the charter drops its tail."
+    # The captured answer's lines after its row are the reader's refusal (TOOL-aClearedLedger-7 S3):
+    # said here, once, because this exit comes before check 2, whose verdict would have carried it.
+    _refused=""
+    case $budget in *$'\n'*) _refused=${budget#*$'\n'} ;; esac
+    fail 8 "the rendered charter's cap is not held inside the smallest harness's limit, CODEX_MAX: $_name's cap is $MAX_BYTES (source $SOURCE), and budgets.py home codex-instructions answered '${_home%%$'\n'*}' (exit $_hrc). Lower the cap to CODEX_MAX or under; a harness reading less than the charter drops its tail.${_refused:+
+  The policy reader refused:
+  $_refused}"
   fi
 fi
 

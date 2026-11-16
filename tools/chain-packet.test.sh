@@ -402,7 +402,7 @@ for p in paths:
                              encoding="utf-8", check=True).stdout
     raw = subprocess.run(["git", "cat-file", "blob", f"HEAD:{p}"], capture_output=True, check=True).stdout
     lone += bool(re.search(rb"\r(?!\n)", raw))
-tree_lib = door.load_module("tree_lib", door.HERE / "memory-tree" / "tree_lib.py")
+tree_lib = door.load_module("tree_lib", door.resolve_kit_dir("memory-tree", "tree_lib.py", door.HERE) / "tree_lib.py")
 packet = door.load_module("packet", found["packet"][0])
 door.set_reads(packet, tree_lib)
 packet.schedule.git("ls-tree", "-r", "--name-only", "HEAD", folder)

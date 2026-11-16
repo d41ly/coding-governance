@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.120 -->
+<!-- gov:kit unattended@1.124 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -40,6 +40,15 @@ open pass's commit that stages a path outside its declaration while `--dispatch`
 (`TOOL-aWindowedPass-3`). This repo's `.githooks/commit-msg` is the reference; it is not shipped
 because a hook file is copied whole and would overwrite yours. Its limits: a `--no-verify` commit
 skips it, `Pass: none` is taken at its word, and check 23 grades both at the close.
+
+**Parallel passes come back through `pass-tree.sh`** (`TOOL-aTwinnedPass-2`), which the main loop runs
+in the run's own tree, paired with the unit harness's `passBase` key. `--merge <slug> --pass <unit>
+--branch <branch> --from <sha>` takes the branch the harness returned and the commit that key carried,
+merges it `--no-ff` with a `Pass: none` merge commit whose second parent is the pass commit, resolves
+only a conflict on an effective generated output or a gen-region-only change, re-renders the outputs,
+and takes the pass's worktree and branch away; `--remove <slug> --branch <branch>` takes away those of
+a pass that committed nothing. It finds `regen.py` beside the run-gates kit, and without it announces
+the skip and merges what the resolution left. Its header states the order the main loop runs it in.
 
 **Why the verb entries are not in the protocol.** The move was a BYTE decision and is recorded as
 one. That document had reached its cap EXACTLY, and a contract with no room left to state its next
@@ -104,8 +113,31 @@ file before anything runs `--check`.
 it UNWIRED with the merge command as the remedy. While the run-state record on the CURRENT branch
 is in any phase before `VERIFYING`, it exits 2 on a command that would run the flagged bar
 (`GATE_FULL=` or `GATE_SELFTESTS=` with a non-empty value) or a self-test suite (a word ending
-`run-selftests.sh`, `run-unattended-gates.sh` or `.test.sh` at command position, `bash -c` bodies
-included). The read-only verbs — `--list`, `--check`, `--rank`, `--help`, `--render` — pass, the
+`run-selftests.sh`, `run-unattended-gates.sh`, `.test.sh` or `selftest.py` at command position,
+`bash -c` bodies included). It also refuses a script the gate manifest declares a suite by cost:
+a `chunk = selftests` leg of the `gate-legs.json` in the directory above the kit, run in a
+direct-check form (`--selftest`, `--fixture` or a bare `fixture` word) and with a `ceiling`
+above the direct-check bound the hook exports. Any word of a simple command may name the leg's
+script, whatever launcher stands in front of it, with `\` folded to `/`, case ignored and leading
+`./` taken off, by a trailing path in either direction: the script under a longer path and its
+bare file name after a `cd` both do. A shorter spelling that still reaches that word is refused,
+and so is one whose option value differs from the leg's; a longer one, or one with another option
+name, a single fixture case say, is the direct check and passes, as does every direct-check form
+at or under the bound and every such script the manifest does not declare. A word ends at a glued
+`>` or `<`, so a redirection hides neither this form nor a suite word. The gaps this row keeps:
+two files that share a file name, or a trailing path, read alike; an unquoted mention of a script
+and its direct-check word at an argument position reads as a run; a path assembled at run time, a
+module name after `-m` with no path, and a python heredoc walk past it; a spelling whose option
+name differs from the leg's is read as scoped, whatever the script does with it; a redirection
+carrying `&` ahead of the direct-check word cuts the command there (`<script> 2>&1 --selftest`),
+so the script and its word fall into two commands though bash runs the suite; a suite the
+manifest does not declare, or declares in another chunk, is not seen, and the manifest is read
+uncommitted. The spec lint's bar join holds the same rule, and reads these spellings the hook does
+not: a redirection carrying `&` ahead of the direct-check word, a glued variable prefix
+(`${DIR}<script>`), a quoted mention, a quoted operator character before a redirection
+(`'&'>x.log`, `'>'>x.log`), which this row keeps as an argument, and a `bash -c` body inside
+another. The
+read-only verbs — `--list`, `--check`, `--rank`, `--help`, `--render` — pass, the
 plain bar passes, and a quoted mention of any shape is invisible. It keys the record to the branch
 through the `run-branch:` fact `--preflight` writes on both anchors (protocol fact 13), falling
 back to `branch-ref:` for a record written before that fact existed, and it fails open on every
@@ -254,11 +286,15 @@ header of the `health_log_sh` block in `lib-unattended.sh`.
 ## The sidecar
 
 `<git-dir>/unattended/` is where the keepalive actors write, and it is the WORKTREE's git dir,
-never the common dir, because a run lives in one worktree. Three kinds, one file per run each:
+never the common dir, because a run lives in one worktree. Four kinds, one file per run each:
 `stop.<slug>.log`, one JSON line per stop the stop-guard decided (unit 3); `stall.<slug>.log`, one
 line per API-error end the stall-recorder saw (unit 4); `resume.<slug>.log`, one attempt line per
-tick, with the launcher `resume.<slug>.<utc>.sh` and its `.out` beside it (unit 5). Append-only and
-never tracked; read by `--liveness`, `--status`, `--landed` and the tick.
+tick, with the launcher `resume.<slug>.<utc>.sh` and its `.out` beside it (unit 5). The first three
+are append-only and never tracked; read by `--liveness`, `--status`, `--landed` and the tick.
+The fourth, `liveness.<slug>.json`, is the stop-guard's cache of the driver's `--liveness` stdout
+(`TOOL-aLightenedLoop-5`): one entry, rewritten whole, keyed on a hash of every input that verdict
+reads, a LIVE entry expiring before a fresh read could say STALE. Only the stop-guard reads it, and
+`STOP_GUARD_LIVENESS_CACHE=off` in the hook's environment stops it being read or written.
 
 ## The bar `--close` runs
 

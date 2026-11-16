@@ -18,7 +18,8 @@ workflow-scripts = []
 skill-engines = []
 rendered-skills = []
 gotcha-classes = ["liveness-negative-from-another-population.md", "orchestrator-hand-off-owed-a-disposition.md",
-  "an-attested-count-must-count-what-the-grader-counts.md", "a-spec-run-close-owes-the-closing-review-override.md"]
+  "an-attested-count-must-count-what-the-grader-counts.md", "a-spec-run-close-owes-the-closing-review-override.md",
+  "boundary-arm-sits-past-its-margin.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []

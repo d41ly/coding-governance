@@ -66,7 +66,10 @@ key, read across their line wraps.
          self-test-suite INVOCATION, in a LIVE spec dated at or after SPEC_DIRECT_CUTOFF
          (`.memory-tree.conf`, blank = off) -> a hit (TOOL-aDeferredBar-2). A bar or a suite is
          not an acceptance observation: the pass observes the checker on a staged break, a
-         --selftest flag or a fixture, and the bar runs once after the build is complete. The
+         --selftest flag or a fixture, and the bar runs once after the build is complete. A
+         `--selftest`, `--fixture` or `fixture` form of a `chunk = selftests` leg whose manifest
+         ceiling is above DIRECT_CHECK_BOUND is a suite too, and its hit names the leg and the
+         ceiling (TOOL-aClearedLedger-5); a manifest with no `ceiling` denies no such form. The
          test runs FIRST in each loop, on the raw token, because NOT_A_TOKEN and NOT_A_LEG would
          drop the motivating `GATE_SELFTESTS=1 bash ...` token unread. Pre-cutoff carriers are
          COUNTED on the report line and listed by --list as NEAR, so the OFF state and the
@@ -268,15 +271,194 @@ keeps the broad guards that join drops and marks them, and prints the chunk and 
 hold rule reads without applying that rule. A guard carrying `*`, `?` or `[` is printed UNEVALUATED
 under every path, because the runner's `git diff` would expand it and this rule compares literals.
 A query in which EVERY path is untracked exits 2.
+
+  SPEC_TOKENS_INPUTS=<file> python <prefix>/check-spec-tokens.py   # also record what the run read
+  python <prefix>/check-spec-tokens.py --input-key <file>         # one digest over that record, now
+
+SPEC_TOKENS_INPUTS (TOOL-aLightenedLoop-3 S4) set and not empty makes the run RECORD its inputs to
+that file at exit: every file it opens to read outside the interpreter's own prefixes, every
+directory it lists, and every subprocess it runs through `subprocess.run`, with its cwd, input and
+environment delta. It only records: stdout and the exit status are the same with it and without it.
+A variable and not a flag, so a declared checker that does not know it ignores it. --input-key
+(S5) hashes the record's bytes and the replay of each line against the tree as it is NOW, prints
+the 40-hex digest and exits 0; a record that does not parse, or holds a subprocess the wrapper did
+not see, prints nothing and exits 1. The unattended driver keys its spec-token cache on it.
 """
+import atexit
+import base64
 import datetime
+import hashlib
 import importlib.util
 import json
+import locale
 import os
 import pathlib
 import re
 import subprocess
 import sys
+
+# The read filter (TOOL-aLightenedLoop-3 S3), INLINED byte-identically from the canonical copy named
+# on its marker line and gated by the resolve-python self-test; the policy kit carries it too.
+# >>> read_open_py -- canonical copy: read_open.py in the gov lib dir (byte-identical; gated)
+def derive_read_path(path, mode, flags):
+    """-> (path, refused) for an `open` audit event that reads, or None for one that does not.
+
+    A descriptor is None. With mode None the intent is in the flags, and any of `O_WRONLY`, `O_RDWR`
+    or `O_CREAT` is None (TOOL-dGroundRules-43 S9); a mode that is not a string, or holds any of `w`,
+    `a`, `x` or `+`, is None. A `.pyc` under a `__pycache__` directory is the source file it was
+    compiled from (TOOL-dGroundRules-35 S1); a cache name `source_from_cache` refuses is kept as
+    spelled, with `refused` true (TOOL-dGroundRules-52 S25). The path is returned through realpath.
+    """
+    if isinstance(path, int):
+        return None
+    if mode is None:
+        if flags & (os.O_WRONLY | os.O_RDWR | os.O_CREAT):
+            return None
+    elif not isinstance(mode, str) or any(c in mode for c in "wax+"):
+        return None
+    p = os.fsdecode(path)
+    refused = False
+    # TOOL-dGroundRules-52 S20: no `.pyc.<digits>` cut, since the flag filter above drops importlib's temporary write
+    if os.path.basename(os.path.dirname(p)) == "__pycache__" and p.endswith(".pyc"):
+        try:
+            p = importlib.util.source_from_cache(p)
+        except ValueError:
+            refused = True
+    return os.path.realpath(p), refused
+# <<< read_open_py
+
+
+# TOOL-aLightenedLoop-3 S4 - THE INPUT RECORD, armed below at module level and so ahead of the kit's
+# loads: a kit module the checker loads is then one of its reads, and an edit to it moves the key.
+# INPUT_LINES holds each input as one compact JSON line, so the record is sorted and de-duplicated.
+# `depth` is how many `run_traced` calls are open: a `subprocess.Popen` event fired inside one is
+# that call's own, and one fired outside every one is a call no replay can repeat.
+INPUT_LINES = set()
+INPUT_TRACE = {"path": "", "skip": (), "depth": 0, "run": subprocess.run}
+
+
+def add_input_line(kind, **keys):
+    INPUT_LINES.add(json.dumps({"kind": kind, **keys}, sort_keys=True, separators=(",", ":")))
+
+
+def arm_input_trace(path):
+    """Record this run's inputs to <path> at exit: the checker's own file first, because the
+    interpreter opened it before any hook could exist, then the audit hook, the `subprocess.run`
+    wrapper and the exit handler. The prefixes skipped are the interpreter's, which the launcher in
+    the driver's key stands for."""
+    INPUT_TRACE["path"] = path
+    INPUT_TRACE["skip"] = tuple(sorted({os.path.normcase(os.path.realpath(p)) + os.sep
+                                        for p in (sys.prefix, sys.base_prefix, sys.exec_prefix)}))
+    add_input_line("read", path=os.path.realpath(__file__))
+    subprocess.run = run_traced
+    atexit.register(write_input_record)
+    sys.addaudithook(add_input_event)
+
+
+def add_input_event(event, args):
+    """The audit hook: a kept `open` is a read, `os.listdir` and `os.scandir` a listing, and a
+    `subprocess.Popen` outside `run_traced` a `popen` line that makes the record unreplayable. A hook
+    that raised would fail the very call it audits, so any error records nothing."""
+    try:
+        if event == "open":
+            kept = derive_read_path(args[0], args[1], args[2])
+            if kept is not None and not os.path.normcase(kept[0]).startswith(INPUT_TRACE["skip"]):
+                add_input_line("read", path=kept[0])
+        elif event in ("os.listdir", "os.scandir"):
+            if not isinstance(args[0], int):
+                add_input_line("list", path=os.path.realpath(os.fsdecode(args[0] if args[0] is not None else ".")))
+        elif event == "subprocess.Popen" and not INPUT_TRACE["depth"]:
+            argv = args[1]
+            add_input_line("popen", argv=[os.fsdecode(argv)] if isinstance(argv, (str, bytes))
+                           else [os.fsdecode(os.fspath(a)) for a in argv])
+    except Exception:  # noqa: BLE001 - the hook must never fail what it audits
+        return
+
+
+def run_traced(*popenargs, **kwargs):
+    """`subprocess.run` while the trace is armed: it records the call, then makes it and returns its
+    result untouched. A call a replay could not repeat -- a shell string, a stdin that is neither the
+    call's input nor nothing -- is recorded as `popen`, so its record is a miss and never a wrong hit."""
+    try:
+        argv = popenargs[0] if popenargs else kwargs.get("args")
+        if (isinstance(argv, (str, bytes)) or kwargs.get("shell")
+                or kwargs.get("stdin") not in (None, subprocess.DEVNULL)):
+            add_input_line("popen", argv=[os.fsdecode(argv)] if isinstance(argv, (str, bytes))
+                           else [os.fsdecode(os.fspath(a)) for a in argv])
+        else:
+            data = kwargs.get("input") or b""
+            if isinstance(data, str):
+                data = data.encode(kwargs.get("encoding") or locale.getpreferredencoding(False),
+                                   kwargs.get("errors") or "strict")
+            env = kwargs.get("env")
+            add_input_line(
+                "run", argv=[os.fsdecode(os.fspath(a)) for a in argv],
+                cwd=os.path.realpath(os.fsdecode(os.fspath(kwargs["cwd"]))) if kwargs.get("cwd") is not None
+                else os.getcwd(),
+                drop=sorted(k for k in os.environ if env is not None and k not in env),
+                set={os.fsdecode(k): os.fsdecode(v) for k, v in (env or {}).items() if os.environ.get(k) != v},
+                input=base64.b64encode(data).decode("ascii"))
+    except Exception:  # noqa: BLE001 - a call the record cannot spell is still made, as `popen`
+        add_input_line("popen", argv=[repr(popenargs[:1])])
+    INPUT_TRACE["depth"] += 1
+    try:
+        return INPUT_TRACE["run"](*popenargs, **kwargs)
+    finally:
+        INPUT_TRACE["depth"] -= 1
+
+
+def write_input_record():
+    """The exit handler: the record, one line per input, sorted. A failed write leaves no record,
+    which the driver reads as a run that cannot be keyed, never as a refusal."""
+    try:
+        with open(INPUT_TRACE["path"], "w", encoding="utf-8", newline="\n") as fh:
+            fh.write("".join(line + "\n" for line in sorted(INPUT_LINES)))
+    except OSError:
+        return
+
+
+def derive_input_digest(record):
+    """--input-key (TOOL-aLightenedLoop-3 S5): the SHA-1 over the record's own bytes and, line by line
+    in record order, its replay against the tree now -- a read's file hash or `absent`, a listing's
+    sorted names or `absent`, a run's exit status and stdout hash, re-run with its recorded cwd, input
+    and environment delta. None when the record does not parse or holds a line no replay can repeat."""
+    try:
+        raw = pathlib.Path(record).read_bytes()
+        lines = [json.loads(x) for x in raw.decode("utf-8").splitlines() if x.strip()]
+    except (OSError, ValueError):
+        return None
+    if not all(isinstance(x, dict) and x.get("kind") in ("read", "list", "run") for x in lines):
+        return None
+    h = hashlib.sha1(raw)
+    for x in lines:
+        try:
+            if x["kind"] == "read":
+                try:
+                    ans = hashlib.sha1(pathlib.Path(x["path"]).read_bytes()).hexdigest()
+                except OSError:
+                    ans = "absent"
+            elif x["kind"] == "list":
+                try:
+                    ans = json.dumps(sorted(os.listdir(x["path"])))
+                except OSError:
+                    ans = "absent"
+            else:
+                env = {k: v for k, v in os.environ.items() if k not in x["drop"]}
+                env.update(x["set"])
+                try:
+                    p = subprocess.run(x["argv"], cwd=x["cwd"], env=env, input=base64.b64decode(x["input"]),
+                                       stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+                    ans = f"{p.returncode} {hashlib.sha1(p.stdout).hexdigest()}"
+                except OSError as exc:
+                    ans = f"oserror {type(exc).__name__}"
+        except (KeyError, TypeError, ValueError):
+            return None
+        h.update(f"{x['kind']}\0{ans}\n".encode("utf-8"))
+    return h.hexdigest()
+
+
+if os.environ.get("SPEC_TOKENS_INPUTS"):
+    arm_input_trace(os.environ["SPEC_TOKENS_INPUTS"])
 
 # The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test.
@@ -450,6 +632,11 @@ AC_ORDER_KEY = "SPEC_AC_ORDER_CUTOFF"
 # `\S` read it as one while the hook of TOOL-aDeferredBar-3 unquoted it to OFF). The policy kit's
 # `check_policy.py --fixture` with no case is a suite, because it runs every case, while naming one
 # case makes it the direct check a criterion may name.
+# The pattern is the TEXTUAL half and reads no ceiling (TOOL-aClearedLedger-5): a `--selftest`,
+# `--fixture` or `fixture` form the manifest declares ABOVE DIRECT_CHECK_BOUND is a suite by cost,
+# and `check_bar` denies it by joining the token to the set `derive_flag_suites` reads from the
+# manifest. A form at or under the bound, and a longer or case-scoped spelling of a leg above it,
+# stay the direct check.
 BAR = re.compile(
     r"(?:^|&&|[;|(])\s*(?:\w+=\S*\s+)*(?:timeout\s+(?:(?:-[ks]|--kill-after|--signal)\s+\S+\s+|-\S+\s+)*\S+\s+)?"
     r"(?:(?:bash|sh|python3?(?:\.\d+)?|py)\s+(?:(?!-[ncm]\s)(?:-X\S*(?:\s+\S+)?|-[A-Za-z]+|-\d+(?:\.\d+)?)\s+)?)?(?:\S*/)?"
@@ -459,6 +646,118 @@ BAR = re.compile(
 BAR_WHY = ("a bar or suite is not an acceptance observation: observe the checker on a staged break, "
            "a --selftest flag or a fixture; name the suite under New arm:; the bar and the suites "
            "run once, after the build is complete")
+# TOOL-aClearedLedger-5: the manifest half of the bar join. The bound is the manifest's default
+# ceiling in seconds, and the words are the three direct-check spellings; the unattended kit's
+# gate guard carries both under the same names and values, and neither file reads the other.
+DIRECT_CHECK_BOUND = 300
+DIRECT_CHECK_WORDS = ("--selftest", "--fixture", "fixture")
+# TOOL-aClearedLedger-11: the separator characters are the gate guard's own. The split differs from
+# the hook's where TOOL-aClearedLedger-13 names it: an `&` beside a `>` is part of a redirection
+# (`2>&1`, `&>`) and does not split here, and does there; and the braces of `${ }` split here and
+# not there, since this pattern holds no brace state. In both the lint reads more. Every other `&`
+# splits, so `&&` splits twice and a bare `&` never survives as a word.
+# A quote character is NOT a separator: a quoted script path and its flag stay one command.
+SIMPLE_COMMAND_SPLIT = re.compile(r"[;|(){}`\n]|(?<!>)&(?!>)")
+# TOOL-aClearedLedger-13: read with `fullmatch` over a word. Group 1 stands before the operator and
+# group 2 is the target glued behind it.
+REDIRECTION = re.compile(r"(.*?)&?[<>]+&?(.*)", re.S)   # used with fullmatch
+
+
+def derive_flag_suites(rows, bound=DIRECT_CHECK_BOUND):
+    """The manifest's suites in a direct-check form, as `(name, ceiling, words)` in manifest order:
+    each `chunk = selftests` row whose `ceiling` is a number above `bound` and whose `words` hold a
+    member of DIRECT_CHECK_WORDS after the first. `words` is the argv from its first word carrying
+    a slash on, with a leading `{prefix}/` taken off that word."""
+    suites = []
+    for r in rows:
+        ceiling = r.get("ceiling")
+        if (r.get("chunk") != "selftests" or isinstance(ceiling, bool)
+                or not isinstance(ceiling, (int, float)) or ceiling <= bound):
+            continue
+        argv = r.get("argv") or []
+        at = next((i for i, a in enumerate(argv) if "/" in a), None)
+        if at is None:
+            continue
+        words = list(argv[at:])
+        if words[0].startswith("{prefix}/"):
+            words[0] = words[0][len("{prefix}/"):]
+        if any(w in DIRECT_CHECK_WORDS for w in words[1:]):
+            suites.append((r["name"], ceiling, tuple(words)))
+    return suites
+
+
+def check_bar(tok, flag_suites=()):
+    """The reason `tok` is a bar or suite invocation, or None: BAR_WHY when `BAR` matches it, and
+    BAR_WHY with a clause naming the leg and its ceiling when a simple command of it spells a
+    member of `flag_suites`.
+
+    The spelling rule is the gate guard's row D6 rule, held here in this file's own words
+    (TOOL-aClearedLedger-11). Each simple command is read twice (TOOL-aClearedLedger-13): flat, its
+    words split on whitespace, so a quoted body reads as words; and quoted, a quoted run kept one
+    word, so a value holding a space stays one. A leg spelled by either read is a hit. A word is
+    read with every quote character taken out. Everything from its first `>` or `<` on, with an
+    `&` glued ahead of that operator, is a redirection: what stands before it is kept as the word
+    unless it is empty or all digits, a file descriptor, and when nothing stands behind the
+    operator its target is the next word, which is dropped. Any word may be the script word: folded (`\\`
+    to `/`, lower case, leading `./` off) it equals the leg's script, ends with `/` and that
+    script, or is a trailing path of it. The words from it on are no more than the leg's, reach the
+    leg's direct-check word and equal the leg's up to it; after it each equals the leg's, except
+    that an option's VALUE (a leg word not opening with `-` behind one that does) may be any word.
+    Two files that share a file name read alike, and an unquoted mention at an argument position
+    reads as a run, as in the hook. This reader has no quote state over a command, no depth and no
+    brace state, and it keeps an `&` beside a `>` inside the command, so it OVER-reads the hook.
+    These are hits here and not there: a redirection carrying `&` ahead of the direct-check word
+    (`<script> 2>&1 --selftest`, where the hook cuts the command at the `&`);
+    a glued variable prefix (`${DIR}<script>`, which splits here at the braces); a quoted mention;
+    a quoted operator character before a redirection, which the hook keeps as an argument: a
+    quoted `&` splits the command here because the split pattern has no quote state, and a quoted
+    `>` is read with its quotes out and dropped as a redirection; and a `bash -c` body inside
+    another."""
+    if BAR.search(tok):
+        return BAR_WHY
+    for command in SIMPLE_COMMAND_SPLIT.split(tok):
+        # The flat read, then the quoted one; neither processes an escape, so a backslash
+        # survives for the fold below.
+        for raw in (command.split(),
+                    re.findall(r"(?:[^\s\"']|\"[^\"]*\"|'[^']*'|[\"'])+", command)):
+            words, drop_next = [], False
+            for w in raw:
+                w = w.replace("'", "").replace('"', "")
+                if not w:
+                    continue
+                if drop_next:
+                    drop_next = False
+                    continue
+                m = REDIRECTION.fullmatch(w)
+                if m:
+                    drop_next = not m.group(2)   # the operator ended the word: its target is next
+                    w = m.group(1)
+                    if not w or w.isdigit():     # nothing, or a file descriptor
+                        continue
+                words.append(w)
+            for name, ceiling, leg in flag_suites:
+                first = leg[0].lower()
+                reach = next(i for i, w in enumerate(leg) if i and w in DIRECT_CHECK_WORDS)
+                for i, w in enumerate(words):
+                    w = re.sub(r"^(?:\./+)+", "", w.replace("\\", "/").lower())
+                    if not w or (w != first and not w.endswith("/" + first)
+                                 and not first.endswith("/" + w)):
+                        continue
+                    candidate = words[i:]
+                    if not reach < len(candidate) <= len(leg):
+                        continue
+                    # Up to the direct-check word each word is the leg's; after it an option's
+                    # value may be any word, and any other difference names a case or another
+                    # option.
+                    if all(candidate[j] == leg[j]
+                           or (j > reach and not leg[j].startswith("-")
+                               and leg[j - 1].startswith("-"))
+                           for j in range(1, len(candidate))):
+                        return (f"{BAR_WHY}; this spells the manifest leg `{name}`, a suite by its "
+                                f"declared ceiling of {ceiling} s")
+    return None
+
+
 # TOOL-dDerivedDocket-37: the hands-off join's key and refusal. Its GRAMMAR IS CHECK 12'S, read through
 # the memory-tree kit's `design_lib.read_spec_edges` (TOOL-dGroundRules-32 S17), which also reads a
 # bullet's two-space continuation lines: a payload wrapped past the house width is still the
@@ -949,7 +1248,7 @@ SPEC_DATE = load_design_lib().SPEC_FILE_DATE if DESIGN_LIB else None
 NOT_A_TOKEN = load_design_lib().NOT_A_TOKEN if DESIGN_LIB else None
 
 
-def read_carries_specs(root, design, cutoff, files=None, conf=None):
+def read_carries_specs(root, design, cutoff, files=None, conf=None, pre=None):
     """THE CARRIES JOIN'S POPULATION (TOOL-dTrueNorth-2): `(specs, statuses, skipped)`.
 
     `specs` is `{build: [(path, text, revisions)]}`, the shape `scan_carries` reads: every TRACKED spec
@@ -966,7 +1265,23 @@ def read_carries_specs(root, design, cutoff, files=None, conf=None):
     apart before its history is read and counted under `wontdo`, and a spec whose header does not
     parse, or carries a verb the grammar refuses, under `unparsed`, beside the selector's own reasons.
     Read per path without following a rename, so a rename starts a new history.
+
+    `pre` (TOOL-aLightenedLoop-6 S8) is a `read_carries_texts` answer the caller already read over the
+    same arguments, taken as read so the status pass runs once; None reads it here.
     """
+    texts, statuses, skipped = pre or read_carries_texts(root, design, cutoff, files, conf)
+    history = load_design_lib().read_spec_revisions(pathlib.Path(root), list(texts))
+    specs = {}
+    for p, (build, text) in texts.items():
+        specs.setdefault(build, []).append((p, text, [after for _sha, _before, after in history.get(p, [])
+                                                      if after is not None]))
+    return specs, statuses, skipped
+
+
+def read_carries_texts(root, design, cutoff, files=None, conf=None):
+    """`read_carries_specs` up to its history read (TOOL-aLightenedLoop-1 S4): `(texts, statuses,
+    skipped)`, `texts` mapping each kept path to `(build, text)`, so a caller that needs only the
+    statuses reads no spec history."""
     dl = load_design_lib()
     gbi = load_kit_module("gen_build_index")
     root = pathlib.Path(root)
@@ -993,12 +1308,7 @@ def read_carries_specs(root, design, cutoff, files=None, conf=None):
             continue
         statuses[path] = unit["status"]
         texts[path] = (build, text)
-    history = dl.read_spec_revisions(root, list(texts))
-    specs = {}
-    for p, (build, text) in texts.items():
-        specs.setdefault(build, []).append((p, text, [after for _sha, _before, after in history.get(p, [])
-                                                      if after is not None]))
-    return specs, statuses, skipped
+    return texts, statuses, skipped
 
 
 def scan_carries(design, specs, exit_mode=False):
@@ -1119,7 +1429,7 @@ def scan_carries(design, specs, exit_mode=False):
     return {"findings": findings, "carriers": carriers, "measured": measured, "bindings": bindings}
 
 
-def derive_carries_coverage(root, files=None, conf=None):
+def derive_carries_coverage(root, files=None, conf=None, building=False):
     """The carries join's coverage, read once (TOOL-dTrueNorth-2): the one value the leg and the
     coverage region read. The keys come from `conf`, the caller's parse of `.memory-tree.conf`, or
     from `design_lib.read_design_conf`'s when it passes none, so the leg and the generator read one
@@ -1134,6 +1444,11 @@ def derive_carries_coverage(root, files=None, conf=None):
     `carries.py:293-312` computes, computed the same way, and its findings with their arm labels. A
     cutoff `check_cutoff_value` refused, a blank or unreadable design key and an unreadable history
     each raise `DesignRefusal`; a measured count of zero is returned, and refusing it is the leg's.
+
+    `building=True` (TOOL-aLightenedLoop-1 S4, check 29's staged read) returns early, after the
+    statuses, when no chain spec is INPROGRESS: `{"state": "armed", "cutoff", "building": False,
+    "builds"}`, each build carrying its `specs` and a `findings` of None. WHAT IT DOES NOT CHECK: on
+    that path a history read that would have failed is never reached.
     """
     root = pathlib.Path(root)
     dl = load_design_lib()
@@ -1148,7 +1463,17 @@ def derive_carries_coverage(root, files=None, conf=None):
         raise dl.DesignRefusal(f"{CARRIES_KEY} {cutoff} is set and every DESIGN_* key ({', '.join(dl.DESIGN_KEYS)}) "
                                "is blank, so the carries join has no design to read", blank=dl.DESIGN_KEYS)
     design = dl.read_design(root, conf)
-    specs, statuses, skipped = read_carries_specs(root, design, cutoff, files, conf)
+    pre = None
+    if building:
+        pre = texts, statuses, skipped = read_carries_texts(root, design, cutoff, files, conf)
+        if "INPROGRESS" not in statuses.values():
+            # TOOL-aLightenedLoop-1 S4 — no chain spec is building, so check 29 grades nothing: no
+            # history read and no join. `findings` is None, never [], so no reader takes this value
+            # for a clean coverage.
+            return {"state": "armed", "cutoff": cutoff, "building": False,
+                    "builds": {b: {"specs": [(p, statuses[p]) for p, (at, _t) in texts.items() if at == b],
+                                   "findings": None} for b in design["builds"]}}
+    specs, statuses, skipped = read_carries_specs(root, design, cutoff, files, conf, pre=pre)
     scan = scan_carries(design, specs, exit_mode=True)
     carriers, bindings, measured = scan["carriers"], scan["bindings"], scan["measured"]
     home = {p: b for b, ps in measured.items() for p in ps}
@@ -1625,6 +1950,13 @@ def read_pass_spec(root, files, args):
 
 
 def main(argv):
+    if "--input-key" in argv:   # TOOL-aLightenedLoop-3 S5: a query over a record, ahead of the spec walk
+        ops = argv[argv.index("--input-key") + 1:]
+        key = derive_input_digest(ops[0]) if ops else None
+        if key is None:
+            return 1
+        print(key)
+        return 0
     listing = "--list" in argv
     root = pathlib.Path(run("git", "rev-parse", "--show-toplevel").strip())
     if not root.name:
@@ -1690,6 +2022,7 @@ def main(argv):
                 r["guard"] = [resolve_prefix_token(g, troot) for g in r["guard"]]
         legs = {r["name"] for r in rows}
         guarded, broad = derive_guarded_legs(rows)
+        flag_suites = derive_flag_suites(rows)
     except Exception as exc:  # noqa: BLE001 - a malformed manifest is a refusal, not a pass
         print(f"spec-tokens: REFUSING — {LEGS} did not parse: {exc}")
         return 1
@@ -1750,7 +2083,7 @@ def main(argv):
         armed = bool(direct_cut) and bool(m) and m.group(1) >= direct_cut
         g_armed = bool(guards_cut) and bool(m) and m.group(1) >= guards_cut
         named = set()                 # the manifest names the leg line contributes
-        pop_toks, bar_toks = [], []   # every graded-population token · the BAR matches among them
+        pop_toks, bar_toks = [], []   # every graded-population token · the (token, reason) bar hits
         gates = extract_gates(text)
         if gates is None:
             # No Gates heading at all. Silent by design, and counted apart from the section that
@@ -1767,8 +2100,9 @@ def main(argv):
                 # The bar test runs FIRST, on the raw token. NOT_A_TOKEN drops a `GATE_` prefix and
                 # NOT_A_LEG a `bash ` opener or a slash, and the motivating instruction carries all
                 # three; a bar token was never a leg, so it contributes nothing and continues.
-                if BAR.search(tok):
-                    bar_toks.append(tok)
+                why = check_bar(tok, flag_suites)
+                if why:
+                    bar_toks.append((tok, why))
                     continue
                 if NOT_A_TOKEN.match(tok):
                     continue
@@ -1798,8 +2132,9 @@ def main(argv):
                 pop_toks.append(tok)
                 # First here too, and the paths join still runs over the token's words: a tracked
                 # runner path resolves either way, and the two joins answer different questions.
-                if BAR.search(tok):
-                    bar_toks.append(tok)
+                why = check_bar(tok, flag_suites)
+                if why:
+                    bar_toks.append((tok, why))
                 for word in tok.split():
                     if check_path_shaped(word, files):
                         graded += 1
@@ -1812,16 +2147,16 @@ def main(argv):
         if armed:
             bar_specs += 1
             bar_examined += len(pop_toks)
-            hits += [(f, "bar", tok, BAR_WHY) for tok in bar_toks]
+            hits += [(f, "bar", tok, why) for tok, why in bar_toks]
         elif bar_toks:
             # Not graded, but COUNTED and listed: a skip that does not announce its size is
             # indistinguishable from coverage, and the OFF state hides the most.
             bar_carriers += 1
             where = f"predates {DIRECT_KEY} {direct_cut}" if direct_cut else f"{DIRECT_KEY} blank (arm off)"
-            near += [(f, "bar", tok, where) for tok in bar_toks]
+            near += [(f, "bar", tok, where) for tok, _why in bar_toks]
         graded_set = set(pop_toks)
         near += [(f, "bar", tok, "outside the graded population")
-                 for tok in TICK.findall(text) if BAR.search(tok) and tok not in graded_set]
+                 for tok in TICK.findall(text) if check_bar(tok, flag_suites) and tok not in graded_set]
         # THE GUARDS JOIN (TOOL-aBlindedTrial-8): the declared write set against every guarded leg.
         # One hit per MISSING leg, its token naming the first declared path that trips it — the
         # composite keeps a `[leg]` waiver row keyed on the bare leg name from swallowing it.

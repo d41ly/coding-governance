@@ -749,6 +749,13 @@ covers() {
   return 1
 }
 overlaps() { covers "$1" "$2" || covers "$2" "$1"; }
+# `check_generated_output path pairs` — the index half of one `index:generator` pair covers the path,
+# through `covers`, so the path is a generated output's and not a pass's own write.
+check_generated_output() { # path · generated-indexes (`index:generator` pairs, space-separated) -> 0 when one index half covers the path
+  local _cgo_q
+  for _cgo_q in $2; do covers "${_cgo_q%%:*}" "$1" && return 0; done
+  return 1
+}
 # The whole-repository spellings, which normalise to something no containment test can express: `.`
 # covers everything and is under nothing, and an empty path is not a path. Named here so the driver
 # and any later reader refuse the same set.

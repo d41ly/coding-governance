@@ -97,6 +97,46 @@ INSTRUMENT_BLOBS = {
 FAST_MODES = ("--write", "--check", "--fixture")
 
 
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
 def derive_blob(path):
     """The git blob id of a file's bytes with CRLF folded, as `git hash-object` gives a text file."""
     data = Path(path).read_bytes().replace(b"\r\n", b"\n")
@@ -235,14 +275,16 @@ def main(argv):
         print("chain-packet: --parity takes one slug and nothing else", file=sys.stderr)
         return 2
     reasons = scan_moved(found)
-    tree_lib = None
-    if not (HERE / "memory-tree" / "tree_lib.py").is_file():
+    tree_lib = kit = None
+    try:
+        kit = resolve_kit_dir("memory-tree", "tree_lib.py", HERE)
+    except LookupError:
         reasons.append("tree_lib.py is not beside this script")
     if not parity and not any(a in FAST_MODES for a in argv):
         reasons.append("no shortcut mode in the arguments")
     if not reasons:     # nothing is loaded before the blobs have been compared
         try:
-            tree_lib = load_module("tree_lib", HERE / "memory-tree" / "tree_lib.py")
+            tree_lib = load_module("tree_lib", kit / "tree_lib.py")
         except Exception:
             reasons.append("tree_lib.py is not beside this script")
     if reasons:

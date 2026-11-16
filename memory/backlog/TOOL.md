@@ -16,6 +16,7 @@ Cite ids, never line numbers.
 
 | Ask | Status | Sev | Decided by | Filed | Summary |
 |---|---|---|---|---|---|
+| [TOOL-aBatchedPacket-3](../builds/aBatchedPacket/BACKLOG.md) | OPEN | LOW | — | 2026-11-14 | THE MEMORY-TREE ENGINE VERSION THIS BUILD OWED. TOOL-aBatchedPacket-1… |
 | [TOOL-aBoundedCeiling-8](../builds/aBoundedCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | tools/run-gates/run-gates.turnstile.test.sh arm 4c (AC4c) CANNOT FAIL.… |
 | [TOOL-aBoundedCeiling-9](../builds/aBoundedCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | the unattended kit gate leg is RED ON MAIN and has been since… |
 | [TOOL-aBoundedCeiling-10](../builds/aBoundedCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | A HELD LEG CANNOT NOTICE ITS OWN DRIFT, and two independent instances… |
@@ -40,6 +41,9 @@ Cite ids, never line numbers.
 | [TOOL-aBranchedMandate-8](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | --preflight OVERWRITES a live non-terminal run-state file, losing the… |
 | [TOOL-aBranchedMandate-10](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | map_extractors.template.py unions the two JS scans with a bare +,… |
 | [TOOL-aBranchedMandate-11](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | govkit.py's blocked skip reason is unreachable behind cmd_apply's early… |
+| [TOOL-aBriskDeclaration-2](../builds/aBriskDeclaration/BACKLOG.md) | OPEN | MED | — | 2026-11-14 | THE RESOLVER REFUSAL'S PIN OUTLIVED ITS REASON. Arm A5 of… |
+| [TOOL-aBriskDeclaration-3](../builds/aBriskDeclaration/BACKLOG.md) | OPEN | LOW | — | 2026-11-14 | THE OLD ORDER STILL STATED ONE SENTENCE UP. The verbs guide's… |
+| [TOOL-aBriskDeclaration-4](../builds/aBriskDeclaration/BACKLOG.md) | OPEN | LOW | — | 2026-11-14 | NO PLANT FOR AN UNTERMINATED LAST LINE. order_verb_of's read loop sees… |
 | [TOOL-aBriskPreflight-8](../builds/aBriskPreflight/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | owner call: a read-only selector on tools/check-wiring.sh that skips… |
 | [TOOL-aBriskPreflight-9](../builds/aBriskPreflight/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | owner call: preflight reads the unattended kit's own hook wiring before… |
 | [TOOL-aBriskPreflight-13](../builds/aBriskPreflight/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite push-main self-test red at 9b743831 on the daily held… |
@@ -50,6 +54,11 @@ Cite ids, never line numbers.
 | [TOOL-aBriskPreflight-18](../builds/aBriskPreflight/BACKLOG.md) | OPEN | BLOCKER | — | 2026-10-12 | inherited red: leg playbook render wiring red at 37200355, older than… |
 | [TOOL-aCandidStub-1](../builds/aCandidStub/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | tools/hooks/agent-cap.js blesses an identifier bound from an EMPTY… |
 | [TOOL-aCandidStub-2](../builds/aCandidStub/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | tools/memory-tree/adopt-memory-tree.sh scaffolds no gotchas/, and… |
+| [TOOL-aCarriedStop-4](../builds/aCarriedStop/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | held red: suite codebase-map adopter e2e red at 8db6f4be on the daily… |
+| [TOOL-aCarriedStop-5](../builds/aCarriedStop/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | held red: suite check-wiring self-test red at 8db6f4be on the daily… |
+| [TOOL-aCarriedStop-6](../builds/aCarriedStop/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | held red: suite playbook render selftest red at 8db6f4be on the daily… |
+| [TOOL-aCarriedStop-7](../builds/aCarriedStop/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | held red: suite scratch-guard self-test red at 8db6f4be on the daily… |
+| [TOOL-aCarriedStop-8](../builds/aCarriedStop/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | held red: suite template size gate selftest red at 8db6f4be on the… |
 | [TOOL-aCollapsedScan-5](../builds/aCollapsedScan/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | THE ORIGINAL FACT IS NOW FALSE and the ASK SURVIVES. Re-measured… |
 | [TOOL-aCollapsedScan-8](../builds/aCollapsedScan/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | tools/drift-audit/drift_report.py at line 65 carries the SAME… |
 | [TOOL-aCollapsedScan-9](../builds/aCollapsedScan/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | a BUDGET_* ceiling is a single integer over a cost that is both… |
@@ -185,17 +194,7 @@ Cite ids, never line numbers.
 | [TOOL-aMeteredTurnstile-5](../builds/aMeteredTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | longest-first dispatch pessimises time-to-first-signal by construction:… |
 | [TOOL-aMeteredTurnstile-6](../builds/aMeteredTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | the bar did not get slower, PROCESS CREATION did: measured 2026-08-20… |
 | [TOOL-aNamedGesture-2](../builds/aNamedGesture/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | the kickoff manifest's last-audit stamp read 2026-08-26T10:10:00+03:00… |
-| [TOOL-aNimbleMend-16](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | INHERITED RED: THE GATE-GUARD SUITE'S TWO MANIFEST PARITY ARMS.… |
-| [TOOL-aNimbleMend-17](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | INHERITED RED: SEVEN CONTEXT ARMS OF THE SCRATCH-GUARD SUITE.… |
-| [TOOL-aNimbleMend-18](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | INHERITED RED: THE SPEC-TOKENS SUITE'S MANIFEST PARITY ARM.… |
-| [TOOL-aNimbleMend-19](../builds/aNimbleMend/BACKLOG.md) | OPEN | MED | — | 2026-11-13 | INHERITED RED: EIGHT LINES OF THE HYGIENE SELF-TEST.… |
-| [TOOL-aNimbleMend-20](../builds/aNimbleMend/BACKLOG.md) | OPEN | MED | — | 2026-11-13 | INHERITED RED: THIRTY-THREE WRONG ASSERTIONS OF THE POLICY FIXTURES… |
-| [TOOL-aNimbleMend-21](../builds/aNimbleMend/BACKLOG.md) | OPEN | MED | — | 2026-11-13 | THE HYGIENE GATE PRINTS AN UNBOUND-VARIABLE ERROR UNDER --staged. Every… |
-| [TOOL-aNimbleMend-22](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | FOUR SUITES RAN PAST THEIR DECLARED COST BUDGETS AT THIS BUILD'S CLOSE.… |
-| [TOOL-aNimbleMend-23](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | A Red-fix: COMMIT THAT TOUCHES NO PATH CAN NEVER BE RECORDED. The door… |
-| [TOOL-aNimbleMend-24](../builds/aNimbleMend/BACKLOG.md) | OPEN | MED | — | 2026-11-13 | OWNER CALL: TWO SENTENCES ABOUT THE LANE THAT ONLY THE OWNER MAY… |
-| [TOOL-aNimbleMend-25](../builds/aNimbleMend/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | inherited red: leg shell hygiene (a fork spent on builtin work) red at… |
-| [TOOL-aNimbleMend-26](../builds/aNimbleMend/BACKLOG.md) | OPEN | HIGH | — | 2026-11-13 | inherited red: leg spawn budget (forks per hot entrypoint) red at… |
+| [TOOL-aNimbleMend-22](../builds/aNimbleMend/BACKLOG.md) | DEFERRED | LOW | TOOL-aClearedLedger-10 | 2026-11-13 | FOUR SUITES RAN PAST THEIR DECLARED COST BUDGETS AT THIS BUILD'S CLOSE.… |
 | [TOOL-aNimbleMend-28](../builds/aNimbleMend/BACKLOG.md) | OPEN | LOW | — | 2026-11-13 | THREE SUITES' FORK-IDIOM ROWS WERE RE-DECLARED UPWARD, NOT DRAINED.… |
 | [TOOL-aNumeralWarden-2](../builds/aNumeralWarden/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | agent-cap's enclosing-opener walk is defeated by two nested wrappers or… |
 | [TOOL-aNumeralWarden-3](../builds/aNumeralWarden/BACKLOG.md) | OPEN | — | — | 2026-08-10 | a drift-audit pin RAISE is indistinguishable from a population drain to… |
@@ -358,6 +357,12 @@ Cite ids, never line numbers.
 | [TOOL-aTracedSpawn-3](../builds/aTracedSpawn/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THE SHARD-2 FAILURE COUNT AFTER THE FIXTURE-HEADING FIX IS UNMEASURED,… |
 | [TOOL-aTrimmedHook-8](../builds/aTrimmedHook/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | after this build a one-file RUN.md commit's .githooks/pre-commit still… |
 | [TOOL-aTrimmedHook-17](../builds/aTrimmedHook/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite process-monitor census selftest red at 37200355 on the… |
+| [TOOL-aTwinnedPass-6](../builds/aTwinnedPass/BACKLOG.md) | OPEN | MED | — | 2026-11-15 | THE CLOSING REVIEW'S ROUND 2, BATCHED. Five MEDIUM and three LOW items,… |
+| [TOOL-aTwinnedPass-7](../builds/aTwinnedPass/BACKLOG.md) | OPEN | MED | — | 2026-11-15 | THE ROUND-1 LEFT-SHIFT GATES ARE UNBUILT. The closing review's round 1… |
+| [TOOL-aTwinnedPass-8](../builds/aTwinnedPass/BACKLOG.md) | OPEN | LOW | — | 2026-11-15 | THREE COPIES OF ONE QUESTION. check_generated_output in… |
+| [TOOL-aTwinnedPass-9](../builds/aTwinnedPass/BACKLOG.md) | OPEN | LOW | — | 2026-11-15 | M6 CONDITION (1) STILL SAYS THE WRITE SETS DO NOT INTERSECT. After… |
+| [TOOL-aTwinnedPass-10](../builds/aTwinnedPass/BACKLOG.md) | OPEN | LOW | — | 2026-11-15 | THE COMMIT-MSG CHECK IS SILENT IN A PASS WORKTREE. check_commit_message… |
+| [TOOL-aTwinnedPass-12](../builds/aTwinnedPass/BACKLOG.md) | OPEN | MED | — | 2026-11-15 | NO ARM PINS THE INTERIOR OF THE wf_ PASS NAME. TOOL-aTwinnedPass-11's… |
 | [TOOL-aUnblockedFleet-9](../builds/aUnblockedFleet/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-31 | FIVE ACCEPTANCE CRITERIA OF TOOL-aUnblockedFleet-2 ARE WRITTEN,… |
 | [TOOL-aUnmannedHelm-2](../builds/aUnmannedHelm/BACKLOG.md) | OPEN | — | — | 2026-08-10 | the ledger_dir in tools/drift-audit/drift_report.py points at an… |
 | [TOOL-aUnmannedHelm-10](../builds/aUnmannedHelm/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | three root docs (AGENTS.md, WIRE-INTO-PROJECT.md, .gitattributes) come… |
@@ -464,9 +469,7 @@ Cite ids, never line numbers.
 | [TOOL-dDerivedDocket-45](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-16 | NO JOIN COUNTS THE MEMBERS AN S-ITEM OR A REFUSAL LIST ENUMERATES… |
 | [TOOL-dDerivedDocket-46](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-16 | NOTHING ON THE BAR WILL GRADE THE REMOTE-CI WORKFLOW FILE AFTER ITS… |
 | [TOOL-dDerivedDocket-47](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-20 | tools/run-gates/run-selftests.test.sh DECLARES A FLOOR NOTHING READS.… |
-| [TOOL-dDerivedDocket-55](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-21 | tools/workflows/unattended-unit.js CANNOT RUN TWO PASSES AT ONCE. It… |
 | [TOOL-dDerivedDocket-56](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-21 | tools/workflows/unattended-build.js STILL STATES THE SUPERSEDED… |
-| [TOOL-dDerivedDocket-57](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-21 | NOTHING RUNS A WAVE. The driver's --dispatch already decides M6… |
 | [TOOL-dDerivedDocket-58](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-21 | A SPEC CANNOT PROVE ITS OWN DISJOINTNESS. The spec template's… |
 | [TOOL-dDerivedDocket-59](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-21 | AUTHORED ORDERS ARE A TOTAL ORDER. Every dDerivedDocket unit was… |
 | [TOOL-dDerivedDocket-60](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-21 | A DECISION ROW FORCES A PASS TO RUN ALONE. M6 condition 3 names… |

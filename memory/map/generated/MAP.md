@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 193 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 169 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 193 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 172 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -331,6 +331,7 @@ Inventories: gate-legs: 193 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · 
 | `bash-c-multiline-flattens-under-msys.md` | agent-cap |
 | `beacon-published-before-it-is-complete.md` | run-gates-turnstile |
 | `borrowed-seed-inherits-its-head-state.md` | unattended |
+| `boundary-arm-sits-past-its-margin.md` | unattended-stops |
 | `bounded-through-a-pipe-is-unbounded.md` | run-gates, unattended |
 | `budget-row-not-remeasured-after-added-arms.md` | policy |
 | `canary-waits-on-a-rendezvous-not-a-clock.md` | run-gates |
@@ -376,6 +377,7 @@ Inventories: gate-legs: 193 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · 
 | `heredoc-escape-reaches-the-regex.md` | baseline |
 | `history-leg-graded-before-the-reconcile-commit.md` | memory-tree-hygiene |
 | `hookspath-resolves-into-another-checkout.md` | run-gates |
+| `hot-path-reads-its-input-twice.md` | spec-tokens |
 | `id-matched-as-a-substring.md` | unattended |
 | `index-derivation-reads-a-half-staged-move-as-a-deletion.md` | memory-tree-hygiene |
 | `inherited-env-retargets-a-check.md` | run-gates |
@@ -424,6 +426,7 @@ Inventories: gate-legs: 193 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · 
 | `record-file-read-by-line-position.md` | run-gates-turnstile |
 | `record-without-serves-or-with-a-round-counter.md` | memory-tree-hygiene |
 | `reflowed-prompt-string-reads-as-a-deleted-stop.md` | unattended |
+| `refusal-branch-with-no-arm.md` | unattended |
 | `remote-write-without-an-unreachable-outcome.md` | build-method |
 | `reseed-at-a-later-sha-launders-the-base.md` | build-method |
 | `retirement-inventory-misses-readers-by-value.md` | runlog |

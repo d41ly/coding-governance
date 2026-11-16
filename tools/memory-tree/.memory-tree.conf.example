@@ -283,6 +283,34 @@ LEG_MANIFEST=""
 # BLANK = uncapped.
 RECALL_CACHE_BUDGET_MB="512"
 
+# memory-recall only (safe to delete if that kit is not adopted): the optional keys below.
+# `id_grammar.py` in this kit is their reader, and the memory-recall kit's README owns the full text.
+#
+# The node-tag character class of the id grammar, as a class body over `[a-z0-9-]` (`a-f`).
+# BLANK = the class `a-z`. It changes which strings are ids, so editing it rebuilds the cache.
+RECALL_NODE_TAG_CLASS=""
+
+# Families your corpus CITES and never homes: they become ids, and gain no durable home. A token
+# `FAMILIES` already declares is refused. BLANK = no cited family.
+RECALL_CITED_FAMILIES=""
+
+# `<tag>:<qid>` pairs: each node's build-era boundary in its own query log, which `--export` labels.
+# BLANK = no boundary.
+RECALL_BUILD_QID_CUTOFF=""
+
+# A repo-relative directory for `--export`'s aggregate; one that resolves outside the root is
+# refused. BLANK = the export sits under the common git directory.
+RECALL_EXPORT_DIR=""
+
+# Space-separated, repo-relative glob patterns the corpus walk leaves out (`*` spans a slash), for
+# superseded copies such as versioned snapshots under an archive. BLANK = nothing is left out.
+RECALL_EXCLUDE=""
+
+# Space-separated, repo-relative files whose `KEY=value` declarations join the corpus as chunks.
+# Declared, never globbed, and a named file is INDEXED, so name none holding secrets.
+# BLANK = no declared extra source.
+RECALL_EXTRA_SOURCES=""
+
 # check-arms.py: the per-gate floors on armed fail branches, space-separated, each
 # `<gate>:<branches>:<armed>` and each one-sided UPWARD. BLANK = no floors at all, which is the state
 # every tree that never declared it is already in — so nothing changes until you measure your own.

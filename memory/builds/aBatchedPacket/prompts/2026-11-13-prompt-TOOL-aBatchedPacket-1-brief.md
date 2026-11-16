@@ -48,7 +48,7 @@ The spec-token checker's suite and the new suite, run directly. `check-arms` ove
 - `carries.py --build <slug> --exit`, the Design-exit join, which reads every revision and stays as slow as it is.
 - A recorded-verdict cache. The measured cost after the change leaves nothing for one to save.
 - `memory/builds/dDeclaredLoop/` and the driver's `verb_dispatch`.
-- `gen_build_index.py --asks`, 13 seconds of what remains.
+- `gen_build_index.py --asks`, 13 seconds of what remains. <!-- PINNED 2026-11-14 -->
 
 ### Limitations
 - The spec's acceptance criteria name observations a pass makes directly: the suite the unit adds, probes over a fixture tree, a `git rev-parse` of the three instrument blobs. The two that need the frozen clone and a 14-minute instrument run (PINNED 2026-11-13) are the main loop's, and the criterion says so. The acceptance section cites no path the unit has not built yet.

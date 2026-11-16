@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.120 -->
+<!-- gov:kit unattended@1.124 -->
 [memory/guides/UNATTENDED-VERBS.md · Level 3 · Binding with the unattended protocol, the verbs a run calls; yields to levels 0 to 2]
 # Unattended runs — the verbs
 
@@ -154,6 +154,12 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   or `none`, and `PROGRESSING` or `STALLED` against `TASK_STALL_BOUND`, a `STALLED` line again
   followed by one remedy line — or `no heartbeat-bearing tasks registered`. A heartbeat that exists
   and cannot be dated is check 51; one not written yet is graded from its registration.
+- `--wake` — `--wake <slug> --keepalive-id <id>`, the tick's first act, one line, exit 0:
+  `unattended-wake: <slug> · HEALTHY|FULL · [<reason> · ]tasks <n> open · cadence <c>`. The
+  reason, first to hold: the phase, then `--resume`'s (`abandoned`, `asks moved`,
+  `worktree`, `holder`, `lease`, `claims unread`, `claim`, `orphans`), then `--audit`'s
+  (`clock probe`, `tree idle`, `task probe`, `task stalled`); each sufficient, not necessary.
+  `<c>`: `KEEPALIVE_INTERVAL`, or `undeclared` when it is blank.
 - `--register-task` — `--register-task <slug> --task <name> --heartbeat <absolute path>`, run by
   the STARTER of a background task BEFORE it starts it: the main loop for an `Agent` or a background
   leg, a brief's author for a unit's own long command. It appends one row to the per-slug sidecar
@@ -255,18 +261,23 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   several pass kinds per unit, and a later row is read the same way whichever it is. What the verb
   REFUSES is overlap with a SIBLING pass still open, the disjointness question it exists for and the
   one thing here that is unchanged; a unit's own rows are never siblings of each other.
+  A declared path that an effective generated output covers, a kit's `[[generated]]` row or a `GENERATED_INDEXES` pair, is left out of that comparison on either side, because every pass may rewrite one and `--check-commit` admits it undeclared; the call names its own such paths in one stderr note, and its row still records them and the generator pairing still reads them.
   A pass of a unit whose spec is CLOSED or WONTDO is not a sibling: it reserves nothing, and a later pass for such a unit reserves its paths only once its spec is set back to INPROGRESS. A pass of a deferred unit, whose spec reads DEFERRED and whose latest rescope defer row follows every dispatch row naming it, is not a sibling either, until the unit is dispatched again.
   A pass's COMMIT is the one whose `Pass: <unit-id>` trailer names it; a commit with no trailer falls back to
   its subject, and `Pass: none` names no unit. After every cheap refusal and before the claim read it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
   live tree: the checker's bar join grades LIVE specs, an unattended build closes each unit spec in its
-  own build commit, and this verb is the one point that sees a spec before its unit builds. It runs
-  last because it costs a tree-wide scan, and every refusal above it — the order gate, the edge and
-  hold gates, the path and shared-record refusals, condition 1 — is decided from the run-state file,
-  the spec headers or `git` in seconds. It refuses on any red but a hit in another build's spec,
+  own build commit, and this verb is the one point that sees a spec before its unit builds.
+  It is started just before the open-pass reader and read after condition 1, because it costs a tree-wide
+  scan: it runs beside the reader, a refusal between the two waits for it and discards its answer,
+  and its own refusal still prints after every refusal above it — the order gate, the edge and hold
+  gates, the path and shared-record refusals, condition 1 — each decided from the run-state file, the
+  spec headers or `git`. It refuses on any red but a hit in another build's spec,
   which it notes and admits, because the bar's whole-tree leg still grades that build.
   It skips the run when its inputs match the last check it admitted for this build, keyed on the
-  slug, the checker, the launcher, HEAD and the run-gates working-tree fingerprint, recorded under
-  the sidecar root; with no fingerprint it announces that the cache is off and runs the checker. A blank or absent key is an ANNOUNCED skip on stdout,
+  slug, the checker, the launcher and
+  a digest of every file and git answer its last admitted run read,
+  recorded under the sidecar root only when the tree and HEAD held still while it ran; with no
+  fingerprint it announces that the cache is off and runs the checker. A blank or absent key is an ANNOUNCED skip on stdout,
   never a silent pass. Where `RUN_CLAIMS` is `on` it reads the run's claim as the holder after every
   local refusal and before the row: another session's claim is check 108 and no row is written.
 - `--review` — records ONE review round for a subject and reports what the loop is doing:
@@ -323,19 +334,29 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   worktree, rows disposing fewer BLOCKER or HIGH ids than `--blockers` or `--highs` count, so a round
   whose HIGHs reached neither a promotion nor a fold is a refusal, and a `local` or `--sibling` row that
   never reached the tree: a unit no tracked spec carries, a rev below 2 or above the spec's header, or a
-  rev with no Revision log entry.
+  rev with no Revision log entry. `--record-round <slug> --owner-stop <path>` records the owner's
+  ruling that the chain has ended instead: it appends `round <N> · owner-stop · record <path>` on a
+  round of its own, counted over every row of the record, and names a new record from the roster's
+  first id. `<path>` is a tracked file directly under the build's `prompts/` folder, and the whole
+  path, the memory root included, stays inside `[A-Za-z0-9._/-]`. No round flag sits beside it, and it refuses one given, a path outside that
+  folder or that charset, a path git does not track, and a roster that yields no id for a new record.
+  It does not check that the owner wrote the cited record: the row is evidence a reader opens.
 - `--chain-verdict` — `--chain-verdict <slug>`: derives whether a spec audit's chain goes on from that
   record and the roster alone, and writes nothing. It prints one line, and every word exits 0:
-  `unattended: chain <slug> · round <N> · <word> · reason <reason>[ · audit <ids>][ · override specs-audited <ids>]`.
+  `unattended: chain <slug> · round <N> · <word> · reason <reason>[ · audit <ids>][ · override specs-audited <ids>][ · record <path>]`.
   The word is `CONTINUE`, `STOP` or `HOLD`, in the five ordered steps the build method's
   spec-audit section states, and the reason names the step: `unreviewed`, `clean`, `own-work`,
-  `ceiling` or `open`. On CONTINUE, re-invoke the build harness at the next `round` with `auditIds`
+  `ceiling` or `open`. Ahead of the five, a last round holding an `owner-stop` row reads `STOP` with
+  reason `owner-stop` and the cited record after `record`, naming no override, and `--dispatch`
+  prints that record on its own line; an audit round recorded after the row takes the verdict back.
+  On CONTINUE, re-invoke the build harness at the next `round` with `auditIds`
   the ids after `audit`, no `subjectRound` and no `subjects`, and dispatch nothing, because a folded
   spec is audited again. On STOP, dispatch the roster; a unit after `override specs-audited` is built
   from its spec as written and closes under a recorded `--override specs-audited`. On HOLD a second
   line prints the recipe: `--park <slug> --item spec-audit-chain-ceiling`, reap the keepalive, then
   `--handoff <slug> --code owner-decision --reaped <id>`, because `--hold` refuses that code; an
-  attended run asks the owner. A HOLD stays the answer until the owner moves the ceiling or rules.
+  attended run asks the owner. A HOLD stays the answer until the owner moves the ceiling or rules,
+  and a ruling to stop is recorded by `--record-round <slug> --owner-stop <path>`.
   THE VERDICT IS COMPUTED ONCE, here: the harness renders the two commands and reads no set. Three
   policy keys answer, each reported by `policy.py get`, and with no policy kit each takes its kit
   default with a note. `review.spec-audit.disposal` is the rule above, its old value `promote-all`.
@@ -458,7 +479,7 @@ under its Close heading.
    unattended stretch a run has; a step written inside one path is a step the others do not run.
    `Resume` is the one path it does not bind: a resumed session inherits a job it did not schedule,
    so that path reaps before it schedules.
-2. **What the tick runs: TWO acts, in order**, and only once this session's `--preflight` has written
+2. **What the tick runs, in order**, and only once this session's `--preflight` has written
    the run's record; before that it does nothing. A tick issued earlier meets a refusal that is
    expected and is never a signal to reap the keepalive `--preflight` is about to need: `--resume`
    refuses with check 10 when no run-state file exists, with check 26 on a re-run build whose
@@ -466,6 +487,8 @@ under its Close heading.
    a HELD or working record carrying a lease and this worktree is not on its run branch; under
    `in-place`, where a landed record stays LANDING until the next `--preflight` retires it, `--resume`
    prints nothing to resume and `--audit` then refuses with check 51.
+   - `unattended.sh --wake <slug> --keepalive-id <your own id>`: `HEALTHY` ends the turn; `FULL`
+     runs the two below.
    - FIRST, `unattended.sh --resume <slug> --keepalive-id <your own id>`. For the holder it writes
      nothing to the record, because liveness is derived from what `--liveness` reads and this tick
      moves it; where `RUN_CLAIMS` is `on` it reads the run's claim on the remote and renews it when
@@ -800,7 +823,7 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   cover; `add` stays history.
 - **Before dispatching a pass, DECLARE its write set** (M6): `--dispatch <slug> --pass <unit-id>
   --writes <path> <path>`. `--writes` takes every path up to the next flag: a whitespace-joined
-  value splits into its paths, and the flag may repeat. It refuses two passes claiming one file
+  value splits into its paths, and the flag may repeat. It refuses two passes claiming one file other than a generated output
   and a pass claiming a shared mutable record; a generated index alone is fine and only the index
   WITH its generator is refused. A `--writes` naming the run's own run-state file is removed from
   the declaration with a note, because every pass commit carries that file, and a path containing it
@@ -826,7 +849,11 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   `by-nature` every `units[]` entry also carries its `planState` and `rev` from
   `--plan <slug> --paths`, because a disposal naming a unit with no `planState` is refused and its
   hand-out carries no roster, and a fold into a unit no audit read compares against that `rev`.
-  The unit harness then builds ONE unit per call from its brief and its spec. Every call is made by
+  The unit harness then builds ONE unit per call from its brief and its spec. A group the build order
+  marks parallel may build at once, each pass on a branch of its own: `--dispatch` and `--brief` for
+  each unit, one records commit, then one harness call per unit carrying that commit as `passBase`
+  and `writes`, run concurrently, then `pass-tree.sh --merge` per committed pass in turn and
+  `--remove` per uncommitted one, as that tool's header states. Every call is made by
   `scriptPath`, never by `name`: the fan-out guard's read-window narrowing is conditional on
   `scriptPath`. **Every harness call also carries `roles`**: the JSON the roles kit's
   `handoff.py harness-args <harness>` prints, `<harness>` being `unattended-build`, `unattended-unit`

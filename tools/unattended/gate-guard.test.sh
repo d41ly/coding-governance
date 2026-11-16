@@ -367,23 +367,28 @@ run "F2 a --selftest FLAG on another file -> allow"  0 "$B" 'python3 '"${PFX}${M
 # manifest naming no suite would otherwise certify parity by grading nothing), every graded argv is
 # a hit, and graded plus PRINTED exemptions equals the manifest's own count — so no unannounced skip
 # is left to grow.
-# THE ONE EXEMPTION RULE is a ceiling, not a flag. A `--selftest` leg whose manifest `ceiling` is at
-# or under DIRECT_CHECK_BOUND is the seconds-long direct check the child prompt admits, exempt by
-# that fact and printed with its ceiling; a `--selftest` leg ABOVE the bound is a suite by cost that
-# this hook cannot deny textually, so each is DECLARED below by script name with its ceiling and
-# reason, and an undeclared one reds. The bound is the manifest's own default ceiling — sixteen of
-# its selftests legs sit exactly at 300 — because a bound under it exempts nothing and names every
-# flag form. The declared list is asserted live: a stale name reds.
+# THE ONE EXEMPTION RULE is a ceiling, not a flag (TOOL-aClearedLedger-3). A leg whose argv carries
+# one of DIRECT_CHECK_WORDS — `--selftest`, `--fixture` or the bare `fixture` — and whose manifest
+# `ceiling` is at or under DIRECT_CHECK_BOUND is the seconds-long direct check the child prompt
+# admits, exempt by that fact and printed with its ceiling. A leg in such a form ABOVE the bound is
+# a suite by cost and is GRADED like every other leg: the hook's row D6 reads the same manifest and
+# must deny it, so no flag-form suite is declared here by name. The bound is the manifest's own
+# default ceiling, because a bound under it exempts nothing and names every direct-check form. The
+# bound and the word list are this suite's own restatement, pinned to the hook's exports below.
+# The declared list is asserted live: a stale name reds. It holds one member:
 #   test_recall_floor.py — the pytest `test_*.py` convention, gov-only, 12 s to 34 s in the ledger.
 #     A `test_*.py` word shape would deny an adopter's single-file pytest run, which is exactly the
 #     direct check a spec may name, so the class is not gated and this one member is named instead.
-#   corpus_ids.py --selftest (ceiling 2690 s, 599 s in the ledger) and gen_build_index.py --selftest
-#     (350 s) — flag-form suites above the bound; the backlog row round 2 owes moves their
-#     entrypoints to a `selftest.py` file row D4 already denies.
 LEGS="$HERE/../gate-legs.json"
 DIRECT_CHECK_BOUND=300
-PARITY_EXEMPT='test_recall_floor.py corpus_ids.py gen_build_index.py'
-if [ -f "$LEGS" ]; then
+DIRECT_CHECK_WORDS='--selftest --fixture fixture'
+PARITY_EXEMPT='test_recall_floor.py'
+# check_parity <manifest> <hook> — grades every `chunk = selftests` leg of <manifest> against <hook>
+# at BUILDING and leaves legn, popn, skipn, exempt_seen and unmatched for the caller. A function
+# because the arm class "a manifest suite in flag form" below runs it once more over a planted
+# population, which is how the rule is seen to red.
+check_parity() {
+  local legs=$1 hook=$2 pop ceil script cmd payload w direct
   # One TAB-separated row per leg: ceiling, the script's basename, the argv. `tr -d '\r'`: a
   # Windows python writes CRLF to a pipe, and a CR on the basename made the exemption never match —
   # observed while writing this arm, and the stale-exemption clause is what said so.
@@ -392,7 +397,7 @@ for l in json.load(open(sys.argv[1], encoding="utf-8")):
     a = l.get("argv") or []
     if l.get("chunk") != "selftests": continue
     script = next((x.rsplit("/", 1)[-1] for x in a if "/" in x), "")
-    print("%s\t%s\t%s" % (l.get("ceiling", 0), script, " ".join(a)))' "$LEGS" | tr -d '\r')
+    print("%s\t%s\t%s" % (l.get("ceiling", 0), script, " ".join(a)))' "$legs" | tr -d '\r')
   legn=$(printf '%s\n' "$pop" | grep -c .)
   unmatched=""; exempt_seen=""; popn=0; skipn=0
   while IFS=$'\t' read -r ceil script cmd; do
@@ -401,22 +406,22 @@ for l in json.load(open(sys.argv[1], encoding="utf-8")):
       exempt_seen="$exempt_seen $script"; skipn=$((skipn+1))
       echo "     skip: $script — declared exempt (ceiling ${ceil}s), see the comment above: $cmd"; continue ;;
     esac
-    case " $cmd " in *" --selftest "*)
-      if [ "$ceil" -le "$DIRECT_CHECK_BOUND" ]; then
-        skipn=$((skipn+1)); echo "     skip: a --selftest direct check at or under the ${DIRECT_CHECK_BOUND}s bound (ceiling ${ceil}s): $cmd"
-      else
-        unmatched="$unmatched
-     (a --selftest leg above the ${DIRECT_CHECK_BOUND}s bound is a suite the hook cannot deny textually and it is not declared exempt: $cmd, ceiling ${ceil}s)"
-      fi
-      continue ;;
-    esac
+    direct=0
+    for w in $DIRECT_CHECK_WORDS; do case " $cmd " in *" $w "*) direct=1 ;; esac; done
+    if [ "$direct" = 1 ] && [ "$ceil" -le "$DIRECT_CHECK_BOUND" ]; then
+      skipn=$((skipn+1)); echo "     skip: a direct check at or under the ${DIRECT_CHECK_BOUND}s bound (ceiling ${ceil}s): $cmd"
+      continue
+    fi
     popn=$((popn+1))
     payload=$("$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Bash","cwd":sys.argv[1],"tool_input":{"command":sys.argv[2]}}))' "$(resolve_native "$B")" "$cmd")
-    printf '%s' "$payload" | node "$HOOK" >/dev/null 2>&1; [ $? = 2 ] || unmatched="$unmatched
-     $cmd"
+    printf '%s' "$payload" | node "$hook" >/dev/null 2>&1; [ $? = 2 ] || unmatched="$unmatched
+     $cmd (ceiling ${ceil}s)"
   done <<PARITY
 $pop
 PARITY
+}
+if [ -f "$LEGS" ]; then
+  check_parity "$LEGS" "$HOOK"
   if [ "$popn" -gt 0 ]; then echo "ok   parity: the manifest holds $popn whole-suite selftests leg(s) to grade, $skipn exempt and printed above"; pass=$((pass+1))
   else echo "FAIL parity: the manifest holds no whole-suite selftests leg, so parity would be certified over nothing"; fail=$((fail+1)); fi
   for x in $PARITY_EXEMPT; do
@@ -430,6 +435,12 @@ PARITY
 else
   echo "FAIL parity: no gate manifest beside the kit at $LEGS, so the suite population cannot be derived"; fail=$((fail+1))
 fi
+# The pin (TOOL-aClearedLedger-3 S6): the bound and the word list above are restated, not read from
+# the hook, so the arm and the hook share no state; this is what says the restatement has not drifted.
+want="$DIRECT_CHECK_BOUND $DIRECT_CHECK_WORDS"
+got=$(node -p "const g = require(require('path').resolve(process.argv[1])); g.DIRECT_CHECK_BOUND + ' ' + g.DIRECT_CHECK_WORDS.join(' ')" "$HOOK" 2>/dev/null | tr -d '\r')
+if [ "$want" = "$got" ]; then echo "ok   DIRECT_CHECK_BOUND and DIRECT_CHECK_WORDS equal the hook's exports: $got"; pass=$((pass+1))
+else echo "FAIL the suite's direct-check bound and words [$want] != the hook's exports [$got] — a restatement that drifted"; fail=$((fail+1)); fi
 
 # ---- AC3: the allow set is the tail of PHASES_CORE from VERIFYING -------------------------------
 for ph in VERIFYING LANDING LANDED ABORTED; do
@@ -757,6 +768,96 @@ printf '%s' '{"tool_name":"AskUserQuestion","session_id":"tSess-1","cwd":42,"too
 if [ "$got" = 0 ] && [ ! -s "$TMP/err" ]; then echo "ok   Q12 a cwd of 42 makes resolveRepo throw -> allow (exit 0)"; pass=$((pass+1))
 else echo "FAIL Q12 a cwd of 42 (exit $got, want 0 with an empty stderr)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
 
+# ---- TOOL-aClearedLedger-3: a manifest suite in flag form (row D6) ---------------------------------
+# The hook reads the manifest in the directory above its own, so these arms run the kit copy above
+# beside a PLANTED manifest at $TMP: two legs in a direct-check form, at the ceiling each arm names.
+# The real manifest's legs cross the bound whenever a ceiling is re-derived; a planted one does not.
+# build_manifest <ceiling> [extra-row] — <extra-row> is a JSON object appended to the list.
+build_manifest() {
+  printf '[{"name":"planted flag suite","chunk":"selftests","ceiling":%s,"argv":["python3","{prefix}/zz-kit/planted_suite.py","--selftest"]},\n {"name":"planted fixture suite","chunk":"selftests","ceiling":%s,"argv":["python","{prefix}/zz-kit/planted_cases.py","--fixture","--strict-from","zz/cases/"]}%s]\n' \
+    "$1" "$1" "${2:+,$2}" > "$TMP/gate-legs.json"
+}
+run_planted() { local HOOK=$ASK_HOOK; run "$@"; }
+M_FLAG='python3 '"${PFX}"'zz-kit/planted_suite.py --selftest'
+M_FIX='python '"${PFX}"'zz-kit/planted_cases.py --fixture'
+build_manifest 900
+run_planted "D6 a --selftest leg above the bound -> deny"                 2 "$B" "$M_FLAG"
+if grep -q 'planted flag suite' "$TMP/err"; then echo "ok   D6 the deny names the manifest leg"; pass=$((pass+1))
+else echo "FAIL D6 the deny does not name the leg planted flag suite"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+run_planted "D6 a --fixture leg above the bound, spelled short -> deny"   2 "$B" "$M_FIX"
+run_planted "D6 the same leg with a case word -> allow"                   0 "$B" "$M_FIX one-case"
+run_planted "D6 the over-bound leg behind a redirection -> deny"          2 "$B" "$M_FLAG > x.log 2>&1"
+run_planted "D6 the over-bound leg in a bash -c body -> deny"             2 "$B" "bash -c '$M_FLAG'"
+run_planted "D6 the over-bound leg in a double-quoted \$( ) -> deny"       2 "$B" 'printf '"'%s'"' "$('"$M_FLAG"')"'
+# TOOL-aClearedLedger-11: the spellings the closing review walked past row D6, each over the 900
+# manifest. The script is matched at ANY word, so a launcher the grammar does not skip hides
+# nothing (M1); an option's value may differ and a case word after it may not (M2); the bare file
+# name, a `./` path and a glued redirection all read (M3); a backslashed upper-case path folds (L1).
+M_REST="${M_FLAG#python3 }"
+run_planted "D6 the leg behind an unexpanded \"\$PY\" -> deny"              2 "$B" '"$PY" '"$M_REST"
+run_planted "D6 the leg behind python.exe -> deny"                        2 "$B" "python.exe $M_REST"
+run_planted "D6 the leg behind python3 -u -B -> deny"                     2 "$B" "python3 -u -B $M_REST"
+run_planted "D6 the leg as an if condition -> deny"                       2 "$B" "if $M_FLAG; then :; fi"
+run_planted "D6 the leg behind /usr/bin/python3 -> deny"                  2 "$B" "/usr/bin/python3 $M_REST"
+run_planted "D6 the --fixture leg with another option value -> deny"      2 "$B" "$M_FIX --strict-from other/"
+run_planted "D6 the same with a case word after the full argv -> allow"   0 "$B" "$M_FIX --strict-from other/ one-case"
+run_planted "D6 the leg by its file name after a cd -> deny"              2 "$B" "cd ${PFX}zz-kit && python3 planted_suite.py --selftest"
+run_planted "D6 the leg by a ./ path -> deny"                             2 "$B" "python3 ./planted_suite.py --selftest"
+run_planted "D6 the --fixture leg with a glued redirection -> deny"       2 "$B" "$M_FIX>x.log"
+run "D4 a suite word with a glued redirection -> deny"                    2 "$B" "$D4>x.log"
+run_planted "D6 the leg by a backslashed upper-case path -> deny"         2 "$B" 'python3 C:\repo\ZZ-KIT\PLANTED_SUITE.py --selftest'
+# TOOL-aClearedLedger-12: an appended output hides nothing. A two-character redirection operator is
+# one word, so its target is dropped with it and the leg's spelling stays the leg's (review H1).
+run_planted "D6 the leg appended to a log -> deny"                        2 "$B" "$M_FLAG >> x.log"
+run_planted "D6 the leg appended with 2>&1 behind it -> deny"             2 "$B" "$M_FLAG >> x.log 2>&1"
+run_planted "D6 the leg appended by 2>> -> deny"                          2 "$B" "$M_FLAG 2>> err.log"
+run_planted "D6 the leg appended to an unexpanded \"\$LOG\" -> deny"        2 "$B" "$M_FLAG"' >> "$LOG"'
+# TOOL-aClearedLedger-13: the head-less segment (`-m` leaves the grammar no head) still yields a
+# candidate, and two ALLOW arms that pin a miss on purpose. Each is the hook's half of a difference
+# the header comment and the README state against the spec lint, which reads both spellings: it
+# fails on the day the hook reads the spelling, which is the day those texts must move.
+run_planted "D6 the leg behind python3 -m pdb -> deny"                    2 "$B" "python3 -m pdb $M_REST"
+run_planted "D6 a kept gap: a 2>&1 ahead of the flag -> allow"            0 "$B" "${M_FLAG% --selftest} 2>&1 --selftest"
+run_planted "D6 a kept gap: a glued variable prefix -> allow"             0 "$B" 'python3 ${DIR}zz-kit/planted_suite.py --selftest'
+# TOOL-aClearedLedger-14, review item L2: a quoted character glued before a `>` is an argument, as
+# bash passes it, so the leg runs with one more word: a scoped spelling, not the leg.
+run_planted "D6 a quoted & glued before a redirection is an argument -> allow"  0 "$B" "$M_FLAG '&'>x.log"
+run_planted "D6 a quoted > glued before a redirection is an argument -> allow"  0 "$B" "$M_FLAG '>'>x.log"
+# TOOL-aClearedLedger-15, review round 4's item H1: a quoted `>` opening a glued target after an
+# operator is the target's, so bash runs the leg with its output redirected: the leg, denied.
+run_planted "D6 a quoted > opening a glued target after > -> deny"  2 "$B" "$M_FLAG >'>x.log'"
+run_planted "D6 a quoted > opening a glued target after 2> -> deny"  2 "$B" "$M_FLAG 2>'>x.log'"
+# TOOL-aClearedLedger-16, review round 4's item M1: a quote opening after a complete operator leaves
+# a glued redirection, so the target is dropped and the words are the leg's: the leg, denied.
+run_planted "D6 the leg with a quoted target glued to > -> deny"  2 "$B" "$M_FLAG >\"x.log\""
+run_planted "D6 the leg with a quoted target glued to 2> -> deny"  2 "$B" "$M_FLAG 2>\"x.log\""
+F=$(build_fixture VERIFYING)
+run_planted "D6 the over-bound leg at VERIFYING -> allow"                 0 "$F" "$M_FLAG"
+build_manifest 300
+run_planted "D6 the same --selftest leg at the bound -> allow"            0 "$B" "$M_FLAG"
+# The two fail-open arms beside each manifest state send a row D2 hit WITH the row D6 candidate
+# (TOOL-aClearedLedger-11, M5): a manifest read that throws reaches the catch in `main`, which
+# exits 0 exactly as the unarmed row does, so the allow arm alone cannot tell the two apart. The
+# deny can: it is printed only when the read answered the empty list and row D2 stood.
+M_BOTH="bash ${PFX}${RUN_GATES}/run-selftests.sh; $M_FLAG"
+rm -f "$TMP/gate-legs.json"
+run_planted "D6 the over-bound leg, manifest absent -> allow"             0 "$B" "$M_FLAG"
+run_planted "D6 a runner beside the leg, manifest absent -> deny"         2 "$B" "$M_BOTH"
+printf '{' > "$TMP/gate-legs.json"
+run_planted "D6 the over-bound leg, manifest unparsable -> allow"         0 "$B" "$M_FLAG"
+run_planted "D6 a runner beside the leg, manifest unparsable -> deny"     2 "$B" "$M_BOTH"
+# The parity rule's own failing case: a leg above the bound in NO direct-check form is a suite
+# convention neither the word shapes nor row D6 reads, and the rule must name it — and must not
+# name the flag-form leg beside it, which row D6 denies.
+build_manifest 900 '{"name":"planted bare suite","chunk":"selftests","ceiling":900,"argv":["python3","{prefix}/zz-kit/planted_bare.py"]}'
+check_parity "$TMP/gate-legs.json" "$ASK_HOOK"
+case "$unmatched" in
+  *planted_suite.py*|*planted_cases.py*) echo "FAIL D6 parity over the planted population names a leg row D6 denies:$unmatched"; fail=$((fail+1)) ;;
+  *planted_bare.py*) echo "ok   D6 parity over the planted population reds on the bare over-bound script and on it alone ($popn graded)"; pass=$((pass+1)) ;;
+  *) echo "FAIL D6 parity over the planted population does not name planted_bare.py, graded $popn:$unmatched"; fail=$((fail+1)) ;;
+esac
+rm -f "$TMP/gate-legs.json"
+
 # ---- the meta-arm: prove the liveness guard itself fires ------------------------------------------
 if [ "${GG_META:-}" != "1" ]; then
   # The copy runs from $TMP, outside every repository, so its HERE is pinned to this suite's own:
@@ -775,7 +876,31 @@ n=$((pass+fail))
 # static count of the arms above at ~10% headroom, because the pass that wrote this file may not
 # run it (the hook it tests denies the invocation at BUILDING); the main loop's first green at
 # VERIFYING confirms the executed count against this floor. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=183
+FLOOR_ASSERTIONS=223
+# RAISED 221 -> 223 at TOOL-aClearedLedger-16, by the static count of the assertions it added to the
+# arm class "a manifest suite in flag form", two: the leg with a double-quoted target glued to `>`
+# and to `2>`, each the leg with its output redirected.
+# RAISED 219 -> 221 at TOOL-aClearedLedger-15, by the static count of the assertions it added to the
+# arm class "a manifest suite in flag form", two: a quoted `>` opening a glued target after `>` and
+# after `2>`, each the leg with its output redirected.
+# RAISED 217 -> 219 at TOOL-aClearedLedger-14, by the static count of the assertions it added to the
+# arm class "a manifest suite in flag form", two: a quoted `&` and a quoted `>`, each glued before a
+# redirection and kept as an argument.
+# RAISED 214 -> 217 at TOOL-aClearedLedger-13, by the static count of the assertions it added to the
+# arm class "a manifest suite in flag form", three: the leg behind `python3 -m pdb`, and the two
+# kept gaps pinned as allows, a `2>&1` ahead of the flag and a glued variable prefix.
+# RAISED 210 -> 214 at TOOL-aClearedLedger-12, by the static count of the assertions it added to the
+# arm class "a manifest suite in flag form", four: the leg's output appended by `>>`, by `>>` with
+# `2>&1` behind it, by `2>>`, and by `>>` to a quoted unexpanded variable.
+# RAISED 196 -> 210 at TOOL-aClearedLedger-11, by the static count of the assertions it added to the
+# arm class "a manifest suite in flag form", fourteen: five launcher spellings, the option value
+# and its case-word control, the file name after a `cd`, the `./` path, the two glued redirections
+# (one of them row D4's, through the hook in place), the backslashed upper-case path, and the two
+# runner-beside-the-leg denies with the manifest absent and unparsable.
+# RAISED 183 -> 196 at TOOL-aClearedLedger-3, by the static count of the assertions it added: the
+# pin of the direct-check bound and words against the hook's exports, one; and the arm class "a
+# manifest suite in flag form", twelve — ten `run_planted` arms, the token check naming the planted
+# leg, and the parity rule's failing case over the planted population.
 # RAISED 179 -> 183 at TOOL-aNimbleMend-6, by the static count of the assertions it added: the
 # pass-leg runner's allow with its empty-stderr check, and its flagged deny with one token check.
 # RAISED 163 -> 179 at TOOL-aOrientedCast-24, by the static count of the assertions it added: Q1's
