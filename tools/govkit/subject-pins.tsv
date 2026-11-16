@@ -102,6 +102,7 @@ loop review bounds fixtures	kit	selftests
 loop scenario fixtures	repo	selftests
 loop splice check	repo	selftests
 loop stage coverage	repo	declarations
+loop termination	repo	selftests
 loop transition record	repo	selftests
 loop transition tables	repo	declarations
 loop upstream fixtures	kit	selftests

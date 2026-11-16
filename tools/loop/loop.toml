@@ -123,6 +123,14 @@
 #              a `measured` entry with `measured-by`, a path HEAD holds, and `measured-line`, a line it
 #              holds whole; an item carrying one routes the outcome `finding` (TOOL-dDeclaredLoop-29).
 #              No gov row carries it: upstream.py beside this file grades and joins it.
+#   draws      optional, an inline table from an outcome to the rework budget's cause its route draws, one
+#              of budget.py's CAUSES: the route is a counted edge (TOOL-dDeclaredLoop-33)
+#   waits      optional, the outcomes on which the item waits on another party; an item with an owner
+#              actor waits on the owner. Such an item declares both of:
+#   deadline     whole hours, or "policy.<key>" naming a catalogue row of a deadline type
+#   on-deadline  the outcome outside `waits` whose route it takes past the deadline
+#              termination.py beside this file grades the four, and a wait or cycle whose bound a build
+#              not yet landed declares stands on its termination-pending.txt.
 
 [[step]]
 tag = "step.plan"
@@ -1504,6 +1512,9 @@ outcomes = ["held", "waiting", "refused"]
 witness = { class = "history", by = "the lease record, and the spec's dependency record joined to each named unit's clean reuse check" }
 owner = "dScopedBuild"
 routes = { held = "item.build.unit-pass", waiting = "item.build.unit-lease", refused = "stand-in:{prefix}/memory-tree/build_records.py" }
+waits = ["waiting"]
+deadline = "policy.flow.wait-ceiling"
+on-deadline = "refused"
 
 [[item]]
 tag = "item.build.unit-pass"
@@ -1527,6 +1538,7 @@ outcomes = ["pass", "fail"]
 witness = { class = "history", by = "the executor-written acceptance record, and a seen-red record per gate the unit adds or changes" }
 owner = "dScopedBuild"
 routes = { pass = "item.build.scope", fail = "item.build.fix-pass" }
+draws = { fail = "fix-pass" }
 
 [[item]]
 tag = "item.build.fix-pass"
@@ -1550,6 +1562,7 @@ outcomes = ["next-pass", "in-scope", "stray", "refused"]
 witness = { class = "history", by = "the scope report" }
 owner = "dScopedBuild"
 routes = { next-pass = "item.build.unit-pass", in-scope = "item.build.reuse-check", stray = "item.build.reuse-check", refused = "item.build.revert-pass" }
+draws = { next-pass = "fix-pass", refused = "fix-pass" }
 
 [[item]]
 tag = "item.build.revert-pass"
@@ -1570,6 +1583,7 @@ outcomes = ["clean", "duplicate", "disputed", "overflow", "non-converging"]
 witness = { class = "history", by = "a computed join: every listed unit and every MUST has one row" }
 owner = "dScopedBuild"
 routes = { clean = "item.build.recommend", duplicate = "item.build.fix-pass", disputed = "stand-in:{prefix}/workflows/tier2-review.js", overflow = "item.build.reuse-check", non-converging = "stand-in:{prefix}/memory-tree/backlog.py" }
+draws = { duplicate = "fix-pass" }
 
 [[item]]
 tag = "item.build.recommend"
@@ -1812,6 +1826,9 @@ outcomes = ["landed", "held", "withdrawn", "moved"]
 witness = { class = "history", by = "the parents' records" }
 owner = "dShippedRelease"
 routes = { landed = "item.deploy.land", held = "item.deploy.parents", withdrawn = "transition", moved = "item.deploy.parents" }
+waits = ["held", "moved"]
+deadline = "policy.flow.wait-ceiling"
+on-deadline = "withdrawn"
 
 [[item]]
 tag = "item.deploy.land"
@@ -1825,6 +1842,9 @@ outcomes = ["landed-gated", "landed-ungated", "already-held", "refused", "unreac
 witness = { class = "history", by = "the outcome class, from the lander's exit, the pre-push hook's records and probes of the remote" }
 owner = "dShippedRelease"
 routes = { landed-gated = "item.deploy.core", landed-ungated = "item.deploy.core", already-held = "item.deploy.core", refused = "transition", unreachable = "item.deploy.land", argument = "stand-in:{prefix}/memory-tree/backlog.py" }
+waits = ["unreachable"]
+deadline = "policy.flow.wait-ceiling"
+on-deadline = "refused"
 
 [[item]]
 tag = "item.deploy.core"
@@ -1838,6 +1858,9 @@ outcomes = ["green", "red", "refused", "running", "no-verdict"]
 witness = { class = "history", by = "the bar's verdict for the landed SHA" }
 owner = "dShippedRelease"
 routes = { green = "item.deploy.record", red = "item.deploy.record", refused = "stand-in:{prefix}/memory-tree/build_records.py", running = "item.deploy.core", no-verdict = "stand-in:{prefix}/memory-tree/build_records.py" }
+waits = ["running"]
+deadline = "policy.flow.wait-ceiling"
+on-deadline = "no-verdict"
 
 [[item]]
 tag = "item.deploy.record"
@@ -2006,6 +2029,7 @@ outcomes = ["next-round", "released", "at-bound"]
 witness = { class = "history", by = "each confirmed finding joined to its fold at the spec's new blob, which the re-invoke's prevSubjects pins" }
 owner = "dDeclaredLoop"
 routes = { next-round = "item.review.trigger", released = "stand-in:{prefix}/unattended/unattended.sh", at-bound = "item.review.dispose" }
+draws = { next-round = "review-round" }
 
 [[item]]
 tag = "item.review.cost"

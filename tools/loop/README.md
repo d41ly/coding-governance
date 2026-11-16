@@ -648,6 +648,41 @@ python <prefix>/loop/scenario.py check
 python <prefix>/loop/scenario.py check --selftest
 ```
 
+## The termination check, `termination.py`
+
+Every composition a build can run is checked before it runs (TOOL-dDeclaredLoop-33).
+`read_termination_inputs(root, build=None)` reads one: gov's at HEAD, the definition's build table spliced
+with the composed stages, the composed items and the programs `check_program` returns, with `gov`, the
+definition's own rows and the builds the policy kit's `derive_landed_owners` reads landed; or a build's
+at its pin, its items through `position.py`'s `read_build_items`, the one composition reader the position
+engine shares, its stages with its scenarios' and its applied stage changes, and its flow rows.
+`check_termination(composition)` runs `check_terminal`, `check_reachable`, `check_counted`, `check_wait`,
+`check_raise` and `check_decline`, each returning `(rule, subject, why)` findings. The counted rule builds
+the build table's and the item routes' graphs with every set-aside edge left out, a counted backward row,
+an item route whose outcome its `draws` maps to one of `budget.py`'s `CAUSES`, an ending, a dynamic return,
+an owner edge and an item's declared wait on itself, and hands each to `scan_cycles`. The four item
+fields `draws`, `waits`, `deadline` and `on-deadline` are fixed in `item-schema.toml`, so no overlay or flow
+change patches gov's bound. `termination-pending.txt`, shrink-only, lists the waits and cycles whose bound
+a build not yet landed declares; `check` without `--build` reds a row that build's landing, its item's
+own deadline or a vanished cycle makes stale, and every other composition reads the list only to excuse.
+The transition writer runs the check after `write_flow_states` writes an `applied` row, and a finding or a
+program `check_program` refuses refuses the move. `check --selftest` is gov's `loop termination` leg.
+
+```bash
+python <prefix>/loop/termination.py check
+python <prefix>/loop/termination.py check --build <slug>
+python <prefix>/loop/termination.py --fixture --plant stage-self-loop
+```
+
+### The waits outside the composition
+
+The check grades the waits a composition declares. These waits live in code, each with a deadline of
+its own, and the check does not grade them:
+
+| Wait | Its deadline |
+|---|---|
+| the lander's wait on another session's claim lock | `push-main.sh#CLAIM_WAIT_CEILING`, 120 seconds PINNED |
+
 ## The factories, `factories.py`
 
 Six more kinds of the register take their factory from `factories.py` (TOOL-dDeclaredLoop-6): the
@@ -814,7 +849,7 @@ the `step` namespace. That a `command:` name names a real command, that a `hook:
 that a pending role's slot is the stem a later build ships. A non-role item's allowance beyond being
 non-empty: the allowance vocabulary of a role's `writes` is the roles kit's. A need on an item outside the five programs; that a stand-in path
 exists. The transition tables check no witness, no stand-in owner's landing, no reachability or
-termination, and no feature or unit row against the routes, nor that every terminal is entered by
+termination, which `termination.py` checks, and no feature or unit row against the routes, nor that every terminal is entered by
 a row. The parent route reads no parent planning ending, no hold past the wait ceiling, and no
 `withdrawn` post. The transition record judges no witness beyond resolving it and records no feature or
 unit move, and it pairs records with trailers by order. That a disposition

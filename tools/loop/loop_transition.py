@@ -33,7 +33,9 @@ files `composition.py`'s `item-ended` orders, printing `loop: order · <path>` p
 prints `adapt.py`'s path comparison, `loop: path · ...`, filing a `flow-deviation` order per deviation it
 reads, and on a forward or backward move gives each pending flow change of the build its state row in
 `RUN.md` under `flow.adapt`, the file staged beside the records and cut back to its length where the move
-does not record (TOOL-dDeclaredLoop-28); back-fills, writes this move's record, commits the records, or an empty commit, as
+does not record (TOOL-dDeclaredLoop-28), and where a state row reads `applied` holds the composition the move
+applies, its scenarios and applied changes at HEAD, to `termination.py`'s check, refusing the move on a
+finding or a program `check_program` refuses, naming it (TOOL-dDeclaredLoop-33); back-fills, writes this move's record, commits the records, or an empty commit, as
 `loop transition(<slug>): <from> -> <to>` with the trailer where selected, prints
 `loop: recorded · <from> -> <to> · <direction> · commit <sha8>`, and prints the line where selected. A
 set storing neither the trailer nor the log writes no commit. A backward move, testing to building say,
@@ -469,14 +471,30 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
     # this move's commit and is cut back to its length here where the move does not record
     if direction == "forward":
         said += write_path_orders(root, build, state)
-    size = None
+    size, written = None, []
     if direction in ("forward", "backward") and read_pending_rows(root, build):
         mode = read_adapt_mode(root)
         size = run.stat().st_size
-        write_flow_states(root, build, mode)
+        written = write_flow_states(root, build, mode)
     staged = [run.relative_to(root).as_posix()] if size is not None else []
     wrote, prior = [], None
     try:
+        # a change applied here is held to the termination check over the composition this move applies, its
+        # scenarios and its applied changes at HEAD; a finding, or a program check_program refuses, refuses the
+        # move, RUN.md cut back below (TOOL-dDeclaredLoop-33)
+        if any(" · applied · " in line for line in written):
+            from termination import check_termination, read_termination_inputs, render_finding
+            try:
+                found = check_termination(read_termination_inputs(root, build, [move] + before))
+            except LookupError as e:
+                raise ValueError("the termination check is unarmed, so the move applying a flow change is refused: "
+                                 "%s" % e) from None
+            except ValueError as e:
+                raise ValueError("the build's composition does not read, so the move applying a flow change is "
+                                 "refused: %s" % e) from None
+            if found:
+                raise ValueError("the termination check refuses the move applying a flow change: %s" % "; ".join(
+                    render_finding(f) for f in found))
         if "log" in chosen:
             if anchor is None and "trailer" not in chosen:
                 raise ValueError("%s selects log without trailer and %s defines no spec, so the move has no record "

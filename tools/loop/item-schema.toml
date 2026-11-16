@@ -59,6 +59,26 @@ shape = "scalar"
 name = "owner"
 shape = "scalar"
 
+# The termination check's four fields (TOOL-dDeclaredLoop-33) declare no `widens`, so they are fixed by
+# their undeclared class and every patch of one is refused naming it: `draws` and `waits` bound gov's
+# cycles, so a repository row sets its own and never patches gov's, and `deadline` and `on-deadline` stay
+# fixed until a numeric widening direction lands (its spec's F9).
+[[field]]
+name = "draws"
+shape = "scalar"
+
+[[field]]
+name = "waits"
+shape = "set"
+
+[[field]]
+name = "deadline"
+shape = "scalar"
+
+[[field]]
+name = "on-deadline"
+shape = "scalar"
+
 [[field]]
 name = "needs"
 shape = "set"

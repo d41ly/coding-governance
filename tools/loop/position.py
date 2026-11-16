@@ -393,6 +393,21 @@ def derive_position(repo, slug, definition=None):
     return pos
 
 
+def read_build_items(repo, slug, moves, pin, read=None):
+    """The composed item rows build `slug` reads at the pin `pin`, `moves` its moves newest first: the
+    composition there joined with the item rows the newest move's scenarios activate at the same pin
+    (TOOL-dDeclaredLoop-27), then the build's own applied changes, its last layer (TOOL-dDeclaredLoop-28);
+    gov's own rows where the composition is unarmed. `read`, where given, gains the scenario's read line.
+    The position engine and the termination check both read it (TOOL-dDeclaredLoop-33)."""
+    placed = moves[0].get("scenario") if moves else None
+    activated = read_activated_rows(repo, pin, placed.split("+")).get("kind.item", []) if placed else []
+    if placed and read is not None:
+        read.append("scenario=%s · %d activated" % (placed, len(activated)))
+    from adapt import read_flow_layer   # it imports loop_transition, as this module does, so here
+    layer = read_flow_layer(repo, slug, "item")
+    return read_composed_items(repo, pin, (activated + layer) or None)
+
+
 def derive_position_into(pos, repo, slug, definition):
     """The body of `derive_position`, raising on any refused read."""
     read_memory_tree("gen_build_index.py")
@@ -417,16 +432,7 @@ def derive_position_into(pos, repo, slug, definition):
     pos["read"].append("composition@%s · %s" % (pin[:8], pin_state))
     if definition is None:
         data, where = read_definition(KIT)
-        # the newest move's scenarios, their activated item rows composed at the same pin (TOOL-dDeclaredLoop-27)
-        placed = moves[0].get("scenario") if moves else None
-        activated = read_activated_rows(repo, pin, placed.split("+")).get("kind.item", []) if placed else []
-        if placed:
-            pos["read"].append("scenario=%s · %d activated" % (placed, len(activated)))
-        # the build's own applied changes, its last layer, after them (TOOL-dDeclaredLoop-28)
-        from adapt import read_flow_layer   # it imports loop_transition, as this module does, so here
-        layer = read_flow_layer(repo, slug, "item")
-        # unarmed: no composition in this tree, so gov's own rows alone; else the composition at the pin
-        items = read_composed_items(repo, pin, (activated + layer) or None)
+        items = read_build_items(repo, slug, moves, pin, pos["read"])
     else:
         data, where = definition, "the caller's definition"
         items = read_item_rows(data, where)

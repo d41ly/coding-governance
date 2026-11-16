@@ -127,6 +127,13 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # `resolve_kit_dir` for `--plan`, `--close` and its spec-audit opt-in, and reads nothing where it does not
 # resolve. `list` and `stage` exit 2 `unarmed` where a kit does not resolve, never a default. Its leg, `loop
 # breakpoint fixtures`, is gov's own [[exempt_leg]], no row here.
+# The termination check (TOOL-dDeclaredLoop-33): termination.py reads the item and stage compositions
+# through loop_items.py's `read_composition` and composition.py's `read_composition_at`, so the playbook kit
+# is reached as a subprocess with no edge; it reads the catalogue's deadline rows, the landed builds and
+# `flow.wait-ceiling` through the policy kit by `read_policy_kit`, and the trailers through the memory-tree
+# kit under the edge above. The transition writer imports it inside `write_transition`. A kit that does not
+# resolve exits 2 `unarmed`, never a default, and refuses the move at a step boundary. Its leg, `loop
+# termination`, is gov's own [[exempt_leg]], no row here.
 requires = ["memory-tree"]
 
 # Everything the kit ships is engine, overwritten on every update: the definition, its reader, the

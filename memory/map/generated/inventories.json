@@ -95,6 +95,7 @@
       "loop scenario fixtures",
       "loop splice check",
       "loop stage coverage",
+      "loop termination",
       "loop transition record",
       "loop transition tables",
       "loop upstream fixtures",

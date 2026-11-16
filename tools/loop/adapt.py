@@ -38,7 +38,10 @@ names, `continue` applying it and `none` refusing it, under `additive-recorded` 
 `applied` and a loosening one `held`, and under `owner-approves` every change is `held`. Each answer is one
 row appended to `RUN.md`, which rides the move's commit:
 
-    <ts> rescope · flow-state <row tag> · applied|held|refused · class <class> · flow.adapt <value>[ · disposition <record stem>]
+    <ts> rescope · flow-state <row tag> · applied|held|refused · class <class> · flow.adapt <value>[ · recommend decline][ · disposition <record stem>]
+
+A held loosening's row recommends the decline, which the termination check's `decline` rule reads, and
+an applied state row is followed by that check over the build's composition (TOOL-dDeclaredLoop-33).
 
 THE LAYER. `read_flow_layer(root, build, kind)` answers the build's applied changes of `kind` as the
 elements of the `compose --kind <kind> --rows -` array: each applied record's fenced row, oldest first, its
@@ -62,7 +65,8 @@ and a `RUN.md`; `--selftest` runs every plant through `loop_lib.py`'s `run_selft
 reset per plant. Each prints its observations and closes `loop: fixture · <case> · held` or `· MISSED
 <why>`. The cases are `PLANTS`. Exit 0 held, 1 missed, 2 where the scratch could not be built.
 
-WHAT THIS DOES NOT CHECK: a raise of a loop bound, which the termination check reads; that a disposition
+WHAT THIS DOES NOT CHECK: a raise of a loop bound, which the termination check reads, `termination.py`
+beside this file; that a disposition
 record was written by the owner, which its channel states; a `role` row, whose kind the compose verb
 answers unarmed until the roles kit registers a schema, so its boundary refuses it; a witness the position
 engine does not read, which stays `unread`; and a build's `stage` layer beyond the boundary's compose.
@@ -98,17 +102,17 @@ TAG = re.compile(r"[a-z0-9][a-z0-9-]*(?:\.[a-z0-9][a-z0-9-]*)+")
 UNIT_ID = re.compile(r"[A-Za-z]+-[A-Za-z0-9]+-\d+")
 FLOW_ROW = re.compile(r"^\S+ rescope · flow (add|amend|exclude|supersede) (\S+)(?: · change (\S+))? · reason (.*)$")
 STATE_ROW = re.compile(r"^\S+ rescope · flow-state (\S+) · (applied|held|refused) · class (\S+) · flow\.adapt (\S+)"
-                       r"(?: · disposition (\S+))?$")
+                       r"(?: · recommend (\S+))?(?: · disposition (\S+))?$")
 FENCE = ("```toml", "```")
 ORDER_KIND = "flow-deviation"
 HANDOVER = "GOV_POSITION_STATES"
 FX_BUILD, FX_UNIT = "tFix", "TOOL-tFix-1"
-FX_ADD, FX_EXCLUDE = "item.build.adopter.lint-pass", "item.test.flakes"
+FX_ADD, FX_EXCLUDE = "item.build.adopter.lint-pass", "item.review.cost"
 FX_ROW = "flow-row.toml"
 PLANTS = {"additive": "an add of item.build.adopter.lint-pass under additive-recorded, then a forward move",
           "owner-approves": "the same under owner-approves, a move, a continue disposition, a second move",
           "off": "the same under off, then a move",
-          "loosening": "an exclude of item.test.flakes under additive-recorded, a move, a continue disposition, a "
+          "loosening": "an exclude of item.review.cost under additive-recorded, a move, a continue disposition, a "
                        "second move",
           "unrecorded-skip": "a forward move out of building with the hand-over set and item.build.acceptance unheld",
           "act-mismatch": "propose --act add with a row whose edges amends a gov row",
@@ -146,7 +150,7 @@ def read_run_file(root, build):
 
 def read_flow_rows(root, build):
     """The build's flow rows in `RUN.md` order, each `{act, tag, change, reason, states}`, `states` the state
-    rows that follow it for its tag, each `{state, class, mode, disposition}`; a state row belongs to the
+    rows that follow it for its tag, each `{state, class, mode, recommend, disposition}`; a state row belongs to the
     newest flow row of its tag above it. `[]` where the build has no `RUN.md`."""
     run = read_run_file(root, build)
     if not run.is_file():
@@ -160,7 +164,8 @@ def read_flow_rows(root, build):
         s = STATE_ROW.match(ln)
         owner = next((r for r in reversed(rows) if s and r["tag"] == s[1]), None)
         if owner is not None:
-            owner["states"].append({"state": s[2], "class": s[3], "mode": s[4], "disposition": s[5]})
+            owner["states"].append({"state": s[2], "class": s[3], "mode": s[4], "recommend": s[5],
+                                    "disposition": s[6]})
     return rows
 
 
@@ -249,10 +254,11 @@ def derive_change_class(act, operations):
 
 # ------------------------------------------------------------------------------------------ the writes
 def render_state_row(tag, state, klass, mode, stem=None):
-    """One state row, timestamped now."""
+    """One state row, timestamped now; a held loosening recommends the decline (TOOL-dDeclaredLoop-33)."""
     now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    return "%s rescope · flow-state %s · %s · class %s · flow.adapt %s%s" % (
-        now, tag, state, klass, mode, " · disposition %s" % stem if stem else "")
+    advice = " · recommend decline" if (state, klass) == ("held", "loosening") else ""
+    return "%s rescope · flow-state %s · %s · class %s · flow.adapt %s%s%s" % (
+        now, tag, state, klass, mode, advice, " · disposition %s" % stem if stem else "")
 
 
 def write_run_row(run, row):
@@ -475,8 +481,9 @@ def run_adapt_plant(case, base):
         rc, payload, lines = read_composition(top, "item", read_flow_layer(top, FX_BUILD, "item"))
         return rc, ({r.get("tag") for r in payload["rows"]} if rc == 0 else set()), lines
 
+    # its outcome routed, so the program the boundary's termination check reads holds (TOOL-dDeclaredLoop-33)
     add_row = ("[[item]]\ntag = \"%s\"\nstep = \"step.build\"\nactor = \"command:lint\"\nneeds = [\"item.build.unit-pass\"]\n"
-               % FX_ADD)
+               "outcomes = [\"clean\"]\nroutes = { clean = \"transition\" }\n" % FX_ADD)
     try:
         if case in ("additive", "owner-approves", "off"):
             if case != "additive":
@@ -513,8 +520,8 @@ def run_adapt_plant(case, base):
             write_plant_commit("the proposal")
             rc = write_plant_move(0)
             states = read_states()
-            check_owed("held", rc == 0 and len(states) == 1 and " · held · class loosening · " in states[0],
-                       " | ".join(states) or "no state row")
+            check_owed("held", rc == 0 and len(states) == 1 and " · held · class loosening · " in states[0]
+                       and states[0].endswith(" · recommend decline"), " | ".join(states) or "no state row")
             read_memory_tree("build_records.py")
             from build_records import write_disposition
             write_disposition(top, FX_BUILD, FX_UNIT, FX_EXCLUDE, "continue", "terminal")

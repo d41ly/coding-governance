@@ -585,6 +585,19 @@ verb = "stage"
 flags = ["--stage=", "--build=", "--rev="]
 
 [[usage]]
+id = "script:{prefix}/loop/termination.py"
+shape = "verb"
+entry = "{prefix}/loop/termination.py"
+flags = ["--fixture", "--plant="]
+
+[[usage]]
+id = "script:{prefix}/loop/termination.py#check"
+shape = "verb"
+entry = "{prefix}/loop/termination.py"
+verb = "check"
+flags = ["--build=", "--selftest"]
+
+[[usage]]
 id = "script:{prefix}/loop/scenario.py"
 shape = "verb"
 entry = "{prefix}/loop/scenario.py"

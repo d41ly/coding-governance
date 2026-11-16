@@ -99,6 +99,20 @@ role item prints `unarmed`. Neither is refused, and neither counts as checked.
 An item's instruction scope, the instruction units it loads, is never typed on its row. It is
 derived from the units whose `scope` names the item; `--scopes` below prints it.
 
+Four more fields say how an item's loops end, and the termination check below reads them. Each is
+optional, and each is fixed, so your overlay can set them on its own rows but never patch gov's:
+
+```toml
+draws = { fail = "fix-pass" }            # a route that draws on the rework budget, by its cause
+waits = ["waiting"]                      # the outcomes on which it waits on another party
+deadline = "policy.flow.wait-ceiling"    # whole hours, or policy.<key> of a deadline
+on-deadline = "refused"                  # the outcome it takes once the deadline passes
+```
+
+A `draws` cause is one of `route-back`, `fix-pass`, `review-round`, `re-dispatch` and `research`. An
+item with `waits`, or with an owner actor, declares both `deadline` and `on-deadline`, and its
+`on-deadline` is an outcome outside `waits`.
+
 ## Witness classes
 
 Every fact the loop reads as done has a witness, and every witness names its class. Three classes
@@ -1595,6 +1609,52 @@ python tools/memory-tree/build_records.py new disposition --build <slug> --unit 
 The budget does not serialize two draws made at once, which are two rows. The ending reads each unit's
 status header and not its derived state, and anyone who can write a disposition record releases a
 parked build.
+
+## Whether a build's flow can finish
+
+Before a flow runs, one check asks whether it can finish. It reads the composition: gov's definition
+with your overlay's items and stages, and for a build, the scenarios it was placed under and its own
+applied flow changes. Six rules hold it:
+
+- **`terminal`:** every build state reaches a terminal state. A row into `@prior` or `@reentry` counts as
+  reaching every open state. A level that declares no states is a finding. The feature and unit levels
+  declare no terminal set yet, so the check prints `unchecked — no terminal set` for each, never a pass.
+- **`reachable`:** every item of every program is reached from some program's entry, an item with no
+  needs. The walk follows every route, and follows a need only inside one program, so an item needing
+  another program's item is reached only if some route names it.
+- **`counted`:** every loop of the build table and of the item routes passes an edge that ends it.
+  That is a backward build row, which draws on the rework budget, a route whose outcome `draws` names a
+  budget cause, an ending row, a row into `@prior` or `@reentry`, an owner's item, or a wait an item
+  declares on itself. A stage whose exit routes back to its own first item with no `draws` is a finding,
+  even though every state still reaches a terminal.
+- **`wait`:** an item that waits declares its `deadline` and `on-deadline`.
+- **`raise`:** a loosening your build applied names your release, ` · disposition <stem>` on its
+  `flow-state` row. One with none was applied without you.
+- **`decline`:** a loosening held for you recommends the decline, ` · recommend decline` on its row.
+
+A wait or a loop whose bound a build not yet landed will declare stands on the shrink-only list
+`tools/loop/termination-pending.txt`, naming that build, and the check passes it. Checking gov's own
+composition also reports a row on that list that is no longer owed: its build has landed, its item
+now declares its deadline or is gone, or its loop no longer exists. The check runs at the push, through
+gov's `loop termination` gate, and at every step boundary where your build applies a flow change.
+There a finding refuses the move and names it, and nothing is recorded. A change that leaves a program
+the definition's check refuses is refused the same way.
+
+- **Check the flow:** `python tools/loop/termination.py check` checks gov's composition at your <!-- usage: script:tools/loop/termination.py#check 84d96b33 -->
+  repository's top level, and `--build <slug>` checks that build's at its pinned composition. It prints
+  the value of `flow.wait-ceiling`, each `unchecked` level, the pending list's counts, each finding as
+  `loop: termination · <rule> · <subject> · <why>`, and a summary. It exits 0 with no finding, 1 on a
+  finding, and 2 where a composition does not read or a kit is not installed, naming why. `--selftest`
+  also checks every live build, one whose newest move entered no terminal state, then runs every plant.
+
+- **See it on a fixture:** `python tools/loop/termination.py --fixture --plant <case>` runs one planted <!-- usage: script:tools/loop/termination.py e4ce3401 -->
+  break and prints `held` or `MISSED`: `stage-self-loop`, `stage-self-loop-drawn`, `dead-end`,
+  `orphan-item`, `empty-states`, `wait-no-deadline`, `wait-declared`, `wait-stale`, `stale-build`,
+  `raise-unattended`, `raise-released`, `raise-held` and `decline` in memory, and `deadline-patch` and
+  `boundary` each in a scratch repository.
+
+The check trusts `draws` and `waits` as written, so a wrong mark hides a loop. It does not see a wait
+outside the flow, such as the lander's wait on a claim lock, which the loop kit's README lists.
 
 ## How to use it
 

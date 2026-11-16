@@ -2293,6 +2293,20 @@
     "stage": ["step.test"]
   },
   {
+    "name": "loop termination",
+    "argv": [
+      "python",
+      "{prefix}/loop/termination.py",
+      "check",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "repo",
+    "ceiling": 300,
+    "enforces": ["principle.p39"],
+    "stage": ["step.test"]
+  },
+  {
     "name": "loop breakpoint fixtures",
     "argv": [
       "python",

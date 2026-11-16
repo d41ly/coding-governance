@@ -5638,6 +5638,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "check_counted",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
+    },
+    {
       "id": "check_cov_probe",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
@@ -5696,6 +5701,11 @@
       "id": "check_declared_class",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "check_decline",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
     },
     {
       "id": "check_default",
@@ -6943,6 +6953,11 @@
       "file": "tools/playbook/tag_index.py"
     },
     {
+      "id": "check_owner_actor",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
+    },
+    {
       "id": "check_owner_disposition",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -7148,6 +7163,11 @@
       "file": "tools/loop/position.py"
     },
     {
+      "id": "check_plant_found",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
+    },
+    {
       "id": "check_plant_rows",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
@@ -7303,6 +7323,11 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "check_raise",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
+    },
+    {
       "id": "check_raise_shape",
       "kind": "function",
       "file": "tools/policy/guard.py"
@@ -7321,6 +7346,11 @@
       "id": "check_rationale_apart",
       "kind": "function",
       "file": "tools/playbook/writing_practice.py"
+    },
+    {
+      "id": "check_reachable",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
     },
     {
       "id": "check_reaches",
@@ -8098,6 +8128,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "check_stale_rows",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
+    },
+    {
       "id": "check_stalled",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -8253,6 +8288,11 @@
       "file": "tools/memory-tree/asbuilt_view.py"
     },
     {
+      "id": "check_terminal",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
+    },
+    {
       "id": "check_terminal_proof",
       "kind": "function",
       "file": "tools/lib/guarded_write.py"
@@ -8266,6 +8306,11 @@
       "id": "check_terminal_proof",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "check_termination",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
     },
     {
       "id": "check_time_classes",
@@ -8511,6 +8556,11 @@
       "id": "check_view_merge",
       "kind": "function",
       "file": "tools/memory-tree/asbuilt_view.py"
+    },
+    {
+      "id": "check_wait",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
     },
     {
       "id": "check_waiver_scope",
@@ -10353,6 +10403,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "derive_counted_graphs",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
+    },
+    {
       "id": "derive_counted_sources",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -11653,6 +11708,11 @@
       "file": "tools/loop/scenario.py"
     },
     {
+      "id": "derive_plant_state",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
+    },
+    {
       "id": "derive_policy_adopter",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
@@ -11996,6 +12056,11 @@
       "id": "derive_row_canon",
       "kind": "function",
       "file": "tools/playbook/overlay_rows.py"
+    },
+    {
+      "id": "derive_row_class",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
     },
     {
       "id": "derive_row_composition",
@@ -12473,6 +12538,11 @@
       "file": "tools/loop/splice.py"
     },
     {
+      "id": "derive_stage_rows",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
+    },
+    {
       "id": "derive_stage_state",
       "kind": "function",
       "file": "tools/loop/splice.py"
@@ -12633,6 +12703,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "derive_termination_composition",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
+    },
+    {
       "id": "derive_text_lines",
       "kind": "function",
       "file": "tools/playbook/writing_practice.py"
@@ -12726,6 +12801,11 @@
       "id": "derive_turnstile_wait",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "derive_unchecked_levels",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
     },
     {
       "id": "derive_unit_class",
@@ -15390,6 +15470,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/loop/termination.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/loop/upstream.py"
     },
     {
@@ -17933,6 +18018,11 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "print_termination",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
+    },
+    {
       "id": "print_touched_asks",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -18843,6 +18933,11 @@
       "file": "tools/loop/loop_transition.py"
     },
     {
+      "id": "read_build_items",
+      "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
       "id": "read_build_slug",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -19316,6 +19411,11 @@
       "id": "read_cutoff_key",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "read_deadline_keys",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
     },
     {
       "id": "read_debt_gloss",
@@ -20713,6 +20813,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_live_builds",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
+    },
+    {
       "id": "read_live_census",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -21306,6 +21411,11 @@
       "id": "read_plan_destinations",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "read_plant_base",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
     },
     {
       "id": "read_plant_bytes",
@@ -22691,6 +22801,16 @@
       "id": "read_temp_binders",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "read_termination_inputs",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
+    },
+    {
+      "id": "read_termination_pending",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
     },
     {
       "id": "read_text",
@@ -24448,6 +24568,11 @@
       "file": "tools/codebase-map/map_diff.py"
     },
     {
+      "id": "render_cycle",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
+    },
+    {
       "id": "render_date",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -24576,6 +24701,11 @@
       "id": "render_family_view",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "render_finding",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
     },
     {
       "id": "render_fixture",
@@ -28313,6 +28443,11 @@
       "file": "tools/run-gates/py_reads.py"
     },
     {
+      "id": "run_boundary_plant",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
+    },
+    {
       "id": "run_bounded",
       "kind": "function",
       "file": "tools/process-monitor/census.py"
@@ -28500,6 +28635,11 @@
     {
       "id": "run_check",
       "kind": "function",
+      "file": "tools/loop/termination.py"
+    },
+    {
+      "id": "run_check",
+      "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
@@ -28661,6 +28801,11 @@
       "id": "run_cov29_gate",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "run_deadline_patch",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
     },
     {
       "id": "run_dense",
@@ -30450,6 +30595,11 @@
     {
       "id": "run_selftest",
       "kind": "function",
+      "file": "tools/loop/termination.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
       "file": "tools/loop/upstream.py"
     },
     {
@@ -30756,6 +30906,11 @@
       "id": "run_temp_scan",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "run_termination_plant",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
     },
     {
       "id": "run_tick",
@@ -35386,6 +35541,11 @@
       "id": "write_block",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "write_boundary_change",
+      "kind": "function",
+      "file": "tools/loop/termination.py"
     },
     {
       "id": "write_br_build",
