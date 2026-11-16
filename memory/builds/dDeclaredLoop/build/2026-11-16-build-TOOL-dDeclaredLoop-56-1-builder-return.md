@@ -13,7 +13,7 @@ DIVERGENCE: the --dispatch refused this pass, and a refusal is binding. The spec
    - §4 Dependency should also stop reading 70 "for that keyword's default". At HEAD, `derive_phase_position(phase, facts, phase_map=None, extra=())` already has the default S18 needs.
 
 2. Stale figures, which I would otherwise have fixed in deviation 565:
-   - §4 "The sweep" counts 18 positional-registry rows for this spec. At HEAD `grep -c 'spec-TOOL-dDeclaredLoop-56.md' memory/project/positional-refs.txt` prints 2 (BUILD-METHOD M4 and M6), both still cited by the spec. So no shrink runs, and `memory/project/positional-refs.txt` leaves Files touched.
+   - §4 "The sweep" counts 18 positional-registry rows for this spec. At HEAD `grep -c 'spec-TOOL-dDeclaredLoop-56.md' memory/project/positional-refs.txt` prints 2 (the build method's M4 (`doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it`) and M6), both still cited by the spec. So no shrink runs, and `memory/project/positional-refs.txt` leaves Files touched.
    - The sweep's "six other --claims reads" of `tools/unattended/unattended.test.sh` are eight at HEAD. One of them, AC16, reads fields 1, 4 and 5. No field position moves, so nothing turns red.
 
 3. Gaps for the spec writer to settle:
