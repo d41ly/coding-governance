@@ -1,11 +1,12 @@
 # TOOL-aHastenedSweep-7 — the hygiene suite's assertion floor pinned to the count the close measured, so a stranded block of arms reds it
 
-**Status:** INPROGRESS · rev-1 · 2026-11-16 · node a · Tier-1 · base f25308f0 · streams tooling · order 6
+**Status:** CLOSED · rev-1 · 2026-11-16 · node a · Tier-1 · base f25308f0 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-16-build-TOOL-aHastenedSweep-7-1-acceptance-ledger.md](../build/2026-11-16-build-TOOL-aHastenedSweep-7-1-acceptance-ledger.md) | journal | — |
 | [2026-11-16-prompt-TOOL-aHastenedSweep-7-brief.md](../prompts/2026-11-16-prompt-TOOL-aHastenedSweep-7-brief.md) | research | — |
 
 <!-- /gen:spec-records -->

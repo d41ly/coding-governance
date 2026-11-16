@@ -4873,7 +4873,11 @@ done
 # its commit never counted, three top-level and two in a two-pass loop; TOOL-aHastenedSweep-4's two are
 # the raise above; and TOOL-aHastenedSweep-6's four, two one-red arms top-level and its frame-fallback
 # arm's two in a two-pass loop, none skipped. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=719
+# RAISED 719 -> 742 by TOOL-aHastenedSweep-7, to the PRINTED count: the suite printed PASS (742
+# assertions) at 0c1935569 (PINNED, 2026-11-16, node a, n_skip 0). The floor sat 23 below the count
+# before this build began; this build's eleven are the two raises above, so this pins the floor to
+# the measured count and a stranded block of any size reds it.
+FLOOR_ASSERTIONS=742
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
