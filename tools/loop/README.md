@@ -71,8 +71,8 @@ table above, transcribed from the flow-steps record's five step tables.
 
 | key | what it holds |
 |---|---|
-| `tag` | `item.<step>.<name>`, a member of the `item` namespace |
-| `step` | the `[[step]]` tag its tag opens |
+| `tag` | `item.<step>.<name>`, a member of the `item` namespace; `item.review.<name>` for the review program's |
+| `step` | the `[[step]]` tag its tag opens; `none` for an `item.review.<name>` tag, whose program sits in no step |
 | `actor` | `<kind>:<name>`, one actor of one kind in `ACTOR_KINDS`, or the bare `executor` or `owner`; a role's name is its role file's stem |
 | `needs` | the items it waits for: each entry a tag, or a list of tags any one of which meets it; `[]` for none |
 | `inputs` | `<layer tag>:<what it reads>`, the layer a tag of the playbook kit's `layers.toml` |
@@ -107,13 +107,17 @@ a later build names today's stand-in under `{prefix}`, which keeps the row clear
 ban. `routes` is inline, never an `[item.routes]` table, so the tag index reads one span per row.
 
 `check_program(data, where, layers)` grades the rows as one needs graph, an any-of entry an edge to
-each of its tags. It refuses a tag opening no `item.<step>.` of a gov step or a `step` other than
+each of its tags. A tag `item.review.<name>` is the breakpoint program's (TOOL-dDeclaredLoop-50): its
+`step` is `NO_STEP`, `none`, and any other step on it is refused, while `none` on a gov step's row
+stays refused. It refuses a tag opening no `item.<step>.` of a gov step or a `step` other than
 that one, a tag declared twice, a need naming no declared item, and a needs cycle, each cycle named
 once and a self-need a cycle of one. Per item it refuses an outcome set `derive_outcome_set` refuses,
 empty or with a word twice; routes that are not exactly the outcomes; a target that is no declared
 item, `transition` or a stand-in; and, where `layers` is not `None`, an input whose text before its
 first `:` is no layer tag. Each `[[step]]` row's `exit` must be a declared item of that step. It
-returns `{step tag: [item tags in needs order]}`, one order filtered per step. The order and the
+returns `{step tag: [item tags in needs order]}`, one order filtered per step, and the review
+program's tags under the key `review`, `REVIEW_PROGRAM`, which `--check` prints as `loop: program
+review`. A review row is graded for its needs, outcomes, routes and inputs, and is no step's exit. The order and the
 cycles come from the needs-graph helper, `derive_needs_order` and `scan_cycles`, the `needs_graph_py`
 block this module carries inline beside govkit's and the memory-tree kit's backlog copies.
 
@@ -750,7 +754,9 @@ drive rows by `order` and pick each role's practices by its reach word.
   reads clean), `actor-list-grown` (a row the base lacks), `actor-list-stale` (a row for step.design,
   whose witness is `history`), `actor-list-no-build` (a row naming `dNoSuchBuild`) and
   `actor-list-foreign` (the builds folder set to foreign after the read, which reads clean). The program
-  cases are `needs-cycle`, `needs-unresolved` (a missing tag inside an any-of entry),
+  cases are `needs-cycle`, `step-none-outside-review` (item.plan.place's step set to `none`),
+  `review-step-named` (item.review.pin's step set to `step.design`), `needs-unresolved` (a missing tag
+  inside an any-of entry),
   `outcome-unrouted`, `route-unresolved`, `input-no-layer` and `exit-missing`. The actor cases are
   `actor-two` (item.build.unit-pass given a list of two actors), `actor-bad-kind` (its actor
   `agent:x`), `witness-missing` (its witness taken off), `allowance-missing` (item.plan.place's

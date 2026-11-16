@@ -40,13 +40,14 @@ The definition also holds each gov step's program (TOOL-dDeclaredLoop-12): one `
 its `tag` `item.<step>.<name>`, its `step`, `actor`, `needs`, `inputs`, `allowance`, `returns`, closed
 `outcomes`, `witness`, `owner` and `routes`, an inline table naming one target per outcome: a declared
 item, `transition`, or `stand-in:{prefix}/<home>/<file>`. A `needs` entry is a tag, or a list of tags any
-one of which meets it. `check_program` grades the rows as one needs graph, ordered by the needs-graph
-helper below: every need declared, no cycle, each outcome set closed through `derive_outcome_set`, the
-rule `read_outcome_set` applies, each outcome routed once to a target that resolves, each input's text
-before its first `:` a layer tag `read_layer_tags` reads from the playbook kit's `layers.toml`, and each
-step's `exit` an item of that step. `read_items` returns the rows once both checks hold. `--scopes`
-prints each item's instruction scope, `derive_item_scope` running that kit's `load_sets.py derive` once
-per item as a subprocess, so this module imports no sibling kit. Where the playbook kit does not
+one of which meets it. The breakpoint program's rows, tagged `item.review.<name>`, carry the step
+`none` and sit in no step (TOOL-dDeclaredLoop-50). `check_program` grades the rows as one needs graph,
+ordered by the needs-graph helper below: every need declared, no cycle, each outcome set closed
+through `derive_outcome_set`, the rule `read_outcome_set` applies, each outcome routed once to a
+target that resolves, each input's text before its first `:` a layer tag `read_layer_tags` reads from
+the playbook kit's `layers.toml`, and each step's `exit` an item of that step. `read_items` returns the
+rows once both checks hold. `--scopes` prints each item's instruction scope, `derive_item_scope`
+running that kit's `load_sets.py derive` once per item as a subprocess, so this module imports no sibling kit. Where the playbook kit does not
 resolve, the inputs print `unarmed` and every scope line too; the loop kit declares no edge to it.
 
 Each item declares one actor of one kind (TOOL-dDeclaredLoop-9): `<kind>:<name>`, the kind in
@@ -99,8 +100,8 @@ it; `read_dispositions` and `--check` refuse a definition that declares no set.
 
 `--check` prints one line per step and per workflow, the set and one line per alias, then a count, and exits 0; a refused definition is one
 line and exit 1. It prints each step's program, `loop: program <step> · <n> item(s) · <tags>` in needs
-order, or `loop: inputs unarmed` and why before them where no layer tags resolve, then one `loop: item`
-line per item in file order, each field's source or `pending` or `unarmed`, and `loop: items · <n>
+order, then the breakpoint program's as `loop: program review`, or `loop: inputs unarmed` and why
+before them where no layer tags resolve, then one `loop: item` line per item in file order, each field's source or `pending` or `unarmed`, and `loop: items · <n>
 read · <p> pending · <u> unarmed`. It then prints the witness classes, one line per witness alias and per witness, one
 line per list row with its build and the list's base line, the base or `no comparison` and why, the
 builds line, the folder or `foreign` and why, one `loop: computed-witness <name> · serves <tag> · class
@@ -146,6 +147,9 @@ ACTOR_LIST = "actor-witnesses.txt"
 STEP_TAGS = ("step.plan", "step.design", "step.build", "step.test", "step.deploy")
 #: A workflow's `step` when its work sits in no gov step.
 NO_STEP = "none"
+#: The breakpoint program: its rows' tag segment, `item.review.<name>`, each at step `NO_STEP`, and its
+#: key in `check_program`'s return (TOOL-dDeclaredLoop-50).
+REVIEW_PROGRAM = "review"
 #: The reach words that are no gov step: the entry step and the review breakpoint.
 REACH_WORDS = ("entry", "review")
 #: One word of a disposition set or an outcome set: the segment a tag is composed of.
@@ -174,6 +178,8 @@ PLANTS = {"missing-step": "the step.deploy row taken out",
           "actor-list-no-build": "a row naming dNoSuchBuild in the list and its base",
           "actor-list-foreign": "the builds folder read as a tree whose conf sets no DESIGN_RECORD reads it",
           "needs-cycle": "item.plan.dedupe given a need on item.plan.triage-rule, which needs it",
+          "step-none-outside-review": "item.plan.place's step set to none, the breakpoint program's step",
+          "review-step-named": "item.review.pin's step set to step.design",
           "needs-unresolved": "item.plan.triage-oracle added to item.plan.record's any-of need",
           "outcome-unrouted": "item.plan.place's route for unplaced taken out",
           "route-unresolved": "item.plan.place's placed outcome routed to item.plan.leas",
@@ -818,9 +824,11 @@ def check_program(data, where, layers, stages=()):
     which leaves the inputs unchecked. `stages` are the composed repository stage tags,
     `step.adopter.<name>` (TOOL-dDeclaredLoop-25): an item tagged `item.adopter.<name>.<item>` whose
     `step.adopter.<name>` is one of them is that stage's, and the stage's program is returned beside the
-    five. LoopError naming `where`, the item and the field that does not
-    hold: a tag opening no `item.<step>.` of a gov step nor `item.adopter.<stage>.` of a composed stage,
-    a `step` other than that one, or a tag given
+    five. An item tagged `item.review.<name>` is the breakpoint program's, its `step` `none`, and that
+    program is returned under the key `review` (TOOL-dDeclaredLoop-50). LoopError naming `where`, the item
+    and the field that does not hold: a tag opening no `item.<step>.` of a gov step, no
+    `item.adopter.<stage>.` of a composed stage and no `item.review.`, a `step` other than that one, or a
+    tag given
     twice; a need naming no declared item, or a needs cycle, each cycle named once; an outcome set that
     does not hold; routes that are not exactly the outcomes, or a target that is no declared item,
     `transition` or `stand-in:{prefix}/<home>/<file>`; an input naming no layer tag; and a step whose
@@ -840,6 +848,10 @@ def check_program(data, where, layers, stages=()):
             if row.get("step") != stage:
                 raise LoopError(where, "the item %s step %r is not %s, the stage its tag opens" % (
                     tag, row.get("step"), stage))
+        elif len(parts) == 3 and parts[:2] == ["item", REVIEW_PROGRAM] and parts[2]:
+            if row.get("step") != NO_STEP:
+                raise LoopError(where, "the item %s step %r is not %s, the breakpoint program's step" % (
+                    tag, row.get("step"), NO_STEP))
         elif len(parts) != 3 or parts[0] != "item" or parts[1] not in steps or not parts[2]:
             raise LoopError(where, "item row %d tag %r opens no item.<step>. of a gov step: %s" % (
                 n, tag, " ".join(steps)))
@@ -896,7 +908,9 @@ def check_program(data, where, layers, stages=()):
         exit_tag = row.get("exit")
         if exit_tag not in declared or declared[exit_tag]["step"] != row.get("tag"):
             raise LoopError(where, "the step %s exit %r is no declared item of that step" % (row.get("tag"), exit_tag))
-    return {s: [t for t in order if declared[t]["step"] == s] for s in (*STEP_TAGS, *stages)}
+    program = {s: [t for t in order if declared[t]["step"] == s] for s in (*STEP_TAGS, *stages)}
+    program[REVIEW_PROGRAM] = [t for t in order if declared[t]["step"] == NO_STEP]
+    return program
 
 
 def read_role_defaults(kit_dir):
@@ -1120,6 +1134,10 @@ def write_loop_plant(data, case, rows, base_rows):
         items = {r.get("tag"): r for r in data.get("item", [])}
         if case == "needs-cycle":
             items["item.plan.dedupe"]["needs"].append("item.plan.triage-rule")
+        elif case == "step-none-outside-review":
+            items["item.plan.place"]["step"] = NO_STEP
+        elif case == "review-step-named":
+            items["item.review.pin"]["step"] = "step.design"
         elif case == "needs-unresolved":
             items["item.plan.record"]["needs"][0].append("item.plan.triage-oracle")
         elif case == "outcome-unrouted":

@@ -93,7 +93,8 @@
 #
 # One [[item]] row per item of a gov step's program (TOOL-dDeclaredLoop-12), after every table above:
 #   tag        the item's tag, `item.<step>.<name>`, a member of the `item` namespace
-#   step       the [[step]] tag its tag opens
+#   step       the [[step]] tag its tag opens; "none" for a tag `item.review.<name>`, the breakpoint
+#              program's, which sits in no step (TOOL-dDeclaredLoop-50)
 #   actor      `<kind>:<name>`, one actor of one kind: role, command, executor, hook or owner, or the
 #              bare `executor` or `owner`; a role's name is its role file's stem, such as gov-builder
 #   needs     the items it waits for: each entry a tag, or a list of tags any one of which meets it; []
@@ -1022,6 +1023,11 @@ item = "item.plan.place"
 outcome = "unplaced"
 by = "dRankedPlan"
 
+[[owed-row]]
+item = "item.review.dispose"
+outcome = "plan-revision"
+by = "dRankedPlan"
+
 [[record-version]]
 kind = "record-kind.acceptance"
 version = 1
@@ -1862,6 +1868,83 @@ outcomes = ["closed", "red-wait"]
 witness = { class = "history", by = "the transition record" }
 owner = "dShippedRelease"
 routes = { closed = "transition", red-wait = "stand-in:{prefix}/memory-tree/build_records.py" }
+
+# ---- The review program ------------------------------------------------------------------------------
+
+[[item]]
+tag = "item.review.trigger"
+step = "none"
+actor = "command:review.trigger"
+needs = []
+inputs = ["layer.flow:the subject's review rows and the review policy keys"]
+allowance = "none"
+returns = "record-kind.review-trigger"
+outcomes = ["fired", "refused"]
+witness = { class = "history", by = "the trigger line the trigger verb prints, joined to the review record's trigger= field" }
+owner = "dDeclaredLoop"
+routes = { fired = "item.review.pin", refused = "stand-in:{prefix}/unattended/unattended.sh" }
+
+[[item]]
+tag = "item.review.pin"
+step = "none"
+actor = "command:review.pin"
+needs = ["item.review.trigger"]
+inputs = ["layer.memory:the subject paths and the trigger line"]
+allowance = "none"
+returns = "record-kind.review-pin"
+outcomes = ["pinned"]
+witness = { class = "history", by = "the pin line, joined to the trigger line" }
+owner = "dFairHearing"
+routes = { pinned = "item.review.report" }
+
+[[item]]
+tag = "item.review.report"
+step = "none"
+actor = "command:review.report"
+needs = ["item.review.pin"]
+inputs = ["layer.memory:the pinned subjects"]
+allowance = "the review record"
+returns = "record-kind.review"
+outcomes = ["reported"]
+witness = { class = "history", by = "the review record" }
+owner = "dFairHearing"
+routes = { reported = "item.review.dispose" }
+
+[[item]]
+tag = "item.review.dispose"
+step = "none"
+actor = "command:review.dispose"
+needs = ["item.review.report"]
+inputs = ["layer.memory:the review record"]
+allowance = "the build's units and asks"
+returns = "record-kind.review-disposal"
+outcomes = ["fold", "unit", "ask", "intake", "plan-revision", "released"]
+witness = { class = "history", by = "each confirmed finding joined to its fold, unit or ask" }
+owner = "dDeclaredLoop"
+routes = { fold = "item.review.fold", unit = "transition", ask = "stand-in:{prefix}/memory-tree/backlog.py", intake = "stand-in:{prefix}/memory-tree/backlog.py", plan-revision = "item.plan.record", released = "stand-in:{prefix}/unattended/unattended.sh" }
+
+[[item]]
+tag = "item.review.fold"
+step = "none"
+actor = "role:gov-spec-writer"
+needs = ["item.review.dispose"]
+outcomes = ["next-round", "released", "at-bound"]
+witness = { class = "history", by = "each confirmed finding joined to its fold at the spec's new blob, which the re-invoke's prevSubjects pins" }
+owner = "dDeclaredLoop"
+routes = { next-round = "item.review.trigger", released = "stand-in:{prefix}/unattended/unattended.sh", at-bound = "item.review.dispose" }
+
+[[item]]
+tag = "item.review.cost"
+step = "none"
+actor = "command:review.cost"
+needs = ["item.review.report"]
+inputs = ["layer.memory:the review record's review-shape line"]
+allowance = "the review-shape line"
+returns = "record-kind.review-shape"
+outcomes = ["done"]
+witness = { class = "history", by = "the review-shape line's cost fields" }
+owner = "dDeclaredLoop"
+routes = { done = "stand-in:{prefix}/unattended/unattended.sh" }
 
 # One [[selects]] row per policy value that selects a component a layer point stands for
 # (TOOL-dDeclaredLoop-2 S8): `key` the policy key, `value` its value, `point` the layer point the value

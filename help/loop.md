@@ -1490,7 +1490,8 @@ parked build.
 - **Read the loop:** `python tools/loop/loop_lib.py --check` prints one line per step and per <!-- usage: script:tools/loop/loop_lib.py 8a025e56 -->
   workflow with its order, step and reach word, then the dispositions and one line per alias. It
   prints one `loop: program` line per step, with its items in an order where each comes after the
-  items it needs. Where the playbook kit is not installed, a `loop: inputs unarmed` line comes first
+  items it needs, then a `loop: program review` line for the review program, whose items are tagged
+  `item.review.<name>`, carry the step `none` and sit in no step. Where the playbook kit is not installed, a `loop: inputs unarmed` line comes first
   and the inputs go unchecked. Then it prints one `loop: item` line per item, saying where each of
   its fields comes from, or `pending` or `unarmed`, and a `loop: items` count line. Then it
   prints the witness classes, one line per witness alias and per step's and item's witness, one line per
@@ -1506,6 +1507,7 @@ parked build.
   loop: dispositions continue amend new patch repeat unit breakpoint ask none
   loop: disposition-alias defer · means ask
   loop: program step.test · 10 item(s) · item.test.merge item.test.select item.test.verdict ...
+  loop: program review · 6 item(s) · item.review.trigger item.review.pin item.review.report item.review.cost item.review.dispose item.review.fold
   loop: item item.plan.place · command:plan.place · inputs from item · allowance the plan view from item · returns from item
   loop: item item.build.unit-pass · role:gov-builder · inputs from role:gov-builder · allowance product from role:gov-builder · returns from role:gov-builder
   loop: item item.design.inventory · role:gov-architect · pending · the roles kit holds no gov-architect role
@@ -1544,8 +1546,9 @@ parked build.
   `witness-bad-class`, `witness-actor-unlisted`, `witness-actor-listed` (which reads clean),
   `actor-list-grown`, `actor-list-stale`, `actor-list-no-build` and `actor-list-foreign` (which reads
   the builds folder as foreign, prints each row `foreign build` and exits 0). The program cases are
-  `needs-cycle`, `needs-unresolved`, `outcome-unrouted`, `route-unresolved`, `input-no-layer` and
-  `exit-missing`. The actor cases are `actor-two` (two actors on one item), `actor-bad-kind`,
+  `needs-cycle`, `step-none-outside-review` (a step's item given the review program's step `none`),
+  `review-step-named` (a review item given a step), `needs-unresolved`, `outcome-unrouted`,
+  `route-unresolved`, `input-no-layer` and `exit-missing`. The actor cases are `actor-two` (two actors on one item), `actor-bad-kind`,
   `witness-missing` (an item with no witness), `allowance-missing` (a command item with no
   allowance), `role-copy` (a role item repeating its role's allowance), `role-widen` (a role item
   given a wider allowance), `role-pending` (a role the roles kit does not hold, which prints `pending`
