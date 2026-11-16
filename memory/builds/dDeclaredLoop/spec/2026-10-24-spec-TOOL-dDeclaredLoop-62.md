@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-62 — the transition-record merge driver chosen against the recorded union measurement and the row driver's own refusal
 
-**Status:** INPROGRESS · rev-3 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 30 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-4 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 30 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-62-deviation-621.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-62-deviation-621.md) | deviation | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-62-1-builder-return.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-62-1-builder-return.md) | journal | — |
 | [2026-11-16-build-TOOL-dDeclaredLoop-62-deviation-622.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-62-deviation-622.md) | deviation | — |
+| [2026-11-16-build-TOOL-dDeclaredLoop-62-deviation-623.md](../build/2026-11-16-build-TOOL-dDeclaredLoop-62-deviation-623.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-62-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-62-1-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-62-2-spec-brief.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-62-2-spec-brief.md) | research | — |
@@ -53,8 +54,9 @@ with `git check-attr` as rev-2's AC1 did. And one distinct draw merged against o
   `tools/loop/budget.py#PLANTS`, so `--selftest` runs it. It shares the existing `parallel-append`
   branch of `tools/loop/budget.py#run_budget_plant`, which becomes one branch for both cases, as
   `patch-draw` and `patch-trailer-only` share one: the record, the tree's merge attribute copied into
-  the fixture and the branch `side` as today, then one draw on `main` and, for the new case, two on
-  `side`, each on its own item, then the merge. The new case reads the merged rows and `budget_state`.
+  the fixture and the branch `side` as today, then one draw on `main` and the side draws, then the
+  merge. `parallel-append` keeps `TOOL-dDeclaredLoop-61`'s side draw, the item `main` drew; the new
+  case draws two on `side`, each on its own item. The new case reads the merged rows and `budget_state`.
   Observed by AC2.
 - **S3** — Every draw the shared branch makes is held to append only: the record's bytes after the
   draw start with its bytes before it and are longer, a check on each draw of both cases. Observed by
@@ -116,11 +118,13 @@ ran on a `git archive` snapshot of `fd9a9084` in the session scratchpad, git 2.5
 - Probe 2, PINNED 2026-11-16: `git merge-file --union` over the same uneven record exited 0 holding
   four draw rows PINNED, ours first, and `sort | uniq -d` printed no draw row; over the two id-bearing
   rows on one item it exited 0 keeping both.
-- `tools/loop/budget.py#run_budget_plant` at `fd9a9084` serves `patch-draw` and `patch-trailer-only`
-  from one branch, and its `parallel-append` branch reads the tree's attribute with
-  `read_git(KIT, "rev-parse", "--show-toplevel")` and `check-attr merge`, copies it into the fixture,
-  draws on `main` and on `side`, merges with `read_git`, then checks its figures. `PLANTS` holds 16
-  PINNED keys.
+- `tools/loop/budget.py#run_budget_plant` at `52961e46`, after `TOOL-dDeclaredLoop-61` built at
+  `bbb9e82c2`, serves `patch-draw` and `patch-trailer-only` from one branch, and its `parallel-append`
+  branch reads the tree's attribute with `read_git(KIT, "rev-parse", "--show-toplevel")` and
+  `check-attr merge`, copies it into the fixture, draws `TOOL-<fx>-1` on `main` and the same item on
+  `side`, merges with `read_git`, then checks that the rows are that item's `1/4` row twice with two
+  draw ids, `budget_state` and a third draw. Its `draw-id-rows` branch writes rows into one record
+  and merges nothing. `PLANTS` holds 17 PINNED keys.
 
 ### The comment
 
@@ -150,7 +154,7 @@ The widest line is 98 columns PINNED, inside the file's 100. The comment names n
 elif case in ("parallel-append", "parallel-append-uneven"):
   move to planning -> <rel>; the tree's merge attribute copied into the fixture; git branch side
   main: draw TOOL-<fx>-1
-  side: draw TOOL-<fx>-2                        parallel-append
+  side: draw TOOL-<fx>-1, the same item         parallel-append, as TOOL-dDeclaredLoop-61 built it
   side: draw TOOL-<fx>-2, then TOOL-<fx>-3      parallel-append-uneven
   each draw: <rel>'s bytes after start with its bytes before and are longer, else a miss naming it
   git checkout main; merge side -> rc 0, else a miss naming the attribute, as today
@@ -205,18 +209,19 @@ No function, constant or flag is minted, so no name goes to `python tools/lexico
     edit. `parallel-append` gains the append-only check on its two draws; `write_budget_rows` appends,
     so it holds, and that plant's own checks are unchanged.
   - the leg's `ceiling` of 300 PINNED in `tools/gate-legs.json` is a hang bound: the direct-CLI
-    readings summed 224 seconds PINNED before this unit, and one plant costing about what
-    `parallel-append` costs stays under it. Should the order-30 plants together carry the sum past
+    readings summed 226 seconds PINNED at `52961e46`, before this unit, and one plant costing about
+    what `parallel-append` costs stays under it. Should the order-30 plants together carry the sum past
     300 PINNED, the builder stops and records it rather than raising the ceiling.
   - `every held leg is budgeted, every budget row resolves`: the leg keeps its row, re-priced per S4
-    from 336 PINNED (224 seconds PINNED x1.5, 2026-11-16).
+    from 339 PINNED (226 seconds PINNED x1.5 over seventeen plants, 2026-11-16, at `52961e46`).
   - `lexicon naming predicates`: no function is minted, so `VERB_OFFENDER_PIN` in `.lexicon.conf` stays
     1215 PINNED.
   - `help page commands`: no verb or flag is added. The plant is a value of `--plant=`, which the usage
     row `script:{prefix}/loop/budget.py` in `tools/govkit/usage.toml` lists as a flag; the fingerprint
     `tools/govkit/docs_leg.py#derive_usage_fingerprint` hashes the row, not its values, so no anchor on
-    `help/loop.md` moves. No help paragraph changes: its union paragraph, "two byte-identical rows are
-    kept once", stays true.
+    `help/loop.md` moves. No help paragraph changes: its union paragraph as `TOOL-dDeclaredLoop-61`
+    wrote it, "Union keeps two byte-identical rows once, and the draw id is what keeps two parallel
+    draws apart", stays true.
   - `install-prefix (shipped surface)`: the plant's messages name no kit path; `.gitattributes` and the
     budget row do not ship with the kit.
   - `encoding posture (text IO names its encoding)`: the check reads bytes; the plant writes through
@@ -243,12 +248,13 @@ No function, constant or flag is minted, so no name goes to `python tools/lexico
     written as a new file on both sides by two parallel backward moves, which union keeps as both
     bodies.
 - dependency — order 30, built beside `TOOL-dDeclaredLoop-31`, `TOOL-dDeclaredLoop-60` and
-  `TOOL-dDeclaredLoop-61`, read on their committed specs at rev-3, rev-3 and rev-2. The comment names
-  61's draw id, so this unit lands with or after 61. 61's S4 adds the plant `parallel-append-identical`,
-  which merges under the tree's attribute as `parallel-append` does: whichever of the two lands second
-  joins its case to the shared branch rather than copying the steps. 60 and 61 each add `PLANTS` keys
-  and re-price the same budget row, so the last to land re-reads the row's figures. 31 touches neither
-  file's lines this unit writes. `TOOL-dDeclaredLoop-32` (order 29, rev-5) adds a `budget.py` verb and
+  `TOOL-dDeclaredLoop-61`, with 31 and 60 read on their committed specs at rev-3 and rev-3. The comment
+  names 61's draw id, and 61 has landed, built at `bbb9e82c2` on its §8 F4 option (b): it extended
+  `parallel-append` to draw one item alike on `main` and `side`, the rows differing in their draw id
+  alone, and added the plant `draw-id-rows`; the shared branch of S2 keeps that extended
+  `parallel-append` as it is. 60 adds `PLANTS` keys and re-prices the same budget row, so whichever of
+  60 and this unit lands second re-reads the row's figures. 31 touches neither file's lines this unit
+  writes. `TOOL-dDeclaredLoop-32` (order 29, rev-5) adds a `budget.py` verb and
   no plant.
 - testing — AC1 direct, AC2 and AC3 as the plant; the arm under §7, observed RED then GREEN at the
   close.
@@ -259,10 +265,10 @@ Commands that re-derive the counts above, on the branch:
 
 ```
 B=branch/unattended-declared-loop-d56bf0
-git show "$B:tools/loop/budget.py" | sed -n '/^PLANTS = /,/}$/p' | grep -c '": "'            # 16
+git show "$B:tools/loop/budget.py" | sed -n '/^PLANTS = /,/}$/p' | grep -c '": "'            # 17
 git show "$B:.gitattributes" | grep -n -E 'merge=(rows|ours|union)'
 git show "$B:.lexicon.conf" | grep '^VERB_OFFENDER_PIN='                                      # 1215
-git show "$B:tools/run-gates/selftest-budgets.txt" | grep '^loop budget fixtures'               # 336
+git show "$B:tools/run-gates/selftest-budgets.txt" | grep '^loop budget fixtures'               # 339
 ```
 
 ## 6. Acceptance criteria
@@ -326,6 +332,12 @@ New arm: tools/loop/budget.py · covers AC2 AC3 · the `parallel-append-uneven` 
   re-run on the bare rows the writer writes, where the row driver conflicts rather than refuses; the
   comment's text written out; the uneven merge and the append-only check one plant on the shared
   `parallel-append` branch (F3); the budget row re-priced; §5 the sweep; line citations re-read.
+- rev-4 · 2026-11-16 · S2 · §4 §5 · re-grounded on TOOL-dDeclaredLoop-61 as built at `bbb9e82c2`, per
+  the return `2026-11-16-build-TOOL-dDeclaredLoop-62-1-builder-return`: the shared branch keeps 61's
+  same-item side draw for `parallel-append`, and only `parallel-append-uneven` draws its own items on
+  `side`; §5 dependency names 61's extended `parallel-append` and its `draw-id-rows` plant as what
+  landed, the joining clause dropped; the figures refreshed to 17 `PLANTS` keys, the budget row's 339
+  from 226 seconds, and the help/loop.md quote 61 wrote.
 
 ## 10. Reuse audit
 
