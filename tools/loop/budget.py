@@ -5,6 +5,7 @@
     python budget.py value
     python budget.py target --build <slug> --item <item>
     python budget.py ending --build <slug>
+    python budget.py origin --build <slug>
     python budget.py --fixture --plant <case>
     python budget.py --selftest
 
@@ -77,7 +78,15 @@ the unattended driver reads after a round's draw (TOOL-dDeclaredLoop-32); it dra
 `loop: budget · ending · <ending|none> · <open|unfrozen|spent> <spent>/<total> · open <ids|none> ·
 disposed <word|unrecorded>`, exit 0, the ending `derive_ending`'s where the state is `spent` and `none`
 otherwise, the ids the units whose status is neither `CLOSED` nor `WONTDO`; the unattended driver's
-`--exhausted` reads it. `--fixture --plant <case>` builds a scratch repository under the
+`--exhausted` reads it. `origin` prints `loop: budget · origin · <slug|none>`, exit 0, the build
+`derive_patch_origin` answers, the one whose budget a patch build draws on; the unattended driver asks
+it of each live claim before a patch build draws, and refuses the draw where another live run is a
+patch of the same origin (TOOL-dDeclaredLoop-67 S35). After a draw appended to a transition log record,
+`draw` reads `git check-attr merge` on that record once, and where it answers anything but `union`
+prints, after the verdict, `loop: budget · notice · <record> merges as <answer>, not union: add
+<root>/builds/*/build/*-transition-*.md merge=union to .gitattributes`, the root the module reads (S34):
+two worktrees' draws on one record are two appended rows, which only a union merge keeps both of.
+`--fixture --plant <case>` builds a scratch repository under the
 host temp directory, runs the case and prints `held` or `MISSED`; `--selftest` runs every plant.
 
 WHAT THIS DOES NOT CHECK: two racing draws, which are two rows; a row typed by hand with a right
@@ -172,7 +181,11 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
           "no-own-conf-read": "this module's own file graded on its syntax tree for a reader call or a conf name, "
                               "no scratch repository",
           "root-source": "MEMORY_ROOT=records in .unattended.conf, then in .memory-tree.conf, then neither, each "
-                         "folder's root and the conf it came from"}
+                         "folder's root and the conf it came from",
+          "attr-missing": "a draw appended to a log record in a scratch repository with no .gitattributes, then one "
+                          "under the union line",
+          "patch-concurrent": "the sourced driver's draw for tFixPatch, its claims read standing in with one live row "
+                              "naming tFixPatchTwo, a patch of the same origin, then one naming tFix, no patch"}
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
 PLANT_TRAILER = '[transitions]\nrecord = ["trailer"]\n'
 PLANT_SPEC = "# TOOL-%s-%d — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n"
@@ -394,13 +407,21 @@ def freeze_budget(build, root):
     return FREEZE_ROW % (units, base + per * units)
 
 
-def record_draw(build, cause, item, root=".", lines=None, moves=None, notes=None):
+def read_merge_attribute(root, rel):
+    """What `git check-attr merge` answers for `rel` in `root`: `union`, `unspecified`, `set` or another
+    driver; `unread` where git cannot answer."""
+    rc, out = read_git(root, "check-attr", "merge", "--", rel)
+    return out.rsplit(": ", 1)[-1].strip() if rc == 0 and out else "unread"
+
+
+def record_draw(build, cause, item, root=".", lines=None, moves=None, notes=None, merges=None):
     """`("drawn", row)` after writing one draw row of `build`, a freeze row before it where one is owed,
     or `("exhausted", "<slug> · <spent>/<total>")` writing nothing. Where `lines` is a list the rows are
     added to it, the transition writer's record, and no file is written, save a patch build's, which
     lands on its originating build's home, or, where that build holds no log record and the set holds no
     `log`, on the patch build's own run-state file, each row suffixed ` · budget <origin>` and the answer
-    with it. Where `notes` is a list it is extended with the `disagree` entries of the build drawn on.
+    with it. Where `notes` is a list it is extended with the `disagree` entries of the build drawn on, and
+    where `merges` is one, a draw committed to a log record adds `(record, its merge attribute)` to it.
     ValueError on a cause outside `CAUSES`, a derived cause given, an item outside `VALUE`, or a
     build with no home, a patch build with no run-state file under that rule among them."""
     if cause.startswith(PATCH):
@@ -446,6 +467,8 @@ def record_draw(build, cause, item, root=".", lines=None, moves=None, notes=None
     if read_git(root, "commit", "-q", "--only", "-m", subject, "--", held["home"])[0] != 0:
         path.write_bytes(before)
         raise ValueError("git could not commit the draw on %s, so nothing is drawn" % held["home"])
+    if merges is not None:   # TOOL-dDeclaredLoop-67 S34: the record's merge rule, read once
+        merges.append((held["home"], read_merge_attribute(root, held["home"])))
     return "drawn", row
 
 
@@ -1009,6 +1032,65 @@ def run_budget_plant(case):
             check(FREEZE_ROW % (1, 6) in text and all("fix-pass · %s · %d/6 · " % (FX_UNIT, n) in text for n in (1, 2)),
                   "the run-state file under records/ does not hold the freeze row and both draws")
             check(state == "open 2/6", "budget_state answers %s" % state)
+        elif case == "attr-missing":   # TOOL-dDeclaredLoop-67 AC11 (S34): a log record no union line covers
+            run_move("planning", "item.plan.exit", "recorded")
+            notice = "%s: budget · notice · " % SAY
+            for name, attrs, owed in (("no .gitattributes", None, 1), ("the union line", "merge=union", 0)):
+                if attrs:
+                    write_fixture_files(top, {".gitattributes": "%s/builds/*/build/*-transition-*.md %s\n" % (
+                        resolve_memory_root(top), attrs)})
+                    run_fixture_git(top, "add", "-A")
+                    run_fixture_git(top, "commit", "-q", "-m", "the transition records merge as union")
+                rc, out = run_verb(draw + [FX_UNIT])
+                said = [ln for ln in out.splitlines() if ln.startswith(notice)]
+                check(rc == 0 and len(said) == owed and all("merge=union to .gitattributes" in ln for ln in said),
+                      "under %s the draw exited %d printing %d notice(s), owed %d: %r" % (name, rc, len(said), owed,
+                                                                                         out.strip()))
+        elif case == "patch-concurrent":   # TOOL-dDeclaredLoop-67 AC24 (S35): two live patch runs of one origin
+            import subprocess
+            from loop_lib import resolve_kit_dir
+            from loop_witness import HOLD_CONF, read_clean_env, resolve_bash
+            driver = resolve_kit_dir("unattended", "unattended.sh", KIT) / "unattended.sh"
+            bash = resolve_bash(driver)
+            if bash is None:
+                raise LookupError("no bash can run %s" % driver.as_posix())
+            head = run_fixture_git(top, "rev-parse", "HEAD")
+            landed = {"build": FX_BUILD, "from": "deploying", "to": "landed", "item": "item.deploy.close", "sha": head[:8]}
+            write_transition_record(top, FX_UNIT, landed)
+            peer = PATCH_BUILD + "Two"
+            readme = ("---\nslug: %s\nnode: a\nopened: 2026-01-01\nstreams: tooling\nroster: TOOL\nids: TOOL-%s-1\n"
+                      "parents: %s\n---\n# %s\n")
+            write_fixture_files(top, dict({"%s/builds/%s/README.md" % (resolve_memory_root(top), b): readme % (
+                b, b, FX_BUILD, b) for b in (PATCH_BUILD, peer)}, **{".unattended.conf": HOLD_CONF}))
+            run_fixture_git(top, "add", "-A")
+            run_fixture_git(top, "commit", "-q", "-m", "landed\n\n%s" % render_transition_trailer(landed))
+            for b in (PATCH_BUILD, peer):
+                patch = {"build": b, "from": "planning", "to": "designing", "item": "item.plan.exit",
+                         "sha": head[:8], "scenario": PATCH_SCENARIO}
+                run_fixture_git(top, "commit", "-q", "--allow-empty", "-m", "patch\n\n%s" % render_transition_trailer(patch))
+            record = pathlib.Path(top, read_transition_records(FX_BUILD, top)[-1]["path"])
+            script = ('load_driver_conf || exit 3; fx_claimed=$1; '
+                      'read_claims() { CLAIM_ROWS=$(printf "%s\\tnode-b\\tlive\\t5\\tlive\\t-\\t-\\t-\\t-\\t-\\t-" "$fx_claimed"); '
+                      'return 0; }; run_budget_draw "$2" fix-pass item.deploy.close; '
+                      'printf "draw · rc %s · %s\\n" "$_bd_rc" "$_bd_why"')
+            row = "draw · patch:%s · item.deploy.close · 1/4" % PATCH_BUILD
+            for name, claimed, refused in (("a live patch peer", peer, True), ("a live build that is no patch", FX_BUILD,
+                                                                                   False)):
+                before = record.read_bytes()
+                p = subprocess.run([bash, "-c", '. "$1" || exit 2; shift; ' + script, "_", driver.as_posix(), claimed,
+                                    PATCH_BUILD], cwd=str(top), capture_output=True, text=True, encoding="utf-8",
+                                   errors="replace", env=dict(read_clean_env(), GOV_DEFAULT_BRANCH="main"), timeout=600)
+                said = next((ln for ln in p.stdout.splitlines() if ln.startswith("draw · rc ")), "no draw line")
+                print("%s: fixture · patch-concurrent · %s · exit %d · %s" % (SAY, name, p.returncode, said))
+                if refused:
+                    owed = "draw · rc 2 · budget: patch draw refused — %s on node-b is a live patch run of %s" % (peer, FX_BUILD)
+                    check(said == owed and record.read_bytes() == before,
+                          "the second patch draw read %r, owed %r, the record %s" % (
+                              said + " " + p.stderr.strip()[-300:], owed,
+                              "unchanged" if record.read_bytes() == before else "written"))
+                else:
+                    check(said.startswith("draw · rc 0 · %s: budget · drawn · %s" % (SAY, row)) and row in record.read_text(
+                        encoding="utf-8"), "the control draw read %r: %s" % (said, p.stderr.strip()[-300:]))
         elif case == "confs-disagree":   # TOOL-dDeclaredLoop-72 AC3: two confs naming two roots
             write_fixture_files(top, {".unattended.conf": "MEMORY_ROOT=records\n"})
             run_fixture_git(top, "add", "-A")
@@ -1054,14 +1136,18 @@ def main(argv):
             for flag in ("--build", "--cause", "--item"):
                 ap.add_argument(flag, required=True)
             args = ap.parse_args(argv[1:])
-            notes = []
-            answer, said = record_draw(args.build, args.cause, args.item, root, notes=notes)
+            notes, merges = [], []
+            answer, said = record_draw(args.build, args.cause, args.item, root, notes=notes, merges=merges)
             if answer == "exhausted":
                 print("%s: budget · exhausted · %s · %s" % (SAY, said, ENDING_KEY))
             else:
                 print("%s: budget · drawn · %s" % (SAY, said))
             for note in notes:   # after the verdict, which the driver keeps as the first line
                 print("%s: budget · disagrees · %s" % (SAY, note))
+            for record, merge in merges:
+                if merge != "union":
+                    print("%s: budget · notice · %s merges as %s, not union: add %s/builds/*/build/*-transition-*.md "
+                          "merge=union to .gitattributes" % (SAY, record, merge, resolve_memory_root(root)))
             return 3 if answer == "exhausted" else 0
         if argv[:1] == ["target"]:
             ap = argparse.ArgumentParser(prog="budget.py target", description="where a blocking item's open work goes")
@@ -1069,6 +1155,11 @@ def main(argv):
                 ap.add_argument(flag, required=True)
             args = ap.parse_args(argv[1:])
             print("%s: budget · target · %s" % (SAY, promotion_target(args.build, args.item, True, root)))
+            return 0
+        if argv[:1] == ["origin"]:   # TOOL-dDeclaredLoop-67 S35: the build a patch build's draws land on
+            ap = argparse.ArgumentParser(prog="budget.py origin", description="the build a patch build draws on")
+            ap.add_argument("--build", required=True)
+            print("%s: budget · origin · %s" % (SAY, derive_patch_origin(ap.parse_args(argv[1:]).build, root) or "none"))
             return 0
         if argv[:1] == ["ending"]:
             ap = argparse.ArgumentParser(prog="budget.py ending", description="the ending a spent budget takes")
@@ -1081,7 +1172,7 @@ def main(argv):
     except (ValueError, OSError) as e:
         print("%s: budget · refused · %s" % (SAY, e))
         return 2
-    print("usage: python budget.py draw --build <slug> --cause <%s> --item <item> | value | target --build <slug> --item <item> | ending --build <slug> | --fixture --plant <%s> "
+    print("usage: python budget.py draw --build <slug> --cause <%s> --item <item> | value | target --build <slug> --item <item> | ending --build <slug> | origin --build <slug> | --fixture --plant <%s> "
           "| --selftest" % ("|".join(CAUSES), "|".join(PLANTS)), file=sys.stderr)
     return 2
 

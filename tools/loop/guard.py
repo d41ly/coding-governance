@@ -57,7 +57,10 @@ first standard error line, and owes, with no exemption and whatever the combined
 trailer and record for each key its result sets apart from some parent, the old value the first such
 parent's. A commit or merge whose first
 parent lacks the file is printed and not graded. An all-zero
-base, a new ref, reads as the policy kit's `derive_landed_revision`, its Refusal an exit 2. Exit 1
+base, a new ref, reads as the policy kit's `derive_landed_revision`; where that refuses, a first push to
+an empty remote among the causes, the arm prints `push · no landed revision (<why>), graded over every
+commit touching <policy path>` and grades each commit `git log --full-history <tip> -- <policy path>`
+names, merges by the same key grade, exit 0 where none changes a key (TOOL-dDeclaredLoop-67 S33). Exit 1
 names the commit or merge and the key; at `floor.record-changes` `off` each finding is reported after
 `floor: record-changes off`, exit 0.
 
@@ -424,11 +427,20 @@ def check_push_range(base, tip):
         return 0
     try:
         floor = read_floor()
+        revs = ["%s..%s" % (base, tip)]
         if ZERO_SHA.fullmatch(base):
-            base, how = policy.derive_landed_revision(".")
-            print("%s: push · a new ref, graded past %s" % (SAY, how))
+            try:
+                base, how = policy.derive_landed_revision(".")
+                revs = ["%s..%s" % (base, tip)]
+                print("%s: push · a new ref, graded past %s" % (SAY, how))
+            except policy.Refusal as e:
+                # TOOL-dDeclaredLoop-67 S33: no landed revision, so every commit of the tip's history that
+                # touches the policy file is graded, never the arm left unjudged
+                revs = ["--full-history", tip, "--", mguard.POLICY]
+                print("%s: push · no landed revision (%s), graded over every commit touching %s" % (
+                    SAY, e, mguard.POLICY))
         from commit_trailers import read_commits
-        commits = read_commits(".", ["%s..%s" % (base, tip)], [TRAILER_KEY])
+        commits = read_commits(".", revs, [TRAILER_KEY])
         findings, graded = [], 0
         for c in commits:
             sha8, listed, state, clean, why = c["sha"][:8], None, None, None, None
@@ -566,7 +578,10 @@ PLANTS = {
                                "exits 129 with no usage text",
     "push-merge-old-git-usage": "push-merge-both-sides-clean's history graded in process by a git whose usage "
                                 "probe prints only the trivial form on standard error",
-    "push-new-branch": "an all-zero base read as origin's default tip, then that tracking ref deleted",
+    "push-new-branch": "an all-zero base read as origin's default tip, then that tracking ref deleted and every "
+                       "commit touching the policy file graded",
+    "push-first-to-empty-remote": "a first push to a remote holding no ref: the policy file's add and one trailered, "
+                                  "recorded change, then a merge resolution editing it with neither",
     "proof-signed-refuse": "policy_edit.py set policy-file.proof signed under refuse",
     "proof-signed-fallback": "policy_edit.py set policy-file.proof signed under fallback-reported",
     "set-run-live": "policy_edit.py set on a live run's branch, a key then a floor member",
@@ -943,6 +958,7 @@ def run_guard_plant(case, top):
     elif case == "push-new-branch":
         write_staged(top, {mguard.POLICY: add_text(FX_REVIEW)})
         run_fixture_git(top, "commit", "-q", "-m", "review rounds raised, no trailer")
+        raised8 = run_fixture_git(top, "rev-parse", "--short=8", "HEAD")
         run_fixture_git(top, "remote", "add", "origin", "fx-none.invalid")
         run_fixture_git(top, "update-ref", "refs/remotes/origin/main", "HEAD")
         run_fixture_git(top, "symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/main")
@@ -952,7 +968,30 @@ def run_guard_plant(case, top):
         zero, unset = ["--push-range", "%s..HEAD" % ("0" * 40)], {"GOV_REMOTE": "", "GOV_DEFAULT_BRANCH": ""}
         run_scenario("the all-zero base", me + zero, 0, "push · %s commit(s) read · 0 changing" % n, **unset)
         run_fixture_git(top, "update-ref", "-d", "refs/remotes/origin/main")
-        run_scenario("the tracking ref deleted", me + zero, 2, "refs/remotes/origin/main", **unset)
+        # TOOL-dDeclaredLoop-67 S33: no landed revision now grades the policy file's history, naming the raise
+        run_scenario("the tracking ref deleted", me + zero, 1, "commit %s · %s" % (raised8, mguard.POLICY), **unset)
+    elif case == "push-first-to-empty-remote":
+        # TOOL-dDeclaredLoop-67 AC23: a remote holding no ref names no landed revision, so the policy file's history
+        # is graded: its add is not, a trailered, recorded change is clean, an untrailered merge resolution is not
+        run_fixture_git(top, "remote", "add", "origin", "fx-none.invalid")
+        write_staged(top, {mguard.POLICY: add_text(FX_REVIEW)})
+        write_fixture_record(top, "policy.review.max-rounds")
+        run_fixture_git(top, "commit", "-q", "-m", "review rounds raised", "-m",
+                        "%s: policy.review.max-rounds none -> 4" % TRAILER_KEY)
+        zero, unset = ["--push-range", "%s..HEAD" % ("0" * 40)], {"GOV_REMOTE": "", "GOV_DEFAULT_BRANCH": ""}
+        run_scenario("the add and a trailered change", me + zero, 0, "push · no landed revision (", **unset)
+        out.append(("the add and a trailered change, the count", out[-1][1], 0,
+                    "push · 2 commit(s) read · 1 changing %s · 0 finding(s)" % mguard.POLICY, out[-1][4]))
+        run_fixture_git(top, "checkout", "-q", "-b", "side")
+        write_staged(top, {"fx-side.txt": add_text("side's own line\n")})
+        run_fixture_git(top, "commit", "-q", "-m", "side's own commit")
+        run_fixture_git(top, "checkout", "-q", "main")
+        run_fixture_git(top, "merge", "-q", "--no-ff", "--no-commit", "side")
+        write_staged(top, {mguard.POLICY: lambda text: text.replace("max-rounds = 4", "max-rounds = 5")})
+        run_fixture_git(top, "commit", "-q", "-m", "merge side")
+        sha8 = run_fixture_git(top, "rev-parse", "--short=8", "HEAD")
+        run_scenario("a merge resolution with neither", me + zero, 1,
+                     "merge %s · %s · review.max-rounds" % (sha8, mguard.POLICY), **unset)
     elif case in ("proof-signed-refuse", "proof-signed-fallback"):
         refuse = case == "proof-signed-refuse"
         run_scenario("set signed", edit + ["set", "policy-file.proof", "signed", *who], 2 if refuse else 1,
@@ -1104,7 +1143,8 @@ def run_selftest():
             "other-write-owner-only": 1, "with-reason-no-row": 1, "mandate-none": 1, "push-no-trailer": 1,
             "proof-signed-refuse": 2, "proof-signed-fallback": 1, "push-merge-resolution-edit": 1,
             "push-merge-revert-to-unchanged-side": 1, "push-merge-resurrect-deleted-policy": 1,
-            "push-merge-resurrect-emptied-policy": 1, "push-merge-unparseable-c": 1, "push-new-branch": 2,
+            "push-merge-resurrect-emptied-policy": 1, "push-merge-unparseable-c": 1, "push-new-branch": 1,
+            "push-first-to-empty-remote": 1,
             "push-merge-unrelated-histories": 1, "push-merge-tree-fatal": 1, "push-merge-probe-failed": 1,
             "push-merge-probe-silent": 1}
     cases = [(case, ["--fixture", "--plant", case], owed.get(case, 0), "%s: fixture · plant %s · " % (SAY, case),

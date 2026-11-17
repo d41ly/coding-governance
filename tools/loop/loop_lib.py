@@ -4,6 +4,7 @@
     python loop_lib.py --check                    # read the definition, print what was read
     python loop_lib.py --scopes                   # each item's instruction scope, derived
     python loop_lib.py --fixture --plant <case>   # read it with one break planted in memory
+    python loop_lib.py --selftest                 # every plant, each held to the exit and line it owes
     python loop_lib.py --grade-site <site> <entry>...   # grade one declaration site's witness entries
 
 The definition holds the gov steps as `[[step]]` rows and one `[[workflow]]` row per workflow of the roles
@@ -111,7 +112,9 @@ bounds unarmed · <why>` where the policy kit does not resolve (TOOL-dDeclaredLo
 the items, the list, the computed witnesses and the review bounds as `loop: refused · ...`, exit 1. `--fixture --plant <case>` reads the shipped
 definition and list with the named break made in memory, never on disk, the list's base being the
 shipped list as read, and exits 1 on the refusal the break must draw, 0 if the reader accepted it. The
-plants are `PLANTS`. `--grade-site <site> <entry>...` prints `loop: site <site> · <item> · <word> ·
+plants are `PLANTS`. `--selftest` runs every plant in process through `run_selftest_cases`, each owed the
+exit and line `PLANT_OWED` declares beside it, one PASS or FAIL line per plant and a summary, exit 0 only
+when every one holds (TOOL-dDeclaredLoop-67 S30); the `loop definition fixtures` leg runs it. `--grade-site <site> <entry>...` prints `loop: site <site> · <item> · <word> ·
 <class>` per entry, `· until <build>` on a `DOD_CORE` actor entry, `· adopter-declared, not on the
 shipped list` on a `DOD_EXTRA` one, then each refusal, and exits 0, or 1 on a refusal. `--scopes` prints `loop: scope <tag> · <derive's item line> · <the tags it lists, or none>` per
 item and exits 0, or 1 on a refused definition or a derive that exits non-zero. Exit 2 is a usage
@@ -199,6 +202,43 @@ PLANTS = {"missing-step": "the step.deploy row taken out",
           "roles-no-kit": "the roles kit resolved from an empty scratch directory",
           "computed-actor": "the acceptance computed witness's served item given witness class actor",
           "computed-unserved": "the acceptance computed witness set to serve item.build.acceptanc"}
+#: `--selftest`'s owed answer of each plant (TOOL-dDeclaredLoop-67 S30): its exit, the opening of a line
+#: it prints and a needle that line holds, each pair found by running the plant alone at the pass's base.
+#: A definition the reader refuses prints `loop: <path>: <why>`, a graded refusal `loop: refused · <why>`.
+PLANT_OWED = {"missing-step": (1, "loop: ", "the step step.deploy is missing"),
+              "reordered": (1, "loop: ", "the step step.test is out of order"),
+              "bad-step": (1, "loop: ", "step 'step.ship' is neither a declared step tag nor none"),
+              "bad-reach": (1, "loop: ", "reach 'revew' is not one of"),
+              "disposition-unknown": (1, "loop: ", "the disposition ask is given twice"),
+              "disposition-alias": (1, "loop: ", "means 'postpone', which is no member of the set"),
+              "witness-no-class": (1, "loop: ", "the step step.plan carries a witness with no class"),
+              "witness-bad-class": (1, "loop: ", "witness class 'agent-said' is no class and not refused"),
+              "witness-actor-unlisted": (1, "loop: refused · ", "the actor witness step.plan step.plan has no list row"),
+              "witness-actor-listed": (0, "loop: actor witness step.plan · step.plan · until ", ""),
+              "actor-list-grown": (1, "loop: refused · ", "is absent from the list at its compare base"),
+              "actor-list-stale": (1, "loop: refused · ", "the list row step.design step.design names no actor witness"),
+              "actor-list-no-build": (1, "loop: refused · ", "names the build dNoSuchBuild"),
+              "actor-list-foreign": (0, "loop: actor witness ", "foreign build, not graded"),
+              "needs-cycle": (1, "loop: ", "the item needs form a cycle"),
+              "step-none-outside-review": (1, "loop: ", "the item item.plan.place step 'none' is not step.plan"),
+              "review-step-named": (1, "loop: ", "the item item.review.pin step 'step.design' is not none"),
+              "needs-unresolved": (1, "loop: ", "needs item.plan.triage-oracle, which no [[item]] row declares"),
+              "outcome-unrouted": (1, "loop: ", "the item item.plan.place outcome unplaced has no route"),
+              "route-unresolved": (1, "loop: ", "routes placed to 'item.plan.leas'"),
+              "input-no-layer": (1, "loop: ", "names no layer tag"),
+              "exit-missing": (1, "loop: ", "the step step.plan exit 'item.design.exit' is no declared item"),
+              "scope-selected": (0, "loop: fixture · unit.loop-fixture listed on item.plan.record", ""),
+              "scope-no-kit": (0, "loop: scope ", " · unarmed · "),
+              "actor-two": (1, "loop: refused · ", "one actor per item"),
+              "actor-bad-kind": (1, "loop: refused · ", "actor kind agent is not one of"),
+              "witness-missing": (1, "loop: ", "carries no witness"),
+              "allowance-missing": (1, "loop: refused · ", "carries no allowance"),
+              "role-copy": (1, "loop: refused · ", "copies its role gov-builder's writes"),
+              "role-widen": (1, "loop: refused · ", "widens its role gov-reuse-scout"),
+              "role-pending": (0, "loop: item item.build.unit-pass · role:gov-no-such-role · pending", ""),
+              "roles-no-kit": (0, "loop: item ", " · unarmed · no roles kit holding"),
+              "computed-actor": (1, "loop: refused · ", "whose witness class actor is refused"),
+              "computed-unserved": (1, "loop: refused · ", "serves 'item.build.acceptanc'")}
 #: The plants whose break is in what the scope verb reads rather than in the definition, so `--check`
 #: runs whole and the scope verb runs after it.
 SCOPE_PLANTS = ("scope-selected", "scope-no-kit")
@@ -1311,8 +1351,12 @@ def run_selftest_cases(main, cases, label):
 
 
 def main(argv):
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if hasattr(sys.stdout, "reconfigure"):   # a selftest case runs in process with its output captured
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     kit_dir = pathlib.Path(__file__).absolute().parent
+    if argv == ["--selftest"]:   # TOOL-dDeclaredLoop-67 S30: every plant, each held to what PLANT_OWED says
+        return run_selftest_cases(main, [(p, ["--fixture", "--plant", p], *PLANT_OWED[p]) for p in PLANTS],
+                                  "loop: definition selftest")
     plant = argv[2] if len(argv) == 3 and argv[:2] == ["--fixture", "--plant"] else None
     if argv[:1] == ["--grade-site"] and len(argv) >= 2 and argv[1] in DECLARATION_SITES:
         try:
@@ -1326,7 +1370,8 @@ def main(argv):
             print("loop: refused · %s" % r)
         return 1 if refusals else 0
     if argv not in (["--check"], ["--scopes"]) and plant not in PLANTS:
-        print("usage: python loop_lib.py --check | --scopes | --fixture --plant <%s> | --grade-site <%s> <entry>..." % (
+        print("usage: python loop_lib.py --check | --scopes | --selftest | --fixture --plant <%s> | --grade-site <%s> "
+              "<entry>..." % (
             "|".join(PLANTS), "|".join(DECLARATION_SITES)), file=sys.stderr)
         return 2
     root = next((d for d in (kit_dir, *kit_dir.parents) if (d / ".git").exists()), kit_dir)

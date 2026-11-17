@@ -753,7 +753,8 @@ orders a build moves through, and the commands that read it, among them the posi
 `position.py`, the transition tables' `loop_table.py` and the parent route's `loop_parents.py`.
 `help/loop.md` is its page. It is in the default selection because the roles kit requires it: the
 roles kit's catalogue checker and its adopter read each workflow's order from this definition, so a
-selection holding `roles` and not `loop` is refused.
+selection holding `roles` and not `loop` is refused. `govkit apply` installs it, and `govkit update
+--write` installs it into a tree whose receipt predates it, printing `default-gained`.
 
 1. **What the install runs.** The kit renders nothing and seeds nothing, so its adopter has one verb:
    `bash <prefix>/loop/adopt-loop.sh --check` runs `loop_lib.py --check` beside it through the
@@ -1387,6 +1388,7 @@ it.
 ├── <prefix>/settings-merge.py   # the one writer of .claude/settings.json (default)
 ├── <prefix>/check-wiring.sh     # reports an unwired hook or an UNARMED ROUTED_PATHS (default)
 ├── <prefix>/roles/              # the role catalogue + its adopter; house/ overlays are yours (default)
+├── <prefix>/loop/               # the loop definition, its readers and its gates (default)
 ├── .claude/agents/<role>.md     # one rendered agent type per agent role (roles kit, §3g)
 ├── .claude/roles.json           # the role index the write gate and spawn guard arm on (roles kit)
 ├── .claude/skills/build/SKILL.md  # the rendered /build Skill (roles kit)

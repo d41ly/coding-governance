@@ -72,7 +72,8 @@ ref's `read —` line ends `fetched <n>s ago · from FETCH_HEAD|reflog|clone`, o
 and no ask stands), `awaiting` on an owed parked entry or an unpassed hold, `blocked` on a `parents:`
 build neither recorded nor derived `LANDED`, `act` with a next item, `awaiting` on an undecided ask, and
 `stuck` naming the step's unwitnessed exit. Line output is §4's six line kinds; `--json` the same fields
-as one object; `--next-line` the `next:` shape `render_next_line` picks from `NEXT_SHAPES`. Exit 0 for
+as one object, each unit carrying `acceptance_armed`, false exactly where its line ends `· acceptance
+unarmed` (TOOL-dDeclaredLoop-67 S50); `--next-line` the `next:` shape `render_next_line` picks from `NEXT_SHAPES`. Exit 0 for
 every answer but `invalid-input`, which exits 2.
 
 THE ABSENT REMOTE (TOOL-dDeclaredLoop-56 S36). Where the ladder names no remote and refuses nothing, or
@@ -162,7 +163,8 @@ PLANTS = {"steps": "unit 1 deployed, unit 2 built, unit 3 designed: act at unit 
           "frontier-bad-key": "--refused with a malformed key, then an undeclared tag: exit 1 each, the file unchanged",
           "frontier-none": "the step narrowed to A witnessed and an item whose need is unmet: no frontier",
           "plan-frontier": "the frontier-refused repository, then --plan: frontier: A beneath next:",
-          "built-unarmed": "A's pass commit and no record under the shipped stand-in writer: A built, tagged; --plan names B",
+          "built-unarmed": "B tested, then A's pass commit and no record under the shipped stand-in writer: A built, "
+                           "tagged, acceptance_armed false; --status names A",
           "built-unheld": "built-unarmed and a record naming A at a commit not attributed to A: A designed, no tag",
           "built-armed": "built-unarmed with the writer executor:build.acceptance, then no acceptance row: A designed",
           "plan-line": "the driver's next: line equals render_next_line's, in three states",
@@ -737,6 +739,10 @@ def write_position_plant(top, case, root):
             write_pass(uid)
     elif case.startswith("built-"):
         unattributed = run_fixture_git(repo, "rev-parse", "HEAD")  # the `fixture` commit names no unit
+        if case == "built-unarmed":   # TOOL-dDeclaredLoop-67 S50: B tested, ahead of A, so A is the least advanced
+            run_fixture_git(repo, "push", "-q", "origin", "main")
+            write_pass(FX_IDS[1])
+            run_facts += "gates-run: bar-1 %s\n" % run_fixture_git(repo, "rev-parse", "HEAD")[:8]
         write_pass(FX_IDS[0], record=False)
         if case == "built-unheld":
             read_memory_tree("build_records.py")
@@ -754,7 +760,7 @@ def write_position_plant(top, case, root):
     write_fixture_files(repo, {"memory/builds/%s/RUN.md" % FX_SLUG: run_facts})
     run_fixture_git(repo, "add", "-A")
     run_fixture_git(repo, "commit", "-q", "-m", "run state")
-    if remote and case not in ("steps", "plan-line", "status-line"):
+    if remote and case not in ("steps", "plan-line", "status-line", "built-unarmed"):
         run_fixture_git(repo, "push", "-q", "origin", "main")
     if remote:
         run_fixture_git(repo, "remote", "set-head", "origin", "main")
@@ -908,7 +914,7 @@ def check_plant(case, pos, rc, repo):
     lines = render_position_lines(pos)
     ref_line = next((ln for ln in lines if ln.startswith("read — refs/remotes/origin/main@")), "")
     want = {"built-unarmed": lambda: "unit — %s · built · acceptance unarmed" % FX_IDS[0] in lines
-            and "unit — %s · designed" % FX_IDS[1] in lines,
+            and "unit — %s · tested" % FX_IDS[1] in lines,
             "built-unheld": lambda: "unit — %s · designed" % FX_IDS[0] in lines,
             "built-armed": lambda: "unit — %s · designed" % FX_IDS[0] in lines,
 "frontier-chain": lambda: tags == [FX_B],
@@ -944,11 +950,24 @@ def check_plant(case, pos, rc, repo):
         if k1.split("#")[1] == k2.split("#")[1]:
             misses.append("an input SHA left the key unchanged")
     if case == "built-unarmed":
-        out = run_driver(repo, "--plan", FX_SLUG)[0]
-        line = next((ln for ln in out.splitlines() if ln.startswith("next: ")), None)
+        # TOOL-dDeclaredLoop-67 AC10 (S50): --json names the unarmed half, and the driver's --status reads the
+        # unarmed built unit's step past its tag, so A, the least advanced, is its next unit
+        p = subprocess.run([sys.executable, str(pathlib.Path(__file__).absolute()), FX_SLUG, "--json"], cwd=str(repo),
+                           capture_output=True, text=True, encoding="utf-8", errors="replace",
+                           env={k: v for k, v in os.environ.items() if k != HANDOVER})
+        try:
+            armed = {u["id"]: u.get("acceptance_armed") for u in json.loads(p.stdout)["units"]}
+        except (ValueError, KeyError, TypeError):
+            armed = {}
+        print("%s: fixture · %s · --json acceptance_armed %s" % (SAY, case, armed))
+        if armed.get(FX_IDS[0]) is not False or armed.get(FX_IDS[1]) is not True:
+            misses.append("--json read acceptance_armed %s, owed false for %s and true for %s: %s" % (
+                armed, FX_IDS[0], FX_IDS[1], (p.stdout + p.stderr)[-300:]))
+        out = run_driver(repo, "--status", FX_SLUG)[0]
+        line = next((ln for ln in out.splitlines() if ln.startswith("unattended: %s · phase " % FX_SLUG)), None)
         print("%s: fixture · %s · driver %r" % (SAY, case, line))
-        if line != "next: " + NEXT_SHAPES["live-unit"].replace("<id>", FX_IDS[1]):
-            misses.append("the driver's next: line was %r, owed %s's" % (line, FX_IDS[1]))
+        if not line or " · next %s" % FX_IDS[0] not in line:
+            misses.append("the driver's --status line was %r, owed next %s" % (line, FX_IDS[0]))
     return misses
 
 
@@ -1044,8 +1063,10 @@ def main(argv):
     rc, top = read_git(".", "rev-parse", "--show-toplevel")
     pos = derive_position(top if rc == 0 and top else ".", args.slug)
     if args.json:
-        # ponytail: the unarmed tag stays off --json until TOOL-dDeclaredLoop-67 S50 names its field
-        print(json.dumps(dict(pos, units=[{k: u[k] for k in ("id", "step", "state")} for u in pos["units"]]),
+        # TOOL-dDeclaredLoop-67 S50: the unarmed half as its own field, false exactly where the line ends
+        # `· acceptance unarmed`
+        print(json.dumps(dict(pos, units=[dict({k: u[k] for k in ("id", "step", "state")},
+                                               acceptance_armed=not u["unarmed"]) for u in pos["units"]]),
                          ensure_ascii=False))
     elif args.next_line:
         print(render_next_line(pos))

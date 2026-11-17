@@ -7,14 +7,19 @@
     python loop_witness.py --selftest
 
 `run_witness_commands(repo, sha, commands, timeout)` is the re-run: a detached worktree of `sha` in a
-temporary directory, each command run there as `bash -c <command>` with every name of the memory-tree
-kit's `GIT_ENV_LEAKS` unset, its exit status (or `timeout`) and the first twelve hex digits of the SHA-256
-of its combined output kept, and the worktree removed on every exit path. The bash is the inline
+temporary directory, each command run there as `bash -c <command>`, its exit status (or `timeout`) and the
+first twelve hex digits of the SHA-256 of its combined output kept, and the worktree removed on every exit
+path. Each command runs in the environment the run-gates kit's `regen.py` `run_command` gives its
+commands, the shape this follows (TOOL-dDeclaredLoop-67 S22): the caller's, every name of the memory-tree
+kit's `GIT_ENV_LEAKS` unset, `GIT_OPTIONAL_LOCKS=0` set and no inherited `PWD`. The bash is the inline
 `resolve_bash`'s, one that can see this file, and a call with none raises LookupError. Output goes to a
 file beside the worktree, never a pipe, read once the wait returns, so a grandchild holding it cannot hold
-the call; on the timeout the command's process tree is killed through the inline `run_tree_kill`. A
-worktree still on disk after the teardown is named on stderr, `loop-witness: leaked <path>`, never
-raised. The hash is taken after the run-gates kit's `write_normaliser` program, written once by one bash
+the call. Where `run_command` kills on its timeout alone, this calls the inline `run_tree_kill` after
+EVERY command, before any output is read (S37): on POSIX the command's own process group dies with it,
+a background grandchild included; on win32 `taskkill /T` walks the Windows process tree, which holds no
+MSYS parent edge (`tools/process-monitor/reap.py`'s module docstring), so a grandchild that outlives its
+bash is the stated limit there. A worktree still on disk after the teardown, held by such a survivor
+among other causes, is named on stderr, `loop-witness: leaked <path>`, never raised. The hash is taken after the run-gates kit's `write_normaliser` program, written once by one bash
 started in the worktree and applied with `LC_ALL=C sed -E -f` to each output: it strips the worktree's
 path, its realpath, the worktree as that bash's `pwd` prints it and the repository's path in each
 spelling, `tmp.` names, durations, CRs and trailing whitespace. A kit that does not resolve, found before
@@ -75,7 +80,18 @@ PLANTS = {"acceptance": "a unit's two commands re-run at its commit, an uncommit
           "bash-syntax": "a command only bash can run, re-run at its commit",
           "timeout-grandchild": "a command whose grandchild outlives its bound, re-run and torn down",
           "normalise": "a command printing its worktree and a duration, re-run twice at one commit",
-          "normaliser-missing": "the run-gates kit looked for from an empty directory, the re-run refused by name"}
+          "normaliser-missing": "the run-gates kit looked for from an empty directory, the re-run refused by name",
+          "leak-env": "GIT_DIR, GIT_INDEX_FILE and a foreign PWD exported at the caller, a command printing its "
+                      "git, GIT_OPTIONAL_LOCKS and PWD re-run",
+          "exit0-grandchild": "a command leaving a background grandchild and exiting 0, re-run and torn down"}
+#: The `timeout-grandchild` plant's bound and its derivation (TOOL-dDeclaredLoop-67 S44, S45): the plant's
+#: own timeout, the reap wait of the inline `run_tree_kill`, its `proc.wait(timeout=10)`, and the worktree,
+#: normaliser and kill overhead, the largest wall time less the timeout of three runs of the plant,
+#: measured 2026-11-17 on node d (win32) over the three runs that reached the bound: 5.0, 4.1 and 4.6 s.
+GRANDCHILD_TIMEOUT = 2   # PINNED, the plant's own bound
+REAP_WAIT = 10
+GRANDCHILD_OVERHEAD = 3.0   # PINNED 2026-11-17 node d, the largest of three measured runs less the timeout
+GRANDCHILD_BOUND = GRANDCHILD_TIMEOUT + REAP_WAIT + GRANDCHILD_OVERHEAD
 #: The loop reader's plants this leg runs too, each owed exit 1 with a refusal naming the acceptance row.
 READER_PLANTS = ("computed-actor", "computed-unserved")
 FX_UNIT = "TOOL-tFix-1"
@@ -204,7 +220,9 @@ def run_witness_commands(repo, sha, commands, timeout=TIMEOUT):
         lib = resolve_kit_dir("run-gates", "lib-attribute.sh", KIT) / "lib-attribute.sh"
     except LookupError as exc:
         raise LookupError("witness: normaliser unavailable — %s" % exc) from None
-    env = read_clean_env()
+    # regen.py's run_command environment (S22): no GIT_ENV_LEAKS name, no optional locks, no inherited PWD
+    env = read_clean_env(GIT_OPTIONAL_LOCKS="0")
+    env.pop("PWD", None)
     tmp = tempfile.mkdtemp(prefix="lw-")
     tree = os.path.join(tmp, "tree")
     added = False
@@ -225,8 +243,9 @@ def run_witness_commands(repo, sha, commands, timeout=TIMEOUT):
                 try:
                     code = p.wait(timeout=timeout)
                 except subprocess.TimeoutExpired:
-                    run_tree_kill(p)
                     code = "timeout"
+                # S37: after every command, before its output is read, not only on the timeout
+                run_tree_kill(p)
             codes.append(code)
             outs.append(out)
         roots = [pathlib.Path(tree).absolute().as_posix(), pathlib.Path(os.path.realpath(tree)).as_posix(),
@@ -434,8 +453,9 @@ def check_bash_syntax_plant(root, bad):
 
 
 def check_grandchild_plant(root, bad):
-    """TOOL-dDeclaredLoop-42 AC2 and AC3: `sleep 30 & wait` under a 2 s timeout returns within 10 s
-    recording `timeout`, and its worktree is pruned, or still on disk and named by a `leaked` line."""
+    """TOOL-dDeclaredLoop-42 AC2 and AC3: `sleep 30 & wait` under a 2 s timeout returns within
+    `GRANDCHILD_BOUND` recording `timeout`, and its worktree is pruned, or still on disk and named by a
+    `leaked` line."""
     write_scratch_unit(root)
     run_fixture_git(root, "add", "-A")
     run_fixture_git(root, "commit", "-qm", "the scratch unit")
@@ -443,19 +463,106 @@ def check_grandchild_plant(root, bad):
     said = io.StringIO()
     start = time.monotonic()
     with contextlib.redirect_stderr(said):
-        [(_c, code, _d)] = run_witness_commands(root, sha, ["sleep 30 & wait"], timeout=2)
+        [(_c, code, _d)] = run_witness_commands(root, sha, ["sleep 30 & wait"], timeout=GRANDCHILD_TIMEOUT)
     took = time.monotonic() - start
-    print("%s: timeout-grandchild · exit %s · %.1f s" % (SAY, code, took))
-    if code != "timeout" or took > 10:
-        bad.append("the call took %.1f s recording exit %s, not timeout within 10 s" % (took, code))
+    print("%s: timeout-grandchild · exit %s · %.1f s · bound %.1f s" % (SAY, code, took, GRANDCHILD_BOUND))
+    if code != "timeout" or took > GRANDCHILD_BOUND:
+        bad.append("the call took %.1f s recording exit %s, not timeout within %.1f s" % (took, code, GRANDCHILD_BOUND))
+    check_leaked_named(root, said.getvalue(), "timeout-grandchild", bad)
+
+
+def check_leaked_named(root, said, plant, bad):
+    """A miss for each worktree of `root` still listed after a re-run that no `leaked` line of `said`,
+    the call's stderr, names on disk."""
     trees = [ln[len("worktree "):] for ln in run_fixture_git(root, "worktree", "list", "--porcelain").splitlines()
              if ln.startswith("worktree ")]
-    named = {os.path.normcase(os.path.realpath(p))
-             for p in re.findall(r"^%s: leaked (.+)$" % SAY, said.getvalue(), re.M)}
+    named = {os.path.normcase(os.path.realpath(p)) for p in re.findall(r"^%s: leaked (.+)$" % SAY, said, re.M)}
     unnamed = [t for t in trees[1:] if not (os.path.isdir(t) and os.path.normcase(os.path.realpath(t)) in named)]
-    print("%s: timeout-grandchild · %d worktree(s) · %d named leaked" % (SAY, len(trees), len(named)))
+    print("%s: %s · %d worktree(s) · %d named leaked" % (SAY, plant, len(trees), len(named)))
     if unnamed:
         bad.append("worktree(s) left with no leaked line naming them: %s" % unnamed)
+
+
+def write_committed_unit(root):
+    """`write_scratch_unit` committed: -> its commit."""
+    write_scratch_unit(root)
+    run_fixture_git(root, "add", "-A")
+    run_fixture_git(root, "commit", "-qm", "the scratch unit")
+    return run_fixture_git(root, "rev-parse", "HEAD")
+
+
+def check_leak_env_plant(root, bad):
+    """TOOL-dDeclaredLoop-67 AC15 (S22): with `GIT_DIR` and `GIT_INDEX_FILE` naming a foreign repository
+    and a foreign `PWD` exported at the caller, the command reads the worktree's git, `GIT_OPTIONAL_LOCKS`
+    as `0` and a `PWD` naming the worktree, the directory the re-run names `tree`."""
+    sha = write_committed_unit(root)
+    foreign = pathlib.Path(root, "foreign").absolute()
+    foreign.mkdir()
+    run_fixture_git(foreign, "init", "-q", "--template=")
+    said = pathlib.Path(root, "leak-env.txt").absolute()   # outside the worktree, untracked
+    cmd = ('{ git rev-parse --show-toplevel; git rev-parse --absolute-git-dir; echo "${GIT_OPTIONAL_LOCKS:-unset}"; '
+           'echo "$PWD"; } > "%s" 2>&1' % said.as_posix())
+    put = {"GIT_DIR": (foreign / ".git").as_posix(), "GIT_INDEX_FILE": (foreign / "index").as_posix(),
+           "PWD": foreign.as_posix()}
+    held = {k: os.environ.get(k) for k in put}
+    os.environ.update(put)
+    try:
+        [(_c, code, _d)] = run_witness_commands(root, sha, [cmd])
+    finally:
+        for k, v in held.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+    lines = said.read_text(encoding="utf-8", errors="replace").splitlines() if said.is_file() else []
+    print("%s: leak-env · exit %s · %s" % (SAY, code, " | ".join(lines)))
+    if len(lines) != 4:
+        bad.append("the command printed %d line(s), not four: %s" % (len(lines), lines))
+        return
+    top, gitdir, locks, pwd = lines
+    if pathlib.PurePosixPath(top).name != "tree" or "/worktrees/" not in gitdir:
+        bad.append("the command read the git of %s at %s, not the worktree's" % (top, gitdir))
+    if locks != "0":
+        bad.append("GIT_OPTIONAL_LOCKS read %s, not 0" % locks)
+    if pathlib.PurePosixPath(pwd).name != "tree" or pwd == put["PWD"]:
+        bad.append("PWD read %s, not the worktree" % pwd)
+
+
+def check_exit0_grandchild_plant(root, bad):
+    """TOOL-dDeclaredLoop-67 AC25 (S37): `sleep 600 &` left behind by a command that exits 0 is gone
+    once the call returns, on POSIX, and the call returns within `GRANDCHILD_BOUND`. On win32 the survivor
+    is the stated limit: the plant holds the bound and the `leaked` line, then kills the grandchild it
+    started and removes the worktree it held."""
+    sha = write_committed_unit(root)
+    pid_file = pathlib.Path(root, "grandchild.pid").absolute()   # outside the worktree, untracked
+    said = io.StringIO()
+    start = time.monotonic()
+    with contextlib.redirect_stderr(said):
+        [(_c, code, _d)] = run_witness_commands(root, sha, ['sleep 600 & echo $! > "%s"; exit 0' % pid_file.as_posix()])
+    took = time.monotonic() - start
+    pid = pid_file.read_text(encoding="utf-8").strip() if pid_file.is_file() else ""
+    print("%s: exit0-grandchild · exit %s · %.1f s · grandchild %s" % (SAY, code, took, pid or "unread"))
+    if code != 0 or took > GRANDCHILD_BOUND:
+        bad.append("the call took %.1f s recording exit %s, not 0 within %.1f s" % (took, code, GRANDCHILD_BOUND))
+    if not pid.isdigit():
+        bad.append("the grandchild's pid was not written: %r" % pid)
+    elif os.name != "nt":
+        try:
+            os.kill(int(pid), 0)
+            bad.append("the grandchild %s outlived the call: only a timeout killed the group" % pid)
+        except ProcessLookupError:
+            print("%s: exit0-grandchild · grandchild %s gone" % (SAY, pid))
+        except PermissionError:
+            bad.append("the grandchild %s outlived the call: only a timeout killed the group" % pid)
+    else:
+        check_leaked_named(root, said.getvalue(), "exit0-grandchild", bad)
+    if pid.isdigit():   # the plant's own grandchild, reaped whatever the verdict; best-effort
+        bash = resolve_bash(pathlib.Path(__file__).absolute())
+        if bash:
+            subprocess.run([bash, "-c", "kill %s 2>/dev/null; exit 0" % pid], capture_output=True, timeout=20)
+        for leaked in re.findall(r"^%s: leaked (.+)$" % SAY, said.getvalue(), re.M):
+            remove_tree(pathlib.Path(leaked).parent)
+        run_fixture_git(root, "worktree", "prune")
 
 
 def check_normalise_plant(root, bad):
@@ -643,7 +750,8 @@ def run_fixture(plant):
               "probe-rerun": check_rerun_plant, "hold-inherited": check_hold_plant,
               "bash-syntax": check_bash_syntax_plant, "timeout-grandchild": check_grandchild_plant,
               "normalise": check_normalise_plant,
-              "normaliser-missing": check_normaliser_missing_plant}[plant](root, bad)
+              "normaliser-missing": check_normaliser_missing_plant, "leak-env": check_leak_env_plant,
+              "exit0-grandchild": check_exit0_grandchild_plant}[plant](root, bad)
     except (subprocess.CalledProcessError, OSError, LookupError, ImportError) as exc:
         detail = getattr(exc, "stderr", "") or ""
         bad.append("the fixture could not be built: %s %s" % (exc, detail.strip()[:300]))

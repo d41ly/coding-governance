@@ -93,6 +93,7 @@ loop command conformance	repo	declarations
 loop composition fixtures	kit	selftests
 loop computed witness	kit	selftests
 loop definition	repo	declarations
+loop definition fixtures	kit	selftests
 loop factories fixtures	kit	selftests
 loop guard fixtures	kit	selftests
 loop item kind	repo	selftests

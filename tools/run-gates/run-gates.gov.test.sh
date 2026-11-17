@@ -225,10 +225,11 @@ fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
 # Raised from 12 by TOOL-aShardedFloor-2, which adds the shard-contract arms (forward cover and
 # reverse declaration). Stated ABSOLUTELY, never as a delta.
-FLOOR_ASSERTIONS=18
+FLOOR_ASSERTIONS=19
 # Raised 15 -> 16 by TOOL-dDerivedDocket-23, which adds G1b, the four-leg `signature` pin.
 # Raised 16 -> 17 by PLAY-dOrderedCharter-67, which adds the python-reads scanner's plants.
 # Raised 17 -> 18 by TOOL-aMeasuredDrag-4, which adds G8, the tags leg's unguarded pin.
+# Raised 18 -> 19 by TOOL-dDeclaredLoop-67, which adds G9, the `loop termination` leg's unguarded pin.
 
 # The manifest, derived the same way run-gates.sh derives it. GATE_LEGS still outranks it, which is
 # what lets the fixture arms below drive this file without touching the real bar.
@@ -544,6 +545,39 @@ if tags.get("chunk") != edits.get("chunk"):
           % (TAGS, tags.get("chunk"), EDITS, edits.get("chunk")))
     print("  TOOL-aMeasuredDrag-4 left the tree'"'"'s tag checks to the tags leg, so a chunk selection")
     print("  that splits the two grades no tag check. Keep them in one chunk.")
+    sys.exit(1)
+' "$LEGS_FILE"; then
+  fail=1
+fi
+
+# ---- G9. `loop termination` DECLARES NO GUARD -----------------------------------------------------
+# TOOL-dDeclaredLoop-55 S1 took the guard off this leg: its populations are gov's composition, the
+# overlay, the scenarios and every live build's pin, and a `{prefix}/loop/` guard misses all but the
+# first, so a scoped bar would skip the termination check over a change it reads. Modelled on G7.
+#
+# WHAT THIS DOES NOT CHECK: that the push boundary runs the leg, or what the leg grades. It grades one
+# key on one row.
+a=$((a+1))
+if ! "$PYBIN" -c '
+import json, sys
+try:
+    legs = json.load(open(sys.argv[1], encoding="utf-8"))
+except Exception as e:
+    print("gov-canary: %s does not parse: %s" % (sys.argv[1], e)); sys.exit(1)
+
+rows = [l for l in legs if isinstance(l, dict) and l.get("name") == "loop termination"]
+
+# LIVENESS, as G7 states it: a renamed or deleted leg selects nothing and would pass in silence.
+if len(rows) != 1:
+    print("gov-canary: expected exactly one leg named \"loop termination\", found %d, so this arm"
+          " graded nothing" % len(rows))
+    sys.exit(1)
+
+if "guard" in rows[0]:
+    print("gov-canary: the `loop termination` leg declares a guard (%r)." % (rows[0]["guard"],))
+    print("  TOOL-dDeclaredLoop-55 S1 removed it: the leg reads the overlay, the scenarios and every")
+    print("  live build'"'"'s pin, which a {prefix}/loop/ guard misses, so a scoped bar would skip the")
+    print("  termination check over a change it reads. Remove the guard.")
     sys.exit(1)
 ' "$LEGS_FILE"; then
   fail=1

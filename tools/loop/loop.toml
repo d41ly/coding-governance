@@ -1085,6 +1085,7 @@ step = "step.build"
 [[phase]]
 phase = "HELD"
 state = "paused"
+step = "held-in"
 
 [[phase]]
 phase = "HELD"

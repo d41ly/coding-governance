@@ -98,6 +98,11 @@ class Refused(Exception):
 
 # The guarded write (TOOL-dDeclaredLoop-2 S5), carried inline because gov's lib dir ships to no install.
 # >>> guarded_write_py -- canonical copy: guarded_write.py in the gov lib dir (byte-identical; gated)
+#: The route a not-proven refusal ends with (TOOL-dDeclaredLoop-67 S18).
+TERMINAL_ROUTE = ("a mintty or other pipe-backed terminal is no console, so run the command under `winpty` "
+                  "or in a console window")
+
+
 def check_terminal_proof():
     """The owner's proof `tty-cli` where standard error is an interactive terminal, else None: the one
     stream dOrderedCharter-15 S5 tests, and the one an agent's shell lacks. A pty wrapper giving an agent
@@ -374,7 +379,7 @@ def run_write(root, verb, args, given, load) -> tuple[list, int]:
                          f"this command", *proposal)
     if value == OWNER_VALUE and not (proof == TTY_PROOF and check_terminal_proof() == TTY_PROOF):
         raise Refused(1, f"{SAY}: not proven · instructions.proof = {proof} shows no owner here, so this stays "
-                         f"a proposal and nothing is written", *proposal)
+                         f"a proposal and nothing is written · {TERMINAL_ROUTE}", *proposal)
     absent = derive_absent_flags(verb, args)
     if absent:
         raise Refused(2, f"{SAY}: refused · {verb} needs " + ", ".join(f[1] for f in absent) + " · nothing written")

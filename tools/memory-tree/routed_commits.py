@@ -585,22 +585,46 @@ def read_newest_unit(repo, rev_range: str) -> str:
     return ""
 
 
-#: TOOL-dDeclaredLoop-37 S5: the two spellings of a consumer's own trailer parse. Each literal is split
-#: inside its needle, so the probe never reads this line as a hit.
-TRAILER_PARSE_NEEDLES = ("trailers:key=" "Pass,", "interpret-trailers " "--parse")
+#: TOOL-dDeclaredLoop-37 S5: the two spellings of a consumer's own trailer parse, each a case-insensitive
+#: extended pattern (TOOL-dDeclaredLoop-67 S54) split inside its literal, so the probe never reads this line
+#: as a hit. S19 cuts the REGION of the reader's inline block, from its opening marker line to its closing
+#: one, never the carrier file: the same spelling below the closing marker, or in a carrier holding no
+#: block, is graded like any other line. A comment line is cut wherever it sits.
+TRAILER_PARSE_NEEDLES = ("trailers:[^)]*key=" "pass", "interpret-trailers " "--parse")
+#: The inline block whose region the scan cuts, by its marker lines.
+TRAILER_BLOCK = "commit_trailers_py"
+
+
+def read_marker_ranges(text: str, block: str = TRAILER_BLOCK) -> list:
+    """`[(first, last)]`, the 1-based line numbers of each `# >>> <block>` line and the `# <<< <block>`
+    line closing it in `text`, both included; a region left open runs to the last line."""
+    ranges, start = [], None
+    lines = text.split("\n")
+    for n, line in enumerate(lines, 1):
+        bare = line.strip()
+        if start is None and bare.startswith("# >>> " + block):
+            start = n
+        elif start is not None and bare.startswith("# <<< " + block):
+            ranges.append((start, n))
+            start = None
+    if start is not None:
+        ranges.append((start, len(lines)))
+    return ranges
 
 
 def check_trailer_parses(root, rev=None) -> list:
-    """Every line under `root` that spells its own trailer parse, as `<path>:<line>` relative to
-    `root`: ONE `git grep -n -F` for the two needles, run in `root`, over its tracked files, or
-    over the tree of `rev` when given, less `*.test.sh` and any `commit_trailers.py`.
-    [] where git greps and finds none; Refusal where git cannot grep `root`.
+    """Every code line under `root` that spells its own trailer parse, as `<path>:<line>` relative to
+    `root`: ONE `git grep -n -z -i -E` for the two patterns, run in `root`, over its tracked files, or
+    over the tree of `rev` when given, less `*.test.sh`. A hit inside a reader block's marker region,
+    or on a line whose first non-blank characters are `#` or `//`, is cut, each hit's file read once
+    at the same revision, or from the working tree. [] where git greps and finds none; Refusal where
+    git cannot grep `root` or read a hit's file at `rev`.
 
     It does not read a parse spelled another way, a key other than `Pass`, or an untracked file."""
-    argv = ["grep", "-n", "-z", "-F"]
+    argv = ["grep", "-n", "-z", "-i", "-E"]
     for needle in TRAILER_PARSE_NEEDLES:
         argv += ["-e", needle]
-    argv += ([rev] if rev else []) + ["--", ".", ":!*.test.sh", ":!*commit_trailers.py"]
+    argv += ([rev] if rev else []) + ["--", ".", ":!*.test.sh"]
     try:
         out = run_git(root, *argv)
     except Refusal as exc:
@@ -608,11 +632,22 @@ def check_trailer_parses(root, rev=None) -> list:
         if exc.status == 1 and not exc.out.strip():
             return []
         raise
-    hits = []
+    hits, texts = [], {}
     for line in out.decode("utf-8", "replace").split("\n"):
-        if line:
-            path, num = line.split("\0")[:2]
-            hits.append(f"{path[len(rev) + 1:] if rev else path}:{num}")
+        if not line:
+            continue
+        path, num = line.split("\0")[:2]
+        path = path[len(rev) + 1:] if rev else path
+        if path not in texts:
+            raw = run_git(root, "show", f"{rev}:{path}") if rev else (pathlib.Path(root) / path).read_bytes()
+            text = raw.decode("utf-8", "replace").replace("\r\n", "\n")
+            texts[path] = (text.split("\n"), read_marker_ranges(text))
+        lines, ranges = texts[path]
+        n = int(num)
+        code = lines[n - 1].lstrip() if n <= len(lines) else ""
+        if code.startswith(("#", "//")) or any(a <= n <= b for a, b in ranges):
+            continue
+        hits.append(f"{path}:{num}")
     return hits
 
 
@@ -1262,7 +1297,8 @@ def run_selftest() -> int:
         planted = "fmt = '" "%(trailers:key=" "Pass,valueonly)'\n"
         repo, s = build_fixture(root, "parses", [{"msg": "plant", "files": {
             "kit/consumer.sh": "# a consumer\n" + planted, "kit/consumer.test.sh": planted,
-            "kit/commit_trailers.py": planted}}])
+            # TOOL-dDeclaredLoop-67 S19: the reader's own spelling sits inside its block, which is cut
+            "kit/commit_trailers.py": "# >>> commit_trailers_py\n" + planted + "# <<< commit_trailers_py\n"}}])
         hits = check_trailer_parses(repo, s[0])
         try:
             seen = f"returned {check_trailer_parses(repo, '0' * 40)!r}"
@@ -1272,6 +1308,48 @@ def run_selftest() -> int:
             "TOOL-dDeclaredLoop-37 AC3 a planted consumer's trailer parse is named by path and line, the suite "
             "and the reader beside it are not, and a revision git cannot grep is a Refusal",
             f"hits {hits!r}\nan unreadable revision: {seen}")
+
+        # ---- TOOL-dDeclaredLoop-67 AC13 (S19, S20, S40, S41, S54): five plants, one scratch commit. The
+        # reordered lowercase spelling on a code line is a hit; on a comment line it is not; inside a
+        # carrier's block it is cut and below the block's closing marker it is graded; a file named for
+        # the reader that carries no block is graded like any other.
+        spelt = "fmt = '%(trailers:valueonly,key=" "pass)'\n"
+        block = "# >>> commit_trailers_py\n" + spelt + "# <<< commit_trailers_py\n"
+        repo, s = build_fixture(root, "parses67", [{"msg": "plant", "files": {
+            "kit/code.py": spelt, "kit/comment.py": "# " + spelt, "kit/carrier.py": block + spelt,
+            "kit/commit_trailers.py": spelt}}])
+        hits = check_trailer_parses(repo, s[0])
+        owed = ["kit/carrier.py" + ":" + "4", "kit/code.py" + ":" + "1", "kit/commit_trailers.py" + ":" + "1"]
+        print_arm(sorted(hits) == owed,
+            "TOOL-dDeclaredLoop-67 AC13 a lowercase reordered spelling on a code line, the line below a carrier's "
+            "block and a blockless reader file are named; the comment line and the in-block literal are not",
+            f"hits {hits!r}, owed {owed!r}")
+
+        # ---- TOOL-dDeclaredLoop-67 AC9 (S52): the reader's `tokens` verb over a trailer key table that does
+        # not parse, then one whose [[trailer]] row has no key: each refused naming the table, exit 2,
+        # never the floor. The reader is copied beside a scratch table its resolver finds as a sibling kit,
+        # the table's folder named as the tree's own table's is.
+        import commit_trailers  # noqa: E402  the kit's one trailer reader
+        table_home = commit_trailers.read_key_table()[1].parent.name
+        fix52 = commit_trailers.build_fixture(root / "keys52")
+        (fix52 / "kit" / "reader").mkdir(parents=True)
+        (fix52 / "kit" / table_home).mkdir()
+        shutil.copyfile(KIT / "commit_trailers.py", fix52 / "kit" / "reader" / "commit_trailers.py")
+        seen52 = []
+        for label, table, needle in (("does not parse", "[[trailer]\nkey = 1\n", "does not parse"),
+                                     ("a keyless row", '[[trailer]]\nkey = "Pass"\n[[trailer]]\ntype = "x"\n',
+                                      "holds a [[trailer]] row 2 with no key")):
+            (fix52 / "kit" / table_home / "edges.toml").write_text(table, encoding="utf-8")
+            p52 = subprocess.run([sys.executable, str(fix52 / "kit" / "reader" / "commit_trailers.py"), "tokens",
+                                  "HEAD"], cwd=fix52, capture_output=True, text=True, encoding="utf-8",
+                                 errors="replace",
+                                 env={k: v for k, v in build_git_env().items() if k not in GIT_ENV_LEAKS})
+            said = p52.stdout + p52.stderr
+            seen52.append(f"{label}: exit {p52.returncode} · {said.strip()[:300]}")
+            print_arm(p52.returncode == 2 and "commit_trailers: refused · the trailer key table " in said
+                      and needle in said and "edges.toml" in said,
+                "TOOL-dDeclaredLoop-67 AC9 a trailer key table that " + label.replace("a keyless row", "holds a "
+                "keyless row") + " is refused naming the table, exit 2", seen52[-1])
 
         # ---- TOOL-dDeclaredLoop-38 AC1, TOOL-dDeclaredLoop-58 AC1: the trailer CLI's stdout over the
         # planted fixture holds one sha-led line per commit `git rev-list HEAD` lists, then no CR.

@@ -143,13 +143,21 @@ def read_key_table() -> tuple:
     """`(keys, path)`: every key a `[[trailer]]` row of the playbook kit's `edges.toml` registers, typed
     or not, and the table's path. The kit is the one the sibling-kit resolver finds from this file's
     directory. Where this install holds none, or its table holds no row, `(FLOOR_KEYS, None)`, and one
-    stderr line per process says the check was skipped."""
+    stderr line per process says the check was skipped. A table that does not parse, or a `[[trailer]]`
+    row with no non-empty string `key`, is a ValueError naming the table, never the floor
+    (TOOL-dDeclaredLoop-67 S52)."""
     global _floor_noted
     try:
         path = resolve_kit_dir("playbook", "edges.toml", pathlib.Path(__file__).parent) / "edges.toml"
         with open(path, "rb") as fh:
-            rows = tomllib.load(fh).get("trailer") or []
-        keys = {row.get("key") for row in rows if isinstance(row, dict)}
+            try:
+                rows = tomllib.load(fh).get("trailer") or []
+            except tomllib.TOMLDecodeError as exc:
+                raise ValueError(f"the trailer key table {path.as_posix()} does not parse: {exc}") from None
+        for n, row in enumerate(rows, 1):
+            if not (isinstance(row, dict) and isinstance(row.get("key"), str) and row["key"]):
+                raise ValueError(f"the trailer key table {path.as_posix()} holds a [[trailer]] row {n} with no key")
+        keys = {row["key"] for row in rows}
     except LookupError:
         keys = set()
     if keys:

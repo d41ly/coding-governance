@@ -77,6 +77,11 @@ class Refused(Exception):
 
 # The guarded write (S5), carried inline because gov's lib dir ships to no install.
 # >>> guarded_write_py -- canonical copy: guarded_write.py in the gov lib dir (byte-identical; gated)
+#: The route a not-proven refusal ends with (TOOL-dDeclaredLoop-67 S18).
+TERMINAL_ROUTE = ("a mintty or other pipe-backed terminal is no console, so run the command under `winpty` "
+                  "or in a console window")
+
+
 def check_terminal_proof():
     """The owner's proof `tty-cli` where standard error is an interactive terminal, else None: the one
     stream dOrderedCharter-15 S5 tests, and the one an agent's shell lacks. A pty wrapper giving an agent
@@ -304,8 +309,8 @@ def run_set(top, args):
     else:
         admission, whys = plan["mguard"].check_run_mandate()
         if admission is None:
-            return proposal + ["%s: not proven · standard error is no terminal and %s · nothing written" % (
-                SAY, "; ".join(whys))], 1
+            return proposal + ["%s: not proven · standard error is no terminal and %s · nothing written · %s" % (
+                SAY, "; ".join(whys), TERMINAL_ROUTE)], 1
         proof = "none — run mandate %s" % admission.split(", phase ")[0]
     lines = write_policy_change(top, args, plan, plan["new"], "add" if plan["old"] is None else "edit", proof)
     trailer = plan["guard"].render_policy_trailer(plan["policy"], plan["path"], plan["old"], plan["value"])

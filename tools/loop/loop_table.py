@@ -125,6 +125,9 @@ ROW_KEYS = ("level", "from", "item", "outcome", "to", "witness")
 #: A `[[phase]]` row's keys, and the qualifiers a row matches against the run's facts (TOOL-dDeclaredLoop-52).
 PHASE_KEYS = ("phase", "state", "step")
 QUALIFIERS = ("halt-code", "hold-code", "ending")
+#: The step a `HELD` row reads: the step of the phase its run was held from, named by the `held-from` fact
+#: the driver writes at the hold (TOOL-dDeclaredLoop-67 S13). No other phase's row may read it.
+HELD_IN, HELD, HELD_FROM = "held-in", "HELD", "held-from"
 #: A phase, as the unattended driver spells one.
 PHASE_WORD = re.compile(r"[A-Z][A-Z_]*")
 #: `--plant`'s cases, each a break made in memory on the rows as read, and the text its refusal must name.
@@ -147,7 +150,10 @@ PLANTS = {"bad-state": ("a unit row entering reviewing, no unit state", "reviewi
           "phase-missing": ("the REVIEWING phase row taken out", "REVIEWING"),
           "phase-stale": ("a phase row for DRAFTING on step.design", "DRAFTING"),
           "phase-shape": ("the REVIEWING phase row given state designing beside its step", "both state and step"),
-          "phase-twice": ("a second unqualified BUILDING phase row", "two unqualified rows")}
+          "phase-twice": ("a second unqualified BUILDING phase row", "two unqualified rows"),
+          "held-in-elsewhere": ("the BUILDING phase row given the step held-in", "(BUILDING) reads the step held-in"),
+          "phase-row-unknown": ("a phase row for STAGING, an adopter phase, with no PHASES_EXTRA passed",
+                                "names no member of PHASES_CORE or PHASES_EXTRA")}
 
 
 class TransitionRefused(Exception):
@@ -425,7 +431,10 @@ def derive_phase_position(phase, facts, phase_map=None, extra=None, tree="."):
     when None. Where no row reads it, `("none", "none")` for a member of `extra`, the adopter's phases
     (TOOL-dDeclaredLoop-63), else LookupError naming the phase. `extra` None reads `PHASES_EXTRA` from the
     driver conf of `tree`'s work tree through `loop_lib.read_driver_conf`, only for a phase no row reads,
-    and its LoopError passes through (TOOL-dDeclaredLoop-70)."""
+    and its LoopError passes through (TOOL-dDeclaredLoop-70). A row's step `held-in` answers the step of
+    the phase `facts`' `held-from` names, read by a second call with the same map and the default
+    population, and "none" where `facts` carries no `held-from` other than `HELD`; the state is the
+    row's (TOOL-dDeclaredLoop-67 S13)."""
     if phase_map is None:
         phase_map = read_phase_map(*read_definition(KIT))
     rows = [r for r in phase_map["rows"] if r.get("phase") == phase]
@@ -439,6 +448,10 @@ def derive_phase_position(phase, facts, phase_map=None, extra=None, tree="."):
             return "none", "none"
         raise LookupError("phase %s: no row" % phase)
     step = row.get("step") or "none"
+    if step == HELD_IN:
+        held = facts.get(HELD_FROM)
+        step = derive_phase_position(held, {}, phase_map, tree=tree)[1] if held and held != HELD else "none"
+        return row.get("state"), step
     state = row.get("state") or next((s.get("state") for s in phase_map["steps"] if s.get("tag") == step), None)
     return state, step
 
@@ -457,11 +470,14 @@ def derive_crossed_exits(from_step, to_step, steps):
     return [s.get("exit") for s in sorted(steps, key=lambda s: s.get("order")) if low <= s.get("order") < order[to_step]]
 
 
-def check_phase_rows(phase_map, core, states, terminal):
+def check_phase_rows(phase_map, core, states, terminal, extra=()):
     """`(lines, refusals)` of the [[phase]] rows of `phase_map`, what read_phase_map returns, against
     `states`, the build level's open states, and `terminal`, its terminal states; the unqualified rows
     joined both ways with `core`, the driver's PHASES_CORE members, or the join printed unarmed where
-    `core` is None."""
+    `core` is None. A row naming a phase in neither `core` nor `extra`, the driver's PHASES_EXTRA
+    members, is refused; an adopter phase needs no row, and a row for one is admitted
+    (TOOL-dDeclaredLoop-67 S23). The step `held-in` is admitted on a `HELD` row beside its state, and
+    refused on any other (S14)."""
     tags = {s.get("tag") for s in phase_map["steps"]}
     lines, refusals, plain, named = [], [], {}, set()
     rows = phase_map["rows"]
@@ -472,10 +488,19 @@ def check_phase_rows(phase_map, core, states, terminal):
             refusals.append("%s names no phase, a word of [A-Z][A-Z_]*" % at)
             continue
         named.add(phase)
-        extra = sorted(k for k in row if k not in PHASE_KEYS + QUALIFIERS)
-        if extra:
-            refusals.append("%s carries %s, no key of a phase row" % (at, " ".join(extra)))
-        if "state" in row and "step" in row:
+        unknown = sorted(k for k in row if k not in PHASE_KEYS + QUALIFIERS)
+        if unknown:
+            refusals.append("%s carries %s, no key of a phase row" % (at, " ".join(unknown)))
+        held_in = row.get("step") == HELD_IN
+        if held_in and phase != HELD:
+            refusals.append("%s reads the step %s, which only a %s row reads: the step its run was held from" % (
+                at, HELD_IN, HELD))
+        elif held_in and row.get("state") not in list(states) + list(terminal) + ["none"]:
+            refusals.append("%s reads the step %s and the state %r, no build state, terminal nor none" % (
+                at, HELD_IN, row.get("state")))
+        elif held_in:
+            pass
+        elif "state" in row and "step" in row:
             refusals.append("%s carries both state and step: a stepped phase's state is its step's" % at)
         elif "state" not in row and "step" not in row:
             refusals.append("%s carries neither state nor step" % at)
@@ -498,7 +523,8 @@ def check_phase_rows(phase_map, core, states, terminal):
                      "this kit, so no phase is joined" % SAY)
         return lines, refusals
     refusals += ["the phase %s of PHASES_CORE has no unqualified phase row" % p for p in core if p not in plain]
-    refusals += ["the phase row of %s names no member of PHASES_CORE" % p for p in sorted(named - set(core))]
+    refusals += ["the phase row of %s names no member of PHASES_CORE or PHASES_EXTRA" % p
+                 for p in sorted(named - set(core) - set(extra))]
     lines.append("%s: phase join · PHASES_CORE · %d phase(s)" % (SAY, len(core)))
     return lines, refusals
 
@@ -549,6 +575,10 @@ def write_table_plant(case, data):
         next(r for r in data["phase"] if r.get("phase") == "REVIEWING")["state"] = "designing"
     elif case == "phase-twice":
         data["phase"].append({"phase": "BUILDING", "step": "step.build"})
+    elif case == "held-in-elsewhere":
+        next(r for r in data["phase"] if r.get("phase") == "BUILDING")["step"] = HELD_IN
+    elif case == "phase-row-unknown":
+        data["phase"].append({"phase": "STAGING", "state": "none"})
 
 
 def main(argv):
@@ -600,6 +630,9 @@ def main(argv):
                                     "ending=park-for-owner"], 0, "phase HELD · state parked · step none", ""),
                   ("phase one qualifier", ["phase", "--from", "HELD", "--fact", "hold-code=owner-decision"], 0,
                    "phase HELD · state paused · step none", ""),
+                  # TOOL-dDeclaredLoop-67 S13: a held run reads the step of the phase it was held from
+                  ("phase held-in", ["phase", "--from", "HELD", "--fact", "held-from=BUILDING"], 0,
+                   "phase HELD · state paused · step step.build", ""),
                   ("phase crosses design", ["phase", "--from", "SPECCING", "--to", "BUILDING"], 0,
                    "phase SPECCING · state designing · step step.design · to BUILDING · crosses item.design.exit", ""),
                   ("phase crosses plan", ["phase", "--from", "PREFLIGHT", "--to", "SPECCING"], 0,
@@ -783,6 +816,7 @@ def main(argv):
     except LoopError as e:
         print("%s: refused · %s" % (SAY, e))
         return 1
+    extra = ()
     if args.plant:
         core = [r.get("phase") for r in phase_map["rows"] if not any(q in r for q in QUALIFIERS)]
         print("%s: fixture · plant %s · %s" % (SAY, args.plant, PLANTS[args.plant][0]))
@@ -792,9 +826,15 @@ def main(argv):
             core = read_core_registries(KIT, ("PHASES_CORE",))["PHASES_CORE"]
         except LookupError:
             core = None
+        try:   # TOOL-dDeclaredLoop-67 S23: the adopter phases the driver's conf declares, joined beside the core
+            extra = read_driver_conf(".", ("PHASES_EXTRA",)).get("PHASES_EXTRA", "").split()
+        except LoopError as e:
+            print("%s: refused · %s" % (SAY, e))
+            return 1
     lines, refusals = check_transition_tables(data, where, items)
     tables = read_transition_rows(data, where)
-    more = check_phase_rows(read_phase_map(data, where), core, tables["states"].get("build", []), tables["terminal"])
+    more = check_phase_rows(read_phase_map(data, where), core, tables["states"].get("build", []), tables["terminal"],
+                            extra)
     lines, refusals = lines + more[0], refusals + more[1]
     for line in lines:
         print(line)

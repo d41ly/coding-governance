@@ -122,6 +122,8 @@ PLANTS = {
     "factory-restores-create": "core.py new hook fixture-hook over a committed hand fragment that holds its gate red",
     "scenario-new": "core.py new scenario trial --extends scenario.feature --admit entry=trial, then scenario.py check",
     "scenario-hand": "a hand [[scenario]] row in gov's pack whose entry names no step",
+    "factory-interrupt": "the role kind's writes in process, KeyboardInterrupt raised at the second held path's "
+                         "rename, then a stray temp planted beside a held path",
 }
 #: The register's factory verb each `-new` case and `factory-restores` runs, after `core.py new`.
 NEW_ARGV = {
@@ -156,7 +158,8 @@ CASES = (("check-commands", 0, "factories: check-commands", "descriptor(s)"),
          ("factory-restores", 1, "factories: fixture · factory-restores", "porcelain clean"),
          ("factory-restores-create", 1, "factories: fixture · factory-restores-create", "porcelain clean"),
          ("scenario-new", 0, "factories: fixture · scenario-new", "gate green"),
-         ("scenario-hand", 1, "factories: gate", "step.nowhere"))
+         ("scenario-hand", 1, "factories: gate", "step.nowhere"),
+         ("factory-interrupt", 0, "factories: fixture · factory-interrupt", "leftover named"))
 
 
 class Refused(Exception):
@@ -375,12 +378,22 @@ def run_kind_gate(kind, top, kit_rel, render=False, written=()):
     return 0, lines
 
 
+def read_leftover_temps(paths):
+    """Each sibling temp `<name>.*.tmp` beside a path of `paths`, the guarded write's own temp shape, that
+    an interrupted write left behind, in path order."""
+    return [tmp for path in paths for tmp in sorted(path.parent.glob(path.name + ".*.tmp"))]
+
+
 def write_kind_instance(kind, name, top, kit_rel, writes, render=None):
     """Each `(path, text)` of `writes` held through the guarded write, nested, with `render`, a path the
-    renderer writes, held at its own bytes, and the kind's gate run innermost: -> the exit."""
+    renderer writes, held at its own bytes, and the kind's gate run innermost: -> the exit. Before the
+    first write, each leftover temp beside a held path is named on one `leftover` line, and the write goes
+    on (TOOL-dDeclaredLoop-67 S38)."""
     from policy_edit import write_guarded
     held = list(writes) + ([(render, lambda _tmp: None)] if render else [])
     before = {p: (p.read_bytes() if p.is_file() else None) for p, _t in held}
+    for tmp in read_leftover_temps([p for p, _t in held]):
+        print("%s: leftover · %s" % (SAY, tmp.relative_to(top).as_posix()))
 
     def write_held(rest):
         if not rest:
@@ -640,6 +653,8 @@ def run_fixture(case, base, kit_rel):
             print("%s: gate · %s" % (SAY, line))
         print("%s: fixture · %s · gate %s exit %d" % (SAY, case, GATES[kind], rc))
         return rc
+    if case == "factory-interrupt":
+        return run_interrupt_plant(clone, kit_rel)
     created = []
     if case == "factory-restores-create":  # TOOL-dDeclaredLoop-56 S37: a gate red before the factory writes
         write_hand_plant(clone, kit_rel, "hook-hand")
@@ -689,6 +704,68 @@ def run_fixture(case, base, kit_rel):
         return 3 if why else 0
     print("%s: fixture · %s · factory exit 0 · %s" % (SAY, case, "FAIL, " + why if why else "gate green"))
     return 3 if why else 0
+
+
+def run_interrupt_plant(clone, kit_rel):
+    """`factory-interrupt` (TOOL-dDeclaredLoop-67 AC26): the role kind's writes in process over the clone,
+    the loop kit's `policy_edit.os.replace` spied to raise KeyboardInterrupt at the second held path's
+    rename, as guard.py's `write-guarded-rollback` spies it; every held path then reads its prior bytes,
+    the created path is absent and the porcelain is clean. A stray temp planted beside a held path is then
+    named on a `leftover` line by the same writes, interrupted alike: -> 0 held, 3 missed."""
+    import contextlib
+    import io
+    import unittest.mock
+    import policy_edit
+    roles = derive_roles_kit(clone, kit_rel)
+    role = roles / "agents" / "gov-fixture.agent.md"
+    held = [roles / "workflows.toml", roles / "check_roles.py", roles / "README.md"]
+    before = {path: path.read_bytes() for path in held}
+    real_replace = policy_edit.os.replace
+    args = (clone, kit_rel, "gov-fixture", "build", "none", "A fixture role.", "input:question", "a fixture answer",
+            "the answer, to its caller", 1024)
+
+    def run_interrupted():
+        """The role kind's writes, interrupted at the second rename onto a held or created path: its output."""
+        renamed = []
+
+        def run_replace(src, dst):
+            if pathlib.Path(dst) in [role] + held:
+                renamed.append(dst)
+                if len(renamed) == 2:
+                    raise KeyboardInterrupt
+            return real_replace(src, dst)
+        out = io.StringIO()
+        with unittest.mock.patch.object(policy_edit.os, "replace", run_replace), contextlib.redirect_stdout(out):
+            try:
+                write_role(*args)
+                said = "no interrupt"
+            except KeyboardInterrupt:
+                said = "interrupted"
+        print(out.getvalue().rstrip())
+        return said, out.getvalue()
+
+    misses = []
+    said, _out = run_interrupted()
+    moved = [p.relative_to(clone).as_posix() for p in held if p.read_bytes() != before[p]]
+    dirty = run_git(clone, "status", "--porcelain").splitlines()
+    print("%s: fixture · factory-interrupt · %s · %d held path(s) moved · %s · porcelain %s" % (
+        SAY, said, len(moved), "created path present" if role.exists() else "created path absent",
+        "clean" if not dirty else "; ".join(dirty)))
+    if said != "interrupted" or moved or role.exists() or dirty:
+        misses.append("the interrupt left %s, moved %s, the role %s, porcelain %s" % (
+            said, moved, "present" if role.exists() else "absent", dirty))
+    stray = held[0].with_name(held[0].name + ".fx-stray.tmp")
+    stray.write_bytes(b"a stray temp\n")
+    try:
+        said, out = run_interrupted()
+        named = "%s: leftover · %s" % (SAY, stray.relative_to(clone).as_posix()) in out.splitlines()
+    finally:
+        stray.unlink(missing_ok=True)
+    if not named:
+        misses.append("no leftover line named %s" % stray.relative_to(clone).as_posix())
+    print("%s: fixture · factory-interrupt · %s" % (SAY, "FAIL, " + "; ".join(misses) if misses else
+                                                    "held paths at prior bytes · porcelain clean · leftover named"))
+    return 3 if misses else 0
 
 
 def read_arm_findings(lines):

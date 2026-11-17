@@ -6303,7 +6303,36 @@ run_budget_verb() { # verb · flag=value... -> sets _bd_why to the script's firs
   [ -n "$_bd_out" ] && printf '%s\n' "$_bd_out"
   return 0
 }
+# THE CONCURRENT PATCH DRAW (TOOL-dDeclaredLoop-67 S35). A patch build draws on its origin's budget, so two
+# live patch runs of one origin would each count their own draws against one total. Before a patch build
+# draws, the claims are read quietly and each live claim but this slug's is asked its origin through
+# `budget.py origin`; an equal origin draws nothing and answers `_bd_rc=2`, which both callers already relay
+# through their own refusal, so no new refusal site is added here. A slug whose origin does not read is
+# skipped, and a failed claim read draws as before: what that read owes is TOOL-dDeclaredLoop-75's.
+check_patch_peers() { # slug -> 0 to draw; 1 with _bd_rc=2 and _bd_why naming the live peer
+  local slug="$1" mine row peer node rest verdict
+  local -a _cp_rows
+  run_loop_verb budget.py origin "--build=$slug" || return 0
+  [ "$_bd_rc" = 0 ] || return 0
+  mine=${_bd_why##* · }
+  [ -n "$mine" ] && [ "$mine" != none ] || return 0
+  read_claims quiet || return 0
+  mapfile -t _cp_rows <<< "$CLAIM_ROWS"
+  for row in "${_cp_rows[@]}"; do
+    # slug, node, status, beat-age-s, verdict: the claim row's first five fields
+    peer=${row%%$'\t'*}; rest=${row#*$'\t'}; node=${rest%%$'\t'*}
+    rest=${rest#*$'\t'}; rest=${rest#*$'\t'}; rest=${rest#*$'\t'}; verdict=${rest%%$'\t'*}
+    [ "$verdict" = live ] && [ -n "$peer" ] && [ "$peer" != "$slug" ] || continue
+    run_loop_verb budget.py origin "--build=$peer" || continue
+    [ "$_bd_rc" = 0 ] && [ "${_bd_why##* · }" = "$mine" ] || continue
+    _bd_rc=2
+    _bd_why="budget: patch draw refused — $peer on $node is a live patch run of $mine"
+    return 1
+  done
+  return 0
+}
 run_budget_draw() { # slug · cause · item -> as run_budget_verb; on `exhausted`, _bd_why names the remedy
+  check_patch_peers "$1" || return 0
   run_budget_verb draw "--build=$1" "--cause=$2" "--item=$3"
   # THE LAP REFUSAL NAMES ITS REMEDY (TOOL-dDeclaredLoop-31 S5), after the module's line, which keeps naming
   # flow.on-exhausted: end the build while no exhaustion row stands, else the ending that row recorded.
@@ -8742,6 +8771,8 @@ verb_status() { # slug
       "position — "*|"next — "*|"interrupt — "*) _plines+="$_pl"$'\n' ;;
       "unit — "*)
         _plines+="$_pl"$'\n'; _pu=${_pl#unit — }
+        # TOOL-dDeclaredLoop-67 S50: the optional unarmed tag is cut before the step is read
+        _pu=${_pu% · acceptance unarmed}
         case "${_pu##* · }" in none) _pr=0 ;; designed) _pr=1 ;; built) _pr=2 ;; tested) _pr=3 ;; *) _pr=4 ;; esac
         [ "$_pr" -lt "$_pbest" ] && [ "$_pr" -lt 4 ] && { _pbest=$_pr; unit=${_pu%% · *}; } ;;
     esac

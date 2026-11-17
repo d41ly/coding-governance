@@ -5908,6 +5908,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_exit0_grandchild_plant",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
+    },
+    {
       "id": "check_exit_fold",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -6548,6 +6553,16 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "check_leak_env_plant",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "check_leaked_named",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
+    },
+    {
       "id": "check_lease_current",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -7071,6 +7086,11 @@
       "id": "check_pass_tree_run",
       "kind": "function",
       "file": "tools/unattended/pass-tree.sh"
+    },
+    {
+      "id": "check_patch_peers",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_path_inside",
@@ -20698,6 +20718,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "read_leftover_temps",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
       "id": "read_leg_argv",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -20938,6 +20963,11 @@
       "file": "tools/workflows/render_lenses.py"
     },
     {
+      "id": "read_marker_ranges",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
       "id": "read_matched_list",
       "kind": "function",
       "file": "tools/workflows/replay_scorer.py"
@@ -20986,6 +21016,11 @@
       "id": "read_merge_answer",
       "kind": "function",
       "file": "tools/memory-tree/asbuilt_view.py"
+    },
+    {
+      "id": "read_merge_attribute",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
     },
     {
       "id": "read_merge_heads",
@@ -29613,6 +29648,11 @@
       "file": "tools/chain-packet.py"
     },
     {
+      "id": "run_interrupt_plant",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
       "id": "run_ir_push",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -35776,6 +35816,11 @@
       "id": "write_commit",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
+    },
+    {
+      "id": "write_committed_unit",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
     },
     {
       "id": "write_conf",

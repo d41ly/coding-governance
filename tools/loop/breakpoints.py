@@ -119,7 +119,8 @@ PLANTS = {"values": "no policy file, then autonomy three-gates and every-stage, 
                              "naming none, build tRec opened under records/builds/, listed by the scratch's own module",
           "confs-disagree": ".unattended.conf naming MEMORY_ROOT=records beside the memory tree's memory, then the list",
           "no-own-conf-read": "this module's own file graded on its syntax tree for a reader call or a conf name, "
-                              "no scratch repository"}
+                              "no scratch repository",
+          "readded": "the scratch kits' commit, then this module taken out of the scratch and committed back"}
 
 
 # ------------------------------------------------------------------------------------------ the rule
@@ -454,6 +455,25 @@ def run_breakpoint_plant(case):
             owed = ("%s: refused · records root: .unattended.conf says records, .memory-tree.conf says memory — the "
                     "driver writes under records" % SAY)
             check(rc == 2 and lines == [owed], "the list read exit %d, %s" % (rc, lines))
+        elif case == "readded":   # TOOL-dDeclaredLoop-67 AC31 (S48): the placement is the oldest add, never the newest
+            from loop_items import build_scratch_tree, derive_definition_rel
+            scratch = build_scratch_tree()[0]
+            try:
+                module = (pathlib.PurePosixPath(derive_definition_rel()).parent / pathlib.Path(__file__).name).as_posix()
+                placement = read_first_add(scratch, module)
+                run_fixture_git(scratch, "rm", "-q", "--", module)
+                run_fixture_git(scratch, "commit", "-q", "-m", "the module taken out")
+                run_fixture_git(scratch, "checkout", "-q", "HEAD~1", "--", module)
+                run_fixture_git(scratch, "commit", "-q", "-m", "the module committed back")
+                adds = read_git(scratch, "log", "--diff-filter=A", "--format=%H", "--", module)[1].split()
+                first = read_first_add(scratch, module)
+                print("%s: fixture · readded · %d add(s) · placement %s · read %s" % (
+                    SAY, len(adds), (placement or "none")[:8], (first or "none")[:8]))
+                check(len(adds) == 2, "the scratch history holds %d add(s) of %s, not two" % (len(adds), module))
+                check(placement is not None and first == placement,
+                      "the placement read %s after the re-add, not the first add %s" % (first, placement))
+            finally:
+                remove_tree(scratch)
         elif case == "no-own-conf-read":   # TOOL-dDeclaredLoop-76 AC1: this module's own file, no scratch tree
             own = pathlib.Path(__file__)
             try:

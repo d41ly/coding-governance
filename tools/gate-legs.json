@@ -2107,6 +2107,19 @@
     "stage": ["step.test"]
   },
   {
+    "name": "loop definition fixtures",
+    "argv": [
+      "python",
+      "{prefix}/loop/loop_lib.py",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 120,
+    "enforces": ["principle.p1"],
+    "stage": ["step.test"]
+  },
+  {
     "name": "loop computed witness",
     "argv": [
       "python",

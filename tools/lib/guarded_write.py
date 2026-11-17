@@ -15,6 +15,11 @@ import tempfile
 
 
 # >>> guarded_write_py -- canonical copy: guarded_write.py in the gov lib dir (byte-identical; gated)
+#: The route a not-proven refusal ends with (TOOL-dDeclaredLoop-67 S18).
+TERMINAL_ROUTE = ("a mintty or other pipe-backed terminal is no console, so run the command under `winpty` "
+                  "or in a console window")
+
+
 def check_terminal_proof():
     """The owner's proof `tty-cli` where standard error is an interactive terminal, else None: the one
     stream dOrderedCharter-15 S5 tests, and the one an agent's shell lacks. A pty wrapper giving an agent

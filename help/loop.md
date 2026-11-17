@@ -177,12 +177,17 @@ declared item, a served item whose witness class is `actor`, a `writer` that is 
 
 The `acceptance` and `probe-rerun` witnesses are written today by `tools/loop/loop_witness.py`.
 Each re-run checks the commit out into a temporary worktree, runs every command there as
-`bash -c "<command>"` with the git location variables unset, and keeps its exit code and the first
-twelve hex digits of the SHA-256 of its output. Bash runs every command, on Windows too, so a
+`bash -c "<command>"` with the git location variables unset, `GIT_OPTIONAL_LOCKS=0` set and no
+inherited `PWD`, as the run-gates kit's regeneration runs its commands, and keeps its exit code and the
+first twelve hex digits of the SHA-256 of its output. Bash runs every command, on Windows too, so a
 criterion's `[[ ]]` and pipes work as written; where no bash can be found the re-run is refused.
 Output goes to a file, never a pipe, so a command that leaves a background process behind cannot
-keep the re-run waiting. A command that runs past its time limit is stopped with every process it
-started and recorded as `timeout`. The worktree is removed afterwards, even after a failure, and one
+keep the re-run waiting. A command that runs past its time limit is recorded as `timeout`, and after
+every command, timed out or not, the processes it started are stopped before its output is read: on
+Linux and macOS its whole process group, a background process included; on Windows the process tree
+Windows records, which does not reach a process Git Bash started in the background once its own bash
+has exited, so such a survivor is the stated limit there, and the worktree it holds is named as
+leaked. The worktree is removed afterwards, even after a failure, and one
 still on disk is named on stderr as `loop-witness: leaked <path>`. Before it is hashed, the output
 is normalised by the run-gates kit's program, its `write_normaliser`, run once in bash in the
 worktree: it strips the worktree's path, its real path, the worktree as bash's `pwd` prints it (under
@@ -407,7 +412,10 @@ state = "incomplete"
 A row may add qualifiers, `halt-code`, `hold-code` and `ending`, matched against the run's facts of
 those names: an aborted run whose rework budget ran out reads incomplete, and a run held for the
 owner's decision whose budget ending is `park-for-owner` reads parked. Every other aborted run reads
-withdrawn, and every other held run paused.
+withdrawn, and every other held run paused. That paused row reads the step `held-in`: a held run reads the
+step of the phase it was held from, which the driver writes as the run's `held-from` fact at the hold, so
+`--fact held-from=BUILDING` reads `step step.build`, and with no such fact the step reads `none`. Only the
+`HELD` row may read `held-in`.
 
 - **Read a phase:** `python tools/loop/loop_table.py phase --from REVIEWING` prints the phase's state <!-- usage: script:tools/loop/loop_table.py#phase 01f88f39 -->
   and step. Each `--fact k=v` qualifies the `--from` phase. With `--to <PHASE>` it also names the step
@@ -424,22 +432,26 @@ withdrawn, and every other held run paused.
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
   ```bash
   python tools/loop/loop_table.py phase --from ABORTED --fact halt-code=budget-exhausted
+  python tools/loop/loop_table.py phase --from HELD --fact held-from=BUILDING
   python tools/loop/loop_table.py phase --from SPECCING --to BUILDING
   python tools/loop/loop_table.py phase --from STAGING --to BUILDING --extra STAGING
   ```
 
   ```text
   phase ABORTED · state incomplete · step none
+  phase HELD · state paused · step step.build
   phase SPECCING · state designing · step step.design · to BUILDING · crosses item.design.exit
   phase STAGING · state none · step none · adopter phase · to BUILDING · crosses item.plan.exit item.design.exit
   ```
 
 - **The check:** `check` prints `loop: phase map` with the row and qualified counts and joins the
-  rows with the driver's `PHASES_CORE` both ways, refusing a phase with no row and a row for no phase,
-  as well as a row with both a state and a step or neither, an unknown step or state, and two rows
-  for one phase without qualifiers. Where the driver is not installed beside this kit, the join prints
-  `unarmed` and grades nothing. The cases `phase-missing`, `phase-stale`, `phase-shape` and
-  `phase-twice` show each refusal.
+  rows with the driver's `PHASES_CORE` both ways, refusing a phase with no row and a row naming a
+  phase in neither `PHASES_CORE` nor the `PHASES_EXTRA` your `.unattended.conf` declares, so an adopter
+  phase needs no row and a row for one is admitted. It refuses as well a row with both a state and a
+  step or neither, `held-in` on any row but `HELD`'s, an unknown step or state, and two rows for one
+  phase without qualifiers. Where the driver is not installed beside this kit, the join prints
+  `unarmed` and grades nothing. The cases `phase-missing`, `phase-stale`, `phase-shape`,
+  `phase-twice`, `held-in-elsewhere` and `phase-row-unknown` show each refusal.
 
 - **The hold:** the driver's `--phase` asks this map which step exits a move crosses. When an owner
   gate sits at one of them and still reads `held`, the move is refused before anything is written,
@@ -906,7 +918,8 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
   recorded with its item, key and reason, each `interrupt —`, then every file and ref it read as
   `read —` lines and every claim it used with its key and verdict as `claim —` lines. Where the runlog
   kit is not installed it prints `refusal — unarmed` with the reason and still prints the frontier.
-  `--json` prints the same fields as one object, and `--next-line` the `next:` shape alone, with
+  `--json` prints the same fields as one object, each unit carrying `acceptance_armed`, false exactly
+  where its `unit —` line ends `· acceptance unarmed`, and `--next-line` the `next:` shape alone, with
   `--frontier` adding the frontier's tags, or `none`, on a second line. It exits 2 on
   `invalid-input`, else 0. Run in a repository with the unattended kit installed, it asks the driver's
   `--plan` for each unit's spec state.
@@ -920,7 +933,9 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
   `terminal`, `stale-remote` (its tracking tip's reflog entry aged past the bound), `no-remote`,
   `fresh-clone` (a clone read from clone), `quiet-remote` (a fetch from a linked worktree after the
   aged reflog, read from `FETCH_HEAD`), `offline-stale` (a clone's `FETCH_HEAD` dated past the bound), `bad-transition`, `deadlock`, `bar-wait`, `frontier-chain`, `frontier-parallel`,
-  `frontier-refused`, `frontier-bad-key`, `frontier-none`, `plan-frontier`, `built-unarmed`,
+  `frontier-refused`, `frontier-bad-key`, `frontier-none`, `plan-frontier`, `built-unarmed` (one unit
+  tested and one built with no acceptance record under the stand-in writer, which `--json` reads
+  `acceptance_armed` false and the driver's `--status` names as the next unit),
   `built-unheld`, `built-armed`, `plan-line` and `status-line`; `frontier-refused`,
   `frontier-bad-key`, `plan-frontier`, `built-unarmed` and the last two run the unattended driver. `--selftest` runs every case, and gov's own `loop position fixtures` gate runs it.
 
@@ -1262,7 +1277,11 @@ naming it.
   key a default its own row refuses, and expects exit 1 with the clone left clean.
   `factory-restores-create` runs the hook factory, which creates its files, after committing a hand
   fragment that holds the hook gate red, and expects exit 1 with no created file left on disk and the
-  clone clean. `--selftest` runs
+  clone clean. `factory-interrupt` runs the role factory's writes with the second held file's rename
+  interrupted by `KeyboardInterrupt`, and expects every held file at its prior bytes, the role file
+  absent and the clone clean; it then leaves a stray temp beside a held file and expects it named. Before
+  its first write every factory names each temp an interrupted write left beside a file it holds, one
+  `factories: leftover · <path>` line each, and writes on: delete what it names. `--selftest` runs
   `check-commands` and every case. Gov's `loop factories fixtures` gate runs it.
 
 What is still yours to do, as it would be for a part made by hand. A role needs its agent file
@@ -1528,7 +1547,8 @@ instead of reading as an ordinary hold; a build with no held gate prints no such
 - **See it on a fixture:** `python tools/loop/breakpoints.py --fixture --plant <case>` runs one case in <!-- usage: script:tools/loop/breakpoints.py bd781c1c -->
   a scratch repository: `values`, `placed`, `ratification`, `stage`, `driver-close`, `driver-optin`,
   `driver-plan`, `pre-placement`, `driver-pre-placement`, `pre-placement-records-root`, `unattended-root`,
-  `confs-disagree` or `no-own-conf-read`, the one that reads the module's own file and no scratch
+  `confs-disagree`, `readded`, the module taken out of a scratch repository and committed back, its
+  placement still the first commit that added it, or `no-own-conf-read`, the one that reads the module's own file and no scratch
   repository, naming each conf name or conf reader call in its code. `--selftest` runs them all, and gov's own `loop breakpoint fixtures` gate runs them.
 
 The list does not fire a review: you, or the run, fire each review line through the driver's
@@ -1595,7 +1615,19 @@ past it, that item's loop is non-converging, though a spec subject's review roun
   `review-round`, `re-dispatch` and `research`, a `patch:` cause given, which is derived, a build with
   no record and no `RUN.md`, so no home for the row, or a patch build with no `RUN.md` of its own where
   the build it patches has no record and the set has no `log`. The unattended driver draws through it
-  on `--review` and `--dispatch`.
+  on `--review` and `--dispatch`. After a draw appended to a transition log record it reads that
+  record's merge rule once, and where `git check-attr merge` answers anything but `union` it prints,
+  after the verdict, `loop: budget · notice · <record> merges as <answer>, not union: add
+  <MEMORY_ROOT>/builds/*/build/*-transition-*.md merge=union to .gitattributes`. Add that line to your
+  `.gitattributes`: two worktrees drawing on one build each append a row, and only a union merge keeps
+  both. The draw stands either way.
+
+- **See a patch build's origin:** `python tools/loop/budget.py origin --build <slug>` runs at your <!-- usage: script:tools/loop/budget.py#origin 2f439620 -->
+  repository's top level and prints `loop: budget · origin · <slug|none>`, the build whose budget a
+  patch build's draws land on, `none` for any other build, exit 0. Before a patch build draws, the
+  unattended driver reads the run claims and asks it of each live claim but its own; where another live
+  run is a patch of the same origin, the draw is refused naming that run, its node and the origin, and
+  nothing is drawn. A claim read that fails, or a claim whose origin does not read, draws as before.
 
 - **See the value:** `python tools/loop/budget.py value` prints `base <n> per-unit <n>` from the policy <!-- usage: script:tools/loop/budget.py#value 689b423c -->
   file at HEAD, or refuses a value of another shape naming the key.
@@ -1710,7 +1742,7 @@ outside the flow, such as the lander's wait on a claim lock, which the loop kit'
 
 ## How to use it
 
-- **Read the loop:** `python tools/loop/loop_lib.py --check` prints one line per step and per <!-- usage: script:tools/loop/loop_lib.py 8a025e56 -->
+- **Read the loop:** `python tools/loop/loop_lib.py --check` prints one line per step and per <!-- usage: script:tools/loop/loop_lib.py a3a33b34 -->
   workflow with its order, step and reach word, then the dispositions and one line per alias. It
   prints one `loop: program` line per step, with its items in an order where each comes after the
   items it needs, then a `loop: program review` line for the review program, whose items are tagged
@@ -1781,7 +1813,9 @@ outside the flow, such as the lander's wait on a claim lock, which the loop kit'
   alone, and `scope-no-kit` looks for the playbook kit in an empty scratch folder and shows every line
   `unarmed`. The computed-witness cases are `computed-actor` (the item the `acceptance` row serves
   given the `actor` class) and `computed-unserved` (the row serving an item the file does not
-  declare). The files on disk are never changed.
+  declare). The files on disk are never changed. `python tools/loop/loop_lib.py --selftest` runs every
+  case and holds each to the exit and line it owes, one `PASS` or `FAIL` line per case and a summary;
+  gov's own `loop definition fixtures` gate runs it, with no guard, so every bar runs these cases.
 - **Check the re-run stand-in:** `python tools/loop/loop_witness.py --fixture --plant acceptance` runs <!-- usage: script:tools/loop/loop_witness.py 6de87be4 -->
   one case in a scratch repository and exits 0 when it holds. The cases are `acceptance` (a unit's
   commands re-run at its commit while an uncommitted edit sits beside them), `acceptance-malformed`
@@ -1791,7 +1825,12 @@ outside the flow, such as the lander's wait on a claim lock, which the loop kit'
   the unattended driver and holds it under `inherited-red` over an `OWN` leg, an untied bar and an
   `INHERITED` one, `bash-syntax` (a command only bash can run, re-run with exit 0 and the hash of its
   `0`) and `timeout-grandchild` (`sleep 30 & wait` under a two-second limit, which must come back
-  within ten seconds as `timeout`, its worktree removed or named as leaked), `normalise` (a command
+  as `timeout` within `GRANDCHILD_BOUND`, the limit plus the stop's ten-second reap wait plus the
+  overhead measured on three runs, its worktree removed or named as leaked), `leak-env` (git location
+  variables and a foreign `PWD` set by the caller, the command still reading the worktree's git,
+  `GIT_OPTIONAL_LOCKS` as `0` and the worktree as `PWD`), `exit0-grandchild` (a command leaving
+  `sleep 600` behind and exiting 0, the background process gone once the call returns on Linux and
+  macOS, and on Windows the call bounded and its worktree removed or named as leaked), `normalise` (a command
   printing its working directory three ways and a duration that changes per run, re-run twice to one
   hash) and `normaliser-missing` (the run-gates kit looked for from an empty directory: the re-run is
   refused by name before it adds a worktree, and `rerun` answers `inconclusive` printing why). `--selftest` runs every case and the two computed-witness cases above, and the

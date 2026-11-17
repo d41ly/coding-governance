@@ -405,6 +405,43 @@ python <prefix>/loop/loop_transition.py --fixture --plant default
 python <prefix>/loop/loop_transition.py check --selftest
 ```
 
+## The rework budget
+
+Contract: TOOL-dDeclaredLoop-30, its merge rule TOOL-dDeclaredLoop-49 and TOOL-dDeclaredLoop-62, its adopter
+route and its concurrent patches TOOL-dDeclaredLoop-67. `budget.py` writes a build's draw rows to its
+newest transition log record, `<MEMORY_ROOT>/builds/<slug>/build/<date>-build-<id>-transition-<n>.md`, before
+its first record to its run-state file, and to its `Gov-Transition` trailers under a set without `log`.
+A log record only gains rows, so two worktrees drawing on one build's budget each append a row at its
+end, where a text merge conflicts. The weighing `.gitattributes` records beside the transition-record
+line: `union`, git's built-in driver, keeps both sides' appended rows with no per-node config, ours
+first, and the reader re-derives the count from them; the row driver `merge=rows` conflicts on every such
+pair, since a draw row is no `- ` bullet; and `union` introduced a duplicate in 147 of 151
+`DECISIONS.md` conflicts, which is why that file keeps the row driver, while a draw row is only
+appended. `union` keeps two byte-identical appended rows once, and the draw id every draw row ends in,
+`<UTC yyyymmddThhmmssZ>-<6 hex>` (TOOL-dDeclaredLoop-61), keeps two draws two rows.
+
+An adopter's tree carries the rule by one line of its own `.gitattributes`, since no descriptor key
+installs a merge driver:
+
+```
+<MEMORY_ROOT>/builds/*/build/*-transition-*.md merge=union
+```
+
+After a draw appended to a log record, `draw` reads `git check-attr merge` on that record once, and
+where it answers anything but `union` it prints one `loop: budget · notice · <record> merges as
+<answer>, not union: add <MEMORY_ROOT>/builds/*/build/*-transition-*.md merge=union to .gitattributes`
+line after the verdict, the root the module resolves. The draw stands either way; the notice is the
+route. `origin --build <slug>` prints `loop: budget · origin · <slug|none>`, the build a patch build's
+draws land on, and the unattended driver's draw asks it of each live claim before a patch build draws,
+refusing the draw where another live run is a patch of the same origin. The plants `attr-missing` and
+`patch-concurrent` observe both.
+
+```bash
+python <prefix>/loop/budget.py draw --build <slug> --cause <cause> --item <item>
+python <prefix>/loop/budget.py origin --build <slug>
+python <prefix>/loop/budget.py --fixture --plant attr-missing
+```
+
 ## The policy file's guard
 
 Contract: TOOL-dDeclaredLoop-2. Three modules, each reading the policy kit through `read_policy_kit`,
