@@ -441,3 +441,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-17T06:30:46Z brief · item TOOL-dDeclaredLoop-91 · reason 4074d0d1da73 memory/builds/dDeclaredLoop/prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-91-build-brief.md
 
 2026-11-17T07:16:42Z dispatch · item af5996d3 TOOL-dDeclaredLoop-91 · reason tools/loop/loop_lib.py tools/loop/budget.py tools/loop/README.md memory/builds/dDeclaredLoop/README.md memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-91.md memory/builds/dDeclaredLoop/build/2026-11-17-build-TOOL-dDeclaredLoop-91-1-acceptance-ledger.md memory/builds/dDeclaredLoop/build/2026-11-17-build-TOOL-dDeclaredLoop-91-deviation-912.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-17T07:36:16Z brief · item TOOL-dDeclaredLoop-92 · reason 1fd7c0d56e66 memory/builds/dDeclaredLoop/prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-92-build-brief.md
