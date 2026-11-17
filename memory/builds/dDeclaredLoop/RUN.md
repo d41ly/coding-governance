@@ -433,3 +433,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-17T05:39:20Z brief · item TOOL-dDeclaredLoop-88 · reason 5f717b466245 memory/builds/dDeclaredLoop/prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-88-build-brief.md
 
 2026-11-17T05:51:25Z dispatch · item 9560d470 TOOL-dDeclaredLoop-88 · reason tools/loop/guard.py tools/loop/loop_lib.py tools/loop/budget.py tools/loop/README.md tools/loop/kit.toml tools/memory-tree/tree_lib.py tools/memory-tree/gen_build_index.py tools/run-gates/selftest-budgets.txt memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-88.md memory/builds/dDeclaredLoop/build/2026-11-17-build-TOOL-dDeclaredLoop-88-1-acceptance-ledger.md memory/builds/dDeclaredLoop/build/2026-11-17-build-TOOL-dDeclaredLoop-88-deviation-883.md
+
+2026-11-17T06:05:42Z brief · item TOOL-dDeclaredLoop-90 · reason 4ca2073baa70 memory/builds/dDeclaredLoop/prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-90-build-brief.md
