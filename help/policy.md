@@ -303,7 +303,8 @@ or a broken object store say, is graded against every parent, with one line nami
 owes the trailer and the change record for each key that differs from one parent, the trailer's old
 value the first such parent's. A git whose usage probe fails, cannot start or prints no usage text is
 graded as a failed re-merge too, and only a usage text lacking `--write-tree` reads as a git without
-it. A re-merge that conflicts only on other files still holds the policy file's clean merge, so the
+it; a probe exiting other than 0 or 129, or printing no `usage: git merge-tree` line, is a failed
+probe whatever else it prints. A re-merge that conflicts only on other files still holds the policy file's clean merge, so the
 merge is graded against that re-merge as above. Only an octopus merge, a merge whose re-merge conflicts
 on the policy file itself, or a git
 without `merge-tree --write-tree` is graded against its parents alone,

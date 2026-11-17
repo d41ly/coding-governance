@@ -885,7 +885,9 @@ def write_position_plant(top, case, root):
             raise subprocess.CalledProcessError(rc, "git fetch over the ssh shim", out)
     if case == "url-forms":  # TOOL-dDeclaredLoop-77 S4: a URL carrying a password, its fetch failing at connect
         run_fixture_git(repo, "remote", "set-url", "origin", "https://u:SECRET@127.0.0.1:9/r.git")
-        rc, out = read_git(repo, "fetch", "-q", "origin", env=read_clean_env(GIT_TERMINAL_PROMPT="0"))
+        # TOOL-dDeclaredLoop-86 S9: no credential helper runs and nothing prompts, so no store entry is written
+        rc, out = read_git(repo, "-c", "credential.helper=", "fetch", "-q", "origin",
+                           env=read_clean_env(GIT_TERMINAL_PROMPT="0", GCM_INTERACTIVE="never"))
         if rc == 0:
             raise subprocess.CalledProcessError(rc, "git fetch from port 9 exited 0", out)
     if case in ("fresh-clone", "offline-stale", "clone-without-reflog"):  # the engine reads the clone, whose remote's HEAD names main
@@ -1143,7 +1145,7 @@ def check_url_forms_rows(top, repo, definition, handover):
         run_fixture_git(repo, "remote", "add", "web", configured)
         with contextlib.redirect_stderr(io.StringIO()):   # the handler's request log
             rc, out = read_git(repo, "-c", "credential.helper=", "fetch", "-q", "web",
-                               env=read_clean_env(GIT_TERMINAL_PROMPT="0", NO_PROXY="127.0.0.1"))
+                               env=read_clean_env(GIT_TERMINAL_PROMPT="0", GCM_INTERACTIVE="never", NO_PROXY="127.0.0.1"))
     finally:
         server.shutdown()
         server.server_close()

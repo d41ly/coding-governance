@@ -48,14 +48,16 @@ path, or that prints no tree id; and `failed`, every other outcome. An exit 1 wh
 conflicted paths, the lines after its tree id up to the first blank line, miss the policy path reads
 `absent` or `present` from that tree, as an exit 0 does (TOOL-dDeclaredLoop-75 S27). A git whose usage probe fails, cannot start or prints no usage text is graded as a failed
 re-merge, `probe failed: <detail>`, and only a usage text lacking `--write-tree` reads as a git without
-it (TOOL-dDeclaredLoop-85). A `present` re-merge whose file does not parse is refused, `merge <sha8> · <policy
+it (TOOL-dDeclaredLoop-85); a probe exiting other than 0 or 129, or printing no `usage: git merge-tree`
+line, is a failed probe, whatever its text names (TOOL-dDeclaredLoop-86 S2). A `present` re-merge whose file does not parse is refused, `merge <sha8> · <policy
 path> does not parse at C`, as is a merge whose own file does not parse, `at M`, or a parent's on the
 parents' grade, `at parent <sha8>`; a non-merge commit's reads `on one side`. Every
 `uncomputable` or `conflicted` merge is graded against its parents (TOOL-dDeclaredLoop-59), and only where the
 combined diff lists the file with a blob differing from its first parent's: it owes for a key its result
 sets to a value no parent holds, the trailer's old value the first parent's. A `failed` merge prints
 `<sha8> graded against every parent — the clean re-merge failed: <detail>`, its exit code and git's
-first standard error line, and owes, with no exemption and whatever the combined diff lists, the
+first standard error line, a start that fails spelled `start failed: <its text>`, a negative code
+`signal <n>` and an empty standard error `(no stderr)` (TOOL-dDeclaredLoop-86 S22), and owes, with no exemption and whatever the combined diff lists, the
 trailer and record for each key its result sets apart from some parent, the old value the first such
 parent's. A commit or merge whose first
 parent lacks the file is printed and not graded. An all-zero
@@ -340,11 +342,12 @@ def read_added_units(sha, rels=None):
 
 def build_failure_detail(outcome, text):
     """The one spelling of a detail under `the clean re-merge failed:` (TOOL-dDeclaredLoop-85): an OSError
-    reads `start failed: <its text>`, an exit code `<rc>` and the first non-blank line of `text`, if any."""
+    reads `start failed: <its text>`; an exit code reads `<rc>`, a negative one `signal <n>`, followed by
+    the first non-blank line of `text`, or `(no stderr)` where it has none (TOOL-dDeclaredLoop-86 S22)."""
     if isinstance(outcome, OSError):
         return "start failed: %s" % outcome
-    line = next((ln.strip() for ln in text.splitlines() if ln.strip()), "")
-    return ("%d %s" % (outcome, line)).strip()
+    line = next((ln.strip() for ln in text.splitlines() if ln.strip()), "(no stderr)")
+    return "%s %s" % ("signal %d" % -outcome if outcome < 0 else outcome, line)
 
 
 def run_merge_tree_usage():
@@ -356,14 +359,13 @@ def run_merge_tree_usage():
 
 
 def check_write_tree_usage(rc, text):
-    """The usage probe's answer from its exit `rc` and its joined `text` (TOOL-dDeclaredLoop-85):
-    `supported` where the text names `--write-tree`; `unsupported` only for exit 129 with a usage line
-    lacking it, the form a git before it prints; `probe failed` for anything else."""
-    if "--write-tree" in text:
-        return "supported"
-    if rc == 129 and any(ln.startswith("usage: git merge-tree") for ln in text.splitlines()):
-        return "unsupported"
-    return "probe failed"
+    """The usage probe's answer from its exit `rc` and its joined `text` (TOOL-dDeclaredLoop-85): where `rc`
+    is 0 or 129 and a line opens `usage: git merge-tree`, `supported` if the text names `--write-tree`,
+    else `unsupported`, the form a git before it prints; `probe failed` for anything else, a text naming
+    the option with no usage line or under another exit included (TOOL-dDeclaredLoop-86 S2)."""
+    if rc not in (0, 129) or not any(ln.startswith("usage: git merge-tree") for ln in text.splitlines()):
+        return "probe failed"
+    return "supported" if "--write-tree" in text else "unsupported"
 
 
 @functools.cache
@@ -598,7 +600,10 @@ PLANTS = {
     "push-merge-unrelated-histories": "an orphan run branch keeping the base's policy file, merged into main with "
                                       "--allow-unrelated-histories, with trailer and record, then neither",
     "push-merge-tree-fatal": "a run branch merging main and keeping its own policy file, graded in process with "
-                             "the clean re-merge exiting 128",
+                             "the clean re-merge exiting 128, then failing to start, killed by signal 9 and "
+                             "exiting 128 with no stderr",
+    "push-merge-tree-fatal-unparseable-parent": "push-merge-tree-fatal with main declaring [review] twice, graded "
+                                                "in process with the clean re-merge exiting 128",
     "push-merge-no-write-tree": "push-merge-both-sides-clean's history graded in process by a git with no "
                                 "merge-tree --write-tree",
     "push-merge-probe-failed": "push-merge-tree-fatal's history graded in process by a git whose usage probe "
@@ -993,8 +998,8 @@ def run_guard_plant(case, top):
             sha8 = run_fixture_git(top, "rev-parse", "--short=8", "HEAD")
             run_scenario("graded", me + ["--push-range", "%s..HEAD" % base], 0,
                          "%s graded against its parents only" % sha8)
-    elif case in ("push-merge-unrelated-histories", "push-merge-tree-fatal", "push-merge-probe-failed",
-                  "push-merge-probe-silent"):
+    elif case in ("push-merge-unrelated-histories", "push-merge-tree-fatal", "push-merge-tree-fatal-unparseable-parent",
+                  "push-merge-probe-failed", "push-merge-probe-silent"):
         # TOOL-dDeclaredLoop-81: main sets review.max-rounds and the run keeps the base's policy file, so the
         # merge's blob equals the run's and the combined list never names it; only the failed re-merge's
         # grade against every parent sees main's key dropped.
@@ -1006,7 +1011,9 @@ def run_guard_plant(case, top):
             write_staged(top, {"fx-run.txt": add_text("the run's own line\n")})
             run_fixture_git(top, "commit", "-q", "-m", "the run's own commit")
             run_fixture_git(top, "checkout", "-q", "main")
-        write_staged(top, {mguard.POLICY: add_text(FX_REVIEW)})
+        # TOOL-dDeclaredLoop-86 S6: main declaring [review] twice, so its policy blob does not parse
+        twice = case == "push-merge-tree-fatal-unparseable-parent"
+        write_staged(top, {mguard.POLICY: add_text(FX_REVIEW * (2 if twice else 1))})
         run_fixture_git(top, "commit", "-q", "-m", "review rounds set on main")
         tip = run_fixture_git(top, "rev-parse", "HEAD")
         if fatal:
@@ -1020,16 +1027,30 @@ def run_guard_plant(case, top):
                 raise OSError("fx stand-in")
             # TOOL-dDeclaredLoop-85: a probe that cannot start, or exits 129 with no usage text, is a failed
             # re-merge graded against every parent, the re-merge itself never run.
+            fatal_swap = {"run_merge_tree": lambda p1, p2: (128, "", "fatal: fx stand-in\n")}
             swap, said, n = {
-                "push-merge-tree-fatal": ({"run_merge_tree": lambda p1, p2: (128, "", "fatal: fx stand-in\n")},
-                                          "128 fatal: fx stand-in", 1),
+                "push-merge-tree-fatal": (fatal_swap, "128 fatal: fx stand-in", 1),
+                "push-merge-tree-fatal-unparseable-parent": (fatal_swap, "128 fatal: fx stand-in", 1),
                 "push-merge-probe-failed": ({"run_merge_tree_usage": run_unstartable_usage},
                                             "probe failed: start failed: fx stand-in", 0),
                 "push-merge-probe-silent": ({"run_merge_tree_usage": lambda: (129, "", "")}, "probe failed: 129", 0),
             }[case]
-            run_grade_in_process(tip, swap, [
-                ("graded", 1, "the clean re-merge failed: %s" % said),
-                ("graded, the key", 1, dropped % sha8), ("graded, the re-merge count", 1, "merge-tree runs: %d" % n)])
+            if twice:   # TOOL-dDeclaredLoop-86 S6: the failed branch refuses main's unparseable blob by its parent
+                run_grade_in_process(tip, swap, [
+                    ("graded", 1, "the clean re-merge failed: %s" % said),
+                    ("graded, the parent", 1, "merge %s · %s does not parse at parent %s" % (
+                        sha8, mguard.POLICY, tip[:8]))])
+            else:
+                run_grade_in_process(tip, swap, [
+                    ("graded", 1, "the clean re-merge failed: %s" % said),
+                    ("graded, the key", 1, dropped % sha8), ("graded, the re-merge count", 1, "merge-tree runs: %d" % n)])
+            if case == "push-merge-tree-fatal":
+                # TOOL-dDeclaredLoop-86 S22: a start that fails, a signal and an empty stderr, each spelled
+                for name, swapped, spelled in (("start failed", run_unstartable_usage, "start failed: fx stand-in"),
+                                               ("signal", lambda: (-9, "", ""), "signal 9 (no stderr)"),
+                                               ("no stderr", lambda: (128, "", ""), "128 (no stderr)")):
+                    run_grade_in_process(tip, {"run_merge_tree": lambda p1, p2, f=swapped: f()}, [
+                        ("graded, %s" % name, 1, "the clean re-merge failed: %s" % spelled)])
         else:
             run_fixture_git(top, "checkout", "-q", "--orphan", "run", base)
             run_fixture_git(top, "commit", "-q", "-m", "the orphan run")
@@ -1241,7 +1262,8 @@ def run_selftest():
             "push-merge-unparseable-parent": 1, "push-merge-resurrect-emptied-policy": 1,
             "push-merge-unparseable-c": 1, "push-new-branch": 1,
             "push-first-to-empty-remote": 1,
-            "push-merge-unrelated-histories": 1, "push-merge-tree-fatal": 1, "push-merge-probe-failed": 1,
+            "push-merge-unrelated-histories": 1, "push-merge-tree-fatal": 1,
+            "push-merge-tree-fatal-unparseable-parent": 1, "push-merge-probe-failed": 1,
             "push-merge-probe-silent": 1}
     cases = [(case, ["--fixture", "--plant", case], owed.get(case, 0), "%s: fixture · plant %s · " % (SAY, case),
               "all held") for case in PLANTS]

@@ -77,8 +77,8 @@ if str(KIT) not in sys.path:
 from adapt import read_disposition_release  # noqa: E402
 from composition import build_composition_base, read_step_composition, read_tag_policy  # noqa: E402
 from loop_items import read_composed_items  # noqa: E402
-from loop_lib import (derive_conf_reads, derive_fixture_boundary, read_memory_tree, read_steps, resolve_kit_dir,  # noqa: E402
-                      resolve_memory_root_source, run_selftest_cases)
+from loop_lib import (LoopError, derive_conf_reads, derive_fixture_boundary, read_memory_tree, read_steps,  # noqa: E402
+                      resolve_kit_dir, resolve_memory_root_source, run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_transition import (FX_BUILD, FX_SPEC, FX_UNIT, read_build_headers, read_build_specs,  # noqa: E402
                              read_transitions, write_transition_plant)
@@ -493,6 +493,9 @@ def run_breakpoint_plant(case):
             except SyntaxError as e:
                 bound, hits = [], []
                 check(False, "%s does not parse: %s" % (own.name, e))
+            except LoopError as e:   # TOOL-dDeclaredLoop-86 S21: a missing loop_lib or a stale tree_lib, a miss
+                bound, hits = [], []
+                check(False, str(e))
             print("%s: fixture · fixture boundary: %d functions — %s" % (SAY, len(bound), ", ".join(bound) or "none"))
             for line, kind in hits:
                 print("%s: fixture · conf read · %s:%d %s" % (SAY, own.name, line, kind))

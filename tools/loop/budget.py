@@ -121,8 +121,8 @@ KIT = pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from adapt import read_disposition_release, read_run_file  # noqa: E402
-from loop_lib import (derive_conf_reads, derive_fixture_boundary, read_memory_tree, resolve_memory_root,  # noqa: E402
-                      resolve_memory_root_source, run_selftest_cases)
+from loop_lib import (LoopError, derive_conf_reads, derive_fixture_boundary, read_memory_tree,  # noqa: E402
+                      resolve_memory_root, resolve_memory_root_source, run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_transition import (BUDGET_FIELDS, FX_BUILD, FX_SPEC, FX_UNIT, VALUE,  # noqa: E402
                              check_transition_channels, read_build_specs, read_build_unit_ids,
@@ -204,7 +204,8 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
           "no-confs": "the memory tree's conf taken out and no driver's conf written, the root read",
           "conf-read-forms": "the conf-read rule over scratch modules beside a loop_lib binding the driver's conf's "
                              "name: a constant, the same line in fixture code, a bash string, an aliased reader, "
-                             "docstrings alone, then the first module with no loop_lib beside it"}
+                             "docstrings alone, a Path binding, an annotated binding and a star import of the "
+                             "loop_lib, then the first module with no loop_lib beside it"}
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
 PLANT_TRAILER = '[transitions]\nrecord = ["trailer"]\n'
 PLANT_SPEC = "# TOOL-%s-%d — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n"
@@ -746,18 +747,27 @@ def run_budget_plant(case):
             except SyntaxError as e:
                 bound, hits = [], []
                 check(False, "%s does not parse: %s" % (own.name, e))
+            except LoopError as e:   # TOOL-dDeclaredLoop-86 S21: a missing loop_lib or a stale tree_lib, a miss
+                bound, hits = [], []
+                check(False, str(e))
             print("%s: fixture · fixture boundary: %d functions — %s" % (SAY, len(bound), ", ".join(bound) or "none"))
             for line, kind in hits:
                 print("%s: fixture · conf read · %s:%d %s" % (SAY, own.name, line, kind))
             check(not hits, "%d conf read(s) in %s" % (len(hits), own.name))
-            # TOOL-dDeclaredLoop-80 AC2: the boundary's lasting arm, a whole-token match over defs alone
+            # TOOL-dDeclaredLoop-80 AC2: the boundary's lasting arm, a whole-token match over defs alone; its
+            # loop_lib.py stub binds no conf name (TOOL-dDeclaredLoop-86 S15)
             staged = top / "staged.py"
             write_fixture_files(top, {staged.name: 'def check_plant_root(tree): return tree / ".unattended.conf"\n'
                                       'async def build_fixture_tree(t): return ".memory-tree.conf"\n'
                                       'def read_planted_root(t): return ".unattended.conf"\n'
-                                      'class fixture_rows:\n    CONF = ".memory-tree.conf"\n'})
+                                      'class fixture_rows:\n    CONF = ".memory-tree.conf"\n',
+                                      "loop_lib.py": "NOTHING = 0\n"})
             bound = [f.name for f in derive_fixture_boundary(ast.parse(staged.read_text(encoding="utf-8")))]
-            hits = derive_conf_reads(staged)
+            try:
+                hits = derive_conf_reads(staged)
+            except LoopError as e:
+                hits = []
+                check(False, str(e))
             print("%s: fixture · %s · fixture boundary: %d functions — %s" % (SAY, staged.name, len(bound),
                                                                              ", ".join(bound) or "none"))
             for line, kind in hits:
@@ -804,10 +814,24 @@ def run_budget_plant(case):
                 print("%s: fixture · conf-read-forms · %s · %s" % (SAY, name, ", ".join(
                     "line %d %s" % hit for hit in got) or "no hit"))
                 check(got == owed, "%s answered %s, owed %s" % (name, got, owed))
+            # TOOL-dDeclaredLoop-86 S13: a Path binding, an annotated binding and a star import, each a folder
+            # holding its module beside a loop_lib.py binding a conf's name in that form
+            for name, lib, text in (
+                    ("path-binding", 'from pathlib import Path\nUNATTENDED_CONF_PATH = Path(".unattended.conf")\n',
+                     "import loop_lib as ll\ndef read_root(tree): return tree / ll.UNATTENDED_CONF_PATH\n"),
+                    ("annotated-binding", 'CONF: str = ".memory-tree.conf"\n',
+                     "import loop_lib as ll\ndef read_root(tree): return tree / ll.CONF\n"),
+                    ("star-import", 'CONF = ".unattended.conf"\n',
+                     "from loop_lib import *\ndef read_root(tree): return tree / CONF\n")):
+                write_fixture_files(top / name, {"loop_lib.py": lib, name + ".py": text})
+                got = derive_conf_reads(top / name / (name + ".py"))
+                print("%s: fixture · conf-read-forms · %s · %s" % (SAY, name, ", ".join(
+                    "line %d %s" % hit for hit in got) or "no hit"))
+                check(got == [(2, "conf constant")], "%s answered %s, owed one conf constant" % (name, got))
             write_fixture_files(top / "no-lib", {"constant.py": first})
             try:
                 got = "answered %s" % derive_conf_reads(top / "no-lib" / "constant.py")
-            except OSError as e:
+            except LoopError as e:   # TOOL-dDeclaredLoop-86 S13: a missing sibling is a refusal, never an empty set
                 got = "raised %s" % e
             print("%s: fixture · conf-read-forms · constant, no loop_lib beside it · %s" % (SAY, got))
             check(got.startswith("raised") and "loop_lib.py" in got, "the module with no loop_lib beside it %s" % got)

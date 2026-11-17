@@ -10418,6 +10418,11 @@
       "file": "tools/loop/composition.py"
     },
     {
+      "id": "derive_conf_constants",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "derive_conf_key",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
