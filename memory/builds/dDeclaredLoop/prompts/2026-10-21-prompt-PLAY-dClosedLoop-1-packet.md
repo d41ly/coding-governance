@@ -86,7 +86,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `a3b352b3cd37917b1f1a7a0764dd398dd2e3222d`
+- rendered at: `66624e75a6a5706c44e8c6436f91381d724dbdd8`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -290,7 +290,7 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dDeclaredLoop`:
 
-Coverage of dDeclaredLoop's 34 clauses and 49 owned nodes, over 103 PINNED specs:
+Coverage of dDeclaredLoop's 34 clauses and 49 owned nodes, over 103 specs:
 - carried whole: 34; carried in parts: 0 (none)
 - moved, retired or deferred: none
 - uncarried: none; stale: cl-dClosedLoop-0091, cl-dClosedLoop-0117, cl-dClosedLoop-0118; ambiguous: none

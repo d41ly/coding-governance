@@ -425,7 +425,7 @@ New arm: tools/lib/resolve-python.test.sh · covers AC5 · the `needs_graph_py` 
   pick stands and no ask is filed.
 - **F6 — Where does the instruction scope run, given one `derive` per item?** One `derive` took 0.79 s,
   PINNED 2026-11-14, so the 61 rows cost about 48 s, PINNED. Options: (a) inside `--check`, serially,
-  which spends that on every `loop definition` run, against its 120 s ceiling, and on every
+  which spends that on every `loop definition` run, against its 120 PINNED s ceiling, and on every
   `adopt-loop.sh --check` an apply or an upgrade walk runs; (b) inside `--check` through a bounded
   pool, a declared fan-out bound and its own failure modes on every adopter; (c) a `--scopes` verb that
   `--check` does not run, serial, with no reader in a gate today. Recommendation (c): the scope is read

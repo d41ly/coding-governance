@@ -502,7 +502,7 @@ New arm: tools/loop/budget.py · covers AC1 AC3 · the module-scope group of con
   `derive_conf_constants`'s answer, in place of an absent update command 88 S33's rows print (F6). S5
   keeps the over-match paragraph before `NOT SEEN`, where it landed, and AC4 reads it there. The units
   rev-3 read on their specs are read as landed; the sweep's figures are re-read: the two greps that
-  matched nothing now match, the positional registry holds 1 row, the leg's budget is 498 seconds and
+  matched nothing now match, the positional registry holds 1 row, the leg's budget is 498 PINNED seconds and
   budget.py's usage rows 6.
 
 ## 10. Reuse audit

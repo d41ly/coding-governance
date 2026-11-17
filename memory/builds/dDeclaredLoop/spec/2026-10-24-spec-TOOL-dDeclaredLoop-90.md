@@ -150,7 +150,7 @@ unit builds, at order 45. Each item's criterion leaves with it.
 | S17 | 87 is CLOSED here. 87 rev-6 AC2 binds `JOINED`, `OSJOIN` and `MULTI`, three distinct names, each owed in the answer. |
 | S18 | 88 rev-6 §4 Evidence cites code by symbol and cites 75 by no line number. |
 | S21 | 86 rev-8 S22 keeps the `OSError` spelling of `tools/loop/guard.py#build_failure_detail`, `start failed: <its text>` (its §8 F6), and the tip spells it with `%s` over the error itself, so a one-argument `OSError("fx stand-in")` reads `start failed: fx stand-in`, never `None`. 86 S22's own row raises that one-argument error. No `strerror` reading is built. |
-| S22 | 78, 81, 83 and 84 are CLOSED at orders 19 to 21 and frozen, and 75 is CLOSED here. The push arm paragraph of the module docstring of `tools/loop/guard.py` names the five states, `absent`, `present`, `uncomputable`, `conflicted` and `failed`, as 88 rev-6 §3 records for its S2. The build README's units region renders 78's frozen H1. |
+| S22 | 78, 81, 83 and 84 are CLOSED at orders 19 to 21 and frozen, and 75 is CLOSED here. The push arm paragraph of the module docstring of `tools/loop/guard.py` names the five states, `absent`, `present`, `uncomputable`, `conflicted` and `failed`, as 88 rev-6 §3 PINNED records for its S2. The build README's units region renders 78's frozen H1. |
 
 ### Edges
 

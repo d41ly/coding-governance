@@ -93,7 +93,7 @@ v2:1253-1255).
   in `tools/gate-legs.json`. Its row carries `enforces = ["principle.p38"]` (dOrderedCharter-7 S2), the
   tag of the v2 `[enforcement]` row naming this unit's clause `cl-dClosedLoop-0106`, and
   `stage = ["step.test"]`, the key every leg row carries, with chunk `selftests`, subject `kit` and a
-  ceiling of 120 seconds. The leg is gov's own: an `[[exempt_leg]]` row in `tools/govkit/registry.toml`
+  ceiling of 120 PINNED seconds. The leg is gov's own: an `[[exempt_leg]]` row in `tools/govkit/registry.toml`
   and the row `python tools/govkit/govkit.py selfcheck --write` writes into
   `tools/govkit/subject-pins.tsv`, with a comment in `tools/loop/kit.toml` naming the module and its leg,
   as `loop upstream fixtures` is declared. It gains a `tools/run-gates/selftest-budgets.txt` row priced
@@ -456,7 +456,7 @@ bytes once its row lands and not `conf_to_policy.py`'s, which it imports, as it 
     `MA_ROUNDS`'s `hit`s (S6). Each arm text is read statically by the leg, so the waiver of the suites'
     runs does not waive their arming.
   - TOOL-dDeclaredLoop-30's raise by two then starts from 327, as the decision row records.
-- `memory/guides/BUILD-METHOD.md` measures 30709 bytes against its 30720 cap in
+- `memory/guides/BUILD-METHOD.md` measures 30709 PINNED bytes against its 30720 cap in
   `tools/template-size-limits.txt`, 11 spare. S4's M4 rewording is exactly two substitutions, in the
   template and its render: the BLOCKED-verdict paragraph's `REVIEW_ROUNDS` becomes
   `review.design.rounds`, so "A SPEC subject takes `review.design.rounds` rounds (protocol §8)", +7
@@ -516,8 +516,8 @@ commands below re-derive them, and a builder re-runs them at its base.
 
 | Changed or removed | Population at `12e930f8` | What keeps it green |
 |---|---|---|
-| `RUNAWAY_CEILING` | 23 lines in 6 files under `tools/`, and the gotcha record that cites it | S3 and S6 re-point every line; the tier2-review parity arm and the driver suite's `review_state` slice set `MAX_ROUNDS` themselves; the record keeps its text |
-| `REVIEW_ROUNDS`, `REVIEW_ROUNDS_DEFAULT` | 73 lines in 20 files under AC5's pathspec, 8 of them the default; outside it `help/policy.md`, three renders under `memory/guides/`, and two append-only records | S4's derived rule and AC5; the renders regenerate; `memory/DECISIONS.md` and `memory/backlog/TOOL.md` keep their text |
+| `RUNAWAY_CEILING` | 23 PINNED lines in 6 files under `tools/`, and the gotcha record that cites it | S3 and S6 re-point every line; the tier2-review parity arm and the driver suite's `review_state` slice set `MAX_ROUNDS` themselves; the record keeps its text |
+| `REVIEW_ROUNDS`, `REVIEW_ROUNDS_DEFAULT` | 73 lines in 20 PINNED files under AC5's pathspec, 8 of them the default; outside it `help/policy.md`, three renders under `memory/guides/`, and two append-only records | S4's derived rule and AC5; the renders regenerate; `memory/DECISIONS.md` and `memory/backlog/TOOL.md` keep their text |
 | `review_state` | its one caller `verb_review`; the driver suite's slice arms; the tier2-review parity arm | the default third argument becomes `MAX_ROUNDS`, which each slicing arm sets (S3, AC4) |
 | `verb_review` | 85 `--review` lines in the driver suite: 46 on `write_switch_fixture` trees, one sub-fixture round at blockers 0, the rest the main fixture's; one in `tools/unattended/runlog-writer.test.sh`, at blockers 0 | the switch trees read the kit defaults, spec bound 1 as their deleted line set (§8 F9); the main fixture reads its policy on `main` (§8 F7); a blockers-0 round reads `CONVERGED` under any bound |
 | `verb_preflight` | `tools/loop/loop_witness.py#check_hold_plant` runs the real driver's `--preflight` in a scratch repository | untouched (§8 F10), so the `loop computed witness` leg sees no new line |
@@ -783,7 +783,7 @@ New arm: tools/unattended/unattended.test.sh and tools/unattended/check-unattend
   builder return, build/2026-11-16-build-TOOL-dDeclaredLoop-21-2-builder-return.md: `verb_review`'s
   `fail 37` kept and the driver's ceiling raised 326 -> 327 under decision `TOOL-dDeclaredLoop-21`,
   with the conf token, its comment line and its positional row in Files touched, and the M4 rewording
-  worded to fit the 11 bytes `BUILD-METHOD.md` has left; §7's line gains `transition-audit arms` and
+  worded to fit the 11 PINNED bytes `BUILD-METHOD.md` has left; §7's line gains `transition-audit arms` and
   `straggler-guard arms`, the legs whose guard holds `.memory-tree.conf`.
 - rev-7 · 2026-11-16 · S4 · S6 · §4 What this does not check · §4 Budgets and records · §4 Files touched ·
   AC6 · F6 · F7 · §10 · the divergence of the third builder return,

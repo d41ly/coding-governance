@@ -122,7 +122,7 @@ Every code claim below was read on `branch/unattended-declared-loop-d56bf0` at `
   a conflict, so a landing merge is git's clean merge and equals C at the policy file.
 - `tools/loop/guard.py#run_fixture` prints `all held` when every scenario held and exits as the last
   scenario did; `tools/loop/guard.py#run_selftest` owes each plant its owed-map exit, 0 by default.
-- No scratch probe was run: the harness refuses git outside this worktree. 59 §4 records the
+- No scratch probe was run: the harness refuses git outside this worktree. 59 §4 PINNED records the
   `merge-tree --write-tree` probe, PINNED 2026-10-24, and AC1's red observation is this unit's probe
   that the combined list never names the revert merge.
 

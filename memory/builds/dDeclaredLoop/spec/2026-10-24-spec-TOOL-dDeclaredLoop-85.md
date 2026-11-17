@@ -140,7 +140,7 @@ Every code claim below was read on `branch/unattended-declared-loop-d56bf0` at `
   `or: git merge-tree [--trivial-merge] <base-tree> <branch1> <branch2>`. A probe reading standard
   error alone answers absence on a capable git, which is why S2 joins both streams.
 - A git before the feature prints only the trivial form: UNVERIFIED, from git's documentation, as 81
-  §4 records, so `push-merge-old-git-usage` plants that text rather than an old git.
+  §4 PINNED records, so `push-merge-old-git-usage` plants that text rather than an old git.
 - `tools/loop/guard.py#read_remerge_policy`, built by `TOOL-dDeclaredLoop-59`, is the one `merge-tree`
   call in the module, run through `tools/loop/loop_witness.py#read_git`, which discards standard error;
   no probe exists at that tip. `tools/loop/guard.py#check_push_range` runs

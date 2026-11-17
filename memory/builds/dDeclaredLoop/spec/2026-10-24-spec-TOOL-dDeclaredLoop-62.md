@@ -341,7 +341,7 @@ New arm: tools/loop/budget.py · covers AC2 AC3 · the `parallel-append-uneven` 
   same-item side draw for `parallel-append`, and only `parallel-append-uneven` draws its own items on
   `side`; §5 dependency names 61's extended `parallel-append` and its `draw-id-rows` plant as what
   landed, the joining clause dropped; the figures refreshed to 17 `PLANTS` keys, the budget row's 339
-  from 226 seconds, and the help/loop.md quote 61 wrote.
+  from 226 PINNED seconds, and the help/loop.md quote 61 wrote.
 
 ## 10. Reuse audit
 

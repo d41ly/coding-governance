@@ -303,7 +303,7 @@ so the apply step exits non-zero inside whatever bash `resolve_bash` answers, wi
 For each unit, its pass commit is the one 75's probe finds by the `Pass:` trailer. Its legs are every row
 of `tools/gate-legs.json` at this unit's base whose argv names a file under `{prefix}/loop/` that the pass
 commit changes, as `git show --name-only <pass>` lists them. Each leg runs at the pass commit as 75's
-probe runs it, and a row the pass commit's manifest lacks is recorded `no leg`, as 75 records it.
+probe runs it, and a row the pass commit's manifest lacks is recorded `no leg`, as 75 PINNED records it.
 Unit 71 writes nothing (71 rev-4 §8 F3) and unit 73 writes no loop file, so neither is in the population.
 
 ### The gained prune (S19)
@@ -383,7 +383,7 @@ Each is a case of `tools/loop/budget.py#run_budget_plant`, inside 80 S1's bounda
 
 `python tools/lexicon/lexicon.py --suggest check_gained_prune_vintage --as py.function` answered OK on this
 worktree at `179486e8f`; the tip export holds no `.git`, so the verb refused there, and the two
-`.lexicon.conf` files differ in `VERB_OFFENDER_PIN` alone of what this verb reads, as 70 §4 records.
+`.lexicon.conf` files differ in `VERB_OFFENDER_PIN` alone of what this verb reads, as 70 §4 PINNED records.
 
 ### Files touched (estimate)
 

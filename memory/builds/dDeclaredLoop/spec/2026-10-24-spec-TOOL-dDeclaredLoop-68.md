@@ -93,7 +93,7 @@ the program route as landed. It repairs `TOOL-dDeclaredLoop-56`.
 - Rev-2's S2, the deletion of 56's Python copy and its `normalise_output` parity row, leaves the scope:
   56 rev-6 §8 F7 (b) builds neither, and `git grep -c normalise_output -- tools/` prints nothing at the
   tip. Rev-2's AC3, which observed that absence, leaves with it; 67 AC17 observes it at its own pass. The
-  `resolve_bash_py` row stands, as 56 rev-6 §3 records against its S28.
+  `resolve_bash_py` row stands, as 56 rev-6 §3 PINNED records against its S28.
 - Rev-2's §5 claim that the loop kit's descriptor requires every kit it resolves was false at the time
   (round-4 id 4); it is `TOOL-dDeclaredLoop-79` S5's to make true, and this spec no longer states it.
 

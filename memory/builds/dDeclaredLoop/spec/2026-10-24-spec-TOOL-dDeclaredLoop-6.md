@@ -524,7 +524,7 @@ New arm: tools/loop/factories.py · covers AC2 AC3 AC5 AC6 AC7 AC10 · each `-ha
   TOOL-dDeclaredLoop-25's non-goal naming this unit's `[[step]]` writer are read by both units' own
   re-grounds. RESOLVED (agent, 2026-11-15, delegated): (b), rung 3: (a) fails `check_loop`'s closed step
   set and clause 0110, the build method's first veto, and (b) is the one option left; the carry stays
-  whole and deviation 64 records the stage factory's move to TOOL-dDeclaredLoop-25.
+  whole and deviation 64 PINNED records the stage factory's move to TOOL-dDeclaredLoop-25.
   widens: none · relaxes: the clause's stage factory and gate at this unit
 - **F5 — How do a new role and a new workflow join the two sets the roles kit closes in code?**
   (a) The factory writes the row into `BODY_CEILINGS`, priced by `--ceiling`, and the name into

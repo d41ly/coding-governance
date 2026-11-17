@@ -611,7 +611,7 @@ are declared here and read by the owner's run PLAY-dClosedLoop-13 names.
   a catalogued value the owner could set and the tool would refuse. Recommendation: (a). RESOLVED (agent,
   2026-11-16, delegated): (a), by rung 3.
   widens: none · relaxes: none
-- **F7 — How does M4 take the pointer, with 6 bytes left under its row?** Options: (a) the SPEC-exit
+- **F7 — How does M4 take the pointer, with 6 PINNED bytes left under its row?** Options: (a) the SPEC-exit
   promotion sentence restated by reference to the DIFF exit's, which pays for the pointer and puts both
   exits under one count; (b) raise the `build-method size` row, which the owner's ruling keeps theirs;
   (c) no pointer, so M4 states a rule a key can change. Recommendation: (a). RESOLVED (agent, 2026-11-16,

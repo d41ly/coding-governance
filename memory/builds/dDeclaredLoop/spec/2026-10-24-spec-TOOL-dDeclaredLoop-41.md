@@ -198,7 +198,7 @@ same build run. S2 is the unit that makes those installs green.
     and `report` prints nothing there without `GOV_UNATTENDED_REPORT=1`. The suite is waived for this
     build's landing (the build README's waiver of the unattended kit's suites).
   - `tools/unattended/cross-component.test.sh` seeds the loop kit's three files beside its prefix and
-    runs the leg, whose check 53 calls `--grade-site`, which reads no conf.
+    runs the leg, whose check 53 PINNED calls `--grade-site`, which reads no conf.
   - `harness arms (fail branches armed or pinned)`: S5 adds no `fail` site and no `status=1`, so the
     census and its `REFUSAL_CEILINGS` token stand.
   - `docs`: the usage row `script:{prefix}/loop/loop_lib.py` in `tools/govkit/usage.toml` keeps its

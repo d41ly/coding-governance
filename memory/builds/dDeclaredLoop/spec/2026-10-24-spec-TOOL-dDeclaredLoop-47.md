@@ -190,7 +190,7 @@ No arm is added or moved: the unit builds nothing under §8 F3 (a).
   (a) Nothing: H3 is answered by `TOOL-dDeclaredLoop-25` S8, whose factory writes the stage row and its
   exit item, derives the state and the rows, and grades them under every check that holds them before
   any write; the run resolves this fork, moves the spec to WONTDO with `TOOL-dDeclaredLoop-25` as its
-  successor pointer, and writes the record that move owes, as deviation 64 records unit 6's.
+  successor pointer, and writes the record that move owes, as deviation 64 PINNED records unit 6's.
   (b) This unit re-targeted as a post-write gate on `splice.py new`: after the factory appends its
   tables, run `splice.py check` and `loop_items.py check` and restore the overlay through the guarded
   write on a red. The factory already writes nothing on a refusal, so the gate re-runs predicates the

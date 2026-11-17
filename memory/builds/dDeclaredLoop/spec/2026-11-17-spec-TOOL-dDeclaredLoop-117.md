@@ -416,7 +416,7 @@ main's: `loop definition fixtures`, whose `--selftest` runs the six new plants a
 plants, whose answers do not move. The deviation join, hosted in `tools/memory-tree/routed_commits.py`
 under its `report` policy, reads the three records and lists them, never refusing.
 
-New arm: tools/loop/loop_lib.py · covers AC1 AC3 · the six conf plants run by --selftest against their PLANT_OWED rows, red with derive_conf_openers at the tip's bytes, where the three opener cases exit 0, and with each refusal arm of check_conf_readers_plant left out in turn · none, unless the leg's first reading passes the 33 s budget row, which is then re-priced in the same commit
+New arm: tools/loop/loop_lib.py · covers AC1 AC3 · the six conf plants run by --selftest against their PLANT_OWED rows, red with derive_conf_openers at the tip's bytes, where the three opener cases exit 0, and with each refusal arm of check_conf_readers_plant left out in turn · none, unless the leg's first reading passes the 33 PINNED s budget row, which is then re-priced in the same commit
 
 What the arm does not check, stated so a green is not read as more. It grades shapes S1 names and no
 other: the §3 blind spots pass it undeclared. Each opener case appends one function, so it shows the

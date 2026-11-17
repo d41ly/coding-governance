@@ -214,7 +214,7 @@ Read on branch `unattended-declared-loop-d56bf0` at `e0a7e54b3`.
 | S15 | `tools/lib/commit_trailers.py#read_commits` refuses only a requested key the table does not register, so a table lacking `Gov-Policy` still serves a `Pass` read. |
 | S16 | `tools/loop/position.py#derive_position` arms the acceptance half on the named pattern `ROUTE_STAND_IN` over the `acceptance` row's `writer`. |
 | S21 | §8 F6. |
-| S24 | `TOOL-dDeclaredLoop-68` rev-3 S1 and S4 build the program-route normaliser and its `normalise` plant at order 37, and its §3 records that no `normalise_output` row exists. S22 and S37 edit the same function on that body. |
+| S24 | `TOOL-dDeclaredLoop-68` rev-3 S1 and S4 build the program-route normaliser and its `normalise` plant at order 37, and its §3 PINNED records that no `normalise_output` row exists. S22 and S37 edit the same function on that body. |
 | S25 | Every `command:` actor of `tools/loop/loop.toml` reads `command:<kit>.<verb>`; none spells a path. |
 | S26, S27, S49 | `TOOL-dDeclaredLoop-1` and `TOOL-dDeclaredLoop-36` are CLOSED: the passes these items instruct are past, and `govkit selftest`'s default-plan pins are the ones unit 36's pass left green. |
 | S28 | `KIT_RUN_GATES_VERSION` and the README's `gov:kit run-gates@` marker read one value at the tip, which `kit version markers` holds; the canary's `KNOWN` key set names `stage`, and `tools/run-gates/README.md` keeps no leg-row key list. |
