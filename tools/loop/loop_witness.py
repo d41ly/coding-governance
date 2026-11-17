@@ -10,8 +10,8 @@
 temporary directory, each command run there as `bash -c <command>`, its exit status (or `timeout`) and the
 first twelve hex digits of the SHA-256 of its combined output kept, and the worktree removed on every exit
 path. Each command runs in the environment the run-gates kit's `regen.py` `run_command` gives its
-commands, the shape this follows (TOOL-dDeclaredLoop-67 S22): the caller's, every name of the memory-tree
-kit's `GIT_ENV_LEAKS` unset, `GIT_OPTIONAL_LOCKS=0` set and no inherited `PWD`. The bash is the inline
+commands, the shape this follows (TOOL-dDeclaredLoop-67 S22): the caller's, every name of the inline
+`git_env_leaks` block's `GIT_ENV_LEAKS` unset (TOOL-dDeclaredLoop-92 S8), `GIT_OPTIONAL_LOCKS=0` set and no inherited `PWD`. The bash is the inline
 `resolve_bash`'s, one that can see this file, and a call with none raises LookupError. Output goes to a
 file beside the worktree, never a pipe, read once the wait returns, so a grandchild holding it cannot hold
 the call. Where `run_command` kills on its timeout alone, this calls the inline `run_tree_kill` after
@@ -146,11 +146,31 @@ def run_tree_kill(proc):
 # <<< run_tree_kill_py
 
 
+# >>> git_env_leaks_py -- canonical copy: git_env_leaks.py in the gov lib dir (byte-identical; gated)
+# The eight location variables git EXPORTS to a hook, which reach any subprocess the hook starts and
+# name another tree than the one a reader was pointed at; and the four pathspec-mode variables a
+# caller can carry, which turn a `:(glob)` pathspec into a literal name that matches nothing.
+GIT_ENV_LEAKS = (
+    "GIT_DIR",
+    "GIT_WORK_TREE",
+    "GIT_INDEX_FILE",
+    "GIT_OBJECT_DIRECTORY",
+    "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+    "GIT_COMMON_DIR",
+    "GIT_NAMESPACE",
+    "GIT_PREFIX",
+    "GIT_LITERAL_PATHSPECS",
+    "GIT_GLOB_PATHSPECS",
+    "GIT_NOGLOB_PATHSPECS",
+    "GIT_ICASE_PATHSPECS",
+)
+# <<< git_env_leaks_py
+
+
 def read_clean_env(**put):
-    """This process's environment less the memory-tree kit's `GIT_ENV_LEAKS`, with `put` set."""
-    read_memory_tree("tree_lib.py")
-    from tree_lib import GIT_ENV_LEAKS
-    env = {k: v for k, v in os.environ.items() if k not in GIT_ENV_LEAKS}
+    """This process's environment less the inline `git_env_leaks` block's `GIT_ENV_LEAKS`, with `put` set
+    (TOOL-dDeclaredLoop-92 S8): no memory-tree kit is resolved, so a missing or older one cannot refuse it."""
+    env ={k: v for k, v in os.environ.items() if k not in GIT_ENV_LEAKS}
     env.update(put)
     return env
 

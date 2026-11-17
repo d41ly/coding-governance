@@ -57,7 +57,8 @@ parents' grade, `at parent <sha8>`; a non-merge commit's reads `on one side`. Ev
 combined diff lists the file with a blob differing from its first parent's: it owes for a key its result
 sets to a value no parent holds, the trailer's old value the first parent's. A `failed` merge prints
 `<sha8> graded against every parent — the clean re-merge failed: <detail>`, its exit code and git's
-first standard error line, a start that fails spelled `start failed: <its text>`, a negative code
+first standard error line, a start that fails spelled `start failed: <its text>`, stripped, or its class name
+where that is empty (TOOL-dDeclaredLoop-92 S17), a negative code
 `signal <n>` and an empty standard error `(no stderr)` (TOOL-dDeclaredLoop-86 S22), and owes, with no exemption and whatever the combined diff lists, the
 trailer and record for each key its result sets apart from some parent, the old value the first such
 parent's. A commit or merge whose first
@@ -343,10 +344,11 @@ def read_added_units(sha, rels=None):
 
 def build_failure_detail(outcome, text):
     """The one spelling of a detail under `the clean re-merge failed:` (TOOL-dDeclaredLoop-85): an OSError
-    reads `start failed: <its text>`; an exit code reads `<rc>`, a negative one `signal <n>`, followed by
+    reads `start failed: <its text>`, stripped, or `start failed: <its class name>` where that text is empty
+    (TOOL-dDeclaredLoop-92 S17); an exit code reads `<rc>`, a negative one `signal <n>`, followed by
     the first non-blank line of `text`, or `(no stderr)` where it has none (TOOL-dDeclaredLoop-86 S22)."""
     if isinstance(outcome, OSError):
-        return "start failed: %s" % outcome
+        return "start failed: %s" % (str(outcome).strip() or type(outcome).__name__)
     line = next((ln.strip() for ln in text.splitlines() if ln.strip()), "(no stderr)")
     return "%s %s" % ("signal %d" % -outcome if outcome < 0 else outcome, line)
 
@@ -603,8 +605,8 @@ PLANTS = {
     "push-merge-unrelated-histories": "an orphan run branch keeping the base's policy file, merged into main with "
                                       "--allow-unrelated-histories, with trailer and record, then neither",
     "push-merge-tree-fatal": "a run branch merging main and keeping its own policy file, graded in process with "
-                             "the clean re-merge exiting 128, then failing to start, killed by signal 9 and "
-                             "exiting 128 with no stderr",
+                             "the clean re-merge exiting 128, then failing to start, failing to start with no "
+                             "message and with an errno alone, killed by signal 9 and exiting 128 with no stderr",
     "push-merge-tree-fatal-unparseable-parent": "push-merge-tree-fatal with main declaring [review] twice, graded "
                                                 "in process with the clean re-merge exiting 128",
     "push-merge-no-write-tree": "push-merge-both-sides-clean's history graded in process by a git with no "
@@ -1078,7 +1080,12 @@ def run_guard_plant(case, top):
             run_grade_in_process(tip, swap, rows)
             if case == "push-merge-tree-fatal":
                 # TOOL-dDeclaredLoop-86 S22: a start that fails, a signal and an empty stderr, each spelled
+                # TOOL-dDeclaredLoop-92 S17: an OSError with no text, and an errno alone, spelled by class or errno
                 for name, swapped, spelled in (("start failed", run_unstartable_usage, "start failed: fx stand-in"),
+                                               ("start failed, no message", lambda: (_ for _ in ()).throw(OSError()),
+                                                "start failed: OSError"),
+                                               ("start failed, an errno alone",
+                                                lambda: (_ for _ in ()).throw(OSError(5, "")), "start failed: [Errno 5]"),
                                                ("signal", lambda: (-9, "", ""), "signal 9 (no stderr)"),
                                                ("no stderr", lambda: (128, "", ""), "128 (no stderr)")):
                     run_grade_in_process(tip, {"run_merge_tree": lambda p1, p2, f=swapped: f()}, [
