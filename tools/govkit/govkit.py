@@ -1192,14 +1192,20 @@ def demand_claimed_requires(claimed: list[str], gained: list[str], descs: dict[s
     `apply` refuses by, so the update and the install answer one question one way. `why` is the
     reason `derive_default_gained` returned for gaining nothing; it rides in the refusal so "no
     vintage" and "registry unreadable at a vintage" read differently from "the default never held
-    it", which carries no reason clause. The route names the first pair; the text names every pair.
+    it", which carries no reason clause. The text names every pair, and the route every kit of every
+    pair, once each, in the order the pairs are listed (TOOL-dDeclaredLoop-75 S26).
+
+    THE POPULATION IS EVERY CLAIMED KIT'S `requires` AT `to_commit`, accepted and stated: a receipt
+    that predates an edge its kit gained since, such as the ones the unattended kit's descriptor
+    gained, is refused here until `apply --kits` installs the kits the route names.
     """
     unmet = derive_unsatisfied_requires(list(claimed) + list(gained), descs, receipt)
     if unmet:
         pairs = ", ".join(f"'{k}' requires '{d}'" for k, d in unmet)
+        kits = ",".join(dict.fromkeys(k for pair in unmet for k in pair))
         raise Refusal(f"update would leave {pairs} unmet"
                       + (f"; default-gained did not cover it: {why}" if why else "")
-                      + f"; `apply --kits {unmet[0][0]},{unmet[0][1]}` installs both")
+                      + f"; `apply --kits {kits}` installs them")
 
 
 def add_deploy_kits(target: pathlib.Path, ids: list[str]) -> str:

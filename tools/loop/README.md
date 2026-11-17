@@ -419,6 +419,10 @@ pair, since a draw row is no `- ` bullet; and `union` introduced a duplicate in 
 `DECISIONS.md` conflicts, which is why that file keeps the row driver, while a draw row is only
 appended. `union` keeps two byte-identical appended rows once, and the draw id every draw row ends in,
 `<UTC yyyymmddThhmmssZ>-<6 hex>` (TOOL-dDeclaredLoop-61), keeps two draws two rows.
+A class-keyed `%P` census in the memory-tree kit's `merge-rows.py` was weighed against `union` too:
+keyed by draw id, the way that driver's `check_build_backlog` keys a build's `BACKLOG.md` by its path, it
+would count each side's rows by class, and `union` is kept because a transition record is written once
+and only appended to, and the draw id already keeps two draws two rows (TOOL-dDeclaredLoop-75 S33).
 
 An adopter's tree carries the rule by one line of its own `.gitattributes`, since no descriptor key
 installs a merge driver:

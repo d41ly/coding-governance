@@ -2902,6 +2902,12 @@ def check_roles_default() -> None:
     check("[dDL-57] AC3 a claimed kit other than roles is graded, and an empty reason adds no clause",
           "'loop' requires 'memory-tree'" in _dl_r and "default-gained did not cover it" not in _dl_r,
           _dl_r or "returned")
+    # TOOL-dDeclaredLoop-75 AC26 (S26): the route names every kit of every unmet pair, once each, in pair order
+    _dl_r = derive_claim_refusal(["unattended"], [], {"unattended": ({"requires": ["review-harness", "settings-merge"]}, ""),
+                                                      "review-harness": ({}, ""), "settings-merge": ({}, "")}, "")
+    check("[dDL-75] AC26 two unmet pairs of one kit name both pairs and route every kit once",
+          "'unattended' requires 'review-harness'" in _dl_r and "'unattended' requires 'settings-merge'" in _dl_r
+          and "apply --kits unattended,review-harness,settings-merge" in _dl_r, _dl_r or "returned")
     with tempfile.TemporaryDirectory(prefix="gk-dl57-") as _dl_td:
         def build_claim_target(name, extra):
             t = pathlib.Path(_dl_td) / name
@@ -2924,6 +2930,20 @@ def check_roles_default() -> None:
                   "'roles' requires 'loop'", "gov_commit", "apply --kits roles,loop"))
               and "default-gained: none computed" not in _dl_p.stdout and _dl_st == "",
               f"rc {_dl_p.returncode} · status {_dl_st!r} · {(_dl_p.stdout + _dl_p.stderr)[-900:]}")
+        # TOOL-dDeclaredLoop-75 AC14 (S14): the write path refuses the same way, the lock it took released
+        _dl_p = run("update", "--target", str(_dl_t), "--write")
+        _dl_st = subprocess.run(["git", "-C", str(_dl_t), "status", "--porcelain", "--untracked-files=all"],
+                                capture_output=True, text=True, encoding="utf-8").stdout
+        _dl_rc = subprocess.run(["git", "-C", str(_dl_t), "show", "HEAD:.governance/install.json"],
+                                capture_output=True, text=True, encoding="utf-8").stdout
+        _dl_ln = [ln for ln in _dl_p.stderr.splitlines() if ln.startswith("govkit: update would leave")]
+        _dl_lock = _dl_t.joinpath(*gk.WRITE_LOCK_REL.split("/"))
+        check("[dDL-75] AC14 update --write over the committed receipt refuses with one line, writes nothing "
+              "and leaves no lock",
+              _dl_p.returncode == 2 and len(_dl_ln) == 1 and _dl_st == "" and not _dl_lock.exists()
+              and _dl_rc == (_dl_t / ".governance" / "install.json").read_text(encoding="utf-8"),
+              f"rc {_dl_p.returncode} · status {_dl_st!r} · lock {_dl_lock.exists()} · "
+              f"{(_dl_p.stdout + _dl_p.stderr)[-900:]}")
         _dl_p = run("update", "--target", str(_dl_t), "--kits", "roles")
         _dl_ln = [ln for ln in _dl_p.stderr.splitlines() if ln.startswith("govkit: update would leave")]
         check("[dDL-57] AC1 ...and a --kits-scoped update over it refuses the same pair",

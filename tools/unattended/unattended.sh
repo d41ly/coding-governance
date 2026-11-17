@@ -6308,15 +6308,20 @@ run_budget_verb() { # verb · flag=value... -> sets _bd_why to the script's firs
 # draws, the claims are read quietly and each live claim but this slug's is asked its origin through
 # `budget.py origin`; an equal origin draws nothing and answers `_bd_rc=2`, which both callers already relay
 # through their own refusal, so no new refusal site is added here. A slug whose origin does not read is
-# skipped, and a failed claim read draws as before: what that read owes is TOOL-dDeclaredLoop-75's.
-check_patch_peers() { # slug -> 0 to draw; 1 with _bd_rc=2 and _bd_why naming the live peer
+# skipped. A claim read that fails refuses the draw the same way, naming CL_WHY, since a peer it could not
+# see may be drawing on the same origin (TOOL-dDeclaredLoop-75 S28).
+check_patch_peers() { # slug -> 0 to draw; 1 with _bd_rc=2 and _bd_why naming the live peer or the unread claims
   local slug="$1" mine row peer node rest verdict
   local -a _cp_rows
   run_loop_verb budget.py origin "--build=$slug" || return 0
   [ "$_bd_rc" = 0 ] || return 0
   mine=${_bd_why##* · }
   [ -n "$mine" ] && [ "$mine" != none ] || return 0
-  read_claims quiet || return 0
+  if ! read_claims quiet; then
+    _bd_rc=2
+    _bd_why="budget: patch draw refused — claims unread: $CL_WHY"
+    return 1
+  fi
   mapfile -t _cp_rows <<< "$CLAIM_ROWS"
   for row in "${_cp_rows[@]}"; do
     # slug, node, status, beat-age-s, verdict: the claim row's first five fields

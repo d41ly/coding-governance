@@ -309,6 +309,9 @@ A project MAY append members via `PHASES_EXTRA` in `.unattended.conf`. It may NO
 member: the gate pins a shrink-only COUNT of the core set (`CORE_FLOOR`), because a
 deletable core member is a silent, reason-free override of everything keyed on it — and a
 membership assertion cannot work here, since the checker composes the effective set FROM core.
+An adopter phase, a member of PHASES_EXTRA, has no row in the loop kit's phase map: it reads state none and
+step none, a move into it crosses no step exit, and a move out of it counts from the first step, as a move
+out of PREFLIGHT does.
 
 **Every phase claim carries a witness** — a sha, a tag, or a workflow id — and the witness must be
 PRESENT. Presence is its own refusal, checked separately from whether the witness resolves. The

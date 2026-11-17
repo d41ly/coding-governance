@@ -70,7 +70,8 @@ each `FETCH_HEAD` under the common git directory and its `worktrees/*/` that hol
 default branch fetched from the remote's own URL, `git remote get-url` past one trailing `/` and `.git`
 (TOOL-dDeclaredLoop-74), and the tracking ref's newest
 reflog entry, or, where none of those is read, the default branch's newest `clone: ` reflog entry; the
-ref's `read —` line ends `fetched <n>s ago · from FETCH_HEAD|reflog|clone`, or `fetched never`, and each
+ref's `read —` line ends `fetched <n>s ago · from FETCH_HEAD|reflog|clone`, or `fetched never`, which gains
+` · core.logAllRefUpdates=false` where the repository's setting reads false (TOOL-dDeclaredLoop-75 S34), and each
 skipped `FETCH_HEAD` follows it as `read — <name> · skipped — empty`, `no line for <branch> of <remote>`
 or `unreadable`), `terminal` (the state is a `[states]` terminal, or every unit is deployed
 and no ask stands), `awaiting` on an owed parked entry or an unpassed hold, `blocked` on a `parents:`
@@ -89,7 +90,8 @@ its local witnesses.
 `--fixture --plant <case>` builds one scratch repository under the host temp folder, plants the case,
 prints the engine's lines and one `position: fixture · <case> · held` or `· MISSED <why>` line, and
 removes the scratch; it exits as the engine did where the case held, 1 where it missed, 2 where a kit it
-needs does not resolve. `frontier-refused`, `frontier-bad-key`, `plan-frontier`, `built-unarmed`,
+needs does not resolve. Every case runs with `GIT_CONFIG_GLOBAL` and `GIT_CONFIG_SYSTEM` naming one empty
+file under its scratch top, so no setting of the machine's reaches it (TOOL-dDeclaredLoop-75 S34). `frontier-refused`, `frontier-bad-key`, `plan-frontier`, `built-unarmed`,
 `plan-line` and `status-line` run the unattended driver found by `resolve_kit_dir`. `--selftest` runs every case
 through `loop_lib.run_selftest_cases`.
 
@@ -174,6 +176,10 @@ PLANTS = {"steps": "unit 1 deployed, unit 2 built, unit 3 designed: act at unit 
                            "tagged, acceptance_armed false; --status names A",
           "built-unheld": "built-unarmed and a record naming A at a commit not attributed to A: A designed, no tag",
           "built-armed": "built-unarmed with the writer executor:build.acceptance, then no acceptance row: A designed",
+          "fetch-other-branch": "stale-remote's aged reflog, then a fetch of another branch: stale-remote, FETCH_HEAD "
+                                "skipped as holding no line for main, read from reflog",
+          "clone-without-reflog": "fresh-clone with core.logAllRefUpdates=false: stale-remote, fetched never, the "
+                                  "setting named",
           "plan-line": "the driver's next: line equals render_next_line's, in three states",
           "status-line": "the driver's --status prints the engine's position line"}
 FX_SLUG = "tPos"
@@ -300,7 +306,8 @@ def read_remote_claim(repo, bound, now):
     """`(sha or None, entries, claim)` of the default branch's remote-tracking tip: the claim keyed over
     `<ref>@<sha>`, `at` its last fetch by `read_fetch_time`, judged `remote` against `bound`; `entries`
     the ref's `read` row, `<ref>@<sha8> · fetched <n>s ago · from <source>` or `<ref>@<sha8> · fetched
-    never` (TOOL-dDeclaredLoop-65 S3), the bare ref where the claim is None, then each skipped
+    never` (TOOL-dDeclaredLoop-65 S3), ` · core.logAllRefUpdates=false` after it where the repository's
+    setting reads false (TOOL-dDeclaredLoop-75 S34), the bare ref where the claim is None, then each skipped
     `FETCH_HEAD`'s entry (TOOL-dDeclaredLoop-74 S2). The claim is None where the remote
     reads absent (TOOL-dDeclaredLoop-56 S36): the ladder names no remote and refuses nothing, or the
     tracking ref of its default branch does not resolve. A ladder refusal keeps the claim."""
@@ -317,6 +324,9 @@ def read_remote_claim(repo, bound, now):
         at, fetched, skipped = read_fetch_time(repo, remote, ref, branch)
         entry = "%s@%s · %s" % (ref, sha[:8], "fetched %ds ago · from %s" % (
             max(0, int((now - at).total_seconds())), fetched) if at else "fetched never")
+        if not at:   # TOOL-dDeclaredLoop-75 S34: the setting that leaves no reflog to read, named
+            rc, out = read_git(repo, "config", "--type=bool", "--get", "core.logAllRefUpdates")
+            entry += " · core.logAllRefUpdates=false" if rc == 0 and out == "false" else ""
     source = "%s@%s" % (ref, sha or "?")
     key = derive_claim_key([source])
     verdict = derive_claim_verdict(key, key, "remote", at, now, bound)
@@ -715,7 +725,8 @@ def render_handover(units, ask=None, parents=None):
 
 def write_position_plant(top, case, root):
     """The scratch repository `top/r` for `case`, with its bare remote `top/o.git` where it has one,
-    and the clone `top/c` of that remote as the repository for `fresh-clone` and `offline-stale`;
+    and the clone `top/c` of that remote as the repository for `fresh-clone`, `offline-stale` and
+    `clone-without-reflog`;
     `(repo, definition, handover)`."""
     repo = top / "r"
     repo.mkdir()
@@ -808,7 +819,7 @@ def write_position_plant(top, case, root):
         run_fixture_git(repo, "push", "-q", "origin", "main")
     if remote:
         run_fixture_git(repo, "remote", "set-head", "origin", "main")
-    if case in ("stale-remote", "quiet-remote", "failed-fetch"):  # the tracking tip kept, its one reflog entry dated 2000-01-01, past any bound
+    if case in ("stale-remote", "quiet-remote", "failed-fetch", "fetch-other-branch"):  # the tracking tip kept, its one reflog entry dated 2000-01-01, past any bound
         tip = run_fixture_git(repo, "rev-parse", "refs/remotes/origin/main")
         run_fixture_git(repo, "update-ref", "-d", "refs/remotes/origin/main")
         rc, out = read_git(repo, "update-ref", "--create-reflog", "-m", "aged", "refs/remotes/origin/main", tip,
@@ -824,9 +835,14 @@ def write_position_plant(top, case, root):
         rc, out = read_git(repo, "fetch", "-q", "origin")
         if rc == 0:
             raise subprocess.CalledProcessError(rc, "git fetch from a path that does not exist exited 0", out)
-    if case in ("fresh-clone", "offline-stale"):  # the engine reads the clone, whose remote's HEAD names main
+    if case == "fetch-other-branch":  # TOOL-dDeclaredLoop-75 S12: a FETCH_HEAD holding another branch's line alone
+        run_fixture_git(repo, "push", "-q", "origin", "HEAD:refs/heads/other")
+        run_fixture_git(repo, "fetch", "-q", "origin", "other")
+    if case in ("fresh-clone", "offline-stale", "clone-without-reflog"):  # the engine reads the clone, whose remote's HEAD names main
         run_fixture_git(remote, "symbolic-ref", "HEAD", "refs/heads/main")
-        run_fixture_git(top, "clone", "-q", "--template=", str(remote), str(top / "c"))
+        # TOOL-dDeclaredLoop-75 S34: a clone that writes no reflog, so no time is read
+        unlogged = ["-c", "core.logAllRefUpdates=false"] if case == "clone-without-reflog" else []
+        run_fixture_git(top, "clone", "-q", "--template=", *unlogged, str(remote), str(top / "c"))
         repo = top / "c"
     if case == "offline-stale":  # a fetch that moves nothing, its FETCH_HEAD dated back by twice the bound
         run_fixture_git(repo, "fetch", "-q", "origin")
@@ -987,6 +1003,10 @@ def check_plant(case, pos, rc, repo):
             "offline-stale": lambda: pos["answer"] == "stale-remote" and ref_line.endswith(" · from FETCH_HEAD"),
             "failed-fetch": lambda: pos["answer"] == "stale-remote" and "read — FETCH_HEAD · skipped — empty" in lines
             and ref_line.endswith(" · from reflog"),
+            "fetch-other-branch": lambda: pos["answer"] == "stale-remote"
+            and "read — FETCH_HEAD · skipped — no line for main of origin" in lines and ref_line.endswith(" · from reflog"),
+            "clone-without-reflog": lambda: pos["answer"] == "stale-remote"
+            and ref_line.endswith(" · fetched never · core.logAllRefUpdates=false"),
             "no-remote": lambda: pos["answer"] == "act" and "interrupt — remote · none" in lines
             and not any("remote tip" in ln for ln in lines),
             "bad-transition": lambda: pos["answer"] == "invalid-input" and rc == 2,
@@ -1032,7 +1052,11 @@ def check_plant(case, pos, rc, repo):
 def run_plant(case):
     """One fixture case: its lines, then `held` or `MISSED`; the engine's exit where it held."""
     top = pathlib.Path(tempfile.mkdtemp(prefix="pos-"))
+    # TOOL-dDeclaredLoop-75 S34: the machine's git config reaches no plant, every git under it reading one empty file
+    kept = {k: os.environ.get(k) for k in ("GIT_CONFIG_GLOBAL", "GIT_CONFIG_SYSTEM")}
     try:
+        (top / "empty.gitconfig").write_bytes(b"")
+        os.environ.update(dict.fromkeys(kept, str(top / "empty.gitconfig")))
         root = next((d for d in (KIT, *KIT.parents) if (d / ".git").exists()), KIT)
         repo, definition, handover = write_position_plant(top, case, root)
         if case == "plan-line":
@@ -1062,6 +1086,11 @@ def run_plant(case):
         print("%s: fixture · %s · unarmed: %s" % (SAY, case, e))
         return 2
     finally:
+        for k, v in kept.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
         remove_tree(top)
     print("%s: fixture · %s · %s" % (SAY, case, "held" if not misses else "MISSED " + "; ".join(misses)))
     return rc if not misses else 1

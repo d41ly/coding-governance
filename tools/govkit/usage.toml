@@ -569,7 +569,7 @@ id = "script:{prefix}/loop/budget.py#ending"
 shape = "verb"
 entry = "{prefix}/loop/budget.py"
 verb = "ending"
-flags = ["--build="]
+flags = ["--build=", "--explain"]
 
 [[usage]]
 id = "script:{prefix}/loop/breakpoints.py"

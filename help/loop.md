@@ -897,7 +897,8 @@ still counts, but only when it holds a line for the default branch fetched from 
 URL, as `git remote get-url` spells it past one trailing `/` and `.git`, so a failed fetch, which
 leaves the file empty, or a fetch of another branch or remote is not a fetch; the tracking ref's
 newest reflog entry; and, only where neither is there, as on a fresh clone, the clone itself. The tracking ref's `read —` line says which, ending `fetched <n>s ago · from
-FETCH_HEAD`, `from reflog` or `from clone`, or `fetched never`, and each `FETCH_HEAD` it
+FETCH_HEAD`, `from reflog` or `from clone`, or `fetched never`, which adds `· core.logAllRefUpdates=false`
+where your repository's setting reads false, the reason no reflog was written, and each `FETCH_HEAD` it
 skipped prints its own line after it, `read — FETCH_HEAD · skipped — empty` or `skipped — no line for
 <branch> of <remote>`, naming the remote and never its URL. With no remote at all, or no tracking ref of the default branch, the remote reads absent: the
 engine answers on your local witnesses, so no unit reads `deployed`, and prints
@@ -941,8 +942,11 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
   `frontier-refused`, `frontier-bad-key`, `frontier-none`, `plan-frontier`, `built-unarmed` (one unit
   tested and one built with no acceptance record under the stand-in writer, which `--json` reads
   `acceptance_armed` false and the driver's `--status` names as the next unit),
-  `built-unheld`, `built-armed`, `plan-line` and `status-line`; `frontier-refused`,
-  `frontier-bad-key`, `plan-frontier`, `built-unarmed` and the last two run the unattended driver. `--selftest` runs every case, and gov's own `loop position fixtures` gate runs it.
+  `built-unheld`, `built-armed`, `fetch-other-branch` (the aged reflog, then a fetch of another
+  branch, its `FETCH_HEAD` skipped as holding no line for `main`), `clone-without-reflog` (a clone
+  under `core.logAllRefUpdates=false`, read `fetched never` with the setting named), `plan-line` and `status-line`; `frontier-refused`,
+  `frontier-bad-key`, `plan-frontier`, `built-unarmed` and the last two run the unattended driver. Every
+  case runs with an empty global and system git config, so no setting of your machine's reaches it. `--selftest` runs every case, and gov's own `loop position fixtures` gate runs it.
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries placeholders the shell reads as redirects -->
   ```bash
@@ -1533,9 +1537,11 @@ gate of that build, the plan gate included, reads `passed before placement` inst
 flight when the module landed is not held for positions it crossed before the gate existed. The owner item
 and the review lines keep their answers. Where either commit cannot be found, a README not yet committed
 for one, the gate holds as above. Where an owner gate reads `held` and no commit adds the README under the
-memory root your `.memory-tree.conf` names, the list ends with one more line,
-`breakpoints: held · no commit adds <path>`, the README path it looked for, so a misread root shows
-instead of reading as an ordinary hold; a build with no held gate prints no such line.
+memory root, the list ends with one more line,
+`breakpoints: held · no commit adds <path> · root from <.unattended.conf|.memory-tree.conf|default>`, the
+README path it looked for and the conf the root came from: your `.unattended.conf`'s `MEMORY_ROOT` where
+that file exists, as the unattended driver reads it, else your `.memory-tree.conf`'s. A misread root
+shows instead of reading as an ordinary hold; a build with no held gate prints no such line.
 
 - **List a build's breakpoints:** `python tools/loop/breakpoints.py list --build <slug>` runs at your <!-- usage: script:tools/loop/breakpoints.py#list 74c047ff -->
   repository's top level and prints one line per breakpoint, in item order:
@@ -1632,7 +1638,9 @@ past it, that item's loop is non-converging, though a spec subject's review roun
   patch build's draws land on, `none` for any other build, exit 0. Before a patch build draws, the
   unattended driver reads the run claims and asks it of each live claim but its own; where another live
   run is a patch of the same origin, the draw is refused naming that run, its node and the origin, and
-  nothing is drawn. A claim read that fails, or a claim whose origin does not read, draws as before.
+  nothing is drawn. A claim read that fails refuses the draw too, `budget: patch draw refused — claims
+  unread: <why>`, since a run it could not see may be drawing on the same origin, and nothing is drawn; a
+  claim whose origin does not read draws as before.
 
 - **See the value:** `python tools/loop/budget.py value` prints `base <n> per-unit <n>` from the policy <!-- usage: script:tools/loop/budget.py#value 689b423c -->
   file at HEAD, or refuses a value of another shape naming the key.
@@ -1669,12 +1677,16 @@ the budget:
 
 No ending raises `flow.rework-budget`: raising it stays yours.
 
-- **See the ending:** `python tools/loop/budget.py ending --build <slug>` runs at your repository's top <!-- usage: script:tools/loop/budget.py#ending 004f19ef -->
+- **See the ending:** `python tools/loop/budget.py ending --build <slug> [--explain]` runs at your repository's top <!-- usage: script:tools/loop/budget.py#ending f7f47c38 -->
   level and prints `loop: budget · ending · <ending|none> · <open|unfrozen|spent> <spent>/<total> ·
   open <ids|none> · disposed <word|unrecorded>`, exit 0. The ending is `none` until the budget is
   spent, the ids are the units whose status is neither `CLOSED` nor `WONTDO`, and `disposed` is the
   word of your newest disposition record of the build's exhaustion item. It refuses a value outside
-  the three, exit 2.
+  the three, exit 2. With `--explain` it first prints `loop: budget · root <root> · from
+  <.unattended.conf|.memory-tree.conf|default>`, the records root and the conf it came from, then one
+  `loop: budget · read <path>` line per file the rows were taken from, or `loop: budget · read none`,
+  then one `loop: budget · no draw id · <row>` line per draw row written before draw ids, each counted as
+  its own draw, so a count of zero read under the wrong root shows where it looked.
 
 - **End a spent build:** `bash tools/unattended/unattended.sh --exhausted <slug>` records the ending <!-- usage: verb:unattended.sh:--exhausted 40c08fe9 -->
   once, as a `decision` row the wrap-up shows you, and prints what comes next: `close-incomplete`

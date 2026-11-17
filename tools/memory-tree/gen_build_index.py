@@ -1881,6 +1881,10 @@ def derive_parallel_step(units: list) -> str:
     or more units one of which has no Files touched sub-head, whose write set nobody declared
     (TOOL-dGroundRules-32 S13). `yes` says only that the estimates are disjoint; `--dispatch` still
     decides."""
+    # TOOL-aSurfacedLexicon-17 asked that the Parallel cell stop asserting concurrency from a shared order
+    # alone. Answered here (TOOL-dDeclaredLoop-75 S24, observed by TOOL-dDeclaredLoop-66): the cell derives
+    # from the step's declared write sets and its consumes-from edges, and says `no` or `unknown` wherever
+    # it cannot prove the units disjoint.
     def pathlike(w):
         parts = w.rstrip("/").split("/")
         return len(parts) >= 2 and all(parts)

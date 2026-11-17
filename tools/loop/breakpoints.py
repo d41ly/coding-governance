@@ -27,7 +27,13 @@ opened before the placement reads `passed before placement` ahead of those answe
 the placement is the oldest commit adding this module's own file, the opening the oldest adding the build's
 README under the memory root, and the build was opened before it where both are found and the opening does
 not contain the placement. Either not found reads as after, so the gate keeps its answer; the owner item
-and the review lines always do.
+and the review lines always do. The README path takes the driver's root, `resolve_memory_root_source`'s:
+the unattended driver reads each build's README at `$M/builds/<slug>/README.md` (`unattended.sh`'s
+`readme_of`), `$M` the `MEMORY_ROOT` its `.unattended.conf` sets, and where `.memory-tree.conf` names a
+root too the two are checked, not assumed, to agree, by the `records root:` refusal. Where an owner gate
+stays `held` and no commit adds that README, `list` ends with `breakpoints: held · no commit adds <path> ·
+root from <.unattended.conf|.memory-tree.conf|default>`, the conf the root came from (TOOL-dDeclaredLoop-64,
+TOOL-dDeclaredLoop-75 S8, S30).
 
 THE READS. `autonomy`, `decisions.major` and the five `review.<stage>` keys at the landed revision, or at
 `--rev`, through the policy kit's `resolve_read` over one `read_revision`, the kit found by
@@ -72,7 +78,7 @@ from adapt import read_disposition_release  # noqa: E402
 from composition import build_composition_base, read_step_composition, read_tag_policy  # noqa: E402
 from loop_items import read_composed_items  # noqa: E402
 from loop_lib import (derive_conf_reads, derive_fixture_boundary, read_memory_tree, read_steps, resolve_kit_dir,  # noqa: E402
-                      resolve_memory_root, run_selftest_cases)
+                      resolve_memory_root_source, run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_transition import (FX_BUILD, FX_SPEC, FX_UNIT, read_build_headers, read_build_specs,  # noqa: E402
                              read_transitions, write_transition_plant)
@@ -117,7 +123,8 @@ PLANTS = {"values": "no policy file, then autonomy three-gates and every-stage, 
                                         "records/builds/ and tWrong under memory/builds/, listed by the scratch's "
                                         "own module, then tWrong again with no policy file",
           "unattended-root": "the same history under .unattended.conf's MEMORY_ROOT=records and a memory tree's conf "
-                             "naming none, build tRec opened under records/builds/, listed by the scratch's own module",
+                             "naming none, build tRec opened under records/builds/ and tWrong under memory/builds/, "
+                             "each listed by the scratch's own module",
           "confs-disagree": ".unattended.conf naming MEMORY_ROOT=records beside the memory tree's memory, then the list",
           "no-own-conf-read": "this module's own file graded on its syntax tree for a reader call or a conf name, "
                               "no scratch repository",
@@ -226,7 +233,8 @@ def read_breakpoints(build, root, spec_audit=False, delegated=False):
     """`derive_breakpoints` over `build`'s policy, steps, composed tags and tiers, each owner line's release
     read: `passed before placement` on each owner gate of a build opened before this module was placed,
     else `released <stem> <word>` where the owner's disposition record of its tag answers. An owner gate
-    still `held` where the opening read found no commit adding the README carries `unopened`, that path."""
+    still `held` where the opening read found no commit adding the README carries `unopened`, that path,
+    and `root_from`, the conf `resolve_memory_root_source` read the root from (TOOL-dDeclaredLoop-75 S8)."""
     check_slug(build)
     root = pathlib.Path(root).absolute()
     values = read_policy_values(root)
@@ -236,14 +244,15 @@ def read_breakpoints(build, root, spec_audit=False, delegated=False):
     tiers = [tier for _uid, _status, tier in read_build_headers(build, root)]
     out = derive_breakpoints(values, read_steps(KIT), tags,
                              {"spec_audit": spec_audit, "delegated": delegated, "tiers": tiers})
-    early, unopened = False, None
+    early, unopened, source = False, None, None
     if any(b["name"] == "owner gate" for b in out):   # TOOL-dDeclaredLoop-53: opened before the placement
         try:
             placement = read_first_add(root, (KIT / "breakpoints.py").resolve().relative_to(root.resolve()).as_posix())
         except ValueError:
             placement = None
         if placement:
-            readme = "%s/builds/%s/README.md" % (resolve_memory_root(root), build)
+            mem, source = resolve_memory_root_source(root)
+            readme = "%s/builds/%s/README.md" % (mem, build)
             opening = read_first_add(root, readme)
             early = bool(opening) and not check_is_ancestor(root, placement, opening)
             unopened = None if opening else readme   # TOOL-dDeclaredLoop-64: the path a hold looked for
@@ -255,7 +264,7 @@ def read_breakpoints(build, root, spec_audit=False, delegated=False):
             if hit:
                 b["release"] = "released %s %s" % hit
             elif unopened and b["name"] == "owner gate":
-                b["unopened"] = unopened
+                b["unopened"], b["root_from"] = unopened, source
     return out
 
 
@@ -493,7 +502,8 @@ def run_breakpoint_plant(case):
             readme = "%s/builds/%s/README.md"
             records = case == "pre-placement-records-root"
             if case == "unattended-root":
-                scratch, kit = write_pre_placement_plant("records", (readme % ("records", "tRec"),), {
+                scratch, kit = write_pre_placement_plant("records", (readme % ("records", "tRec"),
+                                                                     readme % ("memory", "tWrong")), {
                     ".unattended.conf": "MEMORY_ROOT=records\n", ".memory-tree.conf": ""})
             else:
                 scratch, kit = (write_pre_placement_plant("records", (readme % ("records", "tRec"),
@@ -502,7 +512,8 @@ def run_breakpoint_plant(case):
             try:
                 three = [plan, gate % ("at", "item.design.exit"), closing, gate % ("before", "item.deploy.mandate")]
                 pre = "breakpoint: owner gate · %s %s · owner · autonomy · " + PRE_PLACEMENT
-                unopened = "%s: held · no commit adds %s" % (SAY, readme)
+                # TOOL-dDeclaredLoop-75 AC8: the held line names the conf its root came from
+                unopened = "%s: held · no commit adds %s · root from %%s" % (SAY, readme)
 
                 def run_scratch_breakpoints(build, *flags):
                     """`(exit, lines)` of the scratch's own module listing `build` in the scratch, echoed."""
@@ -521,6 +532,9 @@ def run_breakpoint_plant(case):
                                                 pre % ("before", "item.deploy.mandate")],
                           "the build opened under the driver's records root read %s" % lines)
                     check_owner_lines(lines)
+                    rc, lines = run_scratch_breakpoints("tWrong")
+                    check(rc == 0 and lines == three + [unopened % ("records", "tWrong", ".unattended.conf")],
+                          "the build opened under memory/ beneath the driver's records root read %s" % lines)
                 elif records:
                     rc, lines = run_scratch_breakpoints("tRec")   # AC1
                     check(rc == 0 and lines == [pre % ("at", PLAN_GATE), pre % ("at", "item.design.exit"), closing,
@@ -528,7 +542,7 @@ def run_breakpoint_plant(case):
                           "the build opened under the records root read %s" % lines)
                     check_owner_lines(lines)
                     rc, lines = run_scratch_breakpoints("tWrong")   # AC2
-                    check(rc == 0 and lines == three + [unopened % ("records", "tWrong")],
+                    check(rc == 0 and lines == three + [unopened % ("records", "tWrong", ".memory-tree.conf")],
                           "the build opened under memory/ in a records tree read %s" % lines)
                     check_owner_lines(lines)
                     write_policy(scratch, None, "no policy file")   # AC3
@@ -547,7 +561,7 @@ def run_breakpoint_plant(case):
                         check(rc == 0 and owner + "held" in lines and closing in lines,
                               "%s with a delegated fork read %s" % (build, lines))
                     rc, lines = run_scratch_breakpoints("tNone")   # AC3
-                    check(rc == 0 and lines == three + [unopened % ("memory", "tNone")],
+                    check(rc == 0 and lines == three + [unopened % ("memory", "tNone", ".memory-tree.conf")],
                           "the build whose README no commit adds read %s" % lines)
                     try:
                         lines = [render_breakpoint_line(b) for b in read_breakpoints("tPre", scratch)]
@@ -677,9 +691,9 @@ def main(argv):
             found = read_breakpoints(args.build, root, args.spec_audit, args.delegated_fork)
             for b in found:
                 print(render_breakpoint_line(b))
-            unopened = next((b["unopened"] for b in found if b.get("unopened")), None)
-            if unopened:   # TOOL-dDeclaredLoop-64: its own head, never an owner line's bytes
-                print("%s: held · no commit adds %s" % (SAY, unopened))
+            held = next((b for b in found if b.get("unopened")), None)
+            if held:   # TOOL-dDeclaredLoop-64: its own head, never an owner line's bytes; 75 S8: the root's source
+                print("%s: held · no commit adds %s · root from %s" % (SAY, held["unopened"], held["root_from"]))
             return 0
         if argv[:1] == ["stage"]:
             ap = argparse.ArgumentParser(prog="breakpoints.py stage", description="one stage's review reading")

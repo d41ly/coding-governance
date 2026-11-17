@@ -303,7 +303,9 @@ or a broken object store say, is graded against every parent, with one line nami
 owes the trailer and the change record for each key that differs from one parent, the trailer's old
 value the first such parent's. A git whose usage probe fails, cannot start or prints no usage text is
 graded as a failed re-merge too, and only a usage text lacking `--write-tree` reads as a git without
-it. Only an octopus merge, a merge whose re-merge conflicts, or a git
+it. A re-merge that conflicts only on other files still holds the policy file's clean merge, so the
+merge is graded against that re-merge as above. Only an octopus merge, a merge whose re-merge conflicts
+on the policy file itself, or a git
 without `merge-tree --write-tree` is graded against its parents alone,
 with one line saying so: it owes for each key its result sets to a value no parent holds, the
 trailer's old value the first parent's. With no python launcher or no loop kit, the hook prints one

@@ -4,7 +4,7 @@
     python budget.py draw --build <slug> --cause <cause> --item <item>
     python budget.py value
     python budget.py target --build <slug> --item <item>
-    python budget.py ending --build <slug>
+    python budget.py ending --build <slug> [--explain]
     python budget.py origin --build <slug>
     python budget.py --fixture --plant <case>
     python budget.py --selftest
@@ -37,6 +37,11 @@ or a rotated record under the memory root's `builds/` folders suffixed ` · budg
 suffixed row counting for the build it names and never for its file's own. They are read oldest first
 by UTC second, a tie broken by the typed `spent` with a freeze row first, and the transition writer
 copies them into the first record it writes.
+
+THE ROOT. A build's records are read under the root `resolve_memory_root` answers: the `MEMORY_ROOT` of
+the driver's `.unattended.conf` wherever that file exists, because the unattended driver writes each
+run-state file under its own root (`unattended.sh`'s `scaffold_runmd`), else `.memory-tree.conf`'s, and
+two confs that name two roots refuse, `records root:`, before anything is read (TOOL-dDeclaredLoop-75 S5).
 
 THE FREEZE. `freeze_budget` answers the row the transition writer writes on the move `designing` to
 `building`: the base plus the per-unit share for each unit a tracked spec H1 of the build defines, once,
@@ -78,7 +83,11 @@ the unattended driver reads after a round's draw (TOOL-dDeclaredLoop-32); it dra
 `loop: budget · ending · <ending|none> · <open|unfrozen|spent> <spent>/<total> · open <ids|none> ·
 disposed <word|unrecorded>`, exit 0, the ending `derive_ending`'s where the state is `spent` and `none`
 otherwise, the ids the units whose status is neither `CLOSED` nor `WONTDO`; the unattended driver's
-`--exhausted` reads it. `origin` prints `loop: budget · origin · <slug|none>`, exit 0, the build
+`--exhausted` reads it. With `--explain` it prints first `loop: budget · root <root> · from
+<.unattended.conf|.memory-tree.conf|default>`, the pair `resolve_memory_root_source` answers, then one
+`loop: budget · read <path>` line per entry of `read_budget_rows`' `read`, or `loop: budget · read none`,
+then one `loop: budget · no draw id · <row>` line per draw row read with no draw id, which counts as its
+own draw (TOOL-dDeclaredLoop-75 S2, S7). `origin` prints `loop: budget · origin · <slug|none>`, exit 0, the build
 `derive_patch_origin` answers, the one whose budget a patch build draws on; the unattended driver asks
 it of each live claim before a patch build draws, and refuses the draw where another live run is a
 patch of the same origin (TOOL-dDeclaredLoop-67 S35). After a draw appended to a transition log record,
@@ -167,8 +176,8 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
                              "merged under this tree's attribute, then drawn",
           "parallel-append-uneven": "one item drawn on main and two others on a branch, each draw only appending, "
                                     "merged under this tree's attribute",
-          "draw-id-rows": "one log record given two identical id-less draw rows, one id-bearing row twice, then a "
-                          "malformed id",
+          "draw-id-rows": "one log record given two identical id-less draw rows, each named by ending --explain, "
+                          "one id-bearing row twice, then a malformed id",
           "draws-survive-rotation": "two draws, the run-state file rotated as an aborted run's, then a third draw",
           "patch-archived": "patch-trailer-only through its patch draw, then tFixPatch's run-state file rotated "
                             "as an aborted run's",
@@ -186,7 +195,10 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
           "attr-missing": "a draw appended to a log record in a scratch repository with no .gitattributes, then one "
                           "under the union line",
           "patch-concurrent": "the sourced driver's draw for tFixPatch, its claims read standing in with one live row "
-                              "naming tFixPatchTwo, a patch of the same origin, then one naming tFix, no patch"}
+                              "naming tFixPatchTwo, a patch of the same origin, then one naming tFix, no patch",
+          "unset-driver-root": ".unattended.conf setting no MEMORY_ROOT beside the memory tree's records, one draw; "
+                               "then the build moved under records, both confs naming it, a draw and ending --explain",
+          "patch-claims-unread": "the sourced driver's draw for tFixPatch, its claims read standing in as failed"}
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
 PLANT_TRAILER = '[transitions]\nrecord = ["trailer"]\n'
 PLANT_SPEC = "# TOOL-%s-%d — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n"
@@ -221,7 +233,10 @@ def read_budget_rows(build, root, moves=None):
     `total`, `freeze` the row a draw writes first under the unrecorded-build rule or None, `draws` each
     draw row's `(cause, item)`, `route-backs`, and `disagree`, each draw row whose typed spent is not its
     ordinal as `<row> · typed <a>, derived <b>`, in the order read: the figure is what its writer
-    counted, and the count is re-derived from the rows, rows carrying one draw id counting once. `moves`, the build's recorded moves where the
+    counted, and the count is re-derived from the rows, rows carrying one draw id counting once. `read`,
+    the repository-relative paths the rows were taken from: the log records where any exists, else each
+    run-state file and rotated record that gave a row, and `trailers` where a trailer row was taken
+    (TOOL-dDeclaredLoop-75 S7). `moves`, the build's recorded moves where the
     caller read them. ValueError on a row outside its grammar; LookupError where a kit does not
     resolve."""
     root = pathlib.Path(root)
@@ -235,8 +250,10 @@ def read_budget_rows(build, root, moves=None):
     named = sorted(run.parent.parent.glob("*/RUN.md")) + sorted(run.parent.parent.glob("*/" + ROTATED))
     files += [] if records else [(path, build) for path in named]
     carried = [] if records else read_trailer_rows(build, root)
+    read = [rec["path"] for rec in records] or (["trailers"] if carried else [])
     for path, owner in files:
         if path.is_file():
+            before = len(carried)
             for ln in path.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n").split("\n"):
                 hit = RUN_ROW.fullmatch(ln.rstrip())
                 mark = SUFFIXED.fullmatch(hit.group(2)) if hit else None
@@ -244,6 +261,8 @@ def read_budget_rows(build, root, moves=None):
                     carried.append((hit.group(1), hit.group(2)))
                 elif mark and owner is not None and mark.group(2) == owner:
                     carried.append((hit.group(1), mark.group(1)))
+            if len(carried) > before and not records:
+                read.append(path.relative_to(root).as_posix())
     order = []
     for ts, text in carried:   # oldest first by UTC second, a tie broken by the typed spent, a freeze row first
         hit = ROW.fullmatch(text)
@@ -279,7 +298,7 @@ def read_budget_rows(build, root, moves=None):
     home = records[-1]["path"] if records else (run.relative_to(root).as_posix() if run.is_file() else None)
     return {"rows": rows, "home": home, "record": bool(records), "carried": [] if records else carried,
             "frozen_any": frozen_any, "spent": len(draws), "total": total, "freeze": freeze, "draws": draws,
-            "route-backs": route_backs, "disagree": disagree}
+            "route-backs": route_backs, "disagree": disagree, "read": read}
 
 
 def read_trailer_rows(build, root):
@@ -375,12 +394,13 @@ def derive_ending(value, units):
     return "descope" if CLOSED in counted else "close-incomplete"
 
 
-def read_ending(build, root):
+def read_ending(build, root, held=None):
     """The ending line of `build` at HEAD of `root`: `loop: budget · ending · <ending|none> · <state word>
-    <spent>/<total> · open <ids|none> · disposed <word|unrecorded>`. ValueError on a value or a row the
-    grammar refuses; LookupError where a kit does not resolve."""
+    <spent>/<total> · open <ids|none> · disposed <word|unrecorded>`; `held`, what `read_budget_rows`
+    answered where the caller read it, else a fresh read. ValueError on a value or a row the grammar
+    refuses; LookupError where a kit does not resolve."""
     root = pathlib.Path(root)
-    held = read_budget_rows(build, root)
+    held = read_budget_rows(build, root) if held is None else held
     state = budget_state(build, root, held).split(" ", 1)[0]
     policy, _guard = read_policy_kit()
     try:
@@ -519,7 +539,8 @@ def write_budget_plant(top, case):
     if case == "ending":   # the second unit witnessed green, the first open, and nothing left to draw
         files[FX_SPEC.replace(FX_UNIT, "TOOL-%s-2" % FX_BUILD)] = (PLANT_SPEC % (FX_BUILD, 2)).replace("INPROGRESS", CLOSED)
         files[".governance/policy.toml"] = "[flow]\nrework-budget = 0\n"
-    if case in ("pre-spec", "unrecorded", "trailer-only", "draws-survive-rotation", "confs-disagree"):
+    if case in ("pre-spec", "unrecorded", "trailer-only", "draws-survive-rotation", "confs-disagree",
+                "unset-driver-root"):
         files["memory/builds/%s/RUN.md" % FX_BUILD] = PLANT_RUN
     if case == "route-backs":
         files[".governance/policy.toml"] = "[flow]\nroute-backs = 3\nrework-budget = 6\n"
@@ -994,6 +1015,11 @@ def run_budget_plant(case):
                     states.append(budget_state(FX_BUILD, top))
                 except ValueError as e:
                     states.append("refused: %s" % e)
+                if len(states) == 1:   # TOOL-dDeclaredLoop-75 AC2: each id-less row named, before the id-bearing step
+                    rc, out = run_verb(["ending", "--build", FX_BUILD, "--explain"])
+                    named = [ln for ln in out.splitlines() if ln.startswith("%s: budget · no draw id · " % SAY)]
+                    check(rc == 0 and named == ["%s: budget · no draw id · %s" % (SAY, row % 1)] * 2,
+                          "ending --explain over two id-less rows named %r, exit %d" % (named, rc))
             print("%s: fixture · budget_state · %s" % (SAY, " / ".join(states)))
             check(states[0] == "unfrozen 2/4", "two identical id-less rows read %s" % states[0])
             check(states[1] == "unfrozen 3/4", "one id-bearing row twice reads %s" % states[1])
@@ -1064,7 +1090,9 @@ def run_budget_plant(case):
                 check(rc == 0 and len(said) == owed and all("merge=union to .gitattributes" in ln for ln in said),
                       "under %s the draw exited %d printing %d notice(s), owed %d: %r" % (name, rc, len(said), owed,
                                                                                          out.strip()))
-        elif case == "patch-concurrent":   # TOOL-dDeclaredLoop-67 AC24 (S35): two live patch runs of one origin
+        elif case in ("patch-concurrent", "patch-claims-unread"):
+            # TOOL-dDeclaredLoop-67 AC24 (S35): two live patch runs of one origin; TOOL-dDeclaredLoop-75 AC28 (S28):
+            # a claim read that fails refuses the draw
             import subprocess
             from loop_lib import resolve_kit_dir
             from loop_witness import HOLD_CONF, read_clean_env, resolve_bash
@@ -1087,20 +1115,31 @@ def run_budget_plant(case):
                          "sha": head[:8], "scenario": PATCH_SCENARIO}
                 run_fixture_git(top, "commit", "-q", "--allow-empty", "-m", "patch\n\n%s" % render_transition_trailer(patch))
             record = pathlib.Path(top, read_transition_records(FX_BUILD, top)[-1]["path"])
-            script = ('load_driver_conf || exit 3; fx_claimed=$1; '
-                      'read_claims() { CLAIM_ROWS=$(printf "%s\\tnode-b\\tlive\\t5\\tlive\\t-\\t-\\t-\\t-\\t-\\t-" "$fx_claimed"); '
-                      'return 0; }; run_budget_draw "$2" fix-pass item.deploy.close; '
-                      'printf "draw · rc %s · %s\\n" "$_bd_rc" "$_bd_why"')
+            stand_in = {"patch-concurrent": 'CLAIM_ROWS=$(printf "%s\\tnode-b\\tlive\\t5\\tlive\\t-\\t-\\t-\\t-\\t-\\t-" '
+                                            '"$fx_claimed"); return 0;',
+                        "patch-claims-unread": 'CL_WHY="fx: the remote did not answer"; return 1;'}[case]
+            script = ('load_driver_conf || exit 3; fx_claimed=$1; read_claims() { %s }; '
+                      'run_budget_draw "$2" fix-pass item.deploy.close; '
+                      'printf "draw · rc %%s · %%s\\n" "$_bd_rc" "$_bd_why"' % stand_in)
             row = "draw · patch:%s · item.deploy.close · 1/4" % PATCH_BUILD
-            for name, claimed, refused in (("a live patch peer", peer, True), ("a live build that is no patch", FX_BUILD,
-                                                                                   False)):
+            runs = (("a live patch peer", peer, True), ("a live build that is no patch", FX_BUILD, False))
+            if case == "patch-claims-unread":
+                runs = (("a claim read that failed", "", None),)
+            for name, claimed, refused in runs:
                 before = record.read_bytes()
                 p = subprocess.run([bash, "-c", '. "$1" || exit 2; shift; ' + script, "_", driver.as_posix(), claimed,
                                     PATCH_BUILD], cwd=str(top), capture_output=True, text=True, encoding="utf-8",
                                    errors="replace", env=dict(read_clean_env(), GOV_DEFAULT_BRANCH="main"), timeout=600)
                 said = next((ln for ln in p.stdout.splitlines() if ln.startswith("draw · rc ")), "no draw line")
-                print("%s: fixture · patch-concurrent · %s · exit %d · %s" % (SAY, name, p.returncode, said))
-                if refused:
+                print("%s: fixture · %s · %s · exit %d · %s" % (SAY, case, name, p.returncode, said))
+                if refused is None:
+                    owed = "draw · rc 2 · budget: patch draw refused — claims unread: fx: the remote did not answer"
+                    spent = read_budget_rows(FX_BUILD, top)["spent"]
+                    check(said == owed and record.read_bytes() == before and spent == 0,
+                          "the draw over an unread claim set read %r, owed %r, the record %s, %d draw(s) counted" % (
+                              said + " " + p.stderr.strip()[-300:], owed,
+                              "unchanged" if record.read_bytes() == before else "written", spent))
+                elif refused:
                     owed = "draw · rc 2 · budget: patch draw refused — %s on node-b is a live patch run of %s" % (peer, FX_BUILD)
                     check(said == owed and record.read_bytes() == before,
                           "the second patch draw read %r, owed %r, the record %s" % (
@@ -1120,6 +1159,28 @@ def run_budget_plant(case):
                     "— the driver writes under records" % SAY)
             check(rc == 2 and out.strip() == owed, "the draw answered %r, exit %d" % (out.strip(), rc))
             check(run.read_bytes() == before, "the refused draw changed the run-state file")
+        elif case == "unset-driver-root":   # TOOL-dDeclaredLoop-75 AC6, AC7 (S6, S7): the driver's default root
+            write_fixture_files(top, {".unattended.conf": 'PHASES_EXTRA=""\n',
+                                      ".memory-tree.conf": 'MEMORY_ROOT=records\nFAMILIES="tool:TOOL"\n'})
+            run_fixture_git(top, "add", "-A")
+            run_fixture_git(top, "commit", "-q", "-m", "the driver's conf naming no root, the memory tree's records")
+            run = top / "memory" / "builds" / FX_BUILD / "RUN.md"
+            before = run.read_bytes()
+            rc, out = run_verb(draw + [FX_UNIT])
+            owed = "records root: .unattended.conf says memory, .memory-tree.conf says records"
+            check(rc == 2 and owed in out, "the draw answered %r, exit %d, owed %r" % (out.strip(), rc, owed))
+            check(run.read_bytes() == before, "the refused draw changed the run-state file")
+            # the second half: the build moved under records, both confs naming it; one draw, so a file gives a row
+            run_fixture_git(top, "mv", "memory", "records")
+            write_fixture_files(top, {".unattended.conf": "MEMORY_ROOT=records\n"})
+            run_fixture_git(top, "add", "-A")
+            run_fixture_git(top, "commit", "-q", "-m", "both confs naming records")
+            drawn = run_verb(draw + [FX_UNIT])[0]
+            rc, out = run_verb(["ending", "--build", FX_BUILD, "--explain"])
+            lines = out.strip().split("\n")
+            check(drawn == 0 and rc == 0 and lines[0] == "%s: budget · root records · from .unattended.conf" % SAY
+                  and len(lines) > 1 and lines[1].startswith("%s: budget · read records/builds/%s/" % (SAY, FX_BUILD)),
+                  "the agreeing tree drew exit %d and explained %r, exit %d" % (drawn, out.strip(), rc))
     except LookupError as e:
         print("%s: fixture · %s · unarmed: %s" % (SAY, case, e))
         return 2
@@ -1182,7 +1243,18 @@ def main(argv):
         if argv[:1] == ["ending"]:
             ap = argparse.ArgumentParser(prog="budget.py ending", description="the ending a spent budget takes")
             ap.add_argument("--build", required=True)
-            print(read_ending(ap.parse_args(argv[1:]).build, root))
+            ap.add_argument("--explain", action="store_true")
+            args = ap.parse_args(argv[1:])
+            said = []
+            if args.explain:   # TOOL-dDeclaredLoop-75 S2, S7: the root, its source, and what was read
+                said.append("%s: budget · root %s · from %s" % ((SAY,) + resolve_memory_root_source(root)))
+            held = read_budget_rows(args.build, root)
+            if args.explain:
+                said += ["%s: budget · read %s" % (SAY, p) for p in held["read"] or ["none"]]
+                said += ["%s: budget · no draw id · %s" % (SAY, r) for r in held["rows"]
+                         if (m := ROW.fullmatch(r)) and m.group(3) is not None and m.group(7) is None]
+            said.append(read_ending(args.build, root, held))
+            print("\n".join(said))
             return 0
     except LookupError as e:
         print("%s: unarmed · %s" % (SAY, e))
@@ -1190,7 +1262,7 @@ def main(argv):
     except (ValueError, OSError) as e:
         print("%s: budget · refused · %s" % (SAY, e))
         return 2
-    print("usage: python budget.py draw --build <slug> --cause <%s> --item <item> | value | target --build <slug> --item <item> | ending --build <slug> | origin --build <slug> | --fixture --plant <%s> "
+    print("usage: python budget.py draw --build <slug> --cause <%s> --item <item> | value | target --build <slug> --item <item> | ending --build <slug> [--explain] | origin --build <slug> | --fixture --plant <%s> "
           "| --selftest" % ("|".join(CAUSES), "|".join(PLANTS)), file=sys.stderr)
     return 2
 

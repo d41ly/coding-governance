@@ -175,7 +175,11 @@ memory/guides/BUILD-METHOD.md	30720
 # MERGED at TOOL-aLightenedLoop-8's reconcile of origin/main, 2026-11-15: the render measures 68130
 # CR-stripped, both raises above kept, and the row is that figure because this block's rule is no
 # headroom. A run's raise, on the four terms above (memory/DECISIONS.md, TOOL-aLightenedLoop-8).
-memory/guides/UNATTENDED-PROTOCOL.md	68130
+# RAISED 68130 -> 68288, 2026-11-17, by TOOL-dDeclaredLoop-75: section 3's sentence on an adopter phase
+# beside PHASES_EXTRA, which TOOL-dDeclaredLoop-63 wrote for the protocol to state. The render measures
+# 68288 CR-stripped, and the row is that figure because this block's rule is no headroom. A run's
+# raise, on the four terms above (memory/DECISIONS.md, TOOL-dDeclaredLoop-75).
+memory/guides/UNATTENDED-PROTOCOL.md	68288
 
 # --- the unattended Skill, as rendered ----------------------------------------------------------
 # 10240 bytes = 10 KiB, CR-stripped (TOOL-aMendedFleet-68 S5). The Skill is the first file every

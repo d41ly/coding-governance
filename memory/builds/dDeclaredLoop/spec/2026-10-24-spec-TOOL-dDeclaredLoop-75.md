@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-75 — the round-3 spec audit's 36 minors, batched
 
-**Status:** INPROGRESS · rev-10 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 39 · advances TOOL-dDeclaredLoop-35
+**Status:** CLOSED · rev-10 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 39 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,8 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-68-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-68-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-75-deviation-751.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-75-deviation-751.md) | deviation | — |
 | [2026-10-24-build-TOOL-dDeclaredLoop-75-deviation-752.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-75-deviation-752.md) | deviation | — |
+| [2026-11-17-build-TOOL-dDeclaredLoop-75-1-acceptance-ledger.md](../build/2026-11-17-build-TOOL-dDeclaredLoop-75-1-acceptance-ledger.md) | journal | — |
+| [2026-11-17-build-TOOL-dDeclaredLoop-75-deviation-753.md](../build/2026-11-17-build-TOOL-dDeclaredLoop-75-deviation-753.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-68-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-68-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-75-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-75-1-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-75-reground-brief.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-75-reground-brief.md) | research | — |

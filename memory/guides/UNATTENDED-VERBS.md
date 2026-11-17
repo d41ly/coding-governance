@@ -71,8 +71,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `authorization`, `held` or `released <record> <word>`, and `passed before placement` on each owner gate
   of a build whose README's first commit does not contain the loop kit's placement of the module
   (`TOOL-dDeclaredLoop-53`), which no hold reads as `held`. Beside an owner gate reading `held` where no
-  commit adds the build's README under the memory root, a last `breakpoints: held · no commit adds <path>`
-  line names the path looked for (`TOOL-dDeclaredLoop-64`); no hold reads it. Fire a review line through `--trigger` with its
+  commit adds the build's README under the memory root, a last `breakpoints: held · no commit adds <path> ·
+  root from <conf>` line names the path looked for and the conf its root came from, `.unattended.conf`,
+  `.memory-tree.conf` or `default` (`TOOL-dDeclaredLoop-64`, `TOOL-dDeclaredLoop-75`); no hold reads it. Fire a review line through `--trigger` with its
   cause. None print under `--paths` or `--framed`, nor where the loop kit does not resolve.
 - `--attest` — **the two agent-attested items have a VERB, and it is the only way to write one.**
   `--attest <slug> --item <item> [--value <text>]` derives the record key so no operator spells
