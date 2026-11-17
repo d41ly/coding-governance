@@ -5573,6 +5573,11 @@
       "file": "tools/memory-tree/routed_commits.py"
     },
     {
+      "id": "check_conf_name",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "check_conf_reader_parity",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -10433,6 +10438,11 @@
       "file": "tools/loop/loop_lib.py"
     },
     {
+      "id": "derive_conf_rebinds",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "derive_conf_rel",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -15121,6 +15131,11 @@
       "id": "load_toml",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "load_tree_lib",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "load_tree_lib",

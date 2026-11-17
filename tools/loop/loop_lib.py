@@ -819,6 +819,75 @@ def derive_import_aliases(tree):
     return aliases
 
 
+def check_conf_name(node, docs=()):
+    """True where the syntax subtree of `node` holds anywhere a str constant containing
+    `.memory-tree.conf` or `.unattended.conf`, an f-string's literal part included, whose `id()` is not in
+    `docs`: the one conf-name predicate `derive_conf_constants` and `derive_conf_rebinds` call
+    (TOOL-dDeclaredLoop-87 S1, TOOL-dDeclaredLoop-89 S1)."""
+    import ast
+    return any(isinstance(n, ast.Constant) and isinstance(n.value, str) and id(n) not in docs
+               and any(c in n.value for c in (".memory-tree.conf", ".unattended.conf")) for n in ast.walk(node))
+
+
+def derive_conf_rebinds(tree, docs):
+    """The module names a parsed `loop_lib.py` binds outside an assignment's own value, from two passes
+    (TOOL-dDeclaredLoop-89 S1). Global loaders: each `def` or `async def` at any depth whose subtree holds
+    a conf name outside the docstring ids `docs` answers every name a `global` statement in that subtree
+    declares and a `Name` in a store context there binds. Module-level targets: each walrus, `for`,
+    `async for`, `with` or `async with` reached from the module body without entering a `def`, a `class`
+    or a `lambda` answers every `Name` in its target where its source holds a conf name: the walrus's
+    value, the loop's iterable, the same `with` item's context expression. Each test is
+    `check_conf_name`.
+
+    The global-loader rule over-matches on the fail-closed side: a function whose subtree holds a conf
+    name anywhere, nested functions included, answers every global it rebinds, whichever function the
+    constant belongs to.
+
+    NOT SEEN, each binding a module name of `loop_lib.py` outside both passes (TOOL-dDeclaredLoop-89 S5):
+    an import, whose name would have to be followed to its source (TOOL-dDeclaredLoop-87 F2); an
+    `except ... as` name, unbound when its handler ends; a `match` capture pattern, of which no kit module
+    holds a module-level instance; a `def` or `class` name, read through a call as a `reader call`; a name
+    bound through `globals()` or `setattr`, which no parse can see; a `global` in a class body, and a
+    walrus in a default argument, a decorator or a class base, each evaluated in module scope outside
+    both passes."""
+    import ast
+    names = set()
+    for f in ast.walk(tree):
+        if isinstance(f, (ast.FunctionDef, ast.AsyncFunctionDef)) and check_conf_name(f, docs):
+            sub = list(ast.walk(f))
+            declared = {g for n in sub if isinstance(n, ast.Global) for g in n.names}
+            names |= declared & {n.id for n in sub if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Store)}
+    todo = list(tree.body)
+    while todo:
+        n = todo.pop()
+        if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.Lambda)):
+            continue
+        if isinstance(n, ast.NamedExpr) and check_conf_name(n.value, docs):
+            names.add(n.target.id)
+        elif isinstance(n, (ast.For, ast.AsyncFor)) and check_conf_name(n.iter, docs):
+            names.update(t.id for t in ast.walk(n.target) if isinstance(t, ast.Name))
+        elif isinstance(n, (ast.With, ast.AsyncWith)):
+            for item in n.items:
+                if item.optional_vars is not None and check_conf_name(item.context_expr, docs):
+                    names.update(t.id for t in ast.walk(item.optional_vars) if isinstance(t, ast.Name))
+        todo.extend(ast.iter_child_nodes(n))
+    return names
+
+
+def load_tree_lib():
+    """The memory-tree kit's `tree_lib`, found through `read_memory_tree` and imported inside the call,
+    never at this module's import: the one route by which this module reaches it, which
+    `derive_conf_reads` and `derive_conf_constants` call. LoopError naming the loaded file and
+    `govkit update --kits memory-tree` where the module lacks `derive_docstring_ids`
+    (TOOL-dDeclaredLoop-86 S21, TOOL-dDeclaredLoop-89 S6)."""
+    read_memory_tree("tree_lib.py")
+    import tree_lib
+    if not hasattr(tree_lib, "derive_docstring_ids"):
+        raise LoopError(pathlib.Path(tree_lib.__file__).as_posix(),
+                        "has no derive_docstring_ids — govkit update --kits memory-tree")
+    return tree_lib
+
+
 def derive_conf_constants(loop_lib_path):
     """The module-level names the file at `loop_lib_path` binds, the class and never a list of shapes:
     every `Name` in the targets, a tuple target's included, of an `Assign`, an `AnnAssign` with a value or
@@ -826,28 +895,30 @@ def derive_conf_constants(loop_lib_path):
     `with`, `for` or `while` included, whose value's syntax subtree holds anywhere a str constant
     containing `.memory-tree.conf` or `.unattended.conf`, an f-string's literal part included. The value's
     shape is never tested, so a join of any operands and any call are inside the class; a value that
-    only names another binding is not (TOOL-dDeclaredLoop-87 S1). Read by `ast.parse`, never an import.
-    LoopError naming the path where the file is missing or does not parse (TOOL-dDeclaredLoop-86 S13)."""
+    only names another binding is not (TOOL-dDeclaredLoop-87 S1). It also answers the names
+    `derive_conf_rebinds` answers over the same parse, a global loader's and a module-level walrus, `for`
+    or `with` target's, the docstring ids from `load_tree_lib` (TOOL-dDeclaredLoop-89 S2). Read by
+    `ast.parse`, never an import. LoopError naming the path where the file is missing or does not parse,
+    raised before any `tree_lib` load (TOOL-dDeclaredLoop-86 S13), and `load_tree_lib`'s refusal."""
     import ast
     path = pathlib.Path(loop_lib_path)
     try:
-        body = ast.parse(path.read_text(encoding="utf-8"), str(path)).body
+        tree = ast.parse(path.read_text(encoding="utf-8"), str(path))
     except (OSError, UnicodeDecodeError, SyntaxError, ValueError) as e:
         raise LoopError(path.as_posix(), "cannot be read as the conf constants' module: %s" % e) from None
-    confs = (".memory-tree.conf", ".unattended.conf")
-    names, todo = set(), list(body)
+    docs = load_tree_lib().derive_docstring_ids(tree)
+    names, todo = set(), list(tree.body)
     while todo:
         st = todo.pop()
         if isinstance(st, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
             continue
         if isinstance(st, (ast.Assign, ast.AugAssign, ast.AnnAssign)) and st.value is not None:
-            if any(isinstance(n, ast.Constant) and isinstance(n.value, str) and any(c in n.value for c in confs)
-                   for n in ast.walk(st.value)):
+            if check_conf_name(st.value, docs):
                 for t in getattr(st, "targets", None) or [st.target]:
                     names.update(n.id for n in ast.walk(t) if isinstance(n, ast.Name))
             continue
         todo.extend(c for c in ast.iter_child_nodes(st) if isinstance(c, (ast.stmt, ast.excepthandler)))
-    return names
+    return names | derive_conf_rebinds(tree, docs)
 
 
 def derive_conf_reads(path):
@@ -863,19 +934,14 @@ def derive_conf_reads(path):
     S13, S15). A comment is not in the tree. Every node a definition of `derive_fixture_boundary`
     encloses, its decorators and signature included, is passed over (TOOL-dDeclaredLoop-80).
     SyntaxError where the module does not parse (TOOL-dDeclaredLoop-76); LoopError where that
-    `loop_lib.py` is missing or does not parse, or where the memory-tree kit's `tree_lib`, loaded inside
-    the call and never at this module's import, lacks `derive_docstring_ids` (TOOL-dDeclaredLoop-86
-    S21)."""
+    `loop_lib.py` is missing or does not parse, or where the memory-tree kit's `tree_lib`, which
+    `load_tree_lib` loads inside the call and never at this module's import, lacks
+    `derive_docstring_ids` (TOOL-dDeclaredLoop-86 S21, TOOL-dDeclaredLoop-89 S6)."""
     import ast
     path = pathlib.Path(path)
     confs = (".memory-tree.conf", ".unattended.conf")
     tree = ast.parse(path.read_text(encoding="utf-8"), str(path))
-    read_memory_tree("tree_lib.py")
-    import tree_lib
-    if not hasattr(tree_lib, "derive_docstring_ids"):
-        raise LoopError(pathlib.Path(tree_lib.__file__).as_posix(),
-                        "has no derive_docstring_ids — govkit update --kits memory-tree")
-    docs = tree_lib.derive_docstring_ids(tree)
+    docs = load_tree_lib().derive_docstring_ids(tree)
     bounded = {id(n) for f in derive_fixture_boundary(tree) for n in ast.walk(f)}
     aliases = derive_import_aliases(tree)
     consts = derive_conf_constants(path.parent / "loop_lib.py")

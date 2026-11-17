@@ -206,7 +206,10 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
                              "name: a constant, the same line in fixture code, a bash string, an aliased reader, "
                              "docstrings alone, a Path binding, an annotated binding and a star import of the "
                              "loop_lib, a joined path, an os.path.join call, a multi-argument Path and an aliased "
-                             "from-import, a join naming no conf, then the first module with no loop_lib beside it"}
+                             "from-import, a join naming no conf, a global loader rebinding a name to the driver's "
+                             "conf's path, one holding the memory tree's conf in a with, a walrus, a for target and "
+                             "a with target, a global loader naming no conf and one naming the driver's conf in its "
+                             "docstring alone, then the first module with no loop_lib beside it"}
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
 PLANT_TRAILER = '[transitions]\nrecord = ["trailer"]\n'
 PLANT_SPEC = "# TOOL-%s-%d — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n"
@@ -840,7 +843,25 @@ def run_budget_plant(case):
                      "import loop_lib as ll", "ll.CONF", [(2, "conf constant")]),
                     ("aliased-from-import", 'CONF = ROOT / ".unattended.conf"\n', "from loop_lib import CONF as C",
                      "C", [(2, "conf constant")]),
-                    ("non-conf-join", 'OTHER = ROOT / "other.toml"\n', "import loop_lib as ll", "ll.OTHER", [])):
+                    ("non-conf-join", 'OTHER = ROOT / "other.toml"\n', "import loop_lib as ll", "ll.OTHER", []),
+                    # TOOL-dDeclaredLoop-89 S3: a global loader and module-level walrus, for and with targets,
+                    # then a global loader naming no conf and one naming it in its docstring alone
+                    ("global-loader", 'CONF = None\ndef load(): global CONF; CONF = HERE.parent / ".unattended.conf"\n',
+                     "import loop_lib as ll", "ll.CONF", [(2, "conf constant")]),
+                    ("with-held-loader", 'def read_kit_conf():\n    global KIT_CONF\n'
+                                         '    with open(ROOT / ".memory-tree.conf") as fh:\n'
+                                         '        KIT_CONF = fh.read()\n',
+                     "import loop_lib as ll", "ll.KIT_CONF", [(2, "conf constant")]),
+                    ("walrus-target", 'if (WCONF := ROOT / ".unattended.conf").exists(): pass\n',
+                     "import loop_lib as ll", "ll.WCONF", [(2, "conf constant")]),
+                    ("for-target", 'for FCONF in (ROOT / ".memory-tree.conf",): pass\n', "import loop_lib as ll",
+                     "ll.FCONF", [(2, "conf constant")]),
+                    ("with-target", 'with open(ROOT / ".unattended.conf") as FH: pass\n', "import loop_lib as ll",
+                     "ll.FH", [(2, "conf constant")]),
+                    ("plain-global", "def reset(): global COUNTER; COUNTER = 0\n", "import loop_lib as ll",
+                     "ll.COUNTER", []),
+                    ("docstring-loader", 'def note(): """Reads .unattended.conf."""; global NOTE; NOTE = 1\n',
+                     "import loop_lib as ll", "ll.NOTE", [])):
                 write_fixture_files(top / name, {"loop_lib.py": lib,
                                                  name + ".py": "%s\ndef read_root(): return open(%s).read()\n" % (
                                                      opens, reads)})
