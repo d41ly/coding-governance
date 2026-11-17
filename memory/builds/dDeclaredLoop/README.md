@@ -195,7 +195,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-75 — the round-3 spec audit's 36 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md) | 39 | 2 | CLOSED | rev-10 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-77 — a FETCH_HEAD URL is compared in the spelling git writes it, its user part stripped from both sides](spec/2026-10-24-spec-TOOL-dDeclaredLoop-77.md) | 39 | 2 | CLOSED | rev-3 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-79 — the round-4 spec audit's 28 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-79.md) | 40 | 2 | CLOSED | rev-7 | 2026-11-17 |
-| [TOOL-dDeclaredLoop-82 — the round-5 spec audit's 23 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-82.md) | 41 | 2 | INPROGRESS | rev-7 | 2026-11-17 |
+| [TOOL-dDeclaredLoop-82 — the round-5 spec audit's 23 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-82.md) | 41 | 2 | INPROGRESS | rev-8 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-86 — the round-6 spec audit's 22 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-86.md) | 42 | 2 | DEFERRED | rev-8 | 2026-11-16 |
 | [TOOL-dDeclaredLoop-87 — the conf-constant kind is stated as a class: any module-level binding whose value holds a conf name, and every import that binds it](spec/2026-10-24-spec-TOOL-dDeclaredLoop-87.md) | 43 | 2 | DEFERRED | rev-6 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-88 — the round-7 spec audit's 36 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-88.md) | 44 | 2 | DEFERRED | rev-6 | 2026-11-17 |
