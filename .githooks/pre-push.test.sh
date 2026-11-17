@@ -1960,9 +1960,10 @@ git init -q --template= --bare "$tmp/pg.git"
 git init -q --template= "$tmp/pg"
 cd "$tmp/pg" || exit 2
 git config core.hooksPath "$tmp/hooks"
-mkdir -p loop
-printf 'import os, sys\nprint("LOOP PUSH ARM RAN", *sys.argv[1:])\nsys.exit(int(os.environ.get("PG_EXIT", "0")))\n' > loop/guard.py
-printf 'import os\nprint(os.environ.get("FL_VAL", "on"))\n' > loop/floor.py
+lk=loop   # the stand-in loop kit's folder, named once
+mkdir -p "$lk"
+printf 'import os, sys\nprint("LOOP PUSH ARM RAN", *sys.argv[1:])\nsys.exit(int(os.environ.get("PG_EXIT", "0")))\n' > "$lk/guard.py"
+printf 'import os\nprint(os.environ.get("FL_VAL", "on"))\n' > "$lk/floor.py"
 git add -A; git commit -q -m base; git branch -M main
 git remote add origin "$tmp/pg.git"; git push -q --no-verify origin main
 git -C "$tmp/pg.git" symbolic-ref HEAD refs/heads/main

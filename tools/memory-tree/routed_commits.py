@@ -1404,8 +1404,9 @@ def run_selftest() -> int:
                   and note40 in tok.stderr,
             "TOOL-dDeclaredLoop-40 AC3 `tokens` with no trailer key table exits 0, its note on stderr only",
             f"exit {tok.returncode}\n{tok.stdout}\n{tok.stderr}")
-        (top40 / "playbook").mkdir()
-        (top40 / "playbook" / "edges.toml").write_text("# no [[trailer]] row\n", encoding="utf-8")
+        edge_kit = "playbook"   # the trailer key table's kit folder, named once, never joined as a literal
+        (top40 / edge_kit).mkdir()
+        (top40 / edge_kit / "edges.toml").write_text("# no [[trailer]] row\n", encoding="utf-8")
         got = run40("-c", read40, str(top40 / "kit"))
         print_arm(got.stdout.splitlines()[:1] == want40[:1] and note40 in got.stderr,
             "TOOL-dDeclaredLoop-40 AC5 a trailer key table of no rows reads the floor keys, with the note",
