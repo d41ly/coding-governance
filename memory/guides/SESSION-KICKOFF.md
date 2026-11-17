@@ -6,7 +6,7 @@
 last-audit: 2026-11-17T02:13:55+02:00 @ 9c06b8ef86df218a26eae6d9fe3ff51dadb20df9
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 975e27fa07f2010e170d3cba6c6a2a9d643ab9aa
+last-body-change: 6bc52aca7f46a91f23812d9854365bee4a626735
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -81,6 +81,7 @@ lives where each bullet points.
 - The loop kit's definition `tools/loop/loop.toml` is checked one concern per module, each its own leg: `loop_lib.py --check`, and `check` on `loop_table.py`, `loop_checklist.py` and `loop_items.py` (`help/loop.md`).
 - A repository's own loop rows each have their own module and fixture leg: its stages `splice.py check`, an item's upstream rows `upstream.py`, the composition pinned per move `composition.py`, and the build's position from witnesses `position.py` (`help/loop.md`).
 - The review round bounds are policy keys read through `tools/loop/review_bounds.py`; the driver falls back to four defaults with a NOTE where the module or the policy kit does not resolve (`help/loop.md`).
+- Every composition is checked to terminate by `tools/loop/termination.py`, its own leg `loop termination`, and the owner gates and review breakpoints of a build are one list read by `tools/loop/breakpoints.py` (`help/loop.md`).
 
 ### Pointer map (load the row(s) the task touches)
 
