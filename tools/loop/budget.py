@@ -121,8 +121,8 @@ KIT = pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from adapt import read_disposition_release, read_run_file  # noqa: E402
-from loop_lib import (LoopError, derive_conf_reads, derive_fixture_boundary, load_tree_lib,  # noqa: E402
-                      read_memory_tree, resolve_memory_root, resolve_memory_root_source, run_selftest_cases)
+from loop_lib import (LoopError, check_conf_name, derive_conf_constants, derive_conf_reads,  # noqa: E402
+                      derive_fixture_boundary, load_tree_lib, read_memory_tree, resolve_memory_root, resolve_memory_root_source, run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_transition import (BUDGET_FIELDS, FX_BUILD, FX_SPEC, FX_UNIT, VALUE,  # noqa: E402
                              check_transition_channels, read_build_specs, read_build_unit_ids,
@@ -211,7 +211,11 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
                              "conf's path, one holding the memory tree's conf in a with, a walrus, a for target and "
                              "a with target, a global loader naming no conf and one naming the driver's conf in its "
                              "docstring alone, an annotation-only binding, a subscript target and a for body each "
-                             "naming a conf, then the first module with no loop_lib beside it, then with the "
+                             "naming a conf, then a name bound to a conf's path by a global in a class body and "
+                             "by a walrus in a default, a keyword-only default, a lambda default, a class base and "
+                             "a decorator, beside a walrus in a function body and one in a class body binding none, "
+                             "each row's loop_lib also run to compare the names it binds with the rule's, then "
+                             "the first module with no loop_lib beside it, then with the "
                              "memory-tree kit's tree_lib unlocatable, blocked from import and unparseable"}
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
 PLANT_TRAILER = '[transitions]\nrecord = ["trailer"]\n'
@@ -907,6 +911,45 @@ def run_budget_plant(case):
                 print("%s: fixture · conf-read-forms · %s · %s" % (SAY, name, ", ".join(
                     "line %d %s" % hit for hit in got) or "no hit"))
                 check(got == owed, "%s answered %s, owed %s" % (name, got, owed))
+            # TOOL-dDeclaredLoop-91 S3, S4: the module-scope group, a name bound in a part of a definition Python
+            # evaluates in module scope, then a walrus in a function body and one in a class body, the liveness
+            # negatives; each row's loop_lib.py also runs by exec, and every name it binds to a conf's path must
+            # be one derive_conf_constants answers, the over-report of the lambda row's own target aside
+            for name, lib, reads, owed in (
+                    ("class-global", "class Cfg:\n"
+                                     "    global CONF_K\n"
+                                     '    CONF_K = ROOT / ".unattended.conf"\n', "ll.CONF_K", [(2, "conf constant")]),
+                    ("default-walrus", "def f(x=(DCONF := ROOT\n"
+                                       '                  / ".memory-tree.conf")): pass\n', "ll.DCONF",
+                     [(2, "conf constant")]),
+                    ("keyword-default-walrus", "def fk(*, y=(KWCONF := ROOT\n"
+                                               '                     / ".unattended.conf")): pass\n', "ll.KWCONF",
+                     [(2, "conf constant")]),
+                    ("lambda-default-walrus", "g = lambda x=(LCONF := ROOT\n"
+                                              '              / ".unattended.conf"): x\n', "ll.LCONF",
+                     [(2, "conf constant")]),
+                    ("class-base-walrus", "class KB(type(BCONF :=\n"
+                                          '                ".memory-tree.conf")): pass\n', "ll.BCONF",
+                     [(2, "conf constant")]),
+                    ("decorator-walrus", '@(lambda fn, _=(DECO := ROOT / ".unattended.conf"): fn)\n'
+                                         "def h(): pass\n", "ll.DECO", [(2, "conf constant")]),
+                    ("function-body-walrus", "def h2():\n"
+                                             '    (HLOCAL := ".unattended.conf")\n', "ll.HLOCAL", []),
+                    ("class-body-walrus", "class K2:\n"
+                                          '    KATTR = (KW := ".unattended.conf")\n', "ll.KW", [])):
+                write_fixture_files(top / name, {"loop_lib.py": lib,
+                                                 name + ".py": "import loop_lib as ll\ndef read_root(): return open(%s)"
+                                                               ".read()\n" % reads})
+                got = derive_conf_reads(top / name / (name + ".py"))
+                print("%s: fixture · conf-read-forms · %s · %s" % (SAY, name, ", ".join(
+                    "line %d %s" % hit for hit in got) or "no hit"))
+                check(got == owed, "%s answered %s, owed %s" % (name, got, owed))
+                ns = {"ROOT": pathlib.PurePath(".")}
+                exec(lib, ns)   # the row's own literal above, no input from outside the plant
+                bound = {k for k, v in ns.items() if k != "__builtins__" and check_conf_name(ast.Constant(str(v)))}
+                missed = ", ".join(sorted(bound - derive_conf_constants(top / name / "loop_lib.py")))
+                print("%s: fixture · parity · %s · missed %s" % (SAY, name, missed or "none"))
+                check(not missed, "%s: the rule missed %s, which the execution bound" % (name, missed))
             write_fixture_files(top / "no-lib", {"constant.py": first})
             try:
                 got = "answered %s" % derive_conf_reads(top / "no-lib" / "constant.py")

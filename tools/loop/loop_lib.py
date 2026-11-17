@@ -829,31 +829,44 @@ def check_conf_name(node, docs=()):
                and any(c in n.value for c in (".memory-tree.conf", ".unattended.conf")) for n in ast.walk(node))
 
 
+# The parts of a definition Python evaluates in module scope when the definition runs, each a dotted
+# attribute path keyed by the `ast` class name, the only parts of a definition `derive_conf_rebinds`'s
+# module-level walk reads (TOOL-dDeclaredLoop-91 S2): a position added later is one entry here.
+_MODULE_SCOPE_PARTS = {
+    "FunctionDef": ("decorator_list", "args.defaults", "args.kw_defaults"),
+    "AsyncFunctionDef": ("decorator_list", "args.defaults", "args.kw_defaults"),
+    "Lambda": ("args.defaults", "args.kw_defaults"),
+    "ClassDef": ("decorator_list", "bases", "keywords"),
+}
+
+
 def derive_conf_rebinds(tree, docs):
     """The module names a parsed `loop_lib.py` binds outside an assignment's own value, from two passes
-    (TOOL-dDeclaredLoop-89 S1). Global loaders: each `def` or `async def` at any depth whose subtree holds
-    a conf name outside the docstring ids `docs` answers every name a `global` statement in that subtree
-    declares and a `Name` in a store context there binds. Module-level targets: each walrus, `for`,
-    `async for`, `with` or `async with` reached from the module body without entering a `def`, a `class`
-    or a `lambda` answers every `Name` in its target where its source holds a conf name: the walrus's
-    value, the loop's iterable, the same `with` item's context expression. Each test is
-    `check_conf_name`.
+    (TOOL-dDeclaredLoop-89 S1, TOOL-dDeclaredLoop-91 S1, S2). Global loaders: each `def`, `async def` or
+    `class` at any depth whose subtree holds a conf name outside the docstring ids `docs` answers every
+    name a `global` statement in that subtree declares and a `Name` in a store context there binds, so a
+    `global` in a class body is read. Module-level targets: each walrus, `for`, `async for`, `with` or
+    `async with` reached from the module body answers every `Name` in its target where its source holds
+    a conf name: the walrus's value, the loop's iterable, the same `with` item's context expression. The
+    walk never enters the body of a `def`, a `class` or a `lambda`; of each it reads only the parts
+    `_MODULE_SCOPE_PARTS` names, the ones Python evaluates in module scope, and again inside them: a
+    decorator, a default argument, a keyword-only one included, a class base and a class keyword. Each
+    test is `check_conf_name`.
 
-    The global-loader rule over-matches on the fail-closed side: a function whose subtree holds a conf
-    name anywhere, nested functions included, answers every global it rebinds, whichever function the
-    constant belongs to.
+    The global-loader rule over-matches on the fail-closed side: a function or a class whose subtree
+    holds a conf name anywhere, nested functions included, answers every global it rebinds, whichever
+    function the constant belongs to.
 
     NOT SEEN, each binding a module name of `loop_lib.py` outside both passes (TOOL-dDeclaredLoop-89 S5):
     an import, whose name would have to be followed to its source (TOOL-dDeclaredLoop-87 F2); an
     `except ... as` name, unbound when its handler ends; a `match` capture pattern, of which no kit module
     holds a module-level instance; a `def` or `class` name, read through a call as a `reader call`; a name
-    bound through `globals()` or `setattr`, which no parse can see; a `global` in a class body, and a
-    walrus in a default argument, a decorator or a class base, each evaluated in module scope outside
-    both passes."""
+    bound through `globals()` or `setattr`, which no parse can see; a `type` statement, which binds a
+    type alias whose value is evaluated lazily and never a path (TOOL-dDeclaredLoop-91 S5)."""
     import ast
     names = set()
     for f in ast.walk(tree):
-        if isinstance(f, (ast.FunctionDef, ast.AsyncFunctionDef)) and check_conf_name(f, docs):
+        if isinstance(f, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and check_conf_name(f, docs):
             sub = list(ast.walk(f))
             declared = {g for n in sub if isinstance(n, ast.Global) for g in n.names}
             names |= declared & {n.id for n in sub if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Store)}
@@ -861,6 +874,11 @@ def derive_conf_rebinds(tree, docs):
     while todo:
         n = todo.pop()
         if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.Lambda)):
+            for part in _MODULE_SCOPE_PARTS.get(type(n).__name__, ()):
+                got = n
+                for attr in part.split("."):
+                    got = getattr(got, attr)
+                todo.extend(p for p in got if p is not None)
             continue
         if isinstance(n, ast.NamedExpr) and check_conf_name(n.value, docs):
             names.add(n.target.id)
