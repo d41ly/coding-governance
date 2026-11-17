@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-79 — the round-4 spec audit's 28 minors, batched
 
-**Status:** DEFERRED · rev-6 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 40 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-6 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 40 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-76-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-76-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-79-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-79-1-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-79-reground-brief.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-79-reground-brief.md) | research | — |
+| [2026-11-17-prompt-TOOL-dDeclaredLoop-79-build-brief.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-79-build-brief.md) | journal | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-76-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-76-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 |
 
 <!-- /gen:spec-records -->

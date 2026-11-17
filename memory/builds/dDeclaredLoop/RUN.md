@@ -409,3 +409,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-17T02:30:00Z draw · re-dispatch · TOOL-dDeclaredLoop-77 · 2/204 · 20261117T023000Z-69d5e7
 
 2026-11-17T02:30:00Z dispatch · item 29abc145 TOOL-dDeclaredLoop-77 · reason memory/backlog/TOOL.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-17T02:38:30Z brief · item TOOL-dDeclaredLoop-79 · reason 55fb604a5d9f memory/builds/dDeclaredLoop/prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-79-build-brief.md
