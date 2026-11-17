@@ -67,8 +67,9 @@ parse, a read refusal, a recorded move no build row holds, or a hand-over naming
 and no undecided ask), `stale-remote` (the remote tip's claim not `fresh`: a remote the ladder refuses,
 or a tracking tip last fetched longer ago than the bound, the fetch read as the newest of the mtime of
 each `FETCH_HEAD` under the common git directory and its `worktrees/*/` that holds a line for the
-default branch fetched from the remote's own URL, `git remote get-url` past one trailing `/` and `.git`
-(TOOL-dDeclaredLoop-74), and the tracking ref's newest
+default branch fetched from the remote's own URL, `git remote get-url` as git writes it into `FETCH_HEAD`,
+its user part, every trailing `/` and one `.git` cut from both sides (TOOL-dDeclaredLoop-74,
+TOOL-dDeclaredLoop-77), and the tracking ref's newest
 reflog entry, or, where none of those is read, the default branch's newest `clone: ` reflog entry; the
 ref's `read —` line ends `fetched <n>s ago · from FETCH_HEAD|reflog|clone`, or `fetched never`, which gains
 ` · core.logAllRefUpdates=false` where the repository's setting reads false (TOOL-dDeclaredLoop-75 S34), and each
@@ -100,8 +101,9 @@ the build that arms the item; a settling row for a parked entry, which the drive
 have yet, so every owed entry stands; the mailbox, printed `unarmed`; that a `gates-run` fact names a
 green bar rather than the last bar run; a fetch run with `--no-write-fetch-head`, which leaves no
 `FETCH_HEAD` and so reads by the reflog where the ref moved, and as stale where it did not; a
-`FETCH_HEAD` whose URL git spelled otherwise than the configured URL past one trailing `/` and `.git`,
-such as one with a user part, which reads skipped.
+`FETCH_HEAD` whose URL git spelled otherwise than `derive_fetch_url` spells the configured URL, its
+user part cut by git's rule, then every trailing `/` and one `.git`, such as one git rewrote through a
+`url.<base>.insteadOf`, which reads skipped.
 """
 import argparse
 import copy
@@ -180,6 +182,12 @@ PLANTS = {"steps": "unit 1 deployed, unit 2 built, unit 3 designed: act at unit 
                                 "skipped as holding no line for main, read from reflog",
           "clone-without-reflog": "fresh-clone with core.logAllRefUpdates=false: stale-remote, fetched never, the "
                                   "setting named",
+          "scp-remote": "stale-remote's aged reflog, then a fetch over an ssh shim from git@example.com:up.git: not "
+                        "stale-remote, read from FETCH_HEAD, nothing skipped",
+          "ssh-userinfo-remote": "scp-remote over ssh://user@example.com/up.git: not stale-remote, read from FETCH_HEAD, "
+                                 "nothing skipped",
+          "url-forms": "stale-remote's aged reflog, then a fetch failing at connect from a URL carrying a password: "
+                       "stale-remote, FETCH_HEAD skipped as empty, no password printed; each url-forms pair as tabled",
           "plan-line": "the driver's next: line equals render_next_line's, in three states",
           "status-line": "the driver's --status prints the engine's position line"}
 FX_SLUG = "tPos"
@@ -194,6 +202,14 @@ FX_A, FX_B, FX_C, FX_D = "item.build.base", "item.build.unit-lease", "item.build
 FX_UNIT = "item.build.acceptance"
 #: The plants that run the unattended driver, and so copy its conf into the scratch repository.
 FX_DRIVER = ("frontier-refused", "frontier-bad-key", "plan-frontier", "built-unarmed", "plan-line", "status-line")
+#: The `url-forms` plant's pairs (TOOL-dDeclaredLoop-77 S3): a configured URL, a URL as git wrote it into
+#: `FETCH_HEAD`, and whether `derive_fetch_url` owes them equal.
+FX_URL_FORMS = (("git@example.com:up.git", "example.com:up", "equal"),
+                ("ssh://user@example.com/up.git", "ssh://example.com/up", "equal"),
+                ("example.com:up.git/", "example.com:up", "equal"),
+                ("C:/x/up.git//", "C:/x/up", "equal"),
+                ("git@other.example:up.git", "example.com:up", "unequal"),
+                ("C:/x@b/up.git", "C:/y@b/up", "unequal"))
 
 
 # ------------------------------------------------------------------------------------------ the reads
@@ -236,9 +252,22 @@ def read_handover(repo, slug):
 
 
 def derive_fetch_url(url):
-    """`url` as git spells it on a `FETCH_HEAD` line (TOOL-dDeclaredLoop-74 S1): one trailing `/`
-    stripped, then one trailing `.git`."""
-    url = url[:-1] if url.endswith("/") else url
+    """`url` as git spells it on a `FETCH_HEAD` line (TOOL-dDeclaredLoop-74 S1, TOOL-dDeclaredLoop-77 S1):
+    the user part cut, then every trailing `/`, then one trailing `.git`. The user part is git's: in a
+    `<scheme>://` URL, its scheme of letters, digits, `+`, `.` and `-`, the bytes through the first `@`
+    where no `/` comes before it; in an scp form, the bytes through the first `@` where a `:` follows it
+    and no `/` comes before the URL's first `:`. A local path keeps every other byte."""
+    if "://" in url:
+        scheme, rest = url.split("://", 1)
+        at, slash = rest.find("@"), rest.find("/")
+        if re.fullmatch(r"[A-Za-z0-9+.-]+", scheme) and at >= 0 and (slash < 0 or at < slash):
+            url = scheme + "://" + rest[at + 1:]
+    elif "@" in url:
+        after = url[url.index("@") + 1:]
+        colon, slash = url.find(":"), url.find("/")
+        if ":" in after and not (0 <= slash < colon):
+            url = after
+    url = url.rstrip("/")
     return url[:-4] if url.endswith(".git") else url
 
 
@@ -819,7 +848,8 @@ def write_position_plant(top, case, root):
         run_fixture_git(repo, "push", "-q", "origin", "main")
     if remote:
         run_fixture_git(repo, "remote", "set-head", "origin", "main")
-    if case in ("stale-remote", "quiet-remote", "failed-fetch", "fetch-other-branch"):  # the tracking tip kept, its one reflog entry dated 2000-01-01, past any bound
+    if case in ("stale-remote", "quiet-remote", "failed-fetch", "fetch-other-branch", "scp-remote", "ssh-userinfo-remote",
+                "url-forms"):  # the tracking tip kept, its one reflog entry dated 2000-01-01, past any bound
         tip = run_fixture_git(repo, "rev-parse", "refs/remotes/origin/main")
         run_fixture_git(repo, "update-ref", "-d", "refs/remotes/origin/main")
         rc, out = read_git(repo, "update-ref", "--create-reflog", "-m", "aged", "refs/remotes/origin/main", tip,
@@ -838,6 +868,19 @@ def write_position_plant(top, case, root):
     if case == "fetch-other-branch":  # TOOL-dDeclaredLoop-75 S12: a FETCH_HEAD holding another branch's line alone
         run_fixture_git(repo, "push", "-q", "origin", "HEAD:refs/heads/other")
         run_fixture_git(repo, "fetch", "-q", "origin", "other")
+    if case in ("scp-remote", "ssh-userinfo-remote"):  # TOOL-dDeclaredLoop-77 S2: a user-part URL fetched over a shim
+        shim = top / "ssh-shim.sh"  # sh strips a Windows path's backslashes, so both paths reach it as_posix
+        write_fixture_files(top, {shim.name: "exec git-upload-pack '%s'\n" % remote.as_posix()})
+        url = "git@example.com:up.git" if case == "scp-remote" else "ssh://user@example.com/up.git"
+        run_fixture_git(repo, "remote", "set-url", "origin", url)
+        rc, out = read_git(repo, "fetch", "-q", "origin", env=read_clean_env(GIT_SSH_COMMAND="sh '%s'" % shim.as_posix()))
+        if rc:
+            raise subprocess.CalledProcessError(rc, "git fetch over the ssh shim", out)
+    if case == "url-forms":  # TOOL-dDeclaredLoop-77 S4: a URL carrying a password, its fetch failing at connect
+        run_fixture_git(repo, "remote", "set-url", "origin", "https://u:SECRET@127.0.0.1:9/r.git")
+        rc, out = read_git(repo, "fetch", "-q", "origin", env=read_clean_env(GIT_TERMINAL_PROMPT="0"))
+        if rc == 0:
+            raise subprocess.CalledProcessError(rc, "git fetch from port 9 exited 0", out)
     if case in ("fresh-clone", "offline-stale", "clone-without-reflog"):  # the engine reads the clone, whose remote's HEAD names main
         run_fixture_git(remote, "symbolic-ref", "HEAD", "refs/heads/main")
         # TOOL-dDeclaredLoop-75 S34: a clone that writes no reflog, so no time is read
@@ -1007,6 +1050,12 @@ def check_plant(case, pos, rc, repo):
             and "read — FETCH_HEAD · skipped — no line for main of origin" in lines and ref_line.endswith(" · from reflog"),
             "clone-without-reflog": lambda: pos["answer"] == "stale-remote"
             and ref_line.endswith(" · fetched never · core.logAllRefUpdates=false"),
+            "scp-remote": lambda: pos["answer"] != "stale-remote" and ref_line.endswith(" · from FETCH_HEAD")
+            and not any("skipped —" in ln for ln in lines),
+            "ssh-userinfo-remote": lambda: pos["answer"] != "stale-remote" and ref_line.endswith(" · from FETCH_HEAD")
+            and not any("skipped —" in ln for ln in lines),
+            "url-forms": lambda: pos["answer"] == "stale-remote" and "read — FETCH_HEAD · skipped — empty" in lines
+            and not any("SECRET" in ln for ln in lines + [render_next_line(pos), json.dumps(pos)]),
             "no-remote": lambda: pos["answer"] == "act" and "interrupt — remote · none" in lines
             and not any("remote tip" in ln for ln in lines),
             "bad-transition": lambda: pos["answer"] == "invalid-input" and rc == 2,
@@ -1021,6 +1070,12 @@ def check_plant(case, pos, rc, repo):
         print("%s: fixture · %s · another url reads %s" % (SAY, case, why or "kept"))
         if why != "no line for main of origin":
             misses.append("a main line fetched from a second url read %r" % (why or "kept"))
+    if case == "url-forms":  # TOOL-dDeclaredLoop-77 S3: each pair as tabled
+        for configured, written, owed in FX_URL_FORMS:
+            got = "equal" if derive_fetch_url(configured) == derive_fetch_url(written) else "unequal"
+            print("%s: fixture · %s · %s against %s · %s" % (SAY, case, configured, written, got))
+            if got != owed:
+                misses.append("%s against %s read %s, owed %s" % (configured, written, got, owed))
     if case == "idempotent":
         k1 = derive_instance_key("item.build.base", FX_IDS[0], ["a" * 40])
         k2 = derive_instance_key("item.build.base", FX_IDS[0], ["b" * 40])

@@ -894,13 +894,16 @@ The answer is one of `act`, `awaiting`, `blocked`, `terminal`, `stuck`, `invalid
 else. The last fetch is the newest of three readings: the time of each `FETCH_HEAD` git wrote, in
 the repository's own git directory or under any of its worktrees, so a fetch that finds nothing new
 still counts, but only when it holds a line for the default branch fetched from the remote's own
-URL, as `git remote get-url` spells it past one trailing `/` and `.git`, so a failed fetch, which
+URL, as `git remote get-url` spells it past every trailing `/` and one `.git`, so a failed fetch, which
 leaves the file empty, or a fetch of another branch or remote is not a fetch; the tracking ref's
 newest reflog entry; and, only where neither is there, as on a fresh clone, the clone itself. The tracking ref's `read —` line says which, ending `fetched <n>s ago · from
 FETCH_HEAD`, `from reflog` or `from clone`, or `fetched never`, which adds `· core.logAllRefUpdates=false`
 where your repository's setting reads false, the reason no reflog was written, and each `FETCH_HEAD` it
 skipped prints its own line after it, `read — FETCH_HEAD · skipped — empty` or `skipped — no line for
-<branch> of <remote>`, naming the remote and never its URL. With no remote at all, or no tracking ref of the default branch, the remote reads absent: the
+<branch> of <remote>`, naming the remote and never its URL. git leaves a URL's user part out of what
+it writes into `FETCH_HEAD`, so an SSH remote, in the scp form or `ssh://` with a user, or a URL carrying a user
+and a token, compares without it on both sides; a URL git rewrote through `url.<base>.insteadOf`
+still reads skipped. With no remote at all, or no tracking ref of the default branch, the remote reads absent: the
 engine answers on your local witnesses, so no unit reads `deployed`, and prints
 `interrupt — remote · none` with no remote-tip claim. A tracking ref you deleted reads the same. An owed parked decision or an unpassed hold answers
 `awaiting`; a `parents:` build that has not landed answers `blocked`; an undecided ask answers
@@ -944,7 +947,11 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
   `acceptance_armed` false and the driver's `--status` names as the next unit),
   `built-unheld`, `built-armed`, `fetch-other-branch` (the aged reflog, then a fetch of another
   branch, its `FETCH_HEAD` skipped as holding no line for `main`), `clone-without-reflog` (a clone
-  under `core.logAllRefUpdates=false`, read `fetched never` with the setting named), `plan-line` and `status-line`; `frontier-refused`,
+  under `core.logAllRefUpdates=false`, read `fetched never` with the setting named), `scp-remote` and
+  `ssh-userinfo-remote` (the aged reflog, then a fetch over an ssh shim from a URL with a user part,
+  read from `FETCH_HEAD`), `url-forms` (a fetch failing at connect from a URL carrying a password,
+  which no line prints, then one row per configured and written URL pair, `equal` or `unequal`),
+  `plan-line` and `status-line`; `frontier-refused`,
   `frontier-bad-key`, `plan-frontier`, `built-unarmed` and the last two run the unattended driver. Every
   case runs with an empty global and system git config, so no setting of your machine's reaches it. `--selftest` runs every case, and gov's own `loop position fixtures` gate runs it.
 

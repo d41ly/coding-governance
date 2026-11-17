@@ -404,3 +404,8 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-17T02:04:36Z dispatch · item aa1ce32c TOOL-dDeclaredLoop-75 · reason help/policy.md
 
 2026-11-17T02:15:42Z brief · item TOOL-dDeclaredLoop-77 · reason 5732ec81fa69 memory/builds/dDeclaredLoop/prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-77-build-brief.md
+
+2026-11-17T02:23:59Z dispatch · item 29abc145 TOOL-dDeclaredLoop-77 · reason tools/loop/position.py help/loop.md memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-77.md memory/builds/dDeclaredLoop/build/2026-11-17-build-TOOL-dDeclaredLoop-77-1-acceptance-ledger.md memory/builds/dDeclaredLoop/build/2026-11-17-build-TOOL-dDeclaredLoop-77-deviation-772.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/ledger/2026-11.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/map/features/loop.md
+2026-11-17T02:30:00Z draw · re-dispatch · TOOL-dDeclaredLoop-77 · 2/204 · 20261117T023000Z-69d5e7
+
+2026-11-17T02:30:00Z dispatch · item 29abc145 TOOL-dDeclaredLoop-77 · reason memory/backlog/TOOL.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
