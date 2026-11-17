@@ -20,6 +20,13 @@ and the leg's hang ceiling in `tools/gate-legs.json` read against the leg's own 
 eighteen plants read slower under load than unit 7's twelve did alone. The unattended suite is waived
 for this landing; its parity row, hostile-value entry and `--refused` arms were written, not run.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+Not observed: the arm in `tools/loop/position.py`, no staged break was run for it at this close.
+Not observed: the arm in `tools/unattended/unattended.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-14
 - AC1 — `frontier — B` — `python tools/loop/position.py --fixture --plant frontier-chain` printed `frontier — item.build.unit-lease`, B, and no other tag, with A, `item.build.base`, witnessed by a recorded move naming it, and `next — item.build.unit-lease`, the frontier's first entry, then `held`, exit 0.
 - AC2 — `frontier-parallel` — the plant printed `frontier — item.build.base · item.build.unit-lease`, A and B, B's needs emptied in its in-memory definition and neither witnessed, and `held`, exit 0.

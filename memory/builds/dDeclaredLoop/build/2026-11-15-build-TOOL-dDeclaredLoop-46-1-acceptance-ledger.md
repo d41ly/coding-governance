@@ -14,6 +14,12 @@ Owed to the close: every leg the spec's section 7 names, `govkit selfcheck` and 
 among them, AC4's scratch-copy selfcheck runs, AC5 again over the landing's reconciled tree, and the
 RED-first observation of the `New arm:` line, staged against the base emitter and the base 7h.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+Not observed: the arm in `tools/govkit/selftest.py`, a suite arm, left unrun for the owner's opt-in slow-suite
+run.
+
 **Evidences:** TOOL-dDeclaredLoop-46
 - AC1 — `KIT_RUN_GATES_VERSION` — the runner's version line and the README marker both print 1.49, one above origin/main's 1.48 at `179486e8f`, the higher of it and the branch's 1.47 PINNED 2026-11-15; `govkit.STAGE_FLOOR_RUN_GATES` prints `(1, 49)`, and the canary's `KNOWN` count prints 2 PINNED 2026-11-15.
 - AC2 — `tomllib` — the join reads 70 tables in 27 files, none lacking `stage`, none differing from its row, and `stage` last in each, PINNED 2026-11-15; the `govkit.py selfcheck` exit is owed to the close.

@@ -27,6 +27,29 @@ control against a key set admitting it; the `adopt-roles.test.sh` arm 24 against
 answering an empty table; the `selftest.py` review-rounds rows against the tip's writing up; and the
 `unattended-build.test.sh` AC36 pair against the tip's count over every other record.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/position.py --selftest` with every function the unit's pass changed in
+`tools/loop/position.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/loop_parents.py --selftest` with every function the unit's pass changed in
+`tools/loop/loop_parents.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/factories.py --fixture --plant factory-restores-create` with every function the unit's pass
+changed in `tools/lib/guarded_write.py` and `tools/loop/factories.py` swapped back to its pre-pass source
+exited 1, and 1 once restored: not reddened by this break, so not observed.
+`python tools/loop/factories.py --fixture --plant factory-restores-create` with the created-path removal
+dropped from every copy of the guarded write exited 3, and 1 once restored: RED observed.
+Not observed: the arm in `skills/session-kickoff/manifest-check.test.sh`, a suite arm, left unrun for the
+owner's opt-in slow-suite run.
+Not observed: the arm in `tools/run-gates/run-gates.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+Not observed: the arm in `tools/roles/adopt-roles.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+Not observed: the arm in `tools/govkit/selftest.py`, a suite arm, left unrun for the owner's opt-in slow-suite
+run.
+Not observed: the arm in `tools/workflows/unattended-build.test.sh`, a suite arm, left unrun for the owner's
+opt-in slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-56
 - AC5 — ` · key -` — PINNED readings: the card's claims awk cut from the working tree printed `zFive · n1 · live · beat 60s · live · key -` over a five-field stand-in row; the awk cut from main at `179486e8f` placed the new driver's plain five-field row with no `cannot read` line; the awk at the base printed the skip line for the five-field row.
 - AC6 — `--claims --with-key` — `grep -c` printed 3 over `tools/unattended/unattended.test.sh` and 2 over `skills/session-kickoff/manifest-check.test.sh`, the DL8 AC8 arm calling the driver through it; the sourced driver's `print_claims` printed five fields plain and six under `--with-key`.

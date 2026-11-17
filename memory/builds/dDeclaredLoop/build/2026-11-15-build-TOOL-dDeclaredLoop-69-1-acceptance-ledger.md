@@ -16,6 +16,12 @@ and the `loop guard fixtures` row in `tools/run-gates/selftest-budgets.txt` re-p
 loop's reading of the leg alone, as that row's own rule says, since the new plant adds one scratch
 repository to that leg.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/guard.py --selftest` with every function the unit's pass changed in `tools/loop/guard.py`
+swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-69
 - AC1 — `merge <sha8> · .governance/policy.toml · review.max-rounds` — `python tools/loop/guard.py --fixture --plant push-merge-revert-to-unchanged-side`: in both variants, the run branch changing the cap and the run branch leaving the policy file alone, the merge of main setting `review.max-rounds` back to the base's value with neither trailer nor record was refused naming that merge and key, exit 1; the plant printed `all held` and exited 1.
 - AC2 — `review.max-rounds` — `python tools/loop/guard.py --fixture --plant push-merge-both-sides-clean` exited 0 printing `all held`, its needle now counting the side's and main's commits alone since the merge equals its re-merge; `--plant push-merge-resolution-edit` exited 1, its bare merge refused naming `review.max-rounds`, its trailered one clean, printing `all held`.

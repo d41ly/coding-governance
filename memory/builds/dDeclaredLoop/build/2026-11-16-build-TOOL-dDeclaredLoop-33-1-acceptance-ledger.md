@@ -31,6 +31,46 @@ Gov's cycles at landing, each with its bound by §4's rules:
 - rule 3, a `cycle` row of `tools/loop/termination-pending.txt`, owner by the item whose route returns to an item it needs: `paused -> paused` dWellOiledMachine; `item.build.reuse-check` on `overflow` dScopedBuild; the four `item.design.decompose` cycles and the two `item.design.ready` cycles dIndexedDesign; `item.plan.record -> item.plan.research` dRankedPlan; `item.review.dispose -> item.review.fold` dDeclaredLoop; the four test cycles dWitnessedBar.
 - rule 4: `item.build.ratify`, a `wait` row naming `run.owner-deadline` and dWellOiledMachine.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+The `stage-self-loop` plant of `tools/loop/termination.py`, whose planted defect is the staged break, exited 0
+over its scratch tree, its last line reading `loop: fixture · stage-self-loop · held`; the leg over the tree
+read green at HEAD: RED observed.
+The `stage-self-loop-drawn` plant of `tools/loop/termination.py`, whose planted defect is the staged break,
+exited 0 over its scratch tree, its last line reading `loop: fixture · stage-self-loop-drawn · held`; the leg
+over the tree read green at HEAD: RED observed.
+The `dead-end` plant of `tools/loop/termination.py`, whose planted defect is the staged break, exited 0 over
+its scratch tree, its last line reading `loop: fixture · dead-end · held`; the leg over the tree read green at
+HEAD: RED observed.
+The `orphan-item` plant of `tools/loop/termination.py`, whose planted defect is the staged break, exited 0
+over its scratch tree, its last line reading `loop: fixture · orphan-item · held`; the leg over the tree read
+green at HEAD: RED observed.
+The `empty-states` plant of `tools/loop/termination.py`, whose planted defect is the staged break, exited 0
+over its scratch tree, its last line reading `loop: fixture · empty-states · held`; the leg over the tree read
+green at HEAD: RED observed.
+The `wait-no-deadline` plant of `tools/loop/termination.py`, whose planted defect is the staged break, exited
+0 over its scratch tree, its last line reading `loop: fixture · wait-no-deadline · held`; the leg over the
+tree read green at HEAD: RED observed.
+The `wait-stale` plant of `tools/loop/termination.py`, whose planted defect is the staged break, exited 0 over
+its scratch tree, its last line reading `loop: fixture · wait-stale · held`; the leg over the tree read green
+at HEAD: RED observed.
+The `stale-build` plant of `tools/loop/termination.py`, whose planted defect is the staged break, exited 0
+over its scratch tree, its last line reading `loop: fixture · stale-build · held`; the leg over the tree read
+green at HEAD: RED observed.
+The `raise-unattended` plant of `tools/loop/termination.py`, whose planted defect is the staged break, exited
+0 over its scratch tree, its last line reading `loop: fixture · raise-unattended · held`; the leg over the
+tree read green at HEAD: RED observed.
+The `decline` plant of `tools/loop/termination.py`, whose planted defect is the staged break, exited 0 over
+its scratch tree, its last line reading `loop: fixture · decline · held`; the leg over the tree read green at
+HEAD: RED observed.
+The `deadline-patch` plant of `tools/loop/termination.py`, whose planted defect is the staged break, exited 0
+over its scratch tree, its last line reading `loop: fixture · deadline-patch · held`; the leg over the tree
+read green at HEAD: RED observed.
+The `boundary` plant of `tools/loop/termination.py`, whose planted defect is the staged break, exited 0 over
+its scratch tree, its last line reading `loop: fixture · boundary · held`; the leg over the tree read green at
+HEAD: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-33
 - AC1 — `stage-self-loop` — printed `held`: one finding, `counted · item.adopter.lint.exit -> item.adopter.lint.run -> item.adopter.lint.exit`, and no `terminal` or `reachable` finding; `stage-self-loop-drawn` printed `held` with no finding.
 - AC2 — `dead-end` — printed `held`: a `terminal` finding naming `build stuck`, and `unchecked — no terminal set` for the feature and unit levels.

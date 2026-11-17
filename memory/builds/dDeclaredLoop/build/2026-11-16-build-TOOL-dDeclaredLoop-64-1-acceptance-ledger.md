@@ -16,6 +16,12 @@ Owed to the close: every leg section 7 names. Owed RED-first: the `tools/loop/br
 `pre-placement-records-root` plant staged against `TOOL-dDeclaredLoop-53`'s landed list, which prints no
 `breakpoints: held` line, so its `tWrong` expectation misses.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/breakpoints.py --selftest` with every function the unit's pass changed in
+`tools/loop/breakpoints.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-64
 - AC1 — `passed before placement` — the plant's scratch list of `tRec` printed that release at `item.plan.exit`, `item.design.exit` and before `item.deploy.mandate`, the closing review, and no `breakpoints: held` line.
 - AC2 — `breakpoints: held · no commit adds <path>` — the scratch list of `tWrong` printed `breakpoint: owner gate · at item.design.exit · owner · autonomy · held` with its five fields, and last `breakpoints: held · no commit adds records/builds/tWrong/README.md`.

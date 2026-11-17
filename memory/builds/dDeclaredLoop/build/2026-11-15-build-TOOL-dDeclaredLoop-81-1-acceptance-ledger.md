@@ -19,6 +19,12 @@ and the `loop guard fixtures` row in `tools/run-gates/selftest-budgets.txt` re-p
 loop's reading of the leg alone, as that row's own rule says, since the three new plants each add one
 scratch repository to that leg.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/guard.py --selftest` with every function the unit's pass changed in `tools/loop/guard.py`
+swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-81
 - AC1 — `the clean re-merge failed: 128` — `push-merge-unrelated-histories`, its bare scenario: the orphan merge, untrailered, exited 1 naming `the clean re-merge failed: 128 fatal: refusing to merge unrelated histories` and `merge <sha8> · .governance/policy.toml · review.max-rounds`; the plant printed `all held` and exited 1.
 - AC2 — `0 finding(s)` — the same plant's first scenario, the merge carrying `Gov-Policy: policy.review.max-rounds 4 -> none` and a record naming `policy.review.max-rounds`, exited 0 naming `0 finding(s)` and printing `the clean re-merge failed: 128`.

@@ -15,6 +15,11 @@ Owed to the close: every leg the spec's section 7 names; the RED-first observati
 `ask_rank_order` bytes restored in the worktree, which is AC4's second half; and the
 `unattended-status` and `check-unattended` rows read by the leg itself.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+Not observed: the arm in `memory/project/fork-ceilings.txt`, no staged break was run for it at this close.
+
 **Evidences:** TOOL-dDeclaredLoop-112
 - AC1 — `--keyed` — with `lib-unattended.sh` sourced, `expand_id_runs --keyed` read `p` TAB `closes` TAB `TOOL-x-1..3 TOOL-y-7@rev-2` and printed four rows keyed `p` TAB `closes`, ids `TOOL-x-1`, `TOOL-x-2`, `TOOL-x-3` and `TOOL-y-7`, and the same words unkeyed printed the four bare ids; `spec_ask_verbs`, sliced with `read_spec_asks` and the expander out of this pass's driver and alone out of the base driver, printed byte-identical id lists for `closes` and `advances` over every tracked spec of `memory/builds/dDeclaredLoop/spec/` and `memory/builds/dConvergedCharter/spec/`, a non-empty population carrying both verbs.
 - AC2 — `refused=duplicate-closer` — `GOV_POSITION_STATES= bash tools/unattended/unattended.sh --plan --asks dConvergedCharter` from this worktree and from the base extraction printed byte-identical output, an `ASK` row per filed ask with the `refused=duplicate-closer` row among them; `--plan dConvergedCharter` with the engine called printed the same output from both, its `next:` line included. The base run took 239 s, this pass's 98 s (PINNED 2026-11-15).

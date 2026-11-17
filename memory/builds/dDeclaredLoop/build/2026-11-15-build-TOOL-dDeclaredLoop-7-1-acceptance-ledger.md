@@ -19,6 +19,13 @@ changed; and the `loop position fixtures` row in `tools/run-gates/selftest-budge
 the leg's own timing. The unattended suite is waived for this landing; its arms that assert a typed
 `CLOSED` spec prints the terminal shape, and those counting one `--status` line, now read the engine.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+Not observed: the arm in `tools/loop/position.py`, no staged break was run for it at this close.
+Not observed: the arm in `tools/unattended/unattended.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-7
 - AC1 — `unit —` — `python position.py --fixture --plant steps` in the loop kit's folder printed `unit —` lines `deployed`, `built` and `designed`, the position line's step `step.build`, the designed unit's, and `held`; `--plant typed-status` printed the unit whose header reads `CLOSED` as `designed`, and `held`; both exited 0.
 - AC2 — `next —` — `--plant idempotent` printed `next — item.build.unit-lease`, the second item, with its key, and a `claim —` line for `item.build.base@TOOL-tPos-1#…` reading `fresh`, re-read rather than named next, and `held`, exit 0.

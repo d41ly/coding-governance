@@ -17,6 +17,15 @@ RED-first: the `tools/loop/loop_table.py` arm, its five PINNED adopter-phase cas
 takes no `--extra`; and the `tools/loop/breakpoints.py` arm, the `driver-plan` plant's adopter-phase calls
 against unit 52's `check_phase_gates`, which passes no `--extra`.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/loop_table.py check --selftest` with every function the unit's pass changed in
+`tools/loop/loop_table.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/breakpoints.py --selftest` with every function the unit's pass changed in
+`tools/loop/breakpoints.py` swapped back to its pre-pass source exited 0, and 0 once restored: not reddened by
+this break, so not observed.
+
 **Evidences:** TOOL-dDeclaredLoop-63
 - AC1 — `adopter phase` — `--from STAGING --extra STAGING` printed `phase STAGING · state none · step none · adopter phase`, exit 0; `--from STAGNG --extra STAGING` exited 1 printing `refused — phase STAGNG: no row`; `--from REVIEWING --to STAGING --extra "STAGING QA"` printed `phase REVIEWING · state designing · step step.design · to STAGING · adopter phase · crosses none`; `--from STAGING --to BUILDING --extra STAGING` ended `crosses item.plan.exit item.design.exit`; `--from REVIEWING --extra REVIEWING` printed `phase REVIEWING · state designing · step step.design` with no marker; `--from STAGING` with no `--extra` still exited 1 naming it.
 - AC2 — `check_phase_gates tPos REVIEWING STAGING` — the plant printed `held` with its scratch conf setting `PHASES_EXTRA="STAGING"`: that call exited 0, and `check_phase_gates tPos STAGING BUILDING` exited 1 printing `UNATTENDED check 82 FAILED` and `held at item.design.exit`; unit 52's observations printed what they printed.

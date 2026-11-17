@@ -28,6 +28,16 @@ govkit selftest's `check_step_gate_fixture` with the `item` case, its other `New
 for here; AC2's `core.py kinds` and `core.py meta-check`; the `docs` leg over the new anchors and the
 re-rendered kinds page; and a budget re-priced from the main loop's first reading of the leg alone.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+The `repo-cycle` plant of `tools/loop/loop_items.py`, whose planted defect is the staged break, exited 1 over
+its scratch tree, its last line reading `loop: refused ·
+C:/Users/DAILY-~1/AppData/Local/Temp/li-ph_whmzn/tools/loop/loop.toml: the`; the leg over the tree read green
+at HEAD: RED observed.
+Not observed: the arm in `tools/govkit/selftest.py`, a suite arm, left unrun for the owner's opt-in slow-suite
+run.
+
 **Evidences:** TOOL-dDeclaredLoop-24
 - AC1 — `item.test.demo` — `--plant factory` ran `core.py new item demo ...` in its scratch, which
   exited 0 printing `loop: new · appended item.test.demo`; `check` over the committed result exited 0;

@@ -19,6 +19,14 @@ the one `New arm:` line, the `budget.py` plants: `conf-read-forms` with `derive_
 each binding's value alone, and `no-own-conf-read` with `load_tree_lib` testing `derive_docstring_ids`
 alone.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant conf-read-forms` with every function the unit's pass changed in
+`tools/loop/loop_lib.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant no-own-conf-read` with every function the unit's pass changed
+in `tools/loop/loop_lib.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-90
 - AC1 — `annotation` — the probe read `annotation`, `target` and `derive_constant_charges` in `derive_conf_constants.__doc__`; over the kit's README the row grep piped to `grep -c "annotation"` printed 1, to `grep -c "syntax subtree"` printed 1, and to `grep -c "PurePath"` printed 0.
 - AC2 — `FOR_BODY` — the `conf-read-forms` plant printed one `conf constant` hit on line 2 for each of the `annotation-only`, `subscript-target` and `for-body` rows, then `held`, exit 0; in process, with `derive_conf_constants` swapped for a value-only walk united with `derive_conf_rebinds`, the plant returned 1 printing `MISSED` naming the `annotation-only` and `subscript-target` rows; the probe over a scratch `loop_lib.py` holding the three bindings and the `while False` body answered `['ANNO', 'D', 'FOR_BODY', 'WHILE_BODY']`.

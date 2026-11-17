@@ -20,6 +20,15 @@ against feature and unit sets filled with the build's list. Both staged breaks w
 patching the composition's sets, and each plant closed `MISSED`, exit 1; the close's observation on the
 staged files stands owed.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/termination.py --fixture --plant unit-dead-end` with every function the unit's pass changed
+in `tools/loop/termination.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED
+observed.
+`python tools/loop/loop_table.py check --selftest` with every function the unit's pass changed in
+`tools/loop/loop_table.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-54
 - AC1 — `['build', 'feature', 'unit']` — the `python -c` probe printed it, then the build's `terminal` list, `['deployed']` and `['deployed']`; `python loop_table.py check` exited 0 printing `loop: terminal unit · deployed` and no `loop: table unit-terminal` line.
 - AC2 — `unit-terminal-from` — the plant exited 1 printing `loop: refused · ` naming `leaves deployed, a terminal`; `--plant level-no-terminal` exited 1 naming `the level unit declares no terminal set`.

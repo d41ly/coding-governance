@@ -23,6 +23,37 @@ pass-commit probe, whose legs are gate runs. Owed RED-first, on the six `New arm
 and `no-confs` plants, the `guard.py` `push-merge-equal-to-every-parent` plant, the `position.py`
 `url-forms` rows, and the govkit `check_gained_prune_vintage` arm.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant trailing-slash-agree` with every function the unit's pass
+changed in `tools/loop/loop_lib.py` swapped back to its pre-pass source exited 0, and 0 once restored: not
+reddened by this break, so not observed.
+`python tools/loop/budget.py --fixture --plant no-confs` with every function the unit's pass changed in
+`tools/loop/loop_lib.py` swapped back to its pre-pass source exited 0, and 0 once restored: not reddened by
+this break, so not observed.
+`python tools/loop/budget.py --fixture --plant no-confs` with the driver conf read raising on an absent file
+exited 1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant trailing-slash-agree` with the driver's root compared raw, its
+trailing slash kept exited 1, and 0 once restored: RED observed.
+`python tools/loop/guard.py --selftest` with every function the unit's pass changed in `tools/loop/guard.py`
+swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/position.py --selftest` with every function the unit's pass changed in
+`tools/loop/position.py` swapped back to its pre-pass source exited 0, and 0 once restored: not reddened by
+this break, so not observed.
+`python tools/loop/loop_table.py check --selftest` with every function the unit's pass changed in
+`tools/loop/loop_table.py` swapped back to its pre-pass source exited 0, and 0 once restored: not reddened by
+this break, so not observed.
+`python tools/loop/position.py --fixture --plant url-forms` with the user part cut for the ssh scheme alone
+exited 1, and 0 once restored: RED observed.
+`python tools/loop/loop_table.py check --selftest` with the driver conf read leaving the caller's exports set
+exited 1, and 0 once restored: RED observed.
+`python tools/loop/loop_witness.py --selftest` with every function the unit's pass changed in
+`tools/loop/loop_witness.py` swapped back to its pre-pass source exited 1, and 1 once restored: not reddened
+by this break, so not observed.
+Not observed: the arm in `tools/govkit/selftest.py`, a suite arm, left unrun for the owner's opt-in slow-suite
+run.
+
 **Evidences:** TOOL-dDeclaredLoop-79
 - AC1 — `read_driver_conf` — with `MEMORY_ROOT=elsewhere` exported, the probe over a scratch tree whose conf is one comment line printed `{}`.
 - AC2 — `-records` — the probe over the scratch tree `ac2-records` printed `MEMORY_ROOT` as `ac2-records-records` and `PHASES_EXTRA` as `.unattended.conf`.

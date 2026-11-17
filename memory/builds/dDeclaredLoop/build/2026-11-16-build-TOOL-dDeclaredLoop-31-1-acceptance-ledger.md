@@ -23,6 +23,21 @@ arm:` line: the `ending` and `driver-exhausted` plants staged against the base m
 the base writer, and the driver suite's new arms, the three new refusals' signatures and the
 exhaustion park's refused and admitted resume, against the base driver.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant ending` with the base module, which has no `ending` verb exited
+1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant driver-exhausted` with the base module and driver, which have
+no exhausted read exited 1, and 0 once restored: RED observed.
+`python tools/loop/loop_transition.py --fixture --plant descope-spent` with every function the unit's pass
+changed in `tools/loop/loop_transition.py` swapped back to its pre-pass source exited 1, and 0 once restored:
+RED observed.
+`python tools/loop/loop_table.py check --selftest` with every function the unit's pass changed in
+`tools/loop/loop_table.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+Not observed: the arm in `tools/unattended/unattended.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-31
 - AC1 — `descope` — `derive_ending` answered `land-green` over one CLOSED and one WONTDO unit, `descope` over one CLOSED and one INPROGRESS, `close-incomplete` over one INPROGRESS and over none, `park-for-owner` and `close-incomplete` each over all CLOSED, and `lap` raised naming `flow.on-exhausted`; `--fixture --plant ending` printed `loop: budget · ending · descope · spent 0/0 · open TOOL-tFix-1 · disposed continue`, then `ending · none · unfrozen 0/8` under the default value, and `held`; figures PINNED by the plant's policy file.
 - AC2 — `--exhausted` — `--fixture --plant driver-exhausted` printed `held`: the build slug's second round exited 1 naming `end the build with --exhausted tPos`, `--exhausted` exited 0 leaving one `decision · item flow.on-exhausted · reason ending close-incomplete · spent 0/0 · open TOOL-tPos-1` row, a second call exited 0 printing the recorded ending and adding no row, and a further round and a second dispatch each exited 1 naming `the build's ending is close-incomplete, and only the owner raises flow.rework-budget`.

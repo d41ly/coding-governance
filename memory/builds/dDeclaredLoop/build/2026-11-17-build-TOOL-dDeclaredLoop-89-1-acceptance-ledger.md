@@ -20,6 +20,12 @@ the one `New arm:` line: the `budget.py` `conf-read-forms` plant with `derive_co
 answer the empty set, owed to exit 1 printing `MISSED` naming the global-loader, with-held-loader,
 walrus-target, for-target and with-target rows.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant conf-read-forms` with `derive_conf_rebinds` answering the empty
+set exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-89
 - AC1 — `conf constant` — the plant exited 0 printing `line 2 conf constant` for `global-loader`, `with-held-loader`, `walrus-target`, `for-target` and `with-target`, `no hit` for `plain-global` and `docstring-loader`, every row 82, 86 and 87 wrote unchanged, then `held`; it ran in under 1 PINNED second by direct CLI. `no-own-conf-read` of `budget.py` and of `breakpoints.py` each printed `held`.
 - AC2 — `derive_conf_constants` — over a scratch `loop_lib.py` the probe wrote with the ten shapes the criterion names, it answered exactly `CONF_G`, `FCONF`, `FH`, `KIT_CONF`, `PLAIN` and `WCONF`, never `COUNTER`, `NOTE`, `PEEK` or `LOCAL`.

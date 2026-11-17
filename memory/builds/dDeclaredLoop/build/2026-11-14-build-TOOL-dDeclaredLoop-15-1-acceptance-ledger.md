@@ -26,6 +26,13 @@ its `New arm:` line names, staged by the `withdrawn-parent` plant with `read_wit
 no `phase` fact; AC9's `core.py meta-check`; and a budget re-priced from the main loop's first reading
 of the new leg alone.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/loop_parents.py --fixture --plant withdrawn-parent` with `read_withdrawn_parents` reading
+no phase fact exited 2, and 0 once restored: RED observed.
+Not observed: the arm in `tools/loop/loop_table.py`, no staged break was run for it at this close.
+
 **Evidences:** TOOL-dDeclaredLoop-15
 - AC1 — `loop: terminal build` — `python loop_table.py check` in `tools/loop/` exited 0 printing
   `loop: terminal build · landed withdrawn superseded incomplete deferred retired refused merged

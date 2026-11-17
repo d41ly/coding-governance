@@ -23,6 +23,20 @@ line, the six conf plants under `--selftest`, red with `derive_conf_openers` at 
 with each refusal arm of `check_conf_readers_plant` left out in turn. This pass saw each red side
 here, in scratch copies of the loop, lib and memory-tree kits, as AC1 and AC3 below record.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/loop_lib.py --selftest` with `derive_conf_openers` at the bytes before the pass exited 1,
+and 0 once restored: RED observed.
+`python tools/loop/loop_lib.py --selftest` with the empty-answer refusal of `check_conf_readers_plant` left
+out exited 1, and 0 once restored: RED observed.
+`python tools/loop/loop_lib.py --selftest` with the undeclared-opener refusal left out exited 1, and 0 once
+restored: RED observed.
+`python tools/loop/loop_lib.py --selftest` with the declared-non-opener refusal left out exited 1, and 0 once
+restored: RED observed.
+`python tools/loop/loop_lib.py --selftest` with the unparsable-module refusal answering nothing exited 1, and
+0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-117
 - AC1 — `conf-opener-literal` — each of the six cases exited 1 printing its owed line, `conf-openers-none` naming also the two declared members, and `conf-readers-declared` exited 0 on its pass line naming the two openers; with `derive_conf_openers` restored to the base's bytes in a scratch copy, the three opener cases exited 0 on the pass line.
 - AC2 — `read_receiver` — the live call printed `['read_driver_conf', 'resolve_memory_root_source']`; over the AC2 module written under the scratchpad it printed `['read_constant', 'read_keyword', 'read_literal', 'read_local', 'read_rebound', 'read_receiver']`, and the base's predicate printed `[]` over the same module.

@@ -21,6 +21,15 @@ built tree, whose HEAD holds the pack only once this commit lands; and the RED-f
 `New arm:` lines. The new leg's run time was not read: its budget row is a proxy priced from the plants
 run alone, and the close re-prices it from the leg itself.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/scenario.py --fixture --plant conflict` with the later scenario winning under refuse exited
+1, and 0 once restored: RED observed.
+The `scenario-hand` plant of `tools/loop/factories.py`, whose planted defect is the staged break, exited 1
+over its scratch tree, its last line reading `factories: fixture · scenario-hand · gate loop scenario fixtures
+exit 1`; the leg over the tree read green at HEAD: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-27
 - AC1 — `select` — in the scratch, `select --fact entry=feature --fact design-only=true` printed `scenario.feature scenario.design-only`, `select` with no fact printed `scenario.feature`, and `select --fact entry=patch` printed `scenario.patch`, each exit 0 with its `loop: facts` line.
 - AC2 — `two-builds` — `--plant two-builds` printed `read — scenario=scenario.feature · 0 activated` for `tFix` and `read — scenario=scenario.feature+scenario.adopter.mobile · 1 activated` for `tFix2` (PINNED), each from `position.py` run as a subprocess in the scratch, then `held`, exit 0.

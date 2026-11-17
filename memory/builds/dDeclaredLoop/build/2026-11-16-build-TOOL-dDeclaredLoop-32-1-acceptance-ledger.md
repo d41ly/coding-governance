@@ -27,6 +27,20 @@ base check, the harness arms against the base harness (their six assertions were
 base render as a probe, where five red and the bare-record negative holds), the `targets` plant
 against a `show` of four fields, and `tFixPassLast` against `_RUN_ROW`'s `[a-z]+`.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/review_bounds.py --fixture --plant targets` with every function the unit's pass changed in
+`tools/loop/review_bounds.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+Not observed: the arm in `tools/unattended/unattended.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+Not observed: the arm in `tools/unattended/check-unattended.test.sh`, a suite arm, left unrun for the owner's
+opt-in slow-suite run.
+Not observed: the arm in `tools/workflows/unattended-build.test.sh`, a suite arm, left unrun for the owner's
+opt-in slow-suite run.
+Not observed: the arm in `tools/drift-audit/selftest.py`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-32
 - AC1 — `3 3` — the sliced `review_counts` printed `3 3` for `S` and `2` for `T`, and `review_state "3" 3 3` printed `NON-CONVERGENT` with `MAX_ROUNDS=8`.
 - AC2 — `round-highs 2` — in a plant repository the slug's round 2 printed `NON-CONVERGENT`, its row read `blockers 1 · round-highs 2 · round-minors 0 · NON-CONVERGENT · highs 3 · minors 0 · to units · disposition promote`, and a third `--review` exited 1 naming the terminal round.

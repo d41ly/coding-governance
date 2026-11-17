@@ -29,6 +29,12 @@ of that leg's budget row from the close's timed reading. Owed RED-first, on the 
 `tools/loop/position.py` arm (`scp-remote`, `ssh-userinfo-remote` and `url-forms`, staged against 74's
 `derive_fetch_url`).
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/position.py --selftest` with every function the unit's pass changed in
+`tools/loop/position.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-77
 - AC1 — `scp-remote` — `python position.py --fixture --plant scp-remote` printed the ref's line ending `· from FETCH_HEAD`, no line holding `skipped —`, the answer `act`, and `position: fixture · scp-remote · held`, exit 0.
 - AC2 — `ssh-userinfo-remote` — that plant printed the ref's line ending `· from FETCH_HEAD`, the answer `act`, and `position: fixture · ssh-userinfo-remote · held`, exit 0.

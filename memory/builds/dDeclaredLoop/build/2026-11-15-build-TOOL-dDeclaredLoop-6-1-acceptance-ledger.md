@@ -16,6 +16,22 @@ kit that does not resolve was not probed. The fixture leg's run time was not rea
 proxy priced from the plants run alone, and that proxy sits above the leg's manifest ceiling, which
 the close reads from the leg itself.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+The `command-hand` plant of `tools/loop/factories.py`, whose planted defect is the staged break, exited 1 over
+its scratch tree, its last line reading `factories: fixture · command-hand · gate loop command conformance
+exit 1`; the leg over the tree read green at HEAD: RED observed.
+The `hook-hand` plant of `tools/loop/factories.py`, whose planted defect is the staged break, exited 1 over
+its scratch tree, its last line reading `factories: fixture · hook-hand · gate hook destinations (every
+declared hook path ships) e`; the leg over the tree read green at HEAD: RED observed.
+The `role-hand` plant of `tools/loop/factories.py`, whose planted defect is the staged break, exited 1 over
+its scratch tree, its last line reading `factories: fixture · role-hand · gate roles catalogue exit 1`; the
+leg over the tree read green at HEAD: RED observed.
+The `workflow-hand` plant of `tools/loop/factories.py`, whose planted defect is the staged break, exited 1
+over its scratch tree, its last line reading `factories: fixture · workflow-hand · gate roles catalogue exit
+1`; the leg over the tree read green at HEAD: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-6
 - AC1 — `kind.command` — `grep -cP '^kind\tkind\.(command|policy-key|hook|role|workflow)\t' tools/playbook/core-pending.txt` printed 0, and `core.check_kind_row` returned no red and conforming for each of `kind.command`, `kind.policy-key`, `kind.hook`, `kind.role` and `kind.workflow`; the `core.py kinds` exit is owed to the close.
 - AC2 — `command-hand` — `--plant command-new` exited 0 ending `factory exit 0 · gate green`; `--plant command-hand` exited 1 naming `command.loop.hand`, its run naming no file git holds under the loop kit's folder.

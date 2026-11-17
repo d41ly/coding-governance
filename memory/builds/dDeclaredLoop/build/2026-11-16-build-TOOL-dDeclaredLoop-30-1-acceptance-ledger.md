@@ -26,6 +26,14 @@ pass wrote and did not run, the unattended suites waived for this landing by REA
 arms (fail branches armed or pinned)` at the raised ceiling; `govkit selftest` over the subject pin row
 written by hand in the generator's sorted place; and `core meta-check` over the removed pending row.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant mint-each-lap` with the total read from the current roster on
+every lap exited 1, and 0 once restored: RED observed.
+Not observed: the arm in `tools/unattended/unattended.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-30
 - AC1 — `mint-each-lap` — the plant froze at two units writing `budget · frozen · 2 unit(s) · 8`, then minted a spec and drew `fix-pass` on each lap: the eighth draw printed `8/8`, the ninth `loop: budget · exhausted · tFix · 8/8 · flow.on-exhausted` with exit 3, and the rows held one freeze row and eight draws, each of 8; figures PINNED at the default `4+2`.
 - AC2 — `before-freeze` — four laps of `designing` back to `planning` and forward wrote `route-back` draws reading 1/4 to 4/4, one on each of four records, and the fifth backward move was refused as spent, the record count unchanged.

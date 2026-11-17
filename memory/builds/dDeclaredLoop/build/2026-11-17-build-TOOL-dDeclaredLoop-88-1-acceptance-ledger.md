@@ -28,6 +28,18 @@ propagate and with `derive_constant_charges` answering rule 4 for a module-level
 glob-reader arm of `gen_build_index.py --selftest`, with `derive_constant_charges` charging a
 module-level binding to the module.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant conf-read-forms` with every function the unit's pass changed in
+`tools/loop/loop_lib.py` swapped back to its pre-pass source exited 2, and 0 once restored: RED observed.
+`python tools/memory-tree/gen_build_index.py --selftest` with every function the unit's pass changed in
+`tools/memory-tree/gen_build_index.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED
+observed.
+`python tools/loop/guard.py --selftest` with every function the unit's pass changed in `tools/loop/guard.py`
+swapped back to its pre-pass source exited 0, and 0 once restored: not reddened by this break, so not
+observed.
+
 **Evidences:** TOOL-dDeclaredLoop-88
 - AC13 — `derive_constant_charges` — `grep -c "def scan_scope"` over `gen_build_index.py` printed 0 and `grep -c "^def derive_constant_charges"` over `tree_lib.py` printed 1; the probe over the five-place module answered `[('m', 4), ('m.K', 3), ('m.X', 2), ('m.f', 1)]`; `scan_glob_readers` over a scratch folder holding that module with a `:(glob)` needle answered `['m', 'm.K', 'm.X', 'm.f']`; `derive_conf_constants` over section 4's probe module answered `['A', 'B', 'CONF', 'D', 'G', 'GUARDED', 'SUFFIX']`; and the `conf-read-forms` plant printed `held`, every row units 82, 86, 87 and 89 wrote unchanged.
 - AC16 — `LC_ALL` — with `guard.subprocess.run` swapped for a recorder answering exit 129, `run_merge_tree_usage()` recorded one call whose `env` mapped `LC_ALL` to `C` and `LANGUAGE` to the empty string, `os.environ` equal before and after; with `LC_ALL=de_DE.UTF-8` exported, `resolve_write_tree_support()[0]` printed `supported`.

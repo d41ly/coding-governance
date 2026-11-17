@@ -18,6 +18,17 @@ reading. A probe in this pass, the old reader bound in place of `resolve_memory_
 `MISSED` for both budget plants and for the breakpoints `confs-disagree`; the breakpoints `unattended-root`
 runs the scratch's own module copy, which that probe does not reach, so its red is the close's alone.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant unattended-root` with every function the unit's pass changed in
+`tools/loop/loop_lib.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant confs-disagree` with every function the unit's pass changed in
+`tools/loop/loop_lib.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/breakpoints.py --selftest` with every function the unit's pass changed in
+`tools/loop/breakpoints.py` and `tools/loop/loop_lib.py` swapped back to its pre-pass source exited 1, and 0
+once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-72
 - AC1 — `open 2/6` — `python budget.py --fixture --plant unattended-root` printed both draws as `1/6` and `2/6`, `budget_state` as `open 2/6` and `held`, exit 0; with the old reader bound it printed `MISSED`, both draws refused for no home.
 - AC2 — `list --build tRec` — `python breakpoints.py --fixture --plant unattended-root` printed the scratch's list of `tRec`, the owner gates at `item.plan.exit`, `item.design.exit` and before `item.deploy.mandate` each `passed before placement`, no held line, and `held`, exit 0.

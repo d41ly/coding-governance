@@ -18,6 +18,13 @@ this pass, and `loop budget fixtures` for AC11. Owed RED-first: the `tools/loop/
 seven plants against the base tree, and the `tools/unattended/unattended.test.sh` arm, the `fail 82` and
 `fail 55` assertions against the base driver.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+Not observed: the arm in `tools/loop/breakpoints.py`, no staged break was run for it at this close.
+Not observed: the arm in `tools/unattended/unattended.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-19
 - AC1 — `values` — the plant printed `held`: no policy file listed the plan gate `· authorization` and `closing review · after item.build.recommend · reviewer · owed` alone; `three-gates` added `item.design.exit` and `before item.deploy.mandate`; `every-stage` added `item.build.exit`, `item.test.exit` and `item.deploy.close`; `test = "owed"` added `gate review · before item.test.exit`.
 - AC2 — `placed` — the plant printed `held`: `breakpoint: breakpoint · before item.build.unit-pass · reviewer · placement` listed, and `item.build.nothing` exited 2 printing `breakpoints: refused · review.breakpoints names item.build.nothing, an item the composed rows at the build's pin do not declare`.

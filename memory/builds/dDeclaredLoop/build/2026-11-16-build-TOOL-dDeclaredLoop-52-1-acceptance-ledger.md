@@ -18,6 +18,19 @@ phase readings and four plants against the base tree; the `tools/loop/breakpoint
 `driver-plan` plant's phase observations against the base driver; and the `tools/unattended/unattended.test.sh`
 arm, the `check_phase_gates` refusal text against the base driver.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/loop_table.py check --selftest` with every function the unit's pass changed in
+`tools/loop/loop_table.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/breakpoints.py --selftest` with every function the unit's pass changed in
+`tools/loop/breakpoints.py` swapped back to its pre-pass source exited 0, and 0 once restored: not reddened by
+this break, so not observed.
+`python tools/loop/breakpoints.py --fixture --plant driver-plan` with the driver plan move skipping
+`check_phase_gates` exited 0, and 0 once restored: not reddened by this break, so not observed.
+Not observed: the arm in `tools/unattended/unattended.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-52
 - AC1 — `phase --from REVIEWING` — printed `phase REVIEWING · state designing · step step.design`; `--fact halt-code=budget-exhausted` on `ABORTED` printed `state incomplete · step none`, `halt-code=fork-unresolvable` `state withdrawn · step none`; `phase --from DRAFTING` exited 1 printing `refused — phase DRAFTING: no row`.
 - AC2 — `hold-code=owner-decision` — with `ending=park-for-owner` beside it `HELD` printed `state parked · step none`; with it alone, and with no fact, `state paused · step none`.

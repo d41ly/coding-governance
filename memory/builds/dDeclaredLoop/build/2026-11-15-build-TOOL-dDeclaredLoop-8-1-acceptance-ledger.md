@@ -16,6 +16,16 @@ out of the canonical form, the new manifest-check arms staged red against a `ren
 AC2 arm staged red against the driver's five-field rows; and the `loop claims fixtures` row in
 `tools/run-gates/selftest-budgets.txt` read against the leg's own timing.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/claims.py --fixture --plant key-moves` with the base sha left out of the canonical key form
+exited 1, and 0 once restored: RED observed.
+Not observed: the arm in `skills/session-kickoff/manifest-check.test.sh`, a suite arm, left unrun for the
+owner's opt-in slow-suite run.
+Not observed: the arm in `tools/unattended/unattended.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-8
 - AC1 — `key-stable` — `python claims.py --fixture --plant key-stable` in the loop kit's folder printed the same `k1:` key over the sources in two orders and `held`; `--plant key-moves` printed two different keys once the base sha moved, and `held`; both exited 0.
 - AC2 — `key-unread` — `--plant key-unread` printed a key opening `k1:?` over a `base=?` source and `verdict re-derived` over two such keys, `held`, exit 0.

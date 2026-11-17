@@ -16,6 +16,16 @@ new leg `loop composition fixtures`, `loop stage coverage` for the row's stage c
 and the RED-first observation of both `New arm:` lines. The new leg's run time was not read: its budget
 row is a proxy priced from the plants run alone, and the close re-prices it from the leg itself.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/composition.py --fixture --plant rename` with the position engine reading the tip, the
+move's pin ignored exited 1, and 0 once restored: RED observed.
+`python tools/loop/loop_transition.py --fixture --plant field` with the derived `composition` field accepted
+as given exited 0, and 0 once restored: not reddened by this break, so not observed.
+`python tools/loop/loop_transition.py check --selftest` with the derived `composition` field accepted as given
+exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-26
 - AC1 — `read_step_composition` — `--plant rename` printed `loop: fixture · pin after C2 · <C1's sha8> · pinned`, C1 the first move's commit; `loop: fixture · composition at the pin · item.design.decompose True · item.design.regroup False`, read through a scratch worktree at C1; and `loop: fixture · position reads · composition@<C1's sha8> · pinned` from `derive_position` over the plant; then `· rename · held`, exit 0.
 - AC2 — `derive_carried_witnesses` — the same plant printed `loop: fixture · move at C2 · composition=<C2's sha8> · C2 <C2's sha8>` and `loop: fixture · carry · <the decompose move's sha8> under item.design.regroup`, with no `item-ended` order filed.

@@ -24,6 +24,30 @@ arm (the held lines of `pre-placement`, `pre-placement-records-root` and `unatte
 (`push-merge-conflict-elsewhere` and `push-merge-tree-fatal`), and the `tools/govkit/selftest.py` arm (the
 `[dDL-75] AC14` and `[dDL-75] AC26` checks).
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant unset-driver-root` with every function the unit's pass changed
+in `tools/loop/budget.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant draw-id-rows` with every function the unit's pass changed in
+`tools/loop/budget.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant patch-claims-unread` with every function the unit's pass
+changed in `tools/loop/budget.py` swapped back to its pre-pass source exited 0, and 0 once restored: not
+reddened by this break, so not observed.
+`python tools/loop/budget.py --fixture --plant unset-driver-root` with every function the unit's pass changed
+in `tools/loop/loop_lib.py` swapped back to its pre-pass source exited 0, and 0 once restored: not reddened by
+this break, so not observed.
+`python tools/loop/budget.py --fixture --plant patch-claims-unread` with the patch draw going ahead on a
+failed claims read exited 1, and 0 once restored: RED observed.
+`python tools/loop/guard.py --selftest` with every function the unit's pass changed in `tools/loop/guard.py`
+swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/position.py --selftest` with every function the unit's pass changed in
+`tools/loop/position.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/breakpoints.py --selftest` with every function the unit's pass changed in
+`tools/loop/breakpoints.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+Not observed: the arm in `tools/govkit/selftest.py`, a suite arm, left unrun for the owner's opt-in slow-suite
+run.
+
 **Evidences:** TOOL-dDeclaredLoop-75
 - AC2 — `draw-id-rows` — `python budget.py --fixture --plant draw-id-rows` printed two lines `loop: budget · no draw id · draw · fix-pass · TOOL-tFix-1 · 1/4` after its two identical id-less rows, then `unfrozen 2/4 / unfrozen 3/4 / refused` and `loop: fixture · draw-id-rows · held`, exit 0.
 - AC5 — `scaffold_runmd` — a `python -c` print of `budget.__doc__` tested true for `.unattended.conf`, `resolve_memory_root` and `scaffold_runmd`.

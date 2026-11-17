@@ -19,6 +19,12 @@ before and after this pass answered the same names, and `derive_conf_constants` 
 Owed to the close: every leg section 7 names and the three loop legs it keeps green; and RED-first, on
 the one `New arm:` line, the `budget.py` plant `conf-read-forms` with `_MODULE_SCOPE_PARTS` emptied.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant conf-read-forms` with `_MODULE_SCOPE_PARTS` emptied exited 1,
+and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-91
 - AC1 — `held` — `python budget.py --fixture --plant conf-read-forms` exited 0 printing `held`; the `class-global`, `default-walrus`, `keyword-default-walrus`, `lambda-default-walrus`, `class-base-walrus` and `decorator-walrus` rows, reading `CONF_K`, `DCONF`, `KWCONF`, `LCONF`, `BCONF` and `DECO`, each printed one `conf constant` hit on line 2, the `function-body-walrus` and `class-body-walrus` rows, reading `HLOCAL` and `KW`, printed `no hit`, every module-scope row printed a parity line ending `missed none`, and every row earlier units planted printed what it printed before, the three `tree_lib` rows each naming the update command.
 - AC2 — `NESTED` — the probe wrote the spec's probe file to a scratch `loop_lib.py` and `derive_conf_rebinds(tree, set())` answered `BCONF`, `CONF_K`, `DCONF`, `DECO`, `KWCONF`, `LCONF` and `NESTED`, neither `HLOCAL` nor `KW`, the set `exec` of the same bytes bound; with the table emptied in process it answered `CONF_K` alone.

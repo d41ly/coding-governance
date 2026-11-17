@@ -16,6 +16,16 @@ where the spy sees no rename; and the `loop guard fixtures` budget row in
 `tools/run-gates/selftest-budgets.txt` read against the leg's own timing, since the plant adds one
 scratch repository to that leg.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/guard.py --fixture --plant write-guarded-rollback` with every function the unit's pass
+changed in `tools/loop/guard.py` swapped back to its pre-pass source exited 0, and 0 once restored: not
+reddened by this break, so not observed.
+`python tools/loop/guard.py --fixture --plant write-guarded-rollback` with every function the unit's pass
+changed in `tools/lib/guarded_write.py` and `tools/loop/policy_edit.py` swapped back to its pre-pass source
+exited 3, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-43
 - AC1 — `record refused over a prior file` — `python tools/loop/guard.py --fixture --plant write-guarded-rollback` printed `held` for the record's error reaching the caller, the policy file's bytes equal to the committed bytes, two renames onto it and no temp sibling, then `bytes held`; the scenario held.
 - AC2 — `record refused, no prior file` — the same run printed `held` for the error reaching the caller, the path not existing, one rename onto it and no temp sibling; the scenario held.

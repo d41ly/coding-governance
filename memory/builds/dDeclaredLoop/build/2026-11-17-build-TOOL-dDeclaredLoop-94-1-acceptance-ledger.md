@@ -25,6 +25,14 @@ Owed to the close: every leg section 7 names; and RED-first, on its two `New arm
 `push-merge-tree-fatal` plant with `build_failure_detail` taking the message whole, and the
 `conf-read-forms` plant with `load_tree_lib`'s base catch and first-name refusal restored.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant conf-read-forms` with every function the unit's pass changed in
+`tools/loop/loop_lib.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/guard.py --selftest` with every function the unit's pass changed in `tools/loop/guard.py`
+swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-94
 - AC14 — `start failed: a` — the probe answered `start failed: OSError`, `start failed: [Errno 5]`, `start failed: boom`, `start failed: [Errno 2] No such file`, `start failed: a` and `start failed: b`.
 - AC15 — `all held` — `python guard.py --fixture --plant push-merge-tree-fatal` exited 1 and printed `10 of 10 scenario(s) held · all held` PINNED, its row `graded, start failed, two lines` held naming `the clean re-merge failed: start failed: a` and its row `graded, start failed, two lines, the second line` held; no output line is `b`.

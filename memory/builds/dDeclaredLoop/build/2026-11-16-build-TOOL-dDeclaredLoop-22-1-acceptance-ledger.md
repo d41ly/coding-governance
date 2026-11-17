@@ -26,6 +26,17 @@ has no recommendation kind; the hygiene suite's call of the plant against the ba
 floor raised by one; and the driver suite's `--recommend` arms, the verb over planted rosters and
 policy files with a positive assertion of each new refusal's whole text, against the base driver.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/memory-tree/build_records.py --fixture --plant recommendation` with every function the unit's
+pass changed in `tools/memory-tree/build_records.py` swapped back to its pre-pass source exited 1, and 0 once
+restored: RED observed.
+Not observed: the arm in `tools/memory-tree/check-memory-hygiene.test.sh`, a suite arm, left unrun for the
+owner's opt-in slow-suite run.
+Not observed: the arm in `tools/unattended/unattended.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-22
 - AC1 — `build-records: PASS recommendation` — the plant wrote a score record numbered 1 and a reason record numbered 2 whose `Answers` names the first, each read back by `read` with every field; `--score maybe`, `--binds perhaps`, the stage `design review`, an `--answers` naming no record and a score record carrying `--answers` each exited 1 naming the field, writing nothing; both records bound with an `S` row and no `A` row; and `--plant typed-kinds` printed its PASS line with nine typed kinds bound, the recommendation among them.
 - AC2 — `a spec grading FORKED` — over three unforked units the design score exited 0 and its staged record read `Score: review`, `Signals: 3 units in the generated region`, `Binds: no` and `Reason: pending`; one unforked unit read `Score: no-review` and `Signals: none`; one unit whose spec holds an open F-item read `Score: review` naming `a spec grading FORKED`; the anchor of a region holding units 2, 3 and 10 was unit 2.

@@ -22,6 +22,16 @@ Owed to the close: every leg the spec's section 7 names, `loop budget fixtures` 
 record` whole, and the RED-first observation of the `New arm:` line, the `trailer-only` plant staged
 against the refusing `record_draw` unit 30 landed.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant patch-trailer-only` with every function the pass changed
+swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant log-dropped` with every function the pass changed swapped back
+to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant trailer-only` with `record_draw` restored to the refusing
+writer unit 30 landed exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-48
 - AC1 — `trailer-only` — under `["trailer"]` the move into `building` carried `budget=frozen@1@6`, the build's `RUN.md` carried `draw · fix-pass · TOOL-tFix-1 · 1/6`, the backward move's trailer carried `draw=route-back@item.build.unit-pass@2+6`, and `budget_state` answered `open 2/6`; figures PINNED at the default `4+2` over one unit.
 - AC2 — `check_transition_channels` — the same plant printed `loop: transition check · tFix · 2 trailer(s) · 0 record(s) · 0 finding(s)` (figures PINNED), and the move given `draw=x` was refused as `--field draw is derived`.

@@ -22,6 +22,12 @@ for the budget scratch is reached: the position line names the acceptance record
 Owed to the close: every leg the spec's gates list names; and RED-first, on its one `New arm:` line, the
 `driver-root-readers` plant with S1 to S5 reverted, owed to print `MISSED` naming each reader.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant driver-root-readers` with the five readers S1 to S5 rewrote
+restored from the commit before the pass exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-116
 - AC1 — `disposed continue` — `python tools/loop/budget.py --fixture --plant driver-root-readers` exited 0, its `ending` line ending `disposed continue` and its last line `loop: fixture · driver-root-readers · held`.
 - AC2 — `-acceptance-` — the same run's `position` line read `records/builds/tFix/README.md@` and `records/builds/tFix/build/2026-01-01-build-TOOL-tFix-1-acceptance-1.md@`, its reason the unlanded parent, not a missing README.

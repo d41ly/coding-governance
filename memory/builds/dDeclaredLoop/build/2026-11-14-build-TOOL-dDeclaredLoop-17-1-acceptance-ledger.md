@@ -22,6 +22,12 @@ waived under README rule 8, whose park-path arms observe the `write_gates_staged
 close (S6) and whose two edited arms now hold under `host-degraded`; and the govkit selfcheck over the
 new `[[exempt_leg]]` row (deviation 173).
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/loop_witness.py --fixture --plant hold-inherited` with the inherited-red join taken out of
+`run_hold` exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-17
 - AC1 — `Writer: stand-in` — `--plant acceptance` exited 0: the stand-in wrote
   `memory/builds/tFix/build/2026-11-14-build-TOOL-tFix-1-acceptance-1.md` from an eight-digit `--sha`,

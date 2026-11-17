@@ -16,6 +16,17 @@ its seven PINNED scratch-tree cases and the `DRAFTING` case's `--extra=`, agains
 `tools/loop/loop_parents.py` arm, the `parent-in-extra-phase` case against a parent call passing no tree,
 which reds as `loop: unanswered` (deviation 702).
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/loop_parents.py --fixture --plant parent-in-extra-phase` with every function the unit's
+pass changed in `tools/loop/loop_parents.py` swapped back to its pre-pass source exited 2, and 0 once
+restored: RED observed.
+`python tools/loop/loop_parents.py --fixture --plant parent-in-extra-phase` with the parent call passing no
+tree exited 2, and 0 once restored: RED observed.
+`python tools/loop/loop_table.py check --selftest` with every function the unit's pass changed in
+`tools/loop/loop_table.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-70
 - AC1 — `phase STAGING · state none · step none · adopter phase` — in a scratch tree whose conf sets `PHASES_EXTRA="STAGING"`, `--from STAGING` printed it, exit 0; `--from REVIEWING --to STAGING` ended `· to STAGING · adopter phase · crosses none`, exit 0; `--from STAGNG` exited 1 printing `refused — phase STAGNG: no row`; `--from STAGING --extra=` exited 1 printing `refused — phase STAGING: no row`.
 - AC2 — `route none` — `loop_parents.py --fixture --plant parent-in-extra-phase` from gov's top printed it, exit 0, the tree unchanged; the same plant with the parent call's `tree` dropped printed `loop: unanswered` naming `STAGING`, exit 2.

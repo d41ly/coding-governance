@@ -20,6 +20,22 @@ the `New arm:` line, the extended `parallel-append`, `pre-spec`, `trailer-only`,
 `patch-trailer-only` plants and the new `draw-id-rows`, each staged over the tip's id-less `ROW` and
 `record_draw`.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant parallel-append` with every function the unit's pass changed in
+`tools/loop/budget.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant pre-spec` with every function the unit's pass changed in
+`tools/loop/budget.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant trailer-only` with every function the unit's pass changed in
+`tools/loop/budget.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant log-dropped` with every function the unit's pass changed in
+`tools/loop/budget.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant patch-trailer-only` with every function the unit's pass changed
+in `tools/loop/budget.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant draw-id-rows` with every function the unit's pass changed in
+`tools/loop/budget.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-61
 - AC1 — `typed 1, derived 2` — `--fixture --plant parallel-append` read the tree's attribute `union`, merged `side` at exit 0, and the record held two `draw · fix-pass · TOOL-tFix-1 · 1/4` rows carrying two different draw ids; `budget_state` answered `unfrozen 2/4`, the third draw printed `loop: budget · drawn · draw · fix-pass · TOOL-tFix-3 · 3/4` then its id first and a `disagrees` line ending `typed 1, derived 2` after it; the plant printed `held`; figures PINNED at the default `4+2`'s base.
 - AC2 — `unfrozen 3/4` — `--fixture --plant draw-id-rows` answered `unfrozen 2/4` after two identical id-less rows, `unfrozen 3/4` after one id-bearing row twice, and the ValueError naming the row ending ` · not-an-id` as outside its grammar after it; the plant printed `held`; figures PINNED at the plant's base.

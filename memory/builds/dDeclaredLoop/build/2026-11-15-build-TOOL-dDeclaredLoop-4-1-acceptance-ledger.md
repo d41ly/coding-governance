@@ -22,6 +22,14 @@ lines: the module's plants through `--selftest`, with `unclaimed-leg` staged red
 join's owner every part, and the map selftest's arm `test_stage_key` staged red against a parser that
 refuses the key. The exit 2 `unarmed` path, a kit that does not resolve, was not probed.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/stage_coverage.py --fixture --plant unclaimed-leg` with the part join's owner fed every
+part exited 0, and 1 once restored: RED observed.
+Not observed: the arm in `tools/codebase-map/selftest.py`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-4
 - AC1 — `--plant unclaimed-leg` — `python stage_coverage.py --fixture --plant unclaimed-leg` exited 1 printing `stage-coverage: unclaimed leg kickoff-manifest ratchet · no claim`; `--plant unclaimed-hook` exited 1 printing `stage-coverage: unclaimed hook PostToolUse tools/memory-recall/recall-opened.js · no claim`.
 - AC2 — `--plant stale-hook` — exited 1 printing `stage-coverage: stale hook PreToolUse tools/hooks/no-such-hook.js`; `--plant role-derived` exited 0 and its `role gov-builder` line read `workflow build · step.test`, the role file carrying no stage of its own.

@@ -16,6 +16,17 @@ Owed to the close: every leg the spec's section 7 names, and the RED-first obser
 arm:` line, the `draws-survive-rotation` and `patch-archived` plants staged against the base's reader,
 `ROTATED` reading `RUN.LANDED.*.md` and the suffixed population every live `RUN.md` alone.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant draws-survive-rotation` with every function the unit's pass
+changed in `tools/loop/budget.py` swapped back to its pre-pass source exited 0, and 0 once restored: not
+reddened by this break, so not observed.
+`python tools/loop/budget.py --fixture --plant patch-archived` with every function the unit's pass changed in
+`tools/loop/budget.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant draws-survive-rotation` with `ROTATED` reading only landed
+run-state files and the suffixed population the live files alone exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-60
 - AC1 — `open 3/6` — `--fixture --plant draws-survive-rotation` drew twice, moved the record to `RUN.ABORTED.0000aaaa.md`, planted a fresh `RUN.md` and drew a third time, printed `3/6` on that draw, `budget_state` answered `open 3/6`, the fresh `RUN.md` held no `budget · ` row, and the plant printed `held`; figures PINNED at the default `4+2` over one unit.
 - AC3 — `unfrozen 1/4` — `--fixture --plant patch-archived` drew `patch:tFixPatch` into the run-state file of `tFixPatch` suffixed ` · budget tFix`, moved it to `RUN.ABORTED.0000bbbb.md` and planted a fresh one; `budget_state` answered `unfrozen 1/4` for `tFix` and `unfrozen 0/4` for `tFixPatch`, and the plant printed `held`; figures PINNED at the default base.

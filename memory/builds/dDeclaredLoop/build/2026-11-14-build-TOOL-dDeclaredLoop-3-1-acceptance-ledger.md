@@ -28,6 +28,13 @@ comparing a record to itself; the `micro-format definitions` grammar over the ne
 over the re-stamp; AC9's `core.py meta-check`; and a budget re-priced from the main loop's first
 reading of the new leg alone.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+The `log-drift` plant of `tools/loop/loop_transition.py`, whose planted defect is the staged break, exited 1
+over its scratch tree, its last line reading `loop: fixture · check · exit 1`; the leg over the tree read
+green at HEAD: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-3
 - AC1 — `python loop_transition.py --fixture --plant default` — exited 0: `record` wrote the record
   `transition-1`, and its commit's trailer read back as

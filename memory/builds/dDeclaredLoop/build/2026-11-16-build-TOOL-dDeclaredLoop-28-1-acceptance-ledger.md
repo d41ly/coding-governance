@@ -21,6 +21,16 @@ new leg `loop adapt fixtures` and `loop stage coverage` for its stage claim; and
 observation of both `New arm:` lines. The new leg's run time was not read: its budget row is a proxy
 priced from the plants run alone, and the close re-prices it from the leg itself.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/adapt.py --fixture --plant loosening` with the class read from the act's word exited 0, and
+0 once restored: not reddened by this break, so not observed.
+`python tools/loop/adapt.py --fixture --plant loosening` with every act classed additive exited 1, and 0 once
+restored: RED observed.
+Not observed: the arm in `tools/unattended/unattended.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-28
 - AC1 — `applied · class additive` — `--plant additive` printed the composition with the build's layer lacking `item.build.adopter.lint-pass` after the proposal and before the move, then one state row reading `applied · class additive · flow.adapt additive-recorded`, `RUN.md` committed with the move, and the composition with the layer holding the item, then `held`, exit 0.
 - AC2 — `held` — `--plant owner-approves` printed the first move's state row `held · class additive · flow.adapt owner-approves`, `record` exit 0, the composition lacking the item; after the `continue` disposition the second move's row read `applied` ending ` · disposition 2026-11-16-build-TOOL-tFix-1-disposition-1`, and the composition held the item, then `held`.

@@ -10,6 +10,11 @@ Owed to the close: every leg the spec's section 7 names, and the RED-first obser
 `New arm:` line in `tools/memory-tree/routed_commits.py#run_selftest`, staged by removing one name
 from the `git_env_leaks_py` block of the memory-tree copy of the reader for one run and restoring it.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+Not observed: the arm in `tools/memory-tree/routed_commits.py`, no staged break was run for it at this close.
+
 **Evidences:** TOOL-dDeclaredLoop-39
 - AC1 — `derive_attribution(c, "replace")` — a `git replace` of the fixture's newest commit by one
   carrying `Pass: TOOL-tFix-9`, then `read_commits` over that sha from the canonical copy: at base

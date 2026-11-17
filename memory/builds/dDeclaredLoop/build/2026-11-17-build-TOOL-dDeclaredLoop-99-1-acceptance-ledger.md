@@ -23,6 +23,12 @@ self-test now runs 35 PINNED plants, and the RED-first observation of the `New a
 AC3, the plant staged with an undeclared opener, an empty `CONF_ROUTES` and a declared member that opens no
 conf. The selftest budget row's reading text counts the plants as it measured them before this pass.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/loop_lib.py --selftest` with every function the unit's pass changed in
+`tools/loop/loop_lib.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-99
 - AC1 — `loop: conf readers declared · 2 opener(s) · read_driver_conf resolve_memory_root_source · outside this module read_design_conf parse_conf` — the plant in `tools/loop/` exited 0 printing exactly that line after its `loop: fixture · plant conf-readers-declared` line, PINNED 2026-11-17; at the base the plant is no `PLANTS` key, so the usage line answers it.
 - AC2 — `['read_driver_conf', 'resolve_memory_root_source']` — the spec's probe in `tools/loop/` printed exactly that, and over the fixture module the spec states, written under the run's scratch directory, it printed `['read_by_constant', 'read_by_shell', 'read_path_call', 'read_slash']`, PINNED 2026-11-17.

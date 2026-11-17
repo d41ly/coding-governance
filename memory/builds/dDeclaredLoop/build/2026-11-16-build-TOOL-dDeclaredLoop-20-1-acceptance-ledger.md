@@ -27,6 +27,20 @@ arms against the base leg. The build harness suite's three unverified-promotion 
 arm were re-pointed to `review.unverified block`, the route they assert, which only a run of that suite
 confirms.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/review_bounds.py --fixture` with every function the unit's pass changed in
+`tools/loop/review_bounds.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+Not observed: the arm in `tools/workflows/tier2-review.test.sh`, a suite arm, left unrun for the owner's
+opt-in slow-suite run.
+Not observed: the arm in `tools/workflows/unattended-build.test.sh`, a suite arm, left unrun for the owner's
+opt-in slow-suite run.
+Not observed: the arm in `tools/unattended/unattended.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+Not observed: the arm in `tools/unattended/check-unattended.test.sh`, a suite arm, left unrun for the owner's
+opt-in slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-20
 - AC1 — `item.review.fold` — a stub run of the rendered build harness returning `CONVERGING` handed back a `nextAction` ending `The fold is \`item.review.fold\`; this spec subject ends at its target or its bound, BOUNDED or CEILING.`, and `NON-CONVERGENT` was absent from it.
 - AC2 — `--trigger` — over a committed policy file setting `review.unclassed` to `reason` and `review.blocks` to `owed-only`, `--cause owed --pin memory/builds/tRun/spec/one.md` printed one line carrying `"preset": "unit-spec"`, `"unclassed": "reason"`, `"trigger": "owed"` and `"blocks": "yes"`; `--cause placement` with no pin printed one line with `"blocks": "no"` and no preset; `--cause later` exited 1 printing `UNATTENDED check 37 FAILED — --trigger names a cause outside the closed set`; after a terminal `--review` row the owed call exited 1 naming the subject; a non-empty `review.opt-in` and a refused round count each exited 1 through the policy-read relay.

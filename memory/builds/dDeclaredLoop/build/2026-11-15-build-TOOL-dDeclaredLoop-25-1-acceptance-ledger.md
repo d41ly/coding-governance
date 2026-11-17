@@ -19,6 +19,14 @@ both `New arm:` lines. The exit 2 path of a kit that does not resolve was not pr
 time was not read: its budget row is a proxy priced from the cases run alone, and the close re-prices it
 from the leg itself.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/splice.py --fixture --plant between-test-deploy` with the adjacency rule inverted exited 1,
+and 0 once restored: RED observed.
+Not observed: the arm in `tools/govkit/selftest.py`, a suite arm, left unrun for the owner's opt-in slow-suite
+run.
+
 **Evidences:** TOOL-dDeclaredLoop-25
 - AC1 — `adopter-security-review` — `--plant between-test-deploy` exited 0 printing the R1 line from `testing` into `adopter-security-review` on `item.test.exit` and the R2 line from there into `deploying` on `item.adopter.security-review.exit`, and the splice table line; `check_splices` refuses a split row that survives the spliced table, and none did.
 - AC2 — `removes` — `--plant removes` exited 1 naming the gov stage `step.test` excluded; `--plant reorders` exited 1 reading `step.deploy and step.test are not adjacent in order`; `--plant replaces` exited 1 naming the stage `step.test` with no `adopter` seat.

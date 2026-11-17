@@ -10,6 +10,12 @@ through two `python -c` probes that call the changed checks over the live tree's
 observation of the new arm in `tools/playbook/adopt-playbook.sh`, seven rows, five in the tag
 resolver's block and two in the block guarded on the policy kit.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+Not observed: the arm in `tools/playbook/adopt-playbook.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-18
 - AC1 — `policy-ns-word` — the plant exited 1 and printed `tags: tools/policy/catalogue.toml@9ce5a224:2 · shape ·
   policy.step.timeout · first segment 'step' is a namespace word`; the name-check printed the same

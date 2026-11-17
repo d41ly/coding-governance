@@ -20,6 +20,12 @@ Owed to the close: every leg the spec's section 7 names, `loop_lib.py --check` a
 RED-first observation of its `New arm:` line, the `step-none-outside-review` and `review-step-named`
 plants against a `check_program` that admits `none` on every row and a review row at any step.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/loop_lib.py --selftest` with every function the unit's pass changed in
+`tools/loop/loop_lib.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-50
 - AC1 — `item.review.trigger` — the clean-reading plant exited 0 with no `loop: refused` line, printing `loop: program review · 6 PINNED item(s) · item.review.trigger item.review.pin item.review.report item.review.cost item.review.dispose item.review.fold` and one `loop: item` line per review row, five naming `command:review.<name>` and the fold row `role:gov-spec-writer`; the `git grep` for a bare or path-shaped actor printed nothing and exited 1.
 - AC2 — `step-none-outside-review` — the plant exited 1 printing `the item item.plan.place step 'none' is not step.plan`; `review-step-named` exited 1 printing `the item item.review.pin step 'step.design' is not none`.

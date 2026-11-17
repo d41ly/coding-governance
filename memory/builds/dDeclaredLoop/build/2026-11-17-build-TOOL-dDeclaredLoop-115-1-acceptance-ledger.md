@@ -25,6 +25,13 @@ Owed to the close: every leg the spec's gates list names; and RED-first, on its 
 `push-merge-first-parent-lacks-policy` plant with the first-parent read and its continue restored in
 `check_push_range`, owed to print `MISSED` on every row and exit 3.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/guard.py --fixture --plant push-merge-first-parent-lacks-policy` with `check_push_range`
+reading the file as added where the first parent lacks it, its continue in place exited 3, and 1 once
+restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-115
 - AC1 — `all held` — `python tools/loop/guard.py --fixture --plant push-merge-first-parent-lacks-policy` exited 1, its rows `an orphan first parent` naming `review.max-rounds`, `an orphan first parent, the failed line` naming `the clean re-merge failed: 128` and `a first parent that deleted the file` naming `budgets.` each `held`, then `3 of 3 scenario(s) held · all held` PINNED; the AST count of `PLANTS` printed 45 PINNED.
 - AC2 — `push-first-to-empty-remote` — its plant exited 1 with `3 of 3 scenario(s) held · all held` PINNED, the count row naming `push · 2 commit(s) read · 1 changing .governance/policy.toml · 0 finding(s)` PINNED and `held`.

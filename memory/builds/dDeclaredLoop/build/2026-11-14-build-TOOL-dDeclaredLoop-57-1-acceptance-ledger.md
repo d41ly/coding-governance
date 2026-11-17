@@ -15,6 +15,12 @@ the one `New arm:` line, the `[dDL-57]` checks in `tools/govkit/selftest.py#chec
 staged by taking the call to `demand_claimed_requires` out of `tools/govkit/govkit.py#_cmd_update`
 for one run and restoring it.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+Not observed: the arm in `tools/govkit/selftest.py`, a suite arm, left unrun for the owner's opt-in slow-suite
+run.
+
 **Evidences:** TOOL-dDeclaredLoop-57
 - AC1 — `'roles' requires 'loop'` — at base the update printed `default-gained: none computed` and
   refused later on the absent `deploy.toml`; built, it exited 2 with stderr naming the pair, the

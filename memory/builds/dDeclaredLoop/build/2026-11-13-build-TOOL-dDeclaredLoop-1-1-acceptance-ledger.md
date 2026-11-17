@@ -16,6 +16,17 @@ named it in the manifest), the `core meta-check` leg (AC10's second command), an
 observation of each `New arm:` line of the spec's section 7: `tools/loop/loop_lib.py`,
 `tools/roles/adopt-roles.test.sh` and `tools/playbook/instruction_units.py`.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+The `missing-step` plant of `tools/loop/loop_lib.py`, whose planted defect is the staged break, exited 1 over
+its scratch tree, its last line reading `loop:
+C:/Users/daily-agent/AppData/Local/Temp/rf3/tools/loop/loop.toml: the step step.depl`; the leg over the tree
+read green at HEAD: RED observed.
+Not observed: the arm in `tools/roles/adopt-roles.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+Not observed: the arm in `tools/playbook/instruction_units.py`, no staged break was run for it at this close.
+
 **Evidences:** TOOL-dDeclaredLoop-1
 - AC1 — `bash adopt-loop.sh --check` — exited 0 and printed the steps `step.plan`, `step.design`,
   `step.build`, `step.test`, `step.deploy` in that order and one `loop: workflow` line for each row of

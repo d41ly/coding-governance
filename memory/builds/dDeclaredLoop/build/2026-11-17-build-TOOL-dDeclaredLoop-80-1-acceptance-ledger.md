@@ -27,6 +27,15 @@ whose module this pass edits, run by its argv once; and AC4. Owed RED-first: the
 `no-own-conf-read` over its own module and over the staged module, and the `tools/loop/breakpoints.py` arm,
 `no-own-conf-read` and the four plants calling the renamed staging, each on its staged break.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant no-own-conf-read` with every function the unit's pass changed
+in `tools/loop/loop_lib.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/breakpoints.py --selftest` with every function the unit's pass changed in
+`tools/loop/breakpoints.py` and `tools/loop/loop_lib.py` swapped back to its pre-pass source exited 1, and 0
+once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-80
 - AC1 — `fixture boundary:` — `python budget.py --fixture --plant no-own-conf-read` printed `fixture boundary: 2 functions — write_budget_plant, run_budget_plant` and `held`, exit 0, and the same plant of `breakpoints.py` printed `fixture boundary: 2 functions — write_pre_placement_plant, run_breakpoint_plant` and `held`, exit 0: 76 AC1's owed exit 0. In a scratch copy of the kit folder whose two modules each gained a module-level `CONF = ".unattended.conf"` and `read_records_root(tree)` returning `(tree / ".memory-tree.conf").read_text()`, each copy's plant named both added lines as `conf name` and ended `MISSED 2 conf read(s)`, exit 1.
 - AC2 — `read_planted_root` — a `python -c` probe writing the spec's staged module of four definitions to a scratch file answered `[(3, 'conf name'), (5, 'conf name')]` from `derive_conf_reads`, the lines inside `read_planted_root` and `fixture_rows`, and `['check_plant_root', 'build_fixture_tree']` from `derive_fixture_boundary`; `python budget.py --fixture --plant no-own-conf-read` printed that module's boundary line and its two hits among its rows, then `held`.

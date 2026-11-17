@@ -17,6 +17,12 @@ owed 1 under the key grade; and the `loop guard fixtures` row in `tools/run-gate
 re-priced from the main loop's reading of the leg alone, as that row's own rule says, since the three
 plants each add one scratch repository to that leg.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/guard.py --selftest` with every function the unit's pass changed in `tools/loop/guard.py`
+swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-59
 - AC1 — `push-merge-both-sides-clean` — `python tools/loop/guard.py --fixture --plant push-merge-both-sides-clean`: side's trailered cap raise and main's trailered `review.max-rounds` merged cleanly with `--no-ff`; the arm graded all three commits, the merge included, printed no finding and `all held`, and exited 0.
 - AC2 — `review.max-rounds` — `python tools/loop/guard.py --fixture --plant push-merge-resolution-edit`, unit 44's plant unchanged: with its trailer and record the merge printed no finding, exit 0; with neither it was refused naming `merge <sha8>`, `review.max-rounds` and the merge's own change, exit 1; the plant printed `all held`.

@@ -15,6 +15,16 @@ observation of its two `New arm:` lines, `tools/loop/loop_lib.py` covering AC1, 
 staged by the kind in the factory's table and not the reader's tuple. The kit version constants of
 the spec's section 5 move at the close, where the epoch legs name them.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+The `disposition-unknown` plant of `tools/loop/loop_lib.py`, whose planted defect is the staged break, exited
+1 over its scratch tree, its last line reading `loop:
+C:/Users/daily-agent/AppData/Local/Temp/rf3/tools/loop/loop.toml: the disposition as`; the leg over the tree
+read green at HEAD: RED observed.
+Not observed: the arm in `tools/memory-tree/check-memory-hygiene.test.sh`, a suite arm, left unrun for the
+owner's opt-in slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-16
 - AC1 — `loop: dispositions` — the line is printed by `tools/loop/loop_lib.py#main` from the members
   `check_loop` returns; `python tools/loop/loop_lib.py --check` itself was NOT RUN, being the

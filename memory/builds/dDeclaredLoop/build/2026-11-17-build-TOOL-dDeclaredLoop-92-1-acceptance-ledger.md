@@ -24,6 +24,14 @@ Owed to the close: every leg section 7 names; and RED-first, on its two `New arm
 `push-merge-tree-fatal` plant with `build_failure_detail` restored to its base spelling, and the
 `git_env_leaks_py` parity population with one member of the `loop_witness.py` copy edited.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/guard.py --selftest` with every function the unit's pass changed in `tools/loop/guard.py`
+swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+Not observed: the arm in `tools/lib/resolve-python.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-92
 - AC8 — `False` — the `ast` probe of `loop_witness.py` found no `Import` or `ImportFrom` naming `tree_lib`, no str constant `tree_lib.py`, and no call of `read_memory_tree` or `load_tree_lib` in `read_clean_env`; the two `git_env_leaks_py` spans, each piped through `tr -d '\r'`, compared equal under `cmp`, 19 PINNED lines each; in a scratch copy of the loop folder the spec's probe printed `False` and exited 0, and with the base's `loop_witness.py` in the same copy it raised `LookupError` naming `tree_lib.py`.
 - AC16 — `start failed: OSError` — the probe answered `start failed: OSError`, `start failed: [Errno 5]`, `start failed: boom` and `start failed: [Errno 2] No such file`; `python guard.py --fixture --plant push-merge-tree-fatal` exited 1 and printed `8 of 8 scenario(s) held · all held` PINNED, its rows `graded, start failed, no message` and `graded, start failed, an errno alone` held naming `the clean re-merge failed: start failed: OSError` and `the clean re-merge failed: start failed: [Errno 5]`.

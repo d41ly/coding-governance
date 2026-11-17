@@ -31,6 +31,20 @@ call taken out; the pre-commit row with the block's verdict put back to the mini
 pre-push rows with the push arm's call and the floor read taken out; and the budget row read against
 the leg's own timing.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/guard.py --fixture --plant raise-admitted` with the verdict forced to refuse exited 3, and
+0 once restored: RED observed.
+Not observed: the arm in `tools/hooks/scratch-guard.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+Not observed: the arm in `tools/lib/resolve-python.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+Not observed: the arm in `.githooks/pre-commit.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+Not observed: the arm in `.githooks/pre-push.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-2
 - AC1 — `raise-admitted` — `python guard.py --fixture --plant raise-admitted` printed `policy-edit: wrote .governance/policy.toml`, the change record, `Gov-Policy: policy.budgets."AGENTS.md" 100 -> 120`, then `policy-guard: admitted` and `loop-guard: admitted · policy-file.guard = owner-only · the minimal guard admits it`; exit 0, both scenarios held.
 - AC2 — `raise-no-record` — exit 1, `loop-guard: refused · .governance/policy.toml · budgets."AGENTS.md" changed, and no staged change record names policy.budgets`, while the minimal guard admitted the shape.

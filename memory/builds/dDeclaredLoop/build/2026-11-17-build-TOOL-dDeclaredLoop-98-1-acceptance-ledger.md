@@ -22,6 +22,14 @@ Owed to the close: every leg section 7 names, the `loop budget fixtures` leg amo
 observation of the `New arm:` line covering AC1 and AC2, the declared readers seen row staged with the
 rule's callee set restored to the literal pair and with an empty tuple.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant conf-read-forms` with the reader-call callee set restored to
+the literal pair exited 1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant conf-read-forms` with an empty `CONF_READERS` exited 1, and 0
+once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-98
 - AC1 — `declared readers seen · 9/9 calls answered · read_design_conf, read_driver_conf, parse_conf` — the plant in `tools/loop/` exited 0 printing that line and `held`, PINNED 2026-11-17; the row absent, no such line prints, the red case the staged breaks under AC2 stand beside.
 - AC2 — `declared reader not answered: read_design_conf as loop_lib.read_design_conf` — with the copy's rule matching the literal pair the plant printed `6/9 calls answered` and exited 1, its `MISSED` line naming that miss, `as ll.read_design_conf` and `as r0`; with the copy's tuple empty it printed `0/0 calls answered` and exited 1, its `MISSED` line holding `CONF_READERS is empty` beside the aliased-reader row's miss, PINNED 2026-11-17.

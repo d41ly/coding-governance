@@ -17,6 +17,12 @@ RED-first observation of the spec's one `New arm:` line, the three built plants 
 fixtures` row in `tools/run-gates/selftest-budgets.txt` read against the leg's own timing, since its
 hang ceiling in `tools/gate-legs.json` sits below the re-priced budget on a loaded node.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/position.py --selftest` with every function the unit's pass changed in
+`tools/loop/position.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-45
 - AC1 — `unit — <A> · built · acceptance unarmed` — `python position.py --fixture --plant built-unarmed` in the loop kit's folder printed `unit — TOOL-tPos-1 · built · acceptance unarmed`, A with its pass commit and no acceptance record under the shipped stand-in writer, and `unit — TOOL-tPos-2 · designed`, then `held`, exit 0.
 - AC2 — `executor:build.acceptance` — `--plant built-unheld`, a well-formed record naming A at the plant's `fixture` commit, which no `Pass:` trailer attributes to A, read on a `read —` line, printed `unit — TOOL-tPos-1 · designed` with no tag and `held`; `--plant built-armed` printed that line twice, once with the in-memory row's writer set to `executor:build.acceptance` and once with the `acceptance` row removed, and `held`, exit 0.

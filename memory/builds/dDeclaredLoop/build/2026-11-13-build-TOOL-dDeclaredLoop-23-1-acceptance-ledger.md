@@ -28,6 +28,14 @@ dispatch row or runs the commit check, so neither reaches a re-pointed reader. T
 suites are waived for this landing by the build README's rule, and an arm of theirs that sources the
 library with no `resolve_python` defined now meets the reader's named refusal.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+Not observed: the arm in `tools/memory-tree/routed_commits.py`, no staged break was run for it at this close.
+Not observed: the arm in `tools/lib/resolve-python.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+Not observed: the arm in `tools/playbook/edge_grammar.py`, no staged break was run for it at this close.
+
 **Evidences:** TOOL-dDeclaredLoop-23
 - AC1 — `--fixture` — `python commit_trailers.py --fixture`, run in the gov lib directory, printed one
   line per planted commit, oldest first: `union TOOL-tFix-1 · replace TOOL-tFix-1`, then

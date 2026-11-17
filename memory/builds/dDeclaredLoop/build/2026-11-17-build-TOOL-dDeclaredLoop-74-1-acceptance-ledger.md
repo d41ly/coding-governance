@@ -18,6 +18,12 @@ Owed to the close: every leg section 7 names, and the `loop position fixtures` l
 close's timed reading re-prices where it passes it. Owed RED-first: the `tools/loop/position.py` arm,
 `failed-fetch` on its staged break beside `quiet-remote` and `offline-stale`.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/position.py --selftest` with every function the unit's pass changed in
+`tools/loop/position.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-74
 - AC1 — `failed-fetch` — `python position.py --fixture --plant failed-fetch` printed `read — FETCH_HEAD · skipped — empty` right after the tracking ref's line ending `from reflog`, `next: none - stale-remote: ...` and `position: fixture · failed-fetch · held`, exit 0. With `check_fetch_head` patched in-process to keep every file, the mtime-only reading, the same plant read the ref `from FETCH_HEAD`, its claim `fresh`, and printed `MISSED`, exit 1.
 - AC2 — `quiet-remote` — `--plant quiet-remote` printed the ref's line ending `from FETCH_HEAD` and `position: fixture · quiet-remote · held`, and `--plant offline-stale` the same ending and `position: fixture · offline-stale · held`, each exit 0 with no `skipped —` line; `stale-remote` and `fresh-clone` each still printed `held`.

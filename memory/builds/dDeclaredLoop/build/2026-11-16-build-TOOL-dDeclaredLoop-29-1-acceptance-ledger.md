@@ -16,6 +16,14 @@ and `loop item kind` among them, the new leg `loop upstream fixtures`, `adopt-ro
 and the RED-first observation of both `New arm:` lines. The new leg's run time was not read: its budget
 row is a proxy priced from the plants run alone, and the close re-prices it from the leg itself.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/upstream.py --fixture --plant drop-gating` with the join reading only the answered ids
+exited 0, and 1 once restored: RED observed.
+Not observed: the arm in `tools/roles/adopt-roles.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-29
 - AC1 — `drop-gating` — `--plant drop-gating` exited 1 printing `upstream · finding · dropped · item.design.seams#must-2 · no answer names it` and `upstream · verdict · refused`.
 - AC2 — `drop-recorded` — `--plant drop-recorded` exited 0 printing the same `dropped` line and `upstream · verdict · finding`.

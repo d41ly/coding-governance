@@ -22,6 +22,37 @@ this pass, and two of four PINNED runs of the base's own module run in process, 
 unavailable — bash: past the 2 s bound` (PINNED): the normaliser runs under the command's own two-second bound
 (`TOOL-dDeclaredLoop-68`), a red this unit did not introduce and leaves for the close to weigh.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant attr-missing` with every function the unit's pass changed in
+`tools/loop/budget.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant patch-concurrent` with every function the unit's pass changed
+in `tools/loop/budget.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/guard.py --selftest` with every function the unit's pass changed in `tools/loop/guard.py`
+swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/position.py --selftest` with every function the unit's pass changed in
+`tools/loop/position.py` and `tools/unattended/unattended.sh` swapped back to its pre-pass source exited 0,
+and 0 once restored: not reddened by this break, so not observed.
+`python tools/memory-tree/routed_commits.py --selftest` with every function the unit's pass changed in
+`tools/memory-tree/routed_commits.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED
+observed.
+`python tools/loop/factories.py --fixture --plant factory-interrupt` with every function the unit's pass
+changed in `tools/loop/factories.py` and `tools/lib/guarded_write.py` swapped back to its pre-pass source
+exited 3, and 0 once restored: RED observed.
+`python tools/loop/position.py --fixture --plant built-unarmed` with the driver read keeping the
+acceptance-unarmed tag exited 1, and 0 once restored: RED observed.
+`python tools/loop/loop_table.py check --selftest` with every function the unit's pass changed in
+`tools/loop/loop_table.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/breakpoints.py --selftest` with every function the unit's pass changed in
+`tools/loop/breakpoints.py` swapped back to its pre-pass source exited 0, and 0 once restored: not reddened by
+this break, so not observed.
+`python tools/loop/loop_witness.py --selftest` with every function the unit's pass changed in
+`tools/loop/loop_witness.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+Not observed: the arm in `tools/run-gates/run-gates.gov.test.sh`, a suite arm, left unrun for the owner's
+opt-in slow-suite run.
+Not observed: the arm in `tools/loop/loop_lib.py`, no staged break was run for it at this close.
+
 **Evidences:** TOOL-dDeclaredLoop-67
 - AC1 — `loop termination` — a `python -c` probe running G9's own program over the manifest exited 0, over a copy whose row carries a guard exited 1 naming it, and over a copy with the row twice exited 1 naming the count, each exit PINNED.
 - AC8 — `phase HELD · state paused · step step.build` — `python loop_table.py phase --from HELD --fact held-from=BUILDING` printed it; without the fact `step none`; `--fixture --plant held-in-elsewhere` printed the refusal naming `phase row 7 (BUILDING)`, exit 1, and every one of the 18 PINNED plants drew its owed refusal.

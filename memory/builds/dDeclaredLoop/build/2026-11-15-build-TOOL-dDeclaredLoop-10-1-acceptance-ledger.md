@@ -23,6 +23,14 @@ the `direction-order` case prints `forward`; the `loop transition record` leg wi
 observation its `New arm:` line names, staged by exempting a backward move from the channel check so
 the `skip-backward` plant exits 0; and the budget row read against the leg's own timing.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+The `skip-backward` plant of `tools/loop/loop_transition.py`, whose planted defect is the staged break, exited
+1 over its scratch tree, its last line reading `loop: fixture · check · exit 1`; the leg over the tree read
+green at HEAD: RED observed.
+Not observed: the arm in `tools/loop/loop_table.py`, no staged break was run for it at this close.
+
 **Evidences:** TOOL-dDeclaredLoop-10
 - AC1 — `move — build · building → testing` — `loop_table.py move --level build --from building --item item.build.exit --outcome recorded`
   printed `move — build · building → testing · item.build.exit · stand-in dScopedBuild · forward`;

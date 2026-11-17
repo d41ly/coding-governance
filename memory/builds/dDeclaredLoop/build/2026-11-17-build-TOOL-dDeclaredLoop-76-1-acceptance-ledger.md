@@ -19,6 +19,15 @@ Owed to the close: every leg section 7 names, and both plant legs, which exit no
 copy below named its added line, and `resolve_memory_root_source` rebound in process to guess the source
 from the root made `root-source` print `MISSED tree answered`.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant no-own-conf-read` with every function the unit's pass changed
+in `tools/loop/loop_lib.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant root-source` with every function the unit's pass changed in
+`tools/loop/loop_lib.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+Not observed: the arm in `tools/loop/breakpoints.py`, no staged break was run for it at this close.
+
 **Evidences:** TOOL-dDeclaredLoop-76
 - AC1 — `conf name` — `python budget.py --fixture --plant no-own-conf-read` printed 8 PINNED hits and `python breakpoints.py --fixture --plant no-own-conf-read` 8 PINNED, every one `conf name` and none `reader call`, each plant ending `MISSED 8 conf read(s)` and exiting 1; the `ast` probe mapped all 8 PINNED budget hits to `tools/loop/budget.py#run_budget_plant`, and of the breakpoints hits 7 PINNED to `tools/loop/breakpoints.py#run_breakpoint_plant` and 1 PINNED to `tools/loop/breakpoints.py#write_pre_placement_tree`, each a function that seeds or asserts a scratch tree. In a scratch copy of the kit folder whose `budget.py` gained `(root / ".unattended.conf").read_text()` in `read_budget_value`, the copy's plant named that line as `conf name` among 9 PINNED hits. The exit 0 is owed at `TOOL-dDeclaredLoop-80`'s pass commit.
 - AC2 — `SyntaxError` — a `python -c` probe of `derive_conf_reads` answered `[]` over a scratch module whose module, function, `async def` and class docstrings and a comment each name `.unattended.conf`; five hits over the module holding the five reads, the first three `reader call` and the last two `conf name`, the f-string's included; and raised `SyntaxError` over a module that does not parse.

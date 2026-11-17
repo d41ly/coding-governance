@@ -19,6 +19,14 @@ pipe-captured `shell=True` run, and the `run_tree_kill_py` parity row staged by 
 loop copy; and the `resolve-python.test.sh` parity table over the new row, whose population grep reads
 tracked files only.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/loop_witness.py --selftest` with every function the unit's pass changed in
+`tools/loop/loop_witness.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+Not observed: the arm in `tools/lib/resolve-python.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-42
 - AC1 — `PASS bash-syntax` — `--plant bash-syntax` exited 0 printing `PASS bash-syntax`, the command
   re-run at the fixture's commit recording exit `0` and `9a271f2a916b`, the first twelve hex digits of

@@ -20,6 +20,26 @@ the `budget.py` `conf-read-forms` rows and the two unset-key `root-source` trees
 `position.py` `url-forms` mismatch, scp-pair and git-written rows, and the glob-reader arm's async
 docstring in `gen_build_index.py`.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant conf-read-forms` with every function the unit's pass changed in
+`tools/loop/loop_lib.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant root-source` with every function the unit's pass changed in
+`tools/loop/loop_lib.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/memory-tree/gen_build_index.py --selftest` with every function the unit's pass changed in
+`tools/memory-tree/gen_build_index.py` swapped back to its pre-pass source exited 0, and 0 once restored: not
+reddened by this break, so not observed.
+`python tools/loop/guard.py --selftest` with every function the unit's pass changed in `tools/loop/guard.py`
+swapped back to its pre-pass source exited 0, and 0 once restored: not reddened by this break, so not
+observed.
+`python tools/loop/position.py --selftest` with every function the unit's pass changed in
+`tools/loop/position.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/memory-tree/gen_build_index.py --selftest` with a docstring set without `async def` exited 1,
+and 0 once restored: RED observed.
+`python tools/loop/guard.py --selftest` with every merge-tree exit 1 read as conflicted exited 1, and 0 once
+restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-82
 - AC1 — `conf constant` — before any edit the widened rule over both live modules found eight module-level `conf name` hits and no other, the six `tools/loop/budget.py#PLANTS` descriptions S10 names and the two of `tools/loop/breakpoints.py#PLANTS`; with S10's rule built and those descriptions as at the base, `no-own-conf-read` printed `MISSED 6 conf read(s) in budget.py` and `MISSED 2 conf read(s) in breakpoints.py`, each exit 1; once reworded, each printed `held`, exit 0, and the base probe found no hit; `conf-read-forms` printed `constant · line 2 conf constant`, `fixture-code · no hit`, and for the module with no `loop_lib.py` beside it a raise naming that file, then `held`, exit 0.
 - AC3 — `FETCH_HEAD · skipped — no line for main of origin` — `url-forms` printed that entry after `FETCH_HEAD` was written as one line for main of another URL, no line holding `SECRET`, then `held`, exit 0.

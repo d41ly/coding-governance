@@ -18,6 +18,16 @@ arm:` line, the `parallel-append-uneven` plant and the append-only check staged 
 answering `unspecified`, a write that doubles a row, and a write that puts rows ahead of the record's
 lines.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant parallel-append-uneven` with the fixture's merge attribute
+answering unspecified exited 1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant parallel-append-uneven` with a write that doubles each row
+exited 1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant parallel-append-uneven` with a write that puts the rows ahead
+of the record's lines exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-62
 - AC1 — `merge=rows` — the `sed` range from the `instructions.lock` line to the transition line holds `merge=rows`, `147 of` and `draw id` once each in its comment lines, and `git check-attr merge` on `2026-11-16-build-TOOL-dDeclaredLoop-1-transition-1.md` in `memory/builds/dDeclaredLoop/build/` answered `merge: union`.
 - AC2 — `unfrozen 3/4` — `--fixture --plant parallel-append-uneven` read the attribute `union`, merged `side` at exit 0, printed three draw rows `TOOL-tFix-1 · 1/4`, `TOOL-tFix-2 · 1/4` and `TOOL-tFix-3 · 2/4`, each with its own draw id, `budget_state` answered `unfrozen 3/4`, and the plant printed `held`; staged with `check-attr` answering `unspecified` it printed `MISSED` naming the conflicted merge, and staged with a row doubled it printed `MISSED` naming the three distinct rows; figures PINNED at the default `4+2` base.

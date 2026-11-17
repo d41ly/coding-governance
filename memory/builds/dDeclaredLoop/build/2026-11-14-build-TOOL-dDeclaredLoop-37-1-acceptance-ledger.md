@@ -13,6 +13,12 @@ Owed to the close: every leg the spec's section 7 names, and the RED-first obser
 `New arm:` lines, both in `tools/memory-tree/routed_commits.py#run_selftest`. The second line's
 staged break is the one deviation 373 describes: observe it on the arm's unreadable-revision call.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+Not observed: the arm in `tools/memory-tree/routed_commits.py`, no staged break was run for it at this close.
+Not observed: the arm in `tools/memory-tree/routed_commits.py`, no staged break was run for it at this close.
+
 **Evidences:** TOOL-dDeclaredLoop-37
 - AC1 — `git grep -n -F` — the S1 probe over the built tree, this pass's edit to
   `tools/memory-tree/routed_commits.py` included, printed no line and exited with git's no-match

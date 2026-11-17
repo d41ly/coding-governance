@@ -17,6 +17,12 @@ the one `New arm:` line: the `budget.py` `conf-read-forms` plant with `derive_co
 to 86 S13's shape list, owed to exit 1 printing `MISSED` naming the joined-path, os-path-join,
 multi-argument-path and aliased-from-import rows.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant conf-read-forms` with every function the unit's pass changed in
+`tools/loop/loop_lib.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-87
 - AC1 — `loop: fixture · conf-read-forms · held` — the plant exited 0 printing `line 2 conf constant` for `joined-path`, `os-path-join`, `multi-argument-path` and `aliased-from-import`, `no hit` for `non-conf-join`, the rows 82 and 86 wrote unchanged, then `held`; it ran in under 1 PINNED second by direct CLI. `no-own-conf-read` of `budget.py` and of `breakpoints.py` each printed `held`.
 - AC2 — `derive_conf_constants` — over a scratch `loop_lib.py` the probe wrote with the ten bindings the criterion names, it answered `A`, `B`, `GUARDED`, `JOINED`, `MULTI`, `OSJOIN`, `SUFFIX` and `TRIED`, never `OTHER`, the function-local name or the class attribute; a missing file raised the `LoopError` naming its path.

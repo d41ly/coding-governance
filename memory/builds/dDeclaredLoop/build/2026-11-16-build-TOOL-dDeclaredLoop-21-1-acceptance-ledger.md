@@ -21,6 +21,16 @@ waived for this landing by README rule 8; `harness arms (fail branches armed or 
 raised ceiling; `govkit selfcheck` over the subject pin row written by hand in the generator's sorted
 place; and `core meta-check` over the removed pending row.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/review_bounds.py --fixture --plant count-above` with a count above the ceiling read with
+the strict-below form exited 1, and 0 once restored: RED observed.
+Not observed: the arm in `tools/govkit/selftest.py`, a suite arm, left unrun for the owner's opt-in slow-suite
+run.
+Not observed: the arm in `tools/unattended/unattended.test.sh`, a suite arm, left unrun for the owner's opt-in
+slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-21
 - AC1 — `review.design.round-count` — `--plant count-above` committed `fixed-count` with a count of 4 and `review.max-rounds = 3` and `show --rev HEAD` exited 2 printing `review.design.round-count is 4, above review.max-rounds 3`; `--plant count-equal` with the count at 3 exited 0 printing `spec-bound=3`.
 - AC2 — `unattended.sh` — `--plant no-driver` ran a copy of the module beside the policy kit's three files in a tree holding no unattended kit, and the same planted file exited 2 naming `review.design.round-count`. The literal clone under a short temp path was not made: the plant is the same reading with nothing of the driver present.

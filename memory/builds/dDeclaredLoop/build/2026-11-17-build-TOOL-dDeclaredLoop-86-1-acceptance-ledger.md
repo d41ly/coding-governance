@@ -19,6 +19,21 @@ constant `Assign`, and the `no-own-conf-read` stub staged out; and the `position
 fetches with the credential-helper arguments staged out, whose staged break writes one dummy entry to
 the OS credential store that the close makes and clears with `cmdkey //delete:<target>`.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant conf-read-forms` with every function the unit's pass changed in
+`tools/loop/loop_lib.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/budget.py --fixture --plant no-own-conf-read` with every function the unit's pass changed
+in `tools/loop/loop_lib.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/position.py --selftest` with every function the unit's pass changed in
+`tools/loop/position.py` swapped back to its pre-pass source exited 0, and 0 once restored: not reddened by
+this break, so not observed.
+`python tools/loop/guard.py --selftest` with every function the unit's pass changed in `tools/loop/guard.py`
+swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+`python tools/loop/position.py --fixture --plant url-forms` with the credential-helper arguments staged out
+exited 0, and 0 once restored: not reddened by this break, so not observed.
+
 **Evidences:** TOOL-dDeclaredLoop-86
 - AC2 — `probe failed` — the probe answered `supported`, `unsupported`, `probe failed` and `probe failed` for the four pairs, `resolve_write_tree_support()` answered `supported` with the detail `129 usage: git merge-tree [--write-tree] [<options>] <branch1> <branch2>` under git 2.54, and `grep -c "0 or 129"` over `help/policy.md` printed 1; `push-merge-old-git-usage`, `push-merge-probe-silent` and `push-merge-probe-failed` each still printed `all held`.
 - AC6 — `does not parse at parent ` — `push-merge-tree-fatal-unparseable-parent` exited 1 printing `the clean re-merge failed: 128 fatal: fx stand-in` and the merge's `does not parse at parent` line naming main's tip, `2 of 2 scenario(s) held · all held`, counts PINNED, no `Traceback` in its output.

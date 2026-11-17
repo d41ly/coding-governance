@@ -20,6 +20,12 @@ observation of the `tools/loop/loop_witness.py` arm over AC1, AC3 and AC4 on its
 `timeout-grandchild` plant's call, which now holds the normaliser's bash under the same short bound, read
 4.0 PINNED seconds inside its ten-second window.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/loop_witness.py --selftest` with every function the unit's pass changed in
+`tools/loop/loop_witness.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-68
 - AC1 — `e3b0c44298fc` — `python loop_witness.py --fixture --plant normalise` printed `exit 0 6911d22ae925` for both re-runs and PASS, exit 0; the probe showed each raw output open with a `/tmp/lw-` line from bash's `pwd`, which only the third root's rule stripped, and both `.norm` files hashed the bytes of three empty lines and `took`, never the empty output.
 - AC2 — `write_normaliser` — `grep -c write_normaliser loop_witness.py` printed 5 PINNED and `git grep -n '"sed"' -- tools/loop/` printed nothing.

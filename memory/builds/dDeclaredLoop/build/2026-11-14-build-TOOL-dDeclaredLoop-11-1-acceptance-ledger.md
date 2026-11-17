@@ -18,6 +18,13 @@ Owed to the close: every leg the spec's section 7 names; the `loop checklist tag
 RED-first observation its `New arm:` line names, the failing case staged by the `missing-handle` plant;
 and the core meta-check over the new leg's `enforces`, which AC6 names.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+The `missing-handle` plant of `tools/loop/loop_checklist.py`, whose planted defect is the staged break, exited
+1 over its scratch tree, its last line reading `loop: refused · DOD_CORE unmapped-check has no [[checklist]]
+row mapping it onto an item`; the leg over the tree read green at HEAD: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-11
 - AC1 — `loop: checklist` — `python loop_checklist.py check` exited 0 printing one `loop: checklist`
   line per handle of the two registry lines, `loop: checklist DOD_CORE · gates-green · item.test.verdict`

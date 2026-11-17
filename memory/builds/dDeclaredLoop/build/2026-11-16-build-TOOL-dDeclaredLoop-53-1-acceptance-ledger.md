@@ -17,6 +17,12 @@ Owed to the close: every leg section 7 names. Owed RED-first: the `tools/loop/br
 `pre-placement` and `driver-pre-placement` plants against the base module, which reads every owner gate it
 cannot release as `held`.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/breakpoints.py --selftest` with every function the unit's pass changed in
+`tools/loop/breakpoints.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-53
 - AC1 — `--plant pre-placement` — printed `held`: the scratch's module listed `tPre` with `passed before placement` on the gates at `item.plan.exit`, `item.design.exit` and before `item.deploy.mandate`, and `tPost` with the plan gate `authorization` and the other two `held`.
 - AC2 — `--delegated-fork` — both `tPre` and `tPost` listed `breakpoint: owner item · at item.build.ratify · owner · ratification · held` and the closing review line with four fields.

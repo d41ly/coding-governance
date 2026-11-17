@@ -22,6 +22,12 @@ record`, `loop adapt fixtures` and `loop composition fixtures` whole, and the RE
 the `New arm:` line, the `parallel-append` plant staged against the typed-figure refusal the branch tip
 carried and against a tree whose `git check-attr merge` answers `unspecified`.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+`python tools/loop/budget.py --fixture --plant parallel-append` with every function the unit's pass changed in
+`tools/loop/budget.py` swapped back to its pre-pass source exited 1, and 0 once restored: RED observed.
+
 **Evidences:** TOOL-dDeclaredLoop-49
 - AC1 — `merge: union` — `git check-attr merge -- 2026-11-16-build-TOOL-dDeclaredLoop-1-transition-1.md` in `memory/builds/dDeclaredLoop/build/` answered `merge: union` with the line in place; the first dispatch read `merge: unspecified` at its base.
 - AC2 — `typed 1, derived 2` — the plant's merge of `side` exited 0, the record carried `draw · fix-pass · TOOL-tFix-1 · 1/4` and `draw · fix-pass · TOOL-tFix-2 · 1/4`, `budget_state` answered `unfrozen 2/4`, and the third draw exited 0 printing `loop: budget · drawn · draw · fix-pass · TOOL-tFix-3 · 3/4` first and `loop: budget · disagrees · draw · fix-pass · TOOL-tFix-2 · 1/4 · typed 1, derived 2` after it; figures PINNED at the default `4+2`'s base.

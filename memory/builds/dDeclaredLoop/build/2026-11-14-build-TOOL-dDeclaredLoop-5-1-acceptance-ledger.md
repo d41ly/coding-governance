@@ -18,6 +18,15 @@ first is the `witness-actor-unlisted` plant of `tools/loop/loop_lib.py`, staged 
 kit's directory removed beside the copy. That suite is waived under README rule 8, so its reading is
 owed with PLAY-dClosedLoop-13.
 
+The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+worktrees outside the repository: each staged break applied, the arm run, the break restored and the
+arm run again, the green half also read off every loop leg run whole at that commit.
+The `witness-actor-unlisted` plant of `tools/loop/loop_lib.py`, whose planted defect is the staged break,
+exited 1 over its scratch tree, its last line reading `loop: refused · the actor witness step.plan step.plan
+has no list row naming the build tha`; the leg over the tree read green at HEAD: RED observed.
+Not observed: the arm in `tools/unattended/check-unattended.test.sh`, a suite arm, left unrun for the owner's
+opt-in slow-suite run.
+
 **Evidences:** TOOL-dDeclaredLoop-5
 - AC1 — `--check` — its parts, called in-process over gov's tree: `read_witness_classes` returned the
   three classes and `actor`; `check_witness_classes` returned one `history` witness per step;
