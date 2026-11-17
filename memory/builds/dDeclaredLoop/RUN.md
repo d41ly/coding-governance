@@ -488,3 +488,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-17T11:42:18Z rescope · item add TOOL-dDeclaredLoop-116 · reason Closing diff review round 1 item 2 (HIGH, findings 3 and 4): five loop readers (adapt.py read_disposition_release, position.py, loop_parents.py, loop_lib.py read_builds_dir, upstream.py write_upstream_record) take the builds root from .memory-tree.conf alone instead of resolve_memory_root; promoted at the CONVERGED exit
 
 2026-11-17T11:42:21Z rescope · item add TOOL-dDeclaredLoop-117 · reason Closing diff review minors batched (rounds 1 and 2: items 3 to 6 of round 1, items 1 and 2 of round 2): derive_conf_openers blind to a conf name passed straight to open(), the conf-readers-declared plant's refusal arms unexercised, and four record defects; promoted at the CONVERGED exit
+
+2026-11-17T12:51:33Z brief · item TOOL-dDeclaredLoop-115 · reason df7935a3f980 memory/builds/dDeclaredLoop/prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-115-build-brief.md
