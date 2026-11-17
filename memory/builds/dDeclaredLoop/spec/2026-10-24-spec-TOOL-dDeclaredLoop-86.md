@@ -13,6 +13,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-86-deviation-862.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-86-deviation-862.md) | deviation | — |
 | [2026-11-17-build-TOOL-dDeclaredLoop-86-1-acceptance-ledger.md](../build/2026-11-17-build-TOOL-dDeclaredLoop-86-1-acceptance-ledger.md) | journal | — |
 | [2026-11-17-build-TOOL-dDeclaredLoop-86-deviation-863.md](../build/2026-11-17-build-TOOL-dDeclaredLoop-86-deviation-863.md) | deviation | — |
+| [2026-11-17-build-TOOL-dDeclaredLoop-86-red-fix-60.md](../build/2026-11-17-build-TOOL-dDeclaredLoop-86-red-fix-60.md) | red-fix | — |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-86-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-86-1-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-86-reground-brief.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-86-reground-brief.md) | research | — |
 | [2026-11-17-prompt-TOOL-dDeclaredLoop-86-build-brief.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-86-build-brief.md) | journal | — |
