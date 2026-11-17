@@ -6078,6 +6078,11 @@
       "file": "tools/playbook/writing_practice.py"
     },
     {
+      "id": "check_gained_prune_vintage",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_gate_admits",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"

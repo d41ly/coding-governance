@@ -208,6 +208,8 @@ FX_URL_FORMS = (("git@example.com:up.git", "example.com:up", "equal"),
                 ("ssh://user@example.com/up.git", "ssh://example.com/up", "equal"),
                 ("example.com:up.git/", "example.com:up", "equal"),
                 ("C:/x/up.git//", "C:/x/up", "equal"),
+                ("https://user:tok@host.example/r.git", "https://host.example/r", "equal"),   # TOOL-dDeclaredLoop-79 S21
+                ("https://user@host.example/r/", "https://host.example/r", "equal"),
                 ("git@other.example:up.git", "example.com:up", "unequal"),
                 ("C:/x@b/up.git", "C:/y@b/up", "unequal"))
 

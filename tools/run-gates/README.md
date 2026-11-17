@@ -966,6 +966,10 @@ turn a leg into a pass or a skip.
 install resolves it at any prefix. `GATE_LEGS` still outranks the derivation, which is the seam both
 harnesses drive so a nested run never re-enters the real bar.
 
+Leg-row keys: `argv`, `ceiling`, `chunk`, `doc_reads`, `enforces`, `guard`, `name`, `pack`, `pass_leg`, `reads`, `scope_of`, `signature`, `stage`, `subject`.
+
+Each is a key some row of the manifest carries.
+
 The manifest does NOT travel. A target's leg list is emitted from the selected kits' `[[gate_leg]]`
 blocks; seeding an adopter with gov's leg names is the class
 `memory/gotchas/pin-copied-from-another-corpus.md` exists for, and the adopter starts with an empty

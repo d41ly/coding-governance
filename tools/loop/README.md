@@ -182,7 +182,9 @@ through its `write_acceptance`, `Writer: stand-in`; `rerun --sha --cmd --expect.
 `probe-rerun`, `bash-syntax`, a command only bash runs, `timeout-grandchild`, a grandchild outliving
 the bound, `normalise`, one command printing its worktree and a duration re-run twice to one hash,
 `normaliser-missing`, the module's `KIT` rebound to an empty directory so the re-run refuses by name
-and `rerun` reads inconclusive, and `hold-inherited`, the last running the unattended driver, found by
+and `rerun` reads inconclusive, `sed-fails`, a stub of that kit's library whose normaliser program
+`sed -E` refuses, so the re-run refuses naming its `sed:` step, and `hold-inherited`, the last running
+the unattended driver, found by
 `resolve_kit_dir` and run through the inline `resolve_bash`, with no edge to that kit, since it requires
 this one; a kit that does not resolve exits 2, never a pass. `--selftest` runs them and this reader's
 `computed-actor` and `computed-unserved` plants, and is gov's `loop computed witness` gate.

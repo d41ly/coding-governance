@@ -198,7 +198,10 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
                               "naming tFixPatchTwo, a patch of the same origin, then one naming tFix, no patch",
           "unset-driver-root": ".unattended.conf setting no MEMORY_ROOT beside the memory tree's records, one draw; "
                                "then the build moved under records, both confs naming it, a draw and ending --explain",
-          "patch-claims-unread": "the sourced driver's draw for tFixPatch, its claims read standing in as failed"}
+          "patch-claims-unread": "the sourced driver's draw for tFixPatch, its claims read standing in as failed",
+          "trailing-slash-agree": ".unattended.conf naming MEMORY_ROOT=memory/ beside the memory tree's memory, "
+                                  "one draw",
+          "no-confs": "the memory tree's conf taken out and no .unattended.conf written, the root read"}
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
 PLANT_TRAILER = '[transitions]\nrecord = ["trailer"]\n'
 PLANT_SPEC = "# TOOL-%s-%d — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n"
@@ -540,7 +543,7 @@ def write_budget_plant(top, case):
         files[FX_SPEC.replace(FX_UNIT, "TOOL-%s-2" % FX_BUILD)] = (PLANT_SPEC % (FX_BUILD, 2)).replace("INPROGRESS", CLOSED)
         files[".governance/policy.toml"] = "[flow]\nrework-budget = 0\n"
     if case in ("pre-spec", "unrecorded", "trailer-only", "draws-survive-rotation", "confs-disagree",
-                "unset-driver-root"):
+                "unset-driver-root", "trailing-slash-agree", "no-confs"):
         files["memory/builds/%s/RUN.md" % FX_BUILD] = PLANT_RUN
     if case == "route-backs":
         files[".governance/policy.toml"] = "[flow]\nroute-backs = 3\nrework-budget = 6\n"
@@ -1181,6 +1184,23 @@ def run_budget_plant(case):
             check(drawn == 0 and rc == 0 and lines[0] == "%s: budget · root records · from .unattended.conf" % SAY
                   and len(lines) > 1 and lines[1].startswith("%s: budget · read records/builds/%s/" % (SAY, FX_BUILD)),
                   "the agreeing tree drew exit %d and explained %r, exit %d" % (drawn, out.strip(), rc))
+        elif case == "trailing-slash-agree":   # TOOL-dDeclaredLoop-79 S20: one root spelled two ways agrees
+            write_fixture_files(top, {".unattended.conf": "MEMORY_ROOT=memory/\n"})
+            run_fixture_git(top, "add", "-A")
+            run_fixture_git(top, "commit", "-q", "-m", "the driver's conf naming memory/")
+            run = top / "memory" / "builds" / FX_BUILD / "RUN.md"
+            rc, out = run_verb(draw + [FX_UNIT])
+            check(rc == 0 and "fix-pass · %s · 1/" % FX_UNIT in run.read_text(encoding="utf-8"),
+                  "the draw answered %r, exit %d, its row not under memory" % (out.strip(), rc))
+        elif case == "no-confs":   # TOOL-dDeclaredLoop-79 S25: neither conf, the default root, no traceback
+            run_fixture_git(top, "rm", "-q", ".memory-tree.conf")
+            run_fixture_git(top, "commit", "-q", "-m", "no memory tree conf")
+            try:
+                got = resolve_memory_root(top)
+            except Exception as e:   # noqa: BLE001  any raise is the miss this plant reads
+                got = "%s: %s" % (type(e).__name__, e)
+            print("%s: fixture · no-confs · root %s" % (SAY, got))
+            check(got == "memory", "resolve_memory_root answered %r" % got)
     except LookupError as e:
         print("%s: fixture · %s · unarmed: %s" % (SAY, case, e))
         return 2

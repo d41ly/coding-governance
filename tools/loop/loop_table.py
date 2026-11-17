@@ -51,8 +51,9 @@ the reading it qualifies, so a move into it crosses nothing and a move out count
 `.unattended.conf` at the top of the work tree it runs in, through `loop_lib.read_driver_conf`, sourced as
 the driver sources it, only for a phase no row reads; a conf that does not source prints `loop: refused ·
 driver conf unreadable: <conf> — <reason>`, exit 1. `--extra=` reads no conf (TOOL-dDeclaredLoop-70). Of
-`check --selftest`'s cases, those opening `tree <name>` run in one of three scratch work trees it builds:
-`extra`, whose conf sets `PHASES_EXTRA="STAGING"`, `broken`, whose conf exits 3, and `bare`, with none. `check` grades the rows by `check_phase_rows` and joins the unqualified
+`check --selftest`'s cases, those opening `tree <name>` run in one of four scratch work trees it builds:
+`extra`, whose conf sets `PHASES_EXTRA="STAGING"`, `broken`, whose conf exits 3, `bare`, with none, and
+`leak`, whose conf sets neither name, its case run with `MEMORY_ROOT` and `PHASES_EXTRA` exported. `check` grades the rows by `check_phase_rows` and joins the unqualified
 rows with the driver's `PHASES_CORE` line both ways, read through `loop_checklist.py`'s
 `read_core_registries`, printing the join `unarmed` where the driver does not resolve; every plant
 passes the shipped rows' unqualified phases in its place, taken before the break.
@@ -669,7 +670,10 @@ def main(argv):
                   ("tree broken row", ["tree", "broken", "phase", "--from", "REVIEWING"], 0,
                    "phase REVIEWING · state designing · step step.design", ""),
                   ("tree bare", ["tree", "bare", "phase", "--from", "STAGING"], 1,
-                   "refused — phase STAGING: no row", "")]
+                   "refused — phase STAGING: no row", ""),
+                  # TOOL-dDeclaredLoop-79 S3: the caller's exports never read as the conf's
+                  ("tree leak", ["tree", "leak", "phase", "--from", "BOGUS"], 1,
+                   "refused — phase BOGUS: no row", "")]
         cases += [("move by order", move + ["planning", "--item", "item.design.exit", "--outcome", "recorded"], 1,
                    "refused — build · planning · item.design.exit · recorded", "no row"),
                   ("move designing", move + ["designing", "--item", "item.design.exit", "--outcome", "recorded"], 0,
@@ -722,14 +726,22 @@ def main(argv):
         def run_table_case(argv):
             """`main(argv)`, or for `direction-order` the shipped rows with building's and testing's step
             orders swapped, so a direction read from anything but the rows still prints forward; an argv
-            opening `tree <name>` runs the rest with the scratch work tree `<name>` as the working directory."""
+            opening `tree <name>` runs the rest with the scratch work tree `<name>` as the working directory,
+            the environment that tree declares set for the case and the prior values put back after."""
             if argv[:1] == ["tree"]:
-                here = os.getcwd()
+                here, put = os.getcwd(), envs.get(argv[1], {})
+                prior = {k: os.environ.get(k) for k in put}
+                os.environ.update(put)
                 os.chdir(scratch / argv[1])
                 try:
                     return main(argv[2:])
                 finally:
                     os.chdir(here)
+                    for k, v in prior.items():
+                        if v is None:
+                            os.environ.pop(k, None)
+                        else:
+                            os.environ[k] = v
             if argv != ["direction-order"]:
                 return main(argv)
             tables = read_transition_rows(*read_definition(KIT))
@@ -742,8 +754,10 @@ def main(argv):
         import tempfile
         from loop_witness import remove_tree, run_fixture_git, write_fixture_files
         scratch = pathlib.Path(tempfile.mkdtemp(prefix="loop-table-"))
+        envs = {"leak": {"MEMORY_ROOT": "elsewhere", "PHASES_EXTRA": "BOGUS"}}
         try:
-            for name, conf in (("extra", 'PHASES_EXTRA="STAGING"\n'), ("broken", "exit 3\n"), ("bare", None)):
+            for name, conf in (("extra", 'PHASES_EXTRA="STAGING"\n'), ("broken", "exit 3\n"), ("bare", None),
+                               ("leak", "# a conf that sets neither MEMORY_ROOT nor PHASES_EXTRA\n")):
                 (scratch / name).mkdir()
                 run_fixture_git(scratch / name, "init", "-q", "--template=")
                 if conf is not None:

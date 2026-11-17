@@ -23,6 +23,9 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # deviation_join inside its functions, under the edge above, and its `hold-inherited` plant runs the
 # unattended driver, which requires this kit, so that reach takes no edge and exits 2 where the driver
 # does not resolve; the plant's leg is gov's own, an [[exempt_leg]] of the registry, no row here.
+# loop_witness.py normalises each command's output with the run-gates kit's `write_normaliser`, found by
+# `resolve_kit_dir`, so this kit requires run-gates (TOOL-dDeclaredLoop-79); that kit requires nothing,
+# so the edge forms no cycle.
 # The checklist command, loop_checklist.py (TOOL-dDeclaredLoop-11), reads that driver's two core
 # registry lines as text, found the same way, so it takes no edge either and exits 2 where the driver
 # does not resolve; its leg is gov's own [[exempt_leg]] too. The transition tables' command, loop_table.py
@@ -135,7 +138,7 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # kit under the edge above. The transition writer imports it inside `write_transition`. A kit that does not
 # resolve exits 2 `unarmed`, never a default, and refuses the move at a step boundary. Its leg, `loop
 # termination`, is gov's own [[exempt_leg]], no row here.
-requires = ["memory-tree"]
+requires = ["memory-tree", "run-gates"]
 
 # Everything the kit ships is engine, overwritten on every update: the definition, its reader, the
 # adopter and the README. The gov steps and each workflow's place are gov's, never an adopter's seed.

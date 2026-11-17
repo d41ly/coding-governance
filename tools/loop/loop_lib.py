@@ -704,7 +704,9 @@ def read_driver_conf(tree, names):
     """`{name: value}` for each of `names` the unattended driver's `.unattended.conf` sets, the conf at the
     top of `tree`'s work tree, the first of `tree` and its parents holding `.git`, else `tree`: sourced in
     bash with the top as the working directory, as the driver sources it, each value read back with a
-    sentinel after them. `{}` where the file is absent; each answer held for the process. ValueError on a
+    sentinel after them. Each name is unset before the source, so a value the caller's environment
+    exports never reads as the conf's, and `ROOT` and `CONF` are set to the top and its conf, as the
+    driver sets them (TOOL-dDeclaredLoop-79). `{}` where the file is absent; each answer held for the process. ValueError on a
     name outside `[A-Z][A-Z0-9_]*`, before any bash starts; LoopError `driver conf unreadable` naming the
     conf and why, where no bash sees it, it does not start, exits non-zero or prints no sentinel
     (TOOL-dDeclaredLoop-70). `loop_witness.py`'s `resolve_bash` is imported inside the function, since
@@ -725,12 +727,16 @@ def read_driver_conf(tree, names):
         bash = resolve_bash(conf.as_posix())
         if bash is None:
             raise LoopError("driver conf unreadable", "%s — no bash that can see it" % conf.as_posix())
-        script = ('__rdc_conf=$1; shift; __rdc_names=("$@")\n'
+        # TOOL-dDeclaredLoop-79 S1, S2: each requested name unset, so a caller's export never reads as the
+        # conf's, then ROOT and CONF set as the driver's load_driver_conf sets them before its source
+        script = ('__rdc_conf=$1; __rdc_root=$2; shift 2; __rdc_names=("$@")\n'
+                  'for __rdc_n in "${__rdc_names[@]}"; do unset "$__rdc_n"; done\n'
+                  'ROOT=$__rdc_root; CONF="$ROOT/.unattended.conf"\n'
                   '. "$__rdc_conf" >/dev/null 2>&1 || exit 9\n'
                   'for n in "${__rdc_names[@]}"; do eval "v=\\${$n-__UNSET__}"; printf "%s\\0%s\\0" "$n" "$v"; done\n'
                   'printf "__CONF_IMPORT_OK__\\0\\0"')
         try:
-            p = subprocess.run([bash, "-c", script, "_", conf.as_posix(), *names], cwd=str(top),
+            p = subprocess.run([bash, "-c", script, "_", conf.as_posix(), top.as_posix(), *names], cwd=str(top),
                                stdin=subprocess.DEVNULL, capture_output=True)
         except OSError as e:
             raise LoopError("driver conf unreadable", "%s — %s" % (conf.as_posix(), e)) from None

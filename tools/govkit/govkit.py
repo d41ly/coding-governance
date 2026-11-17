@@ -9841,8 +9841,21 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # ---- this target cannot satisfy is named and left out, never pulled in after it.
     gained, _gained_why = ([], "") if kits else derive_default_gained(root, base_commit, to_commit,
                                                                       receipt, descs)
+    # TOOL-dDeclaredLoop-73 S3, S4: the `requires` graded are each kit's AT `to_commit`, the bytes this
+    # run installs, and a claimed kit whose requires that vintage cannot answer is refused, never read as
+    # none. TOOL-dDeclaredLoop-79 S19: the one read feeds the gained prune too, so it grades the vintage
+    # the refusal grades; a gained kit that vintage cannot answer is left out by name, never pulled in.
+    _req_at, _unknown_at = read_requires_at(root, to_commit, list(claimed) + list(gained))
+    _unknown_claimed = {k: why for k, why in _unknown_at.items() if k in claimed}
+    if _unknown_claimed:
+        raise Refusal("; ".join(f"'{k}' requires are unknown at {to_commit[:8]}: {why}"
+                                for k, why in sorted(_unknown_claimed.items())))
+    for _ge in [g for g in gained if g in _unknown_at]:
+        gained.remove(_ge)
+        print(f"govkit update — default-gained {_ge} NOT installed: its requires are unknown at "
+              f"{to_commit[:8]}: {_unknown_at[_ge]}")
     while True:
-        _unmet_g = derive_unsatisfied_requires(gained, descs, receipt)
+        _unmet_g = derive_unsatisfied_requires(gained, _req_at, receipt)
         if not _unmet_g:
             break
         for _ge, _gd in _unmet_g:
@@ -9853,12 +9866,6 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                       f"both is the route")
     # TOOL-dDeclaredLoop-57 S1: the CLAIMED kits' edges too, on every non-source run, before any
     # gain line prints and before anything is written, so a refused run reports no gain it never made.
-    # TOOL-dDeclaredLoop-73 S3, S4: the `requires` graded are each kit's AT `to_commit`, the bytes this
-    # run installs, and a kit whose requires that vintage cannot answer is refused, never read as none.
-    _req_at, _unknown_at = read_requires_at(root, to_commit, list(claimed) + list(gained))
-    if _unknown_at:
-        raise Refusal("; ".join(f"'{k}' requires are unknown at {to_commit[:8]}: {why}"
-                                for k, why in sorted(_unknown_at.items())))
     demand_claimed_requires(claimed, gained, _req_at, receipt, _gained_why)
     if _gained_why:
         print(f"govkit update — default-gained: none computed — {_gained_why}")

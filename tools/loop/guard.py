@@ -430,7 +430,10 @@ def read_remerge_policy(parents):
 def check_push_range(base, tip):
     """The push arm over `<base>..<tip>` -> its exit: 0 clean, reported or unarmed, 1 a commit refused, 2 not
     judged. A tree holding no policy kit or no memory-tree kit has no guarded policy file to grade: one
-    `unarmed` line, exit 0, as the hook prints one line for no loop kit."""
+    `unarmed` line, exit 0, as the hook prints one line for no loop kit. Its cost past the commit walk is
+    one `git merge-tree --write-tree` per two-parent merge whose policy blob differs from some parent's,
+    a merge equal to every parent skipped before it (TOOL-dDeclaredLoop-79): 23 ms PINNED each, the
+    median of ten runs over a two-file scratch, measured 2026-11-17 on node d (win32, git 2.54)."""
     try:
         policy, mguard = read_policy_modules()
         read_memory_tree("commit_trailers.py")
@@ -469,8 +472,12 @@ def check_push_range(base, tip):
                     print("%s: push · %s %s adds %s, not graded" % (SAY, kind, sha8, mguard.POLICY))
                 continue
             if kind == "merge":
+                # TOOL-dDeclaredLoop-79 S23: a merge whose blob equals EVERY parent's, an absent one equal only
+                # to an absent one, is skipped before any re-merge, since git's clean re-merge equals it too.
+                if new == old and all(read_policy_blob(p, mguard.POLICY) == new for p in c["parents"][1:]):
+                    continue
                 # TOOL-dDeclaredLoop-69: where git's clean re-merge is computable it is the whole reference,
-                # so neither the combined list nor a parent's equal blob skips the merge.
+                # so neither the combined list nor ONE parent's equal blob skips the merge.
                 # TOOL-dDeclaredLoop-81: a failed re-merge never takes that skip either.
                 state, clean, why = read_remerge_policy(c["parents"])
                 if state in ("uncomputable", "conflicted") and (mguard.POLICY not in listed or old == new):
@@ -567,6 +574,8 @@ PLANTS = {
     "push-merge-carries-trailered": "a --no-ff merge taking a side's trailered, recorded policy change whole",
     "push-merge-resolution-edit": "a merge resolution setting review.max-rounds, with trailer and record, then neither",
     "push-merge-both-sides-clean": "a clean --no-ff merge of side's cap raise and main's review.max-rounds",
+    "push-merge-equal-to-every-parent": "a --no-ff merge of a side and a main each committing a non-policy file, "
+                                        "graded in process",
     "push-merge-conflict-pick": "a conflicting review.max-rounds resolved to side's value, the merge untrailered",
     "push-merge-octopus": "an octopus merge of b1 and b2, each branch and main setting a different key",
     "push-merge-revert-to-unchanged-side": "a run branch merging main and setting main's review.max-rounds back "
@@ -790,7 +799,7 @@ def run_guard_plant(case, top):
                   "push-merge-revert-to-unchanged-side", "push-merge-conflict-elsewhere",
                   "push-merge-resurrect-deleted-policy",
                   "push-merge-resurrect-emptied-policy", "push-merge-both-absent", "push-merge-unparseable-c",
-                  "push-merge-no-write-tree", "push-merge-old-git-usage"):
+                  "push-merge-no-write-tree", "push-merge-old-git-usage", "push-merge-equal-to-every-parent"):
         # TOOL-dDeclaredLoop-59: three keys in separate tables, unchanged lines between, so git merges an
         # edit of each cleanly; every non-merge commit carries its trailer and its change record, each
         # branch's records under a build of its own, since a build numbers its records and two branches
@@ -831,6 +840,15 @@ def run_guard_plant(case, top):
             else:
                 run_scenario("graded", me + ["--push-range", "%s..HEAD" % base], 0,
                              "2 changing %s · 0 finding(s)" % mguard.POLICY)
+        elif case == "push-merge-equal-to-every-parent":
+            # TOOL-dDeclaredLoop-79 S23: the merge's blob equals both parents', so no re-merge runs
+            for branch, rel in (("side", "fx-side.txt"), ("main", "fx-main.txt")):
+                run_fixture_git(top, "checkout", "-q", *(["-b", branch] if branch == "side" else [branch]))
+                write_staged(top, {rel: add_text("a line\n")})
+                run_fixture_git(top, "commit", "-q", "-m", "%s's own file" % branch)
+            run_fixture_git(top, "merge", "-q", "--no-ff", "-m", "merge side", "side")
+            run_grade_in_process(base, {}, [("graded", 0, "0 finding(s)"),
+                                            ("graded, the re-merge count", 0, "merge-tree runs: 0")])
         elif case == "push-merge-revert-to-unchanged-side":
             # TOOL-dDeclaredLoop-69: the merge's blob equals the run branch's, so the combined list never
             # names it; only the clean re-merge, holding main's value, sees the key set back.

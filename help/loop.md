@@ -1857,7 +1857,10 @@ outside the flow, such as the lander's wait on a claim lock, which the loop kit'
   macOS, and on Windows the call bounded and its worktree removed or named as leaked), `normalise` (a command
   printing its working directory three ways and a duration that changes per run, re-run twice to one
   hash) and `normaliser-missing` (the run-gates kit looked for from an empty directory: the re-run is
-  refused by name before it adds a worktree, and `rerun` answers `inconclusive` printing why). `--selftest` runs every case and the two computed-witness cases above, and the
+  refused by name before it adds a worktree, and `rerun` answers `inconclusive` printing why) and
+  `sed-fails` (a stub of that kit's library whose normaliser program `sed -E` refuses: the re-run is
+  refused naming its `sed:` step, no hash taken, its worktree removed, and `rerun` answers
+  `inconclusive`). `--selftest` runs every case and the two computed-witness cases above, and the
   `loop computed witness` gate runs it. A case whose kit is not installed exits 2, never a pass.
 
 ## What stops a read
@@ -1896,7 +1899,9 @@ adopter's to seed. The loop kit is in the default selection, so a default instal
 requires the loop kit: a `--kits` selection naming `roles` names `loop` too or is refused. The
 unattended kit requires the loop kit too, for check 53. The loop kit requires the memory-tree kit,
 because `--check` reads the actor list at the compare base that kit resolves, and reads
-`DESIGN_RECORD` and `MEMORY_ROOT` through that kit's conf reader. `--check` also reads the roles
+`DESIGN_RECORD` and `MEMORY_ROOT` through that kit's conf reader.
+The loop kit requires the run-gates kit too, because loop_witness.py normalises each re-run's output
+with that kit's normaliser before it hashes it. `--check` also reads the roles
 kit's role files for the role items' defaults, without requiring that kit: where it is not
 installed, each role item prints `unarmed`. `loop_witness.py` writes its records through the
 memory-tree kit, and its `hold-inherited` case runs the unattended driver without requiring that kit,

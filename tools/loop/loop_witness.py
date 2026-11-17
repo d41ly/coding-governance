@@ -81,6 +81,8 @@ PLANTS = {"acceptance": "a unit's two commands re-run at its commit, an uncommit
           "timeout-grandchild": "a command whose grandchild outlives its bound, re-run and torn down",
           "normalise": "a command printing its worktree and a duration, re-run twice at one commit",
           "normaliser-missing": "the run-gates kit looked for from an empty directory, the re-run refused by name",
+          "sed-fails": "a stub run-gates library whose write_normaliser writes a program sed -E refuses, the "
+                       "re-run refused naming the sed step",
           "leak-env": "GIT_DIR, GIT_INDEX_FILE and a foreign PWD exported at the caller, a command printing its "
                       "git, GIT_OPTIONAL_LOCKS and PWD re-run",
           "exit0-grandchild": "a command leaving a background grandchild and exiting 0, re-run and torn down"}
@@ -583,9 +585,12 @@ def check_normalise_plant(root, bad):
         bad.append("the two re-runs read %s, not one exit 0 hash other than the empty %s" % (digests, empty))
 
 
-def check_normaliser_missing_plant(root, bad):
+def check_normaliser_missing_plant(root, bad, sed=False):
     """TOOL-dDeclaredLoop-68 AC4: with the run-gates kit looked for from an empty scratch directory the
-    re-run refuses by name before it adds a worktree, and `rerun` reads inconclusive printing why."""
+    re-run refuses by name before it adds a worktree, and `rerun` reads inconclusive printing why. Given
+    `sed` (TOOL-dDeclaredLoop-79 S7, the `sed-fails` plant), the directory holds a stub of that kit's
+    library whose `write_normaliser` writes `s/(/x/`, which `sed -E` refuses under any bash, so the
+    refusal names the `sed:` step and the worktree it added is removed."""
     global KIT
     write_scratch_unit(root)
     run_fixture_git(root, "add", "-A")
@@ -593,6 +598,12 @@ def check_normaliser_missing_plant(root, bad):
     sha = run_fixture_git(root, "rev-parse", "HEAD")
     empty = pathlib.Path(root, "nokit", KIT.name)
     empty.mkdir(parents=True)
+    owed, plant = ("witness: normaliser unavailable — sed:", "sed-fails") if sed else (
+        "witness: normaliser unavailable", "normaliser-missing")
+    if sed:   # the kit's folder name from its resolved directory, the first place the probe looks
+        stub = empty / resolve_kit_dir("run-gates", "lib-attribute.sh", KIT).name / "lib-attribute.sh"
+        stub.parent.mkdir()
+        stub.write_text("write_normaliser() { printf 's/(/x/\\n' > \"$1\"; }\n", encoding="utf-8", newline="\n")
     kit, cwd, out, err = KIT, os.getcwd(), io.StringIO(), io.StringIO()
     KIT = empty
     try:
@@ -609,13 +620,12 @@ def check_normaliser_missing_plant(root, bad):
     finally:
         KIT = kit
         os.chdir(cwd)
-    print("%s: normaliser-missing · %s · %d worktree(s) · rerun exit %d" % (SAY, raised[:200], len(trees), rc))
-    if not raised.startswith("witness: normaliser unavailable"):
-        bad.append("run_witness_commands raised %r, not witness: normaliser unavailable" % raised[:300])
+    print("%s: %s · %s · %d worktree(s) · rerun exit %d" % (SAY, plant, raised[:200], len(trees), rc))
+    if not raised.startswith(owed):
+        bad.append("run_witness_commands raised %r, not %s" % (raised[:300], owed))
     if len(trees) != 1:
         bad.append("git worktree list shows %d worktrees, not the fixture's one: %s" % (len(trees), trees))
-    if rc != 1 or "rerun · inconclusive · " not in out.getvalue() \
-            or "witness: normaliser unavailable" not in err.getvalue():
+    if rc != 1 or "rerun · inconclusive · " not in out.getvalue() or owed not in err.getvalue():
         bad.append("rerun exited %d, not 1 reading inconclusive with the reason on stderr: %s | %s" % (
             rc, out.getvalue()[:300], err.getvalue()[:300]))
 
@@ -751,6 +761,7 @@ def run_fixture(plant):
               "bash-syntax": check_bash_syntax_plant, "timeout-grandchild": check_grandchild_plant,
               "normalise": check_normalise_plant,
               "normaliser-missing": check_normaliser_missing_plant, "leak-env": check_leak_env_plant,
+              "sed-fails": lambda r, b: check_normaliser_missing_plant(r, b, sed=True),
               "exit0-grandchild": check_exit0_grandchild_plant}[plant](root, bad)
     except (subprocess.CalledProcessError, OSError, LookupError, ImportError) as exc:
         detail = getattr(exc, "stderr", "") or ""

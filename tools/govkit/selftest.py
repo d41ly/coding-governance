@@ -2883,7 +2883,8 @@ def check_roles_default() -> None:
     check("OC8 AC2 LIVENESS ...and an unmoved default gains nothing", _same == ([], ""), str(_same))
     # ---- TOOL-dDeclaredLoop-57: `update` refuses a CLAIMED kit whose `requires` it leaves unmet.
     # AC2 and AC3 call the function; AC1 and AC4 run the verb over a committed hand-written receipt.
-    _dl_claim = ["kickoff-manifest", "memory-tree", "roles"]
+    # TOOL-dDeclaredLoop-79 S4: run-gates claimed too, since the loop kit requires it, so each arm grades its pair
+    _dl_claim = ["kickoff-manifest", "memory-tree", "roles", "run-gates"]
 
     def derive_claim_refusal(claimed, gained, dd, why):
         try:
@@ -3641,17 +3642,21 @@ def check_succession(tmp: pathlib.Path) -> None:
           all((t / r).is_file() for r in rows) and p.returncode == 0, p.stdout[-900:] + p.stderr)
 
 
+#: The scratch kits' descriptor body past its `id` line, shared by the vintage arms (TOOL-dDeclaredLoop-73, -79).
+VINTAGE_KIT_BODY = ('home = "demo"\nversion_from = { none = "fixture" }\n\n[check]\nnone = "fixture"\n\n'
+                    '[[files]]\ninclude = "**"\nrole = "engine"\n\n[adopt]\nargv = []\nmutates_index = false\n')
+
+
 def check_requires_vintage(tmp: pathlib.Path) -> None:
     """TOOL-dDeclaredLoop-73 AC1 to AC5: `update`'s claimed-requires refusal grades each kit's
     `requires` at `--to`, not at gov's working tree. A scratch gov's A declares `demo` with no edge;
     B adds `other` outside the default and makes `demo` require it; C takes `demo`'s descriptor out
     while the registry still names it. Each way across A and B is run from the other's checkout, so
     a refusal reading the working tree reds one of the two. WHAT THIS DOES NOT CHECK: a write path's
-    bytes after the refusal, or the gained-prune loop's vintage."""
+    bytes after the refusal; the gained-prune loop's vintage is `check_gained_prune_vintage`'s."""
     gkn = KIT_NAMES["govkit"]
     gk = govkit_module()
-    body = ('home = "demo"\nversion_from = { none = "fixture" }\n\n[check]\nnone = "fixture"\n\n'
-            '[[files]]\ninclude = "**"\nrole = "engine"\n\n[adopt]\nargv = []\nmutates_index = false\n')
+    body = VINTAGE_KIT_BODY
     reg = ('[selection]\ndefault = ["demo"]\n\n[surface]\nglobs = ["{prefix}/*"]\n\n'
            '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n')
     g = tmp / "rv-gov"
@@ -3710,6 +3715,61 @@ def check_requires_vintage(tmp: pathlib.Path) -> None:
     check("[dDL-73] AC5 the shared registry read leaves default-gained's reason byte-identical",
           _why == f"{PFX}{gkn}/registry.toml does not resolve at aaaaaaaa, so the default set there is unknown",
           _why)
+
+
+def check_gained_prune_vintage(tmp: pathlib.Path) -> None:
+    """TOOL-dDeclaredLoop-79 AC19 (S19): `update`'s gained prune grades each default-gained kit's
+    `requires` at `--to`, the vintage the claimed-requires refusal grades. A scratch gov's A declares
+    `demo` in the default and `other` and `extra` outside it, none requiring anything; B adds `extra` to
+    the default and makes it require `other`; D drops that edge; E takes `extra`'s descriptor out while
+    the registry still names it. Each read-only update runs from a checkout whose working tree answers
+    otherwise, so a prune reading the working tree reds each of the three. D to E exits 2: the prune's
+    line, then `read_steps`' refusal of the absent descriptor, reached after the prune (§8 F8 (a)).
+    WHAT THIS DOES NOT CHECK: an update exiting 0 past a gained kit whose requires are unknown, which
+    the landed step reader admits no staging for; the order of the stdout line against the stderr
+    line; a write run's bytes."""
+    gkn = KIT_NAMES["govkit"]
+    kits = ("demo", "other", "extra")
+    reg = '[selection]\ndefault = [%s]\n\n[surface]\nglobs = ["{prefix}/*"]\n' + "".join(
+        '\n[[entry]]\nid = "%s"\ndescriptor = "{prefix}/%s/kit.toml"\n' % (k, k) for k in kits)
+    descs = {f"{k}/kit.toml": f'id = "{k}"\n' + VINTAGE_KIT_BODY.replace('"demo"', f'"{k}"') for k in kits}
+    g = tmp / "gp-gov"
+    a = build_steps_gov(g, {f"{gkn}/registry.toml": reg % '"demo"', **descs, **{f"{k}/a.txt": "a\n" for k in kits}})
+    t = build_target(tmp / "gp-t", f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+    govkit = [sys.executable, str(g / PFX / gkn / "govkit.py")]
+    p = subprocess.run(govkit + ["apply", "--target", str(t), "--kits", "demo"], capture_output=True, text=True,
+                       encoding="utf-8", env=STEPS_ENV)
+    check("[dDL-79] the fixture installs `demo` at A, or every arm over it grades nothing",
+          p.returncode == 0, p.stdout[-900:] + p.stderr[-600:])
+    settle(t, "the install")
+    commits = {"A": a}
+    edge = descs["extra/kit.toml"].replace("home =", 'requires = ["other"]\nhome =')
+    for name, edits in (("B", {f"{gkn}/registry.toml": reg % '"demo", "extra"', "extra/kit.toml": edge}),
+                        ("D", {"extra/kit.toml": descs["extra/kit.toml"]}), ("E", {"extra/kit.toml": None})):
+        for rel, text in edits.items():
+            if text is None:
+                git(g, "rm", "-q", f"{PFX}{rel}")
+            else:
+                (g / PFX / rel).write_bytes(text.encode("utf-8"))
+        settle(g, name)
+        commits[name] = run_gov_git(g, "rev-parse", "HEAD")
+    for at, to, label, rc, owed, owed_err, banned in (
+            ("A", "B", "AC19 a gained extra whose requires at B are unmet is left out from A's checkout, unrefused",
+             0, "default-gained extra NOT installed", "", ("update would leave",)),
+            ("B", "D", "AC19 ...a gained extra D frees of its edge is gained from B's checkout",
+             0, "would gain extra", "", ("extra NOT installed",)),
+            ("D", "E", "AC19 ...and a gained extra whose descriptor E lacks is left out by name, then the step "
+                       "reader refuses the absent descriptor, never the requires-unknown refusal",
+             2, "default-gained extra NOT installed: its requires are unknown at",
+             "the registry names this descriptor for 'extra' and it is absent at",
+             ("update would leave", "'extra' requires are unknown"))):
+        git(g, "checkout", "-q", "--detach", commits[at])
+        p = subprocess.run(govkit + ["update", "--target", str(t), "--to", commits[to]], capture_output=True,
+                           text=True, encoding="utf-8", env=STEPS_ENV)
+        check(f"[dDL-79] {label}", p.returncode == rc and owed in p.stdout and owed_err in p.stderr
+              and not any(b in p.stdout + p.stderr for b in banned),
+              f"rc {p.returncode} · {(p.stdout + p.stderr)[-900:]}")
+    git(g, "checkout", "-q", "main")
 
 
 def check_fanout_step(tmp: pathlib.Path) -> None:
@@ -10116,6 +10176,7 @@ user_skills = "/tmp/gk-fake-skills"
             # ---- Module-level functions, so a slice reaches each without this block.
             check_roles_default()
             check_requires_vintage(tmp3)
+            check_gained_prune_vintage(tmp3)
             check_roles_install(tmp3)
             check_roles_install(tmp3, charter=False)
             check_roles_install(tmp3, runner=True)
