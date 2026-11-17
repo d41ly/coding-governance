@@ -217,7 +217,8 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
                              "each row's loop_lib also run to compare the names it binds with the rule's, then "
                              "the first module with no loop_lib beside it, then with the "
                              "memory-tree kit's tree_lib unlocatable, blocked from import, unparseable, raising "
-                             "at import and lacking both names the loop_lib reads"}
+                             "at import and lacking both names the loop_lib reads, then a module calling each "
+                             "conf reader the loop_lib declares, in three spellings"}
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
 PLANT_TRAILER = '[transitions]\nrecord = ["trailer"]\n'
 PLANT_SPEC = "# TOOL-%s-%d — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n"
@@ -992,6 +993,23 @@ def run_budget_plant(case):
                 print("%s: fixture · conf-read-forms · tree_lib %s · %s" % (SAY, name, got))
                 check(got.startswith("raised") and "govkit update --kits memory-tree" in got and owed in got,
                       "tree_lib %s %s, owed a LoopError naming %r and the update command" % (name, got, owed))
+            # TOOL-dDeclaredLoop-98 S1 to S3: a call of each declared conf reader in three spellings, each call
+            # line owed a reader call; the tuple is read, never typed here
+            members = loop_lib.CONF_READERS
+            check(members, "CONF_READERS is empty")
+            lines, owed = ["import loop_lib", "import loop_lib as ll"], {}
+            for i, m in enumerate(members):
+                lines.append("from loop_lib import %s as r%d" % (m, i))
+                for tag, callee in (("a", "loop_lib." + m), ("b", "ll." + m), ("c", "r%d" % i)):
+                    lines.append("def call_%d_%s(tree): return %s(tree)" % (i, tag, callee))
+                    owed[len(lines)] = (m, callee)
+            write_fixture_files(top / "with-lib", {"reader_calls.py": "\n".join(lines) + "\n"})
+            got = {line for line, kind in derive_conf_reads(top / "with-lib" / "reader_calls.py")
+                   if kind == "reader call"}
+            print("%s: fixture · conf-read-forms · declared readers seen · %d/%d calls answered · %s" % (
+                SAY, len(got & owed.keys()), len(owed), ", ".join(members)))
+            for line, (m, callee) in owed.items():
+                check(line in got, "declared reader not answered: %s as %s" % (m, callee))
         else:
             write_budget_plant(top, case)
         draw = ["draw", "--build", FX_BUILD, "--cause", "fix-pass", "--item"]
