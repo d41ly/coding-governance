@@ -390,3 +390,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-17T01:01:18Z brief · item TOOL-dDeclaredLoop-74 · reason eb0f3712e029 memory/builds/dDeclaredLoop/prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-74-build-brief.md
 
 2026-11-17T01:11:20Z dispatch · item 83f37f3f TOOL-dDeclaredLoop-74 · reason tools/loop/position.py help/loop.md tools/run-gates/selftest-budgets.txt memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/map/features/loop.md memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-74.md memory/builds/dDeclaredLoop/build/2026-11-17-build-TOOL-dDeclaredLoop-74-1-acceptance-ledger.md memory/builds/dDeclaredLoop/build/2026-11-17-build-TOOL-dDeclaredLoop-74-deviation-742.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/backlog/TOOL.md memory/ledger/2026-11.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-17T01:21:15Z brief · item TOOL-dDeclaredLoop-66 · reason be40fc65d076 memory/builds/dDeclaredLoop/prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-66-build-brief.md
