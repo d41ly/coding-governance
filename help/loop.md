@@ -1837,7 +1837,9 @@ outside the flow, such as the lander's wait on a claim lock, which the loop kit'
   alone, and `scope-no-kit` looks for the playbook kit in an empty scratch folder and shows every line
   `unarmed`. The computed-witness cases are `computed-actor` (the item the `acceptance` row serves
   given the `actor` class) and `computed-unserved` (the row serving an item the file does not
-  declare). The files on disk are never changed. `python tools/loop/loop_lib.py --selftest` runs every
+  declare). The case `conf-readers-declared` reads no definition: it finds each function of the loop
+  module that builds a conf path and opens it, and exits 1 naming one that is declared neither a
+  conf reader nor a route, or a declared one that no longer opens a conf. The files on disk are never changed. `python tools/loop/loop_lib.py --selftest` runs every
   case and holds each to the exit and line it owes, one `PASS` or `FAIL` line per case and a summary;
   gov's own `loop definition fixtures` gate runs it, with no guard, so every bar runs these cases.
 - **Check the re-run stand-in:** `python tools/loop/loop_witness.py --fixture --plant acceptance` runs <!-- usage: script:tools/loop/loop_witness.py 6de87be4 -->

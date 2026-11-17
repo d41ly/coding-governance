@@ -201,7 +201,9 @@ PLANTS = {"missing-step": "the step.deploy row taken out",
           "role-pending": "item.build.unit-pass's actor set to role:gov-no-such-role",
           "roles-no-kit": "the roles kit resolved from an empty scratch directory",
           "computed-actor": "the acceptance computed witness's served item given witness class actor",
-          "computed-unserved": "the acceptance computed witness set to serve item.build.acceptanc"}
+          "computed-unserved": "the acceptance computed witness set to serve item.build.acceptanc",
+          "conf-readers-declared": "this module's functions that open a conf compared both ways with its declared "
+                                   "readers and routes, no definition read"}
 #: `--selftest`'s owed answer of each plant (TOOL-dDeclaredLoop-67 S30): its exit, the opening of a line
 #: it prints and a needle that line holds, each pair found by running the plant alone at the pass's base.
 #: A definition the reader refuses prints `loop: <path>: <why>`, a graded refusal `loop: refused · <why>`.
@@ -238,7 +240,8 @@ PLANT_OWED = {"missing-step": (1, "loop: ", "the step step.deploy is missing"),
               "role-pending": (0, "loop: item item.build.unit-pass · role:gov-no-such-role · pending", ""),
               "roles-no-kit": (0, "loop: item ", " · unarmed · no roles kit holding"),
               "computed-actor": (1, "loop: refused · ", "whose witness class actor is refused"),
-              "computed-unserved": (1, "loop: refused · ", "serves 'item.build.acceptanc'")}
+              "computed-unserved": (1, "loop: refused · ", "serves 'item.build.acceptanc'"),
+              "conf-readers-declared": (0, "loop: conf readers declared · ", " opener(s) · ")}
 #: The plants whose break is in what the scope verb reads rather than in the definition, so `--check`
 #: runs whole and the scope verb runs after it.
 SCOPE_PLANTS = ("scope-selected", "scope-no-kit")
@@ -1009,6 +1012,52 @@ def derive_conf_reads(path):
     return sorted(hits)
 
 
+# The functions of this module that open a conf and answer a resolved root, never a conf's values: the
+# sanctioned route the no-own-conf-read rule never grades, declared beside `CONF_READERS` for the
+# `conf-readers-declared` plant (TOOL-dDeclaredLoop-99 S2).
+CONF_ROUTES = ("resolve_memory_root_source",)
+
+
+def derive_conf_openers(loop_lib_path):
+    """The sorted names of the module-level `def` and `async def` nodes of the file at `loop_lib_path`,
+    outside `derive_fixture_boundary`, whose own body, a nested `def`, `async def` or `class` excluded,
+    both builds a conf path and opens content (TOOL-dDeclaredLoop-99 S1). A conf path is an operand of
+    `/`, or a positional argument of a `join`, `Path` or `PurePath` call, that `check_conf_name` answers
+    or that is a name or attribute naming a member of `derive_conf_constants`' answer; an open is a call
+    of `parse_conf`, `open`, `read_bytes` or `read_text`, or of an attribute of the name `subprocess`.
+    A callee is a name by its id and an attribute by its attr. Read by `ast.parse`, never an import;
+    `derive_conf_constants`' refusals are this one's. NOT SEEN: a path built in one function and opened
+    in another, a conf name composed at run time, and `subprocess` reached under another name."""
+    import ast
+    consts = derive_conf_constants(loop_lib_path)
+    path = pathlib.Path(loop_lib_path)
+    tree = ast.parse(path.read_text(encoding="utf-8"), str(path))
+    bounded = {id(f) for f in derive_fixture_boundary(tree)}
+    found = []
+    for f in tree.body:
+        if not isinstance(f, (ast.FunctionDef, ast.AsyncFunctionDef)) or id(f) in bounded:
+            continue
+        body, todo = [], list(f.body)
+        while todo:
+            n = todo.pop()
+            if not isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                body.append(n)
+                todo.extend(ast.iter_child_nodes(n))
+        calls = [(c, c.func.id if isinstance(c.func, ast.Name) else getattr(c.func, "attr", None))
+                 for c in body if isinstance(c, ast.Call)]
+        operands = [o for n in body if isinstance(n, ast.BinOp) and isinstance(n.op, ast.Div)
+                    for o in (n.left, n.right)] + [a for c, callee in calls
+                                                   if callee in ("join", "Path", "PurePath") for a in c.args]
+        builds = any(check_conf_name(o) or (isinstance(o, ast.Name) and o.id in consts)
+                     or (isinstance(o, ast.Attribute) and o.attr in consts) for o in operands)
+        opens = any(callee in ("parse_conf", "open", "read_bytes", "read_text") or (
+            isinstance(c.func, ast.Attribute) and isinstance(c.func.value, ast.Name)
+            and c.func.value.id == "subprocess") for c, callee in calls)
+        if builds and opens:
+            found.append(f.name)
+    return sorted(found)
+
+
 def read_actor_rows(kit_dir):
     """The actor-witness list's lines in `kit_dir`, blank lines dropped; LoopError where it does not read."""
     path = pathlib.Path(kit_dir) / ACTOR_LIST
@@ -1573,6 +1622,12 @@ def main(argv):
               "<entry>..." % (
             "|".join(PLANTS), "|".join(DECLARATION_SITES)), file=sys.stderr)
         return 2
+    if plant == "conf-readers-declared":   # TOOL-dDeclaredLoop-99 S3: this file's conf openers, no definition read
+        print("loop: fixture · plant %s · %s" % (plant, PLANTS[plant]))
+        refusals = check_conf_readers_plant(pathlib.Path(__file__))
+        for r in refusals:
+            print("loop: refused · %s" % r)
+        return 1 if refusals else 0
     root = next((d for d in (kit_dir, *kit_dir.parents) if (d / ".git").exists()), kit_dir)
     if argv == ["--scopes"]:
         try:
@@ -1716,6 +1771,30 @@ def check_scope_plant(plant, layers, scratch, kit_dir, root, tags):
     armed = [ln for ln in lines if " · unarmed · " not in ln]
     return ([] if layers is None else ["the inputs read layer tags with no playbook kit"]) + [
         "a scope line with no playbook kit is armed: %s" % ln for ln in armed]
+
+
+def check_conf_readers_plant(loop_lib_path):
+    """The `conf-readers-declared` plant's refusals (TOOL-dDeclaredLoop-99 S3): `derive_conf_openers` over
+    `loop_lib_path` compared both ways with `CONF_READERS` and `CONF_ROUTES`, one refusal per mismatch,
+    in this order: an empty answer; a derived opener in neither tuple; a member of either tuple this
+    module binds as a function that the answer lacks. A member this module does not bind is outside the
+    comparison and named on the pass line; a LoopError is one refusal, its text."""
+    try:
+        derived = derive_conf_openers(loop_lib_path)
+    except LoopError as e:
+        return [str(e)]
+    tuples = (("CONF_READERS", CONF_READERS), ("CONF_ROUTES", CONF_ROUTES))
+    declared = [m for _, members in tuples for m in members]
+    refusals = [] if derived else ["no conf opener found in loop_lib.py"]
+    refusals += ["%s opens a conf and is in neither CONF_READERS nor CONF_ROUTES" % d
+                 for d in derived if d not in declared]
+    refusals += ["%s is in %s and opens no conf" % (m, label) for label, members in tuples for m in members
+                 if callable(globals().get(m)) and m not in derived]
+    if not refusals:
+        print("loop: conf readers declared · %d opener(s) · %s · outside this module %s" % (
+            len(derived), " ".join(derived),
+            " ".join(m for m in declared if not callable(globals().get(m))) or "none"))
+    return refusals
 
 
 if __name__ == "__main__":

@@ -5583,6 +5583,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_conf_readers_plant",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "check_conflicts",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -10431,6 +10436,11 @@
       "id": "derive_conf_key",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
+    },
+    {
+      "id": "derive_conf_openers",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "derive_conf_reads",
