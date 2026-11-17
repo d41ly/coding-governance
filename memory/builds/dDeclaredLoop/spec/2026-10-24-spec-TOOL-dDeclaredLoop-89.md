@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-89 — the conf-constant class covers a module name a global loader rebinds, and module-level walrus, for and with targets
 
-**Status:** DEFERRED · rev-5 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 44 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-5 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 44 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-89-deviation-892.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-89-deviation-892.md) | deviation | — |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-89-reground-brief.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-89-reground-brief.md) | research | — |
 | [2026-11-17-prompt-TOOL-dDeclaredLoop-89-1-spec-writer.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-89-1-spec-writer.md) | journal | — |
+| [2026-11-17-prompt-TOOL-dDeclaredLoop-89-build-brief.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-89-build-brief.md) | journal | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-89-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-89-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-90 |
 
 <!-- /gen:spec-records -->

@@ -97,7 +97,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 100 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 100 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13
 ids TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26
 ids TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-35 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39
@@ -199,7 +199,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-86 — the round-6 spec audit's 22 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-86.md) | 42 | 2 | CLOSED | rev-8 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-87 — the conf-constant kind is stated as a class: any module-level binding whose value holds a conf name, and every import that binds it](spec/2026-10-24-spec-TOOL-dDeclaredLoop-87.md) | 43 | 2 | CLOSED | rev-6 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-88 — the round-7 spec audit's 36 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-88.md) | 44 | 2 | DEFERRED | rev-6 | 2026-11-17 |
-| [TOOL-dDeclaredLoop-89 — the conf-constant class covers a module name a global loader rebinds, and module-level walrus, for and with targets](spec/2026-10-24-spec-TOOL-dDeclaredLoop-89.md) | 44 | 2 | DEFERRED | rev-5 | 2026-11-17 |
+| [TOOL-dDeclaredLoop-89 — the conf-constant class covers a module name a global loader rebinds, and module-level walrus, for and with targets](spec/2026-10-24-spec-TOOL-dDeclaredLoop-89.md) | 44 | 2 | INPROGRESS | rev-5 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-90 — the round-8 spec audit's 22 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-90.md) | 45 | 2 | DEFERRED | rev-6 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-91 — derive_conf_rebinds reads every position a module evaluates: class bodies, defaults, decorators and bases](spec/2026-10-24-spec-TOOL-dDeclaredLoop-91.md) | 45 | 2 | DEFERRED | rev-3 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-92 — the round-9 spec audit's 17 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-92.md) | 46 | 2 | DEFERRED | rev-4 | 2026-10-24 |
@@ -213,7 +213,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 841 bound to this build, across 4 record folder(s).
+Records: 842 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
