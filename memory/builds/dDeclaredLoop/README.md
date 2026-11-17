@@ -205,15 +205,15 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-92 — the round-9 spec audit's 17 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-92.md) | 46 | 2 | CLOSED | rev-5 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-93 — 92 AC16 states the push-merge-tree-fatal plant's exit as 1, the code every sibling states](spec/2026-10-24-spec-TOOL-dDeclaredLoop-93.md) | 47 | 2 | CLOSED | rev-3 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-94 — the round-10 spec audit's 24 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-94.md) | 48 | 2 | CLOSED | rev-4 | 2026-11-17 |
-| [TOOL-dDeclaredLoop-95 — the loop kit reads `.memory-tree.conf` through `load_tree_lib`, so 94 AC1's route probe holds on the built tree](spec/2026-10-24-spec-TOOL-dDeclaredLoop-95.md) | 49 | 2 | DEFERRED | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-96 — the round-11 spec audit's 13 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-96.md) | 50 | 2 | DEFERRED | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-97 — the no-own-conf-read rule reads its reader calls from one declared tuple, `CONF_READERS`, which holds `read_tree_conf`](spec/2026-10-24-spec-TOOL-dDeclaredLoop-97.md) | 50 | 2 | DEFERRED | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-95 — the loop kit reads `.memory-tree.conf` through the memory-tree kit's `read_design_conf` alone, and `load_tree_lib`'s tuple holds every name read on its result](spec/2026-10-24-spec-TOOL-dDeclaredLoop-95.md) | 49 | 2 | DEFERRED | rev-3 | 2026-11-17 |
+| [TOOL-dDeclaredLoop-96 — the round-11 spec audit's 13 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-96.md) | 50 | 2 | DEFERRED | rev-3 | 2026-11-17 |
+| [TOOL-dDeclaredLoop-97 — the no-own-conf-read rule reads its reader calls from one declared tuple, `CONF_READERS`, which holds the three callee names it answers](spec/2026-10-24-spec-TOOL-dDeclaredLoop-97.md) | 50 | 2 | DEFERRED | rev-2 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-98 — the `conf-read-forms` plant proves on every run that the rule answers a call of each declared conf reader](spec/2026-10-24-spec-TOOL-dDeclaredLoop-98.md) | 50 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-99 — every `loop_lib.py` function that opens a conf is in `CONF_READERS`, checked both ways by a definition plant](spec/2026-10-24-spec-TOOL-dDeclaredLoop-99.md) | 50 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 873 bound to this build, across 4 record folder(s).
+Records: 877 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
