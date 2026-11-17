@@ -53,6 +53,7 @@ resolved under delegation reads as major; whether the disposition record's write
 breakpoint firing, which is the main loop's `--trigger`.
 """
 import argparse
+import ast
 import contextlib
 import io
 import os
@@ -70,7 +71,7 @@ if str(KIT) not in sys.path:
 from adapt import read_disposition_release  # noqa: E402
 from composition import build_composition_base, read_step_composition, read_tag_policy  # noqa: E402
 from loop_items import read_composed_items  # noqa: E402
-from loop_lib import (derive_conf_reads, read_memory_tree, read_steps, resolve_kit_dir,  # noqa: E402
+from loop_lib import (derive_conf_reads, derive_fixture_boundary, read_memory_tree, read_steps, resolve_kit_dir,  # noqa: E402
                       resolve_memory_root, run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_transition import (FX_BUILD, FX_SPEC, FX_UNIT, read_build_headers, read_build_specs,  # noqa: E402
@@ -276,7 +277,7 @@ def read_stage_review(build, root, stage, rev=None):
 
 
 # ------------------------------------------------------------------------------------------ the plants
-def write_pre_placement_tree(memory_root="memory", opened=("memory/builds/tPre/README.md",), confs=None):
+def write_pre_placement_plant(memory_root="memory", opened=("memory/builds/tPre/README.md",), confs=None):
     """`(top, the scratch's loop kit)`: `build_scratch_tree`'s kits commit, the placement; each README of
     `opened` added on a root commit it does not precede and merged in; then `confs`, `{path: text}`, else
     `.memory-tree.conf` at `MEMORY_ROOT=<memory_root>`, with `autonomy = "three-gates"`,
@@ -477,10 +478,12 @@ def run_breakpoint_plant(case):
         elif case == "no-own-conf-read":   # TOOL-dDeclaredLoop-76 AC1: this module's own file, no scratch tree
             own = pathlib.Path(__file__)
             try:
+                bound = [f.name for f in derive_fixture_boundary(ast.parse(own.read_text(encoding="utf-8"), str(own)))]
                 hits = derive_conf_reads(own)
             except SyntaxError as e:
-                hits = []
+                bound, hits = [], []
                 check(False, "%s does not parse: %s" % (own.name, e))
+            print("%s: fixture · fixture boundary: %d functions — %s" % (SAY, len(bound), ", ".join(bound) or "none"))
             for line, kind in hits:
                 print("%s: fixture · conf read · %s:%d %s" % (SAY, own.name, line, kind))
             check(not hits, "%d conf read(s) in %s" % (len(hits), own.name))
@@ -490,12 +493,12 @@ def run_breakpoint_plant(case):
             readme = "%s/builds/%s/README.md"
             records = case == "pre-placement-records-root"
             if case == "unattended-root":
-                scratch, kit = write_pre_placement_tree("records", (readme % ("records", "tRec"),), {
+                scratch, kit = write_pre_placement_plant("records", (readme % ("records", "tRec"),), {
                     ".unattended.conf": "MEMORY_ROOT=records\n", ".memory-tree.conf": ""})
             else:
-                scratch, kit = (write_pre_placement_tree("records", (readme % ("records", "tRec"),
+                scratch, kit = (write_pre_placement_plant("records", (readme % ("records", "tRec"),
                                                                      readme % ("memory", "tWrong")))
-                                if records else write_pre_placement_tree())
+                                if records else write_pre_placement_plant())
             try:
                 three = [plan, gate % ("at", "item.design.exit"), closing, gate % ("before", "item.deploy.mandate")]
                 pre = "breakpoint: owner gate · %s %s · owner · autonomy · " + PRE_PLACEMENT

@@ -95,6 +95,7 @@ as one; two byte-identical rows written before the id, which a union merge of th
 the `research` cause's site, which no writer reaches yet.
 """
 import argparse
+import ast
 import contextlib
 import datetime
 import io
@@ -111,7 +112,7 @@ KIT = pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from adapt import read_disposition_release, read_run_file  # noqa: E402
-from loop_lib import (derive_conf_reads, read_memory_tree, resolve_memory_root,  # noqa: E402
+from loop_lib import (derive_conf_reads, derive_fixture_boundary, read_memory_tree, resolve_memory_root,  # noqa: E402
                       resolve_memory_root_source, run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_transition import (BUDGET_FIELDS, FX_BUILD, FX_SPEC, FX_UNIT, VALUE,  # noqa: E402
@@ -713,13 +714,30 @@ def run_budget_plant(case):
         elif case == "no-own-conf-read":   # TOOL-dDeclaredLoop-76 AC1: this module's own file, no scratch tree
             own = pathlib.Path(__file__)
             try:
+                bound = [f.name for f in derive_fixture_boundary(ast.parse(own.read_text(encoding="utf-8"), str(own)))]
                 hits = derive_conf_reads(own)
             except SyntaxError as e:
-                hits = []
+                bound, hits = [], []
                 check(False, "%s does not parse: %s" % (own.name, e))
+            print("%s: fixture · fixture boundary: %d functions — %s" % (SAY, len(bound), ", ".join(bound) or "none"))
             for line, kind in hits:
                 print("%s: fixture · conf read · %s:%d %s" % (SAY, own.name, line, kind))
             check(not hits, "%d conf read(s) in %s" % (len(hits), own.name))
+            # TOOL-dDeclaredLoop-80 AC2: the boundary's lasting arm, a whole-token match over defs alone
+            staged = top / "staged.py"
+            write_fixture_files(top, {staged.name: 'def check_plant_root(tree): return tree / ".unattended.conf"\n'
+                                      'async def build_fixture_tree(t): return ".memory-tree.conf"\n'
+                                      'def read_planted_root(t): return ".unattended.conf"\n'
+                                      'class fixture_rows:\n    CONF = ".memory-tree.conf"\n'})
+            bound = [f.name for f in derive_fixture_boundary(ast.parse(staged.read_text(encoding="utf-8")))]
+            hits = derive_conf_reads(staged)
+            print("%s: fixture · %s · fixture boundary: %d functions — %s" % (SAY, staged.name, len(bound),
+                                                                             ", ".join(bound) or "none"))
+            for line, kind in hits:
+                print("%s: fixture · conf read · %s:%d %s" % (SAY, staged.name, line, kind))
+            check(bound == ["check_plant_root", "build_fixture_tree"] and hits == [(3, "conf name"), (5, "conf name")],
+                  "%s answered boundary %s and hits %s, owed the first two defs and lines 3 and 5" % (
+                      staged.name, bound, hits))
         elif case == "root-source":   # TOOL-dDeclaredLoop-76 AC3: each root paired with the conf it came from
             for name, confs, owed in (("driver", {".unattended.conf": "MEMORY_ROOT=records\n"}, ("records", ".unattended.conf")),
                                       ("tree", {".memory-tree.conf": "MEMORY_ROOT=records\n"}, ("records", ".memory-tree.conf")),

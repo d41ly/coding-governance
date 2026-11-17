@@ -783,15 +783,26 @@ def resolve_memory_root(tree):
     return resolve_memory_root_source(tree)[0]
 
 
+def derive_fixture_boundary(tree):
+    """The fixture code of a parsed module, sorted by line: every `def` and `async def`, nested ones
+    included, whose name split on `_` holds the whole token `fixture` or `plant`, case-sensitive; a
+    class, a module constant and a name holding neither token stay out (TOOL-dDeclaredLoop-80 S1)."""
+    import ast
+    return sorted((f for f in ast.walk(tree) if isinstance(f, (ast.FunctionDef, ast.AsyncFunctionDef))
+                   and {"fixture", "plant"} & set(f.name.split("_"))), key=lambda f: f.lineno)
+
+
 def derive_conf_reads(path):
     """`[(line, kind)]` sorted by line, one per conf read in the module at `path`, graded on its syntax
     tree: kind `reader call` for a call whose callee, a name or an attribute, is `read_design_conf`,
     `read_driver_conf` or `parse_conf`; kind `conf name` for a string constant ending `.memory-tree.conf`
     or `.unattended.conf`, an f-string's literal part included, that is not the docstring of the module,
-    a class, a function or an `async def`. A comment is not in the tree. SyntaxError where the module
-    does not parse (TOOL-dDeclaredLoop-76)."""
+    a class, a function or an `async def`. A comment is not in the tree. Every node a definition of
+    `derive_fixture_boundary` encloses, its decorators and signature included, is passed over
+    (TOOL-dDeclaredLoop-80). SyntaxError where the module does not parse (TOOL-dDeclaredLoop-76)."""
     import ast
     tree = ast.parse(pathlib.Path(path).read_text(encoding="utf-8"), str(path))
+    bounded = {id(n) for f in derive_fixture_boundary(tree) for n in ast.walk(f)}
     # ponytail: gen_build_index.py's scan_glob_readers builds the same set; one copy once 82 S8 shares it
     docs = {id(node.body[0].value) for node in ast.walk(tree)
             if isinstance(node, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
@@ -799,6 +810,8 @@ def derive_conf_reads(path):
             and isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str)}
     hits = []
     for node in ast.walk(tree):
+        if id(node) in bounded:
+            continue
         if isinstance(node, ast.Call):
             callee = node.func
             name = callee.id if isinstance(callee, ast.Name) else getattr(callee, "attr", None)

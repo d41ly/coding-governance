@@ -10753,6 +10753,11 @@
       "file": "tools/playbook/overlay.py"
     },
     {
+      "id": "derive_fixture_boundary",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "derive_fixture_files",
       "kind": "function",
       "file": "tools/playbook/writing_practice.py"
@@ -36753,7 +36758,7 @@
       "file": "tools/govkit/selftest.py"
     },
     {
-      "id": "write_pre_placement_tree",
+      "id": "write_pre_placement_plant",
       "kind": "function",
       "file": "tools/loop/breakpoints.py"
     },
