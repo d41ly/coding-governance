@@ -71,7 +71,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 13 unit(s) · node a · opened 2026-11-14 · streams tooling
+**Build status:** SPECCED · 14 unit(s) · node a · opened 2026-11-14 · streams tooling
 ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10 TOOL-aTrimmedWait-11 TOOL-aTrimmedWait-12 TOOL-aTrimmedWait-13 TOOL-aTrimmedWait-14
 ids TOOL-aTrimmedWait-15 TOOL-aTrimmedWait-16 TOOL-aTrimmedWait-17 TOOL-aTrimmedWait-18
 
@@ -91,16 +91,17 @@ ids TOOL-aTrimmedWait-15 TOOL-aTrimmedWait-16 TOOL-aTrimmedWait-17 TOOL-aTrimmed
 | [TOOL-aTrimmedWait-11 — close repair, inherited: the hygiene suite's partition arm sets aside check 26's cache-hit count](spec/2026-11-15-spec-TOOL-aTrimmedWait-11.md) | 10 | 2 | CLOSED | rev-5 | 2026-11-15 |
 | [TOOL-aTrimmedWait-12 — the reconcile with local main at 5d48501da: its eight conflicts resolved so the landing merge is clean](spec/2026-11-16-spec-TOOL-aTrimmedWait-12.md) | 11 | 2 | CLOSED | rev-2 | 2026-11-16 |
 | [TOOL-aTrimmedWait-13 — close repair: the driver suite's parity table gains the `--check-specs` row unit 1 owed](spec/2026-11-16-spec-TOOL-aTrimmedWait-13.md) | 12 | 1 | CLOSED | rev-1 | 2026-11-16 |
+| [TOOL-aTrimmedWait-18 — the reconcile with local main at 8eda4a5a0: its five conflicts resolved and the coincident floor summed, so the landing merge is clean](spec/2026-11-17-spec-TOOL-aTrimmedWait-18.md) | 13 | 2 | SPECCED | rev-1 | 2026-11-17 |
 <!-- /gen:build-units -->
 
-Records: 68 bound to this build, across 4 record folder(s).
+Records: 69 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10 TOOL-aTrimmedWait-11 TOOL-aTrimmedWait-12
-TOOL-aTrimmedWait-13.
+TOOL-aTrimmedWait-13 TOOL-aTrimmedWait-18.
 
-Ids whose spec moved past its audited revision: none — 0 of 13 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 14 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -119,6 +120,7 @@ Ids whose spec moved past its audited revision: none — 0 of 13 unit id(s) carr
 | 10 | `TOOL-aTrimmedWait-11` | no |
 | 11 | `TOOL-aTrimmedWait-12` | no |
 | 12 | `TOOL-aTrimmedWait-13` | no |
+| 13 | `TOOL-aTrimmedWait-18` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
