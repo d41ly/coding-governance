@@ -62,6 +62,19 @@ def parse_leg_names(text: str) -> set:
     return {r["name"] for r in rows if isinstance(r, dict) and isinstance(r.get("name"), str)}
 
 
+def derive_docstring_ids(tree) -> set:
+    """The `id()` of each docstring constant in a parsed module: the module's and that of every class,
+    function and `async def` whose body opens with a string constant. A docstring is prose, so the
+    walks that grade a module's string constants pass these over: `gen_build_index.py#scan_glob_readers`
+    and the loop kit's `derive_conf_reads` (TOOL-dDeclaredLoop-82 S8). The ids hold while `tree` lives."""
+    import ast
+
+    return {id(node.body[0].value) for node in ast.walk(tree)
+            if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef))
+            and node.body and isinstance(node.body[0], ast.Expr)
+            and isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str)}
+
+
 def read_policy_value(key, root):
     """`key` at `root`'s landed revision, through the policy kit's `policy.py get`, found beside this
     kit since a kit imports no sibling. LookupError where no policy kit resolves; ValueError, the

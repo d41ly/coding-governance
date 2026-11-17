@@ -185,23 +185,26 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
                     "then the default value",
           "driver-exhausted": "the driver's --exhausted unspent, then spent under close-incomplete with one unit "
                               "open: the rounds, the dispatches and the budget-exhausted abort",
-          "unattended-root": "the build moved under records, .unattended.conf naming MEMORY_ROOT=records and the "
+          "unattended-root": "the build moved under records, the driver's conf naming MEMORY_ROOT=records and the "
                              "memory tree's conf none, two draws",
-          "confs-disagree": ".unattended.conf naming MEMORY_ROOT=records beside the memory tree's memory, one draw",
+          "confs-disagree": "the driver's conf naming MEMORY_ROOT=records beside the memory tree's memory, one draw",
           "no-own-conf-read": "this module's own file graded on its syntax tree for a reader call or a conf name, "
                               "no scratch repository",
-          "root-source": "MEMORY_ROOT=records in .unattended.conf, then in .memory-tree.conf, then neither, each "
-                         "folder's root and the conf it came from",
+          "root-source": "MEMORY_ROOT=records in the driver's conf, then in the memory tree's conf, then neither, then "
+                         "each conf alone with the key unset, each folder's root and the conf it came from",
           "attr-missing": "a draw appended to a log record in a scratch repository with no .gitattributes, then one "
                           "under the union line",
           "patch-concurrent": "the sourced driver's draw for tFixPatch, its claims read standing in with one live row "
                               "naming tFixPatchTwo, a patch of the same origin, then one naming tFix, no patch",
-          "unset-driver-root": ".unattended.conf setting no MEMORY_ROOT beside the memory tree's records, one draw; "
+          "unset-driver-root": "the driver's conf setting no MEMORY_ROOT beside the memory tree's records, one draw; "
                                "then the build moved under records, both confs naming it, a draw and ending --explain",
           "patch-claims-unread": "the sourced driver's draw for tFixPatch, its claims read standing in as failed",
-          "trailing-slash-agree": ".unattended.conf naming MEMORY_ROOT=memory/ beside the memory tree's memory, "
+          "trailing-slash-agree": "the driver's conf naming MEMORY_ROOT=memory/ beside the memory tree's memory, "
                                   "one draw",
-          "no-confs": "the memory tree's conf taken out and no .unattended.conf written, the root read"}
+          "no-confs": "the memory tree's conf taken out and no driver's conf written, the root read",
+          "conf-read-forms": "the conf-read rule over scratch modules beside a loop_lib binding the driver's conf's "
+                             "name: a constant, the same line in fixture code, a bash string, an aliased reader, "
+                             "docstrings alone, then the first module with no loop_lib beside it"}
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
 PLANT_TRAILER = '[transitions]\nrecord = ["trailer"]\n'
 PLANT_SPEC = "# TOOL-%s-%d — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n"
@@ -765,7 +768,12 @@ def run_budget_plant(case):
         elif case == "root-source":   # TOOL-dDeclaredLoop-76 AC3: each root paired with the conf it came from
             for name, confs, owed in (("driver", {".unattended.conf": "MEMORY_ROOT=records\n"}, ("records", ".unattended.conf")),
                                       ("tree", {".memory-tree.conf": "MEMORY_ROOT=records\n"}, ("records", ".memory-tree.conf")),
-                                      ("neither", {}, ("memory", "default"))):
+                                      ("neither", {}, ("memory", "default")),
+                                      # TOOL-dDeclaredLoop-82 AC15 (S15): each conf alone, the key unset
+                                      ("driver-unset", {".unattended.conf": 'PHASES_EXTRA=""\n'},
+                                       ("memory", ".unattended.conf")),
+                                      ("tree-unset", {".memory-tree.conf": 'FAMILIES="tool:TOOL"\n'},
+                                       ("memory", ".memory-tree.conf"))):
                 folder = top / name
                 folder.mkdir()
                 run_fixture_git(folder, "init", "-q", "--template=", "-b", "main")
@@ -776,6 +784,33 @@ def run_budget_plant(case):
                     got = ("refused", str(e))
                 print("%s: fixture · root-source · %s · %s · %s" % (SAY, name, got[0], got[1]))
                 check(got == (owed, owed[0]), "%s answered %s, owed %s" % (name, got, owed))
+        elif case == "conf-read-forms":   # TOOL-dDeclaredLoop-82 AC1, AC10, AC16 (S1, S10, S16): one row per form
+            first = "import loop_lib as ll\ndef read_root(tree): return (tree / ll.UNATTENDED_CONF).read_text()\n"
+            rows = (("constant", first, [(2, "conf constant")]),
+                    ("fixture-code", first.replace("read_root", "check_plant_root"), []),
+                    ("bash-string", "import subprocess\ndef read_root_bash():\n    return subprocess.run(['bash', "
+                                    "'-c', '. \"$ROOT/.unattended.conf\"; printf %s \"$MEMORY_ROOT\"'])\n",
+                     [(3, "conf name")]),
+                    ("aliased-reader", "from loop_lib import read_driver_conf as rdc\n"
+                                       "def read_root(tree): return rdc(tree, ['MEMORY_ROOT'])\n",
+                     [(2, "reader call")]),
+                    ("docstrings", '"""Names .unattended.conf."""\nclass Rows:\n    """Names .unattended.conf."""\n'
+                                   'def read_rows():\n    """Names .unattended.conf."""\n'
+                                   'async def read_rows_later():\n    """Names .unattended.conf."""\n', []))
+            write_fixture_files(top / "with-lib", {"loop_lib.py": 'UNATTENDED_CONF = ".unattended.conf"\n'})
+            for name, text, owed in rows:
+                write_fixture_files(top / "with-lib", {name + ".py": text})
+                got = derive_conf_reads(top / "with-lib" / (name + ".py"))
+                print("%s: fixture · conf-read-forms · %s · %s" % (SAY, name, ", ".join(
+                    "line %d %s" % hit for hit in got) or "no hit"))
+                check(got == owed, "%s answered %s, owed %s" % (name, got, owed))
+            write_fixture_files(top / "no-lib", {"constant.py": first})
+            try:
+                got = "answered %s" % derive_conf_reads(top / "no-lib" / "constant.py")
+            except OSError as e:
+                got = "raised %s" % e
+            print("%s: fixture · conf-read-forms · constant, no loop_lib beside it · %s" % (SAY, got))
+            check(got.startswith("raised") and "loop_lib.py" in got, "the module with no loop_lib beside it %s" % got)
         else:
             write_budget_plant(top, case)
         draw = ["draw", "--build", FX_BUILD, "--cause", "fix-pass", "--item"]

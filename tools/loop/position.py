@@ -187,7 +187,9 @@ PLANTS = {"steps": "unit 1 deployed, unit 2 built, unit 3 designed: act at unit 
           "ssh-userinfo-remote": "scp-remote over ssh://user@example.com/up.git: not stale-remote, read from FETCH_HEAD, "
                                  "nothing skipped",
           "url-forms": "stale-remote's aged reflog, then a fetch failing at connect from a URL carrying a password: "
-                       "stale-remote, FETCH_HEAD skipped as empty, no password printed; each url-forms pair as tabled",
+                       "stale-remote, FETCH_HEAD skipped as empty, no password printed; each url-forms pair as tabled; "
+                       "then FETCH_HEAD naming main of another URL, skipped as no line for main of origin, no "
+                       "password printed; then a fetch over git's dumb http from 127.0.0.1, its written URL owed equal",
           "plan-line": "the driver's next: line equals render_next_line's, in three states",
           "status-line": "the driver's --status prints the engine's position line"}
 FX_SLUG = "tPos"
@@ -211,7 +213,10 @@ FX_URL_FORMS = (("git@example.com:up.git", "example.com:up", "equal"),
                 ("https://user:tok@host.example/r.git", "https://host.example/r", "equal"),   # TOOL-dDeclaredLoop-79 S21
                 ("https://user@host.example/r/", "https://host.example/r", "equal"),
                 ("git@other.example:up.git", "example.com:up", "unequal"),
-                ("C:/x@b/up.git", "C:/y@b/up", "unequal"))
+                ("C:/x@b/up.git", "C:/y@b/up", "unequal"),
+                # TOOL-dDeclaredLoop-82 S19: the regression pairs unattended.sh's norm_endpoint comment records
+                ("github.com:alice/repo", "github.com:bob/repo", "unequal"),
+                ("git@github.com:alice/repo", "github.com:alice/repo", "equal"))
 
 
 # ------------------------------------------------------------------------------------------ the reads
@@ -1106,6 +1111,52 @@ def check_plant(case, pos, rc, repo):
     return misses
 
 
+def check_url_forms_rows(top, repo, definition, handover):
+    """The misses of the `url-forms` plant's two later readings (TOOL-dDeclaredLoop-82): `FETCH_HEAD`
+    written as one line for main of another URL and read with no fetch, owed `stale-remote`, the skip
+    entry naming the remote and no `SECRET` on any line or in the JSON (S3); then the git-written row,
+    a fetch over git's dumb HTTP protocol from `http.server` on 127.0.0.1 with a user part in the URL
+    and every credential helper cleared, `derive_fetch_url` of the configured URL owed equal to the
+    URL git wrote (S23). It runs last, so its `FETCH_HEAD` is no earlier reading's."""
+    import contextlib
+    import functools
+    import http.server
+    import io
+    import threading
+    misses = []
+    sha = run_fixture_git(repo, "rev-parse", "main")
+    write_fixture_files(repo, {".git/FETCH_HEAD": "%s\t\tbranch 'main' of https://other.example/r\n" % sha})
+    pos = derive_plant_position(repo, definition, handover)
+    lines = render_position_lines(pos)
+    for line in lines:
+        print(line)
+    skip = "read — FETCH_HEAD · skipped — no line for main of origin"
+    if pos["answer"] != "stale-remote" or skip not in lines or any(
+            "SECRET" in s for s in lines + [render_next_line(pos), json.dumps(pos)]):
+        misses.append("the FETCH_HEAD naming another URL read %s" % json.dumps(pos)[:600])
+    run_fixture_git(top / "o.git", "update-server-info")
+    server = http.server.ThreadingHTTPServer(
+        ("127.0.0.1", 0), functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(top)))
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    try:
+        configured = "http://user:tok@127.0.0.1:%d/o.git" % server.server_address[1]
+        run_fixture_git(repo, "remote", "add", "web", configured)
+        with contextlib.redirect_stderr(io.StringIO()):   # the handler's request log
+            rc, out = read_git(repo, "-c", "credential.helper=", "fetch", "-q", "web",
+                               env=read_clean_env(GIT_TERMINAL_PROMPT="0", NO_PROXY="127.0.0.1"))
+    finally:
+        server.shutdown()
+        server.server_close()
+    head = (repo / ".git" / "FETCH_HEAD").read_text(encoding="utf-8").splitlines()
+    written = head[0].split(" of ", 1)[1] if rc == 0 and head and " of " in head[0] else None
+    got = "equal" if derive_fetch_url(configured) == written else "unequal"
+    print("%s: fixture · url-forms · git-written · %s against %s · %s" % (
+        SAY, derive_fetch_url(configured), written, got))
+    if got != "equal" or "user:tok@" not in configured:
+        misses.append("the git-written row read %s: fetch exit %d %s" % (got, rc, out[-300:]))
+    return misses
+
+
 def run_plant(case):
     """One fixture case: its lines, then `held` or `MISSED`; the engine's exit where it held."""
     top = pathlib.Path(tempfile.mkdtemp(prefix="pos-"))
@@ -1139,6 +1190,8 @@ def run_plant(case):
                     print(line)
                 print("next: %s" % render_next_line(pos))
                 misses += check_plant(case, pos, rc, repo)
+            if case == "url-forms":
+                misses += check_url_forms_rows(top, repo, definition, handover)
     except LookupError as e:
         print("%s: fixture · %s · unarmed: %s" % (SAY, case, e))
         return 2

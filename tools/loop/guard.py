@@ -584,6 +584,12 @@ PLANTS = {
                                      "re-merge exits 1 on that file alone, with trailer and record, then neither",
     "push-merge-resurrect-deleted-policy": "a run branch merging main, which deleted the policy file, and "
                                            "keeping its own file, untrailered",
+    "push-merge-resurrect-deleted-policy-conflict-elsewhere": "push-merge-resurrect-deleted-policy with main also "
+                                                              "adding fx-run.txt apart from the run's, so the merge "
+                                                              "stops on that file alone, the run keeping both its "
+                                                              "own files, untrailered",
+    "push-merge-unparseable-parent": "an octopus merge of b1, setting review.max-rounds, and b2, declaring [review] "
+                                     "twice, into main, which raises the cap, written by commit-tree, graded past b2",
     "push-merge-resurrect-emptied-policy": "a run branch merging main, which emptied the policy file, and "
                                            "keeping its own file, untrailered",
     "push-merge-both-absent": "a run branch merging main, which deleted the policy file, taking the deletion",
@@ -797,9 +803,10 @@ def run_guard_plant(case, top):
                 run_fixture_git(top, "reset", "-q", "--hard", "HEAD~1")
     elif case in ("push-merge-both-sides-clean", "push-merge-conflict-pick", "push-merge-octopus",
                   "push-merge-revert-to-unchanged-side", "push-merge-conflict-elsewhere",
-                  "push-merge-resurrect-deleted-policy",
+                  "push-merge-resurrect-deleted-policy", "push-merge-resurrect-deleted-policy-conflict-elsewhere",
                   "push-merge-resurrect-emptied-policy", "push-merge-both-absent", "push-merge-unparseable-c",
-                  "push-merge-no-write-tree", "push-merge-old-git-usage", "push-merge-equal-to-every-parent"):
+                  "push-merge-no-write-tree", "push-merge-old-git-usage", "push-merge-equal-to-every-parent",
+                  "push-merge-unparseable-parent"):
         # TOOL-dDeclaredLoop-59: three keys in separate tables, unchanged lines between, so git merges an
         # edit of each cleanly; every non-merge commit carries its trailer and its change record, each
         # branch's records under a build of its own, since a build numbers its records and two branches
@@ -897,6 +904,25 @@ def run_guard_plant(case, top):
                 run_scenario(name, me + ["--push-range", "%s..HEAD" % tip], 0 if recorded else 1,
                              "0 finding(s)" if recorded else "merge %s · %s · review.max-rounds" % (sha8, mguard.POLICY))
                 run_fixture_git(top, "reset", "-q", "--hard", "HEAD~1")
+        elif case == "push-merge-unparseable-parent":
+            # TOOL-dDeclaredLoop-82 S9: b2's policy file declares [review] twice, so it does not parse. An octopus
+            # merge of it would not parse at M either, so M's tree is main's file with b1's value, written by
+            # hand and joined to its three parents; the range starts at b2, whose own commit is graded elsewhere.
+            run_fixture_git(top, "checkout", "-q", "-b", "b1")
+            write_key_commit("tB1", *derive_rounds(4))
+            run_fixture_git(top, "checkout", "-q", "-b", "b2", "main")
+            write_staged(top, {mguard.POLICY: add_text("\n[review]\nmax-rounds = 7\n")})
+            run_fixture_git(top, "commit", "-q", "-m", "a second [review] table")
+            b2 = run_fixture_git(top, "rev-parse", "HEAD")
+            run_fixture_git(top, "checkout", "-q", "main")
+            write_key_commit(FX_BUILD, *cap)
+            write_staged(top, {mguard.POLICY: lambda t: t.replace("max-rounds = 3\n", "max-rounds = 4\n")})
+            merge = run_fixture_git(top, "commit-tree", run_fixture_git(top, "write-tree"), "-p", "HEAD", "-p", "b1",
+                                    "-p", b2, "-m", "octopus")
+            run_fixture_git(top, "reset", "-q", "--hard", merge)
+            run_scenario("graded", me + ["--push-range", "%s..HEAD" % b2], 1, "does not parse at parent %s" % b2[:8])
+            out.append(("graded, no Traceback", out[-1][1], 1, "Traceback absent" if "Traceback" in out[-1][4] else "",
+                        out[-1][4]))
         elif case not in ("push-merge-conflict-pick", "push-merge-octopus"):
             # TOOL-dDeclaredLoop-78: main deletes, empties or declares a table the run branch also declares
             # apart; the run merges main and, but where both lack the file, keeps its own policy file, so the
@@ -911,6 +937,8 @@ def run_guard_plant(case, top):
                 run_fixture_git(top, "commit", "-q", "-m", "the policy file emptied")
             else:
                 run_fixture_git(top, "rm", "-q", "--", mguard.POLICY)
+                if case == "push-merge-resurrect-deleted-policy-conflict-elsewhere":
+                    write_staged(top, {"fx-run.txt": lambda t: "main's line\n"})
                 run_fixture_git(top, "commit", "-q", "-m", "the policy file deleted")
             tip = run_fixture_git(top, "rev-parse", "HEAD")
             run_fixture_git(top, "checkout", "-q", "-b", "run", base)
@@ -920,7 +948,16 @@ def run_guard_plant(case, top):
             else:
                 write_staged(top, {"fx-run.txt": add_text("the run's own line\n")})
                 run_fixture_git(top, "commit", "-q", "-m", "the run's own commit")
-            run_fixture_git(top, "merge", "-q", "--no-ff", "--no-commit", "main")
+            if case == "push-merge-resurrect-deleted-policy-conflict-elsewhere":
+                # TOOL-dDeclaredLoop-82 S4: git stops on fx-run.txt alone and the run takes its own side, so the
+                # clean re-merge exits 1 with a tree lacking the policy file, read `absent`
+                rc, _said = read_git(top, "merge", "--no-ff", "--no-commit", "main")
+                if rc != 1:
+                    raise OSError("the deleted-policy conflict-elsewhere merge exited %d, not 1" % rc)
+                run_fixture_git(top, "checkout", "--ours", "--", "fx-run.txt")
+                run_fixture_git(top, "add", "--", "fx-run.txt")
+            else:
+                run_fixture_git(top, "merge", "-q", "--no-ff", "--no-commit", "main")
             if case != "push-merge-both-absent":
                 run_fixture_git(top, "checkout", "HEAD", "--", mguard.POLICY)
             run_fixture_git(top, "commit", "-q", "-m", "merge main")
@@ -1200,8 +1237,9 @@ def run_selftest():
             "other-write-owner-only": 1, "with-reason-no-row": 1, "mandate-none": 1, "push-no-trailer": 1,
             "proof-signed-refuse": 2, "proof-signed-fallback": 1, "push-merge-resolution-edit": 1,
             "push-merge-revert-to-unchanged-side": 1, "push-merge-conflict-elsewhere": 1,
-            "push-merge-resurrect-deleted-policy": 1,
-            "push-merge-resurrect-emptied-policy": 1, "push-merge-unparseable-c": 1, "push-new-branch": 1,
+            "push-merge-resurrect-deleted-policy": 1, "push-merge-resurrect-deleted-policy-conflict-elsewhere": 1,
+            "push-merge-unparseable-parent": 1, "push-merge-resurrect-emptied-policy": 1,
+            "push-merge-unparseable-c": 1, "push-new-branch": 1,
             "push-first-to-empty-remote": 1,
             "push-merge-unrelated-histories": 1, "push-merge-tree-fatal": 1, "push-merge-probe-failed": 1,
             "push-merge-probe-silent": 1}

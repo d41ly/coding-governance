@@ -8558,6 +8558,11 @@
       "file": "tools/loop/upstream.py"
     },
     {
+      "id": "check_url_forms_rows",
+      "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
       "id": "check_usage_refused",
       "kind": "function",
       "file": "tools/unattended/pass-tree.test.sh"
@@ -10538,6 +10543,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_docstring_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
       "id": "derive_docstring_lines",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -11031,6 +11041,11 @@
       "id": "derive_image_path",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "derive_import_aliases",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "derive_import_closure",

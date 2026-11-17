@@ -758,7 +758,8 @@ def resolve_memory_root_source(tree):
     """`(root, source)`: the root a build's records sit under in `tree` and the conf it came from. The
     `MEMORY_ROOT` the driver's `.unattended.conf` sets, read through `read_driver_conf`, `memory` where it
     leaves the key unset, wherever that conf is a file, source `.unattended.conf`; else the `MEMORY_ROOT`
-    of `.memory-tree.conf`, source `.memory-tree.conf`; else `memory`, source `default`. Each value
+    of `.memory-tree.conf`, `memory` where it leaves the key unset, wherever that conf is a file, source
+    `.memory-tree.conf` (TOOL-dDeclaredLoop-82 S15); else `memory`, source `default`. Each value
     stripped of whitespace and slashes, a blank one unset. ValueError `records root:` where both confs
     name a root and the two differ; LookupError where the memory-tree kit does not resolve
     (TOOL-dDeclaredLoop-72, TOOL-dDeclaredLoop-76). The kit's `read_design_conf` is imported inside the
@@ -768,7 +769,9 @@ def resolve_memory_root_source(tree):
     mt = (read_design_conf(tree).get("MEMORY_ROOT") or "").strip().strip("/")
     conf = pathlib.Path(tree).resolve() / ".unattended.conf"
     if not conf.is_file():
-        return (mt, ".memory-tree.conf") if mt else ("memory", "default")
+        if mt or (pathlib.Path(tree) / ".memory-tree.conf").is_file():
+            return mt or "memory", ".memory-tree.conf"
+        return "memory", "default"
     key = (str(conf), conf.read_bytes())
     if key not in DRIVER_ROOTS:
         # ponytail: read_driver_conf holds its answer per conf path, so a conf rewritten in this process is
@@ -798,34 +801,74 @@ def derive_fixture_boundary(tree):
                    and {"fixture", "plant"} & set(f.name.split("_"))), key=lambda f: f.lineno)
 
 
+def derive_import_aliases(tree):
+    """`{local name: dotted name}` for each name an absolute `import` or `from ... import` of a parsed
+    module binds, aliased or not: `import a.b as c` binds `c` to `a.b`, `import a.b` binds `a` to `a`,
+    `from m import n` binds `n` and `from m import n as c` binds `c`, each to `m.n`. A relative import
+    and a star import bind none (TOOL-dDeclaredLoop-82 S10)."""
+    import ast
+    aliases = {}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for a in node.names:
+                aliases[a.asname or a.name.split(".")[0]] = a.name if a.asname else a.name.split(".")[0]
+        elif isinstance(node, ast.ImportFrom) and not node.level and node.module:
+            for a in node.names:
+                if a.name != "*":
+                    aliases[a.asname or a.name] = "%s.%s" % (node.module, a.name)
+    return aliases
+
+
 def derive_conf_reads(path):
     """`[(line, kind)]` sorted by line, one per conf read in the module at `path`, graded on its syntax
-    tree: kind `reader call` for a call whose callee, a name or an attribute, is `read_design_conf`,
-    `read_driver_conf` or `parse_conf`; kind `conf name` for a string constant ending `.memory-tree.conf`
-    or `.unattended.conf`, an f-string's literal part included, that is not the docstring of the module,
-    a class, a function or an `async def`. A comment is not in the tree. Every node a definition of
-    `derive_fixture_boundary` encloses, its decorators and signature included, is passed over
-    (TOOL-dDeclaredLoop-80). SyntaxError where the module does not parse (TOOL-dDeclaredLoop-76)."""
+    tree: kind `reader call` for a call whose callee is `read_design_conf`, `read_driver_conf` or
+    `parse_conf`, an attribute by its name and a name by the last segment of what
+    `derive_import_aliases` binds it to; kind `conf name` for a string constant holding
+    `.memory-tree.conf` or `.unattended.conf` anywhere, an f-string's literal part included, that is
+    not a docstring `derive_docstring_ids` answers (TOOL-dDeclaredLoop-82 S8, S10); kind
+    `conf constant` for a name or attribute reaching a module-level name of `loop_lib` that an `Assign`
+    binds to a string constant holding either conf name, through `import loop_lib` or
+    `from loop_lib import`, aliased or not, the bindings read by `ast.parse` of the `loop_lib.py`
+    beside `path`, only where the module imports `loop_lib` (TOOL-dDeclaredLoop-82 S1). A comment is
+    not in the tree. Every node a definition of `derive_fixture_boundary` encloses, its decorators and
+    signature included, is passed over (TOOL-dDeclaredLoop-80). SyntaxError where the module, or that
+    `loop_lib.py`, does not parse, OSError where that `loop_lib.py` does not read
+    (TOOL-dDeclaredLoop-76). The memory-tree kit's `derive_docstring_ids` is imported inside the
+    function."""
     import ast
-    tree = ast.parse(pathlib.Path(path).read_text(encoding="utf-8"), str(path))
+    path = pathlib.Path(path)
+    confs = (".memory-tree.conf", ".unattended.conf")
+    tree = ast.parse(path.read_text(encoding="utf-8"), str(path))
+    read_memory_tree("tree_lib.py")
+    from tree_lib import derive_docstring_ids
+    docs = derive_docstring_ids(tree)
     bounded = {id(n) for f in derive_fixture_boundary(tree) for n in ast.walk(f)}
-    # ponytail: gen_build_index.py's scan_glob_readers builds the same set; one copy once 82 S8 shares it
-    docs = {id(node.body[0].value) for node in ast.walk(tree)
-            if isinstance(node, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
-            and node.body and isinstance(node.body[0], ast.Expr)
-            and isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str)}
+    aliases = derive_import_aliases(tree)
+    consts = set()
+    if any(v == "loop_lib" or v.startswith("loop_lib.") for v in aliases.values()):
+        lib = path.parent / "loop_lib.py"
+        consts = {t.id for st in ast.parse(lib.read_text(encoding="utf-8"), str(lib)).body
+                  if isinstance(st, ast.Assign) and isinstance(st.value, ast.Constant)
+                  and isinstance(st.value.value, str) and any(c in st.value.value for c in confs)
+                  for t in st.targets if isinstance(t, ast.Name)}
     hits = []
     for node in ast.walk(tree):
         if id(node) in bounded:
             continue
         if isinstance(node, ast.Call):
             callee = node.func
-            name = callee.id if isinstance(callee, ast.Name) else getattr(callee, "attr", None)
+            name = (aliases.get(callee.id, callee.id).rsplit(".", 1)[-1] if isinstance(callee, ast.Name)
+                    else getattr(callee, "attr", None))
             if name in ("read_design_conf", "read_driver_conf", "parse_conf"):
                 hits.append((node.lineno, "reader call"))
         elif isinstance(node, ast.Constant) and isinstance(node.value, str) \
-                and node.value.endswith((".memory-tree.conf", ".unattended.conf")) and id(node) not in docs:
+                and any(c in node.value for c in confs) and id(node) not in docs:
             hits.append((node.lineno, "conf name"))
+        elif (isinstance(node, ast.Name) and aliases.get(node.id, "").startswith("loop_lib.")
+              and aliases[node.id][len("loop_lib."):] in consts) or (
+                isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name)
+                and aliases.get(node.value.id) == "loop_lib" and node.attr in consts):
+            hits.append((node.lineno, "conf constant"))
     return sorted(hits)
 
 

@@ -189,8 +189,8 @@ SPEC_RECORDS_CLOSE = "<!-- /gen:spec-records -->"
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from tree_lib import (  # noqa: E402  the kit's shared helpers
     BIND_HEAD_LINES, BIND_RE, GIT_ENV_LEAKS, HDR_RE, RECORD_KIND_TOKENS, RECORD_KINDS, STATUS_TOKENS, TERMINAL,
-    UNBOUND_RE, _expand_ids, _id_alternation, build_id_token_re, build_spec_path_re, kit_rel, parse_conf,
-    parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at, read_id_pins, read_text, record_paths,
+    UNBOUND_RE, _expand_ids, _id_alternation, build_id_token_re, build_spec_path_re, derive_docstring_ids, kit_rel,
+    parse_conf, parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at, read_id_pins, read_text, record_paths,
     scan_missing_citations, unfenced, unfenced_lines,
 )
 
@@ -5634,7 +5634,6 @@ def scan_glob_readers(kit_dir: str) -> list:
     run time from pieces, as this function's own needle is, and one spelled in a shell script of the kit.
     """
     magic = ":(" + "glob)"     # composed, so this walk's own needle is no constant it finds
-    scopes = (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
     found = set()
 
     def scan_scope(node, qual, function, assign, klass, docs):
@@ -5661,11 +5660,7 @@ def scan_glob_readers(kit_dir: str) -> list:
         if not name.endswith(".py"):
             continue
         tree = ast.parse(read_text(os.path.join(kit_dir, name)), name)
-        docs = {id(node.body[0].value) for node in ast.walk(tree)
-                if isinstance(node, (ast.Module, *scopes))
-                and node.body and isinstance(node.body[0], ast.Expr)
-                and isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str)}
-        scan_scope(tree, [name[:-3]], None, None, None, docs)
+        scan_scope(tree, [name[:-3]], None, None, None, derive_docstring_ids(tree))
     return sorted(found)
 
 
@@ -7025,6 +7020,8 @@ def cmd_selftest() -> int:
                    'PLANTED = ":(glob)memory/builds/*/spec/**"\n\n\n'
                    'def read_planted():\n    return ":(glob)memory/**"\n\n\n'
                    'def read_prose():\n    """It names :(glob)memory/** in prose only."""\n    return "memory/**"\n\n\n'
+                   'async def read_async_prose():\n    """It names :(glob)memory/** in prose only."""\n'
+                   '    return "memory/**"\n\n\n'
                    'class Planted:\n    """A class docstring naming :(glob)memory/** is prose."""\n\n'
                    '    PATHS = []\n    PATHS.append(":(glob)memory/builds/*/prompts/**")\n\n'
                    '    def read_method(self):\n        return ":(glob)memory/builds/*/reviews/**"\n\n\n'
@@ -7041,6 +7038,8 @@ def cmd_selftest() -> int:
         # stopping at a class nested in a function, which names no `outer_class`, against one naming no
         # expression statement, which names neither `planted23` nor `planted23.Planted`, and against a
         # walk charging a nested def's constant to its enclosing function, which names `planted23.outer`.
+        # TOOL-dDeclaredLoop-82 AC8 (S8): `read_async_prose`'s docstring is charged to nothing, so the list
+        # holds; red against a docstring set without `async def`, which names `planted23.read_async_prose`.
         arm("TOOL-dTrueNorth-23 AC5 TOOL-dTrueNorth-31 AC5 TOOL-dTrueNorth-32 AC5 AC9 AC13 — a planted module's "
             "glob-pathspec function, constant, class method, guarded constant, class in a function, class-level and "
             "module-level appends and nested def are readers the table lacks, each charged to exactly one name, "

@@ -122,10 +122,11 @@ PLANTS = {"values": "no policy file, then autonomy three-gates and every-stage, 
           "pre-placement-records-root": "the same history under MEMORY_ROOT=records, build tRec opened under "
                                         "records/builds/ and tWrong under memory/builds/, listed by the scratch's "
                                         "own module, then tWrong again with no policy file",
-          "unattended-root": "the same history under .unattended.conf's MEMORY_ROOT=records and a memory tree's conf "
-                             "naming none, build tRec opened under records/builds/ and tWrong under memory/builds/, "
-                             "each listed by the scratch's own module",
-          "confs-disagree": ".unattended.conf naming MEMORY_ROOT=records beside the memory tree's memory, then the list",
+          "unattended-root": "the same history under the driver's conf naming MEMORY_ROOT=records and a memory "
+                             "tree's conf naming none, build tRec opened under records/builds/ and tWrong under "
+                             "memory/builds/, each listed by the scratch's own module",
+          "confs-disagree": "the driver's conf naming MEMORY_ROOT=records beside the memory tree's memory, then "
+                            "the list",
           "no-own-conf-read": "this module's own file graded on its syntax tree for a reader call or a conf name, "
                               "no scratch repository",
           "readded": "the scratch kits' commit, then this module taken out of the scratch and committed back"}
