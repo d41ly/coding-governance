@@ -2463,6 +2463,7 @@ slug refusal | : | --status ../etc
 status with no run | : | --status tRun
 plan | : | --plan tRun
 plan framed over two slugs | : | --plan tRun tNone --framed
+check-specs | : | --check-specs tRun ARCH-tRun-1
 preflight | : | --preflight tRun --keepalive-id k1
 phase | : | --phase tRun BUILDING --witness abc
 audit | : | --audit tRun
@@ -8298,6 +8299,49 @@ git rm -q --cached memory/builds/tRun/spec/swift4.md memory/builds/tRun/spec/swi
 rm -f memory/builds/tRun/spec/swift4.md memory/builds/tRun/spec/swift5.md ${PFX}swift-stub.py
 cp "$TMP/swift-readme" memory/builds/tRun/README.md; cp "$TMP/swift-runmd" memory/builds/tRun/RUN.md
 git add memory/builds/tRun/README.md memory/builds/tRun/RUN.md >/dev/null 2>&1
+# ---- TOOL-aTrimmedWait-1 - `--check-specs` makes --dispatch's five spec-file refusals over UNTRACKED
+# ---- specs, with no run-state file, in --dispatch's own words: one build per refusal class, since the
+# ---- edge scan grades a whole build, a clean build, and a two-unit build carrying two refusals, which
+# ---- are both reported rather than the first alone. Nothing is staged, by the arm or by the verb.
+# ---- RED-first is the close's: staged by making `check_dispatch_specs` read tracked specs only and
+# ---- return after its first refusal, which reds the clean and two-refusal arms.
+write_cs_spec() { # slug · seq · header tail · scope body · edges body
+  mkdir -p "memory/builds/$1/spec"
+  printf '%s\n' "# ARCH-$1-$2 — fixture" "" \
+    "**Status:** SPECCED · rev-1 · 2026-11-14 · node a · Tier-2 · base 0123abcd$3" "" \
+    "## 2. Scope (IN)" "" "$4" "" "## 3. Non-goals (OUT)" "" "### Edges" "" "$5" "" \
+    "## 6. Acceptance criteria" "" '- **AC1** — When `x` runs, it prints y.' "" \
+    "## 7. Gates" "" '- g' "" "## 8. Open questions" "" "none" \
+    > "memory/builds/$1/spec/2026-11-14-spec-ARCH-$1-$2.md"
+}
+cs_s='- **S1** — a thing. Observed by AC1.'
+write_cs_spec tCsA 1 ' · order 1' "$cs_s" 'none'
+write_cs_spec tCsB 1 '' '' 'none'
+write_cs_spec tCsC 1 ' · order 2x' "$cs_s" 'none'
+write_cs_spec tCsD 1 '' "$cs_s" '- **consumes-from** ARCH-tCsD-2 — no backticks'
+write_cs_spec tCsE 1 '' "$cs_s" '- **consumes-from** `ARCH-tCsE-2` — one end'
+write_cs_spec tCsE 2 '' "$cs_s" '- **consumes-from** `ARCH-tCsE-1` — the other end'
+write_cs_spec tCsG 1 '' '' 'none'
+write_cs_spec tCsG 2 ' · order 2x' "$cs_s" 'none'
+o=$(run --check-specs tCsA ARCH-tCsA-1); same "check-specs: a clean untracked build exits 0" "$?" 0
+hit "$o" "unattended: --check-specs tCsA — ARCH-tCsA-1: none carries a refusal --dispatch makes from its spec files"
+miss "$o" "UNATTENDED check"
+o=$(run --check-specs tCsB ARCH-tCsB-1); same "check-specs: a THIN spec exits 1" "$?" 1
+hit "$o" "--dispatch declares a build pass for a unit whose spec grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing states what done MEANS for it: ARCH-tCsB-1"
+o=$(run --check-specs tCsC ARCH-tCsC-1); same "check-specs: a malformed order verb exits 1" "$?" 1
+hit "$o" "and a reader taking its numeric prefix would sequence the build on a value nobody wrote: memory/builds/tCsC/spec/2026-11-14-spec-ARCH-tCsC-1.md spells [· order 2x]"
+o=$(run --check-specs tCsD ARCH-tCsD-1); same "check-specs: an unreadable Edges line exits 1" "$?" 1
+hit "$o" "or the word none with no backticked token after it in the bullet: memory/builds/tCsD/spec/2026-11-14-spec-ARCH-tCsD-1.md"
+o=$(run --check-specs tCsE ARCH-tCsE-1 ARCH-tCsE-2); same "check-specs: a consumes-from cycle exits 1" "$?" 1
+hit "$o" "edges form a cycle, so no unit on it can be dispatched after its producer closes and the run would wedge here with no named stop: ARCH-tCsE-1 -> ARCH-tCsE-2 -> ARCH-tCsE-1"
+o=$(run --check-specs tCsF ARCH-tCsF-1); same "check-specs: a unit no spec carries exits 1" "$?" 1
+hit "$o" "--dispatch declares a build pass for a unit no tracked spec under this build defines, which is M2's MISSING: the method's hard floor is that a MISSING unit is never built, and writing the spec afterwards is the same act with the record written last: ARCH-tCsF-1"
+o=$(run --check-specs tCsG ARCH-tCsG-1 ARCH-tCsG-2); same "check-specs: a two-unit build with two refusals exits 1" "$?" 1
+same "check-specs: both units' refusals are reported, not the first alone" "$(grep -c '^UNATTENDED check 49 FAILED' <<<"$o")" 2
+o=$(run --check-specs tCsA); same "check-specs: no unit id exits 1" "$?" 1
+hit "$o" "--check-specs was given no unit id, so it would grade nothing and print what a clean build prints: tCsA"
+same "check-specs: the verb stages nothing, so every fixture spec stays untracked" "$(git ls-files --others --exclude-standard -- 'memory/builds/tCs*/spec/*.md' | grep -c .)" 8
+rm -rf memory/builds/tCsA memory/builds/tCsB memory/builds/tCsC memory/builds/tCsD memory/builds/tCsE memory/builds/tCsG
 # ---- region 3 ends HERE rather than at the old seam above the spec-token arm group: that group runs
 # ---- over the dispatch fixture the arms before it left, so it cannot open a region (TOOL-aGraftedHelix-41).
 fi   # ---- end REGION 3 ------------------------------------------------------------------------
@@ -8369,6 +8413,42 @@ printf 'and now edited\n' >> memory/builds/tRun/prompts/brief-2.md
 git add memory/builds/tRun/prompts/brief-2.md >/dev/null 2>&1
 o=$(run --status tRun)
 n=$((n+1)); case "$o" in *"STALE briefs 1"*) ;; *) echo "FAIL brief: with two briefs and one edited, the reader did not report exactly one stale -- $o"; st=1 ;; esac
+
+# ---- TOOL-aTrimmedWait-5 - ONE GIT CALL GRADES EVERY BRIEF, AND A FAILED BATCH MOVES NO COUNT. A git
+# ---- shim on PATH logs each `hash-object` call while `--status` grades three briefs: one fresh, one
+# ---- edited, one gone. The batch answers in one call; with `--stdin-paths` failed, the per-path
+# ---- fallback grades the two present rows to the same line. `run_proc`, because the shim must be the
+# ---- `git` a fresh driver process resolves. Shim and log live under `.git/`, so the tree stays clean.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+mkdir -p memory/builds/tRun/prompts "$TMP/.git/tw5-shim"
+for _tw in 1 2 3; do
+  printf 'tw5 brief %s\n' "$_tw" > "memory/builds/tRun/prompts/tw5-$_tw.md"
+  _twh=$(git hash-object "memory/builds/tRun/prompts/tw5-$_tw.md")
+  printf '2026-11-14T10:00:00Z brief · item ARCH-tRun-7%s · reason %s memory/builds/tRun/prompts/tw5-%s.md\n' \
+    "$_tw" "${_twh:0:12}" "$_tw" >> memory/builds/tRun/RUN.md
+done
+printf 'edited\n' >> memory/builds/tRun/prompts/tw5-2.md; rm -f memory/builds/tRun/prompts/tw5-3.md
+printf '#!/usr/bin/env bash\ncase " $* " in *" hash-object "*) printf "%%s\\n" "$*" >> "$TW5_LOG";; esac\n[ -n "${TW5_FAIL:-}" ] && case " $* " in *" --stdin-paths "*) exit 1;; esac\n[ -n "${TW5_EMPTY:-}" ] && case " $* " in *" --stdin-paths "*) cat >/dev/null; exit 0;; esac\nexec "%s" "$@"\n' \
+  "$(command -v git)" > "$TMP/.git/tw5-shim/git"
+chmod +x "$TMP/.git/tw5-shim/git"
+export TW5_LOG="$TMP/.git/tw5.calls"
+: > "$TW5_LOG"; o=$(PATH="$TMP/.git/tw5-shim:$PATH" run_proc --status tRun)
+hit "$o" "STALE briefs 1 · briefs gone 1"
+same "TW5 the present briefs are graded by one hash-object call" "$(grep -c '' "$TW5_LOG")" 1
+same "TW5 that one call is the --stdin-paths batch" "$(grep -c -- '--stdin-paths' "$TW5_LOG")" 1
+: > "$TW5_LOG"; o2=$(TW5_FAIL=1 PATH="$TMP/.git/tw5-shim:$PATH" run_proc --status tRun)
+same "TW5 a failed batch falls back per path and prints the same status line" "$o2" "$o"
+same "TW5 the fallback pays the failed batch and then one call per present brief" "$(grep -c '' "$TW5_LOG")" 3
+# ---- ONE PRESENT BRIEF AND AN EMPTY BATCH. `--stdin-paths` exits 0 and prints nothing: the empty
+# ---- capture must split to ZERO lines, so the count check fails and the per-path call grades the row.
+# ---- Split by `mapfile` alone it reads as one empty line, passes against one path, and grades stale.
+rm -f memory/builds/tRun/prompts/tw5-2.md
+o=$(PATH="$TMP/.git/tw5-shim:$PATH" run_proc --status tRun)
+miss "$o" "STALE briefs"
+: > "$TW5_LOG"; o2=$(TW5_EMPTY=1 PATH="$TMP/.git/tw5-shim:$PATH" run_proc --status tRun)
+same "TW5 an empty batch over one brief falls back and prints the same status line" "$o2" "$o"
+same "TW5 the empty batch is followed by one per-path call" "$(grep -c -- '--stdin-paths' "$TW5_LOG") $(grep -vc -- '--stdin-paths' "$TW5_LOG")" "1 1"
+unset TW5_LOG; rm -rf "$TMP/.git/tw5-shim" "$TMP/.git/tw5.calls"
 
 echo "MARK park-taxonomy" >&2
 # ---------------------------------------------------------------------------------------------
@@ -19998,7 +20078,25 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3348 -> 3377 by TOOL-aPiecewiseGrade-6 on 2026-11-16: the spec-token lock's two arms after
 # TOOL-aPiecewiseGrade-2's block (+29), every one unconditional inside the checker's block, counted
 # off the block's own lines; no suite ran, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=3377
+# RAISED 3329 -> 3347 by TOOL-aTrimmedWait-1: the --check-specs arm's 18 region-three `same`/`hit`/`miss`
+# lines, every one unconditional, counted off the block's own lines; no suite ran, and its RED-first
+# observation is the close's.
+# RAISED 3347 -> 3352 by TOOL-aTrimmedWait-5: the batched brief-hash arm's one `hit` and four `same`
+# lines in region four, every one unconditional, counted off the block's own lines; no suite ran, and
+# its RED-first observation is the close's.
+# RAISED 3352 -> 3355 by TOOL-aTrimmedWait-5's fix pass: the empty-batch case's one `miss` and two
+# `same` lines in region four, every one unconditional, counted off the block's own lines; no suite
+# ran, and its RED-first observation is the close's.
+# MERGED at TOOL-aTrimmedWait-12's reconcile of local main at 5d48501da: the base 3329 at 846d51d39, plus main's 19
+# (TOOL-aLightenedLoop-3's 5 and -8's 1, TOOL-aTwinnedPass-3's 10 and -5's 3), plus this branch's 26
+# (TOOL-aTrimmedWait-1's 18 and -5's 8) = 3374.
+# RAISED 3374 -> 3377 by TOOL-aTrimmedWait-13: the parity table's `--check-specs` row, the loop's three `same`
+# lines run once more in region one, every one unconditional, counted off the loop's own lines; no suite
+# ran, and its RED-first observation is the close's.
+# MERGED at TOOL-aTrimmedWait-18's reconcile of local main at 8eda4a5a0: this branch's 3377,
+# plus main's 29 since 5d48501da (TOOL-aPiecewiseGrade-6) = 3406. Main raised no FLOOR_SHARD_<n>
+# since 5d48501da, so each keeps this branch's figure.
+FLOOR_ASSERTIONS=3406
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -20144,7 +20242,8 @@ PROLOGUE_ARMS=20
 # RAISED 524 -> 565 by TOOL-dFoldedAudit-11: the same 41 region-one fold join assertions, see FLOOR_ASSERTIONS.
 # RAISED 565 -> 676 by TOOL-dFoldedAudit-9: the same 111 region-one chain gate assertions, see FLOOR_ASSERTIONS.
 # RAISED 676 -> 734 by TOOL-dFoldedAudit-15: the same 58 region-one batch assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_1=734
+# RAISED 734 -> 737 by TOOL-aTrimmedWait-13: the same 3 region-one parity-row assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_1=737
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
@@ -20212,7 +20311,9 @@ FLOOR_SHARD_2=229
 # RAISED 445 -> 450 by TOOL-aLightenedLoop-3: the same 5 region-three spec-token cache assertions, see FLOOR_ASSERTIONS.
 # MERGED at TOOL-aLightenedLoop-8's reconcile: the base 445, plus main's 0, plus this branch's 5 = 450.
 # RAISED 450 -> 451 by TOOL-aLightenedLoop-8: the same 1 region-three assertion, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_3=451
+# RAISED 445 -> 463 by TOOL-aTrimmedWait-1: the same 18 region-three --check-specs assertions, see FLOOR_ASSERTIONS.
+# MERGED at TOOL-aTrimmedWait-12's reconcile of local main at 5d48501da: the base 445, plus main's 6, plus this branch's 18 = 469.
+FLOOR_SHARD_3=469
 # RAISED 373 -> 382 by TOOL-dGroundRules-66: the same 9 region-four terminal-unit assertions, see FLOOR_ASSERTIONS.
 # RAISED 382 -> 383 by TOOL-dGroundRules-70: the same 1 region-four reader assertion, see FLOOR_ASSERTIONS.
 # RAISED 383 -> 386 by TOOL-aSmoothedDispatch-1 on 2026-11-10: the same net 3 region-four --writes split assertions, see FLOOR_ASSERTIONS.
@@ -20222,7 +20323,10 @@ FLOOR_SHARD_3=451
 # MERGED at TOOL-aSmoothedDispatch-21's reconcile: the base 383, plus 7, plus 20 = 410.
 # RAISED 410 -> 420 by TOOL-aTwinnedPass-3 on 2026-11-15: the same 10 region-four generated-output assertions, see FLOOR_ASSERTIONS.
 # RAISED 420 -> 423 by TOOL-aTwinnedPass-5 on 2026-11-15: the same 3 region-four assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_4=423
+# RAISED 410 -> 415 by TOOL-aTrimmedWait-5: the same 5 region-four batched brief-hash assertions, see FLOOR_ASSERTIONS.
+# RAISED 415 -> 418 by TOOL-aTrimmedWait-5's fix pass: the same 3 region-four empty-batch assertions, see FLOOR_ASSERTIONS.
+# MERGED at TOOL-aTrimmedWait-12's reconcile of local main at 5d48501da: the base 410, plus main's 13, plus this branch's 8 = 431.
+FLOOR_SHARD_4=431
 FLOOR_SHARD_5=297
 FLOOR_SHARD_6=127
 FLOOR_SHARD_7=311

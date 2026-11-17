@@ -3578,6 +3578,11 @@
       "file": "tools/playbook/fixtures/row_kind.py"
     },
     {
+      "id": "build_render_pathspec",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "build_reordered_plant",
       "kind": "function",
       "file": "tools/playbook/fixtures/row_kind.py"
@@ -4568,6 +4573,11 @@
       "file": "tools/workflows/unattended-build.template.js"
     },
     {
+      "id": "checkPollWait",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkPosixRootLitter",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -5353,6 +5363,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_cold23",
+      "kind": "function",
+      "file": "tools/roles/adopt-roles.test.sh"
+    },
+    {
       "id": "check_collisions",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -5563,6 +5578,11 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "check_dispatch_specs",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_dl_archive",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -5601,6 +5621,11 @@
       "id": "check_drive_red",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "check_edge_shape",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_edges",
@@ -7708,6 +7733,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "check_staged_write",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "check_stalled",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -8011,6 +8041,11 @@
       "id": "check_unit_row",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "check_unit_spec",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_unmerged_live",
@@ -8898,6 +8933,11 @@
       "file": "tools/playbook/tag_index.py"
     },
     {
+      "id": "common_git_dir",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "compliant",
       "kind": "function",
       "file": "tools/check-testsuite-counts.sh"
@@ -9326,6 +9366,11 @@
       "id": "deriveSidecarPath",
       "kind": "function",
       "file": "tools/unattended/run-lease.js"
+    },
+    {
+      "id": "deriveSleepSeconds",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "deriveSlotLens",
@@ -10733,6 +10778,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "derive_moved_artifacts",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "derive_moved_invariants",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
@@ -10841,6 +10891,11 @@
       "id": "derive_parity_lines",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_partition_lines",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
       "id": "derive_pass_legs",
@@ -12601,11 +12656,6 @@
       "id": "extract_heredoc_body",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
-    },
-    {
-      "id": "extract_hs_lines",
-      "kind": "function",
-      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
       "id": "extract_jsx_defs",
@@ -16203,6 +16253,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "parse_session_line",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "parse_shell_defs",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -18713,6 +18768,11 @@
       "file": "tools/playbook/tag_index.py"
     },
     {
+      "id": "read_git_stdout",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "read_gloss",
       "kind": "function",
       "file": "tools/lexicon/canon.py"
@@ -20623,6 +20683,11 @@
       "file": "tools/runlog/extract.py"
     },
     {
+      "id": "read_session_record",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "read_set",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -22346,6 +22411,11 @@
       "id": "renderPerLineBlanked",
       "kind": "function",
       "file": "tools/workflows/check-review-join.js"
+    },
+    {
+      "id": "renderPollDeny",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "renderPosix",
@@ -26288,6 +26358,11 @@
       "file": "tools/process-monitor/adopt-process-monitor.test.sh"
     },
     {
+      "id": "run_agents23",
+      "kind": "function",
+      "file": "tools/roles/adopt-roles.test.sh"
+    },
+    {
       "id": "run_ak_leg",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -28031,6 +28106,11 @@
       "id": "run_render_cli",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "run_render_commit",
+      "kind": "function",
+      "file": ".githooks/pre-commit.test.sh"
     },
     {
       "id": "run_render_helper",
@@ -32363,6 +32443,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "test_staged_write",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "test_stale_declaration_is_reported_not_honoured",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -32586,6 +32671,11 @@
       "id": "test_write_atomic_temp",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "test_write_moved",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "test_writes_nothing_in_worktree",
@@ -33261,6 +33351,11 @@
       "id": "write_cov29_view",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "write_cs_spec",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_decl",
@@ -34371,6 +34466,11 @@
       "id": "write_session",
       "kind": "function",
       "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "write_session_record",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "write_settings",

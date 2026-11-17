@@ -156,7 +156,7 @@ landed build has. The first build to opt in is the first one graded.
 
 ## 7. Gates
 
-`memory hygiene` · `kit/dogfood doc parity` · `verdict epoch (kit version dates the engine)` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `method carriers (every pointer declared)` · `recall floor` · `recall floor arms`
+`memory hygiene` · `kit/dogfood doc parity` · `verdict epoch (kit version dates the engine)` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `method carriers (every pointer declared)` · `recall floor` · `recall floor arms` · `branch-guard self-test`
 
 New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC2 AC3 AC4 AC5 · fixture builds with briefs and specs staged per arm · none
 

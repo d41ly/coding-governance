@@ -47,7 +47,7 @@ unattended.sh	49	8	cannot hash the brief, so the row would carry no join
 # rostered units carrying `order` verbs. The order-gate blocker message beside it was pinned for the
 # same reason until TOOL-aSwiftRefusal-1 armed it with a two-unit fixture that restores itself; this
 # one stays pinned, and arming it on that fixture is a follow-up.
-unattended.sh	49	21	a sibling spec status header carries something shaped like the build-order verb that does not conform, so this build's order cannot be sequenced against it
+unattended.sh	49	23	a sibling spec status header carries something shaped like the build-order verb that does not conform, so this build's order cannot be sequenced against it
 # THEY MOVED AGAIN, 22 -> 27, 21 -> 26 and 18 -> 23, at aWindowedPass: `--check-commit`'s five `fail 49`
 # refusals landed above verb_dispatch, the same insertion-point class; re-keyed, never re-waived.
 # THE ORDINALS ABOVE MOVED 19 -> 22 and 18 -> 21 at aDeferredBar's closing round 2 (R1): three
@@ -67,4 +67,7 @@ unattended.sh	49	21	a sibling spec status header carries something shaped like t
 # RE-KEYED 38 -> 15 and 18 -> 21 at TOOL-aSmoothedDispatch-21's reconcile: the three spec-token refusals
 # sit in `run_spec_token_check` above `verb_dispatch` again, so the resolver reads 15 and the sibling
 # malformed-order row, auto-merged at 18, reads 21; the order-gate row stays out, armed by TOOL-aSwiftRefusal-1.
+# RE-KEYED 21 -> 23 at TOOL-aTrimmedWait-1: the unreadable-edge and cycle refusals moved out of
+# `verb_dispatch` into `check_edge_shape`, defined above it, so they now precede the sibling
+# malformed-order refusal; same branch, same text.
 unattended.sh	49	15	--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run

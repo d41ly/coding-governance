@@ -1,0 +1,19 @@
+# aTrimmedWait — asks
+
+## Asks
+
+- TOOL-aTrimmedWait-14 · filed 2026-11-17 · FOUR DERIVED-POPULATION ARMS RED ON LOCAL MAIN. The driver suite's hostile-value matrix does not drive `--record-round` (unmatrixed since before `846d51d39`) or `--wake` (unmatrixed since main's keepalive work); `KEEPALIVE_INTERVAL` has no default in the driver's init block; `GATE_REGEN_CHECK` is in the driver's scrub and not in `BAR_SCRUBBED_KNOBS` (TOOL-aFrugalTurnstile-12 AC3, two lines); and FA9 AC15's census reads 0. Each reds on a frozen clone of `5d48501da`, as recorded in `memory/builds/aTrimmedWait/build/2026-11-15-build-TOOL-aTrimmedWait-1-arms-observed.md`. · seen `tools/unattended/unattended.test.sh` matching `_rf_matrix=` run `bash tools/unattended/unattended.test.sh` · accept the six lines print no FAIL, each repair seen red under its staged break first
+- TOOL-aTrimmedWait-15 · filed 2026-11-17 · THREE PARITY ROWS RED ON LOCAL MAIN. The parity table's `register-task` and `release-task` rows expect exit 0 and a registered or released line and get check 88's refusal (four lines), and the `liveness` row's output no longer matches its expected block. Red on a frozen clone of `5d48501da`. · seen `tools/unattended/unattended.test.sh` matching `PARITY_ROWS=` run `bash tools/unattended/unattended.test.sh --shard 1/8` · accept the three rows pass, or each row's expectation is re-derived from the verb's current contract with the reason recorded
+- TOOL-aTrimmedWait-16 · filed 2026-11-17 · CHECK 118 REFUSES FIVE `--dispatch` FIXTURES BEFORE THEIR OWN REFUSAL. The arms for `dispatch declared`, the generated-index-with-generator pairing (two lines), `--dispatch cannot resolve HEAD` and the retracted condition all get check 118's spec-audit chain refusal, because the fixture's conf at its base cannot be read for `SPEC_FOLD_CUTOFF`. Red on a frozen clone of `5d48501da`; the call order of `check_chain_dispatch` is unchanged since `846d51d39`. · seen `tools/unattended/unattended.sh` matching `check_chain_dispatch "$rel" "$slug" || return 1` run `bash tools/unattended/unattended.test.sh --shard 4/8` · accept the five fixtures reach the refusal their arm names, and a fixture with an unreadable cutoff still meets check 118
+- TOOL-aTrimmedWait-17 · filed 2026-11-17 · SEVEN `--resume`, `--close` AND PRE-PUSH ARMS RED ON LOCAL MAIN. The turnstile take-over arm gets check 58's lease refusal instead of naming the dead-pid ticket; TOOL-aFrugalTurnstile-9 AC2 and AC3 (four lines) see a scoped answer run the full bar and a covered close write a gates-run fact; and the `met without a bar` and pre-push `full stale` arms get the close's stale-bound note instead. Red on a frozen clone of `5d48501da`. · seen `tools/unattended/unattended.test.sh` matching `INTERRUPTED — a turnstile ticket names a pid that is not running` run `bash tools/unattended/unattended.test.sh --shard 7/8` · accept the seven lines print no FAIL, or each arm's fixture is shown stale and re-derived
+
+## Dispositions
+
+- SEV · TOOL-aTrimmedWait-14 · MED · the arms guard populations a later verb or knob can slip out of, and they are red today
+- SEV · TOOL-aTrimmedWait-15 · MED · the parity table cannot grade these three verbs while their rows are red
+- SEV · TOOL-aTrimmedWait-16 · MED · five refusals of `--dispatch` go unexercised while check 118 answers first
+- SEV · TOOL-aTrimmedWait-17 · MED · the take-over and covered-close arms cannot see a regression while red
+- KEEP · TOOL-aTrimmedWait-14 · inherited from local main; this build's reworks touch none of the six
+- KEEP · TOOL-aTrimmedWait-15 · inherited from local main; this build's reworks touch none of the three rows
+- KEEP · TOOL-aTrimmedWait-16 · inherited from local main; this build moves neither check 118 nor its call
+- KEEP · TOOL-aTrimmedWait-17 · inherited from local main; the same seven lines red there

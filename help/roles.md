@@ -90,6 +90,10 @@ refuses the render, naming the key.
 
 - **Run an attended build:** after kickoff's READY card and the owner's go, invoke `/build`. It walks
   the workflows in stage order and calls the same harnesses `/unattended` uses.
+- **Check a spec before it is committed:** a spec writer runs
+  `unattended.sh --check-specs <slug> <unit>` before returning, and the spec commit refuses on it. <!-- usage: verb:unattended.sh:--check-specs 131e24bd -->
+  It prints each refusal `--dispatch` would make from the spec files, in its words, so a defect is
+  fixed before the spec commit rather than after a builder was dispatched.
 - **Hand one task to one agent:**
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and placeholders -->
@@ -164,6 +168,11 @@ unchanged from `handoff.py agents --handoff <path>` for an agent it spawned itse
   holds every agent of that build, in the order the lines were added. A run without it writes
   nothing, so a mid-pass call leaves your tree clean; pass `--write` only at a bookkeeping step,
   when no pass is running.
+- **The record.** So that a call reads only what the session added since the last one, the verb
+  keeps one record per session file in `handoff-calls/` under the repository's git common dir, the
+  `.git` folder every worktree shares. The folder may be deleted at any time: the next call reads
+  the whole session again and prints the same lines. A record from another version of the verb, or
+  for a session file that was edited, is never used.
 
 ## When no role agent can be spawned
 
@@ -183,6 +192,8 @@ until an owner writes its first row.
 - A spec write from anything but the spec writer, and a product write from anything but the builder
   on a specced unit. The main loop may still flip a spec's `**Status:**` line.
 - A role agent running the bar, the self-test runner or any suite, beyond what `[gates]` allows.
+- A role agent's polling wait: a `tail` that follows a file, a `sleep` inside a `while`
+  or `until` loop, or a `sleep` of 5 s or more.
 - In a session routed to a live build, a final message that leaves out the `agent` or `returned`
   line of an agent its turn dispatched or received. It is refused once per turn end, and the
   refusal prints the lines to paste, derived for it by `handoff.py agents`; where it cannot derive

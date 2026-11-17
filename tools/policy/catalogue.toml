@@ -793,6 +793,15 @@ summary = "Whether the declared fast gate legs run after every unit pass: on, or
 usage = 'pass.fast-legs = "off"'
 owner = "aNimbleMend"
 
+# TOOL-aTrimmedWait-10: the commit-render switch, default off. It is no row of the design's [policies] table, so the header's order does not place it.
+[[key]]
+name = "memory.staged-render"
+allowed = ["on", "off"]
+default = "off"
+summary = "Whether the pre-commit hook renders and stages the build index when check 9 refuses a commit: on, or off, the commit then refused as before."
+usage = 'memory.staged-render = "on"'
+owner = "aTrimmedWait"
+
 [[key]]
 name = "review.design-audit.runs"
 allowed = [1, 2, 3]

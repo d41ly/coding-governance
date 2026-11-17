@@ -115,6 +115,7 @@ unattended.sh --brief <slug> --unit <unit-id> --path <the brief file>
 unattended.sh --rescope <slug> --act retire|supersede|add|defer --item <unit-id> --reason "<why>"
 unattended.sh --dispatch <slug> --pass <unit-id> --writes <path> --writes <path>
 unattended.sh --plan <slug> --paths
+unattended.sh --check-specs <slug> <unit-id>...
 unattended.sh --status <slug>
 unattended.sh --claims  # RUN_CLAIMS on
 unattended.sh --overlaps  # local

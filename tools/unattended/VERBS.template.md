@@ -98,6 +98,15 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   format from the slug COUNT gives a caller two output shapes for one verb: a frame-reading caller
   handed a single-build corpus finds none of the lines it parses and reads the run as having graded
   NOTHING. Without the flag the one-slug form stays byte-identical to what it has always been.
+- `--check-specs` — `--check-specs <slug> <unit> [<unit> ...]` makes `--dispatch`'s five spec-file
+  refusals, MISSING, THIN, a malformed `order` verb, an unreadable consumes-from line and a
+  consumes-from cycle, over the build's tracked AND untracked specs, through the same functions
+  `--dispatch` calls and in the same words, under check 49. It needs no run-state file and writes
+  nothing in the worktree. It grades each named unit and then the build's edges once, printing every
+  refusal it finds rather than the first, and exits 1; clean, it prints one line naming the units and
+  exits 0. No unit given is check 14, and an unreadable fork cutoff, check 86, stops it. It is what the
+  spec stage runs before the spec commit, so a spec defect is refused while its author can fix it. It
+  does not make a refusal `--dispatch` reads from run state, the README or the whole tree.
 - `--status` — ONE line, opened by `unattended: <slug>`, with every field after it joined by ` · `
   in the order this entry names them. The phase, the witness and the next unit print on every line:
   `phase <phase>`, where a LANDED an owner's hand-off made, derived or settled, reads

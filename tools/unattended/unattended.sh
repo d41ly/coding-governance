@@ -33,6 +33,7 @@
 #   unattended.sh --record-round <slug> --owner-stop <path>        # append the owner's stop, citing a tracked record under the build's prompts/ folder
 #   unattended.sh --chain-verdict <slug>                           # CONTINUE, STOP or HOLD, derived from that record and the roster; writes nothing
 #   unattended.sh --check-commit <message file>                    # from commit-msg: refuse an open pass's undeclared staged path
+#   unattended.sh --check-specs <slug> <unit> [<unit> ...]   # --dispatch's spec-file refusals, before the spec commit
 #   unattended.sh --claims                                         # every run claim on the remote: slug, node, status, beat-age-s, verdict
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
 #   unattended.sh --version                                        # the kit version, then exit
@@ -116,7 +117,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 VERBS_SLUG="--preflight --status --audit --wake --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --brief --beat"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
-VERBS_INLINE="--plan --phase --check-commit --claims --overlaps --version"
+VERBS_INLINE="--plan --check-specs --phase --check-commit --claims --overlaps --version"
 verbs_all()   { printf '%s %s' "$VERBS_SLUG" "$VERBS_INLINE"; }
 is_slug_verb(){ case " $VERBS_SLUG " in *" $1 "*) return 0 ;; esac; return 1; }
 verb_list() { # -> "--a, --b and --c", for a human reading a refusal
@@ -8489,13 +8490,20 @@ verb_status() { # slug
   # STILL `STALE briefs 1`. A count that cannot return to zero is indistinguishable from one that is
   # stuck, so it tells a reader nothing. `awk` keeps the LAST row seen per unit, which is the live
   # claim; the superseded rows stay in the record as the history they are.
-  local _bstale=0 _bgone=0 _bl _bh _bp _bnow
+  #
+  # ONE GIT CALL FOR EVERY BRIEF (TOOL-aTrimmedWait-5). The loop only sorts rows into gone and
+  # present; the present paths are hashed after it by ONE `hash-object --stdin-paths`, which applies
+  # each path's filters as the writer's path-argument form does. A per-row call cost the holder's
+  # idle-wake tick about 15 s at 72 rows. A batch that exits non-zero or answers a different number of
+  # lines than it was given is not trusted: every row is graded by the per-path call instead, so a
+  # failed batch never moves a count. An empty answer is stale, as it always was.
+  local _bstale=0 _bgone=0 _bl _bh _bp _bi _bout _brc
+  local -a _bhs=() _bps=() _bnows=()
   while IFS= read -r _bl; do
     [ -n "$_bl" ] || continue
     _bh=${_bl%% *}; _bp=${_bl#* }
     if [ ! -f "$_bp" ]; then _bgone=$((_bgone+1)); continue; fi
-    _bnow=$(GIT hash-object "$_bp" 2>/dev/null | cut -c1-12)
-    [ "$_bnow" = "$_bh" ] || _bstale=$((_bstale+1))
+    _bhs+=("$_bh"); _bps+=("$_bp")
   #
   # ONE awk PASS AND NO BACK-REFERENCE. The first cut used a `sed` capture group and the `` did
   # not survive being written through a shell heredoc: the landed bytes read `/ /p`, so the unit id
@@ -8508,6 +8516,19 @@ $(awk -F' · ' '$1 ~ /^[0-9][0-9-]*T[0-9:]*Z brief$/ && $2 ~ /^item / && $3 ~ /^
      u = substr($2, 6); r = substr($3, 8); last[u] = r
    } END { for (u in last) print last[u] }' "$rel" 2>/dev/null)
 BRIEFROWS
+  if [ "${#_bps[@]}" -gt 0 ]; then
+    _bout=$(printf '%s\n' "${_bps[@]}" | GIT hash-object --stdin-paths 2>/dev/null); _brc=$?
+    # An empty capture is zero lines: `mapfile` over an empty here-string reads one, and with one
+    # present brief that would pass the count check (`line-count-reads-empty-capture-as-one`).
+    [ -z "$_bout" ] || mapfile -t _bnows <<<"$_bout"
+    if [ "$_brc" -ne 0 ] || [ "${#_bnows[@]}" -ne "${#_bps[@]}" ]; then
+      _bnows=()
+      for _bi in "${!_bps[@]}"; do _bnows[_bi]=$(GIT hash-object "${_bps[_bi]}" 2>/dev/null); done
+    fi
+    for _bi in "${!_bps[@]}"; do
+      [ "${_bnows[_bi]:0:12}" = "${_bhs[_bi]}" ] || _bstale=$((_bstale+1))
+    done
+  fi
   [ "$_bstale" -gt 0 ] && parked="$parked · STALE briefs $_bstale"
   [ "$_bgone" -gt 0 ] && parked="$parked · briefs gone $_bgone"
   # THE RESUME TICK'S ATTEMPTS, on the parked/noted rule: a FIELD on this one line, printed only
@@ -14772,6 +14793,79 @@ run_spec_token_check() { # slug -> 0 admitted or skipped, 1 refused under check 
   return 0
 }
 
+# ------------------------------------------------------- TOOL-aTrimmedWait-1, THE SPEC-FILE REFUSALS
+# `--dispatch`'s refusals that read the spec files alone, lifted out of `verb_dispatch` so
+# `--check-specs` makes them through the same predicates in the same words before the spec commit.
+# Both read the `SPEC_PATH` map their caller loaded. The texts moved verbatim, and each message keeps
+# its value in a NAMED variable after the sentence, because check-arms reads a branch's signature up
+# to its first interpolation.
+_cu_spec=""; _cu_ord=""
+check_unit_spec() { # unit -> 0, or 1 after check 49 (86 from load_fork_cutoff); sets _cu_spec, _cu_ord
+  local unit="$1" _d_spec _d_state _d_ord
+  _cu_spec=""; _cu_ord=""
+  _d_spec="${SPEC_PATH[$unit]:-}"
+  if [ -z "$_d_spec" ]; then
+    fail 49 "--dispatch declares a build pass for a unit no tracked spec under this build defines, which is M2's MISSING: the method's hard floor is that a MISSING unit is never built, and writing the spec afterwards is the same act with the record written last: $unit"
+    return 1
+  fi
+  _cu_spec=$_d_spec
+  load_fork_cutoff || return 1
+  _d_state=$(plan_state "$_d_spec" "$FORK_CUTOFF")
+  case "$_d_state" in
+    THIN) fail 49 "--dispatch declares a build pass for a unit whose spec grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing states what done MEANS for it: $unit ($_d_spec)"; return 1 ;;
+  esac
+  order_verb_of "$_d_spec" >/dev/null; _d_ord=$_order_verb
+  case "$_d_ord" in MALFORMED\ *)
+    fail 49 "a spec status header carries something shaped like the build-order verb that does not conform, and a reader taking its numeric prefix would sequence the build on a value nobody wrote: $_d_spec spells [${_d_ord#MALFORMED }]"
+    return 1 ;;
+  esac
+  _cu_ord=$_d_ord
+}
+check_edge_shape() { # unit spec ... -> 0, or 1 after check 49
+  local _c_kind _c_what _c_bad="" _c_cycle=""
+  while IFS=$'\t' read -r _c_kind _c_what; do
+    case "$_c_kind" in
+      unreadable) _c_bad="$_c_bad $_c_what" ;;
+      cycle) _c_cycle=$_c_what ;;
+    esac
+  done < <(scan_consumes_cycles "$@")
+  if [ -n "$_c_bad" ]; then
+    fail 49 "--dispatch declares a build pass while a spec of this build holds a consumes-from line in its Edges block from which no unit id is read, so every edge refusal here would read fewer edges than the spec declares, the direction that blocks nothing; write each as a column-0 bullet headed **consumes-from**, a space, then the producer's id in backticks, or the word external, or the word none with no backticked token after it in the bullet:$_c_bad"
+    return 1
+  fi
+  if [ -n "$_c_cycle" ]; then
+    fail 49 "--dispatch declares a build pass while this build's consumes-from edges form a cycle, so no unit on it can be dispatched after its producer closes and the run would wedge here with no named stop: $_c_cycle"
+    return 1
+  fi
+}
+# `--check-specs <slug> <unit> ...`: every refusal above, over the build's TRACKED and UNTRACKED specs,
+# with no run-state file, so a spec writer and the spec commit meet them before `--dispatch` does. It
+# reports each named unit's first refusal and the build's edge refusal rather than stopping at the
+# first, so a writer fixes them in one round. A check-86 refusal stops it: every later unit would
+# refuse the same way. WHAT IT DOES NOT CHECK: a refusal `--dispatch` makes from run state, the README
+# or the whole tree, nor a sibling's malformed order verb unless that sibling is named.
+check_dispatch_specs() { # slug · unit... -> 0 clean, 1 after the refusals it printed
+  local slug="$1"; shift
+  local spec="$MEMORY_ROOT/builds/$slug/spec/*.md" _cs_unit _cs_id _cs_rc=0 _cs_args=()
+  check_slug "$slug" || return 1
+  if [ "$#" -eq 0 ]; then
+    fail 14 "--check-specs was given no unit id, so it would grade nothing and print what a clean build prints: $slug"
+    return 1
+  fi
+  load_spec_facts $(GIT ls-files -- "$spec" 2>/dev/null) $(GIT ls-files --others --exclude-standard -- "$spec" 2>/dev/null) >/dev/null 2>&1 || true
+  for _cs_unit in "$@"; do
+    check_unit_spec "$_cs_unit" && continue
+    _cs_rc=1
+    [ "${RUNLOG_CHECKS[${#RUNLOG_CHECKS[@]}-1]}" = 86 ] && return 1
+  done
+  for _cs_id in $(printf '%s\n' "${!SPEC_PATH[@]}" | grep -E "^[A-Z]+-$slug-[0-9]+\$" | sort -u); do
+    _cs_args+=("$_cs_id" "${SPEC_PATH[$_cs_id]}")
+  done
+  check_edge_shape "${_cs_args[@]}" || _cs_rc=1
+  [ "$_cs_rc" = 0 ] || return 1
+  echo "unattended: --check-specs $slug — $*: none carries a refusal --dispatch makes from its spec files"
+}
+
 verb_dispatch() { # slug · unit · writes...
   local slug="$1" unit="$2"; shift 2
   local rel shaped grp p q sib sibpaths want cur curpaths gen idx pair _dk _c1_own _c1_gen
@@ -14796,18 +14890,12 @@ verb_dispatch() { # slug · unit · writes...
   # THE MESSAGE NAMES THE ID AND THE STATE AND NOT THE EMPTY SECTION. `plan_state`'s contract is one
   # bare token on stdout, pinned deliberately because two harnesses slice the function body, and
   # `build-complete` already words its own message the same way for the same reason.
-  local _d_spec _d_state
+  # The MISSING, THIN and own-order refusals live in `check_unit_spec`, which `--check-specs` shares
+  # (TOOL-aTrimmedWait-1), so the two verbs refuse one spec defect through one reader in one wording.
+  local _d_spec
   load_spec_facts $(GIT ls-files -- "$MEMORY_ROOT/builds/$slug/spec/*.md" 2>/dev/null) >/dev/null 2>&1 || true
-  _d_spec="${SPEC_PATH[$unit]:-}"
-  if [ -z "$_d_spec" ]; then
-    fail 49 "--dispatch declares a build pass for a unit no tracked spec under this build defines, which is M2's MISSING: the method's hard floor is that a MISSING unit is never built, and writing the spec afterwards is the same act with the record written last: $unit"
-    return 1
-  fi
-  load_fork_cutoff || return 1
-  _d_state=$(plan_state "$_d_spec" "$FORK_CUTOFF")
-  case "$_d_state" in
-    THIN) fail 49 "--dispatch declares a build pass for a unit whose spec grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing states what done MEANS for it: $unit ($_d_spec)"; return 1 ;;
-  esac
+  check_unit_spec "$unit" || return 1
+  _d_spec=$_cu_spec
   # ------------------------------------------------------------------------------ THE ORDER GATE
   # A unit may not be dispatched while an EARLIER step still holds a unit that is neither terminal
   # nor already dispatched. Units sharing an `order` value are the parallel group and do not block
@@ -14821,12 +14909,9 @@ verb_dispatch() { # slug · unit · writes...
   # with `gen_build_index.py` on exactly the inputs a comment here claimed they could not
   # disagree on: two spaces after the separator, or none, read EMPTY here and 3 there, and a
   # trailing-garbage value read as its numeric prefix here while the generator RAISES. An empty
-  # read SILENTLY SKIPS the whole order gate, which is the worst of the three.
-  order_verb_of "$_d_spec" >/dev/null; _d_ord=$_order_verb
-  case "$_d_ord" in MALFORMED\ *)
-    fail 49 "a spec status header carries something shaped like the build-order verb that does not conform, and a reader taking its numeric prefix would sequence the build on a value nobody wrote: $_d_spec spells [${_d_ord#MALFORMED }]"
-    return 1 ;;
-  esac
+  # read SILENTLY SKIPS the whole order gate, which is the worst of the three. Read, and its MALFORMED
+  # form refused, by `check_unit_spec` above.
+  _d_ord=$_cu_ord
   if [ -n "$_d_ord" ]; then
     for _o_id in $(unit_ids_of "$slug"); do
       [ "$_o_id" = "$unit" ] && continue
@@ -14901,24 +14986,11 @@ verb_dispatch() { # slug · unit · writes...
   # whose prose holds one is unreadable here (TOOL-dTrueNorth-32 S4). The remedy names that rule.
   # Hygiene check 12 reads the bullet's first line alone and passes any `none`, a divergence the
   # spec of TOOL-dTrueNorth-32 declares as owed work in its Edges.
-  local _c_args=() _c_kind _c_what _c_bad="" _c_cycle=""
+  local _c_args=()
   for _e_id in $_e_units; do
     [ -n "${SPEC_PATH[$_e_id]:-}" ] && _c_args+=("$_e_id" "${SPEC_PATH[$_e_id]}")
   done
-  while IFS=$'\t' read -r _c_kind _c_what; do
-    case "$_c_kind" in
-      unreadable) _c_bad="$_c_bad $_c_what" ;;
-      cycle) _c_cycle=$_c_what ;;
-    esac
-  done < <(scan_consumes_cycles "${_c_args[@]}")
-  if [ -n "$_c_bad" ]; then
-    fail 49 "--dispatch declares a build pass while a spec of this build holds a consumes-from line in its Edges block from which no unit id is read, so every edge refusal here would read fewer edges than the spec declares, the direction that blocks nothing; write each as a column-0 bullet headed **consumes-from**, a space, then the producer's id in backticks, or the word external, or the word none with no backticked token after it in the bullet:$_c_bad"
-    return 1
-  fi
-  if [ -n "$_c_cycle" ]; then
-    fail 49 "--dispatch declares a build pass while this build's consumes-from edges form a cycle, so no unit on it can be dispatched after its producer closes and the run would wedge here with no named stop: $_c_cycle"
-    return 1
-  fi
+  check_edge_shape "${_c_args[@]}" || return 1
   for _e_id in $(read_consumes_from "$_d_spec"); do
     case $'\n'"$_e_producers"$'\n' in *$'\n'"$_e_id"$'\n'*) ;; *) continue ;; esac
     _e_spec="${SPEC_PATH[$_e_id]:-}"
@@ -15542,12 +15614,13 @@ write_run_record() { # slug -> 0 always; one line per miss
 # Refusal 1 of five, and it does NOT belong in verb_preflight's precondition block where this spec
 # first put it: that function never runs for another verb, so a guard there could never fire. It is a
 # DISPATCH guard, and it has to be evaluated inside the --plan and --phase arms too, because both of
-# those exit INSIDE the loop and a post-loop check alone never sees them.
-refuse_waive_unless_preflight() { # verb
+# those exit INSIDE the loop and a post-loop check alone never sees them. It EXITS rather than returns
+# (TOOL-aTrimmedWait-1): every caller exited 1 on its refusal, so the five `|| { ...; exit 1; }` sites
+# were one refusal spelled five times, each an unarmable delegated site; now it is this one fail branch.
+refuse_waive_unless_preflight() { # verb -> 0, or exit 1 after check 37
   [ "$WAIVE_SEEN" = 1 ] || return 0
   local v="$1"
-  fail 37 "--waive is accepted by --preflight alone; the owner turn that grants a waiver is the last one there is, and a verb reachable mid-run is a place the run could answer its own question: $v"
-  return 1
+  fail 37 "--waive is accepted by --preflight alone; the owner turn that grants a waiver is the last one there is, and a verb reachable mid-run is a place the run could answer its own question: $v"; RUNLOG_CLEAN=1; exit 1
 }
 # --------------------------------------------------------------------------------------- dispatch
 # TOOL-cBriefedPilot-1 - the PAIRED accumulator. `--override) OV="${2:-}"` stored a scalar, so a
@@ -15668,7 +15741,7 @@ while [ $# -gt 0 ]; do
     --finding)      RR_FINDINGS+=("${2:-}"); shift 2 || shift ;;
     --sibling)      RR_SIBLINGS+=("${2:-}"); shift 2 || shift ;;
     --owner-stop)   RR_OWNER_STOP="${2:-}"; shift 2 || shift ;;
-    --plan)         shift; refuse_waive_unless_preflight --plan || { RUNLOG_CLEAN=1; exit 1; }
+    --plan)         shift; refuse_waive_unless_preflight --plan
                     # SEVERAL SLUGS IN ONE PROCESS, and the single-slug form is byte-identical to
                     # what it always was — the framing below only appears when more than one slug is
                     # given, so no existing caller sees a new byte. TOOL-aQuenchedHarness-10.
@@ -15712,16 +15785,21 @@ while [ $# -gt 0 ]; do
                       printf 'unattended-plan-rc: %s %s\n' "$_pl_s" "$_pl_one"
                     done
                     RUNLOG_CLEAN=1; exit 0 ;;
+    # TOOL-aTrimmedWait-1 - the slug, then every bare word up to the next flag as a unit.
+    --check-specs)  shift; CS_SLUG=${1:-}; shift 2>/dev/null || true; CS_UNITS=()
+                    while [ $# -gt 0 ]; do case "$1" in --*) break ;; esac; CS_UNITS+=("$1"); shift; done
+                    refuse_waive_unless_preflight --check-specs
+                    check_dispatch_specs "$CS_SLUG" "${CS_UNITS[@]}"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     --phase)        shift; PH_SLUG=${1:-}; shift 2>/dev/null || true; PH_WANT=${1:-}; shift 2>/dev/null || true
                     PH_WIT=""
                     [ "${1:-}" = "--witness" ] && { shift; PH_WIT=${1:-}; }
-                    refuse_waive_unless_preflight --phase || { RUNLOG_CLEAN=1; exit 1; }
+                    refuse_waive_unless_preflight --phase
                     verb_phase "$PH_SLUG" "$PH_WANT" "$PH_WIT"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     --check-commit) shift
                     CC_TMP=$(mktemp) || { echo "unattended: --check-commit cannot create a scratch file, so it graded nothing"; RUNLOG_CLEAN=1; exit 2; }
                     check_commit_message "${1:-}"; _rl_rc=$?; rm -f "$CC_TMP"; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     # TOOL-aGraftedHelix-1 - the remote's claims, read and printed; no slug, because it lists them all.
-    --claims)       refuse_waive_unless_preflight --claims || { RUNLOG_CLEAN=1; exit 1; }
+    --claims)       refuse_waive_unless_preflight --claims
                     print_claims; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; RUNLOG_CLEAN=1; exit 0 ;;
     --help|-h)      echo "unattended: the verbs are $(verb_list); each verb's contract is $MEMORY_ROOT/guides/UNATTENDED-VERBS.md"
@@ -15745,7 +15823,7 @@ done
 # re-synchronised by hand and drifted again at the next verb. Both survivors now DERIVE - the refusal
 # above from VERBS_SLUG, this usage text from the header's own invocation lines - so there is nothing
 # left here to re-synchronise.
-case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}" || { RUNLOG_CLEAN=1; exit 1; } ;; esac
+case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}" ;; esac
 [ -n "$VERB" ] || { usage; RUNLOG_CLEAN=1; exit 2; }
 
 case "$VERB" in
