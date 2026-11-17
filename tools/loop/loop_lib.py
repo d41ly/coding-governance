@@ -820,42 +820,33 @@ def derive_import_aliases(tree):
 
 
 def derive_conf_constants(loop_lib_path):
-    """The module-level names the file at `loop_lib_path` binds by an `Assign` or `AnnAssign` whose value
-    is a str constant, an f-string, a `BinOp` over such values, or a `Path(...)` or `PurePath(...)` call
-    over one, and whose source text holds `.memory-tree.conf` or `.unattended.conf`; read by `ast.parse`,
-    never an import. LoopError naming the path where the file is missing or does not parse
-    (TOOL-dDeclaredLoop-86 S13)."""
+    """The module-level names the file at `loop_lib_path` binds, the class and never a list of shapes:
+    every `Name` in the targets, a tuple target's included, of an `Assign`, an `AnnAssign` with a value or
+    an `AugAssign` that no function and no class encloses, one nested in a module-level `if`, `try`,
+    `with`, `for` or `while` included, whose value's syntax subtree holds anywhere a str constant
+    containing `.memory-tree.conf` or `.unattended.conf`, an f-string's literal part included. The value's
+    shape is never tested, so a join of any operands and any call are inside the class; a value that
+    only names another binding is not (TOOL-dDeclaredLoop-87 S1). Read by `ast.parse`, never an import.
+    LoopError naming the path where the file is missing or does not parse (TOOL-dDeclaredLoop-86 S13)."""
     import ast
     path = pathlib.Path(loop_lib_path)
     try:
-        src = path.read_text(encoding="utf-8")
-        body = ast.parse(src, str(path)).body
+        body = ast.parse(path.read_text(encoding="utf-8"), str(path)).body
     except (OSError, UnicodeDecodeError, SyntaxError, ValueError) as e:
         raise LoopError(path.as_posix(), "cannot be read as the conf constants' module: %s" % e) from None
-
-    def check_conf_value(node):
-        """Whether `node` is one of the value shapes a conf constant takes."""
-        if isinstance(node, ast.Constant):
-            return isinstance(node.value, str)
-        if isinstance(node, ast.BinOp):
-            return check_conf_value(node.left) and check_conf_value(node.right)
-        if isinstance(node, ast.Call):
-            name = getattr(node.func, "id", None) or getattr(node.func, "attr", None)
-            return name in ("Path", "PurePath") and len(node.args) == 1 and not node.keywords \
-                and check_conf_value(node.args[0])
-        return isinstance(node, ast.JoinedStr)
-
-    names = set()
-    for st in body:
-        if isinstance(st, ast.Assign):
-            targets = st.targets
-        elif isinstance(st, ast.AnnAssign) and st.value is not None:
-            targets = [st.target]
-        else:
+    confs = (".memory-tree.conf", ".unattended.conf")
+    names, todo = set(), list(body)
+    while todo:
+        st = todo.pop()
+        if isinstance(st, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
             continue
-        text = ast.get_source_segment(src, st.value) or ""
-        if check_conf_value(st.value) and any(c in text for c in (".memory-tree.conf", ".unattended.conf")):
-            names.update(t.id for t in targets if isinstance(t, ast.Name))
+        if isinstance(st, (ast.Assign, ast.AugAssign, ast.AnnAssign)) and st.value is not None:
+            if any(isinstance(n, ast.Constant) and isinstance(n.value, str) and any(c in n.value for c in confs)
+                   for n in ast.walk(st.value)):
+                for t in getattr(st, "targets", None) or [st.target]:
+                    names.update(n.id for n in ast.walk(t) if isinstance(n, ast.Name))
+            continue
+        todo.extend(c for c in ast.iter_child_nodes(st) if isinstance(c, (ast.stmt, ast.excepthandler)))
     return names
 
 

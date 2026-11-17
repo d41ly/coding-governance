@@ -205,7 +205,8 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
           "conf-read-forms": "the conf-read rule over scratch modules beside a loop_lib binding the driver's conf's "
                              "name: a constant, the same line in fixture code, a bash string, an aliased reader, "
                              "docstrings alone, a Path binding, an annotated binding and a star import of the "
-                             "loop_lib, then the first module with no loop_lib beside it"}
+                             "loop_lib, a joined path, an os.path.join call, a multi-argument Path and an aliased "
+                             "from-import, a join naming no conf, then the first module with no loop_lib beside it"}
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
 PLANT_TRAILER = '[transitions]\nrecord = ["trailer"]\n'
 PLANT_SPEC = "# TOOL-%s-%d — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n"
@@ -828,6 +829,25 @@ def run_budget_plant(case):
                 print("%s: fixture · conf-read-forms · %s · %s" % (SAY, name, ", ".join(
                     "line %d %s" % hit for hit in got) or "no hit"))
                 check(got == [(2, "conf constant")], "%s answered %s, owed one conf constant" % (name, got))
+            # TOOL-dDeclaredLoop-87 S3: the repo's own binding idioms, each inside the class and outside 86's
+            # shape list, then a join naming no conf, the liveness negative
+            for name, lib, opens, reads, owed in (
+                    ("joined-path", 'CONF = ROOT / ".unattended.conf"\n', "import loop_lib as ll", "ll.CONF",
+                     [(2, "conf constant")]),
+                    ("os-path-join", 'CONF = os.path.join(ROOT, ".memory-tree.conf")\n', "import loop_lib as ll",
+                     "ll.CONF", [(2, "conf constant")]),
+                    ("multi-argument-path", 'CONF = Path(ROOT, "cfg", ".unattended.conf")\n',
+                     "import loop_lib as ll", "ll.CONF", [(2, "conf constant")]),
+                    ("aliased-from-import", 'CONF = ROOT / ".unattended.conf"\n', "from loop_lib import CONF as C",
+                     "C", [(2, "conf constant")]),
+                    ("non-conf-join", 'OTHER = ROOT / "other.toml"\n', "import loop_lib as ll", "ll.OTHER", [])):
+                write_fixture_files(top / name, {"loop_lib.py": lib,
+                                                 name + ".py": "%s\ndef read_root(): return open(%s).read()\n" % (
+                                                     opens, reads)})
+                got = derive_conf_reads(top / name / (name + ".py"))
+                print("%s: fixture · conf-read-forms · %s · %s" % (SAY, name, ", ".join(
+                    "line %d %s" % hit for hit in got) or "no hit"))
+                check(got == owed, "%s answered %s, owed %s" % (name, got, owed))
             write_fixture_files(top / "no-lib", {"constant.py": first})
             try:
                 got = "answered %s" % derive_conf_reads(top / "no-lib" / "constant.py")
