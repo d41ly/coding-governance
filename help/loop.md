@@ -1841,7 +1841,12 @@ outside the flow, such as the lander's wait on a claim lock, which the loop kit'
   given the `actor` class) and `computed-unserved` (the row serving an item the file does not
   declare). The case `conf-readers-declared` reads no definition: it finds each function of the loop
   module that builds a conf path and opens it, and exits 1 naming one that is declared neither a
-  conf reader nor a route, or a declared one that no longer opens a conf. The files on disk are never changed. `python tools/loop/loop_lib.py --selftest` runs every
+  conf reader nor a route, or a declared one that no longer opens a conf. Six more cases each run that
+  comparison over a scratch copy of the loop module with one change, and each exits 1 on the refusal
+  it must draw: `conf-opener-literal`, `conf-opener-constant` and `conf-opener-local` add a function,
+  declared nowhere, that opens a conf by its literal name, through a module constant or through a
+  local name; `conf-route-opens-none` empties the route; `conf-openers-none` empties every declared
+  opener; and `conf-module-unparsable` adds a definition that does not parse. The files on disk are never changed. `python tools/loop/loop_lib.py --selftest` runs every
   case and holds each to the exit and line it owes, one `PASS` or `FAIL` line per case and a summary;
   gov's own `loop definition fixtures` gate runs it, with no guard, so every bar runs these cases.
 - **Check the re-run stand-in:** `python tools/loop/loop_witness.py --fixture --plant acceptance` runs <!-- usage: script:tools/loop/loop_witness.py 6de87be4 -->

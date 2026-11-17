@@ -203,7 +203,17 @@ PLANTS = {"missing-step": "the step.deploy row taken out",
           "computed-actor": "the acceptance computed witness's served item given witness class actor",
           "computed-unserved": "the acceptance computed witness set to serve item.build.acceptanc",
           "conf-readers-declared": "this module's functions that open a conf compared both ways with its declared "
-                                   "readers and routes, no definition read"}
+                                   "readers and routes, no definition read",
+          "conf-opener-literal": "a scratch copy of this module given a function, declared nowhere, that opens "
+                                 "the memory tree's conf by its literal name",
+          "conf-opener-constant": "a scratch copy of this module given a module constant naming the driver's conf "
+                                  "and a function, declared nowhere, that opens it",
+          "conf-opener-local": "a scratch copy of this module given a function, declared nowhere, that binds the "
+                               "memory tree's conf name to a local and opens it",
+          "conf-route-opens-none": "a scratch copy of this module whose resolve_memory_root_source returns None",
+          "conf-openers-none": "a scratch copy of this module whose read_driver_conf and resolve_memory_root_source "
+                               "each return None",
+          "conf-module-unparsable": "a scratch copy of this module given a definition that does not parse"}
 #: `--selftest`'s owed answer of each plant (TOOL-dDeclaredLoop-67 S30): its exit, the opening of a line
 #: it prints and a needle that line holds, each pair found by running the plant alone at the pass's base.
 #: A definition the reader refuses prints `loop: <path>: <why>`, a graded refusal `loop: refused · <why>`.
@@ -241,10 +251,25 @@ PLANT_OWED = {"missing-step": (1, "loop: ", "the step step.deploy is missing"),
               "roles-no-kit": (0, "loop: item ", " · unarmed · no roles kit holding"),
               "computed-actor": (1, "loop: refused · ", "whose witness class actor is refused"),
               "computed-unserved": (1, "loop: refused · ", "serves 'item.build.acceptanc'"),
-              "conf-readers-declared": (0, "loop: conf readers declared · ", " opener(s) · ")}
+              "conf-readers-declared": (0, "loop: conf readers declared · ", " opener(s) · "),
+              "conf-opener-literal": (1, "loop: refused · ", "read_literal_conf opens a conf and is in neither "
+                                                             "CONF_READERS nor CONF_ROUTES"),
+              "conf-opener-constant": (1, "loop: refused · ", "read_constant_conf opens a conf and is in neither "
+                                                              "CONF_READERS nor CONF_ROUTES"),
+              "conf-opener-local": (1, "loop: refused · ", "read_local_conf opens a conf and is in neither "
+                                                           "CONF_READERS nor CONF_ROUTES"),
+              "conf-route-opens-none": (1, "loop: refused · ", "resolve_memory_root_source is in CONF_ROUTES and "
+                                                               "opens no conf"),
+              "conf-openers-none": (1, "loop: refused · ", "no conf opener found in loop_lib.py"),
+              "conf-module-unparsable": (1, "loop: refused · ", "cannot be read as the conf constants' module")}
 #: The plants whose break is in what the scope verb reads rather than in the definition, so `--check`
 #: runs whole and the scope verb runs after it.
 SCOPE_PLANTS = ("scope-selected", "scope-no-kit")
+#: The plants that read no definition and run `check_conf_readers_plant`, over this file for
+#: `conf-readers-declared` and over the scratch copy `write_conf_plant` writes for each other one
+#: (TOOL-dDeclaredLoop-117 S2).
+CONF_PLANTS = ("conf-readers-declared", "conf-opener-literal", "conf-opener-constant", "conf-opener-local",
+               "conf-route-opens-none", "conf-openers-none", "conf-module-unparsable")
 #: The `scope-selected` plant's unit: one scratch manifest row scoped to one item.
 PLANT_SCOPE_UNIT = ("unit.loop-fixture", "item.plan.record")
 #: The declaration sites outside the definition whose entries `--grade-site` grades: the unattended
@@ -1026,13 +1051,19 @@ CONF_ROUTES = ("resolve_memory_root_source",)
 def derive_conf_openers(loop_lib_path):
     """The sorted names of the module-level `def` and `async def` nodes of the file at `loop_lib_path`,
     outside `derive_fixture_boundary`, whose own body, a nested `def`, `async def` or `class` excluded,
-    both builds a conf path and opens content (TOOL-dDeclaredLoop-99 S1). A conf path is an operand of
-    `/`, or a positional argument of a `join`, `Path` or `PurePath` call, that `check_conf_name` answers
-    or that is a name or attribute naming a member of `derive_conf_constants`' answer; an open is a call
-    of `parse_conf`, `open`, `read_bytes` or `read_text`, or of an attribute of the name `subprocess`.
-    A callee is a name by its id and an attribute by its attr. Read by `ast.parse`, never an import;
+    both builds a conf path and opens content (TOOL-dDeclaredLoop-99 S1, TOOL-dDeclaredLoop-117 S1). A
+    conf path is an expression `check_conf_name` answers, a name or attribute naming a member of
+    `derive_conf_constants`' answer, or a name the function's own body binds to a conf path: the `Name`
+    target of an `Assign`, an `AnnAssign` with a value or a walrus whose value is a conf path, read to a
+    fixpoint so a re-bound name carries. It builds one where a conf path is an operand of `/`, a
+    positional or keyword argument of a `join`, `Path`, `PurePath`, `open` or `parse_conf` call, or the
+    receiver of an `open`, `read_bytes` or `read_text` attribute call; an open is a call of
+    `parse_conf`, `open`, `read_bytes` or `read_text`, or of an attribute of the name `subprocess`. A
+    callee is a name by its id and an attribute by its attr. Read by `ast.parse`, never an import;
     `derive_conf_constants`' refusals are this one's. NOT SEEN: a path built in one function and opened
-    in another, a conf name composed at run time, and `subprocess` reached under another name."""
+    in another; a conf name composed at run time; `subprocess` reached under another name; and a path
+    carried through an attribute, a subscript, a container, or a conf-path name wrapped in a call that
+    is none of `join`, `Path`, `PurePath`, `open` and `parse_conf`, such as `open(str(p))`."""
     import ast
     consts = derive_conf_constants(loop_lib_path)
     path = pathlib.Path(loop_lib_path)
@@ -1050,11 +1081,24 @@ def derive_conf_openers(loop_lib_path):
                 todo.extend(ast.iter_child_nodes(n))
         calls = [(c, c.func.id if isinstance(c.func, ast.Name) else getattr(c.func, "attr", None))
                  for c in body if isinstance(c, ast.Call)]
+        local = set()
+        conf = lambda o: check_conf_name(o) or (isinstance(o, ast.Name) and (o.id in consts or o.id in local)) \
+            or (isinstance(o, ast.Attribute) and o.attr in consts)   # noqa: E731
+        binds = [(t.id, n.value) for n in body if isinstance(n, ast.Assign) for t in n.targets
+                 if isinstance(t, ast.Name)] + [(n.target.id, n.value) for n in body
+                                                if isinstance(n, (ast.AnnAssign, ast.NamedExpr))
+                                                and n.value is not None and isinstance(n.target, ast.Name)]
+        grown = True
+        while grown:
+            grown = {name for name, value in binds if name not in local and conf(value)}
+            local |= grown
         operands = [o for n in body if isinstance(n, ast.BinOp) and isinstance(n.op, ast.Div)
-                    for o in (n.left, n.right)] + [a for c, callee in calls
-                                                   if callee in ("join", "Path", "PurePath") for a in c.args]
-        builds = any(check_conf_name(o) or (isinstance(o, ast.Name) and o.id in consts)
-                     or (isinstance(o, ast.Attribute) and o.attr in consts) for o in operands)
+                    for o in (n.left, n.right)] + [
+            a for c, callee in calls if callee in ("join", "Path", "PurePath", "open", "parse_conf")
+            for a in (*c.args, *(k.value for k in c.keywords))] + [
+            c.func.value for c, callee in calls
+            if isinstance(c.func, ast.Attribute) and callee in ("open", "read_bytes", "read_text")]
+        builds = any(conf(o) for o in operands)
         opens = any(callee in ("parse_conf", "open", "read_bytes", "read_text") or (
             isinstance(c.func, ast.Attribute) and isinstance(c.func.value, ast.Name)
             and c.func.value.id == "subprocess") for c, callee in calls)
@@ -1627,9 +1671,13 @@ def main(argv):
               "<entry>..." % (
             "|".join(PLANTS), "|".join(DECLARATION_SITES)), file=sys.stderr)
         return 2
-    if plant == "conf-readers-declared":   # TOOL-dDeclaredLoop-99 S3: this file's conf openers, no definition read
+    if plant in CONF_PLANTS:   # TOOL-dDeclaredLoop-99 S3, TOOL-dDeclaredLoop-117 S2: conf openers, no definition read
         print("loop: fixture · plant %s · %s" % (plant, PLANTS[plant]))
-        refusals = check_conf_readers_plant(pathlib.Path(__file__))
+        if plant == "conf-readers-declared":
+            refusals = check_conf_readers_plant(pathlib.Path(__file__))
+        else:   # the copy sits under the host temp directory and is removed after
+            with tempfile.TemporaryDirectory() as scratch:
+                refusals = check_conf_readers_plant(write_conf_plant(plant, scratch))
         for r in refusals:
             print("loop: refused · %s" % r)
         return 1 if refusals else 0
@@ -1776,6 +1824,36 @@ def check_scope_plant(plant, layers, scratch, kit_dir, root, tags):
     armed = [ln for ln in lines if " · unarmed · " not in ln]
     return ([] if layers is None else ["the inputs read layer tags with no playbook kit"]) + [
         "a scope line with no playbook kit is armed: %s" % ln for ln in armed]
+
+
+def write_conf_plant(plant, scratch):
+    """The path of a copy of this file with the one change the conf plant `plant` names, written as
+    `loop_lib.py` into the directory `scratch` (TOOL-dDeclaredLoop-117 S2): an opener case appends a
+    function that opens a conf and is declared nowhere, `conf-module-unparsable` a definition that does
+    not parse, and a body case reduces the named functions' bodies to `return None` through `ast` and
+    `ast.unparse`, never a tuple, since the plant's third arm reads this module's `globals()`. The
+    appended texts sit here and never at module scope, so `derive_conf_constants` stays empty."""
+    import ast
+    text = pathlib.Path(__file__).read_text(encoding="utf-8")
+    appended = {"conf-opener-literal": 'def read_literal_conf():\n    return open(".memory-tree.conf").read()\n',
+                "conf-opener-constant": 'SEED_CONF = ".unattended.conf"\n\n\ndef read_constant_conf():\n'
+                                        '    return open(SEED_CONF).read()\n',
+                "conf-opener-local": 'def read_local_conf():\n    name = ".memory-tree.conf"\n'
+                                     '    return open(name).read()\n',
+                "conf-module-unparsable": "def read_broken_conf(:\n"}
+    emptied = {"conf-route-opens-none": ("resolve_memory_root_source",),
+               "conf-openers-none": ("read_driver_conf", "resolve_memory_root_source")}
+    if plant in appended:
+        text += "\n\n" + appended[plant]
+    else:
+        tree = ast.parse(text)
+        for f in tree.body:
+            if isinstance(f, (ast.FunctionDef, ast.AsyncFunctionDef)) and f.name in emptied[plant]:
+                f.body = [ast.Return(ast.Constant(None))]
+        text = ast.unparse(tree)
+    path = pathlib.Path(scratch) / "loop_lib.py"
+    path.write_text(text, encoding="utf-8")
+    return path
 
 
 def check_conf_readers_plant(loop_lib_path):

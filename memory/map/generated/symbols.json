@@ -35913,6 +35913,11 @@
       "file": "tools/govkit/step_gate.py"
     },
     {
+      "id": "write_conf_plant",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "write_conflict_body",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"

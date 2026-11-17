@@ -27,6 +27,7 @@
 | [2026-11-13-build-TOOL-dDeclaredLoop-1-1-builder-return.md](../build/2026-11-13-build-TOOL-dDeclaredLoop-1-1-builder-return.md) | journal | — |
 | [2026-11-13-build-TOOL-dDeclaredLoop-1-deviation-13.md](../build/2026-11-13-build-TOOL-dDeclaredLoop-1-deviation-13.md) | deviation | — |
 | [2026-11-13-build-TOOL-dDeclaredLoop-1-deviation-14.md](../build/2026-11-13-build-TOOL-dDeclaredLoop-1-deviation-14.md) | deviation | — |
+| [2026-11-17-build-TOOL-dDeclaredLoop-1-deviation-1173.md](../build/2026-11-17-build-TOOL-dDeclaredLoop-1-deviation-1173.md) | deviation | TOOL-dDeclaredLoop-115 TOOL-dDeclaredLoop-116 TOOL-dDeclaredLoop-117 |
 | [2026-11-17-build-TOOL-dDeclaredLoop-1-red-fix-63.md](../build/2026-11-17-build-TOOL-dDeclaredLoop-1-red-fix-63.md) | red-fix | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-1-reuse-scout.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-1-reuse-scout.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-2-reuse-scout.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-2-reuse-scout.md) | journal | — |
