@@ -189,7 +189,7 @@ SPEC_RECORDS_CLOSE = "<!-- /gen:spec-records -->"
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from tree_lib import (  # noqa: E402  the kit's shared helpers
     BIND_HEAD_LINES, BIND_RE, GIT_ENV_LEAKS, HDR_RE, RECORD_KIND_TOKENS, RECORD_KINDS, STATUS_TOKENS, TERMINAL,
-    UNBOUND_RE, _expand_ids, _id_alternation, build_id_token_re, build_spec_path_re, derive_docstring_ids, kit_rel,
+    UNBOUND_RE, _expand_ids, _id_alternation, build_id_token_re, build_spec_path_re, derive_constant_charges, kit_rel,
     parse_conf, parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at, read_id_pins, read_text, record_paths,
     scan_missing_citations, unfenced, unfenced_lines,
 )
@@ -5621,46 +5621,18 @@ def scan_glob_readers(kit_dir: str) -> list:
     directly in `kit_dir`, sorted. A docstring is prose and never counts; a comment is not in the tree.
 
     TOOL-dTrueNorth-23 S3: the population the pathspec-mode arm grades is DERIVED here, so a reader the
-    kit gains is named by the arm instead of skipped by it. THE CHARGE RULE (TOOL-dTrueNorth-32 S5, S9):
-    each such constant outside a docstring is charged to exactly one name, the first of these that holds:
-      1. the innermost enclosing function, its decorators and signature included, as
-         `<module>.<qualified name>` joining every enclosing class and function name, so a class built
-         inside a function is charged to that function, its one reader;
-      2. else, outside every function, each `Name` in the targets of the innermost enclosing `Assign`,
-         `AnnAssign` or `AugAssign`, qualified by the enclosing classes;
-      3. else the innermost enclosing class, qualified, as a class-level `PATHS.append(...)` is;
-      4. else the module, as `<module>`, as a module-level `SPECS.append(...)` is.
-    The rule is total, so every shape the tree can hold has an owner. NOT SEEN: a pathspec composed at
-    run time from pieces, as this function's own needle is, and one spelled in a shell script of the kit.
+    kit gains is named by the arm instead of skipped by it. Each such constant is charged to the one
+    name `tree_lib.py#derive_constant_charges` answers, whose docstring states THE CHARGE RULE
+    (TOOL-dTrueNorth-32 S5, S9; TOOL-dDeclaredLoop-88 S13). NOT SEEN: a pathspec composed at run time
+    from pieces, as this function's own needle is, and one spelled in a shell script of the kit.
     """
     magic = ":(" + "glob)"     # composed, so this walk's own needle is no constant it finds
     found = set()
-
-    def scan_scope(node, qual, function, assign, klass, docs):
-        # `qual` is the module, then each enclosing class and function name; `function`, `assign` and
-        # `klass` the charge rule's first three owners in force at `node`, None where none encloses it
-        for child in ast.iter_child_nodes(node):
-            if isinstance(child, ast.Constant) and isinstance(child.value, str) and magic in child.value \
-                    and id(child) not in docs:
-                found.update([function] if function else assign or [klass or qual[0]])
-            elif isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                inner = [*qual, child.name]
-                scan_scope(child, inner, ".".join(inner), None, klass, docs)
-            elif isinstance(child, ast.ClassDef):
-                inner = [*qual, child.name]
-                scan_scope(child, inner, function, None, ".".join(inner), docs)
-            elif function is None and isinstance(child, (ast.Assign, ast.AnnAssign, ast.AugAssign)):
-                targets = child.targets if isinstance(child, ast.Assign) else [child.target]
-                names = [".".join([*qual, n.id]) for t in targets for n in ast.walk(t) if isinstance(n, ast.Name)]
-                scan_scope(child, qual, None, names or assign, klass, docs)
-            else:
-                scan_scope(child, qual, function, assign, klass, docs)
-
     for name in sorted(os.listdir(kit_dir)):
         if not name.endswith(".py"):
             continue
         tree = ast.parse(read_text(os.path.join(kit_dir, name)), name)
-        scan_scope(tree, [name[:-3]], None, None, None, derive_docstring_ids(tree))
+        found.update(owner for owner, _rule in derive_constant_charges(tree, name[:-3], lambda s: magic in s))
     return sorted(found)
 
 

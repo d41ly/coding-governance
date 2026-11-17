@@ -65,7 +65,7 @@ def parse_leg_names(text: str) -> set:
 def derive_docstring_ids(tree) -> set:
     """The `id()` of each docstring constant in a parsed module: the module's and that of every class,
     function and `async def` whose body opens with a string constant. A docstring is prose, so the
-    walks that grade a module's string constants pass these over: `gen_build_index.py#scan_glob_readers`
+    walks that grade a module's string constants pass these over: `derive_constant_charges`
     and the loop kit's `derive_conf_reads` (TOOL-dDeclaredLoop-82 S8). The ids hold while `tree` lives."""
     import ast
 
@@ -73,6 +73,52 @@ def derive_docstring_ids(tree) -> set:
             if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef))
             and node.body and isinstance(node.body[0], ast.Expr)
             and isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str)}
+
+
+def derive_constant_charges(tree, module, is_needle) -> list:
+    """The sorted pairs `(owner, rule)` the str constants of a parsed module whose value `is_needle`
+    answers true for are charged to, one per owner a charge names, `rule` the number of the rule that
+    charged it. A docstring `derive_docstring_ids` answers is prose and never counts; a comment is not
+    in the tree. The one charge walk (TOOL-dDeclaredLoop-88 S13): `gen_build_index.py#scan_glob_readers`
+    reads its owners and the loop kit's `derive_conf_constants` its rule-2 slice.
+
+    THE CHARGE RULE (TOOL-dTrueNorth-32 S5, S9): each such constant is charged to exactly one name, the
+    first of these that holds:
+      1. the innermost enclosing function, its decorators and signature included, as
+         `<module>.<qualified name>` joining every enclosing class and function name, so a class built
+         inside a function is charged to that function, its one reader;
+      2. else, outside every function, each `Name` in the targets of the innermost enclosing `Assign`,
+         `AnnAssign` or `AugAssign`, qualified by the enclosing classes;
+      3. else the innermost enclosing class, qualified, as a class-level `PATHS.append(...)` is;
+      4. else the module, as `<module>`, as a module-level `SPECS.append(...)` is.
+    The rule is total, so every shape the tree can hold has an owner."""
+    import ast
+
+    docs, found = derive_docstring_ids(tree), set()
+
+    def scan_scope(node, qual, function, assign, klass):
+        # `qual` is the module, then each enclosing class and function name; `function`, `assign` and
+        # `klass` the charge rule's first three owners in force at `node`, None where none encloses it
+        for child in ast.iter_child_nodes(node):
+            if isinstance(child, ast.Constant) and isinstance(child.value, str) and id(child) not in docs \
+                    and is_needle(child.value):
+                found.update([(function, 1)] if function else [(a, 2) for a in assign] if assign
+                             else [(klass, 3)] if klass else [(qual[0], 4)])
+            elif isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                inner = [*qual, child.name]
+                scan_scope(child, inner, ".".join(inner), None, klass)
+            elif isinstance(child, ast.ClassDef):
+                inner = [*qual, child.name]
+                scan_scope(child, inner, function, None, ".".join(inner))
+            elif function is None and isinstance(child, (ast.Assign, ast.AnnAssign, ast.AugAssign)):
+                targets = child.targets if isinstance(child, ast.Assign) else [child.target]
+                names = [".".join([*qual, n.id]) for t in targets for n in ast.walk(t) if isinstance(n, ast.Name)]
+                scan_scope(child, qual, None, names or assign, klass)
+            else:
+                scan_scope(child, qual, function, assign, klass)
+
+    scan_scope(tree, [module], None, None, None)
+    return sorted(found)
 
 
 def read_policy_value(key, root):

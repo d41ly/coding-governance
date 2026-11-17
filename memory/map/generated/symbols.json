@@ -10448,6 +10448,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "derive_constant_charges",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
       "id": "derive_contained_rel",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"

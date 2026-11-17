@@ -209,7 +209,8 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
                              "from-import, a join naming no conf, a global loader rebinding a name to the driver's "
                              "conf's path, one holding the memory tree's conf in a with, a walrus, a for target and "
                              "a with target, a global loader naming no conf and one naming the driver's conf in its "
-                             "docstring alone, then the first module with no loop_lib beside it"}
+                             "docstring alone, then the first module with no loop_lib beside it, then with the "
+                             "memory-tree kit's tree_lib unlocatable, blocked from import and unparseable"}
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
 PLANT_TRAILER = '[transitions]\nrecord = ["trailer"]\n'
 PLANT_SPEC = "# TOOL-%s-%d — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n"
@@ -876,6 +877,32 @@ def run_budget_plant(case):
                 got = "raised %s" % e
             print("%s: fixture · conf-read-forms · constant, no loop_lib beside it · %s" % (SAY, got))
             check(got.startswith("raised") and "loop_lib.py" in got, "the module with no loop_lib beside it %s" % got)
+            # TOOL-dDeclaredLoop-88 S33: the route to tree_lib unlocatable, blocked from import and unparseable,
+            # each a LoopError naming the update command, never a traceback
+            import unittest.mock
+            import loop_lib
+            broken = top / "broken-tree-lib"
+            write_fixture_files(broken, {"tree_lib.py": "def derive_docstring_ids(:\n"})
+
+            def read_unlocatable(anchor):
+                raise LookupError("no memory-tree kit holding %s: looked in fx-a, fx-b and fx-c" % anchor)
+            for name, swap, block, owed in (("unlocatable", read_unlocatable, False, "looked in"),
+                                            ("blocked", loop_lib.read_memory_tree, True, "None in sys.modules"),
+                                            ("unparseable", lambda anchor: broken, False, "SyntaxError")):
+                with contextlib.ExitStack() as stack:
+                    stack.enter_context(unittest.mock.patch.dict(sys.modules))
+                    stack.enter_context(unittest.mock.patch.object(sys, "path", [str(broken), *sys.path]))
+                    stack.enter_context(unittest.mock.patch.object(loop_lib, "read_memory_tree", swap))
+                    sys.modules.pop("tree_lib", None)
+                    if block:
+                        sys.modules["tree_lib"] = None
+                    try:
+                        got = "answered %s" % derive_conf_reads(top / "with-lib" / "constant.py")
+                    except LoopError as e:
+                        got = "raised %s" % e
+                print("%s: fixture · conf-read-forms · tree_lib %s · %s" % (SAY, name, got))
+                check(got.startswith("raised") and "govkit update --kits memory-tree" in got and owed in got,
+                      "tree_lib %s %s, owed a LoopError naming %r and the update command" % (name, got, owed))
         else:
             write_budget_plant(top, case)
         draw = ["draw", "--build", FX_BUILD, "--cause", "fix-pass", "--item"]
