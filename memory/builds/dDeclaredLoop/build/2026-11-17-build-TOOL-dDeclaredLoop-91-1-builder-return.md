@@ -1,0 +1,20 @@
+**Serves:** journal TOOL-dDeclaredLoop-91
+
+# Builder return — TOOL-dDeclaredLoop-91, dispatch 1: AC3's absent update command cannot hold beside the tree_lib rows unit 88 planted in the same plant
+
+## Why
+
+DIVERGENCE: section 6 (AC3) can't hold alongside AC1 and the plant code already landed. AC3 requires `python budget.py --fixture --plant conf-read-forms`, run in the three-folder copy with `_MODULE_SCOPE_PARTS = {}` appended, to "print no `govkit update --kits memory-tree`". But the same case already runs the three tree_lib rows that unit 88 S33 planted (tools/loop/budget.py#run_budget_plant, the unlocatable, blocked and unparseable rows). Each of those rows prints `got`, and the row holds only if `got` contains `govkit update --kits memory-tree`. So every run of this case prints that text, in the copy too. AC1 says every row an earlier unit planted still answers as its spec states, so the builder can't remove that output either. AC3 needs a different signal that tree_lib resolved. For example, the parity lines themselves can stand in: they print only after `derive_conf_constants`, which calls `load_tree_lib`, has answered. Or AC3 could look for a missing `has no derive_` refusal, or require the tree_lib rows to still print as they do in the uncopied tree. Second item, which the same revision should make explicit: S5 says "the over-match the clause names reads 'a function or a class whose subtree'", and AC4 requires `or a class whose subtree` in the text after the first `NOT SEEN`. In the landed docstring of `derive_conf_rebinds` (tools/loop/loop_lib.py#derive_conf_rebinds), the over-match is its own paragraph before `NOT SEEN`, and the `NOT SEEN` clause names no over-match. S5 should say that this sentence moves after `NOT SEEN`, or AC4 should check the text before it. Stale figures only, which the pass would have fixed with a deviation record: the section 5 sweep's lines expecting "no match" for `derive_conf_rebinds` and `conf-read-forms` now match, because units 82 to 90 built them. `memory/project/positional-refs.txt` holds 1 row PINNED for this spec, not 3 PINNED, and that row is `BUILD-METHOD M6`.
+
+## Summary
+
+I didn't build TOOL-dDeclaredLoop-91 and made no commit: acceptance criterion AC3 can't pass against code that is already in the tree (see `why`). The worktree is clean at base d346d8d2c354c05b9a64e266601c5591c644bf29. Nothing was edited, so there is no patch file to save, and I didn't re-run `--brief`, because line 441 of RUN.md already records this brief.
+
+How I found it: I read the spec (rev-3) and the brief whole, then checked the spec's claims against C:/projects/coding-governance/.claude/worktrees/unattended-declared-loop-d56bf0/tools/loop/loop_lib.py (`derive_conf_rebinds`, `check_conf_name`, `load_tree_lib`, `derive_conf_constants`) and C:/projects/coding-governance/.claude/worktrees/unattended-declared-loop-d56bf0/tools/loop/budget.py (the `conf-read-forms` branch of `run_budget_plant`). I also checked unit 88's spec for its S33 rows, which require the update command in their output, the kickoff manifest's watch line (it names no file under tools/loop) and the positional-refs rows for this spec. This was reading the source only. No gate, suite, plant or probe ran, so none of them stands in for any gate.
+
+What the spec writer's revision needs:
+- **AC3:** use a tree_lib-resolved signal that the existing tree_lib rows don't contradict.
+- **S5/AC4:** say where the over-match sentence of the `derive_conf_rebinds` docstring goes.
+- **Stale sweep figures:** these I would have fixed myself with a deviation record.
+
+The build itself looks straightforward once the spec is revised. The module-scope rows can join the existing in-function row tuple of the plant as a local group, followed by the parity loop over that group. `_MODULE_SCOPE_PARTS` is read at call time, so the copy check in AC3 that appends an empty table would work. Still owed at the close for this unit: the `New arm:` on tools/loop/budget.py for AC1 and AC3 (observed red with the table emptied, then green), and the `loop budget fixtures`, `loop breakpoint fixtures` and `loop definition` legs.
