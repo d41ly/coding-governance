@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-79 — the round-4 spec audit's 28 minors, batched
 
-**Status:** INPROGRESS · rev-6 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 40 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-7 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 40 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -103,9 +103,11 @@ The labels keep their rev-5 numbers, which sibling specs cite; every other rev-5
   `requires` at `to_commit` that 73's refusal grades: one call of `read_requires_at` over the claimed
   and the gained kits, made before the loop, feeds both the loop and `demand_claimed_requires`. A gained
   kit whose `requires` that vintage cannot answer is left out with a line naming it and why, never
-  pulled in; a claimed kit's unknown `requires` refuses as `TOOL-dDeclaredLoop-73` S4 refuses it. The
-  arm `check_gained_prune_vintage(tmp)` in `tools/govkit/selftest.py` observes it (§4 "The gained
-  prune"). Observed by AC19.
+  pulled in; a claimed kit's unknown `requires` refuses as `TOOL-dDeclaredLoop-73` S4 refuses it. Where
+  that vintage's registry names a descriptor it lacks, the update still refuses after the line, in the
+  step reader `tools/govkit/upgrade_steps.py#read_steps`, which reads every entry's descriptor whether
+  or not the kit is gained (§8 F8). The arm `check_gained_prune_vintage(tmp)` in
+  `tools/govkit/selftest.py` observes it (§4 "The gained prune"). Observed by AC19.
 - **S20** — id 35. 72's refusal is observed on an agreeing pair spelled apart: the plant
   `trailing-slash-agree` joins `PLANTS` of `tools/loop/budget.py`, `.unattended.conf` naming `memory/`
   and `.memory-tree.conf` naming `memory`, and a draw there reads no refusal (§8 F6). Observed by AC20.
@@ -210,6 +212,16 @@ but one blob-pinned range.
   `demand_claimed_requires` with that answer. The docstring of
   `tools/govkit/selftest.py#check_requires_vintage` names the gained-prune loop's vintage as what it does
   not check.
+- Rev-7 re-read the update's later path at the branch tip `dd1a15e01`, where `_cmd_update` and the step
+  module are unchanged since `8b06bb0a4`. The read-only branch of `_cmd_update` calls
+  `tools/govkit/upgrade_steps.py#derive_pending_steps` after the prune, and that calls
+  `tools/govkit/upgrade_steps.py#read_steps` at `to_commit`. `read_steps` reads every registry entry's
+  descriptor and raises `<path>: the registry names this descriptor for '<id>' and it is absent at
+  <commit8>` for one it lacks, gained or not. Its entry reader,
+  `tools/govkit/upgrade_steps.py#read_registry_entries`, drops an entry with no string `descriptor`;
+  it refuses an unparseable descriptor through `parse_table_rows`, and a non-UTF-8 one raises
+  `UnicodeDecodeError` in `read_file_at`. The module holds the one `Refusal` class govkit catches, and
+  `tools/govkit/govkit.py#main` writes `govkit: <text>` to stderr and returns 2.
 - `tools/loop/guard.py#check_push_range` calls `read_remerge_policy` on every merge whose first parent
   holds the policy file, before any comparison of blobs, so a merge equal to every parent still runs
   `git merge-tree`; its docstring states no cost. The `push-merge-both-sides-clean` plant's
@@ -234,9 +246,9 @@ but one blob-pinned range.
 70 rev-3's reader, its two lines before the source added and its `ROOT` passed:
 
 ```
-run [bash, "-c", '__rdc_conf=$1; ROOT=$2; shift 2; __rdc_names=("$@")
+run [bash, "-c", '__rdc_conf=$1; __rdc_root=$2; shift 2; __rdc_names=("$@")
                   for __rdc_n in "${__rdc_names[@]}"; do unset "$__rdc_n"; done
-                  CONF="$ROOT/.unattended.conf"
+                  ROOT=$__rdc_root; CONF="$ROOT/.unattended.conf"
                   . "$__rdc_conf" >/dev/null 2>&1 || exit 9
                   for n in "${__rdc_names[@]}"; do eval "v=\${$n-__UNSET__}"; printf "%s\0%s\0" "$n" "$v"; done
                   printf "__CONF_IMPORT_OK__\0\0"', "_", conf, Path(top).as_posix(), *names],
@@ -244,7 +256,8 @@ run [bash, "-c", '__rdc_conf=$1; ROOT=$2; shift 2; __rdc_names=("$@")
 ```
 
 The names are unset before `ROOT` and `CONF` are set, so a request for either reads the conf's value
-over the driver's. The source keeps 70's `conf` argument, the path `resolve_bash` tested.
+over the driver's. The top rides in the private `__rdc_root` until the loop is done, so a request
+naming `ROOT` cannot unset it. The source keeps 70's `conf` argument, the path `resolve_bash` tested.
 
 ### The leak tree (S3)
 
@@ -304,13 +317,29 @@ demand_claimed_requires(claimed, gained, _req_at, receipt, _gained_why)
 with `build_steps_gov` whose registry declares `demo` in the default and `other` and `extra` outside it,
 none requiring anything, and a target that installs `demo` at that commit, A. Then B adds `extra` to the
 default and makes it require `other`; D keeps `extra` in the default and drops that edge again; E takes
-`extra`'s descriptor out while the registry still names it. Read-only `update` runs:
+`extra`'s descriptor out while the registry still names it. Read-only `update` runs, each from a
+checkout whose working tree answers otherwise than `--to`:
 
-| Checkout | `--to` | Owed |
-|---|---|---|
-| A | B | exit 0, `default-gained extra NOT installed`, no `update would leave` |
-| B | D | exit 0, `would gain extra` |
-| D | E | exit 0, `default-gained extra NOT installed: its requires are unknown at` |
+| Checkout | `--to` | Exit | Owed | Never, in stdout or stderr |
+|---|---|---|---|---|
+| A | B | 0 | stdout `default-gained extra NOT installed` | `update would leave` |
+| B | D | 0 | stdout `would gain extra` | `extra NOT installed` |
+| D | E | 2 | stdout `default-gained extra NOT installed: its requires are unknown at`, then stderr `the registry names this descriptor for 'extra' and it is absent at` | `update would leave`, `'extra' requires are unknown` |
+
+The D-to-E row exits 2 by §8 F8 (a). The prune's line is printed before the refusal, and the refusal is
+the step reader's, reached through `derive_pending_steps` after the prune, so its text is graded to
+tell it from 73's claimed-requires refusal, which a prune grading D's working tree would raise instead.
+The builder observed this row on S19 as written, in a scratch gov
+(`2026-11-17-build-TOOL-dDeclaredLoop-79-1-builder-return`).
+
+Each row reads red at the tip, whose prune grades the working tree. A to B refuses with
+`update would leave 'extra' requires 'other' unmet`. B to D prunes `extra` on B's edge and prints no
+`would gain extra`. D to E keeps `extra` and refuses with `'extra' requires are unknown at`, printing no
+prune line.
+
+What the arm does not check: an update that exits 0 past a gained kit whose `requires` are unknown,
+for which the builder found no staging the landed step reader admits, and §8 F8 refuses the one
+unprobed candidate; the order of the stdout line against the stderr line; and a write run's bytes.
 
 ### The pre-filter and its cost (S22, S23)
 
@@ -418,6 +447,8 @@ this unit.
 ### The sweep
 
 Read at `8b06bb0a4`. Each figure is PINNED 2026-11-16 and re-derived by the commands below the table.
+Rev-7 re-ran those commands at the branch tip `dd1a15e01` on 2026-11-17: the `loop guard fixtures`
+budget row and this spec's positional rows moved, and are PINNED there; every other figure held.
 
 | What moves | Its readers, pins and populations | What keeps each green |
 |---|---|---|
@@ -426,10 +457,11 @@ Read at `8b06bb0a4`. Each figure is PINNED 2026-11-16 and re-derived by the comm
 | `tools/loop/kit.toml`'s `requires` | `tools/govkit/govkit.py#derive_unsatisfied_requires` in `apply`, `plan` and `update`; `check_roles_default`'s 57 arms; `govkit selfcheck`; `tools/govkit/matrix.py`, which closes its install set over `requires`; `tools/policy/check_policy.py#derive_requires_closure` | `_dl_claim` gains `run-gates`; the default set holds it, so `OC8 AC2`'s default selection stays satisfied; the matrix and the policy closure add it themselves; no `--kits` selection under `tools/` names `roles`, `loop` or `unattended` but 57's two |
 | the descriptor comment and the help sentence | `install-prefix (shipped surface)`; `docs` and `help page commands` | each names a file and a kit, never a path joined to the prefix; no usage row or command block moves, so no anchor is re-stamped |
 | the `sed-fails` plant | the `loop computed witness` leg, its budget row of 75 seconds PINNED; 68's `normaliser-missing`, whose check function it shares; 82 S7 | one re-run more, seconds; the stub file is written only for `sed-fails`, so `normaliser-missing` still finds an empty directory; 82 re-grounds on this staging |
-| `check_push_range` | the `loop guard fixtures` leg, ceiling of 300 seconds PINNED and row of 90 seconds PINNED; every `push-merge-*` plant | the pre-filter skips only a merge equal to every parent, which no existing plant stages as a policy change; the new plant runs in one scratch |
+| `check_push_range` | the `loop guard fixtures` leg, ceiling of 300 seconds PINNED and row of 95 seconds PINNED; every `push-merge-*` plant | the pre-filter skips only a merge equal to every parent, which no existing plant stages as a policy change; the new plant runs in one scratch |
 | `budget.py` plants | `loop budget fixtures`; 80's `no-own-conf-read` case and its AC4 greps for `trailing-slash-agree` and `no-confs`; 88 S9; 95's re-run | both write their confs inside `run_budget_plant`, which 80 S1 bounds; the two names 80 AC4 greps are the names minted here |
 | the `url-forms` table | `loop position fixtures`; 77 AC3, which owes each row as tabled; 82 S19 and S23 | two rows more, computed in memory |
 | `_cmd_update`'s prune | `govkit refusal join`, whose anchors are a function and an ordinal; 73's arms; 57's `would gain` and `NOT installed` lines | no `raise` is added or taken out, and none sits between the read's old and new places, so each anchor keeps its ordinal; 73's AC3 still reaches the claimed kit's unknown refusal |
+| `upgrade_steps.read_steps`' absent-descriptor refusal | the new arm's D-to-E row, which grades its text; `check_requires_vintage`'s C, which stages the same absence for a claimed kit | the arm reads the text from `the registry names` up to `absent at`, never the descriptor path before it or the commit after it; a rewording of that refusal reds the arm by its label, so the rewording's own unit moves the owed text |
 | `check_requires_vintage`'s docstring | `govkit selftest`, budget row of 1600 seconds PINNED | the clause naming the prune's vintage as unchecked goes, since the new arm checks it; one scratch gov and three read-only updates more |
 | the run-gates README | `run-gates canary`'s width-source arm and the evidence suite's section arms read other sections; `measure-legs selftest` reads the profiler section | one line under the manifest section, which no arm reads |
 | new names | `VERB_OFFENDER_PIN` in `.lexicon.conf`, 1215 PINNED | `check_gained_prune_vintage` leads with a declared verb |
@@ -439,7 +471,7 @@ Read at `8b06bb0a4`. Each figure is PINNED 2026-11-16 and re-derived by the comm
 | kit epochs | the loop, run-gates and govkit kits' shipped bytes move | the lander mints each version, `KIT_LOOP_VERSION` and the README marker paired |
 | the kickoff manifest | the `watch:` line of `memory/guides/SESSION-KICKOFF.md` | no watched path is edited, so no re-stamp |
 | subject pins, epoch delegates, upgrade rows, size rows | `tools/govkit/subject-pins.tsv`, `tools/memory-tree/check-verdict-epoch.sh`'s `DELEGATES`, `[[upgrade]]` rows, `tools/template-size-limits.txt` | no leg is added, no memory-tree file is edited, no migration is owed, and no size row names a touched file |
-| this spec's citations | `positional (the citation check alone)`; the 16 rows PINNED of this spec in `memory/project/positional-refs.txt` | this revision cites by symbol and one blob-pinned range; the commit landing it runs `python tools/playbook/positional.py shrink` |
+| this spec's citations | `positional (the citation check alone)`; the 1 row PINNED of this spec in `memory/project/positional-refs.txt` | this revision cites by symbol and one blob-pinned range; the commit landing it runs `python tools/playbook/positional.py shrink` |
 | this spec's labels | 68, 76, 80, 82, 86, 88 and 95 cite S4, S6, S8, S10, S17, S18, S25, S26, AC10, AC11, AC20 and AC25 | the kept labels keep their numbers; S6, S8, S17, S18, S26 and AC11 are in §3, and 68 and 82 re-ground at their own orders |
 
 ```
@@ -507,11 +539,13 @@ command runs at the top of the repository.
   Red when: no single key-list line exists, or it omits `stage` or another key the manifest carries.
 - **AC19** — When a `python -c` probe imports the govkit kit's self-test module and calls
   `check_gained_prune_vintage` over a temporary folder, its three updates read as §4 "The gained prune"
-  tables them: the first exits 0 printing `default-gained extra NOT installed` and no
-  `update would leave`, the second prints `would gain extra`, and the third prints
-  `default-gained extra NOT installed: its requires are unknown at`.
-  Red when: the prune grades the working tree, so the first run refuses the whole update and the second
-  leaves `extra` out.
+  tables them. The first exits 0 printing `default-gained extra NOT installed` and no
+  `update would leave`. The second exits 0 printing `would gain extra`. The third exits 2: its stdout
+  carries `default-gained extra NOT installed: its requires are unknown at`, its stderr carries
+  `the registry names this descriptor for 'extra' and it is absent at`, and neither
+  carries `update would leave` or `'extra' requires are unknown`.
+  Red when: the prune grades the working tree, so the first run refuses the whole update, the second
+  leaves `extra` out, and the third refuses on `'extra' requires are unknown` with no prune line.
 - **AC20** — When `python budget.py --fixture --plant trailing-slash-agree` runs, it prints
   `loop: fixture · trailing-slash-agree · held`: the draw exits 0 and its row lands under `memory`.
   Red when: a raw compare refuses `memory/` against `memory`.
@@ -540,7 +574,7 @@ New arm: tools/loop/loop_witness.py · covers AC7 · the sed-fails plant, staged
 New arm: tools/loop/budget.py · covers AC20 AC25 · the trailing-slash-agree and no-confs plants, staged against a raw compare of the two roots and a conf read that raises on an absent file · none
 New arm: tools/loop/guard.py · covers AC23 · the equal-to-every-parent plant, staged against the tip's grade, which runs the re-merge first · none
 New arm: tools/loop/position.py · covers AC21 · the two https rows of the url-forms table, staged against a user-part cut for the scp and ssh forms alone · none
-New arm: tools/govkit/selftest.py · covers AC19 · the gained-prune vintage arm, staged against the prune grading the working tree's descriptors · none
+New arm: tools/govkit/selftest.py · covers AC19 · the gained-prune vintage arm, staged against the prune grading the working tree's descriptors, its D-to-E row owing exit 2 with the prune's line and the step reader's absent-descriptor refusal, never the requires-unknown refusal · none
 
 ## 8. Open questions
 
@@ -586,6 +620,20 @@ New arm: tools/govkit/selftest.py · covers AC19 · the gained-prune vintage arm
   tree, so nothing is sourced, and (b) observes one of the two names. Recommendation: (a).
   RESOLVED (agent, 2026-11-16, delegated): (a), S3.
   widens: none · relaxes: none
+- **F8 — What does the D-to-E update owe, given that E's registry names a descriptor E lacks (id 24)?**
+  (a) exit 2: the prune's `NOT installed` line, then the step reader's refusal naming `extra`'s absent
+  descriptor; the arm grades that line and that refusal, and never `update would leave` or the
+  requires-unknown refusal. (b) E staged another way, one where `read_requires_at` answers unknown and
+  `read_steps` at E does not refuse. `read_requires_at` answers unknown for an unreadable registry, an
+  absent descriptor or an unparseable one; by the Evidence reads, `read_steps` refuses the first three
+  too, and raises on a non-UTF-8 descriptor. The one unprobed candidate is an E whose registry
+  entry for `extra` carries no string `descriptor`, which `read_registry_entries` drops and
+  `read_requires_at` keeps; it grades the prune over two readers disagreeing about one malformed row, so
+  the arm would hold only while that disagreement lasts. Any other route to (b) changes `read_steps`,
+  outside this unit's write set. (a) is what the landed code prints, as the builder observed, and still
+  tells the vintage the prune grades. Recommendation: (a). RESOLVED (agent, 2026-11-17, delegated): (a),
+  S19 and AC19.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -607,6 +655,13 @@ New arm: tools/govkit/selftest.py · covers AC19 · the gained-prune vintage arm
   S7 staged through 68's route (F5); S10's legs derived on 75's probe; S19's arm and its fixture; S20 on
   72's normalisation (F6); S21 on `derive_fetch_url`; S23 on the built grade; S25 the `no-confs` plant
   alone; F3 and F4 re-resolved; line citations made symbol citations; the sweep.
+- rev-7 · 2026-11-17 · §2 S19 · §4 · §5 · §6 AC19 · §7 · §8 F8 · per the builder return
+  `2026-11-17-build-TOOL-dDeclaredLoop-79-1-builder-return`: the D-to-E row of §4 "The gained prune"
+  owes exit 2, the prune's line and then `read_steps`' absent-descriptor refusal, never the
+  requires-unknown refusal (F8 (a)), with each row's red at the tip and what the arm does not check;
+  the Evidence gains the step reader's reads at `dd1a15e01`; the driver-conf sketch holds the top in
+  `__rdc_root` and sets `ROOT` and `CONF` after the unset loop; the sweep's `loop guard fixtures` row
+  reads 95 and this spec's positional rows 1, and gains the step reader's refusal row.
 
 ## 10. Reuse audit
 
