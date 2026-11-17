@@ -496,3 +496,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-17T13:11:32Z brief · item TOOL-dDeclaredLoop-116 · reason 3f234fb4edf0 memory/builds/dDeclaredLoop/prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-116-build-brief.md
 
 2026-11-17T13:20:46Z dispatch · item 1c489a95 TOOL-dDeclaredLoop-116 · reason tools/loop/adapt.py tools/loop/position.py tools/loop/loop_parents.py tools/loop/upstream.py tools/loop/loop_lib.py tools/loop/budget.py tools/loop/README.md help/loop.md memory/builds/dDeclaredLoop/spec/2026-11-17-spec-TOOL-dDeclaredLoop-116.md memory/builds/dDeclaredLoop/build/2026-11-17-build-TOOL-dDeclaredLoop-116-1-acceptance-ledger.md memory/builds/dDeclaredLoop/build/2026-11-17-build-TOOL-dDeclaredLoop-116-deviation-1162.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-17T13:32:23Z brief · item TOOL-dDeclaredLoop-117 · reason 5d17b2b02074 memory/builds/dDeclaredLoop/prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-117-build-brief.md
