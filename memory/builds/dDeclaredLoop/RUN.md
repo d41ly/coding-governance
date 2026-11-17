@@ -449,3 +449,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-17T08:04:08Z brief · item TOOL-dDeclaredLoop-93 · reason 868733ad2ead memory/builds/dDeclaredLoop/prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-93-build-brief.md
 
 2026-11-17T08:13:10Z dispatch · item 44be2307 TOOL-dDeclaredLoop-93 · reason memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-93.md memory/builds/dDeclaredLoop/build/2026-11-17-build-TOOL-dDeclaredLoop-93-1-acceptance-ledger.md memory/builds/dDeclaredLoop/build/2026-11-17-build-TOOL-dDeclaredLoop-93-deviation-932.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-17T08:24:07Z brief · item TOOL-dDeclaredLoop-94 · reason c263e0ba1aef memory/builds/dDeclaredLoop/prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-94-build-brief.md

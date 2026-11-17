@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-94 — the round-10 spec audit's 24 minors, batched
 
-**Status:** DEFERRED · rev-4 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 48 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-4 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 48 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-94-deviation-941.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-94-deviation-941.md) | deviation | — |
 | [2026-10-24-build-TOOL-dDeclaredLoop-94-deviation-942.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-94-deviation-942.md) | deviation | — |
 | [2026-11-17-prompt-TOOL-dDeclaredLoop-94-1-spec-writer.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-94-1-spec-writer.md) | journal | — |
+| [2026-11-17-prompt-TOOL-dDeclaredLoop-94-build-brief.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-94-build-brief.md) | journal | — |
 | [2026-11-17-prompt-TOOL-dDeclaredLoop-94-reground-brief.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-94-reground-brief.md) | research | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-93-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-93-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-93 |
 
