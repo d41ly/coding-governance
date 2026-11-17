@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-88 — the round-7 spec audit's 36 minors, batched
 
-**Status:** DEFERRED · rev-6 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 44 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-6 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 44 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-11-17-prompt-TOOL-dDeclaredLoop-88-1-spec-writer.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-88-1-spec-writer.md) | journal | — |
 | [2026-11-17-prompt-TOOL-dDeclaredLoop-88-2-spec-brief.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-88-2-spec-brief.md) | research | — |
 | [2026-11-17-prompt-TOOL-dDeclaredLoop-88-3-spec-writer.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-88-3-spec-writer.md) | journal | — |
+| [2026-11-17-prompt-TOOL-dDeclaredLoop-88-build-brief.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-88-build-brief.md) | journal | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-87-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-87-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-87 |
 
 <!-- /gen:spec-records -->
