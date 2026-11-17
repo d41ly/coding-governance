@@ -17,7 +17,7 @@ file beside the worktree, never a pipe, read once the wait returns, so a grandch
 the call. Where `run_command` kills on its timeout alone, this calls the inline `run_tree_kill` after
 EVERY command, before any output is read (S37): on POSIX the command's own process group dies with it,
 a background grandchild included; on win32 `taskkill /T` walks the Windows process tree, which holds no
-MSYS parent edge (`tools/process-monitor/reap.py`'s module docstring), so a grandchild that outlives its
+MSYS parent edge (the process monitor's reap module docstring), so a grandchild that outlives its
 bash is the stated limit there. A worktree still on disk after the teardown, held by such a survivor
 among other causes, is named on stderr, `loop-witness: leaked <path>`, never raised. The hash is taken after the run-gates kit's `write_normaliser` program, written once by one bash
 started in the worktree and applied with `LC_ALL=C sed -E -f` to each output: it strips the worktree's
