@@ -874,14 +874,21 @@ def derive_conf_rebinds(tree, docs):
     return names
 
 
+# Every `tree_lib` name this module reads on what `load_tree_lib` answers, tested there in this order
+# (TOOL-dDeclaredLoop-90 S4): a name read on the loaded module joins this tuple, never a check of its own.
+TREE_LIB_SYMBOLS = ("derive_docstring_ids", "derive_constant_charges")
+
+
 def load_tree_lib():
     """The memory-tree kit's `tree_lib`, found through `read_memory_tree` and imported inside the call,
     never at this module's import: the one route by which this module reaches it, which
-    `derive_conf_reads` and `derive_conf_constants` call. LoopError naming the loaded file and
-    `govkit update --kits memory-tree` where the module lacks `derive_docstring_ids`
-    (TOOL-dDeclaredLoop-86 S21, TOOL-dDeclaredLoop-89 S6); LoopError naming the same command where
-    `read_memory_tree` cannot locate the kit, keeping its message and the places it looked, or where
-    the import raises `ImportError` or `SyntaxError`, naming that error (TOOL-dDeclaredLoop-88 S33)."""
+    `derive_conf_reads` and `derive_conf_constants` call. LoopError naming the loaded file, the first
+    name of `TREE_LIB_SYMBOLS` the module lacks, and `govkit update --kits memory-tree`
+    (TOOL-dDeclaredLoop-86 S21, TOOL-dDeclaredLoop-89 S6, TOOL-dDeclaredLoop-90 S4), so a memory-tree
+    kit older than the charge walk refuses by name, never by an AttributeError; LoopError naming the
+    same command where `read_memory_tree` cannot locate the kit, keeping its message and the places it
+    looked, or where the import raises `ImportError` or `SyntaxError`, naming that error
+    (TOOL-dDeclaredLoop-88 S33)."""
     try:
         read_memory_tree("tree_lib.py")
         import tree_lib
@@ -890,22 +897,28 @@ def load_tree_lib():
     except (ImportError, SyntaxError) as e:
         raise LoopError("memory-tree kit", "%s: %s — govkit update --kits memory-tree" % (
             type(e).__name__, e)) from None
-    if not hasattr(tree_lib, "derive_docstring_ids"):
-        raise LoopError(pathlib.Path(tree_lib.__file__).as_posix(),
-                        "has no derive_docstring_ids — govkit update --kits memory-tree")
+    for name in TREE_LIB_SYMBOLS:
+        if not hasattr(tree_lib, name):
+            raise LoopError(pathlib.Path(tree_lib.__file__).as_posix(),
+                            "has no %s — govkit update --kits memory-tree" % name)
     return tree_lib
 
 
 def derive_conf_constants(loop_lib_path):
     """The module-level names the file at `loop_lib_path` binds, the class and never a list of shapes:
-    the rule-2 slice of the memory-tree kit's one charge walk, `derive_constant_charges`, its needle
-    `check_conf_name` over a str constant's value (TOOL-dDeclaredLoop-88 S13). That is every `Name` in the
-    targets, a tuple target's included, of an `Assign`, an `AnnAssign` or an `AugAssign` that no function
-    and no class encloses, one nested in a module-level `if`, `try`, `with`, `for` or `while` included,
-    where a str constant containing `.memory-tree.conf` or `.unattended.conf`, an f-string's literal part
-    included, sits anywhere under that statement, its value, targets and annotation alike. The value's
+    the rule-2, module-qualified slice of the memory-tree kit's one charge walk, `derive_constant_charges`,
+    its needle `check_conf_name` over a str constant's value (TOOL-dDeclaredLoop-88 S13), the whole of
+    charge rule 2's predicate (TOOL-dDeclaredLoop-90 S1). That is every `Name` in the targets, a tuple or
+    subscript target's included, of an `Assign`, an `AnnAssign`, one with no value included, or an
+    `AugAssign` that no function and no class encloses, every module-level compound statement descended,
+    one nested in a module-level `if`, `try`, `with`, `for` or `while` body included, where a str
+    constant containing `.memory-tree.conf` or `.unattended.conf`, an f-string's literal part included,
+    sits anywhere under that statement: in a target, in the annotation or in the value. The value's
     shape is never tested, so a join of any operands and any call are inside the class; a value that
-    only names another binding is not (TOOL-dDeclaredLoop-87 S1). It also answers the names
+    only names another binding is not (TOOL-dDeclaredLoop-87 S1). NOT SEEN: a conf name composed at
+    run time from pieces, such as `".unattended" + ".conf"`, holds no single constant naming a conf and
+    is outside the class, as the memory-tree kit's `scan_glob_readers`, the walk's other reader, records
+    for a pathspec composed from pieces (TOOL-dDeclaredLoop-90 S20). It also answers the names
     `derive_conf_rebinds` answers over the same parse, a global loader's and a module-level walrus, `for`
     or `with` target's, the docstring ids from `load_tree_lib` (TOOL-dDeclaredLoop-89 S2). Read by
     `ast.parse`, never an import. LoopError naming the path where the file is missing or does not parse,
@@ -936,9 +949,9 @@ def derive_conf_reads(path):
     encloses, its decorators and signature included, is passed over (TOOL-dDeclaredLoop-80).
     SyntaxError where the module does not parse (TOOL-dDeclaredLoop-76); LoopError where that
     `loop_lib.py` is missing or does not parse, or where the memory-tree kit's `tree_lib`, which
-    `load_tree_lib` loads inside the call and never at this module's import, lacks
-    `derive_docstring_ids` (TOOL-dDeclaredLoop-86 S21, TOOL-dDeclaredLoop-89 S6), cannot be located or
-    does not import (TOOL-dDeclaredLoop-88 S33)."""
+    `load_tree_lib` loads inside the call and never at this module's import, lacks a name of
+    `TREE_LIB_SYMBOLS` (TOOL-dDeclaredLoop-86 S21, TOOL-dDeclaredLoop-89 S6, TOOL-dDeclaredLoop-90 S4),
+    cannot be located or does not import (TOOL-dDeclaredLoop-88 S33)."""
     import ast
     path = pathlib.Path(path)
     confs = (".memory-tree.conf", ".unattended.conf")

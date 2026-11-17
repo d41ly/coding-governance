@@ -121,8 +121,8 @@ KIT = pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from adapt import read_disposition_release, read_run_file  # noqa: E402
-from loop_lib import (LoopError, derive_conf_reads, derive_fixture_boundary, read_memory_tree,  # noqa: E402
-                      resolve_memory_root, resolve_memory_root_source, run_selftest_cases)
+from loop_lib import (LoopError, derive_conf_reads, derive_fixture_boundary, load_tree_lib,  # noqa: E402
+                      read_memory_tree, resolve_memory_root, resolve_memory_root_source, run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_transition import (BUDGET_FIELDS, FX_BUILD, FX_SPEC, FX_UNIT, VALUE,  # noqa: E402
                              check_transition_channels, read_build_specs, read_build_unit_ids,
@@ -189,7 +189,8 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
                              "memory tree's conf none, two draws",
           "confs-disagree": "the driver's conf naming MEMORY_ROOT=records beside the memory tree's memory, one draw",
           "no-own-conf-read": "this module's own file graded on its syntax tree for a reader call or a conf name, "
-                              "no scratch repository",
+                              "no scratch repository, then a kit pair whose tree_lib lacks derive_constant_charges, "
+                              "its loader run in a fresh process: tree_lib lacking derive_constant_charges",
           "root-source": "MEMORY_ROOT=records in the driver's conf, then in the memory tree's conf, then neither, then "
                          "each conf alone with the key unset, each folder's root and the conf it came from",
           "attr-missing": "a draw appended to a log record in a scratch repository with no .gitattributes, then one "
@@ -209,7 +210,8 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
                              "from-import, a join naming no conf, a global loader rebinding a name to the driver's "
                              "conf's path, one holding the memory tree's conf in a with, a walrus, a for target and "
                              "a with target, a global loader naming no conf and one naming the driver's conf in its "
-                             "docstring alone, then the first module with no loop_lib beside it, then with the "
+                             "docstring alone, an annotation-only binding, a subscript target and a for body each "
+                             "naming a conf, then the first module with no loop_lib beside it, then with the "
                              "memory-tree kit's tree_lib unlocatable, blocked from import and unparseable"}
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
 PLANT_TRAILER = '[transitions]\nrecord = ["trailer"]\n'
@@ -780,6 +782,33 @@ def run_budget_plant(case):
             check(bound == ["check_plant_root", "build_fixture_tree"] and hits == [(3, "conf name"), (5, "conf name")],
                   "%s answered boundary %s and hits %s, owed the first two defs and lines 3 and 5" % (
                       staged.name, bound, hits))
+            # TOOL-dDeclaredLoop-90 S5: the skew of a memory-tree kit older than TOOL-dDeclaredLoop-88, a kit
+            # pair whose tree_lib lacks derive_constant_charges, its loader run in a fresh process
+            import subprocess
+            skew = "tree_lib lacking derive_constant_charges"
+            try:
+                mt = pathlib.Path(load_tree_lib().__file__).parent
+            except LoopError as e:
+                mt = None
+                check(False, "%s: %s" % (skew, e))
+            if mt:
+                pair = top / "skew"
+                for kit, name in ((KIT, "loop_lib.py"), (mt, "tree_lib.py")):
+                    (pair / kit.name).mkdir(parents=True)
+                    shutil.copyfile(kit / name, pair / kit.name / name)
+                with open(pair / mt.name / "tree_lib.py", "a", encoding="utf-8", newline="\n") as fh:
+                    fh.write('\nglobals().pop("derive_constant_charges", None)\n')
+                probe = ("import sys; sys.path.insert(0, sys.argv[1]); import loop_lib\n"
+                         "try: loop_lib.load_tree_lib()\n"
+                         "except loop_lib.LoopError as e: print(e); sys.exit(1)\n")
+                p = subprocess.run([sys.executable, "-I", "-c", probe, str(pair / KIT.name)], capture_output=True,
+                                   text=True, encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL)
+                print("%s: fixture · no-own-conf-read · %s · exit %d · %s" % (
+                    SAY, skew, p.returncode, (p.stdout + p.stderr).strip() or "no output"))
+                check(p.returncode == 1 and "derive_constant_charges" in p.stdout
+                      and "govkit update --kits memory-tree" in p.stdout and "Traceback" not in p.stdout + p.stderr,
+                      "%s: exit %d, owed exit 1 naming derive_constant_charges and the update command, no "
+                      "traceback" % (skew, p.returncode))
         elif case == "root-source":   # TOOL-dDeclaredLoop-76 AC3: each root paired with the conf it came from
             for name, confs, owed in (("driver", {".unattended.conf": "MEMORY_ROOT=records\n"}, ("records", ".unattended.conf")),
                                       ("tree", {".memory-tree.conf": "MEMORY_ROOT=records\n"}, ("records", ".memory-tree.conf")),
@@ -862,7 +891,15 @@ def run_budget_plant(case):
                     ("plain-global", "def reset(): global COUNTER; COUNTER = 0\n", "import loop_lib as ll",
                      "ll.COUNTER", []),
                     ("docstring-loader", 'def note(): """Reads .unattended.conf."""; global NOTE; NOTE = 1\n',
-                     "import loop_lib as ll", "ll.NOTE", [])):
+                     "import loop_lib as ll", "ll.NOTE", []),
+                    # TOOL-dDeclaredLoop-90 S2: charge rule 2's whole predicate, a conf name in a value-less
+                    # annotation, in a subscript target and in a module-level for body
+                    ("annotation-only", 'ANNO: Literal[".unattended.conf"]\n', "import loop_lib as ll", "ll.ANNO",
+                     [(2, "conf constant")]),
+                    ("subscript-target", 'D[".memory-tree.conf"] = 1\n', "import loop_lib as ll", "ll.D",
+                     [(2, "conf constant")]),
+                    ("for-body", 'for _i in range(1): FOR_BODY = ROOT / ".unattended.conf"\n', "import loop_lib as ll",
+                     "ll.FOR_BODY", [(2, "conf constant")])):
                 write_fixture_files(top / name, {"loop_lib.py": lib,
                                                  name + ".py": "%s\ndef read_root(): return open(%s).read()\n" % (
                                                      opens, reads)})
