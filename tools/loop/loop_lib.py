@@ -900,25 +900,26 @@ TREE_LIB_SYMBOLS = ("derive_docstring_ids", "derive_constant_charges")
 def load_tree_lib():
     """The memory-tree kit's `tree_lib`, found through `read_memory_tree` and imported inside the call,
     never at this module's import: the one route by which this module reaches it, which
-    `derive_conf_reads` and `derive_conf_constants` call. LoopError naming the loaded file, the first
-    name of `TREE_LIB_SYMBOLS` the module lacks, and `govkit update --kits memory-tree`
-    (TOOL-dDeclaredLoop-86 S21, TOOL-dDeclaredLoop-89 S6, TOOL-dDeclaredLoop-90 S4), so a memory-tree
-    kit older than the charge walk refuses by name, never by an AttributeError; LoopError naming the
-    same command where `read_memory_tree` cannot locate the kit, keeping its message and the places it
-    looked, or where the import raises `ImportError` or `SyntaxError`, naming that error
-    (TOOL-dDeclaredLoop-88 S33)."""
+    `derive_conf_reads` and `derive_conf_constants` call. One LoopError naming the loaded file, every
+    name of `TREE_LIB_SYMBOLS` the module lacks, in tuple order joined by `, `, and
+    `govkit update --kits memory-tree` (TOOL-dDeclaredLoop-86 S21, TOOL-dDeclaredLoop-89 S6,
+    TOOL-dDeclaredLoop-90 S4, TOOL-dDeclaredLoop-94 S21), so a memory-tree kit older than the charge
+    walk refuses by name, never by an AttributeError; LoopError naming the same command where
+    `read_memory_tree` cannot locate the kit, keeping its message and the places it looked, or where
+    the import raises any other exception, naming its class (TOOL-dDeclaredLoop-88 S33,
+    TOOL-dDeclaredLoop-94 S21)."""
     try:
         read_memory_tree("tree_lib.py")
         import tree_lib
     except LookupError as e:
         raise LoopError("memory-tree kit", "%s — govkit update --kits memory-tree" % e) from None
-    except (ImportError, SyntaxError) as e:
+    except Exception as e:   # noqa: BLE001  a damaged tree_lib.py raises anything at import; named, never a traceback
         raise LoopError("memory-tree kit", "%s: %s — govkit update --kits memory-tree" % (
             type(e).__name__, e)) from None
-    for name in TREE_LIB_SYMBOLS:
-        if not hasattr(tree_lib, name):
-            raise LoopError(pathlib.Path(tree_lib.__file__).as_posix(),
-                            "has no %s — govkit update --kits memory-tree" % name)
+    missing = [name for name in TREE_LIB_SYMBOLS if not hasattr(tree_lib, name)]
+    if missing:
+        raise LoopError(pathlib.Path(tree_lib.__file__).as_posix(),
+                        "has no %s — govkit update --kits memory-tree" % ", ".join(missing))
     return tree_lib
 
 

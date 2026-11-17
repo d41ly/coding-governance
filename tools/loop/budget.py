@@ -216,7 +216,8 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
                              "a decorator, beside a walrus in a function body and one in a class body binding none, "
                              "each row's loop_lib also run to compare the names it binds with the rule's, then "
                              "the first module with no loop_lib beside it, then with the "
-                             "memory-tree kit's tree_lib unlocatable, blocked from import and unparseable"}
+                             "memory-tree kit's tree_lib unlocatable, blocked from import, unparseable, raising "
+                             "at import and lacking both names the loop_lib reads"}
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
 PLANT_TRAILER = '[transitions]\nrecord = ["trailer"]\n'
 PLANT_SPEC = "# TOOL-%s-%d — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n"
@@ -963,15 +964,23 @@ def run_budget_plant(case):
             import loop_lib
             broken = top / "broken-tree-lib"
             write_fixture_files(broken, {"tree_lib.py": "def derive_docstring_ids(:\n"})
+            # TOOL-dDeclaredLoop-94 S21: one raising at import and one lacking both names, each its own folder
+            raising, lacking = top / "raising-tree-lib", top / "lacking-tree-lib"
+            write_fixture_files(raising, {"tree_lib.py": 'raise RuntimeError("fx stand-in")\n'})
+            write_fixture_files(lacking, {"tree_lib.py": "FX_NEITHER = 1\n"})
 
             def read_unlocatable(anchor):
                 raise LookupError("no memory-tree kit holding %s: looked in fx-a, fx-b and fx-c" % anchor)
-            for name, swap, block, owed in (("unlocatable", read_unlocatable, False, "looked in"),
-                                            ("blocked", loop_lib.read_memory_tree, True, "None in sys.modules"),
-                                            ("unparseable", lambda anchor: broken, False, "SyntaxError")):
+            for name, folder, swap, block, owed in (
+                    ("unlocatable", broken, read_unlocatable, False, "looked in"),
+                    ("blocked", broken, loop_lib.read_memory_tree, True, "None in sys.modules"),
+                    ("unparseable", broken, lambda anchor: broken, False, "SyntaxError"),
+                    ("raising", raising, lambda anchor: raising, False, "RuntimeError"),
+                    ("lacking both", lacking, lambda anchor: lacking, False,
+                     "derive_docstring_ids, derive_constant_charges")):
                 with contextlib.ExitStack() as stack:
                     stack.enter_context(unittest.mock.patch.dict(sys.modules))
-                    stack.enter_context(unittest.mock.patch.object(sys, "path", [str(broken), *sys.path]))
+                    stack.enter_context(unittest.mock.patch.object(sys, "path", [str(folder), *sys.path]))
                     stack.enter_context(unittest.mock.patch.object(loop_lib, "read_memory_tree", swap))
                     sys.modules.pop("tree_lib", None)
                     if block:

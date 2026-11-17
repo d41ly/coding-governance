@@ -57,8 +57,8 @@ parents' grade, `at parent <sha8>`; a non-merge commit's reads `on one side`. Ev
 combined diff lists the file with a blob differing from its first parent's: it owes for a key its result
 sets to a value no parent holds, the trailer's old value the first parent's. A `failed` merge prints
 `<sha8> graded against every parent — the clean re-merge failed: <detail>`, its exit code and git's
-first standard error line, a start that fails spelled `start failed: <its text>`, stripped, or its class name
-where that is empty (TOOL-dDeclaredLoop-92 S17), a negative code
+first standard error line, a start that fails spelled `start failed: <the first non-blank line of its text>`,
+stripped, or its class name where it has none (TOOL-dDeclaredLoop-92 S17, TOOL-dDeclaredLoop-94 S20), a negative code
 `signal <n>` and an empty standard error `(no stderr)` (TOOL-dDeclaredLoop-86 S22), and owes, with no exemption and whatever the combined diff lists, the
 trailer and record for each key its result sets apart from some parent, the old value the first such
 parent's. A commit or merge whose first
@@ -344,11 +344,13 @@ def read_added_units(sha, rels=None):
 
 def build_failure_detail(outcome, text):
     """The one spelling of a detail under `the clean re-merge failed:` (TOOL-dDeclaredLoop-85): an OSError
-    reads `start failed: <its text>`, stripped, or `start failed: <its class name>` where that text is empty
-    (TOOL-dDeclaredLoop-92 S17); an exit code reads `<rc>`, a negative one `signal <n>`, followed by
-    the first non-blank line of `text`, or `(no stderr)` where it has none (TOOL-dDeclaredLoop-86 S22)."""
+    reads `start failed: <the first non-blank line of its text>`, stripped, or `start failed: <its class name>`
+    where that text has none (TOOL-dDeclaredLoop-92 S17, TOOL-dDeclaredLoop-94 S20); an exit code reads
+    `<rc>`, a negative one `signal <n>`, followed by the first non-blank line of `text`, or `(no stderr)`
+    where it has none (TOOL-dDeclaredLoop-86 S22)."""
     if isinstance(outcome, OSError):
-        return "start failed: %s" % (str(outcome).strip() or type(outcome).__name__)
+        detail = next((ln.strip() for ln in str(outcome).splitlines() if ln.strip()), type(outcome).__name__)
+        return "start failed: %s" % detail
     line = next((ln.strip() for ln in text.splitlines() if ln.strip()), "(no stderr)")
     return "%s %s" % ("signal %d" % -outcome if outcome < 0 else outcome, line)
 
@@ -606,7 +608,8 @@ PLANTS = {
                                       "--allow-unrelated-histories, with trailer and record, then neither",
     "push-merge-tree-fatal": "a run branch merging main and keeping its own policy file, graded in process with "
                              "the clean re-merge exiting 128, then failing to start, failing to start with no "
-                             "message and with an errno alone, killed by signal 9 and exiting 128 with no stderr",
+                             "message and with an errno alone, killed by signal 9 and exiting 128 with no stderr, "
+                             "then failing to start with a two-line message, graded on its first line alone",
     "push-merge-tree-fatal-unparseable-parent": "push-merge-tree-fatal with main declaring [review] twice, graded "
                                                 "in process with the clean re-merge exiting 128",
     "push-merge-no-write-tree": "push-merge-both-sides-clean's history graded in process by a git with no "
@@ -1050,6 +1053,9 @@ def run_guard_plant(case, top):
 
             def run_unstartable_usage():
                 raise OSError("fx stand-in")
+
+            def run_unstartable_lines():
+                raise OSError("a\nb")
             # TOOL-dDeclaredLoop-85: a probe that cannot start, or exits 129 with no usage text, is a failed
             # re-merge graded against every parent, the re-merge itself never run.
             fatal_swap = {"run_merge_tree": lambda p1, p2: (128, "", "fatal: fx stand-in\n")}
@@ -1090,6 +1096,12 @@ def run_guard_plant(case, top):
                                                ("no stderr", lambda: (128, "", ""), "128 (no stderr)")):
                     run_grade_in_process(tip, {"run_merge_tree": lambda p1, p2, f=swapped: f()}, [
                         ("graded, %s" % name, 1, "the clean re-merge failed: %s" % spelled)])
+                # TOOL-dDeclaredLoop-94 S20: a two-line OSError is graded on its first line; the needle matches by
+                # substring, so a second row, the `graded, no Traceback` idiom, misses where any line is `b`
+                run_grade_in_process(tip, {"run_merge_tree": lambda p1, p2: run_unstartable_lines()}, [
+                    ("graded, start failed, two lines", 1, "the clean re-merge failed: start failed: a")])
+                out.append(("graded, start failed, two lines, the second line", out[-1][1], 1,
+                            "no line b" if "b" in out[-1][4].splitlines() else "", out[-1][4]))
         else:
             run_fixture_git(top, "checkout", "-q", "--orphan", "run", base)
             run_fixture_git(top, "commit", "-q", "-m", "the orphan run")
