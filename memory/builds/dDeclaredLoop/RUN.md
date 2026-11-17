@@ -479,3 +479,12 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-17T11:00:45Z dispatch · item 9d4cef54 TOOL-dDeclaredLoop-100 · reason memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md memory/builds/dDeclaredLoop/build/2026-11-17-build-TOOL-dDeclaredLoop-100-1-acceptance-ledger.md memory/builds/dDeclaredLoop/README.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
 
 2026-11-17T11:24:55Z review · item dDeclaredLoop · reason verdict CLEAN WITH FIXES · blockers 0 · round-highs 2 · round-minors 5
+2026-11-17T11:41:25Z draw · review-round · dDeclaredLoop · 3/204 · 20261117T114125Z-0e47df
+
+2026-11-17T11:41:27Z review · item dDeclaredLoop · reason verdict CLEAN WITH FIXES · blockers 0 · round-highs 0 · round-minors 2 · CONVERGED · highs 2 · minors 7 · to units · disposition promote
+
+2026-11-17T11:42:12Z rescope · item add TOOL-dDeclaredLoop-115 · reason Closing diff review round 1 item 1 (HIGH, findings 1 and 2): tools/loop/guard.py's push arm reads a merge whose first parent lacks .governance/policy.toml as an add and never grades it, so an unrecorded policy change can be pushed; promoted at the CONVERGED exit (round 2), owner rule 2026-10-04
+
+2026-11-17T11:42:18Z rescope · item add TOOL-dDeclaredLoop-116 · reason Closing diff review round 1 item 2 (HIGH, findings 3 and 4): five loop readers (adapt.py read_disposition_release, position.py, loop_parents.py, loop_lib.py read_builds_dir, upstream.py write_upstream_record) take the builds root from .memory-tree.conf alone instead of resolve_memory_root; promoted at the CONVERGED exit
+
+2026-11-17T11:42:21Z rescope · item add TOOL-dDeclaredLoop-117 · reason Closing diff review minors batched (rounds 1 and 2: items 3 to 6 of round 1, items 1 and 2 of round 2): derive_conf_openers blind to a conf name passed straight to open(), the conf-readers-declared plant's refusal arms unexercised, and four record defects; promoted at the CONVERGED exit

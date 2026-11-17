@@ -17,7 +17,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dBoundRoles](builds/dBoundRoles/README.md) | DEFERRED | d | 2026-10-21 | tooling | 75 | 2026-11-05 | active | 0 |
 | [dCalibratedLens](builds/dCalibratedLens/README.md) | DEFERRED | d | 2026-10-21 | tooling | 56 | 2026-11-04 | active | 0 |
 | [dConvergedCharter](builds/dConvergedCharter/README.md) | DEFERRED | d | 2026-10-21 | playbook | 41 | 2026-11-05 | active | 0 |
-| [dDeclaredLoop](builds/dDeclaredLoop/README.md) | DEFERRED | d | 2026-10-21 | tooling | 114 | 2026-11-17 | active | 0 |
+| [dDeclaredLoop](builds/dDeclaredLoop/README.md) | DEFERRED | d | 2026-10-21 | tooling | 117 | 2026-11-17 | active | 0 |
 | [dFurnishedOrders](builds/dFurnishedOrders/README.md) | DEFERRED | d | 2026-10-21 | tooling | 61 | 2026-11-05 | active | 0 |
 | [dIndexedDesign](builds/dIndexedDesign/README.md) | DEFERRED | d | 2026-10-21 | tooling | 53 | 2026-11-05 | active | 0 |
 | [dKeptSession](builds/dKeptSession/README.md) | DEFERRED | d | 2026-10-21 | kickoff | 66 | 2026-11-05 | active | 0 |
