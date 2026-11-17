@@ -19,8 +19,8 @@ hold-code: host-owner-action
 held-from: BUILDING
 refreshed-at: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 5f0d0633dc69263e1fb4fecf82021ca62e5692f6
-phase: BUILDING
+witness: 308d339f68ef25515e658ec9264f8ae3a2b44902
+phase: VERIFYING
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-declared-loop-d56bf0
