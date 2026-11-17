@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-77 — a FETCH_HEAD URL is compared in the spelling git writes it, its user part stripped from both sides
 
-**Status:** DEFERRED · rev-3 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 39 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-3 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 39 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-76-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-76-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-77-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-77-1-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-77-reground-brief.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-77-reground-brief.md) | research | — |
+| [2026-11-17-prompt-TOOL-dDeclaredLoop-77-build-brief.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-77-build-brief.md) | journal | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-76-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-76-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-79 |
 
 <!-- /gen:spec-records -->

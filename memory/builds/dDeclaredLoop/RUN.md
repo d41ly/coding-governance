@@ -402,3 +402,5 @@ base: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b
 2026-11-17T02:04:36Z draw · re-dispatch · TOOL-dDeclaredLoop-75 · 1/204 · 20261117T020436Z-a8bc83
 
 2026-11-17T02:04:36Z dispatch · item aa1ce32c TOOL-dDeclaredLoop-75 · reason help/policy.md
+
+2026-11-17T02:15:42Z brief · item TOOL-dDeclaredLoop-77 · reason 5732ec81fa69 memory/builds/dDeclaredLoop/prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-77-build-brief.md
