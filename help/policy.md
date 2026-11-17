@@ -290,9 +290,12 @@ with one line saying so, as `policy-file.on-missing-expansion` says.
 the loop kit's `guard.py --push-range` over the pushed commits: each commit that changes a key of the
 policy file must carry one `Gov-Policy:` trailer line per changed key and add a change record naming
 the key's row. One that does not is refused as `policy-unrecorded`, naming the commit and the key. A
-commit that adds the policy file, as an adopter's scaffold does, is printed and not graded. Merges are
-graded too. A two-parent merge whose clean re-merge git computes owes the trailer and the change
-record itself for each key its result sets to a value other than that re-merge's, a key set back to
+commit that adds the policy file, as an adopter's scaffold does, is printed and not graded, and so is a
+merge none of whose parents holds the file. A merge any of whose parents holds the file is graded as
+below, a parent lacking it read as setting no key, so a merge whose first parent is an orphan branch or
+deleted the file is graded too. Merges are graded too. A two-parent merge whose clean re-merge git
+computes owes the trailer and the change record itself for each key its result sets to a value other
+than that re-merge's, a key set back to
 one side's old value included, the trailer's old value the re-merge's, and is refused as the merge's
 own change when it lacks them. A merge equal to its re-merge, a clean merge of two sides' different
 keys say, owes nothing, since its sides' own commits are graded in the same push. A merge whose

@@ -61,8 +61,9 @@ first standard error line, a start that fails spelled `start failed: <the first 
 stripped, or its class name where it has none (TOOL-dDeclaredLoop-92 S17, TOOL-dDeclaredLoop-94 S20), a negative code
 `signal <n>` and an empty standard error `(no stderr)` (TOOL-dDeclaredLoop-86 S22), and owes, with no exemption and whatever the combined diff lists, the
 trailer and record for each key its result sets apart from some parent, the old value the first such
-parent's. A commit or merge whose first
-parent lacks the file is printed and not graded. An all-zero
+parent's. A commit or merge no parent of which holds the file, a root commit included, is printed where
+it adds the file and is not graded; a merge any parent of which holds it is graded as above, a parent
+lacking it, the first included, read as the empty table (TOOL-dDeclaredLoop-115). An all-zero
 base, a new ref, reads as the policy kit's `derive_landed_revision`; where that refuses, a first push to
 an empty remote among the causes, the arm prints `push · no landed revision (<why>), graded over every
 commit touching <policy path>` and grades each commit `git log --full-history <tip> -- <policy path>`
@@ -89,9 +90,10 @@ Exit: 0 admitted or clean, 1 refused, 2 when a reader, a kit or git does not ans
 WHAT THIS DOES NOT CHECK: a change to the list file alone, which stages no listed path, so the
 pre-commit block never calls the verdict; a run's own switch of the floor, which only its change record
 and the push arm witness; a pty wrapper giving an agent a terminal (SA-1), `git commit --no-verify` and
-`git push --no-verify`; that a change record's argument is true; and a commit adding the policy file,
-which the push arm skips (§8 F11) and the verdict refuses off a live run's branch. Only an octopus
-merge, a re-merge conflicting on the policy file or a git without `merge-tree --write-tree` is graded against its parents
+`git push --no-verify`; that a change record's argument is true; and a commit or merge adding the
+policy file that no parent holds, which the push arm skips (§8 F11) and the verdict refuses off a live
+run's branch. Only an octopus merge, a re-merge conflicting on the policy file or a git without
+`merge-tree --write-tree` is graded against its parents
 alone, one line naming it and why: a key set back to one parent's value passes there unowed, and a
 value git's clean merge would have produced, a multi-line one both sides edited, is owed there. A
 merge whose clean re-merge fails is graded against every parent and owes a trailer and a record for
@@ -474,16 +476,18 @@ def check_push_range(base, tip):
                 if rc:
                     raise OSError("git diff-tree --cc %s exited %d" % (sha8, rc))
                 listed = out.splitlines()
-            old = read_policy_blob(c["parents"][0], mguard.POLICY) if c["parents"] else None
-            new = read_policy_blob(c["sha"], mguard.POLICY)
-            if old is None:
+            blobs = [read_policy_blob(p, mguard.POLICY) for p in c["parents"]]
+            old, new = (blobs[0] if blobs else None), read_policy_blob(c["sha"], mguard.POLICY)
+            if all(blob is None for blob in blobs):
+                # TOOL-dDeclaredLoop-115: an add is a commit or merge no parent of which holds the file, a root
+                # commit included; any other merge is graded below, a lacking parent read as {}
                 if new is not None and (listed is None or mguard.POLICY in listed):
                     print("%s: push · %s %s adds %s, not graded" % (SAY, kind, sha8, mguard.POLICY))
                 continue
             if kind == "merge":
                 # TOOL-dDeclaredLoop-79 S23: a merge whose blob equals EVERY parent's, an absent one equal only
                 # to an absent one, is skipped before any re-merge, since git's clean re-merge equals it too.
-                if new == old and all(read_policy_blob(p, mguard.POLICY) == new for p in c["parents"][1:]):
+                if all(blob == new for blob in blobs):
                     continue
                 # TOOL-dDeclaredLoop-69: where git's clean re-merge is computable it is the whole reference,
                 # so neither the combined list nor ONE parent's equal blob skips the merge.
@@ -510,7 +514,7 @@ def check_push_range(base, tip):
                 # TOOL-dDeclaredLoop-81: a re-merge that failed is graded against every parent, no exemption:
                 # each leaf M sets apart from some parent is owed, its old value the first such parent's.
                 print("%s: push · %s graded against every parent — the clean re-merge failed: %s" % (SAY, sha8, why))
-                refs = [a] + [parse_policy_bytes(read_policy_blob(p, mguard.POLICY)) for p in c["parents"][1:]]
+                refs = [parse_policy_bytes(blob) for blob in blobs]
                 side = "at M" if b is None else "at parent %s" % c["parents"][refs.index(None)][:8] if None in refs else None
                 changes = {}
                 for r in [] if side else refs:
@@ -525,8 +529,8 @@ def check_push_range(base, tip):
             else:
                 graded += 1
                 # TOOL-dDeclaredLoop-59: with no clean re-merge a merge owes only a leaf its result sets to a
-                # value no parent holds; a parent past the first lacking the file reads as {}.
-                refs = [a] + [parse_policy_bytes(read_policy_blob(p, mguard.POLICY)) for p in c["parents"][1:]]
+                # value no parent holds; a parent lacking the file, the first included, reads as {}.
+                refs = [parse_policy_bytes(blob) for blob in blobs]
                 if b is None or None in refs:
                     findings.append(unknown % ("on one side" if kind == "commit" else "at M" if b is None else
                                                "at parent %s" % c["parents"][refs.index(None)][:8]))
@@ -606,6 +610,10 @@ PLANTS = {
                                 "declaring it twice, the run keeping its own file, untrailered",
     "push-merge-unrelated-histories": "an orphan run branch keeping the base's policy file, merged into main with "
                                       "--allow-unrelated-histories, with trailer and record, then neither",
+    "push-merge-first-parent-lacks-policy": "an orphan branch lacking the policy file as a merge's first parent, "
+                                            "main's file with review.max-rounds set as its result, then main "
+                                            "deleting the policy file and merging a run branch that keeps it, each "
+                                            "untrailered",
     "push-merge-tree-fatal": "a run branch merging main and keeping its own policy file, graded in process with "
                              "the clean re-merge exiting 128, then failing to start, failing to start with no "
                              "message and with an errno alone, killed by signal 9 and exiting 128 with no stderr, "
@@ -1120,6 +1128,37 @@ def run_guard_plant(case, top):
                 out.append(("%s, the failed line" % name, out[-1][1], out[-1][2], "the clean re-merge failed: 128",
                             out[-1][4]))
                 run_fixture_git(top, "reset", "-q", "--hard", "HEAD~1")
+    elif case == "push-merge-first-parent-lacks-policy":
+        # TOOL-dDeclaredLoop-115: a merge whose first parent lacks the policy file is graded, never read as an
+        # add. An orphan first parent, joined by commit-tree so git's merge cannot reorder it, fails its
+        # re-merge on unrelated histories; a first parent that deleted the file re-merges `absent`.
+        tip = run_fixture_git(top, "rev-parse", "HEAD")
+        run_fixture_git(top, "checkout", "-q", "--orphan", "lacks")
+        run_fixture_git(top, "rm", "-q", "-f", "--", mguard.POLICY)   # staged with no HEAD, so git wants -f
+        run_fixture_git(top, "commit", "-q", "-m", "the orphan lacking the policy file")
+        run_fixture_git(top, "checkout", "-q", "main")
+        write_staged(top, {mguard.POLICY: add_text(FX_REVIEW)})
+        merge = run_fixture_git(top, "commit-tree", run_fixture_git(top, "write-tree"), "-p", "lacks", "-p", "main",
+                                "-m", "merge main onto the orphan")
+        run_fixture_git(top, "reset", "-q", "--hard", merge)
+        run_scenario("an orphan first parent", me + ["--push-range", "%s..HEAD" % tip], 1,
+                     "merge %s · %s · review.max-rounds" % (merge[:8], mguard.POLICY))
+        out.append(("an orphan first parent, the failed line", out[-1][1], 1, "the clean re-merge failed: 128",
+                    out[-1][4]))
+        run_fixture_git(top, "reset", "-q", "--hard", tip)
+        run_fixture_git(top, "checkout", "-q", "-b", "run")
+        write_staged(top, {"fx-run.txt": add_text("the run's own line\n")})
+        run_fixture_git(top, "commit", "-q", "-m", "the run's own commit")
+        run_fixture_git(top, "checkout", "-q", "main")
+        run_fixture_git(top, "rm", "-q", "--", mguard.POLICY)
+        run_fixture_git(top, "commit", "-q", "-m", "the policy file deleted")
+        deleted = run_fixture_git(top, "rev-parse", "HEAD")
+        run_fixture_git(top, "merge", "-q", "--no-ff", "--no-commit", "run")
+        run_fixture_git(top, "checkout", "run", "--", mguard.POLICY)
+        run_fixture_git(top, "commit", "-q", "-m", "merge run")
+        sha8 = run_fixture_git(top, "rev-parse", "HEAD")[:8]
+        run_scenario("a first parent that deleted the file", me + ["--push-range", "%s..HEAD" % deleted], 1,
+                     "merge %s · %s · budgets." % (sha8, mguard.POLICY))
     elif case == "push-new-branch":
         write_staged(top, {mguard.POLICY: add_text(FX_REVIEW)})
         run_fixture_git(top, "commit", "-q", "-m", "review rounds raised, no trailer")
@@ -1312,7 +1351,7 @@ def run_selftest():
             "push-merge-unparseable-parent": 1, "push-merge-resurrect-emptied-policy": 1,
             "push-merge-unparseable-c": 1, "push-new-branch": 1,
             "push-first-to-empty-remote": 1,
-            "push-merge-unrelated-histories": 1, "push-merge-tree-fatal": 1,
+            "push-merge-unrelated-histories": 1, "push-merge-first-parent-lacks-policy": 1, "push-merge-tree-fatal": 1,
             "push-merge-tree-fatal-unparseable-parent": 1, "push-merge-probe-failed": 1,
             "push-merge-probe-silent": 1, "push-merge-probe-failed-unparseable-parent": 1,
             "push-merge-conflicted-unparseable-parent": 1, "push-merge-probe-signal": 1}
