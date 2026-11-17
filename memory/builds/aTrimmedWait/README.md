@@ -94,7 +94,7 @@ ids TOOL-aTrimmedWait-15 TOOL-aTrimmedWait-16 TOOL-aTrimmedWait-17 TOOL-aTrimmed
 | [TOOL-aTrimmedWait-18 — the reconcile with local main at 8eda4a5a0: its five conflicts resolved and the coincident floor summed, so the landing merge is clean](spec/2026-11-17-spec-TOOL-aTrimmedWait-18.md) | 13 | 2 | INPROGRESS | rev-1 | 2026-11-17 |
 <!-- /gen:build-units -->
 
-Records: 69 bound to this build, across 4 record folder(s).
+Records: 70 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

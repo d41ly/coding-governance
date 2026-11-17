@@ -44,7 +44,7 @@ deleted claim-push lock had (charter rule `[reuse]`).
   `write_claim_push_lock`, `remove_claim_push_lock` and `check_claim_push_lock_stale` at the pinned
   base (`tools/unattended/unattended.sh:2325-2360`), which `TOOL-dPlacedRequest-11` S6 deletes, renamed,
   with the `.break` guard serialising a stale break and the health events renamed
-  `node-lock-broken` and `node-lock-guard-cleared`. **Readers:** by name: `write_claim_push_lock`,
+  `node-lock-broken` and `node-lock-guard-cleared`. **Readers:** by name: READER NOT IN TREE: `write_claim_push_lock`, `check_claim_push_lock_stale` and `remove_claim_push_lock`, which TOOL-aPiecewiseGrade-6 renamed to the shared `write_dir_lock`, `check_dir_lock_stale` and `remove_dir_lock` on 2026-11-16, so no tracked reader spells the old names; `write_claim_push_lock`,
   `remove_claim_push_lock` and `check_claim_push_lock_stale`, spelled by `tools/unattended/unattended.sh`
   (:2325-2444) and `tools/unattended/unattended.test.sh` (:16150-16279), and the two lock events,
   spelled by `tools/unattended/README.md` (:250); TOOL-dPlacedRequest-11 S6 retires each name and

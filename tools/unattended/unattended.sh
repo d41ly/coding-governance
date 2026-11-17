@@ -69,7 +69,7 @@ set -u
 if [ -n "${EPOCHREALTIME:-}" ]; then DRIVER_T0_US=${EPOCHREALTIME//[!0-9]/}
 else printf -v DRIVER_T0_US '%(%s)T' -1; DRIVER_T0_US="${DRIVER_T0_US}000000"; fi
 readonly DRIVER_T0_US
-KIT_UNATTENDED_VERSION=1.124 # gov:kit unattended@1.124 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.126 # gov:kit unattended@1.126 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -406,6 +406,20 @@ resolve_python() {
   # over and named, exactly as a candidate that does not run.
   _rp_floor="3.15"
   _rp_fv=$(( ${_rp_floor%%.*} * 1000 + ${_rp_floor#*.} ))
+  # THE BAR'S OWN RESOLUTION, taken with no spawn (TOOL-aMeasuredDrag-11). The run-gates runner
+  # exports GATE_RESOLVED_PY as four lines: the version, the launcher it resolved, and GOV_PYTHON and
+  # PATH as it saw them. With no caller override the loop below is decided by GOV_PYTHON, PATH and the
+  # floor, so a memo matching both byte for byte, at or above THIS floor, is what the loop would print.
+  # Anything else, malformed or partial included, is ignored and the loop runs. Only an absolute
+  # launcher is admitted (TOOL-aMeasuredDrag-12): a relative one names another file once a leg
+  # changes directory, and a bare name does too under a PATH holding `.`.
+  _rp_re=$'^([0-9]+)\\.([0-9]+)\n(/[^\n]*|[A-Za-z]:/[^\n]*|[A-Za-z]:\\\\[^\n]*)\n([^\n]*)\n(.*)$'
+  if [ -z "${1:-}" ] && [[ ${GATE_RESOLVED_PY:-} =~ $_rp_re ]] \
+    && [ "${BASH_REMATCH[4]}" = "${GOV_PYTHON:-}" ] && [ "${BASH_REMATCH[5]}" = "$PATH" ] \
+    && [ $(( 10#${BASH_REMATCH[1]} * 1000 + 10#${BASH_REMATCH[2]} )) -ge "$_rp_fv" ]; then
+    printf '%s\n' "${BASH_REMATCH[3]}"
+    return 0
+  fi
   _rp_tried=""; _rp_seen=""; _rp_best=""; _rp_bv=0; _rp_bver=""; _rp_o1=""; _rp_og=""; _rp_i=0
   for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
     _rp_i=$((_rp_i + 1))
@@ -2519,16 +2533,20 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
   return 0
 }
 
-# THE CLAIM-PUSH LOCK (TOOL-aGraftedHelix-37). `write_claim_push_lock` takes `claim-push.lock` with
+# THE DIRECTORY LOCK (TOOL-aGraftedHelix-37), a factory at its second caller (TOOL-aPiecewiseGrade-6):
+# `write_claim` takes `claim-push.lock` for `REMOTE_BOUND` plus 10 s with the event stem `claim-push`,
+# and the spec-token start half takes `spec-tokens.<slug>.lock` for `GATE_BOUND` plus 60 s with the
+# stem `spec-tokens`. `write_dir_lock` takes the lock with
 # `mkdir` and writes its deadline into `until` and the caller's token into `owner`. A lock it cannot
-# make is broken only when `check_claim_push_lock_stale` reads it stale - a deadline already passed,
+# make is broken only when `check_dir_lock_stale` reads it stale - a deadline already passed,
 # or none and a directory older than two minutes - and only by the writer that takes the guard
 # `<lock>.break` with `mkdir`. Holding the guard it re-reads the rule, breaks a lock still stale,
 # makes it again and writes both files before it releases the guard; a re-read finding the lock live,
 # or a re-make losing to a plain `mkdir`, releases the guard and reports busy. So no breaker removes
 # a lock another breaker made. A guard older than one minute was left by a crash: the writer finding
 # it removes it and reports busy, never taking it in the same call, and the next call breaks the
-# lock. Each self-heal appends a health event once the guard is released. `remove_claim_push_lock`
+# lock. Each self-heal appends a health event, named from the caller's stem, once the guard is
+# released. `remove_dir_lock`
 # clears the lock only while its `owner` reads the caller's token, the turnstile's nonce pattern, so
 # a release never removes the fresh lock of a writer that broke it. `until` stays a bare epoch, the
 # one field the lander's wait reads.
@@ -2539,37 +2557,62 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
 # it pushes, and its own release can land between a breaker's re-read and its removal. Both the
 # deadline and the age are wall-clock reads, so a clock stepped forward breaks a live lock.
 # A writer in another git dir takes another lock.
-check_claim_push_lock_stale() { # lock dir -> 0 when its deadline passed, or it has none and is older than two minutes
-  local lu=""; { read -r lu <"$1/until"; } 2>/dev/null || :
+# THE OWNER'S PROCESSES, read as data in the lock (TOOL-aPiecewiseGrade-6 S9). A holder may write one
+# `pid.<role>` file per process with `write_dir_lock_pid`: the pid, its procfs start token or `-`, the
+# writer's runtime as `$HOSTNAME:$OSTYPE`, and an optional end file, last because a path may carry a
+# space. `check_dir_lock_stale` also reads a lock stale when it holds at least one such file and every
+# one names a process gone: a digit pid, this runtime, `check_proc_gone` answering gone, and an end
+# file that exists or whose directory is gone, or none recorded. An empty file, the pending `-`, a
+# foreign runtime or a missing stamp reads live. A lock with no pid file keeps the deadline and age
+# rule alone, so the claim-push lock, which writes none, keeps its verdicts.
+# WHAT THIS DOES NOT CHECK: two process tables printing one `$HOSTNAME:$OSTYPE`, such as two MSYS
+# installs on one host, read each other's pids gone and can break a live lock; and a reused pid with
+# no token reads live, so its lock waits for the deadline.
+check_dir_lock_stale() { # lock dir -> 0 when its deadline passed, or it has none and is older than two minutes, or every process it records is gone
+  local lu="" f p t w e n=0; { read -r lu <"$1/until"; } 2>/dev/null || :
   case "$lu" in *[!0-9]*) lu="" ;; esac
+  for f in "$1"/pid.*; do
+    [ -f "$f" ] || continue
+    p=""; t=""; w=""; e=""; { read -r p t w e <"$f"; } 2>/dev/null || :
+    case "$p" in ""|*[!0-9]*) n=-1; break ;; esac
+    [ "$w" = "${HOSTNAME:-}:${OSTYPE:-}" ] && check_proc_gone "$p" "$t" \
+      && { [ -z "$e" ] || [ -e "$e" ] || [ ! -d "${e%/*}" ]; } || { n=-1; break; }
+    n=$((n + 1))
+  done
+  [ "$n" -le 0 ] || return 0
   if [ -n "$lu" ]; then [ "$lu" -lt "$EPOCHSECONDS" ]; return; fi
   [ -n "$(find "$1" -maxdepth 0 -mmin +2 2>/dev/null)" ]
 }
-write_claim_push_lock() { # lock dir · owner token -> 0 taken, 1 busy
+write_dir_lock_pid() { # lock dir · role · pid, or - for pending · end file, optional -> <lock>/pid.<role> written; always 0
+  read_proc_token "$3"
+  printf '%s %s %s %s\n' "$3" "$PT_TOKEN" "${HOSTNAME:-}:${OSTYPE:-}" "${4:-}" >"$1/pid.$2" 2>/dev/null || :
+  return 0
+}
+write_dir_lock() { # lock dir · owner token · seconds it may hold · health-event stem -> 0 taken, 1 busy
   local lk="$1" g="$1.break" broke=""
   if ! mkdir "$lk" 2>/dev/null; then
-    check_claim_push_lock_stale "$lk" || return 1
+    check_dir_lock_stale "$lk" || return 1
     if ! mkdir "$g" 2>/dev/null; then
       if [ -n "$(find "$g" -maxdepth 0 -mmin +1 2>/dev/null)" ]; then
         rm -rf "$g"
-        add_health_event "$(resolve_health_log "$ROOT")" unattended claim-push-guard-cleared "$g"
+        add_health_event "$(resolve_health_log "$ROOT")" unattended "$4-guard-cleared" "$g"
       fi
       return 1
     fi
-    if ! check_claim_push_lock_stale "$lk"; then rmdir "$g" 2>/dev/null; return 1; fi
+    if ! check_dir_lock_stale "$lk"; then rmdir "$g" 2>/dev/null; return 1; fi
     rm -rf "$lk"
     mkdir "$lk" 2>/dev/null || { rmdir "$g" 2>/dev/null; return 1; }
     broke=1
   fi
-  printf '%s\n' "$(( $EPOCHSECONDS + REMOTE_BOUND + 10 ))" >"$lk/until" 2>/dev/null || :
+  printf '%s\n' "$(( $EPOCHSECONDS + $3 ))" >"$lk/until" 2>/dev/null || :
   printf '%s\n' "$2" >"$lk/owner" 2>/dev/null || :
   if [ -n "$broke" ]; then
     rmdir "$g" 2>/dev/null
-    add_health_event "$(resolve_health_log "$ROOT")" unattended claim-push-lock-broken "$lk"
+    add_health_event "$(resolve_health_log "$ROOT")" unattended "$4-lock-broken" "$lk"
   fi
   return 0
 }
-remove_claim_push_lock() { # lock dir · owner token -> removes it only while its owner file reads that token
+remove_dir_lock() { # lock dir · owner token -> removes it only while its owner file reads that token
   local o=""; { read -r o <"$1/owner"; } 2>/dev/null || :
   [ -n "$2" ] && [ "$o" = "$2" ] && rm -rf "$1"
   return 0
@@ -2600,7 +2643,7 @@ remove_claim_push_lock() { # lock dir · owner token -> removes it only while it
 # lock's `until`, and releases it on every path out; push-main touches its marker, then waits for no
 # live lock, then clears and pushes. Whichever side moves second sees the other, so the marker test
 # can no longer pass a moment before the lander clears its verdict files. The take, the break of a
-# stale lock and the release are `write_claim_push_lock` and `remove_claim_push_lock`, whose header
+# stale lock and the release are `write_dir_lock` and `remove_dir_lock`, whose header
 # states their limits (TOOL-aGraftedHelix-37).
 # WHAT THIS DOES NOT CHECK: on a host with no runnable `timeout -k` the push is unbounded, so a push
 # can outlive the deadline it recorded, and a lander past that deadline then pushes beside it.
@@ -2617,7 +2660,7 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
   [ -z "$RUNLOG_GITDIR" ] || rf="$RUNLOG_GITDIR/pre-push-refusal"
   if [ -n "$RUNLOG_GITDIR" ]; then
     lk="$RUNLOG_GITDIR/claim-push.lock"; own="$BASHPID.$RANDOM"
-    write_claim_push_lock "$lk" "$own" || { lk=""; busy=1; }
+    write_dir_lock "$lk" "$own" "$(( REMOTE_BOUND + 10 ))" claim-push || { lk=""; busy=1; }
   fi
   if [ -n "$rel" ]; then
     fact "$rel" session >/dev/null; sid=$_fact; fact "$rel" host >/dev/null; host=$_fact; fact "$rel" lease-utc >/dev/null; lease=$_fact; lease="${lease:-absent}"
@@ -2658,7 +2701,7 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
       [ "$tok" != default-branch ] || WC_WHY="$WC_WHY · fix once: git remote set-head $CR_NAME -a"
     fi
   fi
-  [ -z "$lk" ] || remove_claim_push_lock "$lk" "$own"
+  [ -z "$lk" ] || remove_dir_lock "$lk" "$own"
   [ -z "${d:-}" ] || rm -f "$d"
   if [ "$rc" = 0 ]; then
     # A TAKE-OVER OF A STALE CLAIM IS A SELF-HEAL, logged once per write that landed (I3,
@@ -14400,17 +14443,23 @@ check_commit_message() { # commit message file
   # closed BECAUSE ITS PASS COMMIT IS HEAD is kept apart (`O`): that is `git commit --amend` on the
   # pass commit, whose HEAD is the commit being replaced (closing review r1, M4). Only a trailer naming
   # the unit reopens it, so a records commit after a pass is never asked for a trailer it does not owe.
+  # THE TRAILER FIRST, then only the units the message names (TOOL-aMeasuredDrag-1): `Pass: none` asks
+  # no pass at all, and a key whose unit the message does not name is never asked - each `pass_commit`
+  # walk is one `git log`, and the loops below read only the rows of named units. Named is a token of
+  # a non-empty trailer, else a whole token of the subject (`id_in`), which is each loop's own test.
+  case " $trl " in *" none "*) return 0 ;; esac
   head=$(GIT rev-parse -q --verify HEAD 2>/dev/null)
   rows=$(read_pass_declarations "$rel" current | while IFS= read -r r; do
       [ -n "$r" ] || continue
       d=${r#* dispatch · item }; d=${d%% · reason *}
+      if [ -n "${trl// /}" ]; then case " $trl " in *" ${d#* } "*) ;; *) continue ;; esac
+      else id_in "$subj" "${d#* }" || continue; fi
       if check_pass_open "${d%% *}" "${d#* }" "$rel" "${r#* · reason }"; then
         printf 'o %s %s %s\n' "${d#* }" "${d%% *}" "${r#* · reason }"
       elif [ -n "$head" ] && [ "$(pass_commit "${d%% *}" "${d#* }" "$rel" || true)" = "$head" ]; then
         printf 'O %s %s %s\n' "${d#* }" "${d%% *}" "${r#* · reason }"
       fi
     done)
-  case " $trl " in *" none "*) return 0 ;; esac
   # EVERY LOOP BELOW READS A SCRATCH FILE, `CC_TMP`, never a heredoc over command output: such a loop
   # reads until EOF, and the shell-hygiene leg bans it. The dispatch arm creates and removes the file.
   if [ -z "${trl// /}" ]; then
@@ -14599,17 +14648,33 @@ read_tree_state() { # launcher -> the fingerprint line and HEAD, or nothing and 
 # above carried onto them at the reconcile (TOOL-aLightenedLoop-8). The start half,
 # `init_spec_token_check`, looks the key up over the record, reads the tree state and starts the
 # checker with the record armed, all before the open-pass reader, so the two run side by side; it
-# prints nothing and refuses nothing, and records what it decided in the seven ST_ globals. This read
+# prints nothing and refuses nothing, and records what it decided in the eleven ST_ globals. This read
 # half prints every line and makes every refusal where the call always sat, from those globals, then
 # derives the key over the new record and closes the bracket; it empties the globals so a later call
 # in the same shell never reads them. The bracket so spans the window between the halves, and a write
 # there costs a not-recorded line, never a wrong key. A checker discarded by a refusal in the window
 # leaves its record behind, which the next lookup reads safely because the key folds the record's
 # bytes. A direct call with no start before it runs the two back to back, as `run_bounded` does.
-ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""
+#
+# THE PER-SPEC CACHE (TOOL-aPiecewiseGrade-2), one per slug beside its key: each generation is a
+# `mktemp -d` directory `spec-tokens.<slug>.specs.XXXXXXXX`, and the name file `spec-tokens.<slug>.live`
+# holds the live one's base name. The start half reads that name ONCE, behind an anchored shape check
+# before any `rm -rf` sees it, sweeps every other generation of the slug, and hands the checker the
+# live one as SPEC_TOKENS_CACHE and a fresh one as SPEC_TOKENS_CACHE_NEXT. The read half names the
+# fresh one live, and removes the old, only where the whole key is recorded. Nothing is renamed.
+#
+# ONE DISPATCH OF A SLUG AT A TIME HOLDS THAT STATE (TOOL-aPiecewiseGrade-6). The start half takes
+# `spec-tokens.<slug>.lock` under the sidecar root with `write_dir_lock` before its lookup, records its
+# driver, a pending checker and then the checker's wrapper with its end stamp in the lock, and the
+# read half or `remove_spec_token_check` gives it back. A start that cannot take it is `busy`: no
+# lookup, no tree read, no sweep, the checker run whole with no cache and no record, one line saying
+# so, and no key. So a second start half never sweeps the generation or the record a first still
+# depends on. The lock goes stale at `GATE_BOUND` plus 60 s, or once its driver is gone and its
+# checker has ended, as `check_dir_lock_stale` reads it.
+ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""; ST_NEXT=""; ST_CACHE=""; ST_LOCK=""; ST_OWN=""
 init_spec_token_check() { # slug -> the decision in ST_STATE, and under `run` the checker started; prints nothing
-  local _stdir="" _stwas=""
-  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""
+  local _stdir="" _stwas="" _stlive="" _stold=""
+  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""; ST_NEXT=""; ST_CACHE=""; ST_LOCK=""; ST_OWN=""
   if [ -z "${SPEC_TOKENS_CLI:-}" ]; then ST_STATE=blank; return 0; fi
   [ -f "$ROOT/$SPEC_TOKENS_CLI" ] || { ST_STATE=missing; return 0; }
   # SILENCED HERE, re-run for its print at the read. Printing the resolver's diagnosis now would put
@@ -14617,31 +14682,56 @@ init_spec_token_check() { # slug -> the decision in ST_STATE, and under `run` th
   # stderr not a terminal, the silenced call never reaches the uv prompt either.
   ST_PY=$(resolve_python 2>/dev/null) || { ST_PY=""; ST_STATE=nopython; return 0; }
   _stdir=$(resolve_sidecar_dir) && [ -n "$_stdir" ] && ST_REC="$_stdir/spec-tokens.$1.key" && ST_IN="$_stdir/spec-tokens.$1.inputs"
+  if [ -n "$ST_IN" ]; then
+    mkdir -p "$_stdir" 2>/dev/null
+    ST_LOCK="$_stdir/spec-tokens.$1.lock"; ST_OWN="$BASHPID.$RANDOM"
+    if write_dir_lock "$ST_LOCK" "$ST_OWN" "$(( ${GATE_BOUND:-0} + 60 ))" spec-tokens; then
+      write_dir_lock_pid "$ST_LOCK" driver "$DRIVER_PID"
+    else
+      ST_OWN=""; ST_REC=""; ST_IN=""; ST_STATE=busy
+    fi
+  fi
   if [ -n "$ST_REC" ] && [ -f "$ST_REC" ] && [ -f "$ST_IN" ]; then
     read -r _stwas <"$ST_REC" || :
     ST_KEY=$(derive_spec_token_key "$1" "$ST_PY" "$ST_IN") || ST_KEY=""
     if [ -n "$ST_KEY" ] && [ "$_stwas" = "$ST_KEY" ]; then ST_STATE=skip; return 0; fi
   fi
+  # A busy start reads no tree state. The read keeps its column, so its line's bytes do not move (S6).
+  if [ "$ST_STATE" != busy ]; then
   ST_TREE=$(read_tree_state "$ST_PY") || ST_TREE=""
   ST_STATE=run
-  if [ -n "$ST_IN" ]; then rm -f "$ST_IN" 2>/dev/null; mkdir -p "$_stdir" 2>/dev/null; fi
+  fi
+  if [ -n "$ST_IN" ]; then
+    rm -f "$ST_IN" 2>/dev/null
+    { read -r _stlive <"${ST_REC%.key}.live"; } 2>/dev/null || :
+    [[ $_stlive =~ ^"spec-tokens.$1.specs."[A-Za-z0-9]{8}$ ]] || _stlive=""
+    for _stold in "$_stdir/spec-tokens.$1.specs."*; do
+      [ "$_stold" = "$_stdir/$_stlive" ] || [ ! -d "$_stold" ] || rm -rf "$_stold" 2>/dev/null
+    done
+    ST_NEXT=$(mktemp -d "$_stdir/spec-tokens.$1.specs.XXXXXXXX" 2>/dev/null) || ST_NEXT=""
+    [ -z "$ST_NEXT" ] || ST_CACHE="$_stdir/${_stlive:-spec-tokens.$1.specs.none}"
+  fi
   # A start that cannot make its capture leaves ST_HANDLE empty, and the read half then runs the
   # synchronous form, which prints that sentence where it always did.
-  SPEC_TOKENS_INPUTS=$ST_IN init_bounded "$ST_PY" "$SPEC_TOKENS_CLI" && ST_HANDLE=$RB_HANDLE
+  # ponytail: a wrapper killed with its group leaves no stamp, so its lock waits for the deadline; recording timeout's own pid would break it sooner.
+  [ -z "$ST_OWN" ] || write_dir_lock_pid "$ST_LOCK" checker -
+  SPEC_TOKENS_INPUTS=$ST_IN SPEC_TOKENS_CACHE=$ST_CACHE SPEC_TOKENS_CACHE_NEXT=$ST_NEXT init_bounded "$ST_PY" "$SPEC_TOKENS_CLI" && ST_HANDLE=$RB_HANDLE
+  [ -z "$ST_OWN" ] || [ -z "$ST_HANDLE" ] || write_dir_lock_pid "$ST_LOCK" checker "${ST_HANDLE%% *}" "${ST_HANDLE#* * }/up.end"
   return 0
 }
 # NO CHECKER OUTLIVES THE VERB UNREAD. A refusal between the start and the read waits for the started
 # checker and discards its answer -- never a kill, for the reason `read_preflight_probes` gives.
 remove_spec_token_check() { # -> a started checker waited for and its answer discarded; prints nothing
   [ -z "${ST_HANDLE:-}" ] || read_bounded "$ST_HANDLE" || :
-  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""
+  remove_dir_lock "${ST_LOCK:-}" "${ST_OWN:-}"
+  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""; ST_NEXT=""; ST_CACHE=""; ST_LOCK=""; ST_OWN=""
   return 0
 }
 run_spec_token_check() { # slug -> 0 admitted or skipped, 1 refused under check 49
-  local slug="$1" _stst _stpy _stkey _strec _stin _stat _sth _strc _stq _stnow="" _stwhy=""
+  local slug="$1" _stst _stpy _stkey _strec _stin _stat _sth _stnext _stcache _stlock _stown _strc _stq _stnow="" _stwhy=""
   [ -n "${ST_STATE:-}" ] || init_spec_token_check "$slug"
-  _stst=$ST_STATE; _stpy=$ST_PY; _stkey=$ST_KEY; _strec=$ST_REC; _stin=$ST_IN; _stat=$ST_TREE; _sth=$ST_HANDLE
-  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""
+  _stst=$ST_STATE; _stpy=$ST_PY; _stkey=$ST_KEY; _strec=$ST_REC; _stin=$ST_IN; _stat=$ST_TREE; _sth=$ST_HANDLE; _stnext=$ST_NEXT; _stcache=$ST_CACHE; _stlock=$ST_LOCK; _stown=$ST_OWN
+  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""; ST_NEXT=""; ST_CACHE=""; ST_LOCK=""; ST_OWN=""
   if [ "$_stst" = blank ]; then
     echo "unattended: dispatch — SPEC_TOKENS_CLI is blank or undeclared, so no spec-token check ran over the live tree before this dispatch: an announced skip, not a pass"
     return 0
@@ -14651,25 +14741,29 @@ run_spec_token_check() { # slug -> 0 admitted or skipped, 1 refused under check 
   [ "$_stst" != nopython ] || { resolve_python >/dev/null || :; fail 49 "--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run: $SPEC_TOKENS_CLI"; return 1; }
   if [ "$_stst" = skip ]; then
     echo "unattended: dispatch — spec-token check skipped: its inputs match the check last admitted for $slug (key ${_stkey:0:12})"
+    remove_dir_lock "$_stlock" "$_stown"
     return 0
   fi
-  if [ -z "$_stat" ]; then
+  if [ "$_stst" = busy ]; then
+    echo "unattended: dispatch — spec-token cache off: another dispatch of $slug holds its lock, or the lock cannot be made, so the checker runs whole and records nothing: $_stlock"
+  elif [ -z "$_stat" ]; then
     echo "unattended: dispatch — spec-token cache off: no run-gates gate-fingerprint.sh resolves in this install, or it printed no digest, so the checker runs"
   fi
   if [ -n "$_sth" ]; then
     read_bounded "$_sth"; _strc=$?
   else
-    SPEC_TOKENS_INPUTS=$_stin run_bounded "$_stpy" "$SPEC_TOKENS_CLI"; _strc=$?
+    SPEC_TOKENS_INPUTS=$_stin SPEC_TOKENS_CACHE=$_stcache SPEC_TOKENS_CACHE_NEXT=$_stnext run_bounded "$_stpy" "$SPEC_TOKENS_CLI"; _strc=$?
   fi
   if ! _stq=$(check_spec_token_hits "$slug" "$_strc" "$RB_OUT"); then
     fail 49 "--dispatch refuses: the declared spec-token checker reds over the live tree, so a live spec names a bar, a suite or a token that does not resolve and the unit would build against it ($SPEC_TOKENS_CLI exited $_strc in ${RB_TOOK}s): ${_stq//$'\n'/ }"
+    remove_dir_lock "$_stlock" "$_stown"
     return 1
   fi
   if [ "$_strc" != 0 ]; then
     [[ $RB_OUT =~ spec-tokens:\ ([0-9]+)\ unwaived ]]
     echo "unattended: dispatch — the spec-token checker reds only in other builds' specs, which the bar's whole-tree leg still grades, so this dispatch is admitted: ${BASH_REMATCH[1]:-?} hit(s), first: ${_stq%%$'\n'*}"
   fi
-  [ -n "$_stat" ] || return 0
+  [ -n "$_stat" ] || { remove_dir_lock "$_stlock" "$_stown"; return 0; }
   # TOOL-aLightenedLoop-6 S3 - the key is derived BEFORE the second read, so the bracket spans the
   # checker run and the replay: an edit landing during the replay moves `_stnow` and is refused.
   # Emptied first, because the lookup may have left a key over the earlier record.
@@ -14686,9 +14780,16 @@ run_spec_token_check() { # slug -> 0 admitted or skipped, 1 refused under check 
     _stwhy="the input record cannot be replayed"
   else
     { printf '%s\n' "$_stkey" >"$_strec"; } 2>/dev/null || :
+    # The generation goes live here and only here, under the bracket the key is recorded under; the
+    # old one is removed only once the name is written (TOOL-aPiecewiseGrade-2 S2).
+    if [ -n "$_stnext" ] && [ -d "$_stnext" ]; then
+      { printf '%s\n' "${_stnext##*/}" >"${_strec%.key}.live" && rm -rf "$_stcache"; } 2>/dev/null || :
+    fi
+    remove_dir_lock "$_stlock" "$_stown"
     return 0
   fi
   echo "unattended: dispatch — spec-token cache not recorded: $_stwhy, so the next dispatch runs the checker"
+  remove_dir_lock "$_stlock" "$_stown"
   return 0
 }
 

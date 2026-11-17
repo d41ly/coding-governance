@@ -1691,6 +1691,12 @@
       "source": "tools/unattended/lib-unattended.sh"
     },
     {
+      "path": "tools/unattended/pass-tree.sh",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/pass-tree.sh"
+    },
+    {
       "path": "tools/unattended/playbook.fixture.template.md",
       "kit": "unattended",
       "role": "engine",

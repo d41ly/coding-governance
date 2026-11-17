@@ -56,6 +56,20 @@ resolve_python() {
   # over and named, exactly as a candidate that does not run.
   _rp_floor="3.15"
   _rp_fv=$(( ${_rp_floor%%.*} * 1000 + ${_rp_floor#*.} ))
+  # THE BAR'S OWN RESOLUTION, taken with no spawn (TOOL-aMeasuredDrag-11). The run-gates runner
+  # exports GATE_RESOLVED_PY as four lines: the version, the launcher it resolved, and GOV_PYTHON and
+  # PATH as it saw them. With no caller override the loop below is decided by GOV_PYTHON, PATH and the
+  # floor, so a memo matching both byte for byte, at or above THIS floor, is what the loop would print.
+  # Anything else, malformed or partial included, is ignored and the loop runs. Only an absolute
+  # launcher is admitted (TOOL-aMeasuredDrag-12): a relative one names another file once a leg
+  # changes directory, and a bare name does too under a PATH holding `.`.
+  _rp_re=$'^([0-9]+)\\.([0-9]+)\n(/[^\n]*|[A-Za-z]:/[^\n]*|[A-Za-z]:\\\\[^\n]*)\n([^\n]*)\n(.*)$'
+  if [ -z "${1:-}" ] && [[ ${GATE_RESOLVED_PY:-} =~ $_rp_re ]] \
+    && [ "${BASH_REMATCH[4]}" = "${GOV_PYTHON:-}" ] && [ "${BASH_REMATCH[5]}" = "$PATH" ] \
+    && [ $(( 10#${BASH_REMATCH[1]} * 1000 + 10#${BASH_REMATCH[2]} )) -ge "$_rp_fv" ]; then
+    printf '%s\n' "${BASH_REMATCH[3]}"
+    return 0
+  fi
   _rp_tried=""; _rp_seen=""; _rp_best=""; _rp_bv=0; _rp_bver=""; _rp_o1=""; _rp_og=""; _rp_i=0
   for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
     _rp_i=$((_rp_i + 1))
@@ -3170,6 +3184,9 @@ _pyparity() {  # $1 module directory · $2 example conf · $3 exemption names
 #     — environment, read or set through os.environ by the engine and by its own fixtures.
 #   GIT_INDEX_FILE — environment: gen_build_index.py carries it from os.environ into the hook's git
 #     environment, so both readers stay on one index (TOOL-aTrimmedHook-4).
+#   GOV_INDEX_SET_STDIN — environment: check-memory-hygiene.sh sets it on its own launch of
+#     corpus_ids.py --check, or of gotchas.py --check-with-ids on an unscoped run, never in a conf,
+#     to hand check 16 its index set (TOOL-aHastenedSweep-3).
 #   GRAMMAR_DIR GRAMMAR_WHERE READ_PATH_RULES_GATE — module-level constants, reached through
 #     globals() by selftest arms that save and restore them. GRAMMAR_WHERE is swapped beside
 #     GRAMMAR_DIR in corpus_ids.py (TOOL-aRepatriatedFork-46 S4).
@@ -3180,7 +3197,7 @@ _pyparity() {  # $1 module directory · $2 example conf · $3 exemption names
 #     on purpose: adopt-memory-tree.sh copies the example and appends the first two only when neither
 #     is assigned, so an uncommented blank would skip that append and leave the write gate unarmed on
 #     every new adopter. Discoverable in the example's comments, not by `^KEY=` (TOOL-dHomedResolver-8).
-_pyexempt="EXMP GATE_PUSH_BASE GIT_AUTHOR_DATE GIT_COMMITTER_DATE GIT_DIR GIT_GRAFT_FILE GIT_INDEX_FILE GOV_BASH GOV_DEFAULT_BRANCH GOV_REMOTE GRAMMAR_DIR GRAMMAR_WHERE PATH READ_PATH_RULES_GATE ROUTED_COMMIT_CUTOFF ROUTED_COMMIT_WAIVED ROUTED_PATHS"
+_pyexempt="EXMP GATE_PUSH_BASE GIT_AUTHOR_DATE GIT_COMMITTER_DATE GIT_DIR GIT_GRAFT_FILE GIT_INDEX_FILE GOV_BASH GOV_DEFAULT_BRANCH GOV_INDEX_SET_STDIN GOV_REMOTE GRAMMAR_DIR GRAMMAR_WHERE PATH READ_PATH_RULES_GATE ROUTED_COMMIT_CUTOFF ROUTED_COMMIT_WAIVED ROUTED_PATHS"
 _pk_real=$(_pykeys "$HERE")
 n=$((n+1))
 [ -n "$_pk_real" ] || { echo "FAIL could not derive a single conf key from $HERE/*.py; the python example-conf arms below would pass by finding nothing"; st=1; }
@@ -3451,6 +3468,132 @@ case "$_b1out" in
   *"READ_PATH_CEILING is declared"*) : ;;
   *) echo "FAIL the gate exited 0 and said nothing about a conf that still declares the retired READ_PATH_CEILING; corpus_ids.py prints that notice at exit 0 and this wrapper is the only caller an adopter ever runs"; st=1 ;;
 esac
+
+# ---- TOOL-aHastenedSweep-3: check 16's index set is HANDED DOWN on stdin when checks 1 to 5 ran
+# ---- clean, and ASKED of the print mode otherwise. A bash that does not exist proves which route
+# ---- ran: the ask resolves GOV_BASH and names it, the hand-down never spawns a shell. The notice
+# ---- proves the run reached check 16, so silence on both counts is not a run that stopped early.
+_ixo=$(cd "$_b1" && GOV_BASH="$_b1/no-such-bash" bash "$HERE/check-memory-hygiene.sh" 2>&1)
+n=$((n+1))
+case "$_ixo" in
+  *"corpus_ids: GOV_BASH is set"*|*"check 16 rule 3"*) echo "FAIL a clean unscoped run did not hand check 16 its index set: the classifier asked the shell, or was handed an empty set:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+  *"READ_PATH_CEILING is declared"*) echo "ok   a clean unscoped run hands check 16 the index set it already holds" ;;
+  *) echo "FAIL the hand-down arm's run never reached check 16, so its silence proves nothing:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+esac
+# A checks 1 to 5 failure must take the ASK, so the "answered with findings" refusal still fires: a
+# stray file staged at the memory root, run plain, with the variable exported, and under --only 16.
+_ixt=$(mktemp -d)
+cp -R "$_b1/." "$_ixt/"
+( cd "$_ixt" && printf '# stray\n' > memory/stray.md && git add memory/stray.md ) >/dev/null 2>&1
+for _ixm in plain exported; do
+  if [ "$_ixm" = plain ]; then _ixo=$(cd "$_ixt" && bash "$HERE/check-memory-hygiene.sh" 2>&1)
+  else _ixo=$(cd "$_ixt" && GOV_INDEX_SET_STDIN=1 bash "$HERE/check-memory-hygiene.sh" 2>&1); fi
+  n=$((n+1))
+  case "$_ixo" in
+    *"HYGIENE check 3 FAILED"*"answered with findings"*) echo "ok   a checks 1 to 5 failure ($_ixm) is not handed down, so corpus_ids refuses the findings" ;;
+    *) echo "FAIL a checks 1 to 5 failure ($_ixm) did not reach corpus_ids' 'answered with findings' refusal:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+  esac
+done
+_ixo=$(cd "$_ixt" && bash "$HERE/check-memory-hygiene.sh" --only 16 2>&1)
+n=$((n+1))
+case "$_ixo" in
+  *"answered with findings"*) echo "ok   a scoped run that never ran checks 1 to 5 asks for the index set" ;;
+  *) echo "FAIL --only 16 handed down a set although checks 1 to 5 never ran:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+esac
+rm -rf "$_ixt"
+# The standalone CLI keeps the ask: with the variable unset it reads no stdin and resolves GOV_BASH.
+_ixo=$(cd "$_b1" && env -u GOV_INDEX_SET_STDIN GOV_BASH="$_b1/no-such-bash" "$_PY" "$HERE/corpus_ids.py" --check 2>&1 </dev/null)
+n=$((n+1))
+case "$_ixo" in
+  *"corpus_ids: GOV_BASH is set"*) echo "ok   the standalone corpus_ids --check still asks the print mode" ;;
+  *) echo "FAIL the standalone corpus_ids --check did not ask the print mode for the index set:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+esac
+
+# ---- TOOL-aHastenedSweep-4: an unscoped run takes checks 13-16 and 17-19 from ONE interpreter and
+# ---- SPLITS its two frames. A pinned orphan reds check 14 and a class record naming no gate reds check
+# ---- 18 in one run, so a split handing either block to the other's variables keys a line wrongly.
+_ixt=$(mktemp -d)
+cp -R "$_b1/." "$_ixt/"
+(
+  cd "$_ixt" || exit 1
+  printf 'ORPHAN_ID_PIN="0"\n' >> .memory-tree.conf
+  printf '# r\n\nContext lives in ARCH-tNone-9 upstream.\n' > memory/README.md
+  mkdir -p memory/gotchas
+  printf -- '---\nname: x\ndescription: d\n---\n\nFires on `AGENTS.md`. Nothing said about a gate.\n' > memory/gotchas/x.md
+  "$_PY" "$HERE/gotchas.py" --write
+  git add -A && git -c commit.gpgsign=false commit -q -m t --no-verify
+) >/dev/null 2>&1
+_ixo=$(cd "$_ixt" && bash "$HERE/check-memory-hygiene.sh" --offenders 2>&1)
+n=$((n+1))
+case "$_ixo" in
+  *$'check 13-16\tHYGIENE check 14: id ARCH-tNone-9'*) echo "ok   the one-process run keys check 14's orphan under 13-16" ;;
+  *) echo "FAIL the one-process run did not key check 14's orphan under 13-16:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+esac
+n=$((n+1))
+case "$_ixo" in
+  *$'check 17-19\tHYGIENE check 18: memory/gotchas/x.md names no gate'*) echo "ok   the one-process run keys check 18's ungated record under 17-19" ;;
+  *) echo "FAIL the one-process run did not key check 18's ungated record under 17-19:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+esac
+rm -rf "$_ixt"
+
+# ---- TOOL-aHastenedSweep-6: ONE side red at a time, so a split that reads one verb's rc for the other
+# ---- reds alone. The arm above reds both, and a swapped rc keys both of its lines anyway. The _b1
+# ---- notice prints at exit 0, so a misread 13-16 rc keys it; a green 17-19 block prints nothing.
+_ixt=$(mktemp -d)
+cp -R "$_b1/." "$_ixt/"
+(
+  cd "$_ixt" || exit 1
+  mkdir -p memory/gotchas
+  printf -- '---\nname: x\ndescription: d\n---\n\nFires on `AGENTS.md`. Nothing said about a gate.\n' > memory/gotchas/x.md
+  "$_PY" "$HERE/gotchas.py" --write
+  git add -A && git -c commit.gpgsign=false commit -q -m t --no-verify
+) >/dev/null 2>&1
+_ixo=$(cd "$_ixt" && bash "$HERE/check-memory-hygiene.sh" --offenders 2>&1)
+n=$((n+1))
+case "$_ixo" in
+  *$'check 13-16\t'*) echo "FAIL a bug-class-only red keyed a line under 13-16, so the split read the gotchas rc for corpus_ids':"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+  *$'check 17-19\tHYGIENE check 18: memory/gotchas/x.md names no gate'*) echo "ok   a bug-class-only red keys check 18 under 17-19 and nothing under 13-16" ;;
+  *) echo "FAIL a bug-class-only red did not key check 18's ungated record under 17-19:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+esac
+rm -rf "$_ixt"
+_ixt=$(mktemp -d)
+cp -R "$_b1/." "$_ixt/"
+(
+  cd "$_ixt" || exit 1
+  printf 'ORPHAN_ID_PIN="0"\n' >> .memory-tree.conf
+  printf '# r\n\nContext lives in ARCH-tNone-9 upstream.\n' > memory/README.md
+  git add -A && git -c commit.gpgsign=false commit -q -m t --no-verify
+) >/dev/null 2>&1
+_ixo=$(cd "$_ixt" && bash "$HERE/check-memory-hygiene.sh" --offenders 2>&1)
+n=$((n+1))
+case "$_ixo" in
+  *$'check 17-19\t'*) echo "FAIL an id-classifier-only red keyed a line under 17-19, so the split read corpus_ids' rc for the gotchas one:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+  *$'check 13-16\tHYGIENE check 14: id ARCH-tNone-9'*) echo "ok   an id-classifier-only red keys check 14 under 13-16 and nothing under 17-19" ;;
+  *) echo "FAIL an id-classifier-only red did not key check 14's orphan under 13-16:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+esac
+rm -rf "$_ixt"
+
+# ---- TOOL-aHastenedSweep-6: a frame that does not split falls back LOUDLY under 13-16, never as a
+# ---- second gotchas.py --check launch. A GOV_PYTHON wrapper answers --check-with-ids with one
+# ---- unframed line, at exit 0 (the split's [[ ]] fails) and at exit 2 (the launch fails, the usage
+# ---- exit an older adopter-owned gotchas.py gives), and passes every other call to the real
+# ---- interpreter, which resolve_python's probe needs. What it does not check: the exit alone, since
+# ---- the fallback's _gotrc=1 keeps the run at 1 with its _idsrc=1 zeroed; the key reds that.
+_ixt=$(mktemp -d)
+cp -R "$_b1/." "$_ixt/"
+_ixw=$(mktemp -d); _ixl="$_ixw/log"
+for _ixm in 0 2; do
+  printf '#!/usr/bin/env bash\ncase " $* " in *" --check-with-ids "*) echo "wrapper: an unframed answer"; exit %s ;; esac\nprintf '"'"'%%s\\n'"'"' "$*" >> "%s"\nexec "%s" "$@"\n' "$_ixm" "$_ixl" "$_PY" > "$_ixw/py.sh"
+  chmod +x "$_ixw/py.sh"; : > "$_ixl"
+  _ixo=$(cd "$_ixt" && GOV_PYTHON="$_ixw/py.sh" bash "$HERE/check-memory-hygiene.sh" --offenders 2>&1); _ixrc=$?
+  _ixc=$(grep -c 'gotchas\.py --check$' "$_ixl")
+  n=$((n+1))
+  case "$_ixc:$_ixrc:$_ixo" in
+    0:[1-9]:*$'check 13-16\twrapper: an unframed answer'*) echo "ok   an unframed --check-with-ids answer (exit $_ixm) reds keyed under 13-16, with no second launch" ;;
+    *) echo "FAIL an unframed --check-with-ids answer (exit $_ixm) left the run green, was not keyed under 13-16, or launched gotchas.py --check again (rc $_ixrc, launches $_ixc):"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+  esac
+done
+rm -rf "$_ixt" "$_ixw"
 
 # ---- TOOL-dRetiredFork-15: the five project keys -------------------------------------------------
 # Three arms per validated key -- default, valid override, INVALID override -- because the invalid
@@ -4843,6 +4986,16 @@ done
 # RAISED 707 -> 708 by TOOL-aClearedLedger-6: its three resolver-block assertions, each top-level and
 # never skipped, less OSTYPE out of the population loop and GOV_PYTHON out of the exemption loop.
 # Counted by reading; OWED: observed at the close.
+# RAISED 708 -> 710 by TOOL-aHastenedSweep-4: its two one-process split assertions, each top-level and
+# never skipped. Counted by reading; OWED: observed at the close.
+# RAISED 710 -> 719 by TOOL-aHastenedSweep-6: TOOL-aHastenedSweep-3's five hand-down assertions, which
+# its commit never counted, three top-level and two in a two-pass loop; TOOL-aHastenedSweep-4's two are
+# the raise above; and TOOL-aHastenedSweep-6's four, two one-red arms top-level and its frame-fallback
+# arm's two in a two-pass loop, none skipped. Counted by reading; OWED: observed at the close.
+# RAISED 719 -> 742 by TOOL-aHastenedSweep-7, to the PRINTED count: the suite printed PASS (742
+# assertions) at 0c1935569 (PINNED, 2026-11-16, node a, n_skip 0). The floor sat 23 below the count
+# before this build began; this build's eleven are the two raises above, so this pins the floor to
+# the measured count and a stranded block of any size reds it.
 # RAISED 707 -> 745 by TOOL-aTrimmedWait-2: its scope arms, eleven top-level and twenty-seven in a
 # nine-pass refusal loop, none skipped. Counted by reading; OWED: observed at the close.
 # RAISED 745 -> 749 by TOOL-aTrimmedWait-11: its four check 26 set-aside fixture assertions, each
@@ -4850,7 +5003,10 @@ done
 # MERGED at TOOL-aTrimmedWait-12's reconcile of local main at 5d48501da: the base 707 at 846d51d39, plus main's 1
 # (TOOL-aClearedLedger-6), plus this branch's 42 (TOOL-aTrimmedWait-2's 38 and -11's 4) = 750.
 # Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=750
+# MERGED at TOOL-aTrimmedWait-18's reconcile of local main at 8eda4a5a0: this branch's 750,
+# plus main's 34 since 5d48501da (TOOL-aHastenedSweep-4's 2, -6's 9 and -7's pin of 23) = 784.
+# Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=784
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

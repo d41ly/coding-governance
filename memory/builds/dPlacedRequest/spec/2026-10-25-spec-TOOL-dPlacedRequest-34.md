@@ -173,7 +173,7 @@ the skeptic's binding re-grade. Criterion ACn observes item Sn.
 - **S38** — finding 48 (M29). `python tools/codebase-map/gen_map.py --write` regenerates
   `memory/map/generated/` once over the build's final tree, so `symbols.json` names every function the build
   minted and none it deleted, such as the four claim-push lock functions. **Readers:** by name:
-  `write_claim_push_lock` and its three siblings, spelled by `symbols.json`, regenerated here. by value:
+  READER NOT IN TREE: `write_claim_push_lock` and its three siblings, which TOOL-aPiecewiseGrade-6 renamed to the shared `write_dir_lock`, `check_dir_lock_stale` and `remove_dir_lock` on 2026-11-16, so `symbols.json` spells none of them. by value:
   NO VALUE READERS, since nothing counts a generated index. Observed by AC38.
 - **S39** — finding 50 (M30). `derive_claims_line`'s ranking (§4) gains `released`, hidden past
   `CARD_CLAIMS_HIDE_S` as `stale` and `terminal` are. Observed by AC39.
