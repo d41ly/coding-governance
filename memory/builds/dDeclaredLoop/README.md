@@ -201,7 +201,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-88 — the round-7 spec audit's 36 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-88.md) | 44 | 2 | CLOSED | rev-6 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-89 — the conf-constant class covers a module name a global loader rebinds, and module-level walrus, for and with targets](spec/2026-10-24-spec-TOOL-dDeclaredLoop-89.md) | 44 | 2 | CLOSED | rev-5 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-90 — the round-8 spec audit's 22 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-90.md) | 45 | 2 | CLOSED | rev-6 | 2026-11-17 |
-| [TOOL-dDeclaredLoop-91 — derive_conf_rebinds reads every position a module evaluates: class bodies, defaults, decorators and bases](spec/2026-10-24-spec-TOOL-dDeclaredLoop-91.md) | 45 | 2 | INPROGRESS | rev-3 | 2026-11-17 |
+| [TOOL-dDeclaredLoop-91 — derive_conf_rebinds reads every position a module evaluates: class bodies, defaults, decorators and bases](spec/2026-10-24-spec-TOOL-dDeclaredLoop-91.md) | 45 | 2 | INPROGRESS | rev-4 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-92 — the round-9 spec audit's 17 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-92.md) | 46 | 2 | DEFERRED | rev-4 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-93 — 92 AC16 states the push-merge-tree-fatal plant's exit as 1, the code every sibling states](spec/2026-10-24-spec-TOOL-dDeclaredLoop-93.md) | 47 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-94 — the round-10 spec audit's 24 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-94.md) | 48 | 2 | DEFERRED | rev-3 | 2026-10-24 |

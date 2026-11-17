@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-91 — derive_conf_rebinds reads every position a module evaluates: class bodies, defaults, decorators and bases
 
-**Status:** INPROGRESS · rev-3 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 45 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-4 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 45 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -38,11 +38,11 @@ and proves the class with a plant that executes each row and compares the names 
 with the names the rule answers. It builds at order 45, after 89 at order 44, and repairs
 `TOOL-dDeclaredLoop-89`.
 
-Re-grounded at rev-3 on the branch tip. `derive_conf_rebinds`, its docstring, its README row and the
-`conf-read-forms` plant are still unbuilt there; they land at orders 41 to 44 and are read on their
-committed specs (§5 "Dependency"). 87 and 89 are CLOSED when this unit builds, so rev-2's restatements in
-their specs give way to the two carriers 89 rev-5 keeps, the docstring of `derive_conf_rebinds` and its
-row in the loop kit's README (§8 F4).
+Re-grounded at rev-4 on the branch tip `97ef56324`. `derive_conf_rebinds`, its docstring, its README row
+and the `conf-read-forms` plant are built there, and 80, 82 and 86 to 90 are CLOSED, so this unit reads them as
+they landed (§4 Evidence, §5 "Dependency"). rev-2's restatements in the specs of 87 and 89 give way to
+the two carriers 89 rev-5 keeps, the docstring of `derive_conf_rebinds` and its row in the loop kit's
+README (§8 F4).
 
 ## 2. Scope (IN)
 
@@ -84,7 +84,9 @@ row in the loop kit's README (§8 F4).
   every name but `__builtins__` that the row bound and whose `str()` value contains a conf name. Every
   name in that set must be among the names `derive_conf_constants` answers over the row's scratch
   `loop_lib.py`. Each row prints one parity line naming the names the rule missed, or `none`, and a
-  missed name is a miss of the case, which then ends `MISSED` and exits 1. The check is one-way on
+  missed name is a miss of the case, which then ends `MISSED` and exits 1. A parity line prints only
+  from the names `derive_conf_constants` answered, which it reaches through `load_tree_lib`, so where
+  that call refuses no parity line prints (§8 F6). The check is one-way on
   purpose: `derive_conf_constants` also answers `g` for the lambda row, since charge rule 2 charges the
   constant to that assignment's target (88 S13), an over-report on the rule's fail-closed side, while a
   name the execution bound and the rule missed is the defect. The rows are the plant's own literals, so
@@ -94,13 +96,16 @@ row in the loop kit's README (§8 F4).
   decorator, a default argument, a class base and a class keyword. Its `NOT SEEN` clause keeps every
   other form 89 S5 lists, and drops the sub-bullet naming a `global` in a class body and a walrus in a
   default argument, a decorator or a class base. It gains one form, a `type` statement, which binds a type alias whose value is evaluated lazily
-  and never a path. The over-match the clause names reads "a function or a class whose subtree" holds a
-  conf name. The row 89 S4 writes for `derive_conf_rebinds(tree, docs)` in the table of
-  `tools/loop/README.md`, under "The reader, `loop_lib.py`", says a class is a loader too and names the
-  decorator, default and class-base positions. Observed by AC4.
+  and never a path. The over-match paragraph, which stands before `NOT SEEN` in the landed docstring,
+  reads "a function or a class whose subtree" holds a conf name, and stays where it stands: the clause
+  opens on forms "each binding a module name of `loop_lib.py` outside both passes", and an over-match is
+  the rule's fail-closed over-report, a name the rule answers, so it is no member of that list. The row
+  89 S4 writes for `derive_conf_rebinds(tree, docs)` in the table of `tools/loop/README.md`, under "The
+  reader, `loop_lib.py`", says a class is a loader too and names the decorator, default and class-base
+  positions. Observed by AC4.
   **Readers:**
-  by name: READER NOT IN TREE — the docstring and the README row this item edits land at order 44 and are absent at the branch tip
-  by value: NO VALUE READERS — no code and no gate parses the docstring or the row; a person reads them
+  by name: `tools/loop/README.md`, whose `derive_conf_rebinds(tree, docs)` row points at the docstring's `NOT SEEN` clause and is edited by this item too
+  by value: NO VALUE READERS — no code and no gate parses the docstring or the row; a person reads them, and each `__doc__` read under `tools/loop/` at the tip is a module's own argparse summary
 
 ## 3. Non-goals (OUT)
 
@@ -127,7 +132,7 @@ Read on branch `unattended-declared-loop-d56bf0` at `9c06b8ef8`.
 | rev-2 S5's 89 half | 89 rev-5 §8 F4 moves its restatements into the carriers the code keeps, its S4 row in `tools/loop/README.md` and its S5 `NOT SEEN` clause in the docstring of `derive_conf_rebinds`. 89 is CLOSED at order 44, so S5 edits those two carriers. |
 | rev-2 S5's 87 half | 87 rev-6 §3 holds no binding-form bullet, since 89 rev-5 no longer writes one there. The priced list lives in the docstring, and the `type` statement joins it there (S5). |
 | rev-2 AC4 | Its greps read 89's and 87's spec text, frozen once CLOSED, so it could never turn green. AC4 now reads the docstring and the README row. |
-| 94 S12 and S13 over this spec | 94 builds at order 48, after this unit is CLOSED, and cannot amend it. Its two items on this spec's own text are written here: AC3's copy holds `tools/memory-tree/` and observes no `govkit update`, and S5's over-match reads "a function or a class whose subtree" (§8 F5). 94's re-ground owns its own text. |
+| 94 S12 and S13 over this spec | 94 builds at order 48, after this unit is CLOSED, and cannot amend it. Its two items on this spec's own text are written here: AC3's copy holds `tools/memory-tree/`, and its parity line shows `tree_lib` resolved there (§8 F5, F6), and S5's over-match reads "a function or a class whose subtree" (§8 F5). 94's re-ground owns its own text. |
 
 ### Edges
 
@@ -140,20 +145,21 @@ Read on branch `unattended-declared-loop-d56bf0` at `9c06b8ef8`.
 
 ### Evidence
 
-Read at branch `unattended-declared-loop-d56bf0`, tip `9c06b8ef8`, through `git show` and a
-`git archive` scratch copy of that tip; `tools/loop/` is absent from this worktree's main.
-`derive_conf_rebinds`, `derive_conf_constants`, `load_tree_lib`, `derive_docstring_ids`,
-`derive_fixture_boundary` and the `conf-read-forms` plant are not built at that tip, and are read on the
-committed specs §5 "Dependency" names.
+Read at branch `unattended-declared-loop-d56bf0`, tip `97ef56324`, through `git show` and a
+`git archive` scratch copy of that tip's `tools/`; `tools/loop/` is absent from this worktree's main.
 
-- 89 rev-5 S1 takes `FunctionDef` and `AsyncFunctionDef` as loaders and reaches its module-level targets
-  from `tree.body` without entering a `FunctionDef`, `AsyncFunctionDef`, `ClassDef` or `Lambda`. Its S4
-  writes the README row of `derive_conf_rebinds`, and its S5 the `NOT SEEN` clause, whose last
-  sub-bullet names a `global` in a class body and a walrus in a default argument, a decorator or a class
-  base (`memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-89.md`, §2 and its sketch
-  "The conf-constant class, after this unit").
-- 88 rev-6 S13 makes `derive_conf_constants` the rule-2 slice of `derive_constant_charges` united with
-  `derive_conf_rebinds`. `tools/memory-tree/gen_build_index.py#scan_glob_readers` states the charge rule:
+- `tools/loop/loop_lib.py#derive_conf_rebinds` takes a `FunctionDef` or an `AsyncFunctionDef` as a
+  global loader and walks its module-level targets from `tree.body`, passing over every `FunctionDef`,
+  `AsyncFunctionDef`, `ClassDef` and `Lambda` whole. Its docstring states the two passes, then the
+  global-loader over-match in a paragraph of its own, "a function whose subtree holds a conf name
+  anywhere", then the `NOT SEEN` clause, whose last form is a `global` in a class body and a walrus in a
+  default argument, a decorator or a class base. Its row in `tools/loop/README.md` names a `def` or
+  `async def` loader and a module-level walrus, `for` or `with` target, and points at the clause.
+- `tools/loop/loop_lib.py#derive_conf_constants` parses the file, calls `load_tree_lib`, and answers the
+  rule-2, module-qualified slice of `derive_constant_charges` united with `derive_conf_rebinds`;
+  `tools/loop/loop_lib.py#load_tree_lib` raises `LoopError` naming `govkit update --kits memory-tree`
+  where `tree_lib` cannot be located, does not import, or lacks a name of `TREE_LIB_SYMBOLS`, the last
+  refusal reading `has no <name>`. `tools/memory-tree/gen_build_index.py#scan_glob_readers` states the charge rule:
   rule 1 charges a constant to its innermost function, "its decorators and signature included", rule 2
   answers the targets of an `Assign`, `AnnAssign` or `AugAssign` outside every function, qualified by the
   enclosing classes, and rule 3 the innermost class. The slice keeps names qualified by the module alone,
@@ -173,18 +179,22 @@ committed specs §5 "Dependency" names.
   still loads no `ast`.
 - `tools/loop/budget.py#run_budget_plant` prints `held` or `MISSED <why>` for its case, exiting 0, 1, or
   2 where a kit does not resolve; a failed `check` inside it is a miss. `tools/loop/budget.py#run_selftest`
-  runs every `PLANTS` case and owes `held`. No `conf-read-forms` case exists at the tip; 82 rev-7 mints
-  it as a branch of `run_budget_plant`, each row a scratch folder holding the module and its
-  `loop_lib.py`.
+  runs every `PLANTS` case and owes `held`. Its `conf-read-forms` branch writes each row's module beside
+  a scratch `loop_lib.py` and checks what `derive_conf_reads` answers, catching no `LoopError` from
+  those rows. Its last three rows, 88 S33's unlocatable, blocked and unparseable `tree_lib`, swap the
+  route in process, and each prints and owes `govkit update --kits memory-tree`.
 - A scratch copy of the tip's `tools/loop/`, `tools/lib/` and `tools/memory-tree/` resolves the
-  memory-tree kit from its `loop/` through `tools/loop/loop_lib.py#read_memory_tree`, and `budget.py`
-  imports there: probed 2026-11-17.
+  memory-tree kit from its `loop/` through `tools/loop/loop_lib.py#read_memory_tree`. With
+  `_MODULE_SCOPE_PARTS = {}` appended to the copy's `loop_lib.py`, `python budget.py --fixture --plant
+  conf-read-forms` in its `loop/` exited 0 printing `held`, and `govkit update --kits memory-tree` on 3
+  lines, the three `tree_lib` rows'. A copy without `tools/memory-tree/` exited 1 on a `LoopError`
+  traceback before the case printed any row: probed 2026-11-17, PINNED.
 - `tools/codebase-map/map_lib.py#python_symbols` captures the module-body `def` and `class` names with
   no leading underscore and the `__all__` names; a table assignment is neither.
 - The `CELLS` block of `.lexicon.conf` declares no `py.constant` cell, so no lexicon cell grades a
   module-level table.
 - `tools/gate-legs.json` holds `loop budget fixtures`, running `budget.py --selftest` under a ceiling of
-  300 seconds PINNED, and `tools/run-gates/selftest-budgets.txt` prices it at 485 seconds PINNED.
+  300 seconds PINNED, and `tools/run-gates/selftest-budgets.txt` prices it at 498 seconds PINNED.
 
 ### The module-scope walk, after this unit
 
@@ -244,10 +254,10 @@ class KN(type((lambda x=(NESTED := ".unattended.conf"): x)())): pass
 
 A probe of the sketch over these bytes answered exactly `BCONF`, `CONF_K`, `DCONF`, `DECO`, `KWCONF`,
 `LCONF` and `NESTED`, the set `exec` of the same bytes bound. With the table emptied it answered `CONF_K`
-alone, and 89's walk alone answered none: PINNED, 2026-11-17. Over every `*.py` under the tip's `tools/`,
-188 files PINNED at `9c06b8ef8`, the sketch and 89's walk answered the same two names, `_SLOT_DATA_DIR`
-in `tools/memory-tree/gen_build_index.py` and `_KIT_CONF` in `tools/memory-tree/merge-rows.py`, and the
-kit's own `loop_lib.py` answered none.
+alone, and the landed `derive_conf_rebinds` answered none: PINNED, 2026-11-17. Over every `*.py` under
+the tip's `tools/`, 188 files PINNED at `97ef56324`, the sketch and the landed rule answered the same
+names, `_SLOT_DATA_DIR` in `tools/memory-tree/gen_build_index.py` and `_ANCHOR_AT`, `_GRAMMAR` and
+`_KIT_CONF` in `tools/memory-tree/merge-rows.py`, and the kit's own `loop_lib.py` answered none.
 
 ### Inventory
 
@@ -262,8 +272,9 @@ captures no assignment, so `memory/map/generated/symbols.json` does not move.
 
 This pass writes `tools/loop/loop_lib.py` (S1, S2 and S5's docstring), `tools/loop/budget.py` (S3, S4)
 and `tools/loop/README.md` (S5's row). It writes no spec but this one, and the build README's regions
-are the generator's render. The write set meets 90 rev-5's in `tools/loop/loop_lib.py` and
-`tools/loop/budget.py`. The two units share order 45, and BUILD-METHOD M6 clause 1 sequences them.
+are the generator's render. The write set meets 90's in `tools/loop/loop_lib.py` and
+`tools/loop/budget.py`. The two units share order 45, BUILD-METHOD M6 clause 1 sequences them, and 90
+is CLOSED at rev-6 at the tip, so this pass reads its edits as landed.
 
 ### Files touched (estimate)
 
@@ -307,29 +318,32 @@ are the generator's render. The write set meets 90 rev-5's in `tools/loop/loop_l
 
 ### The sweep
 
-Read at `9c06b8ef8`; counts PINNED there unless named DERIVED.
+Read at `97ef56324`; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
-| `derive_conf_rebinds` answers class loaders and module-scope parts (S1, S2) | its one caller `derive_conf_constants` (89 S2, 88 S13), and through it `derive_conf_reads` and the `no-own-conf-read` case of `budget.py` and of `breakpoints.py` over the kit's own modules; 80 S3's staged module and its sibling (86 S15); the `conf-read-forms` rows of 82, 86, 87, 88, 89 and 90; the probe modules of 88 AC13 and 89 AC2 | over the tip's 188 files PINNED the sketch answers what 89's walk answers, and the kit's own `loop_lib.py` none, a probe the pass re-runs over the landed file; no sibling `loop_lib.py` those rows and probes write, as their specs give the bytes, holds a `global` inside a class or a walrus in a default, decorator, base or keyword; 88 AC13's `class K` holds no `global` |
+| `derive_conf_rebinds` answers class loaders and module-scope parts (S1, S2) | its one caller `derive_conf_constants` (89 S2, 88 S13), and through it `derive_conf_reads` and the `no-own-conf-read` case of `budget.py` and of `breakpoints.py` over the kit's own modules; 80 S3's staged module and its sibling (86 S15); the `conf-read-forms` rows of 82, 86, 87, 88, 89 and 90; the probe modules of 88 AC13 and 89 AC2 | over the tip's 188 files PINNED the sketch answers what the landed rule answers, and the kit's own `loop_lib.py` none, a probe the pass re-runs over the landed file; no sibling `loop_lib.py` those rows and probes write, as their specs give the bytes, holds a `global` inside a class or a walrus in a default, decorator, base or keyword; 88 AC13's `class K` holds no `global` |
 | `_MODULE_SCOPE_PARTS` minted (S2) | `python -c "import loop_lib"` in every loop leg, `loop definition` among them; the codebase-map symbol tier; the lexicon's cells | a literal table of strings, so no import moves at load; `python_symbols` captures no assignment; no `py.constant` cell is declared |
-| the module-scope group and parity in `conf-read-forms` (S3, S4) | `run_selftest` of `budget.py` under `loop budget fixtures`, its row of 485 seconds PINNED in `tools/run-gates/selftest-budgets.txt` and its ceiling of 300 seconds PINNED; the `no-own-conf-read` case over `budget.py` itself; the `--plant` choices and the usage anchor of `budget.py` in `help/loop.md` | no `PLANTS` key is added; the rows and the `exec` sit inside the function 80 S1 bounds, so their conf names stay outside the graded population; each row is one parse and one `exec`, milliseconds |
+| the module-scope group and parity in `conf-read-forms` (S3, S4) | `run_selftest` of `budget.py` under `loop budget fixtures`, its row of 498 seconds PINNED in `tools/run-gates/selftest-budgets.txt` and its ceiling of 300 seconds PINNED; the `no-own-conf-read` case over `budget.py` itself; the `--plant` choices and the usage anchor of `budget.py` in `help/loop.md` | no `PLANTS` key is added; the rows and the `exec` sit inside the function 80 S1 bounds, so their conf names stay outside the graded population; each row is one parse and one `exec`, milliseconds |
 | the docstring and the README row (S5) | their readers; the greps 89 AC4 runs over the docstring; the spec text of 92 and 94 that cites them | `class body`, `default argument` and `subtree` stay in the docstring, in the half before `NOT SEEN`; 92 and 94 are re-grounded before their builders |
 | shipped bytes | `install-prefix (shipped surface)` and `kit epoch (shipped bytes move, the version moves)` | the new lines name confs, AST fields and module files, never a kit path; `KIT_LOOP_VERSION` is owed at the lander, as for 89 |
-| this spec's citations | `memory/project/positional-refs.txt`, its 3 rows PINNED for this spec, under `positional (the citation check alone)` | rev-3 cites symbols, so the two line rows go stale and the commit landing it runs `python tools/playbook/positional.py shrink`; the `BUILD-METHOD M6` row stays |
-| this spec's numbers | 92 and 94 cite S1, S2, S5, AC3 and AC4 by number, the grep below | every number is kept; each sibling's re-ground owns its own text |
+| this spec's citations | `memory/project/positional-refs.txt`, its 1 row PINNED for this spec, `BUILD-METHOD M6`, under `positional (the citation check alone)` | rev-4 keeps that citation in §4 Write set and adds no line citation, citing code by symbol |
+| this spec's numbers | 94 cites S1, S5 and AC3 by number, the grep below | every number is kept; 94's re-ground owns its own text |
 
 ```
 B=branch/unattended-declared-loop-d56bf0
-git grep -n -w -e derive_conf_rebinds -e derive_conf_constants -e load_tree_lib -e _MODULE_SCOPE_PARTS "$B" -- tools/loop   # no match
-git grep -n -e "conf-read-forms" "$B" -- tools help                                   # no match
-git show "$B:tools/gate-legs.json" | grep -A10 '"loop budget fixtures"'
-git show "$B:tools/run-gates/selftest-budgets.txt" | grep '^loop budget fixtures'
-git show "$B:tools/govkit/usage.toml" | grep -c 'id = "script:{prefix}/loop/budget.py'  # 5, one per verb row
+git grep -c -w -e derive_conf_rebinds -e derive_conf_constants -e load_tree_lib "$B" -- tools/loop
+    # README.md 6, budget.py 3, kit.toml 1, loop_lib.py 15
+git grep -n -w -e _MODULE_SCOPE_PARTS "$B" -- tools help                              # no match
+git grep -c -e "conf-read-forms" "$B" -- tools help                                   # budget.py 7
+git show "$B:tools/gate-legs.json" | grep -A10 '"loop budget fixtures"'                # ceiling 300
+git show "$B:tools/run-gates/selftest-budgets.txt" | grep '^loop budget fixtures'      # 498
+git show "$B:tools/govkit/usage.toml" | grep -c 'id = "script:{prefix}/loop/budget.py'  # 6
 git show "$B:tools/lib/python-floor.txt"                                              # 3.15
 git show "$B:.lexicon.conf" | grep -E '^VERB_OFFENDER_PIN|^  py\.'
-git show "$B:memory/project/positional-refs.txt" | grep -c 'spec-TOOL-dDeclaredLoop-91.md'   # 3
+git show "$B:memory/project/positional-refs.txt" | grep -c 'spec-TOOL-dDeclaredLoop-91.md'   # 1
 git grep -o -h -E "91 (S|AC)[0-9]+|91 §[0-9]+" "$B" -- memory/builds/dDeclaredLoop/spec | sort | uniq -c
+    # 2 91 AC3, 1 91 S1, 2 91 S5, all in 94's spec
 git show "$B:.unattended.conf" | grep '^SHARED_RECORDS'
 git show "$B:.memory-tree.conf" | grep '^REFUSAL_CEILINGS'
 git show "$B:memory/guides/SESSION-KICKOFF.md" | grep '^watch:'
@@ -352,23 +366,20 @@ git show "$B:tools/memory-tree/check-verdict-epoch.sh" | grep -c 'loop/'        
 
 ### Dependency
 
-Unbuilt at the tip, read on their committed specs: `TOOL-dDeclaredLoop-80` rev-6 (order 38) for
-`derive_fixture_boundary` and the row placement; `TOOL-dDeclaredLoop-82` rev-7 (order 41) for the
+Built and CLOSED at the tip, read as they landed: `TOOL-dDeclaredLoop-80` rev-6 (order 38) for
+`derive_fixture_boundary` and the row placement; `TOOL-dDeclaredLoop-82` rev-8 (order 41) for the
 conf-constant kind, `derive_docstring_ids` and the `conf-read-forms` plant; `TOOL-dDeclaredLoop-86` rev-8
 (order 42) for `derive_conf_constants`, the sibling `loop_lib.py` rule and the row placement;
 `TOOL-dDeclaredLoop-87` rev-6 (order 43) for the binding walk and its rows; `TOOL-dDeclaredLoop-89` rev-5
-(order 44) for `derive_conf_rebinds`, its docstring, its README row, `load_tree_lib` and its rows; and
+(order 44) for `derive_conf_rebinds`, its docstring, its README row, `load_tree_lib` and its rows;
 `TOOL-dDeclaredLoop-88` rev-6 (order 44) for the rule-2 slice that `derive_conf_constants` unites with
-`derive_conf_rebinds`. Each builds before this unit; where a landed shape differs from its committed
-spec, the pass reads the landed one and records the difference as a deviation.
-`TOOL-dDeclaredLoop-90` rev-5 shares order 45 and two files with this unit (§4 Write set).
-`TOOL-dDeclaredLoop-92` (order 46) and `TOOL-dDeclaredLoop-94` (order 48) build after it.
-`TOOL-dDeclaredLoop-76` is CLOSED and `derive_conf_reads` is built at the tip; `TOOL-dDeclaredLoop-67` is
-building now and 80, 74 and 66 follow. `TOOL-dDeclaredLoop-34` is deferred against ask
-TOOL-dDeclaredLoop-113, and `TOOL-dDeclaredLoop-33`'s numeric direction against ask
-TOOL-dDeclaredLoop-114; none moves a read this unit makes. The probes and the reuse probe ran in the
-scratch copy of the tip; the memory-recall query and the spec-token checker ran in this worktree, cut
-from main.
+`derive_conf_rebinds` and S33's three `tree_lib` rows; and `TOOL-dDeclaredLoop-90` rev-6 (order 45) for
+`TREE_LIB_SYMBOLS` and its rows, sharing two files with this unit (§4 Write set).
+`TOOL-dDeclaredLoop-76` is CLOSED and `derive_conf_reads` is built at the tip.
+`TOOL-dDeclaredLoop-92` (order 46) and `TOOL-dDeclaredLoop-94` (order 48) are DEFERRED and build after
+it. `TOOL-dDeclaredLoop-34` is DEFERRED and moves no read this unit makes. The probes and the reuse
+probe ran in the scratch copy of the tip; the memory-recall query and the spec-token checker ran in
+this worktree, cut from main.
 
 ## 6. Acceptance criteria
 
@@ -391,14 +402,19 @@ Each `python budget.py` and `python -c` command below runs in the loop kit's fol
 - **AC3** — When `tools/loop/`, `tools/lib/` and `tools/memory-tree/` are copied into a `tools/` folder
   under the run's scratch directory, the line `_MODULE_SCOPE_PARTS = {}` is appended to the
   `loop_lib.py` of the copy's `loop/`, and `python budget.py --fixture --plant conf-read-forms` runs in
-  that `loop/`, it exits 1, prints a parity line naming `DCONF` as missed, and prints no
-  `govkit update --kits memory-tree`.
+  that `loop/`, it exits 1 and prints a parity line naming `DCONF` as missed. That line prints only from
+  the names `derive_conf_constants` answered after `load_tree_lib` returned (S4), so it is the
+  observation that `tree_lib` resolved in the copy (§8 F6). The three `tree_lib` rows 88 S33 planted
+  print `govkit update --kits memory-tree` in the copy as in the uncopied tree, and AC3 reads no line of
+  theirs.
   Red when: the parity half compares the walk with itself, so a walk that skips a position still passes,
-  or the copy cannot resolve `tree_lib` and a bare non-zero exit passes for a parity failure.
+  or the copy cannot resolve `tree_lib`, so no parity line prints and a bare non-zero exit passes for a
+  parity failure.
 - **AC4** — When a `python -c` probe splits `loop_lib.derive_conf_rebinds.__doc__` at its first
   `NOT SEEN`, the text before it holds each of `_MODULE_SCOPE_PARTS`, `decorator`, `default argument`,
-  `class base` and `class body`. The text after it holds `type alias` and
-  `or a class whose subtree`, and none of `decorator`, `default argument` and `class base`. When
+  `class base`, `class body` and `or a class whose subtree`, the last in the over-match paragraph S5
+  keeps where it stands. The text after it holds `type alias`, and none of `decorator`,
+  `default argument` and `class base`. When
   `grep "derive_conf_rebinds(tree, docs)"` over the kit's `README.md` is piped to `grep -c "class"` and
   to `grep -c "decorator"`, each prints at least 1.
   Red when: the docstring still prices a covered position as unseen, or names no `type` statement, so a
@@ -446,6 +462,19 @@ New arm: tools/loop/budget.py · covers AC1 AC3 · the module-scope group of con
   failure. Recommendation: (b).
   RESOLVED (agent, 2026-11-16, delegated): (b), S5 and AC3.
   widens: none · relaxes: none
+- **F6 — Which line of AC3's copy run shows that `tree_lib` resolved there?** rev-3's "prints no
+  `govkit update --kits memory-tree`" cannot hold: the same case runs 88 S33's three `tree_lib` rows,
+  each printing that command and holding only when it does, and AC1 keeps every planted row
+  (2026-11-17-build-TOOL-dDeclaredLoop-91-1-builder-return). (a) the parity line itself, which prints
+  only from the names `derive_conf_constants` answered after `load_tree_lib` returned; (b) no
+  `has no derive_` refusal in the output; (c) the three `tree_lib` rows printing as they do in the
+  uncopied tree. (b) holds in a copy that resolved nothing, since an unlocatable kit refuses with
+  `looked in`, never `has no`. (c) reads rows that swap the route in process, so the unlocatable and
+  unparseable rows print the same with or without a memory-tree kit, and a copy lacking one ends in a
+  traceback before any row prints (§4 Evidence). (a) prints only where the route resolved in the copy
+  and reads no line a planted row prints. Recommendation: (a).
+  RESOLVED (agent, 2026-11-17, delegated): (a), S4 and AC3.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -461,6 +490,15 @@ New arm: tools/loop/budget.py · covers AC1 AC3 · the module-scope group of con
   `derive_conf_constants` as 88 S13 builds it. AC2 calls the function on a parsed tree. AC3 copies the
   three folders and S5 names the class-or-function over-match, 94's items on this spec (F5). Python is
   3.15.2 and the probes re-ran at the tip; line citations made symbol citations; the sweep.
+- rev-4 · 2026-11-17 · §1 · S4 · S5 · §3 · §4 · §5 · AC3 · AC4 · §8 · re-grounded on
+  branch/unattended-declared-loop-d56bf0 at `97ef56324` after the builder return
+  2026-11-17-build-TOOL-dDeclaredLoop-91-1-builder-return; mechanism, carries, order and status kept.
+  AC3 observes `tree_lib` resolved in the copy by its parity line, which S4 prints only from
+  `derive_conf_constants`'s answer, in place of an absent update command 88 S33's rows print (F6). S5
+  keeps the over-match paragraph before `NOT SEEN`, where it landed, and AC4 reads it there. The units
+  rev-3 read on their specs are read as landed; the sweep's figures are re-read: the two greps that
+  matched nothing now match, the positional registry holds 1 row, the leg's budget is 498 seconds and
+  budget.py's usage rows 6.
 
 ## 10. Reuse audit
 
