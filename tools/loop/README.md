@@ -322,7 +322,8 @@ is the parent's run-state file holding a `phase` that `loop_table.py`'s `derive_
 with `halt-code` and `hold-code` where set, to the state `withdrawn` (TOOL-dDeclaredLoop-56 S18), so an
 `ABORTED` parent halted `budget-exhausted` reads `incomplete`, and a phase no row maps exits 2 naming the
 parent. `read_withdrawn_parents` reads the front matter through the memory-tree kit's
-`parse_front_matter`, the builds folder from its `read_design_conf`, and the run facts through the
+`parse_front_matter`, the builds folder from this kit's `resolve_memory_root` (TOOL-dDeclaredLoop-116),
+and the run facts through the
 policy kit's `read_run_fact`, from the file at `refs/remotes/<remote>/<run-branch>` where that ref holds
 it, the remote by `claims.py`'s inline ladder and the branch by the tree copy's `run-branch:` fact, else
 from the tree's copy (S39); a parent with neither prints `parent <p> · not withdrawn (no run record)`
@@ -806,7 +807,7 @@ python <prefix>/loop/factories.py --selftest
 | `resolve_alias(rows, word)` | the `means` of the row holding `word`, or `None` |
 | `read_actor_rows(kit_dir)` | the actor list's non-blank lines, the list's one reader |
 | `read_actor_base(kit_dir)` | `(rows, base)` of the list at the compare base, or `(None, why)` for no comparison |
-| `read_builds_dir(kit_dir, root)` | `(builds_dir, "")` where the conf at `root` sets `DESIGN_RECORD`, or `(None, why)`: no memory-tree kit, or no `DESIGN_RECORD` |
+| `read_builds_dir(kit_dir, root)` | `(builds_dir, "")` where the conf at `root` sets `DESIGN_RECORD`, under the root `resolve_memory_root` answers, or `(None, why)`: no memory-tree kit, no `DESIGN_RECORD`, or a records root that does not resolve, the `records root:` refusal of two confs naming two roots among them |
 | `read_driver_conf(tree, names)` | `{name: value}` for each of `names` the unattended driver's `.unattended.conf` at the top of `tree`'s work tree sets, sourced in bash as the driver sources it, `{}` where the file is absent, held for the process; `ValueError` on a name that is no variable name, `LoopError` `driver conf unreadable` where the conf does not source |
 | `resolve_memory_root_source(tree)` | `(root, source)`: the root a build's records sit under: `.unattended.conf`'s `MEMORY_ROOT` through `read_driver_conf`, `memory` where unset, wherever that conf is a file, source `.unattended.conf`; else `.memory-tree.conf`'s, `memory` where unset, wherever that conf is a file, source `.memory-tree.conf`; else `memory`, source `default`; held per tree and conf bytes; `ValueError` `records root:` where the two confs name different roots |
 | `resolve_memory_root(tree)` | the root of `resolve_memory_root_source`'s pair, the one reader every loop module takes the root from |

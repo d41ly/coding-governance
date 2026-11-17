@@ -203,6 +203,11 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
           "trailing-slash-agree": "the driver's conf naming MEMORY_ROOT=memory/ beside the memory tree's memory, "
                                   "one draw",
           "no-confs": "the memory tree's conf taken out and no driver's conf written, the root read",
+          "driver-root-readers": "the build moved under records, the driver's conf naming MEMORY_ROOT=records and the "
+                                 "memory tree's conf no root, then each reader of a build's folder: the ending's "
+                                 "disposition, the position engine's README and acceptance reads, a withdrawn parent, "
+                                 "an upstream record and the actor list's builds folder, then that folder again with "
+                                 "the memory tree's conf naming memory",
           "conf-read-forms": "the conf-read rule over scratch modules beside a loop_lib binding the driver's conf's "
                              "name: a constant, the same line in fixture code, a bash string, an aliased reader, "
                              "docstrings alone, a Path binding, an annotated binding and a star import of the "
@@ -1435,6 +1440,70 @@ def run_budget_plant(case):
                 got = "%s: %s" % (type(e).__name__, e)
             print("%s: fixture · no-confs · root %s" % (SAY, got))
             check(got == "memory", "resolve_memory_root answered %r" % got)
+        elif case == "driver-root-readers":   # TOOL-dDeclaredLoop-116 AC1 to AC5: each reader follows the driver's root
+            read_memory_tree("build_records.py")
+            from build_records import write_acceptance, write_disposition
+            from loop_lib import read_builds_dir
+            from loop_parents import read_withdrawn_parents
+            from position import HANDOVER, derive_position, render_handover
+            from upstream import write_upstream_record
+            readme = "---\nslug: %s\nnode: a\nopened: 2026-01-01\nstreams: tooling\nroster: none\nids: none\n%s---\n# %s\n"
+            write_fixture_files(top, {"memory/builds/%s/README.md" % FX_BUILD: readme % (FX_BUILD, "parents: tPar\n", FX_BUILD),
+                                      "memory/builds/tPar/README.md": readme % ("tPar", "", "tPar"),
+                                      "memory/builds/tPar/RUN.md": "# tPar run\n\n## Run facts\nphase: ABORTED\n"})
+            run_fixture_git(top, "add", "-A")
+            run_fixture_git(top, "commit", "-q", "-m", "a pass\n\nPass: %s" % FX_UNIT)
+            sha = run_fixture_git(top, "rev-parse", "HEAD")
+            write_acceptance(top, FX_BUILD, FX_UNIT, sha, "stand-in", [("true", 0, "0" * 12)], today="2026-01-01")
+            write_disposition(top, FX_BUILD, FX_UNIT, EXHAUSTED_ITEM, "continue", "terminal")
+            run_fixture_git(top, "add", "-A")
+            run_fixture_git(top, "commit", "-q", "-m", "the unit's records")
+            run_fixture_git(top, "mv", "memory", "records")   # the move, as unattended-root makes it
+            write_fixture_files(top, {".memory-tree.conf": 'FAMILIES="tool:TOOL"\n', ".unattended.conf": "MEMORY_ROOT=records\n",
+                                      "records/builds/%s/RUN.md" % FX_BUILD: PLANT_RUN})
+            run_fixture_git(top, "add", "-A")
+            run_fixture_git(top, "commit", "-q", "-m", "the driver's records root")
+            said = "%s: fixture · driver-root-readers · %%s · %%s" % SAY
+            rc, out = run_verb(["ending", "--build", FX_BUILD])
+            print(said % ("ending", out.strip()))
+            check(rc == 0 and out.strip().endswith("disposed continue"), "ending read %r, exit %d" % (out.strip(), rc))
+            before = os.environ.get(HANDOVER)
+            os.environ[HANDOVER] = render_handover([(FX_UNIT, "READY")])
+            try:
+                pos = derive_position(top, FX_BUILD)
+            finally:
+                if before is None:
+                    os.environ.pop(HANDOVER, None)
+                else:
+                    os.environ[HANDOVER] = before
+            print(said % ("position", "read %s · reason %s" % (" | ".join(pos["read"]) or "none", pos["reason"] or "none")))
+            folder = "records/builds/%s/" % FX_BUILD
+            check(any(r.startswith(folder + "README.md@") for r in pos["read"])
+                  and any(r.startswith(folder + "build/") and "-acceptance-" in r for r in pos["read"]),
+                  "the position engine read no README and acceptance record under records: %s" % (pos["reason"] or pos["read"]))
+            try:
+                parents = read_withdrawn_parents(FX_BUILD, top)
+            except ValueError as e:
+                parents = str(e)
+            print(said % ("parents", sorted(parents) if isinstance(parents, dict) else parents))
+            check(isinstance(parents, dict) and list(parents) == ["tPar"] and "phase: ABORTED" in (parents["tPar"] or ""),
+                  "the withdrawn parents read %r" % parents)
+            owed = "records/builds/%s/build/2026-01-01-build-%s-upstream-1.md" % (FX_BUILD, FX_UNIT)
+            try:
+                got = write_upstream_record(top, FX_BUILD, FX_UNIT, "item.design.unit-spec", ["a line"], today="2026-01-01")
+            except ValueError as e:
+                got = str(e)
+            print(said % ("upstream", got))
+            check(got == owed and (top / owed).is_file(), "the upstream record answered %r, owed %r" % (got, owed))
+            for name, conf in (("builds-dir", 'FAMILIES="tool:TOOL"\nDESIGN_RECORD="x"\n'),
+                               ("builds-dir disagree", 'FAMILIES="tool:TOOL"\nDESIGN_RECORD="x"\nMEMORY_ROOT=memory\n')):
+                write_fixture_files(top, {".memory-tree.conf": conf})   # the working file alone, both readers read it
+                builds, why = read_builds_dir(KIT, top)
+                print(said % (name, "%s · %s" % (builds.relative_to(top).as_posix() if builds else "none", why or "none")))
+                if name == "builds-dir":
+                    check((builds, why) == (top / "records" / "builds", ""), "%s answered %r, %r" % (name, builds, why))
+                else:
+                    check(builds is None and why.startswith("records root:"), "%s answered %r, %r" % (name, builds, why))
     except LookupError as e:
         print("%s: fixture · %s · unarmed: %s" % (SAY, case, e))
         return 2

@@ -676,10 +676,12 @@ def read_actor_base(kit_dir):
 
 
 def read_builds_dir(kit_dir, root):
-    """`(builds_dir, why)`: `<root>/<MEMORY_ROOT>/builds` where the memory tree's conf at `root` sets
-    `DESIGN_RECORD`, the mark of the tree that owns the chain's build names, or None and why: no
-    memory-tree kit, or no `DESIGN_RECORD` in the conf, a missing conf included. The memory-tree kit's
-    `read_design_conf` is imported inside the function, as `read_actor_base` imports its compare base."""
+    """`(builds_dir, why)`: `<root>/<records root>/builds`, the root `resolve_memory_root` answers, where the
+    memory tree's conf at `root` sets `DESIGN_RECORD`, the mark of the tree that owns the chain's build
+    names, or None and why: no memory-tree kit, no `DESIGN_RECORD` in the conf, a missing conf included,
+    or a records root that does not resolve, the two confs naming two roots among them, its `records
+    root:` reason as the why (TOOL-dDeclaredLoop-116). The memory-tree kit's `read_design_conf` is
+    imported inside the function, as `read_actor_base` imports its compare base."""
     try:
         mt_dir = resolve_kit_dir("memory-tree", "design_lib.py", kit_dir)
     except LookupError as e:
@@ -691,7 +693,10 @@ def read_builds_dir(kit_dir, root):
     if not str(conf.get("DESIGN_RECORD") or "").strip():
         return None, "%s sets no DESIGN_RECORD, or is absent, so the chain's builds are not this tree's" % (
             (pathlib.Path(root) / ".memory-tree.conf").as_posix())
-    memory_root = (conf.get("MEMORY_ROOT") or "memory").strip().strip("/")
+    try:
+        memory_root = resolve_memory_root(root)
+    except (LookupError, ValueError) as e:
+        return None, str(e)
     return pathlib.Path(root) / memory_root / "builds", ""
 
 

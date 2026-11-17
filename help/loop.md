@@ -148,6 +148,8 @@ refused when the witness it names is no `actor` witness, or when its site is nei
 `DOD_CORE`. A row whose build has no `<MEMORY_ROOT>/builds/<build>/README.md` is refused only in a
 tree whose `.memory-tree.conf` sets `DESIGN_RECORD`, the tree that owns the chain's builds. Anywhere
 else, `--check` prints each row ending `foreign build, not graded`, and says why on its builds line.
+A tree whose two confs name two records roots prints each row `foreign build, not graded` too, its
+builds line carrying the `records root:` reason.
 
 **Upgrading.** If your `.unattended.conf` declares a `DOD_EXTRA` entry with no class, check 53 of the
 unattended leg refuses it, naming the entry. Append `:machine` or `:agent` to it. An `:agent` entry
@@ -1901,7 +1903,8 @@ adopter's to seed. The loop kit is in the default selection, so a default instal
 requires the loop kit: a `--kits` selection naming `roles` names `loop` too or is refused. The
 unattended kit requires the loop kit too, for check 53. The loop kit requires the memory-tree kit,
 because `--check` reads the actor list at the compare base that kit resolves, and reads
-`DESIGN_RECORD` and `MEMORY_ROOT` through that kit's conf reader.
+`DESIGN_RECORD` through that kit's conf reader, finding the builds folder under the records root the
+section above states.
 The loop kit requires the run-gates kit too, because loop_witness.py normalises each re-run's output
 with that kit's normaliser before it hashes it. `--check` also reads the roles
 kit's role files for the role items' defaults, without requiring that kit: where it is not

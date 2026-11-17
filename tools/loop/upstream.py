@@ -61,7 +61,7 @@ if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from loop_items import read_composed_items  # noqa: E402
 from loop_lib import (OUTCOMES_REF, SEG, LoopError, read_definition, read_dispositions, read_item_rows,  # noqa: E402
-                      read_memory_tree, run_selftest_cases)
+                      read_memory_tree, resolve_memory_root, run_selftest_cases)
 
 SAY = "upstream"
 SEP = " · "
@@ -289,12 +289,11 @@ def write_upstream_record(root, build, unit, item, lines, today=None):
     where the slug or the id does not read, or the build has no folder."""
     read_memory_tree("build_records.py")
     from build_records import ID, SLUG
-    from design_lib import read_design_conf
     if not SLUG.match(build):
         raise ValueError("--build %r is not a build slug" % build)
     if not re.fullmatch(ID, unit):
         raise ValueError("--unit %r is not a unit id" % unit)
-    memory_root = (read_design_conf(root).get("MEMORY_ROOT") or "memory").strip().strip("/")
+    memory_root = resolve_memory_root(root)
     folder = pathlib.Path(root, memory_root, "builds", build)
     if not folder.is_dir():
         raise ValueError("%s/builds/%s/ is no build folder of this tree" % (memory_root, build))

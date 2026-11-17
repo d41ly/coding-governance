@@ -6,8 +6,9 @@
     python loop_parents.py --fixture --plant <case> [--value <v>] [--state <s>]
 
 `read_withdrawn_parents(build, root)` reads the slugs of the build README's `parents:` front matter
-through the memory-tree kit's `parse_front_matter`, the builds folder `<root>/<MEMORY_ROOT>/builds` by
-that kit's `read_design_conf`, `memory` where unset. A parent reads withdrawn on today's stand-in for its
+through the memory-tree kit's `parse_front_matter`, the builds folder `<root>/<records root>/builds` by
+the loop kit's `resolve_memory_root` (TOOL-dDeclaredLoop-116). A parent reads withdrawn on today's
+stand-in for its
 `withdrawn` post: its run-state file `RUN.md`, read at the tip of `refs/remotes/<remote>/<run-branch>`
 where that ref holds it, else in the tree (TOOL-dDeclaredLoop-56 S39), has a run fact `phase` that
 `loop_table.py`'s `derive_phase_position` maps, with `halt-code` and `hold-code` where set, to the state
@@ -60,7 +61,7 @@ sys.dont_write_bytecode = True
 KIT = pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
-from loop_lib import read_definition, read_memory_tree, resolve_kit_dir, run_selftest_cases  # noqa: E402
+from loop_lib import read_definition, read_memory_tree, resolve_kit_dir, resolve_memory_root, run_selftest_cases  # noqa: E402
 from loop_table import TransitionRefused, derive_move, read_transition_rows  # noqa: E402
 from loop_witness import read_git, remove_tree, run_fixture_git, write_fixture_files  # noqa: E402
 
@@ -103,11 +104,10 @@ def read_withdrawn_parents(build, root):
     phase the map refuses; LookupError where the memory-tree or policy kit does not resolve."""
     read_memory_tree("gen_build_index.py")
     from claims import resolve_remote
-    from design_lib import read_design_conf
     from gen_build_index import Problem, parse_front_matter
     from loop_table import derive_phase_position
     _policy, guard = read_policy_kit()
-    memory_root = (read_design_conf(root).get("MEMORY_ROOT") or "memory").strip().strip("/")
+    memory_root = resolve_memory_root(root)
     builds = pathlib.Path(root) / memory_root / "builds"
     try:
         fm = parse_front_matter(str(builds / build / "README.md"), build)

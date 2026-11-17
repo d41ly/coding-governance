@@ -127,7 +127,7 @@ from claims import derive_claim_key, derive_claim_verdict, resolve_remote  # noq
 from composition import derive_carried_witnesses, read_step_composition  # noqa: E402
 from loop_items import read_composed_items  # noqa: E402
 from loop_lib import (NO_STEP, ROUTE_STAND_IN, LoopError, check_computed_witnesses, read_definition,  # noqa: E402
-                      read_item_rows, read_memory_tree, resolve_kit_dir, run_selftest_cases)
+                      read_item_rows, read_memory_tree, resolve_kit_dir, resolve_memory_root, run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_table import check_recorded_move, derive_from_states, read_transition_rows  # noqa: E402
 from loop_transition import read_transitions  # noqa: E402
@@ -562,11 +562,10 @@ def derive_position_into(pos, repo, slug, definition):
     read_memory_tree("gen_build_index.py")
     from build_records import read_acceptance, read_records
     from commit_trailers import derive_attribution, read_commits
-    from design_lib import read_design_conf
     from gen_build_index import Problem, parse_front_matter
     now = datetime.datetime.now(datetime.timezone.utc)
-    conf = read_design_conf(repo)
-    builds = repo / (conf.get("MEMORY_ROOT") or "memory").strip().strip("/") / "builds"
+    root = resolve_memory_root(repo)
+    builds = repo / root / "builds"
     folder = builds / slug
     if not (folder / "README.md").is_file():
         raise ValueError("the slug %s names no build README under %s" % (slug, builds.as_posix()))
@@ -604,7 +603,7 @@ def derive_position_into(pos, repo, slug, definition):
         for uid in derive_attribution(c, "replace", UNIT_ID):
             passes.setdefault(uid, []).append(c["sha"])
     records = {}
-    for r in read_records(repo, conf, "acceptance", read_acceptance):
+    for r in read_records(repo, {"MEMORY_ROOT": root}, "acceptance", read_acceptance):
         if r["build"] == slug:
             records.setdefault(r.get("Caused-by", "").strip("`"), []).append(r)
             if not r["malformed"]:

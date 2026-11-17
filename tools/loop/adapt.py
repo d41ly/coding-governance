@@ -232,8 +232,7 @@ def read_disposition_release(root, build, tag, named):
     in `named`, or None."""
     read_memory_tree("build_records.py")
     from build_records import read_disposition, read_records
-    from design_lib import read_design_conf
-    found = [r for r in read_records(root, read_design_conf(root), "disposition", read_disposition)
+    found = [r for r in read_records(root, {"MEMORY_ROOT": resolve_memory_root(root)}, "disposition", read_disposition)
              if r["build"] == build and not r["malformed"] and r.get("Item", "").strip("`") == tag
              and r["id"] not in named]
     if not found:
