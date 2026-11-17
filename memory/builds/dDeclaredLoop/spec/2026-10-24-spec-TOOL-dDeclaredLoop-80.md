@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-80 — the no-own-conf-read rule stops at a named fixture boundary, so the plants that write the confs are outside its population
 
-**Status:** DEFERRED · rev-6 · 2026-11-16 · node d · Tier-2 · base ed497191 · streams tooling · order 38 · advances TOOL-dDeclaredLoop-35
+**Status:** INPROGRESS · rev-6 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 38 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-80-deviation-802.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-80-deviation-802.md) | deviation | — |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-80-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-80-1-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-80-reground-brief.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-80-reground-brief.md) | research | — |
+| [2026-11-17-prompt-TOOL-dDeclaredLoop-80-build-brief.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-80-build-brief.md) | journal | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-80-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-80-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82 |
 
 <!-- /gen:spec-records -->
