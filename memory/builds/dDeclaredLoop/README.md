@@ -210,7 +210,7 @@ ids TOOL-dDeclaredLoop-105 TOOL-dDeclaredLoop-106 TOOL-dDeclaredLoop-107 TOOL-dD
 | [TOOL-dDeclaredLoop-97 — the no-own-conf-read rule reads its reader calls from one declared tuple, `CONF_READERS`, which holds the three callee names it answers](spec/2026-10-24-spec-TOOL-dDeclaredLoop-97.md) | 50 | 2 | CLOSED | rev-2 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-98 — the `conf-read-forms` plant proves on every run that the rule answers a call of each declared conf reader](spec/2026-10-24-spec-TOOL-dDeclaredLoop-98.md) | 50 | 2 | DEFERRED | rev-2 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-99 — every `loop_lib.py` function that opens a conf is declared in `CONF_READERS` or `CONF_ROUTES`, checked both ways by a definition plant](spec/2026-10-24-spec-TOOL-dDeclaredLoop-99.md) | 50 | 2 | DEFERRED | rev-2 | 2026-11-17 |
-| [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-2 | 2026-11-17 |
 <!-- /gen:build-units -->
 
 Records: 891 bound to this build, across 4 record folder(s).
