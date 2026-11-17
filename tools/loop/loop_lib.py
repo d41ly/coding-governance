@@ -954,10 +954,15 @@ def derive_conf_constants(loop_lib_path):
     return names | derive_conf_rebinds(tree, tl.derive_docstring_ids(tree))
 
 
+# Every callee `derive_conf_reads` answers as a `reader call` (TOOL-dDeclaredLoop-97 S1): a conf
+# reader the rule must answer joins this tuple, never a literal of its own.
+CONF_READERS = ("read_design_conf", "read_driver_conf", "parse_conf")
+
+
 def derive_conf_reads(path):
     """`[(line, kind)]` sorted by line, one per conf read in the module at `path`, graded on its syntax
-    tree: kind `reader call` for a call whose callee is `read_design_conf`, `read_driver_conf` or
-    `parse_conf`, an attribute by its name and a name by the last segment of what
+    tree: kind `reader call` for a call whose callee is a member of `CONF_READERS`, read when the call
+    runs (TOOL-dDeclaredLoop-97 S2), an attribute by its name and a name by the last segment of what
     `derive_import_aliases` binds it to; kind `conf name` for a string constant holding
     `.memory-tree.conf` or `.unattended.conf` anywhere, an f-string's literal part included, that is
     not a docstring `derive_docstring_ids` answers (TOOL-dDeclaredLoop-82 S8, S10); kind
@@ -991,7 +996,7 @@ def derive_conf_reads(path):
             callee = node.func
             name = (aliases.get(callee.id, callee.id).rsplit(".", 1)[-1] if isinstance(callee, ast.Name)
                     else getattr(callee, "attr", None))
-            if name in ("read_design_conf", "read_driver_conf", "parse_conf"):
+            if name in CONF_READERS:
                 hits.append((node.lineno, "reader call"))
         elif isinstance(node, ast.Constant) and isinstance(node.value, str) \
                 and any(c in node.value for c in confs) and id(node) not in docs:
