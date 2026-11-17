@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-18 — the reconcile with local main at 8eda4a5a0: its five conflicts resolved and the coincident floor summed, so the landing merge is clean
 
-**Status:** SPECCED · rev-1 · 2026-11-17 · node a · Tier-2 · base 8eda4a5a0 · streams tooling · order 13
+**Status:** INPROGRESS · rev-1 · 2026-11-17 · node a · Tier-2 · base 8eda4a5a0 · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
