@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-66 — the build-order region derives `Parallel` from the group's write sets and edges, never from a shared order alone
 
-**Status:** INPROGRESS · rev-4 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 38 · advances TOOL-dDeclaredLoop-35
+**Status:** CLOSED · rev-4 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 38 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,8 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-67 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-66-deviation-661.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-66-deviation-661.md) | deviation | — |
 | [2026-10-24-build-TOOL-dDeclaredLoop-66-deviation-662.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-66-deviation-662.md) | deviation | — |
+| [2026-11-17-build-TOOL-dDeclaredLoop-66-1-acceptance-ledger.md](../build/2026-11-17-build-TOOL-dDeclaredLoop-66-1-acceptance-ledger.md) | journal | — |
+| [2026-11-17-build-TOOL-dDeclaredLoop-66-deviation-663.md](../build/2026-11-17-build-TOOL-dDeclaredLoop-66-deviation-663.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-67 |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-66-1-spec-writer.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-66-1-spec-writer.md) | journal | — |
 | [2026-11-16-prompt-TOOL-dDeclaredLoop-66-reground-brief.md](../prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-66-reground-brief.md) | research | — |
