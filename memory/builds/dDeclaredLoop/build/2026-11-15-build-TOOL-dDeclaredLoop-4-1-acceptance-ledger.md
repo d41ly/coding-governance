@@ -9,7 +9,7 @@ kit's folder, and `parse_dossier` and the new map arm's function called through 
 
 The seed, by the spec's rollout rules: every manifest row carries `["step.test"]`, and the rows whose
 script `.githooks/pre-commit` runs on staged paths (`kickoff-manifest ratchet`, `template size
-<=48KiB`, `codebase-map coverage + freshness`, `unattended skill wiring` and `memory hygiene`) carry
+<=48 PINNED KiB`, `codebase-map coverage + freshness`, `unattended skill wiring` and `memory hygiene`) carry
 `step.build` before it. The git hooks `pre-commit`, `commit-msg` and `pre-rebase` claim `step.build`
 and `pre-push` claims `step.test`. A harness hook on an event every session raises claims all the
 steps; the SubagentStart hook, which reaches role agents alone, claims the steps of the workflows that

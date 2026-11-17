@@ -11,7 +11,7 @@ move; no shell file is edited, so the driver's census and its family counts do n
 anchors through `docs_leg.py --fingerprints` read unchanged for the four `script:tools/loop/budget.py`
 rows.
 
-The `loop budget fixtures` row is re-priced from the direct readings, as deviation 624 records.
+The `loop budget fixtures` row is re-priced from the direct readings, as deviation 624 PINNED records.
 
 Owed to the close: every leg the spec's section 7 names, and the RED-first observation of the `New
 arm:` line, the `parallel-append-uneven` plant and the append-only check staged by a fixture attribute

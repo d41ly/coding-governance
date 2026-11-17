@@ -42,7 +42,7 @@ Built, then saved to the patch and restored. Each item below was probed directly
 - Naming: the lexicon's `--suggest` answered OK for check_gained_prune_vintage.
 
 Owed to the close, which runs once the unit is re-dispatched:
-- AC10 and S10: the pass-commit legs at 8 commits, which are gate runs.
+- AC10 and S10: the pass-commit legs at 8 PINNED commits, which are gate runs.
 - AC3's `check --selftest`, and the 57 and 73 govkit arms under the new `_dl_claim`.
 - Every section 7 leg.
 - RED-first observation of the six `New arm:` lines.

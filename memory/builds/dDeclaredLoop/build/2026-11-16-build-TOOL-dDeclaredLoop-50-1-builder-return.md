@@ -27,5 +27,5 @@ The rest of the spec's sweep held when re-run at HEAD:
 One thing the spec does not mention: declaring item.review.dispose makes `tools/loop/loop_table.py#check_transition_tables` check build row B10 against dispose's routes, so dispose must route the outcome `unit` to `transition`.
 
 What the next pass owes once the spec is revised:
-- The §7 legs at the close.
+- The §7 PINNED legs at the close.
 - The new arm's RED-first observation: the `step-none-outside-review` and `review-step-named` plants in `tools/loop/loop_lib.py`.

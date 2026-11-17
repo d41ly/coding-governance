@@ -23,7 +23,7 @@ What the spec would have to say:
 - **Section 7** keeps `harness arms (fail branches armed or pinned)` and says the close observes the ceiling line `check-arms: ceiling tools/unattended/unattended.sh <census>/<ceiling>`.
 
 The rest of rev-6 was checked and holds, with nothing else found that would newly red:
-- position.py: `derive_next_item`, `PLANTS`, `run_plant`, and the composition fallback that deviation 145 records.
+- position.py: `derive_next_item`, `PLANTS`, `run_plant`, and the composition fallback that deviation 145 PINNED records.
 - In the driver: `park`, `verb_propose`, `verb_plan`, `resolve_position_engine`, `VERB_REQUIRES`, `VERBS_SLUG`, and the argument loop between the `gov:argv` markers.
 - check-unattended.sh checks 26, 27 and 52.
 - In the suite: `PARITY_ROWS`, `_rf_matrix`, `run_hostile_verb`.

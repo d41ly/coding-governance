@@ -3,7 +3,7 @@
 **Serves:** red-fix TOOL-dDeclaredLoop-32
 
 - **Leg:** runlog record schema
-- **Red line:** runlog: check-records 34 records under memory/builds/*/build/*-runlog-*.md · 34 refused · 68 refusal(s)
+- **Red line:** runlog: check-records 34 PINNED records under memory/builds/*/build/*-runlog-*.md · 34 refused · 68 refusal(s)
 - **Files:** tools/runlog/record.py
 - **Commit:** 81eacecd971bb30788749ca03d712bbc2377cfea
 - **Rerun:** python tools/runlog/runlog.py check-records

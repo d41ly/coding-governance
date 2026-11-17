@@ -26,7 +26,7 @@ that return, so it builds over unit 61 as shipped.
 2. §4 "The plant" and S2: the shared branch keeps 61's same-item side draw for `parallel-append`; only `parallel-append-uneven`
    draws its own items on side; S2's "each on its own item" is limited to the new case.
 3. §5 "dependency": name 61's extended `parallel-append` and `draw-id-rows` as what landed, and drop the joining clause.
-4. Refresh the figures: PLANTS holds 17 keys; the `loop budget fixtures` row reads 339 from 226 seconds, and S4's re-price starts
+4. Refresh the figures: PLANTS holds 17 keys; the `loop budget fixtures` row reads 339 from 226 PINNED seconds, and S4's re-price starts
    there; the help/loop.md quote is the text 61 wrote.
 5. Change nothing else. Keep the unit one mechanism, its carries, its order and its DEFERRED status. Write only that spec file. Do
    not commit and do not regenerate any index. Run the spec-token checker with its spec flag over the spec and fix every hit.

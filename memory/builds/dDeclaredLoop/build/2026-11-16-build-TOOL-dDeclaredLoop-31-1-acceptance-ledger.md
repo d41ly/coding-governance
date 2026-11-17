@@ -14,7 +14,7 @@ is 330 branches PINNED and 5 sites PINNED, 335 PINNED at the raised ceiling; no 
 family of `tools/unattended/unattended.families.txt`. The help anchors carry the fingerprints
 `docs_leg.py --fingerprints` printed.
 
-The `loop budget fixtures` row is re-priced from the direct readings, as deviation 313 records, and
+The `loop budget fixtures` row is re-priced from the direct readings, as deviation 313 PINNED records, and
 its proxy now sits above that leg's hang-bound ceiling, which the close reads.
 
 Owed to the close: every leg the spec's section 7 names, and the RED-first observation of each `New

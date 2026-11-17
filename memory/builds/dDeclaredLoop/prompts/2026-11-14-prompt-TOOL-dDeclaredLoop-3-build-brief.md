@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Orders 1 to 12 are complete: unit 13 wrote the transition tables and unit 15 their terminal states, and unit 23 landed the one trailer reader. This unit, order 13, records each transition three ways: the trailer, the typed record and the run line.
+  table's order. Orders 1 to 12 are complete: unit 13 wrote the transition tables and unit 15 their terminal states, and unit 23 landed the one trailer reader. This unit, order 13, PINNED records each transition three ways: the trailer, the typed record and the run line.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

@@ -43,7 +43,7 @@ Beyond the inventory I added `ACTOR_LIST` and `read_actor_rows`, because two pla
 
 **Owed at the close once the unit is re-dispatched and built:**
 - AC5, AC7 and AC8.
-- The §7 legs.
+- The §7 PINNED legs.
 - Both `New arm:` RED-first observations: the `witness-actor-unlisted` plant, and check 53's two branches in `check-unattended.test.sh`.
 
 **Not done because nothing was committed:** the M6 bug-class checklist (`gotchas.py --for-diff`), which needs a commit to read; the codebase-map regeneration; the kickoff-manifest re-stamp; and the build-index write.

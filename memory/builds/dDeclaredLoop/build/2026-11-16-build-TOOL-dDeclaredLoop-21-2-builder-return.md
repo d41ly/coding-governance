@@ -42,7 +42,7 @@ Every other rev-5 claim I probed holds at base 8a3bd0c8:
 - govkit selftest.py has the dSafePassage-1 arms block.
 - The `loop upstream fixtures` companion rows that S2 follows are in gate-legs.json, registry.toml, subject-pins.tsv, selftest-budgets.txt and features/loop.md.
 
-One constraint for the builder, not a divergence: memory/guides/BUILD-METHOD.md measures 30709 bytes against its 30720-byte cap, which leaves 11 bytes. The M4 rewording S4 asks for adds about 5 net (line 144's key name becomes `review.design.rounds`, and line 148 becomes "so no round bound bounds a chain"), so it fits only if worded that tightly.
+One constraint for the builder, not a divergence: memory/guides/BUILD-METHOD.md measures 30709 bytes against its 30720-byte cap, which leaves 11 PINNED bytes. The M4 rewording S4 asks for adds about 5 net (line 144's key name becomes `review.design.rounds`, and line 148 becomes "so no round bound bounds a chain"), so it fits only if worded that tightly.
 
 ## Summary
 
@@ -73,4 +73,4 @@ That script stands in for the harness arms leg's ceiling check; nothing else sta
 
 **Owed at the close once the spec is revised and the unit rebuilt:** the RED-first runs of the three `New arm:` lines (the review bounds fixtures for AC1–AC3, the govkit selftest arm for AC7–AC8, and the unattended and check-unattended suite arms for AC4 and AC6), plus the harness arms leg's census read after the build.
 
-**For the next dispatch:** `memory/guides/BUILD-METHOD.md` is 11 bytes under its 30720-byte cap. The M4 rewording costs about 5 net bytes, so it only fits if worded tightly.
+**For the next dispatch:** `memory/guides/BUILD-METHOD.md` is 11 PINNED bytes under its 30720-byte cap. The M4 rewording costs about 5 net bytes, so it only fits if worded tightly.

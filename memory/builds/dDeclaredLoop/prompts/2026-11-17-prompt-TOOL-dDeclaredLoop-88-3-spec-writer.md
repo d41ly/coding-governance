@@ -111,7 +111,7 @@ and add only what 88 needs on top, with one revision-log line at the END of the 
    `C:/Users/DAILY-~1/AppData/Local/Temp/claude/b120d4a7f8b5be2e/7c85732c-fa0c-43e9-83f2-238d293195e0/scratchpad/pending/88-rev6-draft.md`
    (copy it over your worktree's spec file), then read unit 89's committed spec from
    `branch/unattended-declared-loop-d56bf0` through `git show`, its S6 and F5 whole.
-2. Rewrite S33, its criteria, §8 F7, Files touched and the §5 sweep so 88 calls 89's loader and adds only the named
+2. Rewrite S33, its criteria, §8 F7, Files touched and the §5 sweep so 88 PINNED calls 89's loader and adds only the named
    refusals or catches 89 does not already raise; where 89 already raises one, S33 leaves it to 89. Keep F7's mark,
    `RESOLVED (agent, 2026-11-17, delegated): (<option>)`, and every other fork's.
 3. The draft keeps one citation of the build method by its short name; cite it by its alias tag instead

@@ -10,7 +10,7 @@ function is minted, so the lexicon pin does not move; no shell file is edited, s
 its family counts do not move. The help anchors through `docs_leg.py --fingerprints` read unchanged for
 the four `script:tools/loop/budget.py` rows, whose usage rows this pass does not write.
 
-The `loop budget fixtures` row is re-priced from the direct readings, as deviation 604 records.
+The `loop budget fixtures` row is re-priced from the direct readings, as deviation 604 PINNED records.
 
 Owed to the close: every leg the spec's section 7 names, and the RED-first observation of the `New
 arm:` line, the `draws-survive-rotation` and `patch-archived` plants staged against the base's reader,

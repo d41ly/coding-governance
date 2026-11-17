@@ -6,5 +6,5 @@
 - **Red line:** run-selftests: row 'manifest-check self-test' does not carry the four tab-separated fields
 - **Files:** tools/run-gates/selftest-budgets.txt
 - **Commit:** dec6a332ff5e44eaa1045432c9245737ad4a05c9
-- **Rerun:** bash tools/run-gates/run-selftests.sh --check, declaration clean, 110 rows
+- **Rerun:** bash tools/run-gates/run-selftests.sh --check, declaration clean, 110 PINNED rows
 - **Caused-by:** TOOL-dDeclaredLoop-15

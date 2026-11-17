@@ -47,6 +47,6 @@ I did not build TOOL-dDeclaredLoop-56 and committed nothing. The write-set decla
 - **AC36:** two rounds of one review in `tools/workflows/unattended-build.test.sh`, floor 1069 to 1071.
 - **AC37:** a counter probe over `build_commit` in `tools/unattended/lib-unattended.sh`.
 - **AC15:** a `check_terminal_proof` probe with stderr sent to a pipe, to `NUL` and to a regular file.
-- **Owed to the close:** each of these new arms observed RED first, then the section 7 legs.
+- **Owed to the close:** each of these new arms observed RED first, then the section 7 PINNED legs.
 
 Files: `C:/projects/coding-governance/.claude/worktrees/unattended-declared-loop-d56bf0/memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-56.md` and `C:/projects/coding-governance/.claude/worktrees/unattended-declared-loop-d56bf0/memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-70.md`.

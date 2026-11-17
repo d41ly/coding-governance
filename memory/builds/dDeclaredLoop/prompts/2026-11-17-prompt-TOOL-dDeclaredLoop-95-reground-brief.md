@@ -23,7 +23,7 @@ over HEAD. Where every claim already holds, change nothing and say so in your re
    Unit 91 (c7a472129): `derive_conf_rebinds` takes a class as a global loader and reads every module-scope part of a definition
    from `_MODULE_SCOPE_PARTS`. Unit 92 (c6a5756b5, rev-5): `tools/loop/loop_witness.py` carries the shared git-env-leaks block
    inline, so `read_clean_env` resolves no memory-tree kit and `TREE_LIB_SYMBOLS` keeps its two names; `build_failure_detail`
-   spells an `OSError` with no text by its class name; the `loop guard fixtures` row is 141 s. Unit 93 (order 47, rev-3) is an
+   spells an `OSError` with no text by its class name; the `loop guard fixtures` row is 141 PINNED s. Unit 93 (order 47, rev-3) is an
    observation pass building now and writes no product file. Unit 94 (order 48) is re-grounded at rev-4 (2d81bbac4): only its
    S20 (an `OSError`'s first non-blank line) and S21 (`load_tree_lib` naming every missing symbol in one refusal and turning any
    import exception into a named refusal) still build; it settles its S7, S8, S22 and S24 and the `need` argument, which this

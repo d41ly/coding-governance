@@ -14,7 +14,7 @@ I stopped before any write. Nothing was dispatched, recorded or committed, and n
 
 **What I checked, as read-only probes (no gate, suite or bar ran):**
 - **Canary admission (part of AC1):** both `KNOWN` lines in tools/run-gates/run-gates.test.sh already carry `stage`, as unit 4 left them.
-- **Population (stands in for AC2's tomllib probe):** every `[[gate_leg]]` table, joined to tools/gate-legs.json by name, gives 70 tables in 27 files, 11 of them under tools/govkit/entries/. Every manifest row carries `stage` and no table does yet. This matches S2.
+- **Population (stands in for AC2's tomllib probe):** every `[[gate_leg]]` table, joined to tools/gate-legs.json by name, gives 70 tables in 27 PINNED files, 11 of them under tools/govkit/entries/. Every manifest row carries `stage` and no table does yet. This matches S2.
 - **govkit.py code:** `check_target_reads_subject`, the three existing floors and the `write_gate_legs` row order match §4. One build note: the ceiling keep rule can append `ceiling` after any key set earlier. To keep `stage` last, it has to be set after the keep rule, on the row already placed in `existing`.
 - **7h:** `manifest_ceiling` and the `impure` presence-included compare are where §4 places them.
 - **Self-test edits:** the staged edits in `check_benched_probe_arms` (`name`/`subject` and `ceiling = 1780` in tools/govkit/entries/push-main.kit.toml) would still match once if `stage` is the table's last key.

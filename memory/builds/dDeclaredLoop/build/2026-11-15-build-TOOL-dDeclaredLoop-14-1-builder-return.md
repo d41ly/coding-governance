@@ -14,7 +14,7 @@ Checks that ran, all read-only, none a gate:
 - The lexicon's suggest verb over `verb_refused` and over the planned Python and shell names (`derive_frontier`, `check_refusal`, `write_refusal` and others). Every name passed except `verb_refused`. The lexicon's `--list` confirmed the existing `verb_*` functions are counted offenders. Together these stand in for the `lexicon naming predicates` leg.
 - Python probes of the shipped loop definition's step.build and step.test items and of the unit transition rows. These grounded the A/B/C/D plant tags as `item.build.base`, `item.build.unit-lease`, `item.build.unit-pass` and `item.test.merge`, and showed the `frontier-none` gap.
 - Reads of the code the spec relies on, all of which hold as built: `derive_next_item`, `PLANTS` and `main` in tools/loop/position.py; `park`, `verb_propose`, `verb_plan`, `resolve_position_engine`, `VERB_REQUIRES`, `VERBS_SLUG` and the argument loop in unattended.sh; check 26 and check 27 in check-unattended.sh; `read_run_state` and `PARK_KINDS` in tools/runlog/model.py; `_RUN_PARK_KINDS` in tools/drift-audit/drift_report.py.
-- Counts at base: `grep -c '"refusal"'` over drift_report.py prints 0, and `grep -c 'unattended.sh --refused '` over the Skill render prints 0. The Skill render measures 10524 bytes CR-stripped, equal to its row.
+- Counts at base: `grep -c '"refusal"'` over drift_report.py prints 0, and `grep -c 'unattended.sh --refused '` over the Skill render prints 0. The Skill render measures 10524 PINNED bytes CR-stripped, equal to its row.
 
 For the rebuild after the spec is revised, the suite needs three things the spec does not list:
 - A parity-table row for `--refused`, because every verb needs one.

@@ -34,7 +34,7 @@ Everything else I probed holds at c28d4e5f:
 - census 326/326 and 266/266; families 1/1, 11/11, 36/37
 - REFUSAL_CEILINGS token and positional row at 326
 - the decision row TOOL-dDeclaredLoop-21 is in memory/DECISIONS.md
-- BUILD-METHOD.md is 30709 bytes, and the two M4 substitutions land at 30714
+- BUILD-METHOD.md is 30709 PINNED bytes, and the two M4 substitutions land at 30714
 - the four catalogue keys and their defaults
 - review_state, verb_review and RUNAWAY_CEILING as cited
 - tools/unattended/unattended.sh#resolve_position_engine already takes a loop-kit script name, so it is the seam for `load_review_bounds`

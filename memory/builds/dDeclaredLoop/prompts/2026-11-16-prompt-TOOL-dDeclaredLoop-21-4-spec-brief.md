@@ -31,7 +31,7 @@ that return, so its refusal is graded and its ceiling raise is stated.
    families stay as the return measured them, the new message spelling no family pattern; §4 Files touched gains
    `.memory-tree.conf` (the REFUSAL_CEILINGS token and its comment line) and the positional registry row that token's
    `path:number` text needs.
-4. The return notes `memory/guides/BUILD-METHOD.md` sits 11 bytes under its cap: state the M4 rewording's exact text in §4
+4. The return notes `memory/guides/BUILD-METHOD.md` sits 11 PINNED bytes under its cap: state the M4 rewording's exact text in §4
    so it fits, or say how it fits.
 5. Change nothing else. Keep the unit one mechanism, its carries, its order and its INPROGRESS status. Write only that spec
    file. Do not commit and do not regenerate any index. Run the spec-token checker with its spec flag over the spec and fix

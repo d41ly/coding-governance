@@ -16,7 +16,7 @@ the run's own idle-wake ticks.
   `--plan <slug>` for its hand-over (`tools/loop/position.py`, the hand-over reader).
 - On node a at 1e11500da, `GOV_POSITION_STATES= bash tools/unattended/unattended.sh --plan dDeclaredLoop` took 11m25s
   real, 3m24s user and 6m22s sys over 111 units (all PINNED). `--status dDeclaredLoop` printed nothing within 400 s, and
-  `--resume dDeclaredLoop --keepalive-id <id>` printed nothing within 600 s; before unit 7, `--resume` returned within
+  `--resume dDeclaredLoop --keepalive-id <id>` printed nothing within 600 PINNED s; before unit 7, `--resume` returned within
   about a minute. Every idle-wake tick runs `--resume`, then `--audit`.
 - `memory/project/fork-ceilings.txt`'s `unattended-status` row measures `--status` over a one-build fixture with no
   units, so it cannot see a cost that scales with the roster, and it was re-set 47 to 45 by unit 7 while the real verb
