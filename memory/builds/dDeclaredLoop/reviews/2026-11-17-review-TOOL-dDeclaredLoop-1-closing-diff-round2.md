@@ -51,7 +51,7 @@ Review shape: intensity full, raw 2, confirmed 2, refuted 0, merged 0, unverifie
 - Where: memory/builds/dDeclaredLoop/reviews/2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round1.md@ec07f524:14.
 - What is wrong: the line reads 'Every item is owed a fix, or a close deviation for the records items, before the close's merge bar and RED-first observations run'.
 - The record never mentions promotion.
-- The governing rule is the owner's 2026-10-04 rule, quoted in verb_review at tools/unattended/unattended.sh:13601-13604.
+- The governing rule is the owner's 2026-10-04 rule, quoted in verb_review at tools/unattended/unattended.sh@c098d58a:13601-13604.
 - That rule promotes every finding the closing diff review confirms: one unit for each BLOCKER and HIGH, with the MEDIUMs and LOWs batched.
 - The run applies that rule: the RUN.md row added in this fold records 'round-highs 2 · round-minors 5', and the round's framing promotes at the exit.
 - The record therefore gives two answers to what happens to the same items.
@@ -71,7 +71,7 @@ Review shape: intensity full, raw 2, confirmed 2, refuted 0, merged 0, unverifie
 ### 2. LOW — one code site in round-1 item 2 has no blob pin (finding 2)
 
 - Where: memory/builds/dDeclaredLoop/reviews/2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round1.md@ec07f524:65.
-- What is wrong: item 2 cites its fourth sibling site as a bare `tools/loop/upstream.py:297 (write_upstream_record)`.
+- What is wrong: item 2 cites its fourth sibling site as a bare `tools/loop/upstream.py@43147593:297 (write_upstream_record)`.
 - Every other site in the same Where list (lines 61-64) is pinned as file@blob:line.
 - Probe: `git rev-parse 520e5125c:tools/loop/upstream.py` returns 43147593.
 - Line 297 at that blob is the `memory_root = (read_design_conf(root).get("MEMORY_ROOT") ...` line, so the cite is correct today.
@@ -97,4 +97,4 @@ review-round round=2 limit=- prior=2 count=0 state=CONVERGED
 | id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict | classes | disposition |
 |---|---|---|---|---|---|---|---|---|---|
 | 1 | seams | memory/builds/dDeclaredLoop/reviews/2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round1.md:14 | low | low | confirmed | Line 14 of the new round-1 record (added in this fold) reads 'Every item is owed a fix, or a close deviation for the records items, before the close's merge bar and RED-first observations run'. Nowhere in the record is promotion mentioned. verb_review at tools/unattended/unattended.sh quotes the owner's 2026-10-04 rule that every finding the closing diff review confirms is PROMOTED: one unit per BLOCKER and HIGH, with the MEDIUMs and LOWs batched. The RUN.md row this fold adds records 'round-highs 2 · round-minors 5', and the task framing also says promote at the exit. So the record contradicts the rule the run applies. No reader parses the sentence. Its only effect is that it can mislead whoever runs the close next, so this is low. | instance | amendment-leaves-its-other-half-standing | class:two-answers-to-one-question |
-| 2 | intent | memory/builds/dDeclaredLoop/reviews/2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round1.md:65 | low | low | confirmed | Line 65 of the round-1 record, which this fold adds, reads `tools/loop/upstream.py:297 (write_upstream_record)` with no blob pin. The four other sites in item 2's Where list (lines 61-64) are written as file@blob:line. `git rev-parse 520e5125c:tools/loop/upstream.py` returns 43147593cf4d…. Line 297 at that blob is the `memory_root = (read_design_conf(root).get("MEMORY_ROOT") ...` line, so the cite is correct today but has nothing to anchor it once the file changes. The fold introduced it, so it is in scope. It affects only the record and changes no behaviour. | instance | fold-text-is-unreviewed-surface | class:fold-text-is-unreviewed-surface |
+| 2 | intent | memory/builds/dDeclaredLoop/reviews/2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round1.md:65 | low | low | confirmed | Line 65 of the round-1 record, which this fold adds, reads `tools/loop/upstream.py@43147593:297 (write_upstream_record)` with no blob pin. The four other sites in item 2's Where list (lines 61-64) are written as file@blob:line. `git rev-parse 520e5125c:tools/loop/upstream.py` returns 43147593cf4d…. Line 297 at that blob is the `memory_root = (read_design_conf(root).get("MEMORY_ROOT") ...` line, so the cite is correct today but has nothing to anchor it once the file changes. The fold introduced it, so it is in scope. It affects only the record and changes no behaviour. | instance | fold-text-is-unreviewed-surface | class:fold-text-is-unreviewed-surface |

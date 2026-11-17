@@ -97,7 +97,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 100 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 103 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13
 ids TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26
 ids TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-35 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39
@@ -212,13 +212,16 @@ ids TOOL-dDeclaredLoop-117
 | [TOOL-dDeclaredLoop-98 — the `conf-read-forms` plant proves on every run that the rule answers a call of each declared conf reader](spec/2026-10-24-spec-TOOL-dDeclaredLoop-98.md) | 50 | 2 | CLOSED | rev-2 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-99 — every `loop_lib.py` function that opens a conf is declared in `CONF_READERS` or `CONF_ROUTES`, checked both ways by a definition plant](spec/2026-10-24-spec-TOOL-dDeclaredLoop-99.md) | 50 | 2 | CLOSED | rev-2 | 2026-11-17 |
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | CLOSED | rev-2 | 2026-11-17 |
+| [TOOL-dDeclaredLoop-115 — the push arm reads the policy file as added only where no parent holds it, so a merge whose first parent lacks it is graded](spec/2026-11-17-spec-TOOL-dDeclaredLoop-115.md) | 52 | 2 | DEFERRED | rev-1 | 2026-11-17 |
+| [TOOL-dDeclaredLoop-116 — the five loop readers left on the memory tree's conf take the records root from `resolve_memory_root`](spec/2026-11-17-spec-TOOL-dDeclaredLoop-116.md) | 53 | 2 | DEFERRED | rev-1 | 2026-11-17 |
+| [TOOL-dDeclaredLoop-117 — the conf-opener derivation reads a conf path passed straight to its open, and every refusal of the `conf-readers-declared` plant is a standing case](spec/2026-11-17-spec-TOOL-dDeclaredLoop-117.md) | 54 | 2 | DEFERRED | rev-1 | 2026-11-17 |
 <!-- /gen:build-units -->
 
-Records: 899 bound to this build, across 4 record folder(s).
+Records: 908 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dDeclaredLoop-100 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-112.
+Ids no `spec-audit` record has ever named: TOOL-dDeclaredLoop-100 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-112 TOOL-dDeclaredLoop-115 TOOL-dDeclaredLoop-116 TOOL-dDeclaredLoop-117.
 
 Ids whose spec moved past its audited revision: TOOL-dDeclaredLoop-1@rev-1 TOOL-dDeclaredLoop-10@rev-1 TOOL-dDeclaredLoop-11@rev-1 TOOL-dDeclaredLoop-12@rev-1 TOOL-dDeclaredLoop-13@rev-1 TOOL-dDeclaredLoop-14@rev-1 TOOL-dDeclaredLoop-15@rev-1 TOOL-dDeclaredLoop-16@rev-1 TOOL-dDeclaredLoop-17@rev-1
 TOOL-dDeclaredLoop-18@rev-1 TOOL-dDeclaredLoop-19@rev-1 TOOL-dDeclaredLoop-2@rev-1 TOOL-dDeclaredLoop-20@rev-1 TOOL-dDeclaredLoop-21@rev-1 TOOL-dDeclaredLoop-22@rev-1 TOOL-dDeclaredLoop-23@rev-1 TOOL-dDeclaredLoop-24@rev-1 TOOL-dDeclaredLoop-25@rev-1 TOOL-dDeclaredLoop-26@rev-1
@@ -234,7 +237,7 @@ TOOL-dDeclaredLoop-91@rev-1 TOOL-dDeclaredLoop-92@rev-1 TOOL-dDeclaredLoop-93@re
 
 <!-- gen:build-coverage -->
 
-Coverage of dDeclaredLoop's 34 clause(s) and 49 owned node(s), over 99 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dDeclaredLoop's 34 clause(s) and 49 owned node(s), over 102 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 34
 - carried in parts: 0 (none)
@@ -259,7 +262,8 @@ Coverage of dDeclaredLoop's 34 clause(s) and 49 owned node(s), over 99 spec(s) a
   `spec/2026-10-24-spec-TOOL-dDeclaredLoop-87.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-88.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-89.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-90.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-24-spec-TOOL-dDeclaredLoop-91.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-92.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-93.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-94.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-24-spec-TOOL-dDeclaredLoop-95.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-96.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-97.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-98.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-99.md` (PLAY-dClosedLoop-2), `spec/2026-11-15-spec-TOOL-dDeclaredLoop-112.md` (TOOL-dDeclaredLoop-7)
+  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-99.md` (PLAY-dClosedLoop-2), `spec/2026-11-15-spec-TOOL-dDeclaredLoop-112.md` (TOOL-dDeclaredLoop-7), `spec/2026-11-17-spec-TOOL-dDeclaredLoop-115.md` (TOOL-dDeclaredLoop-44), `spec/2026-11-17-spec-TOOL-dDeclaredLoop-116.md` (TOOL-dDeclaredLoop-72),
+  `spec/2026-11-17-spec-TOOL-dDeclaredLoop-117.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0086, cl-dClosedLoop-0089, cl-dClosedLoop-0090, cl-dClosedLoop-0091, cl-dClosedLoop-0092, cl-dClosedLoop-0093, cl-dClosedLoop-0094, cl-dClosedLoop-0095, cl-dClosedLoop-0096, cl-dClosedLoop-0097, cl-dClosedLoop-0098, cl-dClosedLoop-0101,
   cl-dClosedLoop-0102, cl-dClosedLoop-0111
 <!-- /gen:build-coverage -->
@@ -319,6 +323,9 @@ Coverage of dDeclaredLoop's 34 clause(s) and 49 owned node(s), over 99 spec(s) a
 | 49 | `TOOL-dDeclaredLoop-95` | no |
 | 50 | `TOOL-dDeclaredLoop-96`, `TOOL-dDeclaredLoop-97`, `TOOL-dDeclaredLoop-98`, `TOOL-dDeclaredLoop-99` | no |
 | 51 | `TOOL-dDeclaredLoop-100` | no |
+| 52 | `TOOL-dDeclaredLoop-115` | no |
+| 53 | `TOOL-dDeclaredLoop-116` | no |
+| 54 | `TOOL-dDeclaredLoop-117` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
