@@ -356,6 +356,10 @@ Cite ids, never line numbers.
 | [TOOL-aTracedSpawn-3](../builds/aTracedSpawn/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THE SHARD-2 FAILURE COUNT AFTER THE FIXTURE-HEADING FIX IS UNMEASURED,… |
 | [TOOL-aTrimmedHook-8](../builds/aTrimmedHook/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | after this build a one-file RUN.md commit's .githooks/pre-commit still… |
 | [TOOL-aTrimmedHook-17](../builds/aTrimmedHook/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite process-monitor census selftest red at 37200355 on the… |
+| [TOOL-aTrimmedWait-14](../builds/aTrimmedWait/BACKLOG.md) | OPEN | MED | — | 2026-11-17 | FOUR DERIVED-POPULATION ARMS RED ON LOCAL MAIN. The driver suite's… |
+| [TOOL-aTrimmedWait-15](../builds/aTrimmedWait/BACKLOG.md) | OPEN | MED | — | 2026-11-17 | THREE PARITY ROWS RED ON LOCAL MAIN. The parity table's register-task… |
+| [TOOL-aTrimmedWait-16](../builds/aTrimmedWait/BACKLOG.md) | OPEN | MED | — | 2026-11-17 | CHECK 118 REFUSES FIVE --dispatch FIXTURES BEFORE THEIR OWN REFUSAL.… |
+| [TOOL-aTrimmedWait-17](../builds/aTrimmedWait/BACKLOG.md) | OPEN | MED | — | 2026-11-17 | SEVEN --resume, --close AND PRE-PUSH ARMS RED ON LOCAL MAIN. The… |
 | [TOOL-aTwinnedPass-6](../builds/aTwinnedPass/BACKLOG.md) | OPEN | MED | — | 2026-11-15 | THE CLOSING REVIEW'S ROUND 2, BATCHED. Five MEDIUM and three LOW items,… |
 | [TOOL-aTwinnedPass-7](../builds/aTwinnedPass/BACKLOG.md) | OPEN | MED | — | 2026-11-15 | THE ROUND-1 LEFT-SHIFT GATES ARE UNBUILT. The closing review's round 1… |
 | [TOOL-aTwinnedPass-8](../builds/aTwinnedPass/BACKLOG.md) | OPEN | LOW | — | 2026-11-15 | THREE COPIES OF ONE QUESTION. check_generated_output in… |

@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-14
 streams: tooling
 roster: TOOL
-ids: TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10 TOOL-aTrimmedWait-11 TOOL-aTrimmedWait-12 TOOL-aTrimmedWait-13
+ids: TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10 TOOL-aTrimmedWait-11 TOOL-aTrimmedWait-12 TOOL-aTrimmedWait-13 TOOL-aTrimmedWait-14 TOOL-aTrimmedWait-15 TOOL-aTrimmedWait-16 TOOL-aTrimmedWait-17
 ---
 
 # aTrimmedWait — builds stop waiting on checks that grade more than the caller needs, without moving any verdict
@@ -71,7 +71,8 @@ None.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 13 unit(s) · node a · opened 2026-11-14 · streams tooling
-ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10 TOOL-aTrimmedWait-11 TOOL-aTrimmedWait-12 TOOL-aTrimmedWait-13
+ids TOOL-aTrimmedWait-1 TOOL-aTrimmedWait-2 TOOL-aTrimmedWait-3 TOOL-aTrimmedWait-4 TOOL-aTrimmedWait-5 TOOL-aTrimmedWait-6 TOOL-aTrimmedWait-7 TOOL-aTrimmedWait-8 TOOL-aTrimmedWait-9 TOOL-aTrimmedWait-10 TOOL-aTrimmedWait-11 TOOL-aTrimmedWait-12 TOOL-aTrimmedWait-13 TOOL-aTrimmedWait-14
+ids TOOL-aTrimmedWait-15 TOOL-aTrimmedWait-16 TOOL-aTrimmedWait-17
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |

@@ -137,3 +137,13 @@ Unit 12 adds no arm. The four suites its merge touches each ran once, one at a t
 - GREEN: the driver suite on a frozen clone of `ebf9919de` exited 1 in 26637 s on 23 FAIL lines; <!-- PINNED 2026-11-16 -->
   the parity FAIL was gone and no new FAIL line appeared. The aFrugalTurnstile-9 AC2 and AC3 lines
   print again with a fresh base and run id, the same two assertions.
+
+## The driver suite's 23 inherited FAIL lines, attributed on local main
+
+The driver suite's shards 1, 3, 4, 5, 7 and 8 ran one at a time on a frozen clone of local main
+`5d48501da`, 2026-11-16 to 2026-11-17. They printed the same FAIL lines as the branch at `ebf9919de`,
+the TOOL-aFrugalTurnstile-9 AC2 and AC3 lines with their own base and run id. The two hostile-matrix
+lines sit in shard 2, which did not run there; the arm's own usage-table probe applied to
+`unattended.sh` names `--record-round` unmatrixed at `846d51d39` and `--wake` unmatrixed at
+`5d48501da`. None of the 23 is this build's: they are filed as `TOOL-aTrimmedWait-14` to
+`TOOL-aTrimmedWait-17` in `memory/builds/aTrimmedWait/BACKLOG.md`.
