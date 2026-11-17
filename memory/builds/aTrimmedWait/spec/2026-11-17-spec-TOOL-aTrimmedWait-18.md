@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-18 — the reconcile with local main at 8eda4a5a0: its five conflicts resolved and the coincident floor summed, so the landing merge is clean
 
-**Status:** CLOSED · rev-1 · 2026-11-17 · node a · Tier-2 · base 8eda4a5a0 · streams tooling · order 13
+**Status:** CLOSED · rev-2 · 2026-11-17 · node a · Tier-2 · base 8eda4a5a0 · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,9 @@
 |---|---|---|
 | [2026-11-17-build-TOOL-aTrimmedWait-18-1-acceptance-ledger.md](../build/2026-11-17-build-TOOL-aTrimmedWait-18-1-acceptance-ledger.md) | journal | — |
 | [2026-11-17-prompt-TOOL-aTrimmedWait-18-1-spec-writer.md](../prompts/2026-11-17-prompt-TOOL-aTrimmedWait-18-1-spec-writer.md) | journal | — |
+| [2026-11-17-prompt-TOOL-aTrimmedWait-18-2-spec-writer.md](../prompts/2026-11-17-prompt-TOOL-aTrimmedWait-18-2-spec-writer.md) | journal | — |
 | [2026-11-17-prompt-TOOL-aTrimmedWait-18-brief.md](../prompts/2026-11-17-prompt-TOOL-aTrimmedWait-18-brief.md) | research | — |
+| [2026-11-17-prompt-TOOL-aTrimmedWait-18-revision.md](../prompts/2026-11-17-prompt-TOOL-aTrimmedWait-18-revision.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -179,11 +181,12 @@ FLOOR_ASSERTIONS=3406
 ```
 
 - `.githooks/pre-commit`, in the check 9 render's `if [ "$hy_rc" != 0 ]` branch: the `hy_r=` line goes,
-  and the condition's third term becomes `resolve_hook_python`. The branch then reads:
+  and the condition's third term becomes `resolve_hook_python`. The branch then reads, with `<N>`
+  standing for the render's own check number, 9, which the hook spells as a digit:
 
 ```bash
     if [ "$hy_rc" != 0 ]; then
-      if [[ $'\n'$hy_out == *$'\n''HYGIENE check 9 FAILED'* ]] \
+      if [[ $'\n'$hy_out == *$'\n''HYGIENE check <N> FAILED'* ]] \
           && gb=$(resolve_kit_gate memory-tree gen_build_index.py) \
           && resolve_hook_python \
           && with_hook_index "$py" "$gb" --write-staged; then
@@ -358,7 +361,7 @@ INPROGRESS before the pass, or the scratch-guard refuses the resolution.
 ### Alternatives rejected
 
 - **Keep git's `FLOOR_ASSERTIONS=3377`.** It counts one side's raise, so a stranded block of either
-  side's arms up to 29 lines long passes the floor.
+  side's arms up to 29 lines long passes the floor. <!-- DERIVED from §4: main's raise, 3406 - 3377 -->
 - **Leave the hook's inline resolver.** Main's header would then be false in the file it heads, and a
   run reaching both the policy guard and the render would resolve python twice.
 - **Rewrite main's header to admit a second resolution.** It keeps the cost main removed and edits
@@ -478,6 +481,9 @@ none
   grounded at `073bfbf68` and `8eda4a5a0`. The six resolutions and the probe were run on a trial
   merge in a scratch clone, and the trial was committed there to read its remerge diff, its landing
   merge-tree and check 9's count.
+- rev-2 · 2026-11-17 · prose only, from `prompts/2026-11-17-prompt-TOOL-aTrimmedWait-18-2-spec-writer.md`:
+  §4's hook excerpt spells the hygiene check as `<N>`, stated beside the fence, and the 29 in
+  "Alternatives rejected" carries its DERIVED source. No value, resolution or criterion changes.
 
 ## 10. Reuse audit
 
