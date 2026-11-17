@@ -147,3 +147,30 @@ lines sit in shard 2, which did not run there; the arm's own usage-table probe a
 `unattended.sh` names `--record-round` unmatrixed at `846d51d39` and `--wake` unmatrixed at
 `5d48501da`. None of the 23 is this build's: they are filed as `TOOL-aTrimmedWait-14` to
 `TOOL-aTrimmedWait-17` in `memory/builds/aTrimmedWait/BACKLOG.md`.
+
+## TOOL-aTrimmedWait-18's reconcile, observed by the main loop
+
+Unit 18 adds no arm. Its owed criteria ran at `9ddbabd41`, 2026-11-17:
+
+- AC1: the merge `c654b0208` has the parents `0159e06eb` and `8eda4a5a0`, and no conflict marker is
+  tracked.
+- AC2: `gen_build_index.py --check-format` exited 0.
+- AC9: `regen.py --check` and `adopt-unattended.sh --check` exited 0, and the merge's remerge diff
+  names no product file outside the six the spec resolves.
+- AC10: `manifest-check.sh`, `git merge-tree --write-tree 8eda4a5a0 HEAD` and
+  `git merge-base --is-ancestor 8eda4a5a0 HEAD` each exited 0.
+
+The merged tree's suites ran once, one at a time, on a frozen `git clone --no-local` of `9ddbabd41`:
+
+- `gen_build_index.py --selftest` exited 0 in 226 s. <!-- PINNED 2026-11-17 -->
+- The pre-commit suite exited 0 in 79 s. <!-- PINNED 2026-11-17 -->
+- The build-workflow suite printed PASS over 1557 assertions in 685 s. <!-- PINNED 2026-11-17 -->
+- The hygiene suite printed PASS over 790 assertions in 2013 s. <!-- PINNED 2026-11-17 -->
+- The driver suite was stopped on the owner's word on 2026-11-17, before its end. It had printed
+  the 23 inherited FAIL lines filed as `TOOL-aTrimmedWait-14` to `TOOL-aTrimmedWait-17` and no
+  other, the aFrugalTurnstile-9 AC2 and AC3 lines with their own base and run id. Its full result
+  on the merged tree is owed and is the owner's to order: the owner ruled that a slow self-test
+  suite runs only on the owner's explicit instruction, and build `slow-suite-opt-in` gates it.
+
+The pass legs over `0159e06eb..9ddbabd41` read two legs red on the spec's prose, `positional` and
+`writing practice`; spec rev-2 at `4020dfe22` cleared both.
