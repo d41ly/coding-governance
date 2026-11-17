@@ -66,9 +66,13 @@ The answer is one of `ANSWERS`, the first that holds: `invalid-input` (no build,
 parse, a read refusal, a recorded move no build row holds, or a hand-over naming no unit, no MISSING id
 and no undecided ask), `stale-remote` (the remote tip's claim not `fresh`: a remote the ladder refuses,
 or a tracking tip last fetched longer ago than the bound, the fetch read as the newest of the mtime of
-each `FETCH_HEAD` under the common git directory and its `worktrees/*/`, and the tracking ref's newest
+each `FETCH_HEAD` under the common git directory and its `worktrees/*/` that holds a line for the
+default branch fetched from the remote's own URL, `git remote get-url` past one trailing `/` and `.git`
+(TOOL-dDeclaredLoop-74), and the tracking ref's newest
 reflog entry, or, where none of those is read, the default branch's newest `clone: ` reflog entry; the
-ref's `read —` line ends `fetched <n>s ago · from FETCH_HEAD|reflog|clone`, or `fetched never`), `terminal` (the state is a `[states]` terminal, or every unit is deployed
+ref's `read —` line ends `fetched <n>s ago · from FETCH_HEAD|reflog|clone`, or `fetched never`, and each
+skipped `FETCH_HEAD` follows it as `read — <name> · skipped — empty`, `no line for <branch> of <remote>`
+or `unreadable`), `terminal` (the state is a `[states]` terminal, or every unit is deployed
 and no ask stands), `awaiting` on an owed parked entry or an unpassed hold, `blocked` on a `parents:`
 build neither recorded nor derived `LANDED`, `act` with a next item, `awaiting` on an undecided ask, and
 `stuck` naming the step's unwitnessed exit. Line output is §4's six line kinds; `--json` the same fields
@@ -94,7 +98,8 @@ the build that arms the item; a settling row for a parked entry, which the drive
 have yet, so every owed entry stands; the mailbox, printed `unarmed`; that a `gates-run` fact names a
 green bar rather than the last bar run; a fetch run with `--no-write-fetch-head`, which leaves no
 `FETCH_HEAD` and so reads by the reflog where the ref moved, and as stale where it did not; a
-`FETCH_HEAD`'s content, whose mtime alone is read.
+`FETCH_HEAD` whose URL git spelled otherwise than the configured URL past one trailing `/` and `.git`,
+such as one with a user part, which reads skipped.
 """
 import argparse
 import copy
@@ -154,6 +159,8 @@ PLANTS = {"steps": "unit 1 deployed, unit 2 built, unit 3 designed: act at unit 
           "fresh-clone": "a clone with no tracking reflog and no FETCH_HEAD: not stale-remote, read from clone",
           "quiet-remote": "stale-remote's aged reflog, then a fetch from a linked worktree: not stale-remote, read from FETCH_HEAD",
           "offline-stale": "fresh-clone, then a fetch whose FETCH_HEAD is dated past the bound: stale-remote, read from FETCH_HEAD",
+          "failed-fetch": "stale-remote's aged reflog, then a fetch from a path that does not exist: stale-remote, "
+                          "FETCH_HEAD skipped as empty, read from reflog",
           "bad-transition": "a recorded move no build row holds: invalid-input, exit 2",
           "deadlock": "the step's root item needs an item of a later step: stuck",
           "bar-wait": "every unit built, no gates-run fact, no ask: act, and the terminal next: shape",
@@ -222,21 +229,56 @@ def read_handover(repo, slug):
     return out
 
 
-def read_fetch_time(repo, ref, branch):
-    """`(at, source)` of the last fetch of `ref` (TOOL-dDeclaredLoop-65 S1, S2): the newest of the mtime
-    of each `FETCH_HEAD` under the common git directory and its `worktrees/*/`, source `FETCH_HEAD`, and
-    the time of `ref`'s newest reflog entry, source `reflog`, the first listed on a tie; where none is
-    read, the newest `clone: ` entry of `refs/heads/<branch>`'s reflog, source `clone`; else
-    `(None, None)`. A file whose mtime does not read is skipped."""
+def derive_fetch_url(url):
+    """`url` as git spells it on a `FETCH_HEAD` line (TOOL-dDeclaredLoop-74 S1): one trailing `/`
+    stripped, then one trailing `.git`."""
+    url = url[:-1] if url.endswith("/") else url
+    return url[:-4] if url.endswith(".git") else url
+
+
+def check_fetch_head(text, remote, branch, want):
+    """The empty string where `text`, a `FETCH_HEAD`'s content, holds a line for `branch` fetched from
+    the URL `want` spells, by `derive_fetch_url` of both sides; else the skip reason, `empty` or
+    `no line for <branch> of <remote>` (TOOL-dDeclaredLoop-74 S1). An empty `want` keeps no file."""
+    if not text.strip():
+        return "empty"
+    line = re.compile(r"[0-9a-f]{40,64}\t[^\t]*\tbranch '%s' of (.+)" % re.escape(branch))
+    for ln in text.splitlines():
+        m = line.fullmatch(ln)
+        if m and want and derive_fetch_url(m.group(1)) == want:
+            return ""
+    return "no line for %s of %s" % (branch, remote)
+
+
+def read_fetch_time(repo, remote, ref, branch):
+    """`(at, source, skipped)` of the last fetch of `ref` (TOOL-dDeclaredLoop-65 S1, S2): the newest of
+    the mtime of each `FETCH_HEAD` under the common git directory and its `worktrees/*/` that
+    `check_fetch_head` keeps for `branch` of `remote` (TOOL-dDeclaredLoop-74 S1), source `FETCH_HEAD`,
+    and the time of `ref`'s newest reflog entry, source `reflog`, the first listed on a tie; where none
+    is read, the newest `clone: ` entry of `refs/heads/<branch>`'s reflog, source `clone`; else
+    `(None, None, skipped)`. A file `os.stat` does not answer is passed over; `skipped` holds one
+    `<name> · skipped — <reason>` entry per file the check skips, `<name>` its path under the common
+    directory, `unreadable` where it does not open, and a skipped file's time is never read."""
     rc, out = read_git(repo, "rev-parse", "--git-common-dir")
-    times = []
+    times, skipped, want = [], [], None
     if rc == 0 and out:
         common = pathlib.Path(repo) / out
         for f in [common / "FETCH_HEAD"] + sorted(common.glob("worktrees/*/FETCH_HEAD")):
             try:
-                times.append((f.stat().st_mtime, "FETCH_HEAD"))
+                st = f.stat()
             except OSError:
                 continue
+            if want is None:  # one spawn per reading, only where a FETCH_HEAD exists
+                rc, url = read_git(repo, "remote", "get-url", remote)
+                want = derive_fetch_url(url) if rc == 0 else ""
+            try:
+                why = check_fetch_head(f.read_text(encoding="utf-8", errors="replace"), remote, branch, want)
+            except OSError:
+                why = "unreadable"
+            if why:
+                skipped.append("%s · skipped — %s" % (f.relative_to(common).as_posix(), why))
+                continue
+            times.append((st.st_mtime, "FETCH_HEAD"))
     rc, out = read_git(repo, "reflog", "show", "--date=unix", "-n1", "--format=%gd", ref)
     m = re.search(r"@\{(\d+)\}", out) if rc == 0 else None
     if m:
@@ -249,16 +291,17 @@ def read_fetch_time(repo, ref, branch):
                 times.append((int(m.group(1)), "clone"))
                 break
     if not times:
-        return None, None
+        return None, None, skipped
     at, source = max(times, key=lambda t: t[0])  # max keeps the first of equal times
-    return datetime.datetime.fromtimestamp(at, datetime.timezone.utc), source
+    return datetime.datetime.fromtimestamp(at, datetime.timezone.utc), source, skipped
 
 
 def read_remote_claim(repo, bound, now):
-    """`(sha or None, entry, claim)` of the default branch's remote-tracking tip: the claim keyed over
-    `<ref>@<sha>`, `at` its last fetch by `read_fetch_time`, judged `remote` against `bound`; `entry` the
-    ref's `read` row, `<ref>@<sha8> · fetched <n>s ago · from <source>` or `<ref>@<sha8> · fetched never`
-    (TOOL-dDeclaredLoop-65 S3), the bare ref where the claim is None. The claim is None where the remote
+    """`(sha or None, entries, claim)` of the default branch's remote-tracking tip: the claim keyed over
+    `<ref>@<sha>`, `at` its last fetch by `read_fetch_time`, judged `remote` against `bound`; `entries`
+    the ref's `read` row, `<ref>@<sha8> · fetched <n>s ago · from <source>` or `<ref>@<sha8> · fetched
+    never` (TOOL-dDeclaredLoop-65 S3), the bare ref where the claim is None, then each skipped
+    `FETCH_HEAD`'s entry (TOOL-dDeclaredLoop-74 S2). The claim is None where the remote
     reads absent (TOOL-dDeclaredLoop-56 S36): the ladder names no remote and refuses nothing, or the
     tracking ref of its default branch does not resolve. A ladder refusal keeps the claim."""
     remote, branch, _observed, refusal = resolve_remote(repo)
@@ -268,15 +311,16 @@ def read_remote_claim(repo, bound, now):
         rc, out = read_git(repo, "rev-parse", "-q", "--verify", "%s^{commit}" % ref)
         sha = out if rc == 0 and out else None
     if not refusal and not sha:
-        return None, ref, None
+        return None, [ref], None
+    skipped = []
     if sha:
-        at, fetched = read_fetch_time(repo, ref, branch)
+        at, fetched, skipped = read_fetch_time(repo, remote, ref, branch)
         entry = "%s@%s · %s" % (ref, sha[:8], "fetched %ds ago · from %s" % (
             max(0, int((now - at).total_seconds())), fetched) if at else "fetched never")
     source = "%s@%s" % (ref, sha or "?")
     key = derive_claim_key([source])
     verdict = derive_claim_verdict(key, key, "remote", at, now, bound)
-    return sha, entry, {"name": "remote tip %s" % ref, "key": key, "verdict": verdict}
+    return sha, [entry] + skipped, {"name": "remote tip %s" % ref, "key": key, "verdict": verdict}
 
 
 def check_is_ancestor(repo, sha, tip):
@@ -533,7 +577,7 @@ def derive_position_into(pos, repo, slug, definition):
         gates_tip = out if rc == 0 else None
     remote_sha, remote_read, remote_claim = read_remote_claim(repo, handover["bound"], now)
     if remote_sha:
-        pos["read"].append(remote_read)
+        pos["read"].extend(remote_read)
     if remote_claim:
         pos["claims"].append(remote_claim)
     order = ["none"] + list(tables["states"].get("unit", []))
@@ -764,7 +808,7 @@ def write_position_plant(top, case, root):
         run_fixture_git(repo, "push", "-q", "origin", "main")
     if remote:
         run_fixture_git(repo, "remote", "set-head", "origin", "main")
-    if case in ("stale-remote", "quiet-remote"):  # the tracking tip kept, its one reflog entry dated 2000-01-01, past any bound
+    if case in ("stale-remote", "quiet-remote", "failed-fetch"):  # the tracking tip kept, its one reflog entry dated 2000-01-01, past any bound
         tip = run_fixture_git(repo, "rev-parse", "refs/remotes/origin/main")
         run_fixture_git(repo, "update-ref", "-d", "refs/remotes/origin/main")
         rc, out = read_git(repo, "update-ref", "--create-reflog", "-m", "aged", "refs/remotes/origin/main", tip,
@@ -775,6 +819,11 @@ def write_position_plant(top, case, root):
     if case == "quiet-remote":  # a fetch from a linked worktree, which moves nothing and writes its own FETCH_HEAD
         run_fixture_git(repo, "worktree", "add", "-q", "--detach", str(top / "w"))
         run_fixture_git(top / "w", "fetch", "-q", "origin")
+    if case == "failed-fetch":  # a fetch from a path that does not exist, which leaves FETCH_HEAD at 0 bytes
+        run_fixture_git(repo, "remote", "set-url", "origin", str(top / "gone.git"))
+        rc, out = read_git(repo, "fetch", "-q", "origin")
+        if rc == 0:
+            raise subprocess.CalledProcessError(rc, "git fetch from a path that does not exist exited 0", out)
     if case in ("fresh-clone", "offline-stale"):  # the engine reads the clone, whose remote's HEAD names main
         run_fixture_git(remote, "symbolic-ref", "HEAD", "refs/heads/main")
         run_fixture_git(top, "clone", "-q", "--template=", str(remote), str(top / "c"))
@@ -936,6 +985,8 @@ def check_plant(case, pos, rc, repo):
             "fresh-clone": lambda: pos["answer"] != "stale-remote" and ref_line.endswith(" · from clone"),
             "quiet-remote": lambda: pos["answer"] != "stale-remote" and ref_line.endswith(" · from FETCH_HEAD"),
             "offline-stale": lambda: pos["answer"] == "stale-remote" and ref_line.endswith(" · from FETCH_HEAD"),
+            "failed-fetch": lambda: pos["answer"] == "stale-remote" and "read — FETCH_HEAD · skipped — empty" in lines
+            and ref_line.endswith(" · from reflog"),
             "no-remote": lambda: pos["answer"] == "act" and "interrupt — remote · none" in lines
             and not any("remote tip" in ln for ln in lines),
             "bad-transition": lambda: pos["answer"] == "invalid-input" and rc == 2,
@@ -943,6 +994,13 @@ def check_plant(case, pos, rc, repo):
             "bar-wait": lambda: pos["answer"] == "act" and pos["build_step"] == "step.test"
             and render_next_line(pos) == NEXT_SHAPES["everything-terminal"]}
     misses = [] if want[case]() else ["the position was %s" % json.dumps(pos)[:600]]
+    if case == "failed-fetch":  # TOOL-dDeclaredLoop-74 AC3: a `main` line fetched from a second URL is skipped
+        top = repo.parent
+        why = check_fetch_head("%s\t\tbranch 'main' of %s" % ("0" * 40, (top / "up2").as_posix()), "origin", "main",
+                               derive_fetch_url((top / "o.git").as_posix()))
+        print("%s: fixture · %s · another url reads %s" % (SAY, case, why or "kept"))
+        if why != "no line for main of origin":
+            misses.append("a main line fetched from a second url read %r" % (why or "kept"))
     if case == "idempotent":
         k1 = derive_instance_key("item.build.base", FX_IDS[0], ["a" * 40])
         k2 = derive_instance_key("item.build.base", FX_IDS[0], ["b" * 40])

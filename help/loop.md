@@ -893,9 +893,13 @@ The answer is one of `act`, `awaiting`, `blocked`, `terminal`, `stuck`, `invalid
 `RESUME_STALE_BOUND`, or a remote the ladder cannot choose, answers `stale-remote` before anything
 else. The last fetch is the newest of three readings: the time of each `FETCH_HEAD` git wrote, in
 the repository's own git directory or under any of its worktrees, so a fetch that finds nothing new
-still counts; the tracking ref's newest reflog entry; and, only where neither is there, as on a fresh
-clone, the clone itself. The tracking ref's `read —` line says which, ending `fetched <n>s ago · from
-FETCH_HEAD`, `from reflog` or `from clone`, or `fetched never`. With no remote at all, or no tracking ref of the default branch, the remote reads absent: the
+still counts, but only when it holds a line for the default branch fetched from the remote's own
+URL, as `git remote get-url` spells it past one trailing `/` and `.git`, so a failed fetch, which
+leaves the file empty, or a fetch of another branch or remote is not a fetch; the tracking ref's
+newest reflog entry; and, only where neither is there, as on a fresh clone, the clone itself. The tracking ref's `read —` line says which, ending `fetched <n>s ago · from
+FETCH_HEAD`, `from reflog` or `from clone`, or `fetched never`, and each `FETCH_HEAD` it
+skipped prints its own line after it, `read — FETCH_HEAD · skipped — empty` or `skipped — no line for
+<branch> of <remote>`, naming the remote and never its URL. With no remote at all, or no tracking ref of the default branch, the remote reads absent: the
 engine answers on your local witnesses, so no unit reads `deployed`, and prints
 `interrupt — remote · none` with no remote-tip claim. A tracking ref you deleted reads the same. An owed parked decision or an unpassed hold answers
 `awaiting`; a `parents:` build that has not landed answers `blocked`; an undecided ask answers
@@ -932,7 +936,8 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
   `MISSED`, and removes it: `steps`, `typed-status`, `idempotent`, `owner-decision`, `parent-unlanded`,
   `terminal`, `stale-remote` (its tracking tip's reflog entry aged past the bound), `no-remote`,
   `fresh-clone` (a clone read from clone), `quiet-remote` (a fetch from a linked worktree after the
-  aged reflog, read from `FETCH_HEAD`), `offline-stale` (a clone's `FETCH_HEAD` dated past the bound), `bad-transition`, `deadlock`, `bar-wait`, `frontier-chain`, `frontier-parallel`,
+  aged reflog, read from `FETCH_HEAD`), `offline-stale` (a clone's `FETCH_HEAD` dated past the bound), `failed-fetch` (the
+  aged reflog, then a fetch from a path that does not exist, its empty `FETCH_HEAD` skipped), `bad-transition`, `deadlock`, `bar-wait`, `frontier-chain`, `frontier-parallel`,
   `frontier-refused`, `frontier-bad-key`, `frontier-none`, `plan-frontier`, `built-unarmed` (one unit
   tested and one built with no acceptance record under the stand-in writer, which `--json` reads
   `acceptance_armed` false and the driver's `--status` names as the next unit),

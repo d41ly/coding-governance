@@ -5988,6 +5988,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "check_fetch_head",
+      "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
       "id": "check_file_line_row",
       "kind": "function",
       "file": "tools/playbook/positional.py"
@@ -10716,6 +10721,11 @@
       "id": "derive_farm_row",
       "kind": "function",
       "file": "tools/loop/scenario.py"
+    },
+    {
+      "id": "derive_fetch_url",
+      "kind": "function",
+      "file": "tools/loop/position.py"
     },
     {
       "id": "derive_first_bound",
