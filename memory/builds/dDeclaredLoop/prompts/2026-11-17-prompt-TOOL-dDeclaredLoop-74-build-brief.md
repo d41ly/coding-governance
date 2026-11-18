@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 37 is built, and of order 38 units 67 (6bc52aca7) and 80 (4da72dac1, the fixture boundary of the no-own-conf-read rule, which renamed write_pre_placement_tree to write_pre_placement_plant) are built. Unit 65 (order 37) built read_fetch_time, which this unit builds on. The spec is rev-3, re-grounded on the branch: it derives the fetch URL with derive_fetch_url, not normalise_fetch_url.
+  table's order. Every unit through build order 37 is built, and of order 38 units 67 (faf051f67) and 80 (38ff07b0d, the fixture boundary of the no-own-conf-read rule, which renamed write_pre_placement_tree to write_pre_placement_plant) are built. Unit 65 (order 37) built read_fetch_time, which this unit builds on. The spec is rev-3, re-grounded on the branch: it derives the fetch URL with derive_fetch_url, not normalise_fetch_url.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

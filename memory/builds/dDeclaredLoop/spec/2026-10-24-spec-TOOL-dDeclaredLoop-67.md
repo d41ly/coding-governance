@@ -36,7 +36,7 @@ MEDIUM and every LOW, each by its report id and each its own scope item, where t
 into one item too. The minors land on twenty-two units, so this unit repairs none in particular and
 builds after every unit it reads (order 38).
 
-Rev-4 re-grounds the batch on branch `unattended-declared-loop-d56bf0` at `e0a7e54b3`, built through
+Rev-4 re-grounds the batch on branch `unattended-declared-loop-d56bf0` at `adbc3ecf5`, built through
 order 33 and units 52 and 53 of order 34, and on the committed specs of orders 34 to 37. Most minors
 were closed by the passes of the units they named, or by a committed sibling spec; those leave this
 unit's scope, each in §3 with what closed it. The items the built code leaves open stay here, under
@@ -88,7 +88,7 @@ their rev-3 labels, which sibling specs cite.
 | L11 | LOW | 67 | S53 | §3 |
 | L12 | LOW | 68 | S54 | S54 |
 
-The report counts 38 MEDIUM and 16 LOW findings by raw id; rev-4 keeps 25 scope items PINNED at `e0a7e54b3`.
+The report counts 38 MEDIUM and 16 LOW findings by raw id; rev-4 keeps 25 scope items PINNED at `adbc3ecf5`.
 
 ## 2. Scope (IN)
 
@@ -200,7 +200,7 @@ The labels keep their rev-3 numbers, which sibling specs cite; every other rev-3
 
 ### The rev-3 items the built code or a committed spec settles
 
-Read on branch `unattended-declared-loop-d56bf0` at `e0a7e54b3`.
+Read on branch `unattended-declared-loop-d56bf0` at `adbc3ecf5`.
 
 | Item | What settles it |
 |---|---|
@@ -273,7 +273,7 @@ Read on branch `unattended-declared-loop-d56bf0` at `e0a7e54b3`.
 
 ### Evidence
 
-Every code claim was read on branch `unattended-declared-loop-d56bf0` at `e0a7e54b3`, extracted to a
+Every code claim was read on branch `unattended-declared-loop-d56bf0` at `adbc3ecf5`, extracted to a
 scratch directory, because this worktree's main lacks the loop kit. Each claim cites its symbol; no
 line number is cited.
 
@@ -303,7 +303,7 @@ a plant passes none. `read_driver_conf`'s `LoopError` prints as a refusal. Gov's
 `interpret-trailers --parse`, unchanged; the pathspec cuts `*.test.sh` alone. Each hit is then read
 against its file's text at the same revision, or the working file: a hit inside a `commit_trailers_py`
 marker region, or on a line opening `#` or `//` after blanks, is cut. `read_marker_ranges(text)` answers
-the regions. Over the tree at `e0a7e54b3` the new pattern matches only lines of `*.test.sh` files, which
+the regions. Over the tree at `adbc3ecf5` the new pattern matches only lines of `*.test.sh` files, which
 stay cut, so the live arm's verdict does not move. The planted arm of `TOOL-dDeclaredLoop-37` AC3 moves
 its `kit/commit_trailers.py` plant inside a marker block, and one arm joins for this unit's AC13 over five
 plants: a lowercase reordered spelling on a code line, the same on a comment line, the literal inside a
@@ -365,7 +365,7 @@ and `--selftest` in the `script:{prefix}/loop/loop_lib.py` row of `tools/govkit/
 G9 follows G7: parse the manifest, select rows named `loop termination`, red on a count other than one,
 then red where the row holds a `guard` key, naming `TOOL-dDeclaredLoop-55` S1's reason. Its WHAT-THIS-DOES-
 NOT-CHECK line says it grades one key on one row. `FLOOR_ASSERTIONS` rises from 18 to 19 with its
-comment line, both PINNED at `e0a7e54b3`.
+comment line, both PINNED at `adbc3ecf5`.
 
 ### The first push (S33)
 
@@ -479,7 +479,7 @@ does, and its body gains the two sentences; the result tree gains
 
 ### The sweep
 
-Read at `e0a7e54b3` on the branch; counts PINNED there unless named DERIVED.
+Read at `adbc3ecf5` on the branch; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
@@ -663,7 +663,7 @@ New arm: tools/loop/position.py · covers AC10 · the built-unarmed plant's seco
   TOOL-dDeclaredLoop-99, written by the round-12 spec audit's disposal; nothing else moved.
 - rev-4 · 2026-11-16 · §1 · §2 S13 S14 S17 S18 S19 S20 S22 S23 S30 S31 S33 S34 S35 S37 S38 S39 S40 S41
   S44 S45 S48 S50 S51 S52 S54 · §3 · §4 · §5 · §6 AC1 AC8 AC9 AC10 AC11 AC12 AC13 AC15 AC16 AC22 AC23
-  AC24 AC25 AC26 AC27 AC29 AC31 AC32 · §7 · §8 F3 F4 F5 F6 · §10 · re-grounded at `e0a7e54b3`, the tip
+  AC24 AC25 AC26 AC27 AC29 AC31 AC32 · §7 · §8 F3 F4 F5 F6 · §10 · re-grounded at `adbc3ecf5`, the tip
   of branch/unattended-declared-loop-d56bf0, by the brief
   2026-11-16-prompt-TOOL-dDeclaredLoop-67-1-spec-writer; carries, order and status kept. The items
   the built code or a committed sibling settles leave scope with their criteria (§3), and S21 by F6; the kept

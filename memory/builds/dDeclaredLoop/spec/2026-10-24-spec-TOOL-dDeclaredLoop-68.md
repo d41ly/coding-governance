@@ -109,8 +109,8 @@ the program route as landed. It repairs `TOOL-dDeclaredLoop-56`.
 ### Evidence
 
 Every code claim below was read with `git show` on branch `unattended-declared-loop-d56bf0` at
-`dca74c239`, the tip after `TOOL-dDeclaredLoop-53` landed, and re-read for rev-4 at `a339daae2`, where
-`git diff --stat dca74c239 a339daae2 -- tools/loop/loop_witness.py tools/run-gates/lib-attribute.sh tools/run-gates/run-gates.sh tools/run-gates/run-selftests.sh`
+`353d964b2`, the tip after `TOOL-dDeclaredLoop-53` landed, and re-read for rev-4 at `083cd0a32`, where
+`git diff --stat 353d964b2 083cd0a32 -- tools/loop/loop_witness.py tools/run-gates/lib-attribute.sh tools/run-gates/run-gates.sh tools/run-gates/run-selftests.sh`
 prints nothing, PINNED 2026-11-17, and the `tools/loop/loop_lib.py` diff between them leaves
 `resolve_kit_dir` alone.
 
@@ -146,7 +146,7 @@ prints nothing, PINNED 2026-11-17, and the `tools/loop/loop_lib.py` diff between
 - `help/loop.md` says the output "is hashed exactly as printed", and the acceptance grammar in
   `tools/memory-tree/HYGIENE.template.md` says the hash is of "the command's combined output".
 - No acceptance record exists at the tip, and main carries no loop kit, so no hash recorded under the raw
-  rule survives this pass: `git ls-tree -r --name-only dca74c239 memory/ | grep -c -E 'build/[0-9-]+-build-.*-acceptance-[0-9]+\.md$'`
+  rule survives this pass: `git ls-tree -r --name-only 353d964b2 memory/ | grep -c -E 'build/[0-9-]+-build-.*-acceptance-[0-9]+\.md$'`
   prints 0, PINNED 2026-11-16.
 
 ### The route (S1, S3)
@@ -264,8 +264,8 @@ TOOL-dDeclaredLoop-114. Neither shares a line with this unit.
 
 ### The sweep
 
-Read at `dca74c239`. Each figure is PINNED 2026-11-16 and re-derived by the command beside it; for
-rev-4 the counts were re-derived at `a339daae2` on 2026-11-17, the `run_witness_commands(` lines, the
+Read at `353d964b2`. Each figure is PINNED 2026-11-16 and re-derived by the command beside it; for
+rev-4 the counts were re-derived at `083cd0a32` on 2026-11-17, the `run_witness_commands(` lines, the
 importers, the conf count, the encoding and size-cap rows and the budget row, and only the importers
 row moved. The usage fingerprints were not re-derived. The rows the `pwd` root and the normaliser's
 `cwd` reach, the parity blocks, the refusal ceilings and the encoding posture, were re-read and hold.
@@ -372,7 +372,7 @@ New arm: tools/loop/loop_witness.py · covers AC1 AC3 AC4 · the normalise and n
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-79, written by the round-4 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-16 · §1 to §10 · S1, S2, S3, S4, S5 · AC1 to AC6 · §8 F3 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `dca74c239` and on the committed specs of TOOL-dDeclaredLoop-56
+  `unattended-declared-loop-d56bf0` at `353d964b2` and on the committed specs of TOOL-dDeclaredLoop-56
   rev-6, -67 rev-3 and -79 rev-5, per the brief `2026-11-16-prompt-TOOL-dDeclaredLoop-68-1-spec-writer`:
   56 builds no copy, so S2 and rev-2's AC3 leave the scope and S1 builds the normaliser on the program;
   by F3 the apply step runs inside the resolved bash over forward-slash roots, the realpath among them;
@@ -384,7 +384,7 @@ New arm: tools/loop/loop_witness.py · covers AC1 AC3 AC4 · the normalise and n
   `pwd` prints the worktree through the `/tmp` mount, which no root of rev-3 spells, so AC1 could not
   hold on node d. By F4 (a) the normaliser's bash starts in the worktree and adds the tree as its own
   `pwd` prints it as a root; the route spawns that bash as the commands are, killed through
-  `run_tree_kill` on the bound; the sweep's importer count is 16, not 13, re-derived at `a339daae2`.
+  `run_tree_kill` on the bound; the sweep's importer count is 16, not 13, re-derived at `083cd0a32`.
 
 ## 10. Reuse audit
 

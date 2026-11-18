@@ -37,7 +37,7 @@ into one item too. The minors land on eight units, so this unit repairs none in 
 after every unit (order 40). Where a minor is the medium grade of a defect a high unit closes, the item
 here is what that grade's fix asks beyond the high unit's mechanism.
 
-Rev-6 re-grounds the batch on branch `unattended-declared-loop-d56bf0` at `8b06bb0a4`, built through
+Rev-6 re-grounds the batch on branch `unattended-declared-loop-d56bf0` at `1f23a1576`, built through
 order 35, and on the committed specs of orders 36 to 39. Many minors were closed by a built unit or by a
 committed sibling spec; those leave this unit's scope, each in §3 with what closed it, and one is
 refused there because the spec it amends is CLOSED. The items left open stay here under their rev-5
@@ -142,7 +142,7 @@ The labels keep their rev-5 numbers, which sibling specs cite; every other rev-5
 
 ### The rev-5 items the built code or a committed spec settles
 
-Read on branch `unattended-declared-loop-d56bf0` at `8b06bb0a4`.
+Read on branch `unattended-declared-loop-d56bf0` at `1f23a1576`.
 
 | Item | What settles it |
 |---|---|
@@ -184,7 +184,7 @@ bullet would have said.
 
 ### Evidence
 
-Every code claim was read on branch `unattended-declared-loop-d56bf0` at `8b06bb0a4`, through `git show`,
+Every code claim was read on branch `unattended-declared-loop-d56bf0` at `1f23a1576`, through `git show`,
 `git log` and a `git archive` copy in a scratch directory, because this worktree's main at `179486e8f`
 lacks the loop kit. Units 68, 70, 72, 74, 75, 76, 77 and 80 are not built at that tip and are read on
 their committed specs, rev-3, rev-3, rev-6, rev-3, rev-10, rev-6, rev-3 and rev-6. No line number is cited
@@ -216,8 +216,8 @@ but one blob-pinned range.
   `demand_claimed_requires` with that answer. The docstring of
   `tools/govkit/selftest.py#check_requires_vintage` names the gained-prune loop's vintage as what it does
   not check.
-- Rev-7 re-read the update's later path at the branch tip `dd1a15e01`, where `_cmd_update` and the step
-  module are unchanged since `8b06bb0a4`. The read-only branch of `_cmd_update` calls
+- Rev-7 re-read the update's later path at the branch tip `77cf5c0c8`, where `_cmd_update` and the step
+  module are unchanged since `1f23a1576`. The read-only branch of `_cmd_update` calls
   `tools/govkit/upgrade_steps.py#derive_pending_steps` after the prune, and that calls
   `tools/govkit/upgrade_steps.py#read_steps` at `to_commit`. `read_steps` reads every registry entry's
   descriptor and raises `<path>: the registry names this descriptor for '<id>' and it is absent at
@@ -234,7 +234,7 @@ but one blob-pinned range.
   rows as read, never a scratch tree; 70 S5 adds the selftest's scratch-tree cases.
 - `tools/run-gates/README.md` holds no line opening `Leg-row keys:`. The rows of `tools/gate-legs.json`
   carry the keys `argv`, `ceiling`, `chunk`, `doc_reads`, `enforces`, `guard`, `name`, `pack`,
-  `pass_leg`, `reads`, `scope_of`, `signature`, `stage` and `subject`, 14 keys PINNED at `8b06bb0a4`,
+  `pass_leg`, `reads`, `scope_of`, `signature`, `stage` and `subject`, 14 keys PINNED at `1f23a1576`,
   re-derived by AC13's probe.
 - The loop legs of `tools/gate-legs.json` each run one module: `loop definition` runs `loop_lib.py`,
   `loop transition tables` runs `loop_table.py`, `loop parent routes` runs `loop_parents.py`,
@@ -242,7 +242,7 @@ but one blob-pinned range.
   fixtures` runs `budget.py`, `loop breakpoint fixtures` runs `breakpoints.py`, `loop position fixtures`
   runs `position.py`, `loop transition record` runs `loop_transition.py` and `loop adapt fixtures` runs
   `adapt.py`.
-- The pass commits of units 69 and 78 are `59982f60c` and `47c98c1a2`, each found by its `Pass:`
+- The pass commits of units 69 and 78 are `bbcbb2bab` and `6a946400b`, each found by its `Pass:`
   trailer, and each changes `tools/loop/guard.py` alone under `tools/`.
 
 ### The driver-conf subshell (S1, S2)
@@ -450,8 +450,8 @@ this unit.
 
 ### The sweep
 
-Read at `8b06bb0a4`. Each figure is PINNED 2026-11-16 and re-derived by the commands below the table.
-Rev-7 re-ran those commands at the branch tip `dd1a15e01` on 2026-11-17: the `loop guard fixtures`
+Read at `1f23a1576`. Each figure is PINNED 2026-11-16 and re-derived by the commands below the table.
+Rev-7 re-ran those commands at the branch tip `77cf5c0c8` on 2026-11-17: the `loop guard fixtures`
 budget row and this spec's positional rows moved, and are PINNED there; every other figure held.
 
 | What moves | Its readers, pins and populations | What keeps each green |
@@ -651,7 +651,7 @@ New arm: tools/govkit/selftest.py · covers AC19 · the gained-prune vintage arm
 - rev-5 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-95, written by the round-11 spec audit's disposal; nothing else moved.
 - rev-6 · 2026-11-16 · §1 to §10 · S1 to S28 · AC1 to AC28 · §8 F3 to F7 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `8b06bb0a4` and on the committed specs of TOOL-dDeclaredLoop-68
+  `unattended-declared-loop-d56bf0` at `1f23a1576` and on the committed specs of TOOL-dDeclaredLoop-68
   rev-3, -70 rev-3, -72 rev-6, -74 rev-3, -75 rev-10, -76 rev-6, -77 rev-3 and -80 rev-6, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-79-1-spec-writer`: S5, S6, S8, S9, S11, S12, S14 to S18 and S26
   to S28 and their criteria in §3 with what settles each, S24 refused on CLOSED 73; S1 and S2 on 70's
@@ -663,7 +663,7 @@ New arm: tools/govkit/selftest.py · covers AC19 · the gained-prune vintage arm
   `2026-11-17-build-TOOL-dDeclaredLoop-79-1-builder-return`: the D-to-E row of §4 "The gained prune"
   owes exit 2, the prune's line and then `read_steps`' absent-descriptor refusal, never the
   requires-unknown refusal (F8 (a)), with each row's red at the tip and what the arm does not check;
-  the Evidence gains the step reader's reads at `dd1a15e01`; the driver-conf sketch holds the top in
+  the Evidence gains the step reader's reads at `77cf5c0c8`; the driver-conf sketch holds the top in
   `__rdc_root` and sets `ROOT` and `CONF` after the unset loop; the sweep's `loop guard fixtures` row
   reads 95 and this spec's positional rows 1, and gains the step reader's refusal row.
 

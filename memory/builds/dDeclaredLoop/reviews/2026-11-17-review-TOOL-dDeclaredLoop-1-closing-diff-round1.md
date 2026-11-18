@@ -2,9 +2,9 @@
 
 # Tier-2 diff review — dDeclaredLoop (the Spine build of the dClosedLoop chain), round 1
 
-Provenance: gov-diff-reviewer finders over five lenses, gov-skeptic batches, synthesis by gov-synthesizer, at head 520e5125c on branch/unattended-declared-loop-d56bf0.
+Provenance: gov-diff-reviewer finders over five lenses, gov-skeptic batches, synthesis by gov-synthesizer, at head bada76713 on branch/unattended-declared-loop-d56bf0.
 
-Range reviewed: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b...520e5125c581f2dcb1b4df6f550956555c126f0e (ROUND 1).
+Range reviewed: 2ba17e9d690eb26ef8796fc0eddf190daba3b43b...bada76713db927cbdaf039bf0c2ff4019f838ca0 (ROUND 1).
 
 ## Verdict: CLEAN WITH FIXES
 
@@ -109,7 +109,7 @@ Every counter that would mark the run incomplete is zero, so this run is complet
 ### 6. LOW — unit 99's hands-off edge claims a re-run by unit 100 that never happened (finding 8)
 
 - Where: memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-99.md@c4913160:126.
-- What is wrong: the edge says unit 100's 'AC6 re-runs [the conf-readers-declared plant] over the conf read it rewrites'. Unit 100 rev-2 drops AC1 to AC21, closes on AC22 alone, and writes nothing under `tools/` ('no read moves'; pass commit c9a4c606f). No conf read was rewritten, and the plant was not re-run.
+- What is wrong: the edge says unit 100's 'AC6 re-runs [the conf-readers-declared plant] over the conf read it rewrites'. Unit 100 rev-2 drops AC1 to AC21, closes on AC22 alone, and writes nothing under `tools/` ('no read moves'; pass commit e8307cd60). No conf read was rewritten, and the plant was not re-run.
 - Consequence: the closed record counts coverage that was never run, which is an empty population read as coverage. The effect stays in the records, because the plant still runs under the loop definition fixtures leg.
 - Grade: low (binding).
 - Fix (judged INSTANCE-ONLY by the skeptic; this is the skeptic's class-level fix): write one close deviation covering all ten hands-off edges into unit 100 (specs 41, 60, 64, 72, 90, 92, 94, 95, 96 and 99). For each, state that unit 100 rev-2 settled the edge's ids in its §3 table with no write and no re-run, and give the standing observation where one exists. Edges of the same defect include:

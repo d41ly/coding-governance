@@ -22,10 +22,10 @@ One change is left staged in the index: the dispatch row that `--dispatch` wrote
 
 ## Summary
 
-Nothing committed: this is a divergence report. Base is 584f6168c. The brief was already recorded (`--brief` answered `already recorded, unchanged`). `--dispatch` declared the full write set and admitted it (2m20s run). Its row sits staged in memory/builds/dDeclaredLoop/RUN.md, the only change left in the tree.
+Nothing committed: this is a divergence report. Base is c7cb43a96. The brief was already recorded (`--brief` answered `already recorded, unchanged`). `--dispatch` declared the full write set and admitted it (2m20s run). Its row sits staged in memory/builds/dDeclaredLoop/RUN.md, the only change left in the tree.
 
 Sweep re-run at HEAD:
-- Design claims held: kit.toml `requires = ["memory-tree"]`; one `resolve_kit_dir("run-gates"` reach; no `--kits` selection names roles, loop or unattended except 57's arms; manifest ceilings 300 and 120; lexicon offender pin 1215; pass commits 59982f60c and 47c98c1a2; 14 manifest keys; no watched kickoff path is touched; SHARED_RECORDS is not written; no shell file is edited.
+- Design claims held: kit.toml `requires = ["memory-tree"]`; one `resolve_kit_dir("run-gates"` reach; no `--kits` selection names roles, loop or unattended except 57's arms; manifest ceilings 300 and 120; lexicon offender pin 1215; pass commits bbcbb2bab and 6a946400b; 14 manifest keys; no watched kickoff path is touched; SHARED_RECORDS is not written; no shell file is edited.
 - Stale figures: the guard budget row reads 95, not 90, and this spec has 1 positional row, not 16.
 
 Built, then saved to the patch and restored. Each item below was probed directly, with no gate, suite or bar:

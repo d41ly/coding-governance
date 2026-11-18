@@ -77,7 +77,7 @@ at order 47, and closes on AC1 to AC3.
 ### Evidence
 
 Read or probed 2026-11-17 on node `d`: PINNED, that date. Every read is of
-`branch/unattended-declared-loop-d56bf0` at `af5996d3d`, its tree written by `git archive` into the run's
+`branch/unattended-declared-loop-d56bf0` at `2a95c3eb9`, its tree written by `git archive` into the run's
 scratch directory, since this worktree is cut from main, which lacks the loop kit. The plant ran in that
 extracted tree after a scratch `git init` and one commit, since `guard.py` reads its own repository.
 

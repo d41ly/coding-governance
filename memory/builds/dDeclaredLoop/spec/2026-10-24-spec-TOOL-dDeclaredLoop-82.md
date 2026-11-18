@@ -32,15 +32,15 @@ promotions. Its two highs are units 80 and 81, one per id. This unit is the batc
 of the rest, every MEDIUM and every LOW, each by its report id. It builds after every unit it reads, at
 order 41, and repairs none in particular.
 
-Rev-7 re-grounds the batch on branch `unattended-declared-loop-d56bf0` at `77130f24`, built through
+Rev-7 re-grounds the batch on branch `unattended-declared-loop-d56bf0` at `b1c2347b`, built through
 order 35 and units 56, 70 and 71 of order 36, and on the committed specs of orders 36 to 40. Every
 sibling spec this batch amended builds at an earlier order and is CLOSED when this unit builds, so no
 item here rewrites one (§8 F5). An item a committed spec or the built code already settles leaves the
 scope, each in §3 with what settles it; the code half of every other item stays here under its rev-6
 label, which sibling specs cite.
 
-Rev-8 answers the first builder return of this unit, read at the tip `c00538d24`, whose `tools/` equals
-the return's base `8efa0fb0f`: S10's rule reaches eight `PLANTS` descriptions of the two live modules
+Rev-8 answers the first builder return of this unit, read at the tip `87fcd157b`, whose `tools/` equals
+the return's base `9a08ad1a2`: S10's rule reaches eight `PLANTS` descriptions of the two live modules
 outside the fixture boundary, and S10 now rewords them (§8 F7).
 
 | Report item | Severity | Report ids | Rev-6 scope items | At rev-7 |
@@ -167,7 +167,7 @@ The labels keep their rev-6 numbers; every other rev-6 item is in §3.
 
 ### The rev-6 items the built code or a committed spec settles
 
-Read on branch `unattended-declared-loop-d56bf0` at `77130f24`. "CLOSED here" means CLOSED when this unit
+Read on branch `unattended-declared-loop-d56bf0` at `b1c2347b`. "CLOSED here" means CLOSED when this unit
 builds, at order 41 (§8 F5).
 
 | Item | What settles it |
@@ -218,13 +218,13 @@ records and writes no code.
 
 ### Evidence
 
-Read at branch `unattended-declared-loop-d56bf0`, tip `77130f24`, through `git archive` into a scratch
+Read at branch `unattended-declared-loop-d56bf0`, tip `b1c2347b`, through `git archive` into a scratch
 copy, unless named otherwise. `tools/loop/` is absent from this worktree's main. `derive_conf_reads`,
 `resolve_memory_root_source`, `derive_fixture_boundary`, `derive_fetch_url`, `check_fetch_head` and the
 `url-forms` plant were unbuilt at that tip and were read on the committed specs §5 "Dependency" names;
-at the tip `c00538d24` each is built, and the bullets rev-8 restates are read there through `git show`.
+at the tip `87fcd157b` each is built, and the bullets rev-8 restates are read there through `git show`.
 The first builder return (`2026-11-17-build-TOOL-dDeclaredLoop-82-1-builder-return`) re-checked the
-guard, glob-reader, skip-entry, import, carrier and budget claims below at `8efa0fb0f`, whose `tools/`
+guard, glob-reader, skip-entry, import, carrier and budget claims below at `9a08ad1a2`, whose `tools/`
 equals that tip's, and found each held.
 
 - `tools/loop/guard.py#read_remerge_policy` answers `conflicted` for every merge-tree exit 1 at the tip;
@@ -250,7 +250,7 @@ equals that tip's, and found each held.
   no reader call and no conf constant, and eight `conf name` hits outside the boundary, each a description
   in the module's `PLANTS` spelling a conf file name mid-string, at module level: six in
   `tools/loop/budget.py#PLANTS` and two in `tools/loop/breakpoints.py#PLANTS`, the eight S10 names. Rev-8
-  re-ran it at `c00538d24` and found the same eight; with those eight reworded in a scratch copy, the same
+  re-ran it at `87fcd157b` and found the same eight; with those eight reworded in a scratch copy, the same
   probe found none. The conf names in `tools/loop/breakpoints.py#write_pre_placement_plant` sit inside the
   boundary. Each module's `no-own-conf-read` case (`tools/loop/budget.py#run_budget_plant`,
   `tools/loop/breakpoints.py#run_breakpoint_plant`) ends in a check of no hits, and each module prints a
@@ -259,7 +259,7 @@ equals that tip's, and found each held.
 - Every `.memory-tree.conf` a plant under `tools/loop/` writes sets `MEMORY_ROOT`, but for the
   `unattended-root` plants of `budget.py` and `breakpoints.py`, each staged beside a `.unattended.conf`,
   which answers first; gov's own `.unattended.conf` and `.memory-tree.conf` each set `memory`, read at
-  `c00538d24`.
+  `87fcd157b`.
 - 74 rev-3 S2 prints a skipped file as `<name> · skipped — <reason>`, naming the remote by name and never a
   URL; 77 rev-3 §4 "The plants" stages `url-forms` over `https://u:SECRET@127.0.0.1:9/r.git` and a failing
   fetch, on `tools/loop/position.py#write_position_plant`'s bare `<top>/o.git`; 75 rev-10 S34 runs each
@@ -393,24 +393,24 @@ leading with the declared verb `derive`, run on this worktree's main at `179486e
 
 ### The sweep
 
-Read at the tip `77130f24` in the scratch copy; counts PINNED there unless named DERIVED. The rows and
-commands rev-8 restates are read at the tip `c00538d24` and PINNED there, 2026-11-17.
+Read at the tip `b1c2347b` in the scratch copy; counts PINNED there unless named DERIVED. The rows and
+commands rev-8 restates are read at the tip `87fcd157b` and PINNED there, 2026-11-17.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
 | `derive_conf_reads` widened (S1, S10) | its callers at this pass: the `no-own-conf-read` cases of `budget.py` and `breakpoints.py` over their own files, and 80's staged module in `budget.py`'s case; 76 AC2's probe module | the base probe, AC1's first step, runs the widened rule over both live modules before any edit and owes exactly the eight `PLANTS` descriptions §4 "Evidence" names, which S10 rewords; any other hit outside the boundary stops the pass as a deviation. Neither scratch module imports `loop_lib`, so no binding is read (§8 F6), and every hit 76's ending rule found is a containing hit too, so 80's staged module still answers its two hits |
 | the same | the legs `loop budget fixtures` and `loop breakpoint fixtures`, which run every plant | both modules import from `loop_lib`, whose file sits beside them and binds no conf constant; once S10's eight descriptions are reworded, every live hit sits inside 80's boundary, which AC1 observes through each module's `no-own-conf-read` plant, MISSED before the rewording and held after |
 | eight `PLANTS` descriptions reworded (S10) | each module's `fixture · plant <case> · <description>` line, the one reader of a description; any copy of a description outside the two modules | no `run_selftest` owes a description, each owing `fixture · <case> · held` alone; `git grep -F` of each reworded phrase outside `memory/builds/` finds the two modules alone; `breakpoints.py` sits in the folder `budget.py` already puts under Files touched, so no leg's `guard` newly trips |
-| `derive_docstring_ids` minted in `tree_lib.py` (S8) | every importer of `tree_lib`: the memory-tree engines, `loop_transition.py`, `loop_witness.py`, `chain-packet.py`, `check-spec-tokens.py`; govkit's self-test that loads `tree_lib` for its conf-parser parity; and, read at `c00538d24`, `upstream.py` of the loop kit, the playbook kit's modules, `check_policy.py` and memory-recall's self-test, each importing named functions or constants | a new name and a stdlib `import ast` alone; no name moves, and `tree_lib` still imports no engine |
+| `derive_docstring_ids` minted in `tree_lib.py` (S8) | every importer of `tree_lib`: the memory-tree engines, `loop_transition.py`, `loop_witness.py`, `chain-packet.py`, `check-spec-tokens.py`; govkit's self-test that loads `tree_lib` for its conf-parser parity; and, read at `87fcd157b`, `upstream.py` of the loop kit, the playbook kit's modules, `check_policy.py` and memory-recall's self-test, each importing named functions or constants | a new name and a stdlib `import ast` alone; no name moves, and `tree_lib` still imports no engine |
 | `tree_lib.py` and `gen_build_index.py` edited | the `DELEGATES` of `tools/memory-tree/check-verdict-epoch.sh`, which names both | `KIT_MEMORY_TREE_VERSION` is minted by the lander; off the push boundary the gate prints `owed at the lander` and exits 0 |
 | `scan_glob_readers`' set (S8) | its one call, the glob-reader self-test arm, which owes eight charged names over its planted module | the set is the same ids; the planted `async def`'s docstring is charged to nothing, so the owed list holds |
 | `resolve_memory_root_source`'s memory-tree branch (S15) | 75 S7's explain line and S8's held line; 76 AC3's three folders; 79's `no-confs`; adapt's and every other plant's root | the plants staging a memory-tree conf without the key, the `unattended-root` plants of `budget.py` and `breakpoints.py`, stage a `.unattended.conf` beside it, which answers first, so no owed line moves; the root of the branch stays `memory`; `no-confs` holds neither conf and keeps `default` |
 | `PLANTS` of `guard.py` gains two, of `budget.py` one; `position.py`'s `url-forms` gains rows | each module's `run_selftest`, `main` and usage line; `run_selftest`'s owed map in `guard.py` | each reads the dict; the guard plants join the owed map at 1; no flag is added, so the usage rows of `tools/govkit/usage.toml` and the anchors on `help/loop.md` hold |
-| the same, and `breakpoints.py`'s two descriptions | budget rows in `tools/run-gates/selftest-budgets.txt`: `loop budget fixtures` 498 seconds PINNED, `loop guard fixtures` 95 seconds PINNED, `loop position fixtures` 432 seconds PINNED, `build-index selftest` 140 seconds PINNED, `loop breakpoint fixtures` 317 seconds PINNED, each at `c00538d24`; manifest ceilings 300 seconds PINNED for the loop legs and 350 seconds PINNED for build-index | `loop breakpoint fixtures` gains no plant and no plant's work, so its row is not re-read; a row a timed reading at the close passes is re-priced by that file's rule, PINNED with date and node; no ceiling is raised |
+| the same, and `breakpoints.py`'s two descriptions | budget rows in `tools/run-gates/selftest-budgets.txt`: `loop budget fixtures` 498 seconds PINNED, `loop guard fixtures` 95 seconds PINNED, `loop position fixtures` 432 seconds PINNED, `build-index selftest` 140 seconds PINNED, `loop breakpoint fixtures` 317 seconds PINNED, each at `87fcd157b`; manifest ceilings 300 seconds PINNED for the loop legs and 350 seconds PINNED for build-index | `loop breakpoint fixtures` gains no plant and no plant's work, so its row is not re-read; a row a timed reading at the close passes is re-priced by that file's rule, PINNED with date and node; no ceiling is raised |
 | `derive_import_aliases` and `derive_docstring_ids` minted | `memory/map/generated/symbols.json` and its three siblings, under `codebase-map coverage + freshness`; the lexicon offender pin | `python tools/codebase-map/gen_map.py --write` regenerates them; both names lead with a declared verb |
 | 72 AC4's grep half | its count of `read_design_conf`, `read_driver_conf` and `parse_conf` over `budget.py`, whose `conf-read-forms` row 4 spells one | 72 is CLOSED and its AC4 is observed at its pass; 76 S4 holds the lasting observation on the syntax tree, which passes over the bounded rows |
 | shipped bytes | `install-prefix (shipped surface)` and `kit epoch (shipped bytes move, the version moves)` | the new lines name no kit path; the loop and memory-tree versions are minted at the lander |
-| this spec's citations | `memory/project/positional-refs.txt`, its 1 PINNED row for this spec at `c00538d24`, the build method's batching rule §1 cites, under `positional (the citation check alone)` | §1 and §4 "Alternatives rejected" keep that citation, and rev-8 adds no line citation, so the row holds and no shrink is owed |
+| this spec's citations | `memory/project/positional-refs.txt`, its 1 PINNED row for this spec at `87fcd157b`, the build method's batching rule §1 cites, under `positional (the citation check alone)` | §1 and §4 "Alternatives rejected" keep that citation, and rev-8 adds no line citation, so the row holds and no shrink is owed |
 | this spec's labels | 72, 75 to 81 and 84 name this unit in hands-off bullets; 86, 87, 88, 89, 90, 97 and 98 consume S1, S6, S8, S10, S14, S21, AC4, AC5, AC10, §4's sketch and the two plants | every edge is kept; each kept label keeps its number and meaning, and the sketch keeps its heading; 86's and 88's asks of S6, S14, AC5, AC6 and AC22 meet items in §3 and re-ground at their own pass; 86 S13's missing-file refusal and S15's sibling folder are written here already (S1, F6) |
 
 ```
@@ -460,7 +460,7 @@ This unit builds alone at order 41 and reads the landed code of every earlier or
 committed specs: `TOOL-dDeclaredLoop-72` rev-6 (order 36, building now) for `resolve_memory_root` and AC4;
 `TOOL-dDeclaredLoop-76` rev-6 (order 37) for `derive_conf_reads`, `resolve_memory_root_source` and the
 `no-own-conf-read` and `root-source` plants; `TOOL-dDeclaredLoop-80` rev-6 (order 38) for
-`derive_fixture_boundary` and `write_pre_placement_plant`, both built at `c00538d24`; `TOOL-dDeclaredLoop-74` rev-3 (order 38) for
+`derive_fixture_boundary` and `write_pre_placement_plant`, both built at `87fcd157b`; `TOOL-dDeclaredLoop-74` rev-3 (order 38) for
 `derive_fetch_url`, `check_fetch_head` and the skip entry; `TOOL-dDeclaredLoop-67` rev-4 (order 38) for
 `loop definition fixtures`; `TOOL-dDeclaredLoop-75` rev-10 and `TOOL-dDeclaredLoop-77` rev-3 (order 39)
 for the exit-1 reading, the empty git config, the pass-commit probe and the `url-forms` plant;
@@ -630,7 +630,7 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC8 · the glob-reader a
   TOOL-dDeclaredLoop-83 writes it, and AC4 greps 75 for the retired fallback and for 83's clause and
   re-runs 81's `push-merge-tree-fatal` plant; nothing else moved.
 - rev-7 · 2026-11-16 · §1 to §10 · S1 to S24 · AC1 to AC24 · §8 F1 to F6 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `77130f24` and on the committed specs of TOOL-dDeclaredLoop-72
+  `unattended-declared-loop-d56bf0` at `b1c2347b` and on the committed specs of TOOL-dDeclaredLoop-72
   rev-6, 67 rev-4, 74 rev-3, 75 rev-10, 76 rev-6, 77 rev-3, 79 rev-6 and 80 rev-6 and the CLOSED 78 rev-7,
   per the brief 2026-11-16-prompt-TOOL-dDeclaredLoop-82-1-spec-writer: no sibling spec is amended, its
   siblings being CLOSED at this order (F5); S2, S5 to S7, S11 to S14, S17, S18, S20, S22 and the text
@@ -645,7 +645,7 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC8 · the glob-reader a
   2026-11-17-prompt-TOOL-dDeclaredLoop-82-3-spec-writer: S10's rule reaches eight `PLANTS` descriptions
   of `budget.py` and `breakpoints.py` outside the boundary, and S10 rewords them to name each conf in
   words, the rule kept whole (F7 (a)), `breakpoints.py` joining Files touched; AC1's base probe owes those
-  eight and observes both `no-own-conf-read` plants MISSED, then held; restated at `c00538d24`: the
+  eight and observes both `no-own-conf-read` plants MISSED, then held; restated at `87fcd157b`: the
   Evidence probe and conf bullets, the staging function's name `write_pre_placement_plant`, the three
   budget rows and the breakpoint row, the one positional row, the guard grep, the `tree_lib` importers
   and the two unattended-root confs.

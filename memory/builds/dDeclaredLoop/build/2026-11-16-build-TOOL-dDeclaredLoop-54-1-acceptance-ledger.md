@@ -20,7 +20,7 @@ against feature and unit sets filled with the build's list. Both staged breaks w
 patching the composition's sets, and each plant closed `MISSED`, exit 1; the close's observation on the
 staged files stands owed.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/termination.py --fixture --plant unit-dead-end` with every function the unit's pass changed

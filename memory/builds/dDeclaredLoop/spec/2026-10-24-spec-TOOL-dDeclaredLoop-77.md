@@ -122,7 +122,7 @@ through a `GIT_SSH_COMMAND` shim that runs `git-upload-pack` on a local bare rep
 - 74 §4 recorded that a fetch from a path that does not exist exits 128 and leaves `FETCH_HEAD` empty,
   PINNED on 2026-10-24; that a fetch failing at connect over https does the same is UNVERIFIED, and AC4
   re-observes it.
-- Read through `git show` at the branch tip `e916c1c4a`:
+- Read through `git show` at the branch tip `84fae4006`:
   - `position.py` holds no `FETCH_HEAD` reader and no `derive_fetch_url`: 65's `read_fetch_time` and
     74's `derive_fetch_url` and `check_fetch_head` are unbuilt, so this design is written on
     `TOOL-dDeclaredLoop-74` rev-3 §4 "The reading, restated", where `read_fetch_time` passes
@@ -233,7 +233,7 @@ sit inside `write_position_plant` and `check_plant`.
 
 ### The sweep
 
-Read at the branch tip `e916c1c4a`; counts PINNED there unless named DERIVED.
+Read at the branch tip `84fae4006`; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
@@ -380,7 +380,7 @@ New arm: tools/loop/position.py · covers AC1 AC2 AC3 AC4 · the scp-remote, ssh
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-82, written by the round-5 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-16 · §1 to §10 · S1 to S5 · AC1 to AC5 · §8 F3, F4 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `e916c1c4a` and on the committed specs of TOOL-dDeclaredLoop-74
+  `unattended-declared-loop-d56bf0` at `84fae4006` and on the committed specs of TOOL-dDeclaredLoop-74
   rev-3, TOOL-dDeclaredLoop-65 rev-3 and TOOL-dDeclaredLoop-56 rev-6, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-77-1-spec-writer`: S1 extends 74's `derive_fetch_url` in place
   of a second function (F3), with git's own local-path test; S2 stages on 56's restaged scratch and

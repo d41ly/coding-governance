@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Units through order 26 are built: 21 (975e27fa0) moved the review round bounds into policy keys read through tools/loop/review_bounds.py and left the driver's refusal census at 327. Unit 34 (order 27) is deferred against ask TOOL-dDeclaredLoop-113. 30 rev-5's decision row (TOOL-dDeclaredLoop-30) has landed; its raise by two reads 327 -> 329 over what 21 left.
+  table's order. Units through order 26 are built: 21 (c06829447) moved the review round bounds into policy keys read through tools/loop/review_bounds.py and left the driver's refusal census at 327. Unit 34 (order 27) is deferred against ask TOOL-dDeclaredLoop-113. 30 rev-5's decision row (TOOL-dDeclaredLoop-30) has landed; its raise by two reads 327 -> 329 over what 21 left.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

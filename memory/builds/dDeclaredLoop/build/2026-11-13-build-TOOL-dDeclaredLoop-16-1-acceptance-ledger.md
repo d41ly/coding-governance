@@ -15,7 +15,7 @@ observation of its two `New arm:` lines, `tools/loop/loop_lib.py` covering AC1, 
 staged by the kind in the factory's table and not the reader's tuple. The kit version constants of
 the spec's section 5 move at the close, where the epoch legs name them.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 The `disposition-unknown` plant of `tools/loop/loop_lib.py`, whose planted defect is the staged break, exited

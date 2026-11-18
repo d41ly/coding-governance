@@ -25,7 +25,7 @@ TOOL-dDeclaredLoop-68 is not built. I'm returning a divergence before any write.
 
 Checks that ran:
 - I read BUILD-METHOD.md, the brief (memory/builds/dDeclaredLoop/prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-68-build-brief.md) and spec rev-3 whole.
-- I re-ran the §5 sweep at HEAD a339daae2. One figure is stale: the `from loop_witness import` count is 16 files, not 13.
+- I re-ran the §5 sweep at HEAD 083cd0a32. One figure is stale: the `from loop_witness import` count is 16 files, not 13.
 - A probe stood in for the normalise plant (AC1), which no gate covered here. I called run_witness_commands over a scratch fixture repo under %TEMP%/lw68fx, which was removed afterwards. It showed Git Bash's `pwd` printing `/tmp/lw-<random>/tree`. None of the three S1 roots spells that path, so the normalise plant's two re-runs cannot hash equal.
 
 No gate, suite or bar ran.

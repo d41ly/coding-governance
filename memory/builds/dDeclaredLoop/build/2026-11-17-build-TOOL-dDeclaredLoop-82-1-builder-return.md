@@ -4,7 +4,7 @@
 
 ## Why
 
-DIVERGENCE: if S10 is built as written, the `no-own-conf-read` plants of both loop modules go red. Spec §4 "Evidence", §5 "The sweep" (its first two derive_conf_reads rows) and AC1's base probe each say this cannot happen, and at HEAD 8efa0fb0f it does.
+DIVERGENCE: if S10 is built as written, the `no-own-conf-read` plants of both loop modules go red. Spec §4 "Evidence", §5 "The sweep" (its first two derive_conf_reads rows) and AC1's base probe each say this cannot happen, and at HEAD 9a08ad1a2 it does.
 
 What the spec claims:
 - §4 "Evidence": "A probe of S1 and S10's rule, with 80 S1's boundary, over the two modules finds no reader call, no conf name mid-string and no conf constant".
@@ -42,7 +42,7 @@ Nothing was written under the repository: no product edit, no dispatch and no co
 
 ## Summary
 
-I stopped before the first write and committed nothing. The base is 8efa0fb0fb41f2545764ad974213b21f9f68f3a5.
+I stopped before the first write and committed nothing. The base is 9a08ad1a2c2680b6812d289222974dfffea6e10e.
 
 **Check that ran:** AC1's own first step, the base probe. It is a python reimplementation of the widened derive_conf_reads rule, using HEAD's `derive_fixture_boundary`, run over tools/loop/budget.py and tools/loop/breakpoints.py. It stands in for the `no-own-conf-read` plants that the `loop budget fixtures` and `loop breakpoint fixtures` legs run. Script and output are in the scratchpad:
 - C:/Users/DAILY-~1/AppData/Local/Temp/claude/b120d4a7f8b5be2e/7c85732c-fa0c-43e9-83f2-238d293195e0/scratchpad/u82/probe_widened.py

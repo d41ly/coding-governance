@@ -96,7 +96,7 @@ Not supplied, optional: `input:code`.
 > drop spec-audit: from this build's README and from the run's pinned fact; rearm the unattended session and continue
 
 — owner, 2026-11-13. The first dispatch of TOOL-dDeclaredLoop-62 returned a divergence before any write: rev-3 was grounded before
-TOOL-dDeclaredLoop-61 built (bbb9e82c2), and 61 took its own §8 option (b), extending `parallel-append` to draw the same item on
+TOOL-dDeclaredLoop-61 built (5fe74a281), and 61 took its own §8 option (b), extending `parallel-append` to draw the same item on
 both sides and adding a `draw-id-rows` plant, where rev-3 expected a `parallel-append-identical` plant to join. The return is
 `memory/builds/dDeclaredLoop/build/2026-11-16-build-TOOL-dDeclaredLoop-62-1-builder-return.md` and names three changes.
 

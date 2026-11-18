@@ -99,7 +99,7 @@ floor named by a runner version this unit moves. It repairs `TOOL-dDeclaredLoop-
 ### Evidence
 
 Every reading below was taken on 2026-11-15 through `git show`, from branch/unattended-declared-loop-d56bf0
-at `98ba0aec9` unless it names origin/main, which it read at `179486e8f`. This worktree is cut from main
+at `70be1d955` unless it names origin/main, which it read at `179486e8f`. This worktree is cut from main
 at `179486e8f`, which lacks the loop kit. The spec-token check ran on the worktree's own tree.
 
 - On the branch the canary's two `KNOWN` copies hold `name argv guard impure reads chunk subject
@@ -404,7 +404,7 @@ New arm: tools/govkit/selftest.py · covers AC3 AC4 · `check_ceiling_emission` 
   omission is silent (F4); AC2 reads the tables through `tomllib`, since other descriptor tables carry
   their own `stage`; AC3 observes the below-floor half through the reader, as the ceiling's arm does.
   Line citations become symbol citations or blob-pinned lines.
-- rev-5 · 2026-11-15 · S1 · §4 · §5 · AC1 AC5 · §8 F5 · §10 · re-grounded at `98ba0aec9` and origin/main
+- rev-5 · 2026-11-15 · S1 · §4 · §5 · AC1 AC5 · §8 F5 · §10 · re-grounded at `70be1d955` and origin/main
   `179486e8f` by the brief 2026-11-15-prompt-TOOL-dDeclaredLoop-46-2-spec-writer, after the builder return 2026-11-15-build-TOOL-dDeclaredLoop-46-1-builder-return found origin/main already shipping run-gates `1.48` with a canary lacking `stage`; S1 steps from the higher of the branch's and origin/main's values, AC5 and F5 keep the floor above origin/main's runner to the landing, and §5 names the landing's reconcile of the version marker; mechanism, carries, order and status kept.
 
 ## 10. Reuse audit

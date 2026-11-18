@@ -14,7 +14,7 @@ Owed to the close: every leg the spec's section 7 names; the RED-first observati
 to git as written; and the `loop guard fixtures` row in `tools/run-gates/selftest-budgets.txt` read
 against the leg's own timing, since the three plants each add one scratch repository to that leg.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/guard.py --selftest` with every function the unit's pass changed in `tools/loop/guard.py`

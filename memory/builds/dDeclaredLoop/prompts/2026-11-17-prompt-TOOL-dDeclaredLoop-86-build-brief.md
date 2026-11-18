@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 41 is built: unit 82 (a0ba898db, the round-5 audit's minors, from spec rev-8 on its second dispatch) built derive_import_aliases in loop_lib.py, widened derive_conf_reads (a conf name anywhere, an aliased reader, and a loop_lib conf constant read inline by ast.parse), moved derive_docstring_ids into tree_lib.py, and added the conf-read-forms plant and the url-forms rows. The spec is rev-8, re-grounded on the branch at 77130f241.
+  table's order. Every unit through build order 41 is built: unit 82 (6ff991964, the round-5 audit's minors, from spec rev-8 on its second dispatch) built derive_import_aliases in loop_lib.py, widened derive_conf_reads (a conf name anywhere, an aliased reader, and a loop_lib conf constant read inline by ast.parse), moved derive_docstring_ids into tree_lib.py, and added the conf-read-forms plant and the url-forms rows. The spec is rev-8, re-grounded on the branch at b1c2347b8.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

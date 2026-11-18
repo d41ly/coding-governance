@@ -15,7 +15,7 @@ copy of the reader as the kit's own for one run and restoring it. The arm's text
 outside the suite over a planted base copy, read FAIL on its first two checks with the resolver's
 `LookupError` line, and ok on all three over the built copy.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 Not observed: the arm in `tools/memory-tree/routed_commits.py`, no staged break was run for it at this close.

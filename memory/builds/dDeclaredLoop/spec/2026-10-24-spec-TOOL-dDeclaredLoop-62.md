@@ -44,7 +44,7 @@ It repairs `TOOL-dDeclaredLoop-49`.
 ## 2. Scope (IN)
 
 Three items of rev-2 left this unit's scope at rev-3, each built or carried elsewhere. The transition
-line itself, rev-2's S2, is `TOOL-dDeclaredLoop-49` S3's, built at `6dd0d7f0`, and that unit's rev-3
+line itself, rev-2's S2, is `TOOL-dDeclaredLoop-49` S3's, built at `2b81b242`, and that unit's rev-3
 already corrected the false Evidence claim rev-2's S2 answered. The merge of two identical draws under
 the tree's attribute, rev-2's AC1, is `TOOL-dDeclaredLoop-61` S4's plant, which reads the attribute
 with `git check-attr` as rev-2's AC1 did. And one distinct draw merged against one is
@@ -93,10 +93,10 @@ with `git check-attr` as rev-2's AC1 did. And one distinct draw merged against o
 
 ### Evidence
 
-Code read on branch `unattended-declared-loop-d56bf0` at `fd9a9084` through `git show`; the worktree
+Code read on branch `unattended-declared-loop-d56bf0` at `039e0a0d` through `git show`; the worktree
 this spec was written in is cut from main, which lacks the loop kit. The tip's commits after
-`6dd0d7f0`, the last to touch `.gitattributes` or `tools/loop/budget.py`, are records alone. The probes
-ran on a `git archive` snapshot of `fd9a9084` in the session scratchpad, git 2.54.0, node `d`,
+`2b81b242`, the last to touch `.gitattributes` or `tools/loop/budget.py`, are records alone. The probes
+ran on a `git archive` snapshot of `039e0a0d` in the session scratchpad, git 2.54.0, node `d`,
 2026-11-16.
 
 - `.gitattributes@eab9e190:77` and :78, :84, :87 and :88 declare `merge=rows`; :94 to :96, :104 and
@@ -123,8 +123,8 @@ ran on a `git archive` snapshot of `fd9a9084` in the session scratchpad, git 2.5
 - Probe 2, PINNED 2026-11-16: `git merge-file --union` over the same uneven record exited 0 holding
   four draw rows PINNED, ours first, and `sort | uniq -d` printed no draw row; over the two id-bearing
   rows on one item it exited 0 keeping both.
-- `tools/loop/budget.py#run_budget_plant` at `52961e46`, after `TOOL-dDeclaredLoop-61` built at
-  `bbb9e82c2`, serves `patch-draw` and `patch-trailer-only` from one branch, and its `parallel-append`
+- `tools/loop/budget.py#run_budget_plant` at `f2e72c33`, after `TOOL-dDeclaredLoop-61` built at
+  `5fe74a281`, serves `patch-draw` and `patch-trailer-only` from one branch, and its `parallel-append`
   branch reads the tree's attribute with `read_git(KIT, "rev-parse", "--show-toplevel")` and
   `check-attr merge`, copies it into the fixture, draws `TOOL-<fx>-1` on `main` and the same item on
   `side`, merges with `read_git`, then checks that the rows are that item's `1/4` row twice with two
@@ -209,16 +209,16 @@ No function, constant or flag is minted, so no name goes to `python tools/lexico
   row is the reader's ValueError, which the shared branch reports as a miss, as `parallel-append` does.
 - observability — the `.gitattributes` comment carries the weighing; the plant prints its rows and
   `budget_state`, and a miss names the draw that rewrote the record.
-- risks — what this change could newly red, and what keeps each green, read at `fd9a9084`:
+- risks — what this change could newly red, and what keeps each green, read at `039e0a0d`:
   - `loop budget fixtures`: `run_selftest` reads `PLANTS`, so the new plant joins the leg with no
     edit. `parallel-append` gains the append-only check on its two draws; `write_budget_rows` appends,
     so it holds, and that plant's own checks are unchanged.
   - the leg's `ceiling` of 300 PINNED in `tools/gate-legs.json` is a hang bound: the direct-CLI
-    readings summed 226 seconds PINNED at `52961e46`, before this unit, and one plant costing about
+    readings summed 226 seconds PINNED at `f2e72c33`, before this unit, and one plant costing about
     what `parallel-append` costs stays under it. Should the order-30 plants together carry the sum past
     300 PINNED, the builder stops and records it rather than raising the ceiling.
   - `every held leg is budgeted, every budget row resolves`: the leg keeps its row, re-priced per S4
-    from 339 PINNED (226 seconds PINNED x1.5 over seventeen plants, 2026-11-16, at `52961e46`).
+    from 339 PINNED (226 seconds PINNED x1.5 over seventeen plants, 2026-11-16, at `f2e72c33`).
   - `lexicon naming predicates`: no function is minted, so `VERB_OFFENDER_PIN` in `.lexicon.conf` stays
     1215 PINNED.
   - `help page commands`: no verb or flag is added. The plant is a value of `--plant=`, which the usage
@@ -254,7 +254,7 @@ No function, constant or flag is minted, so no name goes to `python tools/lexico
     bodies.
 - dependency — order 30, built beside `TOOL-dDeclaredLoop-31`, `TOOL-dDeclaredLoop-60` and
   `TOOL-dDeclaredLoop-61`, with 31 and 60 read on their committed specs at rev-3 and rev-3. The comment
-  names 61's draw id, and 61 has landed, built at `bbb9e82c2` on its §8 F4 option (b): it extended
+  names 61's draw id, and 61 has landed, built at `5fe74a281` on its §8 F4 option (b): it extended
   `parallel-append` to draw one item alike on `main` and `side`, the rows differing in their draw id
   alone, and added the plant `draw-id-rows`; the shared branch of S2 keeps that extended
   `parallel-append` as it is. 60 adds `PLANTS` keys and re-prices the same budget row, so whichever of
@@ -284,7 +284,7 @@ git show "$B:tools/run-gates/selftest-budgets.txt" | grep '^loop budget fixtures
   `memory/builds/dDeclaredLoop/build/`, still answers `merge: union`.
   Red when: the line rests on no recorded weighing, as `TOOL-dDeclaredLoop-49` S3 left it, or the edit
   moved the attribute.
-  fixture: no transition record is tracked at `fd9a9084`, so the record is named, not found; git
+  fixture: no transition record is tracked at `039e0a0d`, so the record is named, not found; git
   answers for an untracked path by its name.
 - **AC2** — When `python budget.py --fixture --plant parallel-append-uneven` runs in `tools/loop/`, the
   merge exits 0, the merged record holds three draw rows with no row twice, and `budget_state` answers
@@ -330,14 +330,14 @@ New arm: tools/loop/budget.py · covers AC2 AC3 · the `parallel-append-uneven` 
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-75, written by the round-3 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-16 · §1 · S1 S2 S3 S4 · AC1 AC2 AC3 · §3 §4 §5 §7 · §8 F2 F3 · §10 · re-grounded on
-  the code of branch `unattended-declared-loop-d56bf0` at `fd9a9084`, per the brief
+  the code of branch `unattended-declared-loop-d56bf0` at `039e0a0d`, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-62-1-spec-writer`: the transition line and the corrected
   evidence left scope, built by TOOL-dDeclaredLoop-49 S3 and its rev-3; the identical-draws merge left
   to TOOL-dDeclaredLoop-61 S4, and the one-against-one merge to TOOL-dDeclaredLoop-49 S4; Probe 1
   re-run on the bare rows the writer writes, where the row driver conflicts rather than refuses; the
   comment's text written out; the uneven merge and the append-only check one plant on the shared
   `parallel-append` branch (F3); the budget row re-priced; §5 the sweep; line citations re-read.
-- rev-4 · 2026-11-16 · S2 · §4 §5 · re-grounded on TOOL-dDeclaredLoop-61 as built at `bbb9e82c2`, per
+- rev-4 · 2026-11-16 · S2 · §4 §5 · re-grounded on TOOL-dDeclaredLoop-61 as built at `5fe74a281`, per
   the return `2026-11-16-build-TOOL-dDeclaredLoop-62-1-builder-return`: the shared branch keeps 61's
   same-item side draw for `parallel-append`, and only `parallel-append-uneven` draws its own items on
   `side`; §5 dependency names 61's extended `parallel-append` and its `draw-id-rows` plant as what
@@ -354,7 +354,7 @@ are the two candidates, measured by Probes 1 and 2. `python tools/codebase-map/r
 field on an appended row so a merge keeps both"` ranked `rows`, `row`, `merge`
 (`tools/memory-tree/merge-rows.py`, `tools/settings-merge.py`), `field`, `extract_row` and `id_rows`
 at rev-2; the two `merge` functions are the row driver and the settings merger, and the first is the
-candidate this unit measured and rejected. Re-run at rev-3 on the snapshot of `fd9a9084`,
+candidate this unit measured and rejected. Re-run at rev-3 on the snapshot of `039e0a0d`,
 `python tools/codebase-map/reuse_lookup.py "fixture plant that merges two branches of appended rows and
 checks none is written twice"` ranked `rows`, `row`, `merge`, `fixture`, `run_fixture_git` and
 `write_fixture_files`, the last two in `tools/loop/loop_witness.py` and already imported by the plant;

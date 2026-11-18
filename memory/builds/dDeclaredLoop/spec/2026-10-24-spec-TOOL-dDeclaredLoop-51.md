@@ -83,8 +83,8 @@ answers it, and the help page's example count follow.
 
 ### Evidence
 
-Read on branch `unattended-declared-loop-d56bf0` at `697e7fce9` through `git show`, and run on an export of
-`250b236fe`, whose `tools/` and `help/` trees `697e7fce9` leaves unchanged.
+Read on branch `unattended-declared-loop-d56bf0` at `e4e196bf2` through `git show`, and run on an export of
+`57723d6c9`, whose `tools/` and `help/` trees `e4e196bf2` leaves unchanged.
 
 | Tag | Actor at the tip | After this unit |
 |---|---|---|
@@ -242,7 +242,7 @@ named in §4 ran on the export; every other claim was read on the branch through
   reason row `item.design.reason role:gov-spec-writer None none`; and
   `grep -c 'returns = "record-kind.recommendation"' tools/loop/loop.toml` prints 5.
   Red when: a tag is declared twice, or a reason row gains a typed return and moves the count.
-  figure: 8 and 5 PINNED, the rows at `697e7fce9`.
+  figure: 8 and 5 PINNED, the rows at `e4e196bf2`.
 - **AC3** — When `grep -cF "$(python tools/loop/loop_lib.py --check | grep '^loop: items')" help/loop.md`
   runs on the built tree, it prints 1.
   Red when: the page keeps a pending count the tree no longer prints; with S1 alone it prints 0.
@@ -288,7 +288,7 @@ No suite arm is added or moved (§8 F5).
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the hands-off bullets mirroring the
   consumes-from edges of TOOL-dDeclaredLoop-67, written by the round-2 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-16 · §1 to §10 · S1 to S3 · AC1 to AC3 · §8 F3 to F5 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `697e7fce9`, per the brief
+  `unattended-declared-loop-d56bf0` at `e4e196bf2`, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-51-1-spec-writer`: seven of the eight rows already stand as the
   audit's fix asks, so the recommend rows, the reason witnesses and the restatement of unit 22's AC8 leave
   scope, and S3 with them; S1 is Design's reason row alone, `role:gov-spec-writer` with

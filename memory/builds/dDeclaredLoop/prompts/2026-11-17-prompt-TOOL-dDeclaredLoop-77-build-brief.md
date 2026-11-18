@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 38 is built, and of order 39 unit 75 (d45f1d031, the round-3 audit's minors, which added the fetch-other-branch and clone-without-reflog plants to position.py and runs every plant under empty global and system git configs) is built. Unit 74 (1e022e062) minted derive_fetch_url and check_fetch_head in position.py, which this unit extends. The spec is rev-3, re-grounded on the branch; two of its claims are UNVERIFIED and owed observation at the close.
+  table's order. Every unit through build order 38 is built, and of order 39 unit 75 (0111c3a62, the round-3 audit's minors, which added the fetch-other-branch and clone-without-reflog plants to position.py and runs every plant under empty global and system git configs) is built. Unit 74 (4af5395e2) minted derive_fetch_url and check_fetch_head in position.py, which this unit extends. The spec is rev-3, re-grounded on the branch; two of its claims are UNVERIFIED and owed observation at the close.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

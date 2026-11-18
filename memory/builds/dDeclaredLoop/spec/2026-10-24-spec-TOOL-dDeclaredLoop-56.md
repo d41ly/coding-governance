@@ -175,7 +175,7 @@ The labels keep their rev-5 numbers, which sibling specs cite; every other rev-5
 
 ### The rev-5 items the built code closed
 
-Read on branch `unattended-declared-loop-d56bf0` at `e8018d94f`.
+Read on branch `unattended-declared-loop-d56bf0` at `e3d842339`.
 
 | Item | What closed it at the tip |
 |---|---|
@@ -275,9 +275,9 @@ unit, sequenced.
 
 ### Evidence
 
-Read in an export of branch `unattended-declared-loop-d56bf0` at `e8018d94f`; this worktree is cut from
+Read in an export of branch `unattended-declared-loop-d56bf0` at `e3d842339`; this worktree is cut from
 main at `179486e8f`, which holds no loop kit. Rev-7 re-read the edge with `TOOL-dDeclaredLoop-70`, the
-counts and the three gaps the first builder return names at the tip `8b06bb0a4`, where that return found
+counts and the three gaps the first builder return names at the tip `1f23a1576`, where that return found
 every other claim below held.
 
 - `tools/unattended/unattended.sh#print_claims` prints six TAB fields on every row, the sixth from
@@ -422,13 +422,13 @@ No function is minted.
 
 ### The sweep
 
-Read at the tip `e8018d94f`, and the rows rev-7 moved at `8b06bb0a4`; counts PINNED there unless named
+Read at the tip `e3d842339`, and the rows rev-7 moved at `1f23a1576`; counts PINNED there unless named
 DERIVED.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
 | `--claims` prints five fields by default | `derive_claims_line`; the DL8 AC8 arm of `skills/session-kickoff/manifest-check.test.sh`; the AC2 arm of `tools/unattended/unattended.test.sh` | the card asks `--with-key`; both arms ask it too (S9) |
-| the same | the nine other `--claims` calls of `tools/unattended/unattended.test.sh`, PINNED at `8b06bb0a4`: seven field reads, AC16's of fields 1, 4 and 5 and the six others' of fields 1, 3 and 5; AC1's `claims: none`; AC3's exit 2 | no read reaches the sixth field, and field positions are unchanged |
+| the same | the nine other `--claims` calls of `tools/unattended/unattended.test.sh`, PINNED at `1f23a1576`: seven field reads, AC16's of fields 1, 4 and 5 and the six others' of fields 1, 3 and 5; AC1's `claims: none`; AC3's exit 2 | no read reaches the sixth field, and field positions are unchanged |
 | the same | `tools/loop/README.md`'s sentence on the sixth field; `help/loop.md`'s; the VERBS entry and its render | each restated with the flag, the render re-copied byte for byte |
 | `--with-key` added to the usage line | `docs` and `help page commands` through `tools/govkit/step_gate.py#VERB_SOURCES` | the anchor `verb:unattended.sh:--claims` lands on `help/loop.md`, its fingerprint from `docs_leg.py --fingerprints`, and its row leaves the shrink-only `memory/project/docs-undocumented.txt` |
 | `read_withdrawn_parents` maps a no-record parent to None | `derive_parent_route`, its one caller; `TOOL-dDeclaredLoop-70` S5's planned fixture, which reads a `STAGING` parent | the route skips None; a `STAGING` parent is not withdrawn either way |
@@ -446,7 +446,7 @@ DERIVED.
 | `render_policy_text` loses this caller | `tools/govkit/steps/fanout_cap.py`, `tools/govkit/steps/conf_to_policy.py` | kept: the landed fan-out step still writes through it |
 | the class count's review key | the DL20 AC7 arm of `tools/workflows/unattended-build.test.sh`, its records `r1.md`, `r2.md`, `r3.md`; the `review_dispose.py classes` sentence of `tools/workflows/README.md` | each stem is its own review, so its expectations hold; the sentence is restated with the review key |
 | `build_commit`'s token read | `tools/unattended/check-pass-order.sh` and `tools/unattended/check-brief-recorded.sh`, which declare `_SUBJ`; the driver's DoD read; the arms of `tools/unattended/check-unattended.test.sh` and `tools/push-main.test.sh` | a declared cache takes today's path; an undeclared one reads the same tokens once |
-| `memory/project/positional-refs.txt` | its 2 rows PINNED at `8b06bb0a4` for this spec, `BUILD-METHOD M4` and `BUILD-METHOD M6`, under `positional (the citation check alone)` | §1 still cites M4 and §4 M6, so no row moves and the pass leaves the file alone |
+| `memory/project/positional-refs.txt` | its 2 rows PINNED at `1f23a1576` for this spec, `BUILD-METHOD M4` and `BUILD-METHOD M6`, under `positional (the citation check alone)` | §1 still cites M4 and §4 M6, so no row moves and the pass leaves the file alone |
 | sibling specs | `TOOL-dDeclaredLoop-65` (S36's age source), `TOOL-dDeclaredLoop-67` (AC30, AC41, S19, S20 and the items this revision moves to §3), `TOOL-dDeclaredLoop-68` (S27), `TOOL-dDeclaredLoop-70` (S18) | each re-grounds on this revision at its own pass; the labels S18, S20 and S36 keep their meaning |
 
 ```
@@ -475,7 +475,7 @@ git grep -n -e 'REVIEW_ROUNDS' -e 'render_policy_text' "$B" -- tools help
 - The refusal ceilings and families: `tools/memory-tree/check-arms.py#branches` and
   `tools/memory-tree/check-arms.py#scan_refusal_sites` read the edited `*.sh` files, the driver,
   `lib-unattended.sh` and `manifest-check.sh`, and no `fail` call or refusal site is added to any. The
-  driver's ceiling is 343 PINNED at the tip `8b06bb0a4`, under `TOOL-dDeclaredLoop-52`'s decision row;
+  driver's ceiling is 343 PINNED at the tip `1f23a1576`, under `TOOL-dDeclaredLoop-52`'s decision row;
   `tools/unattended/unattended.families.txt` does not move.
 - Help anchors: the one flag added, `--with-key`, is anchored by S10; no verb is added.
 - Subject pins, epoch delegates, upgrade rows and the kickoff watch list: no leg is added; no file of the
@@ -488,7 +488,7 @@ git grep -n -e 'REVIEW_ROUNDS' -e 'render_policy_text' "$B" -- tools help
 ### Dependency
 
 `TOOL-dDeclaredLoop-52` (order 34) and `TOOL-dDeclaredLoop-63` (order 35) are CLOSED, and at the tip
-`8b06bb0a4` `tools/loop/loop_table.py#derive_phase_position` reads `(phase, facts, phase_map=None,
+`1f23a1576` `tools/loop/loop_table.py#derive_phase_position` reads `(phase, facts, phase_map=None,
 extra=())` beside 52's `[[phase]]` rows. S18 passes no `extra` and takes that `()` default, which builds
 nothing on another unit. `TOOL-dDeclaredLoop-70` (order 36, DEFERRED, rev-4) builds after this unit: it adds
 `tree`, moves the `extra` default, and writes `tree=root` onto S18's call, by the hands-off edge in §3.
@@ -613,7 +613,7 @@ rule; S9's edit to `tools/unattended/unattended.test.sh` keeps that suite truthf
   `write_record`; (b) keep the module's `journal` record, created exclusively, which no reader reads. (a)
   moves the memory-tree kit's vocabulary, its guide and its verdict epoch for a record nothing reads.
   Recommendation: (b), by rung 3. widens: none · relaxes: none · RESOLVED (agent, 2026-11-16, delegated): (b)
-- **F9 — What does an absent remote do with the remote-tip claim (S36)?** At the tip `8b06bb0a4`,
+- **F9 — What does an absent remote do with the remote-tip claim (S36)?** At the tip `1f23a1576`,
   `read_remote_claim` keys a claim over `refs/remotes/?@?` with no reflog time, which reads `re-derived`
   and prints `interrupt — invalidated · remote tip refs/remotes/?`. Options: (a) an absent remote adds no
   remote-tip claim, and `interrupt — remote · none` alone names the absence; (b) the claim stays and prints
@@ -640,7 +640,7 @@ rule; S9's edit to `tools/unattended/unattended.test.sh` keeps that suite truthf
   `2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade`: §4 owed rows states every unit's tag.
 - rev-6 · 2026-11-16 · §1 to §10 · S8 to S10, S18, S20, S24, S26, S33, S36, S37, S39 to S42 · AC5, AC6,
   AC13, AC15, AC19, AC21, AC28, AC31, AC32, AC34 to AC37, AC43 · §8 F6 to F8 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `e8018d94f` and on the committed specs of TOOL-dDeclaredLoop-52,
+  `unattended-declared-loop-d56bf0` at `e3d842339` and on the committed specs of TOOL-dDeclaredLoop-52,
   -63 and -70, per the brief `2026-11-16-prompt-TOOL-dDeclaredLoop-56-1-spec-writer`: the items the built
   code closed move to §3 with what closed each, their criteria with them; S22, S27 and S29 leave by F6 to F8;
   S10's card needs no fallback call; S18 reads through `derive_phase_position`; S20's EOF clause binds

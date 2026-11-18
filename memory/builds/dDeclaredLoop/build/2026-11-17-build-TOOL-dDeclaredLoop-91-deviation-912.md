@@ -8,7 +8,7 @@
 - **After:** the `PLANTS` description of `conf-read-forms` names the new rows in words, a global in a class body and a walrus in a default, a keyword-only default, a lambda default, a class base and a decorator, the two body walruses binding none, and the execution comparison, naming each conf in words and never by its file name, as unit 90 extended the same description for its rows; the README row also names `_MODULE_SCOPE_PARTS` as the table the walk reads; the citation grep run at the base matched one more of each citation, every extra one in the annotation line of this spec's own sweep, while the spec of `TOOL-dDeclaredLoop-94` holds exactly the counts the annotation states.
 - **Cause:** builder discovery
 - **Reason:** a description that lists every row of its plant but the new group would state the plant short of its code, and the table is where a reader of the row finds the positions; the grep's extra matches are the annotation reading itself, no citation moved. No design claim moved.
-- **Evidence:** `tools/loop/budget.py#PLANTS`, the `derive_conf_rebinds(tree, docs)` row of `tools/loop/README.md`, and the sweep's citation grep run at the base `af5996d3d`.
+- **Evidence:** `tools/loop/budget.py#PLANTS`, the `derive_conf_rebinds(tree, docs)` row of `tools/loop/README.md`, and the sweep's citation grep run at the base `2a95c3eb9`.
 - **Risk:** editorial
 - **Approver:** author, the builder pass, under the chain's `author-recorded` value (`PLAY-dClosedLoop-4`)
 - **Follow-through:** ask TOOL-dDeclaredLoop-35

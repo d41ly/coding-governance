@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-115 — the push arm reads the policy file as added only where no parent holds it, so a merge whose first parent lacks it is graded
 
-**Status:** CLOSED · rev-1 · 2026-11-17 · node a · Tier-2 · base a4256373 · streams tooling · order 52
+**Status:** CLOSED · rev-1 · 2026-11-17 · node a · Tier-2 · base 017b0299 · streams tooling · order 52
 
 **Derived:** TOOL-dDeclaredLoop-44
 
@@ -87,7 +87,7 @@ reads every later parent. One plant observes both topologies the review names.
 
 ### Evidence
 
-Every code claim below was read at the branch tip a4256373 of
+Every code claim below was read at the branch tip 017b0299 of
 `branch/unattended-declared-loop-d56bf0` through `git show`, `tools/loop/guard.py` at blob 13a73d3e;
 this worktree is cut from main, which lacks the loop kit. Both review records were read whole at the
 same tip. The probes of §10 ran on this worktree's tree, main at 8eda4a5a0.
@@ -219,7 +219,7 @@ the first parent's absence, not one arm.
     The exit contract does not move.
   - `.githooks/pre-push.test.sh`, its TDL2 AC19 case: it writes a stub `loop/guard.py` that prints
     its argv and exits as told, so no byte of the real arm reaches it.
-  - `PLANTS`, 44 keys PINNED at a4256373, 45 after; re-derived by the AST count in AC1's `figure:`.
+  - `PLANTS`, 44 keys PINNED at 017b0299, 45 after; re-derived by the AST count in AC1's `figure:`.
     Its readers are `main`'s `--plant` choices, `run_fixture` and `run_selftest`, which iterates the
     table and reads its owed map, where the new key is owed 1.
   - the module docstring: `main` passes only its first paragraph, the title line, to the argument
@@ -229,12 +229,12 @@ the first parent's absence, not one arm.
     fenced blocks and inline code spans opening `python`, `python3` or `bash`
     (`tools/govkit/docs_leg.py`), and the edited sentences add none of the three.
   - `tools/run-gates/selftest-budgets.txt`, row `loop guard fixtures`: budget 146 PINNED at
-    a4256373 against an r of 97 s PINNED on node d 2026-11-17, x1.5. The builder adds the plant's
+    017b0299 against an r of 97 s PINNED on node d 2026-11-17, x1.5. The builder adds the plant's
     worst of two direct-CLI runs, rounded up, to r, writes the ceiling of 1.5 times the sum, and
     appends the clause and this unit's id as units 75 to 94 did. The leg's hang ceiling, 300 s PINNED
-    in `tools/gate-legs.json` at a4256373, stays above it.
+    in `tools/gate-legs.json` at 017b0299, stays above it.
   - the lexicon's verb offender pin, 1215 PINNED as `VERB_OFFENDER_PIN` in `.lexicon.conf` at
-    a4256373: no function is minted. Re-derive with `python tools/lexicon/lexicon.py --offenders`,
+    017b0299: no function is minted. Re-derive with `python tools/lexicon/lexicon.py --offenders`,
     its rows under `tools/loop/guard.py` equal at the base and at the pass. A helper a builder adds
     goes through `python tools/lexicon/lexicon.py --suggest <name> --as py.function` first.
   - `SHARED_RECORDS` in `.unattended.conf` names `memory/DECISIONS.md` and
@@ -264,7 +264,7 @@ the first parent's absence, not one arm.
   exits 3.
   figure: the plant count is DERIVED by
   `python -c "import ast,sys; t=ast.parse(open(sys.argv[1],encoding='utf-8').read()); print([len(n.value.keys) for n in t.body if isinstance(n,ast.Assign) and getattr(n.targets[0],'id','')=='PLANTS'])" tools/loop/guard.py`,
-  44 PINNED at a4256373 and 45 at the pass.
+  44 PINNED at 017b0299 and 45 at the pass.
 - **AC2** — When `python tools/loop/guard.py --fixture --plant push-first-to-empty-remote` runs, its
   rows print `held`, the count row naming
   `push · 2 commit(s) read · 1 changing .governance/policy.toml · 0 finding(s)`.

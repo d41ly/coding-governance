@@ -104,8 +104,8 @@ home under every set that stores a move, so no draw is refused for the set. It r
 
 ### Evidence
 
-Read on branch `unattended-declared-loop-d56bf0` at `b1d66ba26` through `git show`, its product code
-unchanged since `50f5dea5d`, the commit that landed `TOOL-dDeclaredLoop-30`.
+Read on branch `unattended-declared-loop-d56bf0` at `c6e66bfc4` through `git show`, its product code
+unchanged since `1d284c8b4`, the commit that landed `TOOL-dDeclaredLoop-30`.
 
 - `tools/loop/budget.py#record_draw` reads `read_record_channels` at HEAD and raises where `log` is
   absent, ahead of the patch origin and the home. With `lines` given it extends them and writes no file;
@@ -223,7 +223,7 @@ imports, since `budget.py` imports this module.
 - observability — every home holds one row grammar, and `budget.py draw` prints the row it wrote, its
   suffix included.
 - risks — what this change could newly red, and what keeps each green, each read on branch
-  `unattended-declared-loop-d56bf0` at `b1d66ba26`:
+  `unattended-declared-loop-d56bf0` at `c6e66bfc4`:
   - `loop budget fixtures`: every plant but `no-log` runs the default set, where no home moves; the two
     new populations add rows only where a trailer carries `budget` or `draw` or a `RUN.md` carries
     ` · budget <slug>`, which no other plant writes. `stale-verdict` and `route-backs` call `record_draw`
@@ -235,13 +235,13 @@ imports, since `budget.py` imports this module.
     holds `log`, which never carry the fields.
   - `loop adapt fixtures`, `loop composition fixtures`, `loop guard fixtures`, `loop scenario fixtures`:
     each runs the writer through `loop_transition.py`'s `main` under the default set, found by
-    `git grep -n -E 'loop_transition.main|lt.main|"record", "--build"' b1d66ba26 -- tools/loop`, so their
+    `git grep -n -E 'loop_transition.main|lt.main|"record", "--build"' c6e66bfc4 -- tools/loop`, so their
     homes stay and the two new populations are empty in their scratch repositories.
   - `loop position fixtures`, `loop review bounds fixtures`: the driver they run draws through
     `budget.py draw` under the default set, into `RUN.md` as landed.
   - `harness arms (fail branches armed or pinned)` and the refusal ceiling: the census of
     `tools/unattended/unattended.sh`, read through `tools/memory-tree/check-arms.py`'s `branches` and
-    `scan_refusal_sites`, is 329 PINNED at `b1d66ba26`, re-derived by those two readers: 324 branches
+    `scan_refusal_sites`, is 329 PINNED at `c6e66bfc4`, re-derived by those two readers: 324 branches
     and 5 sites PINNED, at its ceiling of 329 PINNED in `REFUSAL_CEILINGS`. The three families of
     `tools/unattended/unattended.families.txt`, re-derived by matching each pattern over that census as
     the module's `check_families` does, count 1, 11 and 36 PINNED against ceilings 1, 11 and 37. This
@@ -251,7 +251,7 @@ imports, since `budget.py` imports this module.
     `memory/project/readme-contract.txt`, the `SHARED_RECORDS` of `.unattended.conf`, and the run owes no
     decision row ahead, since no ceiling and no pin moves.
   - `lexicon naming predicates`: the three new names lead with declared verbs, so `VERB_OFFENDER_PIN`
-    stays 1215 PINNED (`.lexicon.conf` at `b1d66ba26`).
+    stays 1215 PINNED (`.lexicon.conf` at `c6e66bfc4`).
   - `help page commands`: no verb or flag is added, so the three `script:tools/loop/budget.py` usage rows
     in `tools/govkit/usage.toml` and their fingerprints do not move; the edited paragraphs keep each
     anchor comment on its command's line.
@@ -270,7 +270,7 @@ imports, since `budget.py` imports this module.
     under it; a sum at or above it is a deviation the builder records rather than a raise.
   - the run-state readers: `tools/runlog/model.py`'s `read_run_state` skips a line without ` · item `,
     and no driver row grammar reads a line opening `draw ·` or `budget ·`, suffix or not:
-    `git grep -n '· budget' b1d66ba26 -- tools/unattended tools/runlog` finds only check 23's fleet line
+    `git grep -n '· budget' c6e66bfc4 -- tools/unattended tools/runlog` finds only check 23's fleet line
     in `tools/unattended/check-unattended.test.sh`.
   - untouched, each read on the branch: the kickoff manifest's `watch:` line in
     `memory/guides/SESSION-KICKOFF.md` names no path this unit edits; `DELEGATES` in
@@ -371,7 +371,7 @@ New arm: tools/loop/budget.py · covers AC1 AC2 AC3 AC4 · the `trailer-only`, `
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the hands-off bullets mirroring the
   consumes-from edges of TOOL-dDeclaredLoop-60 and TOOL-dDeclaredLoop-67, written by the round-2 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-16 · §1 · S1 to S6 · §3 · §4 · §5 · AC1 to AC5 · §7 · §8 F3 F4 F5 · §10 · re-grounded
-  on the code of branch `unattended-declared-loop-d56bf0` at `b1d66ba26`, per the brief
+  on the code of branch `unattended-declared-loop-d56bf0` at `c6e66bfc4`, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-48-1-spec-writer`: the log-selected home is built by
   `TOOL-dDeclaredLoop-30` and leaves this scope; the landed refusal and its plant go (S1); the writer's
   rows reach a newest record, the trailer or `RUN.md` (S3, F3, F4); a patch draw's suffix (S4); the

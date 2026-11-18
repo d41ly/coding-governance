@@ -143,7 +143,7 @@ print(bool(load and kid and min(load) < min(kid)))
 ### Evidence
 
 Read or probed 2026-11-17 on node `d`: PINNED, that date. Every read is of
-`branch/unattended-declared-loop-d56bf0` at `5031e98fd`, its tree written by `git archive` into the run's
+`branch/unattended-declared-loop-d56bf0` at `c35e8d15d`, its tree written by `git archive` into the run's
 scratch directory, since this worktree is cut from main, which lacks the loop kit. The plant ran in that
 extracted tree, and the staged break in a scratch copy of its `tools/loop/`, `tools/lib/` and
 `tools/memory-tree/`. 95 rev-3 was read from the run's pending copy, since it is not on the branch yet.

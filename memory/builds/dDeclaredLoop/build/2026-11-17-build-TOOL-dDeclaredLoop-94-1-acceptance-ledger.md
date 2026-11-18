@@ -4,7 +4,7 @@
 
 No merge bar, no self-test suite and no gate leg ran in this pass. The criteria were observed on node `d`
 (win32), at rev-4 of the spec, over the working tree, by the first dispatch, which started from the base
-`5031e98fd`. The `push-merge-tree-fatal` plant of `guard.py` ran alone by `--fixture --plant`, standing in
+`c35e8d15d`. The `push-merge-tree-fatal` plant of `guard.py` ran alone by `--fixture --plant`, standing in
 for the `loop guard fixtures` leg; the `conf-read-forms` plant of `budget.py` ran alone the same way,
 standing in for the `loop budget fixtures` leg; `python -I -c` probes of `build_failure_detail`, and of
 `load_tree_lib` in a scratch copy of the loop, lib and memory-tree folders, stood in for nothing a leg runs.
@@ -25,7 +25,7 @@ Owed to the close: every leg section 7 names; and RED-first, on its two `New arm
 `push-merge-tree-fatal` plant with `build_failure_detail` taking the message whole, and the
 `conf-read-forms` plant with `load_tree_lib`'s base catch and first-name refusal restored.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/budget.py --fixture --plant conf-read-forms` with every function the unit's pass changed in

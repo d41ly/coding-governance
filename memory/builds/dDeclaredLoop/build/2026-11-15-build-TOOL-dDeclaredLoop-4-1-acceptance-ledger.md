@@ -22,7 +22,7 @@ lines: the module's plants through `--selftest`, with `unclaimed-leg` staged red
 join's owner every part, and the map selftest's arm `test_stage_key` staged red against a parser that
 refuses the key. The exit 2 `unarmed` path, a kit that does not resolve, was not probed.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/stage_coverage.py --fixture --plant unclaimed-leg` with the part join's owner fed every

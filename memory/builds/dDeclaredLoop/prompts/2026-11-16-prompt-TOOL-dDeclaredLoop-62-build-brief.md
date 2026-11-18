@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Units through order 29 and unit 61 of this order are built: 61 (bbb9e82c2) gave every draw row a draw id, extended the parallel-append plant to one item on both sides, added the draw-id-rows plant and re-priced the loop budget fixtures row to 339 for seventeen plants. 62 rev-3 was grounded before 61 landed: read 61's code as shipped. Units 60 and 31 of this order build after you.
+  table's order. Units through order 29 and unit 61 of this order are built: 61 (5fe74a281) gave every draw row a draw id, extended the parallel-append plant to one item on both sides, added the draw-id-rows plant and re-priced the loop budget fixtures row to 339 for seventeen plants. 62 rev-3 was grounded before 61 landed: read 61's code as shipped. Units 60 and 31 of this order build after you.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

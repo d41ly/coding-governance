@@ -28,7 +28,7 @@ dispatch row or runs the commit check, so neither reaches a re-pointed reader. T
 suites are waived for this landing by the build README's rule, and an arm of theirs that sources the
 library with no `resolve_python` defined now meets the reader's named refusal.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 Not observed: the arm in `tools/memory-tree/routed_commits.py`, no staged break was run for it at this close.

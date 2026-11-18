@@ -4,7 +4,7 @@
 
 No merge bar, no self-test suite and no gate leg ran in this pass. The criteria were observed on node `d`
 (win32), at rev-2 of the spec, over the working tree, by the first dispatch, which started from the base
-`5fc2ef889`. The `no-own-conf-read` plants of `budget.py` and `breakpoints.py` and the `conf-read-forms`
+`fad1b2db5`. The `no-own-conf-read` plants of `budget.py` and `breakpoints.py` and the `conf-read-forms`
 plant of `budget.py`, each run alone by `--fixture --plant`, stand in for the `loop budget fixtures` and
 `loop breakpoint fixtures` legs; the AC1 and AC2 probes, run by `python -I`, and the AC5 greps stand in for
 nothing a leg runs. Each criterion's staged break was observed in a scratch copy of the loop, lib and

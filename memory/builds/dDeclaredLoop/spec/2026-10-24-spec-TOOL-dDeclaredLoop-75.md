@@ -34,7 +34,7 @@ item too. The minors land on twelve units, so this unit repairs none in particul
 unit it reads (order 39). Where a minor is the medium or low grade of a defect a high unit closes, the item
 here is what that grade's fix asks beyond the high unit's mechanism.
 
-Rev-10 re-grounds the batch on branch `unattended-declared-loop-d56bf0` at `f74eacaf5`, built through
+Rev-10 re-grounds the batch on branch `unattended-declared-loop-d56bf0` at `9bdfeecca`, built through
 order 34 and units 63, 54 and 64 of order 35, and on the committed specs of orders 35 to 38. Many minors were
 closed by the passes of the units they named, or by a committed sibling spec; those leave this unit's
 scope, each in §3 with what closed it. The items the built code and the committed specs leave open stay
@@ -173,7 +173,7 @@ The labels keep their rev-9 numbers, which sibling specs cite; every other rev-9
 
 ### The rev-9 items the built code or a committed spec settles
 
-Read on branch `unattended-declared-loop-d56bf0` at `f74eacaf5`.
+Read on branch `unattended-declared-loop-d56bf0` at `9bdfeecca`.
 
 | Item | What settles it |
 |---|---|
@@ -227,11 +227,11 @@ Read on branch `unattended-declared-loop-d56bf0` at `f74eacaf5`.
 
 ### Evidence
 
-Every code claim was read on branch `unattended-declared-loop-d56bf0` at `e916c1c4a`, through `git show`
+Every code claim was read on branch `unattended-declared-loop-d56bf0` at `84fae4006`, through `git show`
 and a `git archive` copy in a scratch directory, because this worktree's main at `179486e8f` lacks the
-loop kit. The tip then moved to `f74eacaf5` with unit 64's pass, `ade343442`, whose code diff is
+loop kit. The tip then moved to `9bdfeecca` with unit 64's pass, `dfcaf9d26`, whose code diff is
 `tools/loop/breakpoints.py`, `help/loop.md`, `tools/unattended/VERBS.template.md` with its render, and one
-row of `tools/run-gates/selftest-budgets.txt`; those were re-read at `f74eacaf5`, and no other code moved.
+row of `tools/run-gates/selftest-budgets.txt`; those were re-read at `9bdfeecca`, and no other code moved.
 Units 56, 65, 66, 67, 70, 72, 74, 76 and 80 are not built at that tip and are read on their committed
 specs, rev-6, rev-3, rev-4, rev-4, rev-3, rev-6, rev-3, rev-6 and rev-6. No line number is cited.
 
@@ -266,13 +266,13 @@ specs, rev-6, rev-3, rev-4, rev-4, rev-3, rev-6, rev-3, rev-6 and rev-6. No line
   `Refusal`; the constant `WRITE_LOCK_REL` in `tools/govkit/govkit.py` is `.governance/outbox/.update.lock`.
   `demand_claimed_requires` names every pair in its text and the first pair alone in its route.
 - `git log -G'^requires' -- tools/unattended/kit.toml` lists `95e4ae142`, `ff0b3dc32`, `a0116e508` and
-  `867b14a9f` after the file's first `requires`, PINNED at `e916c1c4a` on 2026-11-16 and re-derived by
+  `867b14a9f` after the file's first `requires`, PINNED at `84fae4006` on 2026-11-16 and re-derived by
   that command.
 - `tools/memory-tree/gen_build_index.py#render_order` writes each step's cell from
   `tools/memory-tree/gen_build_index.py#derive_parallel_step`, whose docstring cites
   `TOOL-dGroundRules-25` and `TOOL-dGroundRules-32` and not the ask; `grep -n TOOL-aSurfacedLexicon-17` over
   the generator prints nothing at the tip.
-- `tools/unattended/PROTOCOL.template.md` and its render each measure 68050 bytes PINNED at `e916c1c4a`,
+- `tools/unattended/PROTOCOL.template.md` and its render each measure 68050 bytes PINNED at `84fae4006`,
   against the render's row of 68130 bytes PINNED in `tools/template-size-limits.txt`, whose block keeps
   no headroom.
 - `tools/loop/position.py#run_plant` builds every plant's scratch under one temporary top and runs git
@@ -434,7 +434,7 @@ function or a conf.
 
 ### The sweep
 
-Read at `e916c1c4a` in the scratch copy, and at `f74eacaf5` for the files unit 64 moved; counts PINNED there
+Read at `84fae4006` in the scratch copy, and at `9bdfeecca` for the files unit 64 moved; counts PINNED there
 unless named DERIVED.
 
 | Changed | Population | What keeps it green |
@@ -447,7 +447,7 @@ unless named DERIVED.
 | `PLANTS` of `position.py` gains two, and every plant runs under empty configs | the leg `loop position fixtures`, its row (411 seconds PINNED) and every plant's `check_plant` entry, the `plan-line` and `status-line` driver plants among them | each plant names its branch with `-b main` and its identity through `run_fixture_git`; the leg is observed whole at the close, and its row re-priced |
 | `run_merge_tree` passes `--name-only`; exit 1 reads C | every guard plant, the stand-ins of `push-merge-tree-fatal` and its probe siblings, `push-merge-conflict-pick`, whose re-merge conflicts on the policy file | a stand-in replaces the function whole; a policy conflict still reads `conflicted`; the leg `loop guard fixtures`, row 90 seconds PINNED, is re-priced for one plant more |
 | the held line gains its source | the owed lists of `pre-placement`, `pre-placement-records-root` and 72's `unattended-root`; `print_breakpoint_lines` and `check_owner_gates` in the driver; 19's `driver-plan` compare; the held-line sentences of `help/loop.md` and `tools/unattended/VERBS.template.md` with its render | the three owed lines carry the suffix in this pass; the line's head is not `breakpoint: `, and `--plan` and `list` print it alike; both sentences name the source |
-| `PLANTS` of `breakpoints.py` is unchanged, 72's plant lists one build more | the leg `loop breakpoint fixtures` and its row, 297 seconds PINNED at `f74eacaf5` against the manifest ceiling of 300 seconds PINNED | one `list` call more; the row is re-priced from a timed run, and a priced reading past the ceiling is a divergence the pass reports |
+| `PLANTS` of `breakpoints.py` is unchanged, 72's plant lists one build more | the leg `loop breakpoint fixtures` and its row, 297 seconds PINNED at `9bdfeecca` against the manifest ceiling of 300 seconds PINNED | one `list` call more; the row is re-priced from a timed run, and a priced reading past the ceiling is a divergence the pass reports |
 | `read_breakpoints` reads the root through `resolve_memory_root_source` | 76's and 80's `no-own-conf-read` plants | the function is none of the three reader names they count, and the docstrings sit outside the population; AC6 re-runs the plant |
 | `demand_claimed_requires`' route | `TOOL-dDeclaredLoop-57`'s arm, which asserts `apply --kits roles,loop` on one pair, and `govkit refusal join` | the one-pair route reads as before; no raise is added or moved, so the join's anchor set holds |
 | `check_patch_peers` returns on rc 1 | 67's `patch-concurrent` plant; the driver's refusal census, 343 PINNED under `REFUSAL_CEILINGS`, and `tools/unattended/unattended.families.txt` | that plant's stand-in returns 0; no `fail`, `exit 1` or `status=1` is added |
@@ -484,7 +484,7 @@ git grep -n -e '75 S[0-9]' -e '75 AC[0-9]' -e "75's S" "$B" -- memory/builds/dDe
   which the protocol states beside `PHASES_EXTRA`; no headroom, on the file's four terms."
 - The refusal ceilings and families: `tools/memory-tree/check-arms.py#branches` and
   `tools/memory-tree/check-arms.py#scan_refusal_sites` read the driver's `fail` calls and its `exit 1` and
-  `status=1` sites, 338 and 5 at `e916c1c4a`, 343 PINNED together, the ceiling's own figure. S28 adds
+  `status=1` sites, 338 and 5 at `84fae4006`, 343 PINNED together, the ceiling's own figure. S28 adds
   none, and `tools/unattended/unattended.families.txt` reads `fail` messages alone, so neither moves.
 - Help anchors: the one new flag, `--explain`, is in the `ending` usage row and its re-stamped anchor; no
   verb is added.
@@ -498,7 +498,7 @@ git grep -n -e '75 S[0-9]' -e '75 AC[0-9]' -e "75's S" "$B" -- memory/builds/dDe
 
 This unit builds at order 39 over the landed code of every earlier order, and each claim on an unbuilt
 unit is written on its committed spec. `TOOL-dDeclaredLoop-64` (order 35) built the held line and its plant at
-`ade343442`. `TOOL-dDeclaredLoop-56` (order 36, rev-6) gives S20's terminal proof, which S18
+`dfcaf9d26`. `TOOL-dDeclaredLoop-56` (order 36, rev-6) gives S20's terminal proof, which S18
 probes, and S36's restaged stale scratch. `TOOL-dDeclaredLoop-70` (rev-3) and `TOOL-dDeclaredLoop-72`
 (rev-6), order 36, give `read_driver_conf`, `resolve_memory_root`, its refusal and its plants.
 `TOOL-dDeclaredLoop-65` (rev-3) and `TOOL-dDeclaredLoop-76` (rev-6), order 37, give the last-fetch line and
@@ -662,7 +662,7 @@ New arm: tools/govkit/selftest.py · covers AC14 AC26 · the committed-target re
   TOOL-dDeclaredLoop-94, written by the round-10 spec audit's disposal; nothing else moved.
 - rev-9 · 2026-11-15 · S27 · AC27 · §7 · S27's fallback clause restated to TOOL-dDeclaredLoop-81's exit table, AC27 re-observing `push-merge-tree-fatal` and the guard arm line naming the tree-fatal plant, written by TOOL-dDeclaredLoop-83 (the round-6 spec audit's id 1); nothing else moved.
 - rev-10 · 2026-11-16 · §1 to §10 · S1 to S36 · AC1 to AC36 · §8 F1 to F6 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `f74eacaf5`, unit 64 built, and on the committed specs of
+  `unattended-declared-loop-d56bf0` at `9bdfeecca`, unit 64 built, and on the committed specs of
   TOOL-dDeclaredLoop-56 rev-6, TOOL-dDeclaredLoop-65 rev-3, TOOL-dDeclaredLoop-66 rev-4,
   TOOL-dDeclaredLoop-67 rev-4, TOOL-dDeclaredLoop-70 rev-3, TOOL-dDeclaredLoop-72 rev-6,
   TOOL-dDeclaredLoop-74 rev-3, TOOL-dDeclaredLoop-76 rev-6 and TOOL-dDeclaredLoop-80 rev-6, per the brief

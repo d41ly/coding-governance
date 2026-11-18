@@ -16,7 +16,7 @@ its seven PINNED scratch-tree cases and the `DRAFTING` case's `--extra=`, agains
 `tools/loop/loop_parents.py` arm, the `parent-in-extra-phase` case against a parent call passing no tree,
 which reds as `loop: unanswered` (deviation 702).
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/loop_parents.py --fixture --plant parent-in-extra-phase` with every function the unit's

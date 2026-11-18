@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Units through order 31 are built: 21 (review bounds), the budget units, 32 (convergence routing), 31 (--exhausted, ending rows) and 20 (3b094c89b, the review program's trigger, dispose, fold and cost; it wrote no review [[item]] row, per its §8 F4). 50 rev-3 was grounded before 20 landed: read 20's code as shipped. Unit 22 of this order builds after you and edits other rows of tools/loop/loop.toml.
+  table's order. Units through order 31 are built: 21 (review bounds), the budget units, 32 (convergence routing), 31 (--exhausted, ending rows) and 20 (ffbe05eb4, the review program's trigger, dispose, fold and cost; it wrote no review [[item]] row, per its §8 F4). 50 rev-3 was grounded before 20 landed: read 20's code as shipped. Unit 22 of this order builds after you and edits other rows of tools/loop/loop.toml.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

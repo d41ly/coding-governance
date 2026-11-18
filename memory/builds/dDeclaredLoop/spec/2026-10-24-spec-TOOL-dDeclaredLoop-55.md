@@ -81,7 +81,7 @@ repairs `TOOL-dDeclaredLoop-33`.
   moves; through `tools/loop/adapt.py#read_flow_rows`, a build's own flow changes; and its wait rule reads
   the catalogue through `tools/policy/policy.py#derive_bounds`. The overlay, the scenario rows, the change
   records and the catalogue all lie outside `{prefix}/loop/`.
-- At the tip `a7b10569` no `loop` row of `tools/gate-legs.json` carries `guard`, the loop descriptor's
+- At the tip `fc947748` no `loop` row of `tools/gate-legs.json` carries `guard`, the loop descriptor's
   `[[gate_leg]]` tables are `loop definition` and `loop transition tables` alone, and the registry's
   `[[exempt_leg]]` rows hold every other `loop` leg (a `json.load` and `tomllib` probe over the files
   `git show` extracted on 2026-11-16).
@@ -115,7 +115,7 @@ None. The pass writes no product file; its acceptance ledger line records AC1 an
 
 ### The sweep: what the change reaches, and what keeps each green
 
-Read on `branch/unattended-declared-loop-d56bf0` at `a7b10569` through `git show`; the probes ran over
+Read on `branch/unattended-declared-loop-d56bf0` at `fc947748` through `git show`; the probes ran over
 files extracted from it; the reuse lookup ran on this worktree's main at `179486e8`, and the
 spec-token checker on a scratch index of the tip's tree, where every path this spec names is tracked.
 This spec is written on `TOOL-dDeclaredLoop-33`'s committed rev-6 spec (order 34), which
@@ -175,7 +175,7 @@ lands the row and the `[[exempt_leg]]` row this unit reads.
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the hands-off bullets mirroring the
   consumes-from edges of TOOL-dDeclaredLoop-67, written by the round-2 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-16 · §1 · S1 · §3 · §4 · §5 · AC1 · AC2 · §8 F3 · §10 · re-grounded at the tip of
-  branch/unattended-declared-loop-d56bf0 (`a7b10569`), per the brief
+  branch/unattended-declared-loop-d56bf0 (`fc947748`), per the brief
   prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-55-1-spec-writer.md: TOOL-dDeclaredLoop-33 rev-6 lands the
   row with no guard and the leg as gov's own exempt row with no descriptor table, so this pass writes
   nothing and observes (F3); AC2 reads the descriptor's absent table; the review record's path; the

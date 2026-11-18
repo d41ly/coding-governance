@@ -421,7 +421,7 @@ bytes once its row lands and not `conf_to_policy.py`'s, which it imports, as it 
 - `REFUSAL_CEILINGS` in `.memory-tree.conf` prices the driver and `tools/unattended/check-unattended.sh`,
   and the leg `harness arms (fail branches armed or pinned)` on §7's line observes both (§8 F5).
   - The driver: its census, read through `tools/memory-tree/check-arms.py`'s `branches` and
-    `scan_refusal_sites`, is 326 PINNED (second builder return, base `8a3bd0c8`, 2026-11-16), at its
+    `scan_refusal_sites`, is 326 PINNED (second builder return, base `8369c89f`, 2026-11-16), at its
     ceiling of 326. The refusal this unit retires from `load_driver_conf` is an `echo` and `exit 2`,
     which neither `tools/memory-tree/check-arms.py#FAIL_RE` nor its `EXIT_RE` and `STATUS_RE` count,
     so retiring it lowers nothing, and `verb_review`'s one new `fail 37` branch relaying the module's refusal makes
@@ -436,7 +436,7 @@ bytes once its row lands and not `conf_to_policy.py`'s, which it imports, as it 
     the line, after TOOL-dDeclaredLoop-28's, the pass adds the comment line:
     `# TOOL-dDeclaredLoop-21 RAISED the driver 326 -> 327, the census, under decision TOOL-dDeclaredLoop-21 (ER:388): verb_review's one fail 37 relay of the review-bounds module's refusal; the conf-load refusal it retires was an echo the census never counted.`
   - The positional row: `memory/project/positional-refs.txt`'s row pairing `.memory-tree.conf` with the
-    driver's path and count 326 is re-pointed in place to 327, as d0ce2bc2 re-pointed it from 325 for
+    driver's path and count 326 is re-pointed in place to 327, as a62d74ea re-pointed it from 325 for
     TOOL-dDeclaredLoop-28, since `positional.py shrink` drops a stale row and never adds one.
   - The families: `tools/unattended/unattended.families.txt` stays as the return measured it,
     missing-run-state 1 of 1, required-flag 11 of 11 and field-shape 36 of 37 PINNED; the new
@@ -450,7 +450,7 @@ bytes once its row lands and not `conf_to_policy.py`'s, which it imports, as it 
     `core_of` call, and the fixtures' policy commits are suite lines. The census after the change is
     the driver at 327 of a ceiling raised to 327, `tools/unattended/check-unattended.sh` at 266 of 266,
     and the families at 1 of 1, 11 of 11 and 36 of 37, each PINNED to the return's measurement at
-    `12e930f8` plus this unit's one relay.
+    `37486233` plus this unit's one relay.
   - Armed: check 2's re-worded `fail 2` by the re-pointed arm at
     `tools/unattended/check-unattended.test.sh@ef109261:1185`, and check 19's re-worded `fail 19` by
     `MA_ROUNDS`'s `hit`s (S6). Each arm text is read statically by the leg, so the waiver of the suites'
@@ -511,10 +511,10 @@ bytes once its row lands and not `conf_to_policy.py`'s, which it imports, as it 
 ### The sweep
 
 Every name the body changes or removes, its callers, readers, fixtures, suite arms, pinned contracts
-and test populations, read at the branch tip `12e930f8`. Counts are PINNED to that commit; the
+and test populations, read at the branch tip `37486233`. Counts are PINNED to that commit; the
 commands below re-derive them, and a builder re-runs them at its base.
 
-| Changed or removed | Population at `12e930f8` | What keeps it green |
+| Changed or removed | Population at `37486233` | What keeps it green |
 |---|---|---|
 | `RUNAWAY_CEILING` | 23 PINNED lines in 6 files under `tools/`, and the gotcha record that cites it | S3 and S6 re-point every line; the tier2-review parity arm and the driver suite's `review_state` slice set `MAX_ROUNDS` themselves; the record keeps its text |
 | `REVIEW_ROUNDS`, `REVIEW_ROUNDS_DEFAULT` | 73 lines in 20 PINNED files under AC5's pathspec, 8 of them the default; outside it `help/policy.md`, three renders under `memory/guides/`, and two append-only records | S4's derived rule and AC5; the renders regenerate; `memory/DECISIONS.md` and `memory/backlog/TOOL.md` keep their text |
@@ -679,7 +679,7 @@ New arm: tools/unattended/unattended.test.sh and tools/unattended/check-unattend
   widens: none · relaxes: none
 - **F6 — How does check 2 grade a record written under the retired backstop of 8?** Check 2 reads
   every tracked `RUN*.md`, and its one `fail 2` takes every subject past its limit. The third builder
-  return measured, with check 2's own subject split over the tracked records at `c28d4e5f`, 69 subjects
+  return measured, with check 2's own subject split over the tracked records at `eab6ff8f`, 69 subjects
   over their subject's bound after this unit and 4 over `review.max-rounds` alone, all in append-only
   records no verb rewrites, so the `unattended kit gate` would red at the close. Options: (a) grandfather
   by the record's first-commit date, `rv_fc` (`tools/unattended/check-unattended.sh@f86fd49d:960`), the
@@ -767,7 +767,7 @@ New arm: tools/unattended/unattended.test.sh and tools/unattended/check-unattend
   prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-reground.md
 - rev-5 · 2026-11-16 · §1 · S1 · S2 · S3 · S4 · S6 · S7 · S9 · S10 · §4 · AC5 · AC7 · AC9 · AC10 · §7 · F1 · §10 ·
   the six findings of the first builder return,
-  build/2026-11-16-build-TOOL-dDeclaredLoop-21-1-builder-return.md, re-grounded at `131629c6`:
+  build/2026-11-16-build-TOOL-dDeclaredLoop-21-1-builder-return.md, re-grounded at `812dc9a3`:
   S4 and AC5 gain the readers `tools/loop/loop_witness.py`, `tools/unattended/pass-tree.test.sh`,
   `tools/policy/check_policy.py` and `tools/policy/legacy-homes.txt`, regenerated by its generator, and
   `help/policy.md`'s example row, with the by-value fixtures split into lines deleted and confs raised
@@ -787,7 +787,7 @@ New arm: tools/unattended/unattended.test.sh and tools/unattended/check-unattend
   `straggler-guard arms`, the legs whose guard holds `.memory-tree.conf`.
 - rev-7 · 2026-11-16 · S4 · S6 · §4 What this does not check · §4 Budgets and records · §4 Files touched ·
   AC6 · F6 · F7 · §10 · the divergence of the third builder return,
-  build/2026-11-16-build-TOOL-dDeclaredLoop-21-3-builder-return.md, re-grounded at `c28d4e5f`: check 2
+  build/2026-11-16-build-TOOL-dDeclaredLoop-21-3-builder-return.md, re-grounded at `eab6ff8f`: check 2
   grades a record's round count from `ROUND_BOUND_CUTOFF` by its first-commit date and a pre-cutoff
   record's by nothing; the driver suite's default policy is committed on the fixture's `main` before
   the ORIGIN push, the bound-1 arm landing its value on the tracking ref alone, and the 9, 8 and 0
@@ -795,7 +795,7 @@ New arm: tools/unattended/unattended.test.sh and tools/unattended/check-unattend
 - rev-8 · 2026-11-16 · S1 · S2 · S3 · S4 · S6 · S8 · §4 How the shell reads it · §4 What this does not
   check · §4 Files touched · §4 Budgets and records · section 5 · AC6 · AC8 · AC11 · §7 · F8 · F9 · F10 ·
   §10 · the divergence of the fourth builder return,
-  build/2026-11-16-build-TOOL-dDeclaredLoop-21-4-builder-return.md, re-grounded at `12e930f8`:
+  build/2026-11-16-build-TOOL-dDeclaredLoop-21-4-builder-return.md, re-grounded at `37486233`:
   `fanout_cap.py` stays byte-identical and `conf_to_policy.py` has `review_rounds.py` as its one caller;
   where the module or the policy kit does not resolve, the driver and check 2 read four kit defaults,
   the switch fixtures losing their line alone; `verb_preflight` reads no bound; section 5 carries the
@@ -817,7 +817,7 @@ seam that finds the module, and check 53's `resolve_kit_dir` read the seam check
 `fanout_cap.py` is no longer a seam this unit edits: its frozen bytes are read, not moved.
 `python tools/codebase-map/reuse_lookup.py "move a conf round bound into a policy key with an upgrade step"`
 ranked name stems (`key`, `load_conf`, `parse_conf`, `step` in `tools/govkit/govkit.py`) and found no
-upgrade-step code at base. At rev-5's re-grounding, `131629c6`, the step kind is built:
+upgrade-step code at base. At rev-5's re-grounding, `812dc9a3`, the step kind is built:
 `tools/govkit/upgrade_steps.py` is tracked and `fanout_cap.py` loads it, and the other step programs
 under `tools/govkit/steps/` move a schema, a floor or the charter's adopter rules, none a conf key into
 a policy key, so `fanout_cap.py` stays the one prior instance and S8 extracts at the second. The new

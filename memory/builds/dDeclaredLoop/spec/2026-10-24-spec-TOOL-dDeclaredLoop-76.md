@@ -103,7 +103,7 @@ repairs `TOOL-dDeclaredLoop-72`.
 
 ### Evidence
 
-Read at branch `unattended-declared-loop-d56bf0`, tip `689e1b07d`, through `git archive` into a scratch
+Read at branch `unattended-declared-loop-d56bf0`, tip `d9cec781e`, through `git archive` into a scratch
 copy, unless named otherwise. `tools/loop/` is absent from this worktree's main. `resolve_memory_root` and
 `read_driver_conf` are not built at that tip: they are read on the committed specs of
 `TOOL-dDeclaredLoop-72` rev-6 and `TOOL-dDeclaredLoop-70` rev-3.
@@ -248,7 +248,7 @@ in the scratch copy of the tip on 2026-11-16: each leads with a declared verb, `
 
 ### The sweep
 
-Read at the tip `689e1b07d` in the scratch copy; counts PINNED there unless named DERIVED.
+Read at the tip `d9cec781e` in the scratch copy; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
@@ -400,7 +400,7 @@ New arm: tools/loop/breakpoints.py · covers AC1 · the no-own-conf-read plant o
 - rev-5 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-97, written by the round-12 spec audit's disposal; nothing else moved.
 - rev-6 · 2026-11-16 · §1 to §10 · S1 to S5 · AC1 to AC5 · §8 F2, F3, F4 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `689e1b07d` and on the committed specs of TOOL-dDeclaredLoop-72
+  `unattended-declared-loop-d56bf0` at `d9cec781e` and on the committed specs of TOOL-dDeclaredLoop-72
   rev-6, TOOL-dDeclaredLoop-70 rev-3, TOOL-dDeclaredLoop-75 rev-9, TOOL-dDeclaredLoop-80 rev-5 and
   TOOL-dDeclaredLoop-86 rev-7, per the brief `2026-11-16-prompt-TOOL-dDeclaredLoop-76-1-spec-writer`: the
   goal restated over 72 rev-6's reader-call AC4; S1 written on 72's resolution, each return paired with

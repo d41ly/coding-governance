@@ -8,11 +8,11 @@ dispatch's saved edits and changed the gained-prune arm's D-to-E row to rev-7's 
 alone by `--fixture --plant`, standing in for its loop leg; the `leak` tree's case ran as its argv alone in a
 scratch work tree with both names exported, standing in for the `loop transition tables` leg; the govkit
 arm ran alone through a `python -c` import of the self-test module, standing in for the `govkit selftest`
-leg; and `python -c` and `grep -c` probes read the rest. The sweep re-run at this pass's base `2dc5d9496`
+leg; and `python -c` and `grep -c` probes read the rest. The sweep re-run at this pass's base `e8f1c26ae`
 held every design claim and every figure rev-7 pins: `requires = ["memory-tree"]` at the base, one
 `resolve_kit_dir("run-gates"` reach, no `--kits` selection naming `roles`, `loop` or `unattended` but
 unit 57's, the leg ceilings and budget rows as tabled, the lexicon offender pin at 1215 PINNED, the pass
-commits `59982f60c` and `47c98c1a2`, one PINNED row of this spec in the positional registry, no shell file
+commits `bbcbb2bab` and `6a946400b`, one PINNED row of this spec in the positional registry, no shell file
 edited, no watched kickoff path edited, and neither shared record written. The one change the spec did not
 state is deviation 793.
 
@@ -23,7 +23,7 @@ pass-commit probe, whose legs are gate runs. Owed RED-first, on the six `New arm
 and `no-confs` plants, the `guard.py` `push-merge-equal-to-every-parent` plant, the `position.py`
 `url-forms` rows, and the govkit `check_gained_prune_vintage` arm.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/budget.py --fixture --plant trailing-slash-agree` with every function the unit's pass

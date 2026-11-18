@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 33 is built: unit 19 (bcdcf0c79) shipped tools/loop/breakpoints.py, check_owner_gates, run_loop_verb and the driver census 342. Unit 33 of this order is parked INPROGRESS on a spec revision and writes nothing now. This unit's decision row has landed: the driver's refusal ceiling 342 to 343. The spec is rev-3, re-grounded at 2ce86cf07.
+  table's order. Every unit through build order 33 is built: unit 19 (6ffd8a882) shipped tools/loop/breakpoints.py, check_owner_gates, run_loop_verb and the driver census 342. Unit 33 of this order is parked INPROGRESS on a spec revision and writes nothing now. This unit's decision row has landed: the driver's refusal ceiling 342 to 343. The spec is rev-3, re-grounded at 782209fcb.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

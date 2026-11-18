@@ -146,7 +146,7 @@ reaches both conf functions through one loader (S6, §8 F5).
 
 ### The rev-4 items the built code or a committed spec settles
 
-Read on branch `unattended-declared-loop-d56bf0` at `759298f0f`.
+Read on branch `unattended-declared-loop-d56bf0` at `64e2a7e97`.
 
 | Item | What settles it |
 |---|---|
@@ -171,8 +171,8 @@ Read on branch `unattended-declared-loop-d56bf0` at `759298f0f`.
 
 ### Evidence
 
-Read at branch `unattended-declared-loop-d56bf0`, tip `759298f0f`, through `git show` and a `git archive`
-scratch copy of `a339daae2`, whose code is identical: the two differ only in records under
+Read at branch `unattended-declared-loop-d56bf0`, tip `64e2a7e97`, through `git show` and a `git archive`
+scratch copy of `083cd0a32`, whose code is identical: the two differ only in records under
 `memory/builds/`. `tools/loop/` is absent from this worktree's main. `derive_conf_reads`,
 `derive_conf_constants`, `derive_fixture_boundary`, `derive_docstring_ids` and the `conf-read-forms` plant
 are not built at that tip, and are read on the committed specs §5 "Dependency" names.
@@ -186,14 +186,14 @@ are not built at that tip, and are read on the committed specs §5 "Dependency" 
 - `tools/memory-tree/merge-rows.py#read_kit_conf` is the idiom: module-level `_KIT_CONF = None`, then
   `global _KIT_CONF`, `with open(root / ".memory-tree.conf", ...)` and `_KIT_CONF = conf` in the function.
   The conf name is in the `with`, not in the rebinding's value. S3's second row plants that shape.
-- A probe of every `*.py` under `tools/`, 188 files PINNED at `a339daae2`, counted 28 functions holding a
+- A probe of every `*.py` under `tools/`, 188 files PINNED at `083cd0a32`, counted 28 functions holding a
   `global` statement in their own body, nested definitions excluded. One of them, `read_kit_conf`, holds a
   conf name in its subtree outside docstrings.
   The same probe counted module-level `For` 64 times PINNED, `With` 29 times PINNED, `NamedExpr` once,
   `ExceptHandler` 32 times PINNED and `Match` 0 times PINNED, all at that tip.
 - The same probe over `tools/loop/loop_lib.py` answered no name to either pass of S1 nor to 87 S1's walk.
   `tools/loop/loop_lib.py#read_driver_conf` and `tools/loop/loop_lib.py#resolve_memory_root` hold
-  `.unattended.conf` and declare no `global`: PINNED, `a339daae2`.
+  `.unattended.conf` and declare no `global`: PINNED, `083cd0a32`.
 - `tools/loop/loop_lib.py#read_memory_tree` resolves the memory-tree kit and puts it on `sys.path`; its
   callers import inline after it. `loop_transition.py` reaches `tree_lib` twice that way,
   `tools/loop/loop_witness.py#read_clean_env` and `upstream.py` once each, and `loop_lib.py` not at all.
@@ -300,7 +300,7 @@ writes `loop_lib.py`, `budget.py` and `symbols.json` again over what this pass l
 
 ### The sweep
 
-Read at `759298f0f`; counts PINNED there unless named DERIVED.
+Read at `64e2a7e97`; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
@@ -387,7 +387,7 @@ Each `python budget.py` and `python -c` command below runs in the loop kit's fol
   `grep -c "derive_conf_rebinds"` prints at least 1.
   Red when: the README describes `derive_conf_constants` by the binding set alone beside code that answers
   the union.
-  figure: each prints 0 at `759298f0f`, PINNED.
+  figure: each prints 0 at `64e2a7e97`, PINNED.
 - **AC4** — When `python -c "import loop_lib; print(loop_lib.derive_conf_rebinds.__doc__)"` is piped, one
   run each, to `grep -c "NOT SEEN"`, `grep -c "except"`, `grep -c "capture pattern"`,
   `grep -cF "globals()"`, `grep -c "setattr"`, `grep -c "import"`, `grep -c "class body"`,
@@ -461,7 +461,7 @@ New arm: tools/loop/budget.py · covers AC1 · the global-loader, with-held load
 - rev-4 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-99, written by the round-12 spec audit's disposal; nothing else moved.
 - rev-5 · 2026-11-17 · §1 · S1 to S6 · §3 · §4 · §5 · AC1 to AC5 · §7 · §8 · §10 · re-grounded on
-  branch/unattended-declared-loop-d56bf0 at `759298f0f` by the brief
+  branch/unattended-declared-loop-d56bf0 at `64e2a7e97` by the brief
   2026-11-17-prompt-TOOL-dDeclaredLoop-89-1-spec-writer; mechanism, carries, order and status kept. This
   unit builds before 88 at order 44, so S2 writes the union. 82, 86 and 87 are CLOSED by then (F4): S4
   restates the class in the loop kit's README table and S5 lists the unseen forms in the pass's

@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Units through order 28 are built, the last 21 (review bounds as policy keys) and 30 (tools/loop/budget.py, the rework budget). Unit 34 is deferred. 48 rev-3 was re-grounded at b1d66ba26 with a sweep in its section 5; unit 49 (same order) also edits read_budget_rows and builds after you.
+  table's order. Units through order 28 are built, the last 21 (review bounds as policy keys) and 30 (tools/loop/budget.py, the rework budget). Unit 34 is deferred. 48 rev-3 was re-grounded at c6e66bfc4 with a sweep in its section 5; unit 49 (same order) also edits read_budget_rows and builds after you.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

@@ -747,7 +747,7 @@ New arm: tools/loop/factories.py · covers AC7 · `scenario-hand`, a hand pack r
   scenario rows' page is deferred and the kinds page re-renders; `kind.scenario` names `binds` and
   `gate`, and its leg carries `enforces`.
 - rev-4 · 2026-11-15 · §1 · S1 to S13 · §3 · §4 · §5 · AC1 to AC12 · §7 · §8 F1 F3 F5 F6 F7 F8 F9
-  F10 F11 F12 · §10 · re-grounded at `68a3569b6`, the tip of branch/unattended-declared-loop-d56bf0, by
+  F10 F11 F12 · §10 · re-grounded at `916df427f`, the tip of branch/unattended-declared-loop-d56bf0, by
   the brief 2026-11-15-prompt-TOOL-dDeclaredLoop-27-1-spec-writer; mechanism, carries, order and status
   kept. The kind fills the pending `kind.scenario` row, binds as read, its leg enforcing
   `principle.p16` and `principle.p8` (F6); the namespace's `source` is the pack's path; the activatable

@@ -132,7 +132,7 @@ The labels keep their rev-5 numbers; every other rev-5 item is in §3's table.
 
 ### The rev-5 items the built code, a committed spec or a frozen record settles
 
-Read on branch `unattended-declared-loop-d56bf0` at `9c06b8ef8`. "CLOSED here" means CLOSED when this
+Read on branch `unattended-declared-loop-d56bf0` at `bbad7b0e4`. "CLOSED here" means CLOSED when this
 unit builds, at order 45. Each item's criterion leaves with it.
 
 | Item | What settles it |
@@ -220,7 +220,7 @@ repository, and probes the parent of its own folder for the memory-tree kit.
 
 ### Evidence
 
-Read at branch `unattended-declared-loop-d56bf0`, tip `9c06b8ef8`, through `git archive` into a scratch
+Read at branch `unattended-declared-loop-d56bf0`, tip `bbad7b0e4`, through `git archive` into a scratch
 copy; `tools/loop/` is absent from this worktree's main. `derive_docstring_ids`, `derive_conf_constants`,
 `derive_constant_charges`, `derive_conf_rebinds`, `load_tree_lib`, the `conf-read-forms` plant and the
 fixture boundary are not built at that tip: they are read on the committed specs §5 "Dependency" names.
@@ -247,7 +247,7 @@ fixture boundary are not built at that tip: they are read on the committed specs
 - `tools/loop/budget.py#run_budget_plant` makes its scratch folder with `tempfile.mkdtemp`, and its
   `no-own-conf-read` case grades `budget.py` itself through `derive_conf_reads` and writes no scratch
   tree. `budget.py` binds `KIT` to its own folder and imports `read_memory_tree` from `loop_lib`.
-- Branch commit `954deee7d` is the install-prefix red fix that named a scratch kit folder `KIT.name`
+- Branch commit `90d25c629` is the install-prefix red fix that named a scratch kit folder `KIT.name`
   in place of a typed `loop`.
 - `tools/loop/guard.py#build_failure_detail` spells an `OSError` as `"start failed: %s" % outcome`.
 - The push arm paragraph of `guard.py`'s module docstring says the re-merge is in one of five states.
@@ -313,7 +313,7 @@ The pass mints no function.
 
 ### The sweep
 
-Read at the tip `9c06b8ef8` in the scratch copy; counts PINNED there unless named DERIVED.
+Read at the tip `bbad7b0e4` in the scratch copy; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
@@ -504,7 +504,7 @@ New arm: tools/loop/budget.py · covers AC2 AC5 · the annotation-only, subscrip
 - rev-5 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-100, written by the round-12 spec audit's disposal; nothing else moved.
 - rev-6 · 2026-11-17 · §1 to §10 · S1 to S22 · AC1 to AC22 · §8 F1 to F8 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `9c06b8ef8` and on the committed specs of TOOL-dDeclaredLoop-80
+  `unattended-declared-loop-d56bf0` at `bbad7b0e4` and on the committed specs of TOOL-dDeclaredLoop-80
   rev-6, 82 rev-7, 86 rev-8, 87 rev-6, 88 rev-6 and 89 rev-5, per the brief
   2026-11-17-prompt-TOOL-dDeclaredLoop-90-1-spec-writer; mechanism, carries, order and status kept. No
   sibling spec is amended, each being CLOSED by order 45 (F5): seventeen items and their criteria move to

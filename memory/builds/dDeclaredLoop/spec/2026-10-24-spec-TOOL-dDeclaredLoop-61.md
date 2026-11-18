@@ -166,7 +166,7 @@ for row in rows:                       # rows as read today, in order
 - observability — the id is in the `<row>` of `draw`'s `loop: budget · drawn · <row>` line and in each
   `disagrees` line, so a repeated or missing id is visible where the row is printed.
 - risks — what this change could newly red, and what keeps each green, read at branch
-  `unattended-declared-loop-d56bf0`, `a68d80da`, through `git show`:
+  `unattended-declared-loop-d56bf0`, `9a726bbc`, through `git show`:
   - the callers: `read_budget_rows`, `record_draw`, `render_budget_fields`, `write_budget_rows` and
     `budget_state` are called from `tools/loop/budget.py` and `tools/loop/loop_transition.py#write_transition`
     alone. The transition writer passes `record_draw`'s rows to `write_transition_record`,
@@ -174,7 +174,7 @@ for row in rows:                       # rows as read today, in order
     reads `ROW`'s groups 3 to 6, so a trailer never carries the id. `tools/memory-tree/build_records.py#write_record`
     refuses a line only for a newline or a field shape, which the id is not.
   - `loop budget fixtures`, the module's own plants at the tip, sixteen PINNED by the grep below. These
-    needles, nine PINNED at `a68d80da`, pin a row's end and red under the id, each kept green by S6's cut:
+    needles, nine PINNED at `9a726bbc`, pin a row's end and red under the id, each kept green by S6's cut:
 
     | Plant | Needle at the tip | Under S1 |
     |---|---|---|
@@ -326,7 +326,7 @@ New arm: tools/loop/budget.py · covers AC1 AC2 AC3 · the extended `parallel-ap
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-75, written by the round-3 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-16 · §1 to §10 · S1 to S7 · AC1 to AC3 · §8 F2 to F4 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `a68d80da`, per the brief
+  `unattended-declared-loop-d56bf0` at `9a726bbc`, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-61-1-spec-writer`: S2 refines the count 30 S3 built; the id
   sits before a patch row's suffix (F2); a malformed id is refused (F3); the identical merge rides the
   built `parallel-append` plant (F4) and `legacy-rows` and `id-on-every-home` become one new plant and

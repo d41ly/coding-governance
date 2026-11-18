@@ -16,7 +16,7 @@ named it in the manifest), the `core meta-check` leg (AC10's second command), an
 observation of each `New arm:` line of the spec's section 7: `tools/loop/loop_lib.py`,
 `tools/roles/adopt-roles.test.sh` and `tools/playbook/instruction_units.py`.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 The `missing-step` plant of `tools/loop/loop_lib.py`, whose planted defect is the staged break, exited 1 over

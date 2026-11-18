@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 47 is built: unit 92 (c6a5756b5) carries the git-env-leaks block inline in loop_witness.py and spells an OSError with no text by its class name, with the push-merge-tree-fatal plant's no-message and errno-alone rows (8 of 8 held) and the guard row at 141 s; unit 93 (77a7e1a26) observed it. The spec is rev-4 (2d81bbac4): only S20 and S21 still build.
+  table's order. Every unit through build order 47 is built: unit 92 (a5b0b73e4) carries the git-env-leaks block inline in loop_witness.py and spells an OSError with no text by its class name, with the push-merge-tree-fatal plant's no-message and errno-alone rows (8 of 8 held) and the guard row at 141 s; unit 93 (3af8c467e) observed it. The spec is rev-4 (bfe9daef0): only S20 and S21 still build.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

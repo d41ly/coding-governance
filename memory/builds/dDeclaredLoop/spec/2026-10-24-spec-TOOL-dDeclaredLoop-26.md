@@ -357,7 +357,7 @@ Live at landing: the pin only narrows what a mid-step reader sees, and no caller
     `read_composed_items` does the same, since `composition.py` imports `loop_items`.
   - `lexicon naming predicates`: the eight functions of §4 Inventory each lead with a declared verb, so
     the offender count stays at `VERB_OFFENDER_PIN`, 1209 PINNED at `.lexicon.conf` on the branch
-    `dac974418eab`.
+    `68466ea7c24e`.
   - the shared records: the pass writes neither `memory/DECISIONS.md` nor
     `memory/project/readme-contract.txt`, the `SHARED_RECORDS` of `.unattended.conf`, and owes no
     decision row, since no ceiling moves.
@@ -552,7 +552,7 @@ New arm: tools/loop/loop_transition.py · covers none · the `field` plant's `co
   `2026-11-05-prompt-TOOL-dDeclaredLoop-56-owner-forks-cascade`: the leg keeps `principle.p8`; S8 takes
   the stale pending row of its tag, and AC8 observes the core meta-check green.
 - rev-5 · 2026-11-15 · S1 to S9 · §1 · §3 · §4 · §5 · AC1 to AC8 · §7 · §8 F6 F7 F8 · §10 · re-grounded
-  on the code of branch `unattended-declared-loop-d56bf0` at `dac974418eab`, per the brief
+  on the code of branch `unattended-declared-loop-d56bf0` at `68466ea7c24e`, per the brief
   `2026-11-15-prompt-TOOL-dDeclaredLoop-26-1-spec-writer`. The `compose --kind item` verb and
   `read_composition` landed with unit 24, so `read_composition_at` wraps that read and position's call
   of it; no population runs, the item rows being the namespace source's blob at `HEAD`. The policy is
@@ -564,7 +564,7 @@ New arm: tools/loop/loop_transition.py · covers none · the `field` plant's `co
   §5 names every row, pin, budget and fixture the change reaches.
 - rev-6 · 2026-11-16 · S3 S4 · §1 · §4 · §5 · AC1 · §7 · §8 F9 · §10 · answers the four findings of
   the builder return `2026-11-16-build-TOOL-dDeclaredLoop-26-1-builder-return`, re-read on branch
-  `unattended-declared-loop-d56bf0` at `fa3b7151c`: Files touched and §5 gain the loop dossier's claim,
+  `unattended-declared-loop-d56bf0` at `29ae1bda1`: Files touched and §5 gain the loop dossier's claim,
   the four generated map files and `tools/loop/README.md`; §1 and S3 read through `read_composed_items`,
   which takes the pin's revision (F9 (a)), adding `tools/loop/loop_items.py`; S4 and The carry find the
   tag resolver under the repository being read; The plants name the scratch's branch `main`; C1 is the
@@ -573,7 +573,7 @@ New arm: tools/loop/loop_transition.py · covers none · the `field` plant's `co
 
 ## 10. Reuse audit
 
-The seams this unit extends, each read at `dac974418eab`: `read_composition` and
+The seams this unit extends, each read at `68466ea7c24e`: `read_composition` and
 `build_scratch_tree` in `tools/loop/loop_items.py`, the item composition and its scratch of real kits;
 `TRANSITION_FIELDS`, `write_transition` and `read_transitions` in `tools/loop/loop_transition.py`;
 `resolve_commit`, `read_git` and `read_clean_env` in `tools/loop/loop_witness.py`; `read_policy_kit` in
@@ -587,7 +587,7 @@ with" ranked `read_change_records`, `write_change`, `read_change` and `derive_su
 practice's `replaces` map and the others the record's own readers, which §4 Alternatives rejected
 weighs. No existing seam pins a composition on a move: scout A found every build reads the landed tip
 (`memory/builds/dDeclaredLoop/build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-a.md:33`). The
-order writer has no reachable seam (§8 F6). At rev-6, read at `fa3b7151c`, position's item read is
+order writer has no reachable seam (§8 F6). At rev-6, read at `29ae1bda1`, position's item read is
 `read_composed_items` in `tools/loop/loop_items.py`, the seam S3 extends with a revision (§8 F9), and
 the resolver is found by the loop kit's `resolve_kit_dir` under the repository being read.
 

@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every roster unit through order 51 is CLOSED (unit 34 deferred against ask TOOL-dDeclaredLoop-113); the closing diff review promoted its findings to units 115, 116 and 117, and 115 is CLOSED at 799cb4b7d. This unit is round 1's HIGH item 2.
+  table's order. Every roster unit through order 51 is CLOSED (unit 34 deferred against ask TOOL-dDeclaredLoop-113); the closing diff review promoted its findings to units 115, 116 and 117, and 115 is CLOSED at 1ac15a9dd. This unit is round 1's HIGH item 2.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

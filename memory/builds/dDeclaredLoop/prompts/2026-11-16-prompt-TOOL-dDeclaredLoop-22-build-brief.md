@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 31 is built, and of order 32 units 20 (3b094c89b, `--trigger`, `review_dispose.py`), 21, 28, 30, 31 and 32 are CLOSED; unit 50 is parked INPROGRESS on a rev-4 spec and writes no file this pass touches. This unit's decision row has landed in `memory/DECISIONS.md` re-based over unit 20: the driver's refusal ceiling 338 to 340 and the Skill size row 10922 to 10967. The spec's own figures (335 to 337, 10848 to 10893) predate unit 20 and are stale: build on the landed row's figures and record the difference as a deviation.
+  table's order. Every unit through build order 31 is built, and of order 32 units 20 (ffbe05eb4, `--trigger`, `review_dispose.py`), 21, 28, 30, 31 and 32 are CLOSED; unit 50 is parked INPROGRESS on a rev-4 spec and writes no file this pass touches. This unit's decision row has landed in `memory/DECISIONS.md` re-based over unit 20: the driver's refusal ceiling 338 to 340 and the Skill size row 10922 to 10967. The spec's own figures (335 to 337, 10848 to 10893) predate unit 20 and are stale: build on the landed row's figures and record the difference as a deviation.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

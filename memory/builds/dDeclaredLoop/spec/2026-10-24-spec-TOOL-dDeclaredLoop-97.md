@@ -90,7 +90,7 @@ one source, and a reader added later is one entry. It builds at order 50, before
 ### Evidence
 
 Read or probed 2026-11-17 on node `d`: PINNED, that date. Every read is of
-`branch/unattended-declared-loop-d56bf0` at `5031e98fd`, its `tools/` and `memory/` written by
+`branch/unattended-declared-loop-d56bf0` at `c35e8d15d`, its `tools/` and `memory/` written by
 `git archive` into the run's scratch directory, since this worktree is cut from main, which lacks the
 loop kit. 95 rev-3 was read from the dispatcher's pending copy, not yet on the branch. Each staged break
 and the prototype of S1 and S2 ran in a scratch copy of `tools/loop/`, `tools/lib/` and
@@ -98,7 +98,7 @@ and the prototype of S1 and S2 ran in a scratch copy of `tools/loop/`, `tools/li
 
 - `tools/loop/loop_lib.py#derive_conf_reads` answers `reader call` where the callee name is in the
   literal `("read_design_conf", "read_driver_conf", "parse_conf")` inside its body, and its docstring
-  names the same three. `git log -S` over `loop_lib.py` finds that literal first in `92f119c11`, 76's
+  names the same three. `git log -S` over `loop_lib.py` finds that literal first in `199b4aa16`, 76's
   build. `grep -c '"read_design_conf", "read_driver_conf", "parse_conf"' tools/loop/loop_lib.py`
   prints 1.
 - `grep -rn read_tree_conf tools/` prints nothing, and an import of `loop_lib` has no `CONF_READERS`.

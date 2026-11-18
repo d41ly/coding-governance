@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 32 is built: unit 50 (fbc3a11fe) declared the six item.review rows and edited help/loop.md's example block, and unit 22 (0ed098afd) added the recommendation kind and --recommend. The spec is rev-3, re-grounded at 2d99e7784: its scope is the item.design.reason row's actor and allowance, and help/loop.md's count line.
+  table's order. Every unit through build order 32 is built: unit 50 (ee517e052) declared the six item.review rows and edited help/loop.md's example block, and unit 22 (d065715b4) added the recommendation kind and --recommend. The spec is rev-3, re-grounded at 0116f2d9b: its scope is the item.design.reason row's actor and allowance, and help/loop.md's count line.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

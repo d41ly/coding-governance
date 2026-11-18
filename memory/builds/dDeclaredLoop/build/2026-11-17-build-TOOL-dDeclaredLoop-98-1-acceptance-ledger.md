@@ -4,7 +4,7 @@
 
 No merge bar, no self-test suite and no gate leg ran in this pass. The criteria were observed on node `d`
 (win32), at rev-2 of the spec, over the working tree, by the first dispatch, which started from the base
-`6d0b2a447`. The `conf-read-forms` plant of `budget.py`, run alone by `--fixture --plant`, stands in for the
+`bb8d57327`. The `conf-read-forms` plant of `budget.py`, run alone by `--fixture --plant`, stands in for the
 `loop budget fixtures` leg's run of that plant; the `no-own-conf-read` plants of `budget.py` and
 `breakpoints.py`, each run alone, stand in for that leg's and the `loop breakpoint fixtures` leg's runs of
 them, and both printed `held`. The AC3 probe, run by `python -I`, stands in for nothing a leg runs. Each
@@ -22,7 +22,7 @@ Owed to the close: every leg section 7 names, the `loop budget fixtures` leg amo
 observation of the `New arm:` line covering AC1 and AC2, the declared readers seen row staged with the
 rule's callee set restored to the literal pair and with an empty tuple.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/budget.py --fixture --plant conf-read-forms` with the reader-call callee set restored to

@@ -14,7 +14,7 @@ Owed to the close: every leg the spec's section 7 names, `govkit selfcheck` and 
 among them, AC4's scratch-copy selfcheck runs, AC5 again over the landing's reconciled tree, and the
 RED-first observation of the `New arm:` line, staged against the base emitter and the base 7h.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 Not observed: the arm in `tools/govkit/selftest.py`, a suite arm, left unrun for the owner's opt-in slow-suite

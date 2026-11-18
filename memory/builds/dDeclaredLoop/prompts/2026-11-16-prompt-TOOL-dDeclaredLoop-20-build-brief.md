@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Units through order 30 are built: 21 (review bounds), 30/48/49/61/60/62 (the rework budget and its homes), 32 (convergence routing, --fix-pass, budget.py target) and 31 (6a3174eb0, --exhausted, the ending rows, census 335). 20 rev-5 was grounded at 02524cadf while 31 built: read 31's code as shipped. Its decision row (ceiling 335 -> 338, Skill row 10848 -> 10922) has landed. Unit 50 (order 32) writes the review [[item]] rows; you write none.
+  table's order. Units through order 30 are built: 21 (review bounds), 30/48/49/61/60/62 (the rework budget and its homes), 32 (convergence routing, --fix-pass, budget.py target) and 31 (c7f4ef116, --exhausted, the ending rows, census 335). 20 rev-5 was grounded at 0a3c9e057 while 31 built: read 31's code as shipped. Its decision row (ceiling 335 -> 338, Skill row 10848 -> 10922) has landed. Unit 50 (order 32) writes the review [[item]] rows; you write none.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

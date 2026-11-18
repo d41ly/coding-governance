@@ -8,7 +8,7 @@ DIVERGENCE: section 6 (AC3) can't hold alongside AC1 and the plant code already 
 
 ## Summary
 
-I didn't build TOOL-dDeclaredLoop-91 and made no commit: acceptance criterion AC3 can't pass against code that is already in the tree (see `why`). The worktree is clean at base d346d8d2c354c05b9a64e266601c5591c644bf29. Nothing was edited, so there is no patch file to save, and I didn't re-run `--brief`, because line 441 of RUN.md already records this brief.
+I didn't build TOOL-dDeclaredLoop-91 and made no commit: acceptance criterion AC3 can't pass against code that is already in the tree (see `why`). The worktree is clean at base ed327ccd215a9e4df4468071000ebd97f3bf3e42. Nothing was edited, so there is no patch file to save, and I didn't re-run `--brief`, because line 441 of RUN.md already records this brief.
 
 How I found it: I read the spec (rev-3) and the brief whole, then checked the spec's claims against C:/projects/coding-governance/.claude/worktrees/unattended-declared-loop-d56bf0/tools/loop/loop_lib.py (`derive_conf_rebinds`, `check_conf_name`, `load_tree_lib`, `derive_conf_constants`) and C:/projects/coding-governance/.claude/worktrees/unattended-declared-loop-d56bf0/tools/loop/budget.py (the `conf-read-forms` branch of `run_budget_plant`). I also checked unit 88's spec for its S33 rows, which require the update command in their output, the kickoff manifest's watch line (it names no file under tools/loop) and the positional-refs rows for this spec. This was reading the source only. No gate, suite, plant or probe ran, so none of them stands in for any gate.
 

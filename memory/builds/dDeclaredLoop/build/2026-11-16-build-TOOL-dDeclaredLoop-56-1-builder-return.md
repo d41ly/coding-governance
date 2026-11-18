@@ -31,7 +31,7 @@ Every other sweep claim held at HEAD:
 
 I did not build TOOL-dDeclaredLoop-56 and committed nothing. The write-set declaration (`--dispatch`) refused the pass with check 49: this unit's spec says it consumes from unit 70, which is DEFERRED and builds after it. The edge in §3 Edges is reversed and needs the spec writer to flip it; the full list is in `why`.
 
-- **Repository state:** HEAD is unchanged at 8b06bb0a4. The refused dispatch wrote nothing to `RUN.md`. No product file was edited, so there is no patch to save. The two untracked unit-79 prompt files in the tree belong to another session.
+- **Repository state:** HEAD is unchanged at 1f23a1576. The refused dispatch wrote nothing to `RUN.md`. No product file was edited, so there is no patch to save. The two untracked unit-79 prompt files in the tree belong to another session.
 - **Checks run before the refusal:** I re-ran the spec's sweep against HEAD, reading every file it cites, and printed the docs fingerprints for the scripts this unit touches (`python tools/govkit/docs_leg.py --fingerprints`). `verb:unattended.sh:--claims` reads 4da4f494 with no page anchoring it yet. Every design claim held; the only failures are the edge, two stale counts and three gaps, all in `why`.
 - **Blocked:** one attempted read of `check_runbook_parity.py` was refused by the role hook as the gate leg "govkit runbook parity". I relied on the task's figure of 18 problems at HEAD instead.
 - **No gate ran,** so nothing stands in for any section 7 leg.

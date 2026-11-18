@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 40 is built: unit 79 (a8b4dca02, the round-4 audit's minors) built on its second dispatch from spec rev-7, after a divergence on its gained-prune row. The spec is rev-7, re-grounded on the branch on the committed specs of units 72, 67, 74, 75, 76, 77, 79 (rev-6) and 80 and the CLOSED 78; 79's rev-7 changed only its S19 and its driver-conf sketch, neither of which this spec cites.
+  table's order. Every unit through build order 40 is built: unit 79 (f424a1eb8, the round-4 audit's minors) built on its second dispatch from spec rev-7, after a divergence on its gained-prune row. The spec is rev-7, re-grounded on the branch on the committed specs of units 72, 67, 74, 75, 76, 77, 79 (rev-6) and 80 and the CLOSED 78; 79's rev-7 changed only its S19 and its driver-conf sketch, neither of which this spec cites.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

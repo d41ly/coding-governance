@@ -96,7 +96,7 @@ Not supplied, optional: `input:code`.
 > drop spec-audit: from this build's README and from the run's pinned fact; rearm the unattended session and continue
 
 — owner, 2026-11-13. The re-ground of TOOL-dDeclaredLoop-88 (its rev-6, not yet committed) has S33 create `load_tree_lib()`
-in `tools/loop/loop_lib.py` (its §8 F7). Unit 89's committed rev-5 (at 240095e82) mints the same function in its S6 and §8 F5,
+in `tools/loop/loop_lib.py` (its §8 F7). Unit 89's committed rev-5 (at bd4ee63bc) mints the same function in its S6 and §8 F5,
 and 89 builds before 88 at order 44. Two specs minting one name is a divergence waiting for the second builder.
 
 ### brief:goal

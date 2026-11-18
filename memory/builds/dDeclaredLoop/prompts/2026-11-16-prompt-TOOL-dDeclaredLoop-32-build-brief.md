@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Units through order 28 are built, and of order 29 units 48 (1551afb16, the budget's homes under every transitions.record set) and 49 (6dd0d7f01, an advisory typed figure and transition records merged by union) are built. 32 rev-5 was grounded at 50f5dea5d, before 48 and 49: read their code in tools/loop/budget.py as shipped. Its decision row (ceiling 329 -> 332, Skill row 10755 -> 10815) has landed.
+  table's order. Units through order 28 are built, and of order 29 units 48 (d7d833cb5, the budget's homes under every transitions.record set) and 49 (2b81b2421, an advisory typed figure and transition records merged by union) are built. 32 rev-5 was grounded at 1d284c8b4, before 48 and 49: read their code in tools/loop/budget.py as shipped. Its decision row (ceiling 329 -> 332, Skill row 10755 -> 10815) has landed.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

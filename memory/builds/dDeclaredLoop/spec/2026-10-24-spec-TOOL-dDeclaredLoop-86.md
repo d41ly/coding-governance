@@ -150,7 +150,7 @@ frozen record settles" says what settles each, keeping its number (§8 F5).
 
 ### The rev-7 items the built code, a committed spec or a frozen record settles
 
-Read on branch `unattended-declared-loop-d56bf0` at `77130f241`.
+Read on branch `unattended-declared-loop-d56bf0` at `b1c2347b8`.
 
 | Item | What settles it |
 |---|---|
@@ -251,7 +251,7 @@ matches, since `run_fixture` tests `needle in said`.
 
 ### Evidence
 
-Read at branch `unattended-declared-loop-d56bf0`, tip `77130f241`, through `git archive` into a
+Read at branch `unattended-declared-loop-d56bf0`, tip `b1c2347b8`, through `git archive` into a
 scratch copy, unless named otherwise. `tools/loop/` is absent from this worktree's main.
 `derive_conf_reads`, `derive_fixture_boundary`, `derive_docstring_ids`, the `no-own-conf-read`,
 `conf-read-forms` and `url-forms` plants and the HTTP fetch are not built at that tip: they are read on
@@ -352,7 +352,7 @@ with the declared verb `derive`, run in the scratch copy of the tip on 2026-11-1
 
 ### The sweep
 
-Read at the tip `77130f241` in the scratch copy; counts PINNED there unless named DERIVED.
+Read at the tip `b1c2347b8` in the scratch copy; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
@@ -545,7 +545,7 @@ New arm: tools/loop/position.py · covers AC9 · the url-forms fetches with the 
 - rev-7 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-98, written by the round-12 spec audit's disposal; nothing else moved.
 - rev-8 · 2026-11-16 · §1 · S1 to S22 · §3 · §4 · §5 · AC1 to AC22 · §7 · §8 · §10 · re-grounded on
-  branch/unattended-declared-loop-d56bf0 at `77130f241` by the brief
+  branch/unattended-declared-loop-d56bf0 at `b1c2347b8` by the brief
   2026-11-16-prompt-TOOL-dDeclaredLoop-86-1-spec-writer; mechanism, carries, order and status kept.
   Every sibling rev bump leaves scope, the specs being CLOSED by order 42 (F5): S1, S3, S4, S5, S7, S8,
   S11, S12, S14, S16 to S20 and their criteria move to §3's table with what settles each, numbers kept.

@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-116 — the five loop readers left on the memory tree's conf take the records root from `resolve_memory_root`
 
-**Status:** CLOSED · rev-1 · 2026-11-17 · node a · Tier-2 · base a4256373 · streams tooling · order 53
+**Status:** CLOSED · rev-1 · 2026-11-17 · node a · Tier-2 · base 017b0299 · streams tooling · order 53
 
 **Derived:** TOOL-dDeclaredLoop-72
 
@@ -98,7 +98,7 @@ each reader follow it.
 
 ## 4. Design
 
-Every code claim below was read at the build branch's tip, a42563736 on
+Every code claim below was read at the build branch's tip, 017b0299f on
 `branch/unattended-declared-loop-d56bf0`, through `git show` and `git archive`; this worktree is cut
 from `main`, which holds no loop kit.
 
@@ -231,7 +231,7 @@ not a name.
 - risks — the configuration change in the row above is the one behaviour a working tree could see:
   before, these five readers read `records` there while the driver wrote under `memory`; after, they
   refuse naming both confs, as every other loop reader does. Gov's own two confs both name `memory`
-  (PINNED at a4256373), so every answer in this tree keeps its bytes.
+  (PINNED at 017b0299), so every answer in this tree keeps its bytes.
 - dependency — order 53, after TOOL-dDeclaredLoop-115 (order 52, `tools/loop/guard.py`, round-1
   item 1) and before TOOL-dDeclaredLoop-117 (order 54). That unit edits `tools/loop/loop_lib.py` for
   round-1 items 3 and 4, at `derive_conf_openers` and the plant branch of `main`; this unit edits only
@@ -263,10 +263,10 @@ not a name.
   - the `no-own-conf-read` plants of `budget.py` and `breakpoints.py`: the new case sits inside
     `run_budget_plant`, a definition `derive_fixture_boundary` answers, and calls no `CONF_READERS`
     member, so `derive_conf_reads` over `budget.py` still answers nothing.
-  - `PLANTS` in `budget.py`: 33 plants, PINNED at a4256373, become 34; `run_selftest` derives its
+  - `PLANTS` in `budget.py`: 33 plants, PINNED at 017b0299, become 34; `run_selftest` derives its
     cases from the dict, so the self-test owes the new plant `held` with no list to edit.
 - registry, budgets, ceilings and maps, each the change could newly red and what keeps it green:
-  - `.lexicon.conf` `VERB_OFFENDER_PIN`, 1215 at the tip (PINNED a4256373): no function name is
+  - `.lexicon.conf` `VERB_OFFENDER_PIN`, 1215 at the tip (PINNED 017b0299): no function name is
     minted, so no suggest call is owed and the offender count does not move.
   - `.unattended.conf` `SHARED_RECORDS`: no pass of this unit writes `memory/DECISIONS.md` or
     `memory/project/readme-contract.txt`.
@@ -277,7 +277,7 @@ not a name.
     `loop_parents.py` and `upstream.py` declare flags, and no flag or verb changes; a plant id is not a
     flag, so no usage pin and no help anchor moves.
   - `tools/run-gates/selftest-budgets.txt`, row `loop budget fixtures`: not edited; it grades an
-    overrun of its value, 498 (PINNED a4256373), and the close's reading of the leg decides whether it
+    overrun of its value, 498 (PINNED 017b0299), and the close's reading of the leg decides whether it
     moves.
   - `memory/map/generated/symbols.json`: no symbol added or renamed, and its rows carry no line, so it
     does not move.
@@ -332,7 +332,7 @@ not a name.
   Red when: any of the four modules still calls `read_design_conf`, or a `MEMORY_ROOT` read outside
   the resolver survives, `read_builds_dir`'s included.
   figure: the tip answers a `reader call` in each of the four modules and six `get("MEMORY_ROOT")`
-  lines, PINNED at a4256373; the close's answer is DERIVED by the two commands.
+  lines, PINNED at 017b0299; the close's answer is DERIVED by the two commands.
   ```
   python -I -c "import sys; sys.path.insert(0, 'tools/loop'); from loop_lib import derive_conf_reads; [print(m, derive_conf_reads('tools/loop/' + m)) for m in ('adapt.py', 'position.py', 'loop_parents.py', 'upstream.py')]"
   git grep -n 'get("MEMORY_ROOT")' -- 'tools/loop/*.py'

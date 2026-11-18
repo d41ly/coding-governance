@@ -4,7 +4,7 @@
 
 No merge bar, no self-test suite and no gate leg ran in this pass. The criteria were observed on node `d`
 (win32), at rev-2 of the spec, over the working tree, by the first dispatch, which started from the base
-`919b359bd`. The plant run alone by `--fixture --plant`, and once through `main` in process from a
+`d4859d0cd`. The plant run alone by `--fixture --plant`, and once through `main` in process from a
 `python -I -c` probe, stands in for the `loop definition fixtures` leg's `--selftest` run of that plant
 against its owed row. Each staged break was observed in a scratch copy of the loop, lib and memory-tree kit
 folders outside the tree, each break inserted or substituted by a probe script.
@@ -23,7 +23,7 @@ self-test now runs 35 PINNED plants, and the RED-first observation of the `New a
 AC3, the plant staged with an undeclared opener, an empty `CONF_ROUTES` and a declared member that opens no
 conf. The selftest budget row's reading text counts the plants as it measured them before this pass.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/loop_lib.py --selftest` with every function the unit's pass changed in

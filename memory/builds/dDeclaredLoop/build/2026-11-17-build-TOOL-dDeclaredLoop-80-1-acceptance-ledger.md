@@ -27,7 +27,7 @@ whose module this pass edits, run by its argv once; and AC4. Owed RED-first: the
 `no-own-conf-read` over its own module and over the staged module, and the `tools/loop/breakpoints.py` arm,
 `no-own-conf-read` and the four plants calling the renamed staging, each on its staged break.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/budget.py --fixture --plant no-own-conf-read` with every function the unit's pass changed

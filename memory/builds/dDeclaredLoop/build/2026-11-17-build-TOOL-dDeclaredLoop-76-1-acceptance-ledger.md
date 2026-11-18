@@ -19,7 +19,7 @@ Owed to the close: every leg section 7 names, and both plant legs, which exit no
 copy below named its added line, and `resolve_memory_root_source` rebound in process to guess the source
 from the root made `root-source` print `MISSED tree answered`.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/budget.py --fixture --plant no-own-conf-read` with every function the unit's pass changed

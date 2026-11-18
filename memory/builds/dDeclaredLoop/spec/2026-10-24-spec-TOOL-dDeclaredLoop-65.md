@@ -99,7 +99,7 @@ This unit takes the report's corrected fix. It repairs `TOOL-dDeclaredLoop-56`.
 - This pass could not re-run either probe, because the worktree it ran in refuses a git command aimed
   at a scratch repository outside it. AC1 and AC2 re-observe both at the close, and a git that writes
   otherwise turns them red.
-- Read through `git show` at the branch tip `689e1b07d`:
+- Read through `git show` at the branch tip `d9cec781e`:
   - `tools/loop/position.py#read_remote_claim` names the remote and branch through
     `tools/loop/claims.py#resolve_remote`, reads the tracking ref's sha, and takes `at` from
     `git reflog show --date=unix -n1 --format=%gd <ref>`, parsing `@{<unix>}`. It keys the claim over
@@ -201,7 +201,7 @@ only in tag-name grading, the `stage` keys of its two legs and `VERB_OFFENDER_PI
 
 ### The sweep
 
-Read at the branch tip `689e1b07d`; counts PINNED there unless named DERIVED.
+Read at the branch tip `d9cec781e`; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
@@ -326,7 +326,7 @@ New arm: tools/loop/position.py · covers AC1 AC2 AC3 AC5 · the fresh-clone, qu
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-74 and TOOL-dDeclaredLoop-75, written by the round-3 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-16 · §1 to §10 · S1 to S5 · AC1 to AC5 · §8 F2 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `689e1b07d` and on the committed spec of TOOL-dDeclaredLoop-56
+  `unattended-declared-loop-d56bf0` at `d9cec781e` and on the committed spec of TOOL-dDeclaredLoop-56
   rev-6, per the brief `2026-11-16-prompt-TOOL-dDeclaredLoop-65-1-spec-writer`: S1 names the common
   directory's resolution and reaches only a resolving ref; S3's source rides the ref's `read —` line by F2;
   S4 places the plants ahead of the last two, stages `quiet-remote` on 56's restaged scratch from a linked

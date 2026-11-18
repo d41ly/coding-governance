@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 35 is built, and units 71 (d73187e7c) and 56 (28a075db0) of this order. Unit 56 built S18's parent read through derive_phase_position with no explicit extra; this unit writes tree=root onto that call. The spec is rev-4, re-grounded at e8da8304e with the 56 edge reversed at aa46ed45f.
+  table's order. Every unit through build order 35 is built, and units 71 (1887fa6d4) and 56 (511f0e560) of this order. Unit 56 built S18's parent read through derive_phase_position with no explicit extra; this unit writes tree=root onto that call. The spec is rev-4, re-grounded at 1310ff4fc with the 56 edge reversed at 9145829ed.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

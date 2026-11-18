@@ -101,7 +101,7 @@ This unit makes the file's content validate its mtime. It repairs `TOOL-dDeclare
 - This pass could not re-run the probe: the worktree it ran in refuses a git command aimed at a scratch
   repository outside it. AC1 and AC2 re-observe it at the close, and a git that writes otherwise turns
   them red.
-- Read through `git show` at the branch tip `e0a7e54b3`:
+- Read through `git show` at the branch tip `adbc3ecf5`:
   - `tools/loop/position.py#read_remote_claim` still reads the tracking ref's age from its newest reflog
     entry alone; `tools/loop/position.py#derive_position_into`, its one caller, appends `<ref>@<sha8>` to
     the read list where the sha resolves, and `tools/loop/position.py#render_position_lines` prints each
@@ -206,7 +206,7 @@ branch tip's only in tag-name grading, the `stage` keys of its two legs and `VER
 
 ### The sweep
 
-Read at the branch tip `e0a7e54b3`; counts PINNED there unless named DERIVED.
+Read at the branch tip `adbc3ecf5`; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
@@ -337,7 +337,7 @@ New arm: tools/loop/position.py · covers AC1 AC2 AC3 · the failed-fetch plant 
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-77, written by the round-4 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-16 · §1 to §10 · S1 to S4 · AC1 to AC4 · §8 F2, F3 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `e0a7e54b3` and on the committed specs of TOOL-dDeclaredLoop-65
+  `unattended-declared-loop-d56bf0` at `adbc3ecf5` and on the committed specs of TOOL-dDeclaredLoop-65
   rev-3 and TOOL-dDeclaredLoop-56 rev-6, per the brief `2026-11-16-prompt-TOOL-dDeclaredLoop-74-1-spec-writer`:
   S1 names its two functions and the remote it now takes; S2's skip entry rides the read list by F2;
   S3 stages the plant on 56's restaged scratch and adds the second-URL probe, AC3; S4 and AC4 bring the

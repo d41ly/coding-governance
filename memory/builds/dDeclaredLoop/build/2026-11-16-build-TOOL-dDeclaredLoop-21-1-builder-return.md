@@ -4,7 +4,7 @@
 
 ## Why
 
-DIVERGENCE: rev-4 cannot be built as written. Since base ed497191, the tree gained readers and companions that S4, AC5, §4 Files touched and §7 do not name. Each finding below was checked against source at HEAD 115fdccce.
+DIVERGENCE: rev-4 cannot be built as written. Since base ed497191, the tree gained readers and companions that S4, AC5, §4 Files touched and §7 do not name. Each finding below was checked against source at HEAD 56dbf1ea6.
 (1) §2 S4's reader inventory and AC5 no longer hold. Four tracked files name REVIEW_ROUNDS that S4 does not list and §4 does not list. None of them named it at ed497191:
  - tools/loop/loop_witness.py: a by-value fixture conf line `REVIEW_ROUNDS="7"`.
  - tools/unattended/pass-tree.test.sh: the same fixture line.

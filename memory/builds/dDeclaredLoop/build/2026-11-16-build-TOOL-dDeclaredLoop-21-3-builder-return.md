@@ -4,7 +4,7 @@
 
 ## Why
 
-DIVERGENCE: rev-6 §2 S6, together with §4 "Rollout" and §7's `unattended kit gate`, cannot be built as written. A second interface disagreement sits between §2 S4 and §4 "How the shell reads it". Both were probed read-only at base c28d4e5f.
+DIVERGENCE: rev-6 §2 S6, together with §4 "Rollout" and §7's `unattended kit gate`, cannot be built as written. A second interface disagreement sits between §2 S4 and §4 "How the shell reads it". Both were probed read-only at base eab6ff8f.
 
 (1) S6 newly reds check 2 on the tracked historical corpus.
 - S6 says check 2's awk arm (tools/unattended/check-unattended.sh#scan_round_writes's sibling block, the `n[it] > ceil` comparison) "compares each subject's rounds with that subject's bound".
@@ -30,7 +30,7 @@ DIVERGENCE: rev-6 §2 S6, together with §4 "Rollout" and §7's `unattended kit 
   - (b) Have the driver call `show --rev HEAD`, which is a change to §4.
 - The unattended suites are waived for this landing (§3), but S4 asks for these edits to be made, and as written they cannot be made meaningful.
 
-Everything else I probed holds at c28d4e5f:
+Everything else I probed holds at eab6ff8f:
 - census 326/326 and 266/266; families 1/1, 11/11, 36/37
 - REFUSAL_CEILINGS token and positional row at 326
 - the decision row TOOL-dDeclaredLoop-21 is in memory/DECISIONS.md
@@ -45,7 +45,7 @@ Everything else I probed holds at c28d4e5f:
 
 ## Summary
 
-Nothing is committed and the tree is unchanged: TOOL-dDeclaredLoop-21 rev-6 can't be built as written. HEAD is still c28d4e5f1ae527105861e1fb6ef4b747fae1d480 and the tree is clean. I edited no product file, so there is no patch file.
+Nothing is committed and the tree is unchanged: TOOL-dDeclaredLoop-21 rev-6 can't be built as written. HEAD is still eab6ff8fc275cb83628688bf58d1d9589616a2fb and the tree is clean. I edited no product file, so there is no patch file.
 
 **Blocker 1 — check 2 would go red on old run records.** S6 asks check 2 in tools/unattended/check-unattended.sh to compare each review subject's round count with that subject's new bound, where it compares against 8 today. Check 2 reads every tracked `RUN*.md` under memory/builds, and those records can't be rewritten.
 - Against the new per-subject bounds (1 for a spec audit, 3 for the closing review), 69 recorded subjects are over.

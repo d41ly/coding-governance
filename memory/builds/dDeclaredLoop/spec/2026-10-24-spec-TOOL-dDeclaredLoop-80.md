@@ -109,7 +109,7 @@ builds at order 38, after 76 at order 37, and repairs `TOOL-dDeclaredLoop-76`.
 
 ### Evidence
 
-Read at branch `unattended-declared-loop-d56bf0`, tip `e0a7e54b3`, through `git show` and through
+Read at branch `unattended-declared-loop-d56bf0`, tip `adbc3ecf5`, through `git show` and through
 `git archive` into a scratch copy, unless named otherwise. `tools/loop/` is absent from this worktree's
 main. `derive_conf_reads`, the `no-own-conf-read` plant, `resolve_memory_root` and the plants of 63, 64,
 72 and 76 are not built at that tip: they are read on the committed specs named in §5 "Dependency".
@@ -256,7 +256,7 @@ takes any call of the staging that 67's `readded` plant adds.
 
 ### The sweep
 
-Read at the tip `e0a7e54b3`; counts PINNED there unless named DERIVED.
+Read at the tip `adbc3ecf5`; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
@@ -427,7 +427,7 @@ New arm: tools/loop/breakpoints.py · covers AC1 AC3 · the no-own-conf-read pla
 - rev-5 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-99, written by the round-12 spec audit's disposal; nothing else moved.
 - rev-6 · 2026-11-16 · §1 to §10 · S1 to S5 · AC1 to AC5 · §8 F3, F4, F5 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `e0a7e54b3` and on the committed specs of TOOL-dDeclaredLoop-76
+  `unattended-declared-loop-d56bf0` at `adbc3ecf5` and on the committed specs of TOOL-dDeclaredLoop-76
   rev-6, TOOL-dDeclaredLoop-72 rev-6, TOOL-dDeclaredLoop-64 rev-4, TOOL-dDeclaredLoop-63 rev-3,
   TOOL-dDeclaredLoop-67 rev-3, TOOL-dDeclaredLoop-75 rev-9, TOOL-dDeclaredLoop-79 rev-5,
   TOOL-dDeclaredLoop-82 rev-6, TOOL-dDeclaredLoop-86 rev-7, TOOL-dDeclaredLoop-88 rev-5 and

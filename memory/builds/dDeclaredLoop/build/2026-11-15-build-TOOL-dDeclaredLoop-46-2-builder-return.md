@@ -4,7 +4,7 @@
 
 ## Why
 
-REFUSAL: --dispatch refused this unit's write set, and that refusal is binding. It printed "UNATTENDED check 49 FAILED — --dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint: tools/loop/kit.toml also in 56b7b183 TOOL-dDeclaredLoop-6" and exited 1.
+REFUSAL: --dispatch refused this unit's write set, and that refusal is binding. It printed "UNATTENDED check 49 FAILED — --dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint: tools/loop/kit.toml also in 2b1d84b0 TOOL-dDeclaredLoop-6" and exited 1.
 
 Unit 6's dispatch row is still open in memory/builds/dDeclaredLoop/RUN.md (line 222, at 2026-11-15T16:57:06Z). That unit is being re-specced and is not building, but its row has not been withdrawn. The check names only the first collision. Comparing that row with my 76-path declaration, five paths overlap:
 - tools/loop/kit.toml (spec §4 Files touched: its two [[gate_leg]] tables must gain `stage`, S2)
@@ -28,7 +28,7 @@ Before dispatching, I checked rev-5 against the tree with read-only probes. No g
 - **Version carriers:** under tools/, skills/ and help/, only tools/run-gates/README.md line 3 and run-gates.sh line 36 carry run-gates@1.47.
 - **Budgets:** no new function, verb, flag or leg is planned, and memory/DECISIONS.md is not needed. No other code checks the key set of a [[gate_leg]] table. The longest `stage` line would be 35 characters, well under the line-length limit.
 
-The refusal and the five overlapping paths are listed in `why`. The overlap is with unit 6's open dispatch row (56b7b183) in memory/builds/dDeclaredLoop/RUN.md.
+The refusal and the five overlapping paths are listed in `why`. The overlap is with unit 6's open dispatch row (2b1d84b0) in memory/builds/dDeclaredLoop/RUN.md.
 
 Owed once a pass can dispatch:
 - at the close: the spec's §7 PINNED legs, plus AC2 and AC4 through `govkit selfcheck`;

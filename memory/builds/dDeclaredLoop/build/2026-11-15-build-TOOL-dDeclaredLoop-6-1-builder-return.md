@@ -8,7 +8,7 @@ DIVERGENCE: §2 S4, §4 "The factory contract" and "What a factory leaves to its
 
 ## Summary
 
-Nothing was committed, and the working tree is back at base 56b7b18. The only change left is the dispatch row that `unattended.sh --dispatch` itself staged in `memory/builds/dDeclaredLoop/RUN.md`; I left it for the caller.
+Nothing was committed, and the working tree is back at base 2b1d84b. The only change left is the dispatch row that `unattended.sh --dispatch` itself staged in `memory/builds/dDeclaredLoop/RUN.md`; I left it for the caller.
 
 The work in progress is saved as a patch: C:/Users/DAILY-~1/AppData/Local/Temp/claude/b120d4a7f8b5be2e/7c85732c-fa0c-43e9-83f2-238d293195e0/scratchpad/TOOL-dDeclaredLoop-6.patch. It holds:
 - the new `tools/loop/factories.py`: the five factories, `check-commands`, the eleven plants and `--selftest`, with every function name checked against the lexicon's suggest verb;

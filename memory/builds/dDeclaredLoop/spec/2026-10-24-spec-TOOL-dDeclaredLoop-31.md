@@ -316,7 +316,7 @@ Each render is its template's copy: `memory/guides/UNATTENDED-VERBS.md` and
 
 ### The sweep
 
-Read at branch `unattended-declared-loop-d56bf0`, tip `a68d80da1`, through `git show` and an export of
+Read at branch `unattended-declared-loop-d56bf0`, tip `9a726bbc8`, through `git show` and an export of
 that commit; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
@@ -348,7 +348,7 @@ printf '%s\n' 'unattended.sh --exhausted <slug>' | wc -c                    # 33
 
 - The driver's census, read through `tools/memory-tree/check-arms.py#branches` and
   `tools/memory-tree/check-arms.py#scan_refusal_sites` over the export, is 329 PINNED (324 branches and
-  5 sites at `a68d80da1`), at its ceiling of 329 PINNED; `TOOL-dDeclaredLoop-32` raises both to 332
+  5 sites at `9a726bbc8`), at its ceiling of 329 PINNED; `TOOL-dDeclaredLoop-32` raises both to 332
   PINNED. This unit adds three sites, S3's, S4's and S6's, so the ceiling rises 332 -> 335 PINNED with
   the comment line below, and `memory/project/positional-refs.txt`'s row pairing `.memory-tree.conf`
   with the driver at 332 PINNED is re-pointed in place to 335.
@@ -434,7 +434,7 @@ the worktree at `179486e8f`; every other claim was read on the branch.
   recording `testing -> building` on `@any`'s `descope` with no draw row, where the backward move on
   `item.test.attribute`'s `code-miss` is refused naming the spent budget.
   Red when: E5 lacks `draws = "none"`, so the descope draws `route-back` and is refused.
-  figure: 36 PINNED, the 31 rows PINNED at `a68d80da1` and the five this unit adds.
+  figure: 36 PINNED, the 31 rows PINNED at `9a726bbc8` and the five this unit adds.
 - **AC7** — When `python tools/policy/guard.py --staged` runs at the top of a scratch copy holding no
   run-state file, with an agent's raise of `flow.rework-budget` from `"4+2"` to `"6+2"` staged in
   `.governance/policy.toml`, it exits 1; and AC2's `--exhausted` output holds `only the owner raises
@@ -523,7 +523,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC5 · the exhaustion par
   AC2 read the closing review's round, a spec subject's round being unrefused under TOOL-dDeclaredLoop-30
   rev-4 S4, by the brief prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-reground.md
 - rev-4 · 2026-11-16 · §1 to §10 · S1 to S10 · AC1 to AC8 · §8 F1 F4 to F8 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `a68d80da1`, per the brief
+  `unattended-declared-loop-d56bf0` at `9a726bbc8`, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-31-1-spec-writer`: symbol citations; the ending as the row's
   outcome and `draws` read by the writer (F4); the rule and its line in `budget.py`, no state argument
   (F5); the verb records and names the act, `--abort` guarded and the park a hand-off (F6); the release

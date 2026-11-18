@@ -107,23 +107,23 @@ over HEAD. Where every claim already holds, change nothing and say so in your re
 
 1. Read the whole spec against the code at HEAD of branch/unattended-declared-loop-d56bf0 and settle every claim the landed
    code has moved. The branch has built every unit through build order 48, each a CLOSED spec in this build's spec folder.
-   Unit 92 (c6a5756b5): `tools/loop/loop_witness.py` carries the shared git-env-leaks block inline; `TREE_LIB_SYMBOLS` keeps its
-   two names and `load_tree_lib` takes no argument. Unit 94 (11c68b7f9): `build_failure_detail` keeps an `OSError`'s first non-blank
+   Unit 92 (a5b0b73e4): `tools/loop/loop_witness.py` carries the shared git-env-leaks block inline; `TREE_LIB_SYMBOLS` keeps its
+   two names and `load_tree_lib` takes no argument. Unit 94 (a16b38c6a): `build_failure_detail` keeps an `OSError`'s first non-blank
    line, and `load_tree_lib` names every missing name and any import failure in one refusal. Unit 95 (order 49, rev-3, building
    now) and unit 96 (order 50, rev-3) are observation passes that build NO code: there is no `read_tree_conf` (every loop-kit read
    of the memory-tree conf calls the memory-tree kit's `read_design_conf`), no `need` argument and no four-name tuple. Unit 97
-   (order 50, rev-2, 24ec154b6) builds `CONF_READERS = ("read_design_conf", "read_driver_conf", "parse_conf")` in
+   (order 50, rev-2, 55658aa55) builds `CONF_READERS = ("read_design_conf", "read_driver_conf", "parse_conf")` in
    `tools/loop/loop_lib.py` directly above `derive_conf_reads`, which then reads that tuple instead of its own list; two of its
    members are defined outside `loop_lib.py`, so a check over 'a tuple member loop_lib does not derive' covers only the members
    `loop_lib.py` defines. 97 builds before 98 and 99. Any item here built on `read_tree_conf`, a `need` argument or a wider
-   tuple has nothing left to change: settle it in section 3 with the evidence. Built since the last re-grounds, in the files this spec most likely reads: unit 79 (a8b4dca02: the round-4
-   minors, `read_driver_conf`'s isolated subshell, the gained prune's D-to-E row owing exit 2); unit 82 (a0ba898db, rev-8:
+   tuple has nothing left to change: settle it in section 3 with the evidence. Built since the last re-grounds, in the files this spec most likely reads: unit 79 (f424a1eb8: the round-4
+   minors, `read_driver_conf`'s isolated subshell, the gained prune's D-to-E row owing exit 2); unit 82 (6ff991964, rev-8:
    `derive_import_aliases`, `derive_conf_reads` counting a conf name anywhere, an aliased reader and a `loop_lib` conf constant,
    `derive_docstring_ids` in `tools/memory-tree/tree_lib.py`, eight PLANTS descriptions naming each conf in words); unit 86
-   (16829da16: `derive_conf_constants(loop_lib_path)`, the guard's usage probe and failure detail, the url-forms credential
-   isolation); unit 87 (82087c644: the conf-constant kind as a class); unit 89 (20362ef2b: `load_tree_lib`, `derive_conf_rebinds`,
-   `check_conf_name`); unit 88 (5b4e1a339: `derive_constant_charges` in tree_lib as the one charge walk, `load_tree_lib`'s
-   LookupError, ImportError and SyntaxError catches, four guard plants, the guard row at 140 s); unit 90 (b10a81331:
+   (8f2d6b693: `derive_conf_constants(loop_lib_path)`, the guard's usage probe and failure detail, the url-forms credential
+   isolation); unit 87 (74258774d: the conf-constant kind as a class); unit 89 (bd3cf1c87: `load_tree_lib`, `derive_conf_rebinds`,
+   `check_conf_name`); unit 88 (52dcd8623: `derive_constant_charges` in tree_lib as the one charge walk, `load_tree_lib`'s
+   LookupError, ImportError and SyntaxError catches, four guard plants, the guard row at 140 s); unit 90 (be7988ff4:
    `TREE_LIB_SYMBOLS` and `load_tree_lib` testing each name, three conf-read-forms rows, the version-skew row). Every PLANTS
    description names a conf in words, never by its file name. Unit 34 is deferred against ask TOOL-dDeclaredLoop-113, and unit
    33's numeric direction against ask TOOL-dDeclaredLoop-114. A CLOSED spec is frozen: never plan an edit to one. An item the

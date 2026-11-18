@@ -21,7 +21,7 @@ new leg `loop adapt fixtures` and `loop stage coverage` for its stage claim; and
 observation of both `New arm:` lines. The new leg's run time was not read: its budget row is a proxy
 priced from the plants run alone, and the close re-prices it from the leg itself.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/adapt.py --fixture --plant loosening` with the class read from the act's word exited 0, and

@@ -16,7 +16,7 @@ kit that does not resolve was not probed. The fixture leg's run time was not rea
 proxy priced from the plants run alone, and that proxy sits above the leg's manifest ceiling, which
 the close reads from the leg itself.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 The `command-hand` plant of `tools/loop/factories.py`, whose planted defect is the staged break, exited 1 over

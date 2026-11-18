@@ -163,7 +163,7 @@ The labels keep their rev-5 numbers; every other rev-5 item is in §3.
 
 ### The rev-5 items the built code, a committed spec or a frozen record settles
 
-Read on branch `unattended-declared-loop-d56bf0` at `a339daae2`. "CLOSED here" means CLOSED when this
+Read on branch `unattended-declared-loop-d56bf0` at `083cd0a32`. "CLOSED here" means CLOSED when this
 unit builds, at order 44. Each item's criterion leaves with it.
 
 | Item | What settles it |
@@ -287,7 +287,7 @@ adds; `G` is 89 S1's global loader; `OTHER`, `K.KC` and `local` answer nothing.
 
 ### Evidence
 
-Read at branch `unattended-declared-loop-d56bf0`, tip `a339daae2`, through `git archive` into a scratch
+Read at branch `unattended-declared-loop-d56bf0`, tip `083cd0a32`, through `git archive` into a scratch
 copy, unless named otherwise; `tools/loop/` is absent from this worktree's main. `derive_conf_reads`,
 `derive_conf_constants`, `derive_docstring_ids`, `derive_conf_rebinds`, `load_tree_lib`, the `no-own-conf-read` and
 `conf-read-forms` plants, 86's unparseable-parent plant and 86's detail spellings are not built at that
@@ -397,7 +397,7 @@ tip: they are read on the committed specs §5 "Dependency" names.
 
 ### The sweep
 
-Read at the tip `a339daae2` in the scratch copy; counts PINNED there unless named DERIVED.
+Read at the tip `083cd0a32` in the scratch copy; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
@@ -461,7 +461,7 @@ as a deviation. `TOOL-dDeclaredLoop-68` is building now, `TOOL-dDeclaredLoop-34`
 TOOL-dDeclaredLoop-113, and `TOOL-dDeclaredLoop-33`'s numeric direction against ask
 TOOL-dDeclaredLoop-114; none moves a read this unit makes. The reuse probes and the lexicon's suggest
 verb ran in the scratch copy of the tip; 89 rev-5 and 90 rev-5 were read through `git show` at
-`240095e82`; the spec-token checker ran in this worktree; the locale reading ran on node `d`.
+`bd4ee63bc`; the spec-token checker ran in this worktree; the locale reading ran on node `d`.
 
 ## 6. Acceptance criteria
 
@@ -600,7 +600,7 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC13 · the glob-reader 
 - rev-5 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-96, written by the round-11 spec audit's disposal; nothing else moved.
 - rev-6 · 2026-11-17 · §1 to §10 · S1 to S36 · AC1 to AC36 · §8 F1 to F7 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `a339daae2` and on the committed specs of TOOL-dDeclaredLoop-75
+  `unattended-declared-loop-d56bf0` at `083cd0a32` and on the committed specs of TOOL-dDeclaredLoop-75
   rev-10, 76 rev-6, 80 rev-6, 82 rev-7, 86 rev-8, 87 rev-5 and 89 rev-5, per the briefs
   2026-11-17-prompt-TOOL-dDeclaredLoop-88-1-spec-writer and
   2026-11-17-prompt-TOOL-dDeclaredLoop-88-3-spec-writer; mechanism, carries, order and status kept. No

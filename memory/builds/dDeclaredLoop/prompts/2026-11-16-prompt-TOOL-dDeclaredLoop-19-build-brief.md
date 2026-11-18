@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 32 is built, and unit 51 of order 33 (dd5962773). Unit 22 (0ed098afd) raised the driver's refusal ceiling to 340; this unit's decision row, 340 to 342, has landed. The spec is rev-3, re-grounded at 2d99e7784 with forks F4 to F9 resolved.
+  table's order. Every unit through build order 32 is built, and unit 51 of order 33 (1e3227ccd). Unit 22 (d065715b4) raised the driver's refusal ceiling to 340; this unit's decision row, 340 to 342, has landed. The spec is rev-3, re-grounded at 0116f2d9b with forks F4 to F9 resolved.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

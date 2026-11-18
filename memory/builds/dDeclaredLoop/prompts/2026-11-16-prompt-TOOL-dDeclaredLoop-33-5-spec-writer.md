@@ -97,7 +97,7 @@ Not supplied, optional: `input:code`.
 
 — owner, 2026-11-13. The second dispatch of TOOL-dDeclaredLoop-33 returned a divergence before any write. The return is
 `memory/builds/dDeclaredLoop/build/2026-11-16-build-TOOL-dDeclaredLoop-33-2-builder-return.md`. It names three blockers, each
-measured at 440236882: S11's boundary check through `check_program` refuses the compositions of four `loop adapt fixtures`
+measured at 3918078c9: S11's boundary check through `check_program` refuses the compositions of four `loop adapt fixtures`
 plants (the lint-pass add row carries no outcomes; the loosening plant's exclusion leaves `item.test.route` routing to the
 excluded `item.test.flakes`); gov's pending list goes stale over any build's composition that excludes or supersedes an item a
 pending row names; and F7's departure needs an `amends` deviation record, which moves `cl-dClosedLoop-0118`'s hash in the

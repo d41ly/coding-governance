@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Units through order 29 are built, and of this order 61 (draw ids), 60 (every rotated run record read) and 62 (the parallel-append-uneven plant, append-only draws) are built; the loop budget fixtures row reads 369 for twenty plants. Unit 32 (75ef75cad) gave the driver run_budget_verb, --fix-pass and a budget.py target verb, and the driver's census is 332 at its ceiling. 31 rev-4 was grounded before 32, 61, 60 and 62 landed; its decision row (ceiling 332 -> 335, Skill row 10815 -> 10848) has landed.
+  table's order. Units through order 29 are built, and of this order 61 (draw ids), 60 (every rotated run record read) and 62 (the parallel-append-uneven plant, append-only draws) are built; the loop budget fixtures row reads 369 for twenty plants. Unit 32 (29d86011b) gave the driver run_budget_verb, --fix-pass and a budget.py target verb, and the driver's census is 332 at its ceiling. 31 rev-4 was grounded before 32, 61, 60 and 62 landed; its decision row (ceiling 332 -> 335, Skill row 10815 -> 10848) has landed.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

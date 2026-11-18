@@ -104,7 +104,7 @@ through one reader of the driver's conf. It repairs `TOOL-dDeclaredLoop-63`.
 
 ### Evidence
 
-Every claim below was read at the tip of branch `unattended-declared-loop-d56bf0`, `e8018d94`, through `git
+Every claim below was read at the tip of branch `unattended-declared-loop-d56bf0`, `e3d84233`, through `git
 show` and in a scratch export of that tree; the worktree this spec was written in is cut from main, which
 holds no loop kit.
 
@@ -289,14 +289,14 @@ phase the map holds no row of, and a phase the map holds a row of never reads th
 | `tools/loop/loop_lib.py` gains `read_driver_conf` | every loop module importing `loop_lib`, each loop leg, all unguarded; `TOOL-dDeclaredLoop-72`, 75, 76, 79, 82, 97, 98 and 99, which read the name and its `(tree, names)` mapping | a new name beside the others; no existing function moves; the name and signature are rev-2's, which those specs read; it sources a file and imports a module of this kit, so no `requires` edge in `tools/loop/kit.toml` moves |
 | `derive_phase_position` gains `tree`, `extra` defaults to `None` | 52's verb and selftest, 63's cases and the hold's call, 56 S18's call, 67 S13's lookup | a phase with a row starts no read; every 63 case passes `--extra`; the hold passes `--extra=$PHASES_EXTRA`; 52's `DRAFTING` case passes `--extra=` (S4) |
 | the verb's `--extra` default | `tools/govkit/usage.toml`'s row for the verb, which lists flags and no default; its help anchor | no flag added, so the row and its fingerprint stay |
-| `run_table_case` and the selftest's trees | the `loop transition tables` leg, ceiling 120 PINNED at `e8018d94` in `tools/gate-legs.json` | three `git init` runs and two conf reads beside the existing in-process cases |
-| `tools/loop/loop_parents.py`, the call and `PLANTS` | the `loop parent routes` leg, ceiling 120 PINNED at `e8018d94`; its eleven existing cases; 56's plants | every existing plant's parent reads a core phase, so no read starts; the new plant adds one scratch repository |
+| `run_table_case` and the selftest's trees | the `loop transition tables` leg, ceiling 120 PINNED at `e3d84233` in `tools/gate-legs.json` | three `git init` runs and two conf reads beside the existing in-process cases |
+| `tools/loop/loop_parents.py`, the call and `PLANTS` | the `loop parent routes` leg, ceiling 120 PINNED at `e3d84233`; its eleven existing cases; 56's plants | every existing plant's parent reads a core phase, so no read starts; the new plant adds one scratch repository |
 | the `driver-plan` plant of `tools/loop/breakpoints.py` | the `loop breakpoint fixtures` leg | the hold passes its value, so no read starts |
 | `help/loop.md` | `docs`, `help page commands` | prose only, no command block; no usage row moves, so no anchor is re-stamped |
 | `tools/loop/README.md`, the docstrings | `install-prefix (shipped surface)` | name siblings by file name and the conf by its file name, never a path under the install prefix |
 | a subprocess read | `encoding posture (text IO names its encoding)`, `python reads (a name never bound, an import outside its guard)` | output captured as bytes and decoded as UTF-8; the import sits inside the function, as `read_builds_dir`'s does |
 | the census and the families | `tools/memory-tree/check-arms.py`'s readers over the driver; `tools/unattended/unattended.families.txt` | no shell file is edited |
-| new names | `VERB_OFFENDER_PIN` in `.lexicon.conf`, 1215 PINNED at `e8018d94` | `read_driver_conf` leads with a declared verb |
+| new names | `VERB_OFFENDER_PIN` in `.lexicon.conf`, 1215 PINNED at `e3d84233` | `read_driver_conf` leads with a declared verb |
 | shared records | `SHARED_RECORDS` in `.unattended.conf` | the pass writes neither `memory/DECISIONS.md` nor `memory/project/readme-contract.txt`; no decision row is owed |
 | the kickoff manifest | `watch:` of `memory/guides/SESSION-KICKOFF.md` | no watched path is edited, so no re-stamp |
 | subject pins, epoch delegates, upgrade rows, the registry, size rows | `tools/govkit/subject-pins.tsv`, `tools/memory-tree/check-verdict-epoch.sh`'s `DELEGATES`, `[[upgrade]]`, `tools/govkit/registry.toml`, `tools/template-size-limits.txt` | no leg added, no memory-tree module edited, no migration, no kit added; no size row names a loop file or `help/loop.md` |
@@ -317,7 +317,7 @@ git show "$B:tools/gate-legs.json" | grep -A12 '"loop parent routes"\|"loop tran
 ### Budgets and records
 
 - The driver's census, read through `tools/memory-tree/check-arms.py#branches` and
-  `tools/memory-tree/check-arms.py#scan_refusal_sites` over the scratch export, is 342 PINNED at `e8018d94`,
+  `tools/memory-tree/check-arms.py#scan_refusal_sites` over the scratch export, is 342 PINNED at `e3d84233`,
   337 branches and 5 sites PINNED, at its ceiling under `TOOL-dDeclaredLoop-19`'s row;
   `TOOL-dDeclaredLoop-52` raises it to 343 PINNED under its landed decision row. This unit edits no shell
   file, so the census and the ceiling stay where unit 52 leaves them.
@@ -343,7 +343,7 @@ marker, its selftest cases and the hold's argument, all of which land before thi
 and 64 (rev-4) edit `tools/loop/loop_table.py` and `tools/loop/breakpoints.py` elsewhere, and 55 (rev-3) writes
 nothing here. Order 34's `TOOL-dDeclaredLoop-52` (rev-3) is read on its committed spec: the reader, the verb,
 its selftest cases and the hold; `TOOL-dDeclaredLoop-33` (rev-6, building) and `TOOL-dDeclaredLoop-53` (rev-3)
-touch none of them. Units through order 33 are CLOSED, read on landed code at `e8018d94`;
+touch none of them. Units through order 33 are CLOSED, read on landed code at `e3d84233`;
 `TOOL-dDeclaredLoop-34` is deferred against ask TOOL-dDeclaredLoop-113 and shares no file. The code reads, the
 census and the reuse probe ran in a scratch export of the branch tip; the counts above ran through `git show`
 and `git grep` of the branch; the lexicon suggest ran in this spec's worktree, as §4 "Inventory" says.
@@ -415,7 +415,7 @@ New arm: tools/loop/loop_parents.py · covers AC2 · the `parent-in-extra-phase`
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-79, written by the round-4 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-16 · §1 to §10 · S1 to S6 · AC1 to AC5 · §8 F3 F4 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `e8018d94`, per the brief
+  `unattended-declared-loop-d56bf0` at `e3d84233`, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-70-1-spec-writer`: symbol citations; the reader at the work tree's
   top, through the loop kit's `resolve_bash`, refusing with `LoopError`; the default read only for a phase
   with no row, on unit 63's rev-3 `extra` and `phase --from` verb, the `--plan` row and unit 31's reading out of
@@ -435,7 +435,7 @@ the work-tree top idiom of `tools/loop/loop_lib.py#resolve_kit_dir`; `TOOL-dDecl
 for the plant.
 
 `python tools/codebase-map/reuse_lookup.py "read the adopter phase vocabulary from the driver conf"`, run in the
-scratch export of the branch tip `e8018d94`, ranked name-stem neighbours (`read_text`, `read`, `load_conf`,
+scratch export of the branch tip `e3d84233`, ranked name-stem neighbours (`read_text`, `read`, `load_conf`,
 `parse_conf`), the driver's `phases`, and the conf readers `read_conf` (`tools/playbook/render_playbook.py#read_conf`)
 and `read_conf_key` (`tools/roles/roles_lib.py#read_conf_key`). Each conf reader parses a line's text and
 sources nothing, and no Python reader sources `.unattended.conf`, so no existing Python seam fits and S1 is the

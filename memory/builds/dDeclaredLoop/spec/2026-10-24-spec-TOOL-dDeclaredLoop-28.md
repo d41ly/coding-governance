@@ -379,7 +379,7 @@ waits, and no caller records a move until the executor lands.
     probe does not match.
   - `harness arms (fail branches armed or pinned)` and the refusal ceiling: the census of
     `tools/unattended/unattended.sh`, read through `tools/memory-tree/check-arms.py`'s `branches` and
-    `scan_refusal_sites`, is 325 PINNED (320 branches and 5 sites, branch `68a3569b6`, 2026-11-15),
+    `scan_refusal_sites`, is 325 PINNED (320 branches and 5 sites, branch `916df427f`, 2026-11-15),
     at its ceiling of 325 in `REFUSAL_CEILINGS`. The flow form adds one `fail 48` site, so the ceiling
     rises 325 -> 326 PINNED in `.memory-tree.conf` with a comment line, under a decision row the run
     lands in `memory/DECISIONS.md` before the pass (§8 F8): "**TOOL-dDeclaredLoop-28** - **the driver's
@@ -393,7 +393,7 @@ waits, and no caller records a move until the executor lands.
     row above is the run's, landed ahead.
   - `lexicon naming predicates`: the five functions of §4 Inventory each lead with a declared verb, so
     the offender count stays at `VERB_OFFENDER_PIN`, 1209 PINNED at `.lexicon.conf` on branch
-    `68a3569b6`.
+    `916df427f`.
   - `help page commands`: the S9 section carries the anchors of `verb:unattended.sh:--rescope` and
     `script:tools/loop/adapt.py`, each fingerprint the one `docs_leg.py --fingerprints` prints; the
     `compose` usage row keeps the `--rows=` TOOL-dDeclaredLoop-27 gives it, so its anchor in
@@ -418,7 +418,7 @@ waits, and no caller records a move until the executor lands.
     and `straggler-guard arms` on `.memory-tree.conf` and the memory guides. This unit changes none of
     their code, and changes those files only by the rows and lines this section names.
 - dependency — order 25. Units 3, 7, 16 and 24 are CLOSED and this spec is read on their landed code at
-  branch `68a3569b6`. TOOL-dDeclaredLoop-26 (order 23) lands `tools/loop/composition.py` with
+  branch `916df427f`. TOOL-dDeclaredLoop-26 (order 23) lands `tools/loop/composition.py` with
   `read_composition_at` and `write_loop_order` and the `composition` field, read on its committed spec
   at rev-5; this unit calls both. TOOL-dDeclaredLoop-25 (order 21) gives `read_composition` its kind
   argument, read on its committed spec at rev-5. TOOL-dDeclaredLoop-27 (order 24) builds first: it lands
@@ -585,18 +585,18 @@ New arm: tools/unattended/unattended.test.sh · covers AC6 · the flow form rela
   `principle.p8`; this pass takes the stale pending row of its tag, and AC10 observes the core meta-check
   green.
 - rev-5 · 2026-11-15 · S1 to S9 · §1 · §3 · §4 · §5 · AC1 to AC10 · §7 · §8 F4 F5 F6 F7 F8 · §10 ·
-  re-grounded on the code of branch `unattended-declared-loop-d56bf0` at `68a3569b6`, per the brief
+  re-grounded on the code of branch `unattended-declared-loop-d56bf0` at `916df427f`, per the brief
   `2026-11-15-prompt-TOOL-dDeclaredLoop-28-1-spec-writer`. `compose_at` is `read_composition_at`, and
   the composer the `compose` verb, which gains `--layer` (F6). `propose` writes the record and the flow
   row, the driver's flow form its adapter; `write_change` gains `lines`. The class reads the composed
   operations, the boundary runs inside `write_transition`, and the comparison reads two new position
   fields, an unread witness never a skip (F7). The driver's one new refusal raises its ceiling (F8).
   §5 names every row, pin, budget, ceiling and fixture the change reaches.
-- rev-6 · 2026-11-15 · S5 S6 · AC4 · §3 Edges · §4 Data model, Inventory, The plants, Files touched, Alternatives rejected · §5 · §8 F6 F9 · §10 · re-grounded on TOOL-dDeclaredLoop-27's committed rev-4 at branch `3d7790fb5`, per the brief `2026-11-15-prompt-TOOL-dDeclaredLoop-28-2-spec-writer`: the layer reaches the composition through 27's `compose --kind <kind> --rows -` input and its `rows` arguments, so rev-5's layer flag is not built and no compose input is added (F6); an applied exclusion rides that input as one `exclude` element form (F9), which AC4 now observes applied after a `continue`; 27 builds first, at order 24. F7, F8 and §5's decision row stand as rev-5 resolved them.
+- rev-6 · 2026-11-15 · S5 S6 · AC4 · §3 Edges · §4 Data model, Inventory, The plants, Files touched, Alternatives rejected · §5 · §8 F6 F9 · §10 · re-grounded on TOOL-dDeclaredLoop-27's committed rev-4 at branch `664da434a`, per the brief `2026-11-15-prompt-TOOL-dDeclaredLoop-28-2-spec-writer`: the layer reaches the composition through 27's `compose --kind <kind> --rows -` input and its `rows` arguments, so rev-5's layer flag is not built and no compose input is added (F6); an applied exclusion rides that input as one `exclude` element form (F9), which AC4 now observes applied after a `continue`; 27 builds first, at order 24. F7, F8 and §5's decision row stand as rev-5 resolved them.
 
 ## 10. Reuse audit
 
-The seams this unit extends, each read at branch `68a3569b6`: `verb_rescope` in
+The seams this unit extends, each read at branch `916df427f`: `verb_rescope` in
 `tools/unattended/unattended.sh`, the driver's one writer of a run's amendments of its own scope, read
 by `RESCOPE` in `tools/memory-tree/deviation_join.py` and by check 24 of
 `tools/unattended/check-unattended.sh`, both anchored on ` rescope · item ` and so untouched by the flow
@@ -612,6 +612,6 @@ class reads; `read_composition` in `tools/loop/loop_items.py`; `write_change` an
 `read_composition_at` and `write_loop_order`. `python tools/codebase-map/reuse_lookup.py "compose a
 build's own rows as a layer after the overlay"`, run on main's map, ranked the name stems `rows`, `row`,
 `build` and `build_records`, none a layer of a composition; 27's committed rev-4, read at branch
-`3d7790fb5`, is the seam that carries one, and this unit extends it rather than adding a second.
+`664da434a`, is the seam that carries one, and this unit extends it rather than adding a second.
 
 Recall terms used: flow adapt recorded change additive owner-approves off rescope step boundary witnessed path pinned composition layer

@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 49 is built: unit 94 (11c68b7f9) rewrote load_tree_lib's refusal to name every missing name and any import failure, and unit 95 (0f3cff684) observed the two-name tuple and the no-confs plant. The spec is rev-3 (24ec154b6), an observation pass that writes no code: S1 to S13 are settled in its section 3, and S14 observes the no-own-conf-read skew row after unit 94's loader rewrite (AC14, AC15).
+  table's order. Every unit through build order 49 is built: unit 94 (a16b38c6a) rewrote load_tree_lib's refusal to name every missing name and any import failure, and unit 95 (f1bbe5b68) observed the two-name tuple and the no-confs plant. The spec is rev-3 (55658aa55), an observation pass that writes no code: S1 to S13 are settled in its section 3, and S14 observes the no-own-conf-read skew row after unit 94's loader rewrite (AC14, AC15).
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

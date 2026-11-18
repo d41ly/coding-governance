@@ -103,11 +103,11 @@ verbs `TOOL-dDeclaredLoop-20` built.
 
 ## 4. Design
 
-Every claim below was read at the tip of branch `unattended-declared-loop-d56bf0`, `02524cadf`, through
+Every claim below was read at the tip of branch `unattended-declared-loop-d56bf0`, `0a3c9e057`, through
 a `git archive` extraction to a scratch directory; this worktree is cut from main, which holds no loop
 kit. The prototype runs named here edited that scratch copy only. Rev-4's claims were read the same
-way at `250b236fe`, where the dispatch-1 builder found the rest of this section unchanged; the tip
-`697e7fce9` moves no file under `tools/`.
+way at `57723d6c9`, where the dispatch-1 builder found the rest of this section unchanged; the tip
+`e4e196bf2` moves no file under `tools/`.
 
 ### Evidence
 
@@ -312,7 +312,7 @@ Both sit in `tools/loop/loop_lib.py#write_loop_plant`'s item branch beside `need
 of this section on the scratch copy, the six rows added, printed the review program line, its count
 `6 item(s)` PINNED 2026-11-16, in the order trigger, pin, report, cost, dispose, fold, and each plant
 exited 1 on its owed line. Rev-4's prototype, S3's branch and the six rows of §4 "The rows" on a scratch
-copy of `250b236fe`, printed the same line in the same order, and one `loop: item` line per row.
+copy of `57723d6c9`, printed the same line in the same order, and one `loop: item` line per row.
 
 ### Inventory
 
@@ -555,7 +555,7 @@ S30.
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the hands-off bullets mirroring the
   consumes-from edges of TOOL-dDeclaredLoop-67, written by the round-2 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-16 · §1 to §10 · S1 to S4 · AC1 to AC3 · §8 F3 to F5 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `02524cadf`, per the brief
+  `unattended-declared-loop-d56bf0` at `0a3c9e057`, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-50-1-spec-writer`: the goal cites the measured refusal and the
   live audit record; the actors take the tag-derived form, clear of the install-prefix ban (F4), with
   their fields; the check admits `none` on an `item.review.<name>` tag alone, through `NO_STEP`, and
@@ -570,7 +570,7 @@ S30.
   row routes `unit` to `transition` for B10, and its plan revision stands on a new owed row by
   `dRankedPlan` (§5); AC4 observes the table check and the routes; the trigger's set (F6), the
   program's ends (F7), the plan revision (F8), the asks and intakes (F9), the fold's routes (F10); the
-  sweep re-run at `250b236fe`.
+  sweep re-run at `57723d6c9`.
 
 ## 10. Reuse audit
 

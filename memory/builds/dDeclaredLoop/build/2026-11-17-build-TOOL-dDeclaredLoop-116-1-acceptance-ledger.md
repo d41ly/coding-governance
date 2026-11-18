@@ -4,7 +4,7 @@
 
 No merge bar, no self-test suite and no gate leg ran in this pass. The criteria were observed on this
 node (win32), at rev-1 of the spec, over the working tree, by the first dispatch, which started from the
-base `1c489a95e`. The new plant ran alone by `--fixture --plant`, standing in for the `loop budget
+base `bd1f7d8d2`. The new plant ran alone by `--fixture --plant`, standing in for the `loop budget
 fixtures` leg; the plants `ending`, `unattended-root` and `no-own-conf-read` of `budget.py`,
 `parent-in-extra-phase` of `loop_parents.py`, `record-written` of `upstream.py`, `steps` of
 `position.py`, `owner-approves` of `adapt.py` and `conf-readers-declared` of `loop_lib.py` each ran alone
@@ -22,7 +22,7 @@ for the budget scratch is reached: the position line names the acceptance record
 Owed to the close: every leg the spec's gates list names; and RED-first, on its one `New arm:` line, the
 `driver-root-readers` plant with S1 to S5 reverted, owed to print `MISSED` naming each reader.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/budget.py --fixture --plant driver-root-readers` with the five readers S1 to S5 rewrote

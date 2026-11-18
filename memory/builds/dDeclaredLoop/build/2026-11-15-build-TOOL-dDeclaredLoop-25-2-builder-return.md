@@ -34,7 +34,7 @@ Every other claim I probed held against the tree:
 
 ## Summary
 
-I committed nothing and changed nothing in the worktree. `git status` is clean at base aa47ebbe8, so there was nothing to restore and no patch file. I did not run --dispatch or --brief: a divergence leaves no write set to declare, and the first dispatch's builder return records that RUN.md already holds this unit's brief row.
+I committed nothing and changed nothing in the worktree. `git status` is clean at base fb91a2b30, so there was nothing to restore and no patch file. I did not run --dispatch or --brief: a divergence leaves no write set to declare, and the first dispatch's builder return records that RUN.md already holds this unit's brief row.
 
 What ran:
 - The spec's claims about current code, checked against the tree with greps and reads.

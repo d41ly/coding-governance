@@ -4,7 +4,7 @@
 
 No merge bar, no self-test suite and no gate leg ran in this pass. The criteria were observed on this
 node (win32), at rev-1 of the spec, over the working tree, by the first dispatch, which started from the
-base `f79dc9285`. Each named plant of `guard.py` ran alone by `--fixture --plant`, standing in for the
+base `9e7ed53bd`. Each named plant of `guard.py` ran alone by `--fixture --plant`, standing in for the
 `loop guard fixtures` leg; the docstring and help-page probes of the spec's acceptance stand in for the
 `docs` and `help page commands` legs only as far as the sentences they search. The sweep re-run at the
 base held every design claim: `check_push_range` read the first parent alone and continued above the merge
@@ -25,7 +25,7 @@ Owed to the close: every leg the spec's gates list names; and RED-first, on its 
 `push-merge-first-parent-lacks-policy` plant with the first-parent read and its continue restored in
 `check_push_range`, owed to print `MISSED` on every row and exit 3.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/guard.py --fixture --plant push-merge-first-parent-lacks-policy` with `check_push_range`

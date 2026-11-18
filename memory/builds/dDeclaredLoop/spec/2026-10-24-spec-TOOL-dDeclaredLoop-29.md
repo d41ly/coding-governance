@@ -217,7 +217,7 @@ The leg's row, its keys in the manifest's order with `stage` last, as `TOOL-dDec
  "chunk": "selftests", "subject": "kit", "ceiling": 120, "enforces": ["principle.p26"], "stage": ["step.test"]}
 ```
 
-The ceiling is `loop claims fixtures`' value, PINNED from `tools/gate-legs.json` at `dac974418`.
+The ceiling is `loop claims fixtures`' value, PINNED from `tools/gate-legs.json` at `68466ea7c`.
 
 ### The join
 
@@ -278,7 +278,7 @@ The handed rows are the three of "Data model".
 | `loop upstream fixtures` | gate leg | `tools/gate-legs.json` |
 
 Each function name passed `python tools/lexicon/lexicon.py --suggest <name> --as py.function` on
-2026-11-15 at `dac974418`, leading with a declared verb in the snake `py.function` cell (§8 F8).
+2026-11-15 at `68466ea7c`, leading with a declared verb in the snake `py.function` cell (§8 F8).
 
 ### Migration
 
@@ -401,14 +401,14 @@ versions are owed at the lander, as `kit epoch (shipped bytes move, the version 
 
 ### Budgets and records
 
-- The lexicon's `VERB_OFFENDER_PIN` in `.lexicon.conf` reads 1209 (PINNED at `dac974418`), and every
+- The lexicon's `VERB_OFFENDER_PIN` in `.lexicon.conf` reads 1209 (PINNED at `68466ea7c`), and every
   new function name passed `--suggest`, so the pin does not move.
 - `SHARED_RECORDS` in `.unattended.conf` lists `memory/DECISIONS.md` and
   `memory/project/readme-contract.txt`; the pass writes neither, and no decision row is owed ahead,
   since no cap, ceiling or budget key rises.
 - `REFUSAL_CEILINGS` in `.memory-tree.conf` prices `tools/unattended/unattended.sh` and
   `tools/unattended/check-unattended.sh`, which `python tools/memory-tree/check-arms.py --report`
-  read at 325 of 325 and 266 of 266 sites (PINNED, 2026-11-15, a scratch clone of `dac974418`), and
+  read at 325 of 325 and 266 of 266 sites (PINNED, 2026-11-15, a scratch clone of `68466ea7c`), and
   the one `.families.txt` sidecar is `tools/unattended/unattended.families.txt`. This unit edits no
   `.sh` gate; its one shell file, `tools/roles/adopt-roles.test.sh`, is a `*.test.sh` the census
   leaves out, so no ceiling or family moves.
@@ -561,7 +561,7 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC7 AC8 · arm 23 over the ba
   meta-check never reds the leg.
 - rev-4 · 2026-11-15 · §1 · S1 S2 S3 S4 S5 S6 S7 S8 S9 S10 · §3 · §4 · §5 · AC1 AC2 AC3 AC4 AC5 AC6
   AC7 AC8 AC9 AC10 AC11 AC12 AC13 AC14 · §7 · §8 · §10 · re-grounded on
-  branch/unattended-declared-loop-d56bf0 at `dac974418` by the brief
+  branch/unattended-declared-loop-d56bf0 at `68466ea7c` by the brief
   2026-11-15-prompt-TOOL-dDeclaredLoop-29-1-spec-writer; mechanism, carries, order and status kept.
   The schema file is named and entries sit on one line, as TOML 1.0 requires; the checks run in the
   item kind's `check` (F5); the verbs read the composition through an extracted reader (F6); findings
@@ -580,11 +580,11 @@ extracted at its third instance; `tools/memory-tree/tree_lib.py#read_blobs_at`; 
 conf and id readers; and `tools/loop/loop_lib.py#run_selftest_cases`. For `used`, `bypassed` and
 `not-applicable` no existing seam fits: `python tools/codebase-map/reuse_lookup.py "answer each handed
 commitment row used bypassed or not-applicable at an agent return"`, re-run 2026-11-15 over a scratch
-clone of `dac974418`, ranked only name stems (`rows`, `row`, `write_commit`, `parse_unit_rows`) with no
+clone of `68466ea7c`, ranked only name stems (`rows`, `row`, `write_commit`, `parse_unit_rows`) with no
 join of handed to returned ids; its run for "read the lines under one markdown heading section of a
 file" found one heading reader, `tools/roles/handoff.py#extract_card_section`, which §4 rejects.
 `python tools/memory-recall/query.py` returned the packet's row, the writers' brief items, scout B's row
 and later builds' scouts naming rev-3's names; scout B's `READ_KEYS` and `render_handoff` agree with
-source at `dac974418`.
+source at `68466ea7c`.
 
 Recall terms used: upstream rows used bypassed not-applicable commitment edge gating measured reuse-scout READ_KEYS handoff render

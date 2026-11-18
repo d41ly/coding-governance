@@ -81,7 +81,7 @@ record, writing no product file (§8 F2). It builds at order 38.
 
 ### Evidence
 
-Read at the branch tip `e0a7e54b3` of `unattended-declared-loop-d56bf0`, from its tree as `git archive`
+Read at the branch tip `adbc3ecf5` of `unattended-declared-loop-d56bf0`, from its tree as `git archive`
 wrote it:
 
 - `derive_parallel_step` answers as S1 states. Its docstring says `yes` speaks only to the estimates
@@ -103,7 +103,7 @@ wrote it:
 - `memory/builds/aTunedCompass/README.md` reads `unknown` at step 2, because `TOOL-aTunedCompass-10`,
   CLOSED, carries no Files touched sub-head.
 - Over every build README the region holds 128 `yes`, 1529 `no` and 17 `unknown` rows, in 214 PINNED
-  READMEs at `e0a7e54b3`; §5 "The sweep" re-derives them.
+  READMEs at `adbc3ecf5`; §5 "The sweep" re-derives them.
 - The round-2 probe found 14 shared-order groups and 13 intersecting pairs: PINNED, 2026-10-24.
 
 ### The cell, as built
@@ -160,7 +160,7 @@ path declared is the file the pass does write; its acceptance ledger and other r
 
 ### The sweep
 
-Read at the branch tip `e0a7e54b3`; counts PINNED there unless named DERIVED.
+Read at the branch tip `adbc3ecf5`; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
@@ -286,7 +286,7 @@ pass's direct probe of the same function.
 - rev-3 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-86, written by the round-6 spec audit's disposal; nothing else moved.
 - rev-4 · 2026-11-16 · §1 to §10 · S1 to S3 · AC1 to AC4 · §8 F2 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `e0a7e54b3`, per the brief
+  `unattended-declared-loop-d56bf0` at `adbc3ecf5`, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-66-1-spec-writer`: TOOL-dGroundRules-25 and TOOL-dGroundRules-32
   built rev-3's readers, cell and re-render after this spec's base, so by F2 the unit writes no product
   file, its Files touched names its own spec for the dispatch's one required path, and its criteria

@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 50 is built: of order 50, units 96 (observed), 97 (84b130976, CONF_READERS), 98 (cc02f8137, the declared-readers row) and 99 (35230bb9a, CONF_ROUTES and the conf-readers-declared plant). This is the last unit. The spec is rev-2 (324de1f6e), an observation pass: S22 re-runs unit 90 AC4's tree_lib attribute collection over loop_lib.py after 97 and 99 wrote it (AC22).
+  table's order. Every unit through build order 50 is built: of order 50, units 96 (observed), 97 (13cf2e205, CONF_READERS), 98 (ec7919319, the declared-readers row) and 99 (d0c7adcba, CONF_ROUTES and the conf-readers-declared plant). This is the last unit. The spec is rev-2 (5ca4dd078), an observation pass: S22 re-runs unit 90 AC4's tree_lib attribute collection over loop_lib.py after 97 and 99 wrote it (AC22).
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

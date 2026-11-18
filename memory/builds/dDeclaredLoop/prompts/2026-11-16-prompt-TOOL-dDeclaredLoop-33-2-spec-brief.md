@@ -31,7 +31,7 @@ that return, so S3, AC3, AC10 and §4 all hold over gov's own rows at HEAD and A
    any item like it, carries a declared bound, such as a pending row of a new kind. Measure each option over gov's rows at HEAD
    and over AC3's plant, recommend the one that keeps the rule able to red with the smallest change, mark it RESOLVED (agent,
    2026-11-16, delegated), and write S3, AC3, AC10 and §4 on it.
-3. Update the PINNED cycle count to 23 at e8018d94f (the two new cycles come from unit 50's review rows), and name both in §4's
+3. Update the PINNED cycle count to 23 at e3d842339 (the two new cycles come from unit 50's review rows), and name both in §4's
    rules where they are bounded.
 4. Re-run the spec's sweep for anything the change reaches, and keep everything else, including F7's departure and F9.
 5. Keep the unit one mechanism, its carries, its order and its INPROGRESS status. Write only that spec file. Do not commit and do

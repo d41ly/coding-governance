@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 49 is built, and unit 96 of order 50 (d81d97eb2) observed the no-own-conf-read skew row after unit 94's loader rewrite. The spec is rev-2 (24ec154b6): it builds CONF_READERS in loop_lib.py above derive_conf_reads, which then reads that tuple instead of its own hard-coded list; units 98 and 99 build after you on it.
+  table's order. Every unit through build order 49 is built, and unit 96 of order 50 (4125a5d97) observed the no-own-conf-read skew row after unit 94's loader rewrite. The spec is rev-2 (55658aa55): it builds CONF_READERS in loop_lib.py above derive_conf_reads, which then reads that tuple instead of its own hard-coded list; units 98 and 99 build after you on it.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

@@ -26,7 +26,7 @@ has no recommendation kind; the hygiene suite's call of the plant against the ba
 floor raised by one; and the driver suite's `--recommend` arms, the verb over planted rosters and
 policy files with a positive assertion of each new refusal's whole text, against the base driver.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/memory-tree/build_records.py --fixture --plant recommendation` with every function the unit's

@@ -252,15 +252,15 @@ rules, in order, recorded per cycle in the acceptance ledger:
    no site draws on it, so its row names `dDeclaredLoop`, the owner of `item.review.fold`'s row.
 4. An item with an owner actor is a `wait` row naming `run.owner-deadline` and dWellOiledMachine.
 
-Measured over gov's `[[item]]` rows at the branch tip `e8018d94f` by `scan_cycles` over every route
+Measured over gov's `[[item]]` rows at the branch tip `e3d842339` by `scan_cycles` over every route
 between declared items: 23 cycles over 45 edges, PINNED on 2026-11-16 at that tip. The count was 21
-over 39 at `250b236f`, and the two added are unit 50's review cycles that rules 2 and 3 name above.
+over 39 at `57723d6c`, and the two added are unit 50's review cycles that rules 2 and 3 name above.
 Rule 1 covers four items, `item.build.unit-lease` on `waiting`, `item.deploy.core` on `running`,
 `item.deploy.land` on `unreachable` and `item.deploy.parents` on `held` and `moved`. Units 52 and 53,
 beside this unit at order 34, may land rows, so the population is re-derived at the builder's base by
 the module's own `check` before rule 1 to 4 are applied, never read off this paragraph.
 
-Over the same rows the `reachable` rule prints no finding, PINNED on 2026-11-16 at `e8018d94f` and
+Over the same rows the `reachable` rule prints no finding, PINNED on 2026-11-16 at `e3d842339` and
 re-derived by the same `check` at the builder's base. `item.build.resolve` needs only
 `item.test.merge` (`tools/loop/loop.toml@44ea9acb:1567`) and is reached through that item's
 `conflict` route (`tools/loop/loop.toml@44ea9acb:1589`), which the walk follows across programs. No
@@ -377,7 +377,7 @@ The leg lands with the check. Gov's own composition must be green at landing, ev
   fixed, deny by default, so no overlay or flow change patches gov's bound. At the boundary a
   composition `check_program` refuses refuses the move, so a broken program never applies.
 - perf / scale — each rule is linear in rows and edges; the push composes gov's once and each live
-  build's at its pin, a scratch worktree per pin not HEAD; live builds number 0 PINNED at `250b236f` on
+  build's at its pin, a scratch worktree per pin not HEAD; live builds number 0 PINNED at `57723d6c` on
   2026-11-16 (`git log --grep=Gov-Transition:` prints none). The step boundary composes only on a move
   that applies a change. The leg's ceiling is 300 PINNED; its budget row is a proxy of each plant alone.
 - error / empty / loading states — an empty state set is a finding; a level with no terminal set prints
@@ -394,13 +394,13 @@ The leg lands with the check. Gov's own composition must be green at landing, ev
 
 ### The sweep: what the change reaches, and what keeps each green
 
-Read on `branch/unattended-declared-loop-d56bf0` at `250b236f`, extracted by `git archive`; the
+Read on `branch/unattended-declared-loop-d56bf0` at `57723d6c`, extracted by `git archive`; the
 lexicon ran on this worktree's main at `179486e8`.
 
 | Reached | Readers and populations | What keeps it green |
 |---|---|---|
 | `render_state_row`, `STATE_ROW` | writer `write_flow_states`; reader `read_flow_rows`, and through it `read_pending_rows` and `read_flow_layer`; `grep -rn "flow-state" tools skills` names `tools/loop/adapt.py` alone | the group is optional, before `disposition`, so every landed row reads; the `loosening` plant expects it; `help/loop.md`'s row grammar gains it |
-| `write_transition` | the `record` verb, `budget.py`'s plants, the driver through `record`; `adapt.py` is the one writer of a flow row (`grep -rln "write_flow_proposal\|rescope · flow " tools`) | the call runs only after an `applied` row, so only `adapt.py`'s `additive`, `owner-approves`, `mid-step` and `loosening` plants reach it; each composes a program `check_program` holds once S11's two plant edits land, measured at `440236882` (§8 F13); `off` refuses, and `unrecorded-skip`, `act-mismatch` and `unit-row` apply nothing; `loop adapt fixtures`' budget row, 225 PINNED, is re-read |
+| `write_transition` | the `record` verb, `budget.py`'s plants, the driver through `record`; `adapt.py` is the one writer of a flow row (`grep -rln "write_flow_proposal\|rescope · flow " tools`) | the call runs only after an `applied` row, so only `adapt.py`'s `additive`, `owner-approves`, `mid-step` and `loosening` plants reach it; each composes a program `check_program` holds once S11's two plant edits land, measured at `3918078c9` (§8 F13); `off` refuses, and `unrecorded-skip`, `act-mismatch` and `unit-row` apply nothing; `loop adapt fixtures`' budget row, 225 PINNED, is re-read |
 | `run_adapt_plant`'s add row, `FX_EXCLUDE`, `PLANTS` | `run_adapt_plant` alone: `grep -rn "FX_EXCLUDE\|item.test.flakes" tools help` names `adapt.py`, `loop.toml`'s own rows and `loop_items.py`'s `exclude-breakpoint` plant, which writes its own literal | the add row keeps its tag, step, actor and needs, so `act-mismatch` and `unit-row` read as before; `help/loop.md`'s `--rescope` example names the tag and a row file, never the row's fields |
 | the pending list's staleness | `check` without `--build`; `check --build` and the boundary read the list to excuse its rows | graded over `gov` alone (§8 F14), so the `loosening` plant's composition, which drops no gov cycle and no wait row's item, and any build's exclusion grade no stale row |
 | `cl-dClosedLoop-0118`'s as-built row | the carries join, its stale and token arms, and the coverage regions `gen_build_index.py --write` renders | deviation 334's `amends` moves the row's text and hash to `ae61aaf4`, which the Carries line pins; the row's tokens `flow.wait-ceiling` and `flow.adapt` both stand in this spec; no other spec carries the clause, and the dispatcher's one `--write` re-renders the view |
@@ -416,7 +416,7 @@ lexicon ran on this worktree's main at `179486e8`.
 | reader coverage | `check_reader_coverage` over `flow.wait-ceiling` | `termination.py`'s literal `resolve` call |
 | the install-prefix ban | `check-install-prefix.sh` | the kit's files spell `<prefix>` or `{prefix}`, never the tool root |
 
-Rev-7 re-read what its change reaches at `e8018d94f`: gov's `[[item]]` rows, the review program's among
+Rev-7 re-read what its change reaches at `e3d842339`: gov's `[[item]]` rows, the review program's among
 them, `tools/loop/loop_lib.py#check_program`, `tools/loop/position.py#derive_next_item`,
 `tools/loop/budget.py#CAUSES` and `tools/unattended/unattended.sh#verb_review`. Outside
 `tools/loop/loop.toml`, `item.review.fold` is named only in prompt text, in
@@ -424,16 +424,16 @@ them, `tools/loop/loop_lib.py#check_program`, `tools/loop/position.py#derive_nex
 workflow's test, none of which reads a row field, so its `draws` reaches no reader the table lacks. The walk S3 gives reads the rows `check_program` already
 grades and adds no reader.
 
-Rev-8 re-read what its change reaches at `440236882`, the code unchanged at the tip `e0a7e54b3`:
+Rev-8 re-read what its change reaches at `3918078c9`, the code unchanged at the tip `adbc3ecf5`:
 `tools/loop/adapt.py#run_adapt_plant` and `#write_flow_states`, `tools/loop/loop_transition.py#write_transition`,
 `tools/loop/loop_lib.py#check_program`, `tools/loop/loop_table.py#derive_direction`, the `[[stand-in]]`
 rows, and `tools/memory-tree/asbuilt_view.py#render_view` with `tools/check-spec-tokens.py#scan_carries`.
 Gov's composition still holds 23 cycles over 45 edges, and the reachable walk still leaves no item
 unreached.
 
-Sibling code this spec is written on: units 50, 19 and 51 landed by `e8018d94f`, unit 50's review
+Sibling code this spec is written on: units 50, 19 and 51 landed by `e3d842339`, unit 50's review
 program adding the two cycles §4 bounds; units 52 and 53 beside this one at order 34, unit 52
-INPROGRESS and unit 53 DEFERRED at `a737706a7`, either of which may edit `tools/loop/loop.toml`. The builder re-derives gov's cycles and the
+INPROGRESS and unit 53 DEFERRED at `bd31adbcc`, either of which may edit `tools/loop/loop.toml`. The builder re-derives gov's cycles and the
 reachable walk at its base (§4).
 
 ## 6. Acceptance criteria
@@ -543,7 +543,7 @@ New arm: tools/loop/termination.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 AC9 AC1
   dWellOiledMachine's stand-in, a `cycle` row by §4's rule 3. Recommendation (a); the body is written on it.
   RESOLVED (agent, 2026-11-16, delegated): (a).
 - **F6 — How do gov's own item-route cycles pass the counted rule at landing?** 23 cycles PINNED at
-  `e8018d94f` on 2026-11-16: waits on a lease, the remote and a parent, fix passes, review rounds, and
+  `e3d842339` on 2026-11-16: waits on a lease, the remote and a parent, fix passes, review rounds, and
   design, test and disposal loops no draw site records. Options: (a) §4 "Gov's own cycles at
   landing"'s four rules; (b) every
   cycle a pending row; (c) the item routes left out of the rule. (b) leaves the waits this unit's key
@@ -569,7 +569,7 @@ New arm: tools/loop/termination.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 AC9 AC1
   unit 6's.
 - **FACT-QUESTION · F8 — Is F4's ask filed, and does the classifier order a number?** Probe: `git grep -n
   -i "numeric" branch/unattended-declared-loop-d56bf0 -- memory/builds/dOrderedCharter/BACKLOG.md` and
-  `tools/playbook/row_checks.py#derive_patch_class`, read at `250b236f`. Observation, 2026-11-16: the
+  `tools/playbook/row_checks.py#derive_patch_class`, read at `57723d6c`. Observation, 2026-11-16: the
   grep prints nothing; dOrderedCharter's README reads `CLOSED`; and `derive_patch_class` reads `add` or
   `remove` on a set and a listed value on a scalar, refusing any value off its order. Liveness: the grep
   finds the ask once filed, and `derive_patch_class` gains a numeric branch once it lands. RESOLVED
@@ -607,7 +607,7 @@ New arm: tools/loop/termination.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 AC9 AC1
   need only between two items of one program, with AC3's orphan rebuilt as a build item needing
   `item.test.merge` that no route names; (b) rev-6's walk, with `item.build.resolve` and any item like
   it carrying a declared bound, a `reach` row as a third kind of the pending list. Measured at
-  `e8018d94f` on 2026-11-16 over gov's rows, bare and with that orphan added: (a) prints nothing on gov
+  `e3d842339` on 2026-11-16 over gov's rows, bare and with that orphan added: (a) prints nothing on gov
   and the orphan alone on the plant; (b) prints nothing on gov beside one pending row, and the orphan
   on the plant. Following every need across programs under (a), or counting an item whose needs all
   leave its program as an entry, prints nothing on either: every item's needs lead back to some entry,
@@ -616,7 +616,7 @@ New arm: tools/loop/termination.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 AC9 AC1
   exemption read as coverage. RESOLVED (agent, 2026-11-16, delegated): (a), the smallest change that
   keeps the rule able to red; S3, AC3, AC10 and §4 are written on it.
 - **F13 — What does the step boundary do with a build's composition that `check_program` refuses?**
-  The builder return 2026-11-16-build-TOOL-dDeclaredLoop-33-2-builder-return measured, at `440236882`,
+  The builder return 2026-11-16-build-TOOL-dDeclaredLoop-33-2-builder-return measured, at `3918078c9`,
   that every composition the `loop adapt fixtures` plants apply is refused by `check_program`:
   - `run_adapt_plant`'s add row, `item.build.adopter.lint-pass`, carries no outcomes;
   - the `loosening` plant's exclusion of `item.test.flakes` leaves `item.test.route`'s `nondeterministic`
@@ -631,7 +631,7 @@ New arm: tools/loop/termination.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 AC9 AC1
   - (c) The boundary reads the build's items without `check_program`, walking only routes between
     declared items.
 
-  Measured by a probe calling `read_composition` and `check_program` over gov's rows at `440236882`.
+  Measured by a probe calling `read_composition` and `check_program` over gov's rows at `3918078c9`.
   Gov's composition holds 23 cycles over 45 edges, with no item unreached. The old add row and the
   flakes exclusion are each refused. The new add row and the exclusion of `item.review.cost` each hold:
   23 cycles, no gov cycle gone, no wait row's item gone, no item unreached. Of gov's 67 items, 17
@@ -664,7 +664,7 @@ New arm: tools/loop/termination.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 AC9 AC1
   excluded. It also makes every reader re-derive a build's exclusions. (c) reds an adopter whose overlay
   excludes such an item, though the list describes gov's rows and not theirs. Under (a), the `loosening`
   plant's composition grades no staleness. Its exclusion, `item.review.cost` by F13, drops none of
-  gov's 23 cycles and names no wait row's item, measured at `440236882`. RESOLVED (agent, 2026-11-16,
+  gov's 23 cycles and names no wait row's item, measured at `3918078c9`. RESOLVED (agent, 2026-11-16,
   delegated): (a), the list graded where its rows were measured. §4 "The pending list", the data model's
   `gov`, S5 and AC5 are written on it.
 
@@ -686,14 +686,14 @@ New arm: tools/loop/termination.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 AC9 AC1
   brief `2026-11-05-prompt-TOOL-dDeclaredLoop-3-owner-forks`; S8 names the direction.
 - rev-6 · 2026-11-16 · §1 · S1 · S2 · S3 · S4 · S5 · S6 · S7 · S8 · S9 · S10 · S11 · S12 · S13 · §3 · §4 ·
   §5 · AC1 · AC2 · AC3 · AC4 · AC5 · AC6 · AC7 · AC8 · AC9 · AC10 · AC11 · §7 · §8 F5 F6 F7 F8 F9 F10 F11 ·
-  §10 · re-grounded at the tip of branch/unattended-declared-loop-d56bf0 (`250b236f`), per the brief
+  §10 · re-grounded at the tip of branch/unattended-declared-loop-d56bf0 (`57723d6c`), per the brief
   prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-33-1-spec-writer.md: symbol citations; the landed
   composition readers and `read_build_items`; `scan_cycles`; F5 to F11; S6 and AC6 out, built by unit
   27; the help page that now exists; §5's sweep.
 - rev-7 · 2026-11-16 · S3 · §4 · §5 · AC3 · AC10 · §8 F6 F12 · per the builder return
   2026-11-16-build-TOOL-dDeclaredLoop-33-1-builder-return: the reachable walk starts from every
   program's entry and follows a need only within one program (F12), so `item.build.resolve` holds and
-  AC3's orphan still reds; gov's cycles re-pinned at 23 at `e8018d94f`, unit 50's two review cycles
+  AC3's orphan still reds; gov's cycles re-pinned at 23 at `e3d842339`, unit 50's two review cycles
   bounded by §4's rules 2 and 3.
 - rev-9 · 2026-11-16 · §8 F5 F6 F7 F9 F10 F11 · per the builder return 2026-11-16-build-TOOL-dDeclaredLoop-33-3-builder-return: each
   fork the body is already written on carries its resolution mark, (a); nothing else moves.

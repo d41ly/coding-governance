@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 44 is built, and unit 90 of order 45 (b10a81331: TREE_LIB_SYMBOLS, load_tree_lib testing each tree_lib name in order, conf-read-forms rows annotation-only, subscript-target and for-body, the version-skew row) is built. Unit 89 (20362ef2b) built derive_conf_rebinds, which this unit widens. The spec is rev-3, re-grounded on the branch; it takes unit 94's two items early (F5).
+  table's order. Every unit through build order 44 is built, and unit 90 of order 45 (be7988ff4: TREE_LIB_SYMBOLS, load_tree_lib testing each tree_lib name in order, conf-read-forms rows annotation-only, subscript-target and for-body, the version-skew row) is built. Unit 89 (bd3cf1c87) built derive_conf_rebinds, which this unit widens. The spec is rev-3, re-grounded on the branch; it takes unit 94's two items early (F5).
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

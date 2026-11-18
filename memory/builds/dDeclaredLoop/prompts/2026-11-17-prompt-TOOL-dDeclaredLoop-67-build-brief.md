@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 37 is built: units 65, 68 (0f4d95ac1, the witness normaliser) and 76 (92f119c11, the syntax-tree conf-read rule; its no-own-conf-read plant reds the budget and breakpoint fixture legs until unit 80 of this order) of order 37. The spec is rev-4, re-grounded at c3ae32535 with forks F3 to F6 marked by the main loop.
+  table's order. Every unit through build order 37 is built: units 65, 68 (5b9809f25, the witness normaliser) and 76 (199b4aa16, the syntax-tree conf-read rule; its no-own-conf-read plant reds the budget and breakpoint fixture legs until unit 80 of this order) of order 37. The spec is rev-4, re-grounded at b12cd5f39 with forks F3 to F6 marked by the main loop.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

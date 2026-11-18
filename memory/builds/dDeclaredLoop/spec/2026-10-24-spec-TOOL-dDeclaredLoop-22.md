@@ -241,7 +241,7 @@ The main loop scores Design once the spec set is committed, spawns `gov-spec-wri
 | `Stage`, `Score`, `Signals`, `Source`, `Binds`, `Reason`, `Role`, `Answers` | record fields | none |
 
 Each function name passed `python tools/lexicon/lexicon.py --suggest <name> --as <cell>` on an export of
-the branch at `02524cadf`, whose lexicon declaration the tip at `6a3174eb0` leaves unchanged.
+the branch at `0a3c9e057`, whose lexicon declaration the tip at `c7f4ef116` leaves unchanged.
 
 ### Migration
 
@@ -307,8 +307,8 @@ Each render is its template's copy: `memory/HYGIENE.md`, `memory/guides/UNATTEND
 
 ### The sweep
 
-Read at branch `unattended-declared-loop-d56bf0`, tip `6a3174eb0`, through `git show` and an export of
-`02524cadf` with the delta to `6a3174eb0` applied; counts PINNED there unless named DERIVED.
+Read at branch `unattended-declared-loop-d56bf0`, tip `c7f4ef116`, through `git show` and an export of
+`0a3c9e057` with the delta to `c7f4ef116` applied; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
@@ -338,7 +338,7 @@ python tools/check-spec-tokens.py --legs-for <each path under Files touched>  # 
 ### Budgets and records
 
 - The driver's census, read through `tools/memory-tree/check-arms.py#branches` and
-  `tools/memory-tree/check-arms.py#scan_refusal_sites`, is 335 PINNED at `6a3174eb0`, at its ceiling.
+  `tools/memory-tree/check-arms.py#scan_refusal_sites`, is 335 PINNED at `c7f4ef116`, at its ceiling.
   This unit adds two sites, so the ceiling rises by two from the value `REFUSAL_CEILINGS` holds when the
   pass starts: 335 -> 337 PINNED where `TOOL-dDeclaredLoop-20` has raised nothing, else from its landed
   figure, with the comment line below. `memory/project/positional-refs.txt`'s row pairing
@@ -378,7 +378,7 @@ Order 32, beside `TOOL-dDeclaredLoop-50`, read on its committed rev-2: it edits 
 `[[record-version]]` row, a disjoint hunk. `TOOL-dDeclaredLoop-20` builds alone at order 31, read on its
 committed rev-4: it mints `--trigger`, the verb this unit's trigger line names, and adds driver sites and
 a Skill line of its own, so the census and the Skill row are re-read at this pass's start. Units 12, 21,
-30, 31 and 32 are landed, read on code at `6a3174eb0`; units 19 and 51 build after this one;
+30, 31 and 32 are landed, read on code at `c7f4ef116`; units 19 and 51 build after this one;
 `TOOL-dDeclaredLoop-34` is deferred against ask TOOL-dDeclaredLoop-113 and shares no file. The suggests,
 the reuse probe, the recall query, the census probe and `--legs-for` ran on the export; every other claim
 was read on the branch through `git show`.
@@ -440,7 +440,7 @@ was read on the branch through `git show`.
   "item[.](plan|design|test)[.]reason"' tools/loop/loop.toml` prints 3 while the same for `build` and
   `deploy` prints 0.
   Red when: the kind joins the factory without its version row, so the check refuses the five returns.
-  figure: 5 and 3 PINNED, the rows at `6a3174eb0`.
+  figure: 5 and 3 PINNED, the rows at `c7f4ef116`.
 - **AC9** — When `grep -c -- '--recommend'` runs over `tools/unattended/VERBS.template.md` and
   `memory/guides/UNATTENDED-VERBS.md`, and `grep -c 'handoff.py render --role gov-spec-writer'` over the
   same two, each prints at least 1; `grep -c 'unattended.sh --recommend '` prints 1 over
@@ -512,7 +512,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC2 AC3 AC4 AC6 AC7 · th
   kind joins `TYPED_RECORD_KINDS` and the HYGIENE kind list, the binding is observed, and no
   `new recommendation` door is claimed.
 - rev-4 · 2026-11-16 · §1 to §10 · S1 to S8 · AC1 to AC9 · §8 F3 to F7 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `6a3174eb0`, per the brief
+  `unattended-declared-loop-d56bf0` at `c7f4ef116`, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-22-1-spec-writer`: symbol and blob-pinned citations; the
   factory's door and plant, landed per kind (F6); the eight item rows already on the branch, so S6 is
   their version row and AC8 their observation, AC10 folded into AC1; the answer on `--verdict`, since
@@ -533,7 +533,7 @@ a score, no existing seam fits: the build harness's stages run before the score 
 direct spawn through `handoff.py render` is how a role runs outside a harness today.
 
 `python tools/codebase-map/reuse_lookup.py "score a stage exit review recommendation from signals and
-record it as a typed build record"`, on the export at `02524cadf`, ranked name-stem neighbours, among them
+record it as a typed build record"`, on the export at `0a3c9e057`, ranked name-stem neighbours, among them
 `write_record` (`tools/memory-tree/build_records.py`), the seam above, `read_records`,
 `read_transition_records` and `score` (`tools/memory-recall/bench.py`, a recall benchmark); none scores a
 recommendation. `python tools/memory-recall/query.py "who scores and reasons the review recommendation

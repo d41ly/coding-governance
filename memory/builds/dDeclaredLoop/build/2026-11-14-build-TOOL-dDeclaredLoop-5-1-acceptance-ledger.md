@@ -18,7 +18,7 @@ first is the `witness-actor-unlisted` plant of `tools/loop/loop_lib.py`, staged 
 kit's directory removed beside the copy. That suite is waived under README rule 8, so its reading is
 owed with PLAY-dClosedLoop-13.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 The `witness-actor-unlisted` plant of `tools/loop/loop_lib.py`, whose planted defect is the staged break,

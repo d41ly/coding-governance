@@ -15,7 +15,7 @@ the RED-first observation of its two `New arm:` lines: the `--fixture` plants of
 `tools/loop/loop_lib.py`, staged by the `needs-cycle` plant, and the `needs_graph_py` parity row of
 `tools/lib/resolve-python.test.sh`, staged by a one-byte edit to the backlog copy, each restored.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 The `needs-cycle` plant of `tools/loop/loop_lib.py`, whose planted defect is the staged break, exited 1 over

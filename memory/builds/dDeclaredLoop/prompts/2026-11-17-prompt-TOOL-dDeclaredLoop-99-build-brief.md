@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 49 is built, and of order 50 units 96 (d81d97eb2, observed), 97 (84b130976, CONF_READERS above derive_conf_reads) and 98 (cc02f8137, the declared-readers row of the conf-read-forms plant). The spec is rev-2 (b5124a616): a both-ways check of CONF_READERS plus CONF_ROUTES for resolve_memory_root_source, as a plant on the loop definition fixtures leg.
+  table's order. Every unit through build order 49 is built, and of order 50 units 96 (4125a5d97, observed), 97 (13cf2e205, CONF_READERS above derive_conf_reads) and 98 (ec7919319, the declared-readers row of the conf-read-forms plant). The spec is rev-2 (f060f250c): a both-ways check of CONF_READERS plus CONF_ROUTES for resolve_memory_root_source, as a plant on the loop definition fixtures leg.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

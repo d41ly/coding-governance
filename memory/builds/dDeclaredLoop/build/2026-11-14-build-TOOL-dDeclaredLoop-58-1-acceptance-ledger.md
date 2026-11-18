@@ -12,7 +12,7 @@ Owed to the close: every leg the spec's section 7 names, and the RED-first obser
 range `HEAD~3..HEAD` in the arm's spawn and, on win32, for one run by deleting the `reconfigure` call
 from the memory-tree copy of the trailer CLI, each restored.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 Not observed: the arm in `tools/memory-tree/routed_commits.py`, no staged break was run for it at this close.

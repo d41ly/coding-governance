@@ -8,7 +8,7 @@
 - **After:** `TOOL-dDeclaredLoop-100` rev-2 wrote nothing under `tools/`, restated no sibling spec and re-ran no plant: it read 95's and 96's settled items, settled the ids each edge names in the rows of its §3 table and closed on AC22 alone, the collection 90 AC4 states; the plants stand where they run, `conf-readers-declared` under the `loop definition fixtures` leg and `confs-disagree` under the `loop budget fixtures` and `loop breakpoint fixtures` legs.
 - **Cause:** review finding
 - **Reason:** the closing diff review's round 1 confirmed 99's edge claiming a re-run that never happened, an empty population read as coverage (its item 6, finding 8), and named the other edges into the same unit as the same defect; each spec is CLOSED and frozen, so one record answers every edge and their texts stay as landed.
-- **Evidence:** `memory/builds/dDeclaredLoop/reviews/2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round1.md`, item 6; §1 to §3 of `memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md`, which hold S22 and AC22 alone and write nothing under `tools/`; the pass commit c9a4c606f.
+- **Evidence:** `memory/builds/dDeclaredLoop/reviews/2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round1.md`, item 6; §1 to §3 of `memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md`, which hold S22 and AC22 alone and write nothing under `tools/`; the pass commit e8307cd60.
 - **Risk:** editorial
 - **Approver:** author, the builder pass of TOOL-dDeclaredLoop-117, under the chain's `author-recorded` value (`PLAY-dClosedLoop-4`)
 - **Follow-through:** ask TOOL-dDeclaredLoop-35

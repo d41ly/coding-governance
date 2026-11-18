@@ -3,7 +3,7 @@
 **Serves:** journal TOOL-dDeclaredLoop-66
 
 No merge bar and no self-test suite ran in this pass, and no product file was written (F2). The criteria
-were observed on node `d` (win32), at rev-4 of the spec, at this pass's base `677c81b50`: a `python -c`
+were observed on node `d` (win32), at rev-4 of the spec, at this pass's base `74a6bc30f`: a `python -c`
 probe importing `gen_build_index` in `tools/memory-tree/`, standing in for the five Parallel arms the
 `build-index selftest` leg runs; and `grep` probes of the rendered regions and the readers, standing in
 for nothing a leg runs. The section 5 sweep re-run at this pass's base held its design claims: steps 4,

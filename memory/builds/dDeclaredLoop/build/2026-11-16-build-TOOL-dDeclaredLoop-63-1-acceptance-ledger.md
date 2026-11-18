@@ -17,7 +17,7 @@ RED-first: the `tools/loop/loop_table.py` arm, its five PINNED adopter-phase cas
 takes no `--extra`; and the `tools/loop/breakpoints.py` arm, the `driver-plan` plant's adopter-phase calls
 against unit 52's `check_phase_gates`, which passes no `--extra`.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/loop_table.py check --selftest` with every function the unit's pass changed in

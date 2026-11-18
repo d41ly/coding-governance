@@ -8,7 +8,7 @@ DIVERGENCE: spec §8 (Open questions) cannot reach CLOSED as written. Six of its
 
 ## Summary
 
-Nothing is committed and the tree is clean at 2fa00d7c3. I built the whole unit, but the commit that closes the spec was refused by memory-hygiene check 12: six forks in §8 (F5, F6, F7, F9, F10, F11) carry no resolution mark. Only the spec writer can add those marks; details are in `why`.
+Nothing is committed and the tree is clean at f30ea8167. I built the whole unit, but the commit that closes the spec was refused by memory-hygiene check 12: six forks in §8 (F5, F6, F7, F9, F10, F11) carry no resolution mark. Only the spec writer can add those marks; details are in `why`.
 
 **Saved work.** All 29 changed paths are in C:/Users/DAILY-~1/AppData/Local/Temp/claude/b120d4a7f8b5be2e/7c85732c-fa0c-43e9-83f2-238d293195e0/scratchpad/TOOL-dDeclaredLoop-33-builder-3.patch. `git apply --check` passes against HEAD. It contains:
 - the new `tools/loop/termination.py` and `tools/loop/termination-pending.txt`;

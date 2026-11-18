@@ -4,7 +4,7 @@
 
 No merge bar, no self-test suite and no gate leg ran in this pass. The criteria were observed on node `d`
 (win32), at rev-6 of the spec, over the working tree, by the first dispatch, which started from the
-base `f16312ad5`. The `conf-read-forms` and `no-own-conf-read` plants of `budget.py` ran alone by
+base `031739e5b`. The `conf-read-forms` and `no-own-conf-read` plants of `budget.py` ran alone by
 `--fixture --plant`, standing in for the `loop budget fixtures` leg; `python -c` probes of
 `derive_conf_constants`, `load_tree_lib` and `TREE_LIB_SYMBOLS`, an `ast` collection over
 `loop_lib.py`, and the README greps stood in for the rest. The sweep re-run at the base held every
@@ -19,7 +19,7 @@ the one `New arm:` line, the `budget.py` plants: `conf-read-forms` with `derive_
 each binding's value alone, and `no-own-conf-read` with `load_tree_lib` testing `derive_docstring_ids`
 alone.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/budget.py --fixture --plant conf-read-forms` with every function the unit's pass changed in

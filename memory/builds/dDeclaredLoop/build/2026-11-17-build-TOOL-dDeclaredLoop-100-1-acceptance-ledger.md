@@ -4,7 +4,7 @@
 
 No merge bar, no self-test suite and no gate leg ran in this pass. The criterion was observed on node `d`
 (win32), at rev-2 of the spec, over the working tree, by the first dispatch, which started from the base
-`9d4cef54f`, after units 97, 98 and 99 closed at order 50. The pass is an observation pass and writes no
+`af8b77f82`, after units 97, 98 and 99 closed at order 50. The pass is an observation pass and writes no
 product file. The spec's collection probe, an `ast` read run by `python -I -c` in `tools/loop/`, stands in
 for nothing a leg runs: no leg reads the collection. Its staged break was observed over a scratch copy of
 `loop_lib.py` outside the tree, with the spec's `fx_conf` line appended.

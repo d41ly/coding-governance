@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 36 is built: unit 56 (28a075db0) restaged the stale-remote plant with an aged reflog entry and added the no-remote plant; unit 72 (de95ec635) put resolve_memory_root in loop_lib.py. The spec is rev-3, re-grounded at e0a7e54b3.
+  table's order. Every unit through build order 36 is built: unit 56 (511f0e560) restaged the stale-remote plant with an aged reflog entry and added the no-remote plant; unit 72 (5ec7e095e) put resolve_memory_root in loop_lib.py. The spec is rev-3, re-grounded at adbc3ecf5.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

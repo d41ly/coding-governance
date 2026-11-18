@@ -98,7 +98,7 @@ tuple, and repairs `TOOL-dDeclaredLoop-95`.
 ### Evidence
 
 Read or probed 2026-11-17 on node `d`: PINNED, that date. Every read is of
-`branch/unattended-declared-loop-d56bf0` at `1bb9bbd62`, its `tools/`, `memory/`, `help/` and three
+`branch/unattended-declared-loop-d56bf0` at `5197eb157`, its `tools/`, `memory/`, `help/` and three
 confs written by `git archive` into the run's scratch directory, since this worktree is cut from main,
 which lacks the loop kit. 97 rev-2 was read from the branch tip. The prototype and each staged break ran
 in a scratch copy of `tools/loop/`, `tools/lib/` and `tools/memory-tree/` carrying 97 S1 and S2 as 97

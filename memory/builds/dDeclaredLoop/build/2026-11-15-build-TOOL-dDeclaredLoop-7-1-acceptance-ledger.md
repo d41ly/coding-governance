@@ -19,7 +19,7 @@ changed; and the `loop position fixtures` row in `tools/run-gates/selftest-budge
 the leg's own timing. The unattended suite is waived for this landing; its arms that assert a typed
 `CLOSED` spec prints the terminal shape, and those counting one `--status` line, now read the engine.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 Not observed: the arm in `tools/loop/position.py`, no staged break was run for it at this close.

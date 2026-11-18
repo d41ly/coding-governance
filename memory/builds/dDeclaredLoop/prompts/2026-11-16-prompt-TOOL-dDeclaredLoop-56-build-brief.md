@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 35 is built: units 33 (termination module and leg), 52 (phase rows), 53 (pre-placement release), 63 (adopter phases), 54 (per-level terminal sets), 64 (held path line) and 55 (observed). The spec is rev-6, re-grounded at e8da8304e: 33 items left scope as built, 14 remain.
+  table's order. Every unit through build order 35 is built: units 33 (termination module and leg), 52 (phase rows), 53 (pre-placement release), 63 (adopter phases), 54 (per-level terminal sets), 64 (held path line) and 55 (observed). The spec is rev-6, re-grounded at 1310ff4fc: 33 items left scope as built, 14 remain.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

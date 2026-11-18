@@ -6,7 +6,7 @@ No merge bar, no self-test suite and no gate leg ran in this pass. The pass wrot
 S4's sentence keeping the rest of 75 S27's exit table, and 82 AC4's class-level checks, as a rev-6
 bump of the 82 spec with its revision-log line citing the round-6 spec audit by file stem. Each
 criterion was observed by its own grep over the 82 spec in the working tree, and every grep was also
-run at the pass's base `55275e620` before the edit, where each printed 0, so each can read red. The
+run at the pass's base `d26b25130` before the edit, where each printed 0, so each can read red. The
 checks the new AC4 names were read against the tree as it stands: over the 75 spec,
 `grep -c "any other exit code grades against the parents alone"` printed 0 and the S27-to-S28 range
 grep for `never a fall to the parents` printed 1, and

@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 37 is built, and unit 67 of order 38 (6bc52aca7, the round-2 audit's kept minors) is built with red-fixes 73a62e8d6 and 59d8c5773. Unit 76's no-own-conf-read plant reds the budget and breakpoint fixture legs until this unit lands; greening them is this unit's job. The spec is rev-6, re-grounded with unit 67 dispatched first; it renames write_pre_placement_tree to its _plant spelling and carries edits of units 86, 88 and 90 early.
+  table's order. Every unit through build order 37 is built, and unit 67 of order 38 (faf051f67, the round-2 audit's kept minors) is built with red-fixes ebf71426c and a8c78caee. Unit 76's no-own-conf-read plant reds the budget and breakpoint fixture legs until this unit lands; greening them is this unit's job. The spec is rev-6, re-grounded with unit 67 dispatched first; it renames write_pre_placement_tree to its _plant spelling and carries edits of units 86, 88 and 90 early.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

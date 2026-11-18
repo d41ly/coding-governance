@@ -2,9 +2,9 @@
 
 # Tier-2 diff review — dDeclaredLoop (the Spine build of the dClosedLoop chain), round 2
 
-Provenance: gov-diff-reviewer finders over five lenses, gov-skeptic batches, synthesis by gov-synthesizer, at head 4a5f7d217 on branch/unattended-declared-loop-d56bf0.
+Provenance: gov-diff-reviewer finders over five lenses, gov-skeptic batches, synthesis by gov-synthesizer, at head 99a1b7a06 on branch/unattended-declared-loop-d56bf0.
 
-Range reviewed: 520e5125c581f2dcb1b4df6f550956555c126f0e...4a5f7d217887e92c28a22a0abf22124271f18b32 (ROUND 2).
+Range reviewed: bada76713db927cbdaf039bf0c2ff4019f838ca0...99a1b7a06b07d7605851be2f659a0ee02d6d3af4 (ROUND 2).
 
 ## Verdict: CLEAN WITH FIXES
 
@@ -39,7 +39,7 @@ Review shape: intensity full, raw 2, confirmed 2, refuted 0, merged 0, unverifie
 - Lens notes: none were supplied, so every lens ran on the kit's generic brief.
 - Roles: finders gov-diff-reviewer, skeptic batches gov-skeptic, synthesis gov-synthesizer.
 - Intent: 1 spec document supplied as `specs`, beside the range's commit messages.
-- Checklist: 23 items, acquired by the harness from --for-diff 520e5125c581f2dcb1b4df6f550956555c126f0e..4a5f7d217887e92c28a22a0abf22124271f18b32, each assigned to exactly one lens: security 5, correctness 5, seams 5, verification 4, intent 4.
+- Checklist: 23 items, acquired by the harness from --for-diff bada76713db927cbdaf039bf0c2ff4019f838ca0..99a1b7a06b07d7605851be2f659a0ee02d6d3af4, each assigned to exactly one lens: security 5, correctness 5, seams 5, verification 4, intent 4.
 - By design: the caller's byDesign.
 - Refuted findings shown: 0. Same-address pairs shown: 0. Twins flagged: none.
 - Every integrity count that must be zero is zero, so the run is complete.
@@ -73,13 +73,13 @@ Review shape: intensity full, raw 2, confirmed 2, refuted 0, merged 0, unverifie
 - Where: memory/builds/dDeclaredLoop/reviews/2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round1.md@ec07f524:65.
 - What is wrong: item 2 cites its fourth sibling site as a bare `tools/loop/upstream.py@43147593:297 (write_upstream_record)`.
 - Every other site in the same Where list (lines 61-64) is pinned as file@blob:line.
-- Probe: `git rev-parse 520e5125c:tools/loop/upstream.py` returns 43147593.
+- Probe: `git rev-parse bada76713:tools/loop/upstream.py` returns 43147593.
 - Line 297 at that blob is the `memory_root = (read_design_conf(root).get("MEMORY_ROOT") ...` line, so the cite is correct today.
 - Consequence: the unit promoted from item 2 inherits an unpinned address for the site the skeptic added.
 - Once upstream.py is edited, line 297 drifts with nothing to anchor it, and a reader cannot tell which reviewed text was meant.
 - Only the record is affected.
 - Grade: LOW, the binding grade, because the defect sits only in a record.
-- Fix (judged INSTANCE-ONLY by the skeptic; this is the skeptic's class-level fix): pin every file:line cite in the round-1 record to its blob at 520e5125c (file@blob:line), not only line 65.
+- Fix (judged INSTANCE-ONLY by the skeptic; this is the skeptic's class-level fix): pin every file:line cite in the round-1 record to its blob at bada76713 (file@blob:line), not only line 65.
 - That covers the cites on lines 66, 72 and 103 and the per-finding table rows at lines 129-135.
 - Make the change in the promoted unit's spec or in the next generated rewrite of the record.
 - The record must not be edited by hand, because it is persisted as written.
@@ -97,4 +97,4 @@ review-round round=2 limit=- prior=2 count=0 state=CONVERGED
 | id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict | classes | disposition |
 |---|---|---|---|---|---|---|---|---|---|
 | 1 | seams | memory/builds/dDeclaredLoop/reviews/2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round1.md:14 | low | low | confirmed | Line 14 of the new round-1 record (added in this fold) reads 'Every item is owed a fix, or a close deviation for the records items, before the close's merge bar and RED-first observations run'. Nowhere in the record is promotion mentioned. verb_review at tools/unattended/unattended.sh quotes the owner's 2026-10-04 rule that every finding the closing diff review confirms is PROMOTED: one unit per BLOCKER and HIGH, with the MEDIUMs and LOWs batched. The RUN.md row this fold adds records 'round-highs 2 · round-minors 5', and the task framing also says promote at the exit. So the record contradicts the rule the run applies. No reader parses the sentence. Its only effect is that it can mislead whoever runs the close next, so this is low. | instance | amendment-leaves-its-other-half-standing | class:two-answers-to-one-question |
-| 2 | intent | memory/builds/dDeclaredLoop/reviews/2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round1.md:65 | low | low | confirmed | Line 65 of the round-1 record, which this fold adds, reads `tools/loop/upstream.py@43147593:297 (write_upstream_record)` with no blob pin. The four other sites in item 2's Where list (lines 61-64) are written as file@blob:line. `git rev-parse 520e5125c:tools/loop/upstream.py` returns 43147593cf4d…. Line 297 at that blob is the `memory_root = (read_design_conf(root).get("MEMORY_ROOT") ...` line, so the cite is correct today but has nothing to anchor it once the file changes. The fold introduced it, so it is in scope. It affects only the record and changes no behaviour. | instance | fold-text-is-unreviewed-surface | class:fold-text-is-unreviewed-surface |
+| 2 | intent | memory/builds/dDeclaredLoop/reviews/2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round1.md:65 | low | low | confirmed | Line 65 of the round-1 record, which this fold adds, reads `tools/loop/upstream.py@43147593:297 (write_upstream_record)` with no blob pin. The four other sites in item 2's Where list (lines 61-64) are written as file@blob:line. `git rev-parse bada76713:tools/loop/upstream.py` returns 43147593cf4d…. Line 297 at that blob is the `memory_root = (read_design_conf(root).get("MEMORY_ROOT") ...` line, so the cite is correct today but has nothing to anchor it once the file changes. The fold introduced it, so it is in scope. It affects only the record and changes no behaviour. | instance | fold-text-is-unreviewed-surface | class:fold-text-is-unreviewed-surface |

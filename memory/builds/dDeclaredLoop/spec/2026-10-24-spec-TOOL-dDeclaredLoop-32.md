@@ -380,9 +380,9 @@ Each render is its template's copy: `memory/guides/UNATTENDED-VERBS.md`,
 
 ### The sweep
 
-Read at branch `unattended-declared-loop-d56bf0`, `50f5dea5d`, through `git show`; counts PINNED there.
-The `review_state` and `verb_review` rows were re-run at rev-6 over the branch tip `fd9a90840`, where
-`tools/unattended/unattended.test.sh` is blob `1e64a58c`, unchanged since `50f5dea5d`; each arm is named
+Read at branch `unattended-declared-loop-d56bf0`, `1d284c8b4`, through `git show`; counts PINNED there.
+The `review_state` and `verb_review` rows were re-run at rev-6 over the branch tip `039e0a0da`, where
+`tools/unattended/unattended.test.sh` is blob `1e64a58c`, unchanged since `1d284c8b4`; each arm is named
 by its `same` label or its subject, and its lines are cited at that blob.
 
 | Changed | Population | What keeps it green |
@@ -423,12 +423,12 @@ git show "$B:.claude/skills/unattended/SKILL.md" | tr -d '\r' | wc -c           
 
 - The driver's census, read through `tools/memory-tree/check-arms.py#branches` and
   `tools/memory-tree/check-arms.py#scan_refusal_sites`, is 329 PINNED (324 branches and 5 sites, branch
-  `50f5dea5d`, 2026-11-16), at its ceiling of 329 PINNED in `REFUSAL_CEILINGS`. This unit adds three
+  `1d284c8b4`, 2026-11-16), at its ceiling of 329 PINNED in `REFUSAL_CEILINGS`. This unit adds three
   sites (S5), so the ceiling rises 329 -> 332 PINNED, with the comment line below.
   `memory/project/positional-refs.txt`'s row pairing `.memory-tree.conf` with the driver at 329 PINNED is
   re-pointed in place to 332. `verb_review`'s target refusal adds no site (S4).
 - The families of `tools/unattended/unattended.families.txt` stay PINNED at missing-run-state 1 of 1,
-  required-flag 11 of 11 and field-shape 36 of 37, all PINNED at `50f5dea5d`: no new message spells
+  required-flag 11 of 11 and field-shape 36 of 37, all PINNED at `1d284c8b4`: no new message spells
   `requires --`, `requires $`, a newline, a carriage return, a separator or the bypass flag.
 - `tools/unattended/check-unattended.sh` stays at 266 of its 266 PINNED (S6 adds `printf`s only).
 - `VERB_OFFENDER_PIN` in `.lexicon.conf` stays 1215 PINNED: every new name leads with a declared verb.
@@ -670,7 +670,7 @@ New arm: tools/drift-audit/selftest.py · covers AC6 · a run-state whose last r
   TOOL-dDeclaredLoop-20 edge gives a spec subject ` · to units` always; the `roundLimit` claim is dropped,
   by the brief prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-reground.md
 - rev-5 · 2026-11-16 · §1 to §10 · S1 to S9 · AC1 to AC13 · §8 F1 F5 to F8 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `50f5dea5d`, per the brief
+  `unattended-declared-loop-d56bf0` at `1d284c8b4`, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-32-1-spec-writer`: line citations become symbol citations; the
   round flags optional (F6); the route-back test strictly past its value, as `count_returns` and the
   record read it; the target words and `route-backs=` printed by `show` (F5); the promotion target
@@ -680,7 +680,7 @@ New arm: tools/drift-audit/selftest.py · covers AC6 · a run-state whose last r
   help page and usage row for the new verbs; the sweep and budgets in §5.
 - rev-6 · 2026-11-16 · §2 §4 §5 §7 §8 · S9 · §8 F9 · the builder return
   `2026-11-16-build-TOOL-dDeclaredLoop-32-1-builder-return` found driver-suite arms rev-5 reddens and §5
-  did not name: the sweep's `review_state` and `verb_review` rows re-run at `fd9a90840` name every arm
+  did not name: the sweep's `review_state` and `verb_review` rows re-run at `039e0a0da` name every arm
   with its fate; F9 re-plants the five flat spec-subject arms, D1 found by the re-run; the eight
   exact-row assertions carry ` · to units`; the printed state line carries no target field; the
   kit-defaults parity arm reads seven constants.

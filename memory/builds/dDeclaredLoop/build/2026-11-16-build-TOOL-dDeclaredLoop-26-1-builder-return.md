@@ -4,7 +4,7 @@
 
 ## Why
 
-DIVERGENCE: TOOL-dDeclaredLoop-26 rev-5 cannot be built as written. I checked it against HEAD 3a169e52d and four places fail. No product edit was made, so there is no patch to save, and the tree is clean.
+DIVERGENCE: TOOL-dDeclaredLoop-26 rev-5 cannot be built as written. I checked it against HEAD 830567b20 and four places fail. No product edit was made, so there is no patch to save, and the tree is clean.
 
 (1) §4 Files touched, and §5 "registry and pins", leave out paths the change needs.
 - `memory/map/features/loop.md` is missing. Its `[claims] gate-legs` list must gain `loop composition fixtures`. The codebase map's inventories read every name in tools/gate-legs.json (memory/map/generated/inventories.json lists each loop leg), so the coverage gate reds a new leg no dossier claims. Unit 29's spec listed this file for its own leg.
@@ -27,7 +27,7 @@ Confirmed as written: the claims of S1, S2 and S8 I probed (read_overlay, read_k
 
 ## Summary
 
-Not built and nothing committed: the spec has to be revised first. The base is 3a169e52d19585f980e24316c1e25832173d17b6 and the working tree is clean.
+Not built and nothing committed: the spec has to be revised first. The base is 830567b20732add8bbda1d34ef885e9b0fe97d18 and the working tree is clean.
 
 I did not run `--dispatch` or `--brief`, because both write `memory/builds/dDeclaredLoop/RUN.md` and this pass makes no write. I ran no gate, suite or bar, not even the naming lexicon. That means no gate's verdict is replaced by anything here.
 

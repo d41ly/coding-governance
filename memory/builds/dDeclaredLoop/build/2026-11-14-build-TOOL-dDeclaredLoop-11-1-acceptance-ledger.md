@@ -18,7 +18,7 @@ Owed to the close: every leg the spec's section 7 names; the `loop checklist tag
 RED-first observation its `New arm:` line names, the failing case staged by the `missing-handle` plant;
 and the core meta-check over the new leg's `enforces`, which AC6 names.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 The `missing-handle` plant of `tools/loop/loop_checklist.py`, whose planted defect is the staged break, exited

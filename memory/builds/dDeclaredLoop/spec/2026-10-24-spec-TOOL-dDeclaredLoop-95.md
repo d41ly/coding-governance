@@ -98,9 +98,9 @@ AC9.
 ### Evidence
 
 Read or probed 2026-11-17 on node `d`: PINNED, that date. Every read is of
-`branch/unattended-declared-loop-d56bf0` at `44be2307e`, its tree written by `git archive` into the run's
+`branch/unattended-declared-loop-d56bf0` at `255e74b5d`, its tree written by `git archive` into the run's
 scratch directory, since this worktree is cut from main, which lacks the loop kit. The tip moved to
-`77a7e1a26` while this rev was written; that commit writes unit 93's records and no file under `tools/`.
+`3af8c467e` while this rev was written; that commit writes unit 93's records and no file under `tools/`.
 The plants ran in the extracted tree after a scratch `git init` and one commit. Each staged break ran in
 a scratch copy of its `tools/loop/`, `tools/lib/` and `tools/memory-tree/`.
 

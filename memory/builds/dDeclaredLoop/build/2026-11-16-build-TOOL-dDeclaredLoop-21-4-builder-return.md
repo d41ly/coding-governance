@@ -4,7 +4,7 @@
 
 ## Why
 
-DIVERGENCE: rev-7 cannot be built as written. I found two problems, both probed read-only at base 12e930f8, and wrote nothing.
+DIVERGENCE: rev-7 cannot be built as written. I found two problems, both probed read-only at base 37486233, and wrote nothing.
 
 (1) §2 S8 and AC8 conflict with §7's `step-rows-frozen` leg.
 - S8 has `tools/govkit/steps/fanout_cap.py` "re-pointed in this unit" to call the extracted `tools/govkit/steps/conf_to_policy.py`. AC8 requires that "the program imports `conf_to_policy`", and its "Red when" rules out leaving fanout_cap.py with its own copy.
@@ -31,7 +31,7 @@ DIVERGENCE: rev-7 cannot be built as written. I found two problems, both probed 
   - for refusal: S4 must list these fixtures and have them copy the loop and policy kits. Under no policy file they then read spec bound 1, so they need no policy commit.
   - for defaults: whether a refusal here adds a census site.
 
-Every other rev-7 claim I probed holds at 12e930f8:
+Every other rev-7 claim I probed holds at 37486233:
 - driver census 326/326; check-unattended.sh 266/266; families 1/1, 11/11, 36/37
 - the decision row `TOOL-dDeclaredLoop-21` is in memory/DECISIONS.md
 - the REFUSAL_CEILINGS token and positional row stand at 326
@@ -43,7 +43,7 @@ Every other rev-7 claim I probed holds at 12e930f8:
 
 ## Summary
 
-I committed nothing and changed nothing: TOOL-dDeclaredLoop-21 rev-7 can't be built as written. HEAD is still 12e930f80459a09d994750f0ccbfd6bac22d01b4, the tree is clean, and there is no patch file.
+I committed nothing and changed nothing: TOOL-dDeclaredLoop-21 rev-7 can't be built as written. HEAD is still 37486233cdb9434d26b2b2eac516d418d1b84cf5, the tree is clean, and there is no patch file.
 
 **Blocker 1 — the shared step extraction would turn the frozen-step check red.**
 - §2 S8 and AC8 tell me to change `tools/govkit/steps/fanout_cap.py` so it imports the new `conf_to_policy.py`.

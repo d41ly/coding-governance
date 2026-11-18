@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 38 is built: of order 38, units 67 (6bc52aca7), 80 (4da72dac1, the no-own-conf-read fixture boundary, which renamed write_pre_placement_tree to write_pre_placement_plant), 74 (1e022e062, the FETCH_HEAD default-branch test in position.py) and 66 (b706fd261, records only). The spec is rev-10, re-grounded on the branch. Its F6 size raise of the protocol row has its decision row landed ahead at fcc09fa9b, as condition 4 of the size-limits file asks.
+  table's order. Every unit through build order 38 is built: of order 38, units 67 (faf051f67), 80 (38ff07b0d, the no-own-conf-read fixture boundary, which renamed write_pre_placement_tree to write_pre_placement_plant), 74 (4af5395e2, the FETCH_HEAD default-branch test in position.py) and 66 (7fe9db7b1, records only). The spec is rev-10, re-grounded on the branch. Its F6 size raise of the protocol row has its decision row landed ahead at fb5e59e13, as condition 4 of the size-limits file asks.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

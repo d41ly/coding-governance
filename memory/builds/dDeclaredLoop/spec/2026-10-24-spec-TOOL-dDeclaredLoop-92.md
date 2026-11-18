@@ -185,7 +185,7 @@ row's budget becomes that figure rounded up to a whole second.
 ### Evidence
 
 Read or probed 2026-11-17 on node `d`: PINNED, that date. Every read is of `branch/unattended-declared-loop-d56bf0`
-at `d346d8d2c`, its tree written by `git archive` into the run's scratch directory, since this worktree is
+at `ed327ccd2`, its tree written by `git archive` into the run's scratch directory, since this worktree is
 cut from main, which lacks the loop kit. Every probe ran in that extracted tree.
 
 - `tools/loop/loop_witness.py#read_clean_env` calls `read_memory_tree("tree_lib.py")`, then

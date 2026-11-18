@@ -4,7 +4,7 @@
 
 No merge bar, no self-test suite and no gate leg ran in this pass. The criteria were observed on node `d`
 (win32), at rev-3 of the spec, over the working tree, by the first dispatch, which started from the base
-`44be2307e`. The pass is an observation pass and writes no product file. The `push-merge-tree-fatal` plant
+`255e74b5d`. The pass is an observation pass and writes no product file. The `push-merge-tree-fatal` plant
 of `guard.py` ran alone by `--fixture --plant`, standing in for the `loop guard fixtures` leg; an `awk` and
 `grep -c` pair over the spec of `TOOL-dDeclaredLoop-92` and a `python -I -c` run of the exit-claim probe
 over the build's spec folder stood in for the `spec tokens` and `memory hygiene` readings of the same text.

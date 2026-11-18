@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 48 is built: unit 94 (11c68b7f9) made build_failure_detail keep an OSError's first non-blank line and load_tree_lib name every missing name and any import failure in one refusal; the guard row is 146 s. The spec is rev-3 (24ec154b6), an observation pass that builds no code and closes on AC7 to AC9.
+  table's order. Every unit through build order 48 is built: unit 94 (a16b38c6a) made build_failure_detail keep an OSError's first non-blank line and load_tree_lib name every missing name and any import failure in one refusal; the guard row is 146 s. The spec is rev-3 (55658aa55), an observation pass that builds no code and closes on AC7 to AC9.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

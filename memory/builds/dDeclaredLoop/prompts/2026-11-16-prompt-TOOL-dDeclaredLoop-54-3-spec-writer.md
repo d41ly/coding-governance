@@ -97,7 +97,7 @@ Not supplied, optional: `input:code`.
 
 — owner, 2026-11-13. The first dispatch of TOOL-dDeclaredLoop-54 returned a divergence before any write. The return is
 `memory/builds/dDeclaredLoop/build/2026-11-16-build-TOOL-dDeclaredLoop-54-1-builder-return.md`. Unit 33 built
-`tools/loop/termination.py` at rev-9 (aeef7e3c8), and rev-3 of this spec was written on unit 33's rev-6: its §8 forks F3 to F5
+`tools/loop/termination.py` at rev-9 (b6c23d4fd), and rev-3 of this spec was written on unit 33's rev-6: its §8 forks F3 to F5
 carry no resolution mark, so hygiene check 12 would refuse the CLOSED commit; AC3 expects the plant to exit 1, where the built
 plants exit 0 when they hold and print the inner check's exit as a line; and S4 puts the per-level fill in
 `read_termination_inputs`, where the built composition is made in `derive_termination_composition`, which every in-memory plant

@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 44 is built: of order 44, unit 89 (20362ef2b: load_tree_lib, derive_conf_rebinds, check_conf_name, derive_conf_constants as the union) and unit 88 (5b4e1a339: derive_constant_charges in tree_lib.py as the one charge walk, derive_conf_constants reading its rule-2 slice united with derive_conf_rebinds, load_tree_lib refusing an unlocatable, blocked or unparseable tree_lib, four guard plants, the guard row re-priced to 140). This unit builds first at order 45, before unit 91. The spec is rev-6, re-grounded on the branch at 9c06b8ef8.
+  table's order. Every unit through build order 44 is built: of order 44, unit 89 (bd3cf1c87: load_tree_lib, derive_conf_rebinds, check_conf_name, derive_conf_constants as the union) and unit 88 (52dcd8623: derive_constant_charges in tree_lib.py as the one charge walk, derive_conf_constants reading its rule-2 slice united with derive_conf_rebinds, load_tree_lib refusing an unlocatable, blocked or unparseable tree_lib, four guard plants, the guard row re-priced to 140). This unit builds first at order 45, before unit 91. The spec is rev-6, re-grounded on the branch at bbad7b0e4.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 42 is built: unit 86 (16829da16, the round-6 audit's minors) built derive_conf_constants(loop_lib_path) in loop_lib.py, which raises LoopError on a missing or unparseable file and binds every conf constant through a star import; derive_conf_reads now always reads the sibling loop_lib.py. The spec is rev-6, re-grounded on the branch at 759298f0f.
+  table's order. Every unit through build order 42 is built: unit 86 (8f2d6b693, the round-6 audit's minors) built derive_conf_constants(loop_lib_path) in loop_lib.py, which raises LoopError on a missing or unparseable file and binds every conf constant through a star import; derive_conf_reads now always reads the sibling loop_lib.py. The spec is rev-6, re-grounded on the branch at 64e2a7e97.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

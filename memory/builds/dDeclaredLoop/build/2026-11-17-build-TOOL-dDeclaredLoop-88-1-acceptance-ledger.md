@@ -4,7 +4,7 @@
 
 No merge bar, no self-test suite and no gate leg ran in this pass. The criteria were observed on node `d`
 (win32), at rev-6 of the spec, over the working tree, by the first dispatch, which started from the
-base `9560d4708`. The four new `guard.py` plants, the `push-merge-tree-fatal`, its unparseable-parent
+base `64378f543`. The four new `guard.py` plants, the `push-merge-tree-fatal`, its unparseable-parent
 twin, `push-merge-probe-failed`, `push-merge-probe-silent` and `push-merge-unrelated-histories` plants
 ran alone by `--fixture --plant`, standing in for the `loop guard fixtures` leg; the `conf-read-forms`
 and both `no-own-conf-read` plants ran the same way, standing in for the `loop budget fixtures` and
@@ -28,7 +28,7 @@ propagate and with `derive_constant_charges` answering rule 4 for a module-level
 glob-reader arm of `gen_build_index.py --selftest`, with `derive_constant_charges` charging a
 module-level binding to the module.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/budget.py --fixture --plant conf-read-forms` with every function the unit's pass changed in

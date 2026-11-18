@@ -3,7 +3,7 @@
 **Serves:** journal TOOL-dDeclaredLoop-56
 
 No merge bar and no self-test suite ran in this pass. The criteria were observed on node `d` (win32), at
-rev-7 of the spec, over the working tree on base `dfdb0b3fe`: each new plant run alone by direct CLI,
+rev-7 of the spec, over the working tree on base `512cddc8f`: each new plant run alone by direct CLI,
 standing in for the `loop parent routes`, `loop position fixtures` and `loop factories fixtures` legs;
 `python -c` and script probes of `check_terminal_proof`, the card's claims awk, the driver's
 `print_claims`, `review_rounds.py up`, `review_dispose.py classes` and `build_commit`, standing in for
@@ -27,7 +27,7 @@ control against a key set admitting it; the `adopt-roles.test.sh` arm 24 against
 answering an empty table; the `selftest.py` review-rounds rows against the tip's writing up; and the
 `unattended-build.test.sh` AC36 pair against the tip's count over every other record.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/position.py --selftest` with every function the unit's pass changed in

@@ -29,7 +29,7 @@ of that leg's budget row from the close's timed reading. Owed RED-first, on the 
 `tools/loop/position.py` arm (`scp-remote`, `ssh-userinfo-remote` and `url-forms`, staged against 74's
 `derive_fetch_url`).
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/position.py --selftest` with every function the unit's pass changed in

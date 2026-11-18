@@ -21,7 +21,7 @@ waived for this landing by README rule 8; `harness arms (fail branches armed or 
 raised ceiling; `govkit selfcheck` over the subject pin row written by hand in the generator's sorted
 place; and `core meta-check` over the removed pending row.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/review_bounds.py --fixture --plant count-above` with a count above the ceiling read with

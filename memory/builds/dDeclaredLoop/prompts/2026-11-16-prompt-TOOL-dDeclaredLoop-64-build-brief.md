@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 34 is built, and units 63 (c45d41673) and 54 (b1ef1c994) of this order. Unit 53 (dca74c239) built read_first_add, the passed-before-placement release and the pre-placement plants in tools/loop/breakpoints.py. The spec is rev-4, re-grounded at fe8664207.
+  table's order. Every unit through build order 34 is built, and units 63 (0d2cd4c70) and 54 (241a98ab5) of this order. Unit 53 (353d964b2) built read_first_add, the passed-before-placement release and the pre-placement plants in tools/loop/breakpoints.py. The spec is rev-4, re-grounded at ba5f0a52f.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

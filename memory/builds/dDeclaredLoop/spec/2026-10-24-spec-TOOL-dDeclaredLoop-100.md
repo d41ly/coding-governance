@@ -163,7 +163,7 @@ print(sorted(got), got <= set(loop_lib.TREE_LIB_SYMBOLS), loop_lib.TREE_LIB_SYMB
 ### Evidence
 
 Read or probed 2026-11-17 on node `d`: PINNED, that date. Every read is of
-`branch/unattended-declared-loop-d56bf0` at `e9e356424`, its tree written by `git archive` into the
+`branch/unattended-declared-loop-d56bf0` at `03ddc555c`, its tree written by `git archive` into the
 run's scratch directory, since this worktree is cut from main, which lacks the loop kit. The plant and
 the probe ran in that extracted tree, and the staged break over a scratch copy of its `loop_lib.py`.
 

@@ -16,7 +16,7 @@ Owed to the close: every leg section 7 names. Owed RED-first: the `tools/loop/br
 `pre-placement-records-root` plant staged against `TOOL-dDeclaredLoop-53`'s landed list, which prints no
 `breakpoints: held` line, so its `tWrong` expectation misses.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/breakpoints.py --selftest` with every function the unit's pass changed in

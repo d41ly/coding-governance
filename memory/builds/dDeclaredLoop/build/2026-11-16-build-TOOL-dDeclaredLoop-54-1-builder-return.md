@@ -4,7 +4,7 @@
 
 ## Why
 
-DIVERGENCE: three spec defects, found by the pre-write sweep of memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-54.md (rev-3) against HEAD 685e21957. The first one blocks the commit outright.
+DIVERGENCE: three spec defects, found by the pre-write sweep of memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-54.md (rev-3) against HEAD 020264ca3. The first one blocks the commit outright.
 
 (1) Section 8: F3, F4 and F5 carry no resolution mark. Each ends with "Recommendation (a); the spec body is written on it." and nothing more. The spec is dated 2026-10-24, which is on or after FORK_ITEM_CUTOFF 2026-09-30 in .memory-tree.conf, so hygiene check 12 grades each F-item on its own. The function check_span_mark in tools/memory-tree/check-memory-hygiene.sh finds no `RESOLVED (agent|owner, <date>[, delegated])` in those three spans. The pre-commit hook's staged hygiene leg would therefore refuse the CLOSED commit with "§8 F-items carrying no conforming resolution mark ...: F3, F4, F5". The task says these forks are marked; they are not. Only F1 and F2 carry marks. Fix: each of F3 to F5 needs a mark such as `RESOLVED (agent, 2026-11-16, delegated): (a)` with its widens/relaxes line. The header also needs the `ratified <date>` pointer the template asks for.
 
@@ -16,7 +16,7 @@ Everything else in the sweep still holds at HEAD. `read_transition_rows`, `check
 
 ## Summary
 
-I did not build or commit anything. The spec has three defects, so I'm returning a divergence; the details are in `why`. The worktree is clean at base 685e219575327e914d9e9c510fe5964d54b67a32.
+I did not build or commit anything. The spec has three defects, so I'm returning a divergence; the details are in `why`. The worktree is clean at base 020264ca3be75957c7de453bf923c656173da37a.
 
 **Checks that ran (all read-only):**
 - I read the spec, the brief and the build method in full, and compared the spec's claims with tools/loop/loop_table.py, tools/loop/termination.py, tools/loop/loop.toml, help/loop.md and tools/loop/README.md at HEAD. This stands in for the spec-tokens and sweep part of the memory hygiene gate.

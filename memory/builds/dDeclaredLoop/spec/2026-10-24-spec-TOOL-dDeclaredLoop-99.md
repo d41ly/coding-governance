@@ -133,7 +133,7 @@ reds it too. It builds at order 50, after 97, and repairs `TOOL-dDeclaredLoop-95
 ### Evidence
 
 Read or probed 2026-11-17 on node `d`: PINNED, that date. Every code read is of
-`branch/unattended-declared-loop-d56bf0` at `1bb9bbd62`, its tree written by `git archive` into the
+`branch/unattended-declared-loop-d56bf0` at `5197eb157`, its tree written by `git archive` into the
 run's scratch directory, since this worktree is cut from main, which lacks the loop kit. The
 prototype of S1 ran in that copy's `tools/loop/`, importing its `loop_lib`. 97 rev-2 was read from the
 branch, not yet built. The lexicon's `--suggest` ran in this worktree, whose `.lexicon.conf` differs

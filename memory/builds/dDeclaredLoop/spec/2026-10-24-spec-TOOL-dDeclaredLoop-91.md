@@ -43,7 +43,7 @@ and proves the class with a plant that executes each row and compares the names 
 with the names the rule answers. It builds at order 45, after 89 at order 44, and repairs
 `TOOL-dDeclaredLoop-89`.
 
-Re-grounded at rev-4 on the branch tip `97ef56324`. `derive_conf_rebinds`, its docstring, its README row
+Re-grounded at rev-4 on the branch tip `f517a8618`. `derive_conf_rebinds`, its docstring, its README row
 and the `conf-read-forms` plant are built there, and 80, 82 and 86 to 90 are CLOSED, so this unit reads them as
 they landed (§4 Evidence, §5 "Dependency"). rev-2's restatements in the specs of 87 and 89 give way to
 the two carriers 89 rev-5 keeps, the docstring of `derive_conf_rebinds` and its row in the loop kit's
@@ -130,7 +130,7 @@ README (§8 F4).
 
 ### The rev-2 items the built code or a committed spec settles
 
-Read on branch `unattended-declared-loop-d56bf0` at `9c06b8ef8`.
+Read on branch `unattended-declared-loop-d56bf0` at `bbad7b0e4`.
 
 | Item | What settles it |
 |---|---|
@@ -150,7 +150,7 @@ Read on branch `unattended-declared-loop-d56bf0` at `9c06b8ef8`.
 
 ### Evidence
 
-Read at branch `unattended-declared-loop-d56bf0`, tip `97ef56324`, through `git show` and a
+Read at branch `unattended-declared-loop-d56bf0`, tip `f517a8618`, through `git show` and a
 `git archive` scratch copy of that tip's `tools/`; `tools/loop/` is absent from this worktree's main.
 
 - `tools/loop/loop_lib.py#derive_conf_rebinds` takes a `FunctionDef` or an `AsyncFunctionDef` as a
@@ -260,7 +260,7 @@ class KN(type((lambda x=(NESTED := ".unattended.conf"): x)())): pass
 A probe of the sketch over these bytes answered exactly `BCONF`, `CONF_K`, `DCONF`, `DECO`, `KWCONF`,
 `LCONF` and `NESTED`, the set `exec` of the same bytes bound. With the table emptied it answered `CONF_K`
 alone, and the landed `derive_conf_rebinds` answered none: PINNED, 2026-11-17. Over every `*.py` under
-the tip's `tools/`, 188 files PINNED at `97ef56324`, the sketch and the landed rule answered the same
+the tip's `tools/`, 188 files PINNED at `f517a8618`, the sketch and the landed rule answered the same
 names, `_SLOT_DATA_DIR` in `tools/memory-tree/gen_build_index.py` and `_ANCHOR_AT`, `_GRAMMAR` and
 `_KIT_CONF` in `tools/memory-tree/merge-rows.py`, and the kit's own `loop_lib.py` answered none.
 
@@ -323,7 +323,7 @@ is CLOSED at rev-6 at the tip, so this pass reads its edits as landed.
 
 ### The sweep
 
-Read at `97ef56324`; counts PINNED there unless named DERIVED.
+Read at `f517a8618`; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
@@ -487,7 +487,7 @@ New arm: tools/loop/budget.py · covers AC1 AC3 · the module-scope group of con
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-94, written by the round-10 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-17 · §1 · S1 to S5 · §3 · §4 · §5 · AC1 to AC4 · §7 · §8 · §10 · re-grounded on
-  branch/unattended-declared-loop-d56bf0 at `9c06b8ef8` by the brief
+  branch/unattended-declared-loop-d56bf0 at `bbad7b0e4` by the brief
   2026-11-17-prompt-TOOL-dDeclaredLoop-91-1-spec-writer; mechanism, carries, order and status kept. 87 and
   89 are CLOSED when this unit builds (F4): S5 edits the docstring of `derive_conf_rebinds` and its README
   row in place of their specs, and AC4 reads those carriers. S2's table holds no annotation position
@@ -496,7 +496,7 @@ New arm: tools/loop/budget.py · covers AC1 AC3 · the module-scope group of con
   three folders and S5 names the class-or-function over-match, 94's items on this spec (F5). Python is
   3.15.2 and the probes re-ran at the tip; line citations made symbol citations; the sweep.
 - rev-4 · 2026-11-17 · §1 · S4 · S5 · §3 · §4 · §5 · AC3 · AC4 · §8 · re-grounded on
-  branch/unattended-declared-loop-d56bf0 at `97ef56324` after the builder return
+  branch/unattended-declared-loop-d56bf0 at `f517a8618` after the builder return
   2026-11-17-build-TOOL-dDeclaredLoop-91-1-builder-return; mechanism, carries, order and status kept.
   AC3 observes `tree_lib` resolved in the copy by its parity line, which S4 prints only from
   `derive_conf_constants`'s answer, in place of an absent update command 88 S33's rows print (F6). S5

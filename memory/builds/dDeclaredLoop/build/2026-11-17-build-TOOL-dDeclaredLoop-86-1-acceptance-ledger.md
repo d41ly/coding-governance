@@ -4,7 +4,7 @@
 
 No merge bar, no self-test suite and no gate leg ran in this pass. The criteria were observed on node `d`
 (win32), at rev-8 of the spec, over the working tree, by the first dispatch, which started from the
-base `7002fa0b0`. Each new or widened plant ran alone by `--fixture --plant`, standing in for its loop
+base `2f834a4e1`. Each new or widened plant ran alone by `--fixture --plant`, standing in for its loop
 leg; `python -c` probes of `check_write_tree_usage`, `build_failure_detail`, `derive_conf_constants`
 and the signature of `derive_conf_reads` stood in for the rest. The sweep re-run at the base held every
 design claim; its stale figures, the guard row's price and the positional count, and the landed
@@ -19,7 +19,7 @@ constant `Assign`, and the `no-own-conf-read` stub staged out; and the `position
 fetches with the credential-helper arguments staged out, whose staged break writes one dummy entry to
 the OS credential store that the close makes and clears with `cmdkey //delete:<target>`.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/budget.py --fixture --plant conf-read-forms` with every function the unit's pass changed in

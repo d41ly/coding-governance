@@ -4,7 +4,7 @@
 
 No merge bar and no self-test suite ran in this pass, and it wrote no product file, as rev-4 §8 F3 (a)
 resolves. The criteria were observed on node `d` (win32), at rev-4 of the spec, over the working tree at
-`f74eacaf5`, the tree `TOOL-dDeclaredLoop-33` (`aeef7e3c8`) left at order 34: the two `python -c` probes
+`9bdfeecca`, the tree `TOOL-dDeclaredLoop-33` (`b6c23d4fd`) left at order 34: the two `python -c` probes
 section 6 spells, standing in for the no-guard arm `TOOL-dDeclaredLoop-67` S31 adds to the
 `run-gates gov canary` leg at order 38. The AC1 probe's liveness was observed on an in-memory copy of the manifest whose
 `loop termination` row was given a `guard`, which printed `1 [True]`, and with the name changed to one no

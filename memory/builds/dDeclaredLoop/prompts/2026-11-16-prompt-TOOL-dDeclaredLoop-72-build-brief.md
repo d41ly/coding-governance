@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 35 is built, and units 71, 56 and 70 (71956dfaf, read_driver_conf in loop_lib.py) of this order. Units 53 and 64 read the README through read_memory_root; this unit replaces it with resolve_memory_root in loop_lib.py and moves every caller. The spec is rev-6, re-grounded at e8da8304e.
+  table's order. Every unit through build order 35 is built, and units 71, 56 and 70 (394fbe13a, read_driver_conf in loop_lib.py) of this order. Units 53 and 64 read the README through read_memory_root; this unit replaces it with resolve_memory_root in loop_lib.py and moves every caller. The spec is rev-6, re-grounded at 1310ff4fc.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

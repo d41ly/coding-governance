@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 33 is built, and unit 52 of this order (975723b24: the phase map rows, read_held_gates extracted from check_owner_gates, check_phase_gates, census 343). Unit 33 of this order is parked INPROGRESS on its rev-7 spec and writes nothing now. The spec is rev-3, re-grounded at 2ce86cf07: the pre-placement release lives in unit 19's read_breakpoints and touches no driver line.
+  table's order. Every unit through build order 33 is built, and unit 52 of this order (c12df2635: the phase map rows, read_held_gates extracted from check_owner_gates, check_phase_gates, census 343). Unit 33 of this order is parked INPROGRESS on its rev-7 spec and writes nothing now. The spec is rev-3, re-grounded at 782209fcb: the pre-placement release lives in unit 19's read_breakpoints and touches no driver line.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

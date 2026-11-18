@@ -91,7 +91,7 @@ runs every plant those arm lines name and reds on one failed plant (§8 F3). It 
 
 ### Evidence
 
-Read on branch `unattended-declared-loop-d56bf0` at tip `e8018d94f` through `git show`, and probed over
+Read on branch `unattended-declared-loop-d56bf0` at tip `e3d842339` through `git show`, and probed over
 that tip's tree extracted with `git archive` into a scratch folder on 2026-11-16.
 
 - The leg row sits at `tools/gate-legs.json@dd6649e0ee94:2296`: argv `python`,
@@ -144,7 +144,7 @@ None. The pass writes no product file; its acceptance ledger line records AC1 to
 
 ### The sweep: what the change reaches, and what keeps each green
 
-Every claim was read on `branch/unattended-declared-loop-d56bf0` at `e8018d94f` through `git show`; the
+Every claim was read on `branch/unattended-declared-loop-d56bf0` at `e3d842339` through `git show`; the
 probes ran over that tip's tree extracted into a scratch folder; the reuse lookup ran on this worktree's
 main at `179486e8f`, which holds no loop kit; the spec-token checker ran over the extracted tree.
 
@@ -223,7 +223,7 @@ against ask TOOL-dDeclaredLoop-114; neither reaches the leg.
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-79, written by the round-4 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-16 · §1 · S1 to S5 · §3 · §4 · §5 · AC1 to AC4 · §7 · §8 F3 · §10 · re-grounded at
-  the tip of branch/unattended-declared-loop-d56bf0 (`e8018d94f`), per the brief
+  the tip of branch/unattended-declared-loop-d56bf0 (`e3d842339`), per the brief
   prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-71-1-spec-writer.md: TOOL-dDeclaredLoop-19 lands the leg
   as `loop breakpoint fixtures`, running `--selftest` with no guard, gov's own exempt row and every meta
   row, so this pass writes nothing and observes (F3); S2 inverts rev-2's descriptor row; S5's ruling on

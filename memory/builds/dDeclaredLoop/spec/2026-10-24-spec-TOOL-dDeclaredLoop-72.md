@@ -111,7 +111,7 @@ later of the two and repairs both; its placement names `TOOL-dDeclaredLoop-64`.
 
 ### Evidence
 
-Read at branch `unattended-declared-loop-d56bf0`, tip `a737706a7`, through `git show`, unless named
+Read at branch `unattended-declared-loop-d56bf0`, tip `bd31adbcc`, through `git show`, unless named
 otherwise. Units 53 and 64 are not built at that tip and are read on their committed specs, rev-3 and
 rev-4. `read_driver_conf` is `TOOL-dDeclaredLoop-70`'s, read on its committed rev-2.
 
@@ -260,7 +260,7 @@ only in `VERB_OFFENDER_PIN`, its comment and the tag rule. The retired `read_mem
 
 ### The sweep
 
-Read at the tip `a737706a7`; counts PINNED there unless named DERIVED.
+Read at the tip `bd31adbcc`; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
@@ -412,7 +412,7 @@ New arm: tools/loop/breakpoints.py · covers AC2 AC3 · the same two plants, sta
 - rev-5 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-100, written by the round-12 spec audit's disposal; nothing else moved.
 - rev-6 · 2026-11-16 · §1 to §10 · S1 to S5 · AC1 to AC5 · §8 F3, F4 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `a737706a7` and on the committed specs of TOOL-dDeclaredLoop-53,
+  `unattended-declared-loop-d56bf0` at `bd31adbcc` and on the committed specs of TOOL-dDeclaredLoop-53,
   TOOL-dDeclaredLoop-64 and TOOL-dDeclaredLoop-70, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-72-1-spec-writer`: the loop kit's existing root reader,
   `read_memory_root`, is the read this unit points at the driver's root, its callers moved to

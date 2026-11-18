@@ -4,7 +4,7 @@
 
 No merge bar, no self-test suite and no gate leg ran in this pass. The criteria were observed on node `d`
 (win32), at rev-6 of the spec, over the working tree, by the first dispatch, which started from the
-base `2a71d7a70`. The `conf-read-forms` and both `no-own-conf-read` plants ran alone by
+base `68cb6f19d`. The `conf-read-forms` and both `no-own-conf-read` plants ran alone by
 `--fixture --plant`, standing in for the `loop budget fixtures` leg; a `python -c` probe of
 `derive_conf_constants` and two greps stood in for the rest. The sweep re-run at the base held every
 design claim; its stale figures, the budget row's price and the positional count, are deviation 873.
@@ -17,7 +17,7 @@ the one `New arm:` line: the `budget.py` `conf-read-forms` plant with `derive_co
 to 86 S13's shape list, owed to exit 1 printing `MISSED` naming the joined-path, os-path-join,
 multi-argument-path and aliased-from-import rows.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/budget.py --fixture --plant conf-read-forms` with every function the unit's pass changed in

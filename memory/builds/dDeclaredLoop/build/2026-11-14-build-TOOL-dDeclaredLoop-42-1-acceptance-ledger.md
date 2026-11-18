@@ -19,7 +19,7 @@ pipe-captured `shell=True` run, and the `run_tree_kill_py` parity row staged by 
 loop copy; and the `resolve-python.test.sh` parity table over the new row, whose population grep reads
 tracked files only.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/loop_witness.py --selftest` with every function the unit's pass changed in

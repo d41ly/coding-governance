@@ -294,7 +294,7 @@ spec stage committed, and logs `the review runs alongside`; its `nextAction` sti
 
 ### The method's text
 
-The render measures 30714 bytes (PINNED, at `02524cadf`) against its row of 30720
+The render measures 30714 bytes (PINNED, at `0a3c9e057`) against its row of 30720
 (`tools/template-size-limits.txt@1ff70a75:136`), which the owner ruled is theirs to raise. So the pointer
 is paid for in the same section. The DIFF-exit sentence's tail `never one per minor.` becomes `never one
 per minor (`review.findings` can change that count; `review.unverified` routes an unverified finding).`
@@ -403,7 +403,7 @@ The kickoff manifest watches `.memory-tree.conf` and `memory/guides/BUILD-METHOD
 
 ### The sweep
 
-Read at branch `unattended-declared-loop-d56bf0`, tip `02524cadf`, through `git show` and an export of
+Read at branch `unattended-declared-loop-d56bf0`, tip `0a3c9e057`, through `git show` and an export of
 that commit; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
@@ -422,7 +422,7 @@ that commit; counts PINNED there unless named DERIVED.
 | `memory/guides/BUILD-METHOD.md` | `build-method size` at 30720 PINNED; `kit/dogfood doc parity`; the kickoff manifest's watch list; the positional row `BUILD-METHOD M4` this spec already holds | §4 "The method's text"; the template is the edit; the stamp; no new `BUILD-METHOD M<n>` citation |
 | a new module under the workflows kit | the kit's `**` include; the map's symbol inventory; `review-join self-test`, `verifier fan-out self-test` and both harness suites, whose guard is the kit folder | no registry row; `gen_map.py --write`; the arms named in §7 |
 | reader coverage | `arm_reader_coverage`, which grades `dDeclaredLoop`'s keys once every spec of the build is terminal | each of the nine keys reaches `resolve` as a literal in `review_bounds.py`, the shape `scan_reader_keys` reads |
-| `tools/loop/loop.toml` | `loop_lib.py --check`, the `loop definition` leg; every `read_items` caller; the build table's B10 row and the dispose `[[stand-in]]` row | untouched: the rows land with unit 50 (§8 F4), so the check reads at this landing what it reads at `02524cadf` |
+| `tools/loop/loop.toml` | `loop_lib.py --check`, the `loop definition` leg; every `read_items` caller; the build table's B10 row and the dispose `[[stand-in]]` row | untouched: the rows land with unit 50 (§8 F4), so the check reads at this landing what it reads at `0a3c9e057` |
 | subject pins, epoch delegates, upgrade rows | `tools/govkit/subject-pins.tsv`, `check-verdict-epoch.sh`'s `DELEGATES`, `[[upgrade]]` | no memory-tree module, no subject, no migration |
 | suite floors | each `FLOOR_ASSERTIONS`, a lower bound | may rise by the arms added |
 
@@ -439,7 +439,7 @@ git show "$B:tools/unattended/unattended.sh" | grep -c "grep -qE '(CONVERGED|NON
 
 - The driver's census, read through `tools/memory-tree/check-arms.py#branches` and
   `tools/memory-tree/check-arms.py#scan_refusal_sites` over the export, is 332 PINNED (327 branches and
-  5 sites at `02524cadf`), at its ceiling of 332 PINNED; `TOOL-dDeclaredLoop-31` raises both to 335
+  5 sites at `0a3c9e057`), at its ceiling of 332 PINNED; `TOOL-dDeclaredLoop-31` raises both to 335
   PINNED. This unit adds three sites, S2's cause refusal, its ended-subject refusal and its read relay,
   so the ceiling rises 335 -> 338 PINNED with the comment line below, and
   `memory/project/positional-refs.txt`'s row pairing `.memory-tree.conf` with the driver is re-pointed in
@@ -537,7 +537,7 @@ the worktree at `179486e8f`; every other claim was read on the branch.
   `memory/guides/BUILD-METHOD.md`, each prints at least 1, `grep -c 'PROMOTED as at a DIFF exit'` prints
   1 over each, and `wc -c` on the guide stays at or under 30720.
   Red when: the template names the key and the guide is not re-rendered, or the pointer is not paid for.
-  figure: 30720 is PINNED, the `build-method size` row at `02524cadf`.
+  figure: 30720 is PINNED, the `build-method size` row at `0a3c9e057`.
 - **AC10** — When `python tools/loop/review_bounds.py --fixture --plant disposal-keys` runs, it prints
   `held`: a policy file setting the four keys prints them after `route-backs=`; `--plant pin` prints the
   five flags with the file's `review.unclassed`; `--plant opt-in-set` exits 2 naming `review.opt-in`;
@@ -586,7 +586,7 @@ are declared here and read by the owner's run PLAY-dClosedLoop-13 names.
   grants: PLAY-dClosedLoop-3 the --trigger verb, the trigger and reviewPolicy harness arguments and the four review-shape fields
 - **F4 — Who writes the four item rows, when `check_program` refuses an `item.review.*` tag and the
   admission lands with `TOOL-dDeclaredLoop-50` at order 32?** Measured by that unit's re-ground at
-  `02524cadf`: the rev-4 rows make `loop_lib.py --check` exit 1 with `item row 62 tag
+  `0a3c9e057`: the rev-4 rows make `loop_lib.py --check` exit 1 with `item row 62 tag
   'item.review.trigger' opens no item.<step>. of a gov step`, before any actor is read. Options: (a) unit
   50 writes them from §4's table, with step `none`, the actors `command:review.<name>` and the inputs,
   allowance and returns a non-role actor carries, beside its admission and the pin and report rows, in
@@ -648,7 +648,7 @@ are declared here and read by the owner's run PLAY-dClosedLoop-13 names.
   `flow.route-backs` on the build slug only, by the brief
   prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-reground.md
 - rev-5 · 2026-11-16 · §1 to §10 · S1 to S12 · AC1 to AC11 · §8 F4 to F9 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `02524cadf`, per the brief
+  `unattended-declared-loop-d56bf0` at `0a3c9e057`, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-20-1-spec-writer`: symbol and blob-pinned citations; the rows'
   content handed to unit 50, whose admission they need (F4), and AC1 moved onto S8's fold instruction;
   the trigger's `--pin`, the five pin values and the opt-in set (F5); `block` as today's adjudication

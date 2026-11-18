@@ -4,7 +4,7 @@
 
 No merge bar, no self-test suite and no gate leg ran in this pass. The criteria were observed on node `d`
 (win32), at rev-4 of the spec, over the working tree, by the second dispatch, which started from the
-base `af5996d3d`. The `conf-read-forms` and `no-own-conf-read` plants of `budget.py` and the
+base `2a95c3eb9`. The `conf-read-forms` and `no-own-conf-read` plants of `budget.py` and the
 `no-own-conf-read` plant of `breakpoints.py` ran alone by `--fixture --plant`, standing in for the
 `loop budget fixtures` and `loop breakpoint fixtures` legs; `python -c` probes of `derive_conf_rebinds`,
 its docstring and `import loop_lib` stood in for the rest, `loop definition` among them. The sweep re-run
@@ -19,7 +19,7 @@ before and after this pass answered the same names, and `derive_conf_constants` 
 Owed to the close: every leg section 7 names and the three loop legs it keeps green; and RED-first, on
 the one `New arm:` line, the `budget.py` plant `conf-read-forms` with `_MODULE_SCOPE_PARTS` emptied.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/budget.py --fixture --plant conf-read-forms` with `_MODULE_SCOPE_PARTS` emptied exited 1,

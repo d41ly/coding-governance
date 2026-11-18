@@ -4,7 +4,7 @@
 
 No merge bar, no self-test suite and no gate leg ran in this pass. The criteria were observed on node `d`
 (win32), at rev-8 of the spec, over the working tree, by the second dispatch, which started from the base
-`94abd60fd`. Each new or widened plant ran alone by `--fixture --plant`, standing in for its loop leg;
+`6fc43588b`. Each new or widened plant ran alone by `--fixture --plant`, standing in for its loop leg;
 a `python -c` probe of `derive_docstring_ids` and of `scan_glob_readers` over a scratch module stood in
 for the `build-index selftest` arm; `grep -c` probes read the rest. The sweep re-run at the base held
 every design claim and every figure rev-8 pins: no minted name built yet, the budget rows and the
@@ -20,7 +20,7 @@ the `budget.py` `conf-read-forms` rows and the two unset-key `root-source` trees
 `position.py` `url-forms` mismatch, scp-pair and git-written rows, and the glob-reader arm's async
 docstring in `gen_build_index.py`.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/budget.py --fixture --plant conf-read-forms` with every function the unit's pass changed in
@@ -50,6 +50,6 @@ restored: RED observed.
 - AC15 — `(memory, .memory-tree.conf)` — `root-source` printed `driver-unset · ('memory', '.unattended.conf')` and `tree-unset · ('memory', '.memory-tree.conf')` beside the three earlier folders, then `held`, exit 0.
 - AC16 — `async def` — `conf-read-forms` printed `docstrings · no hit` for the module whose module, class, function and `async def` docstrings each name the driver's conf file.
 - AC19 — `github.com:alice/repo against github.com:bob/repo · unequal` — `url-forms` printed that row and `git@github.com:alice/repo against github.com:alice/repo · equal`.
-- AC21 — `loop definition fixtures` — owed to the close: the population is the pass commits `6bc52aca7` of unit 67, `a8b4dca02` of unit 79 and `4da72dac1` of unit 80; running the leg at each is a gate run, which no role agent runs, so the close records each unit, commit and exit here, a `no leg` answer followed by the leg's exit at the next pass commit of the population.
+- AC21 — `loop definition fixtures` — owed to the close: the population is the pass commits `faf051f67` of unit 67, `f424a1eb8` of unit 79 and `38ff07b0d` of unit 80; running the leg at each is a gate run, which no role agent runs, so the close records each unit, commit and exit here, a `no leg` answer followed by the leg's exit at the next pass commit of the population.
 - AC23 — `git-written` — `url-forms` served the scratch's bare repository from `http.server` on 127.0.0.1 and printed `git-written · http://127.0.0.1:<port>/o against http://127.0.0.1:<port>/o · equal`, the configured URL holding `user:tok@`, then `held`.
 - AC24 — `derive_import_aliases` — `grep -c` printed 2 for `derive_import_aliases` and 2 for `derive_docstring_ids` over `tools/loop/README.md`, and 1 for `derive_conf_reads` over `tools/loop/kit.toml`.

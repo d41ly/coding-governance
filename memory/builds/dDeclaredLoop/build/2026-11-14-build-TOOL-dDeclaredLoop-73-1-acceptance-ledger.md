@@ -16,7 +16,7 @@ by passing `descs` back to `demand_claimed_requires` in `tools/govkit/govkit.py#
 run and restoring the call. The arm's body was checked here only by compiling it and resolving every
 name it loads; it did not run.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 Not observed: the arm in `tools/govkit/selftest.py`, a suite arm, left unrun for the owner's opt-in slow-suite

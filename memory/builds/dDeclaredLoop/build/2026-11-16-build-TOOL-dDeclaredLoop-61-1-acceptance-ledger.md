@@ -20,7 +20,7 @@ the `New arm:` line, the extended `parallel-append`, `pre-spec`, `trailer-only`,
 `patch-trailer-only` plants and the new `draw-id-rows`, each staged over the tip's id-less `ROW` and
 `record_draw`.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/budget.py --fixture --plant parallel-append` with every function the unit's pass changed in

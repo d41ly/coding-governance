@@ -4,11 +4,11 @@
 
 ## Why
 
-DIVERGENCE: S3 (rule `reachable`), as rev-6 writes it, reds gov's own composition at landing. AC10 and §5 Rollout need that composition to exit 0, and §4 "Gov's own cycles at landing" bounds only cycles, so the spec as written cannot be built. The facts below were read at HEAD e8018d94f.
+DIVERGENCE: S3 (rule `reachable`), as rev-6 writes it, reds gov's own composition at landing. AC10 and §5 Rollout need that composition to exit 0, and §4 "Gov's own cycles at landing" bounds only cycles, so the spec as written cannot be built. The facts below were read at HEAD e3d842339.
 
 What S3 says: each program's items are walked from "its items with no needs", along routes to declared items and from each need to the item needing it. `item.build.resolve` is in the step.build program, and its one need is `item.test.merge`, which belongs to the test step. The only route into it is `item.test.merge` conflict -> resolve. Walking from the build program's entry, `item.build.base`, never reaches it. That gives one `reachable` finding on gov's rows, so AC10 is red.
 
-This is not caused by later units. The row was already at the spec's own measuring tip, 250b236f (line 1555 of tools/loop/loop.toml there), and units 50, 51 and 19 did not add it. It also reds every build's composition, so S11's step boundary would refuse every move that applies a change.
+This is not caused by later units. The row was already at the spec's own measuring tip, 57723d6c (line 1555 of tools/loop/loop.toml there), and units 50, 51 and 19 did not add it. It also reds every build's composition, so S11's step boundary would refuse every move that applies a change.
 
 Changing only the entry does not fix this. Following the need edges from S3's own wording, every item reaches back through its needs to an entry of its own program. So the only items this rule can ever flag are those whose needs leave their program, and `item.build.resolve` is the only one in gov. If an item whose needs all lie outside its program counted as an entry, no item could ever be flagged. The rule would then check nothing, and AC3's `orphan-item` plant could not go red.
 
@@ -27,7 +27,7 @@ Everything else I checked holds:
 - In registry.toml, `loop budget fixtures` is an `[[exempt_leg]]`. scenario.py has the `then-cycle` plant. The `loop adapt fixtures` budget row reads 225. `git log --grep=Gov-Transition:` prints no live build.
 - The terminal rule holds on gov's build level: every open state reaches a terminal. `item.build.ratify` is the only item with an owner actor.
 
-One count moved and would have been a deviation record, not a divergence: gov's item-route cycles are now 23 PINNED at e8018d94f, up from the spec's 21. The two new ones are unit 50's `item.review.dispose -> item.review.fold` and `item.review.dispose -> item.review.fold -> item.review.trigger -> item.review.pin -> item.review.report`. The build table still leaves one cycle, `paused -> paused` on `item.life.request` pause, as F5 says.
+One count moved and would have been a deviation record, not a divergence: gov's item-route cycles are now 23 PINNED at e3d842339, up from the spec's 21. The two new ones are unit 50's `item.review.dispose -> item.review.fold` and `item.review.dispose -> item.review.fold -> item.review.trigger -> item.review.pin -> item.review.report`. The build table still leaves one cycle, `paused -> paused` on `item.life.request` pause, as F5 says.
 
 ## Summary
 
@@ -44,6 +44,6 @@ Checks that ran: read-only `python -c` probes over the gov definition at HEAD, u
 These probes stand in for nothing: no gate, suite or bar ran.
 
 Owed when the unit is dispatched again:
-- Gov's composition at HEAD stays at 23 item-route cycles, PINNED at e8018d94f, not 21. Record that in a deviation record.
+- Gov's composition at HEAD stays at 23 item-route cycles, PINNED at e3d842339, not 21. Record that in a deviation record.
 - F7's departure needs its own deviation record.
 - The `New arm:` observations for AC1 to AC5, AC7 to AC9 and AC11 are the main loop's, at the close.

@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Units through order 28 are built, and unit 48 of this order (1551afb16) gave the budget a home under every transitions.record set: read_budget_rows now also reads trailer rows and suffixed RUN.md rows for a build with no log record, and three new functions render_budget_fields, read_trailer_rows and write_budget_rows exist. 49 rev-3 was grounded at b1d66ba26, before 48: read 48's code as shipped. Unit 32 of this order builds after you.
+  table's order. Units through order 28 are built, and unit 48 of this order (d7d833cb5) gave the budget a home under every transitions.record set: read_budget_rows now also reads trailer rows and suffixed RUN.md rows for a build with no log record, and three new functions render_budget_fields, read_trailer_rows and write_budget_rows exist. 49 rev-3 was grounded at c6e66bfc4, before 48: read 48's code as shipped. Unit 32 of this order builds after you.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

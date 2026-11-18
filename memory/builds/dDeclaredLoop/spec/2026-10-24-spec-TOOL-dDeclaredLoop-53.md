@@ -88,7 +88,7 @@ builds opened after the gate was placed. It repairs `TOOL-dDeclaredLoop-19`.
 
 ### Evidence
 
-Read at branch `unattended-declared-loop-d56bf0`, tip `2d99e7784`, through `git show` and an export of
+Read at branch `unattended-declared-loop-d56bf0`, tip `0116f2d9b`, through `git show` and an export of
 that commit. `tools/loop/breakpoints.py` is not in that tree; it is `TOOL-dDeclaredLoop-19`'s, order 33,
 read on its committed rev-3.
 
@@ -189,7 +189,7 @@ scratch's loop kit so that it resolves the scratch's module.
 
 ### The sweep
 
-Read on the export of tip `2d99e7784`; counts PINNED there unless named DERIVED.
+Read on the export of tip `0116f2d9b`; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
@@ -311,7 +311,7 @@ New arm: tools/loop/breakpoints.py · covers AC1 AC2 AC3 AC4 · the `pre-placeme
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the hands-off bullets mirroring the
   consumes-from edges of TOOL-dDeclaredLoop-64 and TOOL-dDeclaredLoop-67, written by the round-2 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-16 · §1 to §10 · S1 to S5 · AC1 to AC5 · §8 F3 to F6 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `2d99e7784` and on `TOOL-dDeclaredLoop-19`'s committed rev-3, per
+  `unattended-declared-loop-d56bf0` at `0116f2d9b` and on `TOOL-dDeclaredLoop-19`'s committed rev-3, per
   the brief `2026-11-16-prompt-TOOL-dDeclaredLoop-53-1-spec-writer`: the rule moves into the list's release
   answer, the driver unedited; the `--phase` move gives way to the `--close` hold and `three-gates`; the
   plan gate included (F4), the owner item kept held (F5), the README read under the memory root (F6); the

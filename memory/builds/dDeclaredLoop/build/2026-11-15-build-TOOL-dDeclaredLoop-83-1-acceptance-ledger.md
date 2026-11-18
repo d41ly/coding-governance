@@ -5,7 +5,7 @@
 No merge bar, no self-test suite and no gate leg ran in this pass. The pass wrote spec text only: 75
 S27's fallback clause, 75 AC27 and 75's guard arm line, as a rev-9 bump of the 75 spec with its
 revision-log line. Each criterion was observed by its own grep over the 75 spec in the working tree,
-and AC1 and AC3 were also read at the pass's base `8be303ca3` through `git show`, where AC1's grep
+and AC1 and AC3 were also read at the pass's base `4975700c6` through `git show`, where AC1's grep
 printed 1 and AC3's AC27-range grep for the plant key printed 0, so both greps can read red. The
 claims S1 restates were read against `tools/loop/guard.py#read_remerge_policy` and
 `tools/loop/guard.py#check_push_range` as built: `uncomputable` for an octopus merge or a git without

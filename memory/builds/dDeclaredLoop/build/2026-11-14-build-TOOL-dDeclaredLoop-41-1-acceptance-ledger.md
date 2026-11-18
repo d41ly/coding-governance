@@ -13,7 +13,7 @@ Owed to the close: every leg the spec's section 7 names, and the RED-first obser
 check as `TOOL-dDeclaredLoop-5` landed it, where the folder is tested in every tree and no foreign
 line prints.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/loop_lib.py --fixture --plant actor-list-foreign` with every function the unit's pass

@@ -16,7 +16,7 @@ Owed to the close: every leg the spec's section 7 names, and the RED-first obser
 arm:` line, the `draws-survive-rotation` and `patch-archived` plants staged against the base's reader,
 `ROTATED` reading `RUN.LANDED.*.md` and the suffixed population every live `RUN.md` alone.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/budget.py --fixture --plant draws-survive-rotation` with every function the unit's pass

@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 34 is built: unit 52 (975723b24) shipped derive_phase_position, the phase verb and check_phase_gates; unit 33 (aeef7e3c8) the termination module. Unit 54 of this order is parked INPROGRESS on a spec revision and writes nothing now. The spec is rev-3, re-grounded at fe8664207.
+  table's order. Every unit through build order 34 is built: unit 52 (c12df2635) shipped derive_phase_position, the phase verb and check_phase_gates; unit 33 (b6c23d4fd) the termination module. Unit 54 of this order is parked INPROGRESS on a spec revision and writes nothing now. The spec is rev-3, re-grounded at ba5f0a52f.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

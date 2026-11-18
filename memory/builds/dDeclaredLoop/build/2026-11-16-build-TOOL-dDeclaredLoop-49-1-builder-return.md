@@ -4,7 +4,7 @@
 
 ## Why
 
-DIVERGENCE: section 5 of memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-49.md (rev-3, grounded at b1d66ba2) makes two claims that unit 48 (1551afb16) has since changed.
+DIVERGENCE: section 5 of memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-49.md (rev-3, grounded at c6e66bfc) makes two claims that unit 48 (d7d833cb5) has since changed.
 
 (1) In the risks bullet "every held leg is budgeted, every budget row resolves", the spec says the `loop budget fixtures` row in tools/run-gates/selftest-budgets.txt has "315 PINNED proxy, 210 seconds of thirteen direct-CLI plant readings x1.5". It also says that after the re-price "its prose says fourteen plants". 48 re-priced that row. It now reads 328, from a 219 s reading over fifteen plants (trailer-only, patch-trailer-only and log-dropped took the place of no-log). If I followed the spec as written, the row would say "fourteen plants" and use the wrong base figure. Section 5 needs to say: the 328 PINNED proxy (219 s of fifteen direct-CLI plant readings x1.5) is re-priced with the parallel-append plant's direct-CLI reading added, x1.5, and its prose says sixteen plants.
 
@@ -25,11 +25,11 @@ Nothing was written or staged, so no patch was saved.
 
 ## Summary
 
-I stopped before writing anything, so nothing is committed and no product path changed. Base is 341310d645830a0a61c9e94730b77a4693fc4a5a.
+I stopped before writing anything, so nothing is committed and no product path changed. Base is b7ce52613d01e0c30b13fda1b0edbac472a40937.
 
 **What I checked (read-only):**
 - I read the spec, the brief, BUILD-METHOD.md and tools/loop/budget.py as 48 shipped it, then re-ran the spec's section 5 sweep against the tree.
-- I diffed 1551afb16 on tools/run-gates/selftest-budgets.txt. 48 moved that row from 315 / 210 s / thirteen plants to 328 / 219 s / fifteen plants.
+- I diffed d7d833cb5 on tools/run-gates/selftest-budgets.txt. 48 moved that row from 315 / 210 s / thirteen plants to 328 / 219 s / fifteen plants.
 - I ran AC1's probe at the base: `git check-attr merge -- 2026-11-16-build-TOOL-dDeclaredLoop-1-transition-1.md` in memory/builds/dDeclaredLoop/build/ answered `merge: unspecified`. That is AC1 failing as expected before the change, and it stands in for nothing at the gate.
 - `python tools/govkit/docs_leg.py --fingerprints` showed the three budget.py anchors on help/loop.md.
 - I checked the readers of `.gitattributes` (check-wiring.sh, asbuilt_view, and govkit's lf_pin, which only reads eol pins). None of them reads a `merge=union` line.

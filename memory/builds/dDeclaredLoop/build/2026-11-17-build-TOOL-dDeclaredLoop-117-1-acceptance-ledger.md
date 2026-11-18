@@ -4,7 +4,7 @@
 
 No merge bar, no self-test suite and no gate leg ran in this pass. The criteria were observed on node a
 (win32), at rev-1 of the spec, over the working tree, by the first dispatch, which started from the
-base `afce3169a`. Each new plant ran alone by `--fixture --plant`, standing in for the `loop definition
+base `4a1e71b9d`. Each new plant ran alone by `--fixture --plant`, standing in for the `loop definition
 fixtures` leg as far as those plants reach; `--selftest` did not run. The sweep re-run at the base held
 every design claim: the live opener answer read `read_driver_conf` and `resolve_memory_root_source`,
 unit 116's `read_builds_dir` among no openers; `PLANTS` and `PLANT_OWED` held 35 keys each, PINNED;
@@ -23,7 +23,7 @@ line, the six conf plants under `--selftest`, red with `derive_conf_openers` at 
 with each refusal arm of `check_conf_readers_plant` left out in turn. This pass saw each red side
 here, in scratch copies of the loop, lib and memory-tree kits, as AC1 and AC3 below record.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/loop_lib.py --selftest` with `derive_conf_openers` at the bytes before the pass exited 1,

@@ -91,7 +91,7 @@ The labels S2 and S3 keep their rev-3 numbers, which sibling specs cite; rev-3's
 
 ### Evidence
 
-Read at branch `unattended-declared-loop-d56bf0`, tip `a7b105696`, through `git show`. The module
+Read at branch `unattended-declared-loop-d56bf0`, tip `fc9477488`, through `git show`. The module
 `tools/loop/breakpoints.py` is not in that tree: it is `TOOL-dDeclaredLoop-19`'s, order 33, building now
 and read on its committed rev-3, and `TOOL-dDeclaredLoop-53`'s, order 34, read on its committed rev-3.
 
@@ -196,7 +196,7 @@ parameters and keeps its name; a builder who names a new function runs
 
 ### The sweep
 
-Read at the tip `a7b105696`; counts PINNED there unless named DERIVED.
+Read at the tip `fc9477488`; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
@@ -324,7 +324,7 @@ New arm: tools/loop/breakpoints.py · covers AC1 AC2 AC3 · the `pre-placement-r
 - rev-3 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-100, written by the round-12 spec audit's disposal; nothing else moved.
 - rev-4 · 2026-11-16 · §1 to §10 · S1 to S4 · AC1 to AC4 · §8 F2 to F4 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `a7b105696` and on the committed rev-3 specs of
+  `unattended-declared-loop-d56bf0` at `fc9477488` and on the committed rev-3 specs of
   TOOL-dDeclaredLoop-19 and TOOL-dDeclaredLoop-53, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-64-1-spec-writer`: S1 and its no-conf criterion leave scope to
   TOOL-dDeclaredLoop-53 S1's root read; the held path prints on its own `breakpoints:` line, the owner

@@ -23,7 +23,7 @@ exit 0 set to owe 1, and AC10's comparison of its lines with those at the pass's
 meta-check AC8 names; and `govkit selfcheck`, whose one finding at its `--write` run named
 `loop_table.py` as shipped by no rule while the file was still untracked, cleared by staging it.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/loop_checklist.py check --selftest` with one case owing exit 0 set to owe 1 exited 1, and 0

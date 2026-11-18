@@ -88,7 +88,7 @@ The labels keep their rev-5 numbers; S2 and S4 are in §3's table.
 
 ### The rev-5 items a committed spec settles
 
-Read on branch `unattended-declared-loop-d56bf0` at `759298f0f`.
+Read on branch `unattended-declared-loop-d56bf0` at `64e2a7e97`.
 
 | Item | What settles it |
 |---|---|
@@ -112,9 +112,9 @@ Read on branch `unattended-declared-loop-d56bf0` at `759298f0f`.
 
 ### Evidence
 
-Read at branch `unattended-declared-loop-d56bf0`, tip `759298f0f`, through `git show` and a
+Read at branch `unattended-declared-loop-d56bf0`, tip `64e2a7e97`, through `git show` and a
 `git archive` scratch copy of its `tools/`, unless named otherwise; `tools/loop/` is absent from this
-worktree's main. The tip's code matches `a339daae2`, the tip this re-ground opened on. The conf-read rule,
+worktree's main. The tip's code matches `083cd0a32`, the tip this re-ground opened on. The conf-read rule,
 `derive_conf_constants`, `derive_import_aliases`, `derive_fixture_boundary` and the `conf-read-forms`
 plant are not built at the tip: they are read on the committed specs §5 "Dependency" names.
 
@@ -220,7 +220,7 @@ no line numbers, does not move. The build README's regions are the generator's r
 
 ### The sweep
 
-Read at the tip `759298f0f`; counts PINNED there unless named DERIVED.
+Read at the tip `64e2a7e97`; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
 |---|---|---|
@@ -349,7 +349,7 @@ New arm: tools/loop/budget.py · covers AC1 · the joined-path, os.path.join, mu
 - rev-5 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-99, written by the round-12 spec audit's disposal; nothing else moved.
 - rev-6 · 2026-11-17 · §1 · S1 · S2 · S3 · S4 · S5 · §3 · §4 · §5 · AC1 · AC2 · AC3 · AC4 · §7 · §8 ·
-  §10 · re-grounded on branch/unattended-declared-loop-d56bf0 at `759298f0f` by the brief
+  §10 · re-grounded on branch/unattended-declared-loop-d56bf0 at `64e2a7e97` by the brief
   2026-11-17-prompt-TOOL-dDeclaredLoop-87-1-spec-writer; mechanism, carries, order and status kept. S2,
   S4 and AC3 move to §3's table, 82 and 86 being CLOSED by order 43 (F3); S5 and AC4 state the class in
   the README row; S1 keeps 86's `LoopError` and names nested bindings; S3's rows sit in the boundary and

@@ -18,7 +18,7 @@ What the spec asks for: §4 says "On a refusal it passes the module's stderr thr
 - So "fails 37" means a new `fail 37 "..."` branch, and the spec says load_review_bounds holds it.
 - Removing the old refusal takes nothing out of the census, so the count goes from 326 to 327.
 
-Measured at base 8a3bd0c8 with check-arms.py's own readers (branches and scan_refusal_sites, imported read-only):
+Measured at base 8369c89f with check-arms.py's own readers (branches and scan_refusal_sites, imported read-only):
 - tools/unattended/unattended.sh: census 326 against the ceiling token `tools/unattended/unattended.sh:326:2026-11-15:TOOL-dDeclaredLoop-28`. Adding the branch makes it 327 against 326, and the `harness arms (fail branches armed or pinned)` leg reds.
 - tools/unattended/check-unattended.sh: census 266, at its ceiling. S6 re-words check 2's existing `fail 2` in place and adds no branch to check 19, so this one stays flat as the spec says.
 - Families in unattended.families.txt: missing-run-state 1/1, required-flag 11/11, field-shape 36/37. The new message must not contain `requires --`.
@@ -31,7 +31,7 @@ To make this buildable the spec must choose one of:
 (a) Keep `verb_review fails 37`. Then §4 Budgets names the driver's raise from 326 to 327 under a decision id whose DECISIONS.md row lands ahead of the pass, as unit 30's did, and Files touched adds .memory-tree.conf (the REFUSAL_CEILINGS token and its comment line). Unit 30's planned raise from 326 to 328 then has to be re-based to 327 to 329, or the two units ordered so one decision covers both.
 (b) Keep the census flat. The refusal stays a stderr echo with a non-fail exit, the shape of the one it replaces, and §4 drops "verb_review fails 37". The cost is that harness arms does not grade the refusal.
 
-Every other rev-5 claim I probed holds at base 8a3bd0c8:
+Every other rev-5 claim I probed holds at base 8369c89f:
 - REVIEW_ROUNDS readers: `git grep -n REVIEW_ROUNDS` matches S4's by-name and by-value lists, including loop_witness.py#HOLD_CONF, the conf of pass-tree.test.sh, check_policy.py#LEGACY_CONF and legacy-homes.txt.
 - legacy-homes.txt already lists `.unattended.conf GATE_BOUND owner-policy`.
 - The four catalogue keys and their defaults (3, one, 2, after-high) are in tools/policy/catalogue.toml and read through policy.py#resolve.
@@ -46,7 +46,7 @@ One constraint for the builder, not a divergence: memory/guides/BUILD-METHOD.md 
 
 ## Summary
 
-I committed nothing and changed nothing in the tree; HEAD is still 8a3bd0c8. TOOL-dDeclaredLoop-21 rev-5 cannot be built as written: the refusal the spec puts in the unattended driver would push its refusal count past the ceiling, and the spec provides no raise for it.
+I committed nothing and changed nothing in the tree; HEAD is still 8369c89f. TOOL-dDeclaredLoop-21 rev-5 cannot be built as written: the refusal the spec puts in the unattended driver would push its refusal count past the ceiling, and the spec provides no raise for it.
 
 **The blocker:**
 - §4 says the new function `load_review_bounds` holds the refusal and `verb_review` "fails 37". In this driver that has to be a new `fail 37` branch, because only `fail` sets a non-zero exit.

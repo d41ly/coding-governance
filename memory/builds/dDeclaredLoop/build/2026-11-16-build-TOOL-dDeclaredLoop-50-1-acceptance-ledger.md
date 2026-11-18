@@ -20,7 +20,7 @@ Owed to the close: every leg the spec's section 7 names, `loop_lib.py --check` a
 RED-first observation of its `New arm:` line, the `step-none-outside-review` and `review-step-named`
 plants against a `check_program` that admits `none` on every row and a review row at any step.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/loop_lib.py --selftest` with every function the unit's pass changed in

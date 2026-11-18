@@ -26,7 +26,7 @@ its `New arm:` line names, staged by the `withdrawn-parent` plant with `read_wit
 no `phase` fact; AC9's `core.py meta-check`; and a budget re-priced from the main loop's first reading
 of the new leg alone.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/loop_parents.py --fixture --plant withdrawn-parent` with `read_withdrawn_parents` reading

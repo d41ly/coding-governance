@@ -10,12 +10,12 @@ committed; the `additive`, `owner-approves`, `mid-step`, `loosening`, `act-misma
 of `adapt.py` run alone, standing in for `loop adapt fixtures`; a `python -c` probe of `check_loop`,
 `check_program`, `check_witness_classes` and `check_transition_tables` over the edited definition, standing
 in for `loop definition` and `loop transition tables`; a `json.load` probe of the leg row; the naming
-lexicon; and `docs_leg.py --fingerprints`. The section 5 sweep re-run at this pass's base `2fa00d7c3`
+lexicon; and `docs_leg.py --fingerprints`. The section 5 sweep re-run at this pass's base `f30ea8167`
 held: gov's item routes hold 23 cycles over 45 edges PINNED, the reachable walk leaves no item unreached,
 no `Gov-Transition` trailer exists, so 0 live builds PINNED, `item.build.ratify` is the one owner item,
 units 52 and 53 changed no `[[item]]` row, the offender pin reads 1215 PINNED, and no `*.sh` is edited.
 Its one stale figure, the sweep's name count, is deviation 335. The pass re-landed at rev-9, which adds
-only the section 8 resolution marks, over base `47fe36855`: the `check` probe over this repository exited
+only the section 8 resolution marks, over base `0d65b661c`: the `check` probe over this repository exited
 0 again, and the `stage-self-loop` and `raise-unattended` plants and `adapt.py`'s `loosening` plant each
 printed `held` again.
 
@@ -31,7 +31,7 @@ Gov's cycles at landing, each with its bound by §4's rules:
 - rule 3, a `cycle` row of `tools/loop/termination-pending.txt`, owner by the item whose route returns to an item it needs: `paused -> paused` dWellOiledMachine; `item.build.reuse-check` on `overflow` dScopedBuild; the four `item.design.decompose` cycles and the two `item.design.ready` cycles dIndexedDesign; `item.plan.record -> item.plan.research` dRankedPlan; `item.review.dispose -> item.review.fold` dDeclaredLoop; the four test cycles dWitnessedBar.
 - rule 4: `item.build.ratify`, a `wait` row naming `run.owner-deadline` and dWellOiledMachine.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 The `stage-self-loop` plant of `tools/loop/termination.py`, whose planted defect is the staged break, exited 0

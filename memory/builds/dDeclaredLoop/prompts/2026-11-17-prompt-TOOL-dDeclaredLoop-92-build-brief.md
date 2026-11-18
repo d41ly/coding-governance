@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 45 is built: of order 45, unit 90 (b10a81331: TREE_LIB_SYMBOLS, load_tree_lib testing each tree_lib name) and unit 91 (c7a472129: derive_conf_rebinds reading every module-scope position from _MODULE_SCOPE_PARTS, a class as a global loader). The spec is rev-5 (af5996d3d), re-grounded on the branch: only S8 (the shared git-env-leaks block carried inline in tools/loop/loop_witness.py, F3 (c)) and S17 (the guard's OSError detail from the exception's own text, F4) still build.
+  table's order. Every unit through build order 45 is built: of order 45, unit 90 (be7988ff4: TREE_LIB_SYMBOLS, load_tree_lib testing each tree_lib name) and unit 91 (cf2a58780: derive_conf_rebinds reading every module-scope position from _MODULE_SCOPE_PARTS, a class as a global loader). The spec is rev-5 (2a95c3eb9), re-grounded on the branch: only S8 (the shared git-env-leaks block carried inline in tools/loop/loop_witness.py, F3 (c)) and S17 (the guard's OSError detail from the exception's own text, F4) still build.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

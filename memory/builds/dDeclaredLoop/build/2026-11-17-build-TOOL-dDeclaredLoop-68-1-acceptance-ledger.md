@@ -20,7 +20,7 @@ observation of the `tools/loop/loop_witness.py` arm over AC1, AC3 and AC4 on its
 `timeout-grandchild` plant's call, which now holds the normaliser's bash under the same short bound, read
 4.0 PINNED seconds inside its ten-second window.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/loop_witness.py --selftest` with every function the unit's pass changed in

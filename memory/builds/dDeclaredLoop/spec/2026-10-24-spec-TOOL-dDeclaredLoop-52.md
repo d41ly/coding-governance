@@ -102,7 +102,7 @@ the move crosses. This unit gives the map one owner in code, and builds that hol
 
 ### Evidence
 
-Every claim below was read at the tip of branch `unattended-declared-loop-d56bf0`, `2d99e7784`, in a scratch
+Every claim below was read at the tip of branch `unattended-declared-loop-d56bf0`, `0116f2d9b`, in a scratch
 export of that tree; the worktree this spec was written in is cut from main, which holds no loop kit.
 
 - `tools/unattended/unattended.sh#PHASES_CORE` holds 13 members PINNED, read 2026-11-16, re-derived by the
@@ -386,13 +386,13 @@ git show "$B:memory/project/positional-refs.txt" | grep -c 'spec-TOOL-dDeclaredL
 
 - The driver's census, read through `tools/memory-tree/check-arms.py#branches` and
   `tools/memory-tree/check-arms.py#scan_refusal_sites` over the scratch export, is 340 PINNED at
-  `2d99e7784`, at its ceiling of 340 PINNED under `TOOL-dDeclaredLoop-22`'s decision; `TOOL-dDeclaredLoop-19`
+  `0116f2d9b`, at its ceiling of 340 PINNED under `TOOL-dDeclaredLoop-22`'s decision; `TOOL-dDeclaredLoop-19`
   raises both to 342 PINNED under its landed decision row. This unit adds one site, `check_phase_gates`'
   `fail 82`, so the ceiling rises 342 -> 343 PINNED, re-based from the value `REFUSAL_CEILINGS` holds when
   the pass starts where `TOOL-dDeclaredLoop-53` has moved it first. The pass writes the comment line below
   above `REFUSAL_CEILINGS` and re-points `memory/project/positional-refs.txt`'s row pairing
   `.memory-tree.conf` with the driver's count to the new figure.
-- The families of `tools/unattended/unattended.families.txt` do not move, each count PINNED at `2d99e7784`:
+- The families of `tools/unattended/unattended.families.txt` do not move, each count PINNED at `0116f2d9b`:
   missing-run-state 1 of 1 PINNED, required-flag 11 of 11 PINNED and field-shape 36 of 37 PINNED.
   The message spells no `requires --`, `requires $`, newline, carriage return, separator or bypass flag,
   and does not open `no run-state file`.
@@ -425,7 +425,7 @@ committed spec. Unit 33 edits `tools/loop/loop.toml`, `help/loop.md` and `tools/
 rev-3) is read on its committed spec: `check_owner_gates`, `run_loop_verb`, the `breakpoint:` line shape
 and the `driver-plan` plant, all of which land before this unit builds; it raises the census to 342 PINNED.
 `TOOL-dDeclaredLoop-51` (order 33, rev-3) amends item rows this unit reads by step only. Units 13, 22, 31
-and the rest through order 31 are CLOSED, read on landed code at `2d99e7784`; `TOOL-dDeclaredLoop-50`
+and the rest through order 31 are CLOSED, read on landed code at `0116f2d9b`; `TOOL-dDeclaredLoop-50`
 (order 32, rev-4, building) adds six review `[[item]]` rows on step none, none a step exit;
 `TOOL-dDeclaredLoop-34` is deferred against ask TOOL-dDeclaredLoop-113 and shares no file. The code reads,
 the census, the lexicon suggests and the reuse probe ran in a scratch export of the branch tip; the counts
@@ -524,7 +524,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC5 · a positive asserti
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the hands-off bullets mirroring the
   consumes-from edges of TOOL-dDeclaredLoop-63 and TOOL-dDeclaredLoop-67, written by the round-2 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-16 · §1 to §10 · S1 to S6 · AC1 to AC7 · §8 F3 to F5 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `2d99e7784`, per the brief
+  `unattended-declared-loop-d56bf0` at `0116f2d9b`, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-52-1-spec-writer`: symbol citations; the `HELD` row's two
   qualifiers on unit 31's built reading (F5); a stepped row's state read from its step; the verb's
   `--from`, `--to` and `--fact`, and the crossed exits; the join through `read_core_registries`, its plants
@@ -544,7 +544,7 @@ second reader, `run_loop_verb` and the `driver-plan` plant; and
 transcription source.
 
 `python tools/codebase-map/reuse_lookup.py "map an unattended run phase to a build state and step, and the
-step exits a phase move crosses"`, run in a scratch export of the branch tip `2d99e7784`, ranked the
+step exits a phase move crosses"`, run in a scratch export of the branch tip `0116f2d9b`, ranked the
 driver's `phases` (`tools/unattended/unattended.sh#phases`), which composes the vocabulary and maps none,
 `read_steps` (`tools/loop/loop_lib.py#read_steps`), the step rows the crossing reads, and name-stem
 neighbours (`run`, `build`, `run_selftest_cases`); no existing seam maps a phase to a state or a step, or

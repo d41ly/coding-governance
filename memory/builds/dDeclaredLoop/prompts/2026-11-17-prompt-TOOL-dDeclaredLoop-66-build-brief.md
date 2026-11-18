@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 37 is built, and of order 38 units 67 (6bc52aca7), 80 (4da72dac1) and 74 (1e022e062, the FETCH_HEAD default-branch test) are built. This is order 38's last unit. The spec is rev-4, re-grounded on the branch: TOOL-dGroundRules-25 and TOOL-dGroundRules-32 have already made the Parallel column a derivation of each group's write sets and edges, so this unit builds no product file; it observes that derivation on this build's own regions and closes the round-2 audit's finding id 1 on the build's record (F2).
+  table's order. Every unit through build order 37 is built, and of order 38 units 67 (faf051f67), 80 (38ff07b0d) and 74 (4af5395e2, the FETCH_HEAD default-branch test) are built. This is order 38's last unit. The spec is rev-4, re-grounded on the branch: TOOL-dGroundRules-25 and TOOL-dGroundRules-32 have already made the Parallel column a derivation of each group's write sets and edges, so this unit builds no product file; it observes that derivation on this build's own regions and closes the round-2 audit's finding id 1 on the build's record (F2).
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

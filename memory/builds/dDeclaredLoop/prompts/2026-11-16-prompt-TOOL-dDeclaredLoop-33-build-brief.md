@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dDeclaredLoop's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
-  table's order. Every unit through build order 33 is built: unit 19 (bcdcf0c79) shipped tools/loop/breakpoints.py and its leg, unit 50 (fbc3a11fe) the review rows and program, unit 51 (dd5962773) Design's reason row, unit 22 (0ed098afd) --recommend. The spec is rev-6, re-grounded at 2d99e7784; its F7 departs from its clause (the raise rule grades applied loosenings, not three policy plants), which the pass records as a deviation, and its F9 waits on ask TOOL-dDeclaredLoop-114, filed.
+  table's order. Every unit through build order 33 is built: unit 19 (6ffd8a882) shipped tools/loop/breakpoints.py and its leg, unit 50 (ee517e052) the review rows and program, unit 51 (1e3227ccd) Design's reason row, unit 22 (d065715b4) --recommend. The spec is rev-6, re-grounded at 0116f2d9b; its F7 departs from its clause (the raise rule grades applied loosenings, not three policy plants), which the pass records as a deviation, and its F9 waits on ask TOOL-dDeclaredLoop-114, filed.
 - The spec's base is older than the run's: verify each claim about current code against source before building on it, and
   hand a claim that no longer holds back as a divergence rather than building around it.
 

@@ -405,7 +405,7 @@ New arm: tools/memory-tree/routed_commits.py · covers AC1 AC2 AC3 AC4 AC5 AC6 A
   self-test` leg to §7. Recommendation (b); the spec body is written on it.
 - **FACT-QUESTION · F9 — Is F6's ask filed, and does `pins.py` answer the `mark` verb, at HEAD?**
   Probe: `git grep -n -F "mark --before" branch/unattended-declared-loop-d56bf0 -- memory/builds/dOrderedCharter/BACKLOG.md`
-  and `tools/playbook/pins.py#main` read at `115fdccce`. Observation, 2026-11-16: the grep prints
+  and `tools/playbook/pins.py#main` read at `56dbf1ea6`. Observation, 2026-11-16: the grep prints
   nothing, and `main` answers `drift` and `--fixture` alone, printing its usage with exit 2 for any
   other verb, which S4 would read as a refusal of every editorial claim. Liveness: the grep finds the
   ask's row once it is filed, and `main` gains a `mark` branch once it lands. RESOLVED (agent,
@@ -424,7 +424,7 @@ New arm: tools/memory-tree/routed_commits.py · covers AC1 AC2 AC3 AC4 AC5 AC6 A
   per the brief `2026-11-05-prompt-TOOL-dDeclaredLoop-3-owner-forks`; S4 and the edge name the ask as filed.
 - rev-4 · 2026-11-16 · §1 · S1 · S2 · S3 · S4 · S5 · S6 · S7 · S8 · S9 · §3 · §4 · §5 · AC1 · AC3 · AC4 ·
   AC5 · AC6 · AC7 · AC9 · AC10 · §7 · §8 F1 F5 F6 F7 F8 F9 · §10 · re-grounded at HEAD of
-  branch/unattended-declared-loop-d56bf0 (`115fdccce`), per the brief
+  branch/unattended-declared-loop-d56bf0 (`56dbf1ea6`), per the brief
   prompts/2026-11-16-prompt-TOOL-dDeclaredLoop-34-1-spec-writer.md: every code citation a symbol
   citation; S1 reads the key through `policy.resolve` with its literal, the shape reader coverage
   counts, at the landed revision; the fixture's policy file rides its base commit; S5's pins read as

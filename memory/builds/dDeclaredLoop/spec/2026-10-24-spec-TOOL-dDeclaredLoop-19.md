@@ -204,7 +204,7 @@ derive_breakpoints(values, steps, tags, facts) -> [{name, relation, position, di
 
 The table is `STAGE_REVIEWS`, the one typed fact: which review each stage owns and where, from the
 flow-steps record. Each position tag is a declared `[[item]]` row of `tools/loop/loop.toml` at
-`250b236fe`, and a position the composed tags lack is refused as S4's member is. A duplicate position
+`57723d6c9`, and a position the composed tags lack is refused as S4's member is. A duplicate position
 from two declarations, an owner gate under both `three-gates` and `every-stage` say, is listed once.
 `read_breakpoints` answers each owner line's release: `authorization` for `item.plan.exit`, else
 `released <stem> <word>` where `read_disposition_release(root, build, tag, ())` answers, else `held`.
@@ -232,7 +232,7 @@ at its read, since the policy kit's reader coverage counts a key only so
 ### The owner item
 
 The FK-9-1 ruling held `build.recommend`'s route for the owner until dScopedBuild lands `build.ratify`.
-At `250b236fe` the definition declares that item: `item.build.ratify`, actor `owner:build.ratify`,
+At `57723d6c9` the definition declares that item: `item.build.ratify`, actor `owner:build.ratify`,
 outcomes `ratified` and `rejected`, its allowance "the owner's disposition record for each major fork",
 and `item.build.recommend` routes `ratify` to it. So the owner item sits at that declared item rather than
 standing in beside it (§8 F4), and the disposition record whose `Item` is `item.build.ratify` releases it.
@@ -395,7 +395,7 @@ Each `memory/guides/*.md` is its template's render; the template is the edit.
 
 ### The sweep
 
-Read at branch `unattended-declared-loop-d56bf0`, tip `250b236fe`, through `git show` and an export of
+Read at branch `unattended-declared-loop-d56bf0`, tip `57723d6c9`, through `git show` and an export of
 that commit; counts PINNED there unless named DERIVED.
 
 | Changed | Population | What keeps it green |
@@ -429,7 +429,7 @@ git show "$B:tools/unattended/unattended.sh" | grep -c 'run.on-owner-question'  
 ### Budgets and records
 
 - The driver's census, read through `tools/memory-tree/check-arms.py#branches` and
-  `tools/memory-tree/check-arms.py#scan_refusal_sites` over the export, is 338 PINNED at `250b236fe`, at its
+  `tools/memory-tree/check-arms.py#scan_refusal_sites` over the export, is 338 PINNED at `57723d6c9`, at its
   ceiling of 338 PINNED; `TOOL-dDeclaredLoop-22` raises both to 340 PINNED under its landed decision row.
   This unit adds two sites, `check_owner_gates`' `fail 82` and `read_design_review`'s `fail 55`, so the
   ceiling rises 340 -> 342 PINNED with the comment line below, and `memory/project/positional-refs.txt`'s
@@ -581,7 +581,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC3 · a positive asserti
   design gate pass the whole build before it holds. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3.
   Its `--phase` half moves to `TOOL-dDeclaredLoop-52` under F5, the table it read having no reader here.
 - **F4 — Where does the owner item sit, now that the definition declares `item.build.ratify`?** The rev-2
-  stand-in was placed "while the loop definition declares no `item.build.ratify` row", and at `250b236fe`
+  stand-in was placed "while the loop definition declares no `item.build.ratify` row", and at `57723d6c9`
   it declares one, owned by dScopedBuild with the owner as its actor. Options: (a) at the declared
   `item.build.ratify`, under `author-owner-ratifies` with a delegated fork, released by a disposition
   record of that item; (b) keep rev-2's condition, which the landed definition makes never true, so the
@@ -637,7 +637,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC3 · a positive asserti
 - rev-2 · 2026-10-24 · §3 · the Edges block gains a hands-off TOOL-dDeclaredLoop-52, a hands-off TOOL-dDeclaredLoop-53, a hands-off TOOL-dDeclaredLoop-56, the mirror of each unit the round-1 spec audit
   promoted (reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md); no scope moved.
 - rev-3 · 2026-11-16 · §1 to §10 · S1 to S13 · AC1 to AC11 · §8 F3 to F10 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `250b236fe`, per the brief
+  `unattended-declared-loop-d56bf0` at `57723d6c9`, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-19-1-spec-writer`: symbol citations; the owner item at the declared
   `item.build.ratify` (F4); the hold at `--close` alone, `--phase` unit 52's (F5); the plan gate released
   by the authorization (F6); the release by `Item` through `read_disposition_release` (F7); the derived
@@ -656,7 +656,7 @@ The review breakpoint reuses `TOOL-dDeclaredLoop-20`'s `--trigger`, and the plac
 `check_authorization`, its two sources kept, and the forks are read by `plan_state`'s grammar. The runner
 is extracted from `run_budget_verb` and the header read from `read_build_specs`, each at its second
 instance. The list itself is new: no breakpoint list exists, and no code reads `autonomy`,
-`review.<stage>` or `review.breakpoints` at `250b236fe` but the loop kit's own plants.
+`review.<stage>` or `review.breakpoints` at `57723d6c9` but the loop kit's own plants.
 
 `python tools/codebase-map/reuse_lookup.py "list the review and owner breakpoints a build's policy places at item boundaries"`,
 on the worktree at `179486e8f`, which holds no loop kit, ranked name-stem neighbours (`build`,

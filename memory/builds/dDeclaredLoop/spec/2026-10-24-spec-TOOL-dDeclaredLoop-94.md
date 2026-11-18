@@ -215,7 +215,7 @@ the `loop budget fixtures` row moves only where the delta reads a whole second.
 ### Evidence
 
 Read or probed 2026-11-17 on node `d`: PINNED, that date. Every read is of
-`branch/unattended-declared-loop-d56bf0` at `3c3e0d95`, its tree written by `git archive` into the run's
+`branch/unattended-declared-loop-d56bf0` at `ccb8a5a8`, its tree written by `git archive` into the run's
 scratch directory, since this worktree is cut from main, which lacks the loop kit. Every probe ran in
 that extracted tree, or in a scratch copy of its `tools/loop/`, `tools/lib/` and `tools/memory-tree/`.
 

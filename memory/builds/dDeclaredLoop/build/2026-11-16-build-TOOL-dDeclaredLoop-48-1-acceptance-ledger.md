@@ -22,7 +22,7 @@ Owed to the close: every leg the spec's section 7 names, `loop budget fixtures` 
 record` whole, and the RED-first observation of the `New arm:` line, the `trailer-only` plant staged
 against the refusing `record_draw` unit 30 landed.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/budget.py --fixture --plant patch-trailer-only` with every function the pass changed

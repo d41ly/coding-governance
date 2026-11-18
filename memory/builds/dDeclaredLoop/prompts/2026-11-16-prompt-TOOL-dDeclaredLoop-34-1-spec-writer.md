@@ -108,7 +108,7 @@ over HEAD. Where every claim already holds, change nothing and say so in your re
 1. Read the whole spec against the code at HEAD of branch/unattended-declared-loop-d56bf0 and settle every claim the landed
    code has moved. Since this spec's rev was written on 2026-11-05, the branch built every unit through build order 25 (each a
    CLOSED spec in this build's spec folder; the loop kit now holds splice.py, upstream.py, composition.py, scenario.py and
-   adapt.py beside the modules before them), and merged local main at 4310deb9b and origin/main at bee1741ea, bringing
+   adapt.py beside the modules before them), and merged local main at 3b81812c4 and origin/main at a4bab683c, bringing
    aTwinnedPass, aMeasuredDrag, aCarriedStop, aClearedLedger, aBriskDeclaration and aLightenedLoop (the driver's `--wake`).
    TOOL-dDeclaredLoop-21's first builder found its rev-4 stale in six places of the same kinds: new readers of a key the spec
    retires, a §7 leg line missing legs its Files touched trips, missing usage rows and help anchors for new verbs, and a new

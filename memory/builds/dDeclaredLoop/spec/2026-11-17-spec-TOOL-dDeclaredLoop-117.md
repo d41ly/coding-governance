@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-117 — the conf-opener derivation reads a conf path passed straight to its open, and every refusal of the `conf-readers-declared` plant is a standing case
 
-**Status:** CLOSED · rev-1 · 2026-11-17 · node a · Tier-2 · base a4256373 · streams tooling · order 54
+**Status:** CLOSED · rev-1 · 2026-11-17 · node a · Tier-2 · base 017b0299 · streams tooling · order 54
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -81,7 +81,7 @@ so S4 to S6 settle them by deviation records and change no code.
   Its text is §4 "The records", record 1172. Observed by AC6.
 - **S6** — Round 2 items 1 and 2: one deviation record states the promote disposition the round-1
   record contradicts, and pins every bare `path:line` cite of that record to its blob at the reviewed
-  head 520e5125c. Its text is §4 "The records", record 1173. Observed by AC6.
+  head bada76713. Its text is §4 "The records", record 1173. Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -111,7 +111,7 @@ so S4 to S6 settle them by deviation records and change no code.
 
 ### Evidence
 
-Every reading below ran on `git archive a4256373` of `branch/unattended-declared-loop-d56bf0`, the
+Every reading below ran on `git archive 017b0299` of `branch/unattended-declared-loop-d56bf0`, the
 branch tip, extracted under the writer's scratch directory, with Python 3.15.2. This worktree is cut
 from main, which lacks the loop kit, so no code claim here was read on main.
 
@@ -223,7 +223,7 @@ Record 1172, under unit 100:
 - **After:** `TOOL-dDeclaredLoop-100` rev-2 wrote nothing under `tools/`, restated no sibling spec and re-ran no plant: it read 95's and 96's settled items, settled the ids each edge names in the rows of its §3 table and closed on AC22 alone, the collection 90 AC4 states; the plants stand where they run, `conf-readers-declared` under the `loop definition fixtures` leg and `confs-disagree` under the `loop budget fixtures` and `loop breakpoint fixtures` legs.
 - **Cause:** review finding
 - **Reason:** the closing diff review's round 1 confirmed 99's edge claiming a re-run that never happened, an empty population read as coverage (its item 6, finding 8), and named the other edges into the same unit as the same defect; each spec is CLOSED and frozen, so one record answers every edge and their texts stay as landed.
-- **Evidence:** `memory/builds/dDeclaredLoop/reviews/2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round1.md`, item 6; §1 to §3 of `memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md`, which hold S22 and AC22 alone and write nothing under `tools/`; the pass commit c9a4c606f.
+- **Evidence:** `memory/builds/dDeclaredLoop/reviews/2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round1.md`, item 6; §1 to §3 of `memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md`, which hold S22 and AC22 alone and write nothing under `tools/`; the pass commit e8307cd60.
 - **Risk:** editorial
 - **Approver:** author, the builder pass of TOOL-dDeclaredLoop-117, under the chain's `author-recorded` value (`PLAY-dClosedLoop-4`)
 - **Follow-through:** ask TOOL-dDeclaredLoop-35
@@ -240,7 +240,7 @@ Record 1173, under unit 1, the id the review records are named by:
 - **Departs from:** dDeclaredLoop [the closing diff review's round-1 record]
 - **Hand-off:** code-to-record
 - **Before:** the round-1 record says every item is owed a fix, or a close deviation for the records items, before the close's merge bar and RED-first observations run, and it cites code by bare `path:line` beside its pinned sites.
-- **After:** every item the round confirmed is promoted at the closing review's exit under the owner's 2026-10-04 rule `verb_review` quotes, item 1 to `TOOL-dDeclaredLoop-115`, item 2 to `TOOL-dDeclaredLoop-116` and items 3 to 6 batched to `TOOL-dDeclaredLoop-117`; each bare cite reads at the reviewed head 520e5125c, where the blobs are `help/policy.md@1482cecf`, `tools/loop/upstream.py@43147593`, `tools/loop/loop_lib.py@637ea901`, `tools/loop/adapt.py@1c930e56`, `tools/loop/guard.py@13a73d3e`, `tools/loop/breakpoints.py@790d996d`, `tools/loop/budget.py@ae3163cf`, `tools/memory-tree/build_records.py@e689f3e9`, `tools/loop/loop_parents.py@d078c52c`, `tools/loop/position.py@87072a03`, the unit 100 spec `@96299153` and the unit 99 spec `@c4913160`, so item 2's fourth site is `tools/loop/upstream.py@43147593:297`.
+- **After:** every item the round confirmed is promoted at the closing review's exit under the owner's 2026-10-04 rule `verb_review` quotes, item 1 to `TOOL-dDeclaredLoop-115`, item 2 to `TOOL-dDeclaredLoop-116` and items 3 to 6 batched to `TOOL-dDeclaredLoop-117`; each bare cite reads at the reviewed head bada76713, where the blobs are `help/policy.md@1482cecf`, `tools/loop/upstream.py@43147593`, `tools/loop/loop_lib.py@637ea901`, `tools/loop/adapt.py@1c930e56`, `tools/loop/guard.py@13a73d3e`, `tools/loop/breakpoints.py@790d996d`, `tools/loop/budget.py@ae3163cf`, `tools/memory-tree/build_records.py@e689f3e9`, `tools/loop/loop_parents.py@d078c52c`, `tools/loop/position.py@87072a03`, the unit 100 spec `@96299153` and the unit 99 spec `@c4913160`, so item 2's fourth site is `tools/loop/upstream.py@43147593:297`.
 - **Cause:** review finding
 - **Reason:** the closing diff review's round 2 confirmed both defects in the round-1 record (its items 1 and 2); a review record is persisted as written and never edited by hand, so this record carries the correction.
 - **Evidence:** `memory/builds/dDeclaredLoop/reviews/2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round2.md`, items 1 and 2; the rescope add rows for `TOOL-dDeclaredLoop-115`, `TOOL-dDeclaredLoop-116` and `TOOL-dDeclaredLoop-117` in `memory/builds/dDeclaredLoop/RUN.md`; `tools/unattended/unattended.sh#verb_review`.
@@ -250,11 +250,11 @@ Record 1173, under unit 1, the id the review records are named by:
 - **Caused-by:** 2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round2
 ```
 
-The blobs in record 1173 were read with `git ls-tree -r 520e5125c` over the twelve paths, and each
+The blobs in record 1173 were read with `git ls-tree -r bada76713` over the twelve paths, and each
 cited line was read at its blob: `tools/loop/upstream.py@43147593:297` is the `memory_root =
 (read_design_conf(root)...` line, and `tools/memory-tree/build_records.py@e689f3e9:249` is the
 `memory_root = (conf.get("MEMORY_ROOT")...` line, the one round 1 cites bare under that file's
-name. The review cites the two specs as written at 520e5125c, rows the tip has since moved: 100's S3
+name. The review cites the two specs as written at bada76713, rows the tip has since moved: 100's S3
 row is line 80 at `@96299153`, and 99's edge line 126 at `@c4913160`.
 
 ### Inventory
@@ -459,7 +459,7 @@ module's conf reads are its concern.
 
 - rev-1 · 2026-11-17 · initial draft, from the writer's handoff
   2026-11-17-prompt-TOOL-dDeclaredLoop-117-1-spec-writer, the closing diff review's rounds 1 and 2 read
-  whole at `branch/unattended-declared-loop-d56bf0` a4256373.
+  whole at `branch/unattended-declared-loop-d56bf0` 017b0299.
 
 ## 10. Reuse audit
 

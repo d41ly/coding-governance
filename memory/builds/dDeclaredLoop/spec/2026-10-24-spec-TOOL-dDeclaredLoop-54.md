@@ -33,7 +33,7 @@ its item H5) confirmed finding **id 5 at HIGH**. `TOOL-dDeclaredLoop-33` S2 requ
 level to reach a terminal. `[states]` in `tools/loop/loop.toml` declares feature and unit states that end
 at `deployed`, while its one terminal key, `terminal`, lists the build's terminals alone
 (`tools/loop/loop_table.py#read_transition_rows`). So `TOOL-dDeclaredLoop-33`, built at order 34 on its
-rev-9 at `aeef7e3c8`, walks the build level and prints the feature and unit levels unchecked (its §8
+rev-9 at `b6c23d4fd`, walks the build level and prints the feature and unit levels unchecked (its §8
 F11). This unit declares a terminal set per level, reads it through one reader, keys the from-terminal
 refusal by level, and runs the termination rule over all three tables. It takes the report's first fix and repairs
 `TOOL-dDeclaredLoop-33`.
@@ -112,11 +112,11 @@ refusal by level, and runs the termination rule over all three tables. It takes 
 
 ### Evidence
 
-Read on `branch/unattended-declared-loop-d56bf0` at `a7b10569` for rev-3 and re-read at `685e2195` for
+Read on `branch/unattended-declared-loop-d56bf0` at `fc947748` for rev-3 and re-read at `020264ca` for
 rev-4, through `git show` and a scratch export made by `git archive`, where each probe below ran. Between
 the two, `tools/loop/loop_table.py` gained `TOOL-dDeclaredLoop-52`'s phase map and `tools/loop/termination.py`
-landed with `TOOL-dDeclaredLoop-33` at `aeef7e3c8`; `read_transition_rows`, `derive_from_states`,
-`derive_move` and the terminal refusals in `check_transition_tables` read as at `a7b10569`.
+landed with `TOOL-dDeclaredLoop-33` at `b6c23d4fd`; `read_transition_rows`, `derive_from_states`,
+`derive_move` and the terminal refusals in `check_transition_tables` read as at `fc947748`.
 
 - `[states]` holds `build`, `feature`, `unit` and `terminal`. The feature list is `decomposed`,
   `designed`, `built`, `tested`, `deployed`; the unit list is `designed`, `built`, `tested`, `deployed`.
@@ -315,13 +315,13 @@ The third command's hits outside `tools/loop/termination.py` and `help/loop.md`,
 
 ### Budgets and records
 
-- `VERB_OFFENDER_PIN` in `.lexicon.conf` stays 1215 PINNED at `685e2195`: `python
+- `VERB_OFFENDER_PIN` in `.lexicon.conf` stays 1215 PINNED at `020264ca`: `python
   tools/lexicon/lexicon.py --suggest read_terminal_set --as py.function` prints `OK`, run on this
   worktree's main at `179486e8`, whose declared verbs the branch's `.lexicon.conf` does not move.
 - The shared records: `.unattended.conf`'s `SHARED_RECORDS` names `memory/DECISIONS.md` and
   `memory/project/readme-contract.txt`. The pass writes neither, and no decision row is owed, since no
   ceiling or census moves.
-- The refusal ceilings: `REFUSAL_CEILINGS` holds the driver at 343 PINNED at `685e2195`, raised from 340
+- The refusal ceilings: `REFUSAL_CEILINGS` holds the driver at 343 PINNED at `020264ca`, raised from 340
   to 342 by `TOOL-dDeclaredLoop-19`'s landed decision row and to 343 by `TOOL-dDeclaredLoop-52`'s. Its
   population is shell scripts, as are the families of
   `tools/unattended/unattended.families.txt` and the census `tools/memory-tree/check-arms.py` reads. This
@@ -336,7 +336,7 @@ The third command's hits outside `tools/loop/termination.py` and `help/loop.md`,
 ### Dependency
 
 Order 35, beside `TOOL-dDeclaredLoop-55`, `TOOL-dDeclaredLoop-63` and `TOOL-dDeclaredLoop-64`.
-`TOOL-dDeclaredLoop-33` is CLOSED at rev-9 and its module read as built at `aeef7e3c8`;
+`TOOL-dDeclaredLoop-33` is CLOSED at rev-9 and its module read as built at `b6c23d4fd`;
 `TOOL-dDeclaredLoop-52` is CLOSED at rev-3, its plants and `check_phase_rows` read as built. Read on
 committed specs: `TOOL-dDeclaredLoop-63` rev-3, which adds selftest cases to `loop_table.py` beside this
 unit and touches neither the terminal reader nor the refusals; `TOOL-dDeclaredLoop-70` rev-3 at order 36,
@@ -344,7 +344,7 @@ which adds more cases and a plant in `tools/loop/loop_parents.py`. Units 53, 55 
 this one. `TOOL-dDeclaredLoop-34` is deferred against ask TOOL-dDeclaredLoop-113 and
 unit 33's numeric direction against ask TOOL-dDeclaredLoop-114; neither reaches `[states]`. Units 13, 15,
 19, 22, 31, 50, 51 and 53 are CLOSED and read on landed code, and none of the landed changes since
-`a7b10569` adds a `[states]` key.
+`fc947748` adds a `[states]` key.
 
 ## 6. Acceptance criteria
 
@@ -426,7 +426,7 @@ New arm: tools/loop/termination.py · covers AC3 · the `unit-dead-end` plant, s
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the hands-off bullets mirroring the
   consumes-from edges of TOOL-dDeclaredLoop-67, written by the round-2 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-16 · §1 to §10 · S1 to S5 · AC1 to AC4 · §8 F3 F4 F5 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `a7b10569`, per the brief
+  `unattended-declared-loop-d56bf0` at `fc947748`, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-54-1-spec-writer`: the audit record's path corrected; the split
   of the `-terminal` keys out of the levels, which the tip reads as levels; `read_terminal_set` taking
   the tables; the from-refusal over the expanded `from` (F5); the termination rule on unit 33's rev-6
@@ -434,7 +434,7 @@ New arm: tools/loop/termination.py · covers AC3 · the `unit-dead-end` plant, s
   docstring carriers; the sweep, budgets and dependency.
 - rev-4 · 2026-11-16 · §1 · S4 · S5 · §3 · §4 · AC3 · AC4 · §7 · §8 F3 F4 F5 · §10 · per the builder return
   `2026-11-16-build-TOOL-dDeclaredLoop-54-1-builder-return`, re-grounded on unit 33's module as built at
-  `aeef7e3c8`, read at `685e2195`: F3 to F5 each carry their resolution mark; S4 and §4 move the
+  `b6c23d4fd`, read at `020264ca`: F3 to F5 each carry their resolution mark; S4 and §4 move the
   per-level fill into `derive_termination_composition`, which every composition and in-memory plant is
   built through, and name `derive_unchecked_levels`, its print and the `dead-end` expectation as what S4
   changes; AC3 reads the plants' exit contract, 0 when held with the inner check's exit printed as a
@@ -451,7 +451,7 @@ levels and gains the per-level keys beside it; `tools/loop/loop_table.py#check_t
 every composition the rule walks, its `PLANTS`, `run_termination_plant` and `check_plant_found`, and
 `check_terminal`, which already walks every level its composition's `terminal` holds. `python
 tools/codebase-map/reuse_lookup.py "terminal states declared per level of a transition table, read by one
-reader"`, run in the scratch export of the branch tip `a7b10569`, ranked `read_transition_rows` a SEAM
+reader"`, run in the scratch export of the branch tip `fc947748`, ranked `read_transition_rows` a SEAM
 by fan-in, beside `derive_from_states` and name-stem neighbours (`read_text`, `read_definition`,
 `read_item_rows`), none a state table's reader.
 

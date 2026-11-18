@@ -4,7 +4,7 @@
 
 ## Why
 
-DIVERGENCE: rev-7 still cannot be built as written. Three checks fail, two in the spec's design and one in how F7's record has to land. All were read at HEAD 440236882, before any write.
+DIVERGENCE: rev-7 still cannot be built as written. Three checks fail, two in the spec's design and one in how F7's record has to land. All were read at HEAD 3918078c9, before any write.
 
 (1) S11 and the §5 sweep row for `write_transition`. The sweep says adapt.py's additive, owner-approves and loosening plants "compose gov's green composition". At HEAD they do not. S1 and S3 read the programs through `check_program`, and it refuses every composition those plants apply:
 - The add row in `tools/loop/adapt.py#run_adapt_plant`, `item.build.adopter.lint-pass`, carries only tag, step, actor and needs. A probe of `check_program` over gov's rows plus that row raised "the item item.build.adopter.lint-pass carries no outcomes".
@@ -27,8 +27,8 @@ I built nothing and committed nothing: rev-7 diverges from the code at HEAD in t
 
 I made no product edits, so there is no patch to save. I also did not run `--dispatch`, because there was no write set to declare, and I did not run `--brief`. The brief is already recorded in `memory/builds/dDeclaredLoop/RUN.md` (the brief row for TOOL-dDeclaredLoop-33, reason 2c0873edcaa9), and a re-run would have left that file modified with nothing to commit.
 
-What I re-derived at HEAD 440236882, using only read-only `python -c` probes and a probe script under the scratchpad (`C:/Users/DAILY-~1/AppData/Local/Temp/claude/b120d4a7f8b5be2e/7c85732c-fa0c-43e9-83f2-238d293195e0/scratchpad/probe33.py`) that calls the kit's own readers:
-- Gov's composition: 23 item-route cycles over 45 edges, PINNED at 440236882, matching rev-7's figure. There are 105 PINNED routes between declared items.
+What I re-derived at HEAD 3918078c9, using only read-only `python -c` probes and a probe script under the scratchpad (`C:/Users/DAILY-~1/AppData/Local/Temp/claude/b120d4a7f8b5be2e/7c85732c-fa0c-43e9-83f2-238d293195e0/scratchpad/probe33.py`) that calls the kit's own readers:
+- Gov's composition: 23 item-route cycles over 45 edges, PINNED at 3918078c9, matching rev-7's figure. There are 105 PINNED routes between declared items.
 - F12's reachable walk leaves no item unreached on gov's rows.
 - `item.build.ratify` is the only item with an owner actor.
 - No composed stage, and no live build: `git log --grep=Gov-Transition:` prints nothing.

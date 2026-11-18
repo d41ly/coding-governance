@@ -19,7 +19,7 @@ against the reflog-only reading `TOOL-dDeclaredLoop-56` S36 keeps. A probe in th
 reader bound in place of `read_fetch_time` in process, printed `MISSED` for all three new plants; the
 `stale-remote` plant's red is the tip's entry naming no source, which that probe does not reach.
 
-The close's RED-first observation, made by the main loop on 2026-11-17 at `c7cbca292` in scratch
+The close's RED-first observation, made by the main loop on 2026-11-17 at `a48272d09` in scratch
 worktrees outside the repository: each staged break applied, the arm run, the break restored and the
 arm run again, the green half also read off every loop leg run whole at that commit.
 `python tools/loop/position.py --selftest` with every function the unit's pass changed in

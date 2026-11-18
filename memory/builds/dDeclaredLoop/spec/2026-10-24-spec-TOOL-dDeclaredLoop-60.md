@@ -87,7 +87,7 @@ This unit reads the driver's whole archive population. It repairs `TOOL-dDeclare
 
 ### Evidence
 
-Read at the branch tip `fd9a90840` of `unattended-declared-loop-d56bf0`.
+Read at the branch tip `039e0a0da` of `unattended-declared-loop-d56bf0`.
 
 - `tools/loop/budget.py#read_budget_rows` reads `sorted(run.parent.glob(ROTATED)) + [run]` for the
   build itself, `ROTATED` being `RUN.LANDED.*.md`, and, while the build holds no log record,
@@ -143,14 +143,14 @@ whole-slug case: `tFixPatch` spells `tFix`.
 - security — no new surface: a wider read of files the driver writes, under the build folders of the
   resolved root.
 - perf / scale — the suffixed read already opens each build's `RUN.md` while the origin holds no log
-  record, 119 files PINNED at `fd9a90840`, re-derived by
+  record, 119 files PINNED at `039e0a0da`, re-derived by
   `git ls-tree -r --name-only <tip> -- memory/builds | grep -cE '^memory/builds/[^/]+/RUN\.md$'`, and it
   gains the archives, 14 files PINNED. The selftest gains two plants, each a scratch repository as the
   `unrecorded` plant, 4s PINNED, and the `patch-trailer-only` plant, 3s PINNED, are in the budget row.
 - error / empty / loading states — an archive row outside the grammar refuses as a live row does,
   naming the row; a build folder holding no archive reads as today.
 - observability — none added; the `--explain` line naming each file read is `TOOL-dDeclaredLoop-75`'s.
-- risks — what this change could newly red, and what keeps each green, read at `fd9a90840`:
+- risks — what this change could newly red, and what keeps each green, read at `039e0a0da`:
   - the callers: `git grep -n -w -e read_budget_rows -e ROTATED <tip> -- tools` names
     `tools/loop/budget.py` and `tools/loop/loop_transition.py#write_transition` alone. The transition
     writer copies the `carried` rows into a build's first log record, so it now copies an aborted run's
@@ -271,7 +271,7 @@ New arm: tools/loop/budget.py · covers AC1 AC3 · the `draws-survive-rotation` 
 - rev-3 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-100, written by the round-12 spec audit's disposal; nothing else moved.
 - rev-4 · 2026-11-16 · §1 · S1 to S5 · §3 · §4 · §5 · AC1 to AC4 · §7 · §8 F2 · §10 · re-grounded on
-  the code of branch `unattended-declared-loop-d56bf0` at `fd9a90840`, per the brief
+  the code of branch `unattended-declared-loop-d56bf0` at `039e0a0da`, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-60-1-spec-writer`: the root (S2, with AC2) and the count-once
   rule (S4) are built by TOOL-dDeclaredLoop-48 and TOOL-dDeclaredLoop-30 and leave this scope; the own
   population widens from `LANDED` archives to the driver's `RUN.*.md` (S1) and the suffixed population

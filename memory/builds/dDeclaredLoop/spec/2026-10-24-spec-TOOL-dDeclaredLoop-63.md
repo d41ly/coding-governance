@@ -85,7 +85,7 @@ defined reading taken from the driver's resolved set. It repairs `TOOL-dDeclared
 
 ### Evidence
 
-Every claim below was read at the tip of branch `unattended-declared-loop-d56bf0`, `a7b10569`, in a scratch
+Every claim below was read at the tip of branch `unattended-declared-loop-d56bf0`, `fc947748`, in a scratch
 export of that tree; the worktree this spec was written in is cut from main, which holds no loop kit.
 
 - `tools/unattended/unattended.sh#phases` prints `PHASES_CORE` and `PHASES_EXTRA`; `#PHASES_CORE` holds 13
@@ -230,7 +230,7 @@ out of PREFLIGHT does.
 | `help/loop.md` | `docs`, `help page commands` | the command sits in `TOOL-dDeclaredLoop-52`'s block, which carries `<!-- run: no -->` |
 | shipped bytes | `install-prefix (shipped surface)` | no line names a path under the install prefix |
 | the census and the families | `tools/memory-tree/check-arms.py`'s readers over the driver; `tools/unattended/unattended.families.txt` | no `fail` site and no message is added or edited |
-| new names | `VERB_OFFENDER_PIN` in `.lexicon.conf`, 1215 PINNED at `a7b10569` | no function name is minted |
+| new names | `VERB_OFFENDER_PIN` in `.lexicon.conf`, 1215 PINNED at `fc947748` | no function name is minted |
 | shared records | `SHARED_RECORDS` in `.unattended.conf` | the pass writes neither `memory/DECISIONS.md` nor `memory/project/readme-contract.txt`; no decision row is owed |
 | the kickoff manifest | `watch:` of `memory/guides/SESSION-KICKOFF.md` | no watched path is edited, so no re-stamp |
 | subject pins, epoch delegates, upgrade rows, the registry | `tools/govkit/subject-pins.tsv`, `tools/memory-tree/check-verdict-epoch.sh`'s `DELEGATES`, `[[upgrade]]`, `tools/govkit/registry.toml` | no leg added, no memory-tree module edited, no migration, no kit added |
@@ -251,7 +251,7 @@ git show "$B:memory/project/positional-refs.txt" | grep -c 'spec-TOOL-dDeclaredL
 ### Budgets and records
 
 - The driver's census, read through `tools/memory-tree/check-arms.py#branches` and
-  `tools/memory-tree/check-arms.py#scan_refusal_sites` over the scratch export, is 340 PINNED at `a7b10569`,
+  `tools/memory-tree/check-arms.py#scan_refusal_sites` over the scratch export, is 340 PINNED at `fc947748`,
   335 branches and 5 sites PINNED; `TOOL-dDeclaredLoop-19` raises it to 342 PINNED and
   `TOOL-dDeclaredLoop-52` to 343 PINNED, each under its landed decision row. This unit adds no site, so the
   census and the ceiling stay where unit 52 leaves them.
@@ -279,7 +279,7 @@ builds. `TOOL-dDeclaredLoop-19` (order 33, rev-3, building) is read on its commi
 `breakpoints.py`, its `driver-plan` plant and the leg `loop breakpoint fixtures`. `TOOL-dDeclaredLoop-33`
 (rev-6) and `TOOL-dDeclaredLoop-53` (rev-3), order 34, edit `help/loop.md`, `tools/govkit/usage.toml` and
 `breakpoints.py` elsewhere and add no `[[phase]]` row. Units through order 32, and units 50, 51 and 22, are
-CLOSED, read on landed code at `a7b10569`; `TOOL-dDeclaredLoop-34` is deferred against ask
+CLOSED, read on landed code at `fc947748`; `TOOL-dDeclaredLoop-34` is deferred against ask
 TOOL-dDeclaredLoop-113 and shares no file. The code reads, the census and the reuse probe ran in a scratch
 export of the branch tip; the counts above ran through `git show` of the branch.
 
@@ -346,7 +346,7 @@ AC2 is observed through the loop kit's plant instead.
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-70 and TOOL-dDeclaredLoop-75, written by the round-3 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-16 · §1 to §10 · S1 to S5 · AC1 to AC3 · §8 F2 F3 · re-grounded on branch
-  `unattended-declared-loop-d56bf0` at `a7b10569`, per the brief
+  `unattended-declared-loop-d56bf0` at `fc947748`, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-63-1-spec-writer`: symbol citations; the reader and verb on unit 52's
   rev-3 signature, `phase --from` form and exit 1 refusal; the consumer is unit 52's `check_phase_gates`
   through unit 19's `run_loop_verb`, not unit 19's S6; the move out of an adopter phase (F2); the plant
@@ -361,7 +361,7 @@ The seams this unit extends: `TOOL-dDeclaredLoop-52`'s `derive_phase_position`, 
 plant; and the selftest's cases through `tools/loop/loop_lib.py#run_selftest_cases`.
 
 `python tools/codebase-map/reuse_lookup.py "an adopter phase with no row reads ungated, the driver passing its
-extra phases to the loop kit's phase reader"`, run in a scratch export of the branch tip `a7b10569`, ranked
+extra phases to the loop kit's phase reader"`, run in a scratch export of the branch tip `fc947748`, ranked
 name-stem neighbours (`rows`, `read_text`, `resolve_kit_dir`), the driver's `phases`, the composer this unit
 reads, and `read_definition` (`tools/loop/loop_lib.py#read_definition`), the definition read the phase map
 sits on; no existing seam reads an adopter's phase.

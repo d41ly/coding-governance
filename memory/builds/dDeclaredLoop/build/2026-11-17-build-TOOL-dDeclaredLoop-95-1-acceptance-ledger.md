@@ -4,7 +4,7 @@
 
 No merge bar, no self-test suite and no gate leg ran in this pass. The criteria were observed on node `d`
 (win32), at rev-3 of the spec, over the working tree, by the first dispatch, which started from the base
-`1bb9bbd62`, after unit 94's rewrite of `load_tree_lib`. The pass is an observation pass and writes no
+`5197eb157`, after unit 94's rewrite of `load_tree_lib`. The pass is an observation pass and writes no
 product file. The `no-confs` plant of `budget.py` ran alone by `--fixture --plant`, standing in for the
 `loop budget fixtures` leg; an `ast` probe of the loop folder and a `python -I -c` import of `loop_lib`
 stood in for nothing a leg runs. Each criterion's staged break was also observed, in scratch copies outside

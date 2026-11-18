@@ -255,7 +255,7 @@ units then (§8 F12), so its bound scales with its roster and minted units add n
 
 Live at landing, since the clause is the bound. With the default `4+2` a build of three units has ten
 repetitions; v2:1261 sets that figure and only the owner raises it. This build's own run freezes at
-its first draw after landing, at the 100 specs its folder holds, PINNED at branch `115fdccce`
+its first draw after landing, at the 100 specs its folder holds, PINNED at branch `56dbf1ea6`
 (2026-11-16), so a total of 204 at the default.
 
 ### Files touched (estimate)
@@ -326,7 +326,7 @@ its first draw after landing, at the 100 specs its folder holds, PINNED at branc
     `read_run_state` skips a line without ` · item `.
   - `harness arms (fail branches armed or pinned)` and the refusal ceiling: the census of
     `tools/unattended/unattended.sh`, read through `tools/memory-tree/check-arms.py`'s `branches` and
-    `scan_refusal_sites`, is 326 PINNED (321 branches and 5 sites, branch `115fdccce`, 2026-11-16), at its
+    `scan_refusal_sites`, is 326 PINNED (321 branches and 5 sites, branch `56dbf1ea6`, 2026-11-16), at its
     ceiling of 326 in `REFUSAL_CEILINGS`. This unit adds two sites, so the ceiling rises by two over the
     census TOOL-dDeclaredLoop-21 leaves, 326 -> 328 PINNED where it leaves 326, with a comment line, under
     a decision row the run lands in `memory/DECISIONS.md` before the pass (§8 F9): "**TOOL-dDeclaredLoop-30**
@@ -341,7 +341,7 @@ its first draw after landing, at the 100 specs its folder holds, PINNED at branc
     above is the run's, landed ahead.
   - `lexicon naming predicates`: the six names of §4 Inventory's first row are offenders, so
     `VERB_OFFENDER_PIN` is re-measured six above what TOOL-dDeclaredLoop-21 leaves, 1209 -> 1215 PINNED
-    where it leaves 1209 (`.lexicon.conf` on branch `115fdccce`), with a `RE-MEASURED` comment naming the
+    where it leaves 1209 (`.lexicon.conf` on branch `56dbf1ea6`), with a `RE-MEASURED` comment naming the
     six, as TOOL-dDeclaredLoop-57 re-measured it for its spec's own name (§8 F10); every other new name
     leads with a declared verb.
   - `help page commands`: the S10 section carries the anchors of `script:tools/loop/budget.py`,
@@ -378,7 +378,7 @@ its first draw after landing, at the 100 specs its folder holds, PINNED at branc
     loop kit without `budget.py`, so its second rounds refuse. Both are waived for this landing by the
     build README's rule on the unattended kit's suites, their clean reading owed with PLAY-dClosedLoop-13.
 - dependency — order 28. Units 3, 10, 27 and 28 are CLOSED and read on their landed code at branch
-  `115fdccce`. TOOL-dDeclaredLoop-21 (order 26) lands first, read on its committed spec at rev-4: it
+  `56dbf1ea6`. TOOL-dDeclaredLoop-21 (order 26) lands first, read on its committed spec at rev-4: it
   re-points `verb_review`'s bound and moves the census and the pin, each counted above by what it
   leaves; its rows in the registry, usage, pin, budget and pending files are their own lines.
 - registry and pins — one leg, so one `[[exempt_leg]]` row, three usage rows, one `subject-pins.tsv` row
@@ -578,7 +578,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC7 · a positive asserti
   made but `exhausted` refuses no round of it, planted by `spent-spec-round`; all for TOOL-dDeclaredLoop-32
   rev-3, by the brief prompts/2026-11-05-prompt-TOOL-dDeclaredLoop-1-parents-reground.md
 - rev-5 · 2026-11-16 · S1 to S10 · §3 · §4 · §5 · AC2 AC4 AC7 AC9 AC10 AC13 · §7 · §8 F1 F4 F6 to F14 · §10 ·
-  re-grounded on the code of branch `unattended-declared-loop-d56bf0` at `115fdccce`, per the brief
+  re-grounded on the code of branch `unattended-declared-loop-d56bf0` at `56dbf1ea6`, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-30-1-spec-writer`: the policy read through `read_policy_kit`;
   the units counted from spec H1s (F6); the driver's sites through `resolve_position_engine` and one
   helper, the census and its ceiling raised by two (F9); a driver draw committed alone; the leg an
@@ -593,7 +593,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC7 · a positive asserti
 No existing seam keeps a per-build budget: `python tools/codebase-map/reuse_lookup.py "draw on a per-build rework budget at each repetition"`,
 run on the worktree at `179486e8f`, ranked name stems (`build`, `build_records`, `build_commit`) and
 nothing counted per build, and a grep for `rework`, `route-back` and `budget` over `tools/loop/` at branch
-`115fdccce` found only the guard's `[budgets]` table, a cap and not a count. The seams this unit extends
+`56dbf1ea6` found only the guard's `[budgets]` table, a cap and not a count. The seams this unit extends
 are the transition writer, `tools/loop/loop_transition.py#write_transition`, whose record writer takes
 `lines` from the factory's `write_record`, and its readers `read_transition_records`, `read_transitions`
 and `read_record_channels`; the unit walk inside `resolve_build_anchor`, extracted at its second reader;

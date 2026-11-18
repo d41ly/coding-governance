@@ -41,7 +41,7 @@ advisory and merges transition records by union, so both rows survive and the co
 ## 2. Scope (IN)
 
 S1 left this unit's scope at rev-3: `TOOL-dDeclaredLoop-30` S3 counts `spent` across every record of the
-build, built at branch `b1d66ba2`, and its `before-freeze` plant observes four draws on four records.
+build, built at branch `c6e66bfc`, and its `before-freeze` plant observes four draws on four records.
 
 - **S2** — A draw row's typed `<spent>` is what its writer counted when it wrote the row, and the count is
   re-derived from the rows alone. Where a row's typed `<spent>` is not its ordinal among the build's draw
@@ -95,9 +95,9 @@ build, built at branch `b1d66ba2`, and its `before-freeze` plant observes four d
 
 ### Evidence
 
-Read on branch `unattended-declared-loop-d56bf0` at `b1d66ba2`, through `git show` and a `git archive`
+Read on branch `unattended-declared-loop-d56bf0` at `c6e66bfc`, through `git show` and a `git archive`
 snapshot of that tip; the worktree this spec was written in is cut from main, which lacks the loop kit.
-The tip's two commits after `50f5dea5` touch no file below.
+The tip's two commits after `1d284c8b` touch no file below.
 
 - `tools/loop/budget.py#read_budget_rows` reads every record `read_transition_records` lists, ordered by
   `<n>`, counts their draw rows as `spent`, and raises ValueError where a row's typed spent is not its
@@ -115,7 +115,7 @@ The tip's two commits after `50f5dea5` touch no file below.
   `check_merge_ours` read only those two values, and `tools/memory-tree/merge-rows.py#derive_governed_paths`
   governs `DECISIONS.md`, the backlog shards and the build `BACKLOG.md` files, none a transition record.
 - No transition record is tracked at the tip: `git ls-tree -r --name-only <tip> -- memory/builds` piped to
-  `grep -c -- '/build/.*-transition-[0-9]*\.md$'` prints 0, PINNED at `b1d66ba2`.
+  `grep -c -- '/build/.*-transition-[0-9]*\.md$'` prints 0, PINNED at `c6e66bfc`.
 - Probe, 2026-11-16, PINNED: `git merge-file --union` over a two-field record where each side appended one
   draw row on its own item kept both rows, ours first, at rc 0; given two byte-identical appended rows it
   kept one; and `git merge-file` without `--union` over the distinct pair exited 1 (git 2.54.0, this node).
@@ -190,7 +190,7 @@ No function, constant or flag is minted, so no name goes to `python tools/lexico
   prints its one line, as today.
 - observability — each disagreeing row is named with both figures, after the verdict, in the driver's
   printed output.
-- risks — what this change could newly red, and what keeps each green, read at `b1d66ba2`:
+- risks — what this change could newly red, and what keeps each green, read at `c6e66bfc`:
   - the callers of the reader and the draw: `git grep -n -e read_budget_rows -e record_draw <tip> -- tools`
     names `tools/loop/budget.py` and `write_transition` alone. Each reads the answer by key, so the added
     key moves nothing, and `notes` defaults to None, which the transition writer's call keeps.
@@ -204,7 +204,7 @@ No function, constant or flag is minted, so no name goes to `python tools/lexico
     `fail() {`, so `budget.py` is outside it, `REFUSAL_CEILINGS`' 329 PINNED for the driver does not move,
     and `tools/unattended/unattended.families.txt` counts nothing this unit writes.
   - `lexicon naming predicates`: no function is minted, so `VERB_OFFENDER_PIN` stays 1215 PINNED
-    (`.lexicon.conf` at `b1d66ba2`).
+    (`.lexicon.conf` at `c6e66bfc`).
   - `help page commands`: no verb or flag is added. The plant is a value of `--plant=`, which the row
     `script:{prefix}/loop/budget.py` already lists, so `tools/govkit/usage.toml` is not written, and the
     fingerprints `python tools/govkit/docs_leg.py --fingerprints` prints for the three budget rows keep
@@ -253,7 +253,7 @@ No function, constant or flag is minted, so no name goes to `python tools/lexico
   in `memory/builds/dDeclaredLoop/build/` at this unit's commit, it answers `merge: union`.
   Red when: the line is absent, or its glob misses the name the transition writer gives a record, so the
   answer is `merge: unspecified`.
-  fixture: no transition record is tracked at `b1d66ba2`, so the record is named, not found; git answers
+  fixture: no transition record is tracked at `c6e66bfc`, so the record is named, not found; git answers
   for an untracked path by its name.
 - **AC2** — When `python budget.py --fixture --plant parallel-append` runs in `tools/loop/`, the merge
   exits 0, the record carries both `1/4` rows, `budget_state` answers `unfrozen 2/4`, and the third draw
@@ -296,7 +296,7 @@ New arm: tools/loop/budget.py · covers AC2 · the `parallel-append` plant, its 
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the hands-off bullets mirroring the
   consumes-from edges of TOOL-dDeclaredLoop-61 and TOOL-dDeclaredLoop-62 and TOOL-dDeclaredLoop-67, written by the round-2 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-16 · S1 S2 S3 S4 S5 · AC1 AC2 AC3 · §1 §3 §4 §5 §7 §8 F3 · §10 · re-grounded on the
-  code of branch `unattended-declared-loop-d56bf0` at `b1d66ba2`, per the brief
+  code of branch `unattended-declared-loop-d56bf0` at `c6e66bfc`, per the brief
   `2026-11-16-prompt-TOOL-dDeclaredLoop-49-1-spec-writer`: S1 and its AC1 left scope, the count across
   records built by TOOL-dDeclaredLoop-30 (its §8 F14), and the commit order dropped as no answer reads
   it; the title says what is left; the review citation names the record that exists; the false Evidence
@@ -315,7 +315,7 @@ where the typed figure is already compared; `record_draw`'s `lines` list, whose 
 `tools/loop/loop_witness.py#read_git`, already imported. The merge rule is git's built-in `union`, read
 back with `git check-attr` as `tools/memory-tree/merge-rows.py#cmd_check` and
 `tools/check-wiring.sh#check_merge_rows` read theirs. `python tools/codebase-map/reuse_lookup.py "read a
-merge attribute with git check-attr for a record path"`, run on the snapshot of `b1d66ba2`, ranked
+merge attribute with git check-attr for a record path"`, run on the snapshot of `c6e66bfc`, ranked
 `read_git` in `tools/loop/loop_witness.py` among generic `read`, `git`, `run_git` and `merge` stems; the
 same tool asked for "print an advisory line after a verdict instead of refusing a disagreeing typed
 figure" ranked refusal classes and line parsers, none of which prints after a verdict. No new reader is

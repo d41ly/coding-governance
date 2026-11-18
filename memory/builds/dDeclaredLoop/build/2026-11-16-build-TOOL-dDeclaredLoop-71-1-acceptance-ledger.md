@@ -4,8 +4,8 @@
 
 No merge bar and no self-test suite ran in this pass, and it wrote no product file, as rev-4 §8 F3 (a)
 resolves. The criteria were observed on node `d` (win32), at rev-4 of the spec, over the working tree at
-`432668bb0`, which holds the leg `TOOL-dDeclaredLoop-19` landed (`bcdcf0c79`) and the plants
-`TOOL-dDeclaredLoop-53` (`dca74c239`) and `TOOL-dDeclaredLoop-64` (`ade343442`) added to `PLANTS`: the
+`e0cfdc540`, which holds the leg `TOOL-dDeclaredLoop-19` landed (`6ffd8a882`) and the plants
+`TOOL-dDeclaredLoop-53` (`353d964b2`) and `TOOL-dDeclaredLoop-64` (`dfcaf9d26`) added to `PLANTS`: the
 probes section 6 spells, standing in for the `loop breakpoint fixtures` leg itself, which the close runs.
 AC1's probe was observed live on an in-memory copy of the manifest whose row was given a `guard`, which
 printed `True` for it; AC3's on a copy of `PLANTS` without `pre-placement-records-root`, which printed
