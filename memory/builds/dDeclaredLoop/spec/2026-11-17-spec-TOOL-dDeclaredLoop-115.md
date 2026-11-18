@@ -12,6 +12,7 @@
 | [2026-11-17-build-TOOL-dDeclaredLoop-1-deviation-1173.md](../build/2026-11-17-build-TOOL-dDeclaredLoop-1-deviation-1173.md) | deviation | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-116 TOOL-dDeclaredLoop-117 |
 | [2026-11-17-build-TOOL-dDeclaredLoop-115-1-acceptance-ledger.md](../build/2026-11-17-build-TOOL-dDeclaredLoop-115-1-acceptance-ledger.md) | journal | — |
 | [2026-11-17-build-TOOL-dDeclaredLoop-115-deviation-1151.md](../build/2026-11-17-build-TOOL-dDeclaredLoop-115-deviation-1151.md) | deviation | — |
+| [2026-11-18-build-TOOL-dDeclaredLoop-115-red-fix-77.md](../build/2026-11-18-build-TOOL-dDeclaredLoop-115-red-fix-77.md) | red-fix | — |
 | [2026-11-17-prompt-TOOL-dDeclaredLoop-115-1-spec-writer.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-115-1-spec-writer.md) | journal | — |
 | [2026-11-17-prompt-TOOL-dDeclaredLoop-115-build-brief.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-115-build-brief.md) | journal | — |
 | [2026-11-17-prompt-TOOL-dDeclaredLoop-115-spec-brief.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-115-spec-brief.md) | research | — |
