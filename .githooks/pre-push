@@ -1110,6 +1110,49 @@ if [ -z "$DECIDE" ] && [ -n "${main_local//0/}" ]; then   # --decide skips it: i
   fi
 fi
 
+# ---- THE POLICY FILE'S PUSH ARM — TOOL-dDeclaredLoop-2 S6 -------------------------------------
+# Beside the merge-loss block and under its two conditions: the loop kit's `guard.py --push-range`
+# grades the pushed default-branch range, and its push arm's docstring is the one statement of which
+# commits, merges included, owe a `Gov-Policy:` trailer and a change record. The kit is resolved as the merge-loss
+# block resolves its own, over the pushing tree and this hook's parent, and a copy under the pushing
+# tree is vetted by check_reviewed_file before it runs. Exit 1 refuses as `policy-unrecorded`, a
+# token no run-log decision pairs with; exit 2 refuses naming the reason, deny by default; no launcher
+# or no loop kit prints one line naming the miss, never silence.
+# WHAT THIS DOES NOT SEE: a change to the list file of guarded paths, which carries its change record
+# alone; history already on the remote; a push with --no-verify.
+if [ -z "$DECIDE" ] && [ -n "${main_local//0/}" ] && [ -n "${main_remote//0/}" ]; then
+  _pg_py=$(resolve_python 2>/dev/null || true)
+  _pg_rel=""; _pg_tree=""
+  if [ -n "$_pg_py" ]; then
+    for _pg_tree in "$top" "$(cd "${0%/*}/.." && pwd)"; do
+      if _pg_dir=$(resolve_kit_dir "$_pg_py" loop guard.py "$_pg_tree/${GOV_KITROOT:-.}" 2>/dev/null); then
+        _pg_rel="${_pg_dir%$'\r'}/guard.py"; break
+      fi
+    done
+  fi
+  if [ -z "$_pg_py" ]; then
+    echo "pre-push: the policy push arm did NOT run over refs/heads/$def — no usable python launcher resolved, so no Gov-Policy trailer in this push was graded."
+  elif [ -z "$_pg_rel" ]; then
+    echo "pre-push: the policy push arm did NOT run over refs/heads/$def — the loop kit's guard.py is installed neither under '$top' nor beside this hook."
+  else
+    [ "$_pg_tree" != "$top" ] || check_reviewed_file "$_pg_rel" "$main_local" "runs as the policy push arm"
+    _pg_out=$(cd "$top" && "$_pg_py" "$_pg_tree/$_pg_rel" --push-range "$main_remote..$main_local" 2>&1); _pg_rc=$?
+    if [ "$_pg_rc" = 0 ]; then
+      printf 'pre-push: %s\n' "${_pg_out//$'\n'/$'\n'pre-push: }"
+    else
+      if [ "$_pg_rc" = 1 ]; then
+        why="pre-push: REFUSING — a commit in this push changes the policy file without its Gov-Policy trailer or its change record (TOOL-dDeclaredLoop-2)."
+      else
+        why="pre-push: REFUSING — the policy push arm could not judge this push (exit $_pg_rc), and an unjudged policy change does not land."
+      fi
+      echo "$why" >&2
+      printf '  %s\n' "${_pg_out//$'\n'/$'\n'  }" >&2
+      echo "  Write a policy change through the loop kit's policy_edit.py, which stages its record and prints its trailer." >&2
+      write_refusal policy-unrecorded "$why"; RUNLOG_CLEAN=1; exit 1
+    fi
+  fi
+fi
+
 # ---- WHICH BAR RUNS, and has this repository ever seen it? — TOOL-aRepatriatedFork-5 ----------
 # The bar used to be resolved on the line that ran it, out of an environment variable nothing checked.
 # Reproduced 2026-09-23 in a scratch repo with the default bar stubbed RED: with no override the push
@@ -2514,6 +2557,25 @@ if [ "$rc" -ne 0 ] && [ "$PP_POLICY" = land ]; then
     echo "pre-push: this red does not land under INHERITED_RED=land — $PP_NOT"
   fi
 fi
+# THE FLOOR'S FIRST MEMBER (TOOL-dDeclaredLoop-2 S14): `floor.verdict-before-move`, read only on a red
+# bar through the loop kit's floor.py, vetted by check_reviewed_file when it sits under the pushing
+# tree. At `off` the bar's red is advisory: the push goes through with its allow record and writes no
+# `gate-bar-green`. Anything but `off`, a reader that does not answer or no loop kit, refuses as before.
+floor_off=""
+if [ "$rc" -ne 0 ] && _fl_py=$(resolve_python 2>/dev/null); then
+  for _fl_tree in "$top" "$(cd "${0%/*}/.." && pwd)"; do
+    if _fl_dir=$(resolve_kit_dir "$_fl_py" loop floor.py "$_fl_tree/${GOV_KITROOT:-.}" 2>/dev/null); then
+      _fl_rel="${_fl_dir%$'\r'}/floor.py"
+      [ "$_fl_tree" != "$top" ] || check_reviewed_file "$_fl_rel" "$main_local" "is read for floor.verdict-before-move"
+      _fl_val=$(cd "$top" && "$_fl_py" "$_fl_tree/$_fl_rel" get verdict-before-move 2>/dev/null)
+      if [ "${_fl_val%$'\r'}" = off ]; then
+        echo "pre-push: floor: verdict-before-move off — the bar's red is advisory"
+        floor_off=1; rc=0
+      fi
+      break
+    fi
+  done
+fi
 if [ "$rc" -ne 0 ]; then
   why="pre-push: gate RED — push blocked (fix, or 'git push --no-verify' to override deliberately)."
   echo "$why"
@@ -2532,7 +2594,9 @@ else
   # for the STUB, and never on a doc-only scoped push: that bar ran fewer legs than a scoped bar from the
   # same base, which the record cannot say, so a later push of the same tree could be covered by more
   # than was graded. Declining costs a saving, never a verdict.
-  if [ "$bar_record" = stub ]; then
+  if [ -n "$floor_off" ]; then
+    echo "pre-push: no gate-bar-green written — the bar was red, read as advisory under floor.verdict-before-move off"
+  elif [ "$bar_record" = stub ]; then
     echo "pre-push: no gate-bar-green written — the bar is the declared STUB"
   elif [ -n "${GATE_DOCS_BASE:-}" ]; then
     echo "pre-push: no gate-bar-green written — this push was scoped doc-only"

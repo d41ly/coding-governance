@@ -7,6 +7,8 @@ status = "shipped"
 streams = ["tooling"]
 decisions = ["TOOL-dDerivedDocket-19", "TOOL-dDerivedDocket-33", "TOOL-dDerivedDocket-34"]
 
+stage = ["none"]
+
 [claims]
 gate-legs = []
 kits = []

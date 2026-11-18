@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the drift-audit kit's own falsifiability test.
 
-gov:kit drift-audit@1.33
+gov:kit drift-audit@1.34
 
     python <kit>/selftest.py
 
@@ -3536,6 +3536,10 @@ def test_nonterminal_merged_runs(tmp: pathlib.Path) -> None:
     # passes one of these and fails the other.
     add_counted("tOwedThenReview", "other", [P("decision", "asked first"), P("review", "then this")])
     add_counted("tReviewThenOwed", "surfaced-park", [P("review", "this first"), P("decision", "then asked")])
+    # TOOL-dDeclaredLoop-32: a `fix-pass` row is a record's last row and classes it, so the owed row
+    # before it no longer decides. A `_RUN_ROW` reading `[a-z]+` never matches the hyphenated kind, the
+    # owed row stays last, and this record reads `surfaced-park`.
+    add_counted("tFixPassLast", "other", [P("decision", "asked first"), P("fix-pass", "TOOL-tRun-1")])
     # A kind the driver does not declare is not a parked row, so it cannot be the last one.
     add_counted("tUndeclaredKind", "surfaced-park",
                 [P("decision", "asked"), P("heartbeat", "no driver writes this kind")])

@@ -103,7 +103,6 @@
 .unattended.conf RESUME_SCHEDULE_LIMIT owner-policy
 .unattended.conf RESUME_STALE_BOUND owner-policy
 .unattended.conf RESUME_TURNS owner-policy
-.unattended.conf REVIEW_ROUNDS owner-policy
 .unattended.conf RUNLOG_SESSION_VARS owner-policy
 .unattended.conf RUN_CLAIMS owner-policy
 .unattended.conf SELFTESTS_OWED_PATHS owner-policy

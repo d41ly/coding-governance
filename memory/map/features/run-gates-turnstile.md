@@ -9,6 +9,8 @@ decisions = ["TOOL-aFrugalTurnstile-5", "TOOL-aPairedSlots-1", "TOOL-aPairedSlot
   "TOOL-aPairedSlots-3", "TOOL-aPairedSlots-4", "TOOL-aPairedSlots-5", "TOOL-aPairedSlots-6",
   "TOOL-aPairedSlots-7", "TOOL-aPairedSlots-9", "TOOL-dDerivedDocket-64"]
 
+stage = ["step.test"]
+
 [claims]
 gate-legs = ["run-gates turnstile"]
 kits = []

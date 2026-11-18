@@ -255,6 +255,20 @@ git reset -q; echo 6 > "$pl"
 out=$(git commit -qm g6 -- "$pl" 2>&1); rc=$?
 case "$out" in *"GUARD SAW"*"$pl"*) r=$rc ;; *) r=0 ;; esac
 ck "S1 a listed path committed by git commit -- <path>, never added: refused by a guard that saw it" "$r" 1
+# TOOL-dDeclaredLoop-2 S11 (AC15): a stand-in loop kit guard.py beside the stand-in policy guard must
+# run INSTEAD of it, so the verdict reads the guard values and the floor where the loop kit resolves.
+# Each stand-in names itself; the policy one admits, the loop one refuses, so the commit is refused
+# only when the loop guard ran, and its output must not carry the policy stand-in's line. Red with the
+# block's verdict put back to "$g".
+git reset -q; lk=loop; mkdir -p "$lk"
+printf 'print("GUARD RAN")\n' > "$pk/guard.py"
+printf 'print("LOOP VERDICT RAN")\nraise SystemExit(1)\n' > "$lk/guard.py"
+echo 8 > "$pl"; git add "$pl"
+out=$(git commit -q -m g8 2>&1); rc=$?
+case "$out" in *"GUARD RAN"*) r=0 ;; *"LOOP VERDICT RAN"*) r=$rc ;; *) r=0 ;; esac
+ck "S11 a loop kit guard.py beside the policy guard runs instead of it, and its refusal holds" "$r" 1
+git reset -q; rm -rf "$lk"
+printf 'print("GUARD RAN")\nraise SystemExit(1)\n' > "$pk/guard.py"
 # TOOL-dGroundRules-21 S21: guard.py removed from the working tree while its list stays at HEAD, and a
 # listed path staged. No rung resolves the guard, so the block's `else` refuses, naming the rungs.
 rm -f "$pk/guard.py"; echo 4 > "$pl"; git add "$pl"

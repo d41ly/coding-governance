@@ -7,6 +7,8 @@ status = "building"
 streams = ["tooling"]
 decisions = ["TOOL-dDerivedDocket-4", "TOOL-dDerivedDocket-28"]
 
+stage = ["none"]
+
 [claims]
 gate-legs = []
 kits = []

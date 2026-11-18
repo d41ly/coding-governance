@@ -7,6 +7,8 @@ status = "shipped"
 streams = ["tooling"]
 decisions = []
 
+stage = ["step.test"]
+
 [claims]
 gate-legs = ["row-keyed merge driver replay", "row-driver view refusal"]
 kits = []

@@ -1740,6 +1740,20 @@ def check_benched_probe_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
           o2[-1500:])
     for f, b in keep.items():
         f.write_bytes(b)
+    # Runs d and e (TOOL-dDeclaredLoop-46 AC4): 7h compares `stage` presence included, so a
+    # descriptor value the manifest does not hold reds, and so does the key taken off the table.
+    _st = next(x for x in json.loads(man.read_text(encoding="utf-8")) if x.get("name") == leg)["stage"]
+    _anchor = f"ceiling = 1780\nstage = {json.dumps(_st)}"
+    for tag, new, shown in (("d", 'ceiling = 1780\nstage = ["step.disagree"]', "['step.disagree']"),
+                            ("e", "ceiling = 1780", "None")):
+        write_staged(desc, _anchor, new, f"{tag} stage")
+        rs = run_selfcheck(gcopy)
+        out_st = rs.stdout + rs.stderr
+        check(f"[dDL-46] {tag}: 7h reds a descriptor stage of {shown} against the manifest's, naming both",
+              rs.returncode != 0 and check_line(out_st, "entry 'push-main'", f"gate leg '{leg}' with stage {shown}",
+                                                f"says {_st!r}"), out_st[-1500:])
+        for f, b in keep.items():
+            f.write_bytes(b)
     # Run 3 (c, H-L1): no manifest. 7h's block is skipped, so 7j4 must still answer for itself, and
     # with the dead pre-initialisation gone a reader outside its own guard would raise here.
     man.unlink()
@@ -2719,6 +2733,17 @@ def check_ceiling_emission(tmp: pathlib.Path) -> None:
           gk.CEILING_FLOOR_RUN_GATES == (1, 2), str(gk.CEILING_FLOOR_RUN_GATES))
     check("CE2: the manifest writer routes the ceiling through its own floor",
           "floor=CEILING_FLOOR_RUN_GATES)" in GOVKIT.read_text(encoding="utf-8"), "")
+    # TOOL-dDeclaredLoop-46 AC3: the stage floor, one version below it and at it, both derived from
+    # the constant so a reconcile that raises the floor moves both sides with it.
+    _fl = gk.STAGE_FLOOR_RUN_GATES
+    for ver, want in ((".".join(map(str, _fl[:-1] + (_fl[-1] - 1,))), False), (".".join(map(str, _fl)), True)):
+        _rgs.write_text(f"#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION={ver}\n",
+                        encoding="utf-8", newline="\n")
+        check(f"ST1: a target at run-gates {ver} {'gets' if want else 'does not get'} a stage",
+              gk.check_target_reads_subject(_rg, {"prefix": PFX[:-1]},
+                                            floor=gk.STAGE_FLOOR_RUN_GATES) is want, ver)
+    check("ST1: the manifest writer routes the stage through its own floor",
+          "floor=STAGE_FLOOR_RUN_GATES)" in GOVKIT.read_text(encoding="utf-8"), "")
 
     # AC1/AC3: an applied push-main carries 1780 on the declaring leg, row and receipt, and no other.
     t = tmp / "ceiling-install"
@@ -2764,6 +2789,15 @@ def check_ceiling_emission(tmp: pathlib.Path) -> None:
     for other in ("push-main self-test", "pre-push bar self-test"):
         check(f"CE3: '{other}' declares no ceiling and its row carries none, never a fallback",
               other in rows and "ceiling" not in rows[other], str(rows.get(other)))
+    # TOOL-dDeclaredLoop-46 AC3: the reader answers True here, so every row the apply emitted
+    # carries its descriptor's stage, as the row's last key.
+    _rep = gk.Report()
+    _pm = gk.read_descriptors(GOV_ROOT, gk.load_registry(GOV_ROOT), _rep)["push-main"][0]
+    for dl in _pm.get("gate_leg", []):
+        _row = rows.get(dl.get("name"), {})
+        check(f"ST2: '{dl.get('name')}' carries its descriptor's stage as its last key",
+              dl.get("stage") is not None and _row.get("stage") == dl["stage"]
+              and list(_row)[-1:] == ["stage"], str(_row))
 
     # AC4: a hand-raised ceiling is the adopter's own, kept and reported, never refused as drift.
     settle(t, "the push-main install")
@@ -2847,6 +2881,81 @@ def check_roles_default() -> None:
     check("OC8 AC2 a registry aged before roles joined the default gains it", _gained == (["roles"], ""),
           str(_gained))
     check("OC8 AC2 LIVENESS ...and an unmoved default gains nothing", _same == ([], ""), str(_same))
+    # ---- TOOL-dDeclaredLoop-57: `update` refuses a CLAIMED kit whose `requires` it leaves unmet.
+    # AC2 and AC3 call the function; AC1 and AC4 run the verb over a committed hand-written receipt.
+    # TOOL-dDeclaredLoop-79 S4: run-gates claimed too, since the loop kit requires it, so each arm grades its pair
+    _dl_claim = ["kickoff-manifest", "memory-tree", "roles", "run-gates"]
+
+    def derive_claim_refusal(claimed, gained, dd, why):
+        try:
+            gk.demand_claimed_requires(claimed, gained, dd, {"kits": list(claimed)}, why)
+        except gk.Refusal as e:
+            return str(e)
+        return ""
+
+    _dl_r = derive_claim_refusal(_dl_claim, [], descs, "registry.toml does not resolve at 00000000")
+    check("[dDL-57] AC2 a roles claim without loop refuses, carrying the unreadable vintage's reason",
+          "'roles' requires 'loop'" in _dl_r and "does not resolve" in _dl_r, _dl_r or "returned")
+    _dl_r = derive_claim_refusal(_dl_claim, ["loop"], descs, "registry.toml does not resolve at 00000000")
+    check("[dDL-57] AC2 LIVENESS ...and a gained loop satisfies the claim", _dl_r == "", _dl_r)
+    _dl_r = derive_claim_refusal(["loop"], [], {"loop": ({"requires": ["memory-tree"]}, ""),
+                                                "memory-tree": ({}, "")}, "")
+    check("[dDL-57] AC3 a claimed kit other than roles is graded, and an empty reason adds no clause",
+          "'loop' requires 'memory-tree'" in _dl_r and "default-gained did not cover it" not in _dl_r,
+          _dl_r or "returned")
+    # TOOL-dDeclaredLoop-75 AC26 (S26): the route names every kit of every unmet pair, once each, in pair order
+    _dl_r = derive_claim_refusal(["unattended"], [], {"unattended": ({"requires": ["review-harness", "settings-merge"]}, ""),
+                                                      "review-harness": ({}, ""), "settings-merge": ({}, "")}, "")
+    check("[dDL-75] AC26 two unmet pairs of one kit name both pairs and route every kit once",
+          "'unattended' requires 'review-harness'" in _dl_r and "'unattended' requires 'settings-merge'" in _dl_r
+          and "apply --kits unattended,review-harness,settings-merge" in _dl_r, _dl_r or "returned")
+    with tempfile.TemporaryDirectory(prefix="gk-dl57-") as _dl_td:
+        def build_claim_target(name, extra):
+            t = pathlib.Path(_dl_td) / name
+            (t / ".governance").mkdir(parents=True)
+            git(t, "init", "-q")
+            (t / ".governance" / "install.json").write_text(json.dumps(
+                {"kits": _dl_claim, "files": [], **extra}, indent=2) + "\n", encoding="utf-8", newline="\n")
+            settle(t, "a hand-written receipt")
+            return t
+
+        _dl_t = build_claim_target("ac1", {})
+        _dl_p = run("update", "--target", str(_dl_t))
+        _dl_st = subprocess.run(["git", "-C", str(_dl_t), "status", "--porcelain", "--untracked-files=all"],
+                                capture_output=True, text=True, encoding="utf-8").stdout
+        # Graded on the ONE refusal line, never the whole stream, so a name on another line passes nothing.
+        _dl_ln = [ln for ln in _dl_p.stderr.splitlines() if ln.startswith("govkit: update would leave")]
+        check("[dDL-57] AC1 an update over a receipt with no gov_commit refuses the roles claim before "
+              "any gain line, naming the pair, the reason and the route, and writes nothing",
+              _dl_p.returncode == 2 and len(_dl_ln) == 1 and all(n in _dl_ln[0] for n in (
+                  "'roles' requires 'loop'", "gov_commit", "apply --kits roles,loop"))
+              and "default-gained: none computed" not in _dl_p.stdout and _dl_st == "",
+              f"rc {_dl_p.returncode} · status {_dl_st!r} · {(_dl_p.stdout + _dl_p.stderr)[-900:]}")
+        # TOOL-dDeclaredLoop-75 AC14 (S14): the write path refuses the same way, the lock it took released
+        _dl_p = run("update", "--target", str(_dl_t), "--write")
+        _dl_st = subprocess.run(["git", "-C", str(_dl_t), "status", "--porcelain", "--untracked-files=all"],
+                                capture_output=True, text=True, encoding="utf-8").stdout
+        _dl_rc = subprocess.run(["git", "-C", str(_dl_t), "show", "HEAD:.governance/install.json"],
+                                capture_output=True, text=True, encoding="utf-8").stdout
+        _dl_ln = [ln for ln in _dl_p.stderr.splitlines() if ln.startswith("govkit: update would leave")]
+        _dl_lock = _dl_t.joinpath(*gk.WRITE_LOCK_REL.split("/"))
+        check("[dDL-75] AC14 update --write over the committed receipt refuses with one line, writes nothing "
+              "and leaves no lock",
+              _dl_p.returncode == 2 and len(_dl_ln) == 1 and _dl_st == "" and not _dl_lock.exists()
+              and _dl_rc == (_dl_t / ".governance" / "install.json").read_text(encoding="utf-8"),
+              f"rc {_dl_p.returncode} · status {_dl_st!r} · lock {_dl_lock.exists()} · "
+              f"{(_dl_p.stdout + _dl_p.stderr)[-900:]}")
+        _dl_p = run("update", "--target", str(_dl_t), "--kits", "roles")
+        _dl_ln = [ln for ln in _dl_p.stderr.splitlines() if ln.startswith("govkit: update would leave")]
+        check("[dDL-57] AC1 ...and a --kits-scoped update over it refuses the same pair",
+              _dl_p.returncode == 2 and len(_dl_ln) == 1 and "'roles' requires 'loop'" in _dl_ln[0],
+              f"rc {_dl_p.returncode} · {(_dl_p.stdout + _dl_p.stderr)[-900:]}")
+        # The base vintage holds roles and not loop in its registry default, so the update gains loop.
+        _dl_t = build_claim_target("ac4", {"gov_commit": run_gov_git(GOV_ROOT, "rev-parse", "ed497191^{commit}")})
+        _dl_p = run("update", "--target", str(_dl_t))
+        check("[dDL-57] AC4 LIVENESS a receipt whose default gained loop still gains it and is not refused",
+              "would gain loop" in _dl_p.stdout and "update would leave" not in _dl_p.stdout + _dl_p.stderr,
+              f"rc {_dl_p.returncode} · {(_dl_p.stdout + _dl_p.stderr)[-900:]}")
     d = descs.get("roles", ({}, ""))[0]
     rules = d.get("files") or []
 
@@ -3533,6 +3642,136 @@ def check_succession(tmp: pathlib.Path) -> None:
           all((t / r).is_file() for r in rows) and p.returncode == 0, p.stdout[-900:] + p.stderr)
 
 
+#: The scratch kits' descriptor body past its `id` line, shared by the vintage arms (TOOL-dDeclaredLoop-73, -79).
+VINTAGE_KIT_BODY = ('home = "demo"\nversion_from = { none = "fixture" }\n\n[check]\nnone = "fixture"\n\n'
+                    '[[files]]\ninclude = "**"\nrole = "engine"\n\n[adopt]\nargv = []\nmutates_index = false\n')
+
+
+def check_requires_vintage(tmp: pathlib.Path) -> None:
+    """TOOL-dDeclaredLoop-73 AC1 to AC5: `update`'s claimed-requires refusal grades each kit's
+    `requires` at `--to`, not at gov's working tree. A scratch gov's A declares `demo` with no edge;
+    B adds `other` outside the default and makes `demo` require it; C takes `demo`'s descriptor out
+    while the registry still names it. Each way across A and B is run from the other's checkout, so
+    a refusal reading the working tree reds one of the two. WHAT THIS DOES NOT CHECK: a write path's
+    bytes after the refusal; the gained-prune loop's vintage is `check_gained_prune_vintage`'s."""
+    gkn = KIT_NAMES["govkit"]
+    gk = govkit_module()
+    body = VINTAGE_KIT_BODY
+    reg = ('[selection]\ndefault = ["demo"]\n\n[surface]\nglobs = ["{prefix}/*"]\n\n'
+           '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n')
+    g = tmp / "rv-gov"
+    a = build_steps_gov(g, {f"{gkn}/registry.toml": reg, "demo/kit.toml": 'id = "demo"\n' + body,
+                            "demo/a.txt": "a\n"})
+    t = build_target(tmp / "rv-t", f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+
+    def run_gk(*args: str) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, str(g / PFX / gkn / "govkit.py"), *args],
+                              capture_output=True, text=True, encoding="utf-8", env=STEPS_ENV)
+
+    def write_file(rel: str, text: str) -> None:
+        (g / PFX / rel).parent.mkdir(parents=True, exist_ok=True)
+        (g / PFX / rel).write_bytes(text.encode("utf-8"))
+
+    p = run_gk("apply", "--target", str(t), "--kits", "demo")
+    check("[dDL-73] the fixture installs `demo` at A, or every arm over it grades nothing",
+          p.returncode == 0, p.stdout[-900:] + p.stderr[-600:])
+    settle(t, "the install")
+    write_file(f"{gkn}/registry.toml", reg + '\n[[entry]]\nid = "other"\ndescriptor = "{prefix}/other/kit.toml"\n')
+    write_file("other/kit.toml", 'id = "other"\n' + body.replace('"demo"', '"other"'))
+    write_file("demo/kit.toml", 'id = "demo"\nrequires = ["other"]\n' + body)
+    settle(g, "B: demo requires other")
+    b = run_gov_git(g, "rev-parse", "HEAD")
+    git(g, "checkout", "-q", "--detach", a)
+    p = run_gk("update", "--target", str(t), "--to", b)
+    _ln = [ln for ln in p.stderr.splitlines() if ln.startswith("govkit: update would leave")]
+    check("[dDL-73] AC1 an update to a vintage whose demo requires other refuses from A's checkout",
+          p.returncode == 2 and len(_ln) == 1 and "'demo' requires 'other'" in _ln[0],
+          f"rc {p.returncode} · {(p.stdout + p.stderr)[-900:]}")
+    git(g, "checkout", "-q", "--detach", b)
+    p = run_gk("update", "--target", str(t), "--to", a)
+    check("[dDL-73] AC2 LIVENESS ...and an update to A from B's checkout, whose newer edge A lacks, is not refused",
+          p.returncode == 0 and "update would leave" not in p.stdout + p.stderr,
+          f"rc {p.returncode} · {(p.stdout + p.stderr)[-900:]}")
+    git(g, "checkout", "-q", "main")
+    git(g, "rm", "-q", f"{PFX}demo/kit.toml")
+    settle(g, "C: the demo descriptor leaves while the registry names it")
+    c = run_gov_git(g, "rev-parse", "HEAD")
+    git(g, "checkout", "-q", "--detach", b)
+    p = run_gk("update", "--target", str(t), "--to", c)
+    _ln = [ln for ln in p.stderr.splitlines() if ln.startswith("govkit: 'demo' requires are unknown at")]
+    _at_c = gk.read_requires_at(g, c, ["demo"])
+    check("[dDL-73] AC3 a descriptor absent at --to refuses as unknown, never as requiring nothing",
+          p.returncode == 2 and len(_ln) == 1 and "does not resolve" in _ln[0] and "demo" in _at_c[1],
+          f"rc {p.returncode} · {_at_c} · {(p.stdout + p.stderr)[-900:]}")
+    _at_a = gk.read_requires_at(g, a, ["other"])
+    check("[dDL-73] AC4 an id the vintage does not declare reads as requiring nothing, not unknown",
+          _at_a == ({"other": ({"requires": []}, "")}, {}), str(_at_a))
+    _blob = gk.blob_at
+    gk.blob_at = lambda _r, _c, _p: None
+    try:
+        _why = gk.derive_default_gained(GOV_ROOT, "a" * 40, "b" * 40, {"kits": []}, {})[1]
+    finally:
+        gk.blob_at = _blob
+    check("[dDL-73] AC5 the shared registry read leaves default-gained's reason byte-identical",
+          _why == f"{PFX}{gkn}/registry.toml does not resolve at aaaaaaaa, so the default set there is unknown",
+          _why)
+
+
+def check_gained_prune_vintage(tmp: pathlib.Path) -> None:
+    """TOOL-dDeclaredLoop-79 AC19 (S19): `update`'s gained prune grades each default-gained kit's
+    `requires` at `--to`, the vintage the claimed-requires refusal grades. A scratch gov's A declares
+    `demo` in the default and `other` and `extra` outside it, none requiring anything; B adds `extra` to
+    the default and makes it require `other`; D drops that edge; E takes `extra`'s descriptor out while
+    the registry still names it. Each read-only update runs from a checkout whose working tree answers
+    otherwise, so a prune reading the working tree reds each of the three. D to E exits 2: the prune's
+    line, then `read_steps`' refusal of the absent descriptor, reached after the prune (§8 F8 (a)).
+    WHAT THIS DOES NOT CHECK: an update exiting 0 past a gained kit whose requires are unknown, which
+    the landed step reader admits no staging for; the order of the stdout line against the stderr
+    line; a write run's bytes."""
+    gkn = KIT_NAMES["govkit"]
+    kits = ("demo", "other", "extra")
+    reg = '[selection]\ndefault = [%s]\n\n[surface]\nglobs = ["{prefix}/*"]\n' + "".join(
+        '\n[[entry]]\nid = "%s"\ndescriptor = "{prefix}/%s/kit.toml"\n' % (k, k) for k in kits)
+    descs = {f"{k}/kit.toml": f'id = "{k}"\n' + VINTAGE_KIT_BODY.replace('"demo"', f'"{k}"') for k in kits}
+    g = tmp / "gp-gov"
+    a = build_steps_gov(g, {f"{gkn}/registry.toml": reg % '"demo"', **descs, **{f"{k}/a.txt": "a\n" for k in kits}})
+    t = build_target(tmp / "gp-t", f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+    govkit = [sys.executable, str(g / PFX / gkn / "govkit.py")]
+    p = subprocess.run(govkit + ["apply", "--target", str(t), "--kits", "demo"], capture_output=True, text=True,
+                       encoding="utf-8", env=STEPS_ENV)
+    check("[dDL-79] the fixture installs `demo` at A, or every arm over it grades nothing",
+          p.returncode == 0, p.stdout[-900:] + p.stderr[-600:])
+    settle(t, "the install")
+    commits = {"A": a}
+    edge = descs["extra/kit.toml"].replace("home =", 'requires = ["other"]\nhome =')
+    for name, edits in (("B", {f"{gkn}/registry.toml": reg % '"demo", "extra"', "extra/kit.toml": edge}),
+                        ("D", {"extra/kit.toml": descs["extra/kit.toml"]}), ("E", {"extra/kit.toml": None})):
+        for rel, text in edits.items():
+            if text is None:
+                git(g, "rm", "-q", f"{PFX}{rel}")
+            else:
+                (g / PFX / rel).write_bytes(text.encode("utf-8"))
+        settle(g, name)
+        commits[name] = run_gov_git(g, "rev-parse", "HEAD")
+    for at, to, label, rc, owed, owed_err, banned in (
+            ("A", "B", "AC19 a gained extra whose requires at B are unmet is left out from A's checkout, unrefused",
+             0, "default-gained extra NOT installed", "", ("update would leave",)),
+            ("B", "D", "AC19 ...a gained extra D frees of its edge is gained from B's checkout",
+             0, "would gain extra", "", ("extra NOT installed",)),
+            ("D", "E", "AC19 ...and a gained extra whose descriptor E lacks is left out by name, then the step "
+                       "reader refuses the absent descriptor, never the requires-unknown refusal",
+             2, "default-gained extra NOT installed: its requires are unknown at",
+             "the registry names this descriptor for 'extra' and it is absent at",
+             ("update would leave", "'extra' requires are unknown"))):
+        git(g, "checkout", "-q", "--detach", commits[at])
+        p = subprocess.run(govkit + ["update", "--target", str(t), "--to", commits[to]], capture_output=True,
+                           text=True, encoding="utf-8", env=STEPS_ENV)
+        check(f"[dDL-79] {label}", p.returncode == rc and owed in p.stdout and owed_err in p.stderr
+              and not any(b in p.stdout + p.stderr for b in banned),
+              f"rc {p.returncode} · {(p.stdout + p.stderr)[-900:]}")
+    git(g, "checkout", "-q", "main")
+
+
 def check_fanout_step(tmp: pathlib.Path) -> None:
     """TOOL-dSafePassage-1 AC10 AC11 AC12 — S6's up, down and witness argvs over scratch targets,
     each run under `-I` as the runner runs it, the limit read back through gov's own policy reader."""
@@ -3678,6 +3917,111 @@ def check_fanout_step(tmp: pathlib.Path) -> None:
     check("[dSP-1 S6 F10] a FANOUT_CAP that lowers nothing retires the file and leaves the policy file byte-identical",
           up.returncode == 0 and not (t / ".agent-cap.conf").exists()
           and (t / ".governance" / "policy.toml").read_bytes() == pol0, up.stdout + up.stderr)
+
+
+def check_review_rounds_step(tmp: pathlib.Path) -> None:
+    """TOOL-dDeclaredLoop-21 AC7 — S7's up, down and witness argvs over scratch targets, each run under
+    `-I` as the runner runs it, with every `raise Refusal` site of `review_rounds.py` and of the shared
+    `conf_to_policy.py` it loads reached: a value that is no integer of at least 1, a conf that is not
+    UTF-8, and a conf that differs from its blob at HEAD. The written keys are read back through gov's
+    own policy reader."""
+    step_py = HERE / "steps" / "review_rounds.py"
+    policy_py = KIT_DIRS["policy"] / "policy.py"
+
+    def run_step(verb: str, t: pathlib.Path) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, "-I", str(step_py), verb, str(t)], capture_output=True,
+                              text=True, encoding="utf-8")
+
+    def read_key(t: pathlib.Path, key: str) -> str:
+        return subprocess.run([sys.executable, str(policy_py), "get", key, "--rev", "HEAD"],
+                              cwd=str(t), capture_output=True, text=True, encoding="utf-8").stdout.strip()
+
+    def build_bounded(tag: str, conf: bytes) -> pathlib.Path:
+        t = build_target(tmp / tag, None)
+        (t / ".unattended.conf").write_bytes(conf)
+        settle(t, "a target with a round bound")
+        return t
+
+    def read_tree(t: pathlib.Path) -> dict:
+        return {q.relative_to(t).as_posix(): q.read_bytes() for q in t.rglob("*")
+                if q.is_file() and ".git" not in q.relative_to(t).parts}
+
+    # TOOL-dDeclaredLoop-56 AC35: the up never writes the policy file. A bound above 1 first reads as a
+    # proposal, one `policy_edit.py set` line per mapped key, then, with the owner's value set otherwise, as
+    # a conflict, each exiting 1 with the tree's bytes unchanged; with the mapped keys set it takes the
+    # conf line out. RED against the up that writes the keys itself.
+    for n, keys, owner in (("1", {}, ""),
+                           ("2", {"review.design.rounds": "fixed-count", "review.design.round-count": "2",
+                                  "review.max-rounds": "3"},
+                            '[review.design]\nrounds = "fixed-count"\nround-count = 2\n'),
+                           ("5", {"review.design.rounds": "fixed-count", "review.design.round-count": "5",
+                                  "review.max-rounds": "5"},
+                            '[review]\nmax-rounds = 5\n\n[review.design]\nrounds = "fixed-count"\nround-count = 5\n')):
+        t = build_bounded(f"rr-ac7-{n}", f'MEMORY_ROOT=memory\nREVIEW_ROUNDS="{n}"\nLANDER="echo land"\n'.encode())
+        if owner:
+            pre = read_tree(t)
+            up = run_step("up", t)
+            check(f"[dDL-56 AC35] REVIEW_ROUNDS={n}: with no policy key set the up exits 1 proposing "
+                  f"`policy_edit.py set review.design.rounds fixed-count` and the tree's bytes are unchanged",
+                  up.returncode == 1 and read_tree(t) == pre and any(
+                      ln.startswith("policy_edit.py set review.design.rounds fixed-count")
+                      for ln in up.stdout.splitlines()), up.stdout + up.stderr)
+            (t / ".governance").mkdir(exist_ok=True)
+            (t / ".governance" / "policy.toml").write_text('[review.design]\nrounds = "one"\n', encoding="utf-8",
+                                                           newline="\n")
+            settle(t, "the owner's other value")
+            pre = read_tree(t)
+            up = run_step("up", t)
+            check(f"[dDL-56 AC35] REVIEW_ROUNDS={n}: with review.design.rounds = \"one\" set the up exits 1 "
+                  f"printing its conflict line and the tree's bytes are unchanged",
+                  up.returncode == 1 and read_tree(t) == pre
+                  and "conflict · review.design.rounds · policy one · conf fixed-count" in up.stdout,
+                  up.stdout + up.stderr)
+            (t / ".governance" / "policy.toml").write_text(owner, encoding="utf-8", newline="\n")
+            settle(t, "the owner's keys")
+        pre = read_tree(t)
+        w0, up = run_step("witness", t), run_step("up", t)
+        w1 = run_step("witness", t)
+        settle(t, "the step")
+        got = {k: read_key(t, k) for k in keys}
+        check(f"[dDL-21 AC7] REVIEW_ROUNDS={n}: the up takes the line out of the conf, keeps the conf and writes "
+              f"no policy file{', the owner keys reading the same bound back' if keys else ''}, its witness "
+              f"exiting 1 before and 0 after",
+              up.returncode == 0 and w0.returncode == 1 and w1.returncode == 0
+              and (t / ".unattended.conf").read_bytes() == b'MEMORY_ROOT=memory\nLANDER="echo land"\n'
+              and got == keys and (t / ".governance" / "policy.toml").is_file() == bool(owner)
+              and (not owner or (t / ".governance" / "policy.toml").read_bytes() == owner.encode()),
+              up.stdout + up.stderr + repr(got))
+        run_gov_git(t, "reset", "-q", "--soft", "HEAD~1")
+        down = run_step("down", t)
+        w2 = run_step("witness", t)
+        check(f"[dDL-21 AC7] REVIEW_ROUNDS={n}: the down restores the conf and the policy file byte-identical, "
+              f"and the witness exits 1 again",
+              down.returncode == 0 and read_tree(t) == pre and w2.returncode == 1, down.stdout + down.stderr)
+
+    t = build_bounded("rr-bad", b"REVIEW_ROUNDS=abc\n")
+    pre = read_tree(t)
+    up = run_step("up", t)
+    check("[dDL-21 S8] a REVIEW_ROUNDS that is no integer: the up exits 1 naming the conf's line and writes no byte",
+          up.returncode == 1 and ".unattended.conf:1: REVIEW_ROUNDS must be an integer of at least 1" in up.stderr
+          and read_tree(t) == pre, up.stdout + up.stderr)
+    t = build_bounded("rr-utf8", b"REVIEW_ROUNDS=\xff\n")
+    pre = read_tree(t)
+    up = run_step("up", t)
+    check("[dDL-21 S8] a conf that is not UTF-8: the up exits 1 naming it and writes no byte",
+          up.returncode == 1 and ".unattended.conf: not UTF-8" in up.stderr and read_tree(t) == pre,
+          up.stdout + up.stderr)
+    t = build_bounded("rr-dirty", b"REVIEW_ROUNDS=2\n")
+    (t / ".unattended.conf").write_bytes(b"REVIEW_ROUNDS=3\n")
+    pre = read_tree(t)
+    up = run_step("up", t)
+    check("[dDL-21 S7] a conf differing from its blob at HEAD: the up exits 1 naming it and writes no byte",
+          up.returncode == 1 and ".unattended.conf: differs from its blob at HEAD" in up.stderr
+          and read_tree(t) == pre, up.stdout + up.stderr)
+    steps = govkit_module().upgrade_steps
+    got = steps.render_policy_text("[review]\nmax-rounds = 5\n", "review.design", "round-count", 5)
+    check("[dDL-21 S8] render_policy_text sets a key under a dotted table and reads it back",
+          got == "[review]\nmax-rounds = 5\n\n[review.design]\nround-count = 5\n", repr(got))
 
 
 def check_steps_recordable() -> None:
@@ -5764,6 +6108,7 @@ def main() -> int:
         check_upgrade_steps(tmp / "dsp")
         check_succession(tmp / "dsc")
         check_fanout_step(tmp / "dfs")
+        check_review_rounds_step(tmp / "drr")
         check_receipt_schema(tmp / "drs")
         check_steps_recordable()
         check_step_isolation(tmp / "dsi")
@@ -6190,8 +6535,11 @@ def main() -> int:
         # and `gov_oid`, so this block never derives an identity itself (TOOL-dRedressedBar-13). The
         # helper re-sets the rows `stale_target` already rewound to the same values. The two
         # identity checks either side of that call are TOOL-dRedressedBar-17's S3: the row is
-        # appended bare, and the helper is what gives it all three keys.
-        _rb11b = stale_target("rq11b", DEPLOY_FULL + '\n[kit.agent-cap]\nprefix = "scripts"\n')
+        # appended bare, and the helper is what gives it all three keys. The claim carries
+        # kickoff-manifest because agent-cap requires it, and `update` now refuses a claim that
+        # leaves it unmet (TOOL-dDeclaredLoop-57) before the settings-merge adopter runs.
+        _rb11b = stale_target("rq11b", DEPLOY_FULL + '\n[kit.agent-cap]\nprefix = "scripts"\n',
+                              kits="check-wiring,kickoff-manifest")
         _rb11dest = f"scripts/{KIT_NAMES['hooks']}/agent-cap.js"
         _rb11d = _rb11gk.read_descriptors(govroot, _rb11gk.load_toml(
             govroot / PFX / KIT_NAMES["govkit"] / "registry.toml"), _rb11gk.Report())["agent-cap"][0]
@@ -9827,6 +10175,8 @@ user_skills = "/tmp/gk-fake-skills"
             # ---- rendered, or, with no governing doc, arrives with its Skill and names the doc.
             # ---- Module-level functions, so a slice reaches each without this block.
             check_roles_default()
+            check_requires_vintage(tmp3)
+            check_gained_prune_vintage(tmp3)
             check_roles_install(tmp3)
             check_roles_install(tmp3, charter=False)
             check_roles_install(tmp3, runner=True)

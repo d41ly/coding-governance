@@ -2,7 +2,8 @@
 """handoff.py — a role and one task's inputs, rendered into one hashed prompt file (TOOL-aOrientedCast-2).
 
     python handoff.py render --role <name> --build <slug> [--unit <id>] [--card <path>]
-                             [--input <key>=<value>]... [--out <path> | --stdout | --stand-in]
+                             [--input <key>=<value>]... [--upstream <rows file>]
+                             [--out <path> | --stdout | --stand-in]
                              [--part full|task]
     python handoff.py harness-args <harness>
     python handoff.py stage-efforts <workflow> [--model <id>]
@@ -81,11 +82,13 @@ Sources, by key family: `task:` the card's `## task` field, read by the kickoff 
 that checker's `--task-skeleton` prints, so a skeleton that does not yield eight refuses; `card:` the lines
 under the card's last `## <heading>`; `brief:` the `### <sub-head>` under the brief record's
 `## The brief`, and `brief:prompt` that record's `## The prompt` section; `input:` the `--input`
-argument; a rule tag the governing doc's practices. The card is `--card`, else the file the
+argument; `upstream:rows` the rows file `--upstream` names, the loop kit's `upstream.py rows` output,
+then `UPSTREAM_CONTRACT`, the line every row id is answered by, an empty file supplying nothing
+(TOOL-dDeclaredLoop-29); a rule tag the governing doc's practices. The card is `--card`, else the file the
 kickoff checker's `--card --path` prints for CLAUDE_CODE_SESSION_ID, so the card's location stays
 that checker's rule. A required key resolving to nothing, an empty value or a placeholder refuses
 and writes nothing; an optional one is named on the `Not supplied` line. A relative path
-given to `--card`, `--out`, an `--input` or `check` is read from the repository root.
+given to `--card`, `--out`, an `--input`, `--upstream` or `check` is read from the repository root.
 
 Exit 0 on success, 1 on a refusal naming its key, file, role or missing waiver row, 2 on usage or an unarmed
 environment: no repository, no MEMORY_ROOT, no CHARTER (`roster` needs no CHARTER). `agents` exits 1
@@ -130,7 +133,14 @@ PATH_INPUTS = ("spec", "prompt", "code")
 #: Every role's `code` slot (PLAY-dOrderedCharter-27): derived for each role, never written into its `reads`,
 #: so its key is read as optional and the CLI admits it for any role; its block holds the file's text.
 CODE_INPUT = "code"
-PLACEHOLDERS = ("…", "...", "tbd", "todo", "n/a", "none", "-", "?")
+#: The `upstream:rows` key (TOOL-dDeclaredLoop-29): its block is the rows file `--upstream` names, then this
+#: contract, so the return answers exactly the ids the block lists.
+UPSTREAM_KEY = "upstream:rows"
+UPSTREAM_CONTRACT = ("Answer every row id above exactly once, in a `## Upstream` section of your return, one line "
+                     "per row: `- <row id> · used|bypassed|not-applicable · <reason>`, a reason on every line, "
+                     "and no row id this block does not list. `used` means your work honours the row, "
+                     "`bypassed` that it departs from it, and `not-applicable` that the row does not bear on it.")
+PLACEHOLDERS =("…", "...", "tbd", "todo", "n/a", "none", "-", "?")
 KICKOFF_HOME, KICKOFF_CHECKER = "session-kickoff", "manifest-check.sh"
 CHECKER_BOUND_S = 30
 SLUG_RE = lib.SLUG_RE
@@ -441,14 +451,21 @@ def render_card_block(root):
 
 
 def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card_arg, inputs, out_path,
-                   notes=None, tail=""):
+                   notes=None, tail="", upstream=None):
     """`(path, text, task_part)` of the prompt file; raises RolesError naming every key that refused.
     The charter library's notes are appended to `notes` when a list is given; `tail` goes before
-    the derived name's `.md`."""
+    the derived name's `.md`; `upstream` is the rows file `--upstream` names, the `upstream:rows` source."""
     build_dir = root / memory_root / "builds" / slug
     if not build_dir.is_dir():
         raise lib.RolesError("the build folder %s does not exist" % build_dir.as_posix())
     values = {}
+    if upstream:
+        p = pathlib.Path(os.path.normpath(root / upstream))
+        if root not in p.parents or not p.is_file():
+            raise lib.RolesError("%s — %s names no file inside the repository" % (UPSTREAM_KEY, upstream))
+        rows = lib.load_text(p).strip("\n")
+        if rows.strip():   # an empty rows file hands nothing, so the key reads as not supplied
+            values[UPSTREAM_KEY] = rows + "\n\n" + UPSTREAM_CONTRACT
     for name, v in inputs.items():
         if name in PATH_INPUTS and v:
             p = pathlib.Path(os.path.normpath(root / v))
@@ -532,7 +549,7 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
                 if section is not None:
                     values[k.rstrip("?")] = section
     sources = {"task": ("card", card), "card": ("card", card), "brief": ("brief record", brief),
-               "input": ("arguments", None)}
+               "input": ("arguments", None), "upstream": ("arguments", None)}
     blocks, absent, reasons = [], [], []
     for k in reads:
         key = k.rstrip("?")
@@ -543,7 +560,8 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         src, path = sources[key.split(":")[0]]
         what = ("no %s: %s" % (src, why[src])) if why.get(src) else (
             "the %s %s carries no single filled value for it: absent, repeated, empty or a placeholder"
-            % (src, path.as_posix()) if path else "not supplied; pass --input %s=<value>" % key[6:])
+            % (src, path.as_posix()) if path else "not supplied; pass --upstream <rows file>" if key == UPSTREAM_KEY
+            else "not supplied; pass --input %s=<value>" % key[6:])
         if not k.endswith("?"):
             refusals.append("%s — %s" % (key, what))
         else:
@@ -1264,6 +1282,7 @@ def main(argv):
     r.add_argument("--unit")
     r.add_argument("--card")
     r.add_argument("--input", action="append", default=[])
+    r.add_argument("--upstream")
     dest = r.add_mutually_exclusive_group()
     dest.add_argument("--out")
     dest.add_argument("--stdout", action="store_true")
@@ -1362,6 +1381,8 @@ def main(argv):
         for name in inputs:
             if name not in ("prompt", CODE_INPUT) and "input:" + name not in read:
                 ap.error("input:%s is a key %s does not read" % (name, a.role))
+        if a.upstream and UPSTREAM_KEY not in read:
+            ap.error("--upstream: %s is a key %s does not read" % (UPSTREAM_KEY, a.role))
         prompts = root / memory_root / "builds" / a.build / "prompts"
         out = a.out and pathlib.Path(os.path.normpath(root / a.out))
         if out and prompts not in out.parents:
@@ -1378,7 +1399,7 @@ def main(argv):
         notes = []
         path, text, task_part = render_handoff(root, memory_root, charter_path, a.role, keys, a.build,
                                                a.unit, a.card, inputs, out, notes,
-                                               lib.STAND_IN_TAIL if a.stand_in else "")
+                                               lib.STAND_IN_TAIL if a.stand_in else "", a.upstream)
         for line in notes:
             print("handoff: note — %s" % line, file=sys.stderr)
         if not a.stand_in:

@@ -87,8 +87,9 @@ catalogue nor the key.
 
 THE DRIVE LINES (PLAY-dOrderedCharter-6). A template's `{{DRIVE}}` line expands, before the placeholder set
 is collected, to `render_drive_line` per `[[drive]]` row of the selected kits' descriptors, in
-`read_drive_rows` order: `start` rows first, then the stage integer of the roles kit's workflow the row
-names, then kit and row order. A selection with no row drops the section, heading and region. A selected
+`read_drive_rows` order: `start` rows first, then the order the loop definition, the loop kit's `loop.toml`,
+gives the workflow the row names (TOOL-dDeclaredLoop-1), then kit and row order; with no loop kit, or a loop
+definition that does not read, kit and row order alone (TOOL-dDeclaredLoop-25). A selection with no row drops the section, heading and region. A selected
 kit whose descriptor is found neither beside this engine nor at the registry's path refuses the render.
 
 THE RE-FOUNDED CHARTER (PLAY-dOrderedCharter-2). Four more lines expand before the placeholder set is
@@ -1442,24 +1443,20 @@ def render_delta_line(state: str, origin: str, what: str) -> str:
 
 
 def read_kind_rows(target: Path, exclude: set, records: list) -> list[tuple[str, dict, list]]:
-    """`(kind, {gov tag: state}, widenings)` per row kind the target's kinds register lists with a schema, its
-    gov rows read at HEAD from the namespace row's `source`, composed through `overlay_rows`."""
+    """`(kind, {gov tag: state}, widenings)` per row kind the target's kinds register lists with a schema,
+    composed at HEAD through `overlay_rows.derive_kind_composition`; a kind it answers None for, its schema
+    file absent or HEAD holding no blob at its namespace `source`, is passed over (TOOL-dDeclaredLoop-24 S3)."""
     import overlay_rows
     import pins
     import row_checks
-    from policy_value import read_tag_policy
-    from tag_index import resolve_prefix_token
-    iu, out = load_units_module(), []
+    load_units_module()
+    out = []
     for k in pins.read_row_kinds(target):
         kind = str(k.get('tag', '')).partition('.')[2]
-        schema = overlay_rows.read_kind_schema(target, kind)
-        names = tomllib.loads(read_input(iu.derive_kit_file(target, 'namespaces.toml'), 'the namespace registry'))
-        source = next((r.get('source') for r in names.get('namespace') or [] if r.get('ns') == kind), None)
-        text = iu.run_git(target, 'show', f'HEAD:{resolve_prefix_token(source, iu.derive_kit_prefix())}') if source else ''
-        gov = [{**r, 'origin': kind, 'source': source} for r in tomllib.loads(text).get(kind, [])]
-        policy = read_tag_policy(target, 'HEAD') if exclude else {}
-        _rows, states, *_rest, checks = overlay_rows.derive_row_composition(
-            kind, schema, gov, overlay_rows.read_overlay_rows(target).get(kind, []), exclude, 'order', records, policy)
+        got = overlay_rows.derive_kind_composition(target, kind, exclude, records)
+        if got is None:
+            continue
+        _rows, states, *_rest, checks = got
         out.append((kind, states, row_checks.derive_widenings(checks)))
     return out
 
@@ -1631,10 +1628,24 @@ def read_workflows(engine_dir: Path) -> list[dict]:
     return tomllib.loads(read_input(kit / 'workflows.toml', "the roles kit's workflow list")).get('workflow', [])
 
 
+def load_loop_kit(engine_dir: Path):
+    """`(the loop kit's reader module, that kit's directory)`, the kit found with `resolve_kit_dir` from
+    `engine_dir` and put on `sys.path` (TOOL-dDeclaredLoop-1); LookupError where no install holds it. The
+    reader's refusal of a definition is `LoopError`, a ValueError, the caller's to catch."""
+    kit = resolve_kit_dir('loop', 'loop_lib.py', engine_dir)
+    if str(kit) not in sys.path:
+        sys.path.insert(0, str(kit))
+    import loop_lib  # the loop kit's reader, found above
+    return loop_lib, kit
+
+
 def read_drive_rows(engine_dir: Path, kits: list[str]) -> list[dict]:
     """Every `[[drive]]` row of the selected `kits`, each with its `kit` and its 1-based `row` there, in render order: `start` rows
-    first, then by the stage integer of the workflow the row names, then kit order and row order. A stage
-    no workflow names sorts last. A selected kit whose descriptor no place holds refuses, naming the kit. A kit id
+    first, then by the order the loop definition gives the workflow the row names, read through the loop kit's
+    reader (TOOL-dDeclaredLoop-1), then kit order and row order. A stage no workflow names sorts last. With no
+    loop kit every row keeps kit and row order, and so with a loop definition that does not read, whose guard is
+    the `loop definition` leg, never this render (TOOL-dDeclaredLoop-25). A selected
+    kit whose descriptor no place holds refuses, naming the kit. A kit id
     that left the registry with a `[[retired]]` row reads as its successor (PLAY-dOrderedCharter-31 S10)."""
     reg = tomllib.loads(read_input(resolve_declaration_paths(engine_dir, engine_dir)[1], 'the govkit registry'))
     spelled = {e.get('id'): e.get('descriptor', '') for e in reg.get('entry', [])}
@@ -1650,8 +1661,12 @@ def read_drive_rows(engine_dir: Path, kits: list[str]) -> list[dict]:
                           f'none beside this engine or at the registry\'s path {spelled.get(kit) or "(no row)"}')
         desc = tomllib.loads(read_input(path, f'the descriptor of {kit}'))
         rows += [{**r, 'kit': kit, 'row': n} for n, r in enumerate(desc.get('drive', []), 1) if isinstance(r, dict)]
-    stages = {w.get('name'): w.get('stage', 0) for w in read_workflows(engine_dir)}
-    last = max([s for s in stages.values() if isinstance(s, int)], default=0) + 1
+    try:
+        loop_lib, loop_kit = load_loop_kit(engine_dir)
+        stages = loop_lib.read_workflow_order(loop_kit)
+    except (LookupError, ValueError):   # no loop kit, or the reader's LoopError (TOOL-dDeclaredLoop-25 F10)
+        stages = {}
+    last = max(stages.values(), default=0) + 1
     return sorted(rows, key=lambda r: (r.get('stage') != DRIVE_START, stages.get(r.get('stage'), last)))
 
 
@@ -3917,4 +3932,4 @@ def run_charter_scope(engine_dir: Path, gov_root: Path, target: Path, charter_pa
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
 
-KIT_PLAYBOOK_RENDER_VERSION = "1.40"  # gov:kit playbook-render@1.40
+KIT_PLAYBOOK_RENDER_VERSION = "1.42"  # gov:kit playbook-render@1.42

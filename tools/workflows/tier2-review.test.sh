@@ -500,8 +500,8 @@ arm('round state: round 3 with priorCounts [4, 2] and roundLimit 3 -> proceeds',
 }
 
 // ---- TOOL-dFairHearing-17 AC6 — THE PARITY ARM: deriveRoundState against the driver's review_state.
-// The shell block before this runner sliced `review_state()` and the `RUNAWAY_CEILING=` line out of the
-// unattended kit's driver and ran them over every row of the domain both can see: 0 to 3 prior counts,
+// The shell block before this runner sliced `review_state()` out of the unattended kit's driver, its ceiling
+// `MAX_ROUNDS` set to each row's limit, and ran them over every row of the domain both can see: 0 to 3 prior counts,
 // each 0 to 3, a count of 0 to 3 and a limit of 1 to 4 with the round at or below it. Highs are 0 there,
 // so the driver's blocker count and the harness's count are one number. The domain stops at the limit on
 // purpose: past it the driver refuses the round outright where the harness reports CEILING, so the two
@@ -2050,7 +2050,7 @@ async function runLedgerArms() {
   const regradedWrong = []
   // TOOL-aMendedFleet-18 - each exit's `shape` matches the S1 grammar at the stage its path reaches,
   // is logged, and reads `out-tokens=unknown` because the stub runtime's `budget` has no `spent`.
-  const SHAPE_RE = /^review-shape kind=(diff-review|spec-audit) round=\d+ intensity=(full|light) at=(find|verify|synth) raw=(\d+|-) confirmed=(\d+|-) refuted=(\d+|-) merged=(\d+|-) unverified=(\d+|-) blocker=(\d+|-) high=(\d+|-) medium=(\d+|-) low=(\d+|-) agents=\d+ out-tokens=unknown$/
+  const SHAPE_RE = /^review-shape kind=(diff-review|spec-audit) round=\d+ intensity=(full|light) at=(find|verify|synth) raw=(\d+|-) confirmed=(\d+|-) refuted=(\d+|-) merged=(\d+|-) unverified=(\d+|-) blocker=(\d+|-) high=(\d+|-) medium=(\d+|-) low=(\d+|-) agents=\d+ out-tokens=unknown trigger=- shape=- efforts=- role-sha=-$/
   const shapeStage = { 'every lens dead': 'find', 'no finding raised': 'find', 'every finding refuted': 'verify',
     'one skeptic batch dead': 'verify', 'the synthesis dead': 'synth', complete: 'synth' }
   let shapeSeen = 0
@@ -3083,6 +3083,15 @@ async function runDispositionArms() {
   ck(!!r.threw && r.threw.indexOf('tier2-review: `unclassed` must be one of refuse | reason | owner-rules') === 0 && r.trace.length === 0,
     'unclassed: maybe is refused before any spawn, naming the three values')
   ck(synthCall(ra).prompt.indexOf('\nunclassed: refuse - none is refused') !== -1, 'unclassed: absent, the synthesis prompt states refuse')
+  // ---- TOOL-dDeclaredLoop-20 AC4: `trigger`, a closed set checked beside `unclassed`, rides the review-shape
+  // line after `out-tokens=` with the three cost fields printing `-`. RED against the base harness, whose line
+  // ends at out-tokens and which reads no `trigger`.
+  r = await runReview(Object.assign({}, DIFF, { trigger: 'later' }), ALL_OK)
+  ck(!!r.threw && r.threw.indexOf('tier2-review: `trigger` must be one of owed | opt-in | recommendation | placement') === 0 && r.trace.length === 0,
+    'trigger: later is refused before any spawn, naming the four causes')
+  r = await runReview(Object.assign({}, DIFF, { trigger: 'owed' }), ALL_OK)
+  ck(!r.threw && typeof r.result.shape === 'string' && / out-tokens=unknown trigger=owed shape=- efforts=- role-sha=-$/.test(r.result.shape),
+    'trigger: owed rides the review-shape line after out-tokens, shape, efforts and role-sha printing -')
   // ---- AC5: `gateManifest` refused on the specs rule, rendered into the probe, and no legs refusing every gate:.
   r = await runReview(Object.assign({}, DIFF, { gateManifest: '../x.json' }), ALL_OK)
   ck(!!r.threw && r.threw.indexOf('tier2-review: `gateManifest` must be a repo-relative path') === 0 && r.trace.length === 0,
@@ -3784,8 +3793,10 @@ fi
 # which reds them by name rather than skipping them.
 case "$bd_why" in "no usable python"*) lens_py="" ;; *) lens_py=$bd_py ;; esac
 
-# ---- TOOL-dFairHearing-17 S5: the driver's `review_state()` and its `RUNAWAY_CEILING=` line, sliced out of the
-# unattended kit beside this one and run over the parity domain, one `<priors>|<count>|<limit>|<token>` row each.
+# ---- TOOL-dFairHearing-17 S5: the driver's `review_state()`, sliced out of the unattended kit beside this one
+# and run over the parity domain, one `<priors>|<count>|<limit>|<token>` row each. Since TOOL-dDeclaredLoop-21 the
+# function reads its ceiling from `MAX_ROUNDS`, one round past it, as `deriveRoundState` reads `roundLimit`, so the
+# arm sets `MAX_ROUNDS` to each row's limit and the limit-4 row reads BOUNDED in both.
 # The runner compares every row with deriveRoundState; a driver that cannot be read or sliced writes
 # PRODUCER-FAILED, which reds the arm by name rather than skipping it.
 RS_OUT="$TMP/review-state.out"; rs_why=""; rs_src=""
@@ -3793,12 +3804,12 @@ RS_OUT="$TMP/review-state.out"; rs_why=""; rs_src=""
 RS_DRIVER=$(resolve_kit_dir "$bd_py" unattended unattended.sh "$HERE" 2>/dev/null) && RS_DRIVER="$ROOT/$RS_DRIVER/unattended.sh" || RS_DRIVER=""
 if [ ! -f "$RS_DRIVER" ]; then rs_why="the driver '$RS_DRIVER' is not a file: the unattended kit did not resolve to one"
 else
-  rs_src=$(tr -d '\r' < "$RS_DRIVER" | sed -n -e '/^RUNAWAY_CEILING=/p' -e '/^review_state() {/,/^}$/p')
-  case "$rs_src" in RUNAWAY_CEILING=*'review_state() {'*) ;; *) rs_why="could not slice RUNAWAY_CEILING= and review_state() out of $RS_DRIVER" ;; esac
+  rs_src=$(tr -d '\r' < "$RS_DRIVER" | sed -n -e '/^review_state() {/,/^}$/p')
+  case "$rs_src" in 'review_state() {'*'MAX_ROUNDS'*) ;; *) rs_why="could not slice review_state() reading MAX_ROUNDS out of $RS_DRIVER" ;; esac
 fi
 if [ -z "$rs_why" ]; then
   ( eval "$rs_src" || exit 1
-    for l in 1 2 3 4; do for c in 0 1 2 3; do
+    for l in 1 2 3 4; do MAX_ROUNDS=$l; for c in 0 1 2 3; do
       printf '|%s|%s|%s\n' "$c" "$l" "$(review_state "" "$c" "$l")"
       for p1 in 0 1 2 3; do
         [ "$l" -ge 2 ] && printf '%s|%s|%s|%s\n' "$p1" "$c" "$l" "$(review_state "$p1" "$c" "$l")"
@@ -4005,7 +4016,10 @@ printf '%s\n' "$out"
 # RAISED 629 -> 638 by TOOL-dFairHearing-43: 9 assertions, the `FH43` arms — AC1's refusals and admissions (2), AC2's
 # three in place of the one it moved (2 net), and AC7's four runs and its command check (5). Counted by hand and by
 # scratch probes of the same calls, not by a run: the pass runs no suite.
-FLOOR_ASSERTIONS=638
+# RAISED 638 -> 640 by TOOL-dDeclaredLoop-20: 2 assertions, the `trigger:` arms — the refused cause (1) and the
+# owed cause on the review-shape line (1). The re-pinned SHAPE_RE adds none. Counted by hand, not by a run: the
+# pass runs no suite.
+FLOOR_ASSERTIONS=640
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

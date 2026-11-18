@@ -401,9 +401,35 @@ python tools/govkit/steps/fanout_cap.py down <repo>     # exit 1 if a file chang
 Then commit the result, `.governance/steps/agent-cap/` included: the before-image there is what the
 down restores from.
 
+## Where `.unattended.conf`'s review round bound lives
+
+A spec audit's round bound is the policy keys of [the review bounds](loop.md#how-many-rounds-a-review-takes)
+now, and the driver reads no `REVIEW_ROUNDS` line. The step `unattended/review-rounds-to-policy` moves
+the line out once your policy file reads the same bound. It never writes your policy file. A value of
+1, or none, is the default one round and needs no key. A value N above 1 needs
+`review.design.rounds = "fixed-count"` and `review.design.round-count = N`, and
+`review.max-rounds = N` too where N is above 3, since a count above the ceiling is refused. For each
+of those keys your policy file does not set, the up prints a `policy_edit.py set <key> <value>` line
+for you to run; for each it sets to another value, a `conflict · <key> · policy <value> · conf
+<value>` line for you to settle. Either way it exits 1 and writes nothing. Once every key reads its
+value, the up takes every `REVIEW_ROUNDS` line out of `.unattended.conf` and keeps the file. It also
+exits 1, writing nothing, on a value that is not a whole number of at least 1, or where either file
+differs from your last commit. Its down puts the conf back byte-for-byte.
+`update --write` runs it as one of its steps; to run it by hand, from this checkout, against a
+repository whose `.unattended.conf` and policy file are committed: <!-- usage: script:tools/govkit/steps/review_rounds.py#up 902dec5b --> <!-- usage: script:tools/govkit/steps/review_rounds.py#witness aca0ad2d --> <!-- usage: script:tools/govkit/steps/review_rounds.py#down ae113c46 -->
+
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and a <repo> placeholder -->
+```sh
+python tools/govkit/steps/review_rounds.py up <repo>       # exit 1, writing nothing, on a bad value or an unset key
+python tools/govkit/steps/review_rounds.py witness <repo>  # exit 0 once no REVIEW_ROUNDS is left
+python tools/govkit/steps/review_rounds.py down <repo>     # exit 1 if a file changed since the up
+```
+
+Then commit the result, `.governance/steps/unattended/` included.
+
 ## What this release's steps do to your repository
 
-Four moves reach an installed repository through `update`, each named here with what it leaves
+Five moves reach an installed repository through `update`, each named here with what it leaves
 behind.
 
 - **Your adopter rules move into the overlay.** The step `playbook/adopter-rules-to-overlay` turns
@@ -435,6 +461,13 @@ behind.
   the template it ships. `update` installs it as a default-gained kit, and the receipt claims it
   from then on. An existing adopter's next `update` adds the `policy` kit too, because it joined the
   default selection and `playbook-render` requires it.
+- **The `loop` kit joins the default selection**, because the `roles` kit now requires it: the roles
+  kit reads each workflow's order from the loop definition the `loop` kit ships. `update` installs
+  it as a default-gained kit, and the receipt claims it from then on. A `--kits`-scoped `update`
+  gains nothing, and a `--kits` selection naming `roles` names `loop` too or is refused. An `update`
+  over a receipt claiming `roles` without `loop` that is `--kits`-scoped, or that cannot work the
+  gain out because the receipt records no `gov_commit` or the registry is unreadable at a vintage,
+  is refused before it writes, naming why; `apply --kits roles,loop` installs both.
 
 ## How gov proves a step before you meet it
 

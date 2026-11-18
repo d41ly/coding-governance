@@ -3,18 +3,20 @@
 #
 # One [[edge]] row per type of ONE closed set: `type`; `inverse`, derived from this row and never declared
 # at a site; `from` and `to`, the namespace words of namespaces.toml a source and a target sit in, its
-# native-id classes (`family-id`, `clause-id`), or the class words `any` (every registered namespace and
+# native-id classes (`family-id`, `clause-id`, `commit`), or the class words `any` (every registered namespace and
 # every native id) and `selects` (every namespace whose row has role = "selects"); `pin`, `none`, `tag` or
 # `clause`; `status`, `declared` or `derived`; `declared-at`, the site that owns the fact; and an optional
 # `writer`, the one site that writes the type, an edge of it read at any other site being red. A word not
-# registered yet (`feature`, `item`, `record`, `commit`, `session`, `act`, and the classes `spec`,
+# registered yet (`feature`, `item`, `record`, `session`, `act`, and the classes `spec`,
 # `decision` and `build`) admits nothing until its build registers it; an id matching no class under such
 # a word is `unarmed`. These are P33's twelve declared types and the derived `cites`, then
 # PLAY-dOrderedCharter-28's twelve from the memory plan's [edges], `decides` and `after` widened,
 # then PLAY-dOrderedCharter-49's two of a spec's `### Edges` block.
 #
 # One [[trailer]] row per commit trailer key: `key` and the `type` it declares, so a key is registered
-# once and the commit adapter reads this table.
+# once and the commit adapter reads this table. A row with no `type` registers a key that carries a
+# value and no edge (`Gov-Transition`, `Gov-Policy`, `Red-fix`): the adapter passes over it, and the
+# one trailer reader, commit_trailers.read_commits, reads every row's key and refuses any other.
 
 [[edge]]
 type = "part-of"
@@ -290,3 +292,15 @@ type = "serves"
 [[trailer]]
 key = "Decided"
 type = "decides"
+
+# The keys that carry a value and no edge (TOOL-dDeclaredLoop-23 S2): registered, so the one trailer
+# reader reads them, and passed over by the commit adapter.
+
+[[trailer]]
+key = "Gov-Transition"     # value: <from> -> <to>, written by TOOL-dDeclaredLoop-3
+
+[[trailer]]
+key = "Gov-Policy"         # value: the policy change's record, written by TOOL-dDeclaredLoop-2
+
+[[trailer]]
+key = "Red-fix"            # value: one gate leg's name, read by the routed-commit gate

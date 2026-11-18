@@ -84,6 +84,29 @@ lexicon selftest	kit	selftests
 lexicon wiring	repo	wiring
 line length	repo	product
 line-length gate selftest	kit	selftests
+loop adapt fixtures	kit	selftests
+loop breakpoint fixtures	kit	selftests
+loop budget fixtures	kit	selftests
+loop checklist tags	repo	declarations
+loop claims fixtures	kit	selftests
+loop command conformance	repo	declarations
+loop composition fixtures	kit	selftests
+loop computed witness	kit	selftests
+loop definition	repo	declarations
+loop definition fixtures	kit	selftests
+loop factories fixtures	kit	selftests
+loop guard fixtures	kit	selftests
+loop item kind	repo	selftests
+loop parent routes	kit	selftests
+loop position fixtures	kit	selftests
+loop review bounds fixtures	kit	selftests
+loop scenario fixtures	repo	selftests
+loop splice check	repo	selftests
+loop stage coverage	repo	declarations
+loop termination	repo	selftests
+loop transition record	repo	selftests
+loop transition tables	repo	declarations
+loop upstream fixtures	kit	selftests
 manifest-check self-test	kit	selftests
 marker contracts	repo	declarations
 measure-legs selftest	kit	selftests

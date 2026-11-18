@@ -18,8 +18,10 @@ namespace no row registers as a selector selects nothing and is reported `unarme
 green. The registry is the target's own, under its tool root, else the one beside this module. The set keeps
 the unit registry's order.
 
-THE REACH UNITS (PLAY-dOrderedCharter-21), `derive_reach_units`: a `role.<name>` reader's step is the `step`
-of the roles kit's workflow row its `workflow:` value names; for a step other than `none`, one unit per active
+THE REACH UNITS (PLAY-dOrderedCharter-21), `derive_reach_units`: a `role.<name>` reader's step is the reach
+word the loop definition gives the workflow its `workflow:` value names, read through the loop kit's
+`read_workflow_reach` (TOOL-dDeclaredLoop-1): the loop row's `reach`, else the last segment of its `step`,
+else `none`; for a step other than `none`, one unit per active
 practice (`charter.practices` at the root) whose catalogue row has a reach at that step, tag
 `practice.<name>.<step>`, text the reach, derived at render and never written as a row. `derive` lists them
 after the registry's units; `check --reach` prints one `load-set — reach ·` line per unit for each reader.
@@ -155,20 +157,25 @@ def read_role_rules(name) -> tuple[list | None, str]:
 
 
 def read_role_step(name) -> tuple[str | None, str]:
-    """`(step, why)`: the `step` of the roles kit's workflow row that role `name`'s `workflow:` value names
-    (PLAY-dOrderedCharter-21 S1); None with the reason when no kit, role, row or step is found."""
+    """`(step, why)`: the reach word the loop definition gives the workflow that role `name`'s `workflow:`
+    value names (PLAY-dOrderedCharter-21 S1, moved by TOOL-dDeclaredLoop-1), read through the loop kit's
+    `read_workflow_reach`; None with the reason when no roles kit, role, loop kit or loop row is found, or
+    the definition does not read."""
     got, why = read_role_field(name, "workflow")
     if got is None:
         return None, why
-    kit, workflow = got
+    workflow = got[1]
+    from render_playbook import load_loop_kit
     try:
-        rows = tomllib.loads((kit / "workflows.toml").read_text(encoding="utf-8")).get("workflow", [])
-    except (OSError, ValueError) as exc:     # ValueError: a TOML or a UTF-8 fault
-        return None, f"the roles kit's workflows.toml does not read: {exc}"
-    row = next((w for w in rows if isinstance(w, dict) and w.get("name") == workflow), None)
-    if row is None or not isinstance(row.get("step"), str):
-        return None, f"role {name}'s workflow {workflow!r} has no row with a step in workflows.toml"
-    return row["step"], ""
+        loop_lib, kit = load_loop_kit(KIT_DIR)
+        reach = loop_lib.read_workflow_reach(kit)
+    except LookupError as exc:
+        return None, f"no loop kit: {exc}"
+    except ValueError as exc:     # the reader's LoopError
+        return None, f"the loop definition does not read: {exc}"
+    if workflow not in reach:
+        return None, f"role {name}'s workflow {workflow!r} has no row in the loop definition"
+    return reach[workflow], ""
 
 
 @functools.lru_cache(maxsize=None)

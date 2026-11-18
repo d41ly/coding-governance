@@ -62,6 +62,65 @@ def parse_leg_names(text: str) -> set:
     return {r["name"] for r in rows if isinstance(r, dict) and isinstance(r.get("name"), str)}
 
 
+def derive_docstring_ids(tree) -> set:
+    """The `id()` of each docstring constant in a parsed module: the module's and that of every class,
+    function and `async def` whose body opens with a string constant. A docstring is prose, so the
+    walks that grade a module's string constants pass these over: `derive_constant_charges`
+    and the loop kit's `derive_conf_reads` (TOOL-dDeclaredLoop-82 S8). The ids hold while `tree` lives."""
+    import ast
+
+    return {id(node.body[0].value) for node in ast.walk(tree)
+            if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef))
+            and node.body and isinstance(node.body[0], ast.Expr)
+            and isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str)}
+
+
+def derive_constant_charges(tree, module, is_needle) -> list:
+    """The sorted pairs `(owner, rule)` the str constants of a parsed module whose value `is_needle`
+    answers true for are charged to, one per owner a charge names, `rule` the number of the rule that
+    charged it. A docstring `derive_docstring_ids` answers is prose and never counts; a comment is not
+    in the tree. The one charge walk (TOOL-dDeclaredLoop-88 S13): `gen_build_index.py#scan_glob_readers`
+    reads its owners and the loop kit's `derive_conf_constants` its rule-2 slice.
+
+    THE CHARGE RULE (TOOL-dTrueNorth-32 S5, S9): each such constant is charged to exactly one name, the
+    first of these that holds:
+      1. the innermost enclosing function, its decorators and signature included, as
+         `<module>.<qualified name>` joining every enclosing class and function name, so a class built
+         inside a function is charged to that function, its one reader;
+      2. else, outside every function, each `Name` in the targets of the innermost enclosing `Assign`,
+         `AnnAssign` or `AugAssign`, qualified by the enclosing classes;
+      3. else the innermost enclosing class, qualified, as a class-level `PATHS.append(...)` is;
+      4. else the module, as `<module>`, as a module-level `SPECS.append(...)` is.
+    The rule is total, so every shape the tree can hold has an owner."""
+    import ast
+
+    docs, found = derive_docstring_ids(tree), set()
+
+    def scan_scope(node, qual, function, assign, klass):
+        # `qual` is the module, then each enclosing class and function name; `function`, `assign` and
+        # `klass` the charge rule's first three owners in force at `node`, None where none encloses it
+        for child in ast.iter_child_nodes(node):
+            if isinstance(child, ast.Constant) and isinstance(child.value, str) and id(child) not in docs \
+                    and is_needle(child.value):
+                found.update([(function, 1)] if function else [(a, 2) for a in assign] if assign
+                             else [(klass, 3)] if klass else [(qual[0], 4)])
+            elif isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                inner = [*qual, child.name]
+                scan_scope(child, inner, ".".join(inner), None, klass)
+            elif isinstance(child, ast.ClassDef):
+                inner = [*qual, child.name]
+                scan_scope(child, inner, function, None, ".".join(inner))
+            elif function is None and isinstance(child, (ast.Assign, ast.AnnAssign, ast.AugAssign)):
+                targets = child.targets if isinstance(child, ast.Assign) else [child.target]
+                names = [".".join([*qual, n.id]) for t in targets for n in ast.walk(t) if isinstance(n, ast.Name)]
+                scan_scope(child, qual, None, names or assign, klass)
+            else:
+                scan_scope(child, qual, function, assign, klass)
+
+    scan_scope(tree, [module], None, None, None)
+    return sorted(found)
+
+
 def read_policy_value(key, root):
     """`key` at `root`'s landed revision, through the policy kit's `policy.py get`, found beside this
     kit since a kit imports no sibling. LookupError where no policy kit resolves; ValueError, the
@@ -442,8 +501,13 @@ BIND_HEAD_LINES = 12
 # `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, joined to that name the same
 # way. The factory's kind table is refused at import when its keys differ from this tuple: the
 # reader owns the one list, and the factory reads it, because the reader importing the factory
-# would cycle through `deviation_join.py`.
-TYPED_RECORD_KINDS = ("deviation", "exception", "override", "change", "red-fix")
+# would cycle through `deviation_join.py`. `acceptance` (TOOL-dDeclaredLoop-17 S1) is a unit's acceptance
+# commands re-run at a commit, written by a stand-in or an executor and never by a door. `transition`
+# (TOOL-dDeclaredLoop-3 S2) is a build's stage move, written by the loop kit's transition writer alone.
+# `recommendation` (TOOL-dDeclaredLoop-22 S1) is a stage exit's review recommendation, a command's score or a
+# role's reason, written through the factory's door by the unattended driver's `--recommend`.
+TYPED_RECORD_KINDS = ("deviation", "exception", "override", "change", "red-fix", "disposition", "acceptance",
+                      "transition", "recommendation")
 RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "journal", "research") + TYPED_RECORD_KINDS
 # Optional leading whitespace and an optional comment marker: the corpus holds a non-markdown record
 # (a shell script), where the line can only be a comment. An extension-scoped rule would structurally

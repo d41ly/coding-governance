@@ -99,6 +99,7 @@ subject = "repo"
 argv = ["python", "{kit}/drift_report.py", "--check"]
 guard = []
 history_depth = "full"
+stage = ["step.test"]
 
 [[hole]]
 id = "drift-product-globs"
@@ -144,6 +145,7 @@ name = "drift-audit wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-drift-audit.sh", "--check"]
 guard = []
+stage = ["step.test"]
 
 # Line-ending pins this kit needs in a TARGET. Emitted into the target's own
 # .gitattributes as one govkit-owned block; the renormalize that follows reads git's

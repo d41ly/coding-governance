@@ -59,6 +59,7 @@ name = "cleanup skill wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-branch-reconcile.sh", "--check"]
 guard = []
+stage = ["step.test"]
 
 # ONE [[lf_pin]], for the rendered Skill, which its own leg byte-compares.
 [[lf_pin]]

@@ -1001,6 +1001,57 @@ def all_kits(descs: dict[str, tuple[dict, str]]) -> list[str]:
     return sorted(e for e, (d, _) in descs.items() if d.get("selectable") != "conditional")
 
 
+# The order a needs graph allows, and its cycles: `derive_install_order` orders a selection through it.
+# >>> needs_graph_py -- canonical copy: needs_graph.py in the gov lib dir (byte-identical; gated)
+class NeedsCycle(ValueError):
+    """No order exists. `stuck` holds the nodes left unplaced, sorted: every node on a cycle and every
+    node that needs one, so `scan_cycles` is what names the cycles themselves."""
+
+    def __init__(self, stuck):
+        super().__init__("a needs cycle among %s" % ", ".join(stuck))
+        self.stuck = stuck
+
+
+def derive_needs_order(nodes, needs):
+    """`nodes` in an order where each follows every node `needs[node]` names: Kahn, each ready tier
+    sorted, so the order is sorted order wherever no edge applies. A need outside `nodes` constrains
+    nothing, and a node needing itself is a cycle. NeedsCycle where no order exists."""
+    want = set(nodes)
+    deps = {n: {d for d in needs.get(n, ()) if d in want} for n in nodes}
+    out, placed = [], set()
+    while len(out) < len(nodes):
+        ready = sorted(n for n in nodes if n not in placed and deps[n] <= placed)
+        if not ready:
+            raise NeedsCycle(sorted(n for n in nodes if n not in placed))
+        out.extend(ready)
+        placed.update(ready)
+    return out
+
+
+def scan_cycles(edges, live=None):
+    """Every cycle of `edges`, `{node: the nodes it points at}`, each reported ONCE and rotated to its
+    smallest member, in sorted order; a node pointing at itself is a cycle of one. `live`, a predicate
+    over a node, leaves out each node it answers False for, as a start and as a step; None keeps all.
+    Once and rotated, because a cycle found from each of its members is one finding."""
+    keep = live if live is not None else (lambda node: True)
+    found = {}
+    for start in [a for a in sorted(edges) if keep(a)]:
+        stack = [(start, (start,))]
+        while stack:
+            node, path = stack.pop()
+            for nxt in sorted(edges.get(node, ())):
+                if not keep(nxt):
+                    continue
+                if nxt == start:
+                    low = path.index(min(path))
+                    key = path[low:] + path[:low]
+                    found.setdefault(key, key)
+                elif nxt not in path:
+                    stack.append((nxt, path + (nxt,)))
+    return [found[k] for k in sorted(found)]
+# <<< needs_graph_py
+
+
 def derive_install_order(ids: list[str], descs: dict[str, tuple[dict, str]]) -> list[str]:
     """Order a selection so a kit follows everything it `requires`. Alphabetical within a tier.
 
@@ -1020,24 +1071,18 @@ def derive_install_order(ids: list[str], descs: dict[str, tuple[dict, str]]) -> 
     Kahn with an alphabetical ready-queue, so the result is deterministic and reduces to today's
     alphabetical order whenever no edge applies. A cycle REFUSES rather than falling back to
     alphabetical: an install order nobody can satisfy is not an order, and silently picking one is
-    how this class returns.
+    how this class returns. The order is the gov lib's needs-graph helper, carried inline above.
     """
     want = set(ids)
     deps = {i: sorted({d for d in (descs[i][0].get("requires") or []) if d in want and d != i})
             for i in ids}
-    out, placed = [], set()
-    while len(out) < len(ids):
-        ready = sorted(i for i in ids
-                       if i not in placed and all(d in placed for d in deps[i]))
-        if not ready:
-            stuck = sorted(i for i in ids if i not in placed)
-            raise Refusal(
-                f"`requires` has a cycle among {', '.join(stuck)} — refusing to invent an install "
-                f"order. Break the cycle in the descriptors; an order nobody can satisfy is not one"
-            )
-        out.extend(ready)
-        placed.update(ready)
-    return out
+    try:
+        return derive_needs_order(ids, deps)
+    except NeedsCycle as e:
+        raise Refusal(
+            f"`requires` has a cycle among {', '.join(e.stuck)} — refusing to invent an install "
+            f"order. Break the cycle in the descriptors; an order nobody can satisfy is not one"
+        ) from None
 
 
 def derive_unsatisfied_requires(selection: list[str], descs: dict[str, tuple[dict, str]],
@@ -1079,20 +1124,88 @@ def derive_default_gained(root: pathlib.Path, base_commit: str | None, to_commit
     """
     if not base_commit:
         return [], "the receipt records no gov_commit, so there is no vintage to compare the default set against"
-    tr = derive_tool_root(root)
-    rel = "/".join(([tr] if tr else []) + [GOVKIT_DIR.name, REGISTRY_NAME])
     sets = []
     for commit in (base_commit, to_commit):
-        blob = blob_at(root, commit, rel)
-        if blob is None:
-            return [], f"{rel} does not resolve at {commit[:8]}, so the default set there is unknown"
-        try:
-            sets.append(default_kits(tomllib.loads(blob.decode("utf-8"))))
-        except (tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
-            return [], f"{rel} at {commit[:8]} does not parse ({e}), so the default set there is unknown"
+        reg, why = read_registry_at(root, commit)
+        if reg is None:
+            return [], f"{why}, so the default set there is unknown"
+        sets.append(default_kits(reg))
     was, now = sets
     claimed = set(receipt.get("kits") or [])
     return [e for e in now if e not in was and e not in claimed and e in descs], ""
+
+
+def read_registry_at(root: pathlib.Path, commit: str) -> tuple[dict | None, str]:
+    """TOOL-dDeclaredLoop-73 S1: gov's registry parsed AT `commit`, and '' — or None and why not.
+
+    The one read both vintage readers make, through the module name `blob_at` with three positional
+    arguments so a selftest stand-in for it still answers. The path is built from the tool root as
+    the working tree's is, never spelled."""
+    tr = derive_tool_root(root)
+    rel = "/".join(([tr] if tr else []) + [GOVKIT_DIR.name, REGISTRY_NAME])
+    blob = blob_at(root, commit, rel)
+    if blob is None:
+        return None, f"{rel} does not resolve at {commit[:8]}"
+    try:
+        return tomllib.loads(blob.decode("utf-8")), ""
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
+        return None, f"{rel} at {commit[:8]} does not parse ({e})"
+
+
+def read_requires_at(root: pathlib.Path, commit: str,
+                     ids: list[str]) -> tuple[dict[str, tuple[dict, str]], dict[str, str]]:
+    """TOOL-dDeclaredLoop-73 S2: each id's `requires` as gov holds it AT `commit`, `(descs_at, unknown)`.
+
+    The descriptor path is the registry's at that commit, so a descriptor that moved is read where
+    that vintage keeps it. An id that registry does not declare has no edge there and maps to an
+    empty `requires`; a declared descriptor absent or unparseable there, or every id when the
+    registry itself is, goes to `unknown` with its reason, never graded as requiring nothing."""
+    reg, why = read_registry_at(root, commit)
+    if reg is None:
+        return {}, {e: why for e in ids}
+    tr = derive_tool_root(root)
+    paths = {e.get("id"): e.get("descriptor") for e in reg.get("entry", [])}
+    out: dict[str, tuple[dict, str]] = {}
+    unknown: dict[str, str] = {}
+    for eid in ids:
+        if eid not in paths:
+            out[eid] = ({"requires": []}, "")
+            continue
+        dpath = resolve_prefix_token(paths[eid] or "", tr)
+        try:
+            desc = read_descriptor_at(root, commit, dpath)
+        except Refusal as e:
+            unknown[eid] = str(e)
+            continue
+        if desc is None:
+            unknown[eid] = f"{dpath} does not resolve at {commit[:8]}"
+            continue
+        out[eid] = ({"requires": list(desc.get("requires") or [])}, dpath)
+    return out, unknown
+
+
+def demand_claimed_requires(claimed: list[str], gained: list[str], descs: dict[str, tuple[dict, str]],
+                            receipt: dict, why: str) -> None:
+    """TOOL-dDeclaredLoop-57 S1, S2: `update` refuses a claimed kit whose `requires` it leaves unmet.
+
+    The claimed kits plus the gained ones go through `derive_unsatisfied_requires`, the predicate
+    `apply` refuses by, so the update and the install answer one question one way. `why` is the
+    reason `derive_default_gained` returned for gaining nothing; it rides in the refusal so "no
+    vintage" and "registry unreadable at a vintage" read differently from "the default never held
+    it", which carries no reason clause. The text names every pair, and the route every kit of every
+    pair, once each, in the order the pairs are listed (TOOL-dDeclaredLoop-75 S26).
+
+    THE POPULATION IS EVERY CLAIMED KIT'S `requires` AT `to_commit`, accepted and stated: a receipt
+    that predates an edge its kit gained since, such as the ones the unattended kit's descriptor
+    gained, is refused here until `apply --kits` installs the kits the route names.
+    """
+    unmet = derive_unsatisfied_requires(list(claimed) + list(gained), descs, receipt)
+    if unmet:
+        pairs = ", ".join(f"'{k}' requires '{d}'" for k, d in unmet)
+        kits = ",".join(dict.fromkeys(k for pair in unmet for k in pair))
+        raise Refusal(f"update would leave {pairs} unmet"
+                      + (f"; default-gained did not cover it: {why}" if why else "")
+                      + f"; `apply --kits {kits}` installs them")
 
 
 def add_deploy_kits(target: pathlib.Path, ids: list[str]) -> str:
@@ -2647,6 +2760,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
         manifest_impure = {leg.get("name"): leg.get("impure") for leg in _legs_json}
         manifest_reads = {leg.get("name"): leg.get("reads") for leg in _legs_json}
         manifest_ceiling = {leg.get("name"): leg.get("ceiling") for leg in _legs_json}
+        manifest_stage = {leg.get("name"): leg.get("stage") for leg in _legs_json}
         claimed_legs: dict[str, str] = {}
         for eid, (d, _dpath) in descs.items():
             for leg in d.get("gate_leg", []):
@@ -2722,6 +2836,13 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                                f"{leg.get('impure')!r} while <prefix>/gate-legs.json says "
                                f"{manifest_impure.get(nm)!r} — the descriptor and the manifest "
                                f"disagree about whether a verdict cached on a tree may be reused")
+                    # AND ABOUT STAGE (TOOL-dDeclaredLoop-46 S4), presence included: the emitter
+                    # carries the descriptor's claim into adopters, so it must be the manifest's.
+                    if leg.get("stage") != manifest_stage.get(nm):
+                        r.fail(f"entry '{eid}' declares gate leg '{nm}' with stage "
+                               f"{leg.get('stage')!r} while <prefix>/gate-legs.json says "
+                               f"{manifest_stage.get(nm)!r} — the descriptor and the manifest "
+                               f"disagree about which step this leg serves")
                     # AND ABOUT THE READ CLASSES, where the descriptor declares them, as with ceiling
                     # (TOOL-aSparedSpawn-13 S1): the classes decide what enters a leg's reuse key, so a
                     # descriptor and a manifest that disagree key one leg two ways. A descriptor that
@@ -4379,6 +4500,12 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                     existing[by_name[nm]] = row
                 else:
                     existing.append(row)
+                # THE STAGE CLAIM TRAVELS like the ceiling, verbatim with no fallback and silent
+                # below STAGE_FLOOR_RUN_GATES, and is set on the placed row after the keep rule,
+                # which can append `ceiling`, so it stays the row's last key. TOOL-dDeclaredLoop-46.
+                if leg.get("stage") is not None and check_target_reads_subject(
+                        target, deploy, descs, floor=STAGE_FLOOR_RUN_GATES):
+                    row["stage"] = leg["stage"]
                 # THE RECEIPT CARRIES SUBJECT TOO, and not only so the caller's summary can count
                 # it. The receipt is what a later run reads to decide what this deployer owns; a
                 # field that reaches the target's manifest but not the receipt is a field no drift
@@ -5904,6 +6031,10 @@ DOC_READS_FLOOR_RUN_GATES = (1, 25)
 # while the runner still read 1.1, and 836e4e27b is the first commit at 1.2, so 1.1 is ambiguous and
 # 1.2 is the first version that cannot red a target's canary on the key. DEPL-aBenchedProbe-2.
 CEILING_FLOOR_RUN_GATES = (1, 2)
+# The run-gates version that first admits `stage`. TOOL-dDeclaredLoop-4 put the key in the canary's
+# key set with no version move, and origin/main had already shipped 1.48 without it, so the first
+# runner certainly carrying the admission is one above both. TOOL-dDeclaredLoop-46.
+STAGE_FLOOR_RUN_GATES = (1, 49)
 
 
 def derive_doc_reads(leg: dict, ctx: dict[str, str], have: set[str]) -> tuple[list[str] | None, str]:
@@ -9710,8 +9841,21 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # ---- this target cannot satisfy is named and left out, never pulled in after it.
     gained, _gained_why = ([], "") if kits else derive_default_gained(root, base_commit, to_commit,
                                                                       receipt, descs)
+    # TOOL-dDeclaredLoop-73 S3, S4: the `requires` graded are each kit's AT `to_commit`, the bytes this
+    # run installs, and a claimed kit whose requires that vintage cannot answer is refused, never read as
+    # none. TOOL-dDeclaredLoop-79 S19: the one read feeds the gained prune too, so it grades the vintage
+    # the refusal grades; a gained kit that vintage cannot answer is left out by name, never pulled in.
+    _req_at, _unknown_at = read_requires_at(root, to_commit, list(claimed) + list(gained))
+    _unknown_claimed = {k: why for k, why in _unknown_at.items() if k in claimed}
+    if _unknown_claimed:
+        raise Refusal("; ".join(f"'{k}' requires are unknown at {to_commit[:8]}: {why}"
+                                for k, why in sorted(_unknown_claimed.items())))
+    for _ge in [g for g in gained if g in _unknown_at]:
+        gained.remove(_ge)
+        print(f"govkit update — default-gained {_ge} NOT installed: its requires are unknown at "
+              f"{to_commit[:8]}: {_unknown_at[_ge]}")
     while True:
-        _unmet_g = derive_unsatisfied_requires(gained, descs, receipt)
+        _unmet_g = derive_unsatisfied_requires(gained, _req_at, receipt)
         if not _unmet_g:
             break
         for _ge, _gd in _unmet_g:
@@ -9720,6 +9864,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 print(f"govkit update — default-gained {_ge} NOT installed: it requires '{_gd}', which "
                       f"this receipt does not claim and the default did not gain; `apply --kits` "
                       f"both is the route")
+    # TOOL-dDeclaredLoop-57 S1: the CLAIMED kits' edges too, on every non-source run, before any
+    # gain line prints and before anything is written, so a refused run reports no gain it never made.
+    demand_claimed_requires(claimed, gained, _req_at, receipt, _gained_why)
     if _gained_why:
         print(f"govkit update — default-gained: none computed — {_gained_why}")
     for _ge in gained:

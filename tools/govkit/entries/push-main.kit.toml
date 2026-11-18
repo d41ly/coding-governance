@@ -71,6 +71,7 @@ name = "push-main self-test"
 subject = "kit"
 argv = ["bash", "{prefix}/push-main.test.sh"]
 guard = ["{prefix}/push-main.sh", ".githooks/"]
+stage = ["step.test"]
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
@@ -87,6 +88,7 @@ guard = [".githooks/"]
 # Carried into an adopter's manifest at run-gates 1.2 or later, kept where the adopter raised it, and
 # graded equal to gov's manifest by selfcheck 7h (DEPL-aBenchedProbe-2). The only descriptor leg with one.
 ceiling = 1780
+stage = ["step.test"]
 
 # THE BAR HARNESS, which re-disables the hook's executed-word, option, working-copy and declared arms in a copy
 # on every run and observes the evasions land (TOOL-aRepatriatedFork-5, the owner's F2 ruling). It
@@ -96,6 +98,7 @@ name = "pre-push bar self-test"
 subject = "kit"
 argv = ["python3", ".githooks/pre_push_bar_selftest.py"]
 guard = [".githooks/"]
+stage = ["step.test"]
 
 # Line-ending pins this kit needs in a TARGET. Emitted into the target's own
 # .gitattributes as one govkit-owned block; the renormalize that follows reads git's

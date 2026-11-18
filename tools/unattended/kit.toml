@@ -10,7 +10,9 @@ version_from = { file = "unattended.sh", pattern = "^KIT_UNATTENDED_VERSION=" }
 # settings-merge.py, and the target's receipt then names the program that wrote its settings file.
 # `kickoff-manifest` since TOOL-aRoutedQuill-7: past PROMPT_BRIEF_SKELETON_CUTOFF a prompt-mode preflight
 # reads the brief's sub-heads from that kit's checker, so an install without it refuses every such run.
-requires = ["memory-tree", "review-harness", "settings-merge", "kickoff-manifest"]
+# `loop` since TOOL-dDeclaredLoop-5: check 53 of the leg grades each Definition-of-Done entry's witness
+# class through that kit's `loop_lib.py --grade-site`, the one reader of the alias rows and the actor list.
+requires = ["memory-tree", "review-harness", "settings-merge", "kickoff-manifest", "loop"]
 # PLAY-dOrderedCharter-17: each edge to a non-core kit is a declared slot with its fallback.
 optional = [
   { part = "unattended.sh", point = "point.runtime.reading", fallback = "the close prints no drift delta, said" },
@@ -180,7 +182,7 @@ file = ".unattended.conf"
 owner = "unattended"
 required_keys_gate = ["LANDER", "BYPASS_BAN", "GATE_CMD", "WIRING_CHECK", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "CORE_FLOOR", "DIRECTIVES_FLOOR"]
 required_keys_render = ["LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL"]
-optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI", "MAP_CLI", "SPEC_TOKENS_CLI", "UNIT_STALL_BOUND", "TASK_STALL_BOUND", "REVIEW_ROUNDS", "RESUME_SCHEDULE", "RESUME_SCHEDULE_DELAY", "RESUME_SCHEDULE_LIMIT", "RESUME_STALE_BOUND", "STOP_GUARD_BLOCKS", "RESUME_ATTEMPTS", "RESUME_TURNS", "HELD_CI_WORKFLOW"]
+optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI", "MAP_CLI", "SPEC_TOKENS_CLI", "UNIT_STALL_BOUND", "TASK_STALL_BOUND", "RESUME_SCHEDULE", "RESUME_SCHEDULE_DELAY", "RESUME_SCHEDULE_LIMIT", "RESUME_STALE_BOUND", "STOP_GUARD_BLOCKS", "RESUME_ATTEMPTS", "RESUME_TURNS", "HELD_CI_WORKFLOW"]
 # REQUIRED UNLESS `RESUME_SCHEDULE="off"`, so neither list above can hold them: govkit reads the
 # two required lists against the target conf (DEPL-aHalvedInstall-1), and a condition is the
 # `keepalive-tool-names` hole's to grade. Listed here so check 7 still knows them as keys.
@@ -280,6 +282,7 @@ reads = { remote = "its verdict is a function of the REMOTE as well as of the tr
 guard = []
 doc_reads = ["{memory_root}/builds/", "{memory_root}/guides/", "{memory_root}/archive/"]
 red_after_land = true
+stage = ["step.test"]
 
 # the playbook validity leg. No guard: it grades an adopter's playbooks and
 # the kit's own fixture, so a guard scoped to this kit dir would skip it on exactly the commits that
@@ -290,6 +293,7 @@ subject = "repo"
 argv = ["bash", "{kit}/check-playbook.sh"]
 guard = []
 red_after_land = true
+stage = ["step.test"]
 
 [[gate_leg]]
 name = "pass-order history"
@@ -299,6 +303,7 @@ reads = { remote = "its verdict is a function of the REMOTE as well as of the tr
 guard = []
 doc_reads = ["{memory_root}/builds/", "{memory_root}/project/"]
 red_after_land = true
+stage = ["step.test"]
 
 # the brief-recorded leg. No guard, for `pass-order history`'s reason: its subject is the
 # REPOSITORY's run-state records, so it goes stale with nobody editing this kit, and a guard scoped
@@ -315,6 +320,7 @@ reads = { remote = "its verdict is a function of the REMOTE as well as of the tr
 guard = []
 doc_reads = ["{memory_root}/builds/", "{memory_root}/project/"]
 red_after_land = true
+stage = ["step.test"]
 
 [[gate_leg]]
 name = "unattended skill wiring"
@@ -322,6 +328,7 @@ subject = "repo"
 argv = ["bash", "{kit}/adopt-unattended.sh", "--check"]
 guard = []
 red_after_land = true
+stage = ["step.build", "step.test"]
 
 # the structural group linter's self-test (TOOL-aBatchedArm-2). A KIT leg, held off the automatic
 # bar like every `subject = kit` row. This kit declares NO self-test as a leg: the arms-groups
@@ -434,3 +441,20 @@ stage = "start"
 role = "main"
 command = "/unattended <slug>"
 when = "a build is requested: it runs unattended by default, its committed README at BASE being the mandate"
+
+# TOOL-dDeclaredLoop-21 S7: `.unattended.conf`'s spec-audit round bound moves into the policy keys
+# `review.design.rounds` and `review.design.round-count`, with `review.max-rounds` raised to it above
+# the catalogue's 3, so a spec audit's bound reads the same on either side; a bound of 1 is the default
+# and maps to no key. The step never writes the policy file (TOOL-dDeclaredLoop-56 S40): it prints a
+# `policy_edit.py set` line per mapped key the owner has not set, and a `conflict` line per key set
+# otherwise, and exits 1 writing nothing; once every key reads its value it takes the conf's line out.
+# The program is gov's, run by its own argv until the walk lands;
+# `<prefix>/govkit/upgrade_steps.py list` prints the order. Once landed this row is frozen: a correction
+# is a new step, a retirement a `[[retired]]` row in the registry.
+[[upgrade]]
+id = "unattended/review-rounds-to-policy"
+up = ["python", "{gov}/govkit/steps/review_rounds.py", "up", "{target}"]
+down = ["python", "{gov}/govkit/steps/review_rounds.py", "down", "{target}"]
+witness = ["python", "{gov}/govkit/steps/review_rounds.py", "witness", "{target}"]
+surfaces = ["conf-key:.unattended.conf#REVIEW_ROUNDS"]
+needs-target = false

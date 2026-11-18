@@ -120,7 +120,7 @@ An install with no policy kit renders the `explicit-override` sentence and print
 committed value goes unread until you install that kit. A value the policy reader refuses stops the
 render, naming the key.
 
-An override taken is a record in the build's `build/` folder, written by the memory-tree kit: <!-- usage: script:tools/memory-tree/build_records.py#new d9f4ae09 -->
+An override taken is a record in the build's `build/` folder, written by the memory-tree kit: <!-- usage: script:tools/memory-tree/build_records.py#new 3cae4d5e -->
 
 <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries a placeholder the shell reads as a redirect -->
 ```bash
@@ -178,7 +178,9 @@ when = "a unit whose spec is READY"
 `stage` names a workflow of the roles kit's `workflows.toml`, or `start` for how a session begins; `role`
 is a role slot, or `main` for the main session. Where your template holds a `{{DRIVE}}` line, as gov's
 does, the render writes one line per row of the kits your `.governance/deploy.toml` selects there: the
-`start` rows first, then by the workflow's stage, then kit and row order. A kit you did not select adds
+`start` rows first, then by the workflow's stage, then kit and row order. With no loop kit, or a loop
+definition that does not read, the rows keep kit and row order alone: the loop kit's `loop definition`
+gate is what refuses a definition that does not read, not the render. A kit you did not select adds
 nothing, and a selection with no rows renders no section. A subagent's handoff carries its own role's
 lines under `### Drive`, so it holds the line the main session does.
 

@@ -8,6 +8,8 @@ streams = ["tooling"]
 decisions = ["TOOL-dSweptBranches-1", "TOOL-dSweptBranches-2", "TOOL-dSweptBranches-3",
              "TOOL-dSweptBranches-4", "TOOL-dSweptBranches-5"]
 
+stage = ["step.test"]
+
 [claims]
 gate-legs = ["branch-reconcile selftest", "cleanup skill wiring"]
 kits = ["branch-reconcile"]

@@ -389,6 +389,10 @@ run_wf() { # args-expr · returns-expr · [script] -> prints the trace, then RES
 # by stripping `specAudit` strips it with it. A builder that sets a base strips this one first.
 FIX_B=5eed5eed5eed5eed5eed5eed5eed5eed5eed5eed
 UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","base":"5eed5eed5eed5eed5eed5eed5eed5eed5eed5eed","subjects":[{"path":"s1","blob":"abc1234","id":"A-tB-1","rev":1},{"path":"s2","blob":"def5678","id":"A-tB-2","rev":1}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1"},{"id":"A-tB-2","order":1,"specPath":"s2","briefPath":"b2"},{"id":"A-tB-3","order":2,"specPath":"s3","briefPath":"b3"}]}'
+# TOOL-dDeclaredLoop-20 S5 - `UNITS` under `review.unverified block`, today's route for an UNVERIFIED finding: the
+# stage adjudicates it and may promote it. Every arm whose disposal promotes one passes this; the default `ask`
+# files it as an ask instead and refuses its promotion by name.
+UNITS_BLOCK=${UNITS%\}}',"reviewPolicy":{"findings":"blocker-high-own","unverified":"block","leftShift":"second-occurrence","blocks":"yes"}}'
 SPEC_OK='{"authored":["A-tB-1"],"alreadyPresent":["A-tB-2","A-tB-3"],"refused":[],"summary":"ok"}'
 # TOOL-aGraftedHelix-15 - the spec COMMIT stage's double. The stage runs whenever the writers authored a
 # unit of the roster and the caller pinned no `subjects`, so every fixture that strips `subjects` meets
@@ -1063,8 +1067,8 @@ MT_MERGED='[{"severity":"BLOCKER","ids":[14,26,40]},{"severity":"HIGH","ids":[1]
 # the four MEDIUMs batched into one, so 13 promoted into 10 units.
 MT_DISPOSE='{"disposed":true,"standing":[],"promoted":13,"folded":0,"refuted":0,"promotedIds":["A-tB-16","A-tB-17","A-tB-18","A-tB-19","A-tB-20","A-tB-21","A-tB-22","A-tB-23","A-tB-24","A-tB-25"],"edges":[],"placements":[{"unit":"A-tB-16","repairs":"A-tB-3","order":3},{"unit":"A-tB-17","repairs":"A-tB-3","order":3},{"unit":"A-tB-18","repairs":"A-tB-3","order":3},{"unit":"A-tB-19","repairs":"A-tB-3","order":3},{"unit":"A-tB-20","repairs":"A-tB-3","order":3},{"unit":"A-tB-21","repairs":"A-tB-3","order":3},{"unit":"A-tB-22","repairs":"A-tB-3","order":3},{"unit":"A-tB-23","repairs":"A-tB-3","order":3},{"unit":"A-tB-24","repairs":"A-tB-3","order":3},{"unit":"A-tB-25","repairs":"none","order":3}],"summary":"13 promoted into 10 units: 3 blockers, 6 highs, 1 minors batch"}'
 run_merged_review() { RUN_WF_SCHEMA=strict run_wf "$MT_ARGS" "$1" "$MT_T2"; }
-run_merged_build() { # callee RESULT json · [driver token] · [disposal double] -> the build harness run over it
-  rec "${2:-BOUNDED}" >/dev/null; run_wf "$UNITS" "$(printf '{"spec-write":%s,"workflow":%s,"record":%s,"dispose":%s}' \
+run_merged_build() { # callee RESULT json · [driver token] · [disposal double] · [args] -> the build harness run over it
+  rec "${2:-BOUNDED}" >/dev/null; run_wf "${4:-$UNITS}" "$(printf '{"spec-write":%s,"workflow":%s,"record":%s,"dispose":%s}' \
     "$SPEC_OK" "${1:-null}" "$_rec" "${3:-$MT_DISPOSE}")"
 }
 t2=$(run_merged_review "$(build_merged_returns "$MT_MERGED")")
@@ -1123,7 +1127,7 @@ t2=$(run_merged_review "$(build_merged_returns '[]' 0)")
 au=$(printf '%s\n' "$t2" | sed -n 's/^RESULT //p')
 has    "MT zero confirmed and 48 unverified reaches the synthesis" "$au" '"confirmed":0,"refuted":0,"merged":0,"unverified":48'
 has    "MT ...and an empty item list counts 0 and 0, not null" "$au" '"blockers":0,"highs":0'
-o=$(run_merged_build "$au" CONVERGED '{"disposed":true,"standing":[],"promoted":48,"folded":0,"refuted":0,"promotedIds":["A-tB-16"],"edges":[],"placements":[{"unit":"A-tB-16","repairs":"none","order":3}],"summary":"s"}')
+o=$(run_merged_build "$au" CONVERGED '{"disposed":true,"standing":[],"promoted":48,"folded":0,"refuted":0,"promotedIds":["A-tB-16"],"edges":[],"placements":[{"unit":"A-tB-16","repairs":"none","order":3}],"summary":"s"}' "$UNITS_BLOCK")
 has    "MT ...and the harness disposes the unverified population" "$o" "disposal: done — promoted 48 · folded 0"
 has    "MT ...and the record counts the 48 promoted UNVERIFIED findings as minors" "$(printf '%s\n' "$o" | grep '^prompt:record:')" "--blockers 0 --highs 0 --minors 48 --disposition promote"
 # THE SECOND MEASURED AUDIT, dLoggedFlight's round-1 spec audit of units 14, 16 and 20, ran on the
@@ -1847,15 +1851,17 @@ hasnt_ "DP ...and the Disposal stage is not reached" "$o" "phase:Disposal"
 has    "DP ...and the next step re-runs once, then holds naming the runId" "$o" "--pending-run <that Workflow runId>"
 printf -v _wfj '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":%s}' "$DEF"; o=$(run_wf "$A_UNITS" "$_wfj")
 has    "DP attended: deferred too, and told to stop rather than hold" "$o" "an attended run has no driver to hold"
-# id 14: unverified findings are OUTSTANDING and run the stage.
-review_out 0 0 0 2 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec-write":%s,"workflow":%s,"record":%s,"dispose":%s}' \
+# id 14: unverified findings are OUTSTANDING and run the stage. The three arms promoting one take `review.unverified
+# block`, today's adjudication route, since the default `ask` files an unverified finding and never promotes it
+# (TOOL-dDeclaredLoop-20 S5).
+review_out 0 0 0 2 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS_BLOCK" "$(printf '{"spec-write":%s,"workflow":%s,"record":%s,"dispose":%s}' \
     "$SPEC_OK" "$_review_out" "$_rec" "$(build_dispose_units 2 1)")")
 has    "F 0 confirmed + 2 unverified: the disposal agent RUNS" "$o" "agent:dispose"
 has    "F ...and the prompt hands it the unverified population" "$o" "and 2 unverified. Open the report"
 has    "F ...and says an unverified finding is OUTSTANDING, not cleared" "$o" "OUTSTANDING, not cleared"
 has    "F ...and the hand-out carries unverified 2" "$o" '"unverified":2'
 has    "F ...and the roster is handed out" "$o" '"roster":[{'
-review_out 0 1 1 1 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec-write":%s,"workflow":%s,"record":%s,"dispose":%s}' \
+review_out 0 1 1 1 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS_BLOCK" "$(printf '{"spec-write":%s,"workflow":%s,"record":%s,"dispose":%s}' \
     "$SPEC_OK" "$_review_out" "$_rec" "$(build_dispose_units 2 2)")")
 has    "F confirmed 1 + unverified 1: reconciles against their sum" "$o" '"roster":[{'
 review_out 0 1 1 1 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec-write":%s,"workflow":%s,"record":%s,"dispose":%s}' \
@@ -1876,7 +1882,7 @@ hasnt_ "F ...and the stage is never reached" "$o" "phase:Disposal"
 # ---- one of the unverified findings used to record a bare CONVERGED row the merge bar reads as
 # ---- demanding nothing. At zero blockers with something outstanding the DISPOSAL stage now runs
 # ---- FIRST and the record carries `promote` iff `promotedIds` is non-empty.
-review_out 0 0 0 2 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec-write":%s,"workflow":%s,"record":%s,"dispose":%s}' \
+review_out 0 0 0 2 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS_BLOCK" "$(printf '{"spec-write":%s,"workflow":%s,"record":%s,"dispose":%s}' \
     "$SPEC_OK" "$_review_out" "$_rec" '{"disposed":true,"standing":[],"promoted":1,"folded":0,"refuted":1,"promotedIds":["A-tB-9"],"edges":[],"placements":[{"unit":"A-tB-9","repairs":"A-tB-3","order":3}],"summary":"d"}')")
 p=$(printf '%s\n' "$o" | grep '^prompt:record:')
 has    "R2-B zero blockers, zero highs, a promoted UNVERIFIED finding: the record carries --disposition promote" "$p" "--blockers 0 --highs 0 --minors 1 --disposition promote"
@@ -3907,6 +3913,98 @@ has    "FA15 AC25 the declared throw" "$o" 'a disposal passes the ids `--chain-v
 o=$(run_strict_fa3 "$UNITS" '{"terminalSubject":true,"stderr":"x"}')
 has    "FA15 AC25 the undeclared throw" "$o" "a disposal passes the hand-out's \`promotedIds\` as \`auditIds\`"
 
+# ================================================== TOOL-dDeclaredLoop-32 S7 — THE SPEC TARGET AND THE ROUND FLAGS
+# Every recorded round carries its own highs and minors, and `specTarget` `highs` reads a zero-blocker round
+# standing on a high as no exit: it records BARE and returns the driver's CONVERGING. The staged break, observed
+# RED at the close: the base harness, which reads zero blockers as the exit and spawns no record agent here.
+DL32_HIGHS="${UNITS/\"specAudit\"/\"specTarget\":\"highs\",\"specAudit\"}"
+review_out 0 1 1 >/dev/null; rec CONVERGING >/dev/null
+o=$(run_wf "$DL32_HIGHS" "$(printf '{"spec-write":%s,"workflow":%s,"record":%s,"dispose":%s}' "$SPEC_C" "$_review_out" "$_rec" "$DISPOSE_OK")")
+p=$(printf '%s\n' "$o" | grep '^prompt:record:')
+has    "DL32 AC8 a highs target records the zero-blocker round" "$p" "--review tB --round-highs 1 --round-minors 0 --subject tB-spec-set-r1 --verdict \"CLEAN\" --blockers 0  Return"
+hasnt_ "DL32 AC8 ...bare, with no exit counts" "$p" "--blockers 0 --highs"
+has    "DL32 AC8 ...and returns the driver's CONVERGING" "$o" "log:audit round 1: CONVERGING"
+hasnt_ "DL32 AC8 ...with no disposal before the record" "$(printf '%s\n' "$o" | grep '^agent:')" "agent:dispose"
+# ...an unknown word is refused by name before any agent spawns
+o=$(run_wf "${UNITS/\"specAudit\"/\"specTarget\":\"nope\",\"specAudit\"}" '{}')
+has    "DL32 AC8 an unknown specTarget word refuses by name" "$o" 'THROW unattended-build: `specTarget` must be one of blockers, highs, all'
+hasnt_ "DL32 AC8 ...before any agent spawns" "$o" "agent:"
+
+# ================================================== TOOL-dDeclaredLoop-20 — THE REVIEW POLICY
+# `reviewPolicy` decides the unit bounds, an UNVERIFIED finding's route and whether a CONVERGING round holds the
+# roster; the CONVERGING return names the fold's item and a spec subject's terminal states; and the left-shift
+# count reads fixture records. The staged break, observed RED at the close: the base harness, which reads no
+# `reviewPolicy`, names neither the item nor a terminal state, and has no `deriveUnitBounds` or `review_dispose.py`.
+DL20_CONV='{"blockers":3,"confirmed":3,"highs":0,"unverified":0,"report":"r.md","precision":1,"note":"n","confirmedFindings":[]}'
+rec CONVERGING >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec-write":%s,"workflow":%s,"record":%s,"dispose":%s}' "$SPEC_OK" "$DL20_CONV" "$_rec" "$DISPOSE_OK")")
+na=$(printf '%s\n' "$o" | sed -n 's/^RESULT //p' | grep -o '"nextAction":"[^"]*"')
+has    "DL20 AC1 the CONVERGING fold instruction names its item" "$na" 'item.review.fold'
+has    "DL20 AC1 ...and a spec subject's two terminal states" "$na" 'BOUNDED or CEILING'
+hasnt_ "DL20 AC1 ...and never NON-CONVERGENT, which a no-fall subject never reaches" "$na" 'NON-CONVERGENT'
+has    "DL20 AC8 with no reviewPolicy the CONVERGING roster is held" "$o" '"roster":[]'
+has    "DL20 AC8 ...and the four defaults are logged as read" "$o" 'log:reviewPolicy: absent, so the four defaults are read'
+DL20_NO=${UNITS%\}}',"reviewPolicy":{"findings":"blocker-high-own","unverified":"ask","leftShift":"second-occurrence","blocks":"no"}}'
+rec CONVERGING >/dev/null; o=$(run_wf "$DL20_NO" "$(printf '{"spec-write":%s,"workflow":%s,"record":%s,"dispose":%s}' "$SPEC_OK" "$DL20_CONV" "$_rec" "$DISPOSE_OK")")
+has    "DL20 AC8 under blocks no the CONVERGING return hands the roster out" "$o" '"roster":[{"id":"A-tB-1"'
+has    "DL20 AC8 ...and the log names the review as running alongside" "$o" 'the review runs alongside'
+o=$(run_wf "${DL20_NO/\"findings\":\"blocker-high-own\",/}" '{}')
+has    "DL20 AC8 a reviewPolicy missing findings refuses naming it" "$o" 'THROW unattended-build: `reviewPolicy.findings` must be one of blocker-high-own | all-own | blocker-own'
+hasnt_ "DL20 AC8 ...before any agent spawns" "$o" "agent:"
+# AC6: the unit bounds at one blocker, one high, three confirmed minors and none adjudicated, under each value.
+for _dl20_row in 'blocker-high-own={"floor":3,"ceiling":4}' 'all-own={"floor":5,"ceiling":5}' 'blocker-own={"floor":2,"ceiling":3}'; do
+  _dl20_got=$(node -e '
+    const s = require("fs").readFileSync(process.argv[1], "utf8")
+    const a = s.indexOf("function deriveUnitBounds("), b = s.indexOf("\n}\n", a) + 3
+    const f = new Function(s.slice(a, b) + "\nreturn deriveUnitBounds")()
+    console.log(JSON.stringify(f(process.argv[2], { blockers: 1, highs: 1, minors: 3, confirmedMinors: 3, adjudicated: 0, byNature: false })))
+  ' "$F" "${_dl20_row%%=*}" 2>&1)
+  same "DL20 AC6 deriveUnitBounds under ${_dl20_row%%=*}" "$_dl20_got" "${_dl20_row#*=}"
+done
+# ...and the unverified routes: under the default `ask` a promoted UNVERIFIED finding is refused by name, the same
+# finding returned as `routed` hands the roster out, and under `block` a routed one is refused.
+DL20_PROMOTED='{"disposed":true,"standing":[],"promoted":2,"folded":0,"promotedIds":["A-tB-4","A-tB-5"],"edges":[],"placements":[{"unit":"A-tB-4","repairs":"none","order":3},{"unit":"A-tB-5","repairs":"none","order":3}],"summary":"d"}'
+DL20_ROUTED='{"disposed":true,"standing":[],"promoted":1,"folded":0,"routed":1,"promotedIds":["A-tB-4"],"edges":[],"placements":[{"unit":"A-tB-4","repairs":"none","order":3}],"summary":"d"}'
+review_out 0 1 1 1 >/dev/null; rec CONVERGED >/dev/null
+o=$(run_wf "$UNITS" "$(printf '{"spec-write":%s,"workflow":%s,"record":%s,"dispose":%s}' "$SPEC_OK" "$_review_out" "$_rec" "$DL20_PROMOTED")")
+has    "DL20 AC6 under ask a promoted unverified finding is refused naming review.unverified" "$o" 'review.unverified ask files an unverified finding as an ask and never promotes it'
+has    "DL20 AC6 ...with an empty roster" "$o" '"roster":[]'
+p=$(printf '%s\n' "$o" | grep '^prompt:dispose:')
+has    "DL20 AC6 the prompt files an unrefuted unverified finding as an ask" "$p" 'FILE each one you do not refute as an ask in `memory/builds/tB/BACKLOG.md`'
+has    "DL20 AC7 the prompt runs the class count under the left-shift value" "$p" "RUN \`python ${PFX}${KIT}/review_dispose.py classes --builds memory/builds --record r.md --left-shift second-occurrence\`"
+o=$(run_wf "$UNITS" "$(printf '{"spec-write":%s,"workflow":%s,"record":%s,"dispose":%s}' "$SPEC_OK" "$_review_out" "$_rec" "$DL20_ROUTED")")
+has    "DL20 AC6 the same finding returned as routed hands the roster out" "$o" '"roster":[{'
+has    "DL20 AC6 ...and routed travels out" "$o" '"routed":1'
+o=$(run_wf "$UNITS_BLOCK" "$(printf '{"spec-write":%s,"workflow":%s,"record":%s,"dispose":%s}' "$SPEC_OK" "$_review_out" "$_rec" "$DL20_ROUTED")")
+has    "DL20 AC6 under block a routed finding is refused" "$o" 'routed 1 under review.unverified block, which adjudicates every unverified finding and routes none'
+# AC7: the class count over fixture records. One prior record disposes class:stale-pin, one carries no appendix,
+# and the current one disposes class:stale-pin and class:fresh-slug; the current record never counts itself.
+_dl20_b=$(mktemp -d); mkdir -p "$_dl20_b/bA/reviews" "$_dl20_b/bB/reviews" "$_dl20_b/bC/reviews"
+_dl20_t='| id | lens | ref | severity | verdict | disposition |\n|---|---|---|---|---|---|\n'
+printf "## Verdict: CLEAN\n\nreview-shape kind=diff-review round=1 confirmed=1\n\n## Appendix — every finding\n\n${_dl20_t}| 1 | c | a.sh | medium | confirmed | class:stale-pin |\n" > "$_dl20_b/bA/reviews/r1.md"
+printf '## Verdict: CLEAN\n\nno appendix here\n' > "$_dl20_b/bB/reviews/r2.md"
+printf "## Verdict: CLEAN\n\nreview-shape kind=diff-review round=1 confirmed=2\n\n## Appendix — every finding\n\n${_dl20_t}| 1 | c | a.sh | medium | confirmed | class:stale-pin |\n| 2 | c | b.sh | low | confirmed | class:fresh-slug |\n" > "$_dl20_b/bC/reviews/r3.md"
+o=$("$_rkd_py" "$HERE/review_dispose.py" classes --builds "$_dl20_b" --record "$_dl20_b/bC/reviews/r3.md" --left-shift second-occurrence 2>&1)
+has    "DL20 AC7 second-occurrence earns the slug a prior record disposed" "$o" 'review-dispose: gate stale-pin · prior 1 · second-occurrence'
+hasnt_ "DL20 AC7 ...and not the first occurrence, the current record never counting itself" "$o" 'gate fresh-slug'
+has    "DL20 AC7 ...and a prior record with no appendix is skipped by name" "$o" 'r2.md · no-appendix'
+o=$("$_rkd_py" "$HERE/review_dispose.py" classes --builds "$_dl20_b" --record "$_dl20_b/bC/reviews/r3.md" --left-shift every-class 2>&1)
+has    "DL20 AC7 every-class earns the prior slug" "$o" 'review-dispose: gate stale-pin · prior 1 · every-class'
+has    "DL20 AC7 ...and the fresh one" "$o" 'review-dispose: gate fresh-slug · prior 0 · every-class'
+o=$("$_rkd_py" "$HERE/review_dispose.py" classes --builds "$_dl20_b" --record "$_dl20_b/bC/reviews/r3.md" --left-shift owner-selects 2>&1)
+has    "DL20 AC7 owner-selects marks the prior slug an owner item" "$o" 'review-dispose: gate stale-pin · prior 1 · owner-selects · owner'
+has    "DL20 AC7 ...and the fresh one" "$o" 'review-dispose: gate fresh-slug · prior 0 · owner-selects · owner'
+# TOOL-dDeclaredLoop-56 AC36: two rounds of one review, each disposing class:stale-pin, the second as
+# --record: the first round is the same review, never a prior occurrence, so no gate is earned. RED
+# against the count over every other record, which reads the first round as prior 1.
+mkdir -p "$_dl20_b/bD/reviews"
+printf "## Verdict: CLEAN\n\nreview-shape kind=diff-review round=1 confirmed=1\n\n## Appendix — every finding\n\n${_dl20_t}| 1 | c | a.sh | medium | confirmed | class:stale-pin |\n" > "$_dl20_b/bD/reviews/2026-01-01-review-TOOL-bD-1-diff-review-round1.md"
+printf "## Verdict: CLEAN\n\nreview-shape kind=diff-review round=2 confirmed=1\n\n## Appendix — every finding\n\n${_dl20_t}| 1 | c | a.sh | medium | confirmed | class:stale-pin |\n" > "$_dl20_b/bD/reviews/2026-01-02-review-TOOL-bD-1-diff-review-round2.md"
+rm -f "$_dl20_b/bA/reviews/r1.md" "$_dl20_b/bC/reviews/r3.md"
+o=$("$_rkd_py" "$HERE/review_dispose.py" classes --builds "$_dl20_b" --record "$_dl20_b/bD/reviews/2026-01-02-review-TOOL-bD-1-diff-review-round2.md" --left-shift second-occurrence 2>&1)
+hasnt_ "DL56 AC36 a review's own earlier round earns no second-occurrence gate" "$o" 'gate stale-pin'
+o=$("$_rkd_py" "$HERE/review_dispose.py" classes --builds "$_dl20_b" --record "$_dl20_b/bD/reviews/2026-01-02-review-TOOL-bD-1-diff-review-round2.md" --left-shift every-class 2>&1)
+has    "DL56 AC36 ...and counts it prior 0" "$o" 'review-dispose: gate stale-pin · prior 0 · every-class'
+rm -rf "$_dl20_b"
 # ================================ TOOL-aTrimmedWait-1 — `--check-specs` BEFORE THE SPEC COMMIT
 # Each writer, typed or not, is told to run the verb over its own group's ids, and the committer to run
 # it over every authored id before its block and return `committed: false` on a non-zero exit; that
@@ -4073,12 +4171,18 @@ hasnt_ "TW1 AC5 ...and hands out no roster" "$o" '"roster":[{'
 # RAISED 1028 -> 1039 by TOOL-aTwinnedPass-11: the 11 its TP11 group executes — the wf_ return's three, the hostile wf_ tail's four, and two each for the wf_ name off the structure and the name under neither prefix. Counted by reading, not measured by a run: the pass that wrote it runs no suite.
 # MERGED at TOOL-aTwinnedPass-13's reconcile of local main at a76c6afe7: the base 950 at aebbb4a72, plus main's 4
 # (TOOL-aLightenedLoop-3), plus this branch's 89 (TOOL-aTwinnedPass-1's 50, -4's 28 and -11's 11) = 1043.
+# RAISED 1043 -> 1069 by TOOL-dDeclaredLoop-20: the 26 its `DL20` group executes — AC1's three, AC8's six, AC6's
+# three bounds, its routes' five and the prompt's ask sentence, AC7's prompt command and its seven class-count
+# sites. Counted by reading, not measured by a run: the pass that wrote it runs no suite.
+# RAISED 1069 -> 1071 by TOOL-dDeclaredLoop-56: AC36's two class-count sites over two rounds of one review.
+# Counted by reading, not measured by a run: the pass that wrote it runs no suite.
 # RAISED 950 -> 958 by TOOL-aTrimmedWait-1: the `TW1 AC5` sites, two per writer mode across the loop's two
 # modes, two on the commit prompt, and the refused commit's throw and absent roster. Counted by reading,
 # not measured by a run: the pass that wrote it runs no suite.
 # MERGED at TOOL-aTrimmedWait-12's reconcile of local main at 5d48501da: the base 950 at 846d51d39, plus main's 93
 # (TOOL-aLightenedLoop-3's 4, TOOL-aTwinnedPass-1's 50, -4's 28 and -11's 11), plus this branch's 8 (TOOL-aTrimmedWait-1) = 1051.
-FLOOR_ASSERTIONS=1051
+# MERGED at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c, 2026-11-18: the base 1043 at 5d48501da, plus main's 8 (TOOL-aTrimmedWait-1), plus this branch's 28 (TOOL-dDeclaredLoop-20 and -56) = 1079.
+FLOOR_ASSERTIONS=1079
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

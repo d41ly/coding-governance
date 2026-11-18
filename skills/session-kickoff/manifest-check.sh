@@ -45,7 +45,7 @@
 #          READY line pins a BASE that is not HEAD, an id reader that could not answer, or a route
 #          the tree cannot check: no MEMORY_ROOT, or no defined-id set).
 set -u
-KIT_MANIFEST_VERSION="1.35"   # gov:kit kickoff-manifest@1.35 — the registry id
+KIT_MANIFEST_VERSION="1.36"   # gov:kit kickoff-manifest@1.36 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
 # VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
 # MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`
@@ -539,7 +539,7 @@ read_memory_root() {
   printf '%s' "${v%$'\r'}"
 }
 render_card() {
-  local verb="$1" registry="" memroot live
+  local verb="$1" registry="" memroot live body
   [ -n "$MF" ] && [ -f "$MF" ] && { BLOCK=$(read_block "$MF"); getval 'registry' registry; }
   derive_head_state
   if ! memroot=$(read_memory_root); then
@@ -553,20 +553,45 @@ render_card() {
       live="live — LIVE.md · $(awk '/^\|/ && !/^\|[-|: ]*$/ {n++} END{print (n>0?n-1:0)}' "$ROOT/$memroot/LIVE.md") non-terminal builds"
     fi
   fi
+  # The cells below the header first, so the `keys —` cell's remote key is taken after the `claims —`
+  # read has fetched; then the header, that cell and the cells, in that order (TOOL-dDeclaredLoop-8 S5).
+  body=$(
+    derive_node_tag "$registry"
+    derive_cli_line
+    render_tree_cell
+    printf 'worktrees — %s\n' "$(git worktree list 2>/dev/null | wc -l | tr -d '[:space:]')"
+    derive_drift_line
+    derive_overlaps_line
+    printf '%s\n' "$live"
+    derive_memory_line
+    derive_claims_line "$verb"
+    render_health_cell
+    printf 'recent —\n'
+    git log --oneline -5 2>/dev/null
+    printf 'READY — none yet\n'
+  )
   printf 'orientation — %s · written %s · by %s --card --%s\n' "$CARD_SID" "$(date +%Y-%m-%dT%H:%M:%S%z)" "${0##*/}" "$verb"
-  derive_node_tag "$registry"
-  derive_cli_line
-  render_tree_cell
-  printf 'worktrees — %s\n' "$(git worktree list 2>/dev/null | wc -l | tr -d '[:space:]')"
-  derive_drift_line
-  derive_overlaps_line
-  printf '%s\n' "$live"
-  derive_memory_line
-  derive_claims_line "$verb"
-  render_health_cell
-  printf 'recent —\n'
-  git log --oneline -5 2>/dev/null
-  printf 'READY — none yet\n'
+  render_keys_cell
+  printf '%s\n' "$body"
+}
+
+# The `keys —` cell (TOOL-dDeclaredLoop-8 S5): the loop kit's `claims.py card-keys` over this tree, found
+# as every sibling is by `resolve_kit_file`, printed as `keys — view <k> · remote <k> · at <iso>`. Each
+# cell joins one of the two keys by its class, declared in that module's CARD_CELL_CLASSES: `overlaps —`
+# and `claims —` the remote key, every other cell the view key. No loop kit, no python or a key read
+# that fails is one `keys — skipped:` line, and the card still writes.
+# WHAT THIS DOES NOT CHECK: the `cli —`, `worktrees —`, `drift —`, `memory —` and `health —` cells' own
+# inputs, which sit outside the commit and the refs, so the view key does not move with them.
+render_keys_cell() {
+  local ck py out rc
+  ck=$(resolve_kit_file loop claims.py)
+  [ -n "$ck" ] || { printf 'keys — skipped: no loop kit resolves in this tree\n'; return 0; }
+  py=$(resolve_python 2>/dev/null) || { printf 'keys — skipped: no Python resolves on this node\n'; return 0; }
+  out=$("$py" "$ck" card-keys 2>/dev/null); rc=$?
+  [ "$rc" = 0 ] || { printf 'keys — skipped: card-keys exited %s\n' "$rc"; return 0; }
+  printf '%s\n' "$out" | awk '{ sub(/\r$/, "") } $1 == "view" { v = $2 } $1 == "remote" { r = $2 } $1 == "at" { a = $2 }
+    END { if (v == "" || r == "" || a == "") print "keys — skipped: card-keys printed no view, remote and at lines"
+          else print "keys — view " v " · remote " r " · at " a }'
 }
 
 # The `overlaps —` cell (KICK-aMendedFleet-2): which unmerged remote refs share a path with this
@@ -699,6 +724,10 @@ render_health_cell() {
 # where RUN_CLAIMS is not `on`, `--claims` prints `claims: off` and reads nothing, and the cell says so;
 # this card never reads the conf's switch itself, so the driver stays its one reader. WHAT THIS DOES
 # NOT CHECK: who drives a slug, or whether a claim is honest — it prints what the driver answered.
+# Each row is six TAB fields, the sixth the claim's key or `-` (TOOL-dDeclaredLoop-8 S7), printed as
+# ` · key ` and the eight characters after `k1:`. The read asks `--claims --with-key`, and a row of five,
+# from a driver released before the flag, which ignores it, prints ` · key -` (TOOL-dDeclaredLoop-56 S8),
+# so neither side of a kit skew loses the cell.
 derive_claims_line() {   # $1 = the writer verb → the cell's head line and its rows
   local drv sd rc
   [ "$1" = replay ] && { printf 'claims — skipped: --card --replay reads no remote\n'; return 0; }
@@ -709,7 +738,7 @@ derive_claims_line() {   # $1 = the writer verb → the cell's head line and its
     || { printf 'claims — skipped: this node has no working timeout -k, so the read would be unbounded and none ran\n'; return 0; }
   sd=$(mkdir -p "$CARD_DIR" && mktemp -d "$CARD_DIR/.claims.XXXXXX") \
     || { printf 'claims — skipped: no scratch directory under %s to capture the read in\n' "$CARD_DIR"; return 0; }
-  GOV_RUNLOG=0 timeout -k 2 "$CARD_CLAIMS_BOUND" bash "$drv" --claims </dev/null >"$sd/out" 2>"$sd/err"; rc=$?
+  GOV_RUNLOG=0 timeout -k 2 "$CARD_CLAIMS_BOUND" bash "$drv" --claims --with-key </dev/null >"$sd/out" 2>"$sd/err"; rc=$?
   case "$rc" in
     0)
       # Split on the TAB in awk, never `read`: an empty field collapses under `read`. Ordered by
@@ -720,11 +749,11 @@ derive_claims_line() {   # $1 = the writer verb → the cell's head line and its
         { sub(/\r$/, "") }
         $0 == "claims: none" { none = 1; next }
         $0 == "claims: off" { off = 1; next }
-        NF == 5 && ($5 in rk) {
+        (NF == 5 || NF == 6) && ($5 in rk) {
           all++
           if (($5 == "stale" || $5 == "terminal") && $4 ~ /^[0-9]+$/ && $4 + 0 > hide + 0) { hid++; next }
           k = rk[$5] "\t" $1
-          r = "  " $1 " · " $2 " · " $3 " · beat " ($4 ~ /^[0-9]+$/ ? $4 "s" : "-") " · " $5
+          r = "  " $1 " · " $2 " · " $3 " · beat " ($4 ~ /^[0-9]+$/ ? $4 "s" : "-") " · " $5 " · key " (NF == 6 && $6 ~ /^k1:/ ? substr($6, 4, 8) : "-")
           for (i = ++m; i > 1 && key[i - 1] > k; i--) { key[i] = key[i - 1]; row[i] = row[i - 1] }
           key[i] = k; row[i] = r; next
         }
@@ -827,13 +856,89 @@ derive_map_block() {
 }
 
 # The instruction map first, so the harness's cut of a hook's output takes a card's tail and never the
-# map; then the stored card, unchanged, then ONE `now —` line computed here and never stored — a second
-# replay must print one, not two. A missing card is written fresh under the replay's own name in its header.
+# map; then the stored card, re-keyed by `print_rekeyed_card`, then ONE `now —` line computed here and
+# never stored — a second replay must print one, not two. The line names this tree's toplevel and how
+# its keys read. A missing card is written fresh under the replay's own name in its header.
+REPLAY_KEYS=""
 print_replay() {
   derive_map_block
-  if [ -f "$CARD_FILE" ]; then cat "$CARD_FILE"; else write_card replay; fi
+  if [ -f "$CARD_FILE" ]; then
+    print_rekeyed_card
+  else
+    write_card replay
+    REPLAY_KEYS=$(awk '{ sub(/\r$/, "") } sub(/^keys — skipped: /, "keys skipped: ") { print; exit }
+      /^keys — view / { print "keys view fresh · remote evidence"; exit }' "$CARD_FILE")
+  fi
   derive_head_state
-  printf 'now — HEAD %s · %s · %s\n' "$HEAD_SHA" "$HEAD_BRANCH" "$HEAD_DIRTY"
+  printf 'now — HEAD %s · %s · %s · %s · %s\n' "$HEAD_SHA" "$HEAD_BRANCH" "$HEAD_DIRTY" "$TOPLEVEL" "$REPLAY_KEYS"
+}
+
+# The replay's re-key (TOOL-dDeclaredLoop-8 S6, F5): the view key recomputed by `claims.py card-keys` in
+# the tree the replay runs in and judged by its `verdict` against the stored `keys —` cell. A fresh key
+# prints the stored card unchanged. A moved key, or a stored card with no `keys —` view key, re-renders
+# the startup cells under `--card --replay` and carries, from the stored card, its header line, each
+# cell `card-keys` names on its `remote-cells` line (the head line and the indented lines under it),
+# the remote key and `at`, and its whole TAIL, the READY line and `## route` the scratch guard admits a
+# commit by, byte for byte; the result is written under CARD_CAP_BYTES and printed. The header is
+# carried because the scratch guard reads a `--card --replay` header as a session that started before
+# the writer was wired. A replay reads no remote, so its remote verdict is always `evidence`. Sets
+# REPLAY_KEYS, the `now —` line's tail. Over the cap, or with no scratch to build in, the stored card
+# prints and nothing is written. WHAT THIS DOES NOT CHECK: the five cells whose inputs no key covers.
+print_rekeyed_card() {
+  local ck py out view cells stored verdict sd bytes
+  REPLAY_KEYS="keys skipped: no loop kit resolves in this tree"
+  ck=$(resolve_kit_file loop claims.py)
+  [ -n "$ck" ] || { cat "$CARD_FILE"; return 0; }
+  py=$(resolve_python 2>/dev/null) || { REPLAY_KEYS="keys skipped: no Python resolves on this node"; cat "$CARD_FILE"; return 0; }
+  out=$("$py" "$ck" card-keys 2>/dev/null) || { REPLAY_KEYS="keys skipped: card-keys exited $?"; cat "$CARD_FILE"; return 0; }
+  out=${out//$'\r'/}
+  view=$(printf '%s\n' "$out" | awk '$1 == "view" { print $2; exit }')
+  cells=$(printf '%s\n' "$out" | awk '$1 == "remote-cells" { $1 = ""; sub(/^ +/, ""); print; exit }')
+  stored=$(awk '{ sub(/\r$/, "") } /^keys — view / { print $4; exit }' "$CARD_FILE")
+  verdict=re-derived
+  if [ -n "$stored" ] && [ -n "$view" ]; then
+    verdict=$("$py" "$ck" verdict --stored "$stored" --class view --recomputed "$view" 2>/dev/null) || verdict=re-derived
+    verdict=${verdict%$'\r'}
+  fi
+  if [ "$verdict" = fresh ]; then
+    REPLAY_KEYS="keys view fresh · remote evidence"; cat "$CARD_FILE"; return 0
+  fi
+  REPLAY_KEYS="keys view moved · not re-derived: no scratch directory under $CARD_DIR · remote evidence"
+  sd=$(mkdir -p "$CARD_DIR" && mktemp -d "$CARD_DIR/.replay.XXXXXX") || { cat "$CARD_FILE"; return 0; }
+  CARD_TMP=$sd
+  extract_card_parts "$CARD_FILE"
+  render_card replay > "$sd/fresh"
+  awk -v want=startup "$CARD_PARTS_AWK" "$sd/fresh" > "$sd/fstartup"
+  # PATHS AND THE CELL LIST REACH awk THROUGH THE ENVIRONMENT: `-v` processes escapes.
+  RK_STORED="$sd/startup" RK_CELLS="$cells" awk '
+    BEGIN {
+      n = split(ENVIRON["RK_CELLS"], c, " "); for (i = 1; i <= n; i++) want[c[i]] = 1
+      while ((getline l < ENVIRON["RK_STORED"]) > 0) {
+        if (++sn == 1) head = l
+        if (l ~ /^keys — view /) { split(l, f, " "); srem = f[7]; sat = f[10] }
+        if (cur != "" && l ~ /^  /) { blk[cur] = blk[cur] "\n" l; continue }
+        cur = ""
+        split(l, h, " ")
+        if ((h[1] in want) && h[2] == "—") { cur = h[1]; blk[cur] = l }
+      }
+    }
+    FNR == 1 { print head; next }
+    skip && /^  / { next }
+    { skip = 0; split($0, h, " ") }
+    /^keys — view / { print "keys — view " h[4] " · remote " (srem == "" ? "k1:?" : srem) " · at " (sat == "" ? "?" : sat); next }
+    (h[1] in want) && h[2] == "—" && (h[1] in blk) { print blk[h[1]]; skip = 1; next }
+    { print }' "$sd/fstartup" > "$sd/new"
+  cat "$sd/tail" >> "$sd/new"
+  bytes=$(wc -c < "$sd/new" | tr -d '[:space:]')
+  if [ "$bytes" -gt "$CARD_CAP_BYTES" ]; then
+    REPLAY_KEYS="keys view moved · not re-derived: over the cap · remote evidence"; cat "$CARD_FILE"
+  elif cat "$sd/new" > "$CARD_FILE"; then
+    REPLAY_KEYS="keys view re-derived · remote evidence"; cat "$CARD_FILE"
+  else
+    REPLAY_KEYS="keys view moved · not re-derived: $CARD_FILE could not be written · remote evidence"; cat "$CARD_FILE"
+  fi
+  rm -rf "$sd" 2>/dev/null
+  return 0
 }
 
 # >>> envelope_sh — canonical copy: envelope.sh in the gov lib dir (byte-identical; gated)

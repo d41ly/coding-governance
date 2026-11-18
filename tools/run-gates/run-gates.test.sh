@@ -388,7 +388,7 @@ if bad:
 n=$((n+1))
 "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads", "pack", "enforces", "pass_leg", "scope_of"}
+KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads", "pack", "enforces", "pass_leg", "scope_of", "stage"}
 try:
     legs = json.load(open(sys.argv[1]))
 except Exception as e:
@@ -809,7 +809,7 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"]},{"name":"b","argv":["bash","y.
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"impur":"typo"}]' > "$ctl/typo.json"
 keyset_probe() { "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads", "pack", "enforces", "pass_leg", "scope_of"}
+KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads", "pack", "enforces", "pass_leg", "scope_of", "stage"}
 legs = json.load(open(sys.argv[1]))
 sys.exit(1 if any(k not in KNOWN for l in legs for k in l) else 0)
 ' "$1"; }
@@ -876,6 +876,16 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"],"scope-of":"b"},{"name":"b","ar
 if keyset_probe "$ctl/so.json" && ! keyset_probe "$ctl/sotypo.json"; then :
 else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`scope_of\` and FAIL a near-miss of it; one of the two did not hold"
+  fail=1
+fi
+# ...and `stage` (TOOL-dDeclaredLoop-56 S24), by the same two halves, in both KNOWN copies: the step tags
+# every leg row carries, and the near-miss is the plural a hand would type.
+n=$((n+1))
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"stage":["step.test"]}]' > "$ctl/st.json"
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"stages":["step.test"]}]' > "$ctl/sttypo.json"
+if keyset_probe "$ctl/st.json" && ! keyset_probe "$ctl/sttypo.json"; then :
+else
+  echo "canary: the manifest key-set predicate must PASS a row carrying \`stage\` and FAIL a near-miss of it; one of the two did not hold"
   fail=1
 fi
 rm -rf "$ctl"

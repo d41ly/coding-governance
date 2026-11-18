@@ -5,28 +5,17 @@
 # the build pass from the tree, its `practice` rows when the catalogue landed (PLAY-dOrderedCharter-1), it only
 # shrinks after: `python <prefix>/playbook/core.py meta-check` reds a row
 # whose item is enforced now, and an item with no row.
-principle	principle.p1	dDeclaredLoop
-principle	principle.p2	dDeclaredLoop
 principle	principle.p3	dWitnessedBar
 principle	principle.p4	dOrderedCharter
 principle	principle.p5	dPlacedRequest
 principle	principle.p6	dTendedCadence
-principle	principle.p7	dDeclaredLoop
-principle	principle.p8	dOrderedCharter
 principle	principle.p9	dGroundRules
-principle	principle.p10	dGroundRules
 principle	principle.p12	dIndexedDesign
 principle	principle.p15	dOrderedCharter
 principle	principle.p17	dIndexedDesign
 principle	principle.p18	dBoundRoles
 principle	principle.p19	dScopedBuild
-principle	principle.p20	dDeclaredLoop
-principle	principle.p21	dKeptSession
-principle	principle.p22	dDeclaredLoop
-principle	principle.p23	dDeclaredLoop
-principle	principle.p24	dDeclaredLoop
 principle	principle.p25	dBoundRoles
-principle	principle.p26	dBoundRoles
 principle	principle.p27	dOrderedCharter
 principle	principle.p29	dBoundRoles
 principle	principle.p30	dTotalRecall
@@ -37,8 +26,6 @@ principle	principle.p34	dOrderedCharter
 principle	principle.p35	dTrueNorth
 principle	principle.p36	dWellOiledMachine
 principle	principle.p37	dSafePassage
-principle	principle.p38	dGroundRules
-principle	principle.p39	dGroundRules
 principle	principle.p40	dPlacedRequest
 principle	principle.p41	dTrueNorth
 practice	practice.yagni	dWitnessedBar
@@ -176,7 +163,6 @@ leg	profile-bar selftest	dWitnessedBar
 leg	held-halves selftest	dWitnessedBar
 leg	measure-legs selftest	dWitnessedBar
 leg	install-prefix (shipped surface)	dWitnessedBar
-leg	hook destinations (every declared hook path ships)	dWitnessedBar
 leg	hook destinations self-test	dWitnessedBar
 leg	agent-cap restatement	dWitnessedBar
 leg	agent-cap restatement self-test	dWitnessedBar
@@ -213,11 +199,9 @@ leg	playbook render selftest	dWitnessedBar
 leg	spec tokens (a spec's own names resolve)	dWitnessedBar
 leg	spec tokens (the pass's own spec)	dWitnessedBar
 leg	kit placeholders (a declared token its adopter substitutes)	dWitnessedBar
-leg	roles catalogue	dWitnessedBar
 leg	roles render wiring	dWitnessedBar
 leg	roles render selftest	dWitnessedBar
 leg	roles adopter self-test	dWitnessedBar
-leg	policy check	dWitnessedBar
 leg	positional (the citation check alone)	dWitnessedBar
 leg	tags positional selftest	dWitnessedBar
 leg	tags bundle selftest	dWitnessedBar
@@ -232,15 +216,7 @@ leg	selftest harness self-test	dWitnessedBar
 leg	extract-arms self-test	dWitnessedBar
 leg	run-selftests self-test	dWitnessedBar
 kind	kind.tool-kit	dShippedRelease
-kind	kind.command	dDeclaredLoop
-kind	kind.policy-key	dDeclaredLoop
-kind	kind.preset	dDeclaredLoop
+kind	kind.preset	dKeptSession
 kind	kind.gate-leg	dWitnessedBar
-kind	kind.role	dDeclaredLoop
-kind	kind.workflow	dDeclaredLoop
-kind	kind.hook	dDeclaredLoop
 kind	kind.record-kind	dConvergedCharter
-kind	kind.stage	dDeclaredLoop
-kind	kind.item	dDeclaredLoop
 kind	kind.lens	dCalibratedLens
-kind	kind.scenario	dDeclaredLoop

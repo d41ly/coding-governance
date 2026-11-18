@@ -400,6 +400,10 @@ render_envelope|$ROOT/$KIT_REL/envelope.py|$KIT_REL/envelope
 envelope_sh|$ROOT/$KIT_REL/envelope.sh|$KIT_REL/envelope
 auto_memory|$ROOT/$KIT_REL/auto_memory.py|$KIT_REL/auto_memory
 retired_kits|$ROOT/$KIT_REL/retired_kits.py|$KIT_REL/retired_kits
+commit_trailers_py|$ROOT/$KIT_REL/commit_trailers.py|$KIT_REL/commit_trailers
+needs_graph_py|$ROOT/$KIT_REL/needs_graph.py|$KIT_REL/needs_graph
+run_tree_kill_py|$ROOT/$KIT_REL/run_tree_kill.py|$KIT_REL/run_tree_kill
+guarded_write_py|$ROOT/$KIT_REL/guarded_write.py|$KIT_REL/guarded_write
 read_open_py|$ROOT/$KIT_REL/read_open.py|$KIT_REL/read_open
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
@@ -445,6 +449,19 @@ read_open_py|$ROOT/$KIT_REL/read_open.py|$KIT_REL/read_open
 # retired_kits (PLAY-dOrderedCharter-31 S10) is a target's kit selection read through the registry's
 # `[[retired]]` rows; govkit's selection resolver and the playbook renderer's kit readers each carry it
 # inline, both kits copy-installed, and part 2l below holds the canonical to its behaviour.
+# commit_trailers_py (TOOL-dDeclaredLoop-23 S4) is the one reader of a commit's trailers, its two
+# attribution views and its CLI; the memory-tree kit's and the unattended kit's commit_trailers.py are
+# each that block whole, beside a copy of resolve_kit_dir, through which the reader finds the key table,
+# and a copy of git_env_leaks_py, the names the reader's pinned runner drops (TOOL-dDeclaredLoop-39 S4).
+# needs_graph_py (TOOL-dDeclaredLoop-12 S5) is the order a needs graph allows and its cycles, extracted
+# at its third instance: govkit's install order, the backlog grader's hold cycles and the loop kit's
+# item programs each carry it inline.
+# run_tree_kill_py (TOOL-dDeclaredLoop-42 S4) is the run-gates kit's kill of a timed-out child's tree
+# and its reap; the run-gates regenerator and the loop kit's witness re-run each carry it inline.
+# guarded_write_py (TOOL-dDeclaredLoop-2 S5) is the guarded write, extracted at its second instance:
+# the owner's terminal proof, standard error a terminal, and the write-then-record that puts a target's
+# prior bytes back when its record is refused; the playbook kit's instruction command and the loop kit's
+# policy command each carry it inline.
 # read_open_py (TOOL-aLightenedLoop-3 S3) is the `open` audit event's read filter: the policy kit's
 # guard trace and the spec-token checker's input record each carry it inline, both copy-installed.
 #

@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.167 -->
+<!-- gov:kit memory-tree@2.168 -->
 [{{MEMORY_ROOT}}/HYGIENE.md · Level 3 · Read before writing any record, index or id under the memory root; yields to levels 0 to 2]
 # {{MEMORY_ROOT}}/ retention & hygiene
 
@@ -654,8 +654,12 @@ carry it too:
   `deviation` (a departure from the design or from a spec, in the grammar under "Deviation records") ·
   `exception` (a principle excused for one part, minted by `PLAY-dOrderedCharter-7`'s record factory) ·
   `override` (minted by `PLAY-dOrderedCharter-2`) · `change` (minted by `PLAY-dOrderedCharter-15`) ·
-  `red-fix` (the record of an inline red fix, in the grammar under "Red-fix records").
-  The five after `research` are the typed kinds: each record is named
+  `red-fix` (the record of an inline red fix, in the grammar under "Red-fix records") ·
+  `disposition` (the owner's disposition of one loop item, in the grammar under "Disposition records") ·
+  `acceptance` (a unit's acceptance commands re-run at a commit, in the grammar under "Acceptance
+  records") · `transition` (one build stage move, in the grammar under "Transition records") ·
+  `recommendation` (a stage exit's review recommendation, in the grammar under "Recommendation
+  records"). The nine after `research` are the typed kinds: each record is named
   `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, and the kind and that name are
   joined both ways. An open kind field stops being groupable the first time two authors spell one
   relation differently.
@@ -725,6 +729,50 @@ command that showed the leg green, and its result) and Caused-by (one id). Write
 commit carrying no trailer naming that leg. Check 31 joins every such commit to its record. A path-less
 commit carrying the trailer, an empty commit or any merge, owes no red-fix record: its `Files` would be
 the change it accounts for and it holds none, so the door refuses it saying so and check 31 asks none.
+
+**Disposition records.** The owner's answer to a held loop item is a `disposition` record named
+`<date>-build-<unit id>-disposition-<n>.md` in a build's `build/` folder, under the unit the item
+belongs to, or the build's first unit for an item no unit owns. Its fields are `- **<Key>:** <value>`
+bullets, one line each: Item (the disposed item's tag, opening `item.`), Disposition (one word, a
+member of that item's closed outcome set), Channel (`mailbox` · `terminal` · `prompt`, where the owner
+answered) and Caused-by (one id), with Reason optional. Write it through the door, `build_records.py
+new disposition --build <slug> --unit <id> --item <tag> --disposition <word> --channel <channel>
+[--reason <text>]`, which refuses a value outside those shapes. The door does not read the item's
+outcome set: that join is the loop kit's `check_disposition_record`, run by whoever reads the record.
+
+**Acceptance records.** A unit's acceptance commands re-run at one commit are an `acceptance` record
+named `<date>-build-<unit id>-acceptance-<n>.md` in a build's `build/` folder. Its fields are
+`- **<Key>:** <value>` bullets, one line each and all required: Sha (the full 40-hex commit the re-run
+read), Writer (`executor` · `stand-in`) and Caused-by (the unit). After one blank line come its run
+lines, one per command, `run · <exit> · <hash> · <command>`: the exit an integer or `timeout`, the
+hash the first twelve hex digits of the SHA-256 of the command's combined output after the run-gates kit's `write_normaliser` program strips its roots and durations. A record with no
+run line, or with a line opening `run ·` outside that grammar, is malformed. It has no door: the
+lines are computed, never typed, by the loop kit's `loop_witness.py acceptance` until an executor
+writes it, and a hand-typed record reads malformed wherever it lacks them.
+
+**Transition records.** A build's stage move is a `transition` record named
+`<date>-build-<anchor id>-transition-<n>.md` in the build's `build/` folder, the anchor the lowest unit
+id a spec H1 under the build defines, `<n>` following the move order. Its fields are
+`- **<Key>:** <value>` bullets, one line each: Build, From and To (one state word each), Item (the exit
+item's tag) and Sha (eight to forty hex digits, the witness commit), all required, then any extension
+field the move carries, its name capitalised (`Stand-in`). It has no door: the loop kit's
+`loop_transition.py record` writes it from the move, beside the move's `Gov-Transition` trailer, and
+its `check` holds the record to that trailer field by field. A move made before the build's first spec
+writes no record; the next move after it back-fills one per earlier trailer.
+
+**Recommendation records.** A stage exit's review recommendation is a `recommendation` record named
+`<date>-build-<anchor id>-recommendation-<n>.md` in the build's `build/` folder, the anchor the lowest unit
+id of the build README's generated units region, `<n>` following the order written, so a stage scored
+twice keeps both. Its fields are `- **<Key>:** <value>` bullets, one line each: Stage, Source and Role (one
+word each), Score (`review` · `no-review` · `unarmed` · `none`), Binds (`yes` · `no`), Reason and
+Caused-by, all required, and exactly one of Signals and Answers. A SCORE record carries Signals, the
+signals that held or `none`, and Role `command`; a REASON record carries Answers, the stem of the score
+record it answers, and the answering role. Write it through the door, `build_records.py new
+recommendation --build <slug> --unit <id> --stage <stage> --score <score> --source <source> --binds
+yes|no --reason <text> --role <role> [--signals <text>] [--answers <stem>]`, which refuses a value outside
+those shapes and an Answers naming no recommendation record of the build. The unattended driver's
+`--recommend` calls it; the newest score record of a stage and the reason answering it are the pair
+that decides.
 
 ## Acceptance ledger — how a built unit evidences its criteria
 

@@ -7,6 +7,8 @@ status = "building"
 streams = ["tooling"]
 decisions = []
 
+stage = ["step.test"]
+
 [claims]
 gate-legs = ["playbook validity gate"]
 kits = []

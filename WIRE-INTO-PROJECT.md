@@ -745,6 +745,28 @@ or point `CHARTER` at the one you have, then re-run `--scaffold`.
 `check-wiring.sh` reports an install left unrendered as `UNWIRED  roles`, with `--scaffold` as the
 remedy, and names the doc and the `CHARTER` key first when that is the cause.
 
+<!-- govkit:entry loop -->
+## 3j — The loop kit (default)
+
+The loop definition, `<prefix>/loop/loop.toml`: the steps, items, transitions, phases and workflow
+orders a build moves through, and the commands that read it, among them the position engine
+`position.py`, the transition tables' `loop_table.py` and the parent route's `loop_parents.py`.
+`help/loop.md` is its page. It is in the default selection because the roles kit requires it: the
+roles kit's catalogue checker and its adopter read each workflow's order from this definition, so a
+selection holding `roles` and not `loop` is refused. `govkit apply` installs it, and `govkit update
+--write` installs it into a tree whose receipt predates it, printing `default-gained`.
+
+1. **What the install runs.** The kit renders nothing and seeds nothing, so its adopter has one verb:
+   `bash <prefix>/loop/adopt-loop.sh --check` runs `loop_lib.py --check` beside it through the
+   resolved python. It exits 0 where the definition reads, 1 where the reader refused it, naming the
+   row on its own line, and 2 on a wrong invocation or no python. `govkit apply` and
+   `govkit update --write` run it at install and update, and it is the kit's whole adoption.
+2. **Its legs.** The descriptor's `loop definition` and `loop transition tables` legs ship with it,
+   so your bar reads the definition and its tables on every run.
+3. **Without it.** The roles adopter's `--check` exits non-zero naming
+   `no loop kit places the workflows`, and the `/build` Skill cannot order its workflows. Put the kit
+   back with `govkit update --write`.
+
 <!-- govkit:entry branch-reconcile -->
 ## 3h — Adopt the branch-reconcile kit (optional)
 
@@ -1366,6 +1388,7 @@ it.
 ├── <prefix>/settings-merge.py   # the one writer of .claude/settings.json (default)
 ├── <prefix>/check-wiring.sh     # reports an unwired hook or an UNARMED ROUTED_PATHS (default)
 ├── <prefix>/roles/              # the role catalogue + its adopter; house/ overlays are yours (default)
+├── <prefix>/loop/               # the loop definition, its readers and its gates (default)
 ├── .claude/agents/<role>.md     # one rendered agent type per agent role (roles kit, §3g)
 ├── .claude/roles.json           # the role index the write gate and spawn guard arm on (roles kit)
 ├── .claude/skills/build/SKILL.md  # the rendered /build Skill (roles kit)

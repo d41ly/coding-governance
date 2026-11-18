@@ -22,8 +22,12 @@ reference; this page is the short version.
 3. **The handoff renderer joins them.** `handoff.py render` writes one prompt file under the build's
    `prompts/` folder, with `## Role` and then `## Task`, filled from the card, the build's brief and
    any `--input` values. A spec writer's task also carries the brief's `## The prompt`, the owner's
-   own words, as its `brief:prompt` block. A required input that is missing or still a placeholder
-   refuses by name. The prompt carries no charter text: the charter rides once, in the agent file.
+   own words, as its `brief:prompt` block. A role reading `upstream:rows?` is handed, beside any
+   `--input`, the rows file `--upstream` names: the commitments its upstream items established, which
+   the loop kit's `upstream.py rows` prints, then the line telling the agent to answer each row
+   `used`, `bypassed` or `not-applicable` in its return. Without `--upstream` the task names the key as
+   not supplied; for a role not reading it, `--upstream` is refused. A required input that is missing
+   or still a placeholder refuses by name. The prompt carries no charter text: the charter rides once, in the agent file.
 4. **The agent runs as a native type.** Each role is rendered into `.claude/agents/gov-<role>.md`,
    which starts without the full charter and at the reasoning effort the policy file sets. It
    carries the practices its role cites and the charter's Protocols and Facts sections, first.
@@ -61,14 +65,16 @@ render prints one `load-set — unarmed` note and proceeds.
 
 ## The practices at the work order's step
 
-Each workflow names the step its work serves, under `step` in `<prefix>/roles/workflows.toml`: `entry`,
-`plan`, `design`, `build`, `test`, `deploy`, `review`, or `none`. A work order carries what each active
+Each workflow has a reach word, the step its work orders load practices at: `entry`, `plan`, `design`,
+`build`, `test`, `deploy`, `review`, or `none`. It is the loop definition's, `<prefix>/loop/loop.toml`,
+and no key of the roles kit: the workflow's row there gives it as `reach` where it carries one, else as
+the last word of its `step` ([the loop definition](loop.md)). A work order carries what each active
 practice changes at its role's step: the handoff's task section ends with a `### Practices at <step>`
 block, one `- [<name>] <reach>` line per practice that reaches that step. A builder's reads, for example,
 `- [yagni] delete rather than disable`. The charter keeps one line per practice and carries no reach.
 
 The active practices are the policy key `charter.practices`, the foundation set when unset. A step of
-`none`, a step no active practice reaches, or an install with no playbook kit renders no block.
+`none`, a step no active practice reaches, or an install with no playbook kit or no loop kit renders no block.
 `python <prefix>/playbook/load_sets.py derive --reader role.<name>` lists the units as <!-- usage: script:tools/playbook/load_sets.py#derive c95f3b73 -->
 `practice.<name>.<step>`.
 
@@ -89,7 +95,8 @@ refuses the render, naming the key.
 ## How to use it
 
 - **Run an attended build:** after kickoff's READY card and the owner's go, invoke `/build`. It walks
-  the workflows in stage order and calls the same harnesses `/unattended` uses.
+  the workflows in the order the loop definition gives them, each workflow's `order` in
+  `<prefix>/loop/loop.toml`, and calls the same harnesses `/unattended` uses.
 - **Check a spec before it is committed:** a spec writer runs
   `unattended.sh --check-specs <slug> <unit>` before returning, and the spec commit refuses on it. <!-- usage: verb:unattended.sh:--check-specs 131e24bd -->
   It prints each refusal `--dispatch` would make from the spec files, in its words, so a defect is
@@ -101,7 +108,7 @@ refuses the render, naming the key.
   python tools/roles/handoff.py render --role gov-builder --build <slug> --unit <unit-id> --part task
   ```
 
-  Pass that output, unchanged, as the prompt of an `Agent` call whose `subagent_type` is <!-- usage: script:tools/roles/handoff.py#render 57cac9a7 -->
+  Pass that output, unchanged, as the prompt of an `Agent` call whose `subagent_type` is <!-- usage: script:tools/roles/handoff.py#render 1e3b1deb -->
   `gov-builder`. An edited prompt is refused. Pass the name it prints on stderr after
   `handoff: description — ` as the call's `description`; any other name is refused.
   That `Agent` call also carries `effort`: the role's value in the JSON

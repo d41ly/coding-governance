@@ -10,6 +10,8 @@ decisions = ["TOOL-dLoggedFlight-1", "TOOL-dLoggedFlight-2", "TOOL-dLoggedFlight
   "TOOL-dLoggedFlight-10", "TOOL-dLoggedFlight-12", "TOOL-dLoggedFlight-14", "TOOL-dLoggedFlight-16",
   "TOOL-dLoggedFlight-21", "TOOL-dLoggedFlight-24"]
 
+stage = ["step.test"]
+
 [claims]
 gate-legs = ["runlog selftest", "pre-push run-log line", "runlog record schema",
   "runlog skill wiring"]

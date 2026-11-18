@@ -188,6 +188,9 @@ function chunk(a, n) {
 //                                                   //   preflighted before SPEC_FOLD_CUTOFF: today's prompt,
 //                                                   //   today's row and no `dispositions`. Not audit-shaped:
 //                                                   //   with the audit off the stage never reads it
+//   specTarget: "blockers" | "highs" | "all",       // optional: the `spec-target=` word `review_bounds.py show`
+//                                                   //   prints, which this runtime cannot read. ABSENT reads
+//                                                   //   `blockers`, today's prompts but for the round flags
 //   briefDir: "memory/builds/<slug>/prompts",
 //   reviewDir: "memory/builds/<slug>/reviews",
 //   round: <integer>,                               // which audit round this invocation is
@@ -241,6 +244,13 @@ function chunk(a, n) {
 //   unclassed: "<review.unclassed value>",          //   way, unchecked, each of the four: the review
 //   fixJudge: "<the review harness's fixJudge>",    //   harness's boundary refuses what it does not take.
 //   walk: { "runs": 2, "run": 1, "seed": "<seed>" } //   `review_pin.py` prints all but fixJudge. Absent, no key is sent
+//   trigger: "owed" | "opt-in" | "recommendation" | "placement", // optional (TOOL-dDeclaredLoop-20): the cause
+//                                                   //   `--trigger` printed, forwarded to the audit's review call
+//                                                   //   as `unclassed` is, unchecked here. Absent, no key is sent
+//   reviewPolicy: { findings, unverified, leftShift, blocks } // optional (TOOL-dDeclaredLoop-20): the object
+//                                                   //   `--trigger` prints, each key refused by name outside
+//                                                   //   its set. ABSENT reads the four defaults, `blocks` `yes`,
+//                                                   //   and logs that it did
 // }
 // TOOL-aEvidencedLens-5 - the two fold args are REFUSED at a callee round of 1 (a fresh generation has
 // no previous round) and refused by name when malformed, before any agent spawns.
@@ -250,7 +260,7 @@ function chunk(a, n) {
 // was terminal after its one round, `verb_review` refused a second, and the promoted spec was built
 // unaudited. The key is `<slug>-spec-set-r<N>` where N is the round the generation was FIRST audited
 // at — `subjectRound` when the caller carries it, this invocation's round otherwise. Keying on the
-// invocation round ALONE would reset the driver's sequence on every fold under `REVIEW_ROUNDS` > 1,
+// invocation round ALONE would reset the driver's sequence on every fold under a spec bound above 1,
 // so BOUNDED and NON-CONVERGENT could never fire and the loop had no end; the CONVERGING return
 // carries `subjectRound` back so the caller copies it rather than derives it.
 //
@@ -343,7 +353,7 @@ if (!units.length) {
 // PRESENT-BUT-WRONG-TYPED REFUSES BY NAME (closing review round 2, cluster G), like `mode`, `scratch`
 // and `units` below. These three used to fold to their defaults: a string `subjectRound` — the `"2"` an
 // agent copying a log line produces — became the invocation round, which keys a FRESH subject on every
-// fold and resets the driver's sequence, so under `REVIEW_ROUNDS` > 1 BOUNDED and NON-CONVERGENT could
+// fold and resets the driver's sequence, so under a spec bound above 1 BOUNDED and NON-CONVERGENT could
 // never fire; a string `auditIds` became the whole set, re-auditing the subject a terminal round closed.
 // `specAudit` joins the table (TOOL-aBlindedTrial-3): a truthy non-string — `true`, `1`, the
 // `"later"` a README typo produces — must refuse rather than switch the audit ON, and a string that is
@@ -355,6 +365,7 @@ const TYPED = [
   ['auditIds', Array.isArray(a.auditIds), 'an array of unit ids'],
   ['specAudit', typeof a.specAudit === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(a.specAudit), 'a YYYY-MM-DD date string'],
   ['disposal', a.disposal === 'by-nature' || a.disposal === 'promote-all', 'one of by-nature, promote-all'],
+  ['specTarget', ['blockers', 'highs', 'all'].indexOf(a.specTarget) !== -1, 'one of blockers, highs, all'],
 ]
 for (const t of TYPED) {
   if (a[t[0]] !== undefined && !t[1]) {
@@ -392,7 +403,33 @@ const auditIds = a.auditIds === undefined ? [] : a.auditIds
 // no new mechanism. `promote-all` keeps today's rule and refuses a fold, and both declared values write
 // the counted row and return `dispositions`.
 const disposalDeclared = a.disposal !== undefined
+// TOOL-dDeclaredLoop-32 S7 - THE SPEC TARGET, the count a spec subject's loop converges at when it reads zero:
+// `blockers`, `highs` (plus the round's highs) or `all` (every confirmed finding). Absent reads `blockers`.
+const specTarget = a.specTarget === undefined ? 'blockers' : a.specTarget
 const byNature = a.disposal === 'by-nature'
+// TOOL-dDeclaredLoop-20 S4 S5 S6 S7 - THE REVIEW POLICY, the object the driver's `--trigger` prints: `findings`, the
+// promotion count `deriveUnitBounds` reads; `unverified`, an unverified finding's route at the DISPOSAL stage;
+// `leftShift`, which class earns a gate; and `blocks`, `review.blocks` folded with the trigger's cause, whether the
+// roster waits for the review. Each key is refused by name outside its set; absent, the four defaults are read and
+// the run logs that it did.
+const REVIEW_POLICY = {
+  findings: ['blocker-high-own', 'all-own', 'blocker-own'],
+  unverified: ['ask', 'block', 'record'],
+  leftShift: ['second-occurrence', 'every-class', 'owner-selects'],
+  blocks: ['yes', 'no'],
+}
+const reviewPolicy = a.reviewPolicy !== undefined ? a.reviewPolicy
+  : { findings: 'blocker-high-own', unverified: 'ask', leftShift: 'second-occurrence', blocks: 'yes' }
+if (!reviewPolicy || typeof reviewPolicy !== 'object' || Array.isArray(reviewPolicy)) {
+  throw new Error('unattended-build: `reviewPolicy` must be the object `--trigger` prints, {findings, unverified, ' +
+    'leftShift, blocks}. Got ' + JSON.stringify(a.reviewPolicy) + '.')
+}
+for (const k of Object.keys(REVIEW_POLICY)) {
+  if (REVIEW_POLICY[k].indexOf(reviewPolicy[k]) === -1) {
+    throw new Error('unattended-build: `reviewPolicy.' + k + '` must be one of ' + REVIEW_POLICY[k].join(' | ') +
+      '. Got ' + JSON.stringify(reviewPolicy[k]) + '. Copy the object `--trigger` printed rather than composing one.')
+  }
+}
 // THE AUDIT IS OPT-IN, and absent means OFF (TOOL-aBlindedTrial-3, F1 resolved). Every audit-shaped
 // argument beside no declaration is an IMPOSSIBLE PAIRING, refused by name like the others below: a
 // caller-pinned subject set, a post-disposal scope and a fold re-invoke each presuppose a round that,
@@ -523,6 +560,10 @@ for (const k of Object.keys(roles)) {
 // the tool titles the run with `meta.name` alone, so this is where the owner reads what it is doing.
 const identity = renderAgentLabel(mode + ' round ' + roundNo, specAudit ? 'spec, audit, disposal, hand-out' : 'spec, hand-out')
 log(identity)
+if (a.reviewPolicy === undefined) {
+  log('reviewPolicy: absent, so the four defaults are read — findings blocker-high-own, unverified ask, ' +
+    'leftShift second-occurrence, blocks yes')
+}
 // S4 - one line per stage key, typed, forwarded or untyped, so a fallback is never a silent one.
 for (const k of ROLE_KEYS) {
   const reviewKey = k === 'specFinder' || k === 'skeptic' || k === 'synthesis'
@@ -899,6 +940,21 @@ const SPEC_COMMIT_SCHEMA = {
 // this list does not hold. It sits out of `required` for `dispositions`' reason, and only `by-nature`
 // asks for it. It binds what the stage SAYS as well: whether a sibling was edited is read from the tree.
 //
+// TOOL-dDeclaredLoop-20 S4 - THE UNIT BOUNDS BY `review.findings`, pure, so a `node` slice evaluates it alone.
+// Over the stage's counts: `blockers` and `highs` (by nature, the new-mechanism ones), `minors` (the confirmed minors
+// plus `adjudicated`, by nature the new-mechanism ones), `confirmedMinors`, `adjudicated` and `byNature`. Under the
+// default the two expressions are today's; under `all-own` every counted finding is its own unit, both ways; under
+// `blocker-own` one unit per blocker plus one batch for the highs and minors, its ceiling two for the batch plus the
+// adjudicated findings by severity.
+function deriveUnitBounds(findings, c) {
+  if (findings === 'all-own') return { floor: c.blockers + c.highs + c.minors, ceiling: c.blockers + c.highs + c.minors }
+  if (findings === 'blocker-own') {
+    return { floor: c.blockers + (c.highs + c.minors > 0 ? 1 : 0),
+      ceiling: c.blockers + (c.highs + c.minors > 0 ? 2 : 0) + (c.byNature ? 0 : c.adjudicated) }
+  }
+  return { floor: c.blockers + c.highs + (c.minors > 0 ? 1 : 0),
+    ceiling: c.blockers + c.highs + (c.byNature ? (c.minors > 0 ? 2 : 0) : c.adjudicated + (c.confirmedMinors > 0 ? 2 : 0)) }
+}
 // TOOL-dFoldedAudit-15 S17 - ONE SPELLING EACH, read by this schema and by `deriveDispositionFault`.
 const SEVERITIES = ['BLOCKER', 'HIGH', 'MEDIUM', 'LOW']
 const NATURES = ['local', 'new-mechanism']
@@ -912,6 +968,7 @@ const DISPOSAL_SCHEMA = {
     promoted: { type: 'integer', minimum: 0 },
     folded: { type: 'integer', minimum: 0 },
     refuted: { type: 'integer', minimum: 0 },
+    routed: { type: 'integer', minimum: 0 },
     promotedIds: { type: 'array', items: { type: 'string' } },
     edges: {
       type: 'array',
@@ -1778,6 +1835,9 @@ const auRaw = !specAudit ? null : await workflow(
     // never runs the audit at the callee's default.
     ...(a.twin !== undefined ? { twin: a.twin } : {}),
     ...(a.unclassed !== undefined ? { unclassed: a.unclassed } : {}),
+    // TOOL-dDeclaredLoop-20 S3 - the trigger's cause, forwarded the same way: the callee records it as the
+    // review-shape line's `trigger=` and refuses a value outside its set.
+    ...(a.trigger !== undefined ? { trigger: a.trigger } : {}),
     ...(a.fixJudge !== undefined ? { fixJudge: a.fixJudge } : {}),
     ...(a.walk !== undefined ? { walk: a.walk } : {}),
   },
@@ -1998,21 +2058,28 @@ const auUnverified = !specAudit ? null : cleanRound ? 0 : auRaw.unverified
 // <p>`, a third argument because `folded` and `promoted` are in their temporal dead zone when `verdict`
 // first calls this. A non-empty one carries the `--highs` and `--minors` counts at any blocker count,
 // and at a positive count it spawns as `record-exit`, so a trace tells the two spawns apart.
+//
+// TOOL-dDeclaredLoop-32 S7 - EVERY ROUND CARRIES ITS OWN HIGHS AND MINORS, ` --round-highs <h> --round-minors <m>`
+// after `--review <slug>`, `m` the round's confirmed minors, so the driver counts blockers plus highs and
+// reads the spec target. Every prediction from a zero count reads `auTarget`, the target count of
+// `specTarget`'s word; the `--verdict` word and attended mode's token keep the blocker count.
 async function writeRound(disposition, adjudicated, tally) {
   const minorsCount = au.confirmed - au.blockers - au.highs + (adjudicated || 0)
   const counts = ' --highs ' + au.highs + ' --minors ' + minorsCount
+  const roundMinors = au.confirmed - au.blockers - au.highs
   const rv = attended
     ? { token: au.blockers === 0 ? 'CONVERGED' : 'CONVERGING', exitCode: 0 }
     : await agent(
     GROUND +
       'Record AUDIT round ' + roundNo + ' with the driver and return its convergence token.\n\n' +
-      'Run exactly:\n  ' + DRIVER + ' --review ' + slug + ' --subject ' + subject +
+      'Run exactly:\n  ' + DRIVER + ' --review ' + slug + ' --round-highs ' + au.highs + ' --round-minors ' + roundMinors +
+      ' --subject ' + subject +
       ' --verdict ' + (au.blockers > 0 ? '"BLOCKED"' : '"CLEAN"') +
-      ' --blockers ' + au.blockers + (au.blockers === 0 || tally ? counts : '') + (tally || '') + disposition + '\n\n' +
+      ' --blockers ' + au.blockers + (auTarget === 0 || tally ? counts : '') + (tally || '') + disposition + '\n\n' +
       'Return the CONVERGENCE token it prints — one of CONVERGING, CONVERGED, NON-CONVERGENT, ' +
       'CEILING, BOUNDED — verbatim, and the command\'s exit code. Do not infer the token from the ' +
       'blocker count: it is a property of the SEQUENCE of rounds, which only the driver can see. ' +
-      (au.blockers === 0 || tally
+      (auTarget === 0 || tally
         ? ''
         : disposalDeclared
           ? 'If the command REFUSES naming --disposition, --highs or --minors, this round is a terminal ' +
@@ -2024,7 +2091,7 @@ async function writeRound(disposition, adjudicated, tally) {
       'If the command REFUSES saying the subject already carries a terminal review ' +
       'round, return terminalSubject: true with its stderr and no token — do not retry under another ' +
       'subject. If the command fails for any other reason, return its stderr rather than a token.',
-    { label: renderAgentLabel('audit round ' + roundNo, au.blockers > 0 && tally ? 'record-exit' : 'record'), phase: 'Audit', schema: REVIEW_RECORD_SCHEMA },
+    { label: renderAgentLabel('audit round ' + roundNo, auTarget > 0 && tally ? 'record-exit' : 'record'), phase: 'Audit', schema: REVIEW_RECORD_SCHEMA },
   )
   if (attended) log('attended mode: verdict computed from the blocker count; no round was recorded')
   // THE TERMINAL-SUBJECT REFUSAL IS ITS OWN THROW. It used to surface as "the round was not
@@ -2043,7 +2110,7 @@ async function writeRound(disposition, adjudicated, tally) {
   // THE HELD EXIT. Only a first call at a positive count under a declared value can hold one, because
   // the row is unwritten there; a held exit on a `tally` call would read as recorded. A state word
   // outside the three throws by name: a reworded driver sentence that drops `exits` lands here.
-  if (disposalDeclared && !tally && au.blockers > 0 && rv && rv.terminalExit === true) {
+  if (disposalDeclared && !tally && auTarget > 0 && rv && rv.terminalExit === true) {
     const HELD_EXITS = ['NON-CONVERGENT', 'CEILING', 'BOUNDED']
     if (HELD_EXITS.indexOf(rv.exitState) === -1) {
       throw new Error(
@@ -2082,10 +2149,12 @@ async function writeRound(disposition, adjudicated, tally) {
   // count is a token no driver printed. The second direction is what makes the ordering above hold:
   // a CONVERGED exit is never reached on the record-first path, so a disposition it owed is never
   // left off the row.
-  if ((rv.token === 'CONVERGED') !== (au.blockers === 0)) {
+  if ((rv.token === 'CONVERGED') !== (auTarget === 0)) {
     throw new Error(
-      'unattended-build: the AUDIT stage returned ' + rv.token + ' paired with ' + au.blockers +
-        ' blockers at round ' + roundNo + '. Those two cannot both be true — the driver converges at 0 ' +
+      'unattended-build: the AUDIT stage returned ' + rv.token + ' paired with ' +
+        (specTarget === 'blockers' || attended ? au.blockers + ' blockers'
+          : 'a target count of ' + auTarget + ' under specTarget ' + specTarget) +
+        ' at round ' + roundNo + '. Those two cannot both be true — the driver converges at 0 ' +
         'and only at 0 — and this pairing is this repo\'s signature for a record no verb produced. ' +
         'REFUSING rather than emitting it.',
     )
@@ -2093,21 +2162,25 @@ async function writeRound(disposition, adjudicated, tally) {
   return rv.token
 }
 const au = { blockers: auBlockers, confirmed: auConfirmed, highs: auHighs, unverified: auUnverified, reportPath: lastReport }
+// THE TARGET COUNT (TOOL-dDeclaredLoop-32 S7), the driver's map of the word over this round's counts. Attended
+// mode reaches no driver and keeps the blocker count.
+const auTarget = attended || specTarget === 'blockers' ? au.blockers
+  : specTarget === 'highs' ? au.blockers + au.highs : au.confirmed
 // OUTSTANDING is the callee's word and covers two populations (see the DISPOSAL stage). It decides
 // the ORDER here: zero blockers with something to dispose records AFTER the disposal; every other
 // shape records first, because at a positive count only the driver knows whether the loop ended.
 const outstanding = specAudit ? au.confirmed + au.unverified : 0
-const disposeFirst = au.blockers === 0 && outstanding > 0
+const disposeFirst = auTarget === 0 && outstanding > 0
 // `NOT-OWED` IS THE OFF PATH'S VERDICT, and it is deliberately NOT in `REVIEW_TOKENS`: the driver
 // never prints it, because no round was recorded for it to grade. It is a harness word for "no audit
 // was declared", distinct from every terminal token so nothing downstream can read it as CONVERGED.
 // A DECLARED ROUND WITH NOTHING TO DISPOSE (TOOL-dFoldedAudit-3 S7) records its zero counts here, since
 // no stage will; at a positive count the first call stays bare, because a CONVERGING row carries none.
 const verdict = !specAudit ? 'NOT-OWED' : disposeFirst ? 'CONVERGED'
-  : await writeRound('', 0, disposalDeclared && au.blockers === 0 ? ' --folded 0 --promoted 0' : '')
+  : await writeRound('', 0, disposalDeclared && auTarget === 0 ? ' --folded 0 --promoted 0' : '')
 // WHETHER THE RECORD WAITS FOR THE STAGE. A held exit joins `disposeFirst` here. Attended mode never
 // reaches the second half, because `writeRound` answers CONVERGING at any positive count there.
-const recordAfter = disposeFirst || (disposalDeclared && au.blockers > 0 && verdict !== 'CONVERGING')
+const recordAfter = disposeFirst || (disposalDeclared && auTarget > 0 && verdict !== 'CONVERGING')
 log(!specAudit
   ? 'audit round ' + roundNo + ': NOT-OWED — off by declaration, so no round was recorded and no count exists'
   : 'audit round ' + roundNo + ': ' + verdict + ' · blockers ' + au.blockers + ' · unverified ' + au.unverified +
@@ -2127,7 +2200,15 @@ const audit = { ran: specAudit, verdict: verdict, blockers: au.blockers, highs: 
 // than a claim asserted here and runs on the confirmed count rather than on the verdict. An earlier
 // revision of this comment claimed the promotion happened and no line of the program did it.
 if (verdict === 'CONVERGING') {
-  log('audit is still CONVERGING — no roster this invocation; fold, then re-invoke at round ' + (roundNo + 1))
+  // TOOL-dDeclaredLoop-20 S7 - UNDER `reviewPolicy.blocks` `no` THE ROSTER RIDES THIS RETURN, the one the terminal
+  // hand-out renders over the units the spec stage committed, and the review runs alongside; the fold is still ordered.
+  const alongside = reviewPolicy.blocks === 'no'
+  if (alongside) {
+    log('audit is still CONVERGING, and under reviewPolicy.blocks no the review runs alongside — the roster is handed ' +
+      'out; fold, then re-invoke at round ' + (roundNo + 1))
+  } else {
+    log('audit is still CONVERGING — no roster this invocation; fold, then re-invoke at round ' + (roundNo + 1))
+  }
   // TOOL-aEvidencedLens-5 S7 - the fold inputs travel back for the caller to copy, as `subjectRound`
   // does. A callee return with no `confirmedFindings` array OMITS `priorFindings` rather than carrying
   // `[]`, so the next invoke is announced as lacking it instead of handed an empty set.
@@ -2162,7 +2243,9 @@ if (verdict === 'CONVERGING') {
     // condition. This return carried no such key at all, while the Skill bullet told the run that an
     // empty roster is the refusal — a caller reading `roster.length` read a property of `undefined`
     // and threw. `built` and `unbuilt` left with the stage that produced them.
-    roster: [],
+    roster: alongside
+      ? ordered.map(function (u) { return { id: u.id, order: u.order, specPath: u.specPath || '', briefPath: u.briefPath || '' } })
+      : [],
     nextAction:
       'FOLD the confirmed findings in ' + lastReport + ' as rev-N bumps with their section 9 lines, ' +
       'then re-invoke this harness with round: ' + (roundNo + 1) + ', subjectRound: ' + subjectRound +
@@ -2170,8 +2253,13 @@ if (verdict === 'CONVERGING') {
       ', and copy this return\'s prevSubjects' + (handPrior ? ' and priorFindings' : '') + ' as those args. Do not build. ' +
       // TOOL-aEvidencedLens-8 S7 - the boundary, stated where the fold is ordered.
       'This in-loop fold is the review loop\'s own fix step and not the exit\'s disposition: only a ' +
-      'terminal exit disposes, and it ' + (byNature ? 'disposes by nature.' : 'PROMOTES whatever stands.'),
-    note: 'HELD AT AUDIT — the review loop has not ended, so no unit was built' +
+      'terminal exit disposes, and it ' + (byNature ? 'disposes by nature.' : 'PROMOTES whatever stands.') +
+      // TOOL-dDeclaredLoop-20 S8 - the fold is the item `item.review.fold`, and a spec subject takes `no-fall`, so
+      // its loop ends at its target or its bound and its terminal states are these two.
+      ' The fold is `item.review.fold`; this spec subject ends at its target or its bound, BOUNDED or CEILING.' +
+      (alongside ? ' The review runs alongside: dispatch the roster below while the fold and its rounds go on.' : ''),
+    note: (alongside ? 'CONVERGING ALONGSIDE — the review loop has not ended, and under reviewPolicy.blocks no the roster is handed out'
+      : 'HELD AT AUDIT — the review loop has not ended, so no unit was built') +
       (attended ? ' · ATTENDED, so no driver-side check ran' : ''),
   }
 }
@@ -2470,7 +2558,7 @@ const auditedIds = !specAudit ? [] : auditUnits
 // fourth, a stated `[]` on a skip and on the absent path, where the stage's list is not read.
 // `siblingEdits` is the fifth, a stated `[]` wherever the stage's list is not read, which is everywhere
 // but `by-nature` (TOOL-dFoldedAudit-4 S2).
-let stood = [], promoted = 0, folded = 0, refuted = 0, promotedIds = [], dispositions = [], siblingEdits = []
+let stood = [], promoted = 0, folded = 0, refuted = 0, routed = 0, promotedIds = [], dispositions = [], siblingEdits = []
 // TWO SKIPS, TWO REASONS, said apart: "confirmed no finding" is a fact about a round that ran, and
 // saying it over a round that did not would be the audit-that-never-ran reading as a clean one.
 if (!specAudit) {
@@ -2490,6 +2578,37 @@ if (!specAudit) {
   // was unreachable in that mode and the contradiction was never live.
   // TOOL-aOrientedCast-4 S2/S3 - typed by `roles.disposal`, which leaves out the edge join's rationale the
   // role carries; the rule itself and the `edges` contract stay in every case.
+  // TOOL-dDeclaredLoop-20 S4 S5 S6 - the sentences `reviewPolicy` decides: which severities own a unit, the batch,
+  // an UNVERIFIED finding's route, and the left-shift count over the report's classes.
+  const ownWord = reviewPolicy.findings === 'all-own' ? 'BLOCKER, HIGH, MEDIUM or LOW'
+    : reviewPolicy.findings === 'blocker-own' ? 'BLOCKER' : 'BLOCKER or HIGH'
+  const batchSentence = reviewPolicy.findings === 'all-own'
+    ? (byNature ? 'PROMOTE every NEW MECHANISM MEDIUM and LOW too, ' : 'PROMOTE every MEDIUM and every LOW too, ') +
+      'each into a unit of its own (`review.findings all-own`), never batched: each unit\'s spec names its finding by ' +
+      'report id in its §1. Add each such unit by the same '
+    : (reviewPolicy.findings === 'blocker-own'
+      ? (byNature ? 'PROMOTE every NEW MECHANISM HIGH, MEDIUM and LOW too, BATCHED (`review.findings blocker-own`): '
+        : 'PROMOTE every HIGH, MEDIUM and LOW too, BATCHED (`review.findings blocker-own`): ')
+      : (byNature ? 'PROMOTE every NEW MECHANISM MEDIUM and LOW too, BATCHED: ' : 'PROMOTE every MEDIUM and every LOW too, BATCHED: ')) +
+      'all of them go into ONE unit whose spec ' +
+      'names every finding by report id in its §1 and gives each its own §2 item. Use TWO units ' +
+      'only when the minors split into two disjoint write sets by BUILD-METHOD M6\'s clauses, so ' +
+      'the halves build concurrently — never one unit per minor. Add each batch unit by the same '
+  const unverifiedSentence = reviewPolicy.unverified === 'block'
+    ? 'read the code yourself and take it at the severity you adjudicate. '
+    : 'read the code yourself and refute it where you find no defect; ' +
+      (reviewPolicy.unverified === 'ask'
+        ? 'FILE each one you do not refute as an ask in `memory/builds/' + slug + '/BACKLOG.md`, one `- <ID> · filed ' +
+          '<date> · <text>` line naming `' + reportStem + '` and the finding\'s evidence, '
+        : 'LIST each one you do not refute in `summary` and file nothing, ') +
+      'and never promote or fold it (`review.unverified ' + reviewPolicy.unverified + '`). Return their count as ' +
+      '`routed`, each id counted once across `promoted`, `folded`, `refuted`, `routed` and `standing`. '
+  const leftShiftSentence = 'RUN `python tools/workflows/review_dispose.py classes --builds memory/builds --record ' +
+    lastReport + ' --left-shift ' + reviewPolicy.leftShift + '`, which counts the report\'s `class:` dispositions ' +
+    'against every prior review record (`review.left-shift ' + reviewPolicy.leftShift + '`), and FILE each ' +
+    '`review-dispose: gate` line it prints as an ask in `memory/builds/' + slug + '/BACKLOG.md` naming the slug, the ' +
+    'records and `item.review.dispose`' + (reviewPolicy.leftShift === 'owner-selects' ? ', each an owner item' : '') +
+    '; it exits 2 only where it cannot read this report, which you name in `summary`. '
   const d = await agent(
     GROUND +
       (roles.disposal ? ROLE_STAMP[0] + roles.disposal + ROLE_STAMP[1] : '') +
@@ -2499,11 +2618,11 @@ if (!specAudit) {
       ' unverified. Open the report and take each confirmed finding at the severity the report ' +
       'gives it. Every count above is of RAW findings by report id and never of the items a report ' +
       'may merge them into, so a finding merged into an item takes that item\'s severity and still ' +
-      'counts once, by its own id. Each ' + (byNature ? 'NEW MECHANISM ' : '') + 'BLOCKER or HIGH id is its own unit even where the report merged ' +
+      'counts once, by its own id. Each ' + (byNature ? 'NEW MECHANISM ' : '') + ownWord + ' id is its own unit even where the report merged ' +
       'several ids into one item, because the unit floor, the driver\'s owed count and check 2 all count ' +
       'raw ids: ids sharing an item each take a unit, and each unit\'s spec names its id and the item it ' +
       'shares. An UNVERIFIED finding came back with no usable skeptic verdict and is OUTSTANDING, ' +
-      'not cleared — read the code yourself and take it at the severity you adjudicate. ' +
+      'not cleared — ' + unverifiedSentence +
       (byNature
         ? 'BUILD-METHOD M4 disposes a spec audit BY NATURE, independent of severity. A finding NEEDS A NEW ' +
           'MECHANISM when its fix adds a document, gate, adopter, generated artifact, verb or write path that ' +
@@ -2512,7 +2631,7 @@ if (!specAudit) {
           'the spec or specs it touches: bump each spec\'s rev and add a section 9 line naming `' + reportStem +
           '` and the finding id. PROMOTE every NEW MECHANISM finding: '
         : 'BUILD-METHOD M4 disposes BY SEVERITY and admits no third ' +
-          'route. PROMOTE every BLOCKER and every HIGH: ') +
+          'route. ' + (reviewPolicy.findings === 'blocker-own' ? 'PROMOTE every BLOCKER: ' : 'PROMOTE every BLOCKER and every HIGH: ')) +
       (attended
         ? 'add its row to the build README\'s authored Units table, because the recording verbs are ' +
           'unavailable with no run-state file, '
@@ -2528,11 +2647,7 @@ if (!specAudit) {
       'IS RENUMBERED. A promotion that repairs no unit in particular takes an order ABOVE EVERY ' +
       'unit in this build — the honest append-past-the-end default, and the only case in which a ' +
       'promotion may land there. Never guess a position for one. ' +
-      (byNature ? 'PROMOTE every NEW MECHANISM MEDIUM and LOW too, BATCHED: ' : 'PROMOTE every MEDIUM and every LOW too, BATCHED: ') +
-      'all of them go into ONE unit whose spec ' +
-      'names every finding by report id in its §1 and gives each its own §2 item. Use TWO units ' +
-      'only when the minors split into two disjoint write sets by BUILD-METHOD M6\'s clauses, so ' +
-      'the halves build concurrently — never one unit per minor. Add each batch unit by the same ' +
+      batchSentence +
       (attended ? 'README roster row' : '`--rescope --act add`') + ' a promoted blocker takes, its ' +
       'reason naming every report id it closes. A finding is not an ask, so it is named in scope ' +
       'and never through the `closes` verb, which joins a spec to a `BACKLOG.md` ask. In ' +
@@ -2547,6 +2662,7 @@ if (!specAudit) {
           'edited in `siblingEdits` as {unit, rev}, and `siblingEdits: []` when you edited none. Every section 9 ' +
           'line this stage writes names `' + reportStem + '`. '
         : 'Nothing is folded: return `folded` as 0. ') +
+      leftShiftSentence +
       'EVERY §3 EDGE YOU WRITE GETS BOTH OF ITS ENDS, in the same pass: a **consumes-from** `X` in ' +
       'one spec is a **hands-off** back in X\'s own §3, amended there as a rev-N bump with its ' +
       'section 9 line. ' +
@@ -2623,6 +2739,8 @@ if (!specAudit) {
   promoted = counted ? d.promoted : null
   folded = counted ? d.folded : null
   refuted = d && d.refuted !== undefined ? d.refuted : 0
+  // TOOL-dDeclaredLoop-20 S5 - `routed`, the UNVERIFIED findings `ask` or `record` took, optional and read as 0.
+  routed = d && d.routed !== undefined ? d.routed : 0
   promotedIds = Array.isArray(d && d.promotedIds) ? d.promotedIds : []
   dispositions = disposalDeclared && d && Array.isArray(d.dispositions) ? d.dispositions : []
   siblingEdits = byNature && d && Array.isArray(d.siblingEdits) ? d.siblingEdits : []
@@ -2689,10 +2807,20 @@ if (!specAudit) {
   const boundBlockers = byNature ? mechanism.filter(function (e) { return e.severity === 'BLOCKER' }).length : au.blockers
   const boundHighs = byNature ? mechanism.filter(function (e) { return e.severity === 'HIGH' }).length : au.highs
   const minors = byNature ? mechanism.length - boundBlockers - boundHighs : confirmedMinors + adjudicated
-  const unitFloor = boundBlockers + boundHighs + (minors > 0 ? 1 : 0)
-  const unitCeiling = boundBlockers + boundHighs +
-    (byNature ? (minors > 0 ? 2 : 0) : adjudicated + (confirmedMinors > 0 ? 2 : 0))
-  const refutedOk = Number.isInteger(refuted) && refuted >= 0 && refuted <= au.unverified
+  const unitBounds = deriveUnitBounds(reviewPolicy.findings, { blockers: boundBlockers, highs: boundHighs, minors: minors,
+    confirmedMinors: confirmedMinors, adjudicated: adjudicated, byNature: byNature })
+  const unitFloor = unitBounds.floor
+  const unitCeiling = unitBounds.ceiling
+  // TOOL-dDeclaredLoop-20 S5 - `refuted + routed` is bounded by the unverified count; under `ask` or `record` no
+  // unverified finding is promoted, so a positive `adjudicated` is refused by name, and under `block` none is routed.
+  const refutedOk = Number.isInteger(refuted) && refuted >= 0 && Number.isInteger(routed) && routed >= 0 &&
+    refuted + routed <= au.unverified
+  const unverifiedFault = reviewPolicy.unverified === 'block'
+    ? (routed !== 0 ? 'routed ' + routed + ' under review.unverified block, which adjudicates every unverified finding and routes none' : '')
+    : (adjudicated > 0 ? 'promoted ' + d.promoted + ' is above the ' + au.confirmed + ' confirmed, so ' + adjudicated +
+      ' unverified finding(s) were promoted, and review.unverified ' + reviewPolicy.unverified + ' ' +
+      (reviewPolicy.unverified === 'ask' ? 'files' : 'lists') + ' an unverified finding as ' +
+      (reviewPolicy.unverified === 'ask' ? 'an ask' : 'a summary line') + ' and never promotes it' : '')
   const dispositionFault = disposalDeclared && d && counted ? deriveDispositionFault(d, promotedIds) : ''
   // TWO ARMS BELOW ARE UNREACHABLE TODAY, kept on purpose and said so (guard-above-a-fold class).
   // `d.promoted < au.confirmed` is settled by the sum, `folded` 0 and `refuted <= unverified`, which
@@ -2703,7 +2831,7 @@ if (!specAudit) {
   // `by-nature`: the first does not apply there, and the second is the same arithmetic over the entries,
   // because `deriveDispositionFault` makes `promoted` the count of distinct new-mechanism ids.
   if (!d || d.disposed !== true || stood.length || !counted || !refutedOk ||
-      d.promoted + d.folded + refuted + stood.length !== outstanding ||
+      d.promoted + d.folded + refuted + routed + stood.length !== outstanding || unverifiedFault ||
       (!byNature && (d.folded !== 0 || d.promoted < au.confirmed)) || dispositionFault ||
       promotedIds.length < unitFloor || promotedIds.length > unitCeiling ||
       (d.promoted > 0) !== (promotedIds.length > 0) ||
@@ -2713,12 +2841,15 @@ if (!specAudit) {
       : !counted ? 'the stage returned no integer promoted/folded counts'
       : d.disposed !== true ? 'the stage answered disposed:false with nothing standing'
       : !refutedOk
-        ? 'refuted ' + JSON.stringify(refuted) + ' is above the ' + au.unverified + ' unverified — a ' +
+        ? 'refuted ' + JSON.stringify(refuted) + (routed ? ' + routed ' + JSON.stringify(routed) : '') + ' is above the ' +
+          au.unverified + ' unverified — a ' +
           'refutation covers the UNVERIFIED population only, and a CONFIRMED finding is never re-reviewed'
-      : d.promoted + d.folded + refuted + stood.length !== outstanding
+      : d.promoted + d.folded + refuted + routed + stood.length !== outstanding
         ? 'the counts do not reconcile — promoted ' + d.promoted + ' + folded ' + d.folded +
-          ' + refuted ' + refuted + ' + standing ' + stood.length + ' is not confirmed ' + au.confirmed +
-          ' + unverified ' + au.unverified
+          ' + refuted ' + refuted + (routed ? ' + routed ' + routed : '') + ' + standing ' + stood.length +
+          ' is not confirmed ' + au.confirmed + ' + unverified ' + au.unverified
+      : unverifiedFault
+        ? unverifiedFault
       : !byNature && d.folded !== 0
         ? 'folded ' + d.folded + ' — a spec audit\'s MEDIUM and LOW are PROMOTED, batched, never ' +
           'folded (owner, 2026-10-05)'
@@ -2767,6 +2898,7 @@ if (!specAudit) {
       promoted: promoted,
       folded: folded,
       refuted: refuted,
+      routed: routed,
       promotedIds: promotedIds,
       dispositions: dispositions,
       siblingEdits: siblingEdits,
@@ -2810,6 +2942,7 @@ if (!specAudit) {
     }
   }
   log('disposal: done — promoted ' + promoted + ' · folded ' + folded + ' · refuted ' + refuted +
+    (routed ? ' · routed ' + routed + ' under review.unverified ' + reviewPolicy.unverified : '') +
     (promotedIds.length ? ' · units ' + promotedIds.join(', ') : '') +
     ' · edges ' + (edges.length ? edges.length + ' paired' : 'none declared') +
     (placements.length
@@ -2941,6 +3074,7 @@ if (attended && !buildUnits.length) {
     promoted: promoted,
     folded: folded,
     refuted: refuted,
+    routed: routed,
     promotedIds: promotedIds,
     dispositions: dispositions,
     siblingEdits: siblingEdits,
@@ -3001,6 +3135,7 @@ const handOut = {
   promoted: promoted,
   folded: folded,
   refuted: refuted,
+  routed: routed,
   promotedIds: promotedIds,
   dispositions: dispositions,
   siblingEdits: siblingEdits,

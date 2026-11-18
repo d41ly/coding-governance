@@ -1,0 +1,192 @@
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/.
+# Contract: memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-1.md
+
+id = "loop"
+home = "loop"
+layer = "layer.flow"
+scope = "repo"
+# The two edges this core kit keeps into an expansion, each at a core point and each degrading where
+# that kit does not resolve: position.py reads a build's refusal rows through the runlog kit's run-state
+# reader (TOOL-dDeclaredLoop-14), and stage_coverage.py reads the codebase-map kit's dossier claims
+# (TOOL-dDeclaredLoop-4).
+optional = [
+  { part = "position.py", point = "point.runtime.reading", fallback = "the refusal rows read unarmed, the reason said" },
+  { part = "stage_coverage.py", point = "point.memory.consult", fallback = "the stage coverage leg refuses, naming the kit that did not resolve" },
+]
+# The kit's version constant; README.md's first line carries the marker that equals it.
+version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
+# The definition names no other kit's file. Its reader is stdlib only but for `read_actor_base`, which
+# imports the memory-tree kit's compare base to read the actor-witness list at it (TOOL-dDeclaredLoop-5),
+# and `read_builds_dir`, which imports that kit's conf reader to find the builds folder of a tree whose
+# conf sets DESIGN_RECORD (TOOL-dDeclaredLoop-41), and `resolve_memory_root`, which imports the same
+# conf reader for a build's records root (TOOL-dDeclaredLoop-72), and `derive_conf_reads`, which imports
+# that kit's `derive_docstring_ids` (TOOL-dDeclaredLoop-82), and `derive_conf_constants`, which reads its
+# one charge walk, `derive_constant_charges` (TOOL-dDeclaredLoop-88), so this kit requires memory-tree. The roles kit requires this one, since its catalogue checker and its
+# adopter read each workflow's order here. Two reads of the playbook kit take no edge
+# (TOOL-dDeclaredLoop-12): `read_layer_tags` reads its layers.toml for the item inputs' layer tags, and
+# `--scopes` runs its load_sets.py as a subprocess for each item's scope. Each prints `unarmed` where
+# that kit does not resolve, so the check and the verb degrade rather than fail. The read of the roles
+# kit takes no edge either, since the roles kit requires this one (TOOL-dDeclaredLoop-9):
+# `read_role_defaults` imports its roles_lib.py inside the function for each role item's defaults, and
+# where that kit does not resolve every role item prints `unarmed`. The re-run stand-in,
+# loop_witness.py (TOOL-dDeclaredLoop-17), imports the memory-tree kit's build_records and deviation_join
+# inside its functions, under the edge above, and carries the GIT_ENV_LEAKS list its environment drops
+# inline (TOOL-dDeclaredLoop-92); its `hold-inherited` plant runs the unattended driver, which requires this kit, so that reach takes no edge and exits 2 where the driver
+# does not resolve; the plant's leg is gov's own, an [[exempt_leg]] of the registry, no row here.
+# loop_witness.py normalises each command's output with the run-gates kit's `write_normaliser`, found by
+# `resolve_kit_dir`, so this kit requires run-gates (TOOL-dDeclaredLoop-79); that kit requires nothing,
+# so the edge forms no cycle.
+# The checklist command, loop_checklist.py (TOOL-dDeclaredLoop-11), reads that driver's two core
+# registry lines as text, found the same way, so it takes no edge either and exits 2 where the driver
+# does not resolve; its leg is gov's own [[exempt_leg]] too. The transition tables' command, loop_table.py
+# (TOOL-dDeclaredLoop-13), reads this kit's definition alone, and the playbook kit's layer tags through
+# `read_items` only where they resolve, so every holder can run it and its leg ships below; its phase join
+# (TOOL-dDeclaredLoop-52) reads that driver's PHASES_CORE line as text, found as the checklist command finds
+# it, and prints the join `unarmed` where the driver does not resolve, so it takes no edge either. The item
+# kind's module, loop_items.py (TOOL-dDeclaredLoop-24), reads the composition of gov's items with an
+# adopter's through the playbook kit's overlay_rows.py `compose` verb, run as a subprocess and found
+# through `resolve_kit_dir`, so it takes no edge and `check` exits 2 where that kit does not resolve; it
+# reads the memory-tree kit's record table under the edge above, and its leg is gov's own [[exempt_leg]].
+# The parent route's module, loop_parents.py (TOOL-dDeclaredLoop-15), reads a build README's `parents:`
+# and the memory tree's conf through the memory-tree kit under the edge above, and the policy value
+# `deps.on-parent-withdrawn` and each parent's run facts through the policy kit's policy.py and
+# guard.py, found through `resolve_kit_dir`. It takes no edge to that kit: `route` exits 2 `unarmed`
+# where it does not resolve, never a default, and its leg is gov's own [[exempt_leg]].
+# The transition record's module, loop_transition.py (TOOL-dDeclaredLoop-3), reads each Gov-Transition
+# trailer through the memory-tree kit's commit_trailers.py and writes and reads the log record through
+# its build_records.py, under the edge above, and reads `transitions.record` through the policy kit's
+# policy.py, found through loop_parents.py's `read_policy_kit`. It takes no edge to that kit: `record`
+# and `check` exit 2 `unarmed` where it does not resolve, never a default, and its leg is gov's own
+# [[exempt_leg]].
+# The policy file's guard (TOOL-dDeclaredLoop-2): floor.py reads the `[floor]` table through the policy
+# kit's policy.py; guard.py runs that kit's guard.py, the minimal guard, as a subprocess and calls its
+# helpers, reads `policy-file.guard` and `policy-file.on-missing-expansion` through policy.py, reads the
+# playbook kit's layers.toml for the declared points, and its trailers and change records through the
+# memory-tree kit under the edge above; policy_edit.py writes through policy.py's checks and the
+# memory-tree kit's change door. Each policy-kit read goes through `read_policy_kit`, found by
+# `resolve_kit_dir`, so none takes an edge: the floor reads all on where that kit does not resolve,
+# the push arm prints `unarmed` and exits 0, and the commit verdict, run only where the minimal guard
+# resolves, exits 2 where a reader does not answer. The leg is gov's own [[exempt_leg]].
+# The claim keys (TOOL-dDeclaredLoop-8): claims.py reads git alone, the remote through its inline ladder
+# copy, and imports only loop_lib.py beside it, so its reach takes no edge; the session-kickoff checker
+# and the unattended driver each find it by `resolve_kit_dir` and print a skipped or `-` form where it
+# does not resolve. Its leg is gov's own [[exempt_leg]].
+# The position engine (TOOL-dDeclaredLoop-7): position.py reads commits, acceptance records and the
+# front matter through the memory-tree kit under the edge above, the run facts through the policy kit
+# by `read_policy_kit`, and each unit's M2 state from the unattended driver's `--plan`, found by
+# `resolve_kit_dir`, so neither takes an edge: a read that does not resolve answers `invalid-input`,
+# never a default. The driver finds the engine the same way. Its leg is gov's own [[exempt_leg]].
+# Its refusal rows (TOOL-dDeclaredLoop-14) are read through runlog's model, `read_run_state`, found by
+# `resolve_kit_dir` too, so that reach takes no edge either: where runlog does not resolve, the engine
+# prints `refusal — unarmed` and still prints the frontier.
+# The stage claims (TOOL-dDeclaredLoop-4): stage_coverage.py reads the codebase-map kit's map_lib.py and
+# the roles kit's roles_lib.py, each found by `resolve_kit_dir` with no edge, the roles kit requiring
+# this one, and the memory-tree kit's coverage factory under the edge above; it exits 2 `unarmed` where
+# a kit does not resolve, never a default. Its populations are gov's tree, so its leg is gov's own
+# [[exempt_leg]], no row here.
+# The kind factories (TOOL-dDeclaredLoop-6): factories.py writes the roles kit's role files,
+# workflows.toml and check_roles.py, the policy kit's catalogue and a kit descriptor's directory, and runs
+# the roles kit's check_roles.py, the policy kit's arms in process and the tool root's hook-destination
+# gate, each found by `resolve_kit_dir` with no edge; a kit that does not resolve exits 2 naming it, never
+# a default. Both its legs, `loop command conformance` and `loop factories fixtures`, are gov's own
+# [[exempt_leg]] rows, no row here.
+# The stage kind (TOOL-dDeclaredLoop-25): splice.py composes the stage and item kinds through
+# loop_items.py's `read_composition`, so the playbook kit is reached as a subprocess with no edge; it reads
+# `instructions.exclude` through the policy kit by `read_policy_kit` and the change records and the pin
+# normaliser through the memory-tree kit under the edge above. `check` exits 2 `unarmed` where a kit does not
+# resolve, never a default, and its leg, `loop splice check`, is gov's own [[exempt_leg]], no row here.
+# The upstream field (TOOL-dDeclaredLoop-29): upstream.py reads the composition through loop_items.py's
+# `read_composed_items`, so the playbook kit is reached as a subprocess with no edge and gov's own rows are
+# read where it does not resolve; it reads git blobs through the memory-tree kit's tree_lib and writes its
+# journal record under that kit's conf and id readers, under the edge above. The roles kit's handoff takes
+# the rows as a file and imports nothing here. Its leg, `loop upstream fixtures`, is gov's own
+# [[exempt_leg]], no row here.
+# The composition pin (TOOL-dDeclaredLoop-26): composition.py reads the item composition at a pin through
+# loop_items.py's `read_composition`, in a scratch worktree of the repository detached at it, so the
+# playbook kit is reached as a subprocess with no edge; it runs the playbook kit's tag resolver found under
+# the repository being read, also as a subprocess, reads a tag-valued policy key through the policy kit by
+# `read_policy_kit`, and writes order files under the outbox alone. A resolver or kit that does not answer
+# is a refusal, never a default. Its leg, `loop composition fixtures`, is gov's own [[exempt_leg]], no row
+# here.
+# The scenario kind (TOOL-dDeclaredLoop-27): scenario.py composes the scenario kind, and each kind a
+# scenario activates with its rows, through loop_items.py's `read_composition` and composition.py's
+# `read_composition_at`, so the playbook kit is reached as a subprocess with no edge; it imports that
+# kit's pins.py, found by `resolve_kit_dir`, only to read the register's row kinds, and reads
+# `flow.scenario-default` and `flow.scenario-conflict` through the policy kit by `read_policy_kit`. A kit
+# that does not resolve exits 2 `unarmed`, never a default, and the transition writer records no scenario
+# where the composition is unarmed. Its leg, `loop scenario fixtures`, is gov's own [[exempt_leg]], no row
+# here.
+# A build's own flow changes (TOOL-dDeclaredLoop-28): adapt.py writes a proposal's change record through the
+# memory-tree kit's `write_change` and its row in the build's RUN.md, composes each pending change through
+# loop_items.py's `read_composition`, so the playbook kit is reached as a subprocess with no edge, and reads
+# `flow.adapt` through the policy kit by `read_policy_kit`. A kit that does not resolve exits 2 `unarmed`,
+# never a default. Its leg, `loop adapt fixtures`, is gov's own [[exempt_leg]], no row here.
+# The review bounds (TOOL-dDeclaredLoop-21): review_bounds.py reads the four review bound keys through the
+# policy kit, found by its inline `resolve_kit_dir` with no edge, derives the spec and closing bounds and
+# refuses a fixed count above the ceiling; `loop_lib.py --check` runs it over the tree's policy file and
+# prints `review bounds unarmed` where the policy kit does not resolve. Its plants' leg, `loop review
+# bounds fixtures`, is gov's own [[exempt_leg]], no row here.
+# The rework budget (TOOL-dDeclaredLoop-30): budget.py reads `flow.rework-budget` and `flow.route-backs`
+# through the policy kit by `read_policy_kit`, its rows through loop_transition.py's records and adapt.py's
+# run-state path, and a patch build's `parents:` through the memory-tree kit under the edge above; the
+# transition writer imports it inside `write_transition`. It takes no edge to the policy kit: `draw` exits 2
+# `unarmed` where it does not resolve, never a default. The unattended driver finds it by `resolve_kit_dir`
+# and draws through it, so its driver plants run that driver with no edge either. Its leg, `loop budget
+# fixtures`, is gov's own [[exempt_leg]], no row here.
+# The breakpoints (TOOL-dDeclaredLoop-19): breakpoints.py lists a build's reviews and owner gates from
+# `autonomy`, `decisions.major`, `review.<stage>` and `review.breakpoints`, read through the policy kit by
+# `read_policy_kit` and composition.py's `read_tag_policy`, its tags through loop_items.py's
+# `read_composed_items`, so the playbook kit is reached as a subprocess with no edge, and each owner gate's
+# release through adapt.py's disposition read under the edge above. The unattended driver finds it by
+# `resolve_kit_dir` for `--plan`, `--close` and its spec-audit opt-in, and reads nothing where it does not
+# resolve. `list` and `stage` exit 2 `unarmed` where a kit does not resolve, never a default. Its leg, `loop
+# breakpoint fixtures`, is gov's own [[exempt_leg]], no row here.
+# The termination check (TOOL-dDeclaredLoop-33): termination.py reads the item and stage compositions
+# through loop_items.py's `read_composition` and composition.py's `read_composition_at`, so the playbook kit
+# is reached as a subprocess with no edge; it reads the catalogue's deadline rows, the landed builds and
+# `flow.wait-ceiling` through the policy kit by `read_policy_kit`, and the trailers through the memory-tree
+# kit under the edge above. The transition writer imports it inside `write_transition`. A kit that does not
+# resolve exits 2 `unarmed`, never a default, and refuses the move at a step boundary. Its leg, `loop
+# termination`, is gov's own [[exempt_leg]], no row here.
+requires = ["memory-tree", "run-gates"]
+
+# Everything the kit ships is engine, overwritten on every update: the definition, its reader, the
+# adopter and the README. The gov steps and each workflow's place are gov's, never an adopter's seed.
+[[files]]
+include = "**"
+role = "engine"
+
+# The adopter grades the installed definition and writes nothing, so adopting is checking.
+[adopt]
+argv = ["bash", "{kit}/adopt-loop.sh", "--check"]
+mutates_index = false
+why_no_regenerate = "the adopter reads the definition the kit ships and writes nothing: there is no rendered artifact to go a vintage stale"
+
+[check]
+argv = ["bash", "{kit}/adopt-loop.sh", "--check"]
+
+[[outcome]]
+code = 0
+probe = { must_exist = "{kit}/loop.toml" }
+means = "adopted"
+
+# THE DEFINITION LEG SHIPS. Its subject is the definition every reader in the target reads, so a
+# failure means the target's loop does not read, whoever changed it.
+[[gate_leg]]
+name = "loop definition"
+subject = "repo"
+argv = ["python", "{kit}/loop_lib.py", "--check"]
+reads = { base = "it compares the actor-witness list with itself at the compare base, the merge-base with the default branch, so a verdict cached against one base says nothing about another (TOOL-dDeclaredLoop-5)." }
+guard = []
+ceiling = 120
+stage = ["step.test"]
+
+# THE TRANSITION TABLES' LEG SHIPS, for the reason the definition's does: its subject is the tables every
+# mover in the target reads, so a failure means the target's moves do not hold (TOOL-dDeclaredLoop-13).
+[[gate_leg]]
+name = "loop transition tables"
+subject = "repo"
+argv = ["python", "{kit}/loop_table.py", "check", "--selftest"]
+guard = []
+ceiling = 120
+stage = ["step.test"]

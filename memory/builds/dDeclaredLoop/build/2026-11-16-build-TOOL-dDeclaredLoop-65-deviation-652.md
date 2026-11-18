@@ -1,0 +1,15 @@
+# TOOL-dDeclaredLoop-65 deviation 652 — the clone plants name the remote's branch, the sweep's stale figures, and the row priced at the pass
+
+**Serves:** deviation TOOL-dDeclaredLoop-65
+
+- **Departs from:** `TOOL-dDeclaredLoop-65@rev-3` [§4, §5]
+- **Hand-off:** spec-to-code
+- **Before:** §4's plants table stages `fresh-clone` and `offline-stale` as `git clone -q --template= o.git <top>/c` of the generic plant's bare remote; §5's sweep counts this spec's rows in `memory/project/positional-refs.txt` as one PINNED, so the landing commit runs a positional shrink, and §4's Evidence counts `PLANTS` at twenty-one PINNED; §5's sweep re-prices the `loop position fixtures` row from a timed reading of the leg alone at the close.
+- **After:** before the clone, the two clone plants point the bare remote's `HEAD` at `refs/heads/main` with `git symbolic-ref`, then clone as the table spells it, so the clone checks out `main`, holds its `clone: ` entry and resolves `refs/remotes/origin/HEAD`. The registry holds no row of this spec, 0 PINNED, so no shrink runs; `PLANTS` held twenty-two PINNED at this pass's base, `TOOL-dDeclaredLoop-56`'s `no-remote` among them, and holds twenty-five PINNED after it. The hand-over's bound is one module constant, `FX_BOUND`, read by `tools/loop/position.py#render_handover` and by the `offline-stale` staging. The row is re-priced in this pass from the three plants run alone, 425 PINNED seconds from 411 PINNED; the leg's 300 PINNED ceiling is not raised.
+- **Cause:** builder discovery
+- **Reason:** the generic plant inits its bare remote with no branch named, so its `HEAD` follows the node's `init.defaultBranch`; on node d that names `master`, the clone checks out nothing, and with no `refs/remotes/origin/HEAD` the engine reads the remote absent, so AC1 could not hold. The fixture's git config and `-b main` on every plant are `TOOL-dDeclaredLoop-75` S34's, so this pass names the branch on the two clone plants alone. The registry's row went with an earlier positional shrink, and unit 56 added its plant after the re-ground's count. The run's brief asks the row re-priced where the plants add time.
+- **Evidence:** a probe on node d with git 2.54.0.windows.1 cloned a bare remote whose `HEAD` named no pushed branch: `refs/heads/main` did not exist in the clone; after `git symbolic-ref HEAD refs/heads/main` in the remote, the clone's `main` reflog held `clone: from <url>`, `refs/remotes/origin/HEAD` named `refs/remotes/origin/main`, and `git reflog exists refs/remotes/origin/main` exited 1 PINNED; `grep -c 'spec-TOOL-dDeclaredLoop-65.md' memory/project/positional-refs.txt` printed 0 PINNED; the three plants run alone by direct CLI took 2, 4 and 3 PINNED seconds.
+- **Risk:** additive
+- **Approver:** author, the builder pass, under the chain's `author-recorded` value (`PLAY-dClosedLoop-4`)
+- **Follow-through:** gap — the `loop position fixtures` row stands at 425 PINNED seconds above its 300 PINNED ceiling, as before this pass; the main loop re-prices it from its first reading of the leg alone at the close
+- **Caused-by:** PLAY-dClosedLoop-2

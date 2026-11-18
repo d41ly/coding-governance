@@ -1,0 +1,33 @@
+# stage-schema.toml — the row schema of the `stage` kind (TOOL-dDeclaredLoop-25): what a repository's own
+# `[[stage]]` row in its overlay holds. Read by the playbook kit's overlay_rows.py through the kinds
+# register's `kind.stage` row, and by splice.py beside this file, which splices each composed stage
+# between two adjacent gov steps of the build's transition table.
+#
+# [kind]: `name`, the kind, and `owner-seat`, the tag segment a repository row holds `adopter` at, so a
+# repository stage is tagged step.adopter.<name>. Gov ships no stage row: its five steps are the
+# definition's [[step]] table, which no factory writes, so every composed stage row is the repository's.
+#
+# One [[field]] row per key but `tag`: `after` and `before`, the two adjacent gov steps; `pin`, the
+# eight-hex pin of the build row the splice replaces; and `exit`, the stage's exit item. No field
+# declares `widens` or `fixed-by`: with no gov row an `amends` has no target, and a field declaring
+# neither is fixed by its undeclared class.
+
+[kind]
+name = "stage"
+owner-seat = 1
+
+[[field]]
+name = "after"
+shape = "scalar"
+
+[[field]]
+name = "before"
+shape = "scalar"
+
+[[field]]
+name = "pin"
+shape = "scalar"
+
+[[field]]
+name = "exit"
+shape = "scalar"

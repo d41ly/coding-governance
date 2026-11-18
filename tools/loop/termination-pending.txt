@@ -1,0 +1,24 @@
+# termination-pending.txt — the waits and cycles of gov's definition whose bound a build that has not
+# landed declares, read by termination.py beside this file (TOOL-dDeclaredLoop-33). SHRINK-ONLY: `check`
+# without `--build` reds a row whose build has landed, whose item declares its deadline or is gone, or
+# whose cycle gov's counted graph no longer holds. Every other composition reads a row only to excuse it.
+#
+#   wait · <item tag> · <deadline key> · <build that lands it>
+#   cycle · <node> -> <node> -> ... · <owner build of the item whose route re-enters the cycle>
+#
+# A cycle's nodes are rotated to its smallest member, as scan_cycles rotates them, the first again last.
+wait · item.build.ratify · run.owner-deadline · dWellOiledMachine
+cycle · paused -> paused · dWellOiledMachine
+cycle · item.build.reuse-check -> item.build.reuse-check · dScopedBuild
+cycle · item.design.decompose -> item.design.overlaps -> item.design.decompose · dIndexedDesign
+cycle · item.design.decompose -> item.design.overlaps -> item.design.streams -> item.design.unit-spec -> item.design.decompose · dIndexedDesign
+cycle · item.design.decompose -> item.design.overlaps -> item.design.unit-spec -> item.design.decompose · dIndexedDesign
+cycle · item.design.decompose -> item.design.research -> item.design.decompose · dIndexedDesign
+cycle · item.design.ready -> item.design.unit-spec -> item.design.recommend -> item.design.ready · dIndexedDesign
+cycle · item.design.ready -> item.design.unit-spec -> item.design.recommend -> item.design.reason -> item.design.ready · dIndexedDesign
+cycle · item.plan.record -> item.plan.research -> item.plan.record · dRankedPlan
+cycle · item.review.dispose -> item.review.fold -> item.review.dispose · dDeclaredLoop
+cycle · item.test.flakes -> item.test.select -> item.test.verdict -> item.test.route -> item.test.flakes · dWitnessedBar
+cycle · item.test.flakes -> item.test.verdict -> item.test.route -> item.test.flakes · dWitnessedBar
+cycle · item.test.merge -> item.test.select -> item.test.verdict -> item.test.merge · dWitnessedBar
+cycle · item.test.route -> item.test.verdict -> item.test.route · dWitnessedBar

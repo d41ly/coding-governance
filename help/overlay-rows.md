@@ -5,14 +5,47 @@ Gov ships structured rows as well as instruction units: a kind the kinds registe
 way you change a unit (see [the instruction overlay](overlay.md)): from your own row in
 `.governance/instructions.toml`, never by editing gov's row, which the next update overwrites.
 
-No real kind registers a schema yet; the mechanism ships dark, proven on a fixture kind, and each kind's
-own build arms it. The examples use a kind `fixture` whose schema declares the open set fields `grants`
+The first kind to register a schema is the loop's items, `kind.item`, whose schema is
+`tools/loop/item-schema.toml` and whose rows, fields and fixed rows the [loop definition](loop.md) page
+describes. The examples below use a kind `fixture` whose schema declares the open set fields `grants`
 and `needs`, the open scalar `ceiling`, and its owner seat at segment 1.
+
+## See one kind's composition
+
+`python tools/playbook/overlay_rows.py compose --kind item` composes the repository you run it in at <!-- usage: script:tools/playbook/overlay_rows.py#compose dd930bb1 -->
+its last commit and prints one JSON object: `rows`, the composed rows; `states`, each gov row's state;
+`held` and `stale`, the held patches and the stale edges; `operations`, each patch operation classified
+`widens` or `narrows`; and `pins`, each gov row's eight-hex pin, the one an `amends` or `supersedes`
+names. It exits 1 with each line of a refusal, and 2 naming `unarmed` and the path where the kind is
+not registered with a schema, its schema file is absent, or your last commit holds no copy of the
+kind's gov rows yet, as right after a first install, before its commit. A render passes over such a kind
+and composes none of its rows.
+
+`compose --kind <kind> --rows -` also reads a JSON array of rows on standard input and adds them after
+your overlay's own rows, each as one of yours: the rows a scenario a build was placed under activates
+(see [the loop definition](loop.md), choosing a build's scenario). Each meets every refusal a row of
+your overlay meets, the owned seat, a fixed field, a fixed row, an edge's pin and the row checks, and
+keeps the `source` it arrived with, the scenario's tag, so a refusal names it. A row that is no object,
+or one typing `origin`, is refused, exit 1; any `--rows` value but `-` is a usage error, exit 2.
+
+The array takes one more element form, `{"exclude": "<tag>"}`, an object whose only key is `exclude`:
+an exclusion a build applied to its own flow (see [the loop definition](loop.md), a build's own
+changes). Its tag joins `instructions.exclude`'s tags before the composition runs, so it meets every
+check an entry of that set meets, a fixed row, a tag a composed row still needs, a policy key naming
+it, and those refusals name `instructions.exclude`. An `exclude` holding no tag is refused, exit 1.
+
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
+```bash
+python tools/playbook/overlay_rows.py compose --kind item
+```
 
 ## Your own tag
 
 A row of yours is tagged with `adopter` at the seat the kind's schema declares (`owner-seat`), for
-example `fixture.adopter.extra`, so it never collides with a gov tag. Gov's packs never ship that seat,
+example `fixture.adopter.extra`, so it never collides with a gov tag. A schema may list more than one
+seat, `owner-seat = [2, 1]`, and a row of yours then holds `adopter` at any one of them: the item kind
+takes `item.test.adopter.<name>` for an item of a gov stage and `item.adopter.<stage>.<name>` for
+an item of a stage of your own. Gov's packs never ship `adopter` at any listed seat,
 and a row of yours without it is refused under `owned`. You never write `origin`: every row read from
 the overlay is the repository's, and a row typing `origin` is refused.
 

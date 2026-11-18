@@ -11,11 +11,11 @@ a directory <prefix>/<kit>/ holding kit.toml, its adopter and its engine, with a
 ```
 
 ## `kind.command`
-<!-- usage: kind:kind.command a64a6cbe -->
-A slash command an adopter's harness runs.
+<!-- usage: kind:kind.command ce0a41ad -->
+A command a kit declares: a [[command]] row of its kit descriptor, its verb and the file it runs.
 
 ```text
-no factory has landed; dDeclaredLoop lands it, and until then the kind has no member
+python <prefix>/playbook/core.py new command <verb> --kit <id> --run <path>
 ```
 
 ## `kind.instruction-unit`
@@ -27,19 +27,19 @@ python <prefix>/playbook/core.py new instruction-unit <name> [factory flags]
 ```
 
 ## `kind.policy-key`
-<!-- usage: kind:kind.policy-key 37cbbdaf -->
+<!-- usage: kind:kind.policy-key 282e334d -->
 A policy key: a [[key]] row of the policy catalogue, read through policy.py get.
 
 ```text
-a [[key]] row in <prefix>/policy/catalogue.toml, its name, allowed values, default, summary and usage
+python <prefix>/playbook/core.py new policy-key <name> --allowed <toml> --default <toml> --summary <text> --usage <text> --owner <build>
 ```
 
 ## `kind.preset`
-<!-- usage: kind:kind.preset 8b503872 -->
-A named preset of policy values an adopter selects at once.
+<!-- usage: kind:kind.preset f85797c7 -->
+A named preset of policy values an adopter selects at once; dKeptSession lands its factory, with the preset store.
 
 ```text
-no factory has landed; dDeclaredLoop lands it, and until then the kind has no member
+no factory has landed; dKeptSession lands it, and until then the kind has no member
 ```
 
 ## `kind.gate-leg`
@@ -51,27 +51,27 @@ a row in <prefix>/gate-legs.json, its name, argv, chunk, subject and ceiling
 ```
 
 ## `kind.role`
-<!-- usage: kind:kind.role e259cccd -->
-A role an agent takes in the loop, rendered into its agent file.
+<!-- usage: kind:kind.role 626337da -->
+A role an agent takes in the loop: a role file of the roles kit, listed by its workflow and priced by its body ceiling.
 
 ```text
-no factory has landed; dDeclaredLoop lands it, and until then the kind has no member
+python <prefix>/playbook/core.py new role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --returns <text> --output <text> --ceiling <bytes>
 ```
 
 ## `kind.workflow`
-<!-- usage: kind:kind.workflow 519594eb -->
-A Workflow script the harness runs as one program.
+<!-- usage: kind:kind.workflow d22b7cd9 -->
+A workflow the loop runs: a [[workflow]] row of the roles kit's table, placed by its row of the loop definition.
 
 ```text
-a script <prefix>/workflows/<name>.js
+python <prefix>/playbook/core.py new workflow <name> --driver <driver> --harness <path|none> --roles <slots> --enforced-by <text> --trigger <text> --order <n> --step <step tag|none>
 ```
 
 ## `kind.hook`
-<!-- usage: kind:kind.hook eca119d0 -->
-A harness hook script and the fragment that wires it.
+<!-- usage: kind:kind.hook 821942a3 -->
+A harness hook script and the fragment that wires it, shipped by its kit's descriptor.
 
 ```text
-a script <prefix>/hooks/<name>.js with its fragment
+python <prefix>/playbook/core.py new hook <name> --kit <id> --event <event> [--matcher <m>]
 ```
 
 ## `kind.skill`
@@ -99,11 +99,11 @@ no factory has landed; dConvergedCharter lands it, and until then the kind has n
 ```
 
 ## `kind.stage`
-<!-- usage: kind:kind.stage 405f4568 -->
-A stage of the loop a drive row names.
+<!-- usage: kind:kind.stage 7fdd6f5a -->
+A stage of the loop: one of gov's steps, or a repository's own spliced between two adjacent ones from its overlay.
 
 ```text
-no factory has landed; dDeclaredLoop lands it, and until then the kind has no member
+python <prefix>/playbook/core.py new stage <name> --after <step> --before <step> --actor <kind:name> --witness-by <text> --owner <build> [--input <layer:what> --allowance <text> --returns <record>]
 ```
 
 ## `kind.product-layer`
@@ -115,11 +115,11 @@ python <prefix>/playbook/check_layers.py --new <tag> --kind <kind> [--of <tag>] 
 ```
 
 ## `kind.item`
-<!-- usage: kind:kind.item 3e272ca3 -->
-A work item the loop carries.
+<!-- usage: kind:kind.item af468ce7 -->
+A work item of a gov step's program: an [[item]] row of the loop definition, or a repository's own in its overlay.
 
 ```text
-no factory has landed; dDeclaredLoop lands it, and until then the kind has no member
+python <prefix>/playbook/core.py new item <name> --step <step> --actor <kind:name> --witness-by <text> --owner <build> [--input <layer:what> --allowance <text> --returns <record>]
 ```
 
 ## `kind.lens`
@@ -131,9 +131,9 @@ no factory has landed; dCalibratedLens lands it, and until then the kind has no 
 ```
 
 ## `kind.scenario`
-<!-- usage: kind:kind.scenario 7e1f2422 -->
-A scenario the loop is exercised against.
+<!-- usage: kind:kind.scenario f87dc072 -->
+A scenario a build runs under: what kind of work it is, the request facts that admit it, its entry step and the rows of other kinds it activates.
 
 ```text
-no factory has landed; dDeclaredLoop lands it, and until then the kind has no member
+python <prefix>/playbook/core.py new scenario <name> --extends <tag|none> --admit <fact>=<value> --entry <step tag>
 ```

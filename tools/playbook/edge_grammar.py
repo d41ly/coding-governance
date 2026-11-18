@@ -125,15 +125,18 @@ def read_edge_types(path=None) -> dict:
 
 
 def read_trailer_keys(types, path=None) -> dict:
-    """`{trailer key: type}` of the registry's `[[trailer]]` rows, or EdgeError: a key named twice, or a
-    type the closed set does not hold."""
+    """`{trailer key: type}` of the registry's typed `[[trailer]]` rows, or EdgeError: a key any two rows
+    name, or a type the closed set does not hold. A row with no `type` registers a key that carries a
+    value and no edge (TOOL-dDeclaredLoop-23 S2): it is passed over, so the commit adapter never sees it."""
     path = pathlib.Path(path or KIT_DIR / "edges.toml")
-    keys = {}
+    keys, seen = {}, set()
     for i, row in enumerate(read_toml_rows(path, "trailer", "edge registry"), 1):
         key, kind = row.get("key"), row.get("type")
-        if not key or kind not in types or key in keys:
+        if not key or key in seen or ("type" in row and kind not in types):
             raise EdgeError(f"{path.as_posix()}: trailer row {i} needs a key named once and a type of the set")
-        keys[key] = kind
+        seen.add(key)
+        if "type" in row:
+            keys[key] = kind
     return keys
 
 

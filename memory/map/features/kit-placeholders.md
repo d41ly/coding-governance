@@ -7,6 +7,8 @@ status = "shipped"
 streams = ["tooling"]
 decisions = []
 
+stage = ["step.test"]
+
 [claims]
 gate-legs = ["kit placeholders (a declared token its adopter substitutes)", "kit-placeholders self-test"]
 kits = []

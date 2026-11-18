@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-96 — the round-11 spec audit's 13 minors, batched
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 50 · advances TOOL-dDeclaredLoop-35
+**Status:** CLOSED · rev-3 · 2026-11-17 · node d · Tier-2 · base ed497191 · streams tooling · order 50 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,9 +8,16 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82 TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 TOOL-dDeclaredLoop-87 TOOL-dDeclaredLoop-88 TOOL-dDeclaredLoop-89 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-91 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-100 |
+| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82 TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 TOOL-dDeclaredLoop-87 TOOL-dDeclaredLoop-88 TOOL-dDeclaredLoop-89 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-91 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-100 TOOL-dDeclaredLoop-112 TOOL-dDeclaredLoop-115 TOOL-dDeclaredLoop-116 TOOL-dDeclaredLoop-117 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-96-deviation-961.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-96-deviation-961.md) | deviation | — |
+| [2026-11-17-build-TOOL-dDeclaredLoop-100-deviation-1172.md](../build/2026-11-17-build-TOOL-dDeclaredLoop-100-deviation-1172.md) | deviation | TOOL-dDeclaredLoop-100 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-117 |
+| [2026-11-17-build-TOOL-dDeclaredLoop-96-1-acceptance-ledger.md](../build/2026-11-17-build-TOOL-dDeclaredLoop-96-1-acceptance-ledger.md) | journal | — |
+| [2026-11-17-prompt-TOOL-dDeclaredLoop-96-2-spec-writer.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-96-2-spec-writer.md) | journal | — |
+| [2026-11-17-prompt-TOOL-dDeclaredLoop-96-build-brief.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-96-build-brief.md) | journal | — |
+| [2026-11-17-prompt-TOOL-dDeclaredLoop-96-reground-brief.md](../prompts/2026-11-17-prompt-TOOL-dDeclaredLoop-96-reground-brief.md) | research | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-95-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-95-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-95 |
+| [2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round1.md](../reviews/2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round1.md) | diff-review | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82 TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 TOOL-dDeclaredLoop-87 TOOL-dDeclaredLoop-88 TOOL-dDeclaredLoop-89 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-91 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-100 TOOL-dDeclaredLoop-112 |
+| [2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round2.md](../reviews/2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round2.md) | diff-review | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82 TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 TOOL-dDeclaredLoop-87 TOOL-dDeclaredLoop-88 TOOL-dDeclaredLoop-89 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-91 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-100 TOOL-dDeclaredLoop-112 |
 
 <!-- /gen:spec-records -->
 
@@ -20,8 +27,7 @@ The round-11 spec audit (`memory/builds/dDeclaredLoop/reviews/2026-10-24-review-
 exited CONVERGED with 14 confirmed findings over units 93 and 94, the round-10 promotions. Its one high,
 id 1, is unit 95. This unit is the batch BUILD-METHOD M4 makes of the rest, every MEDIUM and every LOW.
 Each finding keeps its report id and its own scope item, including where the report merged ids into one
-item. The minors land on 93 and 94 both, so this unit repairs neither in particular and builds after every
-unit (order 50, above 95's 49).
+item. The report's three refuted findings, ids 6, 8 and 11, are not in the disposal population.
 
 | Report item | Severity | Report ids | Scope items |
 |---|---|---|---|
@@ -37,362 +43,268 @@ unit (order 50, above 95's 49).
 | L4 | LOW | 16 | S12 |
 | L5 | LOW | 17 | S13 |
 
-That is 7 MEDIUM and 6 LOW findings by raw id. Two report items merge ids, and each is fixed once across
-its scope items: M2 (S2 and S3) and L2 (S9 and S10). Id 7 overlaps id 9, and S4's rewrite discharges S11.
-The report's three refuted findings, ids 6, 8 and 11, are not in the disposal population.
+At rev-3 none of S1 to S13 has anything left to build. Each spec text they amend sits in a spec that is
+CLOSED at the branch tip, or in 94's, which is CLOSED at order 48 before this unit builds, so frozen.
+Each code half was built by 90 §8 F8 (a), or has nothing to change because `load_tree_lib` takes no
+argument under 92 §8 F3 (c). §3 names each with its evidence, and F6 settles S13, the one half that
+could still build. The item ids and the criterion ids AC1 to AC13 keep their labels on §3's table, so a
+sibling's citation of them still lands.
+
+What this unit still owes is S14, the observation that the skew row of ids 5 and 15 holds after 94 S21
+rewrites the refusal of `load_tree_lib` at order 48. The pass writes no file of the tree. It builds at
+order 50 and closes on AC14 and AC15.
 
 ## 2. Scope (IN)
 
-- **S1** — id 2. 94 §6 gains AC19, one range grep over the 92 spec per sentence 94 orders there, each
-  printing at least 1 and each pinned at 0 at HEAD. Over 92's AC8 range the tokens are `derive_X`,
-  `import_module`, `getattr` and `non-empty`. Over its AC16 range they are `S24` and `S21`. Over its S8
-  range they are `need` and `first use`. Over its S3 and S8 ranges the token is `conf-constant class`. Over
-  its S17 range they are `first non-blank` and `85 S3`. AC19 lands in this unit's rev bump of 94. Where
-  94's pass left one of those 92 sentences without its token, this pass writes it, in the rev bump of 92.
-  Observed by AC1.
-- **S2** — id 4. 93 §4's exit-claim probe reads every `*.md` under `memory/builds/dDeclaredLoop/spec/` but
-  the 93 and 96 specs, the two that state the probe. 93 AC3 requires at least one claim from each of the
-  81, 83, 88 and 92 specs in place of its floor of five, and pins no count per file, because 94 S14
-  rewrites 92 S17. In this unit's rev bump of 93. Observed by AC2.
-- **S3** — id 12. 93 §4's matcher accepts `exits`, `exit` and `exit code`, each optionally followed by `of`
-  or `with`, before a number, and accepts `non-zero`. 93 AC3 passes on a set that holds 1 and no member but
-  1 and `non-zero`. Its staged break rewords 92 AC16 to `exit code of 0` in a scratch copy and observes the
-  probe red. 94 AC10 also re-runs 93 AC1's grep over 92's AC16 range. In this unit's rev bumps of 93 and
-  94. Observed by AC2, AC3.
-- **S4** — id 9. 90's sketch "The tree_lib route, after this unit" carries 94's loader whole: the
-  keyword-only `need`, one refusal naming every missing name, and any `Exception` the import raises
-  refused by its class name. The comment "every tree_lib name loop_lib calls" leaves it, and the
-  four-name tuple 95 S1 writes stays. 90 S4, 86 S21 and 88 S33 state the refusal over the caller's
-  `need`, and 88 S33 names any exception the import raises in place of `ImportError` or `SyntaxError`.
-  These land in this unit's rev bumps of 90, 86 and 88. 94 S10 names the three sites and 94 AC6 gains
-  their greps, in the rev bump of 94. Observed by AC4.
-- **S5** — id 10. 92's sketch "The tree_lib route, after this unit" shows `derive_conf_reads` and
-  `derive_conf_constants` calling `load_tree_lib(need=<the names it reads>)`, and `loop_witness.py`
-  reading `GIT_ENV_LEAKS` inside its reading function with `need=("GIT_ENV_LEAKS",)`. The module-level
-  `GIT_ENV_LEAKS = loop_lib.load_tree_lib().GIT_ENV_LEAKS` line leaves it. That lands in the rev bump of
-  92. 94 S8 and S22 name 92's sketch as a restatement site, and 94 AC2 gains its grep, in the rev bump of
-  94. Observed by AC5.
-- **S6** — id 13. 94 S5 and §4 "The tree_lib route probe" state the value-flow class. A loader result may
-  only be the direct value of an `Attribute`, the first argument of `getattr`, or a plain `Name` bound once
-  in the same body. A loader result that is returned, yielded, assigned to an attribute, a subscript or a
-  second `Name`, placed in a list, tuple, set or dict display, or passed to any call but `getattr` is a
-  HIT. 94 AC3 gains a staged helper that returns `loop_lib.load_tree_lib(need=())` and is read through
-  `.derive_X`. In this unit's rev bump of 94. Observed by AC6.
-- **S7** — id 14. `load_tree_lib` in `tools/loop/loop_lib.py` takes `need` as a keyword-only parameter,
-  `def load_tree_lib(*, need=TREE_LIB_SYMBOLS)`. 94's probe counts any positional argument of a
-  `load_tree_lib` call as a HIT, and a `need` that is not a tuple display of str constants as a HIT, a list
-  display included. 94 S22, its sketch and its probe say so, and 94 AC3 gains a staged positional read of
-  an unchecked name, in the rev bump of 94. Observed by AC7.
-- **S8** — id 3. 94's **consumes-from** `TOOL-dDeclaredLoop-93` bullet cites the round-10 spec audit's
-  ids 4, 11, 13, 20 and 29, the set 93's mirroring bullet cites, in the rev bump of 94. Observed by AC8.
-- **S9** — id 5. The version-skew row of `tools/loop/budget.py` checks its scratch copy in a fresh child
-  `python` process, run as `sys.executable` with its working directory at the copy's `loop/`. The parent's
-  `sys.modules` and `sys.path` therefore never answer for the copy. 94 S2, S21 and S24 and 94's sketch say
-  so, and 92 S7 says so, in the rev bumps of 94 and 92. Where 94's pass checked the copy in-process, this
-  pass moves the check into the child. Observed by AC9.
-- **S10** — id 15. 94 AC18 gains a half: after an in-process `load_tree_lib()` of the real kit, the row
-  still prints `tree_lib lacking derive_constant_charges`. In the rev bump of 94. Observed by AC10.
-- **S11** — id 7. 90's sketch catch line and per-name loop read as 94 S21's idiom, and 88 S33 names any
-  exception the import raises. S4's rewrite is what writes both. Observed by AC4.
-- **S12** — id 16. 94 S24 and 94's sketch name the copied set as 90 S5 does: `tools/loop/`, `tools/lib/`
-  and `tools/memory-tree/` as siblings, with `__pycache__` excluded. 94 §5 and 92 §5 price the copy from
-  `du -sk` of those three directories, with the command and the list written beside the figure, measured
-  at this pass. 94 AC18's grep of 92 §5 reads `du -sk` in place of `3.3 MB`. These land in the rev bumps
-  of 94 and 92. Where 94's pass copied another set, this pass copies that one. Observed by AC11.
-- **S13** — id 17. Before it creates its scratch directory, the skew row resolves `tempfile.gettempdir()`
-  and the repository root from `git rev-parse --show-toplevel`, compared after `os.path.realpath` and
-  `os.path.normcase`. Where the temp root sits under the repository, the row refuses by name, printing
-  `scratch root <path> is inside the repository`, and creates nothing. It opens
-  `tempfile.TemporaryDirectory(ignore_cleanup_errors=True)`, and prints `scratch copy left at <path>` where
-  the directory survives the `with` block. 94 §5 "security" and 92 §5 "security" read "cleaned up on normal
-  exit and on an exception". 94 AC18 asserts the created path is outside the repository root. These land
-  in the rev bumps of 94 and 92. Observed by AC12, AC13.
+- **S14** — ids 5 and 15, observed at this unit's pass, after 94 S21 has rewritten `load_tree_lib` in
+  `tools/loop/loop_lib.py` at order 48. The `no-own-conf-read` plant of `tools/loop/budget.py` first
+  loads the real `tree_lib` in its own process through `load_tree_lib`. It then checks a kit pair whose
+  `tree_lib.py` lacks `derive_constant_charges` in a fresh `sys.executable -I` child, and the child's
+  refusal still names `derive_constant_charges` and `govkit update --kits memory-tree`, with no
+  `Traceback`. No code moves in this pass. Observed by AC14, AC15.
 
 ## 3. Non-goals (OUT)
 
-- The high's mechanism, `read_tree_conf` and the four-name tuple: unit 95. S4 keeps the tuple 95 writes.
-- The report's left-shift gates and checklist entries: each class is recorded at the close, and each item
-  above carries the observation that discharges its own defect.
-- Rewriting a passage a sibling unit already wrote as this unit's item states. An item whose target reads as
-  stated is observed and recorded, never rewritten.
-- A by-path module load keyed on the resolved directory, the report's other fix for ids 5 and 15. S9's
-  child process isolates the copy without changing how `load_tree_lib` imports for every caller.
-- Cleanup after `SIGKILL`. No `with` block runs then, and §5 claims only normal exit and an exception.
+- **S1 to S13, settled at the tip.** Each was read on the branch tip §4 Evidence names. Their criteria,
+  AC1 to AC13, leave the scope with them; AC14 and AC15 are new labels.
+
+| Item | Id | Rev-2 ordered | Settled because |
+|---|---|---|---|
+| S1 | 2 | 94 AC19 and a rev bump of 92, each writing range tokens | 92 is CLOSED at the tip and 94 CLOSED at order 48, so both are frozen; 94 rev-4 holds no AC19 and settles its own S3 to S8 in its §3 |
+| S2 | 4 | the exit-claim probe's population and floor, in a rev bump of 93 | spec text alone, in 93, CLOSED at the tip; its probe ran at its own close |
+| S3 | 12 | the probe's matcher and staged break in 93, and 94 AC10 re-running 93 AC1's grep | 93 is CLOSED; 94 rev-4 holds no AC10 and is frozen before this unit builds |
+| S4 | 9 | 90's loader sketch, 90 S4, 86 S21 and 88 S33 over a `need` argument, and 94 S10 and AC6 | `load_tree_lib` takes no argument, and 94 rev-4 §3 sets `need` out under 92 §8 F3 (c); 86, 88 and 90 are CLOSED; 94 S21 builds the any-exception catch and the every-name refusal at order 48 |
+| S5 | 10 | 92's sketch calling the loader with `need=`, and `loop_witness.py` reading `GIT_ENV_LEAKS` through it | `tools/loop/loop_witness.py` carries the shared git-env-leaks block inline and calls no loader, as 92 rev-5 S8 states; 92 is CLOSED |
+| S6 | 13 | the loader-result value-flow class in 94's route probe, and 94 AC3's staged helper | 94 rev-4 holds no route probe and no AC3, as 95 rev-3 §4 Evidence also reads |
+| S7 | 14 | `need` keyword-only in `load_tree_lib`, and 94's probe grading positional and list forms | no `need` argument exists to make keyword-only, and 94 S21's sketch keeps the signature `load_tree_lib()` |
+| S8 | 3 | 94's consumes-from 93 bullet citing ids 4, 11, 13, 20 and 29 | spec text alone, in 94, frozen before this unit builds; the two bullets keep their id sets as record |
+| S9 | 5 | the skew row checking its copy in a fresh child process | built by 90 §8 F8 (a): the row runs `loop_lib.load_tree_lib()` in a `sys.executable -I` child with the copy's `loop/` first on its `sys.path`; the spec halves sit in the frozen 92 and 94; S14 observes it after order 48 |
+| S10 | 15 | 94 AC18's half, the label printing after an in-process load | the row loads the real `tree_lib` in its own process before it starts the child, so every run of the plant is that observation; 94 rev-4 holds no AC18; S14 observes it after order 48 |
+| S11 | 7 | 90's catch line and per-name loop, and 88 S33 naming any exception | as S4: 88 and 90 are CLOSED, and 94 S21 builds the idiom in code |
+| S12 | 16 | the copied set as three sibling folders, priced from `du -sk` in 92 §5 and 94 §5 | the row copies two files, `loop_lib.py` and `tree_lib.py`, so no folder set is copied and no `du` price is owed; 92 and 94 are frozen |
+| S13 | 17 | a refusal where the temp root sits inside the repository, a `TemporaryDirectory` with `ignore_cleanup_errors`, and a left-copy line | F6 (a): the row has no scratch root of its own, it writes under the `tempfile.mkdtemp` root of `run_budget_plant` that every plant shares, and the memory-tree kit's `remove_tree` already swallows an `OSError`, so a cleanup error ends in no `Traceback` |
+
+- The high's mechanism: unit 95, at rev-3 an observation pass at order 49 that writes no code.
+- A temp-root check for the loop kit's fixtures. Every `tools/loop/*.py` that creates a temp directory
+  shares the case id 17 names, so a check in one plant gates one instance of the class (F6). The class is
+  recorded at the close.
+- The report's left-shift gates and checklist entries: each class is recorded at the close.
+- A by-path load of `tree_lib`. 90 §8 F8 (a) chose the child process, and 94 rev-4 §4 rejects the
+  by-path load because it moves how every caller imports.
+- Cleanup after `SIGKILL`. No `finally` block runs then.
 
 ### Edges
 
-- **consumes-from** `TOOL-dDeclaredLoop-95` — the four-name `TREE_LIB_SYMBOLS`, `read_tree_conf` and 94's probe as that unit leaves it, which S4's rewrite of 90's loader block keeps and S6 and S7 widen (the round-11 spec audit's ids 1, 9, 13, 14)
-- **consumes-from** `TOOL-dDeclaredLoop-94` — S2, S5, S8, S10, S21, S22, S24, §3's Edges, §4's sketch and probe, §5, AC2, AC3, AC6, AC10 and AC18, with the skew row of `budget.py` and `load_tree_lib` as that unit builds them (the round-11 spec audit's ids 2, 3, 4, 5, 7, 9, 10, 12, 13, 14, 15, 16, 17)
-- **consumes-from** `TOOL-dDeclaredLoop-93` — §4's exit-claim probe, AC1 and AC3, which S2 and S3 restate (the round-11 spec audit's ids 3, 4, 12)
-- **consumes-from** `TOOL-dDeclaredLoop-92` — S3, S7, S8, S17, AC8, AC16, §5 and the sketch "The tree_lib route, after this unit", which S1, S5, S9, S12 and S13 restate (the round-11 spec audit's ids 2, 5, 10, 16, 17)
-- **consumes-from** `TOOL-dDeclaredLoop-90` — S4 and the sketch "The tree_lib route, after this unit", which S4 and S11 restate (the round-11 spec audit's ids 7, 9)
-- **consumes-from** `TOOL-dDeclaredLoop-88` — S33, which S4 and S11 restate (the round-11 spec audit's ids 7, 9)
-- **consumes-from** `TOOL-dDeclaredLoop-86` — S21, which S4 restates (the round-11 spec audit's id 9)
-- **hands-off** `TOOL-dDeclaredLoop-100` — S4, S6, S9, S12, S13, §4's route-probe and skew-row sketches and §7, with the skew row of `budget.py`, which that unit restates and completes (the round-12 spec audit's ids 5, 13, 15, 21, 22, 23, 24)
+- **consumes-from** `TOOL-dDeclaredLoop-95` — rev-3's observation pass, which writes no code: the two-name `TREE_LIB_SYMBOLS` and no `read_tree_conf`, the state that settles S4, S6 and S7 here (the round-11 spec audit's ids 1, 9, 13, 14)
+- **consumes-from** `TOOL-dDeclaredLoop-94` — S21's `load_tree_lib` at order 48, whose refusal S14 observes through the skew row, and rev-4's §3 and §6, which hold no route probe, no `need` argument and no AC10, AC18 or AC19, settling S1, S3, S6, S7, S8 and S10 (the round-11 spec audit's ids 2, 3, 4, 5, 7, 9, 10, 12, 13, 14, 15, 16, 17)
+- **consumes-from** `TOOL-dDeclaredLoop-93` — its exit-claim probe, AC1 and AC3, frozen at its close, which settle S2 and S3 (the round-11 spec audit's ids 3, 4, 12)
+- **consumes-from** `TOOL-dDeclaredLoop-92` — rev-5's S8 and §8 F3 (c), the inline git-env-leaks block and no `need` argument, which settle S4, S5 and S7, and its frozen S3, S17, AC8, AC16 and §5, which settle S1, S9, S12 and S13's spec halves (the round-11 spec audit's ids 2, 5, 10, 16, 17)
+- **consumes-from** `TOOL-dDeclaredLoop-90` — S4 and its loader sketch, frozen, which settle S4 and S11, and the skew row of its §8 F8 (a), which S14 observes (the round-11 spec audit's ids 7, 9)
+- **consumes-from** `TOOL-dDeclaredLoop-88` — S33, frozen, which settles S4 and S11 (the round-11 spec audit's ids 7, 9)
+- **consumes-from** `TOOL-dDeclaredLoop-86` — S21, frozen, which settles S4 (the round-11 spec audit's id 9)
+- **hands-off** `TOOL-dDeclaredLoop-100` — rev-3's §3, where S4, S6, S9, S12 and S13 and the route-probe and skew-row sketches that unit restates are settled, and §7, which that unit's re-ground reads (the round-12 spec audit's ids 5, 13, 15, 21, 22, 23, 24)
 
 ## 4. Design
 
 ### Write set
 
-This pass writes `tools/loop/loop_lib.py` (S7) and `tools/loop/budget.py` (S9, S12, S13). Inside this
-build's folder it amends the specs of 86, 88, 90, 92, 93 and 94 as rev bumps, one per spec, each with its
-§9 line. The build README's regions are the generator's render. A keyword-only parameter moves no `id`,
-`kind` or `file` of `load_tree_lib`'s symbol row, and the pass mints no public module-level `def`, so
-`memory/map/generated/symbols.json` does not move.
+None under `tools/` and no sibling spec. The pass runs AC14 and AC15. The close's records and the build
+README's regions are the main loop's and the generator's. The pass mints no public module-level `def`,
+so `memory/map/generated/symbols.json` does not move.
 
-### The exit-claim probe, after this unit (S2, S3)
+### The skew row, as built (S14)
 
-```
-claim = re.compile(r"--plant push-merge-tree-fatal`((?:(?!--plant|\. |; ).){0,60}?)"
-                   r"\b(?:exit(?:s| code)?(?: of| with)? (\d+)|(non-zero))")
-for each *.md under memory/builds/dDeclaredLoop/spec/ but the 93 and 96 specs:
-    text = the file with every whitespace run squeezed to one space
-    collect (file, m.group(2) or m.group(3)) for every claim.finditer(text)
-assert each of the 81, 83, 88 and 92 specs holds at least one claim
-print the claims per file and the set of codes
-```
-
-### The tree_lib route probe, after this unit (S6, S7)
+The pass observes this; it builds none of it.
 
 ```
-for every *.py under tools/loop/, parsed:
-    outside loop_lib.load_tree_lib, the HITs of 94 §4 stand, and these join them:
-        a load_tree_lib(...) Call with any positional argument
-        a need that is not a tuple display of str constants
-        a LOADER RESULT returned, yielded, assigned to an Attribute, a Subscript or a second Name,
-          placed in a List, Tuple, Set or Dict display, or an argument of any call but getattr
-    a LOADER RESULT is a load_tree_lib(...) Call, or a Name bound once from one in the same body
-    a LOADER RESULT may only be the value of an Attribute, getattr's first argument, or that Name
+mt   = parent folder of load_tree_lib().__file__        # the real tree_lib, loaded in this process
+pair = <run_budget_plant's mkdtemp root>/skew
+copy loop/loop_lib.py and memory-tree/tree_lib.py into pair, as siblings
+append globals().pop("derive_constant_charges", None) to pair/memory-tree/tree_lib.py
+run [sys.executable, "-I", "-c", probe, pair/loop]      # probe: sys.path.insert(0, argv[1]); loop_lib.load_tree_lib()
+held where the child exits 1 naming derive_constant_charges and govkit update --kits memory-tree, no Traceback
+remove_tree(<the mkdtemp root>) in run_budget_plant's finally
 ```
 
-### The skew row, after this unit (S9, S12, S13)
+### The isolation probe (AC15)
 
 ```
-real   = dirname(loop_lib.load_tree_lib(need=()).__file__)          # tools/memory-tree, loaded in-process
-top    = git rev-parse --show-toplevel
-if under(realpath(tempfile.gettempdir()), realpath(top)): refuse "scratch root <path> is inside the repository"
-with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as scratch:
-    copy tools/loop/, tools/lib/ and tools/memory-tree/ as siblings into scratch, no __pycache__
-    rename derive_constant_charges in scratch/memory-tree/tree_lib.py
-    run [sys.executable, "-c", <call loop_lib.load_tree_lib()>] with cwd scratch/loop   # a fresh child
-    pass where the child exits non-zero naming derive_constant_charges
-if exists(scratch): print "scratch copy left at <path>"
+import ast
+t = ast.parse(open("budget.py", encoding="utf-8").read())
+f = next(n for n in t.body if isinstance(n, ast.FunctionDef) and n.name == "run_budget_plant")
+calls = [n for n in ast.walk(f) if isinstance(n, ast.Call)]
+load = [c.lineno for c in calls if ast.unparse(c.func) == "load_tree_lib"]
+kid = [c.lineno for c in calls if ast.unparse(c.func) == "subprocess.run" and c.args
+       and isinstance(c.args[0], ast.List)
+       and [ast.unparse(e) for e in c.args[0].elts[:2]] == ["sys.executable", "'-I'"]]
+print(bool(load and kid and min(load) < min(kid)))
 ```
 
 ### Evidence
 
-Read or probed 2026-10-24 at the worktree tip on node `d`: PINNED, that date.
+Read or probed 2026-11-17 on node `d`: PINNED, that date. Every read is of
+`branch/unattended-declared-loop-d56bf0` at `c35e8d15d`, its tree written by `git archive` into the run's
+scratch directory, since this worktree is cut from main, which lacks the loop kit. The plant ran in that
+extracted tree, and the staged break in a scratch copy of its `tools/loop/`, `tools/lib/` and
+`tools/memory-tree/`. 95 rev-3 was read from the run's pending copy, since it is not on the branch yet.
 
-- 93 §4's matcher, run over the spec folder, found one claim each in 81, 83 and 92, two in 88 and four in
-  93, and the widened matcher above found the same nine. No spec phrases a claim as `exit code`,
-  `exit with` or `non-zero` today.
-- `tools/memory-tree/row_grammar.py:1010-1039` `load_recall_kit` does `sys.path.insert(0, kit)` and a plain
-  `import`, so a module it loads stays cached in `sys.modules`. `tools/check-spec-tokens.py:851`
-  `load_kit_module` keys its cache on the resolved path.
-- `tempfile.TemporaryDirectory` honours `TMPDIR`, `TEMP` and `TMP`. Its `ignore_cleanup_errors` keyword
-  exists from Python 3.10, and `python --version` printed 3.14.5.
-- `tools/loop/` is absent at base, so every module this unit writes is sibling-minted.
-- Baselines over `memory/builds/dDeclaredLoop/spec/`, each grep as its criterion states, at HEAD:
-  - over 92: AC8's range `derive_X`, `import_module`, `getattr` and `non-empty`, AC16's range `S24` and
-    `S21`, S8's range `need`, `first use` and `conf-constant class`, S3's range `conf-constant class`,
-    S17's range `first non-blank` and `85 S3`, the sketch range `need=`, S7's range `child`, and §5's
-    `du -sk` and `normal exit`: 0 each; the sketch range `GIT_ENV_LEAKS = loop_lib.load_tree_lib()`: 1;
-  - over 90: the sketch range `need` 0, `for name in TREE_LIB_SYMBOLS` 1, `ImportError | SyntaxError` 1
-    and `every tree_lib name loop_lib calls` 1; S4's range `need` 0;
-  - over 86's S21 range `need` 0; over 88's S33 range `need` 0, `any exception` 0 and `SyntaxError` 1;
-  - over 93: §4's probe `non-zero` 0, AC3's range `exit code of 0` 0;
-  - over 94: AC10's range `93 AC1` 0, S5's range `returned` 0, the probe `positional` 0, S22's range
-    `keyword-only` 0, AC3's range `positional` 0, S24's range `child`, `tools/lib/` and `__pycache__` 0
-    each, the sketch `and its siblings` 1, AC18's range `show-toplevel` and `du -sk` 0 each, §5
-    `normal exit` 0, and the consumes-from 93 bullet citing `ids 4, 11, 13, 20, 29` 0.
+- `tools/loop/loop_lib.py#TREE_LIB_SYMBOLS` holds `derive_docstring_ids` and `derive_constant_charges`.
+  `tools/loop/loop_lib.py#load_tree_lib` takes no argument. It catches `LookupError`, then `ImportError`
+  and `SyntaxError`, and refuses at the first missing name with `has no <name>` and the update command.
+- `tools/loop/budget.py#run_budget_plant`, case `no-own-conf-read`, runs the sketch above. Its root is
+  `tempfile.mkdtemp(prefix="loop-budget-")`, handed to `remove_tree` in the function's `finally`. Its
+  check owes exit 1, the symbol, `govkit update --kits memory-tree` and no `Traceback`.
+- `tools/loop/loop_witness.py#remove_tree` calls `tools/memory-tree/deviation_join.py#remove_tree`, which
+  makes a refused path writable, deletes it again, and swallows any `OSError` left.
+- 94 rev-4 S21 tests every name of the tuple and raises one refusal naming each missing name, and a
+  module lacking one name gets the refusal text it gets at the tip. Its sketch keeps `load_tree_lib()`
+  with no argument. Its §6 holds AC14, AC15 and AC16 alone, and its §3 holds no route probe and settles
+  its own S24 on the built skew row.
+- 95 rev-3 states no `read_tree_conf`, no `need` argument and the two-name tuple, and writes no code.
+- The specs of units 86, 88, 90, 92 and 93 are CLOSED at the tip, and 94's is INPROGRESS at order 48.
+- `python budget.py --fixture --plant no-own-conf-read` in `tools/loop/` exited 0. It printed the
+  child's `exit 1` line naming `derive_constant_charges` and the update command, then `held`, in
+  1.0 s PINNED wall time.
+- Staged break: in a scratch copy whose `loop_lib.py` refusal reads `has no <name>` without the update
+  command, the same plant exited 1 printing `MISSED`.
+- §4's isolation probe printed `True` over `budget.py`.
+- `grep -lE "tempfile\.(mkdtemp|TemporaryDirectory)" tools/loop/*.py | wc -l` printed 15, DERIVED, and
+  `grep -rln gettempdir tools/loop/` printed nothing, so no loop fixture compares its temp root with the
+  repository.
 
 ### Files touched (estimate)
 
-- `tools/loop/loop_lib.py`
-- `tools/loop/budget.py`
-- `memory/builds/dDeclaredLoop/spec/`
-- `memory/builds/dDeclaredLoop/README.md`
+None under `tools/`.
 
 ### Alternatives rejected
 
-- **One unit per minor.** M4 forbids it.
-- **Two batch units, the 93 minors and the 94 minors.** The halves are not disjoint by M6. S3 writes 94
-  AC10 as well as 93's probe, which is clause 1. Each half re-renders the build README's units region, a
-  generated index written with its generator, which is clause 3.
-- **A by-path load keyed on the resolved directory (L2's other fix).** It changes how `load_tree_lib`
-  imports for every caller in order to serve one fixture row.
-- **A `dir=` under a fixed path outside the repository (L5's other fix).** It picks an install location
-  for every adopter. The refusal keeps the platform's temp root and names the case where it is unsafe.
+- **Rev bumps of the sibling specs, as rev-2 planned.** Each is CLOSED, or CLOSED before this unit builds,
+  and a CLOSED spec is frozen.
+- **Build S13's refusal in the skew row (F6).** The row holds no scratch root of its own, and the case is
+  the class of every loop fixture's temp root.
+- **Settle S14 with S1 to S13 and close the unit unbuilt (F7).** 94 S21 rewrites the refusal the row
+  reads at order 48, after this re-ground.
 
 ## 5. Production-readiness checklist
 
-- security — S13 refuses a scratch root inside the repository before anything is written, and S9 keeps the
-  copy's module state out of the checking process. S6 and S7 close the routes by which a loader result
-  escapes its symbol check.
-- perf / scale — one child `python` process per plant run, beside the copy S12 prices from `du -sk`.
-- error / empty / loading states — S13 names a scratch root inside the tree and a copy left behind. A
-  positional `need` raises `TypeError` at the call, and the probe names it first.
-- observability — S13's two lines name the path; the probe names each escaping form.
-- risks — the amendments land on specs whose units build before this one, each a rev bump with its §9
-  line. S12's figure is measured at this pass, because `tools/loop/` is unbuilt at HEAD.
-- testing — AC1 to AC13 as greps, probes, staged breaks and plant runs.
-- migration — none: every reader is unbuilt at base.
-- user docs — none.
+- security — the skew row checks its copy in a fresh isolated child, so the parent's module state never
+  answers for it; a temp root inside the repository is out under F6.
+- perf / scale — one plant run and one `ast` probe, about 1.0 s PINNED 2026-11-17.
+- error / empty / loading states — a skewed kit refuses by name in the child, which AC14 observes; a
+  cleanup error is swallowed by `remove_tree`.
+- observability — the plant's `exit 1` line and `held` are 90's; this pass reads them.
+- risks — unit 100 restates rev-2's items and sketches, and units 97, 98 and 99 at order 50 write
+  `loop_lib.py` and `budget.py`; the sweep below names each.
+- testing — AC14 and AC15 as a plant run and a probe.
+- migration — none: no stored data.
+- user docs — none: no verb, flag or usage row is added. `grep -rln "no-own-conf-read" help/` prints
+  `help/loop.md` alone at the tip, whose line names the `breakpoints.py` plant of that name, which this
+  pass does not read.
+
+### The sweep
+
+The pass writes no file, so no function, constant or fixture moves. The readers below read this spec's
+text, which the re-ground commit lands. Each count is DERIVED by the command beside it, run on the
+branch tip.
+
+| What moves | Readers, pins and populations | What keeps each green |
+|---|---|---|
+| this spec's item and criterion ids | 100, DEFERRED, and the CLOSED 93, `grep -c "96 [SA][C0-9]" memory/builds/dDeclaredLoop/spec/*.md` | S1 to S13 and AC1 to AC13 keep their labels on §3's table, so each citation lands; 100 is re-grounded before its builder, and 93's text is frozen record |
+| the edges naming this unit | eight bullets, seven hands-off from 86, 88, 90, 92, 93, 94 and 95 and one consumes-from from 100, `grep -n "^- \*\*[a-z-]*\*\* .TOOL-dDeclaredLoop-96. " memory/builds/dDeclaredLoop/spec/*.md` | rev-3 keeps the eight mirrored bullets, verbs, targets and id sets unchanged |
+| the title | the units row of `memory/builds/dDeclaredLoop/README.md`, a generated region | the title is unchanged; the dispatcher's index regeneration renders rev-3 |
+| this spec's positional rows | `memory/project/positional-refs.txt`, three rows naming this spec, `grep -c "dDeclaredLoop-96.md" memory/project/positional-refs.txt` | rev-3 keeps the `BUILD-METHOD M4` row in §1 and cites code by symbol only, so the two rows citing lines of `tools/check-spec-tokens.py` and `tools/memory-tree/row_grammar.py` go stale; the commit landing rev-3 runs `python tools/playbook/positional.py shrink` |
+| the symbol tier | `memory/map/generated/symbols.json` | no def is minted, so no row moves |
+| the `loop budget fixtures` leg | `tools/gate-legs.json`, whose argv runs `budget.py --selftest`, every plant, `no-own-conf-read` among them; its row in `tools/run-gates/selftest-budgets.txt` | the pass adds and moves no plant row and no budget |
+| the lexicon offender pin | `VERB_OFFENDER_PIN` in `.lexicon.conf`, 1215 PINNED at the tip | no new function or constant name, so no `--suggest` run is owed |
+| refusal ceilings and families | `tools/memory-tree/check-arms.py` reads tracked `*.sh` files | the pass writes no shell script; `REFUSAL_CEILINGS` in `.memory-tree.conf` names two `tools/unattended/` scripts, and `tools/loop/` holds no `.families.txt` |
+| shared records | `SHARED_RECORDS` in `.unattended.conf`: `memory/DECISIONS.md` and `memory/project/readme-contract.txt` | the pass writes neither, and the run lands no decision row ahead of it |
+| the kickoff manifest | the `watch:` line of `memory/guides/SESSION-KICKOFF.md` | it names no path under `memory/builds/` or `tools/loop/` |
+| the install-prefix ban, the verdict-epoch delegates, subject pins, upgrade steps, help anchors and usage rows | `tools/check-install-prefix.sh`, `tools/memory-tree/check-verdict-epoch.sh`, every leg's `subject`, `tools/govkit/upgrade_steps.py`, `help/` | the pass writes no shipped file, leg, step, verb or flag |
+
+Order: this unit reads the skew row unit 90 built, CLOSED at the tip, and 94 S21's `load_tree_lib`,
+which lands at order 48 as 94 rev-4 states it. Unit 95 at order 49 writes no code. Units 97 and 99 write
+`tools/loop/loop_lib.py` and 98 writes `tools/loop/budget.py` at order 50, each re-grounded on its own;
+where one lands before this pass, AC14 and AC15 run over its landed code, and a red there is that
+unit's. Unit 100 at order 51 reads this rev.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When each range of the 92 spec below is piped to its grep, each prints at least 1:
-  `awk '/^- \*\*AC8\*\*/,/^- \*\*AC9\*\*/'` with `grep -c derive_X`, `grep -c import_module`,
-  `grep -c getattr` and `grep -c non-empty`; `awk '/^- \*\*AC16\*\*/,/^## 7/'` with `grep -c S24` and
-  `grep -c S21`; `awk '/^- \*\*S8\*\*/,/^- \*\*S9\*\*/'` with `grep -c need`, `grep -c "first use"` and
-  `grep -c "conf-constant class"`; `awk '/^- \*\*S3\*\*/,/^- \*\*S4\*\*/'` with
-  `grep -c "conf-constant class"`; and `awk '/^- \*\*S17\*\*/,/^## 3/'` with `grep -c "first non-blank"`
-  and `grep -c "85 S3"`. `awk '/^- \*\*AC19\*\*/,/^## 7/'` over the 94 spec piped to
-  `grep -c "first non-blank"` prints at least 1.
-  Red when: a pass writes only the code halves of 94's items and every criterion stays green.
-  figure: each 92 grep prints 0 at HEAD, PINNED 2026-10-24.
-- **AC2** — When a `python -c` probe runs §4 "The exit-claim probe, after this unit" over
-  `memory/builds/dDeclaredLoop/spec/`, it prints at least one claim from each of the 81, 83, 88 and 92
-  specs, none from the 93 or 96 specs, and a set holding 1 and nothing but 1 and `non-zero`.
-  `awk '/^### The exit-claim probe/,/^### Write set/'` over the 93 spec piped to `grep -c non-zero`, and
-  `awk '/^- \*\*AC3\*\*/,/^## 7/'` over it piped to `grep -c "exit code of 0"`, each print at least 1.
-  Red when: the floor is met by 93's own sentences, staged by rewording 81's claim out of the matcher in a
-  scratch copy of the folder, which must turn the probe red naming the 81 spec.
-  figure: both 93 greps print 0 at HEAD, PINNED 2026-10-24; the claims are DERIVED from the folder.
-- **AC3** — When the probe of AC2 runs over a scratch copy of the spec folder whose 92 AC16 reads
-  `exit code of 0` in place of exit 1, it prints a set holding 0 and fails; with `exits with 0` it fails
-  the same way. `awk '/^- \*\*AC10\*\*/,/^- \*\*AC11\*\*/'` over the 94 spec piped to `grep -c "93 AC1"`
-  prints at least 1.
-  Red when: a reworded relapse of 92 AC16 leaves the probe printing `{1}`.
-  figure: the 94 grep prints 0 at HEAD, PINNED 2026-10-24.
-- **AC4** — When `awk '/^### The tree_lib route/,/^### Evidence/'` over the 90 spec is piped to
-  `grep -c need` and to `grep -c parse_conf`, each prints at least 1, and piped to
-  `grep -cF "for name in TREE_LIB_SYMBOLS"`, `grep -cF "ImportError | SyntaxError"` and
-  `grep -c "every tree_lib name loop_lib calls"`, each prints 0. Each of `awk '/^- \*\*S4\*\*/,/^- \*\*S5\*\*/'`
-  over the 90 spec, `awk '/^- \*\*S21\*\*/,/^- \*\*S22\*\*/'` over the 86 spec and
-  `awk '/^- \*\*S33\*\*/,/^- \*\*S34\*\*/'` over the 88 spec, piped to `grep -c need`, prints at least 1.
-  The 88 range piped to `grep -c "any exception"` prints at least 1, and piped to `grep -c SyntaxError`
-  prints 0. `awk '/^- \*\*AC6\*\*/,/^- \*\*AC7\*\*/'` over the 94 spec piped to `grep -c ImportError`
-  prints at least 1.
-  Red when: a sibling still says `need=("GIT_ENV_LEAKS",)` refuses over a missing derive name.
-  figure: the `need` greps print 0 and the three negative greps 1 each at HEAD, PINNED 2026-10-24.
-- **AC5** — When `awk '/^### The tree_lib route/,/^### The OSError/'` over the 92 spec is piped to
-  `grep -c "need="`, it prints at least 1, and piped to `grep -cF "GIT_ENV_LEAKS = loop_lib.load_tree_lib()"`,
-  it prints 0. `awk '/^- \*\*AC2\*\*/,/^- \*\*AC3\*\*/'` over the 94 spec piped to `grep -c "need="` prints
-  at least 1.
-  Red when: 92's sketch keeps the import-time route that 94 S8 removes.
-  figure: the 92 greps print 0 and 1 at HEAD, PINNED 2026-10-24.
-- **AC6** — When a scratch copy of `tools/loop/`, `tools/lib/` and `tools/memory-tree/` under the run's
-  scratch directory gains, in its `loop_witness.py`, one staged read per form, the probe of §4 "The
-  tree_lib route probe, after this unit" over the copy's `loop/` reports a hit for each. The forms are a
-  helper returning `loop_lib.load_tree_lib(need=())` read through `.derive_X`, a generator yielding one, a
-  `self.tl` store, a `CACHE["tl"]` store, a `t2 = tl` alias, a `[tl]` display and a helper argument. Over
-  the unmodified `tools/loop/` it reports no hit. `awk '/^- \*\*S5\*\*/,/^- \*\*S6\*\*/'` over the 94 spec
-  piped to `grep -c returned` prints at least 1.
-  Red when: a returned, stored or aliased loader result passes the probe.
-  figure: the 94 grep prints 0 at HEAD, PINNED 2026-10-24.
-- **AC7** — When `python -c "import inspect, loop_lib; print(inspect.signature(loop_lib.load_tree_lib).parameters['need'].kind.name)"`
-  runs in `tools/loop/`, it prints `KEYWORD_ONLY`. A scratch copy as in AC6 whose `loop_witness.py` reads
-  `loop_lib.load_tree_lib(("GIT_ENV_LEAKS",)).derive_docstring_ids` makes the probe report a hit naming the
-  positional argument, and one passing `need=["GIT_ENV_LEAKS"]` makes it report a hit naming the list.
-  `awk '/^- \*\*S22\*\*/,/^- \*\*S23\*\*/'` over the 94 spec piped to `grep -c keyword-only` prints at
-  least 1.
-  Red when: a positional or list `need` passes the probe while the loader checks fewer names than are read.
-  figure: the 94 grep prints 0 at HEAD, PINNED 2026-10-24.
-- **AC8** — When `grep -c 'consumes-from\*\* .TOOL-dDeclaredLoop-93.*ids 4, 11, 13, 20, 29'` runs over the 94
-  spec, it prints 1.
-  Red when: the two sides of the 93 and 94 edge cite different id sets.
-  figure: 0 at HEAD, PINNED 2026-10-24.
-- **AC9** — When a `python -c` probe parses `budget.py` in `tools/loop/`, the function holding the skew row calls
-  `subprocess.run` with `sys.executable` first in its argument list and a `cwd` under its scratch
-  directory, and imports nothing from the copy in-process. `awk '/^- \*\*S7\*\*/,/^- \*\*S8\*\*/'` over the
-  92 spec and `awk '/^- \*\*S24\*\*/,/^## 3/'` over the 94 spec, piped to `grep -c child`, each print at
-  least 1.
-  Red when: the row checks the copy in the process that already holds the real `tree_lib`.
-  figure: both greps print 0 at HEAD, PINNED 2026-10-24.
-- **AC10** — When a `python -c` call in `tools/loop/` first runs `loop_lib.load_tree_lib()`, then sets
-  `sys.argv` to `budget.py --fixture --plant no-own-conf-read` and runs `budget.py` through
-  `runpy.run_path` as `__main__`, its output holds `tree_lib lacking derive_constant_charges`.
-  `awk '/^- \*\*AC18\*\*/,/^## 7/'` over the 94 spec piped to `grep -c "in-process"` prints at least 1.
-  Red when: the row is staged to check the copy in-process, which then reuses the cached module and
-  prints no label.
-- **AC11** — When `awk '/^- \*\*S24\*\*/,/^## 3/'` over the 94 spec is piped to `grep -c "tools/lib/"` and to
-  `grep -c __pycache__`, and `awk '/^## 5/,/^## 6/'` over the 92 spec and over the 94 spec are each piped
-  to `grep -c "du -sk"`, each prints at least 1. The 94 sketch range
-  `awk '/^### The tree_lib route, after/,/^### The tree_lib route probe/'` piped to
-  `grep -c "and its siblings"` prints 0. A `python -c` probe parsing the loop kit's `budget.py` finds the str
-  constants `loop`, `lib`, `memory-tree` and `__pycache__` in the function holding the skew row.
-  Red when: the sketch still reads as a copy of all of `tools/`, or the price omits `loop/`.
-  figure: the `and its siblings` grep prints 1 and the rest 0 at HEAD, PINNED 2026-10-24.
-- **AC12** — When `python budget.py --fixture --plant no-own-conf-read` runs in `tools/loop/` with `TMPDIR`,
-  `TEMP` and `TMP` all set to a directory inside the repository, it exits non-zero printing
-  `scratch root` and `inside the repository`, and `git status --porcelain` prints the same before and
-  after.
-  Red when: the row copies into a temp root inside the tree, staged by removing the check.
-  fixture: the directory is an existing tracked one. With the check removed the row exits 0 and prints no
-  `scratch root` line, which is the red; its own cleanup leaves `git status` unchanged either way.
-- **AC13** — When `python budget.py --fixture --plant no-own-conf-read` runs in `tools/loop/` with the
-  default temp root, a `python -c` probe parsing `budget.py` finds `ignore_cleanup_errors=True` on the
-  `tempfile.TemporaryDirectory` call, and the run prints no `scratch copy left at`. `awk '/^## 5/,/^## 6/'`
-  over the 92 spec and over the 94 spec, piped to `grep -c "normal exit"`, each print at least 1.
-  `awk '/^- \*\*AC18\*\*/,/^## 7/'` over the 94 spec piped to `grep -c show-toplevel` prints at least 1.
-  Red when: §5 still promises removal on every exit, or a cleanup error on Windows ends the row in a
-  traceback.
-  figure: each grep prints 0 at HEAD, PINNED 2026-10-24.
+- **AC14** — When `python budget.py --fixture --plant no-own-conf-read` runs in `tools/loop/`, it exits 0.
+  It prints a `tree_lib lacking derive_constant_charges · exit 1` line naming `derive_constant_charges`
+  and `govkit update --kits memory-tree`, then `no-own-conf-read · held`, with no `Traceback`.
+  Red when: the refusal of `load_tree_lib` loses its update command, staged in a scratch copy of
+  `tools/loop/`, `tools/lib/` and `tools/memory-tree/` by cutting that command from its missing-name
+  message, where the plant exits 1 printing `MISSED`.
+  figure: 1.0 s PINNED wall time at the tip, 2026-11-17.
+- **AC15** — When §4's isolation probe runs as `python -I -c` in `tools/loop/`, it prints `True`: inside
+  `run_budget_plant`, a `load_tree_lib()` call sits on an earlier line than a `subprocess.run` call whose
+  argument list opens with `sys.executable` and `"-I"`.
+  Red when: the row checks the copy in the parent process, which already holds the real `tree_lib`, and
+  the probe prints `False`.
 
 ## 7. Gates
 
 `recall floor` · `recall floor arms` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-The sibling-minted loop legs this pass keeps green, outside the base manifest, each declared by the unit
-that mints it: `loop budget fixtures` and `loop computed witness`, neither a leg at HEAD.
-
-New arm: tools/loop/budget.py · covers AC12 · the no-own-conf-read skew row with its temp root inside the repository, staged with the root check removed · none
+The loop kit's leg this pass keeps green, a leg in `tools/gate-legs.json` on the branch and absent from
+main's: `loop budget fixtures`, which runs `budget.py --selftest`, the `no-own-conf-read` plant among its
+plants. This pass adds and moves no arm: the skew row is 90's, and AC15 is a probe.
 
 ## 8. Open questions
 
-- **F1 — Which binding line does a unit the spec audit promoted carry?** RESOLVED (agent, 2026-10-24,
-  delegated): `**Derived:** PLAY-dClosedLoop-2`, rung 3, as `TOOL-dDeclaredLoop-36` §8 F1 records.
-  widens: none · relaxes: none
+- **F1 — Which binding line does a unit the spec audit promoted carry?** `**Derived:** PLAY-dClosedLoop-2`,
+  rung 3, as `TOOL-dDeclaredLoop-36` §8 F1 records.
+  RESOLVED (agent, 2026-11-17, delegated): (rung 3). widens: none · relaxes: none
 - **F2 — Isolate the skew row's copy by a child process or by a path-keyed load (ids 5, 15)?** (a) a
-  fresh child `python` with its working directory at the copy's `loop/`; (b) `load_tree_lib` loading by
-  path under a key naming the resolved directory. The report judged both sound. (b) changes the import of
-  every caller to serve one row, and the row would then observe something the real readers do not.
-  (a) satisfies every criterion (b) would. RESOLVED (agent, 2026-10-24, delegated): (a), S9.
-  widens: none · relaxes: none
+  fresh child `python`; (b) `load_tree_lib` loading by path under a key naming the resolved directory.
+  (b) changes the import of every caller to serve one row. 90 §8 F8 (a) built (a), which S14 observes.
+  RESOLVED (agent, 2026-11-17, delegated): (a). widens: none · relaxes: none
 - **F3 — Keep the scratch copy out of the tree by a `dir=` or by a refusal (id 17)?** (a) a `dir=` under a
-  chosen path outside the repository; (b) refuse by name where the temp root sits under the repository.
-  (a) picks a location for every adopter, which veto 2 reserves to the owner. RESOLVED (agent,
-  2026-10-24, delegated): (b), S13.
-  widens: none · relaxes: none
+  chosen path outside the repository; (b) refuse by name where the temp root sits under the repository;
+  (c) neither, as F6 settles. (a) picks a location for every adopter,
+  and (b) gates one instance of a class. Recommendation: (c).
+  RESOLVED (agent, 2026-11-17, delegated): (c). widens: none · relaxes: none
 - **F4 — Make `need` keyword-only, or read a positional argument as `need` (id 14)?** (a) keyword-only;
-  (b) the probe reads the first positional argument as `need`. (a) fails at the call as well as in the
-  probe, and leaves one spelling to grade. RESOLVED (agent, 2026-10-24, delegated): (a), S7.
-  widens: none · relaxes: none
+  (b) the probe reads the first positional argument as `need`; (c) neither, since `load_tree_lib` takes
+  no argument under 92 §8 F3 (c) and 94 rev-4 holds no probe. Recommendation: (c).
+  RESOLVED (agent, 2026-11-17, delegated): (c). widens: none · relaxes: none
 - **F5 — Which side of the 93 and 94 edge moves (id 3)?** (a) 94's bullet cites ids 4, 11, 13, 20 and 29;
-  (b) 93's bullet cites id 11 alone. The report found ids 13 and 29 cross the edge, so (b) under-cites it.
-  RESOLVED (agent, 2026-10-24, delegated): (a), S8.
-  widens: none · relaxes: none
+  (b) 93's bullet cites id 11 alone; (c) neither, since 93 is CLOSED and 94 is frozen before this unit
+  builds. Recommendation: (c).
+  RESOLVED (agent, 2026-11-17, delegated): (c). widens: none · relaxes: none
+- **F6 — With the row writing under the shared plant root, what does S13 build (id 17)?** (a) nothing: S13
+  leaves the scope, and the class, a loop fixture's temp root inside the repository, is recorded at the
+  close; (b) a refusal in `run_budget_plant` for every budget plant; (c) one temp-root check in
+  `loop_lib.py` that every loop fixture calls. (b) gates one file of the 15 that create a temp directory
+  (§4 Evidence). (c) is a second mechanism across the kit, a unit of its own under M2. The report graded
+  id 17 LOW, with nothing falsely certified or lost, and its cleanup half holds through `remove_tree`.
+  Recommendation: (a).
+  RESOLVED (agent, 2026-11-17, delegated): (a). widens: none · relaxes: none
+- **F7 — With S1 to S13 settled at the tip, does the unit still build?** (a) yes, as an observation pass at
+  order 50 that writes no file and closes on AC14 and AC15; (b) settle S14 too and close the unit
+  unbuilt. 94 S21 rewrites the refusal the skew row reads at order 48, after this re-ground, and the run
+  keeps this unit's order and status. Recommendation: (a).
+  RESOLVED (agent, 2026-11-17, delegated): (a). widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, the round-11 spec audit's 13 minors batched (7 MEDIUM, 6 LOW).
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-100, written by the round-12 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-11-17 · §1 §2 §3 §4 §5 §6 §7 §8 §10 · S1 to S13 S14 AC14 AC15 · re-grounded on the code at
+  `branch/unattended-declared-loop-d56bf0` by 2026-11-17-prompt-TOOL-dDeclaredLoop-96-2-spec-writer: S1
+  to S13 settled in §3, every sibling spec frozen and no `need` argument; S14 observes the skew row after
+  94 S21; AC1 to AC13 leave with their items and AC14 and AC15 are new; the eight Edges bullets kept
+  with their payloads re-worded; §5's sweep added; every fork re-marked, F3 to F5 gaining option (c),
+  and F6 and F7 added.
 
 ## 10. Reuse audit
 
-Each item extends the seam its finding names, never a parallel copy. These are 93's exit-claim probe (S2,
-S3), 94's tree_lib route probe and `load_tree_lib` (S6, S7), the `no-own-conf-read` skew row of
-`budget.py` (S9, S10, S12, S13), and the sibling specs' own sentences (S1, S4, S5, S8, S11). The temp
-root and the child process are the standard library's `tempfile` and `subprocess`.
-`python tools/codebase-map/reuse_lookup.py "check a scratch copy of a kit in a fresh process outside the repository"`
-ranked `check`, `scratch`, `kit_rel`, `resolve_kit_dir`, `kit_dir` and `add_scratch_worktree`
-(`tools/run-gates/lib-attribute.sh`). `scratch` is a helper of three bash test suites and
-`add_scratch_worktree` a bash worktree helper, neither callable from the copy-installed loop kit, and
-`resolve_kit_dir` is the locator the loader already calls. So no existing seam fits the row's isolation,
-and it stays the row's own lines. The memory-recall query returned the round-11 report's L2, 94's §4
-sketch and the scratch-guard specs `TOOL-aProbedUnit-5` and `TOOL-aTetheredScratch-1`, which guard an
-agent's writes rather than a fixture's temp root.
+The seam is the `no-own-conf-read` case of `tools/loop/budget.py#run_budget_plant`, 90's skew row,
+observed in place over `tools/loop/loop_lib.py#load_tree_lib`. No row, probe or checker is minted.
+`python tools/codebase-map/reuse_lookup.py "check a skewed kit copy in a fresh child process outside the repository"`,
+run on the branch tip 2026-11-17, ranked `check`, `resolve_kit_dir`, `kit_rel`, `checks`, `kit_dir` and
+`read_policy_kit`. `resolve_kit_dir` is the locator `read_memory_tree` already calls, and none of the
+others checks a kit copy in a child, so no existing seam fits a second isolation and the row stays 90's.
 
-Recall terms used: exit-claim probe floor matcher load_tree_lib need keyword-only escape skew row child process scratch root minors batch
+Recall terms used: skew row no-own-conf-read load_tree_lib TREE_LIB_SYMBOLS child process scratch root temp root remove_tree observation pass minors batch
