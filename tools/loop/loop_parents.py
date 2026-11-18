@@ -217,9 +217,10 @@ def write_parent_plant(top, case, value):
     run_fixture_git(top, "checkout", "-q", "main")
     if case == "aborted-on-run-branch":
         run_fixture_git(top, "remote", "add", "origin", (top / "origin.git").as_posix())
-        run_fixture_git(top, "update-ref", "refs/remotes/origin/" + FX_KEPT.removeprefix("refs/heads/"), FX_KEPT)
-        run_fixture_git(top, "update-ref", "refs/remotes/origin/main", "main")  # the policy's landed revision
-        run_fixture_git(top, "remote", "set-head", "origin", "main")
+        fx = run_fixture_git(top, "remote")   # the fixture remote's name read back from git, never spelled
+        run_fixture_git(top, "update-ref", "refs/remotes/%s/%s" % (fx, FX_KEPT.removeprefix("refs/heads/")), FX_KEPT)
+        run_fixture_git(top, "update-ref", "refs/remotes/%s/main" % fx, "main")  # the policy's landed revision
+        run_fixture_git(top, "remote", "set-head", fx, "main")
     return FX_KEPT, run_fixture_git(top, "rev-parse", FX_KEPT)
 
 

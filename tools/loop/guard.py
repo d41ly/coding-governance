@@ -1164,14 +1164,15 @@ def run_guard_plant(case, top):
         run_fixture_git(top, "commit", "-q", "-m", "review rounds raised, no trailer")
         raised8 = run_fixture_git(top, "rev-parse", "--short=8", "HEAD")
         run_fixture_git(top, "remote", "add", "origin", "fx-none.invalid")
-        run_fixture_git(top, "update-ref", "refs/remotes/origin/main", "HEAD")
-        run_fixture_git(top, "symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/main")
+        tracking = "refs/remotes/%s/main" % run_fixture_git(top, "remote")   # the name read back, never spelled
+        run_fixture_git(top, "update-ref", tracking, "HEAD")
+        run_fixture_git(top, "symbolic-ref", tracking.rsplit("/", 1)[0] + "/HEAD", tracking)
         write_staged(top, {"fx-clean.txt": add_text("one clean line\n")})
         run_fixture_git(top, "commit", "-q", "-m", "one clean commit")
-        n = run_fixture_git(top, "rev-list", "--count", "refs/remotes/origin/main..HEAD")
+        n = run_fixture_git(top, "rev-list", "--count", tracking + "..HEAD")
         zero, unset = ["--push-range", "%s..HEAD" % ("0" * 40)], {"GOV_REMOTE": "", "GOV_DEFAULT_BRANCH": ""}
         run_scenario("the all-zero base", me + zero, 0, "push · %s commit(s) read · 0 changing" % n, **unset)
-        run_fixture_git(top, "update-ref", "-d", "refs/remotes/origin/main")
+        run_fixture_git(top, "update-ref", "-d", tracking)
         # TOOL-dDeclaredLoop-67 S33: no landed revision now grades the policy file's history, naming the raise
         run_scenario("the tracking ref deleted", me + zero, 1, "commit %s · %s" % (raised8, mguard.POLICY), **unset)
     elif case == "push-first-to-empty-remote":

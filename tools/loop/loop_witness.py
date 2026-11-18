@@ -724,7 +724,7 @@ def check_hold_plant(root, bad):
         run_fixture_git(root, *where, "config", "user.email", "fx@example.invalid")
         run_fixture_git(root, *where, "config", "user.name", "fx")
     run_fixture_git(repo, "remote", "add", "origin", str(origin))
-    run_fixture_git(repo, "push", "-q", "origin", "main")
+    run_fixture_git(repo, "push", "-q", run_fixture_git(repo, "remote"), "main")
     base = run_fixture_git(repo, "rev-parse", "HEAD")
     run_fixture_git(repo, "checkout", "-q", "-b", "unit")
     run_fixture_git(repo, "commit", "-q", "--allow-empty", "-m", "unit work")
