@@ -9,6 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+landed-by: attended
+landed-derived: abe6ac994833c636d192e18d1a018bb454b3042a c1f80c00275e2560a625072ccddb3add3fc7b81a
 asks-at-landing: TOOL-dDeclaredLoop-35=DEFERRED TOOL-dDeclaredLoop-101=OPEN TOOL-dDeclaredLoop-102=OPEN TOOL-dDeclaredLoop-103=OPEN TOOL-dDeclaredLoop-104=OPEN TOOL-dDeclaredLoop-105=OPEN TOOL-dDeclaredLoop-106=OPEN TOOL-dDeclaredLoop-107=OPEN TOOL-dDeclaredLoop-108=OPEN TOOL-dDeclaredLoop-109=OPEN TOOL-dDeclaredLoop-110=OPEN TOOL-dDeclaredLoop-111=OPEN TOOL-dDeclaredLoop-113=OPEN TOOL-dDeclaredLoop-114=OPEN
 units-at-landing: TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-112 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-82 TOOL-dDeclaredLoop-86 TOOL-dDeclaredLoop-87 TOOL-dDeclaredLoop-88 TOOL-dDeclaredLoop-89 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-91 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-96 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-100 TOOL-dDeclaredLoop-115 TOOL-dDeclaredLoop-116 TOOL-dDeclaredLoop-117
 hold-run: 
@@ -21,8 +23,8 @@ hold-code: owner-decision
 held-from: VERIFYING
 refreshed-at: 8eda4a5a0028fdf15c540293fdf462a110532667 · handoff · 52 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: f208abfa0702edff5dc7bdff076880c820143a74
-phase: HELD
+witness: abe6ac994833c636d192e18d1a018bb454b3042a
+phase: LANDED
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-declared-loop-d56bf0
