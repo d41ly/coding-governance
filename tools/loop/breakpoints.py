@@ -367,7 +367,7 @@ def run_breakpoint_plant(case):
             run_fixture_git(repo, "add", "-A")
             run_fixture_git(repo, "commit", "-q", "--allow-empty", "-m", message)
             if run_fixture_git(repo, "remote"):
-                run_fixture_git(repo, "push", "-q", "origin", "main")
+                run_fixture_git(repo, "push", "-q", run_fixture_git(repo, "remote"), "main")
 
         def check_owner_lines(lines):
             """A miss for each owner line ending in no release, and for an owner item not caused by ratification."""

@@ -643,7 +643,8 @@ def run_budget_plant(case):
                 fh.write('\nSPEC_TOKENS_CLI=""\nRUN_CLAIMS="off"\n')
             run_fixture_git(repo, "add", "-A")
             run_fixture_git(repo, "commit", "-q", "-m", "the budget plant's policy")
-            run_fixture_git(repo, "push", "-q", "origin", "main")   # the review bounds read the landed revision
+            # the review bounds read the landed revision
+            run_fixture_git(repo, "push", "-q", run_fixture_git(repo, "remote"), "main")
             run = repo / "memory" / "builds" / FX_SLUG / "RUN.md"
             missed = []
 
@@ -698,7 +699,7 @@ def run_budget_plant(case):
                                                                                'on-exhausted = "close-incomplete"\n'})
                 run_fixture_git(repo, "add", "-A")
                 run_fixture_git(repo, "commit", "-q", "-m", "the budget spent, one unit open")
-                run_fixture_git(repo, "push", "-q", "origin", "main")
+                run_fixture_git(repo, "push", "-q", run_fixture_git(repo, "remote"), "main")
                 owner = "only the owner raises %s" % BUDGET_KEY
                 row = "decision · item %s · reason ending close-incomplete · spent 0/0 · open %s" % (ENDING_KEY, FX_IDS[0])
                 run_round(FX_SLUG, 3)
