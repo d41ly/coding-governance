@@ -4,7 +4,7 @@
 
 - **Leg:** positional (the citation check alone)
 - **Red line:** tags: positional · RED · 3 red
-- **Files:** memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-14.md, memory/project/positional-refs.txt
+- **Files:** memory/project/positional-refs.txt
 - **Commit:** aa4abcadbb60350efe3a05b7c12a16548dd77cf6
 - **Rerun:** python tools/playbook/positional.py check, green 0 red
 - **Caused-by:** TOOL-dDeclaredLoop-14

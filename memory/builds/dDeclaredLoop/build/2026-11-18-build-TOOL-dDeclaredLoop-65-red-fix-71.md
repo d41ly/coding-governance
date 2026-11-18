@@ -4,7 +4,7 @@
 
 - **Leg:** remote literals (kit code names no remote)
 - **Red line:** remote-literals: FAILED — 30 line(s) in 259 file(s) name a remote by literal
-- **Files:** memory/builds/dDeclaredLoop/README.md, memory/builds/dDeclaredLoop/build/2026-11-18-build-TOOL-dDeclaredLoop-20-red-fix-69.md, memory/builds/dDeclaredLoop/build/2026-11-18-build-TOOL-dDeclaredLoop-20-red-fix-70.md, memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-20.md, tools/loop/position.py
+- **Files:** memory/builds/dDeclaredLoop/README.md, memory/builds/dDeclaredLoop/build/2026-11-18-build-TOOL-dDeclaredLoop-20-red-fix-69.md, memory/builds/dDeclaredLoop/build/2026-11-18-build-TOOL-dDeclaredLoop-20-red-fix-70.md, tools/loop/position.py
 - **Commit:** f357fcd48ad2278c3f3c36821b01aa733ce3a125
 - **Rerun:** bash tools/check-remote-literals.sh
 - **Caused-by:** TOOL-dDeclaredLoop-65
