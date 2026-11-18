@@ -10893,11 +10893,6 @@
       "file": "tools/govkit/govkit.py"
     },
     {
-      "id": "derive_partition_lines",
-      "kind": "function",
-      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
-    },
-    {
       "id": "derive_pass_legs",
       "kind": "function",
       "file": "tools/run-gates/pass_legs.py"
@@ -12656,6 +12651,11 @@
       "id": "extract_heredoc_body",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "extract_hs_lines",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
       "id": "extract_jsx_defs",
