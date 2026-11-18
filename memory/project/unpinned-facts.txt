@@ -9130,6 +9130,7 @@ memory/builds/dDeclaredLoop/build/2026-11-05-build-TOOL-dDeclaredLoop-1-reground
 memory/builds/dDeclaredLoop/build/2026-11-05-build-TOOL-dDeclaredLoop-1-reground-returns.md	32652 bytes
 memory/builds/dDeclaredLoop/build/2026-11-05-build-TOOL-dDeclaredLoop-20-deviation-201.md	3 calls
 memory/builds/dDeclaredLoop/build/2026-11-05-build-TOOL-dDeclaredLoop-32-deviation-321.md	4 calls
+memory/builds/dDeclaredLoop/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	103 specs
 memory/builds/dDeclaredLoop/prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-owner-review-cap.md	11 units
 memory/builds/dDeclaredLoop/prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-owner-review-until-no-high.md	11 units
 memory/builds/dDeclaredLoop/prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md	49152 bytes
