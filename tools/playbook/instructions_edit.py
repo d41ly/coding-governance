@@ -114,8 +114,12 @@ def check_terminal_proof():
     if sys.platform == "win32":
         import ctypes
         import msvcrt
+        try:
+            fd = sys.stderr.fileno()
+        except (OSError, ValueError):   # an in-process stream with no descriptor: its isatty answers alone
+            return "tty-cli"
         mode = ctypes.c_uint32()
-        handle = ctypes.c_void_p(msvcrt.get_osfhandle(sys.stderr.fileno()))
+        handle = ctypes.c_void_p(msvcrt.get_osfhandle(fd))
         if not ctypes.windll.kernel32.GetConsoleMode(handle, ctypes.byref(mode)):
             return None
     return "tty-cli"
