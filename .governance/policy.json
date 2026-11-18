@@ -679,9 +679,9 @@
       "value": "structural-roles"
     },
     "memory.staged-render": {
-      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
-      "source": "default",
-      "value": "off"
+      "reason": "set in .governance/policy.toml at {rev}",
+      "source": "file",
+      "value": "on"
     },
     "memory.superseded-slices": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
@@ -1333,5 +1333,5 @@
     ".agent-cap.conf": null,
     ".governance/instructions.toml": "9a0e827adc3598ff86ae582b76b5a457990dc90d"
   },
-  "policy_blob": "43fa1bb1dbe35b80a185cc5c1c452285b74086c0"
+  "policy_blob": "430e68331c5aec17e27ddb9650860a37502d906e"
 }
