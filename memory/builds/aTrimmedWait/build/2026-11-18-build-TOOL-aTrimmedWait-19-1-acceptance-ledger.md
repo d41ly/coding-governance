@@ -68,6 +68,6 @@ The two red rows are the fixture's liveness: the helper's comparison can go red.
 
 ## Owed to the main loop
 
-The spec's section 6 legs, `memory hygiene`, `spec tokens (a spec's own names resolve)`,
+The legs the spec's section 6 names, `memory hygiene`, `spec tokens (a spec's own names resolve)`,
 `recall floor`, `recall floor arms` and `codebase-map coverage + freshness`, run at the push
 through `push-main.sh`. The spec declares no `New arm:` line, so no RED-first observation is owed.
