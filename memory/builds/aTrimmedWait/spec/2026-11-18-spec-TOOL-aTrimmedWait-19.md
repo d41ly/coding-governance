@@ -1,6 +1,6 @@
 # TOOL-aTrimmedWait-19 — the hygiene suite's partition helper takes back main's name, so the landing's merge-loss check clears
 
-**Status:** SPECCED · rev-1 · 2026-11-18 · node a · Tier-1 · base 3cecd39a0 · streams tooling · order 14
+**Status:** INPROGRESS · rev-1 · 2026-11-18 · node a · Tier-1 · base 3cecd39a0 · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
