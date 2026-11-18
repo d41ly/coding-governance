@@ -217,7 +217,7 @@ ids TOOL-dDeclaredLoop-117
 | [TOOL-dDeclaredLoop-117 — the conf-opener derivation reads a conf path passed straight to its open, and every refusal of the `conf-readers-declared` plant is a standing case](spec/2026-11-17-spec-TOOL-dDeclaredLoop-117.md) | 54 | 2 | CLOSED | rev-1 | 2026-11-17 |
 <!-- /gen:build-units -->
 
-Records: 935 bound to this build, across 4 record folder(s).
+Records: 936 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
