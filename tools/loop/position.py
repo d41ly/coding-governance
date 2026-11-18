@@ -793,6 +793,7 @@ def write_position_plant(top, case, root):
     if remote:
         run_fixture_git(top, "init", "-q", "--bare", "--template=", str(remote))
         run_fixture_git(repo, "remote", "add", "origin", str(remote))
+    fx = run_fixture_git(repo, "remote")   # the fixture remote's name read back from git, never spelled
 
     def write_pass(uid, record=True):
         """One pass commit for `uid` and, where `record`, the acceptance record naming it; the pass
@@ -822,7 +823,7 @@ def write_position_plant(top, case, root):
         write_pass(FX_IDS[0])
         tip = run_fixture_git(repo, "rev-parse", "HEAD")
         run_facts += "gates-run: bar-1 %s\n" % tip[:8]
-        run_fixture_git(repo, "push", "-q", "origin", "main")
+        run_fixture_git(repo, "push", "-q", fx, "main")
         write_pass(FX_IDS[1])
     elif case == "bar-wait":
         for uid in ids:
@@ -830,7 +831,7 @@ def write_position_plant(top, case, root):
     elif case.startswith("built-"):
         unattributed = run_fixture_git(repo, "rev-parse", "HEAD")  # the `fixture` commit names no unit
         if case == "built-unarmed":   # TOOL-dDeclaredLoop-67 S50: B tested, ahead of A, so A is the least advanced
-            run_fixture_git(repo, "push", "-q", "origin", "main")
+            run_fixture_git(repo, "push", "-q", fx, "main")
             write_pass(FX_IDS[1])
             run_facts += "gates-run: bar-1 %s\n" % run_fixture_git(repo, "rev-parse", "HEAD")[:8]
         write_pass(FX_IDS[0], record=False)
@@ -851,41 +852,41 @@ def write_position_plant(top, case, root):
     run_fixture_git(repo, "add", "-A")
     run_fixture_git(repo, "commit", "-q", "-m", "run state")
     if remote and case not in ("steps", "plan-line", "status-line", "built-unarmed"):
-        run_fixture_git(repo, "push", "-q", "origin", "main")
+        run_fixture_git(repo, "push", "-q", fx, "main")
     if remote:
-        run_fixture_git(repo, "remote", "set-head", "origin", "main")
+        run_fixture_git(repo, "remote", "set-head", fx, "main")
     if case in ("stale-remote", "quiet-remote", "failed-fetch", "fetch-other-branch", "scp-remote", "ssh-userinfo-remote",
                 "url-forms"):  # the tracking tip kept, its one reflog entry dated 2000-01-01, past any bound
-        tip = run_fixture_git(repo, "rev-parse", "refs/remotes/origin/main")
-        run_fixture_git(repo, "update-ref", "-d", "refs/remotes/origin/main")
-        rc, out = read_git(repo, "update-ref", "--create-reflog", "-m", "aged", "refs/remotes/origin/main", tip,
+        tip = run_fixture_git(repo, "rev-parse", "refs/remotes/%s/main" % fx)
+        run_fixture_git(repo, "update-ref", "-d", "refs/remotes/%s/main" % fx)
+        rc, out = read_git(repo, "update-ref", "--create-reflog", "-m", "aged", "refs/remotes/%s/main" % fx, tip,
                            env=read_clean_env(GIT_COMMITTER_NAME="fx", GIT_COMMITTER_EMAIL="fx@example.invalid",
                                               GIT_COMMITTER_DATE="946684800 +0000"))
         if rc:
             raise subprocess.CalledProcessError(rc, "git update-ref", out)
     if case == "quiet-remote":  # a fetch from a linked worktree, which moves nothing and writes its own FETCH_HEAD
         run_fixture_git(repo, "worktree", "add", "-q", "--detach", str(top / "w"))
-        run_fixture_git(top / "w", "fetch", "-q", "origin")
+        run_fixture_git(top / "w", "fetch", "-q", fx)
     if case == "failed-fetch":  # a fetch from a path that does not exist, which leaves FETCH_HEAD at 0 bytes
-        run_fixture_git(repo, "remote", "set-url", "origin", str(top / "gone.git"))
-        rc, out = read_git(repo, "fetch", "-q", "origin")
+        run_fixture_git(repo, "remote", "set-url", fx, str(top / "gone.git"))
+        rc, out = read_git(repo, "fetch", "-q", fx)
         if rc == 0:
             raise subprocess.CalledProcessError(rc, "git fetch from a path that does not exist exited 0", out)
     if case == "fetch-other-branch":  # TOOL-dDeclaredLoop-75 S12: a FETCH_HEAD holding another branch's line alone
-        run_fixture_git(repo, "push", "-q", "origin", "HEAD:refs/heads/other")
-        run_fixture_git(repo, "fetch", "-q", "origin", "other")
+        run_fixture_git(repo, "push", "-q", fx, "HEAD:refs/heads/other")
+        run_fixture_git(repo, "fetch", "-q", fx, "other")
     if case in ("scp-remote", "ssh-userinfo-remote"):  # TOOL-dDeclaredLoop-77 S2: a user-part URL fetched over a shim
         shim = top / "ssh-shim.sh"  # sh strips a Windows path's backslashes, so both paths reach it as_posix
         write_fixture_files(top, {shim.name: "exec git-upload-pack '%s'\n" % remote.as_posix()})
         url = "git@example.com:up.git" if case == "scp-remote" else "ssh://user@example.com/up.git"
-        run_fixture_git(repo, "remote", "set-url", "origin", url)
-        rc, out = read_git(repo, "fetch", "-q", "origin", env=read_clean_env(GIT_SSH_COMMAND="sh '%s'" % shim.as_posix()))
+        run_fixture_git(repo, "remote", "set-url", fx, url)
+        rc, out = read_git(repo, "fetch", "-q", fx, env=read_clean_env(GIT_SSH_COMMAND="sh '%s'" % shim.as_posix()))
         if rc:
             raise subprocess.CalledProcessError(rc, "git fetch over the ssh shim", out)
     if case == "url-forms":  # TOOL-dDeclaredLoop-77 S4: a URL carrying a password, its fetch failing at connect
-        run_fixture_git(repo, "remote", "set-url", "origin", "https://u:SECRET@127.0.0.1:9/r.git")
+        run_fixture_git(repo, "remote", "set-url", fx, "https://u:SECRET@127.0.0.1:9/r.git")
         # TOOL-dDeclaredLoop-86 S9: no credential helper runs and nothing prompts, so no store entry is written
-        rc, out = read_git(repo, "-c", "credential.helper=", "fetch", "-q", "origin",
+        rc, out = read_git(repo, "-c", "credential.helper=", "fetch", "-q", fx,
                            env=read_clean_env(GIT_TERMINAL_PROMPT="0", GCM_INTERACTIVE="never"))
         if rc == 0:
             raise subprocess.CalledProcessError(rc, "git fetch from port 9 exited 0", out)
@@ -896,7 +897,7 @@ def write_position_plant(top, case, root):
         run_fixture_git(top, "clone", "-q", "--template=", *unlogged, str(remote), str(top / "c"))
         repo = top / "c"
     if case == "offline-stale":  # a fetch that moves nothing, its FETCH_HEAD dated back by twice the bound
-        run_fixture_git(repo, "fetch", "-q", "origin")
+        run_fixture_git(repo, "fetch", "-q", fx)
         aged = datetime.datetime.now().timestamp() - 2 * FX_BOUND
         os.utime(repo / ".git" / "FETCH_HEAD", (aged, aged))
     definition = None
@@ -979,7 +980,7 @@ def check_plan_line(repo):
     text = re.sub(r"gates-run: .*", "gates-run: bar-2 %s" % tip[:8], run_path.read_text(encoding="utf-8"))
     write_fixture_files(repo, {run_path.relative_to(repo).as_posix(): text})
     run_fixture_git(repo, "commit", "-q", "-am", "the bar's fact")
-    run_fixture_git(repo, "push", "-q", "origin", "main")
+    run_fixture_git(repo, "push", "-q", run_fixture_git(repo, "remote"), "main")
     check_state("every unit deployed beside the ask", "%s (UNDECIDED" % FX_ASK)
     return misses
 
@@ -1028,7 +1029,8 @@ def check_plant(case, pos, rc, repo):
     kinds = {i["kind"]: i["subject"] for i in pos["interrupts"]}
     tags = [f["item"] for f in pos["frontier"]]
     lines = render_position_lines(pos)
-    ref_line = next((ln for ln in lines if ln.startswith("read — refs/remotes/origin/main@")), "")
+    tracking = "read — refs/remotes/%s/main@" % run_fixture_git(repo, "remote")
+    ref_line = next((ln for ln in lines if ln.startswith(tracking)), "")
     want = {"built-unarmed": lambda: "unit — %s · built · acceptance unarmed" % FX_IDS[0] in lines
             and "unit — %s · tested" % FX_IDS[1] in lines,
             "built-unheld": lambda: "unit — %s · designed" % FX_IDS[0] in lines,
