@@ -326,7 +326,7 @@ owned $_tk|1|kit expkit (layer.exp) mints layer.fixture-x in core namespace laye
 owned-core $_tk|0|tags: green · 0 red
 scope $_tk|0|tags: unarmed unit (1 not graded)|· unresolved ·
 scope-guide $_tk|1|memory/guides/ALPHA.md:13 · unresolved · \`doc.nope\` names no row
-unclosed-fence $_tk|1|· unclosed fence ·|unresolved
+unclosed-fence $_tk|1|· unclosed fence ·|· unresolved ·
 unclosed-record $_tk|0|unclosed fence, frozen record, printed
 bad-ns $_tk|1|· shape · step.build · namespace 'step' is not registered
 bad-seg $_tk|1|· shape · layer.Memory · segment 'Memory' is outside
