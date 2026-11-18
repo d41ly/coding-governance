@@ -94,6 +94,10 @@ GRANDCHILD_TIMEOUT = 2   # PINNED, the plant's own bound
 REAP_WAIT = 10
 GRANDCHILD_OVERHEAD = 3.0   # PINNED 2026-11-17 node d, the largest of three measured runs less the timeout
 GRANDCHILD_BOUND = GRANDCHILD_TIMEOUT + REAP_WAIT + GRANDCHILD_OVERHEAD
+#: The normaliser's own floor, in seconds: it sources the run-gates library and runs sed once per
+#: command, so a command bound set short on purpose, as the `timeout-grandchild` plant's is, never
+#: starves it on a loaded host (TOOL-dDeclaredLoop-68's flake, repaired at the close).
+NORMALISER_FLOOR = 30
 #: The loop reader's plants this leg runs too, each owed exit 1 with a refusal naming the acceptance row.
 READER_PLANTS = ("computed-actor", "computed-unserved")
 FX_UNIT = "TOOL-tFix-1"
@@ -201,7 +205,8 @@ def run_normaliser(bash, lib, prog, roots, outs, tree, env, timeout):
     one bash started in `tree` as each command's is: it sources the kit's library, writes the program
     once over `roots` with the worktree as its own `pwd` prints it third, and applies it with sed.
     LookupError `witness: normaliser unavailable — ` naming the step and its exit, where the bash does
-    not start, a step exits non-zero or the run passes `timeout`; a timed-out bash is killed through
+    not start, a step exits non-zero or the run passes the later of `timeout` and `NORMALISER_FLOOR`;
+    a timed-out bash is killed through
     `run_tree_kill` before this returns."""
     unavailable = "witness: normaliser unavailable — "
     steps = {3: "source:", 4: "write_normaliser:", 5: "sed:"}
@@ -218,10 +223,10 @@ def run_normaliser(bash, lib, prog, roots, outs, tree, env, timeout):
         except OSError as exc:
             raise LookupError(unavailable + "bash: did not start: %s" % exc) from None
         try:
-            code = p.wait(timeout=timeout)
+            code = p.wait(timeout=max(timeout, NORMALISER_FLOOR))
         except subprocess.TimeoutExpired:
             run_tree_kill(p)
-            raise LookupError(unavailable + "bash: past the %s s bound" % timeout) from None
+            raise LookupError(unavailable + "bash: past the %s s bound" % max(timeout, NORMALISER_FLOOR)) from None
     if code != 0:
         with open(err, encoding="utf-8", errors="replace") as fh:
             said = fh.read().strip().splitlines()
