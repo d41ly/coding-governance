@@ -27,12 +27,14 @@ name = "testsuite counts (every bar self-test prints one)"
 subject = "repo"
 argv = ["bash", "{prefix}/check-testsuite-counts.sh"]
 guard = ["{prefix}/check-testsuite-counts.sh", "{prefix}/gate-legs.json"]
+stage = ["step.test"]
 
 [[gate_leg]]
 name = "testsuite counts self-test"
 subject = "kit"
 argv = ["bash", "{prefix}/check-testsuite-counts.test.sh"]
 guard = ["{prefix}/check-testsuite-counts.sh", "{prefix}/check-testsuite-counts.test.sh"]
+stage = ["step.test"]
 
 [check]
 # Declared absence, not silence. DEPL-aRepatriatedFork-14 S3: `check` redded at every target on the

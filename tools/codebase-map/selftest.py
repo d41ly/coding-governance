@@ -557,6 +557,14 @@ def test_parse_contract():
     expect_maperror(DOSSIER.replace("src/x/**", "src\\\\x"), "forward-slash")
 
 
+def test_stage_key():
+    """TOOL-dDeclaredLoop-4 AC7: the optional top-level `stage` is carried as a list, refused as a string."""
+    assert m.parse_dossier(DOSSIER, IDS, source="t").stage is None
+    d = m.parse_dossier(DOSSIER.replace("[claims]", 'stage = ["step.build"]\n\n[claims]'), IDS, source="t")
+    assert d.stage == ("step.build",), d.stage
+    expect_maperror(DOSSIER.replace("[claims]", 'stage = "step.build"\n\n[claims]'), "stage must be a list")
+
+
 def test_attribution():
     d = m.parse_dossier(DOSSIER, IDS, source="t")
     f = m.parse_dossier(
@@ -1853,6 +1861,7 @@ def main() -> int:
                       test_js_probe_against_the_lexicon)
     failures += check("coverage both directions + ratchet guards", test_coverage_directions)
     failures += check("dossier contract fails loud", test_parse_contract)
+    failures += check("the optional stage key: a list carried, a string refused (TOOL-dDeclaredLoop-4)", test_stage_key)
     failures += check("attribution: keyed > globs, posix, case-sensitive", test_attribution)
     failures += check("renders deterministic + keys-only + round-trip", test_renders_round_trip_and_determinism)
     failures += check("glob brackets fail loud; [[]-escape matches", test_glob_brackets_fail_loud_and_escape_works)

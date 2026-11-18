@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """drift_report.py — does this repo's own RECORD of its state still describe reality?
 
-gov:kit drift-audit@1.33
+gov:kit drift-audit@1.34
 
     python <prefix>/drift-audit/drift_report.py            # human table, always exits 0
     python <prefix>/drift-audit/drift_report.py --json     # machine-readable, always exits 0
@@ -92,7 +92,7 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
-KIT_DRIFT_AUDIT_VERSION = "1.33"
+KIT_DRIFT_AUDIT_VERSION = "1.34"
 
 CONF_NAME = ".memory-tree.conf"
 
@@ -2455,7 +2455,11 @@ def build_backlog_stragglers(ctx) -> dict:
 # holds each set here to its source in both directions.
 _RUN_PHASES_TERMINAL = frozenset({"LANDED", "ABORTED"})
 _RUN_PARK_KINDS = frozenset({"decision", "abort", "override", "waiver", "proposal", "rescope",
-                             "dispatch", "review", "brief", "hold", "resume", "handoff"})
+                             "dispatch", "review", "brief", "hold", "resume", "handoff", "refusal",
+                             "fix-pass"})
+# `fix-pass` joined in TOOL-dDeclaredLoop-32, `--fix-pass`'s history row, not owed; its hyphen is why
+# `_RUN_ROW` below reads `[a-z][a-z-]*`.
+# `refusal` joined the driver's PARK_KINDS in TOOL-dDeclaredLoop-14, a history row and not owed.
 # `hold` and `resume` joined the driver's PARK_KINDS in TOOL-dDerivedDocket-5 (auto-resume from
 # HELD). Neither is owed, so a record whose last row is one reads `other`. `handoff` joined both sets
 # in TOOL-dUnstuckLanding-13: its row is the landing recipe the owner is shown, so it is owed.
@@ -2467,7 +2471,7 @@ _RUN_PARK_ACTS_OWED = frozenset({"retire", "supersede", "defer"})
 # <why>`, the timestamp in the shape the driver's own counters grep for. The act of a `rescope` row is
 # the FIRST word of its item and only the first, so an addition whose second word happens to be
 # `retire` stays an addition.
-_RUN_ROW = re.compile(r"^[0-9][0-9-]*T[0-9:]*Z ([a-z]+) \u00b7 item (\S*)")
+_RUN_ROW = re.compile(r"^[0-9][0-9-]*T[0-9:]*Z ([a-z][a-z-]*) \u00b7 item (\S*)")
 # SHA-SHAPED before anything resolves it, for the reason the driver's own admission check gives: the
 # run being graded authors its witness, and a witness reading `main` resolves and is an ancestor of the
 # base ref by construction.

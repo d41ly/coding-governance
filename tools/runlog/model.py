@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""model.py — one unattended run's sources joined into one account of it. gov:kit runlog@1.16
+"""model.py — one unattended run's sources joined into one account of it. gov:kit runlog@1.17
 
 A run's evidence is spread across its run-state file, three journals, git, its build folder and, where
 local, its session extracts. `build_run_model` joins them into ONE model of ONE run: a timeline, a
@@ -96,7 +96,10 @@ LEDGER_SOURCES = ("decision", "abort", "override", "waiver", "handoff", "rescope
 # value is held to the file that owns it: the withheld self-test extracts these from the driver's
 # source where that file is present, compares both directions, and announces its skip where it is not.
 PARK_KINDS = ("decision", "abort", "override", "waiver", "proposal", "rescope", "dispatch", "review",
-              "brief", "hold", "resume", "handoff")
+              "brief", "hold", "resume", "handoff", "refusal", "fix-pass")
+# `fix-pass` joined in TOOL-dDeclaredLoop-32: `--fix-pass`'s history row, one fix pass against a unit's
+# acceptance; not owed, so it joins `--status`'s noted count.
+# `refusal` joined in TOOL-dDeclaredLoop-14: `--refused`'s history row, read by the loop kit's engine.
 # `handoff` joined both in TOOL-dUnstuckLanding-13: its row is the landing recipe the owner is shown,
 # so it is owed, and it sits in LEDGER_SOURCES after `waiver` so the owed kinds still lead that tuple.
 PARK_KINDS_OWED = ("decision", "abort", "override", "waiver", "handoff")

@@ -93,6 +93,16 @@ class = "module-export"
 usage = "none"
 why = "an import name a module keeps for older callers has no verb, key, hook, leg or page"
 
+[[class]]
+class = "item"
+usage = "none"
+why = "an item is a definition row, used by no verb, key, hook, leg or page of its own (TOOL-dDeclaredLoop-24)"
+
+[[class]]
+class = "stage"
+usage = "none"
+why = "a gov stage is a definition row, used by no verb, key, hook, leg or page of its own; a repository's stage is written by the stage kind's factory, documented under its own script rows (TOOL-dDeclaredLoop-25)"
+
 [[usage]]
 id = "command:build"
 shape = "verb"
@@ -104,7 +114,7 @@ id = "script:{prefix}/roles/handoff.py#render"
 shape = "verb"
 entry = "{prefix}/roles/handoff.py"
 verb = "render"
-flags = ["--role=", "--build=", "--unit=", "--card=", "--input=", "--out=", "--stdout", "--stand-in", "--part="]
+flags = ["--role=", "--build=", "--unit=", "--card=", "--input=", "--upstream=", "--out=", "--stdout", "--stand-in", "--part="]
 
 [[usage]]
 id = "script:{prefix}/roles/handoff.py#roster"
@@ -130,7 +140,7 @@ id = "script:{prefix}/memory-tree/build_records.py#new"
 shape = "verb"
 entry = "{prefix}/memory-tree/build_records.py"
 verb = "new"
-flags = ["--build=", "--unit=", "--root=", "--principle=", "--excuses=", "--reason=", "--expires=", "--tag=", "--action=", "--mark=", "--before=", "--after=", "--successor=", "--promoted-from=", "--rule=", "--words=", "--session=", "--leg=", "--red-line=", "--commit=", "--rerun="]
+flags = ["--build=", "--unit=", "--root=", "--principle=", "--excuses=", "--reason=", "--expires=", "--tag=", "--action=", "--mark=", "--before=", "--after=", "--successor=", "--promoted-from=", "--rule=", "--words=", "--session=", "--leg=", "--red-line=", "--commit=", "--rerun=", "--item=", "--disposition=", "--channel="]
 
 [[usage]]
 id = "script:{prefix}/memory-tree/build_records.py#join"
@@ -278,6 +288,426 @@ entry = "{prefix}/policy/adopt-policy.sh"
 flags = ["--scaffold", "--check", "--target="]
 
 [[usage]]
+id = "script:{prefix}/loop/loop_lib.py"
+shape = "verb"
+entry = "{prefix}/loop/loop_lib.py"
+flags = ["--check", "--scopes", "--selftest", "--fixture", "--plant=", "--grade-site="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_witness.py"
+shape = "verb"
+entry = "{prefix}/loop/loop_witness.py"
+flags = ["--fixture", "--plant=", "--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_witness.py#acceptance"
+shape = "verb"
+entry = "{prefix}/loop/loop_witness.py"
+verb = "acceptance"
+flags = ["--build=", "--unit=", "--sha=", "--cmd=", "--root="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_witness.py#rerun"
+shape = "verb"
+entry = "{prefix}/loop/loop_witness.py"
+verb = "rerun"
+flags = ["--sha=", "--cmd=", "--expect="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_checklist.py"
+shape = "verb"
+entry = "{prefix}/loop/loop_checklist.py"
+flags = ["--fixture", "--plant="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_checklist.py#check"
+shape = "verb"
+entry = "{prefix}/loop/loop_checklist.py"
+verb = "check"
+flags = ["--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_checklist.py#show"
+shape = "verb"
+entry = "{prefix}/loop/loop_checklist.py"
+verb = "show"
+flags = []
+
+[[usage]]
+id = "script:{prefix}/loop/claims.py"
+shape = "verb"
+entry = "{prefix}/loop/claims.py"
+flags = ["--fixture", "--plant=", "--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/claims.py#key"
+shape = "verb"
+entry = "{prefix}/loop/claims.py"
+verb = "key"
+flags = ["--stdin"]
+
+[[usage]]
+id = "script:{prefix}/loop/claims.py#verdict"
+shape = "verb"
+entry = "{prefix}/loop/claims.py"
+verb = "verdict"
+flags = ["--stored=", "--class=", "--recomputed=", "--at=", "--bound="]
+
+[[usage]]
+id = "script:{prefix}/loop/claims.py#card-keys"
+shape = "verb"
+entry = "{prefix}/loop/claims.py"
+verb = "card-keys"
+flags = []
+
+[[usage]]
+id = "script:{prefix}/loop/position.py"
+shape = "verb"
+entry = "{prefix}/loop/position.py"
+flags = ["--json", "--next-line", "--frontier", "--check-refusal=", "--fixture", "--plant=", "--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/stage_coverage.py"
+shape = "verb"
+entry = "{prefix}/loop/stage_coverage.py"
+flags = ["--fixture", "--plant=", "--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_table.py"
+shape = "verb"
+entry = "{prefix}/loop/loop_table.py"
+flags = ["--fixture", "--plant="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_table.py#move"
+shape = "verb"
+entry = "{prefix}/loop/loop_table.py"
+verb = "move"
+flags = ["--level=", "--from=", "--item=", "--outcome=", "--fact="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_table.py#check"
+shape = "verb"
+entry = "{prefix}/loop/loop_table.py"
+verb = "check"
+flags = ["--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_table.py#phase"
+shape = "verb"
+entry = "{prefix}/loop/loop_table.py"
+verb = "phase"
+flags = ["--from=", "--to=", "--fact=", "--extra="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_parents.py"
+shape = "verb"
+entry = "{prefix}/loop/loop_parents.py"
+flags = ["--selftest", "--fixture", "--plant=", "--value=", "--state="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_parents.py#route"
+shape = "verb"
+entry = "{prefix}/loop/loop_parents.py"
+verb = "route"
+flags = ["--build=", "--state=", "--root="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_transition.py"
+shape = "verb"
+entry = "{prefix}/loop/loop_transition.py"
+flags = ["--fixture", "--plant="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_transition.py#record"
+shape = "verb"
+entry = "{prefix}/loop/loop_transition.py"
+verb = "record"
+flags = ["--build=", "--from=", "--item=", "--outcome=", "--witness=", "--fact=", "--field=", "--root="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_transition.py#check"
+shape = "verb"
+entry = "{prefix}/loop/loop_transition.py"
+verb = "check"
+flags = ["--build=", "--root=", "--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/policy_edit.py#set"
+shape = "verb"
+entry = "{prefix}/loop/policy_edit.py"
+verb = "set"
+flags = ["--build=", "--unit="]
+
+[[usage]]
+id = "script:{prefix}/loop/policy_edit.py#raise"
+shape = "verb"
+entry = "{prefix}/loop/policy_edit.py"
+verb = "raise"
+flags = ["--build=", "--unit=", "--argument="]
+
+[[usage]]
+id = "script:{prefix}/loop/policy_edit.py#propose"
+shape = "verb"
+entry = "{prefix}/loop/policy_edit.py"
+verb = "propose"
+flags = []
+
+[[usage]]
+id = "script:{prefix}/loop/floor.py#get"
+shape = "verb"
+entry = "{prefix}/loop/floor.py"
+verb = "get"
+flags = ["--root="]
+
+[[usage]]
+id = "script:{prefix}/loop/adopt-loop.sh"
+shape = "verb"
+entry = "{prefix}/loop/adopt-loop.sh"
+flags = ["--check"]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_items.py"
+shape = "verb"
+entry = "{prefix}/loop/loop_items.py"
+flags = ["--fixture", "--plant="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_items.py#check"
+shape = "verb"
+entry = "{prefix}/loop/loop_items.py"
+verb = "check"
+flags = ["--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_items.py#new"
+shape = "verb"
+entry = "{prefix}/loop/loop_items.py"
+verb = "new"
+flags = ["--step=", "--actor=", "--witness-by=", "--owner=", "--input=", "--allowance=", "--returns="]
+
+[[usage]]
+id = "script:{prefix}/loop/splice.py"
+shape = "verb"
+entry = "{prefix}/loop/splice.py"
+flags = ["--fixture", "--plant="]
+
+[[usage]]
+id = "script:{prefix}/loop/splice.py#check"
+shape = "verb"
+entry = "{prefix}/loop/splice.py"
+verb = "check"
+flags = ["--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/splice.py#new"
+shape = "verb"
+entry = "{prefix}/loop/splice.py"
+verb = "new"
+flags = ["--after=", "--before=", "--actor=", "--witness-by=", "--owner=", "--input=", "--allowance=", "--returns="]
+
+[[usage]]
+id = "script:{prefix}/loop/upstream.py"
+shape = "verb"
+entry = "{prefix}/loop/upstream.py"
+flags = ["--fixture", "--plant=", "--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/review_bounds.py"
+shape = "verb"
+entry = "{prefix}/loop/review_bounds.py"
+flags = ["--fixture", "--plant="]
+
+[[usage]]
+id = "script:{prefix}/loop/composition.py"
+shape = "verb"
+entry = "{prefix}/loop/composition.py"
+flags = ["--fixture", "--plant=", "--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/adapt.py"
+shape = "verb"
+entry = "{prefix}/loop/adapt.py"
+flags = ["--fixture", "--plant=", "--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/budget.py"
+shape = "verb"
+entry = "{prefix}/loop/budget.py"
+flags = ["--fixture", "--plant=", "--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/budget.py#draw"
+shape = "verb"
+entry = "{prefix}/loop/budget.py"
+verb = "draw"
+flags = ["--build=", "--cause=", "--item="]
+
+[[usage]]
+id = "script:{prefix}/loop/budget.py#value"
+shape = "verb"
+entry = "{prefix}/loop/budget.py"
+verb = "value"
+flags = []
+
+[[usage]]
+id = "script:{prefix}/loop/budget.py#target"
+shape = "verb"
+entry = "{prefix}/loop/budget.py"
+verb = "target"
+flags = ["--build=", "--item="]
+
+[[usage]]
+id = "script:{prefix}/loop/budget.py#origin"
+shape = "verb"
+entry = "{prefix}/loop/budget.py"
+verb = "origin"
+flags = ["--build="]
+
+[[usage]]
+id = "script:{prefix}/loop/budget.py#ending"
+shape = "verb"
+entry = "{prefix}/loop/budget.py"
+verb = "ending"
+flags = ["--build=", "--explain"]
+
+[[usage]]
+id = "script:{prefix}/loop/breakpoints.py"
+shape = "verb"
+entry = "{prefix}/loop/breakpoints.py"
+flags = ["--fixture", "--plant=", "--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/breakpoints.py#list"
+shape = "verb"
+entry = "{prefix}/loop/breakpoints.py"
+verb = "list"
+flags = ["--build=", "--spec-audit", "--delegated-fork"]
+
+[[usage]]
+id = "script:{prefix}/loop/breakpoints.py#stage"
+shape = "verb"
+entry = "{prefix}/loop/breakpoints.py"
+verb = "stage"
+flags = ["--stage=", "--build=", "--rev="]
+
+[[usage]]
+id = "script:{prefix}/loop/termination.py"
+shape = "verb"
+entry = "{prefix}/loop/termination.py"
+flags = ["--fixture", "--plant="]
+
+[[usage]]
+id = "script:{prefix}/loop/termination.py#check"
+shape = "verb"
+entry = "{prefix}/loop/termination.py"
+verb = "check"
+flags = ["--build=", "--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/scenario.py"
+shape = "verb"
+entry = "{prefix}/loop/scenario.py"
+flags = ["--fixture", "--plant="]
+
+[[usage]]
+id = "script:{prefix}/loop/scenario.py#select"
+shape = "verb"
+entry = "{prefix}/loop/scenario.py"
+verb = "select"
+flags = ["--fact="]
+
+[[usage]]
+id = "script:{prefix}/loop/scenario.py#check"
+shape = "verb"
+entry = "{prefix}/loop/scenario.py"
+verb = "check"
+flags = ["--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/upstream.py#rows"
+shape = "verb"
+entry = "{prefix}/loop/upstream.py"
+verb = "rows"
+flags = ["--return="]
+
+[[usage]]
+id = "script:{prefix}/loop/upstream.py#join"
+shape = "verb"
+entry = "{prefix}/loop/upstream.py"
+verb = "join"
+flags = ["--rows=", "--return=", "--write", "--build=", "--unit="]
+
+[[usage]]
+id = "script:{prefix}/loop/review_bounds.py#show"
+shape = "verb"
+entry = "{prefix}/loop/review_bounds.py"
+verb = "show"
+flags = ["--rev="]
+
+[[usage]]
+id = "script:{prefix}/loop/factories.py"
+shape = "verb"
+entry = "{prefix}/loop/factories.py"
+flags = ["--fixture", "--plant=", "--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/factories.py#check-commands"
+shape = "verb"
+entry = "{prefix}/loop/factories.py"
+verb = "check-commands"
+flags = []
+
+[[usage]]
+id = "script:{prefix}/loop/factories.py#command"
+shape = "verb"
+entry = "{prefix}/loop/factories.py"
+verb = "command"
+flags = ["--kit=", "--run="]
+
+[[usage]]
+id = "script:{prefix}/loop/factories.py#policy-key"
+shape = "verb"
+entry = "{prefix}/loop/factories.py"
+verb = "policy-key"
+flags = ["--allowed=", "--default=", "--summary=", "--usage=", "--owner="]
+
+[[usage]]
+id = "script:{prefix}/loop/factories.py#hook"
+shape = "verb"
+entry = "{prefix}/loop/factories.py"
+verb = "hook"
+flags = ["--kit=", "--event=", "--matcher="]
+
+[[usage]]
+id = "script:{prefix}/loop/factories.py#role"
+shape = "verb"
+entry = "{prefix}/loop/factories.py"
+verb = "role"
+flags = ["--workflow=", "--writes=", "--description=", "--reads=", "--returns=", "--output=", "--ceiling="]
+
+[[usage]]
+id = "script:{prefix}/loop/factories.py#workflow"
+shape = "verb"
+entry = "{prefix}/loop/factories.py"
+verb = "workflow"
+flags = ["--driver=", "--harness=", "--roles=", "--enforced-by=", "--trigger=", "--order=", "--step="]
+
+[[usage]]
+id = "script:{prefix}/loop/factories.py#scenario"
+shape = "verb"
+entry = "{prefix}/loop/factories.py"
+verb = "scenario"
+flags = ["--extends=", "--admit=", "--entry="]
+
+[[usage]]
+id = "script:{prefix}/playbook/overlay_rows.py#compose"
+shape = "verb"
+entry = "{prefix}/playbook/overlay_rows.py"
+verb = "compose"
+flags = ["--kind=", "--rows="]
+
+[[usage]]
 id = "script:{prefix}/policy/budgets.py#resolve"
 shape = "verb"
 entry = "{prefix}/policy/budgets.py"
@@ -370,6 +800,27 @@ flags = []
 id = "script:{prefix}/govkit/steps/fanout_cap.py#down"
 shape = "verb"
 entry = "{prefix}/govkit/steps/fanout_cap.py"
+verb = "down"
+flags = []
+
+[[usage]]
+id = "script:{prefix}/govkit/steps/review_rounds.py#up"
+shape = "verb"
+entry = "{prefix}/govkit/steps/review_rounds.py"
+verb = "up"
+flags = []
+
+[[usage]]
+id = "script:{prefix}/govkit/steps/review_rounds.py#witness"
+shape = "verb"
+entry = "{prefix}/govkit/steps/review_rounds.py"
+verb = "witness"
+flags = []
+
+[[usage]]
+id = "script:{prefix}/govkit/steps/review_rounds.py#down"
+shape = "verb"
+entry = "{prefix}/govkit/steps/review_rounds.py"
 verb = "down"
 flags = []
 

@@ -7,6 +7,8 @@ status = "shipped"
 streams = ["tooling"]
 decisions = ["TOOL-aLeakedHandle-1", "TOOL-cListedCensus-1"]
 
+stage = ["step.test"]
+
 [claims]
 gate-legs = [
   "shell hygiene (a loop fed by a command substitution)",

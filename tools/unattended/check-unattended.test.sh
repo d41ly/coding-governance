@@ -188,6 +188,28 @@ cp "$HERE/ASKS.template.md" memory/guides/UNATTENDED-ASKS.md
 # probe tests only that the FILE exists, so a stub at the sibling home is the whole dependency.
 MT_REL=$(dirname "$KIT_REL")/memory-tree; MT_REL=${MT_REL#./}
 mkdir -p "$MT_REL" && printf '# fixture stub: the probe target of derive_index_repair\n' > "$MT_REL/gen_build_index.py"
+# THE LOOP KIT, BESIDE THIS KIT WHERE CHECK 53'S SIBLING-KIT RESOLVER PROBES (TOOL-dDeclaredLoop-5): its
+# reader, its definition and its actor-witness list, the three files `--grade-site` reads. FOUND by the
+# file only that kit holds, never by a typed kit directory, as the ask block finds the id grammar. Every
+# tree below that runs the leg is seeded the same way, or check 53 reds there on a missing kit.
+_lk_rel=$(git -C "$HERE" ls-files --full-name -- ':(top)*loop_lib.py' | head -n 1)
+_lk_src="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/${_lk_rel%/*}"
+LOOP_REL=$(dirname "$KIT_REL")/${_lk_src##*/}; LOOP_REL=${LOOP_REL#./}
+seed_loop_kit() { # tree -> the loop kit's three files copied into <tree>/$LOOP_REL
+  mkdir -p "$1/$LOOP_REL" && cp "$_lk_src/loop_lib.py" "$_lk_src/loop.toml" "$_lk_src/actor-witnesses.txt" "$1/$LOOP_REL/"
+}
+# TOOL-dDeclaredLoop-21 S6: THE REVIEW BOUNDS' MODULE AND THE POLICY KIT IT READS, for the trees whose
+# check 19 reads a raise in the policy file: the loop kit's review_bounds.py beside the three files above,
+# and the policy kit's policy.py, budgets.py and catalogue.toml at their sibling home, the kit found by
+# budgets.py, the file only it holds. Every other tree holds neither, so its leg reads the driver's kit defaults.
+_pk_rel=$(git -C "$HERE" ls-files --full-name -- ':(top)*budgets.py' | head -n 1)
+_pk_src="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/${_pk_rel%/*}"
+POLICY_KIT_REL=$(dirname "$KIT_REL")/${_pk_src##*/}; POLICY_KIT_REL=${POLICY_KIT_REL#./}
+seed_bound_kits() { # tree -> review_bounds.py beside the loop kit's files, and the policy kit's three
+  mkdir -p "$1/$LOOP_REL" "$1/$POLICY_KIT_REL" && cp "$_lk_src/review_bounds.py" "$1/$LOOP_REL/" \
+    && cp "$_pk_src/policy.py" "$_pk_src/budgets.py" "$_pk_src/catalogue.toml" "$1/$POLICY_KIT_REL/"
+}
+seed_loop_kit .
 SCRIPT="$TMP/$KIT_REL/check-unattended.sh"
 
 mkconf() { cat > .unattended.conf <<EOF
@@ -804,6 +826,8 @@ ma_init() { # name · [bare] -> $ma_root/<name>, built to the shape above; `bare
      "$TMP/$KIT_REL/check-playbook.sh" "$TMP/$KIT_REL/PROTOCOL.template.md" "$TMP/$KIT_REL/SKILL.template.md" \
      "$TMP/$KIT_REL/VERBS.template.md" "$TMP/$KIT_REL/PLAYBOOK-TEMPLATE.template.md" \
      "$TMP/$KIT_REL/.unattended.conf.example" "$d/$KIT_REL/"
+  seed_loop_kit "$d"
+  [ -z "${MA_BOUND_KITS:-}" ] || seed_bound_kits "$d"
   cp "$TMP/$KIT_REL/PROTOCOL.template.md" "$d/memory/guides/UNATTENDED-PROTOCOL.md"
   cp "$TMP/$KIT_REL/VERBS.template.md" "$d/memory/guides/UNATTENDED-VERBS.md"
   cp "$TMP/$KIT_REL/ASKS.template.md" "$d/$KIT_REL/"
@@ -826,9 +850,12 @@ ma_init() { # name · [bare] -> $ma_root/<name>, built to the shape above; `bare
   ( cd "$d" && git push -q origin main && git checkout -q unit ) >/dev/null 2>&1
 }
 ma0_reset() { ( cd "$ma0" && git reset -q --hard "$MA0_PRISTINE" && git clean -qfd ); }
-write_rounds_line() { sed -i '/^REVIEW_ROUNDS=/d' "$1/.unattended.conf"; printf 'REVIEW_ROUNDS="%s"\n' "$2" >> "$1/.unattended.conf"; }
+write_rounds_line() { # tree · count -> the policy file setting a fixed spec bound of <count>, at or below the ceiling of 3
+  mkdir -p "$1/.governance"
+  printf '[review.design]\nrounds = "fixed-count"\nround-count = %s\n' "$2" > "$1/.governance/policy.toml"
+}
 build_round_walk() { # name · run raise or "" · evil merge value or "" -> $mar, a landed terminal record
-  ma_init "$1" bare; mar="$ma_root/$1"
+  MA_BOUND_KITS=1 ma_init "$1" bare; mar="$ma_root/$1"
   ( cd "$mar" && git checkout -q main ) >/dev/null 2>&1; write_rounds_line "$mar" 2; ma_commit "$mar" "owner raises rounds"
   ( cd "$mar" && git push -q origin main && git checkout -q unit ) >/dev/null 2>&1
   if [ -n "$3" ]; then
@@ -1162,15 +1189,17 @@ n=$((n+1)); [ -z "$undoc" ] || { echo "FAIL a dispatched verb is absent from a s
 
 
 # ---- THE REVIEW-LOOP CHECK. Its three clauses cannot be exercised by the corpus, which is exactly why
-# ---- they need fixtures — and the FIRST arm is about the check being able to run at all. It reads the
-# ---- ceiling from the driver through `core_of`, which parses only a DOUBLE-QUOTED value; when that
-# ---- read came back empty the whole three-clause check was skipped and said nothing, which is
-# ---- indistinguishable from a clean corpus. An unreadable ceiling is a refusal now.
+# ---- they need fixtures — and the FIRST arm is about the check being able to run at all. This tree holds
+# ---- no review_bounds.py, so the leg reads the driver's REVIEW_*_DEFAULT constants through `core_of`,
+# ---- which parses only a DOUBLE-QUOTED value, and says so (TOOL-dDeclaredLoop-21 S6); when that read
+# ---- came back empty the whole three-clause check was skipped and said nothing, which is
+# ---- indistinguishable from a clean corpus. Unreadable review bounds are a refusal.
 reset_tree; mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh; mkconf
-sed -i 's/^RUNAWAY_CEILING=.*/RUNAWAY_CEILING=8/' $KIT_REL/unattended.sh
+hit "$(run)" "unattended: check 2 grades each subject's review rounds against the driver's REVIEW_*_DEFAULT kit defaults"
+sed -i 's/^REVIEW_MAX_ROUNDS_DEFAULT=.*/REVIEW_MAX_ROUNDS_DEFAULT=3/' $KIT_REL/unattended.sh
 
 
-hit "$(run)" "the driver declares no readable RUNAWAY_CEILING, so the review-loop check below would be skipped entirely and its absence would look exactly like a clean corpus"
+hit "$(run)" "the review bounds do not read, so the review-loop check below would be skipped entirely and its absence would look exactly like a clean corpus"
 
 # ---- AND THE SAME SHAPE FOR THE THREE REMOTE BOUNDS, which is where this class was actually LIVE:
 # ---- all three were declared unquoted in the driver, so every core_of read returned empty and a
@@ -1181,10 +1210,11 @@ reset_tree; mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh
 sed -i 's/^REMOTE_CONNECT_BOUND=.*/REMOTE_CONNECT_BOUND=20/' $KIT_REL/unattended.sh
 hit "$(run)" "the driver declares no readable REMOTE_BOUND, REMOTE_CONNECT_BOUND or REMOTE_LOWSPEED_BYTES, so this leg would observe the remote under bounds it invented rather than the ones the driver uses; core_of reads a double-quoted value only, so an unquoted constant reads as absent"
 
-# a group whose counts do not shrink and which records no exit
+# a group whose counts do not shrink and which records no exit. On the build slug `tRev`: a spec
+# subject takes no strict-fall rule, so it is legally flat while it runs (TOOL-dDeclaredLoop-32 S6).
 reset_tree; mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh; mkconf
 mkdir -p memory/builds/tRev
-printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2\n\n2026-08-20T02:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2\n\n2026-08-20T03:00:00Z review · item S1 · reason verdict BLOCKED · blockers 3\n' > memory/builds/tRev/RUN.md
+printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z review · item tRev · reason verdict BLOCKED · blockers 2\n\n2026-08-20T02:00:00Z review · item tRev · reason verdict BLOCKED · blockers 2\n\n2026-08-20T03:00:00Z review · item tRev · reason verdict BLOCKED · blockers 3\n' > memory/builds/tRev/RUN.md
 git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m rev --no-verify >/dev/null 2>&1
 out=$(run)
 hit "$out" "review loops that ran past the ceiling, stalled without recording it, or exited without accounting for their blockers"
@@ -1192,9 +1222,29 @@ hit "$out" "blocker counts did not shrink across consecutive rounds and no round
 
 # ...and the SAME sequence carrying an exit token is green. Without this the arm above could be
 # passing because the check reds on any review group at all.
-printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2\n\n2026-08-20T02:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT\n' > memory/builds/tRev/RUN.md
+printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z review · item tRev · reason verdict BLOCKED · blockers 2\n\n2026-08-20T02:00:00Z review · item tRev · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT\n' > memory/builds/tRev/RUN.md
 git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m rev2 --no-verify >/dev/null 2>&1
 miss "$(run)" "blocker counts did not shrink across consecutive rounds"
+
+# ---- TOOL-dDeclaredLoop-32 AC7: THE STALLED READING COUNTS BLOCKERS PLUS ROUND-HIGHS, ON THE BUILD SLUG AND
+# ---- ON FIX PASSES ONLY. Against the base check a flat spec subject redded, the round-highs were not
+# ---- read, and a `fix-pass` row was never read at all.
+# a falling blocker count whose blockers plus round-highs is flat, carrying its exit, is no stall
+printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z review · item tRev · reason verdict BLOCKED · blockers 2 · round-highs 1\n\n2026-08-20T02:00:00Z review · item tRev · reason verdict BLOCKED · blockers 1 · round-highs 2 · NON-CONVERGENT\n' > memory/builds/tRev/RUN.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m rev3 --no-verify >/dev/null 2>&1
+miss "$(run)" "blocker counts did not shrink across consecutive rounds"
+# a spec subject flat with no exit token is a loop still running, and green
+printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 1 · round-highs 0\n\n2026-08-20T02:00:00Z review · item S1 · reason verdict BLOCKED · blockers 1 · round-highs 0\n' > memory/builds/tRev/RUN.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m rev4 --no-verify >/dev/null 2>&1
+miss "$(run)" "blocker counts did not shrink across consecutive rounds"
+# ...the same two rows on the build slug red as stalled
+printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z review · item tRev · reason verdict BLOCKED · blockers 1 · round-highs 0\n\n2026-08-20T02:00:00Z review · item tRev · reason verdict BLOCKED · blockers 1 · round-highs 0\n' > memory/builds/tRev/RUN.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m rev5 --no-verify >/dev/null 2>&1
+hit "$(run)" "subject tRev: blocker counts did not shrink across consecutive rounds and no round carries an exit token"
+# ...and two non-terminal fix passes of `reds 1` red as a stalled fix-pass loop
+printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z fix-pass · item TOOL-tRev-1 · reason reds 1\n\n2026-08-20T02:00:00Z fix-pass · item TOOL-tRev-1 · reason reds 1\n' > memory/builds/tRev/RUN.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m rev6 --no-verify >/dev/null 2>&1
+hit "$(run)" "unit TOOL-tRev-1: fix-pass reds counts did not fall across consecutive passes and no pass carries an exit token"
 reset_tree
 
 
@@ -1559,6 +1609,20 @@ reset_tree; dispconf 2000-01-01
 mkdisp "$D_ONE" "$D_TWO" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition promote\n'
 miss "$(run)" "check 2 FAILED"
 
+# ---- TOOL-dDeclaredLoop-32 AC7: AN EXIT PROMOTING TO ASKS OWES ASKS. The rework budget spent, the build
+# ---- slug's exit records ` · to asks`, and its floor is counted in asks the build's BACKLOG.md holds at
+# ---- HEAD and not at BASE, never in unit ids. Against the base check this exit owed a unit id.
+reset_tree; dispconf 2000-01-01
+mkdir -p memory/builds/tDisp; printf '# tDisp backlog\n\n' > memory/builds/tDisp/BACKLOG.md
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict BLOCKED · blockers 1 · NON-CONVERGENT · to asks · disposition promote\n'
+out=$(run)
+hit "$out" "1 subject(s) EXITED recording disposition promote to asks, the rework budget being spent, and the build backlog gained only 0 ask id(s) this run BASE lacked, against a floor of 1"
+miss "$out" "non-WONTDO unit id(s) this run BASE lacked"
+# ...its green control: one ask filed since BASE, and no unit id owed
+printf -- '- TOOL-tDisp-9 · filed 2026-08-20 · the promoted blocker\n' >> memory/builds/tDisp/BACKLOG.md
+git add -A >/dev/null 2>&1; GIT_COMMITTER_DATE="2026-09-01T12:00:00 +0000" git -c commit.gpgsign=false commit -q -m asks --no-verify >/dev/null 2>&1
+miss "$(run)" "check 2 FAILED"
+
 # ---- TOOL-aBatchedMinors-3: A CLOSING-REVIEW ROW CARRYING COUNTS OWES ONE UNIT PER BLOCKER AND HIGH,
 # ---- PLUS ONE FOR ITS MINORS. The owner ruled on 2026-10-04 that the closing diff review promotes
 # ---- every finding, the mediums and lows batched into one unit or two, and `--review` now writes
@@ -1594,6 +1658,26 @@ hit "$(run)" "record NO disposition while this record is graded against DISPOSIT
 reset_tree; dispconf 2000-01-01
 mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 0\n'
 miss "$(run)" "check 2 FAILED"
+# ---- TOOL-dDeclaredLoop-20: THE FLOOR FOLLOWS THE ROW'S review.findings FIELD. One blocker, one high and three
+# ---- minors owe 3 under the default, 5 under all-own and 2 under blocker-own; an absent field reads the default.
+# ---- Against the base check the field is not read, so all-own's row passes on three ids and blocker-own's reds
+# ---- on two.
+D_FIVE='| TOOL-tDisp-1 | CLOSED |\n| TOOL-tDisp-2 | CLOSED |\n| TOOL-tDisp-3 | CLOSED |\n| TOOL-tDisp-4 | CLOSED |\n| TOOL-tDisp-5 | CLOSED |\n| TOOL-tDisp-6 | CLOSED |\n'
+D_FOUR='| TOOL-tDisp-1 | CLOSED |\n| TOOL-tDisp-2 | CLOSED |\n| TOOL-tDisp-3 | CLOSED |\n| TOOL-tDisp-4 | CLOSED |\n'
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_FOUR" '2026-08-20T01:00:00Z review · item tDisp · reason verdict BLOCKED · blockers 1 · BOUNDED · highs 1 · minors 3 · findings all-own · to units · disposition promote\n'
+out=$(run)
+hit "$out" "gained only 3 non-WONTDO unit id(s) this run BASE lacked, against a floor of 5"
+hit "$out" "or under the review.findings value a row records, the promoted count for all-own and one per blocker plus one for the highs and minors for blocker-own: tDisp=all-own"
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_FIVE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict BLOCKED · blockers 1 · BOUNDED · highs 1 · minors 3 · findings all-own · to units · disposition promote\n'
+miss "$(run)" "check 2 FAILED"
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_THREE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict BLOCKED · blockers 1 · BOUNDED · highs 1 · minors 3 · findings blocker-own · to units · disposition promote\n'
+miss "$(run)" "check 2 FAILED"
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_THREE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict BLOCKED · blockers 1 · BOUNDED · highs 1 · minors 3 · to units · disposition promote\n'
+hit "$(run)" "gained only 2 non-WONTDO unit id(s) this run BASE lacked, against a floor of 3"
 # ...and the closing review folds nothing, at the fold cutoff and after it (round 1, L7: both dates armed)
 reset_tree; dispconf 2000-01-01
 DISPDATE="2026-09-15T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 2 · disposition fold\n'
@@ -5389,6 +5473,7 @@ lm_dir=$(mktemp -d)
      "$HERE/PROTOCOL.template.md" "$HERE/SKILL.template.md" "$HERE/VERBS.template.md" \
      "$HERE/STOPS.template.md" "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" \
      "$HERE/.unattended.conf.example" "$KIT_REL/"
+  seed_loop_kit .
   cp "$HERE/PROTOCOL.template.md" memory/guides/UNATTENDED-PROTOCOL.md
   cp "$HERE/VERBS.template.md" memory/guides/UNATTENDED-VERBS.md
   cp "$HERE/ASKS.template.md" "$KIT_REL/"
@@ -5780,6 +5865,7 @@ cp "$TMP/$KIT_REL/check-unattended.sh" "$TMP/$KIT_REL/unattended.sh" "$TMP/$KIT_
    "$TMP/$KIT_REL/check-playbook.sh" "$TMP/$KIT_REL/PROTOCOL.template.md" "$TMP/$KIT_REL/SKILL.template.md" \
    "$TMP/$KIT_REL/VERBS.template.md" "$TMP/$KIT_REL/PLAYBOOK-TEMPLATE.template.md" \
    "$TMP/$KIT_REL/.unattended.conf.example" "$ak/$KIT_REL/"
+seed_loop_kit "$ak"
 cp "$TMP/$KIT_REL/PROTOCOL.template.md" "$ak/memory/guides/UNATTENDED-PROTOCOL.md"
 cp "$TMP/$KIT_REL/VERBS.template.md" "$ak/memory/guides/UNATTENDED-VERBS.md"
 cp "$TMP/$KIT_REL/ASKS.template.md" "$ak/$KIT_REL/"
@@ -6226,6 +6312,7 @@ cp "$TMP/$KIT_REL/check-unattended.sh" "$TMP/$KIT_REL/unattended.sh" "$TMP/$KIT_
    "$TMP/$KIT_REL/check-playbook.sh" "$TMP/$KIT_REL/PROTOCOL.template.md" "$TMP/$KIT_REL/SKILL.template.md" \
    "$TMP/$KIT_REL/VERBS.template.md" "$TMP/$KIT_REL/PLAYBOOK-TEMPLATE.template.md" \
    "$TMP/$KIT_REL/.unattended.conf.example" "$ma0/$KIT_REL/"
+seed_loop_kit "$ma0"
 cp "$TMP/$KIT_REL/PROTOCOL.template.md" "$ma0/memory/guides/UNATTENDED-PROTOCOL.md"
 cp "$TMP/$KIT_REL/VERBS.template.md" "$ma0/memory/guides/UNATTENDED-VERBS.md"
 cp "$TMP/$KIT_REL/ASKS.template.md" "$ma0/$KIT_REL/"
@@ -6448,49 +6535,40 @@ miss "$out" "$MA_OWN_RD"
 
 # ==== TOOL-aEvidencedLens-9: NO RUN COMMIT CHANGES THE ROUND BOUND ===============================
 # The same own-commit list as the grant arm, so the same builder: the run's raise must red on a live
-# and on a terminal record, and an OWNER raise merged into the run branch must not. The fixture conf
-# declares no REVIEW_ROUNDS, so the bound before every raise is the driver's default of 1. At base
+# and on a terminal record, and an OWNER raise merged into the run branch must not. Since
+# TOOL-dDeclaredLoop-21 the bound is the policy file's spec bound, read through the loop kit's
+# review_bounds.py, which each tree below commits in its base with the policy kit; no tree commits a
+# policy file at base, so the bound before every raise is the catalogue's one round. At base
 # no arm below printed a round line. Every graph still carries the run's grant, so the grant arm
 # hitting in the quiet group proves the leg graded that range rather than finding nothing.
-MA_ROUNDS="a commit among a run's own commits changes the effective REVIEW_ROUNDS bound in .unattended.conf, and the round bound is the owner's, set by an owner commit outside any run (run mandate memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-0-run-mandate.md, decision 4) - commit and bound follow:"
+MA_ROUNDS="a commit among a run's own commits changes the effective spec bound the policy file .governance/policy.toml sets, and the round bound is the owner's, set by an owner commit outside any run (run mandate memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-0-run-mandate.md, decision 4) - commit and bound follow:"
 # ---- R1: a live record whose own commit raises the bound
-ma_init gr1; mar="$ma_root/gr1"
+MA_BOUND_KITS=1 ma_init gr1; mar="$ma_root/gr1"
 write_rounds_line "$mar" 2; ma_commit "$mar" "run raises rounds"; MA_RR=$(ma_sha "$mar" HEAD)
 hit "$(ma_leg "$mar")" "$MA_ROUNDS $MA_RR 1 -> 2, run memory/builds/tRun/RUN.md"
 # ---- R2: the owner raises it on main and the run branch merges main. The merge's FIRST-parent diff
 # ---- carries the raise, so a scan reading it would red; the merge took one side's value, and the
 # ---- owner's commit is on the advertised tip, so nothing is named.
-ma_init gr2; mar="$ma_root/gr2"
+MA_BOUND_KITS=1 ma_init gr2; mar="$ma_root/gr2"
 ( cd "$mar" && git checkout -q main ) >/dev/null 2>&1; write_rounds_line "$mar" 2; ma_commit "$mar" "owner raises rounds"
 ( cd "$mar" && git push -q origin main && git checkout -q unit && git merge -q --no-edit main ) >/dev/null 2>&1
 MA_RUN=$(git -C "$mar" log --format=%H --grep='^run grants$' -1)
 same "fixture: the reconcile's first-parent diff carries the owner's raise" \
-  "$(git -C "$mar" diff --name-only HEAD^1 HEAD -- .unattended.conf)" ".unattended.conf"
+  "$(git -C "$mar" diff --name-only HEAD^1 HEAD -- .governance/policy.toml)" ".governance/policy.toml"
 out=$(ma_leg "$mar")
-miss "$out" "changes the effective REVIEW_ROUNDS bound"
+miss "$out" "changes the effective spec bound"
 hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
 # ---- R3: a TERMINAL record, landed by a --no-ff merge named as its witness, whose range holds the
 # ---- run's raise. A live-only fixture never reaches the terminal arm of the range.
-ma_init gr3; mar="$ma_root/gr3"
+MA_BOUND_KITS=1 ma_init gr3; mar="$ma_root/gr3"
 write_rounds_line "$mar" 2; ma_commit "$mar" "run raises rounds"; MA_RR=$(ma_sha "$mar" HEAD)
 ( cd "$mar" && git checkout -q main && git merge -q --no-ff --no-edit -m "land tRun" unit ) >/dev/null 2>&1
 ma_facts "$mar" tRun LANDED HEAD "$(ma_base "$mar")"
 printf 'landed-anchor: remote\n' >> "$mar/memory/builds/tRun/RUN.md"; ma_commit "$mar" "landed record"
 hit "$(ma_leg "$mar")" "$MA_ROUNDS $MA_RR 1 -> 2, run memory/builds/tRun/RUN.md"
-# ---- TOOL-aEvidencedLens-21 S6 (closing review L1). R4: a run commit writes a DECOY conf, `4` sourced
-# ---- and a dead `1` after it; the last-assignment read saw `1`, the default, and named nothing.
-ma_init gr4; mar="$ma_root/gr4"
-sed -i '/^REVIEW_ROUNDS=/d' "$mar/.unattended.conf"; printf 'REVIEW_ROUNDS=4\nif false; then\nREVIEW_ROUNDS=1\nfi\n' >> "$mar/.unattended.conf"
-ma_commit "$mar" "run writes a decoy"; MA_RR=$(ma_sha "$mar" HEAD)
-hit "$(ma_leg "$mar")" "$MA_ROUNDS $MA_RR 1 -> multi:4,1, run memory/builds/tRun/RUN.md"
-# ---- R5: `1` then `01` is one bound, so neither run commit is a round write; the grant hit is the
-# ---- liveness, proving the leg graded that range rather than finding nothing.
-ma_init gr5; mar="$ma_root/gr5"
-write_rounds_line "$mar" 1; ma_commit "$mar" "run spells rounds"; write_rounds_line "$mar" 01; ma_commit "$mar" "run zero-pads rounds"
-MA_RUN=$(git -C "$mar" log --format=%H --grep='^run grants$' -1)
-out=$(ma_leg "$mar")
-miss "$out" "changes the effective REVIEW_ROUNDS bound"
-hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+# ---- R4 and R5, a decoy assignment and a zero-padded value, graded the conf's sourcing grammar, which a
+# ---- policy file does not have: they went with TOOL-dDeclaredLoop-21, since the module reads the bound
+# ---- the policy kit parses, never the file's bytes.
 # ---- The four reports that skip or narrow the walk name BOTH arms it gates.
 same "round reports: no skip report names the grant-write arm alone" \
   "$(grep -cF 'SKIPPED the grant-write arm for' "$TMP/$KIT_REL/check-unattended.sh")" "0"
@@ -6510,7 +6588,7 @@ same "round walk: fixture, the owner raise and the run's reconcile of it are in 
   "$(git -C "$mar" log --format=%s -1 "$MA_OWNR")|$(git -C "$mar" log --format=%s -1 'HEAD~1^2')" "owner raises rounds|Merge branch 'main' into unit"
 out=$(ma_leg "$mar")
 miss "$out" "$MA_ROUNDS $MA_OWNR"
-miss "$out" "changes the effective REVIEW_ROUNDS bound"
+miss "$out" "changes the effective spec bound"
 # ---- round walk: AC2 - the same record with a run raise beside it: named once, the owner's dropped.
 # ---- Also the liveness of AC1's `miss`: the same leg on the same graph does name a round write.
 build_round_walk grw2 3 ""
@@ -7062,6 +7140,27 @@ mutate $KIT_REL/unattended.sh '/^VERB_REQUIRES="/,/"$/d'
 hit  "$(bash "$SCRIPT" --only 52 2>&1)" "nothing to join: no VERB_REQUIRES row"
 reset_tree
 
+# ==== TOOL-dDeclaredLoop-5: CHECK 53, each Definition-of-Done entry's witness class graded through the
+# ---- loop kit's `--grade-site`, read off a run scoped to 53. AC7: an unclassed DOD_EXTRA entry reds,
+# ---- quoting the loop kit's refusal that names it, which also proves `--only 53` reads DOD_EXTRA from
+# ---- the conf rather than `$DOD`, which the core region sets; restored, the run prints its liveness
+# ---- line alone. The first arm carries the refusal branch's whole literal.
+reset_tree; mkconf "" "b"
+out=$(bash "$SCRIPT" --only 53 2>&1); rc=$?
+hit  "$out" "UNATTENDED check 53 FAILED — a Definition-of-Done entry declares no witness class, a word no witness alias holds, or an actor witness the loop kit's actor-witness list does not name, or the list names an actor entry the site no longer declares, so a run would read a fact the acting agent typed as its witness; append :machine or :agent to an unclassed entry, and list an actor one with the build that computes it: "
+hit  "$out" "loop: refused · DOD_EXTRA b declares no witness class"
+same "check 53 refuses an unclassed DOD_EXTRA entry, exit code" "$rc" "1"
+reset_tree
+out=$(bash "$SCRIPT" --only 53 2>&1); rc=$?
+miss "$out" "UNATTENDED check 53 FAILED"
+same "check 53 over the classed fixture prints its liveness line alone" "$(grep -v '^check-unattended: --only 53 ran checks 53; skipped' <<<"$out")" ""
+same "check 53 over the classed fixture, exit code" "$rc" "0"
+# ---- THE SECOND BRANCH: a tree with no loop kit beside the copy reds naming the unreachable kit, never
+# ---- a pass over entries nobody graded.
+reset_tree; rm -rf "$LOOP_REL"
+hit  "$(bash "$SCRIPT" --only 53 2>&1)" "UNATTENDED check 53 FAILED — the loop kit could not grade the Definition-of-Done entries' witness classes, so an unclassed entry or an unlisted actor-typed fact would pass as a witness unread: the loop kit's loop_lib.py resolved through neither"
+reset_tree
+
 # ==== TOOL-dAlignedCarrier-6: CHECK 48, a run-state fact written after the function's last stage
 # ---- of it (closing review M1). The staged function is written to a file and appended by sed's
 # ---- `r` into the fixture's tracked lib, one of the population's shell files; its two calls are
@@ -7397,17 +7496,22 @@ fi   # ---- end of the region-8 span, re-cut across the eight regions by TOOL-aG
 # ---- after the no-commit dodged-join arm in region 8, four `mutate`, four `hit` and two `miss`, so
 # ---- FLOOR_SHARD_8 carries the same +10 and the other seven are untouched. COUNTED off the block's own
 # ---- lines; this pass runs no suite, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=1152
+# ---- LOWERED 1152 -> 1150 by exactly the arms, TOOL-dDeclaredLoop-21: region one gains the announced
+# ---- kit-defaults `hit` before the unreadable-bounds arm (+1) and region six loses R4's `hit` and R5's
+# ---- `miss` and `hit` (-3), so FLOOR_SHARD_1 and FLOOR_SHARD_6 carry the same and the other six are
+# ---- untouched. COUNTED off the diff by region; this pass runs no suite, and their RED-first
+# ---- observation is the close's.
+FLOOR_ASSERTIONS=1150
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
 # figure every floor reads is the FLOOR-GRADED count — `$n` at the grade below — never the PASS line.
-FLOOR_SHARD_1=168
+FLOOR_SHARD_1=169
 FLOOR_SHARD_2=150
 FLOOR_SHARD_3=127
 FLOOR_SHARD_4=101
 FLOOR_SHARD_5=133
-FLOOR_SHARD_6=150
+FLOOR_SHARD_6=147
 FLOOR_SHARD_7=301
 FLOOR_SHARD_8=227
 case "$SH_I" in

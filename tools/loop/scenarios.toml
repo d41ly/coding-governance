@@ -1,0 +1,48 @@
+# scenarios.toml — gov's scenario pack (TOOL-dDeclaredLoop-27): what kind of work a build is, and the flow
+# it runs follows. The `scenario` namespace's source, read at HEAD as the kind's gov rows; its schema is
+# scenario-schema.toml beside this file and its module scenario.py. A build is placed under every
+# scenario whose `admits` holds over its request's facts, `flow.scenario-default` where none does.
+#
+# Gov's five activate no row and name no `then`, so no gov build's flow moves: a repository extends one
+# from its overlay, `[[scenario]]` tagged scenario.adopter.<name>. `python <prefix>/playbook/core.py new
+# scenario <name> ...` appends a gov row here.
+
+[[scenario]]
+tag = "scenario.feature"
+extends = "none"
+admits = { entry = ["feature"] }
+entry = "step.plan"
+activates = {}
+then = []
+
+[[scenario]]
+tag = "scenario.amendment"
+extends = "none"
+admits = { entry = ["amendment"] }
+entry = "step.plan"
+activates = {}
+then = []
+
+[[scenario]]
+tag = "scenario.patch"
+extends = "none"
+admits = { entry = ["patch"] }
+entry = "step.design"
+activates = {}
+then = []
+
+[[scenario]]
+tag = "scenario.playbook-run"
+extends = "none"
+admits = { entry = ["playbook-run"] }
+entry = "step.plan"
+activates = {}
+then = []
+
+[[scenario]]
+tag = "scenario.design-only"
+extends = "scenario.feature"
+admits = { entry = ["feature"], design-only = ["true"] }
+entry = "step.plan"
+activates = {}
+then = []

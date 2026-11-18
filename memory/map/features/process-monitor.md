@@ -7,6 +7,8 @@ status = "shipped"
 streams = ["tooling"]
 decisions = ["TOOL-aReapedSpinner-8", "TOOL-aReapedSpinner-9", "TOOL-aReapedSpinner-10"]
 
+stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
+
 [claims]
 gate-legs = [
   "process-monitor wiring",

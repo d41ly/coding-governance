@@ -311,6 +311,12 @@
       "source": "tools/memory-tree/check-verdict-epoch.sh"
     },
     {
+      "path": "tools/memory-tree/commit_trailers.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/commit_trailers.py"
+    },
+    {
       "path": "tools/memory-tree/corpus_ids.py",
       "kit": "memory-tree",
       "role": "engine",
@@ -1493,6 +1499,12 @@
       "source": "tools/workflows/replay_scorer.py"
     },
     {
+      "path": "tools/review-harness/review_dispose.py",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/review_dispose.py"
+    },
+    {
       "path": "tools/review-harness/review_pin.py",
       "kit": "review-harness",
       "role": "engine",
@@ -1635,6 +1647,12 @@
       "kit": "unattended",
       "role": "engine",
       "source": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "path": "tools/unattended/commit_trailers.py",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/commit_trailers.py"
     },
     {
       "path": "tools/unattended/fixture-pieces/one/piece.md",
@@ -1792,6 +1810,12 @@
       "id": "playbook/adopter-rules-to-overlay",
       "introduced": null,
       "state": "applied"
+    },
+    {
+      "id": "unattended/review-rounds-to-policy",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
     }
   ]
 }

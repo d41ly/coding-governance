@@ -87,3 +87,4 @@ subject = "repo"
 argv = ["python", "{kit}/check_policy.py"]
 guard = []
 ceiling = 120
+stage = ["step.test"]

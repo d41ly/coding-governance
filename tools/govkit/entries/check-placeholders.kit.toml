@@ -36,12 +36,14 @@ name = "playbook placeholder catalogue"
 subject = "repo"
 argv = ["bash", "{prefix}/check-placeholders.sh"]
 guard = []
+stage = ["step.test"]
 
 [[gate_leg]]
 name = "placeholder-catalogue self-test"
 subject = "kit"
 argv = ["bash", "{prefix}/check-placeholders.test.sh"]
 guard = ["{prefix}/check-placeholders.sh", "{prefix}/check-placeholders.test.sh"]
+stage = ["step.test"]
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv

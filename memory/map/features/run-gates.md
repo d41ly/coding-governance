@@ -7,6 +7,8 @@ status = "shipped"
 streams = ["tooling"]
 decisions = ["TOOL-aPacedTurnstile-1", "TOOL-aPacedTurnstile-2", "TOOL-aPacedTurnstile-4", "TOOL-aPacedTurnstile-5", "TOOL-aPacedTurnstile-6", "TOOL-aPacedTurnstile-3", "TOOL-aPacedTurnstile-7", "TOOL-aPacedTurnstile-16", "TOOL-dLoggedFlight-3"]
 
+stage = ["step.test"]
+
 [claims]
 gate-legs = ["run-gates gov canary", "run-gates adopter e2e", "run-gates wiring",
   "profile-bar selftest",

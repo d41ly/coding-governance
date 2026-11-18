@@ -1,6 +1,6 @@
 export const meta = {
   name: 'tier2-review',
-  version: '1.66', // gov:kit tier2-review@1.66 // gov:kit review-harness@1.66 — BOTH ids: the
+  version: '1.67', // gov:kit tier2-review@1.67 // gov:kit review-harness@1.67 — BOTH ids: the
   // second is this entry's REGISTRY id, and without it a deployer grepping the id the
   // registry uses finds nothing. DEPL-dGaugedVintage-5. — engine identity (deployed verbatim; this field is the deployer's version marker)
   description:
@@ -77,11 +77,16 @@ function buildKeyedSchema(schema, extra) {
 // null or absent and prints `-`, never `0`: a zero is a result and an absence is not. `key=value`
 // fields and no head from the chat micro-format set, because this is a RECORD line.
 // TOOL-dFairHearing-5 S4 - `merged` after `refuted`, so a stage before verify prints `merged=-`.
+// TOOL-dDeclaredLoop-20 S3 - `review.cost`'s four fields after `out-tokens=`, so a reader of the older line reads
+// every field it read before: `trigger=` the cause the trigger fired on, and `shape=`, `efforts=` and `role-sha=`,
+// which print `-` until a shape registry supplies them. An absent value is `-`, never `0`.
 function renderShapeLine(fields) {
   return `review-shape kind=${fields.kind} round=${fields.round} intensity=${fields.intensity} at=${fields.at} ` +
     ['raw', 'confirmed', 'refuted', 'merged', 'unverified', 'blocker', 'high', 'medium', 'low']
       .map((k) => `${k}=${fields[k] === null || fields[k] === undefined ? '-' : fields[k]}`).join(' ') +
-    ` agents=${fields.agents} out-tokens=${fields.outTokens === null || fields.outTokens === undefined ? 'unknown' : fields.outTokens}`
+    ` agents=${fields.agents} out-tokens=${fields.outTokens === null || fields.outTokens === undefined ? 'unknown' : fields.outTokens} ` +
+    [['trigger', 'trigger'], ['shape', 'shape'], ['efforts', 'efforts'], ['role-sha', 'roleSha']]
+      .map((k) => `${k[0]}=${fields[k[1]] === null || fields[k[1]] === undefined ? '-' : fields[k[1]]}`).join(' ')
 }
 // TOOL-dFairHearing-17 S1 - THE ROUND STATE, pure: this round's blocker-and-high count against the rounds
 // before it, in the driver's `review_state` test order — zero, then the non-decrease test against the round
@@ -178,6 +183,9 @@ function readOutputTokens() {
 //                                         // the set, and it joins the review key under "class" only
 //   unclassed: "refuse" | "reason" | "owner-rules", // DEFAULTS to "refuse": the `review.unclassed` key, passed
 //                                         // as a pin argument, naming which `none` dispositions the check admits
+//   trigger: "owed" | "opt-in" | "recommendation" | "placement", // optional: the cause `--trigger` printed
+//                                         // (TOOL-dDeclaredLoop-20), recorded as the review-shape line's
+//                                         // `trigger=`; absent prints `-`; refused outside the set
 //   gateManifest: "<repo-relative path>",  // DEFAULTS to "tools/gate-legs.json": the leg manifest the resume
 //                                         // probe reads the `gate:` leg names from; refused on the `specs` rule
 //                                         // (TOOL-dFairHearing-8)
@@ -343,6 +351,12 @@ const UNCLASSED = ['refuse', 'reason', 'owner-rules']
 const unclassed = a.unclassed === undefined ? 'refuse' : a.unclassed
 if (typeof unclassed !== 'string' || UNCLASSED.indexOf(unclassed) === -1)
   throw new Error('tier2-review: `unclassed` must be one of ' + UNCLASSED.join(' | ') + '. Got ' + JSON.stringify(a.unclassed) + '.')
+// TOOL-dDeclaredLoop-20 S3 - `trigger`, the cause the driver's `--trigger` fired the review on, checked beside
+// `unclassed` in the same shape. It reaches the review-shape line alone and joins no review key.
+const TRIGGERS = ['owed', 'opt-in', 'recommendation', 'placement']
+const trigger = a.trigger === undefined ? null : a.trigger
+if (trigger !== null && (typeof trigger !== 'string' || TRIGGERS.indexOf(trigger) === -1))
+  throw new Error('tier2-review: `trigger` must be one of ' + TRIGGERS.join(' | ') + '. Got ' + JSON.stringify(a.trigger) + '.')
 // TOOL-dFairHearing-2 S1 - `preset`, the CALLER's choice of a spec audit's lens literal, in the shape of
 // `intensity` above: a closed set refused by name outside it, and refused beside the diff kind, which
 // has one literal and so no preset. Each member but the default names the `gov:lens-slots` literal it
@@ -1693,7 +1707,7 @@ const tokensAtStart = readOutputTokens()
 function renderStageShape(at, counts, agents) {
   const now = readOutputTokens()
   return renderShapeLine(Object.assign({ kind: kind, round: round, intensity: intensity, at: at, agents: agents,
-    outTokens: tokensAtStart === null || now === null ? null : now - tokensAtStart }, counts))
+    outTokens: tokensAtStart === null || now === null ? null : now - tokensAtStart, trigger: trigger }, counts))
 }
 // `phase('Resume')` opened above the checklist agent (TOOL-dFairHearing-15 S1).
 const probe = await agent(

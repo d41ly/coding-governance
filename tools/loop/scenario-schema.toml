@@ -1,0 +1,38 @@
+# scenario-schema.toml — the row schema of the `scenario` kind (TOOL-dDeclaredLoop-27): what a scenario row
+# holds, in gov's pack `scenarios.toml` beside this file or as a `[[scenario]]` row of a repository's
+# overlay. Read by the playbook kit's overlay_rows.py through the kinds register's `kind.scenario` row,
+# and by scenario.py beside this file, which admits, composes and checks the rows.
+#
+# [kind]: `name`, the kind, and `owner-seat`, the tag segment a repository row holds `adopter` at, so a
+# repository scenario is tagged scenario.adopter.<name>.
+#
+# One [[field]] row per key but `tag`, each a scalar: `extends`, a composed scenario's tag or `none`;
+# `admits`, a table from a fact name to the values that admit; `entry`, the gov step whose state a build
+# row out of `none` enters; `activates`, a table from a kind tag to that kind's rows; and `then`, a list
+# of { at = <gov step tag>, scenario = <tag> }, the scenario that takes over at that step's exit. No field
+# declares `widens` or `fixed-by`, so each is fixed by its undeclared class: a repository extends a gov
+# scenario where it would patch one.
+
+[kind]
+name = "scenario"
+owner-seat = 1
+
+[[field]]
+name = "extends"
+shape = "scalar"
+
+[[field]]
+name = "admits"
+shape = "scalar"
+
+[[field]]
+name = "entry"
+shape = "scalar"
+
+[[field]]
+name = "activates"
+shape = "scalar"
+
+[[field]]
+name = "then"
+shape = "scalar"

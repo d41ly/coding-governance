@@ -7,6 +7,8 @@ status = "shipped"
 streams = ["tooling"]
 decisions = []
 
+stage = ["step.test"]
+
 [claims]
 gate-legs = ["spec tokens (a spec's own names resolve)", "spec tokens (the pass's own spec)", "spec-tokens self-test", "chain-packet self-test"]
 kits = []

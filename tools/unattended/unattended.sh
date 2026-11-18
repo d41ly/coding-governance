@@ -5,7 +5,7 @@
 #   unattended.sh --preflight <slug> --keepalive-id <id> [--waive <item> --reason <text>]   # assert, pin, record, render
 #   unattended.sh --plan <slug> [<slug> ...] [--paths] [--asks] [--framed]   # per-unit state, and the next unit
 #   unattended.sh --phase <slug> <phase> --witness <sha>   # move the run, with its witness
-#   unattended.sh --status <slug>                          # one line: phase · witness · next unit
+#   unattended.sh --status <slug>                          # phase · witness · next unit, then the position engine's lines
 #   unattended.sh --audit <slug>                           # one line per open dispatched unit: idle time, PROGRESSING|STALLED
 #   unattended.sh --wake <slug> --keepalive-id <id>        # the idle-wake's first act: HEALTHY, or FULL and why, then the cadence due
 #   unattended.sh --register-task <slug> --task <name> --heartbeat <absolute path>   # BEFORE starting a background task
@@ -17,10 +17,16 @@
 #   unattended.sh --landed <slug>                          # after the push: observe, then mark LANDED
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
 #   unattended.sh --propose <slug> --item <text> --step <s> --reason <text>  # amend a playbook LATER
+#   unattended.sh --refused <slug> --item <tag> --key <key> --reason <text>  # record a refused item; --plan prints the frontier
 #   unattended.sh --rescope <slug> --act <retire|supersede|add|defer> --item <id> [--successor <id>] --reason <text>
+#   unattended.sh --rescope <slug> --flow <tag> --act <add|amend|exclude|supersede> --item <id> [--row <path>] --reason <text>
 #   unattended.sh --dispatch <slug> --pass <id> --writes <path> [<path> ...] [--writes <path> ...]
 #   unattended.sh --brief <slug> --unit <id> --path <file>  # record WHAT a build pass was handed
-#   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--highs <N> --minors <N>] [--folded <N> --promoted <N>] [--disposition fold|promote]
+#   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--round-highs <N> --round-minors <N>] [--highs <N> --minors <N>] [--folded <N> --promoted <N>] [--disposition fold|promote]
+#   unattended.sh --trigger <slug> --subject <s> --cause owed|opt-in|recommendation|placement [--pin <path>]...   # fire a review: print its call's pin, trigger and review policy
+#   unattended.sh --recommend <slug> --stage <s> [--reason <text> --verdict review|no-review]   # score a stage exit's review, or record its role's reason
+#   unattended.sh --fix-pass <slug> --unit <id> --reds <N>   # record one fix pass against a unit's acceptance, N its criteria still red
+#   unattended.sh --exhausted <slug>                       # end a build whose rework budget is spent: park its ending, print its act
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
 #   unattended.sh --hold <slug> --code <c> --until <cond> --reason <text> --reaped <id>|--keepalive-unreachable <node> [--pending-run <runId>]
 #   unattended.sh --handoff <slug> --code owner-landing|owner-decision --reason <text> --reaped <id>|--keepalive-unreachable <node>   # HELD for an owner to land or decide
@@ -34,7 +40,7 @@
 #   unattended.sh --chain-verdict <slug>                           # CONTINUE, STOP or HOLD, derived from that record and the roster; writes nothing
 #   unattended.sh --check-commit <message file>                    # from commit-msg: refuse an open pass's undeclared staged path
 #   unattended.sh --check-specs <slug> <unit> [<unit> ...]   # --dispatch's spec-file refusals, before the spec commit
-#   unattended.sh --claims                                         # every run claim on the remote: slug, node, status, beat-age-s, verdict
+#   unattended.sh --claims [--with-key]                            # every run claim on the remote: slug, node, status, beat-age-s, verdict[, key]
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
 #   unattended.sh --version                                        # the kit version, then exit
 #   unattended.sh --help                                           # the verb list, the verb carrier's path and this text, then exit 0; -h is the same
@@ -69,7 +75,7 @@ set -u
 if [ -n "${EPOCHREALTIME:-}" ]; then DRIVER_T0_US=${EPOCHREALTIME//[!0-9]/}
 else printf -v DRIVER_T0_US '%(%s)T' -1; DRIVER_T0_US="${DRIVER_T0_US}000000"; fi
 readonly DRIVER_T0_US
-KIT_UNATTENDED_VERSION=1.127 # gov:kit unattended@1.127 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.128 # gov:kit unattended@1.128 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -114,7 +120,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
 # place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
 # the gate leg, because no runtime derivation crosses a file boundary.
-VERBS_SLUG="--preflight --status --audit --wake --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --brief --beat"
+VERBS_SLUG="--preflight --status --audit --wake --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --refused --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --trigger --recommend --fix-pass --exhausted --brief --beat"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
 VERBS_INLINE="--plan --check-specs --phase --check-commit --claims --overlaps --version"
@@ -581,10 +587,6 @@ UNIT_STALL_BOUND_DEFAULT=1800
 # 5400s: three of the thirty-minute beats the build briefs ask for, on the three-cadence rule the line
 # above records for its own figure, so one late beat never reads STALLED. TOOL-aRepatriatedFork-53.
 TASK_STALL_BOUND_DEFAULT=5400
-# 1 round: a spec-audit subject exits BOUNDED after its first blocked round (owner ruling
-# 2026-09-14, TOOL-aProbedUnit-6). ONE constant, interpolated into the NOTE the reader prints, so the
-# argument and the sentence cannot say two numbers — the closing review found them typed twice.
-REVIEW_ROUNDS_DEFAULT=1
 # 1800s: a `probe` hold is a stop whose own release is a probe, and half an hour is the shortest
 # gap at which a restarted session is not simply re-asking the question the hold just answered.
 # 6 holds: the no-progress ceiling. A run that has held six times with nothing changed but its own
@@ -644,8 +646,8 @@ observe_remote() { # <outfile> · <git args…> -> rc (124 = the bound fired)
 # ------------------------------------------------------------------------------ THE CONF PREAMBLE
 # load_driver_conf - every top-level step that depends on the conf, the cwd or a per-call seam, in
 # the order it always ran: the backstop seam, the two NOTEs, the repo root and the `cd`, the conf
-# and its refusals, the closed sets and the bound reads, REVIEW_ROUNDS and its runaway check, and
-# the procfs seam. ONE FUNCTION so a SOURCED driver runs it once per call, in the subshell its caller
+# and its refusals, the closed sets and the bound reads, and the procfs seam. The review bounds are
+# not read here: `load_review_bounds` reads them for `verb_review` alone (TOOL-dDeclaredLoop-21). ONE FUNCTION so a SOURCED driver runs it once per call, in the subshell its caller
 # opens: `( load_driver_conf && main "$@" )`. It EXITS on a refusal, as it always did, which is why
 # that subshell belongs to every call. An EXECUTED driver calls it right below its definition, so
 # every top-level line after it still runs AFTER the conf, and a conf still cannot pre-set the state
@@ -702,7 +704,7 @@ KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTI
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
 ASKS_CMD=""; HELD_CI_WORKFLOW=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""; HANDOFF_CUTOFF=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""; RUN_CLAIMS=""
-GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; TASK_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
+GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; TASK_STALL_BOUND=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
 DISPOSITION_CUTOFF=""; SPEC_FOLD_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; PROMPT_BRIEF_CUTOFF=""; PROMPT_BRIEF_SKELETON_CUTOFF=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
 # TOOL-dLoggedFlight-2 - the run log's two inputs, on the init block's LAST line so the suite's
 # contiguous-block read still covers them (a comment inside the block ends it). RUNLOG_SESSION_VARS
@@ -878,7 +880,7 @@ read_bound_key RESUME_STALE_BOUND "$RESUME_STALE_BOUND_DEFAULT" seconds "a run r
 # ARGV STATE, not a conf default. Initialised AFTER the conf is sourced: in the default block above,
 # a tracked `.unattended.conf` could pre-set it and defeat the "--park requires --item" refusal by
 # supplying the item nobody typed.
-PK_ITEM=""; PK_STEP=""
+PK_ITEM=""; PK_STEP=""; RF_KEY=""
 # Internal state for trusted_base, initialised here for PK_ITEM's reason (TOOL-aHomedAnchor-6 S8).
 TB_IGNORE_RECORD=0
 HALT_CODE=""
@@ -892,6 +894,8 @@ PLAN_PATHS=""
 # input to the rung ladder rather than a property of this output mode.
 PLAN_ASKS=""
 RV_SUBJECT=""; RV_BLOCKERS=""; RV_DISPOSITION=""; RV_HIGHS=""; RV_MINORS=""; RV_FOLDED=""; RV_PROMOTED=""
+RV_RHIGHS=""; RV_RMINORS=""; FP_REDS=""
+TR_CAUSE=""; TR_PINS=(); RC_STAGE=""
 M="$MEMORY_ROOT"
 # SHARED_RECORDS's DEFAULT IS RESOLVED HERE, not in the block above, because it is expressed in terms
 # of MEMORY_ROOT and the conf is what sets that. Computed before the source it baked in this kit's own
@@ -919,24 +923,6 @@ if [ -n "$_two_key" ]; then
   RUNLOG_CLEAN=1; exit 2
 fi
 
-# THE RUNAWAY CEILING, and it is a BACKSTOP rather than the mechanism. A SPEC subject is bounded by
-# `REVIEW_ROUNDS` and exits in a disposition; the DIFF review is bounded by the convergence predicate;
-# this ceiling backstops both, so a defect in the predicate cannot produce an unbounded loop. It is
-# set well above any observed converging sequence, so REACHING it is itself a defect worth reporting
-# rather than a routine outcome — and under the owner resolution the run promotes and lands anyway
-# rather than halting, which is why it must be loud in two carriers.
-# A file constant, not a conf key and not an environment variable, on the argument this repo already
-# recorded for its agent fan-out bound: a ceiling raisable from the environment leaves no diff behind.
-RUNAWAY_CEILING="8"
-# THE ROUND BOUND FOR A SPEC SUBJECT, TOOL-aProbedUnit-6. The third caller of `read_bound_key`, placed
-# here and not beside the other two because the one arm those keys lack — the upper bound — IS the
-# constant above, and a comparison written above its definition reads an empty string. A tracked conf
-# key rather than a constant because a conf leaves a diff behind, the property the header above wants.
-read_bound_key REVIEW_ROUNDS "$REVIEW_ROUNDS_DEFAULT" rounds "a spec-audit subject exits BOUNDED after the kit default of ${REVIEW_ROUNDS_DEFAULT} round(s)"
-# STRICTLY BELOW. `review_state` tests the ceiling BEFORE the bound, so a bound EQUAL to the ceiling
-# is the one value the sentence below refuses and `-le` accepted: at that value the loud CEILING
-# exit fires and the declared bound is never reached, exactly as the sentence says.
-[ "$REVIEW_ROUNDS" -lt "$RUNAWAY_CEILING" ] || { echo "unattended: REFUSING - REVIEW_ROUNDS is $REVIEW_ROUNDS, at or above the runaway ceiling of $RUNAWAY_CEILING, so the ceiling would fire first and the declared bound could never be reached." >&2; exit 2; }
 # `UNATTENDED_PROCFS` is read per call, for the reason the process-ledger block below gives it.
 PROCFS_ROOT=${UNATTENDED_PROCFS:-/proc}
 }
@@ -974,8 +960,12 @@ VERB_REQUIRES="--abort --reason --code
 --wake --keepalive-id
 --attest --item
 --review --subject
+--trigger --subject --cause
+--recommend --stage
+--fix-pass --unit --reds
 --park --item --reason
 --propose --item --step --reason
+--refused --item --key --reason
 --rescope --reason
 --brief --unit --path
 --record-set --leg --verdict
@@ -1032,7 +1022,7 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 # reader parses BY kind, so it is a row nothing counts and nothing surfaces. It became a declaration
 # when a fifth kind arrived and found the alternation that recognises a row typed into `verb_status`
 # - one spelling of a vocabulary that two files read.
-PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief hold resume handoff"
+PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief hold resume handoff refusal fix-pass"
 # The BUILD-ORDER verb, in the two shapes `gen_build_index.py` declares. CONFORMING requires the
 # value to be anchored on both sides; LOOSE is anything wearing the verb's name that is not.
 ORDER_OK_RE='·[[:space:]]*order[[:space:]]+[0-9]+[[:space:]]*(·|$)'
@@ -1150,6 +1140,9 @@ DOD_NO_OVERRIDE="authorization-reachable pieces-complete"
 #   gate-red-out-of-scope     a gate is red and its fix lies outside the mandate scope.
 #   claim-lost                another session holds this run's claim on the remote, so the run must
 #                             not drive its slug any more (TOOL-aGraftedHelix-1); check 108 names it.
+#   budget-exhausted          the build's rework budget is spent and its recorded ending is
+#                             close-incomplete: the build ends incomplete, its branch and records kept
+#                             (TOOL-dDeclaredLoop-31); --abort refuses it without that row.
 # THE REVIEW VERDICT VOCABULARY, closed and kit-owned. Its CANONICAL home is the memory-tree kit,
 # which enforces review-record grammar and renders the build method; a copy-installed kit cannot
 # import across that boundary, so this is a STATED duplication whose drift is armed by a row in that
@@ -1181,6 +1174,15 @@ FOLD_CUTOFF="2026-09-15"
 # reading). Dated by FOLD_CUTOFF's idiom, strictly past the newest record any branch could still
 # write under the old contract: the newest spec-subject `review` row on any ref was 2026-10-05.
 SPEC_COUNTS_CUTOFF="2026-10-06"
+# THE DAY A SUBJECT'S ROUND COUNT BEGAN TO BE GRADED BY ITS OWN BOUND (TOOL-dDeclaredLoop-21 S6). Before
+# it every subject ran under the retired runaway backstop of eight rounds, so a record first-committed
+# earlier may hold more rounds than today's bounds admit, written under the contract then in force; check
+# 2 grades the round count of a record first-committed on or after it, or not yet committed, against its
+# subject's bound, and of no record before it. No driver line reads it, as none reads FOLD_CUTOFF: check
+# 2 reads it by `core_of`. Dated by FOLD_CUTOFF's idiom, strictly past the newest record any branch could
+# still write under the old contract: `git log --all --diff-filter=A --format=%cs --
+# ":(glob)memory/builds/*/RUN*.md"` printed 2026-11-15 as its newest date at the pass.
+ROUND_BOUND_CUTOFF="2026-11-16"
 # THE THREE SPEC-AUDIT SWITCHES' KIT DEFAULTS (TOOL-dFoldedAudit-7 S3), which `read_spec_audit_switch`
 # answers when no policy kit resolves. They repeat the catalogue's defaults because a copy-installed
 # kit cannot read a kit that is not there, and the suite's AC5 arm compares the two. File constants
@@ -1188,6 +1190,30 @@ SPEC_COUNTS_CUTOFF="2026-10-06"
 SPEC_AUDIT_DISPOSAL_DEFAULT="by-nature"
 SPEC_AUDIT_CHAIN_STOP_DEFAULT="own-work"
 SPEC_AUDIT_CHAIN_CEILING_DEFAULT="4"
+# THE REVIEW BOUNDS' KIT DEFAULTS (TOOL-dDeclaredLoop-21 §8 F9), which `load_review_bounds` takes where the
+# loop kit's review_bounds.py or the policy kit it reads does not resolve. They are the line `show`
+# prints under the catalogue's defaults, the DERIVED bounds and not the four keys' defaults, so the
+# derivation stays the module's alone; the suite's parity arm holds them to `show`. Double-quoted, so
+# check 2 of the leg reads them by `core_of` where it cannot run the module either.
+REVIEW_MAX_ROUNDS_DEFAULT="3"
+REVIEW_SPEC_BOUND_DEFAULT="1"
+REVIEW_CLOSING_BOUND_DEFAULT="3"
+REVIEW_FOLLOW_UP_DEFAULT="after-high"
+# ...and the three fields `show` prints after them (TOOL-dDeclaredLoop-32): each subject's target word,
+# the count a loop converges at when it reads zero, and `flow.route-backs`, under the catalogue's defaults.
+REVIEW_SPEC_TARGET_DEFAULT="blockers"
+REVIEW_CLOSING_TARGET_DEFAULT="highs"
+REVIEW_ROUTE_BACKS_DEFAULT="3"
+# ...and the four `review.dispose` keys `show` prints after those (TOOL-dDeclaredLoop-20), each the
+# catalogue's default: the promotion count, an unverified finding's route, which class earns a gate,
+# and whether the roster waits for the review.
+REVIEW_FINDINGS_DEFAULT="blocker-high-own"
+REVIEW_UNVERIFIED_DEFAULT="ask"
+REVIEW_LEFT_SHIFT_DEFAULT="second-occurrence"
+REVIEW_BLOCKS_DEFAULT="every-review"
+# THE CAUSES A REVIEW FIRES ON (TOOL-dDeclaredLoop-20 S2), the closed set `--trigger --cause` takes and
+# `tier2-review.js` checks as `TRIGGERS`: owed by the method, an opt-in, a recommendation, a placement.
+TRIGGER_CAUSES="owed opt-in recommendation placement"
 # THE CHAIN RECORD'S GRAMMAR, ONE SPELLING EACH (TOOL-dFoldedAudit-15 S22): `_ids_of`, `write_chain_round`
 # and `derive_chain_verdict` read these, the awk through `-v` and dynamic regexes. Which two severities
 # are major stays in that awk, because it asks a different question from which four exist.
@@ -1197,7 +1223,7 @@ CHAIN_NATURES='local|new-mechanism'
 # The class of a cited path, whole (TOOL-aCarriedStop-2): the bracket expression and no quantifier, so
 # the writer's refusal prints it and the reader's awk anchors it.
 CHAIN_PATH_CLASS='[A-Za-z0-9._/-]'
-HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed external-prerequisite acceptance-underivable repo-state-out-of-mandate gate-red-out-of-scope claim-lost"
+HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed external-prerequisite acceptance-underivable repo-state-out-of-mandate gate-red-out-of-scope claim-lost budget-exhausted"
 # THE HOLD VOCABULARY, a SECOND closed set beside the halt one and never an extension of it. Each
 # names a stop the run cannot fix and did not cause; none of them ends the run. A project extends
 # through HOLD_CODES_EXTRA and deletes nothing, which HOLD_FLOOR pins the way HALT_FLOOR pins the
@@ -1503,7 +1529,55 @@ read_spec_audit_switch() { # disposal|chain-stop|chain-ceiling -> the value on s
   esac
   printf '%s\n' "$out"
 }
-checker_of()  { local p; for p in $(dod); do case "$p" in "$1:"*) printf '%s' "${p#*:}"; return;; esac; done; printf 'machine'; }
+# THE REVIEW BOUNDS (TOOL-dDeclaredLoop-21 S3). The loop kit's review_bounds.py derives them from the four
+# policy keys and refuses a bound no loop could hold; this runs its `show` and splits the one line, so no
+# shell copy of the policy parse or of the derivation exists here. The module is found as `--rescope
+# --flow` finds adapt.py, the policy kit by the probe `read_spec_audit_switch` makes. Where python, the
+# module or the policy kit does not resolve, an install the kits' descriptors admit, the four kit defaults
+# above answer and a NOTE says so: an `echo` and a `return 0`, never a refusal. A refusal, or a line that
+# is not the seven fields, returns 1 with the module's first line in `_rb_why`, which `verb_review` relays.
+# Called by `verb_review` and `run_fix_pass` alone, so a verb that reads no review bound starts no python
+# (§8 F10). The last three fields, each subject's target word and `flow.route-backs`, are TOOL-dDeclaredLoop-32's;
+# the four after them, the `review.dispose` keys, are TOOL-dDeclaredLoop-20's, each checked against its closed set.
+load_review_bounds() { # -> sets MAX_ROUNDS SPEC_BOUND CLOSING_BOUND FOLLOW_UP SPEC_TARGET CLOSING_TARGET ROUTE_BACKS FINDINGS UNVERIFIED LEFT_SHIFT BLOCKS; 1 and the module's first line in _rb_why
+  local _rb_out _rb_d _rb_m _rb_s _rb_c _rb_f _rb_st _rb_ct _rb_rb _rb_fi _rb_un _rb_ls _rb_bl _rb_x
+  _rb_why=""
+  if ! resolve_position_engine review_bounds.py \
+     || ! _rb_d=$(resolve_kit_dir "$PE_PY" policy policy.py "$KIT_DIR" 2>/dev/null) || [ -z "$_rb_d" ]; then
+    MAX_ROUNDS=$REVIEW_MAX_ROUNDS_DEFAULT; SPEC_BOUND=$REVIEW_SPEC_BOUND_DEFAULT
+    CLOSING_BOUND=$REVIEW_CLOSING_BOUND_DEFAULT; FOLLOW_UP=$REVIEW_FOLLOW_UP_DEFAULT
+    SPEC_TARGET=$REVIEW_SPEC_TARGET_DEFAULT; CLOSING_TARGET=$REVIEW_CLOSING_TARGET_DEFAULT; ROUTE_BACKS=$REVIEW_ROUTE_BACKS_DEFAULT
+    FINDINGS=$REVIEW_FINDINGS_DEFAULT; UNVERIFIED=$REVIEW_UNVERIFIED_DEFAULT
+    LEFT_SHIFT=$REVIEW_LEFT_SHIFT_DEFAULT; BLOCKS=$REVIEW_BLOCKS_DEFAULT
+    echo "unattended: NOTE - the loop kit's review_bounds.py or the policy kit it reads does not resolve beside this kit, so the review bounds take the kit defaults: max-rounds=$MAX_ROUNDS spec-bound=$SPEC_BOUND closing-bound=$CLOSING_BOUND follow-up=$FOLLOW_UP spec-target=$SPEC_TARGET closing-target=$CLOSING_TARGET route-backs=$ROUTE_BACKS findings=$FINDINGS unverified=$UNVERIFIED left-shift=$LEFT_SHIFT blocks=$BLOCKS" >&2
+    return 0
+  fi
+  _rb_out=$("$PE_PY" "$PE_PATH" show 2>&1) || { _rb_why=$(printf '%s\n' "$_rb_out" | sed -n 1p); return 1; }
+  _rb_out=${_rb_out//$'\r'/}
+  read -r _rb_m _rb_s _rb_c _rb_f _rb_st _rb_ct _rb_rb _rb_fi _rb_un _rb_ls _rb_bl _rb_x <<<"$_rb_out"
+  MAX_ROUNDS=${_rb_m#max-rounds=}; SPEC_BOUND=${_rb_s#spec-bound=}
+  CLOSING_BOUND=${_rb_c#closing-bound=}; FOLLOW_UP=${_rb_f#follow-up=}
+  SPEC_TARGET=${_rb_st#spec-target=}; CLOSING_TARGET=${_rb_ct#closing-target=}; ROUTE_BACKS=${_rb_rb#route-backs=}
+  FINDINGS=${_rb_fi#findings=}; UNVERIFIED=${_rb_un#unverified=}; LEFT_SHIFT=${_rb_ls#left-shift=}; BLOCKS=${_rb_bl#blocks=}
+  case "$MAX_ROUNDS $SPEC_BOUND $CLOSING_BOUND $ROUTE_BACKS" in *[!0-9\ ]*|' '*|*'  '*|*' ') _rb_x=bad ;; esac
+  case "$SPEC_TARGET:$CLOSING_TARGET" in blockers:*|highs:*|all:*) ;; *) _rb_x=bad ;; esac
+  case "$CLOSING_TARGET" in blockers|highs|all) ;; *) _rb_x=bad ;; esac
+  case "$FINDINGS:$UNVERIFIED" in blocker-high-own:*|all-own:*|blocker-own:*) ;; *) _rb_x=bad ;; esac
+  case "$UNVERIFIED:$LEFT_SHIFT" in ask:*|block:*|record:*) ;; *) _rb_x=bad ;; esac
+  case "$LEFT_SHIFT:$BLOCKS" in second-occurrence:*|every-class:*|owner-selects:*) ;; *) _rb_x=bad ;; esac
+  case "$BLOCKS" in every-review|owed-only|none) ;; *) _rb_x=bad ;; esac
+  if [ -n "$_rb_x" ] || [ "$_rb_out" != "${_rb_out%%$'\n'*}" ] || [ "$_rb_m" = "$MAX_ROUNDS" ] \
+     || [ "$_rb_s" = "$SPEC_BOUND" ] || [ "$_rb_c" = "$CLOSING_BOUND" ] || [ "$_rb_f" = "$FOLLOW_UP" ] || [ -z "$FOLLOW_UP" ] \
+     || [ "$_rb_st" = "$SPEC_TARGET" ] || [ "$_rb_ct" = "$CLOSING_TARGET" ] || [ "$_rb_rb" = "$ROUTE_BACKS" ] \
+     || [ "$_rb_fi" = "$FINDINGS" ] || [ "$_rb_un" = "$UNVERIFIED" ] || [ "$_rb_ls" = "$LEFT_SHIFT" ] || [ "$_rb_bl" = "$BLOCKS" ]; then
+    _rb_why="review_bounds.py show printed no line of the eleven fields: $(printf '%s\n' "$_rb_out" | sed -n 1p)"
+    return 1
+  fi
+  return 0
+}
+# NO SILENT DEFAULT (TOOL-dDeclaredLoop-5 S5): an entry that declares no `:<class>` has no checker, so
+# this returns 1 and prints nothing, and check 53 of the leg refuses that entry before a run reads it.
+checker_of()  { local p; for p in $(dod); do case "$p" in "$1:"*) printf '%s' "${p#*:}"; return 0;; esac; done; return 1; }
 
 # ------------------------------------------------------------------------------ the region grammar
 # Kit-owned, NOT a project declaration: an adopter chooses paths and commands, not the file's shape.
@@ -2197,6 +2271,10 @@ AUTH_MAY_SET=0
 AUTH_SPEC_AUDIT=""
 AUTH_SPEC_AUDIT_DERIVED=""
 AUTH_SPEC_AUDIT_FROM=""
+# TOOL-dDeclaredLoop-19 S8 - a third source, `policy`: the `review.design` value read at `_cb`, and the
+# answer `breakpoints.py stage` gave for it, `opt-in` wherever nothing was read.
+AUTH_DESIGN_REVIEW=""
+_dr_answer=opt-in
 # TOOL-aQuotedBrief-4 S2 - the DEFAULT-BRANCH SIDE of the pinned BASE, check_authorization's `_cb`,
 # kept so `read_brief_cutoff`'s two callers read the conf at the commit that read SPEC_AUDIT_DEFAULT
 # and never re-derive it. Cleared on that function's entry, so a refusal before the derivation
@@ -2428,12 +2506,44 @@ read_claims() { # strict|soft|quiet -> 0 with CLAIM_ROWS, or 1 with CL_WHY
 # line `claims: off` and reads nothing (TOOL-aGraftedHelix-32): no verb writes or reads a claim then,
 # so a leftover claim is inert and the read bought a SessionStart fetch for nothing; it shows again
 # once the switch is on. WHAT IT DOES NOT CHECK: who drives anything; it reports and decides nothing.
-print_claims() { # -> the rows on stdout; rc 2 when the remote does not answer
+# TOOL-dDeclaredLoop-8 S7: a SIXTH field, the claim's key, beside the verdict and never in its place,
+# printed only under `--claims --with-key` (TOOL-dDeclaredLoop-56 S10), the one form that spends the key
+# spawn: the plain form keeps the five fields every released card reads, and a released driver ignores
+# the flag, so a card that asks for the key over an older driver reads five and prints `-`.
+print_claims() { # [--with-key] -> the rows on stdout; rc 2 when the remote does not answer
+  local keys
   [ "$RUN_CLAIMS" = on ] || { echo "claims: off"; return 0; }
   read_claims strict || return 2
   if [ -z "$CLAIM_ROWS" ]; then echo "claims: none"; return 0; fi
-  printf '%s\n' "$CLAIM_ROWS" | cut -f1-5
+  [ "${1:-}" = --with-key ] || { printf '%s\n' "$CLAIM_ROWS" | cut -f1-5; return 0; }
+  keys=$(derive_claim_keys) || keys=""
+  keys=${keys//$'\r'/}
+  [ "$(printf '%s\n' "$keys" | grep -c .)" = "$(printf '%s\n' "$CLAIM_ROWS" | grep -c '')" ] || keys=""
+  printf '%s\n' "$CLAIM_ROWS" | CK_KEYS="$keys" awk -F'\t' -v OFS='\t' '
+    BEGIN { split(ENVIRON["CK_KEYS"], k, "\n") }
+    { print $1, $2, $3, $4, $5, (k[NR] ~ /^k1:/ ? k[NR] : "-") }'
   return 0
+}
+
+# THE CLAIM KEY of each row of CLAIM_ROWS, in row order: the loop kit's `claims.py key --stdin` over the
+# claim's `refs/gov/runs/<slug>@<sha>` and `runstate=`, the blob id of the slug's run record at the
+# claim remote's tracking ref of the default branch, `runstate=?` where that ref or file is absent (the
+# spec's F4). ONE `cat-file --batch-check` for every blob and ONE key spawn for every row, so no claim
+# spawns a process of its own. Returns 1 printing nothing where python or the loop kit does not
+# resolve, and `print_claims` then prints `-`. WHAT THIS DOES NOT CHECK: that the tracking ref is fresh.
+derive_claim_keys() { # CLAIM_ROWS, CR_NAME -> one key per row on stdout
+  local py d br blobs=""
+  py=$(resolve_python 2>/dev/null) && [ -n "$py" ] || return 1
+  d=$(resolve_kit_dir "$py" loop claims.py "$KIT_DIR" 2>/dev/null) && [ -n "$d" ] || return 1
+  br=$(default_branch 2>/dev/null) || br=""
+  if [ -n "$br" ]; then
+    blobs=$(printf '%s\n' "$CLAIM_ROWS" | CK_PRE="refs/remotes/$CR_NAME/$br:$MEMORY_ROOT/builds/" \
+      awk -F'\t' '{ print ENVIRON["CK_PRE"] $1 "/RUN.md" }' | GIT cat-file --batch-check 2>/dev/null) || blobs=""
+  fi
+  printf '%s\n' "$CLAIM_ROWS" | CK_BLOBS="$blobs" CK_NS="$CLAIM_NS" awk -F'\t' '
+    BEGIN { split(ENVIRON["CK_BLOBS"], b, "\n") }
+    { split(b[NR], f, " "); print ENVIRON["CK_NS"] "/" $1 "@" $6 "\trunstate=" (f[2] == "blob" ? f[1] : "?") }' \
+    | "$py" "$d/claims.py" key --stdin
 }
 
 # THE TABLE'S TWO AXES, declared once (TOOL-aGraftedHelix-19): the claim-read classes the function
@@ -4275,6 +4385,15 @@ check_authorization() { # slug · base
          return 1 ;;
     esac
   fi
+  # TOOL-dDeclaredLoop-19 S8 - THE POLICY READS FIRST, at the same `_cb`, so a run can no more write
+  # `review.design: owed` than a README opt-in: `owed` pins the BASE commit's date, `not-owed` leaves the
+  # audit unowed whatever the README key or the project default said, both from the source `policy`, and
+  # `opt-in`, the default, keeps the derivation above. The key's own refusals above ran under every reading.
+  read_design_review "$slug" "$_cb" || return 1
+  case "$_dr_answer" in
+    owed)     AUTH_SPEC_AUDIT=$(GIT show -s --format=%cs "$base" 2>/dev/null); AUTH_SPEC_AUDIT_FROM=policy ;;
+    not-owed) AUTH_SPEC_AUDIT=""; AUTH_SPEC_AUDIT_FROM=policy ;;
+  esac
   # Set AFTER BOTH halves (round 2, R2): a refusing return above - fail 52, 54 or 55 - leaves it
   # blank, so the specs-audited grader lands on its NOT GRADABLE branch instead of printing the
   # absence the refusal just declined to assert.
@@ -4526,6 +4645,23 @@ check_authorization() { # slug · base
   fi
   return 0
 }
+# TOOL-dDeclaredLoop-19 S8 - `review.design` at the default-branch side of BASE, through the loop kit's
+# `breakpoints.py stage`. A module that does not resolve, its `unarmed` line, or an empty `_cb` reads
+# `opt-in`, today's derivation; a refusal is this one site, and leaves the derivation unfinished.
+read_design_review() { # slug · rev -> sets AUTH_DESIGN_REVIEW and _dr_answer; 1 after its one fail 55
+  AUTH_DESIGN_REVIEW=""; _dr_answer=opt-in
+  [ -n "$2" ] || return 0
+  run_loop_verb breakpoints.py stage --stage=design "--build=$1" "--rev=$2" || return 0
+  case "$_bd_rc:$_bd_why" in
+    "0:breakpoints: stage design · "*" · "*)
+      _dr_answer=${_bd_why##* · }
+      AUTH_DESIGN_REVIEW=${_bd_why#breakpoints: stage design · }; AUTH_DESIGN_REVIEW=${AUTH_DESIGN_REVIEW%% · *} ;;
+    "2:breakpoints: unarmed · "*) ;;
+    *) fail 55 "the policy file's review.design does not read at the default-branch side of the pinned BASE, so whether this build owes the pre-code spec audit is unknown and is not read as opt-in: $_bd_why"
+       return 1 ;;
+  esac
+  return 0
+}
 
 # S2 - the run-state file is CREATED by --preflight rather than asserted. It holds no owner bytes now,
 # so there is nothing for the owner to author and nothing for a truncation to destroy.
@@ -4695,9 +4831,13 @@ refuse_if_terminal() { # run-state file · verb · [--recorded]
 # that span. The shape makes a declared fork gradeable; it cannot find an undeclared one. Blank, an
 # absent key, or an earlier date keeps the section-wide reading below, byte for byte.
 # The cutoff is passed IN rather than read here, so the function stays pure and sliceable.
-plan_state() { # spec file · FORK_ITEM_CUTOFF, blank = off -> prints the M2 state
+# TOOL-dDeclaredLoop-19 S10 - THE `delegated` MODE, a third argument of this same program, so the owner item's
+# fork read is this grammar and never a second section-8 parser: `check_mark`'s shape narrowed to `agent` and
+# `delegated`, over each F-item span at or after the cutoff and over the whole section before it, code and
+# quoted spans removed as `check_span_mark` removes them. It prints DELEGATED or NONE, THIN or not.
+plan_state() { # spec file · FORK_ITEM_CUTOFF, blank = off · [delegated] -> prints the M2 state, or DELEGATED or NONE
   local _psb="${1##*/}"
-  awk -v icut="${2:-}" -v fbase="$_psb" '
+  awk -v icut="${2:-}" -v fbase="$_psb" -v mode="${3:-}" '
     BEGIN { fdate = ""
             if (match(fbase, /[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/)) fdate = substr(fbase, RSTART, RLENGTH) }
     # THE SECTION-8 GRAMMAR, ONCE for this program: the documented mark, the F-item opener, and a
@@ -4706,6 +4846,7 @@ plan_state() { # spec file · FORK_ITEM_CUTOFF, blank = off -> prints the M2 sta
     function check_mark(s) { return (s ~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/) }
     function check_fitem_open(s) { return (s ~ /^- \*\*(FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+(\*\*| )/ || s ~ /^### (FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+([^A-Za-z0-9]|$)/) }
     function check_span_mark(s) { gsub(/`[^`]*`/, "", s); gsub(/"[^"]*"/, "", s); gsub(/[[:space:]]+/, " ", s); return check_mark(s) }
+    function check_delegated_mark(s) { gsub(/`[^`]*`/, "", s); gsub(/"[^"]*"/, "", s); gsub(/[[:space:]]+/, " ", s); return (s ~ /RESOLVED \(agent, [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9], delegated\)/) }
     # TOOL-dBriefedPass-1 - KEYED ON THE HEADING TITLE, NOT ON THE ORDINAL. A TIER-1 SPEC LEGITIMATELY
     # DROPS `## 5. Production-readiness checklist`, so every section from five onward renumbers: the
     # ordinal form read a Tier-1 spec`s GATES as its acceptance criteria, its OPEN QUESTIONS as its
@@ -4742,6 +4883,17 @@ plan_state() { # spec file · FORK_ITEM_CUTOFF, blank = off -> prints the M2 sta
     { seen[cur] = seen[cur] 1
       if (cur == "forks") { fl[++nf] = line; fr[nf] = raw; if (forkline == "") forkline = line } }
     END {
+      if (mode == "delegated") {
+        nfi = 0; dblob = ""; found = 0
+        for (i = 1; i <= nf; i++) {
+          dblob = dblob " " fl[i]
+          if (check_fitem_open(fr[i])) dspan[++nfi] = fl[i]
+          else if (nfi > 0) dspan[nfi] = dspan[nfi] " " fl[i]
+        }
+        if (icut != "" && fdate != "" && fdate >= icut) { for (k = 1; k <= nfi; k++) if (check_delegated_mark(dspan[k])) found = 1 }
+        else found = check_delegated_mark(dblob)
+        print (found ? "DELEGATED" : "NONE"); exit
+      }
       thin = (seen["scope"] == "" || seen["acc"] == "" || seen["gates"] == "")
       # M2 orders the checks and the FIRST match wins, so THIN is decided before FORKED.
       if (thin) { print "THIN"; exit }
@@ -4818,6 +4970,16 @@ load_fork_cutoff() { # -> sets FORK_CUTOFF; rc 1 after a numbered refusal
     return 1
   fi
   FORK_CUTOFF="$_fc"
+}
+# TOOL-dDeclaredLoop-19 S5 - A FORK THE AGENT RESOLVED UNDER DELEGATION, read by `plan_state`'s `delegated`
+# mode over each tracked spec of the build, one awk pass per spec. No fork record carries a class, so every
+# such fork reads as major: the owner item it places asks the owner once too often, never once too few.
+check_delegated_fork() { # slug -> 0 where a tracked spec of the build carries one; FORK_CUTOFF loaded by the caller
+  local _df
+  for _df in $(git ls-files "$M/builds/$1/spec/*.md" 2>/dev/null | drop_working_specs); do
+    [ "$(plan_state "$_df" "$FORK_CUTOFF" delegated)" = DELEGATED ] && return 0
+  done
+  return 1
 }
 
 # TOOL-cBriefedPilot-6 - the roster join. M2 makes the README's authored Units table the roster and
@@ -5154,19 +5316,31 @@ asks_ids_of() { # asks: value -> the mandated ids, one per line; rc 1 and nothin
 # separator and its anchored value. `order_verb_of` reads the third verb the same way and for the
 # same recorded reason: a bespoke reader disagreed with the generator on a doubled separator space
 # and read EMPTY, which skips the join silently while reporting nothing.
-spec_ask_verbs() { # spec file · closes|advances -> the ids that verb names, one per line
-  local hdr
-  hdr=$(grep -m1 '^\*\*Status:\*\*' "$1" 2>/dev/null) || return 0
-  printf '%s' "$hdr" | SAV_V="$2" awk '
-    BEGIN { v = ENVIRON["SAV_V"] }
+# BOTH VERBS OF MANY SPECS IN ONE PASS (TOOL-dDeclaredLoop-112): `build_ask_plan` asked this per
+# (ask, spec) pair, a spawn chain each, and `--status` paid for it through the position engine's
+# `--plan`. One awk reads the first `**Status:**` line of every spec, the way `spec_facts` reads its
+# facts, and one keyed expander expands the ids. AN UNREADABLE PATH IS FILTERED OUT FIRST, because awk
+# is fatal on a file it cannot open and would lose every row after it (`spec_facts`, round 4).
+read_spec_asks() { # spec paths... -> one "<path>\t<closes|advances>\t<ask id>" row per id, ranges expanded
+  local _ok=() _p
+  for _p in "$@"; do [ ! -r "$_p" ] || _ok+=("$_p"); done
+  [ "${#_ok[@]}" -gt 0 ] || return 0
+  awk '
+    FNR == 1 { seen = 0 }
+    seen || !/^\*\*Status:\*\*/ { next }
     {
+      seen = 1
       n = split($0, f, "·")
       for (i = 1; i <= n; i++) {
         t = f[i]
         gsub(/^[ \t]+|[ \t]+$/, "", t)
-        if (substr(t, 1, length(v) + 1) == v " ") print substr(t, length(v) + 2)
+        if (substr(t, 1, 7) == "closes ") print FILENAME "\tcloses\t" substr(t, 8)
+        else if (substr(t, 1, 9) == "advances ") print FILENAME "\tadvances\t" substr(t, 10)
       }
-    }' | expand_id_runs
+    }' "${_ok[@]}" | expand_id_runs --keyed
+}
+spec_ask_verbs() { # spec file · closes|advances -> the ids that verb names, one per line
+  read_spec_asks "$1" | SAV_V="$2" awk -F'\t' '$2 == ENVIRON["SAV_V"] { print $3 }'
 }
 # A disposition row's VERB for one ask, out of a build's own `BACKLOG.md`. The row shape is
 # `- <VERB> · <id> · <slot> <value> · <why>`, so the verb is the first field and the id the second;
@@ -5314,21 +5488,28 @@ ask_sort_key() { # ask id -> "<sev>-<pos>-<seq>", every field fixed width
 # generator's V6 to report rather than a second verdict invented here.
 ask_rank_order() { # ids… -> those ids in rank order, space separated
   local _left="$*" _out="" _id _h _blocked _best _bestkey _key
+  # EACH ID'S HOLDS AND KEY READ ONCE, not once per round (TOOL-dDeclaredLoop-112): both are pure in
+  # the id while this runs, since nothing here moves AW_ROWS or ASK_POSITIONS.
+  local -A _keys=() _holds=()
+  for _id in $_left; do
+    _keys[$_id]=$(ask_sort_key "$_id")
+    _holds[$_id]=$(ask_field "$_id" holds)
+  done
   while [ -n "${_left// /}" ]; do
     _best=""; _bestkey=""
     for _id in $_left; do
       _blocked=0
-      for _h in $(ask_field "$_id" holds | tr ',' ' '); do
+      for _h in ${_holds[$_id]//,/ }; do
         [ -n "$_h" ] && [ "$_h" != "-" ] || continue
         case " $_left " in *" $_h "*) _blocked=1 ;; esac
       done
       [ "$_blocked" = 0 ] || continue
-      _key=$(ask_sort_key "$_id")
+      _key=${_keys[$_id]}
       if [ -z "$_bestkey" ] || [ "$_key" \< "$_bestkey" ]; then _best="$_id"; _bestkey="$_key"; fi
     done
     if [ -z "$_best" ]; then
       for _id in $_left; do
-        _key=$(ask_sort_key "$_id")
+        _key=${_keys[$_id]}
         if [ -z "$_bestkey" ] || [ "$_key" \< "$_bestkey" ]; then _best="$_id"; _bestkey="$_key"; fi
       done
     fi
@@ -6014,14 +6195,21 @@ build_ask_plan() { # slug · spec paths… -> sets ASK_PLAN_ROWS, ASK_PLAN_NEXT,
     ASK_PLAN_WHY="$AW_WHY"
   fi
   _pop=$(ask_rank_order $_pop)
+  # EACH SPEC'S ASK VERBS READ ONCE, not once per ask (TOOL-dDeclaredLoop-112): every ask id maps to
+  # the specs naming it by `closes` or `advances`, in argument order, each path once, so the first
+  # path is the first spec the per-pair scan this replaced matched.
+  local -A _covers=()
+  local _cp _cid
+  while IFS=$'\t' read -r _cp _ _cid; do
+    case " ${_covers[$_cid]:-} " in *" $_cp "*) continue ;; esac
+    _covers[$_cid]="${_covers[$_cid]:-}${_covers[$_cid]:+ }$_cp"
+  done < <(read_spec_asks "$@")
   for _id in $_pop; do
     _n=$((_n + 1))
     _live=""; _cover=""
     # THIS BUILD'S OWN SPECS FIRST, read off their status headers, because a spec that has ALREADY
     # closed an ask still covers it and the projection's closers field lists LIVE specs only.
-    for _sp in "$@"; do
-      spec_ask_verbs "$_sp" closes | grep -qxF -- "$_id" || {
-        spec_ask_verbs "$_sp" advances | grep -qxF -- "$_id" || continue; }
+    for _sp in ${_covers[$_id]:-}; do
       _spid="${SPEC_ID[$_sp]:-}"
       [ -n "$_spid" ] || continue
       [ -n "$_cover" ] || _cover="$_spid"
@@ -6096,96 +6284,191 @@ read_spec_rev() { # spec path -> the N of its header's rev-N, empty when it has 
   awk '/^\*\*Status:\*\* [A-Z]+ / { if (match($0, / rev-[0-9]+/)) print substr($0, RSTART + 5, RLENGTH - 5); exit }' "$1"
 }
 
-# ------------------------------------------------------------------- THE `next:` LADDER, DECLARED
-# WHAT THIS REPLACES. The line `--plan` closes with was built by three guarded assignments spread
-# across two loops of `verb_plan` - `[ -n "$next" ] || next=...` - so the PRECEDENCE between the
-# shapes was whichever loop bash reached first. It was real, it was correct, and it was stated
-# nowhere, which means a fourth shape could only be added by typing a fourth guarded assignment and
-# arguing in prose about where it went. That is how one spec of this build came to hold a design
-# sentence and a fixture that could not both be true (TOOL-dDerivedDocket-49 section 8 F1).
-#
-# ONE LINE PER RUNG, IN RUNG ORDER, AND THE ORDER OF THESE LINES IS THE RULE. The selector below
-# walks them top to bottom and returns the first rung whose input is non-empty, so moving a line
-# moves the precedence - and the sibling suite reads that order back out of THIS block. A position
-# in a declared table is gradeable by an arm; a sentence in a design section is not.
-#
-# `rung ` AT COLUMN 0 IS THE HANDLE. Nothing else in this file begins with it, so the arm counts the
-# rungs and reads their order without parsing shell and without a second copy of the table.
-#
-# THE UNDECIDED-ASK RUNG SITS THIRD, after both unit rungs and before both terminal rungs. Its input
-# is the empty string on every call until TOOL-dDerivedDocket-16 builds the predicate that fills it,
-# so the ladder prints today exactly what the three assignments printed. The position is pinned here
-# rather than in that unit because it is the half that can be graded before the predicate exists,
-# and the rule it encodes is that a run with a planned unit nobody has specced is told to spec it,
-# never to go dispose an ask.
-#
-# WHY RUNG 4 SITS BELOW RUNG 2 - today's behaviour, not a change. The MISSING loop assigned the line
-# whether or not anything graded, so a roster id with no spec already outranked the nothing-graded
-# wording, and leg check 30 reads the conjunction of a NOT A UNIT row with the LAST rung's wording.
-#
-# THE THREE SHAPE LITERALS BELOW ARE BYTE FOR BYTE THE ONES THAT STOOD IN `verb_plan`, and the two
-# terminal ones stay distinct strings. That check and the sibling suite both match on the wording,
-# so reflowing one here silently unwires both while this table reports itself correct.
-#
-# RUNGS 1 AND 3 CARRY A BARE `<id>` ON PURPOSE. The words inside those two shapes belong to whoever
-# supplies them - the state word is the caller's, and the undecided shape is unit 16's - so what the
-# table owns for those two is their POSITION, which is the whole subject of the unit that wrote it.
-#
-# `<id>` IS SUBSTITUTED, NEVER `printf`-ed. The id arrives from a build README, a `%` in one would
-# make the shape a format string, and a `printf` handed a spare argument reuses its format rather
-# than ignoring it.
-# BOTH QUOTES SIT ALONE, so every rung line is the rung and nothing else. The opening one buys the
-# fifth rung a column-0 start; the closing one keeps the last rung's wording a WHOLE line, which
-# is what an arm asserting that literal verbatim can anchor on. `read` skips both blanks the same
-# way it skips any line whose first word is not `rung`.
-NEXT_RUNGS='
-rung live-unit <id>
-rung missing-unit <id> (MISSING - spec it first)
-rung undecided-ask <id>
-rung nothing-graded none - no tracked spec grades as a unit (see the NOT A UNIT rows above)
-rung everything-terminal none - every tracked spec is terminal
-'
+# ------------------------------------------------------------------- THE `next:` LINE, FROM THE ENGINE
+# TOOL-dDeclaredLoop-7 retired the ladder that stood here: five rungs over the README roster's TYPED
+# state. The line is the loop kit's position engine's now, `position.py <slug> --next-line`, which
+# derives each unit's step from witnesses and renders the same five shapes byte for byte; the words
+# are its `NEXT_SHAPES`. This verb keeps the one M2 classifier, `plan_state`, and HANDS its answer
+# over in `GOV_POSITION_STATES`, TAB-separated lines the engine reads: `unit <id> <state>` per row in
+# build order, MISSING rows included, `ask <id>`, `parent <slug> <derived phase>`, `bound
+# <RESUME_STALE_BOUND>` and `owed <PARK_KINDS_OWED> <PARK_ACTS_OWED>`. The engine run standalone calls
+# this verb with the variable SET AND EMPTY, and is answered with those lines in place of `next:`, so
+# the call is never circular. Where python or the engine does not resolve, the line says so in the
+# fall-through shape, which no reader matches as an all-clear.
 
-# FOUR INPUTS AND NO STATE. Every one is derived by the caller from data it already holds, so this
-# runs once per `--plan` and performs no read of its own.
-#
-# THE TWO TERMINAL RUNGS TAKE A SENTINEL, never an id: "nothing graded" and "everything terminal"
-# are conditions rather than subjects, so their input is the word `yes` or nothing at all, and their
-# shapes carry no `<id>` for one to reach.
-#
-# FED BY A HERE-STRING OVER A VARIABLE, never by a command substitution: the loop stays in this
-# shell, and the kit's own shell-hygiene leg has nothing to declare.
-derive_next_shape() { # live-unit shape . first MISSING id . undecided-ask shape . graded flag
-  local _tag _rung _tmpl _in
-  while read -r _tag _rung _tmpl; do
-    [ "$_tag" = rung ] || continue
-    case "$_rung" in
-      live-unit)           _in="$1" ;;
-      missing-unit)        _in="$2" ;;
-      undecided-ask)       _in="$3" ;;
-      nothing-graded)      [ "$4" = 0 ] && _in=yes || _in="" ;;
-      everything-terminal) _in=yes ;;
-      *)                   _in="" ;;
-    esac
-    [ -n "$_in" ] || continue
-    printf '%s\n' "${_tmpl//<id>/$_in}"
-    return 0
-  done <<< "$NEXT_RUNGS"
-  # UNREACHABLE while the last rung's input is the constant above, and it still says something. An
-  # empty tail on a `next:` line is a verb that answered nothing while looking like it answered, and
-  # this is the one state in which the ladder itself is the thing that is broken.
-  printf 'none - the rung table named no shape, which cannot happen while its last rung is unconditional\n'
+# THE ENGINE, ABSOLUTE: `resolve_kit_dir` answers relative to the tree holding this kit, which is the
+# working tree in every install, and the engine's own driver plants run this kit over a scratch
+# repository, where a relative answer would name a file that is not there. A script name, where given,
+# finds that loop kit script the same way: `--rescope --flow` runs `adapt.py` (TOOL-dDeclaredLoop-28).
+resolve_position_engine() { # [script] -> sets PE_PY and PE_PATH; 1 where python or the loop kit's script does not resolve
+  local _d _r=$KIT_DIR _s=${1:-position.py}
+  PE_PATH=""
+  PE_PY=$(resolve_python 2>/dev/null) && [ -n "$PE_PY" ] || return 1
+  _d=$(resolve_kit_dir "$PE_PY" loop "$_s" "$KIT_DIR" 2>/dev/null) && [ -n "$_d" ] || return 1
+  while [ -n "$_r" ] && [ ! -e "$_r/.git" ]; do _r=${_r%/*}; done
+  PE_PATH="${_r:-.}/$_d/$_s"
+  [ -f "$PE_PATH" ]
+}
+# THE REWORK BUDGET'S DRAW (TOOL-dDeclaredLoop-30): the loop kit's `budget.py draw`, found as the engine is,
+# each value JOINED to its flag so one opening `-` is never read as a flag. It prints the script's output and
+# calls no `fail`: each verb relays a refusal in its own literal branch, which check-arms reads by its code.
+# `run_budget_verb` runs any one verb of the module, `draw` or `target` (TOOL-dDeclaredLoop-32), and
+# `run_budget_draw` keeps its name as the `draw` caller.
+# ONE RUNNER FOR EVERY LOOP KIT VERB (TOOL-dDeclaredLoop-19 S10): `run_loop_verb` runs one verb of any loop
+# kit script, keeping its whole output in `_bd_out` and printing nothing, and answers 1 where the script
+# does not resolve, so a caller that reads nothing then can tell that apart from a refusal. `run_budget_verb`
+# is it over `budget.py`, its output printed, its texts and globals byte for byte what they were.
+run_loop_verb() { # script · verb · flag=value... -> sets _bd_out, _bd_why to its first line and _bd_rc to its exit; 1 where it does not resolve
+  _bd_out=""
+  _bd_why="the loop kit's $1 or python does not resolve beside this kit, so the $2 cannot be made"
+  _bd_rc=2
+  resolve_position_engine "$1" || return 1
+  _bd_out=$("$PE_PY" "$PE_PATH" "${@:2}" 2>&1); _bd_rc=$?
+  _bd_why=${_bd_out%%$'\n'*}; _bd_why=${_bd_why%$'\r'}
+  [ -n "$_bd_why" ] || _bd_why="$1 $2 printed nothing and exited $_bd_rc"
   return 0
 }
-
+run_budget_verb() { # verb · flag=value... -> sets _bd_why to the script's first line and _bd_rc to its exit, 2 where it does not resolve
+  run_loop_verb budget.py "$@" || return 0
+  [ -n "$_bd_out" ] && printf '%s\n' "$_bd_out"
+  return 0
+}
+# THE CONCURRENT PATCH DRAW (TOOL-dDeclaredLoop-67 S35). A patch build draws on its origin's budget, so two
+# live patch runs of one origin would each count their own draws against one total. Before a patch build
+# draws, the claims are read quietly and each live claim but this slug's is asked its origin through
+# `budget.py origin`; an equal origin draws nothing and answers `_bd_rc=2`, which both callers already relay
+# through their own refusal, so no new refusal site is added here. A slug whose origin does not read is
+# skipped. A claim read that fails refuses the draw the same way, naming CL_WHY, since a peer it could not
+# see may be drawing on the same origin (TOOL-dDeclaredLoop-75 S28).
+check_patch_peers() { # slug -> 0 to draw; 1 with _bd_rc=2 and _bd_why naming the live peer or the unread claims
+  local slug="$1" mine row peer node rest verdict
+  local -a _cp_rows
+  run_loop_verb budget.py origin "--build=$slug" || return 0
+  [ "$_bd_rc" = 0 ] || return 0
+  mine=${_bd_why##* · }
+  [ -n "$mine" ] && [ "$mine" != none ] || return 0
+  if ! read_claims quiet; then
+    _bd_rc=2
+    _bd_why="budget: patch draw refused — claims unread: $CL_WHY"
+    return 1
+  fi
+  mapfile -t _cp_rows <<< "$CLAIM_ROWS"
+  for row in "${_cp_rows[@]}"; do
+    # slug, node, status, beat-age-s, verdict: the claim row's first five fields
+    peer=${row%%$'\t'*}; rest=${row#*$'\t'}; node=${rest%%$'\t'*}
+    rest=${rest#*$'\t'}; rest=${rest#*$'\t'}; rest=${rest#*$'\t'}; verdict=${rest%%$'\t'*}
+    [ "$verdict" = live ] && [ -n "$peer" ] && [ "$peer" != "$slug" ] || continue
+    run_loop_verb budget.py origin "--build=$peer" || continue
+    [ "$_bd_rc" = 0 ] && [ "${_bd_why##* · }" = "$mine" ] || continue
+    _bd_rc=2
+    _bd_why="budget: patch draw refused — $peer on $node is a live patch run of $mine"
+    return 1
+  done
+  return 0
+}
+run_budget_draw() { # slug · cause · item -> as run_budget_verb; on `exhausted`, _bd_why names the remedy
+  check_patch_peers "$1" || return 0
+  run_budget_verb draw "--build=$1" "--cause=$2" "--item=$3"
+  # THE LAP REFUSAL NAMES ITS REMEDY (TOOL-dDeclaredLoop-31 S5), after the module's line, which keeps naming
+  # flow.on-exhausted: end the build while no exhaustion row stands, else the ending that row recorded.
+  [ "$_bd_rc" = 3 ] || return 0
+  runmd_of "$1" >/dev/null
+  read_exhausted_row "$_runmd"
+  if [ -z "$_ex_row" ]; then
+    _bd_why="$_bd_why · end the build with --exhausted $1"
+  else
+    _bd_why="$_bd_why · the build's ending is $_ex_row, and only the owner raises flow.rework-budget"
+  fi
+  return 0
+}
+# THE ENDING OF A SPENT BUDGET (TOOL-dDeclaredLoop-31). `flow.on-exhausted` names it and `budget.py ending`
+# derives it; `--exhausted` parks it as ONE `decision · item flow.on-exhausted` row, owed at the wrap-up and
+# the question `--handoff --code owner-decision` hands the owner, and names the act that row owes. The acts
+# are the existing verbs: `--abort --code budget-exhausted`, guarded by `check_exhausted_close`; the
+# hand-off, whose resume `check_owner_disposition` holds until the owner's disposition record; `--close`.
+read_exhausted_row() { # run-state file -> sets _ex_row to the newest exhaustion row's ending, empty where none stands
+  _ex_row=$(grep -E '^[0-9][0-9-]*T[0-9:]*Z decision · item flow[.]on-exhausted · reason ending ' "$1" 2>/dev/null | tail -n 1)
+  _ex_row=${_ex_row#* · reason ending }; _ex_row=${_ex_row%% *}; _ex_row=${_ex_row%$'\r'}
+}
+read_exhausted_ending() { # slug -> sets _ex_end _ex_state _ex_open _ex_disp and _ex_why from the ending line; 1 where the module does not answer
+  local _el
+  _ex_end=""; _ex_state=""; _ex_open=""; _ex_disp=""
+  run_budget_verb ending "--build=$1"
+  _ex_why=$_bd_why
+  [ "$_bd_rc" = 0 ] || return 1
+  case "$_bd_why" in "loop: budget · ending · "*" · open "*" · disposed "*) ;; *) return 1 ;; esac
+  _el=${_bd_why#loop: budget · ending · }
+  _ex_end=${_el%% · *}; _el=${_el#* · }
+  _ex_state=${_el%% · *}; _el=${_el#* · open }
+  _ex_open=${_el%% · *}; _ex_disp=${_el##* · disposed }
+  [ "$_ex_open" != none ] || _ex_open=""
+  return 0
+}
+run_exhausted() { # slug
+  local slug="$1" rel _xe
+  check_slug "$slug" || return 1
+  runmd_of "$slug" >/dev/null; rel=$_runmd
+  check_run_state "$rel" "run to end on a spent rework budget" || return 1
+  refuse_if_terminal "$rel" --exhausted || return 1
+  # A STANDING ROW is printed and nothing is written: the first ending stands, a second exhaustion after the
+  # owner's raise included.
+  read_exhausted_row "$rel"; _xe=$_ex_row
+  if [ -n "$_xe" ]; then
+    echo "unattended: the build's ending is already recorded, unchanged — $_xe"
+  else
+    if ! read_exhausted_ending "$slug" || [ "${_ex_state%% *}" != spent ]; then
+      fail 37 "--exhausted ends a build only once its rework budget is spent, and budget.py ending reads otherwise or does not answer, so nothing is recorded: $_ex_why"
+      return 1
+    fi
+    _xe=$_ex_end
+    park "$rel" decision flow.on-exhausted "ending $_xe · spent ${_ex_state#* } · open ${_ex_open:-none}" || return 1
+    stage_or_fail "$rel" || return 1
+    echo "unattended: exhausted — ending $_xe · spent ${_ex_state#* } · open ${_ex_open:-none}"
+  fi
+  case "$_xe" in
+    close-incomplete) echo "unattended: next — file each open unit with --rescope $slug --act defer --item <id> --reason <text>, attest keepalive-reaped and parked-decisions-surfaced, then --abort $slug --code budget-exhausted --reason <text>" ;;
+    park-for-owner)   echo "unattended: next — reap the keepalive, then --handoff $slug --code owner-decision --reason <text> --reaped <id>; the owner's disposition record of item.flow.on-exhausted, continue or none, leaves the park" ;;
+    land-green)       echo "unattended: next — every counted unit is CLOSED: go on to --close $slug" ;;
+    descope)          echo "unattended: next — defer each open unit against an ask it files, recorded with --rescope $slug --act defer --item <id> --reason <text>, then --close $slug, which lands the CLOSED units" ;;
+  esac
+  echo "unattended: only the owner raises flow.rework-budget, and no ending raises it"
+  return 0
+}
+check_exhausted_close() { # slug · run-state file -> 0 admitted; 1 refused through its one fail 33
+  local _cx_why="" _cx_u
+  read_exhausted_row "$2"
+  if [ -z "$_ex_row" ]; then
+    _cx_why="the record holds no exhaustion row; run --exhausted $1 first"
+  elif ! read_exhausted_ending "$1"; then
+    _cx_why="budget.py ending does not answer: $_ex_why"
+  elif [ "$_ex_row" != close-incomplete ] && ! { [ "$_ex_row" = park-for-owner ] && [ "$_ex_disp" = none ]; }; then
+    _cx_why="the exhaustion row reads $_ex_row, and the owner's disposition reads $_ex_disp"
+  else
+    for _cx_u in $_ex_open; do
+      check_unit_deferred "$2" "$_cx_u" DEFERRED && continue
+      _cx_why="$_cx_u is open with no defer row in force; file it with --rescope $1 --act defer --item $_cx_u --reason <text>"
+      break
+    done
+  fi
+  [ -z "$_cx_why" ] && return 0
+  fail 33 "--abort --code budget-exhausted ends only a build whose exhaustion row reads close-incomplete, or park-for-owner with the owner's disposition none, every open unit deferred; the condition that failed: $_cx_why"
+  return 1
+}
+check_owner_disposition() { # slug -> 0 where the ending line's disposed field reads continue, else 1 with _od_why
+  _od_why=""
+  if ! read_exhausted_ending "$1"; then
+    _od_why="budget.py ending does not answer: $_ex_why"; return 1
+  fi
+  [ "$_ex_disp" = continue ] && return 0
+  _od_why="the owner's disposition reads ${_ex_disp:-unrecorded}"
+  return 1
+}
 verb_plan() { # slug
   local slug="$1" dir specs spec id st state miss nmiss=0 _ar_id _ar_sum _rev
-  # THE LADDER'S INPUTS, collected by the two loops below and read ONCE at the bottom. They
-  # are not the line: `_live` and `_miss1` are first-wins captures of data each loop already
-  # has, `_ask1` is the undecided-ask rung's input and stays EMPTY here until
-  # TOOL-dDerivedDocket-16 fills it, and `_graded` is set beside the unit rows further down.
-  # No branch of this verb assigns the printed line any more.
-  local _live="" _miss1="" _ask1=""
+  # THE ENGINE'S HAND-OVER (TOOL-dDeclaredLoop-7), collected by the loops below and read ONCE at the
+  # bottom: one `unit` line per printed row, then the ask, the parents, the bound and the owed sets.
+  # Appended in this shell, so it costs no fork. No branch of this verb assigns the printed line.
+  local _ho="" _pl _pp _pin=0
   check_slug "$slug" || return 1
   load_fork_cutoff || return 1
   dir="$M/builds/$slug"
@@ -6298,7 +6581,7 @@ verb_plan() { # slug
   # a state this verb can SEE. Iterating the substitution directly made it indistinguishable from an
   # empty region, and the verb answered `next: none - every tracked spec is terminal` at exit 0 — a
   # false all-clear on the one verb an agent reads to pick up work.
-  local _ids _graded=0
+  local _ids
   # TOOL-aCollapsedScan-1 - ONE awk over the whole region, where this ran a printf, a grep and a
   # head PER ROW. `match` returns the FIRST occurrence on the line, which is exactly what the
   # `head -1` bought and for the same reason: a rendered row spells its id twice, once as the
@@ -6330,15 +6613,7 @@ verb_plan() { # slug
     case "$st" in CLOSED|WONTDO) [ "$state" = "READY" ] && state="DONE" || state="DONE ($state)" ;; esac
     _rev=""; [ -z "$PLAN_PATHS" ] || _rev=$(read_spec_rev "$spec")
     plan_row "$id" "${st:-?}" "$state" "$spec" "$_rev"
-    _graded=1
-    # FIRST WINS, and what wins is an INPUT rather than the line. The guarded assignments to
-    # `next` that stood here and in the loop below settled the precedence between the shapes
-    # by whichever loop bash reached first. The order is declared at NEXT_RUNGS now, and this
-    # branch says only which id and which state word the live-unit rung takes.
-    case "$state" in
-      THIN|FORKED) [ -n "$_live" ] || _live="$id ($state)" ;;
-      READY)       [ -n "$_live" ] || _live="$id (READY - build it)" ;;
-    esac
+    _ho+="unit	$id	$state"$'\n'
   done
   # The planned units nobody has specced. These are what M2 calls MISSING, and until this
   # unit they were simply absent from the listing rather than reported.
@@ -6350,7 +6625,7 @@ verb_plan() { # slug
   for miss in $(missing_units "$slug" "$dir" | sort -t- -k1,1 -k2,2 -k3,3n); do
     plan_row "$miss" "-" "MISSING" ""
     nmiss=$((nmiss + 1))
-    [ -n "$_miss1" ] || _miss1="$miss"
+    _ho+="unit	$miss	MISSING"$'\n'
   done
   # TOOL-dDerivedDocket-16 S8 - THE ASK ROWS, after every unit row and before the roster line, so
   # the unit projection is byte-identical to what it was for a build that files no asks and declares
@@ -6367,10 +6642,10 @@ verb_plan() { # slug
 $ASK_PLAN_ROWS
 ASKROWS
     fi
-    # THE UNDECIDED SHAPE'S WORDS ARE THIS UNIT'S and the rung's POSITION is the ladder's, which is
-    # why the table carries a bare `<id>` for it. Supplied whether or not `--asks` printed the rows:
-    # the false "every tracked spec is terminal" is a lie about the BUILD, not about an output mode.
-    [ -z "$ASK_PLAN_NEXT" ] || _ask1="$ASK_PLAN_NEXT (UNDECIDED - plan a unit that closes it, or dispose it)"
+    # THE UNDECIDED ASK IS HANDED OVER whether or not `--asks` printed the rows: the false "every
+    # tracked spec is terminal" is a lie about the BUILD, not about an output mode. Its shape's words
+    # are the engine's, and so is its rank, below a next item (TOOL-dDeclaredLoop-7 section 8 F4).
+    [ -z "$ASK_PLAN_NEXT" ] || _ho+="ask	$ASK_PLAN_NEXT"$'\n'
   fi
   # The value resolved at the top of this verb, not re-derived. R2-M3: two `$( )` calls here meant two
   # discarded exit-3s, and the guard that replaced them still sat AFTER the listing.
@@ -6388,16 +6663,41 @@ ASKROWS
     read_spec_disposal "$_runmd" "$slug"
     printf 'spec-disposal: %s\n' "$_sd_value${_se_why:+ - ${_se_why%%$'\n'*}}"
   fi
-  # R3-B1 — THE TERMINAL WORDING IS EARNED, not defaulted. "every tracked spec is terminal" was
-  # printed at exit 0 over builds where no spec graded as a unit at all, one line below the NOT A
-  # UNIT rows saying so. A reader — or an agent picking up work — is told the build is finished.
-  # It is earned by the ladder's LAST rung now, which is the same rule carrying a name and a place.
-  #
-  # ONE WRITER, ONE CALL. Three branches stood here, fed by three guarded assignments in two loops,
-  # and the order among them was an artefact of iteration: a fourth shape could be added only by
-  # arguing in prose about where to type it. `_ask1` is empty on every call until
-  # TOOL-dDerivedDocket-16 supplies it, so this prints byte for byte what the three branches did.
-  echo "next: $(derive_next_shape "$_live" "$_miss1" "$_ask1" "$_graded")"
+  # EACH PARENT'S DERIVED PHASE, so the engine reads a parent landed by its recorded move OR by the
+  # derivation this driver owns (TOOL-dDeclaredLoop-7 section 8 F6). The front matter is read in this
+  # shell, from line 1's `---` to the next, as the index generator's parser reads it.
+  while IFS= read -r _pl || [ -n "$_pl" ]; do
+    _pl=${_pl%$'\r'}
+    if [ "$_pl" = "---" ]; then _pin=$((_pin + 1)); [ "$_pin" -lt 2 ] && continue; break; fi
+    [ "$_pin" = 1 ] || break
+    case "$_pl" in parents:*) _pl=${_pl#parents:} ;; *) continue ;; esac
+    for _pp in $_pl; do
+      if [ -f "$M/builds/$_pp/RUN.md" ]; then read_derived_phase "$M/builds/$_pp/RUN.md"; else DP_PHASE="-"; fi
+      _ho+="parent	$_pp	${DP_PHASE:--}"$'\n'
+    done
+  done < "$_rmp"
+  _ho+="bound	$RESUME_STALE_BOUND"$'\n'"owed	$PARK_KINDS_OWED	$PARK_ACTS_OWED"$'\n'
+  # THE ENGINE'S OWN STANDALONE CALL sets the variable EMPTY and reads these lines in place of `next:`.
+  if [ "${GOV_POSITION_STATES+set}" = set ] && [ -z "$GOV_POSITION_STATES" ]; then
+    printf '%s' "$_ho"
+    return 0
+  fi
+  # ONE ENGINE CALL. Its `invalid-input` exits 2 and still prints its line, so the status is not read.
+  # TOOL-dDeclaredLoop-14 S5 - its SECOND line is the frontier, the stand-in for `next` returning it,
+  # printed beneath `next:` as `frontier:` with the tags space-separated or `none`. An engine that does
+  # not resolve returned no frontier, so no line claims one.
+  local _nl="" _fl=""
+  if resolve_position_engine; then
+    _nl=$(GOV_POSITION_STATES="$_ho" "$PE_PY" "$PE_PATH" "$slug" --next-line --frontier 2>/dev/null)
+    case "$_nl" in *$'\n'*) _fl=${_nl#*$'\n'}; _fl=${_fl%%$'\n'*}; _fl=${_fl%$'\r'} ;; esac
+    _nl=${_nl%%$'\n'*}; _nl=${_nl%$'\r'}
+    [ -n "$_nl" ] || _nl="none - invalid-input: the loop kit's position engine printed no line"
+    _fl="frontier: ${_fl:-none}"
+  else
+    _nl="none - invalid-input: the loop kit's position engine does not resolve beside this kit"
+  fi
+  echo "next: $_nl"
+  [ -z "$_fl" ] || echo "$_fl"
   return 0
 }
 
@@ -6458,6 +6758,8 @@ verb_phase() { # slug · phase · witness
     return 1
   fi
   [ -n "$wit" ] || { fail 11 "a phase claim carries a WITNESS - a sha, a tag or a run id - and presence is its own refusal because an unwitnessed claim is the one an oracle skips: $want"; return 1; }
+  # TOOL-dDeclaredLoop-52 S4 - a move past a step exit an owner gate holds is refused before the first write.
+  check_phase_gates "$slug" "$DP_PHASE" "$want" || return 1
   set_fact "$rel" phase "$want" || return 1
   set_fact "$rel" witness "$wit" || return 1
   # TOOL-aBoundedVerdict-15 S1 - the SECOND omission, and the reason rev-1's "the only phase writer
@@ -6995,6 +7297,11 @@ verb_abort() { # slug · reason · code
   if [ "$code" = gate-red-out-of-scope ]; then
     check_inherited_override "$rel" "--abort --code gate-red-out-of-scope" || return 1
   fi
+  # TOOL-dDeclaredLoop-31 S4 - a spent budget's `close-incomplete` ending is backed by its exhaustion row and
+  # every open unit's defer row, or refused, before the attestations below.
+  if [ "$code" = budget-exhausted ]; then
+    check_exhausted_close "$slug" "$rel" || return 1
+  fi
   # TOOL-dUnstuckLanding-13 S9 - a NOTICE, never a refusal: printed for a hand-off-shaped code and
   # the abort then proceeds exactly as before, because this verb cannot know the work is sound.
   print_abort_notice "$rel" "$code"
@@ -7147,6 +7454,13 @@ run_hold() { # slug · code · until · reason · reaped · unreachable · pendi
   if [ -z "$HO_ACTIVE" ] && check_handoff_code "$code"; then
     fail 89 "--hold names a hand-off code, and those are written by --handoff alone: a HELD record under one carries the landing recipe and the landing facts, and a hold written without them is a hand-off nothing can land or settle; end the run with --handoff instead: $code"
     return 1
+  fi
+  # TOOL-dDeclaredLoop-17 S5 - THE RED ATTRIBUTION JOINED TO THE HOLD. `inherited-red` is a claim about
+  # the bar, so the runner's attribution decides it and never the code the run types: the record the
+  # `gates-run` fact names must read every red leg INHERITED, under the `record-only` tie, because the
+  # hold line the close prints has the run commit its staged records before it holds.
+  if [ "$code" = inherited-red ]; then
+    check_inherited_override "$rel" "--hold --code inherited-red" record-only || return 1
   fi
   check_verb_flag --hold --until "$until" || return 1
   if ! check_hold_condition "$until"; then
@@ -8153,23 +8467,64 @@ write_landed_record() { # run-state file · the LANDED copy -> 0 staged as named
 # recommendation clause: a one-unit build with no open fork is what the trial measured the audit
 # buying nothing on, so the clause rides only where the build has two or more units in its
 # generated region or a tracked spec grades FORKED.
+# THE REVIEW SIGNALS, ONCE (TOOL-dDeclaredLoop-22 S2), read from the build README's generated units region
+# in one pass: `print_spec_audit_line` takes Design's clause from it and `--recommend` scores from it, so no
+# caller keeps a count of its own. `design` holds two or more units and a tracked spec grading FORKED under
+# FORK_CUTOFF, which its caller loads; `build` two or more units and a row whose Tier cell reads 2, counted
+# from the row's end because a title may hold a `|`. It SETS GLOBALS rather than printing, so no caller
+# wraps it in a substitution: `_rs_why` the signals joined by `, `, `_rs_tier2` 1 where any row reads Tier
+# 2, and `_rs_anchor` the lowest-numbered unit id of the region, the build's record anchor. `plan`, `test`
+# and `deploy` read no artifact this tree holds, so they hold no signal and answer 3.
+derive_review_signals() { # slug · stage -> sets _rs_why _rs_tier2 _rs_anchor; 3 for a stage with no signal source
+  local _rs_row _rs_id _rs_t _rs_sp _rs_n=0 _rs_seen=" "
+  local -a _rs_rows=()
+  _rs_why=""; _rs_tier2=""; _rs_anchor=""
+  readme_of "$1" >/dev/null
+  mapfile -t _rs_rows < <(unit_rows "$_readme" 2>/dev/null)
+  for _rs_row in ${_rs_rows[@]+"${_rs_rows[@]}"}; do
+    [[ $_rs_row =~ [A-Z]+-[A-Za-z0-9]+-[0-9]+ ]] || continue
+    _rs_id=${BASH_REMATCH[0]}
+    case "$_rs_seen" in *" $_rs_id "*) ;; *)
+      _rs_seen="$_rs_seen$_rs_id "; _rs_n=$((_rs_n + 1))
+      if [ -z "$_rs_anchor" ] || [ "$((10#${_rs_id##*-}))" -lt "$((10#${_rs_anchor##*-}))" ]; then _rs_anchor=$_rs_id; fi ;;
+    esac
+    _rs_t=${_rs_row%|*}; _rs_t=${_rs_t%|*}; _rs_t=${_rs_t%|*}; _rs_t=${_rs_t%|*}; _rs_t=${_rs_t##*|}
+    [ "${_rs_t//[[:space:]]/}" != 2 ] || _rs_tier2=1
+  done
+  case "${2:-}" in
+    design|build) [ "$_rs_n" -lt 2 ] || _rs_why="$_rs_n units in the generated region" ;;
+    *) return 3 ;;
+  esac
+  if [ "$2" = build ]; then
+    [ -z "$_rs_tier2" ] || _rs_why="${_rs_why:+$_rs_why, }a Tier-2 spec"
+    return 0
+  fi
+  for _rs_sp in $(git ls-files "$M/builds/$1/spec/*.md" 2>/dev/null | drop_working_specs); do
+    [ "$(plan_state "$_rs_sp" "$FORK_CUTOFF")" = FORKED ] || continue
+    _rs_why="${_rs_why:+$_rs_why, }a spec grading FORKED"; break
+  done
+  return 0
+}
+
 print_spec_audit_line() { # slug · run-state file
-  local sa why="" n=0 _sp
+  local sa why=""
   fact "$2" spec-audit >/dev/null; sa=$_fact
   if [ -n "$sa" ]; then
-    if [ "${AUTH_SPEC_AUDIT_FROM:-}" = project ]; then
+    if [ "${AUTH_SPEC_AUDIT_FROM:-}" = policy ]; then
+      echo "unattended: spec-audit — opted in by policy review.design: ${AUTH_DESIGN_REVIEW:-owed} · $sa"
+    elif [ "${AUTH_SPEC_AUDIT_FROM:-}" = project ]; then
       echo "unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: $sa"
     else
       echo "unattended: spec-audit — opted in by README spec-audit: $sa"
     fi
     return 0
   fi
-  readme_of "$1" >/dev/null; n=$(unit_rows "$_readme" 2>/dev/null | row_ids_of | grep -c .)
-  [ "${n:-0}" -ge 2 ] && why="$n units in the generated region"
-  for _sp in $(git ls-files "$M/builds/$1/spec/*.md" 2>/dev/null | drop_working_specs); do
-    [ "$(plan_state "$_sp" "$FORK_CUTOFF")" = FORKED ] || continue
-    why="${why:+$why, }a spec grading FORKED"; break
-  done
+  # TOOL-dDeclaredLoop-19 S8 - the policy's own not-owed, which no README key or project default reopens.
+  if [ "${AUTH_SPEC_AUDIT_FROM:-}" = policy ]; then
+    echo "unattended: spec-audit — not owed by policy review.design: ${AUTH_DESIGN_REVIEW:-off}"
+    return 0
+  fi
+  derive_review_signals "$1" design; why=$_rs_why
   # TOOL-aWardedAudit-1 S3 - the clause is addressed to the OWNER. Its first wording told the run
   # to write the key, and a run did; the opt-in is the owner's, so the run carries it to the wrap-up.
   echo "unattended: spec-audit — not owed (opt-in)${why:+; the opt-in belongs to the owner alone and this run never declares it - name it in the wrap-up for the owner: $why}"
@@ -8437,20 +8792,27 @@ verb_status() { # slug
   elif [ "$p" = LANDING ] && [ -n "$DP_REASON" ]; then
     pshow="LANDING (not on the remote: $DP_REASON)"
   fi
-  # The first non-terminal unit, DERIVED from the build README on every read. It used to be read
-  # from a copy inside this file, which is exactly the staleness that design removes — main's
-  # redesign, taken here over this branch's terminal-exemption workaround for the same problem.
-  # TOOL-aPromptedMandate-12 - through `nonterminal_units`, not a second copy of its pipeline. This
-  # line open-coded the identical `region | grep | grep -v | head -1 | sed` and never called either
-  # helper, so narrowing `unit_rows` alone would have left --close reading the units table while
-  # --status and --resume kept reading the records table - two answers to one question about one
-  # region, which is what the extraction exists to prevent. It was already wrong before the narrowing:
-  # --status on a landed build offered a `build/` record filename as the next unit, measured on
-  # aBranchedMandate by BOTH nodes independently.
-  # `](spec/` and not a bare `]`: the selector deliberately admits a unit whose TITLE contains one,
-  # so cutting at the first `]` would display a truncated id for exactly the row the narrowing was
-  # written to keep. Cut at the link instead, which is the only `](spec/` a unit row carries.
-  readme_of "$slug" >/dev/null; unit=$(nonterminal_units "$_readme" | head -1 | sed -e 's/^| \[//' -e 's/\](spec\/.*//')
+  # TOOL-dDeclaredLoop-7 S9 - THE NEXT UNIT IS THE POSITION ENGINE'S LEAST-ADVANCED UNIT now, the first
+  # `unit —` line at the lowest step, and no longer the first row whose typed status is not terminal.
+  # The engine runs standalone, so it asks `--plan` for the hand-over itself; its `position —`,
+  # `unit —`, `next —` and `interrupt —` lines print after the status line. Where python or the engine
+  # does not resolve, or the build is terminal, the field reads `(no non-terminal unit)`.
+  local _pout="" _plines="" _pl _pu _pr _pbest=9
+  unit=""
+  resolve_position_engine && _pout=$(GOV_POSITION_STATES="" "$PE_PY" "$PE_PATH" "$slug" 2>/dev/null)
+  while IFS= read -r _pl; do
+    _pl=${_pl%$'\r'}
+    case "$_pl" in
+      "position — "*|"next — "*|"interrupt — "*) _plines+="$_pl"$'\n' ;;
+      "unit — "*)
+        _plines+="$_pl"$'\n'; _pu=${_pl#unit — }
+        # TOOL-dDeclaredLoop-67 S50: the optional unarmed tag is cut before the step is read
+        _pu=${_pu% · acceptance unarmed}
+        case "${_pu##* · }" in none) _pr=0 ;; designed) _pr=1 ;; built) _pr=2 ;; tested) _pr=3 ;; *) _pr=4 ;; esac
+        [ "$_pr" -lt "$_pbest" ] && [ "$_pr" -lt 4 ] && { _pbest=$_pr; unit=${_pu%% · *}; } ;;
+    esac
+  done <<< "$_pout"
+  case "$_plines" in *" · answer terminal · "*) unit="" ;; esac
   [ -n "$unit" ] || unit="(no non-terminal unit)"
   # PARKED COUNT, when there is one. `--park` writes a decision the owner does not hear until the
   # wrap-up; the verb an agent checks itself with should say something is waiting rather than leave
@@ -8598,6 +8960,7 @@ BRIEFROWS
     [ -n "$_sa" ] && hc="$hc · spec-audit $_sa"
   printf 'unattended: %s · phase %s · witness %s%s · next %s%s
 ' "$slug" "$pshow" "${w:-NONE}" "$hc" "$unit" "$parked"
+  printf '%s' "$_plines"
   # TOOL-dDerivedDocket-3 - THE LANDING SHAPE, on the status a reader actually opens, and printed
   # only where it DIFFERS from what every other run does. `primary` is announced at conf load like
   # any other defaulted value, so naming it again here would add a line to every adopter's status
@@ -9641,6 +10004,18 @@ verb_resume() { # slug
       echo "unattended: still held — the release condition is not met, so nothing was written and no lease was taken: $cond"
       return 0
     fi
+    # TOOL-dDeclaredLoop-31 S6 - THE EXHAUSTION PARK IS THE OWNER'S TO LEAVE: a hold under owner-decision whose
+    # exhaustion row reads park-for-owner resumes only once the owner's disposition record reads continue.
+    # Every other hold resumes as before.
+    fact "$rel" hold-code >/dev/null
+    if [ "$_fact" = owner-decision ]; then
+      read_exhausted_row "$rel"
+      if [ "$_ex_row" = park-for-owner ] && ! check_owner_disposition "$slug"; then
+        verb_status "$slug" || true
+        fail 57 "this run is parked for its owner on a spent rework budget, and only the owner's disposition record of item.flow.on-exhausted reading continue releases it, so nothing was written and no lease was taken: $_od_why"
+        return 1
+      fi
+    fi
     # THE TAKE-OVER'S CRASH WINDOW: a take-over records its lease BEFORE it moves the phase, so a
     # record still HELD whose `lease-utc` follows its `held-at` was resumed by a session that has not
     # finished. On a fresh or unknown clock, a second session under another keepalive is refused.
@@ -10672,8 +11047,9 @@ check_inherited_override() { # run-state file · the verb as the refusal names i
 }
 
 # TOOL-dUnstuckLanding-13 S4 - IS THE BAR TIED TO THIS TREE. Equal heads always are. `record-only`
-# also admits a bar head that differs from HEAD in the run-state file ALONE, and only `--handoff`
-# passes it: `gates-green` writes and stages its `gates-run` fact, and `--hold`'s clean-tree refusal
+# also admits a bar head that differs from HEAD in the run-state file ALONE, and only `--handoff` and
+# `--hold --code inherited-red` (TOOL-dDeclaredLoop-17 S5) pass it: `gates-green` writes and stages its
+# `gates-run` fact, and `--hold`'s clean-tree refusal
 # then makes the run commit that record before it may hold, which moves HEAD off the bar's head by
 # exactly the run's own record. `--close` and `--abort` pass nothing and keep the strict equality.
 # A bar head this clone cannot resolve makes the diff fail, which reads as untied.
@@ -10737,7 +11113,8 @@ check_bar_tied() { # bar head · HEAD · run-state file · [record-only] · [the
 }
 
 # TOOL-dUnstuckLanding-27 S3 - THE STAGED SET, written into the bar's own run record when gates-green
-# reads its bar MET over an inherited-only red: one `path@blob` line per path the close staged, the
+# reads its bar MET over an inherited-only red under `land`, or prints the hold line over one under
+# `park` (TOOL-dDeclaredLoop-17 S6): one `path@blob` line per path the close staged, the
 # blob the index holds for it now, `-` where it holds a deletion. A bar that staged nothing writes no
 # file, and every bar has a run record of its own, so a later bar never inherits an older set.
 write_gates_staged() { # the bar's run record dir · paths staged beside the record, or empty
@@ -11130,6 +11507,9 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     fail 82 "the run is HELD, so the Definition-of-Done set would be evaluated against a run that stopped part-way for a cause outside itself; --resume it first, and close it when the work it paused in the middle of is done"
     return 1
   fi
+  # TOOL-dDeclaredLoop-19 S6 - AN OWNER GATE THE POLICY PLACES HOLDS THE CLOSE until the owner's disposition
+  # record of its item, free and before the anchor round-trip, as the HELD refusal above is.
+  check_owner_gates "$slug" || return 1
   # TOOL-dUnstuckLanding-20 S5 - THIS NODE'S OWN ANSWER DECIDES, resolved again here: a run resumed
   # on another node carries the first node's `landing` fact, and trusting it would land from a node
   # nobody declared. A disagreement is printed. On a hand-off node an override is a free refusal,
@@ -11390,6 +11770,84 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   # run whose Definition of Done was in fact evaluated. TOOL-dUnstalledConvoy-24.
   echo "unattended: close OK — every declared DoD item met; phase LANDING. COMMIT the run-state file, then land with: $LANDER"
   return 0
+}
+# TOOL-dDeclaredLoop-19 S6 - THE OWNER GATES, from the loop kit's `breakpoints.py list`, with
+# `--delegated-fork` where a tracked spec of the build carries a fork the agent resolved under delegation.
+# An owner line reading `held` holds the close, naming its item and today's door: the `decision` park, the
+# `owner-decision` hand-off and the owner's disposition record whose `Item` is that tag, which the next close
+# reads. The plan gate's release is the authorization, so a default build holds nothing new. A list that
+# refuses is relayed through the same site; a loop kit that does not resolve reads nothing (§8 F10).
+# TOOL-dDeclaredLoop-19 S9 - THE BREAKPOINT LINES OF `--plan <slug>`, after `next:` and `frontier:`: the
+# module's output verbatim, its refusal line included, the list run with `--spec-audit` where the run-state
+# file's `spec-audit` fact holds a date and `--delegated-fork` as the close derives it. Nothing where the
+# module does not resolve. The dispatch calls it for the single-slug human form alone.
+print_breakpoint_lines() { # slug -> prints the list's lines; 0 always
+  local -a _pb_flags=()
+  load_fork_cutoff >/dev/null || return 0
+  runmd_of "$1" >/dev/null
+  fact "$_runmd" spec-audit >/dev/null 2>&1
+  case "${_fact:-}" in [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) _pb_flags+=(--spec-audit) ;; esac
+  check_delegated_fork "$1" && _pb_flags+=(--delegated-fork)
+  run_loop_verb breakpoints.py list "--build=$1" ${_pb_flags[@]+"${_pb_flags[@]}"} || return 0
+  [ -z "$_bd_out" ] || printf '%s\n' "$_bd_out"
+  return 0
+}
+# TOOL-dDeclaredLoop-52 S4 - THE HELD-GATE READ, extracted at its second reader: `check_owner_gates` reads every
+# owner line, and the `--phase` hold only those positioned `at` a step exit the move crosses. It sets the
+# caller's `_og_why` and refuses nothing, so each caller keeps its own refusal.
+read_held_gates() { # slug · [tags] -> sets _og_why where an owner line reads held, at one of the tags where given, or the list refuses; 1 where the fork cutoff does not load
+  local _og_held="" _og_flag="" _og_ln
+  local -a _og_lines=()
+  _og_why=""
+  load_fork_cutoff || return 1
+  check_delegated_fork "$1" && _og_flag=--delegated-fork
+  run_loop_verb breakpoints.py list "--build=$1" ${_og_flag:+"$_og_flag"} || return 0
+  if [ "$_bd_rc" != 0 ]; then
+    _og_why=$_bd_why
+  else
+    mapfile -t _og_lines < <(printf '%s\n' "$_bd_out")
+    for _og_ln in ${_og_lines[@]+"${_og_lines[@]}"}; do
+      _og_ln=${_og_ln%$'\r'}
+      case "$_og_ln" in
+        "breakpoint: "*" · owner · "*" · held") _og_ln=${_og_ln#breakpoint: * · }; _og_ln=${_og_ln%% · *} ;;
+        *) continue ;;
+      esac
+      if [ -n "${2:-}" ]; then
+        case "$_og_ln" in "at "*) ;; *) continue ;; esac
+        case " $2 " in *" ${_og_ln#at } "*) ;; *) continue ;; esac
+      fi
+      _og_held="$_og_held ${_og_ln#* }"
+    done
+    [ -z "$_og_held" ] || _og_why="held at$_og_held; park the question with --park $1 --item <tag> --reason <question>, hand the run over with --handoff $1 --code owner-decision, and the owner's disposition record whose Item is that tag releases it at the next --close"
+  fi
+  return 0
+}
+check_owner_gates() { # slug -> 0 where no owner line reads held or the module does not resolve; 1 after its one fail 82
+  local _og_why=""
+  read_held_gates "$1" || return 1
+  [ -n "$_og_why" ] || return 0
+  fail 82 "--close is held at an owner breakpoint the policy file places, or the list of them did not answer, so the Definition of Done is not evaluated past a gate only the owner releases: $_og_why"
+  return 1
+}
+# TOOL-dDeclaredLoop-52 S4 - THE `--phase` HOLD PAST A STEP EXIT, which TOOL-dDeclaredLoop-19 handed here: the loop
+# kit's phase map names the step exits the move crosses, and an owner gate `at` one of them reading `held`
+# holds the move, as a map that refuses does. A move crossing no exit reads no list; a loop kit that does
+# not resolve reads nothing, and the move goes on. The values are named locals, never positional ones.
+check_phase_gates() { # slug · from · to -> 0 where the move crosses no held exit or the loop kit does not resolve; 1 after its one fail 82
+  local _pg_from="$2" _pg_to="$3" _pg_why="" _og_why=""
+  run_loop_verb loop_table.py phase "--from=$2" "--to=$3" "--extra=$PHASES_EXTRA" >/dev/null || return 0
+  if [ "$_bd_rc" != 0 ]; then
+    _pg_why=$_bd_why
+  else
+    case "$_bd_why" in
+      *" · crosses none") return 0 ;;
+      *" · crosses "*) read_held_gates "$1" "${_bd_why##* · crosses }" || return 1; _pg_why=$_og_why ;;
+      *) _pg_why=$_bd_why ;;
+    esac
+  fi
+  [ -n "$_pg_why" ] || return 0
+  fail 82 "the move $_pg_from -> $_pg_to passes a step exit, and the loop kit's phase map or an owner gate at that exit holds it: $_pg_why"
+  return 1
 }
 
 # write_bar_green <git dir> <head before> <rc> <kind> <base> <bar> <run id> — the close's bar's own
@@ -11740,6 +12198,8 @@ dod_met() { # slug · run-state file · item · checker
                 return 0
               fi
               if [ "$GR_STATE" = hold ]; then
+                # TOOL-dDeclaredLoop-17 S6: the hold's join reads this set, as the hand-off's does.
+                write_gates_staged "$_gdir" "$WI_STAGED"
                 _hold="$GR_LEGS red at ${_gr:0:8}, INHERITED; INHERITED_RED=$GP_POLICY"
                 DOD_OUT="hold · inherited-red · until probe gate · $_hold"
                 [ -z "$GR_WHY" ] || DOD_OUT="$DOD_OUT"$'\n'"  $GR_WHY"
@@ -12206,9 +12666,9 @@ $_bcopen"
       # whether the blockers were real. It reads that a loop for this build ran and reached one of
       # its declared exits. `NON-CONVERGENT` and `CEILING` are legitimate exits whose own
       # obligations the leg's promotion clause grades; this term only refuses the absence of any exit.
-      # `BOUNDED` is listed for VOCABULARY PARITY and is UNREACHABLE here: this subject is the build
-      # slug, whose bound is the runaway ceiling, and `CEILING` fires at equality before `BOUNDED`
-      # can, so no round on this subject can ever carry the token (TOOL-aProbedUnit-6).
+      # `BOUNDED` is a legitimate exit here too since TOOL-dDeclaredLoop-21: this subject is the build
+      # slug, whose closing bound `review.follow-up` sets, one round under `never` and `review.max-rounds`
+      # otherwise, and a bound equal to the ceiling is reached as `BOUNDED` before `CEILING` can fire.
       #
       # THE SUBJECT IS THE BUILD SLUG, exactly, because `review_last_reason` compares the item with
       # `!=` as its sibling does. A spec-audit round keyed `<slug>-specs` is a different subject and
@@ -12287,6 +12747,10 @@ $_bcopen"
       if [ "${AUTH_SPEC_AUDIT:+1}" != "${_sa_fact:+1}" ]; then
         fail 53 "the spec-audit fact in the run-state file and the spec-audit: key in the build README at the pinned BASE, or the SPEC_AUDIT_DEFAULT the project conf declares at its default-branch side, disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: ${AUTH_SPEC_AUDIT:-(none)}; recorded: ${_sa_fact:-(none)}"
         return 1
+      fi
+      if [ -z "${AUTH_SPEC_AUDIT:-}" ] && [ "${AUTH_SPEC_AUDIT_FROM:-}" = policy ]; then
+        DOD_OUT="specs-audited — not owed by policy review.design: ${AUTH_DESIGN_REVIEW:-off}, read at the default-branch side of BASE, so this build owes no pre-code audit evidence whatever its README key or the project default says (TOOL-dDeclaredLoop-19)"
+        return 0
       fi
       if [ -z "${AUTH_SPEC_AUDIT:-}" ]; then
         DOD_OUT="specs-audited — not owed: the spec audit is opt-in, the build README at BASE declares no spec-audit: key and the project conf at the default-branch side of BASE declares no SPEC_AUDIT_DEFAULT, so this build owes no pre-code audit evidence (TOOL-aBlindedTrial-6)"
@@ -12930,24 +13394,35 @@ verb_attest() { # slug · item · value
 # changed", and deliberately so: an oscillating sequence 2, 1, 2 converges under a changed-test and
 # never terminates, which is the shape this exists to stop.
 #
-# TWO BOUNDS, ONE PREDICATE. A SPEC subject is bounded by `REVIEW_ROUNDS` (owner ruling 2026-09-14,
-# TOOL-aProbedUnit-6: one round by default) and exits BOUNDED in a disposition; the DIFF review — the
-# subject that IS the build slug — is bounded by convergence alone; and the runaway ceiling backstops
-# both. `BOUNDED` is tested AFTER the two facts about THIS round and after the ceiling, so a clean
-# round, a flat round and a ceiling hit each keep their own exit, and the default bound (the ceiling)
-# makes a two-argument call byte-for-byte the pre-bound behaviour.
+# TWO BOUNDS AND A CEILING, ONE PREDICATE (TOOL-dDeclaredLoop-21). A SPEC subject is bounded by its spec
+# bound, `review.design.rounds` (one round by default, the owner ruling of 2026-09-14), and exits
+# BOUNDED in a disposition; the DIFF review — the subject that IS the build slug — by its closing bound,
+# `review.follow-up` (one round under `never`, else `review.max-rounds`); and `review.max-rounds` is the
+# ceiling of both, read as ONE ROUND PAST it, `n + 1 > MAX_ROUNDS`, the harness's `deriveRoundState` order.
+# A bound EQUAL to the ceiling is therefore reached as BOUNDED, the equality the loop kit admits.
+# `BOUNDED` is tested AFTER the two facts about THIS round and after the ceiling, so a clean round, a
+# flat round and a ceiling hit each keep their own exit; a two-argument call takes the ceiling as its
+# bound. `MAX_ROUNDS` is the caller's: `verb_review` sets it through `load_review_bounds`, and an arm
+# that slices this function sets it itself.
 #
 # The verb reports one of five states and refuses none of them at the ceiling: CONVERGED (nothing
 # left), NON-CONVERGENT (stop and dispose), CEILING (the backstop fired, which is a defect in the
 # predicate — reported loudly and survived), BOUNDED (the declared round bound is reached; stop and
 # dispose), CONVERGING (go again).
-review_state() { # prior-counts (space separated) · this count · [bound, default the ceiling] -> the state
-  local prev="" n=0 c bound="${3:-$RUNAWAY_CEILING}"
+#
+# THREE MORE ARGUMENTS (TOOL-dDeclaredLoop-32), each empty by default, so a three-argument call answers
+# as above. The fifth is the TARGET count, which CONVERGED reads in place of the count. The sixth,
+# `no-fall`, skips the non-decrease test, as a spec subject's loop takes it. The fourth is
+# `flow.route-backs`: a round whose returns, the rounds before it, are PAST it reads NON-CONVERGENT,
+# tested last, so a round bound reached first still exits BOUNDED or CEILING.
+review_state() { # prior-counts (space separated) · this count · [bound, default the ceiling] · [route-backs] · [target] · [no-fall] -> the state
+  local prev="" n=0 c bound="${3:-$MAX_ROUNDS}"
   for c in $1; do prev=$c; n=$((n+1)); done
-  if [ "$2" = 0 ]; then printf 'CONVERGED\n'; return 0; fi
-  if [ "$n" -gt 0 ] && [ "$2" -ge "$prev" ]; then printf 'NON-CONVERGENT\n'; return 0; fi
-  if [ "$((n + 1))" -ge "$RUNAWAY_CEILING" ]; then printf 'CEILING\n'; return 0; fi
+  if [ "${5:-$2}" = 0 ]; then printf 'CONVERGED\n'; return 0; fi
+  if [ -z "${6:-}" ] && [ "$n" -gt 0 ] && [ "$2" -ge "$prev" ]; then printf 'NON-CONVERGENT\n'; return 0; fi
+  if [ "$((n + 1))" -gt "$MAX_ROUNDS" ]; then printf 'CEILING\n'; return 0; fi
   if [ "$((n + 1))" -ge "$bound" ]; then printf 'BOUNDED\n'; return 0; fi
+  if [ -n "${4:-}" ] && [ "$n" -gt "$4" ]; then printf 'NON-CONVERGENT\n'; return 0; fi
   printf 'CONVERGING\n'
 }
 
@@ -12957,9 +13432,12 @@ review_state() { # prior-counts (space separated) · this count · [bound, defau
 # `review_counts` projects the COUNT out of the same rows and throws the token away, so this is its
 # sibling rather than a second parser: one grammar, spelled once per projection, in the same shape so
 # the two cannot disagree about what a row is.
-review_last_reason() { # run-state file · subject -> the last round's reason text, or empty
-  awk -v subj="$2" '
-    $0 ~ /^[0-9][0-9-]*T[0-9:]*Z review · item / {
+# Both take a third argument, the row kind, default `review` (TOOL-dDeclaredLoop-32): a `fix-pass` row is
+# read by the same awk, and `review_counts` projects its `reds` where a review row's count is its
+# `blockers` plus its `round-highs`, an absent field reading 0.
+review_last_reason() { # run-state file · subject · [row kind, default review] -> the last round's reason text, or empty
+  awk -v subj="$2" -v kind="${3:-review}" '
+    $0 ~ /^[0-9][0-9-]*T[0-9:]*Z / && substr($0, index($0, " ") + 1, length(kind " · item ")) == kind " · item " {
       line = $0; sub(/\r$/, "", line)
       i = index(line, " · item "); if (i == 0) next
       rest = substr(line, i + length(" · item "))
@@ -12971,9 +13449,9 @@ review_last_reason() { # run-state file · subject -> the last round's reason te
     END { if (last != "") print last }' "$1"
 }
 
-review_counts() { # run-state file · subject -> the blocker counts, in order
-  awk -v subj="$2" '
-    $0 ~ /^[0-9][0-9-]*T[0-9:]*Z review · item / {
+review_counts() { # run-state file · subject · [row kind, default review] -> the round counts, in order
+  awk -v subj="$2" -v kind="${3:-review}" '
+    $0 ~ /^[0-9][0-9-]*T[0-9:]*Z / && substr($0, index($0, " ") + 1, length(kind " · item ")) == kind " · item " {
       line = $0; sub(/\r$/, "", line)
       i = index(line, " · item "); if (i == 0) next
       rest = substr(line, i + length(" · item "))
@@ -12981,8 +13459,15 @@ review_counts() { # run-state file · subject -> the blocker counts, in order
       item = substr(rest, 1, j - 1)
       if (item != subj) next
       reason = substr(rest, j + length(" · reason "))
-      if (match(reason, /blockers [0-9]+/))
-        printf "%s ", substr(reason, RSTART + 9, RLENGTH - 9)
+      if (kind == "fix-pass") {
+        if (match(reason, /^reds [0-9]+/)) printf "%s ", substr(reason, RSTART + 5, RLENGTH - 5) + 0
+        next
+      }
+      if (match(reason, /blockers [0-9]+/)) {
+        c = substr(reason, RSTART + 9, RLENGTH - 9) + 0
+        if (match(reason, / · round-highs [0-9]+/)) { h = substr(reason, RSTART, RLENGTH); sub(/^.* /, "", h); c += h }
+        printf "%s ", c
+      }
     }' "$1"
 }
 
@@ -13000,6 +13485,7 @@ review_counts() { # run-state file · subject -> the blocker counts, in order
 review_exit_note() { # disposition -> the sentence
   case "$1" in
     promote|closing) _exitnote="every finding confirmed at this exit is PROMOTED to a unit of this build: one per BLOCKER and HIGH, and the MEDIUMs and LOWs batched into one unit, two only across disjoint write sets. Not folded, not parked, not waived, not re-reviewed" ;;
+    closing-asks) _exitnote="the rework budget is spent, so every finding confirmed at this exit is PROMOTED to an ask in the build's backlog, never a unit: one per BLOCKER and HIGH, and the MEDIUMs and LOWs batched into one. Not folded, not parked, not waived, not re-reviewed" ;;
     spec-fold) _exitnote="every finding confirmed at this exit FOLDS into the spec it names, rev bumped, and none needs a new mechanism" ;;
     spec-promote) _exitnote="a finding that needs a new mechanism is PROMOTED to a unit of this build, a BLOCKER or HIGH to its own, the MEDIUMs and LOWs batched into one unit or two across disjoint write sets, and every other finding FOLDS into the spec it names" ;;
     *)       _exitnote="NO DISPOSITION WAS RECORDED, which the state gate should have refused before this line could print" ;;
@@ -13119,8 +13605,37 @@ check_exit_fold() { # state · review kind · disposition -> 1 on a fold the exi
   return 1
 }
 
-verb_review() { # slug · subject · verdict · blockers · disposition · highs · minors · folded · promoted
-  local slug="$1" subj="$2" verdict="$3" blockers="$4" disposition="${5:-}" highs="${6:-}" minors="${7:-}" folded="${8:-}" promoted="${9:-}" rel prior state note disp bound counts owe exitnote rkind rround rexit route dby dword
+# A SUBJECT WHOSE REVIEW LOOP ENDED (TOOL-dDeclaredLoop-20 S2): the pipeline `verb_review` ran inline, lifted
+# unchanged at its second caller, `--trigger`. It answers a status and refuses nothing, so each caller spells its
+# own `fail 37`, which check-arms finds by its literal number. Scoped to `review` rows and the REASON field, the
+# subject compared with -F: the reasons are beside `verb_review`'s call.
+check_review_ended() { # run-state file · subject -> 0 where the subject's review rows carry a terminal round
+  grep -E '^[0-9][0-9-]*T[0-9:]*Z review · item ' "$1" 2>/dev/null      | grep -F -- " · item $2 · reason "      | sed 's/.* · reason //'      | grep -qE '(CONVERGED|NON-CONVERGENT|CEILING|BOUNDED)'
+}
+
+# THE OWED UNIT COUNT BY `review.findings` (TOOL-dDeclaredLoop-20 S4), the integer both of `verb_review`'s owe
+# sites print and check 2 grades from the row's ` · findings` field. `b h m f p` are the exit's blockers, highs,
+# minors, folded and promoted; the rule is `old`, or `counted`/`folds` with `promoted` above 0. Under the default,
+# `blocker-high-own`, the two expressions are today's: one unit per blocker and high, the minors batched.
+derive_owed_units() { # value · rule · b · h · m · f · p -> prints the owed count
+  local v="$1" b="$3" h="$4" m="$5" f="$6" p="$7"
+  if [ "$2" = old ]; then
+    case "$v" in
+      all-own)     echo $(( b + h + m )) ;;
+      blocker-own) echo $(( b + (h + m > 0 ? 1 : 0) )) ;;
+      *)           echo $(( b + h + (m > 0 ? 1 : 0) )) ;;
+    esac
+  else
+    case "$v" in
+      all-own)     echo $(( p )) ;;
+      blocker-own) echo $(( b > f ? b - f + (h + m > 0 ? 1 : 0) : 1 )) ;;
+      *)           echo $(( b + h > f ? b + h - f + (m > 0 ? 1 : 0) : 1 )) ;;
+    esac
+  fi
+}
+
+verb_review() { # slug · subject · verdict · blockers · disposition · highs · minors · folded · promoted · round-highs · round-minors
+  local slug="$1" subj="$2" verdict="$3" blockers="$4" disposition="${5:-}" highs="${6:-}" minors="${7:-}" folded="${8:-}" promoted="${9:-}" rhighs="${10:-}" rminors="${11:-}" rel prior state note disp bound bkey counts owe exitnote rkind rround rexit route dby dword rcount rtarget rroute rnofall rfields tgt ffield owhy
   check_slug "$slug" || return 1
   runmd_of "$slug" >/dev/null; rel=$_runmd
   check_run_state "$rel" "run to record a review round against" || return 1
@@ -13158,8 +13673,10 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   # while check 2's awk reads the same row field as decimal. A canonical decimal of at most nine
   # digits is the one spelling both read alike, so anything else is refused before either does. The
   # `*[!0-9]*` alternative only --folded and --promoted can reach, the other three being refused above,
-  # and they join this site rather than adding one, because the census stands at its ceiling.
-  for _rv_n in "blockers $blockers" "highs $highs" "minors $minors" "folded $folded" "promoted $promoted"; do
+  # and they join this site rather than adding one, because the census stands at its ceiling. THIS
+  # round's `--round-highs` and `--round-minors` join it too (TOOL-dDeclaredLoop-32 §8 F6), optional on
+  # every round of every subject: an absent one reads 0, so a round recorded without them reads as today.
+  for _rv_n in "blockers $blockers" "highs $highs" "minors $minors" "folded $folded" "promoted $promoted" "round-highs $rhighs" "round-minors $rminors"; do
     _rv_flag=${_rv_n%% *}
     case "${_rv_n#* }" in
       0[0-9]*|??????????*|*[!0-9]*) fail 37 "--review requires --$_rv_flag as a decimal of at most nine digits with no leading zero, because bash arithmetic reads a leading zero as octal and check 2 reads the row as decimal: ${_rv_n#* }"; return 1 ;;
@@ -13218,18 +13735,40 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   # subject comparison so the subject is never a pattern.
   # ONE SUBJECT STILL TAKES NO FURTHER ROUND under either rule, and the route names the rule that
   # applied: a chain's later round is a fresh subject `<slug>-spec-set-r<N>`, never this one again.
-  if grep -E '^[0-9][0-9-]*T[0-9:]*Z review · item ' "$rel" 2>/dev/null      | grep -F -- " · item $subj · reason "      | sed 's/.* · reason //'      | grep -qE '(CONVERGED|NON-CONVERGENT|CEILING|BOUNDED)'; then
+  # The predicate is `check_review_ended`'s, lifted at its second caller, `--trigger` (TOOL-dDeclaredLoop-20).
+  if check_review_ended "$rel" "$subj"; then
     read_spec_exit_rule "$rel" "$slug" "$subj"
     route="is DISPOSED under the build method's M4 by the severity rule, and never re-rounded"
     [ "$_se_rule" != folds ] || route="is DISPOSED under the build method's M4 by its nature, through the chain's next subject, and never re-rounded"
     fail 37 "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now $route: $subj"
     return 1
   fi
-  # THE BOUND IS THE SUBJECT'S. The closing diff review's subject IS the build slug and keeps the
-  # ceiling, so it converges or backstops exactly as before; every other subject is a spec audit and
-  # takes the declared REVIEW_ROUNDS. The same equality `review_last_reason` and the --close term make.
-  bound=$RUNAWAY_CEILING; [ "$subj" = "$slug" ] || bound=$REVIEW_ROUNDS
-  state=$(review_state "$prior" "$blockers" "$bound")
+  # THE BOUND IS THE SUBJECT'S (TOOL-dDeclaredLoop-21). The closing diff review's subject IS the build
+  # slug and takes the closing bound; every other subject is a spec audit and takes the spec bound; both,
+  # and the ceiling past which a round reads CEILING, are the policy keys `load_review_bounds` reads. The
+  # same equality `review_last_reason` and the --close term make. A bound that does not read records nothing.
+  if ! load_review_bounds; then
+    fail 37 "the review bounds do not read, so this round cannot be bounded and nothing is recorded: $_rb_why"
+    return 1
+  fi
+  # THE COUNT IS BLOCKERS PLUS THIS ROUND'S HIGHS, AND EACH SUBJECT HAS ITS TARGET (TOOL-dDeclaredLoop-32).
+  # The build slug's loop takes `flow.route-backs` and the strict-fall rule; a spec subject takes neither,
+  # its loop ending at its target or its bound (`no-fall`). The target word's count is `blockers`,
+  # `highs` (plus round-highs) or `all` (plus round-minors too), the map review_bounds.py derives it by.
+  rcount=$(( blockers + ${rhighs:-0} ))
+  if [ "$subj" = "$slug" ]; then
+    bound=$CLOSING_BOUND; bkey=review.max-rounds; [ "$FOLLOW_UP" != never ] || bkey="review.follow-up never"
+    rtarget=$CLOSING_TARGET; rroute=$ROUTE_BACKS; rnofall=""
+  else
+    bound=$SPEC_BOUND; bkey=review.design.rounds
+    rtarget=$SPEC_TARGET; rroute=""; rnofall=no-fall
+  fi
+  case "$rtarget" in
+    highs) rtarget=$rcount ;;
+    all)   rtarget=$(( rcount + ${rminors:-0} )) ;;
+    *)     rtarget=$blockers ;;
+  esac
+  state=$(review_state "$prior" "$rcount" "$bound" "$rroute" "$rtarget" "$rnofall")
   check_spec_exit "$rel" "$slug" "$subj" "$state" "$blockers" "$disposition" "$highs" "$minors" "$folded" "$promoted" || return 1
   # THE STATE GATE. Keyed on the COMPUTED state and never on --verdict, whose closed set holds none
   # of the state tokens. A terminal exit must say which disposition it took: M4 disposes by
@@ -13238,8 +13777,9 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   # though it had promoted. TOOL-dBriefedPass-9 measured that.
   #
   # THE FIELD'S LEGAL SET FOLLOWS THE EXIT'S RULE AT BOTH ENDS (closing review of aProbedUnit, cluster
-  # C). `review_state` returns CONVERGED for count 0 unconditionally, so every NON-CONVERGENT, CEILING or
-  # BOUNDED exit stands on at least one BLOCKER. Under the severity rule, every subject but a spec audit
+  # C). `review_state` returns CONVERGED for a target count of 0 unconditionally, so every NON-CONVERGENT,
+  # CEILING or BOUNDED exit stands on a target count above zero (TOOL-dDeclaredLoop-32), which may hold no
+  # BLOCKER. Under the severity rule, every subject but a spec audit
   # under `folds`, every blocker is promoted: `fold` cannot be that exit's disposition, and accepting it
   # wrote `blockers 3 · disposition fold`, a row the gate read as demanding nothing. Under `folds` a
   # LOCAL blocker folds and `check_spec_exit` has derived the value, so an absent one is its row 3 or
@@ -13272,8 +13812,8 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   # promoted minors one. A fold spent on a major lowers the first term and cannot also leave no minor, so
   # past the folds' reach the minors still owe their one, and inside it one unit stands for all
   # (TOOL-dFoldedAudit-15 S2). Under `counted` `folded` is 0, so this is the severity rule's own count.
-  # BOUNDED is reachable on a spec subject only: the slug's bound is the ceiling, which `review_state`
-  # tests first.
+  # BOUNDED is reachable on either subject: each takes its own bound, the ceiling one round past it
+  # (TOOL-dDeclaredLoop-21).
   counts=""; owe=0
   # THE WORD NAMES THE RULE THAT APPLIED (TOOL-dFoldedAudit-15 S3): under `folds` a finding may fold, so
   # `promoted` would be false. The `exits <state>` clause never moves, because a harness's bare first
@@ -13288,7 +13828,7 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
       check_exit_fold "$state" "$rkind" "$disposition" || return 1
       counts=" · highs $highs · minors $minors"
       if [ "$_se_rule" = old ]; then
-        owe=$(( blockers + highs + (minors > 0 ? 1 : 0) ))
+        owe=$(derive_owed_units "$FINDINGS" old "$blockers" "$highs" "$minors" 0 0)
         if [ "$owe" -gt 0 ] && [ "$disposition" != promote ]; then
           fail 37 "--review exits $state on $rkind with $blockers blocker(s), $highs high(s) and $minors minor(s) standing, and requires --disposition promote, because every confirmed finding there is promoted"
           return 1
@@ -13299,7 +13839,7 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
         fi
       else
         counts="$counts · folded $folded · promoted $promoted"
-        [ "$promoted" -le 0 ] || owe=$(( blockers + highs > folded ? blockers + highs - folded + (minors > 0 ? 1 : 0) : 1 ))
+        [ "$promoted" -le 0 ] || owe=$(derive_owed_units "$FINDINGS" "$_se_rule" "$blockers" "$highs" "$minors" "$folded" "$promoted")
       fi ;;
     *)
       if [ -n "$highs$minors" ]; then
@@ -13317,11 +13857,57 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   # the count. No new field, no new grammar, no new authored fact: an append-only history of rounds is
   # what a park KIND is for, and the sibling unit takes the FACT route for a per-run singleton instead.
   disp=""; [ -n "$disposition" ] && disp=" · disposition $disposition"
+  # THE REWORK BUDGET (TOOL-dDeclaredLoop-30): every round of a subject after its first, and the first round
+  # of a spec-set generation after the first, draws `review-round`, after every refusal above and before its
+  # row, so a refused round spends nothing and a first round calls nothing. A spec subject's `exhausted`,
+  # exit 3, records its round all the same, which ends at its target or its bound; any other answer but
+  # drawn refuses the round.
+  local _rv_gen=0
+  case "$subj" in "$slug"-spec-set-r[0-9]*) _rv_gen=${subj##*-spec-set-r} ;; esac
+  case "$_rv_gen" in ""|*[!0-9]*|??????????*) _rv_gen=0 ;; esac
+  # THE PROMOTION TARGET (TOOL-dDeclaredLoop-32 S4): an exit recording `disposition promote` says where its
+  # findings go. On the build slug it is `budget.py target`'s answer read AFTER the round's draw, `unit`
+  # writing ` · to units` and `on-exhausted` ` · to asks`; a spec subject's is always ` · to units`, with no
+  # call. Both answers feed one `_bd_rc`, so either refusal reaches the one relay below.
+  _bd_rc=0; _bd_why=""; tgt=""
+  if [ -n "${prior//[[:space:]]/}" ] || [ "$((10#$_rv_gen))" -gt 1 ]; then
+    run_budget_draw "$slug" review-round "$subj"
+    [ "$_bd_rc" -ne 3 ] || [ "$subj" = "$slug" ] || _bd_rc=0
+  fi
+  if [ "$disposition" = promote ] && [ "$_bd_rc" -eq 0 ]; then
+    if [ "$subj" != "$slug" ]; then
+      tgt=" · to units"
+    else
+      run_budget_verb target "--build=$slug" "--item=$subj"
+      case "$_bd_rc:${_bd_why##* · }" in
+        0:unit) tgt=" · to units" ;;
+        0:on-exhausted) tgt=" · to asks" ;;
+        0:*) _bd_rc=2 ;;
+      esac
+    fi
+  fi
+  if [ "$_bd_rc" -ne 0 ]; then
+    fail 37 "the rework budget refused this review round, so no round is recorded: $_bd_why"
+    return 1
+  fi
+  rfields=""
+  [ -z "$rhighs" ] || rfields=" · round-highs $rhighs"
+  [ -z "$rminors" ] || rfields="$rfields · round-minors $rminors"
+  # THE COUNT'S RULE RIDES A TERMINAL ROW (TOOL-dDeclaredLoop-20 S4) where `review.findings` is not the default,
+  # after the counts and before ` · to <target>`, so check 2's ` · to asks · disposition ` match and its
+  # last-field disposition read keep their positions; an absent field reads the default.
+  ffield=""; owhy="one per blocker and high plus one for the minors when any stood"
+  case "$FINDINGS" in
+    all-own)     owhy="one per confirmed finding" ;;
+    blocker-own) owhy="one per blocker plus one for the highs and minors when any stood" ;;
+  esac
+  [ -z "$counts" ] || [ "$FINDINGS" = "$REVIEW_FINDINGS_DEFAULT" ] || ffield=" · findings $FINDINGS"
   # THE COUNTS SIT BEFORE THE DISPOSITION: check 2 reads the disposition as the LAST ` · ` field.
-  park "$rel" review "$subj" "verdict $verdict · blockers $blockers$note$counts$disp" || return 1
+  park "$rel" review "$subj" "verdict $verdict · blockers $blockers$rfields$note$counts$ffield$tgt$disp" || return 1
   stage_or_fail "$rel" || return 1
   exitnote=$(review_exit_note "$disposition")
-  [ -n "$counts" ] && [ "$disposition" = promote ] && exitnote="$(review_exit_note closing); this exit owes at least $owe new unit(s), one per blocker and high plus one for the minors when any stood"
+  [ -n "$counts" ] && [ "$disposition" = promote ] && exitnote="$(review_exit_note closing); this exit owes at least $owe new unit(s), $owhy"
+  [ "$tgt" != " · to asks" ] || exitnote="$(review_exit_note closing-asks); this exit owes at least $owe new ask(s), $owhy"
   dby=SEVERITY
   if [ "$_se_rule" = folds ]; then
     dby=NATURE
@@ -13337,13 +13923,309 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
                       echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers 0 · CONVERGED$counts — the loop is done for this subject"
                     fi ;;
     NON-CONVERGENT) echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · NON-CONVERGENT$counts · disposition $disposition — the count did not shrink, so the loop STOPS here and $exitnote" ;;
-    CEILING)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · CEILING$counts · disposition $disposition — the runaway backstop fired at $RUNAWAY_CEILING rounds and THE CONVERGENCE PREDICATE DID NOT TERMINATE, which is a defect in the predicate rather than a routine outcome. The run lands anyway and $exitnote; record this in the build README, because a fact that lives only in a transcript is a fact nobody reads" ;;
-    BOUNDED)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · BOUNDED$counts · disposition $disposition — the declared round bound of $REVIEW_ROUNDS is reached, so the loop STOPS here and every CONFIRMED finding is DISPOSED BY $dby: $exitnote" ;;
+    CEILING)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · CEILING$counts · disposition $disposition — the backstop review.max-rounds of $MAX_ROUNDS round(s) was passed and THE CONVERGENCE PREDICATE DID NOT TERMINATE, which is a defect in the predicate rather than a routine outcome. The run lands anyway and $exitnote; record this in the build README, because a fact that lives only in a transcript is a fact nobody reads" ;;
+    BOUNDED)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · BOUNDED$counts · disposition $disposition — the declared round bound of $bound is reached (the key $bkey), so the loop STOPS here and every CONFIRMED finding is DISPOSED BY $dby: $exitnote" ;;
     *)              if [ -z "${prior//[[:space:]]/}" ]; then
                       echo "unattended: review $subj · round 1 · $verdict · blockers $blockers · CONVERGING — the first round for a subject has no predecessor to shrink against, so the loop arms"
                     else
                       echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · CONVERGING — smaller than the round before it, so the loop may re-arm"
                     fi ;;
+  esac
+  return 0
+}
+
+# THE REVIEW TRIGGER (TOOL-dDeclaredLoop-20 S2), `review.trigger`:
+#
+#   --trigger <slug> --subject <s> --cause owed|opt-in|recommendation|placement [--pin <path>]...
+#
+# fires one review and prints what its call takes, so no caller types a pin value. It refuses a cause outside
+# TRIGGER_CAUSES and a subject whose loop already ended, by `check_review_ended`, `verb_review`'s predicate.
+# It reads the four `review.dispose` keys through `load_review_bounds` and the five pin values through
+# `review_bounds.py pin`; with a `--pin`, it runs the workflows kit's `review_pin.py` with one `--subject` per
+# path and those flags and prints each line it prints with `trigger` and `reviewPolicy` added; with none, a
+# diff review's call, one line of `unclassed`, `twin`, `trigger` and `reviewPolicy`. `blocks` folds
+# `review.blocks` and the cause: `yes` under every-review, under owed-only when the cause is owed, else `no`.
+# The three reads that can refuse share one relay through `_tr_why`. It WRITES NO ROW: a non-round `review`
+# row would become the subject's last reason and hide its terminal token from `review_last_reason`.
+run_trigger() { # slug · subject · cause · pin path...
+  local slug="$1" subj="$2" cause="$3" rel _tr_why="" _tr_ok="" _tr_flags="" _tr_out="" _tr_d _tr_r _tr_unc="" _tr_twin="" _tr_bl _tr_pol _tr_p
+  local -a _tr_pins=() _tr_args=()
+  shift 3 2>/dev/null || shift $#
+  _tr_pins=("$@")
+  check_slug "$slug" || return 1
+  runmd_of "$slug" >/dev/null; rel=$_runmd
+  check_run_state "$rel" "run to fire a review trigger against" || return 1
+  refuse_if_terminal "$rel" --trigger || return 1
+  check_verb_flag --trigger --subject "$subj" || return 1
+  check_verb_flag --trigger --cause "$cause" || return 1
+  case "$cause" in *[!a-z-]*) ;; *) case " $TRIGGER_CAUSES " in *" $cause "*) _tr_ok=1 ;; esac ;; esac
+  if [ -z "$_tr_ok" ]; then
+    fail 37 "--trigger names a cause outside the closed set, so no review is fired; legal causes: $TRIGGER_CAUSES, and the call named $cause"
+    return 1
+  fi
+  if check_review_ended "$rel" "$subj"; then
+    fail 37 "--trigger takes no subject whose review loop already ended, because its findings went where the terminal round disposed them and the review is never fired again: $subj"
+    return 1
+  fi
+  # THE THREE READS, ONE RELAY: the bounds, the pin flags, then the pin itself where a path was named.
+  if ! load_review_bounds; then
+    _tr_why=$_rb_why
+  elif [ -z "$PE_PATH" ]; then
+    _tr_why="the loop kit's review_bounds.py does not resolve beside this kit, so no pin value is read"
+  elif ! _tr_flags=$("$PE_PY" "$PE_PATH" pin 2>&1); then
+    _tr_why=$_tr_flags
+  else
+    _tr_flags=${_tr_flags//$'\r'/}
+    read -r -a _tr_args <<<"$_tr_flags"
+    for (( _tr_p = 0; _tr_p + 1 < ${#_tr_args[@]}; _tr_p += 2 )); do
+      case "${_tr_args[_tr_p]}" in
+        --unclassed) _tr_unc=${_tr_args[_tr_p + 1]} ;;
+        --twin)      _tr_twin=${_tr_args[_tr_p + 1]} ;;
+      esac
+    done
+    if [ ${#_tr_pins[@]} -gt 0 ]; then
+      _tr_d=$(resolve_kit_dir "$PE_PY" workflows review_pin.py "$KIT_DIR" 2>/dev/null) || _tr_d=""
+      _tr_r=$KIT_DIR
+      while [ -n "$_tr_r" ] && [ ! -e "$_tr_r/.git" ]; do _tr_r=${_tr_r%/*}; done
+      if [ -z "$_tr_d" ]; then
+        _tr_why="the workflows kit's review_pin.py does not resolve beside this kit, so no subject is pinned"
+      else
+        for _tr_p in "${_tr_pins[@]}"; do _tr_args+=(--subject "$_tr_p"); done
+        _tr_out=$("$PE_PY" "${_tr_r:-.}/$_tr_d/review_pin.py" "${_tr_args[@]}" 2>&1) || _tr_why=$_tr_out
+      fi
+    fi
+  fi
+  _tr_why=${_tr_why%%$'\n'*}
+  if [ -n "$_tr_why" ]; then
+    fail 37 "--trigger cannot read the review policy or the pin, so no review is fired: $_tr_why"
+    return 1
+  fi
+  _tr_bl=no
+  case "$BLOCKS" in
+    every-review) _tr_bl=yes ;;
+    owed-only) [ "$cause" != owed ] || _tr_bl=yes ;;
+  esac
+  _tr_pol="\"trigger\": \"$cause\", \"reviewPolicy\": {\"findings\": \"$FINDINGS\", \"unverified\": \"$UNVERIFIED\", \"leftShift\": \"$LEFT_SHIFT\", \"blocks\": \"$_tr_bl\"}}"
+  if [ ${#_tr_pins[@]} -eq 0 ]; then
+    printf '{"unclassed": "%s", "twin": "%s", %s\n' "$_tr_unc" "$_tr_twin" "$_tr_pol"
+    return 0
+  fi
+  # A pin line is `json.dumps` output, so the two fields go before its closing brace.
+  local -a _tr_lines
+  mapfile -t _tr_lines <<<"$_tr_out"
+  for _tr_p in "${_tr_lines[@]}"; do
+    _tr_p=${_tr_p%$'\r'}
+    case "$_tr_p" in *"}") printf '%s, %s\n' "${_tr_p%\}}" "$_tr_pol" ;; esac
+  done
+  return 0
+}
+
+# THE STAGE-EXIT RECOMMENDATION (TOOL-dDeclaredLoop-22 S3, S4), `item.<stage>.recommend` and `.reason`:
+#
+#   --recommend <slug> --stage <s> [--reason <text> --verdict review|no-review]
+#
+# The SCORE form reads `review.recommendation` and `review.recommendation.source` through the policy kit's
+# `policy.py get`, each key spelled whole on its own line as `read_spec_audit_switch` spells its keys,
+# scores the stage from `derive_review_signals` (`unarmed` where the stage has no signal source, `none` for
+# Design under `agent-judgment`, else `review` on any signal and `no-review` on none) and binds it (`no`
+# under `advice`, `yes` under `binding`, under `binding-above-tier` `yes` where a row reads Tier 2). It writes
+# a score record through the record factory's `new recommendation` door under the build's anchor unit and
+# stages it; a build with no unit gets the score line and no record. The REASON form, Design's alone, writes
+# the role's answer as a reason record answering the stage's newest score record. Under `signals-only`, and
+# for every stage but Design, the score record decides; for Design under the other two sources the reason
+# record does. Where the deciding record reads `review` and binds, it prints the `--trigger` line. One `fail
+# 37` refuses every shape; a second relays the policy reader's or the factory's refusal, or names the kit
+# that did not resolve (§8 F7). It needs no run-state file and writes no row.
+run_recommend() { # slug · stage · reason · verdict
+  local slug="$1" stage="$2" reason="$3" verdict="$4" py="" d="" kr _rc_rec="" _rc_src="" _rc_why="" _rc_shape=""
+  local score binds="no" role=command rtext signals answers="" decides="" subj rel _rc_f _rc_n _rc_top=0 _rc_l _rc_st _rc_sg
+  local -a _rc_lines=() _rc_args=()
+  check_slug "$slug" || return 1
+  check_verb_flag --recommend --stage "$stage" || return 1
+  load_fork_cutoff || return 1
+  kr=$KIT_DIR
+  while [ -n "$kr" ] && [ ! -e "$kr/.git" ]; do kr=${kr%/*}; done
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! d=$(resolve_kit_dir "$py" policy policy.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
+    _rc_why="the policy kit does not resolve beside this kit, so review.recommendation and its source cannot be read"
+  elif ! _rc_rec=$("$py" "${kr:-.}/$d/policy.py" get review.recommendation 2>&1); then
+    _rc_why=$_rc_rec
+  elif ! _rc_src=$("$py" "${kr:-.}/$d/policy.py" get review.recommendation.source 2>&1); then
+    _rc_why=$_rc_src
+  fi
+  _rc_rec=${_rc_rec%$'\r'}; _rc_src=${_rc_src%$'\r'}
+  if [ -z "$_rc_why" ]; then
+    case "$_rc_rec" in
+      advice|binding|binding-above-tier) ;;
+      *) _rc_why="review.recommendation answered '$_rc_rec', outside advice, binding and binding-above-tier" ;;
+    esac
+    case "$_rc_src" in
+      scored-signals-and-reasoning|agent-judgment|signals-only) ;;
+      *) _rc_why="review.recommendation.source answered '$_rc_src', outside scored-signals-and-reasoning, agent-judgment and signals-only" ;;
+    esac
+  fi
+  if [ -z "$_rc_why" ]; then
+    case "$stage" in
+      plan|design|build|test|deploy) ;;
+      *) _rc_shape="--stage $stage is none of plan, design, build, test and deploy" ;;
+    esac
+    if [ -z "$_rc_shape" ] && { [ -n "$reason" ] || [ -n "$verdict" ]; }; then
+      if [ -z "$reason" ] || [ -z "$verdict" ]; then
+        _rc_shape="the reason form takes --reason and --verdict together"
+      elif [ "$verdict" != review ] && [ "$verdict" != no-review ]; then
+        _rc_shape="--verdict $verdict is neither review nor no-review"
+      elif [ "$stage" = plan ] || [ "$stage" = test ]; then
+        _rc_shape="--stage $stage takes no reason, because no role in this tree produces its work"
+      elif [ "$stage" != design ]; then
+        _rc_shape="--stage $stage takes no reason, because the stage has no single producing role"
+      elif [ "$_rc_src" = signals-only ]; then
+        _rc_shape="review.recommendation.source is signals-only, so the score record decides and no reason is recorded"
+      else
+        for _rc_f in "$M/builds/$slug/build/"*-recommendation-*.md; do
+          [ -f "$_rc_f" ] || continue
+          _rc_n=${_rc_f##*-recommendation-}; _rc_n=${_rc_n%.md}
+          case "$_rc_n" in ''|*[!0-9]*) continue ;; esac
+          _rc_st=""; _rc_sg=""
+          mapfile -t _rc_lines < "$_rc_f"
+          for _rc_l in ${_rc_lines[@]+"${_rc_lines[@]}"}; do
+            case "${_rc_l%$'\r'}" in
+              "- **Stage:** $stage") _rc_st=1 ;;
+              "- **Signals:** "*) _rc_sg=1 ;;
+            esac
+          done
+          if [ "$_rc_st$_rc_sg" = 11 ] && [ "$((10#$_rc_n))" -gt "$_rc_top" ]; then
+            _rc_top=$((10#$_rc_n)); answers=${_rc_f##*/}; answers=${answers%.md}
+          fi
+        done
+        [ -n "$answers" ] || _rc_shape="no score record of --stage $stage stands in this build for the reason to answer"
+      fi
+    fi
+    if [ -n "$_rc_shape" ]; then
+      fail 37 "--recommend refuses this call and writes no record: $_rc_shape"
+      return 1
+    fi
+  fi
+  if [ -z "$_rc_why" ]; then
+    derive_review_signals "$slug" "$stage"
+    case "$stage" in
+      plan|test|deploy) score=unarmed ;;
+      design) if [ "$_rc_src" = agent-judgment ]; then score=none; else score=${_rs_why:+review}; score=${score:-no-review}; fi ;;
+      *) score=${_rs_why:+review}; score=${score:-no-review} ;;
+    esac
+    case "$_rc_rec" in
+      binding) binds=yes ;;
+      binding-above-tier) [ -z "$_rs_tier2" ] || binds=yes ;;
+    esac
+    signals=${_rs_why:-none}; rtext=none
+    [ "$stage" != design ] || [ "$_rc_src" = signals-only ] || rtext=pending
+    if [ -n "$answers" ]; then
+      score=$verdict; role=gov-spec-writer; rtext=$reason; decides=1
+    elif [ "$rtext" = none ]; then
+      decides=1
+    fi
+    subj=$slug; [ "$stage" != design ] || subj=$slug-specs
+    if [ -z "$_rs_anchor" ]; then
+      echo "unattended: recommendation — $stage · $score · $signals · source $_rc_src · binds $binds · no record: the build's generated units region names no unit to anchor it"
+      return 0
+    fi
+    _rc_args=(--stage "$stage" --score "$score" --source "$_rc_src" --binds "$binds" --reason "$rtext" --role "$role")
+    if [ -n "$answers" ]; then _rc_args+=(--answers "$answers"); else _rc_args+=(--signals "$signals"); fi
+    if ! d=$(resolve_kit_dir "$py" memory-tree build_records.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
+      _rc_why="the memory-tree kit's build_records.py does not resolve beside this kit, so the record cannot be written"
+    else
+      run_bounded "$py" -B "${kr:-.}/$d/build_records.py" new recommendation --root . --build "$slug" --unit "$_rs_anchor" "${_rc_args[@]}"
+      rel=${RB_STDOUT#build-records: wrote }; rel=${rel%%$'\n'*}; rel=${rel%$'\r'}
+      case "$RB_STDOUT" in
+        "build-records: wrote "*) ;;
+        *) _rc_why=${RB_OUT:-the record factory printed nothing}; _rc_why=${_rc_why%%$'\n'*} ;;
+      esac
+    fi
+  fi
+  if [ -n "$_rc_why" ]; then
+    fail 37 "--recommend wrote no record, because the policy reader or the record factory refused or a kit did not resolve: $_rc_why"
+    return 1
+  fi
+  stage_runmd "$rel" || print_env_failure 37 "--recommend wrote a record git could not stage: $rel"
+  [ -z "$answers" ] || signals="answers $answers"
+  echo "unattended: recommendation — $stage · $score · $signals · source $_rc_src · binds $binds · $rel"
+  if [ -z "$decides" ]; then
+    echo "unattended: recommendation — a reason decides: spawn gov-spec-writer through handoff.py render --role gov-spec-writer, handed the line above and one question, should this be reviewed and why, then record its answer: unattended.sh --recommend $slug --stage $stage --reason <why> --verdict review|no-review"
+  elif [ "$score" = review ] && [ "$binds" = yes ]; then
+    echo "unattended: recommendation binds — unattended.sh --trigger $slug --subject $subj --cause recommendation"
+  fi
+  return 0
+}
+
+# THE FIX-PASS LOOP (TOOL-dDeclaredLoop-32 S5). `--fix-pass <slug> --unit <id> --reds <N>` records one fix
+# pass against a unit's acceptance, `<N>` its criteria still red after the pass, as a `fix-pass` row:
+#
+#   <ts> fix-pass · item <unit id> · reason reds <N>[ · <STATE>][ · to <target>]
+#
+# Its state is `review_state`'s over the unit's earlier `fix-pass` rows, the count and the target both the
+# reds, under `flow.route-backs` and the strict-fall rule, so an acceptance red that never greens records
+# `reds 1` twice and the second pass reads NON-CONVERGENT. A terminal pass with reds standing carries
+# ` · to units` or ` · to on-exhausted`, `budget.py target`'s answer as it stands, because an acceptance
+# red blocks its unit's step exit. It draws nothing: the dispatch before a pass draws it. `--reds` is the
+# count the builder's pass reports, as `--blockers` is, never a re-run.
+#
+# A unit whose last `fix-pass` row is terminal takes no further `--fix-pass` and no `--dispatch`: one
+# refusal site, `check_fix_pass_open`, called by both verbs.
+check_fix_pass_open() { # run-state file · unit -> 1 where the unit's last fix pass is terminal
+  local _fo_unit="$2" _fo_last
+  _fo_last=$(review_last_reason "$1" "$2" fix-pass)
+  case "$_fo_last" in
+    *CONVERGED*|*NON-CONVERGENT*|*CEILING*|*BOUNDED*) ;;
+    *) return 0 ;;
+  esac
+  fail 37 "--fix-pass and --dispatch take no unit whose fix-pass loop already ended, because a further pass would rewrite that history and its open work went where the terminal pass recorded: $_fo_unit, last pass $_fo_last"
+  return 1
+}
+
+run_fix_pass() { # slug · unit · reds
+  local slug="$1" unit="$2" reds="$3" rel prior state note tgt where n
+  check_slug "$slug" || return 1
+  runmd_of "$slug" >/dev/null; rel=$_runmd
+  check_run_state "$rel" "run to record a fix pass against" || return 1
+  refuse_if_terminal "$rel" --fix-pass || return 1
+  check_verb_flag --fix-pass --unit "$unit" || return 1
+  check_verb_flag --fix-pass --reds "$reds" || return 1
+  # ONE SITE FOR BOTH SHAPES. A unit `_ids_of` returns whole spells no line end, separator or bypass
+  # literal, so no field-shape refusal is owed; a reds count takes the canonical decimal `--review` holds.
+  if [ "$(printf '%s\n' "$unit" | _ids_of)" != "$unit" ] \
+     || case "$reds" in 0[0-9]*|??????????*|*[!0-9]*) true ;; *) false ;; esac; then
+    fail 37 "--fix-pass names a unit that is not id-shaped by the driver's own spelling, or a reds count that is no decimal of at most nine digits with no leading zero, so no fix pass is recorded: $unit, reds $reds"
+    return 1
+  fi
+  check_fix_pass_open "$rel" "$unit" || return 1
+  prior=$(review_counts "$rel" "$unit" fix-pass)
+  _bd_rc=0; _bd_why=""; tgt=""
+  if load_review_bounds; then
+    state=$(review_state "$prior" "$reds" "" "$ROUTE_BACKS" "$reds" "")
+    case "$state" in
+      NON-CONVERGENT|CEILING|BOUNDED)
+        run_budget_verb target "--build=$slug" "--item=$unit"
+        case "$_bd_rc:${_bd_why##* · }" in
+          0:unit) tgt=" · to units" ;;
+          0:on-exhausted) tgt=" · to on-exhausted" ;;
+          0:*) _bd_rc=2 ;;
+        esac ;;
+    esac
+  else
+    _bd_rc=1; _bd_why=$_rb_why
+  fi
+  if [ "$_bd_rc" -ne 0 ]; then
+    fail 37 "--fix-pass cannot read the review bounds or the rework budget's promotion target, so no fix pass is recorded: $_bd_why"
+    return 1
+  fi
+  note=""; [ "$state" = CONVERGING ] || note=" · $state"
+  park "$rel" fix-pass "$unit" "reds $reds$note$tgt" || return 1
+  stage_or_fail "$rel" || return 1
+  n=$(( $(printf '%s' "$prior" | wc -w) + 1 ))
+  where="to a unit of this build"; [ "$tgt" != " · to on-exhausted" ] || where="to the ending flow.on-exhausted names, the rework budget being spent"
+  case "$state" in
+    CONVERGED)  echo "unattended: fix-pass $unit · pass $n · reds 0 · CONVERGED — the unit's acceptance is green, so its fix-pass loop is done" ;;
+    CONVERGING) echo "unattended: fix-pass $unit · pass $n · reds $reds · CONVERGING — another fix pass may run" ;;
+    *)          echo "unattended: fix-pass $unit · pass $n · reds $reds · $state$tgt — the loop STOPS here: the reds did not fall, passed flow.route-backs of $ROUTE_BACKS, or reached review.max-rounds of $MAX_ROUNDS, and the unit's open work goes $where" ;;
   esac
   return 0
 }
@@ -13416,6 +14298,23 @@ PARKED
 # because of a recorded defect, and the STEP is a third place every one of them can be broken: a
 # newline forges a row, the separator makes the row unparseable by the check that grades it, and the
 # bypass flag reds the bar on a record no verb can rewrite.
+# TOOL-dDeclaredLoop-14 - THE THREE FIELD GUARDS, ONCE. `--refused` writes the step field too, with the
+# instance key in it, so at their second user the guards moved here whole, each keeping its test and
+# its check number; the message says "an item" because two verbs print it.
+check_step_fields() { # item · step · reason -> 0 when all three are one-line, separator-free and bypass-free, else check 48 and 1
+  local item="$1" step="$2" reason="$3"
+  if [ "$(printf '%s' "$reason$item$step" | wc -l)" -ne 0 ]; then
+    fail 48 "an item, step or reason contains a newline, and park() appends ONE line that the gate parses line-wise, so this would forge a second parked row nothing wrote"; return 1
+  fi
+  # ITEM AND STEP, not the reason. The reason is the LINE-FINAL field and can hold anything; these
+  # two are read back as the tokens between the separators, so either one spelling a separator makes
+  # its own record unparseable - by the very check that reads it.
+  case "$item$step" in *" · "*) fail 48 "an item or step spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it: $item at step $step"; return 1 ;; esac
+  if [ -n "$BYPASS_BAN" ] && printf '%s%s%s' "$item" "$step" "$reason" | grep -qF -- "$BYPASS_BAN"; then
+    fail 48 "an item, step or reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag: $BYPASS_BAN"; return 1
+  fi
+  return 0
+}
 verb_propose() { # slug · item · step · reason
   local slug="$1" item="$2" step="$3" reason="$4" rel want pl
   check_slug "$slug" || return 1
@@ -13424,16 +14323,7 @@ verb_propose() { # slug · item · step · reason
   check_verb_flag --propose --item "$item" || return 1
   check_verb_flag --propose --step "$step" || return 1
   check_verb_flag --propose --reason "$reason" || return 1
-  if [ "$(printf '%s' "$reason$item$step" | wc -l)" -ne 0 ]; then
-    fail 48 "a proposed item, step or reason contains a newline, and park() appends ONE line that the gate parses line-wise, so this would forge a second parked row nothing wrote"; return 1
-  fi
-  # ITEM AND STEP, not the reason. The reason is the LINE-FINAL field and can hold anything; these
-  # two are read back as the tokens between the separators, so either one spelling a separator makes
-  # its own record unparseable - by the very check that reads it.
-  case "$item$step" in *" · "*) fail 48 "a proposed item or step spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it: $item at step $step"; return 1 ;; esac
-  if [ -n "$BYPASS_BAN" ] && printf '%s%s%s' "$item" "$step" "$reason" | grep -qF -- "$BYPASS_BAN"; then
-    fail 48 "a proposed item, step or reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag: $BYPASS_BAN"; return 1
-  fi
+  check_step_fields "$item" "$step" "$reason" || return 1
   refuse_if_terminal "$rel" --propose || return 1
   # EXACT LINE COMPARE, for verb_park's recorded reason: the reason is line-final, so a `grep -qF`
   # matched any row whose reason merely STARTS with this one, and the verb then reported success
@@ -13449,6 +14339,49 @@ PROPOSED
   park "$rel" proposal "$item" "$reason" "$step" || return 1
   stage_or_fail "$rel" || return 1
   echo "unattended: proposal recorded against step $step — $item"
+  return 0
+}
+
+# TOOL-dDeclaredLoop-14 - THE DEFAULT FAILURE ROUTE'S RECORD. A refused item was a `fail N` line and a
+# number in the machine-local run log, routed nowhere. `--refused` writes it where history reads it, a
+# `refusal` row through park() with the item's instance key in the step field, and `--plan` then
+# prints the frontier beneath `next:`, the refused instance still on it. A `history` kind, in
+# PARK_KINDS and not in the owed set: nothing blocks on it and the owner is asked nothing.
+# THE ENGINE DECIDES WHAT MAY BE RECORDED: `position.py --check-refusal` holds a tag the composition
+# declares at a key of `derive_instance_key`'s shape, and every other answer, the engine unresolved
+# included, is the ONE refusal below, so an unarmed check records nothing.
+write_refusal() { # slug · item tag · instance key · reason
+  local slug="$1" item="$2" key="$3" reason="$4" rel want pl _out _rc _why
+  check_slug "$slug" || return 1
+  runmd_of "$slug" >/dev/null; rel=$_runmd
+  check_run_state "$rel" "run to record a refusal against" || return 1
+  check_verb_flag --refused --item "$item" || return 1
+  check_verb_flag --refused --key "$key" || return 1
+  check_verb_flag --refused --reason "$reason" || return 1
+  check_step_fields "$item" "$key" "$reason" || return 1
+  refuse_if_terminal "$rel" --refused || return 1
+  # EXACT LINE COMPARE, verb_propose's, read in this shell: the timestamp is the first token.
+  want="refusal · item $item · step $key · reason $reason"
+  while IFS= read -r pl || [ -n "$pl" ]; do
+    pl=${pl%$'\r'}
+    [ "${pl#* }" = "$want" ] || continue
+    echo "unattended: refusal already recorded, unchanged — $item at $key"
+    return 0
+  done < "$rel"
+  _why="the loop kit's position engine does not resolve beside this kit"
+  if resolve_position_engine; then
+    _out=$("$PE_PY" "$PE_PATH" --check-refusal "$item" "$key" 2>&1); _rc=$?
+    _why=${_out%%$'\n'*}; _why=${_why%$'\r'}
+    [ -n "$_why" ] || _why="the engine printed nothing and exited $_rc"
+  else
+    _rc=2
+  fi
+  if [ "$_rc" -ne 0 ]; then
+    fail 48 "the position engine did not hold this refusal, so nothing is recorded and the run-state file is unchanged: $_why"; return 1
+  fi
+  park "$rel" refusal "$item" "$reason" "$key" || return 1
+  stage_or_fail "$rel" || return 1
+  echo "unattended: refusal recorded against $key — $item"
   return 0
 }
 
@@ -13761,7 +14694,7 @@ verb_record_piece() { # slug · piece · leg · verdict
 }
 # TOOL-dFoldedAudit-5 - THE SPEC-AUDIT CHAIN'S RECORD AND ITS VERDICT. Each promotion is a fresh review
 # subject, so no `--review` row can say a chain is done: a row names no spec, an attended run writes
-# none, and `REVIEW_ROUNDS` bounds one subject and no chain of them. `--record-round` appends what a
+# none, and a round bound bounds one subject and no chain of them. `--record-round` appends what a
 # round audited and how it disposed to one tracked file under the build's `build/` folder, and
 # `--chain-verdict` derives CONTINUE, STOP or HOLD from that file and the roster alone. BOTH ANSWER WITH
 # NO RUN-STATE FILE, so an attended run takes the same route, and the verdict lives here and nowhere
@@ -13833,7 +14766,7 @@ check_chain_fold() { # unit · the row's rev, with `load_spec_facts` already rea
   return 1
 }
 # THE ROUND IS THE RECORD'S OWN ORDINAL, the last round plus one and never the harness's `round`: under
-# `REVIEW_ROUNDS` above 1 one generation spends several invocation rounds, which would burn the ceiling
+# a spec bound above 1 one generation spends several invocation rounds, which would burn the ceiling
 # faster than generations pass. `--subject` is the generation key, which is what refuses a replay.
 #
 # EVERY REFUSAL RUNS BEFORE ANY BYTE IS WRITTEN. These tokens reach a tracked record the verdict parses,
@@ -14179,11 +15112,40 @@ check_chain_dispatch() { # run-state file · slug -> 0 when the chain admits thi
 # THE ID SHAPE IS THE DRIVER'S OWN `_ids_of`, never the memory-tree kit's `id_pattern`: that is a
 # PYTHON function in a different kit, each kit is copy-installed standalone, and check 10's own
 # header records that an adopter may hold one and not the other.
-verb_rescope() { # slug · act · unit · successor · reason
-  local slug="$1" act="$2" unit="$3" succ="$4" reason="$5" rel want pl ids shaped _rs_bl
+verb_rescope() { # slug · act · unit · successor · reason · [flow row tag · row file]
+  local slug="$1" act="$2" unit="$3" succ="$4" reason="$5" flow="${6:-}" row="${7:-}" rel want pl ids shaped _rs_bl
+  local _fl_out _fl_rc _fl_why
   check_slug "$slug" || return 1
   runmd_of "$slug" >/dev/null; rel=$_runmd
   check_run_state "$rel" "run to record an amendment against" || return 1
+  # TOOL-dDeclaredLoop-28 - THE FLOW FORM, taken on --flow before the unit form's act case, whose case
+  # and row keep their bytes, so every reader anchored on ` rescope · item ` reads the same rows. A
+  # role proposes a change of its own build's flow; the loop kit's `adapt.py propose` makes every
+  # check of the proposal and writes its change record and its `rescope · flow` row, and this form is
+  # its adapter: the run-state, reason and terminal checks the unit form makes, then ONE refusal
+  # relaying the verb's first line, so the checks live once, in the loop kit.
+  if [ -n "$flow" ]; then
+    check_verb_flag --rescope --reason "$reason" || return 1
+    refuse_if_terminal "$rel" --rescope || return 1
+    # Each value JOINED to its flag, so one opening `-`, the bypass flag above all, is never read as a flag.
+    set -- propose "--build=$slug" "--flow=$flow" "--act=$act" "--item=$unit" "--reason=$reason"
+    [ -n "$row" ] && set -- "$@" "--row=$row"
+    [ -n "$BYPASS_BAN" ] && set -- "$@" "--ban=$BYPASS_BAN"
+    _fl_why="the loop kit's adapt.py does not resolve beside this kit"
+    if resolve_position_engine adapt.py; then
+      _fl_out=$("$PE_PY" "$PE_PATH" "$@" 2>&1); _fl_rc=$?
+      [ -n "$_fl_out" ] && printf '%s\n' "$_fl_out"
+      _fl_why=${_fl_out%%$'\n'*}; _fl_why=${_fl_why%$'\r'}
+      [ -n "$_fl_why" ] || _fl_why="the verb printed nothing and exited $_fl_rc"
+    else
+      _fl_rc=2
+    fi
+    if [ "$_fl_rc" -ne 0 ]; then
+      fail 48 "the loop kit refused this flow proposal, so nothing is recorded and the run-state file is unchanged: $_fl_why"; return 1
+    fi
+    stage_or_fail "$rel" || return 1
+    return 0
+  fi
   # CLOSED SET. A value outside it is a refusal and never a default: defaulting an unrecognised act
   # would let a typo select an amendment nobody asked for, which is the shape ANCHOR_SCOPE's own
   # value guard exists to avoid.
@@ -14406,7 +15368,7 @@ check_pass_open() { # grp · unit · run-state file · declared set (space-separ
 # WHAT IT DOES NOT CHECK: a `--no-verify` commit never reaches it, and `Pass: none` is taken at its
 # word. Check 23 still grades both at the close.
 check_commit_message() { # commit message file
-  local msg="$1" f rel="" ref slug trl subj rows r d o u decl graded st p q ok uncov uncovl briefs cmd kd head
+  local msg="$1" f rel="" ref slug trl subj rows r d o u decl graded st p q ok uncov uncovl briefs cmd kd head py
   [ -f "$msg" ] || { fail 49 "--check-commit was given no readable commit message file: ${msg:-(none)}"; return 1; }
   # It runs on EVERY commit, so the candidates are narrowed by one grep for this branch's ref before
   # the holder predicate, which reads the record's facts, confirms each.
@@ -14418,15 +15380,25 @@ check_commit_message() { # commit message file
   done
   [ -n "$rel" ] || return 0
   slug=${rel%/RUN.md}; slug=${slug##*/}
-  # READ AS THE CLOSE READS THEM (closing review r1, M2/L2): `%(trailers:key=Pass)` matches the key in
-  # any case, ids split on any character an id cannot hold, a `none` anywhere attributes the commit to
-  # nothing, and `%s` is the first PARAGRAPH joined, not its first line.
-  trl=$(git interpret-trailers --parse <"$msg" 2>/dev/null | sed -n 's/^[Pp][Aa][Ss][Ss]: *//p' | tr '\n' ' ')
-  trl=${trl//[^A-Za-z0-9-]/ }
-  # CR STRIPPED FIRST: the hook reads the editor's file before git's cleanup, and a CRLF blank line is
-  # `\r`, which is not blank to awk, so the paragraph never ended (closing review r2, M5). One awk and no
-  # `grep` stage: MSYS grep strips CR on its own, which hid this on one node and not on another.
-  subj=$(awk '{ sub(/\r$/, "") } /^#/ { next } NF { p = 1 } p && !NF { exit } p { printf "%s ", $0 }' "$msg")
+  # READ AS THE CLOSE READS THEM (closing review r1, M2/L2), by the kit's one trailer reader
+  # (TOOL-dDeclaredLoop-23 S5): the `message` verb of `commit_trailers.py` beside this script reads the
+  # `Pass:` key in any case with git's own trailer parse, splits ids on any character an id cannot
+  # hold, and takes the subject as the first PARAGRAPH joined, comment lines and CRs dropped, since the
+  # hook reads the editor's file before git's cleanup (closing review r2, M5). It prints ONE line:
+  # `PASSTRAILER <ids>` where the trailer holds a token, no id where a `none` is among them, else the
+  # subject's tokens. NO LAUNCHER, OR A READER THAT FAILS, GRADES NOTHING AND SAYS SO, status 2, never a
+  # pass: an unread message would read as carrying no trailer and naming no unit.
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! trl=$("$py" "$KIT_DIR/commit_trailers.py" message "$msg"); then
+    echo "unattended: --check-commit could not read this message's Pass: trailer, no python launcher resolved or the kit's commit_trailers.py failed, so it graded nothing"
+    return 2
+  fi
+  trl=${trl%$'\r'}; subj=""
+  case "$trl" in
+    PASSTRAILER) trl=none ;;
+    "PASSTRAILER "*) trl=${trl#PASSTRAILER } ;;
+    *) subj=$trl; trl="" ;;
+  esac
   # ONE LINE PER UNIT, `<o|O> <unit> <anchor> <declared paths>`, from the key holding the unit's LAST
   # row (the library's `current`), which is the window check 23 grades a commit made now in: a row at
   # a later anchor is a new pass, graded alone, and an earlier pass's paths do not carry into it
@@ -15256,6 +16228,8 @@ SIBS
   # holder and renewed when due, after every local refusal above and BEFORE the row is written:
   # another session's claim is check 108 and no row; a read or a write that does not complete is
   # announced and the dispatch goes on, as the holder's paths do offline.
+  # A unit whose fix-pass loop ended takes no further dispatch (TOOL-dDeclaredLoop-32 S5), above the claim.
+  check_fix_pass_open "$rel" "$unit" || return 1
   if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
     fact "$rel" keepalive >/dev/null; _dk=$_fact
     fact "$rel" session >/dev/null; check_claim_writable "$slug" holder "$_dk" "$_fact" "$_dk" "$rel"
@@ -15263,6 +16237,22 @@ SIBS
       1) return 1 ;;
       0) write_claim "$slug" live "$_dk" holder "$rel" || [ "$?" = 2 ] || return 1 ;;
     esac
+  fi
+  # THE REWORK BUDGET (TOOL-dDeclaredLoop-30): a unit dispatched again draws, after every refusal above and
+  # before its row, so a refused dispatch spends nothing: `re-dispatch` where its newest earlier dispatch row
+  # left no pass commit, read by `pass_commit`, and `fix-pass` where that pass committed. A first dispatch
+  # calls nothing, and any answer but drawn refuses the dispatch.
+  local _bd_last _bd_cause
+  _bd_last=$(grep -F -- " dispatch · item " "$rel" 2>/dev/null | grep -F -- " $unit · reason " | tail -n 1)
+  if [ -n "$_bd_last" ]; then
+    _bd_last=${_bd_last#* dispatch · item }; _bd_last=${_bd_last%% *}
+    _bd_cause=re-dispatch
+    [ -z "$(pass_commit "$_bd_last" "$unit" "$rel" || true)" ] || _bd_cause=fix-pass
+    run_budget_draw "$slug" "$_bd_cause" "$unit"
+    if [ "$_bd_rc" -ne 0 ]; then
+      fail 49 "the rework budget refused this dispatch, so no dispatch is recorded: $_bd_why"
+      return 1
+    fi
   fi
   park "$rel" dispatch "$grp $unit" "$want" || return 1
   stage_or_fail "$rel" || return 1
@@ -15646,7 +16636,7 @@ VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
 # refusal nobody typed an argument for.
 HOLD_UNTIL=""; HOLD_REAPED=""; HOLD_UNREACH=""; HOLD_RUN=""; RS_REPLACES=""; RS_SCHEDULED=""
 RP_PATH=""; RP_LEG=""; VERDICT=""; RP_ROOT=""; RP_PBSHA=""; RP_RUN=""; RP_SET=""; BR_UNIT=""
-RS_ACT=""; RS_SUCC=""
+RS_ACT=""; RS_SUCC=""; RS_FLOW=""; RS_ROW=""
 DP_WRITES=()
 RR_AUDITED=""; RR_FINDINGS=(); RR_SIBLINGS=(); RR_OWNER_STOP=""
 OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
@@ -15696,8 +16686,11 @@ while [ $# -gt 0 ]; do
                     [ "$_dw_n" -gt 0 ] || DP_WRITES+=("") ;;
     --act)          RS_ACT="${2:-}"; shift 2 || shift ;;
     --successor)    RS_SUCC="${2:-}"; shift 2 || shift ;;
+    --flow)         RS_FLOW="${2:-}"; shift 2 || shift ;;
+    --row)          RS_ROW="${2:-}"; shift 2 || shift ;;
     --item)         PK_ITEM="${2:-}"; shift 2 || shift ;;
     --step)         PK_STEP="${2:-}"; shift 2 || shift ;;
+    --key)          RF_KEY="${2:-}"; shift 2 || shift ;;
     --unit)         BR_UNIT="${2:-}"; shift 2 || shift ;;
     --path)         RP_PATH="${2:-}"; shift 2 || shift ;;
     --leg)          RP_LEG="${2:-}"; shift 2 || shift ;;
@@ -15737,7 +16730,13 @@ while [ $# -gt 0 ]; do
     --minors)       RV_MINORS="${2:-}"; shift 2 || shift ;;
     --folded)       RV_FOLDED="${2:-}"; shift 2 || shift ;;
     --promoted)     RV_PROMOTED="${2:-}"; shift 2 || shift ;;
-    --audited)      RR_AUDITED="${2:-}"; shift 2 || shift ;;
+    --round-highs)  RV_RHIGHS="${2:-}"; shift 2 || shift ;;
+    --round-minors) RV_RMINORS="${2:-}"; shift 2 || shift ;;
+    --reds)         FP_REDS="${2:-}"; shift 2 || shift ;;
+    --cause)        TR_CAUSE="${2:-}"; shift 2 || shift ;;
+    --stage)        RC_STAGE="${2:-}"; shift 2 || shift ;;
+    --pin)          TR_PINS+=("${2:-}"); shift 2 || shift ;;
+    --audited)     RR_AUDITED="${2:-}"; shift 2 || shift ;;
     --finding)      RR_FINDINGS+=("${2:-}"); shift 2 || shift ;;
     --sibling)      RR_SIBLINGS+=("${2:-}"); shift 2 || shift ;;
     --owner-stop)   RR_OWNER_STOP="${2:-}"; shift 2 || shift ;;
@@ -15778,7 +16777,15 @@ while [ $# -gt 0 ]; do
                     # happened: `check-unattended.sh` check 30 red on every fixture holding a
                     # single build, while the real corpus always gave it several and looked fine.
                     # A caller that wants frames now SAYS so, and gets them at any arity.
-                    if [ $# -le 1 ] && [ -z "$_pl_framed" ]; then verb_plan "${1:-}"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc"; fi
+                    # TOOL-dDeclaredLoop-19 S9 - the breakpoint lines follow, for the human form alone: never
+                    # under --paths or --framed, and never on the position engine's hand-over call.
+                    if [ $# -le 1 ] && [ -z "$_pl_framed" ]; then
+                      verb_plan "${1:-}"; _rl_rc=$?
+                      if [ "$_rl_rc" = 0 ] && [ -z "$PLAN_PATHS" ] && [ "${GOV_POSITION_STATES+set}" != set ]; then
+                        print_breakpoint_lines "${1:-}"
+                      fi
+                      RUNLOG_CLEAN=1; exit "$_rl_rc"
+                    fi
                     for _pl_s in "$@"; do
                       printf 'unattended-plan-open: %s\n' "$_pl_s"
                       ( verb_plan "$_pl_s" ); _pl_one=$?
@@ -15799,8 +16806,8 @@ while [ $# -gt 0 ]; do
                     CC_TMP=$(mktemp) || { echo "unattended: --check-commit cannot create a scratch file, so it graded nothing"; RUNLOG_CLEAN=1; exit 2; }
                     check_commit_message "${1:-}"; _rl_rc=$?; rm -f "$CC_TMP"; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     # TOOL-aGraftedHelix-1 - the remote's claims, read and printed; no slug, because it lists them all.
-    --claims)       refuse_waive_unless_preflight --claims
-                    print_claims; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+    --claims)       refuse_waive_unless_preflight --claims || { RUNLOG_CLEAN=1; exit 1; }
+                    print_claims "${2:-}"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; RUNLOG_CLEAN=1; exit 0 ;;
     --help|-h)      echo "unattended: the verbs are $(verb_list); each verb's contract is $MEMORY_ROOT/guides/UNATTENDED-VERBS.md"
                     usage; RUNLOG_CLEAN=1; exit 0 ;;
@@ -15844,14 +16851,19 @@ case "$VERB" in
   --settle)    run_settle "$SLUG" ;;
   --park)    verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
   --propose)   verb_propose "$SLUG" "$PK_ITEM" "$PK_STEP" "$REASON" ;;
+  --refused)   write_refusal "$SLUG" "$PK_ITEM" "$RF_KEY" "$REASON" ;;
   --brief)     verb_brief "$SLUG" "$BR_UNIT" "$RP_PATH" ;;
-  --review)    verb_review "$SLUG" "$RV_SUBJECT" "$VERDICT" "$RV_BLOCKERS" "$RV_DISPOSITION" "$RV_HIGHS" "$RV_MINORS" "$RV_FOLDED" "$RV_PROMOTED" ;;
+  --review)    verb_review "$SLUG" "$RV_SUBJECT" "$VERDICT" "$RV_BLOCKERS" "$RV_DISPOSITION" "$RV_HIGHS" "$RV_MINORS" "$RV_FOLDED" "$RV_PROMOTED" "$RV_RHIGHS" "$RV_RMINORS" ;;
+  --trigger)   run_trigger "$SLUG" "$RV_SUBJECT" "$TR_CAUSE" ${TR_PINS[@]+"${TR_PINS[@]}"} ;;
+  --recommend) run_recommend "$SLUG" "$RC_STAGE" "$REASON" "$VERDICT" ;;
+  --fix-pass)  run_fix_pass "$SLUG" "$BR_UNIT" "$FP_REDS" ;;
+  --exhausted) run_exhausted "$SLUG" ;;
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
   --record-piece) verb_record_piece "$SLUG" "$RP_PATH" "$RP_LEG" "$VERDICT" ;;
   --record-set)   verb_record_set "$SLUG" "$RP_LEG" "$VERDICT" ;;
   --record-round) write_chain_round "$SLUG" "$RV_SUBJECT" "$RR_AUDITED" "$RV_BLOCKERS" "$RV_HIGHS" ;;
   --chain-verdict) print_chain_verdict "$SLUG" ;;
-  --rescope)   verb_rescope "$SLUG" "$RS_ACT" "$PK_ITEM" "$RS_SUCC" "$REASON" ;;
+  --rescope)   verb_rescope "$SLUG" "$RS_ACT" "$PK_ITEM" "$RS_SUCC" "$REASON" "$RS_FLOW" "$RS_ROW" ;;
   --dispatch)  verb_dispatch "$SLUG" "$PK_ITEM" "${DP_WRITES[@]}" ;;
   --beat)      write_claim_beat "$SLUG" ;;
 esac

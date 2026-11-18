@@ -64,6 +64,7 @@ name = "shell hygiene (a loop fed by a command substitution)"
 subject = "repo"
 argv = ["python3", "{kit}/sh_hygiene.py"]
 guard = []
+stage = ["step.test"]
 
 # The location-probe ban, the scanner's second mode (TOOL-aGraftedHelix-45). `subject = "repo"` and
 # no guard for the loop scan's reason: it grades the repository's shell tree, and a new probe can
@@ -76,6 +77,7 @@ name = "shell hygiene (a location probe asked from a moved directory)"
 subject = "repo"
 argv = ["python3", "{kit}/sh_hygiene.py", "--location-probes"]
 guard = []
+stage = ["step.test"]
 
 # The spawn-idiom lint, the scanner's third mode (TOOL-aSparedSpawn-8). `subject = "repo"` and no guard
 # for the loop scan's reason: a fork spent on builtin work can arrive in any shell file. Its three
@@ -90,6 +92,7 @@ name = "shell hygiene (a fork spent on builtin work)"
 subject = "repo"
 argv = ["python3", "{kit}/sh_hygiene.py", "--spawn-idioms"]
 guard = []
+stage = ["step.test"]
 
 # The temp-name lint, the scanner's fourth mode (TOOL-dRedressedBar-24). `subject = "repo"` and no guard
 # for the loop scan's reason: a temp written at a fixed name and renamed into place can arrive in any
@@ -102,6 +105,7 @@ name = "shell hygiene (a fixed-name temp renamed into place)"
 subject = "repo"
 argv = ["python3", "{kit}/sh_hygiene.py", "--temp-names"]
 guard = []
+stage = ["step.test"]
 
 # The self-test arm. `subject = "kit"` puts it under the 2026-08-23 kit-self-test hold deliberately:
 # a suite that stages breaks into a copy of a scanner has a job only when that scanner's source
@@ -112,3 +116,4 @@ name = "shell-hygiene selftest"
 subject = "kit"
 argv = ["python3", "{kit}/sh_hygiene.py", "--selftest"]
 guard = ["{kit}/"]
+stage = ["step.test"]

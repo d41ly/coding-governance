@@ -3,10 +3,10 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-11-18T05:10:10+02:00 @ 0e804e0e71d2e65d28ac152abb3cb7ef7665af10
+last-audit: 2026-11-18T06:36:29+02:00 @ e689f82a9f90a424247ec4f815568af36ce48190
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: c654b0208e26e5d00098598294ca648b3f9a9226
+last-body-change: e689f82a9f90a424247ec4f815568af36ce48190
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -52,8 +52,9 @@ lives where each bullet points.
 - Every session start writes an orientation card; a commit is refused until its READY line is appended, and only from a tree the card names (`tools/hooks/scratch-guard.js`).
 - A card's `## route` lands only when its build, unit specs and brief all resolve; a write under `ROUTED_PATHS` needs a route naming a buildable unit, and a pushed commit there names a specced one (`TOOL-aRoutedQuill-2`, `-3`).
 - The one exception is the red-fix lane: with `bar.inline-red-fixes` on and a leg recorded red at this branch's own head, the gate admits a product write with no route, and its commit carries a `Red-fix: <leg>` trailer and owes a `red-fix` record (`TOOL-aNimbleMend-8`, `-9`, `-10`, `-14`).
+- A `Red-fix:` commit carries the fix alone: its record goes in the next commit, since the index regen writes it into a spec and limit L3 of `tools/memory-tree/routed_commits.py` refuses the push (`dDeclaredLoop`).
 - The card's READY anchor accepts both the bare and the `- ` list-item spelling (`TOOL-cMendedVintage-16`).
-- An attended code build runs through `/build` after kickoff's go: the role catalogue's workflows in stage order (`KICK-aOrientedCast-2`).
+- An attended code build runs through `/build` after kickoff's go: the role catalogue's workflows in the order `tools/loop/loop.toml` gives them (`KICK-aOrientedCast-2`, `TOOL-dDeclaredLoop-1`).
 - Layout: `main` lives in `C:/projects/coding-governance`; every unit's branch rides its own worktree under `.claude/worktrees/<branch-slug>/`, and `git worktree list` is the inventory.
 - Remote `origin`, default branch `main`; a push needs an explicit ask or the authorization `memory/guides/UNATTENDED-PROTOCOL.md` section 1 defines.
 - Governing docs: `AGENTS.md`, the template it renders from, and `memory/DECISIONS.md`; binding guides are `memory/guides/REVIEW-PROTOCOL.md` and the unattended protocol and verbs.
@@ -76,7 +77,12 @@ lives where each bullet points.
 - `tools/unattended/check-unattended.sh` carries raw CR bytes in its awk regexes: edit it in binary mode (`memory/gotchas/text-mode-read-eats-a-bare-cr.md`).
 - The read-path byte budget is retired (`TOOL-dSpentCeiling-1`): check 6's per-class caps are the bound, and a sum is not re-added.
 - A live `RUN.md` is outside check 6 by class (`TOOL-cMendedVintage-13`); a retired one is capped.
-- This repository's policy values live in `.governance/policy.toml`, checked against `tools/policy/catalogue.toml`; the pre-commit guard refuses an agent's change to it but one raised measured-file cap with its record (`help/policy.md`).
+- This repository's policy values live in `.governance/policy.toml`, checked against `tools/policy/catalogue.toml`; an agent writes it only through `tools/loop/policy_edit.py`, whose change record every commit and push of it owes, and the pre-commit guard admits an agent's change to it as one raised measured-file cap or on a live run's branch (`help/policy.md`).
+- `--dispatch` refuses one write set naming a generated index with its generator (check 49): a unit that edits a generator builds in two passes, the generator edit first and the re-rendered index second (`TOOL-dDeclaredLoop-12`).
+- The loop kit's definition `tools/loop/loop.toml` is checked one concern per module, each its own leg: `loop_lib.py --check`, and `check` on `loop_table.py`, `loop_checklist.py` and `loop_items.py` (`help/loop.md`).
+- A repository's own loop rows each have their own module and fixture leg: its stages `splice.py check`, an item's upstream rows `upstream.py`, the composition pinned per move `composition.py`, and the build's position from witnesses `position.py` (`help/loop.md`).
+- The review round bounds are policy keys read through `tools/loop/review_bounds.py`; the driver falls back to four defaults with a NOTE where the module or the policy kit does not resolve (`help/loop.md`).
+- Every composition is checked to terminate by `tools/loop/termination.py`, its own leg `loop termination`, and the owner gates and review breakpoints of a build are one list read by `tools/loop/breakpoints.py` (`help/loop.md`).
 
 ### Pointer map (load the row(s) the task touches)
 

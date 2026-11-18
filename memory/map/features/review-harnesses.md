@@ -7,6 +7,8 @@ status = "shipped"
 streams = ["tooling"]
 decisions = []
 
+stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
+
 [claims]
 gate-legs = [
   "workflow script syntax",

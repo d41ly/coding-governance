@@ -7,9 +7,9 @@
 # kind, and `usage`, its factory command or how a member joins its population, which help/reference/kinds.md
 # renders (PLAY-dOrderedCharter-37). A kind whose factory or
 # gate has not landed carries "" there and is a `kind` row of core-pending.txt naming its owner.
-# `python <prefix>/playbook/core.py kinds` grades the contract. A kind's name is never a namespace word: where a
-# kind's members form a namespace, its name puts a qualifier before that word, naming where the population lives,
-# and the `<kind>` that `core.py new` takes is that name.
+# `python <prefix>/playbook/core.py kinds` grades the contract. A kind's one-segment name may be a namespace word, as
+# the `item` and `command` kinds are: the grammar refuses a word only as the first of two or more segments
+# (TOOL-dDeclaredLoop-18 S10). The `<kind>` that `core.py new` takes is still the name.
 
 [[kind]]
 tag = "kind.tool-kit"
@@ -25,11 +25,11 @@ usage = "a directory {prefix}/<kit>/ holding kit.toml, its adopter and its engin
 tag = "kind.command"
 owner = "dDeclaredLoop"
 binds = ["principle.p16"]
-population = ""
-factory = ""
-gate = ""
-summary = "A slash command an adopter's harness runs."
-usage = "no factory has landed; dDeclaredLoop lands it, and until then the kind has no member"
+population = "{prefix}/*kit.toml"
+factory = "python {prefix}/loop/factories.py command"
+gate = "loop command conformance"
+summary = "A command a kit declares: a [[command]] row of its kit descriptor, its verb and the file it runs."
+usage = "python {prefix}/playbook/core.py new command <verb> --kit <id> --run <path>"
 
 [[kind]]
 tag = "kind.instruction-unit"
@@ -46,20 +46,20 @@ tag = "kind.policy-key"
 owner = "dDeclaredLoop"
 binds = ["principle.p16"]
 population = "{prefix}/policy/catalogue.toml"
-factory = ""
-gate = ""
+factory = "python {prefix}/loop/factories.py policy-key"
+gate = "policy check"
 summary = "A policy key: a [[key]] row of the policy catalogue, read through policy.py get."
-usage = "a [[key]] row in {prefix}/policy/catalogue.toml, its name, allowed values, default, summary and usage"
+usage = "python {prefix}/playbook/core.py new policy-key <name> --allowed <toml> --default <toml> --summary <text> --usage <text> --owner <build>"
 
 [[kind]]
 tag = "kind.preset"
-owner = "dDeclaredLoop"
+owner = "dKeptSession"
 binds = ["principle.p16"]
 population = ""
 factory = ""
 gate = ""
-summary = "A named preset of policy values an adopter selects at once."
-usage = "no factory has landed; dDeclaredLoop lands it, and until then the kind has no member"
+summary = "A named preset of policy values an adopter selects at once; dKeptSession lands its factory, with the preset store."
+usage = "no factory has landed; dKeptSession lands it, and until then the kind has no member"
 
 [[kind]]
 tag = "kind.gate-leg"
@@ -75,31 +75,31 @@ usage = "a row in {prefix}/gate-legs.json, its name, argv, chunk, subject and ce
 tag = "kind.role"
 owner = "dDeclaredLoop"
 binds = ["principle.p16"]
-population = ""
-factory = ""
-gate = ""
-summary = "A role an agent takes in the loop, rendered into its agent file."
-usage = "no factory has landed; dDeclaredLoop lands it, and until then the kind has no member"
+population = "{prefix}/roles/agents/*.agent.md"
+factory = "python {prefix}/loop/factories.py role"
+gate = "roles catalogue"
+summary = "A role an agent takes in the loop: a role file of the roles kit, listed by its workflow and priced by its body ceiling."
+usage = "python {prefix}/playbook/core.py new role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --returns <text> --output <text> --ceiling <bytes>"
 
 [[kind]]
 tag = "kind.workflow"
 owner = "dDeclaredLoop"
 binds = ["principle.p16"]
-population = "{prefix}/workflows/*.js"
-factory = ""
-gate = ""
-summary = "A Workflow script the harness runs as one program."
-usage = "a script {prefix}/workflows/<name>.js"
+population = "{prefix}/roles/workflows.toml"
+factory = "python {prefix}/loop/factories.py workflow"
+gate = "roles catalogue"
+summary = "A workflow the loop runs: a [[workflow]] row of the roles kit's table, placed by its row of the loop definition."
+usage = "python {prefix}/playbook/core.py new workflow <name> --driver <driver> --harness <path|none> --roles <slots> --enforced-by <text> --trigger <text> --order <n> --step <step tag|none>"
 
 [[kind]]
 tag = "kind.hook"
 owner = "dDeclaredLoop"
 binds = ["principle.p16"]
-population = "{prefix}/hooks/*.js"
-factory = ""
-gate = ""
-summary = "A harness hook script and the fragment that wires it."
-usage = "a script {prefix}/hooks/<name>.js with its fragment"
+population = "*.fragment.json"
+factory = "python {prefix}/loop/factories.py hook"
+gate = "hook destinations (every declared hook path ships)"
+summary = "A harness hook script and the fragment that wires it, shipped by its kit's descriptor."
+usage = "python {prefix}/playbook/core.py new hook <name> --kit <id> --event <event> [--matcher <m>]"
 
 [[kind]]
 tag = "kind.skill"
@@ -135,11 +135,12 @@ usage = "no factory has landed; dConvergedCharter lands it, and until then the k
 tag = "kind.stage"
 owner = "dDeclaredLoop"
 binds = ["principle.p16"]
-population = ""
-factory = ""
-gate = ""
-summary = "A stage of the loop a drive row names."
-usage = "no factory has landed; dDeclaredLoop lands it, and until then the kind has no member"
+population = "{prefix}/loop/loop.toml"
+factory = "python {prefix}/loop/splice.py new"
+gate = "loop splice check"
+schema = "{prefix}/loop/stage-schema.toml"
+summary = "A stage of the loop: one of gov's steps, or a repository's own spliced between two adjacent ones from its overlay."
+usage = "python {prefix}/playbook/core.py new stage <name> --after <step> --before <step> --actor <kind:name> --witness-by <text> --owner <build> [--input <layer:what> --allowance <text> --returns <record>]"
 
 [[kind]]
 tag = "kind.product-layer"
@@ -155,11 +156,12 @@ usage = "python {prefix}/playbook/check_layers.py --new <tag> --kind <kind> [--o
 tag = "kind.item"
 owner = "dDeclaredLoop"
 binds = ["principle.p16"]
-population = ""
-factory = ""
-gate = ""
-summary = "A work item the loop carries."
-usage = "no factory has landed; dDeclaredLoop lands it, and until then the kind has no member"
+population = "{prefix}/loop/loop.toml"
+factory = "python {prefix}/loop/loop_items.py new"
+gate = "loop item kind"
+schema = "{prefix}/loop/item-schema.toml"
+summary = "A work item of a gov step's program: an [[item]] row of the loop definition, or a repository's own in its overlay."
+usage = "python {prefix}/playbook/core.py new item <name> --step <step> --actor <kind:name> --witness-by <text> --owner <build> [--input <layer:what> --allowance <text> --returns <record>]"
 
 [[kind]]
 tag = "kind.lens"
@@ -175,8 +177,9 @@ usage = "no factory has landed; dCalibratedLens lands it, and until then the kin
 tag = "kind.scenario"
 owner = "dDeclaredLoop"
 binds = ["principle.p16"]
-population = ""
-factory = ""
-gate = ""
-summary = "A scenario the loop is exercised against."
-usage = "no factory has landed; dDeclaredLoop lands it, and until then the kind has no member"
+population = "{prefix}/loop/scenarios.toml"
+factory = "python {prefix}/loop/factories.py scenario"
+gate = "loop scenario fixtures"
+schema = "{prefix}/loop/scenario-schema.toml"
+summary = "A scenario a build runs under: what kind of work it is, the request facts that admit it, its entry step and the rows of other kinds it activates."
+usage = "python {prefix}/playbook/core.py new scenario <name> --extends <tag|none> --admit <fact>=<value> --entry <step tag>"

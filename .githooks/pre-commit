@@ -218,10 +218,12 @@ resolve_hook_python() { # -> py; rc 1 when no tracked resolver or no usable laun
   py=$hook_py
 }
 
-# policy guard (TOOL-dGroundRules-6) — the minimal guard over the paths the policy kit's
-# guarded-paths.txt lists at HEAD: owner-only outside a live unattended run's branch, and the TTY
-# proof, enforced without reading
-# policy-file.guard or policy-file.proof, until dDeclaredLoop's guard lands and retires this block.
+# policy guard (TOOL-dGroundRules-6) — the guard over the paths the policy kit's guarded-paths.txt
+# lists at HEAD. The verdict it runs is the loop kit's guard.py --staged wherever that resolves
+# (TOOL-dDeclaredLoop-2 S11): it reads policy-file.guard and the floor at the landed revision, asks a
+# change record of every change, and wraps the minimal guard below, whose admitted shapes, a cap raised,
+# the mirror's render and a live run's branch, it keeps. Where the loop kit does not resolve, the
+# minimal guard runs alone, as it did before the loop kit's guard landed.
 # Git sends a hook's stdout to stderr and leaves stderr as the committer's, so `[ -t 2 ]` reads
 # whether a person sits at a terminal, which an agent's shell does not. It stops forgetting, not
 # evasion: the guard's header names what passes it. The guard runs only when a listed path is
@@ -231,6 +233,8 @@ resolve_hook_python() { # -> py; rc 1 when no tracked resolver or no usable laun
 # an early signal. SO DOES A MISSING GUARD (TOOL-dGroundRules-21 S21): a `guard.py` no rung resolves,
 # while the list at HEAD under the declared GOV_KITROOT names a staged path, prints the rungs that
 # missed and refuses, so a deleted guard never reads as a clean commit.
+lg_kit=loop     # the loop kit, named once as pg_kit names the policy kit (TOOL-dDeclaredLoop-2 S11)
+lg=$(resolve_kit_gate "$lg_kit" guard.py) || lg=""
 pg_kit=policy   # named once, so no guard path below spells the kit's directory (TOOL-dGroundRules-84)
 if g=$(resolve_kit_gate "$pg_kit" guard.py); then
   pg_list=$(git show "HEAD:${g%guard.py}guarded-paths.txt" 2>/dev/null | tr -d '\r' |
@@ -244,7 +248,7 @@ if g=$(resolve_kit_gate "$pg_kit" guard.py); then
     elif ! resolve_hook_python; then
       echo "pre-commit: policy guard REFUSING — ${pg_names}staged and no python launcher to judge them."
       rc=1
-    elif ! with_hook_index "$py" "$g" --staged; then
+    elif ! with_hook_index "$py" "${lg:-$g}" --staged; then
       rc=1
     fi
   fi

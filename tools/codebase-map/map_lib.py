@@ -45,9 +45,9 @@ from dataclasses import dataclass, field
 from fnmatch import fnmatchcase
 from pathlib import Path
 
-#: gov:kit codebase-map@1.33 — engine identity. Bump on any engine/render change; mirrored into the
+#: gov:kit codebase-map@1.34 — engine identity. Bump on any engine/render change; mirrored into the
 #: generated artifacts as `codebase-map@<v>` so the deployer can grep the installed version.
-KIT_CODEBASE_MAP_VERSION = "1.33"
+KIT_CODEBASE_MAP_VERSION = "1.34"
 
 #: The per-repo conf, at the adopting repo's ROOT. Also the MARKER resolve_root walks up for: a
 #: repo that has adopted the kit has this file, and the kit needs no other declaration of where
@@ -1012,6 +1012,8 @@ class Dossier:
     claims: dict[str, tuple[str, ...]] = field(default_factory=dict)
     globs: tuple[str, ...] = ()
     source: str = "<dossier>"
+    #: The optional `stage` key, the build stages the feature serves; graded here for shape alone.
+    stage: tuple[str, ...] | None = None
 
 
 def _require_str_list(value: object, what: str, source: str) -> tuple[str, ...]:
@@ -1030,7 +1032,8 @@ def parse_dossier(
     """Parse a dossier's machine half — the FIRST ```` ```toml ```` fence. Fails loud on:
     no fence, TOML errors, missing/unknown top or claim keys (claims must carry EXACTLY the
     project's inventory ids — typo protection), bad status, malformed decision ids, non-string
-    title, backslashes in globs. A dossier that doesn't parse must break the gate, never be
+    title, backslashes in globs, and an optional top-level `stage` that is not a list of non-empty
+    strings (TOOL-dDeclaredLoop-4), whose step tags the loop kit grades. A dossier that doesn't parse must break the gate, never be
     skipped."""
     match = _TOML_FENCE_RE.search(text)
     if match is None:
@@ -1042,7 +1045,7 @@ def parse_dossier(
 
     required_top = {"feature", "title", "status", "streams", "decisions", "claims", "paths"}
     missing = required_top - set(data)
-    unknown = set(data) - required_top
+    unknown = set(data) - required_top - {"stage"}
     if missing or unknown:
         raise MapError(
             f"{source}: top-level keys — missing {sorted(missing)}, unknown {sorted(unknown)}"
@@ -1095,6 +1098,7 @@ def parse_dossier(
         claims=claims,
         globs=globs,
         source=source,
+        stage=_require_str_list(data["stage"], "stage", source) if "stage" in data else None,
     )
 
 

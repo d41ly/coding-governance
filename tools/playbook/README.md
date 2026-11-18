@@ -281,17 +281,29 @@ function in `tag_index.py` and printed `unarmed` while that source declares noth
 `kind` (`kinds.toml`), `kit` (the top-level `id` of every `kit.toml` and `*.kit.toml`, in
 `layer.distribution`) and `repo` (`.governance/instructions.toml`'s units). `check` adds the shape check
 (every defined tag and selector value in a registered namespace, every segment in shape, at most 64
-bytes before any `#`, no first segment that is a namespace word, a registry word outside the segment
-shape a red and never a word), the joins (every citation a member; every `reader` and `practice` member
+bytes before any `#`, no name of two or more segments whose first is a namespace word, a registry word
+outside the segment shape a red and never a word), the joins (every citation a member; every `reader` and `practice` member
 selecting a unit once some unit's `scope` names a tag of its namespace, a unit scoped `reader.every`
 selected by every reader since it is in the set every reader loads) and the name-check slot, `point.instruction.name-check`, where the
 lexicon's `--tags` grades the same names. A cited span that is the base name of a tracked file is counted
-as a file name, never red. The later namespaces are not registered, so their tags red until the build
-that arms each adds its row:
+as a file name, never red.
+
+TOOL-dDeclaredLoop-18 registers four more, their extractors beside the eight: `step` and `item` (each
+`[[step]]` and `[[item]]` row's `tag` in the loop definition, the loop kit's `loop.toml`, both
+`selects`; `step` is armed since TOOL-dDeclaredLoop-1 landed that file, and `item` stays `unarmed` until it
+holds an `[[item]]` row), `policy` (`policy.<name>` for each `[[key]]` row of the
+policy kit's `catalogue.toml` whose name is all literal segments) and `command` (`command.<id>.<verb>` for
+each `[[command]]` row, `verb` and `run`, of a kit descriptor, `unarmed` until a descriptor holds one). A
+catalogue name carrying a `<word>` or `*` segment is no member: its literal prefix is one `family` row,
+shape-graded, and a citation under it is declared where the policy kit's own row matcher finds a row for
+the key, read in process through `policy_value.read_declared_keys`; `check` prints the count on its
+`join policy · families` line, and a refused policy read declares nothing. What the family join does not
+check: what a placeholder stands for, so `policy.review.<anything>` is declared by `review.<stage>`.
+
+The later namespaces are not registered, so their tags red until the build that arms each adds its row:
 
 | Namespace | Armed by |
 |---|---|
-| `step`, `item`, `policy` | dDeclaredLoop |
 | `role` | dBoundRoles |
 | `record` | dTotalRecall |
 
@@ -379,9 +391,14 @@ PLAY-dOrderedCharter-28 adds the memory plan's twelve types (`serves`, `made-by`
 `answers`, `runs-in`, `carries`, `carries-clause`, `pinned-at`, `reads`, `writes`, `promoted-from`),
 widens `decides` and `after`, and gives a row an optional `writer`: `promoted-from`'s is
 `instructions.edit`, so the type read at any other site is red. `edges.toml`'s `[[trailer]]` rows map each
-commit trailer key to its type, read by `read_trailer_keys`. `namespaces.toml`'s `[[native]]` rows
+commit trailer key to its type, read by `read_trailer_keys`; a row with no `type` (`Gov-Transition`,
+`Gov-Policy`, `Red-fix`, TOOL-dDeclaredLoop-23) registers a key that carries a value and no edge, which
+`read_trailer_keys` passes over while still refusing a key two rows name, and which memory-tree's
+`commit_trailers.read_commits`, the one trailer reader, reads beside the typed keys, refusing a key no
+row registers. `namespaces.toml`'s `[[native]]` rows
 register the native-id classes, `family-id` (pattern `id_grammar:grammar_for`, resolver `corpus_ids.py
---print-defined-ids`) and `clause-id` (pattern `design_lib:_CL`, resolver `read_design_view`), read by
+--print-defined-ids`), `clause-id` (pattern `design_lib:_CL`, resolver `read_design_view`) and `commit`
+(pattern `commit_trailers:SHA_RE`, the full sha, resolver `commit_trailers.py --print-commits`), read by
 `read_native_classes`; `gov_tag.py check` prints each with its owner and population
 (`check_native_classes`). A pinned tag is legal only where a row's `pin` is `tag` and resolves when some
 committed revision of its unit's text hashes to it (`read_text_history` over `tree_lib.read_blobs_at`);

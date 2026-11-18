@@ -333,7 +333,6 @@ verb:unattended.sh:--authorization	undocumented when the docs leg landed
 verb:unattended.sh:--beat	undocumented when the docs leg landed
 verb:unattended.sh:--brief	undocumented when the docs leg landed
 verb:unattended.sh:--check-commit	undocumented when the docs leg landed
-verb:unattended.sh:--claims	undocumented when the docs leg landed
 verb:unattended.sh:--close	undocumented when the docs leg landed
 verb:unattended.sh:--dispatch	undocumented when the docs leg landed
 verb:unattended.sh:--handoff	undocumented when the docs leg landed
@@ -350,7 +349,6 @@ verb:unattended.sh:--record-piece	undocumented when the docs leg landed
 verb:unattended.sh:--record-set	undocumented when the docs leg landed
 verb:unattended.sh:--register-task	undocumented when the docs leg landed
 verb:unattended.sh:--release-task	undocumented when the docs leg landed
-verb:unattended.sh:--rescope	undocumented when the docs leg landed
 verb:unattended.sh:--resume	undocumented when the docs leg landed
 verb:unattended.sh:--review	undocumented when the docs leg landed
 verb:unattended.sh:--settle	undocumented when the docs leg landed

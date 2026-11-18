@@ -345,6 +345,7 @@ Cite ids, never line numbers.
 | [TOOL-aSurfacedLexicon-23](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-06 | A CELL CANNOT SAY "PRODUCT CODE, NOT RECORDS", so two surfaces ship… |
 | [TOOL-aSurfacedLexicon-24](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-06 | A SKIP CLAIM WRITTEN AS check(<label>, True) IS A COMMENT WEARING A… |
 | [TOOL-aSurfacedLexicon-25](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-06 | A PUSH TO THE DEFAULT BRANCH PROCEEDED WITH NO BAR RUN, and the hook… |
+| [TOOL-aSurfacedLexicon-26](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | LOW | — | 2026-11-17 | TOOL-aSurfacedLexicon-17 IS ANSWERED, for its owner to dispose. The… |
 | [TOOL-aTetheredConvoy-1](../builds/aTetheredConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | the playbook template reached origin/main carrying UNRESOLVED conflict… |
 | [TOOL-aTetheredScratch-3](../builds/aTetheredScratch/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | tools/memory-recall/selftest.py leaves 2 EMPTY tmp.* dirs per run that… |
 | [TOOL-aTetheredScratch-4](../builds/aTetheredScratch/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | A TEST FIXTURE COMMITTED INTO THE LIVE REPO. Two commits authored t… |
@@ -453,7 +454,7 @@ Cite ids, never line numbers.
 | [TOOL-dCarriedReceipt-3](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | a FOLD pass legitimately spans many units, and the dispatch machinery… |
 | [TOOL-dCarriedReceipt-4](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | a spec that is DELIBERATELY never closed cannot be cited from tracked… |
 | [TOOL-dClosedLexicon-14](../builds/dClosedLexicon/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | govkit check printed playbook: landed-but-inert and exited 0 over a… |
-| [TOOL-dDeclaredLoop-35](../builds/dDeclaredLoop/BACKLOG.md) | DEFERRED | MED | TOOL-dDeclaredLoop-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dDeclaredLoop-35](../builds/dDeclaredLoop/BACKLOG.md) | DEFERRED | MED | TOOL-dDeclaredLoop-34 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dDeclaredLoop-101](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE ABSENT-EXPANSION REFUSAL ADMITS A VALUE ON A CORE POINT.… |
 | [TOOL-dDeclaredLoop-102](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | A NEW POLICY KEY LANDS WITHOUT ITS PRESET VALUES. v2:1421 lets no key… |
 | [TOOL-dDeclaredLoop-103](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE MAILBOX INTERRUPT NAMES THE WRONG ARMING BUILD.… |
@@ -465,6 +466,8 @@ Cite ids, never line numbers.
 | [TOOL-dDeclaredLoop-109](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | DERIVE_BREAKPOINTS READS NO REVIEW.MAINTAIN. v2:1656 lists… |
 | [TOOL-dDeclaredLoop-110](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE LOOP KIT REFUSES A CADENCE STEP VALUE. TOOL-dDeclaredLoop-50 S3… |
 | [TOOL-dDeclaredLoop-111](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | REVIEW.COST WRITES NO SHAPE-RUN RECORD. TOOL-dDeclaredLoop-20 S3 only… |
+| [TOOL-dDeclaredLoop-113](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-16 | A pins.py mark VERB FOR THE DEVIATION CLASSIFIER.… |
+| [TOOL-dDeclaredLoop-114](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-16 | A NUMERIC PATCH DIRECTION FOR THE CLASSIFIER. TOOL-dDeclaredLoop-33's… |
 | [TOOL-dDerivedDocket-38](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/run-gates/run-selftests.sh SELECTS SUITES ONLY BY A --kit <dir>… |
 | [TOOL-dDerivedDocket-39](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-14 | govkit's requires_if SELECTS NO KIT AT APPLY. Its one reader is… |
 | [TOOL-dDerivedDocket-40](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-16 | NO LEASE-MATRIX ROW NAMES WHO REACHES IT, AND NOTHING COUNTS ROWS… |

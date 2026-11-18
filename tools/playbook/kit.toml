@@ -167,6 +167,7 @@ argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check
 name = "playbook render wiring"
 subject = "repo"
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check"]
+stage = ["step.test"]
 
 # THE ENGINE'S OWN ARMS, and an adopter receives them because they are about the ENGINE rather than
 # about gov: every fixture is written into a temp dir by the selftest itself, so there is no gov path
@@ -177,3 +178,4 @@ argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check
 name = "playbook render selftest"
 subject = "kit"
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--selftest"]
+stage = ["step.test"]

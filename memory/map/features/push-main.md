@@ -8,6 +8,8 @@ streams = ["tooling"]
 decisions = ["TOOL-aLeasedGauntlet-1", "TOOL-dLoggedFlight-4", "TOOL-dDerivedDocket-26",
   "TOOL-aSignalledHook-1"]
 
+stage = ["step.test"]
+
 [claims]
 gate-legs = ["pre-push self-test", "push-main self-test"]
 kits = []

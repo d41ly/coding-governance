@@ -72,6 +72,7 @@ argv = ["bash", "{prefix}/manifest-check.sh", "{manifest_path}"]
 guard = []
 history_depth = "full"
 red_after_land = true
+stage = ["step.build", "step.test"]
 
 [[hole]]
 id = "manifest-section-b"

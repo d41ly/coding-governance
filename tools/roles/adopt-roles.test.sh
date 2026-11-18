@@ -5,13 +5,14 @@
 #   ROLES_ADOPTER=<a copy> bash <prefix>/roles/adopt-roles.test.sh   # grade a copy, for a red observation
 #
 # Each arm builds its own fixture: a fresh git repository holding a copy of this kit, with the adopter
-# under test as its `adopt-roles.sh`, the governing doc and memory root this repository's conf names,
+# under test as its `adopt-roles.sh`, a copy of the loop kit's definition and reader beside it, the
+# governing doc and memory root this repository's conf names,
 # scaffolded once. Then it stages ONE break into the fixture and asserts the adopter's refusal by exit
 # code AND by the text naming it, because an exit code alone is shared by every refusal the adopter
 # has: a copy with the stage binding staged out still exits 1 on the agent compare.
 #
-# The arms: a stage heading naming a workflow at the wrong stage; a catalogue workflow no heading
-# names; a token surviving the substitution; a byte appended to a rendered agent type; an unknown
+# The arms: a loop row whose order disagrees with its stage heading; a workflow of the loop
+# definition no heading names; a token surviving the substitution; a byte appended to a rendered agent type; an unknown
 # argument; the renderer's task part sent to the hooks kit's spawn guard (arm 6, which SKIPs out loud
 # without that kit or node); an `export` conf line with a trailing comment (arm 7); the roster verb's
 # one line per role and its refusal of a line past 200 characters (arm 8); the agents verb's two
@@ -19,7 +20,8 @@
 # ledger exactly once across two runs, a run without `--write` writing nothing, a harness run's two
 # agent lines and one returned line, a prompt opening with a blank line still matching, and a
 # transcript stripped of its effort printing `unknown` under the plain policy (arm 9);
-# the stand-in render's refusal, R15 both ways and over eight bad rows, R13, R14 and R0 (arm 10);
+# the stand-in render's refusal, R15 both ways and over eight bad rows, R13, R14, R6 over a loop row
+# with no step, a misspelt one and a `stage` key in the catalogue, and R0 (arm 10);
 # the roles kit's reading of a prompt's marker line and of the charter's micro-format fence
 # against the hooks kit's own (arm 11, which SKIPs out loud as arm 6 does); a `--scaffold` whose
 # agent render refuses, which exits 1 naming the refusal and writes no Skill (arm 13); the cited
@@ -35,10 +37,13 @@
 # of model ids read by `resolve_profile` and by the spawn guard's `resolveModelProfile` over the index
 # rendered from arm 19's policy (arm 20, which SKIPs out loud as arm 6 does); and a profile level
 # edited with no re-render, which the adopter's check names as a drifted index (arm 21); and the spec writer's handoff carrying the brief's `## The prompt`
-# as its `brief:prompt` block, an empty prompt refusing by name (arm 22); and the agents verb's
+# as its `brief:prompt` block, an empty prompt refusing by name (arm 22); and a role reading
+# `upstream:rows?` handed the `--upstream` rows file and the row contract, the key named not supplied
+# without one, and R3 refusing a bare `upstream:rows` and an `upstream:` key outside the vocabulary
+# (arm 23); and the agents verb's
 # session record, cold, warm, read, resumed after an append and a torn line, and keyed off by a
-# transcript edit, a foreign key or an unwritable folder (arm 23). Every arm is a self-contained block below the prologue, so a
-# slice of the prologue and one block runs that arm alone; arm 20 reads arm 19's fixture, and arm 23
+# transcript edit, a foreign key or an unwritable folder (arm 25). Every arm is a self-contained block below the prologue, so a
+# slice of the prologue and one block runs that arm alone; arm 20 reads arm 19's fixture, and arm 25
 # arm 9's writer and lines.
 #
 # WHAT THIS DOES NOT CHECK: what the rendered Skill or an agent type SAYS beyond the citation paths
@@ -96,18 +101,30 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +2 for arm 21 (TOOL-aGuardedEffort-1); arm 20 and arm 6's added payload are out of the floor.
 # +0 for arm 6's harness calls and rendered tables (TOOL-aGuardedEffort-2): on its SKIP path, out of the floor.
 # +2 for arm 22 (TOOL-dPavedRoad-3).
-# +8 for arm 23 (TOOL-aTrimmedWait-7).
-FLOOR_ASSERTIONS=69
+# +1 for arm 10's planted `stage` key (TOOL-dDeclaredLoop-1).
+# +4 for arm 23 (TOOL-dDeclaredLoop-29).
+# +1 for arm 24 (TOOL-dDeclaredLoop-56).
+# +8 for arm 25 (TOOL-aTrimmedWait-7).
+# merged at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c: 61 shared, +6 this branch's, +8 main's = 75.
+FLOOR_ASSERTIONS=75
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
-FX=""; FXK="$KREL"
+# THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
+# from the loop definition, so every fixture holds a copy of the loop kit beside its roles kit, at the
+# home `loop`, where the library's resolver probes. The source is the loop kit beside this one.
+LOOP_SRC="$HERE/../loop"
+[ -f "$LOOP_SRC/loop_lib.py" ] && [ -f "$LOOP_SRC/loop.toml" ] || { echo "adopt-roles.test: no loop kit beside this one at $LOOP_SRC, so no fixture can place its workflows"; exit 2; }
+FX=""; FXK="$KREL"; FXL=""
 build_fixture() { # [kit path] [fixture dir] -> $FX: a repo holding this kit at the kit path, $KREL
-  # unless given, with $ADOPTER as its adopter, scaffolded; rc of the scaffold. The fixture directory
-  # is $TMP_ROOT/fx<n> unless given, and run_adopter reads the kit path the last call used.
+  # unless given, with $ADOPTER as its adopter, and the loop kit beside it at $FXL, scaffolded; rc of
+  # the scaffold. The fixture directory is $TMP_ROOT/fx<n> unless given, and run_adopter reads the kit
+  # path the last call used.
   FXK=${1:-$KREL}; FX=${2:-$TMP_ROOT/fx$n}
-  _chd=.; [[ $CH == */* ]] && _chd=${CH%/*}; mkdir -p "$FX/$FXK" "$FX/$_chd" || return 2
+  FXL=loop; [[ $FXK == */* ]] && FXL=${FXK%/*}/loop
+  _chd=.; [[ $CH == */* ]] && _chd=${CH%/*}; mkdir -p "$FX/$FXK" "$FX/$FXL" "$FX/$_chd" || return 2
   git init -q "$FX" || return 2
   cp -R "$HERE"/. "$FX/$FXK"/ && cp "$ADOPTER" "$FX/$FXK/adopt-roles.sh" || return 2
+  cp "$LOOP_SRC/loop_lib.py" "$LOOP_SRC/loop.toml" "$FX/$FXL"/ || return 2
   printf 'MEMORY_ROOT=%s\nCHARTER=%s\n' "$MR" "$CH" > "$FX/.memory-tree.conf"
   cp "$REPO/$CH" "$FX/$CH" || return 2
   (cd "$FX" && bash "$FXK/adopt-roles.sh" --scaffold >/dev/null 2>&1)
@@ -135,21 +152,23 @@ for w in table:
         pairs.append(pair)
 sys.stdout.buffer.write("".join(p + "\n" for p in pairs).encode("utf-8"))'
 
-# ---- arm 1: a stage heading naming a workflow at the wrong stage --------------------------------
+# ---- arm 1: a loop row whose order disagrees with its stage heading --------------------------------
 build_fixture; check_arm "arm 1 the fixture scaffolds and checks clean" "$([ $? = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
-sed -i 's/^## Stage 2 — reuse$/## Stage 3 — reuse/' "$FX/$KREL/SKILL.template.md"
+# TOOL-dDeclaredLoop-1: the order is the loop definition's, so the break is planted THERE, on the
+# fixture's `reuse` row. An adopter still reading the roles catalogue never compares it.
+awk '/^name = "reuse"$/{b=1} b && /^order = /{print "order = 9"; b=0; next} {print}' "$LOOP_SRC/loop.toml" > "$FX/$FXL/loop.toml"
 out=$(run_adopter --check); rc=$?
-check_arm "arm 1 a heading at the wrong stage refuses, naming the entry's own stage" \
-   "$([ "$rc" = 1 ] && [[ $out == *'says stage 3 but the entry reuse is stage 2'* ]] && echo 1 || echo 0)"
+check_arm "arm 1 a loop row whose order disagrees with its heading refuses, naming the entry's own order" \
+   "$([ "$rc" = 1 ] && [[ $out == *'says stage 2 but the order of the entry reuse is 9 in the loop definition'* ]] && echo 1 || echo 0)"
 # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
 if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 
-# ---- arm 2: a catalogue workflow no heading names ----------------------------------------------
+# ---- arm 2: a workflow of the loop definition no heading names ----------------------------------------------
 build_fixture; check_arm "arm 2 the fixture scaffolds and checks clean" "$([ $? = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
 sed -i '/^## Stage 2 — reuse$/d' "$FX/$KREL/SKILL.template.md"
 out=$(run_adopter --check); rc=$?
-check_arm "arm 2 a stage-2 workflow no heading names refuses, naming it" \
-   "$([ "$rc" = 1 ] && _re2=$'the entry reuse \\(stage 2\\) of [^\n]* is named by no ## Stage heading' && [[ $out =~ $_re2 ]] && echo 1 || echo 0)"
+check_arm "arm 2 an order-2 workflow no heading names refuses, naming it and the loop definition" \
+   "$([ "$rc" = 1 ] && [[ $out == *'the entry reuse (order 2) of the loop definition is named by no ## Stage heading'* ]] && echo 1 || echo 0)"
 
 # ---- arm 3: a token surviving the substitution --------------------------------------------------
 build_fixture; check_arm "arm 3 the fixture scaffolds and checks clean" "$([ $? = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
@@ -528,16 +547,23 @@ sed -i 's/^output: .*/output: specs/' "$FX/$KREL/agents/gov-spec-writer.agent.md
 check_arm "arm 10 a spec writer whose output lacks its folder is one R14 line, naming the folder" \
    "$([ "$rc" = 1 ] && [ "$(grep -c ': R14 — ' "$A10R")" = 1 ] && grep ': R14 — ' "$A10R" | grep -qF '{{MEMORY_ROOT}}/builds/<slug>/spec/' && echo 1 || echo 0)"
 cp "$TMP_ROOT/a10.writer" "$FX/$KREL/agents/gov-spec-writer.agent.md"
-# PLAY-dOrderedCharter-21 S1: the build row's step, dropped and then misspelt, is one R6 line naming the row.
+# PLAY-dOrderedCharter-21 S1, moved by TOOL-dDeclaredLoop-1: a workflow's step is the loop definition's,
+# so the build row's step is dropped and then misspelt in the fixture's LOOP definition, each one R6
+# line naming that definition and the row; and a `stage` key planted in the catalogue is an unknown key.
+awk '/^name = "build"$/{b=1} b && /^step = /{b=0; next} {print}' "$LOOP_SRC/loop.toml" > "$FX/$FXL/loop.toml"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?
+check_arm "arm 10 a loop row without step is one R6 line, naming the loop definition and the row" \
+   "$([ "$rc" = 1 ] && [ "$(grep -c ': R6 — ' "$A10R")" = 1 ] && grep ': R6 — ' "$A10R" | grep -F 'the loop definition does not read' | grep -qF '(build) carries no step' && echo 1 || echo 0)"
+awk '/^name = "build"$/{b=1} b && /^step = /{print "step = \"step.buld\""; b=0; next} {print}' "$LOOP_SRC/loop.toml" > "$FX/$FXL/loop.toml"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?
+check_arm "arm 10 a step that is no declared step tag is one R6 line, naming the loop definition, the row and the value" \
+   "$([ "$rc" = 1 ] && [ "$(grep -c ': R6 — ' "$A10R")" = 1 ] && grep ': R6 — ' "$A10R" | grep -F 'the loop definition does not read' | grep -F '(build)' | grep -qF "step 'step.buld'" && echo 1 || echo 0)"
+cp "$LOOP_SRC/loop.toml" "$FX/$FXL/loop.toml"
 cp "$FX/$KREL/workflows.toml" "$TMP_ROOT/a10.workflows"
-awk '/^name = "build"$/{b=1} b && /^step = /{b=0; next} {print}' "$TMP_ROOT/a10.workflows" > "$FX/$KREL/workflows.toml"
+awk '{print} /^name = "spec-write"$/{print "stage = 3"}' "$TMP_ROOT/a10.workflows" > "$FX/$KREL/workflows.toml"
 (cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?
-check_arm "arm 10 a workflow row without step is one R6 line, naming the row and the field" \
-   "$([ "$rc" = 1 ] && grep ': R6 — ' "$A10R" | grep -qF "(build) is missing key 'step'" && echo 1 || echo 0)"
-sed 's/^step = "build"$/step = "buld"/' "$TMP_ROOT/a10.workflows" > "$FX/$KREL/workflows.toml"
-(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?
-check_arm "arm 10 a step outside the declared words is one R6 line, naming the row and the value" \
-   "$([ "$rc" = 1 ] && grep ': R6 — ' "$A10R" | grep -F '(build)' | grep -qF "step 'buld'" && echo 1 || echo 0)"
+check_arm "arm 10 a stage key in the catalogue is one R6 line, naming the row and the unknown key" \
+   "$([ "$rc" = 1 ] && [ "$(grep -c ': R6 — ' "$A10R")" = 1 ] && grep ': R6 — ' "$A10R" | grep -qF "(spec-write) has an unknown key 'stage'" && echo 1 || echo 0)"
 cp "$TMP_ROOT/a10.workflows" "$FX/$KREL/workflows.toml"
 printf 'CHARTER=%s\n' "$CH" > "$FX/.memory-tree.conf"
 (cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?
@@ -1014,7 +1040,69 @@ check_arm "arm 22 an empty prompt refuses by name" \
    "$([ "${A22#*$'\n'}" = 'refused 1' ] && echo 1 || echo 0)"
 [ "$A22" = $'rendered 1\nrefused 1' ] || printf '    %s\n' "${A22//$'\n'/$'\n'    }"
 
-# ---- arm 23 (TOOL-aTrimmedWait-7 AC1 to AC7): the agents verb's session record. Arm 9's fixture,
+# ---- arm 23 (TOOL-dDeclaredLoop-29 AC7 AC8): a role reading `upstream:rows?` is handed the rows file
+# ---- `--upstream` names as its `### upstream:rows` block, the row contract after the rows, and names
+# ---- the key on its `Not supplied` line without one; the catalogue checker's R3 refuses a bare
+# ---- `upstream:rows` as optional-only and an `upstream:` key outside the vocabulary. The fixture kit's
+# ---- gov-builder and gov-skeptic files gain the keys, so the shipped role files are what is edited,
+# ---- and the render's keys are gov-builder's reads filtered to the `upstream:` family, as arm 22
+# ---- filters to `brief:`. The failing case, observed at the close and not by the pass that wrote
+# ---- this: `READ_KEYS` at its base, which holds no `upstream:` family, so the render has no source
+# ---- for the key and R3 reads the bare key as outside the vocabulary, never as optional-only.
+build_fixture; _rc23=$?
+A23=$("$PY" -B -c 'import pathlib, re, subprocess, sys
+fx, kit, mr = pathlib.Path(sys.argv[1]).resolve(), pathlib.Path(sys.argv[2]).resolve(), sys.argv[3]
+sys.path.insert(0, str(kit))
+import handoff, roles_lib as lib
+def set_reads(role, old, new):
+    path = kit / "agents" / (role + ".agent.md")
+    text = path.read_text(encoding="utf-8")
+    path.write_text(re.sub(r"(?m)^(reads:.*?)%s$" % re.escape(old), lambda m: m.group(1) + new, text, count=1),
+                    encoding="utf-8", newline="")
+set_reads("gov-builder", "", ", upstream:rows?")
+reads = lib.load_roles(handoff.KIT_DIR)["gov-builder"]["keys"]["reads"].split(", ")
+keys = {"reads": ", ".join(k for k in reads if k.startswith("upstream:"))}
+(fx / sys.argv[3] / "builds" / "bx").mkdir(parents=True, exist_ok=True)
+rows = ("item.design.seams#seam-1 · seam · the kit resolver finds a sibling kit\n"
+        "item.design.seams#must-2 · criterion · no second copy of the ladder\n")
+(fx / "rows.txt").write_text(rows, encoding="utf-8")
+for up in ("rows.txt", None):
+    task = handoff.render_handoff(fx, mr, lib.resolve_charter_path(fx), "gov-builder", keys, "bx", "TOOL-bx-1",
+                                  None, {}, None, upstream=up)[2]
+    block = task.split("### upstream:rows\n\n", 1)[1] if "### upstream:rows\n\n" in task else ""
+    if up:
+        print("rendered %d" % (block.startswith(rows) and all(w in block for w in ("## Upstream", "used", "bypassed", "not-applicable"))))
+    else:
+        print("absent %d" % (not block and re.search(r"Not supplied, optional: [^\n]*`upstream:rows`", task) is not None))
+set_reads("gov-builder", ", upstream:rows?", ", upstream:rows")
+set_reads("gov-skeptic", "", ", upstream:other?")
+out = subprocess.run([sys.executable, "-B", str(kit / "check_roles.py"), "--root", str(fx)], cwd=str(fx),
+                     capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.splitlines()
+r3 = [ln for ln in out if ": R3 — " in ln]
+print("bare %d" % any("gov-builder" in ln and "upstream:rows must be optional" in ln for ln in r3))
+print("other %d" % any("gov-skeptic" in ln and "upstream:other?" in ln and "outside the vocabulary" in ln for ln in r3))
+' "$FX" "$FX/$KREL" "$MR" 2>&1)
+A23=${A23//$'\r'/}
+check_arm "arm 23 a role reading upstream:rows? is handed the rows and the row contract under --upstream" \
+   "$([ "$_rc23" = 0 ] && [[ $A23 == *'rendered 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 23 ...and without --upstream names the key on its Not supplied line" \
+   "$([[ $A23 == *'absent 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 23 R3 refuses a bare upstream:rows, naming it optional-only" \
+   "$([[ $A23 == *'bare 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 23 R3 refuses upstream:other? as outside the vocabulary" \
+   "$([[ $A23 == *'other 1'* ]] && echo 1 || echo 0)"
+[ "$A23" = $'rendered 1\nabsent 1\nbare 1\nother 1' ] || printf '    %s\n' "${A23//$'\n'/$'\n'    }"
+
+# ---- arm 24 (TOOL-dDeclaredLoop-56 AC28): a fixture whose copy of the loop kit is taken away after its
+# ---- scaffold: the adopter's `--check` exits non-zero naming the library's refusal, never reading the
+# ---- absent kit as an empty workflow table. The failing case, observed at the close and not by the
+# ---- pass that wrote this: a `read_workflow_order` answering an empty table for an absent kit.
+build_fixture; rm -rf "${FX:?}/$FXL"
+A24=$(run_adopter --check); _rc24=$?
+check_arm "arm 24 --check with no loop kit exits non-zero naming no loop kit places the workflows: " \
+   "$([ "$_rc24" != 0 ] && [[ $A24 == *'no loop kit places the workflows: '* ]] && echo 1 || echo 0)"
+[ "$_rc24" != 0 ] && [[ $A24 == *'no loop kit places the workflows: '* ]] || printf '    exit %s\n    %s\n' "$_rc24" "${A24//$'\n'/$'\n'    }"
+# ---- arm 25 (TOOL-aTrimmedWait-7 AC1 to AC7): the agents verb's session record. Arm 9's fixture,
 # ---- written afresh, run through the CLI: cold, which writes one record under the fixture's git
 # ---- common dir; warm, which writes nothing; with the record's `notified` emptied, which drops the
 # ---- `returned` line and so proves the record is read; after an append and after a torn line, each
@@ -1026,7 +1114,7 @@ check_arm "arm 22 an empty prompt refuses by name" \
 # ---- at the base, where no record is written. Not checked: timing, and a forged record.
 build_fixture; _rc23=$?
 A23S="$TMP_ROOT/s23/projects/p/22222222-2222-4222-8222-222222222222.jsonl"
-"$PY" -B -c "$A9_WRITE" "$FX" "$A23S" "$A9H" || echo "    arm 23: the fixture writer exited non-zero"
+"$PY" -B -c "$A9_WRITE" "$FX" "$A23S" "$A9H" || echo "    arm 25: the fixture writer exited non-zero"
 A23D="$FX/.git/handoff-calls"; cp "$A23S" "$TMP_ROOT/a23.full"
 A23_EDIT='import json, pathlib, sys
 rp = next(pathlib.Path(sys.argv[1]).glob("*.json"))
@@ -1045,38 +1133,38 @@ rp.write_text(text[:len(text) // 2] if mode == "truncated" else text, encoding="
 run_agents23() { out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" agents --handoff "$A9H" --session "$A23S" 2>"$TMP_ROOT/a23.err"); rc=$?; out=${out//$'\r'/}; }
 check_cold23() { [ "$rc" = 0 ] && [ "$out" = "$A9L1"$'\n'"$A9L2" ]; }
 [ ! -e "$A23D" ]; _a=$?; run_agents23
-check_arm "arm 23 a cold call prints arm 9's lines and writes one record under the fixture's git common dir" \
+check_arm "arm 25 a cold call prints arm 9's lines and writes one record under the fixture's git common dir" \
    "$([ "$_rc23" = 0 ] && [ "$_a" = 0 ] && check_cold23 && [ "$(ls "$A23D" | grep -cE '^[0-9a-f]{16}\.json$')" = 1 ] \
       && [ "$(ls -A "$A23D" | wc -l)" = 1 ] && echo 1 || echo 0)"
 touch -d '2000-01-01 00:00:00' "$A23D"/*.json; run_agents23
 _w23=0; check_cold23 && [ -n "$(find "$A23D" -name '*.json')" ] \
    && [ -z "$(find "$A23D" -name '*.json' -newermt '2001-01-01')" ] && _w23=1
-check_arm "arm 23 ...a warm call prints the same lines and leaves the record unwritten" "$_w23"
+check_arm "arm 25 ...a warm call prints the same lines and leaves the record unwritten" "$_w23"
 "$PY" -B -c "$A23_EDIT" "$A23D" poison; _e23=$?; run_agents23
-check_arm "arm 23 ...a record whose notifications are emptied drops the returned line, so the record is read" \
+check_arm "arm 25 ...a record whose notifications are emptied drops the returned line, so the record is read" \
    "$([ "$_e23" = 0 ] && [ "$rc" = 0 ] && [ "$out" = "$A9L1" ] && echo 1 || echo 0)"
 head -n 1 "$TMP_ROOT/a23.full" > "$A23S"; run_agents23
 "$PY" -B -c "$A23_EDIT" "$A23D" bad; _e23=$?; tail -n +2 "$TMP_ROOT/a23.full" >> "$A23S"; run_agents23
-check_arm "arm 23 ...a record taken on the first line, its bad count seeded, then the rest appended, prints the cold lines and the seeded count" \
+check_arm "arm 25 ...a record taken on the first line, its bad count seeded, then the rest appended, prints the cold lines and the seeded count" \
    "$([ "$_e23" = 0 ] && check_cold23 && grep -q ': 7 line(s) did not parse' "$TMP_ROOT/a23.err" && echo 1 || echo 0)"
 _l1=$(head -n 1 "$TMP_ROOT/a23.full" | wc -c)
 head -c $((_l1 + 40)) "$TMP_ROOT/a23.full" > "$A23S"; run_agents23
 "$PY" -B -c "$A23_EDIT" "$A23D" bad; _e23=$?; tail -c +$((_l1 + 41)) "$TMP_ROOT/a23.full" >> "$A23S"; run_agents23
-check_arm "arm 23 ...a torn last line, its bad count seeded, then completed, prints the cold lines and the seeded count" \
+check_arm "arm 25 ...a torn last line, its bad count seeded, then completed, prints the cold lines and the seeded count" \
    "$([ "$_e23" = 0 ] && check_cold23 && grep -q ': 7 line(s) did not parse' "$TMP_ROOT/a23.err" && cmp -s "$A23S" "$TMP_ROOT/a23.full" && echo 1 || echo 0)"
 "$PY" -B -c "$A23_EDIT" "$A23D" poison; _e23=$?; sed -i 's/async_launched/async_launchex/' "$A23S"; run_agents23
-check_arm "arm 23 a transcript edited at equal length keys the record off and prints the cold lines" \
+check_arm "arm 25 a transcript edited at equal length keys the record off and prints the cold lines" \
    "$([ "$_e23" = 0 ] && check_cold23 && echo 1 || echo 0)"
 _f=""
 for _k in parser session offset truncated; do
   "$PY" -B -c "$A23_EDIT" "$A23D" "$_k" || _f="$_f $_k(no-edit)"; run_agents23; check_cold23 || _f="$_f $_k"
 done
-check_arm "arm 23 a record with a foreign parser, session or offset, or truncated, prints the cold lines" \
+check_arm "arm 25 a record with a foreign parser, session or offset, or truncated, prints the cold lines" \
    "$([ -z "$_f" ] && echo 1 || echo 0)"
-[ -z "$_f" ] || echo "    arm 23: the record was used under:$_f"
+[ -z "$_f" ] || echo "    arm 25: the record was used under:$_f"
 rm -rf "$A23D"; printf x > "$A23D"; run_agents23
 _w23=0; check_cold23 && [ -z "$(find "$FX/.git" -name '*.tmp')" ] && _w23=1
-check_arm "arm 23 an unwritable record folder prints the cold lines and leaves no temporary file" "$_w23"
+check_arm "arm 25 an unwritable record folder prints the cold lines and leaves no temporary file" "$_w23"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

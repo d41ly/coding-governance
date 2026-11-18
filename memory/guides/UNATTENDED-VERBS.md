@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.127 -->
+<!-- gov:kit unattended@1.128 -->
 [memory/guides/UNATTENDED-VERBS.md · Level 3 · Binding with the unattended protocol, the verbs a run calls; yields to levels 0 to 2]
 # Unattended runs — the verbs
 
@@ -33,7 +33,10 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `UNATTENDED-STOPS.md` §7 is the contract; undeclared, the switch is `off` and one NOTE says so.
 - `--phase` — writes a phase and its witness. Without it the vocabulary is decorative: only
   `--preflight` and `--close` ever wrote one, so every member between them entered the file only by
-  hand-editing an artifact this kit calls generated.
+  hand-editing an artifact this kit calls generated. A move past a step exit is held, before anything is
+  written, while an owner gate at that exit reads `held` in the loop kit's breakpoint list, or while
+  that kit's phase map refuses either phase; the refusal names the gate and the act that releases it,
+  as at `--close`. Where the loop kit does not resolve, nothing is read and the move goes on.
 - `--park` — writes a decision the run REFUSED to take: the question, the options seen, the reason.
   Refused on a terminal record, and with no run-state file: a park minted for a run that never
   started records nothing about a run. **A fork with no delegated resolver is parked THROUGH THE
@@ -52,6 +55,26 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   rewrites the checklist it is graded by has no rules left. It reuses `--park`'s newline, separator,
   bypass and terminal refusals over the new step field, and its exact-line idempotence — with the
   step inside the identity, so one amendment at two steps is two rows.
+- `--refused` — records a REFUSED item, the default failure route: `--refused <slug> --item <tag>
+  --key <instance key> --reason <text>` writes one `refusal` row through `park()`, the key in the step
+  field, a `history` kind nothing blocks on and the owner is not asked about. It shares `--propose`'s
+  field guards, terminal refusal and exact-line idempotence, and records nothing unless the loop kit's
+  position engine holds the tag as one the composition declares and the key as that tag's instance
+  shape. `--plan` then prints the frontier on a `frontier:` line beneath `next:`: the unwitnessed items
+  of the build's step whose needs are witnessed, the refused instance still among them.
+  Beneath `frontier:`, `--plan <slug>` prints the build's breakpoints, the loop kit's
+  `breakpoints.py list` verbatim (`TOOL-dDeclaredLoop-19`): one
+  `breakpoint: <name> · <before|at|after> <item tag> · <reviewer|owner> · <cause>[ · <release>]` line each,
+  the reviews `review.<stage>` places, the owner gates `autonomy` places, each `review.breakpoints`
+  member, and under `decisions.major = "author-owner-ratifies"` the owner item at `item.build.ratify`
+  where a tracked spec carries a fork resolved `(agent, <date>, delegated)`. An owner line's release is
+  `authorization`, `held` or `released <record> <word>`, and `passed before placement` on each owner gate
+  of a build whose README's first commit does not contain the loop kit's placement of the module
+  (`TOOL-dDeclaredLoop-53`), which no hold reads as `held`. Beside an owner gate reading `held` where no
+  commit adds the build's README under the memory root, a last `breakpoints: held · no commit adds <path> ·
+  root from <conf>` line names the path looked for and the conf its root came from, `.unattended.conf`,
+  `.memory-tree.conf` or `default` (`TOOL-dDeclaredLoop-64`, `TOOL-dDeclaredLoop-75`); no hold reads it. Fire a review line through `--trigger` with its
+  cause. None print under `--paths` or `--framed`, nor where the loop kit does not resolve.
 - `--attest` — **the two agent-attested items have a VERB, and it is the only way to write one.**
   `--attest <slug> --item <item> [--value <text>]` derives the record key so no operator spells
   one, and REFUSES a machine-checked item by reading its declared CHECKER — so a project
@@ -86,7 +109,15 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   skips any line with fewer than four fields. The `roster:` and `next:` lines are unchanged, which is
   what makes one `--paths` invocation the resume path's single source for both "which unit is next" and
   "where is its spec". A `spec-disposal:` line sits between those two, carries no TAB and holds the value
-  a caller copies as `disposal`.
+  a caller copies as `disposal`. The `next:` line is the loop kit's position engine's, `position.py
+  <slug> --next-line`, handed this verb's rows, the first undecided ask, each `parents:` build's derived
+  phase, `RESUME_STALE_BOUND` and the owed park sets in `GOV_POSITION_STATES`. It names the
+  LEAST-ADVANCED unit, a unit's step read from witnesses — its pass commit and acceptance record, the
+  bar's `gates-run` tip, the remote-tracking tip — and never from a typed status word, so a MISSING,
+  THIN or FORKED unit beside a READY one takes the line and the loop holds on it. A build whose
+  least-advanced unit is built and waiting on its bar prints the terminal shape, or the ask's where one
+  is undecided; any answer the five shapes do not carry prints `none - <answer>: <reason>`, a
+  stale remote-tracking tip among them, which no reader matches as an all-clear.
   SEVERAL SLUGS may be given, and the single-slug form is then byte-identical to what it always
   was, because the framing appears only for two or more. Each build's output is opened by
   `unattended-plan-open: <slug>` and closed by `unattended-plan-rc: <slug> <rc>`, and each runs in
@@ -107,14 +138,15 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   exits 0. No unit given is check 14, and an unreadable fork cutoff, check 86, stops it. It is what the
   spec stage runs before the spec commit, so a spec defect is refused while its author can fix it. It
   does not make a refusal `--dispatch` reads from run state, the README or the whole tree.
-- `--status` — ONE line, opened by `unattended: <slug>`, with every field after it joined by ` · `
-  in the order this entry names them. The phase, the witness and the next unit print on every line:
+- `--status` — ONE status line, then the position engine's `position —`, `unit —`, `next —` and
+  `interrupt —` lines for the slug. The status line is opened by `unattended: <slug>`, with every
+  field after it joined by ` · ` in the order this entry names them. The phase, the witness and the next unit print on every line:
   `phase <phase>`, where a LANDED an owner's hand-off made, derived or settled, reads
   `LANDED (attended)`, any other derived LANDED reads `LANDED (derived: <sha8> on <ref> at <tip8>)`,
   and a LANDING the derivation explains reads `LANDING (not on the remote: <reason>)`;
   `witness <sha>`, the sha reading `NONE` on a record that names none, which the verb then refuses;
-  and `next <unit>`, the link label of the first non-terminal row in the generated units region, or
-  `(no non-terminal unit)`. Every other field is OPTIONAL and prints only under the condition named
+  and `next <unit>`, the position engine's least-advanced unit, or `(no non-terminal unit)` where the
+  build is terminal, every unit is deployed or the engine does not resolve. Every other field is OPTIONAL and prints only under the condition named
   beside it, so a record none of them applies to prints only the fields above. Between the witness
   and `next`: `halt-code <code>` when the record carries one, then `spec-audit <date>` when it pins
   one. After `next`, in order: `parked <n>` when owed parked rows exist; `noted <n>` when rows the
@@ -136,7 +168,7 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   refusals use, so neither refuses anything here. LAST,
   `keepalive <id> present|absent in the harness listing at <utc>` from the stop-guard's newest
   sidecar line, whatever its phase, when the record names a keepalive id and that line exists. The
-  line stays ONE line: a field joins it or does not print, and the suite arms that.
+  status line stays ONE line: a field joins it or does not print, and the engine's lines follow it.
 - `--audit` — one line per unit whose dispatch rows at their newest anchor, taken together, are still
   open and whose spec is neither terminal nor deferred (DEFERRED, with its latest rescope defer row
   after every dispatch row naming it): how long the TREE has been idle (newest write, newest commit)
@@ -195,6 +227,11 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   Where `RUN_CLAIMS` is `on`, before any item is graded, a run that does not hold its claim
   on the remote is check 108 and a claim that cannot be read or renewed is check 109: a close
   that lands a claim it never read is a double landing.
+  An owner breakpoint the policy file places holds the close before the anchor round-trip, check 82,
+  while its `breakpoint:` line reads `held`, naming each item: park the question with `--park <slug>
+  --item <tag> --reason <question>`, hand over with `--handoff <slug> --code owner-decision`, and the
+  owner's disposition record whose `Item` is that tag releases it at the next `--close`. A list that
+  refuses is relayed through the same check; where the loop kit does not resolve nothing is read.
 - `--authorization` — `--authorization <slug>` grades `authorization-reachable` alone, by the arm
   `--close` grades it with, so it answers what the close would from the same tree. Run it after any
   merge of the remote's default branch into the run branch, mid-build included, and under
@@ -234,6 +271,12 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   checking it. Nothing forces the call to precede the edit, so the row is a declaration in shape
   rather than in enforced ordering: the pair catches an amendment made with NO record, never a
   truthful-looking row attached to a different edit.
+  With `--flow <tag>` it records a change of the build's own FLOW instead (TOOL-dDeclaredLoop-28):
+  `--act add|amend|exclude|supersede`, the proposing unit as `--item`, the row file as `--row` on every
+  act but `exclude`, and a reason. The loop kit's `adapt.py propose` makes every check of the proposal and
+  writes its change record and its `rescope · flow` row; this verb stages the run-state file, and any
+  refusal of that verb is its one refusal, naming the verb's first line. The change applies, waits for
+  the owner or is refused at the build's next step boundary under `flow.adapt`.
 - `--dispatch` — records the WRITE-SET DECLARATION a concurrent dispatch owes: `--pass <unit-id>`
   and `--writes`, which takes every path up to the next flag: a whitespace-joined value splits into
   its paths, and the flag may repeat. The build method requires two path
@@ -280,9 +323,12 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `review` line in the parked region, a `history` kind, so it never inflates the count of decisions
   the owner must be shown. A round re-arms the loop only if its confirmed-blocker count is STRICTLY
   smaller than the round before — and a subject that is NOT the build slug, a spec audit, takes at
-  most the declared `REVIEW_ROUNDS` rounds (kit default 1) before it exits `BOUNDED`; the build slug
-  is the closing diff review and its bound is the runaway ceiling, so it converges or backstops as it
-  always did. At a TERMINAL exit — `CONVERGED`, `NON-CONVERGENT`, `CEILING` or `BOUNDED` — on EVERY
+  most its spec bound before it exits `BOUNDED`, and the build slug, the closing diff review, its
+  closing bound: both are policy keys, read by the loop kit's `review_bounds.py show` (one round under
+  the default `review.design.rounds`, `review.max-rounds` under the default `review.follow-up`), and a
+  round one past `review.max-rounds`, default 3, reads `CEILING`. Where that module or the policy kit
+  does not resolve, the driver takes its four `REVIEW_*_DEFAULT` constants and says so on stderr; a
+  bound the module refuses refuses the round, writing nothing. At a TERMINAL exit — `CONVERGED`, `NON-CONVERGENT`, `CEILING` or `BOUNDED` — on EVERY
   subject, spec subjects included, the round REQUIRES `--highs <n>` and `--minors <n>`, the confirmed
   HIGH and MEDIUM-plus-LOW findings standing at the exit, and writes them before the disposition.
   The build slug, and a spec subject before `SPEC_FOLD_CUTOFF` or under a blank one, write
@@ -315,6 +361,83 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   or no disposition and, on `promote`, one per blocker and high its folds cannot account for plus one
   for its minors, at least one, and reds a short sum or a disposition its counts do not derive; every
   other row keeps the floor of one.
+  THE ROUND COUNT (TOOL-dDeclaredLoop-32) is blockers plus THIS round's highs: `--round-highs <n>` and
+  `--round-minors <n>`, optional on every round of every subject and held to the canonical decimal,
+  write ` · round-highs <n>` and ` · round-minors <n>` directly after `blockers <b>`, and a round
+  recorded without them reads as its blockers alone. They are not `--highs` and `--minors`, which keep
+  their meaning and their terminal-only refusal. Each subject converges at its TARGET count reading
+  zero: `review_bounds.py show` prints `spec-target=` and `closing-target=`, each `blockers`, `highs`
+  (plus round-highs) or `all` (plus round-minors too). The build slug also ends `NON-CONVERGENT` once its
+  rounds before this one are past `flow.route-backs`, default 3; a spec subject takes no strict-fall
+  rule and ends at its target or its bound. Every exit row recording `disposition promote` records
+  its target before it: ` · to units`, or on the build slug ` · to asks` once `budget.py target`, read
+  after the round's draw, answers `on-exhausted`. Check 2 reads a ` · to asks` exit as owing its floor in
+  asks the build's `BACKLOG.md` gained since BASE, never unit ids.
+  THE COUNT'S RULE (TOOL-dDeclaredLoop-20) is `review.findings`, read with the bounds: `blocker-high-own`, the
+  default, owes the floors above; `all-own` one unit per confirmed finding, the promoted count past
+  `SPEC_FOLD_CUTOFF`; `blocker-own` one per blocker plus one for the highs and minors when any stood. A terminal
+  row under a value other than the default records ` · findings <value>` after its counts and before
+  ` · to <target>`, the exit note names that value's clause, and check 2 computes the row's floor from the field,
+  an absent one reading the default.
+- `--trigger` — `--trigger <slug> --subject <s> --cause owed|opt-in|recommendation|placement [--pin <path>]...`
+  fires ONE review (TOOL-dDeclaredLoop-20) and prints what its call takes, so no caller types a pin value. It
+  refuses a cause outside `TRIGGER_CAUSES` and a subject whose review loop already ended, by `--review`'s own
+  terminal predicate, and relays a review policy or pin that does not read. It reads the four `review.dispose`
+  keys through `review_bounds.py show` and the five pin values through `review_bounds.py pin`, refusing a
+  non-empty `review.opt-in`. With a `--pin`, it runs the workflows kit's `review_pin.py` with one `--subject` per
+  path and prints each line that prints with `"trigger"` and `"reviewPolicy"` added; with none, a diff
+  review's call, it prints one line of `unclassed`, `twin`, `trigger` and `reviewPolicy`. `reviewPolicy` is
+  `{findings, unverified, leftShift, blocks}`, `blocks` `yes` under `review.blocks every-review`, under
+  `owed-only` when the cause is `owed`, else `no`. It writes no row: a non-round `review` row would hide the
+  subject's terminal token. The build harness takes the `trigger` and `reviewPolicy` it prints.
+- `--recommend` — `--recommend <slug> --stage <s> [--reason <text> --verdict review|no-review]` scores ONE
+  stage exit's review recommendation (TOOL-dDeclaredLoop-22), `item.<stage>.recommend`, and records Design's
+  reason, `item.design.reason`. The SCORE form reads `review.recommendation` and
+  `review.recommendation.source` through the policy kit, scores the stage from the build README's generated
+  units region (`unarmed` for `plan`, `test` and `deploy`, which hold no signal source; `none` for `design`
+  under `agent-judgment`; else `review` on any signal and `no-review` on none, the signals two or more units,
+  a spec grading `FORKED` for `design` and a Tier-2 row for `build`) and binds it (`no` under `advice`, `yes`
+  under `binding`, under `binding-above-tier` `yes` where a row reads Tier 2). It writes a score record
+  through the record factory's `new recommendation` door under the build's lowest-numbered unit and stages
+  it; a build with no unit gets the line and no record. The main loop calls it at each stage exit, Design's
+  once the spec set is committed. The REASON form, `design` alone, writes the role's answer as a reason
+  record answering the stage's newest score record. THE DECIDING RECORD is the score record under
+  `signals-only` and for every stage but `design`; for `design` under the other two sources it is the reason,
+  and the score line then names the spawn: the main loop runs `handoff.py render --role gov-spec-writer`,
+  hands it the score line and one question, should this be reviewed and why, and records its `review` or
+  `no-review` with the reason form. Where the deciding record reads `review` and binds, it prints
+  `unattended.sh --trigger <slug> --subject <s> --cause recommendation`, `<s>` `<slug>-specs` for `design`
+  and `<slug>` for `build`. It refuses, writing nothing, a stage outside the five, one of `--reason` and
+  `--verdict` alone, a verdict outside the two, a reason for any stage but `design` or under `signals-only`,
+  and a reason with no score record to answer; and it relays the policy reader's or the factory's refusal,
+  or names the kit that did not resolve. It needs no run-state file and writes no row; the answer is
+  recorded, never acted on, since the spec audit's opt-in is the owner's.
+- `--fix-pass` — `--fix-pass <slug> --unit <id> --reds <n>` records ONE fix pass against a unit's
+  acceptance, `<n>` its criteria still red after the pass, as a `fix-pass` row
+  `reds <n>[ · <EXIT>][ · to <target>]`, a history kind like `review`. Its state is the review loop's
+  over the unit's earlier passes, the count and the target both the reds, under `flow.route-backs`
+  and the strict-fall rule, so an acceptance red that never greens records `reds 1` twice and the
+  second pass reads `NON-CONVERGENT`. A terminal pass with reds standing records ` · to units` while
+  the rework budget remains and ` · to on-exhausted` once it is spent, the build then ending as
+  `flow.on-exhausted` says. It draws nothing: the dispatch before a pass draws it. A unit whose last
+  `fix-pass` row is terminal takes no further `--fix-pass` and no `--dispatch`. It refuses a unit that
+  is not id-shaped or a reds count off the canonical decimal, and relays a review bound or budget
+  target that does not read. Check 2 reds a unit whose passes stay flat with no exit token.
+- `--exhausted` — `--exhausted <slug>` ends a build whose rework budget is spent (TOOL-dDeclaredLoop-31).
+  It reads `budget.py ending`, whose ending `flow.on-exhausted` names: `best-effort-ending`, the
+  default, reads `land-green` where every unit not `WONTDO` is `CLOSED`, `descope` where some unit is,
+  else `close-incomplete`; `park-for-owner` and `close-incomplete` read themselves. It parks ONE
+  `decision · item flow.on-exhausted · reason ending <e> · spent <s>/<t> · open <ids>` row, owed at the
+  wrap-up, stages it, and prints the act that ending owes: `close-incomplete` files each open unit with
+  `--rescope --act defer`, then `--abort --code budget-exhausted`; `park-for-owner` reaps the keepalive,
+  then `--handoff --code owner-decision`, the row its parked decision; `land-green` and `descope` go on
+  to `--close`, a descope first deferring each open unit against an ask. It prints that only the owner
+  raises `flow.rework-budget`. A standing exhaustion row is printed and nothing is written, and a
+  budget that is not spent, or a module that does not answer, is refused writing nothing. Once the
+  budget is spent, a refused round or dispatch names `--exhausted <slug>`, or the recorded ending once
+  the row stands. A hold under `owner-decision` whose exhaustion row reads `park-for-owner` is refused
+  by `--resume` until the owner's newest disposition record of the item `flow.on-exhausted` names reads
+  `continue`; it releases on `continue`, and on `none` the abort above ends the build.
 - `--record-round` — `--record-round <slug> --subject <s> --audited "<ids>" --blockers <b> --highs <h>`
   with a repeatable `--finding <id>/<severity>/<nature>/<spec>[,<spec>]/<unit>/<rev>` and a repeatable
   `--sibling <unit>@rev-<n>`: appends ONE spec-audit round to the build's one tracked chain record,
@@ -373,7 +496,11 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   AMEND of a pass commit is graded too, but an undeclared path in it is refused with no widening:
   a `--dispatch` would anchor at the commit the amend replaces, which check 23 never grades.
 - `--claims` — every run claim on the remote, one TAB-separated row each: slug, node, status,
-  beat age in seconds and verdict, `live`, `stale`, `held`, `terminal` or `unknown`, sorted by slug;
+  beat age in seconds and verdict, `live`, `stale`, `held`, `terminal` or `unknown`, sorted by
+  slug. `--with-key` adds a sixth field, the claim's key, a `k1:` key over its claim ref and its run
+  record's blob at the default branch's tracking ref (`k1:?` where that record is absent; `-` where
+  python or the loop kit does not resolve), and only that form spends the key's one python spawn; a
+  driver released before the flag ignores it and prints five;
   `claims: none` when there is none, and exit 2 with check 109 when the remote does not answer, never
   an empty list. Where `RUN_CLAIMS` is not `on` it prints the single line `claims: off`, exits 0
   and reads nothing, since no verb writes or reads a claim then; `git ls-remote <remote>
@@ -401,7 +528,10 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   any write: an already-HELD record, a dirty tree, an unpublished tip under `ANCHOR_SCOPE=published`,
   a code or condition outside its grammar, a keepalive neither reaped nor recorded unreachable,
   because a job still firing into a held run re-dispatches its units at the next tick, and a
-  process the slug's driver recorded still alive once its orphans are reaped. One
+  process the slug's driver recorded still alive once its orphans are reaped. `--code inherited-red`
+  is the red attribution's to decide, never the run's: it is refused, check 83, unless the attribution
+  record of the bar the `gates-run` fact names reads every red leg INHERITED on this tree, the
+  run-state file and the paths that close staged excepted, as `--handoff --code owner-landing` is. One
   exception to the published-tip clause: under `--code platform-unavailable`, and only when the
   remote does not ANSWER, it accepts the unpublished tip and records it as `hold-unpushed`. In the
   SAME write it decides whether a DURABLE restart is owed and records `resume-owed` and
@@ -444,7 +574,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   With both attested items met it makes `--park`'s refresh and records `refreshed-at` beside the phase.
   Where `RUN_CLAIMS` is `on` it writes `aborted` into the run's claim once the record is staged;
   a claim another session holds is announced and the abort still lands, which is how a run
-  that lost its claim ends: `--abort <slug> --code claim-lost`.
+  that lost its claim ends: `--abort <slug> --code claim-lost`. `budget-exhausted` ends a build whose
+  spent budget's exhaustion row reads `close-incomplete`, or `park-for-owner` with the owner's
+  disposition `none`, and is refused without that row or while an open unit has no defer row in force.
 
 ## The paths, in order
 
@@ -575,7 +707,12 @@ one are two acts with two authorizations.
    `unattended: spec-audit — opted in by README spec-audit: <date>`;
    `unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: <date>` when the README
    declares no key (`TOOL-aBlindedTrial-7`; the README key wins whatever it says); or
-   `unattended: spec-audit — not owed (opt-in)`. The audit is OPT-IN per build (owner ruling of
+   `unattended: spec-audit — not owed (opt-in)`; or, where the policy key `review.design` read at the
+   default-branch side of BASE decides (`TOOL-dDeclaredLoop-19`), `unattended: spec-audit — opted in
+   by policy review.design: <value> · <date>` under `owed` or a Tier-2 spec under `owed-above-tier`,
+   the date BASE's, and `unattended: spec-audit — not owed by policy review.design: <value>` under
+   `off` or `owed-above-tier` with no Tier-2 spec; a policy file that does not read there is check 55.
+   The audit is OPT-IN per build (owner ruling of
    2026-09-20, `TOOL-aBlindedTrial-6`); the README key is read at BASE and the project default at
    the default-branch side of it, so a working-copy edit opts nothing in or out, and a value that is
    not a date is a refusal. **The opt-in is the OWNER's, never yours** (`TOOL-aWardedAudit-4`): do
@@ -898,7 +1035,8 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
 
 ### Review rounds, and the loop that ends itself
 
-Record EVERY round: `--review <slug> --subject <id-or-slug> --verdict <verdict> --blockers <N>`.
+Record EVERY round: `--review <slug> --subject <id-or-slug> --verdict <verdict> --blockers <N>`,
+with `--round-highs <H> --round-minors <M>` where the round's highs and minors are known.
 `--subject` is the spec for a spec audit and the BUILD SLUG for the closing diff review; the verdict
 is `CLEAN`, `CLEAN WITH FIXES` or `BLOCKED`; `--blockers` is THIS round's confirmed count. Act on the
 state it answers (the rule is M4 and M8; the verb entry above states the recording):
@@ -920,7 +1058,7 @@ state it answers (the rule is M4 and M8; the verb entry above states the recordi
   run added only from a spec run whose `--rescope --act add` row stands, and the build run after it
   must build it. Record `--highs`, `--minors` and `--disposition promote`; `fold` is refused at this
   exit. A spec subject past `SPEC_FOLD_CUTOFF` takes **BOUNDED**'s disposal instead.
-- **BOUNDED** — `REVIEW_ROUNDS` (kit default 1) reached on a subject that is not the build slug.
+- **BOUNDED** — the subject's bound reached: the spec bound on a spec subject, the closing bound on the build slug.
   Before `SPEC_FOLD_CUTOFF`, disposed exactly as `NON-CONVERGENT`, recorded with both counts and
   `promote`. Past it the build harness's DISPOSAL stage disposes by nature: a LOCAL finding, a BLOCKER
   too, folds into each spec it touches, a NEW MECHANISM finding is PROMOTED, and a repair's sibling
@@ -931,7 +1069,7 @@ state it answers (the rule is M4 and M8; the verb entry above states the recordi
   declared `disposal` the ids `--chain-verdict` names, and no `subjectRound`, a fold re-invoke copies
   the `subjectRound` the CONVERGING return handed back, and `auditIds` and `subjects` are never
   passed together. Skip it and `specs-audited` refuses at `--close` where an audit is declared.
-- **CEILING** — the runaway backstop fired: a defect in the predicate. Promote, land anyway, and
+- **CEILING** — a round one past `review.max-rounds`: a defect in the predicate. Promote, land anyway, and
   record it in the build README. A chain's `review.spec-audit.chain-ceiling` is another bound, which
   HOLDs a chain of subjects for the owner and is a `--chain-verdict` word, never this state.
 
@@ -946,6 +1084,20 @@ spec subject recorded by hand they are that exit round's `highs`, and its `confi
 highs` plus every UNVERIFIED finding the disposal promoted, with no summing, because a spec round's
 fold fixes everything that round confirmed. Strictly smaller, never merely different: 2, 1, 2
 changes forever. A subject whose loop ended takes no further round.
+
+**The count is blockers plus the round's highs, and each subject has a target** (TOOL-dDeclaredLoop-32).
+Every state above reads `blockers + round-highs` where it says blockers, and `CONVERGED` is the
+subject's TARGET count at zero: `blockers` under `review.design.rounds` `one`, `fixed-count` and
+`until-no-blocker` and under `review.follow-up` `never`; `highs`, blockers plus round-highs, under
+`until-no-high` and `after-high`; `all`, every confirmed finding, under `until-clean` and
+`while-finding`. A spec subject's loop never ends on a flat count; it ends at its target or its bound.
+The build slug's ends `NON-CONVERGENT` too once its earlier rounds are past `flow.route-backs`. Its
+promoting exit goes ` · to units` while the rework budget remains and ` · to asks` once it is spent, an
+ask per BLOCKER and HIGH and one for the minors, filed in the build's `BACKLOG.md`; a spec subject's
+always goes ` · to units`. The build harness passes the round flags on every round it records and
+reads its `specTarget` arg, the `spec-target=` word `show` prints, default `blockers`, so a spec
+target of `highs` or `all` is never predicted converged at zero blockers. A fix pass ends the same
+way through `--fix-pass`, its count the unit's reds.
 
 **A spec subject past `SPEC_FOLD_CUTOFF` COUNTS its disposal.** Its terminal round also carries
 `--folded <F> --promoted <P>`, and the build harness, given `disposal`, records the exit after the
@@ -1130,7 +1282,9 @@ landed `abandoned`, and refuses anything git does not prove.
 `--abort <slug> --code <halt-code> --reason "<what stopped it, and what you refused to decide>"`.
 Both are required: the reason is prose for the owner, the code is what the status line, the resume
 path and the gate leg join on. No catch-all member exists: take the closest code, put the specifics
-in the reason, and say so. Both attestations come first. An abort neither merges nor pushes, and the
+in the reason, and say so. A build whose rework budget is spent ends through `--exhausted <slug>`
+first, and its `close-incomplete` ending through `--code budget-exhausted`, once every open unit is
+filed with `--rescope --act defer`. Both attestations come first. An abort neither merges nor pushes, and the
 verb stages the run record beside the ABORTED record, so commit them together.
 
 ### Reap

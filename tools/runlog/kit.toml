@@ -97,6 +97,7 @@ subject = "repo"
 argv = ["python", "{kit}/runlog.py", "check-records"]
 guard = []
 history_depth = "full"
+stage = ["step.test"]
 
 # THE SKILL'S WIRING LEG SHIPS (TOOL-dLoggedFlight-12), for the reason the memory-recall kit's does:
 # its subject is the target's own rendered Skill, which goes stale when the target's memory root moves
@@ -106,6 +107,7 @@ name = "runlog skill wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-runlog.sh", "--check"]
 guard = []
+stage = ["step.test"]
 
 # ONE [[lf_pin]], for the rendered Skill, which its own leg byte-compares; the leg strips CR from the
 # working copy too, so the pin keeps the committed bytes deterministic rather than holding the leg up.

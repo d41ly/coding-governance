@@ -24,7 +24,7 @@ import pathlib
 import re
 import tomllib
 
-KIT_ROLES_VERSION = "1.22"
+KIT_ROLES_VERSION = "1.23"
 
 #: Every front-matter key a role file may carry: Claude Code's own, then gov's.
 #: Split from one string, because a quoted `"tools"` beside a quoted segment reads to the
@@ -37,7 +37,10 @@ READ_KEYS = frozenset(
     ["task:" + f for f in ("title", "goal", "in", "out", "todo", "reuse", "acceptance", "gates")]
     + ["card:" + f for f in ("route", "records", "classes", "read", "open", "reuse")]
     + ["brief:" + f for f in ("prompt", "goal", "items", "acceptance", "gates", "non-goals")]
-    + ["input:" + f for f in ("spec", "diff", "question", "prompt")])
+    + ["input:" + f for f in ("spec", "diff", "question", "prompt")]
+    # the rows an item's upstream items established, handed on by `handoff.py render --upstream`, legal
+    # only optional since only an item naming upstream items has them (TOOL-dDeclaredLoop-29)
+    + ["upstream:rows"])
 
 #: The reasoning-effort levels a role or a stage may take (TOOL-aOrientedCast-10). Read from Claude
 #: Code 2.1.292, whose agent loader and `Workflow` `agent()` options both take these five names; the
@@ -491,6 +494,25 @@ def load_workflows(kit_dir):
     if not isinstance(entries, list) or not all(isinstance(e, dict) for e in entries):
         raise RolesError("%s: R6 — 'workflow' is not an array of tables" % path.as_posix())
     return entries
+
+
+def read_workflow_order(kit_dir):
+    """`{workflow name: order}` from the loop definition (TOOL-dDeclaredLoop-1): each workflow's build
+    order, 0 for an any-time one, which this kit's table no longer carries. The loop kit is found by
+    `resolve_kit_dir` from `kit_dir` and its reader imported, as `read_cap_answer` reaches the policy
+    kit. No loop kit, or a definition its reader refuses, raises RolesError naming it."""
+    import sys
+    try:
+        kit = str(resolve_kit_dir("loop", "loop_lib.py", kit_dir))
+        if kit not in sys.path:
+            sys.path.insert(0, kit)
+        import loop_lib  # the loop kit's reader, found above
+    except (LookupError, ImportError) as exc:
+        raise RolesError("no loop kit places the workflows: %s" % exc)
+    try:
+        return loop_lib.read_workflow_order(kit)
+    except loop_lib.LoopError as exc:
+        raise RolesError("the loop definition does not read: %s" % exc)
 
 
 def extract_workflow_harnesses(workflows):

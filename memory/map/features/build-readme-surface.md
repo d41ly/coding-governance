@@ -7,6 +7,8 @@ status = "shipped"
 streams = ["tooling"]
 decisions = []
 
+stage = ["step.test"]
+
 [claims]
 gate-legs = ["build README slot contract"]
 kits = []
@@ -106,7 +108,8 @@ pair, so a README with no markers passed every trigger however much prose it hel
 it went unseen.
 
 **Order is authored on the SPECS and computed here.** `· order <n>` in a status header is a positive
-integer, at most once; ties are the parallel group, gaps are permitted so a retired unit needs no
+integer, at most once; a tie is one step, parallel only where `derive_parallel_step` proves its units'
+declared write sets and edges disjoint, gaps are permitted so a retired unit needs no
 renumber, and a malformed value REFUSES rather than rendering a plausible step. The roster carries
 Order and Tier and sorts by build order; the link cell stays first and status stays a whole delimited
 cell, because the unattended driver selects on both.

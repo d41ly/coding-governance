@@ -32,6 +32,7 @@ name = "install-prefix self-test"
 subject = "kit"
 argv = ["bash", "{prefix}/check-install-prefix.test.sh"]
 guard = ["{prefix}/check-install-prefix.sh"]
+stage = ["step.test"]
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
@@ -45,3 +46,4 @@ name = "install-prefix (shipped surface)"
 subject = "repo"
 argv = ["bash", "{prefix}/check-install-prefix.sh"]
 guard = []
+stage = ["step.test"]

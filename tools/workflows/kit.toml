@@ -130,6 +130,7 @@ name = "verifier fan-out"
 subject = "repo"
 argv = ["bash", "{kit}/check-verifier-fanout.sh"]
 guard = ["{kit}/"]
+stage = ["step.test"]
 
 [[gate_leg]]
 name = "review-protocol parity (kit vs dogfood)"
@@ -141,6 +142,7 @@ argv = ["bash", "{kit}/check-protocol-parity.test.sh"]
 # let a memory-tree move skip this leg inside the pre-push window. It costs about a second.
 guard = []
 doc_reads = ["{memory_root}/guides/"]
+stage = ["step.test"]
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
@@ -154,12 +156,14 @@ name = "review-join ban (no ref-keyed join)"
 subject = "repo"
 argv = ["bash", "{kit}/check-review-join.sh"]
 guard = []
+stage = ["step.test"]
 
 [[gate_leg]]
 name = "workflow script syntax"
 subject = "repo"
 argv = ["node", "{kit}/check-workflow-syntax.js"]
 guard = []
+stage = ["step.test"]
 
 # THE REPLAY TOOL'S SELF-TEST. TOOL-aSightedSkeptic-9 S8, mirroring `shell-hygiene selftest` in the
 # gate-lint kit. Unlike this kit's `*.test.sh` suites it SHIPS: the tool is an engine file under
@@ -172,6 +176,7 @@ name = "review-replay selftest"
 subject = "kit"
 argv = ["python3", "{kit}/review_replay.py", "--selftest"]
 guard = []
+stage = ["step.test"]
 
 [[lf_pin]]
 pattern = "{kit}/*.js"

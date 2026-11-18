@@ -9,8 +9,10 @@ scope = "repo"
 
 # The card every `task:` and `card:` input is read from is written by the kickoff kit's card writer,
 # and the checker, the library and the adopter read the memory root and the governing doc's path from
-# `.memory-tree.conf`.
-requires = ["kickoff-manifest", "memory-tree"]
+# `.memory-tree.conf`. Each workflow's build order and step are the loop kit's (TOOL-dDeclaredLoop-1):
+# the catalogue checker joins the workflow table with the loop definition, and the adopter binds the
+# Skill's stage headings to its orders, so with no loop kit both refuse.
+requires = ["kickoff-manifest", "memory-tree", "loop"]
 
 # `/build` and `handoff.py harness-args` drive the three harnesses `workflows.toml` names, and all
 # three ship in `review-harness`, which is not a default. TOOL-aOrientedCast-8 section 8 F1: a plain
@@ -101,6 +103,7 @@ subject = "repo"
 argv = ["python", "{kit}/check_roles.py"]
 guard = []
 ceiling = 120
+stage = ["step.test"]
 
 # THE RENDER'S WIRING LEG SHIPS. One leg grades the agent types, the role index and the Skill
 # together; its subject is the target's own render, which goes stale when an overlay, the conf or the
@@ -111,6 +114,7 @@ subject = "repo"
 argv = ["bash", "{kit}/adopt-roles.sh", "--check"]
 guard = []
 ceiling = 300
+stage = ["step.test"]
 
 [[gate_leg]]
 name = "roles render selftest"
@@ -118,6 +122,7 @@ subject = "kit"
 argv = ["python", "{kit}/render_agents.py", "--selftest"]
 guard = []
 ceiling = 300
+stage = ["step.test"]
 
 # THE OUTPUTS ARE A PROGRAM'S. An agent type is a base role, a house overlay and front matter
 # composed by `render_agents.py`, not one template with tokens, so it is declared here and not as a

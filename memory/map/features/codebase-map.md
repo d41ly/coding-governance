@@ -7,6 +7,8 @@ status = "shipped"
 streams = ["tooling"]
 decisions = []
 
+stage = ["step.build", "step.test"]
+
 [claims]
 gate-legs = ["codebase-map coverage + freshness", "codebase-map gate coverage", "codebase-map kit selftest", "codebase-map adopter e2e"]
 kits = ["codebase-map"]

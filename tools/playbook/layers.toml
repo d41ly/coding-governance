@@ -27,7 +27,7 @@ uses = []
 tag = "layer.flow"
 kind = "core"
 definition = "a build's lifecycle: Plan, Design, Build, Test and Deploy as programs of items, review as breakpoints and testing as probes at any boundary, with the verdict engine and the lander"
-declares = ["point.flow.verdict-backend", "point.flow.release", "point.flow.version", "point.flow.leg-pack"]
+declares = ["point.flow.verdict-backend", "point.flow.release", "point.flow.version", "point.flow.leg-pack", "point.instruction.guard"]
 uses = []
 
 [[layer]]

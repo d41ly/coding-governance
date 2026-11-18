@@ -220,7 +220,7 @@ derive_index_repair() {
 # library from an unsourced shell refuses on its first run instead of taking the defaults silently.
 # A BOUND KEY: DEFAULTED, VALIDATED, AND ANNOUNCED. TOOL-aBoundedCeiling-6, hoisted at its second
 # instance by TOOL-aProbedUnit-3 — the charter's section 12 extracts the shared contract when the
-# second caller arrives, and the third (`REVIEW_ROUNDS`) is a call, never a third `case`.
+# second caller arrives, and a later one is a call, never a third `case`.
 #
 # A conf that declares nothing still gets a bound, because the population that produced the observed
 # 3h19m hang is exactly the one that never edits this key. What it does NOT get is silence: the line
@@ -1069,21 +1069,17 @@ pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEA
   # nothing and its subject is never read; a commit with no trailer keeps the subject match a landed
   # record was graded by. Before this a records commit whose subject named a unit, or a range such as
   # `-1..4`, was taken as that unit's pass.
-  GIT log --reverse --format="%H%x09%s%x1f%(trailers:key=Pass,valueonly,separator=%x20)" "$_pa..$_pto" >"$_pf" 2>/dev/null || :
-  # It reads LINES rather than word-splitting because a subject holds spaces, and the possibly-empty
-  # field is LAST for the reason memory/gotchas/empty-field-collapses-unless-it-is-last.md states.
-  while IFS=$'\t' read -r _pc _psub; do
+  # THE WALK IS THE ONE TRAILER READER'S (TOOL-dDeclaredLoop-23 S5): `read_attribution_tokens` below
+  # prints one tokenised line per commit, `<sha> PASSTRAILER <ids>` for a trailered commit and
+  # `<sha> <subject tokens>` otherwise, with the one token rule applied and a `none` already cleared,
+  # so the unit is matched here as a whole token of the line. A reader that cannot answer says why on
+  # stderr, and that is rc 2 for the reason the scratch-file refusal above gives.
+  read_attribution_tokens --reverse "$_pa..$_pto" >"$_pf" || { rm -f "$_pf"; return 2; }
+  # It reads LINES rather than word-splitting because a subject holds spaces: the sha is the first
+  # word and everything after it is the line's tokens.
+  while read -r _pc _psub; do
     [ -n "$_pc" ] || continue
-    _ptr=${_psub#*$'\x1f'}; [ "$_ptr" = "$_psub" ] && _ptr=""; _psub=${_psub%%$'\x1f'*}
-    if [ -n "$_ptr" ]; then
-      # ONE TOKEN RULE for every trailer reader (closing review r1, M2/L2): ids split on any character
-      # an id cannot hold, so `A, B` names both, and a `none` anywhere attributes the commit to nothing.
-      _ptr=" ${_ptr//[^A-Za-z0-9-]/ } "
-      case "$_ptr" in *" none "*) continue ;; esac
-      case "$_ptr" in *" $_pu "*) ;; *) continue ;; esac
-    else
-      id_in "$_psub" "$_pu" || continue
-    fi
+    case " $_psub " in *" $_pu "*) ;; *) continue ;; esac
     _ptouch=$(GIT diff-tree --no-commit-id --name-only -r "$_pc" 2>/dev/null | grep -vxF -- "$_prel" || true)
     [ -n "$_ptouch" ] || continue
     # EXACT membership against the newline-wrapped set, deliberately not `covers`: a row naming a
@@ -1170,12 +1166,23 @@ check_gen_region_only() { # before object · after object -> 0 when both exist a
 # everywhere: a commit carrying a `Pass:` trailer yields `PASSTRAILER <its ids>` and NOT its subject,
 # so `Pass: none` names no unit; one with no trailer yields its subject's tokens, as before. Tokens
 # are runs of `[A-Za-z0-9-]`, the shape a whole-token `case " $id "` match reads.
+#
+# THE LINES ARE THE KIT'S ONE TRAILER READER'S (TOOL-dDeclaredLoop-23 S5): the `tokens` verb of
+# `commit_trailers.py` beside this library, its `replace` view, run with the launcher the caller's own
+# inline `resolve_python` answers, as `resolve_index_generator` asks it. NO LAUNCHER IS A NAMED
+# REFUSAL, status 2 with nothing printed, never an empty answer: an empty answer reads every unit as
+# unbuilt and looks like a correct one. An install holding no trailer key table reads the reader's
+# floor keys, `Pass` among them, and its one note goes to stderr (TOOL-dDeclaredLoop-40); the
+# reader's own refusal reaches stderr and is this function's status. The CRs a Windows interpreter ends its
+# lines with are dropped here. The pins `GIT` carries are the reader's own runner's, for every caller
+# (TOOL-dDeclaredLoop-39), so this call sets none.
 read_attribution_tokens() { # git-log revision arguments -> one tokenised line per commit
-  GIT log --format='%H %s%x1f%(trailers:key=Pass,valueonly,separator=%x20)' "$@" 2>/dev/null \
-    | awk -F '\037' '{ if ($2 != "") { split($1, h, " "); t = $2; gsub(/[^A-Za-z0-9-]/, " ", t)
-                                        if ((" " t " ") ~ / none /) t = ""; print h[1] " PASSTRAILER " t }
-                       else print $1 }' \
-    | tr -c 'A-Za-z0-9\n-' ' '
+  local _rt_py="" _rt_d
+  declare -F resolve_python >/dev/null && _rt_py=$(resolve_python 2>/dev/null) || _rt_py=""
+  [ -n "$_rt_py" ] || { printf '%s\n' 'lib-unattended: read_attribution_tokens found no python launcher, so no commit is attributed' >&2; return 2; }
+  case "${BASH_SOURCE[0]}" in */*) _rt_d=${BASH_SOURCE[0]%/*} ;; *) _rt_d=. ;; esac
+  "$_rt_py" "$_rt_d/commit_trailers.py" tokens "$@" | tr -d '\r'
+  return "${PIPESTATUS[0]}"
 }
 
 # ------------------------------------------------------------- which commit BUILT this unit, once
@@ -1271,6 +1278,19 @@ build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · sh
   else
     _bc_list=$(GIT rev-list $_bc_ord $_bc_mc $_bc_range 2>/dev/null)
   fi
+  # NO CALLER CACHE, ONE READ (TOOL-dDeclaredLoop-56 S42): a caller that declares no `_SUBJ`, the
+  # driver's DoD read among them, gets a map local to this call, filled from ONE
+  # `read_attribution_tokens` over the walk's own revision arguments before the walk, so no commit
+  # starts an interpreter of its own. The per-commit read below runs only for a commit a caller's
+  # declared `_SUBJ` lacks.
+  local -A _bc_tok=()
+  local _bc_lines _bc_l
+  if [ "$_bc_cache" = 0 ]; then
+    mapfile -t _bc_lines < <(read_attribution_tokens $_bc_ord $_bc_mc $_bc_range 2>/dev/null)
+    for _bc_l in "${_bc_lines[@]}"; do
+      case "$_bc_l" in *" "*) _bc_tok[${_bc_l%% *}]=" ${_bc_l#* } " ;; ?*) _bc_tok[$_bc_l]="  " ;; esac
+    done
+  fi
   for _bc_c in $_bc_list; do
     _bc_n=$((_bc_n+1))
     # the (cap+1)-th commit is the SENTINEL: proof that more exists, never graded.
@@ -1289,7 +1309,7 @@ build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · sh
     #
     # THE PROBE IS DECLARED-ONCE, not per commit: `declare -p` is a builtin but this loop runs tens of
     # thousands of times, and a caller that declares no `_SUBJ` must not error under `set -u`.
-    if [ "$_bc_cache" = 1 ]; then _bc_subj=${_SUBJ[$_bc_c]-}; else _bc_subj=""; fi
+    if [ "$_bc_cache" = 1 ]; then _bc_subj=${_SUBJ[$_bc_c]-}; else _bc_subj=${_bc_tok[$_bc_c]-}; fi
     # A cached value is ALREADY tokenised and space-padded on both ends, so an empty read is a MISS
     # and nothing else — an empty subject caches as two spaces. A miss falls back to the pair of
     # processes the cache replaced rather than reading as "this commit does not name the id", which
@@ -1297,7 +1317,7 @@ build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · sh
     #
     # THE WHOLE-TOKEN MATCH is `memory/gotchas/id-matched-as-a-substring`: every id ending in a 1-up
     # sequence is a prefix of nine others, so an unanchored `TOOL-x-1` matches `TOOL-x-19`'s commit.
-    [ -n "$_bc_subj" ] || _bc_subj=" $(read_attribution_tokens -1 "$_bc_c" | cut -d' ' -f2-) "
+    [ -n "$_bc_subj" ] || [ "$_bc_cache" = 0 ] || _bc_subj=" $(read_attribution_tokens -1 "$_bc_c" | cut -d' ' -f2-) "
     case "$_bc_subj" in *" $_bc_id "*) ;; *) continue ;; esac
     # Did it touch anything outside this build's own record surface?
     if GIT show --pretty=format: --name-only "$_bc_c" 2>/dev/null \
@@ -2370,9 +2390,21 @@ asks_unit_in() { # BACKLOG.md text -> every filed `unit` ask id, one per line, i
 # this corpus: 18 of 123 tracked `spec-audit` binding lines use the range form. A join that does not
 # expand blocks a unit that WAS audited under `TOOL-x-1..5`; a join that matches as a SUBSTRING lets
 # `TOOL-x-19` satisfy `TOOL-x-1`. This emits whole tokens, one per line, for a `grep -qxF` join.
-expand_id_runs() { # stdin: binding-line text -> stdout: ids, ranges expanded, one per line
-  awk '{
-    n = split($0, w, /[ \t]+/)
+# `--keyed` (TOOL-dDeclaredLoop-112) reads `<a> TAB <b> TAB <words>` rows and prints `<a> TAB <b> TAB
+# <id>` per id the words name, through this same program, so a batched reader of many specs' headers
+# expands exactly as the per-spec one does. A keyed row with fewer than two TABs prints nothing.
+expand_id_runs() { # [--keyed] · stdin: binding-line text, or keyed rows -> stdout: ids, ranges expanded, one per line
+  local _keyed=""
+  [ "${1:-}" != --keyed ] || _keyed=1
+  awk -v keyed="$_keyed" '{
+    s = $0; pre = ""
+    if (keyed) {
+      p = index(s, "\t"); if (p == 0) next
+      pre = substr(s, 1, p); s = substr(s, p + 1)
+      p = index(s, "\t"); if (p == 0) next
+      pre = pre substr(s, 1, p); s = substr(s, p + 1)
+    }
+    n = split(s, w, /[ \t]+/)
     for (i = 1; i <= n; i++) {
       t = w[i]
       sub(/@rev-[0-9]+$/, "", t)
@@ -2381,8 +2413,8 @@ expand_id_runs() { # stdin: binding-line text -> stdout: ids, ranges expanded, o
         head = substr(t, 1, p - 1); hi = substr(t, p + 2) + 0
         match(head, /[0-9]+$/); lo = substr(head, RSTART) + 0
         stem = substr(head, 1, RSTART - 1)
-        for (k = lo; k <= hi; k++) print stem k
-      } else if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/) print t
+        for (k = lo; k <= hi; k++) print pre stem k
+      } else if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/) print pre t
     }
   }'
 }

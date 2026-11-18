@@ -57,6 +57,7 @@ the gate IS the check. Its leg runs it over whatever the target declared, and a 
 name = "line length"
 subject = "repo"
 argv = ["bash", "{prefix}/check-line-length.sh"]
+stage = ["step.test"]
 
 # The `line-length gate selftest` leg is NOT declared here. It is a leg on GOV's bar and carries
 # an [[exempt_leg]] row in <prefix>/govkit/registry.toml, for the reason recorded beside

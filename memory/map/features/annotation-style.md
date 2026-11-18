@@ -7,6 +7,8 @@ status = "shipped"
 streams = ["tooling"]
 decisions = ["TOOL-aKeyedAnnotation-1"]
 
+stage = ["none"]
+
 [claims]
 gate-legs = []
 kits = []

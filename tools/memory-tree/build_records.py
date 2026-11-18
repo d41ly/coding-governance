@@ -53,9 +53,45 @@ NOT CHECKED: that the record is the fix's direct child, that `Rerun` or `Red lin
 was red, or whether a merge's resolution changed a file. `--fixture --plant red-fix-join` stages the door's
 refusals, the path-less cases and each finding.
 
+THE DISPOSITION KIND and its stand-in door (TOOL-dDeclaredLoop-16 S4): `build_records.py new disposition
+--build <slug> --unit <id> --item <tag> --disposition <word> --channel <channel> [--reason <text>]` writes the
+next `<date>-build-<unit id>-disposition-<n>.md`, the owner's disposition of one loop item: `Item` (a tag
+opening `item.`), `Disposition` (one word), `Channel` (`mailbox`, `terminal` or `prompt`, where the owner
+answered), an optional `Reason` and `Caused-by`. It refuses, exit 1 and writing nothing, an `--item` that is no
+such tag, a `--disposition` that is not one word, a `--channel` outside the closed set and an empty
+`--reason`. It is the door every channel calls until a mailbox or a prompt writer adopts it. NOT CHECKED
+here: that the word is a member of the item's closed outcome set, which is the loop kit's
+`check_disposition_record`, since a kit imports no sibling; and that the item is declared.
+
+THE ACCEPTANCE KIND (TOOL-dDeclaredLoop-17 S1): `<date>-build-<unit id>-acceptance-<n>.md`, a unit's
+acceptance commands re-run at one commit: `Sha` (the full commit the re-run read), `Writer` (`executor` or
+`stand-in`) and `Caused-by`, then one `run · <exit> · <hash12> · <command>` line per command, `RUN_LINE`.
+`write_acceptance` is its one writer and `read_acceptance` its reader, which refuses a `Sha` that is not 40
+hex, no run line, and a line opening `run ·` outside the grammar. It has no `new` door, so no flag types a
+run line: the loop kit's re-run stand-in, `loop_witness.py acceptance`, computes them and calls the writer.
+
+THE TRANSITION KIND (TOOL-dDeclaredLoop-3 S2): `<date>-build-<anchor id>-transition-<n>.md`, one build stage
+move, the anchor the lowest unit id a spec H1 under the build defines: `Build`, `From`, `To`, `Item` and `Sha`,
+then any extension field the move carries. `read_transition` is its reader, which refuses a `Sha` that is not
+eight to forty hex digits and a `From` or `To` that is not one word. It has no `new` door: every field is
+computed from the move, and the loop kit's transition writer, `loop_transition.py record`, calls `write_record`.
+
+THE RECOMMENDATION KIND and its door (TOOL-dDeclaredLoop-22 S1): `build_records.py new recommendation --build
+<slug> --unit <id> --stage <stage> --score <score> --source <source> --binds yes|no --reason <text> --role
+<role> [--signals <text>] [--answers <record stem>]` writes the next `<date>-build-<unit id>-recommendation-<n>.md`,
+one stage exit's review recommendation. A SCORE record, the unattended driver's `--recommend`, carries
+`Signals` and `Role` `command`; a REASON record carries `Answers`, the stem of the score record it answers,
+and the answering role. Both carry `Stage`, `Score` (`RECOMMEND_SCORES`), `Source`, `Binds`
+(`RECOMMEND_BINDS`), `Reason` and `Caused-by`. `check_recommendation_fields` holds the shape both ways:
+`Stage`, `Source` and `Role` one word each, exactly one of `Signals` and `Answers`, and `Role` `command`
+exactly where `Signals` stands. The door also refuses an `Answers` naming no recommendation record of the
+build; every refusal exits 1, writing nothing. `--fixture --plant recommendation` stages a score record, the
+reason answering it, each refusal and their bindings.
+
 ONE LINE PER VALUE, at the one writer (PLAY-dOrderedCharter-49 S53): `write_record` refuses a field value
 holding a CR or an LF, or opening `**<Word>:**`, before it writes anything, so no door's value forges a
-field; every door's refusal exits 1, writing nothing.
+field; every door's refusal exits 1, writing nothing. Its `lines`, written after the fields, are refused
+the same way, and so is a line that reads as a field.
 
 `build_records.py read <path>` prints one record's fields and every refusal: exit 0 well-formed, 1 malformed,
 2 an unreadable path or a pending kind.
@@ -90,7 +126,8 @@ ID = r"[A-Za-z]+-[A-Za-z0-9]+-\d+"
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 SLUG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9-]*$")
 PRINCIPLE = re.compile(r"^principle\.p[1-9]\d*$")
-TAG = r"[a-z0-9][a-z0-9-]*(?:\.[a-z0-9][a-z0-9-]*)+"
+SEG = r"[a-z0-9][a-z0-9-]*"                                    # one segment of a tag, and one disposition word
+TAG = SEG + r"(?:\." + SEG + r")+"
 PIN = re.compile(TAG + r"@[0-9a-f]{8}")
 FORGED_FIELD = re.compile(r"^\s*\*\*[A-Za-z][A-Za-z-]*(?: [a-z]+)?:\*\*")   # a value that would read as a field
 CHANGE_ACTIONS = ("add", "edit", "remove", "rename", "split")   # the one list `instructions_edit.WRITE_VERBS` reads
@@ -99,6 +136,13 @@ CHANGE_MARKS = ("editorial", "semantic")
 OVERRIDE_TAKEN = ("explicit-override", "live-owner-wins")   # the `charter.override` values an override is taken under
 PROOF = re.compile(r"tty-cli|none — \S.*")
 DOOR_PROOF = "none — stand-in door"
+DISPOSITION_CHANNELS = ("mailbox", "terminal", "prompt")   # where the owner answered a held item
+ACCEPTANCE_WRITERS = ("executor", "stand-in")   # who re-ran an acceptance record's commands
+RECOMMEND_SCORES = ("review", "no-review", "unarmed", "none")   # a recommendation's score, or a role's verdict
+RECOMMEND_BINDS = ("yes", "no")
+#: one re-run command of an acceptance record: its exit (an integer, or `timeout`), the first twelve hex
+#: digits of the SHA-256 of its combined output, and the command as run
+RUN_LINE = re.compile(r"run · (?P<exit>-?\d+|timeout) · (?P<hash>[0-9a-f]{12}) · (?P<command>\S.*)")
 
 # kind -> its required fields and its closed sets, `(field, allowed values)` in refusal order
 KINDS = {
@@ -126,12 +170,28 @@ KINDS = {
         "required": ("Leg", "Red line", "Files", "Commit", "Rerun", "Caused-by"),
         "closed": (),
     },
+    "disposition": {
+        "required": ("Item", "Disposition", "Channel", "Caused-by"),
+        "closed": (("Channel", DISPOSITION_CHANNELS),),
+    },
+    "acceptance": {
+        "required": ("Sha", "Writer", "Caused-by"),
+        "closed": (("Writer", ACCEPTANCE_WRITERS),),
+    },
+    "transition": {
+        "required": ("Build", "From", "To", "Item", "Sha"),
+        "closed": (),
+    },
+    "recommendation": {
+        "required": ("Stage", "Score", "Source", "Binds", "Reason", "Role", "Caused-by"),
+        "closed": (("Score", RECOMMEND_SCORES), ("Binds", RECOMMEND_BINDS)),
+    },
 }
 if set(KINDS) != set(TYPED_RECORD_KINDS):
     raise ImportError("build_records: the kind table and tree_lib.TYPED_RECORD_KINDS differ on "
                       + ", ".join(sorted(set(KINDS) ^ set(TYPED_RECORD_KINDS))))
-DOORS = ("exception", "change", "override", "red-fix")  # the kinds `new <kind>` writes; every other kind is `write_record`'s alone
-PLANTS = ("typed-kinds", "pending-kind", "red-fix-join")
+DOORS = ("exception", "change", "override", "red-fix", "disposition", "recommendation")  # the kinds `new <kind>` writes; every other kind is `write_record`'s alone
+PLANTS = ("typed-kinds", "pending-kind", "red-fix-join", "recommendation")
 SHA40 = re.compile(r"[0-9a-f]{40}")
 SAY_JOIN = "build-records: red-fix join"
 #: PLAY-dOrderedCharter-55 S8's `pending-kind`: the exception kind's entry staged pending, in a copy of this module
@@ -299,9 +359,11 @@ def read_changes(root, conf=None):
 
 
 def write_change(root, build, unit, tag, action, mark, before, after, proof, successor=None, promoted_from=None,
-                 today=None):
+                 today=None, lines=()):
     """The one writer of a change record, under `root`'s own memory tree. -> its repo-relative path. Every value
-    is validated here, the write boundary; a refusal is ValueError."""
+    is validated here, the write boundary; a refusal is ValueError. `lines`, written after the fields, are
+    `write_record`'s, as the acceptance kind's are: the loop kit's flow proposal holds its row there
+    (TOOL-dDeclaredLoop-28)."""
     fields = [("Unit", tag), ("Action", action), ("Before", before), ("After", after), ("Mark", mark)]
     fields += [("Successor", successor)] * (successor is not None)
     fields += [("Proof", proof)] + [("Promoted-from", promoted_from)] * (promoted_from is not None)
@@ -312,7 +374,7 @@ def write_change(root, build, unit, tag, action, mark, before, after, proof, suc
     bad += [f"{k} {why}" for k, why in check_change_fields(held)]
     if bad:
         raise ValueError("; ".join(bad))
-    return write_record(root, build, unit, "change", f"{action} {tag}", fields, today)
+    return write_record(root, build, unit, "change", f"{action} {tag}", fields, today, lines)
 
 
 # -------------------------------------------------------------------------------- the override kind
@@ -486,10 +548,157 @@ def check_red_fix_join(root, staged=False):
     return (1 if found else 0), lines
 
 
-def write_record(root, build, unit, kind, title, fields, today=None):
+# -------------------------------------------------------------------------------- the disposition kind
+def check_disposition_fields(fields):
+    """The disposition kind's own field rules: `Item` a tag opening `item.`, `Disposition` one word."""
+    bad = []
+    item, word = fields.get("Item"), fields.get("Disposition")
+    if item is not None and not (item.startswith("item.") and re.fullmatch(TAG, item)):
+        bad.append(("Item", f"{item} is no tag opening item."))
+    if word is not None and not re.fullmatch(SEG, word):
+        bad.append(("Disposition", f"{word} is not one word"))
+    return bad
+
+
+def read_disposition(path, text):
+    """One disposition record: its fields under their own names, and `id`, `path`, `build`, `n` and
+    `malformed`."""
+    fields, bad, name = read_record(path, text, "disposition", check_fields=check_disposition_fields)
+    return {**fields, "id": pathlib.PurePosixPath(path).stem, "path": path,
+            "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None,
+            "malformed": bad}
+
+
+def write_disposition(root, build, unit, item, disposition, channel, reason=None, today=None):
+    """The stand-in door: the next disposition record of `build`, written under `root`'s own memory tree.
+    -> its repo-relative path. Every value is validated here, the write boundary; a refusal is ValueError.
+    The word's membership of the item's outcome set is not read here: that join is the loop kit's."""
+    fields = [("Item", item), ("Disposition", disposition), ("Channel", channel)]
+    fields += [("Reason", reason)] * (reason is not None)
+    fields.append(("Caused-by", unit))
+    bad = [f"{k} is one non-empty line" for k, v in fields if not v or not v.strip()]
+    if channel not in DISPOSITION_CHANNELS:
+        bad.append(f"Channel {channel} is outside {' · '.join(DISPOSITION_CHANNELS)}")
+    bad += [f"{k} {why}" for k, why in check_disposition_fields(dict(fields))]
+    if bad:
+        raise ValueError("; ".join(bad))
+    return write_record(root, build, unit, "disposition", f"{item} disposed {disposition}", fields, today)
+
+
+# -------------------------------------------------------------------------------- the acceptance kind
+def read_acceptance(path, text):
+    """One acceptance record: its fields under their own names, `runs` its run lines as `(command, exit,
+    hash)`, and `id`, `path`, `build`, `n` and `malformed`. Its own rules: `Sha` is a full 40-hex sha, at
+    least one line reads `RUN_LINE`, and every line opening `run ·` matches it."""
+    opened = [ln.strip() for ln in text.replace("\r\n", "\n").split("\n") if ln.startswith("run ·")]
+    runs = [(m.group("command"), m.group("exit"), m.group("hash")) for ln in opened if (m := RUN_LINE.fullmatch(ln))]
+
+    def check_fields(fields):
+        bad = [("run line", f"{ln!r} is not run · <exit> · <hash12> · <command>")
+               for ln in opened if not RUN_LINE.fullmatch(ln)]
+        if not opened:
+            bad.append(("run line", "is missing: the record holds one run · <exit> · <hash12> · <command> line per "
+                                    "command re-run"))
+        if "Sha" in fields and not SHA40.fullmatch(fields["Sha"]):
+            bad.append(("Sha", f"{fields['Sha']} is not a full 40-hex sha"))
+        return bad
+
+    fields, bad, name = read_record(path, text, "acceptance", check_fields=check_fields)
+    return {**fields, "runs": runs, "id": pathlib.PurePosixPath(path).stem, "path": path,
+            "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None,
+            "malformed": bad}
+
+
+def write_acceptance(root, build, unit, sha, writer, runs, today=None):
+    """The one writer of an acceptance record, under `root`'s own memory tree: `runs` is `[(command, exit,
+    hash12)]`, each written as one run line after the fields. -> its repo-relative path. Every value is
+    validated here, the write boundary; a refusal is ValueError. The kind has no `new` door: its run lines
+    are computed by the caller and never typed from a flag."""
+    bad = []
+    if not SHA40.fullmatch(sha or ""):
+        bad.append(f"Sha {sha!r} is not a full 40-hex sha")
+    if writer not in ACCEPTANCE_WRITERS:
+        bad.append(f"Writer {writer} is outside {' · '.join(ACCEPTANCE_WRITERS)}")
+    if not runs:
+        bad.append("no run: an acceptance record holds one run line per command re-run")
+    lines = [f"run · {code} · {digest} · {command}" for command, code, digest in runs]
+    bad += [f"run line {ln!r} is not run · <exit> · <hash12> · <command>" for ln in lines if not RUN_LINE.fullmatch(ln)]
+    if bad:
+        raise ValueError("; ".join(bad))
+    fields = [("Sha", sha), ("Writer", writer), ("Caused-by", unit)]
+    return write_record(root, build, unit, "acceptance", f"re-run at {sha[:8]}", fields, today, lines)
+
+
+# -------------------------------------------------------------------------------- the transition kind
+def read_transition(path, text):
+    """One transition record: its fields under their own names, and `id`, `path`, `build`, `n` and
+    `malformed`. Its own rules: `Sha` is eight to forty hex digits, and `From` and `To` are single words."""
+    def check_fields(fields):
+        bad = [(k, f"{fields[k]} is not one word") for k in ("From", "To")
+               if k in fields and not re.fullmatch(SEG, fields[k])]
+        if "Sha" in fields and not re.fullmatch(r"[0-9a-f]{8,40}", fields["Sha"]):
+            bad.append(("Sha", f"{fields['Sha']} is not eight to forty hex digits"))
+        return bad
+
+    fields, bad, name = read_record(path, text, "transition", check_fields=check_fields)
+    return {**fields, "id": pathlib.PurePosixPath(path).stem, "path": path,
+            "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None,
+            "malformed": bad}
+
+
+# -------------------------------------------------------------------------------- the recommendation kind
+def check_recommendation_fields(fields):
+    """The recommendation kind's own field rules, both ways: `Stage`, `Source` and `Role` one word each;
+    exactly one of `Signals` (a score record) and `Answers` (a reason record); `Role` `command` exactly where
+    `Signals` stands."""
+    bad = [(k, f"{fields[k]} is not one word") for k in ("Stage", "Source", "Role")
+           if k in fields and not re.fullmatch(SEG, fields[k])]
+    if ("Signals" in fields) == ("Answers" in fields):
+        bad.append(("Answers", "and Signals: a record carries exactly one, Signals on a score record and "
+                               "Answers on a reason record"))
+    if "Role" in fields and (fields["Role"] == "command") != ("Signals" in fields):
+        bad.append(("Role", f"{fields['Role']} is not command exactly where Signals stands"))
+    return bad
+
+
+def read_recommendation(path, text):
+    """One recommendation record: its fields under their own names, and `id`, `path`, `build`, `n` and
+    `malformed`."""
+    fields, bad, name = read_record(path, text, "recommendation", check_fields=check_recommendation_fields)
+    return {**fields, "id": pathlib.PurePosixPath(path).stem, "path": path,
+            "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None,
+            "malformed": bad}
+
+
+def write_recommendation(root, build, unit, stage, score, source, binds, reason, role, signals=None,
+                         answers=None, today=None):
+    """The door: the next recommendation record of `build`, written under `root`'s own memory tree, a score
+    record where `signals` is given and a reason record where `answers` names the score record's stem.
+    -> its repo-relative path. Every value is validated here, the write boundary; a refusal is ValueError."""
+    fields = [("Stage", stage), ("Score", score)] + [("Signals", signals)] * (signals is not None)
+    fields += [("Source", source), ("Binds", binds), ("Reason", reason), ("Role", role)]
+    fields += [("Answers", answers)] * (answers is not None)
+    fields.append(("Caused-by", unit))
+    held = dict(fields)
+    bad = [f"{k} is one non-empty line" for k, v in fields if not v or not v.strip()]
+    bad += [f"{k} {held[k]} is outside {' · '.join(allowed)}" for k, allowed in KINDS["recommendation"]["closed"]
+            if held[k] not in allowed]
+    bad += [f"{k} {why}" for k, why in check_recommendation_fields(held)]
+    if answers is not None and not bad:
+        memory_root = (read_design_conf(root).get("MEMORY_ROOT") or "memory").strip().strip("/")
+        answered = pathlib.Path(root, memory_root, "builds", build, "build", f"{answers}.md")
+        if not (re.fullmatch(derive_stem("recommendation") + r"\d+", answers) and answered.is_file()):
+            bad.append(f"Answers {answers} names no recommendation record of {build}")
+    if bad:
+        raise ValueError("; ".join(bad))
+    return write_record(root, build, unit, "recommendation", f"{stage} review", fields, today)
+
+
+def write_record(root, build, unit, kind, title, fields, today=None, lines=()):
     """The record writer every door shares: the next `kind` record of `build` under `root`'s own memory tree,
-    headed `# <unit> <kind> <n> — <title>`, then `**Serves:** <kind> <unit>` and each `(key, value)` of
-    `fields` as a bold-key bullet. -> its repo-relative path. A refusal is ValueError."""
+    headed `# <unit> <kind> <n> — <title>`, then `**Serves:** <kind> <unit>`, each `(key, value)` of
+    `fields` as a bold-key bullet and, after one blank line, each of `lines` as written (TOOL-dDeclaredLoop-17
+    S1), each refused as a value is. -> its repo-relative path. A refusal is ValueError."""
     if kind not in KINDS:
         raise ValueError(f"{kind!r} is not a typed kind: " + ", ".join(KINDS))
     if "pending" in KINDS[kind]:   # PLAY-dOrderedCharter-55 S8: refused before any write, as `read` refuses it
@@ -503,6 +712,10 @@ def write_record(root, build, unit, kind, title, fields, today=None):
     if forged:
         raise ValueError(f"{', '.join(forged)}: a value is one line and never opens **<Word>:**, so it cannot "
                          f"forge a field")
+    forged = [ln for ln in lines if "\n" in ln or "\r" in ln or FORGED_FIELD.match(ln) or FIELD.match(ln)]
+    if forged:
+        raise ValueError(f"{forged[0]!r}: a line after the fields is one line that never reads as a field, so it "
+                         f"cannot forge one")
     memory_root = (read_design_conf(root).get("MEMORY_ROOT") or "memory").strip().strip("/")
     folder = pathlib.Path(root, memory_root, "builds", build)
     if not folder.is_dir():
@@ -516,6 +729,7 @@ def write_record(root, build, unit, kind, title, fields, today=None):
     path = out / f"{day}-build-{unit}-{kind}-{n}.md"
     body = [f"# {unit} {kind} {n} — {title}", "", f"**Serves:** {kind} {unit}", ""]
     body += [f"- **{key}:** {value}" for key, value in fields]
+    body += [""] + list(lines) if lines else []
     out.mkdir(exist_ok=True)
     with open(path, "x", encoding="utf-8", newline="\n") as fh:   # never over a record already there
         fh.write("\n".join(body) + "\n")
@@ -534,6 +748,11 @@ DOOR_ARGV = {
     # the fixture's first commit carries the trailer, so HEAD is a fix of this leg when the door runs
     "red-fix": (["--leg", "the fixture leg", "--red-line", "FAIL the fixture leg", "--commit", "HEAD",
                  "--rerun", "the fixture leg · green"], ["--leg", "the fixture leg"]),
+    "disposition": (["--item", "item.plan.exit", "--disposition", "continue", "--channel", "terminal"],
+                    ["--item", "item.plan.exit"]),
+    "recommendation": (["--stage", "design", "--score", "review", "--source", "scored-signals-and-reasoning",
+                        "--binds", "no", "--reason", "pending", "--role", "command",
+                        "--signals", "3 units in the generated region"], ["--stage", "design"]),
 }
 
 
@@ -548,6 +767,89 @@ def run_door(root, kind, unit, flags):
         except SystemExit as exc:
             rc = exc.code
     return rc, buf.getvalue()
+
+
+def check_bindings(root, plant, written, run_git):
+    """`written`, `[(kind, rel)]` tracked in the fixture's repository: each read `bound` as its kind by
+    `tree_lib.read_bindings`, and `gen_build_index.py --print-bindings` printing its `S` row and no `A` row.
+    -> the failures, an empty `written` among them."""
+    import subprocess
+    from tree_lib import read_bindings   # noqa: E402
+    bad = []
+    tracked = [p for p in run_git("ls-files").split("\n") if p]
+    binds = read_bindings(str(root), tracked, read_design_conf(root))
+    for kind, rel in written:
+        rec = binds.get(rel) or {"state": "absent", "kind": None, "why": "not read"}
+        if rec["state"] != "bound" or rec["kind"] != kind:
+            bad.append(f"{kind}: {rel} reads {rec['state']} as {rec['kind']} — {rec['why']}")
+        else:
+            print(f"build-records: {plant} · {kind} · {rel} · bound")
+    p = subprocess.run([sys.executable, str(KIT / "gen_build_index.py"), "--print-bindings"], cwd=root,
+                       capture_output=True, text=True, encoding="utf-8")
+    lines = p.stdout.splitlines()
+    if p.returncode != 0:
+        bad.append(f"--print-bindings exited {p.returncode}: {(p.stdout + p.stderr).strip()[:300]}")
+    bad += [f"--print-bindings printed {ln}" for ln in lines if ln.startswith("A\t")]
+    # no A row is an answer only where the predicate read the records: each owes its S row
+    bad += [f"--print-bindings printed no S row for {rel}" for kind, rel in written
+            if not any(ln.startswith(f"S\t{rel}\t{kind}\t") for ln in lines)]
+    if not written:
+        bad.append("no typed kind was written, so no A row proves nothing")
+    return bad
+
+
+def derive_flags(flags, flag, value):
+    """`flags` with `flag`'s value replaced by `value`, or `flag value` appended where it is absent."""
+    if flag not in flags:
+        return [*flags, flag, value]
+    at = flags.index(flag) + 1
+    return [*flags[:at], value, *flags[at + 1:]]
+
+
+def check_recommendation_plant(root, unit, run_git):
+    """`--fixture --plant recommendation` (TOOL-dDeclaredLoop-22 AC1), over the fixture's committed build: a
+    score record numbered 1 and a reason record numbered 2 answering it, each read back by `read` with every
+    field; `--score maybe`, `--binds perhaps`, a two-word `--stage`, an `--answers` naming no record and a
+    score record carrying `--answers` each exit 1 naming the field, writing nothing; both bound. -> failures."""
+    import contextlib
+    import io
+    bad, written = [], []
+    folder = root / "memory/builds/tKinds/build"
+    score = DOOR_ARGV["recommendation"][0]
+    reason = ["--stage", "design", "--score", "review", "--source", "scored-signals-and-reasoning", "--binds", "no",
+              "--reason", "two units share a seam", "--role", "gov-spec-writer"]
+    for n, flags, own in ((1, score, "Signals"), (2, reason, "Answers")):
+        if n == 2:
+            flags = derive_flags(flags, "--answers", pathlib.PurePosixPath(written[0][1]).stem)
+        rc, said = run_door(root, "recommendation", unit, flags)
+        got = re.search(r"wrote (\S+-recommendation-(\d+)\.md)", said)
+        if rc != 0 or not got or got.group(2) != str(n):
+            bad.append(f"record {n}: new recommendation exited {rc}, not 0 writing recommendation-{n}: "
+                       f"{said.strip()[:200]}")
+            return bad
+        written.append(("recommendation", got.group(1)))
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = main(["read", str(root / got.group(1))])
+        missing = [k for k in (*KINDS["recommendation"]["required"], own) if f" · {k}: " not in buf.getvalue()]
+        if rc != 0 or missing:
+            bad.append(f"record {n}: read exited {rc}, missing {missing}: {buf.getvalue().strip()[:300]}")
+        print(f"build-records: recommendation · record {n} · {got.group(1)} · read exit {rc}")
+    held = sorted(p.name for p in folder.glob("*.md"))
+    nowhere = f"2026-01-01-build-{unit}-recommendation-9"
+    for field, flags in (("Score", derive_flags(score, "--score", "maybe")),
+                         ("Binds", derive_flags(score, "--binds", "perhaps")),
+                         ("Stage", derive_flags(score, "--stage", "design review")),
+                         ("Answers", derive_flags(reason, "--answers", nowhere)),
+                         ("Answers", derive_flags(score, "--answers", pathlib.PurePosixPath(written[0][1]).stem))):
+        rc, said = run_door(root, "recommendation", unit, flags)
+        if rc != 1 or (f"refused · {field}" not in said and f"; {field}" not in said):
+            bad.append(f"{field}: exited {rc}, not 1 naming {field}: {said.strip()[:200]}")
+        print(f"build-records: recommendation · refusal · {field} · exit {rc}")
+    if sorted(p.name for p in folder.glob("*.md")) != held:
+        bad.append("a refused recommendation door wrote a record")
+    run_git("add", "-A")
+    return bad + check_bindings(root, "recommendation", written, run_git)
 
 
 def run_fixture(plant):
@@ -722,6 +1024,14 @@ def run_fixture(plant):
                     print(f"build-records: PASS {plant} — {cases[0]} cases: the door, its refusals, owed, --staged, "
                           f"path-less and J1 to J6")
                 return 1 if bad else 0
+            if plant == "recommendation":   # TOOL-dDeclaredLoop-22 AC1: the door, its refusals, the bindings
+                bad += check_recommendation_plant(root, unit, run_git)
+                for why in bad:
+                    print(f"build-records: FAIL {plant} · {why}")
+                if not bad:
+                    print(f"build-records: PASS {plant} — a score record, the reason answering it, five refusals "
+                          f"writing nothing, and both bound")
+                return 1 if bad else 0
             try:
                 read_override_value(root)
                 unarmed = set()
@@ -765,28 +1075,10 @@ def run_fixture(plant):
             with open(root / research, "w", encoding="utf-8", newline="\n") as fh:
                 fh.write(f"# {unit} — a change plan\n\n**Serves:** research {unit}\n")
             run_git("add", "-A")
-            tracked = [p for p in run_git("ls-files").split("\n") if p]
             changes = [r["path"] for r in read_changes(root)]
             if research in changes or changes != [written.get("change")]:
                 bad.append(f"read_changes selected {changes}, not the change record alone")
-            binds = read_bindings(str(root), tracked, read_design_conf(root))
-            for kind, rel in written.items():
-                rec = binds.get(rel) or {"state": "absent", "kind": None, "why": "not read"}
-                if rec["state"] != "bound" or rec["kind"] != kind:
-                    bad.append(f"{kind}: {rel} reads {rec['state']} as {rec['kind']} — {rec['why']}")
-                else:
-                    print(f"build-records: {plant} · {kind} · {rel} · bound")
-            p = subprocess.run([sys.executable, str(KIT / "gen_build_index.py"), "--print-bindings"], cwd=root,
-                               capture_output=True, text=True, encoding="utf-8")
-            lines = p.stdout.splitlines()
-            if p.returncode != 0:
-                bad.append(f"--print-bindings exited {p.returncode}: {(p.stdout + p.stderr).strip()[:300]}")
-            bad += [f"--print-bindings printed {ln}" for ln in lines if ln.startswith("A\t")]
-            # no A row is an answer only where the predicate read the records: each owes its S row
-            bad += [f"--print-bindings printed no S row for {rel}" for kind, rel in written.items()
-                    if not any(ln.startswith(f"S\t{rel}\t{kind}\t") for ln in lines)]
-            if not written:
-                bad.append("no typed kind was written, so no A row proves nothing")
+            bad += check_bindings(root, plant, list(written.items()), run_git)
     except (subprocess.CalledProcessError, OSError, ValueError) as exc:
         bad.append(f"the fixture could not be built: {exc}")
     finally:
@@ -824,6 +1116,13 @@ def main(argv):
         doors.choices["override"].add_argument(flag, required=True)
     for flag in ("--leg", "--red-line", "--commit", "--rerun"):
         doors.choices["red-fix"].add_argument(flag, required=True)
+    for flag in ("--item", "--disposition", "--channel"):
+        doors.choices["disposition"].add_argument(flag, required=True)
+    doors.choices["disposition"].add_argument("--reason")
+    for flag in ("--stage", "--score", "--source", "--binds", "--reason", "--role"):
+        doors.choices["recommendation"].add_argument(flag, required=True)
+    doors.choices["recommendation"].add_argument("--signals")
+    doors.choices["recommendation"].add_argument("--answers")
     read = sub.add_parser("read", help="read one record and name every refusal")
     read.add_argument("path")
     join = sub.add_parser("join", help="join every Red-fix: commit to its red-fix record, both ways")
@@ -855,6 +1154,12 @@ def main(argv):
                 rel = write_override(root, args.build, args.unit, args.rule, args.words, args.session)
             elif args.kind == "red-fix":
                 rel = write_red_fix(root, args.build, args.unit, args.leg, args.red_line, args.commit, args.rerun)
+            elif args.kind == "disposition":
+                rel = write_disposition(root, args.build, args.unit, args.item, args.disposition, args.channel,
+                                        args.reason)
+            elif args.kind == "recommendation":
+                rel = write_recommendation(root, args.build, args.unit, args.stage, args.score, args.source,
+                                           args.binds, args.reason, args.role, args.signals, args.answers)
             else:
                 rel = write_exception(root, args.build, args.unit, args.principle, args.excuses, args.reason,
                                       args.expires)
@@ -885,6 +1190,14 @@ def main(argv):
         bad = read_override(rel, text)["malformed"]
     elif kind == "red-fix":
         bad = read_red_fix(rel, text)["malformed"]
+    elif kind == "disposition":
+        bad = read_disposition(rel, text)["malformed"]
+    elif kind == "acceptance":
+        bad = read_acceptance(rel, text)["malformed"]
+    elif kind == "transition":
+        bad = read_transition(rel, text)["malformed"]
+    elif kind == "recommendation":
+        bad = read_recommendation(rel, text)["malformed"]
     else:
         bad = read_exception(rel, text)["malformed"]
     for ln in text.replace("\r\n", "\n").split("\n"):

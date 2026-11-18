@@ -175,7 +175,11 @@ memory/guides/BUILD-METHOD.md	30720
 # MERGED at TOOL-aLightenedLoop-8's reconcile of origin/main, 2026-11-15: the render measures 68130
 # CR-stripped, both raises above kept, and the row is that figure because this block's rule is no
 # headroom. A run's raise, on the four terms above (memory/DECISIONS.md, TOOL-aLightenedLoop-8).
-memory/guides/UNATTENDED-PROTOCOL.md	68130
+# RAISED 68130 -> 68288, 2026-11-17, by TOOL-dDeclaredLoop-75: section 3's sentence on an adopter phase
+# beside PHASES_EXTRA, which TOOL-dDeclaredLoop-63 wrote for the protocol to state. The render measures
+# 68288 CR-stripped, and the row is that figure because this block's rule is no headroom. A run's
+# raise, on the four terms above (memory/DECISIONS.md, TOOL-dDeclaredLoop-75).
+memory/guides/UNATTENDED-PROTOCOL.md	68288
 
 # --- the unattended Skill, as rendered ----------------------------------------------------------
 # 10240 bytes = 10 KiB, CR-stripped (TOOL-aMendedFleet-68 S5). The Skill is the first file every
@@ -201,6 +205,30 @@ memory/guides/UNATTENDED-PROTOCOL.md	68130
 # `unattended.sh --wake` first, which the kit gate requires of every declared verb, and the pair on
 # `FULL` after it. The render measures 10744 CR-stripped, and the row is that figure, with no
 # headroom. A run's raise, on the four terms above (memory/DECISIONS.md, TOOL-aLightenedLoop-2).
+# RAISED 10524 -> 10611, 2026-11-15, by TOOL-dDeclaredLoop-14: `--refused` in the fenced verb list,
+# which the kit gate requires of every declared verb, so it is a block the gate reads and no prose
+# coming back. The render measures 10611 CR-stripped, and the row is that figure, with no headroom. A
+# run's raise, on the four terms above (memory/DECISIONS.md, TOOL-dDeclaredLoop-14).
+# RAISED 10744 -> 10755, 2026-11-16, by TOOL-dDeclaredLoop-14, at this run's merge of local main: the
+# `--refused` line above meets aCarriedStop's and aLightenedLoop's lines in one render. The render
+# measures 10755 CR-stripped, and the row is that figure, with no headroom. A run's raise, on the four
+# terms above (memory/DECISIONS.md, TOOL-dDeclaredLoop-14).
+# RAISED 10755 -> 10815, 2026-11-16, by TOOL-dDeclaredLoop-32: the `--fix-pass` line the fenced verb list
+# gains, which the kit gate requires of every declared verb. The render measures 10815 CR-stripped, and the
+# row is that figure, with no headroom. A run's raise, on the four terms above (memory/DECISIONS.md,
+# TOOL-dDeclaredLoop-32).
+# RAISED 10815 -> 10848, 2026-11-16, by TOOL-dDeclaredLoop-31: the `--exhausted` line the fenced verb list
+# gains, which the kit gate requires of every declared verb. The render measures 10848 CR-stripped, and the
+# row is that figure, with no headroom. A run's raise, on the four terms above (memory/DECISIONS.md,
+# TOOL-dDeclaredLoop-31).
+# RAISED 10848 -> 10922, 2026-11-16, by TOOL-dDeclaredLoop-20: the `--trigger` line the fenced verb list
+# gains, which the kit gate requires of every declared verb. The render measures 10922 CR-stripped, and the
+# row is that figure, with no headroom. A run's raise, on the four terms above (memory/DECISIONS.md,
+# TOOL-dDeclaredLoop-20).
+# RAISED 10922 -> 10967, 2026-11-16, by TOOL-dDeclaredLoop-22: the `--recommend` line the fenced verb list
+# gains, which the kit gate requires of every declared verb. The render measures 10967 CR-stripped, and the
+# row is that figure, with no headroom. A run's raise, on the four terms above (memory/DECISIONS.md,
+# TOOL-dDeclaredLoop-22).
 # RAISED 10580 -> 10628, 2026-11-14, by TOOL-aTrimmedWait-1: the `--check-specs` line in the fenced
 # verb list, which the kit gate's check 26 requires of every declared verb, so it is a block the gate
 # reads and no prose coming back. The render measures 10628 CR-stripped, and the row is that figure,
@@ -208,7 +236,10 @@ memory/guides/UNATTENDED-PROTOCOL.md	68130
 # MERGED at TOOL-aTrimmedWait-12's reconcile of local main at 5d48501da, 2026-11-16: the render measures 10716
 # CR-stripped, both raises above kept, and the row is that figure, with no headroom. A run's raise,
 # on the four terms above (memory/DECISIONS.md, TOOL-aTrimmedWait-12).
-.claude/skills/unattended/SKILL.md	10716
+# MERGED at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c, 2026-11-18: the render measures 11015
+# CR-stripped, every raise above kept, and the row is that figure, with no headroom. A run's raise, on
+# the four terms above (memory/DECISIONS.md, TOOL-dDeclaredLoop-20).
+.claude/skills/unattended/SKILL.md	11015
 
 # --- every LIVE spec, a CLASS row (TOOL-aMendedFleet-25) --------------------------------------
 # 49152 bytes = 48 KiB, CR-stripped, the charter template's own ceiling, so no spec costs more to

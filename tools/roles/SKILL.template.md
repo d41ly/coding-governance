@@ -2,14 +2,14 @@
 name: build
 description: Drive an ATTENDED code build through the harness pipeline an unattended run uses - spec writers, the spec audit where the owner declared one, one builder per unit, the closing review and one bar - with every agent spawned as its rendered role. Use after /session-kickoff's READY card and the owner's go, for a build that writes product code. Do NOT use for a run that merges and pushes with no owner turn, which is /unattended, or for a change that writes no product code.
 ---
-<!-- gov:kit roles@1.22 -->
+<!-- gov:kit roles@1.23 -->
 [.claude/skills/build/SKILL.md · Level 4 · A Skill, followed when its trigger holds; yields to levels 0 to 3]
 
 # Attended builds
 
 This Skill is a ROUTER. The procedure is `{{MEMORY_ROOT}}/guides/BUILD-METHOD.md`: read it WHOLE
 before stage 3, and it wins any difference. The stages below are the workflows of
-`{{KIT_DIR}}/workflows.toml`, in its stage order. Every `handoff.py` here is
+`{{KIT_DIR}}/workflows.toml`, in the order the loop kit's definition, `loop.toml`, gives them. Every `handoff.py` here is
 `python {{KIT_DIR}}/handoff.py`, and every `unattended.sh` is `bash {{TOOL_ROOT}}unattended/unattended.sh`.
 
 ## Before stage 3

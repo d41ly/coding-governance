@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.127 -->
+<!-- gov:kit unattended@1.128 -->
 [.claude/skills/unattended/SKILL.md · Level 4 · A Skill, followed when its trigger holds; yields to levels 0 to 3]
 
 # Unattended runs
@@ -111,6 +111,7 @@ Not a run: the record verbs, slug `-`, `--records-root <root>`.
 unattended.sh --phase <slug> BUILDING --witness $(git rev-parse HEAD)
 unattended.sh --park <slug> --item "<the question>" --reason "<options; why refused>"
 unattended.sh --propose <slug> --item "<amendment>" --step "<step>" --reason "<why>"
+unattended.sh --refused <slug> --item <item tag> --key <instance key> --reason "<why>"
 unattended.sh --brief <slug> --unit <unit-id> --path <the brief file>
 unattended.sh --rescope <slug> --act retire|supersede|add|defer --item <unit-id> --reason "<why>"
 unattended.sh --dispatch <slug> --pass <unit-id> --writes <path> --writes <path>
@@ -121,6 +122,10 @@ unattended.sh --claims  # RUN_CLAIMS on
 unattended.sh --overlaps  # local
 unattended.sh --beat <slug>
 unattended.sh --review <slug> --subject <id-or-slug> --verdict <verdict> --blockers <N>
+unattended.sh --trigger <slug> --subject <s> --cause <cause> --pin <path>
+unattended.sh --recommend <slug> --stage <s>
+unattended.sh --fix-pass <slug> --unit <unit-id> --reds <N>
+unattended.sh --exhausted <slug>
 unattended.sh --record-round <slug> --subject <s> --audited "<ids>" --blockers <N> --highs <N>
 unattended.sh --record-round <slug> --owner-stop <path>
 unattended.sh --chain-verdict <slug>

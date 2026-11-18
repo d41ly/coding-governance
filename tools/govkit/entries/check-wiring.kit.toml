@@ -38,6 +38,7 @@ name = "check-wiring self-test"
 subject = "kit"
 argv = ["bash", "{prefix}/check-wiring.test.sh"]
 guard = ["{prefix}/check-wiring.sh", "{prefix}/check-wiring.test.sh"]
+stage = ["step.test"]
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a

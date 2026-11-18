@@ -3300,6 +3300,12 @@ cnot 12 'memory/builds/tTen/spec/2026-08-01-spec-tTen-1.md'
 out=$("$_PY" "$HERE/build_records.py" --fixture --plant typed-kinds 2>&1)
 hit 'build-records: PASS typed-kinds'
 
+# --- TOOL-dDeclaredLoop-22 S1 (AC1) — the recommendation door: a score record and the reason answering it,
+# --- each read back with every field, five refusals naming their field and writing nothing, and both
+# --- bound. Red on a factory that writes a score outside its set or a reason answering no record.
+out=$("$_PY" "$HERE/build_records.py" --fixture --plant recommendation 2>&1)
+hit 'build-records: PASS recommendation'
+
 # --- PLAY-dOrderedCharter-55 S8 (AC8) — a pending kind: a copy of the record factory with one kind's
 # --- entry declared pending imports, `read` exits 2 naming the unit, and `write_record` refuses it
 # --- naming the unit with no file written. Red on a write_record that writes a pending kind.
@@ -4986,6 +4992,8 @@ done
 # RAISED 707 -> 708 by TOOL-aClearedLedger-6: its three resolver-block assertions, each top-level and
 # never skipped, less OSTYPE out of the population loop and GOV_PYTHON out of the exemption loop.
 # Counted by reading; OWED: observed at the close.
+# RAISED 708 -> 709 by TOOL-dDeclaredLoop-22: its recommendation plant assertion, top-level and never
+# skipped. Counted by reading; OWED: observed at the close.
 # RAISED 708 -> 710 by TOOL-aHastenedSweep-4: its two one-process split assertions, each top-level and
 # never skipped. Counted by reading; OWED: observed at the close.
 # RAISED 710 -> 719 by TOOL-aHastenedSweep-6: TOOL-aHastenedSweep-3's five hand-down assertions, which
@@ -5006,7 +5014,9 @@ done
 # MERGED at TOOL-aTrimmedWait-18's reconcile of local main at 8eda4a5a0: this branch's 750,
 # plus main's 34 since 5d48501da (TOOL-aHastenedSweep-4's 2, -6's 9 and -7's pin of 23) = 784.
 # Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=784
+# MERGED at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c: main's 784, plus TOOL-dDeclaredLoop-22's one
+# recommendation assertion above = 785. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=785
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
