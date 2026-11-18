@@ -1,4 +1,4 @@
-<!-- gov:kit roles@1.21 -->
+<!-- gov:kit roles@1.22 -->
 # roles — the role catalogue: one agent definition per role, the workflow table, and the checker
 
 A governed session runs its LLM work through ten declared WORKFLOWS — `orient`, `research`, `reuse`,
@@ -167,6 +167,18 @@ at the ledger's folder. The ledger's `**Serves:**` line lists every unit id the 
 on their first line, and it is re-derived on every write. The build is the marker's `build`, else the
 `Workflow` call's `slug`, else the session card's last `## route`. A build with no folder or no
 specced id writes nothing and says why.
+
+**The record** (TOOL-aTrimmedWait-7). The verb keeps what it parsed from the session file in one
+JSON record per file, `<git-common-dir>/handoff-calls/<first 16 hex of sha256 of the file's resolved
+path>.json`, holding `handoff.py`'s own sha256, the resolved path, the bytes consumed, the sha256 of
+those bytes, and the parsed calls, notifications and unparsed-line count. A call whose record holds
+in every key re-hashes the consumed bytes, and on a match parses only the complete lines after them;
+the record is rewritten when that moved the offset, and a torn last line is parsed after the write,
+so no record holds it. Any other record is a miss and a read from byte 0, and an unwritable folder
+is a miss on every call. The output is byte-identical either way, so the folder may be deleted at
+any time to clear it. Records are never pruned. Not checked: a record forged with a matching prefix
+hash and parser hash, whose calls are trusted as the transcript's own lines are, and a transcript
+rewritten so its consumed bytes keep their sha256.
 
 Exit 0 on lines printed, notes or none; 1 on a refusal: no marker in the handoff, no matching call,
 no run journal, a missing shape, an underived placeholder, or two ledgers in one build. Exit 2 with

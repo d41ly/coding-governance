@@ -9,12 +9,18 @@
 #   <prefix>/memory-tree/check-memory-hygiene.sh --staged   # pre-commit fast leg (file-checks on staged paths)
 #   <this script> --offenders                            # one `check <n><TAB><key>` per offender, nothing else
 #   <this script> --only N[,M]                           # only the check blocks naming N or M (TOOL-aSparedSpawn-7)
+#   <this script> --only 12 --spec <path> | --build <slug>   # check 12's block over one spec or one build, tracked or not
 #
 # `--only` runs every producer and only the check blocks whose `check_selected` call names a requested
 # id. A block grading several ids runs whole and records them all, so `--only 12` reads `ran checks 12
 # 25`, and 6, 7 and 8 are one unit over the waiver state they share. The selectable set is READ from
 # this file's own `check_selected` calls, never typed. It takes no other argument: `--staged`,
 # `--offenders` and the print modes each grade or print something `--only` does not select.
+# `--spec` and `--build` are the one exception (TOOL-aTrimmedWait-2): beside `--only 12` or `--only 25`,
+# check 12's block grades the named spec, its build's other specs read for their edges only, or every
+# spec of the named build, untracked ones included, with the `base` resolve arm the full run runs. Any
+# other use of either flag, a path check 12's selector does not select, an absent file, a build with no
+# selectable spec, or a selection the format cutoff leaves empty refuses with exit 2 and grades nothing.
 #
 # `--staged` is NOT the full check with a narrower file list. Several checks whose population is the
 # CORPUS rather than the diff are HELD: 13-16, 17-19, 21, the row-grammar arm and 26 (whose
@@ -40,11 +46,15 @@ set -u
 # --only N[,M]: parsed BEFORE the `cd` below, because the selectable set is read from "$0" and a
 # relative "$0" names this file only from the caller's directory. Refused whole, before any check runs,
 # when it shares the argv with anything else or names an id no `check_selected` call carries.
-ONLY=""; ONLY_SEL=""; RAN=""
+ONLY=""; ONLY_SEL=""; RAN=""; SCOPE_KIND=""; SCOPE_ARG=""; SCOPED=0
 case " $* " in
   *" --only "*)
-    [ "${1:-}" = --only ] && [ "$#" = 2 ] \
-      || { echo "HYGIENE — cannot run: --only takes one comma list and no other argument; --staged, --offenders and the print modes each grade or print something --only does not select"; exit 2; }
+    if [ "${1:-}" = --only ] && [ "$#" = 4 ] && { [ "$3" = --spec ] || [ "$3" = --build ]; }; then
+      SCOPE_KIND=${3#--}; SCOPE_ARG=$4; SCOPED=1
+    else
+      [ "${1:-}" = --only ] && [ "$#" = 2 ] \
+        || { echo "HYGIENE — cannot run: --only takes one comma list and no other argument; --staged, --offenders and the print modes each grade or print something --only does not select"; exit 2; }
+    fi
     ONLY_SEL=$2
     case "$ONLY_SEL" in
       ""|,*|*,|*,,*|*[!0-9,]*) echo "HYGIENE — cannot run: --only takes check numbers joined by commas, got '$ONLY_SEL'"; exit 2 ;;
@@ -56,7 +66,10 @@ case " $* " in
         *" $_o "*) ;;
         *) echo "HYGIENE — cannot run: --only names check $_o, which no check_selected call in this script carries; the selectable ids are: $(printf '%s\n' $_only_known | sort -un | tr '\n' ' ')"; exit 2 ;;
       esac
+      [ "$SCOPED" = 0 ] || case "$_o" in 12|25) ;; *) echo "HYGIENE — cannot run: --$SCOPE_KIND scopes check 12's block only, so --only takes 12 or 25 beside it, got check $_o"; exit 2 ;; esac
     done ;;
+  *" --spec "*|*" --build "*)
+    echo "HYGIENE — cannot run: --spec and --build scope check 12's block and run only as --only 12 --spec <path> or --only 12 --build <slug>"; exit 2 ;;
 esac
 # --offenders: THE SIGNATURE THE MERGE BAR GRADES THIS LEG WITH (TOOL-dDerivedDocket-23 S3). The full
 # check runs exactly as it does with no flag and exits as it does; what changes is stdout, which
@@ -69,7 +82,7 @@ esac
 # no key at all, which the bar reads as a probe that could not answer rather than as a clean set.
 OFFENDERS=0; OFFENDER_KEYS=""
 if [ "${1:-}" = "--offenders" ]; then OFFENDERS=1; exec 3>&1 1>/dev/null; fi
-KIT_MEMORY_TREE_VERSION=2.164   # gov:kit memory-tree@2.164 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.167   # gov:kit memory-tree@2.167 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -733,7 +746,7 @@ REC_TAIL='(-[a-z0-9][a-z0-9-]*)?'
 # `--staged` is exempt throughout: an empty staged set is the normal case.
 POP_MISSING=""
 pop_guard() { # check-number · label · population-count · precondition-count
-  [ "$STAGED" = 1 ] && return 0
+  [ "$STAGED" = 1 ] || [ "$SCOPED" = 1 ] && return 0
   [ "${3:-0}" -gt 0 ] && return 0
   [ "${4:-0}" -gt 0 ] || return 0
   POP_MISSING="${POP_MISSING}    check $1: $2 (but $4 file(s) of that kind exist elsewhere under $M/ — the selector is mis-segmented)"$'\n'
@@ -821,7 +834,29 @@ if [ "$STAGED" = 1 ]; then
     echo "memory-hygiene: --staged grades the staged files and their own build folders, not the whole tree; the push-boundary run grades the whole tree"
   fi
 fi
-in_scope() { [ "$STAGED" = 0 ] && return 0; [ -n "${STAGED_SET[$1]+x}" ]; }   # zero-fork (see LEGACY_SET)
+# THE SCOPED SELECTION (TOOL-aTrimmedWait-2): `--spec <path>` or `--build <slug>` beside `--only` fills
+# STAGED_SET from its argument instead of the index, and FILES becomes that build's spec folder,
+# tracked then untracked, since the spec a writer has not committed is the one it asks about. STAGED
+# stays 0, so the `base` resolve arm runs as on the full run; that arm is why this is not `--staged`.
+# Check 12's block refuses a path its own selector does not select and an empty graded selection.
+if [ "$SCOPED" = 1 ]; then
+  [ -n "$SPEC_FORMAT_CUTOFF" ] || { echo "HYGIENE — cannot run: --$SCOPE_KIND grades check 12's selection, and SPEC_FORMAT_CUTOFF is blank, so check 12 grades no spec"; exit 2; }
+  if [ "$SCOPE_KIND" = spec ]; then
+    case "/$SCOPE_ARG/" in */../*) echo "HYGIENE — cannot run: --spec '$SCOPE_ARG' carries a '..' segment; name the spec by its path from the repository root"; exit 2 ;; esac
+    [ -f "$SCOPE_ARG" ] || { echo "HYGIENE — cannot run: --spec '$SCOPE_ARG' names no file"; exit 2; }
+    _sb=${SCOPE_ARG#"$M"/builds/}; _sb=${_sb%%/*}
+  else
+    [[ $SCOPE_ARG =~ ^[A-Za-z][A-Za-z0-9-]*$ ]] || { echo "HYGIENE — cannot run: --build '$SCOPE_ARG' is no build slug: a letter, then letters, digits or dashes"; exit 2; }
+    _sb=$SCOPE_ARG
+  fi
+  FILES=$(git ls-files -- "$M/builds/$_sb/spec/"; git ls-files --others --exclude-standard -- "$M/builds/$_sb/spec/" 2>/dev/null)
+  if [ "$SCOPE_KIND" = spec ]; then
+    STAGED_SET["$SCOPE_ARG"]=1
+  else
+    while IFS= read -r _l; do [ -z "$_l" ] || STAGED_SET["$_l"]=1; done < <(printf '%s\n' "$FILES")
+  fi
+fi
+in_scope() { [ "$STAGED" = 0 ] && [ "$SCOPED" = 0 ] && return 0; [ -n "${STAGED_SET[$1]+x}" ]; }   # zero-fork (see LEGACY_SET)
 
 # CHECKS 1, 3, 4 AND 5 GRADE PATH NAMES (TOOL-aTrimmedHook-2). A commit makes one wrong by staging a NEW
 # name, or by staging what decides which names pass: the grandfather list or the conf, which grade the
@@ -1196,6 +1231,12 @@ VIEW_SET=""
 [ "$_IDX_STAGED" = 1 ] && [ "$BMODE" = builds ] && VIEW_SET=$(printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$" \
   | while IFS= read -r f; do [ -f "$f" ] && echo "$f"; done)
 case "${1:-}" in --print-index-set) printf '%s\n' "$INDEX_SET"; exit 0 ;; esac   # see the PRINT MODES note above
+# THE HAND-DOWN SNAPSHOT, taken HERE and not at the launch: checks 6 onward also call `fail`, so the
+# launch site's `status` no longer answers "did checks 1 to 5 fail". When an unscoped, unstaged run's
+# checks 1 to 5 recorded none, the print mode would answer exactly this INDEX_SET, so check 16 is
+# handed it on stdin instead of re-running this prologue; otherwise corpus_ids asks as before and its
+# "answered with findings" refusal still fires (TOOL-aHastenedSweep-3).
+_IXH=""; [ "$STAGED" = 0 ] && [ -z "$ONLY" ] && [ "$status" = 0 ] && _IXH=1   # TOOL-aHastenedSweep-3
 
 if check_selected 6 7 8; then
 # 6 — index size caps (grandfather: curation-debt.txt).
@@ -2112,7 +2153,7 @@ c12_all=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/spec/(.+/)?[0-9]{4}
 c12_sel=$(printf '%s\n' "$c12_all" | grep . | {
 mapfile -t _c12l
 declare -A _C12B=()
-if [ "$STAGED" = 1 ] && [ -n "$SPEC_EDGES_CUTOFF" ]; then
+if { [ "$STAGED" = 1 ] || [ "$SCOPED" = 1 ]; } && [ -n "$SPEC_EDGES_CUTOFF" ]; then
   for _cf in ${_c12l[@]+"${_c12l[@]}"}; do
     [ -n "${STAGED_SET[$_cf]+x}" ] || continue
     _b=${_cf#"$M"/builds/}; _C12B["${_b%%/*}"]=1
@@ -2129,6 +2170,17 @@ for f in ${_c12l[@]+"${_c12l[@]}"}; do
   fi
 done
 })
+# The scoped run's refusals that need check 12's own selector (TOOL-aTrimmedWait-2): a path it does
+# not select, a build it selects nothing of, and a selection the cutoff left with no spec to grade,
+# which would print what a clean spec prints.
+if [ "$SCOPED" = 1 ]; then
+  if [ "$SCOPE_KIND" = spec ]; then
+    case $'\n'"$c12_all"$'\n' in *$'\n'"$SCOPE_ARG"$'\n'*) ;; *) echo "HYGIENE — cannot run: --spec '$SCOPE_ARG' names no spec check 12 selects: a dated spec file under $M/builds/<slug>/spec/"; exit 2 ;; esac
+  else
+    [ -n "$c12_all" ] || { echo "HYGIENE — cannot run: --build '$SCOPE_ARG' holds no spec check 12 selects under $M/builds/$SCOPE_ARG/spec/"; exit 2; }
+  fi
+  case $'\n'"$c12_sel" in *$'\n'P$'\t'*) ;; *) echo "HYGIENE — cannot run: --$SCOPE_KIND '$SCOPE_ARG' leaves check 12 no spec to grade: every one is dated before SPEC_FORMAT_CUTOFF $SPEC_FORMAT_CUTOFF or absent from the worktree"; exit 2 ;; esac
+fi
 bad12_raw=""
 if [ -n "$c12_sel" ]; then
 # Every array below is read only up to its own counter (n, ng, q), so entries left from a previous
@@ -2995,7 +3047,7 @@ if [ "$STAGED" = 1 ] && [ -n "$SPEC_EDGES_CUTOFF" ]; then
   echo "memory-hygiene: the §3 edge JOINS grade each staged spec against its own build's specs as they stand in the worktree, and report an edge when either end of it is staged; the push-boundary run grades every edge"
 fi
 if [ -n "$edge12" ]; then
-  edgebad=$(printf '%s\n' "$edge12" | awk -F'\t' -v stg="$STAGED" '
+  edgebad=$(printf '%s\n' "$edge12" | awk -F'\t' -v stg="$((STAGED | SCOPED))" '
     $2 == "U" { pop[$3 SUBSEP $4] = 1; ord[$3 SUBSEP $4] = $5; file[$3 SUBSEP $4] = $8; staged[$3 SUBSEP $4] = $9; next }
     $2 == "E" { k = ++ne; eslug[k] = $3; euid[k] = $4; eord[k] = $5; everb[k] = $6; etgt[k] = $7; efile[k] = $8
                 eprose[k] = $9; estaged[k] = $10
@@ -3114,7 +3166,8 @@ if [ -n "$_rdtok" ]; then
       left = np
       for (c = 1; c <= nr && left > 0; c++) {
         while (left > 0 && (getline ln < rdr[c]) > 0)
-          for (i = 1; i <= np; i++) if (!(pl[i] in got) && test_whole_token(ln, pl[i])) { got[pl[i]] = 1; left-- }
+          # index() first: test_whole_token returns 0 whenever index() does, so this skips only the line copy (TOOL-aHastenedSweep-1)
+          for (i = 1; i <= np; i++) if (!(pl[i] in got) && index(ln, pl[i]) && test_whole_token(ln, pl[i])) { got[pl[i]] = 1; left-- }
         close(rdr[c])
       }
       for (k = 1; k <= nt; k++) {
@@ -3143,7 +3196,7 @@ $bad25"
 # ---- alone, which OVER-counts (the arm reaches Tier-2 only), and that is the safe direction: a
 # ---- date-count of zero proves a Tier-2 count of zero, while a non-zero date-count only means the
 # ---- notice stays quiet, which is the state where the corpus itself is the evidence.
-if [ "$STAGED" = 0 ] && [ -n "$SPEC10_EVIDENCE_CUTOFF" ]; then
+if [ "$STAGED" = 0 ] && [ "$SCOPED" = 0 ] && [ -n "$SPEC10_EVIDENCE_CUTOFF" ]; then
   _ev_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$SPEC10_EVIDENCE_CUTOFF" \
     '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
   [ "${_ev_n:-0}" -gt 0 ] || echo "memory-hygiene: the §10 reuse-evidence arm graded NO spec — SPEC10_EVIDENCE_CUTOFF is $SPEC10_EVIDENCE_CUTOFF and every tracked spec predates it. That is the intended state at adoption; the arm's coverage is its self-test fixtures, not this corpus."
@@ -3151,19 +3204,19 @@ fi
 # Same notice, same footing, for the §9 rev-scope arm (TOOL-aJoinedCanon-1). An arm that grades no
 # spec prints a silent green otherwise, which is indistinguishable from one that graded the corpus
 # and found nothing.
-if [ "$STAGED" = 0 ] && [ -n "$REV_SCOPE_CUTOFF" ]; then
+if [ "$STAGED" = 0 ] && [ "$SCOPED" = 0 ] && [ -n "$REV_SCOPE_CUTOFF" ]; then
   _rs_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$REV_SCOPE_CUTOFF" \
     '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
   [ "${_rs_n:-0}" -gt 0 ] || echo "memory-hygiene: the §9 rev-scope arm graded NO spec — REV_SCOPE_CUTOFF is $REV_SCOPE_CUTOFF and every tracked spec predates it. That is the intended state at adoption; the arm's coverage is its self-test fixtures, not this corpus."
 fi
 # Same notice, same footing, for the §2 scope-join arm (TOOL-aJoinedCanon-3).
-if [ "$STAGED" = 0 ] && [ -n "$SCOPE_JOIN_CUTOFF" ]; then
+if [ "$STAGED" = 0 ] && [ "$SCOPED" = 0 ] && [ -n "$SCOPE_JOIN_CUTOFF" ]; then
   _sj_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$SCOPE_JOIN_CUTOFF" \
     '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
   [ "${_sj_n:-0}" -gt 0 ] || echo "memory-hygiene: the §2 scope-join arm graded NO spec — SCOPE_JOIN_CUTOFF is $SCOPE_JOIN_CUTOFF and every tracked spec predates it. That is the intended state at adoption; the arm's coverage is its self-test fixtures, not this corpus."
 fi
 # Same notice, same footing, for the §6 failure-mode arm (TOOL-aJoinedCanon-4).
-if [ "$STAGED" = 0 ] && [ -n "$SPEC_FAILURE_MODE_CUTOFF" ]; then
+if [ "$STAGED" = 0 ] && [ "$SCOPED" = 0 ] && [ -n "$SPEC_FAILURE_MODE_CUTOFF" ]; then
   _fm_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$SPEC_FAILURE_MODE_CUTOFF" \
     '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
   [ "${_fm_n:-0}" -gt 0 ] || echo "memory-hygiene: the §6 failure-mode arm graded NO spec — SPEC_FAILURE_MODE_CUTOFF is $SPEC_FAILURE_MODE_CUTOFF and every tracked spec predates it. That is the intended state at adoption; the arm's coverage is its self-test fixtures, not this corpus."
@@ -3172,21 +3225,21 @@ fi
 # than a nicety: under the ratified cutoff the whole LIVE CORPUS is the grandfather case, so a green
 # with a graded population of zero and a green with a graded population of hundreds are the same
 # byte, and this line is the only thing that tells them apart.
-if [ "$STAGED" = 0 ] && [ -n "$SPEC_EDGES_CUTOFF" ]; then
+if [ "$STAGED" = 0 ] && [ "$SCOPED" = 0 ] && [ -n "$SPEC_EDGES_CUTOFF" ]; then
   _eg_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$SPEC_EDGES_CUTOFF" \
     '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
   [ "${_eg_n:-0}" -gt 0 ] || echo "memory-hygiene: the §3 edge arms graded NO spec — SPEC_EDGES_CUTOFF is $SPEC_EDGES_CUTOFF and every tracked spec predates it. That is the intended state at adoption; their coverage is the self-test fixtures, not this corpus."
 fi
 # Same notice, same footing, for the §8 F-item arms (TOOL-dDerivedDocket-31): the terminal per-item
 # reading and the Tier-2 shape. Its declared value sits past every tracked spec date at adoption.
-if [ "$STAGED" = 0 ] && [ -n "$FORK_ITEM_CUTOFF" ]; then
+if [ "$STAGED" = 0 ] && [ "$SCOPED" = 0 ] && [ -n "$FORK_ITEM_CUTOFF" ]; then
   _fi_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$FORK_ITEM_CUTOFF" \
     '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
   [ "${_fi_n:-0}" -gt 0 ] || echo "memory-hygiene: the §8 F-item arms graded NO spec — FORK_ITEM_CUTOFF is $FORK_ITEM_CUTOFF and every tracked spec predates it. That is the intended state at adoption; their coverage is the self-test fixtures and the marker-contract table, not this corpus."
 fi
 # Same notice, same footing, for the Tier-1 micro-spec arm (TOOL-aRoutedQuill-1). Counted by date
 # alone, so Tier-2 specs inflate it: the safe direction, since it can only stay silent too OFTEN.
-if [ "$STAGED" = 0 ] && [ -n "$SPEC_TIER1_CUTOFF" ]; then
+if [ "$STAGED" = 0 ] && [ "$SCOPED" = 0 ] && [ -n "$SPEC_TIER1_CUTOFF" ]; then
   _t1_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$SPEC_TIER1_CUTOFF" \
     '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
   [ "${_t1_n:-0}" -gt 0 ] || echo "memory-hygiene: the Tier-1 micro-spec arm graded NO spec — SPEC_TIER1_CUTOFF is $SPEC_TIER1_CUTOFF and every tracked spec predates it. That is the intended state at adoption; the arm's coverage is its self-test fixtures, not this corpus."
@@ -3194,7 +3247,7 @@ fi
 # Same notice, same footing, for check 25 (TOOL-dGatedProse-1), keyed on the LIVE count rather than on
 # a cutoff: its population empties by specs CLOSING, which nobody configures and so nobody watches.
 # It answers the ARMED-and-empty state only; the disarmed state is the notice below this block.
-if [ "$STAGED" = 0 ]; then
+if [ "$STAGED" = 0 ] && [ "$SCOPED" = 0 ]; then
   _rd_n=$(printf '%s\n' "$rd25" | grep -c $'^\004\tL\t' || true)
   [ "${_rd_n:-0}" -gt 0 ] || echo "memory-hygiene: the §2 reader-inventory arm, check 25, graded NO spec — no spec in check 12's selection is LIVE by its test, a status header that is not CLOSED|WONTDO. That is a skip that looks like a pass; the arm's coverage is then its self-test fixtures, not this corpus."
 fi
@@ -3209,18 +3262,41 @@ fi
 
 fi
 
+_onepy=""   # 1 once the 13-16 block ran 17-19 in the same interpreter (TOOL-aHastenedSweep-4)
 if check_selected 13 14 15 16; then
 # 13-15 (pinned) + 16 (structural) — id + path corpus classification (delegates to the sibling classifier). ONE grammar and ONE
 # walk: this script owns the append-only and index sets and PRINTS them on demand; the classifier
 # owns the id grammar it imports from the recall kit. Neither transcribes the other. Every pin the
 # classifier reads is measured per corpus, and checks 13-15 are behind DEAD_PATH_PIN / ORPHAN_ID_PIN; check 16 is STRUCTURAL and behind none.
+# When this script's own checks 1 to 5 ran clean it hands --print-index-set's answer down on stdin
+# under GOV_INDEX_SET_STDIN=1 instead (TOOL-aHastenedSweep-3).
 if [ "$STAGED" = 0 ]; then
   # PRINT WHATEVER IT SAID, then decide the status from the exit code. The classifier has a
   # NON-GATING channel — check 16's not-asked, grace and retired-key notices all print at exit 0
   # — and the old form captured stdout and threw it away unless the run was already red. Every
   # one of those notices was computed and discarded, so the retirement had no notification
   # channel at all and the grace was invisible for its whole life: a skip that looks like a pass.
-  ids=$("$_PY" "$HERE/corpus_ids.py" --check 2>&1); _idsrc=$?
+  # The prefix is written on EVERY run, so an inherited GOV_INDEX_SET_STDIN=1 is blanked whenever the
+  # run is not eligible; a here-string is no pipeline, so _idsrc stays the interpreter's own code.
+  if [ -z "$ONLY" ]; then
+    # ONE INTERPRETER FOR 13-16 AND 17-19 on an unscoped run, over one memoized walk
+    # (TOOL-aHastenedSweep-4). gotchas.py --check-with-ids prints `<block>\x1d<rc>\n` per verb,
+    # corpus_ids first; the split is parameter expansion only, each block losing its trailing newlines
+    # one at a time as `$( )` stripped them (a CR before each too, where Cygwin's and MSYS's do), so
+    # both blocks print, red and key exactly as two launches did. A frame that does not split reds
+    # LOUDLY under 13-16 with the whole capture, never as a silent second launch.
+    _both=$(GOV_INDEX_SET_STDIN=$_IXH "$_PY" "$HERE/gotchas.py" --check-with-ids 2>&1 <<<"${_IXH:+$INDEX_SET}") && {
+      ids=${_both%%$'\x1d'*}; got=${_both#*$'\x1d'}
+      _idsrc=${got%%$'\n'*}; _idsrc=${_idsrc%$'\r'}; got=${got#*$'\n'}
+      _gotrc=${got#*$'\x1d'}; _gotrc=${_gotrc%$'\r'}; got=${got%%$'\x1d'*}
+      while [[ $ids == *$'\n' ]]; do ids=${ids%$'\n'}; case $OSTYPE in cygwin*|msys*) ids=${ids%$'\r'} ;; esac; done
+      while [[ $got == *$'\n' ]]; do got=${got%$'\n'}; case $OSTYPE in cygwin*|msys*) got=${got%$'\r'} ;; esac; done
+      [[ $_both == *$'\x1d'*$'\x1d'* && $_idsrc =~ ^[0-9]+$ && $_gotrc =~ ^[0-9]+$ ]]
+    } && _onepy=1
+    [ "$_onepy" = 1 ] || { ids=$_both; _idsrc=1; got=""; _gotrc=1; _onepy=1; }
+  else
+    ids=$(GOV_INDEX_SET_STDIN=$_IXH "$_PY" "$HERE/corpus_ids.py" --check 2>&1 <<<"${_IXH:+$INDEX_SET}"); _idsrc=$?
+  fi
   [ -n "$ids" ] && printf '%s
 ' "$ids"
   # The suite's check 13 claimant arm drives this exit through the engine (TOOL-aGraftedHelix-47).
@@ -3240,7 +3316,7 @@ if check_selected 17 18 19; then
 # 19's dead-anchor advisory (TOOL-aMendedFleet-23), and an invariant guard or decision the module
 # could not resolve, ANNOUNCED inside its green output (TOOL-aGraftedHelix-3 S7), as check 20's is.
 if [ "$STAGED" = 0 ]; then
-  got=$("$_PY" "$HERE/gotchas.py" --check 2>&1); _gotrc=$?
+  [ "$_onepy" = 1 ] || { got=$("$_PY" "$HERE/gotchas.py" --check 2>&1); _gotrc=$?; }
   [ -n "$got" ] && printf '%s
 ' "$got"
   [ "$_gotrc" -ne 0 ] && status=1
@@ -3735,7 +3811,13 @@ fi
 # scoped run graded, sorted. A requested id no guard recorded exits 2, since its verdict would be silence.
 if [ -n "$ONLY" ]; then
   _ran_sorted=$(printf '%s\n' $RAN | sort -un | tr '\n' ' '); _ran_sorted=${_ran_sorted% }
-  echo "HYGIENE --only $ONLY_SEL ran checks ${_ran_sorted:-none}"
+  # TOOL-aTrimmedWait-2: a scoped run names its scope and the count of specs it graded, `P` lines.
+  if [ "$SCOPED" = 1 ]; then
+    _c12_t=$'\n'$c12_sel; _c12_u=${_c12_t//$'\n'P$'\t'/}; _c12_p=$(( (${#_c12_t} - ${#_c12_u}) / 3 ))
+    echo "HYGIENE --only $ONLY_SEL ran checks ${_ran_sorted:-none} over $_c12_p spec(s) of $SCOPE_ARG"
+  else
+    echo "HYGIENE --only $ONLY_SEL ran checks ${_ran_sorted:-none}"
+  fi
   for _o in $ONLY; do
     case " $RAN " in
       *" $_o "*) ;;

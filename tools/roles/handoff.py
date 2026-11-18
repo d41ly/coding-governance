@@ -72,7 +72,10 @@ the label (TOOL-aOrientedCast-27). With `--write`, each line holding no `unknown
 build's one `<MEMORY_ROOT>/builds/<build>/build/*-agent-ledger.md`, its prompt link re-rooted at
 that folder; without it nothing is written and one note names the held lines and `--write`, so a
 mid-pass call leaves the tree as it found it. Pass `--write` only at a bookkeeping step, when no
-pass is running.
+pass is running. The session's parsed calls are kept in one record per session file under
+`<git-common-dir>/handoff-calls/`, keyed by this file's sha256, the file's resolved path and the
+sha256 of the bytes it consumed, so a later call parses only the lines appended since; any other
+record is a miss and a read from byte 0, and deleting the folder clears it (TOOL-aTrimmedWait-7).
 
 Sources, by key family: `task:` the card's `## task` field, read by the kickoff checker's grammar
 (stated above its `check_card_task`, and ported here because that one is shell) under the labels
@@ -101,7 +104,9 @@ or a `model` is what the transcript records, not proved to be what the API appli
 transcript record carries prints `unknown`, never the agent type's `effort:` line, which is the
 default tables' level and not the level a profile dispatched (TOOL-aProfiledEffort-4); a file written
 through Bash is not counted as written; the session read may not be the one the build ran in; and
-a ledger line edited by hand passes, since nothing re-derives the ledger.
+a ledger line edited by hand passes, since nothing re-derives the ledger; a `handoff-calls` record
+forged with a matching prefix and parser hash is trusted as the transcript's own lines are, and a
+transcript rewritten so its consumed bytes keep their sha256 resumes from the stale record.
 For `--model`: the id is not checked to be the model the session or the spawned agent runs, since
 the caller types it, and an id no profile matches answers the default levels with no note.
 """
@@ -178,6 +183,33 @@ SHAPE_FIELD_RE = re.compile(r"<([^<>]+)>")
 NOTIFICATION_RE = re.compile(r"<task-notification>(.*?)</task-notification>", re.S)
 #: The session file's lines worth parsing: every other line is skipped unparsed, by its bytes.
 SESSION_LINE_TOKENS = (b'"Agent"', b'"Workflow"', b"toolUseResult", b"task-notification")
+#: TOOL-aTrimmedWait-7: the folder under the git common dir holding one parsed-calls record per
+#: session file, and the record's keys, every one checked by read_session_record before use.
+SESSION_CACHE_DIR = "handoff-calls"
+SESSION_RECORD_KEYS = frozenset(("parser", "session", "offset", "prefix", "calls", "notified", "bad"))
+
+
+def read_git_stdout(repo: pathlib.Path, *args: str) -> str:
+    return subprocess.run(
+        ["git", "-C", str(repo), *args], capture_output=True, text=True, encoding="utf-8", check=True
+    ).stdout
+
+
+git = read_git_stdout  # the name the inlined common_git_dir block calls
+
+
+# >>> common_git_dir -- canonical copy: common_dir.py in the gov lib dir (byte-identical; gated)
+def common_git_dir(repo: pathlib.Path) -> pathlib.Path:
+    """The MAIN repository's git directory, shared by every worktree.
+
+    ``--git-dir`` in a linked worktree is ``.git/worktrees/<name>``, which ``git worktree remove``
+    deletes outright -- taking the query log with it. It is also RELATIVE (bare ``.git``) when run
+    at the repo root and absolute elsewhere, so the raw value is not a usable path either way.
+    """
+    raw = git(repo, "rev-parse", "--git-common-dir").strip()
+    p = pathlib.Path(raw)
+    return p.resolve() if p.is_absolute() else (repo / raw).resolve()
+# <<< common_git_dir
 
 
 def check_placeholder(value):
@@ -791,54 +823,141 @@ def resolve_session_file(root, session_arg):
     return max(hits, key=lambda p: (p.stat().st_size, p.as_posix())), None
 
 
-def load_session_calls(path):
+def parse_session_line(raw, state):
+    """Fold one session-file line's bytes into `state`, `{"calls", "by_id", "notified", "bad"}`: the
+    per-line body of load_session_calls, shared by its cold and its resumed read."""
+    if not any(t in raw for t in SESSION_LINE_TOKENS):
+        return
+    try:
+        rec = json.loads(raw)
+    except (ValueError, RecursionError):
+        rec = None
+    if not isinstance(rec, dict):
+        state["bad"] += 1
+        return
+    calls, by_id, notified = state["calls"], state["by_id"], state["notified"]
+    msg = rec.get("message") if isinstance(rec.get("message"), dict) else {}
+    content, texts = msg.get("content"), []
+    if rec.get("type") == "user" and isinstance(content, str):
+        texts.append(content)
+    for b in content if isinstance(content, list) else []:
+        if not isinstance(b, dict):
+            continue
+        if rec.get("type") == "assistant" and b.get("type") == "tool_use" \
+                and b.get("name") in ("Agent", "Workflow"):
+            call = {"id": b.get("id"), "name": b["name"], "result": None,
+                    "input": b.get("input") if isinstance(b.get("input"), dict) else {}}
+            calls.append(call)
+            by_id[call["id"]] = call
+        elif b.get("type") == "tool_result" and b.get("tool_use_id") in by_id \
+                and isinstance(rec.get("toolUseResult"), dict):
+            by_id[b["tool_use_id"]]["result"] = rec["toolUseResult"]
+        elif rec.get("type") == "user" and b.get("type") == "text" and isinstance(b.get("text"), str):
+            texts.append(b["text"])
+    att = rec.get("attachment")
+    if isinstance(att, dict) and att.get("type") == "queued_command" and isinstance(att.get("prompt"), str):
+        texts.append(att["prompt"])
+    if rec.get("type") == "queue-operation" and isinstance(rec.get("content"), str):
+        texts.append(rec["content"])
+    for block in (n for t in texts for n in NOTIFICATION_RE.findall(t)):
+        tid = re.search(r"<tool-use-id>([^<]*)</tool-use-id>", block)
+        status = re.search(r"<status>([^<]*)</status>", block)
+        if tid:
+            notified[tid.group(1).strip()] = status.group(1).strip() if status else None
+
+
+def read_session_record(path, parser, session):
+    """The session record at `path` (TOOL-aTrimmedWait-7), or None when it is absent, unreadable, or
+    any key fails: exactly SESSION_RECORD_KEYS, `parser` and `session` equal to the given ones, `offset`
+    an int from 0 to the session file's size, `prefix` 64 lowercase hex, `calls` the call dicts,
+    `notified` a map of string to string or None, `bad` an int of at least 0. None is a miss."""
+    try:
+        with open(path, encoding="utf-8") as fh:
+            rec = json.load(fh)
+        size = os.path.getsize(session)
+    except (OSError, ValueError, RecursionError):
+        return None
+    if not isinstance(rec, dict) or set(rec) != SESSION_RECORD_KEYS:
+        return None
+    nat = lambda v: isinstance(v, int) and not isinstance(v, bool) and v >= 0  # noqa: E731
+    calls, notified = rec["calls"], rec["notified"]
+    ok = (rec["parser"] == parser and rec["session"] == session and nat(rec["offset"]) and rec["offset"] <= size
+          and isinstance(rec["prefix"], str) and re.fullmatch(r"[0-9a-f]{64}", rec["prefix"]) is not None
+          and nat(rec["bad"]) and isinstance(calls, list) and isinstance(notified, dict)
+          and all(isinstance(c, dict) and set(c) == {"id", "name", "input", "result"}
+                  and not isinstance(c["id"], (list, dict)) and c["name"] in ("Agent", "Workflow")
+                  and isinstance(c["input"], dict) and (c["result"] is None or isinstance(c["result"], dict))
+                  for c in calls)
+          and all(isinstance(v, str) or v is None for v in notified.values()))
+    return rec if ok else None
+
+
+def write_session_record(path, rec):
+    """Write `rec` to `path` through `<path>.<pid>.tmp` and os.replace, creating its folder. Any
+    OSError removes the temporary file and returns: a record not written is a later miss."""
+    tmp = path.with_name("%s.%d.tmp" % (path.name, os.getpid()))
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write(json.dumps(rec))
+        os.replace(tmp, path)
+    except OSError:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+
+
+def load_session_calls(path, cache_dir=None):
     """`(calls, notified, bad)` of one session file, read once, line by line. `calls` holds each
     `Agent` and `Workflow` call as `{"id", "name", "input", "result"}` in call order, `result` its
     record's `toolUseResult` or None; `notified` maps a tool-use id to the `<status>` (None when it
     carries none) of a `<task-notification>` naming it, delivered in a user record or still queued
     in a `queued_command` attachment or a `queue-operation` record; `bad` counts the lines that did
-    not parse. Only a line whose bytes carry one of SESSION_LINE_TOKENS is parsed."""
-    calls, by_id, notified, bad = [], {}, {}, 0
+    not parse. Only a line whose bytes carry one of SESSION_LINE_TOKENS is parsed.
+    With `cache_dir` (TOOL-aTrimmedWait-7), the record there for this file, valid by
+    read_session_record and its `prefix` the sha256 of the file's first `offset` bytes, resumes the
+    read at `offset`; the record is written back when the complete lines read moved `offset`, and only
+    then is an unterminated last line parsed, so a record never holds a torn line."""
+    state = {"calls": [], "by_id": {}, "notified": {}, "bad": 0}
+    offset, h, rec, record, tail = 0, hashlib.sha256(), None, None, b""
+    if cache_dir is not None:
+        session = pathlib.Path(path).resolve().as_posix()
+        record = pathlib.Path(cache_dir) / (hashlib.sha256(session.encode("utf-8")).hexdigest()[:16] + ".json")
+        parser = hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest()
+        rec = read_session_record(record, parser, session)
     with open(path, "rb") as fh:
+        if rec is not None:
+            left = rec["offset"]
+            while left:
+                chunk = fh.read(min(left, 1 << 20))
+                if not chunk:
+                    break
+                h.update(chunk)
+                left -= len(chunk)
+            if not left and h.hexdigest() == rec["prefix"]:
+                state.update(calls=rec["calls"], notified=rec["notified"], bad=rec["bad"])
+                for call in state["calls"]:
+                    state["by_id"][call["id"]] = call
+                offset = rec["offset"]
+            else:
+                rec, h = None, hashlib.sha256()
+                fh.seek(0)
         for raw in fh:
-            if not any(t in raw for t in SESSION_LINE_TOKENS):
-                continue
-            try:
-                rec = json.loads(raw)
-            except (ValueError, RecursionError):
-                rec = None
-            if not isinstance(rec, dict):
-                bad += 1
-                continue
-            msg = rec.get("message") if isinstance(rec.get("message"), dict) else {}
-            content, texts = msg.get("content"), []
-            if rec.get("type") == "user" and isinstance(content, str):
-                texts.append(content)
-            for b in content if isinstance(content, list) else []:
-                if not isinstance(b, dict):
-                    continue
-                if rec.get("type") == "assistant" and b.get("type") == "tool_use" \
-                        and b.get("name") in ("Agent", "Workflow"):
-                    call = {"id": b.get("id"), "name": b["name"], "result": None,
-                            "input": b.get("input") if isinstance(b.get("input"), dict) else {}}
-                    calls.append(call)
-                    by_id[call["id"]] = call
-                elif b.get("type") == "tool_result" and b.get("tool_use_id") in by_id \
-                        and isinstance(rec.get("toolUseResult"), dict):
-                    by_id[b["tool_use_id"]]["result"] = rec["toolUseResult"]
-                elif rec.get("type") == "user" and b.get("type") == "text" and isinstance(b.get("text"), str):
-                    texts.append(b["text"])
-            att = rec.get("attachment")
-            if isinstance(att, dict) and att.get("type") == "queued_command" and isinstance(att.get("prompt"), str):
-                texts.append(att["prompt"])
-            if rec.get("type") == "queue-operation" and isinstance(rec.get("content"), str):
-                texts.append(rec["content"])
-            for block in (n for t in texts for n in NOTIFICATION_RE.findall(t)):
-                tid = re.search(r"<tool-use-id>([^<]*)</tool-use-id>", block)
-                status = re.search(r"<status>([^<]*)</status>", block)
-                if tid:
-                    notified[tid.group(1).strip()] = status.group(1).strip() if status else None
-    return calls, notified, bad
+            if record is not None:
+                if not raw.endswith(b"\n"):
+                    tail = raw
+                    break
+                h.update(raw)
+                offset += len(raw)
+            parse_session_line(raw, state)
+    if record is not None and (rec is None or offset != rec["offset"]):
+        write_session_record(record, {"parser": parser, "session": session, "offset": offset,
+                                      "prefix": h.hexdigest(), "calls": state["calls"],
+                                      "notified": state["notified"], "bad": state["bad"]})
+    if tail:
+        parse_session_line(tail, state)
+    return state["calls"], state["notified"], state["bad"]
 
 
 def load_agent_transcript(path):
@@ -1041,7 +1160,11 @@ def print_agent_lines(root, memory_root, charter_path, session, handoff_arg, run
     except ValueError as e:
         raise lib.RolesError("%s is not JSON — %s; re-render it with render_agents.py --write" % (INDEX_REL, e))
     held = index.get("roles") if isinstance(index, dict) and isinstance(index.get("roles"), dict) else {}
-    calls, notified, bad = load_session_calls(session)
+    try:  # TOOL-aTrimmedWait-7: no common dir reads as before, with no record
+        cache_dir = common_git_dir(root) / SESSION_CACHE_DIR
+    except (OSError, subprocess.CalledProcessError):
+        cache_dir = None
+    calls, notified, bad = load_session_calls(session, cache_dir)
     notes = ["%s: %d line(s) did not parse as JSON and were skipped" % (session.as_posix(), bad)] if bad else []
     sdir = session.with_name(session.name[:-len(".jsonl")] if session.name.endswith(".jsonl") else session.stem)
 

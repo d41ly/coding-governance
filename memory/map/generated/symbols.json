@@ -253,6 +253,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "MemberProbe",
+      "kind": "class",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "MemoryStatus",
       "kind": "class",
       "file": "tools/run-gates/measure_legs.py"
@@ -3693,6 +3698,11 @@
       "file": "tools/playbook/fixtures/row_kind.py"
     },
     {
+      "id": "build_render_pathspec",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "build_reordered_plant",
       "kind": "function",
       "file": "tools/playbook/fixtures/row_kind.py"
@@ -4698,6 +4708,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkPollWait",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkPosixRootLitter",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -5503,11 +5518,6 @@
       "file": "tools/push-main.sh"
     },
     {
-      "id": "check_claim_push_lock_stale",
-      "kind": "function",
-      "file": "tools/unattended/unattended.sh"
-    },
-    {
       "id": "check_claim_writable",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -5521,6 +5531,11 @@
       "id": "check_clean",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_cold23",
+      "kind": "function",
+      "file": "tools/roles/adopt-roles.test.sh"
     },
     {
       "id": "check_collisions",
@@ -5753,6 +5768,11 @@
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
+      "id": "check_dir_lock_stale",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_dir_shaped",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
@@ -5771,6 +5791,11 @@
       "id": "check_dispatch_pause",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
+      "id": "check_dispatch_specs",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_disposition_fields",
@@ -5821,6 +5846,11 @@
       "id": "check_drive_red",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "check_edge_shape",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_edges",
@@ -6166,6 +6196,16 @@
       "id": "check_gov_units",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "check_grade_same",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "check_grade_step",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
     },
     {
       "id": "check_graders",
@@ -8178,6 +8218,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "check_staged_write",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "check_stale_rows",
       "kind": "function",
       "file": "tools/loop/termination.py"
@@ -8536,6 +8581,11 @@
       "id": "check_unit_row",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "check_unit_spec",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_unmerged_live",
@@ -9033,6 +9083,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "cmd_check_with_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
+    },
+    {
       "id": "cmd_contribute",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -9466,6 +9521,11 @@
       "id": "common_git_dir",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
+    },
+    {
+      "id": "common_git_dir",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "compliant",
@@ -9906,6 +9966,11 @@
       "id": "deriveSidecarPath",
       "kind": "function",
       "file": "tools/unattended/run-lease.js"
+    },
+    {
+      "id": "deriveSleepSeconds",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "deriveSlotLens",
@@ -11553,6 +11618,11 @@
       "file": "tools/loop/scenario.py"
     },
     {
+      "id": "derive_moved_artifacts",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "derive_moved_invariants",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
@@ -12616,6 +12686,11 @@
       "id": "derive_spec_class_plant",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "derive_spec_context",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "derive_spec_token_key",
@@ -16338,6 +16413,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "measure_pg6_call",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "measure_phrase",
       "kind": "function",
       "file": "tools/codebase-map/replay-phrases.py"
@@ -17451,6 +17531,11 @@
       "id": "parse_seen",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "parse_session_line",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "parse_shell_defs",
@@ -20238,6 +20323,11 @@
       "file": "tools/playbook/tag_index.py"
     },
     {
+      "id": "read_git_stdout",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "read_gloss",
       "kind": "function",
       "file": "tools/lexicon/canon.py"
@@ -21438,6 +21528,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_pg6_dead_pid",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "read_phase",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -22388,6 +22483,11 @@
       "file": "tools/runlog/extract.py"
     },
     {
+      "id": "read_session_record",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "read_set",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -22591,6 +22691,11 @@
       "id": "read_spec_audit_switch",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_spec_cache",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "read_spec_disposal",
@@ -23663,11 +23768,6 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
-      "id": "remove_claim_push_lock",
-      "kind": "function",
-      "file": "tools/unattended/unattended.sh"
-    },
-    {
       "id": "remove_claim_refs",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -23691,6 +23791,11 @@
       "id": "remove_descendants",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "remove_dir_lock",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "remove_drive_section",
@@ -24261,6 +24366,11 @@
       "id": "renderPerLineBlanked",
       "kind": "function",
       "file": "tools/workflows/check-review-join.js"
+    },
+    {
+      "id": "renderPollDeny",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "renderPosix",
@@ -28463,6 +28573,11 @@
       "file": "tools/process-monitor/adopt-process-monitor.test.sh"
     },
     {
+      "id": "run_agents23",
+      "kind": "function",
+      "file": "tools/roles/adopt-roles.test.sh"
+    },
+    {
       "id": "run_ak_leg",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -29558,6 +29673,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "run_grade_checker",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
       "id": "run_grammar",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -30466,6 +30586,11 @@
       "id": "run_render_cli",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "run_render_commit",
+      "kind": "function",
+      "file": ".githooks/pre-commit.test.sh"
     },
     {
       "id": "run_render_helper",
@@ -31799,6 +31924,11 @@
     },
     {
       "id": "scan_live_packets",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "scan_live_spec",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
     },
@@ -34998,6 +35128,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "test_staged_write",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "test_stale_declaration_is_reported_not_honoured",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -35221,6 +35356,11 @@
       "id": "test_write_atomic_temp",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "test_write_moved",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "test_writes_nothing_in_worktree",
@@ -35848,11 +35988,6 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
-      "id": "write_claim_push_lock",
-      "kind": "function",
-      "file": "tools/unattended/unattended.sh"
-    },
-    {
       "id": "write_class_row_plant",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
@@ -35943,6 +36078,11 @@
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
+      "id": "write_cs_spec",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "write_decl",
       "kind": "function",
       "file": "tools/run-gates/adopt-run-gates.test.sh"
@@ -35966,6 +36106,16 @@
       "id": "write_design_fixture",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
+    },
+    {
+      "id": "write_dir_lock",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_dir_lock_pid",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "write_disposal_fixture",
@@ -36261,6 +36411,11 @@
       "id": "write_gov_files",
       "kind": "function",
       "file": "tools/govkit/fixtures/retired_edits.py"
+    },
+    {
+      "id": "write_grade_spec",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
     },
     {
       "id": "write_guard_plant",
@@ -36696,6 +36851,16 @@
       "id": "write_pfx_stamp",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "write_pg6_lock",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_pg6_pid",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_pk_conf",
@@ -37203,6 +37368,11 @@
       "file": "tools/runlog/extract.py"
     },
     {
+      "id": "write_session_record",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "write_settings",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -37261,6 +37431,11 @@
       "id": "write_spec",
       "kind": "function",
       "file": "tools/unattended/check-pass-order.test.sh"
+    },
+    {
+      "id": "write_spec_cache",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "write_specimen",

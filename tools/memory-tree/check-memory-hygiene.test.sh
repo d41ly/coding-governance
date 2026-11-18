@@ -1306,22 +1306,127 @@ for _hs_a in "--only 12 --staged" "--staged --only 12" "--offenders --only 12" "
   n=$((n+1)); [ "$_hs_rc" = 2 ] || { echo "FAIL [$_hs_a] exited $_hs_rc, not 2"; st=1; }
   n=$((n+1)); grep -qF 'HYGIENE check' <<<"$_hs_o" && { echo "FAIL [$_hs_a] graded a check"; st=1; }
 done
+# ---- TOOL-aTrimmedWait-2: `--only 12 --spec <path>` and `--only 12 --build <slug>` grade check 12's
+# ---- block over one spec or one build, untracked specs included, with the `base` resolve arm the
+# ---- unscoped run runs. Its own tree: tOne holds a clean spec, a red one, a LIVE one whose `base`
+# ---- resolves to nothing, an untracked red one and an untracked pre-cutoff one; tTwo holds a red one.
+# ---- Staged breaks: the scope run as STAGED=1 skips the `base` arm, so the tOne-3 arms red; FILES
+# ---- left tracked-only drops tOne-4, so its arms red.
+SC=$TMP/scoped12; _sc_s=memory/builds/tOne/spec; mkdir -p "$SC"
+( cd "$SC" && git init -q --template= .
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nBASE_RESOLVE_CUTOFF="2026-08-26"\nSPEC_EDGES_CUTOFF="2026-09-08"\n' > .memory-tree.conf
+  mkdir -p "$_sc_s" memory/builds/tTwo/spec memory/builds/tThree/spec
+  good | sed 's/tFixture-1/tOne-1/' > "$_sc_s/2026-08-01-spec-tOne-1.md"
+  good | sed 's/tFixture-1/tOne-2/; /^## 7\. Gates$/d' > "$_sc_s/2026-08-01-spec-tOne-2.md"
+  good | sed 's/tFixture-1/tOne-3/; s/2026-08-01/2026-08-26/g' > "$_sc_s/2026-08-26-spec-tOne-3.md"
+  good | sed 's/tFixture-1/tTwo-1/; /^## 7\. Gates$/d' > memory/builds/tTwo/spec/2026-08-01-spec-tTwo-1.md
+  # TOOL-aTrimmedWait-8 S5: tThree, dated at the edge cutoff. tThree-1 declares an edge tThree-2 does
+  # not declare back, and tThree-3 carries a bullet with no payload.
+  good10 | sed 's/tFixture-1/tThree-1/; s/2026-08-10/2026-09-08/g; s/^- Nothing else\.$/&\n\n### Edges\n\n- **hands-off** `ARCH-tThree-2` — the second half./' \
+    > memory/builds/tThree/spec/2026-09-08-spec-tThree-1.md
+  good10 | sed 's/tFixture-1/tThree-2/; s/2026-08-10/2026-09-08/g; s/^- Nothing else\.$/&\n\n### Edges\n\nnone/' \
+    > memory/builds/tThree/spec/2026-09-08-spec-tThree-2.md
+  good10 | sed 's/tFixture-1/tThree-3/; s/2026-08-10/2026-09-08/g; s/^- Nothing else\.$/&\n\n### Edges\n\n- **hands-off** — something, somewhere./' \
+    > memory/builds/tThree/spec/2026-09-08-spec-tThree-3.md
+  git add -A && git commit -q -m scoped12 --no-verify
+  good | sed 's/tFixture-1/tOne-4/; /^## 7\. Gates$/d' > "$_sc_s/2026-08-01-spec-tOne-4.md"
+  good | sed 's/tFixture-1/tOne-5/; s/2026-08-01/2026-07-01/g' > "$_sc_s/2026-07-01-spec-tOne-5.md"
+  printf 'notes\n' > "$_sc_s/notes.md" )
+_sc_base='tOne-3.md (status header `base 0123abcd` resolves to no commit'
+_sc_full=$(cd "$SC" && bash "$SCRIPT" --only 12 2>/dev/null); _sc_rc=$?
+n=$((n+1)); [ "$_sc_rc" = 1 ] && grep -qF 'tOne-2.md (' <<<"$_sc_full" && grep -qF 'tTwo-1.md (' <<<"$_sc_full" && grep -qF "$_sc_base" <<<"$_sc_full" \
+  || { echo "FAIL scoped: the unscoped --only 12 over the scope tree exited $_sc_rc or missed a tracked plant"; st=1; }
+n=$((n+1)); grep -qF 'tOne-4.md (' <<<"$_sc_full" && { echo "FAIL scoped: the unscoped --only 12 graded the untracked tOne-4"; st=1; }
+# TOOL-aTrimmedWait-10 fix: an unscoped --only that leaves out check 12 never assigns `c12_sel`, so its
+# liveness line must not read it. Staged break: the `P`-line count hoisted out of the scoped branch,
+# as 49cdded06 had it, ends the run on `c12_sel: unbound variable` before the liveness line.
+_sc_o=$(cd "$SC" && bash "$SCRIPT" --only 2 2>&1); _sc_rc=$?
+n=$((n+1)); [ "$_sc_rc" = 0 ] && grep -qxF 'HYGIENE --only 2 ran checks 2' <<<"$_sc_o" && ! grep -qF 'unbound variable' <<<"$_sc_o" \
+  || { echo "FAIL unscoped: --only 2 exited $_sc_rc, printed no liveness line or read an unbound variable"; st=1; }
+_sc_o=$(cd "$SC" && bash "$SCRIPT" --only 12 --spec "$_sc_s/2026-08-01-spec-tOne-2.md" 2>/dev/null); _sc_rc=$?
+n=$((n+1)); [ "$_sc_rc" = 1 ] && [ "$(grep -F 'tOne-2.md (' <<<"$_sc_o")" = "$(grep -F 'tOne-2.md (' <<<"$_sc_full")" ] \
+  || { echo "FAIL scoped: --spec tOne-2 exited $_sc_rc or its findings differ from the unscoped run's"; st=1; }
+n=$((n+1)); grep -qF 'tTwo-1.md (' <<<"$_sc_o" && { echo "FAIL scoped: --spec tOne-2 graded the other build's tTwo-1"; st=1; }
+n=$((n+1)); grep -qxF "HYGIENE --only 12 ran checks 12 25 over 1 spec(s) of $_sc_s/2026-08-01-spec-tOne-2.md" <<<"$_sc_o" \
+  || { echo "FAIL scoped: --spec tOne-2 printed no liveness line naming one spec and its path"; st=1; }
+_sc_o=$(cd "$SC" && bash "$SCRIPT" --only 12 --spec "$_sc_s/2026-08-26-spec-tOne-3.md" 2>/dev/null); _sc_rc=$?
+n=$((n+1)); [ "$_sc_rc" = 1 ] && [ "$(grep -F "$_sc_base" <<<"$_sc_o")" = "$(grep -F "$_sc_base" <<<"$_sc_full")" ] \
+  || { echo "FAIL scoped: --spec tOne-3 exited $_sc_rc or skipped the base resolve arm the unscoped run reds"; st=1; }
+_sc_o=$(cd "$SC" && bash "$SCRIPT" --only 12 --spec "$_sc_s/2026-08-01-spec-tOne-1.md" 2>/dev/null); _sc_rc=$?
+n=$((n+1)); [ "$_sc_rc" = 0 ] && grep -qxF "HYGIENE --only 12 ran checks 12 25 over 1 spec(s) of $_sc_s/2026-08-01-spec-tOne-1.md" <<<"$_sc_o" \
+  || { echo "FAIL scoped: --spec on the clean tOne-1 exited $_sc_rc or printed no liveness line"; st=1; }
+_sc_o=$(cd "$SC" && bash "$SCRIPT" --only 12 --spec "$_sc_s/2026-08-01-spec-tOne-4.md" 2>/dev/null); _sc_rc=$?
+n=$((n+1)); [ "$_sc_rc" = 1 ] && grep -qF 'tOne-4.md (## sections differ' <<<"$_sc_o" \
+  || { echo "FAIL scoped: --spec on the untracked red tOne-4 exited $_sc_rc or did not name it"; st=1; }
+_sc_o=$(cd "$SC" && bash "$SCRIPT" --only 12 --build tOne 2>/dev/null); _sc_rc=$?
+n=$((n+1)); [ "$_sc_rc" = 1 ] && grep -qF 'tOne-2.md (' <<<"$_sc_o" && grep -qF "$_sc_base" <<<"$_sc_o" && grep -qF 'tOne-4.md (' <<<"$_sc_o" \
+  || { echo "FAIL scoped: --build tOne exited $_sc_rc or missed tOne-2, tOne-3's base or the untracked tOne-4"; st=1; }
+n=$((n+1)); grep -qF 'tTwo-1.md (' <<<"$_sc_o" && { echo "FAIL scoped: --build tOne graded the other build's tTwo-1"; st=1; }
+n=$((n+1)); grep -qxF 'HYGIENE --only 12 ran checks 12 25 over 4 spec(s) of tOne' <<<"$_sc_o" \
+  || { echo "FAIL scoped: --build tOne printed no liveness line naming its four graded specs"; st=1; }
+# ---- TOOL-aTrimmedWait-8 AC8: the scoped EDGE reading. --spec tThree-1 grades it as `P` and reads its
+# ---- build's other specs as `J` siblings: the reciprocity finding is tThree-1's own and prints as the
+# ---- unscoped run prints it; tThree-3's payload finding is a sibling's, which the unscoped run prints
+# ---- and the scoped one keeps out. Staged breaks: `|| SCOPED` dropped from the sibling tagging, and
+# ---- `| SCOPED` dropped from the edge awk's `stg`.
+_sc_recip='declares no matching **consumes-from**'
+_sc_line=$(grep -F "$_sc_recip" <<<"$_sc_full" | grep -F 'tThree-1.md (')
+n=$((n+1)); [ -n "$_sc_line" ] && grep -qF '2026-09-08-spec-tThree-3.md (§3 `### Edges` bullet with no payload' <<<"$_sc_full" \
+  || { echo "FAIL scoped: the unscoped --only 12 printed no tThree-1 reciprocity line or no tThree-3 payload line"; st=1; }
+_sc_o=$(cd "$SC" && bash "$SCRIPT" --only 12 --spec memory/builds/tThree/spec/2026-09-08-spec-tThree-1.md 2>/dev/null); _sc_rc=$?
+n=$((n+1)); [ "$_sc_rc" = 1 ] && [ "$(grep -F "$_sc_recip" <<<"$_sc_o" | grep -F 'tThree-1.md (')" = "$_sc_line" ] \
+  || { echo "FAIL scoped: --spec tThree-1 exited $_sc_rc or its reciprocity line differs from the unscoped run's"; st=1; }
+n=$((n+1)); grep -qF '2026-09-08-spec-tThree-3.md' <<<"$_sc_o" && { echo "FAIL scoped: --spec tThree-1 printed its J sibling tThree-3"; st=1; }
+# ---- AC9: every cutoff key a SCOPED branch of the producer tests is armed by this tree's conf, at a
+# ---- date on or before a committed spec's. The key set is DERIVED from $SCRIPT each run, and an empty
+# ---- set reds, so the arm cannot pass over a producer whose SCOPED lines it no longer reads.
+_sc_last=$(cd "$SC" && git ls-files -- memory/builds | grep -oE '/spec/[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-' | cut -c7-16 | sort | tail -n1)
+_sc_nk=0
+while read -r _sc_k; do
+  _sc_nk=$((_sc_nk+1))
+  _sc_v=$(sed -n "s/^$_sc_k=\"\([0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\)\"\$/\1/p" "$SC/.memory-tree.conf")
+  n=$((n+1)); [ -n "$_sc_v" ] && ! [ "$_sc_last" \< "$_sc_v" ] \
+    || { echo "FAIL scoped: the scope tree's conf leaves $_sc_k unarmed: '$_sc_v' is not a date on or before its last committed spec's, '$_sc_last'"; st=1; }
+done < <(grep -E '"\$SCOPED" = 1|\| SCOPED' "$SCRIPT" | grep -oE '[A-Z0-9_]+_CUTOFF' | sort -u)
+n=$((n+1)); [ "$_sc_nk" -gt 0 ] || { echo "FAIL scoped: no *_CUTOFF key derived from the producer's SCOPED lines"; st=1; }
+# S1's refusals: each exits 2 on one `cannot run` line and grades nothing.
+for _sc_a in "--spec $_sc_s/2026-08-01-spec-tOne-2.md" "--only 9 --spec $_sc_s/2026-08-01-spec-tOne-2.md" \
+  "--only 12 --spec $_sc_s/2026-08-01-spec-tOne-2.md --staged" "--only 12 --spec $_sc_s/notes.md" \
+  "--only 12 --spec $_sc_s/2026-08-01-spec-tOne-404.md" "--only 12 --spec $_sc_s/2026-07-01-spec-tOne-5.md" \
+  "--only 12 --spec memory/builds/tTwo/../tOne/spec/2026-08-01-spec-tOne-2.md" "--only 12 --build nope" "--only 12 --build ../tOne"; do
+  _sc_o=$(cd "$SC" && bash "$SCRIPT" $_sc_a 2>/dev/null); _sc_rc=$?
+  n=$((n+1)); [ "$_sc_rc" = 2 ] || { echo "FAIL scoped [$_sc_a] exited $_sc_rc, not 2"; st=1; }
+  n=$((n+1)); [ "$(grep -c '^HYGIENE — cannot run' <<<"$_sc_o")" = 1 ] || { echo "FAIL scoped [$_sc_a] printed no single cannot-run line"; st=1; }
+  n=$((n+1)); grep -qF 'HYGIENE check' <<<"$_sc_o" && { echo "FAIL scoped [$_sc_a] graded a check"; st=1; }
+done
+rm -rf "$SC"
 # ---- AC8: the PARTITION. Over this red tree the SET of lines the unscoped run printed (`out`, above)
 # ---- equals the union of the scoped runs' lines, liveness lines set aside, over one selection per
 # ---- `check_selected` call, named by its first id. The list is this suite's pin of the population.
+extract_hs_lines() { printf '%s\n' "$1" | grep . | sed -E -e '/^memory-hygiene: check 26 cache recomputed /d' -e 's/^(memory-hygiene: check 26 transitions examined .* cache hits )[0-9]+/\1<n>/' | sort -u; }
 _hs_union=""
 for _hs_s in 1 2 3 4 5 6 9 10 11 12 13 17 20 21 22 23 24 26 27 28 29 30 31; do
   run_scoped "$_hs_s"
   _hs_union+=$(grep -v '^HYGIENE --only ' <<<"$sout" || true)$'\n'
 done
-# ---- Both sides go through ONE helper, which folds check 26's cache figure to a constant
-# ---- (TOOL-aClearedLedger-6). That figure counts the cached deltas a run READ, so it depends on
-# ---- which run came first: on a cold clone the unscoped run reads none and a later scoped run reads
-# ---- what it wrote. It is a fact about the cache and no verdict; every other byte still decides.
-extract_hs_lines() { grep . | sed -E 's/(cache hits )[0-9]+/\1N/' | sort -u; }
-n=$((n+1)); [ "$(printf '%s\n' "$_hs_union" | extract_hs_lines)" = "$(printf '%s\n' "$out" | extract_hs_lines)" ] \
-  || { echo "FAIL the scoped runs do not partition the unscoped run's lines:"; diff <(printf '%s\n' "$out" | extract_hs_lines) <(printf '%s\n' "$_hs_union" | extract_hs_lines) | head -20; st=1; }
+# TOOL-aTrimmedWait-11: check 26's cache-hit count and its `cache recomputed` lines are what the
+# cache's state moves (the unscoped run reads it cold, the scoped one warm), so both sides set them aside.
+n=$((n+1)); [ "$(extract_hs_lines "$_hs_union")" = "$(extract_hs_lines "$out")" ] \
+  || { echo "FAIL the scoped runs do not partition the unscoped run's lines:"; diff <(extract_hs_lines "$out") <(extract_hs_lines "$_hs_union") | head -20; st=1; }
 n=$((n+1)); grep -qF 'HYGIENE --only' <<<"$out" && { echo "FAIL the unscoped run printed a liveness line"; st=1; }
+# ---- TOOL-aTrimmedWait-11: the set-aside, over lines the producer itself renders.
+mapfile -t _hs_c26 < <("$_PY" -I -c 'import sys; sys.path.insert(0, sys.argv[1]); import transition_audit as t
+r = lambda m, h: t.render_liveness({"registry": [], "transitions": ["a"] * 4, "merges": m, "hits": h}, True)
+print(r(9, 0)); print(r(9, 4)); print(r(8, 4)); t.print_recomputed({"recomputed": {"foreign inputs": 1}})' "$HERE")
+_hs_cr=$'\r'; _hs_c26=("${_hs_c26[@]%"$_hs_cr"}")
+n=$((n+1)); [ "$(extract_hs_lines "${_hs_c26[0]-}")" = "$(extract_hs_lines "${_hs_c26[1]-}")" ] \
+  || { echo "FAIL check 26's cold and warm liveness lines compare unequal through extract_hs_lines"; st=1; }
+n=$((n+1)); [ "$(extract_hs_lines "${_hs_c26[0]-}")" != "$(extract_hs_lines "${_hs_c26[2]-}")" ] \
+  || { echo "FAIL check 26's liveness lines differing in merges walked compare equal through extract_hs_lines"; st=1; }
+n=$((n+1)); [ "$(extract_hs_lines "${_hs_c26[0]+${_hs_c26[0]/check 26/check 12}}")" != "$(extract_hs_lines "${_hs_c26[1]+${_hs_c26[1]/check 26/check 12}}")" ] \
+  || { echo "FAIL a line outside check 26 had its cache-hit count set aside"; st=1; }
+n=$((n+1)); [ -n "${_hs_c26[3]-}" ] && [ "$(extract_hs_lines "${_hs_c26[0]-}"$'\n'"${_hs_c26[3]-}")" = "$(extract_hs_lines "${_hs_c26[0]-}")" ] \
+  || { echo "FAIL check 26's cache recomputed line was not set aside, or the producer rendered none"; st=1; }
 # ---- check 22: the acceptance ledger (TOOL-dUnstalledConvoy-12).
 hit  'ARCH-tFixture-70/AC2'                    # numbered, unevidenced — the defect this exists for
 miss 'ARCH-tFixture-70/AC1'                    # ...and the evidenced sibling is silent
@@ -3079,6 +3184,9 @@ _pyparity() {  # $1 module directory · $2 example conf · $3 exemption names
 #     — environment, read or set through os.environ by the engine and by its own fixtures.
 #   GIT_INDEX_FILE — environment: gen_build_index.py carries it from os.environ into the hook's git
 #     environment, so both readers stay on one index (TOOL-aTrimmedHook-4).
+#   GOV_INDEX_SET_STDIN — environment: check-memory-hygiene.sh sets it on its own launch of
+#     corpus_ids.py --check, or of gotchas.py --check-with-ids on an unscoped run, never in a conf,
+#     to hand check 16 its index set (TOOL-aHastenedSweep-3).
 #   GRAMMAR_DIR GRAMMAR_WHERE READ_PATH_RULES_GATE — module-level constants, reached through
 #     globals() by selftest arms that save and restore them. GRAMMAR_WHERE is swapped beside
 #     GRAMMAR_DIR in corpus_ids.py (TOOL-aRepatriatedFork-46 S4).
@@ -3089,7 +3197,7 @@ _pyparity() {  # $1 module directory · $2 example conf · $3 exemption names
 #     on purpose: adopt-memory-tree.sh copies the example and appends the first two only when neither
 #     is assigned, so an uncommented blank would skip that append and leave the write gate unarmed on
 #     every new adopter. Discoverable in the example's comments, not by `^KEY=` (TOOL-dHomedResolver-8).
-_pyexempt="EXMP GATE_PUSH_BASE GIT_AUTHOR_DATE GIT_COMMITTER_DATE GIT_DIR GIT_GRAFT_FILE GIT_INDEX_FILE GOV_BASH GOV_DEFAULT_BRANCH GOV_REMOTE GRAMMAR_DIR GRAMMAR_WHERE PATH READ_PATH_RULES_GATE ROUTED_COMMIT_CUTOFF ROUTED_COMMIT_WAIVED ROUTED_PATHS"
+_pyexempt="EXMP GATE_PUSH_BASE GIT_AUTHOR_DATE GIT_COMMITTER_DATE GIT_DIR GIT_GRAFT_FILE GIT_INDEX_FILE GOV_BASH GOV_DEFAULT_BRANCH GOV_INDEX_SET_STDIN GOV_REMOTE GRAMMAR_DIR GRAMMAR_WHERE PATH READ_PATH_RULES_GATE ROUTED_COMMIT_CUTOFF ROUTED_COMMIT_WAIVED ROUTED_PATHS"
 _pk_real=$(_pykeys "$HERE")
 n=$((n+1))
 [ -n "$_pk_real" ] || { echo "FAIL could not derive a single conf key from $HERE/*.py; the python example-conf arms below would pass by finding nothing"; st=1; }
@@ -3366,6 +3474,132 @@ case "$_b1out" in
   *"READ_PATH_CEILING is declared"*) : ;;
   *) echo "FAIL the gate exited 0 and said nothing about a conf that still declares the retired READ_PATH_CEILING; corpus_ids.py prints that notice at exit 0 and this wrapper is the only caller an adopter ever runs"; st=1 ;;
 esac
+
+# ---- TOOL-aHastenedSweep-3: check 16's index set is HANDED DOWN on stdin when checks 1 to 5 ran
+# ---- clean, and ASKED of the print mode otherwise. A bash that does not exist proves which route
+# ---- ran: the ask resolves GOV_BASH and names it, the hand-down never spawns a shell. The notice
+# ---- proves the run reached check 16, so silence on both counts is not a run that stopped early.
+_ixo=$(cd "$_b1" && GOV_BASH="$_b1/no-such-bash" bash "$HERE/check-memory-hygiene.sh" 2>&1)
+n=$((n+1))
+case "$_ixo" in
+  *"corpus_ids: GOV_BASH is set"*|*"check 16 rule 3"*) echo "FAIL a clean unscoped run did not hand check 16 its index set: the classifier asked the shell, or was handed an empty set:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+  *"READ_PATH_CEILING is declared"*) echo "ok   a clean unscoped run hands check 16 the index set it already holds" ;;
+  *) echo "FAIL the hand-down arm's run never reached check 16, so its silence proves nothing:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+esac
+# A checks 1 to 5 failure must take the ASK, so the "answered with findings" refusal still fires: a
+# stray file staged at the memory root, run plain, with the variable exported, and under --only 16.
+_ixt=$(mktemp -d)
+cp -R "$_b1/." "$_ixt/"
+( cd "$_ixt" && printf '# stray\n' > memory/stray.md && git add memory/stray.md ) >/dev/null 2>&1
+for _ixm in plain exported; do
+  if [ "$_ixm" = plain ]; then _ixo=$(cd "$_ixt" && bash "$HERE/check-memory-hygiene.sh" 2>&1)
+  else _ixo=$(cd "$_ixt" && GOV_INDEX_SET_STDIN=1 bash "$HERE/check-memory-hygiene.sh" 2>&1); fi
+  n=$((n+1))
+  case "$_ixo" in
+    *"HYGIENE check 3 FAILED"*"answered with findings"*) echo "ok   a checks 1 to 5 failure ($_ixm) is not handed down, so corpus_ids refuses the findings" ;;
+    *) echo "FAIL a checks 1 to 5 failure ($_ixm) did not reach corpus_ids' 'answered with findings' refusal:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+  esac
+done
+_ixo=$(cd "$_ixt" && bash "$HERE/check-memory-hygiene.sh" --only 16 2>&1)
+n=$((n+1))
+case "$_ixo" in
+  *"answered with findings"*) echo "ok   a scoped run that never ran checks 1 to 5 asks for the index set" ;;
+  *) echo "FAIL --only 16 handed down a set although checks 1 to 5 never ran:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+esac
+rm -rf "$_ixt"
+# The standalone CLI keeps the ask: with the variable unset it reads no stdin and resolves GOV_BASH.
+_ixo=$(cd "$_b1" && env -u GOV_INDEX_SET_STDIN GOV_BASH="$_b1/no-such-bash" "$_PY" "$HERE/corpus_ids.py" --check 2>&1 </dev/null)
+n=$((n+1))
+case "$_ixo" in
+  *"corpus_ids: GOV_BASH is set"*) echo "ok   the standalone corpus_ids --check still asks the print mode" ;;
+  *) echo "FAIL the standalone corpus_ids --check did not ask the print mode for the index set:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+esac
+
+# ---- TOOL-aHastenedSweep-4: an unscoped run takes checks 13-16 and 17-19 from ONE interpreter and
+# ---- SPLITS its two frames. A pinned orphan reds check 14 and a class record naming no gate reds check
+# ---- 18 in one run, so a split handing either block to the other's variables keys a line wrongly.
+_ixt=$(mktemp -d)
+cp -R "$_b1/." "$_ixt/"
+(
+  cd "$_ixt" || exit 1
+  printf 'ORPHAN_ID_PIN="0"\n' >> .memory-tree.conf
+  printf '# r\n\nContext lives in ARCH-tNone-9 upstream.\n' > memory/README.md
+  mkdir -p memory/gotchas
+  printf -- '---\nname: x\ndescription: d\n---\n\nFires on `AGENTS.md`. Nothing said about a gate.\n' > memory/gotchas/x.md
+  "$_PY" "$HERE/gotchas.py" --write
+  git add -A && git -c commit.gpgsign=false commit -q -m t --no-verify
+) >/dev/null 2>&1
+_ixo=$(cd "$_ixt" && bash "$HERE/check-memory-hygiene.sh" --offenders 2>&1)
+n=$((n+1))
+case "$_ixo" in
+  *$'check 13-16\tHYGIENE check 14: id ARCH-tNone-9'*) echo "ok   the one-process run keys check 14's orphan under 13-16" ;;
+  *) echo "FAIL the one-process run did not key check 14's orphan under 13-16:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+esac
+n=$((n+1))
+case "$_ixo" in
+  *$'check 17-19\tHYGIENE check 18: memory/gotchas/x.md names no gate'*) echo "ok   the one-process run keys check 18's ungated record under 17-19" ;;
+  *) echo "FAIL the one-process run did not key check 18's ungated record under 17-19:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+esac
+rm -rf "$_ixt"
+
+# ---- TOOL-aHastenedSweep-6: ONE side red at a time, so a split that reads one verb's rc for the other
+# ---- reds alone. The arm above reds both, and a swapped rc keys both of its lines anyway. The _b1
+# ---- notice prints at exit 0, so a misread 13-16 rc keys it; a green 17-19 block prints nothing.
+_ixt=$(mktemp -d)
+cp -R "$_b1/." "$_ixt/"
+(
+  cd "$_ixt" || exit 1
+  mkdir -p memory/gotchas
+  printf -- '---\nname: x\ndescription: d\n---\n\nFires on `AGENTS.md`. Nothing said about a gate.\n' > memory/gotchas/x.md
+  "$_PY" "$HERE/gotchas.py" --write
+  git add -A && git -c commit.gpgsign=false commit -q -m t --no-verify
+) >/dev/null 2>&1
+_ixo=$(cd "$_ixt" && bash "$HERE/check-memory-hygiene.sh" --offenders 2>&1)
+n=$((n+1))
+case "$_ixo" in
+  *$'check 13-16\t'*) echo "FAIL a bug-class-only red keyed a line under 13-16, so the split read the gotchas rc for corpus_ids':"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+  *$'check 17-19\tHYGIENE check 18: memory/gotchas/x.md names no gate'*) echo "ok   a bug-class-only red keys check 18 under 17-19 and nothing under 13-16" ;;
+  *) echo "FAIL a bug-class-only red did not key check 18's ungated record under 17-19:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+esac
+rm -rf "$_ixt"
+_ixt=$(mktemp -d)
+cp -R "$_b1/." "$_ixt/"
+(
+  cd "$_ixt" || exit 1
+  printf 'ORPHAN_ID_PIN="0"\n' >> .memory-tree.conf
+  printf '# r\n\nContext lives in ARCH-tNone-9 upstream.\n' > memory/README.md
+  git add -A && git -c commit.gpgsign=false commit -q -m t --no-verify
+) >/dev/null 2>&1
+_ixo=$(cd "$_ixt" && bash "$HERE/check-memory-hygiene.sh" --offenders 2>&1)
+n=$((n+1))
+case "$_ixo" in
+  *$'check 17-19\t'*) echo "FAIL an id-classifier-only red keyed a line under 17-19, so the split read corpus_ids' rc for the gotchas one:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+  *$'check 13-16\tHYGIENE check 14: id ARCH-tNone-9'*) echo "ok   an id-classifier-only red keys check 14 under 13-16 and nothing under 17-19" ;;
+  *) echo "FAIL an id-classifier-only red did not key check 14's orphan under 13-16:"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+esac
+rm -rf "$_ixt"
+
+# ---- TOOL-aHastenedSweep-6: a frame that does not split falls back LOUDLY under 13-16, never as a
+# ---- second gotchas.py --check launch. A GOV_PYTHON wrapper answers --check-with-ids with one
+# ---- unframed line, at exit 0 (the split's [[ ]] fails) and at exit 2 (the launch fails, the usage
+# ---- exit an older adopter-owned gotchas.py gives), and passes every other call to the real
+# ---- interpreter, which resolve_python's probe needs. What it does not check: the exit alone, since
+# ---- the fallback's _gotrc=1 keeps the run at 1 with its _idsrc=1 zeroed; the key reds that.
+_ixt=$(mktemp -d)
+cp -R "$_b1/." "$_ixt/"
+_ixw=$(mktemp -d); _ixl="$_ixw/log"
+for _ixm in 0 2; do
+  printf '#!/usr/bin/env bash\ncase " $* " in *" --check-with-ids "*) echo "wrapper: an unframed answer"; exit %s ;; esac\nprintf '"'"'%%s\\n'"'"' "$*" >> "%s"\nexec "%s" "$@"\n' "$_ixm" "$_ixl" "$_PY" > "$_ixw/py.sh"
+  chmod +x "$_ixw/py.sh"; : > "$_ixl"
+  _ixo=$(cd "$_ixt" && GOV_PYTHON="$_ixw/py.sh" bash "$HERE/check-memory-hygiene.sh" --offenders 2>&1); _ixrc=$?
+  _ixc=$(grep -c 'gotchas\.py --check$' "$_ixl")
+  n=$((n+1))
+  case "$_ixc:$_ixrc:$_ixo" in
+    0:[1-9]:*$'check 13-16\twrapper: an unframed answer'*) echo "ok   an unframed --check-with-ids answer (exit $_ixm) reds keyed under 13-16, with no second launch" ;;
+    *) echo "FAIL an unframed --check-with-ids answer (exit $_ixm) left the run green, was not keyed under 13-16, or launched gotchas.py --check again (rc $_ixrc, launches $_ixc):"; printf '%s\n' "$_ixo" | sed 's/^/      /'; st=1 ;;
+  esac
+done
+rm -rf "$_ixt" "$_ixw"
 
 # ---- TOOL-dRetiredFork-15: the five project keys -------------------------------------------------
 # Three arms per validated key -- default, valid override, INVALID override -- because the invalid
@@ -4760,7 +4994,29 @@ done
 # Counted by reading; OWED: observed at the close.
 # RAISED 708 -> 709 by TOOL-dDeclaredLoop-22: its recommendation plant assertion, top-level and never
 # skipped. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=709
+# RAISED 708 -> 710 by TOOL-aHastenedSweep-4: its two one-process split assertions, each top-level and
+# never skipped. Counted by reading; OWED: observed at the close.
+# RAISED 710 -> 719 by TOOL-aHastenedSweep-6: TOOL-aHastenedSweep-3's five hand-down assertions, which
+# its commit never counted, three top-level and two in a two-pass loop; TOOL-aHastenedSweep-4's two are
+# the raise above; and TOOL-aHastenedSweep-6's four, two one-red arms top-level and its frame-fallback
+# arm's two in a two-pass loop, none skipped. Counted by reading; OWED: observed at the close.
+# RAISED 719 -> 742 by TOOL-aHastenedSweep-7, to the PRINTED count: the suite printed PASS (742
+# assertions) at 0c1935569 (PINNED, 2026-11-16, node a, n_skip 0). The floor sat 23 below the count
+# before this build began; this build's eleven are the two raises above, so this pins the floor to
+# the measured count and a stranded block of any size reds it.
+# RAISED 707 -> 745 by TOOL-aTrimmedWait-2: its scope arms, eleven top-level and twenty-seven in a
+# nine-pass refusal loop, none skipped. Counted by reading; OWED: observed at the close.
+# RAISED 745 -> 749 by TOOL-aTrimmedWait-11: its four check 26 set-aside fixture assertions, each
+# top-level and never skipped. Counted by reading; OWED: observed at the close.
+# MERGED at TOOL-aTrimmedWait-12's reconcile of local main at 5d48501da: the base 707 at 846d51d39, plus main's 1
+# (TOOL-aClearedLedger-6), plus this branch's 42 (TOOL-aTrimmedWait-2's 38 and -11's 4) = 750.
+# Counted by reading; OWED: observed at the close.
+# MERGED at TOOL-aTrimmedWait-18's reconcile of local main at 8eda4a5a0: this branch's 750,
+# plus main's 34 since 5d48501da (TOOL-aHastenedSweep-4's 2, -6's 9 and -7's pin of 23) = 784.
+# Counted by reading; OWED: observed at the close.
+# MERGED at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c: main's 784, plus TOOL-dDeclaredLoop-22's one
+# recommendation assertion above = 785. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=785
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

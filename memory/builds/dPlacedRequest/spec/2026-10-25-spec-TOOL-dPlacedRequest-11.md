@@ -57,7 +57,7 @@ build adds five more callers of it.
   just before its push (`[ "$rf" -nt "$scratch" ]`), so a stale token is never read as this push's.
   `GOVREF_GITDIR` names the git dir; empty, it attributes nothing. Observed by AC4 and AC6.
 - **S6** — The lander lock leaves both kits. `write_claim` no longer tests push-main's marker, and the
-  lock, its break and its wait are deleted. **Readers:** by name: `tools/unattended/unattended.sh`
+  lock, its break and its wait are deleted. **Readers:** by name: READER NOT IN TREE: `write_claim_push_lock`, `check_claim_push_lock_stale` and `remove_claim_push_lock`, which TOOL-aPiecewiseGrade-6 renamed to the shared `write_dir_lock`, `check_dir_lock_stale` and `remove_dir_lock` on 2026-11-16, so no tracked reader spells the old names; `tools/unattended/unattended.sh`
   spells `write_claim_push_lock`, `check_claim_push_lock_stale`, `remove_claim_push_lock`,
   `claim-push.lock`, `claim-push-lock-broken` and `claim-push-guard-cleared`;
   `tools/unattended/unattended.test.sh` spells the three functions and `claim-push.lock` in its GH32

@@ -136,16 +136,24 @@
  * launcher's options and a prefix word's options are stepped past by `GATE_OPTION_RULES`
  * (TOOL-aOrientedCast-14): an option that takes an argument takes it, a shell's `-n`, a Python `-c`
  * or `-m`, a Node `-e` or `-p` and `command -v` end the command, and a shell's `-c` and `env -S`
- * scan their body once. The index is read at the checkout root of the payload `cwd`, else of
+ * scan their body once. A shell option cluster takes one word for each `o` or `O` it carries
+ * (TOOL-aTrimmedWait-6), so `-eo pipefail` steps past `pipefail`. The same arm refuses a role
+ * agent's polling wait, read by `checkPollWait` with the shell's reserved words stepped: P1 tail
+ * follow, a `tail` carrying a follow option; P2 sleep in a loop, a `sleep` in a command holding a
+ * `while` or `until` loop; P3 sleep at or over 5 s, a `sleep` of `POLL_SLEEP_FLOOR_S` or more, or
+ * of a duration that does not read. A shell comment is read by no row. A gate row refusing the same command wins, and the background
+ * command's exit notification is the wait. The index is read at the checkout root of the payload `cwd`, else of
  * `CLAUDE_PROJECT_DIR`; neither resolving adds no arm, with one witness line when
  * `CLAUDE_PROJECT_DIR` is set. An absent
  * index adds no arm; a broken one refuses a candidate; a manifest that does not read leaves G1
  * unarmed with one witness line while G2 and G3 bind; a throw refuses a role agent. THE CEILING:
  * the match is textual, so a gate reached through an interpreter, an alias, a function, an
  * assembled path, a `$(…)` inside quotes, a scoped variant of a leg with an extra argument, or an
- * option missing from the table that takes an argument (`bash -eo pipefail` among them, since only
- * a bare `-o` is in the table) passes it. It stops forgetting, not evasion, and the push-boundary
- * bar is still the guarantee.
+ * option missing from the table that takes an argument passes it. The polling rows do not see a
+ * poll through a script, an interpreter, a function or an alias, a short `sleep` in a `for` loop, a
+ * `sleep` under a shorter `timeout`, a file named like a follow option without `--`, or PowerShell's
+ * own wait cmdlets, and they refuse a backgrounded poll too. It stops forgetting, not evasion, and
+ * the push-boundary bar is still the guarantee.
  *
  * THE THIRD EVENT: SUBAGENTSTART (TOOL-aRoutedQuill-4). A subagent inherits the hooks but not the
  * parent's card, so it would meet the write gate blind. Wired by `scratch-guard-subagent.fragment.json`
@@ -162,7 +170,7 @@
  */
 'use strict'
 
-const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.48 — ships inside the hooks kit entry
+const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.49 — ships inside the hooks kit entry
 
 const TOOLS = ['Bash', 'PowerShell']
 const MAX_FINDINGS = 6
@@ -1481,10 +1489,13 @@ const GATE_PREFIX_WORDS = ['env', 'export', 'nohup', 'time', 'exec', 'command', 
  * next word as their argument; an `ends` option ends the simple command, which runs no script; a
  * `body` option's next word is a command of its own. Any other option is stepped past alone. A
  * prefix word with no row (`export`, `nohup`, `time`) takes the empty rule. A shell's `n` cluster is
- * tested before its `c` cluster, because `bash -nc '<x>'` only checks the syntax of `<x>`.
+ * tested before its `c` cluster, because `bash -nc '<x>'` only checks the syntax of `<x>`. A
+ * `clusterTakes` letter (TOOL-aTrimmedWait-6) takes one following word for each time it appears in a
+ * single-dash or plus cluster, so `-eo pipefail` and `-euxo pipefail` step past `pipefail`, and a
+ * `body` cluster scans the word after those arguments.
  */
 const GATE_OPTION_RULES = {
-  shell: { plus: true, takes: ['-o', '+o', '-O', '+O', '--rcfile', '--init-file'], ends: /^-[A-Za-z]*n[A-Za-z]*$/, body: /^-[A-Za-z]*c[A-Za-z]*$/ },
+  shell: { plus: true, takes: ['--rcfile', '--init-file'], clusterTakes: /[oO]/g, ends: /^-[A-Za-z]*n[A-Za-z]*$/, body: /^-[A-Za-z]*c[A-Za-z]*$/ },
   python: { takes: ['-W', '-X', '-Q'], ends: /^-[A-Za-z]*[cm]$/ },
   node: { takes: ['-r', '--require', '--import'], ends: /^(?:-e|--eval|-p|--print)$/ },
   env: { takes: ['-u', '--unset', '-C', '--chdir'], body: /^(?:-S|--split-string)$/ },
@@ -1499,6 +1510,10 @@ const GATE_OPTION_RULES = {
 const GATE_RUNNERS = ['run-gates.sh', 'run-selftests.sh', 'run-unattended-gates.sh', 'pass-legs.sh']
 /** G3's admitting words: a render, a listing or a usage text runs no arm. */
 const GATE_SUITE_ADMITS = ['--render', '--list', '--help']
+/** The words the polling rows' scan steps before a head (TOOL-aTrimmedWait-6); the gate rows step none. */
+const SHELL_RESERVED_WORDS = ['!', '{', 'do', 'then', 'else', 'elif', 'if', 'while', 'until']
+/** P3's floor in seconds: a flat `sleep` this long or longer is a poll. */
+const POLL_SLEEP_FLOOR_S = 5
 
 /** The last segment of a word, either slash, lower-cased, `.exe` dropped. */
 function buildBaseName(w) {
@@ -1519,11 +1534,12 @@ function buildGateWord(w, base, topC) {
 
 /**
  * From word <k> of <a>, past every option of <rule>: a word opening `-`, or `+` for a shell. Returns
- * the index of the next non-option word, or -1 when the simple command ends. A body option scans its
- * next word ONCE through scanCommandHeads into <out>, at depth 0 only, then ends it. A `--` is stepped
- * past and ends the options.
+ * the index of the next non-option word, or -1 when the simple command ends. A cluster takes one
+ * word per `clusterTakes` letter it carries. A body option scans the word after those ONCE through
+ * scanCommandHeads into <out>, with <opts>, at depth 0 only, then ends it. A `--` is stepped past and
+ * ends the options.
  */
-function scanLauncherOptions(a, k, rule, depth, out) {
+function scanLauncherOptions(a, k, rule, depth, out, opts) {
   const r = rule || {}
   for (; k < a.length; k++) {
     const w = a[k]
@@ -1531,10 +1547,12 @@ function scanLauncherOptions(a, k, rule, depth, out) {
     if (!w.startsWith('-') && !(r.plus && w.startsWith('+'))) return k
     if (r.takes && r.takes.includes(w)) { k++; continue }
     if (r.ends && r.ends.test(w)) return -1
+    const j = r.clusterTakes && /^[-+][A-Za-z]+$/.test(w) ? (w.match(r.clusterTakes) || []).length : 0
     if (r.body && r.body.test(w)) {
-      if (depth === 0 && a[k + 1] !== undefined) out.push(...scanCommandHeads(a[k + 1], depth + 1))
+      if (depth === 0 && a[k + 1 + j] !== undefined) out.push(...scanCommandHeads(a[k + 1 + j], depth + 1, opts))
       return -1
     }
+    k += j
   }
   return k
 }
@@ -1546,11 +1564,14 @@ function scanLauncherOptions(a, k, rule, depth, out) {
  * any prefix word with its options, and `timeout` with its options and duration, then past a
  * launcher and its options, each stepped by GATE_OPTION_RULES through scanLauncherOptions: a shell's
  * `-c` scans its body ONCE as a command of its own, a shell's `-n` executes nothing, and a Python
- * `-c` or `-m` names no script — each ends the segment.
- * Returns `[{ text, head, argv, launched }]`, argv being the head and every word after it.
+ * `-c` or `-m` names no script — each ends the segment. With `opts.reserved` (TOOL-aTrimmedWait-6,
+ * the polling rows alone) the prefix loop also steps a word of SHELL_RESERVED_WORDS.
+ * Returns `[{ text, head, argv, launched, reserved }]`, argv being the head and every word after it,
+ * reserved the reserved words stepped. A `#` beginning a word, outside quotes and heredoc bodies,
+ * blanks the rest of its line first, as the shell drops a comment (TOOL-aTrimmedWait-9).
  */
-function scanCommandHeads(cmd, depth = 0) {
-  const view = buildCommandView(cmd)
+function scanCommandHeads(cmd, depth = 0, opts = {}) {
+  const view = buildCommandView(cmd).replace(/(^|[\s;&|()<>])#[^\n]*/g, (w, p) => p + ' '.repeat(w.length - p.length))
   const out = []
   const seg = /[^;|&()\n]+/g
   let m
@@ -1569,10 +1590,15 @@ function scanCommandHeads(cmd, depth = 0) {
       else if (r[1] === '') i++
     }
     let k = 0
+    const reserved = []
     for (;;) {
       while (k < a.length && /^[A-Za-z_][A-Za-z0-9_]*=/.test(a[k])) k++
+      if (opts.reserved && SHELL_RESERVED_WORDS.includes(a[k])) {
+        reserved.push(a[k++])
+        continue
+      }
       if (GATE_PREFIX_WORDS.includes(a[k])) {
-        k = scanLauncherOptions(a, k + 1, GATE_OPTION_RULES[a[k]], depth, out)
+        k = scanLauncherOptions(a, k + 1, GATE_OPTION_RULES[a[k]], depth, out, opts)
         if (k < 0) break
         continue
       }
@@ -1589,11 +1615,11 @@ function scanCommandHeads(cmd, depth = 0) {
     let launched = false
     if (GATE_LAUNCHERS.includes(lb) || /^python3\.\d+$/.test(lb)) {
       const family = lb === 'bash' || lb === 'sh' ? 'shell' : lb === 'node' ? 'node' : 'python'
-      k = scanLauncherOptions(a, k + 1, GATE_OPTION_RULES[family], depth, out)
+      k = scanLauncherOptions(a, k + 1, GATE_OPTION_RULES[family], depth, out, opts)
       if (k < 0 || k >= a.length) continue
       launched = true
     }
-    out.push({ text: cmd.slice(m.index, m.index + m[0].length).trim(), head: a[k], argv: a.slice(k), launched })
+    out.push({ text: cmd.slice(m.index, m.index + m[0].length).trim(), head: a[k], argv: a.slice(k), launched, reserved })
   }
   return out
 }
@@ -1609,6 +1635,51 @@ function checkGateSuite(c) {
   const script = c.launched || /[\\/]/.test(c.head)
   const hit = b.endsWith('.test.sh') || b.endsWith('selftest.py') || (script && c.argv.includes('--selftest'))
   return hit && !c.argv.some((w) => GATE_SUITE_ADMITS.includes(w))
+}
+
+/**
+ * The seconds GNU `sleep` waits for <words>, summed: a decimal number with an optional `s`, `m`,
+ * `h` or `d` suffix, or `infinity`. Any other word makes the sum null.
+ */
+function deriveSleepSeconds(words) {
+  const unit = { '': 1, s: 1, m: 60, h: 3600, d: 86400 }
+  let sum = 0
+  for (const w of words) {
+    if (w === 'infinity') { sum = Infinity; continue }
+    const r = /^(\d+(?:\.\d*)?|\.\d+)([smhd]?)$/.exec(w)
+    if (!r) return null
+    sum += parseFloat(r[1]) * unit[r[2]]
+  }
+  return sum
+}
+
+/**
+ * The polling rows (TOOL-aTrimmedWait-6): `{ row, c }` for the first simple command of <cmd>, its
+ * reserved words stepped, that is P1 a `tail` with a follow option, P2 a `sleep` in a command holding
+ * a `while` or `until` loop, or P3 a `sleep` of POLL_SLEEP_FLOOR_S or more, or of a duration that
+ * does not read; else null.
+ */
+function checkPollWait(cmd) {
+  const cs = scanCommandHeads(cmd, 0, { reserved: true })
+  const loop = cs.some((c) => c.reserved.includes('while') || c.reserved.includes('until'))
+  for (const c of cs) {
+    const b = buildBaseName(c.head)
+    const rest = c.argv.slice(1)
+    if (b === 'tail' && rest.some((w) => w === '--follow' || w.startsWith('--follow=') || /^-[A-Za-z0-9]*[fF][A-Za-z0-9]*$/.test(w))) return { row: 'P1 tail follow', c }
+    if (b !== 'sleep') continue
+    if (loop) return { row: 'P2 sleep in a loop', c }
+    const s = deriveSleepSeconds(rest)
+    if (s === null || s >= POLL_SLEEP_FLOOR_S) return { row: `P3 sleep at or over ${POLL_SLEEP_FLOOR_S} s`, c }
+  }
+  return null
+}
+
+function renderPollDeny(type, c, row) {
+  return (
+    `BLOCKED by scratch-guard: a role agent does not poll. Agent type ${type} ran \`${c.text}\`, which is row ${row}.\n\n` +
+    'A command started with run_in_background notifies this agent when it exits, so that notification is the wait. ' +
+    `A pause under ${POLL_SLEEP_FLOOR_S} s outside a while or until loop is admitted.\n`
+  )
 }
 
 /**
@@ -1680,8 +1751,8 @@ function resolveRoleRoot(cwd, env) {
  * THE ONE EVALUATION ORDER of the role-gate arm. Returns null to admit, `{ witness }` to admit with
  * one stderr line, `{ deny }` to refuse.
  *  1. `agent_type` absent or empty → null (the main loop runs every gate)
- *  2. no simple command whose head is a launched script, a path-bearing word, or a G2 or G3 shape
- *     → null, with no file read
+ *  2. no simple command whose head is a launched script, a path-bearing word, or a G2 or G3 shape,
+ *     and no polling hit by checkPollWait → null, with no file read
  *  3. no root by resolveRoleRoot (the payload `cwd`, then `CLAUDE_PROJECT_DIR`) → null, or one
  *     witness naming both starts when `CLAUDE_PROJECT_DIR` is set
  *  4. loadRoleIndex: absent → null; broken → deny naming the index
@@ -1690,13 +1761,16 @@ function resolveRoleRoot(cwd, env) {
  *  6. readGateLegs: no manifest, an absent one or one that does not parse leaves G1 unarmed and
  *     returns a witness naming it; G2 and G3 still bind
  *  7. each simple command: an allowlisted G1 leg is admitted whole; else G2, G3, then G1 refuses
+ *  8. a polling hit refuses with renderPollDeny, so a gate row refusing the same command wins
+ *  9. G1 unarmed → its witness; else null
  */
 function checkRoleGate(cmd, data, env) {
   const path = require('path')
   const type = typeof data.agent_type === 'string' ? data.agent_type : ''
   if (!type) return null
   const cands = scanCommandHeads(cmd).filter((c) => c.launched || /[\\/]/.test(c.head) || checkGateRunner(c) || checkGateSuite(c))
-  if (cands.length === 0) return null
+  const poll = checkPollWait(cmd)
+  if (cands.length === 0 && !poll) return null
   const raw = typeof data.cwd === 'string' ? data.cwd : ''
   const project = env && env.CLAUDE_PROJECT_DIR
   const top = resolveRoleRoot(raw, env)
@@ -1720,6 +1794,7 @@ function checkRoleGate(cmd, data, env) {
     const row = checkGateRunner(c) ? 'G2 runner' : checkGateSuite(c) ? 'G3 suite' : leg ? 'G1 leg' : null
     if (row) return { deny: renderGateDeny(type, c, row, leg, allow, index.shown) }
   }
+  if (poll) return { deny: renderPollDeny(type, poll.c, poll.row) }
   return g.legs ? null : { witness: `role-gate row G1 leg unarmed — ${g.why}; rows G2 runner and G3 suite still bind` }
 }
 
@@ -1936,4 +2011,4 @@ function main() {
 }
 
 if (require.main === module) main()
-module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane }
+module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane }

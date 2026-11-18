@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.125 -->
+<!-- gov:kit unattended@1.127 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -280,7 +280,9 @@ live pid the tick spared one `stale-live-pid` line per tick, to the
 health log under the git common dir that the orientation card counts; the driver appends
 `claim-taken-over` when it takes over a stale claim (`TOOL-aGraftedHelix-8`), and
 `claim-push-lock-broken` when it breaks a stale `claim-push.lock` under that lock's guard, or
-`claim-push-guard-cleared` when it removes a guard a crashed writer left (`TOOL-aGraftedHelix-37`). The line format is the
+`claim-push-guard-cleared` when it removes a guard a crashed writer left (`TOOL-aGraftedHelix-37`), and
+`spec-tokens-lock-broken` or `spec-tokens-guard-cleared` for a dispatch's `spec-tokens.<slug>.lock` the same way
+(`TOOL-aPiecewiseGrade-6`). The line format is the
 header of the `health_log_sh` block in `lib-unattended.sh`.
 
 ## The sidecar

@@ -39,6 +39,7 @@
 #   unattended.sh --record-round <slug> --owner-stop <path>        # append the owner's stop, citing a tracked record under the build's prompts/ folder
 #   unattended.sh --chain-verdict <slug>                           # CONTINUE, STOP or HOLD, derived from that record and the roster; writes nothing
 #   unattended.sh --check-commit <message file>                    # from commit-msg: refuse an open pass's undeclared staged path
+#   unattended.sh --check-specs <slug> <unit> [<unit> ...]   # --dispatch's spec-file refusals, before the spec commit
 #   unattended.sh --claims [--with-key]                            # every run claim on the remote: slug, node, status, beat-age-s, verdict[, key]
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
 #   unattended.sh --version                                        # the kit version, then exit
@@ -74,7 +75,7 @@ set -u
 if [ -n "${EPOCHREALTIME:-}" ]; then DRIVER_T0_US=${EPOCHREALTIME//[!0-9]/}
 else printf -v DRIVER_T0_US '%(%s)T' -1; DRIVER_T0_US="${DRIVER_T0_US}000000"; fi
 readonly DRIVER_T0_US
-KIT_UNATTENDED_VERSION=1.125 # gov:kit unattended@1.125 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.127 # gov:kit unattended@1.127 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -122,7 +123,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 VERBS_SLUG="--preflight --status --audit --wake --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --refused --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --trigger --recommend --fix-pass --exhausted --brief --beat"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
-VERBS_INLINE="--plan --phase --check-commit --claims --overlaps --version"
+VERBS_INLINE="--plan --check-specs --phase --check-commit --claims --overlaps --version"
 verbs_all()   { printf '%s %s' "$VERBS_SLUG" "$VERBS_INLINE"; }
 is_slug_verb(){ case " $VERBS_SLUG " in *" $1 "*) return 0 ;; esac; return 1; }
 verb_list() { # -> "--a, --b and --c", for a human reading a refusal
@@ -2642,16 +2643,20 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
   return 0
 }
 
-# THE CLAIM-PUSH LOCK (TOOL-aGraftedHelix-37). `write_claim_push_lock` takes `claim-push.lock` with
+# THE DIRECTORY LOCK (TOOL-aGraftedHelix-37), a factory at its second caller (TOOL-aPiecewiseGrade-6):
+# `write_claim` takes `claim-push.lock` for `REMOTE_BOUND` plus 10 s with the event stem `claim-push`,
+# and the spec-token start half takes `spec-tokens.<slug>.lock` for `GATE_BOUND` plus 60 s with the
+# stem `spec-tokens`. `write_dir_lock` takes the lock with
 # `mkdir` and writes its deadline into `until` and the caller's token into `owner`. A lock it cannot
-# make is broken only when `check_claim_push_lock_stale` reads it stale - a deadline already passed,
+# make is broken only when `check_dir_lock_stale` reads it stale - a deadline already passed,
 # or none and a directory older than two minutes - and only by the writer that takes the guard
 # `<lock>.break` with `mkdir`. Holding the guard it re-reads the rule, breaks a lock still stale,
 # makes it again and writes both files before it releases the guard; a re-read finding the lock live,
 # or a re-make losing to a plain `mkdir`, releases the guard and reports busy. So no breaker removes
 # a lock another breaker made. A guard older than one minute was left by a crash: the writer finding
 # it removes it and reports busy, never taking it in the same call, and the next call breaks the
-# lock. Each self-heal appends a health event once the guard is released. `remove_claim_push_lock`
+# lock. Each self-heal appends a health event, named from the caller's stem, once the guard is
+# released. `remove_dir_lock`
 # clears the lock only while its `owner` reads the caller's token, the turnstile's nonce pattern, so
 # a release never removes the fresh lock of a writer that broke it. `until` stays a bare epoch, the
 # one field the lander's wait reads.
@@ -2662,37 +2667,62 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
 # it pushes, and its own release can land between a breaker's re-read and its removal. Both the
 # deadline and the age are wall-clock reads, so a clock stepped forward breaks a live lock.
 # A writer in another git dir takes another lock.
-check_claim_push_lock_stale() { # lock dir -> 0 when its deadline passed, or it has none and is older than two minutes
-  local lu=""; { read -r lu <"$1/until"; } 2>/dev/null || :
+# THE OWNER'S PROCESSES, read as data in the lock (TOOL-aPiecewiseGrade-6 S9). A holder may write one
+# `pid.<role>` file per process with `write_dir_lock_pid`: the pid, its procfs start token or `-`, the
+# writer's runtime as `$HOSTNAME:$OSTYPE`, and an optional end file, last because a path may carry a
+# space. `check_dir_lock_stale` also reads a lock stale when it holds at least one such file and every
+# one names a process gone: a digit pid, this runtime, `check_proc_gone` answering gone, and an end
+# file that exists or whose directory is gone, or none recorded. An empty file, the pending `-`, a
+# foreign runtime or a missing stamp reads live. A lock with no pid file keeps the deadline and age
+# rule alone, so the claim-push lock, which writes none, keeps its verdicts.
+# WHAT THIS DOES NOT CHECK: two process tables printing one `$HOSTNAME:$OSTYPE`, such as two MSYS
+# installs on one host, read each other's pids gone and can break a live lock; and a reused pid with
+# no token reads live, so its lock waits for the deadline.
+check_dir_lock_stale() { # lock dir -> 0 when its deadline passed, or it has none and is older than two minutes, or every process it records is gone
+  local lu="" f p t w e n=0; { read -r lu <"$1/until"; } 2>/dev/null || :
   case "$lu" in *[!0-9]*) lu="" ;; esac
+  for f in "$1"/pid.*; do
+    [ -f "$f" ] || continue
+    p=""; t=""; w=""; e=""; { read -r p t w e <"$f"; } 2>/dev/null || :
+    case "$p" in ""|*[!0-9]*) n=-1; break ;; esac
+    [ "$w" = "${HOSTNAME:-}:${OSTYPE:-}" ] && check_proc_gone "$p" "$t" \
+      && { [ -z "$e" ] || [ -e "$e" ] || [ ! -d "${e%/*}" ]; } || { n=-1; break; }
+    n=$((n + 1))
+  done
+  [ "$n" -le 0 ] || return 0
   if [ -n "$lu" ]; then [ "$lu" -lt "$EPOCHSECONDS" ]; return; fi
   [ -n "$(find "$1" -maxdepth 0 -mmin +2 2>/dev/null)" ]
 }
-write_claim_push_lock() { # lock dir · owner token -> 0 taken, 1 busy
+write_dir_lock_pid() { # lock dir · role · pid, or - for pending · end file, optional -> <lock>/pid.<role> written; always 0
+  read_proc_token "$3"
+  printf '%s %s %s %s\n' "$3" "$PT_TOKEN" "${HOSTNAME:-}:${OSTYPE:-}" "${4:-}" >"$1/pid.$2" 2>/dev/null || :
+  return 0
+}
+write_dir_lock() { # lock dir · owner token · seconds it may hold · health-event stem -> 0 taken, 1 busy
   local lk="$1" g="$1.break" broke=""
   if ! mkdir "$lk" 2>/dev/null; then
-    check_claim_push_lock_stale "$lk" || return 1
+    check_dir_lock_stale "$lk" || return 1
     if ! mkdir "$g" 2>/dev/null; then
       if [ -n "$(find "$g" -maxdepth 0 -mmin +1 2>/dev/null)" ]; then
         rm -rf "$g"
-        add_health_event "$(resolve_health_log "$ROOT")" unattended claim-push-guard-cleared "$g"
+        add_health_event "$(resolve_health_log "$ROOT")" unattended "$4-guard-cleared" "$g"
       fi
       return 1
     fi
-    if ! check_claim_push_lock_stale "$lk"; then rmdir "$g" 2>/dev/null; return 1; fi
+    if ! check_dir_lock_stale "$lk"; then rmdir "$g" 2>/dev/null; return 1; fi
     rm -rf "$lk"
     mkdir "$lk" 2>/dev/null || { rmdir "$g" 2>/dev/null; return 1; }
     broke=1
   fi
-  printf '%s\n' "$(( $EPOCHSECONDS + REMOTE_BOUND + 10 ))" >"$lk/until" 2>/dev/null || :
+  printf '%s\n' "$(( $EPOCHSECONDS + $3 ))" >"$lk/until" 2>/dev/null || :
   printf '%s\n' "$2" >"$lk/owner" 2>/dev/null || :
   if [ -n "$broke" ]; then
     rmdir "$g" 2>/dev/null
-    add_health_event "$(resolve_health_log "$ROOT")" unattended claim-push-lock-broken "$lk"
+    add_health_event "$(resolve_health_log "$ROOT")" unattended "$4-lock-broken" "$lk"
   fi
   return 0
 }
-remove_claim_push_lock() { # lock dir · owner token -> removes it only while its owner file reads that token
+remove_dir_lock() { # lock dir · owner token -> removes it only while its owner file reads that token
   local o=""; { read -r o <"$1/owner"; } 2>/dev/null || :
   [ -n "$2" ] && [ "$o" = "$2" ] && rm -rf "$1"
   return 0
@@ -2723,7 +2753,7 @@ remove_claim_push_lock() { # lock dir · owner token -> removes it only while it
 # lock's `until`, and releases it on every path out; push-main touches its marker, then waits for no
 # live lock, then clears and pushes. Whichever side moves second sees the other, so the marker test
 # can no longer pass a moment before the lander clears its verdict files. The take, the break of a
-# stale lock and the release are `write_claim_push_lock` and `remove_claim_push_lock`, whose header
+# stale lock and the release are `write_dir_lock` and `remove_dir_lock`, whose header
 # states their limits (TOOL-aGraftedHelix-37).
 # WHAT THIS DOES NOT CHECK: on a host with no runnable `timeout -k` the push is unbounded, so a push
 # can outlive the deadline it recorded, and a lander past that deadline then pushes beside it.
@@ -2740,7 +2770,7 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
   [ -z "$RUNLOG_GITDIR" ] || rf="$RUNLOG_GITDIR/pre-push-refusal"
   if [ -n "$RUNLOG_GITDIR" ]; then
     lk="$RUNLOG_GITDIR/claim-push.lock"; own="$BASHPID.$RANDOM"
-    write_claim_push_lock "$lk" "$own" || { lk=""; busy=1; }
+    write_dir_lock "$lk" "$own" "$(( REMOTE_BOUND + 10 ))" claim-push || { lk=""; busy=1; }
   fi
   if [ -n "$rel" ]; then
     fact "$rel" session >/dev/null; sid=$_fact; fact "$rel" host >/dev/null; host=$_fact; fact "$rel" lease-utc >/dev/null; lease=$_fact; lease="${lease:-absent}"
@@ -2781,7 +2811,7 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
       [ "$tok" != default-branch ] || WC_WHY="$WC_WHY · fix once: git remote set-head $CR_NAME -a"
     fi
   fi
-  [ -z "$lk" ] || remove_claim_push_lock "$lk" "$own"
+  [ -z "$lk" ] || remove_dir_lock "$lk" "$own"
   [ -z "${d:-}" ] || rm -f "$d"
   if [ "$rc" = 0 ]; then
     # A TAKE-OVER OF A STALE CLAIM IS A SELF-HEAL, logged once per write that landed (I3,
@@ -8822,13 +8852,20 @@ verb_status() { # slug
   # STILL `STALE briefs 1`. A count that cannot return to zero is indistinguishable from one that is
   # stuck, so it tells a reader nothing. `awk` keeps the LAST row seen per unit, which is the live
   # claim; the superseded rows stay in the record as the history they are.
-  local _bstale=0 _bgone=0 _bl _bh _bp _bnow
+  #
+  # ONE GIT CALL FOR EVERY BRIEF (TOOL-aTrimmedWait-5). The loop only sorts rows into gone and
+  # present; the present paths are hashed after it by ONE `hash-object --stdin-paths`, which applies
+  # each path's filters as the writer's path-argument form does. A per-row call cost the holder's
+  # idle-wake tick about 15 s at 72 rows. A batch that exits non-zero or answers a different number of
+  # lines than it was given is not trusted: every row is graded by the per-path call instead, so a
+  # failed batch never moves a count. An empty answer is stale, as it always was.
+  local _bstale=0 _bgone=0 _bl _bh _bp _bi _bout _brc
+  local -a _bhs=() _bps=() _bnows=()
   while IFS= read -r _bl; do
     [ -n "$_bl" ] || continue
     _bh=${_bl%% *}; _bp=${_bl#* }
     if [ ! -f "$_bp" ]; then _bgone=$((_bgone+1)); continue; fi
-    _bnow=$(GIT hash-object "$_bp" 2>/dev/null | cut -c1-12)
-    [ "$_bnow" = "$_bh" ] || _bstale=$((_bstale+1))
+    _bhs+=("$_bh"); _bps+=("$_bp")
   #
   # ONE awk PASS AND NO BACK-REFERENCE. The first cut used a `sed` capture group and the `` did
   # not survive being written through a shell heredoc: the landed bytes read `/ /p`, so the unit id
@@ -8841,6 +8878,19 @@ $(awk -F' · ' '$1 ~ /^[0-9][0-9-]*T[0-9:]*Z brief$/ && $2 ~ /^item / && $3 ~ /^
      u = substr($2, 6); r = substr($3, 8); last[u] = r
    } END { for (u in last) print last[u] }' "$rel" 2>/dev/null)
 BRIEFROWS
+  if [ "${#_bps[@]}" -gt 0 ]; then
+    _bout=$(printf '%s\n' "${_bps[@]}" | GIT hash-object --stdin-paths 2>/dev/null); _brc=$?
+    # An empty capture is zero lines: `mapfile` over an empty here-string reads one, and with one
+    # present brief that would pass the count check (`line-count-reads-empty-capture-as-one`).
+    [ -z "$_bout" ] || mapfile -t _bnows <<<"$_bout"
+    if [ "$_brc" -ne 0 ] || [ "${#_bnows[@]}" -ne "${#_bps[@]}" ]; then
+      _bnows=()
+      for _bi in "${!_bps[@]}"; do _bnows[_bi]=$(GIT hash-object "${_bps[_bi]}" 2>/dev/null); done
+    fi
+    for _bi in "${!_bps[@]}"; do
+      [ "${_bnows[_bi]:0:12}" = "${_bhs[_bi]}" ] || _bstale=$((_bstale+1))
+    done
+  fi
   [ "$_bstale" -gt 0 ] && parked="$parked · STALE briefs $_bstale"
   [ "$_bgone" -gt 0 ] && parked="$parked · briefs gone $_bgone"
   # THE RESUME TICK'S ATTEMPTS, on the parked/noted rule: a FIELD on this one line, printed only
@@ -15570,17 +15620,33 @@ read_tree_state() { # launcher -> the fingerprint line and HEAD, or nothing and 
 # above carried onto them at the reconcile (TOOL-aLightenedLoop-8). The start half,
 # `init_spec_token_check`, looks the key up over the record, reads the tree state and starts the
 # checker with the record armed, all before the open-pass reader, so the two run side by side; it
-# prints nothing and refuses nothing, and records what it decided in the seven ST_ globals. This read
+# prints nothing and refuses nothing, and records what it decided in the eleven ST_ globals. This read
 # half prints every line and makes every refusal where the call always sat, from those globals, then
 # derives the key over the new record and closes the bracket; it empties the globals so a later call
 # in the same shell never reads them. The bracket so spans the window between the halves, and a write
 # there costs a not-recorded line, never a wrong key. A checker discarded by a refusal in the window
 # leaves its record behind, which the next lookup reads safely because the key folds the record's
 # bytes. A direct call with no start before it runs the two back to back, as `run_bounded` does.
-ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""
+#
+# THE PER-SPEC CACHE (TOOL-aPiecewiseGrade-2), one per slug beside its key: each generation is a
+# `mktemp -d` directory `spec-tokens.<slug>.specs.XXXXXXXX`, and the name file `spec-tokens.<slug>.live`
+# holds the live one's base name. The start half reads that name ONCE, behind an anchored shape check
+# before any `rm -rf` sees it, sweeps every other generation of the slug, and hands the checker the
+# live one as SPEC_TOKENS_CACHE and a fresh one as SPEC_TOKENS_CACHE_NEXT. The read half names the
+# fresh one live, and removes the old, only where the whole key is recorded. Nothing is renamed.
+#
+# ONE DISPATCH OF A SLUG AT A TIME HOLDS THAT STATE (TOOL-aPiecewiseGrade-6). The start half takes
+# `spec-tokens.<slug>.lock` under the sidecar root with `write_dir_lock` before its lookup, records its
+# driver, a pending checker and then the checker's wrapper with its end stamp in the lock, and the
+# read half or `remove_spec_token_check` gives it back. A start that cannot take it is `busy`: no
+# lookup, no tree read, no sweep, the checker run whole with no cache and no record, one line saying
+# so, and no key. So a second start half never sweeps the generation or the record a first still
+# depends on. The lock goes stale at `GATE_BOUND` plus 60 s, or once its driver is gone and its
+# checker has ended, as `check_dir_lock_stale` reads it.
+ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""; ST_NEXT=""; ST_CACHE=""; ST_LOCK=""; ST_OWN=""
 init_spec_token_check() { # slug -> the decision in ST_STATE, and under `run` the checker started; prints nothing
-  local _stdir="" _stwas=""
-  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""
+  local _stdir="" _stwas="" _stlive="" _stold=""
+  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""; ST_NEXT=""; ST_CACHE=""; ST_LOCK=""; ST_OWN=""
   if [ -z "${SPEC_TOKENS_CLI:-}" ]; then ST_STATE=blank; return 0; fi
   [ -f "$ROOT/$SPEC_TOKENS_CLI" ] || { ST_STATE=missing; return 0; }
   # SILENCED HERE, re-run for its print at the read. Printing the resolver's diagnosis now would put
@@ -15588,31 +15654,56 @@ init_spec_token_check() { # slug -> the decision in ST_STATE, and under `run` th
   # stderr not a terminal, the silenced call never reaches the uv prompt either.
   ST_PY=$(resolve_python 2>/dev/null) || { ST_PY=""; ST_STATE=nopython; return 0; }
   _stdir=$(resolve_sidecar_dir) && [ -n "$_stdir" ] && ST_REC="$_stdir/spec-tokens.$1.key" && ST_IN="$_stdir/spec-tokens.$1.inputs"
+  if [ -n "$ST_IN" ]; then
+    mkdir -p "$_stdir" 2>/dev/null
+    ST_LOCK="$_stdir/spec-tokens.$1.lock"; ST_OWN="$BASHPID.$RANDOM"
+    if write_dir_lock "$ST_LOCK" "$ST_OWN" "$(( ${GATE_BOUND:-0} + 60 ))" spec-tokens; then
+      write_dir_lock_pid "$ST_LOCK" driver "$DRIVER_PID"
+    else
+      ST_OWN=""; ST_REC=""; ST_IN=""; ST_STATE=busy
+    fi
+  fi
   if [ -n "$ST_REC" ] && [ -f "$ST_REC" ] && [ -f "$ST_IN" ]; then
     read -r _stwas <"$ST_REC" || :
     ST_KEY=$(derive_spec_token_key "$1" "$ST_PY" "$ST_IN") || ST_KEY=""
     if [ -n "$ST_KEY" ] && [ "$_stwas" = "$ST_KEY" ]; then ST_STATE=skip; return 0; fi
   fi
+  # A busy start reads no tree state. The read keeps its column, so its line's bytes do not move (S6).
+  if [ "$ST_STATE" != busy ]; then
   ST_TREE=$(read_tree_state "$ST_PY") || ST_TREE=""
   ST_STATE=run
-  if [ -n "$ST_IN" ]; then rm -f "$ST_IN" 2>/dev/null; mkdir -p "$_stdir" 2>/dev/null; fi
+  fi
+  if [ -n "$ST_IN" ]; then
+    rm -f "$ST_IN" 2>/dev/null
+    { read -r _stlive <"${ST_REC%.key}.live"; } 2>/dev/null || :
+    [[ $_stlive =~ ^"spec-tokens.$1.specs."[A-Za-z0-9]{8}$ ]] || _stlive=""
+    for _stold in "$_stdir/spec-tokens.$1.specs."*; do
+      [ "$_stold" = "$_stdir/$_stlive" ] || [ ! -d "$_stold" ] || rm -rf "$_stold" 2>/dev/null
+    done
+    ST_NEXT=$(mktemp -d "$_stdir/spec-tokens.$1.specs.XXXXXXXX" 2>/dev/null) || ST_NEXT=""
+    [ -z "$ST_NEXT" ] || ST_CACHE="$_stdir/${_stlive:-spec-tokens.$1.specs.none}"
+  fi
   # A start that cannot make its capture leaves ST_HANDLE empty, and the read half then runs the
   # synchronous form, which prints that sentence where it always did.
-  SPEC_TOKENS_INPUTS=$ST_IN init_bounded "$ST_PY" "$SPEC_TOKENS_CLI" && ST_HANDLE=$RB_HANDLE
+  # ponytail: a wrapper killed with its group leaves no stamp, so its lock waits for the deadline; recording timeout's own pid would break it sooner.
+  [ -z "$ST_OWN" ] || write_dir_lock_pid "$ST_LOCK" checker -
+  SPEC_TOKENS_INPUTS=$ST_IN SPEC_TOKENS_CACHE=$ST_CACHE SPEC_TOKENS_CACHE_NEXT=$ST_NEXT init_bounded "$ST_PY" "$SPEC_TOKENS_CLI" && ST_HANDLE=$RB_HANDLE
+  [ -z "$ST_OWN" ] || [ -z "$ST_HANDLE" ] || write_dir_lock_pid "$ST_LOCK" checker "${ST_HANDLE%% *}" "${ST_HANDLE#* * }/up.end"
   return 0
 }
 # NO CHECKER OUTLIVES THE VERB UNREAD. A refusal between the start and the read waits for the started
 # checker and discards its answer -- never a kill, for the reason `read_preflight_probes` gives.
 remove_spec_token_check() { # -> a started checker waited for and its answer discarded; prints nothing
   [ -z "${ST_HANDLE:-}" ] || read_bounded "$ST_HANDLE" || :
-  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""
+  remove_dir_lock "${ST_LOCK:-}" "${ST_OWN:-}"
+  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""; ST_NEXT=""; ST_CACHE=""; ST_LOCK=""; ST_OWN=""
   return 0
 }
 run_spec_token_check() { # slug -> 0 admitted or skipped, 1 refused under check 49
-  local slug="$1" _stst _stpy _stkey _strec _stin _stat _sth _strc _stq _stnow="" _stwhy=""
+  local slug="$1" _stst _stpy _stkey _strec _stin _stat _sth _stnext _stcache _stlock _stown _strc _stq _stnow="" _stwhy=""
   [ -n "${ST_STATE:-}" ] || init_spec_token_check "$slug"
-  _stst=$ST_STATE; _stpy=$ST_PY; _stkey=$ST_KEY; _strec=$ST_REC; _stin=$ST_IN; _stat=$ST_TREE; _sth=$ST_HANDLE
-  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""
+  _stst=$ST_STATE; _stpy=$ST_PY; _stkey=$ST_KEY; _strec=$ST_REC; _stin=$ST_IN; _stat=$ST_TREE; _sth=$ST_HANDLE; _stnext=$ST_NEXT; _stcache=$ST_CACHE; _stlock=$ST_LOCK; _stown=$ST_OWN
+  ST_STATE=""; ST_PY=""; ST_KEY=""; ST_REC=""; ST_IN=""; ST_TREE=""; ST_HANDLE=""; ST_NEXT=""; ST_CACHE=""; ST_LOCK=""; ST_OWN=""
   if [ "$_stst" = blank ]; then
     echo "unattended: dispatch — SPEC_TOKENS_CLI is blank or undeclared, so no spec-token check ran over the live tree before this dispatch: an announced skip, not a pass"
     return 0
@@ -15622,25 +15713,29 @@ run_spec_token_check() { # slug -> 0 admitted or skipped, 1 refused under check 
   [ "$_stst" != nopython ] || { resolve_python >/dev/null || :; fail 49 "--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run: $SPEC_TOKENS_CLI"; return 1; }
   if [ "$_stst" = skip ]; then
     echo "unattended: dispatch — spec-token check skipped: its inputs match the check last admitted for $slug (key ${_stkey:0:12})"
+    remove_dir_lock "$_stlock" "$_stown"
     return 0
   fi
-  if [ -z "$_stat" ]; then
+  if [ "$_stst" = busy ]; then
+    echo "unattended: dispatch — spec-token cache off: another dispatch of $slug holds its lock, or the lock cannot be made, so the checker runs whole and records nothing: $_stlock"
+  elif [ -z "$_stat" ]; then
     echo "unattended: dispatch — spec-token cache off: no run-gates gate-fingerprint.sh resolves in this install, or it printed no digest, so the checker runs"
   fi
   if [ -n "$_sth" ]; then
     read_bounded "$_sth"; _strc=$?
   else
-    SPEC_TOKENS_INPUTS=$_stin run_bounded "$_stpy" "$SPEC_TOKENS_CLI"; _strc=$?
+    SPEC_TOKENS_INPUTS=$_stin SPEC_TOKENS_CACHE=$_stcache SPEC_TOKENS_CACHE_NEXT=$_stnext run_bounded "$_stpy" "$SPEC_TOKENS_CLI"; _strc=$?
   fi
   if ! _stq=$(check_spec_token_hits "$slug" "$_strc" "$RB_OUT"); then
     fail 49 "--dispatch refuses: the declared spec-token checker reds over the live tree, so a live spec names a bar, a suite or a token that does not resolve and the unit would build against it ($SPEC_TOKENS_CLI exited $_strc in ${RB_TOOK}s): ${_stq//$'\n'/ }"
+    remove_dir_lock "$_stlock" "$_stown"
     return 1
   fi
   if [ "$_strc" != 0 ]; then
     [[ $RB_OUT =~ spec-tokens:\ ([0-9]+)\ unwaived ]]
     echo "unattended: dispatch — the spec-token checker reds only in other builds' specs, which the bar's whole-tree leg still grades, so this dispatch is admitted: ${BASH_REMATCH[1]:-?} hit(s), first: ${_stq%%$'\n'*}"
   fi
-  [ -n "$_stat" ] || return 0
+  [ -n "$_stat" ] || { remove_dir_lock "$_stlock" "$_stown"; return 0; }
   # TOOL-aLightenedLoop-6 S3 - the key is derived BEFORE the second read, so the bracket spans the
   # checker run and the replay: an edit landing during the replay moves `_stnow` and is refused.
   # Emptied first, because the lookup may have left a key over the earlier record.
@@ -15657,10 +15752,90 @@ run_spec_token_check() { # slug -> 0 admitted or skipped, 1 refused under check 
     _stwhy="the input record cannot be replayed"
   else
     { printf '%s\n' "$_stkey" >"$_strec"; } 2>/dev/null || :
+    # The generation goes live here and only here, under the bracket the key is recorded under; the
+    # old one is removed only once the name is written (TOOL-aPiecewiseGrade-2 S2).
+    if [ -n "$_stnext" ] && [ -d "$_stnext" ]; then
+      { printf '%s\n' "${_stnext##*/}" >"${_strec%.key}.live" && rm -rf "$_stcache"; } 2>/dev/null || :
+    fi
+    remove_dir_lock "$_stlock" "$_stown"
     return 0
   fi
   echo "unattended: dispatch — spec-token cache not recorded: $_stwhy, so the next dispatch runs the checker"
+  remove_dir_lock "$_stlock" "$_stown"
   return 0
+}
+
+# ------------------------------------------------------- TOOL-aTrimmedWait-1, THE SPEC-FILE REFUSALS
+# `--dispatch`'s refusals that read the spec files alone, lifted out of `verb_dispatch` so
+# `--check-specs` makes them through the same predicates in the same words before the spec commit.
+# Both read the `SPEC_PATH` map their caller loaded. The texts moved verbatim, and each message keeps
+# its value in a NAMED variable after the sentence, because check-arms reads a branch's signature up
+# to its first interpolation.
+_cu_spec=""; _cu_ord=""
+check_unit_spec() { # unit -> 0, or 1 after check 49 (86 from load_fork_cutoff); sets _cu_spec, _cu_ord
+  local unit="$1" _d_spec _d_state _d_ord
+  _cu_spec=""; _cu_ord=""
+  _d_spec="${SPEC_PATH[$unit]:-}"
+  if [ -z "$_d_spec" ]; then
+    fail 49 "--dispatch declares a build pass for a unit no tracked spec under this build defines, which is M2's MISSING: the method's hard floor is that a MISSING unit is never built, and writing the spec afterwards is the same act with the record written last: $unit"
+    return 1
+  fi
+  _cu_spec=$_d_spec
+  load_fork_cutoff || return 1
+  _d_state=$(plan_state "$_d_spec" "$FORK_CUTOFF")
+  case "$_d_state" in
+    THIN) fail 49 "--dispatch declares a build pass for a unit whose spec grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing states what done MEANS for it: $unit ($_d_spec)"; return 1 ;;
+  esac
+  order_verb_of "$_d_spec" >/dev/null; _d_ord=$_order_verb
+  case "$_d_ord" in MALFORMED\ *)
+    fail 49 "a spec status header carries something shaped like the build-order verb that does not conform, and a reader taking its numeric prefix would sequence the build on a value nobody wrote: $_d_spec spells [${_d_ord#MALFORMED }]"
+    return 1 ;;
+  esac
+  _cu_ord=$_d_ord
+}
+check_edge_shape() { # unit spec ... -> 0, or 1 after check 49
+  local _c_kind _c_what _c_bad="" _c_cycle=""
+  while IFS=$'\t' read -r _c_kind _c_what; do
+    case "$_c_kind" in
+      unreadable) _c_bad="$_c_bad $_c_what" ;;
+      cycle) _c_cycle=$_c_what ;;
+    esac
+  done < <(scan_consumes_cycles "$@")
+  if [ -n "$_c_bad" ]; then
+    fail 49 "--dispatch declares a build pass while a spec of this build holds a consumes-from line in its Edges block from which no unit id is read, so every edge refusal here would read fewer edges than the spec declares, the direction that blocks nothing; write each as a column-0 bullet headed **consumes-from**, a space, then the producer's id in backticks, or the word external, or the word none with no backticked token after it in the bullet:$_c_bad"
+    return 1
+  fi
+  if [ -n "$_c_cycle" ]; then
+    fail 49 "--dispatch declares a build pass while this build's consumes-from edges form a cycle, so no unit on it can be dispatched after its producer closes and the run would wedge here with no named stop: $_c_cycle"
+    return 1
+  fi
+}
+# `--check-specs <slug> <unit> ...`: every refusal above, over the build's TRACKED and UNTRACKED specs,
+# with no run-state file, so a spec writer and the spec commit meet them before `--dispatch` does. It
+# reports each named unit's first refusal and the build's edge refusal rather than stopping at the
+# first, so a writer fixes them in one round. A check-86 refusal stops it: every later unit would
+# refuse the same way. WHAT IT DOES NOT CHECK: a refusal `--dispatch` makes from run state, the README
+# or the whole tree, nor a sibling's malformed order verb unless that sibling is named.
+check_dispatch_specs() { # slug · unit... -> 0 clean, 1 after the refusals it printed
+  local slug="$1"; shift
+  local spec="$MEMORY_ROOT/builds/$slug/spec/*.md" _cs_unit _cs_id _cs_rc=0 _cs_args=()
+  check_slug "$slug" || return 1
+  if [ "$#" -eq 0 ]; then
+    fail 14 "--check-specs was given no unit id, so it would grade nothing and print what a clean build prints: $slug"
+    return 1
+  fi
+  load_spec_facts $(GIT ls-files -- "$spec" 2>/dev/null) $(GIT ls-files --others --exclude-standard -- "$spec" 2>/dev/null) >/dev/null 2>&1 || true
+  for _cs_unit in "$@"; do
+    check_unit_spec "$_cs_unit" && continue
+    _cs_rc=1
+    [ "${RUNLOG_CHECKS[${#RUNLOG_CHECKS[@]}-1]}" = 86 ] && return 1
+  done
+  for _cs_id in $(printf '%s\n' "${!SPEC_PATH[@]}" | grep -E "^[A-Z]+-$slug-[0-9]+\$" | sort -u); do
+    _cs_args+=("$_cs_id" "${SPEC_PATH[$_cs_id]}")
+  done
+  check_edge_shape "${_cs_args[@]}" || _cs_rc=1
+  [ "$_cs_rc" = 0 ] || return 1
+  echo "unattended: --check-specs $slug — $*: none carries a refusal --dispatch makes from its spec files"
 }
 
 verb_dispatch() { # slug · unit · writes...
@@ -15687,18 +15862,12 @@ verb_dispatch() { # slug · unit · writes...
   # THE MESSAGE NAMES THE ID AND THE STATE AND NOT THE EMPTY SECTION. `plan_state`'s contract is one
   # bare token on stdout, pinned deliberately because two harnesses slice the function body, and
   # `build-complete` already words its own message the same way for the same reason.
-  local _d_spec _d_state
+  # The MISSING, THIN and own-order refusals live in `check_unit_spec`, which `--check-specs` shares
+  # (TOOL-aTrimmedWait-1), so the two verbs refuse one spec defect through one reader in one wording.
+  local _d_spec
   load_spec_facts $(GIT ls-files -- "$MEMORY_ROOT/builds/$slug/spec/*.md" 2>/dev/null) >/dev/null 2>&1 || true
-  _d_spec="${SPEC_PATH[$unit]:-}"
-  if [ -z "$_d_spec" ]; then
-    fail 49 "--dispatch declares a build pass for a unit no tracked spec under this build defines, which is M2's MISSING: the method's hard floor is that a MISSING unit is never built, and writing the spec afterwards is the same act with the record written last: $unit"
-    return 1
-  fi
-  load_fork_cutoff || return 1
-  _d_state=$(plan_state "$_d_spec" "$FORK_CUTOFF")
-  case "$_d_state" in
-    THIN) fail 49 "--dispatch declares a build pass for a unit whose spec grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing states what done MEANS for it: $unit ($_d_spec)"; return 1 ;;
-  esac
+  check_unit_spec "$unit" || return 1
+  _d_spec=$_cu_spec
   # ------------------------------------------------------------------------------ THE ORDER GATE
   # A unit may not be dispatched while an EARLIER step still holds a unit that is neither terminal
   # nor already dispatched. Units sharing an `order` value are the parallel group and do not block
@@ -15712,12 +15881,9 @@ verb_dispatch() { # slug · unit · writes...
   # with `gen_build_index.py` on exactly the inputs a comment here claimed they could not
   # disagree on: two spaces after the separator, or none, read EMPTY here and 3 there, and a
   # trailing-garbage value read as its numeric prefix here while the generator RAISES. An empty
-  # read SILENTLY SKIPS the whole order gate, which is the worst of the three.
-  order_verb_of "$_d_spec" >/dev/null; _d_ord=$_order_verb
-  case "$_d_ord" in MALFORMED\ *)
-    fail 49 "a spec status header carries something shaped like the build-order verb that does not conform, and a reader taking its numeric prefix would sequence the build on a value nobody wrote: $_d_spec spells [${_d_ord#MALFORMED }]"
-    return 1 ;;
-  esac
+  # read SILENTLY SKIPS the whole order gate, which is the worst of the three. Read, and its MALFORMED
+  # form refused, by `check_unit_spec` above.
+  _d_ord=$_cu_ord
   if [ -n "$_d_ord" ]; then
     for _o_id in $(unit_ids_of "$slug"); do
       [ "$_o_id" = "$unit" ] && continue
@@ -15792,24 +15958,11 @@ verb_dispatch() { # slug · unit · writes...
   # whose prose holds one is unreadable here (TOOL-dTrueNorth-32 S4). The remedy names that rule.
   # Hygiene check 12 reads the bullet's first line alone and passes any `none`, a divergence the
   # spec of TOOL-dTrueNorth-32 declares as owed work in its Edges.
-  local _c_args=() _c_kind _c_what _c_bad="" _c_cycle=""
+  local _c_args=()
   for _e_id in $_e_units; do
     [ -n "${SPEC_PATH[$_e_id]:-}" ] && _c_args+=("$_e_id" "${SPEC_PATH[$_e_id]}")
   done
-  while IFS=$'\t' read -r _c_kind _c_what; do
-    case "$_c_kind" in
-      unreadable) _c_bad="$_c_bad $_c_what" ;;
-      cycle) _c_cycle=$_c_what ;;
-    esac
-  done < <(scan_consumes_cycles "${_c_args[@]}")
-  if [ -n "$_c_bad" ]; then
-    fail 49 "--dispatch declares a build pass while a spec of this build holds a consumes-from line in its Edges block from which no unit id is read, so every edge refusal here would read fewer edges than the spec declares, the direction that blocks nothing; write each as a column-0 bullet headed **consumes-from**, a space, then the producer's id in backticks, or the word external, or the word none with no backticked token after it in the bullet:$_c_bad"
-    return 1
-  fi
-  if [ -n "$_c_cycle" ]; then
-    fail 49 "--dispatch declares a build pass while this build's consumes-from edges form a cycle, so no unit on it can be dispatched after its producer closes and the run would wedge here with no named stop: $_c_cycle"
-    return 1
-  fi
+  check_edge_shape "${_c_args[@]}" || return 1
   for _e_id in $(read_consumes_from "$_d_spec"); do
     case $'\n'"$_e_producers"$'\n' in *$'\n'"$_e_id"$'\n'*) ;; *) continue ;; esac
     _e_spec="${SPEC_PATH[$_e_id]:-}"
@@ -16451,12 +16604,13 @@ write_run_record() { # slug -> 0 always; one line per miss
 # Refusal 1 of five, and it does NOT belong in verb_preflight's precondition block where this spec
 # first put it: that function never runs for another verb, so a guard there could never fire. It is a
 # DISPATCH guard, and it has to be evaluated inside the --plan and --phase arms too, because both of
-# those exit INSIDE the loop and a post-loop check alone never sees them.
-refuse_waive_unless_preflight() { # verb
+# those exit INSIDE the loop and a post-loop check alone never sees them. It EXITS rather than returns
+# (TOOL-aTrimmedWait-1): every caller exited 1 on its refusal, so the five `|| { ...; exit 1; }` sites
+# were one refusal spelled five times, each an unarmable delegated site; now it is this one fail branch.
+refuse_waive_unless_preflight() { # verb -> 0, or exit 1 after check 37
   [ "$WAIVE_SEEN" = 1 ] || return 0
   local v="$1"
-  fail 37 "--waive is accepted by --preflight alone; the owner turn that grants a waiver is the last one there is, and a verb reachable mid-run is a place the run could answer its own question: $v"
-  return 1
+  fail 37 "--waive is accepted by --preflight alone; the owner turn that grants a waiver is the last one there is, and a verb reachable mid-run is a place the run could answer its own question: $v"; RUNLOG_CLEAN=1; exit 1
 }
 # --------------------------------------------------------------------------------------- dispatch
 # TOOL-cBriefedPilot-1 - the PAIRED accumulator. `--override) OV="${2:-}"` stored a scalar, so a
@@ -16586,7 +16740,7 @@ while [ $# -gt 0 ]; do
     --finding)      RR_FINDINGS+=("${2:-}"); shift 2 || shift ;;
     --sibling)      RR_SIBLINGS+=("${2:-}"); shift 2 || shift ;;
     --owner-stop)   RR_OWNER_STOP="${2:-}"; shift 2 || shift ;;
-    --plan)         shift; refuse_waive_unless_preflight --plan || { RUNLOG_CLEAN=1; exit 1; }
+    --plan)         shift; refuse_waive_unless_preflight --plan
                     # SEVERAL SLUGS IN ONE PROCESS, and the single-slug form is byte-identical to
                     # what it always was — the framing below only appears when more than one slug is
                     # given, so no existing caller sees a new byte. TOOL-aQuenchedHarness-10.
@@ -16638,10 +16792,15 @@ while [ $# -gt 0 ]; do
                       printf 'unattended-plan-rc: %s %s\n' "$_pl_s" "$_pl_one"
                     done
                     RUNLOG_CLEAN=1; exit 0 ;;
+    # TOOL-aTrimmedWait-1 - the slug, then every bare word up to the next flag as a unit.
+    --check-specs)  shift; CS_SLUG=${1:-}; shift 2>/dev/null || true; CS_UNITS=()
+                    while [ $# -gt 0 ]; do case "$1" in --*) break ;; esac; CS_UNITS+=("$1"); shift; done
+                    refuse_waive_unless_preflight --check-specs
+                    check_dispatch_specs "$CS_SLUG" "${CS_UNITS[@]}"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     --phase)        shift; PH_SLUG=${1:-}; shift 2>/dev/null || true; PH_WANT=${1:-}; shift 2>/dev/null || true
                     PH_WIT=""
                     [ "${1:-}" = "--witness" ] && { shift; PH_WIT=${1:-}; }
-                    refuse_waive_unless_preflight --phase || { RUNLOG_CLEAN=1; exit 1; }
+                    refuse_waive_unless_preflight --phase
                     verb_phase "$PH_SLUG" "$PH_WANT" "$PH_WIT"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     --check-commit) shift
                     CC_TMP=$(mktemp) || { echo "unattended: --check-commit cannot create a scratch file, so it graded nothing"; RUNLOG_CLEAN=1; exit 2; }
@@ -16671,7 +16830,7 @@ done
 # re-synchronised by hand and drifted again at the next verb. Both survivors now DERIVE - the refusal
 # above from VERBS_SLUG, this usage text from the header's own invocation lines - so there is nothing
 # left here to re-synchronise.
-case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}" || { RUNLOG_CLEAN=1; exit 1; } ;; esac
+case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}" ;; esac
 [ -n "$VERB" ] || { usage; RUNLOG_CLEAN=1; exit 2; }
 
 case "$VERB" in

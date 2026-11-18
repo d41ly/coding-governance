@@ -640,9 +640,14 @@ or PowerShell payload carrying an `agent_type`, after the scratch verdict and th
 `NAME=value`, prefix word (`env`, `exec`, `command`, `nice`, `nohup`, `export`, `time`), `timeout`
 or launcher, and refuses one that is listed below. A launcher's options and a prefix word's options
 are stepped past by the rule table `GATE_OPTION_RULES` (`TOOL-aOrientedCast-14`): `bash -o pipefail`
-or `python -X utf8` takes its argument; a shell's `-n`, a Python `-c` or `-m`, a Node `-e` or `-p`
+or `python -X utf8` takes its argument, and a shell option cluster takes one word for each `o` or
+`O` it carries (`TOOL-aTrimmedWait-6`), so `bash -eo pipefail` and `bash -euxo pipefail` step past
+`pipefail`; a shell's `-n`, a Python `-c` or `-m`, a Node `-e` or `-p`
 and `command -v` end the command, which runs no script; a shell's `-c` and `env -S` have their body
-scanned once. The role index is read at the checkout root of the payload `cwd`, else of
+scanned once, past any arguments its cluster takes. The same arm refuses a role agent's polling
+wait, read by `checkPollWait` over the same simple commands with the shell's reserved words (`do`,
+`then`, `if`, `while`, `until` and the rest) stepped for these rows alone: the background command's
+exit notification is the wait. A gate row refusing the same command wins. The role index is read at the checkout root of the payload `cwd`, else of
 `CLAUDE_PROJECT_DIR`; neither resolving adds no arm, with one witness line when
 `CLAUDE_PROJECT_DIR` is set. The rows:
 
@@ -651,6 +656,9 @@ scanned once. The role index is read at the checkout root of the payload `cwd`, 
 | G1 leg | its argv equals a leg's of the gate manifest the role index names, from the leg's script on | the role's allowlist names that leg |
 | G2 runner | the bar runner, the self-test runner, the unattended gates runner or the pass-leg runner `pass-legs.sh`, by basename, any form | never |
 | G3 suite | a `*.test.sh` or `*selftest.py` script, or a script carrying `--selftest` | it carries `--render`, `--list` or `--help`, or it is an allowlisted G1 leg |
+| P1 tail follow | a `tail` carrying `--follow`, `--follow=<x>`, or a single-dash cluster holding `f` or `F` | never |
+| P2 sleep in a loop | a `sleep` in a command that also holds a `while` or `until` loop | never |
+| P3 sleep at or over 5 s | a `sleep` of `POLL_SLEEP_FLOOR_S` (5) seconds or more, summed as GNU `sleep` sums, or of a duration that does not read | never |
 
 The allowlist is the role index's `gates` list for that type, which the roles kit renders from the
 `[gates]` table of its policy file; a type the index does not name, `workflow-subagent` and every
@@ -663,7 +671,10 @@ to return the need and verify with a fixture or a probe of your own code.
 **Its ceiling.** The match is textual: a gate reached through an interpreter, an alias, a function,
 an assembled path or a `$(…)` inside quotes passes it, and so does a scoped variant of a leg that
 adds an argument the leg does not carry, or an option missing from the rule table that takes an
-argument, such as the `o` inside `bash -eo pipefail`. It stops forgetting, not evasion, and the push-boundary bar
+argument. The polling rows do not see a poll through a script, an interpreter, a function or an
+alias, a `sleep` under 5 s in a `for` loop, a `sleep` under a shorter `timeout` (graded on its own
+duration), a file named like a follow option without `--`, or PowerShell's own wait cmdlets; they do
+not read `run_in_background`, so a backgrounded poll is refused too. It stops forgetting, not evasion, and the push-boundary bar
 is still the guarantee. The main loop, which carries no `agent_type`, is never refused.
 
 ## The authoring rule for kit files

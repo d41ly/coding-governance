@@ -24,6 +24,8 @@ consumers today, each family documented on its own page:
 - `pass.fast-legs`, which the pass-leg runner reads ([the pass legs](pass-legs.md));
 - `bar.inline-red-fixes`, which the write gate and the commit grader read
   ([the red-fix lane](red-fix-lane.md));
+- `memory.staged-render`, which the build-index generator's `--write-staged` reads
+  ([the commit render](commit-render.md));
 - `policy-file.on-invalid`, which the reader itself reads ([below](#how-to-use-it)).
 
 Every other key has no consumer yet: the build its catalogue row names as `owner` adds one, so a

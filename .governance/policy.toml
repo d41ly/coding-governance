@@ -10,3 +10,6 @@ on-invalid = "last-valid"
 
 [runtime]
 agents-in-flight = 6
+
+[memory]
+staged-render = "on"

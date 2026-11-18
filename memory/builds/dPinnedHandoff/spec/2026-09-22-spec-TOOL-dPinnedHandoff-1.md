@@ -203,7 +203,7 @@ rides `TOOL-dPinnedHandoff-3`, per the build README.
 
 ## 7. Gates
 
-`memory hygiene` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `testsuite counts (every bar self-test prints one)` · `spec tokens (a spec's own names resolve)` · `transition-audit arms` · `straggler-guard arms`
+`memory hygiene` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `testsuite counts (every bar self-test prints one)` · `spec tokens (a spec's own names resolve)` · `transition-audit arms` · `straggler-guard arms` · `branch-guard self-test`
 
 `kit/dogfood doc parity` is the leg this unit arms: its guard names `memory/TEMPLATE-SPEC.md` and
 `memory/HYGIENE.md`, and this unit edits both templates and both rendered copies. `recall floor` and

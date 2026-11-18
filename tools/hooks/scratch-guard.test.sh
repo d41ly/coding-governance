@@ -1478,6 +1478,41 @@ run_role_bash "O-AC2 bash -e -n <suite> -> allow, stderr EMPTY" 0 empty gov-buil
 run_role_bash "O-AC2 command -v <runner> -> allow, stderr EMPTY" 0 empty gov-builder Bash "command -v kit/$RUN_GATES/run-gates.sh"
 run_role_bash "O-AC2 python -c <program> <selftest.py> -> allow, stderr EMPTY" 0 empty gov-builder Bash "python -c \"print(1)\" kit/$SG_K_GOVKIT/selftest.py"
 run_role_bash "O-AC2 node -e <program> <script> --selftest -> allow, stderr EMPTY" 0 empty gov-builder Bash 'node -e "1" kit/x.js --selftest'
+# ---- TOOL-aTrimmedWait-6: a shell option cluster takes one word per o or O, and a role agent's ----
+# ---- polling wait is refused by its P row. Against the base hook R1, R2 and R5 exited 0 ----------
+# ---- (2026-11-14, node a, the spec's pass probe); every R row exits 0 with the polling step -------
+# ---- removed, and R1 with the bare -o back in takes and no clusterTakes --------------------------
+run_role_bash "W-AC2 R1 bash -eo pipefail <suite> -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "bash -eo pipefail kit/$SG_K_HOOKS/agent-cap.test.sh"
+run_role_bash "W-AC2 R2 timeout 590 tail -f -> deny naming P1" 2 "any;;P1 tail follow;;run_in_background" gov-builder Bash 'timeout 590 tail -f /c/x.log'
+run_role_bash "W-AC2 R3 tail --pid -f | grep -> deny naming P1" 2 "any;;P1 tail follow" gov-builder Bash 'tail --pid=4242 -f /c/x.log | grep -m1 exit='
+run_role_bash "W-AC2 R4 until ...; do sleep 1; done -> deny naming P2" 2 "any;;P2 sleep in a loop" gov-builder Bash 'until [ -s /c/x.out ]; do sleep 1; done'
+run_role_bash "W-AC2 R5 sleep 240; cat -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep 240; cat /c/x.out'
+run_role_bash "W-AC2 R6 sleep \"\$W\" -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep "$W"; cat /c/x.out'
+run_role_bash "W-AC2 R7 bash -c 'sleep 30' -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash "bash -c 'sleep 30'"
+run_role_bash "W-AC3 N1 kill; sleep 1; ps -> allow, stderr EMPTY" 0 empty gov-builder Bash 'kill 4242; sleep 1; ps -ef'
+run_role_bash "W-AC3 N2 tail -n 5 -> allow, stderr EMPTY" 0 empty gov-builder Bash 'tail -n 5 /c/x.log'
+run_role_bash "W-AC3 N3 tail -5; grep -f -> allow, stderr EMPTY" 0 empty gov-builder Bash 'tail -5 /c/x.log; grep -f /c/p.txt /c/x.log'
+run_role_bash "W-AC3 N4 the main loop's tail -f -> allow, stderr EMPTY" 0 empty - Bash 'timeout 590 tail -f /c/x.log'
+run_role_bash "W-AC3 N5 for ...; do sleep 1; done -> allow, stderr EMPTY" 0 empty gov-builder Bash 'for i in 1 2 3; do sleep 1; done'
+run_role_bash "W-AC3 N6 bash -no pipefail <suite> -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash -no pipefail kit/$SG_K_HOOKS/agent-cap.test.sh"
+run_role_bash "W-AC3 N7 bash -o pipefail <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash -o pipefail kit/$RUN_GATES/run-gates.sh"
+# ---- TOOL-aTrimmedWait-9, review items M2 and L2: a shell comment is read by no row, and P3 is ----
+# ---- tested at its floor. With the comment cut removed from scanCommandHeads, C1 and C3 exit 2 ----
+# ---- and C6 exits 0; with the cut opening at any #, C5 exits 0. With >= become > in -------------
+# ---- checkPollWait F1 exits 0, and with the m multiplier become 1 F2 exits 0 ----------------------
+run_role_bash "W9-AC1 C1 sleep 3 # brief pause -> allow, stderr EMPTY" 0 empty gov-builder Bash 'sleep 3 # brief pause'
+run_role_bash "W9-AC1 C2 sleep 9 # x -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep 9 # x'
+run_role_bash "W9-AC1 C3 a comment's ; starts no command -> allow, stderr EMPTY" 0 empty gov-builder Bash 'sleep 3 # a; sleep 9'
+run_role_bash "W9-AC1 C4 a quoted ' #' opens no comment -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash "echo ' #'; sleep 9"
+run_role_bash "W9-AC1 C5 a # inside a word opens no comment -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep 3#x'
+run_role_bash "W9-AC2 C6 <suite> # --render -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "bash kit/$SG_K_HOOKS/agent-cap.test.sh # --render"
+run_role_bash "W9-AC4 F1 sleep 5, at the floor -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep 5'
+run_role_bash "W9-AC4 F2 sleep 1m -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep 1m'
+run_role_bash "W9-AC4 F3 sleep 1h -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep 1h'
+run_role_bash "W9-AC4 F4 sleep 1d -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep 1d'
+run_role_bash "W9-AC4 F5 sleep infinity -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep infinity'
+run_role_bash "W9-AC4 F6 sleep 4.9, under the floor -> allow, stderr EMPTY" 0 empty gov-builder Bash 'sleep 4.9'
+run_role_bash "W9-AC4 F7 sleep 4s, under the floor -> allow, stderr EMPTY" 0 empty gov-builder Bash 'sleep 4s'
 # ---- AC3: the anchor — a cwd under no checkout falls back to CLAUDE_PROJECT_DIR; against a ---------
 # ---- checkRoleGate reading the payload cwd alone, the first row exits 0 and the third says nothing -
 run_role_bash "O-AC3 cwd under no checkout, CLAUDE_PROJECT_DIR the fixture -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash kit/$RUN_GATES/run-gates.sh" "$SG_NOREPO" "$SG_CWD_WT"
@@ -1726,8 +1761,14 @@ n=$((pass+fail))
 # and none found), counted by hand under the same rule.
 # 363 = 361 + the 2 policy-file rows of TOOL-dDeclaredLoop-2 S10 (the arm silent with no policy kit
 # beside the hook, and the deny naming policy_edit.py), counted by hand under the same rule.
+# 375 = 361 + the 14 run_role_bash rows TOOL-aTrimmedWait-6 added (7 for AC2 and 7 for AC3), counted
+# by hand under the same rule.
+# 388 = 375 + the 13 run_role_bash rows TOOL-aTrimmedWait-9 added (6 for its S1 and 7 for its S2),
+# counted by hand under the same rule.
+# 390 = 388 + the 2 policy-file rows of TOOL-dDeclaredLoop-2 above, at dDeclaredLoop's reconcile of origin/main
+# 4e6ac5f7c, counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=363
+FLOOR_ASSERTIONS=390
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

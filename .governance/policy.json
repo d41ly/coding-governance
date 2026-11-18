@@ -1,5 +1,5 @@
 {
-  "catalogue_blob": "9ce5a224c3e6ec3c462f228f1c2ed443eaf56515",
+  "catalogue_blob": "9d43738cca727d03cb43c81c40e059ef74c8cd50",
   "keys": {
     "actions.free": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
@@ -678,6 +678,11 @@
       "source": "default",
       "value": "structural-roles"
     },
+    "memory.staged-render": {
+      "reason": "set in .governance/policy.toml at {rev}",
+      "source": "file",
+      "value": "on"
+    },
     "memory.superseded-slices": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
       "source": "default",
@@ -1328,5 +1333,5 @@
     ".agent-cap.conf": null,
     ".governance/instructions.toml": "9a0e827adc3598ff86ae582b76b5a457990dc90d"
   },
-  "policy_blob": "43fa1bb1dbe35b80a185cc5c1c452285b74086c0"
+  "policy_blob": "430e68331c5aec17e27ddb9650860a37502d906e"
 }

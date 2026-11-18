@@ -451,7 +451,7 @@ probe = ["python3", "{own}", "--print-defined-ids"]
 expect = "(?m)^# id-ere: "
 consumer = "kickoff-manifest:manifest-check.sh"
 [[contract.clause]]
-imports = ["ask_shell"]
+imports = ["ask_shell", "main"]
 consumer = "gotchas.py"
 
 [[contract]]
@@ -461,6 +461,17 @@ id = "memory-tree/gotchas"
 probe = ["python3", "{own}", "--for-paths", "{own}"]
 expect = "(?m)^# "
 consumer = "kickoff-manifest:SKILL.md unattended:SKILL.template.md"
+# TOOL-aHastenedSweep-5 (closing review round 1, H1). One clause per launch the hygiene shell makes of
+# this program: `--check-with-ids` on an unscoped run, `--check` under `--only`. An owned copy that
+# predates the one-process verb lacks `cmd_check_with_ids` and is named here, where the shell would
+# otherwise red checks 13 to 19 with a usage line. `imports` measures the names, never that `main`
+# dispatches the verb to them or the `\x1d<rc>` frame the shell splits.
+[[contract.clause]]
+imports = ["cmd_check_with_ids", "main"]
+consumer = "check-memory-hygiene.sh"
+[[contract.clause]]
+imports = ["cmd_check", "main"]
+consumer = "check-memory-hygiene.sh"
 
 # SHAPE-EXACT, and measured: adopter ic's own hygiene engine ignores two of these flags and runs its whole
 # check instead, whose failure text a bare `\S` read as a pass. One path per line, and one line.

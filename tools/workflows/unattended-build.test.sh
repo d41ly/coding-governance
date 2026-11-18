@@ -4005,6 +4005,24 @@ hasnt_ "DL56 AC36 a review's own earlier round earns no second-occurrence gate" 
 o=$("$_rkd_py" "$HERE/review_dispose.py" classes --builds "$_dl20_b" --record "$_dl20_b/bD/reviews/2026-01-02-review-TOOL-bD-1-diff-review-round2.md" --left-shift every-class 2>&1)
 has    "DL56 AC36 ...and counts it prior 0" "$o" 'review-dispose: gate stale-pin · prior 0 · every-class'
 rm -rf "$_dl20_b"
+# ================================ TOOL-aTrimmedWait-1 — `--check-specs` BEFORE THE SPEC COMMIT
+# Each writer, typed or not, is told to run the verb over its own group's ids, and the committer to run
+# it over every authored id before its block and return `committed: false` on a non-zero exit; that
+# return is refused by its `why`. Staged by deleting the writer sentence and the commit step.
+TW1_SPEC='{"spec-write":{"authored":["A-tB-1","A-tB-2","A-tB-3"],"alreadyPresent":[],"refused":[],"summary":"s"},"commit":%s}'
+TW1_OK='{"committed":true,"sha":"'$CSHA'","why":"","specs":[{"id":"A-tB-1","path":"'$GH33_SF'/2026-10-13-spec-A-tB-1.md"},{"id":"A-tB-2","path":"'$GH33_SF'/2026-10-13-spec-A-tB-2.md"},{"id":"A-tB-3","path":"'$GH33_SF'/2026-10-13-spec-A-tB-3.md"}],"summary":"ok"}'
+for tw1_args in "$OFF_UNITS" "${OFF_UNITS/'"slug":"tB",'/'"slug":"tB","roles":{"specWriter":"gov-spec-writer"},'}"; do
+  printf -v tw1_in "$TW1_SPEC" "$TW1_OK"; o=$(run_wf "$tw1_args" "$tw1_in"); tw1_w=$(grep '^prompt:spec-write:' <<<"$o")
+  same "TW1 AC5 the order-1 writer is told to run --check-specs over its two ids" "$(grep -cF -- 'Before you return, run `bash '"${PFX}${UNATTENDED}"'/unattended.sh --check-specs tB A-tB-1 A-tB-2` in /tmp/r.' <<<"$tw1_w")" 1
+  same "TW1 AC5 the order-2 writer is told to run it over its one id" "$(grep -cF -- 'run `bash '"${PFX}${UNATTENDED}"'/unattended.sh --check-specs tB A-tB-3` in /tmp/r.' <<<"$tw1_w")" 1
+done
+tw1_c=$(grep '^prompt:commit:' <<<"$o")
+has    "TW1 AC5 the committer runs --check-specs over every authored id" "$tw1_c" 'Then run `bash '"${PFX}${UNATTENDED}"'/unattended.sh --check-specs tB A-tB-1 A-tB-2 A-tB-3` in /tmp/r'
+has    "TW1 AC5 ...and returns committed: false on a non-zero exit" "$tw1_c" 'when it exits non-zero, run nothing further and return `committed: false` with its stdout in `why`'
+printf -v tw1_in "$TW1_SPEC" '{"committed":false,"sha":"","why":"UNATTENDED check 49 FAILED — spec THIN: A-tB-2","specs":[],"summary":"x"}'
+o=$(run_wf "$OFF_UNITS" "$tw1_in")
+has    "TW1 AC5 a commit double refused by --check-specs THROWS naming its output" "$(grep '^THROW' <<<"$o")" 'the spec commit stage did not commit: "UNATTENDED check 49 FAILED — spec THIN: A-tB-2"'
+hasnt_ "TW1 AC5 ...and hands out no roster" "$o" '"roster":[{'
 
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Authored from a
 # static count of the `same`/`has`/`hasnt_` sites in this file — `grep -cE '^\s*(same|has|hasnt_) '`
@@ -4158,7 +4176,13 @@ rm -rf "$_dl20_b"
 # sites. Counted by reading, not measured by a run: the pass that wrote it runs no suite.
 # RAISED 1069 -> 1071 by TOOL-dDeclaredLoop-56: AC36's two class-count sites over two rounds of one review.
 # Counted by reading, not measured by a run: the pass that wrote it runs no suite.
-FLOOR_ASSERTIONS=1071
+# RAISED 950 -> 958 by TOOL-aTrimmedWait-1: the `TW1 AC5` sites, two per writer mode across the loop's two
+# modes, two on the commit prompt, and the refused commit's throw and absent roster. Counted by reading,
+# not measured by a run: the pass that wrote it runs no suite.
+# MERGED at TOOL-aTrimmedWait-12's reconcile of local main at 5d48501da: the base 950 at 846d51d39, plus main's 93
+# (TOOL-aLightenedLoop-3's 4, TOOL-aTwinnedPass-1's 50, -4's 28 and -11's 11), plus this branch's 8 (TOOL-aTrimmedWait-1) = 1051.
+# MERGED at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c, 2026-11-18: the base 1043 at 5d48501da, plus main's 8 (TOOL-aTrimmedWait-1), plus this branch's 28 (TOOL-dDeclaredLoop-20 and -56) = 1079.
+FLOOR_ASSERTIONS=1079
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

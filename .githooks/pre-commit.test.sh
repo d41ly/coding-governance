@@ -319,5 +319,56 @@ case "$out" in *"JOIN RAN"*) r=1 ;; *"pre-commit: red-fix join leg SKIPPED — n
 ck "S12 a join no rung resolves is an announced skip naming every rung, and the commit proceeds" "$r" 0
 cd "$tmp" || exit 2
 
+# ---- the check 9 render, TOOL-aTrimmedWait-3 AC5/AC6 ----------------------------------------------
+# A stand-in hygiene gate at the root install fails its FIRST run with the check line the real fail()
+# prints, read from the producer here so a message edit there reds these arms, and passes every later
+# run; it counts its runs. A stand-in generator says how it was called, then exits as `.gen-exit`
+# says, staging a file on 0. Check 9 with a staging generator commits that file after a second
+# grading; check 12 never runs the generator; a declining generator is never followed by a grading.
+hy_src=$(cd "$repo_src" && git ls-files -- "*$hy" | head -n 1)
+fail_n=$(grep -c 'echo "HYGIENE check $1 FAILED' "$repo_src/$hy_src")
+[ "$fail_n" = 1 ] && r=0 || r=1
+ck "AC6 the producer prints its check line from one fail() literal (found $fail_n)" "$r" 0
+fail_tpl=$(grep -o 'echo "HYGIENE check $1 FAILED[^"]*"' "$repo_src/$hy_src" | head -n 1)
+fail_tpl=${fail_tpl#echo \"}; fail_tpl=${fail_tpl%\"}
+run_render_commit() { # <check N> <generator exit> -> the commit's output, its exit, the run count, HEAD's paths
+  local d="$tmp/render-$1-$2" line=${fail_tpl/\$1/$1}
+  line=${line/\$2/drift}
+  rm -rf "$d"; mkdir -p "$d"
+  ( cd "$d" || exit 2
+    git init -q --template= -b main
+    mkdir hk; cp "$HOOK" hk/pre-commit; chmod +x hk/pre-commit; git config core.hooksPath hk
+    mkdir -p "$mt" vendor memory; cp "$repo_src/$resolver" vendor/
+    printf '%s\n' "$line" > .hy-line; printf '%s\n' "$2" > .gen-exit
+    cat > "$mt/$hy" <<'EOF'
+#!/usr/bin/env bash
+n=$(( $(cat .hy-runs 2>/dev/null || echo 0) + 1 )); echo "$n" > .hy-runs
+[ "$n" = 1 ] || { echo "HYGIENE ok"; exit 0; }
+cat .hy-line; exit 1
+EOF
+    cat > "$mt/gen_build_index.py" <<'EOF'
+import subprocess, sys
+print("GEN RAN", *sys.argv[1:])
+if open(".gen-exit").read().strip() != "0":
+    sys.exit(1)
+open("memory/rendered.md", "w").write("rendered\n")
+subprocess.run(["git", "add", "memory/rendered.md"], check=True)
+EOF
+    git add -A; git commit -q --no-verify -m fixture
+    echo x > memory/note.md; git add memory/note.md
+    git commit -q -m note 2>&1; echo "COMMIT RC=$?"
+    echo "HYGIENE RUNS=$(<.hy-runs)"
+    echo "HEAD CARRIES $(git show --name-only --format= HEAD | tr '\n' ' ')" )
+}
+out=$(run_render_commit 9 0)
+case "$out" in *"GEN RAN --write-staged"*"grading the memory hygiene leg again"*"COMMIT RC=0"*"HYGIENE RUNS=2"*"memory/rendered.md"*) r=0 ;; *) r=1 ;; esac
+ck "AC5 a check 9 refusal runs --write-staged, grades again, and commits the staged file" "$r" 0
+out=$(run_render_commit 12 0)
+case "$out" in *"GEN RAN"*) r=1 ;; *"COMMIT RC=0"*) r=1 ;; *"HYGIENE RUNS=1"*) r=0 ;; *) r=1 ;; esac
+ck "AC6 a check 12 refusal never runs the generator, and the commit is refused" "$r" 0
+out=$(run_render_commit 9 1)
+case "$out" in *"COMMIT RC=0"*|*"grading the memory hygiene leg again"*) r=1 ;; *"GEN RAN --write-staged"*"HYGIENE RUNS=1"*) r=0 ;; *) r=1 ;; esac
+ck "AC6 a declined render is followed by no second grading, and the commit is refused" "$r" 0
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

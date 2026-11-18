@@ -1154,6 +1154,11 @@ const specResults = await boundedParallel(
           'regenerates the index once: this program\'s commit stage, or the caller when it pinned ' +
           '`subjects`. A writer that commits contends with its siblings on one git ' +
           'index, which is the experiment this repository has NOT run. ' +
+          // TOOL-aTrimmedWait-1 S3 - outside every `roles.specWriter` conditional, so a typed writer gets it too.
+          'Before you return, run `' + DRIVER + ' --check-specs ' + slug + ' ' +
+            gUnits.map(function (u) { return u.id }).join(' ') + '` in ' + repo + '. It prints each ' +
+            'refusal `--dispatch` would make from your specs, in its own words; fix every one naming a ' +
+            'unit of yours, and name any other in your summary. ' +
           'NAME every unit you could not spec, in `refused`, with the reason in your summary. ' +
           'Name every unit in `authored`, `alreadyPresent` and `refused` by its unit id, exactly as this ' +
           'roster spells it, never by a path.',
@@ -1347,7 +1352,11 @@ if (!authoredIds.length) {
       ', in this order:\n' +
       '1. Find each id\'s spec: the file under `' + specFolder + '` whose H1 line opens `# <id> —`, which is ' +
       'the key `gen_build_index.py` reads the id from; its basename ends `-spec-<id>.md`, and the status ' +
-      'header carries no id. Return them as `specs`, one `{id, path}` per id, repo-relative and forward-slashed.\n' +
+      'header carries no id. Return them as `specs`, one `{id, path}` per id, repo-relative and forward-slashed. ' +
+      // TOOL-aTrimmedWait-1 S3 - its own step before the block, which stays untouched: the block's
+      // real-git suite arm runs it in a fixture holding no driver.
+      'Then run `' + DRIVER + ' --check-specs ' + slug + ' ' + authoredIds.join(' ') + '` in ' + repo +
+      '; when it exits non-zero, run nothing further and return `committed: false` with its stdout in `why`.\n' +
       '2. Run the block below in ' + repo + ' exactly as written, except that every `<spec paths>` becomes ' +
       'those paths, space-separated, and `<attribution trailer>` becomes the attribution trailer the ' +
       'charter mandates. It is the only copy of this stage\'s git sequence: add no step to it. Run it as ' +

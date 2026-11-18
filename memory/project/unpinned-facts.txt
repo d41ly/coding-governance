@@ -3507,6 +3507,8 @@ memory/builds/aPairedSlots/spec/2026-10-11-spec-TOOL-aPairedSlots-9.md	8440 s
 memory/builds/aPairedSlots/spec/2026-10-11-spec-TOOL-aPairedSlots-9.md	8945 s
 memory/builds/aPairedSlots/spec/2026-10-12-spec-TOOL-aPairedSlots-15.md	11s
 memory/builds/aPairedSlots/spec/2026-10-12-spec-TOOL-aPairedSlots-15.md	8 records
+memory/builds/aPiecewiseGrade/prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-3-1-spec-writer.md	1 s
+memory/builds/aPiecewiseGrade/prompts/2026-11-15-prompt-TOOL-aPiecewiseGrade-3-1-spec-writer.md	69 s
 memory/builds/aPooledSweep/BACKLOG.md	1126 s
 memory/builds/aPooledSweep/BACKLOG.md	17 s
 memory/builds/aPooledSweep/BACKLOG.md	34 s
@@ -6102,6 +6104,12 @@ memory/builds/aTrimmedHook/spec/2026-10-11-spec-TOOL-aTrimmedHook-2.md	4 s
 memory/builds/aTrimmedHook/spec/2026-10-11-spec-TOOL-aTrimmedHook-2.md	53 lines
 memory/builds/aTrimmedHook/spec/2026-10-11-spec-TOOL-aTrimmedHook-3.md	50 s
 memory/builds/aTrimmedHook/spec/2026-10-11-spec-TOOL-aTrimmedHook-7.md	101 files
+memory/builds/aTrimmedWait/prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-5-spec-writer.md	26 lines
+memory/builds/aTrimmedWait/prompts/2026-11-15-prompt-TOOL-aTrimmedWait-11-revision-4.md	26 lines
+memory/builds/aTrimmedWait/prompts/2026-11-16-prompt-TOOL-aTrimmedWait-13-1-spec-writer.md	23 rows
+memory/builds/aTrimmedWait/prompts/2026-11-16-prompt-TOOL-aTrimmedWait-13-brief.md	23 rows
+memory/builds/aTrimmedWait/spec/2026-11-18-spec-TOOL-aTrimmedWait-19.md	17 seconds
+memory/builds/aTrimmedWait/spec/2026-11-18-spec-TOOL-aTrimmedWait-19.md	9 lines
 memory/builds/aTunedCompass/README.md	261 KB
 memory/builds/aTunedCompass/RUN.md	100 seconds
 memory/builds/aTunedCompass/build/2026-09-05-build-TOOL-aTunedCompass-1-run-outcome.md	100 seconds

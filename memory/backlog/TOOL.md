@@ -211,6 +211,7 @@ Cite ids, never line numbers.
 | [TOOL-aPairedSlots-18](../builds/aPairedSlots/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite memory-hygiene self-test red at 9b743831 on the daily… |
 | [TOOL-aPairedSlots-19](../builds/aPairedSlots/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite unattended driver selftest shard 5/8 red at 9b743831 on… |
 | [TOOL-aPairedSlots-20](../builds/aPairedSlots/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite unattended driver selftest shard 7/8 red at 9b743831 on… |
+| [TOOL-aPiecewiseGrade-9](../builds/aPiecewiseGrade/BACKLOG.md) | OPEN | MED | — | 2026-11-16 | THE CARRIES JOIN STILL READS HISTORY ON EVERY RUN. The spec-token… |
 | [TOOL-aPooledSweep-4](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THREE HELD SUITES ARE RED AT HEAD AND THIS BUILD DID NOT CAUSE ANY OF… |
 | [TOOL-aPooledSweep-5](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE WHOLE-POPULATION SWEEP IS UNMEASURED, and the 4.0x figure this… |
 | [TOOL-aPooledSweep-6](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE PEAK-CONCURRENCY ARM DOES NOT DISCRIMINATE THE COMPARISON IT EXISTS… |
@@ -315,7 +316,6 @@ Cite ids, never line numbers.
 | [TOOL-aSmoothedDispatch-13](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | MED | — | 2026-11-10 | INHERITED RED: FIVE REGION-FOUR DISPATCH ARMS ARE ANSWERED BY CHECK… |
 | [TOOL-aSmoothedDispatch-14](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | MED | — | 2026-11-10 | THE SPEC-COMMIT STAGE CANNOT COMMIT A NEW BUILD'S FIRST SPECS. A build… |
 | [TOOL-aSmoothedDispatch-15](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | MED | — | 2026-11-10 | A RECORD QUOTING A DANGLING ID WRITES IT INTO ANOTHER BUILD'S IDS. Spec… |
-| [TOOL-aSmoothedDispatch-16](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | ROLE AGENTS RUN THE WHOLE-TREE HYGIENE GATE FOR A ONE-SPEC EDIT. Spec… |
 | [TOOL-aSmoothedDispatch-17](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | A CARRIAGE RETURN WRITTEN INLINE IN A SUITE ARGUMENT IS NOT A RELIABLE… |
 | [TOOL-aSmoothedDispatch-19](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | THE SHELL-HYGIENE SCANNER CREDITS ONE NAME PER LOCAL LINE.… |
 | [TOOL-aSmoothedDispatch-20](../builds/aSmoothedDispatch/BACKLOG.md) | OPEN | LOW | — | 2026-11-10 | THE ROUTED-COMMITS LEG OUTGROWS ITS CEILING WHEN NO PUSH BASE IS SET. A… |
@@ -360,6 +360,10 @@ Cite ids, never line numbers.
 | [TOOL-aTracedSpawn-3](../builds/aTracedSpawn/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THE SHARD-2 FAILURE COUNT AFTER THE FIXTURE-HEADING FIX IS UNMEASURED,… |
 | [TOOL-aTrimmedHook-8](../builds/aTrimmedHook/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | after this build a one-file RUN.md commit's .githooks/pre-commit still… |
 | [TOOL-aTrimmedHook-17](../builds/aTrimmedHook/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite process-monitor census selftest red at 37200355 on the… |
+| [TOOL-aTrimmedWait-14](../builds/aTrimmedWait/BACKLOG.md) | OPEN | MED | — | 2026-11-17 | FOUR DERIVED-POPULATION ARMS RED ON LOCAL MAIN. The driver suite's… |
+| [TOOL-aTrimmedWait-15](../builds/aTrimmedWait/BACKLOG.md) | OPEN | MED | — | 2026-11-17 | THREE PARITY ROWS RED ON LOCAL MAIN. The parity table's register-task… |
+| [TOOL-aTrimmedWait-16](../builds/aTrimmedWait/BACKLOG.md) | OPEN | MED | — | 2026-11-17 | CHECK 118 REFUSES FIVE --dispatch FIXTURES BEFORE THEIR OWN REFUSAL.… |
+| [TOOL-aTrimmedWait-17](../builds/aTrimmedWait/BACKLOG.md) | OPEN | MED | — | 2026-11-17 | SEVEN --resume, --close AND PRE-PUSH ARMS RED ON LOCAL MAIN. The… |
 | [TOOL-aTwinnedPass-6](../builds/aTwinnedPass/BACKLOG.md) | OPEN | MED | — | 2026-11-15 | THE CLOSING REVIEW'S ROUND 2, BATCHED. Five MEDIUM and three LOW items,… |
 | [TOOL-aTwinnedPass-7](../builds/aTwinnedPass/BACKLOG.md) | OPEN | MED | — | 2026-11-15 | THE ROUND-1 LEFT-SHIFT GATES ARE UNBUILT. The closing review's round 1… |
 | [TOOL-aTwinnedPass-8](../builds/aTwinnedPass/BACKLOG.md) | OPEN | LOW | — | 2026-11-15 | THREE COPIES OF ONE QUESTION. check_generated_output in… |

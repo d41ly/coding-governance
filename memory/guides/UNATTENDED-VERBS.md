@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.125 -->
+<!-- gov:kit unattended@1.127 -->
 [memory/guides/UNATTENDED-VERBS.md · Level 3 · Binding with the unattended protocol, the verbs a run calls; yields to levels 0 to 2]
 # Unattended runs — the verbs
 
@@ -129,6 +129,15 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   format from the slug COUNT gives a caller two output shapes for one verb: a frame-reading caller
   handed a single-build corpus finds none of the lines it parses and reads the run as having graded
   NOTHING. Without the flag the one-slug form stays byte-identical to what it has always been.
+- `--check-specs` — `--check-specs <slug> <unit> [<unit> ...]` makes `--dispatch`'s five spec-file
+  refusals, MISSING, THIN, a malformed `order` verb, an unreadable consumes-from line and a
+  consumes-from cycle, over the build's tracked AND untracked specs, through the same functions
+  `--dispatch` calls and in the same words, under check 49. It needs no run-state file and writes
+  nothing in the worktree. It grades each named unit and then the build's edges once, printing every
+  refusal it finds rather than the first, and exits 1; clean, it prints one line naming the units and
+  exits 0. No unit given is check 14, and an unreadable fork cutoff, check 86, stops it. It is what the
+  spec stage runs before the spec commit, so a spec defect is refused while its author can fix it. It
+  does not make a refusal `--dispatch` reads from run state, the README or the whole tree.
 - `--status` — ONE status line, then the position engine's `position —`, `unit —`, `next —` and
   `interrupt —` lines for the slug. The status line is opened by `unattended: <slug>`, with every
   field after it joined by ` · ` in the order this entry names them. The phase, the witness and the next unit print on every line:
@@ -298,7 +307,15 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   slug, the checker, the launcher and
   a digest of every file and git answer its last admitted run read,
   recorded under the sidecar root only when the tree and HEAD held still while it ran; with no
-  fingerprint it announces that the cache is off and runs the checker. A blank or absent key is an ANNOUNCED skip on stdout,
+  fingerprint it announces that the cache is off and runs the checker.
+  On a miss it runs the checker's incremental mode, which reuses each live spec's findings from a
+  per-spec cache under the sidecar root while that spec's own inputs hold,
+  re-grades the rest and runs every cross-build join whole,
+  so its output is the whole-tree run's; a new generation of that cache goes live only where the key is recorded.
+  One dispatch of a build at a time holds that cache, under a lock in the sidecar root; a dispatch
+  that cannot take the lock says so, runs the checker whole and records nothing, and a dispatch
+  breaks a lock whose driver is gone and whose checker has ended.
+  A blank or absent key is an ANNOUNCED skip on stdout,
   never a silent pass. Where `RUN_CLAIMS` is `on` it reads the run's claim as the holder after every
   local refusal and before the row: another session's claim is check 108 and no row is written.
 - `--review` — records ONE review round for a subject and reports what the loop is doing:
