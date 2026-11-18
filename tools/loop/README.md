@@ -912,8 +912,8 @@ drive rows by `order` and pick each role's practices by its reach word.
   scratch manifest under the host temp directory scoping one unit to one item, which must be listed
   on that item's line alone; the second with a scratch directory as the kit directory, where the
   inputs and every scope line must read `unarmed`. `computed-actor` (the item the `acceptance`
-  computed witness serves given class `actor`) and `computed-unserved` (that row serving
-  `item.build.acceptanc`) each exit 1 naming the row. `conf-readers-declared` reads no definition: it
+  computed witness serves given class `actor`) and `computed-unserved` (that row serving the
+  build item's acceptance tag cut one letter short) each exit 1 naming the row. `conf-readers-declared` reads no definition: it
   compares `derive_conf_openers` over this file both ways with `CONF_READERS` and `CONF_ROUTES`,
   exiting 1 on an empty answer, an opener in neither tuple or a member this module binds that opens
   no conf, and 0 printing

@@ -189,7 +189,7 @@ Every write prints `Proof: <proof>` (`tty-cli`, `none — run mandate <run-state
 `none — budgets raise`) and the trailer line the commit must carry, one per changed key:
 `Gov-Policy: policy.<key> <old> -> <new>`, each value as compact JSON and `none` for a key the file
 did not set. Its change record, under the build's `build/` folder, names the key's catalogue row
-(`policy.review.max-rounds`, or `policy.budgets` for any cap). A value the policy file selects whose
+(`policy.review.max-rounds`, or `policy.budgets.<cap>` for any cap). A value the policy file selects whose
 component is not installed, `policy-file.proof = "signed"` say, is refused, or read as its default
 with one line saying so, as `policy-file.on-missing-expansion` says.
 
@@ -225,7 +225,7 @@ with one line saying so, as `policy-file.on-missing-expansion` says.
   else in the four files changed. The commit must carry its argument and its record:
   - comment lines added directly above the cap, one of them `RAISED <old> -> <new>`;
   - at least one row added to `memory/DECISIONS.md`, with no row removed;
-  - the change record naming `policy.budgets`, and the `Gov-Policy:` trailer.
+  - the change record naming `policy.budgets.<cap>`, and the `Gov-Policy:` trailer.
 
   `policy_edit.py raise` writes all but the decision row, which it prints for the caller to add. It
   writes only on the four conditions of the paragraph "WHEN A RUN MAY RAISE A ROW" of

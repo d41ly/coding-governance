@@ -44,7 +44,7 @@ python tools/playbook/overlay_rows.py compose --kind item
 A row of yours is tagged with `adopter` at the seat the kind's schema declares (`owner-seat`), for
 example `fixture.adopter.extra`, so it never collides with a gov tag. A schema may list more than one
 seat, `owner-seat = [2, 1]`, and a row of yours then holds `adopter` at any one of them: the item kind
-takes `item.test.adopter.smoke` for an item of a gov stage and `item.adopter.security-review.exit` for
+takes `item.test.adopter.<name>` for an item of a gov stage and `item.adopter.<stage>.<name>` for
 an item of a stage of your own. Gov's packs never ship `adopter` at any listed seat,
 and a row of yours without it is refused under `owned`. You never write `origin`: every row read from
 the overlay is the repository's, and a row typing `origin` is refused.
