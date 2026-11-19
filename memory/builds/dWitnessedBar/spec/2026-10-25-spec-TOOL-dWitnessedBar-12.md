@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-12 — the `leg`, `check` and `pack` tag namespaces, and a `tag` on every leg
 
-**Status:** DEFERRED · rev-6 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 5 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-6 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 5 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0350@37beff65 whole
 **Carries:** node:tag-namespace.leg
