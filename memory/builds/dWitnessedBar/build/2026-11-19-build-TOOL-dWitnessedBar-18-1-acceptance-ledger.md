@@ -13,7 +13,7 @@ changed code, a module's own `--fixture --plant` run, or the changed program ove
 
 **Evidences:** TOOL-dWitnessedBar-18
 - AC1 — `legacy_ledger.py read` — each of the five populations reads with exit 0 and its keys equal its
-  seed's at the pass tree: `positional-refs` 38334 rows and `positional.py list` 38334 lines, the two
+  seed's at the pass tree: `positional-refs` 38334 rows and `positional.py list` 38334 lines, the two (DERIVED from the builder's probe)
   key sets equal (DERIVED); `positional-producers` 15 and 15, `unpinned-facts` 15216 and 15216,
   `instructions-legacy` 33 and 33, each key set equal (DERIVED); `landed-steps` 26 rows written from
   `upgrade_steps.py list --ids`, which reads no landed ref (DERIVED).

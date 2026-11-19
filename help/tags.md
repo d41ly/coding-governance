@@ -118,7 +118,7 @@ tag-shaped word that is not a citation, quote it another way, with doubled backt
   A reference ending in a line number is kept as written. A list a newly installed repository is given holds
   the header and an `# unarmed` line, no row. The producer list `positional-producers.txt` beside it
   holds its rows the same way, keyed by path and line text; a hit is kept there through
-  `python tools/memory-tree/ratchet.py widen positional-producers`, whose widen record holds its reason.
+  `python tools/memory-tree/ratchet.py widen positional-producers`, whose widen record holds its reason. <!-- usage: script:tools/memory-tree/ratchet.py#widen 1c6a8748 -->
   The writing practice's `unpinned-facts.txt` (keyed by path and fact) and the render gate's
   `instructions-legacy.txt` (keyed by path), both under `memory/project/`, are ledger rows too. Where the list's folder,
   `<MEMORY_ROOT>/project/`, is absent too, as at a repository with no memory tree adopted, the arm
