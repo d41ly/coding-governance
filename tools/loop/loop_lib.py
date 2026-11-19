@@ -143,8 +143,9 @@ item and exits 0, or 1 on a refused definition or a derive that exits non-zero. 
 prints the item's seed as `resolve_item_seed` answers it, one path per line or its `unarmed` line, and
 exits 0, 1 on a refused definition, or 2 naming an item no row declares or the resolver's refusal. Its
 plants, `SEED_PLANTS` and `seed-bad`, run `seed` as a process in a scratch repository and break the
-definition's seeds. The map's plants, `map-bad`, `unfold-unregistered` and `unfold-no-map`, break the
-declarations, and `no-registry` resolves the registry from an empty scratch directory. Exit 2 is a usage error, a site outside `DECLARATION_SITES` included.
+definition's seeds. The map's plants, `map-bad`, `unfold-unregistered`, `unfold-no-map` and
+`unfold-not-list`, break the declarations, `no-registry` resolves the registry from an empty scratch
+directory and `registry-bad` from one whose registry is no TOML. Exit 2 is a usage error, a site outside `DECLARATION_SITES` included.
 
 WHAT THIS DOES NOT CHECK: that a workflow row names a workflow the roles kit holds, which is that kit's
 catalogue check, both ways; that a step tag or an item tag is registered in its namespace, which is the
@@ -259,7 +260,10 @@ PLANTS = {"missing-step": "the step.deploy row taken out",
           "unfold-unregistered": "item.design.inventory's unfolds set to legs, a word no namespace row registers",
           "unfold-no-map": "item.build.unit-pass given unfolds kit beside map none",
           "no-registry": "item.design.inventory's unfolds set to legs, the namespace registry resolved from an "
-                         "empty scratch directory"}
+                         "empty scratch directory",
+          "unfold-not-list": "item.design.inventory's unfolds set to the string kit, no list",
+          "registry-bad": "the namespace registry resolved from a scratch directory whose namespaces.toml is no "
+                          "TOML"}
 #: `--selftest`'s owed answer of each plant (TOOL-dDeclaredLoop-67 S30): its exit, the opening of a line
 #: it prints and a needle that line holds, each pair found by running the plant alone at the pass's base.
 #: A definition the reader refuses prints `loop: <path>: <why>`, a graded refusal `loop: refused · <why>`.
@@ -316,7 +320,10 @@ PLANT_OWED = {"missing-step": (1, "loop: ", "the step step.deploy is missing"),
               "unfold-unregistered": (1, "loop: refused · ", "the item item.design.inventory unfolds 'legs', which "
                                                               "is no ns"),
               "unfold-no-map": (1, "loop: refused · ", "the item item.build.unit-pass unfolds kit with map none"),
-              "no-registry": (0, "loop: unfolds · ", "unarmed — no namespace registry resolves")}
+              "no-registry": (0, "loop: unfolds · ", "unarmed — no namespace registry resolves"),
+              "unfold-not-list": (1, "loop: refused · ", "the item item.design.inventory unfolds 'kit', which is no "
+                                                          "list of namespace words"),
+              "registry-bad": (1, "loop: refused · ", "/playbook/namespaces.toml does not read: ")}
 #: The plants whose break is in what the scope verb reads rather than in the definition, so `--check`
 #: runs whole and the scope verb runs after it.
 SCOPE_PLANTS = ("scope-selected", "scope-no-kit")
@@ -1934,6 +1941,10 @@ def write_loop_plant(data, case, rows, base_rows):
             items["item.build.unit-pass"]["map"] = "full"
         elif case in ("unfold-unregistered", "no-registry"):   # no-registry's other break is in `main`
             items["item.design.inventory"]["unfolds"] = ["legs"]
+        elif case == "unfold-not-list":
+            items["item.design.inventory"]["unfolds"] = "kit"
+        elif case == "registry-bad":
+            pass  # its break is the registry, which `main` writes in a scratch directory
         elif case == "unfold-no-map":
             items["item.build.unit-pass"]["map"] = SEED_NONE
             items["item.build.unit-pass"]["unfolds"] = ["kit"]
@@ -2016,9 +2027,10 @@ def main(argv):
         for line in lines:
             print(line)
         return 0
-    # A scope plant's, roles-no-kit's or no-registry's scratch directory sits under the host temp directory
-    # and is removed after.
-    scratch = tempfile.TemporaryDirectory() if plant in SCOPE_PLANTS + ("roles-no-kit", "no-registry") else None
+    # A scope plant's, roles-no-kit's, no-registry's or registry-bad's scratch directory sits under the host
+    # temp directory and is removed after.
+    scratch = tempfile.TemporaryDirectory() if plant in SCOPE_PLANTS + ("roles-no-kit", "no-registry",
+                                                                        "registry-bad") else None
     layer_dir = scratch.name if plant == "scope-no-kit" else kit_dir
     try:
         data, where = read_definition(kit_dir)
@@ -2068,7 +2080,10 @@ def main(argv):
         print(line)
     # TOOL-dPlacedRequest-6 S3: each item's map and unfolds, each unfold word joined to the playbook kit's
     # namespace registry, read as the lexicon's read_tag_words reads it; no playbook kit leaves the arm unarmed.
-    ns_dir = scratch.name if plant in ("scope-no-kit", "no-registry") else kit_dir
+    ns_dir = scratch.name if plant in ("scope-no-kit", "no-registry", "registry-bad") else kit_dir
+    if plant == "registry-bad":   # a registry that resolves and is no TOML
+        (pathlib.Path(ns_dir) / "playbook").mkdir()
+        (pathlib.Path(ns_dir) / "playbook" / "namespaces.toml").write_text("[[namespace]\n", encoding="utf-8")
     try:
         try:
             registry = resolve_kit_dir("playbook", "namespaces.toml", ns_dir) / "namespaces.toml"
@@ -2081,11 +2096,8 @@ def main(argv):
         map_lines, map_refusals = check_item_maps(read_item_rows(data, where), namespaces)
     except LoopError as e:
         map_lines, map_refusals = [], [str(e)]
-    except OSError as e:
-        map_lines, map_refusals = [], ["the namespace registry %s cannot be read: %s" % (registry.as_posix(),
-                                                                                         e.strerror)]
-    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
-        map_lines, map_refusals = [], ["the namespace registry %s is not valid TOML: %s" % (registry.as_posix(), e)]
+    except (OSError, tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
+        map_lines, map_refusals = [], ["the namespace registry %s does not read: %s" % (registry.as_posix(), e)]
     for line in map_lines:
         print(line)
     item_refusals = item_refusals + seed_refusals + map_refusals

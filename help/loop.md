@@ -1124,8 +1124,9 @@ and `policy`. `loop_lib.py --check` prints one `loop: map <tag> · map <value>` 
 `· unfolds <words>` where it unfolds, and refuses a `map` outside `none` and `base`, an `unfolds` beside
 `map = "none"`, and an unfold word no namespace row registers, naming the item and the value or word.
 Where the playbook kit is not installed it prints `loop: unfolds · unarmed — no namespace registry
-resolves`, checks no unfold word, and the rest of the check runs. `--fixture --plant map-bad`,
-`unfold-unregistered`, `unfold-no-map` and `no-registry` show each.
+resolves`, checks no unfold word, and the rest of the check runs; a registry that resolves and does not
+read is refused. `--fixture --plant map-bad`, `unfold-unregistered`, `unfold-no-map`, `unfold-not-list`,
+`no-registry` and `registry-bad` show each.
 
 ## Handing an item what its upstream items established
 
