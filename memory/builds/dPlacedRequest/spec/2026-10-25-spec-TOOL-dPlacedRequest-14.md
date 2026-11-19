@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-14 — the pre-claim budget: placement loops before `entry.claim` drawing on a budget keyed to the request's content key
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 18 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 18 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0132@6096ecb9 whole
 
@@ -206,7 +206,7 @@ loops unbounded in between.
 
 ## 7. Gates
 
-`recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`scratch-guard self-test` · `tier2-review self-test` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/loop/budget.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · the `loop budget fixtures` leg's plants, its failing case staged by `placement-loop` with the draw site removed from `place` · none
 New arm: tools/unattended/unattended.test.sh · covers AC3 AC4 · the `--request-draw` case over a scratch remote, its failing case staged by a parentless row commit · none
@@ -238,6 +238,11 @@ New arm: tools/unattended/unattended.test.sh · covers AC3 AC4 · the `--request
   `derive_request_content_key`, the function unit 19 hands off.
 - rev-3 · 2026-10-25 · §3 · the round-1 spec audit's disposal: hands-off TOOL-dPlacedRequest-34,
   each the mirror of that promoted unit's own edge.
+- rev-4 · 2026-11-19 · §7 · the spec stage's gate hits: the spec-token checker's guards join names
+  `scratch-guard self-test <- tools/unattended/unattended.sh` and
+  `tier2-review self-test <- tools/unattended/unattended.sh`, guards `tools/gate-legs.json` gained on
+  2026-11-03 and 2026-11-10, after this spec's 2026-10-25 revisions; the leg line names
+  both legs.
 
 ## 10. Reuse audit
 

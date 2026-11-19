@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-8 — each item's declared code seed: its write set, its scope paths or its question's paths
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 13 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 13 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0126@b35ab44f whole
 
@@ -228,7 +228,7 @@ record lands, so nothing consumes the list yet but the command.
 
 ## 7. Gates
 
-`spec tokens (a spec's own names resolve)`
+`scratch-guard self-test` · `tier2-review self-test` · `spec tokens (a spec's own names resolve)`
 
 The unattended kit's own self-test suites are waived for this build's landing (README rule 8), so S5's
 extraction is observed by AC7's direct comparison, never by those suites.
@@ -260,6 +260,11 @@ New arm: tools/loop/loop_lib.py · covers AC3 AC4 AC5 AC6 · the `seed-bad`, `se
   prose, so no illustrative path reads as a repository path.
 - rev-3 · 2026-10-25 · §3 · the round-1 spec audit's disposal: hands-off TOOL-dPlacedRequest-34,
   each the mirror of that promoted unit's own edge.
+- rev-4 · 2026-11-19 · §7 · the spec stage's gate hits: the spec-token checker's guards join names
+  `scratch-guard self-test <- tools/unattended/unattended.sh` and
+  `tier2-review self-test <- tools/unattended/unattended.sh`, guards `tools/gate-legs.json` gained on
+  2026-11-03 and 2026-11-10, after this spec's 2026-10-25 revisions; the leg line names
+  both legs, neither of them the unattended kit's own suites README rule 8 waives.
 
 ## 10. Reuse audit
 

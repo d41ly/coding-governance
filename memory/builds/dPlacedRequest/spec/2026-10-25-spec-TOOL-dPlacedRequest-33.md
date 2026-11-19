@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-33 — the card's remote ref is written by the driver, dark behind `RUN_CLAIMS`
 
-**Status:** DEFERRED · rev-5 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 13 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 13 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -183,7 +183,7 @@ The fixture is `TOOL-dPlacedRequest-2` S12's `card-store.fixture.sh`.
 
 ## 7. Gates
 
-`manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`manifest-check self-test` · `scratch-guard self-test` · `tier2-review self-test` · `lexicon naming predicates` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: skills/session-kickoff/card-store.fixture.sh · covers AC1 AC2 AC3 · the `publish-off` and `publish-hung` plants, staged against `TOOL-dPlacedRequest-2`'s inline publish · none
 New arm: tools/unattended/unattended.test.sh · covers AC5 · the verb under the switch off with a logging `git` stub, staged against a verb that reads before testing the switch · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
@@ -207,6 +207,9 @@ New arm: tools/unattended/unattended.test.sh · covers AC5 · the verb under the
   hands-off TOOL-dPlacedRequest-43.
 - rev-4 · 2026-10-25 · §3 · the round-3 spec audit's disposal: the edge mirror hands-off TOOL-dPlacedRequest-49.
 - rev-5 · 2026-10-25 · §3 · the disposal of the spec audit of the round-3 promotions: the hands-off edge to `TOOL-dPlacedRequest-52`, mirroring its consumes-from.
+- rev-6 · 2026-11-19 · §7 · the spec stage's gate hits: the spec-token checker's guards join names
+  `tier2-review self-test <- tools/unattended/unattended.sh`, a guard `tools/gate-legs.json` gained on
+  2026-11-03 (dFairHearing's TOOL-dFairHearing-17); the leg line names the leg.
 
 ## 10. Reuse audit
 

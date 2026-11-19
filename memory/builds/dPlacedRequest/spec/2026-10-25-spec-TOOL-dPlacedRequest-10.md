@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-10 — a build's scenarios chosen at `entry.place`, every admission predicate re-evaluated by `placement.check`
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 17 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-3 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 17 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0128@e0109d47 whole
 
@@ -199,7 +199,7 @@ so no gov build's flow moves.
 
 ## 7. Gates
 
-`roles catalogue` · `roles render selftest` · `check-wiring self-test` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render selftest` · `policy fixtures` · `check-wiring self-test` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/loop/placement.py · covers AC1 AC2 AC3 AC4 AC6 AC7 · the `loop placement fixtures` leg's plants, its failing case staged by `predicate-fails` with the predicate re-run removed · none
 
@@ -228,6 +228,8 @@ New arm: tools/loop/placement.py · covers AC1 AC2 AC3 AC4 AC6 AC7 · the `loop 
   read at base `c63aabbb`.
 - rev-2 · 2026-10-25 · §3 · the round-1 spec audit's disposal: hands-off TOOL-dPlacedRequest-34,
   each the mirror of that promoted unit's own edge.
+- rev-3 · 2026-11-19 · §7 · the spec stage's gate hits: the spec-token checker's guards join names
+  `policy fixtures <- tools/roles/render_agents.py`; the leg line names the leg.
 
 ## 10. Reuse audit
 
