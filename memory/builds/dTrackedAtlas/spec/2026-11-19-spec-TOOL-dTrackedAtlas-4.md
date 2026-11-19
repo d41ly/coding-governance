@@ -1,6 +1,6 @@
 # TOOL-dTrackedAtlas-4 — the Atlas page regenerates on node d after main moves, behind a switch whose default is on
 
-**Status:** DEFERRED · rev-5 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 4 · advances TOOL-dTrackedAtlas-7
+**Status:** DEFERRED · rev-6 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 4 · advances TOOL-dTrackedAtlas-7
 
 <!-- gen:spec-records -->
 
@@ -11,9 +11,11 @@
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-3-name-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-3-name-fold.md) | research | TOOL-dTrackedAtlas-3 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-2-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-4-3-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-3-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-ac6-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-ac6-fold.md) | research | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-build-brief.md) | research | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-map-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-map-fold.md) | research | — |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-4-pin-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-pin-fold.md) | research | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-spec-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -303,9 +305,9 @@ globs = [
   path read `UNMAPPED` through `tools/codebase-map/map_lib.py#attribute_paths` against every dossier
   and `memory/map/FOUNDATION.md` on 2026-11-19 (PINNED), so no glob overlaps another dossier's.
 - Probed on 2026-11-19 (PINNED): `tools/codebase-map/map_lib.py#parse_dossier` parses the fence;
-  its title is 149 bytes, under `tools/codebase-map/map_lib.py#_CARD_TITLE_BYTES`; and
-  `tools/codebase-map/map_lib.py#render_cards_md` renders its card in 925 bytes, under
-  `tools/codebase-map/map_lib.py#FEATURE_CARD_CAP_BYTES`, so nothing is cut.
+  its title is 149 bytes (PINNED), under `tools/codebase-map/map_lib.py#_CARD_TITLE_BYTES`; and
+  `tools/codebase-map/map_lib.py#render_cards_md` renders its card in 925 bytes (PINNED),
+  under `tools/codebase-map/map_lib.py#FEATURE_CARD_CAP_BYTES`, so nothing is cut.
 - The prose carries the headings `## Constraints & why`, `## Shared seams` and `## Gaps`, which
   `tools/codebase-map/test_codebase_map.py#test_dossier_prose_headings_pinned` grades, and
   `## Reuse affordance`, from which a new dossier is never exempt. Its one `seam:` line names unit
@@ -585,6 +587,9 @@ row, and stays red on that row until §8 F3 is resolved. The dead-path leg reads
   stage-coverage and dead-path legs, AC10 observes the claim, and §3 and §4 "The wiring" stop
   saying no reader grades the group. §8 F3 is new and open: the key also needs a `[[hook]]` row in
   `tools/loop/loop.toml`, which this build may not write. No change to the hook's design.
+- rev-6 · 2026-11-19 · §4 · the writing-practice pins, folded from
+  2026-11-19-prompt-TOOL-dTrackedAtlas-4-3-spec-writer: the dossier title's and card's measured
+  byte figures in "The codebase map's claim" are marked PINNED on their lines. No design change.
 
 ## 10. Reuse audit
 
