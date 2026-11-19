@@ -1173,14 +1173,29 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "arm_card",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
       "id": "arm_card_absent",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "arm_card_cap",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
       "id": "arm_card_level",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_card_no_playbook",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "arm_card_tracked",
@@ -1246,6 +1261,11 @@
       "id": "arm_document",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_down",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "arm_drive_bad_role",
@@ -1573,6 +1593,16 @@
       "file": "tools/playbook/pins.py"
     },
     {
+      "id": "arm_no_answer",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
+      "id": "arm_no_kit",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
       "id": "arm_noop",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -1638,6 +1668,16 @@
       "file": "tools/playbook/core.py"
     },
     {
+      "id": "arm_pockets_cap",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
+      "id": "arm_pockets_level",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
       "id": "arm_policy_at_head",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
@@ -1701,6 +1741,11 @@
       "id": "arm_records",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_refused",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "arm_regenerate_unclaimed",
@@ -1873,6 +1918,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "arm_template",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
       "id": "arm_two_kits",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -1916,6 +1966,11 @@
       "id": "arm_unreadable",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_up",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "arm_wall",
@@ -2911,6 +2966,11 @@
       "id": "build_exclude_plant",
       "kind": "function",
       "file": "tools/playbook/fixtures/row_kind.py"
+    },
+    {
+      "id": "build_fact_fixture",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "build_failure_detail",
@@ -6098,6 +6158,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "check_fact_row",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
       "id": "check_fact_value",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -6251,6 +6316,16 @@
       "id": "check_frozen",
       "kind": "function",
       "file": "tools/playbook/writing_practice.py"
+    },
+    {
+      "id": "check_fx_nothing",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
+      "id": "check_fx_quiet",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "check_gained_prune_vintage",
@@ -6686,6 +6761,11 @@
       "id": "check_key_read",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "check_kickoff_facts_step",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "check_kind_row",
@@ -9285,6 +9365,11 @@
     {
       "id": "cmd_down",
       "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
+      "id": "cmd_down",
+      "kind": "function",
       "file": "tools/govkit/steps/receipt_schema_4.py"
     },
     {
@@ -9585,6 +9670,11 @@
     {
       "id": "cmd_up",
       "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
+      "id": "cmd_up",
+      "kind": "function",
       "file": "tools/govkit/steps/receipt_schema_4.py"
     },
     {
@@ -9611,6 +9701,11 @@
       "id": "cmd_witness",
       "kind": "function",
       "file": "tools/govkit/steps/fanout_cap.py"
+    },
+    {
+      "id": "cmd_witness",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "cmd_witness",
@@ -10973,6 +11068,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "derive_fact_plan",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
       "id": "derive_fact_templates",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -10981,6 +11081,11 @@
       "id": "derive_facts",
       "kind": "function",
       "file": "tools/playbook/writing_practice.py"
+    },
+    {
+      "id": "derive_facts_bullet",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "derive_facts_path",
@@ -11171,6 +11276,11 @@
       "id": "derive_fx_row",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "derive_fx_rows",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "derive_fx_unit",
@@ -11526,6 +11636,11 @@
       "id": "derive_key_line",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "derive_kickoff_home",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "derive_kind_composition",
@@ -12101,6 +12216,11 @@
       "id": "derive_plant_state",
       "kind": "function",
       "file": "tools/loop/termination.py"
+    },
+    {
+      "id": "derive_pockets_block",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "derive_policy_adopter",
@@ -13406,6 +13526,11 @@
       "id": "derive_worktree_root",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_write_command",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "derive_yes_no",
@@ -15328,6 +15453,11 @@
       "file": "tools/govkit/steps/adopter_rules_to_overlay.py"
     },
     {
+      "id": "load_overlay",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
       "id": "load_owned_names",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
@@ -15451,6 +15581,11 @@
       "id": "load_steps",
       "kind": "function",
       "file": "tools/govkit/steps/fanout_cap.py"
+    },
+    {
+      "id": "load_steps",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "load_text",
@@ -15716,6 +15851,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/govkit/steps/fanout_cap.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "main",
@@ -17566,6 +17706,11 @@
       "id": "parse_edge_target",
       "kind": "function",
       "file": "tools/playbook/edge_grammar.py"
+    },
+    {
+      "id": "parse_fact_bullets",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "parse_file",
@@ -20523,6 +20668,26 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "read_fx_bullets",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
+      "id": "read_fx_card",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
+      "id": "read_fx_section",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
+      "id": "read_fx_units",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
       "id": "read_gate",
       "kind": "function",
       "file": "tools/check-install-prefix.test.sh"
@@ -20886,6 +21051,11 @@
       "id": "read_ih_facts",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_image_bullets",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "read_image_changes",
@@ -21436,6 +21606,11 @@
       "id": "read_manifest",
       "kind": "function",
       "file": "tools/run-gates/pass_legs.py"
+    },
+    {
+      "id": "read_manifest_path",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "read_manifest_tags",
@@ -23873,6 +24048,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "read_where",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
       "id": "read_wired",
       "kind": "function",
       "file": "tools/govkit/fixtures/retired_edits.py"
@@ -25561,6 +25741,11 @@
       "id": "render_loop_order",
       "kind": "function",
       "file": "tools/loop/composition.py"
+    },
+    {
+      "id": "render_manifest_facts",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "render_map_line",
@@ -29720,6 +29905,11 @@
     {
       "id": "run_fixture",
       "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
       "file": "tools/loop/factories.py"
     },
     {
@@ -29903,6 +30093,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "run_fx_card",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
       "id": "run_fx_check",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
@@ -29911,6 +30106,21 @@
       "id": "run_fx_drift",
       "kind": "function",
       "file": "tools/playbook/pins.py"
+    },
+    {
+      "id": "run_fx_git",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
+      "id": "run_fx_pockets",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
+      "id": "run_fx_step",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "run_fxgit",
@@ -30836,6 +31046,11 @@
       "id": "run_pm_decide",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "run_pockets",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "run_policy_cli",
@@ -36986,6 +37201,16 @@
       "id": "write_from_before_image",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "write_fx_commit",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
+      "id": "write_fx_units",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "write_gate_exit",

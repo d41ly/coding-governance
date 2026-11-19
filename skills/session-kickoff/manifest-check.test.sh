@@ -1343,7 +1343,9 @@ run_card "map block: no module replays at exit 0" "$R" 0 - --card --replay --ses
 check_replay "map block: no module" t79a "map — skipped: no playbook instruction map resolves in this tree"
 mkrepo mapcell; mp_kit=playbook; mp_mod="$R/$mp_kit/instruction_units.py"; mkdir -p "$R/$mp_kit"
 mp_two=$'[AGENTS.md · Level 0 · a stub map]\n[/AGENTS.md]'
-printf 'print("[AGENTS.md · Level 0 · a stub map]")\nprint("[/AGENTS.md]")\n' > "$mp_mod"
+# The stub prints for the `map` verb alone: a card write calls the `pockets` verb of the same module
+# (TOOL-dPlacedRequest-9 S4), and a stub printing for any argv would land its lines in that section.
+printf 'import sys\nif sys.argv[1:2] == ["map"]:\n    print("[AGENTS.md · Level 0 · a stub map]")\n    print("[/AGENTS.md]")\n' > "$mp_mod"
 commit_all "$R" "the stub instruction map"
 run_card "map block: the startup writer over a stub map" "$R" 0 - --card --write --session "$NONCE-t79b"
 check_eq "map block: the startup writer prints no map — line and no envelope line" "0" "$(grep -cE '^(map — |\[)' "$CARD_OUT")"
@@ -1360,6 +1362,26 @@ export CARD_MAP_BOUND=1
 run_card "map block: a map past the bound replays at exit 0" "$R" 0 - --card --replay --session "$NONCE-t79b"
 check_replay "map block: a map past the bound" t79b "map — skipped: the map did not answer within 1s"
 unset CARD_MAP_BOUND
+
+# TOOL-dPlacedRequest-9 AC5 — the card's `## pockets` section over a stub `pockets` verb the resolver finds
+# as the repo's one tracked `instruction_units.py`: the section sits immediately above `recent —` and the
+# room the verb is handed is the cap less the card's other parts, which the stub prints back; a stub that
+# exits 2 is one `pockets — skipped:` line in the section's place, and the card still writes. Staged red
+# by a stub that exits 2 under the first arm. WHAT THIS DOES NOT CHECK: the real verb's fit, which the
+# step's own `card` and `card-cap` fixture cases observe.
+mkrepo pockcell; pk_mod="$R/$mp_kit/instruction_units.py"; mkdir -p "$R/$mp_kit"
+printf 'import sys\nif sys.argv[1:2] == ["pockets"]:\n    print("## pockets")\n    print("- room " + sys.argv[sys.argv.index("--room") + 1])\n' > "$pk_mod"
+commit_all "$R" "the stub pockets verb"
+run_card "pockets: a card over a stub pockets verb" "$R" 0 - --card --write --session "$NONCE-t81a"
+pk_card="$R/.git/orientation/$NONCE-t81a.md"
+check_eq "pockets: the section sits immediately above recent —, handed the room the cap leaves" \
+  "## pockets|- room $(( 8192 - $(grep -v -e '^## pockets$' -e '^- room [0-9]*$' "$pk_card" | wc -c | tr -d '[:space:]') ))|recent —" \
+  "$(awk '/^## pockets$/{f=1} f{print} /^recent —/{exit}' "$pk_card" | tr '\n' '|' | sed 's/|$//')"
+printf 'import sys\nprint("pockets: refused · a stub refusal")\nsys.exit(2)\n' > "$pk_mod"
+run_card "pockets: a refusing verb still writes the card" "$R" 0 - --card --write --session "$NONCE-t81b"
+check_eq "pockets: the refusal is one skipped: line, immediately above recent —" \
+  "pockets — skipped: pockets: refused · a stub refusal|recent —" \
+  "$(awk '/^recent —/{print prev "|" $0; exit} {prev=$0}' "$R/.git/orientation/$NONCE-t81b.md")"
 
 # PLAY-dOrderedCharter-11 S5 — the injected load points measured at a card write: the playbook kit's
 # load_sets.py, found in gov as the checker finds every sibling and copied beside the fixture's root, over
@@ -1543,10 +1565,13 @@ printf 'nothing here\n%s\n' "$(render_ready_line "$wt_head")" | (cd "$CWT" && ba
 [ "$got" = 1 ] && grep -q 'DEAD PROBE' "$CARD_OUT" && { echo "ok   K2 AC3 a token-free body is DEAD PROBE, exit 1"; pass=$((pass+1)); } \
   || { echo "FAIL K2 AC3 a token-free body is DEAD PROBE, exit 1 (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
 check_card_unchanged "K2 AC3 the card is byte-identical after DEAD PROBE"
-# AC4 — the cap, forced to the card's own size plus a few bytes so any body that grows the card
-# overflows it; a no-READY body, because a real one replaces the tail and can shrink the card.
+# AC4 — the cap, forced to the card's own size plus a few bytes; a no-READY body, because a real one
+# replaces the tail and can shrink the card. Since TOOL-dPlacedRequest-9 an append refits the card's
+# `## pockets` section to the room the body leaves, so a short body now lands; this body is padded
+# past the card's own size, so the card's other parts pass the cap with no section at all.
 k2cap=$(( $(wc -c < "$K2CARD" | tr -d '[:space:]') + 8 ))
-printf '## open\n- `AGENTS.md:1`\n' | (cd "$CWT" && CARD_CAP_BYTES=$k2cap bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
+k2pad=$(printf '%*s' "$k2cap" '' | tr ' ' x)
+printf '## open\n- `AGENTS.md:1`\n%s\n' "$k2pad" | (cd "$CWT" && CARD_CAP_BYTES=$k2cap bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
 [ "$got" = 2 ] && grep -qE "the card would be [0-9]+ bytes, [0-9]+ over the $k2cap-byte cap" "$CARD_OUT" \
   && { echo "ok   K2 AC4 a body past CARD_CAP_BYTES is refused with exit 2 naming the overage"; pass=$((pass+1)); } \
   || { echo "FAIL K2 AC4 a body past CARD_CAP_BYTES is refused with exit 2 naming the overage (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
@@ -2252,7 +2277,8 @@ rm -f "$CWT/.unattended.conf"; unset CARD_OVERLAP_BOUND CARD_CLAIMS_BOUND
 # The log is the card clone's own `<common-dir>/health.log`, seeded here and removed after; nothing
 # else in this suite writes one. Stamps count back from one clock read: two events an hour old, one
 # thirty hours old (outside the 24-hour window), and one line of three fields. The cell is read as
-# the line DIRECTLY ABOVE `recent —`, the position the startup split needs. WHAT THIS DOES NOT CHECK:
+# the line DIRECTLY ABOVE the `## pockets` section, or above `recent —` where the card carries none
+# (TOOL-dPlacedRequest-9 S4 puts the section between them), the position the startup split needs. WHAT THIS DOES NOT CHECK:
 # any writer, whose own suite owns its call site, or the BSD `date -r` fallback no node here takes.
 HLOG="$CCLONE/.git/health.log"; HLNOW=$(date -u +%s)
 hl_h1=$(date -u -d "@$((HLNOW - 3600))" +%Y-%m-%dT%H:%M:%S+00:00)
@@ -2262,12 +2288,12 @@ printf '%s\tcheck-wiring\thookspath-set\tcore.hooksPath -> .githooks · mode ses
 run_card "AGH8 AC7 --card --write over a seeded health log" "$CWT" 0 - --card --write --session "$NONCE-h7"
 check_eq "AGH8 AC7 the health — line counts the window, names its kinds and the unreadable line, directly above recent —" \
   "health — 2 in the last 24h of 3 logged · check-wiring hookspath-set ×1 · run-gates retry-passed ×1 · 1 unreadable" \
-  "$(awk '/^recent —/{print prev; exit} {prev=$0}' "$CARD_HOME/$NONCE-h7.md")"
+  "$(awk '/^(## pockets$|pockets — skipped: |recent —)/{print prev; exit} {prev=$0}' "$CARD_HOME/$NONCE-h7.md")"
 rm -f "$HLOG"
 run_card "AGH8 AC8 --card --write with no health log" "$CWT" 0 - --card --write --session "$NONCE-h8"
 check_eq "AGH8 AC8 an absent log reads none recorded on the same line position, never a zero it did not read" \
   "health — none recorded: no health.log in the git common dir" \
-  "$(awk '/^recent —/{print prev; exit} {prev=$0}' "$CARD_HOME/$NONCE-h8.md")"
+  "$(awk '/^(## pockets$|pockets — skipped: |recent —)/{print prev; exit} {prev=$0}' "$CARD_HOME/$NONCE-h8.md")"
 
 # C12 — the manifest carries no CR byte. Round 3's M1: the §B bullet ABOUT raw CR bytes had its own
 # CR eaten twice by text-mode rewrites, leaving a sentence that said a newline becomes a newline.
@@ -2333,7 +2359,9 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # the block; no suite ran in the pass, the card's awk was probed alone over the stand-in's row.
 # +2: TOOL-dPlacedRequest-16 AC15's two `released` seeds, one run_card and one check_eq, counted off the
 # block; no suite ran in the pass, the card's awk was probed alone over nine rows.
-FLOOR_ASSERTIONS=352
+# +4: TOOL-dPlacedRequest-9 AC5's `## pockets` block, two run_card and two check_eq calls, counted off the
+# block; no suite ran in the pass, the card write was probed alone over a scratch fixture.
+FLOOR_ASSERTIONS=356
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

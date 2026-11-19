@@ -224,6 +224,9 @@ CARD_OVERLAP_ROWS=5
 # The replay's `map —` block's bound in seconds (PLAY-dOrderedCharter-4); the env override exists for
 # the self-test's slow-stub arm and is not an adopter knob.
 CARD_MAP_BOUND=${CARD_MAP_BOUND:-5}
+# The `## pockets` section's bound on the playbook kit's `pockets` verb, in seconds (TOOL-dPlacedRequest-9);
+# the env override exists for the self-test's slow-stub arm and is not an adopter knob.
+CARD_POCKETS_BOUND=${CARD_POCKETS_BOUND:-5}
 # The `cli —` cell's bound on `claude --version`, in seconds (KICK-aMendedFleet-4); the env override
 # exists for the self-test's slow-stub arm and is not an adopter knob.
 CARD_CLI_BOUND=${CARD_CLI_BOUND:-5}
@@ -792,7 +795,7 @@ derive_claims_line() {   # $1 = the writer verb → the cell's head line and its
 # and a truncated card would carry that error into every later reader.
 write_card() {
   local card bytes breach
-  card=$(render_card "$1")
+  card=$(render_card "$1" | derive_pockets_block)
   bytes=$(printf '%s\n' "$card" | wc -c | tr -d '[:space:]')
   if [ "$bytes" -gt "$CARD_CAP_BYTES" ]; then
     echo "MANIFEST env ERROR — the startup card is $bytes bytes, $((bytes - CARD_CAP_BYTES)) over the $CARD_CAP_BYTES-byte cap (CARD_CAP_BYTES); a bounded derivation overflowed, so nothing was written"
@@ -854,6 +857,54 @@ derive_map_block() {
   esac
   rm -f "$sf" 2>/dev/null
   return 0
+}
+
+# The card's `## pockets` section (TOOL-dPlacedRequest-9 S4): a composed card on stdin, printed with the
+# section fitted to the card's one cap. Any stored section, the run from a `## pockets` or `pockets —
+# skipped:` line up to the first `recent —` line, is taken out and the rest measured; the playbook kit's
+# `pockets` verb is handed the room the cap leaves and its lines go in immediately above `recent —`. The
+# verb is found as every sibling is, by `resolve_kit_file`, over the session's tree, and bounded as the
+# `overlaps —` cell bounds its read: a kill into a scratch file under the card dir, stdin /dev/null. Every
+# failure is one `pockets — skipped:` line, printed where it fits the room and omitted where it does not.
+# A card is never refused for its pockets: a card whose other parts leave no room carries no section.
+# WHAT THIS DOES NOT CHECK: the units' text, which is the verb's to compose, or the `injected — breach`
+# lines `write_card` appends after its cap check, which sit outside the room as they sit outside that check.
+derive_pockets_block() {
+  local rest bytes room iu py sf rc block=""
+  rest=$(awk '{ ln = $0; sub(/\r$/, "", ln) }
+    !seen && (ln ~ /^## pockets$/ || ln ~ /^pockets — skipped: /) { skip = 1 }
+    !seen && ln ~ /^recent —/ { seen = 1; skip = 0 }
+    !skip { print ln }')
+  bytes=$(printf '%s\n' "$rest" | wc -c | tr -d '[:space:]')
+  room=$((CARD_CAP_BYTES - bytes))
+  if [ "$room" -gt 0 ]; then
+    iu=$(resolve_kit_file playbook instruction_units.py)
+    if [ -z "$iu" ]; then
+      block='pockets — skipped: no playbook instruction_units.py resolves in this tree'
+    elif ! py=$(resolve_python 2>/dev/null); then
+      block='pockets — skipped: no Python resolves on this node'
+    elif ! timeout -k 1 5 true </dev/null >/dev/null 2>&1; then
+      block='pockets — skipped: this node has no working timeout -k, so the read would be unbounded and none ran'
+    elif ! sf=$(mkdir -p "$CARD_DIR" && mktemp "$CARD_DIR/.pockets.XXXXXX"); then
+      block="pockets — skipped: no scratch file under $CARD_DIR to capture the section in"
+    else
+      timeout -k 2 "$CARD_POCKETS_BOUND" "$py" "$iu" pockets --root "$CARD_TREE" --room "$room" </dev/null >"$sf" 2>/dev/null; rc=$?
+      case "$rc" in
+        0) block=$(tr -d '\r' < "$sf") ;;
+        124|137) block="pockets — skipped: the pockets verb did not answer within ${CARD_POCKETS_BOUND}s" ;;
+        *)
+          block=$(LC_ALL=C awk -v rc="$rc" '{ sub(/\r$/, "") }
+            NF && f == "" { f = $0 }
+            END { if (f == "") f = "the pockets verb exited " rc " and printed nothing"
+                  if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }
+                  print "pockets — skipped: " f }' "$sf") ;;
+      esac
+      rm -f "$sf" 2>/dev/null
+    fi
+    # Whatever printed it, a section or a skipped: line past the room is omitted, never cut.
+    [ -z "$block" ] || [ "$(printf '%s\n' "$block" | wc -c | tr -d '[:space:]')" -le "$room" ] || block=""
+  fi
+  printf '%s\n' "$rest" | PK_BLOCK="$block" awk '!done && /^recent —/ { if (ENVIRON["PK_BLOCK"] != "") print ENVIRON["PK_BLOCK"]; done = 1 } { print }'
 }
 
 # The instruction map first, so the harness's cut of a hook's output takes a card's tail and never the
@@ -930,6 +981,7 @@ print_rekeyed_card() {
     (h[1] in want) && h[2] == "—" && (h[1] in blk) { print blk[h[1]]; skip = 1; next }
     { print }' "$sd/fstartup" > "$sd/new"
   cat "$sd/tail" >> "$sd/new"
+  derive_pockets_block < "$sd/new" > "$sd/new.p" && mv "$sd/new.p" "$sd/new"   # TOOL-dPlacedRequest-9 S4
   bytes=$(wc -c < "$sd/new" | tr -d '[:space:]')
   if [ "$bytes" -gt "$CARD_CAP_BYTES" ]; then
     REPLAY_KEYS="keys view moved · not re-derived: over the cap · remote evidence"; cat "$CARD_FILE"
@@ -1617,6 +1669,8 @@ add_card_body() {
     fi
     { cat "$CARD_TMP/startup"; cat "$CARD_TMP/kept"; cat "$CARD_TMP/annotated"; grep "$CARD_READY_RE" "$CARD_TMP/tail"; } > "$CARD_TMP/new"
   fi
+  # The `## pockets` section refitted to the room this body leaves (TOOL-dPlacedRequest-9 S4).
+  derive_pockets_block < "$CARD_TMP/new" > "$CARD_TMP/new.p" && mv "$CARD_TMP/new.p" "$CARD_TMP/new"
   bytes=$(wc -c < "$CARD_TMP/new" | tr -d '[:space:]')
   if [ "$bytes" -gt "$CARD_CAP_BYTES" ]; then
     echo "MANIFEST env ERROR — the card would be $bytes bytes, $((bytes - CARD_CAP_BYTES)) over the $CARD_CAP_BYTES-byte cap (CARD_CAP_BYTES), so nothing was appended"; exit 2

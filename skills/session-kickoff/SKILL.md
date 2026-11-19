@@ -115,8 +115,10 @@ proceed unaudited and say so in one clause. Relay a version WARN without blockin
 On failures, repair NOW as part of kickoff (a ≤2-minute pass — a deep restructure becomes a
 flagged §A task instead) and STAGE it; Step 5 commits it after the append: for each file the
 drift check lists, re-check the §B claim(s) derived from it (gate fence ← CI/scripts · pointer
-map ← moved dirs · traps/corrections ← toolchain files), fix or DELETE stale rows, and delete
-dated entries whose prune-when condition now holds.
+map ← moved dirs · traps/corrections ← toolchain files): a §B fact that is a level-2 unit the card prints under
+`## pockets` is repaired by proposal, a stale one with `propose edit` and a missing one with
+`instructions_edit.py propose add --manifest overlay`; in the sub-sections that stay guide text, fix or DELETE
+stale rows, and delete dated entries whose prune-when condition now holds.
 Re-stamp `last-audit` (ISO datetime with offset · sha per the manifest's own stamp rule), and record
 `manifest-audit: delta <none|summary incl. deletions> · watch-commits-since-stamp: <n>`
 (n = `git rev-list --count <old-stamp-sha>..HEAD -- <watch…>`, counted BEFORE re-stamping) in the
