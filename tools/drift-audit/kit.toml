@@ -97,6 +97,7 @@ means = "adopted"
 tag = "leg.drift-audit.drift-audit-records"
 name = "drift-audit records"
 subject = "repo"
+purpose = "checks the repo's record of its state still matches reality"
 argv = ["python", "{kit}/drift_report.py", "--check"]
 guard = []
 history_depth = "full"
@@ -145,6 +146,7 @@ discharge = { command = ["bash", "-c", "python {kit}/drift_report.py --check"] }
 tag = "leg.drift-audit.drift-audit-wiring"
 name = "drift-audit wiring"
 subject = "repo"
+purpose = "checks the drift-audit kit's wiring has not drifted"
 argv = ["bash", "{kit}/adopt-drift-audit.sh", "--check"]
 guard = []
 stage = ["step.test"]

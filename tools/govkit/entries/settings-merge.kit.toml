@@ -67,6 +67,7 @@ the shipped engine DOES carry a check arm and this entry deliberately does not w
 tag = "leg.settings-merge.settings-merge-selftest"
 name = "settings-merge selftest"
 subject = "kit"
+purpose = "self-tests wiring a hook into a target's settings.json"
 argv = ["python3", "{prefix}/settings-merge.py", "--selftest"]
 guard = ["{prefix}/"]
 stage = ["step.test"]

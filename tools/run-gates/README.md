@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.51` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.52` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `<prefix>/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -966,7 +966,7 @@ turn a leg into a pass or a skip.
 install resolves it at any prefix. `GATE_LEGS` still outranks the derivation, which is the seam both
 harnesses drive so a nested run never re-enters the real bar.
 
-Leg-row keys: `argv`, `ceiling`, `chunk`, `doc_reads`, `enforces`, `guard`, `name`, `pack`, `pass_leg`, `reads`, `scope_of`, `signature`, `stage`, `subject`, `tag`, `tests`.
+Leg-row keys: `argv`, `ceiling`, `chunk`, `doc_reads`, `enforces`, `guard`, `name`, `pack`, `pass_leg`, `purpose`, `reads`, `scope_of`, `signature`, `stage`, `subject`, `tag`, `tests`.
 
 Each is a key some row of the manifest carries. `tag` is the leg's `leg.<owner>.<name>` tag in the
 leg namespace, beside its free-text `name`, which stays the key every file keyed by leg joins on;
@@ -975,7 +975,10 @@ tests (`feature.<f>`) and `enforces` the principles and practices it enforces; b
 the row's `tag`, read by the playbook kit's edge check (`edge_grammar.py --check`), declared on a claimed
 leg's descriptor row too, where govkit's selfcheck 7h holds the two equal, and neither travels into
 an adopter's manifest. The gov canary compares `tests` with the map dossiers' `gate-legs` claims in
-both directions (TOOL-dWitnessedBar-22).
+both directions (TOOL-dWitnessedBar-22). `purpose` says what the leg is for: one line of 1 to 60
+characters, no two legs sharing one, declared on a claimed leg's descriptor row too, where selfcheck 7h
+holds the two equal and grades presence and shape over every manifest row; it travels into an
+adopter's manifest from run-gates 1.52, `LEG_KEY_FLOORS["purpose"]` (TOOL-dWitnessedBar-19).
 
 The manifest does NOT travel. A target's leg list is emitted from the selected kits' `[[gate_leg]]`
 blocks; seeding an adopter with gov's leg names is the class

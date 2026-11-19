@@ -1781,6 +1781,45 @@ def check_benched_probe_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
           out_e[-1500:])
     for f, b in keep.items():
         f.write_bytes(b)
+    # Run h (TOOL-dWitnessedBar-19 AC2 AC3 AC4): 7h grades every manifest row's `purpose`. A 61-character
+    # purpose on the claimed leg's two rows reds the shape arm; an exempt leg given another's purpose reds
+    # uniqueness naming both; an exempt leg with none reds presence. Each reds its own line.
+    _pu = {x["name"]: x.get("purpose") for x in json.loads(man.read_text(encoding="utf-8"))}
+    _long = "x" * 61
+    write_staged(desc, f"purpose = {json.dumps(_pu[leg])}\n", f"purpose = {json.dumps(_long)}\n", "h1 descriptor")
+    write_staged(man, f'"purpose": {json.dumps(_pu[leg])},', f'"purpose": {json.dumps(_long)},', "h1 manifest")
+    _a, _b, _c = "charter size", "template size <=48KiB", "build-method size"
+    write_staged(man, f'"purpose": {json.dumps(_pu[_b])},', f'"purpose": {json.dumps(_pu[_a])},', "h2 shared")
+    write_staged(man, f'    "purpose": {json.dumps(_pu[_c])},\n', "", "h3 exempt none")
+    rh = run_selfcheck(gcopy)
+    out_h = rh.stdout + rh.stderr
+    check("[dWB-19] h1: 7h reds a 61-character purpose, naming the leg and the shape arm",
+          rh.returncode != 0 and check_line(out_h, f"gate leg '{leg}'", "61 characters", "shape arm"), out_h[-1500:])
+    check("[dWB-19] h2: 7h reds two legs sharing one purpose, naming both",
+          check_line(out_h, repr(_a), repr(_b), "share the purpose"), out_h[-1500:])
+    check("[dWB-19] h3: 7h reds an exempt leg with no purpose, naming it and the presence arm",
+          check_line(out_h, f"gate leg '{_c}' carries no `purpose`", "presence arm"), out_h[-1500:])
+    for f, b in keep.items():
+        f.write_bytes(b)
+    # Run i (TOOL-dWitnessedBar-19 AC2 AC6): sixty CHARACTERS holding a multibyte one are inside the bound,
+    # so the shape arm is silent on them; a descriptor purpose its manifest row does not hold reds the
+    # agreement arm, naming the leg and both values.
+    _sixty = "é" * 60
+    write_staged(desc, f"purpose = {json.dumps(_pu[leg])}\n", f"purpose = {json.dumps(_sixty, ensure_ascii=False)}\n",
+                 "i1 descriptor")
+    write_staged(man, f'"purpose": {json.dumps(_pu[leg])},', f'"purpose": {json.dumps(_sixty)},', "i1 manifest")
+    _d = "pre-push bar self-test"
+    write_staged(desc, f"purpose = {json.dumps(_pu[_d])}\n", 'purpose = "drifted from the manifest"\n', "i2 agreement")
+    ri = run_selfcheck(gcopy)
+    out_i = ri.stdout + ri.stderr
+    check("[dWB-19] i1: 7h is silent on a 60-character purpose holding a multibyte character",
+          not check_line(out_i, f"gate leg '{leg}'", "shape arm"), out_i[-1500:])
+    check("[dWB-19] i2: 7h reds a descriptor purpose its manifest row does not hold, naming the leg and both",
+          ri.returncode != 0 and check_line(out_i, "entry 'push-main'", f"gate leg '{_d}' with purpose "
+                                            "'drifted from the manifest'", f"says {_pu[_d]!r}",
+                                            "agreement arm"), out_i[-1500:])
+    for f, b in keep.items():
+        f.write_bytes(b)
     # Run 3 (c, H-L1): no manifest. 7h's block is skipped, so 7j4 must still answer for itself, and
     # with the dead pre-initialisation gone a reader outside its own guard would raise here.
     man.unlink()
@@ -2782,6 +2821,16 @@ def check_ceiling_emission(tmp: pathlib.Path) -> None:
                                             floor=gk.LEG_KEY_FLOORS["tag"]) is want, ver)
     check("TG1: the manifest writer routes the tag through its row of LEG_KEY_FLOORS",
           'floor=LEG_KEY_FLOORS["tag"])' in GOVKIT.read_text(encoding="utf-8"), "")
+    # TOOL-dWitnessedBar-19 AC8: the purpose's row of LEG_KEY_FLOORS, the same pair, and the writer reads it.
+    _fl = gk.LEG_KEY_FLOORS["purpose"]
+    for ver, want in ((".".join(map(str, _fl[:-1] + (_fl[-1] - 1,))), False), (".".join(map(str, _fl)), True)):
+        _rgs.write_text(f"#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION={ver}\n",
+                        encoding="utf-8", newline="\n")
+        check(f"PU1: a target at run-gates {ver} {'gets' if want else 'does not get'} a purpose",
+              gk.check_target_reads_subject(_rg, {"prefix": PFX[:-1]},
+                                            floor=gk.LEG_KEY_FLOORS["purpose"]) is want, ver)
+    check("PU1: the manifest writer routes the purpose through its row of LEG_KEY_FLOORS",
+          'floor=LEG_KEY_FLOORS["purpose"])' in GOVKIT.read_text(encoding="utf-8"), "")
 
     # AC1/AC3: an applied push-main carries 1780 on the declaring leg, row and receipt, and no other.
     t = tmp / "ceiling-install"

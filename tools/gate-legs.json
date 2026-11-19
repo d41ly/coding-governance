@@ -3,6 +3,8 @@
     "name": "kickoff-manifest ratchet",
     "pass_leg": true,
     "tag": "leg.kickoff-manifest.kickoff-manifest-ratchet",
+    "purpose": "verifies the kickoff manifest against mechanical signals",
+    "purpose": "verifies the kickoff manifest against mechanical signals",
     "argv": [
       "bash",
       "skills/session-kickoff/manifest-check.sh"
@@ -16,6 +18,8 @@
   {
     "name": "template size <=48KiB",
     "tag": "leg.gov.template-size-48kib",
+    "purpose": "caps the charter template's bytes at its declared ceiling",
+    "purpose": "caps the charter template's bytes at its declared ceiling",
     "argv": [
       "bash",
       "{prefix}/check-template-size.sh"
@@ -29,6 +33,8 @@
     "name": "charter size",
     "tag": "leg.gov.charter-size",
     "tests": ["feature.playbook"],
+    "purpose": "caps the charter's bytes at its declared ceiling",
+    "purpose": "caps the charter's bytes at its declared ceiling",
     "argv": [
       "bash",
       "{prefix}/check-template-size.sh",
@@ -43,6 +49,8 @@
     "name": "micro-format definitions",
     "tag": "leg.check-microformats.micro-format-definitions",
     "tests": ["feature.playbook"],
+    "purpose": "grades the charter's micro-format definitions by grammar",
+    "purpose": "grades the charter's micro-format definitions by grammar",
     "argv": [
       "bash",
       "{prefix}/check-microformats.sh"
@@ -56,6 +64,8 @@
     "name": "micro-format gate selftest",
     "tag": "leg.check-microformats.micro-format-gate-selftest",
     "tests": ["feature.playbook"],
+    "purpose": "observes the micro-format gate's failing case per predicate",
+    "purpose": "observes the micro-format gate's failing case per predicate",
     "argv": [
       "bash",
       "{prefix}/check-microformats.test.sh"
@@ -73,6 +83,8 @@
     "name": "line length",
     "tag": "leg.check-line-length.line-length",
     "tests": ["feature.playbook"],
+    "purpose": "holds agent-instruction prose to a declared line length",
+    "purpose": "holds agent-instruction prose to a declared line length",
     "argv": [
       "bash",
       "{prefix}/check-line-length.sh"
@@ -86,6 +98,8 @@
     "name": "line-length gate selftest",
     "tag": "leg.gov.line-length-gate-selftest",
     "tests": ["feature.playbook"],
+    "purpose": "observes the line-length gate's failing case per branch",
+    "purpose": "observes the line-length gate's failing case per branch",
     "argv": [
       "bash",
       "{prefix}/check-line-length.test.sh"
@@ -104,6 +118,8 @@
     "pass_leg": true,
     "tag": "leg.gov.playbook-parity",
     "tests": ["feature.playbook"],
+    "purpose": "runs the charter's parity gate over its stated values",
+    "purpose": "runs the charter's parity gate over its stated values",
     "argv": [
       "python",
       "{prefix}/playbook/render_playbook.py",
@@ -126,6 +142,8 @@
       "{prefix}/playbook-kit-waivers.txt",
       "{prefix}/workflows/check-verifier-fanout.js"
     ],
+    "purpose": "self-tests the playbook parity check",
+    "purpose": "self-tests the playbook parity check",
     "argv": [
       "bash",
       "{prefix}/check-playbook-parity.test.sh"
@@ -139,6 +157,8 @@
     "name": "template size gate selftest",
     "tag": "leg.gov.template-size-gate-selftest",
     "tests": ["feature.playbook"],
+    "purpose": "self-tests the template size gate",
+    "purpose": "self-tests the template size gate",
     "argv": [
       "bash",
       "{prefix}/check-template-size.test.sh"
@@ -152,6 +172,8 @@
     "name": "build-method size",
     "tag": "leg.gov.build-method-size",
     "tests": ["feature.build-method"],
+    "purpose": "caps the build method's bytes at its declared ceiling",
+    "purpose": "caps the build method's bytes at its declared ceiling",
     "argv": [
       "bash",
       "{prefix}/check-template-size.sh",
@@ -167,6 +189,8 @@
     "pass_leg": true,
     "tag": "leg.gov.unattended-protocol-size",
     "tests": ["feature.unattended"],
+    "purpose": "caps the unattended protocol's bytes at its declared ceiling",
+    "purpose": "caps the unattended protocol's bytes at its declared ceiling",
     "argv": [
       "bash",
       "{prefix}/check-template-size.sh",
@@ -181,6 +205,8 @@
     "name": "unattended skill size",
     "tag": "leg.gov.unattended-skill-size",
     "tests": ["feature.unattended"],
+    "purpose": "caps the unattended skill's bytes at its declared ceiling",
+    "purpose": "caps the unattended skill's bytes at its declared ceiling",
     "argv": [
       "bash",
       "{prefix}/check-template-size.sh",
@@ -195,6 +221,8 @@
     "name": "kickoff engine size <=18KiB",
     "tag": "leg.gov.kickoff-engine-size-18kib",
     "tests": ["feature.session-kickoff"],
+    "purpose": "caps the kickoff engine's bytes at its declared ceiling",
+    "purpose": "caps the kickoff engine's bytes at its declared ceiling",
     "argv": [
       "bash",
       "{prefix}/check-template-size.sh",
@@ -210,6 +238,8 @@
     "pass_leg": true,
     "tag": "leg.gate-lint.shell-hygiene-a-loop-fed-by-a-command-substitution",
     "tests": ["feature.gate-lint"],
+    "purpose": "catches a loop fed by a command substitution in a shell file",
+    "purpose": "catches a loop fed by a command substitution in a shell file",
     "argv": [
       "python3",
       "{prefix}/gate-lint/sh_hygiene.py",
@@ -224,6 +254,8 @@
     "name": "shell hygiene (a location probe asked from a moved directory)",
     "tag": "leg.gate-lint.shell-hygiene-a-location-probe-asked-from-a-moved",
     "tests": ["feature.gate-lint"],
+    "purpose": "catches a location probe asked from a moved directory",
+    "purpose": "catches a location probe asked from a moved directory",
     "argv": [
       "python3",
       "{prefix}/gate-lint/sh_hygiene.py",
@@ -242,6 +274,8 @@
     "name": "shell hygiene (a fork spent on builtin work)",
     "tag": "leg.gate-lint.shell-hygiene-a-fork-spent-on-builtin-work",
     "tests": ["feature.gate-lint"],
+    "purpose": "catches a fork spent on builtin work in a shell file",
+    "purpose": "catches a fork spent on builtin work in a shell file",
     "argv": [
       "python3",
       "{prefix}/gate-lint/sh_hygiene.py",
@@ -260,6 +294,8 @@
     "name": "shell hygiene (a fixed-name temp renamed into place)",
     "tag": "leg.gate-lint.shell-hygiene-a-fixed-name-temp-renamed-into-place",
     "tests": ["feature.gate-lint"],
+    "purpose": "catches a fixed-name temp renamed into place in a shell file",
+    "purpose": "catches a fixed-name temp renamed into place in a shell file",
     "argv": [
       "python3",
       "{prefix}/gate-lint/sh_hygiene.py",
@@ -279,6 +315,8 @@
     "name": "spawn budget (forks per hot entrypoint)",
     "tag": "leg.gov.spawn-budget-forks-per-hot-entrypoint",
     "tests": ["feature.gate-lint"],
+    "purpose": "caps the forks per hot entrypoint at a shrink-only ceiling",
+    "purpose": "caps the forks per hot entrypoint at a shrink-only ceiling",
     "argv": [
       "bash",
       "{prefix}/gate-lint/fork-count.sh",
@@ -294,6 +332,8 @@
     "name": "shell-hygiene selftest",
     "tag": "leg.gate-lint.shell-hygiene-selftest",
     "tests": ["feature.gate-lint"],
+    "purpose": "stages breaks into a copy of the shell-hygiene scanner",
+    "purpose": "stages breaks into a copy of the shell-hygiene scanner",
     "argv": [
       "python3",
       "{prefix}/gate-lint/sh_hygiene.py",
@@ -312,6 +352,8 @@
     "pass_leg": true,
     "tag": "leg.gov.encoding-posture-text-io-names-its-encoding",
     "tests": ["feature.gate-lint"],
+    "purpose": "catches Python text IO that does not name its encoding",
+    "purpose": "catches Python text IO that does not name its encoding",
     "argv": [
       "python3",
       "{prefix}/gate-lint/encoding_posture.py",
@@ -330,6 +372,8 @@
     "name": "kit version markers",
     "tag": "leg.check-kit-versions.kit-version-markers",
     "tests": ["feature.memory-tree-hygiene"],
+    "purpose": "checks every kit carries a well-formed version constant",
+    "purpose": "checks every kit carries a well-formed version constant",
     "argv": [
       "bash",
       "{prefix}/check-kit-versions.sh"
@@ -345,6 +389,8 @@
     "pass_leg": true,
     "tag": "leg.memory-tree.verdict-epoch-kit-version-dates-the-engine",
     "tests": ["feature.memory-tree-hygiene"],
+    "purpose": "requires the version that dates the engine to move with it",
+    "purpose": "requires the version that dates the engine to move with it",
     "argv": [
       "bash",
       "{prefix}/memory-tree/check-verdict-epoch.sh"
@@ -359,6 +405,8 @@
     "name": "verdict-epoch self-test",
     "tag": "leg.gov.verdict-epoch-self-test",
     "tests": ["feature.memory-tree-hygiene"],
+    "purpose": "self-tests the verdict-epoch check in throwaway repos",
+    "purpose": "self-tests the verdict-epoch check in throwaway repos",
     "argv": [
       "bash",
       "{prefix}/memory-tree/check-verdict-epoch.test.sh"
@@ -376,6 +424,8 @@
     "name": "agent-instructions wiring",
     "tag": "leg.gov.agent-instructions-wiring",
     "tests": ["feature.playbook"],
+    "purpose": "compares the rendered CLAUDE.md entry file with its render",
+    "purpose": "compares the rendered CLAUDE.md entry file with its render",
     "argv": [
       "python",
       "{prefix}/playbook/render_playbook.py",
@@ -393,6 +443,8 @@
   {
     "name": "manifest-check self-test",
     "tag": "leg.gov.manifest-check-self-test",
+    "purpose": "runs the kickoff manifest check's scenario suite",
+    "purpose": "runs the kickoff manifest check's scenario suite",
     "argv": [
       "bash",
       "skills/session-kickoff/manifest-check.test.sh"
@@ -409,6 +461,8 @@
   {
     "name": "python resolver (behaviour + inline parity + idiom ban)",
     "tag": "leg.gov.python-resolver-behaviour-inline-parity-idiom-ban",
+    "purpose": "tests the python resolver's behaviour, inline parity and ban",
+    "purpose": "tests the python resolver's behaviour, inline parity and ban",
     "argv": [
       "bash",
       "{prefix}/lib/resolve-python.test.sh"
@@ -428,6 +482,8 @@
     "name": "agent-cap self-test",
     "tag": "leg.gov.agent-cap-self-test",
     "tests": ["feature.agent-cap"],
+    "purpose": "tests the agent-cap guard on Workflow and Agent tool calls",
+    "purpose": "tests the agent-cap guard on Workflow and Agent tool calls",
     "argv": [
       "bash",
       "{prefix}/hooks/agent-cap.test.sh"
@@ -446,6 +502,8 @@
     "name": "scratch-guard self-test",
     "tag": "leg.gov.scratch-guard-self-test",
     "tests": ["feature.agent-cap"],
+    "purpose": "tests the guard that keeps agent scratch out of home",
+    "purpose": "tests the guard that keeps agent scratch out of home",
     "argv": [
       "bash",
       "{prefix}/hooks/scratch-guard.test.sh"
@@ -466,6 +524,8 @@
     "name": "format-guard self-test",
     "tag": "leg.gov.format-guard-self-test",
     "tests": ["feature.agent-cap"],
+    "purpose": "tests the hook refusing a final message without its format",
+    "purpose": "tests the hook refusing a final message without its format",
     "argv": [
       "bash",
       "{prefix}/hooks/format-guard.test.sh"
@@ -488,6 +548,8 @@
     "name": "memory-hygiene self-test",
     "tag": "leg.gov.memory-hygiene-self-test",
     "tests": ["feature.memory-tree-hygiene"],
+    "purpose": "fixture-tests the memory hygiene checks and empty guard",
+    "purpose": "fixture-tests the memory hygiene checks and empty guard",
     "argv": [
       "bash",
       "{prefix}/memory-tree/check-memory-hygiene.test.sh"
@@ -506,6 +568,8 @@
     "name": "row-driver view refusal",
     "tag": "leg.gov.row-driver-view-refusal",
     "tests": ["feature.memory-tree-merge-driver"],
+    "purpose": "asserts governed paths resolve merge=rows and views refuse",
+    "purpose": "asserts governed paths resolve merge=rows and views refuse",
     "argv": [
       "python3",
       "{prefix}/memory-tree/merge-rows.py",
@@ -520,6 +584,8 @@
     "name": "row-keyed merge driver replay",
     "tag": "leg.gov.row-keyed-merge-driver-replay",
     "tests": ["feature.memory-tree-merge-driver"],
+    "purpose": "replays fixtures through the row-keyed merge driver",
+    "purpose": "replays fixtures through the row-keyed merge driver",
     "argv": [
       "bash",
       "{prefix}/memory-tree/merge-rows.test.sh"
@@ -538,6 +604,8 @@
     "name": "kit/dogfood doc parity",
     "tag": "leg.memory-tree.kit-dogfood-doc-parity",
     "tests": ["feature.memory-tree-hygiene"],
+    "purpose": "holds the memory-tree kit's shipped docs equal to live ones",
+    "purpose": "holds the memory-tree kit's shipped docs equal to live ones",
     "argv": [
       "bash",
       "{prefix}/memory-tree/kit-dogfood-parity.test.sh"
@@ -561,6 +629,8 @@
     "pass_leg": true,
     "tag": "leg.memory-tree.method-carriers-every-pointer-declared",
     "tests": ["feature.build-method"],
+    "purpose": "requires every pointer at the build method to be declared",
+    "purpose": "requires every pointer at the build method to be declared",
     "argv": [
       "bash",
       "{prefix}/memory-tree/check-method-carriers.sh"
@@ -574,6 +644,8 @@
     "name": "method-carriers self-test",
     "tag": "leg.gov.method-carriers-self-test",
     "tests": ["feature.build-method"],
+    "purpose": "self-tests the method-carrier gate in a scratch repo",
+    "purpose": "self-tests the method-carrier gate in a scratch repo",
     "argv": [
       "bash",
       "{prefix}/memory-tree/check-method-carriers.test.sh"
@@ -586,6 +658,8 @@
   {
     "name": "build-index selftest",
     "tag": "leg.memory-tree.build-index-selftest",
+    "purpose": "self-tests the generated build index",
+    "purpose": "self-tests the generated build index",
     "argv": [
       "python3",
       "{prefix}/memory-tree/gen_build_index.py",
@@ -608,6 +682,8 @@
     "pass_leg": true,
     "tag": "leg.memory-tree.build-readme-slot-contract",
     "tests": ["feature.build-readme-surface"],
+    "purpose": "grades each build README's slot contract and heading canon",
+    "purpose": "grades each build README's slot contract and heading canon",
     "argv": [
       "python3",
       "{prefix}/memory-tree/gen_build_index.py",
@@ -621,6 +697,8 @@
   {
     "name": "corpus-ids selftest",
     "tag": "leg.memory-tree.corpus-ids-selftest",
+    "purpose": "self-tests the corpus's id and path classifier",
+    "purpose": "self-tests the corpus's id and path classifier",
     "argv": [
       "python3",
       "{prefix}/memory-tree/corpus_ids.py",
@@ -638,6 +716,8 @@
   {
     "name": "gotchas selftest",
     "tag": "leg.memory-tree.gotchas-selftest",
+    "purpose": "self-tests the bug-class index and its per-diff checklist",
+    "purpose": "self-tests the bug-class index and its per-diff checklist",
     "argv": [
       "python3",
       "{prefix}/memory-tree/gotchas.py",
@@ -658,6 +738,8 @@
     "name": "routed-commits selftest",
     "tag": "leg.memory-tree.routed-commits-selftest",
     "tests": ["feature.memory-tree-hygiene"],
+    "purpose": "self-tests the check that routed commits name a unit",
+    "purpose": "self-tests the check that routed commits name a unit",
     "argv": [
       "python3",
       "{prefix}/memory-tree/routed_commits.py",
@@ -678,6 +760,8 @@
     "name": "row-grammar selftest",
     "tag": "leg.memory-tree.row-grammar-selftest",
     "tests": ["feature.row-grammar"],
+    "purpose": "self-tests the row-document grammar and id-collision check",
+    "purpose": "self-tests the row-document grammar and id-collision check",
     "argv": [
       "python3",
       "{prefix}/memory-tree/row_grammar.py",
@@ -696,6 +780,8 @@
     "name": "backlog migration selftest",
     "tag": "leg.memory-tree.backlog-migration-selftest",
     "tests": ["feature.memory-tree-hygiene"],
+    "purpose": "runs the backlog migration planner's suite",
+    "purpose": "runs the backlog migration planner's suite",
     "argv": [
       "python3",
       "{prefix}/memory-tree/migrate_backlog.py",
@@ -714,6 +800,8 @@
     "name": "harness arms (fail branches armed or pinned)",
     "pass_leg": true,
     "tag": "leg.memory-tree.harness-arms-fail-branches-armed-or-pinned",
+    "purpose": "requires each harness fail branch to be armed or pinned",
+    "purpose": "requires each harness fail branch to be armed or pinned",
     "argv": [
       "python3",
       "{prefix}/memory-tree/check-arms.py",
@@ -727,6 +815,8 @@
   {
     "name": "check-arms selftest",
     "tag": "leg.memory-tree.check-arms-selftest",
+    "purpose": "self-tests the harness arms meta-gate",
+    "purpose": "self-tests the harness arms meta-gate",
     "argv": [
       "python3",
       "{prefix}/memory-tree/check-arms.py",
@@ -744,6 +834,8 @@
   {
     "name": "branch-guard self-test",
     "tag": "leg.gov.branch-guard-self-test",
+    "purpose": "tests the pre-commit branch guard in a throwaway repo",
+    "purpose": "tests the pre-commit branch guard in a throwaway repo",
     "argv": [
       "bash",
       ".githooks/pre-commit.test.sh"
@@ -762,6 +854,8 @@
     "name": "pre-push self-test",
     "tag": "leg.push-main.pre-push-self-test",
     "tests": ["feature.push-main"],
+    "purpose": "drives a real push through the pre-push hook",
+    "purpose": "drives a real push through the pre-push hook",
     "argv": [
       "bash",
       ".githooks/pre-push.test.sh"
@@ -779,6 +873,8 @@
     "name": "pre-push run-log line",
     "tag": "leg.gov.pre-push-run-log-line",
     "tests": ["feature.runlog"],
+    "purpose": "observes the pre-push hook's run-log lines from outside",
+    "purpose": "observes the pre-push hook's run-log lines from outside",
     "argv": [
       "bash",
       ".githooks/pre-push.runlog.test.sh"
@@ -797,6 +893,8 @@
     "name": "pre-push bar self-test",
     "tag": "leg.push-main.pre-push-bar-self-test",
     "tests": ["feature.run-gates"],
+    "purpose": "re-disables pre-push bar arms in a copy, sees evasions land",
+    "purpose": "re-disables pre-push bar arms in a copy, sees evasions land",
     "argv": [
       "python3",
       ".githooks/pre_push_bar_selftest.py"
@@ -813,6 +911,8 @@
     "name": "push-main self-test",
     "tag": "leg.push-main.push-main-self-test",
     "tests": ["feature.push-main"],
+    "purpose": "proves the lander and the pre-push marker gate",
+    "purpose": "proves the lander and the pre-push marker gate",
     "argv": [
       "bash",
       "{prefix}/push-main.test.sh"
@@ -830,6 +930,8 @@
   {
     "name": "check-wiring self-test",
     "tag": "leg.check-wiring.check-wiring-self-test",
+    "purpose": "tests the wiring checker's wired and unwired detection",
+    "purpose": "tests the wiring checker's wired and unwired detection",
     "argv": [
       "bash",
       "{prefix}/check-wiring.test.sh"
@@ -848,6 +950,8 @@
     "name": "verifier fan-out self-test",
     "tag": "leg.gov.verifier-fan-out-self-test",
     "tests": ["feature.agent-cap"],
+    "purpose": "self-tests the verifier fan-out gate and its rule",
+    "purpose": "self-tests the verifier fan-out gate and its rule",
     "argv": [
       "bash",
       "{prefix}/workflows/check-verifier-fanout.test.sh"
@@ -866,6 +970,8 @@
     "name": "review-protocol parity (kit vs dogfood)",
     "tag": "leg.review-harness.review-protocol-parity-kit-vs-dogfood",
     "tests": ["feature.agent-cap"],
+    "purpose": "holds each review kit render equal to its dogfood copy",
+    "purpose": "holds each review kit render equal to its dogfood copy",
     "argv": [
       "bash",
       "{prefix}/workflows/check-protocol-parity.test.sh"
@@ -880,6 +986,8 @@
     "name": "review-join ban (no ref-keyed join)",
     "tag": "leg.review-harness.review-join-ban-no-ref-keyed-join",
     "tests": ["feature.review-harnesses"],
+    "purpose": "bans a ref-keyed verdict join in a workflow script",
+    "purpose": "bans a ref-keyed verdict join in a workflow script",
     "argv": [
       "bash",
       "{prefix}/workflows/check-review-join.sh"
@@ -893,6 +1001,8 @@
     "name": "workflow script syntax",
     "tag": "leg.review-harness.workflow-script-syntax",
     "tests": ["feature.review-harnesses"],
+    "purpose": "parses every workflow script in its runtime's dialect",
+    "purpose": "parses every workflow script in its runtime's dialect",
     "argv": [
       "node",
       "{prefix}/workflows/check-workflow-syntax.js"
@@ -906,6 +1016,8 @@
     "name": "tier2-review self-test",
     "tag": "leg.gov.tier2-review-self-test",
     "tests": ["feature.review-harnesses"],
+    "purpose": "tests the review harness's argument and durability contracts",
+    "purpose": "tests the review harness's argument and durability contracts",
     "argv": [
       "bash",
       "{prefix}/workflows/tier2-review.test.sh"
@@ -924,6 +1036,8 @@
     "name": "unattended-build self-test",
     "tag": "leg.gov.unattended-build-self-test",
     "tests": ["feature.review-harnesses"],
+    "purpose": "arms the unattended build harness",
+    "purpose": "arms the unattended build harness",
     "argv": [
       "bash",
       "{prefix}/workflows/unattended-build.test.sh"
@@ -940,6 +1054,8 @@
     "name": "review-join self-test",
     "tag": "leg.gov.review-join-self-test",
     "tests": ["feature.review-harnesses"],
+    "purpose": "self-tests the review-join ban and workflow syntax gates",
+    "purpose": "self-tests the review-join ban and workflow syntax gates",
     "argv": [
       "bash",
       "{prefix}/workflows/check-review-join.test.sh"
@@ -958,6 +1074,8 @@
     "name": "spec-audit opt-in pack self-test",
     "tag": "leg.gov.spec-audit-opt-in-pack-self-test",
     "tests": ["feature.review-harnesses"],
+    "purpose": "tests the review kit's spec-audit opt-in pack",
+    "purpose": "tests the review kit's spec-audit opt-in pack",
     "argv": [
       "bash",
       "{prefix}/workflows/spec-audit-optin.test.sh"
@@ -971,6 +1089,8 @@
     "name": "review-replay selftest",
     "tag": "leg.review-harness.review-replay-selftest",
     "tests": ["feature.review-harnesses"],
+    "purpose": "self-tests the review replay tool",
+    "purpose": "self-tests the review replay tool",
     "argv": [
       "python3",
       "{prefix}/workflows/review_replay.py",
@@ -984,6 +1104,8 @@
   {
     "name": "pytest-guardrails self-test",
     "tag": "leg.gov.pytest-guardrails-self-test",
+    "purpose": "statically checks the pytest parallel guardrails kit",
+    "purpose": "statically checks the pytest parallel guardrails kit",
     "argv": [
       "bash",
       "{prefix}/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh"
@@ -1001,6 +1123,8 @@
     "name": "codebase-map kit selftest",
     "tag": "leg.gov.codebase-map-kit-selftest",
     "tests": ["feature.codebase-map"],
+    "purpose": "exercises the codebase-map engine with fixtures",
+    "purpose": "exercises the codebase-map engine with fixtures",
     "argv": [
       "python3",
       "{prefix}/codebase-map/selftest.py"
@@ -1020,6 +1144,8 @@
     "name": "codebase-map gate coverage",
     "tag": "leg.codebase-map.codebase-map-gate-coverage",
     "tests": ["feature.codebase-map"],
+    "purpose": "checks the installed map gate compares every artifact",
+    "purpose": "checks the installed map gate compares every artifact",
     "argv": [
       "python3",
       "{prefix}/codebase-map/check_gate_coverage.py"
@@ -1039,6 +1165,8 @@
     "pass_leg": true,
     "tag": "leg.codebase-map.codebase-map-coverage-freshness",
     "tests": ["feature.codebase-map"],
+    "purpose": "grades the codebase map's coverage and freshness",
+    "purpose": "grades the codebase map's coverage and freshness",
     "argv": [
       "python3",
       "{prefix}/codebase-map/test_codebase_map.py"
@@ -1053,6 +1181,8 @@
     "name": "codebase-map adopter e2e",
     "tag": "leg.gov.codebase-map-adopter-e2e",
     "tests": ["feature.codebase-map"],
+    "purpose": "tests the codebase-map adopter end to end",
+    "purpose": "tests the codebase-map adopter end to end",
     "argv": [
       "bash",
       "{prefix}/codebase-map/adopt-codebase-map.test.sh"
@@ -1069,6 +1199,8 @@
   {
     "name": "settings-merge selftest",
     "tag": "leg.settings-merge.settings-merge-selftest",
+    "purpose": "self-tests wiring a hook into a target's settings.json",
+    "purpose": "self-tests wiring a hook into a target's settings.json",
     "argv": [
       "python3",
       "{prefix}/settings-merge.py",
@@ -1087,6 +1219,8 @@
     "name": "memory-recall kit selftest",
     "tag": "leg.gov.memory-recall-kit-selftest",
     "tests": ["feature.memory-recall"],
+    "purpose": "tests the memory-recall kit's own contract",
+    "purpose": "tests the memory-recall kit's own contract",
     "argv": [
       "python3",
       "{prefix}/memory-recall/selftest.py"
@@ -1109,6 +1243,8 @@
     "name": "recall floor",
     "tag": "leg.gov.recall-floor",
     "tests": ["feature.memory-recall"],
+    "purpose": "grades the committed question set against the recall floor",
+    "purpose": "grades the committed question set against the recall floor",
     "argv": [
       "python3",
       "{prefix}/memory-recall/check-recall.py"
@@ -1132,6 +1268,8 @@
     "name": "recall floor arms",
     "tag": "leg.gov.recall-floor-arms",
     "tests": ["feature.memory-recall"],
+    "purpose": "arms the recall floor check per degradation row",
+    "purpose": "arms the recall floor check per degradation row",
     "argv": [
       "python3",
       "{prefix}/memory-recall/test_recall_floor.py"
@@ -1155,6 +1293,8 @@
     "name": "memory-recall skill wiring",
     "tag": "leg.memory-recall.memory-recall-skill-wiring",
     "tests": ["feature.memory-recall"],
+    "purpose": "checks the memory-recall Skill has not drifted",
+    "purpose": "checks the memory-recall Skill has not drifted",
     "argv": [
       "bash",
       "{prefix}/memory-recall/adopt-memory-recall.sh",
@@ -1168,6 +1308,8 @@
   {
     "name": "drift-audit selftest",
     "tag": "leg.gov.drift-audit-selftest",
+    "purpose": "tests that the drift-audit kit can fail",
+    "purpose": "tests that the drift-audit kit can fail",
     "argv": [
       "python",
       "{prefix}/drift-audit/selftest.py"
@@ -1192,6 +1334,8 @@
   {
     "name": "drift-audit wiring",
     "tag": "leg.drift-audit.drift-audit-wiring",
+    "purpose": "checks the drift-audit kit's wiring has not drifted",
+    "purpose": "checks the drift-audit kit's wiring has not drifted",
     "argv": [
       "bash",
       "{prefix}/drift-audit/adopt-drift-audit.sh",
@@ -1206,6 +1350,8 @@
     "name": "process-monitor wiring",
     "tag": "leg.process-monitor.process-monitor-wiring",
     "tests": ["feature.process-monitor"],
+    "purpose": "checks the process-monitor kit's wiring has not drifted",
+    "purpose": "checks the process-monitor kit's wiring has not drifted",
     "argv": [
       "bash",
       "{prefix}/process-monitor/adopt-process-monitor.sh",
@@ -1221,6 +1367,8 @@
     "name": "process-monitor census selftest",
     "tag": "leg.gov.process-monitor-census-selftest",
     "tests": ["feature.process-monitor"],
+    "purpose": "arms the process-monitor engine's parsing and liveness",
+    "purpose": "arms the process-monitor engine's parsing and liveness",
     "argv": [
       "python",
       "{prefix}/process-monitor/selftest.py"
@@ -1241,6 +1389,8 @@
     "name": "process-monitor adopter selftest",
     "tag": "leg.gov.process-monitor-adopter-selftest",
     "tests": ["feature.process-monitor"],
+    "purpose": "observes each process-monitor adopter refusal red",
+    "purpose": "observes each process-monitor adopter refusal red",
     "argv": [
       "bash",
       "{prefix}/process-monitor/adopt-process-monitor.test.sh"
@@ -1258,6 +1408,8 @@
     "name": "runlog selftest",
     "tag": "leg.gov.runlog-selftest",
     "tests": ["feature.runlog"],
+    "purpose": "arms the runlog kit over fixtures and scratch trees",
+    "purpose": "arms the runlog kit over fixtures and scratch trees",
     "argv": [
       "python",
       "{prefix}/runlog/selftest.py"
@@ -1274,6 +1426,8 @@
     "name": "runlog record schema",
     "tag": "leg.runlog.runlog-record-schema",
     "tests": ["feature.runlog"],
+    "purpose": "checks committed run records and run-state history",
+    "purpose": "checks committed run records and run-state history",
     "argv": [
       "python",
       "{prefix}/runlog/runlog.py",
@@ -1288,6 +1442,8 @@
     "name": "runlog skill wiring",
     "tag": "leg.runlog.runlog-skill-wiring",
     "tests": ["feature.runlog"],
+    "purpose": "checks the rendered runlog Skill has not gone stale",
+    "purpose": "checks the rendered runlog Skill has not gone stale",
     "argv": [
       "bash",
       "{prefix}/runlog/adopt-runlog.sh",
@@ -1302,6 +1458,8 @@
     "name": "cleanup skill wiring",
     "tag": "leg.branch-reconcile.cleanup-skill-wiring",
     "tests": ["feature.branch-reconcile"],
+    "purpose": "checks the rendered cleanup Skill has not gone stale",
+    "purpose": "checks the rendered cleanup Skill has not gone stale",
     "argv": [
       "bash",
       "{prefix}/branch-reconcile/adopt-branch-reconcile.sh",
@@ -1316,6 +1474,8 @@
     "name": "branch-reconcile selftest",
     "tag": "leg.gov.branch-reconcile-selftest",
     "tests": ["feature.branch-reconcile"],
+    "purpose": "tests the branch-reconcile kit in fixture repositories",
+    "purpose": "tests the branch-reconcile kit in fixture repositories",
     "argv": [
       "python",
       "{prefix}/branch-reconcile/selftest.py"
@@ -1332,6 +1492,8 @@
   {
     "name": "drift-audit records",
     "tag": "leg.drift-audit.drift-audit-records",
+    "purpose": "checks the repo's record of its state still matches reality",
+    "purpose": "checks the repo's record of its state still matches reality",
     "argv": [
       "python",
       "{prefix}/drift-audit/drift_report.py",
@@ -1352,6 +1514,8 @@
     "name": "unattended kit gate",
     "tag": "leg.unattended.unattended-kit-gate",
     "tests": ["feature.unattended"],
+    "purpose": "grades the repository against the unattended-run kit",
+    "purpose": "grades the repository against the unattended-run kit",
     "argv": [
       "bash",
       "{prefix}/unattended/check-unattended.sh"
@@ -1367,6 +1531,8 @@
     "name": "pass-order history",
     "tag": "leg.unattended.pass-order-history",
     "tests": ["feature.unattended"],
+    "purpose": "refuses a unit built before it was specced",
+    "purpose": "refuses a unit built before it was specced",
     "argv": [
       "bash",
       "{prefix}/unattended/check-pass-order.sh"
@@ -1383,6 +1549,8 @@
     "name": "routed commits name a specced unit",
     "tag": "leg.memory-tree.routed-commits-name-a-specced-unit",
     "tests": ["feature.memory-tree-hygiene"],
+    "purpose": "requires each routed commit to name a unit specced before it",
+    "purpose": "requires each routed commit to name a unit specced before it",
     "argv": [
       "python3",
       "{prefix}/memory-tree/routed_commits.py"
@@ -1398,6 +1566,8 @@
     "name": "brief-recorded",
     "tag": "leg.unattended.brief-recorded",
     "tests": ["feature.unattended"],
+    "purpose": "refuses a closed unit whose build commit records no brief",
+    "purpose": "refuses a closed unit whose build commit records no brief",
     "argv": [
       "bash",
       "{prefix}/unattended/check-brief-recorded.sh"
@@ -1414,6 +1584,8 @@
     "name": "playbook validity gate",
     "tag": "leg.unattended.playbook-validity-gate",
     "tests": ["feature.playbook-mode"],
+    "purpose": "grades the validity of every playbook and the kit fixture",
+    "purpose": "grades the validity of every playbook and the kit fixture",
     "argv": [
       "bash",
       "{prefix}/unattended/check-playbook.sh"
@@ -1427,6 +1599,8 @@
     "name": "unattended skill wiring",
     "tag": "leg.unattended.unattended-skill-wiring",
     "tests": ["feature.unattended"],
+    "purpose": "verifies the unattended Skill still matches kit and conf",
+    "purpose": "verifies the unattended Skill still matches kit and conf",
     "argv": [
       "bash",
       "{prefix}/unattended/adopt-unattended.sh",
@@ -1440,6 +1614,8 @@
   {
     "name": "run-gates canary",
     "tag": "leg.gov.run-gates-canary",
+    "purpose": "checks the manifest is well-formed and sources every leg",
+    "purpose": "checks the manifest is well-formed and sources every leg",
     "argv": [
       "bash",
       "{prefix}/run-gates/run-gates.test.sh"
@@ -1457,6 +1633,8 @@
   {
     "name": "run-gates evidence",
     "tag": "leg.gov.run-gates-evidence",
+    "purpose": "checks a red leg's own output survives on disk",
+    "purpose": "checks a red leg's own output survives on disk",
     "argv": [
       "bash",
       "{prefix}/run-gates/run-gates.evidence.test.sh"
@@ -1474,6 +1652,8 @@
     "name": "run-gates turnstile",
     "tag": "leg.gov.run-gates-turnstile",
     "tests": ["feature.run-gates-turnstile"],
+    "purpose": "arms the turnstile that serialises bars on one repository",
+    "purpose": "arms the turnstile that serialises bars on one repository",
     "argv": [
       "bash",
       "{prefix}/run-gates/run-gates.turnstile.test.sh"
@@ -1491,6 +1671,8 @@
     "name": "run-gates gov canary",
     "tag": "leg.gov.run-gates-gov-canary",
     "tests": ["feature.run-gates"],
+    "purpose": "runs the run-gates canary arms keyed on this repository",
+    "purpose": "runs the run-gates canary arms keyed on this repository",
     "argv": [
       "bash",
       "{prefix}/run-gates/run-gates.gov.test.sh"
@@ -1508,6 +1690,8 @@
     "name": "foreign-prefix parity (every self-test at three prefixes)",
     "tag": "leg.gov.foreign-prefix-parity-every-self-test-at-three-prefixes",
     "tests": ["feature.install-prefix"],
+    "purpose": "runs every declared self-test at three tool-root prefixes",
+    "purpose": "runs every declared self-test at three tool-root prefixes",
     "argv": [
       "bash",
       "{prefix}/run-gates/foreign-prefix.gov.test.sh"
@@ -1524,6 +1708,8 @@
     "name": "run-gates run-log line",
     "tag": "leg.gov.run-gates-run-log-line",
     "tests": ["feature.run-gates"],
+    "purpose": "observes the gate runner's run-log line from outside",
+    "purpose": "observes the gate runner's run-log line from outside",
     "argv": [
       "bash",
       "{prefix}/run-gates/run-gates.runlog.test.sh"
@@ -1541,6 +1727,8 @@
     "name": "run-gates adopter e2e",
     "tag": "leg.gov.run-gates-adopter-e2e",
     "tests": ["feature.run-gates"],
+    "purpose": "grades the run-gates adopter on its effects",
+    "purpose": "grades the run-gates adopter on its effects",
     "argv": [
       "bash",
       "{prefix}/run-gates/adopt-run-gates.test.sh"
@@ -1557,6 +1745,8 @@
     "name": "run-gates wiring",
     "tag": "leg.run-gates.run-gates-wiring",
     "tests": ["feature.run-gates"],
+    "purpose": "checks the run-gates kit's adopted declaration for drift",
+    "purpose": "checks the run-gates kit's adopted declaration for drift",
     "argv": [
       "bash",
       "{prefix}/run-gates/adopt-run-gates.sh",
@@ -1572,6 +1762,8 @@
     "name": "profile-bar selftest",
     "tag": "leg.gov.profile-bar-selftest",
     "tests": ["feature.run-gates"],
+    "purpose": "self-tests the bar profiler",
+    "purpose": "self-tests the bar profiler",
     "argv": [
       "bash",
       "{prefix}/run-gates/profile_bar.test.sh"
@@ -1588,6 +1780,8 @@
     "name": "held-halves selftest",
     "tag": "leg.run-gates.held-halves-selftest",
     "tests": ["feature.run-gates"],
+    "purpose": "self-tests the split-tier held self-test combiner",
+    "purpose": "self-tests the split-tier held self-test combiner",
     "argv": [
       "python3",
       "{prefix}/run-gates/held_halves.py",
@@ -1602,6 +1796,8 @@
     "name": "measure-legs selftest",
     "tag": "leg.gov.measure-legs-selftest",
     "tests": ["feature.run-gates"],
+    "purpose": "self-tests the profiler that runs each leg clean",
+    "purpose": "self-tests the profiler that runs each leg clean",
     "argv": [
       "python3",
       "{prefix}/run-gates/measure_legs.py",
@@ -1626,6 +1822,8 @@
     "pass_leg": true,
     "tag": "leg.check-install-prefix.install-prefix-shipped-surface",
     "tests": ["feature.install-prefix"],
+    "purpose": "bans a kit path spelled in the shipped surface",
+    "purpose": "bans a kit path spelled in the shipped surface",
     "argv": [
       "bash",
       "{prefix}/check-install-prefix.sh"
@@ -1645,6 +1843,8 @@
     "pass_leg": true,
     "tag": "leg.gov.hook-destinations-every-declared-hook-path-ships",
     "tests": ["feature.agent-cap"],
+    "purpose": "requires every declared hook path to ship",
+    "purpose": "requires every declared hook path to ship",
     "argv": [
       "bash",
       "{prefix}/check-hook-destinations.sh"
@@ -1660,6 +1860,8 @@
     "name": "hook destinations self-test",
     "tag": "leg.gov.hook-destinations-self-test",
     "tests": ["feature.agent-cap"],
+    "purpose": "arms the hook-destinations gate",
+    "purpose": "arms the hook-destinations gate",
     "argv": [
       "bash",
       "{prefix}/check-hook-destinations.test.sh"
@@ -1681,6 +1883,8 @@
     "name": "agent-cap restatement",
     "tag": "leg.check-agent-cap-restatement.agent-cap-restatement",
     "tests": ["feature.agent-cap"],
+    "purpose": "bans live prose stating a fan-out bound as a bare number",
+    "purpose": "bans live prose stating a fan-out bound as a bare number",
     "argv": [
       "bash",
       "{prefix}/check-agent-cap-restatement.sh"
@@ -1694,6 +1898,8 @@
     "name": "agent-cap restatement self-test",
     "tag": "leg.check-agent-cap-restatement.agent-cap-restatement-self-test",
     "tests": ["feature.agent-cap"],
+    "purpose": "self-tests the agent-cap restatement gate",
+    "purpose": "self-tests the agent-cap restatement gate",
     "argv": [
       "bash",
       "{prefix}/check-agent-cap-restatement.test.sh"
@@ -1707,6 +1913,8 @@
     "name": "install-prefix self-test",
     "tag": "leg.check-install-prefix.install-prefix-self-test",
     "tests": ["feature.install-prefix"],
+    "purpose": "arms the install-prefix ban red and green",
+    "purpose": "arms the install-prefix ban red and green",
     "argv": [
       "bash",
       "{prefix}/check-install-prefix.test.sh"
@@ -1725,6 +1933,8 @@
     "pass_leg": true,
     "tag": "leg.gov.dead-path-carriers-deleted-files-still-named",
     "tests": ["feature.install-prefix"],
+    "purpose": "catches a deleted file still named outside the memory tree",
+    "purpose": "catches a deleted file still named outside the memory tree",
     "argv": [
       "bash",
       "{prefix}/check-dead-paths.sh"
@@ -1739,6 +1949,8 @@
     "name": "dead-path carriers self-test",
     "tag": "leg.gov.dead-path-carriers-self-test",
     "tests": ["feature.install-prefix"],
+    "purpose": "self-tests the dead-path carriers gate",
+    "purpose": "self-tests the dead-path carriers gate",
     "argv": [
       "bash",
       "{prefix}/check-dead-paths.test.sh"
@@ -1755,6 +1967,8 @@
     "name": "remote literals (kit code names no remote)",
     "tag": "leg.gov.remote-literals-kit-code-names-no-remote",
     "tests": ["feature.install-prefix"],
+    "purpose": "bans kit code naming a remote by literal",
+    "purpose": "bans kit code naming a remote by literal",
     "argv": [
       "bash",
       "{prefix}/check-remote-literals.sh"
@@ -1768,6 +1982,8 @@
     "name": "remote literals self-test",
     "tag": "leg.gov.remote-literals-self-test",
     "tests": ["feature.install-prefix"],
+    "purpose": "self-tests the remote-literals ban",
+    "purpose": "self-tests the remote-literals ban",
     "argv": [
       "bash",
       "{prefix}/check-remote-literals.test.sh"
@@ -1786,6 +2002,8 @@
     "pass_leg": true,
     "tag": "leg.gov.govkit-selfcheck",
     "tests": ["feature.govkit"],
+    "purpose": "self-checks the deployer's own declarations",
+    "purpose": "self-checks the deployer's own declarations",
     "argv": [
       "python",
       "{prefix}/govkit/govkit.py",
@@ -1802,6 +2020,8 @@
     "pass_leg": true,
     "tag": "leg.gov.kit-epoch-shipped-bytes-move-the-version-moves",
     "tests": ["feature.govkit"],
+    "purpose": "requires a kit's version to move when its shipped bytes do",
+    "purpose": "requires a kit's version to move when its shipped bytes do",
     "argv": [
       "python",
       "{prefix}/govkit/govkit.py",
@@ -1817,6 +2037,8 @@
     "name": "step-rows-frozen",
     "tag": "leg.gov.step-rows-frozen",
     "tests": ["feature.govkit"],
+    "purpose": "refuses an edit to a frozen upgrade step row",
+    "purpose": "refuses an edit to a frozen upgrade step row",
     "argv": [
       "python",
       "{prefix}/govkit/upgrade_steps.py",
@@ -1832,6 +2054,8 @@
     "name": "step-gate",
     "tag": "leg.gov.step-gate",
     "tests": ["feature.govkit"],
+    "purpose": "diffs the adopter-visible surface between base and tip",
+    "purpose": "diffs the adopter-visible surface between base and tip",
     "argv": [
       "python",
       "{prefix}/govkit/step_gate.py"
@@ -1847,6 +2071,8 @@
     "pass_leg": true,
     "tag": "leg.gov.docs",
     "tests": ["feature.govkit"],
+    "purpose": "fingerprints each member's usage against its help page",
+    "purpose": "fingerprints each member's usage against its help page",
     "argv": [
       "python",
       "{prefix}/govkit/docs_leg.py"
@@ -1862,6 +2088,8 @@
     "name": "help reference pages",
     "tag": "leg.gov.help-reference-pages",
     "tests": ["feature.playbook"],
+    "purpose": "compares each help reference page with its render",
+    "purpose": "compares each help reference page with its render",
     "argv": [
       "python",
       "{prefix}/playbook/render_playbook.py",
@@ -1878,6 +2106,8 @@
     "name": "help page commands",
     "tag": "leg.gov.help-page-commands",
     "tests": ["feature.govkit"],
+    "purpose": "runs every command a help page shows in a scratch adopter",
+    "purpose": "runs every command a help page shows in a scratch adopter",
     "argv": [
       "python",
       "{prefix}/govkit/docs_leg.py",
@@ -1894,6 +2124,8 @@
     "name": "upgrade-walk",
     "tag": "leg.gov.upgrade-walk",
     "tests": ["feature.govkit"],
+    "purpose": "walks every declared upgrade step over release-0",
+    "purpose": "walks every declared upgrade step over release-0",
     "argv": [
       "python",
       "{prefix}/govkit/upgrade_walk.py"
@@ -1909,6 +2141,8 @@
     "name": "govkit selftest",
     "tag": "leg.gov.govkit-selftest",
     "tests": ["feature.govkit"],
+    "purpose": "exercises every deployer refusal in throwaway repos",
+    "purpose": "exercises every deployer refusal in throwaway repos",
     "argv": [
       "python",
       "{prefix}/govkit/selftest.py"
@@ -1930,6 +2164,8 @@
     "pass_leg": true,
     "tag": "leg.lexicon.lexicon-naming-predicates",
     "tests": ["feature.lexicon"],
+    "purpose": "grades names against the declared lexicon vocabulary",
+    "purpose": "grades names against the declared lexicon vocabulary",
     "argv": [
       "python",
       "{prefix}/lexicon/lexicon.py"
@@ -1957,6 +2193,8 @@
     "name": "lexicon selftest",
     "tag": "leg.gov.lexicon-selftest",
     "tests": ["feature.lexicon"],
+    "purpose": "runs red and green fixtures for every lexicon predicate",
+    "purpose": "runs red and green fixtures for every lexicon predicate",
     "argv": [
       "python",
       "{prefix}/lexicon/selftest.py"
@@ -1974,6 +2212,8 @@
     "pass_leg": true,
     "tag": "leg.lexicon.lexicon-wiring",
     "tests": ["feature.lexicon"],
+    "purpose": "verifies the repository's naming-lexicon declaration",
+    "purpose": "verifies the repository's naming-lexicon declaration",
     "argv": [
       "bash",
       "{prefix}/lexicon/adopt-lexicon.sh",
@@ -1990,6 +2230,8 @@
     "name": "playbook placeholder catalogue",
     "tag": "leg.check-placeholders.playbook-placeholder-catalogue",
     "tests": ["feature.lexicon"],
+    "purpose": "holds the playbook's version markers in lockstep",
+    "purpose": "holds the playbook's version markers in lockstep",
     "argv": [
       "bash",
       "{prefix}/check-placeholders.sh"
@@ -2003,6 +2245,8 @@
     "name": "placeholder-catalogue self-test",
     "tag": "leg.check-placeholders.placeholder-catalogue-self-test",
     "tests": ["feature.lexicon"],
+    "purpose": "arms the placeholder gate, each arm asserting its message",
+    "purpose": "arms the placeholder gate, each arm asserting its message",
     "argv": [
       "bash",
       "{prefix}/check-placeholders.test.sh"
@@ -2020,6 +2264,8 @@
     "name": "memory hygiene",
     "tag": "leg.memory-tree.memory-hygiene",
     "tests": ["feature.memory-tree-hygiene"],
+    "purpose": "runs the memory tree's mechanized hygiene checks",
+    "purpose": "runs the memory tree's mechanized hygiene checks",
     "argv": [
       "bash",
       "{prefix}/memory-tree/check-memory-hygiene.sh"
@@ -2040,6 +2286,8 @@
     "pass_leg": true,
     "tag": "leg.gov.memory-hygiene-the-pass-checks",
     "tests": ["feature.memory-tree-hygiene"],
+    "purpose": "runs the memory hygiene checks a pass owes",
+    "purpose": "runs the memory hygiene checks a pass owes",
     "argv": [
       "bash",
       "{prefix}/memory-tree/check-memory-hygiene.sh",
@@ -2057,6 +2305,8 @@
     "name": "transition-audit arms",
     "tag": "leg.gov.transition-audit-arms",
     "tests": ["feature.memory-tree-hygiene"],
+    "purpose": "arms hygiene check 26 and its commit-time carrier",
+    "purpose": "arms hygiene check 26 and its commit-time carrier",
     "argv": [
       "bash",
       "{prefix}/memory-tree/transition-audit.test.sh"
@@ -2079,6 +2329,8 @@
     "name": "straggler-guard arms",
     "tag": "leg.gov.straggler-guard-arms",
     "tests": ["feature.memory-tree-hygiene"],
+    "purpose": "arms the shards-to-builds straggler layer",
+    "purpose": "arms the shards-to-builds straggler layer",
     "argv": [
       "bash",
       ".githooks/straggler-guard.test.sh"
@@ -2102,6 +2354,8 @@
     "name": "marker contracts",
     "tag": "leg.memory-tree.marker-contracts",
     "tests": ["feature.row-grammar"],
+    "purpose": "holds live readers to contracts shared code cannot express",
+    "purpose": "holds live readers to contracts shared code cannot express",
     "argv": [
       "bash",
       "{prefix}/memory-tree/marker-contract.test.sh"
@@ -2116,6 +2370,8 @@
     "name": "verifier fan-out",
     "tag": "leg.review-harness.verifier-fan-out",
     "tests": ["feature.agent-cap"],
+    "purpose": "holds workflow harnesses to the verify-stage total",
+    "purpose": "holds workflow harnesses to the verify-stage total",
     "argv": [
       "bash",
       "{prefix}/workflows/check-verifier-fanout.sh"
@@ -2129,6 +2385,8 @@
     "name": "govkit refusal join",
     "tag": "leg.gov.govkit-refusal-join",
     "tests": ["feature.govkit"],
+    "purpose": "requires every deployer refusal to be reached by an arm",
+    "purpose": "requires every deployer refusal to be reached by an arm",
     "argv": [
       "python",
       "{prefix}/govkit/refusal_join.py"
@@ -2146,6 +2404,8 @@
     "pass_leg": true,
     "tag": "leg.gov.govkit-runbook-parity",
     "tests": ["feature.govkit"],
+    "purpose": "holds the prose runbook and the registry to one population",
+    "purpose": "holds the prose runbook and the registry to one population",
     "argv": [
       "python",
       "{prefix}/govkit/check_runbook_parity.py"
@@ -2159,6 +2419,8 @@
     "name": "govkit acceptance matrix",
     "tag": "leg.gov.govkit-acceptance-matrix",
     "tests": ["feature.govkit"],
+    "purpose": "drives the deployer against repository shapes",
+    "purpose": "drives the deployer against repository shapes",
     "argv": [
       "python",
       "{prefix}/govkit/matrix.py"
@@ -2180,6 +2442,8 @@
     "pass_leg": true,
     "tag": "leg.check-testsuite-counts.testsuite-counts-every-bar-self-test",
     "tests": ["feature.testsuite-counts"],
+    "purpose": "requires every bar self-test to print an assertion count",
+    "purpose": "requires every bar self-test to print an assertion count",
     "argv": [
       "bash",
       "{prefix}/check-testsuite-counts.sh"
@@ -2193,6 +2457,8 @@
     "name": "testsuite counts self-test",
     "tag": "leg.check-testsuite-counts.testsuite-counts-self-test",
     "tests": ["feature.testsuite-counts"],
+    "purpose": "arms each testsuite-counts refusal with a green control",
+    "purpose": "arms each testsuite-counts refusal with a green control",
     "argv": [
       "bash",
       "{prefix}/check-testsuite-counts.test.sh"
@@ -2207,6 +2473,8 @@
     "pass_leg": true,
     "tag": "leg.playbook-render.playbook-render-wiring",
     "tests": ["feature.playbook"],
+    "purpose": "asserts the rendered charter region still matches",
+    "purpose": "asserts the rendered charter region still matches",
     "argv": [
       "bash",
       "{prefix}/playbook/adopt-playbook.sh",
@@ -2236,6 +2504,8 @@
       "{prefix}/govkit/entries/playbook.kit.toml",
       "coding-governance-agents.template.md"
     ],
+    "purpose": "arms the charter render engine's own predicates",
+    "purpose": "arms the charter render engine's own predicates",
     "argv": [
       "bash",
       "{prefix}/playbook/adopt-playbook.sh",
@@ -2250,6 +2520,8 @@
     "name": "spec tokens (a spec's own names resolve)",
     "tag": "leg.gov.spec-tokens-a-spec-s-own-names-resolve",
     "tests": ["feature.spec-tokens"],
+    "purpose": "requires a spec's own names to resolve in the tree",
+    "purpose": "requires a spec's own names to resolve in the tree",
     "argv": [
       "python",
       "{prefix}/check-spec-tokens.py"
@@ -2265,6 +2537,8 @@
     "pass_leg": true,
     "tag": "leg.gov.spec-tokens-the-pass-s-own-spec",
     "tests": ["feature.spec-tokens"],
+    "purpose": "resolves the tokens of the pass's own spec",
+    "purpose": "resolves the tokens of the pass's own spec",
     "argv": [
       "python",
       "{prefix}/check-spec-tokens.py",
@@ -2282,6 +2556,8 @@
     "pass_leg": true,
     "tag": "leg.gov.kit-placeholders-a-declared-token-its-adopter",
     "tests": ["feature.kit-placeholders"],
+    "purpose": "requires a kit's adopter to substitute each declared token",
+    "purpose": "requires a kit's adopter to substitute each declared token",
     "argv": [
       "python",
       "{prefix}/check-kit-placeholders.py"
@@ -2295,6 +2571,8 @@
     "name": "roles catalogue",
     "tag": "leg.roles.roles-catalogue",
     "tests": ["feature.roles"],
+    "purpose": "grades role files against the governing doc and overlays",
+    "purpose": "grades role files against the governing doc and overlays",
     "argv": [
       "python",
       "{prefix}/roles/check_roles.py"
@@ -2309,6 +2587,8 @@
     "name": "roles render wiring",
     "tag": "leg.roles.roles-render-wiring",
     "tests": ["feature.roles"],
+    "purpose": "grades the agent types, role index and Skill renders",
+    "purpose": "grades the agent types, role index and Skill renders",
     "argv": [
       "bash",
       "{prefix}/roles/adopt-roles.sh",
@@ -2323,6 +2603,8 @@
     "name": "roles render selftest",
     "tag": "leg.roles.roles-render-selftest",
     "tests": ["feature.roles"],
+    "purpose": "self-tests rendering roles into Claude Code agent types",
+    "purpose": "self-tests rendering roles into Claude Code agent types",
     "argv": [
       "python",
       "{prefix}/roles/render_agents.py",
@@ -2337,6 +2619,8 @@
     "name": "roles adopter self-test",
     "tag": "leg.gov.roles-adopter-self-test",
     "tests": ["feature.roles"],
+    "purpose": "tests the roles adopter in fresh fixture repositories",
+    "purpose": "tests the roles adopter in fresh fixture repositories",
     "argv": [
       "bash",
       "{prefix}/roles/adopt-roles.test.sh"
@@ -2350,6 +2634,8 @@
     "name": "policy check",
     "tag": "leg.policy-kit.policy-check",
     "tests": ["feature.policy"],
+    "purpose": "checks the repository's own policy file",
+    "purpose": "checks the repository's own policy file",
     "argv": [
       "python",
       "{prefix}/policy/check_policy.py"
@@ -2365,6 +2651,8 @@
     "name": "loop definition",
     "tag": "leg.loop.loop-definition",
     "tests": ["feature.loop"],
+    "purpose": "checks the loop definition every reader in the target reads",
+    "purpose": "checks the loop definition every reader in the target reads",
     "argv": [
       "python",
       "{prefix}/loop/loop_lib.py",
@@ -2381,6 +2669,8 @@
     "name": "loop definition fixtures",
     "tag": "leg.gov.loop-definition-fixtures",
     "tests": ["feature.loop"],
+    "purpose": "plants each break in the loop definition's reader",
+    "purpose": "plants each break in the loop definition's reader",
     "argv": [
       "python",
       "{prefix}/loop/loop_lib.py",
@@ -2396,6 +2686,8 @@
     "name": "loop computed witness",
     "tag": "leg.gov.loop-computed-witness",
     "tests": ["feature.loop"],
+    "purpose": "self-tests witnesses computed rather than typed",
+    "purpose": "self-tests witnesses computed rather than typed",
     "argv": [
       "python",
       "{prefix}/loop/loop_witness.py",
@@ -2411,6 +2703,8 @@
     "name": "loop checklist tags",
     "tag": "leg.gov.loop-checklist-tags",
     "tests": ["feature.loop"],
+    "purpose": "maps each core checklist handle onto its declared item",
+    "purpose": "maps each core checklist handle onto its declared item",
     "argv": [
       "python",
       "{prefix}/loop/loop_checklist.py",
@@ -2427,6 +2721,8 @@
     "name": "loop item kind",
     "tag": "leg.gov.loop-item-kind",
     "tests": ["feature.loop"],
+    "purpose": "checks the item kind's factory and the composed items",
+    "purpose": "checks the item kind's factory and the composed items",
     "argv": [
       "python",
       "{prefix}/loop/loop_items.py",
@@ -2443,6 +2739,8 @@
     "name": "loop splice check",
     "tag": "leg.gov.loop-splice-check",
     "tests": ["feature.loop"],
+    "purpose": "checks a repository's own stages spliced into the loop",
+    "purpose": "checks a repository's own stages spliced into the loop",
     "argv": [
       "python",
       "{prefix}/loop/splice.py",
@@ -2459,6 +2757,8 @@
     "name": "loop parent routes",
     "tag": "leg.gov.loop-parent-routes",
     "tests": ["feature.loop"],
+    "purpose": "tests a dependent build's route when its parent withdraws",
+    "purpose": "tests a dependent build's route when its parent withdraws",
     "argv": [
       "python",
       "{prefix}/loop/loop_parents.py",
@@ -2474,6 +2774,8 @@
     "name": "loop transition record",
     "tag": "leg.gov.loop-transition-record",
     "tests": ["feature.loop"],
+    "purpose": "checks a build's stage transition recorded three ways",
+    "purpose": "checks a build's stage transition recorded three ways",
     "argv": [
       "python",
       "{prefix}/loop/loop_transition.py",
@@ -2490,6 +2792,8 @@
     "name": "loop guard fixtures",
     "tag": "leg.gov.loop-guard-fixtures",
     "tests": ["feature.loop"],
+    "purpose": "plants breaks in the policy guard's commit and push arms",
+    "purpose": "plants breaks in the policy guard's commit and push arms",
     "argv": [
       "python",
       "{prefix}/loop/guard.py",
@@ -2505,6 +2809,8 @@
     "name": "loop claims fixtures",
     "tag": "leg.gov.loop-claims-fixtures",
     "tests": ["feature.loop"],
+    "purpose": "tests stored claims keyed and trusted over their sources",
+    "purpose": "tests stored claims keyed and trusted over their sources",
     "argv": [
       "python",
       "{prefix}/loop/claims.py",
@@ -2520,6 +2826,8 @@
     "name": "loop position fixtures",
     "tag": "leg.gov.loop-position-fixtures",
     "tests": ["feature.loop"],
+    "purpose": "tests deriving a build's position from witnesses alone",
+    "purpose": "tests deriving a build's position from witnesses alone",
     "argv": [
       "python",
       "{prefix}/loop/position.py",
@@ -2535,6 +2843,8 @@
     "name": "loop upstream fixtures",
     "tag": "leg.gov.loop-upstream-fixtures",
     "tests": ["feature.loop"],
+    "purpose": "tests an item's upstream commitments and their returns",
+    "purpose": "tests an item's upstream commitments and their returns",
     "argv": [
       "python",
       "{prefix}/loop/upstream.py",
@@ -2550,6 +2860,8 @@
     "name": "loop review bounds fixtures",
     "tag": "leg.gov.loop-review-bounds-fixtures",
     "tests": ["feature.loop"],
+    "purpose": "tests each review loop's round bound from the policy file",
+    "purpose": "tests each review loop's round bound from the policy file",
     "argv": [
       "python",
       "{prefix}/loop/review_bounds.py",
@@ -2565,6 +2877,8 @@
     "name": "loop composition fixtures",
     "tag": "leg.gov.loop-composition-fixtures",
     "tests": ["feature.loop"],
+    "purpose": "tests a build's composition pinned and moved per step",
+    "purpose": "tests a build's composition pinned and moved per step",
     "argv": [
       "python",
       "{prefix}/loop/composition.py",
@@ -2580,6 +2894,8 @@
     "name": "loop adapt fixtures",
     "tag": "leg.gov.loop-adapt-fixtures",
     "tests": ["feature.loop"],
+    "purpose": "tests a build's own flow changes proposed and applied",
+    "purpose": "tests a build's own flow changes proposed and applied",
     "argv": [
       "python",
       "{prefix}/loop/adapt.py",
@@ -2595,6 +2911,8 @@
     "name": "loop budget fixtures",
     "tag": "leg.gov.loop-budget-fixtures",
     "tests": ["feature.loop"],
+    "purpose": "tests a build's rework budget and what draws on it",
+    "purpose": "tests a build's rework budget and what draws on it",
     "argv": [
       "python",
       "{prefix}/loop/budget.py",
@@ -2610,6 +2928,8 @@
     "name": "loop termination",
     "tag": "leg.gov.loop-termination",
     "tests": ["feature.loop"],
+    "purpose": "checks every composition a build can run terminates",
+    "purpose": "checks every composition a build can run terminates",
     "argv": [
       "python",
       "{prefix}/loop/termination.py",
@@ -2626,6 +2946,8 @@
     "name": "loop breakpoint fixtures",
     "tag": "leg.gov.loop-breakpoint-fixtures",
     "tests": ["feature.loop"],
+    "purpose": "tests a build's breakpoints at its item boundaries",
+    "purpose": "tests a build's breakpoints at its item boundaries",
     "argv": [
       "python",
       "{prefix}/loop/breakpoints.py",
@@ -2641,6 +2963,8 @@
     "name": "loop scenario fixtures",
     "tag": "leg.gov.loop-scenario-fixtures",
     "tests": ["feature.loop"],
+    "purpose": "checks the scenario kind's rows and their conflicts",
+    "purpose": "checks the scenario kind's rows and their conflicts",
     "argv": [
       "python",
       "{prefix}/loop/scenario.py",
@@ -2657,6 +2981,8 @@
     "name": "loop transition tables",
     "tag": "leg.loop.loop-transition-tables",
     "tests": ["feature.loop"],
+    "purpose": "checks the transition tables every mover in the target reads",
+    "purpose": "checks the transition tables every mover in the target reads",
     "argv": [
       "python",
       "{prefix}/loop/loop_table.py",
@@ -2673,6 +2999,8 @@
     "name": "loop stage coverage",
     "tag": "leg.gov.loop-stage-coverage",
     "tests": ["feature.loop"],
+    "purpose": "joins every product part both ways to its stage",
+    "purpose": "joins every product part both ways to its stage",
     "argv": [
       "python",
       "{prefix}/loop/stage_coverage.py",
@@ -2688,6 +3016,8 @@
     "name": "loop command conformance",
     "tag": "leg.gov.loop-command-conformance",
     "tests": ["feature.loop"],
+    "purpose": "gates the command kind's rows",
+    "purpose": "gates the command kind's rows",
     "argv": [
       "python",
       "{prefix}/loop/factories.py",
@@ -2703,6 +3033,8 @@
     "name": "loop factories fixtures",
     "tag": "leg.gov.loop-factories-fixtures",
     "tests": ["feature.loop"],
+    "purpose": "self-tests the factories of six registered kinds",
+    "purpose": "self-tests the factories of six registered kinds",
     "argv": [
       "python",
       "{prefix}/loop/factories.py",
@@ -2718,6 +3050,8 @@
     "name": "layer dependencies (the core never depends on an expansion)",
     "tag": "leg.gov.layer-dependencies-the-core-never-depends-on-an",
     "tests": ["feature.playbook"],
+    "purpose": "refuses a core dependency on an expansion",
+    "purpose": "refuses a core dependency on an expansion",
     "argv": [
       "python",
       "{prefix}/playbook/check_layers.py"
@@ -2732,6 +3066,8 @@
     "name": "core meta-check",
     "tag": "leg.gov.core-meta-check",
     "tests": ["feature.playbook"],
+    "purpose": "joins every principle both ways to what enforces it",
+    "purpose": "joins every principle both ways to what enforces it",
     "argv": [
       "python",
       "{prefix}/playbook/core.py",
@@ -2747,6 +3083,8 @@
     "name": "core kinds",
     "tag": "leg.gov.core-kinds",
     "tests": ["feature.playbook"],
+    "purpose": "checks the core kinds' conformance-gate contract",
+    "purpose": "checks the core kinds' conformance-gate contract",
     "argv": [
       "python",
       "{prefix}/playbook/core.py",
@@ -2762,6 +3100,8 @@
     "name": "core skills conformance",
     "tag": "leg.gov.core-skills-conformance",
     "tests": ["feature.playbook"],
+    "purpose": "gates the skill kind's population",
+    "purpose": "gates the skill kind's population",
     "argv": [
       "python",
       "{prefix}/playbook/core.py",
@@ -2778,6 +3118,8 @@
     "name": "core practices conformance",
     "tag": "leg.gov.core-practices-conformance",
     "tests": ["feature.playbook"],
+    "purpose": "gates the practice kind's population",
+    "purpose": "gates the practice kind's population",
     "argv": [
       "python",
       "{prefix}/playbook/core.py",
@@ -2794,6 +3136,8 @@
     "name": "core selftest",
     "tag": "leg.gov.core-selftest",
     "tests": ["feature.playbook"],
+    "purpose": "plants each core check's break in a throwaway repository",
+    "purpose": "plants each core check's break in a throwaway repository",
     "argv": [
       "python",
       "{prefix}/playbook/core.py",
@@ -2809,6 +3153,8 @@
     "name": "instruction ladder (level is the one term)",
     "tag": "leg.gov.instruction-ladder-level-is-the-one-term",
     "tests": ["feature.playbook"],
+    "purpose": "requires level to be the one term for a ladder place",
+    "purpose": "requires level to be the one term for a ladder place",
     "argv": [
       "python",
       "{prefix}/playbook/instruction_units.py",
@@ -2824,6 +3170,8 @@
     "name": "instruction grammar (statement types, provenance lock)",
     "tag": "leg.gov.instruction-grammar-statement-types-provenance-lock",
     "tests": ["feature.playbook"],
+    "purpose": "checks instruction statement types and the provenance lock",
+    "purpose": "checks instruction statement types and the provenance lock",
     "argv": [
       "python",
       "{prefix}/playbook/instruction_units.py",
@@ -2839,6 +3187,8 @@
     "name": "instruction units (schema, one fact)",
     "tag": "leg.gov.instruction-units-schema-one-fact",
     "tests": ["feature.playbook"],
+    "purpose": "checks the instruction unit schema and one fact per unit",
+    "purpose": "checks the instruction unit schema and one fact per unit",
     "argv": [
       "python",
       "{prefix}/playbook/instruction_units.py",
@@ -2855,6 +3205,8 @@
     "name": "instruction render (one renderer of record)",
     "tag": "leg.gov.instruction-render-one-renderer-of-record",
     "tests": ["feature.playbook"],
+    "purpose": "requires one renderer of record per instruction file",
+    "purpose": "requires one renderer of record per instruction file",
     "argv": [
       "python",
       "{prefix}/playbook/render_playbook.py",
@@ -2870,6 +3222,8 @@
     "name": "instruction envelopes",
     "tag": "leg.gov.instruction-envelopes",
     "tests": ["feature.playbook"],
+    "purpose": "checks every instruction document against its envelope",
+    "purpose": "checks every instruction document against its envelope",
     "argv": [
       "python",
       "{prefix}/playbook/instruction_units.py",
@@ -2886,6 +3240,8 @@
     "name": "instruction units selftest",
     "tag": "leg.gov.instruction-units-selftest",
     "tests": ["feature.playbook"],
+    "purpose": "plants each instruction-unit break in a throwaway tree",
+    "purpose": "plants each instruction-unit break in a throwaway tree",
     "argv": [
       "python",
       "{prefix}/playbook/instruction_units.py",
@@ -2901,6 +3257,8 @@
     "name": "instruction edits (manifest checks)",
     "tag": "leg.gov.instruction-edits-manifest-checks",
     "tests": ["feature.playbook"],
+    "purpose": "runs the instruction edit path's manifest checks",
+    "purpose": "runs the instruction edit path's manifest checks",
     "argv": [
       "python",
       "{prefix}/playbook/instructions_edit.py",
@@ -2916,6 +3274,8 @@
     "name": "instruction edits selftest",
     "tag": "leg.gov.instruction-edits-selftest",
     "tests": ["feature.playbook"],
+    "purpose": "self-tests the one write path for instruction units",
+    "purpose": "self-tests the one write path for instruction units",
     "argv": [
       "python",
       "{prefix}/playbook/instructions_edit.py",
@@ -2931,6 +3291,8 @@
     "name": "tags (the resolver's checks)",
     "tag": "leg.gov.tags-the-resolver-s-checks",
     "tests": ["feature.playbook"],
+    "purpose": "runs the tag resolver's checks",
+    "purpose": "runs the tag resolver's checks",
     "argv": [
       "python",
       "{prefix}/playbook/gov_tag.py",
@@ -2948,6 +3310,8 @@
     "pass_leg": true,
     "tag": "leg.gov.positional-the-citation-check-alone",
     "tests": ["feature.playbook"],
+    "purpose": "runs the positional file:line citation check alone",
+    "purpose": "runs the positional file:line citation check alone",
     "argv": [
       "python",
       "{prefix}/playbook/positional.py",
@@ -2964,6 +3328,8 @@
     "name": "tags positional selftest",
     "tag": "leg.gov.tags-positional-selftest",
     "tests": ["feature.playbook"],
+    "purpose": "self-tests the positional citation population",
+    "purpose": "self-tests the positional citation population",
     "argv": [
       "python",
       "{prefix}/playbook/positional.py",
@@ -2979,6 +3345,8 @@
     "name": "tags bundle selftest",
     "tag": "leg.gov.tags-bundle-selftest",
     "tests": ["feature.playbook"],
+    "purpose": "self-tests bundling a tag's node and its inbound edges",
+    "purpose": "self-tests bundling a tag's node and its inbound edges",
     "argv": [
       "python",
       "{prefix}/playbook/tag_bundle.py",
@@ -2994,6 +3362,8 @@
     "name": "edges (every declared edge parses, is registered and resolves)",
     "tag": "leg.gov.edges-every-declared-edge-parses-is-registered-and",
     "tests": ["feature.playbook"],
+    "purpose": "requires every declared edge to parse, register and resolve",
+    "purpose": "requires every declared edge to parse, register and resolve",
     "argv": [
       "python",
       "{prefix}/playbook/edge_grammar.py",
@@ -3011,6 +3381,8 @@
     "pass_leg": true,
     "tag": "leg.gov.writing-practice-records-and-units",
     "tests": ["feature.playbook"],
+    "purpose": "runs the writing practice's checks on records and units",
+    "purpose": "runs the writing practice's checks on records and units",
     "argv": [
       "python",
       "{prefix}/playbook/writing_practice.py",
@@ -3028,6 +3400,8 @@
     "name": "one-owner",
     "tag": "leg.gov.one-owner",
     "tests": ["feature.playbook"],
+    "purpose": "requires each namespace, kind and kit unit to name one owner",
+    "purpose": "requires each namespace, kind and kit unit to name one owner",
     "argv": [
       "python",
       "{prefix}/playbook/writing_practice.py",
@@ -3045,6 +3419,8 @@
     "name": "policy fixtures",
     "tag": "leg.gov.policy-fixtures",
     "tests": ["feature.policy"],
+    "purpose": "proves on a fixture that each policy arm can red",
+    "purpose": "proves on a fixture that each policy arm can red",
     "argv": [
       "python",
       "{prefix}/policy/check_policy.py",
@@ -3148,6 +3524,8 @@
     "pass_leg": true,
     "tag": "leg.gov.leg-ceilings-clear-their-evidenced-maximum",
     "tests": ["feature.run-gates"],
+    "purpose": "checks each leg's ceiling against its recorded evidence",
+    "purpose": "checks each leg's ceiling against its recorded evidence",
     "argv": [
       "python",
       "{prefix}/run-gates/derive-ceilings.py",
@@ -3164,6 +3542,8 @@
     "pass_leg": true,
     "tag": "leg.gov.every-held-leg-is-budgeted-every-budget-row-resolves",
     "tests": ["feature.run-gates"],
+    "purpose": "checks each held self-test's on-demand cost declaration",
+    "purpose": "checks each held self-test's on-demand cost declaration",
     "argv": [
       "bash",
       "{prefix}/run-gates/run-selftests.sh",
@@ -3179,6 +3559,8 @@
     "name": "python reads (a name never bound, an import outside its guard)",
     "tag": "leg.gov.python-reads-a-name-never-bound-an-import-outside-its",
     "tests": ["feature.run-gates"],
+    "purpose": "catches a Python name never bound or an unguarded import",
+    "purpose": "catches a Python name never bound or an unguarded import",
     "argv": [
       "python",
       "{prefix}/run-gates/py_reads.py"
@@ -3193,6 +3575,8 @@
     "name": "receipt sync (installed files match the receipt)",
     "tag": "leg.run-gates.receipt-sync-installed-files-match-the-receipt",
     "tests": ["feature.run-gates"],
+    "purpose": "checks the installed files match the deployer's receipt",
+    "purpose": "checks the installed files match the deployer's receipt",
     "argv": [
       "python",
       "{prefix}/run-gates/check-receipt.py"
@@ -3207,6 +3591,8 @@
     "name": "spec-tokens self-test",
     "tag": "leg.gov.spec-tokens-self-test",
     "tests": ["feature.spec-tokens"],
+    "purpose": "arms the spec-tokens check red and green",
+    "purpose": "arms the spec-tokens check red and green",
     "argv": [
       "bash",
       "{prefix}/check-spec-tokens.test.sh"
@@ -3223,6 +3609,8 @@
     "name": "chain-packet self-test",
     "tag": "leg.gov.chain-packet-self-test",
     "tests": ["feature.spec-tokens"],
+    "purpose": "arms the chain-packet door red and green",
+    "purpose": "arms the chain-packet door red and green",
     "argv": [
       "bash",
       "{prefix}/chain-packet.test.sh"
@@ -3240,6 +3628,8 @@
     "name": "kit-placeholders self-test",
     "tag": "leg.gov.kit-placeholders-self-test",
     "tests": ["feature.kit-placeholders"],
+    "purpose": "arms the kit-placeholders check red and green",
+    "purpose": "arms the kit-placeholders check red and green",
     "argv": [
       "bash",
       "{prefix}/check-kit-placeholders.test.sh"
@@ -3256,6 +3646,8 @@
     "name": "selftest harness self-test",
     "tag": "leg.gov.selftest-harness-self-test",
     "tests": ["feature.run-gates"],
+    "purpose": "arms the shared self-test harness from outside it",
+    "purpose": "arms the shared self-test harness from outside it",
     "argv": [
       "bash",
       "{prefix}/lib/lib-selftest.test.sh"
@@ -3273,6 +3665,8 @@
     "name": "extract-arms self-test",
     "tag": "leg.gov.extract-arms-self-test",
     "tests": ["feature.run-gates"],
+    "purpose": "arms the four states the arm extractor can report",
+    "purpose": "arms the four states the arm extractor can report",
     "argv": [
       "bash",
       "{prefix}/lib/extract-arms.test.sh"
@@ -3291,6 +3685,8 @@
     "name": "run-selftests self-test",
     "tag": "leg.gov.run-selftests-self-test",
     "tests": ["feature.run-gates"],
+    "purpose": "observes every refusal of the on-demand self-test runner",
+    "purpose": "observes every refusal of the on-demand self-test runner",
     "argv": [
       "bash",
       "{prefix}/run-gates/run-selftests.test.sh"

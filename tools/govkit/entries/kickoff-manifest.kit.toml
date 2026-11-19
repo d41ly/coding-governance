@@ -69,6 +69,7 @@ tag = "leg.kickoff-manifest.kickoff-manifest-ratchet"
 # entry is in the registry's DEFAULT selection. The script already accepts and grades a path as $1.
 name = "kickoff-manifest ratchet"
 subject = "repo"
+purpose = "verifies the kickoff manifest against mechanical signals"
 argv = ["bash", "{prefix}/manifest-check.sh", "{manifest_path}"]
 guard = []
 history_depth = "full"

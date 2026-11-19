@@ -168,6 +168,7 @@ tag = "leg.playbook-render.playbook-render-wiring"
 tests = ["feature.playbook"]
 name = "playbook render wiring"
 subject = "repo"
+purpose = "asserts the rendered charter region still matches"
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check"]
 stage = ["step.test"]
 
@@ -181,5 +182,6 @@ tag = "leg.playbook-render.playbook-render-selftest"
 tests = ["feature.playbook"]
 name = "playbook render selftest"
 subject = "kit"
+purpose = "arms the charter render engine's own predicates"
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--selftest"]
 stage = ["step.test"]

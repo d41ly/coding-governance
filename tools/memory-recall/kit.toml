@@ -108,6 +108,7 @@ tag = "leg.memory-recall.memory-recall-skill-wiring"
 tests = ["feature.memory-recall"]
 name = "memory-recall skill wiring"
 subject = "repo"
+purpose = "checks the memory-recall Skill has not drifted"
 argv = ["bash", "{kit}/adopt-memory-recall.sh", "--check"]
 guard = []
 stage = ["step.test"]

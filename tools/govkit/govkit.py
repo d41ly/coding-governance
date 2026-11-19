@@ -2762,6 +2762,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
         manifest_ceiling = {leg.get("name"): leg.get("ceiling") for leg in _legs_json}
         manifest_stage = {leg.get("name"): leg.get("stage") for leg in _legs_json}
         manifest_tag = {leg.get("name"): leg.get("tag") for leg in _legs_json}
+        manifest_purpose = {leg.get("name"): leg.get("purpose") for leg in _legs_json}
         manifest_edges = {k: {leg.get("name"): leg.get(k) for leg in _legs_json} for k in ("tests", "enforces")}
         claimed_legs: dict[str, str] = {}
         for eid, (d, _dpath) in descs.items():
@@ -2861,6 +2862,14 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                                    f"{leg.get(_ek)!r} while <prefix>/gate-legs.json says "
                                    f"{_em.get(nm)!r} — the descriptor and the manifest "
                                    f"disagree about the leg's {_ek} edge")
+                    # AND ABOUT PURPOSE (TOOL-dWitnessedBar-19 S5, the agreement arm), presence
+                    # included: the emitter carries the descriptor's purpose into adopters, so it must
+                    # be the one gov's manifest declares.
+                    if leg.get("purpose") != manifest_purpose.get(nm):
+                        r.fail(f"entry '{eid}' declares gate leg '{nm}' with purpose "
+                               f"{leg.get('purpose')!r} while <prefix>/gate-legs.json says "
+                               f"{manifest_purpose.get(nm)!r} — the purpose agreement arm: the "
+                               f"descriptor and the manifest disagree about what the leg is for")
                     # AND ABOUT THE READ CLASSES, where the descriptor declares them, as with ceiling
                     # (TOOL-aSparedSpawn-13 S1): the classes decide what enters a leg's reuse key, so a
                     # descriptor and a manifest that disagree key one leg two ways. A descriptor that
@@ -2930,6 +2939,40 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                    f"a new leg must red until a declaration says whether an adopter receives it")
         r.note(f"legs: {len(manifest)} in the manifest · {len(claimed_legs)} claimed · "
                f"{len(exempt_legs)} exempt")
+
+        # ---- 7h: THE LEG'S PURPOSE (TOOL-dWitnessedBar-19 S5), read from the MANIFEST as `subject`
+        #          is, so an [[exempt_leg]] leg is graded by the same arms as a claimed one; the
+        #          agreement arm sits with the descriptor comparisons above. PRESENCE admits no
+        #          exception: the review that derived every purpose left no leg underived, so no
+        #          pending population exists (S6), and a row with no purpose is a new leg that owes one.
+        #          WHAT THIS DOES NOT CHECK: whether the 60 characters say what the cited source says;
+        #          the review record's rows are read against their cites by a person.
+        _purpose_legs: dict[str, list[str]] = {}
+        for leg in _legs_json:
+            nm, pu = leg.get("name"), leg.get("purpose")
+            if "purpose" not in leg:
+                r.fail(f"gate leg '{nm}' carries no `purpose` in <prefix>/gate-legs.json — the "
+                       f"purpose presence arm: a leg must say what it is for, in at most "
+                       f"{PURPOSE_MAX_CHARS} characters")
+                continue
+            if not isinstance(pu, str):
+                r.fail(f"gate leg '{nm}' carries purpose {pu!r}, which is not a string — the purpose "
+                       f"shape arm")
+                continue
+            if not pu or len(pu) > PURPOSE_MAX_CHARS or "\n" in pu or "\r" in pu or pu != pu.strip():
+                r.fail(f"gate leg '{nm}' carries purpose {pu!r} ({len(pu)} characters) — the purpose "
+                       f"shape arm: one line of 1 to {PURPOSE_MAX_CHARS} characters with no leading "
+                       f"or trailing space")
+            _purpose_legs.setdefault(pu, []).append(str(nm))
+        for pu, nms in sorted(_purpose_legs.items()):
+            if len(nms) > 1:
+                r.fail(f"gate legs {', '.join(repr(x) for x in nms)} share the purpose {pu!r} — the "
+                       f"purpose shape arm: two legs with one purpose say what a feature is for, "
+                       f"not what each leg is for")
+        # `pending` is the exception list's size, which is empty while no pending population exists.
+        _purpose_pending: set[str] = set()
+        r.note(f"purposes: {sum(len(v) for v in _purpose_legs.values())} declared · "
+               f"{len(_purpose_pending)} pending")
 
         # ---- 7h2: THE SUBJECT RATCHET. TOOL-dUnstalledConvoy-29.
         #
@@ -4464,6 +4507,11 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                 elif _dr_why:
                     print(f"govkit {verb} — gate leg '{nm}': doc_reads omitted ({_dr_why}), so it "
                           f"runs on every doc-only push")
+                # THE PURPOSE TRAVELS verbatim, and only into a runner whose canary's `LEG_KEYS`
+                # admits it, at LEG_KEY_FLOORS' row for it (TOOL-dWitnessedBar-19 S8).
+                if leg.get("purpose") is not None and check_target_reads_subject(
+                        target, deploy, descs, floor=LEG_KEY_FLOORS["purpose"]):
+                    row["purpose"] = leg["purpose"]
                 # THE CEILING TRAVELS where the descriptor declares one and the target's runner is
                 # at CEILING_FLOOR_RUN_GATES or later, carried verbatim: the descriptor is
                 # gov-authored and selfcheck 7h grades its shape. No fallback to gov's manifest,
@@ -6061,7 +6109,11 @@ STAGE_FLOOR_RUN_GATES = (1, 49)
 # ONE TABLE from a row key to the run-gates version whose canary admits it, read by the emitter the way
 # the four constants above are, through `check_target_reads_subject`'s `floor`. A later key is a row
 # here, never a fifth constant. `tag`: 1.51, where `LEG_KEYS` gained it (TOOL-dWitnessedBar-12 S5).
-LEG_KEY_FLOORS = {"tag": (1, 51)}
+# `purpose`: 1.52, where `LEG_KEYS` gained it (TOOL-dWitnessedBar-19 S1).
+LEG_KEY_FLOORS = {"tag": (1, 51), "purpose": (1, 52)}
+# A leg's `purpose` is at most this many CHARACTERS, never bytes: the project map's line grammar,
+# `purpose := at most 60 characters` (TOOL-dWitnessedBar-19 S2, §8 F3). Graded by selfcheck 7h.
+PURPOSE_MAX_CHARS = 60
 
 
 def derive_doc_reads(leg: dict, ctx: dict[str, str], have: set[str]) -> tuple[list[str] | None, str]:

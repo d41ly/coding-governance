@@ -37,6 +37,7 @@ why_no_adopter = "it IS the wiring checker; the runbook wires its self-test as a
 tag = "leg.check-wiring.check-wiring-self-test"
 name = "check-wiring self-test"
 subject = "kit"
+purpose = "tests the wiring checker's wired and unwired detection"
 argv = ["bash", "{prefix}/check-wiring.test.sh"]
 guard = ["{prefix}/check-wiring.sh", "{prefix}/check-wiring.test.sh"]
 stage = ["step.test"]
