@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 9e21ac760dc0a43d6ed007396922722ccee98d57 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 20ca97bea95eaa03709ae81f8281bd9de8606ec1
 phase: BUILDING
@@ -56,3 +57,7 @@ base: 6547d032070ac45966116e412d91e84ceef963b1
 2026-11-19T05:26:39Z draw · re-dispatch · TOOL-dTrackedAtlas-4 · 2/12 · 20261119T052639Z-baa170
 
 2026-11-19T05:26:39Z dispatch · item eabe8f9f TOOL-dTrackedAtlas-4 · reason memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.js memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.json .claude/settings.json memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-ledger.md memory/builds/dTrackedAtlas/spec/2026-11-19-spec-TOOL-dTrackedAtlas-4.md
+
+2026-11-19T05:59:19Z decision · item brief item 5: the page regenerates on node d after a landing — TOOL-dTrackedAtlas-4 is built and held outside the repository, and its hook needs a [[hook]] stage row in tools/loop/loop.toml (spec rev-5, fork F3) · reason options: (a) add the one loop.toml row, lifting the run's no-tools/ rule and owing a GATE_SELFTESTS=1 bar the owner ruled out; (b) wire the hook in an untracked settings file, M3 veto 2; (c) land without the hook group, failing AC8, veto 1; (d) park. No option survives the vetoes under the mandate, so the unit is carried forward against TOOL-dTrackedAtlas-7 and the owner picks; the spec recommends (a)
+
+2026-11-19T05:59:20Z rescope · item defer TOOL-dTrackedAtlas-4 · reason waits on TOOL-dTrackedAtlas-7: its hook's stage claim needs a tools/ edit this run may not make (spec rev-5, fork F3)

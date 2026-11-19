@@ -1,6 +1,6 @@
 # TOOL-dTrackedAtlas-4 — the Atlas page regenerates on node d after main moves, behind a switch whose default is on
 
-**Status:** SPECCED · rev-4 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 4
+**Status:** DEFERRED · rev-5 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 4 · advances TOOL-dTrackedAtlas-7
 
 <!-- gen:spec-records -->
 
@@ -10,8 +10,10 @@
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-3-name-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-3-name-fold.md) | research | TOOL-dTrackedAtlas-3 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-1-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-4-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-2-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-ac6-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-ac6-fold.md) | research | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-build-brief.md) | research | — |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-4-map-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-map-fold.md) | research | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-spec-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -42,6 +44,9 @@ without the page's folder it does nothing and says so.
   stdout line when the page's folder is absent. Observed by AC2, AC3, AC4, AC5 and AC6.
 - **S6** — It never commits, pushes or fetches, and writes only inside the page's folder, the scratch
   checkout's git admin entry excepted, which it removes. Observed by AC9.
+- **S7** — The codebase map's claim of S4's hook: a new dossier,
+  `memory/map/features/closed-loop-atlas.md`, and the map's artifacts regenerated, as §4 "The
+  codebase map's claim" gives. Observed by AC10.
 
 ## 3. Non-goals (OUT)
 
@@ -59,8 +64,8 @@ without the page's folder it does nothing and says so.
 - Publishing or committing the page, and any page other than the one `atlas.page` names.
 - A `help/` page: no kit ships this hook, and the policy move the ask names brings the
   `help/policy.md` row with it.
-- A gate, a suite arm or a self-test: the hook is a build-folder instrument, checked by its fixture
-  observations.
+- A new gate, suite arm or self-test: the hook is a build-folder instrument, checked by its fixture
+  observations. Its wiring is still graded by existing legs, which §4 "The wiring" names.
 
 ### Edges
 
@@ -237,8 +242,85 @@ One group appended to the `PostToolUse` array of `.claude/settings.json`, beside
 It is a group of its own, so a kit adopter rewriting the process monitor's group leaves it alone.
 `tools/check-hook-destinations.sh` reads only tracked fragment files and adopter scripts
 (`tools/check-hook-destinations.sh@bee72010fa7854f384fa85b3b55110c05cea53d2:224`), and the policy
-check reads only the file's `env` block, so neither grades this group. A session reads its hooks at
-start, so the group takes effect in sessions started after the checkout carries it.
+check reads only the file's `env` block, so neither grades this group. Two other readers do. The
+codebase map's `harness-hooks` inventory keys every command hook the file wires as its event and
+script, here `PostToolUse memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.js`
+(`tools/codebase-map/map_extractors.py@302cdbd33b5b3fbc8996b44bc4765227e499f7f4:171`), and §4 "The
+codebase map's claim" gives that key its owner. The loop kit's stage coverage joins the same key to
+a `[[hook]]` row of `tools/loop/loop.toml`
+(`tools/loop/stage_coverage.py@5a7404bf4a92b10b7a72568cd048c9b60f76c912:91`), a row this build may
+not write, which §8 F3 holds. A session reads its hooks at start, so the group takes effect in
+sessions started after the checkout carries it.
+
+### The codebase map's claim
+
+The builder writes a new dossier, `memory/map/features/closed-loop-atlas.md`, whose fence is the
+block below, copied whole, and then runs `python tools/codebase-map/gen_map.py --write`.
+`memory/map/baseline.toml` is not touched: it is reserved for the initial backfill, and
+`tools/codebase-map/test_codebase_map.py#test_baseline_never_gains_a_key` refuses a key it gains.
+
+```toml
+feature = "closed-loop-atlas"
+title = "The chain build state the schedule and the Closed Loop Atlas share, the page's stamp and stale check, and its regeneration on node d after main moves"
+status = "shipped"
+streams = ["tooling"]
+decisions = ["TOOL-dTrackedAtlas-1", "TOOL-dTrackedAtlas-2", "TOOL-dTrackedAtlas-3",
+  "TOOL-dTrackedAtlas-4"]
+
+stage = ["step.plan", "step.deploy"]
+
+[claims]
+gate-legs = []
+kits = []
+git-hooks = []
+harness-hooks = ["PostToolUse memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.js"]
+workflow-scripts = []
+skill-engines = []
+rendered-skills = []
+gotcha-classes = []
+guides = []
+backlog-shards = []
+lexicon-verbs = []
+[paths]
+globs = [
+  "memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-1-build-state.py",
+  "memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.js",
+  "memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.json",
+  "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.py",
+  "memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py",
+]
+```
+
+- The claim kinds are the map's inventory ids, every one present, as
+  `tools/codebase-map/map_lib.py#parse_dossier` requires; only `harness-hooks` holds a key.
+- `stage` is the loop kit's step claim, which `tools/loop/stage_coverage.py#read_stage_parts` reads
+  from the fence; a dossier with none reds the `loop stage coverage` leg as
+  `unclaimed dossier closed-loop-atlas`. It names `step.plan` because the schedule and the Atlas
+  answer what can start next, and `step.deploy` because the page regenerates after a landing.
+- `status` is `shipped`: the dossier lands in the commit carrying unit 4, the build's last unit.
+- The globs name this build's code: unit 1's derivation, unit 4's hook and conf, and the two
+  dClosedLoop instruments units 1 to 3 edited. The pages and ledgers are records and stay out. Each
+  path read `UNMAPPED` through `tools/codebase-map/map_lib.py#attribute_paths` against every dossier
+  and `memory/map/FOUNDATION.md` on 2026-11-19 (PINNED), so no glob overlaps another dossier's.
+- Probed on 2026-11-19 (PINNED): `tools/codebase-map/map_lib.py#parse_dossier` parses the fence;
+  its title is 149 bytes, under `tools/codebase-map/map_lib.py#_CARD_TITLE_BYTES`; and
+  `tools/codebase-map/map_lib.py#render_cards_md` renders its card in 925 bytes, under
+  `tools/codebase-map/map_lib.py#FEATURE_CARD_CAP_BYTES`, so nothing is cut.
+- The prose carries the headings `## Constraints & why`, `## Shared seams` and `## Gaps`, which
+  `tools/codebase-map/test_codebase_map.py#test_dossier_prose_headings_pinned` grades, and
+  `## Reuse affordance`, from which a new dossier is never exempt. Its one `seam:` line names unit
+  1's `memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-1-build-state.py#derive`,
+  reused for any reader of chain build state and extended via a new field of its result. No digit
+  run stands before an inventory noun in the prose, which
+  `tools/codebase-map/test_codebase_map.py#test_dossier_prose_carries_no_typed_count` refuses.
+
+`--write` renders the four artifacts of `tools/codebase-map/gen_map.py#_artifacts`. Three change:
+`memory/map/generated/inventories.json` gains the key, `memory/map/generated/MAP.md` lists it beside
+its owner, and `memory/map/generated/CARDS.md` gains the dossier's card.
+`memory/map/generated/symbols.json` is rewritten with the same bytes, because its extractors read
+only `tools/`, `.githooks/` and `skills/` (`tools/codebase-map/map_extractors.py#SHELL_ROOTS`,
+`tools/codebase-map/map_extractors.py#_live_py`,
+`tools/codebase-map/map_extractors.py#_build_js_layer`).
 
 ### Inventory
 
@@ -277,6 +359,10 @@ start, so the group takes effect in sessions started after the checkout carries 
 `memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.json`
 `.claude/settings.json`
 `memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-ledger.md`
+`memory/map/features/closed-loop-atlas.md`
+`memory/map/generated/inventories.json`
+`memory/map/generated/MAP.md`
+`memory/map/generated/CARDS.md`
 
 ### Alternatives rejected
 
@@ -302,7 +388,8 @@ start, so the group takes effect in sessions started after the checkout carries 
 - risks — A wedged generation is killed at `2400 s`. A browser holding the page open can refuse the
   rename on Windows, which logs `failed` and keeps the old page.
 - testing — The fixture observations of §6, on a scratch clone.
-- migration — N/A — a new file pair and one appended settings group; nothing existing changes shape.
+- migration — N/A — a new file pair, a new dossier, the map's regenerated artifacts and one appended
+  settings group; nothing existing changes shape.
 - user docs — The hook file's header states the switch, the sidecars and how to switch off; the
   `help/policy.md` row arrives with the catalogue move.
 
@@ -384,14 +471,27 @@ runner means `node "$C/$REGEN" --run`. A first run writes the page at the clone'
   `git -C "$C" worktree list` lists one checkout, `git -C "$C" log origin/main` holds only the
   fixture's landings, and the files under `$H` are the page and its stamp, tip and log sidecars.
   Red when: the regeneration commits the page, which `git -C "$C" log` then shows.
+- **AC10** — When the probe below runs in `$W`, it prints `[] []`, the map's own
+  `"$PY" -B tools/codebase-map/gen_map.py --check` exits 0 there, and the output of
+  `"$PY" -B tools/loop/stage_coverage.py` run there holds no line containing
+  `unclaimed dossier closed-loop-atlas`.
+  Red when: the dossier's `harness-hooks` row is emptied in `$W`'s working copy, where the probe's
+  first list names the hook's key.
+
+  ```bash
+  "$PY" -B -c "import sys; sys.path.insert(0, 'tools/codebase-map'); import map_lib as m, map_extractors as e, coverage_join as cj; t = m.load_map_tree(e.inventory_ids()); c = cj.compute_coverage(e.all_inventories(), m.owners_of(t), t.baseline); print(c.unclaimed.get('harness-hooks', []), c.stale_claims.get('harness-hooks', []))"
+  ```
 
 ## 7. Gates
 
 The close runs the plain bar once. The legs below are those the files touched keep green; the
 guarded `check-wiring self-test` is an on-demand leg the plain bar does not run, and it builds its
 own fixture settings. No suite arm is added or moved, so no arm line is declared.
+`codebase-map coverage + freshness` grades the dossier's claim both ways and the generated
+artifacts' bytes. `loop stage coverage` grades the dossier's `stage` and the hook key's `[[hook]]`
+row, and stays red on that row until §8 F3 is resolved. The dead-path leg reads the dossier's prose.
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `recall floor` · `recall floor arms` · `check-wiring self-test` · `lexicon naming predicates`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `recall floor` · `recall floor arms` · `check-wiring self-test` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `loop stage coverage` · `dead-path carriers (deleted files still named)`
 
 ## 8. Open questions
 
@@ -414,7 +514,8 @@ own fixture settings. No suite arm is added or moved, so no arm line is declared
   if its wiring reds a leg only a `tools/` edit clears. Tested: 56 to 68 ms (PINNED, §4); the
   detached child outlived its parent and the tool call; and §4 "The wiring" names the two readers of
   the file, neither grading a hook group. It survives. Its limit is §4 "What it does not check": a
-  console landing waits for the next tool call on the node.
+  console landing waits for the next tool call on the node. Rev-5 found the third test failing on a
+  reader that test missed, the loop kit's stage coverage, which §8 F3 carries.
   (c) A durable scheduled task running the page check. An OS task is a persistent machine change
   the owner must approve, M3's veto 2, so it is parked rather than picked. A harness cron job does
   not outlive its session: the store is in-memory and session-scoped
@@ -434,6 +535,32 @@ own fixture settings. No suite arm is added or moved, so no arm line is declared
   (a) is tracked, in one place, readable without a spawn, and its move into the catalogue is a copy
   of the row in §4 "The switch". It trips none of M3's vetoes.
   RESOLVED (agent, 2026-11-19, delegated): (a), the most feature-rich option by M3's rule.
+- **F3 — The hook's key needs a stage claim only a `tools/` edit adds: what carries it?** The
+  wiring's `harness-hooks` key is a part `tools/loop/stage_coverage.py#derive_part_claims` joins to
+  a claim, and a hook's one claim home is a `[[hook]]` row of `tools/loop/loop.toml`
+  (`tools/loop/loop.toml@b6651f2140d4e9dced399959f6475c2ab4bff0e7:98`). With no row, the
+  unguarded `loop stage coverage` leg prints
+  `stage-coverage: unclaimed hook PostToolUse memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.js · no claim`
+  and exits 1. Measured on node d on 2026-11-19 (PINNED): the key and the dossier added in memory to
+  the parts `tools/loop/stage_coverage.py#read_stage_parts` returns gave that line, and the dossier's
+  own line until a `stage` was set. The build's rule forbids the row: nothing under `tools/`, since
+  a touch there owes a `GATE_SELFTESTS=1` bar this run may not run
+  (`memory/builds/dTrackedAtlas/README.md@451f102e2dd13cf1304b6f0f4f314fe8cc8f28b9:38`). So F1 (b)
+  loses by its own third test, and F1's other candidates had lost already.
+  (a) One row in `tools/loop/loop.toml`, beside the process monitor's
+  (`tools/loop/loop.toml@b6651f2140d4e9dced399959f6475c2ab4bff0e7:1162`), with `key` the hook's key
+  above and `stage = ["step.deploy"]`, the owner lifting the build rule for that file and the close
+  running a `GATE_SELFTESTS=1` bar. Every criterion holds, and AC10 then also observes no
+  `unclaimed hook` line. It needs an owner turn, since the bar it owes is one this run may not run.
+  (b) Wire the group in an untracked settings file on node d, the user's or the checkout's local
+  one, so no inventory key, row or claim arises. It rewrites S4 and AC8, and it is a persistent
+  change outside review on the machine, M3's veto 2.
+  (c) Land unit 4 without S4, the settings group and (a)'s row joining §3's hand-off ask. It fails
+  AC8 and §1's "no command typed for it" until the ask lands, M3's veto 1.
+  (d) Park unit 4: the run closes with units 1 to 3, and the unit waits for the owner's pick.
+  Recommendation: no option survives M3's vetoes under the mandate, so (d) for this run. On the
+  owner's turn, (a): the row is the claim home the loop kit declares, it is one data row, and no
+  criterion is lost.
 
 ## 9. Revision log
 
@@ -451,6 +578,13 @@ own fixture settings. No suite arm is added or moved, so no arm line is declared
   `sys.exit` never ran, so it is now inserted above the `if __name__` guard, and AC6 states what the
   page check answers on that tree and why the runner then logs `failed`. No other criterion plants
   code, and no section had the builder flip the status. No design change.
+- rev-5 · 2026-11-19 · S7 · §3 · §4 · §5 · AC10 · §7 · §8 · the codebase map's claim of the wired
+  hook, folded from 2026-11-19-prompt-TOOL-dTrackedAtlas-4-map-fold after the pre-commit map gate
+  refused the build: §4 "The codebase map's claim" gives the new dossier's fence, Files touched
+  gains it and the three artifacts whose bytes `gen_map.py --write` changes, §7 gains the map,
+  stage-coverage and dead-path legs, AC10 observes the claim, and §3 and §4 "The wiring" stop
+  saying no reader grades the group. §8 F3 is new and open: the key also needs a `[[hook]]` row in
+  `tools/loop/loop.toml`, which this build may not write. No change to the hook's design.
 
 ## 10. Reuse audit
 
@@ -468,5 +602,9 @@ no process on the fast path"`, ranked `stamp` in the pre-push suite and path hel
 `KICK-dKeptSession-21` also records, so the detached start is new here. Seam read and not taken:
 `tools/push-main.sh#run_post_merge`, §8 F1 (d). The recall probe returned `TOOL-aFrugalTurnstile-8`,
 the lander starting the post-merge bar, and `PLAY-dClosedLoop-28`.
+The map claim extends the codebase map's dossier contract, `tools/codebase-map/map_lib.py#parse_dossier`,
+in the shape `memory/map/features/process-monitor.md` uses for its own `PostToolUse` hook; no
+existing dossier fits a build-folder hook, since each is scoped to one kit and
+`memory/map/FOUNDATION.md` holds shared substrate.
 
 Recall terms used: `python tools/memory-recall/query.py "what regenerates a derived page or report after a landing onto main without anyone running it" --terms "post-merge landing GATE_POST_MERGE detached hook PostToolUse throttle stamp regenerate atlas switch policy default-on"`

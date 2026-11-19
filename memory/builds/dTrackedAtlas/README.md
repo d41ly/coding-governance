@@ -5,7 +5,7 @@ opened: 2026-11-19
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4
+ids: TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 TOOL-dTrackedAtlas-5 TOOL-dTrackedAtlas-6 TOOL-dTrackedAtlas-7
 ---
 
 # dTrackedAtlas — the Closed Loop Atlas states the project's and the chain's actual state, and knows when it is stale
@@ -43,7 +43,9 @@ blocks "done". The owner's prompt and the measurements are recorded under `promp
 
 ## Parked decisions
 
-None.
+- **Unit 4 is carried forward against `TOOL-dTrackedAtlas-7`.** Its hook is built and verified, but the
+  `loop stage coverage` leg wants a `[[hook]]` row in `tools/loop/loop.toml`, which this run may not
+  write. Its spec's fork F3 holds the options and recommends that one row. The choice is the owner's.
 
 <!-- roster:units -->
 
@@ -56,8 +58,8 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 4 unit(s) · node d · opened 2026-11-19 · streams tooling
-ids TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4
+**Build status:** DEFERRED · 4 unit(s) · node d · opened 2026-11-19 · streams tooling
+ids TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 TOOL-dTrackedAtlas-5 TOOL-dTrackedAtlas-6 TOOL-dTrackedAtlas-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -65,10 +67,10 @@ ids TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTracked
 | [TOOL-dTrackedAtlas-1 — one chain build-state derivation, read by the schedule and the Atlas](spec/2026-11-19-spec-TOOL-dTrackedAtlas-1.md) | 1 | 1 | CLOSED | rev-3 | 2026-11-19 |
 | [TOOL-dTrackedAtlas-2 — the Atlas renders the actual state of each chain build and each area](spec/2026-11-19-spec-TOOL-dTrackedAtlas-2.md) | 2 | 1 | CLOSED | rev-2 | 2026-11-19 |
 | [TOOL-dTrackedAtlas-3 — the page carries the commit and input digest it was generated from, and `--check` reds a stale one](spec/2026-11-19-spec-TOOL-dTrackedAtlas-3.md) | 3 | 1 | CLOSED | rev-3 | 2026-11-19 |
-| [TOOL-dTrackedAtlas-4 — the Atlas page regenerates on node d after main moves, behind a switch whose default is on](spec/2026-11-19-spec-TOOL-dTrackedAtlas-4.md) | 4 | 1 | SPECCED | rev-4 | 2026-11-19 |
+| [TOOL-dTrackedAtlas-4 — the Atlas page regenerates on node d after main moves, behind a switch whose default is on](spec/2026-11-19-spec-TOOL-dTrackedAtlas-4.md) | 4 | 1 | DEFERRED | rev-5 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 28 bound to this build, across 3 record folder(s).
+Records: 30 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
