@@ -103,3 +103,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-19T08:08:47Z brief · item TOOL-dWitnessedBar-15 · reason cf8e9dc69f47 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-15-build-brief.md
 
 2026-11-19T08:24:31Z brief · item TOOL-dWitnessedBar-12 · reason a9485773206b memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-12-build-brief.md
+
+2026-11-19T08:29:48Z dispatch · item 4a9130fb TOOL-dWitnessedBar-12 · reason tools/gate-legs.json tools/run-gates/run-gates.test.sh tools/run-gates/run-gates.gov.test.sh tools/run-gates/run-gates.sh tools/run-gates/owed_rows.py tools/run-gates/README.md tools/playbook/namespaces.toml tools/playbook/tag_index.py tools/playbook/gov_tag.py tools/govkit/govkit.py tools/govkit/selftest.py help/tags.md .lexicon.conf memory/map/generated/symbols.json memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-12-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-12.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
