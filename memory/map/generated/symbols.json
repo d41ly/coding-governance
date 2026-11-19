@@ -730,6 +730,11 @@
     {
       "id": "add_feed_event",
       "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "add_feed_event",
+      "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
     },
     {
@@ -741,6 +746,11 @@
       "id": "add_feed_sightings",
       "kind": "function",
       "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "add_feed_sightings",
+      "kind": "function",
+      "file": "tools/push-main.sh"
     },
     {
       "id": "add_feed_sightings",
@@ -796,6 +806,11 @@
       "id": "add_health_event",
       "kind": "function",
       "file": "tools/process-monitor/reap.py"
+    },
+    {
+      "id": "add_health_event",
+      "kind": "function",
+      "file": "tools/push-main.sh"
     },
     {
       "id": "add_health_event",
@@ -5845,6 +5860,11 @@
     {
       "id": "check_dir_lock_stale",
       "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "check_dir_lock_stale",
+      "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
     },
     {
@@ -6110,6 +6130,11 @@
     {
       "id": "check_feed",
       "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "check_feed",
+      "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
     },
     {
@@ -6121,6 +6146,11 @@
       "id": "check_feed_copies",
       "kind": "function",
       "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
+      "id": "check_fence_beat",
+      "kind": "function",
+      "file": "tools/push-main.sh"
     },
     {
       "id": "check_fences",
@@ -7461,6 +7491,11 @@
       "id": "check_proc_gone",
       "kind": "function",
       "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "check_proc_gone",
+      "kind": "function",
+      "file": "tools/push-main.sh"
     },
     {
       "id": "check_proc_gone",
@@ -10975,6 +11010,11 @@
     {
       "id": "derive_feed_events",
       "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "derive_feed_events",
+      "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
     },
     {
@@ -11241,6 +11281,11 @@
       "id": "derive_health_log",
       "kind": "function",
       "file": "tools/process-monitor/reap.py"
+    },
+    {
+      "id": "derive_health_log",
+      "kind": "function",
+      "file": "tools/push-main.sh"
     },
     {
       "id": "derive_health_log",
@@ -18065,6 +18110,11 @@
     {
       "id": "print_feed",
       "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "print_feed",
+      "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
     },
     {
@@ -20178,6 +20228,16 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_fence_line",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "read_fence_tips",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
+    },
+    {
       "id": "read_fenced_row",
       "kind": "function",
       "file": "tools/loop/adapt.py"
@@ -20301,6 +20361,11 @@
       "id": "read_first_seen",
       "kind": "function",
       "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "read_first_seen",
+      "kind": "function",
+      "file": "tools/push-main.sh"
     },
     {
       "id": "read_first_seen",
@@ -22091,6 +22156,11 @@
       "id": "read_proc_token",
       "kind": "function",
       "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "read_proc_token",
+      "kind": "function",
+      "file": "tools/push-main.sh"
     },
     {
       "id": "read_proc_token",
@@ -24081,6 +24151,11 @@
       "id": "remove_dir_lock",
       "kind": "function",
       "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "remove_dir_lock",
+      "kind": "function",
+      "file": "tools/push-main.sh"
     },
     {
       "id": "remove_dir_lock",
@@ -26855,6 +26930,11 @@
     {
       "id": "resolve_health_log",
       "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "resolve_health_log",
+      "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
     },
     {
@@ -29576,6 +29656,11 @@
       "id": "run_fd_git",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_fence_land",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
     },
     {
       "id": "run_fix_pass",
@@ -36510,6 +36595,11 @@
     {
       "id": "write_dir_lock",
       "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "write_dir_lock",
+      "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
     },
     {
@@ -36530,6 +36620,11 @@
     {
       "id": "write_dir_lock_pid",
       "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "write_dir_lock_pid",
+      "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
     },
     {
@@ -36541,6 +36636,11 @@
       "id": "write_dir_lock_wait",
       "kind": "function",
       "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "write_dir_lock_wait",
+      "kind": "function",
+      "file": "tools/push-main.sh"
     },
     {
       "id": "write_dir_lock_wait",
@@ -36596,6 +36696,11 @@
       "id": "write_edit",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "write_effect_push",
+      "kind": "function",
+      "file": "tools/push-main.sh"
     },
     {
       "id": "write_empty_lists",
@@ -36665,6 +36770,11 @@
     {
       "id": "write_feed",
       "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "write_feed",
+      "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
     },
     {
@@ -36676,6 +36786,21 @@
       "id": "write_feed_plant",
       "kind": "function",
       "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
+      "id": "write_fence_beat",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_fence_fixture",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
+    },
+    {
+      "id": "write_fence_stub",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
     },
     {
       "id": "write_file",

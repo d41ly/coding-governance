@@ -1621,7 +1621,7 @@ else
   echo "  skip — 41 no govkit deployer or no run-gates kit holding regen.py beside this lander, or no python launcher, so the fold-before-regeneration arm did not run"
 fi
 
-# 42-49 — TOOL-dPlacedRequest-15: THE FENCED PUSH. A bare remote and clone A, each push's hook a stub
+# 42-51 — TOOL-dPlacedRequest-15: THE FENCED PUSH. A bare remote and clone A, each push's hook a stub
 #      that writes the allow record `check_push_allow` reads and exits 0, the unattended kit beside
 #      this lander standing at the fixture's own `<prefix>unattended/` as a one-line launcher of it,
 #      leases on, and clone A's session `sA` holding the build lease `fx` under fleet tag `a`. Clone B
@@ -1641,7 +1641,7 @@ write_fence_fixture() { # -> FX/o.git, FX/a holding the lease fx, FX/b; rc 1 whe
     mkdir -p "./${KIT_REL}unattended" .githooks memory/builds/fx
     cp "$HERE/push-main.sh" "$lander"
     printf '#!/usr/bin/env bash\nexec bash "%s" "$@"\n' "$HERE/$_fn_k/unattended.sh" > "${KIT_REL}unattended/unattended.sh"
-    printf '#!/usr/bin/env bash\ngd=$(git rev-parse --git-dir)\nwhile read -r _l s r _o; do [ "$r" = refs/heads/main ] && printf "%%s\\tstub\\n" "$s" > "$gd/pre-push-allow"; done\nif [ -f "%s/take-once" ]; then rm -f "%s/take-once"; ( cd "%s/b" && USERNAME=agent5 bash "%s" --lease take-over build fx >&2 ); fi\nexit 0\n' \
+    printf '#!/usr/bin/env bash\ngd=$(git rev-parse --git-dir)\nwhile read -r _l s r _o; do [ "$r" = refs/heads/main ] && printf "%%s\\tstub\\n" "$s" > "$gd/pre-push-allow"; done\nif [ -f "%s/take-once" ]; then rm -f "%s/take-once"; ( unset GIT_DIR GIT_WORK_TREE; cd "%s/b" && USERNAME=agent5 bash "%s" --lease take-over build fx >&2 ); fi\nexit 0\n' \
       "$FX" "$FX" "$FX" "${KIT_REL}unattended/unattended.sh" > .githooks/pre-push
     printf '%s\n' 'MEMORY_ROOT=memory' 'RUN_CLAIMS="on"' 'LANDER="echo land"' 'LANDER_MODE="primary"' 'BYPASS_BAN="--no-verify"' \
       'GATE_CMD="true"' 'GATE_WALL="21600"' 'RESUME_SCHEDULE="off"' 'RESUME_SCHEDULE_DELAY=1800' 'RESUME_SCHEDULE_LIMIT=6' \
@@ -1751,8 +1751,29 @@ if [ -n "$_fn_k" ] && [ -n "$_py_arms" ] && write_fence_fixture; then
     "2|push-main: --slug <slug>, a build-folder name"*) ok "49 an attended --slug outside the build-folder grammar exits 2" ;;
     *) bad "49 a malformed attended --slug was not refused at exit 2: $out49" ;;
   esac
+  # 50 — S3: a fence line naming another lease ref refuses unparsed, and a beat not parented on the
+  #      tip refuses at check_fence_beat; the attended `--slug` pushes nothing either time.
+  t50=$(read_fence_tips); lt50=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+  m50=$(git --git-dir="$FX/o.git" rev-parse main)
+  write_fence_stub "echo \"fence — refs/gov/leases/other/build $lt50 $m50\""
+  out50=$(run_fence_land --slug fx); rc50=$?
+  write_fence_stub "echo \"fence — refs/gov/leases/fx/build $lt50 $m50\""
+  out50b=$(run_fence_land --slug fx); rc50b=$?
+  case "$rc50 $rc50b $([ "$(read_fence_tips)" = "$t50" ] && echo unchanged)|$out50|$out50b" in
+    "1 1 unchanged|"*"push-main: fence read unparsed — exit 0 · fence — refs/gov/leases/other/build"*"|"*"so it does not stand on the tip the fence read"*)
+      ok "50 a fence line naming another lease, and a beat not parented on the tip, each refuse with nothing pushed" ;;
+    *) bad "50 a foreign lease ref or an unparented beat was not refused before the push: $out50 | $out50b" ;;
+  esac
+  # 51 — S3: no unattended driver beside the lander is no fence, and the attended `--slug` lands alone.
+  git -C "$FX/a" rm -rq "${KIT_REL}unattended" && git -C "$FX/a" commit -qm "TOOL-fx-9: no driver"
+  lb51=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+  out51=$(run_fence_land --slug fx); rc51=$?
+  case "$rc51 $([ "$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)" = "$lb51" ] && echo unmoved)|$out51" in
+    "0 unmoved|"*"push-main: fence — none · no unattended driver beside this lander"*"landed main"*) ok "51 with no driver beside the lander the --slug landing reads no fence and lands the branch alone" ;;
+    *) bad "51 a lander with no driver beside it refused or moved the lease: $out51" ;;
+  esac
 else
-  echo "  skip — 42-49 no unattended kit beside this lander, no python launcher, or no lease the fixture's user could acquire, so the fenced-push arms did not run"
+  echo "  skip — 42-51 no unattended kit beside this lander, no python launcher, or no lease the fixture's user could acquire, so the fenced-push arms did not run"
 fi
 unset GOV_RUNLOG; export USERNAME="$_fn_u" CLAUDE_CODE_SESSION_ID="$_fn_sid"
 [ -z "$_fn_gct" ] || export GOV_GATE_CMD_TEST="$_fn_gct"
