@@ -6788,6 +6788,11 @@
       "file": "tools/loop/loop_lib.py"
     },
     {
+      "id": "check_item_maps",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "check_item_seeds",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"

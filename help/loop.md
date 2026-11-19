@@ -1114,6 +1114,19 @@ driver's own overlap and dispatch reads take, skipping a CLOSED or WONTDO spec. 
 exits 0, or 2 with one `path-tokens not read` line on a malformed call or a revision or spec git cannot
 read.
 
+**The map slot and its unfolds.** An item's `map` says whether its work order's `map` slot is filled:
+`none`, the default, or `base`, the project map. The items where the project map is delivered to the
+planner, the architect, the reuse scout, the spec writer and the researcher declare `base`, as
+`--check` lists them; the unit workers, the builder and the tester among them, get no map. An item's
+`unfolds` lists the namespace words, each the `ns` of a row of the playbook kit's `namespaces.toml`,
+whose nodes its map slot spells out one by one; `item.design.inventory` unfolds `kit`
+and `policy`. `loop_lib.py --check` prints one `loop: map <tag> · map <value>` line per item, ending
+`· unfolds <words>` where it unfolds, and refuses a `map` outside `none` and `base`, an `unfolds` beside
+`map = "none"`, and an unfold word no namespace row registers, naming the item and the value or word.
+Where the playbook kit is not installed it prints `loop: unfolds · unarmed — no namespace registry
+resolves`, checks no unfold word, and the rest of the check runs. `--fixture --plant map-bad`,
+`unfold-unregistered`, `unfold-no-map` and `no-registry` show each.
+
 ## Handing an item what its upstream items established
 
 An item can name the items whose commitments it must honour, its upstream items, in an `upstream`

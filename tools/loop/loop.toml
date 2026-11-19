@@ -1255,6 +1255,7 @@ routes = { select = "item.plan.record", defer = "stand-in:{prefix}/memory-tree/b
 tag = "item.plan.triage-judge"
 step = "step.plan"
 actor = "role:gov-planner"
+map = "base"
 needs = ["item.plan.triage-rule"]
 outcomes = ["select", "defer", "retire", "refuse"]
 witness = { class = "history", by = "the schema check over its return, its choice joined to the triage record" }
@@ -1276,6 +1277,7 @@ tag = "item.plan.research"
 step = "step.plan"
 actor = "role:gov-researcher"
 seed = "question-paths"
+map = "base"
 needs = ["item.plan.record"]
 outcomes = ["answered"]
 witness = { class = "history", by = "the research record's schema check" }
@@ -1325,6 +1327,7 @@ routes = { scored = "item.plan.reason", review = "stand-in:{prefix}/workflows/ti
 tag = "item.plan.reason"
 step = "step.plan"
 actor = "role:gov-planner"
+map = "base"
 needs = ["item.plan.recommend"]
 outcomes = ["review", "no-review"]
 witness = { class = "history", by = "the schema check, its answer joined to the recommendation record" }
@@ -1377,6 +1380,8 @@ tag = "item.design.inventory"
 step = "step.design"
 actor = "role:gov-architect"
 seed = "scope-paths"
+map = "base"
+unfolds = ["kit", "policy"]
 needs = ["item.design.input"]
 outcomes = ["inventoried"]
 witness = { class = "history", by = "the inventory joined to every built unit" }
@@ -1387,6 +1392,7 @@ routes = { inventoried = "item.design.decompose" }
 tag = "item.design.seams"
 step = "step.design"
 actor = "role:gov-reuse-scout"
+map = "base"
 needs = ["item.design.input"]
 outcomes = ["found"]
 witness = { class = "history", by = "the seams' probe digests, re-derived by the executor" }
@@ -1398,6 +1404,7 @@ tag = "item.design.decompose"
 step = "step.design"
 actor = "role:gov-architect"
 seed = "scope-paths"
+map = "base"
 needs = [["item.design.inventory", "item.design.reentry", "item.design.seams"]]
 outcomes = ["decomposed", "fact-fork", "goal-fork"]
 witness = { class = "history", by = "the roster and interface schema check, every raised feature fork joined to its fork record" }
@@ -1409,6 +1416,7 @@ tag = "item.design.research"
 step = "step.design"
 actor = "role:gov-researcher"
 seed = "question-paths"
+map = "base"
 needs = ["item.design.decompose"]
 outcomes = ["answered"]
 witness = { class = "history", by = "the research record's schema check" }
@@ -1443,6 +1451,7 @@ tag = "item.design.unit-spec"
 step = "step.design"
 actor = "role:gov-spec-writer"
 seed = "write-set"
+map = "base"
 needs = [["item.design.input", "item.design.overlaps", "item.design.streams"]]
 outcomes = ["authored", "feature-fork"]
 witness = { class = "history", by = "the format check on the spec at its SHA, every raised fork joined to its fork record" }
@@ -1467,6 +1476,7 @@ tag = "item.design.reason"
 step = "step.design"
 actor = "role:gov-spec-writer"
 seed = "scope-paths"
+map = "base"
 needs = ["item.design.recommend"]
 allowance = "none"
 outcomes = ["review", "no-review"]
@@ -2046,6 +2056,7 @@ tag = "item.review.fold"
 step = "none"
 actor = "role:gov-spec-writer"
 seed = "write-set"
+map = "base"
 needs = ["item.review.dispose"]
 outcomes = ["next-round", "released", "at-bound"]
 witness = { class = "history", by = "each confirmed finding joined to its fold at the spec's new blob, which the re-invoke's prevSubjects pins" }

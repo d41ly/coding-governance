@@ -249,3 +249,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-19T23:03:19Z brief · item TOOL-dPlacedRequest-8 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
 2026-11-19T23:26:51Z dispatch · item bceeb875 TOOL-dPlacedRequest-6 · reason tools/loop/loop.toml tools/loop/loop_lib.py help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-6.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-6-1-acceptance-ledger.md help/loop.md memory/map/generated tools/loop/loop.toml tools/loop/loop_lib.py tools/loop/item-schema.toml
+
+2026-11-19T23:29:39Z brief · item TOOL-dPlacedRequest-6 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md

@@ -75,6 +75,13 @@ the question's backticked paths, each through the unattended driver's `--path-to
 rule, run as a subprocess where that driver resolves; `scope-paths` reads unarmed until a plan record
 carries a scope. `seed <item tag>` prints it.
 
+A role item also declares its map slot (TOOL-dPlacedRequest-6): `map`, whether its work order's `map`
+slot is filled, `none`, absent reading the same, or `base`, the `widens` order of the schema's `map` row
+read by `read_seed_values`; and `unfolds`, the namespace words whose nodes that slot spells out one by
+one. `check_item_maps` refuses a `map` outside that order, an `unfolds` beside `map = "none"`, and an
+unfold word that is no `ns` of the playbook kit's `namespaces.toml`, found by `resolve_kit_dir` as the
+layer tags are; where that kit does not resolve the namespace arm prints `unarmed` and checks no word.
+
 The definition also declares the computed witness kinds (TOOL-dDeclaredLoop-17): one
 `[[computed-witness]]` row per witness a tool computes rather than the acting agent typing it, its
 `name`, the item it `serves` (or `none`), its `writer` today, a stand-in or an actor, and the build
@@ -116,7 +123,9 @@ line and exit 1. It prints each step's program, `loop: program <step> · <n> ite
 order, then the breakpoint program's as `loop: program review`, or `loop: inputs unarmed` and why
 before them where no layer tags resolve, then one `loop: item` line per item in file order, each field's source or `pending` or `unarmed`, and `loop: items · <n>
 read · <p> pending · <u> unarmed`, then one `loop: seed <tag> · <value>` line per item and `loop: seeds · <n>
-declared · <m> none`. It then prints the witness classes, one line per witness alias and per witness, one
+declared · <m> none`, then one `loop: map <tag> · map <value>` line per item, ending `· unfolds <words>`
+where it unfolds, `loop: maps · <n> declared · <m> none`, and `loop: unfolds · <n> word(s) checked against
+<m> namespace(s)` or `loop: unfolds · unarmed — no namespace registry resolves`. It then prints the witness classes, one line per witness alias and per witness, one
 line per list row with its build and the list's base line, the base or `no comparison` and why, the
 builds line, the folder or `foreign` and why, one `loop: computed-witness <name> · serves <tag> · class
 <class> · writer <writer> · armed by <build>` line per computed witness, then `review_bounds.py`'s
@@ -134,7 +143,8 @@ item and exits 0, or 1 on a refused definition or a derive that exits non-zero. 
 prints the item's seed as `resolve_item_seed` answers it, one path per line or its `unarmed` line, and
 exits 0, 1 on a refused definition, or 2 naming an item no row declares or the resolver's refusal. Its
 plants, `SEED_PLANTS` and `seed-bad`, run `seed` as a process in a scratch repository and break the
-definition's seeds. Exit 2 is a usage error, a site outside `DECLARATION_SITES` included.
+definition's seeds. The map's plants, `map-bad`, `unfold-unregistered` and `unfold-no-map`, break the
+declarations, and `no-registry` resolves the registry from an empty scratch directory. Exit 2 is a usage error, a site outside `DECLARATION_SITES` included.
 
 WHAT THIS DOES NOT CHECK: that a workflow row names a workflow the roles kit holds, which is that kit's
 catalogue check, both ways; that a step tag or an item tag is registered in its namespace, which is the
@@ -147,6 +157,8 @@ which `loop_table.py` beside this file checks, both ways (TOOL-dDeclaredLoop-13)
 unknown key on a row is not read and not refused. That a witness's `by` is true. That a seed path exists,
 stays inside the repository, or is the write set a builder really wrote: the seed is what was declared,
 read from a spec at HEAD, and a CLOSED or WONTDO spec declares none, as the driver's reader skips it.
+That a `map` sits on a role item, or that an unfolded namespace has a node: a map is what was declared,
+and the slot that renders it is dFurnishedOrders'.
 Stdlib only, but for
 `read_actor_base` and `read_builds_dir`, which import the memory-tree kit's compare base and its conf
 reader inside the function, `read_role_defaults`, which imports the roles kit's library there, and
@@ -242,7 +254,12 @@ PLANTS = {"missing-step": "the step.deploy row taken out",
           "seed-question": "seed item.plan.research run with a question naming two backticked paths, then with no "
                            "question",
           "seed-scope": "seed item.design.inventory run in a scratch repository, its scope-paths source armed by "
-                        "no plan record, then an undeclared item and an unknown flag"}
+                        "no plan record, then an undeclared item and an unknown flag",
+          "map-bad": "item.build.unit-pass, a unit worker, given map full",
+          "unfold-unregistered": "item.design.inventory's unfolds set to legs, a word no namespace row registers",
+          "unfold-no-map": "item.build.unit-pass given unfolds kit beside map none",
+          "no-registry": "item.design.inventory's unfolds set to legs, the namespace registry resolved from an "
+                         "empty scratch directory"}
 #: `--selftest`'s owed answer of each plant (TOOL-dDeclaredLoop-67 S30): its exit, the opening of a line
 #: it prints and a needle that line holds, each pair found by running the plant alone at the pass's base.
 #: A definition the reader refuses prints `loop: <path>: <why>`, a graded refusal `loop: refused · <why>`.
@@ -294,7 +311,12 @@ PLANT_OWED = {"missing-step": (1, "loop: ", "the step step.deploy is missing"),
               "seed-bad": (1, "loop: refused · ", "the item item.plan.place seed 'write-set' sits on the actor"),
               "seed-write": (0, "loop: fixture · seed-write held · ", "fx/seed-plant.txt"),
               "seed-question": (0, "loop: fixture · seed-question held · ", "fx/y.sh fx/z.sh"),
-              "seed-scope": (0, "loop: fixture · seed-scope held · ", "unarmed — scope-paths:")}
+              "seed-scope": (0, "loop: fixture · seed-scope held · ", "unarmed — scope-paths:"),
+              "map-bad": (1, "loop: refused · ", "the item item.build.unit-pass map 'full' is not one of"),
+              "unfold-unregistered": (1, "loop: refused · ", "the item item.design.inventory unfolds 'legs', which "
+                                                              "is no ns"),
+              "unfold-no-map": (1, "loop: refused · ", "the item item.build.unit-pass unfolds kit with map none"),
+              "no-registry": (0, "loop: unfolds · ", "unarmed — no namespace registry resolves")}
 #: The plants whose break is in what the scope verb reads rather than in the definition, so `--check`
 #: runs whole and the scope verb runs after it.
 SCOPE_PLANTS = ("scope-selected", "scope-no-kit")
@@ -308,7 +330,8 @@ PLANT_SCOPE_UNIT = ("unit.loop-fixture", "item.plan.record")
 #: The item kind's row schema beside the definition, whose `seed` row's `widens` order is the value set of
 #: an item's declared code seed (TOOL-dPlacedRequest-8).
 ITEM_SCHEMA = "item-schema.toml"
-#: An item's `seed` where it declares none: the value that hands no path.
+#: An item's `seed` where it declares none: the value that hands no path; and its `map` where it declares
+#: none, the value that fills no map slot (TOOL-dPlacedRequest-6).
 SEED_NONE = "none"
 #: The line a `scope-paths` seed resolves to until a plan record carries a scope.
 SEED_SCOPE_UNARMED = "unarmed — scope-paths: no plan record carries a scope; dRankedPlan's plan.record arms it"
@@ -1524,10 +1547,11 @@ def check_item_declarations(items, roles, why):
     return lines, refusals
 
 
-def read_seed_values(kit_dir):
+def read_seed_values(kit_dir, field="seed"):
     """The value set of an item's `seed`, narrowest first: the `widens` order of the `seed` `[[field]]` row
-    of the item kind's schema in `kit_dir` (TOOL-dPlacedRequest-8 S1). LoopError naming the schema where it
-    does not read, is no TOML, or holds no `seed` row whose `widens` is an order of words."""
+    of the item kind's schema in `kit_dir` (TOOL-dPlacedRequest-8 S1), or of the scalar row `field` names,
+    `map` for `check_item_maps` (TOOL-dPlacedRequest-6). LoopError naming the schema where it does not
+    read, is no TOML, or holds no such row whose `widens` is an order of words."""
     path = pathlib.Path(kit_dir) / ITEM_SCHEMA
     try:
         with open(path, "rb") as fh:
@@ -1536,10 +1560,10 @@ def read_seed_values(kit_dir):
         raise LoopError(path.as_posix(), "cannot be read: %s" % e.strerror)
     except (tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
         raise LoopError(path.as_posix(), "not valid TOML: %s" % e)
-    row = next((f for f in data.get("field", []) if isinstance(f, dict) and f.get("name") == "seed"), {})
+    row = next((f for f in data.get("field", []) if isinstance(f, dict) and f.get("name") == field), {})
     widens = row.get("widens")
     if not isinstance(widens, list) or not widens or not all(isinstance(v, str) and SEG.fullmatch(v) for v in widens):
-        raise LoopError(path.as_posix(), "holds no [[field]] row seed whose widens is an order of words")
+        raise LoopError(path.as_posix(), "holds no [[field]] row %s whose widens is an order of words" % field)
     return list(widens)
 
 
@@ -1564,6 +1588,50 @@ def check_item_seeds(items):
         else:
             declared += 1
     lines.append("loop: seeds · %d declared · %d none" % (declared, none))
+    return lines, refusals
+
+
+def check_item_maps(items, namespaces):
+    """`(lines, refusals)` of the `[[item]]` rows `items` (TOOL-dPlacedRequest-6 S3): one `loop: map <tag> ·
+    map <value>` line per item in file order, an absent `map` read `none`, ending `· unfolds <words>` where
+    the item declares unfolds, then `loop: maps · <n> declared · <m> none` and the namespace arm's line. A
+    `map` outside the `widens` order of the schema's `map` row is refused naming the item and the value; an
+    `unfolds` that is no list of words, or that stands on an item whose `map` is `none`, since nothing
+    renders the nodes it would list, is refused naming the item; and an unfold word that is no word of
+    `namespaces`, the `ns` of each row of the playbook kit's namespace registry, is refused naming the item
+    and the word. `namespaces` None is a registry that does not resolve: the arm prints `unarmed — no
+    namespace registry resolves`, checks no unfold word and refuses nothing. LoopError where the schema
+    does not read."""
+    values = read_seed_values(pathlib.Path(__file__).absolute().parent, "map")
+    lines, refusals, declared, none, words = [], [], 0, 0, 0
+    for row in items:
+        tag, value, unfolds = row.get("tag"), row.get("map", SEED_NONE), row.get("unfolds", [])
+        listed = isinstance(unfolds, list) and all(isinstance(w, str) for w in unfolds)
+        lines.append("loop: map %s · map %s%s" % (tag, value, " · unfolds %s" % ", ".join(unfolds)
+                                                   if listed and unfolds else ""))
+        if value not in values:
+            refusals.append("the item %s map %r is not one of %s" % (tag, value, " ".join(values)))
+        elif value == SEED_NONE:
+            none += 1
+        else:
+            declared += 1
+        if not listed:
+            refusals.append("the item %s unfolds %r, which is no list of namespace words" % (tag, unfolds))
+            continue
+        if unfolds and value == SEED_NONE:
+            refusals.append("the item %s unfolds %s with map none: nothing renders the nodes it would list" % (
+                tag, ", ".join(unfolds)))
+        if namespaces is None:
+            continue
+        for word in unfolds:
+            words += 1
+            if word not in namespaces:
+                refusals.append("the item %s unfolds %r, which is no ns of the namespace registry" % (tag, word))
+    lines.append("loop: maps · %d declared · %d none" % (declared, none))
+    if namespaces is None:
+        lines.append("loop: unfolds · unarmed — no namespace registry resolves")
+    else:
+        lines.append("loop: unfolds · %d word(s) checked against %d namespace(s)" % (words, len(namespaces)))
     return lines, refusals
 
 
@@ -1862,6 +1930,13 @@ def write_loop_plant(data, case, rows, base_rows):
         elif case == "seed-bad":
             items["item.build.unit-pass"]["seed"] = "diff"
             items["item.plan.place"]["seed"] = "write-set"
+        elif case == "map-bad":
+            items["item.build.unit-pass"]["map"] = "full"
+        elif case in ("unfold-unregistered", "no-registry"):   # no-registry's other break is in `main`
+            items["item.design.inventory"]["unfolds"] = ["legs"]
+        elif case == "unfold-no-map":
+            items["item.build.unit-pass"]["map"] = SEED_NONE
+            items["item.build.unit-pass"]["unfolds"] = ["kit"]
         else:
             plan["exit"] = "item.design.exit"
 
@@ -1941,9 +2016,9 @@ def main(argv):
         for line in lines:
             print(line)
         return 0
-    # A scope plant's or roles-no-kit's scratch directory sits under the host temp directory and is
-    # removed after.
-    scratch = tempfile.TemporaryDirectory() if plant in SCOPE_PLANTS + ("roles-no-kit",) else None
+    # A scope plant's, roles-no-kit's or no-registry's scratch directory sits under the host temp directory
+    # and is removed after.
+    scratch = tempfile.TemporaryDirectory() if plant in SCOPE_PLANTS + ("roles-no-kit", "no-registry") else None
     layer_dir = scratch.name if plant == "scope-no-kit" else kit_dir
     try:
         data, where = read_definition(kit_dir)
@@ -1991,7 +2066,29 @@ def main(argv):
         seed_lines, seed_refusals = [], [str(e)]
     for line in seed_lines:
         print(line)
-    item_refusals = item_refusals + seed_refusals
+    # TOOL-dPlacedRequest-6 S3: each item's map and unfolds, each unfold word joined to the playbook kit's
+    # namespace registry, read as the lexicon's read_tag_words reads it; no playbook kit leaves the arm unarmed.
+    ns_dir = scratch.name if plant in ("scope-no-kit", "no-registry") else kit_dir
+    try:
+        try:
+            registry = resolve_kit_dir("playbook", "namespaces.toml", ns_dir) / "namespaces.toml"
+        except LookupError:
+            namespaces = None
+        else:
+            with open(registry, "rb") as fh:
+                namespaces = {r["ns"] for r in tomllib.load(fh).get("namespace", [])
+                              if isinstance(r, dict) and isinstance(r.get("ns"), str)}
+        map_lines, map_refusals = check_item_maps(read_item_rows(data, where), namespaces)
+    except LoopError as e:
+        map_lines, map_refusals = [], [str(e)]
+    except OSError as e:
+        map_lines, map_refusals = [], ["the namespace registry %s cannot be read: %s" % (registry.as_posix(),
+                                                                                         e.strerror)]
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
+        map_lines, map_refusals = [], ["the namespace registry %s is not valid TOML: %s" % (registry.as_posix(), e)]
+    for line in map_lines:
+        print(line)
+    item_refusals = item_refusals + seed_refusals + map_refusals
     print("loop: witness classes %s · refused %s" % (" ".join(data["witnesses"]["classes"]),
                                                       " ".join(data["witnesses"]["refused"])))
     for a in data.get("witness-alias", []):
