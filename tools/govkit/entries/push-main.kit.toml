@@ -67,6 +67,7 @@ why_no_adopter = "the hook is inert until the target points core.hooksPath at it
 
 # The three self-tests below are `kit`: each tests an engine file an adopter receives verbatim, self-tests run on demand only (owner, 2026-10-09), and the adopter's runner holds a `kit` leg unless GATE_SELFTESTS=1.
 [[gate_leg]]
+tag = "leg.push-main.push-main-self-test"
 name = "push-main self-test"
 subject = "kit"
 argv = ["bash", "{prefix}/push-main.test.sh"]
@@ -81,6 +82,7 @@ the self-test is this entry's gate leg and there is no rendered artifact to comp
 """
 
 [[gate_leg]]
+tag = "leg.push-main.pre-push-self-test"
 name = "pre-push self-test"
 subject = "kit"
 argv = ["bash", ".githooks/pre-push.test.sh"]
@@ -94,6 +96,7 @@ stage = ["step.test"]
 # on every run and observes the evasions land (TOOL-aRepatriatedFork-5, the owner's F2 ruling). It
 # ships so an adopter can retire its own copy: adopter nc carried the original, TOOL-aRepatriatedFork-5.
 [[gate_leg]]
+tag = "leg.push-main.pre-push-bar-self-test"
 name = "pre-push bar self-test"
 subject = "kit"
 argv = ["python3", ".githooks/pre_push_bar_selftest.py"]

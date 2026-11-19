@@ -82,6 +82,7 @@ means = "adopted"
 # gov's alone, carried by an [[exempt_leg]] row in the deployer's registry: its subject is the code
 # in this directory.
 [[gate_leg]]
+tag = "leg.policy-kit.policy-check"
 name = "policy check"
 subject = "repo"
 argv = ["python", "{kit}/check_policy.py"]

@@ -243,7 +243,8 @@ fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
 # Raised from 12 by TOOL-aShardedFloor-2, which adds the shard-contract arms (forward cover and
 # reverse declaration). Stated ABSOLUTELY, never as a delta.
-FLOOR_ASSERTIONS=19
+FLOOR_ASSERTIONS=20
+# Raised 19 -> 20 by TOOL-dWitnessedBar-12, which adds G10, the leg tags' shape and uniqueness arm.
 # Raised 15 -> 16 by TOOL-dDerivedDocket-23, which adds G1b, the four-leg `signature` pin.
 # Raised 16 -> 17 by PLAY-dOrderedCharter-67, which adds the python-reads scanner's plants.
 # Raised 17 -> 18 by TOOL-aMeasuredDrag-4, which adds G8, the tags leg's unguarded pin.
@@ -597,6 +598,38 @@ if "guard" in rows[0]:
     print("  live build'"'"'s pin, which a {prefix}/loop/ guard misses, so a scoped bar would skip the")
     print("  termination check over a change it reads. Remove the guard.")
     sys.exit(1)
+' "$LEGS_FILE"; then
+  fail=1
+fi
+
+# ---- G10. EVERY GOV LEG CARRIES ONE `leg` TAG, AND NO TWO SHARE ONE ------------------------------
+# TOOL-dWitnessedBar-12 S7: a row's `tag` is `leg.<owner>.<name>`, two segments after the namespace,
+# within 64 bytes. The one check that reds a duplicated leg tag (its section 8 F10): the resolver's
+# `check` keeps a tag's first definition, so two rows sharing one read green there.
+#
+# WHAT THIS DOES NOT CHECK: that a tag follows the rule from its row's owner and name, which 7h joins
+# against the descriptor only for a declared leg, nor a duplicate in any manifest but gov's own.
+a=$((a+1))
+if ! "$PYBIN" -c '
+import json, re, sys
+try:
+    legs = json.load(open(sys.argv[1], encoding="utf-8"))
+except Exception as e:
+    print("gov-canary: %s does not parse: %s" % (sys.argv[1], e)); sys.exit(1)
+seg = "[a-z0-9][a-z0-9-]*"
+bad, seen = [], {}
+for l in legs:
+    nm, tag = l.get("name", "?"), l.get("tag")
+    if not isinstance(tag, str) or not re.fullmatch(r"leg\.%s\.%s" % (seg, seg), tag) or len(tag.encode()) > 64:
+        bad.append("leg %r carries tag %r, not leg.<owner>.<name> within 64 bytes" % (nm, tag))
+    elif tag in seen:
+        bad.append("legs %r and %r share the tag %s" % (seen[tag], nm, tag))
+    else:
+        seen[tag] = nm
+if not legs:
+    print("gov-canary: %s holds no leg, so no tag was graded" % sys.argv[1]); sys.exit(1)
+if bad:
+    print("gov-canary: " + "\ngov-canary: ".join(bad)); sys.exit(1)
 ' "$LEGS_FILE"; then
   fail=1
 fi

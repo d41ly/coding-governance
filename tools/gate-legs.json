@@ -2,6 +2,7 @@
   {
     "name": "kickoff-manifest ratchet",
     "pass_leg": true,
+    "tag": "leg.kickoff-manifest.kickoff-manifest-ratchet",
     "argv": [
       "bash",
       "skills/session-kickoff/manifest-check.sh"
@@ -14,6 +15,7 @@
   },
   {
     "name": "template size <=48KiB",
+    "tag": "leg.gov.template-size-48kib",
     "argv": [
       "bash",
       "{prefix}/check-template-size.sh"
@@ -25,6 +27,7 @@
   },
   {
     "name": "charter size",
+    "tag": "leg.gov.charter-size",
     "argv": [
       "bash",
       "{prefix}/check-template-size.sh",
@@ -37,6 +40,7 @@
   },
   {
     "name": "micro-format definitions",
+    "tag": "leg.check-microformats.micro-format-definitions",
     "argv": [
       "bash",
       "{prefix}/check-microformats.sh"
@@ -48,6 +52,7 @@
   },
   {
     "name": "micro-format gate selftest",
+    "tag": "leg.check-microformats.micro-format-gate-selftest",
     "argv": [
       "bash",
       "{prefix}/check-microformats.test.sh"
@@ -63,6 +68,7 @@
   },
   {
     "name": "line length",
+    "tag": "leg.check-line-length.line-length",
     "argv": [
       "bash",
       "{prefix}/check-line-length.sh"
@@ -74,6 +80,7 @@
   },
   {
     "name": "line-length gate selftest",
+    "tag": "leg.gov.line-length-gate-selftest",
     "argv": [
       "bash",
       "{prefix}/check-line-length.test.sh"
@@ -90,6 +97,7 @@
   {
     "name": "playbook parity",
     "pass_leg": true,
+    "tag": "leg.gov.playbook-parity",
     "argv": [
       "python",
       "{prefix}/playbook/render_playbook.py",
@@ -104,6 +112,7 @@
   },
   {
     "name": "playbook parity selftest",
+    "tag": "leg.gov.playbook-parity-selftest",
     "guard": [
       "{prefix}/check-playbook-parity.sh",
       "{prefix}/check-playbook-parity.test.sh",
@@ -121,6 +130,7 @@
   },
   {
     "name": "template size gate selftest",
+    "tag": "leg.gov.template-size-gate-selftest",
     "argv": [
       "bash",
       "{prefix}/check-template-size.test.sh"
@@ -132,6 +142,7 @@
   },
   {
     "name": "build-method size",
+    "tag": "leg.gov.build-method-size",
     "argv": [
       "bash",
       "{prefix}/check-template-size.sh",
@@ -145,6 +156,7 @@
   {
     "name": "unattended protocol size",
     "pass_leg": true,
+    "tag": "leg.gov.unattended-protocol-size",
     "argv": [
       "bash",
       "{prefix}/check-template-size.sh",
@@ -157,6 +169,7 @@
   },
   {
     "name": "unattended skill size",
+    "tag": "leg.gov.unattended-skill-size",
     "argv": [
       "bash",
       "{prefix}/check-template-size.sh",
@@ -169,6 +182,7 @@
   },
   {
     "name": "kickoff engine size <=18KiB",
+    "tag": "leg.gov.kickoff-engine-size-18kib",
     "argv": [
       "bash",
       "{prefix}/check-template-size.sh",
@@ -182,6 +196,7 @@
   {
     "name": "shell hygiene (a loop fed by a command substitution)",
     "pass_leg": true,
+    "tag": "leg.gate-lint.shell-hygiene-a-loop-fed-by-a-command-substitution",
     "argv": [
       "python3",
       "{prefix}/gate-lint/sh_hygiene.py",
@@ -194,6 +209,7 @@
   },
   {
     "name": "shell hygiene (a location probe asked from a moved directory)",
+    "tag": "leg.gate-lint.shell-hygiene-a-location-probe-asked-from-a-moved",
     "argv": [
       "python3",
       "{prefix}/gate-lint/sh_hygiene.py",
@@ -210,6 +226,7 @@
   },
   {
     "name": "shell hygiene (a fork spent on builtin work)",
+    "tag": "leg.gate-lint.shell-hygiene-a-fork-spent-on-builtin-work",
     "argv": [
       "python3",
       "{prefix}/gate-lint/sh_hygiene.py",
@@ -226,6 +243,7 @@
   },
   {
     "name": "shell hygiene (a fixed-name temp renamed into place)",
+    "tag": "leg.gate-lint.shell-hygiene-a-fixed-name-temp-renamed-into-place",
     "argv": [
       "python3",
       "{prefix}/gate-lint/sh_hygiene.py",
@@ -243,6 +261,7 @@
   },
   {
     "name": "spawn budget (forks per hot entrypoint)",
+    "tag": "leg.gov.spawn-budget-forks-per-hot-entrypoint",
     "argv": [
       "bash",
       "{prefix}/gate-lint/fork-count.sh",
@@ -256,6 +275,7 @@
   },
   {
     "name": "shell-hygiene selftest",
+    "tag": "leg.gate-lint.shell-hygiene-selftest",
     "argv": [
       "python3",
       "{prefix}/gate-lint/sh_hygiene.py",
@@ -272,6 +292,7 @@
   {
     "name": "encoding posture (text IO names its encoding)",
     "pass_leg": true,
+    "tag": "leg.gov.encoding-posture-text-io-names-its-encoding",
     "argv": [
       "python3",
       "{prefix}/gate-lint/encoding_posture.py",
@@ -288,6 +309,7 @@
   },
   {
     "name": "kit version markers",
+    "tag": "leg.check-kit-versions.kit-version-markers",
     "argv": [
       "bash",
       "{prefix}/check-kit-versions.sh"
@@ -301,6 +323,7 @@
   {
     "name": "verdict epoch (kit version dates the engine)",
     "pass_leg": true,
+    "tag": "leg.memory-tree.verdict-epoch-kit-version-dates-the-engine",
     "argv": [
       "bash",
       "{prefix}/memory-tree/check-verdict-epoch.sh"
@@ -313,6 +336,7 @@
   },
   {
     "name": "verdict-epoch self-test",
+    "tag": "leg.gov.verdict-epoch-self-test",
     "argv": [
       "bash",
       "{prefix}/memory-tree/check-verdict-epoch.test.sh"
@@ -328,6 +352,7 @@
   },
   {
     "name": "agent-instructions wiring",
+    "tag": "leg.gov.agent-instructions-wiring",
     "argv": [
       "python",
       "{prefix}/playbook/render_playbook.py",
@@ -344,6 +369,7 @@
   },
   {
     "name": "manifest-check self-test",
+    "tag": "leg.gov.manifest-check-self-test",
     "argv": [
       "bash",
       "skills/session-kickoff/manifest-check.test.sh"
@@ -359,6 +385,7 @@
   },
   {
     "name": "python resolver (behaviour + inline parity + idiom ban)",
+    "tag": "leg.gov.python-resolver-behaviour-inline-parity-idiom-ban",
     "argv": [
       "bash",
       "{prefix}/lib/resolve-python.test.sh"
@@ -376,6 +403,7 @@
   },
   {
     "name": "agent-cap self-test",
+    "tag": "leg.gov.agent-cap-self-test",
     "argv": [
       "bash",
       "{prefix}/hooks/agent-cap.test.sh"
@@ -392,6 +420,7 @@
   },
   {
     "name": "scratch-guard self-test",
+    "tag": "leg.gov.scratch-guard-self-test",
     "argv": [
       "bash",
       "{prefix}/hooks/scratch-guard.test.sh"
@@ -410,6 +439,7 @@
   },
   {
     "name": "format-guard self-test",
+    "tag": "leg.gov.format-guard-self-test",
     "argv": [
       "bash",
       "{prefix}/hooks/format-guard.test.sh"
@@ -430,6 +460,7 @@
   },
   {
     "name": "memory-hygiene self-test",
+    "tag": "leg.gov.memory-hygiene-self-test",
     "argv": [
       "bash",
       "{prefix}/memory-tree/check-memory-hygiene.test.sh"
@@ -446,6 +477,7 @@
   },
   {
     "name": "row-driver view refusal",
+    "tag": "leg.gov.row-driver-view-refusal",
     "argv": [
       "python3",
       "{prefix}/memory-tree/merge-rows.py",
@@ -458,6 +490,7 @@
   },
   {
     "name": "row-keyed merge driver replay",
+    "tag": "leg.gov.row-keyed-merge-driver-replay",
     "argv": [
       "bash",
       "{prefix}/memory-tree/merge-rows.test.sh"
@@ -474,6 +507,7 @@
   },
   {
     "name": "kit/dogfood doc parity",
+    "tag": "leg.memory-tree.kit-dogfood-doc-parity",
     "argv": [
       "bash",
       "{prefix}/memory-tree/kit-dogfood-parity.test.sh"
@@ -495,6 +529,7 @@
   {
     "name": "method carriers (every pointer declared)",
     "pass_leg": true,
+    "tag": "leg.memory-tree.method-carriers-every-pointer-declared",
     "argv": [
       "bash",
       "{prefix}/memory-tree/check-method-carriers.sh"
@@ -506,6 +541,7 @@
   },
   {
     "name": "method-carriers self-test",
+    "tag": "leg.gov.method-carriers-self-test",
     "argv": [
       "bash",
       "{prefix}/memory-tree/check-method-carriers.test.sh"
@@ -517,6 +553,7 @@
   },
   {
     "name": "build-index selftest",
+    "tag": "leg.memory-tree.build-index-selftest",
     "argv": [
       "python3",
       "{prefix}/memory-tree/gen_build_index.py",
@@ -537,6 +574,7 @@
   {
     "name": "build README slot contract",
     "pass_leg": true,
+    "tag": "leg.memory-tree.build-readme-slot-contract",
     "argv": [
       "python3",
       "{prefix}/memory-tree/gen_build_index.py",
@@ -549,6 +587,7 @@
   },
   {
     "name": "corpus-ids selftest",
+    "tag": "leg.memory-tree.corpus-ids-selftest",
     "argv": [
       "python3",
       "{prefix}/memory-tree/corpus_ids.py",
@@ -565,6 +604,7 @@
   },
   {
     "name": "gotchas selftest",
+    "tag": "leg.memory-tree.gotchas-selftest",
     "argv": [
       "python3",
       "{prefix}/memory-tree/gotchas.py",
@@ -583,6 +623,7 @@
   },
   {
     "name": "routed-commits selftest",
+    "tag": "leg.memory-tree.routed-commits-selftest",
     "argv": [
       "python3",
       "{prefix}/memory-tree/routed_commits.py",
@@ -601,6 +642,7 @@
   },
   {
     "name": "row-grammar selftest",
+    "tag": "leg.memory-tree.row-grammar-selftest",
     "argv": [
       "python3",
       "{prefix}/memory-tree/row_grammar.py",
@@ -617,6 +659,7 @@
   },
   {
     "name": "backlog migration selftest",
+    "tag": "leg.memory-tree.backlog-migration-selftest",
     "argv": [
       "python3",
       "{prefix}/memory-tree/migrate_backlog.py",
@@ -634,6 +677,7 @@
   {
     "name": "harness arms (fail branches armed or pinned)",
     "pass_leg": true,
+    "tag": "leg.memory-tree.harness-arms-fail-branches-armed-or-pinned",
     "argv": [
       "python3",
       "{prefix}/memory-tree/check-arms.py",
@@ -646,6 +690,7 @@
   },
   {
     "name": "check-arms selftest",
+    "tag": "leg.memory-tree.check-arms-selftest",
     "argv": [
       "python3",
       "{prefix}/memory-tree/check-arms.py",
@@ -662,6 +707,7 @@
   },
   {
     "name": "branch-guard self-test",
+    "tag": "leg.gov.branch-guard-self-test",
     "argv": [
       "bash",
       ".githooks/pre-commit.test.sh"
@@ -678,6 +724,7 @@
   },
   {
     "name": "pre-push self-test",
+    "tag": "leg.push-main.pre-push-self-test",
     "argv": [
       "bash",
       ".githooks/pre-push.test.sh"
@@ -693,6 +740,7 @@
   },
   {
     "name": "pre-push run-log line",
+    "tag": "leg.gov.pre-push-run-log-line",
     "argv": [
       "bash",
       ".githooks/pre-push.runlog.test.sh"
@@ -709,6 +757,7 @@
   },
   {
     "name": "pre-push bar self-test",
+    "tag": "leg.push-main.pre-push-bar-self-test",
     "argv": [
       "python3",
       ".githooks/pre_push_bar_selftest.py"
@@ -723,6 +772,7 @@
   },
   {
     "name": "push-main self-test",
+    "tag": "leg.push-main.push-main-self-test",
     "argv": [
       "bash",
       "{prefix}/push-main.test.sh"
@@ -739,6 +789,7 @@
   },
   {
     "name": "check-wiring self-test",
+    "tag": "leg.check-wiring.check-wiring-self-test",
     "argv": [
       "bash",
       "{prefix}/check-wiring.test.sh"
@@ -755,6 +806,7 @@
   },
   {
     "name": "verifier fan-out self-test",
+    "tag": "leg.gov.verifier-fan-out-self-test",
     "argv": [
       "bash",
       "{prefix}/workflows/check-verifier-fanout.test.sh"
@@ -771,6 +823,7 @@
   },
   {
     "name": "review-protocol parity (kit vs dogfood)",
+    "tag": "leg.review-harness.review-protocol-parity-kit-vs-dogfood",
     "argv": [
       "bash",
       "{prefix}/workflows/check-protocol-parity.test.sh"
@@ -783,6 +836,7 @@
   },
   {
     "name": "review-join ban (no ref-keyed join)",
+    "tag": "leg.review-harness.review-join-ban-no-ref-keyed-join",
     "argv": [
       "bash",
       "{prefix}/workflows/check-review-join.sh"
@@ -794,6 +848,7 @@
   },
   {
     "name": "workflow script syntax",
+    "tag": "leg.review-harness.workflow-script-syntax",
     "argv": [
       "node",
       "{prefix}/workflows/check-workflow-syntax.js"
@@ -805,6 +860,7 @@
   },
   {
     "name": "tier2-review self-test",
+    "tag": "leg.gov.tier2-review-self-test",
     "argv": [
       "bash",
       "{prefix}/workflows/tier2-review.test.sh"
@@ -821,6 +877,7 @@
   },
   {
     "name": "unattended-build self-test",
+    "tag": "leg.gov.unattended-build-self-test",
     "argv": [
       "bash",
       "{prefix}/workflows/unattended-build.test.sh"
@@ -835,6 +892,7 @@
   },
   {
     "name": "review-join self-test",
+    "tag": "leg.gov.review-join-self-test",
     "argv": [
       "bash",
       "{prefix}/workflows/check-review-join.test.sh"
@@ -851,6 +909,7 @@
   },
   {
     "name": "spec-audit opt-in pack self-test",
+    "tag": "leg.gov.spec-audit-opt-in-pack-self-test",
     "argv": [
       "bash",
       "{prefix}/workflows/spec-audit-optin.test.sh"
@@ -862,6 +921,7 @@
   },
   {
     "name": "review-replay selftest",
+    "tag": "leg.review-harness.review-replay-selftest",
     "argv": [
       "python3",
       "{prefix}/workflows/review_replay.py",
@@ -874,6 +934,7 @@
   },
   {
     "name": "pytest-guardrails self-test",
+    "tag": "leg.gov.pytest-guardrails-self-test",
     "argv": [
       "bash",
       "{prefix}/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh"
@@ -889,6 +950,7 @@
   },
   {
     "name": "codebase-map kit selftest",
+    "tag": "leg.gov.codebase-map-kit-selftest",
     "argv": [
       "python3",
       "{prefix}/codebase-map/selftest.py"
@@ -906,6 +968,7 @@
   },
   {
     "name": "codebase-map gate coverage",
+    "tag": "leg.codebase-map.codebase-map-gate-coverage",
     "argv": [
       "python3",
       "{prefix}/codebase-map/check_gate_coverage.py"
@@ -923,6 +986,7 @@
   {
     "name": "codebase-map coverage + freshness",
     "pass_leg": true,
+    "tag": "leg.codebase-map.codebase-map-coverage-freshness",
     "argv": [
       "python3",
       "{prefix}/codebase-map/test_codebase_map.py"
@@ -935,6 +999,7 @@
   },
   {
     "name": "codebase-map adopter e2e",
+    "tag": "leg.gov.codebase-map-adopter-e2e",
     "argv": [
       "bash",
       "{prefix}/codebase-map/adopt-codebase-map.test.sh"
@@ -950,6 +1015,7 @@
   },
   {
     "name": "settings-merge selftest",
+    "tag": "leg.settings-merge.settings-merge-selftest",
     "argv": [
       "python3",
       "{prefix}/settings-merge.py",
@@ -966,6 +1032,7 @@
   },
   {
     "name": "memory-recall kit selftest",
+    "tag": "leg.gov.memory-recall-kit-selftest",
     "argv": [
       "python3",
       "{prefix}/memory-recall/selftest.py"
@@ -986,6 +1053,7 @@
   },
   {
     "name": "recall floor",
+    "tag": "leg.gov.recall-floor",
     "argv": [
       "python3",
       "{prefix}/memory-recall/check-recall.py"
@@ -1007,6 +1075,7 @@
   },
   {
     "name": "recall floor arms",
+    "tag": "leg.gov.recall-floor-arms",
     "argv": [
       "python3",
       "{prefix}/memory-recall/test_recall_floor.py"
@@ -1028,6 +1097,7 @@
   },
   {
     "name": "memory-recall skill wiring",
+    "tag": "leg.memory-recall.memory-recall-skill-wiring",
     "argv": [
       "bash",
       "{prefix}/memory-recall/adopt-memory-recall.sh",
@@ -1040,6 +1110,7 @@
   },
   {
     "name": "drift-audit selftest",
+    "tag": "leg.gov.drift-audit-selftest",
     "argv": [
       "python",
       "{prefix}/drift-audit/selftest.py"
@@ -1063,6 +1134,7 @@
   },
   {
     "name": "drift-audit wiring",
+    "tag": "leg.drift-audit.drift-audit-wiring",
     "argv": [
       "bash",
       "{prefix}/drift-audit/adopt-drift-audit.sh",
@@ -1075,6 +1147,7 @@
   },
   {
     "name": "process-monitor wiring",
+    "tag": "leg.process-monitor.process-monitor-wiring",
     "argv": [
       "bash",
       "{prefix}/process-monitor/adopt-process-monitor.sh",
@@ -1088,6 +1161,7 @@
   },
   {
     "name": "process-monitor census selftest",
+    "tag": "leg.gov.process-monitor-census-selftest",
     "argv": [
       "python",
       "{prefix}/process-monitor/selftest.py"
@@ -1106,6 +1180,7 @@
   },
   {
     "name": "process-monitor adopter selftest",
+    "tag": "leg.gov.process-monitor-adopter-selftest",
     "argv": [
       "bash",
       "{prefix}/process-monitor/adopt-process-monitor.test.sh"
@@ -1121,6 +1196,7 @@
   },
   {
     "name": "runlog selftest",
+    "tag": "leg.gov.runlog-selftest",
     "argv": [
       "python",
       "{prefix}/runlog/selftest.py"
@@ -1135,6 +1211,7 @@
   },
   {
     "name": "runlog record schema",
+    "tag": "leg.runlog.runlog-record-schema",
     "argv": [
       "python",
       "{prefix}/runlog/runlog.py",
@@ -1147,6 +1224,7 @@
   },
   {
     "name": "runlog skill wiring",
+    "tag": "leg.runlog.runlog-skill-wiring",
     "argv": [
       "bash",
       "{prefix}/runlog/adopt-runlog.sh",
@@ -1159,6 +1237,7 @@
   },
   {
     "name": "cleanup skill wiring",
+    "tag": "leg.branch-reconcile.cleanup-skill-wiring",
     "argv": [
       "bash",
       "{prefix}/branch-reconcile/adopt-branch-reconcile.sh",
@@ -1171,6 +1250,7 @@
   },
   {
     "name": "branch-reconcile selftest",
+    "tag": "leg.gov.branch-reconcile-selftest",
     "argv": [
       "python",
       "{prefix}/branch-reconcile/selftest.py"
@@ -1186,6 +1266,7 @@
   },
   {
     "name": "drift-audit records",
+    "tag": "leg.drift-audit.drift-audit-records",
     "argv": [
       "python",
       "{prefix}/drift-audit/drift_report.py",
@@ -1204,6 +1285,7 @@
   },
   {
     "name": "unattended kit gate",
+    "tag": "leg.unattended.unattended-kit-gate",
     "argv": [
       "bash",
       "{prefix}/unattended/check-unattended.sh"
@@ -1217,6 +1299,7 @@
   },
   {
     "name": "pass-order history",
+    "tag": "leg.unattended.pass-order-history",
     "argv": [
       "bash",
       "{prefix}/unattended/check-pass-order.sh"
@@ -1231,6 +1314,7 @@
   },
   {
     "name": "routed commits name a specced unit",
+    "tag": "leg.memory-tree.routed-commits-name-a-specced-unit",
     "argv": [
       "python3",
       "{prefix}/memory-tree/routed_commits.py"
@@ -1244,6 +1328,7 @@
   },
   {
     "name": "brief-recorded",
+    "tag": "leg.unattended.brief-recorded",
     "argv": [
       "bash",
       "{prefix}/unattended/check-brief-recorded.sh"
@@ -1258,6 +1343,7 @@
   },
   {
     "name": "playbook validity gate",
+    "tag": "leg.unattended.playbook-validity-gate",
     "argv": [
       "bash",
       "{prefix}/unattended/check-playbook.sh"
@@ -1269,6 +1355,7 @@
   },
   {
     "name": "unattended skill wiring",
+    "tag": "leg.unattended.unattended-skill-wiring",
     "argv": [
       "bash",
       "{prefix}/unattended/adopt-unattended.sh",
@@ -1281,6 +1368,7 @@
   },
   {
     "name": "run-gates canary",
+    "tag": "leg.gov.run-gates-canary",
     "argv": [
       "bash",
       "{prefix}/run-gates/run-gates.test.sh"
@@ -1297,6 +1385,7 @@
   },
   {
     "name": "run-gates evidence",
+    "tag": "leg.gov.run-gates-evidence",
     "argv": [
       "bash",
       "{prefix}/run-gates/run-gates.evidence.test.sh"
@@ -1312,6 +1401,7 @@
   },
   {
     "name": "run-gates turnstile",
+    "tag": "leg.gov.run-gates-turnstile",
     "argv": [
       "bash",
       "{prefix}/run-gates/run-gates.turnstile.test.sh"
@@ -1327,6 +1417,7 @@
   },
   {
     "name": "run-gates gov canary",
+    "tag": "leg.gov.run-gates-gov-canary",
     "argv": [
       "bash",
       "{prefix}/run-gates/run-gates.gov.test.sh"
@@ -1342,6 +1433,7 @@
   },
   {
     "name": "foreign-prefix parity (every self-test at three prefixes)",
+    "tag": "leg.gov.foreign-prefix-parity-every-self-test-at-three-prefixes",
     "argv": [
       "bash",
       "{prefix}/run-gates/foreign-prefix.gov.test.sh"
@@ -1356,6 +1448,7 @@
   },
   {
     "name": "run-gates run-log line",
+    "tag": "leg.gov.run-gates-run-log-line",
     "argv": [
       "bash",
       "{prefix}/run-gates/run-gates.runlog.test.sh"
@@ -1371,6 +1464,7 @@
   },
   {
     "name": "run-gates adopter e2e",
+    "tag": "leg.gov.run-gates-adopter-e2e",
     "argv": [
       "bash",
       "{prefix}/run-gates/adopt-run-gates.test.sh"
@@ -1385,6 +1479,7 @@
   },
   {
     "name": "run-gates wiring",
+    "tag": "leg.run-gates.run-gates-wiring",
     "argv": [
       "bash",
       "{prefix}/run-gates/adopt-run-gates.sh",
@@ -1398,6 +1493,7 @@
   },
   {
     "name": "profile-bar selftest",
+    "tag": "leg.gov.profile-bar-selftest",
     "argv": [
       "bash",
       "{prefix}/run-gates/profile_bar.test.sh"
@@ -1412,6 +1508,7 @@
   },
   {
     "name": "held-halves selftest",
+    "tag": "leg.run-gates.held-halves-selftest",
     "argv": [
       "python3",
       "{prefix}/run-gates/held_halves.py",
@@ -1424,6 +1521,7 @@
   },
   {
     "name": "measure-legs selftest",
+    "tag": "leg.gov.measure-legs-selftest",
     "argv": [
       "python3",
       "{prefix}/run-gates/measure_legs.py",
@@ -1446,6 +1544,7 @@
   {
     "name": "install-prefix (shipped surface)",
     "pass_leg": true,
+    "tag": "leg.check-install-prefix.install-prefix-shipped-surface",
     "argv": [
       "bash",
       "{prefix}/check-install-prefix.sh"
@@ -1463,6 +1562,7 @@
   {
     "name": "hook destinations (every declared hook path ships)",
     "pass_leg": true,
+    "tag": "leg.gov.hook-destinations-every-declared-hook-path-ships",
     "argv": [
       "bash",
       "{prefix}/check-hook-destinations.sh"
@@ -1476,6 +1576,7 @@
   },
   {
     "name": "hook destinations self-test",
+    "tag": "leg.gov.hook-destinations-self-test",
     "argv": [
       "bash",
       "{prefix}/check-hook-destinations.test.sh"
@@ -1495,6 +1596,7 @@
   },
   {
     "name": "agent-cap restatement",
+    "tag": "leg.check-agent-cap-restatement.agent-cap-restatement",
     "argv": [
       "bash",
       "{prefix}/check-agent-cap-restatement.sh"
@@ -1506,6 +1608,7 @@
   },
   {
     "name": "agent-cap restatement self-test",
+    "tag": "leg.check-agent-cap-restatement.agent-cap-restatement-self-test",
     "argv": [
       "bash",
       "{prefix}/check-agent-cap-restatement.test.sh"
@@ -1517,6 +1620,7 @@
   },
   {
     "name": "install-prefix self-test",
+    "tag": "leg.check-install-prefix.install-prefix-self-test",
     "argv": [
       "bash",
       "{prefix}/check-install-prefix.test.sh"
@@ -1533,6 +1637,7 @@
   {
     "name": "dead-path carriers (deleted files still named)",
     "pass_leg": true,
+    "tag": "leg.gov.dead-path-carriers-deleted-files-still-named",
     "argv": [
       "bash",
       "{prefix}/check-dead-paths.sh"
@@ -1545,6 +1650,7 @@
   },
   {
     "name": "dead-path carriers self-test",
+    "tag": "leg.gov.dead-path-carriers-self-test",
     "argv": [
       "bash",
       "{prefix}/check-dead-paths.test.sh"
@@ -1559,6 +1665,7 @@
   },
   {
     "name": "remote literals (kit code names no remote)",
+    "tag": "leg.gov.remote-literals-kit-code-names-no-remote",
     "argv": [
       "bash",
       "{prefix}/check-remote-literals.sh"
@@ -1570,6 +1677,7 @@
   },
   {
     "name": "remote literals self-test",
+    "tag": "leg.gov.remote-literals-self-test",
     "argv": [
       "bash",
       "{prefix}/check-remote-literals.test.sh"
@@ -1586,6 +1694,7 @@
   {
     "name": "govkit selfcheck",
     "pass_leg": true,
+    "tag": "leg.gov.govkit-selfcheck",
     "argv": [
       "python",
       "{prefix}/govkit/govkit.py",
@@ -1600,6 +1709,7 @@
   {
     "name": "kit epoch (shipped bytes move, the version moves)",
     "pass_leg": true,
+    "tag": "leg.gov.kit-epoch-shipped-bytes-move-the-version-moves",
     "argv": [
       "python",
       "{prefix}/govkit/govkit.py",
@@ -1613,6 +1723,7 @@
   },
   {
     "name": "step-rows-frozen",
+    "tag": "leg.gov.step-rows-frozen",
     "argv": [
       "python",
       "{prefix}/govkit/upgrade_steps.py",
@@ -1626,6 +1737,7 @@
   },
   {
     "name": "step-gate",
+    "tag": "leg.gov.step-gate",
     "argv": [
       "python",
       "{prefix}/govkit/step_gate.py"
@@ -1639,6 +1751,7 @@
   {
     "name": "docs",
     "pass_leg": true,
+    "tag": "leg.gov.docs",
     "argv": [
       "python",
       "{prefix}/govkit/docs_leg.py"
@@ -1652,6 +1765,7 @@
   },
   {
     "name": "help reference pages",
+    "tag": "leg.gov.help-reference-pages",
     "argv": [
       "python",
       "{prefix}/playbook/render_playbook.py",
@@ -1666,6 +1780,7 @@
   },
   {
     "name": "help page commands",
+    "tag": "leg.gov.help-page-commands",
     "argv": [
       "python",
       "{prefix}/govkit/docs_leg.py",
@@ -1680,6 +1795,7 @@
   },
   {
     "name": "upgrade-walk",
+    "tag": "leg.gov.upgrade-walk",
     "argv": [
       "python",
       "{prefix}/govkit/upgrade_walk.py"
@@ -1693,6 +1809,7 @@
   },
   {
     "name": "govkit selftest",
+    "tag": "leg.gov.govkit-selftest",
     "argv": [
       "python",
       "{prefix}/govkit/selftest.py"
@@ -1712,6 +1829,7 @@
   {
     "name": "lexicon naming predicates",
     "pass_leg": true,
+    "tag": "leg.lexicon.lexicon-naming-predicates",
     "argv": [
       "python",
       "{prefix}/lexicon/lexicon.py"
@@ -1737,6 +1855,7 @@
   },
   {
     "name": "lexicon selftest",
+    "tag": "leg.gov.lexicon-selftest",
     "argv": [
       "python",
       "{prefix}/lexicon/selftest.py"
@@ -1752,6 +1871,7 @@
   {
     "name": "lexicon wiring",
     "pass_leg": true,
+    "tag": "leg.lexicon.lexicon-wiring",
     "argv": [
       "bash",
       "{prefix}/lexicon/adopt-lexicon.sh",
@@ -1766,6 +1886,7 @@
   },
   {
     "name": "playbook placeholder catalogue",
+    "tag": "leg.check-placeholders.playbook-placeholder-catalogue",
     "argv": [
       "bash",
       "{prefix}/check-placeholders.sh"
@@ -1777,6 +1898,7 @@
   },
   {
     "name": "placeholder-catalogue self-test",
+    "tag": "leg.check-placeholders.placeholder-catalogue-self-test",
     "argv": [
       "bash",
       "{prefix}/check-placeholders.test.sh"
@@ -1792,6 +1914,7 @@
   },
   {
     "name": "memory hygiene",
+    "tag": "leg.memory-tree.memory-hygiene",
     "argv": [
       "bash",
       "{prefix}/memory-tree/check-memory-hygiene.sh"
@@ -1810,6 +1933,7 @@
   {
     "name": "memory hygiene (the pass checks)",
     "pass_leg": true,
+    "tag": "leg.gov.memory-hygiene-the-pass-checks",
     "argv": [
       "bash",
       "{prefix}/memory-tree/check-memory-hygiene.sh",
@@ -1825,6 +1949,7 @@
   },
   {
     "name": "transition-audit arms",
+    "tag": "leg.gov.transition-audit-arms",
     "argv": [
       "bash",
       "{prefix}/memory-tree/transition-audit.test.sh"
@@ -1845,6 +1970,7 @@
   },
   {
     "name": "straggler-guard arms",
+    "tag": "leg.gov.straggler-guard-arms",
     "argv": [
       "bash",
       ".githooks/straggler-guard.test.sh"
@@ -1866,6 +1992,7 @@
   },
   {
     "name": "marker contracts",
+    "tag": "leg.memory-tree.marker-contracts",
     "argv": [
       "bash",
       "{prefix}/memory-tree/marker-contract.test.sh"
@@ -1878,6 +2005,7 @@
   },
   {
     "name": "verifier fan-out",
+    "tag": "leg.review-harness.verifier-fan-out",
     "argv": [
       "bash",
       "{prefix}/workflows/check-verifier-fanout.sh"
@@ -1889,6 +2017,7 @@
   },
   {
     "name": "govkit refusal join",
+    "tag": "leg.gov.govkit-refusal-join",
     "argv": [
       "python",
       "{prefix}/govkit/refusal_join.py"
@@ -1904,6 +2033,7 @@
   {
     "name": "govkit runbook parity",
     "pass_leg": true,
+    "tag": "leg.gov.govkit-runbook-parity",
     "argv": [
       "python",
       "{prefix}/govkit/check_runbook_parity.py"
@@ -1915,6 +2045,7 @@
   },
   {
     "name": "govkit acceptance matrix",
+    "tag": "leg.gov.govkit-acceptance-matrix",
     "argv": [
       "python",
       "{prefix}/govkit/matrix.py"
@@ -1934,6 +2065,7 @@
   {
     "name": "testsuite counts (every bar self-test prints one)",
     "pass_leg": true,
+    "tag": "leg.check-testsuite-counts.testsuite-counts-every-bar-self-test",
     "argv": [
       "bash",
       "{prefix}/check-testsuite-counts.sh"
@@ -1945,6 +2077,7 @@
   },
   {
     "name": "testsuite counts self-test",
+    "tag": "leg.check-testsuite-counts.testsuite-counts-self-test",
     "argv": [
       "bash",
       "{prefix}/check-testsuite-counts.test.sh"
@@ -1957,6 +2090,7 @@
   {
     "name": "playbook render wiring",
     "pass_leg": true,
+    "tag": "leg.playbook-render.playbook-render-wiring",
     "argv": [
       "bash",
       "{prefix}/playbook/adopt-playbook.sh",
@@ -1971,6 +2105,7 @@
   },
   {
     "name": "playbook render selftest",
+    "tag": "leg.playbook-render.playbook-render-selftest",
     "guard": [
       "{prefix}/playbook/",
       "{prefix}/memory-tree/import_walk.py",
@@ -1996,6 +2131,7 @@
   },
   {
     "name": "spec tokens (a spec's own names resolve)",
+    "tag": "leg.gov.spec-tokens-a-spec-s-own-names-resolve",
     "argv": [
       "python",
       "{prefix}/check-spec-tokens.py"
@@ -2009,6 +2145,7 @@
   {
     "name": "spec tokens (the pass's own spec)",
     "pass_leg": true,
+    "tag": "leg.gov.spec-tokens-the-pass-s-own-spec",
     "argv": [
       "python",
       "{prefix}/check-spec-tokens.py",
@@ -2024,6 +2161,7 @@
   {
     "name": "kit placeholders (a declared token its adopter substitutes)",
     "pass_leg": true,
+    "tag": "leg.gov.kit-placeholders-a-declared-token-its-adopter",
     "argv": [
       "python",
       "{prefix}/check-kit-placeholders.py"
@@ -2035,6 +2173,7 @@
   },
   {
     "name": "roles catalogue",
+    "tag": "leg.roles.roles-catalogue",
     "argv": [
       "python",
       "{prefix}/roles/check_roles.py"
@@ -2047,6 +2186,7 @@
   },
   {
     "name": "roles render wiring",
+    "tag": "leg.roles.roles-render-wiring",
     "argv": [
       "bash",
       "{prefix}/roles/adopt-roles.sh",
@@ -2059,6 +2199,7 @@
   },
   {
     "name": "roles render selftest",
+    "tag": "leg.roles.roles-render-selftest",
     "argv": [
       "python",
       "{prefix}/roles/render_agents.py",
@@ -2071,6 +2212,7 @@
   },
   {
     "name": "roles adopter self-test",
+    "tag": "leg.gov.roles-adopter-self-test",
     "argv": [
       "bash",
       "{prefix}/roles/adopt-roles.test.sh"
@@ -2082,6 +2224,7 @@
   },
   {
     "name": "policy check",
+    "tag": "leg.policy-kit.policy-check",
     "argv": [
       "python",
       "{prefix}/policy/check_policy.py"
@@ -2095,6 +2238,7 @@
   },
   {
     "name": "loop definition",
+    "tag": "leg.loop.loop-definition",
     "argv": [
       "python",
       "{prefix}/loop/loop_lib.py",
@@ -2109,6 +2253,7 @@
   },
   {
     "name": "loop definition fixtures",
+    "tag": "leg.gov.loop-definition-fixtures",
     "argv": [
       "python",
       "{prefix}/loop/loop_lib.py",
@@ -2122,6 +2267,7 @@
   },
   {
     "name": "loop computed witness",
+    "tag": "leg.gov.loop-computed-witness",
     "argv": [
       "python",
       "{prefix}/loop/loop_witness.py",
@@ -2135,6 +2281,7 @@
   },
   {
     "name": "loop checklist tags",
+    "tag": "leg.gov.loop-checklist-tags",
     "argv": [
       "python",
       "{prefix}/loop/loop_checklist.py",
@@ -2149,6 +2296,7 @@
   },
   {
     "name": "loop item kind",
+    "tag": "leg.gov.loop-item-kind",
     "argv": [
       "python",
       "{prefix}/loop/loop_items.py",
@@ -2163,6 +2311,7 @@
   },
   {
     "name": "loop splice check",
+    "tag": "leg.gov.loop-splice-check",
     "argv": [
       "python",
       "{prefix}/loop/splice.py",
@@ -2177,6 +2326,7 @@
   },
   {
     "name": "loop parent routes",
+    "tag": "leg.gov.loop-parent-routes",
     "argv": [
       "python",
       "{prefix}/loop/loop_parents.py",
@@ -2190,6 +2340,7 @@
   },
   {
     "name": "loop transition record",
+    "tag": "leg.gov.loop-transition-record",
     "argv": [
       "python",
       "{prefix}/loop/loop_transition.py",
@@ -2204,6 +2355,7 @@
   },
   {
     "name": "loop guard fixtures",
+    "tag": "leg.gov.loop-guard-fixtures",
     "argv": [
       "python",
       "{prefix}/loop/guard.py",
@@ -2217,6 +2369,7 @@
   },
   {
     "name": "loop claims fixtures",
+    "tag": "leg.gov.loop-claims-fixtures",
     "argv": [
       "python",
       "{prefix}/loop/claims.py",
@@ -2230,6 +2383,7 @@
   },
   {
     "name": "loop position fixtures",
+    "tag": "leg.gov.loop-position-fixtures",
     "argv": [
       "python",
       "{prefix}/loop/position.py",
@@ -2243,6 +2397,7 @@
   },
   {
     "name": "loop upstream fixtures",
+    "tag": "leg.gov.loop-upstream-fixtures",
     "argv": [
       "python",
       "{prefix}/loop/upstream.py",
@@ -2256,6 +2411,7 @@
   },
   {
     "name": "loop review bounds fixtures",
+    "tag": "leg.gov.loop-review-bounds-fixtures",
     "argv": [
       "python",
       "{prefix}/loop/review_bounds.py",
@@ -2269,6 +2425,7 @@
   },
   {
     "name": "loop composition fixtures",
+    "tag": "leg.gov.loop-composition-fixtures",
     "argv": [
       "python",
       "{prefix}/loop/composition.py",
@@ -2282,6 +2439,7 @@
   },
   {
     "name": "loop adapt fixtures",
+    "tag": "leg.gov.loop-adapt-fixtures",
     "argv": [
       "python",
       "{prefix}/loop/adapt.py",
@@ -2295,6 +2453,7 @@
   },
   {
     "name": "loop budget fixtures",
+    "tag": "leg.gov.loop-budget-fixtures",
     "argv": [
       "python",
       "{prefix}/loop/budget.py",
@@ -2308,6 +2467,7 @@
   },
   {
     "name": "loop termination",
+    "tag": "leg.gov.loop-termination",
     "argv": [
       "python",
       "{prefix}/loop/termination.py",
@@ -2322,6 +2482,7 @@
   },
   {
     "name": "loop breakpoint fixtures",
+    "tag": "leg.gov.loop-breakpoint-fixtures",
     "argv": [
       "python",
       "{prefix}/loop/breakpoints.py",
@@ -2335,6 +2496,7 @@
   },
   {
     "name": "loop scenario fixtures",
+    "tag": "leg.gov.loop-scenario-fixtures",
     "argv": [
       "python",
       "{prefix}/loop/scenario.py",
@@ -2349,6 +2511,7 @@
   },
   {
     "name": "loop transition tables",
+    "tag": "leg.loop.loop-transition-tables",
     "argv": [
       "python",
       "{prefix}/loop/loop_table.py",
@@ -2363,6 +2526,7 @@
   },
   {
     "name": "loop stage coverage",
+    "tag": "leg.gov.loop-stage-coverage",
     "argv": [
       "python",
       "{prefix}/loop/stage_coverage.py",
@@ -2376,6 +2540,7 @@
   },
   {
     "name": "loop command conformance",
+    "tag": "leg.gov.loop-command-conformance",
     "argv": [
       "python",
       "{prefix}/loop/factories.py",
@@ -2389,6 +2554,7 @@
   },
   {
     "name": "loop factories fixtures",
+    "tag": "leg.gov.loop-factories-fixtures",
     "argv": [
       "python",
       "{prefix}/loop/factories.py",
@@ -2402,6 +2568,7 @@
   },
   {
     "name": "layer dependencies (the core never depends on an expansion)",
+    "tag": "leg.gov.layer-dependencies-the-core-never-depends-on-an",
     "argv": [
       "python",
       "{prefix}/playbook/check_layers.py"
@@ -2414,6 +2581,7 @@
   },
   {
     "name": "core meta-check",
+    "tag": "leg.gov.core-meta-check",
     "argv": [
       "python",
       "{prefix}/playbook/core.py",
@@ -2427,6 +2595,7 @@
   },
   {
     "name": "core kinds",
+    "tag": "leg.gov.core-kinds",
     "argv": [
       "python",
       "{prefix}/playbook/core.py",
@@ -2440,6 +2609,7 @@
   },
   {
     "name": "core skills conformance",
+    "tag": "leg.gov.core-skills-conformance",
     "argv": [
       "python",
       "{prefix}/playbook/core.py",
@@ -2454,6 +2624,7 @@
   },
   {
     "name": "core practices conformance",
+    "tag": "leg.gov.core-practices-conformance",
     "argv": [
       "python",
       "{prefix}/playbook/core.py",
@@ -2468,6 +2639,7 @@
   },
   {
     "name": "core selftest",
+    "tag": "leg.gov.core-selftest",
     "argv": [
       "python",
       "{prefix}/playbook/core.py",
@@ -2481,6 +2653,7 @@
   },
   {
     "name": "instruction ladder (level is the one term)",
+    "tag": "leg.gov.instruction-ladder-level-is-the-one-term",
     "argv": [
       "python",
       "{prefix}/playbook/instruction_units.py",
@@ -2494,6 +2667,7 @@
   },
   {
     "name": "instruction grammar (statement types, provenance lock)",
+    "tag": "leg.gov.instruction-grammar-statement-types-provenance-lock",
     "argv": [
       "python",
       "{prefix}/playbook/instruction_units.py",
@@ -2507,6 +2681,7 @@
   },
   {
     "name": "instruction units (schema, one fact)",
+    "tag": "leg.gov.instruction-units-schema-one-fact",
     "argv": [
       "python",
       "{prefix}/playbook/instruction_units.py",
@@ -2521,6 +2696,7 @@
   },
   {
     "name": "instruction render (one renderer of record)",
+    "tag": "leg.gov.instruction-render-one-renderer-of-record",
     "argv": [
       "python",
       "{prefix}/playbook/render_playbook.py",
@@ -2534,6 +2710,7 @@
   },
   {
     "name": "instruction envelopes",
+    "tag": "leg.gov.instruction-envelopes",
     "argv": [
       "python",
       "{prefix}/playbook/instruction_units.py",
@@ -2548,6 +2725,7 @@
   },
   {
     "name": "instruction units selftest",
+    "tag": "leg.gov.instruction-units-selftest",
     "argv": [
       "python",
       "{prefix}/playbook/instruction_units.py",
@@ -2561,6 +2739,7 @@
   },
   {
     "name": "instruction edits (manifest checks)",
+    "tag": "leg.gov.instruction-edits-manifest-checks",
     "argv": [
       "python",
       "{prefix}/playbook/instructions_edit.py",
@@ -2574,6 +2753,7 @@
   },
   {
     "name": "instruction edits selftest",
+    "tag": "leg.gov.instruction-edits-selftest",
     "argv": [
       "python",
       "{prefix}/playbook/instructions_edit.py",
@@ -2587,6 +2767,7 @@
   },
   {
     "name": "tags (the resolver's checks)",
+    "tag": "leg.gov.tags-the-resolver-s-checks",
     "argv": [
       "python",
       "{prefix}/playbook/gov_tag.py",
@@ -2602,6 +2783,7 @@
   {
     "name": "positional (the citation check alone)",
     "pass_leg": true,
+    "tag": "leg.gov.positional-the-citation-check-alone",
     "argv": [
       "python",
       "{prefix}/playbook/positional.py",
@@ -2616,6 +2798,7 @@
   },
   {
     "name": "tags positional selftest",
+    "tag": "leg.gov.tags-positional-selftest",
     "argv": [
       "python",
       "{prefix}/playbook/positional.py",
@@ -2629,6 +2812,7 @@
   },
   {
     "name": "tags bundle selftest",
+    "tag": "leg.gov.tags-bundle-selftest",
     "argv": [
       "python",
       "{prefix}/playbook/tag_bundle.py",
@@ -2642,6 +2826,7 @@
   },
   {
     "name": "edges (every declared edge parses, is registered and resolves)",
+    "tag": "leg.gov.edges-every-declared-edge-parses-is-registered-and",
     "argv": [
       "python",
       "{prefix}/playbook/edge_grammar.py",
@@ -2657,6 +2842,7 @@
   {
     "name": "writing practice (records and units)",
     "pass_leg": true,
+    "tag": "leg.gov.writing-practice-records-and-units",
     "argv": [
       "python",
       "{prefix}/playbook/writing_practice.py",
@@ -2672,6 +2858,7 @@
   },
   {
     "name": "one-owner",
+    "tag": "leg.gov.one-owner",
     "argv": [
       "python",
       "{prefix}/playbook/writing_practice.py",
@@ -2687,6 +2874,7 @@
   },
   {
     "name": "policy fixtures",
+    "tag": "leg.gov.policy-fixtures",
     "argv": [
       "python",
       "{prefix}/policy/check_policy.py",
@@ -2788,6 +2976,7 @@
   {
     "name": "leg ceilings clear their evidenced maximum",
     "pass_leg": true,
+    "tag": "leg.gov.leg-ceilings-clear-their-evidenced-maximum",
     "argv": [
       "python",
       "{prefix}/run-gates/derive-ceilings.py",
@@ -2802,6 +2991,7 @@
   {
     "name": "every held leg is budgeted, every budget row resolves",
     "pass_leg": true,
+    "tag": "leg.gov.every-held-leg-is-budgeted-every-budget-row-resolves",
     "argv": [
       "bash",
       "{prefix}/run-gates/run-selftests.sh",
@@ -2815,6 +3005,7 @@
   },
   {
     "name": "python reads (a name never bound, an import outside its guard)",
+    "tag": "leg.gov.python-reads-a-name-never-bound-an-import-outside-its",
     "argv": [
       "python",
       "{prefix}/run-gates/py_reads.py"
@@ -2827,6 +3018,7 @@
   },
   {
     "name": "receipt sync (installed files match the receipt)",
+    "tag": "leg.run-gates.receipt-sync-installed-files-match-the-receipt",
     "argv": [
       "python",
       "{prefix}/run-gates/check-receipt.py"
@@ -2839,6 +3031,7 @@
   },
   {
     "name": "spec-tokens self-test",
+    "tag": "leg.gov.spec-tokens-self-test",
     "argv": [
       "bash",
       "{prefix}/check-spec-tokens.test.sh"
@@ -2853,6 +3046,7 @@
   },
   {
     "name": "chain-packet self-test",
+    "tag": "leg.gov.chain-packet-self-test",
     "argv": [
       "bash",
       "{prefix}/chain-packet.test.sh"
@@ -2868,6 +3062,7 @@
   },
   {
     "name": "kit-placeholders self-test",
+    "tag": "leg.gov.kit-placeholders-self-test",
     "argv": [
       "bash",
       "{prefix}/check-kit-placeholders.test.sh"
@@ -2882,6 +3077,7 @@
   },
   {
     "name": "selftest harness self-test",
+    "tag": "leg.gov.selftest-harness-self-test",
     "argv": [
       "bash",
       "{prefix}/lib/lib-selftest.test.sh"
@@ -2897,6 +3093,7 @@
   },
   {
     "name": "extract-arms self-test",
+    "tag": "leg.gov.extract-arms-self-test",
     "argv": [
       "bash",
       "{prefix}/lib/extract-arms.test.sh"
@@ -2913,6 +3110,7 @@
   },
   {
     "name": "run-selftests self-test",
+    "tag": "leg.gov.run-selftests-self-test",
     "argv": [
       "bash",
       "{prefix}/run-gates/run-selftests.test.sh"

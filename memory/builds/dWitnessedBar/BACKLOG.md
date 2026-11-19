@@ -21,7 +21,7 @@
 - SEV · TOOL-dWitnessedBar-33 · LOW · the compare arm keeps two hand-kept copies in step
 - DEFERRED · TOOL-dWitnessedBar-33 · until TOOL-dWitnessedBar-22 · TOOL-dWitnessedBar-22's build run fills the legs' `tests` edges and compares them both ways with the dossiers' claims; dTotalRecall's derivation retires the second copy when it lands (the spec run carries it forward with the unit it waits on)
 - SEV · TOOL-dWitnessedBar-34 · LOW · owed_rows.py reads a literal that no longer exists
-- DEFERRED · TOOL-dWitnessedBar-34 · until TOOL-dWitnessedBar-12 · TOOL-dWitnessedBar-12's build run folds the `KNOWN` literals into `LEG_KEYS` and re-points `owed_rows.py` where PLAY-dOrderedCharter-50 has landed first (the spec run carries it forward with the unit it waits on)
+- CLOSED · TOOL-dWitnessedBar-34 · by TOOL-dWitnessedBar-12 · the canary's two `KNOWN` literals are one `LEG_KEYS` line both key-set arms read, and `owed_rows.py`'s `read_known_copies` reads that line, its two-copies refusal and self-test case deleted
 - SEV · TOOL-dWitnessedBar-35 · MED · a resolver landed by dGroundRules first resolves WSL's launcher on Windows
 - DEFERRED · TOOL-dWitnessedBar-35 · until TOOL-dWitnessedBar-26 · TOOL-dWitnessedBar-26's build run lands the one bash resolver in `tools/lib` with the refusal in place of the fall-back, per its §8 F1, whichever build reaches the file first (the spec run carries it forward with the unit it waits on)
 - SEV · TOOL-dWitnessedBar-36 · MED · the ask can never be accepted once the key is gone

@@ -2761,6 +2761,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
         manifest_reads = {leg.get("name"): leg.get("reads") for leg in _legs_json}
         manifest_ceiling = {leg.get("name"): leg.get("ceiling") for leg in _legs_json}
         manifest_stage = {leg.get("name"): leg.get("stage") for leg in _legs_json}
+        manifest_tag = {leg.get("name"): leg.get("tag") for leg in _legs_json}
         claimed_legs: dict[str, str] = {}
         for eid, (d, _dpath) in descs.items():
             for leg in d.get("gate_leg", []):
@@ -2843,6 +2844,13 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                                f"{leg.get('stage')!r} while <prefix>/gate-legs.json says "
                                f"{manifest_stage.get(nm)!r} — the descriptor and the manifest "
                                f"disagree about which step this leg serves")
+                    # AND ABOUT TAG (TOOL-dWitnessedBar-12 S6), presence included: the emitter carries
+                    # the descriptor's tag into adopters, so it must be the one gov's manifest declares.
+                    if leg.get("tag") != manifest_tag.get(nm):
+                        r.fail(f"entry '{eid}' declares gate leg '{nm}' with tag "
+                               f"{leg.get('tag')!r} while <prefix>/gate-legs.json says "
+                               f"{manifest_tag.get(nm)!r} — the descriptor and the manifest "
+                               f"disagree about the leg's tag")
                     # AND ABOUT THE READ CLASSES, where the descriptor declares them, as with ceiling
                     # (TOOL-aSparedSpawn-13 S1): the classes decide what enters a leg's reuse key, so a
                     # descriptor and a manifest that disagree key one leg two ways. A descriptor that
@@ -4416,6 +4424,11 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                 # deployer breaking a target's gate while installing something else.
                 # The floor is read from the TARGET's installed runner, not assumed.
                 row = {"name": nm, "argv": argv}
+                # THE TAG TRAVELS verbatim beside the name, and only into a runner whose canary's
+                # `LEG_KEYS` admits it, at LEG_KEY_FLOORS' row for it (TOOL-dWitnessedBar-12 S5).
+                if leg.get("tag") is not None and check_target_reads_subject(
+                        target, deploy, descs, floor=LEG_KEY_FLOORS["tag"]):
+                    row["tag"] = leg["tag"]
                 if check_target_reads_subject(target, deploy, descs):
                     row["subject"] = leg.get("subject") or "repo"
                     # IMPURE TRAVELS under the same reader check (TOOL-aRoutedQuill-12 S5): the
@@ -6035,6 +6048,10 @@ CEILING_FLOOR_RUN_GATES = (1, 2)
 # key set with no version move, and origin/main had already shipped 1.48 without it, so the first
 # runner certainly carrying the admission is one above both. TOOL-dDeclaredLoop-46.
 STAGE_FLOOR_RUN_GATES = (1, 49)
+# ONE TABLE from a row key to the run-gates version whose canary admits it, read by the emitter the way
+# the four constants above are, through `check_target_reads_subject`'s `floor`. A later key is a row
+# here, never a fifth constant. `tag`: 1.51, where `LEG_KEYS` gained it (TOOL-dWitnessedBar-12 S5).
+LEG_KEY_FLOORS = {"tag": (1, 51)}
 
 
 def derive_doc_reads(leg: dict, ctx: dict[str, str], have: set[str]) -> tuple[list[str] | None, str]:

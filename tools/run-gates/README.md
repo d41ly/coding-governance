@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.50` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.51` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `<prefix>/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -966,9 +966,11 @@ turn a leg into a pass or a skip.
 install resolves it at any prefix. `GATE_LEGS` still outranks the derivation, which is the seam both
 harnesses drive so a nested run never re-enters the real bar.
 
-Leg-row keys: `argv`, `ceiling`, `chunk`, `doc_reads`, `enforces`, `guard`, `name`, `pack`, `pass_leg`, `reads`, `scope_of`, `signature`, `stage`, `subject`.
+Leg-row keys: `argv`, `ceiling`, `chunk`, `doc_reads`, `enforces`, `guard`, `name`, `pack`, `pass_leg`, `reads`, `scope_of`, `signature`, `stage`, `subject`, `tag`.
 
-Each is a key some row of the manifest carries.
+Each is a key some row of the manifest carries. `tag` is the leg's `leg.<owner>.<name>` tag in the
+leg namespace, beside its free-text `name`, which stays the key every file keyed by leg joins on;
+the canary's one key set is `LEG_KEYS` in `run-gates.test.sh`.
 
 The manifest does NOT travel. A target's leg list is emitted from the selected kits' `[[gate_leg]]`
 blocks; seeding an adopter with gov's leg names is the class

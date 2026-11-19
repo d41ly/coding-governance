@@ -60,6 +60,7 @@ mutates_index = false
 why_no_adopter = "installation is a copy plus a per-machine link; the manifest's own section B is the hole"
 
 [[gate_leg]]
+tag = "leg.kickoff-manifest.kickoff-manifest-ratchet"
 # TOOL-aScouredKit-12. The PATH IS PASSED, because the engine cannot derive it. `manifest-check.sh`
 # resolves the manifest from a hardcoded two-element list and reads MEMORY_ROOT zero times, while
 # the seed above lands at the target-supplied `{manifest_path}` that nothing validates and intake

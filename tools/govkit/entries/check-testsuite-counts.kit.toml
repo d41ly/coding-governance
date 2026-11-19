@@ -23,6 +23,7 @@ mutates_index = false
 why_no_adopter = "it needs no install step: the population is DERIVED from the adopter's own gate manifest, and the waiver registry is seeded by running the leg once and pasting what it names. An adopter script would have to guess the memory root's registry path, which the memory-tree kit already owns."
 
 [[gate_leg]]
+tag = "leg.check-testsuite-counts.testsuite-counts-every-bar-self-test"
 name = "testsuite counts (every bar self-test prints one)"
 subject = "repo"
 argv = ["bash", "{prefix}/check-testsuite-counts.sh"]
@@ -30,6 +31,7 @@ guard = ["{prefix}/check-testsuite-counts.sh", "{prefix}/gate-legs.json"]
 stage = ["step.test"]
 
 [[gate_leg]]
+tag = "leg.check-testsuite-counts.testsuite-counts-self-test"
 name = "testsuite counts self-test"
 subject = "kit"
 argv = ["bash", "{prefix}/check-testsuite-counts.test.sh"]

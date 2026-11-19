@@ -98,6 +98,7 @@ ok = true
 # governing doc and house overlays, so its subject is the adopter's tree, and a broken overlay reds
 # on the adopter's bar before a handoff refuses at run time.
 [[gate_leg]]
+tag = "leg.roles.roles-catalogue"
 name = "roles catalogue"
 subject = "repo"
 argv = ["python", "{kit}/check_roles.py"]
@@ -109,6 +110,7 @@ stage = ["step.test"]
 # together; its subject is the target's own render, which goes stale when an overlay, the conf or the
 # governing doc moves with nobody touching this kit.
 [[gate_leg]]
+tag = "leg.roles.roles-render-wiring"
 name = "roles render wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-roles.sh", "--check"]
@@ -117,6 +119,7 @@ ceiling = 300
 stage = ["step.test"]
 
 [[gate_leg]]
+tag = "leg.roles.roles-render-selftest"
 name = "roles render selftest"
 subject = "kit"
 argv = ["python", "{kit}/render_agents.py", "--selftest"]

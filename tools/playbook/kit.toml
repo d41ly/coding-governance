@@ -164,6 +164,7 @@ stage = 1
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check"]
 
 [[gate_leg]]
+tag = "leg.playbook-render.playbook-render-wiring"
 name = "playbook render wiring"
 subject = "repo"
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check"]
@@ -175,6 +176,7 @@ stage = ["step.test"]
 # without measuring — an unrecognised `kits` member silently deleting a charter section, and a value
 # substituted verbatim into a markdown table row.
 [[gate_leg]]
+tag = "leg.playbook-render.playbook-render-selftest"
 name = "playbook render selftest"
 subject = "kit"
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--selftest"]

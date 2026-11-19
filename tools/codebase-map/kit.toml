@@ -100,6 +100,7 @@ probe = { must_exist = "{kit}/map_extractors.py", must_not_exist = "{map_root}/g
 means = "seeded-extractors-or-crashed"
 
 [[gate_leg]]
+tag = "leg.codebase-map.codebase-map-coverage-freshness"
 name = "codebase-map coverage + freshness"
 subject = "repo"
 argv = ["python", "{gate_file}"]
@@ -134,6 +135,7 @@ discharge = { command = ["python", "{kit}/check_gate_coverage.py"] }
 # descriptor declares as its `[config] file` as `root-conf`, and its selfcheck reds a guarded bar
 # leg whose argv names such a conf its guard lacks. TOOL-dDerivedDocket-21.
 [[gate_leg]]
+tag = "leg.codebase-map.codebase-map-gate-coverage"
 name = "codebase-map gate coverage"
 subject = "repo"
 argv = ["python", "{kit}/check_gate_coverage.py"]

@@ -60,6 +60,7 @@ the kit ships no adopter and no rendered artifact, so there is nothing for this 
 # grades every tracked `*.sh`: no subset of paths bounds it, and a guard could only make it skip the
 # file that just broke.
 [[gate_leg]]
+tag = "leg.gate-lint.shell-hygiene-a-loop-fed-by-a-command-substitution"
 name = "shell hygiene (a loop fed by a command substitution)"
 subject = "repo"
 argv = ["python3", "{kit}/sh_hygiene.py"]
@@ -73,6 +74,7 @@ stage = ["step.test"]
 # home repository's own row passes its registry and excludes its memory tree; it grades its suites,
 # because they ship to every adopter (TOOL-dRemeasuredRender-1).
 [[gate_leg]]
+tag = "leg.gate-lint.shell-hygiene-a-location-probe-asked-from-a-moved"
 name = "shell hygiene (a location probe asked from a moved directory)"
 subject = "repo"
 argv = ["python3", "{kit}/sh_hygiene.py", "--location-probes"]
@@ -88,6 +90,7 @@ stage = ["step.test"]
 # The fork COUNT beside it, `fork-count.sh`, ships with this kit and its leg does not: its ceilings name
 # this repository's own entrypoints and fixtures, so it is an `[[exempt_leg]]` in the deployer registry.
 [[gate_leg]]
+tag = "leg.gate-lint.shell-hygiene-a-fork-spent-on-builtin-work"
 name = "shell hygiene (a fork spent on builtin work)"
 subject = "repo"
 argv = ["python3", "{kit}/sh_hygiene.py", "--spawn-idioms"]
@@ -101,6 +104,7 @@ stage = ["step.test"]
 # repository's row passes its registry and excludes its suites and its memory tree, as the spawn-idiom
 # row does: a suite's temps live in its own scratch dir.
 [[gate_leg]]
+tag = "leg.gate-lint.shell-hygiene-a-fixed-name-temp-renamed-into-place"
 name = "shell hygiene (a fixed-name temp renamed into place)"
 subject = "repo"
 argv = ["python3", "{kit}/sh_hygiene.py", "--temp-names"]
@@ -112,6 +116,7 @@ stage = ["step.test"]
 # changes, and none at all in an adopter's repo that copy-installs the kit and never edits it. The
 # guard names the kit dir the scanner lives in, so it runs when the thing it grades moves.
 [[gate_leg]]
+tag = "leg.gate-lint.shell-hygiene-selftest"
 name = "shell-hygiene selftest"
 subject = "kit"
 argv = ["python3", "{kit}/sh_hygiene.py", "--selftest"]
