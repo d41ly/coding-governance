@@ -134,11 +134,15 @@ def _check_table(table):
     return bad
 
 
+DEPLOYER_HOME = "govkit"  # the deployer kit's directory name, as the policy kit's DEPLOYER_HOME spells it
+
+
 def read_registrations(root):
     """-> every `Registration` at `root`, or ValueError naming each bad table, one per line.
 
     No tool root is derived (§8 F7): every tracked file named `kit.toml`, at any depth, and every
-    tracked `govkit/registry.toml`, at any depth, is read where it sits, so a kit homed outside the
+    tracked `registry.toml` under a directory named `DEPLOYER_HOME`, at any depth, is read where it
+    sits, so a kit homed outside the
     others' parent registers as theirs do. Two govkit registries, and two tables declaring one `home`
     wherever each sits, are refused. WHAT IT DOES NOT CHECK: a tracked fixture named `kit.toml`
     holding a `[[ledger]]` table registers as a kit's would.
@@ -147,7 +151,8 @@ def read_registrations(root):
     if rc != 0:
         raise ValueError("git ls-files failed at %s, so no descriptor could be found" % root)
     tracked = [p for p in out.split("\0") if p]
-    registries = [p for p in tracked if p == "govkit/registry.toml" or p.endswith("/govkit/registry.toml")]
+    tail = f"{DEPLOYER_HOME}/registry.toml"
+    registries = [p for p in tracked if p == tail or p.endswith("/" + tail)]
     descriptors = [p for p in tracked if p.rsplit("/", 1)[-1] == "kit.toml"]
     refusals = []
     if len(registries) > 1:

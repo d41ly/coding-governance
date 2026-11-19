@@ -1078,10 +1078,12 @@ run_ll() { # verb population [--measured path] -> the CLI's stdout and stderr, t
 run_ll_reset() { git -C "$LLR" reset -q --hard && git -C "$LLR" clean -qfd; }
 git init -q --bare "$LL/remote.git"
 git init -q -b main "$LLR" && git -C "$LLR" config core.autocrlf false
-mkdir -p "$LLR/tools/fx" "$LLR/tools/govkit" "$LLR/scripts/recall" "$LLR/memory/project"
+LL_DEPLOYER=govkit  # the deployer kit's directory name, spelled once
+LL_GATE_LINT=gate-lint  # the gate-lint kit's directory name, spelled once
+mkdir -p "$LLR/tools/fx" "$LLR/tools/$LL_DEPLOYER" "$LLR/scripts/recall" "$LLR/memory/project"
 { printf 'id = "fx"\n\n'; build_ll_table fx-sites site '"path", "delimiter"' shrink-only memory/project/fx-sites.txt
   build_ll_table fx-refs record '"ref", "note"' append-only memory/project/fx-refs.txt '"ref"'; } > "$LLR/tools/fx/kit.toml"
-build_ll_table fx-keys key '"ref"' declared-set memory/project/fx-keys.txt '"ref"' > "$LLR/tools/govkit/registry.toml"
+build_ll_table fx-keys key '"ref"' declared-set memory/project/fx-keys.txt '"ref"' > "$LLR/tools/$LL_DEPLOYER/registry.toml"
 build_ll_table fx-recall key '"name"' append-only memory/project/fx-recall.txt > "$LLR/scripts/recall/kit.toml"
 { build_ll_ledger fx-sites site path,delimiter shrink-only; printf 'a.sh\tEOF\t2\tabcdef12\tseeded\nc.sh\tEOF\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-sites.txt"
 { build_ll_ledger fx-refs record ref,note append-only; printf 'y:7\tnote\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-refs.txt"
@@ -1105,7 +1107,7 @@ out=$(run_ll read fx-sites); run_ll_reset
 { [ "${out##*$'\n'}" = rc=1 ] && grep -q 'line 4: a key field reads as a line number' <<<"$out"; } || bad "2o AC1: a line-number key read clean: ${out//$'\n'/ | }"; ok
 printf 'd.sh\tEOF\t1\tabcdef12\tdone\n' >> "$LLR/memory/project/fx-sites.txt"
 out=$(run_ll read fx-sites); run_ll_reset
-{ [ "${out##*$'\n'}" = rc=1 ] && grep -q 'line 4: the disposition' <<<"$out"; } || bad "2o AC1: the disposition done read clean: ${out//$'\n'/ | }"; ok
+{ [ "${out##*$'\n'}" = rc=1 ] && grep -q 'line 4: the disposition' <<<"$out"; } || bad "2o AC1: an invalid disposition read clean: ${out//$'\n'/ | }"; ok
 # AC2 — both ways against a measurement, and a compare given none says so.
 printf 'a.sh\tEOF\t2\nb2.sh\tEOF\t1\n' > "$LL/measured.txt"
 out=$(run_ll compare fx-sites --measured "$LL/measured.txt")
@@ -1156,7 +1158,7 @@ out=$(run_ll read fx-recall)
 build_ll_table fx-dup key '"ref"' declared-set memory/project/fx-keys.txt >> "$LLR/tools/fx/kit.toml"
 out=$(run_ll read fx-keys); run_ll_reset
 { [ "${out##*$'\n'}" = rc=2 ] && grep -q "declare one home memory/project/fx-keys.txt" <<<"$out" \
-  && grep -q "tools/govkit/registry.toml: \[\[ledger\]\] 'fx-keys'" <<<"$out" && grep -q "tools/fx/kit.toml: \[\[ledger\]\] 'fx-dup'" <<<"$out"; } \
+  && grep -q "tools/$LL_DEPLOYER/registry.toml: \[\[ledger\]\] 'fx-keys'" <<<"$out" && grep -q "tools/fx/kit.toml: \[\[ledger\]\] 'fx-dup'" <<<"$out"; } \
   || bad "2o AC9: two tables declaring one home did not exit 2 naming both: ${out//$'\n'/ | }"; ok
 # AC10 — verbatim is per field and per registration: a second population's line-number key, a
 # verbatim registration's other field, and a verbatim entry outside the fields.
@@ -1170,13 +1172,13 @@ printf 'y:8\tz:9\t1\tabcdef12\tseeded\n' >> "$LLR/memory/project/fx-refs.txt"
 out=$(run_ll read fx-refs); run_ll_reset
 { [ "${out##*$'\n'}" = rc=1 ] && grep -q 'line 3: a key field reads as a line number' <<<"$out"; } \
   || bad "2o AC10: verbatim ref waived the line-number refusal on the note field too: ${out//$'\n'/ | }"; ok
-build_ll_table fx-keys key '"ref"' declared-set memory/project/fx-keys.txt '"nope"' > "$LLR/tools/govkit/registry.toml"
+build_ll_table fx-keys key '"ref"' declared-set memory/project/fx-keys.txt '"nope"' > "$LLR/tools/$LL_DEPLOYER/registry.toml"
 out=$(run_ll read fx-keys); run_ll_reset
-{ [ "${out##*$'\n'}" = rc=2 ] && grep -q "tools/govkit/registry.toml: \[\[ledger\]\] 'fx-keys': verbatim names nope, not in its fields" <<<"$out"; } \
+{ [ "${out##*$'\n'}" = rc=2 ] && grep -q "tools/$LL_DEPLOYER/registry.toml: \[\[ledger\]\] 'fx-keys': verbatim names nope, not in its fields" <<<"$out"; } \
   || bad "2o AC10: a verbatim entry outside the fields was accepted: ${out//$'\n'/ | }"; ok
 # AC7 — the parity cut sees one byte changed in the gate-lint copy.
-sed 's/^KEY_KINDS = /KEY_KINDZ = /' "$ROOT/${PFX}gate-lint/legacy_ledger.py" > "$TMP/ll-drift.py"
-{ [ "$(blk legacy_ledger_py "$ROOT/${PFX}gate-lint/legacy_ledger.py")" = "$(blk legacy_ledger_py "$HERE/legacy_ledger.py")" ] \
+sed 's/^KEY_KINDS = /KEY_KINDZ = /' "$ROOT/${PFX}$LL_GATE_LINT/legacy_ledger.py" > "$TMP/ll-drift.py"
+{ [ "$(blk legacy_ledger_py "$ROOT/${PFX}$LL_GATE_LINT/legacy_ledger.py")" = "$(blk legacy_ledger_py "$HERE/legacy_ledger.py")" ] \
   && [ "$(blk legacy_ledger_py "$TMP/ll-drift.py")" != "$(blk legacy_ledger_py "$HERE/legacy_ledger.py")" ]; } \
   || bad "2o AC7: the legacy_ledger_py cut did not hold the gate-lint copy identical, or missed one changed byte"; ok
 
