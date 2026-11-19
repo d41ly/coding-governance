@@ -11568,6 +11568,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "derive_lease_renews",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "derive_leg_argv",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"

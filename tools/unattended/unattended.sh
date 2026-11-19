@@ -2398,7 +2398,7 @@ CLAIM_ROWS=""; CL_WHY=""; CL_OFFLINE=""
 CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""; CW_FROM=""; CW_CLS=""; CW_STATUS=""
 CW_EPOCH=0; CW_KIND=""; CW_TAG=""; CW_WIT=""; CW_LEASE=""; CW_CAUSE=""; CW_HINT=""
 WC_WHY=""; WC_BEAT=""; WC_EPOCH=""
-WL_REF=""; WL_KIND=""; WL_SLUG=""; WL_RENEWS=""; WL_WITNESS=""; WL_TAG=""; WL_QUEUE=""
+WL_REF=""; WL_KIND=""; WL_SLUG=""; WL_VERDICT=""; WL_WITNESS=""; WL_TAG=""; WL_QUEUE=""
 
 # THE ONE REMOTE, counted once. SETS rather than prints, because check 24 is a `fail` and a `fail`
 # inside a command substitution is captured as the URL with its status lost. `observe_anchor` calls
@@ -3164,12 +3164,14 @@ read_first_seen() {  # `ref TAB commit` pairs on stdin -> one `seen-utc` or `-` 
 # `run_lease_verb` set the WL_ names; the commit is parented on CW_SHA, the tip read, which for a slug
 # holding only a legacy claim is the legacy tip, so the lease is created on it (expected sha empty) and
 # the legacy ref never moves. The epoch is 1 on a create, the read epoch plus one on a take, the read
-# epoch otherwise and never below 1. `renews` and `witness` are the WL_ values a verb derived, else the
-# driver's under `leases.renewal` (`read_lease_renewal`). WL_QUEUE builds the commit and queues it
+# epoch otherwise and never below 1. `witness` and the witness verdict are the WL_ values a verb
+# derived, else the driver's under `leases.renewal` (`read_lease_renewal`); `renews` is
+# `derive_lease_renews` over the epoch read (empty on a create), the epoch written, the policy and that
+# verdict, so a write that opens a tenure renews (TOOL-dPlacedRequest-25). WL_QUEUE builds the commit and queues it
 # through `add_gov_queue` instead of pushing it, the offline branch of `leases.offline`: rc 0 with
 # WC_WHY `already` where a line already queues the ref and tip, rc 2 `gov-queue.lock busy` on its lock.
 write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [run-state file] · [lease stamp] -> 0 written, 1 lost, 2 not completed; WC_WHY
-  local slug="$1" st="$2" ka="$3" pol="$4" rel="${5:-}" lease="${6:-}" c rc node host sid msg ref exp="" ep kd sl tag ren wit
+  local slug="$1" st="$2" ka="$3" pol="$4" rel="${5:-}" lease="${6:-}" c rc node host sid msg ref exp="" ep kd sl tag ren wit wv rv er
   WC_WHY=""; WC_BEAT=$(read_utc_now); WC_EPOCH=""
   [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
   if [ -n "$rel" ]; then
@@ -3185,7 +3187,7 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
   [ "$ep" -ge 1 ] 2>/dev/null || ep=1
   case "$CW_KIND" in ""|-) exp="" ;; *) exp=$CW_SHA ;; esac
   if [ -n "$WL_REF" ]; then
-    ref=$WL_REF; kd=$WL_KIND; sl=$WL_SLUG; tag=$WL_TAG; ren=$WL_RENEWS; wit=$WL_WITNESS
+    ref=$WL_REF; kd=$WL_KIND; sl=$WL_SLUG; tag=$WL_TAG; wv=$WL_VERDICT; wit=$WL_WITNESS
   else
     derive_lease_ref build "$slug" >/dev/null; ref=$LEASE_REF; kd=build; sl=$slug
     tag=$CW_TAG
@@ -3193,8 +3195,11 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
       [ -n "$FLEET_TAG" ] || FLEET_TAG=$(resolve_fleet_tag) || FLEET_TAG=-
       tag=$FLEET_TAG
     fi
-    read_lease_renewal "$slug"; ren=$LR_RENEWS; wit=$LR_WITNESS
+    read_lease_renewal "$slug"; wv=$LR_VERDICT; wit=$LR_WITNESS
   fi
+  rv=""; ! read_lease_policy leases.renewal >/dev/null || rv=$LP_VALUE
+  er=$CW_EPOCH; [ "$CW_ACT" != create ] || er=""
+  derive_lease_renews "$er" "$ep" "$rv" "$wv" >/dev/null; ren=$LR_RENEWS
   if [ -z "$ref" ]; then
     WC_WHY="no lease ref derives for $slug: $LEASE_WHY"; rc=2
   else
@@ -3511,18 +3516,40 @@ check_lease_witness() { # slug · sha -> transition|question|question-closed|why
   printf '%s\n' "$LW_VERDICT"; return 2
 }
 
-# THE DRIVER'S OWN `renews` AND `witness` under `leases.renewal` (S8): `progress` renews only on the
-# newest transition of the build when it differs from the record's witness, `activity` on every write,
-# `fixed` at acquisition alone, `none` writes `-`. A refused read writes `renews: no`, renewing nothing.
-read_lease_renewal() { # slug -> LR_RENEWS and LR_WITNESS
-  LR_RENEWS=no; LR_WITNESS=${CW_WIT:--}
-  read_lease_policy leases.renewal >/dev/null || return 0
-  case "$LP_VALUE" in
-    activity) LR_RENEWS=yes ;;
-    fixed) case "$CW_ACT" in create|take|take-announced) LR_RENEWS=yes ;; esac ;;
+# THE ONE DERIVATION OF `renews` (TOOL-dPlacedRequest-25), run by every lease write `write_claim`
+# builds. A write that opens a tenure, a create (the epoch read empty) or one whose written epoch
+# differs from the epoch it read, renews under `progress`, `activity` and `fixed`, witness or not; the
+# rule is keyed on the epoch the writer already computes and never on the act's name, so every act that
+# raises it inherits the rule. Within a tenure `progress` renews on a `new` or a `question` witness
+# verdict, `activity` always and `fixed` never; `none` prints `-` throughout. A policy outside the
+# four, a refused read, prints `no`, renewing nothing. Sets LR_RENEWS and prints it.
+derive_lease_renews() { # epoch read or empty · epoch written · policy · new|question|none -> yes|no|- on stdout; LR_RENEWS
+  local er="${1:-}" ew="${2:-}" pv="${3:-}" wv="${4:-none}"
+  case "$pv" in
     none) LR_RENEWS=- ;;
-    progress) if read_transition_witness "$1" && [ "$LT_SHA" != "$LR_WITNESS" ]; then LR_RENEWS=yes; LR_WITNESS=$LT_SHA; fi ;;
+    progress|activity|fixed)
+      if [ -z "$er" ] || [ "$er" != "$ew" ]; then
+        LR_RENEWS=yes
+      else
+        case "$pv:$wv" in
+          progress:new|progress:question|activity:*) LR_RENEWS=yes ;;
+          *) LR_RENEWS=no ;;
+        esac
+      fi ;;
+    *) LR_RENEWS=no ;;
   esac
+  printf '%s\n' "$LR_RENEWS"
+}
+
+# THE DRIVER'S OWN WITNESS VERDICT AND `witness` (S8): under `progress` the newest transition of the
+# build is a `new` verdict, and the witness stored, when it differs from the record's witness; every
+# other case, a refused read included, is `none` with the record's witness kept. `renews` is
+# `derive_lease_renews`'s, which `write_claim` calls with this verdict.
+read_lease_renewal() { # slug -> LR_VERDICT and LR_WITNESS
+  LR_VERDICT=none; LR_WITNESS=${CW_WIT:--}
+  read_lease_policy leases.renewal >/dev/null || return 0
+  [ "$LP_VALUE" = progress ] || return 0
+  if read_transition_witness "$1" && [ "$LT_SHA" != "$LR_WITNESS" ]; then LR_VERDICT=new; LR_WITNESS=$LT_SHA; fi
   return 0
 }
 
@@ -3614,7 +3641,7 @@ write_gov_queue() { # -> one line per queued write; 0 the queue is empty after, 
 # `leases.offline` where it did not), the overlap at an acquisition (S9), the `lease` column, the
 # witness at a renewal (S8), the write.
 run_lease_verb() { # act · kind · name · sub · witness · release status -> 0 written, 1 refused, 2 not written
-  local act="$1" kind="${2:-}" name="${3:-}" sub="${4:-}" warg="${5:-}" as="${6:-}" ref tail lname sl tag sid st rc rv ren wit wk="" k hd ow
+  local act="$1" kind="${2:-}" name="${3:-}" sub="${4:-}" warg="${5:-}" as="${6:-}" ref tail lname sl tag sid st rc wv wit wk="" k hd ow
   [ "$RUN_CLAIMS" = on ] || { echo "lease not written — RUN_CLAIMS is not on in $CONF, so no lease is read or written"; return 2; }
   if [ "$act" = flush ]; then
     read_claims quiet || { echo "lease not written — the queue stays: $CL_WHY"; return 2; }
@@ -3676,8 +3703,10 @@ run_lease_verb() { # act · kind · name · sub · witness · release status -> 
     3) echo "lease not written — $tail holds no lease to $act"; WL_QUEUE=""; return 2 ;;
     *) echo "lease not written — the claim table declined $tail"; WL_QUEUE=""; return 2 ;;
   esac
-  read_lease_policy leases.renewal >/dev/null; rv=$LP_VALUE
-  wit=${CW_WIT:--}
+  # THE WITNESS VERDICT (TOOL-dPlacedRequest-25 S1): `question` for an open question, `new` for a
+  # transition differing from the record's witness, `none` otherwise, a closed question included; a
+  # witness the check answers is stored under every policy. `write_claim` derives `renews` from it.
+  wit=${CW_WIT:--}; wv=none
   if [ -n "$warg" ]; then
     check_lease_witness "$sl" "$warg" >/dev/null; rc=$?
     case "$rc" in
@@ -3686,23 +3715,15 @@ run_lease_verb() { # act · kind · name · sub · witness · release status -> 
       *) echo "lease not written — $LW_VERDICT"; WL_QUEUE=""; return 2 ;;
     esac
   fi
-  case "$rv" in
-    progress)
-      case "$wk" in
-        question) ren=yes; wit=$LW_SHA ;;
-        transition) ren=no; [ "$LW_SHA" = "$wit" ] || ren=yes; wit=$LW_SHA ;;
-        *) ren=no ;;
-      esac ;;
-    activity) ren=yes ;;
-    fixed) ren=no; case "$CW_ACT" in create|take|take-announced) ren=yes ;; esac ;;
-    *) ren=- ;;
+  case "$wk" in
+    question) wv=question; wit=$LW_SHA ;;
+    transition) [ "$LW_SHA" = "$wit" ] || wv=new; wit=$LW_SHA ;;
   esac
-  [ "$rv" = progress ] || [ -z "$wk" ] || wit=$LW_SHA
-  WL_REF=$ref; WL_KIND=$kind; WL_SLUG=$sl; WL_TAG=$tag; WL_RENEWS=$ren; WL_WITNESS=$wit
+  WL_REF=$ref; WL_KIND=$kind; WL_SLUG=$sl; WL_TAG=$tag; WL_VERDICT=$wv; WL_WITNESS=$wit
   [ "$CW_CLS" != mine ] || [ -z "$CW_TAG" ] || WL_TAG=$CW_TAG
   CW_NODE=""
   write_claim "$lname" "$st" absent quiet "" ""; rc=$?
-  WL_REF=""; WL_KIND=""; WL_SLUG=""; WL_TAG=""; WL_RENEWS=""; WL_WITNESS=""
+  WL_REF=""; WL_KIND=""; WL_SLUG=""; WL_TAG=""; WL_VERDICT=""; WL_WITNESS=""
   if [ -n "$WL_QUEUE" ]; then
     WL_QUEUE=""
     [ "$rc:$WC_WHY" != 0:already ] || { echo "lease — queued — already · $tail"; return 0; }

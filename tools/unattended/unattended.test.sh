@@ -18953,6 +18953,42 @@ EOF
 la_got=$( . "$LF/stubs2.sh"; ( cd "$LF/c1" && set +u && . "$SCRIPT" && load_driver_conf >/dev/null 2>&1 && check_lease_witness tFix "$la_q"; printf ' %s;' "$?" ) 2>/dev/null
   run_lease_arm renew build tFix --witness "$la_q" >/dev/null; printf '%s %s' "$?" "$(read_lease_field tFix/build renews)" )
 same "DPR1 AC12 the probe reads question, and the renewal after the question closed writes renews: no" "$la_got" "question 0;0 no"
+# ---- TOOL-dPlacedRequest-25: A WRITE THAT OPENS A TENURE RENEWS. AC1: a take-over with no witness of a
+# ---- planted stale lease at epoch 1, under the default `progress`, opens epoch 2 on `renews: yes`, and
+# ---- the renew after it reads `no`. AC2: a create with no witness reads epoch 1 and `yes`; planted
+# ---- `none` a create reads `-`, planted `fixed` a create reads `yes` and the renew after it `no`. AC3:
+# ---- `derive_lease_renews` over its table, the first column both as a create and as a raised epoch.
+# ---- AC5: the double question renew is DPR1 AC11's above; its cell is probed here. RED against a rule
+# ---- keyed on the act name that misses the announced take, or a `question` column reading `no`.
+seed_lease_at tRt/build tRt build b s-old live "$(derive_claim_ago 99999)" 1 >/dev/null
+LA_SID=s2 run_lease_arm take-over build tRt >/dev/null
+same "DPR25 AC1 a take-over with no witness opens epoch 2 on renews: yes" "$(read_lease_field tRt/build epoch) $(read_lease_field tRt/build renews)" "2 yes"
+LA_SID=s2 run_lease_arm renew build tRt >/dev/null
+same "DPR25 AC1 the renew after it, no witness, reads renews: no" "$(read_lease_field tRt/build epoch) $(read_lease_field tRt/build renews)" "2 no"
+run_lease_arm acquire build tRc >/dev/null
+same "DPR25 AC2 a create with no witness reads epoch 1 and renews: yes" "$(read_lease_field tRc/build epoch) $(read_lease_field tRc/build renews)" "1 yes"
+write_lease_policy '[leases]
+renewal = "none"'
+run_lease_arm acquire build tRn >/dev/null
+same "DPR25 AC2 under none a create reads renews: -" "$(read_lease_field tRn/build renews)" "-"
+write_lease_policy '[leases]
+renewal = "fixed"'
+run_lease_arm acquire build tRf >/dev/null; la_got=$(read_lease_field tRf/build renews)
+run_lease_arm renew build tRf >/dev/null
+same "DPR25 AC2 under fixed a create renews and the renew after it does not" "$la_got $(read_lease_field tRf/build renews)" "yes no"
+write_lease_policy '[budgets]
+enforce = "warn"'
+la_got=$( cd "$LF/c1" && set +u && . "$SCRIPT" >/dev/null 2>&1
+  for la_v in progress activity fixed none; do
+    printf '%s:' "$la_v"
+    for la_c in "_ 1 none" "1 2 none" "3 3 new" "3 3 question" "3 3 none"; do
+      set -- $la_c; derive_lease_renews "${1#_}" "$2" "$la_v" "$3" >/dev/null; printf ' %s' "$LR_RENEWS"
+    done
+    printf ';'
+  done )
+same "DPR25 AC3 derive_lease_renews prints each cell of the tenure table" "$la_got" \
+  "progress: yes yes yes yes no;activity: yes yes yes yes yes;fixed: yes yes no no no;none: - - - - -;"
+same "DPR25 AC5 a held question renews within its tenure" "$( cd "$LF/c1" && set +u && . "$SCRIPT" >/dev/null 2>&1 && derive_lease_renews 3 3 progress question )" "yes"
 # ---- AC9: two clones whose reads see no lease: the second's compare-and-swap is fenced. Its read is
 # ---- made stale by a shim answering the lease fetch with nothing, so only the push can tell.
 git clone -q "$LF/origin.git" "$LF/c2" 2>/dev/null; cp "$LF/c1/.unattended.conf" "$LF/c2/"
@@ -21296,7 +21332,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3562 -> 3571 by TOOL-dPlacedRequest-24: the offline queue lock block's 9 region-eight assertions
 # (7 `same`, 2 `hit`), every one unconditional, counted off the diff's own lines; no suite ran, and its
 # RED-first observation is the close's.
-FLOOR_ASSERTIONS=3571
+# RAISED 3571 -> 3578 by TOOL-dPlacedRequest-25: the tenure renewal block's 7 region-eight assertions
+# (7 `same`), every one unconditional, counted off the diff's own lines; no suite ran, and its RED-first
+# observation is the close's.
+FLOOR_ASSERTIONS=3578
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -21544,7 +21583,8 @@ FLOOR_SHARD_7=311
 # RAISED 765 -> 786 by TOOL-dPlacedRequest-17: the same 21 region-eight observer clock assertions, see FLOOR_ASSERTIONS.
 # RAISED 786 -> 796 by TOOL-dPlacedRequest-23: the same 10 region-eight strict-read assertions, see FLOOR_ASSERTIONS.
 # RAISED 796 -> 805 by TOOL-dPlacedRequest-24: the same 9 region-eight offline queue lock assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=805
+# RAISED 805 -> 812 by TOOL-dPlacedRequest-25: the same 7 region-eight tenure renewal assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=812
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
