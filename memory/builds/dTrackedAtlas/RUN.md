@@ -24,8 +24,8 @@ parked-surfaced: yes, 2 surfaced
 keepalive-reaped: yes
 refreshed-at: 9e21ac760dc0a43d6ed007396922722ccee98d57 · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 8229afe6d4128280bc20f84d5e3ebb1e2fcf426e
-phase: BUILDING
+witness: bb214a89ded336688af6098d1913cdd197b947ff
+phase: VERIFYING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/unattended-atlas-actual-state-a632fb
