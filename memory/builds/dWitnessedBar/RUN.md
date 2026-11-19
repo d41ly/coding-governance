@@ -73,3 +73,7 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-19T05:54:14Z dispatch · item 66f4e8d9 TOOL-dWitnessedBar-49 · reason tools/memory-recall/selftest.py tools/run-gates/measure_legs.py memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-49-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-49.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md .lexicon.conf memory/map/generated/symbols.json
 
 2026-11-19T06:10:48Z brief · item TOOL-dWitnessedBar-13 · reason 183b97abe5c6 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-13-build-brief.md
+
+2026-11-19T06:12:17Z dispatch · item 5e569d9c TOOL-dWitnessedBar-13 · reason tools/lib/legacy_ledger.py tools/memory-tree/legacy_ledger.py tools/gate-lint/legacy_ledger.py tools/gate-lint/coverage_join.py tools/lib/resolve-python.test.sh tools/memory-tree/merge-rows.py tools/memory-tree/merge-rows.test.sh tools/memory-tree/README.md tools/gate-lint/sh_hygiene.py tools/gate-lint/encoding_posture.py .lexicon.conf memory/map/generated/symbols.json memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-13-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-13.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+
+2026-11-19T06:17:50Z brief · item TOOL-dWitnessedBar-50 · reason c42371bc663c memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-50-build-brief.md
