@@ -56,22 +56,25 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 1 unit(s) · node d · opened 2026-11-19 · streams tooling
+**Build status:** SPECCED · 4 unit(s) · node d · opened 2026-11-19 · streams tooling
 ids TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dTrackedAtlas-1 — one chain build-state derivation, read by the schedule and the Atlas](spec/2026-11-19-spec-TOOL-dTrackedAtlas-1.md) | 1 | 1 | SPECCED | rev-2 | 2026-11-19 |
+| [TOOL-dTrackedAtlas-2 — the Atlas renders the actual state of each chain build and each area](spec/2026-11-19-spec-TOOL-dTrackedAtlas-2.md) | 2 | 1 | SPECCED | rev-1 | 2026-11-19 |
+| [TOOL-dTrackedAtlas-3 — the page carries the commit and input digest it was generated from, and `--check` reds a stale one](spec/2026-11-19-spec-TOOL-dTrackedAtlas-3.md) | 3 | 1 | SPECCED | rev-1 | 2026-11-19 |
+| [TOOL-dTrackedAtlas-4 — the Atlas page regenerates on node d after main moves, behind a switch whose default is on](spec/2026-11-19-spec-TOOL-dTrackedAtlas-4.md) | 4 | 1 | SPECCED | rev-1 | 2026-11-19 |
 <!-- /gen:build-units -->
 
 Records: 8 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dTrackedAtlas-1.
+Ids no `spec-audit` record has ever named: TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4.
 
-Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -79,6 +82,9 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-dTrackedAtlas-1` | no |
+| 2 | `TOOL-dTrackedAtlas-2` | no |
+| 3 | `TOOL-dTrackedAtlas-3` | no |
+| 4 | `TOOL-dTrackedAtlas-4` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
