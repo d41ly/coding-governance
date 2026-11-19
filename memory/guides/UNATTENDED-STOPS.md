@@ -231,8 +231,10 @@ process through the policy kit, a refused read writing nothing:
 `<git-common-dir>/gov-feed.log`, never pushed, one line each of `seq`, ref, kind, the commit's tree,
 the commit and `seen-utc`, a deletion's tree `-` and its commit 40 zeros. The one compare-and-swap
 writer's success sets the cache ref `refs/gov/remote/<tail>` to what it wrote and appends the event
-once; every claim read appends the cached commits the feed has not seen, oldest first, stopping at
-the newest one it holds or at a commit not authored `gov-claim`. `--feed check` holds the feed to
+unless the ref's newest line already carries its tree and commit: a retry appends nothing, and a
+later repeat, after another event of that ref such as a second clear of `bar-red`, appends again.
+Every claim read appends the cached commits past the ref's newest line, oldest first, stopping at
+that line's commit or at a commit not authored `gov-claim`. `--feed check` holds the feed to
 what those cached refs derive, `--feed rebuild` writes it where none is present, and `--feed print`
 replays it from a `seq`. A pruned ref's events stay in the feed and out of the check.
 

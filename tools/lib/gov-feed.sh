@@ -15,22 +15,27 @@
 # and seen-utc (`2026-10-25T14:03:07Z`, this node's clock at the append). The key is ref, blob and
 # commit. `write_gov_ref`'s success exit calls `add_feed_event`, so every writer joins by construction.
 # APPENDING ONCE: under the lock directory `gov-feed.lock` (taken by `mkdir`, retried every 50 ms for
-# 5 s, broken when older than one minute) a key already in the file appends nothing; `seq` is one more
+# 5 s, broken when older than one minute) an event whose blob and commit equal the newest line of its
+# ref appends nothing (TOOL-dPlacedRequest-27), so a retry appends nothing and a repeat with another
+# event of the ref between, a second clear of `bar-red` say, appends again; `seq` is one more
 # than the larger of the counter `gov-feed.seq` and the last all-digit first field of the log, so a
 # lagging counter never repeats a `seq`; a last byte that is not LF is closed with one first, so a
 # torn line stays for `check_feed` to name. A failure prints ONE `feed: NOTE -` line on stderr and
 # returns 0, as the health log's appender does: the governance write already landed.
 # THE CACHE `refs/gov/remote/<tail>` mirrors `refs/gov/<tail>` on the remote: what this node fetched
 # and, through `write_gov_ref`, what it wrote. `add_feed_sightings` appends, oldest first, the unseen
-# first-parent chain of every cached ref whose tip the feed does not hold, stopping at the newest
-# commit the feed holds for that ref or at the first commit not authored `gov-claim`, appended as a
-# lone event. `derive_feed_events` is the same walk with no feed to stop at; `check_feed` holds a feed
-# to it per ref git still holds (`missing`, `duplicate`, `extra` on a ref whose tip is a `gov-claim`
-# commit, `order`, `torn`), and `write_feed` writes it as a fresh feed where none is present.
+# first-parent chain of every cached ref whose tip is not the commit of the feed's newest line for
+# that ref, stopping at that commit or at the first commit not authored `gov-claim`, appended as a
+# lone event, so a ref another node set back to a commit an older line holds is sighted again.
+# `derive_feed_events` is the same walk with no feed to stop at; `check_feed` holds a feed to it per
+# ref git still holds (`missing`, `duplicate` for two consecutive events of one ref with one blob and
+# commit, `extra` on a ref whose tip is a `gov-claim` commit, `order`, `torn`), and `write_feed`
+# writes it as a fresh feed where none is present.
 # GOVFEED_DIR names the common dir; unset, the first call resolves it once for the process.
 # WHAT THIS DOES NOT CHECK: two waiters breaking one crashed lock at once can both append, which gives
 # two events one `seq` and loses none; `seq` and `seen-utc` are node-local and never compared; a
-# ref's events from before a deletion of it are outside every chain git holds and are not compared.
+# ref's events from before a deletion of it are outside every chain git holds and are not compared;
+# a retry made after another event of its ref landed appends again, an event that did happen.
 add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the event appended once
   local ref="$1" c="${2:-}" d k t=- r w=0 s=0 l n now
   [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
@@ -53,7 +58,10 @@ add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the e
     [ "$w" -le 100 ] || { printf 'feed: NOTE - %s/gov-feed.lock was held for 5s, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2; return 0; }
     sleep 0.05
   done
-  if [ -f "$d/gov-feed.log" ] && grep -qF -- $'\t'"$ref"$'\t'"$k"$'\t'"$t"$'\t'"$c"$'\t' "$d/gov-feed.log"; then
+  if [ -f "$d/gov-feed.log" ] && FEED_EV="$ref"$'\t'"$t"$'\t'"$c" awk -F'\t' '
+      BEGIN { split(ENVIRON["FEED_EV"], ev, "\t") }
+      $2 == ev[1] { p = $4 "\t" $5 }
+      END { exit !(p == ev[2] "\t" ev[3]) }' "$d/gov-feed.log" 2>/dev/null; then
     rmdir "$d/gov-feed.lock" 2>/dev/null; return 0
   fi
   if [ -f "$d/gov-feed.seq" ]; then { read -r s <"$d/gov-feed.seq"; } 2>/dev/null || :; fi
@@ -83,9 +91,9 @@ derive_feed_events() { # cache prefix · [feed file] -> `ref TAB kind TAB blob T
             if (f != "") while ((getline ln < f) > 0) {
               sub(/\r$/, "", ln)
               if (split(ln, x, "\t") < 5) continue
-              held[x[2] SUBSEP x[5]] = 1; newest[x[2]] = x[5] } }
+              newest[x[2]] = x[5] } }
     { sub(/\r$/, ""); g = "refs/gov/" substr($1, length(ENVIRON["FEED_PRE"]) + 1)
-      if ((g SUBSEP $2) in held) next
+      if ((g in newest) && newest[g] == $2) next
       print $2, g, (g in newest ? newest[g] : "-") }')
   [ -n "$rows" ] || return 0
   printf '%s\n' "$rows" | while read -r t g s; do
@@ -129,9 +137,9 @@ check_feed() {       # cache prefix · [feed file, the node's by default] -> one
       while ((getline ln < f) > 0) {
         sub(/\r$/, "", ln)
         if (split(ln, x, "\t") != 6) { print "torn " ln; bad = 1; continue }
-        k = x[2] SUBSEP x[4] SUBSEP x[5]
-        if (k in seen) { print "duplicate " x[2] " " x[5]; bad = 1; continue }
-        seen[k] = 1
+        k = x[4] SUBSEP x[5]
+        if ((x[2] in last) && last[x[2]] == k) { print "duplicate " x[2] " " x[5]; bad = 1; continue }
+        last[x[2]] = k
         if (!(x[2] in held)) continue
         if ((x[2] SUBSEP x[5]) in inch) { fn[x[2]]++; fs[x[2], fn[x[2]]] = x[5]; got[x[2] SUBSEP x[5]] = 1 }
         else if (x[2] in chain) { print "extra " x[2] " " x[5]; bad = 1 }

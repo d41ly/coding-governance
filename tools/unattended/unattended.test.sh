@@ -17805,7 +17805,9 @@ if in_shard 8; then
 # names a fresh scratch dir, so no earlier arm's claim write is in the feed, and the cache namespace is
 # cleared first. It prints one `key=value` line per observation and the arms below assert them. The
 # staged reds run inside it: the key check cut from a copy of the block (AC2), a feed line deleted
-# and one doubled (AC4), and a copy whose `seq` reads the counter alone (AC10). WHAT THIS BLOCK DOES
+# and one doubled (AC4), and a copy whose `seq` reads the counter alone (AC10). TOOL-dPlacedRequest-27
+# adds the repeats, in a feed of their own: bar-red written, deleted, written and deleted, and a lone
+# ref another clone sets back, each staged red by a copy keyed over the whole file. WHAT THIS BLOCK DOES
 # NOT DRIVE: the lock's contention and stale-break paths, post-merge's bar-red write through the same
 # bytes, and the sightings `read_claims` takes, which call the function this block drives directly.
 # ==================================================================================================
@@ -17813,6 +17815,11 @@ fd_feed=$(mktemp -d); fd_two=$(mktemp -d)
 git for-each-ref --format='delete %(refname)' refs/gov/remote | git update-ref --stdin
 remove_claim_refs
 awk '/^# >>> gov_feed_sh/{f=1} f{print} /^# <<< gov_feed_sh/{exit}' "$SCRIPT" > "$fd_two.block"
+# TOOL-dPlacedRequest-27's planted copies: the append test keyed over the whole file, as the grep it
+# replaced was, and the check's duplicate rule keyed over the whole file.
+sed 's/\$2 == ev\[1\] {/$2 == ev[1] \&\& $4 == ev[2] \&\& $5 == ev[3] {/' "$fd_two.block" > "$fd_two.whole"
+sed -e 's/if ((x\[2\] in last) && last\[x\[2\]\] == k)/if ((x[2] SUBSEP k) in last)/' \
+  -e 's/last\[x\[2\]\] = k$/last[x[2] SUBSEP k] = 1/' "$fd_two.block" > "$fd_two.chk"
 fd_out=$( (
   GOVFEED_DIR=$fd_feed; F="$fd_feed/gov-feed.log"
   run_fd_git() { local o=$1; shift; git "$@" >"$o" 2>/dev/null; }
@@ -17828,7 +17835,7 @@ fd_out=$( (
   c3=$(build_gov_commit "$c1" f3); write_gov_ref refs/gov/runs/tFeed "$c1" "$c3"; echo "ac1.lost=$?"
   echo "ac1.after-lost=$(grep -c . "$F")"
   add_feed_event refs/gov/runs/tFeed "$c2"; echo "ac2.retry=$(grep -c . "$F")"
-  sed 's/ && grep -qF -- .*gov-feed.log"; then/ \&\& false; then/' "$fd_two.block" > "$fd_two.cut"
+  sed 's/{ exit !(p == /{ exit 1 || (p == /' "$fd_two.block" > "$fd_two.cut"
   ( . "$fd_two.cut"; add_feed_event refs/gov/runs/tFeed "$c2" ); echo "ac2.cut=$(grep -c . "$F")"
   head -n 2 "$F" > "$F.t" && mv "$F.t" "$F"; printf '2\n' > "$fd_feed/gov-feed.seq"
   d1=""; d2=""
@@ -17865,6 +17872,34 @@ fd_out=$( (
   e4=$(build_gov_commit "$e2" g4); add_feed_event refs/gov/runs/tTen "$e4"
   [ "$(tail -n 1 "$F" | cut -f1)" -gt "$(head -n -1 "$F" | cut -f1 | sort -n | tail -n 1)" ] && [ "$(tail -n 1 "$F" | cut -f5)" = "$e4" ] && echo "ac10.own-line=ok"
   o=$(check_feed refs/gov/remote/ "$F"); echo "ac10.torn=$? $(grep -c "^torn $k$" <<<"$o")"
+  # TOOL-dPlacedRequest-27 — the append-once test reads the ref's newest event, in a feed of its own.
+  GOVFEED_DIR=$fd_feed/r27; F="$GOVFEED_DIR/gov-feed.log"; mkdir -p "$GOVFEED_DIR"; z=0000000000000000000000000000000000000000
+  cmp -s "$fd_two.block" "$fd_two.whole" || echo "r27.whole=planted"
+  cmp -s "$fd_two.block" "$fd_two.chk" || echo "r27.chk=planted"
+  x=$(git rev-parse HEAD)
+  write_gov_ref refs/gov/bar-red "" "$x"; remove_gov_ref refs/gov/bar-red "$x"
+  write_gov_ref refs/gov/bar-red "" "$x"; remove_gov_ref refs/gov/bar-red "$x"
+  echo "r27.ac1.lines=$(grep -c '	refs/gov/bar-red	' "$F")"
+  [ "$(cut -f5 "$F" | tr '\n' ' ')" = "$x $z $x $z " ] && echo "r27.ac1.order=ok"
+  add_feed_event refs/gov/bar-red ""; echo "r27.ac1.fifth=$(grep -c . "$F")"
+  cp "$F" "$GOVFEED_DIR/four.log"; rm -f "$F" "$GOVFEED_DIR/gov-feed.seq"
+  ( . "$fd_two.whole"
+    write_gov_ref refs/gov/bar-red "" "$x"; remove_gov_ref refs/gov/bar-red "$x"
+    write_gov_ref refs/gov/bar-red "" "$x"; remove_gov_ref refs/gov/bar-red "$x" ) >/dev/null 2>&1
+  echo "r27.ac1.whole=$(grep -c . "$F")"
+  cp "$GOVFEED_DIR/four.log" "$F"; printf '4\n' > "$GOVFEED_DIR/gov-feed.seq"
+  check_feed refs/gov/remote/ "$F" >/dev/null; echo "r27.ac2.check=$?"
+  ( . "$fd_two.chk"; check_feed refs/gov/remote/ "$F" >/dev/null ); echo "r27.ac2.chk=$?"
+  sed 4p "$F" > "$GOVFEED_DIR/dup.log"; o=$(check_feed refs/gov/remote/ "$GOVFEED_DIR/dup.log"); echo "r27.ac2.dup=$? $(grep -c "^duplicate refs/gov/bar-red $z$" <<<"$o")"
+  t=$(git mktree </dev/null); y1=$(git commit-tree "$t" -m back1); y2=$(git commit-tree "$t" -p "$y1" -m back2)
+  write_gov_ref refs/gov/runs/tBack "" "$y1"; write_gov_ref refs/gov/runs/tBack "$y1" "$y2"
+  ( cd "$fd_two" && GOVFEED_DIR="$fd_two/.git" && git fetch -q origin '+refs/gov/runs/*:refs/gov/remote/runs/*' \
+    && write_gov_ref refs/gov/runs/tBack "$y2" "$y1" ) >/dev/null 2>&1; echo "r27.ac3.reset=$?"
+  git fetch -q origin '+refs/gov/runs/*:refs/gov/remote/runs/*'
+  cp "$F" "$GOVFEED_DIR/six.log"
+  ( . "$fd_two.whole"; add_feed_sightings refs/gov/remote/ ); echo "r27.ac3.whole=$(grep -c '	refs/gov/runs/tBack	' "$F")"
+  cp "$GOVFEED_DIR/six.log" "$F"
+  add_feed_sightings refs/gov/remote/; echo "r27.ac3.lines=$(grep -c '	refs/gov/runs/tBack	' "$F") $(tail -n 1 "$F" | cut -f5 | sed "s/^$y1$/back1/")"
 ) 2>&1 )
 read_fd_field() { sed -n "s/^$1=//p" <<<"$fd_out"; }
 same "TOOL-dPlacedRequest-13 AC1 two writes append two lines" "$(read_fd_field ac1.lines)" "2"
@@ -17894,6 +17929,18 @@ same "AC10 a counter planted 1 appends seq 4" "$(read_fd_field ac10.planted)" "4
 same "AC10 a copy reading the counter alone repeats a seq (staged)" "$(read_fd_field ac10.counter-only)" "2"
 same "AC10 an append after a torn line lands on a line of its own" "$(read_fd_field ac10.own-line)" "ok"
 same "AC10 ...and the check names the torn line" "$(read_fd_field ac10.torn)" "1 1"
+same "TOOL-dPlacedRequest-27 the whole-file append copy is planted" "$(read_fd_field r27.whole)" "planted"
+same "-27 ...and the whole-file check copy" "$(read_fd_field r27.chk)" "planted"
+same "-27 AC1 write, delete, write, delete of bar-red append four lines" "$(read_fd_field r27.ac1.lines)" "4"
+same "-27 AC1 ...in that order" "$(read_fd_field r27.ac1.order)" "ok"
+same "-27 AC1 ...and a fifth, identical deletion appends nothing" "$(read_fd_field r27.ac1.fifth)" "4"
+same "-27 AC1 a whole-file key drops the third and fourth (staged)" "$(read_fd_field r27.ac1.whole)" "2"
+same "-27 AC2 the check reads the repeats clean" "$(read_fd_field r27.ac2.check)" "0"
+same "-27 AC2 ...and a whole-file duplicate rule reds them (staged)" "$(read_fd_field r27.ac2.chk)" "1"
+same "-27 AC2 the fourth line doubled in place is a duplicate" "$(read_fd_field r27.ac2.dup)" "1 1"
+same "-27 AC3 a second clone sets the ref back to an older line's commit" "$(read_fd_field r27.ac3.reset)" "0"
+same "-27 AC3 ...and a whole-file key never sights it (staged)" "$(read_fd_field r27.ac3.whole)" "2"
+same "-27 AC3 ...and the sighting appends it" "$(read_fd_field r27.ac3.lines)" "3 back1"
 out=$(GOVFEED_DIR=$fd_feed run --feed print --from 3)
 same "--feed print --from 3 replays the whole events from seq 3" "$(printf '%s\n' "$out" | cut -f1 | tr '\n' ' ')" "3 5 "
 out=$(GOVFEED_DIR=$fd_feed run --feed check); rc=$?
@@ -17908,7 +17955,7 @@ hit  "$(GOVFEED_DIR=$fd_feed run --feed print --from)" "feed: a replay starts at
 hit  "$(GOVFEED_DIR=$fd_feed run --feed print later)" "unattended: --feed print takes --from <seq> or nothing: later"
 hit  "$(GOVFEED_DIR=$fd_feed run --feed bogus)" "unattended: --feed takes check [<file>], rebuild or print [--from <seq>]: bogus"
 git for-each-ref --format='delete %(refname)' refs/gov/remote | git update-ref --stdin
-remove_claim_refs; rm -rf "$fd_feed" "$fd_two" "$fd_two.block" "$fd_two.cut" "$fd_two.ctr"; reset_tree
+remove_claim_refs; rm -rf "$fd_feed" "$fd_two" "$fd_two.block" "$fd_two.cut" "$fd_two.ctr" "$fd_two.whole" "$fd_two.chk"; reset_tree
 
 fi
 if in_shard 8; then
