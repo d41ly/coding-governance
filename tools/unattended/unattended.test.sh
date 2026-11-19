@@ -20483,7 +20483,7 @@ same "DPR19 AC2 the record holds exactly the three key lines and no parent" \
 same "DPR19 AC2 no object on the origin carries the marker" \
   "$(git -C "$LF/origin.git" cat-file --batch-all-objects --batch | grep -c zq-request-marker-7)" "0"
 same "DPR19 AC2 the words sit byte for byte in clone A's common dir" \
-  "$(cmp -s "$LF/req.md" "$LF/c1/.git/requests/$rq_key.md" && echo identical || echo differs) $(cat "$LF/c1/.git/requests/$rq_key.typed")" "identical qA"
+  "$(cmp -s "$LF/req.md" "$LF/c1/.git/requests/$rq_key.md" && echo identical || echo differs) $(cat "$LF/c1/.git/requests/$rq_key.typed")" "identical qA"$'\t'"$(git -C "$LF/c1" hash-object -- "$LF/req.md")"
 rq_tip=$(git --git-dir="$LF/origin.git" rev-parse "refs/gov/requests/$rq_key")
 rq_out=$(run_request_arm --request "$LF/req.md"); rq_rc=$?
 same "DPR19 AC3 a repeated request exits 0 and the ref is unmoved" \
@@ -20573,6 +20573,37 @@ for rq_c in req crlf bom wrap; do
     "$rq_rc ${rq_out%% refs/*} $(cmp -s "$LF/req.md" "$LF/c1/.git/requests/$rq_key.md" && echo identical || echo differs)" \
     "0 request — $rq_key · already recorded identical"
 done
+# ---- TOOL-dPlacedRequest-31 — CONSENT IS BOUND TO THE BYTES A SESSION TYPED. Every `.typed` line is a
+# ---- session, a tab and a 40-hex blob (AC3); qA's consent holds over req.md's stored copy and fails,
+# ---- printing `relayed`, once date.md, which keys alike, replaces that copy (AC1); a line planted for qD
+# ---- naming date.md's blob beside req.md's copy is no consent, one naming the stored copy's blob is
+# ---- (AC2), and a session-only line for qE is none (S2); a `.typed` that cannot be appended to exits 2
+# ---- (S1). RED, observed at the close, is the session-only `.typed` line and its predicate. WHAT THIS
+# ---- DOES NOT DRIVE: a `git hash-object` that fails on a readable file, which shares the append's refusal.
+run_consent_arm() { ( cd "$LF/c1" && export CLAUDE_CODE_SESSION_ID="$1" && set +u && . "$SCRIPT" >/dev/null 2>&1
+  rq_o=$(check_request_consent "$rq_key"); printf '%s|%s' "$rq_o" "$?" ); }
+rq_t="$LF/c1/.git/requests/$rq_key.typed"
+same "DPR31 AC3 every .typed line is a session, a tab and a 40-hex blob" \
+  "$([ -s "$rq_t" ] && echo lines || echo empty)|$(awk -F'\t' 'NF != 2 || $2 !~ /^[0-9a-f]{40}$/' "$rq_t")" "lines|"
+same "DPR31 AC1 consent holds in qA over the stored copy of the words qA typed" "$(run_consent_arm qA)" "|0"
+cp "$LF/date.md" "$LF/c1/.git/requests/$rq_key.md"
+same "DPR31 AC1 a stored copy replaced by words keying alike is no consent, relayed" \
+  "$(run_consent_arm qA)" "request — $rq_key · relayed: data with provenance, never consent|1"
+cp "$LF/req.md" "$LF/c1/.git/requests/$rq_key.md"
+printf 'qD\t%s\n' "$(git -C "$LF/c1" hash-object -- "$LF/date.md")" >> "$rq_t"
+same "DPR31 AC2 a line naming other words' blob is no consent" \
+  "$(run_consent_arm qD)" "request — $rq_key · relayed: data with provenance, never consent|1"
+printf 'qD\t%s\n' "$(git -C "$LF/c1" hash-object -- "$LF/c1/.git/requests/$rq_key.md")" >> "$rq_t"
+same "DPR31 AC2 ...and one naming the stored copy's blob is" "$(run_consent_arm qD)" "|0"
+printf 'qE\n' >> "$rq_t"
+same "DPR31 S2 a session-only line is no consent" \
+  "$(run_consent_arm qE)" "request — $rq_key · relayed: data with provenance, never consent|1"
+rq_t="$LF/c1/.git/requests/$rq_k2.typed"
+mv "$rq_t" "$rq_t.kept" && mkdir "$rq_t"
+rq_out=$(run_request_arm --request "$LF/r2.md"); rq_rc=$?
+rmdir "$rq_t" && mv "$rq_t.kept" "$rq_t"
+same "DPR31 S1 a .typed that cannot be appended to exits 2" "$rq_rc" "2"
+hit  "$rq_out" "request — $rq_k2 · not written · this session could not be added to"
 rm -rf "$LF"
 
 # ==================================================================================================
@@ -22673,7 +22704,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3882 -> 3888 by TOOL-dPlacedRequest-30: the collision arm's 6 region-eight assertions (5
 # `same`, its AC2 loop's four among them, one per pass, and 1 `hit`), off the diff's own lines; no skip
 # branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3888
+# RAISED 3888 -> 3896 by TOOL-dPlacedRequest-31: the consent arm's 8 region-eight assertions (7 `same`
+# and 1 `hit`), off the diff's own lines; no skip branch. No suite ran, and its RED-first observation is
+# the close's.
+FLOOR_ASSERTIONS=3896
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -22939,7 +22973,8 @@ FLOOR_SHARD_7=311
 # RAISED 1068 -> 1105 by TOOL-dPlacedRequest-19: the same 37 region-eight request record assertions, see FLOOR_ASSERTIONS.
 # RAISED 1105 -> 1113 by TOOL-dPlacedRequest-29: the same 8 region-eight re-fence assertions, see FLOOR_ASSERTIONS.
 # RAISED 1113 -> 1119 by TOOL-dPlacedRequest-30: the same 6 region-eight collision assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1119
+# RAISED 1119 -> 1127 by TOOL-dPlacedRequest-31: the same 8 region-eight consent assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1127
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

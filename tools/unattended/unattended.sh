@@ -4348,8 +4348,10 @@ write_register() { # decision <build> <item> <fork> <file> | problem <subject> <
 # normalised or not UTF-8. THE WORDS STAY ON THIS NODE: the file's bytes are copied unchanged to
 # `<git-common-dir>/requests/<key>.md`, the first copy kept for the same words again (TOOL-dPlacedRequest-30:
 # a stored copy whose `derive_request_fold` differs from the file's is a COLLISION, `request not
-# written — <key> · collision: ...` exit 2, before any write), and this session's id is appended once to
-# `<git-common-dir>/requests/<key>.typed`; nothing under `requests/` is tracked or pushed. THE REMOTE
+# written — <key> · collision: ...` exit 2, before any write), and `<session><TAB><blob>` is appended once
+# to `<git-common-dir>/requests/<key>.typed`, the blob `git hash-object` of the bytes THIS session
+# submitted (TOOL-dPlacedRequest-31), a hash that does not answer refused as the append is; nothing
+# under `requests/` is tracked or pushed. THE REMOTE
 # HOLDS THE RECORD ALONE: `refs/gov/requests/<key>`, ONE parentless commit from `build_gov_commit ""`
 # whose message is `gov-request <key>`, a blank line and exactly three lines, `content-key`,
 # `fleet-tag` (this node's, as `resolve_fleet_tag` reads it from `fleet.toml`) and `session` (letters,
@@ -4374,7 +4376,7 @@ derive_request_fold() { # file -> its folded text on stdout
   LC_ALL=C sed "1s/^$bom//" "$1" | LC_ALL=C tr '\t\n\v\f\r' '     ' | LC_ALL=C tr -s ' ' | LC_ALL=C sed 's/^ //; s/ $//'
 }
 write_request_record() { # file -> 0 recorded or already recorded, 2 not written
-  local f="${1:-}" py d out key tag sid cdir msg c rc
+  local f="${1:-}" py d out key tag sid cdir blob msg c rc
   [ $# = 1 ] && [ -n "$f" ] || { echo "request — not written · the form is --request <file>"; return 2; }
   [ -f "$f" ] && [ -r "$f" ] || { echo "request — not written · the request file is not readable: $f"; return 2; }
   py=$(resolve_python 2>/dev/null) && [ -n "$py" ] || { echo "request — not written · no python resolves, so the content key cannot be derived"; return 2; }
@@ -4401,7 +4403,8 @@ write_request_record() { # file -> 0 recorded or already recorded, 2 not written
     rm -f -- "$cdir/requests/$key.md.$$"
     [ -e "$cdir/requests/$key.md" ] || { echo "request — $key · not written · the text could not be copied to $cdir/requests/$key.md"; return 2; }
   fi
-  grep -qxF -- "$sid" "$cdir/requests/$key.typed" 2>/dev/null || printf '%s\n' "$sid" >>"$cdir/requests/$key.typed" \
+  blob=$(GIT hash-object -- "$f" 2>/dev/null) && blob=${blob%$'\r'} && [[ $blob =~ ^[0123456789abcdef]{40}([0123456789abcdef]{24})?$ ]] \
+    && { grep -qxF -- "$sid"$'\t'"$blob" "$cdir/requests/$key.typed" 2>/dev/null || printf '%s\t%s\n' "$sid" "$blob" >>"$cdir/requests/$key.typed"; } \
     || { echo "request — $key · not written · this session could not be added to $cdir/requests/$key.typed"; return 2; }
   msg=$(printf 'gov-request %s\n\ncontent-key: %s\nfleet-tag: %s\nsession: %s' "$key" "$key" "$tag" "$sid")
   resolve_claim_remote || { echo "request — $key · not written, the text kept · the clone does not declare exactly one remote, check 24"; return 2; }
@@ -4443,14 +4446,20 @@ check_request_recorded() { # content key -> 0 recorded, 1 no record, 2 not read;
 # THE CONSENT PREDICATE (TOOL-dPlacedRequest-19 S5): a request is the owner's consent only in a session
 # that recorded its words on THIS node, a line of `<git-common-dir>/requests/<key>.typed`. A key that
 # arrived from another node or session has no such line, so the predicate refuses it by default; the
-# breakpoint disposition calls it before it fires (TOOL-dPlacedRequest-5). -> 0 consent; 1 printing one
-# `request — <key> · relayed` line otherwise, a malformed key or no common dir included.
+# breakpoint disposition calls it before it fires (TOOL-dPlacedRequest-5). CONSENT IS BOUND TO THE BYTES
+# (TOOL-dPlacedRequest-31): the line must be `<this session><TAB><blob>`, the blob the one `git
+# hash-object` reads from `<git-common-dir>/requests/<key>.md` NOW, so a stored copy replaced after the
+# fact, or a line written for other words, is no consent; a line of any other shape never matches.
+# -> 0 consent; 1 printing one `request — <key> · relayed` line otherwise, a malformed key, no common
+# dir and a missing stored copy included.
 # WHAT THIS DOES NOT CHECK: that the session typed the words rather than relayed them into `--request`.
 check_request_consent() { # content key -> 0 this session typed it here, 1 relayed
-  local key="${1:-}" cdir sid="${CLAUDE_CODE_SESSION_ID:-absent}"
+  local key="${1:-}" cdir now="" sid="${CLAUDE_CODE_SESSION_ID:-absent}"
   cdir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || cdir=""
   cdir=${cdir%$'\r'}
-  if [[ $key =~ ^[0123456789abcdef]{12}$ ]] && [ -n "$cdir" ] && grep -qxF -- "$sid" "$cdir/requests/$key.typed" 2>/dev/null; then
+  [[ $key =~ ^[0123456789abcdef]{12}$ ]] && [ -n "$cdir" ] && now=$(GIT hash-object -- "$cdir/requests/$key.md" 2>/dev/null) || now=""
+  now=${now%$'\r'}
+  if [ -n "$now" ] && grep -qxF -- "$sid"$'\t'"$now" "$cdir/requests/$key.typed" 2>/dev/null; then
     return 0
   fi
   echo "request — ${key:--} · relayed: data with provenance, never consent"

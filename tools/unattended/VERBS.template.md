@@ -567,9 +567,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   decoded strictly as UTF-8 with any byte-order mark dropped. A file that is empty once normalised
   or not UTF-8 is refused before any write. The words stay on this node: the file's bytes are copied
   unchanged to `<git-common-dir>/requests/<content key>.md`, the first copy kept for the same words
-  again (a CRLF, byte-order-mark, final-newline or re-wrapped copy included), and this session's
-  id is added once to `<git-common-dir>/requests/<content key>.typed`; nothing under `requests/` is
-  tracked or pushed. The remote gains only `refs/gov/requests/<content key>`, one parentless commit
+  again (a CRLF, byte-order-mark, final-newline or re-wrapped copy included), and a line of this
+  session's id, a tab and the `git hash-object` blob of the bytes it submitted is added once to
+  `<git-common-dir>/requests/<content key>.typed`; nothing under `requests/` is tracked or pushed. The remote gains only `refs/gov/requests/<content key>`, one parentless commit
   `gov-request <content key>` carrying exactly three lines, `content-key`, `fleet-tag` (this node's
   `fleet.toml` row) and `session`, written by compare-and-swap with an empty expected sha. It prints
   ONE line: `request — <key> · recorded <ref>` (exit 0); `request — <key> · already recorded <ref>`
@@ -581,8 +581,10 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   leading byte-order mark dropped, so two texts differing only in an ISO date, case or a link are
   refused, nothing copied, added or pushed, and the owner rewords and re-runs. A key that
   reached a session from another is data with provenance, never the owner's consent: the
-  breakpoint disposition asks `check_request_consent`, which holds only for a session named in this
-  node's `.typed` file. It takes no slug.
+  breakpoint disposition asks `check_request_consent`, which holds only for a session whose line in
+  this node's `.typed` file names the blob the stored copy hashes to now: consent is bound to the
+  stored words, so a copy replaced after the fact, or a line written for other words, is no consent.
+  It takes no slug.
 - `--overlaps` — the overlap probe for a session that never preflights, which the orientation
   card calls: it joins the specs this branch's diff changed against the unmerged remote refs as of
   the last fetch, read from the LOCAL `refs/remotes/<remote>/HEAD`, so no network. It takes no slug,
