@@ -114,7 +114,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-41 — a second offline write to a queued lease chains on the queued commit](spec/2026-10-25-spec-TOOL-dPlacedRequest-41.md) | 5 | 2 | CLOSED | rev-3 | 2026-11-19 |
 | [TOOL-dPlacedRequest-20 — a lease acquisition that honours an offer, and the epoch fence on a stale take](spec/2026-10-25-spec-TOOL-dPlacedRequest-20.md) | 6 | 2 | CLOSED | rev-6 | 2026-11-19 |
 | [TOOL-dPlacedRequest-18 — the cadence segment of the lease grammar takes any tag-grammar name](spec/2026-10-25-spec-TOOL-dPlacedRequest-18.md) | 7 | 2 | CLOSED | rev-4 | 2026-11-19 |
-| [TOOL-dPlacedRequest-28 — every create of a lease ref reads the feed first, the offer's included](spec/2026-10-25-spec-TOOL-dPlacedRequest-28.md) | 7 | 2 | INPROGRESS | rev-3 | 2026-11-19 |
+| [TOOL-dPlacedRequest-28 — every create of a lease ref reads the feed first, the offer's included](spec/2026-10-25-spec-TOOL-dPlacedRequest-28.md) | 7 | 2 | INPROGRESS | rev-4 | 2026-11-19 |
 | [TOOL-dPlacedRequest-12 — create-only decision and problem registers on the remote](spec/2026-10-25-spec-TOOL-dPlacedRequest-12.md) | 8 | 2 | DEFERRED | rev-5 | 2026-11-19 |
 | [TOOL-dPlacedRequest-42 — an offline lease create reads the feed first, as every create on an empty parent does](spec/2026-10-25-spec-TOOL-dPlacedRequest-42.md) | 8 | 2 | DEFERRED | rev-3 | 2026-11-19 |
 | [TOOL-dPlacedRequest-15 — the fenced effect push: the lander's push carries the holder's lease beat atomically](spec/2026-10-25-spec-TOOL-dPlacedRequest-15.md) | 9 | 2 | DEFERRED | rev-6 | 2026-11-19 |
@@ -162,7 +162,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-64 — the round-8 promotions' minors: criteria that read joined text and every carrier, a measured BINMODE, one lift seam that prints what it read, one bullet reader, and citations by anchor](spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md) | 36 | 2 | DEFERRED | rev-3 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 194 bound to this build, across 4 record folder(s).
+Records: 196 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
