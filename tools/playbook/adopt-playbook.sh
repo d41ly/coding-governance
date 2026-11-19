@@ -489,11 +489,13 @@ bad-block|1|site.md:5: `**Edges:** tests=kit.y implements=kit.z` carries a secon
 bad-note-refs|1|site.py:1: `# gov:note layer.memory — x → y refs=a b` refs segment holds the target 'a b'
 leg-unregistered|0|edges: leg rows · 1 tests target(s) unarmed until their namespace is registered|is not registered
 leg-unregistered|0|edges: green · 1 edge(s)
-leg-resolved|0|edges: resolved · gate-legs.json:4 · tests=layer.memory · layer.memory
-leg-resolved|0|edges: resolved · gate-legs.json:4 · enforces=practice.land · practice.land
+leg-resolved|0|edges: resolved · gate-legs.json:
+leg-resolved|0|· tests=layer.memory · layer.memory
+leg-resolved|0|· enforces=practice.land · practice.land
 leg-resolved|0|edges: green · 2 edge(s)|leg rows
 leg-rule-member|0|edges: leg rows · 1 enforces target(s) unarmed, practice rules core meta-check grades|=practice.land.paths ·
-leg-rule-member|0|edges: resolved · gate-legs.json:4 · enforces=practice.land · practice.land
+leg-rule-member|0|edges: resolved · gate-legs.json:
+leg-rule-member|0|· enforces=practice.land · practice.land
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf edge-grammar arm(s) failed"; exit 1; fi
 echo "PASS — the edge grammar's plants"
