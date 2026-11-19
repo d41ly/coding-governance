@@ -1,12 +1,13 @@
 # TOOL-dSettledStage-2 — a commit after a stage nothing tested is gated: a fifth shell-hygiene mode
 
-**Status:** SPECCED · rev-2 · 2026-11-19 · node d · Tier-2 · base 12764ec2 · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-11-19 · node d · Tier-2 · base 12764ec2 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-19-build-TOOL-dSettledStage-1-agent-ledger.md](../build/2026-11-19-build-TOOL-dSettledStage-1-agent-ledger.md) | journal | TOOL-dSettledStage-1 |
+| [2026-11-19-build-TOOL-dSettledStage-2-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dSettledStage-2-1-acceptance-ledger.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dSettledStage-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dSettledStage-1-brief.md) | research | TOOL-dSettledStage-1 |
 | [2026-11-19-prompt-TOOL-dSettledStage-2-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dSettledStage-2-1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dSettledStage-2-pass-legs-fix.md](../prompts/2026-11-19-prompt-TOOL-dSettledStage-2-pass-legs-fix.md) | research | — |

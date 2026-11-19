@@ -171,6 +171,7 @@
       "shell hygiene (a fork spent on builtin work)",
       "shell hygiene (a location probe asked from a moved directory)",
       "shell hygiene (a loop fed by a command substitution)",
+      "shell hygiene (a stage committed with no staged-diff test)",
       "shell-hygiene selftest",
       "spawn budget (forks per hot entrypoint)",
       "spec tokens (a spec's own names resolve)",

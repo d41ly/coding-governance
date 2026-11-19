@@ -2583,6 +2583,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_blanked",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "build_blob_request",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -4086,6 +4091,11 @@
       "id": "build_specced_tree",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "build_stage_measured",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "build_staged_copy",
@@ -18178,6 +18188,11 @@
       "file": "tools/roles/handoff.py"
     },
     {
+      "id": "print_stage_populations",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "print_stale_dossiers",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -20204,6 +20219,11 @@
     },
     {
       "id": "read_function_bodies",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "read_function_spans",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
     },
@@ -22776,6 +22796,16 @@
       "id": "read_sr_close",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_stage_events",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "read_stage_helpers",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "read_stage_members",
@@ -31058,6 +31088,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_stage_scan",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "run_stale_plant",
       "kind": "function",
       "file": "tools/govkit/fixtures/stale_edges.py"
@@ -32181,6 +32216,16 @@
       "id": "scan_spec_sizes",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "scan_stage_file",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "scan_stage_tree",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "scan_stand_in_declarations",

@@ -242,6 +242,22 @@
     "stage": ["step.test"]
   },
   {
+    "name": "shell hygiene (a stage committed with no staged-diff test)",
+    "argv": [
+      "python3",
+      "{prefix}/gate-lint/sh_hygiene.py",
+      "--stage-commits",
+      "memory/project/stage-commit-sites.txt",
+      ".",
+      ":!*.test.sh",
+      ":!memory/"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300,
+    "stage": ["step.test"]
+  },
+  {
     "name": "spawn budget (forks per hot entrypoint)",
     "argv": [
       "bash",
