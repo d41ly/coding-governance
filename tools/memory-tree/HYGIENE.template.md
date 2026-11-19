@@ -408,11 +408,13 @@ citation check. Rules 3 and 4 REPORT without gating until the version named in `
 `READ_PATH_GATES_FROM`, so an adopter is not redded for a pre-existing condition on their first
 upgraded bar; the grace announces itself on every run.
 
-Checks 13-15 live in `{{KIT_DIR}}/corpus_ids.py` and are DISABLED when their pins are blank.
-Every pin is MEASURED against the adopting corpus (`corpus_ids.py --measure`), never inherited: a pin
-copied from a larger tree is either vacuous or permanently red. The id grammar comes from this
-kit's own `id_grammar.py`, so arming these checks requires that file — with the pins blank it is never
-imported, and with a pin set and the file absent the failure is NAMED, not a traceback.
+Checks 13-15 live in `{{KIT_DIR}}/corpus_ids.py` and are DISABLED while both waiver homes,
+`project/id-orphan-waiver.txt` and `project/corpus-path-unresolved.txt`, are absent; a home present,
+even empty, arms its checks. Every row is MEASURED against the adopting corpus (`corpus_ids.py
+--measure`), never inherited: a row copied from another tree is either vacuous or permanently red. The
+id grammar comes from this kit's own `id_grammar.py`, so arming these checks requires that file — with
+both homes absent it is never imported, and with a home present and the file absent the failure is
+NAMED, not a traceback.
 
 17. **catalogue index freshness** — `gotchas/INDEX.md` byte-matches a fresh render.
 18. **a class declares its resolution** — every `kind: class` record names a gate or says in as many
