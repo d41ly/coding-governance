@@ -33,4 +33,3 @@ policy fixtures <- tools/check-spec-tokens.py	1	7dbe0c8d9d2ca46a849065c73ad9cf72
 policy fixtures <- tools/workflows/kit.toml	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/hooks/agent-cap.js:1972	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 hook destinations self-test <- tools/workflows/kit.toml	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/policy/legacy-homes.txt	1	8f93133461be769b41b506188e02ab559036c02b	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-20-2-builder-return.md
