@@ -86,6 +86,10 @@ memory/builds/*/BACKLOG.md merge=rows
 # `[[unit]]` table by its `tag`, so two nodes adding a unit merge with both tags once.
 **/instructions.toml merge=rows
 .governance/instructions.toml merge=rows
+# The baseline ledgers (TOOL-dWitnessedBar-13 §3 leaves this line to each unit adding one): the driver
+# reads a ledger's rendered header and keys its TAB rows, so two branches draining one population merge
+# with the lower count. `conf-scalar-pins` is TOOL-dWitnessedBar-14's.
+memory/project/conf-scalar-pins.txt merge=rows
 
 # Wholly GENERATED views: a merge takes this side, and check 9 (gen_build_index.py --check) or
 # check 17 (gotchas.py --check) then reds the stale result until `--write` re-renders it.

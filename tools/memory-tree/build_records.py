@@ -88,6 +88,11 @@ exactly where `Signals` stands. The door also refuses an `Answers` naming no rec
 build; every refusal exits 1, writing nothing. `--fixture --plant recommendation` stages a score record, the
 reason answering it, each refusal and their bindings.
 
+THE WIDEN KIND (TOOL-dWitnessedBar-14 S5): `<date>-build-<unit id>-widen-<n>.md`, a population's growth
+admitted with its reason: `Population`, `Keys` (each key backticked, its fields TAB-joined), `Reason` and
+`Caused-by`. It has no `new` door: the ratchet pack's `ratchet.py widen` calls `write_record` and writes the
+row `widened:<record stem>` beside it, and its `never gains` leg reads the record back through `read_record`.
+
 ONE LINE PER VALUE, at the one writer (PLAY-dOrderedCharter-49 S53): `write_record` refuses a field value
 holding a CR or an LF, or opening `**<Word>:**`, before it writes anything, so no door's value forges a
 field; every door's refusal exits 1, writing nothing. Its `lines`, written after the fields, are refused
@@ -185,6 +190,10 @@ KINDS = {
     "recommendation": {
         "required": ("Stage", "Score", "Source", "Binds", "Reason", "Role", "Caused-by"),
         "closed": (("Score", RECOMMEND_SCORES), ("Binds", RECOMMEND_BINDS)),
+    },
+    "widen": {   # TOOL-dWitnessedBar-14 S5: written by the ratchet pack's `ratchet.py widen`, no `new` door
+        "required": ("Population", "Keys", "Reason", "Caused-by"),
+        "closed": (),
     },
 }
 if set(KINDS) != set(TYPED_RECORD_KINDS):

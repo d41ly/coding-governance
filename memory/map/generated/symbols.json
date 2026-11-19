@@ -7033,6 +7033,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "check_new_at_base",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "check_no_runstate",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
@@ -7381,6 +7386,11 @@
       "id": "check_plant",
       "kind": "function",
       "file": "tools/loop/position.py"
+    },
+    {
+      "id": "check_plant_case",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "check_plant_found",
@@ -8843,6 +8853,11 @@
       "file": "tools/playbook/instructions_edit.py"
     },
     {
+      "id": "check_widen_admitted",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "check_window_invariant",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -9788,6 +9803,11 @@
       "file": "tools/loop/budget.py"
     },
     {
+      "id": "count_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "counts",
       "kind": "function",
       "file": "tools/unattended/check-playbook.test.sh"
@@ -10456,6 +10476,11 @@
       "id": "derive_build_counts",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
+    },
+    {
+      "id": "derive_build_slug",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "derive_bullet_keys",
@@ -11646,6 +11671,11 @@
       "id": "derive_leg_argv",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "derive_leg_population",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "derive_leg_profile",
@@ -16035,6 +16065,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
     },
     {
@@ -16806,6 +16841,11 @@
       "id": "measure_run",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
+    },
+    {
+      "id": "measure_scalar_pins",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "measure_scouted_compare",
@@ -17918,6 +17958,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "parse_widen_keys",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "parse_worktrees",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -18238,6 +18283,11 @@
       "file": "tools/govkit/upgrade_walk.py"
     },
     {
+      "id": "print_line",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "print_liveness",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -18526,6 +18576,11 @@
       "id": "print_usage",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
+      "id": "print_verdict",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "print_verdict",
@@ -19226,6 +19281,11 @@
       "id": "read_base_population",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "read_base_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "read_base_version",
@@ -22898,6 +22958,11 @@
       "file": "tools/memory-tree/legacy_ledger.py"
     },
     {
+      "id": "read_seed_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "read_serves_ids",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -23608,6 +23673,11 @@
       "file": "tools/memory-tree/design_lib.py"
     },
     {
+      "id": "read_tracked_paths",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "read_trailer_edges",
       "kind": "function",
       "file": "tools/playbook/edge_grammar.py"
@@ -23921,6 +23991,16 @@
       "id": "read_waivers",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "read_widen_paths",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "read_widen_policy",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "read_wired",
@@ -24791,6 +24871,11 @@
       "id": "remove_tree",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "remove_unheld_rows",
@@ -25908,6 +25993,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "render_key",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "render_keys_cell",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
@@ -26380,6 +26470,11 @@
     {
       "id": "render_rows",
       "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "render_rows",
+      "kind": "function",
       "file": "tools/playbook/fixtures/row_kind.py"
     },
     {
@@ -26426,6 +26521,11 @@
       "id": "render_scope_row",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "render_seed",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "render_seedline",
@@ -26603,6 +26703,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "render_table",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "render_target",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -26726,6 +26831,11 @@
       "id": "render_wall",
       "kind": "function",
       "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "render_widen_record",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "render_work_order",
@@ -28895,6 +29005,11 @@
     {
       "id": "resolve_root",
       "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "resolve_root",
+      "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
@@ -29628,6 +29743,11 @@
       "file": "tools/run-gates/py_reads.py"
     },
     {
+      "id": "run_both_ways",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "run_boundary_plant",
       "kind": "function",
       "file": "tools/loop/termination.py"
@@ -30260,6 +30380,11 @@
     {
       "id": "run_fixture",
       "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
       "file": "tools/playbook/core.py"
     },
     {
@@ -30578,6 +30703,11 @@
       "file": "tools/playbook/load_sets.py"
     },
     {
+      "id": "run_git_in",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "run_git_staged",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
@@ -30808,6 +30938,16 @@
       "file": "tools/workflows/check-review-join.test.sh"
     },
     {
+      "id": "run_key_shape",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_keys_not_scalar",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "run_kill",
       "kind": "function",
       "file": "tools/process-monitor/reap.py"
@@ -30873,6 +31013,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "run_leg_cli",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "run_leg_reap",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -30931,6 +31076,11 @@
       "id": "run_lin_push",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "run_list",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "run_list",
@@ -31081,6 +31231,11 @@
       "id": "run_names",
       "kind": "function",
       "file": "tools/run-gates/py_reads.py"
+    },
+    {
+      "id": "run_never_gains",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "run_new",
@@ -31293,6 +31448,11 @@
       "file": "tools/playbook/writing_practice.py"
     },
     {
+      "id": "run_plant_append_edited",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "run_plant_arms",
       "kind": "function",
       "file": "tools/memory-tree/asbuilt_view.py"
@@ -31303,9 +31463,84 @@
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
+      "id": "run_plant_both_ways",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_ceiling_raised",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_ceiling_widened",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_gain",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_gain_refused",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_gain_widened",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_home_moved",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_key_number",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_laundering",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_merge",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_new_population",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_populated_empty_armed",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_rename",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "run_plant_rows",
       "kind": "function",
       "file": "tools/playbook/adopt-playbook.sh"
+    },
+    {
+      "id": "run_plant_unarmed_green",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_untouched_quiet",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "run_planted",
@@ -31336,6 +31571,11 @@
       "id": "run_policy_key_arms",
       "kind": "function",
       "file": "tools/loop/factories.py"
+    },
+    {
+      "id": "run_populated",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "run_positional_plant",
@@ -31536,6 +31776,11 @@
       "id": "run_remote",
       "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "run_rename",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "run_render",
@@ -31766,6 +32011,11 @@
       "id": "run_seed_cli",
       "kind": "function",
       "file": "tools/memory-tree/legacy_ledger.py"
+    },
+    {
+      "id": "run_seed_laundering",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "run_select",
@@ -32263,6 +32513,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "run_unarmed",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "run_unchecked",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -32316,6 +32571,11 @@
       "id": "run_wf",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
+      "id": "run_widen",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "run_window_id_plant",
@@ -37380,6 +37640,11 @@
     {
       "id": "write_files",
       "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "write_files",
+      "kind": "function",
       "file": "tools/playbook/fixtures/row_kind.py"
     },
     {
@@ -37456,6 +37721,11 @@
       "id": "write_fixture_records",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "write_fixture_repo",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "write_fixture_round",
