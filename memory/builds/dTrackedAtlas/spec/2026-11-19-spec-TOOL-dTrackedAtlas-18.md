@@ -1,6 +1,6 @@
 # TOOL-dTrackedAtlas-18 — the schedule instrument re-pinned in every chain packet and in the chain-packet door
 
-**Status:** INPROGRESS · rev-1 · 2026-11-19 · node d · Tier-2 · base 9e21ac76 · streams tooling · order 11 · closes TOOL-dTrackedAtlas-6
+**Status:** CLOSED · rev-1 · 2026-11-19 · node d · Tier-2 · base 9e21ac76 · streams tooling · order 11 · closes TOOL-dTrackedAtlas-6
 
 <!-- gen:spec-records -->
 

@@ -64,7 +64,7 @@ blocks "done". The owner's prompt and the measurements are recorded under `promp
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 10 unit(s) · node d · opened 2026-11-19 · streams tooling
+**Build status:** CLOSED · 10 unit(s) · node d · opened 2026-11-19 · streams tooling
 ids TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 TOOL-dTrackedAtlas-5 TOOL-dTrackedAtlas-6 TOOL-dTrackedAtlas-7 TOOL-dTrackedAtlas-8 TOOL-dTrackedAtlas-9 TOOL-dTrackedAtlas-10 TOOL-dTrackedAtlas-11 TOOL-dTrackedAtlas-12 TOOL-dTrackedAtlas-13
 ids TOOL-dTrackedAtlas-14 TOOL-dTrackedAtlas-15 TOOL-dTrackedAtlas-16 TOOL-dTrackedAtlas-17 TOOL-dTrackedAtlas-18 TOOL-dTrackedAtlas-19
 
@@ -80,7 +80,7 @@ ids TOOL-dTrackedAtlas-14 TOOL-dTrackedAtlas-15 TOOL-dTrackedAtlas-16 TOOL-dTrac
 | [TOOL-dTrackedAtlas-10 — the page's staleness digest covers the merge history the landed predicate reads](spec/2026-11-19-spec-TOOL-dTrackedAtlas-10.md) | 7 | 1 | CLOSED | rev-1 | 2026-11-19 |
 | [TOOL-dTrackedAtlas-11 — the closing review's minors: one reader for valued options, the stale ledger line cleared, the owed pane looks recorded](spec/2026-11-19-spec-TOOL-dTrackedAtlas-11.md) | 8 | 1 | CLOSED | rev-1 | 2026-11-19 |
 | [TOOL-dTrackedAtlas-12 — the closing review's round-2 minors: one stamp-rules table for writer and reader, a relayed refusal the Atlas can act on, one `--ref` rule, the pane reds re-recorded](spec/2026-11-19-spec-TOOL-dTrackedAtlas-12.md) | 9 | 1 | CLOSED | rev-1 | 2026-11-19 |
-| [TOOL-dTrackedAtlas-18 — the schedule instrument re-pinned in every chain packet and in the chain-packet door](spec/2026-11-19-spec-TOOL-dTrackedAtlas-18.md) | 11 | 2 | INPROGRESS | rev-1 | 2026-11-19 |
+| [TOOL-dTrackedAtlas-18 — the schedule instrument re-pinned in every chain packet and in the chain-packet door](spec/2026-11-19-spec-TOOL-dTrackedAtlas-18.md) | 11 | 2 | CLOSED | rev-1 | 2026-11-19 |
 <!-- /gen:build-units -->
 
 Records: 53 bound to this build, across 4 record folder(s).
