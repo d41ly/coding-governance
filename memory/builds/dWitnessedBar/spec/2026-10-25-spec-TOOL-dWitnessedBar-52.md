@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-52 — the scalar-pin seed reads every root conf the working tree holds, so a fresh install seeds its pin before its first commit
 
-**Status:** INPROGRESS · rev-5 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 11 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-6 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 11 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-52-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-52-1-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md) | research | TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-2-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-2-brief.md) | journal | TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-53 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-52-2-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-52-2-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-52-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-52-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-3-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-3-brief.md) | journal | TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-18 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-3-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-3-spec-writer.md) | journal | — |
@@ -47,21 +48,25 @@ fix: the seed reads the root confs present in the working tree, tracked or not. 
 ## 2. Scope (IN)
 
 - **S1** — One conf set. `tools/memory-tree/ratchet.py` reads the root confs through one function,
-  `root_confs(root)`: the files `git ls-files --cached --others --exclude-standard -- ':(glob).*.conf'`
+  `read_root_confs(root)`: the files `git ls-files --cached --others --exclude-standard -- ':(glob).*.conf'`
   lists, run at the repository root. A conf copied but not yet committed is read, and a conf the
-  repository ignores is not. The conf walk of `tools/memory-tree/ratchet.py#measure_scalar_pins`, which
-  at `49f5d3ff6` takes the paths `read_tracked_paths(root)` lists that `ROOT_CONF_RE` matches, takes
-  `root_confs(root)` instead; `read_tracked_paths` stays for its other caller, the widen check of
-  `#run_never_gains`. `keys-not-scalar --measure`, the seed of unit 46 S2, reaches it there.
-  TOOL-dWitnessedBar-17, which builds before this unit at order 11, makes that walk one reader its
-  `measure-cutoffs` shares (its §4 "The cutoffs"); `root_confs` sits behind that shared reader.
-  Observed by AC1 and AC2.
+  repository ignores is not. `tools/memory-tree/ratchet.py#read_root_conf_lines`, the one conf walk
+  `#measure_scalar_pins` and `#measure_cutoffs` share since `TOOL-dWitnessedBar-17` landed it at
+  `dbbd8caba` (its §4 "The cutoffs"), takes the paths `read_tracked_paths(root)` lists that
+  `ROOT_CONF_RE` matches; it takes `read_root_confs(root)` instead, and `ROOT_CONF_RE`
+  (`tools/memory-tree/ratchet.py@586cad8fe8a9:97`), whose one reader is that filter (`:489`), is
+  deleted with it. `read_tracked_paths` stays for its other caller, the widen check of
+  `#run_never_gains`. `keys-not-scalar --measure`, the seed of unit 46 S2, reaches the new read through
+  `measure_scalar_pins`. Observed by AC1, AC2 and AC3.
+  **Readers:** by name: `tools/memory-tree/ratchet.py`, which spells `ROOT_CONF_RE` at its definition
+  and in `read_root_conf_lines`' filter and nowhere else, as §4 Evidence's grep reads · by value: the
+  filter this item replaces is its one reader, so NO VALUE READERS beyond it.
 - **S2** — The leg reads the same set. `keys-not-scalar` without `--measure`, the check of
   `TOOL-dWitnessedBar-14` S11, measures through the same `measure_scalar_pins` call as its seed
   (`tools/memory-tree/ratchet.py#run_keys_not_scalar`, landed at `49f5d3ff6`), so S1's one change
   reaches both and this unit adds no second call; the seed and the leg never measure two different
   sets. Observed by AC1 and AC3.
-- **S3** — What it does not check, stated. `ratchet.py`'s docstring for `root_confs` names the blind
+- **S3** — What it does not check, stated. `ratchet.py`'s docstring for `read_root_confs` names the blind
   spot: a root conf the repository ignores is never measured, so a pin assigned only in a machine-local
   ignored conf is neither seeded nor held. Observed by AC2.
 
@@ -83,9 +88,9 @@ fix: the seed reads the root confs present in the working tree, tracked or not. 
 
 - **consumes-from** `TOOL-dWitnessedBar-46` — `keys-not-scalar --measure` and the adopter's seed of `conf-scalar-pins`, whose conf read this unit widens to the working tree
 - **consumes-from** `TOOL-dWitnessedBar-14` — `ratchet.py keys-not-scalar`, the leg whose conf read S2 binds to the seed's
-- **hands-off** `TOOL-dWitnessedBar-53` — `root_confs`, whose behaviour across a target's first commit unit 53's suite arm observes for every population the scaffold seeds
+- **hands-off** `TOOL-dWitnessedBar-53` — `read_root_confs`, whose behaviour across a target's first commit unit 53's suite arm observes for every population the scaffold seeds
 - **consumes-from** `TOOL-dWitnessedBar-61` — the null SHA on an unborn HEAD, without which AC1's scaffold seed in a commitless `git init` cannot write its row
-- **hands-off** `TOOL-dWitnessedBar-62` — `root_confs` and AC3's plant, which the minors batch keeps to regular work-tree files and arms with a row for another key (ids 9, 11, 34, 40)
+- **hands-off** `TOOL-dWitnessedBar-62` — `read_root_confs` and AC3's plant, which the minors batch keeps to regular work-tree files and arms with a row for another key (ids 9, 11, 34, 40)
 
 ## 4. Design
 
@@ -120,9 +125,11 @@ fix: the seed reads the root confs present in the working tree, tracked or not. 
   `git ls-files -- '.*.conf'` lists, five each (PINNED 2026-11-19 at `045405ff8`, and again at
   `2b0490b8d` and `86dac0fcc`); in a scratch `git init` it lists an untracked root
   `.x.conf`, and neither a nested `sub/.y.conf` nor a root conf named in `.git/info/exclude`.
-- The landed measure: unit 14 (`49f5d3ff6`), unchanged in this respect at `86dac0fcc`, walks each tracked root conf in
-  `tools/memory-tree/ratchet.py#measure_scalar_pins`, through `#read_tracked_paths` filtered by
-  `ROOT_CONF_RE`, and `#run_keys_not_scalar` calls that one function for both the seed and the leg.
+- The landed measure, read at `3721879a2`: unit 14 (`49f5d3ff6`) has `#run_keys_not_scalar` call
+  `tools/memory-tree/ratchet.py#measure_scalar_pins` once for both the seed and the leg; unit 17
+  (`dbbd8caba`) moved that function's conf walk into `#read_root_conf_lines`, which `#measure_cutoffs`
+  shares and which walks each tracked root conf through `#read_tracked_paths` filtered by
+  `ROOT_CONF_RE`. No other line reads `ROOT_CONF_RE` (`git grep -n ROOT_CONF_RE -- tools skills`).
 - The policy kit spells the same pathspec over the tracked set only:
   `tools/policy/policy.py#derive_legacy_homes` runs `git ls-files -z -- ':(glob).*.conf'` over the
   committed legacy homes it converts (§8 F3).
@@ -130,12 +137,18 @@ fix: the seed reads the root confs present in the working tree, tracked or not. 
 ### The read
 
 ```
-root_confs(root) := git -C <root> ls-files --cached --others --exclude-standard -- ':(glob).*.conf'
-                    (glob magic: `*` never crosses `/`, so only root-level files match)
-measure_scalar_pins(root)  -> its conf walk over root_confs(root), in place of read_tracked_paths
+read_root_confs(root) := git -C <root> ls-files --cached --others --exclude-standard -- ':(glob).*.conf'
+                         (glob magic: `*` never crosses `/`, so only root-level files match)
+read_root_conf_lines(root) -> its walk over read_root_confs(root), in place of read_tracked_paths
+                              filtered by ROOT_CONF_RE
+measure_scalar_pins(root)  -> over read_root_conf_lines(root), unchanged
+measure_cutoffs(root)      -> over the same read_root_conf_lines(root), unchanged
 keys-not-scalar --measure  -> one row per scalar *_PIN= assignment, from measure_scalar_pins(root)
 keys-not-scalar            -> unheld pins, from the same measure_scalar_pins(root), against conf-scalar-pins
 ```
+
+`measure-cutoffs` reads the widened set too, which unit 17 §4 "The cutoffs" records; in gov's tree
+every root conf is tracked (§4 Migration), so its seed is unmoved.
 
 `--exclude-standard` rather than a raw directory listing keeps an ignored local conf out, which a
 committed tree never holds either; so the set read before the first commit equals the set read after
@@ -143,8 +156,14 @@ it whenever the user commits what the scaffold told them to.
 
 ### Inventory
 
-Minted: the function `root_confs`. Naming cells: asked of `python tools/lexicon/lexicon.py --suggest
-root_confs --as py.function` at the pass.
+Minted: the function `read_root_confs`, and the plant functions `run_plant_untracked_conf` and
+`run_plant_ignored_conf` behind the `PLANTS` cases `untracked-conf` and `ignored-conf`, spelled as the
+table's other cases are (`tools/memory-tree/ratchet.py@586cad8fe8a9:1039-1050`). Removed: the constant
+`ROOT_CONF_RE`. Naming cells: `python tools/lexicon/lexicon.py --suggest <name> --as py.function`
+answered OK for each minted name, asked 2026-11-19 at `3721879a2`. `read` is the verb the file's other
+readers `read_tracked_paths` and `read_root_conf_lines` lead with, and the lexicon steers
+`list_root_confs` to `read_root_confs`; `derive_root_confs` is accepted too but is the name of
+govkit's descriptor-class read (`tools/govkit/govkit.py#derive_root_confs`), a different set.
 
 ### Migration
 
@@ -160,6 +179,7 @@ pin (§8 F2) keeps AC1 observable over the drained example.
 ### Files touched (estimate)
 
 - `tools/memory-tree/ratchet.py`
+- `memory/map/generated/symbols.json`, regenerated for the minted function definitions
 
 ### Alternatives rejected
 
@@ -195,23 +215,26 @@ pin (§8 F2) keeps AC1 observable over the drained example.
 - **AC2** — When `python ratchet.py --fixture --plant untracked-conf` runs in `tools/memory-tree/`, an
   untracked root `.x.conf` assigning `FOO_PIN="3"` appears in `keys-not-scalar --measure`'s output; under
   `--plant ignored-conf`, the same conf named in `.git/info/exclude` does not; and
-  `grep -n 'def root_confs' ratchet.py` names the function whose docstring states the ignored-conf
+  `grep -n 'def read_root_confs' ratchet.py` names the function whose docstring states the ignored-conf
   blind spot.
   Red when: an untracked conf is unread, or an ignored conf is measured.
-- **AC3** — When `grep -n 'root_confs(\|read_tracked_paths(' ratchet.py` runs in `tools/memory-tree/`,
-  `root_confs(` appears at its definition and in the one conf walk the measures share, and
-  `read_tracked_paths(` appears only at its definition and in the widen check; and `--plant
+- **AC3** — When `grep -n 'read_root_confs(\|read_tracked_paths(\|ROOT_CONF_RE' ratchet.py` runs in
+  `tools/memory-tree/`, `read_root_confs(` appears at its definition and in `read_root_conf_lines`, the
+  one conf walk the measures share, `read_tracked_paths(` appears only at its definition and in the
+  widen check, and `ROOT_CONF_RE` appears nowhere; and `--plant
   untracked-conf` with no population row for `FOO_PIN` makes `keys-not-scalar` exit 1 naming it.
   Red when: the leg or a measure keeps its own conf list, so the seed and the leg read two sets.
 
 ## 7. Gates
 
-`memory hygiene` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `ratchet selftest` · `ratchet (keys, not a scalar)`
+`memory hygiene` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `ratchet selftest` · `ratchet (keys, not a scalar)` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms`
 
 `ratchet selftest`, landed by `TOOL-dWitnessedBar-14` at `49f5d3ff6`, runs the plants of AC2 and AC3;
-`ratchet (keys, not a scalar)` is the leg S2 binds to the seed's read.
+`ratchet (keys, not a scalar)` is the leg S2 binds to the seed's read. `lexicon naming predicates`
+grades the minted names against `VERB_OFFENDER_PIN`, which this unit leaves where it is; the map and
+recall legs read the regenerated `memory/map/generated/symbols.json`.
 
-New arm: tools/memory-tree/ratchet.py · covers AC2 AC3 · the plants `untracked-conf` and `ignored-conf`, staged red by dropping `--others` from `root_confs` · none
+New arm: tools/memory-tree/ratchet.py · covers AC2 AC3 · the plants `untracked-conf` and `ignored-conf`, staged red by dropping `--others` from `read_root_confs` · none
 
 ## 8. Open questions
 
@@ -232,10 +255,10 @@ New arm: tools/memory-tree/ratchet.py · covers AC2 AC3 · the plants `untracked
   closes. RESOLVED (agent, 2026-11-19, delegated): (a), rung 3, the one option whose AC1 holds in
   either order; `FOO_PIN="3"` is the plant AC2 and unit 14's AC7 already spell.
   widens: none · relaxes: none
-- **F3 — Does `root_confs` extract a factory shared with the policy kit's root-conf read?** Since
+- **F3 — Does `read_root_confs` extract a factory shared with the policy kit's root-conf read?** Since
   `cdfbd1cf`, `tools/policy/policy.py#derive_legacy_homes` lists the tracked root confs with the same
-  pathspec (§4 Evidence). Options: (a) `root_confs` lives in `ratchet.py` and the policy reader is left
-  alone; (b) one `root_confs(root, untracked)` in `tools/lib/`, inlined into memory-tree and policy
+  pathspec (§4 Evidence). Options: (a) `read_root_confs` lives in `ratchet.py` and the policy reader is
+  left alone; (b) one `read_root_confs(root, untracked)` in `tools/lib/`, inlined into memory-tree and policy
   under a parity row; (c) `ratchet.py` imports the policy kit's reader. The two read different sets by
   design: the policy reader converts committed legacy homes, and this read must see a conf before its
   first commit. So (b) is a flag with one caller per value, which [yagni] refuses, and it widens the
@@ -271,14 +294,22 @@ New arm: tools/memory-tree/ratchet.py · covers AC2 AC3 · the plants `untracked
   moved lines, unit 46's seed cited at `#seed_scalar_pins`, and the defect recorded as probed in AC1's
   fixture; unit 17 builds before this unit, so S1 and the rollout drop "whichever lands first"; the
   pin and conf counts re-pinned, unchanged. No Scope intent or criterion moved.
+- rev-6 · 2026-11-19 · S1 · S3 · §3 · §4 Evidence, The read, Inventory, Files touched · AC2 · AC3 · §7 ·
+  §8 F3 · §10 · per brief 2026-11-19-prompt-TOOL-dWitnessedBar-52-rename-brief, after the first
+  builder's return: the conf read is renamed `read_root_confs`, a name the naming lexicon accepts, and
+  restated behind `read_root_conf_lines`, the walk unit 17 landed at `dbbd8caba`; `ROOT_CONF_RE`, whose
+  one reader that walk's filter was, is deleted with it and AC3 observes its absence; the plant
+  functions join the inventory and `memory/map/generated/symbols.json` joins Files touched, with the
+  naming, map and recall legs its guards and the rename name joining the §7 leg line.
 
 ## 10. Reuse audit
 
 The seam is the adopter's own working-tree fallback for the `method-carriers.txt` seed
 (`tools/memory-tree/adopt-memory-tree.sh@fbbf1499d9a4:824-829`), the one place this repo already met
 the tracked-only-seed class, expressed as one `git ls-files` call with `--others --exclude-standard` so
-the leg and the seed share it; the call it replaces is the conf walk of
-`tools/memory-tree/ratchet.py#measure_scalar_pins`, landed by unit 14 at `49f5d3ff6`.
+the leg and the seed share it; the call it replaces is the conf filter of
+`tools/memory-tree/ratchet.py#read_root_conf_lines`, the walk unit 17 moved out of `#measure_scalar_pins`
+at `dbbd8caba`, which the new read sits behind.
 `python tools/codebase-map/reuse_lookup.py "seed measure untracked root
 conf before first commit"`, re-run at `86dac0fcc`, ranked `before`, `seed` (test helpers), `repo_root`,
 `load_conf`, `parse_conf` and `write_commit`; none lists a working tree's root confs. A `git grep` for the pathspec
