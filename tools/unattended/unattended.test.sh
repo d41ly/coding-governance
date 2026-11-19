@@ -19185,6 +19185,60 @@ fi   # ---- region 8 continues below: one compound block past about 3000 command
 if in_shard 8; then
 
 # ==================================================================================================
+# TOOL-dPlacedRequest-23 — A STRICT CLAIM READ STAYS STRICT. `--preflight tOff` over the lease
+# fixture's clone with its origin renamed away, under each planted `leases.offline` value: check 109
+# every time, no offline queue and no governance ref made; `--lease acquire` under `warn` still
+# queues. RED against a scratch copy whose preflight claim reaches the `warn` branch, which reads the
+# catalogue default because no policy kit resolves beside it. Waived by README rule 8 with the rest
+# of this suite. WHAT THIS BLOCK DOES NOT DRIVE: a take-over or `--close` offline, which read the
+# claims strict the same way; that split is TOOL-dPlacedRequest-43's to observe by behaviour.
+# ==================================================================================================
+LF=$(mktemp -d); write_lease_fixture
+( cd "$LF/c1" && readme tOff && git add -A && git commit -q -m tOff --no-verify && git push -q origin main 2>/dev/null \
+    && git fetch -q origin )
+sr_copy=$(mktemp -d); cp "$HERE/lib-unattended.sh" "$sr_copy/"
+sr_src=$(<"$SCRIPT")
+sr_cut='    if read_claims strict && check_claim_writable "$slug" preflight'
+sr_warn='    read_claims quiet || { read_lease_policy leases.offline >/dev/null; [ "$LP_VALUE" != warn ] || add_gov_queue "$LEASE_NS/$slug/build" "" "$(GIT rev-parse HEAD)"; }'$'\n'"$sr_cut"
+printf '%s\n' "${sr_src/"$sr_cut"/"$sr_warn"}" >"$sr_copy/warn.sh"
+same "DPR23 the scratch copy carries its one staged line" \
+  "$(grep -c '^    read_claims quiet || { read_lease_policy leases.offline' "$sr_copy/warn.sh")" "1"
+run_strict_preflight() { # [driver] -> the preflight's output over the renamed-away origin, `rc=<exit>` its last line
+  mv "$LF/origin.git" "$LF/away.git"
+  ( cd "$LF/c1" && USERNAME=daily-agent CLAUDE_CODE_SESSION_ID=s1 GOV_RUNLOG=0 bash "${1:-$SCRIPT}" --preflight tOff --keepalive-id k1 2>&1
+    echo "rc=$?" )
+  mv "$LF/away.git" "$LF/origin.git"
+}
+# ---- AC1 and AC2: under every planted value the offline preflight refuses at check 109, exits
+# ---- non-zero, writes no queue and makes no governance ref, in the clone or on the origin.
+for sr_v in refuse follow-leases warn; do
+  write_lease_policy "[leases]
+offline = \"$sr_v\""
+  sr_out=$(run_strict_preflight)
+  hit  "$sr_out" "UNATTENDED check 109 FAILED"
+  sr_rc=$(printf '%s\n' "$sr_out" | sed -n '$s/^rc=//p')
+  same "DPR23 AC1 AC2 under $sr_v the offline preflight exits non-zero, queues nothing and makes no ref" \
+    "$([ "$sr_rc" != 0 ] && echo refused) $([ -e "$LF/c1/.git/gov-queue.log" ] && echo queue || echo none) $(git -C "$LF/c1" for-each-ref refs/gov/ | grep -c .) $(git --git-dir="$LF/origin.git" for-each-ref refs/gov/ | grep -c .)" \
+    "refused none 0 0"
+done
+# ---- AC2: the split leaves the lease verb's queue: under `warn` an offline acquire still queues.
+mv "$LF/origin.git" "$LF/away.git"
+sr_out=$(run_lease_arm acquire build tOff); sr_rc=$?
+mv "$LF/away.git" "$LF/origin.git"
+same "DPR23 AC2 under warn an offline --lease acquire exits 0 with one queue line" "$sr_rc $(grep -c . "$LF/c1/.git/gov-queue.log")" "0 1"
+hit  "$sr_out" "queued"
+# ---- AC1 RED: the copy whose preflight claim reaches the `warn` branch queues a line.
+rm -f "$LF/c1/.git/gov-queue.log"
+write_lease_policy '[budgets]
+enforce = "warn"'
+run_strict_preflight "$sr_copy/warn.sh" >/dev/null
+same "DPR23 AC1 RED: the copy whose preflight claim reaches the warn branch queues a line" "$(grep -c . "$LF/c1/.git/gov-queue.log" 2>/dev/null)" "1"
+rm -rf "$LF" "$sr_copy"
+fi   # ---- region 8 continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 8; then
+
+# ==================================================================================================
 # TOOL-aGraftedHelix-32 — THE CLOSING REVIEW'S MINORS IN THE DRIVER. AC18 (M8, L1): the GH26 AC3
 # no-push witness gets a leg of its own, the bare origin in place, no mktemp shim, and a git shim that
 # fails only the claim fetch and logs every argument list, so nothing absorbs a push before the log
@@ -21159,7 +21213,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # eight (AC3's and AC8's loops run twice each), every one unconditional, counted off the diff's own
 # lines; the re-staged claim arms keep their count. No suite ran, and its RED-first observation is
 # the close's.
-FLOOR_ASSERTIONS=3552
+# RAISED 3552 -> 3562 by TOOL-dPlacedRequest-23: the strict-read block's 10 region-eight assertions
+# (its loop over the three planted values runs a `hit` and a `same` each), every one unconditional;
+# a probe of the block alone counted them. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3562
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -21405,7 +21462,8 @@ FLOOR_SHARD_7=311
 # RAISED 673 -> 744 by TOOL-dPlacedRequest-1: the same 71 region-eight lease assertions, see FLOOR_ASSERTIONS.
 # RAISED 744 -> 765 by TOOL-dPlacedRequest-1: the same 21 region-eight `--lease` refusal assertions, see FLOOR_ASSERTIONS.
 # RAISED 765 -> 786 by TOOL-dPlacedRequest-17: the same 21 region-eight observer clock assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=786
+# RAISED 786 -> 796 by TOOL-dPlacedRequest-23: the same 10 region-eight strict-read assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=796
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

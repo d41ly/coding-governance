@@ -31323,6 +31323,11 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "run_strict_preflight",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "run_su",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
