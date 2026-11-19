@@ -23900,6 +23900,11 @@
     {
       "id": "remove_scratch",
       "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "remove_scratch",
+      "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
     },
     {
@@ -23911,6 +23916,11 @@
       "id": "remove_scratch",
       "kind": "function",
       "file": "tools/run-gates/run-held-wsl.sh"
+    },
+    {
+      "id": "remove_scratch",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "remove_scratch",
