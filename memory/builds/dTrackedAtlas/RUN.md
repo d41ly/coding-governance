@@ -9,13 +9,23 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-dTrackedAtlas-5=OPEN TOOL-dTrackedAtlas-6=OPEN TOOL-dTrackedAtlas-7=DEFERRED TOOL-dTrackedAtlas-13=OPEN TOOL-dTrackedAtlas-14=OPEN TOOL-dTrackedAtlas-15=OPEN TOOL-dTrackedAtlas-16=OPEN TOOL-dTrackedAtlas-17=OPEN
+units-at-landing: TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 TOOL-dTrackedAtlas-8 TOOL-dTrackedAtlas-9 TOOL-dTrackedAtlas-10 TOOL-dTrackedAtlas-11 TOOL-dTrackedAtlas-12
+hold-run: 
+hold-streak: 1 · at 15c462a7
+resume-owed: none · owner
+held-at: 2026-11-19T08:45:18Z
+hold-reason: four Red-fix commits carry spec edits the inline lane refuses at the push boundary's RANGE half, where no waiver reaches; clearing them needs a history rewrite or a tools/ change, neither of which the mandate delegates
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
 gates-run: unattended-179507623879485724666-5596 04f5491e
 parked-surfaced: yes, 2 surfaced
 keepalive-reaped: yes
-refreshed-at: 9e21ac760dc0a43d6ed007396922722ccee98d57 · park · 0 touching
+refreshed-at: 9e21ac760dc0a43d6ed007396922722ccee98d57 · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 3f298cfaba8327a1705128823e497f2e029df021
-phase: VERIFYING
+witness: 15c462a7dd7a75bde4979f7b3e0621f6cb23885e
+phase: HELD
 may: none
 mode: prompt
 run-branch: refs/heads/branch/unattended-atlas-actual-state-a632fb
@@ -101,3 +111,7 @@ base: 6547d032070ac45966116e412d91e84ceef963b1
 2026-11-19T08:00:17Z dispatch · item 3b741f6a TOOL-dTrackedAtlas-12 · reason memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.py memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-12-ledger.md memory/builds/dTrackedAtlas/spec/2026-11-19-spec-TOOL-dTrackedAtlas-12.md
 
 2026-11-19T08:43:46Z decision · item routed commits: four Red-fix commits on the run branch carry spec edits (lane limit L3): f24d90e25, 97da019cf, 68794ff8d, 2e5147a2e; the push boundary grades RANGE, where ROUTED_COMMIT_WAIVED excuses nothing, so the landing reds · reason options: (a) rewrite the run branch so those four commits carry no Red-fix trailer (or split each spec edit into a commit of its own), drop or re-point their six red-fix records, and re-derive every sha the run record and the review records name; (b) widen the lane in tools/memory-tree/routed_commits.py to admit a spec status or pin edit, a tools/ change; (c) the owner lands it attended by a route the owner chooses. Refused: (a) rewrites built history (P19) and moves every recorded sha, (b) is under tools/, outside this run, and (c) is the owner's; the bar's other legs are green and asks-disposed is met
+
+2026-11-19T08:45:21Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dTrackedAtlas && bash tools/push-main.sh --land --slug dTrackedAtlas && bash tools/unattended/unattended.sh --settle dTrackedAtlas
+
+2026-11-19T08:45:21Z hold · item owner-decision · reason until owner · reaped f637f308 · resume none(owner)
