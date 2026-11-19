@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-13 — the change feed: every governance ref write appended once on its node, replayable and rebuilt equal from git
 
-**Status:** DEFERRED · rev-8 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 2 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-66
+**Status:** INPROGRESS · rev-8 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 2 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-66
 
 **Carries:** cl-dClosedLoop-0131@3532cbe6 whole
 
