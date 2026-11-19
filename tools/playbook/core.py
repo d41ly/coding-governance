@@ -45,7 +45,6 @@ import os
 import pathlib
 import re
 import shlex
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -928,7 +927,8 @@ def arm_bypass_never(c):
                      "refused · core.bypass")
         c.failed += inner.failed
     finally:
-        shutil.rmtree(bad, ignore_errors=True)
+        from deviation_join import remove_tree   # git's objects are read-only on Windows
+        remove_tree(bad)
 
 
 def arm_portable_orphan(c):
@@ -963,6 +963,8 @@ PLANTS = {"registry": arm_registry, "unenforced": arm_unenforced, "pending": arm
 
 
 def run_fixture(plant=None):
+    load_memory_tree()
+    from deviation_join import remove_tree   # git's objects are read-only on Windows
     out, failed = [], 0
     for name in [plant] if plant else list(PLANTS):
         top = pathlib.Path(tempfile.mkdtemp(prefix="core-fx-"))
@@ -973,7 +975,7 @@ def run_fixture(plant=None):
             PLANTS[name](case)
             failed += case.failed
         finally:
-            shutil.rmtree(top, ignore_errors=True)
+            remove_tree(top)
     out.append(f"{SAY}: fixture · {'FAILED' if failed else 'green'} · {failed} expectation(s) failed")
     return out, 1 if failed else 0
 

@@ -236,7 +236,7 @@ def main(argv=None) -> int:
     ap.add_argument("--enforce", default="warn", choices=("warn", "refuse"))
     a = ap.parse_args(argv)
     iu.load_memory_tree_path()
-    from deviation_join import set_env_aside
+    from deviation_join import remove_tree, set_env_aside
     from tree_lib import GIT_ENV_LEAKS
     out = [f"{SAY}: plant {a.plant} · enforce {a.enforce}"]
     top = pathlib.Path(tempfile.mkdtemp(prefix="compose-"))
@@ -253,7 +253,7 @@ def main(argv=None) -> int:
             else:
                 rc = 1 if case.failed else 0
     finally:
-        shutil.rmtree(top, ignore_errors=True)
+        remove_tree(top)   # not ignore_errors: git's objects are read-only on Windows
     out.append(f"{SAY}: {'FAILED' if rc else 'green'} · exit {rc}")
     sys.stdout.buffer.write("".join(f"{ln}\n" for ln in out).encode("utf-8"))
     return rc

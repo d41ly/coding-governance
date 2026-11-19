@@ -600,7 +600,11 @@ def run_fixture(plant: str, mode: str, window: int, releases: int, unlanded: boo
         print(f"shims fixture: cannot observe: {exc}")
         return 2
     finally:
-        shutil.rmtree(t, ignore_errors=True)
+        import step_gate  # noqa: E402, PLC0415  its scratch remover: git's objects are read-only on Windows
+        try:
+            step_gate.remove_scratch_tree(t)
+        except OSError:
+            pass
 
 
 def main(argv: list[str]) -> int:

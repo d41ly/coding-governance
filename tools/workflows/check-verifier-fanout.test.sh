@@ -545,6 +545,7 @@ case "$rc:$out" in 1:*"no lens-slot literal (a line marked gov:lens-slots) in an
 # ---- TOOL-aRepatriatedFork-4: the harnesses live under .claude/workflows/ -----------------------
 # Both adopters keep their harnesses there, outside the kit prefix. The a7c78ad2 bytes read this
 # fixture as EMPTY (observed: `the population is empty`); the marker is now the whole selector.
+rm -rf "$FIX_D"   # the AC14 fixture above: only the FIX_D assigned here is removed at the end
 FIX_D=$(mktemp -d); mkfix "$FIX_D" "scripts/$HKK/agent-cap.js"
 rm -f "$FIX_D/scripts/$WFK/harness.js"; mkdir -p "$FIX_D/.claude/workflows"
 cp "$TMP/the-incident.js" "$FIX_D/.claude/workflows/incident.js"

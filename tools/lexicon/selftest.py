@@ -18,6 +18,7 @@ import contextlib
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -108,12 +109,27 @@ def build_tempdir():
     `TemporaryDirectory(ignore_cleanup_errors=True)`: the latter is newer than some interpreters
     this kit meets in an adopter's tree, whose floor is not gov's python-floor.txt, and guessing
     wrong is a TypeError on an adopter first run.
+
+    NOT `ignore_errors=True` itself, though: each dir is a git repo, and git writes its objects
+    READ-ONLY, so on Windows every unlink there raised, was swallowed and the whole tree survived.
+    The hook clears the bit and retries; a refusal it cannot clear is still swallowed.
     """
+    def set_writable(func, path, _exc):
+        try:
+            os.chmod(path, stat.S_IWRITE)
+            func(path)
+        except OSError:
+            pass
+
     td = tempfile.mkdtemp()
     try:
         yield td
     finally:
-        shutil.rmtree(td, ignore_errors=True)
+        # `onexc` replaced `onerror` in 3.12; feature-detected for an adopter's older python.
+        try:
+            shutil.rmtree(td, **{"onexc" if sys.version_info >= (3, 12) else "onerror": set_writable})
+        except OSError:
+            pass
 
 
 KIT = Path(__file__).resolve().parent

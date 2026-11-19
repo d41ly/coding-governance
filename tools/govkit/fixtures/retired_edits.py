@@ -423,7 +423,11 @@ def run_fixture(plant: str, stub: str | None, write_withdrawals: bool, rerender_
         print(f"retired-edits fixture: cannot observe: {exc}")
         return 2
     finally:
-        shutil.rmtree(tmp, ignore_errors=True)
+        import step_gate  # noqa: E402, PLC0415  its scratch remover: git's objects are read-only on Windows
+        try:
+            step_gate.remove_scratch_tree(tmp)
+        except OSError:
+            pass
     bad = 0
     for name, seen, want in obs:
         bad += seen != want
