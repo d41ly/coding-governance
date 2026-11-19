@@ -5,7 +5,7 @@
 path = "AGENTS.md"
 blob = "e0d28051d82a560c7b934b69f987e2ef62d11328"
 units = []
-renderer = "playbook-render@1.42"
+renderer = "playbook-render@1.43"
 template = "coding-governance-agents.template.md@v5.0"
 
 [[target]]
