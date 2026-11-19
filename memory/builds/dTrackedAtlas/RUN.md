@@ -47,3 +47,7 @@ base: 6547d032070ac45966116e412d91e84ceef963b1
 2026-11-19T04:56:45Z draw · re-dispatch · TOOL-dTrackedAtlas-3 · 1/12 · 20261119T045645Z-f818cd
 
 2026-11-19T04:56:45Z dispatch · item 8529cce8 TOOL-dTrackedAtlas-3 · reason memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.py memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.html memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-3-ledger.md memory/builds/dTrackedAtlas/spec/2026-11-19-spec-TOOL-dTrackedAtlas-3.md
+
+2026-11-19T05:17:01Z brief · item TOOL-dTrackedAtlas-4 · reason d44ba2065a97 memory/builds/dTrackedAtlas/prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-build-brief.md
+
+2026-11-19T05:17:25Z dispatch · item 68794ff8 TOOL-dTrackedAtlas-4 · reason memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.js memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.json .claude/settings.json memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-ledger.md memory/builds/dTrackedAtlas/spec/2026-11-19-spec-TOOL-dTrackedAtlas-4.md

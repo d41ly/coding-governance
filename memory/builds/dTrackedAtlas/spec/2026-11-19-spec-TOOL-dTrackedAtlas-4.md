@@ -9,6 +9,7 @@
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-3-name-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-3-name-fold.md) | research | TOOL-dTrackedAtlas-3 |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-4-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-build-brief.md) | research | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-spec-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
