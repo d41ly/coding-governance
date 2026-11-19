@@ -681,7 +681,6 @@ Cite ids, never line numbers.
 | [TOOL-dTrackedAtlas-15](../builds/dTrackedAtlas/BACKLOG.md) | OPEN | HIGH | — | 2026-11-19 | held red: suite unattended brief-recorded selftest red at 9e21ac76 on… |
 | [TOOL-dTrackedAtlas-16](../builds/dTrackedAtlas/BACKLOG.md) | OPEN | HIGH | — | 2026-11-19 | held red: suite unattended pass-order selftest red at 9e21ac76 on the… |
 | [TOOL-dTrackedAtlas-17](../builds/dTrackedAtlas/BACKLOG.md) | OPEN | HIGH | — | 2026-11-19 | held red: suite unattended pass-tree selftest red at 9e21ac76 on the… |
-| [TOOL-dTrackedAtlas-19](../builds/dTrackedAtlas/BACKLOG.md) | OPEN | MED | — | 2026-11-19 | THE FLAGGED BAR THIS BUILD'S tools/ ROWS OWE WAS NOT RUN. Units 4 and… |
 | [TOOL-dTrueNorth-21](../builds/dTrueNorth/BACKLOG.md) | DEFERRED | LOW | TOOL-dPinnedHandoff-2 | 2026-10-21 | TWO LIVE SPECS OF dPinnedHandoff OMIT TWO LEGS THEIR FILES TRIP. Since… |
 | [TOOL-dTrueNorth-22](../builds/dTrueNorth/BACKLOG.md) | DEFERRED | LOW | TOOL-aOrientedCast-28 | 2026-10-22 | A LIVE SPEC OF aOrientedCast OMITS A LEG ITS FILES TRIP. Since… |
 | [TOOL-dTrueNorth-100](../builds/dTrueNorth/BACKLOG.md) | OPEN | HIGH | — | 2026-10-22 | held red: suite build-index selftest red at 271aa59d on the daily held… |
