@@ -18,10 +18,10 @@ mode: slug
 run-branch: refs/heads/branch/unattended-dwitnessedbar-2ed3b3
 anchor-kind: default-branch
 cli-version: 2.1.326
-lease-utc: 2026-11-19T02:58:06Z
+lease-utc: 2026-11-19T14:53:52Z
 pid-image: claude.exe
 host: compeeto
-pid: 22000
+pid: 30016
 session: 0a586af7-47fb-45dc-b963-7ee82521f7da
 keepalive: 0b5bfd26
 anchor-url: https://github.com/d41ly/coding-governance
