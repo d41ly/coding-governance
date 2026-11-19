@@ -21,7 +21,7 @@ main loop makes at the close, and so does every suite the section names.
   `WSL_DISTRO_NAME` unset, exited 0. The same probe with `WSL_DISTRO_NAME` set exited 2.
 - AC4 — `refuse_wrong_shell:` — `wsl.exe -e bash merge-rows.sh` in `tools/memory-tree/` printed the
   two refusal lines and nothing else, and exited 2.
-- AC5 — `refuse_wrong_shell || exit 2` — the 82 inline members and the six sourcers, 88 files
+- AC5 — `refuse_wrong_shell || exit 2` — the 82 inline members and the six sourcers, 88 files (DERIVED, the spec's PINNED population)
   (DERIVED, that comparison's output), all sit in the files `git grep -l` lists for the call, and
   `grep -c` over `resolve-python.sh` printed 0. The coverage arm's function, run over the worktree,
   printed no break and the counts 82 inline, 82 blocks, 6 sources and 88 calls (DERIVED). In a scratch
