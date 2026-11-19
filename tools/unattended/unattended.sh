@@ -41,7 +41,7 @@
 #   unattended.sh --check-commit <message file>                    # from commit-msg: refuse an open pass's undeclared staged path
 #   unattended.sh --check-specs <slug> <unit> [<unit> ...]   # --dispatch's spec-file refusals, before the spec commit
 #   unattended.sh --claims [--with-key]                            # every run claim and lease on the remote: name, node or fleet tag, status, beat-age-s, verdict[, key]
-#   unattended.sh --lease acquire|renew|release|take-over <kind> <name> [<sub>] [--witness <sha>] [--as <status>] [--for draw]   # one lease of a build, unit or cadence run, by compare-and-swap; one line
+#   unattended.sh --lease acquire|renew|release|take-over|offer <kind> <name> [<sub>] [--witness <sha>] [--as <status>] [--for draw] [--to <fleet tag>[/<session>]]   # one lease of a build, unit or cadence run, by compare-and-swap; one line
 #   unattended.sh --lease flush                                    # push this node's queued offline lease writes, oldest first
 #   unattended.sh --lease prune [<kind> <name> [<sub>]]            # delete each run lease and legacy run claim terminal past leases.queued-claim-days; never a build or unit lease
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
@@ -2399,7 +2399,7 @@ CLAIM_ROWS=""; CL_WHY=""; CL_OFFLINE=""; CL_QUEUED=""; GQ_HOLD=""; GQ_DIR=""
 CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""; CW_FROM=""; CW_CLS=""; CW_STATUS=""
 CW_EPOCH=0; CW_KIND=""; CW_TAG=""; CW_WIT=""; CW_LEASE=""; CW_CAUSE=""; CW_HINT=""; CW_DRAW=""
 WC_WHY=""; WC_BEAT=""; WC_EPOCH=""
-WL_REF=""; WL_KIND=""; WL_SLUG=""; WL_VERDICT=""; WL_WITNESS=""; WL_TAG=""; WL_QUEUE=""
+WL_REF=""; WL_KIND=""; WL_SLUG=""; WL_VERDICT=""; WL_WITNESS=""; WL_TAG=""; WL_QUEUE=""; WL_OFFER=""; WL_ODL=""
 
 # THE ONE REMOTE, counted once. SETS rather than prints, because check 24 is a `fail` and a `fail`
 # inside a command substitution is captured as the URL with its status lost. `observe_anchor` calls
@@ -2660,7 +2660,7 @@ derive_claim_keys() { # CLAIM_ROWS, CR_NAME -> one key per row on stdout
 # catch-alls, each of which refuses, announces or declines, and none of which writes a claim.
 # WHAT THIS DOES NOT CHECK: that a member here has a case branch below; the per-cell arm owns that.
 # The verdict half of a `foreign-` class is read off the remote's row, so the join cannot see it.
-CLAIM_READS="none foreign-released foreign-tombstone mine same foreign-live foreign-held foreign-stale foreign-terminal foreign-unknown"
+CLAIM_READS="none offered foreign-released foreign-tombstone mine same foreign-live foreign-held foreign-stale foreign-terminal foreign-unknown"
 CLAIM_MODES="preflight take-over holder status beat lease"
 
 # WHO MAY WRITE THIS SLUG'S CLAIM, by the table in the stops guide's section 7. The identity rows are
@@ -2695,10 +2695,19 @@ CLAIM_MODES="preflight take-over holder status beat lease"
 # tombstone. `foreign-tombstone` refuses each run column by its own check carrying `tombstone`, and
 # the status column announces it, exit unchanged, so a run still closes over its own tombstone.
 # CW_DRAW is 1 where the row is a draw's hold, whoever reads it.
+# TOOL-dPlacedRequest-20 - AN OFFER, in the `lease` mode only and tested before every other row: a
+# record whose `offer` is neither `-` nor this node's fleet tag, nor that tag, `/` and this harness's
+# session (CLAUDE_CODE_SESSION_ID unset, empty or `absent` is no session and forms no such value), is
+# `offered` while `check_deadline_passed` over its tip and `offer-deadline` returns 1, not yet, or 2,
+# unsighted, the window opening at this node's first sighting; an `offer-deadline` that is not a whole
+# number reads as expired. `acquire`, `take-over` and a draw refuse it `offered`, CW_WHO naming the
+# offer for the refusal line; the named node, or any node once the window passed, reads the row below
+# it. The `offer` act writes over none (create) or a `released` record (write, its epoch kept) and
+# refuses a `live` or `held` one `live-holder` and a terminal one `terminal`.
 check_claim_writable() { # slug · mode · lease keepalive · lease session · the keepalive a write sets · [run-state file]
   local slug="$1" mode="$2" ka="$3" sid="$4" wka="$5" rel="${6:-}" me="${CLAUDE_CODE_SESSION_ID:-}" row cls due ps="" la=""
   local c_slug c_node c_status c_age c_verdict c_sha c_sess c_ka c_host c_lease c_beat c_btxt=unknown r_host r_sess r_lease
-  local c_epoch c_kind c_renews c_wit c_offer c_odl c_lf c_bsha c_rest c_tail dh
+  local c_epoch c_kind c_renews c_wit c_offer c_odl c_lf c_bsha c_rest c_tail dh c_open=""
   CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""; CW_FROM=""; CW_CLS=""; CW_STATUS=""
   CW_EPOCH=0; CW_KIND=""; CW_TAG=""; CW_WIT=""; CW_LEASE=""; CW_CAUSE=""; CW_HINT=""; CW_DRAW=""
   [ "$mode" != lease ] || la="$wka"
@@ -2720,8 +2729,18 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
     if [ -n "$rel" ]; then fact "$rel" prior-session >/dev/null; ps=$_fact; fi
     # THE CLASS ORDER (TOOL-dPlacedRequest-16, its section 4): a `released` record, then a build or unit
     # tombstone, BEFORE the identity rows, so its releaser takes a hand-over at the epoch plus one and
-    # nobody, its writer included, revives a tombstone; a draw's hold after them, below.
-    if [ "$c_status" = released ]; then cls=foreign-released
+    # nobody, its writer included, revives a tombstone; a draw's hold after them, below. An open offer
+    # to another node or session (TOOL-dPlacedRequest-20) is tested before all of them.
+    if [ "$mode" = lease ] && [ -n "$c_offer" ] && [ "$c_offer" != - ] && [ "$c_offer" != "$ka" ] \
+      && { [ -z "$me" ] || [ "$me" = absent ] || [ "$c_offer" != "$ka/$me" ]; }; then
+      c_tail=$c_slug; [ "$c_kind" != build ] || c_tail="$c_slug/build"
+      case "$c_odl" in
+        ""|*[!0-9]*) ;;
+        *) check_deadline_passed "$LEASE_NS/$c_tail" "$c_sha" "$c_odl" || c_open=1 ;;
+      esac
+    fi
+    if [ -n "$c_open" ]; then cls=offered; CW_WHO="$slug · $c_offer"
+    elif [ "$c_status" = released ]; then cls=foreign-released
     elif { [ "$c_kind" = build ] || [ "$c_kind" = unit ]; } && { [ "$c_status" = landed ] || [ "$c_status" = withdrawn ]; }; then cls=foreign-tombstone
     elif [ "$mode" = lease ]; then
       if [ "$c_node" = "$ka" ] && [ "$c_sess" = "$sid" ]; then cls=mine
@@ -2773,8 +2792,18 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
       due=1
     fi
   fi
+  if [ "$la" = offer ]; then
+    case "$cls:${c_status:-}" in
+      none:*) CW_ACT=create ;;
+      *:released) CW_ACT=write ;;
+      *:landed|*:aborted|*:withdrawn) CW_CAUSE=terminal; return 1 ;;
+      *) CW_CAUSE=live-holder; return 1 ;;
+    esac
+    return 0
+  fi
   case "$mode:$cls" in
     lease:none) case "$la" in acquire|take-over|draw) CW_ACT=create ;; *) CW_CAUSE=none; return 3 ;; esac ;;
+    lease:offered) case "$la" in acquire|take-over|draw) CW_CAUSE=offered; return 1 ;; *) CW_CAUSE=none; return 3 ;; esac ;;
     lease:mine) case "$la" in release) CW_ACT=write ;; *) CW_ACT=renew ;; esac ;;
     lease:same) case "$la" in take-over) CW_ACT=take ;; release) CW_ACT=write ;; *) CW_ACT=rewrite ;; esac ;;
     lease:foreign-released) case "$la" in acquire|take-over|draw) CW_ACT=take ;; *) CW_CAUSE=none; return 3 ;; esac ;;
@@ -3268,7 +3297,9 @@ read_first_seen() {  # `ref TAB commit` pairs on stdin -> one `seen-utc` or `-` 
 # verdict, so a write that opens a tenure renews (TOOL-dPlacedRequest-25). WL_QUEUE builds the commit and queues it
 # through `add_gov_queue` instead of pushing it, the offline branch of `leases.offline`: rc 0 with
 # WC_WHY `already` where the queued commit it was built on holds its record less the stamp keys
-# (TOOL-dPlacedRequest-41 S2), rc 2 `gov-queue.lock busy` on its lock.
+# (TOOL-dPlacedRequest-41 S2), rc 2 `gov-queue.lock busy` on its lock. WL_OFFER and WL_ODL fill
+# `offer` and `offer-deadline` for `write_lease_offer` (TOOL-dPlacedRequest-20) and are `-` on every
+# other write, so an acquisition of an offered lease carries no stale offer.
 write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [run-state file] · [lease stamp] -> 0 written, 1 lost, 2 not completed; WC_WHY
   local slug="$1" st="$2" ka="$3" pol="$4" rel="${5:-}" lease="${6:-}" c rc node host sid msg ref exp="" ep kd sl tag ren wit wv rv er lf
   WC_WHY=""; WC_BEAT=$(read_utc_now); WC_EPOCH=""
@@ -3313,9 +3344,9 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
   if [ -z "$ref" ]; then
     WC_WHY="no lease ref derives for $slug: $LEASE_WHY"; rc=2
   else
-    msg=$(printf 'gov-claim %s\n\nslug: %s\nnode: %s\nhost: %s\nsession: %s\nkeepalive: %s\nstatus: %s\nlease-utc: %s\nbeat-utc: %s\nepoch: %s\nkind: %s\nfleet-tag: %s\nrenews: %s\nwitness: %s\noffer: -\noffer-deadline: -\nlast-fetch: %s' \
+    msg=$(printf 'gov-claim %s\n\nslug: %s\nnode: %s\nhost: %s\nsession: %s\nkeepalive: %s\nstatus: %s\nlease-utc: %s\nbeat-utc: %s\nepoch: %s\nkind: %s\nfleet-tag: %s\nrenews: %s\nwitness: %s\noffer: %s\noffer-deadline: %s\nlast-fetch: %s' \
       "${ref#"$LEASE_NS"/}" "$sl" "${node//[$'\n\r\t']/ }" "${host:-absent}" "${sid//[$'\n\r\t']/ }" "${ka//[$'\n\r\t']/ }" "$st" "$lease" "$WC_BEAT" \
-      "$ep" "$kd" "${tag:--}" "${ren:--}" "${wit:--}" "$lf")
+      "$ep" "$kd" "${tag:--}" "${ren:--}" "${wit:--}" "${WL_OFFER:--}" "${WL_ODL:--}" "$lf")
     if ! c=$(build_gov_commit "$CW_SHA" "$msg"); then
       WC_WHY="the claim commit could not be built in this clone"; rc=2
     elif [ -n "$WL_QUEUE" ]; then
@@ -3394,12 +3425,13 @@ write_claim_beat() { # slug -> exactly one `beat —` line
 # writer above, its row read by `read_claims` and decided by the `lease` column of
 # `check_claim_writable` (S6). Each verb prints ONE line: `lease — <tail> · <act> · epoch <n>` exit 0,
 # `lease refused — <cause> · <tail> · <holder>` exit 1 (`live-holder`, `tombstone`, `epoch-fence`,
-# `overlap`, `offline`), or `lease not written — <why>` exit 2. Dark behind RUN_CLAIMS, as every claim.
+# `overlap`, `offline`, and an offer's `offered`, naming its target, and `terminal`), or
+# `lease not written — <why>` exit 2. Dark behind RUN_CLAIMS, as every claim.
 # Expiry is judged by the observer clock in `read_claims` (TOOL-dPlacedRequest-17).
 # The hand-over, the tombstone, the draw and `--lease prune` are TOOL-dPlacedRequest-16's.
-# WHAT THIS DOES NOT CHECK: offers (TOOL-dPlacedRequest-20); the queue is unlocked until
-# TOOL-dPlacedRequest-24, so two writers flushing one queue at once can push one line twice, the
-# second losing its compare-and-swap.
+# `--lease offer <kind> <name> [<sub>] --to <fleet tag>[/<session>]` is TOOL-dPlacedRequest-20's.
+# WHAT THIS DOES NOT CHECK: the queue is unlocked until TOOL-dPlacedRequest-24, so two writers
+# flushing one queue at once can push one line twice, the second losing its compare-and-swap.
 FLEET_TAG=""; LEASE_WHY=""; LP_VALUE=""; LP_SEEN=""; LP_NOTED=""; LB_VALUE=""
 LR_RENEWS=""; LR_WITNESS=""; LT_RECORD=""; LT_WHY=""; LT_SHA=""; LW_SHA=""; LW_VERDICT=""; GQ_PUSHED=""
 
@@ -3410,6 +3442,35 @@ check_lease_segment() { # segment -> 0 when it is a legal one-segment ref name, 
   case "$1" in ""|*/*|.*|*.|*.lock|*..*|*"@{"*|@) return 1 ;; esac
   case "$1" in *[[:cntrl:]]*|*[[:space:]]*|*"~"*|*"^"*|*":"*|*"?"*|*"*"*|*"\\"*|*"["*) return 1 ;; esac
   return 0
+}
+
+# A TAG THE FLEET REGISTRY HOLDS (TOOL-dPlacedRequest-20 S1), the target an offer names: asked of the
+# playbook kit's one registry reader, `read_fleet`, found by the `resolve_kit_dir` call
+# `read_lease_policy` makes for the policy kit, so no second parser of `fleet.toml` exists. The kit
+# imported writes no bytecode. -> 0 registered, 1 not, 2 the registry unread; the cause in LEASE_WHY.
+check_fleet_tag() { # tag -> 0 registered, 1 not, 2 the registry unread; LEASE_WHY
+  local tag="${1:-}" py d out
+  LEASE_WHY=""
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! d=$(resolve_kit_dir "$py" playbook render_playbook.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
+    LEASE_WHY="no playbook kit resolves beside this kit, so fleet.toml cannot be read"; return 2
+  fi
+  [ -f "$d/render_playbook.py" ] || d="$(unset GIT_DIR GIT_WORK_TREE; GIT -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)/$d"
+  out=$("$py" -B -c 'import sys
+from pathlib import Path
+sys.path.insert(0, sys.argv[1])
+import render_playbook as r
+try:
+    tags = {n["tag"] for n in r.read_fleet(Path(sys.argv[1]) / r.FLEET_NAME)}
+except r.Refusal as e:
+    print(e); sys.exit(2)
+print("held" if sys.argv[2] in tags else "absent")' "$d" "$tag" 2>&1)
+  out=${out//$'\r'/}
+  case "$out" in
+    held) return 0 ;;
+    absent) LEASE_WHY="'$tag' is no tag of fleet.toml"; return 1 ;;
+    *) LEASE_WHY="fleet.toml could not be read: ${out//$'\n'/ }"; return 2 ;;
+  esac
 }
 
 # THE ONE BUILDER OF A LEASE REF (S1, I5). `<cadence>` takes any legal segment here; TOOL-dPlacedRequest-18
@@ -3816,8 +3877,12 @@ write_gov_queue() { # -> one line per queued write; 0 the queue is empty after, 
 # releases it only `--as landed`, at the same epoch. A create of a ref the remote no longer holds is
 # parented on the newest commit this node's feed holds for it, at its epoch plus one, and a build or
 # unit tombstone there is refused `tombstone` (S5).
-run_lease_verb() { # act · kind · name · sub · witness · release status · purpose -> 0 written, 1 refused, 2 not written
-  local act="$1" kind="${2:-}" name="${3:-}" sub="${4:-}" warg="${5:-}" as="${6:-}" fp="${7:-}" ref tail lname sl tag sid st rc wv wit wk="" k hd ow la fc fm fe
+# TOOL-dPlacedRequest-20 S1: `offer` takes `--to <fleet tag>[/<session>]`, held before any read: the
+# tag `check_fleet_tag` finds in the registry, the session half a legal segment that is neither empty
+# nor `absent`, since either value names no session. It writes through `write_lease_offer`, a create
+# at epoch 1 on an absent lease, and runs no overlap probe, because an offer acquires nothing.
+run_lease_verb() { # act · kind · name · sub · witness · release status · purpose · offer target -> 0 written, 1 refused, 2 not written
+  local act="$1" kind="${2:-}" name="${3:-}" sub="${4:-}" warg="${5:-}" as="${6:-}" fp="${7:-}" to="${8:-}" ref tail lname sl tag sid st rc wv wit wk="" k hd ow la fc fm fe ot os odl=""
   [ "$RUN_CLAIMS" = on ] || { echo "lease not written — RUN_CLAIMS is not on in $CONF, so no lease is read or written"; return 2; }
   if [ "$act" = flush ]; then
     read_claims quiet || { echo "lease not written — the queue stays: $CL_WHY"; return 2; }
@@ -3825,10 +3890,22 @@ run_lease_verb() { # act · kind · name · sub · witness · release status · 
     [ -n "$GQ_PUSHED" ] || [ "$rc" != 0 ] || echo "lease — flush · nothing queued"
     return "$rc"
   fi
-  case "$act" in acquire|renew|release|take-over) ;; *) echo "lease not written — the act is acquire, renew, release, take-over or flush, not '$act'"; return 2 ;; esac
+  case "$act" in acquire|renew|release|take-over|offer) ;; *) echo "lease not written — the act is acquire, renew, release, take-over, offer or flush, not '$act'"; return 2 ;; esac
   derive_lease_ref "$kind" "$name" "$sub" >/dev/null || { echo "lease not written — $LEASE_WHY"; return 2; }
   ref=$LEASE_REF; tail=${ref#"$LEASE_NS"/}
   case "$kind" in build) lname=$name; sl=$name ;; unit) lname=$tail; sl=$name ;; *) lname=$tail; sl=- ;; esac
+  if [ "$act" = offer ]; then
+    [ -n "$to" ] || { echo "lease not written — --lease offer names its target with --to <fleet tag>[/<session>]"; return 2; }
+    ot=${to%%/*}; os=""
+    if [ "$ot" != "$to" ]; then
+      os=${to#*/}
+      case "$os" in ""|absent) echo "lease not written — --to $to names no session, because an empty or absent session is none"; return 2 ;; esac
+      check_lease_segment "$os" || { echo "lease not written — --to $to: '$os' is not a legal one-segment session"; return 2; }
+    fi
+    check_fleet_tag "$ot" || { echo "lease not written — --to $to: $LEASE_WHY"; return 2; }
+  elif [ -n "$to" ]; then
+    echo "lease not written — --to names an offer's target, and $act takes none"; return 2
+  fi
   [ -z "$warg" ] || [ "$act" = renew ] || { echo "lease not written — --witness names a renewal's witness, and $act takes none"; return 2; }
   la=$act
   case "$fp" in
@@ -3846,11 +3923,15 @@ run_lease_verb() { # act · kind · name · sub · witness · release status · 
     esac
   else
     [ -z "$as" ] || { echo "lease not written — --as names a release's status, and $act takes none"; return 2; }
-    st=live; [ "$la" != draw ] || st=held
+    st=live; [ "$la" != draw ] || st=held; [ "$act" != offer ] || st=released
   fi
   for k in leases leases.granularity leases.renewal leases.overlap leases.offline; do
     read_lease_policy "$k" >/dev/null || { echo "lease not written — $k refused: $LP_VALUE"; return 2; }
   done
+  if [ "$act" = offer ]; then
+    read_lease_bound offer >/dev/null || { echo "lease not written — leases.offer-seconds refused: $LP_VALUE"; return 2; }
+    odl=$LB_VALUE
+  fi
   read_lease_policy leases.granularity >/dev/null
   case "$act:$kind:$LP_VALUE" in
     acquire:unit:build) echo "lease not written — leases.granularity is build, so no unit lease is acquired"; return 2 ;;
@@ -3902,8 +3983,8 @@ run_lease_verb() { # act · kind · name · sub · witness · release status · 
     elif [ "$st" != landed ]; then echo "lease not written — a draw's hold is released --as landed"; remove_gov_queue_hold; return 2; fi
   fi
   # THE EPOCH FOR LIFE (S5): a create of a ref the remote does not hold reads the newest commit this
-  # node's feed holds for it, one awk and one cat-file.
-  if [ "$CW_ACT" = create ]; then
+  # node's feed holds for it, one awk and one cat-file. An offer's create is `write_lease_offer`'s.
+  if [ "$CW_ACT" = create ] && [ "$act" != offer ]; then
     [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
     fc=""
     [ ! -f "${GOVFEED_DIR%$'\r'}/gov-feed.log" ] || fc=$(LF_REF="$ref" awk -F'\t' '{ sub(/\r$/, "") } NF == 6 && $2 == ENVIRON["LF_REF"] && $5 ~ /^[0-9a-f]+$/ && $5 !~ /^0+$/ { c = $5 } END { print c }' "${GOVFEED_DIR%$'\r'}/gov-feed.log")
@@ -3936,7 +4017,8 @@ run_lease_verb() { # act · kind · name · sub · witness · release status · 
   WL_REF=$ref; WL_KIND=$kind; WL_SLUG=$sl; WL_TAG=$tag; WL_VERDICT=$wv; WL_WITNESS=$wit
   [ "$CW_CLS" != mine ] || [ -z "$CW_TAG" ] || WL_TAG=$CW_TAG
   CW_NODE=""
-  write_claim "$lname" "$st" absent quiet "" ""; rc=$?
+  if [ "$act" = offer ]; then write_lease_offer "$lname" "$to" "$odl"; rc=$?
+  else write_claim "$lname" "$st" absent quiet "" ""; rc=$?; fi
   WL_REF=""; WL_KIND=""; WL_SLUG=""; WL_TAG=""; WL_VERDICT=""; WL_WITNESS=""
   if [ -n "$WL_QUEUE" ]; then
     remove_gov_queue_hold
@@ -3945,15 +4027,31 @@ run_lease_verb() { # act · kind · name · sub · witness · release status · 
     echo "lease not written — $WC_WHY"; return 2
   fi
   case "$rc" in
-    0) case "$CW_ACT:$st" in
-         write:released) echo "lease — $tail · released · epoch $WC_EPOCH" ;;
-         write:*) echo "lease — $tail · released $st · epoch $WC_EPOCH" ;;
+    0) case "$act:$CW_ACT:$st" in
+         offer:*) echo "lease — $tail · offer $to · epoch $WC_EPOCH" ;;
+         *:write:released) echo "lease — $tail · released · epoch $WC_EPOCH" ;;
+         *:write:*) echo "lease — $tail · released $st · epoch $WC_EPOCH" ;;
          *) echo "lease — $tail · $CW_ACT · epoch $WC_EPOCH" ;;
        esac
        return 0 ;;
     1) echo "lease refused — epoch-fence · $tail · $WC_WHY"; return 1 ;;
     *) echo "lease not written — $WC_WHY"; return 2 ;;
   esac
+}
+
+# THE OFFER WRITE (TOOL-dPlacedRequest-20 S1): the record `released`, `offer` the target and
+# `offer-deadline` the window `read_lease_bound offer` read at this write, a window in seconds and
+# never a timestamp, by `write_claim` through the one compare-and-swap writer on the tip
+# `check_claim_writable` read. Over a `released` record it keeps the epoch it read; over an absent
+# lease it is a create at epoch 1, parented on nothing (the branch TOOL-dPlacedRequest-28 routes
+# through the feed). The run_lease_verb caller set the WL_ names the write reads.
+write_lease_offer() { # name · target · window seconds -> write_claim's rc, WC_WHY and WC_EPOCH
+  local rc
+  if [ "$CW_ACT" = create ]; then CW_SHA=""; CW_EPOCH=0; fi
+  WL_OFFER=$2; WL_ODL=$3
+  write_claim "$1" released absent quiet "" ""; rc=$?
+  WL_OFFER=""; WL_ODL=""
+  return "$rc"
 }
 
 # --lease prune, ONLY A RUN'S TOMBSTONE (TOOL-dPlacedRequest-16 S7): each cadence `run` lease and each
@@ -17999,30 +18097,30 @@ while [ $# -gt 0 ]; do
     # cadence lease is named by its kind and segments, and `flush` names none.
     --lease)        refuse_waive_unless_preflight --lease
                     shift; LV_ACT=${1:-}; [ $# -eq 0 ] || shift
-                    LV_POS=(); LV_WIT=""; LV_AS=""; LV_FOR=""; _rl_rc=""
+                    LV_POS=(); LV_WIT=""; LV_AS=""; LV_FOR=""; LV_TO=""; _rl_rc=""
                     while [ $# -gt 0 ]; do
                       case "$1" in
-                        --witness|--as|--for)
+                        --witness|--as|--for|--to)
                           if [ $# -lt 2 ] || [ -z "$2" ]; then echo "lease not written — $1 takes a value"; _rl_rc=2; break; fi
-                          case "$1" in --witness) LV_WIT=$2 ;; --as) LV_AS=$2 ;; *) LV_FOR=$2 ;; esac
+                          case "$1" in --witness) LV_WIT=$2 ;; --as) LV_AS=$2 ;; --to) LV_TO=$2 ;; *) LV_FOR=$2 ;; esac
                           shift 2 ;;
-                        --*) echo "lease not written — --lease takes --witness <sha>, --as <status> or --for draw, not $1"; _rl_rc=2; break ;;
+                        --*) echo "lease not written — --lease takes --witness <sha>, --as <status>, --for draw or --to <fleet tag>[/<session>], not $1"; _rl_rc=2; break ;;
                         *) LV_POS+=("$1"); shift ;;
                       esac
                     done
                     if [ -n "$_rl_rc" ]; then :
                     elif [ "$LV_ACT" = flush ]; then
-                      if [ "${#LV_POS[@]}" -gt 0 ]; then echo "lease not written — --lease flush takes no argument"; _rl_rc=2
+                      if [ "${#LV_POS[@]}" -gt 0 ] || [ -n "$LV_TO" ]; then echo "lease not written — --lease flush takes no argument"; _rl_rc=2
                       else run_lease_verb flush; _rl_rc=$?; fi
                     elif [ "$LV_ACT" = prune ]; then
                       # TOOL-dPlacedRequest-16 S7 - every prunable run tombstone, or the one lease named.
-                      if [ -n "$LV_WIT$LV_AS$LV_FOR" ] || [ "${#LV_POS[@]}" = 1 ] || [ "${#LV_POS[@]}" -gt 3 ]; then
+                      if [ -n "$LV_WIT$LV_AS$LV_FOR$LV_TO" ] || [ "${#LV_POS[@]}" = 1 ] || [ "${#LV_POS[@]}" -gt 3 ]; then
                         echo "lease not written — --lease prune takes <kind> <name> [<sub>] or nothing"; _rl_rc=2
                       else write_lease_prune ${LV_POS[@]+"${LV_POS[@]}"}; _rl_rc=$?; fi
                     elif [ "${#LV_POS[@]}" -lt 2 ] || [ "${#LV_POS[@]}" -gt 3 ]; then
                       echo "lease not written — --lease <act> <kind> <name> [<sub>]: build <slug>, unit <slug> <id> or run <cadence> <period>"; _rl_rc=2
                     else
-                      run_lease_verb "$LV_ACT" "${LV_POS[0]}" "${LV_POS[1]}" "${LV_POS[2]:-}" "$LV_WIT" "$LV_AS" "$LV_FOR"; _rl_rc=$?
+                      run_lease_verb "$LV_ACT" "${LV_POS[0]}" "${LV_POS[1]}" "${LV_POS[2]:-}" "$LV_WIT" "$LV_AS" "$LV_FOR" "$LV_TO"; _rl_rc=$?
                     fi
                     RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     # TOOL-dPlacedRequest-13 - this node's change feed, held to, rebuilt from or replayed over the cache

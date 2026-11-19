@@ -512,10 +512,16 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
 - `--lease` — one lease of a build, a unit or a cadence run: `--lease acquire|renew|release|take-over
   build <slug>`, `unit <slug> <id>` or `run <cadence> <period>`, `--witness <sha>` on a renewal and
   `--as landed|aborted|withdrawn` on a release; `--lease flush` pushes this node's queued offline
-  writes. Each reads the remote's leases, derives its row through the stops guide's `lease` column,
+  writes. `--lease offer <kind> <name> [<sub>] --to <fleet tag>` offers an absent or `released`
+  lease to one node for `leases.offer-seconds`, printing `lease — <tail> · offer <target> · epoch <n>`,
+  and `--to <fleet tag>/<session>` to one session of it; inside the window every other node, and
+  every other session of the named one, is refused `offered`. A tag `fleet.toml` does not hold, or
+  a session half that is empty, `absent` or no legal segment, exits 2 before any read. Each reads
+  the remote's leases, derives its row through the stops guide's `lease` column,
   writes by compare-and-swap and prints ONE line: `lease — <tail> · <act> · epoch <n>` (exit 0),
   `lease refused — <cause> · <tail> · <holder>` (exit 1; `live-holder`, `tombstone`, `epoch-fence`,
-  `overlap` or `offline`), or `lease not written — <why>` (exit 2: a bad segment, a level
+  `overlap`, `offline`, or an offer's `offered`, naming its target, and `terminal`), or
+  `lease not written — <why>` (exit 2: a bad segment, a level
   `leases.granularity` excludes, a refused policy key, a node with no `fleet.toml` row, a witness
   that records no transition and is no open question). An acquisition runs the overlap probe first.
   Dark behind `RUN_CLAIMS` like every claim; `UNATTENDED-STOPS.md` §7 is the grammar, the record,

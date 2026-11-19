@@ -17504,12 +17504,12 @@ seed_claim() { # slug · session · keepalive · status · beat-utc (empty omits
 # driver's first write creates the lease on its tip, so a claim's position is the lease's where one exists.
 # A BUILD LEASE seeded as the driver writes one (TOOL-dPlacedRequest-1 S2): `gov-claim <slug>/build`, the
 # eight keys and the eight lease keys, epoch 1, `node` and `host` another node's.
-seed_lease() { # slug · session · fleet tag · status · beat-utc (empty omits the line) · [keepalive]
+seed_lease() { # slug · session · fleet tag · status · beat-utc (empty omits the line) · [keepalive] · [offer] · [offer-deadline]
   local t c m
   m=$(printf 'gov-claim %s/build\n\nslug: %s\nnode: other\nhost: otherhost\nsession: %s\nkeepalive: %s\nstatus: %s\nlease-utc: %s' \
     "$1" "$1" "$2" "${6:-absent}" "$4" "$(derive_claim_now)")
   [ -z "$5" ] || m=$(printf '%s\nbeat-utc: %s' "$m" "$5")
-  m=$(printf '%s\nepoch: 1\nkind: build\nfleet-tag: %s\nrenews: no\nwitness: -\noffer: -\noffer-deadline: -\nlast-fetch: -' "$m" "$3")
+  m=$(printf '%s\nepoch: 1\nkind: build\nfleet-tag: %s\nrenews: no\nwitness: -\noffer: %s\noffer-deadline: %s\nlast-fetch: -' "$m" "$3" "${7:--}" "${8:--}")
   t=$(git --git-dir="$ORIGIN" mktree </dev/null); c=$(git --git-dir="$ORIGIN" commit-tree "$t" -m "$m")
   git --git-dir="$ORIGIN" update-ref "refs/gov/leases/$1/build" "$c"
   [ -z "$5" ] || add_claim_sighting . "refs/gov/leases/$1/build" "$t" "$c" "$5"
@@ -18199,7 +18199,13 @@ foreign-tombstone take-over 1 107 same  same    tombstone
 foreign-tombstone holder    1 108 same  same    tombstone
 foreign-tombstone status    0 -   same  changed announced
 foreign-tombstone beat      0 -   same  same    declined
-foreign-tombstone lease     1 -   same  same    tombstone'
+foreign-tombstone lease     1 -   same  same    tombstone
+offered           preflight unreached offered derives in the lease mode only
+offered           take-over unreached offered derives in the lease mode only
+offered           holder    unreached offered derives in the lease mode only
+offered           status    unreached offered derives in the lease mode only
+offered           beat      unreached offered derives in the lease mode only
+offered           lease     1 -   same  same    offered'
 mapfile -t gc_lines <<<"$GC_CELLS"
 gc_rows=$(sed -n 's/^CLAIM_READS="\(.*\)"$/\1/p' "$SCRIPT")
 gc_modes=$(sed -n 's/^CLAIM_MODES="\(.*\)"$/\1/p' "$SCRIPT")
@@ -18221,6 +18227,8 @@ same "GH19 the cell table types exactly the driver's CLAIM_READS by CLAIM_MODES,
 # `landed`, seeded under the reacher's OWN identity (its tag, session and keepalive), so every cell
 # shows the class read before `mine`; `foreign-terminal`'s lease is `aborted`, a status the
 # tombstone rule leaves terminal, and its run claim stays the legacy `landed` one.
+# TOOL-dPlacedRequest-20: `offered` is a `released` build lease offered to tag `b` for 300 s and
+# sighted now, which the `lease` column alone derives; the run columns' cells are unreached.
 seed_lease_row() { # row · slug · the reacher's session
   case "$1" in
     none) ;;
@@ -18233,6 +18241,7 @@ seed_lease_row() { # row · slug · the reacher's session
     foreign-unknown) seed_lease "$2" s-other b live "" ;;
     foreign-released) seed_lease "$2" "$3" a released "$(derive_claim_now)" ;;
     foreign-tombstone) seed_lease "$2" "$3" a landed "$(derive_claim_now)" ;;
+    offered) seed_lease "$2" s-other b released "$(derive_claim_now)" "" b 300 ;;
     *) echo "FAIL DPR1 the cell table names a lease row no seed builds: $1"; st=1; return 1 ;;
   esac
 }
@@ -18295,6 +18304,7 @@ run_claim_cell() { # row · mode -> GC_GOT
     *"unattended: beat — $slug · skipped: the claim is not this run's: "*) line=declined ;;
     *"lease refused — tombstone · $slug/build · "*) line=tombstone ;;
     *"lease refused — live-holder · $slug/build · "*) line=refused ;;
+    *"lease refused — offered · $slug/build · b"*) line=offered ;;
     *"UNATTENDED check 107 FAILED — this slug's lease on the remote is a tombstone, "*) line=tombstone ;;
     *"UNATTENDED check 108 FAILED — this run's lease on the remote is a tombstone, "*) line=tombstone ;;
   esac
@@ -19726,6 +19736,82 @@ done
 same "DPR41 S3 a line after a kept line of its ref stays queued, by the chain's rule: exit 2, two lines" "$ch_kg" "2 2 1"
 same "DPR41 S3 RED: the copy without the rule keeps both lines by the bound alone" "$ch_kr" "2 2 0"
 rm -rf "$LF" "$ch_copy"
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
+# TOOL-dPlacedRequest-20 — AN OFFER, AND THE EPOCH FENCE ON A STALE TAKE. Over the lease fixture's
+# clone c1 (`daily-agent`, tag `a`) and a second clone c2 of its origin under `agent5`, tag `b`: an
+# unregistered `--to`, and a session half that is spaced, `absent` or empty, exit 2 before any read,
+# no last fetch stamped (AC2, AC9); c1's offer of an absent unit lease to `b` writes `released`, the
+# target, the 300 s window and epoch 1 (AC1, AC7); c1's acquisition inside the window is refused
+# `offered`, the tip unmoved (AC3); c2's lands at epoch 2 with no offer left (AC4); an offer over that
+# live lease is refused `live-holder` (AC1); c1 takes an offer its feed first saw 301 s ago, and is
+# refused one its feed cannot hold at all, GOVFEED_DIR naming a file (AC5); an offer to `b/s1`
+# refuses c2 under `s2`, `absent` and no session and lands under `s1` (AC9); and c1's take, replayed
+# from a read the fetch shim keeps stale after c2 took the lease, is refused `epoch-fence`, each epoch
+# once on the origin (AC6). RED, observed at the close, is the base driver, which has no offer act.
+# Waived by README rule 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: a policy
+# setting `leases.offer-seconds`, and an offer queued offline.
+# ==================================================================================================
+run_offer_arm() { # clone dir · user · session, `-` for none · --lease args -> its output, its exit kept
+  local d="$1" u="$2" s="$3"; shift 3
+  if [ "$s" = - ]; then ( cd "$d" && env -u CLAUDE_CODE_SESSION_ID USERNAME="$u" GOV_RUNLOG=0 bash "$SCRIPT" --lease "$@" 2>&1 )
+  else ( cd "$d" && USERNAME="$u" CLAUDE_CODE_SESSION_ID="$s" GOV_RUNLOG=0 bash "$SCRIPT" --lease "$@" 2>&1 ); fi
+}
+LF=$(mktemp -d); LF_GIT=$(command -v git); write_lease_fixture
+git clone -q "$LF/origin.git" "$LF/c2" 2>/dev/null; cp "$LF/c1/.unattended.conf" "$LF/c2/"
+mkdir -p "$LF/bin"
+printf '#!/usr/bin/env bash\ncase " $* " in *" fetch "*"refs/gov/leases/"*) exit 0 ;; esac\nexec "%s" "$@"\n' "$LF_GIT" > "$LF/bin/git"; chmod +x "$LF/bin/git"
+of_bin=$(cd "$LF/bin" && pwd); of_feed="$LF/c1/.git/gov-feed.log"
+read_offer_tip() { # unit id -> the origin's tip of tFix's unit lease, or none
+  git --git-dir="$LF/origin.git" rev-parse -q --verify "refs/gov/leases/tFix/unit/$1" 2>/dev/null || echo none; }
+of_rc=""
+for of_t in zz "b/s 1" b/absent b/; do run_offer_arm "$LF/c1" daily-agent sa offer unit tFix u1 --to "$of_t" >/dev/null; of_rc="$of_rc$? "; done
+same "DPR20 AC2 AC9 zz, 'b/s 1', b/absent and b/ each exit 2 before any read: no ref, no last fetch" \
+  "$of_rc$(git --git-dir="$LF/origin.git" for-each-ref refs/gov | grep -c .) $([ -e "$LF/c1/.git/gov-last-fetch" ] && echo stamped || echo unread)" "2 2 2 2 0 unread"
+of_out=$(run_offer_arm "$LF/c1" daily-agent sa offer unit tFix u1 --to b)
+hit  "$of_out" "lease — tFix/unit/u1 · offer b · epoch 1"
+same "DPR20 AC1 AC7 the offer record: status, offer, offer-deadline, epoch" \
+  "$(read_lease_field tFix/unit/u1 status) $(read_lease_field tFix/unit/u1 offer) $(read_lease_field tFix/unit/u1 offer-deadline) $(read_lease_field tFix/unit/u1 epoch)" "released b 300 1"
+of_t0=$(read_offer_tip u1); of_out=$(run_offer_arm "$LF/c1" daily-agent sa acquire unit tFix u1)
+hit  "$of_out" "lease refused — offered · tFix/unit/u1 · b"
+same "DPR20 AC3 a node the offer does not name moves no tip" "$(read_offer_tip u1)" "$of_t0"
+of_out=$(run_offer_arm "$LF/c2" agent5 s1 acquire unit tFix u1)
+hit  "$of_out" "lease — tFix/unit/u1 · take · epoch 2"
+same "DPR20 AC4 the named node's take carries no offer" \
+  "$(read_lease_field tFix/unit/u1 status) $(read_lease_field tFix/unit/u1 offer) $(read_lease_field tFix/unit/u1 offer-deadline) $(read_lease_field tFix/unit/u1 fleet-tag)" "live - - b"
+of_t0=$(read_offer_tip u1); of_out=$(run_offer_arm "$LF/c1" daily-agent sa offer unit tFix u1 --to b)
+hit  "$of_out" "lease refused — live-holder · tFix/unit/u1 · "
+same "DPR20 AC1 an offer over a live lease moves no tip" "$(read_offer_tip u1)" "$of_t0"
+# ---- AC5: the window is the observer clock's: a sighting 301 s old frees it, none holds it.
+run_offer_arm "$LF/c1" daily-agent sa offer unit tFix u3 --to b >/dev/null
+awk -F'\t' -v OFS='\t' -v c="$(read_offer_tip u3)" -v s="$(derive_claim_ago 301)" '$5 == c { $6 = s } { print }' "$of_feed" >"$of_feed.t" && mv -f "$of_feed.t" "$of_feed"
+of_out=$(run_offer_arm "$LF/c1" daily-agent sa acquire unit tFix u3)
+hit  "$of_out" "lease — tFix/unit/u3 · take · epoch 2"
+run_offer_arm "$LF/c1" daily-agent sa offer unit tFix u4 --to b >/dev/null
+: >"$LF/nofeed"; of_t0=$(read_offer_tip u4)
+of_out=$( cd "$LF/c1" && GOVFEED_DIR="$LF/nofeed" USERNAME=daily-agent CLAUDE_CODE_SESSION_ID=sa GOV_RUNLOG=0 bash "$SCRIPT" --lease acquire unit tFix u4 2>&1 )
+hit  "$of_out" "lease refused — offered · tFix/unit/u4 · b"
+same "DPR20 AC5 an unsighted offer holds its tip" "$(read_offer_tip u4)" "$of_t0"
+# ---- AC9: an offer to one session holds the named node's other sessions, and none at all.
+run_offer_arm "$LF/c1" daily-agent sa offer unit tFix u6 --to b/s1 >/dev/null
+of_t0=$(read_offer_tip u6); of_rc=""
+for of_s in s2 absent -; do of_out=$(run_offer_arm "$LF/c2" agent5 "$of_s" acquire unit tFix u6); of_rc="$of_rc$? $(printf '%s\n' "$of_out" | grep -c '^lease refused — offered · tFix/unit/u6 · b/s1$') "; done
+same "DPR20 AC9 sessions s2, absent and none are refused offered, the tip unmoved" \
+  "$(read_lease_field tFix/unit/u6 offer) $of_rc$([ "$(read_offer_tip u6)" = "$of_t0" ] && echo unmoved || echo moved)" "b/s1 1 1 1 1 1 1 unmoved"
+of_out=$(run_offer_arm "$LF/c2" agent5 s1 acquire unit tFix u6)
+hit  "$of_out" "lease — tFix/unit/u6 · take · epoch 2"
+same "DPR20 AC9 the named session's take carries no offer" "$(read_lease_field tFix/unit/u6 offer)" "-"
+# ---- AC6: c1's read goes stale under the shim after c2 took the expired offer: the push is fenced.
+run_offer_arm "$LF/c1" daily-agent sa offer unit tFix u2 --to b >/dev/null
+awk -F'\t' -v OFS='\t' -v c="$(read_offer_tip u2)" -v s="$(derive_claim_ago 301)" '$5 == c { $6 = s } { print }' "$of_feed" >"$of_feed.t" && mv -f "$of_feed.t" "$of_feed"
+run_offer_arm "$LF/c2" agent5 s1 acquire unit tFix u2 >/dev/null
+of_out=$( cd "$LF/c1" && PATH="$of_bin:$PATH" USERNAME=daily-agent CLAUDE_CODE_SESSION_ID=sa GOV_RUNLOG=0 bash "$SCRIPT" --lease acquire unit tFix u2 2>&1 )
+hit  "$of_out" "lease refused — epoch-fence · tFix/unit/u2 · "
+same "DPR20 AC6 the origin names b at epoch 2, each epoch once, never falling" \
+  "$(read_lease_field tFix/unit/u2 fleet-tag) $(git --git-dir="$LF/origin.git" log --reverse --format=%B refs/gov/leases/tFix/unit/u2 -- | sed -n 's/^epoch: //p' | tr '\n' ' ')" "b 1 2 "
+rm -rf "$LF"
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
@@ -22007,7 +22093,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3724 -> 3737 by TOOL-dPlacedRequest-41: the offline chain block's 13 region-eight
 # assertions (9 `same`, 4 `hit`), off the diff's own lines; it has no skip branch. No suite ran, and
 # its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3737
+# RAISED 3737 -> 3755 by TOOL-dPlacedRequest-20: the offer block's 17 region-eight assertions
+# (9 `same`, 8 `hit`) and the cell table's one `offered` lease cell, its five run-column cells
+# unreached and counted as none, off the diff's own lines; no skip branch. No suite ran, and its
+# RED-first observation is the close's.
+FLOOR_ASSERTIONS=3755
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -22263,7 +22353,8 @@ FLOOR_SHARD_7=311
 # RAISED 933 -> 940 by TOOL-dPlacedRequest-37: the same 7 region-eight node lock deadline assertions, see FLOOR_ASSERTIONS.
 # RAISED 940 -> 955 by TOOL-dPlacedRequest-39: the same 15 region-eight contained append assertions, see FLOOR_ASSERTIONS.
 # RAISED 955 -> 968 by TOOL-dPlacedRequest-41: the same 13 region-eight offline chain assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=968
+# RAISED 968 -> 986 by TOOL-dPlacedRequest-20: the same 18 region-eight offer and cell assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=986
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

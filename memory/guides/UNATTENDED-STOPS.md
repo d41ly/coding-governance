@@ -194,8 +194,8 @@ a commit over the empty tree whose message is `gov-claim <tail>` (the ref after 
 blank line, and sixteen `key: value` lines: `slug`, `node`, `host`, `session`, `keepalive`, `status`
 (`live`, `held`, `released`, `landed`, `aborted` or `withdrawn`), `lease-utc`, `beat-utc`, `epoch`, `kind`
 (`build`, `unit` or `run`), `fleet-tag` (this node's row of `fleet.toml`), `renews`, `witness`,
-`offer`, `offer-deadline` and `last-fetch`, the first two `-` for now and `last-fetch` this node's
-last fetch on a queued write, `-` on every other. A lease outside a run writes
+`offer`, `offer-deadline` and `last-fetch`, the first two an offer's target and window (below), `-`
+on every other write, and `last-fetch` this node's last fetch on a queued write, `-` on every other. A lease outside a run writes
 `keepalive: absent`. **The epoch** is 1 on a create, the read epoch plus one on a take of a foreign
 lease, and the read epoch on every other write; a create of a ref the remote no longer holds, which
 this node's feed names, is parented on the newest commit the feed holds for it at its epoch plus one,
@@ -220,8 +220,8 @@ harness's, `same session` when its `session` alone is. A refusal names one cause
 foreign holder (naming `--lease take-over` when stale); `tombstone`, a build or unit tombstone or a
 foreign terminal lease;
 `epoch-fence`, a compare-and-swap lost to a write between the read and the push, which is also how
-one of two nodes creating one build lease learns the slug is taken; `overlap`; and `offline`. A node
-no `fleet.toml` row names writes nothing. Seven policy keys and `leases` shape it, each read once per
+one of two nodes creating one build lease learns the slug is taken; `overlap`; `offline`; and an
+offer's two, `offered` and `terminal` (below). A node no `fleet.toml` row names writes nothing. Seven policy keys and `leases` shape it, each read once per
 process through the policy kit, a refused read writing nothing:
 
 | key | values (default first) | what it decides |
@@ -334,6 +334,22 @@ Every take of the run columns bumps the epoch. The `lease` column, by act:
 | foreign `stale` | refused `live-holder`, naming `take-over` | take, announced, epoch +1 | refused `live-holder` | refused `live-holder` |
 | foreign `terminal` | refused `tombstone` | refused `tombstone` | refused `tombstone` | refused `tombstone` |
 | `unknown` | refused `live-holder` | refused `live-holder` | refused `live-holder` | refused `live-holder` |
+| `offered` | refused `offered`, naming the target | refused `offered`, naming the target | not written, exit 2 | not written, exit 2 |
+
+**The offer.** `--lease offer <kind> <name> [<sub>] --to <fleet tag>` offers a lease to one node
+without assigning it, and `--to <fleet tag>/<session>` to one session of that node. Before any read,
+the tag must be a row of `fleet.toml` and the session half a legal one-segment name that is neither
+empty nor `absent`, either of which names no session; each miss exits 2. The act writes `released`
+with `offer` the target and `offer-deadline` the window `leases.offer-seconds` gives at the write, in
+seconds and never a timestamp, by compare-and-swap on the tip it read: over a `released` lease at its
+epoch, over an absent one as a create at epoch 1. It refuses a `live` or `held` lease `live-holder`
+and a terminal one `terminal`. In the `lease` column alone, tested before every other row, a record
+whose `offer` is neither `-` nor this node's tag, nor that tag, `/` and this harness's session (an
+unset, empty or `absent` session forms none), reads `offered` while this node first saw its tip at
+most `offer-deadline` seconds ago or has not seen it yet, the window opening at its first sighting.
+An `offer-deadline` that is not a whole number reads as expired. The named node, or session, and
+every node once the window has passed read the `released` row and take the lease at the epoch plus
+one, the new record carrying `offer: -` and `offer-deadline: -`. The run columns never read an offer.
 
 The holder is `--resume`'s holder row and its `--replaces` block, `--dispatch` and `--close`; it
 renews when its tip, by this node's first sighting, is a quarter of `RESUME_STALE_BOUND` old or a field it writes differs, and otherwise only
