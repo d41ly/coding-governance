@@ -20464,7 +20464,8 @@ rm -rf "$LF"
 # a build lease of the slug `request` refused, A's `--claims` reads the row `live`, and B holds no
 # request ref and no feed line of one (AC4); consent holds in A's typing session alone (AC5). RED,
 # observed at the close, is the base driver, which has no request verb. Waived by README rule 8 with
-# the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: a push the remote refuses, the exit 2.
+# the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: a push the remote answers and refuses, other
+# than one remote, no python or loop kit, and a local store that cannot be written.
 # ==================================================================================================
 LF=$(mktemp -d); LF_GIT=$(command -v git); write_lease_fixture
 git clone -q "$LF/origin.git" "$LF/c2" 2>/dev/null; cp "$LF/c1/.unattended.conf" "$LF/c2/"
@@ -20511,6 +20512,44 @@ rq_got=$( for rq_c in "c1 qA" "c1 qA2" "c2 qB"; do
 same "DPR19 AC5 consent holds in A's typing session and nowhere else" "$rq_got" "0 1 1 "
 rq_out=$( cd "$LF/c2" && export CLAUDE_CODE_SESSION_ID=qB && set +u && . "$SCRIPT" >/dev/null 2>&1; check_request_consent "$rq_key" )
 hit  "$rq_out" "relayed"
+# ---- the checklist pass's refusal arms: each branch that writes nothing, and the two reads and the push
+# ---- that do not answer, the words kept and a re-run recording them.
+rq_n=$(git --git-dir="$LF/origin.git" for-each-ref refs/gov/requests | grep -c .)
+rq_out=$(run_request_arm --lease acquire request ABC); rq_rc=$?
+same "DPR19 S4 a request lease of no twelve-hex key exits 2" "$rq_rc" "2"
+hit  "$rq_out" "'ABC' is no content key"
+rq_out=$(run_request_arm --lease acquire request "$rq_key" extra); rq_rc=$?
+same "DPR19 S4 a request lease with a third segment exits 2" "$rq_rc" "2"
+hit  "$rq_out" "a request lease takes no third segment: extra"
+rq_out=$(run_request_arm --request "$LF/none.md"); rq_rc=$?
+same "DPR19 S2 a request file that is not there exits 2" "$rq_rc" "2"
+hit  "$rq_out" "the request file is not readable"
+printf 'Fix\351' > "$LF/bad.md"
+rq_out=$(run_request_arm --request "$LF/bad.md"); rq_rc=$?
+same "DPR19 AC7 a request that is not UTF-8 exits 2 and the origin gains no record" \
+  "$rq_rc $(git --git-dir="$LF/origin.git" for-each-ref refs/gov/requests | grep -c .)" "2 $rq_n"
+hit  "$rq_out" "bad.md is not UTF-8 at byte 3"
+rq_out=$(RQ_SID='q.A' run_request_arm --request "$LF/req.md"); rq_rc=$?
+same "DPR19 S3 a session id outside letters, digits and dashes exits 2" "$rq_rc" "2"
+hit  "$rq_out" "the session id is not letters, digits and dashes"
+rq_out=$(run_request_arm --request); rq_rc=$?
+same "DPR19 S2 --request with no file exits 2" "$rq_rc" "2"
+hit  "$rq_out" "the form is --request <file>"
+mv "$LF/origin.git" "$LF/origin.gone"
+printf 'Another request\n' > "$LF/r2.md"
+rq_out=$(run_request_arm --request "$LF/r2.md"); rq_rc=$?
+rq_k2=$(printf '%s\n' "$rq_out" | sed -n 's/^request — \([0-9a-f]\{12\}\) · not written.*/\1/p')
+same "DPR19 S3 an unanswered push exits 2 with the words kept" \
+  "$rq_rc ${#rq_k2} $([ -f "$LF/c1/.git/requests/$rq_k2.md" ] && echo kept || echo lost)" "2 12 kept"
+hit  "$rq_out" "not written, the text kept and a re-run retries"
+rq_out=$(run_request_arm --lease acquire request "$rq_key"); rq_rc=$?
+same "DPR19 S4 an unanswered record read exits 2" "$rq_rc" "2"
+hit  "$rq_out" "lease not written — the remote did not answer the record read"
+mv "$LF/origin.gone" "$LF/origin.git"
+rq_out=$(run_request_arm --request "$LF/r2.md"); rq_rc=$?
+same "DPR19 S3 the re-run records the kept request" \
+  "$rq_rc $(git --git-dir="$LF/origin.git" for-each-ref "refs/gov/requests/$rq_k2" | grep -c .)" "0 1"
+hit  "$rq_out" "request — $rq_k2 · recorded"
 rm -rf "$LF"
 
 # ==================================================================================================
@@ -22573,10 +22612,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3829 -> 3837 by TOOL-dPlacedRequest-15: the fence read block's 8 region-eight assertions
 # (8 `same`, its checklist pass's illegal-slug and offline arms among them), off the diff's own lines;
 # no skip branch. No suite ran, and its RED-first observation is the close's.
-# RAISED 3837 -> 3856 by TOOL-dPlacedRequest-19: the request record block's 19 region-eight assertions
-# (13 `same` and 6 `hit`), off the diff's own lines; no skip branch. No suite ran, and its RED-first
+# RAISED 3837 -> 3874 by TOOL-dPlacedRequest-19: the request record block's 37 region-eight assertions
+# (22 `same` and 15 `hit`, its checklist pass's refusal and offline arms among them), off the diff's own
+# lines; no skip branch. No suite ran, and its RED-first
 # observation is the close's.
-FLOOR_ASSERTIONS=3856
+FLOOR_ASSERTIONS=3874
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -22839,8 +22879,8 @@ FLOOR_SHARD_7=311
 # RAISED 1035 -> 1051 by TOOL-dPlacedRequest-12's checklist pass: the same 16 region-eight refusal arms, see FLOOR_ASSERTIONS.
 # RAISED 1051 -> 1060 by TOOL-dPlacedRequest-42: the same 9 region-eight offline create assertions, see FLOOR_ASSERTIONS.
 # RAISED 1060 -> 1068 by TOOL-dPlacedRequest-15: the same 8 region-eight fence read assertions, see FLOOR_ASSERTIONS.
-# RAISED 1068 -> 1087 by TOOL-dPlacedRequest-19: the same 19 region-eight request record assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1087
+# RAISED 1068 -> 1105 by TOOL-dPlacedRequest-19: the same 37 region-eight request record assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1105
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

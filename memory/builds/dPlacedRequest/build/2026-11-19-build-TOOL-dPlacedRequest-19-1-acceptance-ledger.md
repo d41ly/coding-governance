@@ -79,10 +79,34 @@ observed by its own CLI over files in that scratch directory, each plant run one
 
 **Owed at the close.**
 - The `New arm:` line on `tools/unattended/unattended.test.sh`: the region-eight block
-  `TOOL-dPlacedRequest-19`, 19 (DERIVED) assertions, 13 `same` and 6 `hit`, RED-first against the base
-  driver, which has no request verb; the floors rose by the same 19 (DERIVED), `FLOOR_ASSERTIONS` and
+  `TOOL-dPlacedRequest-19`, 37 (DERIVED) assertions, 22 `same` and 15 `hit`, RED-first against the base
+  driver, which has no request verb; the floors rose by the same 37 (DERIVED), `FLOOR_ASSERTIONS` and
   `FLOOR_SHARD_8`. Waived for this build's landing by README rule 8.
 - The `New arm:` line on `tools/loop/request.py`: the leg `loop request fixtures`, its `--selftest`
   RED-first against a key taken over the raw bytes, and its first reading, which re-prices the budget
   row's proxy.
 - The legs the spec's section 7 names, the kit gate's check 26 over the new verb among them.
+
+**The checklist, acted on.** The bug-class checklist over the pass commit `60c744ca9` selected 60 (DERIVED)
+classes by anchor and 6 (DERIVED) universal. One needed a change. refusal-branch-with-no-arm: the
+lease's malformed key and third segment, a request that is not UTF-8, a session id outside letters,
+digits and dashes, no file and a file that is not there, and the push and the record read that do not
+answer, with the re-run recording the kept words, had no suite arm; the region-eight block gained 18
+(DERIVED) assertions, each first observed by the probe above, as user `daily-agent` in clone A: the
+session `q.A` printed `the session id is not letters, digits and dashes`, exit 2 (PINNED), no file and
+two files each `the form is --request <file>`, exit 2 (PINNED), a missing file `the request file is not
+readable`, exit 2 (PINNED), and `acquire request <key> extra` `a request lease takes no third segment`,
+exit 2 (PINNED). Branches still with no arm, named: no python, no loop kit, other than one remote, a
+local store, copy or `.typed` line that cannot be written, and a commit git cannot build, each
+unreachable in the fixture without a stub of python, git or the file system; and `request.py key` over
+an unreadable file or with no memory-tree kit, observed by the probe above for the missing file, exit 2
+(PINNED). Named and left: held-suite-guard-misses-a-sibling-kit, since `loop request fixtures` reads
+the memory-tree kit's normaliser and, like every loop leg registered as `loop claims fixtures` is,
+carries no guard, so an edit to that normaliser alone selects the leg on no scoped bar;
+budget-row-not-remeasured-after-added-arms, since the unattended suite's budget row keeps its reading
+while the suite is waived; two-answers-to-one-question, since the content key's shape is held in the
+driver's lease builder, its writer, its consent predicate and the claim read's awk, each a closed
+twelve-hex test the suite arms; and a-new-leg-trips-a-growing-set-of-meta-gates, the leg's registry,
+pin, budget and dossier joins being the close's to read. The rest read clean: the arms assert a positive
+witness each, every count is `grep -c .` over a capture that may be empty, the existence read matches
+the whole ref name, and the `.typed` read matches a whole line.
