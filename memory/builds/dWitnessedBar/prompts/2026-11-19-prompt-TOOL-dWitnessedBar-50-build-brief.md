@@ -15,8 +15,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - The spec is rev-4, re-grounded at `d08ded6f1`: the population is PINNED at 89 (unit 27's 88 plus
   `.githooks/pre-commit`), `pass-tree.sh` and `pass-tree.test.sh` are named exclusions (§8 F3), and the pre-commit hook
   carries the refusal inline after `set -u` (§8 F4).
-- Unit 13 (order 3) is having its spec revised and builds after this unit; its spec writes
-  `tools/lib/resolve-python.test.sh` too, so touch only what this spec names in that file.
+- Unit 13 (`34f8bb7db`, red-fixes `010323e92`, `2bd7e6e36`) is built: `tools/lib/legacy_ledger.py`, section `2o`. Its spec wrote
+  `tools/lib/resolve-python.test.sh` too; touch only what this spec names in that file.
 - Every roster spec was re-grounded at `e4ac7c40c` so `check-spec-tokens.py --spec` admits it; the spec's base is still
   older than the run's `9e21ac76`. Verify each claim about current code against source before building on it, and hand
   a claim that no longer holds back as a divergence rather than building around it.
