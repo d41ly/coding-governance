@@ -21,9 +21,9 @@ Every other probed claim held at base 99fea7ac:
 - 33 dossiers: 180 legs (DERIVED) claimed once, none twice, 18 unclaimed, `run-gates evidence` among them; every claim names a manifest leg.
 - 27 descriptors, the same 4 with no claimed leg.
 - The 6 `enforces` copies exactly as §4 names them; no descriptor row carries `enforces`.
-- `LEG_KEYS` is the one line at `run-gates.test.sh:352` and holds `enforces`, not `tests`.
+- `LEG_KEYS` is the one line at `tools/run-gates/run-gates.test.sh@07550393:352` and holds `enforces`, not `tests`.
 - The `enforces` row of `edges.toml` has `to = [unit, practice, principle]`; `feature` is not registered.
-- The 7h block (govkit.py:2743) has the `doc_reads`, `impure`, `stage` and `tag` presence-included arms.
+- The 7h block (tools/govkit/govkit.py@146416ff:2743) has the `doc_reads`, `impure`, `stage` and `tag` presence-included arms.
 - `run_plant_rows edges` exists in `adopt-playbook.sh`.
 
 ## Summary
