@@ -70,7 +70,7 @@ owed at the close.
 - AC12 — with the stub printing `open` on its first call and `expired` after,
   `tools/unattended/unattended.sh#check_lease_witness` in the sourced driver printed `question` and
   returned 0, and the renewal after it exited 0 with `renews: no` (DERIVED).
-- AC13 — the four `grep -c` reads printed 1, 1, 2 and 1, and the skill render measures 11094 bytes
+- AC13 — the four `grep -c` reads printed 1, 1, 2 and 1, and the skill render measures 11094 bytes (DERIVED)
   CR-stripped against its row 11094 (DERIVED).
 - AC14 — with `refs/remotes/origin/HEAD` deleted under `leases = "refuse"` the acquisition printed
   `lease refused — overlap · tF4/build · overlap probe UNAVAILABLE — …` and exited 1, writing no lease;

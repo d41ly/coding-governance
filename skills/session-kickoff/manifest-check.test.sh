@@ -2100,8 +2100,9 @@ check_eq "DPR1 AC15 the lease row's field 2 is its fleet tag and the legacy row'
 cl_lk=$(cd "$CWT" && bash "$CLDRV" --claims --with-key 2>/dev/null | awk -F'\t' '$1 == "tLease" { print NF " " $6 }' | tr -d '\r')
 cl_sha=$(git -C "$CLB" rev-parse refs/gov/leases/tLease/build)
 cl_py=$(cd "$CWT" && resolve_python 2>/dev/null)
-cl_want=$(cd "$CWT" && printf 'refs/gov/leases/tLease/build@%s\trunstate=?\n' "$cl_sha" | "$cl_py" tools/loop/claims.py key --stdin 2>/dev/null | tr -d '\r')
-cl_runs=$(cd "$CWT" && printf 'refs/gov/runs/tLease@%s\trunstate=?\n' "$cl_sha" | "$cl_py" tools/loop/claims.py key --stdin 2>/dev/null | tr -d '\r')
+cl_ck=$(ROOT="$CWT" MC_DIR="$(dirname "$CHECK")" resolve_kit_file loop claims.py)
+cl_want=$(cd "$CWT" && printf 'refs/gov/leases/tLease/build@%s\trunstate=?\n' "$cl_sha" | "$cl_py" "$cl_ck" key --stdin 2>/dev/null | tr -d '\r')
+cl_runs=$(cd "$CWT" && printf 'refs/gov/runs/tLease@%s\trunstate=?\n' "$cl_sha" | "$cl_py" "$cl_ck" key --stdin 2>/dev/null | tr -d '\r')
 check_eq "DPR1 AC18 the lease row is six fields keyed over refs/gov/leases/tLease/build, never the runs namespace" \
   "6 $cl_want differs" "$cl_lk $([ "$cl_want" != "$cl_runs" ] && echo differs)"
 git -C "$CLB" update-ref -d refs/gov/leases/tLease/build
