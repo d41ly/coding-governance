@@ -19,5 +19,5 @@ is the design; diverge only by returning `diverged: true` with the section and t
 - Run no gate, suite or bar; the direct checks each AC names are allowed. The ask the owner's F1 pick asks for is the
   main loop's to file: write no backlog row.
 - Commit once, with a `Pass: TOOL-dLandedOwners-1` trailer and the co-author trailer the charter names. The
-  pre-commit hook takes minutes: give the commit ten minutes. Never `--no-verify`, never `git add -A`. Leave the
-  spec's status flip to the main loop.
+  pre-commit hook takes minutes: give the commit ten minutes. Never `--no-verify`, never `git add -A`. The spec's
+  status at the commit is what the dispatch states.

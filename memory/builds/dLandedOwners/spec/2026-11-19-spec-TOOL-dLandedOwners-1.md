@@ -1,6 +1,6 @@
 # TOOL-dLandedOwners-1 — the policy kit's landed predicate counts a build run that carried a unit forward
 
-**Status:** INPROGRESS · rev-2 · 2026-11-19 · node d · Tier-2 · base 51971579 · streams tooling · order 1 · closes TOOL-dTrackedAtlas-5 · ratified 2026-11-19
+**Status:** INPROGRESS · rev-3 · 2026-11-19 · node d · Tier-2 · base 51971579 · streams tooling · order 1 · closes TOOL-dTrackedAtlas-5 · ratified 2026-11-19
 
 <!-- gen:spec-records -->
 
@@ -8,8 +8,10 @@
 |---|---|---|
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-2-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dLandedOwners-1-3-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-3-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-brief.md) | research | TOOL-dLandedOwners-2 TOOL-dLandedOwners-3 |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-build-brief.md) | research | — |
+| [2026-11-19-prompt-TOOL-dLandedOwners-1-divergence-1.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-divergence-1.md) | research | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-f1-fold.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-f1-fold.md) | research | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-pinned-facts-fold.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-pinned-facts-fold.md) | research | TOOL-dLandedOwners-2 |
 
@@ -37,8 +39,9 @@ built from the memory-tree kit's shipped readers, so every landed build run read
 - **S3** — A new function `derive_run_kind(...)` in the same file answers `spec` or `build` for one
   build at one run's base, by README rule 1 as §4 "The run kind" states. Observed by AC2 and AC4.
 - **S4** — The refusals. Each of these raises `policy.Refusal` naming the cause, and none reads as
-  "not landed": a git read that fails; a memory-tree module that the run-record half needs and that
-  does not import; and a conf that declares no `FAMILIES` when that half runs. Observed by AC4.
+  "not landed": a git read that fails; a module of `RUN_READER_MODULES` that the resolved
+  memory-tree directory does not hold, or that does not import, when the run-record half runs; and
+  a conf that declares no `FAMILIES` when that half runs. Observed by AC4 and AC5.
 - **S5** — A fixture case `reader-coverage-carried`, registered in `CASES`, holding five planted
   repositories that §4 "The fixture case" lists. Observed by AC4.
 - **S6** — The docs. The "Landed means" bullet of `help/policy.md` states the new predicate. In
@@ -133,14 +136,30 @@ The dClosedLoop instrument makes the same reading from `bare-ids.py`'s `read_ask
 ### Loading the memory-tree modules
 
 `#load_tree_lib` already puts the memory-tree kit's directory on the import path, found by
-`resolve_kit_dir` from `kit`. Half 2 imports `gen_build_index`, `backlog` and `row_grammar` from
-that directory lazily, at the first build that reaches it. An existing fixture repository holds
-only `tree_lib.py` beside its kit copy and has no run record, so it never reaches the import.
-`reader-coverage-relocated` therefore keeps its contract.
+`resolve_kit_dir` from `kit`. A new module constant, `RUN_READER_MODULES`, names the modules half 2
+loads: `gen_build_index`, `backlog`, `row_grammar` and `design_lib`. `design_lib` is on the list
+because `gen_build_index` imports it at module scope
+(`tools/memory-tree/gen_build_index.py@a1bfa9b944d24be88fb3037c302a1bfccf6c2e18:320`).
 
-An `ImportError` or `LookupError` at that import raises
-`policy.Refusal("kit.toml", 0, "requires memory-tree, which does not resolve: <cause>")`, the
-message the existing miss of `tree_lib` uses. A `gen_build_index.Problem` raised for an empty
+Half 2 loads them lazily, at the first build that reaches it, in two steps:
+
+1. It checks that the directory `resolve_kit_dir` named holds `<module>.py` for each module of
+   `RUN_READER_MODULES`.
+2. It then imports `gen_build_index`, `backlog` and `row_grammar`.
+
+An existing fixture repository holds only `tree_lib.py` beside its kit copy and has no run record,
+so it never reaches the check. `reader-coverage-relocated` therefore keeps its contract.
+
+The check comes first because the import alone cannot see an absent module in the fixture's
+process. `import` answers from `sys.modules` for a module already loaded. It also searches the
+whole import path, and `#build_reader_coverage_repo` has put the source tree's memory-tree
+directory there through `load_tree_lib()`. So a planted repository lacking `gen_build_index.py`
+would still import it.
+
+A missing file raises
+`policy.Refusal("kit.toml", 0, "requires memory-tree, which does not resolve: <dir> holds no <module>.py")`.
+An `ImportError` or `LookupError` at the import raises the same Refusal with its own cause. This is
+the message the existing miss of `tree_lib` uses. A `gen_build_index.Problem` raised for an empty
 `FAMILIES` becomes a Refusal naming `.memory-tree.conf`.
 
 ### The loop's termination read
@@ -166,8 +185,24 @@ repository per sub-case. A new `build_carried_repo(t, case)` builds each one in 
 
 - a kit copy whose catalogue holds `RC_KEY`, owned by `RC_OWNER`, and no consumer;
 - a `.memory-tree.conf` declaring `MEMORY_ROOT="memory"` and `FAMILIES="tooling:TOOL"`;
-- every `*.py` of the resolved memory-tree kit, copied untracked beside the kit copy;
+- `tree_lib.py` and the file of each module in `RUN_READER_MODULES`, copied untracked from the
+  resolved memory-tree kit to sit beside the kit copy;
 - one bare remote.
+
+The copy reads only those five files. `run_fixture`'s audit hook, `#add_source_read`, records every
+source file that the copy opens. `#check_guard_trace` then prints a WRONG for each recorded read that
+trips no `policy fixtures` guard. All five trip that guard. Seven other `*.py` files of the kit trip
+none of it: `check-arms.py`, `commit_trailers.py`, `coverage_join.py`, `import_walk.py`,
+`merge-rows.py`, `migrate_backlog.py` and `transition_audit.py`. These figures come from
+`ls tools/memory-tree/*.py | python tools/check-spec-tokens.py --legs-for -` (PINNED, 2026-11-19, at
+`1ca00786`).
+
+A scratch probe imported the three modules from the source kit under an audit hook (PINNED,
+2026-11-19). It called `derive_row_re`, `build_grammar`, `extract_row`, `build_roster_id_re`,
+`extract_roster_ids` and `parse_spec_h1` over dDeclaredLoop's records, and the kit files it opened
+were exactly these five. `id_grammar` is imported only lazily, at three sites, and the probe reached
+none of them: `tools/memory-tree/row_grammar.py#load_index_builder`, `#derive_relation_successors`
+and `tools/memory-tree/backlog.py#_resolve_anchor_at`.
 
 The base commit `B` on `main` holds the build README's `roster:units` pair. A branch `run` then
 commits `RUN.md`, whose `## Run facts` holds `base: <B>`, together with the spec edits. That branch
@@ -179,8 +214,8 @@ each prints `case <name>: red|green`.
 | `carried-landed` | roster units 1 and 2, both specced at `B`; on `run`, unit 1 `CLOSED` and unit 2 `DEFERRED` | graded 1, `RC_KEY` red |
 | `spec-run-landed` | at `B`, an open ask `TOOL-bPlanted-9` in the BACKLOG and unit 2 unspecced; on `run`, both `DEFERRED` | graded 0, the announce line |
 | `run-unlanded` | as `carried-landed`, but `run` fast-forwarded onto `main`, so no merge touches `RUN.md` | graded 0, the announce line |
-| `base-unresolved` | as `carried-landed`, with `base:` forty `e` characters in both run records | graded 0, the announce line |
-| `kit-modules-absent` | as `carried-landed`, with only `tree_lib.py` beside the kit copy | a Refusal naming the memory-tree kit |
+| `base-unresolved` | as `carried-landed`, with the one `RUN.md`'s `base:` set to forty `e` characters; the blob at `L` and at the landing merge is that one file | graded 0, the announce line |
+| `kit-modules-absent` | as `carried-landed`, with only `tree_lib.py` beside the kit copy | a Refusal naming the memory-tree kit and `gen_build_index.py` |
 
 ### What it does not check
 
@@ -190,6 +225,13 @@ These are the instrument's own limits, or follow from them:
 - A merge that touches `RUN.md` with a run's base for some other reason reads as that run's landing.
 - A run record rotated outside the driver is not listed.
 - Under `BACKLOG_MODE="shards"`, no build folder holds a BACKLOG, so every run reads build-kind.
+
+These follow from the module check:
+
+- It checks that each module's file is present. It does not check that the module running was loaded
+  from that file, since within one process an import reuses the first copy loaded.
+- A sibling that a module of `RUN_READER_MODULES` comes to import later is not on the list. In the
+  fixture, that sibling imports from the source kit, so the guard trace still records the read.
 
 ### Measured on the real tree
 
@@ -209,6 +251,7 @@ owners at `51971579` in 2.5 s.
 `tools/policy/check_policy.py`
 `tools/policy/README.md`
 `help/policy.md`
+`memory/builds/dLandedOwners/build/2026-11-19-build-TOOL-dLandedOwners-1-ledger.md`
 
 ### Alternatives rejected
 
@@ -225,6 +268,14 @@ owners at `51971579` in 2.5 s.
   would have only one caller. The dClosedLoop instrument is a CLOSED unit's record, and
   `check_spec_run` is written in bash. This unit composes the kit's existing grammar readers and
   writes no second grammar.
+- **Copy every `*.py` of the memory-tree kit into each planted repository.** Rejected because that
+  copy reads seven files that trip no `policy fixtures` guard, and each one prints a guard-trace
+  WRONG (§4 "The fixture case").
+- **Add those seven paths to the `policy fixtures` guard in `tools/gate-legs.json`.** Rejected
+  because no case reads them, so the leg would run on edits it cannot be affected by.
+- **Run each sub-case's check in a child process, so an absent module fails its import.** Rejected
+  because the audit hook sees this process alone, so the child's reads would leave the guard trace.
+  The file check gives the same Refusal in-process.
 
 ## 5. Production-readiness checklist
 
@@ -273,13 +324,15 @@ L=$("$PY" -B -c "import sys; sys.path.insert(0, 'tools/policy'); import policy; 
   Red when: half 2 is removed, and the answer lacks dDeclaredLoop and dSafePassage.
   cost: about 41 s, for the instrument (PINNED, measured 2026-11-19).
 - **AC4** — When `"$PY" tools/policy/check_policy.py --fixture reader-coverage-carried` runs, it
-  exits 0 and prints five `policy-fixture:` lines, one per §4 sub-case. No line holds `WRONG`,
-  `case carried-landed: red` appears, and `kit-modules-absent` reports the Refusal.
+  exits 0. It prints five `policy-fixture: reader-coverage-carried ·` sub-case lines, one per §4
+  sub-case, and then the `guard-trace` lines and the count line that `run_fixture` always adds. No
+  line holds `WRONG`. `case carried-landed: red` appears, and `kit-modules-absent` reports the
+  Refusal naming `gen_build_index.py`.
   Red when: half 2 is removed, and `carried-landed` prints `WRONG` with `graded 0`.
 - **AC5** — When `"$PY" tools/policy/check_policy.py --fixture reader-coverage` and
   `--fixture reader-coverage-relocated` run, each exits 0 with no line holding `WRONG`.
-  Red when: `gen_build_index` is imported before half 2 is reached, and the relocated case's
-  present repository refuses.
+  Red when: the module check runs before half 2 is reached, and the relocated case's present
+  repository, which holds only `tree_lib.py`, refuses.
 - **AC6** — When
   `"$PY" -B -c "import sys, time; sys.path.insert(0, 'tools/policy'); import check_policy as c; t = time.time(); c.derive_landed_owners('.'); print(round(time.time() - t, 1))"`
   runs, it prints a number under `15`.
@@ -297,9 +350,10 @@ L=$("$PY" -B -c "import sys; sys.path.insert(0, 'tools/policy'); import policy; 
 The close runs the plain bar once. `policy fixtures` is a guarded leg of the `selftests` chunk, so
 the plain bar holds it, and AC4 and AC5 observe its cases directly. `scratch-guard self-test` and
 `routed-commits selftest` guard `tools/policy/check_policy.py` too; this unit changes nothing they
-read beyond that file's landed predicate.
+read beyond that file's landed predicate. `recall floor` and `recall floor arms` guard the build
+folder, where the acceptance ledger is written.
 
-`policy check` · `policy fixtures` · `scratch-guard self-test` · `routed-commits selftest`
+`policy check` · `policy fixtures` · `scratch-guard self-test` · `routed-commits selftest` · `recall floor` · `recall floor arms`
 
 New arm: tools/policy/check_policy.py --fixture reader-coverage-carried · covers AC4 · half 2 of `derive_landed_builds` deleted, so `carried-landed` grades 0 · none
 
@@ -333,6 +387,13 @@ New arm: tools/policy/check_policy.py --fixture reader-coverage-carried · cover
   `c3f402ac1`, folded from 2026-11-19-prompt-TOOL-dLandedOwners-1-2-spec-writer: the leg ceiling
   cites its owning line in `tools/gate-legs.json` and the instrument's measured cost reads PINNED,
   each on its own line; no design change.
+- rev-3 · 2026-11-19 · S4 · §4 · §7 · AC4 · AC5 · the builder's divergence at the first build pass,
+  folded from 2026-11-19-prompt-TOOL-dLandedOwners-1-divergence-1. The fixture copies only
+  `tree_lib.py` and `RUN_READER_MODULES`, since copying every kit `*.py` printed seven guard-trace
+  WRONG lines. A file check now comes before the import, since an import in the fixture's process
+  never misses. Files touched names the acceptance ledger, and §7 adds the two recall-floor legs
+  that guard it. AC4 counts sub-case lines, and
+  `base-unresolved` names its one run record. AC5's red is restated for the check.
 
 ## 10. Reuse audit
 
