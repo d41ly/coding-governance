@@ -84,7 +84,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 63 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 63 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13
 ids TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-22 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25
 ids TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37
@@ -106,7 +106,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-24 — the offline queue under one guarded node lock, appended once and flushed honestly](spec/2026-10-25-spec-TOOL-dPlacedRequest-24.md) | 4 | 2 | CLOSED | rev-8 | 2026-11-19 |
 | [TOOL-dPlacedRequest-25 — a write that opens a holder's tenure renews the lease](spec/2026-10-25-spec-TOOL-dPlacedRequest-25.md) | 4 | 2 | CLOSED | rev-3 | 2026-11-19 |
 | [TOOL-dPlacedRequest-16 — a lease never deleted: a release is a hand-over or a terminal tombstone, the epoch rises for life, and only a run's tombstone is ever pruned](spec/2026-10-25-spec-TOOL-dPlacedRequest-16.md) | 5 | 2 | CLOSED | rev-8 | 2026-11-19 |
-| [TOOL-dPlacedRequest-26 — the renewing-beat walk stops at the current holder's tenure](spec/2026-10-25-spec-TOOL-dPlacedRequest-26.md) | 5 | 2 | INPROGRESS | rev-3 | 2026-11-19 |
+| [TOOL-dPlacedRequest-26 — the renewing-beat walk stops at the current holder's tenure](spec/2026-10-25-spec-TOOL-dPlacedRequest-26.md) | 5 | 2 | CLOSED | rev-3 | 2026-11-19 |
 | [TOOL-dPlacedRequest-36 — the node-lock factory writes its health events through the lock's own common dir](spec/2026-10-25-spec-TOOL-dPlacedRequest-36.md) | 5 | 2 | DEFERRED | rev-5 | 2026-11-19 |
 | [TOOL-dPlacedRequest-37 — the node lock's deadline is the block's own bound, never the driver's `REMOTE_BOUND`](spec/2026-10-25-spec-TOOL-dPlacedRequest-37.md) | 5 | 2 | DEFERRED | rev-6 | 2026-11-19 |
 | [TOOL-dPlacedRequest-38 — the parity leg runs every inline `gov_feed_sh` copy under `set -u` with nothing from its carrier](spec/2026-10-25-spec-TOOL-dPlacedRequest-38.md) | 5 | 2 | DEFERRED | rev-6 | 2026-11-19 |

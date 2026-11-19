@@ -27,16 +27,20 @@ failures named below. No gate, suite or bar ran in this pass.
   `unknown` aged `-` (DERIVED). The crossing copy printed `stale` for all three (DERIVED).
 - AC4 — a legacy `refs/gov/runs/tFix` chain of two commits with no `epoch` key, its tip sighted 60 s (PINNED)
   ago and its parent 90000 s ago, printed `live` (DERIVED). (PINNED)
-- AC5 — `grep -n 'tenure' tools/unattended/STOPS.template.md` printed the new section 7 line "A (DERIVED)
-  lease is aged within its holder's tenure", beside the walk's sentence and the S3 rule after it; the
-  render `memory/guides/UNATTENDED-STOPS.md` compared equal to the template under `cmp` (DERIVED).
+- AC5 — `grep -n 'tenure' tools/unattended/STOPS.template.md` printed, inside section 7, the one (DERIVED)
+  line "A lease is aged within its holder's tenure: a take or a take-over raises the epoch and opens a
+  new", whose sentence goes on to the S3 rule; the render `memory/guides/UNATTENDED-STOPS.md` compared
+  equal to the template under `cmp` (DERIVED).
+- The bug-class checklist over the pass commit selected criterion-asserts-what-its-own-command-cannot-show:
+  the first wording wrapped "tenure" onto the line after "A lease is aged within its holder's", so the
+  criterion's `grep` could not show the sentence; the closing commit rewraps it onto one line.
 - The 90000 and 93600 s figures are PINNED, 25 h and 26 h past the 24 h default of (PINNED)
   `leases.expiry-hours`.
 
 ## Owed at the close
 
 - The spec's `New arm:` line: `tools/unattended/unattended.test.sh`, the region-8 (PINNED)
-  TOOL-dPlacedRequest-26 block, 12 executed assertions (11 `same`, 1 `hit`) (DERIVED), (DERIVED)
+  TOOL-dPlacedRequest-26 block, 12 executed assertions (11 `same`, 1 `hit`) (DERIVED),
   `FLOOR_ASSERTIONS` 3683 to 3695 and `FLOOR_SHARD_8` 914 to 926; its red is the scratch copy (DERIVED)
   `cross.sh`, whose walk crosses the epoch change, for AC1 and AC3. Waived for this build's landing (PINNED)
   by README rule 8. (PINNED)
