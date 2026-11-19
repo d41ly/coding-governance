@@ -1902,7 +1902,7 @@ stage = ["step.test"]
 
 [[exempt_leg]]
 name = "instruction render (one renderer of record)"
-why = "it runs `<prefix>/playbook/render_playbook.py --check-render`, the render gate over gov's own files against gov's own `<prefix>/playbook/renderers.toml` and `<prefix>/playbook/instructions-legacy.txt`, whose rows name gov's instruction files. The engine ships with the playbook-render kit's `**` include and an adopter keeps its renders through the absorbed wiring legs, but the LEG is gov's. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-20."
+why = "it runs `<prefix>/playbook/render_playbook.py --check-render`, the render gate over gov's own files against gov's own `<prefix>/playbook/renderers.toml` and the keyed list `instructions-legacy.txt` under the memory root's `project/` folder, whose rows name gov's instruction files. The engine ships with the playbook-render kit's `**` include and an adopter keeps its renders through the absorbed wiring legs, but the LEG is gov's. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-20."
 tag = "leg.gov.instruction-render-one-renderer-of-record"
 tests = ["feature.playbook"]
 purpose = "requires one renderer of record per instruction file"
@@ -2562,3 +2562,47 @@ fields = ["kit"]
 drain = "key"
 direction = "declared-set"
 home = "memory/project/playbook-kit-waivers.txt"
+
+# The gov legs' keyed lists dOrderedCharter landed and the landed step rows dSafePassage hands this
+# factory (TOOL-dWitnessedBar-18 S1, §8 F4): gov's own, which no target is written, so they owe no step.
+# Each seed is its check's own measurement; `landed-steps` has no check of its own, so it names the
+# both-ways leg, and its seed prints every step id the graded tree declares (§8 F6).
+[[ledger]]
+population = "positional-producers"
+leg = "tags (the resolver's checks)"
+seed = ["python", "{prefix}/playbook/positional.py", "producers", "--list"]
+key = "site"
+fields = ["path", "text"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/positional-producers.txt"
+
+[[ledger]]
+population = "unpinned-facts"
+leg = "writing practice (records and units)"
+seed = ["python", "{prefix}/playbook/writing_practice.py", "check", "pinned-facts", "--list"]
+key = "site"
+fields = ["path", "fact"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/unpinned-facts.txt"
+
+[[ledger]]
+population = "instructions-legacy"
+leg = "instruction render (one renderer of record)"
+seed = ["python", "{prefix}/playbook/instruction_units.py", "legacy", "--list"]
+key = "site"
+fields = ["path"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/instructions-legacy.txt"
+
+[[ledger]]
+population = "landed-steps"
+leg = "ratchet (both ways)"
+seed = ["python", "{prefix}/govkit/upgrade_steps.py", "list", "--ids"]
+key = "key"
+fields = ["id"]
+drain = "none"
+direction = "append-only"
+home = "memory/project/landed-steps.txt"

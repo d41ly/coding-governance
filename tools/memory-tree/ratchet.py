@@ -810,6 +810,16 @@ def run_plant_append_edited(top, results):
                      ["edited · a"])
 
 
+def run_plant_append_removed(top, results):
+    """TOOL-dWitnessedBar-18 AC5: an append-only base row removed, as a landed step's row would be."""
+    rows = [(("a",), 1, SHA_A, "seeded"), (("b",), 1, SHA_A, "seeded")]
+    write_fixture_repo(top, [render_table(direction="append-only")],
+                       {"pop/rows.txt": render_rows(rows, direction="append-only")})
+    write_files(top, {"pop/rows.txt": render_rows(rows[:1], direction="append-only")})
+    check_plant_case(results, "append-removed", "an append-only base row removed", top, ["never-gains"], 1,
+                     ["removed · b"])
+
+
 def read_widen_paths(top):
     """The widen records under the fixture's build folder."""
     return sorted(p.relative_to(top).as_posix() for p in pathlib.Path(top, "memory/builds/dFix").rglob("*-widen-*.md"))
@@ -1083,7 +1093,7 @@ def run_plant_ignored_conf(top, results):
 
 PLANTS = {
     "gain": run_plant_gain, "ceiling-raised": run_plant_ceiling_raised, "append-edited": run_plant_append_edited,
-    "gain-widened": run_plant_gain_widened, "gain-refused": run_plant_gain_refused,
+    "append-removed": run_plant_append_removed, "gain-widened": run_plant_gain_widened, "gain-refused": run_plant_gain_refused,
     "ceiling-widened": run_plant_ceiling_widened, "both-ways": run_plant_both_ways,
     "cutoff-later": run_plant_cutoff_later, "cutoff-blank": run_plant_cutoff_blank,
     "unarmed-green": run_plant_unarmed_green, "populated-empty-armed": run_plant_populated_empty_armed,

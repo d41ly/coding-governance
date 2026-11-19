@@ -36,7 +36,6 @@ help/spec-audit.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 help/tags.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/playbook/adopt-playbook.sh	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/playbook/edge_grammar.py	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/playbook/instructions-legacy.txt	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/playbook/renderers.toml	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 help/charter.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/playbook/documents.toml	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded

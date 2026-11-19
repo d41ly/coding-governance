@@ -222,6 +222,8 @@ LEGACY = {
     "spec-token-waivers.txt": ("spec-token-waivers", read_lines_with(parse_keyed_reason(1)), READS_HOME),
     "dead-path-waivers.txt": ("dead-path-waivers", read_lines_with(parse_dead_path), READS_HOME),
     "playbook-kit-waivers.txt": ("playbook-kit-waivers", read_lines_with(parse_spaced_reason), READS_HOME),
+    # TOOL-dWitnessedBar-18 §4 Migration: an adopter's `<path> TAB <ref>` positional list.
+    "positional-refs.txt": ("positional-refs", read_lines_with(parse_keyed_reason(2)), READS_HOME),
     "drift-pins.txt": ("drift-pins", read_pin_rows, READS_NAMED),
     "drift-baselines.txt": ("drift-baselines", read_baseline_rows, READS_NAMED),
 }

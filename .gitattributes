@@ -123,6 +123,12 @@ memory/project/dead-path-waivers.txt merge=rows
 memory/project/playbook-kit-waivers.txt merge=rows
 memory/project/drift-pins.txt merge=rows
 memory/project/drift-baselines.txt merge=rows
+# TOOL-dWitnessedBar-18 S6: dOrderedCharter's keyed lists and dSafePassage's landed step rows, registered.
+memory/project/positional-refs.txt merge=rows
+memory/project/positional-producers.txt merge=rows
+memory/project/unpinned-facts.txt merge=rows
+memory/project/instructions-legacy.txt merge=rows
+memory/project/landed-steps.txt merge=rows
 
 # Wholly GENERATED views: a merge takes this side, and check 9 (gen_build_index.py --check) or
 # check 17 (gotchas.py --check) then reds the stale result until `--write` re-renders it.

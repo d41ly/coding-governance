@@ -1068,10 +1068,17 @@ def write_charter_lock(gov_root: Path, target: Path, charter_path: Path, units=(
 
 
 def write_empty_lists(target: Path) -> list[str]:
-    """PLAY-dOrderedCharter-70 S10: the two lists this kit's checks red when absent, written empty where
+    """PLAY-dOrderedCharter-70 S10: the two lists this kit's checks red when absent, written with no row where
     the check looks and the folder exists and the list does not: the positional list under
     `<target>/<MEMORY_ROOT>/project/` (PLAY-dOrderedCharter-72), the pending list under
-    `<target>/<prefix>/<kit dir>`. A present file is left alone. -> the paths written, target-relative."""
+    `<target>/<prefix>/<kit dir>`. A present file is left alone. -> the paths written, target-relative.
+
+    The positional list is the `positional-refs` ledger population (TOOL-dWitnessedBar-18 S5, §8 F9): it is
+    written as the bytes `convert_registry.derive_converted_text` returns for its registration with no row,
+    its header and `# unarmed · dead probe · <sha>`, the registration found as `derive_registration` finds
+    it and the sha the target's `read_head_sha`, so a fresh target's list reads `unarmed` as a converted one
+    does; with no sha read it is refused as the converter refuses. `core-pending.txt`, no population, is
+    empty bytes."""
     iu = load_units_module()
     homes = (('positional-refs.txt', target / derive_memory_root(target, {}).strip('/') / 'project'),
              ('core-pending.txt', target / iu.derive_kit_prefix() / iu.KIT_DIR.name))
@@ -1079,9 +1086,27 @@ def write_empty_lists(target: Path) -> list[str]:
     for name, home in homes:
         path = home / name
         if home.is_dir() and not path.exists():
-            path.write_bytes(b'')
+            data = derive_unarmed_list(target, path) if name == 'positional-refs.txt' else b''
+            path.write_bytes(data)
             written.append(path.relative_to(target).as_posix())
     return written
+
+
+def derive_unarmed_list(target: Path, path: Path) -> bytes:
+    """The `positional-refs` home's bytes with no row at `target`, through memory-tree's converter: its
+    header and the factory's unarmed line at the target's HEAD (TOOL-dWitnessedBar-18 §8 F9)."""
+    load_units_module()
+    import positional
+    cr = positional.load_converter()
+    home = path.relative_to(target).as_posix()
+    try:
+        reg, _entry = cr.derive_registration('positional-refs', home)
+    except cr.Refusal as e:
+        raise Refusal(f'{home}: {e}') from None
+    sha, why = cr.LL.read_head_sha(target)
+    if not sha:
+        raise Refusal(f'{home}: {why}, so no sha can be stamped')
+    return cr.derive_converted_text(reg, {}, sha)
 
 
 def build_region(charter: str | None, body: str) -> str:
@@ -3554,6 +3579,9 @@ def run_check_render(engine_dir: Path, gov_root: Path, target: Path, charter_pat
     except PolicyRefused as e:
         reds.append(f'render-playbook: red · instructions.legacy · {e.line} · remedy: repair the committed '
                     f'policy file; a refused read grades under no default')
+    except RuntimeError as e:  # the tag index's TagError: a legacy list the ledger factory refuses (TOOL-dWitnessedBar-18 S5)
+        print(f'render-playbook: REFUSED — the legacy list · {e}', file=sys.stderr)
+        return 2
     for red in reds:
         print(red)
     print(f'render-playbook: gate · {len(reds)} red in the table, the status arm and the legacy list')
@@ -3989,7 +4017,7 @@ def run_charter_scope(engine_dir: Path, gov_root: Path, target: Path, charter_pa
                   for rel in write_alias_copies(target, before)]
     try:
         write_charter_lock(gov_root, target, charter_path, slots)
-        notes += [f"wrote {p} empty: this kit's checks read an absent list as a refusal"
+        notes += [f"wrote {p} with no row: this kit's checks read an absent list as a refusal"
                   for p in write_empty_lists(target)]
     except (Refusal, ValueError) as e:   # ValueError: the lock module's LevelError and LockError
         print(f'render-playbook: REFUSED — the charter is written but its lock row is not: {e}',

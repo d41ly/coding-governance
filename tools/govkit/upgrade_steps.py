@@ -4,6 +4,7 @@ frozen-row check, and the two helpers a step program writes through (TOOL-dSafeP
 
     python <prefix>/govkit/upgrade_steps.py list               # every row, ordered, with its commit
     python <prefix>/govkit/upgrade_steps.py list --window      # each translation-window member
+    python <prefix>/govkit/upgrade_steps.py list --ids         # every declared step id, the `landed-steps` seed
     python <prefix>/govkit/upgrade_steps.py frozen [--base <rev>]   # the `step-rows-frozen` leg
     python <prefix>/govkit/upgrade_steps.py fixture isolation [--plant <case>]   # the contract, observed
     python <prefix>/govkit/upgrade_steps.py fixture walk|update [--plant <case>]  # the walk, observed
@@ -2806,6 +2807,17 @@ def cmd_list(root, window: bool) -> int:
     return 0
 
 
+def cmd_list_ids(root) -> int:
+    """`list --ids`, the `landed-steps` population's seed (TOOL-dWitnessedBar-18 S4): each step id the
+    working tree declares, an `[[upgrade]]` row's or a `[[retired]]` row's holding `/`, as `read_retired`
+    reads a step id, then the count `1`, TAB-separated. It reads no landed ref, so a step row and its
+    ledger row added together are measured in the commit that adds them."""
+    ids = [r.id for r in read_steps(root, None, None)] + [r.id for r in read_retired(root, None, None) if "/" in r.id]
+    for sid in dict.fromkeys(ids):
+        print(f"{sid}\t1")
+    return 0
+
+
 def cmd_frozen(root, base: str | None) -> int:
     """`frozen [--base <rev>]`: every landed row at the push base, frozen at HEAD (`check_frozen`)."""
     sha, _boundary, why = resolve_landing_base(root, base)
@@ -5269,6 +5281,8 @@ def main(argv: list[str]) -> int:
     try:
         if argv and argv[0] == "list" and argv[1:] in ([], ["--window"]):
             return cmd_list(root, argv[1:] == ["--window"])
+        if argv == ["list", "--ids"]:
+            return cmd_list_ids(root)
         if argv and argv[0] == "frozen" and (argv[1:] == [] or (len(argv) == 3 and argv[1] == "--base")):
             return cmd_frozen(root, argv[2] if len(argv) == 3 else None)
         if argv[:2] == ["fixture", "isolation"] and (
@@ -5282,7 +5296,7 @@ def main(argv: list[str]) -> int:
             if argv[:2] == ["fixture", family] and ((bare and len(argv) == 2) or (
                     len(argv) == 4 and argv[2] == "--plant" and argv[3] in plants)):
                 return run(argv[3] if len(argv) == 4 else None)
-        sys.stderr.write(f"usage: python upgrade_steps.py list [--window] | frozen [--base <rev>] | "
+        sys.stderr.write(f"usage: python upgrade_steps.py list [--window | --ids] | frozen [--base <rev>] | "
                          f"fixture isolation [--plant {'|'.join(FIXTURE_PLANTS)}] | "
                          f"fixture walk [--plant {'|'.join(WALK_PLANTS)}] | "
                          f"fixture lock --plant {'|'.join(LOCK_PLANTS)} | "
