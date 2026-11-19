@@ -27,13 +27,13 @@ it lands in `%TEMP%` whenever a suite runs directly, which is how sessions run t
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 1 unit(s) · node d · opened 2026-11-19 · streams tooling
+**Build status:** CLOSED · 1 unit(s) · node d · opened 2026-11-19 · streams tooling
 ids TOOL-dSweptScratch-1
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dSweptScratch-1 — every selftest and fixture removes the scratch it made, read-only git objects included](spec/2026-11-19-spec-TOOL-dSweptScratch-1.md) | — | 1 | OPEN | rev-1 | 2026-11-19 |
+| [TOOL-dSweptScratch-1 — every selftest and fixture removes the scratch it made, read-only git objects included](spec/2026-11-19-spec-TOOL-dSweptScratch-1.md) | — | 1 | CLOSED | rev-1 | 2026-11-19 |
 <!-- /gen:build-units -->
 
 Records: 0 bound to this build, across 1 record folder(s).

@@ -1,6 +1,6 @@
 # TOOL-dSweptScratch-1 — every selftest and fixture removes the scratch it made, read-only git objects included
 
-**Status:** OPEN · rev-1 · 2026-11-19 · node d · Tier-1 · base 389c0c86 · streams tooling
+**Status:** CLOSED · rev-1 · 2026-11-19 · node d · Tier-1 · base 389c0c86 · streams tooling
 
 <!-- gen:spec-records -->
 
