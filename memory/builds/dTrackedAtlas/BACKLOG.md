@@ -10,6 +10,7 @@
 - TOOL-dTrackedAtlas-15 · filed 2026-11-19 · held red: suite unattended brief-recorded selftest red at 9e21ac76 on the daily held job, run 44311333936 · seen `.github/workflows/remote-ci.yml`@9e21ac76 · accept the suite is green on the daily held job at the default branch's tip
 - TOOL-dTrackedAtlas-16 · filed 2026-11-19 · held red: suite unattended pass-order selftest red at 9e21ac76 on the daily held job, run 44311333936 · seen `.github/workflows/remote-ci.yml`@9e21ac76 · accept the suite is green on the daily held job at the default branch's tip
 - TOOL-dTrackedAtlas-17 · filed 2026-11-19 · held red: suite unattended pass-tree selftest red at 9e21ac76 on the daily held job, run 44311333936 · seen `.github/workflows/remote-ci.yml`@9e21ac76 · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-dTrackedAtlas-19 · filed 2026-11-19 · THE FLAGGED BAR THIS BUILD'S `tools/` ROWS OWE WAS NOT RUN. Units 4 and 18 edit `tools/loop/loop.toml` and `tools/chain-packet.py`, so `SELFTESTS_OWED_PATHS` announced the flagged bar at `VERIFYING`; the run kept `GATE_SELFTESTS` unset, because its prompt record pins it unset and the owner's standing rule forbids the unattended kit's suites. · seen `.unattended.conf` matching `SELFTESTS_OWED_PATHS="tools/"` run `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` · accept the owner runs the flagged bar, or rules it waived for this build, and `loop stage coverage` and `chain-packet self-test` read green in it
 
 ## Dispositions
 
@@ -29,3 +30,5 @@
 - KEEP · TOOL-dTrackedAtlas-5 · the fix sits under `tools/`, which this run may not touch; the policy kit's next build takes it
 - KEEP · TOOL-dTrackedAtlas-6 · the packet re-pin is the owner's at a console, and the door constant sits under `tools/`
 - KEEP · TOOL-dTrackedAtlas-7 · held by TOOL-dTrackedAtlas-4, DEFERRED against it until the owner picks its spec's fork F3
+- SEV · TOOL-dTrackedAtlas-19 · MED · two kit edits land with their kits' held self-tests unrun
+- KEEP · TOOL-dTrackedAtlas-19 · the run may not run the suites; the bar is the owner's to run or waive

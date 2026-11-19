@@ -24,8 +24,8 @@ parked-surfaced: yes, 2 surfaced
 keepalive-reaped: yes
 refreshed-at: 9e21ac760dc0a43d6ed007396922722ccee98d57 · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 561e43f1e171f4be96b8894cd12a040904633ab8
-phase: VERIFYING
+witness: 92959104c9aa81de99744f95f609f7f5a37b08c4
+phase: SPECCING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/unattended-atlas-actual-state-a632fb
@@ -117,3 +117,5 @@ base: 6547d032070ac45966116e412d91e84ceef963b1
 2026-11-19T08:45:21Z hold · item owner-decision · reason until owner · reaped f637f308 · resume none(owner)
 
 2026-11-19T09:34:32Z resume · item dTrackedAtlas · reason held · keepalive 5ea16741 · manual
+
+2026-11-19T09:46:09Z rescope · item add TOOL-dTrackedAtlas-18 · reason the owner, 2026-11-19: re-pin the schedule; closes ask TOOL-dTrackedAtlas-6, the packets and the chain-packet door

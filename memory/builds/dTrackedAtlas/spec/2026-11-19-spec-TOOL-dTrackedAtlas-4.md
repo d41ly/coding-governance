@@ -1,6 +1,6 @@
 # TOOL-dTrackedAtlas-4 — the Atlas page regenerates on node d after main moves, behind a switch whose default is on
 
-**Status:** DEFERRED · rev-6 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 4 · advances TOOL-dTrackedAtlas-7
+**Status:** SPECCED · rev-7 · 2026-11-19 · node d · Tier-2 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 4 · closes TOOL-dTrackedAtlas-7
 
 <!-- gen:spec-records -->
 
@@ -12,8 +12,10 @@
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-2-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-3-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-3-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-4-4-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-4-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-ac6-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-ac6-fold.md) | research | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-build-brief.md) | research | — |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-4-f3-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-f3-fold.md) | research | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-map-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-map-fold.md) | research | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-pin-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-pin-fold.md) | research | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-spec-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-spec-brief.md) | research | — |
@@ -51,6 +53,8 @@ without the page's folder it does nothing and says so.
 - **S7** — The codebase map's claim of S4's hook: a new dossier,
   `memory/map/features/closed-loop-atlas.md`, and the map's artifacts regenerated, as §4 "The
   codebase map's claim" gives. Observed by AC10.
+- **S8** — The loop table's stage claim of S4's hook: one `[[hook]]` row in `tools/loop/loop.toml`,
+  as §4 "The loop table's stage claim" gives and §8 F3 resolved. Observed by AC10.
 
 ## 3. Non-goals (OUT)
 
@@ -58,8 +62,8 @@ without the page's folder it does nothing and says so.
   `TOOL-dTrackedAtlas-2`'s, the stamp and `--check --page` are `TOOL-dTrackedAtlas-3`'s, and this unit
   only runs them.
 - A row in `tools/policy/catalogue.toml` and a key in `.governance/policy.toml`: both are under, or
-  read by, `tools/`, which this build may not touch. The move is an ask the main loop files at the
-  close (§3 "Edges").
+  read by, `tools/`, which this build touches only for §8 F3's row. The move is an ask the main loop
+  files at the close (§3 "Edges").
 - A git hook, an edit to `tools/push-main.sh`, an OS scheduled task, or a harness cron job: §8 F1.
 - Fetching from the remote. A landing made on another node reaches this page when something on node
   d next moves `refs/remotes/origin/main`.
@@ -252,9 +256,9 @@ script, here `PostToolUse memory/builds/dTrackedAtlas/build/2026-11-19-build-TOO
 (`tools/codebase-map/map_extractors.py@302cdbd33b5b3fbc8996b44bc4765227e499f7f4:171`), and §4 "The
 codebase map's claim" gives that key its owner. The loop kit's stage coverage joins the same key to
 a `[[hook]]` row of `tools/loop/loop.toml`
-(`tools/loop/stage_coverage.py@5a7404bf4a92b10b7a72568cd048c9b60f76c912:91`), a row this build may
-not write, which §8 F3 holds. A session reads its hooks at start, so the group takes effect in
-sessions started after the checkout carries it.
+(`tools/loop/stage_coverage.py@5a7404bf4a92b10b7a72568cd048c9b60f76c912:91`), and §4 "The loop
+table's stage claim" gives that row, as the owner resolved §8 F3. A session reads its hooks at start,
+so the group takes effect in sessions started after the checkout carries it.
 
 ### The codebase map's claim
 
@@ -326,6 +330,48 @@ only `tools/`, `.githooks/` and `skills/` (`tools/codebase-map/map_extractors.py
 `tools/codebase-map/map_extractors.py#_live_py`,
 `tools/codebase-map/map_extractors.py#_build_js_layer`).
 
+### The loop table's stage claim
+
+The builder inserts one row into `tools/loop/loop.toml`, in the shape of the other `[[hook]]` rows
+(`tools/loop/loop.toml@b6651f2140d4e9dced399959f6475c2ab4bff0e7:1141`), a blank line on each side:
+
+```toml
+[[hook]]
+key = "PostToolUse memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.js"
+stage = ["step.deploy"]
+```
+
+- `key` is the `harness-hooks` key of §4 "The wiring", spelled whole. The script is not under the
+  tool root, so it carries no `{prefix}/`, as the row keyed
+  `SessionStart skills/session-kickoff/manifest-check.sh` carries none
+  (`tools/loop/loop.toml@b6651f2140d4e9dced399959f6475c2ab4bff0e7:1182`).
+  `tools/loop/stage_coverage.py#derive_part_claims` expands only a `{prefix}/` and joins every
+  other key as written.
+- `stage` is the owner's pick: the hook acts only after a landing.
+- The row goes after the `pre-rebase` row and before the
+  `PostToolUse {prefix}/memory-recall/recall-opened.js` row
+  (`tools/loop/loop.toml@b6651f2140d4e9dced399959f6475c2ab4bff0e7:1157`). The harness rows run in
+  byte order of their keys, and `m` sorts before `{`, as the two `SessionStart` rows already show.
+- The comment above the rows says a harness hook on an event every session raises serves all five
+  steps (`tools/loop/loop.toml@b6651f2140d4e9dced399959f6475c2ab4bff0e7:1137`). This row is the
+  first exception, so the builder appends one line to that comment, directly below its third line,
+  keeping it true of the rows it heads. The line is the fenced one below, no wider than that
+  comment's second line, and nothing else in the file changes.
+
+```toml
+# The Atlas regeneration's row (TOOL-dTrackedAtlas-4) claims step.deploy alone: it acts after a landing.
+```
+
+- An adopter's copy of the table carries the row and never reads it. The `loop stage coverage` leg
+  is gov's own `[[exempt_leg]]`
+  (`tools/govkit/registry.toml@aec2b8e3d547a329461575c1ba97f0107908cea4:931`), whose reason says an
+  adopter's copy would read hooks its tree does not hold as stale. The `skills/` row stands the same
+  way.
+- The row moves the loop kit's shipped bytes, so the kit's version owes a move. The lander mints it
+  at the landing, `tools/govkit/govkit.py#cmd_mint`, and a branch owes none
+  (`tools/govkit/govkit.py#cmd_epoch`), so neither `tools/loop/loop_lib.py` nor
+  `tools/loop/README.md` is in Files touched.
+
 ### Inventory
 
 | Name | Kind | Value or signature |
@@ -367,6 +413,7 @@ only `tools/`, `.githooks/` and `skills/` (`tools/codebase-map/map_extractors.py
 `memory/map/generated/inventories.json`
 `memory/map/generated/MAP.md`
 `memory/map/generated/CARDS.md`
+`tools/loop/loop.toml`
 
 ### Alternatives rejected
 
@@ -392,8 +439,8 @@ only `tools/`, `.githooks/` and `skills/` (`tools/codebase-map/map_extractors.py
 - risks — A wedged generation is killed at `2400 s`. A browser holding the page open can refuse the
   rename on Windows, which logs `failed` and keeps the old page.
 - testing — The fixture observations of §6, on a scratch clone.
-- migration — N/A — a new file pair, a new dossier, the map's regenerated artifacts and one appended
-  settings group; nothing existing changes shape.
+- migration — N/A — a new file pair, a new dossier, the map's regenerated artifacts, one appended
+  settings group and one inserted loop table row; nothing existing changes shape.
 - user docs — The hook file's header states the switch, the sidecars and how to switch off; the
   `help/policy.md` row arrives with the catalogue move.
 
@@ -478,9 +525,12 @@ runner means `node "$C/$REGEN" --run`. A first run writes the page at the clone'
 - **AC10** — When the probe below runs in `$W`, it prints `[] []`, the map's own
   `"$PY" -B tools/codebase-map/gen_map.py --check` exits 0 there, and the output of
   `"$PY" -B tools/loop/stage_coverage.py` run there holds no line containing
-  `unclaimed dossier closed-loop-atlas`.
+  `unclaimed dossier closed-loop-atlas`, and none containing
+  `hook PostToolUse memory/builds/dTrackedAtlas/`, the unclaimed and stale forms both.
   Red when: the dossier's `harness-hooks` row is emptied in `$W`'s working copy, where the probe's
-  first list names the hook's key.
+  first list names the hook's key; or S8's `[[hook]]` row is taken out of `tools/loop/loop.toml`
+  there, where the stage coverage output prints a line beginning
+  `stage-coverage: unclaimed hook PostToolUse`, naming `$REGEN` and ending `· no claim`.
 
   ```bash
   "$PY" -B -c "import sys; sys.path.insert(0, 'tools/codebase-map'); import map_lib as m, map_extractors as e, coverage_join as cj; t = m.load_map_tree(e.inventory_ids()); c = cj.compute_coverage(e.all_inventories(), m.owners_of(t), t.baseline); print(c.unclaimed.get('harness-hooks', []), c.stale_claims.get('harness-hooks', []))"
@@ -488,14 +538,19 @@ runner means `node "$C/$REGEN" --run`. A first run writes the page at the clone'
 
 ## 7. Gates
 
-The close runs the plain bar once. The legs below are those the files touched keep green; the
-guarded `check-wiring self-test` is an on-demand leg the plain bar does not run, and it builds its
+The close runs the bar once with the self-test suites on, the bar §8 F3 (a) owes for an edit under
+`tools/`. The legs below are those the files touched keep green; `check-wiring self-test` builds its
 own fixture settings. No suite arm is added or moved, so no arm line is declared.
 `codebase-map coverage + freshness` grades the dossier's claim both ways and the generated
-artifacts' bytes. `loop stage coverage` grades the dossier's `stage` and the hook key's `[[hook]]`
-row, and stays red on that row until §8 F3 is resolved. The dead-path leg reads the dossier's prose.
+artifacts' bytes. `loop stage coverage` grades the dossier's `stage` and S8's `[[hook]]` row both
+ways, and it is the one leg that reads `[[hook]]` rows. `loop definition` parses
+`tools/loop/loop.toml` whole through `tools/loop/loop_lib.py#read_definition`, so it reds a row that
+breaks the file's TOML; `tools/loop/loop_lib.py#check_loop` grades only the step, workflow and
+disposition-alias tables, so it reads no `[[hook]]` row. `kit epoch (shipped bytes move, the version moves)`
+grades, at the push boundary, the loop kit's version move the lander mints for the row. The dead-path
+leg reads the dossier's prose.
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `recall floor` · `recall floor arms` · `check-wiring self-test` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `loop stage coverage` · `dead-path carriers (deleted files still named)`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `recall floor` · `recall floor arms` · `check-wiring self-test` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `loop stage coverage` · `loop definition` · `kit epoch (shipped bytes move, the version moves)` · `dead-path carriers (deleted files still named)`
 
 ## 8. Open questions
 
@@ -519,7 +574,8 @@ row, and stays red on that row until §8 F3 is resolved. The dead-path leg reads
   detached child outlived its parent and the tool call; and §4 "The wiring" names the two readers of
   the file, neither grading a hook group. It survives. Its limit is §4 "What it does not check": a
   console landing waits for the next tool call on the node. Rev-5 found the third test failing on a
-  reader that test missed, the loop kit's stage coverage, which §8 F3 carries.
+  reader that test missed, the loop kit's stage coverage, and the owner's resolution of §8 F3 clears
+  it with one `tools/` row, §4 "The loop table's stage claim".
   (c) A durable scheduled task running the page check. An OS task is a persistent machine change
   the owner must approve, M3's veto 2, so it is parked rather than picked. A harness cron job does
   not outlive its session: the store is in-memory and session-scoped
@@ -565,6 +621,10 @@ row, and stays red on that row until §8 F3 is resolved. The dead-path leg reads
   Recommendation: no option survives M3's vetoes under the mandate, so (d) for this run. On the
   owner's turn, (a): the row is the claim home the loop kit declares, it is one data row, and no
   criterion is lost.
+  RESOLVED (owner, 2026-11-19): (a), the one [[hook]] row in tools/loop/loop.toml, stage = ["step.deploy"].
+  The owner's words: "approve unit 4's loop.toml row then land it". The build's rule against
+  `tools/` is lifted for that one file, §4 "The loop table's stage claim" gives the row, and the
+  close runs the self-test bar the option names.
 
 ## 9. Revision log
 
@@ -592,6 +652,16 @@ row, and stays red on that row until §8 F3 is resolved. The dead-path leg reads
 - rev-6 · 2026-11-19 · §4 · the writing-practice pins, folded from
   2026-11-19-prompt-TOOL-dTrackedAtlas-4-3-spec-writer: the dossier title's and card's measured
   byte figures in "The codebase map's claim" are marked PINNED on their lines. No design change.
+- rev-7 · 2026-11-19 · S8 · §3 · §4 · §5 · AC10 · §7 · §8 · the owner's resolution of F3, folded
+  from 2026-11-19-prompt-TOOL-dTrackedAtlas-4-f3-fold: F3 is RESOLVED (owner, 2026-11-19) to (a).
+  S8 and §4 "The loop table's stage claim" give the one `[[hook]]` row and its comment line, Files
+  touched gains `tools/loop/loop.toml`, AC10 also observes no unclaimed or stale hook line, §7
+  gains the `loop definition` and `kit epoch` legs and the self-test bar, and the sentences of §3,
+  §4 "The wiring", §7 and F1 (b) that cited F3 as open now cite its resolution. A shipped kit edit
+  sets Tier-2 under the manifest's tier rule
+  (`memory/guides/SESSION-KICKOFF.md@22b6155febd410581bffa0a0af325e0f24590552:128`), and the header
+  moves from DEFERRED to SPECCED and from advancing to closing TOOL-dTrackedAtlas-7. No change to
+  the hook's design.
 
 ## 10. Reuse audit
 
@@ -613,5 +683,8 @@ The map claim extends the codebase map's dossier contract, `tools/codebase-map/m
 in the shape `memory/map/features/process-monitor.md` uses for its own `PostToolUse` hook; no
 existing dossier fits a build-folder hook, since each is scoped to one kit and
 `memory/map/FOUNDATION.md` holds shared substrate.
+The stage claim extends the loop table's `[[hook]]` row kind, which
+`tools/loop/stage_coverage.py#derive_part_claims` joins, in the shape of the row keyed
+`SessionStart skills/session-kickoff/manifest-check.sh`, the one other key outside the tool root.
 
 Recall terms used: `python tools/memory-recall/query.py "what regenerates a derived page or report after a landing onto main without anyone running it" --terms "post-merge landing GATE_POST_MERGE detached hook PostToolUse throttle stamp regenerate atlas switch policy default-on"`
