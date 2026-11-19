@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-12 — the `leg`, `check` and `pack` tag namespaces, and a `tag` on every leg
 
-**Status:** CLOSED · rev-7 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 5 · advances TOOL-dWitnessedBar-31
+**Status:** CLOSED · rev-8 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 5 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0350@37beff65 whole
 **Carries:** node:tag-namespace.leg
@@ -26,6 +26,7 @@
 | [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
 | [2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md) | research | TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-28 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-12-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-12-2-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-12-3-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-12-3-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-12-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-12-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-12-pin-fix-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-12-pin-fix-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-12-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-12-reground-brief.md) | journal | TOOL-dWitnessedBar-61 |
@@ -263,8 +264,8 @@ through `apply` or `update` above the floor.
 - `tools/govkit/selftest.py`
 - `help/tags.md`
 
-The 27 descriptors carrying `[[gate_leg]]` rows (PINNED 2026-11-19 at `a30a26466`; DERIVED again
-2026-11-19 at `d832ccb37`, 70 rows, the same set):
+The 27 descriptors carrying `[[gate_leg]]` rows (PINNED 2026-11-19 at `a30a26466`;
+DERIVED again 2026-11-19 at `d832ccb37`, 70 rows, the same set):
 
 - `tools/branch-reconcile/kit.toml`
 - `tools/codebase-map/kit.toml`
@@ -518,6 +519,9 @@ New arm: tools/govkit/selftest.py · covers AC6 AC7 · the `tag` floor pair and 
   Files touched gains `tools/playbook/adopt-playbook.sh`, whose `run_plant_rows` heredoc takes the
   plant rows, and lists each descriptor (27, DERIVED at `d832ccb37`) as its own bullet; §5's
   observability line states what `run_check` prints; nothing else moved.
+- rev-8 · 2026-11-19 · §4 · per brief 2026-11-19-prompt-TOOL-dWitnessedBar-12-pin-fix-brief: the
+  descriptor list's lead-in is rewrapped so its `DERIVED` marker sits on the line carrying the row
+  count; no fact changed; nothing else moved.
 
 ## 10. Reuse audit
 
