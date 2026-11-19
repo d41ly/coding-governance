@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-11 — the gate-leg factory and its conformance gate, every leg declaring the principles it enforces
 
-**Status:** DEFERRED · rev-6 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 8 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-6 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 8 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0349@79373aa7 whole
 
@@ -19,6 +19,7 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 |
 | [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
 | [2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md) | research | TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-28 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-11-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-11-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-11-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-11-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-11-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-11-reground-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-54 |
