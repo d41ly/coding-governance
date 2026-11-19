@@ -36,8 +36,9 @@ the next `<date>-build-<unit>-widen-<n>.md` of the build the unit id names throu
 count 1 for a new key and one above the row's for a key it holds; under `refuse` it writes nothing.
 `never gains` grades every `widened:` row of a `shrink-only` or `ceiling` population against its record:
 tracked, naming the population and the key, its Reason non-empty, and under `refuse` tracked at the base
-too. `keys-not-scalar --measure` is the `conf-scalar-pins` seed: one TAB row per tracked root `.<name>.conf`
-and `*_PIN` key, its count the `<KEY>=` assignments of that key, each conf read from the working tree.
+too. `keys-not-scalar --measure` is the `conf-scalar-pins` seed: one TAB row per root `.<name>.conf` and
+`*_PIN` key, its count the `<KEY>=` assignments of that key, each conf read from the working tree, tracked
+or not, so a conf copied before the first commit is seeded; an ignored one is never read (TOOL-dWitnessedBar-52).
 `measure-cutoffs` is the `date-cutoffs` seed over the same conf walk: one TAB row per `*_CUTOFF` key, its
 count the date as eight digits, a blank date `99991231` (TOOL-dWitnessedBar-17 S6).
 
@@ -94,7 +95,6 @@ WIDEN_KIND = "widen"
 WIDENED_LEAD = "widened:"
 WIDEN_DIRECTIONS = ("shrink-only", "ceiling")  # the directions whose growth a widen record admits
 SCALAR_POPULATION = "conf-scalar-pins"
-ROOT_CONF_RE = re.compile(r"\.[^/]+\.conf")
 PIN_RE = re.compile(r"([A-Z_]+_PIN)=")
 CUTOFF_RE = re.compile(r"([A-Z0-9_]+_CUTOFF)=")
 BLANK_CUTOFF = 99991231  # a blank cutoff reads as the latest date, so disarming its rule is a raise
@@ -482,11 +482,26 @@ def run_rename(root):
     return print_verdict(leg, red, len(sites), sha, why)
 
 
+def read_root_confs(root):
+    """-> the root `.<name>.conf` files of `root`'s working tree, tracked or not: what
+    `git ls-files --cached --others --exclude-standard -- ':(glob).*.conf'` lists, so a conf an adopter has
+    copied but not yet committed is read before its first commit (TOOL-dWitnessedBar-52 S1). The glob
+    magic keeps `*` from crossing `/`, so a nested conf is not one. WHAT IT DOES NOT CHECK: a root conf
+    the repository ignores is never read, so a pin assigned only in a machine-local ignored conf is
+    neither seeded nor held."""
+    rc, out = LL._run_git(root, "ls-files", "-z", "--cached", "--others", "--exclude-standard", "--",
+                          ":(glob).*.conf")
+    if rc != 0:
+        raise ValueError("git ls-files of the root confs failed at %s" % root)
+    return sorted({p for p in out.split("\0") if p})
+
+
 def read_root_conf_lines(root):
-    """-> [(conf, line)]: each line of every tracked root `.<name>.conf`, read from the working tree, the
-    one conf walk `measure_scalar_pins` and `measure_cutoffs` share (TOOL-dWitnessedBar-17 S6)."""
+    """-> [(conf, line)]: each line of every root `.<name>.conf` `read_root_confs` lists, read from the
+    working tree, the one conf walk `measure_scalar_pins` and `measure_cutoffs` share (TOOL-dWitnessedBar-17
+    S6)."""
     out = []
-    for conf in sorted(p for p in read_tracked_paths(root) if ROOT_CONF_RE.fullmatch(p)):
+    for conf in read_root_confs(root):
         try:
             text = pathlib.Path(root, conf).read_bytes().decode("utf-8", "replace")
         except OSError:
@@ -496,8 +511,8 @@ def read_root_conf_lines(root):
 
 
 def measure_scalar_pins(root):
-    """-> {(conf, key): count}: every `<KEY>=` assignment of a `*_PIN` key at a line's start in each tracked
-    root `.<name>.conf`, read from the working tree."""
+    """-> {(conf, key): count}: every `<KEY>=` assignment of a `*_PIN` key at a line's start in each root
+    `.<name>.conf` `read_root_confs` lists, read from the working tree."""
     counts = {}
     for conf, line in read_root_conf_lines(root):
         m = PIN_RE.match(line)
@@ -507,8 +522,8 @@ def measure_scalar_pins(root):
 
 
 def measure_cutoffs(root):
-    """-> {(conf, key): date}: every `*_CUTOFF` key assigned at a line's start in each tracked root
-    `.<name>.conf`, its date the last assignment's `YYYY-MM-DD` as eight digits and a blank one
+    """-> {(conf, key): date}: every `*_CUTOFF` key assigned at a line's start in each root
+    `.<name>.conf` `read_root_confs` lists, its date the last assignment's `YYYY-MM-DD` as eight digits and a blank one
     `BLANK_CUTOFF`, the `date-cutoffs` seed (TOOL-dWitnessedBar-17 S6). A value that is neither is
     ValueError naming the conf and key, never a row. WHAT IT DOES NOT CHECK: that the date is a real day."""
     dates = {}
@@ -1036,6 +1051,36 @@ def run_plant_regrammared(top, results):
                      ["never-gains"], 1, ["gained · c"], ["regrammared at"])
 
 
+def write_scalar_fixture(top):
+    """A fixture registering `conf-scalar-pins`, its seed `keys-not-scalar --measure`, over a tracked root
+    `.fix.conf` assigning `BAR_PIN`, the conf every measure must still read, its one row holding that pin."""
+    table = render_table(population=SCALAR_POPULATION, leg=LEGS["keys-not-scalar"], fields=("conf", "key"),
+                         seed=[sys.executable, str(KIT / "ratchet.py"), "keys-not-scalar", "--measure"])
+    rows = render_rows([((".fix.conf", "BAR_PIN"), 1, SHA_A, "seeded")], population=SCALAR_POPULATION,
+                       fields=("conf", "key"))
+    write_fixture_repo(top, [table], {".fix.conf": 'BAR_PIN="1"\n', "pop/rows.txt": rows})
+
+
+def run_plant_untracked_conf(top, results):
+    """S1 (TOOL-dWitnessedBar-52): an untracked root conf is measured, by the seed and by the leg."""
+    write_scalar_fixture(top)
+    write_files(top, {".x.conf": 'FOO_PIN="3"\n'})
+    check_plant_case(results, "untracked-conf", "an untracked root conf in the seed's measure", top,
+                     ["keys-not-scalar", "--measure"], 0, [".x.conf\tFOO_PIN\t1", ".fix.conf\tBAR_PIN\t1"])
+    check_plant_case(results, "untracked-conf", "its pin with no population row", top, ["keys-not-scalar"], 1,
+                     ["undeclared site · .x.conf\tFOO_PIN"], ["undeclared site · .fix.conf"])
+
+
+def run_plant_ignored_conf(top, results):
+    """S3 (TOOL-dWitnessedBar-52): a root conf the repository ignores is never measured."""
+    write_scalar_fixture(top)
+    write_files(top, {".x.conf": 'FOO_PIN="3"\n', ".git/info/exclude": ".x.conf\n"})
+    check_plant_case(results, "ignored-conf", "a root conf named in .git/info/exclude", top,
+                     ["keys-not-scalar", "--measure"], 0, [".fix.conf\tBAR_PIN\t1"], [".x.conf"])
+    check_plant_case(results, "ignored-conf", "its pin neither held nor graded", top, ["keys-not-scalar"], 0,
+                     ["· held · .fix.conf\tBAR_PIN", "pass"], [".x.conf"])
+
+
 PLANTS = {
     "gain": run_plant_gain, "ceiling-raised": run_plant_ceiling_raised, "append-edited": run_plant_append_edited,
     "gain-widened": run_plant_gain_widened, "gain-refused": run_plant_gain_refused,
@@ -1045,7 +1090,8 @@ PLANTS = {
     "laundering": run_plant_laundering, "rename": run_plant_rename, "key-number": run_plant_key_number,
     "untouched-quiet": run_plant_untouched_quiet, "merge": run_plant_merge,
     "new-population": run_plant_new_population, "home-moved": run_plant_home_moved,
-    "regrammared": run_plant_regrammared,
+    "regrammared": run_plant_regrammared, "untracked-conf": run_plant_untracked_conf,
+    "ignored-conf": run_plant_ignored_conf,
 }
 
 
