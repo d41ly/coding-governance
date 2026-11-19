@@ -4,7 +4,7 @@ node: d
 opened: 2026-11-20
 streams: tooling
 roster: TOOL
-ids: TOOL-dSkippedRecord-1
+ids: TOOL-dSkippedRecord-1 TOOL-dSkippedRecord-2
 ---
 
 # dSkippedRecord — the close's run-record commit is made only when staging left a diff
@@ -44,11 +44,12 @@ prompt is recorded verbatim under `prompts/`.
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
 | 1 | `TOOL-dSkippedRecord-1` | 2 | `write_run_record` answers its stage 0, 1 or 2 the way `write_staged_change` does, skips the commit on 1 and refuses on 2, with an empty-stage and a failed-stage arm, and drains its registry row |
+| 2 | `TOOL-dSkippedRecord-2` | 2 | the closing review's two LOW items, promoted: the `same` arm reads the skip line's commit hash, and the as-built failed-stage mechanism, a PATH `git` shim, recorded against unit 1's frozen spec |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node d · opened 2026-11-20 · streams tooling
-ids TOOL-dSkippedRecord-1
+ids TOOL-dSkippedRecord-1 TOOL-dSkippedRecord-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -56,7 +57,7 @@ ids TOOL-dSkippedRecord-1
 | [TOOL-dSkippedRecord-1 — the close's run-record commit is made only when staging left a diff](spec/2026-11-20-spec-TOOL-dSkippedRecord-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-20 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 3 record folder(s).
+Records: 6 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
