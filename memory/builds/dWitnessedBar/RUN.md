@@ -277,3 +277,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-19T21:39:05Z draw · re-dispatch · TOOL-dWitnessedBar-52 · 44/180 · 20261119T213905Z-69aeea
 
 2026-11-19T21:39:05Z dispatch · item 2d52c02a TOOL-dWitnessedBar-52 · reason memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-52-deviation-522.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-52-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-52.md tools/memory-tree/ratchet.py
+
+2026-11-19T21:43:28Z brief · item TOOL-dWitnessedBar-53 · reason 335e3e512df0 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-53-2-build-brief.md
