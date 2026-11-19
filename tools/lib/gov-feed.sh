@@ -88,14 +88,14 @@ derive_feed_events() { # cache prefix · [feed file] -> `ref TAB kind TAB blob T
       if ((g SUBSEP $2) in held) next
       print $2, g, (g in newest ? newest[g] : "-") }')
   [ -n "$rows" ] || return 0
-  while read -r t g s; do
+  printf '%s\n' "$rows" | while read -r t g s; do
     git log --first-parent --format='%H %T %an' "$t" 2>/dev/null | awk -v ref="$g" -v stop="$s" '
       { sub(/\r$/, "") }
       $1 == stop { exit }
       { a = $0; sub(/^[^ ]+ [^ ]+ /, "", a); n++; h[n] = $1; tr[n] = $2; if (a != "gov-claim") exit }
       END { k = ref; sub(/^refs\/gov\//, "", k); sub(/\/.*$/, "", k)
             for (i = n; i >= 1; i--) printf "%s\t%s\t%s\t%s\n", ref, k, tr[i], h[i] }'
-  done <<<"$rows"
+  done
   return 0
 }
 add_feed_sightings() { # cache prefix -> 0 always; every unseen commit of a cached ref appended oldest first
@@ -188,7 +188,7 @@ FEED_WRITER_EXEMPT_FNS=""
 scan_feed_writers() { # file… -> one line per hit, rc 1; nothing, rc 0
   local out
   out=$(FW_HELPERS="$FEED_WRITER_HELPER_FNS" FW_EXEMPT="$FEED_WRITER_EXEMPT_FNS" awk '
-    function flush() {
+    function write_held_fn() {
       if (fn != "") seen[fn] = 1
       if (np > 0 && (fn == "" || !hc)) { if (fn != "") cand[fn] = 1; if (fn == "" || !(fn in ex)) hits = hits pend }
       fn = ""; hc = 0; np = 0; pend = ""
@@ -204,17 +204,17 @@ scan_feed_writers() { # file… -> one line per hit, rc 1; nothing, rc 0
             PW = "(^|[^A-Za-z0-9_])p" "ush([^A-Za-z0-9_]|$)"
             k = split(ENVIRON["FW_HELPERS"], a, /[ \t]+/); for (i = 1; i <= k; i++) if (a[i] != "") helper[a[i]] = 1
             k = split(ENVIRON["FW_EXEMPT"], a, /[ \t]+/); for (i = 1; i <= k; i++) if (a[i] != "") ex[a[i]] = 1 }
-    FNR == 1 { flush() }
+    FNR == 1 { write_held_fn() }
     { ln = $0; gsub(/\r/, "", ln); c = ln; sub(/^[ \t]+/, "", c); at = FILENAME ":" FNR }
     c ~ /^#/ { next }
     ln ~ /^function[ \t]+[A-Za-z_][A-Za-z0-9_:-]*/ || ln ~ /^[A-Za-z_][A-Za-z0-9_:-]*[ \t]*\(\)[ \t]*\{/ {
-      flush(); fn = ln; sub(/^function[ \t]+/, "", fn); sub(/[ \t(].*$/, "", fn); sub(/\{.*$/, "", fn)
+      write_held_fn(); fn = ln; sub(/^function[ \t]+/, "", fn); sub(/[ \t(].*$/, "", fn); sub(/\{.*$/, "", fn)
       body = ln; sub(/^[^{]*\{/, "", body); scan(body, at)
-      if (ln ~ /\}[ \t;]*$/) flush()
+      if (ln ~ /\}[ \t;]*$/) write_held_fn()
       next }
-    ln ~ /^\}/ { flush(); next }
+    ln ~ /^\}/ { write_held_fn(); next }
     { scan(c, at) }
-    END { flush()
+    END { write_held_fn()
           for (e in ex) if (!(e in cand)) hits = hits "\nFEED_WRITER_EXEMPT_FNS names " e "(), which is no function holding a lease-carrying line without a feed call"
           for (h in helper) {
             if (!(h in seen)) hits = hits "\nFEED_WRITER_HELPER_FNS names " h "(), which is no function of the files read"

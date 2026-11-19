@@ -2898,14 +2898,14 @@ derive_feed_events() { # cache prefix · [feed file] -> `ref TAB kind TAB blob T
       if ((g SUBSEP $2) in held) next
       print $2, g, (g in newest ? newest[g] : "-") }')
   [ -n "$rows" ] || return 0
-  while read -r t g s; do
+  printf '%s\n' "$rows" | while read -r t g s; do
     git log --first-parent --format='%H %T %an' "$t" 2>/dev/null | awk -v ref="$g" -v stop="$s" '
       { sub(/\r$/, "") }
       $1 == stop { exit }
       { a = $0; sub(/^[^ ]+ [^ ]+ /, "", a); n++; h[n] = $1; tr[n] = $2; if (a != "gov-claim") exit }
       END { k = ref; sub(/^refs\/gov\//, "", k); sub(/\/.*$/, "", k)
             for (i = n; i >= 1; i--) printf "%s\t%s\t%s\t%s\n", ref, k, tr[i], h[i] }'
-  done <<<"$rows"
+  done
   return 0
 }
 add_feed_sightings() { # cache prefix -> 0 always; every unseen commit of a cached ref appended oldest first
