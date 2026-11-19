@@ -35,6 +35,12 @@ failure its own answer that every caller refuses on. The lander's helper answers
 status or stage, each attended commit site refuses on it with its own stage's line before the push,
 and the fold returns 1 on it (TOOL-dSettledStage-3).
 
+## Related
+
+- It coexists-with `observation-before-the-last-fold-of-the-same-commit`: both read a step as done
+  while the tree says otherwise, but there an observation saw a tree a later fold of the same commit
+  replaced, and here a stage that failed answers as a stage that held nothing new.
+
 ## Gate
 
 The lander's instance is gated by arms 44 and 45 of `tools/push-main.test.sh`, on the `push-main
