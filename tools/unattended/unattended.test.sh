@@ -19840,6 +19840,66 @@ fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
 # ==================================================================================================
+# TOOL-dPlacedRequest-18 — THE CADENCE SEGMENT IS THE TAG GRAMMAR'S. The sourced driver's
+# `check_cadence_segment` over the spec's probe set, each refusal naming its rule (AC1); the playbook
+# kit's `parse_tag` over each `unit.<name>`, a name admitted there when the tag reads as namespace
+# `unit` and that one segment, agreeing row for row (AC4), and a copy of the predicate planted with
+# `[a-z][a-z0-9-]*` refusing `9am`, the RED the parity exists for; neither the builder nor the reader
+# spelling a cadence kind (AC3); over the lease fixture's clone, a cadence no list names holding a
+# lease that `--claims` lists back, `Nightly` refused before any write (AC2), and the reserved slug
+# `run` refused with the remote unmoved (AC5); section 7 naming the form and the reservation (AC6).
+# RED, observed at the close, is the base driver, which has no cadence predicate. Waived by README
+# rule 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: a name of 60 to 64 bytes, which
+# the predicate admits and the tag `unit.<name>` exceeds, left out of the set as the spec's risk says;
+# and the parity where no playbook kit resolves, which skips said, its 2 assertions counted.
+# ==================================================================================================
+cg_a59=$(printf '%059d' 0 | tr 0 a); cg_a65=$(printf '%065d' 0 | tr 0 a)
+cg_names="nightly-audit maintain 9am Nightly -x a.b $cg_a59 $cg_a65"
+cg_got=""; for cg_n in $cg_names; do check_cadence_segment "$cg_n" >/dev/null; cg_got="$cg_got$? "; done
+same "DPR18 AC1 the probe set reads admitted, admitted, admitted, refused thrice, admitted, refused" "$cg_got" "0 0 0 1 1 1 0 1 "
+cg_why=""; for cg_n in Nightly -x a.b "$cg_a65"; do cg_why="$cg_why$(check_cadence_segment "$cg_n");"; done
+same "DPR18 AC1 each refusal names its rule" "$cg_why" \
+  "outside seg [a-z0-9][a-z0-9-]*;outside seg [a-z0-9][a-z0-9-]*;outside seg [a-z0-9][a-z0-9-]*;over 64 bytes (65);"
+cg_red=$( eval "$(declare -f check_cadence_segment | sed 's/\^\[a-z0-9\]\[a-z0-9-\]\*\$/^[a-z][a-z0-9-]*$/')"
+  for cg_n in $cg_names; do check_cadence_segment "$cg_n" >/dev/null; printf '%s ' "$?"; done )
+same "DPR18 AC4 RED: the predicate planted with [a-z][a-z0-9-]* refuses 9am" "$cg_red" "0 0 1 1 1 1 0 1 "
+cg_rel=$(resolve_kit_dir "$_rkd_py" playbook tag_index.py "$HERE" 2>/dev/null) || cg_rel=""
+if [ -z "$cg_rel" ]; then
+  n=$((n+2))
+  echo "  SKIP the cadence parity arm: no playbook kit resolves beside this one, so parse_tag cannot be asked; its 2 assertions are counted, not run"
+else
+  [ -f "$cg_rel/tag_index.py" ] || cg_rel="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$cg_rel"
+  cg_tag=$("$_rkd_py" -B -c 'import sys
+sys.path.insert(0, sys.argv[1])
+import tag_index as t
+print(" ".join("0" if t.parse_tag("unit." + n)[0] == ("unit", [n]) else "1" for n in sys.argv[2:]) + " ")' "$cg_rel" $cg_names 2>&1)
+  cg_tag=${cg_tag//$'\r'/}
+  same "DPR18 AC4 parse_tag reads each unit.<name> as the predicate reads <name>" "$cg_tag" "$cg_got"
+  same "DPR18 AC4 ...and the planted copy disagrees with it" "$([ "$cg_tag" = "$cg_red" ] && echo agrees || echo disagrees)" "disagrees"
+fi
+same "DPR18 AC3 neither the ref builder nor the claim reader spells a cadence kind" \
+  "$(declare -f derive_lease_ref read_claims check_cadence_segment | grep -cE 'maintain|review')" "0"
+LF=$(mktemp -d); LF_GIT=$(command -v git); write_lease_fixture
+cg_out=$(run_lease_arm acquire run nightly-audit 2026-10-25); cg_rc=$?
+same "DPR18 AC2 a cadence no list names holds a lease on the origin" \
+  "$cg_rc $(git --git-dir="$LF/origin.git" for-each-ref --format='%(refname)' refs/gov/leases | tr '\n' ' ')" "0 refs/gov/leases/run/nightly-audit/2026-10-25 "
+same "DPR18 AC2 --claims lists it back" \
+  "$(cd "$LF/c1" && GOV_RUNLOG=0 bash "$SCRIPT" --claims 2>/dev/null | awk -F'\t' '{ print $1 }' | tr -d '\r')" "run/nightly-audit/2026-10-25"
+cg_out=$(run_lease_arm acquire run Nightly 2026-10-25); cg_rc=$?
+same "DPR18 AC2 a cadence outside the grammar exits 2 and writes nothing" \
+  "$cg_rc $(git --git-dir="$LF/origin.git" for-each-ref refs/gov | grep -c .)" "2 1"
+hit  "$cg_out" "lease not written — the cadence 'Nightly' is outside seg"
+cg_out=$(run_lease_arm acquire build run); cg_rc=$?
+same "DPR18 AC5 a build lease of the slug run exits 2 and writes nothing" \
+  "$cg_rc $(git --git-dir="$LF/origin.git" for-each-ref refs/gov | grep -c .)" "2 1"
+hit  "$cg_out" "lease not written — the slug run is reserved"
+cg_s7=$(awk '/^## 7\. /{f=1; next} /^## 8\. /{f=0} f' "$HERE/STOPS.template.md")
+for cg_w in 'refs/gov/leases/run/<cadence>/<period>' 'any segment the tag grammar admits' 'The slug `run` is reserved'; do hit "$cg_s7" "$cg_w"; done
+rm -rf "$LF"
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
 # TOOL-dPlacedRequest-16 — A LEASE NEVER DELETED. Over the lease fixture's clone, every lease planted
 # on its origin by `seed_lease_at`, its sighting a line of the clone's feed: a plain release hands the
 # lease over at the epoch plus one, its releaser included (AC1); a build tombstone refuses every mode

@@ -189,7 +189,12 @@ announced, and declines the take-over.
 because it lives on the run's own branch. Where `RUN_CLAIMS` is `on` (absent or blank is `off`), a
 run's claim is its BUILD LEASE, `refs/gov/leases/<slug>/build`, on the remote the landing push goes
 to. One grammar serves every holder: `refs/gov/leases/<slug>/build`, `refs/gov/leases/<slug>/unit/<id>`
-and `refs/gov/leases/run/<cadence>/<period>`, each segment a legal one-segment ref name. The ref names
+and `refs/gov/leases/run/<cadence>/<period>`, each segment a legal one-segment ref name. `<cadence>` is
+any segment the tag grammar admits, `[a-z0-9][a-z0-9-]*` within 64 bytes (PINNED, the grammar's cap),
+and never a list of cadence kinds, so a cadence an expansion registers holds a lease as `maintain`
+does; a name outside it is refused `outside seg` or `over 64 bytes`. The slug `run` is reserved: a
+build or unit lease of it is refused, because `refs/gov/leases/run/build` and a cadence named `build`
+cannot both be refs. The ref names
 a commit over the empty tree whose message is `gov-claim <tail>` (the ref after `refs/gov/leases/`), a
 blank line, and sixteen `key: value` lines: `slug`, `node`, `host`, `session`, `keepalive`, `status`
 (`live`, `held`, `released`, `landed`, `aborted` or `withdrawn`), `lease-utc`, `beat-utc`, `epoch`, `kind`

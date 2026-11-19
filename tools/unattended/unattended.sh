@@ -3474,9 +3474,29 @@ print("held" if sys.argv[2] in tags else "absent")' "$d" "$tag" 2>&1)
   esac
 }
 
-# THE ONE BUILDER OF A LEASE REF (S1, I5). `<cadence>` takes any legal segment here; TOOL-dPlacedRequest-18
-# narrows it to the tag grammar. A build or unit lease of a slug named `run` is refused, because its tail
-# would read as the cadence namespace. Sets LEASE_REF and prints it, so a caller in a loop spawns nothing.
+# A CADENCE SEGMENT (TOOL-dPlacedRequest-18 S1): the tag grammar's `seg` production of
+# PLAY-dOrderedCharter-19 S1, `[a-z0-9][a-z0-9-]*`, at most 64 bytes — `RULE_KEY_RE`'s shape in
+# the roles kit's `roles_lib.py` less its optional `?`, and never a list of cadence kinds, so a cadence an
+# expansion registers holds a lease the way `maintain` does. The suite compares its verdict with the
+# playbook kit's `parse_tag` over a fixed probe set, which keeps the two spellings one fact. `LC_ALL=C`
+# so `[a-z]` is the ASCII range under any collation and `${#1}` counts bytes. In bash, with no process
+# start, because a run-lease ref is built on the lease path. WHAT THIS DOES NOT CHECK: a name of 60
+# to 64 bytes is admitted here and is too long for the tag `unit.<name>`. Sets LEASE_WHY to the rule
+# broken and prints it on a refusal, so a caller in a loop spawns nothing.
+check_cadence_segment() { # name -> 0 inside seg and 64 bytes; 1 with the rule broken in LEASE_WHY and on stdout
+  local LC_ALL=C
+  LEASE_WHY=""
+  if ! [[ ${1:-} =~ ^[a-z0-9][a-z0-9-]*$ ]]; then LEASE_WHY="outside seg [a-z0-9][a-z0-9-]*"
+  elif [ "${#1}" -gt 64 ]; then LEASE_WHY="over 64 bytes (${#1})"
+  else return 0
+  fi
+  printf '%s\n' "$LEASE_WHY"; return 1
+}
+
+# THE ONE BUILDER OF A LEASE REF (S1, I5). `<cadence>` is held to the tag grammar by
+# `check_cadence_segment` (TOOL-dPlacedRequest-18). The slug `run` is reserved: a build or unit lease of
+# it is refused, because `refs/gov/leases/run/build` and a cadence named `build` cannot both be refs.
+# Sets LEASE_REF and prints it, so a caller in a loop spawns nothing.
 derive_lease_ref() { # build <slug> | unit <slug> <id> | run <cadence> <period> -> LEASE_REF on stdout; rc 2 with LEASE_WHY
   local k="${1:-}" n="${2:-}" s="${3:-}"
   LEASE_REF=""; LEASE_WHY=""
@@ -3487,7 +3507,8 @@ derive_lease_ref() { # build <slug> | unit <slug> <id> | run <cadence> <period> 
   esac
   check_lease_segment "$n" || { LEASE_WHY="'$n' is not a legal one-segment ref name"; return 2; }
   [ -z "$s" ] || check_lease_segment "$s" || { LEASE_WHY="'$s' is not a legal one-segment ref name"; return 2; }
-  case "$k:$n" in build:run|unit:run) LEASE_WHY="a $k lease of a slug named run would read as the cadence namespace $LEASE_NS/run/"; return 2 ;; esac
+  [ "$k" != run ] || check_cadence_segment "$n" >/dev/null || { LEASE_WHY="the cadence '$n' is $LEASE_WHY"; return 2; }
+  case "$k:$n" in build:run|unit:run) LEASE_WHY="the slug run is reserved: a $k lease of it would read as the cadence namespace $LEASE_NS/run/"; return 2 ;; esac
   case "$k" in
     build) LEASE_REF="$LEASE_NS/$n/build" ;;
     unit) LEASE_REF="$LEASE_NS/$n/unit/$s" ;;
