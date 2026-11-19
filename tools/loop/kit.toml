@@ -174,6 +174,8 @@ means = "adopted"
 # failure means the target's loop does not read, whoever changed it.
 [[gate_leg]]
 tag = "leg.loop.loop-definition"
+tests = ["feature.loop"]
+enforces = ["principle.p1"]
 name = "loop definition"
 subject = "repo"
 argv = ["python", "{kit}/loop_lib.py", "--check"]
@@ -186,6 +188,8 @@ stage = ["step.test"]
 # mover in the target reads, so a failure means the target's moves do not hold (TOOL-dDeclaredLoop-13).
 [[gate_leg]]
 tag = "leg.loop.loop-transition-tables"
+tests = ["feature.loop"]
+enforces = ["principle.p20"]
 name = "loop transition tables"
 subject = "repo"
 argv = ["python", "{kit}/loop_table.py", "check", "--selftest"]

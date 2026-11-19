@@ -1765,6 +1765,22 @@ def check_benched_probe_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
                                             "'leg.push-main.drifted'", f"says {_tg!r}"), out_tg[-1500:])
     for f, b in keep.items():
         f.write_bytes(b)
+    # Run g (TOOL-dWitnessedBar-22 AC6): 7h compares `tests` and `enforces` presence included, so a
+    # descriptor `tests` list the manifest does not hold reds, and so does an `enforces` list the manifest
+    # row lacks, each naming the leg and both lists.
+    _ts = next(x for x in json.loads(man.read_text(encoding="utf-8")) if x.get("name") == leg)["tests"]
+    write_staged(desc, f"tests = {json.dumps(_ts)}\nname = \"{leg}\"",
+                 f'tests = ["feature.drifted"]\nenforces = ["principle.p16"]\nname = "{leg}"', "g tests and enforces")
+    re_ = run_selfcheck(gcopy)
+    out_e = re_.stdout + re_.stderr
+    check("[dWB-22] g: 7h reds a descriptor tests list the manifest does not hold, naming the leg and both lists",
+          re_.returncode != 0 and check_line(out_e, "entry 'push-main'", f"gate leg '{leg}' with tests "
+                                             "['feature.drifted']", f"says {_ts!r}"), out_e[-1500:])
+    check("[dWB-22] g: 7h reds a descriptor enforces list the manifest row lacks, naming the leg and both lists",
+          check_line(out_e, "entry 'push-main'", f"gate leg '{leg}' with enforces ['principle.p16']", "says None"),
+          out_e[-1500:])
+    for f, b in keep.items():
+        f.write_bytes(b)
     # Run 3 (c, H-L1): no manifest. 7h's block is skipped, so 7j4 must still answer for itself, and
     # with the dead pre-initialisation gone a reader outside its own guard would raise here.
     man.unlink()

@@ -29,6 +29,7 @@ why_no_adopter = "installation is a copy of a gate script plus its self-test; th
 
 [[gate_leg]]
 tag = "leg.check-install-prefix.install-prefix-self-test"
+tests = ["feature.install-prefix"]
 name = "install-prefix self-test"
 subject = "kit"
 argv = ["bash", "{prefix}/check-install-prefix.test.sh"]
@@ -44,6 +45,7 @@ this entry IS a gate. Its self-test is the leg, and running a gate from `check` 
 
 [[gate_leg]]
 tag = "leg.check-install-prefix.install-prefix-shipped-surface"
+tests = ["feature.install-prefix"]
 name = "install-prefix (shipped surface)"
 subject = "repo"
 argv = ["bash", "{prefix}/check-install-prefix.sh"]

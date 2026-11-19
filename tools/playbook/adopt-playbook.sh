@@ -442,7 +442,9 @@ fi
 # registry adds admitted with `edges.toml` unchanged. The rows from `promoted-elsewhere` on are
 # PLAY-dOrderedCharter-28's §4 plants: the one-writer type, the pin reds, and each address form resolved
 # over a scratch repository whose unit and clause texts moved under a second commit, beside the malformed
-# section, block and note refs segment.
+# section, block and note refs segment. The `leg-` rows are TOOL-dWitnessedBar-22's leg-row site, each its
+# site named `gate-legs.json`: a `tests` target in a namespace the shipped registry lacks marked `unarmed`
+# and counted, a row's two edges resolved, and a rule-member `enforces` target marked and never resolved.
 _uk=; check_sibling_kit roles roles_lib.py || _uk=roles
 if [ -n "$_uk" ]; then echo "UNARMED — the edge grammar's plants: no $_uk kit in this install"; else
 _tf=0
@@ -485,6 +487,13 @@ resolve-clause|0|edges: resolved · site.md:1 · carries-clause=cl-dAlpha-0001 �
 bad-section|1|site.md:5: `**Edges:** implements=doc.build-method#` holds the target 'doc.build-method#', a malformed section target
 bad-block|1|site.md:5: `**Edges:** tests=kit.y implements=kit.z` carries a second `type=` pair
 bad-note-refs|1|site.py:1: `# gov:note layer.memory — x → y refs=a b` refs segment holds the target 'a b'
+leg-unregistered|0|edges: leg rows · 1 tests target(s) unarmed until their namespace is registered|is not registered
+leg-unregistered|0|edges: green · 1 edge(s)
+leg-resolved|0|edges: resolved · gate-legs.json:4 · tests=layer.memory · layer.memory
+leg-resolved|0|edges: resolved · gate-legs.json:4 · enforces=practice.land · practice.land
+leg-resolved|0|edges: green · 2 edge(s)|leg rows
+leg-rule-member|0|edges: leg rows · 1 enforces target(s) unarmed, practice rules core meta-check grades|=practice.land.paths ·
+leg-rule-member|0|edges: resolved · gate-legs.json:4 · enforces=practice.land · practice.land
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf edge-grammar arm(s) failed"; exit 1; fi
 echo "PASS — the edge grammar's plants"

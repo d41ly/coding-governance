@@ -276,6 +276,7 @@ means = "render-failed-half-stamped"
 # variable at 1, or through `--checks`, after such a change.
 [[gate_leg]]
 tag = "leg.unattended.unattended-kit-gate"
+tests = ["feature.unattended"]
 name = "unattended kit gate"
 subject = "kit"
 argv = ["bash", "{kit}/check-unattended.sh"]
@@ -290,6 +291,7 @@ stage = ["step.test"]
 # change a playbook.
 [[gate_leg]]
 tag = "leg.unattended.playbook-validity-gate"
+tests = ["feature.playbook-mode"]
 name = "playbook validity gate"
 subject = "repo"
 argv = ["bash", "{kit}/check-playbook.sh"]
@@ -299,6 +301,7 @@ stage = ["step.test"]
 
 [[gate_leg]]
 tag = "leg.unattended.pass-order-history"
+tests = ["feature.unattended"]
 name = "pass-order history"
 subject = "repo"
 argv = ["bash", "{kit}/check-pass-order.sh"]
@@ -317,6 +320,7 @@ stage = ["step.test"]
 # next thing to red, and re-declaring it with a reason is the right answer then rather than now.
 [[gate_leg]]
 tag = "leg.unattended.brief-recorded"
+tests = ["feature.unattended"]
 name = "brief-recorded"
 subject = "repo"
 argv = ["bash", "{kit}/check-brief-recorded.sh"]
@@ -328,6 +332,7 @@ stage = ["step.test"]
 
 [[gate_leg]]
 tag = "leg.unattended.unattended-skill-wiring"
+tests = ["feature.unattended"]
 name = "unattended skill wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-unattended.sh", "--check"]

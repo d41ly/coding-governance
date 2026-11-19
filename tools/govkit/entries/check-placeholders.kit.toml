@@ -33,6 +33,7 @@ mutates_index = false
 
 [[gate_leg]]
 tag = "leg.check-placeholders.playbook-placeholder-catalogue"
+tests = ["feature.lexicon"]
 name = "playbook placeholder catalogue"
 subject = "repo"
 argv = ["bash", "{prefix}/check-placeholders.sh"]
@@ -41,6 +42,7 @@ stage = ["step.test"]
 
 [[gate_leg]]
 tag = "leg.check-placeholders.placeholder-catalogue-self-test"
+tests = ["feature.lexicon"]
 name = "placeholder-catalogue self-test"
 subject = "kit"
 argv = ["bash", "{prefix}/check-placeholders.test.sh"]

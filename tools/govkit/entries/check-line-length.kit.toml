@@ -55,6 +55,7 @@ the gate IS the check. Its leg runs it over whatever the target declared, and a 
 
 [[gate_leg]]
 tag = "leg.check-line-length.line-length"
+tests = ["feature.playbook"]
 name = "line length"
 subject = "repo"
 argv = ["bash", "{prefix}/check-line-length.sh"]

@@ -38,6 +38,7 @@ this entry IS a gate. Its self-test is the leg, and running a gate from `check` 
 
 [[gate_leg]]
 tag = "leg.check-agent-cap-restatement.agent-cap-restatement"
+tests = ["feature.agent-cap"]
 # TOOL-aScouredKit-12. Same shape as the kickoff leg: the waiver registry ships to `{prefix}/`, the
 # script defaults it to a literal `<prefix>/...`, and the miss is swallowed by a `2>/dev/null` — so at
 # any other prefix the gate exits 1 and names a path absent from the adopter's tree. The script
@@ -51,6 +52,7 @@ stage = ["step.test"]
 
 [[gate_leg]]
 tag = "leg.check-agent-cap-restatement.agent-cap-restatement-self-test"
+tests = ["feature.agent-cap"]
 name = "agent-cap restatement self-test"
 subject = "kit"
 argv = ["bash", "{prefix}/check-agent-cap-restatement.test.sh"]

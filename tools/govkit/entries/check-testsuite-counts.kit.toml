@@ -24,6 +24,7 @@ why_no_adopter = "it needs no install step: the population is DERIVED from the a
 
 [[gate_leg]]
 tag = "leg.check-testsuite-counts.testsuite-counts-every-bar-self-test"
+tests = ["feature.testsuite-counts"]
 name = "testsuite counts (every bar self-test prints one)"
 subject = "repo"
 argv = ["bash", "{prefix}/check-testsuite-counts.sh"]
@@ -32,6 +33,7 @@ stage = ["step.test"]
 
 [[gate_leg]]
 tag = "leg.check-testsuite-counts.testsuite-counts-self-test"
+tests = ["feature.testsuite-counts"]
 name = "testsuite counts self-test"
 subject = "kit"
 argv = ["bash", "{prefix}/check-testsuite-counts.test.sh"]

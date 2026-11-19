@@ -188,6 +188,7 @@ probe = { must_exist = ".memory-tree.conf" }
 
 [[gate_leg]]
 tag = "leg.memory-tree.memory-hygiene"
+tests = ["feature.memory-tree-hygiene"]
 name = "memory hygiene"
 subject = "repo"
 argv = ["bash", "{kit}/check-memory-hygiene.sh"]
@@ -250,6 +251,7 @@ the adopter's two modes are `--scaffold` and `--render`, measured, and neither i
 
 [[gate_leg]]
 tag = "leg.memory-tree.verdict-epoch-kit-version-dates-the-engine"
+tests = ["feature.memory-tree-hygiene"]
 name = "verdict epoch (kit version dates the engine)"
 subject = "repo"
 argv = ["bash", "{kit}/check-verdict-epoch.sh"]
@@ -258,6 +260,7 @@ stage = ["step.test"]
 
 [[gate_leg]]
 tag = "leg.memory-tree.kit-dogfood-doc-parity"
+tests = ["feature.memory-tree-hygiene"]
 name = "kit/dogfood doc parity"
 subject = "repo"
 argv = ["bash", "{kit}/kit-dogfood-parity.test.sh"]
@@ -278,6 +281,7 @@ stage = ["step.test"]
 
 [[gate_leg]]
 tag = "leg.memory-tree.method-carriers-every-pointer-declared"
+tests = ["feature.build-method"]
 name = "method carriers (every pointer declared)"
 subject = "repo"
 argv = ["bash", "{kit}/check-method-carriers.sh"]
@@ -286,6 +290,7 @@ stage = ["step.test"]
 
 [[gate_leg]]
 tag = "leg.memory-tree.build-readme-slot-contract"
+tests = ["feature.build-readme-surface"]
 name = "build README slot contract"
 subject = "repo"
 argv = ["python3", "{kit}/gen_build_index.py", "--check-format"]
@@ -318,6 +323,7 @@ stage = ["step.test"]
 
 [[gate_leg]]
 tag = "leg.memory-tree.row-grammar-selftest"
+tests = ["feature.row-grammar"]
 name = "row-grammar selftest"
 subject = "kit"
 argv = ["python3", "{kit}/row_grammar.py", "--selftest"]
@@ -330,6 +336,7 @@ stage = ["step.test"]
 # it. Held like its four siblings, by `subject = kit`.
 [[gate_leg]]
 tag = "leg.memory-tree.backlog-migration-selftest"
+tests = ["feature.memory-tree-hygiene"]
 name = "backlog migration selftest"
 subject = "kit"
 argv = ["python3", "{kit}/migrate_backlog.py", "--selftest"]
@@ -338,6 +345,7 @@ stage = ["step.test"]
 
 [[gate_leg]]
 tag = "leg.memory-tree.marker-contracts"
+tests = ["feature.row-grammar"]
 name = "marker contracts"
 subject = "repo"
 argv = ["bash", "{kit}/marker-contract.test.sh"]
@@ -367,6 +375,7 @@ stage = ["step.test"]
 # because a shallow clone refuses rather than grading the commits it lost.
 [[gate_leg]]
 tag = "leg.memory-tree.routed-commits-name-a-specced-unit"
+tests = ["feature.memory-tree-hygiene"]
 name = "routed commits name a specced unit"
 subject = "repo"
 argv = ["python3", "{kit}/routed_commits.py"]
@@ -377,6 +386,7 @@ stage = ["step.test"]
 
 [[gate_leg]]
 tag = "leg.memory-tree.routed-commits-selftest"
+tests = ["feature.memory-tree-hygiene"]
 name = "routed-commits selftest"
 subject = "kit"
 argv = ["python3", "{kit}/routed_commits.py", "--selftest"]

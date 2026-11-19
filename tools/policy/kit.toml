@@ -83,6 +83,8 @@ means = "adopted"
 # in this directory.
 [[gate_leg]]
 tag = "leg.policy-kit.policy-check"
+tests = ["feature.policy"]
+enforces = ["principle.p16"]
 name = "policy check"
 subject = "repo"
 argv = ["python", "{kit}/check_policy.py"]
