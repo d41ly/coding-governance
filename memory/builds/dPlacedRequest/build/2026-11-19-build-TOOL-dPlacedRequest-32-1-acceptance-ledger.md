@@ -46,7 +46,7 @@ and `hit` printers.
   `check_claim_writable tFix preflight k2 absent k2` with the session unset returned 0 (PINNED), class
   `mine`, act `renew`; under keepalive `k3` it returned 1 (PINNED), class `foreign-live`. The full
   `--preflight` reading, which the suite arm drives as `--preflight tFresh`, is owed below.
-- AC6 — `grep -n 'CLAUDE_CODE_SESSION_ID' tools/unattended/STOPS.template.md` prints the section 7 lines
+- AC6 — `grep -n 'CLAUDE_CODE_SESSION_ID' tools/unattended/STOPS.template.md` prints the lines of section 7
   naming it as the session source and stating that unset, empty and `absent` are no session; `cmp` of the
   template and `memory/guides/UNATTENDED-STOPS.md` reads identical.
 
