@@ -35,7 +35,7 @@ the `govkit selftest` runs h and i and its PU1 pair, the RED-first observation o
 - AC5 — `[]` — the criterion's `python -c`, run over
   `2026-11-19-build-TOOL-dWitnessedBar-19-purpose-review.md`, printed `[]`. A probe resolved all 198
   `path:line` cites: each names a file `git ls-files` lists and a line inside it, with the record
-  generated after every edit landed. 35 rows come from step 1, 16 from step 2, 147 from step 3 and
+  generated after every edit landed. 35 rows (DERIVED) come from step 1, 16 from step 2, 147 from step 3 and
   none from step 4 (DERIVED).
 - AC6 — `selfcheck` — not run: owed to the close. A `tomllib` probe joined the 70 descriptor
   `[[gate_leg]]` rows in the 27 descriptors to the manifest by name and found 0 disagreements on
