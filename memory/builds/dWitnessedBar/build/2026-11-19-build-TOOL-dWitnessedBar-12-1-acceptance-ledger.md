@@ -12,7 +12,7 @@ section names, AC5's `python owed_rows.py --selftest`, and AC7's `govkit.py self
 hook refused the last one in this pass.
 
 **Evidences:** TOOL-dWitnessedBar-12
-- AC1 — `tools/gate-legs.json` — a probe read the 198 rows after the pass. Every row carries a
+- AC1 — `tools/gate-legs.json` — a probe read the 198 rows (DERIVED) after the pass. Every row carries a
   `tag` matching `leg.<seg>.<seg>`, within `TAG_MAX_BYTES`, and there are 198 distinct values. Each
   returns None from `tag_index.derive_tag_fault` against the registry's 18 words, which now include
   `leg`. Each of the 70 descriptor-backed rows opens with its owner segment and equals its
@@ -25,7 +25,7 @@ hook refused the last one in this pass.
   `grep -cE '^\| .(leg|check|pack). \|' help/tags.md` printed 3 at the root. The registry holds 18
   `ns` rows, and the page now says "Eighteen".
 - AC3 — `python gov_tag.py --fixture --plant leg-rows` exited 0. `where leg.gate-lint.shell-hygiene`
-  resolved to `tools/gate-legs.json:2`, the manifest row, and the plant printed
+  resolved to `tools/gate-legs.json@1310a3e1:2`, the manifest row, and the plant printed
   `tags: plant leg-rows · where: rc=0, check: rc=0`. Its playbook-render selftest row is in the
   `run_plant_rows` heredoc of `tools/playbook/adopt-playbook.sh`. The duplicated-tag half is AC1's,
   on the gov canary.
