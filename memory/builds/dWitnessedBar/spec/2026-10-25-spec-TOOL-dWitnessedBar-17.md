@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-17 — the seven record and row pins as keyed populations, and the date cutoffs registered as cutoffs
 
-**Status:** INPROGRESS · rev-7 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 11 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-8 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 11 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0355@0f895fff whole
 
@@ -48,7 +48,8 @@ count, registers the two unset ones unseeded, and registers every date cutoff in
   `row-duplicates`, `unbound-records` and `dossier-decisions-empty`, each registered with the seed argv
   §4 names, seeded at the build run's base by `python tools/lib/legacy_ledger.py seed` (I5, unit 15
   S1). Each check reads its population through the factory: an offender with no row reds, a row no
-  offender matches reds as stale. Observed by AC1 to AC4.
+  offender matches reds as stale; `dossier-decisions-empty`'s check is `ratchet (both ways)` itself
+  (§8 F10). Observed by AC1 to AC4.
 - **S2** — The two unset pins, `SEVERITY_UNLABELLED_PIN` and `LIVE_ROW_PIN`, register unseeded: each a
   `[[ledger]]` table with `seed = []`, keyed by shard and row key, which `retrofit.unseeded`'s default
   reports `unarmed` (unit 15 S3); their homes are declared and never written while `seed` is empty.
@@ -87,7 +88,8 @@ count, registers the two unset ones unseeded, and registers every date cutoff in
   `corpus-path-unresolved.txt`, which unit 16's conversion and this unit's replace with ledger headers · by value:
   `corpus_ids.py`'s orphan and dead-path counts compared with the pins in `checks`, and the switch
   `armed`; check 21's graded count against `RECORD_UNBOUND_PIN`; `row_grammar.py`'s duplicate count
-  and per-shard ceilings in `cmd_check`; `test_codebase_map.py`'s empty-decisions count; the
+  and per-shard ceilings in `cmd_check`; `test_codebase_map.py`'s empty-decisions count, deleted
+  with its test (§8 F10); the
   memory-tree descriptor's `conditional_keys` and `measured-pins` discharge reading the two keys as
   set; drift's `RATCHETS` raise rule over four of them, each re-pointed by S1, S4 or S5; and the
   scaffold arm unit 46 adds to `check-memory-hygiene.test.sh`, which counts the `conf-scalar-pins`
@@ -98,7 +100,10 @@ count, registers the two unset ones unseeded, and registers every date cutoff in
   `tools/lib/legacy_ledger.py#read_home_state`, in place of a set pin, so an empty zero-bound home,
   `unarmed · dead probe` since its read-back seed prints no row
   (`tools/memory-tree/convert_registry.py#cmd_read_back`), arms its check; an absent home is the
-  blank pin's off. Unit 16's `id-orphan-waiver` registration and home are unchanged. The refusal
+  blank pin's off. `adopt-memory-tree.sh --scaffold` writes neither home (§8 F11), so a fresh
+  adopter's checks 13 to 15 stay off as its blank pins left them; seeding either population writes
+  its home, the header and one unarmed line over the read-back's dead probe
+  (`tools/lib/legacy_ledger.py#seed_population`), and so arms its check. Unit 16's `id-orphan-waiver` registration and gov's home are unchanged. The refusal
   texts name the homes where they name the pins; the memory-tree descriptor's `conditional_keys` drops
   the two keys, and the `measured-pins` hole's `discharge` command tests the two homes instead of the
   two keys, its `why` re-worded to match. The `requires_if` row on
@@ -108,8 +113,26 @@ count, registers the two unset ones unseeded, and registers every date cutoff in
   `corpus_ids.py` (`armed`, `_PIN_WHY`, `_PIN_CURE_ABSENT`, `_PIN_CURE_OUTDATED`) · by value: govkit's
   `selfcheck`, which reads `conditional_keys` among the declared key lists, the arms of
   `tools/govkit/selftest.py` that read the `measured-pins` hole as undischarged, and each fixture
-  that writes the two homes and expected checks 13 to 15 off
-  (`tools/memory-tree/check-memory-hygiene.test.sh@c6d425b34ac1:2231`), which they now arm.
+  of `check-memory-hygiene.test.sh` writing either home or setting either pin, with its outcome:
+  the scaffold arm's registry list (`tools/memory-tree/check-memory-hygiene.test.sh@c6d425b34ac1:2771`)
+  drops the two names, and the `is not hygiene-clean` arm
+  (`tools/memory-tree/check-memory-hygiene.test.sh@c6d425b34ac1:2878`) stays green over a tree
+  holding neither; the trees writing both homes under no pin drop the two names and keep checks 13
+  to 15 off as the blank pins did: the main tree
+  (`tools/memory-tree/check-memory-hygiene.test.sh@c6d425b34ac1:750-751`), its waiver quote
+  (`tools/memory-tree/check-memory-hygiene.test.sh@c6d425b34ac1:1204`) re-pointed to
+  `unarmed-branches.txt`, and the loops at
+  `tools/memory-tree/check-memory-hygiene.test.sh@c6d425b34ac1:2231`,
+  `tools/memory-tree/check-memory-hygiene.test.sh@c6d425b34ac1:2895` (its `RECORD_UNBOUND_PIN`
+  re-pointed by S1), `tools/memory-tree/check-memory-hygiene.test.sh@c6d425b34ac1:2964`,
+  `tools/memory-tree/check-memory-hygiene.test.sh@c6d425b34ac1:3315` and
+  `tools/memory-tree/check-memory-hygiene.test.sh@c6d425b34ac1:4295`; the trees arming by pin
+  drop it and write its home empty, arming the same checks under unchanged assertions: both pins at
+  `tools/memory-tree/check-memory-hygiene.test.sh@c6d425b34ac1:2593`,
+  `tools/memory-tree/check-memory-hygiene.test.sh@c6d425b34ac1:2677` and
+  `tools/memory-tree/check-memory-hygiene.test.sh@c6d425b34ac1:2712`, and `ORPHAN_ID_PIN` alone at
+  `tools/memory-tree/check-memory-hygiene.test.sh@c6d425b34ac1:3583` and
+  `tools/memory-tree/check-memory-hygiene.test.sh@c6d425b34ac1:3627`.
 - **S5** — `RATCHETS`. The four rows naming conf pins (`ORPHAN_ID_PIN`, `DEAD_PATH_PIN`,
   `ROW_DUPLICATE_PIN`, `DOSSIER_DECISIONS_EMPTY_PIN`) leave `tools/drift-audit/drift_signals.py`, and
   the template's commented example row; `UNIVERSAL_BUDGET` stays, a budget and not a pin. A population's
@@ -148,10 +171,13 @@ count, registers the two unset ones unseeded, and registers every date cutoff in
   and where the conf assigns the key blank also removes its population's home, so its checks stay off
   as the blank pin left them (S4). The memory-tree descriptor gains the conversion row of §4 "The
   dead-path registry". Observed by AC10.
-  **Readers:** by name: at an adopter, the copies of the readers S3 lists, `corpus_ids.py`,
-  `row_grammar.py`, `check-memory-hygiene.sh` and `test_codebase_map.py` among them, which S1 and S4
-  re-point before any step runs · by value: each adopter check S1 re-points, `corpus_ids.py`'s
-  `checks` among them, which reads the population the step seeds where it read the key's value.
+  Each seed program is an engine file every adopter holds at the spelled path (§4 "The pins").
+  **Readers:** by name: at an adopter, the kit copies of the readers S3 lists, `corpus_ids.py`,
+  `row_grammar.py` and `check-memory-hygiene.sh` among them, which S1 and S4 re-point before any
+  step runs; the gate at the adopter's `GATE_FILE` is project-owned and never re-copied, so its
+  `test_dossier_decisions_are_declining` reads the removed key as unset and prints `UNGRADED` (§8 F10)
+  · by value: each adopter check S1 re-points, `corpus_ids.py`'s `checks` and `ratchet (both ways)`
+  among them, which reads the population the step seeds where it read the key's value.
 - **S9** — A seed argv's `{prefix}` resolves (§8 F8). `tools/lib/legacy_ledger.py#run_seed_argv`
   resolves each argument through the `resolve_prefix_token` block
   (`tools/lib/resolve_prefix_token.py#resolve_prefix_token`) against the tool root, the directory
@@ -194,7 +220,7 @@ count, registers the two unset ones unseeded, and registers every date cutoff in
 | `DEAD_PATH_PIN` | 0 | `corpus-path-unresolved` | site · path, cited | `convert_registry.py read-back corpus-path-unresolved` | `memory hygiene` | memory-tree |
 | `ROW_DUPLICATE_PIN` | 3 | `row-duplicates` | record · shard, row key | `row_grammar.py --list-duplicates` | `memory hygiene` | memory-tree |
 | `RECORD_UNBOUND_PIN` | 16 | `unbound-records` | record · record path | `corpus_ids.py --list-unbound` (§8 F6) | `memory hygiene` | memory-tree |
-| `DOSSIER_DECISIONS_EMPTY_PIN` | 16 | `dossier-decisions-empty` | key · feature | `test_codebase_map.py --list-empty-decisions` | `codebase-map coverage + freshness` | codebase-map |
+| `DOSSIER_DECISIONS_EMPTY_PIN` | 16 | `dossier-decisions-empty` | key · feature | `gen_map.py --list-empty-decisions` | `ratchet (both ways)` (§8 F10) | codebase-map |
 | `SEVERITY_UNLABELLED_PIN` | unset | `severity-unlabelled`, unseeded | record · shard, row key | `[]` | `memory hygiene` | memory-tree |
 | `LIVE_ROW_PIN` | unset | `live-rows`, unseeded | record · shard, row key | `[]` | `memory hygiene` | memory-tree |
 
@@ -213,8 +239,15 @@ head, which a Windows host's loader resolves to the System32 WSL launcher
 `row_grammar.py`'s duplicate scan in `cmd_check`, a duplicated key's count the rows of its shard that
 carry it; check 21's graded `U` rows, the ones its `extract_graded_rows` keeps, each count `1`, printed
 by a hygiene print mode `--list-unbound` that exits before check 1 and asked for by `corpus_ids.py
---list-unbound` through `tools/memory-tree/corpus_ids.py#ask_shell`; `test_dossier_decisions_are_declining`'s
-`empty` list, each count `1`. The unseeded homes are `memory/project/severity-unlabelled.txt` and
+--list-unbound` through `tools/memory-tree/corpus_ids.py#ask_shell`; the `empty` list
+`test_dossier_decisions_are_declining` builds, each count `1`, printed by a `--list-empty-decisions`
+mode joining the mode group of `tools/codebase-map/gen_map.py#main`, which already reads the same
+`load_map_tree(IDS, decision_id_re=ID_RE)` (`tools/codebase-map/gen_map.py@874cdcafb861:140`), the
+test then deleted from the gate and its template (§8 F10). Each seed program is an engine file every
+adopter holds at its `{prefix}` path: memory-tree's under its `**` engine rule
+(`tools/memory-tree/kit.toml@aca25b09b5ce:30-31`), and `gen_map.py` under codebase-map's
+(`tools/codebase-map/kit.toml@8dfb2a659a2e:10-12`), whose `project-owned` rule withholds
+`test_codebase_map.py` (`tools/codebase-map/kit.toml@8dfb2a659a2e:32-34`). The unseeded homes are `memory/project/severity-unlabelled.txt` and
 `memory/project/live-rows.txt`, declared and never written while `seed = []`. Check 3 reads no
 registration (`git grep -n legacy_ledger tools/memory-tree/check-memory-hygiene.sh` prints nothing at
 `2b0490b8d`), so the unit that gives either a seed adds its name to check 3's list as S7 does.
@@ -249,7 +282,9 @@ them. `tools/memory-tree/corpus_ids.py#parse_registry` reads the home through th
 `read_rows` at arity 2, a malformed row a `Problem` as `#parse_waiver` raises one. Check 15's rule 1
 keeps grading both sides and the count; rule 3 becomes the factory's `duplicate` refusal; rule 2
 retires with the pin, its shrink held by `ratchet (never gains)`; rule 4 and the state refusal retire
-with the column (§8 F9). The scaffold's comment in `adopt-memory-tree.sh` names the row shape and no pin.
+with the column (§8 F9). The scaffold's two `printf` blocks writing this home and
+`id-orphan-waiver.txt` are deleted (`tools/memory-tree/adopt-memory-tree.sh@fbbf1499d9a4:740-748`),
+and its `project/` comment says an absent home keeps its check off (§8 F11).
 
 ### The cutoffs
 
@@ -287,7 +322,7 @@ Minted: the populations `row-duplicates`, `unbound-records`, `dossier-decisions-
 `severity-unlabelled`, `live-rows` and `date-cutoffs`, their registrations and the four written homes
 `memory/project/row-duplicates.txt`, `unbound-records.txt`, `dossier-decisions-empty.txt` and
 `date-cutoffs.txt`; the verbs `measure-cutoffs`, `--list-duplicates`, `--list-unbound` (the hygiene
-print mode and the `corpus_ids.py` mode that asks it) and `--list-empty-decisions`; the conf walk
+print mode and the `corpus_ids.py` mode that asks it) and `gen_map.py`'s `--list-empty-decisions`; the conf walk
 `measure-cutoffs` and `measure_scalar_pins` share; the step program `tools/govkit/steps/conf_pins_to_ledger.py` and the
 `[[upgrade]]` rows of S8; the `corpus-path-unresolved` registration, its `LEGACY` row and its
 conversion row. Naming cells: each file name, verb and flag is asked of
@@ -330,6 +365,7 @@ data. The pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its
 - `tools/memory-tree/README.md`
 - `tools/memory-tree/HYGIENE.template.md` (rendered to `memory/HYGIENE.md`)
 - `tools/memory-tree/ratchet.py`
+- `tools/codebase-map/gen_map.py`
 - `tools/codebase-map/test_codebase_map.py`
 - `tools/codebase-map/test_codebase_map.template.py`
 - `tools/codebase-map/reuse_lookup.py`
@@ -370,7 +406,8 @@ data. The pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its
   home would red (`tools/memory-tree/ratchet.py#run_populated`).
 - observability — each check prints its population's count where it printed the pin.
 - risks — checks 13-15 now arm on a present home, so a home a failed seed left unarmed arms them and
-  fails closed; an adopter turns them off by removing the home, which S8 does where its pin was blank.
+  fails closed; an adopter turns them off by removing the home, which S8 does where its pin was blank
+  and a fresh scaffold never writes (§8 F11).
 - testing — AC1 to AC10; the arms in §7 are observed RED then GREEN by the main loop at the close.
 - migration — §4 and S8.
 - user docs — `tools/memory-tree/README.md`, `memory/HYGIENE.md` through its template and
@@ -393,15 +430,20 @@ data. The pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its
   `bash tools/memory-tree/check-memory-hygiene.sh --only 21`, it exits 1 naming the record's path.
   Red when: the new record passes because the unbound count is still at or under 16.
 - **AC4** — When a scratch clone empties one feature dossier's `decisions` and runs
-  `python tools/codebase-map/test_codebase_map.py`, it fails naming that feature. When a scratch
+  `python tools/memory-tree/ratchet.py both-ways`, it exits 1 naming `dossier-decisions-empty`,
+  `undeclared site` and that feature. When a scratch
   clone of the landed tree, its conf holding no pin and each of `id-orphan-waiver.txt` and
   `corpus-path-unresolved.txt` its header and `# unarmed` line, commits to `memory/README.md` a
   backticked citation of a path no file holds and runs `python tools/memory-tree/corpus_ids.py`, it
   exits 1 naming check 15 and that path; with both homes also removed it names no check 13 to 15.
   `head -1 memory/project/corpus-path-unresolved.txt` prints the header §4 "The dead-path registry"
-  renders.
+  renders. When a scratch repository holding the scaffold arm's conf (`MEMORY_ROOT`, `DISCIPLINES`,
+  `FAMILIES`, `READINESS_ROWS`) runs `bash tools/memory-tree/adopt-memory-tree.sh --scaffold` and
+  commits, its `memory/project/` holds neither home, and `bash tools/memory-tree/check-memory-hygiene.sh`
+  run there exits 0.
   Red when: the checks still read the conf keys, so removing the keys disarms them silently, or an
-  empty zero-bound home disarms them.
+  empty zero-bound home disarms them, or a fresh scaffold writes a home, arming checks its own
+  rendered documents' citations red.
 - **AC5** — When `python tools/lib/legacy_ledger.py seed --population severity-unlabelled` and the same
   for `live-rows` run on the landed tree, each prints `unarmed <population> no seed` and exits 0 under
   `retrofit.unseeded`'s default, writing no home, and `python ratchet.py unarmed` exits 0 naming both
@@ -441,9 +483,15 @@ data. The pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its
   `unbound-records`, removes the key and drains the row; its `witness` then exits 0, and its `down`
   restores the conf's and `conf-scalar-pins.txt`'s bytes. The `ORPHAN_ID_PIN` step's `up`, over a conf
   assigning that key blank, removes the key and `id-orphan-waiver.txt`, and its `down` restores both.
+  The `DOSSIER_DECISIONS_EMPTY_PIN` step's `up`, in a scratch clone of the landed tree with
+  `tools/codebase-map/test_codebase_map.py` removed, as an adopter's kit directory holds no such file,
+  `dossier-decisions-empty.txt` removed and the key assigned `"16"` in `.codebase-map.conf`, seeds
+  that population with as many rows as `python tools/codebase-map/gen_map.py --list-empty-decisions`
+  prints lines and removes the key.
   Red when: the step removes the key before the seed writes, so a failed seed loses the bound, or
   leaves the key's `conf-scalar-pins` row, which `keys-not-scalar` then reds as an `unmeasured row`,
-  or a blank folded pin leaves its home, arming checks the adopter had off.
+  or a blank folded pin leaves its home, arming checks the adopter had off, or a seed names a file an
+  adopter's kit does not hold, so its key is never converted there.
   fixture: a scratch adopter under `%TEMP%/<short-name>`, none in the tree today.
 - **AC11** — When `git grep -n "^seed = \[\"python\", \"tools/" -- 'tools/*/kit.toml'` runs on the
   landed tree, it prints the `conf-scalar-pins` line alone (`tools/memory-tree/kit.toml@aca25b09b5ce:727`);
@@ -556,6 +604,30 @@ New arm: tools/memory-tree/ratchet.py · covers AC7 · a `cutoff-later` and a `c
   removes rule 4's text. RESOLVED (agent, 2026-11-19, delegated): (a), the tie broken by the seam.
   widens: none · relaxes: check 15's rule 4, that a `moved:` destination is a tracked file, and its
   state refusal
+- **F10 — Which program seeds `dossier-decisions-empty`, and which leg grades it at an adopter?** The
+  gate is `project-owned`, kept at the adopter's `GATE_FILE` and never re-copied
+  (`tools/codebase-map/kit.toml@8dfb2a659a2e:32-34`; `tools/codebase-map/check_gate_coverage.py`, its
+  docstring), so no seed can name it at `{prefix}`. Options: (a) `gen_map.py --list-empty-decisions`
+  under the leg `codebase-map coverage + freshness`, the gate's test re-pointed to the population;
+  (b) the same seed under `ratchet (both ways)`, the test deleted from the gate and its template.
+  Under (a) an adopter's frozen test reads the removed key as unset and prints `UNGRADED`, while
+  `run_both_ways` prints the registration `graded by` that leg (`tools/memory-tree/ratchet.py#run_both_ways`),
+  so no leg grades the population at any adopter, against S1 (veto 1). RESOLVED (agent,
+  2026-11-19, delegated): (b), the one survivor, removing the test's text; `run_both_ways` reds an
+  offender with no row as `undeclared site` and a row with none as `unmeasured row`
+  (`tools/lib/legacy_ledger.py#compare_counts`), as `date-cutoffs` is graded (F5). widens: none ·
+  relaxes: none
+- **F11 — What does a fresh scaffold write, once a present home arms checks 13 to 15?** The scaffold
+  writes both homes (`tools/memory-tree/adopt-memory-tree.sh@fbbf1499d9a4:740-748`), and its own
+  rendered documents cite paths a fresh tree does not hold, so armed check 15 reds the scaffold arm
+  (`tools/memory-tree/check-memory-hygiene.test.sh@c6d425b34ac1:2878`; the second builder's return).
+  Options: (a) the scaffold writes neither home, a fresh adopter off as its blank pins left it; (b) it
+  writes both and seeds rows for its documents' dead citations; (c) arm on a home holding a row. (c)
+  disarms gov's empty `id-orphan-waiver` home against AC4 (veto 1); (b) seeds rows that depend on the
+  kit set installed, so each later kit an adopter installs turns rows stale and reds check 15, a
+  follow-up left open at every adopter, and adds a seed run to a scaffolder that calls no ledger code.
+  RESOLVED (agent, 2026-11-19, delegated): (a), fewest follow-ups open, removing the two blocks and
+  two fixture names. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -592,6 +664,12 @@ New arm: tools/memory-tree/ratchet.py · covers AC7 · a `cutoff-later` and a `c
   builder's divergence (2026-11-19-build-TOOL-dWitnessedBar-17-1-builder-return): this unit converts
   and registers `corpus-path-unresolved` (§4 "The dead-path registry", F9); checks 13 to 15 arm on a
   present home, unit 16's registration unchanged (F2); seeds spell `{prefix}`, which S9 resolves (F8).
+- rev-8 · 2026-11-19 · S1 · S3 · S4 · S8 · §4 The pins, The dead-path registry, Files touched · §5 ·
+  AC4 · AC10 · §8 F10 F11 · §10 · revised by brief 2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-fix-2-brief
+  over the second builder's divergence (2026-11-19-build-TOOL-dWitnessedBar-17-2-builder-return): a
+  fresh scaffold writes neither home of checks 13 to 15, each fixture writing either named in S4
+  (F11); `dossier-decisions-empty` seeds through `gen_map.py`, which every adopter holds, graded by
+  `ratchet (both ways)` (F10).
 
 ## 10. Reuse audit
 
@@ -604,8 +682,10 @@ The unbound seed asks the hygiene script through `tools/memory-tree/corpus_ids.p
 existing Python-to-shell seam (§8 F6). The pin readers re-pointed are
 `tools/memory-tree/corpus_ids.py#checks` and `#armed`, check 21
 (`tools/memory-tree/check-memory-hygiene.sh@2c0cb6f24513:1772-1792`),
-`tools/memory-tree/row_grammar.py#cmd_check` with `#pin_of` and `#_parse_shard_pins`, and
-`tools/codebase-map/test_codebase_map.py#test_dossier_decisions_are_declining`. S8's step program
+`tools/memory-tree/row_grammar.py#cmd_check` with `#pin_of` and `#_parse_shard_pins`; the
+empty-decisions measurement joins the mode group of `tools/codebase-map/gen_map.py#main`, the engine
+program already reading the map tree, and
+`tools/codebase-map/test_codebase_map.py#test_dossier_decisions_are_declining` is deleted (§8 F10). S8's step program
 follows `tools/govkit/steps/review_rounds.py`, the landed step that takes a conf key out, over
 `upgrade_steps.py`'s before-image helpers, minting no second step runner. The dead-path registry
 converts through unit 16's `tools/memory-tree/convert_registry.py#LEGACY` and
