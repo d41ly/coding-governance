@@ -15089,9 +15089,7 @@ memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-10.md	119 ro
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-12.md	64 bytes
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-19.md	122 legs
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-19.md	140 legs
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-19.md	142 rows
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-22.md	122 legs
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-22.md	142 legs
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-25.md	200 KB
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-25.md	60 lines
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-25.md	8192 bytes
