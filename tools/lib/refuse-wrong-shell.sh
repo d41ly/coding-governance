@@ -80,13 +80,15 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then
     --coverage:1)
       # S2 — each one the predicate selects, outside because a file it sources or is sourced by
       # refuses before its first call. `<path>|<reason>`; a row with no reason is refused, not honoured.
-      _rws_excl='tools/unattended/lib-unattended.sh|sourced by members, and each of its calls sits behind `declare -F resolve_python`
-tools/unattended/pass-tree.sh|sources tools/unattended/unattended.sh, an inline member that refuses as it is sourced, before its call
-tools/unattended/pass-tree.test.sh|sources tools/unattended/unattended.sh, an inline member that refuses as it is sourced, before its call'
       _rws_here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd) || exit 2
       _rws_lib=$(cd "$_rws_here" && unset GIT_DIR GIT_WORK_TREE && git rev-parse --show-prefix) \
         && _rws_root=$(cd "$_rws_here/$(cd "$_rws_here" && unset GIT_DIR GIT_WORK_TREE && git rev-parse --show-cdup)" && pwd) \
         || { echo "refuse_wrong_shell: --coverage: $_rws_here is not inside a git work tree" >&2; exit 2; }
+      # the exclusions sit under the install prefix this file derives, the kit named once (install-prefix)
+      _rws_ux="${_rws_lib%lib/}unattended"
+      _rws_excl="$_rws_ux/lib-unattended.sh|sourced by members, and each of its calls sits behind \`declare -F resolve_python\`
+$_rws_ux/pass-tree.sh|sources $_rws_ux/unattended.sh, an inline member that refuses as it is sourced, before its call
+$_rws_ux/pass-tree.test.sh|sources $_rws_ux/unattended.sh, an inline member that refuses as it is sourced, before its call"
       _rws_pop=$(derive_rws_population "$_rws_root" "${_rws_lib}resolve-python.sh")
       _rws_out=$(
         cd "$_rws_root" && unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE || exit 2
