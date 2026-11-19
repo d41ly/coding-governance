@@ -11,11 +11,14 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Built so far: unit 26 (`7526c98fa`) rewrote the `resolve_bash_py` block in `tools/lib/resolve_bash.py` to
   `scan_bash(script, host)` returning `(found, tried, refusal)` with `BASH_NAMES`, added the twin `scanBash` in
   `tools/lib/resolve_bash.js`, inlined both into every site behind adapters that keep their names, made govkit's
-  `resolve_shell_argv` raise `Refusal`, and widened `test_no_bare_bash_argv` through `scan_bare_bash` in
-  `tools/run-gates/measure_legs.py`. This unit adds the wrong-shell predicate's call into those two blocks (unit 26's
-  hands-off edge I7): read the blocks as unit 26 left them, not as the spec's base described them.
-- Unit 26's builder left one bug-class minor open for the close review: `scan_bare_bash` would hide the rest of a file
-  whose `resolve_bash_py` / `resolve_bash_js` block never closes. If your edits touch that scanner, do not widen it.
+  `resolve_shell_argv` raise `Refusal`, and widened `test_no_bare_bash_argv` through `scan_bare_bash`.
+- The spec is rev-5, re-grounded at the main loop over the first builder's divergence
+  (`build/2026-11-19-build-TOOL-dWitnessedBar-27-1-builder-return.md`): the new test section is `2n`, the population
+  is re-derived and re-pinned (PINNED in the spec), `tools/govkit/govkit.py` is off the resolver copies, the library
+  rule is §8 F3 (b) — `tools/lib/resolve-python.sh` carries neither block nor call, each sourcer sources
+  `refuse-wrong-shell.sh` beside it — and the help page is §8 F4 (b), a section in `help/python-floor.md`.
+- Unit 26's builder left one bug-class minor for the close review: `scan_bare_bash` hides the rest of a file whose
+  `resolve_bash_py` / `resolve_bash_js` block never closes. Do not widen that scanner here.
 - Every roster spec was re-grounded at `e4ac7c40c` so `check-spec-tokens.py --spec` admits it; the spec's base is still
   older than the run's `9e21ac76`. Verify each claim about current code against source before building on it, and hand
   a claim that no longer holds back as a divergence rather than building around it.
