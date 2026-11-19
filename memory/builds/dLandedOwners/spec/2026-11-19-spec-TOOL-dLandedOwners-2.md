@@ -1,6 +1,6 @@
 # TOOL-dLandedOwners-2 — the reader scan reads a key passed to a reader through a module constant
 
-**Status:** SPECCED · rev-1 · 2026-11-19 · node d · Tier-2 · base 51971579 · streams tooling · order 2
+**Status:** INPROGRESS · rev-2 · 2026-11-19 · node d · Tier-2 · base 51971579 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,9 @@
 |---|---|---|
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-brief.md) | research | TOOL-dLandedOwners-1 TOOL-dLandedOwners-3 |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-pinned-facts-fold.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-pinned-facts-fold.md) | research | TOOL-dLandedOwners-1 |
+| [2026-11-19-prompt-TOOL-dLandedOwners-2-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-2-1-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dLandedOwners-2-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-2-build-brief.md) | research | — |
+| [2026-11-19-prompt-TOOL-dLandedOwners-2-ledger-fold.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-2-ledger-fold.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -137,6 +140,9 @@ PINNED, measured 2026-11-19 at `9b58eeea`, whose code paths equal base `51971579
 - `tools/loop/budget.py`: `read_budget_value` only.
 - `help/policy.md`: the "A reader" and "What it does not see" bullets.
 - `tools/policy/README.md`: the call-shapes paragraph and the `arm_reader_coverage` paragraph.
+- `memory/builds/dLandedOwners/build/2026-11-19-build-TOOL-dLandedOwners-2-ledger.md`: the acceptance
+  ledger that answers AC1 to AC5 when this spec closes, in the grammar of memory hygiene's
+  "Acceptance ledger".
 
 ### Alternatives rejected
 
@@ -216,10 +222,11 @@ PINNED, measured 2026-11-19 at `9b58eeea`, whose code paths equal base `51971579
 
 ## 7. Gates
 
-`policy fixtures` · `scratch-guard self-test` · `routed-commits selftest` · `loop budget fixtures`
+`policy fixtures` · `scratch-guard self-test` · `routed-commits selftest` · `loop budget fixtures` · `recall floor` · `recall floor arms`
 
-The close runs these with the merge bar. This build's brief waives the policy kit's flagged bar,
-and the main loop decides at the close what that waiver reaches.
+`recall floor` and `recall floor arms` guard the build folder, where the acceptance ledger is
+written. The close runs these with the merge bar. This build's brief waives the policy kit's
+flagged bar, and the main loop decides at the close what that waiver reaches.
 
 New arm: tools/policy/check_policy.py RC_CASES reader-constant and constant-unread · covers AC4 · the new READER_SHAPES row deleted reds reader-constant, and MODULE_CONSTANT unanchored from column 0 reds constant-unread · none
 
@@ -233,6 +240,14 @@ none
 - rev-1 · 2026-11-19 · §4 · the writing-practice leg's pinned-facts reds over `c3f402ac1`, folded
   from 2026-11-19-prompt-TOOL-dLandedOwners-1-2-spec-writer: the probe's file count reads PINNED on
   each line that quotes it; no design change.
+- rev-2 · 2026-11-19 · §4 · §7 · the acceptance ledger unit 1's builder found missing from unit 1's
+  Files touched, folded from 2026-11-19-prompt-TOOL-dLandedOwners-2-ledger-fold, dispatched as
+  2026-11-19-prompt-TOOL-dLandedOwners-2-1-spec-writer. Files touched names the ledger, and §7 adds
+  `recall floor` and `recall floor arms`, the two legs that path trips. Unit 1's other findings do
+  not hold here: AC4's cases plant their files under the case's temporary directory, which the guard
+  trace never records, this unit adds no import, and AC4 names two case lines and counts none.
+  No `tools/policy/check_policy.py` citation is by line or blob, so `c5255c179` moved none; no
+  design change.
 
 ## 10. Reuse audit
 
