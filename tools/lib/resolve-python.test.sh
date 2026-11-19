@@ -479,7 +479,8 @@ legacy_ledger_py|$ROOT/$KIT_REL/legacy_ledger.py|$KIT_REL/legacy_ledger
 # copy, which the row-keyed merge driver reads a ledger's header through, and the gate-lint kit's copy,
 # which its two count-ratchet adapters read through. gate-lint requires no kit, so it also carries a
 # coverage_join.py shaped as memory-tree's, whose coverage_join, remote_ladder_py and compare_base_py
-# blocks the existing rows above find by their markers; part 2o below holds the canonical's CLI.
+# blocks the existing rows above find by their markers, and a resolve_kit_dir block beside the factory's,
+# through which `seed` finds the policy kit (TOOL-dWitnessedBar-15); part 2o below holds the canonical's CLI.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one
@@ -1067,8 +1068,8 @@ for (const line of require("fs").readFileSync(0, "utf8").split("\n").filter(Bool
 # tools/fx/kit.toml, `fx-keys` (key, declared-set, `ref` verbatim) in the fixture's govkit registry, and
 # `fx-recall` (key, append-only) in scripts/recall/kit.toml, outside the directory holding the other
 # kit. Then AC7: one byte changed in a scratch copy of the gate-lint copy reads as drift through `blk`.
-# WHAT THIS DOES NOT CHECK: a registration's `seed` argv, which the factory never runs; a ledger merge,
-# merge-rows.test.sh's group 1l; and AC8, the two scanners' own legs at the pass tip.
+# WHAT THIS DOES NOT CHECK: a ledger merge, merge-rows.test.sh's group 1l; and AC8, the two scanners'
+# own legs at the pass tip. A registration's `seed` argv is run by the seed cases at this part's end.
 T=$'\t'
 LL="$TMP/ll"; LLR="$LL/repo"; mkdir -p "$LL"
 build_ll_table() { # population key fields direction home [verbatim] -> one [[ledger]] table
@@ -1189,6 +1190,100 @@ sed 's/^KEY_KINDS = /KEY_KINDZ = /' "$ROOT/${PFX}$LL_GATE_LINT/legacy_ledger.py"
 { [ "$(blk legacy_ledger_py "$ROOT/${PFX}$LL_GATE_LINT/legacy_ledger.py")" = "$(blk legacy_ledger_py "$HERE/legacy_ledger.py")" ] \
   && [ "$(blk legacy_ledger_py "$TMP/ll-drift.py")" != "$(blk legacy_ledger_py "$HERE/legacy_ledger.py")" ]; } \
   || bad "2o AC7: the legacy_ledger_py cut did not hold the gate-lint copy identical, or missed one changed byte"; ok
+
+# ---- 2o, the seed (TOOL-dWitnessedBar-15 AC1 to AC6) ---------------------------------------------
+# The same fixture gains `fx-seed` (key `name`, shrink-only, home in memory/project/), whose seed argv
+# prints one `<key> TAB 1` row per word of seed-keys.txt and fails or reports a dead probe on a mode
+# file, and `q`, whose `seed = []`. The argv names this host's interpreter by `sys.executable`, in a TOML
+# literal string so a Windows path's backslashes stay. The policy cases land their policy file on the
+# remote's main, which the reader takes, and run last. WHAT THIS DOES NOT CHECK: the 600 s bound, since
+# no seed here hangs; a killed run, beyond `write_rows`' temp file and `os.replace`.
+run_ll_reset
+LL_EXE=$("$REALPY" -c 'import sys; print(sys.executable)' | tr -d '\r')
+cat > "$LLR/fxseed.py" <<'PY'
+import pathlib, sys
+mode = pathlib.Path("seed-mode.txt")
+said = mode.read_text().strip() if mode.exists() else ""
+if said == "fail":
+    sys.exit(1)
+if said == "dead":
+    print("dead probe: no files")
+    sys.exit(0)
+for word in pathlib.Path("seed-keys.txt").read_text().split():
+    print(word + "\t1")
+PY
+build_ll_seeded() { # population home seed-literal -> one [[ledger]] table with a seed argv
+  printf '[[ledger]]\npopulation = "%s"\nleg = "fx leg"\nseed = %s\nkey = "key"\nfields = ["name"]\ndrain = "none"\ndirection = "shrink-only"\nhome = "%s"\n\n' "$1" "$3" "$2"
+}
+LL_SEEDARGV="['$LL_EXE', 'fxseed.py']"
+{ build_ll_seeded fx-seed memory/project/fx-seed.txt "$LL_SEEDARGV"; build_ll_seeded q memory/project/q.txt '[]'; } >> "$LLR/tools/fx/kit.toml"
+printf 'a\nb\n' > "$LLR/seed-keys.txt"
+ll_commit() { git -C "$LLR" add -A && git -C "$LLR" -c user.email=t@e -c user.name=t commit -q --no-verify -m "$1"; }
+ll_commit "seed fixture" || bad "2o seed: the seed fixture could not be committed"; ok
+LL_SEEDED="$LLR/memory/project/fx-seed.txt"
+ll_head=$(git -C "$LLR" rev-parse HEAD)
+# AC1 — a first seed writes the header and both rows, each with HEAD's sha and `seeded`.
+out=$(run_ll seed --population fx-seed)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed fx-seed 2" <<<"$out" \
+  && [ "$(head -1 "$LL_SEEDED")" = "$(build_ll_ledger fx-seed key name shrink-only)" ] \
+  && grep -qxF "a${T}1${T}${ll_head}${T}seeded" "$LL_SEEDED" && grep -qxF "b${T}1${T}${ll_head}${T}seeded" "$LL_SEEDED"; } \
+  || bad "2o seed AC1: a first seed did not print armed fx-seed 2 and write two rows stamped $ll_head seeded: ${out//$'\n'/ | }"; ok
+ll_commit "seeded" || bad "2o seed: the seeded home could not be committed"; ok
+# AC2 — an offence the seed would now measure, committed: a rerun leaves the armed home byte-identical.
+cp "$LL_SEEDED" "$LL/fx-seed.before"
+printf 'a\nb\nc\n' > "$LLR/seed-keys.txt"; ll_commit "planted c" || bad "2o seed: the planted key could not be committed"; ok
+ll_head2=$(git -C "$LLR" rev-parse HEAD)
+out=$(run_ll seed --population fx-seed)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "present fx-seed" <<<"$out" && cmp -s "$LL/fx-seed.before" "$LL_SEEDED"; } \
+  || bad "2o seed AC2: a rerun over an armed home re-seeded it, laundering the planted key: ${out//$'\n'/ | }"; ok
+# AC3 — widened: only the key the home lacks is added, stamped with the new sha and widened:R1.
+out=$(run_ll seed --population fx-seed --widen R1)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "widened fx-seed c" <<<"$out" \
+  && head -3 "$LL_SEEDED" | cmp -s - "$LL/fx-seed.before" \
+  && grep -qxF "c${T}1${T}${ll_head2}${T}widened:R1" "$LL_SEEDED" && [ "$(wc -l < "$LL_SEEDED")" -eq 4 ]; } \
+  || bad "2o seed AC3: --widen R1 did not add c alone, stamped $ll_head2 widened:R1, with the first rows unchanged: ${out//$'\n'/ | }"; ok
+run_ll_reset
+# AC4 — a seed that exits 1, then one reporting a dead probe: the home holds the header and one unarmed
+# line and no row; with the seed repaired, a rerun arms it.
+rm -f "$LL_SEEDED"; printf 'fail\n' > "$LLR/seed-mode.txt"
+out=$(run_ll seed --population fx-seed)
+{ [ "${out##*$'\n'}" = rc=1 ] && grep -qxF "unarmed fx-seed exit 1" <<<"$out" && [ "$(wc -l < "$LL_SEEDED")" -eq 2 ] \
+  && grep -qxF "# unarmed · exit 1 · $ll_head2" "$LL_SEEDED" && ! grep -q "$T" "$LL_SEEDED"; } \
+  || bad "2o seed AC4: a seed exiting 1 did not leave the header and one unarmed line: ${out//$'\n'/ | }"; ok
+printf 'dead\n' > "$LLR/seed-mode.txt"
+out=$(run_ll seed --population fx-seed)
+{ [ "${out##*$'\n'}" = rc=1 ] && grep -qxF "unarmed fx-seed dead probe" <<<"$out" \
+  && grep -qxF "# unarmed · dead probe · $ll_head2" "$LL_SEEDED" && ! grep -q "$T" "$LL_SEEDED"; } \
+  || bad "2o seed AC4: a seed reporting a dead probe read armed or left rows: ${out//$'\n'/ | }"; ok
+rm -f "$LLR/seed-mode.txt"
+out=$(run_ll seed --population fx-seed)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed fx-seed 3" <<<"$out" && ! grep -q '^# unarmed' "$LL_SEEDED"; } \
+  || bad "2o seed AC4: the repaired seed did not re-arm the unarmed home: ${out//$'\n'/ | }"; ok
+run_ll_reset
+# AC5 — a home in a directory that holds no tracked file is never written.
+mkdir -p "$LLR/nodir"; build_ll_seeded fx-nodir nodir/fx-nodir.txt "$LL_SEEDARGV" >> "$LLR/tools/fx/kit.toml"
+out=$(run_ll seed --population fx-nodir)
+{ [ "${out##*$'\n'}" = rc=1 ] && grep -q "^unarmed fx-nodir home directory nodir holds no tracked file" <<<"$out" \
+  && [ ! -e "$LLR/nodir/fx-nodir.txt" ]; } \
+  || bad "2o seed AC5: a home in an unadmitted directory was written or read armed: ${out//$'\n'/ | }"; ok
+run_ll_reset
+# AC6 — `seed = []` under the default, under a landed `refuse`, and with no policy kit resolving.
+out=$(run_ll seed --all)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "unarmed q no seed" <<<"$out" && grep -qxF "present fx-seed" <<<"$out"; } \
+  || bad "2o seed AC6: seed --all did not print unarmed q no seed and exit 0: ${out//$'\n'/ | }"; ok
+mkdir -p "$LLR/.governance"; printf '[retrofit]\nunseeded = "refuse"\n' > "$LLR/.governance/policy.toml"
+{ ll_commit "refuse" && git -C "$LLR" push -q origin HEAD:main 2>/dev/null && git -C "$LLR" fetch -q origin; } \
+  || bad "2o seed AC6: the refuse policy could not be landed on the fixture's remote"; ok
+out=$(run_ll seed --all)
+{ [ "${out##*$'\n'}" = rc=2 ] && grep -q "retrofit.unseeded is refuse.*: .*\bq\b" <<<"$out" && ! grep -q '^armed\|^present' <<<"$out"; } \
+  || bad "2o seed AC6: retrofit.unseeded = refuse let a seed = [] registration through: ${out//$'\n'/ | }"; ok
+mkdir -p "$LL/nokit/lib"; cp "$HERE"/*.py "$HERE"/*.txt "$LL/nokit/lib/" 2>/dev/null
+out=$( (cd "$LLR" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$REALPY" -B "$LL/nokit/lib/legacy_ledger.py" seed --population q) 2>"$LL/nokit.err" | tr -d '\r'; echo "rc=${PIPESTATUS[0]}")
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "unarmed q no seed" <<<"$out" \
+  && [ "$(grep -c 'retrofit.unseeded' "$LL/nokit.err")" = 1 ] && grep -q 'no policy kit' "$LL/nokit.err"; } \
+  || bad "2o seed AC6: with no policy kit the read was not the default with one stderr line naming retrofit.unseeded: ${out//$'\n'/ | } / $(tr '\n' ' ' < "$LL/nokit.err")"; ok
+[ "$(grep -c 'retrofit\.unseeded' "$ROOT/help/policy.md")" = 1 ] \
+  || bad "2o seed AC6: help/policy.md does not name retrofit.unseeded on one line of its consumer list"; ok
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver

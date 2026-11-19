@@ -6,7 +6,7 @@ Run from the ADOPTING repo's root (`<kit>` is this kit's install prefix; --help 
     python <kit>/gen_map.py --write           # (re)render generated/ to disk
     python <kit>/gen_map.py --check           # byte-compare (LF-normalized); exit 1
     python <kit>/gen_map.py --seed-baseline   # rewrite baseline.toml from unclaimed
-    python <kit>/gen_map.py --seed-affordance-baseline  # grace today's dossiers (adopt)
+    python <kit>/gen_map.py --seed-affordance-baseline [--out <path>]  # grace today's dossiers (adopt)
     python <kit>/gen_map.py --seed-affordances --top 10 # worklist: undeclared hot seams
 
 Requires a filled <kit>/map_extractors.py (the template refuses an empty EXTRACTORS).
@@ -167,13 +167,15 @@ def _seed_baseline() -> None:
     print(f"baseline: {sum(len(v) for v in cov.unclaimed.values())} unclaimed keys")
 
 
-def _seed_affordance_baseline() -> None:
+def _seed_affordance_baseline(out: str | None = None) -> None:
     """Seed affordance-exempt.toml from the EXISTING dossiers lacking the `## Reuse affordance`
     section — the mirror of --seed-baseline. Makes adoption/re-adoption green by construction:
     today's dossiers are graced, new ones are not. Shrink-only thereafter (never adds a dossier
-    that has the section — it's not an offender)."""
+    that has the section — it's not an offender). With `out`, the path the ledger factory's
+    `seed --home` hands it, the list is written there instead: that factory has already found the
+    home absent or unarmed, and moves the file into place only when this run is live."""
     exempt_path = m.map_root() / "affordance-exempt.toml"
-    if exempt_path.exists():
+    if out is None and exempt_path.exists():
         print(
             f"affordance-exempt.toml already seeded ({exempt_path}) - refusing to re-seed. "
             "Re-seeding would re-grace section-less dossiers added since adoption (masking real "
@@ -184,7 +186,7 @@ def _seed_affordance_baseline() -> None:
     features_dir = m.map_root() / "features"
     texts = {d.feature: (features_dir / f"{d.feature}.md").read_text(encoding="utf-8") for d in tree.dossiers}
     exempt = m.affordance_offenders(texts, frozenset())  # every dossier without a block → graced
-    _write(m.map_root() / "affordance-exempt.toml", m.render_affordance_exempt(exempt))
+    _write(Path(out) if out is not None else exempt_path, m.render_affordance_exempt(exempt))
     print(f"affordance-exempt: {len(exempt)} dossier(s) graced")
 
 
@@ -216,7 +218,11 @@ def main() -> int:
                  "--seed-affordance-baseline", "--seed-affordances"):
         mode.add_argument(flag, action="store_true")
     parser.add_argument("--top", type=int, default=10, help="--seed-affordances: worklist size (default 10)")
+    parser.add_argument("--out", help="--seed-affordance-baseline: write the list here, the path "
+                        "legacy_ledger.py seed --home hands it")
     args = parser.parse_args()
+    if args.out is not None and not args.seed_affordance_baseline:
+        parser.error("--out goes with --seed-affordance-baseline only")
 
     if args.scaffold:
         map_dir = m.map_root()
@@ -256,7 +262,7 @@ def main() -> int:
         return 0
 
     if args.seed_affordance_baseline:
-        _seed_affordance_baseline()
+        _seed_affordance_baseline(args.out)
         return 0
 
     if args.seed_affordances:

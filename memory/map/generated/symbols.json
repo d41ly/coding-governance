@@ -3358,6 +3358,11 @@
       "file": "tools/lib/resolve-python.test.sh"
     },
     {
+      "id": "build_ll_seeded",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
       "id": "build_ll_table",
       "kind": "function",
       "file": "tools/lib/resolve-python.test.sh"
@@ -6479,6 +6484,21 @@
     },
     {
       "id": "check_home",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
+    },
+    {
+      "id": "check_home_admitted",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "check_home_admitted",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "check_home_admitted",
       "kind": "function",
       "file": "tools/memory-tree/legacy_ledger.py"
     },
@@ -14918,6 +14938,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "ll_commit",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
       "id": "lmland",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -20683,6 +20708,21 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_home_state",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "read_home_state",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "read_home_state",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
+    },
+    {
       "id": "read_hook_const",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -22731,6 +22771,21 @@
       "id": "read_section_rows",
       "kind": "function",
       "file": "tools/playbook/positional.py"
+    },
+    {
+      "id": "read_seed_policy",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "read_seed_policy",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "read_seed_policy",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
     },
     {
       "id": "read_serves_ids",
@@ -27475,6 +27530,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/govkit/govkit.py"
     },
     {
@@ -31523,6 +31583,36 @@
       "file": "tools/playbook/positional.py"
     },
     {
+      "id": "run_seed_argv",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "run_seed_argv",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "run_seed_argv",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
+    },
+    {
+      "id": "run_seed_cli",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "run_seed_cli",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "run_seed_cli",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
+    },
+    {
       "id": "run_select",
       "kind": "function",
       "file": "tools/loop/scenario.py"
@@ -33378,6 +33468,21 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "seed_home",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "seed_home",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "seed_home",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
+    },
+    {
       "id": "seed_hostile_env",
       "kind": "function",
       "file": "tools/run-gates/check-receipt.py"
@@ -33431,6 +33536,21 @@
       "id": "seed_no_empty",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "seed_population",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "seed_population",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "seed_population",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
     },
     {
       "id": "seed_publish",

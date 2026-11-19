@@ -343,13 +343,22 @@ else
   "$PY" "$HERE/gen_map.py" --scaffold || exit 1
 fi
 
-# Seed the affordance grace list ONCE (seed-if-absent): a fresh scaffold gets `exempt = []`; a repo
-# re-adopting from a pre-affordance kit version gets its existing dossiers graced — green by
-# construction either way. NOT re-seeded when present: the list is shrink-only, so re-seeding a
-# repo with a real (non-exempt) violation would mask it.
-if [ ! -f "${MAP_ROOT:-memory/map}/affordance-exempt.toml" ]; then
-  "$PY" "$HERE/gen_map.py" --seed-affordance-baseline || exit 1
-fi
+# Seed the affordance grace list ONCE: a fresh scaffold gets `exempt = []`; a repo re-adopting from a
+# pre-affordance kit version gets its existing dossiers graced — green by construction either way.
+# NOT re-seeded when present: the list is shrink-only, so re-seeding a repo with a real (non-exempt)
+# violation would mask it. The absent-only test is the ledger factory's unregistered form
+# (TOOL-dWitnessedBar-15 S5), run from the memory-tree kit's copy, found through this kit's own
+# MEMORY_TREE_DIR: it seeds only an absent or unarmed home, atomically, and prints `present` otherwise.
+LL_DIR=$("$PY" -c 'import sys
+sys.path.insert(0, sys.argv[1])
+try:
+    import map_lib
+except Exception as exc:
+    sys.exit(str(exc))
+print(map_lib.MEMORY_TREE_DIR.as_posix())' "$HERE" 2>&1) || { echo "codebase-map: the memory-tree kit's legacy_ledger.py was not found: $LL_DIR"; exit 2; }
+[ -f "$LL_DIR/legacy_ledger.py" ] || { echo "codebase-map: no legacy_ledger.py in the memory-tree kit at $LL_DIR, so the affordance list cannot be seeded"; exit 2; }
+"$PY" "$LL_DIR/legacy_ledger.py" seed --home "${MAP_ROOT:-memory/map}/affordance-exempt.toml" \
+  -- "$PY" "$HERE/gen_map.py" --seed-affordance-baseline --out '{out}' || exit 1
 
 GATE="${GATE_FILE:-tests/test_codebase_map.py}"
 if [ -f "$GATE" ]; then
