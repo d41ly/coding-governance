@@ -88,3 +88,14 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-19T07:10:03Z dispatch · item 045405ff TOOL-dWitnessedBar-50 · reason tools/lib/refuse-wrong-shell.sh tools/lib/resolve-python.test.sh .githooks/pre-commit .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-50-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-50.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
 
 2026-11-19T07:36:40Z brief · item TOOL-dWitnessedBar-15 · reason 974c2cd6a53d memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-15-build-brief.md
+
+2026-11-19T07:40:03Z dispatch · item 05245bf0 TOOL-dWitnessedBar-15 · reason tools/lib/legacy_ledger.py tools/memory-tree/legacy_ledger.py tools/gate-lint/legacy_ledger.py tools/lib/resolve-python.test.sh tools/codebase-map/adopt-codebase-map.sh tools/codebase-map/gen_map.py tools/codebase-map/adopt-codebase-map.test.sh tools/drift-audit/adopt-drift-audit.sh tools/loop/loop.toml tools/codebase-map/README.md help/policy.md .lexicon.conf memory/builds/dDeclaredLoop/BACKLOG.md memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-15-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-15.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+2026-11-19T07:45:43Z draw · re-dispatch · TOOL-dWitnessedBar-15 · 8/180 · 20261119T074543Z-a74084
+
+2026-11-19T07:45:43Z dispatch · item 05245bf0 TOOL-dWitnessedBar-15 · reason tools/drift-audit/README.md
+2026-11-19T07:56:37Z draw · re-dispatch · TOOL-dWitnessedBar-15 · 9/180 · 20261119T075637Z-8c2396
+
+2026-11-19T07:56:37Z dispatch · item 05245bf0 TOOL-dWitnessedBar-15 · reason memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-15-deviation-154.md memory/builds/dDeclaredLoop/README.md
+2026-11-19T08:01:04Z draw · re-dispatch · TOOL-dWitnessedBar-15 · 10/180 · 20261119T080104Z-778b56
+
+2026-11-19T08:01:04Z dispatch · item 05245bf0 TOOL-dWitnessedBar-15 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
