@@ -512,16 +512,20 @@ done <<<"$PARITY_ROWS"
 # over sets re-derived at every run from the tracked shell files outside the memory tree, each break
 # naming its file: (1) every inline member, a `# >>> resolve_python` carrier less the library, carries
 # the block and a `refuse_wrong_shell || exit 2` line outside it; (2) every carrier of the block, less
-# its canonical, is an inline member; (3) every file sourcing `refuse-wrong-shell.sh` carries the line;
-# (4) every file carrying the line carries the block or that source, and the library carries neither.
-# Each of the four sets must be non-empty, so an empty population reds. WHAT THIS DOES NOT CHECK: that a
-# file sourcing `resolve-python.sh` through a path it derives sources `refuse-wrong-shell.sh` at all,
-# TOOL-dWitnessedBar-50's predicate; the call's text order against `resolve_python`,
-# TOOL-dWitnessedBar-51's; and a fixture's copy set.
+# its canonical, is a member of the population `derive_rws_population` derives (TOOL-dWitnessedBar-50
+# S1), so the commit hook's inline block, which sits beside no resolve_python block, is admitted;
+# (3) every file sourcing `refuse-wrong-shell.sh` carries the line; (4) every file carrying the line
+# carries the block or that source, and the library carries neither. Each of the five sets must be
+# non-empty, so an empty population reds. Then `refuse-wrong-shell.sh --coverage` holds that derived
+# population, a file sourcing `resolve-python.sh` through a path it derives included, to the block or
+# the source and the call, less its named exclusions, each of which must carry its reason. WHAT THIS
+# DOES NOT CHECK: the call's text order against `resolve_python`, TOOL-dWitnessedBar-51's; that a named
+# exclusion is still selected by the predicate; and a fixture's copy set.
 scan_rws_coverage() {  # <repo root> <library rel> <canonical rel> -> one line per break, then the counts
   local root=$1 lib=$2 rws=$3 f
-  local -A inl=() blk=() src=() call=()
+  local -A inl=() blk=() src=() call=() pop=()
   local ps=('*.sh' '.githooks/*' ':!memory/')
+  while IFS= read -r f; do [ -n "$f" ] && pop[$f]=1; done < <(derive_rws_population "$root" "$lib")
   while IFS= read -r f; do [ -n "$f" ] && [ "$f" != "$lib" ] && inl[$f]=1; done \
     < <(cd "$root" && git grep -l '^# >>> resolve_python' -- "${ps[@]}")
   while IFS= read -r f; do [ -n "$f" ] && [ "$f" != "$rws" ] && blk[$f]=1; done \
@@ -535,7 +539,7 @@ scan_rws_coverage() {  # <repo root> <library rel> <canonical rel> -> one line p
     [ -n "${call[$f]:-}" ] || echo "(1) $f resolves python and never calls refuse_wrong_shell || exit 2"
   done
   for f in "${!blk[@]}"; do
-    [ -n "${inl[$f]:-}" ] || echo "(2) $f carries a refuse_wrong_shell block and no resolve_python block"
+    [ -n "${pop[$f]:-}" ] || echo "(2) $f carries a refuse_wrong_shell block and is no member of the derived population"
   done
   for f in "${!src[@]}"; do
     [ -n "${call[$f]:-}" ] || echo "(3) $f sources refuse-wrong-shell.sh and never calls refuse_wrong_shell || exit 2"
@@ -546,15 +550,19 @@ scan_rws_coverage() {  # <repo root> <library rel> <canonical rel> -> one line p
   done
   [ -z "$(cd "$root" && git grep -l -e '^# >>> refuse_wrong_shell' -e 'refuse_wrong_shell || exit 2' -- "$lib")" ] \
     || echo "(4) $lib, only ever sourced, carries the refuse_wrong_shell block or its call"
-  echo "counts ${#inl[@]} ${#blk[@]} ${#src[@]} ${#call[@]}"
+  echo "counts ${#inl[@]} ${#blk[@]} ${#src[@]} ${#call[@]} ${#pop[@]}"
 }
 rws_out=$(scan_rws_coverage "$ROOT" "$KIT_REL/resolve-python.sh" "$KIT_REL/refuse-wrong-shell.sh")
-read -r _ rws_ni rws_nb rws_ns rws_nc <<<"$(tail -n 1 <<<"$rws_out")"
-echo "resolve-python.test: refuse_wrong_shell coverage over $rws_ni inline members"
-{ [ "${rws_ni:-0}" -gt 0 ] && [ "${rws_nb:-0}" -gt 0 ] && [ "${rws_ns:-0}" -gt 0 ] && [ "${rws_nc:-0}" -gt 0 ]; } \
-  || bad "the refuse_wrong_shell coverage judged an empty set (inline, block, source, call): ${rws_ni:-} ${rws_nb:-} ${rws_ns:-} ${rws_nc:-}"; ok
+read -r _ rws_ni rws_nb rws_ns rws_nc rws_np <<<"$(tail -n 1 <<<"$rws_out")"
+echo "resolve-python.test: refuse_wrong_shell coverage over $rws_ni inline members, $rws_np derived"
+{ [ "${rws_ni:-0}" -gt 0 ] && [ "${rws_nb:-0}" -gt 0 ] && [ "${rws_ns:-0}" -gt 0 ] && [ "${rws_nc:-0}" -gt 0 ] && [ "${rws_np:-0}" -gt 0 ]; } \
+  || bad "the refuse_wrong_shell coverage judged an empty set (inline, block, source, call, derived): ${rws_ni:-} ${rws_nb:-} ${rws_ns:-} ${rws_nc:-} ${rws_np:-}"; ok
 rws_breaks=$(sed '$d' <<<"$rws_out" | sort)
 [ -z "$rws_breaks" ] || bad "the refuse_wrong_shell coverage broke:${rws_breaks//$'\n'/; }"; ok
+rws_cov=$(bash "$HERE/refuse-wrong-shell.sh" --coverage 2>&1) \
+  || bad "refuse-wrong-shell.sh --coverage broke over the derived population:${rws_cov//$'\n'/; }"; ok
+grep -q '^refuse_wrong_shell coverage: [1-9][0-9]* members' <<<"$rws_cov" \
+  || bad "refuse-wrong-shell.sh --coverage printed no non-zero member count: ${rws_cov%%$'\n'*}"; ok
 
 # ---- 2b. THE {prefix} CONTRACT, BEHAVIOUR ---------------------------------------------------------
 # Parity holds each copy to its canonical; this holds the two canonicals to ONE answer. Both run over

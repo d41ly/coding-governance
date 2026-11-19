@@ -24,8 +24,21 @@
 #
 #   bash <prefix>/lib/refuse-wrong-shell.sh                  # judges this file's own location
 #   bash <prefix>/lib/refuse-wrong-shell.sh --probe <path>   # judges <path>, an absolute path
+#   bash <prefix>/lib/refuse-wrong-shell.sh --coverage       # holds the derived population to the refusal
 #
-#   Exit 0 clean · 2 with the refusal on stderr, or a wrong invocation.
+#   Exit 0 clean · 1 a coverage break, each naming its file · 2 with the refusal on stderr, or a wrong
+#   invocation.
+#
+# THE POPULATION IS A PREDICATE, NEVER A LIST (TOOL-dWitnessedBar-50 S1): every tracked shell file under
+# tools/, skills/ and .githooks/ (one named *.sh, or whose first line is a bash or sh shebang) that
+# carries a `# >>> resolve_python` block or calls resolve_python at command position (opening a command
+# substitution, or beginning a line) outside such a block; resolve-python.sh itself is outside it.
+# A typed list missed .githooks/pre-commit, which sources the resolver from a path it derives at run
+# time. `--coverage` derives it, prints its count and each named exclusion with its reason, and exits 1
+# naming each member that neither carries this block nor sources this file, or never calls
+# `refuse_wrong_shell || exit 2`, and each exclusion written without a reason. WHAT IT DOES NOT CHECK:
+# that the call precedes the member's first resolve_python call (TOOL-dWitnessedBar-51), and that a
+# named exclusion is still selected by the predicate.
 
 # >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
 wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
@@ -45,9 +58,69 @@ refuse_wrong_shell() {
 }
 # <<< refuse_wrong_shell
 
+derive_rws_population() {  # <repo root> <resolve-python.sh rel> -> one member path per line (S1)
+  (cd "$1" && unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE && git ls-files -- tools skills .githooks) | (cd "$1" && awk '
+    {
+      f = $0; first = 1; b = 0; c = 0; i = 0
+      while ((getline l < f) > 0) {
+        if (first) { first = 0; if (f !~ /\.sh$/ && l !~ /^#!.*[^A-Za-z0-9_](ba)?sh([^A-Za-z0-9_]|$)/) break }
+        sub(/\r$/, "", l)
+        if (l ~ /^# >>> resolve_python/) { b = 1; i = 1; continue }
+        if (l ~ /^# <<< resolve_python/) { i = 0; continue }
+        if (!i && (l ~ /\$\(resolve_python/ || l ~ /^resolve_python([ \t;|&]|$)/)) c = 1
+      }
+      close(f)
+      if ((b || c) && f != canon) print f
+    }' canon="$2")
+}
+
 if [ "${BASH_SOURCE[0]}" = "$0" ]; then
   case "${1:-}:$#" in
     :0) refuse_wrong_shell || exit 2 ;;
+    --coverage:1)
+      # S2 — each one the predicate selects, outside because a file it sources or is sourced by
+      # refuses before its first call. `<path>|<reason>`; a row with no reason is refused, not honoured.
+      _rws_excl='tools/unattended/lib-unattended.sh|sourced by members, and each of its calls sits behind `declare -F resolve_python`
+tools/unattended/pass-tree.sh|sources tools/unattended/unattended.sh, an inline member that refuses as it is sourced, before its call
+tools/unattended/pass-tree.test.sh|sources tools/unattended/unattended.sh, an inline member that refuses as it is sourced, before its call'
+      _rws_here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd) || exit 2
+      _rws_lib=$(cd "$_rws_here" && unset GIT_DIR GIT_WORK_TREE && git rev-parse --show-prefix) \
+        && _rws_root=$(cd "$_rws_here/$(cd "$_rws_here" && unset GIT_DIR GIT_WORK_TREE && git rev-parse --show-cdup)" && pwd) \
+        || { echo "refuse_wrong_shell: --coverage: $_rws_here is not inside a git work tree" >&2; exit 2; }
+      _rws_pop=$(derive_rws_population "$_rws_root" "${_rws_lib}resolve-python.sh")
+      _rws_out=$(
+        cd "$_rws_root" && unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE || exit 2
+        { printf '%s\n' "$_rws_excl" | sed 's/^/x /'
+          printf '%s\n' "$_rws_pop" | sed 's/^/m /'
+          git grep -l '^# >>> refuse_wrong_shell' -- tools skills .githooks | sed 's/^/b /'
+          git grep -l -E '^[[:space:]]*(\.|source)[[:space:]]+[^[:space:]]*refuse-wrong-shell\.sh' -- tools skills .githooks | sed 's/^/s /'
+          git grep -l -E '^[[:space:]]*refuse_wrong_shell \|\| exit 2[[:space:]]*$' -- tools skills .githooks | sed 's/^/c /'
+        } | awk '
+          { t = substr($0, 1, 1); k = substr($0, 3); if (k == "") next }
+          t == "x" { p = k; r = ""; if (index(k, "|")) { p = substr(k, 1, index(k, "|") - 1); r = substr(k, index(k, "|") + 1) }
+                     if (r ~ /^[ \t]*$/) bad[++nb] = "exclusion " p " carries no reason, so it is refused"
+                     else { ex[p] = r; xo[++nx] = p }
+                     next }
+          t == "m" { m[++nm] = k; next }
+          { s[t, k] = 1 }
+          END {
+            for (j = 1; j <= nm; j++) {
+              f = m[j]
+              if (f in ex) continue
+              n++
+              if (!s["b", f] && !s["s", f]) bad[++nb] = f " neither carries the refuse_wrong_shell block nor sources refuse-wrong-shell.sh"
+              if (!s["c", f]) bad[++nb] = f " never calls refuse_wrong_shell || exit 2"
+            }
+            print "refuse_wrong_shell coverage: " (n + 0) " members, derived from " (nm + 0) " files the predicate selects less " (nx + 0) " named exclusions"
+            for (j = 1; j <= nx; j++) print "  excluded: " xo[j] " (" ex[xo[j]] ")"
+            if (n + 0 == 0) bad[++nb] = "the predicate derived an empty population, which judges nothing"
+            for (j = 1; j <= nb; j++) print "BREAK " bad[j]
+            exit (nb > 0)
+          }'
+      ) && { printf '%s\n' "$_rws_out"; exit 0; }
+      printf '%s\n' "$_rws_out"
+      exit 1
+      ;;
     --probe:2)
       _rws_wsl=0
       { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
@@ -56,7 +129,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then
       echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
       exit 2
       ;;
-    *) echo "usage: bash refuse-wrong-shell.sh [--probe <abs path>]" >&2; exit 2 ;;
+    *) echo "usage: bash refuse-wrong-shell.sh [--probe <abs path> | --coverage]" >&2; exit 2 ;;
   esac
   exit 0
 fi

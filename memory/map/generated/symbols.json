@@ -12483,6 +12483,11 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "derive_rws_population",
+      "kind": "function",
+      "file": "tools/lib/refuse-wrong-shell.sh"
+    },
+    {
       "id": "derive_schema",
       "kind": "function",
       "file": "tools/playbook/fixtures/row_kind.py"
