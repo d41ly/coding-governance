@@ -394,7 +394,7 @@ this landing by the README's self-test waiver rule, its clean reading owed with 
 - rev-5 · 2026-11-19 · §7 · AC1 · the leg line gains `scratch-guard self-test`, `routed-commits selftest`,
   `tier2-review self-test` and `policy fixtures`, whose manifest guards hold the §4 paths
   `tools/unattended/unattended.sh`, `tools/policy/legacy-homes.txt` and `tools/govkit/govkit.py`; and AC1,
-  run from the root, sources the new library through `$KITDIR` as `run-gates.sh:5097` sources its own, in
+  run from the root, sources the new library through `$KITDIR` as `tools/run-gates/run-gates.sh@7c21a741:5097` sources its own, in
   place of the bare name, which resolved against the working directory; per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief; nothing else moved.
 

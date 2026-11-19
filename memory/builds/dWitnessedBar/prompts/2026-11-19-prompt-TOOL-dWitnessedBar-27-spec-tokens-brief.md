@@ -32,42 +32,42 @@ Revise each spec named below in place, as a rev bump with one revision-log line 
 2. Change nothing else. Each status header keeps its status (`DEFERRED`); bump only the rev. The write grant is this batch's spec files alone, each `memory/builds/dWitnessedBar/spec/2026-10-25-spec-<id>.md`: TOOL-dWitnessedBar-27, TOOL-dWitnessedBar-48, TOOL-dWitnessedBar-49, TOOL-dWitnessedBar-50, TOOL-dWitnessedBar-12, TOOL-dWitnessedBar-22, TOOL-dWitnessedBar-19, TOOL-dWitnessedBar-11, TOOL-dWitnessedBar-14, TOOL-dWitnessedBar-16, TOOL-dWitnessedBar-46, TOOL-dWitnessedBar-54.
 3. The specs and their hits:
    - `TOOL-dWitnessedBar-27` (order 2):
-     - [guards] `routed-commits selftest <- tools/policy/check_policy.py` — §4 files-touched names tools/policy/check_policy.py, which trips the guard of leg 'routed-commits selftest', absent from the §7 leg line
-     - [guards] `branch-guard self-test <- tools/memory-tree/check-memory-hygiene.sh` — §4 files-touched names tools/memory-tree/check-memory-hygiene.sh, which trips the guard of leg 'branch-guard self-test', absent from the §7 leg line
-     - [guards] `playbook render selftest <- tools/memory-tree/corpus_ids.py` — §4 files-touched names tools/memory-tree/corpus_ids.py, which trips the guard of leg 'playbook render selftest', absent from the §7 leg line
-     - [guards] `policy fixtures <- tools/govkit/govkit.py` — §4 files-touched names tools/govkit/govkit.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `routed-commits selftest <- tools/policy/check_policy.py` — the Files touched list names tools/policy/check_policy.py, which trips the guard of leg 'routed-commits selftest', absent from the §7 leg line
+     - [guards] `branch-guard self-test <- tools/memory-tree/check-memory-hygiene.sh` — the Files touched list names tools/memory-tree/check-memory-hygiene.sh, which trips the guard of leg 'branch-guard self-test', absent from the §7 leg line
+     - [guards] `playbook render selftest <- tools/memory-tree/corpus_ids.py` — the Files touched list names tools/memory-tree/corpus_ids.py, which trips the guard of leg 'playbook render selftest', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/govkit/govkit.py` — the Files touched list names tools/govkit/govkit.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-48` (order 2):
-     - [bar] `python measure_legs.py --selftest` — a bar or suite is not an acceptance observation: observe the checker on a staged break, a --selftest flag or a fixture; name the suite under New arm:; the bar and the suites run once, after the build is complete; this spells the manifest leg `measure-legs selftest`, a suite by its declared ceiling of 500 s
-     - [guards] `policy fixtures <- tools/memory-tree/row_grammar.py` — §4 files-touched names tools/memory-tree/row_grammar.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [bar] `python measure_legs.py --selftest` — a bar or suite is not an acceptance observation: observe the checker on a staged break, a --selftest flag or a fixture; name the suite under New arm:; the bar and the suites run once, after the build is complete; this spells the manifest leg `measure-legs selftest`, a suite by its declared ceiling of 500 s (PINNED, tools/gate-legs.json)
+     - [guards] `policy fixtures <- tools/memory-tree/row_grammar.py` — the Files touched list names tools/memory-tree/row_grammar.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-49` (order 2):
-     - [bar] `python measure_legs.py --selftest` — a bar or suite is not an acceptance observation: observe the checker on a staged break, a --selftest flag or a fixture; name the suite under New arm:; the bar and the suites run once, after the build is complete; this spells the manifest leg `measure-legs selftest`, a suite by its declared ceiling of 500 s
+     - [bar] `python measure_legs.py --selftest` — a bar or suite is not an acceptance observation: observe the checker on a staged break, a --selftest flag or a fixture; name the suite under New arm:; the bar and the suites run once, after the build is complete; this spells the manifest leg `measure-legs selftest`, a suite by its declared ceiling of 500 s (PINNED, tools/gate-legs.json)
    - `TOOL-dWitnessedBar-50` (order 3):
-     - [guards] `policy fixtures <- tools/check-line-length.sh` — §4 files-touched names tools/check-line-length.sh, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/check-line-length.sh` — the Files touched list names tools/check-line-length.sh, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-12` (order 5):
      - [leg] `agent-instructions self-test` — not a name in tools/gate-legs.json
-     - [guards] `policy fixtures <- tools/gate-legs.json` — §4 files-touched names tools/gate-legs.json, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/gate-legs.json` — the Files touched list names tools/gate-legs.json, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-22` (order 6):
      - [leg] `agent-instructions self-test` — not a name in tools/gate-legs.json
-     - [guards] `policy fixtures <- tools/gate-legs.json` — §4 files-touched names tools/gate-legs.json, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/gate-legs.json` — the Files touched list names tools/gate-legs.json, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-19` (order 7):
      - [leg] `agent-instructions self-test` — not a name in tools/gate-legs.json
-     - [guards] `policy fixtures <- tools/gate-legs.json` — §4 files-touched names tools/gate-legs.json, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/gate-legs.json` — the Files touched list names tools/gate-legs.json, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-11` (order 8):
      - [leg] `agent-instructions self-test` — not a name in tools/gate-legs.json
      - [path] `json;L=json.load(open('tools/gate-legs.json',encoding='utf-8'));print(sum(1` — not tracked by git ls-files
-     - [guards] `policy fixtures <- tools/gate-legs.json` — §4 files-touched names tools/gate-legs.json, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/gate-legs.json` — the Files touched list names tools/gate-legs.json, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-14` (order 9):
-     - [guards] `policy fixtures <- tools/memory-tree/kit.toml` — §4 files-touched names tools/memory-tree/kit.toml, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/memory-tree/kit.toml` — the Files touched list names tools/memory-tree/kit.toml, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-16` (order 10):
      - [path] `memory/map/baseline.txt` — not tracked by git ls-files
      - [path] `memory/map/baseline.txt` — not tracked by git ls-files
-     - [guards] `branch-guard self-test <- tools/memory-tree/check-memory-hygiene.sh` — §4 files-touched names tools/memory-tree/check-memory-hygiene.sh, which trips the guard of leg 'branch-guard self-test', absent from the §7 leg line
-     - [guards] `playbook render selftest <- tools/lexicon/lexicon-suffix-waivers.txt` — §4 files-touched names tools/lexicon/lexicon-suffix-waivers.txt, which trips the guard of leg 'playbook render selftest', absent from the §7 leg line
+     - [guards] `branch-guard self-test <- tools/memory-tree/check-memory-hygiene.sh` — the Files touched list names tools/memory-tree/check-memory-hygiene.sh, which trips the guard of leg 'branch-guard self-test', absent from the §7 leg line
+     - [guards] `playbook render selftest <- tools/lexicon/lexicon-suffix-waivers.txt` — the Files touched list names tools/lexicon/lexicon-suffix-waivers.txt, which trips the guard of leg 'playbook render selftest', absent from the §7 leg line
    - `TOOL-dWitnessedBar-46` (order 10):
-     - [guards] `branch-guard self-test <- tools/memory-tree/check-memory-hygiene.sh` — §4 files-touched names tools/memory-tree/check-memory-hygiene.sh, which trips the guard of leg 'branch-guard self-test', absent from the §7 leg line
-     - [guards] `policy fixtures <- tools/memory-tree/kit.toml` — §4 files-touched names tools/memory-tree/kit.toml, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `branch-guard self-test <- tools/memory-tree/check-memory-hygiene.sh` — the Files touched list names tools/memory-tree/check-memory-hygiene.sh, which trips the guard of leg 'branch-guard self-test', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/memory-tree/kit.toml` — the Files touched list names tools/memory-tree/kit.toml, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-54` (order 10):
-     - [guards] `policy fixtures <- tools/govkit/govkit.py` — §4 files-touched names tools/govkit/govkit.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/govkit/govkit.py` — the Files touched list names tools/govkit/govkit.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
 
 ### Acceptance
 

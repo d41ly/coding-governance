@@ -32,34 +32,34 @@ Revise each spec named below in place, as a rev bump with one revision-log line 
 2. Change nothing else. Each status header keeps its status (`DEFERRED`); bump only the rev. The write grant is this batch's spec files alone, each `memory/builds/dWitnessedBar/spec/2026-10-25-spec-<id>.md`: TOOL-dWitnessedBar-1, TOOL-dWitnessedBar-59, TOOL-dWitnessedBar-30, TOOL-dWitnessedBar-29, TOOL-dWitnessedBar-7, TOOL-dWitnessedBar-21, TOOL-dWitnessedBar-6, TOOL-dWitnessedBar-2, TOOL-dWitnessedBar-43, TOOL-dWitnessedBar-28.
 3. The specs and their hits:
    - `TOOL-dWitnessedBar-1` (order 23):
-     - [guards] `policy fixtures <- tools/memory-tree/build_records.py` — §4 files-touched names tools/memory-tree/build_records.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/memory-tree/build_records.py` — the Files touched list names tools/memory-tree/build_records.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-59` (order 23):
-     - [guards] `policy fixtures <- tools/govkit/selftest.py` — §4 files-touched names tools/govkit/selftest.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/govkit/selftest.py` — the Files touched list names tools/govkit/selftest.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-30` (order 24):
-     - [guards] `scratch-guard self-test <- tools/unattended/unattended.sh` — §4 files-touched names tools/unattended/unattended.sh, which trips the guard of leg 'scratch-guard self-test', absent from the §7 leg line
-     - [guards] `tier2-review self-test <- tools/unattended/unattended.sh` — §4 files-touched names tools/unattended/unattended.sh, which trips the guard of leg 'tier2-review self-test', absent from the §7 leg line
+     - [guards] `scratch-guard self-test <- tools/unattended/unattended.sh` — the Files touched list names tools/unattended/unattended.sh, which trips the guard of leg 'scratch-guard self-test', absent from the §7 leg line
+     - [guards] `tier2-review self-test <- tools/unattended/unattended.sh` — the Files touched list names tools/unattended/unattended.sh, which trips the guard of leg 'tier2-review self-test', absent from the §7 leg line
    - `TOOL-dWitnessedBar-29` (order 25):
-     - [guards] `branch-guard self-test <- tools/memory-tree/check-memory-hygiene.sh` — §4 files-touched names tools/memory-tree/check-memory-hygiene.sh, which trips the guard of leg 'branch-guard self-test', absent from the §7 leg line
-     - [guards] `policy fixtures <- tools/check-template-size.sh` — §4 files-touched names tools/check-template-size.sh, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `branch-guard self-test <- tools/memory-tree/check-memory-hygiene.sh` — the Files touched list names tools/memory-tree/check-memory-hygiene.sh, which trips the guard of leg 'branch-guard self-test', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/check-template-size.sh` — the Files touched list names tools/check-template-size.sh, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-7` (order 26):
-     - [guards] `branch-guard self-test <- tools/memory-tree/check-memory-hygiene.sh` — §4 files-touched names tools/memory-tree/check-memory-hygiene.sh, which trips the guard of leg 'branch-guard self-test', absent from the §7 leg line
-     - [guards] `policy fixtures <- tools/memory-tree/deviation_join.py` — §4 files-touched names tools/memory-tree/deviation_join.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `branch-guard self-test <- tools/memory-tree/check-memory-hygiene.sh` — the Files touched list names tools/memory-tree/check-memory-hygiene.sh, which trips the guard of leg 'branch-guard self-test', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/memory-tree/deviation_join.py` — the Files touched list names tools/memory-tree/deviation_join.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-21` (order 27):
-     - [guards] `scratch-guard self-test <- tools/unattended/unattended.sh` — §4 files-touched names tools/unattended/unattended.sh, which trips the guard of leg 'scratch-guard self-test', absent from the §7 leg line
-     - [guards] `tier2-review self-test <- tools/unattended/unattended.sh` — §4 files-touched names tools/unattended/unattended.sh, which trips the guard of leg 'tier2-review self-test', absent from the §7 leg line
+     - [guards] `scratch-guard self-test <- tools/unattended/unattended.sh` — the Files touched list names tools/unattended/unattended.sh, which trips the guard of leg 'scratch-guard self-test', absent from the §7 leg line
+     - [guards] `tier2-review self-test <- tools/unattended/unattended.sh` — the Files touched list names tools/unattended/unattended.sh, which trips the guard of leg 'tier2-review self-test', absent from the §7 leg line
    - `TOOL-dWitnessedBar-6` (order 28):
-     - [guards] `scratch-guard self-test <- tools/unattended/unattended.sh` — §4 files-touched names tools/unattended/unattended.sh, which trips the guard of leg 'scratch-guard self-test', absent from the §7 leg line
-     - [guards] `tier2-review self-test <- tools/unattended/unattended.sh` — §4 files-touched names tools/unattended/unattended.sh, which trips the guard of leg 'tier2-review self-test', absent from the §7 leg line
+     - [guards] `scratch-guard self-test <- tools/unattended/unattended.sh` — the Files touched list names tools/unattended/unattended.sh, which trips the guard of leg 'scratch-guard self-test', absent from the §7 leg line
+     - [guards] `tier2-review self-test <- tools/unattended/unattended.sh` — the Files touched list names tools/unattended/unattended.sh, which trips the guard of leg 'tier2-review self-test', absent from the §7 leg line
    - `TOOL-dWitnessedBar-2` (order 29):
-     - [guards] `scratch-guard self-test <- tools/unattended/unattended.sh` — §4 files-touched names tools/unattended/unattended.sh, which trips the guard of leg 'scratch-guard self-test', absent from the §7 leg line
-     - [guards] `tier2-review self-test <- tools/unattended/unattended.sh` — §4 files-touched names tools/unattended/unattended.sh, which trips the guard of leg 'tier2-review self-test', absent from the §7 leg line
-     - [guards] `policy fixtures <- help/policy.md` — §4 files-touched names help/policy.md, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `scratch-guard self-test <- tools/unattended/unattended.sh` — the Files touched list names tools/unattended/unattended.sh, which trips the guard of leg 'scratch-guard self-test', absent from the §7 leg line
+     - [guards] `tier2-review self-test <- tools/unattended/unattended.sh` — the Files touched list names tools/unattended/unattended.sh, which trips the guard of leg 'tier2-review self-test', absent from the §7 leg line
+     - [guards] `policy fixtures <- help/policy.md` — the Files touched list names help/policy.md, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-43` (order 29):
-     - [guards] `scratch-guard self-test <- tools/policy/catalogue.toml` — §4 files-touched names tools/policy/catalogue.toml, which trips the guard of leg 'scratch-guard self-test', absent from the §7 leg line
-     - [guards] `routed-commits selftest <- tools/policy/catalogue.toml` — §4 files-touched names tools/policy/catalogue.toml, which trips the guard of leg 'routed-commits selftest', absent from the §7 leg line
-     - [guards] `policy fixtures <- tools/policy/catalogue.toml` — §4 files-touched names tools/policy/catalogue.toml, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `scratch-guard self-test <- tools/policy/catalogue.toml` — the Files touched list names tools/policy/catalogue.toml, which trips the guard of leg 'scratch-guard self-test', absent from the §7 leg line
+     - [guards] `routed-commits selftest <- tools/policy/catalogue.toml` — the Files touched list names tools/policy/catalogue.toml, which trips the guard of leg 'routed-commits selftest', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/policy/catalogue.toml` — the Files touched list names tools/policy/catalogue.toml, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-28` (order 30):
-     - [guards] `policy fixtures <- tools/playbook/row_checks.py` — §4 files-touched names tools/playbook/row_checks.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/playbook/row_checks.py` — the Files touched list names tools/playbook/row_checks.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
 
 ### Acceptance
 

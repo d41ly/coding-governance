@@ -30,7 +30,7 @@ return by its file stem, so a builder can build it as written over HEAD on node 
    (the most feature-rich option that survives the vetoes), mark it RESOLVED in §8, make §6 AC1 and §5's cost line
    agree with the choice, and say which in your return.
 4. The sites: add `tools/loop/factories.py`'s `resolve_bash(...) or "bash"` and `tools/run-gates/regen.py`'s
-   `shutil.which(run[0]) or run[0]` fall-back to the sites table, Files touched and the §7 legs their guards name; say
+   `shutil.which(run[0]) or run[0]` fall-back to the sites table, Files touched and the gates section's legs their guards name; say
    whether the S6 query should find each shape and, where it should, widen the query in §4 "The query".
 5. The adapters: `loop_witness.resolve_bash` is imported by name by `tools/loop/breakpoints.py`, `budget.py`,
    `factories.py`, `loop_lib.py` and `position.py`, so it keeps its `path or None` contract through an adapter. State

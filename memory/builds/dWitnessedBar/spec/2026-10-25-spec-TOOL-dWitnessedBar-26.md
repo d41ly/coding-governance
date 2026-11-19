@@ -346,7 +346,7 @@ only bash was reached through the bare-name fall-back now refuses, which is the 
   Git's candidate, so the copy is returned; or the walk stops at the first pass, so no `tried:` line
   names the copy.
   fixture: a Windows node with WSL installed, so the copy runs and answers `Linux`; node d has one.
-  cost: about 5 s, the WSL start the copy's probe pays (§5).
+  cost: about 5 s (PINNED, §5), the WSL start the copy's probe pays (§5).
 - **AC2** — When the same command runs with Git's `cmd` directory left off `PATH`, it exits 2 with a
   refusal naming every `tried` line and `GOV_BASH`, and prints no `bash:` line.
   Red when: a fall-back returns the bare name `bash`, or the first candidate that merely runs.

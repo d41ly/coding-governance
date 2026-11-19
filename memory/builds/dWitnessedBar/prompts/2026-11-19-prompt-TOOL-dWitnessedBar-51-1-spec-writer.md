@@ -117,35 +117,35 @@ Revise each spec named below in place, as a rev bump with one revision-log line 
 2. Change nothing else. Each status header keeps its status (`DEFERRED`); bump only the rev. The write grant is this batch's spec files alone, each `memory/builds/dWitnessedBar/spec/2026-10-25-spec-<id>.md`: TOOL-dWitnessedBar-51, TOOL-dWitnessedBar-57, TOOL-dWitnessedBar-60, TOOL-dWitnessedBar-62, TOOL-dWitnessedBar-63, TOOL-dWitnessedBar-65, TOOL-dWitnessedBar-67, TOOL-dWitnessedBar-73, TOOL-dWitnessedBar-78, TOOL-dWitnessedBar-84, TOOL-dWitnessedBar-88.
 3. The specs and their hits:
    - `TOOL-dWitnessedBar-51` (order 31):
-     - [guards] `scratch-guard self-test <- tools/unattended/unattended.sh` — §4 files-touched names tools/unattended/unattended.sh, which trips the guard of leg 'scratch-guard self-test', absent from the §7 leg line
-     - [guards] `branch-guard self-test <- tools/memory-tree/check-memory-hygiene.sh` — §4 files-touched names tools/memory-tree/check-memory-hygiene.sh, which trips the guard of leg 'branch-guard self-test', absent from the §7 leg line
-     - [guards] `tier2-review self-test <- tools/unattended/unattended.sh` — §4 files-touched names tools/unattended/unattended.sh, which trips the guard of leg 'tier2-review self-test', absent from the §7 leg line
-     - [guards] `policy fixtures <- AGENTS.md` — §4 files-touched names AGENTS.md, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `scratch-guard self-test <- tools/unattended/unattended.sh` — the Files touched list names tools/unattended/unattended.sh, which trips the guard of leg 'scratch-guard self-test', absent from the §7 leg line
+     - [guards] `branch-guard self-test <- tools/memory-tree/check-memory-hygiene.sh` — the Files touched list names tools/memory-tree/check-memory-hygiene.sh, which trips the guard of leg 'branch-guard self-test', absent from the §7 leg line
+     - [guards] `tier2-review self-test <- tools/unattended/unattended.sh` — the Files touched list names tools/unattended/unattended.sh, which trips the guard of leg 'tier2-review self-test', absent from the §7 leg line
+     - [guards] `policy fixtures <- AGENTS.md` — the Files touched list names AGENTS.md, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-57` (order 32):
-     - [bar] `python measure_legs.py --selftest` — a bar or suite is not an acceptance observation: observe the checker on a staged break, a --selftest flag or a fixture; name the suite under New arm:; the bar and the suites run once, after the build is complete; this spells the manifest leg `measure-legs selftest`, a suite by its declared ceiling of 500 s
-     - [guards] `playbook render selftest <- tools/memory-tree/corpus_ids.py` — §4 files-touched names tools/memory-tree/corpus_ids.py, which trips the guard of leg 'playbook render selftest', absent from the §7 leg line
-     - [guards] `policy fixtures <- tools/memory-tree/row_grammar.py` — §4 files-touched names tools/memory-tree/row_grammar.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [bar] `python measure_legs.py --selftest` — a bar or suite is not an acceptance observation: observe the checker on a staged break, a --selftest flag or a fixture; name the suite under New arm:; the bar and the suites run once, after the build is complete; this spells the manifest leg `measure-legs selftest`, a suite by its declared ceiling of 500 s (PINNED, tools/gate-legs.json)
+     - [guards] `playbook render selftest <- tools/memory-tree/corpus_ids.py` — the Files touched list names tools/memory-tree/corpus_ids.py, which trips the guard of leg 'playbook render selftest', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/memory-tree/row_grammar.py` — the Files touched list names tools/memory-tree/row_grammar.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-60` (order 33):
-     - [guards] `scratch-guard self-test <- tools/unattended/unattended.sh` — §4 files-touched names tools/unattended/unattended.sh, which trips the guard of leg 'scratch-guard self-test', absent from the §7 leg line
-     - [guards] `tier2-review self-test <- tools/unattended/unattended.sh` — §4 files-touched names tools/unattended/unattended.sh, which trips the guard of leg 'tier2-review self-test', absent from the §7 leg line
+     - [guards] `scratch-guard self-test <- tools/unattended/unattended.sh` — the Files touched list names tools/unattended/unattended.sh, which trips the guard of leg 'scratch-guard self-test', absent from the §7 leg line
+     - [guards] `tier2-review self-test <- tools/unattended/unattended.sh` — the Files touched list names tools/unattended/unattended.sh, which trips the guard of leg 'tier2-review self-test', absent from the §7 leg line
    - `TOOL-dWitnessedBar-62` (order 34):
-     - [guards] `policy fixtures <- tools/govkit/selftest.py` — §4 files-touched names tools/govkit/selftest.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/govkit/selftest.py` — the Files touched list names tools/govkit/selftest.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-63` (order 35):
-     - [guards] `scratch-guard self-test <- tools/unattended/unattended.sh` — §4 files-touched names tools/unattended/unattended.sh, which trips the guard of leg 'scratch-guard self-test', absent from the §7 leg line
-     - [guards] `tier2-review self-test <- tools/unattended/unattended.sh` — §4 files-touched names tools/unattended/unattended.sh, which trips the guard of leg 'tier2-review self-test', absent from the §7 leg line
-     - [guards] `policy fixtures <- tools/govkit/govkit.py` — §4 files-touched names tools/govkit/govkit.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `scratch-guard self-test <- tools/unattended/unattended.sh` — the Files touched list names tools/unattended/unattended.sh, which trips the guard of leg 'scratch-guard self-test', absent from the §7 leg line
+     - [guards] `tier2-review self-test <- tools/unattended/unattended.sh` — the Files touched list names tools/unattended/unattended.sh, which trips the guard of leg 'tier2-review self-test', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/govkit/govkit.py` — the Files touched list names tools/govkit/govkit.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-65` (order 37):
-     - [guards] `policy fixtures <- tools/govkit/govkit.py` — §4 files-touched names tools/govkit/govkit.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/govkit/govkit.py` — the Files touched list names tools/govkit/govkit.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-67` (order 39):
-     - [guards] `policy fixtures <- tools/govkit/govkit.py` — §4 files-touched names tools/govkit/govkit.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/govkit/govkit.py` — the Files touched list names tools/govkit/govkit.py, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-73` (order 41):
-     - [guards] `policy fixtures <- tools/gate-legs.json` — §4 files-touched names tools/gate-legs.json, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/gate-legs.json` — the Files touched list names tools/gate-legs.json, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-78` (order 42):
-     - [guards] `policy fixtures <- tools/gate-legs.json` — §4 files-touched names tools/gate-legs.json, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/gate-legs.json` — the Files touched list names tools/gate-legs.json, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-84` (order 44):
-     - [guards] `policy fixtures <- tools/gate-legs.json` — §4 files-touched names tools/gate-legs.json, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/gate-legs.json` — the Files touched list names tools/gate-legs.json, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
    - `TOOL-dWitnessedBar-88` (order 45):
-     - [guards] `policy fixtures <- tools/gate-legs.json` — §4 files-touched names tools/gate-legs.json, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
+     - [guards] `policy fixtures <- tools/gate-legs.json` — the Files touched list names tools/gate-legs.json, which trips the guard of leg 'policy fixtures', absent from the §7 leg line
 
 ### brief:acceptance
 
