@@ -1,5 +1,5 @@
 # **Serves:** research TOOL-dTrackedAtlas-1
-"""Every dClosedLoop chain build's actual state, read from the tree at one git ref: its spec run, its build run and
+r"""Every dClosedLoop chain build's actual state, read from the tree at one git ref: its spec run, its build run and
 the merge that landed it, its units, forks, revisions, deviation records, claim, and whether its next run can start.
 The ONE answer the schedule script (`tree_state`, `chain`, `claims`, `graph`) and the Atlas read
 (TOOL-dTrackedAtlas-1).
@@ -8,8 +8,9 @@ Usage (from a worktree root; `unattended.sh --claims` fills the claim cache, thi
   . tools/lib/resolve-python.sh && PY=$(resolve_python)
   "$PY" <this file> [--ref <rev>] [--claims cache|none]
 prints the state document as JSON. Exit 0; 1 when v2's `[chain]` does not hold 22 builds and 509 clauses; 2 when the
-ref does not resolve, a git call fails or times out, a needed conf key is absent, or no answer comes within
-DERIVE_BOUND seconds, with one `build-state: <reason>` line on stderr.
+ref does not resolve, a git call fails or times out, a needed conf key is absent, a spec file name outside
+`[A-Za-z0-9._-]+\.md` is refused, or no answer comes within DERIVE_BOUND seconds, with one `build-state: <reason>`
+line on stderr.
 
 A library caller loads it by path (its file name is no module name) and calls `derive`, `read_chain`,
 `derive_predecessors` or `read_claims`; it arms no wall bound. Git is read in `root`, a worktree root, and never its working
@@ -24,8 +25,9 @@ build run is carried, never unbuilt.
 
 WHAT IT DOES NOT CHECK: that a merge touching RUN.md with a run's base is that run's own landing rather than a merge
 of its branch for another reason; a run record rotated outside the driver; a record whose base resolves to no commit,
-whose kind reads null and which lands nothing; the open forks of a CLOSED or WONTDO spec; and claims newer than the
-last `unattended.sh --claims`.
+whose kind reads null and which lands nothing; the open forks of a CLOSED or WONTDO spec; claims newer than the
+last `unattended.sh --claims`; and a spec whose name git's listing quotes, such as one holding a non-ASCII byte, `"`
+or `\`, which is not listed as a spec at all.
 """
 import argparse
 import collections
@@ -38,6 +40,7 @@ import io
 import json
 import os
 import re
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -56,6 +59,7 @@ CARRY = re.compile(r"^\*\*(?:Carries|Moved|Retired|Deferred):\*\* (cl-d[A-Z]\w+-
 HEADER = re.compile(r"^\*\*Status:\*\*.*$", re.M)
 VERB = re.compile(r" · (closes|advances) ([A-Z]+-[A-Za-z0-9]+-\d+)")
 RUN_RECORD = re.compile(r"^RUN(?:\.LANDED\.[0-9a-f]{8})?\.md$")
+SPEC_NAME = re.compile(r"^[A-Za-z0-9._-]+\.md$")
 FACT = re.compile(r"^([\w-]+):[ \t]*(.*?)[ \t]*$", re.M)
 CLAIM_REFS = "refs/gov/remote/runs/"
 BEAT_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
@@ -218,11 +222,12 @@ def scan_forks(root, specs, cutoff):
             target = Path(top, str(i), p.rsplit("/", 1)[-1])
             target.parent.mkdir()
             target.write_text(specs[p], encoding="utf-8", newline="\n")
-            lines.append(f"printf '%s %s\\n' {i} \"$(plan_state '{target.as_posix()}' '{cutoff}')\"")
+            lines.append(f"printf '%s %s\\n' {i} \"$(plan_state {shlex.quote(target.as_posix())} "
+                         f"{shlex.quote(cutoff)})\"")
         script = Path(top, "grade.sh")        # sourced from a file: a thousand calls overflow a command line
         script.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
         try:
-            rc, out = breakpoints.run_sourced(Path(root).resolve(), f". '{script.as_posix()}'")
+            rc, out = breakpoints.run_sourced(Path(root).resolve(), f". {shlex.quote(script.as_posix())}")
         except (LookupError, subprocess.TimeoutExpired) as e:
             raise StateError(f"the driver's plan_state could not run: {e}") from None
     graded = dict(re.findall(r"^(\d+) (\w+)$", out, flags=re.M))
@@ -289,6 +294,10 @@ def derive(ref="HEAD", root=".", claims=True, detail=True):
             "deviations": sorted(p for p in listed if rest[p].startswith("build/") and rest[p].count("/") == 1
                                  and fnmatch.fnmatchcase(rest[p][len("build/"):], "*-deviation-*.md")),
         }
+    for b in names:
+        for p in files[b]["specs"]:
+            if not SPEC_NAME.match(p.rsplit("/", 1)[-1]):
+                raise StateError(f"refused spec file name {p} at {commit[:12]}: not [A-Za-z0-9._-]+\\.md")
     wanted = [p for b in names for p in files[b]["specs"] + files[b]["runs"] + (files[b]["deviations"] if detail
                                                                                else [])]
     blobs = {p: text or "" for (_, p), text in read_blobs(root, [(commit, p) for p in wanted]).items()}
