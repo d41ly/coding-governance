@@ -19,27 +19,25 @@ own `mkconf` and `write_lease_fixture` read out of `tools/unattended/unattended.
 origin and one clone with `RUN_CLAIMS=on` under the node's short temp path.
 
 **Evidences:** TOOL-dPlacedRequest-18
-- AC1 — over the probe set `nightly-audit maintain 9am Nightly -x a.b`, a 59-byte and a 65-byte name (PINNED),
-  the predicate returned `0 0 0 1 1 1 0 1`; the four refusals printed `outside seg [a-z0-9][a-z0-9-]*`
-  three times and `over 64 bytes (65)` (PINNED). An empty name and `é` were refused `outside seg` too.
-- AC2 — `--lease acquire run nightly-audit 2026-10-25` printed
-  `lease — run/nightly-audit/2026-10-25 · create · epoch 1` and exited 0 (PINNED); the origin held
-  `refs/gov/leases/run/nightly-audit/2026-10-25`, and `--claims` printed its row
-  whose first field is `run/nightly-audit/2026-10-25` and whose fleet tag is `a`.
-  `--lease acquire run Nightly 2026-10-25` exited 2 (PINNED), printing `lease not written — the cadence 'Nightly' is outside seg [a-z0-9][a-z0-9-]*`, the origin
+- AC1 — a probe sourcing `unattended.sh` called `check_cadence_segment` on each name of the probe set, `nightly-audit maintain 9am Nightly -x a.b`, a 59-byte and a 65-byte name (PINNED):
+  it returned `0 0 0 1 1 1 0 1`, and the four refusals printed `outside seg [a-z0-9][a-z0-9-]*` three
+  times and `over 64 bytes (65)` (PINNED). An empty name and `é` were refused `outside seg` too.
+- AC2 — `unattended.sh --lease acquire run nightly-audit 2026-10-25` exited 0 (PINNED) and the bare remote held `refs/gov/leases/run/nightly-audit/2026-10-25`, which `unattended.sh --claims` listed back;
+  it printed `lease — run/nightly-audit/2026-10-25 · create · epoch 1` (PINNED), and the claims row's first
+  field was `run/nightly-audit/2026-10-25`, fleet tag `a`. `--lease acquire run Nightly 2026-10-25`
+  exited 2 (PINNED) printing `lease not written — the cadence 'Nightly' is outside seg`, the remote
   still holding 1 ref (DERIVED).
-- AC3 — `git grep -nE "maintain|review" -- tools/unattended/unattended.sh` printed only the `VERBS_SLUG`
-  line, no line of the builder or the reader, and `declare -f derive_lease_ref read_claims
-  check_cadence_segment | grep -cE 'maintain|review'` printed 0 (DERIVED).
-- AC4 — `parse_tag` over each `unit.<name>`, a name admitted where the tag reads as namespace `unit` and that
-  one segment, printed `0 0 0 1 1 1 0 1`, equal to the predicate's row for row. A copy of the predicate
-  planted with `[a-z][a-z0-9-]*` printed `0 0 1 1 1 1 0 1`, refusing `9am`, so the parity reds on it.
-- AC5 — `--lease acquire build run` and `--lease acquire unit run x` each exited 2 (PINNED), printing
-  `lease not written — the slug run is reserved: a <kind> lease of it would read as the cadence namespace
-  refs/gov/leases/run/`, and the origin held no `refs/gov/leases/run/build`.
-- AC6 — `grep -n "run/<cadence>/<period>" tools/unattended/STOPS.template.md` printed the section-7 line
-  of the grammar, which goes on to name `<cadence>` any tag-grammar segment and `The slug \`run\` is
-  reserved`.
+- AC3 — `git grep -nE "maintain|review" -- tools/unattended/unattended.sh` printed only the `VERBS_SLUG` line, no line of the lease ref builder or reader;
+  the function bodies `declare -f` prints for `derive_lease_ref`, `read_claims` and
+  `check_cadence_segment` hold 0 matches of `maintain|review` (DERIVED).
+- AC4 — `check_cadence_segment` over the probe set and `parse_tag` from `tag_index.py` over each `unit.<name>` both printed `0 0 0 1 1 1 0 1`, agreeing on every row;
+  a name reads admitted by `parse_tag` where the tag parses to namespace `unit` and that one segment. A
+  copy of the predicate planted with `[a-z][a-z0-9-]*` printed `0 0 1 1 1 1 0 1`, refusing `9am`.
+- AC5 — `unattended.sh --lease acquire build run` exited 2 (PINNED): `derive_lease_ref` refused it naming the reserved slug, and the remote held no `refs/gov/leases/run/build`;
+  the line read `lease not written — the slug run is reserved`, and `--lease acquire unit run x` was
+  refused the same way, exit 2 (PINNED).
+- AC6 — `grep -n "run/<cadence>/<period>" tools/unattended/STOPS.template.md` printed the section-7 line of the lease grammar;
+  the same paragraph names `<cadence>` any segment the tag grammar admits and reserves the slug `run`.
 
 **Reading of AC4.** `parse_tag("unit.a.b")` succeeds as namespace `unit` with two segments, so a bare
 success would admit the row `a.b` the spec expects refused. The spec checks each name "as the tag
@@ -47,6 +45,12 @@ success would admit the row `a.b` the spec expects refused. The spec checks each
 only where the tag parses to `unit` and exactly that name; the suite's arm reads it so.
 
 **Owed at the close.** The `New arm:` line of section 7: the region-8 block `TOOL-dPlacedRequest-18` in
-`tools/unattended/unattended.test.sh`, 15 assertions (DERIVED), RED-first against the base driver,
+`tools/unattended/unattended.test.sh`, 17 assertions (DERIVED), RED-first against the base driver,
 which has no `check_cadence_segment`; the arm carries its own planted-copy RED for AC4 beside it. The
 suite is waived for this build's landing by README rule 8.
+
+**The checklist, acted on.** The bug-class checklist over the pass commit selected 52 classes (DERIVED).
+Two needed a change. refusal-branch-with-no-arm: the reserved slug's `unit:run` alternative had no arm,
+so the block now drives `--lease acquire unit run x` to its refusal. fixture-passes-by-finding-nothing:
+the AC3 arm's zero count would also read 0 over function bodies that printed nothing, so it now
+requires the three bodies present beside the zero.

@@ -19877,8 +19877,8 @@ print(" ".join("0" if t.parse_tag("unit." + n)[0] == ("unit", [n]) else "1" for 
   same "DPR18 AC4 parse_tag reads each unit.<name> as the predicate reads <name>" "$cg_tag" "$cg_got"
   same "DPR18 AC4 ...and the planted copy disagrees with it" "$([ "$cg_tag" = "$cg_red" ] && echo agrees || echo disagrees)" "disagrees"
 fi
-same "DPR18 AC3 neither the ref builder nor the claim reader spells a cadence kind" \
-  "$(declare -f derive_lease_ref read_claims check_cadence_segment | grep -cE 'maintain|review')" "0"
+same "DPR18 AC3 the three bodies print, and neither the ref builder nor the claim reader spells a cadence kind" \
+  "$(declare -f derive_lease_ref read_claims check_cadence_segment | grep -cE '^[a-z_]+ \(\) ?$') $(declare -f derive_lease_ref read_claims check_cadence_segment | grep -cE 'maintain|review')" "3 0"
 LF=$(mktemp -d); LF_GIT=$(command -v git); write_lease_fixture
 cg_out=$(run_lease_arm acquire run nightly-audit 2026-10-25); cg_rc=$?
 same "DPR18 AC2 a cadence no list names holds a lease on the origin" \
@@ -19893,6 +19893,10 @@ cg_out=$(run_lease_arm acquire build run); cg_rc=$?
 same "DPR18 AC5 a build lease of the slug run exits 2 and writes nothing" \
   "$cg_rc $(git --git-dir="$LF/origin.git" for-each-ref refs/gov | grep -c .)" "2 1"
 hit  "$cg_out" "lease not written — the slug run is reserved"
+cg_out=$(run_lease_arm acquire unit run x); cg_rc=$?
+same "DPR18 AC5 a unit lease of the slug run exits 2 and writes nothing" \
+  "$cg_rc $(git --git-dir="$LF/origin.git" for-each-ref refs/gov | grep -c .)" "2 1"
+hit  "$cg_out" "lease not written — the slug run is reserved: a unit lease"
 cg_s7=$(awk '/^## 7\. /{f=1; next} /^## 8\. /{f=0} f' "$HERE/STOPS.template.md")
 for cg_w in 'refs/gov/leases/run/<cadence>/<period>' 'any segment the tag grammar admits' 'The slug `run` is reserved'; do hit "$cg_s7" "$cg_w"; done
 rm -rf "$LF"

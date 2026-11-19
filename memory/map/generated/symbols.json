@@ -5378,6 +5378,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "check_cadence_segment",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_calibration",
       "kind": "function",
       "file": "tools/gate-lint/fork-count.sh"
