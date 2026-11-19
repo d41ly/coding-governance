@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-45 — the leg factory runs in a tree with no govkit: its generated row stays gov's, and its adopter verbs import no govkit
 
-**Status:** DEFERRED · rev-4 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 9 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-4 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 9 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-45-deviation-451.md](../build/2026-10-25-build-TOOL-dWitnessedBar-45-deviation-451.md) | deviation | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-3-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-3-brief.md) | journal | TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-54 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-brief.md) | journal | TOOL-dWitnessedBar-14 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-45-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-45-build-brief.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-40-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-40-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-51 |
 
 <!-- /gen:spec-records -->

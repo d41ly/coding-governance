@@ -702,7 +702,7 @@ Cite ids, never line numbers.
 | [TOOL-dWellOiledMachine-62](../builds/dWellOiledMachine/BACKLOG.md) | DEFERRED | MED | TOOL-dWellOiledMachine-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dWellOiledMachine-128](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE PERIOD KEY HAS NO MONTH AND NO LANDING COUNT. derive_period knows… |
 | [TOOL-dWellOiledMachine-129](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | TWO STALL AND LOOP CLASSES HAVE NO WRITER. cl-dClosedLoop-0473 trends… |
-| [TOOL-dWitnessedBar-31](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | MED | TOOL-dWitnessedBar-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dWitnessedBar-31](../builds/dWitnessedBar/BACKLOG.md) | INPROGRESS | MED | TOOL-dWitnessedBar-45 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dWitnessedBar-32](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-10-25 | THE enforces EDGE ROW OMITS principle. PLAY-dOrderedCharter-7 S2 admits… |
 | [TOOL-dWitnessedBar-33](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-10-25 | THE DOSSIERS' gate-legs CLAIMS AND THE LEGS' tests EDGES ARE ONE FACT… |
 | [TOOL-dWitnessedBar-35](../builds/dWitnessedBar/BACKLOG.md) | OPEN | MED | — | 2026-10-25 | TOOL-dGroundRules-25 S28 KEEPS THE BARE-BASH FALL-BACK. Its… |
