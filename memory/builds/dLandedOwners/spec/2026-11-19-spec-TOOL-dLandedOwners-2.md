@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-brief.md) | research | TOOL-dLandedOwners-1 TOOL-dLandedOwners-3 |
+| [2026-11-19-prompt-TOOL-dLandedOwners-1-pinned-facts-fold.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-pinned-facts-fold.md) | research | TOOL-dLandedOwners-1 |
 
 <!-- /gen:spec-records -->
 
@@ -140,8 +141,8 @@ PINNED, measured 2026-11-19 at `9b58eeea`, whose code paths equal base `51971579
 ### Alternatives rejected
 
 - **An `ast` walk over each `.py` file**, crediting a `Name` argument of any `Call` bound by a
-  module-level `Assign`. Tested by the same probe over the same 177 files: it credits the same six
-  keys and no other, and all 177 files parse, so the real tree does not tell the two apart. It loses
+  module-level `Assign`. Tested by the same probe over the same 177 files (PINNED): it credits the same six
+  keys and no other, and all 177 files parse (PINNED), so the real tree does not tell the two apart. It loses
   on the seam. `READER_SHAPES` states that "a new shape is one row", and an `ast` pass would be a
   second scan beside the rows, with its own comment rule and skip population. Its one gain, a call
   whose argument list spans lines, is a blind spot the literal row already has.
@@ -229,6 +230,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-19 · initial draft.
+- rev-1 · 2026-11-19 · §4 · the writing-practice leg's pinned-facts reds over `c3f402ac1`, folded
+  from 2026-11-19-prompt-TOOL-dLandedOwners-1-2-spec-writer: the probe's file count reads PINNED on
+  each line that quotes it; no design change.
 
 ## 10. Reuse audit
 

@@ -7,8 +7,10 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-1-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dLandedOwners-1-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-2-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-brief.md) | research | TOOL-dLandedOwners-2 TOOL-dLandedOwners-3 |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-f1-fold.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-f1-fold.md) | research | — |
+| [2026-11-19-prompt-TOOL-dLandedOwners-1-pinned-facts-fold.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-pinned-facts-fold.md) | research | TOOL-dLandedOwners-2 |
 
 <!-- /gen:spec-records -->
 
@@ -41,8 +43,8 @@ built from the memory-tree kit's shipped readers, so every landed build run read
 - **S6** — The docs. The "Landed means" bullet of `help/policy.md` states the new predicate. In
   `tools/policy/README.md`, the `arm_reader_coverage` paragraph, its arms-table row and the fixture
   paragraph state the new predicate and the new case. Observed by AC7.
-- **S7** — The cost stays inside the `policy check` leg's 120 s ceiling, within the bound AC6 pins.
-  Observed by AC6.
+- **S7** — The cost stays inside the `policy check` leg's 120 s ceiling (tools/gate-legs.json@d2f27f18:2092),
+  within the bound AC6 pins. Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -53,7 +55,7 @@ built from the memory-tree kit's shipped readers, so every landed build run read
   `TOOL-dLandedOwners-3` owns it. The wider landed set reds that key too.
 - The schedule, the build-state instrument and every other record under `memory/builds/`. This
   unit ports the instrument's predicate and does not call the instrument. The instrument sits under
-  the memory root, covers only the 22 chain builds and takes about 41 s.
+  the memory root, covers only the 22 chain builds and takes about 41 s (PINNED, 2026-11-19).
 - The loop kit's code, `tools/loop/termination.py` included, and the loop's pending list. Fork F1,
   resolved by the owner, leaves dDeclaredLoop's pending row as it stands: the held `loop termination`
   leg reads it stale until a later build bounds the cycle or re-owns the row, and the main loop's ask
@@ -228,7 +230,7 @@ owners at `51971579` in 2.5 s.
 - security — No new write path. Every read is a git read at a resolved commit, made with argv
   lists and no shell, and the build slugs come from the catalogue.
 - perf / scale — About 2.5 s over 23 owners (PINNED, §4). AC6 bounds it at 15 s, well under the
-  `policy check` leg's 120 s ceiling.
+  `policy check` leg's 120 s ceiling (tools/gate-legs.json@d2f27f18:2092).
 - error / empty / loading states — An empty `builds` returns `set()` with no git call, as the base
   function does when there are no owners. A missing module, or a missing conf declaration, is a
   Refusal (S4).
@@ -268,7 +270,7 @@ L=$("$PY" -B -c "import sys; sys.path.insert(0, 'tools/policy'); import policy; 
   and the probe passes the instrument's `builds[].slug` list to `c.derive_landed_builds`, the sorted
   answer equals the sorted `landed` list in `$X/state.json`: six builds at `51971579`.
   Red when: half 2 is removed, and the answer lacks dDeclaredLoop and dSafePassage.
-  cost: about 41 s, for the instrument.
+  cost: about 41 s, for the instrument (PINNED, measured 2026-11-19).
 - **AC4** — When `"$PY" tools/policy/check_policy.py --fixture reader-coverage-carried` runs, it
   exits 0 and prints five `policy-fixture:` lines, one per §4 sub-case. No line holds `WRONG`,
   `case carried-landed: red` appears, and `kit-modules-absent` reports the Refusal.
@@ -326,6 +328,10 @@ New arm: tools/policy/check_policy.py --fixture reader-coverage-carried · cover
 - rev-2 · 2026-11-19 · §3 · §4 · §5 · §8 · the owner resolved fork F1 as option (a), recorded in
   2026-11-19-prompt-TOOL-dLandedOwners-1-f1-fold; F1 marked RESOLVED and the sentences citing it
   restate the resolution; no design change.
+- rev-2 · 2026-11-19 · §2 · §3 · §5 · §6 · the writing-practice leg's pinned-facts reds over
+  `c3f402ac1`, folded from 2026-11-19-prompt-TOOL-dLandedOwners-1-2-spec-writer: the leg ceiling
+  cites its owning line in `tools/gate-legs.json` and the instrument's measured cost reads PINNED,
+  each on its own line; no design change.
 
 ## 10. Reuse audit
 
