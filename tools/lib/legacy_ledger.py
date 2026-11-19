@@ -6,10 +6,12 @@ below travels INLINE, byte-identical, in the memory-tree kit's `legacy_ledger.py
 merge driver reads a ledger's header and key through, and the gate-lint kit's `legacy_ledger.py`, which
 its count-ratchet adapters read through; `<prefix>/lib/resolve-python.test.sh`'s parity table reds a
 copy that drifts. The block calls `compute_coverage` (the `coverage_join` block),
-`resolve_compare_base` (the `compare_base_py` block) and `resolve_kit_dir`, through which its `seed` verb
-finds the policy kit. They are imported OUTSIDE the block, so it stays byte-identical: this file imports
-them from `coverage_join.py`, `compare_base.py` and `resolve_kit_dir.py` beside it, and each kit copy
-imports the first two from its own kit's `coverage_join.py` and the third from its own kit.
+`resolve_compare_base` (the `compare_base_py` block), `resolve_kit_dir`, through which its `seed` verb
+finds the policy kit, and `resolve_prefix_token`, through which a seed argv's `{prefix}` resolves
+against the tool root above this copy (TOOL-dWitnessedBar-17 S9). They are imported OUTSIDE the block,
+so it stays byte-identical: this file imports them from `coverage_join.py`, `compare_base.py`,
+`resolve_kit_dir.py` and `resolve_prefix_token.py` beside it, and each kit copy imports the first two
+and the fourth from its own kit's `coverage_join.py` and the third from its own kit.
 
 A population registers as a `[[ledger]]` table in its owning kit's `kit.toml`, or in the govkit
 registry when no kit owns it, and its ledger file opens with a header rendered from that table:
@@ -51,6 +53,7 @@ from dataclasses import dataclass
 from coverage_join import compute_coverage  # noqa: F401  (the block below calls it)
 from compare_base import resolve_compare_base  # noqa: F401  (the block below calls it)
 from resolve_kit_dir import resolve_kit_dir  # noqa: F401  (the block below calls it)
+from resolve_prefix_token import resolve_prefix_token  # noqa: F401  (the block below calls it)
 
 
 # >>> legacy_ledger_py -- canonical copy: legacy_ledger.py in the gov lib dir (byte-identical; gated)
@@ -479,10 +482,24 @@ def check_home_admitted(root, home):
     return "no directory %s" % parent
 
 
+def derive_seed_prefix(root):
+    """The tool root a seed argv's `{prefix}` names (TOOL-dWitnessedBar-17 S9): the directory above the
+    one holding this copy, relative to `root`, or absolute where no relative path exists, as on another
+    drive on Windows."""
+    tools = pathlib.Path(__file__).absolute().parent.parent
+    try:
+        return pathlib.Path(os.path.relpath(tools, str(root))).as_posix()
+    except ValueError:
+        return tools.as_posix()
+
+
 def run_seed_argv(argv, root):
     """-> (stdout, reason) of one seed run at `root` under `SEED_TIMEOUT`: `reason` is "" for a live
-    result, else `exit <n>`, `timed out` or `dead probe`, a line of its stdout opening `DEAD_PROBE_LEAD`."""
+    result, else `exit <n>`, `timed out` or `dead probe`, a line of its stdout opening `DEAD_PROBE_LEAD`.
+    Each argument's `{prefix}` is resolved through `resolve_prefix_token` against `derive_seed_prefix`."""
     env = {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}
+    troot = derive_seed_prefix(root)
+    argv = [resolve_prefix_token(a, troot) for a in argv]
     try:
         p = subprocess.run(list(argv), cwd=str(root), capture_output=True, text=True, encoding="utf-8",
                            errors="replace", stdin=subprocess.DEVNULL, env=env, timeout=SEED_TIMEOUT)

@@ -147,10 +147,19 @@ never parsed by hand; a row's reason is the conversion record's or its widen rec
   that hides nothing has stopped shrinking. The same run prints which of the three each row earns,
   so a waiver wider than its fault is visible without being failed. Held under `--staged`.
 - **`id-orphan-waiver.txt`** — ids cited in the present tense but never defined, deliberately
-  (check 14). Shrink-only against `ORPHAN_ID_PIN`, with a stale-entry guard: a waived id that
-  now resolves, or that no present-tense file cites, reds.
+  (check 14), the `id-orphan-waiver` ledger keyed by id, with a stale-entry guard: a waived id that
+  now resolves, or that no present-tense file cites, reds. PRESENT, even empty, it arms checks 13
+  and 14; absent, they are off, and `--scaffold` does not write it.
 - **`corpus-path-unresolved.txt`** — rooted repo-path citations that resolve to nothing (check 15),
-  one TAB-separated row per `(citing-file, cited-path)`. Shrink-only against `DEAD_PATH_PIN`.
+  the `corpus-path-unresolved` ledger keyed by `(citing-file, cited-path)`, its count the
+  occurrences. PRESENT, even empty, it arms checks 13 and 15; absent, they are off, and
+  `--scaffold` does not write it.
+- **`row-duplicates.txt`**, **`unbound-records.txt`** — the keyed populations of checks 20 and 21,
+  one row per tolerated duplicate `(shard, id)` and per graded unbound record. Shrink-only; an
+  offender with no row reds, and so does a row no offender matches.
+- **`dossier-decisions-empty.txt`** — the feature dossiers declaring no decisions, one row per
+  feature, graded by `ratchet (both ways)`. **`date-cutoffs.txt`** — every `*_CUTOFF` date of a
+  tracked root conf as an eight-digit ceiling, a blank one `99991231`, so a date moved later reds.
 - **`unarmed-branches.txt`** — `fail` branches no assertion reaches (the harness meta-gate below).
   Shrink-only, and EMPTY is its working state rather than its retirement.
 - **`substitution-fed-loops.txt`** — the sites `gate-lint`'s shell scan grades, shipped by that kit
@@ -359,8 +368,9 @@ Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` pra
 14. **orphan ids** — an id cited in the PRESENT-tense corpus but never defined fails unless listed
     in `project/id-orphan-waiver.txt`. The population is check 15's, decided by one test for both:
     a record of a moment or an append-only file is not a claim about now. The waiver is not a
-    citation. It carries a shrink-only pin (`ORPHAN_ID_PIN`) and a stale-entry guard: a waived
-    id that now resolves, or that no present-tense file cites, is a stale row and reds.
+    citation. It is keyed by id, shrink-only by `ratchet (never gains)`, with a stale-entry guard: a
+    waived id that now resolves, or that no present-tense file cites, is a stale row and reds.
+    The waiver ARMS this check by being present, even empty, and check 13 with it.
     An id with no record is cited as `missing:` written immediately before the id: it is no orphan,
     joins no build's roster, and `--report` counts it on its own line. That form naming an id the
     corpus DEFINES reds in a present-tense file, as marked missing but defined, naming both files.
@@ -369,11 +379,11 @@ Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` pra
     citation counts: it is exactly as broken when it does not resolve, and the flatten left four of
     them in the live ledger. `DEAD_PATH_EXCLUDE` names prefixes that are not repo CONTENT — a
     checkout location, say — because resolution never touches the filesystem and cannot tell meaning
-    from existence. Four rules:
-    (1) set equality between the registry and the measured set, keyed on `(citing-file, cited-path)`
-    with an occurrence count and NEVER on a line number — a line number moves on unrelated edits and
-    a gate whose steady state is red gets bypassed; (2) a shrink-only pin (`DEAD_PATH_PIN`);
-    (3) no duplicate rows; (4) a `moved:<dest>` row needs `<dest>` to be a tracked FILE.
+    from existence. The registry ARMS this check by being present, even empty, and check 13 with it.
+    It is a ledger, read through the ledger factory: set equality between the registry and the
+    measured set, keyed on `(citing-file, cited-path)` with an occurrence count and NEVER on a line
+    number — a line number moves on unrelated edits and a gate whose steady state is red gets
+    bypassed; a duplicate row is the factory's refusal; its shrink is `ratchet (never gains)`'s.
     With `BACKLOG_MODE` set to `builds` the PRESENT-tense corpus swaps `backlog/` for
     `builds/<slug>/BACKLOG.md`: the ask keeps its path grading and the view's derived text does not.
     The member is replaced rather than dropped, because dropping it alone would take every graded
@@ -428,13 +438,14 @@ imported, and with a pin set and the file absent the failure is NAMED, not a tra
     in frozen snapshots where a quoted example row would red a file nobody may edit. Until
     `TOOL-cSpliceWarden-3` the archive half admitted only `DECISIONS.`-prefixed names, so a rotated
     BACKLOG shard was outside this check entirely; three were, and one of them carried two duplicated
-    ids past a green bar for a month. The count of survivors is pinned shrink-only by
-    `ROW_DUPLICATE_PIN`, and an UNDECLARED pin means ZERO — the strictest value, never a refusal and
-    never off, because a default that can only TIGHTEN needs no ceremony.
-    The backlog shards carry two more shrink-only ceilings, `SEVERITY_UNLABELLED_PIN` and
-    `LIVE_ROW_PIN`, one `<shard>:<count>` token per shard. Their polarity is the opposite: undeclared
-    means UNARMED, because no default ceiling over an inherited population is honest, and every green
-    run prints one NOT MEASURED line per unarmed shard, which the gate shows rather than swallows.
+    ids past a green bar for a month. The survivors are KEYED, one row per `(shard, id)` in
+    `project/row-duplicates.txt`: a duplicate with no row reds, and so does a row no duplicate
+    matches, so a repaired duplicate and a new one never net to zero. An ABSENT home is the empty
+    population — the strictest value, never a refusal and never off, because a default that can only
+    TIGHTEN needs no ceremony. Each backlog shard's live and unranked rows are counted too, as the
+    `live-rows` and `severity-unlabelled` populations, registered UNSEEDED: no default over an
+    inherited population is honest, so every green run prints one NOT MEASURED line per shard, which
+    the gate shows rather than swallows.
     Scope is PER FILE deliberately: corpus-wide would red every designed backlog-row-plus-decision-row
     pair. NAMED GAP — the live index and its rotated archive are two files, so a row that rotates out
     and is re-minted is not caught here; the all-time collision grep the index's own header
@@ -679,9 +690,10 @@ carry it too:
   which is a reservation range that admits backlog and decision rows as if they were units.
 - The `none` form's REASON is mandatory; a bare `none` is malformed. The kind is optional there and
   required otherwise, because an unbound record names no ids for a kind to describe. The GRADED
-  count of `none` records — those `RECORD_SERVES_CUTOFF` and `legacy-files.txt` leave — is bounded
-  shrink-only by `RECORD_UNBOUND_PIN`, measured against YOUR corpus. Check 21 prints that count
-  beside `N` on every run, and a pin above it is slack, which reds.
+  `none` records — those `RECORD_SERVES_CUTOFF` and `legacy-files.txt` leave — are KEYED, one row
+  per record in `project/unbound-records.txt`, seeded against YOUR corpus. Check 21 prints their
+  count beside `N` on every run; a graded record with no row reds, and so does a row no graded
+  record matches.
 - `gen_build_index.py --print-bindings` is the read-only report: it classifies every record and
   writes nothing. It exits 0, or 2 on a `SPEC_AUDIT_PIN_CUTOFF` that is neither blank nor an ISO
   date, or on a git read the audit pin needs and cannot make. Beside its A, U, S, B and N rows it

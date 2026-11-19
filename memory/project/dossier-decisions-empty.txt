@@ -1,0 +1,15 @@
+# ledger · dossier-decisions-empty · key key feature · direction shrink-only · drain key
+build-readme-surface	1	a3e1779c7e91ac330cb240f761ac817f088a03ca	seeded
+codebase-map	1	a3e1779c7e91ac330cb240f761ac817f088a03ca	seeded
+govkit	1	a3e1779c7e91ac330cb240f761ac817f088a03ca	seeded
+install-prefix	1	a3e1779c7e91ac330cb240f761ac817f088a03ca	seeded
+kit-placeholders	1	a3e1779c7e91ac330cb240f761ac817f088a03ca	seeded
+lexicon	1	a3e1779c7e91ac330cb240f761ac817f088a03ca	seeded
+memory-recall	1	a3e1779c7e91ac330cb240f761ac817f088a03ca	seeded
+memory-tree-merge-driver	1	a3e1779c7e91ac330cb240f761ac817f088a03ca	seeded
+playbook-mode	1	a3e1779c7e91ac330cb240f761ac817f088a03ca	seeded
+review-harnesses	1	a3e1779c7e91ac330cb240f761ac817f088a03ca	seeded
+row-grammar	1	a3e1779c7e91ac330cb240f761ac817f088a03ca	seeded
+session-kickoff	1	a3e1779c7e91ac330cb240f761ac817f088a03ca	seeded
+spec-tokens	1	a3e1779c7e91ac330cb240f761ac817f088a03ca	seeded
+testsuite-counts	1	a3e1779c7e91ac330cb240f761ac817f088a03ca	seeded

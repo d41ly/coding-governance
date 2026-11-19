@@ -277,17 +277,11 @@ HANDKEPT: list[dict] = [
 RATCHET_LOOKBACK = 14
 
 RATCHETS: list[dict] = [
-    {"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"},
-    {"file": ".memory-tree.conf", "key": "DEAD_PATH_PIN", "weakens": "up"},
     {"file": ".memory-tree.conf", "key": "UNIVERSAL_BUDGET", "weakens": "up"},
-    {"file": ".memory-tree.conf", "key": "ROW_DUPLICATE_PIN", "weakens": "up"},
-    # The six rows naming this layer's own pins retired with its `PINS` dict (TOOL-dWitnessedBar-16 S8):
-    # the pins are `drift-pins` rows, and raising one is the `ratchet` pack's widen, which costs a
-    # widen record and its reason where these rows cost an `<old> -> <new>` comment.
-    # A pin in ANOTHER kit's conf. The ratchet does not care which file a scalar lives in, and
-    # codebase-map has no shrink-only mechanism of its own - so an adopter without drift-audit
-    # gets a declared pin and no enforcement, which the conf example states rather than hides.
-    {"file": ".codebase-map.conf", "key": "DOSSIER_DECISIONS_EMPTY_PIN", "weakens": "up"},
+    # The six rows naming this layer's own pins retired with its `PINS` dict (TOOL-dWitnessedBar-16 S8),
+    # and the four naming conf pins with their keys (TOOL-dWitnessedBar-17 S5): each is a keyed
+    # population now, and its growth is the `ratchet` pack's `never gains` case, which costs a widen
+    # record and its reason where these rows cost an `<old> -> <new>` comment. A budget is no pin.
 ]
 
 CHARTER = "AGENTS.md"

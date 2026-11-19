@@ -90,6 +90,12 @@ memory/builds/*/BACKLOG.md merge=rows
 # reads a ledger's rendered header and keys its TAB rows, so two branches draining one population merge
 # with the lower count. `conf-scalar-pins` is TOOL-dWitnessedBar-14's.
 memory/project/conf-scalar-pins.txt merge=rows
+# TOOL-dWitnessedBar-17 S7: the keyed pin populations, the date cutoffs and the converted dead-path registry.
+memory/project/row-duplicates.txt merge=rows
+memory/project/unbound-records.txt merge=rows
+memory/project/dossier-decisions-empty.txt merge=rows
+memory/project/date-cutoffs.txt merge=rows
+memory/project/corpus-path-unresolved.txt merge=rows
 # The registries converted onto the ledger grammar (TOOL-dWitnessedBar-16 S9): a concurrent drain of
 # one reaches the row-keyed driver's ledger class rather than conflicting on the whole file.
 memory/map/affordance-exempt.txt merge=rows

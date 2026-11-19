@@ -204,5 +204,5 @@ DECLARED_EMPTY: set[str] = {
 # RATCHET_LOOKBACK = 14
 
 RATCHETS: list[dict] = [
-    # {"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"},
+    # {"file": ".memory-tree.conf", "key": "UNIVERSAL_BUDGET", "weakens": "up"},
 ]

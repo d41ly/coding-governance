@@ -2080,7 +2080,7 @@ def test_ratchet_guard(tmp: pathlib.Path) -> None:
     # `git show <base>:<file>`, so a pin that exists only in the working tree has no prior value and
     # is correctly ignored. Seeding it in the working tree alone would make every direction below
     # pass by finding nothing.
-    conf.write_text(conf.read_text(encoding="utf-8") + 'ORPHAN_ID_PIN="5"\n',
+    conf.write_text(conf.read_text(encoding="utf-8") + 'FIXTURE_PIN="5"\n',
                     encoding="utf-8", newline="\n")
     # `make_repo` writes its own MINIMAL signals module, so there is no RATCHETS list to edit —
     # appending one is the only thing that arms this fixture. A `.replace()` against a string this
@@ -2088,7 +2088,7 @@ def test_ratchet_guard(tmp: pathlib.Path) -> None:
     # and passes by finding nothing. That is exactly what the first cut of this arm did.
     sig.write_text(
         sig.read_text(encoding="utf-8")
-        + 'RATCHETS = [{"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"}]\n',
+        + 'RATCHETS = [{"file": ".memory-tree.conf", "key": "FIXTURE_PIN", "weakens": "up"}]\n',
         encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     seeded = run(["git", "commit", "-q", "-m", "seed the ratchet", "--no-verify"], r)
@@ -2097,7 +2097,7 @@ def test_ratchet_guard(tmp: pathlib.Path) -> None:
     # The base value has to be READABLE, or every direction is a skip wearing a pass.
     at_base = run(["git", "show", "main:.memory-tree.conf"], r)
     check("the pin is readable at the fixture's base",
-          at_base.returncode == 0 and 'ORPHAN_ID_PIN="5"' in at_base.stdout,
+          at_base.returncode == 0 and 'FIXTURE_PIN="5"' in at_base.stdout,
           at_base.stdout[-200:])
     committed = conf.read_text(encoding="utf-8")
 
@@ -2109,7 +2109,7 @@ def test_ratchet_guard(tmp: pathlib.Path) -> None:
           (base_ok.stdout + base_ok.stderr)[-400:])
 
     # --- direction one: weakened, unjustified -------------------------------------------------
-    conf.write_text(committed.replace('ORPHAN_ID_PIN="5"', 'ORPHAN_ID_PIN="9"'),
+    conf.write_text(committed.replace('FIXTURE_PIN="5"', 'FIXTURE_PIN="9"'),
                     encoding="utf-8", newline="\n")
     out = _check()
     check("an unjustified RAISE is refused",
@@ -2117,8 +2117,8 @@ def test_ratchet_guard(tmp: pathlib.Path) -> None:
           (out.stdout + out.stderr)[-400:])
 
     # --- direction two: the SAME raise, justified in place ------------------------------------
-    justified = "# RAISED 5 -> 9 because the fixture says so.\n" + 'ORPHAN_ID_PIN="9"'
-    conf.write_text(committed.replace('ORPHAN_ID_PIN="5"', justified),
+    justified = "# RAISED 5 -> 9 because the fixture says so.\n" + 'FIXTURE_PIN="9"'
+    conf.write_text(committed.replace('FIXTURE_PIN="5"', justified),
                     encoding="utf-8", newline="\n")
     out = _check()
     check("the same RAISE with a justification naming both values is allowed",
@@ -2128,7 +2128,7 @@ def test_ratchet_guard(tmp: pathlib.Path) -> None:
     # --- direction three: TIGHTENED, unjustified ----------------------------------------------
     # A ratchet that also refuses improvement is a ratchet nobody turns, so this direction must be
     # free. Without it, direction one would pass equally against a guard that refused any edit.
-    conf.write_text(committed.replace('ORPHAN_ID_PIN="5"', 'ORPHAN_ID_PIN="1"'),
+    conf.write_text(committed.replace('FIXTURE_PIN="5"', 'FIXTURE_PIN="1"'),
                     encoding="utf-8", newline="\n")
     out = _check()
     check("a tightening move needs no justification",
@@ -2302,11 +2302,11 @@ def test_base_is_remote_tracking(tmp: pathlib.Path) -> None:
     r = make_repo(tmp, name="remotebase")
     conf = r / ".memory-tree.conf"
     sig = r / KIT_NAME / "drift_signals.py"
-    conf.write_text(conf.read_text(encoding="utf-8") + 'ORPHAN_ID_PIN="5"\n',
+    conf.write_text(conf.read_text(encoding="utf-8") + 'FIXTURE_PIN="5"\n',
                     encoding="utf-8", newline="\n")
     sig.write_text(
         sig.read_text(encoding="utf-8")
-        + 'RATCHETS = [{"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"}]\n',
+        + 'RATCHETS = [{"file": ".memory-tree.conf", "key": "FIXTURE_PIN", "weakens": "up"}]\n',
         encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "seed the ratchet", "--no-verify"], r)
@@ -2316,7 +2316,7 @@ def test_base_is_remote_tracking(tmp: pathlib.Path) -> None:
     run(["git", "init", "-q", "--template=", "--bare", str(bare)], tmp)
     run(["git", "remote", "add", "origin", str(bare)], r)
     # THE RAISE, UNJUSTIFIED, pushed — what a raise another node already landed looks like from here.
-    conf.write_text(conf.read_text(encoding="utf-8").replace('ORPHAN_ID_PIN="5"', 'ORPHAN_ID_PIN="9"'),
+    conf.write_text(conf.read_text(encoding="utf-8").replace('FIXTURE_PIN="5"', 'FIXTURE_PIN="9"'),
                     encoding="utf-8", newline="\n")
     run(["git", "commit", "-q", "-am", "raise the pin on origin", "--no-verify"], r)
     tip = run(["git", "rev-parse", "HEAD"], r).stdout.strip()

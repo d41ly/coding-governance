@@ -170,6 +170,20 @@ def resolve_compare_base(root):
 # <<< compare_base_py
 
 
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
+
+
 def derive_baseline_additions(root: Path, base: str, rel: str) -> tuple[dict[str, list[str]] | None, str]:
     """Per inventory id of the map baseline the registration homed at `rel` (a root-relative POSIX path)
     declares, the keys its rows at the compare base did not carry — or None with the reason when there is

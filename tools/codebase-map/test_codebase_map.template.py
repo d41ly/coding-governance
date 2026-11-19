@@ -207,47 +207,6 @@ def test_dossier_affordance_present_or_graced() -> None:
     )
 
 
-# A NEW DOSSIER'S `decisions` LIST STARTS EMPTY AND IS NOT FINISHED THERE. It holds the unit ids
-# that govern the feature, it is graded shrink-only by the check below, and it is filled as those
-# ids are learned rather than guessed — a guessed id RESOLVES, which makes it worse than a visibly
-# empty list. This guidance sits here, beside the check that reads the population, rather than in
-# the scaffolder: the skeleton it was first written into is the one file the dossier loader
-# EXCLUDES from that population, so the check could never see it.
-def test_dossier_decisions_are_declining() -> None:
-    """How many dossiers declare NO decisions, against a shrink-only pin.
-
-    An empty list passes validation, so nothing has ever failed on the field, so nobody fills
-    it, so the reuse audit returns a seam with no rationale. That is the vacuous-selector
-    class: a rule that binds nothing reports clean forever. The pin is what converts "legal"
-    into "declining".
-
-    UNSET OR EMPTY IS UNGRADED, AND SAYS SO. A fresh adopter has no measurement of their own
-    corpus, and a number copied from another tree is either vacuous or permanently red. Reading
-    an absent pin as 0 would red their first run; reading it as "skip" silently would make this
-    check the very thing it exists to close. So it announces.
-    """
-    tree = m.load_map_tree(INVENTORY_IDS, decision_id_re=ID_RE)
-    if not tree.dossiers:
-        # UNGRADED, not failed. A freshly seeded tree has no dossiers yet, and asserting over
-        # an empty population is how this check reds an adopter on their first run. It binds
-        # the day the first dossier lands -- the same shape the unset-pin branch below uses.
-        print("     UNGRADED: no dossiers under the map root yet; this check grades a "
-              "population that does not exist, and binds when the first dossier lands")
-        return
-    empty = sorted(d.feature for d in tree.dossiers if not d.decisions)
-    raw = (m.load_conf().get("DOSSIER_DECISIONS_EMPTY_PIN", "") or "").strip()
-    if not raw:
-        print(f"     UNGRADED: {len(empty)} of {len(tree.dossiers)} dossier(s) declare no decisions; "
-              "set DOSSIER_DECISIONS_EMPTY_PIN in the kit conf to a value measured on THIS corpus")
-        return
-    pin = int(raw)
-    assert len(empty) <= pin, (
-        f"{len(empty)} of {len(tree.dossiers)} dossier(s) declare no decisions, over a "
-        f"shrink-only pin of {pin}. Fill one, or lower the pin with the reading beside it.\n"
-        f"empty: {empty}"
-    )
-
-
 def test_dossier_prose_carries_no_typed_count() -> None:
     """No present-tense digit count of an inventory population in dossier prose.
 
@@ -349,7 +308,6 @@ if __name__ == "__main__":
         test_baseline_never_gains_a_key,
         test_dossier_prose_headings_pinned,
         test_dossier_affordance_present_or_graced,
-        test_dossier_decisions_are_declining,
         test_dossier_prose_carries_no_typed_count,
         test_path_derived_keys_are_posix,
         test_generated_artifacts_are_fresh,

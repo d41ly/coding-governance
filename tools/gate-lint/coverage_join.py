@@ -2,8 +2,9 @@
 (TOOL-dWitnessedBar-13).
 
 `compute_coverage` with its `Coverage` and `drop_touched_exemptions`, then
-`resolve_compare_base`, the merge bar's compare base, with the remote ladder it calls: the three names
-this kit's `legacy_ledger.py` reaches. This kit requires no other kit, so it carries them itself rather
+`resolve_compare_base`, the merge bar's compare base, with the remote ladder it calls, then
+`resolve_prefix_token`, through which a seed argv's `{prefix}` resolves (TOOL-dWitnessedBar-17 S9): the
+names this kit's `legacy_ledger.py` reaches. This kit requires no other kit, so it carries them itself rather
 than importing memory-tree's `coverage_join.py`, whose shape this file copies.
 
 Each block below is INLINED byte-identically from the canonical copy its marker line names, gov's lib
@@ -165,3 +166,17 @@ def resolve_compare_base(root):
         return mb, "merge-base of HEAD and %s/%s" % (remote, branch)
     return tip, "%s/%s tip" % (remote, branch)
 # <<< compare_base_py
+
+
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token

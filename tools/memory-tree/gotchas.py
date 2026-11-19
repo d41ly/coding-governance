@@ -1276,7 +1276,9 @@ def cmd_selftest() -> int:
         tw, _cw = build_tree("with-ids", {
             "x.md": _rec("x", "d", f"Fires on `{PFX}some-gate.sh`. Nothing said about a gate.\n"),
             "inv.md": build_invariant("inv")},
-            {".memory-tree.conf": conf_text + 'CHARTER="AGENTS.md"\nORPHAN_ID_PIN="0"\n',
+            {".memory-tree.conf": conf_text + 'CHARTER="AGENTS.md"\n',
+             # The orphan waiver, empty, arms checks 13 and 14 (TOOL-dWitnessedBar-17 S4).
+             "memory/project/id-orphan-waiver.txt": "",
              "AGENTS.md": "# charter\n\nRead `memory/README.md` first.\n"})
 
         def run_framed(loader):
