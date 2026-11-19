@@ -19750,9 +19750,13 @@ if in_shard 8; then
 # refused one its feed cannot hold at all, GOVFEED_DIR naming a file (AC5); an offer to `b/s1`
 # refuses c2 under `s2`, `absent` and no session and lands under `s1` (AC9); and c1's take, replayed
 # from a read the fetch shim keeps stale after c2 took the lease, is refused `epoch-fence`, each epoch
-# once on the origin (AC6). RED, observed at the close, is the base driver, which has no offer act.
-# Waived by README rule 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: a policy
-# setting `leases.offer-seconds`, and an offer queued offline.
+# once on the origin (AC6); and a policy setting `leases.offer-seconds` to 60 is the window written
+# (AC7). The refusal arms beside them: an offer with no `--to` and an acquire with one exit 2, a
+# renewal of an offered lease writes nothing, a draw of an offered build lease is refused `offered`,
+# and an offer over a tombstone is refused `terminal`. RED, observed at the close, is the base
+# driver, which has no offer act. Waived by README rule 8 with the rest of this suite. WHAT THIS
+# BLOCK DOES NOT DRIVE: an offer queued offline, a registry `read_fleet` refuses, and a window the
+# policy kit answers outside the driver's number grammar, which no policy file reaches.
 # ==================================================================================================
 run_offer_arm() { # clone dir · user · session, `-` for none · --lease args -> its output, its exit kept
   local d="$1" u="$2" s="$3"; shift 3
@@ -19770,6 +19774,12 @@ of_rc=""
 for of_t in zz "b/s 1" b/absent b/; do run_offer_arm "$LF/c1" daily-agent sa offer unit tFix u1 --to "$of_t" >/dev/null; of_rc="$of_rc$? "; done
 same "DPR20 AC2 AC9 zz, 'b/s 1', b/absent and b/ each exit 2 before any read: no ref, no last fetch" \
   "$of_rc$(git --git-dir="$LF/origin.git" for-each-ref refs/gov | grep -c .) $([ -e "$LF/c1/.git/gov-last-fetch" ] && echo stamped || echo unread)" "2 2 2 2 0 unread"
+of_out=$(run_offer_arm "$LF/c1" daily-agent sa offer unit tFix u1); of_rc=$?
+of_o2=$(run_offer_arm "$LF/c1" daily-agent sa acquire unit tFix u1 --to b); of_rc="$of_rc $?"
+same "DPR20 S1 an offer with no --to, and an acquire with one, exit 2 writing nothing" \
+  "$of_rc $(git --git-dir="$LF/origin.git" for-each-ref refs/gov | grep -c .)" "2 2 0"
+hit  "$of_out" "lease not written — --lease offer names its target with --to <fleet tag>[/<session>]"
+hit  "$of_o2" "lease not written — --to names an offer's target, and acquire takes none"
 of_out=$(run_offer_arm "$LF/c1" daily-agent sa offer unit tFix u1 --to b)
 hit  "$of_out" "lease — tFix/unit/u1 · offer b · epoch 1"
 same "DPR20 AC1 AC7 the offer record: status, offer, offer-deadline, epoch" \
@@ -19777,6 +19787,11 @@ same "DPR20 AC1 AC7 the offer record: status, offer, offer-deadline, epoch" \
 of_t0=$(read_offer_tip u1); of_out=$(run_offer_arm "$LF/c1" daily-agent sa acquire unit tFix u1)
 hit  "$of_out" "lease refused — offered · tFix/unit/u1 · b"
 same "DPR20 AC3 a node the offer does not name moves no tip" "$(read_offer_tip u1)" "$of_t0"
+of_out=$(run_offer_arm "$LF/c1" daily-agent sa renew unit tFix u1)
+hit  "$of_out" "lease not written — tFix/unit/u1 holds no lease to renew"
+run_offer_arm "$LF/c1" daily-agent sa offer build tFix --to b >/dev/null
+of_out=$(run_offer_arm "$LF/c1" daily-agent sa acquire build tFix --for draw)
+hit  "$of_out" "lease refused — offered · tFix/build · b"
 of_out=$(run_offer_arm "$LF/c2" agent5 s1 acquire unit tFix u1)
 hit  "$of_out" "lease — tFix/unit/u1 · take · epoch 2"
 same "DPR20 AC4 the named node's take carries no offer" \
@@ -19784,6 +19799,10 @@ same "DPR20 AC4 the named node's take carries no offer" \
 of_t0=$(read_offer_tip u1); of_out=$(run_offer_arm "$LF/c1" daily-agent sa offer unit tFix u1 --to b)
 hit  "$of_out" "lease refused — live-holder · tFix/unit/u1 · "
 same "DPR20 AC1 an offer over a live lease moves no tip" "$(read_offer_tip u1)" "$of_t0"
+run_offer_arm "$LF/c2" agent5 s1 release unit tFix u1 --as withdrawn >/dev/null
+of_t0=$(read_offer_tip u1); of_out=$(run_offer_arm "$LF/c1" daily-agent sa offer unit tFix u1 --to b)
+hit  "$of_out" "lease refused — terminal · tFix/unit/u1 · "
+same "DPR20 S1 an offer over a tombstone moves no tip" "$(read_offer_tip u1)" "$of_t0"
 # ---- AC5: the window is the observer clock's: a sighting 301 s old frees it, none holds it.
 run_offer_arm "$LF/c1" daily-agent sa offer unit tFix u3 --to b >/dev/null
 awk -F'\t' -v OFS='\t' -v c="$(read_offer_tip u3)" -v s="$(derive_claim_ago 301)" '$5 == c { $6 = s } { print }' "$of_feed" >"$of_feed.t" && mv -f "$of_feed.t" "$of_feed"
@@ -19811,6 +19830,11 @@ of_out=$( cd "$LF/c1" && PATH="$of_bin:$PATH" USERNAME=daily-agent CLAUDE_CODE_S
 hit  "$of_out" "lease refused — epoch-fence · tFix/unit/u2 · "
 same "DPR20 AC6 the origin names b at epoch 2, each epoch once, never falling" \
   "$(read_lease_field tFix/unit/u2 fleet-tag) $(git --git-dir="$LF/origin.git" log --reverse --format=%B refs/gov/leases/tFix/unit/u2 -- | sed -n 's/^epoch: //p' | tr '\n' ' ')" "b 1 2 "
+# ---- AC7: the window is the policy's, read at the write; a driver typing 300 reds here.
+write_lease_policy '[leases]
+offer-seconds = 60'
+run_offer_arm "$LF/c1" daily-agent sa offer unit tFix u8 --to b >/dev/null
+same "DPR20 AC7 the offer writes the window leases.offer-seconds sets" "$(read_lease_field tFix/unit/u8 offer-deadline)" "60"
 rm -rf "$LF"
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
@@ -22097,7 +22121,9 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # (9 `same`, 8 `hit`) and the cell table's one `offered` lease cell, its five run-column cells
 # unreached and counted as none, off the diff's own lines; no skip branch. No suite ran, and its
 # RED-first observation is the close's.
-FLOOR_ASSERTIONS=3755
+# RAISED 3755 -> 3763 by TOOL-dPlacedRequest-20's checklist pass: the offer block's 8 refusal and
+# window arms (3 `same`, 5 `hit`), off the diff's own lines; no skip branch. No suite ran.
+FLOOR_ASSERTIONS=3763
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -22354,7 +22380,8 @@ FLOOR_SHARD_7=311
 # RAISED 940 -> 955 by TOOL-dPlacedRequest-39: the same 15 region-eight contained append assertions, see FLOOR_ASSERTIONS.
 # RAISED 955 -> 968 by TOOL-dPlacedRequest-41: the same 13 region-eight offline chain assertions, see FLOOR_ASSERTIONS.
 # RAISED 968 -> 986 by TOOL-dPlacedRequest-20: the same 18 region-eight offer and cell assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=986
+# RAISED 986 -> 994 by TOOL-dPlacedRequest-20's checklist pass: the same 8 region-eight refusal and window arms, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=994
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

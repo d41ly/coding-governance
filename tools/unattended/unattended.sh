@@ -2687,7 +2687,8 @@ CLAIM_MODES="preflight take-over holder status beat lease"
 # TOOL-dPlacedRequest-1 S6 - THE `lease` MODE, the `--lease` verbs' column, called as `<name> lease
 # <fleet tag> <session> <act>`: a lease is `mine` when its fleet tag and session are this node's and
 # this harness's, `same session` when only the session is, and `foreign` otherwise. rc 0 writes with
-# CW_ACT; rc 1 is refused with CW_CAUSE (`live-holder` or `tombstone`, CW_HINT `take-over` on a stale
+# CW_ACT; rc 1 is refused with CW_CAUSE (`live-holder` or `tombstone`, and `offered` or `terminal` for
+# TOOL-dPlacedRequest-20 below, CW_HINT `take-over` on a stale
 # acquire) and prints nothing, the verb printing its own line; rc 3 is `none` under renew or release.
 # Every row read also sets CW_EPOCH, CW_KIND (`-` for a legacy claim), CW_TAG, CW_WIT and CW_LEASE.
 # TOOL-dPlacedRequest-16 - `foreign-released` is free to every mode but the holder's, which refuses it

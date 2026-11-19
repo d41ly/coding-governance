@@ -38,10 +38,10 @@ run's scratch directory over a fixture under the node's short temp path: a bare 
 - AC3 — clone A's `--lease acquire unit fx u1` inside the window printed
   `lease refused — offered · fx/unit/u1 · b`, exit 1, the tip unmoved; `take-over` the same; a build (DERIVED)
   lease offered to `b` refused A's acquire the same way. `CLAIM_READS` names `offered`.
-- AC4 — clone B's acquire printed `lease — fx/unit/u1 · take · epoch 2`; the record read `status: (DERIVED)
-  live`, `offer: -`, `offer-deadline: -`, `fleet-tag: b`.
-- AC5 — with clone A's feed line for the offer tip restamped 301 seconds old, A's acquire of (DERIVED)
-  `fx/unit/u3` printed `lease — fx/unit/u3 · take · epoch 2`, `offer: -`. With `GOVFEED_DIR` naming (DERIVED)
+- AC4 — clone B's acquire landed at `epoch: 2`, printing `lease — fx/unit/u1 · take · epoch 2`; (DERIVED)
+  the record read `status: live`, `offer: -`, `offer-deadline: -`, `fleet-tag: b`.
+- AC5 — `gov-feed.log` of clone A, its line for the offer tip restamped 301 seconds old: A's (DERIVED)
+  acquire of `fx/unit/u3` printed `lease — fx/unit/u3 · take · epoch 2`, `offer: -`. With `GOVFEED_DIR` naming (DERIVED)
   a regular file, so the feed could hold no sighting, A's acquire of `fx/unit/u4` printed
   `lease refused — offered · fx/unit/u4 · b`, the tip unmoved. An `offer-deadline` replanted as
   `30x` read as expired: A took `fx/unit/u5` at epoch 2. (DERIVED)
@@ -62,6 +62,19 @@ run's scratch directory over a fixture under the node's short temp path: a bare 
 - `bash -n` read both changed shell files clean. Four names were checked with the naming lexicon
   before they were written: `write_lease_offer` and `check_fleet_tag` in the driver, `run_offer_arm`
   and `read_offer_tip` in the suite.
+
+- The bug-class checklist over the pass commit selected 53 classes. One needed a change: (DERIVED)
+  `refusal-branch-with-no-arm`. An offer with no `--to`, an acquire carrying one, a renewal of an
+  offered lease, a draw of an offered build lease and an offer over a tombstone had no arm; each now
+  has one in the region-eight block, beside a policy window of 60 seconds that a driver typing the (DERIVED)
+  default would red (AC7). The probe observed each: exit 2 naming `--to` for the first two, (DERIVED)
+  `lease not written — fx/unit/u4 holds no lease to renew`, `lease refused — offered · fx/build · b`,
+  `lease refused — terminal`, and `offer-deadline: 60`. Two refusal branches stay armless and are (DERIVED)
+  named in the block: `check_fleet_tag` over a registry `read_fleet` refuses, the kit's own tracked
+  file, and a `leases.offer-seconds` answer outside the driver's number grammar, which the policy kit
+  refuses for the whole file before the driver reads the key, as a probe of a fresh fixture showed.
+  `two-answers-to-one-question` was swept: the refusal causes read the same in the driver, both
+  guides and `help/loop.md`. The codebase map was re-rendered with the four new functions.
 
 **Owed at the close.** The new arm in `tools/unattended/unattended.test.sh`, the region-eight offer
 block and the `offered` row of the claim cell table, runs and is observed RED-first against the base

@@ -6168,6 +6168,11 @@
       "file": "tools/run-gates/check-receipt.py"
     },
     {
+      "id": "check_fleet_tag",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_floor_bash",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -21568,6 +21573,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "read_offer_tip",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "read_one_line_cap",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -30468,6 +30478,11 @@
       "file": "tools/loop/loop_witness.py"
     },
     {
+      "id": "run_offer_arm",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "run_on_invalid_classes",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -37051,6 +37066,11 @@
       "id": "write_lease_fixture",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_lease_offer",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "write_lease_policy",
