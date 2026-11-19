@@ -4,7 +4,6 @@ node: d
 opened: 2026-11-19
 streams: tooling
 roster: TOOL
-status: OPEN
 ids: TOOL-dLandedOwners-1 TOOL-dLandedOwners-2 TOOL-dLandedOwners-3
 ---
 
@@ -51,25 +50,33 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-11-19 · streams tooling
+**Build status:** SPECCED · 3 unit(s) · node d · opened 2026-11-19 · streams tooling
 ids TOOL-dLandedOwners-1 TOOL-dLandedOwners-2 TOOL-dLandedOwners-3
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dLandedOwners-1 — the policy kit's landed predicate counts a build run that carried a unit forward](spec/2026-11-19-spec-TOOL-dLandedOwners-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-11-19 |
+| [TOOL-dLandedOwners-2 — the reader scan reads a key passed to a reader through a module constant](spec/2026-11-19-spec-TOOL-dLandedOwners-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-19 |
+| [TOOL-dLandedOwners-3 — a key read only outside the scanned code takes a declared, reasoned disposition in reader coverage](spec/2026-11-19-spec-TOOL-dLandedOwners-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 3 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dLandedOwners-1 TOOL-dLandedOwners-2 TOOL-dLandedOwners-3.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-dLandedOwners-1` | no |
+| 2 | `TOOL-dLandedOwners-2` | no |
+| 3 | `TOOL-dLandedOwners-3` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
