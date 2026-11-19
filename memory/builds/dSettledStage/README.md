@@ -53,11 +53,11 @@ ids TOOL-dSettledStage-1 TOOL-dSettledStage-2
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dSettledStage-1 — the lander commits a dirty-then-staged change only when the stage holds a diff](spec/2026-11-19-spec-TOOL-dSettledStage-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-11-19 |
+| [TOOL-dSettledStage-1 — the lander commits a dirty-then-staged change only when the stage holds a diff](spec/2026-11-19-spec-TOOL-dSettledStage-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-19 |
 | [TOOL-dSettledStage-2 — a commit after a stage nothing tested is gated: a fifth shell-hygiene mode](spec/2026-11-19-spec-TOOL-dSettledStage-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

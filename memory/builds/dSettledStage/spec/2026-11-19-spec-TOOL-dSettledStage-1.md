@@ -1,11 +1,12 @@
 # TOOL-dSettledStage-1 — the lander commits a dirty-then-staged change only when the stage holds a diff
 
-**Status:** SPECCED · rev-1 · 2026-11-19 · node d · Tier-2 · base 12764ec2 · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-11-19 · node d · Tier-2 · base 12764ec2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-19-build-TOOL-dSettledStage-1-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dSettledStage-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dSettledStage-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dSettledStage-1-brief.md) | research | TOOL-dSettledStage-2 |
 
 <!-- /gen:spec-records -->
