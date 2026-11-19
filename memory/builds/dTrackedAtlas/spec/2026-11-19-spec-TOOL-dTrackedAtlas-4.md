@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-19-build-TOOL-dTrackedAtlas-4-red-fix-7.md](../build/2026-11-19-build-TOOL-dTrackedAtlas-4-red-fix-7.md) | red-fix | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-3-name-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-3-name-fold.md) | research | TOOL-dTrackedAtlas-3 |

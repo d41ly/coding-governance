@@ -11,8 +11,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 ## Run facts
 refreshed-at: 9e21ac760dc0a43d6ed007396922722ccee98d57 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 20ca97bea95eaa03709ae81f8281bd9de8606ec1
-phase: BUILDING
+witness: 2e5147a2ef4389b44980f71aca2874f91a105bf4
+phase: REVIEWING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/unattended-atlas-actual-state-a632fb

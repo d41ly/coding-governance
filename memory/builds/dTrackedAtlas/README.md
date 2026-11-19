@@ -70,7 +70,7 @@ ids TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTracked
 | [TOOL-dTrackedAtlas-4 — the Atlas page regenerates on node d after main moves, behind a switch whose default is on](spec/2026-11-19-spec-TOOL-dTrackedAtlas-4.md) | 4 | 1 | DEFERRED | rev-6 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 32 bound to this build, across 3 record folder(s).
+Records: 33 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
