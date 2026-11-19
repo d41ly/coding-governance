@@ -24,19 +24,19 @@ parked-surfaced: yes, 2 surfaced
 keepalive-reaped: yes
 refreshed-at: 9e21ac760dc0a43d6ed007396922722ccee98d57 · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 15c462a7dd7a75bde4979f7b3e0621f6cb23885e
-phase: HELD
+witness: c942b173d3b67ef8a3a22a5e6607943fc9abcd92
+phase: VERIFYING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/unattended-atlas-actual-state-a632fb
 anchor-kind: local
 cli-version: 2.1.326
-lease-utc: 2026-11-19T03:05:25Z
+lease-utc: 2026-11-19T09:34:29Z
 pid-image: claude.exe
 host: compeeto
 pid: 22548
 session: f00276e6-f2b8-488e-8f71-fd4be1ebb07e
-keepalive: f637f308
+keepalive: 5ea16741
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 9e21ac760dc0a43d6ed007396922722ccee98d57
 anchor-ref: refs/heads/main
@@ -115,3 +115,5 @@ base: 6547d032070ac45966116e412d91e84ceef963b1
 2026-11-19T08:45:21Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dTrackedAtlas && bash tools/push-main.sh --land --slug dTrackedAtlas && bash tools/unattended/unattended.sh --settle dTrackedAtlas
 
 2026-11-19T08:45:21Z hold · item owner-decision · reason until owner · reaped f637f308 · resume none(owner)
+
+2026-11-19T09:34:32Z resume · item dTrackedAtlas · reason held · keepalive 5ea16741 · manual
