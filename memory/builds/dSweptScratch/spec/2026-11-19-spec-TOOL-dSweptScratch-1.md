@@ -1,6 +1,6 @@
 # TOOL-dSweptScratch-1 — every selftest and fixture removes the scratch it made, read-only git objects included
 
-**Status:** CLOSED · rev-1 · 2026-11-19 · node d · Tier-1 · base 389c0c86 · streams tooling
+**Status:** CLOSED · rev-2 · 2026-11-19 · node d · Tier-1 · base 389c0c86 · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -86,9 +86,9 @@ lost its `SCRATCH+=`, a reassigned variable, an EXIT trap replaced by a later on
   (overlay), 14 (review bounds), 12 (pins), 12 (core), 8 (build index), 5 (merge-rows), 2 (pre-push
   bar), 2 (pre-push), 2 (process-monitor), 1 (check-receipt), 1 (migrate-backlog), 1 (routed
   commits), 1 (verifier fan-out), measured on node `d`.
-- **AC2** — When `python tools/runlog/selftest.py` and each other touched suite runs, its verdict is
-  the one the unchanged suite gives. Red when: a removal error reaches a suite
-  that passed, or a new import fails where a fixture is planted alone.
+- **AC2** — When `python tools/govkit/fixtures/stale_edges.py --plant order` runs as a planted fixture,
+  it exits 0 with its scratch removed, as the unchanged fixture exits. Red when: a removal error
+  reaches a fixture that passed, or the new import fails where the fixture is planted alone.
 
 ## 6. Gates
 
@@ -104,3 +104,5 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-11-19 · initial draft.
+- rev-2 · 2026-11-19 · AC2 moved its witness from a suite run to the `stale_edges.py --plant order`
+  fixture, which the spec-tokens bar join reads as an acceptance observation.

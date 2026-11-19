@@ -247,3 +247,4 @@ memory/builds/aPiecewiseGrade/README.md
 memory/builds/aHastenedSweep/README.md
 memory/builds/aTrimmedWait/README.md
 memory/builds/dTrackedAtlas/README.md
+memory/builds/dSweptScratch/README.md
