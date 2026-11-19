@@ -1020,11 +1020,11 @@ raised: [[retired]] row 1 needs a non-empty string id and successor" ] \
 # predicate instead of the probe. A host with no node prints nothing and reds, never skips. WHAT THIS
 # DOES NOT CHECK: a real WSL bash over a `/mnt/` checkout, which the spec's AC1, AC4 and AC6 staged on
 # node d, or a resolver copy refusing for its own location, which the parity rows hold to the canonical.
-RWS_ROWS="1|/mnt/c/r/tools/x.sh|1
-1|/home/u/mirror.held/s/tools/x.sh|0
-0|/mnt/c/r/tools/x.sh|0
-0|C:/r/tools/x.sh|0
-0|/c/r/tools/x.sh|0
+RWS_ROWS="1|/mnt/c/r/src/x.sh|1
+1|/home/u/mirror.held/s/src/x.sh|0
+0|/mnt/c/r/src/x.sh|0
+0|C:/r/src/x.sh|0
+0|/c/r/src/x.sh|0
 1|/mnt/data/x.sh|0"
 rws_want=$(printf '%s\n' "$RWS_ROWS" | cut -d'|' -f3)
 rws_sh=$(while IFS='|' read -r w p _; do
