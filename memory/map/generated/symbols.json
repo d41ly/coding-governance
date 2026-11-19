@@ -29468,6 +29468,11 @@
       "file": "tools/govkit/upgrade_walk.py"
     },
     {
+      "id": "run_consent_arm",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "run_constant_control",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"

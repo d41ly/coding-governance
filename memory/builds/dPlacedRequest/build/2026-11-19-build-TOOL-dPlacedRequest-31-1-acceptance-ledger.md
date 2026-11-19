@@ -44,3 +44,19 @@ block's assertions green on this driver; under the base driver 5 (DERIVED) faile
 the replaced-copy `DPR31 AC1`, the stored-blob `DPR31 AC2` and `DPR31 S2`. That probe is no suite reading.
 The suite is waived for this build's landing by README rule 8. The floors rose by the same 8 (DERIVED):
 `FLOOR_ASSERTIONS` and `FLOOR_SHARD_8`.
+
+**The checklist, acted on.** The bug-class checklist over the pass commit selected 54 classes (DERIVED: 48
+by an anchor, 6 universal). None needed a further change. refusal-branch-with-no-arm: the one site this pass
+touches, the `.typed` append's refusal, which `TOOL-dPlacedRequest-19`'s block left undriven, is now reached
+by the arm's S1 assertion and its `hit`, a `.typed` that is a directory; a `git hash-object` failing on a
+readable file shares that site and is named in the arm's comment as not driven. fixture-passes-by-finding-nothing:
+the AC2 refusal is paired with the same session's line naming the stored copy's blob, which reads 0, and the
+AC3 `awk` runs over a file the arm first observes non-empty. a-spelling-change-strands-its-readers: the
+`.typed` line's spelling changed; its readers are `check_request_consent` and the suite's `DPR19 AC2`
+reading, both moved, and the `DPR30 AC1` line count, which the new spelling leaves whole.
+fixture-inherits-ambient-machine-state: the writer, the reader and the suite each hash in the fixture clone,
+whose `core.autocrlf` the fixture sets false, and `GIT` pins only replace objects and grafts, so all three
+hash alike. two-answers-to-one-question: the driver's comment, the verbs row and the help page state the one
+binding. topology-sweep: two sessions racing one key between the copy and the append is
+`TOOL-dPlacedRequest-48`'s lock, and a `--no-filters` hash is `TOOL-dPlacedRequest-43`'s, the hand-off the
+spec's edges name. The codebase map was regenerated.
