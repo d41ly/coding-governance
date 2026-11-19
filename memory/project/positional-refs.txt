@@ -25818,11 +25818,6 @@ memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md	BUIL
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md	HYGIENE check 25
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-7.md	tools/memory-tree/tree_lib.py:27
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-7.md	tools/unattended/unattended.sh:852
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md	tools/memory-tree/gen_build_index.py:3185
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md	tools/memory-tree/tree_lib.py:27
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md	tools/roles/handoff.py:166
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md	tools/unattended/unattended.sh:3389
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md	tools/unattended/unattended.sh:3404
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md	tools/memory-tree/tree_lib.py:27
 memory/builds/dPolishedVitrine/README.md	BUILD-METHOD M4
 memory/builds/dPolishedVitrine/build/2026-09-12-build-TOOL-dPolishedVitrine-1-1-journal.md	BUILD-METHOD M4
