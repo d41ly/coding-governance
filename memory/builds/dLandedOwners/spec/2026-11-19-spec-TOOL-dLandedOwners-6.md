@@ -1,11 +1,12 @@
 # TOOL-dLandedOwners-6 — the two legs the close's bar read red: the policy-fixtures guard covers its import closure, and the unscanned-readers row stops reading as a spec citation
 
-**Status:** INPROGRESS · rev-1 · 2026-11-19 · node d · Tier-2 · base fcbd7efe · streams tooling · order 5
+**Status:** CLOSED · rev-1 · 2026-11-19 · node d · Tier-2 · base fcbd7efe · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-19-build-TOOL-dLandedOwners-6-ledger.md](../build/2026-11-19-build-TOOL-dLandedOwners-6-ledger.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-6-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-6-1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-6-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-6-build-brief.md) | research | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-6-spec-brief.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-6-spec-brief.md) | research | — |

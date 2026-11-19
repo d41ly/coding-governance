@@ -2739,6 +2739,7 @@
       "{prefix}/memory-tree/asbuilt_view.py",
       "{prefix}/memory-tree/deviation_join.py",
       "{prefix}/memory-tree/routed_commits.py",
+      "{prefix}/memory-tree/commit_trailers.py",
       "{prefix}/memory-tree/row_grammar.py",
       "{prefix}/roles/roles_lib.py",
       "{prefix}/roles/render_agents.py",
