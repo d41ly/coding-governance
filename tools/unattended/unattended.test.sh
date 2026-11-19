@@ -20307,9 +20307,11 @@ if in_shard 8; then
 # exits 1 printing A's record, the origin holding A's text only (AC3); two problems on one path land
 # beside each other (AC4) and a retried filing exits 1, one ref (AC5); a 4097-byte body and one with a
 # NUL are refused, the origin unchanged (AC6); with the switch off nothing is written (AC7); an
-# 80-slash subject and a 241-byte joined key are refused over the ceiling (AC9, AC10). RED, observed
+# 80-slash subject and a 241-byte joined key are refused over the ceiling (AC9, AC10); every other
+# refusal branch exits 2 writing nothing, two remotes and an absent origin among them. RED, observed
 # at the close, is the base driver, which has no register verb. Waived by README rule 8 with the rest
-# of this suite. WHAT THIS BLOCK DOES NOT DRIVE: a push the remote refuses, the `not written` exit 2.
+# of this suite. WHAT THIS BLOCK DOES NOT DRIVE: a commit git cannot build, and a key or problem id
+# that does not derive from fields already held non-empty, which no fixture reaches.
 # ==================================================================================================
 LF=$(mktemp -d); LF_GIT=$(command -v git); write_lease_fixture
 git clone -q "$LF/origin.git" "$LF/c2" 2>/dev/null; cp "$LF/c1/.unattended.conf" "$LF/c2/"
@@ -20361,6 +20363,40 @@ rg_out=$(run_register_arm decision tFix "$(printf 'i%.0s' $(seq 120))" "$(printf
 same "DPR12 AC10 a 241-byte joined key exits 2, the origin's decisions unchanged" \
   "$rg_rc $([ "$rg_before" = "$(git --git-dir="$LF/origin.git" for-each-ref)" ] && echo unchanged || echo changed)" "2 unchanged"
 hit  "$rg_out" "register — refused decision key over 241 bytes encoded"
+# ---- Each other refusal before the remote exits 2 and writes nothing: the arity, an empty item, a
+# ---- subject carrying a newline, a build that is no build-folder name, an unreadable body and a body
+# ---- ending in a CR. Then at the remote: a clone with two remotes (check 24) and an origin moved away.
+rg_out=$(run_register_arm decision tFix entry.claim); rg_rc=$?
+same "DPR12 S4 a wrong arity exits 2" "$rg_rc" "2"
+hit  "$rg_out" "register — not written · the forms are --register decision <build> <item> <fork> <file> and --register problem <subject> <item> <file>"
+rg_out=$(run_register_arm decision tFix "" F1 "$LF/a.txt"); rg_rc=$?
+same "DPR12 S5 an empty item exits 2" "$rg_rc" "2"
+hit  "$rg_out" "register — not written · an empty item"
+rg_out=$(run_register_arm problem $'src/a\nsession: forged' none "$LF/p1.txt"); rg_rc=$?
+same "DPR12 S6 a subject carrying a newline exits 2" "$rg_rc" "2"
+hit  "$rg_out" "register — not written · the subject carries a control byte"
+rg_out=$(run_register_arm decision ../x entry.claim F1 "$LF/a.txt"); rg_rc=$?
+same "DPR12 S4 a build that is no build-folder name exits 2" "$rg_rc" "2"
+hit  "$rg_out" "register — not written · the build is no build-folder name: ../x"
+rg_out=$(run_register_arm problem src/x.sh none "$LF/absent.txt"); rg_rc=$?
+same "DPR12 S6 an unreadable body exits 2" "$rg_rc" "2"
+hit  "$rg_out" "register — not written · the body file is not readable: $LF/absent.txt"
+printf 'text\r\n' > "$LF/cr.txt"
+rg_out=$(run_register_arm problem src/x.sh none "$LF/cr.txt"); rg_rc=$?
+same "DPR12 S6 a body ending in a CR exits 2, the origin unchanged" \
+  "$rg_rc $([ "$rg_before" = "$(git --git-dir="$LF/origin.git" for-each-ref)" ] && echo unchanged || echo changed)" "2 unchanged"
+hit  "$rg_out" "register — not written · the body carries a NUL or a control byte other than tab and newline"
+git -C "$LF/c1" remote add second "$LF/origin.git"
+rg_out=$(run_register_arm problem src/y.sh none "$LF/p1.txt"); rg_rc=$?
+git -C "$LF/c1" remote remove second
+same "DPR12 S5 a clone with two remotes exits 2 under check 24" "$rg_rc" "2"
+hit  "$rg_out" "the clone does not declare exactly one remote, check 24"
+mv "$LF/origin.git" "$LF/away.git"
+rg_out=$(run_register_arm problem src/y.sh none "$LF/p1.txt"); rg_rc=$?
+mv "$LF/away.git" "$LF/origin.git"
+same "DPR12 S5 a push that does not complete exits 2, the origin unchanged" \
+  "$rg_rc $([ "$rg_before" = "$(git --git-dir="$LF/origin.git" for-each-ref)" ] && echo unchanged || echo changed)" "2 unchanged"
+hit  "$rg_out" "register — not written refs/gov/problems/src%2Fy%2Esh/"
 sed -i 's/^RUN_CLAIMS="on"$/RUN_CLAIMS="off"/' "$LF/c1/.unattended.conf"
 rg_out=$(run_register_arm decision tFix entry.claim F2 "$LF/a.txt"); rg_rc=$?
 same "DPR12 AC7 with the switch off it prints register — off, exits 2 and the origin gains no ref" \
@@ -22384,7 +22420,9 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3784 -> 3804 by TOOL-dPlacedRequest-12: the register block's 20 region-eight assertions
 # (12 `same` and 8 `hit`), off the diff's own lines; no skip branch. No suite ran, and its RED-first
 # observation is the close's.
-FLOOR_ASSERTIONS=3804
+# RAISED 3804 -> 3820 by TOOL-dPlacedRequest-12's checklist pass: the register block's 16 region-eight
+# refusal arms (8 `same` and 8 `hit`), off the diff's own lines; no skip branch.
+FLOOR_ASSERTIONS=3820
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -22644,7 +22682,8 @@ FLOOR_SHARD_7=311
 # RAISED 986 -> 994 by TOOL-dPlacedRequest-20's checklist pass: the same 8 region-eight refusal and window arms, see FLOOR_ASSERTIONS.
 # RAISED 994 -> 1015 by TOOL-dPlacedRequest-28: the same 21 region-eight feed-first create assertions, see FLOOR_ASSERTIONS.
 # RAISED 1015 -> 1035 by TOOL-dPlacedRequest-12: the same 20 region-eight register assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1035
+# RAISED 1035 -> 1051 by TOOL-dPlacedRequest-12's checklist pass: the same 16 region-eight refusal arms, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1051
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

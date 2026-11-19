@@ -32,7 +32,7 @@ path, clone A under session `sA` and clone B under `sB`, `RUN_CLAIMS` on in both
   the ids were `67e72741a70f` and `5c7050b18ff4`.
 - AC5 — the first filing re-run with the same session, item, subject and text exited 1 (PINNED) printing `register — exists` and its record, and the origin still held 2 (DERIVED) problem refs;
   so a retried filing is refused rather than landed twice.
-- AC6 — a 4097-byte (PINNED) body exited 2 (PINNED) printing `the body is over 4096 bytes: 4097` (PINNED), and a body carrying a NUL exited 2 (PINNED), the origin's `for-each-ref` unchanged across both;
+- AC6 — `--register problem` given a 4097-byte (PINNED) body exited 2 (PINNED) printing `the body is over 4096 bytes: 4097` (PINNED), and a body carrying a NUL exited 2 (PINNED), the origin's `for-each-ref` unchanged across both;
   a body of exactly 4096 bytes (PINNED) was written, and one ending in a CR was refused as a control
   byte.
 - AC7 — with `RUN_CLAIMS="off"` in clone A's conf, `--register decision fx item2 F2 a.txt` printed `register — off` and exited 2 (PINNED), and the origin gained no ref;
@@ -48,9 +48,22 @@ The edges beyond the criteria: an empty item, a `../x` build (check 1 (PINNED), 
 or fork carrying a newline or CR, a wrong arity and an unreadable body each exited 2 (PINNED) and wrote
 nothing; `--feed check` exited 0 (PINNED) in both clones after every write and the exists read.
 
+A clone declaring two remotes printed check 24 (PINNED) and `register — not written <ref> · the clone does
+not declare exactly one remote, check 24`, and an origin moved away printed `register — not written <ref> ·
+git push exited 128 (PINNED) and printed no status line`, each exiting 2 (PINNED) with no ref written.
+
 **Owed at the close.** The `New arm:` line of section 7: the region-8 block `TOOL-dPlacedRequest-12` in
-`tools/unattended/unattended.test.sh`, 20 assertions (DERIVED), RED-first against the base driver, which has
-no register verb; the floors rose by the same 20 (DERIVED). The suite is waived for this build's landing by
-README rule 8. The leg-observed criteria are the close's too: check 26 of the unattended kit gate over the new
+`tools/unattended/unattended.test.sh`, 36 assertions (DERIVED), RED-first against the base driver, which has
+no register verb; the floors rose by the same 36 (DERIVED), 20 (DERIVED) in the pass commit and 16 (DERIVED)
+in the checklist's. The suite is waived for this build's landing by README rule 8. The leg-observed criteria are the close's too: check 26 of the unattended kit gate over the new
 verb's five carriers, the `unattended skill size` row, the `docs` usage anchor and the codebase map's
 freshness.
+
+**The checklist, acted on.** The bug-class checklist over the pass commit selected 57 classes (DERIVED), 51
+(DERIVED) by anchor and 6 (DERIVED) universal. One needed a change. refusal-branch-with-no-arm: the arity,
+an empty field, a field carrying a control byte, a build that is no build-folder name, an unreadable body, a
+body ending in a CR, two remotes and an uncompleted push had no arm, so the block gained 16 (DERIVED)
+assertions over them, each probed first over the scratch fixture. The branches no fixture reaches, a commit
+git cannot build and a key or id that does not derive from fields already held non-empty, are named in the
+block's header. id-matched-as-a-substring was read against `--register` beside `--register-task`: the parse
+arm, `VERBS_INLINE` membership and check 26's joins each match the whole word, so no change.

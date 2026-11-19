@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-12 — create-only decision and problem registers on the remote
 
-**Status:** INPROGRESS · rev-5 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 8 · advances TOOL-dPlacedRequest-22
+**Status:** CLOSED · rev-5 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 8 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0130@57d242df whole
 

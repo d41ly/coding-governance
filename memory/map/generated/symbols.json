@@ -10713,6 +10713,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "derive_decision_key",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "derive_default_branch",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -12083,6 +12088,11 @@
       "file": "tools/memory-recall/check-recall.py"
     },
     {
+      "id": "derive_problem_id",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "derive_proc_state",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -12211,6 +12221,11 @@
       "id": "derive_ref_parts",
       "kind": "function",
       "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "derive_ref_segment",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "derive_refreshed_at",
@@ -30903,6 +30918,11 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
+      "id": "run_register_arm",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "run_rel27_gate",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -37651,6 +37671,11 @@
       "id": "write_region",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "write_register",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "write_relocated",
