@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-17 — the seven record and row pins as keyed populations, and the date cutoffs registered as cutoffs
 
-**Status:** DEFERRED · rev-5 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 11 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-6 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 11 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0355@0f895fff whole
 
@@ -148,7 +148,7 @@ count, registers the two unset ones unseeded, and registers every date cutoff in
 ### Edges
 
 - **consumes-from** `TOOL-dWitnessedBar-13` — `legacy_ledger.py`: the `record`, `key` and `cutoff` key kinds, the `ceiling` direction, `read_rows` and `write_rows`, which every population here is held in
-- **consumes-from** `TOOL-dWitnessedBar-16` — `RATCHETS` with its `drift_signals.py` rows already retired, and `id-orphan-waiver` and `corpus-path-unresolved` already converted, which S1 folds two pins into
+- **consumes-from** `TOOL-dWitnessedBar-16` — `RATCHETS` with its `drift_signals.py` rows already retired, and `id-orphan-waiver` already converted, which S1 folds `ORPHAN_ID_PIN` into; and `corpus-path-unresolved.txt` left in its grammar for this unit to convert and register before S1 folds `DEAD_PATH_PIN` into it, since `corpus_ids.py` grades its count column and its `absent|moved:DEST` column (unit 16's §8 F16)
 - **consumes-from** `TOOL-dWitnessedBar-14` — the `conf-scalar-pins` population, whose seven rows S3 drains, and `ratchet.py`, which S6 adds the `measure-cutoffs` verb to
 - **consumes-from** `TOOL-dWitnessedBar-15` — `test.seed`, `python legacy_ledger.py seed`, which seeds S1's three new populations and S8's adopter step
 - **consumes-from** external — TOOL-dSafePassage-1's `[[upgrade]]` row grammar and before-image helpers, landed in `tools/govkit/upgrade_steps.py`, for S8's step program
@@ -469,6 +469,10 @@ New arm: tools/memory-tree/ratchet.py · covers AC7 · a `cutoff-later` and a `c
   `measure_scalar_pins`'s conf walk; AC7 and AC8 read `both-ways`, which alone sees a conf's date move,
   and AC6 a scratch clone in place of a self-test plant; S8 drains the adopter's `conf-scalar-pins`
   row; the ratchet legs join the leg line; pins and cutoffs re-pinned, unchanged.
+- rev-6 · 2026-11-19 · §3 · the consumes-from edge of TOOL-dWitnessedBar-16 takes the conversion of
+  `corpus-path-unresolved.txt`, which that unit's rev-12 leaves in its grammar, per brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-16-6-spec-writer; S1 and S4 are restated over it at this
+  unit's re-ground; nothing else moved.
 
 ## 10. Reuse audit
 
