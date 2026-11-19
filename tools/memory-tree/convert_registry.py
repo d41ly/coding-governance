@@ -216,6 +216,8 @@ LEGACY = {
     "spawn-idiom-sites.txt": ("spawn-idiom-sites", read_lines_with(parse_counted_reason(2)), READS_HOME),
     "substitution-fed-loops.txt": ("substitution-fed-loops", read_lines_with(parse_counted_reason(2)), READS_HOME),
     "temp-name-sites.txt": ("temp-name-sites", read_lines_with(parse_counted_reason(2)), READS_HOME),
+    # TOOL-dWitnessedBar-17 §8 F9: the `absent|moved:DEST` column is printed as the row's reason.
+    "corpus-path-unresolved.txt": ("corpus-path-unresolved", read_lines_with(parse_counted_reason(2)), READS_HOME),
     "docs-undocumented.txt": ("docs-undocumented", read_lines_with(parse_keyed_reason(1)), READS_HOME),
     "spec-token-waivers.txt": ("spec-token-waivers", read_lines_with(parse_keyed_reason(1)), READS_HOME),
     "dead-path-waivers.txt": ("dead-path-waivers", read_lines_with(parse_dead_path), READS_HOME),

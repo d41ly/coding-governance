@@ -740,15 +740,15 @@ printf 'x\n' > "$D/spec/units/scratch-notes.md"                      # free-name
 # 14 real files. Silent only because check 5's name ERE and check 12's selector now share one tail.
 printf 'x\n' > "$D/spec/units/2026-08-01-spec-tFixture-31-u2-tail-ok.md"
 mkdir -p memory/project memory/guides
-# ---- CHECK 3: `project/` holds the five waiver registries and NOTHING else — no catch-all. The
+# ---- CHECK 3: `project/` holds the waiver registries and NOTHING else — no catch-all. The
 # ---- `.md` on the stray is load-bearing rather than decoration: a stray `.txt`, an extensionless
 # ---- file or a subdirectory already fell through to the reporting `*)` arm on the PRE-tightening
-# ---- engine, so only a `.md` tells the two engines apart. These five are also the population the
+# ---- engine, so only a `.md` tells the two engines apart. These three are also the population the
 # ---- selector-integrity guard measures — the half-migrated tree below is the same guard's red half.
+# ---- `id-orphan-waiver.txt` and `corpus-path-unresolved.txt` are NOT written: each arms checks 13-15
+# ---- by being present (TOOL-dWitnessedBar-17 S4), and this tree keeps them off as its blank pins did.
 printf '# legacy\n' > memory/project/legacy-files.txt
 printf '# debt\n' > memory/project/curation-debt.txt
-printf '# orphan waiver\n' > memory/project/id-orphan-waiver.txt
-printf '# unresolved repo-path citations\n' > memory/project/corpus-path-unresolved.txt
 printf '# unarmed branches\n' > memory/project/unarmed-branches.txt
 printf '# stray\n' > memory/project/tstray.md          # a .md under project/ -> RED
 
@@ -1201,7 +1201,7 @@ printf '\nQuoted here and nowhere else: `tQuotedInDecisions`.\n' >> memory/DECIS
 printf '\nQuoted here and nowhere else: `tQuotedInBacklog`.\n' >> memory/backlog/ARCH.md
 printf -- '---\nname: treader-quote\ndescription: a fixture note that quotes one name\nkind: note\n---\n\nQuoted here and nowhere else: `tQuotedInGotcha`.\n' \
   > memory/gotchas/treader-quote.md
-printf '# quoted here and nowhere else: tQuotedInWaiver\n' >> memory/project/id-orphan-waiver.txt
+printf '# quoted here and nowhere else: tQuotedInWaiver\n' >> memory/project/unarmed-branches.txt
 "$_PY" "$HERE/gotchas.py" --write >/dev/null 2>&1
 # 217 -- a strict phrase and a kind noun, each wrapped across a line inside one item
 write_readers_spec 217 SPECCED '- **S1** — the `shard_arity` pin no longer
@@ -1698,10 +1698,10 @@ hit  'memory/backlog/notes.md'
 # ---- an ABSENCE assertion satisfies it too. Every unarmed branch is listed in
 # ---- memory/project/unarmed-branches.txt and that pin is shrink-only.
 hit  'unexpected entries (structure)'
-# `project/` is defined as five named registries, so a stray `.md` there is check 3's finding and
+# `project/` is defined as named registries, so a stray `.md` there is check 3's finding and
 # nobody else's — attributed through the slice, because checks 1, 2, 5, 9 and 12 also print bare paths.
 chit 3 'memory/project/tstray.md'
-# ...and the selector-integrity guard's GREEN half, on this tree: the five registries sit at exactly
+# ...and the selector-integrity guard's GREEN half, on this tree: the three registries sit at exactly
 # the depth the path expression expects, so check 3's population is non-empty and the
 # empty-population report must NOT name it. Silence from check 3 itself would prove nothing — a
 # mis-segmented selector is silent for the same reason a clean one is.
@@ -1770,8 +1770,8 @@ cblock "$out" 7 | grep -qF 'memory/builds/tRunBig/RUN.LANDED.b2c3d4e5.md' \
 cnot 8 'memory/builds/tRunBig/RUN.md'
 # ---- (e) the anchor ban — the reason the authored region cites ids inline in prose — is armed in
 # ----     its own scratch tree at the bottom of this file, NOT here. `armed()` in corpus_ids.py
-# ----     turns checks 13-16 off outright when every pin is blank, and this conf deliberately sets
-# ----     none, so a check-13 arm placed here would pass by exercising a disabled check. Measured:
+# ----     turns checks 13-15 off outright when both waiver homes are absent, and this tree
+# ----     deliberately writes neither, so a check-13 arm placed here would pass by exercising a disabled check. Measured:
 # ----     `def_builds` held both slugs and `--check` still returned 0.
 # check 9's green half is the freshly-scaffolded tree at the bottom of this file, which renders the
 # index and then asserts the WHOLE gate exits 0. This tree never renders it, so it drifts.
@@ -2228,7 +2228,7 @@ mkdir -p "$RT"
   printf '# r\n' > memory/README.md
   printf '# ARCH backlog\n' > memory/backlog/ARCH.md
   printf '# stale-header-waiver.txt -- EMPTY is the expected state; the file must exist.\n' > memory/project/stale-header-waiver.txt
-  for r in legacy-files.txt curation-debt.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
+  for r in legacy-files.txt curation-debt.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
   printf -- '---\nslug: tDone\nnode: a\nopened: 2026-08-25\nstreams: architecture\nroster: ARCH\nids: ARCH-tDone-1\n---\n\n# tDone\n' > memory/builds/tDone/README.md
   printf '# ARCH-tDone-1 — a landed unit\n\n**Status:** CLOSED · rev-1 · 2026-08-25 · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 2. Scope (IN)\n\n- **S1** — retire the `shard_arity` pin.\n\n## 8. Open questions\n\nnone\n\n## 9. Revision log\n\n- rev-1 · 2026-08-25 · initial draft.\n' \
     > memory/builds/tDone/spec/2026-08-25-spec-tDone-1.md
@@ -2437,11 +2437,12 @@ grep -qF 'selected an EMPTY population' <<<"$outy" \
 n=$((n+1))
 [ "$rcy" = 0 ] || { echo "FAIL a freshly scaffolded tree is not clean (rc=$rcy):"; printf '%s\n' "$outy" | sed 's/^/      /'; st=1; }
 # TOOL-aRepatriatedFork-9 S6: check 20's capture reaches the operator on a GREEN run. This tree
-# declares no LIVE_ROW_PIN, so row_grammar.py announces the unarmed shard inside its green output,
-# and a gate that printed the capture only on failure turned that announcement back into silence.
+# seeds no `live-rows` population (registered unseeded, TOOL-dWitnessedBar-17 S2), so row_grammar.py
+# announces the unarmed shard inside its green output, and a gate that printed the capture only on
+# failure turned that announcement back into silence.
 n=$((n+1))
-grep -qF 'row-grammar: NOT MEASURED — memory/backlog/ARCH.md has no LIVE_ROW_PIN entry' <<<"$outy" \
-  || { echo "FAIL a green check 20 run swallowed its NOT MEASURED line, so an unarmed live-row pin is silent again"; st=1; }
+grep -qF 'row-grammar: NOT MEASURED — memory/backlog/ARCH.md: ' <<<"$outy" \
+  || { echo "FAIL a green check 20 run swallowed its NOT MEASURED line, so an unarmed live-row population is silent again"; st=1; }
 # TOOL-aWitnessedCrash-1: the crash witness. A copy of this kit runs `--only 1` over the young tree
 # above, with the shipped defect's own shape injected at the tail, outside every check block: an
 # unset map's count, which bash 5.3 reports under `set -u` and runs on past with exit 0. The
@@ -2562,7 +2563,7 @@ cblock "$outn" 6 | grep -qF 'memory/backlog/ARCH.md' \
   && { echo "FAIL check 6 applied the DOSSIER bound to a row document in a tree with no codebase map — the dossier selector is missing its emptiness guard"; st=1; }
 
 # ---- (d) THE RUN.md ANCHOR BAN (kit 2.3), in its OWN tree because `armed()` in corpus_ids.py turns
-# ----     checks 13-16 off outright when every pin is blank, and the main fixture conf sets none.
+# ----     checks 13-15 off outright when both waiver homes are absent, and the main fixture writes neither.
 # ----     Measured before writing this: on that tree `def_builds` held BOTH slugs and `--check`
 # ----     still returned 0 — an arm placed there would have passed against a disabled check.
 # ----
@@ -2590,7 +2591,9 @@ mkdir -p "$A/memory/builds/tRot/spec" "$A/memory/archive" "$A/memory/backlog" "$
   # DEPL is declared and has NO live shard, deliberately: the archive below is named for it, so its
   # stem resolves to ZERO live indexes. That branch is the one whose `continue` made check 10 inert
   # for every backlog archive, and until this fixture existed it shipped unobserved.
-  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH deployer:DEPL"\nORPHAN_ID_PIN="0"\nDEAD_PATH_PIN="0"\n' > .memory-tree.conf
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH deployer:DEPL"\n' > .memory-tree.conf
+  # The two waiver homes, empty, arm checks 13-15 as the two zero pins did (TOOL-dWitnessedBar-17 S4).
+  : > memory/project/id-orphan-waiver.txt; : > memory/project/corpus-path-unresolved.txt
   # The PRESENT-tense citation of the moved id. Check 14 grades present-tense files only
   # (TOOL-aRepatriatedFork-39), so the spec's citation below alone would leave the unstaged-archive
   # arm with no citation to orphan and it would pass by finding nothing.
@@ -2674,7 +2677,9 @@ HM=$TMP/homed
 mkdir -p "$HM/memory/builds/tHome/spec" "$HM/memory/builds/tHome/build/ledger" "$HM/memory/archive" \
          "$HM/memory/backlog" "$HM/memory/project"
 ( cd "$HM" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
-  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH deployer:DEPL"\nORPHAN_ID_PIN="0"\nDEAD_PATH_PIN="0"\n' > .memory-tree.conf
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH deployer:DEPL"\n' > .memory-tree.conf
+  # The two waiver homes, empty, arm checks 13-15 as the two zero pins did (TOOL-dWitnessedBar-17 S4).
+  : > memory/project/id-orphan-waiver.txt; : > memory/project/corpus-path-unresolved.txt
   printf '# r\n' > memory/README.md
   printf '# legacy\n' > memory/project/legacy-files.txt
   printf '# decisions\n\n> Rotated 2026-08-01 to [archive/DECISIONS.2026-08-01.md](archive/DECISIONS.2026-08-01.md).\n\n- ARCH-tHome-2 · a live decision\n' > memory/DECISIONS.md
@@ -2708,8 +2713,10 @@ R=$TMP/runanchor
 mkdir -p "$R/memory/builds/tOwner/spec" "$R/memory/builds/tRunBig" "$R/memory/builds/tRunOk" \
          "$R/memory/backlog" "$R/memory/project"
 ( cd "$R" && git init -q --template= .
-  # ORPHAN_ID_PIN is what ARMS the unit; 0 is legal because every id below is defined.
-  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nORPHAN_ID_PIN="0"\nDEAD_PATH_PIN="0"\n' > .memory-tree.conf
+  # The two waiver homes, empty, are what ARM the unit (TOOL-dWitnessedBar-17 S4); an empty orphan
+  # waiver is legal because every id below is defined.
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n' > .memory-tree.conf
+  : > memory/project/id-orphan-waiver.txt; : > memory/project/corpus-path-unresolved.txt
   printf '# r\n' > memory/README.md
   printf '# ARCH backlog\n' > memory/backlog/ARCH.md
   printf '# stale-header-waiver.txt -- EMPTY is the expected state; the file must exist.\n' > memory/project/stale-header-waiver.txt
@@ -2765,11 +2772,19 @@ n=$((n+1))
 for p in MEMORY.md IN-FLIGHT.md README.md in-flight journal; do
   [ -e "$A/memory/project/$p" ] && { echo "FAIL adopt-memory-tree.sh still scaffolds memory/project/$p, which check 3 now rejects"; st=1; }
 done
-# ...and all FIVE registries, not two. Three of them are NAMED by gates and were created by nothing;
+# ...and all THREE registries, not two. They are NAMED by gates and were created by nothing;
 # "absent" and "present and empty" read identically to every consumer, which is what hid it.
 n=$((n+1))
-for r in legacy-files.txt curation-debt.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt; do
+for r in legacy-files.txt curation-debt.txt unarmed-branches.txt; do
   [ -f "$A/memory/project/$r" ] || { echo "FAIL adopt-memory-tree.sh did not scaffold memory/project/$r"; st=1; }
+done
+# ...and NEITHER waiver home of checks 13-15, where "absent" and "present" are NOT the same answer:
+# each arms its checks by being present, and a fresh tree's own rendered documents cite kit paths it
+# does not hold, so a home written here reds check 15 on the adopter's first run
+# (TOOL-dWitnessedBar-17 S4, its section 8 F11). The clean-run arm below is the other half.
+n=$((n+1))
+for r in id-orphan-waiver.txt corpus-path-unresolved.txt; do
+  [ -e "$A/memory/project/$r" ] && { echo "FAIL adopt-memory-tree.sh --scaffold wrote memory/project/$r, which arms checks 13-15 on a fresh tree"; st=1; }
 done
 n=$((n+1))
 # TOOL-dFramedEntrypoint, round-2 M1/B1 — the KIT COPY the scaffolder writes into, which nothing
@@ -2810,21 +2825,23 @@ _src_valued=$(awk -F'\t' '/^## /{ if ($2 ~ /^[0-9]+$/) c++ } END{ print c+0 }' "
 # ---- scalar)` then holds every `*_PIN` the example assigns, reds `unarmed` with its home removed, and
 # ---- is green again after `--seed-pins`, whose second run leaves the home byte-identical. The kit sits
 # ---- where the registration's seed argv names it, read from the descriptor rather than spelled here.
+# ---- The example assigns no pin since TOOL-dWitnessedBar-17 S3, so the copied conf gains one planted
+# ---- `FOO_PIN="3"` and the arm holds its one row (that unit's section 8 F7).
 n=$((n+1))
 P=$TMP/scalar-pins
 _sk=$(sed -n 's/^seed = \["python", "\([^"]*\)\/ratchet\.py", "keys-not-scalar".*/\1/p' "$HERE/kit.toml")
-_npins=$(grep -cE '^[A-Z_]+_PIN=' "$HERE/.memory-tree.conf.example")
 mkdir -p "$P/$_sk"
 cp -r "$HERE/." "$P/$_sk/" 2>/dev/null; rm -rf "$P/$_sk/__pycache__"
 ( cd "$P" && git init -q --template= . && git config core.autocrlf false &&
-  cp "$_sk/.memory-tree.conf.example" .memory-tree.conf && git add -A &&
+  cp "$_sk/.memory-tree.conf.example" .memory-tree.conf && printf 'FOO_PIN="3"\n' >> .memory-tree.conf && git add -A &&
   bash "$_sk/adopt-memory-tree.sh" --scaffold >/dev/null 2>&1 &&
   git add -A && git commit -q -m scaffolded --no-verify ) || { echo "FAIL AC2 the example-made tree did not scaffold and commit"; st=1; }
 run_scalar_leg() { ( cd "$P" && "$_PY" "$_sk/ratchet.py" keys-not-scalar 2>&1 ); }
+_npins=$(grep -cE '^[A-Z_]+_PIN=' "$P/.memory-tree.conf")
 _ko=$(run_scalar_leg); _krc=$?
 _held=$(printf '%s\n' "$_ko" | grep -c ' · held · \.memory-tree\.conf	[A-Z_]*_PIN	' || true)
-{ [ "$_krc" = 0 ] && [ "$_held" = "$_npins" ] && [ "$_npins" -gt 0 ] \
-  && printf '%s\n' "$_ko" | grep -q 'held · \.memory-tree\.conf	ROW_DUPLICATE_PIN	'; } \
+{ [ "$_krc" = 0 ] && [ "$_held" = "$_npins" ] && [ "$_npins" = 1 ] \
+  && printf '%s\n' "$_ko" | grep -q 'held · \.memory-tree\.conf	FOO_PIN	'; } \
   || { echo "FAIL AC2 keys-not-scalar over the example-made tree exited $_krc holding $_held of $_npins pins: $_ko"; st=1; }
 _h3=$(cd "$P" && bash "$SCRIPT" 2>&1)
 { [ -f "$P/memory/project/conf-scalar-pins.txt" ] && ! printf '%s\n' "$_h3" | grep -q 'memory/project/conf-scalar-pins\.txt'; } \
@@ -2839,7 +2856,7 @@ n=$((n+1))
 ( cd "$P" && bash "$_sk/adopt-memory-tree.sh" --seed-pins >/dev/null 2>&1 )
 cp "$P/memory/project/conf-scalar-pins.txt" "$TMP/scalar-pins.keep" 2>/dev/null
 _ko=$(run_scalar_leg); _krc=$?
-{ grep -q '^\.memory-tree\.conf	ROW_DUPLICATE_PIN	' "$P/memory/project/conf-scalar-pins.txt" 2>/dev/null && [ "$_krc" = 0 ]; } \
+{ grep -q '^\.memory-tree\.conf	FOO_PIN	' "$P/memory/project/conf-scalar-pins.txt" 2>/dev/null && [ "$_krc" = 0 ]; } \
   || { echo "FAIL AC4 --seed-pins did not reseed the home, or keys-not-scalar then exited $_krc: $_ko"; st=1; }
 ( cd "$P" && bash "$_sk/adopt-memory-tree.sh" --seed-pins >/dev/null 2>&1 )
 cmp -s "$P/memory/project/conf-scalar-pins.txt" "$TMP/scalar-pins.keep" \
@@ -2886,13 +2903,13 @@ outa=$(cd "$A" && bash "$SCRIPT" 2>/dev/null); rca=$?
 K=$TMP/c21
 mkdir -p "$K"
 ( cd "$K" && git init -q --template= .
-  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nRECORD_UNBOUND_PIN="1"\n' > .memory-tree.conf
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n' > .memory-tree.conf
   mkdir -p memory/backlog memory/project memory/builds/tOne/spec memory/builds/tOne/reviews \
            memory/builds/tOne/build memory/builds/tTwo/spec memory/builds/tTwo/reviews
   printf '# r\n' > memory/README.md
   printf '# ARCH backlog\n' > memory/backlog/ARCH.md
   printf '# stale-header-waiver.txt -- EMPTY is the expected state; the file must exist.\n' > memory/project/stale-header-waiver.txt
-  for r in legacy-files.txt curation-debt.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
+  for r in legacy-files.txt curation-debt.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
   rk() { printf -- '---\nslug: %s\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-%s-1\n---\n\n# %s\n' "$1" "$1" "$1"; }
   rk tOne > memory/builds/tOne/README.md
   rk tTwo > memory/builds/tTwo/README.md
@@ -2904,9 +2921,12 @@ mkdir -p "$K"
   printf '# r\n\n**Serves:** spec-audit ARCH-tGhost-9\n' > memory/builds/tOne/reviews/2026-08-01-review-ARCH-tOne-1-b.md
   # branch 5 — the filename claims a real id the header does not list
   printf '# r\n\n**Serves:** spec-audit ARCH-tOne-1\n' > memory/builds/tOne/reviews/2026-08-01-review-ARCH-tTwo-1-c.md
-  # branch 4 — two unbound records against a pin of 1
+  # branch 4 — two unbound records, one keyed in the `unbound-records` population and one planted with
+  # no row (TOOL-dWitnessedBar-17 S1, AC3): the planted record is named by its path, never counted.
   printf '# r\n\n**Serves:** none — nothing to serve\n' > memory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-d.md
   printf '# r\n\n**Serves:** none — nothing to serve either\n' > memory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-e.md
+  printf '# ledger · unbound-records · key record path · direction shrink-only · drain key\nmemory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-d.md\t1\tabcdef12\tseeded\n' \
+    > memory/project/unbound-records.txt
   # the GREEN control — a CROSS-BUILD record, housed under tTwo, named for the id it SERVES
   printf '# r\n\n**Serves:** diff-review ARCH-tOne-1\n' > memory/builds/tTwo/reviews/2026-08-01-review-ARCH-tOne-1-f.md
   git add -A && "$_PY" "$HERE/gen_build_index.py" --write >/dev/null 2>&1; git add -A
@@ -2914,16 +2934,22 @@ mkdir -p "$K"
 out=$(cd "$K" && bash "$SCRIPT" 2>/dev/null)
 chit 21 'records under build/, prompts/ or reviews/ whose head carries no conformant Serves line'
 chit 21 'Serves or Commissions lines naming an id that no spec in this tree defines'
-chit 21 'records carrying the unbound Serves form outnumber their pin — bind them, or move the pin in the same commit recording the old and new values beside it'
+chit 21 'records carrying the unbound Serves form with no row in memory/project/unbound-records.txt — bind them, or widen the population through a widen record'
+chit 21 'memory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-e.md'
+cnot 21 'that no graded unbound record matches'
 chit 21 'record filenames whose family, slug and ordinal name an id their own Serves line does not list'
 cblock "$out" 21 | grep -qF '2026-08-01-review-ARCH-tOne-1-f.md' \
   && { echo "FAIL check 21 flagged a CROSS-BUILD record correctly named for the id it serves"; st=1; }
 # the parse-refusal branch is SILENT while the real generator answers — its green control.
 cnot 21 'the bindings parse did not complete'
-# branch 3 — the pin UNDECLARED is a refusal, not a disabled check.
-( cd "$K" && printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n' > .memory-tree.conf )
+# branch 3 — a row no graded unbound record matches is STALE: the record was bound, and a scalar pin
+# would have netted it against a new unbound one. Both records keyed, plus a ghost's row.
+( cd "$K" && printf '# ledger · unbound-records · key record path · direction shrink-only · drain key\nmemory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-d.md\t1\tabcdef12\tseeded\nmemory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-e.md\t1\tabcdef12\tseeded\nmemory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-g.md\t1\tabcdef12\tseeded\n' \
+    > memory/project/unbound-records.txt )
 out=$(cd "$K" && bash "$SCRIPT" 2>/dev/null)
-chit 21 'RECORD_UNBOUND_PIN is undeclared, so the count of records that serve no spec is unbounded — declare it in .memory-tree.conf, measured against this corpus'
+chit 21 'rows of memory/project/unbound-records.txt that no graded unbound record matches — stale rows; the population is shrink-only, so delete each to lock the binding in'
+chit 21 'memory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-g.md'
+cnot 21 'with no row in memory/project/unbound-records.txt'
 # branch 0 — the PARSE itself did not answer (TOOL-dMuffledSentinel-1). Reproduced as an adopter
 # meets it: a COPY of the kit whose sibling generator lacks the mode, run over the fixture above,
 # which still holds the no-Serves record branch 1 names. Two stubs, because the two ways a delegate
@@ -2939,6 +2965,36 @@ for _stub in 'import sys; print("usage: gen_build_index.py [--check|--write]", f
   chit 21 'the bindings parse did not complete, so no record was graded and every branch below would read as a clean corpus — gen_build_index.py --print-bindings exited'
   cnot 21 '2026-08-01-review-ARCH-tOne-1-a.md'
 done
+
+# ---- CHECK 20 — the duplicates a row document carries, against the `row-duplicates` population
+# ---- (TOOL-dWitnessedBar-17 S1, AC2). The control is green with its one duplicate keyed; a planted new
+# ---- duplicate is named by its key, and with the keyed duplicate repaired its row is named stale. A
+# ---- scalar pin of 1 reads the second run green, a new duplicate and a repaired one netting to zero.
+D20=$TMP/c20
+mkdir -p "$D20"
+( cd "$D20" && git init -q --template= .
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n' > .memory-tree.conf
+  mkdir -p memory/backlog memory/project
+  printf '# r\n' > memory/README.md
+  printf '# ARCH backlog\n' > memory/backlog/ARCH.md
+  printf '# d\n\n- ARCH-tOne-1 · one\n- ARCH-tOne-1 · the same id again\n- ARCH-tOne-2 · two\n' > memory/DECISIONS.md
+  printf '# ledger · row-duplicates · key record shard,row-key · direction shrink-only · drain key\nmemory/DECISIONS.md\tARCH-tOne-1\t2\tabcdef12\tseeded\n' \
+    > memory/project/row-duplicates.txt
+  printf '# stale-header-waiver.txt -- EMPTY is the expected state; the file must exist.\n' > memory/project/stale-header-waiver.txt
+  for r in legacy-files.txt curation-debt.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
+  git add -A && "$_PY" "$HERE/gen_build_index.py" --write >/dev/null 2>&1; git add -A
+  git commit -q -m c20 --no-verify )
+out=$(cd "$D20" && bash "$SCRIPT" --only 20 2>&1; echo "exit=$?")
+hitl 'exit=0'
+( cd "$D20" && printf -- '- ARCH-tOne-2 · two, planted twice\n' >> memory/DECISIONS.md )
+out=$(cd "$D20" && bash "$SCRIPT" --only 20 2>&1; echo "exit=$?")
+hitl 'exit=1'
+chit 20 'with no row in memory/project/row-duplicates.txt'
+chit 20 'memory/DECISIONS.md: ARCH-tOne-2 at lines'
+( cd "$D20" && printf '# d\n\n- ARCH-tOne-1 · one\n- ARCH-tOne-2 · two\n- ARCH-tOne-2 · two, planted twice\n' > memory/DECISIONS.md )
+out=$(cd "$D20" && bash "$SCRIPT" --only 20 2>&1; echo "exit=$?")
+hitl 'exit=1'
+chit 20 'memory/project/row-duplicates.txt holds the row memory/DECISIONS.md ARCH-tOne-1, which no duplicate matches'
 
 # ---- CHECK 6 — the per-class caps are DECLARATIONS (TOOL-aLoosenedCeiling-2).
 # ---- Every arm runs BOTH DIRECTIONS OVER ONE FIXTURE: the same file is silent at a loose cap and
@@ -2961,7 +3017,7 @@ c6run() {  # $1 = extra conf lines (%b, so \n works); leaves $out set and assert
 ( cd "$C6" && git init -q --template= .
   mkdir -p memory/backlog memory/project memory/guides memory/builds/tBig memory/builds/tLong memory/builds/tWide
   printf '# r\n' > memory/README.md
-  for r in legacy-files.txt curation-debt.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
+  for r in legacy-files.txt curation-debt.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
   # ONE seq, reused. Building each line with its own command substitution cost this suite minutes.
   # 250 chars keeps every row under check 7's 300-char budget, so only check 6 speaks.
   R=$(printf 'y%.0s' $(seq 1 246))
@@ -3312,7 +3368,7 @@ s10conf() {
 ( cd "$S10" && git init -q --template= .
   mkdir -p memory/builds/tTen/spec memory/backlog memory/project
   printf '# r\n' > memory/README.md
-  for r in legacy-files.txt curation-debt.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
+  for r in legacy-files.txt curation-debt.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
   printf -- '---\nslug: tTen\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tTen-1\n---\n\n# tTen\n' > memory/builds/tTen/README.md
   { printf '# ARCH-tTen-1 — fixture\n\n**Status:** SPECCED · rev-1 · 2026-08-01 · node a · Tier-2 · base 0123abcd\n\n'
     for h in '1. Goal' '2. Scope (IN)' '3. Non-goals (OUT)' '4. Design' '5. Production-readiness checklist' \
@@ -3580,7 +3636,7 @@ _ixt=$(mktemp -d)
 cp -R "$_b1/." "$_ixt/"
 (
   cd "$_ixt" || exit 1
-  printf 'ORPHAN_ID_PIN="0"\n' >> .memory-tree.conf
+  : > memory/project/id-orphan-waiver.txt   # the orphan waiver, empty, arms check 14 (TOOL-dWitnessedBar-17 S4)
   printf '# r\n\nContext lives in ARCH-tNone-9 upstream.\n' > memory/README.md
   mkdir -p memory/gotchas
   printf -- '---\nname: x\ndescription: d\n---\n\nFires on `AGENTS.md`. Nothing said about a gate.\n' > memory/gotchas/x.md
@@ -3624,7 +3680,7 @@ _ixt=$(mktemp -d)
 cp -R "$_b1/." "$_ixt/"
 (
   cd "$_ixt" || exit 1
-  printf 'ORPHAN_ID_PIN="0"\n' >> .memory-tree.conf
+  : > memory/project/id-orphan-waiver.txt   # the orphan waiver, empty, arms check 14 (TOOL-dWitnessedBar-17 S4)
   printf '# r\n\nContext lives in ARCH-tNone-9 upstream.\n' > memory/README.md
   git add -A && git -c commit.gpgsign=false commit -q -m t --no-verify
 ) >/dev/null 2>&1
@@ -3758,8 +3814,8 @@ done
 # ---- TOOL-aRepatriatedFork-10: legacy-files.txt reaches check 4's ENTRY branch and check 21's
 # ---- missing-Serves branch, a KIT registry is admitted by name, and RECORD_UNDATED_ARTIFACTS
 # ---- narrows check 21 OUT LOUD. One commit adds the fixtures; the conf line and the registry decide
-# ---- the rest. RECORD_UNBOUND_PIN is declared on every run here so check 21's pin branch is never
-# ---- the red these arms read, and `zz-probe.txt` is an unlisted registry whose check-3 finding
+# ---- the rest. No `unbound-records` home is written here, the empty population, so check 21's
+# ---- unbound branch names every graded unbound record and never stands in for another branch's red; and `zz-probe.txt` is an unlisted registry whose check-3 finding
 # ---- proves check 3 RAN before its silence about `pass-order-waiver.txt` is read as a pass.
 mkdir -p "$_b1/memory/builds/tOne/build"
 printf 'status\n' > "$_b1/memory/builds/tOne/NOTES.md"
@@ -3770,7 +3826,7 @@ printf '# stand-in waivers\n' > "$_b1/memory/project/role-stand-in-waiver.txt"
 printf 'x\n' > "$_b1/memory/project/zz-probe.txt"
 printf '# legacy\n' > "$_b1/memory/project/legacy-files.txt"
 ( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m rf10 --no-verify ) >/dev/null 2>&1
-write_pk_conf 'RECORD_UNBOUND_PIN="0"'; o=$(run_pk_gate)
+write_pk_conf ""; o=$(run_pk_gate)
 n=$((n+1))
 case "$o" in
   *"HYGIENE check 4 FAILED"*"memory/builds/tOne/NOTES.md"*) echo "ok   check 4: an UNLISTED build-root NOTES.md reds" ;;
@@ -3800,7 +3856,7 @@ case "$o" in
 esac
 printf '# legacy\nmemory/builds/tOne/NOTES.md\nmemory/builds/tOne/build/2026-08-01-build-tOne-1.md\n' > "$_b1/memory/project/legacy-files.txt"
 ( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m rf10-legacy --no-verify ) >/dev/null 2>&1
-write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="0"\nRECORD_UNDATED_ARTIFACTS="exempt"')"; o=$(run_pk_gate)
+write_pk_conf 'RECORD_UNDATED_ARTIFACTS="exempt"'; o=$(run_pk_gate)
 n=$((n+1))
 case "$o" in
   *"memory/builds/tOne/NOTES.md"*) echo "FAIL check 4: a build-root NOTES.md legacy-files.txt lists still reds — the entry branch ignores LEG"; st=1 ;;
@@ -3817,7 +3873,7 @@ case "$o" in
   *"check 21: 1 undated non-markdown artifact(s) not graded (RECORD_UNDATED_ARTIFACTS=exempt)"*) echo "ok   RECORD_UNDATED_ARTIFACTS=exempt drops result.json and prints the count" ;;
   *) echo "FAIL RECORD_UNDATED_ARTIFACTS=exempt: result.json vanished without the count printing — a silent narrowing"; st=1 ;;
 esac
-write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="0"\nRECORD_UNDATED_ARTIFACTS="grade"')"; o=$(run_pk_gate)
+write_pk_conf 'RECORD_UNDATED_ARTIFACTS="grade"'; o=$(run_pk_gate)
 n=$((n+1))
 case "$o" in
   *"result.json — no Serves line"*) echo "ok   RECORD_UNDATED_ARTIFACTS=grade grades result.json" ;;
@@ -3832,22 +3888,32 @@ esac
 
 # ---- TOOL-aRepatriatedFork-32: RECORD_SERVES_CUTOFF exempts a record from EVERY check-21 branch.
 # ---- Three pairs of records, one per branch the cutoff used to miss: an id no spec defines, a name
-# ---- with no family-qualified id, and the unbound form the pin counts. Each pair is one record
-# ---- before the cutoff and one after it. The blank-cutoff run is the control: it must name the
-# ---- pre-cutoff half, or the arms below would pass on a branch that never fired.
+# ---- with no family-qualified id, and the unbound form the `unbound-records` population keys. Each
+# ---- pair is one record before the cutoff and one after it. The blank-cutoff run is the control: it
+# ---- must name the pre-cutoff half, or the arms below would pass on a branch that never fired. The
+# ---- population's home is written UNTRACKED by `write_unbound_rows` and removed after the last arm.
+write_unbound_rows() {   # $@ = the dates whose `z` record holds a row; none removes the home
+  local _h="$_b1/memory/project/unbound-records.txt" _d
+  rm -f "$_h"; [ "$#" -gt 0 ] || return 0
+  printf '# ledger · unbound-records · key record path · direction shrink-only · drain key\n' > "$_h"
+  for _d in "$@"; do
+    printf 'memory/builds/tOne/build/%s-build-ARCH-tOne-1-z.md\t1\tabcdef12\tseeded\n' "$_d" >> "$_h"
+  done
+}
 for _d32 in 2026-08-02 2026-09-02; do
   printf '# r\n\n**Serves:** journal ARCH-tOne-9\n' > "$_b1/memory/builds/tOne/build/$_d32-build-ARCH-tOne-9-x.md"
   printf '# r\n\n**Serves:** journal ARCH-tOne-1\n' > "$_b1/memory/builds/tOne/build/$_d32-build-tOne-1-y.md"
   printf '# r\n\n**Serves:** none — a fixture that serves nothing\n' > "$_b1/memory/builds/tOne/build/$_d32-build-ARCH-tOne-1-z.md"
 done
 ( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m rf32 --no-verify ) >/dev/null 2>&1
-write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="1"\nRECORD_UNDATED_ARTIFACTS="exempt"')"; o=$(run_pk_gate)
+write_unbound_rows 2026-09-02
+write_pk_conf 'RECORD_UNDATED_ARTIFACTS="exempt"'; o=$(run_pk_gate)
 n=$((n+1))
 case "$o" in
-  *"2026-08-02-build-ARCH-tOne-9-x.md — ARCH-tOne-9 is named"*"measured 2 against the pin 1"*"2026-08-02-build-tOne-1-y.md — bound, but the name carries no family-qualified id"*) echo "ok   check 21 control: with no cutoff the id, filename and pin branches all grade the pre-cutoff records" ;;
+  *"2026-08-02-build-ARCH-tOne-9-x.md — ARCH-tOne-9 is named"*"with no row in memory/project/unbound-records.txt"*"2026-08-02-build-ARCH-tOne-1-z.md"*"2026-08-02-build-tOne-1-y.md — bound, but the name carries no family-qualified id"*) echo "ok   check 21 control: with no cutoff the id, filename and unbound branches all grade the pre-cutoff records" ;;
   *) echo "FAIL check 21 control: a blank cutoff did not red all three pre-cutoff records, so the cutoff arms below prove nothing"; st=1 ;;
 esac
-write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="1"\nRECORD_UNDATED_ARTIFACTS="exempt"\nRECORD_SERVES_CUTOFF="2026-09-01"')"; o=$(run_pk_gate)
+write_pk_conf "$(printf 'RECORD_UNDATED_ARTIFACTS="exempt"\nRECORD_SERVES_CUTOFF="2026-09-01"')"; o=$(run_pk_gate)
 n=$((n+1))
 case "$o" in
   *"2026-08-02-build-ARCH-tOne-9-x.md"*) echo "FAIL RECORD_SERVES_CUTOFF: the id branch still grades a record dated before the cutoff"; st=1 ;;
@@ -3862,28 +3928,30 @@ case "$o" in
 esac
 n=$((n+1))
 case "$o" in
-  *"measured 2 against the pin 1"*) echo "FAIL RECORD_SERVES_CUTOFF: the pin still counts the unbound record dated before the cutoff"; st=1 ;;
-  *) echo "ok   RECORD_SERVES_CUTOFF: the pin counts only the unbound record at or after the cutoff" ;;
+  *"with no row in memory/project/unbound-records.txt"*|*"that no graded unbound record matches"*) echo "FAIL RECORD_SERVES_CUTOFF: the population still grades the unbound record dated before the cutoff"; st=1 ;;
+  *) echo "ok   RECORD_SERVES_CUTOFF: the population keys only the unbound record at or after the cutoff" ;;
 esac
-write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="0"\nRECORD_UNDATED_ARTIFACTS="exempt"\nRECORD_SERVES_CUTOFF="2026-09-01"')"; o=$(run_pk_gate)
+write_unbound_rows
+write_pk_conf "$(printf 'RECORD_UNDATED_ARTIFACTS="exempt"\nRECORD_SERVES_CUTOFF="2026-09-01"')"; o=$(run_pk_gate)
 n=$((n+1))
 case "$o" in
-  *"measured 1 against the pin 0"*) echo "ok   RECORD_SERVES_CUTOFF: the pin still grades the unbound record after the cutoff" ;;
-  *) echo "FAIL RECORD_SERVES_CUTOFF: the pin stopped counting the unbound record dated after the cutoff"; st=1 ;;
+  *"with no row in memory/project/unbound-records.txt"*"2026-09-02-build-ARCH-tOne-1-z.md"*) echo "ok   RECORD_SERVES_CUTOFF: the population still grades the unbound record after the cutoff" ;;
+  *) echo "FAIL RECORD_SERVES_CUTOFF: the population stopped grading the unbound record dated after the cutoff"; st=1 ;;
 esac
-# rev-3 (the closing review's C1): a pin set to N, as the runbook used to say, holds slack equal to
-# the exempt record. The pin is shrink-only, so that slack REDS, naming the value to lower it to, and
-# the measurement it is read against prints on every run with all three numbers.
-write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="2"\nRECORD_UNDATED_ARTIFACTS="exempt"\nRECORD_SERVES_CUTOFF="2026-09-01"')"; o=$(run_pk_gate)
+# rev-3 (the closing review's C1), re-pointed by TOOL-dWitnessedBar-17 S1: a row keyed for a record the
+# cutoff exempts is a STALE row, never headroom a new unbound record could spend, and the measurement
+# it is read against prints on every run with all three numbers.
+write_unbound_rows 2026-08-02 2026-09-02
+write_pk_conf "$(printf 'RECORD_UNDATED_ARTIFACTS="exempt"\nRECORD_SERVES_CUTOFF="2026-09-01"')"; o=$(run_pk_gate)
 n=$((n+1))
 case "$o" in
-  *"RECORD_UNBOUND_PIN carries slack — the pin is shrink-only, and this much headroom lets as many new unbound records land green"*"the pin 2 against a graded count of 1 — lower it to 1"*) echo "ok   check 21: a pin above its graded count reds as slack, naming the value to lower it to" ;;
-  *) echo "FAIL check 21: a pin set to N over a cutoff-exempt record passed with slack"; st=1 ;;
+  *"that no graded unbound record matches — stale rows"*"2026-08-02-build-ARCH-tOne-1-z.md"*) echo "ok   check 21: a row for a cutoff-exempt record reds as stale, naming it" ;;
+  *) echo "FAIL check 21: a row keyed for a cutoff-exempt record passed"; st=1 ;;
 esac
 n=$((n+1))
 case "$o" in
-  *"check 21: the unbound pin grades 1 of N 2 unbound record(s), 1 exempt by RECORD_SERVES_CUTOFF or legacy-files.txt, against RECORD_UNBOUND_PIN=2"*) echo "ok   check 21: the pin's measurement prints graded, total and exempt counts" ;;
-  *) echo "FAIL check 21: the pin's measurement did not print its three counts"; st=1 ;;
+  *"check 21: the unbound population grades 1 of N 2 unbound record(s), 1 exempt by RECORD_SERVES_CUTOFF or legacy-files.txt, against memory/project/unbound-records.txt"*) echo "ok   check 21: the population's measurement prints graded, total and exempt counts" ;;
+  *) echo "FAIL check 21: the population's measurement did not print its three counts"; st=1 ;;
 esac
 # A generator that predates the U row prints N and no U, which would leave the pin unreachable. A
 # copy of this kit whose generator lost the line models an adopter's forked one.
@@ -3896,6 +3964,7 @@ case "$o" in
   *) echo "FAIL check 21: a generator printing no U row left the pin silently ungraded"; st=1 ;;
 esac
 rm -rf "$TMP/kit32"
+write_unbound_rows
 ( cd "$_b1" && git rm -q memory/builds/tOne/build/2026-0[89]-02-build-* && git -c commit.gpgsign=false commit -q -m rf32-out --no-verify ) >/dev/null 2>&1
 
 # ---- TOOL-dTrueNorth-5: check 21's AUDIT-PIN ARM. A second build whose one spec carries a status
@@ -3910,7 +3979,7 @@ printf '# r\n\n**Serves:** spec-audit ARCH-tTwo-1\n' > "$_b1/memory/builds/tTwo/
 printf '# r\n\n**Serves:** spec-audit ARCH-tTwo-1@rev-5\n' > "$_b1/memory/builds/tTwo/build/2026-09-02-build-ARCH-tTwo-1-o.md"
 cp "$_b1/memory/project/legacy-files.txt" "$TMP/legacy.tn5"
 ( cd "$_b1" && git add -A && "$_PY" "$HERE/gen_build_index.py" --write && git add -A && git -c commit.gpgsign=false commit -q -m tn5 --no-verify ) >/dev/null 2>&1
-write_pk_conf $'RECORD_UNBOUND_PIN="0"\nSPEC_AUDIT_PIN_CUTOFF="2026-09-01"'; o=$(run_pk_gate)
+write_pk_conf 'SPEC_AUDIT_PIN_CUTOFF="2026-09-01"'; o=$(run_pk_gate)
 n=$((n+1))
 case "$o" in
   *"spec-audit records at or after SPEC_AUDIT_PIN_CUTOFF whose Serves line leaves an id unpinned or pins it past its spec's header revision"*"2026-09-02-build-ARCH-tTwo-1-o.md — ARCH-tTwo-1@rev-5 pins a revision its spec has not reached, header rev-2"*"2026-09-02-build-ARCH-tTwo-1-u.md — ARCH-tTwo-1 carries no @rev-N pin"*) echo "ok   check 21: the audit-pin arm names the over-pinned and the unpinned spec-audit records" ;;
@@ -3932,7 +4001,7 @@ case "$o" in
   *"2026-09-02-build-ARCH-tTwo-1-o.md — ARCH-tTwo-1@rev-5 pins a revision its spec has not reached, header rev-2"*) echo "ok   check 21: the audit-pin arm exempts a legacy-listed record and still grades its sibling" ;;
   *) echo "FAIL check 21: the audit-pin arm stopped naming the over-pinned control record"; st=1 ;;
 esac
-write_pk_conf 'RECORD_UNBOUND_PIN="0"'; o=$(run_pk_gate)
+write_pk_conf ""; o=$(run_pk_gate)
 n=$((n+1))
 case "$o" in
   *"check 21: the audit-pin arm is off (SPEC_AUDIT_PIN_CUTOFF blank)"*) echo "ok   check 21: a blank SPEC_AUDIT_PIN_CUTOFF prints the arm's off line" ;;
@@ -3946,7 +4015,7 @@ esac
 # A generator without the arm prints N and no Q row, which would leave every pin ungraded in silence.
 rm -rf "$TMP/kit5"; cp -r "$HERE" "$TMP/kit5"
 sed -i '/print(f"Q\\t{graded}/d' "$TMP/kit5/gen_build_index.py"
-write_pk_conf $'RECORD_UNBOUND_PIN="0"\nSPEC_AUDIT_PIN_CUTOFF="2026-09-01"'
+write_pk_conf 'SPEC_AUDIT_PIN_CUTOFF="2026-09-01"'
 o=$( cd "$_b1" && bash "$TMP/kit5/check-memory-hygiene.sh" 2>&1 )
 n=$((n+1))
 case "$o" in
@@ -3984,7 +4053,7 @@ else
     && git add -A && git -c commit.gpgsign=false commit -q -m tn14-l --no-verify \
     && git -c commit.gpgsign=false merge -q --no-ff --no-edit tn14-run \
     && "$_PY" "$HERE/gen_build_index.py" --write && git add -A && git -c commit.gpgsign=false commit -q -m tn14-gen --no-verify ) >/dev/null 2>&1
-  write_pk_conf $'RECORD_UNBOUND_PIN="0"\nSPEC_AUDIT_PIN_CUTOFF="2026-09-01"\nRECORD_UNDATED_ARTIFACTS="exempt"'; o=$(run_pk_gate)
+  write_pk_conf $'SPEC_AUDIT_PIN_CUTOFF="2026-09-01"\nRECORD_UNDATED_ARTIFACTS="exempt"'; o=$(run_pk_gate)
   n=$((n+1))
   case "$o" in
     *"check 21: the audit-pin arm graded 1 spec-audit record(s) from SPEC_AUDIT_PIN_CUTOFF=2026-09-01, 1 written by a harness before renderAuditBinding"*) echo "ok   check 21: the audit-pin arm counts a record an older harness wrote as exempt, from the Q row's fourth field" ;;
@@ -4292,7 +4361,7 @@ bm_set() {   # $1 = the BACKLOG_MODE line, or empty for a conf that never declar
   mkdir -p memory/backlog memory/project memory/archive memory/builds/tAsk memory/builds/tHome
   printf '# r\n' > memory/README.md
   printf '# d\n\n- ARCH-tOne-1 · a decision\n' > memory/DECISIONS.md
-  for r in legacy-files.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt method-carriers.txt stale-header-waiver.txt; do : > "memory/project/$r"; done
+  for r in legacy-files.txt unarmed-branches.txt method-carriers.txt stale-header-waiver.txt; do : > "memory/project/$r"; done
   printf 'memory/backlog/BRAND.md\t1\tabcdef12\tseeded\n' > memory/project/curation-debt.txt
   # ONE seq, reused, for the reason the check-6 cap fixtures above give: building each line with its
   # own command substitution costs this suite minutes.

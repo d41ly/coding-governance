@@ -8,6 +8,7 @@
     python <prefix>/memory-tree/ratchet.py seed-laundering      # ratchet (seed laundering)
     python <prefix>/memory-tree/ratchet.py rename               # ratchet (rename)
     python <prefix>/memory-tree/ratchet.py keys-not-scalar [--measure]   # ratchet (keys, not a scalar)
+    python <prefix>/memory-tree/ratchet.py measure-cutoffs      # the `date-cutoffs` seed
     python <prefix>/memory-tree/ratchet.py key-shape            # ratchet (key shape)
     python <prefix>/memory-tree/ratchet.py widen <population> --key <k> [--key <k>] --reason <text> --unit <id>
     python <prefix>/memory-tree/ratchet.py --list               # each pack row, its leg and whether it is armed
@@ -37,6 +38,8 @@ count 1 for a new key and one above the row's for a key it holds; under `refuse`
 tracked, naming the population and the key, its Reason non-empty, and under `refuse` tracked at the base
 too. `keys-not-scalar --measure` is the `conf-scalar-pins` seed: one TAB row per tracked root `.<name>.conf`
 and `*_PIN` key, its count the `<KEY>=` assignments of that key, each conf read from the working tree.
+`measure-cutoffs` is the `date-cutoffs` seed over the same conf walk: one TAB row per `*_CUTOFF` key, its
+count the date as eight digits, a blank date `99991231` (TOOL-dWitnessedBar-17 S6).
 
 WHAT IT DOES NOT CHECK. A widened row's count, which the record does not name. That a leg another
 registration names exists in the manifest. The rows a first seed writes, which are `test.seed`'s
@@ -62,7 +65,7 @@ if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 import legacy_ledger as LL  # noqa: E402  the ledger factory, this kit's copy
 from build_records import derive_record_name, read_record, write_record  # noqa: E402  the record factory
-from tree_lib import read_policy_value  # noqa: E402  the kit's one policy read
+from tree_lib import parse_conf_line, read_policy_value  # noqa: E402  the kit's one conf line and policy read
 
 SAY = "ratchet"
 LEGS = {  # verb -> the leg it is
@@ -93,6 +96,8 @@ WIDEN_DIRECTIONS = ("shrink-only", "ceiling")  # the directions whose growth a w
 SCALAR_POPULATION = "conf-scalar-pins"
 ROOT_CONF_RE = re.compile(r"\.[^/]+\.conf")
 PIN_RE = re.compile(r"([A-Z_]+_PIN)=")
+CUTOFF_RE = re.compile(r"([A-Z0-9_]+_CUTOFF)=")
+BLANK_CUTOFF = 99991231  # a blank cutoff reads as the latest date, so disarming its rule is a raise
 UNIT_RE = re.compile(r"[A-Za-z]+-([A-Za-z0-9]+)-\d+")
 EMPTY_TEXT = "reads unarmed, no seen-red reader"
 
@@ -477,20 +482,55 @@ def run_rename(root):
     return print_verdict(leg, red, len(sites), sha, why)
 
 
-def measure_scalar_pins(root):
-    """-> {(conf, key): count}: every `<KEY>=` assignment of a `*_PIN` key at a line's start in each tracked
-    root `.<name>.conf`, read from the working tree."""
-    counts = {}
+def read_root_conf_lines(root):
+    """-> [(conf, line)]: each line of every tracked root `.<name>.conf`, read from the working tree, the
+    one conf walk `measure_scalar_pins` and `measure_cutoffs` share (TOOL-dWitnessedBar-17 S6)."""
+    out = []
     for conf in sorted(p for p in read_tracked_paths(root) if ROOT_CONF_RE.fullmatch(p)):
         try:
             text = pathlib.Path(root, conf).read_bytes().decode("utf-8", "replace")
         except OSError:
             continue
-        for line in text.splitlines():
-            m = PIN_RE.match(line)
-            if m:
-                counts[(conf, m.group(1))] = counts.get((conf, m.group(1)), 0) + 1
+        out.extend((conf, line) for line in text.splitlines())
+    return out
+
+
+def measure_scalar_pins(root):
+    """-> {(conf, key): count}: every `<KEY>=` assignment of a `*_PIN` key at a line's start in each tracked
+    root `.<name>.conf`, read from the working tree."""
+    counts = {}
+    for conf, line in read_root_conf_lines(root):
+        m = PIN_RE.match(line)
+        if m:
+            counts[(conf, m.group(1))] = counts.get((conf, m.group(1)), 0) + 1
     return counts
+
+
+def measure_cutoffs(root):
+    """-> {(conf, key): date}: every `*_CUTOFF` key assigned at a line's start in each tracked root
+    `.<name>.conf`, its date the last assignment's `YYYY-MM-DD` as eight digits and a blank one
+    `BLANK_CUTOFF`, the `date-cutoffs` seed (TOOL-dWitnessedBar-17 S6). A value that is neither is
+    ValueError naming the conf and key, never a row. WHAT IT DOES NOT CHECK: that the date is a real day."""
+    dates = {}
+    for conf, line in read_root_conf_lines(root):
+        if not CUTOFF_RE.match(line):
+            continue
+        key, value = parse_conf_line(line)
+        digits = value.replace("-", "")
+        if not value:
+            dates[(conf, key)] = BLANK_CUTOFF
+        elif re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value):
+            dates[(conf, key)] = int(digits)
+        else:
+            raise ValueError("%s: %s=%r is neither a YYYY-MM-DD date nor blank" % (conf, key, value))
+    return dates
+
+
+def run_measure_cutoffs(root):
+    """`measure-cutoffs`: one `<conf> TAB <key> TAB <date>` row per measured cutoff, the seed's output."""
+    for (conf, key), date in sorted(measure_cutoffs(root).items()):
+        print("%s\t%s\t%d" % (conf, key, date))
+    return 0
 
 
 def render_seed_command(root):
@@ -836,6 +876,35 @@ def run_plant_both_ways(top, results):
                      ["unarmed · ratchet (both ways) · no registration names this leg"], ["pass"])
 
 
+def write_cutoff_fixture(top):
+    """A fixture whose `ceiling` registration is seeded by `measure-cutoffs` over a tracked root conf
+    holding one cutoff, its row at that date (TOOL-dWitnessedBar-17 S6)."""
+    table = render_table(population="fix-cutoffs", leg=LEGS["both-ways"], key="cutoff", fields=("conf", "key"),
+                         direction="ceiling", seed=[sys.executable, str(KIT / "ratchet.py"), "measure-cutoffs"])
+    rows = render_rows([((".fix.conf", "FIX_CUTOFF"), 20260102, SHA_A, "seeded")], population="fix-cutoffs",
+                       key="cutoff", fields=("conf", "key"), direction="ceiling")
+    write_fixture_repo(top, [table], {".fix.conf": 'FIX_CUTOFF="2026-01-02"\n', "pop/rows.txt": rows})
+
+
+def run_plant_cutoff_later(top, results):
+    write_cutoff_fixture(top)
+    check_plant_case(results, "cutoff-later", "a cutoff at its row's date", top, ["both-ways"], 0,
+                     ["fix-cutoffs · 1 rows, 1 measured", "pass"])
+    write_files(top, {".fix.conf": 'FIX_CUTOFF="2026-01-03"\n'})
+    check_plant_case(results, "cutoff-later", "a cutoff moved a day later", top, ["both-ways"], 1,
+                     ["fix-cutoffs · count rose · .fix.conf\tFIX_CUTOFF"])
+    write_files(top, {".fix.conf": 'FIX_CUTOFF="2026-01-01"\n'})
+    check_plant_case(results, "cutoff-later", "a cutoff moved a day earlier", top, ["both-ways"], 0,
+                     ["pass"], ["count rose"])
+
+
+def run_plant_cutoff_blank(top, results):
+    write_cutoff_fixture(top)
+    write_files(top, {".fix.conf": 'FIX_CUTOFF=""\n'})
+    check_plant_case(results, "cutoff-blank", "a cutoff blanked reads as 99991231, a raise", top, ["both-ways"], 1,
+                     ["fix-cutoffs · count rose · .fix.conf\tFIX_CUTOFF · measured 99991231, declared 20260102"])
+
+
 def run_plant_unarmed_green(top, results):
     rows = [(("a",), 1, SHA_A, "seeded")]
     write_fixture_repo(top, [render_table()], {"pop/rows.txt": render_rows(rows, extra=[LL.UNARMED_LEAD + "exit 1 · "
@@ -971,6 +1040,7 @@ PLANTS = {
     "gain": run_plant_gain, "ceiling-raised": run_plant_ceiling_raised, "append-edited": run_plant_append_edited,
     "gain-widened": run_plant_gain_widened, "gain-refused": run_plant_gain_refused,
     "ceiling-widened": run_plant_ceiling_widened, "both-ways": run_plant_both_ways,
+    "cutoff-later": run_plant_cutoff_later, "cutoff-blank": run_plant_cutoff_blank,
     "unarmed-green": run_plant_unarmed_green, "populated-empty-armed": run_plant_populated_empty_armed,
     "laundering": run_plant_laundering, "rename": run_plant_rename, "key-number": run_plant_key_number,
     "untouched-quiet": run_plant_untouched_quiet, "merge": run_plant_merge,
@@ -1006,7 +1076,7 @@ def run_fixture(cases):
     return 1 if failed or not results else 0
 
 
-USAGE = ("usage: ratchet.py (%s) | keys-not-scalar --measure | widen <population> --key <k> --reason <text> "
+USAGE = ("usage: ratchet.py (%s) | keys-not-scalar --measure | measure-cutoffs | widen <population> --key <k> --reason <text> "
          "--unit <id> | --list | --fixture [--plant <case>]" % " | ".join(LEGS))
 
 
@@ -1023,8 +1093,8 @@ def main(argv=None):
         print("%s: --fixture [--plant <case>], the cases: %s" % (SAY, ", ".join(PLANTS)), file=sys.stderr)
         return 2
     verb = args[0] if args else ""
-    if not (args == ["--list"] or (verb in LEGS and (len(args) == 1 or args == ["keys-not-scalar", "--measure"]))
-            or verb == "widen"):
+    if not (args == ["--list"] or args == ["measure-cutoffs"]
+            or (verb in LEGS and (len(args) == 1 or args == ["keys-not-scalar", "--measure"])) or verb == "widen"):
         print(USAGE, file=sys.stderr)
         return 2
     try:
@@ -1033,6 +1103,8 @@ def main(argv=None):
             return run_list(root)
         if verb == "widen":
             return run_widen(root, args[1:])
+        if verb == "measure-cutoffs":
+            return run_measure_cutoffs(root)
         if verb == "keys-not-scalar":
             return run_keys_not_scalar(root, measure=len(args) == 2)
         return {"never-gains": run_never_gains, "both-ways": run_both_ways, "unarmed": run_unarmed,

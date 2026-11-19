@@ -71,10 +71,11 @@ dash segments, because inCMS's frozen legacy ids (`ABL-015`) sat between the for
 shard closes a row that way. The age walk keys on the same shape behind the declared families, so
 every row the census calls live and keyed is one it can date.
 
-THE TWO SHARD PINS POINT THE OTHER WAY from `ROW_DUPLICATE_PIN`. Zero is honest for a young tree's
-duplicate count; no default ceiling is honest over an inherited backlog, so `SEVERITY_UNLABELLED_PIN`
-and `LIVE_ROW_PIN` are UNARMED when blank and say so in every green run. The hygiene gate prints
-check 20's capture on green for that reason, since swallowing it would silence the announcement.
+THE TWO SHARD POPULATIONS POINT THE OTHER WAY from `row-duplicates`. An absent duplicates home, the
+empty population, is honest for a young tree; no default is honest over an inherited backlog, so
+`live-rows` and `severity-unlabelled` are registered unseeded and check 20 says so in every green
+run (TOOL-dWitnessedBar-17 S1, S2). The hygiene gate prints check 20's capture on green for that
+reason, since swallowing it would silence the announcement.
 
 ## Shared seams
 

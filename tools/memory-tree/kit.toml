@@ -100,12 +100,13 @@ required_keys_render = ["MEMORY_ROOT", "READINESS_ROWS"]
 # declared one executes nothing.
 # BACKLOG_MODE's spelling is frozen — the transition audit classifies commits by it — so it is
 # declared here as well as in the conf example, and a sibling unit's `requires_if` names this entry.
-optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER", "BUILD_SLUG_RE", "PROJECT_REGISTRY_EXTRA", "RECORD_SERVES_CUTOFF", "SPEC_AUDIT_PIN_CUTOFF", "RECORD_UNDATED_ARTIFACTS", "ENTRY_CAP_UNIT", "READINESS_ROWS_CUTOFF", "ARMS_FLOORS", "ARMS_REFUSALS", "LIVE_ROW_PIN", "SEVERITY_UNLABELLED_PIN", "BACKLOG_MODE", "ASK_CUTOFF", "BACKLOG_EXCERPT_CHARS", "PROBE_ALLOW", "ROUTED_COMMIT_CUTOFF", "ROUTED_COMMIT_WAIVED", "ROUTED_PATHS"]
+optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER", "BUILD_SLUG_RE", "PROJECT_REGISTRY_EXTRA", "RECORD_SERVES_CUTOFF", "SPEC_AUDIT_PIN_CUTOFF", "RECORD_UNDATED_ARTIFACTS", "ENTRY_CAP_UNIT", "READINESS_ROWS_CUTOFF", "ARMS_FLOORS", "ARMS_REFUSALS", "BACKLOG_MODE", "ASK_CUTOFF", "BACKLOG_EXCERPT_CHARS", "PROBE_ALLOW", "ROUTED_COMMIT_CUTOFF", "ROUTED_COMMIT_WAIVED", "ROUTED_PATHS"]
 # TOOL-dTrueNorth-20 S1: the four DESIGN_* keys are gov's, the as-built view's and the deviation join's,
 # and blank or absent is off. Listed so govkit's check 7 resolves the unattended row's condition keys;
 # that check is the list's one reader and writes nothing. The example conf declares them blank, which
-# is off, as it declares the list's other three (TOOL-dTrueNorth-29 S5).
-conditional_keys = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN", "LIVE_LANDED_UNCLOSED", "DESIGN_RECORD", "DESIGN_BASELINE", "DESIGN_VIEW", "DESIGN_NODES"]
+# is off, as it declares the list's other key (TOOL-dTrueNorth-29 S5); DEAD_PATH_PIN and ORPHAN_ID_PIN
+# left the list with their keys (TOOL-dWitnessedBar-17 S4).
+conditional_keys = ["LIVE_LANDED_UNCLOSED", "DESIGN_RECORD", "DESIGN_BASELINE", "DESIGN_VIEW", "DESIGN_NODES"]
 defaults = { MEMORY_ROOT = "memory" }
 
 [adopt]
@@ -225,11 +226,11 @@ id = "measured-pins"
 kind = "measurement"
 blocks_adopt = false
 blocks_gate = false
-why = "every pin is measured against the target corpus; an inherited number is vacuous or permanently red. Blank means checks 13-15 are simply OFF, so the hygiene leg exits 0 with that hole wide open. Check 16 is NOT in this bargain: it is structural since memory-tree 2.42 and runs whatever the pins say."
+why = "checks 13-15 arm on their two waiver homes, id-orphan-waiver.txt and corpus-path-unresolved.txt, each keyed by the offender it waives and measured against the target corpus; an inherited row is vacuous or permanently red. An absent home means its checks are simply OFF, so the hygiene leg exits 0 with that hole wide open (TOOL-dWitnessedBar-17 S4). Check 16 is NOT in this bargain: it is structural since memory-tree 2.42 and runs whatever the homes say."
 # DEPL-aRepatriatedFork-13 S5. The probe runs `{kit}/corpus_ids.py --check`; at a target that
 # owns that program, it would grade the adopter's own engine against gov's pins.
 stands_down = { when_owned = ["corpus_ids.py"], why = "the probe runs corpus_ids.py, and an adopter-owned corpus_ids.py is the target's program rather than gov's" }
-discharge = { command = ["bash", "-c", "for k in ORPHAN_ID_PIN DEAD_PATH_PIN; do grep -qE \"^${k}=\\\"[^\\\"]+\\\"\" .memory-tree.conf || exit 1; done; python {kit}/corpus_ids.py --check"] }
+discharge = { command = ["bash", "-c", "for f in memory/project/id-orphan-waiver.txt memory/project/corpus-path-unresolved.txt; do [ -f \"$f\" ] || exit 1; done; python {kit}/corpus_ids.py --check"] }
 
 # THE RE-RENDER an update runs, with GOVKIT_RERENDER=1. This kit owns FOUR `rendered` rows — the
 # hygiene rules, the spec template, the build method and the annotation style — and until this block
@@ -826,6 +827,79 @@ drain = "hunk"
 direction = "shrink-only"
 home = "memory/project/unarmed-branches.txt"
 
+# THE DEAD-PATH REGISTRY (TOOL-dWitnessedBar-17 §4): check 15's waiver, converted in place as unit 16's lists
+# were, `path` the citing file and `cited` the path it cites; its `absent|moved:DEST` column left as the
+# conversion's reason (§8 F9). Present, it arms check 15 and check 13; absent is off (§8 F2).
+[[ledger]]
+population = "corpus-path-unresolved"
+leg = "memory hygiene"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "corpus-path-unresolved"]
+key = "site"
+fields = ["path", "cited"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/corpus-path-unresolved.txt"
+
+# THE COUNTED PINS AS KEYED POPULATIONS (TOOL-dWitnessedBar-17 S1): each check's own measurement exposed as a
+# verb, so a fixed offender and a new one never net to zero. Check 20 grades `row-duplicates`, check 21
+# `unbound-records`, each an offender with no row red and a row no offender matches red as stale.
+[[ledger]]
+population = "row-duplicates"
+leg = "memory hygiene"
+seed = ["python", "{prefix}/memory-tree/row_grammar.py", "--list-duplicates"]
+key = "record"
+fields = ["shard", "row-key"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/row-duplicates.txt"
+
+[[ledger]]
+population = "unbound-records"
+leg = "memory hygiene"
+seed = ["python", "{prefix}/memory-tree/corpus_ids.py", "--list-unbound"]
+key = "record"
+fields = ["path"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/unbound-records.txt"
+
+# THE TWO UNSET SHARD PINS (TOOL-dWitnessedBar-17 S2), registered unseeded: `retrofit.unseeded`'s default
+# reads each `unarmed`, and its home is declared and never written while `seed` is empty. The unit that
+# gives either a seed adds its home to check 3's named list.
+[[ledger]]
+population = "severity-unlabelled"
+leg = "memory hygiene"
+seed = []
+key = "record"
+fields = ["shard", "row-key"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/severity-unlabelled.txt"
+
+[[ledger]]
+population = "live-rows"
+leg = "memory hygiene"
+seed = []
+key = "record"
+fields = ["shard", "row-key"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/live-rows.txt"
+
+# THE DATE CUTOFFS (TOOL-dWitnessedBar-17 S6): every `*_CUTOFF` key of a tracked root `.<name>.conf`, its count
+# the date as eight digits and a blank one `99991231`, under `ceiling`: a date moved later reds in both
+# ways as `count rose` and in never-gains as `above ceiling`, and one moved earlier is admitted. The dates
+# stay in their confs; `ratchet (both ways)` names this registration as its own (§8 F5).
+[[ledger]]
+population = "date-cutoffs"
+leg = "ratchet (both ways)"
+seed = ["python", "{prefix}/memory-tree/ratchet.py", "measure-cutoffs"]
+key = "cutoff"
+fields = ["conf", "key"]
+drain = "none"
+direction = "ceiling"
+home = "memory/project/date-cutoffs.txt"
+
 # Each list this kit's adopter seeds converts at the adopter's next update (TOOL-dWitnessedBar-16 S10).
 [[upgrade]]
 id = "memory-tree/curation-debt-to-ledger"
@@ -881,6 +955,65 @@ up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "-
 down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/unarmed-branches.txt"]
 witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/unarmed-branches.txt"]
 surfaces = ["file:memory/project/unarmed-branches.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/corpus-path-unresolved-to-ledger"
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/corpus-path-unresolved.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/corpus-path-unresolved.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/corpus-path-unresolved.txt"]
+surfaces = ["file:memory/project/corpus-path-unresolved.txt"]
+needs-target = false
+
+# Each conf pin this kit's checks read leaves the conf at the adopter's next update (TOOL-dWitnessedBar-17 S8):
+# a counted pin's population seeded first, then the key and its `conf-scalar-pins` row drained; a folded
+# pin's home removed where the key was blank, so its checks stay off as the blank pin left them.
+[[upgrade]]
+id = "memory-tree/orphan-id-pin-to-ledger"
+up = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "up", "{target}", "--key", "ORPHAN_ID_PIN"]
+down = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "down", "{target}", "--key", "ORPHAN_ID_PIN"]
+witness = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "witness", "{target}", "--key", "ORPHAN_ID_PIN"]
+surfaces = ["conf-key:.memory-tree.conf#ORPHAN_ID_PIN", "file:memory/project/conf-scalar-pins.txt", "file:memory/project/id-orphan-waiver.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/dead-path-pin-to-ledger"
+up = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "up", "{target}", "--key", "DEAD_PATH_PIN"]
+down = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "down", "{target}", "--key", "DEAD_PATH_PIN"]
+witness = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "witness", "{target}", "--key", "DEAD_PATH_PIN"]
+surfaces = ["conf-key:.memory-tree.conf#DEAD_PATH_PIN", "file:memory/project/conf-scalar-pins.txt", "file:memory/project/corpus-path-unresolved.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/row-duplicate-pin-to-ledger"
+up = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "up", "{target}", "--key", "ROW_DUPLICATE_PIN"]
+down = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "down", "{target}", "--key", "ROW_DUPLICATE_PIN"]
+witness = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "witness", "{target}", "--key", "ROW_DUPLICATE_PIN"]
+surfaces = ["conf-key:.memory-tree.conf#ROW_DUPLICATE_PIN", "file:memory/project/conf-scalar-pins.txt", "file:memory/project/row-duplicates.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/record-unbound-pin-to-ledger"
+up = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "up", "{target}", "--key", "RECORD_UNBOUND_PIN"]
+down = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "down", "{target}", "--key", "RECORD_UNBOUND_PIN"]
+witness = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "witness", "{target}", "--key", "RECORD_UNBOUND_PIN"]
+surfaces = ["conf-key:.memory-tree.conf#RECORD_UNBOUND_PIN", "file:memory/project/conf-scalar-pins.txt", "file:memory/project/unbound-records.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/severity-unlabelled-pin-to-ledger"
+up = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "up", "{target}", "--key", "SEVERITY_UNLABELLED_PIN"]
+down = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "down", "{target}", "--key", "SEVERITY_UNLABELLED_PIN"]
+witness = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "witness", "{target}", "--key", "SEVERITY_UNLABELLED_PIN"]
+surfaces = ["conf-key:.memory-tree.conf#SEVERITY_UNLABELLED_PIN", "file:memory/project/conf-scalar-pins.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/live-row-pin-to-ledger"
+up = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "up", "{target}", "--key", "LIVE_ROW_PIN"]
+down = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "down", "{target}", "--key", "LIVE_ROW_PIN"]
+witness = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "witness", "{target}", "--key", "LIVE_ROW_PIN"]
+surfaces = ["conf-key:.memory-tree.conf#LIVE_ROW_PIN", "file:memory/project/conf-scalar-pins.txt"]
 needs-target = false
 
 # THE RATCHET PACK (TOOL-dWitnessedBar-14): one leg per row of retrofit's `[ratchet]` table, each a verb

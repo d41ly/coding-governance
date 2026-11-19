@@ -9300,6 +9300,11 @@
     {
       "id": "cmd_down",
       "kind": "function",
+      "file": "tools/govkit/steps/conf_pins_to_ledger.py"
+    },
+    {
+      "id": "cmd_down",
+      "kind": "function",
       "file": "tools/govkit/steps/fanout_cap.py"
     },
     {
@@ -9326,11 +9331,6 @@
       "id": "cmd_emit_pin",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
-    },
-    {
-      "id": "cmd_emit_pin",
-      "kind": "function",
-      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "cmd_epoch",
@@ -9386,6 +9386,16 @@
       "id": "cmd_list",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "cmd_list_duplicates",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "cmd_list_unbound",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
     },
     {
       "id": "cmd_lists",
@@ -9615,6 +9625,11 @@
     {
       "id": "cmd_up",
       "kind": "function",
+      "file": "tools/govkit/steps/conf_pins_to_ledger.py"
+    },
+    {
+      "id": "cmd_up",
+      "kind": "function",
       "file": "tools/govkit/steps/fanout_cap.py"
     },
     {
@@ -9646,6 +9661,11 @@
       "id": "cmd_witness",
       "kind": "function",
       "file": "tools/govkit/steps/adopter_rules_to_overlay.py"
+    },
+    {
+      "id": "cmd_witness",
+      "kind": "function",
+      "file": "tools/govkit/steps/conf_pins_to_ledger.py"
     },
     {
       "id": "cmd_witness",
@@ -12678,6 +12698,26 @@
       "file": "tools/playbook/writing_practice.py"
     },
     {
+      "id": "derive_seed_prefix",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "derive_seed_prefix",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "derive_seed_prefix",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
+    },
+    {
+      "id": "derive_seeded_home",
+      "kind": "function",
+      "file": "tools/govkit/steps/conf_pins_to_ledger.py"
+    },
+    {
       "id": "derive_self_rel",
       "kind": "function",
       "file": "tools/check-agent-cap-restatement.test.sh"
@@ -13091,6 +13131,11 @@
       "id": "derive_step_context",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "derive_step_id",
+      "kind": "function",
+      "file": "tools/govkit/steps/conf_pins_to_ledger.py"
     },
     {
       "id": "derive_step_id",
@@ -15250,6 +15295,11 @@
     {
       "id": "load_conversion",
       "kind": "function",
+      "file": "tools/govkit/steps/conf_pins_to_ledger.py"
+    },
+    {
+      "id": "load_conversion",
+      "kind": "function",
       "file": "tools/govkit/steps/registry_to_ledger.py"
     },
     {
@@ -15446,6 +15496,11 @@
       "id": "load_module",
       "kind": "function",
       "file": "tools/chain-packet.py"
+    },
+    {
+      "id": "load_module",
+      "kind": "function",
+      "file": "tools/govkit/steps/conf_pins_to_ledger.py"
     },
     {
       "id": "load_overlay",
@@ -15846,6 +15901,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/govkit/steps/adopter_rules_to_overlay.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/govkit/steps/conf_pins_to_ledger.py"
     },
     {
       "id": "main",
@@ -16618,6 +16678,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "measure_cutoffs",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "measure_design_recall",
       "kind": "function",
       "file": "tools/workflows/replay_scorer.py"
@@ -16626,6 +16691,16 @@
       "id": "measure_dossier_staleness",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "measure_duplicates",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "measure_empty_decisions",
+      "kind": "function",
+      "file": "tools/codebase-map/map_diff.py"
     },
     {
       "id": "measure_escape_ratio",
@@ -17903,11 +17978,6 @@
       "file": "tools/policy/policy.py"
     },
     {
-      "id": "parse_live_row_pins",
-      "kind": "function",
-      "file": "tools/memory-tree/row_grammar.py"
-    },
-    {
       "id": "parse_observed",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
@@ -18098,11 +18168,6 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
-      "id": "parse_unranked_pins",
-      "kind": "function",
-      "file": "tools/memory-tree/row_grammar.py"
-    },
-    {
       "id": "parse_verdicts",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
@@ -18151,11 +18216,6 @@
       "id": "phases",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
-    },
-    {
-      "id": "pin_of",
-      "kind": "function",
-      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "pinned_units",
@@ -20023,6 +20083,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_conf_blank",
+      "kind": "function",
+      "file": "tools/govkit/steps/conf_pins_to_ledger.py"
+    },
+    {
       "id": "read_conf_default_of",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
@@ -20386,6 +20451,11 @@
       "id": "read_dump",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
+    },
+    {
+      "id": "read_duplicate_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "read_edge_types",
@@ -22693,6 +22763,11 @@
       "file": "tools/playbook/core.py"
     },
     {
+      "id": "read_registration",
+      "kind": "function",
+      "file": "tools/govkit/steps/conf_pins_to_ledger.py"
+    },
+    {
       "id": "read_registrations",
       "kind": "function",
       "file": "tools/gate-lint/legacy_ledger.py"
@@ -22931,6 +23006,11 @@
       "id": "read_role_step",
       "kind": "function",
       "file": "tools/playbook/load_sets.py"
+    },
+    {
+      "id": "read_root_conf_lines",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "read_root_dir",
@@ -26493,6 +26573,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "render_pins_rest",
+      "kind": "function",
+      "file": "tools/govkit/steps/conf_pins_to_ledger.py"
+    },
+    {
       "id": "render_planted_row",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -28570,6 +28655,11 @@
     {
       "id": "resolve_prefix_token",
       "kind": "function",
+      "file": "tools/gate-lint/coverage_join.py"
+    },
+    {
+      "id": "resolve_prefix_token",
+      "kind": "function",
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
     },
     {
@@ -28586,6 +28676,11 @@
       "id": "resolve_prefix_token",
       "kind": "function",
       "file": "tools/lib/resolve_prefix_token.py"
+    },
+    {
+      "id": "resolve_prefix_token",
+      "kind": "function",
+      "file": "tools/memory-tree/coverage_join.py"
     },
     {
       "id": "resolve_prefix_token",
@@ -31443,6 +31538,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "run_measure_cutoffs",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "run_merge_pair",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -31759,6 +31859,16 @@
     },
     {
       "id": "run_plant_ceiling_widened",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_cutoff_blank",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_cutoff_later",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
     },
@@ -35323,11 +35433,6 @@
       "file": "tools/codebase-map/test_codebase_map.py"
     },
     {
-      "id": "test_dossier_decisions_are_declining",
-      "kind": "function",
-      "file": "tools/codebase-map/test_codebase_map.py"
-    },
-    {
       "id": "test_dossier_prose_carries_no_typed_count",
       "kind": "function",
       "file": "tools/codebase-map/test_codebase_map.py"
@@ -37793,6 +37898,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "write_cutoff_fixture",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "write_decl",
       "kind": "function",
       "file": "tools/run-gates/adopt-run-gates.test.sh"
@@ -39366,6 +39476,11 @@
       "id": "write_transition_record",
       "kind": "function",
       "file": "tools/loop/loop_transition.py"
+    },
+    {
+      "id": "write_unbound_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
       "id": "write_unit_plant",

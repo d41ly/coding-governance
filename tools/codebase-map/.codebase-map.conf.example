@@ -54,12 +54,10 @@ RECALL_DARK_LAYERS=""
 # default 3. Raise it in a big repo where 3 files is common, lower it in a small one.
 SEAM_FANIN_THRESHOLD=3
 
-# How many feature dossiers may declare an EMPTY `decisions` list. SHRINK-ONLY: it is a debt
-# being drained, not a tolerance. SHIPS UNSET ON PURPOSE — a number measured on gov's corpus is
-# either vacuous or permanently red on yours. Unset, the check reports the count as UNGRADED and
-# says so rather than reading it as zero (which would red your first run) or skipping silently
-# (which would make the check the vacuous selector it exists to close). Measure yours, then set
-# it, and record the reading beside it. Enforcement of the shrink-only half needs the
-# drift-audit kit, whose RATCHETS list reds an unjustified raise; without that kit the pin is a
-# declared number with no gate behind it, which is a documented gap rather than a silent one.
-DOSSIER_DECISIONS_EMPTY_PIN=""
+# Which feature dossiers may declare an EMPTY `decisions` list is no key here: each is a row of
+# `memory/project/dossier-decisions-empty.txt`, SHRINK-ONLY, a debt being drained and not a tolerance,
+# measured by `python <kit>/map_diff.py --list-empty-decisions`. Seed it on YOUR corpus with
+# `python <memory-tree kit>/legacy_ledger.py seed --population dossier-decisions-empty`; the
+# memory-tree kit's `ratchet (both ways)` reds a dossier with no row and a row whose dossier declares
+# decisions now, and `ratchet (never gains)` a row gained without a widen record. Unseeded, the
+# population reads unarmed rather than green.

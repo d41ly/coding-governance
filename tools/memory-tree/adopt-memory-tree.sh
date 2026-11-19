@@ -723,9 +723,9 @@ render_all
 *(none yet)*
 ' "$(FAMILY_of "$d")" "$d"; done
 } > "$M/DECISIONS.md"
-# project/ — the gate's OWN waiver registries and nothing else. EVERY registry any gate reads is
-# written here: several are NAMED by gates (corpus_ids.py's checks 14 and 15, check-arms.py,
-# gen_build_index.py) and were created by nothing, so an adopter met them as a missing file rather
+# project/ — the gate's OWN waiver registries and nothing else. EVERY registry any gate reads as an
+# empty ratchet is written here, the two homes below that arm checks excepted: several are NAMED by
+# gates (check-arms.py, gen_build_index.py) and were created by nothing, so an adopter met them as a missing file rather
 # than as an empty ratchet. Most gates read "absent" and "present and empty" identically, which is
 # what makes an omission invisible — and where one does NOT, as the index generator does not, the
 # omission is worse: it refuses, and the tree never scaffolds.
@@ -733,19 +733,17 @@ render_all
 # THE COUNT USED TO BE WRITTEN HERE ("ALL SIX") AND IT WENT STALE THE MOMENT A SEVENTH LANDED,
 # which is how `stale-header-waiver.txt` shipped missing. A number beside the thing it counts is
 # wrong on the next commit and nobody notices; the list below is the count.
+#
+# TWO HOMES ARE DELIBERATELY NOT WRITTEN: `id-orphan-waiver.txt` and `corpus-path-unresolved.txt`.
+# Each ARMS corpus_ids.py's checks by being present (check 14 and check 15, and either check 13), so
+# an absent home keeps its checks off, as the blank pins they replaced did (TOOL-dWitnessedBar-17
+# S4). A fresh tree's own rendered documents cite kit paths it may not hold, so writing them here
+# would red check 15 on the first run. Seeding either population writes its home and arms it:
+#   python <kit>/legacy_ledger.py seed --population id-orphan-waiver
 printf '# legacy-files.txt — recording files kept under historical names (permanent C5 exemption). Empty = strict.
 ' > "$M/project/legacy-files.txt"
 printf '# curation-debt.txt — index files pending slimming (exempt from checks 6/7/8 while listed). Empty = fully strict.
 ' > "$M/project/curation-debt.txt"
-printf '# id-orphan-waiver.txt — ids cited in the present tense but never defined, deliberately (check 14).
-# Shrink-only against ORPHAN_ID_PIN; a waived id that now resolves, or that no present-tense file
-# cites, is a stale row and reds.
-' > "$M/project/id-orphan-waiver.txt"
-printf '# corpus-path-unresolved.txt — rooted repo-path citations in the present-tense corpus that
-# resolve to nothing (check 15). One row per (citing-file, cited-path), TAB-separated:
-#   <citing-file>\t<cited-path>\t<occurrences>\t<absent|moved:DEST>
-# Shrink-only against DEAD_PATH_PIN. Empty = every citation resolves.
-' > "$M/project/corpus-path-unresolved.txt"
 printf '# unarmed-branches.txt — `fail` branches with no positive assertion naming their own failure
 # text (check-arms.py). Fields: gate<TAB>check<TAB>ordinal<TAB>signature.
 # SHRINK-ONLY, and EMPTY is the working state: a row appears only when a new branch lands that no
@@ -891,15 +889,17 @@ echo "     gate, and this kit installs one, so declare it measured:"
 echo "       $_PY $KIT_REL/check-arms.py --emit-floors    (paste its one line into .memory-tree.conf)"
 echo "  8. Bind your records (hygiene check 21). If $M/builds/*/{build,prompts,reviews}/ already"
 echo "     holds records, THE FIRST RUN IS RED: check 21 names every record carrying no Serves line,"
-echo "     and no pin value changes that — RECORD_UNBOUND_PIN bounds the deliberate 'none' escape,"
+echo "     and no population row changes that — $M/project/unbound-records.txt keys the deliberate"
+echo "     'none' escape,"
 echo "     never the absent line. Migrate in this ORDER:"
 echo "       a. See what is unbound:  $_PY $KIT_REL/gen_build_index.py --print-bindings"
 echo "          (read-only, writes nothing, always exits 0; 'A' rows are the work)"
 echo "       b. One mechanical pass: add '**Serves:** none — <why>' to each. No judgement about what"
 echo "          any document was about, so it is not a retrofit — and not a cutoff either: nothing"
 echo "          is exempted by date and every record stays visible."
-echo "       c. THEN measure: set RECORD_UNBOUND_PIN to the GRADED count check 21 prints on every run"
-echo "          ('grades <g> of N <n>'): N minus what RECORD_SERVES_CUTOFF or legacy-files.txt exempt."
-echo "          A pin above it is slack, and check 21 reds it."
+echo "       c. THEN seed it: $_PY $KIT_REL/legacy_ledger.py seed --population unbound-records"
+echo "          writes one row per GRADED unbound record check 21 prints on every run ('grades <g> of"
+echo "          N <n>'): N minus what RECORD_SERVES_CUTOFF or legacy-files.txt exempt. A row no graded"
+echo "          record matches is stale, and check 21 reds it."
 echo "       d. Drain it as you bind records for real: '**Serves:** <kind> <id> [<id>…]', kinds"
 echo "          <kind> from the closed list, and the grammar, in $M/HYGIENE.md, Record bindings."

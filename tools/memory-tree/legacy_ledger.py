@@ -4,9 +4,10 @@ The block below is INLINED byte-identically from the canonical copy its marker l
 dir, which ships nothing; `<prefix>/lib/resolve-python.test.sh`'s parity table reds a copy that drifts.
 `merge-rows.py` reads a ledger's rendered header through `parse_header` here, which is how its ledger
 merge class finds a ledger whose home is declared rather than path-shaped, and the converting kits
-that require this kit read and write their populations through it. Three names the block calls are
-imported outside it, so the block stays byte-identical: `compute_coverage` and `resolve_compare_base`
-from this kit's own `coverage_join.py`, and `resolve_kit_dir`, through which `seed` finds the policy
+that require this kit read and write their populations through it. Four names the block calls are
+imported outside it, so the block stays byte-identical: `compute_coverage`, `resolve_compare_base` and
+`resolve_prefix_token`, through which a seed argv's `{prefix}` resolves (TOOL-dWitnessedBar-17 S9), from
+this kit's own `coverage_join.py`, and `resolve_kit_dir`, through which `seed` finds the policy
 kit, from `backlog.py`. Of the canonical's CLI this copy carries `seed` alone (TOOL-dWitnessedBar-15
 S5), run in the repository its working directory sits in, because an adopter seeds through this copy.
 With no `--sha` it stamps HEAD's sha, or, where HEAD is unborn in a repository with no commit yet, the
@@ -28,7 +29,7 @@ import tomllib
 from dataclasses import dataclass
 
 from backlog import resolve_kit_dir  # noqa: F401  (the block below calls it)
-from coverage_join import compute_coverage, resolve_compare_base  # noqa: F401  (the block below calls both)
+from coverage_join import compute_coverage, resolve_compare_base, resolve_prefix_token  # noqa: F401  (the block below calls all three)
 
 
 # >>> legacy_ledger_py -- canonical copy: legacy_ledger.py in the gov lib dir (byte-identical; gated)
@@ -457,10 +458,24 @@ def check_home_admitted(root, home):
     return "no directory %s" % parent
 
 
+def derive_seed_prefix(root):
+    """The tool root a seed argv's `{prefix}` names (TOOL-dWitnessedBar-17 S9): the directory above the
+    one holding this copy, relative to `root`, or absolute where no relative path exists, as on another
+    drive on Windows."""
+    tools = pathlib.Path(__file__).absolute().parent.parent
+    try:
+        return pathlib.Path(os.path.relpath(tools, str(root))).as_posix()
+    except ValueError:
+        return tools.as_posix()
+
+
 def run_seed_argv(argv, root):
     """-> (stdout, reason) of one seed run at `root` under `SEED_TIMEOUT`: `reason` is "" for a live
-    result, else `exit <n>`, `timed out` or `dead probe`, a line of its stdout opening `DEAD_PROBE_LEAD`."""
+    result, else `exit <n>`, `timed out` or `dead probe`, a line of its stdout opening `DEAD_PROBE_LEAD`.
+    Each argument's `{prefix}` is resolved through `resolve_prefix_token` against `derive_seed_prefix`."""
     env = {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}
+    troot = derive_seed_prefix(root)
+    argv = [resolve_prefix_token(a, troot) for a in argv]
     try:
         p = subprocess.run(list(argv), cwd=str(root), capture_output=True, text=True, encoding="utf-8",
                            errors="replace", stdin=subprocess.DEVNULL, env=env, timeout=SEED_TIMEOUT)

@@ -213,6 +213,20 @@ drain = "key"
 direction = "shrink-only"
 home = "memory/map/baseline.txt"
 
+# THE EMPTY-DECISIONS PIN AS A KEYED POPULATION (TOOL-dWitnessedBar-17 S1): one row per dossier declaring no
+# decisions, so filling one and emptying another never nets to zero. The seed is `map_diff.py`'s, an engine
+# file every adopter holds that renders no generated index (its section 8 F12); the project-owned gate no
+# longer reads it, so `ratchet (both ways)` grades it as its own (section 8 F10).
+[[ledger]]
+population = "dossier-decisions-empty"
+leg = "ratchet (both ways)"
+seed = ["python", "{prefix}/codebase-map/map_diff.py", "--list-empty-decisions"]
+key = "key"
+fields = ["feature"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/dossier-decisions-empty.txt"
+
 # The two map lists this kit's adopter seeds take their `.txt` names at the adopter's next update.
 
 [[upgrade]]
@@ -229,4 +243,14 @@ up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "-
 down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/map/baseline.txt"]
 witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/map/baseline.txt"]
 surfaces = ["file:memory/map/baseline.txt"]
+needs-target = false
+
+# The conf pin this kit's gate read leaves the conf at the adopter's next update, its population seeded
+# first (TOOL-dWitnessedBar-17 S8).
+[[upgrade]]
+id = "codebase-map/dossier-decisions-empty-pin-to-ledger"
+up = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "up", "{target}", "--key", "DOSSIER_DECISIONS_EMPTY_PIN"]
+down = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "down", "{target}", "--key", "DOSSIER_DECISIONS_EMPTY_PIN"]
+witness = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "witness", "{target}", "--key", "DOSSIER_DECISIONS_EMPTY_PIN"]
+surfaces = ["conf-key:.codebase-map.conf#DOSSIER_DECISIONS_EMPTY_PIN", "file:memory/project/conf-scalar-pins.txt", "file:memory/project/dossier-decisions-empty.txt"]
 needs-target = false

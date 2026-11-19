@@ -6157,8 +6157,8 @@ def main() -> int:
         check("check calls that state NOT LANDED by name", "NOT LANDED" in p.stdout, p.stdout)
 
         # --- check RUNS a hole's discharge probe and reds on an undischarged one. The fixture is
-        # --- built so the probe genuinely CANNOT pass: memory-tree's measured pins are absent, which
-        # --- is the state a fresh install leaves. An arm whose fixture cannot trigger the rule
+        # --- built so the probe genuinely CANNOT pass: memory-tree's two waiver homes are absent, which
+        # --- is the state a fresh install leaves (TOOL-dWitnessedBar-17 S4). An arm whose fixture cannot trigger the rule
         # --- passes and proves nothing, so this one is asserted on the message, not the code.
         # The receipt carries a ROW, because a kit the receipt claims with NO rows is the separate
         # `not-landed` state and check reports that and stops — the hole loop is unreachable there.

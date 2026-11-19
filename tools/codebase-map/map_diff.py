@@ -4,6 +4,7 @@
     python <kit>/map_diff.py <base> <head>  [--verbose]
     python <kit>/map_diff.py [<base>..<head>] --stale-dossiers [--json]
     python <kit>/map_diff.py --tree
+    python <kit>/map_diff.py --list-empty-decisions
 
 Attributes every changed file to its claiming feature(s) — keyed attributors first (from
 map_extractors.KEYED_ATTRIBUTORS), then dossier path globs, then foundation globs — and rolls
@@ -16,6 +17,13 @@ prints an `undeclared` line instead, and an entry naming no tracked path a DEAD 
 --tree: attribute every tracked file instead of a range, and print the header and the code and
 record lines only, no per-feature list. Refused with a range, --stale-dossiers or
 --drop-affordance-exempt (a whole tree would clear every grace).
+
+--list-empty-decisions: one `<feature> TAB 1` row per feature dossier whose `decisions` list is empty,
+the `dossier-decisions-empty` population's seed, graded by `ratchet (both ways)` (TOOL-dWitnessedBar-17
+S1, its section 8 F10 and F12). A dossier's list starts empty and is filled as the ids governing it are
+learned, never guessed, since a guessed id resolves and is worse than a visibly empty list. Prints
+nothing over a tree holding no dossier and writes no file. Takes no range, and is refused beside
+--stale-dossiers, --tree or --drop-affordance-exempt.
 
 --drop-affordance-exempt (S4a): after attribution, rewrite <MAP_ROOT>/affordance-exempt.txt,
 dropping every feature the range TOUCHED (shrink-only). Touching a graced feature's files
@@ -96,6 +104,12 @@ def derive_record_roots(root: Path, conf: dict[str, str]) -> tuple[list[str], st
         if not any(p == r or p.startswith(r + "/") for p in tracked):
             return roots, r
     return roots, None
+
+
+def measure_empty_decisions(tree) -> list[str]:
+    """The features whose dossier declares an empty `decisions` list, sorted: the
+    `dossier-decisions-empty` population's measurement (TOOL-dWitnessedBar-17 S1)."""
+    return sorted(d.feature for d in tree.dossiers if not d.decisions)
 
 
 def render_coverage_line(label: str, mapped: int, total: int) -> str:
@@ -259,7 +273,35 @@ def main() -> int:
         help="attribute every tracked file instead of a range; prints the header and the code and "
         "record coverage lines only. Takes no range, --stale-dossiers or --drop-affordance-exempt.",
     )
+    parser.add_argument(
+        "--list-empty-decisions",
+        action="store_true",
+        help="print one `<feature> TAB 1` row per dossier declaring no decisions, the "
+        "`dossier-decisions-empty` seed; writes nothing. Takes no range, --stale-dossiers, --tree or "
+        "--drop-affordance-exempt.",
+    )
     args = parser.parse_args()
+
+    if args.list_empty_decisions:
+        if args.range or args.stale_dossiers or args.tree or args.drop_affordance_exempt:
+            parser.error("--list-empty-decisions takes no range, --stale-dossiers, --tree or "
+                         "--drop-affordance-exempt")
+        try:
+            m.require_adopted_root()
+        except m.MapError as exc:
+            print(f"map-diff refused: {exc}", file=sys.stderr)
+            return 2
+        import map_extractors as ext  # project layer — the dossiers need the inventory ids
+
+        try:
+            tree = m.load_map_tree(ext.inventory_ids(), decision_id_re=getattr(
+                ext, "DECISION_ID_RE", m.DEFAULT_DECISION_ID_RE))
+        except m.MapError as exc:
+            print(f"map-diff: {exc}", file=sys.stderr)
+            return 1
+        for feature in measure_empty_decisions(tree):
+            print(f"{feature}\t1")
+        return 0
 
     if args.tree:
         if args.range or args.stale_dossiers or args.drop_affordance_exempt:
