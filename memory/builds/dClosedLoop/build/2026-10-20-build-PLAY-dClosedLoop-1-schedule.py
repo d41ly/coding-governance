@@ -8,14 +8,19 @@ Usage (from the worktree root; `git fetch` does not fill the claim cache, `--cla
   git fetch; bash tools/unattended/unattended.sh --claims; "$PY" <this file> [--ref <rev>] [--s 0.33] [--b 0.25]
 --ref is the commit whose tree is read, HEAD by default; a node re-running it at a landing passes `origin/main`.
 
-INPUTS, all read at --ref except the claim cache:
-  - v2's `[chain]` (`build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md`), parsed here: each build's stage,
-    parents and clauses. A build's units are its clauses, counted twice, by their `cl-` ids and by the "; " split
-    `critical-path.py` uses; both must give 22 builds and 509 clauses, or the script stops.
+INPUTS, all read at --ref except the claim cache, through the chain build-state derivation
+(`memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-1-build-state.py`, TOOL-dTrackedAtlas-1), the
+one answer this script and the Atlas read:
+  - v2's `[chain]` (`build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md`), parsed by the derivation: each
+    build's stage, parents and clauses. A build's units are its clauses, counted twice, by their `cl-` ids and by the
+    "; " split `critical-path.py` uses; both must give 22 builds and 509 clauses, or the script stops.
   - each chain build's tracked specs under `memory/builds/<slug>/spec/`: its `**Status:**` token and its
     `**Carries:**`, `**Moved:**`, `**Retired:**` and `**Deferred:**` lines. A build's spec phase is DONE when its specs
-    carry or release every clause of its row and none is OPEN or SPECCED; its build phase is DONE when, besides,
-    every spec in its folder is CLOSED or WONTDO, an EXTRA unit's spec included.
+    carry or release every clause of its row and none is OPEN or SPECCED. Its build phase is DONE when its build run
+    has landed, the derivation's build-phase rule: a run record of the build (RUN.md, or a rotated RUN.LANDED.*.md)
+    reads as a build run by README rule 1 at its own `base:`, and a merge on the default branch's first-parent line,
+    which --ref contains, carried it (the derivation's THE LANDED PREDICATE). A DEFERRED unit of a landed build run
+    is carried forward, never unbuilt.
   - the run claims `unattended.sh --claims` last cached under `refs/gov/remote/runs/<slug>` (no fetch is made here),
     `tools/playbook/fleet.toml` to turn a claim's `node:` user into a fleet tag, and `RESUME_STALE_BOUND` from
     `.unattended.conf`. A `held` claim, or a `live` one whose `beat-utc` is within the bound, pins that build's next
@@ -53,24 +58,30 @@ the runs in flight then, and node b's pace swept from 0.25 to 0.5 beside a and d
 not pin is printed with the reason.
 """
 import argparse
-import datetime
+import importlib.util
 import re
 import subprocess
 import sys
+from pathlib import Path
 
-V2 = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
+spec = importlib.util.spec_from_file_location(
+    "build_state", Path(__file__).resolve().parents[2] / "dTrackedAtlas" / "build"
+    / "2026-11-19-build-TOOL-dTrackedAtlas-1-build-state.py")
+STATE = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(STATE)
+
 FLEET = "tools/playbook/fleet.toml"
-ROOT = "dTrueNorth"
-WHOLE = {"dTrueNorth"}                         # one run, spec and build together (`[answers-2]` item 5)
+ROOT = STATE.ROOT
+WHOLE = STATE.WHOLE                            # one run, spec and build together (`[answers-2]` item 5)
 EXTRA = {"dTrueNorth": 1}                      # its unit beyond v2: the carry-forward condition for any unit a spec
 #                                                run adds, from a review or a discovery (`[answers-2]` item 5, widened by
 #                                                `[answers-3]` item 1, ER:320)
 SPEC_ONLY = {"b"}                              # node b takes spec runs only (`[answers-2]` item 4)
 NODES = ("a", "d", "b")                       # the owner's three nodes, full-pace ones first
-CID = re.compile(r"`(cl-d[A-Z]\w+-\d{4})`")
-ROW = re.compile(r"^\| (d[A-Z]\w+) \| ([^|]+) \| ([^|]+) \| (.+) \| [^|]+ \|$")
-STATUS = re.compile(r"^\*\*Status:\*\* ([A-Z]+)", re.M)
-CARRY = re.compile(r"^\*\*(?:Carries|Moved|Retired|Deferred):\*\* (cl-d[A-Z]\w+-\d{4})", re.M)
+CID = STATE.CID
+ROW = STATE.ROW
+STATUS = STATE.STATUS
+CARRY = STATE.CARRY
 # A landing changes what the nodes load when its clauses change a surface the runs themselves stand on. The schedule
 # return's patterns (`surfaces.py`), a hint for the plan's [sync-points], never a verdict.
 SURFACES = {
@@ -93,76 +104,51 @@ def git(*args, check=True):
 
 
 def chain(ref):
-    v2 = git("show", f"{ref}:{V2}")
-    rows = v2.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
-    names = re.findall(r"^\| (d[A-Z]\w+) \|", rows, flags=re.M)
-    stage, parents, ids, split = {}, {}, {}, {}
-    for ln in rows.split("\n"):
-        m = ROW.match(ln)
-        if m:
-            b = m.group(1)
-            stage[b] = m.group(2).strip()
-            parents[b] = [p.strip() for p in m.group(3).split(",") if p.strip() in names]
-            ids[b] = CID.findall(m.group(4))
-            split[b] = len([u for u in m.group(4).split("; ") if u.strip()])
-    n_ids = sum(len(v) for v in ids.values())
-    if len(ids) != 22 or n_ids != 509 or sum(split.values()) != 509 or any(len(ids[b]) != split[b] for b in ids):
-        print(f"schedule: v2's [chain] at {ref} holds {len(ids)} builds and {n_ids} clause ids "
-              f"({sum(split.values())} by the '; ' split), not 22 and 509; the schedule is derived from nothing")
+    try:
+        c = STATE.read_chain(ref)
+    except STATE.ChainError as e:
+        print(f"schedule: {e}")
         sys.exit(1)
-    return names, stage, parents, ids, rows
+    except STATE.StateError as e:
+        sys.exit(f"schedule: {e}")
+    return c["names"], c["stage"], c["parents"], c["clauses"], c["rows"]
 
 
 def tree_state(ref, ids):
-    """build -> (spec done, build done), from the build's tracked specs at ref."""
-    state = {}
-    for b, cl in ids.items():
-        paths = [p for p in git("ls-tree", "-r", "--name-only", ref, f"memory/builds/{b}/spec/").split("\n")
-                 if p.endswith(".md")]
-        statuses, carried = [], set()
-        for p in paths:
-            text = git("show", f"{ref}:{p}")
-            s = STATUS.search(text)
-            statuses.append(s.group(1) if s else "NONE")
-            carried |= set(CARRY.findall(text))
-        spec_done = bool(paths) and set(cl) <= carried and not any(s in ("OPEN", "SPECCED", "NONE") for s in statuses)
-        state[b] = (spec_done, spec_done and all(s in ("CLOSED", "WONTDO") for s in statuses))
-    return state
+    """build -> (spec done, build done) for each build of `ids`, from the derivation's document at ref."""
+    try:
+        doc = STATE.derive(ref, claims=False, detail=False)
+    except (STATE.ChainError, STATE.StateError) as e:
+        sys.exit(f"schedule: {e}")
+    entry = {e["slug"]: e for e in doc["builds"]}
+    return {b: (entry[b]["spec_run"]["done"], entry[b]["build_run"]["state"] != "not-landed") for b in ids}
 
 
 def claims(ref, names):
     """build -> (node tag, status) for a held claim or a live one within the stale bound; the others, reported."""
     fleet = git("show", f"{ref}:{FLEET}")
     tag = dict((u, t) for t, u in re.findall(r'^tag = "(\w)"\s*\nuser = "([^"]+)"', fleet, flags=re.M))
-    bound = re.search(r'^RESUME_STALE_BOUND="(\d+)"', git("show", f"{ref}:.unattended.conf"), flags=re.M)
-    if not bound:
-        sys.exit("schedule: .unattended.conf declares no RESUME_STALE_BOUND, so a live claim's age cannot be read")
-    now = datetime.datetime.now(datetime.timezone.utc)
+    try:
+        cache = STATE.read_claims(ref, names)
+    except STATE.StateError as e:
+        sys.exit(f"schedule: {e}")
     held, other, stale = {}, [], set()
-    for ln in git("for-each-ref", "--format=%(refname)", "refs/gov/remote/runs/").split():
-        slug = ln.rsplit("/", 1)[1]
-        if slug not in names:
+    for slug, c in cache.items():
+        if c["status"] not in ("live", "held"):
+            other.append(f"{slug} {c['status'] or '?'}")
             continue
-        msg = dict(re.findall(r"^(\w[\w-]*): (.*)$", git("log", "-1", "--format=%B", ln), flags=re.M))
-        if msg.get("status") not in ("live", "held"):
-            other.append(f"{slug} {msg.get('status', '?')}")
-            continue
-        if msg.get("node") not in tag:
-            print(f"schedule: the claim on {slug} names node user '{msg.get('node')}', which {FLEET} does not")
+        if c["node"] not in tag:
+            print(f"schedule: the claim on {slug} names node user '{c['node']}', which {FLEET} does not")
             sys.exit(1)
-        n = tag[msg["node"]]
-        if msg["status"] == "live":
-            try:
-                beat = datetime.datetime.strptime(msg.get("beat-utc", ""), "%Y-%m-%dT%H:%M:%SZ").replace(
-                    tzinfo=datetime.timezone.utc)
-            except ValueError:
-                beat = None            # an unreadable beat refuses a second driver (STOPS 7), so it stays pinned
+        n = tag[c["node"]]
+        if c["status"] == "live":
+            if c["stale"] is None:     # an unreadable beat refuses a second driver (STOPS 7), so it stays pinned
                 other.append(f"{slug} beat unreadable on {n}: kept pinned")
-            if beat is not None and (now - beat).total_seconds() > int(bound.group(1)):
+            elif c["stale"]:
                 other.append(f"{slug} stale on {n}: take over per [coordination]")
                 stale.add(slug)
                 continue
-        held[slug] = (n, msg["status"])
+        held[slug] = (n, c["status"])
     return held, other, stale
 
 
@@ -172,17 +158,12 @@ def graph(names, parents, ids, state, s):
     T = {}
     for b in names:
         U = len(ids[b]) + EXTRA.get(b, 0)
-        if b == ROOT:
-            pre = []
-        else:
-            grand = {g for p in parents[b] for g in parents[p]}
-            pre = [("build", ROOT)] + [("build" if p in WHOLE else "spec", p) for p in parents[b]] \
-                + [("build", g) for g in grand]
+        pre = STATE.derive_predecessors(b, parents)
         if b in WHOLE:                      # one run: the build key carries the whole of it
-            T[("build", b)] = (U, pre)
+            T[("build", b)] = (U, pre["build"])
             continue
-        T[("spec", b)] = (s * U, pre)
-        T[("build", b)] = (U - s * U, [("spec", b)] + [("build", p) for p in parents[b]])
+        T[("spec", b)] = (s * U, pre["spec"])
+        T[("build", b)] = (U - s * U, pre["build"])
     return {t: (w, sorted({p for p in pre if p not in done})) for t, (w, pre) in T.items() if t not in done}
 
 

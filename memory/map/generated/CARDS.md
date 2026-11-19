@@ -62,6 +62,15 @@ A build README is mostly generated, and its authored slots are positional and na
 - gotcha-classes 1: `check-format-grades-two-populations.md`
 - globs 1: `tools/memory-tree/gen_build_index.py`
 
+## closed-loop-atlas
+
+The chain build state the schedule and the Closed Loop Atlas share, the page's stamp and stale check, and its regeneration on node d after main moves
+
+- status `shipped` · streams `tooling` · dossier `memory/map/features/closed-loop-atlas.md`
+- decisions 4: `TOOL-dTrackedAtlas-1`, `TOOL-dTrackedAtlas-2`, `TOOL-dTrackedAtlas-3`, `TOOL-dTrackedAtlas-4`
+- harness-hooks 1: `PostToolUse memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.js`
+- globs 5: `memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-1-build-state.py`, `memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.js`, `memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.json`, `memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.py`, `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py`
+
 ## codebase-map
 
 Codebase map — CI-verified inventory claims + the reuse recall index
