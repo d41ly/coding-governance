@@ -880,12 +880,12 @@ def check_page(page, ref="HEAD"):
     """Print whether the tree at `ref` has moved an input `page` was stamped with, and return the exit code: 0
     current, 1 stale, dirty, unstamped or absent, 2 when it cannot answer. Reads the page and git, writes nothing
     and derives nothing. The order is absent, unstamped, the ref and the digest at it, dirty, stale, current."""
-    def cannot(reason):
+    def print_refusal(reason):
         print(f"atlas: cannot check: {reason}", file=sys.stderr)
         return 2
 
     if ref.startswith("-"):
-        return cannot(f"--ref takes a revision, not {ref}")
+        return print_refusal(f"--ref takes a revision, not {ref}")
     if not Path(page).is_file():
         print(f"atlas: absent — no page at {page}")
         return 1
@@ -897,7 +897,7 @@ def check_page(page, ref="HEAD"):
         try:
             at = read_git("rev-parse", "--verify", "-q", f"{ref}^{{commit}}").decode().strip()
         except StampError as e:
-            return cannot(f"{ref} resolves to no commit: {e}")
+            return print_refusal(f"{ref} resolves to no commit: {e}")
         digest = derive_input_digest(at, stamp["inputs"])
         c12, r12 = stamp["commit"][:12], at[:12]
         if stamp["dirty"]:
@@ -922,7 +922,7 @@ def check_page(page, ref="HEAD"):
             print(f"  and {len(moved) - 20} more")
         return 1
     except StampError as e:
-        return cannot(str(e))
+        return print_refusal(str(e))
 
 
 def main(argv):

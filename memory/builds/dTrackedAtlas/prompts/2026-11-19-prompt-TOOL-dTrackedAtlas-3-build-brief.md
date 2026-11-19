@@ -12,7 +12,7 @@ The spec is rev-3: its new function names were renamed to declared verbs after t
   the ledger carries a pin on its line (a sha, a `path:line`, PINNED or DERIVED) or sits in a code span; every
   new function name leads with a verb `.lexicon.conf` declares (`python tools/lexicon/lexicon.py --suggest <name>
   --as py.function`); every symbol citation is `<repository path>#<symbol>`, never a bare basename.
-- Unit 4 calls the page check through the CLI this spec states in its section 4; build it exactly as stated, its exit codes included.
+- Unit 4 reaches the page check through the CLI this spec states in its section 4; build it exactly as stated, its exit codes included.
 - Each AC's red case is observed on the real shape it names, never a synthetic stand-in, and recorded in the
   ledger beside its green. The page goes to a scratch path, never into the repository.
 - Run no gate, suite or bar. Fixture clones go under `%TEMP%/<short>` and are removed after.
