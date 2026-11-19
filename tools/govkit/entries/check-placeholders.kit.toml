@@ -40,6 +40,12 @@ purpose = "holds the playbook's version markers in lockstep"
 argv = ["bash", "{prefix}/check-placeholders.sh"]
 guard = []
 stage = ["step.test"]
+enforces = ["practice.one-fact"]
+
+[gate_leg.gov]
+guard = []
+chunk = "product"
+ceiling = 300
 
 [[gate_leg]]
 tag = "leg.check-placeholders.placeholder-catalogue-self-test"
@@ -50,6 +56,11 @@ purpose = "arms the placeholder gate, each arm asserting its message"
 argv = ["bash", "{prefix}/check-placeholders.test.sh"]
 guard = ["{prefix}/check-placeholders.sh", "{prefix}/check-placeholders.test.sh"]
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+chunk = "selftests"
+ceiling = 300
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv

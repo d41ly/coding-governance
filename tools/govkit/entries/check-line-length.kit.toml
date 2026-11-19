@@ -62,6 +62,10 @@ purpose = "holds agent-instruction prose to a declared line length"
 argv = ["bash", "{prefix}/check-line-length.sh"]
 stage = ["step.test"]
 
+[gate_leg.gov]
+chunk = "product"
+ceiling = 300
+
 # The `line-length gate selftest` leg is NOT declared here. It is a leg on GOV's bar and carries
 # an [[exempt_leg]] row in <prefix>/govkit/registry.toml, for the reason recorded beside
 # `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds

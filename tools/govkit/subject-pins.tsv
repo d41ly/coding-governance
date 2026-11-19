@@ -48,6 +48,7 @@ every held leg is budgeted, every budget row resolves	repo	declarations
 extract-arms self-test	kit	selftests
 foreign-prefix parity (every self-test at three prefixes)	repo	selftests
 format-guard self-test	kit	selftests
+gate-leg conformance	repo	declarations
 gotchas selftest	kit	selftests
 govkit acceptance matrix	repo	declarations
 govkit refusal join	repo	declarations
@@ -79,6 +80,7 @@ kit-placeholders self-test	kit	selftests
 kit/dogfood doc parity	repo	declarations
 layer dependencies (the core never depends on an expansion)	repo	declarations
 leg ceilings clear their evidenced maximum	repo	declarations
+leg-factory selftest	kit	selftests
 lexicon naming predicates	repo	declarations
 lexicon selftest	kit	selftests
 lexicon wiring	repo	wiring

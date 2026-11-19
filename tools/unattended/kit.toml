@@ -287,6 +287,11 @@ doc_reads = ["{memory_root}/builds/", "{memory_root}/guides/", "{memory_root}/ar
 red_after_land = true
 stage = ["step.test"]
 
+[gate_leg.gov]
+guard = []
+chunk = "declarations"
+ceiling = 16040
+
 # the playbook validity leg. No guard: it grades an adopter's playbooks and
 # the kit's own fixture, so a guard scoped to this kit dir would skip it on exactly the commits that
 # change a playbook.
@@ -301,6 +306,11 @@ guard = []
 red_after_land = true
 stage = ["step.test"]
 
+[gate_leg.gov]
+guard = []
+chunk = "declarations"
+ceiling = 4940
+
 [[gate_leg]]
 tag = "leg.unattended.pass-order-history"
 tests = ["feature.unattended"]
@@ -313,6 +323,11 @@ guard = []
 doc_reads = ["{memory_root}/builds/", "{memory_root}/project/"]
 red_after_land = true
 stage = ["step.test"]
+enforces = ["practice.spec"]
+
+[gate_leg.gov]
+chunk = "declarations"
+ceiling = 5400
 
 # the brief-recorded leg. No guard, for `pass-order history`'s reason: its subject is the
 # REPOSITORY's run-state records, so it goes stale with nobody editing this kit, and a guard scoped
@@ -334,6 +349,10 @@ doc_reads = ["{memory_root}/builds/", "{memory_root}/project/"]
 red_after_land = true
 stage = ["step.test"]
 
+[gate_leg.gov]
+chunk = "declarations"
+ceiling = 900
+
 [[gate_leg]]
 tag = "leg.unattended.unattended-skill-wiring"
 tests = ["feature.unattended"]
@@ -344,6 +363,12 @@ argv = ["bash", "{kit}/adopt-unattended.sh", "--check"]
 guard = []
 red_after_land = true
 stage = ["step.build", "step.test"]
+enforces = ["practice.derive"]
+
+[gate_leg.gov]
+guard = []
+chunk = "wiring"
+ceiling = 300
 
 # the structural group linter's self-test (TOOL-aBatchedArm-2). A KIT leg, held off the automatic
 # bar like every `subject = kit` row. This kit declares NO self-test as a leg: the arms-groups

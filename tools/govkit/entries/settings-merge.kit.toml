@@ -71,3 +71,8 @@ purpose = "self-tests wiring a hook into a target's settings.json"
 argv = ["python3", "{prefix}/settings-merge.py", "--selftest"]
 guard = ["{prefix}/"]
 stage = ["step.test"]
+
+[gate_leg.gov]
+guard = ["{prefix}/", "{prefix}/lib/"]
+chunk = "selftests"
+ceiling = 300

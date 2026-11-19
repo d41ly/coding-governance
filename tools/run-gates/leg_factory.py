@@ -1,0 +1,836 @@
+#!/usr/bin/env python3
+"""leg_factory.py — the leg manifest, rendered from each leg's ONE declaration (TOOL-dWitnessedBar-11).
+
+    python <this kit>/leg_factory.py --write      # render <tool root>/gate-legs.json from the declarations
+    python <this kit>/leg_factory.py --check      # exit 1 naming each leg the file holds differently
+    python <this kit>/leg_factory.py --conform    # --check, then every field arm over every declaration
+    python <this kit>/leg_factory.py --list       # one line per declaration and the file declaring it
+    python <this kit>/leg_factory.py new <name> --kit <id> --argv <json> --subject <kit|repo>
+                                      --purpose <text> --enforces <tag> [--enforces <tag>]
+                                      [--tests <tag>] [--guard <json>] [--stage <step>]
+                                      [--chunk <name>] [--ceiling <seconds>]
+    python <this kit>/leg_factory.py new <name> --exempt <why> --argv <json> ...   # a registry row
+    python <this kit>/leg_factory.py --selftest   # each arm's failing case, in a scratch tree
+
+ONE DECLARATION PER LEG. A leg an adopter receives is a `[[gate_leg]]` row of its kit's descriptor;
+any other leg is an `[[exempt_leg]]` row of the deployer's registry, carrying its whole row beside its
+`why`. A descriptor row is what an adopter receives, through the deployer's emitter and its floors;
+where gov's own run differs, gov's value sits under the row's `[gate_leg.gov]` sub-table, key by key,
+which the emitter never reads. The manifest is generated: hand-editing it ends, and a red names the
+declaration to edit.
+
+THE RENDER, per declaration, in order of its declaring file's path and then its row order, the
+registry's rows last:
+  1. the row's keys that are members of `LEG_KEYS`, the canary's one key set;
+  2. each key of `[gate_leg.gov]` overlaid; an empty list there removes the key from gov's row;
+  3. `{kit}` resolved to `{prefix}/<home>` (`{prefix}` where the home is the tool root) and
+     `{memory_root}` to this tree's memory root; `{prefix}` stays, and any other token is a refusal;
+  4. JSON, two-space indent, `name` first and the other keys in KEY_ORDER, UTF-8, one trailing LF;
+  5. `pass_leg`, which `pass_legs.py` derives: its rule and its render, never re-stated here.
+The file written is the manifest beside the tool root, never one `$GATE_LEGS` names.
+
+EXIT 0 clean · 1 a finding (`--check`, `--conform`, a failed selftest) · 2 a refusal: a declaration
+that does not parse, a token left unresolved, an empty population, or a sibling kit not found.
+
+WHAT IT DOES NOT CHECK. Whether a leg's `enforces` names the rule the leg actually enforces: the
+tags are read against their cites by a person. Whether gov's `[gate_leg.gov]` value is RIGHT: the
+sub-table states the difference where a reviewer reads it, and nothing compares it with a run.
+"""
+import argparse
+import json
+import os
+import pathlib
+import re
+import shutil
+import sys
+import tempfile
+import tomllib
+
+HERE = pathlib.Path(os.path.abspath(__file__)).parent
+SAY = "leg-factory"
+# `purpose := at most 60 characters` (TOOL-dWitnessedBar-19 S2, §8 F3), CHARACTERS and never bytes.
+# Moved whole from govkit (TOOL-dWitnessedBar-11 §8 F8): read by the `purpose` arm and by `new`.
+PURPOSE_MAX_CHARS = 60
+# The manifest's own key order, the one its rows were written in, `name` first.
+KEY_ORDER = ("name", "pass_leg", "tag", "tests", "purpose", "argv", "scope_of", "reads", "signature",
+             "guard", "impure", "chunk", "subject", "ceiling", "doc_reads", "pack", "enforces", "stage")
+SUBJECTS = ("kit", "repo")
+# The read classes the runner's reader admits (run-gates.sh, its `reads` reader).
+READ_CLASSES = ("history", "base", "clock", "remote")
+TOKEN_RX = re.compile(r"\{([a-z_]+)\}")
+TAG_MAX_BYTES = 64
+
+
+class Refusal(Exception):
+    """Exit 2, nothing written."""
+
+
+# The sibling-kit resolver, INLINED byte-identically from the canonical copy named on its marker
+# line and gated by the resolve-python self-test.
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
+def load_govkit():
+    """The deployer module, whose registry and descriptor readers and token resolver the render uses."""
+    try:
+        gk = resolve_kit_dir("govkit", "govkit.py", HERE)
+    except LookupError as e:
+        raise Refusal(str(e)) from None
+    if str(gk) not in sys.path:
+        sys.path.insert(0, str(gk))
+    import govkit  # noqa: PLC0415
+    return govkit
+
+
+def load_pass_legs():
+    """This kit's own `pass_legs` module: the pass-leg rule and its render (§8 F7)."""
+    if str(HERE) not in sys.path:
+        sys.path.insert(0, str(HERE))
+    import pass_legs  # noqa: PLC0415
+    return pass_legs
+
+
+def derive_repo_root():
+    """The tree this kit sits in, by walking for `.git` rather than asking git (a hook's GIT_DIR)."""
+    root = next((d for d in (HERE, *HERE.parents) if (d / ".git").exists()), None)
+    if root is None:
+        raise Refusal(f"no repository holds {HERE.as_posix()}, so there is no tree to render")
+    return root
+
+
+def read_layout(root, G):
+    """(tool root relative to `root`, memory root) of the tree at `root`."""
+    tool_rel = G.derive_tool_root(root)
+    mem = "memory"
+    conf = pathlib.Path(root, ".memory-tree.conf")
+    if conf.is_file():
+        for raw in conf.read_text(encoding="utf-8").splitlines():
+            m = re.match(r'^\s*(?:export\s+)?MEMORY_ROOT=["\']?([^"\'\s]+)', raw)
+            if m:
+                mem = m.group(1)
+    return tool_rel, mem
+
+
+def read_leg_keys(root, tool_rel):
+    """`LEG_KEYS`, the one leg-row key set, from the canary beside this kit (TOOL-dWitnessedBar-12 S4)."""
+    canary = pathlib.Path(root, tool_rel, HERE.name, "run-gates.test.sh")
+    if not canary.is_file():
+        raise Refusal(f"{canary.as_posix()} is absent, so no key set bounds a declaration")
+    for ln in canary.read_text(encoding="utf-8").splitlines():
+        m = re.match(r'^LEG_KEYS="([^"]*)"', ln)
+        if m:
+            return set(m.group(1).split())
+    raise Refusal(f"{canary.as_posix()} holds no LEG_KEYS line, so no key set bounds a declaration")
+
+
+def derive_kit_spelling(desc, tool_rel):
+    """What `{kit}` resolves to in gov's row: `{prefix}/<home>`, `{prefix}` where the home is the tool
+    root, and a root-relative home as it is spelled."""
+    home = str(desc.get("home") or ".").strip("/")
+    if desc.get("home_root_relative"):
+        return home
+    if home in ("", ".", tool_rel):
+        return "{prefix}"
+    if tool_rel and home.startswith(tool_rel + "/"):
+        return "{prefix}/" + home[len(tool_rel) + 1:]
+    return "{prefix}/" + home
+
+
+def read_declarations(root, G):
+    """Every declaration, in render order: [{name, file, kind, eid, base, gov, why, kit}]."""
+    reg = G.load_registry(root)
+    rep = G.Report()
+    descs = G.read_descriptors(root, reg, rep)
+    if rep.problems:
+        raise Refusal("; ".join(rep.problems))
+    tool_rel = G.derive_tool_root(root)
+    out, seen = [], set()
+    for eid, (d, dpath) in sorted(descs.items(), key=lambda kv: (kv[1][1], kv[0])):
+        if dpath in seen:
+            continue
+        seen.add(dpath)
+        for leg in d.get("gate_leg", []) or []:
+            gov = leg.get("gov") if isinstance(leg.get("gov"), dict) else {}
+            out.append({"name": leg.get("name"), "file": dpath, "kind": "claimed", "eid": eid,
+                        "base": {k: v for k, v in leg.items() if k != "gov"}, "gov": gov, "why": None,
+                        "kit": derive_kit_spelling(d, tool_rel)})
+    reg_rel = pathlib.Path(G.derive_registry_path(root)).relative_to(root).as_posix()
+    for x in reg.get("exempt_leg", []) or []:
+        out.append({"name": x.get("name"), "file": reg_rel, "kind": "exempt", "eid": None,
+                    "base": {k: v for k, v in x.items() if k != "why"}, "gov": {},
+                    "why": x.get("why"), "kit": "{prefix}"})
+    if not out:
+        raise Refusal("no declaration found: an empty population is refused, never rendered as []")
+    return out
+
+
+def resolve_row_tokens(value, ctx, left):
+    """`value` with `{kit}` and `{memory_root}` resolved; every other token but `{prefix}` into `left`."""
+    if isinstance(value, str):
+        for k, v in ctx.items():
+            value = value.replace("{" + k + "}", v)
+        left.extend(t for t in TOKEN_RX.findall(value) if t != "prefix")
+        return value
+    if isinstance(value, list):
+        return [resolve_row_tokens(x, ctx, left) for x in value]
+    if isinstance(value, dict):
+        return {k: resolve_row_tokens(x, ctx, left) for k, x in value.items()}
+    return value
+
+
+def render_rows(root, G, decls=None):
+    """(gov's manifest rows without `pass_leg`, [(arm, leg, message)]) from the declarations."""
+    decls = read_declarations(root, G) if decls is None else decls
+    tool_rel, mem = read_layout(root, G)
+    keys = read_leg_keys(root, tool_rel)
+    rows, found = [], []
+    for dc in decls:
+        nm = dc["name"]
+        if "pass_leg" in dc["base"] or "pass_leg" in dc["gov"]:
+            found.append(("derived", nm, f"{dc['file']} declares `pass_leg` on leg {nm!r}: the field is "
+                                         f"derived by pass_legs.py at the render, never declared"))
+        row = {k: v for k, v in dc["base"].items() if k in keys and k != "pass_leg"}
+        for k, v in dc["gov"].items():
+            if k not in keys or k == "pass_leg":
+                if k != "pass_leg":
+                    found.append(("token", nm, f"{dc['file']} leg {nm!r}: its [gate_leg.gov] key {k!r} is "
+                                               f"no member of LEG_KEYS, so it reaches no manifest row"))
+                continue
+            if v == []:
+                row.pop(k, None)
+            else:
+                row[k] = v
+        left = []
+        row = resolve_row_tokens(row, {"kit": dc["kit"], "memory_root": mem}, left)
+        for t in sorted(set(left)):
+            found.append(("token", nm, f"{dc['file']} leg {nm!r}: gov's row still carries {{{t}}} after "
+                                       f"rendering — spell gov's own value under [gate_leg.gov]"))
+        rank = {k: i for i, k in enumerate(KEY_ORDER)}
+        rows.append({k: row[k] for k in sorted(row, key=lambda k: (rank.get(k, len(rank)), k))})
+    return rows, found
+
+
+def render_manifest(rows):
+    """The manifest's text: the rows as JSON, then `pass_leg` from pass_legs.py's own rule and render."""
+    pl = load_pass_legs()
+    text = json.dumps(rows, indent=2, ensure_ascii=False) + "\n"
+    evidence = pl.read_pass_evidence()
+    ranked = pl.derive_pass_legs(rows, evidence[1] if evidence else {}, pl.read_ceilings())
+    try:
+        return pl.render_pass_field(text, [r["name"] for r in ranked if r["verdict"] == "selected"])
+    except pl.Refusal as e:
+        raise Refusal(str(e)) from None
+
+
+def read_manifest(path):
+    """(text with LF line ends, parsed rows), or (None, None) where the file is absent."""
+    p = pathlib.Path(path)
+    if not p.is_file():
+        return None, None
+    text = p.read_bytes().decode("utf-8").replace("\r\n", "\n")
+    try:
+        return text, json.loads(text)
+    except ValueError:
+        return text, None
+
+
+def derive_drift(cur_text, cur_rows, new_text):
+    """One line per leg the file holds differently from the render: added, dropped or changed, and how."""
+    if cur_text == new_text:
+        return []
+    if cur_rows is None:
+        return ["the manifest is absent or does not parse as JSON"]
+    new_rows = json.loads(new_text)
+    have = {r.get("name"): r for r in cur_rows if isinstance(r, dict)}
+    want = {r["name"]: r for r in new_rows}
+    out = [f"leg {n!r} added: a declaration renders it and the manifest lacks it" for n in want if n not in have]
+    out += [f"leg {n!r} dropped: the manifest holds it and no declaration renders it" for n in have
+            if n not in want]
+    for n in want:
+        if n in have and have[n] != want[n]:
+            ks = sorted(k for k in set(have[n]) | set(want[n]) if have[n].get(k) != want[n].get(k))
+            out.append(f"leg {n!r} changed: {', '.join(ks)} differ from the render")
+    if not out:
+        out.append("the rows agree and the bytes do not: the order or the formatting was edited by hand")
+    return out
+
+
+def read_enforce_population(root, tool_rel):
+    """(every tag a leg may enforce, the legs the pending list excuses) from the playbook kit, or None."""
+    try:
+        pk = resolve_kit_dir("playbook", "kinds.toml", pathlib.Path(root, tool_rel or ".", HERE.name))
+    except LookupError:
+        return None
+    if pathlib.Path(root).resolve() not in pk.resolve().parents:
+        return None
+    tags = set()
+    for name, table in (("principles.toml", "principle"), ("practices.toml", "practice")):
+        p = pk / name
+        if not p.is_file():
+            continue
+        try:
+            data = tomllib.loads(p.read_text(encoding="utf-8"))
+        except tomllib.TOMLDecodeError as e:
+            raise Refusal(f"{p.as_posix()} does not parse: {e}") from None
+        for row in data.get(table) or []:
+            t = row.get("tag") if isinstance(row, dict) else None
+            if isinstance(t, str):
+                tags.add(t)
+                tags.update(f"{t}.{r}" for r in row.get("rules") or [] if isinstance(r, str))
+    pending = set()
+    pp = pk / "core-pending.txt"
+    if pp.is_file():
+        for ln in pp.read_text(encoding="utf-8").splitlines():
+            cells = ln.split("\t")
+            if len(cells) == 3 and cells[0] == "leg":
+                pending.add(cells[1])
+    return tags, pending
+
+
+def check_declarations(root, G, decls, rows):
+    """[(arm, leg, message)] for every field arm of §4 "The gate" but `fresh` and `token`."""
+    found = []
+    by_name = {}
+    for dc in decls:
+        nm = dc["name"]
+        if not isinstance(nm, str) or not nm:
+            found.append(("name", str(nm), f"{dc['file']} declares a leg with no name"))
+            continue
+        if nm in by_name:
+            found.append(("one declaration", nm, f"leg {nm!r} is declared in {by_name[nm]} and again in "
+                                                 f"{dc['file']}: one leg, one declaration"))
+        by_name.setdefault(nm, dc["file"])
+        if dc["kind"] == "exempt" and not str(dc["why"] or "").strip():
+            found.append(("exempt reason", nm, f"[[exempt_leg]] {nm!r} carries an empty why: an exemption "
+                                               f"without a reason is an omission wearing a label"))
+        if re.search(r"\([^)]*\d[^)]*\)", nm):
+            found.append(("name", nm, f"leg {nm!r} carries a digit-bearing parenthetical: a count in a "
+                                      f"leg name goes stale where nobody is reading"))
+        for side, src in (("its row", dc["base"]), ("[gate_leg.gov]", dc["gov"])):
+            if side == "its row" or "subject" in src:
+                sub = src.get("subject")
+                if sub not in SUBJECTS:
+                    found.append(("subject", nm, f"leg {nm!r} declares subject {sub!r} in {side} of "
+                                                 f"{dc['file']}: absent or outside kit|repo"))
+            if "ceiling" in src:
+                ce = src["ceiling"]
+                if isinstance(ce, bool) or not isinstance(ce, int) or ce <= 0:
+                    found.append(("ceiling", nm, f"leg {nm!r} declares ceiling {ce!r} in {side}: a "
+                                                 f"ceiling is a positive integer, a bool included"))
+            if "reads" in src:
+                rd = src["reads"]
+                bad = sorted(set(rd) - set(READ_CLASSES)) if isinstance(rd, dict) else [repr(rd)]
+                if bad:
+                    found.append(("reads", nm, f"leg {nm!r} declares the read class(es) {', '.join(bad)} "
+                                               f"in {side}, outside {'|'.join(READ_CLASSES)}"))
+    purposes = {}
+    for row in rows:
+        nm = row["name"]
+        if "purpose" not in row:
+            continue
+        pu = row["purpose"]
+        if not isinstance(pu, str):
+            found.append(("purpose", nm, f"leg {nm!r} carries purpose {pu!r}, which is not a string"))
+            continue
+        if not pu or len(pu) > PURPOSE_MAX_CHARS or "\n" in pu or "\r" in pu or pu != pu.strip():
+            found.append(("purpose", nm, f"leg {nm!r} carries purpose {pu!r} ({len(pu)} characters): one "
+                                         f"line of 1 to {PURPOSE_MAX_CHARS} characters with no edge space"))
+        purposes.setdefault(pu, []).append(nm)
+    for pu, nms in sorted(purposes.items()):
+        if len(nms) > 1:
+            found.append(("purpose", nms[0], f"legs {', '.join(repr(x) for x in nms)} share the purpose "
+                                             f"{pu!r}: two legs, one purpose, says what a feature is for"))
+    pop = read_enforce_population(root, G.derive_tool_root(root))
+    if pop is not None:
+        tags, pending = pop
+        for row in rows:
+            nm, enf = row["name"], row.get("enforces")
+            if not enf and nm not in pending:
+                found.append(("enforces", nm, f"leg {nm!r} enforces nothing and no `leg` row of "
+                                              f"core-pending.txt excuses it"))
+            for t in enf or []:
+                if t not in tags:
+                    found.append(("enforces", nm, f"leg {nm!r} enforces {t!r}, which no principle row, "
+                                                  f"practice row or practice rule holds"))
+    return found
+
+
+def render_toml_value(v):
+    """`v` spelled as a TOML value: strings JSON-escaped, which TOML's basic strings read alike."""
+    if isinstance(v, bool):
+        return "true" if v else "false"
+    if isinstance(v, (int, float)):
+        return str(v)
+    if isinstance(v, str):
+        return json.dumps(v, ensure_ascii=False)
+    if isinstance(v, list):
+        one = "[" + ", ".join(render_toml_value(x) for x in v) + "]"
+        if len(one) <= 100:
+            return one
+        return "[\n" + "".join(f"  {render_toml_value(x)},\n" for x in v) + "]"
+    if isinstance(v, dict):
+        return "{ " + ", ".join(f"{k if re.fullmatch(r'[A-Za-z0-9_-]+', k) else json.dumps(k)} = "
+                                f"{render_toml_value(x)}" for k, x in v.items()) + " }"
+    raise Refusal(f"{v!r} has no TOML spelling here")
+
+
+def derive_leg_tag(owner, name, root, tool_rel):
+    """`leg.<owner>.<name>` by TOOL-dWitnessedBar-12's rule: `-kit` after an owner that is a namespace
+    word, the name folded to lower-case hyphenated segments, cut at its last hyphen within 64 bytes."""
+    ns = pathlib.Path(root, tool_rel or ".", "playbook", "namespaces.toml")
+    words = set()
+    if ns.is_file():
+        words = {r.get("ns") for r in tomllib.loads(ns.read_text(encoding="utf-8")).get("namespace") or []}
+    own = f"{owner}-kit" if owner in words else owner
+    tag = f"leg.{own}.{re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-')}"
+    if len(tag.encode("utf-8")) > TAG_MAX_BYTES:
+        tag = tag.encode("utf-8")[:TAG_MAX_BYTES].decode("utf-8", "ignore")
+        tag = tag[:tag.rfind("-")] if tag.rfind("-") > len(f"leg.{own}.") else tag
+    return tag
+
+
+def write_declaration(path, header, row, gov):
+    """Append one declaration to the TOML file at `path`: `header`, its keys, then its gov sub-table."""
+    p = pathlib.Path(path)
+    text = p.read_bytes().decode("utf-8").replace("\r\n", "\n")
+    block = f"\n{header}\n" + "".join(f"{k} = {render_toml_value(v)}\n" for k, v in row.items())
+    if gov:
+        block += "\n[gate_leg.gov]\n" + "".join(f"{k} = {render_toml_value(v)}\n" for k, v in gov.items())
+    p.write_bytes((text.rstrip("\n") + "\n" + block).encode("utf-8"))
+
+
+# ---------------------------------------------------------------------------------------------- verbs
+def run_write(root):
+    G = load_govkit()
+    rows, found = render_rows(root, G)
+    refused = [m for a, _n, m in found if a in ("token", "derived")]
+    if refused:
+        return 2, [f"{SAY}: refused · {m}" for m in refused]
+    tool_rel, _mem = read_layout(root, G)
+    path = pathlib.Path(root, tool_rel, "gate-legs.json")
+    new = render_manifest(rows)
+    cur, _r = read_manifest(path)
+    if cur != new:
+        path.write_bytes(new.encode("utf-8"))
+        return 0, [f"{SAY}: wrote {len(rows)} legs to {pathlib.Path(tool_rel, 'gate-legs.json').as_posix()}"]
+    return 0, [f"{SAY}: {len(rows)} legs, the manifest already fresh"]
+
+
+def run_check(root):
+    G = load_govkit()
+    rows, found = render_rows(root, G)
+    refused = [m for a, _n, m in found if a in ("token", "derived")]
+    if refused:
+        return 2, [f"{SAY}: refused · {m}" for m in refused]
+    tool_rel, _mem = read_layout(root, G)
+    cur_text, cur_rows = read_manifest(pathlib.Path(root, tool_rel, "gate-legs.json"))
+    drift = derive_drift(cur_text, cur_rows, render_manifest(rows))
+    if drift:
+        return 1, [f"{SAY}: fresh · {d}" for d in drift] + [
+            f"{SAY}: the manifest is generated — edit the declaration, then `leg_factory.py --write`"]
+    return 0, [f"{SAY}: fresh · {len(rows)} legs, the manifest is what --write renders"]
+
+
+def run_conform(root):
+    G = load_govkit()
+    decls = read_declarations(root, G)
+    rows, found = render_rows(root, G, decls)
+    tool_rel, _mem = read_layout(root, G)
+    cur_text, cur_rows = read_manifest(pathlib.Path(root, tool_rel, "gate-legs.json"))
+    lines = [f"{SAY}: fresh · {d}" for d in derive_drift(cur_text, cur_rows, render_manifest(rows))]
+    found += check_declarations(root, G, decls, rows)
+    lines += [f"{SAY}: {arm} · {m}" for arm, _n, m in found]
+    pop = read_enforce_population(root, tool_rel)
+    pend = len(pop[1]) if pop else 0
+    if pop is None:
+        lines.append(f"{SAY}: enforces · unarmed: no playbook kit in this tree, so no tag is graded")
+    claimed = sum(1 for d in decls if d["kind"] == "claimed")
+    lines.append(f"legs: {len(decls)} declared · {claimed} claimed · {len(decls) - claimed} exempt · "
+                 f"{pend} enforces-pending")
+    rc = 1 if len(lines) > 1 + (pop is None) else 0
+    lines.append(f"{SAY}: conform · {'red' if rc else 'green'}")
+    return rc, lines
+
+
+def run_list(root):
+    G = load_govkit()
+    return 0, [f"{d['name']}\t{d['file']}" for d in read_declarations(root, G)]
+
+
+def run_new(root, a):
+    G = load_govkit()
+    decls = read_declarations(root, G)
+    tool_rel, _mem = read_layout(root, G)
+    bad = []
+    nm = a.name
+    if not nm or re.search(r"\([^)]*\d[^)]*\)", nm):
+        bad.append(f"name {nm!r} is empty or carries a digit-bearing parenthetical")
+    if any(d["name"] == nm for d in decls):
+        bad.append(f"leg {nm!r} is declared already")
+    if (a.kit is None) == (a.exempt is None):
+        bad.append("name exactly one of --kit <id> and --exempt <why>")
+    if a.exempt is not None and not a.exempt.strip():
+        bad.append("--exempt carries an empty why")
+    if a.subject not in SUBJECTS:
+        bad.append(f"--subject {a.subject!r} is outside kit|repo")
+    pu = a.purpose
+    if pu is None:
+        bad.append("--purpose is required: a leg says what it is for")
+    elif not pu or len(pu) > PURPOSE_MAX_CHARS or "\n" in pu or "\r" in pu or pu != pu.strip():
+        bad.append(f"--purpose {pu!r} is not one line of 1 to {PURPOSE_MAX_CHARS} characters")
+    elif any(d["base"].get("purpose") == pu or d["gov"].get("purpose") == pu for d in decls):
+        bad.append(f"--purpose {pu!r} is another leg's purpose already")
+    pop = read_enforce_population(root, tool_rel)
+    if not a.enforces:
+        bad.append("--enforces is required: a new leg has no pending row to excuse it")
+    elif pop is not None:
+        bad += [f"--enforces {t!r} names no principle row, practice row or practice rule"
+                for t in a.enforces if t not in pop[0]]
+    lists = {}
+    for flag, val in (("argv", a.argv), ("guard", a.guard)):
+        if val is None:
+            continue
+        try:
+            lists[flag] = json.loads(val)
+        except ValueError:
+            lists[flag] = None
+        if not (isinstance(lists[flag], list) and all(isinstance(x, str) and x for x in lists[flag])
+                and (lists[flag] or flag == "guard")):
+            bad.append(f"--{flag} {val!r} is not a JSON list of non-empty strings")
+    if a.argv is None:
+        bad.append("--argv is required")
+    if a.ceiling is not None and a.ceiling <= 0:
+        bad.append(f"--ceiling {a.ceiling} is not a positive integer")
+    path = None
+    if a.kit is not None:
+        reg = G.load_registry(root)
+        ent = next((e for e in reg.get("entry", []) if e.get("id") == a.kit), None)
+        if ent is None:
+            bad.append(f"--kit {a.kit!r} is no entry of the registry")
+        else:
+            path = pathlib.Path(root, ent["descriptor"])
+    left = [t for s in (lists.get("argv") or []) + (lists.get("guard") or [])
+            for t in TOKEN_RX.findall(s) if t not in ("prefix", "kit", "memory_root")]
+    if left:
+        bad.append(f"--argv or --guard carries {{{left[0]}}}, a token gov's own row cannot resolve")
+    if bad:
+        return 2, [f"{SAY}: refused · {b}" for b in bad] + [f"{SAY}: refused · nothing written"]
+    row = {"name": nm, "tag": derive_leg_tag("gov" if a.exempt is not None else a.kit, nm, root, tool_rel)}
+    if a.exempt is not None:
+        row["why"] = a.exempt
+    if a.tests:
+        row["tests"] = a.tests
+    row.update({"purpose": pu, "argv": lists["argv"]})
+    if a.guard is not None:
+        row["guard"] = lists["guard"]
+    own = {k: v for k, v in (("chunk", a.chunk), ("ceiling", a.ceiling)) if v is not None}
+    if a.exempt is not None:
+        row.update(own)
+        own = {}
+    row.update({"subject": a.subject, "enforces": a.enforces})
+    if a.stage:
+        row["stage"] = a.stage
+    if a.exempt is not None:
+        path = G.derive_registry_path(root)
+        write_declaration(path, "[[exempt_leg]]", row, {})
+    else:
+        write_declaration(path, "[[gate_leg]]", row, own)
+    rc, lines = run_write(root)
+    where = pathlib.Path(path).resolve().relative_to(pathlib.Path(root).resolve()).as_posix()
+    return rc, [f"{SAY}: new · declared {nm!r} as {row['tag']} in {where}"] + lines
+
+
+# ------------------------------------------------------------------------------------------- selftest
+FIXTURE = {
+    ".memory-tree.conf": 'MEMORY_ROOT="mem"\n',
+    "kits/govkit/registry.toml": (
+        'version = 1\n\n[[entry]]\nid = "alpha"\ndescriptor = "{prefix}/alpha/kit.toml"\n\n'
+        '[[entry]]\nid = "beta"\ndescriptor = "{prefix}/beta/kit.toml"\n\n'
+        '[[exempt_leg]]\nname = "gov only leg"\nwhy = "a fixture row gov alone runs"\ntag = "leg.gov.gov-only-leg"\n'
+        'purpose = "a gov-only fixture leg"\nargv = ["bash", "{prefix}/gov-only.sh"]\nchunk = "product"\n'
+        'subject = "repo"\nceiling = 60\nenforces = ["principle.p1"]\nstage = ["step.test"]\n\n'
+        '[[exempt_leg]]\nname = "pending leg"\nwhy = "a fixture row the pending list excuses"\n'
+        'tag = "leg.gov.pending-leg"\npurpose = "a fixture leg still pending"\n'
+        'argv = ["bash", "{prefix}/pending.sh"]\nchunk = "product"\nsubject = "repo"\nceiling = 60\n'),
+    "kits/alpha/kit.toml": (
+        'id = "alpha"\nhome = "alpha"\n\n[[gate_leg]]\nname = "alpha check"\ntag = "leg.alpha.alpha-check"\n'
+        'tests = ["feature.alpha"]\nsubject = "repo"\npurpose = "checks the alpha fixture"\n'
+        'argv = ["python3", "{kit}/check.py", "{memory_root}/rows.txt"]\nguard = ["{kit}/"]\n'
+        'doc_reads = ["{memory_root}/doc.md"]\nstage = ["step.test"]\nenforces = ["practice.verify"]\n'
+        'ceiling = 30\n\n[gate_leg.gov]\nargv = ["python3", "{kit}/check.py", "{memory_root}/rows.txt", "--gov"]\n'
+        'chunk = "product"\nceiling = 90\nguard = []\n'),
+    "kits/beta/kit.toml": (
+        'id = "beta"\nhome = "beta"\n\n[[gate_leg]]\nname = "beta selftest"\ntag = "leg.beta.beta-selftest"\n'
+        'subject = "kit"\npurpose = "arms the beta fixture red and green"\nargv = ["bash", "{kit}/beta.test.sh"]\n'
+        'reads = { history = "it reads the log" }\nenforces = ["practice.gate"]\n\n'
+        '[gate_leg.gov]\nchunk = "selftests"\nceiling = 120\n'),
+    "kits/run-gates/run-gates.test.sh": f'LEG_KEYS="{" ".join(KEY_ORDER)}"\n',
+    "kits/playbook/kinds.toml": "",
+    "kits/playbook/namespaces.toml": '[[namespace]]\nns = "leg"\n',
+    "kits/playbook/principles.toml": '[[principle]]\ntag = "principle.p1"\nid = "P1"\nline = "One."\n',
+    "kits/playbook/practices.toml": ('[[practice]]\ntag = "practice.verify"\nline = "Verify."\n\n'
+                                     '[[practice]]\ntag = "practice.gate"\nline = "A gate."\nrules = ["red"]\n'),
+    "kits/playbook/core-pending.txt": "# fixture\nleg\tpending leg\tdFx\n",
+}
+
+
+def write_fixture(top):
+    """FIXTURE at `top`: two descriptors, a registry and the playbook rows the `enforces` arm reads."""
+    for rel, text in FIXTURE.items():
+        p = pathlib.Path(top, rel)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_bytes(text.encode("utf-8"))
+
+
+def write_planted(top, rel, old, new):
+    """Replace `old`, which must occur once, by `new` in the fixture file `rel`."""
+    p = pathlib.Path(top, rel)
+    text = p.read_bytes().decode("utf-8")
+    if text.count(old) != 1:
+        raise AssertionError(f"the plant's anchor {old!r} occurs {text.count(old)} times in {rel}")
+    p.write_bytes(text.replace(old, new, 1).encode("utf-8"))
+
+
+def write_manifest_edit(top, fn):
+    """Rewrite the fixture's manifest rows through `fn`, by hand, as a hand-edit would."""
+    p = pathlib.Path(top, "kits", "gate-legs.json")
+    p.write_bytes((json.dumps(fn(json.loads(p.read_bytes().decode("utf-8"))), indent=2) + "\n").encode("utf-8"))
+
+
+def run_selftest():
+    """Each arm of §4 "The gate", and each plant §4 "The plants" moves out of govkit's selftest."""
+    al, be, reg = "kits/alpha/kit.toml", "kits/beta/kit.toml", "kits/govkit/registry.toml"
+    pu_a = 'purpose = "checks the alpha fixture"'
+    cases = [
+        # (case, plant, verb, rc, needles that one output line holds, needles no line holds)
+        ("control: the fixture conforms", None, run_conform, 0, ("legs: 4 declared · 2 claimed · 2 exempt · 1 "
+                                                                 "enforces-pending",), ("fresh ·",)),
+        ("control: --check is green on the fresh render", None, run_check, 0, ("fresh · 4 legs",), ()),
+        ("AC1 fresh: a manifest row hand-edited", lambda t: write_manifest_edit(
+            t, lambda rs: [dict(r, ceiling=91) if r["name"] == "alpha check" else r for r in rs]),
+         run_check, 1, ("'alpha check' changed: ceiling",), ()),
+        ("AC1 fresh: a declaration added and no --write", lambda t: write_planted(
+            t, be, 'ceiling = 120\n', 'ceiling = 120\n\n[[gate_leg]]\nname = "gamma leg"\nsubject = "repo"\n'
+            'purpose = "a gamma leg"\nargv = ["bash", "g.sh"]\nenforces = ["practice.verify"]\n'),
+         run_check, 1, ("'gamma leg' added",), ()),
+        ("fresh, run 1 b: a declared ceiling moved", lambda t: write_planted(t, al, "ceiling = 90", "ceiling = 91"),
+         run_check, 1, ("'alpha check' changed: ceiling",), ()),
+        ("fresh, run d: a stage changed", lambda t: write_planted(t, al, 'stage = ["step.test"]',
+                                                                  'stage = ["step.disagree"]'),
+         run_check, 1, ("'alpha check' changed: stage",), ()),
+        ("fresh, run e: a stage dropped", lambda t: write_planted(t, al, 'stage = ["step.test"]\n', ""),
+         run_check, 1, ("'alpha check' changed: stage",), ()),
+        ("fresh, run f: a tag", lambda t: write_planted(t, al, '"leg.alpha.alpha-check"', '"leg.alpha.drifted"'),
+         run_check, 1, ("'alpha check' changed: tag",), ()),
+        ("fresh, run g: tests and enforces", lambda t: write_planted(
+            t, al, 'tests = ["feature.alpha"]\n', 'tests = ["feature.drifted"]\nenforces = ["principle.p1"]\n'),
+         run_check, 1, ("'alpha check' changed: enforces, tests",), ()),
+        ("fresh, run i2: a drifted purpose", lambda t: write_planted(t, al, pu_a, 'purpose = "drifted"'),
+         run_check, 1, ("'alpha check' changed: purpose",), ()),
+        ("fresh, D3: doc_reads", lambda t: write_planted(t, al, '["{memory_root}/doc.md"]', '["mem/other.md"]'),
+         run_check, 1, ("'alpha check' changed: doc_reads",), ()),
+        ("fresh, D3 control: a {memory_root} value rendering equal is silent", lambda t: write_planted(
+            t, al, '["{memory_root}/doc.md"]', '["mem/doc.md"]'), run_check, 0, ("fresh · 4 legs",), ()),
+        ("fresh, L1: a subject changed", lambda t: write_planted(t, be, 'subject = "kit"', 'subject = "repo"'),
+         run_check, 1, ("'beta selftest' changed: subject",), ()),
+        ("fresh, the typo leg: one added and one dropped", lambda t: write_planted(
+            t, be, 'name = "beta selftest"', 'name = "beta selftset"'), run_check, 1,
+         ("'beta selftset' added",), ()),
+        ("fresh, the typo leg: ...and its old name dropped", lambda t: write_planted(
+            t, be, 'name = "beta selftest"', 'name = "beta selftset"'), run_check, 1,
+         ("'beta selftest' dropped",), ()),
+        ("subject: maybe", lambda t: write_planted(t, al, 'subject = "repo"', 'subject = "maybe"'),
+         run_conform, 1, ("subject ·", "'alpha check'", "'maybe'"), ()),
+        ("subject, L1: absent", lambda t: write_planted(t, al, 'subject = "repo"\n', ""),
+         run_conform, 1, ("subject ·", "'alpha check'", "None"), ()),
+        ("subject, L1: Kit", lambda t: write_planted(t, be, 'subject = "kit"', 'subject = "Kit"'),
+         run_conform, 1, ("subject ·", "'beta selftest'", "'Kit'"), ()),
+        ("one declaration: a name in a descriptor and the registry", lambda t: write_planted(
+            t, reg, 'name = "gov only leg"', 'name = "alpha check"'), run_conform, 1,
+         ("one declaration ·", "'alpha check'", "kits/govkit/registry.toml"), ()),
+        ("exempt reason: an empty why", lambda t: write_planted(
+            t, reg, 'why = "a fixture row gov alone runs"', 'why = "  "'), run_conform, 1,
+         ("exempt reason ·", "'gov only leg'"), ()),
+        ("ceiling, run 2: a ceiling of true", lambda t: write_planted(t, al, "ceiling = 30", "ceiling = true"),
+         run_conform, 1, ("ceiling ·", "'alpha check'", "True"), ()),
+        ("reads: a class outside the four", lambda t: write_planted(t, be, "history =", "weather ="),
+         run_conform, 1, ("reads ·", "'beta selftest'", "weather"), ()),
+        ("name: a digit-bearing parenthetical", lambda t: write_planted(
+            t, be, 'name = "beta selftest"', 'name = "beta selftest (3 arms)"'), run_conform, 1,
+         ("name ·", "'beta selftest (3 arms)'", "digit-bearing"), ()),
+        ("purpose, run h1: 61 characters", lambda t: write_planted(t, al, pu_a, f'purpose = "{"x" * 61}"'),
+         run_conform, 1, ("purpose ·", "'alpha check'", "61 characters"), ()),
+        ("purpose, run h2: two legs sharing one", lambda t: write_planted(
+            t, be, 'purpose = "arms the beta fixture red and green"', pu_a), run_conform, 1,
+         ("purpose ·", "'alpha check'", "'beta selftest'", "share the purpose"), ()),
+        ("purpose, run i1: 60 characters, one multibyte, is silent", lambda t: write_planted(
+            t, al, pu_a, f'purpose = "{"é" + "x" * 59}"'), run_conform, 0, ("conform · green",),
+         ("purpose ·",)),
+        ("token: a {gate_file} with no gov override", lambda t: write_planted(
+            t, be, '"{kit}/beta.test.sh"]', '"{kit}/beta.test.sh", "{gate_file}"]'), run_conform, 1,
+         ("token ·", "'beta selftest'", "{gate_file}"), ()),
+        ("derived: a declaration carrying pass_leg", lambda t: write_planted(
+            t, be, "ceiling = 120\n", "ceiling = 120\npass_leg = true\n"), run_conform, 1,
+         ("derived ·", "'beta selftest'"), ()),
+        ("enforces: empty on a leg no pending row excuses", lambda t: write_planted(
+            t, al, 'enforces = ["practice.verify"]\n', ""), run_conform, 1,
+         ("enforces ·", "'alpha check'", "core-pending.txt"), ()),
+        ("enforces: a tag no row holds", lambda t: write_planted(
+            t, be, '["practice.gate"]', '["practice.unheard"]'), run_conform, 1,
+         ("enforces ·", "'beta selftest'", "practice.unheard"), ()),
+        ("enforces: a practice rule is a tag a leg may hold", lambda t: write_planted(
+            t, be, '["practice.gate"]', '["practice.gate.red"]'), run_check, 1, ("'beta selftest' changed: "
+                                                                                 "enforces",), ()),
+    ]
+    failed = 0
+    scratch = pathlib.Path(tempfile.mkdtemp(prefix="legf-"))
+    try:
+        for case, plant, verb, want_rc, want, never in cases:
+            shutil.rmtree(scratch / "t", ignore_errors=True)
+            top = scratch / "t"
+            write_fixture(top)
+            rc0, out0 = run_write(top)
+            if rc0 != 0:
+                failed += 1
+                print(f"arm FAIL  {case} — the fixture's --write exited {rc0}: {out0}")
+                continue
+            if plant is not None:
+                plant(top)
+            try:
+                rc, lines = verb(top)
+            except Refusal as e:
+                rc, lines = 2, [f"{SAY}: refused · {e}"]
+            hit = any(all(w in ln for w in want) for ln in lines)
+            leak = any(n in ln for ln in lines for n in never)
+            if rc == want_rc and hit and not leak:
+                print(f"arm ok    {case}")
+                continue
+            failed += 1
+            print(f"arm FAIL  {case} — wanted rc={want_rc} and a line holding {want!r}, got rc={rc}")
+            print("".join(f"      {ln}\n" for ln in lines), end="")
+        # AC5: `new` writes a declaration the gate takes, and refuses one it would not, writing nothing.
+        shutil.rmtree(scratch / "t", ignore_errors=True)
+        top = scratch / "t"
+        write_fixture(top)
+        run_write(top)
+        before = pathlib.Path(top, al).read_bytes()
+        ns = argparse.Namespace(name="demo leg", kit="alpha", exempt=None, argv='["python3", "demo.py"]',
+                                subject="repo", purpose=None, enforces=["practice.verify"], guard=None,
+                                chunk=None, ceiling=None, tests=None, stage=None)
+        rc, lines = run_new(top, ns)
+        ok = rc == 2 and pathlib.Path(top, al).read_bytes() == before and any("--purpose" in ln for ln in lines)
+        print(f"arm {'ok  ' if ok else 'FAIL'}  AC5 new: no --purpose refuses and writes nothing")
+        failed += not ok
+        ns.purpose = "a demo leg"
+        rc, lines = run_new(top, ns)
+        crc, clines = run_conform(top)
+        text = pathlib.Path(top, al).read_bytes().decode("utf-8")
+        ok = (rc == 0 and crc == 0 and 'tag = "leg.alpha.demo-leg"' in text
+              and any(r["name"] == "demo leg" for r in json.loads(
+                  pathlib.Path(top, "kits", "gate-legs.json").read_bytes().decode("utf-8"))))
+        print(f"arm {'ok  ' if ok else 'FAIL'}  AC5 new: the declaration renders and conforms")
+        if not ok:
+            print("".join(f"      {ln}\n" for ln in lines + clines), end="")
+        failed += not ok
+        # Over gov: the live tree conforms, its legs: note printed.
+        rc, lines = run_conform(derive_repo_root())
+        ok = rc == 0 and any(ln.startswith("legs: ") for ln in lines)
+        print(f"arm {'ok  ' if ok else 'FAIL'}  over gov: --conform exits 0 on the live tree, its legs: note printed")
+        if not ok:
+            print("".join(f"      {ln}\n" for ln in lines[-12:]), end="")
+        failed += not ok
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+    total = len(cases) + 3
+    if failed:
+        print(f"FAIL — {failed} of {total} leg-factory fixtures failed")
+        return 1
+    print(f"PASS — the leg-factory fixtures, {total} cases")
+    return 0
+
+
+def main(argv=None):
+    for s in (sys.stdout, sys.stderr):
+        try:
+            s.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
+    argv = sys.argv[1:] if argv is None else argv
+    if argv[:1] == ["new"]:
+        ap = argparse.ArgumentParser(prog="leg_factory.py new", description="declare one conforming leg")
+        ap.add_argument("name")
+        ap.add_argument("--kit", help="the registry entry id whose descriptor receives a [[gate_leg]] row")
+        ap.add_argument("--exempt", help="the why of an [[exempt_leg]] row of the registry instead")
+        ap.add_argument("--argv", help="the argv, a JSON list")
+        ap.add_argument("--subject", help="kit or repo")
+        ap.add_argument("--purpose", help=f"one line of at most {PURPOSE_MAX_CHARS} characters")
+        ap.add_argument("--enforces", action="append", help="a principle or practice tag; repeatable")
+        ap.add_argument("--tests", action="append", help="a feature tag the leg tests; repeatable")
+        ap.add_argument("--guard", help="the guard, a JSON list")
+        ap.add_argument("--stage", action="append", help="a step tag the leg serves; repeatable")
+        ap.add_argument("--chunk", help="gov's chunk for the leg")
+        ap.add_argument("--ceiling", type=int, help="gov's ceiling for the leg, in seconds")
+        a = ap.parse_args(argv[1:])
+        verb = lambda root: run_new(root, a)  # noqa: E731
+    else:
+        ap = argparse.ArgumentParser(prog="leg_factory.py", description=__doc__.split("\n")[0])
+        g = ap.add_mutually_exclusive_group(required=True)
+        for flag, fn in (("--write", run_write), ("--check", run_check), ("--conform", run_conform),
+                         ("--list", run_list), ("--selftest", None)):
+            g.add_argument(flag, action="store_const", dest="verb", const=fn or "selftest")
+        a = ap.parse_args(argv)
+        if a.verb == "selftest":
+            return run_selftest()
+        verb = a.verb
+    try:
+        rc, lines = verb(derive_repo_root())
+    except (Refusal, LookupError) as e:
+        rc, lines = 2, [f"{SAY}: refused · {e}"]
+    except Exception as e:  # noqa: BLE001 - govkit's own Refusal is a refusal here too
+        if type(e).__name__ != "Refusal":
+            raise
+        rc, lines = 2, [f"{SAY}: refused · {e}"]
+    for ln in lines:
+        print(ln)
+    return rc
+
+
+if __name__ == "__main__":
+    sys.exit(main())

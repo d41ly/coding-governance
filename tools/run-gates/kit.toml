@@ -152,8 +152,9 @@ why_no_regenerate = "the adopter writes nothing, so `update` re-runs no adopter 
 # THE PASS-LEG FIELD IS RE-APPLIED AT EVERY LANDING. TOOL-aNimbleMend-2. `regen.py` makes this staged
 # row an item, so the lander re-derives `pass_leg` over each merged tree and every bar's preflight
 # proves it fresh: a ceiling-evidence refresh that moves the selection is cured by the landing or by
-# one `--regen`, and is never a leg's red. NOT a `[[generated]]` row, because the unattended kit
-# enrols every `[[generated]]` path as a generated index and the manifest is an authored file.
+# one `--regen`, and is never a leg's red. The leg factory's `[[generated]]` row below renders the
+# same field through the same rule at stage 1, so `--apply` over its output changes nothing; this
+# row stays so every caller's command still runs (TOOL-dWitnessedBar-11 §8 F7).
 # Stage 2: the field reads no other generated output, and the codebase map at stage 3 reads the
 # tree after it. The adopter above still writes nothing, which is what its reason states.
 # WHICH FILE THE CHECK GRADES (TOOL-aNimbleMend-15): the manifest BESIDE THIS KIT, under any runner.
@@ -165,6 +166,21 @@ argv = ["bash", "{kit}/run-held-wsl.sh", "--leg", "python", "{kit}/pass_legs.py"
 check = ["bash", "{kit}/run-held-wsl.sh", "--leg", "python", "{kit}/pass_legs.py", "--check"]
 stage = 2
 writes = ["the pass_leg field of the leg manifest"]
+
+# THE LEG MANIFEST IS GENERATED (TOOL-dWitnessedBar-11 S2). Each leg's one declaration, a descriptor's
+# [[gate_leg]] row with its `[gate_leg.gov]` sub-table or a registry [[exempt_leg]] row, renders its
+# manifest row; `--check` here is freshness alone, and the `gate-leg conformance` leg runs `--conform`,
+# whose shape reds `--write` cannot cure (§8 F3). Stage 1: it reads no other generated output. A
+# `[[generated]]` row, so the unattended kit enrols the manifest as a generated index: a run
+# regenerates it rather than merging it. The path is spelled from `{kit}`, the manifest being this kit
+# dir's sibling, because the unattended kit's reader resolves `{kit}` and not `{prefix}`.
+[[generated]]
+path = "{kit}/../gate-legs.json"
+generator = "leg_factory.py"
+why = "the leg manifest, rendered from each leg's one declaration (TOOL-dWitnessedBar-11)"
+write = ["python", "{kit}/leg_factory.py", "--write"]
+check = ["python", "{kit}/leg_factory.py", "--check"]
+stage = 1
 
 [check]
 argv = ["bash", "{kit}/adopt-run-gates.sh", "--check"]
@@ -188,6 +204,10 @@ argv = ["bash", "{kit}/adopt-run-gates.sh", "--check"]
 guard = []
 stage = ["step.test"]
 
+[gate_leg.gov]
+chunk = "wiring"
+ceiling = 300
+
 # THE INTEGRITY HALF OF `check`, ON A BAR THAT NEEDS NO GOV CHECKOUT. `check` answers three
 # questions and two of them — descriptor and provenance — resolve only against gov's own blobs, so
 # an adopter can never run it; the third is a sha256 against bytes on their own disk and needs
@@ -210,6 +230,10 @@ argv = ["python", "{kit}/check-receipt.py"]
 guard = []
 stage = ["step.test"]
 
+[gate_leg.gov]
+chunk = "declarations"
+ceiling = 300
+
 # THE SPLIT-TIER COMBINER'S SELF-TEST. TOOL-aSparedSpawn-5, mirroring `review-replay selftest` in the
 # workflows kit. It SHIPS: `held_halves.py` is an engine file under `**`, and `--selftest` builds its
 # own synthetic manifests, halves and git dirs, so a target holding the tool can run it; its one arm
@@ -225,6 +249,11 @@ purpose = "self-tests the split-tier held self-test combiner"
 argv = ["python3", "{kit}/held_halves.py", "--selftest"]
 guard = []
 stage = ["step.test"]
+
+[gate_leg.gov]
+guard = []
+chunk = "selftests"
+ceiling = 300
 
 # The seed for a target's own [gate_runner] declaration. `cmd_intake` emits this block when this
 # entry is selected (S9), resolving the path tokens ONLY: the runner's own `{name}` placeholder in

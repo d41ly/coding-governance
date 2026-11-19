@@ -52,3 +52,8 @@ argv = ["bash", "{prefix}/check-kit-versions.sh"]
 guard = []
 doc_reads = []
 stage = ["step.test"]
+
+[gate_leg.gov]
+guard = []
+chunk = "declarations"
+ceiling = 660

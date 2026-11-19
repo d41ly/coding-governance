@@ -1694,11 +1694,12 @@ def check_halved_install_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
 
 
 def check_benched_probe_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
-    """DEPL-aBenchedProbe-4 (closing review H-M2 and H-L1) — selfcheck 7j4 and the 7h ceiling clause
-    were observed red only by hand-staged breaks that left nothing behind. Five breaks in a COPY of gov,
-    sharing runs where the lines they red are disjoint, each asserted on the ONE line that names it:
-    the subject-pin ratchet and the stale-exemption check red on several of the same breaks, so a
-    whole-output substring could pass on the wrong line."""
+    """DEPL-aBenchedProbe-4 (closing review H-M2 and H-L1) — selfcheck 7j4 was observed red only by
+    hand-staged breaks that left nothing behind. Breaks in a COPY of gov, sharing a run where the lines
+    they red are disjoint, each asserted on the ONE line that names it: the subject-pin ratchet reds on
+    the same breaks, so a whole-output substring could pass on the wrong line. The descriptor-against-
+    manifest plants this run once held moved with their arms to `<prefix>/run-gates/leg_factory.py
+    --selftest` (TOOL-dWitnessedBar-11 §4 "The plants")."""
     desc = gcopy / PFX / KIT_NAMES["govkit"] / "entries" / "push-main.kit.toml"
     man = gcopy / PFX / "gate-legs.json"
     keep = {f: f.read_bytes() for f in (desc, man)}
@@ -1713,111 +1714,32 @@ def check_benched_probe_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
     def check_line(out: str, *parts: str) -> bool:
         return any(all(p in ln for p in parts) for ln in out.splitlines())
 
-    # Run 1: a1 (subject repo in descriptor AND manifest), a2 (a filename-shaped exempt row loses its
-    # chunk), and the 7h ceiling at 1781. Each reds a different line.
+    # Run 1: a1 (subject repo in descriptor AND manifest) and a2 (a filename-shaped exempt row loses
+    # its chunk), 7j4's two, each reds a different line.
     write_staged(desc, f'name = "{leg}"\nsubject = "kit"', f'name = "{leg}"\nsubject = "repo"', "a1 descriptor")
     write_staged(man, '"subject": "kit",\n    "ceiling": 1780', '"subject": "repo",\n    "ceiling": 1780',
           "a1 manifest")
     write_staged(man, '"chunk": "declarations",\n    "subject": "repo",\n    "ceiling": 1840',
           '"subject": "repo",\n    "ceiling": 1840', "a2 marker contracts chunk")
-    write_staged(desc, "ceiling = 1780", "ceiling = 1781", "b ceiling 1781")
     r1 = run_selfcheck(gcopy)
     o1 = r1.stdout + r1.stderr
     check("[aBP-4] a1: 7j4 reds a held self-test declared repo, naming entry and leg",
           r1.returncode != 0 and check_line(o1, "7j4:", f"entry 'push-main' gate leg '{leg}'"), o1[-1500:])
     check("[aBP-4] a2: 7j4 reds a chunkless filename-shaped leg, naming it and its argv element",
           check_line(o1, "7j4:", "'marker contracts'", "marker-contract.test.sh"), o1[-1500:])
-    check("[aBP-4] b: 7h reds a descriptor ceiling of 1781 against the manifest",
-          check_line(o1, "entry 'push-main'", f"gate leg '{leg}' with ceiling 1781"), o1[-1500:])
     for f, b in keep.items():
         f.write_bytes(b)
-    # Run 2: the 7h ceiling as a bool, which an int-only check must refuse.
-    write_staged(desc, "ceiling = 1780", "ceiling = true", "b ceiling true")
-    r2 = run_selfcheck(gcopy)
-    o2 = r2.stdout + r2.stderr
-    check("[aBP-4] b: 7h reds a descriptor ceiling of true",
-          r2.returncode != 0 and check_line(o2, "entry 'push-main'", f"gate leg '{leg}' with ceiling True"),
-          o2[-1500:])
-    for f, b in keep.items():
-        f.write_bytes(b)
-    # Runs d and e (TOOL-dDeclaredLoop-46 AC4): 7h compares `stage` presence included, so a
-    # descriptor value the manifest does not hold reds, and so does the key taken off the table.
-    _st = next(x for x in json.loads(man.read_text(encoding="utf-8")) if x.get("name") == leg)["stage"]
-    _anchor = f"ceiling = 1780\nstage = {json.dumps(_st)}"
-    for tag, new, shown in (("d", 'ceiling = 1780\nstage = ["step.disagree"]', "['step.disagree']"),
-                            ("e", "ceiling = 1780", "None")):
-        write_staged(desc, _anchor, new, f"{tag} stage")
-        rs = run_selfcheck(gcopy)
-        out_st = rs.stdout + rs.stderr
-        check(f"[dDL-46] {tag}: 7h reds a descriptor stage of {shown} against the manifest's, naming both",
-              rs.returncode != 0 and check_line(out_st, "entry 'push-main'", f"gate leg '{leg}' with stage {shown}",
-                                                f"says {_st!r}"), out_st[-1500:])
-        for f, b in keep.items():
-            f.write_bytes(b)
-    # Run f (TOOL-dWitnessedBar-12 AC7): 7h compares `tag`, so a descriptor tag the manifest does not
-    # hold reds, naming the leg and both tags.
-    _tg = next(x for x in json.loads(man.read_text(encoding="utf-8")) if x.get("name") == leg)["tag"]
-    write_staged(desc, f"tag = {json.dumps(_tg)}\n", 'tag = "leg.push-main.drifted"\n', "f tag")
-    rt = run_selfcheck(gcopy)
-    out_tg = rt.stdout + rt.stderr
-    check("[dWB-12] f: 7h reds a descriptor tag the manifest does not hold, naming the leg and both tags",
-          rt.returncode != 0 and check_line(out_tg, "entry 'push-main'", f"gate leg '{leg}' with tag "
-                                            "'leg.push-main.drifted'", f"says {_tg!r}"), out_tg[-1500:])
-    for f, b in keep.items():
-        f.write_bytes(b)
-    # Run g (TOOL-dWitnessedBar-22 AC6): 7h compares `tests` and `enforces` presence included, so a
-    # descriptor `tests` list the manifest does not hold reds, and so does an `enforces` list the manifest
-    # row lacks, each naming the leg and both lists.
-    _ts = next(x for x in json.loads(man.read_text(encoding="utf-8")) if x.get("name") == leg)["tests"]
-    write_staged(desc, f"tests = {json.dumps(_ts)}\nname = \"{leg}\"",
-                 f'tests = ["feature.drifted"]\nenforces = ["principle.p16"]\nname = "{leg}"', "g tests and enforces")
-    re_ = run_selfcheck(gcopy)
-    out_e = re_.stdout + re_.stderr
-    check("[dWB-22] g: 7h reds a descriptor tests list the manifest does not hold, naming the leg and both lists",
-          re_.returncode != 0 and check_line(out_e, "entry 'push-main'", f"gate leg '{leg}' with tests "
-                                             "['feature.drifted']", f"says {_ts!r}"), out_e[-1500:])
-    check("[dWB-22] g: 7h reds a descriptor enforces list the manifest row lacks, naming the leg and both lists",
-          check_line(out_e, "entry 'push-main'", f"gate leg '{leg}' with enforces ['principle.p16']", "says None"),
-          out_e[-1500:])
-    for f, b in keep.items():
-        f.write_bytes(b)
-    # Run h (TOOL-dWitnessedBar-19 AC2 AC3 AC4): 7h grades every manifest row's `purpose`. A 61-character
-    # purpose on the claimed leg's two rows reds the shape arm; an exempt leg given another's purpose reds
-    # uniqueness naming both; an exempt leg with none reds presence. Each reds its own line.
+    # Run h (TOOL-dWitnessedBar-19 AC4): 7h's purpose presence arm, the one arm of its purpose block
+    # selfcheck keeps until TOOL-dWitnessedBar-51 S8 (TOOL-dWitnessedBar-11 §8 F8): an exempt leg with
+    # no purpose reds presence, naming it. Shape and uniqueness are the leg factory's `purpose` arm.
     _pu = {x["name"]: x.get("purpose") for x in json.loads(man.read_text(encoding="utf-8"))}
-    _long = "x" * 61
-    write_staged(desc, f"purpose = {json.dumps(_pu[leg])}\n", f"purpose = {json.dumps(_long)}\n", "h1 descriptor")
-    write_staged(man, f'"purpose": {json.dumps(_pu[leg])},', f'"purpose": {json.dumps(_long)},', "h1 manifest")
-    _a, _b, _c = "charter size", "template size <=48KiB", "build-method size"
-    write_staged(man, f'"purpose": {json.dumps(_pu[_b])},', f'"purpose": {json.dumps(_pu[_a])},', "h2 shared")
+    _c = "build-method size"
     write_staged(man, f'    "purpose": {json.dumps(_pu[_c])},\n', "", "h3 exempt none")
     rh = run_selfcheck(gcopy)
     out_h = rh.stdout + rh.stderr
-    check("[dWB-19] h1: 7h reds a 61-character purpose, naming the leg and the shape arm",
-          rh.returncode != 0 and check_line(out_h, f"gate leg '{leg}'", "61 characters", "shape arm"), out_h[-1500:])
-    check("[dWB-19] h2: 7h reds two legs sharing one purpose, naming both",
-          check_line(out_h, repr(_a), repr(_b), "share the purpose"), out_h[-1500:])
     check("[dWB-19] h3: 7h reds an exempt leg with no purpose, naming it and the presence arm",
-          check_line(out_h, f"gate leg '{_c}' carries no `purpose`", "presence arm"), out_h[-1500:])
-    for f, b in keep.items():
-        f.write_bytes(b)
-    # Run i (TOOL-dWitnessedBar-19 AC2 AC6): sixty CHARACTERS holding a multibyte one are inside the bound,
-    # so the shape arm is silent on them; a descriptor purpose its manifest row does not hold reds the
-    # agreement arm, naming the leg and both values.
-    _sixty = "é" * 60
-    write_staged(desc, f"purpose = {json.dumps(_pu[leg])}\n", f"purpose = {json.dumps(_sixty, ensure_ascii=False)}\n",
-                 "i1 descriptor")
-    write_staged(man, f'"purpose": {json.dumps(_pu[leg])},', f'"purpose": {json.dumps(_sixty)},', "i1 manifest")
-    _d = "pre-push bar self-test"
-    write_staged(desc, f"purpose = {json.dumps(_pu[_d])}\n", 'purpose = "drifted from the manifest"\n', "i2 agreement")
-    ri = run_selfcheck(gcopy)
-    out_i = ri.stdout + ri.stderr
-    check("[dWB-19] i1: 7h is silent on a 60-character purpose holding a multibyte character",
-          not check_line(out_i, f"gate leg '{leg}'", "shape arm"), out_i[-1500:])
-    check("[dWB-19] i2: 7h reds a descriptor purpose its manifest row does not hold, naming the leg and both",
-          ri.returncode != 0 and check_line(out_i, "entry 'push-main'", f"gate leg '{_d}' with purpose "
-                                            "'drifted from the manifest'", f"says {_pu[_d]!r}",
-                                            "agreement arm"), out_i[-1500:])
+          rh.returncode != 0 and check_line(out_h, f"gate leg '{_c}' carries no `purpose`", "presence arm"),
+          out_h[-1500:])
     for f, b in keep.items():
         f.write_bytes(b)
     # Run 3 (c, H-L1): no manifest. 7h's block is skipped, so 7j4 must still answer for itself, and
@@ -7191,18 +7113,12 @@ def main() -> int:
             return NL.join(lines) + NL
 
         r0 = scratch_gov(kit("demo leg"))
-        check("LIVENESS: a scratch gov whose leg names AGREE is silent",
+        check("LIVENESS: a scratch gov declaring one leg is silent",
               r0.returncode == 0, r0.stdout + r0.stderr)
 
-        r1 = scratch_gov(kit("typo leg"))
-        check("a descriptor leg absent from the manifest REDS",
-              "is in no leg of <prefix>/gate-legs.json" in r1.stdout, r1.stdout)
-        check("and the manifest leg it left unclaimed reds too — both directions, one fixture",
-              "claimed by no descriptor and carried by no [[exempt_leg]]" in r1.stdout, r1.stdout)
-
-        r2 = scratch_gov(kit("demo leg (3 checks)"))
-        check("a leg name carrying a digit-bearing parenthetical REDS",
-              "digit-bearing parenthetical" in r2.stdout, r2.stdout)
+        # The leg correspondence's typo and digit-bearing-name plants moved with their arms to
+        # `<prefix>/run-gates/leg_factory.py --selftest`, as its `fresh` and `name` arms
+        # (TOOL-dWitnessedBar-11 §4 "The plants").
 
         r3 = scratch_gov(kit("demo leg", include_all=False))
         check("a file under a non-flat home that no rule claims REDS",
@@ -7210,17 +7126,10 @@ def main() -> int:
         check("and it NAMES the file rather than reporting a count",
               "extra.sh" in r3.stdout, r3.stdout)
 
-        # Over gov itself both correspondences are COMPLETE, and every figure in the notes is
-        # derived. The positive halves matter as much as the negatives: without them these arms
-        # could be silent because the predicate is broken rather than because the tree is clean.
+        # Over gov itself the file correspondence is COMPLETE, and its note's figure is derived. The
+        # leg correspondence's positive halves and its `legs:` note are `leg_factory.py --conform`'s,
+        # whose selftest runs it over the live tree (TOOL-dWitnessedBar-11 §4 "The plants").
         ps = run("selfcheck")
-        check("over gov, every manifest leg is claimed or exempted",
-              "claimed by no descriptor" not in ps.stdout, ps.stdout)
-        check("over gov, no descriptor leg is missing from the manifest",
-              f"is in no leg of {PFX}gate-legs.json" not in ps.stdout, ps.stdout)
-        check("the leg note reports all three figures, derived",
-              "in the manifest" in ps.stdout and "claimed" in ps.stdout
-              and "exempt" in ps.stdout, ps.stdout)
         check("the per-file note reports its own derived figure",
               "unclaimed file(s) under a non-flat home" in ps.stdout, ps.stdout)
 
@@ -9218,7 +9127,7 @@ user_skills = "/tmp/gk-fake-skills"
         _j4arows = json.loads(_j4al.read_text(encoding="utf-8"))
         _j4arows[0]["chunk"] = "selftests"
         _j4al.write_text(json.dumps(_j4arows, indent=2) + "\n", encoding="utf-8", newline="\n")
-        # The unclaimed manifest row reds 7h too, so exit 1 alone cannot tell a 7j4 red from a 7j4
+        # Exit 1 alone cannot tell 7j4's red from another class's red beside a 7j4
         # note. `emit` prints every note before every problem, and 7j4's own count note follows
         # its liveness call, so the line is a PROBLEM only when it prints after that count note.
         _r4a = run_in(_j4a)
@@ -9361,27 +9270,9 @@ user_skills = "/tmp/gk-fake-skills"
               "never falling back to demo's own argv",
               _rb17got.startswith("KeyError") and "'demo'" in _rb17got, _rb17got)
 
-        # ---- D3 (TOOL-dThriftyLanding-4): 7h holds a descriptor's doc_reads and the manifest's equal
-        _d3 = scratch_gov("true", f"{PFX}demo/", tag="d3")
-        _d3k = _d3 / PFX / "demo" / "kit.toml"
-        _d3l = _d3 / PFX / "gate-legs.json"
-        _d3rows = json.loads(_d3l.read_text(encoding="utf-8"))
-        _d3rows[0]["doc_reads"] = ["memory/builds/"]
-        _d3l.write_text(json.dumps(_d3rows, indent=2) + "\n", encoding="utf-8", newline="\n")
-        _r3 = run_in(_d3)
-        check("D3: a manifest doc_reads the descriptor does not declare REDS",
-              _r3.returncode == 1 and "disagree about which doc paths" in _r3.stdout, _r3.stdout)
-        _d3k.write_text(_d3k.read_text(encoding="utf-8").replace(
-            'subject = "repo"\n', 'subject = "repo"\ndoc_reads = ["{memory_root}/builds/"]\n', 1),
-            encoding="utf-8", newline="\n")
-        _r3 = run_in(_d3)
-        check("D3 control: the same paths, spelled through {memory_root}, agree",
-              "disagree about which doc paths" not in _r3.stdout, _r3.stdout)
-        _d3k.write_text(_d3k.read_text(encoding="utf-8").replace(
-            '{memory_root}/builds/', '{memory_root}/gotchas/'), encoding="utf-8", newline="\n")
-        _r3 = run_in(_d3)
-        check("D3: a descriptor naming OTHER doc paths REDS",
-              _r3.returncode == 1 and "disagree about which doc paths" in _r3.stdout, _r3.stdout)
+        # ---- D3 (TOOL-dThriftyLanding-4)'s doc_reads plants moved with their arm to
+        # `<prefix>/run-gates/leg_factory.py --selftest`, as its `fresh` arm on `doc_reads`
+        # (TOOL-dWitnessedBar-11 §4 "The plants").
         check("that message says the taxonomy must partition its own input",
               "does not partition its own input" in bad_g.stdout, bad_g.stdout)
 
@@ -9577,8 +9468,8 @@ user_skills = "/tmp/gk-fake-skills"
             if extra:
                 rows.append({"name": "demo two", "argv": ["true"], "guard": [], "subject": "repo"})
             legsf.write_text(json.dumps(rows, indent=2) + "\n", encoding="utf-8", newline="\n")
-            # The DESCRIPTOR moves with it. Leaving it behind reds on the 7h agreement check, and
-            # the arm would then be green for a reason that has nothing to do with the ratchet.
+            # The DESCRIPTOR moves with it, so the fixture keeps its two spellings equal and the arm
+            # is green or red for the ratchet's reason alone.
             body = ('id = "demo"\nhome = "demo"\n'
                     'version_from = { none = "fixture" }\n\n'
                     '[check]\nnone = "a fixture kit"\n\n'
@@ -9671,7 +9562,7 @@ user_skills = "/tmp/gk-fake-skills"
         _rowsc = [l for l in pinf.read_text(encoding="utf-8").split("\n")
                   if l.strip() and not l.startswith("#")]
         # DEPL-aBenchedProbe-3 S4: the leg stays subject `repo` in chunk `selftests`, which is 7j4's
-        # red class, so `--write` writes the pin AND exits 1 on 7j4 (the write sits in 7h, before it).
+        # red class, so `--write` writes the pin AND exits 1 on 7j4 (the write sits in 7h2, before it).
         check("AC5: and moving the pin in the same commit records the chunk, while 7j4 reds the "
               "repo-subject held leg",
               _wc.returncode == 1 and _rowsc == ["demo\trepo\tselftests"]
@@ -9714,26 +9605,10 @@ user_skills = "/tmp/gk-fake-skills"
 
         _write_legs("repo")
         run_in_gov(rg, "selfcheck", "--write")
-        _write_desc("")                       # the descriptor declares no subject at all
-        _r = run_in(rg)
-        check("L1: a descriptor gate leg with NO subject REDS",
-              _r.returncode == 1 and "with no `subject`" in _r.stdout, _r.stdout + _r.stderr)
-        check("L1: and the refusal points at where the criterion is stated",
-              "ask what a FAILURE of this leg MEANS" in _r.stdout, _r.stdout)
-
-        _write_desc('subject = "Kit"\n')      # right word, wrong case: outside the closed set
-        _r = run_in(rg)
-        check("L1: a descriptor subject outside the closed set kit|repo REDS",
-              _r.returncode == 1 and "outside the closed set kit|repo" in _r.stdout,
-              _r.stdout + _r.stderr)
-
-        _write_desc('subject = "kit"\n')      # descriptor kit against a manifest that says repo
-        _r = run_in(rg)
-        check("L1: a descriptor and manifest that DISAGREE about subject RED",
-              _r.returncode == 1 and "disagree about whether this leg runs by default" in _r.stdout,
-              _r.stdout + _r.stderr)
-
-        # ...back to agreement, then the PIN's own two refusals.
+        # L1's subject plants (none, `Kit`, and a descriptor disagreeing with its manifest) moved with
+        # their arms to `<prefix>/run-gates/leg_factory.py --selftest`, as its `subject` and `fresh`
+        # arms (TOOL-dWitnessedBar-11 §4 "The plants").
+        # The fixture as written, then the PIN's own two refusals.
         _write_desc('subject = "repo"\n')
         run_in_gov(rg, "selfcheck", "--write")
         check("L1 control: the fixture is GREEN again before the pin arms below",

@@ -41,6 +41,12 @@ purpose = "tests the wiring checker's wired and unwired detection"
 argv = ["bash", "{prefix}/check-wiring.test.sh"]
 guard = ["{prefix}/check-wiring.sh", "{prefix}/check-wiring.test.sh"]
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+guard = [".claude/", "{prefix}/", "{prefix}/lib/"]
+chunk = "selftests"
+ceiling = 2320
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a

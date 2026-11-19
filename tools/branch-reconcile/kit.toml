@@ -63,6 +63,12 @@ purpose = "checks the rendered cleanup Skill has not gone stale"
 argv = ["bash", "{kit}/adopt-branch-reconcile.sh", "--check"]
 guard = []
 stage = ["step.test"]
+enforces = ["practice.derive"]
+
+[gate_leg.gov]
+guard = []
+chunk = "wiring"
+ceiling = 300
 
 # ONE [[lf_pin]], for the rendered Skill, which its own leg byte-compares.
 [[lf_pin]]

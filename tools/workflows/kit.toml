@@ -134,6 +134,12 @@ purpose = "holds workflow harnesses to the verify-stage total"
 argv = ["bash", "{kit}/check-verifier-fanout.sh"]
 guard = ["{kit}/"]
 stage = ["step.test"]
+enforces = ["practice.bound"]
+
+[gate_leg.gov]
+guard = []
+chunk = "declarations"
+ceiling = 300
 
 [[gate_leg]]
 tag = "leg.review-harness.review-protocol-parity-kit-vs-dogfood"
@@ -149,6 +155,12 @@ argv = ["bash", "{kit}/check-protocol-parity.test.sh"]
 guard = []
 doc_reads = ["{memory_root}/guides/"]
 stage = ["step.test"]
+enforces = ["practice.one-fact"]
+
+[gate_leg.gov]
+guard = []
+chunk = "declarations"
+ceiling = 300
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
@@ -167,6 +179,11 @@ argv = ["bash", "{kit}/check-review-join.sh"]
 guard = []
 stage = ["step.test"]
 
+[gate_leg.gov]
+guard = []
+chunk = "declarations"
+ceiling = 300
+
 [[gate_leg]]
 tag = "leg.review-harness.workflow-script-syntax"
 tests = ["feature.review-harnesses"]
@@ -176,6 +193,11 @@ purpose = "parses every workflow script in its runtime's dialect"
 argv = ["node", "{kit}/check-workflow-syntax.js"]
 guard = []
 stage = ["step.test"]
+
+[gate_leg.gov]
+guard = []
+chunk = "wiring"
+ceiling = 300
 
 # THE REPLAY TOOL'S SELF-TEST. TOOL-aSightedSkeptic-9 S8, mirroring `shell-hygiene selftest` in the
 # gate-lint kit. Unlike this kit's `*.test.sh` suites it SHIPS: the tool is an engine file under
@@ -192,6 +214,11 @@ purpose = "self-tests the review replay tool"
 argv = ["python3", "{kit}/review_replay.py", "--selftest"]
 guard = []
 stage = ["step.test"]
+
+[gate_leg.gov]
+guard = []
+chunk = "selftests"
+ceiling = 300
 
 [[lf_pin]]
 pattern = "{kit}/*.js"

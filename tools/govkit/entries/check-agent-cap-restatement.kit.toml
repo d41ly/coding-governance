@@ -50,6 +50,13 @@ purpose = "bans live prose stating a fan-out bound as a bare number"
 argv = ["bash", "{prefix}/check-agent-cap-restatement.sh", "{prefix}/agent-cap-restatement-waivers.txt"]
 guard = []
 stage = ["step.test"]
+enforces = ["practice.one-fact"]
+
+[gate_leg.gov]
+argv = ["bash", "{prefix}/check-agent-cap-restatement.sh"]
+guard = []
+chunk = "product"
+ceiling = 640
 
 [[gate_leg]]
 tag = "leg.check-agent-cap-restatement.agent-cap-restatement-self-test"
@@ -60,3 +67,9 @@ purpose = "self-tests the agent-cap restatement gate"
 argv = ["bash", "{prefix}/check-agent-cap-restatement.test.sh"]
 guard = ["{prefix}/check-agent-cap-restatement.sh"]
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+guard = []
+chunk = "selftests"
+ceiling = 1100

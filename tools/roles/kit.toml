@@ -109,6 +109,10 @@ guard = []
 ceiling = 120
 stage = ["step.test"]
 
+[gate_leg.gov]
+guard = []
+chunk = "declarations"
+
 # THE RENDER'S WIRING LEG SHIPS. One leg grades the agent types, the role index and the Skill
 # together; its subject is the target's own render, which goes stale when an overlay, the conf or the
 # governing doc moves with nobody touching this kit.
@@ -122,6 +126,11 @@ argv = ["bash", "{kit}/adopt-roles.sh", "--check"]
 guard = []
 ceiling = 300
 stage = ["step.test"]
+enforces = ["practice.derive"]
+
+[gate_leg.gov]
+guard = []
+chunk = "wiring"
 
 [[gate_leg]]
 tag = "leg.roles.roles-render-selftest"
@@ -133,6 +142,10 @@ argv = ["python", "{kit}/render_agents.py", "--selftest"]
 guard = []
 ceiling = 300
 stage = ["step.test"]
+
+[gate_leg.gov]
+guard = []
+chunk = "selftests"
 
 # THE OUTPUTS ARE A PROGRAM'S. An agent type is a base role, a house overlay and front matter
 # composed by `render_agents.py`, not one template with tokens, so it is declared here and not as a

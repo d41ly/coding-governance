@@ -103,6 +103,13 @@ guard = []
 history_depth = "full"
 stage = ["step.test"]
 
+[gate_leg.gov]
+reads = { base = "it compares records against its base ref (TOOL-aSparedSpawn-13 S3).", history = "it walks `git log` and `rev-list` from its base to HEAD (TOOL-aSparedSpawn-13 S3)." }
+signature = ["python", "{prefix}/drift-audit/drift_report.py", "--offenders"]
+guard = []
+chunk = "declarations"
+ceiling = 540
+
 [[hole]]
 id = "drift-product-globs"
 kind = "authoring"
@@ -150,6 +157,11 @@ purpose = "checks the drift-audit kit's wiring has not drifted"
 argv = ["bash", "{kit}/adopt-drift-audit.sh", "--check"]
 guard = []
 stage = ["step.test"]
+
+[gate_leg.gov]
+guard = []
+chunk = "wiring"
+ceiling = 300
 
 # Line-ending pins this kit needs in a TARGET. Emitted into the target's own
 # .gitattributes as one govkit-owned block; the renormalize that follows reads git's

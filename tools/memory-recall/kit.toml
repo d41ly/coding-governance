@@ -112,6 +112,12 @@ purpose = "checks the memory-recall Skill has not drifted"
 argv = ["bash", "{kit}/adopt-memory-recall.sh", "--check"]
 guard = []
 stage = ["step.test"]
+enforces = ["practice.derive"]
+
+[gate_leg.gov]
+guard = []
+chunk = "wiring"
+ceiling = 300
 
 # Line-ending pins this kit needs in a TARGET. Emitted into the target's own
 # .gitattributes as one govkit-owned block; the renormalize that follows reads git's
