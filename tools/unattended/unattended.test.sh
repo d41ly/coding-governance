@@ -19649,10 +19649,12 @@ if in_shard 8; then
 # re-acquire chain a take; the restored origin's flush lands each ref in its last act's state, the
 # release on the acquire, and empties the queue (AC2); and tOy's acquire and release flushed over a
 # foreign commit planted on the origin both yield, two `lease-yielded` events, the foreign commit
-# kept and the queue empty (AC4). RED, observed at the close, is a copy whose cached read never reads
+# kept and the queue empty (AC4); under a refused `leases.queued-claim-days` a line after a kept line
+# of its ref stays queued by the chain's rule (S3). RED, observed at the close, is a copy whose cached read never reads
 # the queued commit, so every offline write is built on the cached tip, the ref-and-cached-tip key's
 # base: tOff's release finds no lease, tOn's acquire yields to its release, and neither origin ref
-# ends in its last act's state. The copy takes its library and kit directory from this checkout, so
+# ends in its last act's state; S3's RED is a copy with the keep rule's case renamed away, which keeps
+# the line by the bound alone. Each copy takes its library and kit directory from this checkout, so
 # its fleet tag and policy resolve. Waived by README rule 8 with the rest of this suite. WHAT THIS
 # BLOCK DOES NOT DRIVE: two offline writers racing one ref's hold, and a hold outliving
 # `NODE_LOCK_BOUND`.
@@ -19662,7 +19664,8 @@ ch_src=$(<"$SCRIPT")
 ch_cut='KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"'
 ch_src=${ch_src/"$ch_cut"/"KIT_DIR=\"$HERE\""}
 ch_cut='  if [ "$pol" = cached ] && [ -n "${CL_QUEUED#*'
-printf '%s\n' "${ch_src/"$ch_cut"/'  if false && [ -n "${CL_QUEUED#*'}" >"$ch_copy/tip.sh"
+ch_new='  if false && [ -n "${CL_QUEUED#*'
+printf '%s\n' "${ch_src/"$ch_cut"/"$ch_new"}" >"$ch_copy/tip.sh"
 same "DPR41 the scratch copy carries its two staged lines" \
   "$(grep -c "^KIT_DIR=\"$HERE\"\$" "$ch_copy/tip.sh") $(grep -c '^  if false && \[ -n "${CL_QUEUED#\*' "$ch_copy/tip.sh")" "1 1"
 for ch_v in green red; do
@@ -19702,6 +19705,26 @@ for ch_v in green red; do
     same "DPR41 AC2 RED: the cached-tip copy leaves tOff live and tOn released, the queue empty" "$ch_ac2" "0 live no-parent released 1 0"
   fi
 done
+# ---- S3's keep: under a refused `leases.queued-claim-days` the first tOk line is kept, and the second
+# ---- stays queued by the chain's rule, named as such; RED is a copy with that rule's case renamed away.
+ch_cut='      kept) kept=1; echo'
+ch_new='      kept-cut) kept=1; echo'
+printf '%s\n' "${ch_src/"$ch_cut"/"$ch_new"}" >"$ch_copy/keep.sh"
+for ch_v in green red; do
+  ch_drv=$SCRIPT; [ "$ch_v" = green ] || ch_drv="$ch_copy/keep.sh"
+  write_lease_fixture
+  mv "$LF/origin.git" "$LF/away.git"
+  SCRIPT=$ch_drv run_lease_arm acquire build tOk >/dev/null
+  SCRIPT=$ch_drv run_lease_arm release build tOk --as withdrawn >/dev/null
+  mv "$LF/away.git" "$LF/origin.git"
+  write_lease_policy '[leases]
+queued-claim-days = -1'
+  ch_fl=$(SCRIPT=$ch_drv run_lease_arm flush); ch_frc=$?
+  ch_k="$ch_frc $(grep -c '' "$ch_d/gov-queue.log") $(printf '%s\n' "$ch_fl" | grep -c '^lease not written — tOk/build stays queued: an earlier queued write of it stays queued$')"
+  case "$ch_v" in green) ch_kg=$ch_k ;; *) ch_kr=$ch_k ;; esac
+done
+same "DPR41 S3 a line after a kept line of its ref stays queued, by the chain's rule: exit 2, two lines" "$ch_kg" "2 2 1"
+same "DPR41 S3 RED: the copy without the rule keeps both lines by the bound alone" "$ch_kr" "2 2 0"
 rm -rf "$LF" "$ch_copy"
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
@@ -21981,10 +22004,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3709 -> 3724 by TOOL-dPlacedRequest-39: the contained append block's 15 region-eight
 # assertions (7 `same`, 1 `hit`, 7 `mutate`), off the diff's own lines; it has no skip branch, it
 # cuts the driver's own block. No suite ran, and its RED-first observation is the close's.
-# RAISED 3724 -> 3735 by TOOL-dPlacedRequest-41: the offline chain block's 11 region-eight
-# assertions (7 `same`, 4 `hit`), off the diff's own lines; it has no skip branch. No suite ran, and
+# RAISED 3724 -> 3737 by TOOL-dPlacedRequest-41: the offline chain block's 13 region-eight
+# assertions (9 `same`, 4 `hit`), off the diff's own lines; it has no skip branch. No suite ran, and
 # its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3735
+FLOOR_ASSERTIONS=3737
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -22239,8 +22262,8 @@ FLOOR_SHARD_7=311
 # RAISED 926 -> 933 by TOOL-dPlacedRequest-36: the same 7 region-eight carrier event assertions, see FLOOR_ASSERTIONS.
 # RAISED 933 -> 940 by TOOL-dPlacedRequest-37: the same 7 region-eight node lock deadline assertions, see FLOOR_ASSERTIONS.
 # RAISED 940 -> 955 by TOOL-dPlacedRequest-39: the same 15 region-eight contained append assertions, see FLOOR_ASSERTIONS.
-# RAISED 955 -> 966 by TOOL-dPlacedRequest-41: the same 11 region-eight offline chain assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=966
+# RAISED 955 -> 968 by TOOL-dPlacedRequest-41: the same 13 region-eight offline chain assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=968
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

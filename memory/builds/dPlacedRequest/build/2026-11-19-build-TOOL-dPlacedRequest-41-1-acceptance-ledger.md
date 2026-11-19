@@ -56,12 +56,27 @@ answered stamped `gov-last-fetch`.
   lines read once in the copy. (DERIVED)
 - `bash -n` read both changed shell files clean. Three functions were minted, each named through the
   naming lexicon first: `read_gov_queue_head`, `write_gov_queue_hold` and `remove_gov_queue_hold`.
+- The bug-class checklist over the pass commit selected 53 classes. One needed a change: (DERIVED)
+  `refusal-branch-with-no-arm`, since S3's keep, the line after a kept line of its ref, had no arm.
+  The block now drives it: tOk's offline acquire and release queued, then a first policy revision
+  whose `leases.queued-claim-days` is out of range, so the flush keeps the first line by the bound.
+  A probe mirroring the arm read `2 2 1` for the shipped driver, exit 2, both lines kept and one (DERIVED)
+  line naming the chain's keep; and `2 2 0` for a copy with the rule's case renamed away, which (DERIVED)
+  keeps the second line by the bound alone. The rest needed none: the offline branch's busy refusal
+  is TOOL-dPlacedRequest-24's AC3 arm, and the chain's yield line is hit by AC4's arm; every count is
+  `grep -c` over a file or over `grep -c .`; every staged copy is checked to carry its staged line;
+  the doc sentence changed has no reader by its old spelling.
+- The codebase map's `gen_map.py --write` refused the pass commit's arm: its shell parser read a
+  single-quoted replacement inside a `${…/…/…}` expansion as an unterminated `${`. Each staged
+  copy now takes its replacement from a variable, as TOOL-dPlacedRequest-17's copies do; a probe of
+  the two substitutions read each copy carrying its staged line once and `bash -n` clean, and the
+  map re-rendered with `symbols.json` changed for the three new functions.
 
 ## Owed at the close
 
 - The spec's `New arm:` line: `tools/unattended/unattended.test.sh`, the region-8 (PINNED)
-  TOOL-dPlacedRequest-41 block in a compound block of its own, 11 executed assertions (7 `same`, 4 (DERIVED)
-  `hit`), no skip branch; `FLOOR_ASSERTIONS` 3724 to 3735 and `FLOOR_SHARD_8` 955 to 966. Its (DERIVED)
+  TOOL-dPlacedRequest-41 block in a compound block of its own, 13 executed assertions (9 `same`, 4 (DERIVED)
+  `hit`), no skip branch; `FLOOR_ASSERTIONS` 3724 to 3737 and `FLOOR_SHARD_8` 955 to 968. Its (DERIVED)
   RED-first observation inside the suite is the close's; waived for this build's landing by README
   rule 8. (PINNED)
 - TOOL-dPlacedRequest-24's region-8 AC1 and AC3 arms over the changed append, and TOOL-dPlacedRequest-1 (PINNED)

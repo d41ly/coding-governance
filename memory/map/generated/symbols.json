@@ -20533,6 +20533,11 @@
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
     },
     {
+      "id": "read_gov_queue_head",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_gov_text",
       "kind": "function",
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
@@ -24071,6 +24076,11 @@
       "id": "remove_gate_runner",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "remove_gov_queue_hold",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "remove_gov_ref",
@@ -36814,6 +36824,11 @@
     },
     {
       "id": "write_gov_queue",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_gov_queue_hold",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
     },
