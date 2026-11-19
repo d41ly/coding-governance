@@ -29,7 +29,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dSafePassage](builds/dSafePassage/README.md) | DEFERRED | d | 2026-10-21 | tooling | 104 | 2026-11-02 | active | 0 |
 | [dScopedBuild](builds/dScopedBuild/README.md) | DEFERRED | d | 2026-10-21 | tooling | 43 | 2026-11-03 | active | 0 |
 | [dShippedRelease](builds/dShippedRelease/README.md) | DEFERRED | d | 2026-10-21 | deployer | 145 | 2026-11-12 | active | 0 |
-| [dSkippedRecord](builds/dSkippedRecord/README.md) | OPEN | d | 2026-11-20 | tooling | 1 | 2026-11-20 | active | 0 |
+| [dSkippedRecord](builds/dSkippedRecord/README.md) | SPECCED | d | 2026-11-20 | tooling | 1 | 2026-11-20 | active | 0 |
 | [dTendedCadence](builds/dTendedCadence/README.md) | DEFERRED | d | 2026-10-21 | tooling | 74 | 2026-11-03 | active | 0 |
 | [dTotalRecall](builds/dTotalRecall/README.md) | DEFERRED | d | 2026-10-21 | tooling | 108 | 2026-11-05 | active | 0 |
 | [dWellOiledMachine](builds/dWellOiledMachine/README.md) | DEFERRED | d | 2026-10-21 | tooling | 131 | 2026-11-03 | active | 0 |
