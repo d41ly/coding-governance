@@ -15,7 +15,7 @@ close (dropping `--others` from `read_root_confs`), and so does every leg that s
   `armed conf-scalar-pins 1`, `git status` reading the conf `??`; P was `{conf-scalar-pins}`. The helper
   saved the home, `git add -A && git commit` ran, the helper removed the home, `legacy_ledger.py seed
   --population conf-scalar-pins` printed `armed conf-scalar-pins 1`, and the compare printed `compared
-  conf-scalar-pins 1 rows`, exit 0. With the saved count tampered it printed `unequal conf-scalar-pins`, exit 1.
+  conf-scalar-pins 1 rows`, exit 0. With the saved count tampered it printed `unequal conf-scalar-pins`, exit 1. (DERIVED from the builder's fixture)
   Red with the defect: with `--others` dropped from the fixture's kit copy of `ratchet.py`, the scaffold
   printed `armed conf-scalar-pins 0` and the compare printed `unequal conf-scalar-pins: saved [], re-seeded
   [(('.memory-tree.conf', 'FOO_PIN'), 1)]`, exit 1. An empty P compares nothing and exits 0, so the arm's
