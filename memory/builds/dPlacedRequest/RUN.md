@@ -87,3 +87,6 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-19T11:49:25Z draw · re-dispatch · TOOL-dPlacedRequest-16 · 6/130 · 20261119T114925Z-f7c57c
 
 2026-11-19T11:49:25Z dispatch · item 5f71c060 TOOL-dPlacedRequest-16 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md help/loop.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-16-1-acceptance-ledger.md memory/guides/UNATTENDED-STOPS.md tools/unattended/STOPS.template.md tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated tools/govkit/subject-pins.tsv
+2026-11-19T11:56:24Z draw · fix-pass · TOOL-dPlacedRequest-16 · 7/130 · 20261119T115624Z-480c57
+
+2026-11-19T11:56:24Z dispatch · item b7e369ee TOOL-dPlacedRequest-16 · reason tools/unattended/unattended.test.sh memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-16-1-acceptance-ledger.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-16.md

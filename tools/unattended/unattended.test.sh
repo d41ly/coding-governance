@@ -19619,6 +19619,34 @@ dt_tip=$(git --git-dir="$LF/origin.git" rev-parse refs/gov/leases/tWr/build)
 dt_out=$(run_draw_arm off)
 same "DPR16 AC14 with RUN_CLAIMS off it draws and no lease moves" \
   "${dt_out%% *} $(grep -c . "$LF/draws") $(git --git-dir="$LF/origin.git" rev-parse refs/gov/leases/tWr/build)" "0 2 $dt_tip"
+# ---- THE NEW REFUSAL AND DECLINE BRANCHES (refusal-branch-with-no-arm): a renew or release of a
+# ---- `released` lease holds nothing to act on; the prune refuses a unit lease, a run lease missing its
+# ---- period, an unanswered remote and RUN_CLAIMS off, each exit 2 but the unit's 1.
+seed_lease_at tRr/build tRr build a s1 released "$(derive_claim_now)" 2 >/dev/null
+for dt_a in renew release; do
+  dt_out=$(run_lease_arm $dt_a build tRr); dt_rc=$?
+  same "DPR16 a $dt_a of a released lease exits 2" "$dt_rc" "2"; hit "$dt_out" "lease not written — tRr/build holds no lease to $dt_a"
+done
+for dt_row in "prune unit tYr u1|1|prune refused — tombstone · tYr/unit/u1" "prune run maintain|2|lease not written — a run lease takes a third segment"; do
+  dt_a=${dt_row%%|*}; dt_w=${dt_row#*|}
+  dt_out=$(run_lease_arm $dt_a); dt_rc=$?
+  same "DPR16 the refusal of [$dt_a] exits ${dt_w%%|*}" "$dt_rc" "${dt_w%%|*}"; hit "$dt_out" "${dt_w#*|}"
+done
+mv "$LF/origin.git" "$LF/away.git"; dt_out=$(run_lease_arm prune); dt_rc=$?; mv "$LF/away.git" "$LF/origin.git"
+same "DPR16 a prune whose remote does not answer exits 2" "$dt_rc" "2"; hit "$dt_out" "lease not written — the remote did not answer"
+sed -i 's/^RUN_CLAIMS="on"$/RUN_CLAIMS="off"/' "$LF/c1/.unattended.conf"; dt_out=$(run_lease_arm prune); dt_rc=$?
+git -C "$LF/c1" checkout -q -- .unattended.conf
+same "DPR16 a prune with RUN_CLAIMS off exits 2" "$dt_rc" "2"; hit "$dt_out" "so no lease is read or pruned"
+# ---- A REFUSED BOUND: a write queued under the catalogue defaults, then a first policy revision whose
+# ---- `leases.queued-claim-days` is out of range: the flush keeps the line and the prune writes nothing.
+mv "$LF/origin.git" "$LF/away.git"; run_lease_arm acquire build tPq >/dev/null; mv "$LF/away.git" "$LF/origin.git"
+write_lease_policy '[leases]
+queued-claim-days = -1'
+dt_out=$(run_lease_arm flush); dt_rc=$?
+same "DPR16 a flush under a refused bound exits 2 and keeps its line" "$dt_rc $(grep -c . "$LF/c1/.git/gov-queue.log")" "2 1"
+hit  "$dt_out" "lease not written — tPq/build stays queued: leases.queued-claim-days refused"
+dt_out=$(run_lease_arm prune); dt_rc=$?
+same "DPR16 a prune under a refused bound exits 2" "$dt_rc" "2"; hit "$dt_out" "lease not written — leases.queued-claim-days refused"
 rm -rf "$LF"
 # ---- AC3, the run columns: the run's own build tombstone refuses --preflight by check 107 and the
 # ---- holder's --resume by check 108, each naming the tombstone, the ref unmoved.
@@ -21623,11 +21651,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3571 -> 3578 by TOOL-dPlacedRequest-25: the tenure renewal block's 7 region-eight assertions
 # (7 `same`), every one unconditional, counted off the diff's own lines; no suite ran, and its RED-first
 # observation is the close's.
-# RAISED 3578 -> 3667 by TOOL-dPlacedRequest-16: 89 assertions, every one unconditional, counted off
-# the diff's own lines: in region eight the lease-never-deleted block's 74 (its loops run as written)
+# RAISED 3578 -> 3683 by TOOL-dPlacedRequest-16: 105 assertions, every one unconditional, counted off
+# the diff's own lines: in region eight the lease-never-deleted block's 90 (its loops run as written)
 # and GC_CELLS' 12 new cells, one `same` each; in region six the settle arm's 3 over a tombstone. No
 # suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3667
+FLOOR_ASSERTIONS=3683
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -21877,8 +21905,8 @@ FLOOR_SHARD_7=311
 # RAISED 786 -> 796 by TOOL-dPlacedRequest-23: the same 10 region-eight strict-read assertions, see FLOOR_ASSERTIONS.
 # RAISED 796 -> 805 by TOOL-dPlacedRequest-24: the same 9 region-eight offline queue lock assertions, see FLOOR_ASSERTIONS.
 # RAISED 805 -> 812 by TOOL-dPlacedRequest-25: the same 7 region-eight tenure renewal assertions, see FLOOR_ASSERTIONS.
-# RAISED 812 -> 898 by TOOL-dPlacedRequest-16: the same 86 region-eight lease-never-deleted and cell assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=898
+# RAISED 812 -> 914 by TOOL-dPlacedRequest-16: the same 102 region-eight lease-never-deleted and cell assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=914
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

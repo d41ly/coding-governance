@@ -29,8 +29,10 @@ observation is owed at the close.
 - AC1 — session `s1` released its live `tFix` at epoch 1 and session `s2` on the second clone
   acquired it live at epoch 2, parented on the `released` commit; `s1` released that at epoch 2 and
   acquired it itself live at epoch 3 on the `released` commit, `renews: yes` (DERIVED).
-- AC2 — not observed here: the run-claim arms AC9 and AC20 now type `released` after `--abort` and
-  `--landed`, and the cell `foreign-released/preflight` types the take; owed to the suite at the close.
+- AC2 — `--preflight` — the second half only: sourced over a `released` build lease, the write
+  table's `preflight` column read `foreign-released` and the act `take`, rc 0 (DERIVED). The first half,
+  `--landed` writing `released` over a fixture run, was not run here: the run-claim arms AC9 and AC20
+  now type `released` after `--abort` and `--landed`, owed to the suite at the close.
 - AC3 — over a `landed` build lease at epoch 4, its writer's acquire, another session's acquire and a
   take-over each exited 1 printing `lease refused — tombstone`, the ref unchanged; sourced over the
   same row, `preflight` and `take-over` printed `UNATTENDED check 107 FAILED` carrying `tombstone`,
@@ -42,7 +44,7 @@ observation is owed at the close.
   third session read `foreign-tombstone`; with the next opener's line removed a draw read
   `live-holder`, and planted stale a take-over and an acquire each read `tombstone`, the ref
   unchanged (DERIVED).
-- AC5 — a run lease at epoch 2 deleted after this node sighted it was re-created at epoch 3 parented
+- AC5 — `tombstone` — a run lease at epoch 2 deleted after this node sighted it was re-created at epoch 3 parented
   on the deleted tip; a sighted build tombstone deleted from the origin refused `tombstone`, the ref
   absent (DERIVED).
 - AC6 — a queued acquire planted eight days old was refused `epoch-fence` and removed, and one
@@ -67,7 +69,7 @@ observation is owed at the close.
   exited 2, and another session's acquire read `tombstone` (DERIVED).
 - AC12 — `CLAIM_READS` by `CLAIM_MODES` against the cells `GC_CELLS` types, compared with
   `comm -3`, printed nothing over 60 cells each side (DERIVED).
-- AC13 — the driver's own stamp lines, extracted and run 200 times in the background beside 200 reads
+- AC13 — `gov-last-fetch` — the driver's own stamp lines, extracted and run 200 times in the background beside 200 reads
   by its own queued-record reader lines, read `-` 0 times; the grep the criterion names printed 0, and
   the reader over an absent file read `-` (DERIVED).
 - AC14 — with the budget module stood in by a stub, `run_budget_draw tPatch re-dispatch u1` over a
@@ -79,15 +81,20 @@ observation is owed at the close.
 - AC15 — the card's awk, extracted from `derive_claims_line`, over nine rows printed
   `claims — 9 on the remote · 6 shown · 3 hidden`, `sRel` sorted beside `vLanded`, `rRelOld` hidden
   (DERIVED); with `released` dropped from its set it printed `claims — skipped:` (DERIVED).
-- AC16 — sourced over the run's own tombstone, the status column printed one line carrying
+- AC16 — `tombstone` — sourced over the run's own tombstone, the status column printed one line carrying
   `tombstone` and returned 3, which `write_settle_claim` reads as nothing written; the `--settle` arm
   is owed to the suite at the close.
 - The suite gains the block `TOOL-dPlacedRequest-16 — A LEASE NEVER DELETED` and 12 new `GC_CELLS`
-  rows in region eight and a settle arm in region six, 89 assertions (DERIVED): `FLOOR_ASSERTIONS`
-  3578 to 3667, `FLOOR_SHARD_8` 812 to 898 and `FLOOR_SHARD_6` 127 to 130 (DERIVED). Existing arms
+  rows in region eight and a settle arm in region six, 105 assertions (DERIVED): `FLOOR_ASSERTIONS`
+  3578 to 3683, `FLOOR_SHARD_8` 812 to 914 and `FLOOR_SHARD_6` 127 to 130 (DERIVED). Existing arms
   that typed `landed` or `aborted` after a run's end now type `released`, and the queue-lock arm's
   first line carries a recent `last-fetch`. The card suite gains 2 assertions, its floor 350 to 352
   (DERIVED).
+- The bug-class checklist over the pass commit named `refusal-branch-with-no-arm`: the block now also
+  arms a renew and a release of a `released` lease, the prune's unit, missing-period, offline and
+  `RUN_CLAIMS`-off refusals, and a refused `leases.queued-claim-days` keeping a queued line and
+  refusing the prune, each probed first over the scratch fixture (DERIVED). It named
+  `ledger-token-wrapped-across-a-line-joins-nothing`, and no code span in this ledger wraps.
 - `gen_map.py --write` regenerated `memory/map/generated/symbols.json` for `write_lease_prune`; the
-  `--lease` usage anchor in `help/loop.md` is refreshed to the fingerprint `docs_leg.py
-  --fingerprints` printed.
+  `--lease` usage anchor in `help/loop.md` is refreshed to the fingerprint that
+  `docs_leg.py --fingerprints` printed.
