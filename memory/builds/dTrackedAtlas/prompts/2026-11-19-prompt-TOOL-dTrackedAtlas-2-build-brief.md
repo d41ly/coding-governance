@@ -16,5 +16,5 @@ through `memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-1
 - Run no gate, suite or bar. Fixture clones go under `%TEMP%/<short>` and are removed after.
 - No path under `tools/`; no new file under `memory/builds/dClosedLoop/build/`.
 - Commit once, with a `Pass: TOOL-dTrackedAtlas-2` trailer and `Co-Authored-By: Claude Opus 5.5
-  <noreply@anthropic.com>`. The pre-commit hook takes minutes: bound the commit at `600 s`. Never `--no-verify`,
+  <noreply@anthropic.com>`. The pre-commit hook takes minutes: bound the commit at ten minutes. Never `--no-verify`,
   never `git add -A`. Leave the spec's status flip to the main loop.
