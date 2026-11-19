@@ -20321,10 +20321,13 @@ for fo_case in tombstone released unnamed; do
     released) fo_c=$(seed_lease_at tFix/build tFix build b s-o released "$(derive_claim_now)" 4) ;;
   esac
   ( cd "$LF/c1" && GOV_RUNLOG=0 bash "$SCRIPT" --claims >/dev/null 2>&1 )
+  fo_n=$(git -C "$LF/c1" for-each-ref refs/gov/remote/leases/tFix/build | grep -c .)
   [ -z "$fo_c" ] || git --git-dir="$LF/origin.git" update-ref -d refs/gov/leases/tFix/build
   ( cd "$LF/c1" && GOV_RUNLOG=0 bash "$SCRIPT" --claims >/dev/null 2>&1 )
-  same "DPR42 $fo_case: the pruning fetch leaves no cache ref for the lease" \
-    "$(git -C "$LF/c1" for-each-ref refs/gov/remote/leases/tFix | grep -c .)" "0"
+  # THE CACHE REF IS COUNTED BEFORE AND AFTER, so a selector that matched nothing reads `0 0` where a
+  # planted lease owes `1 0`.
+  same "DPR42 $fo_case: the first fetch caches the lease and the pruning fetch drops it" \
+    "$fo_n $(git -C "$LF/c1" for-each-ref refs/gov/remote/leases/tFix/build | grep -c .)" "$([ -n "$fo_c" ] && echo 1 || echo 0) 0"
   mv "$LF/origin.git" "$LF/away.git"; fo_out=$(run_lease_arm acquire build tFix); fo_rc=$?; mv "$LF/away.git" "$LF/origin.git"
   fo_q=$(cat "$LF/c1/.git/gov-queue.log" 2>/dev/null)
   fo_qc=$(printf '%s' "$fo_q" | awk -F'\t' 'NF { n++; e = $2; c = $3 } END { print n + 0 " " (e == "" ? "none" : e) " " c }')

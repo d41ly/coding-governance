@@ -35,3 +35,11 @@ of its own, RED-first against the offline branch staged to read no feed (the gua
 `read_feed_lease_tip` call given a leading `[ -n "$WL_QUEUE" ] ||`), under which AC1 and AC2 queue the
 parentless epoch-1 create. The suite is waived for this build's landing by README rule 8. The floors rose
 by the same 9 (DERIVED): `FLOOR_ASSERTIONS` and `FLOOR_SHARD_8`.
+
+**The checklist, acted on.** The bug-class checklist over the pass commit selected 39 classes (DERIVED).
+One needed a change. fixture-passes-by-finding-nothing: the block's first assertion read only that no
+cache ref stood after the pruning fetch, which a selector matching nothing passes too, so it now counts
+`refs/gov/remote/leases/tFix/build` before the deletion and after the pruning fetch, `1 0` (PINNED) for a
+planted lease and `0 0` (PINNED) for the unnamed ref; a probe observed both pairs. The pass adds no refusal
+branch, so refusal-branch-with-no-arm names none; the floor figure counts the executed `same` and `hit`
+calls, as the grader counts them; and the two section-7 copies are byte-identical.
