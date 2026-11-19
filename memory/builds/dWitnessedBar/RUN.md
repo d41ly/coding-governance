@@ -234,3 +234,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-19T18:22:27Z brief · item TOOL-dWitnessedBar-46 · reason ac26454a3164 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-46-build-brief.md
 
 2026-11-19T18:24:16Z dispatch · item 35592d78 TOOL-dWitnessedBar-46 · reason tools/gate-legs.json tools/govkit/registry.toml tools/memory-tree/README.md tools/memory-tree/adopt-memory-tree.sh tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/kit.toml tools/memory-tree/ratchet.py memory/map/generated/symbols.json .lexicon.conf memory/guides/SESSION-KICKOFF.md memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-46-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-46.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+
+2026-11-19T18:39:55Z brief · item TOOL-dWitnessedBar-17 · reason d65e70de8627 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-build-brief.md
