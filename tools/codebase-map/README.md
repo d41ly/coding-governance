@@ -39,7 +39,8 @@ project specifics live in exactly two files the adopting repo owns.
   every time. This reports the SET difference, not a byte diff, because a project is entitled to
   customise its gate — and it states that it cannot tell a deliberate omission from a stale one.
 - `gen_map.py` — CLI: `--scaffold · --write · --check · --seed-baseline · --seed-affordance-baseline
-  · --seed-affordances --top N`.
+  [--out <path>] · --seed-affordances --top N`. `--out` writes the grace list to the path the
+  ledger factory's `seed --home` hands it, in place of the map root's.
 
   It writes `generated/inventories.json`, `generated/MAP.md`, `generated/CARDS.md` and, where the
   SYMBOL tier is declared, `generated/symbols.json`. `CARDS.md` holds one card of at most
@@ -125,4 +126,8 @@ design pass — substantial work touching an undossiered feature creates its dos
 The affordance check is graced by a shrink-only `affordance-exempt.toml` (feature names),
 seeded from existing dossiers at adoption (`gen_map.py --seed-affordance-baseline`, wired into
 the adopter) so it never retro-reds the fleet; a NEW dossier is never exempt, so new work is
-always forced to record its reuse decision.
+always forced to record its reuse decision. The adopter seeds it through the memory-tree kit's
+`legacy_ledger.py seed --home <list> -- <gen_map.py --seed-affordance-baseline --out {out}>`
+(TOOL-dWitnessedBar-15), which writes it only while it is absent or unarmed, atomically, and prints
+`present` on every later adopt, so a re-adopt never graces a dossier added since. A seed that fails
+leaves one `# unarmed · <reason> · <sha>` line there, and the next adopt seeds it again.

@@ -389,13 +389,24 @@ if [ "$MODE" = "--check" ]; then
 fi
 
 # Seed the project layer ONCE. Never overwrite: PINS are measured project state, and re-seeding a
-# repo that already tuned them would silently reset every ratchet to the template's zeros.
-if [ -f "$KIT_DIR/drift_signals.py" ]; then
-  echo "drift-audit: drift_signals.py already present — left untouched"
-else
-  cp "$KIT_DIR/drift_signals.template.py" "$KIT_DIR/drift_signals.py"
-  echo "drift-audit: seeded drift_signals.py from the template — FILL IT before trusting the report"
-fi
+# repo that already tuned them would silently reset every ratchet to the template's zeros. The
+# absent-only test is the ledger factory's unregistered form (TOOL-dWitnessedBar-15 S5), run from the
+# memory-tree kit's copy, found through drift_report's resolve_kit_dir: it copies the template only
+# over an absent or unarmed home, atomically, and prints `present` otherwise.
+LL_DIR=$("$DA_PY" -c 'import sys
+sys.path.insert(0, sys.argv[1])
+from drift_report import resolve_kit_dir
+try:
+    print(resolve_kit_dir("memory-tree", "legacy_ledger.py", sys.argv[1]).as_posix())
+except LookupError as exc:
+    sys.exit(str(exc))' "$KIT_DIR" 2>&1) || { echo "drift-audit: the memory-tree kit's legacy_ledger.py was not found: $LL_DIR"; exit 2; }
+LL_OUT=$("$DA_PY" "$LL_DIR/legacy_ledger.py" seed --home "$KIT_REL/drift_signals.py" \
+  --copy "$KIT_REL/drift_signals.template.py" 2>&1); LL_RC=$?
+printf '%s\n' "$LL_OUT" | sed 's/^/drift-audit: /'
+[ "$LL_RC" = 0 ] || exit 1
+case "$LL_OUT" in
+  armed*) echo "drift-audit: seeded drift_signals.py from the template — FILL IT before trusting the report" ;;
+esac
 
 mkdir -p "$SKILL_DIR"
 render > "$SKILL_OUT"

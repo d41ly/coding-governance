@@ -26,6 +26,9 @@ consumers today, each family documented on its own page:
   ([the red-fix lane](red-fix-lane.md));
 - `memory.staged-render`, which the build-index generator's `--write-staged` reads
   ([the commit render](commit-render.md));
+- `retrofit.unseeded`, which the baseline ledger factory's `legacy_ledger.py seed` reads: under
+  `unarmed`, the default, a population registered with no seed command is reported unarmed, and under
+  `refuse` the seed run exits 2 naming each one;
 - `policy-file.on-invalid`, which the reader itself reads ([below](#how-to-use-it)).
 
 Every other key has no consumer yet: the build its catalogue row names as `owner` adds one, so a

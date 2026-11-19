@@ -424,5 +424,42 @@ else
   fi
 fi
 
+# ---------------------------------------------------------------------------------------------
+# arm 7 (TOOL-dWitnessedBar-15 AC7) — a re-adopt never re-seeds the affordance grace list. The
+# adopter seeds it through the memory-tree kit's `legacy_ledger.py seed --home`, so the fixture
+# carries that kit beside this one, as an install does (`requires = ["memory-tree"]`). Once the list
+# exists, a dossier lacking the section is planted and committed, and the next adopt must leave the
+# list byte-identical: a re-seed would grace the planted offender. The list may be written by the
+# scaffolding run or, while the seed's home test wants a tracked file in the map directory, by the run
+# after the scaffold is committed; the arm asserts the file, not which run wrote it.
+# ---------------------------------------------------------------------------------------------
+KD=$(mkrepo "$TMP/a7" "${FPFX%/}")
+MT=$("$PY" -c 'import sys
+sys.path.insert(0, sys.argv[1])
+import map_lib
+print(map_lib.MEMORY_TREE_DIR.as_posix())' "$KIT" 2>&1 | tr -d '\r')
+cp -r "$MT" "$(dirname "$KD")/memory-tree" 2>/dev/null
+aff="$TMP/a7/memory/map/affordance-exempt.toml"
+(cd "$TMP/a7" && bash "$KD/adopt-codebase-map.sh" --scaffold >/dev/null 2>&1) || true   # creates the conf, exits 1 by design
+(cd "$TMP/a7" && bash "$KD/adopt-codebase-map.sh" --scaffold >/dev/null 2>&1) || true   # scaffolds the map tree
+git -C "$TMP/a7" add -A && git -C "$TMP/a7" commit -qm scaffold --no-verify
+out=$(cd "$TMP/a7" && bash "$KD/adopt-codebase-map.sh" --scaffold 2>&1)
+if [ ! -d "$(dirname "$KD")/memory-tree" ]; then bad "7 re-adopt: the memory-tree kit was not found beside the kit under test: $MT"
+elif [ ! -f "$aff" ]; then bad "7 re-adopt: no affordance-exempt.toml after the scaffold was committed"; printf '%s\n' "$out" | sed 's/^/      /'
+else
+  cp "$aff" "$TMP/a7-aff.before"
+  printf '# planted\n\n```toml\nfeature = "planted"\ntitle = "planted"\nstatus = "shipped"\nstreams = []\ndecisions = []\npaths = { globs = ["src/*.py"] }\n\n[claims]\nmods = []\n```\n' \
+    > "$TMP/a7/memory/map/features/planted.md"
+  git -C "$TMP/a7" add -A && git -C "$TMP/a7" commit -qm planted --no-verify
+  out=$(cd "$TMP/a7" && bash "$KD/adopt-codebase-map.sh" --scaffold 2>&1)
+  if ! printf '%s' "$out" | grep -q "^present memory/map/affordance-exempt.toml"; then
+    bad "7 re-adopt: the seed did not report the grace list present"; printf '%s\n' "$out" | sed 's/^/      /'
+  elif ! cmp -s "$TMP/a7-aff.before" "$aff" || grep -q planted "$aff"; then
+    bad "7 re-adopt: the second adopt re-seeded affordance-exempt.toml over a planted violation"
+  else
+    good "7 re-adopt leaves the affordance grace list byte-identical with a planted violation present"
+  fi
+fi
+
 [ "$fails" = 0 ] || { printf '%s arm(s) FAILED\n' "$fails"; exit 1; }
 echo "PASS"

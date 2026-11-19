@@ -80,6 +80,11 @@ Requires `.memory-tree.conf` (owned by the memory-tree kit). This kit reads `MEM
 **declares no conf of its own** — there is deliberately no `--memory-root` flag. A second way to state
 the same value is the hand-kept-second-copy defect the kit exists to detect.
 
+The adopter seeds `drift_signals.py` from its template through the memory-tree kit's
+`legacy_ledger.py seed --home <prefix>/drift-audit/drift_signals.py --copy <template>`
+(TOOL-dWitnessedBar-15): the copy is made only while the file is absent, atomically, and every later
+adopt prints `present` and leaves your tuned pins alone.
+
 Then, in order:
 
 1. Fill `<prefix>/drift-audit/drift_signals.py` — `PRODUCT_GLOBS` at minimum.

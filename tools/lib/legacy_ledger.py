@@ -5,10 +5,11 @@ The canonical `legacy_ledger_py` block. `<prefix>/lib/` is gov-internal and ship
 below travels INLINE, byte-identical, in the memory-tree kit's `legacy_ledger.py`, which the row-keyed
 merge driver reads a ledger's header and key through, and the gate-lint kit's `legacy_ledger.py`, which
 its count-ratchet adapters read through; `<prefix>/lib/resolve-python.test.sh`'s parity table reds a
-copy that drifts. The block calls `compute_coverage` (the `coverage_join` block) and
-`resolve_compare_base` (the `compare_base_py` block). They are imported OUTSIDE the block, so it stays
-byte-identical: this file imports them from `coverage_join.py` and `compare_base.py` beside it, and
-each kit copy imports both names from its own kit's `coverage_join.py`.
+copy that drifts. The block calls `compute_coverage` (the `coverage_join` block),
+`resolve_compare_base` (the `compare_base_py` block) and `resolve_kit_dir`, through which its `seed` verb
+finds the policy kit. They are imported OUTSIDE the block, so it stays byte-identical: this file imports
+them from `coverage_join.py`, `compare_base.py` and `resolve_kit_dir.py` beside it, and each kit copy
+imports the first two from its own kit's `coverage_join.py` and the third from its own kit.
 
 A population registers as a `[[ledger]]` table in its owning kit's `kit.toml`, or in the govkit
 registry when no kit owns it, and its ledger file opens with a header rendered from that table:
@@ -21,9 +22,14 @@ The CLI runs in the repository its working directory sits in:
     python <prefix>/lib/legacy_ledger.py read <population>
     python <prefix>/lib/legacy_ledger.py compare <population> [--measured <path>]
     python <prefix>/lib/legacy_ledger.py carry <population>
+    python <prefix>/lib/legacy_ledger.py seed (--all | --population <name>) [--widen <record>] [--sha <sha>]
+    python <prefix>/lib/legacy_ledger.py seed --home <path> [--sha <sha>] (--copy <template> | -- <argv>...)
 
 It prints one row or finding per line and exits 0 on no finding, 1 on any finding, 2 on a refusal.
-WHAT IT DOES NOT CHECK: whether a `--measured` file came from the registration's own `seed`.
+`seed` (TOOL-dWitnessedBar-15) prints `armed`, `present`, `widened` or `unarmed` per population and
+exits 1 when a seed left one unarmed by a failure; the memory-tree kit's copy carries it too, so an
+adopter seeds through that copy. WHAT IT DOES NOT CHECK: whether a `--measured` file came from the
+registration's own `seed`.
 """
 from __future__ import annotations
 
@@ -38,6 +44,7 @@ from dataclasses import dataclass
 
 from coverage_join import compute_coverage  # noqa: F401  (the block below calls it)
 from compare_base import resolve_compare_base  # noqa: F401  (the block below calls it)
+from resolve_kit_dir import resolve_kit_dir  # noqa: F401  (the block below calls it)
 
 
 # >>> legacy_ledger_py -- canonical copy: legacy_ledger.py in the gov lib dir (byte-identical; gated)
@@ -275,14 +282,20 @@ def write_rows(root, reg, rows):
     refusal = check_home(reg.home)
     if refusal:
         raise ValueError("%s: [[ledger]] %r: %s" % (reg.source, reg.population, refusal))
-    target = pathlib.Path(root, reg.home)
     lines = [render_header(reg)]
     for key, (count, values, *_rest) in rows.items():
         lines.append("\t".join([*key, str(count), *values]))
+    _write_atomic(pathlib.Path(root, reg.home), "\n".join(lines) + "\n")
+
+
+def _write_atomic(target, data):
+    """Write `data`, text or bytes, to `target` through a sibling temp file and `os.replace`, every byte
+    as given: a run that dies leaves the old file or the new one, never half of either."""
+    target = pathlib.Path(target)
     fd, tmp = tempfile.mkstemp(dir=str(target.parent), prefix="." + target.name + ".", suffix=".tmp")
     try:
-        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as fh:
-            fh.write("\n".join(lines) + "\n")
+        with os.fdopen(fd, "wb") as fh:
+            fh.write(data.encode("utf-8") if isinstance(data, str) else data)
         os.replace(tmp, str(target))
     except BaseException:
         if os.path.exists(tmp):
@@ -407,6 +420,249 @@ def compare_to_base(root, reg):
             if key in base and count > base[key][0]:
                 findings.append(("above ceiling", key))
     return findings, why
+
+
+# The seed (TOOL-dWitnessedBar-15). A population is seeded once, at a recorded sha, and never again over
+# an armed home, so a re-seed cannot launder an offence into the baseline; a seed that failed is
+# recorded unarmed in its home, never green, and a rerun seeds an unarmed home as an absent one.
+SEED_TIMEOUT = 600  # PINNED 2026-11-19: the `ceiling` of five rows of gate-legs.json, the nearest measure
+UNARMED_LEAD = "# unarmed · "  # the home's state line: `# unarmed · <reason> · <sha>`
+DEAD_PROBE_LEAD = "dead probe:"  # a seed line saying its probe measured nothing
+UNSEEDED_DEFAULT = "unarmed"  # retrofit.unseeded's catalogue default, which holds where no policy kit resolves
+
+
+def read_home_state(path):
+    """-> "absent", "unarmed" or "armed" for the population file at `path`: unarmed when one of its first
+    two lines, the header's and the next, opens `UNARMED_LEAD`. A home that cannot be read raises."""
+    try:
+        head = pathlib.Path(path).read_bytes().decode("utf-8").split("\n")[:2]
+    except FileNotFoundError:
+        return "absent"
+    return "unarmed" if any(line.startswith(UNARMED_LEAD) for line in head) else "armed"
+
+
+def check_home_admitted(root, home):
+    """The refusal for a home whose parent directory holds no tracked file, or "" for one whose does: the
+    hygiene check's structure check has admitted a directory that holds one (§8 F3). WHAT IT DOES NOT
+    CHECK: a file name the structure check refuses inside an admitted directory."""
+    parent = pathlib.PurePosixPath(home.replace("\\", "/")).parent.as_posix()
+    rc, out = _run_git(root, "ls-files", "-z", "--", parent)
+    lead = "" if parent == "." else parent + "/"
+    if rc == 0 and any(p.startswith(lead) and "/" not in p[len(lead):] for p in out.split("\0") if p):
+        return ""
+    return "home directory %s holds no tracked file, so the hygiene check has not admitted it" % parent
+
+
+def run_seed_argv(argv, root):
+    """-> (stdout, reason) of one seed run at `root` under `SEED_TIMEOUT`: `reason` is "" for a live
+    result, else `exit <n>`, `timed out` or `dead probe`, a line of its stdout opening `DEAD_PROBE_LEAD`."""
+    env = {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}
+    try:
+        p = subprocess.run(list(argv), cwd=str(root), capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", stdin=subprocess.DEVNULL, env=env, timeout=SEED_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        return "", "timed out"
+    except OSError:
+        return "", "exit 127"
+    if p.returncode != 0:
+        return p.stdout, "exit %d" % p.returncode
+    if any(line.startswith(DEAD_PROBE_LEAD) for line in p.stdout.splitlines()):
+        return p.stdout, "dead probe"
+    return p.stdout, ""
+
+
+def seed_population(root, reg, sha, widen=None):
+    """-> (the one line `seed` prints for `reg`, False when the seed left it unarmed by a failure).
+
+    Absent or unarmed: run the seed and write the header and its rows, each `<sha>` and `seeded`.
+    Present and armed: nothing, or under `widen` append only the keys the file lacks, each `<sha>` and
+    `widened:<widen>`, never rewriting a row. A seed that exits non-zero, times out, finds a dead probe
+    or prints a row `read_rows` refuses leaves the home holding the header and one unarmed line, an
+    armed home untouched; a home `check_home_admitted` refuses is never written. `seed = []` is
+    reported and nothing is written: the caller asks `retrofit.unseeded` first.
+    """
+    name = reg.population
+    if not reg.seed:
+        return "unarmed %s no seed" % name, True
+    home = pathlib.Path(root, reg.home)
+    state = read_home_state(home)
+    if state == "armed" and widen is None:
+        return "present %s" % name, True
+    if state != "armed":
+        refusal = check_home_admitted(root, reg.home)
+        if refusal:
+            print("legacy_ledger: %s: %s; nothing written" % (reg.home, refusal), file=sys.stderr)
+            return "unarmed %s %s" % (name, refusal), False
+    out, reason = run_seed_argv(reg.seed, root)
+    rows = {}
+    if not reason:
+        at = tuple(i for i, f in enumerate(reg.fields) if f in reg.verbatim)
+        rows, bad = _parse_rows(out.split("\n"), len(reg.fields), (), at)
+        if bad:
+            reason = "seed printed %s" % render_malformed(bad[0]).replace("\t", " ")
+    if reason and state == "armed":
+        return "unarmed %s %s; the armed home is unchanged" % (name, reason), False
+    if reason:
+        _write_atomic(home, "%s\n%s%s · %s\n" % (render_header(reg), UNARMED_LEAD, reason, sha))
+        return "unarmed %s %s" % (name, reason), False
+    if state != "armed":
+        write_rows(root, reg, {k: (r[0], (sha, "seeded")) for k, r in rows.items()})
+        return "armed %s %d" % (name, len(rows)), True
+    declared, bad = read_ledger(root, reg)
+    if bad:
+        raise ValueError("%s: %s" % (reg.home, render_malformed(bad[0])))
+    added = [k for k in rows if k not in declared]
+    if added:
+        text = home.read_bytes().decode("utf-8")
+        text += "" if text.endswith("\n") else "\n"
+        text += "".join("\t".join([*k, str(rows[k][0]), sha, "widened:" + widen]) + "\n" for k in added)
+        _write_atomic(home, text)
+    return " ".join(["widened", name, ", ".join("\t".join(k) for k in added)]).rstrip(), True
+
+
+def seed_home(root, home, sha, argv=None, template=None):
+    """-> (line, False when left unarmed by a failure): the unregistered form for a population not yet in
+    the ledger grammar. Only an absent or unarmed `home` is written: `argv`, each `{out}` in it replaced
+    by a sibling temp path, writes the population there and a live run moves it into place; `template`
+    is copied. Either is atomic; a failed run leaves one unarmed line, a refused home no file."""
+    refusal = check_home(home)
+    if refusal:
+        print("legacy_ledger: %s; nothing written" % refusal, file=sys.stderr)
+        return "unarmed %s %s" % (home, refusal), False
+    target = pathlib.Path(root, home)
+    if read_home_state(target) == "armed":
+        return "present %s" % home, True
+    refusal = check_home_admitted(root, home)
+    if refusal:
+        print("legacy_ledger: %s: %s; nothing written" % (home, refusal), file=sys.stderr)
+        return "unarmed %s %s" % (home, refusal), False
+    if template is not None:
+        _write_atomic(target, pathlib.Path(template).read_bytes())
+        return "armed %s" % home, True
+    fd, out = tempfile.mkstemp(dir=str(target.parent), prefix="." + target.name + ".", suffix=".seed")
+    os.close(fd)
+    try:
+        _stdout, reason = run_seed_argv([a.replace("{out}", out) for a in argv], root)
+        if reason:
+            _write_atomic(target, "%s%s · %s\n" % (UNARMED_LEAD, reason, sha))
+            return "unarmed %s %s" % (home, reason), False
+        os.replace(out, str(target))
+    finally:
+        if os.path.exists(out):
+            os.unlink(out)
+    return "armed %s" % home, True
+
+
+def read_seed_policy(key, root):
+    """-> the value of policy key `key` at `root`, through the policy kit's reader: `policy.py get` run
+    as a subprocess, the Python asker's call shape (the policy kit's README, its reader section), the kit
+    found by `resolve_kit_dir` beside this file; None where no policy kit resolves, the lookup then on
+    stderr. A reader refusal raises ValueError carrying the reader's own line. WHAT IT DOES NOT CHECK: a
+    policy file the working tree changed and has not landed, since the reader takes the landed revision."""
+    try:
+        kit = resolve_kit_dir("policy", "policy.py", pathlib.Path(__file__).absolute().parent)
+    except LookupError as exc:
+        print("legacy_ledger: %s: no policy kit resolves, so its catalogue default holds: %s" % (key, exc),
+              file=sys.stderr)
+        return None
+    env = {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}
+    got = subprocess.run([sys.executable, str(pathlib.Path(kit, "policy.py")), "get", key], cwd=str(root),
+                         capture_output=True, text=True, encoding="utf-8", errors="replace",
+                         stdin=subprocess.DEVNULL, env=env)
+    if got.returncode != 0:
+        raise ValueError(got.stderr.strip() or "policy.py get %s exited %d" % (key, got.returncode))
+    return got.stdout.strip()
+
+
+def run_seed_cli(args, cwd):
+    """`seed --all | --population <name> [--widen <record>] [--sha <sha>]`, and the unregistered
+    `seed --home <path> [--sha <sha>] (--copy <template> | -- <argv>...)`: one line per population, exit
+    0, or 1 when a seed left one unarmed by a failure, or 2 on a refusal. `seed = []` exits 0 under
+    `retrofit.unseeded: unarmed` and 2 under `refuse`, naming every such registration."""
+    usage = ("usage: legacy_ledger.py seed (--all | --population <name>) [--widen <record>] [--sha <sha>]\n"
+             "       legacy_ledger.py seed --home <path> [--sha <sha>] (--copy <template> | -- <argv>...)")
+    argv = None
+    if "--" in args:
+        argv, args = args[args.index("--") + 1:], args[:args.index("--")]
+    opts, every, i = {}, False, 0
+    while i < len(args):
+        if args[i] == "--all":
+            every, i = True, i + 1
+        elif args[i] in ("--population", "--widen", "--sha", "--home", "--copy") and i + 1 < len(args) \
+                and args[i] not in opts:
+            opts[args[i]], i = args[i + 1], i + 2
+        else:
+            print(usage, file=sys.stderr)
+            return 2
+    homed = "--home" in opts
+    if (homed and (every or "--population" in opts or "--widen" in opts
+                   or ("--copy" in opts) == bool(argv))) \
+            or (not homed and (every == ("--population" in opts) or argv is not None or "--copy" in opts)):
+        print(usage, file=sys.stderr)
+        return 2
+    widen = opts.get("--widen")
+    if widen is not None and not re.fullmatch(r"\S+", widen):
+        print("legacy_ledger: --widen takes a record with no whitespace, as widened:<record> is written",
+              file=sys.stderr)
+        return 2
+    rc, top = _run_git(cwd, "rev-parse", "--show-toplevel")
+    if rc != 0 or not top.strip():
+        print("legacy_ledger: not inside a git work tree", file=sys.stderr)
+        return 2
+    root = top.strip()
+    sha = opts.get("--sha")
+    if sha is None:
+        rc, head = _run_git(root, "rev-parse", "--verify", "-q", "HEAD")
+        if rc != 0 or not head.strip():
+            print("legacy_ledger: HEAD names no commit, so there is no sha to stamp; pass --sha",
+                  file=sys.stderr)
+            return 2
+        sha = head.strip()
+    if not SHA_RE.fullmatch(sha):
+        print("legacy_ledger: --sha %r is not 8 to 40 lowercase hex digits" % sha, file=sys.stderr)
+        return 2
+    try:
+        if homed:
+            home = pathlib.Path(os.path.relpath(pathlib.Path(cwd, opts["--home"]), root)).as_posix()
+            copy = str(pathlib.Path(cwd, opts["--copy"])) if "--copy" in opts else None
+            line, ok = seed_home(root, home, sha, argv=argv, template=copy)
+            print(line)
+            return 0 if ok else 1
+        regs = read_registrations(root)
+    except (OSError, UnicodeDecodeError, ValueError) as exc:
+        print("legacy_ledger: %s" % exc, file=sys.stderr)
+        return 2
+    picked = regs if every else [r for r in regs if r.population == opts["--population"]]
+    if not every and len(picked) != 1:
+        print("legacy_ledger: %d registrations name %r; --population seeds exactly one"
+              % (len(picked), opts["--population"]), file=sys.stderr)
+        return 2
+    unseeded = [r.population for r in picked if not r.seed]
+    if unseeded:
+        try:
+            value = read_seed_policy("retrofit.unseeded", root)
+        except ValueError as exc:
+            print(exc, file=sys.stderr)
+            return 2
+        value = UNSEEDED_DEFAULT if value is None else value
+        if value == "refuse":
+            print("legacy_ledger: retrofit.unseeded is refuse, so each registration declaring seed = [] is "
+                  "refused: %s" % ", ".join(unseeded), file=sys.stderr)
+            return 2
+        if value != UNSEEDED_DEFAULT:
+            print("legacy_ledger: retrofit.unseeded reads %r, outside unarmed | refuse" % value, file=sys.stderr)
+            return 2
+    worst = 0
+    for reg in picked:
+        try:
+            line, ok = seed_population(root, reg, sha, widen)
+        except (OSError, UnicodeDecodeError, ValueError) as exc:
+            print("legacy_ledger: %s: %s" % (reg.population, exc), file=sys.stderr)
+            worst = 2
+            continue
+        print(line)
+        worst = max(worst, 0 if ok else 1)
+    return worst
 # <<< legacy_ledger_py
 
 
@@ -499,6 +755,8 @@ def cmd_carry(root, reg):
 
 def main(argv):
     args = list(argv[1:])
+    if args[:1] == ["seed"]:
+        return run_seed_cli(args[1:], os.getcwd())
     measured = None
     if "--measured" in args:
         i = args.index("--measured")
@@ -508,7 +766,8 @@ def main(argv):
         measured = args[i + 1]
         del args[i:i + 2]
     if len(args) != 2 or args[0] not in ("read", "compare", "carry") or (measured and args[0] != "compare"):
-        print("usage: legacy_ledger.py read|compare|carry <population> [--measured <path>, compare only]",
+        print("usage: legacy_ledger.py read|compare|carry <population> [--measured <path>, compare only]\n"
+              "       legacy_ledger.py seed ...   (run `seed` bare for its usage)",
               file=sys.stderr)
         return 2
     verb, population = args
