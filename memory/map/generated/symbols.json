@@ -14295,6 +14295,11 @@
     {
       "id": "git",
       "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
+      "id": "git",
+      "kind": "function",
       "file": "tools/memory-recall/query.py"
     },
     {
