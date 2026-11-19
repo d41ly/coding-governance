@@ -800,6 +800,11 @@
     {
       "id": "add_health_event",
       "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "add_health_event",
+      "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
     },
     {
@@ -11216,6 +11221,11 @@
       "id": "derive_health_log",
       "kind": "function",
       "file": "tools/process-monitor/reap.py"
+    },
+    {
+      "id": "derive_health_log",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
     },
     {
       "id": "derive_health_log",
@@ -26791,6 +26801,11 @@
       "id": "resolve_health_log",
       "kind": "function",
       "file": "tools/process-monitor/reap.py"
+    },
+    {
+      "id": "resolve_health_log",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
     },
     {
       "id": "resolve_health_log",

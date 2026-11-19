@@ -19461,6 +19461,59 @@ fi   # ---- region 8 continues below: one compound block past about 3000 command
 if in_shard 8; then
 
 # ==================================================================================================
+# TOOL-dPlacedRequest-36 — A NODE LOCK'S BREAK LOGS FROM A CARRIER WITH NO DRIVER. The `health_log_sh`
+# and `gov_feed_sh` blocks are cut from the run-gates kit's post-merge carrier and sourced under
+# `env -i` and `set -u`, no ROOT set, over a scratch repository's common dir: a lock whose `until` has
+# passed is broken and `node-lock-broken` logged with source `unattended` (AC1); a guard aged two
+# minutes is removed, the call busy, and `node-guard-cleared` logged (AC2). RED is a scratch copy of
+# the feed cut whose event calls read `$ROOT` unguarded, the claim-push body's spelling: it aborts on
+# the unset name and logs nothing. Waived by README rule 8 with the rest of this suite. WHAT THIS
+# BLOCK DOES NOT DRIVE: a break with ROOT set, which the GH37 and DPR24 arms drive.
+# ==================================================================================================
+pm_home=run-gates
+if pm_rel=$(resolve_kit_dir "$_rkd_py" "$pm_home" post-merge.sh "$HERE" 2>/dev/null) && [ -n "$pm_rel" ]; then
+  pm_d=$(mktemp -d)
+  pm_src="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$pm_rel/post-merge.sh"
+  awk '/^# >>> health_log_sh/{f=1} f{print} /^# <<< health_log_sh/{exit}' "$pm_src" >"$pm_d/hl.sh"
+  awk '/^# >>> gov_feed_sh/{f=1} f{print} /^# <<< gov_feed_sh/{exit}' "$pm_src" >"$pm_d/gf.sh"
+  # ---- AC3: the carrier holds the appender beside the factory, and both cuts are non-empty.
+  same "DPR36 AC3 the post-merge carrier holds one health_log_sh block, and both cuts are non-empty" \
+    "$(grep -c '^# >>> health_log_sh' "$pm_src") $(grep -c '^write_dir_lock()' "$pm_d/gf.sh") $(grep -c '^add_health_event()' "$pm_d/hl.sh")" "1 1 1"
+  cp "$pm_d/gf.sh" "$pm_d/red.sh"
+  mutate "$pm_d/red.sh" 's/"\${ROOT:-\${1%\/\*}}"/"$ROOT"/g'
+  (unset GIT_DIR GIT_WORK_TREE; git init -q "$pm_d/r")
+  pm_c=$(unset GIT_DIR GIT_WORK_TREE; git -C "$pm_d/r" rev-parse --path-format=absolute --git-common-dir)
+  pm_call='set -u; REMOTE_BOUND=60; . "$PM_HL"; . "$PM_GF"; write_dir_lock "$PM_C/gov-feed.lock" t1 10 node'
+  pm_ev='$2 == "unattended" && $3 == e { k++ } END { print k + 0 }'
+  for pm_v in gf red; do
+    # ---- AC1: a planted lock whose `until` passed five seconds ago.
+    rm -rf "$pm_c/gov-feed.lock" "$pm_c/gov-feed.lock.break" "$pm_c/health.log"
+    mkdir "$pm_c/gov-feed.lock"; echo "$((EPOCHSECONDS - 5))" >"$pm_c/gov-feed.lock/until"; echo w-dead >"$pm_c/gov-feed.lock/owner"
+    env -i PATH="$PATH" PM_HL="$pm_d/hl.sh" PM_GF="$pm_d/$pm_v.sh" PM_C="$pm_c" bash -c "$pm_call" 2>"$pm_d/$pm_v.err1"; pm_rc=$?
+    pm_r1="$pm_rc $(cat "$pm_c/gov-feed.lock/owner" 2>/dev/null) $(cat "$pm_c/health.log" 2>/dev/null | awk -F'\t' -v e=node-lock-broken "$pm_ev")"
+    # ---- AC2: a stale lock under a guard aged two minutes.
+    rm -rf "$pm_c/gov-feed.lock" "$pm_c/health.log"
+    mkdir "$pm_c/gov-feed.lock" "$pm_c/gov-feed.lock.break"; echo "$((EPOCHSECONDS - 5))" >"$pm_c/gov-feed.lock/until"
+    touch -d "@$((EPOCHSECONDS - 120))" "$pm_c/gov-feed.lock.break"
+    env -i PATH="$PATH" PM_HL="$pm_d/hl.sh" PM_GF="$pm_d/$pm_v.sh" PM_C="$pm_c" bash -c "$pm_call" 2>"$pm_d/$pm_v.err2"; pm_rc=$?
+    pm_r2="$pm_rc $([ -e "$pm_c/gov-feed.lock.break" ] && echo left || echo gone) $(cat "$pm_c/health.log" 2>/dev/null | awk -F'\t' -v e=node-guard-cleared "$pm_ev")"
+    case "$pm_v" in gf) pm_gf1=$pm_r1; pm_gf2=$pm_r2 ;; *) pm_red1=$pm_r1; pm_red2=$pm_r2 ;; esac
+  done
+  same "DPR36 AC1 a stale node lock broken with no ROOT exits 0, owned by the caller, one node-lock-broken line" "$pm_gf1" "0 t1 1"
+  same "DPR36 AC2 an aged guard is removed, the call busy, one node-guard-cleared line" "$pm_gf2" "1 gone 1"
+  same "DPR36 AC1 RED: the copy reading ROOT unguarded logs no node-lock-broken line" "${pm_red1##* }" "0"
+  hit  "$(cat "$pm_d/red.err1")" "ROOT: unbound variable"
+  same "DPR36 AC2 RED: the copy reading ROOT unguarded logs no node-guard-cleared line" "${pm_red2##* }" "0"
+  rm -rf "$pm_d"
+else
+  n=$((n+7))
+  echo "  SKIP the node lock's carrier event arms: no run-gates kit resolves beside this one, so no post-merge carrier is cut; their 7 assertions are counted, not run"
+fi
+fi   # ---- region 8 continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 8; then
+
+# ==================================================================================================
 # TOOL-dPlacedRequest-16 — A LEASE NEVER DELETED. Over the lease fixture's clone, every lease planted
 # on its origin by `seed_lease_at`, its sighting a line of the clone's feed: a plain release hands the
 # lease over at the epoch plus one, its releaser included (AC1); a build tombstone refuses every mode
@@ -21726,7 +21779,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3683 -> 3695 by TOOL-dPlacedRequest-26: the tenure walk block's 12 region-eight assertions
 # (11 `same`, 1 `hit`, its loops run as written), every one unconditional, counted off the diff's own
 # lines; no suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3695
+# RAISED 3695 -> 3702 by TOOL-dPlacedRequest-36: the carrier event block's 7 region-eight assertions
+# (5 `same`, 1 `hit`, 1 `mutate`), or the same 7 counted on its skip branch, off the diff's own
+# lines; no suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3702
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -21978,7 +22034,8 @@ FLOOR_SHARD_7=311
 # RAISED 805 -> 812 by TOOL-dPlacedRequest-25: the same 7 region-eight tenure renewal assertions, see FLOOR_ASSERTIONS.
 # RAISED 812 -> 914 by TOOL-dPlacedRequest-16: the same 102 region-eight lease-never-deleted and cell assertions, see FLOOR_ASSERTIONS.
 # RAISED 914 -> 926 by TOOL-dPlacedRequest-26: the same 12 region-eight tenure walk assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=926
+# RAISED 926 -> 933 by TOOL-dPlacedRequest-36: the same 7 region-eight carrier event assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=933
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

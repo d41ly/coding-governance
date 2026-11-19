@@ -2928,9 +2928,10 @@ NODE_LOCK_BOUND=10
 # window. An owner that outlives its recorded deadline (no runnable `timeout -k`) is breakable while
 # it pushes, and its own release can land between a breaker's re-read and its removal. Both the
 # deadline and the age are wall-clock reads, so a clock stepped forward breaks a live lock.
-# A writer in another git dir takes another lock. A carrier with no driver has no `ROOT` and no
-# health log appender, so a break there reaches those unset names, prints their two errors and
-# writes no health event, until TOOL-dPlacedRequest-36 gives that carrier its path.
+# A writer in another git dir takes another lock. Each event goes through the `health_log_sh` block
+# every carrier holds beside this one (TOOL-dPlacedRequest-36), to `resolve_health_log` of `ROOT`
+# where the driver sets it, so its spec-tokens lock in the sidecar dir logs to the repository's log,
+# else of the lock's parent, which for a node lock is the common dir: no unset name under `set -u`.
 # THE OWNER'S PROCESSES, read as data in the lock (TOOL-aPiecewiseGrade-6 S9). A holder may write one
 # `pid.<role>` file per process with `write_dir_lock_pid`: the pid, its procfs start token or `-`, the
 # writer's runtime as `$HOSTNAME:$OSTYPE`, and an optional end file, last because a path may carry a
@@ -2994,7 +2995,7 @@ write_dir_lock() { # lock dir · owner token · seconds it may hold · health-ev
     if ! mkdir "$g" 2>/dev/null; then
       if [ -n "$(find "$g" -maxdepth 0 -mmin +1 2>/dev/null)" ]; then
         rm -rf "$g"
-        add_health_event "$(resolve_health_log "$ROOT")" unattended "$4-guard-cleared" "$g"
+        add_health_event "$(resolve_health_log "${ROOT:-${1%/*}}")" unattended "$4-guard-cleared" "$g"
       fi
       return 1
     fi
@@ -3007,7 +3008,7 @@ write_dir_lock() { # lock dir · owner token · seconds it may hold · health-ev
   printf '%s\n' "$2" >"$lk/owner" 2>/dev/null || :
   if [ -n "$broke" ]; then
     rmdir "$g" 2>/dev/null
-    add_health_event "$(resolve_health_log "$ROOT")" unattended "$4-lock-broken" "$lk"
+    add_health_event "$(resolve_health_log "${ROOT:-${1%/*}}")" unattended "$4-lock-broken" "$lk"
   fi
   return 0
 }
