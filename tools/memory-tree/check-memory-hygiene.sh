@@ -1048,6 +1048,9 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   # The same class: the drift-audit kit's populations, its pins and its baselines, which its
   # `[[upgrade]]` steps write at this DEFAULT path at every adopter (TOOL-dWitnessedBar-16 S14).
   F:drift-pins.txt|F:drift-baselines.txt) ;;
+  # The same class: this kit's `conf-scalar-pins` ledger, which its adopter seeds at this path at
+  # `--scaffold` and at every update's `--seed-pins` (TOOL-dWitnessedBar-46 S4).
+  F:conf-scalar-pins.txt) ;;
   # S2 — PROJECT_REGISTRY_EXTRA. A project may ADD registries under <M>/project/ without
   # forking this whitelist, which is what adopter nc carved this file out to do.
   #

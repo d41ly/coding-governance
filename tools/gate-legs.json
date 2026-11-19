@@ -1125,144 +1125,6 @@
     ]
   },
   {
-    "name": "ratchet (never gains)",
-    "tag": "leg.memory-tree.ratchet-never-gains",
-    "tests": [
-      "feature.memory-tree-hygiene"
-    ],
-    "purpose": "refuses a population's growth past its base",
-    "argv": [
-      "python3",
-      "{prefix}/memory-tree/ratchet.py",
-      "never-gains"
-    ],
-    "chunk": "declarations",
-    "subject": "repo",
-    "ceiling": 300,
-    "pack": "ratchet",
-    "enforces": [
-      "practice.gate"
-    ],
-    "stage": [
-      "step.test"
-    ]
-  },
-  {
-    "name": "ratchet (both ways)",
-    "tag": "leg.memory-tree.ratchet-both-ways",
-    "tests": [
-      "feature.memory-tree-hygiene"
-    ],
-    "purpose": "grades its own populations both ways at HEAD",
-    "argv": [
-      "python3",
-      "{prefix}/memory-tree/ratchet.py",
-      "both-ways"
-    ],
-    "chunk": "declarations",
-    "subject": "repo",
-    "ceiling": 300,
-    "pack": "ratchet",
-    "enforces": [
-      "practice.gate"
-    ],
-    "stage": [
-      "step.test"
-    ]
-  },
-  {
-    "name": "ratchet (unarmed)",
-    "tag": "leg.memory-tree.ratchet-unarmed",
-    "tests": [
-      "feature.memory-tree-hygiene"
-    ],
-    "purpose": "refuses an unarmed population that reads armed",
-    "argv": [
-      "python3",
-      "{prefix}/memory-tree/ratchet.py",
-      "unarmed"
-    ],
-    "chunk": "declarations",
-    "subject": "repo",
-    "ceiling": 300,
-    "pack": "ratchet",
-    "enforces": [
-      "practice.gate"
-    ],
-    "stage": [
-      "step.test"
-    ]
-  },
-  {
-    "name": "ratchet (populated)",
-    "tag": "leg.memory-tree.ratchet-populated",
-    "tests": [
-      "feature.memory-tree-hygiene"
-    ],
-    "purpose": "refuses an armed population holding no row",
-    "argv": [
-      "python3",
-      "{prefix}/memory-tree/ratchet.py",
-      "populated"
-    ],
-    "chunk": "declarations",
-    "subject": "repo",
-    "ceiling": 300,
-    "pack": "ratchet",
-    "enforces": [
-      "practice.gate"
-    ],
-    "stage": [
-      "step.test"
-    ]
-  },
-  {
-    "name": "ratchet (seed laundering)",
-    "tag": "leg.memory-tree.ratchet-seed-laundering",
-    "tests": [
-      "feature.memory-tree-hygiene"
-    ],
-    "purpose": "refuses a baseline row re-dated or re-seeded",
-    "argv": [
-      "python3",
-      "{prefix}/memory-tree/ratchet.py",
-      "seed-laundering"
-    ],
-    "chunk": "declarations",
-    "subject": "repo",
-    "ceiling": 300,
-    "pack": "ratchet",
-    "enforces": [
-      "practice.gate"
-    ],
-    "stage": [
-      "step.test"
-    ]
-  },
-  {
-    "name": "ratchet (rename)",
-    "tag": "leg.memory-tree.ratchet-rename",
-    "tests": [
-      "feature.memory-tree-hygiene"
-    ],
-    "purpose": "refuses a renamed file's rows left uncarried",
-    "argv": [
-      "python3",
-      "{prefix}/memory-tree/ratchet.py",
-      "rename"
-    ],
-    "chunk": "declarations",
-    "subject": "repo",
-    "ceiling": 300,
-    "pack": "ratchet",
-    "enforces": [
-      "practice.gate"
-    ],
-    "stage": [
-      "step.test"
-    ]
-  },
-  {
     "name": "ratchet (keys, not a scalar)",
     "tag": "leg.memory-tree.ratchet-keys-not-a-scalar",
     "tests": [
@@ -1273,29 +1135,6 @@
       "python3",
       "{prefix}/memory-tree/ratchet.py",
       "keys-not-scalar"
-    ],
-    "chunk": "declarations",
-    "subject": "repo",
-    "ceiling": 300,
-    "pack": "ratchet",
-    "enforces": [
-      "practice.gate"
-    ],
-    "stage": [
-      "step.test"
-    ]
-  },
-  {
-    "name": "ratchet (key shape)",
-    "tag": "leg.memory-tree.ratchet-key-shape",
-    "tests": [
-      "feature.memory-tree-hygiene"
-    ],
-    "purpose": "refuses a number where a ledger key holds a label",
-    "argv": [
-      "python3",
-      "{prefix}/memory-tree/ratchet.py",
-      "key-shape"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -4942,6 +4781,167 @@
     "chunk": "selftests",
     "subject": "kit",
     "ceiling": 300,
+    "enforces": [
+      "practice.gate"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "ratchet (never gains)",
+    "tag": "leg.gov.ratchet-never-gains",
+    "tests": [
+      "feature.memory-tree-hygiene"
+    ],
+    "purpose": "refuses a population's growth past its base",
+    "argv": [
+      "python3",
+      "{prefix}/memory-tree/ratchet.py",
+      "never-gains"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300,
+    "pack": "ratchet",
+    "enforces": [
+      "practice.gate"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "ratchet (both ways)",
+    "tag": "leg.gov.ratchet-both-ways",
+    "tests": [
+      "feature.memory-tree-hygiene"
+    ],
+    "purpose": "grades its own populations both ways at HEAD",
+    "argv": [
+      "python3",
+      "{prefix}/memory-tree/ratchet.py",
+      "both-ways"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300,
+    "pack": "ratchet",
+    "enforces": [
+      "practice.gate"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "ratchet (unarmed)",
+    "tag": "leg.gov.ratchet-unarmed",
+    "tests": [
+      "feature.memory-tree-hygiene"
+    ],
+    "purpose": "refuses an unarmed population that reads armed",
+    "argv": [
+      "python3",
+      "{prefix}/memory-tree/ratchet.py",
+      "unarmed"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300,
+    "pack": "ratchet",
+    "enforces": [
+      "practice.gate"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "ratchet (populated)",
+    "tag": "leg.gov.ratchet-populated",
+    "tests": [
+      "feature.memory-tree-hygiene"
+    ],
+    "purpose": "refuses an armed population holding no row",
+    "argv": [
+      "python3",
+      "{prefix}/memory-tree/ratchet.py",
+      "populated"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300,
+    "pack": "ratchet",
+    "enforces": [
+      "practice.gate"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "ratchet (seed laundering)",
+    "tag": "leg.gov.ratchet-seed-laundering",
+    "tests": [
+      "feature.memory-tree-hygiene"
+    ],
+    "purpose": "refuses a baseline row re-dated or re-seeded",
+    "argv": [
+      "python3",
+      "{prefix}/memory-tree/ratchet.py",
+      "seed-laundering"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300,
+    "pack": "ratchet",
+    "enforces": [
+      "practice.gate"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "ratchet (rename)",
+    "tag": "leg.gov.ratchet-rename",
+    "tests": [
+      "feature.memory-tree-hygiene"
+    ],
+    "purpose": "refuses a renamed file's rows left uncarried",
+    "argv": [
+      "python3",
+      "{prefix}/memory-tree/ratchet.py",
+      "rename"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300,
+    "pack": "ratchet",
+    "enforces": [
+      "practice.gate"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "ratchet (key shape)",
+    "tag": "leg.gov.ratchet-key-shape",
+    "tests": [
+      "feature.memory-tree-hygiene"
+    ],
+    "purpose": "refuses a number where a ledger key holds a label",
+    "argv": [
+      "python3",
+      "{prefix}/memory-tree/ratchet.py",
+      "key-shape"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300,
+    "pack": "ratchet",
     "enforces": [
       "practice.gate"
     ],

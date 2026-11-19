@@ -2416,6 +2416,108 @@ subject = "kit"
 enforces = ["practice.gate"]
 stage = ["step.test"]
 
+# THE RATCHET PACK'S GOV-ONLY LEGS (TOOL-dWitnessedBar-46 S5): seven of the pack's nine legs read gov's
+# registered populations or the base remote, so an adopter receives the other two from the memory-tree
+# descriptor and these stay gov's, each its whole row, its argv respelled from `{kit}/`.
+
+[[exempt_leg]]
+name = "ratchet (never gains)"
+why = "it grades every registered population against the compare base, so it reads gov's registered populations and the base remote, and `retrofit.widen` through `tree_lib.py#read_policy_value`; no adopter install carries a seed per registration or a base every adopter holds. TOOL-dWitnessedBar-46 S5."
+tag = "leg.gov.ratchet-never-gains"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "refuses a population's growth past its base"
+argv = ["python3", "{prefix}/memory-tree/ratchet.py", "never-gains"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "ratchet (both ways)"
+why = "it runs every registration's seed at HEAD and grades gov's registered populations both ways; an adopter's registrations are seeded by no install at this build. TOOL-dWitnessedBar-46 S5."
+tag = "leg.gov.ratchet-both-ways"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "grades its own populations both ways at HEAD"
+argv = ["python3", "{prefix}/memory-tree/ratchet.py", "both-ways"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "ratchet (unarmed)"
+why = "it reads every registered home, which are gov's populations; no adopter install seeds a home per registration at this build. TOOL-dWitnessedBar-46 S5."
+tag = "leg.gov.ratchet-unarmed"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "refuses an unarmed population that reads armed"
+argv = ["python3", "{prefix}/memory-tree/ratchet.py", "unarmed"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "ratchet (populated)"
+why = "it reads every registered population and the seen-red records, both gov's; no adopter install seeds a population per registration at this build. TOOL-dWitnessedBar-46 S5."
+tag = "leg.gov.ratchet-populated"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "refuses an armed population holding no row"
+argv = ["python3", "{prefix}/memory-tree/ratchet.py", "populated"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "ratchet (seed laundering)"
+why = "it reads every registered population at the compare base, so it reads gov's populations and the base remote, which no adopter install holds for each registration. TOOL-dWitnessedBar-46 S5."
+tag = "leg.gov.ratchet-seed-laundering"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "refuses a baseline row re-dated or re-seeded"
+argv = ["python3", "{prefix}/memory-tree/ratchet.py", "seed-laundering"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "ratchet (rename)"
+why = "it reads the base range for renamed files holding `site` rows of gov's populations, and an adopter holds no base every adopter shares. TOOL-dWitnessedBar-46 S5."
+tag = "leg.gov.ratchet-rename"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "refuses a renamed file's rows left uncarried"
+argv = ["python3", "{prefix}/memory-tree/ratchet.py", "rename"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "ratchet (key shape)"
+why = "it reads every registered population, which are gov's; no adopter install seeds a population per registration at this build. TOOL-dWitnessedBar-46 S5."
+tag = "leg.gov.ratchet-key-shape"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "refuses a number where a ledger key holds a label"
+argv = ["python3", "{prefix}/memory-tree/ratchet.py", "key-shape"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
 # The kit-less gov tools' lists (TOOL-dWitnessedBar-16 §8 F3), registered beside the `[[exempt_leg]]` rows
 # that declare their legs; gov's own, so they owe no upgrade step.
 

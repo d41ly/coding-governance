@@ -5,6 +5,7 @@
 #
 #   <prefix>/memory-tree/adopt-memory-tree.sh --scaffold   # a NEW tree: dirs, registries, renders, index
 #                                          --render     # an ADOPTED tree: the four rendered docs, nothing else
+#                                          --seed-pins  # the conf-scalar-pins ledger, seeded where absent
 set -eu
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
@@ -55,7 +56,7 @@ FAMILY_of() { local p; for p in $FAMILIES; do case "$p" in "$1:"*) echo "${p#*:}
 # existed and still is, because defaulting a missing word to the verb that creates a tree is a
 # widening nobody asked for.
 MODE="${1:-}"
-case "$MODE" in --scaffold|--render|--arm-routing) ;; *) echo "usage: $0 --scaffold|--render|--arm-routing"; exit 2 ;; esac
+case "$MODE" in --scaffold|--render|--arm-routing|--seed-pins) ;; *) echo "usage: $0 --scaffold|--render|--arm-routing|--seed-pins"; exit 2 ;; esac
 
 # TOOL-aRoutedQuill-5 S5. The CANDIDATE product set, derived from THIS tree: every tracked top-level
 # directory with a trailing `/`, less the dot-directories and the directory holding MEMORY_ROOT. A
@@ -130,8 +131,8 @@ if [ "$MODE" = "--render" ]; then
 fi
 # An armed render with no declared row set would write a §5 holding one empty bullet. There is
 # one literal row set and it is the conf, so a blank here is a misconfiguration to say out loud
-# rather than a default to fall back on.
-if [ -z "$READINESS_ROWS" ]; then
+# rather than a default to fall back on. `--seed-pins` renders nothing, so it does not wait on the key.
+if [ "$MODE" != --seed-pins ] && [ -z "$READINESS_ROWS" ]; then
   echo "adopt-memory-tree: REFUSING — READINESS_ROWS is not declared in .memory-tree.conf, so the §5 checklist would render as one empty bullet. Copy the line from .memory-tree.conf.example and edit it." >&2
   exit 1
 fi
@@ -324,6 +325,25 @@ refuse_wrong_shell() {
 # <<< refuse_wrong_shell
 refuse_wrong_shell || exit 2
 _PY=$(resolve_python) || exit 2
+
+# TOOL-dWitnessedBar-46 S2. THE ADOPTER'S OWN SCALAR PINS, seeded into the `conf-scalar-pins` ledger the
+# `ratchet (keys, not a scalar)` leg grades, through the registration this kit's descriptor carries and
+# this kit's copy of the ledger factory. `seed` writes only an absent or unarmed home, so a second run
+# leaves an armed one byte-identical. Two callers: the end of `--scaffold`, and `--seed-pins`, which a
+# `[[regenerate]]` row runs at every `govkit update`, because an update never reaches `--scaffold`.
+# A FAILED SEED DOES NOT STOP EITHER CALLER: its home records the failure or stays absent, and the leg
+# reds naming the command to run (S3). A kit left untracked registers nothing, so that seed refuses
+# here and the command it prints is the one to run once the kit is committed.
+seed_scalar_pins() {
+  local _sp_rc=0
+  "$_PY" "$HERE/legacy_ledger.py" seed --population conf-scalar-pins || _sp_rc=$?
+  [ "$_sp_rc" = 0 ] || echo "memory-tree: the conf-scalar-pins seed exited $_sp_rc; once $KIT_REL is committed, run: $_PY $KIT_REL/legacy_ledger.py seed --population conf-scalar-pins" >&2
+  return 0
+}
+if [ "$MODE" = --seed-pins ]; then
+  seed_scalar_pins
+  exit 0
+fi
 
 # CLOSING REVIEW ROUND 1 L4 (TOOL-aRepatriatedFork-10). Every `{{TOOL_ROOT}}<home>/<file>` the
 # templates cite is resolved for THIS install before the render, receipt row first: one sibling
@@ -843,6 +863,8 @@ done
 # builds/ starts empty; a .gitkeep would be an unsanctioned entry under check 3, so the first build
 # is what makes the directory tracked. The empty-population guard says so out loud on the first run.
 # Stage the tree FIRST so the generator (git ls-files) sees the files, then render + re-stage.
+# The scalar pins are seeded just before, so their home is staged with the tree (TOOL-dWitnessedBar-46 S2).
+seed_scalar_pins
 git add "$M" >/dev/null 2>&1 || true
 "$_PY" "$HERE/gen_build_index.py" --write
 git add "$M" >/dev/null 2>&1 || true

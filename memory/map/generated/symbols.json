@@ -26768,6 +26768,11 @@
       "file": "tools/memory-tree/ratchet.py"
     },
     {
+      "id": "render_seed_command",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "render_seedline",
       "kind": "function",
       "file": "tools/unattended/stop-guard.test.sh"
@@ -32223,6 +32228,11 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
+      "id": "run_scalar_leg",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
       "id": "run_scenario_plant",
       "kind": "function",
       "file": "tools/loop/scenario.py"
@@ -34296,6 +34306,11 @@
       "id": "seed_ros",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "seed_scalar_pins",
+      "kind": "function",
+      "file": "tools/memory-tree/adopt-memory-tree.sh"
     },
     {
       "id": "seed_seam",
