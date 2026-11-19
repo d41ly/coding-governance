@@ -2862,6 +2862,77 @@ _ko=$(run_scalar_leg); _krc=$?
 cmp -s "$P/memory/project/conf-scalar-pins.txt" "$TMP/scalar-pins.keep" \
   || { echo "FAIL AC4 a second --seed-pins rewrote an armed conf-scalar-pins home"; st=1; }
 
+# ---- TOOL-dWitnessedBar-53 AC1 AC2 — EVERY POPULATION AN UNCOMMITTED SCAFFOLD SEEDS EQUALS ITS SEED
+# ---- AFTER THE FIRST COMMIT. The arm above commits before it looks, so a seed that reads tracked files
+# ---- only passes it. Here the kit is staged as `govkit apply` leaves it and the planted conf stays
+# ---- UNTRACKED, as the adopter's seed-and-stop leaves it, and nothing is committed before the scaffold.
+# ---- P is every population an `armed <population> <n>` line of the scaffold's own output names, so a
+# ---- registration the scaffold seeds through the factory joins P with no edit here; an empty P fails.
+# ---- Each home of P is saved, the tree committed, the home removed and re-seeded by `seed
+# ---- --population`, and its key and count columns compared, the SHA and disposition columns dropped
+# ---- because the first seed stamps the null SHA and the re-seed the commit. WHAT IT DOES NOT CHECK: a
+# ---- home the scaffold writes by a shell block, which no `armed` line names (that unit's section 8 F4).
+n=$((n+1))
+W=$TMP/seed-across
+mkdir -p "$W/$_sk" "$TMP/seed-across.keep"
+cp -r "$HERE/." "$W/$_sk/" 2>/dev/null; rm -rf "$W/$_sk/__pycache__"
+_wo=$(cd "$W" && git init -q --template= . && git config core.autocrlf false && git add -- "$_sk" &&
+  cp "$_sk/.memory-tree.conf.example" .memory-tree.conf && printf 'FOO_PIN="3"\n' >> .memory-tree.conf &&
+  bash "$_sk/adopt-memory-tree.sh" --scaffold 2>&1) || { echo "FAIL AC1 the uncommitted example-made tree did not scaffold: $_wo"; st=1; }
+_wp=$(printf '%s\n' "$_wo" | tr -d '\r' | sed -n 's/^armed \([^ ]*\) [0-9][0-9]*$/\1/p')
+_wu=$(cd "$W" && git status --porcelain -- .memory-tree.conf)
+{ printf '%s\n' "$_wp" | grep -qx 'conf-scalar-pins' && [ "$_wu" = '?? .memory-tree.conf' ] \
+  && ! (cd "$W" && git rev-parse -q --verify HEAD >/dev/null); } \
+  || { echo "FAIL AC1 the scaffold over an uncommitted tree with an untracked conf armed {$(printf '%s' "$_wp" | tr '\n' ' ')}, not conf-scalar-pins (conf: $_wu): $_wo"; st=1; }
+run_across_leg() { ( cd "$W" && "$_PY" "$_sk/ratchet.py" keys-not-scalar 2>&1 ); }
+n=$((n+1))
+_ko=$(run_across_leg); _krc=$?
+{ [ "$_krc" = 0 ] && printf '%s\n' "$_ko" | grep -q 'held · \.memory-tree\.conf	FOO_PIN	'; } \
+  || { echo "FAIL AC2 keys-not-scalar before the first commit exited $_krc or did not hold FOO_PIN: $_ko"; st=1; }
+# One reader for save, clear and compare: the kit copy's own factory, through the registrations the
+# target tracks, so a home is the one its descriptor declares and a row is what `read_rows` reads.
+_wpy='import pathlib, shutil, sys
+sys.path.insert(0, sys.argv[2]); import legacy_ledger as L
+mode, keep = sys.argv[1], pathlib.Path(sys.argv[3])
+regs = {r.population: r for r in L.read_registrations(".")}
+bad = 0
+for p in sys.argv[4:]:
+    reg = regs[p]
+    if mode == "save":
+        shutil.copyfile(reg.home, keep / p)
+    elif mode == "clear":
+        pathlib.Path(reg.home).unlink()
+    else:
+        at = tuple(i for i, f in enumerate(reg.fields) if f in reg.verbatim)
+        new = {k: v[0] for k, v in L.read_ledger(".", reg)[0].items()}
+        old = {k: v[0] for k, v in L.read_rows(keep / p, len(reg.fields), verbatim=at)[0].items()}
+        print("compared %s %d rows" % (p, len(old)))
+        if new != old:
+            print("unequal %s: saved %r, re-seeded %r" % (p, sorted(old.items()), sorted(new.items())))
+            bad = 1
+sys.exit(bad)'
+# shellcheck disable=SC2086  # P is one population name per word, the factory's own token
+( cd "$W" && "$_PY" -c "$_wpy" save "$_sk" "$TMP/seed-across.keep" $_wp ) \
+  || { echo "FAIL AC1 could not save the seeded homes of {$_wp}"; st=1; }
+( cd "$W" && git add -A && git commit -q -m scaffolded --no-verify ) || { echo "FAIL AC1 the scaffolded tree did not commit"; st=1; }
+n=$((n+1))
+_ko=$(run_across_leg); _krc=$?
+{ [ "$_krc" = 0 ] && printf '%s\n' "$_ko" | grep -q 'held · \.memory-tree\.conf	FOO_PIN	'; } \
+  || { echo "FAIL AC2 keys-not-scalar after the first commit exited $_krc or did not hold FOO_PIN: $_ko"; st=1; }
+n=$((n+1))
+# shellcheck disable=SC2086
+( cd "$W" && "$_PY" -c "$_wpy" clear "$_sk" "$TMP/seed-across.keep" $_wp ) \
+  || { echo "FAIL AC1 could not remove the seeded homes of {$_wp}"; st=1; }
+for _p in $_wp; do
+  ( cd "$W" && "$_PY" "$_sk/legacy_ledger.py" seed --population "$_p" >/dev/null 2>&1 ) \
+    || { echo "FAIL AC1 seed --population $_p after the first commit failed"; st=1; }
+done
+# shellcheck disable=SC2086
+_wc=$(cd "$W" && "$_PY" -c "$_wpy" compare "$_sk" "$TMP/seed-across.keep" $_wp 2>&1); _wrc=$?
+printf '%s\n' "$_wc" | tr -d '\r' | grep '^compared ' | sed 's/^/      seed-across: /'
+{ [ "$_wrc" = 0 ] && [ -n "$_wp" ]; } \
+  || { echo "FAIL AC1 a population the uncommitted scaffold seeded re-seeds unequal after the first commit: $_wc"; st=1; }
+
 # ---- TOOL-aRoutedQuill-5 AC5 + AC6 — the two routed keys the adopter APPENDS, derived from the tree
 # ---- it runs in. The fixture tracks two product directories, a dot-directory and the memory root,
 # ---- so a candidate that keeps either of the last two, or drops either of the first, reds.
@@ -5143,7 +5214,10 @@ done
 # Counted by reading; OWED: observed at the close.
 # MERGED at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c: main's 784, plus TOOL-dDeclaredLoop-22's one
 # recommendation assertion above = 785. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=785
+# RAISED 785 -> 789 by TOOL-dWitnessedBar-53 on 2026-11-19: its four seed-across-commit assertions, the
+# armed set, the leg before and after the first commit and the re-seed compare, each top-level and
+# never skipped. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=789
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
