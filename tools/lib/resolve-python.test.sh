@@ -561,7 +561,8 @@ fc_got=$(check_feed_copies "$fp/held.sh"); fc_rc=$?
 fc_got=$(check_feed_copies); fc_rc=$?
 case "$fc_rc|$fc_got" in "1|no inline copy of 'gov_feed_sh'"*) ok ;; *) bad "the carrier arm read an empty population as a pass (rc $fc_rc): $fc_got" ;; esac
 # ...and its two guards: a scratch repository git cannot make, and a plant line in no canonical.
-fc_got=$(git() { return 1; }; check_feed_copies "$fp/bound.sh"); fc_rc=$?
+mkdir -p "$fp/nogit" && printf '#!/bin/sh\nexit 1\n' > "$fp/nogit/git" && chmod +x "$fp/nogit/git"
+fc_got=$(PATH="$(cd "$fp/nogit" && pwd):$PATH"; check_feed_copies "$fp/bound.sh"); fc_rc=$?   # pwd: a drive-letter path splits PATH on its colon
 [ "$fc_rc|$fc_got" = "1|$fp/bound.sh: the scratch repository could not be made" ] || bad "the carrier arm ran a copy with no scratch repository (rc $fc_rc): $fc_got"; ok
 write_feed_plant 'no line of the gov_feed_sh block' ':' "$fp/none.sh" && bad "write_feed_plant reported a plant whose line is in no canonical"; ok
 
