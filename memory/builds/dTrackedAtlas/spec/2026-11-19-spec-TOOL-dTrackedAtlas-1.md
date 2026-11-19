@@ -8,6 +8,9 @@
 |---|---|---|
 | [2026-11-19-build-TOOL-dTrackedAtlas-1-build-state.py](../build/2026-11-19-build-TOOL-dTrackedAtlas-1-build-state.py) | research | — |
 | [2026-11-19-build-TOOL-dTrackedAtlas-1-ledger.md](../build/2026-11-19-build-TOOL-dTrackedAtlas-1-ledger.md) | journal | — |
+| [2026-11-19-build-TOOL-dTrackedAtlas-1-red-fix-1.md](../build/2026-11-19-build-TOOL-dTrackedAtlas-1-red-fix-1.md) | red-fix | — |
+| [2026-11-19-build-TOOL-dTrackedAtlas-1-red-fix-2.md](../build/2026-11-19-build-TOOL-dTrackedAtlas-1-red-fix-2.md) | red-fix | — |
+| [2026-11-19-build-TOOL-dTrackedAtlas-1-red-fix-3.md](../build/2026-11-19-build-TOOL-dTrackedAtlas-1-red-fix-3.md) | red-fix | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-2-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-3-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-3-spec-writer.md) | journal | — |
