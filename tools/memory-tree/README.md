@@ -634,6 +634,14 @@ the signature it was recorded with. The replay line is prose; nothing re-runs it
   a refusal, and the file itself is required even when empty — a file nobody created is a decision
   nobody made. It ships EMPTY, and the kit declares a `[[hole]]` whose discharge probe reports it
   unarmed rather than passing silently.
+- **`legacy_ledger.py seed` admits a home whose directory exists, tracked files or none** — so the
+  codebase-map and drift-audit adopters, which seed through this kit's copy into a directory they have
+  just made, seed on a fresh install before its first commit, and a registered home under the
+  `memory/project/` the adopter creates does too. `seed` never creates a directory: a home whose
+  parent is absent is printed `unarmed <population> no directory <parent>` (the `--home` form names the home) and nothing
+  is written.
+  What it does not check: a file name the hygiene check's structure check refuses inside an existing
+  directory is written, and that check reds it at its next run, never silently (TOOL-dWitnessedBar-47).
 - No brand gate, no product-specific migration lives here — those stay in the adopting repo.
 
 ## Codebase-map interop

@@ -429,9 +429,9 @@ fi
 # adopter seeds it through the memory-tree kit's `legacy_ledger.py seed --home`, so the fixture
 # carries that kit beside this one, as an install does (`requires = ["memory-tree"]`). Once the list
 # exists, a dossier lacking the section is planted and committed, and the next adopt must leave the
-# list byte-identical: a re-seed would grace the planted offender. The list may be written by the
-# scaffolding run or, while the seed's home test wants a tracked file in the map directory, by the run
-# after the scaffold is committed; the arm asserts the file, not which run wrote it.
+# list byte-identical: a re-seed would grace the planted offender. The scaffolding run writes the list,
+# since the seed admits a home whose directory exists (TOOL-dWitnessedBar-47), and arm 8 owns that
+# first write; this arm asserts the file, not which run wrote it.
 # ---------------------------------------------------------------------------------------------
 KD=$(mkrepo "$TMP/a7" "${FPFX%/}")
 MT=$("$PY" -c 'import sys
@@ -459,6 +459,29 @@ else
   else
     good "7 re-adopt leaves the affordance grace list byte-identical with a planted violation present"
   fi
+fi
+
+# ---------------------------------------------------------------------------------------------
+# arm 8 (TOOL-dWitnessedBar-47 AC1) — a fresh install seeds before its first commit. One adopt, the
+# conf copied first as arm 4's documented path does, on a `git init` target with nothing committed and
+# the memory-tree kit beside this one, as arm 7 carries it: the map directory the scaffold has just
+# made holds no tracked file, and the seed must still write affordance-exempt.toml there. Red when the
+# seed's home test asks for a tracked file in the directory again.
+# WHAT THIS DOES NOT CHECK: a map directory the scaffold failed to make, which the seed reports
+# `unarmed ... no directory` and the resolver suite's part 2o observes.
+# ---------------------------------------------------------------------------------------------
+KD=$(mkrepo "$TMP/a8" "${FPFX%/}")
+cp -r "$MT" "$(dirname "$KD")/memory-tree" 2>/dev/null
+cp "$KD/.codebase-map.conf.example" "$TMP/a8/.codebase-map.conf"
+aff="$TMP/a8/memory/map/affordance-exempt.toml"
+out=$(cd "$TMP/a8" && bash "$KD/adopt-codebase-map.sh" --scaffold 2>&1); rc=$?
+if git -C "$TMP/a8" rev-parse -q --verify HEAD >/dev/null 2>&1; then bad "8 fresh-install: the target holds a commit, so the arm proves nothing"
+elif [ "$rc" != 0 ] || [ ! -f "$aff" ]; then
+  bad "8 fresh-install: one adopt on an uncommitted target did not write affordance-exempt.toml (rc=$rc)"; printf '%s\n' "$out" | sed 's/^/      /'
+elif ! printf '%s' "$out" | grep -q "^armed memory/map/affordance-exempt.toml"; then
+  bad "8 fresh-install: the list exists but the seed did not report it armed"; printf '%s\n' "$out" | sed 's/^/      /'
+else
+  good "8 fresh-install seeds affordance-exempt.toml before the target's first commit"
 fi
 
 [ "$fails" = 0 ] || { printf '%s arm(s) FAILED\n' "$fails"; exit 1; }
