@@ -1274,10 +1274,10 @@ out=$(run_ll seed --population fx-nodir)
   || bad "2o seed 47 AC3: a home under an existing directory holding no tracked file was not seeded: ${out//$'\n'/ | }"; ok
 run_ll_reset
 # TOOL-dWitnessedBar-17 S9, AC11 — a seed argv spelling its program `{prefix}/<kit>/<file>` runs where the
-# token resolves against the tool root above the running copy. A copy of this directory at the scratch
-# root's tools/lib/ makes that root `tools`, so `{prefix}/fx/fxpfx.py` names the fixture's own file. RED
+# token resolves against the tool root above the running copy. A copy of this directory one level under the
+# scratch root's tool root makes that root the prefix, so `{prefix}/fx/fxpfx.py` names the fixture's own file. RED
 # where the token stays literal: the argv then names no file, the seed exits non-zero and reads unarmed.
-PK="$LLR/tools/lib"; mkdir -p "$PK"; cp "$HERE"/*.py "$PK/" 2>/dev/null
+PK="$LLR/tools/${HERE##*/}"; mkdir -p "$PK"; cp "$HERE"/*.py "$PK/" 2>/dev/null
 printf 'print("p\\t1")\n' > "$LLR/tools/fx/fxpfx.py"
 build_ll_seeded fx-pfx memory/project/fx-pfx.txt "['$LL_EXE', '{prefix}/fx/fxpfx.py']" >> "$LLR/tools/fx/kit.toml"
 out=$( (cd "$LLR" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$REALPY" -B "$PK/legacy_ledger.py" seed --population fx-pfx) 2>&1 | tr -d '\r'; echo "rc=${PIPESTATUS[0]}")

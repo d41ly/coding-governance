@@ -29,7 +29,7 @@ spec section 7, each owing its RED-first observation there.
   `loop.md`'s `decisions` emptied and committed, `map_diff.py --list-empty-decisions` printed `loop	1`
   and `git status --porcelain -- memory/map/generated` printed nothing. With each waiver home its header
   and `# unarmed` line and a backticked dead path committed to `memory/README.md`,
-  `python tools/memory-tree/corpus_ids.py` exited 1 naming `HYGIENE check 15: memory/README.md:37 cites
+  `python tools/memory-tree/corpus_ids.py` exited 1 naming `check 15: memory/README.md:37 cites
   memory/gone/never-was.md`; with both homes removed it exited 0 naming no check 13 to 15.
   `head -1 memory/project/corpus-path-unresolved.txt` printed `# ledger · corpus-path-unresolved · key site
   path,cited · direction shrink-only · drain hunk`. `adopt-memory-tree.sh --scaffold` over the scaffold
@@ -42,7 +42,7 @@ spec section 7, each owing its RED-first observation there.
 - AC7 — `count rose` — owed at the close, with the `cutoff-later` and `cutoff-blank` plants of
   `ratchet selftest`. Observed on the seed: `ratchet.py measure-cutoffs` printed `SPEC_TIER1_CUTOFF
   99991231` with the key blanked and `20261011` with it a day later.
-- AC8 — `measure-cutoffs` — it printed 39 lines, the sum of `git grep -cE "^[A-Z0-9_]+_CUTOFF=" --
+- AC8 — `measure-cutoffs` — it printed 39 lines, the sum of `git grep -cE "^[A-Z0-9_]+_CUTOFF=" -- (DERIVED from the builder's probe)
   '.*.conf'` (28 and 11), each row equal to `date-cutoffs.txt`'s key and date; the `both-ways` half is
   owed at the close.
 - AC9 — `merge: rows` — `git check-attr merge -- date-cutoffs.txt` in `memory/project/` printed it; the
@@ -53,11 +53,11 @@ spec section 7, each owing its RED-first observation there.
   drained its row, `witness` exited 0, and `down` restored the conf's and `conf-scalar-pins.txt`'s bytes
   (`cmp`). The `ORPHAN_ID_PIN` step's `up` over a blank key removed the key and `id-orphan-waiver.txt`,
   and `down` restored both. The `DOSSIER_DECISIONS_EMPTY_PIN` step's `up`, with `test_codebase_map.py` and
-  the home removed and the key `"16"`, seeded 14 rows, as many as `--list-empty-decisions` printed, and
+  the home removed and the key `"16"`, seeded 14 rows, as many as `--list-empty-decisions` printed, and (DERIVED from the builder's probe)
   removed the key.
 - AC11 — `{prefix}` — the spec's `git grep` printed the `conf-scalar-pins` line alone
-  (`tools/memory-tree/kit.toml:727`); in the clone with `row-duplicates.txt` removed, `legacy_ledger.py
+  (`tools/memory-tree/kit.toml@aa9a8685:727`); in the clone with `row-duplicates.txt` removed, `legacy_ledger.py
   seed --population row-duplicates` printed `armed row-duplicates 3` and `row_grammar.py
-  --list-duplicates` printed 3 lines. The new arm's steps, run by hand at `%TEMP%/u17pfx`, printed `armed
+  --list-duplicates` printed 3 lines. The new arm's steps, run by hand at `%TEMP%/u17pfx`, printed `armed (DERIVED from the builder's probe)
   fx-pfx 1` with this pass's factory and `unarmed fx-pfx exit 2` with HEAD's, which leaves the token
   literal.
