@@ -6,7 +6,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-1-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md) | research | TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-1-f2-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-f2-fold.md) | research | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-spec-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->

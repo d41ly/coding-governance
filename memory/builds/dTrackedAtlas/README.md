@@ -65,7 +65,7 @@ ids TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTracked
 | [TOOL-dTrackedAtlas-1 — one chain build-state derivation, read by the schedule and the Atlas](spec/2026-11-19-spec-TOOL-dTrackedAtlas-1.md) | 1 | 1 | SPECCED | rev-1 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 2 record folder(s).
+Records: 7 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
