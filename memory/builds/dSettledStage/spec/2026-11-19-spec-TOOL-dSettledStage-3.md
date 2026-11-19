@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-19-build-TOOL-dSettledStage-3-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dSettledStage-3-1-acceptance-ledger.md) | journal | — |
+| [2026-11-19-build-TOOL-dSettledStage-3-red-fix-2.md](../build/2026-11-19-build-TOOL-dSettledStage-3-red-fix-2.md) | red-fix | — |
 | [2026-11-19-prompt-TOOL-dSettledStage-3-promotion-brief.md](../prompts/2026-11-19-prompt-TOOL-dSettledStage-3-promotion-brief.md) | research | TOOL-dSettledStage-4 |
 
 <!-- /gen:spec-records -->

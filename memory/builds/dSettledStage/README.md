@@ -61,7 +61,7 @@ ids TOOL-dSettledStage-1 TOOL-dSettledStage-2 TOOL-dSettledStage-3 TOOL-dSettled
 | [TOOL-dSettledStage-4 — the stage scan reads past a quoted substitution, every git global option and a stager's wrappers, and arm 43 proves its shape](spec/2026-11-19-spec-TOOL-dSettledStage-4.md) | 4 | 2 | CLOSED | rev-1 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 12 bound to this build, across 4 record folder(s).
+Records: 14 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
