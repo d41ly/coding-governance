@@ -38163,17 +38163,6 @@ memory/map/features/review-harnesses.md	drift-audit-code.js:48
 memory/map/features/review-harnesses.md	drift-audit-state.js:47
 memory/project/spec-token-waivers.txt	tools/hooks/agent-cap.js:1972
 memory/project/spec-token-waivers.txt	tools/hooks/agent-cap.js:2092
-memory/project/unarmed-branches.txt	skills/session-kickoff/manifest-check.test.sh:1186
-memory/project/unarmed-branches.txt	tools/check-dead-paths.test.sh:124
-memory/project/unarmed-branches.txt	tools/check-dead-paths.test.sh:231
-memory/project/unarmed-branches.txt	tools/check-dead-paths.test.sh:281
-memory/project/unarmed-branches.txt	tools/check-dead-paths.test.sh:297
-memory/project/unarmed-branches.txt	tools/check-install-prefix.test.sh:271
-memory/project/unarmed-branches.txt	tools/codebase-map/adopt-codebase-map.test.sh:139
-memory/project/unarmed-branches.txt	tools/lib/resolve-python.test.sh:193
-memory/project/unarmed-branches.txt	tools/lib/resolve-python.test.sh:196
-memory/project/unarmed-branches.txt	tools/workflows/check-review-join.test.sh:226
-memory/project/unarmed-branches.txt	tools/workflows/check-review-join.test.sh:307
 skills/session-kickoff/manifest-check.sh	run-gates.sh:407
 skills/session-kickoff/manifest-check.test.sh	manifest-check.sh:60
 tools/check-install-prefix.test.sh	qdemo/colon.sh:1
