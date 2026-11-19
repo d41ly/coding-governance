@@ -18,10 +18,10 @@ mode: slug
 run-branch: refs/heads/branch/unattended-dplacedrequest-42a7be
 anchor-kind: default-branch
 cli-version: 2.1.326
-lease-utc: 2026-11-19T02:58:11Z
+lease-utc: 2026-11-19T15:04:39Z
 pid-image: claude.exe
 host: compeeto
-pid: 17280
+pid: 27268
 session: dec54915-9f6d-416a-abf5-d4658b7ca977
 keepalive: 447082a8
 anchor-url: https://github.com/d41ly/coding-governance
