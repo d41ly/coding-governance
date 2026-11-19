@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-19-build-TOOL-dSettledStage-1-agent-ledger.md](../build/2026-11-19-build-TOOL-dSettledStage-1-agent-ledger.md) | journal | TOOL-dSettledStage-1 |
 | [2026-11-19-prompt-TOOL-dSettledStage-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dSettledStage-1-brief.md) | research | TOOL-dSettledStage-1 |
 | [2026-11-19-prompt-TOOL-dSettledStage-2-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dSettledStage-2-1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dSettledStage-2-pass-legs-fix.md](../prompts/2026-11-19-prompt-TOOL-dSettledStage-2-pass-legs-fix.md) | research | — |

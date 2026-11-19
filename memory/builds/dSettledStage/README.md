@@ -57,7 +57,7 @@ ids TOOL-dSettledStage-1 TOOL-dSettledStage-2
 | [TOOL-dSettledStage-2 — a commit after a stage nothing tested is gated: a fifth shell-hygiene mode](spec/2026-11-19-spec-TOOL-dSettledStage-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 6 bound to this build, across 3 record folder(s).
+Records: 7 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -2,7 +2,7 @@
 
 # gov-spec-writer handoff — TOOL-dSettledStage-1
 
-<!-- gov:handoff role=gov-spec-writer build=dSettledStage unit=TOOL-dSettledStage-1 path=memory/builds/dSettledStage/prompts/2026-11-19-prompt-TOOL-dSettledStage-1-1-spec-writer.md role-sha=91ec0ce505aa task-sha=be33c6143ac4 -->
+<!-- gov:handoff role=gov-spec-writer build=dSettledStage unit=TOOL-dSettledStage-1 path=memory/builds/dSettledStage/prompts/2026-11-19-prompt-TOOL-dSettledStage-1-1-spec-writer.md role-sha=91ec0ce505aa task-sha=0d6556375a07 -->
 
 ## Role
 
@@ -99,7 +99,7 @@ Not supplied, optional: `input:code`.
 
 ### brief:prompt
 
-> pinned-facts: red · memory/builds/dSettledStage/spec/2026-11-19-spec-TOOL-dSettledStage-1.md · unpinned fact `2 records`: pin it on its line (an id, a path:line, PINNED or DERIVED)
+> pinned-facts: red · memory/builds/dSettledStage/spec/2026-11-19-spec-TOOL-dSettledStage-1.md · unpinned fact (the unit number before "records" in §3): pin it on its line (an id, a path:line, PINNED or DERIVED)
 
 ### brief:goal
 
@@ -108,7 +108,7 @@ commit `864d85d42`, changing nothing else.
 
 ### brief:items
 
-1. §3's line 56, "there, unit 2 records it as a follow-up.", reads "2 records" as a count. It is not a fact:
+1. §3's follow-up sentence names unit two by number before the verb "records", which the reader takes as a count. It is not a fact:
    reword it so no number sits before a counted noun, for example "TOOL-dSettledStage-2 registers it as a
    follow-up", keeping its meaning.
 2. Bump the spec to rev-2 with one §9 line naming this record and the hit.
