@@ -495,6 +495,72 @@ while IFS='|' read -r stem canon excl; do
   done <<<"$copies"
 done <<<"$PARITY_ROWS"
 
+# ---- 2a. EVERY gov_feed_sh COPY RUNS ALONE (TOOL-dPlacedRequest-38 S1, S2) -------------------------
+# Parity holds each copy byte-identical to the canonical; a byte-identical copy still dies in a carrier
+# that lacks a name its body reads. So every file carrying the block, the canonical included, has its
+# cut sourced after the canonical `health_log_sh` cut in an empty environment under `set -u`, inside a
+# scratch repository: a fresh take of `gov-feed.lock` and its release, the break of a planted stale
+# lock and its release, and one `add_feed_event`. A call that exits non-zero, `unbound variable` or
+# `command not found` on stderr (a `$( )` dies alone and its caller runs on), or a lock directory left
+# behind prints `<file>: <first stderr line>`. An empty population is its own red (S2).
+# WHAT THIS DOES NOT CHECK: a name the block reads only on a path the five calls do not take, such as
+# the guard-cleared branch; carrier code outside the block; that the event reached the feed log, since
+# a `feed: NOTE` line exits 0.
+check_feed_copies() { # carrier file… -> `<file>: <first stderr line>` per copy that fails alone, rc 1; none, rc 0
+  local f rc e1 fc="$TMP/feed-copies" out=""
+  [ "$#" -gt 0 ] || { echo "no inline copy of 'gov_feed_sh' found — the carrier arm would be judging an empty population"; return 1; }
+  mkdir -p "$fc"; blk health_log_sh "$HERE/health-log.sh" > "$fc/health.cut"
+  for f in "$@"; do
+    rm -rf "$fc/run"; mkdir -p "$fc/run"
+    blk gov_feed_sh "$f" > "$fc/feed.cut"
+    (unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE; cd "$fc/run" && git init -q . \
+      && git -c user.name=t -c user.email=t@x -c commit.gpgsign=false -c core.hooksPath="$fc/no-hooks" \
+         commit -q --no-verify --allow-empty -m feed) >/dev/null 2>&1 || { out="$out$f: the scratch repository could not be made"$'\n'; continue; }
+    (cd "$fc/run" && env -i PATH="$PATH" HOME="$HOME" bash -c 'set -u; . "$1"; . "$2"
+      c=$(git rev-parse --path-format=absolute --git-common-dir); c=${c%$'\''\r'\''}
+      write_dir_lock "$c/gov-feed.lock" t1 "$NODE_LOCK_BOUND" node || { echo "a fresh take exited $?" >&2; exit 1; }
+      remove_dir_lock "$c/gov-feed.lock" t1 || { echo "the fresh release exited $?" >&2; exit 1; }
+      mkdir "$c/gov-feed.lock" && printf "%s\n" "$(( EPOCHSECONDS - 1 ))" > "$c/gov-feed.lock/until"
+      write_dir_lock "$c/gov-feed.lock" t2 "$NODE_LOCK_BOUND" node || { echo "the stale break exited $?" >&2; exit 1; }
+      remove_dir_lock "$c/gov-feed.lock" t2 || { echo "the release after the break exited $?" >&2; exit 1; }
+      add_feed_event refs/gov/bar-red "$(git rev-parse HEAD)" || { echo "add_feed_event exited $?" >&2; exit 1; }' \
+      _ "$fc/health.cut" "$fc/feed.cut") >/dev/null 2>"$fc/err"; rc=$?
+    e1=""; { IFS= read -r e1 < "$fc/err"; } 2>/dev/null || :; e1=${e1%$'\r'}
+    if [ "$rc" != 0 ] || grep -qE 'unbound variable|command not found' "$fc/err"; then
+      out="$out$f: ${e1:-exited $rc}"$'\n'
+    elif [ -e "$fc/run/.git/gov-feed.lock" ] || [ -e "$fc/run/.git/gov-feed.lock.break" ]; then
+      out="$out$f: a gov-feed.lock directory remains after the calls"$'\n'
+    fi
+  done
+  [ -z "$out" ] && return 0
+  printf '%s' "$out"; return 1
+}
+write_feed_plant() { # from line · to line · out file -> the canonical cut with that one line replaced; rc 1 when no line matched
+  blk gov_feed_sh "$HERE/gov-feed.sh" | awk -v from="$1" -v to="$2" '$0 == from { $0 = to; hit = 1 } { print } END { exit !hit }' > "$3"
+}
+mapfile -t fc_pop < <(cd "$ROOT" && git grep -l '^# >>> gov_feed_sh' | tr -d '\r')
+fc_got=$(cd "$ROOT" && check_feed_copies "${fc_pop[@]}"); fc_rc=$?
+{ [ "$fc_rc" = 0 ] && [ -z "$fc_got" ]; } || bad "a gov_feed_sh copy fails run alone under set -u: ${fc_got//$'\n'/ | }"; ok
+# ...and each red FIRES on a plant: the bound reading the driver's REMOTE_BOUND (AC1), the base's bare
+# `$ROOT` inside a `$( )` that exits 0, a release through no command, a release that is no call, and
+# an empty population (AC3). Each plant reds when its line is not in the canonical, so none is a no-op.
+fp="$TMP/feed-plants"; mkdir -p "$fp"
+write_feed_plant 'NODE_LOCK_BOUND=10' 'NODE_LOCK_BOUND=$(( REMOTE_BOUND + 10 ))' "$fp/bound.sh" || bad "the bound plant matched no line of the canonical gov_feed_sh"; ok
+fc_got=$(check_feed_copies "$fp/bound.sh"); fc_rc=$?
+case "$fc_rc|$fc_got" in "1|$fp/bound.sh: "*"REMOTE_BOUND: unbound variable") ok ;; *) bad "the carrier arm passed a copy whose bound reads REMOTE_BOUND (rc $fc_rc): $fc_got" ;; esac
+write_feed_plant '    add_health_event "$(resolve_health_log "${ROOT:-${1%/*}}")" unattended "$4-lock-broken" "$lk"' \
+  '    add_health_event "$(resolve_health_log "$ROOT")" unattended "$4-lock-broken" "$lk"' "$fp/root.sh" || bad "the ROOT plant matched no line of the canonical gov_feed_sh"; ok
+fc_got=$(check_feed_copies "$fp/root.sh"); fc_rc=$?
+case "$fc_rc|$fc_got" in "1|$fp/root.sh: "*"ROOT: unbound variable") ok ;; *) bad "the carrier arm passed a copy whose break reads an unset ROOT (rc $fc_rc): $fc_got" ;; esac
+write_feed_plant '  remove_dir_lock "$d/gov-feed.lock" "$tok"' '  release_feed_lock "$d/gov-feed.lock" "$tok"' "$fp/cmd.sh" || bad "the command plant matched no line of the canonical gov_feed_sh"; ok
+fc_got=$(check_feed_copies "$fp/cmd.sh"); fc_rc=$?
+case "$fc_rc|$fc_got" in "1|$fp/cmd.sh: "*"command not found") ok ;; *) bad "the carrier arm passed a copy that calls no command (rc $fc_rc): $fc_got" ;; esac
+write_feed_plant '  remove_dir_lock "$d/gov-feed.lock" "$tok"' '  :' "$fp/held.sh" || bad "the release plant matched no line of the canonical gov_feed_sh"; ok
+fc_got=$(check_feed_copies "$fp/held.sh"); fc_rc=$?
+[ "$fc_rc|$fc_got" = "1|$fp/held.sh: a gov-feed.lock directory remains after the calls" ] || bad "the carrier arm passed a copy that leaves its lock (rc $fc_rc): $fc_got"; ok
+fc_got=$(check_feed_copies); fc_rc=$?
+case "$fc_rc|$fc_got" in "1|no inline copy of 'gov_feed_sh'"*) ok ;; *) bad "the carrier arm read an empty population as a pass (rc $fc_rc): $fc_got" ;; esac
+
 # ---- 2b. THE {prefix} CONTRACT, BEHAVIOUR ---------------------------------------------------------
 # Parity holds each copy to its canonical; this holds the two canonicals to ONE answer. Both run over
 # the contract table of TOOL-aRepatriatedFork-47 §4 and must print its third column, row for row.

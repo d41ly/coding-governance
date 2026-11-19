@@ -6113,6 +6113,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_feed_copies",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
       "id": "check_fences",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -36611,6 +36616,11 @@
       "id": "write_feed",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_feed_plant",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
     },
     {
       "id": "write_file",
