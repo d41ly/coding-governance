@@ -4,7 +4,7 @@ node: d
 opened: 2026-11-19
 streams: tooling
 roster: TOOL
-ids: TOOL-dSettledStage-1 TOOL-dSettledStage-2
+ids: TOOL-dSettledStage-1 TOOL-dSettledStage-2 TOOL-dSettledStage-3 TOOL-dSettledStage-4
 ---
 
 # dSettledStage — the lander commits only what staging actually changed
@@ -44,11 +44,13 @@ staging left a diff. The owner's prompt is recorded verbatim under `prompts/`.
 |---|---|---|---|
 | 1 | `TOOL-dSettledStage-1` | 2 | the lander commits a dirty-then-staged change only when the staged diff is non-empty, at all four sites, with an EOL-only arm |
 | 2 | `TOOL-dSettledStage-2` | 2 | the dirty-then-stage commit class gated: a gate-lint scan, else a gotcha class claimed in a dossier |
+| 3 | `TOOL-dSettledStage-3` | 2 | a failed stage refuses: `write_staged_change` answers 2 and every caller aborts on it (closing review item 1, promoted) |
+| 4 | `TOOL-dSettledStage-4` | 2 | the stage scan's gaps closed and arm 43's liveness (closing review items 2 to 6, promoted) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 2 unit(s) · node d · opened 2026-11-19 · streams tooling
-ids TOOL-dSettledStage-1 TOOL-dSettledStage-2
+ids TOOL-dSettledStage-1 TOOL-dSettledStage-2 TOOL-dSettledStage-3 TOOL-dSettledStage-4
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -57,7 +59,7 @@ ids TOOL-dSettledStage-1 TOOL-dSettledStage-2
 | [TOOL-dSettledStage-2 — a commit after a stage nothing tested is gated: a fifth shell-hygiene mode](spec/2026-11-19-spec-TOOL-dSettledStage-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 3 record folder(s).
+Records: 10 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
