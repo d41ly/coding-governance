@@ -113,10 +113,10 @@ memory/project/substitution-fed-loops.txt merge=rows
 memory/project/temp-name-sites.txt merge=rows
 memory/project/trace-waiver.txt merge=rows
 memory/project/unarmed-branches.txt merge=rows
-tools/dead-path-waivers.txt merge=rows
-tools/playbook-kit-waivers.txt merge=rows
-tools/drift-audit/drift-pins.txt merge=rows
-tools/drift-audit/drift-baselines.txt merge=rows
+memory/project/dead-path-waivers.txt merge=rows
+memory/project/playbook-kit-waivers.txt merge=rows
+memory/project/drift-pins.txt merge=rows
+memory/project/drift-baselines.txt merge=rows
 
 # Wholly GENERATED views: a merge takes this side, and check 9 (gen_build_index.py --check) or
 # check 17 (gotchas.py --check) then reds the stale result until `--write` re-renders it.
@@ -161,7 +161,7 @@ AGENTS.md text eol=lf
 tools/line-length-limits.txt text eol=lf
 # TOOL-dHonouredPark-3: the dead-path registry became TAB-separated, so its bytes are load-bearing
 # in a way they were not while a row was `<path>:<line>` plus free whitespace.
-tools/dead-path-waivers.txt text eol=lf
+memory/project/dead-path-waivers.txt text eol=lf
 
 # The rendered recall Skill is compared to a fresh render with plain `diff` by
 # `adopt-memory-recall.sh --check`. The renderer always emits LF, so without this pin a Windows

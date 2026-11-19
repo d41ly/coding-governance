@@ -2623,9 +2623,8 @@ def read_contract_rows(root: str, conf: dict) -> tuple:
 
     A LEDGER POPULATION since TOOL-dWitnessedBar-16 S7, keyed by `path` and `binding`, read through
     the factory's `read_rows`; its `exempt-pin:` line retired, the shrink of the exempt rows graded
-    against the base instead (`check_contract_registry`). TRANSITIONAL (§8 F15, until S12's pass): a
-    home whose first line is no ledger header is read through `convert_registry.read_legacy_rows`, the
-    one legacy table the conversion reads, in memory, and never written back.
+    against the base instead (`check_contract_registry`). A home whose first line is no ledger header
+    REFUSES: the old grammar has no reader here (S12), and the adopter's step converts it.
     """
     rel = os.path.join(conf["MEMORY_ROOT"], CONTRACT_REGISTRY).replace(os.sep, "/")
     full = os.path.join(root, conf["MEMORY_ROOT"], CONTRACT_REGISTRY)
@@ -2634,15 +2633,12 @@ def read_contract_rows(root: str, conf: dict) -> tuple:
                       f"nothing and report clean, which is coverage of nothing")
     try:
         LL.parse_header(read_text(full).split("\n", 1)[0])
-        keyed, bad = LL.read_rows(full, len(CONTRACT_FIELDS))
-        if bad:
-            raise Problem(f"{rel}: {LL.render_malformed(bad[0])}")
     except ValueError:
-        import convert_registry  # noqa: PLC0415  the transitional read, deleted by S12's pass
-        try:
-            keyed = convert_registry.read_legacy_rows(root, rel)[3]
-        except convert_registry.Refusal as exc:
-            raise Problem(f"{rel}: {exc}") from None
+        raise Problem(f"{rel}: its first line is no ledger header, so it is not in the ledger grammar "
+                      f"this reader reads; run its kit's `[[upgrade]]` step to convert it") from None
+    keyed, bad = LL.read_rows(full, len(CONTRACT_FIELDS))
+    if bad:
+        raise Problem(f"{rel}: {LL.render_malformed(bad[0])}")
     bound, exempt = set(), set()
     for path, binding in keyed:
         if binding not in CONTRACT_BINDINGS:
@@ -6606,11 +6602,6 @@ def cmd_selftest() -> int:
             build_reg_check(_render_contract_fixture([]) + "memory/builds/tOne/README.md\tbound\tx\tabcdef12\tseeded\n"))
         arm("a bound row passes", "None",
             lambda: str(build_reg_check(_render_contract_fixture([("memory/builds/tOne/README.md", "bound")]))()))
-        # THE TRANSITIONAL READ (§8 F15): a home in the old grammar reads through the conversion's own
-        # legacy table until S12's pass deletes that read, and this arm with it.
-        arm("a legacy home reads through the transitional read", "{'memory/builds/tOne/README.md'}",
-            lambda: str(build_reg_check("exempt-pin: 0\nmemory/builds/tOne/README.md\n")() or
-                        read_contract_rows(t18, conf18)[0]))
         # TOOL-aRepatriatedFork-21: the population is builds/<slug>/README.md and nothing deeper.
         _pop = ["memory/builds/tOne/README.md", "memory/builds/tOne/build/legacy/README.md",
                 "memory/builds/tOne/spec/x.md", "memory/archive/README.md", ""]

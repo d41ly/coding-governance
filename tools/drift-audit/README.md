@@ -98,7 +98,8 @@ Then, in order:
    measured value hides a live regression on day one; a pin below it reds the bar on work nobody did.
    Where a gateable signal's rows each carry an `id`, seed `drift-baselines` rows with the measured
    ids instead of a pin for it. Both are ledger populations (TOOL-dWitnessedBar-16), registered in
-   this kit's descriptor and homed at `drift-pins.txt` and `drift-baselines.txt` beside the layer.
+   this kit's descriptor and homed at `memory/project/drift-pins.txt` and
+   `memory/project/drift-baselines.txt`, beside every other population.
 4. Wire `--check` into your gate manifest.
 
 ## Layout

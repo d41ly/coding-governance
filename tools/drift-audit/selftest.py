@@ -76,6 +76,7 @@ def resolve_kit_dir(home, anchor, here):
 # and a selftest that could not build one could not test it. Written ONCE here rather than twelve
 # times below: a literal repeated twelve times is twelve chances for eleven of them to be updated.
 ROOT_PFX = ""   # a root install's prefix is empty, and the scratch repos are built through it
+LEDGER_KIT_HOME = "memory-tree"   # the home gov gives the kit that carries the ledger factory
 REPORT_REL = f"{ROOT_PFX}{KIT_NAME}/drift_report.py"
 FAILS: list[str] = []
 
@@ -287,9 +288,10 @@ def _side_branch_commit(r: pathlib.Path) -> str:
 # `[[ledger]]` registrations and their homes, read through the memory-tree kit's ledger factory, so a
 # fixture carries that factory beside its drift kit, as an install does, and a descriptor registering
 # them. `write_pins` and `write_baselines` write the two homes in the ledger grammar; a pin of 0 is no
-# row, and an empty home is the header alone.
-PINS_HOME = f"{ROOT_PFX}{KIT_NAME}/drift-pins.txt"
-BASELINES_HOME = f"{ROOT_PFX}{KIT_NAME}/drift-baselines.txt"
+# row, and an empty home is the header alone. The homes sit in `memory/project/` beside every other
+# population, outside any kit (TOOL-dWitnessedBar-16 S14).
+PINS_HOME = "memory/project/drift-pins.txt"
+BASELINES_HOME = "memory/project/drift-baselines.txt"
 FIXTURE_LEDGERS = (
     'id = "drift-audit"\n\n'
     '[[ledger]]\npopulation = "shrinkme"\nleg = "l"\nseed = []\nkey = "key"\nfields = ["entry"]\n'
@@ -303,6 +305,7 @@ FIXTURE_LEDGERS = (
 def write_pins(r: pathlib.Path, pins: dict) -> None:
     """The fixture's `drift-pins` home, one row per non-zero pin."""
     rows = "".join(f"{sig}\t{n}\tabcdef12\tseeded\n" for sig, n in sorted(pins.items()) if n)
+    (r / PINS_HOME).parent.mkdir(parents=True, exist_ok=True)
     (r / PINS_HOME).write_text("# ledger · drift-pins · key key signal · direction ceiling · drain key\n" + rows,
                                encoding="utf-8", newline="\n")
 
@@ -310,6 +313,7 @@ def write_pins(r: pathlib.Path, pins: dict) -> None:
 def write_baselines(r: pathlib.Path, sets: dict) -> None:
     """The fixture's `drift-baselines` home, one row per (signal, id)."""
     rows = "".join(f"{sig}\t{i}\t1\tabcdef12\tseeded\n" for sig, ids in sorted(sets.items()) for i in ids)
+    (r / BASELINES_HOME).parent.mkdir(parents=True, exist_ok=True)
     (r / BASELINES_HOME).write_text(
         "# ledger · drift-baselines · key record signal,id · direction shrink-only · drain key\n" + rows,
         encoding="utf-8", newline="\n")
@@ -392,10 +396,13 @@ def make_repo(tmp: pathlib.Path, name: str = "repo", ledger: bool = True) -> pat
     for f in ("drift_report.py", "drift_signals.template.py"):
         (r / KIT_NAME / f).write_bytes((KIT / f).read_bytes())
     if ledger:
-        mt = r / "memory-tree"
+        # The ledger factory's kit, resolved in this install and laid out under its own name, as this
+        # kit is under KIT_NAME: never a kit name typed beside a path (TOOL-dWitnessedBar-16 S15).
+        ledger_kit = resolve_kit_dir(LEDGER_KIT_HOME, "legacy_ledger.py", KIT)
+        mt = r / ledger_kit.name
         mt.mkdir()
         for f in ("legacy_ledger.py", "backlog.py", "coverage_join.py"):
-            (mt / f).write_bytes((KIT.parent / "memory-tree" / f).read_bytes())
+            (mt / f).write_bytes((ledger_kit / f).read_bytes())
         (r / KIT_NAME / "kit.toml").write_text(FIXTURE_LEDGERS, encoding="utf-8", newline="\n")
         (r / ".gitignore").write_text("__pycache__/\n", encoding="utf-8", newline="\n")
     (r / KIT_NAME / "drift_signals.py").write_text(

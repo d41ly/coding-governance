@@ -80,10 +80,10 @@ mkrepo() {
   ( cd "$d" && git init -q && git config core.autocrlf false \
       && git config user.email t@t && git config user.name t ) || return 1
   cp "$GATE_SRC" "$d/${PFX}check-dead-paths.sh"
-  # The gate reads its waivers through gov's ledger factory (TOOL-dWitnessedBar-16), so the factory, the
-  # three modules it imports and the launcher travel beside it, as they sit in gov's lib dir.
+  # The gate reads its waivers through gov's ledger factory (TOOL-dWitnessedBar-16), so the factory and
+  # the three modules it imports travel beside it, as they sit in gov's lib dir; the launcher is inline.
   mkdir -p "$d/${PFX}lib"
-  cp "$LIB_SRC/resolve-python.sh" "$LIB_SRC/refuse-wrong-shell.sh" "$LIB_SRC/legacy_ledger.py" "$LIB_SRC/coverage_join.py" \
+  cp "$LIB_SRC/legacy_ledger.py" "$LIB_SRC/coverage_join.py" \
     "$LIB_SRC/compare_base.py" "$LIB_SRC/resolve_kit_dir.py" "$d/${PFX}lib/"
   printf 'placeholder catalogue\n' > "$d/parallel-coding-governance.domain-rules.md"
   printf 'the old product template\n' > "$d/parallel-coding-governance.template.md"
@@ -104,13 +104,15 @@ run() { ( cd "$1" && bash ${PFX}check-dead-paths.sh "${2:---check}" ); }
 # not in history, so they share one. `git add` (no commit) is enough — `git grep` with no rev reads
 # the index and worktree, which is exactly the state the gate grades.
 BASE="$TMPROOT/base"
+# The registry is the ledger population at memory/project/, not beside the gate (TOOL-dWitnessedBar-16 S14).
+WAIVED="$BASE/memory/project/dead-path-waivers.txt"
 mkrepo "$BASE" || exit 2
 # reset_base <carrier-lines...> — restore the fixture to seeded state, then plant the given README
 # body. Clears the waiver registry too, so no arm inherits the previous one's.
 reset_base() {
   printf 'a live file\n' > "$BASE/README.md"
-  rm -f "$BASE/${PFX}dead-path-waivers.txt"
   rm -rf "$BASE/memory"
+  mkdir -p "$BASE/memory/project"
   [ $# -gt 0 ] && printf '%s\n' "$@" >> "$BASE/README.md"
   ( cd "$BASE" && git add -A )
 }
@@ -177,20 +179,20 @@ wrow() { printf '%s\t%s\t%s\tabcdef12\tseeded\n' "$1" "$3" "$2"; }
 CARRIER='see parallel-coding-governance.domain-rules.md for the checklists'
 
 reset_base "$CARRIER"
-{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'deliberate, migration prose'; } > "$BASE/${PFX}dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'deliberate, migration prose'; } > "$WAIVED"
 ( cd "$BASE" && git add -A )
 arm "green: a declared waiver silences its own hit" 0 "1 declared waiver(s)" -- run "$BASE"
 
 # THE ARM THE WHOLE RE-KEY EXISTS FOR. Under line keying this redded, twice in one build, for a
 # change that had nothing to do with the waiver.
 reset_base 'an unrelated line inserted above the carrier' "$CARRIER"
-{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'deliberate, migration prose'; } > "$BASE/${PFX}dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'deliberate, migration prose'; } > "$WAIVED"
 ( cd "$BASE" && git add -A )
 arm "green: a DIFFERENT line above the carrier does not unpin the waiver" 0 "1 declared waiver(s)" -- run "$BASE"
 
 # A waiver whose carrier is gone must red, or the list stops shrinking.
 reset_base
-{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'the carrier this excuses was already removed'; } > "$BASE/${PFX}dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'the carrier this excuses was already removed'; } > "$WAIVED"
 ( cd "$BASE" && git add -A )
 arm "red: a waiver whose carrier is gone is stale" 1 "stale waiver(s)" -- run "$BASE"
 
@@ -198,13 +200,13 @@ arm "red: a waiver whose carrier is gone is stale" 1 "stale waiver(s)" -- run "$
 # a line whose waiver should be re-read. The message is the UNWAIVED one, not the stale one, because
 # the unwaived report comes first and exits — asserted as it behaves rather than as it reads better.
 reset_base 'see parallel-coding-governance.domain-rules.md for the checklist'
-{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'deliberate, migration prose'; } > "$BASE/${PFX}dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'deliberate, migration prose'; } > "$WAIVED"
 ( cd "$BASE" && git add -A )
 arm "red: a REWORDED carrier is no longer waived" 1 "names a path this repo DELETED" -- run "$BASE"
 
 # A waiver must not silence a DIFFERENT line in the same file.
 reset_base 'filler' 'see parallel-coding-governance.domain-rules.md here'
-{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'waives text that is not here'; } > "$BASE/${PFX}dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'waives text that is not here'; } > "$WAIVED"
 ( cd "$BASE" && git add -A )
 arm "red: a waiver whose text names no line does not cover this hit" 1 "names a path this repo DELETED" -- run "$BASE"
 
@@ -212,19 +214,19 @@ arm "red: a waiver whose text names no line does not cover this hit" 1 "names a 
 # unwaived hit reds. This is the case the ordinal exists for and the case rev-2 of the spec got
 # wrong, asserting that one ordinal-bearing row could clear it.
 reset_base "$CARRIER" "$CARRIER"
-{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'first occurrence only'; } > "$BASE/${PFX}dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'first occurrence only'; } > "$WAIVED"
 ( cd "$BASE" && git add -A )
 arm "red: two identical carriers, one row — the second is unwaived" 1 "names a path this repo DELETED" -- run "$BASE"
 
 reset_base "$CARRIER" "$CARRIER"
-{ printf '# waivers\n'; wrow README.md 2 "$CARRIER" 'both occurrences'; } > "$BASE/${PFX}dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 2 "$CARRIER" 'both occurrences'; } > "$WAIVED"
 ( cd "$BASE" && git add -A )
 arm "green: two identical carriers, one row of count 2" 0 "2 declared waiver(s)" -- run "$BASE"
 
 # A count above the identical lines present is a row that waives more than is there, and reds as an
 # occurrence that resolves to nothing rather than as a silent slack.
 reset_base "$CARRIER"
-{ printf '# waivers\n'; wrow README.md 2 "$CARRIER" 'one more than is there'; } > "$BASE/${PFX}dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 2 "$CARRIER" 'one more than is there'; } > "$WAIVED"
 ( cd "$BASE" && git add -A )
 arm "red: a count above the identical lines present is stale" 1 "no occurrence 2 of that text" -- run "$BASE"
 
@@ -232,7 +234,7 @@ arm "red: a count above the identical lines present is stale" 1 "no occurrence 2
 # not a positive integer, and the gate names the row rather than reading it as absent.
 for bad in 0 zero '' -1; do
   reset_base "$CARRIER"
-  { printf '# waivers\n'; wrow README.md "$bad" "$CARRIER" 'count is not a positive integer'; } > "$BASE/${PFX}dead-path-waivers.txt"
+  { printf '# waivers\n'; wrow README.md "$bad" "$CARRIER" 'count is not a positive integer'; } > "$WAIVED"
   ( cd "$BASE" && git add -A )
   arm "red: count [$bad] is MALFORMED, not stale" 1 "MALFORMED waiver row" -- run "$BASE"
 done
@@ -241,7 +243,7 @@ done
 # the branch is unreachable in the ordinary case, because a gone file usually leaves its carrier
 # behind as an unwaived hit and that report exits first.
 reset_base
-{ printf '# waivers\n'; wrow NO-SUCH-FILE.md 1 'text that is not a carrier anywhere' 'names a file that is gone'; } > "$BASE/${PFX}dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow NO-SUCH-FILE.md 1 'text that is not a carrier anywhere' 'names a file that is gone'; } > "$WAIVED"
 ( cd "$BASE" && git add -A )
 arm "red: a row naming an absent file is stale, with its own reason" 1 "file is gone" -- run "$BASE"
 
@@ -250,7 +252,7 @@ arm "red: a row naming an absent file is stale, with its own reason" 1 "file is 
 # a reason nobody can see. ENVIRON does not expand, and this arm is what proves it.
 BSLASH='printf "# ARCH \\n" and parallel-coding-governance.domain-rules.md'
 reset_base "$BSLASH"
-{ printf '# waivers\n'; wrow README.md 1 "$BSLASH" 'carrier text holds a literal backslash-n'; } > "$BASE/${PFX}dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 1 "$BSLASH" 'carrier text holds a literal backslash-n'; } > "$WAIVED"
 ( cd "$BASE" && git add -A )
 arm "green: a carrier holding a literal backslash-n still resolves" 0 "1 declared waiver(s)" -- run "$BASE"
 

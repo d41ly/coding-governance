@@ -41,7 +41,7 @@ _self_dir=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || _self_dir=""   # before 
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "playbook-parity: not a git tree"; exit 2; }
 cd "$ROOT" || exit 2
 # THE TOOL ROOT, DERIVED (TOOL-aRepatriatedFork-29 S3): the directory this gate sits in, which is
-# where the kits, their sources and this gate's waiver file live. Underivable is a refusal.
+# where the kits and their sources live. Underivable is a refusal.
 if ! SELF_PRE=$(unset GIT_DIR GIT_WORK_TREE; git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
   echo "playbook-parity: cannot derive this gate's own directory from '$_self_dir' — REFUSING"
   exit 2
@@ -309,7 +309,9 @@ TEMPLATE=coding-governance-agents.template.md
 # with no precondition on the runbook, an absent one reds every kit with a wrong reason instead of
 # exiting 2 with the right one.
 RUNBOOK=WIRE-INTO-PROJECT.md
-WAIVERS=${PLAYBOOK_KIT_WAIVERS:-${SELF_PRE}playbook-kit-waivers.txt}
+# The waiver list is the ledger population `playbook-kit-waivers` in `memory/project/`, beside every
+# other population and spelled as check-spec-tokens.py spells its own (TOOL-dWitnessedBar-16 S14).
+WAIVERS=${PLAYBOOK_KIT_WAIVERS:-memory/project/playbook-kit-waivers.txt}
 SENTINEL=memory-tree
 
 status=0

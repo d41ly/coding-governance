@@ -9310,12 +9310,12 @@
     {
       "id": "cmd_down",
       "kind": "function",
-      "file": "tools/govkit/steps/review_rounds.py"
+      "file": "tools/govkit/steps/registry_to_ledger.py"
     },
     {
       "id": "cmd_down",
       "kind": "function",
-      "file": "tools/memory-tree/convert_registry.py"
+      "file": "tools/govkit/steps/review_rounds.py"
     },
     {
       "id": "cmd_emit_floors",
@@ -9625,12 +9625,12 @@
     {
       "id": "cmd_up",
       "kind": "function",
-      "file": "tools/govkit/steps/review_rounds.py"
+      "file": "tools/govkit/steps/registry_to_ledger.py"
     },
     {
       "id": "cmd_up",
       "kind": "function",
-      "file": "tools/memory-tree/convert_registry.py"
+      "file": "tools/govkit/steps/review_rounds.py"
     },
     {
       "id": "cmd_update",
@@ -9660,12 +9660,12 @@
     {
       "id": "cmd_witness",
       "kind": "function",
-      "file": "tools/govkit/steps/review_rounds.py"
+      "file": "tools/govkit/steps/registry_to_ledger.py"
     },
     {
       "id": "cmd_witness",
       "kind": "function",
-      "file": "tools/memory-tree/convert_registry.py"
+      "file": "tools/govkit/steps/review_rounds.py"
     },
     {
       "id": "cmd_write",
@@ -13095,7 +13095,7 @@
     {
       "id": "derive_step_id",
       "kind": "function",
-      "file": "tools/memory-tree/convert_registry.py"
+      "file": "tools/govkit/steps/registry_to_ledger.py"
     },
     {
       "id": "derive_step_mode",
@@ -15248,6 +15248,11 @@
       "file": "tools/govkit/steps/review_rounds.py"
     },
     {
+      "id": "load_conversion",
+      "kind": "function",
+      "file": "tools/govkit/steps/registry_to_ledger.py"
+    },
+    {
       "id": "load_corpus",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
@@ -15580,7 +15585,7 @@
     {
       "id": "load_steps",
       "kind": "function",
-      "file": "tools/memory-tree/convert_registry.py"
+      "file": "tools/govkit/steps/registry_to_ledger.py"
     },
     {
       "id": "load_text",
@@ -15856,6 +15861,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/govkit/steps/receipt_schema_4.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/govkit/steps/registry_to_ledger.py"
     },
     {
       "id": "main",
@@ -24445,6 +24455,11 @@
     {
       "id": "refuse_wrong_shell",
       "kind": "function",
+      "file": "tools/check-dead-paths.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
       "file": "tools/check-hook-destinations.sh"
     },
     {
@@ -27493,6 +27508,11 @@
       "file": "tools/loop/loop_checklist.py"
     },
     {
+      "id": "resolve_checkout",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
       "id": "resolve_cited_paths",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
@@ -28630,6 +28650,11 @@
     {
       "id": "resolve_python",
       "kind": "function",
+      "file": "tools/check-dead-paths.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
       "file": "tools/check-hook-destinations.sh"
     },
     {
@@ -29371,6 +29396,11 @@
       "id": "resolve_source",
       "kind": "function",
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
+    },
+    {
+      "id": "resolve_source",
+      "kind": "function",
+      "file": "tools/govkit/steps/registry_to_ledger.py"
     },
     {
       "id": "resolve_stage_efforts",
@@ -39436,6 +39466,11 @@
       "id": "wrong_shell_at",
       "kind": "function",
       "file": "tools/check-agent-cap-restatement.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/check-dead-paths.sh"
     },
     {
       "id": "wrong_shell_at",

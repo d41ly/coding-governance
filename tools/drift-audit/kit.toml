@@ -44,13 +44,6 @@ role = "project-owned"
 include = ["drift_signals.py"]
 role = "project-owned"
 
-# drift's two populations, its pins and its baselines (TOOL-dWitnessedBar-16 S8), are this repo's
-# project layer as `drift_signals.py` is: withheld from installs, an adopter's own made by its
-# `[[upgrade]]` steps from the `PINS` and `BASELINES` dicts its layer held.
-[[files]]
-include = ["drift-pins.txt", "drift-baselines.txt"]
-role = "project-owned"
-
 [[files]]
 include = ["drift_signals.template.py"]
 role = "seed"
@@ -190,7 +183,7 @@ key = "key"
 fields = ["signal"]
 drain = "key"
 direction = "ceiling"
-home = "tools/drift-audit/drift-pins.txt"
+home = "memory/project/drift-pins.txt"
 
 [[ledger]]
 population = "drift-baselines"
@@ -200,22 +193,22 @@ key = "record"
 fields = ["signal", "id"]
 drain = "key"
 direction = "shrink-only"
-home = "tools/drift-audit/drift-baselines.txt"
+home = "memory/project/drift-baselines.txt"
 
 # An adopter's own `PINS` and `BASELINES` dicts become its two files at its next update.
 
 [[upgrade]]
 id = "drift-audit/drift-pins-to-ledger"
-up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "tools/drift-audit/drift-pins.txt"]
-down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "tools/drift-audit/drift-pins.txt"]
-witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "tools/drift-audit/drift-pins.txt"]
-surfaces = ["file:tools/drift-audit/drift-pins.txt"]
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/drift-pins.txt", "--from", "{prefix}/drift-audit/drift_signals.py"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/drift-pins.txt", "--from", "{prefix}/drift-audit/drift_signals.py"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/drift-pins.txt", "--from", "{prefix}/drift-audit/drift_signals.py"]
+surfaces = ["file:memory/project/drift-pins.txt"]
 needs-target = false
 
 [[upgrade]]
 id = "drift-audit/drift-baselines-to-ledger"
-up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "tools/drift-audit/drift-baselines.txt"]
-down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "tools/drift-audit/drift-baselines.txt"]
-witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "tools/drift-audit/drift-baselines.txt"]
-surfaces = ["file:tools/drift-audit/drift-baselines.txt"]
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/drift-baselines.txt", "--from", "{prefix}/drift-audit/drift_signals.py"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/drift-baselines.txt", "--from", "{prefix}/drift-audit/drift_signals.py"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/drift-baselines.txt", "--from", "{prefix}/drift-audit/drift_signals.py"]
+surfaces = ["file:memory/project/drift-baselines.txt"]
 needs-target = false

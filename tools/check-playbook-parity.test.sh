@@ -305,7 +305,7 @@ say_fail() { fails=$((fails+1)); printf 'arm FAIL  %s — %s\n' "$1" "$2"; }
 # fixture <dir> — a minimal but VALID tree the gate passes on, so each arm breaks exactly one thing.
 fixture() {
   local d=$1
-  mkdir -p "$d/${FX}${MT_KIT}" "$d/${FX}${HOOKS}" "$d/${FX}${WF}" "$d/${FX}lib" "$d/${FX}${GK}" "$d/.claude"
+  mkdir -p "$d/memory/project" "$d/${FX}${MT_KIT}" "$d/${FX}${HOOKS}" "$d/${FX}${WF}" "$d/${FX}lib" "$d/${FX}${GK}" "$d/.claude"
   git -C "$d" init -q 2>/dev/null
   git -C "$d" config user.email t@t; git -C "$d" config user.name t
   cp "$GATE_SRC" "$d/${FX}check-playbook-parity.sh"
@@ -348,7 +348,7 @@ fixture() {
   # through the `<prefix>/` token (VERIFYING repair: a bare `memory-tree/` documents nothing).
   # The bare `§2` is S4's NEAR-MISS: a section sign with no charter word, counted and never failed.
   printf 'runbook {{MEMORY_ROOT}}\nadopt '"${FX:-<prefix>/}${MT_KIT}/"' into the target repo\nthe runbook §2 lists the steps\n' > "$d/WIRE-INTO-PROJECT.md"
-  printf '# waivers\nhooks\t1\tabcdef12\tseeded\n%s\t1\tabcdef12\tseeded\n' "$WF" > "$d/${FX}playbook-kit-waivers.txt"
+  printf '# waivers\nhooks\t1\tabcdef12\tseeded\n%s\t1\tabcdef12\tseeded\n' "$WF" > "$d/memory/project/playbook-kit-waivers.txt"
   # The gate reads that registry through the memory-tree kit's ledger factory (TOOL-dWitnessedBar-16),
   # so the factory and the two modules it imports sit in the fixture's memory-tree kit, as installed.
   cp "$ROOT/${PFX}${MT_KIT}/legacy_ledger.py" "$ROOT/${PFX}${MT_KIT}/backlog.py" \
@@ -497,15 +497,15 @@ arm "AC5 a derivation missing its sentinel reds" red \
 # --- AC6 · both waiver-drain arms ----------------------------------------------------------------------
 arm "AC6a a waiver for a kit that is gone reds as stale" red \
   "a waiver row names a kit that no longer exists, so the row excuses nothing and is stale" \
-  sh -c 'printf "ghostkit\t1\tabcdef12\tseeded\n" >> '"${PFX}playbook-kit-waivers.txt"''
+  sh -c 'printf "ghostkit\t1\tabcdef12\tseeded\n" >> memory/project/playbook-kit-waivers.txt'
 arm "AC6b a waiver for a kit the playbook DOES name reds" red \
   "a waiver row names a kit the playbook DOES document, so the row excuses nothing" \
-  sh -c 'printf "memory-tree\t1\tabcdef12\tseeded\n" >> '"${PFX}playbook-kit-waivers.txt"''
+  sh -c 'printf "memory-tree\t1\tabcdef12\tseeded\n" >> memory/project/playbook-kit-waivers.txt'
 
 # --- AC9 · the registry absent: red and STOP, never create one -------------------------------------------
 arm "AC9 an absent waiver registry reds and stops" red \
   "the kit waiver registry is absent and this gate never creates it: expected " \
-  sh -c 'git rm -q --cached '"${PFX}playbook-kit-waivers.txt"' >/dev/null 2>&1; rm -f '"${PFX}playbook-kit-waivers.txt"''
+  sh -c 'git rm -q --cached memory/project/playbook-kit-waivers.txt >/dev/null 2>&1; rm -f memory/project/playbook-kit-waivers.txt'
 
 # --- the two S2-stage integrity guards ----------------------------------------------------------
 # Both mutate the fixture's OWN copy of the gate, which is what a red proof of THIS kind of guard

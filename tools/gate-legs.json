@@ -2621,7 +2621,7 @@
     "guard": [
       "{prefix}/check-playbook-parity.sh",
       "{prefix}/check-playbook-parity.test.sh",
-      "{prefix}/playbook-kit-waivers.txt",
+      "memory/project/playbook-kit-waivers.txt",
       "{prefix}/workflows/check-verifier-fanout.js"
     ],
     "chunk": "selftests",

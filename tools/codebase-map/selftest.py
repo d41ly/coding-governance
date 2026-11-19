@@ -1604,7 +1604,8 @@ def test_baseline_additions_from_git(tmp: Path):
     run_git("add", "-A")
     run_git("commit", "-qm", "seed the baseline")
     seeded = run_git("rev-parse", "HEAD")
-    nowhere, why = cj.derive_baseline_additions(tmp, seeded, "memory/map/baseline.toml")
+    # A name no registration homes answers None and says so: the fixture registers baseline.txt alone.
+    nowhere, why = cj.derive_baseline_additions(tmp, seeded, "memory/map/unregistered.txt")
     assert nowhere is None and "no [[ledger]] registration homes" in why, (nowhere, why)
     # TOOL-dLadderedRemote-2: the remote is the LADDER'S, not one called `origin`. The ambient
     # GOV_REMOTE and GOV_DEFAULT_BRANCH are cleared for these arms, so a node exporting either

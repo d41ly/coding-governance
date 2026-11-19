@@ -217,16 +217,16 @@ home = "memory/map/baseline.txt"
 
 [[upgrade]]
 id = "codebase-map/affordance-exempt-to-ledger"
-up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "memory/map/affordance-exempt.toml"]
-down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "memory/map/affordance-exempt.toml"]
-witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "memory/map/affordance-exempt.toml"]
-surfaces = ["file:memory/map/affordance-exempt.toml"]
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/map/affordance-exempt.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/map/affordance-exempt.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/map/affordance-exempt.txt"]
+surfaces = ["file:memory/map/affordance-exempt.txt"]
 needs-target = false
 
 [[upgrade]]
 id = "codebase-map/baseline-to-ledger"
-up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "memory/map/baseline.toml"]
-down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "memory/map/baseline.toml"]
-witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "memory/map/baseline.toml"]
-surfaces = ["file:memory/map/baseline.toml"]
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/map/baseline.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/map/baseline.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/map/baseline.txt"]
+surfaces = ["file:memory/map/baseline.txt"]
 needs-target = false

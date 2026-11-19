@@ -821,57 +821,57 @@ home = "memory/project/unarmed-branches.txt"
 # Each list this kit's adopter seeds converts at the adopter's next update (TOOL-dWitnessedBar-16 S10).
 [[upgrade]]
 id = "memory-tree/curation-debt-to-ledger"
-up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "memory/project/curation-debt.txt"]
-down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "memory/project/curation-debt.txt"]
-witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "memory/project/curation-debt.txt"]
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/curation-debt.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/curation-debt.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/curation-debt.txt"]
 surfaces = ["file:memory/project/curation-debt.txt"]
 needs-target = false
 
 [[upgrade]]
 id = "memory-tree/id-orphan-waiver-to-ledger"
-up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "memory/project/id-orphan-waiver.txt"]
-down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "memory/project/id-orphan-waiver.txt"]
-witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "memory/project/id-orphan-waiver.txt"]
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/id-orphan-waiver.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/id-orphan-waiver.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/id-orphan-waiver.txt"]
 surfaces = ["file:memory/project/id-orphan-waiver.txt"]
 needs-target = false
 
 [[upgrade]]
 id = "memory-tree/legacy-files-to-ledger"
-up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "memory/project/legacy-files.txt"]
-down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "memory/project/legacy-files.txt"]
-witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "memory/project/legacy-files.txt"]
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/legacy-files.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/legacy-files.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/legacy-files.txt"]
 surfaces = ["file:memory/project/legacy-files.txt"]
 needs-target = false
 
 [[upgrade]]
 id = "memory-tree/method-carriers-to-ledger"
-up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "memory/project/method-carriers.txt"]
-down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "memory/project/method-carriers.txt"]
-witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "memory/project/method-carriers.txt"]
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/method-carriers.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/method-carriers.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/method-carriers.txt"]
 surfaces = ["file:memory/project/method-carriers.txt"]
 needs-target = false
 
 [[upgrade]]
 id = "memory-tree/readme-contract-to-ledger"
-up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "memory/project/readme-contract.txt"]
-down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "memory/project/readme-contract.txt"]
-witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "memory/project/readme-contract.txt"]
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/readme-contract.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/readme-contract.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/readme-contract.txt"]
 surfaces = ["file:memory/project/readme-contract.txt"]
 needs-target = false
 
 [[upgrade]]
 id = "memory-tree/stale-header-waiver-to-ledger"
-up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "memory/project/stale-header-waiver.txt"]
-down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "memory/project/stale-header-waiver.txt"]
-witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "memory/project/stale-header-waiver.txt"]
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/stale-header-waiver.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/stale-header-waiver.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/stale-header-waiver.txt"]
 surfaces = ["file:memory/project/stale-header-waiver.txt"]
 needs-target = false
 
 [[upgrade]]
 id = "memory-tree/unarmed-branches-to-ledger"
-up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "memory/project/unarmed-branches.txt"]
-down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "memory/project/unarmed-branches.txt"]
-witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "memory/project/unarmed-branches.txt"]
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/unarmed-branches.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/unarmed-branches.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/unarmed-branches.txt"]
 surfaces = ["file:memory/project/unarmed-branches.txt"]
 needs-target = false
 
