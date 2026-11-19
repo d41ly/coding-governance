@@ -14,7 +14,8 @@ WHAT IT READS. Every TRACKED `kit.toml` one directory below the tool root, the p
 unattended kit's `resolve_generated_indexes` reads, with tomllib. The tree is the current directory's
 git toplevel; the tool root is where this kit sits below its own repository, applied to that tree. Two tables declare an item:
   - a `[[generated]]` row carrying `write`, `check` (argv arrays) and `stage` (a positive integer),
-    all three or none — an index over the records or the code;
+    all three or none — an index over the records or the code; its optional `when`, either
+    `<conf>:<KEY>=<value>` or `exists:<path>`, skips it where it does not hold, and `--list` says so;
   - a `[[regenerate]]` row carrying `stage` — a render from a kit template. Its check is the row's
     own `check` argv, else its kit's `[check]` argv; a staged row with neither is refused.
 Rows sharing one write and one check are ONE item. Stage 1 renders from kit templates, stage 2 the
@@ -137,12 +138,20 @@ def resolve_argv(argv, ctx, where):
     return out
 
 
-def check_when(root, when, where):
-    """True when a row's `when = "<conf>:<KEY>=<value>"` holds at the repo root."""
-    conf, _, kv = str(when).partition(":")
+def check_when(root, when, ctx, where):
+    """True when a row's `when` holds at the repo root: `<conf>:<KEY>=<value>` when the conf's key reads
+    that value, `exists:<path>` when the path, its tokens resolved as an argv's are, exists in the tree
+    (TOOL-dWitnessedBar-45 S1). Neither form runs a command; any other spelling is a Refusal."""
+    shape = f"{where}: a when must read <conf file>:<KEY>=<value> or exists:<path>, got {when!r}"
+    w = str(when)
+    if w.startswith("exists:"):
+        if not w[len("exists:"):]:
+            raise Refusal(shape)
+        return (root / resolve_argv([w[len("exists:"):]], ctx, where)[0]).exists()
+    conf, _, kv = w.partition(":")
     key, eq, want = kv.partition("=")
     if not conf or not key or not eq:
-        raise Refusal(f"{where}: a when must read <conf file>:<KEY>=<value>, got {when!r}")
+        raise Refusal(shape)
     return read_conf_value(root / conf, key) == want
 
 
@@ -165,7 +174,8 @@ def check_operand(argv, root, where):
 
 def build_items(root, tool_rel, descriptors, skipped=None):
     """Every declared item, joined by its (write, check) pair, sorted into run order. A `[[regenerate]]`
-    row carrying no `stage` is not an item; when `skipped` is a list, each such row is added to it."""
+    row carrying no `stage`, and a `[[generated]]` row whose `when` does not hold, is not an item; when
+    `skipped` is a list, each such row is added to it with its own reason."""
     mem = read_conf_value(root / ".memory-tree.conf", "MEMORY_ROOT") or "memory"
     mapr = read_conf_value(root / ".codebase-map.conf", "MAP_ROOT")
     if mapr is None:
@@ -183,7 +193,10 @@ def build_items(root, tool_rel, descriptors, skipped=None):
             if len(keys) != 3:
                 raise Refusal(f"{where}: carries {', '.join(keys)} of write, check and stage, and a row "
                               f"carries all three or none")
-            if "when" in row and not check_when(root, row["when"], where):
+            if "when" in row and not check_when(root, row["when"], ctx, where):
+                if skipped is not None:
+                    skipped.append(f"{kit} · [[generated]] {row.get('path', '(no path)')} · its when "
+                                   f"{row['when']} does not hold")
                 continue
             path = resolve_argv([str(row.get("path") or "")], ctx, where)[0] if row.get("path") else ""
             add = (check_operand(resolve_argv(row["write"], ctx, where), root, where),
@@ -197,7 +210,8 @@ def build_items(root, tool_rel, descriptors, skipped=None):
                 if "check" in row:
                     raise Refusal(f"{where}: carries a check and no stage, so it joins no stage")
                 if skipped is not None:
-                    skipped.append(f"{kit} · [[regenerate]] {render_argv(resolve_argv(row.get('argv'), ctx, where))}")
+                    skipped.append(f"{kit} · [[regenerate]] {render_argv(resolve_argv(row.get('argv'), ctx, where))}"
+                                   f" · carries no stage, so no bar regenerates it")
                 continue
             chk = row.get("check") or kit_check
             if not chk:
@@ -316,14 +330,14 @@ def print_tail(out):
 
 
 def print_items(items, skipped=()):
-    """`--list`: every item in run order, each `[[regenerate]]` row skipped for carrying no stage, then a
-    derived count line, so a row the verb does not run is never silent (review L3)."""
+    """`--list`: every item in run order, each row skipped with the reason it carries, then a derived
+    count line, so a row the verb does not run is never silent (review L3)."""
     for i in items:
         print(f"regen: stage {i['stage']} · {i['kit']} · {', '.join(i['outputs'])}")
         print(f"regen:   write  {render_argv(i['write'])}")
         print(f"regen:   check  {render_argv(i['check'])}")
     for s in skipped:
-        print(f"regen: skipped · {s} · carries no stage, so no bar regenerates it")
+        print(f"regen: skipped · {s}")
     stages = sorted({i['stage'] for i in items})
     print(f"regen: {len(items)} declared across {len({i['kit'] for i in items})} kit(s), "
           f"in {len(stages)} stage(s)")

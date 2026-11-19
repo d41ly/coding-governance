@@ -29,6 +29,12 @@ registry's rows last:
   5. `pass_leg`, which `pass_legs.py` derives: its rule and its render, never re-stated here.
 The file written is the manifest beside the tool root, never one `$GATE_LEGS` names.
 
+WHERE GOVKIT IS ABSENT, as in every adopter (TOOL-dWitnessedBar-45): the module still loads, since it
+imports govkit only inside the verbs that render. `--write`, `--check`, `--list` and `new` exit 2 with
+the lookup's line naming the places looked. `--conform` reads the tree's descriptors through
+`regen.py`'s reader and grades every field arm over their `[[gate_leg]]` rows, and prints `fresh` and
+`enforces` as not graded here: the render and the registries both arms read are gov's.
+
 EXIT 0 clean · 1 a finding (`--check`, `--conform`, a failed selftest) · 2 a refusal: a declaration
 that does not parse, a token left unresolved, an empty population, or a sibling kit not found.
 
@@ -47,6 +53,11 @@ import tempfile
 import tomllib
 
 HERE = pathlib.Path(os.path.abspath(__file__)).parent
+# NO GOVKIT AT LOAD (TOOL-dWitnessedBar-45 S2): the module imports the standard library and this kit's
+# shipped siblings alone, so it loads in an adopter's tree; govkit is loaded inside the gov verbs.
+if str(HERE) not in sys.path:
+    sys.path.insert(0, str(HERE))
+import regen  # noqa: E402 - this kit's own descriptor reader and token resolver, standard library only
 SAY = "leg-factory"
 # `purpose := at most 60 characters` (TOOL-dWitnessedBar-19 S2, §8 F3), CHARACTERS and never bytes.
 # Moved whole from govkit (TOOL-dWitnessedBar-11 §8 F8): read by the `purpose` arm and by `new`.
@@ -125,8 +136,6 @@ def load_govkit():
 
 def load_pass_legs():
     """This kit's own `pass_legs` module: the pass-leg rule and its render (§8 F7)."""
-    if str(HERE) not in sys.path:
-        sys.path.insert(0, str(HERE))
     import pass_legs  # noqa: PLC0415
     return pass_legs
 
@@ -203,6 +212,36 @@ def read_declarations(root, G):
     if not out:
         raise Refusal("no declaration found: an empty population is refused, never rendered as []")
     return out
+
+
+def read_adopter_declarations(root, tool_rel):
+    """(every `[[gate_leg]]` row of this tree's descriptors as a declaration, [(arm, leg, message)]) in a
+    tree with no govkit (TOOL-dWitnessedBar-45 S3): read through `regen.read_descriptors`, each argv
+    resolved through `regen.resolve_argv`. The registry's `[[exempt_leg]]` rows and the flat entries'
+    descriptors under the playbook kit are not read, since that reader reads `*/kit.toml` alone."""
+    mem = regen.read_conf_value(pathlib.Path(root, ".memory-tree.conf"), "MEMORY_ROOT") or "memory"
+    mapr = regen.read_conf_value(pathlib.Path(root, ".codebase-map.conf"), "MAP_ROOT")
+    out, found = [], []
+    for kit_rel, d in regen.read_descriptors(pathlib.Path(root), tool_rel):
+        dpath = f"{kit_rel}/kit.toml"
+        ctx = {"kit": kit_rel, "prefix": tool_rel or ".", "memory_root": mem,
+               "map_root": "memory/map" if mapr is None else mapr}
+        for leg in d.get("gate_leg", []) or []:
+            nm = leg.get("name")
+            if "pass_leg" in leg:
+                found.append(("derived", nm, f"{dpath} declares `pass_leg` on leg {nm!r}: the field is "
+                                             f"derived by pass_legs.py at the render, never declared"))
+            try:
+                regen.resolve_argv(leg.get("argv"), ctx, f"{dpath} leg {nm!r}")
+            except regen.Refusal as e:
+                found.append(("token", nm, str(e)))
+            gov = leg.get("gov") if isinstance(leg.get("gov"), dict) else {}
+            out.append({"name": nm, "file": dpath, "kind": "claimed", "eid": d.get("id"),
+                        "base": {k: v for k, v in leg.items() if k != "gov"}, "gov": gov, "why": None,
+                        "kit": kit_rel})
+    if not out:
+        raise Refusal("no [[gate_leg]] row found: an empty population is refused, never graded as green")
+    return out, found
 
 
 def resolve_row_tokens(value, ctx, left):
@@ -328,8 +367,8 @@ def read_enforce_population(root, tool_rel):
     return tags, pending
 
 
-def check_declarations(root, G, decls, rows):
-    """[(arm, leg, message)] for every field arm of §4 "The gate" but `fresh` and `token`."""
+def check_declarations(decls, rows):
+    """[(arm, leg, message)] for every field arm of §4 "The gate" but `fresh`, `token` and `enforces`."""
     found = []
     by_name = {}
     for dc in decls:
@@ -381,7 +420,14 @@ def check_declarations(root, G, decls, rows):
         if len(nms) > 1:
             found.append(("purpose", nms[0], f"legs {', '.join(repr(x) for x in nms)} share the purpose "
                                              f"{pu!r}: two legs, one purpose, says what a feature is for"))
-    pop = read_enforce_population(root, G.derive_tool_root(root))
+    return found
+
+
+def check_enforces(root, tool_rel, rows):
+    """[(arm, leg, message)] for the `enforces` arm, gov's: graded against the playbook kit's registries
+    and its pending list; nothing where no playbook kit sits in the tree."""
+    found = []
+    pop = read_enforce_population(root, tool_rel)
     if pop is not None:
         tags, pending = pop
         for row in rows:
@@ -472,14 +518,34 @@ def run_check(root):
     return 0, [f"{SAY}: fresh · {len(rows)} legs, the manifest is what --write renders"]
 
 
+def run_conform_adopter(root):
+    """`--conform` in a tree with no govkit (TOOL-dWitnessedBar-45 S3, §8 F4): every field arm over the
+    `[[gate_leg]]` rows of this tree's descriptors; `fresh` and `enforces` are gov's and named ungraded."""
+    tool_rel = pathlib.Path(os.path.relpath(HERE.parent, root)).as_posix()
+    tool_rel = "" if tool_rel == "." else tool_rel
+    decls, found = read_adopter_declarations(root, tool_rel)
+    found += check_declarations(decls, [dict(dc["base"], name=dc["name"]) for dc in decls])
+    lines = [f"{SAY}: {arm} · {m}" for arm, _n, m in found]
+    lines += [f"{SAY}: fresh: not graded here — no govkit", f"{SAY}: enforces: not graded here — no govkit",
+              f"legs: {len(decls)} declared · {len(decls)} claimed · the registry's exempt rows are not "
+              f"read here — no govkit"]
+    rc = 1 if found else 0
+    lines.append(f"{SAY}: conform · {'red' if rc else 'green'}")
+    return rc, lines
+
+
 def run_conform(root):
+    try:
+        resolve_kit_dir(GOVKIT_HOME, "govkit.py", HERE)
+    except LookupError:
+        return run_conform_adopter(root)
     G = load_govkit()
     decls = read_declarations(root, G)
     rows, found = render_rows(root, G, decls)
     tool_rel, _mem = read_layout(root, G)
     cur_text, cur_rows = read_manifest(pathlib.Path(root, tool_rel, "gate-legs.json"))
     lines = [f"{SAY}: fresh · {d}" for d in derive_drift(cur_text, cur_rows, render_manifest(rows))]
-    found += check_declarations(root, G, decls, rows)
+    found += check_declarations(decls, rows) + check_enforces(root, tool_rel, rows)
     lines += [f"{SAY}: {arm} · {m}" for arm, _n, m in found]
     pop = read_enforce_population(root, tool_rel)
     pend = len(pop[1]) if pop else 0
