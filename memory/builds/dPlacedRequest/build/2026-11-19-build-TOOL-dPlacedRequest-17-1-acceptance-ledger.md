@@ -14,19 +14,19 @@ declares and their RED-first observations are owed at the close.
 **Evidences:** TOOL-dPlacedRequest-17
 - AC1 — a lease whose only commit carries `renews: yes` and a `beat-utc` 25 h before now, sighted by
   the read itself, printed `tOc live` with field 4 at 0 and 1 s (DERIVED, two runs); the base driver
-  copy and the cut whose age pass reads `beat-utc` each printed it `stale`, aged 90003 and 90004 s
+  copy and the cut whose age pass reads `beat-utc` each printed it `stale`, aged 90003 and 90004 s (DERIVED)
   (DERIVED).
 - AC2 — the same lease with its feed line planted 25 h ago printed `stale` at 90001 s (DERIVED); with
   `leases.expiry-hours = 48` committed to `.governance/policy.toml` and pushed, `policy.py get`
   answered 48 and `--claims` printed `live` (DERIVED).
-- AC3 — a `renews: yes` commit sighted 25 h ago under a `renews: no` beat sighted 60 s ago printed
+- AC3 — a `renews: yes` commit sighted 25 h ago under a `renews: no` beat sighted 60 s ago printed (DERIVED)
   `stale` with field 4 at 61 s (DERIVED); the same chain with the beat `renews: yes` printed `live`
   (DERIVED).
-- AC4 — a lease whose commit carries `renews: -`, sighted 1000 h ago, printed `live` at 3600001 s
+- AC4 — a lease whose commit carries `renews: -`, sighted 1000 h ago, printed `live` at 3600001 s (DERIVED)
   (DERIVED).
 - AC5 — `tools/unattended/unattended.sh#check_deadline_passed`, defined over the sourced
-  `tools/lib/gov-feed.sh#read_first_seen`, returned 1 for an offer sighted 60 s ago whose
-  `offer-deadline` read a day past and bound 300, 0 for one sighted 400 s ago, 1 for a tombstone
+  `tools/lib/gov-feed.sh#read_first_seen`, returned 1 for an offer sighted 60 s ago whose (DERIVED)
+  `offer-deadline` read a day past and bound 300, 0 for one sighted 400 s ago, 1 for a tombstone (DERIVED)
   sighted 6 days ago whose `beat-utc` read 8 days ago and bound 604800, 0 for one sighted 8 days ago,
   and 2 for an unsighted commit (DERIVED).
 - AC6 — a lease and a legacy claim both printed `live` under the driver; under the cut deleting the
@@ -56,7 +56,7 @@ declares and their RED-first observations are owed at the close.
 - The DEAD PROBE rule: a sighting planted as `2026-02-30T00:00:00Z` turned both rows of the read
   `unknown`, aged `-` (DERIVED), the staging the AC16 arm now reaches through `seed_claim`.
 - `tools/unattended/unattended.sh#read_lease_bound` printed 86400 for 24 h, 5400 for 1.5 h, 0 for 0,
-  604800 for 7 days and 300 for 300 s, and returned 1 with LB_VALUE empty for a refused read and for
+  604800 for 7 days and 300 for 300 s, and returned 1 with LB_VALUE empty for a refused read and for (DERIVED)
   a kind it does not name (DERIVED).
 - The `gov_feed_sh` block cut from `tools/lib/gov-feed.sh`, `tools/unattended/unattended.sh` and
   `tools/run-gates/post-merge.sh` hashed equal (DERIVED).
