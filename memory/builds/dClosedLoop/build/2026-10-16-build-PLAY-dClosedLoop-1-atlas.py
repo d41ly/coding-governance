@@ -151,6 +151,27 @@ CORPUS_PLANTS = ("instruments-decision", "view-unread")
 ACTUAL_PLANTS = ("state-dropped", "asbuilt-dropped")
 STATE_PATH = REPO / "memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-1-build-state.py"
 STAMP_SCHEMA = 2
+# Each stamp field's rule, the one table the page's writer and its reader both check through `check_stamp`
+# (TOOL-dTrackedAtlas-12), so `--out` refuses a stamp `--check --page` would call unstamped.
+STAMP_RULES = {
+    "schema": lambda v: type(v) is int and v == STAMP_SCHEMA,
+    "commit": lambda v: isinstance(v, str) and re.fullmatch(r"[0-9a-f]{40}", v) is not None,
+    "default_ref": lambda v: isinstance(v, str) and re.fullmatch(r"[A-Za-z0-9._][A-Za-z0-9._/-]*", v) is not None,
+    "landings": lambda v: isinstance(v, dict) and bool(v) and all(
+        isinstance(k, str) and re.fullmatch(r"[A-Za-z0-9._-]+", k) and isinstance(shas, list) and all(
+            isinstance(s, str) and re.fullmatch(r"[0-9a-f]{40}", s) for s in shas)
+        for k, shas in v.items()),
+    "digest": lambda v: isinstance(v, str) and re.fullmatch(r"[0-9a-f]{64}", v) is not None,
+    "inputs": lambda v: isinstance(v, list) and bool(v) and all(
+        isinstance(p, str) and re.fullmatch(r"[A-Za-z0-9._][A-Za-z0-9._/-]*", p) and ".." not in p.split("/")
+        for p in v),
+    "dirty": lambda v: isinstance(v, list) and all(isinstance(p, str) for p in v),
+}
+# The advice TOOL-dTrackedAtlas-1's StateError ends with, an option the Atlas does not take, and the remedy each
+# relaying branch names in its place (TOOL-dTrackedAtlas-12).
+STATE_ADVICE = "pass --default-ref <rev>"
+DERIVE_REMEDY = "fetch the default branch, or name it with GOV_REMOTE and GOV_DEFAULT_BRANCH"
+CHECK_REMEDY = "fetch the default branch the stamp names, or regenerate the page"
 V2_VIEWS = {"layers": "overview", "principles": "principles", "front-door": "records", "policies": "policies",
             "presets": "policies", "floor": "records", "witnesses": "records", "contracts": "flow", "chain": "chain",
             "clause-ids": "records", "enforcement": "records", "planned": "records", "open": "progress", "owed": "progress"}
@@ -736,6 +757,15 @@ def load_build_state():
     return load_build_state.module
 
 
+def render_state_error(error, remedy):
+    """The text of `error`, TOOL-dTrackedAtlas-1's StateError, with a trailing STATE_ADVICE, an option the Atlas does
+    not take, rewritten as `remedy`; any other text unchanged (TOOL-dTrackedAtlas-12)."""
+    said = str(error)
+    if said.endswith(STATE_ADVICE):
+        return said[:-len(STATE_ADVICE)] + remedy
+    return said
+
+
 def derive_actual(data, ref="HEAD", claims=True, plant=None):
     """`data`, `derive`'s result, with the chain's actual state added (TOOL-dTrackedAtlas-2): `state`, the state
     document of TOOL-dTrackedAtlas-1's `derive` at `ref`, whole; `asBuilt`, the as-built view's rows per chain build;
@@ -763,7 +793,9 @@ def derive_actual(data, ref="HEAD", claims=True, plant=None):
 
     try:
         state = build_state.derive(ref, root=str(REPO), claims=claims, detail=True)
-    except (build_state.ChainError, build_state.StateError) as e:
+    except build_state.StateError as e:
+        sys.exit(f"atlas: chain state: {render_state_error(e, DERIVE_REMEDY)}")
+    except build_state.ChainError as e:
         sys.exit(f"atlas: chain state: {e}")
     anchor = state["landed"][-1] if state["landed"] else None
     if plant in ACTUAL_PLANTS and anchor is None:
@@ -804,7 +836,17 @@ def derive_actual(data, ref="HEAD", claims=True, plant=None):
 
 
 class StampError(Exception):
-    """A git call failed or timed out, or the ref does not resolve."""
+    """A git call failed or timed out, the ref does not resolve, or a stamp fails a rule of STAMP_RULES."""
+
+
+def check_stamp(stamp, fields=None):
+    """The reason `the stamp's <field> field fails its rule:<value>` for the first field of `fields` (None: every
+    field of STAMP_RULES, in the table's order) whose rule `stamp.get(field)` fails, else None (TOOL-dTrackedAtlas-12).
+    """
+    for field in STAMP_RULES if fields is None else fields:
+        if not STAMP_RULES[field](stamp.get(field)):
+            return f"the stamp's {field} field fails its rule:{json.dumps(stamp.get(field))[:80]}"
+    return None
 
 
 def read_git(*args):
@@ -827,7 +869,8 @@ def read_git(*args):
 def read_landings(commit, builds, default_ref, default_commit=None):
     """{slug: [merge sha, ...]}, oldest first, for each slug of `builds`: the landing candidates TOOL-dTrackedAtlas-1's
     `derive_landings` reads at `commit` on the first-parent line of `default_commit`, which is `default_ref` resolved
-    now when not passed (TOOL-dTrackedAtlas-10). StampError carrying the text of the module's StateError."""
+    now when not passed (TOOL-dTrackedAtlas-10). StampError carrying the text of the module's StateError, its advice
+    rewritten as CHECK_REMEDY by `render_state_error` (TOOL-dTrackedAtlas-12)."""
     build_state = load_build_state()
     memory_root = BUILD.parent.parent.relative_to(REPO).as_posix()
     try:
@@ -835,7 +878,7 @@ def read_landings(commit, builds, default_ref, default_commit=None):
             _, default_commit = build_state.resolve_default_ref(str(REPO), default_ref)
         found = build_state.derive_landings(str(REPO), commit, default_commit, memory_root, tuple(builds))
     except build_state.StateError as e:
-        raise StampError(str(e)) from None
+        raise StampError(render_state_error(e, CHECK_REMEDY)) from None
     return {b: [sha for sha, _, _ in found[b]] for b in builds}
 
 
@@ -851,16 +894,16 @@ def derive_input_digest(commit, inputs, default_ref, landings):
 def build_stamp(data):
     """The page's stamp (TOOL-dTrackedAtlas-3): the commit the chain state was read at, the tracked inputs the page
     derives from, the default-branch ref and each chain build's landing candidates (TOOL-dTrackedAtlas-10), their
-    digest at that commit, and the inputs the working tree differs in. StampError when the state carries no 40-hex
-    commit, no string default_ref or no 40-hex default_commit, or a git call fails."""
+    digest at that commit, and the inputs the working tree differs in. StampError when the state's commit or
+    default_ref fails its STAMP_RULES row before any git call, its default_commit fails the commit row, a git call
+    fails, or the stamp it would return fails a row, so it never writes a stamp `read_stamp` refuses
+    (TOOL-dTrackedAtlas-12)."""
     state = data.get("state") or {}
-    commit = state.get("commit")
-    if not (isinstance(commit, str) and re.fullmatch(r"[0-9a-f]{40}", commit)):
-        raise StampError(f"the chain state carries no 40-hex commit, but {commit!r}")
-    default_ref, default_commit = state.get("default_ref"), state.get("default_commit")
-    if not isinstance(default_ref, str):
-        raise StampError(f"the chain state carries no string default_ref, but {default_ref!r}")
-    if not (isinstance(default_commit, str) and re.fullmatch(r"[0-9a-f]{40}", default_commit)):
+    commit, default_ref, default_commit = state.get("commit"), state.get("default_ref"), state.get("default_commit")
+    reason = check_stamp({"commit": commit, "default_ref": default_ref}, ("commit", "default_ref"))
+    if reason:
+        raise StampError(reason)
+    if not STAMP_RULES["commit"](default_commit):
         raise StampError(f"the chain state carries no 40-hex default_commit, but {default_commit!r}")
     fixed = [(BUILD / "README.md").relative_to(REPO).as_posix(), HERE.relative_to(REPO).as_posix() + "/",
              REVIEWS.relative_to(REPO).as_posix() + "/", (REPO / ".memory-tree.conf").relative_to(REPO).as_posix(),
@@ -873,9 +916,13 @@ def build_stamp(data):
     for listing in (read_git("diff", "--name-only", "-z", commit, "--", *inputs),
                     read_git("ls-files", "--others", "--exclude-standard", "-z", "--", *inputs)):
         dirty.update(p for p in listing.decode("utf-8", "replace").split("\0") if p)
-    return {"schema": STAMP_SCHEMA, "commit": commit, "default_ref": default_ref, "landings": landings,
-            "digest": derive_input_digest(commit, inputs, default_ref, landings), "inputs": inputs,
-            "dirty": sorted(dirty)}
+    stamp = {"schema": STAMP_SCHEMA, "commit": commit, "default_ref": default_ref, "landings": landings,
+             "digest": derive_input_digest(commit, inputs, default_ref, landings), "inputs": inputs,
+             "dirty": sorted(dirty)}
+    reason = check_stamp(stamp)
+    if reason:
+        raise StampError(reason)
+    return stamp
 
 
 def read_stamp(page):
@@ -894,24 +941,8 @@ def read_stamp(page):
     stamp = data.get("stamp") if isinstance(data, dict) else None
     if not isinstance(stamp, dict):
         return None, "its data carries no stamp"
-    rules = {
-        "schema": lambda v: type(v) is int and v == STAMP_SCHEMA,
-        "commit": lambda v: isinstance(v, str) and re.fullmatch(r"[0-9a-f]{40}", v) is not None,
-        "default_ref": lambda v: isinstance(v, str) and re.fullmatch(r"[A-Za-z0-9._][A-Za-z0-9._/-]*", v) is not None,
-        "landings": lambda v: isinstance(v, dict) and bool(v) and all(
-            isinstance(k, str) and re.fullmatch(r"[A-Za-z0-9._-]+", k) and isinstance(shas, list) and all(
-                isinstance(s, str) and re.fullmatch(r"[0-9a-f]{40}", s) for s in shas)
-            for k, shas in v.items()),
-        "digest": lambda v: isinstance(v, str) and re.fullmatch(r"[0-9a-f]{64}", v) is not None,
-        "inputs": lambda v: isinstance(v, list) and bool(v) and all(
-            isinstance(p, str) and re.fullmatch(r"[A-Za-z0-9._][A-Za-z0-9._/-]*", p) and ".." not in p.split("/")
-            for p in v),
-        "dirty": lambda v: isinstance(v, list) and all(isinstance(p, str) for p in v),
-    }
-    for field, rule in rules.items():
-        if not rule(stamp.get(field)):
-            return None, f"the stamp's {field} field fails its rule:{json.dumps(stamp.get(field))[:80]}"
-    return stamp, None
+    reason = check_stamp(stamp)
+    return (None, reason) if reason else (stamp, None)
 
 
 def check_page(page, ref="HEAD"):
@@ -923,8 +954,6 @@ def check_page(page, ref="HEAD"):
         print(f"atlas: cannot check: {reason}", file=sys.stderr)
         return 2
 
-    if ref.startswith("-"):
-        return print_refusal(f"--ref takes a revision, not {ref}")
     if not Path(page).is_file():
         print(f"atlas: absent — no page at {page}")
         return 1

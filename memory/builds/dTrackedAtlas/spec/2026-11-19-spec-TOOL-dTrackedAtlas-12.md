@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-19-build-TOOL-dTrackedAtlas-12-ledger.md](../build/2026-11-19-build-TOOL-dTrackedAtlas-12-ledger.md) | journal | — |
 | [2026-11-19-build-TOOL-dTrackedAtlas-12-red-fix-10.md](../build/2026-11-19-build-TOOL-dTrackedAtlas-12-red-fix-10.md) | red-fix | — |
 | [2026-11-19-build-TOOL-dTrackedAtlas-12-red-fix-11.md](../build/2026-11-19-build-TOOL-dTrackedAtlas-12-red-fix-11.md) | red-fix | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-12-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-12-build-brief.md) | research | — |
