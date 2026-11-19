@@ -1,13 +1,15 @@
 # TOOL-dLandedOwners-4 — the closing review's promoted findings: the kit threaded to every resolver, a failing case for each landed-predicate arm, every withheld file checked, one git-read refusal and the docs aligned
 
-**Status:** INPROGRESS · rev-1 · 2026-11-19 · node d · Tier-2 · base 515a3e6c · streams tooling · order 4
+**Status:** INPROGRESS · rev-2 · 2026-11-19 · node d · Tier-2 · base 515a3e6c · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-19-prompt-TOOL-dLandedOwners-4-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-4-2-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dLandedOwners-4-3-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-4-3-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-4-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-4-build-brief.md) | research | — |
+| [2026-11-19-prompt-TOOL-dLandedOwners-4-divergence-1.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-4-divergence-1.md) | research | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-4-spec-brief.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-4-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -232,9 +234,11 @@ leaves no restated set to drift again, where (c) leaves the same follow-up the r
   or tabs, so the path holds no whitespace". The "Every run says what it graded" bullet gains: a
   git read the check makes that fails stops it with one finding naming the read.
 - The module docstring's `arm_reader_coverage` clause: "reds a catalogue key whose owner build has
-  landed by `derive_landed_builds` (every spec terminal at the landed revision, or a build-kind run
-  record with a first-parent landing merge, TOOL-dLandedOwners-1)". `git grep` for "terminal at the
-  landed revision" over `tools/`, `help/` and `README.md` then finds no copy of the old clause.
+  landed by `derive_landed_builds` (every spec's status header terminal, read at the landed
+  revision, or a build-kind run record with a first-parent landing merge, TOOL-dLandedOwners-1)".
+  The new clause never holds the old one's phrase "terminal at the landed revision", so `git grep`
+  for that phrase over `tools/`, `help/` and `README.md` then finds no copy of the old clause, and
+  any later restatement of the replaced predicate reds AC11.
 - `tools/policy/README.md`: the arm paragraph says half 2 loads the run readers once and hands
   them to `derive_run_kind`, and the arm table's findings cell and the arm paragraph say that a
   git read of reader coverage that fails is a Refusal naming it. The `reader-coverage-carried`
@@ -327,6 +331,10 @@ Each function name leads with a verb `.lexicon.conf` declares, and `lexicon.py -
 `memory/map/generated/inventories.json`
 `memory/map/generated/symbols.json`
 `memory/builds/dLandedOwners/build/2026-11-19-build-TOOL-dLandedOwners-4-ledger.md`
+`memory/LIVE.md`
+`memory/builds/dLandedOwners/README.md`
+
+The last two are re-rendered by the commit hooks, as at unit 3's build commit `b8297f701`.
 
 ### Alternatives rejected
 
@@ -457,6 +465,14 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-19 · initial draft.
+- rev-2 · 2026-11-19 · §4 · S10 · AC11 · the builder's divergence at the first build pass, folded
+  from 2026-11-19-prompt-TOOL-dLandedOwners-4-divergence-1, dispatched as
+  2026-11-19-prompt-TOOL-dLandedOwners-4-3-spec-writer. The prescribed docstring clause held the
+  phrase AC11 requires absent, so §4 "The docs" rewords it to "every spec's status header terminal,
+  read at the landed revision" and AC11 stands as written: it keeps grepping the old predicate's
+  wording, so a restatement anywhere in `tools/`, `help/` or `README.md` reds, where pointing it at
+  a phrase only line 20 holds would check that one instance. Files touched gains `memory/LIVE.md`
+  and `memory/builds/dLandedOwners/README.md`, which the commit hooks re-render.
 
 ## 10. Reuse audit
 
