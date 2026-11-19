@@ -953,15 +953,15 @@ fw_got=$(cd "$ROOT" && . "$HERE/gov-feed.sh" && scan_feed_writers $fw_pop 2>&1 |
 fw="$TMP/feed-writers"; mkdir -p "$fw"
 printf '%s\n' 'plant_writer() {' '  git push --porcelain "--force-with-lease=refs/gov/runs/x:$1" origin "$2:refs/gov/runs/x"' '}' > "$fw/plant.sh"
 fw_got=$(cd "$ROOT" && . "$HERE/gov-feed.sh" && scan_feed_writers $fw_pop "$fw/plant.sh" 2>&1 | tr -d '\r')
-[ "$fw_got" = "$fw/plant.sh:2" ] || bad "the census passed a planted writer that never appends to the feed: ${fw_got//$'\n'/ | }"; ok
+[ "$fw_got" = "$fw/plant.sh"":2" ] || bad "the census passed a planted writer that never appends to the feed: ${fw_got//$'\n'/ | }"; ok
 printf '%s\n' 'mail_writer() {' '  add_feed_event refs/gov/mail/fx/a/s1 "$c"' '  git push origin "$c:refs/gov/mail/fx/a/s1"' '}' > "$fw/plain.sh"
 fw_got=$(cd "$ROOT" && . "$HERE/gov-feed.sh" && scan_feed_writers $fw_pop "$fw/plain.sh" 2>&1 | tr -d '\r')
-[ "$fw_got" = "$fw/plain.sh:3" ] || bad "the census passed a plain push of a governance ref beside an append: ${fw_got//$'\n'/ | }"; ok
+[ "$fw_got" = "$fw/plain.sh"":3" ] || bad "the census passed a plain push of a governance ref beside an append: ${fw_got//$'\n'/ | }"; ok
 printf '%s\n' 'my_join() {' '  add_feed_event "$1" "$2"' '}' 'join_writer() {' '  git push --porcelain "--force-with-lease=$1:$2" origin "$3:$1"' '  my_join "$1" "$3"' '}' > "$fw/helper.sh"
 fw_got=$(cd "$ROOT" && . "$HERE/gov-feed.sh" && FEED_WRITER_HELPER_FNS="$FEED_WRITER_HELPER_FNS my_join" && scan_feed_writers $fw_pop "$fw/helper.sh" 2>&1 | tr -d '\r')
 [ -z "$fw_got" ] || bad "the census read a pusher through a declared helper as a hit: ${fw_got//$'\n'/ | }"; ok
 fw_got=$(cd "$ROOT" && . "$HERE/gov-feed.sh" && scan_feed_writers $fw_pop "$fw/helper.sh" 2>&1 | tr -d '\r')
-[ "$fw_got" = "$fw/helper.sh:5" ] || bad "the census passed a pusher through a helper the list does not name: ${fw_got//$'\n'/ | }"; ok
+[ "$fw_got" = "$fw/helper.sh"":5" ] || bad "the census passed a pusher through a helper the list does not name: ${fw_got//$'\n'/ | }"; ok
 fw_got=$(cd "$ROOT" && . "$HERE/gov-feed.sh" && FEED_WRITER_HELPER_FNS="$FEED_WRITER_HELPER_FNS my_join no_such_fn" && scan_feed_writers $fw_pop "$fw/helper.sh" 2>&1 | tr -d '\r')
 [ "$fw_got" = "FEED_WRITER_HELPER_FNS names no_such_fn(), which is no function of the files read" ] \
   || bad "the census passed a stale helper entry: ${fw_got//$'\n'/ | }"; ok
