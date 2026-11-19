@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-53 — every population an uncommitted scaffold seeds equals its seed after the first commit, held by a suite arm
 
-**Status:** INPROGRESS · rev-6 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 11 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-7 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 11 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -80,7 +80,7 @@ it arms. It repairs `TOOL-dWitnessedBar-46`.
 
 ### Edges
 
-- **consumes-from** `TOOL-dWitnessedBar-52` — `root_confs`, the read whose behaviour across the first commit this arm observes; without it the arm reds
+- **consumes-from** `TOOL-dWitnessedBar-52` — `read_root_confs`, the read whose behaviour across the first commit this arm observes; without it the arm reds
 - **consumes-from** `TOOL-dWitnessedBar-46` — the memory-tree adopter's seed of `conf-scalar-pins`, the population the arm must find armed
 - **consumes-from** `TOOL-dWitnessedBar-15` — `legacy_ledger.py seed --population` and its `armed` line, which name each population the scaffold seeds and re-seed it
 - **consumes-from** `TOOL-dWitnessedBar-61` — the null SHA on an unborn HEAD, without which the arm's first `seed --all` before the commit cannot arm a population
@@ -207,7 +207,7 @@ pass's parent, after unit 17's raise.
 
 `memory hygiene` · `memory-hygiene self-test`
 
-New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC2 · the uncommitted example-conf scaffold seeded, committed and re-seeded, staged red by dropping `--others` from unit 52's `root_confs` · FLOOR_ASSERTIONS raised by the arm's assertions
+New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC2 · the uncommitted example-conf scaffold seeded, committed and re-seeded, staged red by dropping `--others` from unit 52's `read_root_confs` · FLOOR_ASSERTIONS raised by the arm's assertions
 
 ## 8. Open questions
 
@@ -279,6 +279,9 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC2 · the
   first. AC2, AC3 and the arm line stand.
 - rev-6 · 2026-11-19 · §2 · rewrapped the probe sentence so its PINNED mark sits on the `6 rows` fact's own line,
   per brief 2026-11-19-prompt-TOOL-dWitnessedBar-53-pin-spec-writer; nothing else moved.
+- rev-7 · 2026-11-19 · §3 · §7 · per brief 2026-11-19-prompt-TOOL-dWitnessedBar-52-rename-brief: the
+  Edges bullet and the arm line name unit 52's conf read `read_root_confs`, the name its rev-6 gives it;
+  nothing else moved.
 
 ## 10. Reuse audit
 

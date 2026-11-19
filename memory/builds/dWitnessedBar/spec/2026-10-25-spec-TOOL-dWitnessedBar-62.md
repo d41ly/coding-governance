@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-62 — the round-1 audit of units 52 to 57, its 39 minors batched: readers that agree on every form, arms that compare what they arm, floors and greps that can red, and contained, lossless reads
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 34 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 34 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -142,7 +142,7 @@ That is 25 MEDIUM and 14 LOW findings by raw id.
 - **S22** — id 39. An `exists:` path that is absolute (`/…`, `X:…`) or holds a `..` segment is refused
   by selfcheck's `_gwbad` and by `regen.check_when`, and skipped with S21's line by lib-unattended, by
   the pattern `read_gate_policy` uses (`tools/unattended/unattended.sh:9566-9567`). Observed by AC2.
-- **S23** — id 40. `root_confs` (`TOOL-dWitnessedBar-52` S1) keeps each listed path once and only when it
+- **S23** — id 40. `read_root_confs` (`TOOL-dWitnessedBar-52` S1) keeps each listed path once and only when it
   is a regular file in the work tree; a listed path that is absent is printed
   `not in the work tree <path>` and not read. Observed by AC15.
 - **S24** — id 42. Every reader of a per-tree record or run record takes a key's value as the line after
@@ -212,7 +212,7 @@ That is 25 MEDIUM and 14 LOW findings by raw id.
 - **consumes-from** `TOOL-dWitnessedBar-57` — the pass-commit rule, the gate-health population, the coverage predicate and figure, the seed-home containment, `empty seed` and AC18 (ids 7, 21, 22, 23, 24, 29, 30, 34, 43, 44)
 - **consumes-from** `TOOL-dWitnessedBar-51` — S1, AC8, AC17 and the `PARITY_ROWS` precedent of S21 (ids 5, 23, 24, 29)
 - **consumes-from** `TOOL-dWitnessedBar-1` — `--gate-health`, its write path and AC1 to AC4 (id 29)
-- **consumes-from** `TOOL-dWitnessedBar-52` — `root_confs` and AC3's plant (ids 9, 11, 34, 40)
+- **consumes-from** `TOOL-dWitnessedBar-52` — `read_root_confs` and AC3's plant (ids 9, 11, 34, 40)
 - **consumes-from** `TOOL-dWitnessedBar-14` — the `ratchet.py` docstrings that describe the conf set (id 11)
 - **consumes-from** `TOOL-dWitnessedBar-55` — the parity arm and `witness` (ids 26, 41)
 - **consumes-from** `TOOL-dWitnessedBar-59` — the `lone-cr` parity row, carried with the other eight (id 26)
@@ -481,6 +481,9 @@ New arm: tools/lib/legacy_ledger.py · covers AC18 · the `.git` homes and the r
   consumes-from edge, promoted by the round-1 spec audit of units 58 to 62; nothing else moved.
 - rev-3 · 2026-11-19 · §7 · the leg line gains `policy fixtures`, whose manifest guard holds the §4 path
   `tools/govkit/selftest.py`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief; nothing
+  else moved.
+- rev-4 · 2026-11-19 · S23 · §3 · per brief 2026-11-19-prompt-TOOL-dWitnessedBar-52-rename-brief: S23
+  and the Edges bullet name unit 52's conf read `read_root_confs`, the name its rev-6 gives it; nothing
   else moved.
 
 ## 10. Reuse audit

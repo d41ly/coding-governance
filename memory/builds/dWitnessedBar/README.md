@@ -127,8 +127,8 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-46 — what an adopter receives of the ratchet pack: the scalar-pin leg over its own seeded pins, and the rest kept gov's](spec/2026-10-25-spec-TOOL-dWitnessedBar-46.md) | 10 | 2 | CLOSED | rev-6 | 2026-11-19 |
 | [TOOL-dWitnessedBar-54 — the `exists:` spelling of a generated row's `when` reaches its other two readers, and the three readers are held to agree](spec/2026-10-25-spec-TOOL-dWitnessedBar-54.md) | 10 | 2 | CLOSED | rev-5 | 2026-11-19 |
 | [TOOL-dWitnessedBar-17 — the seven record and row pins as keyed populations, and the date cutoffs registered as cutoffs](spec/2026-10-25-spec-TOOL-dWitnessedBar-17.md) | 11 | 2 | CLOSED | rev-9 | 2026-11-19 |
-| [TOOL-dWitnessedBar-52 — the scalar-pin seed reads every root conf the working tree holds, so a fresh install seeds its pin before its first commit](spec/2026-10-25-spec-TOOL-dWitnessedBar-52.md) | 11 | 2 | INPROGRESS | rev-5 | 2026-11-19 |
-| [TOOL-dWitnessedBar-53 — every population an uncommitted scaffold seeds equals its seed after the first commit, held by a suite arm](spec/2026-10-25-spec-TOOL-dWitnessedBar-53.md) | 11 | 2 | INPROGRESS | rev-6 | 2026-11-19 |
+| [TOOL-dWitnessedBar-52 — the scalar-pin seed reads every root conf the working tree holds, so a fresh install seeds its pin before its first commit](spec/2026-10-25-spec-TOOL-dWitnessedBar-52.md) | 11 | 2 | INPROGRESS | rev-6 | 2026-11-19 |
+| [TOOL-dWitnessedBar-53 — every population an uncommitted scaffold seeds equals its seed after the first commit, held by a suite arm](spec/2026-10-25-spec-TOOL-dWitnessedBar-53.md) | 11 | 2 | INPROGRESS | rev-7 | 2026-11-19 |
 | [TOOL-dWitnessedBar-18 — the positional references, the producer hits, IW-1's legacy list and the unpinned facts registered from dOrderedCharter's keyed lists, and dSafePassage's landed step rows as an append-only population](spec/2026-10-25-spec-TOOL-dWitnessedBar-18.md) | 12 | 2 | DEFERRED | rev-6 | 2026-11-19 |
 | [TOOL-dWitnessedBar-20 — the legacy-homes list converted into a ledger population keyed by conf and key](spec/2026-10-25-spec-TOOL-dWitnessedBar-20.md) | 13 | 2 | DEFERRED | rev-3 | 2026-11-19 |
 | [TOOL-dWitnessedBar-24 — the portability leg pack: every P37 rule on a leg, each arm seen red on a planted case](spec/2026-10-25-spec-TOOL-dWitnessedBar-24.md) | 14 | 2 | DEFERRED | rev-5 | 2026-11-19 |
@@ -160,7 +160,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-57 — the round-1 audit of units 40 to 51, resolver, ledger and adopter minors batched: one stated wrong-shell predicate, contained seed homes, readers that see what the runner holds, and observations that can red](spec/2026-10-25-spec-TOOL-dWitnessedBar-57.md) | 32 | 2 | DEFERRED | rev-4 | 2026-10-25 |
 | [TOOL-dWitnessedBar-58 — the hook's inherited-base export observed where the knob is still visible: the stub bar's environment and the runner's decline, with every leg proven blind to it](spec/2026-10-25-spec-TOOL-dWitnessedBar-58.md) | 33 | 2 | DEFERRED | rev-2 | 2026-10-25 |
 | [TOOL-dWitnessedBar-60 — every bar caller that records a trusted green scrubs every knob the hook clears, held by one parity arm over the three lists](spec/2026-10-25-spec-TOOL-dWitnessedBar-60.md) | 33 | 2 | DEFERRED | rev-3 | 2026-10-25 |
-| [TOOL-dWitnessedBar-62 — the round-1 audit of units 52 to 57, its 39 minors batched: readers that agree on every form, arms that compare what they arm, floors and greps that can red, and contained, lossless reads](spec/2026-10-25-spec-TOOL-dWitnessedBar-62.md) | 34 | 2 | DEFERRED | rev-3 | 2026-10-25 |
+| [TOOL-dWitnessedBar-62 — the round-1 audit of units 52 to 57, its 39 minors batched: readers that agree on every form, arms that compare what they arm, floors and greps that can red, and contained, lossless reads](spec/2026-10-25-spec-TOOL-dWitnessedBar-62.md) | 34 | 2 | DEFERRED | rev-4 | 2026-10-25 |
 | [TOOL-dWitnessedBar-63 — the round-1 audit of units 58 to 62, its 34 minors batched: readers that read the whole list and every path form, criteria graded on what the built tree derives, honest failure paths, and observed sequences](spec/2026-10-25-spec-TOOL-dWitnessedBar-63.md) | 35 | 2 | DEFERRED | rev-3 | 2026-10-25 |
 | [TOOL-dWitnessedBar-64 — the seed reads HEAD as unborn only when it names a branch that does not exist, so a HEAD git cannot resolve takes the no-HEAD path](spec/2026-10-25-spec-TOOL-dWitnessedBar-64.md) | 36 | 2 | DEFERRED | rev-2 | 2026-10-25 |
 | [TOOL-dWitnessedBar-65 — the round-1 audit of unit 63, its 22 minors batched: one containment rule in three readers, plants a leg runs, a seed order that never stalls, honest seed and sweep failures, and readers that keep every normalisation](spec/2026-10-25-spec-TOOL-dWitnessedBar-65.md) | 37 | 2 | DEFERRED | rev-4 | 2026-10-25 |
@@ -198,7 +198,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-97 — the round-1 audit of units 91 and 92, 10 minors batched: derivation notes naming launcher, exit and script, an isolated third clone, pass commits read through the shipped seams, unit 91's note graded and every unit ledger read](spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md) | 50 | 2 | DEFERRED | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 412 bound to this build, across 4 record folder(s).
+Records: 413 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
