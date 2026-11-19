@@ -178,6 +178,7 @@ tests = ["feature.loop"]
 enforces = ["principle.p1"]
 name = "loop definition"
 subject = "repo"
+purpose = "checks the loop definition every reader in the target reads"
 argv = ["python", "{kit}/loop_lib.py", "--check"]
 reads = { base = "it compares the actor-witness list with itself at the compare base, the merge-base with the default branch, so a verdict cached against one base says nothing about another (TOOL-dDeclaredLoop-5)." }
 guard = []
@@ -192,6 +193,7 @@ tests = ["feature.loop"]
 enforces = ["principle.p20"]
 name = "loop transition tables"
 subject = "repo"
+purpose = "checks the transition tables every mover in the target reads"
 argv = ["python", "{kit}/loop_table.py", "check", "--selftest"]
 guard = []
 ceiling = 120

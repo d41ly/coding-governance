@@ -87,6 +87,7 @@ tests = ["feature.policy"]
 enforces = ["principle.p16"]
 name = "policy check"
 subject = "repo"
+purpose = "checks the repository's own policy file"
 argv = ["python", "{kit}/check_policy.py"]
 guard = []
 ceiling = 120

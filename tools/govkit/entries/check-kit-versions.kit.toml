@@ -47,6 +47,7 @@ tag = "leg.check-kit-versions.kit-version-markers"
 tests = ["feature.memory-tree-hygiene"]
 name = "kit version markers"
 subject = "repo"
+purpose = "checks every kit carries a well-formed version constant"
 argv = ["bash", "{prefix}/check-kit-versions.sh"]
 guard = []
 doc_reads = []

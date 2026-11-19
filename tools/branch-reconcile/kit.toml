@@ -59,6 +59,7 @@ tag = "leg.branch-reconcile.cleanup-skill-wiring"
 tests = ["feature.branch-reconcile"]
 name = "cleanup skill wiring"
 subject = "repo"
+purpose = "checks the rendered cleanup Skill has not gone stale"
 argv = ["bash", "{kit}/adopt-branch-reconcile.sh", "--check"]
 guard = []
 stage = ["step.test"]

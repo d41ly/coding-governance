@@ -48,6 +48,7 @@ tag = "leg.check-microformats.micro-format-definitions"
 tests = ["feature.playbook"]
 name = "micro-format definitions"
 subject = "repo"
+purpose = "grades the charter's micro-format definitions by grammar"
 argv = ["bash", "{prefix}/check-microformats.sh"]
 stage = ["step.test"]
 
@@ -56,6 +57,7 @@ tag = "leg.check-microformats.micro-format-gate-selftest"
 tests = ["feature.playbook"]
 name = "micro-format gate selftest"
 subject = "kit"
+purpose = "observes the micro-format gate's failing case per predicate"
 argv = ["bash", "{prefix}/check-microformats.test.sh"]
 guard = ["{prefix}/check-microformats.sh", "{prefix}/check-microformats.test.sh"]
 stage = ["step.test"]

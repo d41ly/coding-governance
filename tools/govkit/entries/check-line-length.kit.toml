@@ -58,6 +58,7 @@ tag = "leg.check-line-length.line-length"
 tests = ["feature.playbook"]
 name = "line length"
 subject = "repo"
+purpose = "holds agent-instruction prose to a declared line length"
 argv = ["bash", "{prefix}/check-line-length.sh"]
 stage = ["step.test"]
 

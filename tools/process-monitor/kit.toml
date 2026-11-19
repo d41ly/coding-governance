@@ -82,6 +82,7 @@ tag = "leg.process-monitor.process-monitor-wiring"
 tests = ["feature.process-monitor"]
 name = "process-monitor wiring"
 subject = "repo"
+purpose = "checks the process-monitor kit's wiring has not drifted"
 argv = ["bash", "{kit}/adopt-process-monitor.sh", "--check"]
 guard = []
 doc_reads = []
