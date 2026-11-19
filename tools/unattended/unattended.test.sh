@@ -19239,6 +19239,83 @@ fi   # ---- region 8 continues below: one compound block past about 3000 command
 if in_shard 8; then
 
 # ==================================================================================================
+# TOOL-dPlacedRequest-24 — THE OFFLINE QUEUE UNDER ONE NODE LOCK. Over the lease fixture's clone:
+# a re-run offline acquire appends nothing (AC1); a held `gov-queue.lock` refuses an append with exit
+# 2 inside the 5 s wait, and a lock freed after the first busy try is retaken (AC3); a line appended
+# while the flush pushes survives the rewrite (AC4); and two breakers of one stale node lock admit one
+# (AC5). The driver's functions run in process, sourced above, each staged inside a `$( )` or a
+# background subshell so the suite's shell keeps the clean ones. AC4's push is a stub writer, never
+# a remote. AC5's meeting point is an `rm` SHIM first on each breaker's own PATH, at the step after
+# its staleness verdict: it waits (bounded 3 s) for the other breaker to reach the same step, and the
+# second for the first's verdict, so a copy with the `.break` guard cut lets both in every time. The
+# staged reds are TOOL-dPlacedRequest-1's unlocked queue and that guard-cut copy, observed at the
+# close. WHAT THIS BLOCK DOES NOT DRIVE: the feed's lock under contention, and a flush whose second
+# take is refused.
+# ==================================================================================================
+LF=$(mktemp -d); write_lease_fixture
+qa_d="$LF/c1/.git"; qa_c=$(git -C "$LF/c1" rev-parse HEAD)
+# ---- AC1: the second offline acquire of one ref and cached tip prints `queued — already`, one line.
+mv "$LF/origin.git" "$LF/away.git"
+run_lease_arm acquire build tOff >/dev/null; qa_rc1=$?
+qa_out=$(run_lease_arm acquire build tOff); qa_rc=$?
+same "DPR24 AC1 a re-run offline acquire exits 0 and the queue holds one line" \
+  "$qa_rc1 $qa_rc $(grep -c '' "$qa_d/gov-queue.log")" "0 0 1"
+hit  "$qa_out" "queued — already"
+# ---- AC3: a planted live lock refuses the append with exit 2 inside 6 s and leaves the file as it was.
+qa_sum=$(cksum <"$qa_d/gov-queue.log")
+mkdir "$qa_d/gov-queue.lock"; echo "$((EPOCHSECONDS + 60))" >"$qa_d/gov-queue.lock/until"
+echo w-other >"$qa_d/gov-queue.lock/owner"
+qa_got=$(cd "$LF/c1" && qa_t=${EPOCHREALTIME/[.,]/}; add_gov_queue refs/gov/leases/tQ/build "" "$qa_c"; qa_r=$?
+  [ $(( ${EPOCHREALTIME/[.,]/} - qa_t )) -le 6000000 ] && echo "$qa_r within" || echo "$qa_r late")
+same "DPR24 AC3 a held gov-queue.lock refuses the append with exit 2 within 6 s" "$qa_got" "2 within"
+qa_out=$(run_lease_arm acquire build tBusy); qa_rc=$?
+same "DPR24 AC3 ...and the offline acquire through it exits 2" "$qa_rc" "2"
+hit  "$qa_out" "gov-queue.lock"
+same "DPR24 AC3 ...and the queue is unchanged" "$(cksum <"$qa_d/gov-queue.log")" "$qa_sum"
+# ---- AC3, the retry half: `write_dir_lock` wrapped to count each try and free the planted lock after
+# ---- the first busy one, the original kept as `write_dir_lock_once`; the append lands on a retry.
+qa_got=$(cd "$LF/c1" && qa_n="$LF/tries"; : >"$qa_n"
+  eval "$(declare -f write_dir_lock | sed '1s/^write_dir_lock /write_dir_lock_once /')"
+  write_dir_lock() { local r; echo try >>"$qa_n"; write_dir_lock_once "$@"; r=$?
+    [ "$r" = 0 ] || rm -rf "$qa_d/gov-queue.lock"; return "$r"; }
+  add_gov_queue refs/gov/leases/tQ/build "" "$qa_c"; qa_r=$?
+  [ "$(grep -c '' "$qa_n")" -ge 2 ] && echo "$qa_r retried" || echo "$qa_r once")
+same "DPR24 AC3 a lock freed after the first busy try is retaken, the append landing" \
+  "$qa_got $(grep -c '' "$qa_d/gov-queue.log")" "0 retried 2"
+# ---- AC4: a stub writer appends a second line while the first is pushed; the rewrite keeps exactly it.
+qa_got=$(cd "$LF/c1" && ROOT="$LF/c1"; RUNLOG_GITDIR=""; qa_f="$qa_d/gov-queue.log"
+  printf 'refs/gov/leases/tQ1/build\t-\t%s\t2026-11-19T00:00:00Z\n' "$qa_c" >"$qa_f"
+  write_gov_ref() { GOVREF_WHY=""
+    printf 'refs/gov/leases/tQ2/build\t-\t%s\t2026-11-19T00:00:01Z\n' "$qa_c" >>"$qa_f"; return 0; }
+  write_gov_queue >/dev/null; echo "$? $(cut -f1 "$qa_f" | tr '\n' ' ')")
+same "DPR24 AC4 the flush resolves the first line and keeps the one appended during its push" \
+  "$qa_got" "0 refs/gov/leases/tQ2/build "
+# ---- AC5: two breakers of one planted node lock whose `until` has passed: one takes, one event.
+qa_x="$LF/race"; qa_lk="$qa_x/gov-queue.lock"; mkdir -p "$qa_x/bin" "$qa_lk"
+echo "$((EPOCHSECONDS - 5))" >"$qa_lk/until"; echo w-dead >"$qa_lk/owner"
+printf '%s\n' '#!/usr/bin/env bash' 'case "${!#}" in *.break) ;; *)' \
+  '  : >"$QA_X/in$QA_ID"; i=0' \
+  '  while [ ! -e "$QA_X/in$((3 - QA_ID))" ] && [ "$i" -lt 30 ]; do sleep 0.1; i=$((i + 1)); done' \
+  '  i=0; while [ "$QA_ID" = 2 ] && [ ! -e "$QA_X/v1" ] && [ "$i" -lt 30 ]; do sleep 0.1; i=$((i + 1)); done ;;' \
+  'esac' 'exec "$QA_RM" "$@"' >"$qa_x/bin/rm"
+chmod +x "$qa_x/bin/rm"
+for qa_i in 1 2; do
+  ( ROOT=$qa_x; resolve_health_log() { echo "$qa_x/health"; }; add_health_event() { echo "$3" >>"$1"; }
+    QA_RM=$(command -v rm); export QA_X="$qa_x" QA_ID=$qa_i QA_RM; PATH="$qa_x/bin:$PATH"
+    write_dir_lock "$qa_lk" "w$qa_i" "$NODE_LOCK_BOUND" node && qa_v=taken || qa_v=busy
+    echo "$qa_v" >"$qa_x/v$qa_i.t"; mv "$qa_x/v$qa_i.t" "$qa_x/v$qa_i" ) &
+  eval "qa_p$qa_i=\$!"
+done
+wait "$qa_p1" "$qa_p2"
+# The third figure is the shim's liveness: one breaker reached it, so the meeting point was armed.
+same "DPR24 AC5 two breakers of one stale node lock: one takes it, one node-lock-broken event" \
+  "$(cat "$qa_x/v1" "$qa_x/v2" | grep -c taken) $(grep -c node-lock-broken "$qa_x/health" 2>/dev/null) $(ls "$qa_x" | grep -c '^in[12]$')" "1 1 1"
+rm -rf "$LF"
+fi   # ---- region 8 continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 8; then
+
+# ==================================================================================================
 # TOOL-aGraftedHelix-32 — THE CLOSING REVIEW'S MINORS IN THE DRIVER. AC18 (M8, L1): the GH26 AC3
 # no-push witness gets a leg of its own, the bare origin in place, no mktemp shim, and a git shim that
 # fails only the claim fetch and logs every argument list, so nothing absorbs a push before the log
@@ -21216,7 +21293,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3552 -> 3562 by TOOL-dPlacedRequest-23: the strict-read block's 10 region-eight assertions
 # (its loop over the three planted values runs a `hit` and a `same` each), every one unconditional;
 # a probe of the block alone counted them. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3562
+# RAISED 3562 -> 3571 by TOOL-dPlacedRequest-24: the offline queue lock block's 9 region-eight assertions
+# (7 `same`, 2 `hit`), every one unconditional, counted off the diff's own lines; no suite ran, and its
+# RED-first observation is the close's.
+FLOOR_ASSERTIONS=3571
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -21463,7 +21543,8 @@ FLOOR_SHARD_7=311
 # RAISED 744 -> 765 by TOOL-dPlacedRequest-1: the same 21 region-eight `--lease` refusal assertions, see FLOOR_ASSERTIONS.
 # RAISED 765 -> 786 by TOOL-dPlacedRequest-17: the same 21 region-eight observer clock assertions, see FLOOR_ASSERTIONS.
 # RAISED 786 -> 796 by TOOL-dPlacedRequest-23: the same 10 region-eight strict-read assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=796
+# RAISED 796 -> 805 by TOOL-dPlacedRequest-24: the same 9 region-eight offline queue lock assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=805
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

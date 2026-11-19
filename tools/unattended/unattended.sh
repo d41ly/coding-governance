@@ -2019,22 +2019,8 @@ read_landed_observation() { # slug · landing commit -> 0 with LO_SHA and LO_UTC
 # one slow census and still ends a hung one. A pinned literal, chosen rather than measured, on
 # REMOTE_BOUND's argument that a bound raisable from the environment leaves no diff behind.
 REAP_BOUND=120
-PT_TOKEN=""
-read_proc_token() { # pid -> sets PT_TOKEN to its procfs start token, or `-` when procfs cannot say
-  local _l="" _r
-  local -a _f
-  PT_TOKEN=-
-  case "${1:-}" in ""|*[!0-9]*) return 0 ;; esac
-  { IFS= read -r _l < "$PROCFS_ROOT/$1/stat" || [ -n "$_l" ]; } 2>/dev/null || return 0
-  # EVERY FIELD AFTER THE LAST `)` IS NUMERIC OR ONE LETTER. The command name inside the parentheses
-  # may carry spaces and parentheses of its own, so the split starts after it: field 3 is `_f[0]`.
-  _r=${_l##*) }
-  read -r -a _f <<<"$_r"
-  [ "${#_f[@]}" -ge 20 ] || return 0
-  case "${_f[19]}" in ""|*[!0-9]*) return 0 ;; esac
-  PT_TOKEN=${_f[19]}
-  return 0
-}
+# `read_proc_token` and `check_proc_gone`, the procfs readers this ledger and the directory lock share,
+# are defined in the `gov_feed_sh` block below (TOOL-dPlacedRequest-24).
 resolve_procs_path() { # slug -> the process ledger's path on this node, beside the landed log
   local _pp; _pp=$(resolve_landed_log "$1") || return 1
   printf '%s/%s.procs\n' "${_pp%/*}" "$1"
@@ -2092,14 +2078,6 @@ derive_proc_state() { # ledger line -> PS_STATE gone|reused|live|orphan|untokene
   if kill -0 "$PS_DPID" 2>/dev/null; then PS_STATE=live; return 0; fi
   if [ "$PS_TOK" = - ] || [ "$PT_TOKEN" = - ]; then PS_STATE=untokened; else PS_STATE=orphan; fi
   return 0
-}
-# Is the RECORDED process still there? Dead, or its pid now carrying another start token, is gone.
-check_proc_gone() { # pid · recorded token -> 0 when that process no longer exists
-  kill -0 "$1" 2>/dev/null || return 0
-  [ "${2:--}" != - ] || return 1
-  read_proc_token "$1"
-  [ "$PT_TOKEN" != - ] && [ "$PT_TOKEN" != "$2" ] && return 0
-  return 1
 }
 measure_orphans() { # slug -> how many recorded processes are alive with their driver gone, on stdout; reads only
   local _l _n=0
@@ -2765,87 +2743,9 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
 }
 
 # THE DIRECTORY LOCK (TOOL-aGraftedHelix-37), a factory (TOOL-aPiecewiseGrade-6): the spec-token
-# start half takes `spec-tokens.<slug>.lock` for `GATE_BOUND` plus 60 s with the
-# stem `spec-tokens`. `write_dir_lock` takes the lock with
-# `mkdir` and writes its deadline into `until` and the caller's token into `owner`. A lock it cannot
-# make is broken only when `check_dir_lock_stale` reads it stale - a deadline already passed,
-# or none and a directory older than two minutes - and only by the writer that takes the guard
-# `<lock>.break` with `mkdir`. Holding the guard it re-reads the rule, breaks a lock still stale,
-# makes it again and writes both files before it releases the guard; a re-read finding the lock live,
-# or a re-make losing to a plain `mkdir`, releases the guard and reports busy. So no breaker removes
-# a lock another breaker made. A guard older than one minute was left by a crash: the writer finding
-# it removes it and reports busy, never taking it in the same call, and the next call breaks the
-# lock. Each self-heal appends a health event, named from the caller's stem, once the guard is
-# released. `remove_dir_lock`
-# clears the lock only while its `owner` reads the caller's token, the turnstile's nonce pattern, so
-# a release never removes the fresh lock of a writer that broke it. `until` stays a bare epoch.
-# WHAT THIS DOES NOT CHECK: removing an abandoned guard is itself unguarded, so two writers removing
-# one at once while a third takes a fresh guard between them can admit two breakers; that needs a
-# writer to die or stall for a minute inside the break, then four writers in one git dir in one
-# window. An owner that outlives its recorded deadline (no runnable `timeout -k`) is breakable while
-# it pushes, and its own release can land between a breaker's re-read and its removal. Both the
-# deadline and the age are wall-clock reads, so a clock stepped forward breaks a live lock.
-# A writer in another git dir takes another lock.
-# THE OWNER'S PROCESSES, read as data in the lock (TOOL-aPiecewiseGrade-6 S9). A holder may write one
-# `pid.<role>` file per process with `write_dir_lock_pid`: the pid, its procfs start token or `-`, the
-# writer's runtime as `$HOSTNAME:$OSTYPE`, and an optional end file, last because a path may carry a
-# space. `check_dir_lock_stale` also reads a lock stale when it holds at least one such file and every
-# one names a process gone: a digit pid, this runtime, `check_proc_gone` answering gone, and an end
-# file that exists or whose directory is gone, or none recorded. An empty file, the pending `-`, a
-# foreign runtime or a missing stamp reads live. A lock with no pid file keeps the deadline and age
-# rule alone.
-# WHAT THIS DOES NOT CHECK: two process tables printing one `$HOSTNAME:$OSTYPE`, such as two MSYS
-# installs on one host, read each other's pids gone and can break a live lock; and a reused pid with
-# no token reads live, so its lock waits for the deadline.
-check_dir_lock_stale() { # lock dir -> 0 when its deadline passed, or it has none and is older than two minutes, or every process it records is gone
-  local lu="" f p t w e n=0; { read -r lu <"$1/until"; } 2>/dev/null || :
-  case "$lu" in *[!0-9]*) lu="" ;; esac
-  for f in "$1"/pid.*; do
-    [ -f "$f" ] || continue
-    p=""; t=""; w=""; e=""; { read -r p t w e <"$f"; } 2>/dev/null || :
-    case "$p" in ""|*[!0-9]*) n=-1; break ;; esac
-    [ "$w" = "${HOSTNAME:-}:${OSTYPE:-}" ] && check_proc_gone "$p" "$t" \
-      && { [ -z "$e" ] || [ -e "$e" ] || [ ! -d "${e%/*}" ]; } || { n=-1; break; }
-    n=$((n + 1))
-  done
-  [ "$n" -le 0 ] || return 0
-  if [ -n "$lu" ]; then [ "$lu" -lt "$EPOCHSECONDS" ]; return; fi
-  [ -n "$(find "$1" -maxdepth 0 -mmin +2 2>/dev/null)" ]
-}
-write_dir_lock_pid() { # lock dir · role · pid, or - for pending · end file, optional -> <lock>/pid.<role> written; always 0
-  read_proc_token "$3"
-  printf '%s %s %s %s\n' "$3" "$PT_TOKEN" "${HOSTNAME:-}:${OSTYPE:-}" "${4:-}" >"$1/pid.$2" 2>/dev/null || :
-  return 0
-}
-write_dir_lock() { # lock dir · owner token · seconds it may hold · health-event stem -> 0 taken, 1 busy
-  local lk="$1" g="$1.break" broke=""
-  if ! mkdir "$lk" 2>/dev/null; then
-    check_dir_lock_stale "$lk" || return 1
-    if ! mkdir "$g" 2>/dev/null; then
-      if [ -n "$(find "$g" -maxdepth 0 -mmin +1 2>/dev/null)" ]; then
-        rm -rf "$g"
-        add_health_event "$(resolve_health_log "$ROOT")" unattended "$4-guard-cleared" "$g"
-      fi
-      return 1
-    fi
-    if ! check_dir_lock_stale "$lk"; then rmdir "$g" 2>/dev/null; return 1; fi
-    rm -rf "$lk"
-    mkdir "$lk" 2>/dev/null || { rmdir "$g" 2>/dev/null; return 1; }
-    broke=1
-  fi
-  printf '%s\n' "$(( $EPOCHSECONDS + $3 ))" >"$lk/until" 2>/dev/null || :
-  printf '%s\n' "$2" >"$lk/owner" 2>/dev/null || :
-  if [ -n "$broke" ]; then
-    rmdir "$g" 2>/dev/null
-    add_health_event "$(resolve_health_log "$ROOT")" unattended "$4-lock-broken" "$lk"
-  fi
-  return 0
-}
-remove_dir_lock() { # lock dir · owner token -> removes it only while its owner file reads that token
-  local o=""; { read -r o <"$1/owner"; } 2>/dev/null || :
-  [ -n "$2" ] && [ "$o" = "$2" ] && rm -rf "$1"
-  return 0
-}
+# start half takes `spec-tokens.<slug>.lock` for `GATE_BOUND` plus 60 s with the stem `spec-tokens`,
+# and the node locks take theirs with the stem `node`. The factory and its rule are defined in the
+# `gov_feed_sh` block below (TOOL-dPlacedRequest-24), the one definition every carrier of it shares.
 
 # >>> gov_ref_sh — canonical copy: gov-ref.sh in gov's lib dir (byte-identical; gated)
 # I1 AND I2, ONE WRITER FOR EVERY GOVERNANCE REF (TOOL-dPlacedRequest-11): a run claim, the bar-red
@@ -2931,15 +2831,137 @@ remove_gov_ref() {   # ref · expected sha -> as write_gov_ref, pushing the ref'
 }
 # <<< gov_ref_sh
 # >>> gov_feed_sh — canonical copy: gov-feed.sh in gov's lib dir (byte-identical; gated)
+# THE NODE LOCKS (TOOL-dPlacedRequest-24): a node-local file two sessions of this node write, the
+# feed's log and the offline queue's, is read and written only under a lock directory beside it in
+# the common dir, taken through `write_dir_lock_wait` with the stem `node`, so a stale break appends
+# `node-lock-broken` or `node-guard-cleared`. NODE_LOCK_BOUND is the seconds a node lock may hold:
+# a pinned literal, because a holder does local file work alone and never pushes while it holds.
+NODE_LOCK_BOUND=10
+# THE DIRECTORY LOCK (TOOL-aGraftedHelix-37), a factory (TOOL-aPiecewiseGrade-6), moved into this
+# block (TOOL-dPlacedRequest-24) so every carrier holds the one definition. `write_dir_lock` takes the
+# lock with `mkdir` and writes its deadline into `until` and the caller's token into `owner`. A lock it cannot
+# make is broken only when `check_dir_lock_stale` reads it stale - a deadline already passed,
+# or none and a directory older than two minutes - and only by the writer that takes the guard
+# `<lock>.break` with `mkdir`. Holding the guard it re-reads the rule, breaks a lock still stale,
+# makes it again and writes both files before it releases the guard; a re-read finding the lock live,
+# or a re-make losing to a plain `mkdir`, releases the guard and reports busy. So no breaker removes
+# a lock another breaker made. A guard older than one minute was left by a crash: the writer finding
+# it removes it and reports busy, never taking it in the same call, and the next call breaks the
+# lock. Each self-heal appends a health event, named from the caller's stem, once the guard is
+# released. `write_dir_lock_wait` is the one retrying take: it calls `write_dir_lock` every 50 ms
+# until it takes or its ceiling in seconds passes, read on the whole-second clock. `remove_dir_lock`
+# clears the lock only while its `owner` reads the caller's token, the turnstile's nonce pattern, so
+# a release never removes the fresh lock of a writer that broke it. `until` stays a bare epoch.
+# WHAT THIS DOES NOT CHECK: removing an abandoned guard is itself unguarded, so two writers removing
+# one at once while a third takes a fresh guard between them can admit two breakers; that needs a
+# writer to die or stall for a minute inside the break, then four writers in one git dir in one
+# window. An owner that outlives its recorded deadline (no runnable `timeout -k`) is breakable while
+# it pushes, and its own release can land between a breaker's re-read and its removal. Both the
+# deadline and the age are wall-clock reads, so a clock stepped forward breaks a live lock.
+# A writer in another git dir takes another lock. A carrier with no driver has no `ROOT` and no
+# health log appender, so a break there reaches those unset names, prints their two errors and
+# writes no health event, until TOOL-dPlacedRequest-36 gives that carrier its path.
+# THE OWNER'S PROCESSES, read as data in the lock (TOOL-aPiecewiseGrade-6 S9). A holder may write one
+# `pid.<role>` file per process with `write_dir_lock_pid`: the pid, its procfs start token or `-`, the
+# writer's runtime as `$HOSTNAME:$OSTYPE`, and an optional end file, last because a path may carry a
+# space. `check_dir_lock_stale` also reads a lock stale when it holds at least one such file and every
+# one names a process gone: a digit pid, this runtime, `check_proc_gone` answering gone, and an end
+# file that exists or whose directory is gone, or none recorded. An empty file, the pending `-`, a
+# foreign runtime or a missing stamp reads live. A lock with no pid file keeps the deadline and age
+# rule alone. The procfs read is `${PROCFS_ROOT:-/proc}`: the driver sets PROCFS_ROOT from its fixture
+# seam, and a carrier with no driver reads `/proc`.
+# WHAT THIS DOES NOT CHECK: two process tables printing one `$HOSTNAME:$OSTYPE`, such as two MSYS
+# installs on one host, read each other's pids gone and can break a live lock; and a reused pid with
+# no token reads live, so its lock waits for the deadline.
+PT_TOKEN=""
+read_proc_token() { # pid -> sets PT_TOKEN to its procfs start token, or `-` when procfs cannot say
+  local _l="" _r
+  local -a _f
+  PT_TOKEN=-
+  case "${1:-}" in ""|*[!0-9]*) return 0 ;; esac
+  { IFS= read -r _l < "${PROCFS_ROOT:-/proc}/$1/stat" || [ -n "$_l" ]; } 2>/dev/null || return 0
+  # EVERY FIELD AFTER THE LAST `)` IS NUMERIC OR ONE LETTER. The command name inside the parentheses
+  # may carry spaces and parentheses of its own, so the split starts after it: field 3 is `_f[0]`.
+  _r=${_l##*) }
+  read -r -a _f <<<"$_r"
+  [ "${#_f[@]}" -ge 20 ] || return 0
+  case "${_f[19]}" in ""|*[!0-9]*) return 0 ;; esac
+  PT_TOKEN=${_f[19]}
+  return 0
+}
+# Is the RECORDED process still there? Dead, or its pid now carrying another start token, is gone.
+check_proc_gone() { # pid · recorded token -> 0 when that process no longer exists
+  kill -0 "$1" 2>/dev/null || return 0
+  [ "${2:--}" != - ] || return 1
+  read_proc_token "$1"
+  [ "$PT_TOKEN" != - ] && [ "$PT_TOKEN" != "$2" ] && return 0
+  return 1
+}
+check_dir_lock_stale() { # lock dir -> 0 when its deadline passed, or it has none and is older than two minutes, or every process it records is gone
+  local lu="" f p t w e n=0; { read -r lu <"$1/until"; } 2>/dev/null || :
+  case "$lu" in *[!0-9]*) lu="" ;; esac
+  for f in "$1"/pid.*; do
+    [ -f "$f" ] || continue
+    p=""; t=""; w=""; e=""; { read -r p t w e <"$f"; } 2>/dev/null || :
+    case "$p" in ""|*[!0-9]*) n=-1; break ;; esac
+    [ "$w" = "${HOSTNAME:-}:${OSTYPE:-}" ] && check_proc_gone "$p" "$t" \
+      && { [ -z "$e" ] || [ -e "$e" ] || [ ! -d "${e%/*}" ]; } || { n=-1; break; }
+    n=$((n + 1))
+  done
+  [ "$n" -le 0 ] || return 0
+  if [ -n "$lu" ]; then [ "$lu" -lt "$EPOCHSECONDS" ]; return; fi
+  [ -n "$(find "$1" -maxdepth 0 -mmin +2 2>/dev/null)" ]
+}
+write_dir_lock_pid() { # lock dir · role · pid, or - for pending · end file, optional -> <lock>/pid.<role> written; always 0
+  read_proc_token "$3"
+  printf '%s %s %s %s\n' "$3" "$PT_TOKEN" "${HOSTNAME:-}:${OSTYPE:-}" "${4:-}" >"$1/pid.$2" 2>/dev/null || :
+  return 0
+}
+write_dir_lock() { # lock dir · owner token · seconds it may hold · health-event stem -> 0 taken, 1 busy
+  local lk="$1" g="$1.break" broke=""
+  if ! mkdir "$lk" 2>/dev/null; then
+    check_dir_lock_stale "$lk" || return 1
+    if ! mkdir "$g" 2>/dev/null; then
+      if [ -n "$(find "$g" -maxdepth 0 -mmin +1 2>/dev/null)" ]; then
+        rm -rf "$g"
+        add_health_event "$(resolve_health_log "$ROOT")" unattended "$4-guard-cleared" "$g"
+      fi
+      return 1
+    fi
+    if ! check_dir_lock_stale "$lk"; then rmdir "$g" 2>/dev/null; return 1; fi
+    rm -rf "$lk"
+    mkdir "$lk" 2>/dev/null || { rmdir "$g" 2>/dev/null; return 1; }
+    broke=1
+  fi
+  printf '%s\n' "$(( $EPOCHSECONDS + $3 ))" >"$lk/until" 2>/dev/null || :
+  printf '%s\n' "$2" >"$lk/owner" 2>/dev/null || :
+  if [ -n "$broke" ]; then
+    rmdir "$g" 2>/dev/null
+    add_health_event "$(resolve_health_log "$ROOT")" unattended "$4-lock-broken" "$lk"
+  fi
+  return 0
+}
+write_dir_lock_wait() { # lock dir · owner token · seconds it may hold · health-event stem · seconds to wait -> 0 taken, 1 busy
+  local end=$(( EPOCHSECONDS + ${5:-0} ))
+  until write_dir_lock "$1" "$2" "$3" "$4"; do
+    [ "$EPOCHSECONDS" -lt "$end" ] || return 1
+    sleep 0.05
+  done
+  return 0
+}
+remove_dir_lock() { # lock dir · owner token -> removes it only while its owner file reads that token
+  local o=""; { read -r o <"$1/owner"; } 2>/dev/null || :
+  [ -n "$2" ] && [ "$o" = "$2" ] && rm -rf "$1"
+  return 0
+}
 # I4, THE CHANGE FEED (TOOL-dPlacedRequest-13): `<git-common-dir>/gov-feed.log`, node-local and never
 # pushed, one LF-terminated line per governance ref write this node made or saw, six TAB fields:
 # seq (a positive integer rising across refs), ref (the remote ref name), kind (the segment after
 # `refs/gov/`), blob (the commit's tree, `-` on a deletion), commit (40 hex, 40 zeros on a deletion)
 # and seen-utc (`2026-10-25T14:03:07Z`, this node's clock at the append). The key is ref, blob and
 # commit. `write_gov_ref`'s success exit calls `add_feed_event`, so every writer joins by construction.
-# APPENDING ONCE: under the lock directory `gov-feed.lock` (taken by `mkdir`, retried every 50 ms for
-# 5 s, broken when older than one minute) an event whose blob and commit equal the newest line of its
-# ref appends nothing (TOOL-dPlacedRequest-27), so a retry appends nothing and a repeat with another
+# APPENDING ONCE: under the feed's node lock (above, a 5 s wait) an event whose blob and commit
+# equal the newest line of its ref appends nothing (TOOL-dPlacedRequest-27), so a retry appends nothing and a repeat with another
 # event of the ref between, a second clear of `bar-red` say, appends again; `seq` is one more
 # than the larger of the counter `gov-feed.seq` and the last all-digit first field of the log, so a
 # lagging counter never repeats a `seq`; a last byte that is not LF is closed with one first, so a
@@ -2955,12 +2977,12 @@ remove_gov_ref() {   # ref · expected sha -> as write_gov_ref, pushing the ref'
 # commit, `extra` on a ref whose tip is a `gov-claim` commit, `order`, `torn`), and `write_feed`
 # writes it as a fresh feed where none is present.
 # GOVFEED_DIR names the common dir; unset, the first call resolves it once for the process.
-# WHAT THIS DOES NOT CHECK: two waiters breaking one crashed lock at once can both append, which gives
-# two events one `seq` and loses none; `seq` and `seen-utc` are node-local and never compared; a
+# WHAT THIS DOES NOT CHECK: two breakers the guard's own blind spots (above) admit can both append, which
+# gives two events one `seq` and loses none; `seq` and `seen-utc` are node-local and never compared; a
 # ref's events from before a deletion of it are outside every chain git holds and are not compared;
 # a retry made after another event of its ref landed appends again, an event that did happen.
 add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the event appended once
-  local ref="$1" c="${2:-}" d k t=- r w=0 s=0 l n now
+  local ref="$1" c="${2:-}" d k t=- r s=0 l n now tok
   [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
   d=${GOVFEED_DIR%$'\r'}
   [ -n "$d" ] || { printf 'feed: NOTE - no git common dir resolves here, so this write of %s is not in the feed\n' "$ref" >&2; return 0; }
@@ -2973,19 +2995,14 @@ add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the e
     [ "${#c}:${#t}" = 40:40 ] || c=""
     case "$c$t" in *[!0-9a-f]*|"") printf 'feed: NOTE - %s names no commit this clone holds, so the write is not in the feed\n' "$ref" >&2; return 0 ;; esac
   fi
-  until mkdir "$d/gov-feed.lock" 2>/dev/null; do
-    if [ $((w % 10)) = 0 ] && [ -n "$(find "$d/gov-feed.lock" -maxdepth 0 -mmin +1 2>/dev/null)" ]; then
-      rm -rf "$d/gov-feed.lock" 2>/dev/null
-    fi
-    w=$((w + 1))
-    [ "$w" -le 100 ] || { printf 'feed: NOTE - %s/gov-feed.lock was held for 5s, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2; return 0; }
-    sleep 0.05
-  done
+  tok="$BASHPID.$RANDOM"
+  write_dir_lock_wait "$d/gov-feed.lock" "$tok" "$NODE_LOCK_BOUND" node 5 \
+    || { printf 'feed: NOTE - the feed lock in %s was held for 5s, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2; return 0; }
   if [ -f "$d/gov-feed.log" ] && FEED_EV="$ref"$'\t'"$t"$'\t'"$c" awk -F'\t' '
       BEGIN { split(ENVIRON["FEED_EV"], ev, "\t") }
       $2 == ev[1] { p = $4 "\t" $5 }
       END { exit !(p == ev[2] "\t" ev[3]) }' "$d/gov-feed.log" 2>/dev/null; then
-    rmdir "$d/gov-feed.lock" 2>/dev/null; return 0
+    remove_dir_lock "$d/gov-feed.lock" "$tok"; return 0
   fi
   if [ -f "$d/gov-feed.seq" ]; then { read -r s <"$d/gov-feed.seq"; } 2>/dev/null || :; fi
   s=${s%$'\r'}
@@ -3004,7 +3021,7 @@ add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the e
     rm -f "$d/gov-feed.seq.$$" 2>/dev/null
     printf 'feed: NOTE - %s/gov-feed.seq could not be written; the next append reads the log past it\n' "$d" >&2
   fi
-  rmdir "$d/gov-feed.lock" 2>/dev/null
+  remove_dir_lock "$d/gov-feed.lock" "$tok"
   return 0
 }
 derive_feed_events() { # cache prefix · [feed file] -> `ref TAB kind TAB blob TAB commit` per event, per ref oldest first
@@ -3149,7 +3166,8 @@ read_first_seen() {  # `ref TAB commit` pairs on stdin -> one `seen-utc` or `-` 
 # the legacy ref never moves. The epoch is 1 on a create, the read epoch plus one on a take, the read
 # epoch otherwise and never below 1. `renews` and `witness` are the WL_ values a verb derived, else the
 # driver's under `leases.renewal` (`read_lease_renewal`). WL_QUEUE builds the commit and queues it
-# through `add_gov_queue` instead of pushing it, the offline branch of `leases.offline`.
+# through `add_gov_queue` instead of pushing it, the offline branch of `leases.offline`: rc 0 with
+# WC_WHY `already` where a line already queues the ref and tip, rc 2 `gov-queue.lock busy` on its lock.
 write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [run-state file] · [lease stamp] -> 0 written, 1 lost, 2 not completed; WC_WHY
   local slug="$1" st="$2" ka="$3" pol="$4" rel="${5:-}" lease="${6:-}" c rc node host sid msg ref exp="" ep kd sl tag ren wit
   WC_WHY=""; WC_BEAT=$(read_utc_now); WC_EPOCH=""
@@ -3186,7 +3204,13 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
     if ! c=$(build_gov_commit "$CW_SHA" "$msg"); then
       WC_WHY="the claim commit could not be built in this clone"; rc=2
     elif [ -n "$WL_QUEUE" ]; then
-      if add_gov_queue "$ref" "$exp" "$c"; then rc=0; WC_WHY=queued; else WC_WHY="the offline queue could not be written"; rc=2; fi
+      add_gov_queue "$ref" "$exp" "$c" && rc=0 || rc=$?
+      case "$rc" in
+        0) WC_WHY=queued ;;
+        3) WC_WHY=already; rc=0 ;;
+        2) WC_WHY="gov-queue.lock busy" ;;
+        *) WC_WHY="the offline queue could not be written"; rc=2 ;;
+      esac
     else
       GOVREF_RUNNER=observe_remote; GOVREF_REMOTE=$CR_NAME; GOVREF_GITDIR=$RUNLOG_GITDIR
       write_gov_ref "$ref" "$exp" "$c" && rc=0 || rc=$?
@@ -3508,24 +3532,56 @@ read_lease_renewal() { # slug -> LR_RENEWS and LR_WITNESS
 # `write_gov_ref` on its recorded tip, oldest first: written and lost resolve the line, a lost one
 # printing `yield` with a `lease-yielded` health event, and a write that did not complete keeps it.
 # Every later compare-and-swap writer of this build applies `leases.offline` through these two.
-add_gov_queue() { # ref · expected sha or empty · commit -> 0 appended, 1 not
-  local d now
+# UNDER THE NODE LOCK (TOOL-dPlacedRequest-24): both take `gov-queue.lock` in the common dir through
+# `write_dir_lock_wait`, waiting 5 s. An append whose ref and cached tip a line already queues appends
+# nothing and returns 3, since a re-run offline acquire builds a new commit on the same tip; a busy
+# lock returns 2 with nothing queued. A flush reads the lines under the lock and releases it, pushes
+# with no lock held, then retakes it and rewrites the file now less exactly the lines it resolved, so
+# a line appended during the pushes stays; a busy lock skips the flush with one `queue: NOTE -` line.
+# Two flushes racing one line cannot both resolve it as lost: git reports a push whose remote ref is
+# already the queued commit as `[up to date]` before it tests the lease, so the loser's failed update
+# keeps the line (rc 2) and its next flush prints `flushed`.
+# WHAT THIS DOES NOT CHECK: a flush whose second take is refused leaves its resolved lines queued, so
+# the next flush pushes them again: a written one then prints `flushed` again, and a lost one yields
+# again.
+add_gov_queue() { # ref · expected sha or empty · commit -> 0 appended, 1 not, 2 gov-queue.lock busy, 3 already queued
+  local d now tok rc=0
   d=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 1
   d=${d%$'\r'}; [ -n "$d" ] || return 1
-  TZ=UTC printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
-  printf '%s\t%s\t%s\t%s\n' "$1" "${2:--}" "$3" "$now" >>"$d/gov-queue.log" 2>/dev/null
+  tok="$BASHPID.$RANDOM"
+  write_dir_lock_wait "$d/gov-queue.lock" "$tok" "$NODE_LOCK_BOUND" node 5 || return 2
+  if [ -f "$d/gov-queue.log" ] && GQ_KEY="$1"$'\t'"${2:--}" awk -F'\t' '
+      BEGIN { split(ENVIRON["GQ_KEY"], k, "\t") }
+      { sub(/\r$/, "") }
+      $1 == k[1] && $2 == k[2] { hit = 1; exit }
+      END { exit !hit }' "$d/gov-queue.log" 2>/dev/null; then
+    rc=3
+  else
+    TZ=UTC printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
+    printf '%s\t%s\t%s\t%s\n' "$1" "${2:--}" "$3" "$now" >>"$d/gov-queue.log" 2>/dev/null || rc=1
+  fi
+  remove_dir_lock "$d/gov-queue.lock" "$tok"
+  return "$rc"
 }
-write_gov_queue() { # -> one line per queued write; 0 the queue is empty after, 2 a line was kept; GQ_PUSHED
-  local d f ref tip c utc rc kept=0 ep
+write_gov_queue() { # -> one line per queued write; 0 the queue is empty after, 2 a line was kept or the lock busy; GQ_PUSHED
+  local d f l ref tip c utc rc kept=0 ep tok n
+  local -a q=()
+  local -A rs=()
   GQ_PUSHED=""
   d=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || d=""
   d=${d%$'\r'}; f="$d/gov-queue.log"
   [ -n "$d" ] && [ -s "$f" ] || return 0
   [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
-  : >"$f.$$" || { echo "lease not written — the queue could not be rewritten: $f"; return 2; }
-  while IFS=$'\t' read -r -u 3 ref tip c utc; do
-    utc=${utc%$'\r'}
-    [ -n "$ref" ] && [ -n "$c" ] || continue
+  tok="$BASHPID.$RANDOM"
+  write_dir_lock_wait "$d/gov-queue.lock" "$tok" "$NODE_LOCK_BOUND" node 5 \
+    || { echo "queue: NOTE - gov-queue.lock is busy, so this flush is skipped and the next read that answers flushes"; return 2; }
+  while IFS= read -r l || [ -n "$l" ]; do q+=("${l%$'\r'}"); done <"$f"
+  remove_dir_lock "$d/gov-queue.lock" "$tok"
+  for l in "${q[@]}"; do
+    [ -n "$l" ] || continue
+    ref=""; tip=""; c=""; utc=""
+    IFS=$'\t' read -r ref tip c utc <<<"$l"
+    if [ -z "$ref" ] || [ -z "$c" ]; then n=${rs["$l"]:-0}; rs["$l"]=$((n + 1)); continue; fi
     [ "$tip" != - ] || tip=""
     GOVREF_RUNNER=observe_remote; GOVREF_REMOTE=$CR_NAME; GOVREF_GITDIR=$RUNLOG_GITDIR
     write_gov_ref "$ref" "$tip" "$c" && rc=0 || rc=$?
@@ -3534,11 +3590,21 @@ write_gov_queue() { # -> one line per queued write; 0 the queue is empty after, 
       0) GQ_PUSHED=1; echo "lease — ${ref#"$LEASE_NS"/} · flushed · epoch ${ep:--}" ;;
       1) GQ_PUSHED=1; echo "lease — ${ref#"$LEASE_NS"/} · yield · epoch ${ep:--} · $GOVREF_WHY"
          add_health_event "$(resolve_health_log "$ROOT")" unattended lease-yielded "$ref" ;;
-      *) kept=1; printf '%s\t%s\t%s\t%s\n' "$ref" "${tip:--}" "$c" "$utc" >>"$f.$$"
-         echo "lease not written — ${ref#"$LEASE_NS"/} stays queued: $GOVREF_WHY" ;;
+      *) kept=1; echo "lease not written — ${ref#"$LEASE_NS"/} stays queued: $GOVREF_WHY"; continue ;;
     esac
-  done 3<"$f"
-  mv -f "$f.$$" "$f" 2>/dev/null || { rm -f "$f.$$"; echo "lease not written — the queue could not be rewritten: $f"; return 2; }
+    n=${rs["$l"]:-0}; rs["$l"]=$((n + 1))
+  done
+  write_dir_lock_wait "$d/gov-queue.lock" "$tok" "$NODE_LOCK_BOUND" node 5 \
+    || { echo "queue: NOTE - gov-queue.lock is busy, so the lines this flush resolved stay queued for the next flush"; return 2; }
+  while IFS= read -r l || [ -n "$l" ]; do
+    l=${l%$'\r'}
+    [ -n "$l" ] || continue
+    n=${rs["$l"]:-0}
+    if [ "$n" -gt 0 ]; then rs["$l"]=$((n - 1)); continue; fi
+    printf '%s\n' "$l"
+  done <"$f" >"$f.$$" && mv -f "$f.$$" "$f" 2>/dev/null \
+    || { rm -f "$f.$$"; remove_dir_lock "$d/gov-queue.lock" "$tok"; echo "lease not written — the queue could not be rewritten: $f"; return 2; }
+  remove_dir_lock "$d/gov-queue.lock" "$tok"
   [ "$kept" = 0 ] || return 2
   return 0
 }
@@ -3639,6 +3705,7 @@ run_lease_verb() { # act · kind · name · sub · witness · release status -> 
   WL_REF=""; WL_KIND=""; WL_SLUG=""; WL_TAG=""; WL_RENEWS=""; WL_WITNESS=""
   if [ -n "$WL_QUEUE" ]; then
     WL_QUEUE=""
+    [ "$rc:$WC_WHY" != 0:already ] || { echo "lease — queued — already · $tail"; return 0; }
     [ "$rc" = 0 ] && { echo "lease — $tail · queued · epoch $WC_EPOCH"; return 0; }
     echo "lease not written — $WC_WHY"; return 2
   fi

@@ -5830,6 +5830,16 @@
     {
       "id": "check_dir_lock_stale",
       "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "check_dir_lock_stale",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "check_dir_lock_stale",
+      "kind": "function",
       "file": "tools/unattended/unattended.sh"
     },
     {
@@ -7426,6 +7436,16 @@
       "id": "check_probe_scrubbed",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "check_proc_gone",
+      "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "check_proc_gone",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
     },
     {
       "id": "check_proc_gone",
@@ -22010,6 +22030,16 @@
     {
       "id": "read_proc_token",
       "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "read_proc_token",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "read_proc_token",
+      "kind": "function",
       "file": "tools/unattended/unattended.sh"
     },
     {
@@ -23986,6 +24016,16 @@
       "id": "remove_descendants",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "remove_dir_lock",
+      "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "remove_dir_lock",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
     },
     {
       "id": "remove_dir_lock",
@@ -36375,10 +36415,50 @@
     {
       "id": "write_dir_lock",
       "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "write_dir_lock",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "write_dir_lock",
+      "kind": "function",
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "write_dir_lock",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "write_dir_lock_pid",
+      "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "write_dir_lock_pid",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "write_dir_lock_pid",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_dir_lock_wait",
+      "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "write_dir_lock_wait",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "write_dir_lock_wait",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
     },
@@ -36711,6 +36791,11 @@
       "id": "write_gov_ref",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_gov_ref",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_grade_spec",
