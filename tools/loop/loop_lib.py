@@ -323,7 +323,9 @@ PLANT_OWED = {"missing-step": (1, "loop: ", "the step step.deploy is missing"),
               "no-registry": (0, "loop: unfolds · ", "unarmed — no namespace registry resolves"),
               "unfold-not-list": (1, "loop: refused · ", "the item item.design.inventory unfolds 'kit', which is no "
                                                           "list of namespace words"),
-              "registry-bad": (1, "loop: refused · ", "/playbook/namespaces.toml does not read: ")}
+              "registry-bad": (1, "loop: refused · ", "namespaces.toml does not read: ")}
+#: The kit home whose `namespaces.toml` registers the namespace words an item unfolds (TOOL-dPlacedRequest-6 S3).
+NS_KIT_HOME = "playbook"
 #: The plants whose break is in what the scope verb reads rather than in the definition, so `--check`
 #: runs whole and the scope verb runs after it.
 SCOPE_PLANTS = ("scope-selected", "scope-no-kit")
@@ -2082,11 +2084,12 @@ def main(argv):
     # namespace registry, read as the lexicon's read_tag_words reads it; no playbook kit leaves the arm unarmed.
     ns_dir = scratch.name if plant in ("scope-no-kit", "no-registry", "registry-bad") else kit_dir
     if plant == "registry-bad":   # a registry that resolves and is no TOML
-        (pathlib.Path(ns_dir) / "playbook").mkdir()
-        (pathlib.Path(ns_dir) / "playbook" / "namespaces.toml").write_text("[[namespace]\n", encoding="utf-8")
+        ns_home = pathlib.Path(ns_dir) / NS_KIT_HOME
+        ns_home.mkdir()
+        (ns_home / "namespaces.toml").write_text("[[namespace]\n", encoding="utf-8")
     try:
         try:
-            registry = resolve_kit_dir("playbook", "namespaces.toml", ns_dir) / "namespaces.toml"
+            registry = resolve_kit_dir(NS_KIT_HOME, "namespaces.toml", ns_dir) / "namespaces.toml"
         except LookupError:
             namespaces = None
         else:
