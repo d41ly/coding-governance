@@ -84,7 +84,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 63 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 63 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13
 ids TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-22 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25
 ids TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37
@@ -124,7 +124,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-31 — consent is bound to the bytes a session typed](spec/2026-10-25-spec-TOOL-dPlacedRequest-31.md) | 11 | 2 | CLOSED | rev-4 | 2026-11-19 |
 | [TOOL-dPlacedRequest-32 — an absent session is no identity: no consent, and no lease held on session alone](spec/2026-10-25-spec-TOOL-dPlacedRequest-32.md) | 11 | 2 | CLOSED | rev-5 | 2026-11-19 |
 | [TOOL-dPlacedRequest-9 — the kickoff manifest's facts as level-2 instruction units the card reads](spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md) | 11 | 2 | CLOSED | rev-6 | 2026-11-19 |
-| [TOOL-dPlacedRequest-2 — the build's orientation card kept per build: a remote ref, a clone cache and a snapshot, following its build](spec/2026-10-25-spec-TOOL-dPlacedRequest-2.md) | 12 | 2 | DEFERRED | rev-9 | 2026-11-19 |
+| [TOOL-dPlacedRequest-2 — the build's orientation card kept per build: a remote ref, a clone cache and a snapshot, following its build](spec/2026-10-25-spec-TOOL-dPlacedRequest-2.md) | 12 | 2 | INPROGRESS | rev-9 | 2026-11-19 |
 | [TOOL-dPlacedRequest-40 — the id-less refusal gates the holder acts by name and lets every other lease act run](spec/2026-10-25-spec-TOOL-dPlacedRequest-40.md) | 12 | 2 | DEFERRED | rev-3 | 2026-11-19 |
 | [TOOL-dPlacedRequest-33 — the card's remote ref is written by the driver, dark behind `RUN_CLAIMS`](spec/2026-10-25-spec-TOOL-dPlacedRequest-33.md) | 13 | 2 | DEFERRED | rev-7 | 2026-11-19 |
 | [TOOL-dPlacedRequest-8 — each item's declared code seed: its write set, its scope paths or its question's paths](spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md) | 13 | 2 | DEFERRED | rev-6 | 2026-11-19 |
