@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-16 — a lease never deleted: a release is a hand-over or a terminal tombstone, the epoch rises for life, and only a run's tombstone is ever pruned
 
-**Status:** DEFERRED · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-7 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0134@bacb3ef7 whole
 
@@ -17,6 +17,7 @@
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-34 |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
+| [2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-63 |
 | [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 |
 
@@ -37,32 +38,46 @@ and nothing queues a claim or prunes one.
 ## 2. Scope (IN)
 
 - **S1** — The hand-over: the status `released` joins the reader's set (`unattended.sh:2162`) with the
-  verdict `released`. `--lease release <kind> <name> [<sub>]` without `--as` writes it, and every mode
-  of the write table reads a `released` record as free: it takes it, parented on its tip, at its epoch
-  plus one, whoever released it. Observed by AC1.
+  verdict `released`, so a foreign `released` record reads the class `foreign-released`, which
+  `check_claim_writable`'s `cls="foreign-$c_verdict"` derives (`tools/unattended/unattended.sh#check_claim_writable`)
+  and which joins `CLAIM_READS` beside `foreign-tombstone`. `--lease release <kind> <name> [<sub>]`
+  without `--as` writes it, and every mode of the write table reads a `released` record as free: it
+  takes it, parented on its tip, at its epoch plus one, whoever released it. Observed by AC1 and AC12.
 - **S2** — A run's end hands its build's lease over: the driver's status writes of `landed` and
   `aborted` on a build lease (`:6383`, `:6634`, `:6770`, `:7620` and `--settle`'s) write `released`,
   the run's own outcome staying in its run-state file; `held` stays `held`. Only the `lease` verb's
   `--as landed` or `--as withdrawn` writes a build or unit lease terminal, at Deploy's release or a
-  withdrawal. Observed by AC2.
+  withdrawal. `--lease release` is total over its kind and its `--as` (§4 "The release outcomes", §8
+  F5): a build or unit lease admits no `--as`, `landed` and `withdrawn`; a cadence `run` lease admits
+  no `--as`, `landed` and `aborted`; every other pair, `--as aborted` on a build or unit lease and
+  `--as withdrawn` on a run lease, prints `lease not written — --as <status> on a <kind> lease`, exits
+  2 and writes nothing. Observed by AC2 and AC11.
 - **S3** — The tombstone: a build or unit lease whose status is `landed` or `withdrawn`, and a `held`
-  record whose parent is such a tombstone (a draw's hold), read the class `foreign-tombstone` in
-  `CLAIM_READS` (`:2219`). Every mode refuses it with the cause `tombstone`, the run columns'
+  record whose first-parent chain reaches such a tombstone through `held` records only (a draw's hold,
+  however many draws re-took it), read the class `foreign-tombstone` in `CLAIM_READS` (`:2219`). The
+  chain is read by one `git log --first-parent` over the fetched ref, stopping at the first record
+  that is not `held`. Every mode refuses it with the cause `tombstone`, the run columns'
   `preflight:foreign-terminal` take included, except `--lease acquire build <slug> --for draw`. A
   cadence `run` lease and a legacy `refs/gov/runs/*` claim keep today's terminal take. Observed by AC3
   and AC4.
 - **S4** — The draw: `--for draw` over a tombstone writes `held` at the epoch plus one, parented on the
   tombstone; over a draw's hold it refuses `live-holder` until `TOOL-dPlacedRequest-17` reads that hold
-  stale, then takes it the same way. `--lease release build <slug> --as landed` writes the tombstone
-  back at the same epoch. TOOL-dDeclaredLoop-30 S7's patch draw (`tools/loop/budget.py`) wraps its
-  `patch:<slug>` row in that acquire and release, so concurrent draws on one closed root serialise.
-  Observed by AC4.
+  stale, then takes it the same way, parented on that hold, so S3's chain still reaches the tombstone.
+  A write by the hold's own holder keeps `status: held`: a renew or re-acquire of a draw's hold writes
+  `held`, never `live`. `--lease release build <slug> --as landed` writes the tombstone back at the
+  same epoch, and it is the one release a draw's hold admits: a release without `--as`, or with any
+  other, prints `lease not written — a draw's hold is released --as landed`, exits 2 and leaves the
+  hold reading `foreign-tombstone`. TOOL-dDeclaredLoop-30 S7's patch draw (`tools/loop/budget.py`)
+  wraps its `patch:<slug>` row in that acquire and release, so concurrent draws on one closed root
+  serialise. Observed by AC4 and AC11.
 - **S5** — The epoch for life: an acquisition of a ref the remote does not hold, whose ref this node's
   feed (`TOOL-dPlacedRequest-13`) names, reads the newest commit the feed holds for it. A build or unit
   tombstone there refuses `tombstone`; any other record makes the write a create parented on that commit
   at its epoch plus one, never at 1. Observed by AC5.
 - **S6** — The queued claim's age: every successful lease read writes `<git-common-dir>/gov-last-fetch`
-  with this node's time, `TOOL-dPlacedRequest-1`'s offline queue records it in the queued record's
+  with this node's time, atomically: the stamp goes to `gov-last-fetch.<pid>` in the same directory
+  and `mv -f` replaces the file, so a reader sees the old stamp or the new one, never an empty or
+  half-written file. `TOOL-dPlacedRequest-1`'s offline queue records it in the queued record's
   `last-fetch` key, and `write_gov_queue` refuses a queued write whose `last-fetch` is older than
   `leases.queued-claim-days` with the cause `epoch-fence`, removing it from the queue. When
   `gov-last-fetch` is absent or holds no ISO-8601 UTC second, the queued record's `last-fetch` reads
@@ -71,7 +86,7 @@ and nothing queues a claim or prunes one.
   remote is not pushed on a guess. A write it does
   not refuse is still a compare-and-swap on its recorded tip, so a claim queued after a release by a node
   whose last fetch preceded the lease yields on the moved tip, or is refused by age once the tombstone it
-  would race could have been pruned. Observed by AC6, AC7 and AC10.
+  would race could have been pruned. Observed by AC6, AC7, AC10 and AC13.
 - **S7** — The prune: `unattended.sh --lease prune` prunes, through `remove_gov_ref` on the tip read
   (`TOOL-dPlacedRequest-11` S1), each cadence `run` lease and each legacy `refs/gov/runs/*` claim whose status
   is terminal and whose terminal commit `check_deadline_passed` reads older than
@@ -114,13 +129,24 @@ and nothing queues a claim or prunes one.
 | status | verdict | written by | a later write |
 |---|---|---|---|
 | `live` | `live` or `stale` | acquire, renew, the run's holder writes | per the table |
-| `held` | `held` | `--hold`, a draw | per the table; a draw's hold reads `foreign-tombstone` |
-| `released` | `released` | `--lease release`, a run's end | taken by any mode, epoch plus one |
+| `held` | `held` | `--hold`, a draw, its holder's renew | per the table; a draw's hold, at any depth of re-takes, reads `foreign-tombstone` |
+| `released` | `released`, class `foreign-released` | `--lease release`, a run's end | taken by any mode, epoch plus one |
 | `landed`, `withdrawn` on a build or unit lease | `terminal`, class `foreign-tombstone` | `--lease release --as` | refused `tombstone` but a draw |
 | `landed`, `aborted` on a run lease or a legacy claim | `terminal` | the cadence verb, a legacy run | today's terminal take |
 
 The `--claims` row keeps five fields; `released` and `terminal` are values of its status and verdict
 columns.
+
+### The release outcomes
+
+| lease read | no `--as` | `--as landed` | `--as withdrawn` | `--as aborted` |
+|---|---|---|---|---|
+| build or unit, `live` and mine | `released` | `landed` | `withdrawn` | refused, exit 2 |
+| build, a draw's hold and mine | refused, exit 2 | `landed`, the epoch kept | refused, exit 2 | refused, exit 2 |
+| cadence `run`, `live` and mine | `released` | `landed` | refused, exit 2 | `aborted` |
+
+Every refused pair prints one `lease not written —` line naming the pair and writes nothing, so no
+release writes a status the statuses table above does not read (§8 F5).
 
 ### The draw
 
@@ -131,8 +157,9 @@ unattended.sh --lease release build dRoot --as landed  # held -> landed, epoch n
 ```
 
 A patch build that dies between the two leaves a draw's hold. It refuses every other mode
-(`foreign-tombstone`), and once `TOOL-dPlacedRequest-17` reads it stale a later draw takes it, so the
-closed root is never released as a free lease.
+(`foreign-tombstone`), and once `TOOL-dPlacedRequest-17` reads it stale a later draw takes it,
+parented on the hold, so the new hold's chain still reaches the tombstone and a second death leaves a
+hold that refuses as the first did. The closed root is never released as a free lease.
 
 ### Why only a run's tombstone is pruned
 
@@ -148,7 +175,7 @@ pruning an old one frees nothing anyone would draw on.
 | Minted | Kind | Lexicon cell |
 |---|---|---|
 | `released` | claim status value | none |
-| `foreign-tombstone` | `CLAIM_READS` member | graded by leg check 52 |
+| `foreign-tombstone`, `foreign-released` | `CLAIM_READS` members | graded by leg check 52 |
 | `tombstone` | refusal cause | none |
 | `--for draw`, `--lease prune` | driver options | none |
 | `gov-last-fetch` | node-local file | none |
@@ -171,7 +198,19 @@ the next run of the slug takes the hand-over at the epoch plus one, as it took a
 - `tools/unattended/unattended.sh`: the `released` status and verdict, the `foreign-tombstone` class and
   its rows, the run's status writes, the draw, the epoch read from the feed, `gov-last-fetch`, the
   queued-claim age, `--lease prune`; the kit version is minted by the lander (TOOL-aMendedFleet-65; TOOL-dPlacedRequest-34 S59)
-- `tools/unattended/unattended.test.sh`: the tombstone, draw, prune and queued-claim arms
+- `tools/unattended/unattended.test.sh`: the tombstone, draw, prune and queued-claim arms; `GC_CELLS`
+  gains one row per (`foreign-tombstone`, mode) and per (`foreign-released`, mode) over `CLAIM_MODES`'
+  six modes, `lease` included, each `foreign-tombstone` cell typing S3's refusal (exit 1, the ref
+  `same`) and `beat` `declined`, each `foreign-released` cell typing S1's take (the ref `moved`), its
+  `holder` cell refused as `foreign-terminal`'s and its `beat` cell `declined`; `seed_claim_row` gains
+  a `foreign-tombstone` case seeding a `landed` build lease and a `foreign-released` case seeding a
+  `released` one (`tools/unattended/unattended.test.sh#seed_claim_row`)
+- `help/loop.md`: the `verb:unattended.sh:--lease` usage anchor `TOOL-dPlacedRequest-1` adds, its
+  fingerprint refreshed to the one the govkit kit's `docs_leg.py --fingerprints` prints once
+  `--lease prune` and `--for draw` move the usage line
+- `memory/map/generated/`: regenerated by the codebase-map kit's `gen_map.py --write` in this
+  unit's own pass, since `write_lease_prune` is minted, so `gen_map.py --check` exits 0 after the
+  pass; `TOOL-dPlacedRequest-34` S38 is the final re-check only
 - `tools/unattended/STOPS.template.md`: section 7
 - `memory/guides/UNATTENDED-STOPS.md`: its render
 - `tools/loop/budget.py`: the patch draw's acquire and release, at TOOL-dDeclaredLoop-30 S7's site once
@@ -200,7 +239,9 @@ the next run of the slug takes the hand-over at the epoch plus one, as it took a
   queued claim outlives the prune age.
 - testing — the probes of §6 and the suite arms of §7.
 - migration — none for data (§4).
-- user docs — `memory/guides/UNATTENDED-STOPS.md` section 7; no `help/` page covers the kit.
+- user docs — `memory/guides/UNATTENDED-STOPS.md` section 7, and `help/loop.md`, which anchors the
+  unattended driver's verbs beside its `--claims` paragraph: this unit refreshes the `--lease`
+  anchor's fingerprint.
 
 ## 6. Acceptance criteria
 
@@ -220,8 +261,13 @@ the next run of the slug takes the hand-over at the epoch plus one, as it took a
 - **AC4** — When `--lease acquire build tFix --for draw` runs over that tombstone at epoch 5, the lease
   reads `held` at epoch 6; a second `--for draw` exits 1 printing `live-holder`; `--lease release build
   tFix --as landed` restores `landed` at epoch 6; with the hold's feed sighting planted past
-  `leases.expiry-hours`, a second draw takes it at epoch 7.
-  Red when: a draw's hold reads free, or two draws hold one root at once.
+  `leases.expiry-hours`, a second draw takes it at epoch 7, and that record reads `status: held` with
+  the class `foreign-tombstone` for another session. With the epoch-7 hold planted stale in turn,
+  `--lease take-over build tFix` and a plain `--lease acquire build tFix` each exit 1 printing
+  `tombstone`, the origin unchanged. The epoch-7 holder's own `--lease renew build tFix` writes
+  `status: held`.
+  Red when: a draw's hold reads free at any depth, a renew turns a hold `live`, or two draws hold one
+  root at once.
 - **AC5** — When the origin's `refs/gov/leases/run/maintain/2026-10` at epoch 4 is deleted outside the
   kit after this node sighted it, and `--lease acquire run maintain 2026-10` runs, the new commit reads
   epoch 5 and its parent is the deleted tip; with `refs/gov/leases/tFix/build` deleted after this node sighted its tombstone,
@@ -251,12 +297,33 @@ the next run of the slug takes the hand-over at the epoch plus one, as it took a
   prints `lease refused — epoch-fence`, removes the line and writes no ref. With the file planted
   `garbage`, the same holds.
   Red when: a claim queued with no recorded fetch is pushed, or the flush exits on the value.
+- **AC11** — When the holder runs `--lease release build tFix --as aborted` over its live build lease
+  and `--lease release run maintain 2026-10 --as withdrawn` over its live cadence lease, each exits 2
+  printing `lease not written` and the origin is unchanged; `--as landed`, `--as withdrawn` and no
+  `--as` on the build lease, and `--as aborted` on the run lease, write the status §4 "The release
+  outcomes" names. Over a draw's hold, `--lease release build tFix` and `--lease release build tFix
+  --as aborted` each exit 2, the lease still reads `foreign-tombstone` for another session, and that
+  session's `--lease acquire build tFix` exits 1 printing `tombstone`.
+  Red when: a release writes a status no row of §4's statuses table reads, or a plain release of a
+  draw's hold frees the closed root.
+- **AC12** — When a probe derives `CLAIM_READS` by `CLAIM_MODES` from `tools/unattended/unattended.sh`
+  and the cells `GC_CELLS` types, as the GH19 arm does, and compares them with `comm -3`, it prints
+  nothing, and `CLAIM_READS` names `foreign-tombstone` and
+  `foreign-released`.
+  Red when: a class this unit adds has a mode with no typed outcome.
+- **AC13** — When a probe that sources `unattended.sh` in a scratch clone runs S6's stamp write 200
+  times in a background loop beside a loop of 200 offline `--lease acquire build tOff` queue writes in
+  that clone, over a `gov-last-fetch` holding a valid stamp before the loops start, no queued record
+  reads `last-fetch: -`, and `grep -c '> *"[^"]*gov-last-fetch"'` over `tools/unattended/unattended.sh`
+  prints 0.
+  Red when: a reader catches the file truncated, so a valid queued claim is dropped as `epoch-fence`.
+  fixture: one scratch clone whose origin is renamed away, so every acquire queues.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures` · `docs` · `codebase-map coverage + freshness`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC10 · the hand-over, tombstone, draw, epoch, queued-claim and prune arms, staged by restoring `preflight:foreign-terminal`'s take for a build lease and by cutting the age refusal · `FLOOR_ASSERTIONS` and its shard floor rise by the arms' count, counted off the diff · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14, and each covered criterion's own probe is the observation at landing
+New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC10 AC11 AC12 AC13 · the GC_CELLS rows for `foreign-tombstone` and `foreign-released` and the hand-over, tombstone, draw, epoch, queued-claim and prune arms, staged by restoring `preflight:foreign-terminal`'s take for a build lease and by cutting the age refusal · `FLOOR_ASSERTIONS` and its shard floor rise by the arms' count, counted off the diff · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14, and each covered criterion's own probe is the observation at landing
 
 ## 8. Open questions
 
@@ -278,6 +345,14 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 A
 - **F4 — Which cause refuses a stale queued claim?** I9 offers `offline` and `epoch-fence`. The refusal
   protects the epoch against a pruned lease, and the remote is reachable when it fires. RESOLVED (agent,
   2026-10-25, delegated): `epoch-fence`, rung 3. widens: none · relaxes: none
+- **F5 — What does `--lease release` write for a pair the statuses table has no row for: `--as aborted`
+  on a build or unit lease, `--as withdrawn` on a run lease, and any release of a draw's hold but
+  `--as landed`?** (a) Refuse each with exit 2, writing nothing; (b) map each onto a row, `aborted` on a
+  build as `released`, `withdrawn` on a run as `aborted`, and any release of a hold as `landed`. (b)
+  writes a status the caller did not name, and on a hold whose root was withdrawn it would write
+  `landed`. RESOLVED (agent, 2026-11-19, delegated): (a), rung 3, the charter's deny-by-default at the
+  write boundary; a plain release of a draw's hold then leaves the hold, which a later draw takes.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -295,6 +370,15 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 A
   `gov-last-fetch` records `last-fetch: -`, which the flush refuses as `epoch-fence`, observed by AC10;
   finding 28 (H4), the prune goes through `remove_gov_ref`, with the consumes-from edge to
   TOOL-dPlacedRequest-11 mirroring its hands-off.
+- rev-7 · 2026-11-19 · §2 S1 to S4, S6 · §4 · §5 · §6 AC4, AC11 to AC13 · §7 · §8 F5 · §10 · folds
+  `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`: finding 18 (H2), the tombstone class holds
+  over the whole chain of draws and a holder's renew keeps `held` (AC4); findings 2 and 19 (M2),
+  `--lease release` is total over kind and `--as`, refusing every pair no status row reads and every
+  release of a draw's hold but `--as landed` (§4 The release outcomes, §8 F5, AC11); finding 15
+  (M6), `foreign-released` joins `CLAIM_READS` and `GC_CELLS` types both new classes (AC12); finding
+  21 (M9), `gov-last-fetch` is replaced atomically (AC13); finding 16 (M7), the `--lease` anchor is
+  refreshed and §7 names `docs`; finding 17 (M8), the map is regenerated in this pass; finding 9
+  (L3), §10 names `remove_red_ref`.
 
 ## 10. Reuse audit
 
@@ -305,8 +389,10 @@ the deleted ref's last record from `TOOL-dPlacedRequest-13`'s feed. `python tool
 reuse_lookup.py "release a claim with a terminal status and never delete it"` ranked `write_claim`,
 `check_claim_writable` and the claim-push lock functions, all in the claim block above, and
 `ts_release` (`tools/run-gates/run-gates.sh`, the turnstile, a different lease); no seam fits the
-prune or the queued-claim age, and `git grep` finds no deletion of a `refs/gov` ref outside test
-fixtures, agreeing with scout A's row 6. `python tools/memory-recall/query.py "when may a released or
+prune or the queued-claim age. One deletion of a `refs/gov` ref exists outside test fixtures:
+`remove_red_ref` (`tools/run-gates/post-merge.sh#remove_red_ref`) deletes `refs/gov/bar-red` on the
+remote by pushing an empty source under a lease, found by `git grep -n 'PM_PUSH_SRC=""'`; unit 11 makes
+it `remove_gov_ref`, the seam S7's prune calls. Scout A's row 6 missed it. `python tools/memory-recall/query.py "when may a released or
 terminal lease be pruned and what stops an epoch restart"` returned the brief's unit row, scout A's row 6,
 v2's `[chain]` row and the packet's Items; none disagrees with source.
 

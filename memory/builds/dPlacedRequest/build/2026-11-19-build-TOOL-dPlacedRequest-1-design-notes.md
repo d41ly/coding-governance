@@ -76,7 +76,11 @@ probe KICK-dKeptSession-25 §8 F7 (b) calls: it prints `transition`, `question`,
 why it admits none, exiting 0, 0, 1 or 2. It applies its tests in one order. First, where `declare -F`
 finds both functions, it runs `read_mailbox <slug> soft`, whose fetch is the only remote read the check
 makes. Second, it resolves `<sha>` with `git rev-parse --verify --quiet <sha>^{commit}`, after that
-fetch, and a sha that does not resolve exits 2 whatever the mailbox printed. Third, it classifies the
+fetch, and a sha that does not resolve exits 2 whatever the mailbox printed. From here on `<sha>` is
+that resolved full 40-hex sha, never the argument as typed: the record's `witness` field is written
+with it, the differs-from-the-record test compares it, and the mailbox row's `commit` is matched
+against it, so a short sha, a full one and a ref name naming one commit are one witness (the
+disposal of `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`, finding 22). Third, it classifies the
 resolved commit: a transition of the build, read as the section above states, answers `transition`.
 Otherwise it answers `question` when `declare -F` finds both `read_mailbox` and
 `check_mail_deadline`, and `read_mailbox <slug> soft`, which prints only messages addressed to the
@@ -93,6 +97,44 @@ that counts, and a closed question is no error. A commit that `read_mailbox` pri
 writes the record as a beat does: `renews` as `TOOL-dPlacedRequest-25`'s `derive_lease_renews` gives it
 for no witness, `no` under `progress`, and `witness` left at the record's value. The beat loses no
 record, and a closed question still renews nothing.
+
+## The policy reads
+
+| Key | Values | Default | Read where |
+|---|---|---|---|
+| `leases` | warn, refuse | warn | the overlap's verdict (S9) |
+| `leases.granularity` | build-and-unit, build, unit | build-and-unit | `--lease acquire` (S7) |
+| `leases.renewal` | progress, activity, fixed, none | progress | every lease write (S8) |
+| `leases.overlap` | kit-dirs, files, builds | kit-dirs | the overlap's reduction (S9) |
+| `leases.offline` | warn, refuse, follow-leases | warn | an unanswered read (S10) |
+
+Defaults from v2:1157-1162. A policy file cannot hold `leases` and a `leases.*` key together
+(TOOL-dGroundRules-1 §8 F5); a project setting one reads the other at its default.
+
+Moved here from the spec's §4 on 2026-11-19 by the disposal of
+`2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`, with nothing re-decided; the spec's S7 to S10
+and S12 state each key's values and default.
+
+## The overlap reduction
+
+The probe drops `SHARED_RECORDS` and the index half of `GENERATED_INDEXES` first
+(`tools/unattended/unattended.sh@875eaadf:3803-3805`), then reduces the rest. `kit-dirs` reduces a
+`tools/<kit>/…` or `skills/<skill>/…` path to that directory and joins every other path as `files`
+does, so two builds editing one kit overlap and two touching only their own `memory/builds/<slug>/`
+do not. `files` is today's join, a path or a directory the other sits under. `builds` keeps that join
+and prints one finding per other branch. The population stays every unmerged remote branch within
+`OVERLAP_AGE_DAYS`.
+
+`--lease acquire` sets `ASHA` from the claim remote's local `refs/remotes/<remote>/HEAD`, as
+`print_overlaps` does (`tools/unattended/unattended.sh#print_overlaps`), and passes a build lease's
+slug, a unit lease's build slug, or for a cadence run lease the empty slug, the attended semantics. The probe's four UNAVAILABLE exits, an unset or unresolvable anchor,
+no scratch directory, an unlistable own diff and unlistable tracking refs, each return 0 at base; under
+`refuse` each returns 1 and its line is the refusal's cause, and the summary line that reads `this run
+is NOT blocked` at base (`tools/unattended/unattended.sh@875eaadf:3884`) reads `refused` instead.
+
+Moved here from the spec's §4 on 2026-11-19 by the disposal of
+`2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`, with nothing re-decided, to keep the spec under
+its ceiling as that audit's findings folded in.
 
 ## Migration
 

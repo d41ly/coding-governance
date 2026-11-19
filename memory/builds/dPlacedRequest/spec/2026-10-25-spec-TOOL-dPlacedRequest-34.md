@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-34 — the round-1 spec audit's minors: one fetch and one cache, honest censuses and counts, every reader of a moved name, and bounded walks
 
-**Status:** DEFERRED · rev-12 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 22 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-13 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 22 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -23,6 +23,7 @@
 | [2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-21 |
 | [2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-16 |
 | [2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 |
+| [2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-63 |
 | [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 |
 
@@ -109,9 +110,12 @@ item amends its named unit's code. ACn observes Sn.
   rewritten. by value: NO VALUE READERS after unit 11 S6. Observed by AC26.
 - **S27** — finding 49 (M20). That gotcha gains a dated paragraph naming unit 11's removal of the lock
   and what serialises the two pushes now. Observed by AC27.
-- **S28** — finding 26 (M21), the skeptic's fix. `readCard` resolves bash as `tools/roles/handoff.py`'s
-  `resolve_bash` (`:225`), folds `/c/…` output through `buildNativePath` (`:819`), and reads a silent
-  checker as no card, named. Observed by AC28.
+- **S28** — finding 26 (M21), the skeptic's fix. `readCard` resolves bash in
+  `tools/lib/resolve_bash.py#resolve_bash`'s run-each-candidate order, as
+  `tools/policy/policy-mirror.js#resolveBash` ports it, probing `test -f` on the checker it runs
+  (`TOOL-dWitnessedBar-26`'s `resolve_bash.js` once landed); it folds `/c/…` output through
+  `tools/hooks/scratch-guard.js#buildNativePath` and reads a silent checker as no card, named.
+  Observed by AC28.
 - **S29** — finding 27 (M22). Unit 1's fixture is hermetic: `render_playbook.py --fleet-tag` takes
   `--fleet <path>`, the fixture plants `fleet.toml` and `COMPUTERNAME`, and an empty-`host` row
   resolves by user. Observed by AC29.
@@ -144,8 +148,8 @@ item amends its named unit's code. ACn observes Sn.
   build time: the verbs guide names unit 5's third opt-in source and the protocol points there; unit
   43 S21's shorter `RUN_CLAIMS` row nets S35's bytes against the row's zero headroom. Observed by
   AC37.
-- **S38** — finding 48 (M29). `gen_map.py --write` regenerates `memory/map/generated/` once over the
-  final tree, so `symbols.json` names every minted function and none deleted. **Readers:** by name:
+- **S38** — finding 48 (M29). A unit minting or deleting a function regenerates the map in its own
+  pass; this pass's `gen_map.py --write` re-checks `memory/map/generated/` over the final tree, so `symbols.json` names every minted function and none deleted. **Readers:** by name:
   READER NOT IN TREE, since TOOL-aPiecewiseGrade-6 renamed `write_claim_push_lock`'s family. by value:
   NO VALUE READERS. Observed by AC38.
 - **S39** — finding 50 (M30). `derive_claims_line`'s ranking gains `released`, hidden past
@@ -243,6 +247,7 @@ item amends its named unit's code. ACn observes Sn.
 - **hands-off** `TOOL-dPlacedRequest-54` — AC59, which that unit cuts to one line pointing at 44 AC1
 - **hands-off** `TOOL-dPlacedRequest-57` — AC59, from which that unit drops the base
 - **hands-off** `TOOL-dPlacedRequest-59` — this spec's size, which that unit cuts in prose if over 48128
+- **hands-off** external — `TOOL-dWitnessedBar-26`'s site census, which gains `scratch-guard.js`'s `readCard` (S28)
 
 ## 4. Design
 
@@ -311,6 +316,8 @@ cost (S28) and the alternatives rejected are in the design record
 - `memory/map/features/unattended-stops.md`
 - `memory/gotchas/decision-re-derived-by-a-second-process.md`
 - `memory/map/generated/symbols.json`
+- `tools/lib/resolve-python.test.sh`
+- `help/loop.md`
 
 ## 5. Production-readiness checklist
 
@@ -322,7 +329,8 @@ cost (S28) and the alternatives rejected are in the design record
 - risks — S36 moves kickoff text behind one pointer; S43's early `stale` is the verdict anyway.
 - testing — the probes of §6 and the arms of §7.
 - migration — none: every item lands before anything it amends ships.
-- user docs — the verbs, stops and protocol guides and `RESUME.md`; no `help/` page covers these kits.
+- user docs — the verbs, stops and protocol guides, `RESUME.md`, and `help/loop.md`'s `--lease` and
+  `--card-ref` anchors, refreshed for `status` and `lookup`.
 
 ## 6. Acceptance criteria
 
@@ -393,7 +401,8 @@ Fixtures are the named unit's own unless an item names one.
 - **AC27** — When `grep -n 'TOOL-dPlacedRequest-11'` runs over the S26 gotcha, a dated paragraph
   names the lock's removal. Red when: the gotcha stops at the lock.
 - **AC28** — When a `node -e` probe calls `readCard` with a stub checker printing a `/c/` path, it
-  reads the card at the `C:/` path. Red when: the MSYS path reads as no card.
+  reads the card at the `C:/` path; with a non-running bash first on PATH and a working one second,
+  it reads the card. Red when: the MSYS path, or a stub bash, reads as no card.
 - **AC29** — When unit 1's fixture plants a `fleet.toml` with an empty-host row and a `COMPUTERNAME`,
   `--lease acquire build tFix` takes `fleet-tag` from that row. Red when: it rests on the machine.
 - **AC30** — When `USERNAME` matches a row in another case and `GOV_NODE` is unset, the tag resolves;
@@ -472,23 +481,22 @@ Fixtures are the named unit's own unless an item names one.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `lexicon naming predicates` · `spawn budget (forks per hot entrypoint)` · `recall floor` · `recall floor arms` · `manifest-check self-test` · `scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `branch-guard self-test` · `pre-push self-test` · `pre-push run-log line` · `pre-push bar self-test` · `push-main self-test` · `transition-audit arms` · `straggler-guard arms` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `playbook render selftest` · `kickoff engine size <=18KiB` · `unattended protocol size` · `codebase-map coverage + freshness` · `codebase-map gate coverage` · `harness arms (fail branches armed or pinned)` · `tier2-review self-test` · `policy fixtures`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `lexicon naming predicates` · `spawn budget (forks per hot entrypoint)` · `recall floor` · `recall floor arms` · `manifest-check self-test` · `scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `docs` · `branch-guard self-test` · `pre-push self-test` · `pre-push run-log line` · `pre-push bar self-test` · `push-main self-test` · `transition-audit arms` · `straggler-guard arms` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `playbook render selftest` · `kickoff engine size <=18KiB` · `unattended protocol size` · `codebase-map coverage + freshness` · `codebase-map gate coverage` · `harness arms (fail branches armed or pinned)` · `tier2-review self-test` · `policy fixtures`
 
 New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC14 AC15 AC22 AC23 AC33 AC40 AC43 AC45 AC49 AC54 · each item's plant, staged against the unit it amends · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
 New arm: tools/push-main.test.sh · covers AC6 · the fenced landing's cache ref, staged against `add_feed_event` alone · its assertion count raised
 New arm: .githooks/pre-push.test.sh · covers AC24 AC25 · a parented claim beat pushed alone, staged against the base `<sha>^ missing` predicate · its assertion count raised
-New arm: tools/hooks/scratch-guard.test.sh · covers AC28 · a stub checker printing a `/c/` path, staged against a bare `bash` and no fold · none
+New arm: tools/hooks/scratch-guard.test.sh · covers AC28 · a stub checker printing a `/c/` path and a stub bash first on PATH, staged against a bare `bash`, no fold and an existence-only resolver · none
+New arm: tools/lib/resolve-python.test.sh · covers AC28 · a 2j row holding `readCard`'s order to `resolve_bash.py`'s, staged by a reorder · none
 New arm: skills/session-kickoff/card-store.fixture.sh · covers AC7 AC9 AC11 AC12 AC39 · the terminal-route, hung-lookup, replay and released plants, staged against `TOOL-dPlacedRequest-2`'s local ref and fetch · none
 
 ## 8. Open questions
 
-- **F1 — Where does the kickoff text that overflows SKILL.md go (S36)?** (a) `RESUME.md`, pointed at
-  in one line; (b) a trim elsewhere in SKILL.md; (c) a raised limit, an owner's ceiling. (b) cuts
-  text other units wrote.
-  RESOLVED (agent, 2026-10-25, delegated): (a), rung 3. widens: none · relaxes: none
+- **F1 — Where does the kickoff text that overflows SKILL.md go (S36)?** (a) `RESUME.md`; (b) a trim
+  elsewhere, cutting other units' text; (c) a raised limit, an owner's ceiling. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3. widens: none · relaxes: none
 - **F2 — How is the claim's offline outcome stated once (S14)?** (a) It never queues, `offline`
-  routing to `awaiting` but under `refuse`; (b) a queued claim is `awaiting` and a flush lands it,
-  needing a yield to reach an ended session. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3.
+  routing to `awaiting` but under `refuse`; (b) a queued claim is `awaiting`, needing a yield to reach
+  an ended session. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3.
   widens: none · relaxes: none
 - **F3 — How is the age pass bounded (S43)?** (a) A streaming walk stopping at the first commit
   sighted before the window; (b) per-ref `git log -n`, a process per ref; (c) a `renewed-by` key,
@@ -528,6 +536,9 @@ New arm: skills/session-kickoff/card-store.fixture.sh · covers AC7 AC9 AC11 AC1
   it leaves DEFERRED, §4's evidence, walk, sizes, deletion and cost moved to the design record, no item,
   criterion, edge or fork dropped; finding 28 (H4), S57 and AC57 name `remove_gov_ref`;
   finding 17 (M5), S5 and S17 name unit 13's helper list.
+- rev-13 · 2026-11-19 · §2 S28, S38 · §3 · §4 · §5 · §6 AC28 · §7 · §8 · §10 · folds
+  `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`: findings 11 (M5, S28, AC28), 16 (M7, `docs`)
+  and 17 (M8, S38 a final re-check only).
 
 ## 10. Reuse audit
 
@@ -537,6 +548,7 @@ claim fetch (`tools/unattended/unattended.sh:2136`) and the claims cell
 "append an event only when the ref's newest event differs" ranked name stems only
 (`add_health_event`, `claims`): no seam fits beyond the units named. `python
 tools/memory-recall/query.py` over "how does the feed avoid appending a retried write twice" returned
-units 2 and 13 and the audit's items; none disagrees with source.
+units 2 and 13 and the audit's items; none disagrees with source. S28 takes `resolveBash`'s order, not
+`tools/roles/handoff.py`'s existence-only one.
 
 Recall terms used: feed sightings cache census card lookup FETCH_HEAD parity size limit offline claim walk bound

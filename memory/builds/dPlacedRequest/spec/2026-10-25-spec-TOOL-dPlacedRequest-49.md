@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-49 — the round-2 promotions' minors: one bound per question, traps before takes, every carrier observed, and criteria that can fail
 
-**Status:** DEFERRED · rev-5 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 26 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 26 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-44-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-44-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 |
 | [2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 |
+| [2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-63 |
 | [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-52 |
 
@@ -100,14 +101,16 @@ build, at order 26, after units 44, 45 and 48 at 25. Criterion ACn observes item
 - **S13** — finding 4 (M7). `TOOL-dPlacedRequest-43` S22's and AC22's ceiling is 48128, 1 KiB under
   the 49152 spec ceiling, DERIVED. It rests on one dated measurement: unit 34 measured 55953 bytes at
   rev-11 and, after the cut the disposal of `2026-11-19-review-dPlacedRequest-spec-audit-round-1`
-  made, 47185 at rev-12, both PINNED 2026-11-19 with the records region as it stood then; that
-  record's own row adds about 0.7 KB when it renders. Observed by AC13.
+  made, 47885 at rev-12 (blob `dd223d03`), both PINNED 2026-11-19 with the records region as it stood
+  then, 243 under 48128; the records rows measured since run 557 and 1562 bytes each, so one render
+  can cross the ceiling. This unit's pass re-measures 34 after `gen_build_index.py --write`, and a
+  spec over 48128 then is cut in prose here, as 43 S22 cuts it. Observed by AC13.
 - **S14** — finding 19 (L3). `TOOL-dPlacedRequest-43` §4's pinned 50111 names the commit it was
   measured at, `dfb9b0d3`, beside the rev-5 figure. Observed by AC14.
 - **S15** — finding 20 (M8). `TOOL-dPlacedRequest-43` §4's scratch-guard evidence names `readCard`
-  (`tools/hooks/scratch-guard.js:667`), which spawns nothing at the base, its bash spawn added by
-  `TOOL-dPlacedRequest-34` S28, and states that `:710` is `checkAuthorizedReadme`'s `runGit`, which
-  takes no bound. Observed by AC15.
+  (`tools/hooks/scratch-guard.js#readCard`), which spawns nothing at the base, its bash spawn added by
+  `TOOL-dPlacedRequest-34` S28, and states that `checkAuthorizedReadme`'s `runGit` takes no bound,
+  beside `readOpenReds`' `runGit`, which takes one. Observed by AC15.
 - **S16** — finding 25 (L4). `readCard`'s bound is a named constant, `CARD_READ_BOUND_MS = 5000`,
   with a `SCRATCH_GUARD_CARD_READ_BOUND_MS` override for the arm, shaped as `runLiveness`
   (`tools/unattended/stop-guard.js@fce3251b:119-127`) with its whole option set: `timeout: bound,
@@ -136,10 +139,11 @@ build, at order 26, after units 44, 45 and 48 at 25. Criterion ACn observes item
 - **S24** — finding 27 (M16). `TOOL-dPlacedRequest-36`, `-37`, `-38` and `-39` each state in §4 that
   their write sets meet in `tools/lib/gov-feed.sh` and its carriers, and that their passes run in
   sequence despite the shared order 5, as `--dispatch` enforces. Observed by AC24.
-- **S25** — finding 37 (M17). `--request` retries `requests.lock` every 50 ms for up to 5 s, as
-  `TOOL-dPlacedRequest-24` S2's two callers do; a lock it cannot take prints `request not written —
-  requests.lock busy`, exits 2 and writes nothing. `TOOL-dPlacedRequest-37` S1 names the request
-  section among those `NODE_LOCK_BOUND` covers. Observed by AC25.
+- **S25** — finding 37 (M17). `--request` takes `requests.lock` through `write_dir_lock_wait`, the
+  one retrying take `TOOL-dPlacedRequest-24` S2 mints beside `write_dir_lock` in `gov_feed_sh`, with
+  the 5 s ceiling its two callers pass; no third copy of the 50 ms loop exists. A lock it cannot take
+  prints `request not written — requests.lock busy`, exits 2 and writes nothing. `TOOL-dPlacedRequest-37` S1 names the request
+  section among those `NODE_LOCK_BOUND` covers. Observed by AC25 and AC35.
 - **S26** — finding 38 (M18), the skeptic's corrected fix. `TOOL-dPlacedRequest-41`'s offline write
   refuses when the newest queued line's commit is absent under `git cat-file -e` or the line fails the
   four-field shape: one `queue: NOTE - <ref>: queued commit unreadable; nothing queued` line, exit 2,
@@ -179,7 +183,7 @@ build, at order 26, after units 44, 45 and 48 at 25. Criterion ACn observes item
 ### Edges
 
 - **consumes-from** `TOOL-dPlacedRequest-2` — the card-store fixture, which S18 gives the `publish-late` plant
-- **consumes-from** `TOOL-dPlacedRequest-24` — `write_dir_lock`, whose write order S5 sets
+- **consumes-from** `TOOL-dPlacedRequest-24` — `write_dir_lock`, whose write order S5 sets, and `write_dir_lock_wait`, which S25 calls
 - **consumes-from** `TOOL-dPlacedRequest-33` — `--card-ref write`'s bound, which S1 names
 - **consumes-from** `TOOL-dPlacedRequest-34` — AC59, which S3 rewrites
 - **consumes-from** `TOOL-dPlacedRequest-36` — the Goal, S2, AC1 to AC3 and §4, which S7, S9, S24 and S30 amend
@@ -253,6 +257,9 @@ caller: overlaps | claims | card publish | card lookup each prints its own line 
   S2, S21, S22
 - `skills/session-kickoff/card-store.fixture.sh`: S18
 - `tools/hooks/scratch-guard.js` and `tools/hooks/scratch-guard.test.sh`: S16
+- `memory/map/generated/`: regenerated by the codebase-map kit's `gen_map.py --write` in this
+  unit's own pass wherever its diff mints, renames or deletes a function the symbol extractor reads;
+  `TOOL-dPlacedRequest-34` S38 is the final re-check only
 - `tools/unattended/README.md`: S34
 - `memory/builds/dPlacedRequest/spec/`: the specs of units 33, 34, 36 to 41 and 43, each edit a rev
   bump with its §9 line: S1, S3, S4, S6, S7, S9, S11 to S15, S17, S19, S23, S24, S25, S27 to S31, S33,
@@ -322,12 +329,14 @@ block, each `RUN_CLAIMS=on` unless stated.
   compare-and-swap passes `-` literally fails to push. Red when: the encoding is never read.
 - **AC13** — When `gen_build_index.py --write` has rendered and `wc -c` reads unit 34's spec, it
   prints at most 48128, and unit 43's S22 and AC22 name 48128. Red when: a ceiling no named cut reaches.
-  figure: 55953 at rev-11 and 47185 at rev-12, PINNED 2026-11-19; 48128 DERIVED as 49152 less 1024.
+  figure: 55953 at rev-11 and 47885 at rev-12, PINNED 2026-11-19; 48128 DERIVED as 49152 less 1024.
 - **AC14** — When `grep -n '50111' 2026-10-25-spec-TOOL-dPlacedRequest-43.md` runs, the line names
   `dfb9b0d3`. Red when: a pin carries no commit.
-- **AC15** — When `grep -n ':710' 2026-10-25-spec-TOOL-dPlacedRequest-43.md` runs, the line names
-  `checkAuthorizedReadme`, and the `spawnSync('git'` line of `scratch-guard.js` carries no `timeout`.
-  Red when: the bound lands on the README call.
+- **AC15** — When `grep -n 'checkAuthorizedReadme' 2026-10-25-spec-TOOL-dPlacedRequest-43.md` runs,
+  the §4 Evidence line names its `runGit`, and the body of `checkAuthorizedReadme`, cut from
+  `function checkAuthorizedReadme(` to the next line opening `function ` in `scratch-guard.js`, holds
+  one `spawnSync('git'` call and no `timeout`. Red when: the bound lands on the README call; a
+  file-wide grep, which also matches `readOpenReds`' bounded call, is not this observation.
 - **AC16** — When `readCard`, required from `tools/hooks/scratch-guard.js`, runs under
   `SCRATCH_GUARD_CARD_READ_BOUND_MS=500` over a stub checker sleeping 30 s, it returns no card within
   2 s; over a stub that backgrounds a sleeping child holding stdout, within 1.5 s; and
@@ -378,12 +387,16 @@ block, each `RUN_CLAIMS=on` unless stated.
 - **AC34** — When a probe lists each token `add_health_event` is passed in `unattended.sh` and
   `gov-feed.sh` and greps `tools/unattended/README.md` for it, none is missing, `lease-yielded`
   included. Red when: an emitted event is undocumented.
+- **AC35** — When the `gov_feed_sh` block is cut from its library file, `gov-feed.sh`, and from
+  `tools/unattended/unattended.sh`, `grep -c 'sleep 0.05'` over each cut prints 1, and over
+  `unattended.sh` outside its cut prints 1, `init_bounded`'s readiness wait, which is no lock.
+  Red when: a second retry loop on a lock is written beside `write_dir_lock_wait`.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `govkit selfcheck` · `lexicon naming predicates` · `spawn budget (forks per hot entrypoint)` · `recall floor` · `recall floor arms` · `manifest-check self-test` · `scratch-guard self-test` · `agent-cap self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `format-guard self-test` · `push-main self-test` · `run-selftests self-test` · `tier2-review self-test` · `policy fixtures`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `govkit selfcheck` · `lexicon naming predicates` · `spawn budget (forks per hot entrypoint)` · `recall floor` · `recall floor arms` · `manifest-check self-test` · `scratch-guard self-test` · `agent-cap self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `format-guard self-test` · `push-main self-test` · `run-selftests self-test` · `tier2-review self-test` · `policy fixtures` · `codebase-map coverage + freshness`
 
-New arm: tools/unattended/unattended.test.sh · covers AC5 AC6 AC11 AC12 AC25 AC26 AC28 · each item's plant, staged against the unit it amends · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
+New arm: tools/unattended/unattended.test.sh · covers AC5 AC6 AC11 AC12 AC25 AC26 AC28 AC35 · each item's plant, staged against the unit it amends · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
 New arm: tools/lib/resolve-python.test.sh · covers AC8 AC10 AC20 AC32 · scratch carriers lacking the appender, reading `$ROOT` after the lock, and a quoting record, staged against unit 38's arm as written · none
 New arm: skills/session-kickoff/card-store.fixture.sh · covers AC18 · a stub driver that writes the ref and sleeps past `CARD_PUBLISH_BOUND=2`, staged against the `not written` kill line · none
 New arm: skills/session-kickoff/manifest-check.test.sh · covers AC21 AC22 · a missing conf and a stderr-only failing driver, staged against the helper printing its own line and capturing stdout alone · none
@@ -416,9 +429,15 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC16 · a stub checker that
 - rev-4 · 2026-11-19 · §2 S4, S5, S6 · §3 Edges · §4 Evidence and the sketch · §6 AC5, AC29 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1` finding 15 (H3): the node lock is the shared `write_dir_lock` family, which `TOOL-dPlacedRequest-24` rev-5 S1 moves into `gov_feed_sh`, so every name of the lock factory this spec spells is that family's: S5's write order and S6's `_fl_mine` land in that shared factory, and the guard event reads `node-guard-cleared` under the stem `node`. §7 also names `tier2-review self-test`, the leg(s) the spec-token guard join names for this spec's Files touched. §6 AC6 sources the cut by an argument path, `$s/cut.sh`, as the source join requires.
 - rev-5 · 2026-11-19 · §2 S13, S16 · §6 AC13, AC16 · §7 · folds
   `2026-11-19-review-dPlacedRequest-spec-audit-round-1`: finding 2 (H1), S13 and AC13 re-pin unit 34's
-  size on the disposal's dated measurement, 47185 at rev-12; finding 14 (L8), S16 spells
+  size on the disposal's dated measurement, 47885 at rev-12 (a figure rev-6 corrected);
+  finding 14 (L8), S16 spells
   `runLiveness`' whole option set and AC16 plants a grandchild holding stdout; finding 23 (M11), §7
   names `policy fixtures`.
+- rev-6 · 2026-11-19 · §2 S13, S15, S25 · §3 Edges · §4 Files touched · §6 AC13, AC15, AC35 · §7 ·
+  §9 rev-5 · §10 · folds `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`: findings 1, 6 and 13
+  (M1), 47885 at rev-12, the measured row sizes and a cut in prose here; finding 8 (M4), AC15 reads
+  `checkAuthorizedReadme`'s body; finding 12 (L4), S25 calls unit 24's `write_dir_lock_wait` (AC35);
+  finding 17 (M8), the map in this pass.
 
 ## 10. Reuse audit
 
@@ -426,7 +445,8 @@ Each item extends the unit its finding names, and the new code reuses four seams
 `CARD_*_BOUND` default pattern (`manifest-check.sh:220-229`) for S1 and S2, `runLiveness`'s bounded
 spawn (`tools/unattended/stop-guard.js:106-114`) for S16, the parity loop's pathspec and `blk`
 extractor (`tools/lib/resolve-python.test.sh:213-221`) for S8, S10 and S32, and
-`TOOL-dPlacedRequest-24`'s retry for S25. `python tools/codebase-map/reuse_lookup.py "bounded driver
+`TOOL-dPlacedRequest-24` S2's `write_dir_lock_wait` for S25, the one retrying take, where a third copy
+of the 50 ms loop stood before. `python tools/codebase-map/reuse_lookup.py "bounded driver
 call that returns a skip reason and captures stderr"` ranked `skip`, `boundedParallel`, `drive` and
 `read_bound_key`, name stems only, none the engine's call. `python tools/memory-recall/query.py "how
 are a spec audit's minor findings batched into one unit"` returned TOOL-dGroundRules-21, -32 and -43
