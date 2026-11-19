@@ -282,7 +282,7 @@ New arm: tools/loop/selftest.py · covers AC1 AC7 · the normalised pair keyed a
   TOOL-dPlacedRequest-34, each the mirror of that promoted unit's own edge.
 - rev-4 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirror
   hands-off TOOL-dPlacedRequest-43.
-- rev-5 · 2026-11-19 · §2 S1 · §5 · §6 AC7 · §7 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1` finding 37 (M12): the file is read as bytes and
+- rev-5 · 2026-11-19 · §2 S1 · §5 · §6 AC7 · §7 · folds `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit` finding 37 (M12): the file is read as bytes and
   decoded strictly as `utf-8-sig`, so a byte-order mark keys alike and an undecodable byte is refused
   by name; AC7 observes both. §7 also names `scratch-guard self-test`, `tier2-review self-test`, the leg(s) the spec-token guard join names for this spec's Files touched.
 - rev-6 · 2026-11-19 · §4 Files touched · §7 · folds

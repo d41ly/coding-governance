@@ -325,7 +325,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC5 · the `fence` act ov
 - rev-4 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirrors
   consumes-from TOOL-dPlacedRequest-36, consumes-from TOOL-dPlacedRequest-37, hands-off
   TOOL-dPlacedRequest-40.
-- rev-5 · 2026-11-19 · §2 S3 · §4 The fence read · §5 · §6 AC9 · §7 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1` finding 34 (M10): a fence read
+- rev-5 · 2026-11-19 · §2 S3 · §4 The fence read · §5 · §6 AC9 · §7 · folds `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit` finding 34 (M10): a fence read
   matching none of its three outcomes refuses, the lander exiting 1 with nothing pushed and printing
   the driver's exit code and first line, and only a missing driver reads `none`; AC9 plants a driver
   that exits 2 with empty output. §7 also names `scratch-guard self-test`, `tier2-review self-test`, the leg(s) the spec-token guard join names for this spec's Files touched.

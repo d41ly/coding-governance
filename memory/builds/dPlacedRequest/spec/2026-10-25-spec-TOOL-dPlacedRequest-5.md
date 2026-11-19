@@ -314,7 +314,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 · the preflight case
   and for the at-once firing past the position; S7 states the hold for each `review.blocks` value; AC1 gains
   the `audit-request-owed-only` plant, by the brief
   prompts/2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-reground.md
-- rev-6 · 2026-11-19 · §7 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1` finding 4 (M3), the unattended.test.sh arm cites README rule 8 and owes its clean reading to PLAY-dClosedLoop-14. §7 also names `scratch-guard self-test`, `tier2-review self-test`, the leg(s) the spec-token guard join names for this spec's Files touched.
+- rev-6 · 2026-11-19 · §7 · folds `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit` finding 4 (M3), the unattended.test.sh arm cites README rule 8 and owes its clean reading to PLAY-dClosedLoop-14. §7 also names `scratch-guard self-test`, `tier2-review self-test`, the leg(s) the spec-token guard join names for this spec's Files touched.
 - rev-7 · 2026-11-19 · §4 Files touched · §7 · folds
   `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`: finding 16 (M7), `help/loop.md` gains the
   `--request-consent` anchor and §7 names `docs`; finding 17 (M8), this unit's own pass regenerates

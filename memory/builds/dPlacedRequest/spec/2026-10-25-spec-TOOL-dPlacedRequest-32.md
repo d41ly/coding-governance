@@ -160,7 +160,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 · th
   `<git-common-dir>/` prefix, so it does not read as a repository path.
 - rev-3 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirrors
   hands-off TOOL-dPlacedRequest-40, hands-off TOOL-dPlacedRequest-43.
-- rev-4 · 2026-11-19 · §3 Edges · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1` findings 3, 18 and 29 (M2): the consumes-from TOOL-dPlacedRequest-20,
+- rev-4 · 2026-11-19 · §3 Edges · folds `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit` findings 3, 18 and 29 (M2): the consumes-from TOOL-dPlacedRequest-20,
   mirroring its hands-off in build order, so the offer's session half is one more read S1's rule covers. §7 also names `scratch-guard self-test`, `tier2-review self-test`, the leg(s) the spec-token guard join names for this spec's Files touched.
 - rev-5 · 2026-11-19 · §4 Files touched · §5 · §7 · folds
   `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`: finding 16 (M7), the user-docs line names

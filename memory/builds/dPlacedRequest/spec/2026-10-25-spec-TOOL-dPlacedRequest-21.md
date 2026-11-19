@@ -364,7 +364,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC2 AC4 · the `--entry-c
 - rev-6 · 2026-11-05 · §2 S6, S8 · §4 Files touched · §6 AC8 · §8 F6, F7 · the owner resolved F6 to (a) and F7
   to (a), by `2026-11-05-prompt-TOOL-dPlacedRequest-3-owner-forks`: S6 states the pre-spec id and the ask
   this build's run files in dDeclaredLoop's `BACKLOG.md`; S8, Files touched and AC8 name `principle.p39`.
-- rev-7 · 2026-11-19 · §7 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1` finding 4 (M3), the unattended.test.sh arm cites README rule 8 and owes its clean reading to PLAY-dClosedLoop-14. §7 also names `scratch-guard self-test`, `govkit acceptance matrix`, `playbook render selftest`, `policy fixtures`, the leg(s) the spec-token guard join names for this spec's Files touched.
+- rev-7 · 2026-11-19 · §7 · folds `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit` finding 4 (M3), the unattended.test.sh arm cites README rule 8 and owes its clean reading to PLAY-dClosedLoop-14. §7 also names `scratch-guard self-test`, `govkit acceptance matrix`, `playbook render selftest`, `policy fixtures`, the leg(s) the spec-token guard join names for this spec's Files touched.
 - rev-8 · 2026-11-19 · §4 Files touched · §7 · folds
   `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`: finding 16 (M7), `help/loop.md` gains the
   `--entry-claim` anchor and §7 names `docs`; finding 17 (M8), this unit's own pass regenerates

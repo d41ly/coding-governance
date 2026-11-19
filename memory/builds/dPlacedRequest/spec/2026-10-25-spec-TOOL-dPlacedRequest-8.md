@@ -272,7 +272,7 @@ New arm: tools/loop/loop_lib.py · covers AC3 AC4 AC5 AC6 · the `seed-bad`, `se
   the tier2-review self-test on 2026-11-03 (TOOL-dFairHearing-17) and the scratch-guard self-test on
   2026-11-10 (TOOL-aSmoothedDispatch-8), after this spec's 2026-10-25 revisions; the leg line names
   both legs, neither of them the unattended kit's own suites README rule 8 waives.
-- rev-5 · 2026-11-19 · §9 rev-4 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1` finding 7 (L1), the rev-4 line pairs each guard with the date it was gained: the tier2-review self-test on 2026-11-03 (TOOL-dFairHearing-17) and the scratch-guard self-test on 2026-11-10 (TOOL-aSmoothedDispatch-8).
+- rev-5 · 2026-11-19 · §9 rev-4 · folds `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit` finding 7 (L1), the rev-4 line pairs each guard with the date it was gained: the tier2-review self-test on 2026-11-03 (TOOL-dFairHearing-17) and the scratch-guard self-test on 2026-11-10 (TOOL-aSmoothedDispatch-8).
 - rev-6 · 2026-11-19 · §4 Files touched · §7 · folds
   `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`: finding 17 (M8), this unit's own pass
   regenerates `memory/map/generated/`, named in Files touched, and §7 names its leg.

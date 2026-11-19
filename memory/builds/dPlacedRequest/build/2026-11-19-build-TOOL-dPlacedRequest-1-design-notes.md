@@ -33,7 +33,7 @@ last-fetch: -
 
 A lease taken by a step checklist outside a run has no keepalive and writes `absent`. A run claim
 keeps its keepalive, session and host rules from the run-state file, unchanged
-(`tools/unattended/unattended.sh:2405-2410` at the pinned base).
+(`tools/unattended/unattended.sh@875eaadf:2405-2410` at the pinned base).
 
 ## The table, extended
 
@@ -168,7 +168,7 @@ rev-7 wrote them. Each fork id below is the spec's, and the marks here are copie
 resolution.
 
 - FACT-QUESTION · F1 — The brief gives this spec's status header the token `DRAFT`; is that legal?
-  Probe: `STATUS_TOKENS` at `tools/memory-tree/tree_lib.py:28`. Observation, 2026-10-25: the tuple holds
+  Probe: `STATUS_TOKENS` at `tools/memory-tree/tree_lib.py@772ccec8:28`. Observation, 2026-10-25: the tuple holds
   `OPEN`, `SPECCED`, `INPROGRESS`, `BLOCKED`, `DEFERRED`, `CLOSED` and `WONTDO`, and not `DRAFT`.
   Liveness: the tuple would show `DRAFT` if the vocabulary held it. RESOLVED (agent, 2026-10-25,
   delegated): `OPEN`, rung 2.

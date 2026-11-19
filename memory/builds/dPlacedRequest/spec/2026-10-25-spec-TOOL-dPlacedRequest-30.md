@@ -164,9 +164,9 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 · a date-differi
   `<git-common-dir>/` prefix, so they do not read as repository paths.
 - rev-3 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirror
   hands-off TOOL-dPlacedRequest-43.
-- rev-4 · 2026-11-19 · §3 Edges · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1` finding 15 (H3): the node lock is the shared `write_dir_lock` family, which `TOOL-dPlacedRequest-24` rev-5 S1 moves into `gov_feed_sh`, so every name of the lock factory this spec spells is that family's. §7 also names `scratch-guard self-test`, `tier2-review self-test`, the leg(s) the spec-token guard join names for this spec's Files touched.
+- rev-4 · 2026-11-19 · §3 Edges · folds `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit` finding 15 (H3): the node lock is the shared `write_dir_lock` family, which `TOOL-dPlacedRequest-24` rev-5 S1 moves into `gov_feed_sh`, so every name of the lock factory this spec spells is that family's. §7 also names `scratch-guard self-test`, `tier2-review self-test`, the leg(s) the spec-token guard join names for this spec's Files touched.
 - rev-5 · 2026-11-19 · §2 S1, S2 · §4 The order of `--request`, The fold · §6 AC2 · §7 · folds
-  `2026-11-19-review-dPlacedRequest-spec-audit-round-1` findings 15 and 31 (item L9): the collision test
+  `2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit` findings 15 and 31 (item L9): the collision test
   compares both texts under the key's own whitespace fold, a leading BOM dropped, so a CRLF, BOM,
   final-newline or re-wrapped copy is the same words again, and AC2 plants each.
 - rev-6 · 2026-11-19 · §4 Files touched · §5 · §7 · folds

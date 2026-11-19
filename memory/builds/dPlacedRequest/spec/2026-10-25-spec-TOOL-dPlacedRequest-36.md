@@ -167,7 +167,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 · the break and 
 - rev-2 · 2026-10-25 · §3 · the round-3 spec audit's disposal: the edge mirror hands-off TOOL-dPlacedRequest-49.
 - rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-3 promotions: the hands-off edge to `TOOL-dPlacedRequest-52`, mirroring its consumes-from.
 - rev-4 · 2026-11-19 · §2 S1 · §3 Edges · §4 Evidence, The break end to end, Alternatives rejected ·
-  §5 · §6 AC1, AC2 · §8 F1 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1` finding 15 (H3): the event path is the shared
+  §5 · §6 AC1, AC2 · §8 F1 · folds `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit` finding 15 (H3): the event path is the shared
   `write_dir_lock`'s, reaching the log by `ROOT` where the driver sets it and from the lock's parent
   where no `ROOT` exists, so the spec-tokens caller keeps its log; events read `node-lock-broken` and
   `node-guard-cleared` under the stem `node`. §7 also names `scratch-guard self-test`, `tier2-review self-test`, the leg(s) the spec-token guard join names for this spec's Files touched. AC1 names the factory in prose, the path-token join reading no anchor inside a criterion.

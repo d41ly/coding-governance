@@ -34,7 +34,7 @@ pass; the arms the spec's §7 declares and their RED-first observations are owed
   `STOPS.template.md` only in the sentence naming a create; `write_dir_lock()` and the take
   `write_dir_lock "$ST_LOCK"` still found.
 - AC8 — `awk` cuts of the block from `gov-ref.sh`, `unattended.sh` and `post-merge.sh` compared equal
-  by `cmp` (75 lines), and `grep -c '^gov_ref_sh|' resolve-python.test.sh` printed 1. The parity loop,
+  by `cmp` (75 lines), and `grep -c '^gov_ref_sh|' resolve-python.test.sh` printed 1. The parity loop, (DERIVED)
   run alone over that row, passed, and failed naming `post-merge.sh` under a one-byte edit of its copy.
 - AC10 — a `git` function failing only `commit-tree`: `build_gov_commit` returned 1 and printed
   nothing, `write_gov_ref` returned 2 `no source`, and the origin still named the second tip. The new

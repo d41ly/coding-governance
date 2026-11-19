@@ -365,9 +365,9 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 A
   promoted unit's own edge.
 - rev-4 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirror
   hands-off TOOL-dPlacedRequest-40.
-- rev-5 · 2026-11-19 · §4 Files touched · §7 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1`: finding 24 (H6), the kit version is the lander's to mint; finding 4 (M3), the unattended.test.sh arm cites README rule 8 and owes its clean reading to PLAY-dClosedLoop-14. §7 also names `scratch-guard self-test`, `tier2-review self-test`, `policy fixtures`, the leg(s) the spec-token guard join names for this spec's Files touched.
+- rev-5 · 2026-11-19 · §4 Files touched · §7 · folds `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit`: finding 24 (H6), the kit version is the lander's to mint; finding 4 (M3), the unattended.test.sh arm cites README rule 8 and owes its clean reading to PLAY-dClosedLoop-14. §7 also names `scratch-guard self-test`, `tier2-review self-test`, `policy fixtures`, the leg(s) the spec-token guard join names for this spec's Files touched.
 - rev-6 · 2026-11-19 · §2 S6, S7 · §3 Edges · §6 AC10 · §7 · folds
-  `2026-11-19-review-dPlacedRequest-spec-audit-round-1`: finding 29 (M12), an absent or unparsable
+  `2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit`: finding 29 (M12), an absent or unparsable
   `gov-last-fetch` records `last-fetch: -`, which the flush refuses as `epoch-fence`, observed by AC10;
   finding 28 (H4), the prune goes through `remove_gov_ref`, with the consumes-from edge to
   TOOL-dPlacedRequest-11 mirroring its hands-off.

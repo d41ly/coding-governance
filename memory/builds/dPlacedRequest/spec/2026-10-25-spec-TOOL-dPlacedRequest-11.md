@@ -386,7 +386,7 @@ New arm: tools/push-main.test.sh · covers none · arms 2d and 2e deleted with t
   hands-off to TOOL-dPlacedRequest-14.
 - rev-3 · 2026-10-25 · §3 · the round-1 spec audit's disposal: hands-off TOOL-dPlacedRequest-33,
   hands-off TOOL-dPlacedRequest-34, each the mirror of that promoted unit's own edge.
-- rev-4 · 2026-11-19 · §2 S5, S6, S7 · §4 The block, Files touched · §6 AC6, AC7, AC9 · §7 · §8 F3 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1`:
+- rev-4 · 2026-11-19 · §2 S5, S6, S7 · §4 The block, Files touched · §6 AC6, AC7, AC9 · §7 · §8 F3 · folds `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit`:
   findings 16 and 33 (H4), S6 deletes only `write_claim`'s take of `claim-push.lock`, its `busy`
   branch, the marker test and the lander's wait, keeps the shared `write_dir_lock` family the
   spec-tokens lock takes, rebuilds its Readers from `git grep`, and AC7 observes the factory kept;
@@ -394,7 +394,7 @@ New arm: tools/push-main.test.sh · covers none · arms 2d and 2e deleted with t
   is advisory and never this push's cause, the set-head hint comes from this call's own read, and AC9
   plants a concurrent token; finding 4 (M3), the unattended.test.sh arm cites README rule 8. §7 also names `scratch-guard self-test`, `tier2-review self-test`, `policy fixtures`, the leg(s) the spec-token guard join names for this spec's Files touched.
 - rev-5 · 2026-11-19 · §2 S1, S2, S3, S6 · §3 Non-goals, Edges · §4 The block, Files touched · §6 AC3,
-  AC4, AC7, AC10 · §7 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1`: finding 28 (H4),
+  AC4, AC7, AC10 · §7 · folds `2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit`: finding 28 (H4),
   the one deletion form is `remove_gov_ref`, an empty source to `write_gov_ref` returns 2 `no source`,
   and AC10 stubs a failing `commit-tree`, with the hands-off to TOOL-dPlacedRequest-16 for the prune;
   finding 8 (M3), AC4 to AC6 and AC9 run under `env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH`; finding 20

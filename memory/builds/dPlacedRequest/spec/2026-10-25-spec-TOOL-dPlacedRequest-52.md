@@ -89,7 +89,7 @@ unit and the items it carries.
   `health_log_sh` itself" is rewritten to name 38's own carrier arm as that check, 49 S8 names 38 §3
   among what it amends, and 49's Edges line to 38 names §3. Observed by AC8.
 - **S9** — finding 7 (M4). 43 S22 and AC22 read 48128, carrying 49 S13's derivation, and 49 S13
-  names S22 beside AC22; the disposal of `2026-11-19-review-dPlacedRequest-spec-audit-round-1` wrote
+  names S22 beside AC22; the disposal of `2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit` wrote
   both and cut unit 34 to 47885 bytes at rev-12 (blob `dd223d03`), PINNED 2026-11-19, 243 under
   48128, so this unit's pass re-observes the two figures and the size rather than rewriting them. It
   re-measures 34 after `gen_build_index.py --write`, and a spec over 48128 then is cut in prose here,
@@ -424,8 +424,8 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC19 · a stub 
 - rev-4 · 2026-10-25 · §3 · the disposal of the spec audit of the round-5 promotions: the hands-off edges to `TOOL-dPlacedRequest-58` and `TOOL-dPlacedRequest-59`, mirroring their consumes-from.
 - rev-5 · 2026-10-25 · §3 · the disposal of the spec audit of the round-7 promotions: the hands-off edge to `TOOL-dPlacedRequest-63`, mirroring its consumes-from.
 - rev-6 · 2026-10-25 · §3 · the disposal of the spec audit of the round-8 promotions: the hands-off edge to `TOOL-dPlacedRequest-64`, mirroring its consumes-from.
-- rev-7 · 2026-11-19 · §2 S20 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1` finding 15 (H3): the node lock is the shared `write_dir_lock` family, which `TOOL-dPlacedRequest-24` rev-5 S1 moves into `gov_feed_sh`, so every name of the lock factory this spec spells is that family's. §7 also names `tier2-review self-test`, the leg(s) the spec-token guard join names for this spec's Files touched.
-- rev-8 · 2026-11-19 · §2 S9 · §6 AC9 · §7 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1`:
+- rev-7 · 2026-11-19 · §2 S20 · folds `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit` finding 15 (H3): the node lock is the shared `write_dir_lock` family, which `TOOL-dPlacedRequest-24` rev-5 S1 moves into `gov_feed_sh`, so every name of the lock factory this spec spells is that family's. §7 also names `tier2-review self-test`, the leg(s) the spec-token guard join names for this spec's Files touched.
+- rev-8 · 2026-11-19 · §2 S9 · §6 AC9 · §7 · folds `2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit`:
   finding 2 (H1), S9 re-observes 43's 48128 and unit 34's size on the disposal's dated measurement;
   finding 23 (M11), §7 names `policy fixtures`.
 - rev-9 · 2026-11-19 · §1 · §2 S9 · §4 Files touched · §6 AC9 · §7 · folds

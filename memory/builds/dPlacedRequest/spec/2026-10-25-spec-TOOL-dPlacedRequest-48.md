@@ -168,7 +168,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 · the placed
 - rev-4 · 2026-10-25 · §3 · the disposal of the spec audit of the round-4 promotions: the hands-off edge to `TOOL-dPlacedRequest-56`, mirroring its consumes-from.
 - rev-5 · 2026-10-25 · §3 · the disposal of the spec audit of the round-5 promotions: the hands-off edge to `TOOL-dPlacedRequest-58`, mirroring its consumes-from.
 - rev-6 · 2026-10-25 · §3 · the disposal of the spec audit of the round-6 promotions: the hands-off edge to `TOOL-dPlacedRequest-61`, mirroring its consumes-from.
-- rev-7 · 2026-11-19 · §1 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1` finding 15 (H3): the node lock is the shared `write_dir_lock` family, which `TOOL-dPlacedRequest-24` rev-5 S1 moves into `gov_feed_sh`, so every name of the lock factory this spec spells is that family's.
+- rev-7 · 2026-11-19 · §1 · folds `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit` finding 15 (H3): the node lock is the shared `write_dir_lock` family, which `TOOL-dPlacedRequest-24` rev-5 S1 moves into `gov_feed_sh`, so every name of the lock factory this spec spells is that family's.
 - rev-8 · 2026-11-19 · §4 Files touched · §7 · folds
   `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`: finding 17 (M8), this unit's own pass
   regenerates `memory/map/generated/`, named in Files touched, and §7 names its leg.

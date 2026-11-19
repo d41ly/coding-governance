@@ -271,12 +271,12 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 · th
   hands-off TOOL-dPlacedRequest-43.
 - rev-4 · 2026-10-25 · §3 · the round-3 spec audit's disposal: the edge mirror hands-off TOOL-dPlacedRequest-49.
 - rev-5 · 2026-11-19 · §2 S1, S2 · §3 Edges · §4 Evidence, The queue under the lock, Inventory, Files
-  touched, Alternatives rejected · §5 · §6 AC5, AC6, AC7 · §8 F1 · §10 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1`
+  touched, Alternatives rejected · §5 · §6 AC5, AC6, AC7 · §8 F1 · §10 · folds `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit`
   finding 15 (H3) and findings 16 and 33 (H4): S1 moves the shared `write_dir_lock` family into
   `gov_feed_sh` instead of minting a second factory from bodies the base no longer holds, every node
   lock passes the stem `node`, and AC7 observes one definition and no spec naming another. §7 also names `scratch-guard self-test`, `tier2-review self-test`, the leg(s) the spec-token guard join names for this spec's Files touched.
 - rev-6 · 2026-11-19 · §2 S1, S2 · §3 Edges · §4 Evidence, Inventory, Files touched · §6 AC3, AC7 ·
-  folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1`: finding 1 (M1), S2 mints
+  folds `2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit`: finding 1 (M1), S2 mints
   `NODE_LOCK_BOUND=10` at this unit's own order, so its takes expand no empty hold, and the hands-off
   to TOOL-dPlacedRequest-37 names the guard; finding 3 (M2), AC3's retry half releases the lock on the
   call's own busy return and counts at least two attempts; finding 4 (L1), S1's Readers and §4

@@ -168,10 +168,10 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC3 · the deadline w
 - rev-2 · 2026-10-25 · §3 · the round-3 spec audit's disposal: the edge mirror hands-off TOOL-dPlacedRequest-49.
 - rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-3 promotions: the hands-off edge to `TOOL-dPlacedRequest-52`, mirroring its consumes-from.
 - rev-4 · 2026-11-19 · §2 S1 · §3 Non-goals, Edges · §4 Evidence, Alternatives rejected · §6 AC1 · §8
-  F1 · §10 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1` finding 15 (H3): the factory is the shared `write_dir_lock`, whose hold
+  F1 · §10 · folds `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit` finding 15 (H3): the factory is the shared `write_dir_lock`, whose hold
   argument carries `NODE_LOCK_BOUND`, and AC1 takes the lock through the feed's own call. §7 also names `scratch-guard self-test`, `tier2-review self-test`, the leg(s) the spec-token guard join names for this spec's Files touched.
 - rev-5 · 2026-11-19 · §1 · §2 S1, S3 · §3 Edges · §4 Evidence, Files touched, Inventory · §6 AC3 · §7 ·
-  folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1`: finding 1 (M1), `NODE_LOCK_BOUND` is
+  folds `2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit`: finding 1 (M1), `NODE_LOCK_BOUND` is
   minted by TOOL-dPlacedRequest-24 S2, so this unit narrows to its guard and the Goal no longer says
   unit 24 builds the factory from the claim-push body; finding 4 (L1), Evidence cites `write_claim`'s
   take as history; finding 11 (L5), the bash 5 floor rests on no code the build deletes, S3 tests

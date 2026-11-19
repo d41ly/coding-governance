@@ -1,4 +1,4 @@
-**Serves:** research TOOL-dPlacedRequest-65 TOOL-dPlacedRequest-66 TOOL-dPlacedRequest-67 TOOL-dPlacedRequest-68 TOOL-dPlacedRequest-69 TOOL-dPlacedRequest-70 TOOL-dPlacedRequest-71 TOOL-dPlacedRequest-73
+**Serves:** research TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-20
 
 # Brief — dPlacedRequest: the eight asks the child builds filed, adopted as spec amendments
 

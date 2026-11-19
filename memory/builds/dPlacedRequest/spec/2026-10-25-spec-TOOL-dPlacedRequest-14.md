@@ -252,7 +252,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC3 AC4 · the `--request
   the tier2-review self-test on 2026-11-03 (TOOL-dFairHearing-17) and the scratch-guard self-test on
   2026-11-10 (TOOL-aSmoothedDispatch-8), after this spec's 2026-10-25 revisions; the leg line names
   both legs.
-- rev-5 · 2026-11-19 · §7 · §9 rev-4 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1`: finding 7 (L1), the rev-4 line pairs each guard with the date it was gained: the tier2-review self-test on 2026-11-03 (TOOL-dFairHearing-17) and the scratch-guard self-test on 2026-11-10 (TOOL-aSmoothedDispatch-8); finding 4 (M3), the unattended.test.sh arm cites README rule 8 and owes its clean reading to PLAY-dClosedLoop-14.
+- rev-5 · 2026-11-19 · §7 · §9 rev-4 · folds `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit`: finding 7 (L1), the rev-4 line pairs each guard with the date it was gained: the tier2-review self-test on 2026-11-03 (TOOL-dFairHearing-17) and the scratch-guard self-test on 2026-11-10 (TOOL-aSmoothedDispatch-8); finding 4 (M3), the unattended.test.sh arm cites README rule 8 and owes its clean reading to PLAY-dClosedLoop-14.
 - rev-6 · 2026-11-19 · §4 Files touched · §7 · folds
   `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`: finding 16 (M7), `help/loop.md` gains the
   `--request-draw` anchor and §7 names `docs`; finding 17 (M8), this unit's own pass regenerates

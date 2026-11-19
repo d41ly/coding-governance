@@ -146,8 +146,8 @@ New arm: tools/lib/resolve-python.test.sh · covers AC1 AC2 AC3 · every inline 
   24 (HIGH, item H1, shared with findings 2, 13 and 32).
 - rev-2 · 2026-10-25 · §3 · the round-3 spec audit's disposal: the edge mirror hands-off TOOL-dPlacedRequest-49.
 - rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-3 promotions: the hands-off edge to `TOOL-dPlacedRequest-52`, mirroring its consumes-from.
-- rev-4 · 2026-11-19 · §3 Edges · §4 The arm · §6 AC1 · §7 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1` finding 15 (H3): the node lock is the shared `write_dir_lock` family, which `TOOL-dPlacedRequest-24` rev-5 S1 moves into `gov_feed_sh`, so every name of the lock factory this spec spells is that family's, each take passing `"$NODE_LOCK_BOUND"` and the stem `node`; AC1's plant is a take that passes the driver's bound.
-- rev-5 · 2026-11-19 · §6 AC1 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1` finding 4
+- rev-4 · 2026-11-19 · §3 Edges · §4 The arm · §6 AC1 · §7 · folds `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit` finding 15 (H3): the node lock is the shared `write_dir_lock` family, which `TOOL-dPlacedRequest-24` rev-5 S1 moves into `gov_feed_sh`, so every name of the lock factory this spec spells is that family's, each take passing `"$NODE_LOCK_BOUND"` and the stem `node`; AC1's plant is a take that passes the driver's bound.
+- rev-5 · 2026-11-19 · §6 AC1 · folds `2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit` finding 4
   (L1): AC1 cites `write_claim`'s claim-push hold as history, a take TOOL-dPlacedRequest-11 S6 deletes.
 - rev-6 · 2026-11-19 · §4 Files touched · §7 · folds
   `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`: finding 17 (M8), this unit's own pass

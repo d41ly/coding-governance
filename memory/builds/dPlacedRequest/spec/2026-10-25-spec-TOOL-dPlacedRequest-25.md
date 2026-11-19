@@ -175,7 +175,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC5 · the re
 - rev-1 · 2026-10-25 · initial draft, promoted from the round-1 spec audit's finding 20 (HIGH, item H1,
   shared with finding 1).
 - rev-2 · 2026-11-19 · §2 S1, S2 · §3 Non-goals, Edges · §4 The table · §6 AC3, AC5 · §7 · folds
-  `2026-11-19-review-dPlacedRequest-spec-audit-round-1` findings 1 and 23 (item H1): the witness verdict gains `question`, which renews under
+  `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit` findings 1 and 23 (item H1): the witness verdict gains `question`, which renews under
   `progress` even when it equals the record's witness, as `TOOL-dPlacedRequest-1` rev-7 S8 states; AC3
   counts sixteen cells and AC5 runs that unit's AC11 double renew through `derive_lease_renews`. §7 also names `scratch-guard self-test`, `tier2-review self-test`, the leg(s) the spec-token guard join names for this spec's Files touched.
 - rev-3 · 2026-11-19 · §4 Files touched · §5 · §7 · folds
