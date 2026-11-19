@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-61 — the seed stamps the null SHA when HEAD is unborn, so a before-first-commit seed writes rows the ledger reads
 
-**Status:** DEFERRED · rev-3 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 5 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-3 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 5 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
