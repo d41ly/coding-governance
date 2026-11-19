@@ -22,7 +22,7 @@ ea1efc18f, read before the first edit; the base suite is `git show 41e57fca5:too
   (1, 0, 0, 0), the two-hop checked one as (0, 1, 0, 0) and the call cycle as (0, 0, 1, 0), each
   under a millisecond; the base read the two-hop unchecked one as (0, 0, 1, 0), PINNED at blob
   `19e87517`.
-- AC4 — `FLOOR_ASSERTIONS` — `stage_cases` holds the 13 rows of section 4's table and
+- AC4 — `FLOOR_ASSERTIONS` — `stage_cases` holds the 13 rows, PINNED by section 4's table, and
   `STAGE_BOUNDARY` its new row, 14 executed assertions, PINNED by section 4's table; the floor is
   165, counted off the arms over the 151 of blob `19e87517`, DERIVED at observation, and its
   `RAISED` line names TOOL-dSettledStage-4. A copy of `read_stage_helpers` making one pass read the
